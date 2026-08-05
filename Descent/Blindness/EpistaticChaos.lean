@@ -819,8 +819,8 @@ moment `n q (1-q) (1 + 3 (n - 2) q (1-q))` has its correction term vanish at
 
 This is the fourth channel of the observable algebra, and unlike the drift and the
 jet variance it is a rational function of a quantity the corpus already owns:
-`Descent.StandardizedGenotypeMoments.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance`
-states it against `hweGenotypeVariance` itself. It diverges as the allele
+`Descent.StandardizedGenotypeMoments.hweStandardizedFourthMoment_eq_inv_genotypeVarianceHWE`
+states it against `genotypeVarianceHWE` itself. It diverges as the allele
 frequency goes to zero, so rare variants have heavy-tailed standardized
 coordinates in the precise sense that the fourth channel is large. -/
 theorem standardizedGenotype_fourth_moment (h : Foundations.HardyWeinbergModel)

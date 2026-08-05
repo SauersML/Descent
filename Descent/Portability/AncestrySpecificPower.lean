@@ -97,24 +97,27 @@ theorem fisherInformation_at_reference_point :
     written out independently in `CovarianceStructure`, `StratificationConfounding`
     and `GeneticArchitectureDiscovery`; those definitions are gone and their
     references point here, so the ploidy convention is stated in one place.
-    `Conventions.genotypeVarianceHWE_eq_hwe` ties it to `hweGenotypeVariance`,
-    which derives the factor of two from `ploidy`.
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below ties it to the kernel it
+    calls, which derives the factor of two from `ploidy`.
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_ldsc.py`, `test_hwe_fork`).
     Two million Hardy-Weinberg genotypes per cell against the realised dosage
     variance: worst 1.72 sems over a prediction spanning 0.09500 to 0.50000.
 
-    This body is `Conventions.hweGenotypeVariance` and `hweHeterozygosity` as
-    well -- one quantity under three names in three files, all three measured
-    against the same oracle, so a divergence between them would show up.
+    Independently VALIDATED again by `validation/empirical/simcov/battery_core.py`,
+    `test_hwe_variance`: realised dosage variance over 400000 Hardy-Weinberg
+    genotypes per cell, worst 0.88 sems over a prediction spanning 0.09500 to
+    0.50000. That battery was recorded against a third name for this body, in
+    Program/Conventions, which has since been deleted; both records measure
+    this quantity against the same oracle, so they belong on one declaration
+    rather than one apiece.
 
-    They ARE now related by theorem, and this note used to say they were not.
-    `hweHeterozygosity_eq_genotypeVarianceHWE` below joins the two in this file,
-    and `Conventions.genotypeVarianceHWE_eq_hwe` and
-    `Conventions.hweHeterozygosity_eq_hwe` tie both back to the third, so the
-    ploidy convention has exactly one place to change. The three names are kept
-    because they denote three different things that coincide -- see below.
+    This body is `hweHeterozygosity` as well -- two names in two files, both
+    measured against that oracle, so a divergence between them would show up.
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below joins them, so the ploidy
+    convention has exactly one place to change. The two names are kept because
+    they denote two different things that coincide -- see below.
 
     Denotes: a variance — the variance of the dosage `G ∈ {0, 1, 2}`. It is
     *not* the allelic variance `p(1-p)`, and it is numerically but not

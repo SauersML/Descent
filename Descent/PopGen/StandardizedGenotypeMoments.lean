@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Spectral.PolygenicSpectroscopy
 import Descent.Conditionals.LatentMechanismCollapse
-import Descent.Program.Conventions
+import Descent.Portability.AncestrySpecificPower
 import Descent.Core.Fst
 
 namespace Descent.PopGen
@@ -50,21 +50,21 @@ open scoped BigOperators
 -/
 
 /-- **Ploidy guard.** The genotype variance used to standardize the Mellin coordinate
-is the corpus-wide `hweGenotypeVariance`, which is built from the single `ploidy`
+is the corpus-wide `genotypeVarianceHWE`, which is built from the single `ploidy`
 constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : Foundations.HardyWeinbergModel) :
-    h.genotypeVariance = Program.hweGenotypeVariance h.altFreq := by
+    h.genotypeVariance = Portability.genotypeVarianceHWE h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold Program.hweGenotypeVariance Foundations.HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.genotypeVarianceHWE Foundations.HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
 standardized genotype is the squared centered dosage divided by the corpus genotype
 variance, with no second convention introduced. -/
-theorem standardizedSquare_eq_over_hweGenotypeVariance
+theorem standardizedSquare_eq_over_genotypeVarianceHWE
     (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.standardizedSquare g =
-      (h.centeredAltAlleleCount g) ^ 2 / Program.hweGenotypeVariance h.altFreq := by
+      (h.centeredAltAlleleCount g) ^ 2 / Portability.genotypeVarianceHWE h.altFreq := by
   unfold Foundations.HardyWeinbergModel.standardizedSquare
   rw [mellinDrift_uses_ploidy]
 
@@ -277,23 +277,23 @@ hypothesis, only the explicit floor-one and panel-mixture calculations below.
 **The fourth channel, exactly.** For a standardized Hardy-Weinberg genotype the fourth
 moment is the reciprocal of the genotype variance,
 `Descent.EpistaticChaos.standardizedGenotype_fourth_moment`, and in the corpus's own
-primitive that reads `E[x⁴] = 1 / hweGenotypeVariance q`. Two consequences are stated
+primitive that reads `E[x⁴] = 1 / genotypeVarianceHWE q`. Two consequences are stated
 below and both are checkable: the level-two coordinate is never symmetric, at any allele
 frequency, so that channel is always live one floor up; and the hub channel is blind at
 one specific frequency, `MAF = (3 - √3)/6 = 0.211324…`, where the standardized genotype
 has exactly Gaussian kurtosis.
 -/
 
-/-- **The fourth channel against the corpus primitive.** `E[x⁴] = 1 / hweGenotypeVariance q`.
+/-- **The fourth channel against the corpus primitive.** `E[x⁴] = 1 / genotypeVarianceHWE q`.
 
 This is the over-determination tie for the new observable: the fourth moment is not a
-free constant but the reciprocal of the same `hweGenotypeVariance` that
+free constant but the reciprocal of the same `genotypeVarianceHWE` that
 `mellinDrift_uses_ploidy` pins to `ploidy`. Change the ploidy convention and this stops
 compiling. -/
-theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : Foundations.HardyWeinbergModel)
+theorem hweStandardizedFourthMoment_eq_inv_genotypeVarianceHWE (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
-      1 / Program.hweGenotypeVariance h.altFreq := by
+      1 / Portability.genotypeVarianceHWE h.altFreq := by
   rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
 
 /-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
@@ -384,7 +384,7 @@ is `6q² - 6q + 1 = 0`, whose polymorphic roots are `(3 ± √3)/6`. The minor-a
 this constant.
 
 Provenance: DERIVED, not fitted. The constant is the polymorphic root of `6q² - 6q + 1`, forced
-by `hweGenotypeVariance` through `standardizedGenotype_fourth_moment`;
+by `genotypeVarianceHWE` through `standardizedGenotype_fourth_moment`;
 `gaussianKurtosisMaf_genotypeVariance` proves the variance identity and
 `standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the fourth moment is `3`
 there. Nothing is fitted and there is no free parameter.
@@ -459,8 +459,8 @@ theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
 
 /-- At the blind frequency the genotype variance is exactly `1/3`. -/
 theorem gaussianKurtosisMaf_genotypeVariance :
-    Program.hweGenotypeVariance gaussianKurtosisMaf = 1 / 3 := by
-  unfold Program.hweGenotypeVariance gaussianKurtosisMaf Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    Portability.genotypeVarianceHWE gaussianKurtosisMaf = 1 / 3 := by
+  unfold Portability.genotypeVarianceHWE gaussianKurtosisMaf Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sqrt_three_sq]
 
 /-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**
@@ -492,7 +492,7 @@ theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : Foundations.Har
   have hq1 : h.altFreq < 1 := by
     rw [hmaf]
     exact gaussianKurtosisMaf_lt_one
-  rw [hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance h hq0 hq1, hmaf,
+  rw [hweStandardizedFourthMoment_eq_inv_genotypeVarianceHWE h hq0 hq1, hmaf,
     gaussianKurtosisMaf_genotypeVariance]
   norm_num
 
@@ -1248,7 +1248,7 @@ is open upstream, so nothing here should be read as "a design can measure the fo
 
 /-- The genotype variance is at most one half, with equality at the balanced locus:
 `2q(1-q) ≤ 1/2` because `(2q-1)² ≥ 0`. -/
-theorem hweGenotypeVariance_le_half (h : Foundations.HardyWeinbergModel) :
+theorem genotypeVarianceHWE_le_half (h : Foundations.HardyWeinbergModel) :
     h.genotypeVariance ≤ 1 / 2 := by
   rw [h.genotypeVariance_eq]
   unfold Foundations.HardyWeinbergModel.refFreq
@@ -1261,7 +1261,7 @@ theorem standardizedGenotype_fourth_moment_ge_two (h : Foundations.HardyWeinberg
     2 ≤ ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, le_div_iff₀ hvar]
-  have hle := hweGenotypeVariance_le_half h
+  have hle := genotypeVarianceHWE_le_half h
   linarith [hle]
 
 /-- **Equality holds exactly at the balanced locus.** `E[x⁴] = 2` iff `q = 1/2`, so the
