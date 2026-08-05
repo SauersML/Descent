@@ -177,7 +177,7 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     `nei_fst_equilibrium_consistent` which connects the two. -/
 theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
     expectedHeterozygosity θ + fstMutationDriftEquilibrium θ = 1 := by
-  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
   ring
@@ -200,7 +200,7 @@ theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
 theorem nei_fst_equilibrium_consistent (θ : ℝ) (hθ : 0 ≤ θ) :
     (neiFst 1 (expectedHeterozygosity θ)).value = fstMutationDriftEquilibrium θ := by
   simp only [neiFst_value]
-  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
   ring

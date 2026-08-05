@@ -311,9 +311,9 @@ theorem r2_lt_of_drift_variance_pos
     PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E <
       PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A 0) V_E := by
   apply Portability.expectedR2_strictMono_nonneg V_E _ _ hVE
-  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
+  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
     exact le_of_lt (mul_pos hVA (by linarith))
-  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
+  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
     simp only [sub_zero]
     have : (1 - fst) * V_A < 1 * V_A := by
       exact mul_lt_mul_of_pos_right (by linarith) hVA

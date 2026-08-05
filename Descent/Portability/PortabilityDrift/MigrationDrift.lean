@@ -442,7 +442,7 @@ theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
 /-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
 theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = 1 / (1 + Descent.Core.scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  unfold fstMigrationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.ploidy
   ring
 
 /-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
@@ -568,7 +568,7 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
   unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**
@@ -1104,7 +1104,7 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (Descent.Core.scaledMigrationRate Ne m) = 1 := by
   unfold fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.scaledMigrationRate
-    Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    Descent.Core.fstFromFlow Descent.Core.saturation Descent.Core.ploidy
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
   have hden' : 1 + Ne * m * 4 ≠ 0 := by intro hc; apply hden; linarith
   field_simp
@@ -1288,7 +1288,7 @@ theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
   ring
@@ -1323,7 +1323,7 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
   ring
@@ -1360,7 +1360,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy at h1 h2
+    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy at h1 h2
   norm_num at h1 h2
   linarith
 

@@ -194,7 +194,7 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
     ne_of_gt (add_pos (mul_pos h1f hVA) hVE)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
-  unfold neutralDriftR2Ratio Portability.presentDayR2 Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
+  unfold neutralDriftR2Ratio Portability.presentDayR2 Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
     TransportedMetrics.r2FromSignalVariance Descent.Core.share
   field_simp [hden, hsum, hVA']
   ring
@@ -221,7 +221,7 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
     Portability.fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold Portability.fstFromGenerations Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
+  unfold Portability.fstFromGenerations Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.saturation
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
   nlinarith

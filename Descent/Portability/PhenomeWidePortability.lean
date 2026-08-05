@@ -93,7 +93,7 @@ theorem neutralPortabilityRatioLD_eq_presentDayPGSVariance
     (fst_additional ld_factor : ℝ) :
     neutralPortabilityRatioLD fst_additional ld_factor =
       presentDayPGSVariance ld_factor fst_additional := by
-  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet Descent.Core.retainedFraction; ring
+  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet Descent.Core.product Descent.Core.retainedFraction; ring
 
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)
@@ -672,7 +672,7 @@ theorem worse_than_neutral_implies_fluctuating_regime
           PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
         PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
           PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
-    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
+    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet, Descent.Core.product,
       mul_comm] using
       portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩

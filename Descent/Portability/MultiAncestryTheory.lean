@@ -56,7 +56,7 @@ signal variance `V_A × (1 - fst)`. -/
 private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
     presentDayR2 V_A V_E fst = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - fst) * V_A) V_E := by
-  simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet,
+  simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet, Descent.Core.product,
     PopGen.TransportedMetrics.r2FromSignalVariance, mul_comm,
       Descent.Core.share]
 

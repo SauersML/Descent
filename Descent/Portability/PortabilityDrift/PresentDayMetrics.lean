@@ -576,7 +576,7 @@ of the three quantities this module already computes. -/
 theorem driftMoments_scoreVariance (V_A V_E fst : ℝ) :
     (driftMoments V_A V_E fst).scoreVariance = presentDayPGSVariance V_A fst := by
   unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
-    pgsVarianceFromHet Descent.Core.retainedFraction
+    pgsVarianceFromHet Descent.Core.product Descent.Core.retainedFraction
   simp only [Descent.Core.product]
   ring
 

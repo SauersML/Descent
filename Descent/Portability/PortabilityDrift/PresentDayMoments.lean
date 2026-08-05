@@ -577,7 +577,7 @@ theorem portability_ratio_with_ld_decay
     have hscaled :
         rhoT * (V_A * (1 - fstT)) < 1 * (V_A * (1 - fstT)) :=
       mul_lt_mul_of_pos_right hRhoT_lt_one hTargetPos
-    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
+    simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet, Descent.Core.product,
       mul_assoc, mul_left_comm, mul_comm] using hscaled
   have hR2Target_lt :
       PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
@@ -591,7 +591,7 @@ theorem portability_ratio_with_ld_decay
       exact mul_nonneg hRhoTerm_nonneg (le_of_lt hVA)
     · exact hRealTarget_lt
   have hSourcePos : 0 < presentDayPGSVariance V_A fstS := by
-    unfold presentDayPGSVariance pgsVarianceFromHet
+    unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
     have h1s : 0 < 1 - fstS := by linarith
     exact mul_pos hVA h1s
   have hR2Source_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
@@ -653,7 +653,7 @@ theorem portability_ratio_lt_one_of_positive_drift
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
     unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstS := by
-      unfold presentDayPGSVariance pgsVarianceFromHet
+      unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
       have h_one_minus : 0 < 1 - fstS := by linarith
       exact mul_pos hVA h_one_minus
     exact div_pos hv_pos (by linarith)
@@ -683,7 +683,7 @@ theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
     unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
-      unfold presentDayPGSVariance pgsVarianceFromHet
+      unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
       exact mul_pos hVA h_one_minus
     exact div_pos hv_pos (by linarith)
@@ -1836,7 +1836,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 V_A V_E fst) =
       presentDayEqualVarianceGaussianAUC V_A V_E fst := by
   have hv_pos : 0 < presentDayPGSVariance V_A fst := by
-    unfold presentDayPGSVariance pgsVarianceFromHet
+    unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
     have h_one_minus : 0 < 1 - fst := by linarith
     exact mul_pos hVA h_one_minus
   have hsum_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by
