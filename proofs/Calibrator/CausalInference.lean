@@ -149,11 +149,11 @@ theorem r2_strictMono_under_effect_turnover
     r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
       r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
   -- This proof was written out a second time here, tactic for tactic, as
-  -- `effect_retention_lowers_target_r2_at_fixed_fst` in `OpenQuestions`.  That one is the
-  -- same claim with the source `Fst` carried along unused, so this is its instance at
-  -- `fstS = 0` and the argument now exists once.
-  effect_retention_lowers_target_r2_at_fixed_fst V_A V_E 0 fst ρ hVA hVE le_rfl hfst_lt
-    hfst_pos hρ_pos hρ_lt
+  -- `effect_retention_lowers_target_r2_at_fixed_fst` in `OpenQuestions`.  That one carried
+  -- a source `Fst` and two hypotheses about it that no proof term used; all three are now
+  -- gone, so the two statements coincide and the argument exists once.
+  effect_retention_lowers_target_r2_at_fixed_fst V_A V_E fst ρ hVA hVE hfst_lt
+    hρ_pos hρ_lt
 
 end SumDecompositionArithmetic
 

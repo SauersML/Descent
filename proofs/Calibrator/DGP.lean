@@ -314,11 +314,7 @@ theorem HWEPolygenicScoreDGP.mem_scoreApproximationInterval_of_abs_sub_le
       Calibrator.approximationInterval gaussianCenter dgp.scoreApproximationError := by
   simpa [Calibrator.approximationInterval] using
     (Calibrator.mem_approximationInterval_of_abs_sub_le
-    exactValue gaussianCenter dgp.scoreApproximationError
-    (by
-      unfold HWEPolygenicScoreDGP.scoreApproximationError
-      exact dgp.scoreModel.berryEsseenErrorBound_nonneg _ dgp.berryEsseenConstant_nonneg)
-    h)
+    exactValue gaussianCenter dgp.scoreApproximationError h)
 
 /-! ### Tagged DGP (Causal vs Observable Architecture)
 
@@ -3965,7 +3961,6 @@ rates only, not a theorem about total portability.
     still needs them. -/
 theorem ld_breakage_dominates_alleleFreq_divergence
     (Ne mu m_rate r : ℝ)
-    (_hNe : 0 < Ne) (_hmu : 0 ≤ mu) (_hm : 0 ≤ m_rate)
     (h_ld_fast : 1 / (2 * Ne) < 2 * r) :
     alleleFreqDivergenceRate Ne mu m_rate < ldBreakageRate r := by
   unfold alleleFreqDivergenceRate ldBreakageRate

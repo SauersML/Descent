@@ -1082,7 +1082,7 @@ variants.** Each interior variant contributes exactly the whitening gain; the
 first variant, having no left neighbour to be whitened against, contributes
 one. This is the finite-chromosome correction that the limit hides. -/
 theorem ldPrecisionTrace_eq_boundary_add_interior {decay : ℝ} (hd : |decay| < 1)
-    (nSites : ℕ) (_hsites : 1 ≤ nSites) :
+    (nSites : ℕ) :
     ldPrecisionTrace decay nSites =
       1 + ((nSites : ℝ) - 1) * ldWhiteningGain decay := by
   have hne : (1 : ℝ) - decay ^ 2 ≠ 0 := by
@@ -1107,7 +1107,7 @@ theorem ldPrecisionTrace_div_sites_tendsto {decay : ℝ} (hd : |decay| < 1) :
     filter_upwards [Filter.eventually_ge_atTop 1] with nSites hsites
     have hpos : (0 : ℝ) < (nSites : ℝ) := by
       exact_mod_cast Nat.lt_of_lt_of_le Nat.zero_lt_one hsites
-    rw [ldPrecisionTrace_eq_boundary_add_interior hd nSites hsites]
+    rw [ldPrecisionTrace_eq_boundary_add_interior hd nSites]
     field_simp
     ring
   have hzero : Filter.Tendsto

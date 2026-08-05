@@ -261,7 +261,6 @@ theorem mean_shift_changes_benchmark_high_score_rate
 theorem variance_change_changes_benchmark_high_score_rate
     (threshold μ σ_S σ_T : ℝ)
     (h_σS : 0 < σ_S)
-    (_h_σT : 0 < σ_T)
     (h_larger : σ_S < σ_T)
     (h_thr : 0 < threshold - μ) :
     benchmarkHighScoreRate threshold μ σ_S <

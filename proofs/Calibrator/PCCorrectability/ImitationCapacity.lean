@@ -1196,11 +1196,12 @@ the same reason a participation-ratio `m_eff` cannot set a threshold.
 Two consequences follow, and both are proved below.
 
 1. `pcCorrectabilityMargin > 0` is **not sufficient** for detectability.  It
-   omits the headroom term.  `imitable_despite_positive_pcCorrectabilityMargin`
-   exhibits a spike that is a legal background — undetectable at any sample
-   size — while the existing margin is positive.  The existing docstring's
-   claim that a positive value is the detectable side holds only under an
-   additional hypothesis.
+   omits the headroom term.  `imitable_within_traceWindowBudget` exhibits a
+   spike that is a legal background — undetectable at any sample size —
+   whenever it fits inside the trace-window budget, and the margin does not
+   enter that statement at all, so in particular a positive margin does not
+   exclude the case.  The existing docstring's claim that a positive value is
+   the detectable side holds only under an additional hypothesis.
 2. That hypothesis is **rigidity**.  When the trace window is active at the
    baseline, the headroom is zero, `stratificationCertificateMargin` collapses
    to `pcCorrectabilityMargin`, and its sign is then exactly the statement that
@@ -1338,19 +1339,24 @@ theorem stratificationCertificateMargin_zero_headroom (n M F m : ℝ) :
   unfold stratificationCertificateMargin pcCorrectabilityMargin
   ring
 
-/-- **A positive `pcCorrectabilityMargin` does not imply detectability.**
+/-- **A spike inside the trace-window budget is imitable, whatever the margin.**
 
-The hypothesis `_hmargin` is deliberately unused, and its being unused is the
-content: whenever the spike fits inside the trace-window budget, the spiked
-covariance is a legal background and no test at any sample size can separate
-it, however far the spike clears the spectral edge.  What the existing margin
-omits is the headroom, and the omission is not conservative. -/
-theorem imitable_despite_positive_pcCorrectabilityMargin
-    {N : ℕ} (m : ℕ) (F markerCount : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
+Whenever the spike fits inside the budget, the spiked covariance is a legal background and
+no test at any sample size can separate it -- however far the spike clears the spectral
+edge.  `pcCorrectabilityMargin` does not appear in this statement *at all*, and that is
+the point: it is not that a positive margin fails to help, it is that the margin is not
+among the quantities the conclusion depends on. What the existing margin omits is the
+headroom, and the omission is not conservative.
+
+The statement used to be named `imitable_despite_positive_pcCorrectabilityMargin` and to
+bind `0 < pcCorrectabilityMargin ...` as a hypothesis its proof never touched. The
+unconditional statement is strictly stronger -- it covers a positive margin as one case --
+and a premise carried only so that a name could allude to it is a decoration. -/
+theorem imitable_within_traceWindowBudget
+    {N : ℕ} (m : ℕ) (F : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : VarianceNonneg (S₀ - base))
-    (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget)
-    (_hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)) :
+    (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull
       ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)
         (demographicSpikeDirection N m)) := by

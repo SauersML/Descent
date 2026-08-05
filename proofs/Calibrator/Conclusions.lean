@@ -276,7 +276,7 @@ Until those exist, this is a correct conditional theorem about Brier scores and 
 Bayesian content. The rename is the point: the previous name asserted the conclusion that
 steps 1–3 would have licensed. -/
 theorem brier_le_at_prob_mean_when_mean_is_true (pred : PosteriorPrediction)
-    (π : ℝ) (_hπ : 0 ≤ π ∧ π ≤ 1)
+    (π : ℝ)
     (h_true : π = pred.prob_mean) :
     expectedBrierScore pred.prob_mean π ≤ expectedBrierScore pred.prob_mode π := by
   -- The posterior mean IS the true probability, so by the proper scoring rule,
@@ -939,7 +939,6 @@ theorem brierRisk_target_le_mul_source_of_withDensity
     (hw_meas : AEMeasurable (fun z ↦ ENNReal.ofReal (w z)) μS)
     (hw_nonneg : ∀ z, 0 ≤ w z)
     (hw_bdd : ∀ z, w z ≤ M)
-    (_hM_nonneg : 0 ≤ M)
     (h_int_source : Integrable (fun z ↦ expectedBrierScore (q z).1 (η z).1) μS)
     (h_int_weighted : Integrable (fun z ↦ w z * expectedBrierScore (q z).1 (η z).1) μS) :
     brierRisk μT η q ≤ M * brierRisk μS η q := by

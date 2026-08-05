@@ -6,19 +6,20 @@
 set -u
 export PATH=$HOME/.elan/bin:$PATH
 HERE=$(cd "$(dirname "$0")" && pwd)
-MODE=${1:-one}   # one | all
+MODE=${1:-one}   # one | all | vacuity
 # The scripts use 3.12 f-string nesting; a bare `python3` is 3.6 on some
 # clusters and dies with a SyntaxError that reads like a bug in the emitter.
 PY=${PYTHON:-$(command -v python3.12 || command -v python3)}
 SRC=$(ls proofs/Calibrator/*.lean | grep -v TProbe)
 rm -f proofs/Calibrator/TProbe*.lean
-if [ "$MODE" = all ]; then
-  "$PY" "$HERE/mutate.py" --all-at-once proofs/Calibrator $SRC
-  G=TACGUARD-C2
-else
-  "$PY" "$HERE/mutate.py" proofs/Calibrator $SRC
-  G=TACGUARD-C1
-fi
+case "$MODE" in
+  all)     "$PY" "$HERE/mutate.py" --all-at-once proofs/Calibrator $SRC
+           G=TACGUARD-C2 ;;
+  vacuity) "$PY" "$HERE/mutate.py" --vacuity proofs/Calibrator $SRC
+           G=VACGUARD-C3 ;;
+  *)       "$PY" "$HERE/mutate.py" proofs/Calibrator $SRC
+           G=TACGUARD-C1 ;;
+esac
 "$PY" "$HERE/calibrate.py" proofs/Calibrator $G
 rm -rf .mutlogs && mkdir -p .mutlogs
 # The options MUST be on the command line.  `set_option maxErrors` inside the
@@ -32,9 +33,9 @@ ls proofs/Calibrator/TProbe*.lean | \
 cat .mutlogs/*.log > mutation-$MODE.log
 rm -rf .mutlogs
 echo "TRUNCATED=$(grep -c 'maximum number of errors' mutation-$MODE.log)"
-if [ "$MODE" = all ]; then
-  "$PY" "$HERE/score.py" mutation-$MODE.log proofs/Calibrator ALLMUT UNCONDITIONAL
-else
-  "$PY" "$HERE/score.py" mutation-$MODE.log proofs/Calibrator MUT DROPPABLE
-fi
+case "$MODE" in
+  all)     "$PY" "$HERE/score.py" mutation-$MODE.log proofs/Calibrator ALLMUT UNCONDITIONAL ;;
+  vacuity) "$PY" "$HERE/score.py" mutation-$MODE.log proofs/Calibrator VACMUT VACUOUS ;;
+  *)       "$PY" "$HERE/score.py" mutation-$MODE.log proofs/Calibrator MUT DROPPABLE ;;
+esac
 rm -f proofs/Calibrator/TProbe*.lean

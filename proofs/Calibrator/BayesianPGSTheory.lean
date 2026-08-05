@@ -415,12 +415,12 @@ theorem scaled_bias_strictMono (c fst x y : ℝ)
     is the strict inequality. A `≤` conclusion would be weaker than the headline claims,
     and it also holds at `α = 1`, that is under no attenuation at all.
 
-    `_h_α_pos` is deliberately unused and marked as such: `α > 0` is part of the modelled
-    range of an attenuation factor, but the inequality does not need it. -/
+    `α > 0` is part of the modelled range of an attenuation factor, but the inequality does
+    not need it, so it is not a hypothesis here. -/
 theorem multi_ancestry_reference_reduces_bias
     (c fst α : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (_h_α_pos : 0 < α) (h_α_lt : α < 1) :
+    (h_α_lt : α < 1) :
     c * α * fst < c * fst := by
   simpa using scaled_bias_strictMono c fst α 1 h_c h_fst h_α_lt
 
@@ -430,12 +430,11 @@ theorem multi_ancestry_reference_reduces_bias
     Model: bias in a region = c · n_correlated_snps · fst.  Long-range LD
     regions have more correlated SNPs, so the bias is larger.
 
-    `_h_short_pos` is deliberately unused and marked as such: a nonnegative SNP count is part
-    of the modelled range, but the inequality follows from the comparison alone. -/
+    A nonnegative SNP count is part of the modelled range, but the inequality follows from
+    the comparison alone, so it is not a hypothesis here. -/
 theorem long_range_ld_worse_mismatch
     (c fst n_short n_long : ℝ)
     (h_c : 0 < c) (h_fst : 0 < fst)
-    (_h_short_pos : 0 < n_short)
     (h_more_snps : n_short < n_long) :
     c * n_short * fst < c * n_long * fst :=
   scaled_bias_strictMono c fst n_short n_long h_c h_fst h_more_snps
@@ -724,10 +723,9 @@ theorem global_shrinkage_controls_sparsity
     are kept for that reason, but they carry no weight in the proof. -/
 theorem ct_r2_le_prs_cs_r2_of_assumed_noise_ordering
     (h_sq p M noise_ct noise_cs : ℝ)
-    (h_hsq : 0 < h_sq) (_h_p : 0 < p) (h_M : 0 < M)
+    (h_hsq : 0 < h_sq) (h_M : 0 < M)
     (h_pM : p ≤ M)
-    (_h_noise_ct : 0 ≤ noise_ct) (h_noise_ct1 : noise_ct < 1)
-    (_h_noise_cs : 0 ≤ noise_cs) (_h_noise_cs1 : noise_cs < 1)
+    (h_noise_ct1 : noise_ct < 1)
     (h_cs_better : noise_cs ≤ noise_ct) :
     h_sq * (p / M) * (1 - noise_ct) ≤ h_sq * (1 - noise_cs) := by
   have h_pM_ratio : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
@@ -747,14 +745,14 @@ theorem ct_r2_le_prs_cs_r2_of_assumed_noise_ordering
 
     The reversal is a rearrangement of `h_penalty_large`, which is the modelling assumption
     that the mismatch penalty exceeds the SNP-count advantage; the theorem does not
-    establish that any real LD mismatch is that large. `_h_r2`, `_h_p` and `_h_pen_lt` are
-    unused: the rearrangement holds without them. -/
+    establish that any real LD mismatch is that large. Positivity of the base `R²`, of the
+    SNP count and of the penalty gap are not hypotheses here: the rearrangement holds
+    without them. -/
 theorem ld_mismatch_can_reverse_advantage
     (base_r2 p M mismatch_penalty : ℝ)
-    (_h_r2 : 0 < base_r2) (_h_p : 0 < p) (h_M : 0 < M)
+    (h_M : 0 < M)
     (h_pM : p ≤ M)
-    (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty)
-    (_h_pen_lt : mismatch_penalty < base_r2) :
+    (h_penalty_large : base_r2 * (1 - p / M) < mismatch_penalty) :
     base_r2 - mismatch_penalty < base_r2 * (p / M) := by
   have : p / M ≤ 1 := by rwa [div_le_one (by linarith : (0:ℝ) < M)]
   nlinarith

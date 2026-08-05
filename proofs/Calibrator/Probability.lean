@@ -618,7 +618,6 @@ def approximationInterval (center epsilon : ℝ) : Set ℝ :=
 /-- Any quantity within absolute error `ε` belongs to the corresponding approximation interval. -/
 theorem mem_approximationInterval_of_abs_sub_le
     (x center epsilon : ℝ)
-    (_heps : 0 ≤ epsilon)
     (h : |x - center| ≤ epsilon) :
     x ∈ approximationInterval center epsilon := by
   unfold approximationInterval

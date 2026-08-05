@@ -2586,19 +2586,19 @@ tested set empty and hence the zero overlap matrix. Any future construction must
 therefore use a different pair of matrices with the same separation, not these
 two read literally.
 
-Within that scope the point stands. The hypothesis `hrecurrence` — that the two
-agree in the whole variant-recurrence profile — is an argument of the theorem and
-is *never used in the proof*. That is the content: recurrence is a star density,
-it is compatible with either value of the fourth cycle density, and a scheme that
+Within that scope the point stands, and the statement no longer mentions recurrence at
+all. It used to take `∀ i, resampled.variantRecurrence i = design.variantRecurrence i` as
+a hypothesis its proof never touched, and was named for it. Dropping it makes the theorem
+strictly stronger and says the same thing more directly: the fourth cycle density is free
+on this pair *whatever* the recurrence profiles do, matched or not. Recurrence is a star
+density, it is compatible with either value of the fourth cycle density, and a scheme that
 preserves it has preserved nothing the limit law depends on.
 
 The prescription is `CycleDeterminacy.cycle_preserving_resampling_is_a_calibration`:
 preserve the cycle densities, of which the fourth is the first that bites in the
 quadratic sector. -/
-theorem recurrence_matching_leaves_fourth_cycle_density_free_of_palindromic_pair
+theorem fourth_cycle_density_free_of_palindromic_pair
     (design resampled : GenotypeDesign nx ιx) (s : ℝ) (hs : s ^ 2 = 2)
-    (_hrecurrence : ∀ i : Fin nx,
-      resampled.variantRecurrence i = design.variantRecurrence i)
     (hdesign : design.cycleDensity 4 = palindromicCycleDensityA s 4)
     (hresampled : resampled.cycleDensity 4 = palindromicCycleDensityB s 4) :
     design.cycleDensity 4 ≠ resampled.cycleDensity 4 := by

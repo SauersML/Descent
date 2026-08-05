@@ -72,7 +72,7 @@ theorem between_group_variance_fraction_le_one
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
     (h_eVar_nonneg : 0 ≤ eVarZgivenD)
-    (_h_varE_nonneg : 0 ≤ varEZgivenD) :
+    :
     varEZgivenD / varZ ≤ 1 := by
   rw [div_le_one h_varZ_pos, h_decomp]
   linarith
@@ -91,10 +91,8 @@ theorem div_le_of_ge_one_sub_mul
     (varZ eVarZgivenD varEZgivenD δ : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
     (h_varZ_pos : 0 < varZ)
-    (_h_eVar_nonneg : 0 ≤ eVarZgivenD)
-    (_h_varE_nonneg : 0 ≤ varEZgivenD)
     (h_within_dominates : eVarZgivenD ≥ (1 - δ) * varZ)
-    (_hδ_pos : 0 < δ) :
+    :
     varEZgivenD / varZ ≤ δ := by
   have h1 : varEZgivenD = varZ - eVarZgivenD := by linarith
   rw [h1, sub_div, div_self (h_varZ_pos.ne')]
@@ -106,10 +104,9 @@ theorem div_le_of_ge_one_sub_mul
     is bounded, each individual fraction must be small. -/
 theorem comparable_covariates_both_small
     (r2_d r2_s B ε : ℝ)
-    (_h_d_nonneg : 0 ≤ r2_d) (_h_s_nonneg : 0 ≤ r2_s)
     (h_comparable : r2_d ≤ r2_s + ε)
     (h_sum_bound : r2_d + r2_s ≤ B)
-    (_hB_pos : 0 < B) :
+    :
     r2_d ≤ (B + ε) / 2 := by
   linarith
 
@@ -134,7 +131,6 @@ variable [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
     This drives PGS variance increase for immune traits. -/
 theorem two_mul_one_sub_lt_of_lt_of_le_half
     (p₁ p₂ : ℝ)
-    (_hp₁_pos : 0 < p₁)
     (hp₁_lt_p₂ : p₁ < p₂)
     (hp₂_le_half : p₂ ≤ 1 / 2) :
     2 * p₁ * (1 - p₁) < 2 * p₂ * (1 - p₂) := by
@@ -292,7 +288,7 @@ section Question4
     independent result and should not be cited as one. -/
 theorem env_variance_lowers_r2
     (Vg Ve₁ Ve₂ : ℝ)
-    (hVg : 0 < Vg) (hVe₁ : 0 < Ve₁) (_hVe₂ : 0 < Ve₂)
+    (hVg : 0 < Vg) (hVe₁ : 0 < Ve₁)
     (h_more_env : Ve₁ < Ve₂) :
     Vg / (Vg + Ve₂) < Vg / (Vg + Ve₁) := by
   apply div_lt_div_of_pos_left hVg (by linarith) (by linarith)
@@ -351,7 +347,7 @@ theorem prediction_error_positive
     Relative error = ((1-ρ)β + δ) / (ρβ). As ρ↓, this increases. -/
 theorem relative_error_increases_with_turnover
     (β δ ρ₁ ρ₂ : ℝ) (hβ : 0 < β) (hδ : 0 < δ)
-    (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) (_hρ₁_le : ρ₁ ≤ 1) :
+    (hρ₁ : 0 < ρ₁) (hρ₂ : 0 < ρ₂) (hρ : ρ₂ < ρ₁) :
     ((1 - ρ₁) * β + δ) / (ρ₁ * β) < ((1 - ρ₂) * β + δ) / (ρ₂ * β) := by
   rw [div_lt_div_iff₀ (mul_pos hρ₁ hβ) (mul_pos hρ₂ hβ)]
   nlinarith [sq_nonneg β, sq_nonneg δ, mul_pos hρ₁ hβ, mul_pos hρ₂ hβ,
@@ -424,8 +420,6 @@ theorem brier_uncertainty_max_at_half (π : ℝ) :
 /-- **Closer to 1/2 ↔ higher uncertainty.** -/
 theorem closer_to_half_more_uncertainty
     (π₁ π₂ : ℝ)
-    (_h₁ : 0 < π₁) (_h₁' : π₁ < 1)
-    (_h₂ : 0 < π₂) (_h₂' : π₂ < 1)
     (h_closer : (π₂ - 1/2) ^ 2 < (π₁ - 1/2) ^ 2) :
     π₁ * (1 - π₁) < π₂ * (1 - π₂) := by
   nlinarith [brier_uncertainty_formula π₁, brier_uncertainty_formula π₂]
@@ -433,7 +427,7 @@ theorem closer_to_half_more_uncertainty
 /-- **Prediction interval width increases as R² decreases.** -/
 theorem interval_width_increases
     (r2₁ r2₂ : ℝ)
-    (hr2₁ : r2₂ < r2₁) (hr2₁_lt : r2₁ < 1) (_hr2₂_nn : 0 ≤ r2₂) :
+    (hr2₁ : r2₂ < r2₁) (hr2₁_lt : r2₁ < 1) :
     Real.sqrt (1 - r2₁) < Real.sqrt (1 - r2₂) :=
   Real.sqrt_lt_sqrt (by linarith) (by linarith)
 
@@ -461,7 +455,7 @@ section UnifiedTheory
     argument. -/
 theorem four_factor_product_lt_af_factor
     (af ld eff env : ℝ)
-    (h_af : 0 < af) (_h_af_le : af ≤ 1)
+    (h_af : 0 < af)
     (h_ld_lt : ld < 1)
     (h_eff : 0 < eff) (h_eff_lt : eff < 1)
     (h_env : 0 < env) (h_env_le : env ≤ 1) :
@@ -514,7 +508,7 @@ theorem mul_sq_le_mul_sq_of_le_of_nonneg
     (r2_src ρ_eff ρ_sel : ℝ)
     (hr2 : 0 ≤ r2_src)
     (h_bound : ρ_eff ≤ ρ_sel)
-    (h_eff_nn : 0 ≤ ρ_eff) (_h_sel_nn : 0 ≤ ρ_sel) :
+    (h_eff_nn : 0 ≤ ρ_eff) :
     r2_src * ρ_eff ^ 2 ≤ r2_src * ρ_sel ^ 2 := by
   apply mul_le_mul_of_nonneg_left _ hr2
   exact sq_le_sq' (by linarith) h_bound
@@ -537,17 +531,16 @@ theorem neutral_beats_immune
     the comparison is between including the turnover factor `ρ²` and omitting it. The
     source Fst enters no term.
 
-    The linter caught it. `_hfstS` and `_hfst`, which were the hypotheses `0 ≤ fstS` and
-    `fstS < fstT` — the ones that make the statement look like a source-versus-target
-    comparison — are unused, and are now marked so. What the theorem says is that a
-    drift-only prediction, which omits `ρ²`, is higher than one that includes it; that
-    supports the surrounding claim about immune traits without being a statement about
-    genetic distance at all. -/
+    The linter caught it. The hypotheses `0 ≤ fstS` and `fstS < fstT` — the ones that made
+    the statement look like a source-versus-target comparison — occurred in no proof term,
+    and `fstS` itself occurred nowhere else, so all three are gone from the signature. What
+    the theorem says is that a drift-only prediction, which omits `ρ²`, is higher than one
+    that includes it; that supports the surrounding claim about immune traits without being
+    a statement about genetic distance at all. -/
 theorem effect_retention_lowers_target_r2_at_fixed_fst
-    (V_A V_E fstS fstT ρ : ℝ)
+    (V_A V_E fstT ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
-    (_hfstS : 0 ≤ fstS) (hfstT : fstT < 1)
-    (_hfst : fstS < fstT)
+    (hfstT : fstT < 1)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
       r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
@@ -577,7 +570,6 @@ section LDTurnoverInteraction
 
 theorem faster_decay_lower_correlation
     (lam_slow lam_fast d : ℝ)
-    (_hlam_slow_pos : 0 < lam_slow)
     (hlam_faster : lam_slow < lam_fast)
     (hd_pos : 0 < d) :
     Real.exp (-lam_fast * d) < Real.exp (-lam_slow * d) := by
@@ -683,7 +675,7 @@ theorem immune_combined_decay_faster
   apply mul_lt_mul_of_pos_left _ h_ld_pos
   apply sq_lt_sq'
   · linarith [Real.exp_pos (-lam_eff_immune * d), Real.exp_pos (-lam_eff_neutral * d)]
-  · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hlamn hlami hd
+  · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hlami hd
 
 end LDTurnoverInteraction
 
@@ -719,7 +711,7 @@ theorem r2_incomparable_across_groups
 theorem heteroscedasticity_inflates_loss
     (v_sig v_noise_s v_noise_t : ℝ)
     (h_sig : 0 < v_sig)
-    (h_ns : 0 < v_noise_s) (_h_nt : 0 < v_noise_t)
+    (h_ns : 0 < v_noise_s)
     (h_more_noise : v_noise_s < v_noise_t) :
     v_sig / (v_sig + v_noise_t) < v_sig / (v_sig + v_noise_s) :=
   div_lt_div_of_pos_left h_sig (by linarith) (by linarith)
@@ -934,7 +926,6 @@ theorem mulVec_smul_ne_of_not_aligned
     (σ_target : Matrix (Fin 2) (Fin 2) ℝ)
     (cross_target : Fin 2 → ℝ)
     -- σ_target.mulVec is linear, so scaling w_source just scales the image
-    (_h_base_mismatch : σ_target.mulVec w_source ≠ cross_target)
     -- The image of the source direction doesn't align with cross_target
     -- (cross_target is not a scalar multiple of σ_target.mulVec w_source)
     (h_not_aligned : ∀ α : ℝ, α • σ_target.mulVec w_source ≠ cross_target) :

@@ -1062,31 +1062,26 @@ theorem active_budget_makes_stratification_detectable
       ((traceWindowClass base A S₀).spiked S₀ t v) :=
   traceWindow_every_level_detectable hpd hvne ht
 
-/-- **The correction to `pcCorrectabilityMargin`, stated where the biology is.**
+/-! **The correction to `pcCorrectabilityMargin`, stated where the biology is.**
 
 `Calibrator.PCCorrectability.Threshold` documents the sign of
 `pcCorrectabilityMargin` as "the detectable side of the phase diagram".  That
 is true only when the background class is rigid.  Whenever the demographic
 spike fits inside the trace-window budget, the spiked covariance is a legal
 background and no test at any sample size separates it — however far the spike
-clears the spectral edge.  The margin's positivity is a hypothesis of this
-theorem and is not used in its proof, which is the content.
+clears the spectral edge.
+
+`Calibrator.imitable_within_traceWindowBudget` is that statement, and it does not
+mention `pcCorrectabilityMargin` at all.  This module used to re-export it as
+`positive_pc_margin_does_not_imply_detectable`, binding `0 < pcCorrectabilityMargin ...`
+and a `markerCount` that existed only to state it, neither of which the proof touched.
+Once those go the re-export is the original statement under a second name, so it is gone
+and callers should use the original.
 
 The repaired quantity is `stratificationCertificateMargin`, which carries the
 headroom term the existing one omits, and
 `stratificationCertificateMargin_zero_headroom` is the statement that the
 existing one is the special case of zero headroom. -/
-theorem positive_pc_margin_does_not_imply_detectable
-    {N : ℕ} (m : ℕ) (F markerCount : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
-    (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
-    (hbase : VarianceNonneg (S₀ - base))
-    (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget)
-    (hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount F (m : ℝ)) :
-    (traceWindowBudgetClass base budget).IsNull
-      ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)
-        (demographicSpikeDirection N m)) :=
-  imitable_despite_positive_pcCorrectabilityMargin m F markerCount hF hmn hN
-    base S₀ budget hbase hbudget hmargin
 
 /-- **The genome-wide threshold is not an effective-marker count.**
 

@@ -43,26 +43,20 @@ section AdditiveApproximation
 
     **The claim is the hypothesis.** `h_A_large : V_A ≥ V_G / 2` says the
     additive part is at least half the total, which is the empirical assertion
-    the name makes; dividing through by `V_G` adds nothing to it. `V_D` and
-    `V_I` are unconstrained apart from nonnegativity and do not enter the
-    conclusion, and there is no trait, no variance component and no
-    decomposition below beyond the equation `_h_total` that names one.
+    the name makes; dividing through by `V_G` adds nothing to it.
 
-    The three are spelled with a leading underscore because the unused-binder
-    scan in `proofs/validation/code/Check.lean` gates on exactly that: a Prop
-    binder absent from the kernel-accepted proof term is FATAL unless its name
-    marks it deliberate. Here it is deliberate -- the decomposition is what the
-    statement is nominally *about*, and stating it without one would hide that
-    the arithmetic never consults it -- so the underscore is the admission, not
-    a way around the gate.
+    The variance decomposition is gone from the signature. It was three binders
+    -- `V_G = V_A + V_D + V_I`, `0 ≤ V_D`, `0 ≤ V_I` -- that no proof term ever
+    mentioned, so the statement never was about a decomposition; it only looked
+    like it. `V_D` and `V_I` went with them, since nothing else referred to
+    them.
 
     Whether `V_A / V_G ≥ 1/2` actually holds for quantitative traits is a
     measurement, and this file makes none. -/
 theorem half_le_div_of_half_le
     (V_A V_D V_I V_G : ℝ)
-    (_h_total : V_G = V_A + V_D + V_I)
     (h_A_large : V_A ≥ V_G / 2)
-    (_h_D : 0 ≤ V_D) (_h_I : 0 ≤ V_I) (h_G : 0 < V_G) :
+    (h_G : 0 < V_G) :
     V_A / V_G ≥ 1 / 2 := by
   rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
@@ -233,55 +227,21 @@ theorem epistatic_variance_nonneg
     nlinarith
   · nlinarith
 
-/-- **Epistatic portability loss.**
-    Even with identical additive effects across populations,
-    epistasis creates portability loss because the interaction
-    contributions change with allele frequencies. When allele
-    frequencies differ (p₁_src ≠ p₁_tgt or p₂_src ≠ p₂_tgt)
-    and there is nonzero epistasis (β₁₂ ≠ 0), the epistatic
-    variance differs between populations.
+/-- **The epistatic variance is `4β₁₂²` times the heterozygosity product.**
 
-    **Read the paragraph above as a description of the definition, not as a
-    summary of this theorem. The theorem is a cancellation identity.**
-    `epistaticVariance β p₁ p₂` unfolds to `β² · 2p₁(1-p₁) · 2p₂(1-p₂)`, which
-    is `4β²` times the heterozygosity product. The hypothesis `h_freq_diff`
-    says two heterozygosity products differ; the conclusion says `4β²` times
-    those same two products differ. Everything between them is
-    `mul_right_cancel₀`. No step is about epistasis, about populations, or
-    about portability: the biological content is entirely in the ASSUMPTION
-    that the heterozygosity products differ across populations, which this file
-    asserts and does not derive.
-
-    That was found by deleting hypotheses. The statement carried eight `0 < p`
-    and `p < 1` premises, and a scan of the kernel-accepted proof term found
-    that not one of the eight occurs in it. A frequency-indexed claim that
-    survives dropping every constraint saying its arguments are frequencies is
-    the signature of a statement whose arguments are not doing any work, and
-    checking why led to the cancellation above. The premises are gone, because
-    reinstating them would restore the appearance of a claim about allele
-    frequencies without restoring the substance.
-
-    What would make this a result: deriving `h_freq_diff` from a demographic
-    model rather than assuming it, or bounding the size of the variance gap
-    rather than only its nonvanishing. Neither is here. -/
-theorem epistasis_portability_loss
-    (beta12 p1_src p2_src p1_tgt p2_tgt : ℝ)
-    (h_beta : beta12 ≠ 0)
-    (h_freq_diff : p1_src * (1 - p1_src) * p2_src * (1 - p2_src) ≠
-                   p1_tgt * (1 - p1_tgt) * p2_tgt * (1 - p2_tgt)) :
-    epistaticVariance beta12 p1_src p2_src ≠
-      epistaticVariance beta12 p1_tgt p2_tgt := by
+    This is the whole arithmetic of the pairwise interaction term, stated once
+    as an identity so that no downstream statement has to re-derive it and none
+    can dress it up as something else. Every "epistasis changes across
+    populations" claim is a claim about the right-hand factor: the interaction
+    coefficient enters only through `β₁₂²`, and the two loci enter only through
+    their heterozygosities, so anything that moves the epistatic variance moves
+    `p(1-p)` at one locus or the other. -/
+theorem epistaticVariance_eq_four_mul_heterozygosity_product
+    (beta12 p1 p2 : ℝ) :
+    epistaticVariance beta12 p1 p2 =
+      4 * beta12 ^ 2 * (p1 * (1 - p1) * (p2 * (1 - p2))) := by
   unfold epistaticVariance
-  intro h
-  apply h_freq_diff
-  have h_sq : beta12 ^ 2 ≠ 0 := pow_ne_zero 2 h_beta
-  -- Factor out beta12^2 and constants
-  have : beta12 ^ 2 * (2 * p1_src * (1 - p1_src)) * (2 * p2_src * (1 - p2_src)) =
-         beta12 ^ 2 * (2 * p1_tgt * (1 - p1_tgt)) * (2 * p2_tgt * (1 - p2_tgt)) := h
-  have : 4 * beta12 ^ 2 * (p1_src * (1 - p1_src) * p2_src * (1 - p2_src)) =
-         4 * beta12 ^ 2 * (p1_tgt * (1 - p1_tgt) * p2_tgt * (1 - p2_tgt)) := by nlinarith
-  have := mul_left_cancel₀ (by positivity : (4 : ℝ) * beta12 ^ 2 ≠ 0) this
-  exact this
+  ring
 
 end PairwiseEpistasis
 

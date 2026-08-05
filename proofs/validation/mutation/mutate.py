@@ -1,5 +1,16 @@
 #!/usr/bin/env python3.12
-"""Delete-and-rebuild mutation for the tactic blind spot.
+"""Proof mutation: three modes over the Calibrator corpus.
+
+    one       one mutant per Prop binder, that binder deleted   -> DROPPABLE
+    all       one mutant per theorem, every Prop binder deleted -> UNCONDITIONAL
+    vacuity   binders kept, conclusion replaced by `False`      -> VACUOUS
+
+The first two close the tactic blind spot described below.  `vacuity` answers a
+different question -- are the corpus's hypothesis sets satisfiable -- and also
+covers conclusion-negation for this fragment, since a proof that survives a
+negated conclusion yields both `C` and `¬C` and hence `False`.
+
+Delete-and-rebuild for the tactic blind spot.
 
 `omega`, `linarith`, `simp_all` and friends splice every hypothesis in scope
 into the certificate they emit, so a hypothesis they did not need still occurs
@@ -29,6 +40,7 @@ import pathlib
 
 GUARD_ONE = "TACGUARD-C1"
 GUARD_ALL = "TACGUARD-C2"
+GUARD_VAC = "VACGUARD-C3"
 
 SPLICERS = ["omega", "linarith", "nlinarith", "polyrith", "simp_all", "aesop",
             "decide", "positivity", "bound", "field_simp", "tauto", "grind"]
@@ -119,8 +131,9 @@ def binder_groups(binders):
     return out
 
 
-def build(path, all_at_once):
-    guard = GUARD_ALL if all_at_once else GUARD_ONE
+def build(path, mode):
+    guard = {"one": GUARD_ONE, "all": GUARD_ALL, "vacuity": GUARD_VAC}[mode]
+    all_at_once = mode == "all"
     text = pathlib.Path(path).read_text(errors="replace")
     parts = list(pathlib.Path(path).with_suffix("").parts)
     mod = ".".join(parts[parts.index("Calibrator"):])
@@ -129,6 +142,20 @@ def build(path, all_at_once):
              "namespace Calibrator", ""] + opens + [""]
     n = 0
     for name, binders, concl, proof, srcline in decls(text):
+        if mode == "vacuity":
+            # SATISFIABILITY, not deletability: keep the binders and replace the
+            # conclusion by `False`.  A probe that COMPILES means `linarith`
+            # derived a contradiction from the theorem's own hypotheses, so the
+            # theorem is vacuous and proves nothing.  Also covers
+            # conclusion-negation for this fragment: a proof surviving a negated
+            # conclusion yields both `C` and `¬C`, hence `False`.
+            groups = binder_groups(binders)
+            if not any(isp for _, isp, _ in groups):
+                continue
+            lines.append(f"-- {guard} VACMUT {mod} {name} hypotheses {srcline}")
+            lines.append(f"example{binders}: False := by linarith")
+            n += 1
+            continue
         if not any(re.search(r"\b" + re.escape(t) + r"\b", proof) for t in SPLICERS):
             continue
         groups = binder_groups(binders)
@@ -155,14 +182,16 @@ def build(path, all_at_once):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    all_at_once = args and args[0] == "--all-at-once"
-    if all_at_once:
+    mode = "one"
+    if args and args[0].startswith("--"):
+        mode = {"--all-at-once": "all", "--vacuity": "vacuity"}[args[0]]
         args = args[1:]
-    print(f"FRESHNESS_GUARD={GUARD_ALL if all_at_once else GUARD_ONE}")
+    guards = {"one": GUARD_ONE, "all": GUARD_ALL, "vacuity": GUARD_VAC}
+    print(f"FRESHNESS_GUARD={guards[mode]}")
     outdir = pathlib.Path(args[0])
     total = 0
     for i, p in enumerate(args[1:]):
-        body, n = build(p, all_at_once)
+        body, n = build(p, mode)
         if n == 0:
             continue
         (outdir / f"TProbe{i:03d}.lean").write_text(body)
