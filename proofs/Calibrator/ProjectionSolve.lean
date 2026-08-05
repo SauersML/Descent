@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Calibrator.PCCorrectability.Core
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
@@ -96,5 +97,29 @@ theorem ridged_infoQuadraticForm_zero_ridge_degenerate
     infoQuadraticForm (ridgedInfoMatrix A 0) x = 0 := by
   rw [infoQuadraticForm_ridged, hnull]
   ring
+
+/-- **The ridge floor, at the direction PC correction leaves behind.**
+
+`PCCorrectionModel.residualBiasEnergy` is the squared magnitude of the
+confounding that survives top-PC residualization, and it is a sum of squares --
+exactly the quantity the ridge bound is stated over.  So the projection solve's
+regularized form is at least `ridge` times the confounding energy the correction
+did not remove: the direction the solve still has to resolve is the one the
+ridge guarantees a floor on.
+
+This also ties this module to `PCCorrectability.Core`.  A module whose theorems
+only ever mention its own definitions cannot be contradicted by anything else in
+the corpus, and a wrong definition sheltered there is consistent with everything
+-- so the relation is stated rather than left implicit. -/
+theorem ridged_form_dominates_residualBiasEnergy
+    (m : PCCorrectionModel) (bias : Fin m.p → ℝ)
+    (A : Matrix (Fin m.p) (Fin m.p) ℝ) (ridge : ℝ)
+    (hA : 0 ≤ infoQuadraticForm A (m.removeTopPCs bias)) :
+    ridge * m.residualBiasEnergy bias ≤
+      infoQuadraticForm (ridgedInfoMatrix A ridge) (m.removeTopPCs bias) := by
+  have hbound :=
+    ridged_infoQuadraticForm_lower_bound A ridge (m.removeTopPCs bias) hA
+  unfold PCCorrectionModel.residualBiasEnergy
+  exact hbound
 
 end Calibrator

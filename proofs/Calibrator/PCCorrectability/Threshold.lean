@@ -97,7 +97,13 @@ obligation that stops the defect recurring: `ReferenceEvaluation.ofScale`
 cannot be applied unless the body is nonzero at the point, and
 `scale_competitor_ne_iff` proves that nonzeroness is exactly what it takes to
 separate `demographicSpike` from a wrong constant factor.  The competitor
-carried here is the halved constant -- the error that was actually live. -/
+carried here is the halved constant -- the error that was actually live.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM.  This bundles an evaluation point,
+    a value and a rejected competitor for `demographicSpike`; the empirical
+    content is `demographicSpike`'s own, which is VALIDATED against a BBP
+    inversion recovering `3.9920 ± 0.0045`.  Nothing here is measurable
+    separately from that. -/
 noncomputable def demographicSpike_referenceEvaluation :
     ReferenceEvaluation (ℝ × ℝ × ℝ) :=
   ReferenceEvaluation.ofScale
@@ -108,6 +114,19 @@ theorem demographicSpike_referenceEvaluation_value :
     demographicSpike_referenceEvaluation.value = 3 := by
   show demographicSpike 4 1 1 = 3
   exact demographicSpike_at_reference_point
+
+/-- **A discriminating reference evaluation exists for `demographicSpike`.**
+
+This is the statement that relates `ReferenceEvaluation` to the quantity it
+constrains.  Without it the obligation would live in a module no other module's
+theorem ever mentions, and a false definition there would be consistent with the
+whole corpus -- the same shelter that let two falsified identifications survive
+review.  A machine that forbids vacuous reference points is not much use sitting
+somewhere nothing can contradict. -/
+theorem exists_discriminating_referenceEvaluation_for_demographicSpike :
+    ∃ r : ReferenceEvaluation (ℝ × ℝ × ℝ),
+      r.body = (fun p ↦ demographicSpike p.1 p.2.1 p.2.2) ∧ r.value = 3 :=
+  ⟨demographicSpike_referenceEvaluation, rfl, demographicSpike_referenceEvaluation_value⟩
 
 /-- **The old reference point pinned nothing, stated as a theorem rather than as
 a warning in a docstring.**  At `n = m = 1` the spike vanishes, so the
