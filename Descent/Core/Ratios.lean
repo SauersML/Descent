@@ -33,11 +33,23 @@ A kernel here is a SHAPE, not a quantity. `proportionalReduction a b = 1 - a/b` 
 `F_ST`, is not `R²`, and is not PC-correction efficacy. It is the construction all three
 instantiate: a residual measured against a baseline.
 
+## Empirical status
+
 **Kernels carry no biological claim, and therefore no empirical status.** They cannot be
 falsified, because they assert nothing about a population. What can be falsified is a
 named quantity that claims a kernel computes it -- and those names are defined in the
 subsystem modules, each keeping its own docstring, its own regime, and its own ledger
-record. This file must never acquire an `Empirical status:` line.
+record. No DECLARATION in this file may acquire an `Empirical status:` line.
+
+The heading above is what makes that policy visible to a machine. It is a module-level
+declaration, and `validation/code/check.py`'s `identifications` guard and
+`validation/empirical/simcov/inventory.py` both read it and apply it to every declaration
+here that states none of its own -- which is all of them, by the rule in the paragraph
+above. Before the heading existed the policy was stated in prose, both guards read it as
+seven declarations owing a measurement, and the coverage scan additionally parsed the
+words `Empirical status:` out of the sentence forbidding them and reported the two
+characters after it as a verdict outside the closed vocabulary. A file was penalised for
+saying clearly that it has no status.
 
 **Do not fold named referents into their kernel.** Four names for `(1 - r)^t` is not
 four copies of one thing: `admixtureLDDecay` carries a measured `+0.24%` to `+0.37%`

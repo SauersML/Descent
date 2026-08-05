@@ -44,12 +44,27 @@ MULT = re.compile(r"(?<![\^A-Za-z_0-9.])[24]\s*\*\s*(?:\([^)]*\)|[A-Za-z_0-9.]*\
                   r"|\b(?:[A-Za-z_0-9]+\.)?" + POP + r"\s*\*\s*[24]\b")
 
 DEF_RE = re.compile(r"^(?:noncomputable\s+)?def\s+([A-Za-z_][\w.']*)")
+# A module-level `## Empirical status` section inside a `/-! ... -/` header.
+MODULE_STATUS = re.compile(r"(?:^|\n)##+[ \t]*Empirical status\b")
 # Statuses are written with markdown emphasis (`Empirical status: **VALIDATED**`)
 # and a docstring may carry two of them ("VALIDATED at linkage equilibrium; the
 # unconditional reading is FALSIFIED").  A parser that stops at the first
 # `[A-Za-z]+` after the colon reads `**VALIDATED**` as no status at all, which is
 # how nine measured definitions looked undeclared.
-STATUS_RE = re.compile(r"Empirical status:\s*[*_ ]*([A-Za-z_]+)")
+# A QUOTED MENTION IS NOT A DECLARATION. `Empirical status:` also occurs inside
+# ordinary prose -- `Descent/Core/Ratios.lean` said "This file must never
+# acquire an `Empirical status:` line" -- and reading the characters after it as
+# a status counted a docstring that declares it has no status as one that owes a
+# measurement, and reported "` line" as a verdict outside the closed vocabulary.
+#
+# The discriminator is the BACKTICK, and only the backtick. Anchoring at the
+# start of a line instead was tried and is wrong in both directions: a real
+# marker sits on the `/--` opening line in `integratedCoalescentHazard` and
+# mid-line after a bolded sentence in `freeRecombinationStep`, and both are
+# genuine verdicts. The corpus quotes the phrase when talking ABOUT it and
+# never when asserting one.
+DECLARES_STATUS = re.compile(r"(?<!`)Empirical status:")
+STATUS_RE = re.compile(r"(?<!`)Empirical status:\s*[*_ ]*([A-Za-z_]+)")
 STATE_WORDS = ("UNTESTED", "VALIDATED", "FALSIFIED", "DERIVED", "MEASURED",
                "VACUOUS", "CONVENTION", "TESTED", "REFUTED")
 
@@ -120,6 +135,18 @@ def main():
     records = []
     for f in lean_files(ROOT):
         raw = open(f, errors="ignore").read()
+        # A MODULE MAY DECLARE ONE FOR ALL OF ITS DECLARATIONS. `Descent/Core/
+        # Fst.lean` opens with a `## Empirical status` section saying "None. The
+        # bodies here are algebra ... what carries an empirical status is a
+        # named quantity in a subsystem module", which is the right verdict,
+        # stated once where it belongs. Nothing could see it, so five
+        # declarations that share it were counted as coverage debt.
+        #
+        # `check.py`'s `ident` guard was taught the same rule in the same
+        # commit. A denominator that disagrees with the guard is a coverage
+        # number nobody can check, and that is the whole reason this file
+        # transcribes the guard's screen rather than inventing one.
+        module_declared = bool(MODULE_STATUS.search(raw))
         raw_lines = raw.split("\n")
         stripped_lines = strip_comments(raw).split("\n")
         for i, line in enumerate(stripped_lines):
@@ -135,7 +162,7 @@ def main():
             body = "\n".join(stripped_lines[i:i + 6])
             body = body.split(":=", 1)[1] if ":=" in body else ""
             doc = preceding_doc(raw_lines, i)
-            declared = "Empirical status:" in doc
+            declared = bool(DECLARES_STATUS.search(doc))
             sm = STATUS_RE.search(doc)
             status = sm.group(1).upper() if sm else None
             # The tail after the marker may qualify or reverse the headline
@@ -143,8 +170,8 @@ def main():
             # FALSIFIED"), so record every state word the note uses, not just
             # the first.  A definition both validated and falsified is a
             # different object from one that is merely validated.
-            tail = doc[doc.index("Empirical status:"):] if declared else ""
-            head_text = re.sub(r"^Empirical status:\s*[*_ ]*", "",
+            tail = doc[DECLARES_STATUS.search(doc).start():] if declared else ""
+            head_text = re.sub(r"^[\s*_]*Empirical status:\s*[*_ ]*", "",
                                tail).upper()
             multiword = any(head_text.startswith(v) for v in VOCAB_MULTIWORD)
             states = [w for w in STATE_WORDS if re.search(r"\b" + w + r"\b", tail)]
@@ -165,9 +192,7 @@ def main():
                 # and nine definitions that can never receive a measurement were
                 # counted as owing one.  A docstring is penalised for arguing
                 # its own case.
-                if any(tail_head.startswith(v) for v in VOCAB_NONSTATE
-                       for tail_head in (re.sub(r"^Empirical status:\s*[*_ ]*", "",
-                                                tail).upper(),)):
+                if any(head_text.startswith(v) for v in VOCAB_NONSTATE):
                     status = "FREETEXT:" + status
                 else:
                     status = states[0] if states else (
@@ -193,6 +218,7 @@ def main():
                 # FALSIFIED measurement, because the only state word left inside
                 # the window came from a retracted battery quoted in its history.
                 "nonclaim": "NOT AN EMPIRICAL CLAIM" in doc,
+                "module_declared": module_declared,
                 "doc": doc[-1200:],
                 "body": body.strip()[:600],
             })
@@ -238,7 +264,19 @@ def main():
     # that can be abused, so it is not free: see `unsubstantiated` below. A
     # DERIVED docstring that names nothing it is derived FROM is an assertion,
     # not a derivation, and stays in the denominator.
-    SETTLED_WITHOUT_MEASUREMENT = {"DERIVED", "VACUOUS", "FREETEXT:ASSERTED"}
+    SETTLED_WITHOUT_MEASUREMENT = {"DERIVED", "VACUOUS", "FREETEXT:ASSERTED",
+                                   # `THIS IS THE MODEL`: the definition
+                                   # CONSTITUTES the model rather than asserting
+                                   # anything about a population, so no
+                                   # measurement of IT is owed -- the empirical
+                                   # question is whether a population is
+                                   # described by it, and the term requires the
+                                   # docstring to name where that is asked.
+                                   # Adjudicated into
+                                   # `empirical_status_vocabulary` after turning
+                                   # up four times in four files for one meaning
+                                   # the other terms cannot express.
+                                   "FREETEXT:THIS"}
     measured = sum(v for k, v in by_status.items() if k in MEASURED_STATES)
     # A definition that declares itself NOT AN EMPIRICAL CLAIM is not owed a
     # measurement, so counting it in the denominator understates what has been
@@ -264,19 +302,28 @@ def main():
     # separates `DERIVED from `ldRetentionPerGen`, which is VALIDATED` from a
     # bare `DERIVED.` that means only that nobody measured it.
     NAMES_A_REFERENT = re.compile(r"`[A-Za-z_][\w.']*`")
+    # A declaration inheriting its MODULE's declaration is settled by it, and
+    # the module note is the referent -- so it does not need to name one of its
+    # own the way a bare `DERIVED` does.
+    module_settled = [r for r in emp
+                      if not r["nonclaim"] and not r["declared"]
+                      and r.get("module_declared")]
     settled = [r for r in emp
                if not r["nonclaim"] and r["status"] in SETTLED_WITHOUT_MEASUREMENT]
+    settled = settled + [r for r in module_settled if r not in settled]
     unsubstantiated = [
         r for r in settled
-        if not NAMES_A_REFERENT.search(
+        if r not in module_settled
+        and not NAMES_A_REFERENT.search(
             r["doc"][r["doc"].index("Empirical status:"):]
             if "Empirical status:" in r["doc"] else "")]
     # Owed a measurement: everything screened, minus the non-claims, minus the
     # ones the vocabulary settles -- but the unsubstantiated ones come back.
     owed_denominator = (claimable - len(settled) + len(unsubstantiated))
 
-    print("\nsettled without a measurement (DERIVED / VACUOUS / ASSERTED): %d"
-          % len(settled))
+    print("\nsettled without a measurement (DERIVED / VACUOUS / ASSERTED / "
+          "THIS IS THE MODEL): %d, of which %d inherit their MODULE's "
+          "declaration" % (len(settled), len(module_settled)))
     if unsubstantiated:
         print("  of which UNSUBSTANTIATED -- the marker names nothing it "
               "follows from, so it stays in the denominator: %d"
@@ -287,8 +334,7 @@ def main():
     owed = [r for r in emp
             if not r["nonclaim"]
             and r["status"] not in MEASURED_STATES
-            and (r["status"] not in SETTLED_WITHOUT_MEASUREMENT
-                 or r in unsubstantiated)]
+            and (r not in settled or r in unsubstantiated)]
     print("\nOWED A MEASUREMENT AND NOT PAID: %d" % len(owed))
     for r in owed:
         print("    %-46s %-40s status=%s"

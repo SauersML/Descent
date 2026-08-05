@@ -787,6 +787,10 @@ def run_identifications() -> int:
     #     segment. Written case-sensitively, and as a separate pattern rather
     #     than an inline `(?-i:...)` scope, which needs Python 3.11 and would
     #     fail on the cluster's 3.6.
+    # A module-level `## Empirical status` section inside a `/-! ... -/` header.
+    # Anchored at the start of a line so a declaration docstring's own heading
+    # cannot be mistaken for one.
+    MODULE_STATUS = re.compile(r"(?:^|\n)##+[ \t]*Empirical status\b")
     undeclared = []
     for f in ident_lean_files():
         raw = open(f).read().split("\n")
@@ -801,8 +805,24 @@ def run_identifications() -> int:
             if not (DOMAIN.search(short) or DOMAIN_CASED.search(short) or
                     mult.search(re.sub(r"\^\s*[0-9]+", "", body))):
                 continue
-            if "Empirical status:" not in ident_preceding_docstring(raw, i):
-                undeclared.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{short}` has no Empirical status")
+            if "Empirical status:" in ident_preceding_docstring(raw, i):
+                continue
+            # A MODULE MAY DECLARE ONE FOR ALL OF ITS DECLARATIONS, and until
+            # now nothing could see that it had.  `Descent/Core/Fst.lean` opens
+            # with a `## Empirical status` section saying "None. The bodies here
+            # are algebra: an equilibrium formula is a claim about a model, and
+            # what carries an empirical status is a named quantity in a
+            # subsystem module" -- which is the right verdict, is stated once
+            # where it belongs, and would otherwise have to be copied onto five
+            # declarations that share it.
+            #
+            # The section is a MODULE header (`/-! ... -/`) rather than a
+            # declaration docstring, so it says nothing about any one `def` and
+            # cannot be mistaken for one: `ident_preceding_docstring` is checked
+            # first and wins wherever a declaration states its own.
+            if MODULE_STATUS.search("\n".join(raw[:i])):
+                continue
+            undeclared.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{short}` has no Empirical status")
     if undeclared:
         bad.append(f"definitions making an empirical claim without an Empirical status marker: "
                    f"{len(undeclared)}")
@@ -5200,7 +5220,19 @@ CONVENTION_NUMBER = re.compile(r"(?<![A-Za-z_0-9'₀-₉.])([0-9]+(?:\.[0-9]+)?)
 # whole status text -- `MEASURED` is also ordinary English inside the evidence
 # tables ("against measured 0.53297"), and a whole-text rule produced 99
 # findings of which none was a defect.
-CONVENTION_STATUS = re.compile(r"Empirical status:[ \t]*(.{0,140})", re.S)
+# A QUOTED MENTION IS NOT A DECLARATION.  `Empirical status:` also occurs inside
+# ordinary prose -- `Descent/Core/Ratios.lean` said "This file must never
+# acquire an `Empirical status:` line", and this regex read the two characters
+# after it as a status head and reported `\` line` as a term outside the closed
+# vocabulary.  A guard that fails on a docstring for SAYING it has no status is
+# a guard that punishes the clearest possible declaration.
+#
+# The discriminator is the BACKTICK and only the backtick.  Anchoring at the
+# start of a line was tried first and is wrong in both directions: a real marker
+# sits on the `/--` opening line in `integratedCoalescentHazard` and mid-line
+# after a bolded sentence in `freeRecombinationStep`.  The corpus quotes the
+# phrase when talking ABOUT it and never when asserting one.
+CONVENTION_STATUS = re.compile(r"(?<!`)Empirical status:[ \t]*(.{0,140})", re.S)
 
 
 def convention_docstrings(raw: str):
