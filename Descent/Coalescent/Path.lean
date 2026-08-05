@@ -221,6 +221,26 @@ theorem blockCountAt_eq (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold
 With the block count in hand, the path is Kingman's `R_t = ℛ_{D(n,t)}` (K-G (6.5)) -- the
 jump chain read at the level the death process has reached. -/
 
+/-- Finitely many holding times, read as a sequence.  `Descent.Coalescent.Law` puts a measure
+on `Fin m → ℝ` -- finitely many coordinates, which is all an `n`-coalescent needs -- while the
+path construction indexes holds by block count; this is the bridge, and it is what lets the
+two compose. -/
+noncomputable def extendHold {m : ℕ} (hold : Fin m → ℝ) : ℕ → ℝ :=
+  fun j => if hj : j < m then hold ⟨j, hj⟩ else 0
+
+theorem extendHold_nonneg {m : ℕ} {hold : Fin m → ℝ} (h : ∀ i, 0 ≤ hold i) (j : ℕ) :
+    0 ≤ extendHold hold j := by
+  unfold extendHold
+  by_cases hj : j < m
+  · rw [dif_pos hj]
+    exact h _
+  · rw [dif_neg hj]
+
+theorem extendHold_apply {m : ℕ} (hold : Fin m → ℝ) (i : Fin m) :
+    extendHold hold (i : ℕ) = hold i := by
+  unfold extendHold
+  rw [dif_pos i.isLt]
+
 /-- **K-G (6.5): the coalescent path of one trajectory.**  `chain k` is the state with `k`
 blocks; the path reads it off at the current block count.
 
