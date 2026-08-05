@@ -808,7 +808,7 @@ quantity nothing had been shown to have. -/
 def zero : GradedModulus where
   raw := fun _grade _step ↦ 0
 
-instance instNonempty : Nonempty GradedModulus := ⟨zero⟩
+instance Program.instNonempty : Nonempty GradedModulus := ⟨zero⟩
 
 /-- **The nonnegativity floor is attained.** `Δ_nonneg` alone is compatible with a
 strictly positive floor -- an irreducible modulus no certificate could beat --

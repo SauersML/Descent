@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Descent.Foundations.Probability
 
-namespace Descent
+namespace Descent.Program
 
 universe u
 
@@ -1450,4 +1450,4 @@ theorem BayesRisk_strict_of_truth_in_closure_not_in_baseline_closure
   rw [ha_eq]
   linarith
 
-end Descent
+end Descent.Program

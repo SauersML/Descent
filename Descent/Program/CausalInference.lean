@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Program
 
 open MeasureTheory
 -- `r2FromSignalVariance` lives in `Descent.TransportedMetrics` (in `DGP`) since the
@@ -516,4 +516,4 @@ theorem e_value_ge_one (rr : ℝ) (h_rr : 1 ≤ rr) :
 
 end SensitivityAnalysis
 
-end Descent
+end Descent.Program

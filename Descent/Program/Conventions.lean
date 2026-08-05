@@ -25,7 +25,7 @@ import Descent.Portability.RareVariantPortability
 import Descent.Core.Fst
 import Descent.Core.Parameters
 
-namespace Descent
+namespace Descent.Program
 
 /-!
 
@@ -1685,4 +1685,4 @@ theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
 
 end SharedMaps
 
-end Descent
+end Descent.Program

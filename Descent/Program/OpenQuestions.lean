@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift
 
-namespace Descent
+namespace Descent.Program
 
 open MeasureTheory
 open scoped ProbabilityTheory
@@ -980,4 +980,4 @@ theorem effect_mismatch_gives_prediction_mismatch_at_nonzero_genotype
 
 end RecoverablePortability
 
-end Descent
+end Descent.Program

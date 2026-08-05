@@ -337,7 +337,7 @@ theorem z_score_strictMono_in_rho
     (h_more_turnover : ρ₂ < ρ₁) :
     -- z-score for sign concordance is smaller with more turnover
     ρ₂ * β / σ < ρ₁ * β / σ := by
-  exact sign_flip_z_decreases_with_turnover β σ ρ₁ ρ₂ hβ hσ h_more_turnover
+  exact Program.sign_flip_z_decreases_with_turnover β σ ρ₁ ρ₂ hβ hσ h_more_turnover
 
 end ConcreteWitnesses
 

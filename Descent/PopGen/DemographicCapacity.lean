@@ -51,7 +51,7 @@ stipulating it.
     Empirical status: DERIVED as an identity for Nei's `G_ST`; distinct from
     the empirically validated Hudson BBP level. -/
 noncomputable def contrastSpikeLevel (p₁ p₂ : ℝ) : ℝ :=
-  (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
+  (p₁ - p₂) ^ 2 / (Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂))
 
 /-- **contrastSpikeLevel at its junk point, named.** The divisor is `p̄ (1 - p̄)` inside
 `meanAlleleFreq`, which vanishes when both populations are fixed. Numerator and denominator
@@ -61,7 +61,7 @@ reading this line does not reveal that a branch exists. Consumers must exclude t
 makes the guard vanish. -/
 theorem contrastSpikeLevel_monomorphic_is_junk :
     contrastSpikeLevel 0 0 = 0 := by
-  unfold contrastSpikeLevel meanAlleleFreq Descent.Core.midpoint
+  unfold contrastSpikeLevel Program.meanAlleleFreq Descent.Core.midpoint
   norm_num
 
 /-- **No contrast, no spike.** Two populations at the same allele frequency produce a level of
@@ -74,10 +74,10 @@ theorem contrastSpikeLevel_self (p : ℝ) :
 
 /-- **The level is four times Nei's `G_ST`, derived rather than stipulated.** -/
 theorem contrastSpikeLevel_eq_four_neiGst (p₁ p₂ : ℝ)
-    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ := by
+    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0) :
+    contrastSpikeLevel p₁ p₂ = 4 * Program.neiGst p₁ p₂ := by
   unfold contrastSpikeLevel
-  exact (four_neiGst_eq_standardizedContrastVariance p₁ p₂ h).symm
+  exact (Program.four_neiGst_eq_standardizedContrastVariance p₁ p₂ h).symm
 
 /-- **The exact Nei contrast law composed with the certificate load.**
 
@@ -88,15 +88,15 @@ subgroup-contrast direction is the load, pinned to `effectiveSubgroupSize` by
 numeral appears. -/
 theorem neiContrastSpike_eq_contrastSpikeLevel_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)
+    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+    Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       contrastSpikeLevel p₁ p₂ *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
   rw [contrastSpikeLevel_eq_four_neiGst p₁ p₂ h,
     traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold neiContrastSpike demographicSpike
+  unfold Program.neiContrastSpike demographicSpike
   ring
 
 /-- **The exact Nei contrast spike written without a free coefficient.**
@@ -108,25 +108,25 @@ subgroup-contrast direction, pinned by `dot_demographicSpikeDirection`.  Both
 factors are quantities rather than names, and their equality is proved directly. -/
 theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)
+    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) *
+    Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+      ((p₁ - p₂) ^ 2 / (Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂))) *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
-  rw [neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
+  rw [Program.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
     traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
 /-- **The empirically calibrated Hudson BBP spike is level times load.** -/
 theorem hudsonBbpSpike_eq_level_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      (4 * hudsonFst p₁ p₂) *
+    Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+      (4 * Program.hudsonFst p₁ p₂) *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
   rw [traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold hudsonBbpSpike demographicSpike
+  unfold Program.hudsonBbpSpike demographicSpike
   ring
 
 /-- **The Hudson BBP spike on the Nei scale.** This is the exact formula that
@@ -135,13 +135,13 @@ wrong differentiation estimator. -/
 theorem hudsonBbpSpike_eq_nei_conversion_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
-    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0)
+    (hbar : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      (8 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂)) *
+    Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+      (8 * Program.neiGst p₁ p₂ / (1 + Program.neiGst p₁ p₂)) *
         (traceWindowBudgetClass base budget).spikeLoad a
           (demographicSpikeDirection N m) := by
-  rw [hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+  rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
       (N : ℝ) (m : ℝ) p₁ p₂ hpos hbar,
     traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
@@ -151,12 +151,12 @@ rescales the complete PC-correction certificate, not merely a descriptive scalar
 theorem hudsonBbpSpike_eq_nei_multiplier_mul_neiContrastSpike
     (N m p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
-    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    hudsonBbpSpike N m p₁ p₂ =
-      (2 / (1 + neiGst p₁ p₂)) * neiContrastSpike N m p₁ p₂ := by
-  rw [hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+    (hbar : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0) :
+    Program.hudsonBbpSpike N m p₁ p₂ =
+      (2 / (1 + Program.neiGst p₁ p₂)) * Program.neiContrastSpike N m p₁ p₂ := by
+  rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
     N m p₁ p₂ hpos hbar]
-  unfold neiContrastSpike demographicSpike
+  unfold Program.neiContrastSpike demographicSpike
   ring
 
 /-- On the biological range `0 ≤ G_ST ≤ 1`, the Hudson-to-Nei spike multiplier lies between one
@@ -181,15 +181,15 @@ inside the budget.  Nothing here is a spectral quantity: `bbpProxyThreshold`
 does not appear, because the imitation question does not involve it. -/
 theorem hudsonCalibrated_stratification_imitable_if_within_budget
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (hfst : 0 ≤ hudsonFst p₁ p₂)
+    (hfst : 0 ≤ Program.hudsonFst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : VarianceNonneg (S₀ - base))
     (hbudget : traceForm S₀ +
-      hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
+      Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull
-      ((traceWindowBudgetClass base budget).spiked S₀ (4 * hudsonFst p₁ p₂)
+      ((traceWindowBudgetClass base budget).spiked S₀ (4 * Program.hudsonFst p₁ p₂)
         (demographicSpikeDirection N m)) :=
-  imitable_within_traceWindowBudget m (hudsonFst p₁ p₂)
+  imitable_within_traceWindowBudget m (Program.hudsonFst p₁ p₂)
     hfst hmn hN base S₀ budget hbase hbudget
 
 /-- **The correction to the empirically Hudson-calibrated
@@ -203,14 +203,14 @@ quantity omits. -/
 theorem hudsonCalibrated_rigid_pcCorrectabilityMargin_is_the_criterion
     {N : ℕ} (m : ℕ) (p₁ p₂ markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
-    0 < pcCorrectabilityMargin (N : ℝ) markerCount (hudsonFst p₁ p₂) (m : ℝ) ↔
+    0 < pcCorrectabilityMargin (N : ℝ) markerCount (Program.hudsonFst p₁ p₂) (m : ℝ) ↔
       (traceWindowBudgetClass base (traceForm S₀)).bound a +
           bbpProxyThreshold (N : ℝ) markerCount <
         (traceWindowBudgetClass base (traceForm S₀)).form a
           ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀
-            (4 * hudsonFst p₁ p₂) (demographicSpikeDirection N m)) :=
+            (4 * Program.hudsonFst p₁ p₂) (demographicSpikeDirection N m)) :=
   rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos m
-    (hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
+    (Program.hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
 
 end DemographicCapacity
 

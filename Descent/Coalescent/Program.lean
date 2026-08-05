@@ -220,10 +220,18 @@ nonnegative series with summable means is finite almost everywhere.  So
 
 That is the forward direction of the equivalence, and the statement K-C (2.8) and K-G (6.1)
 rely on when they start the death process from infinity -- which the corpus previously had
-only in expectation.  STILL ABSENT: the converse, that failing the condition forces an
-infinite descent time almost surely, which is Kolmogorov's three-series theorem applied to
-independent exponentials; and Pólya's renewal identity, which needs a walk on `ℤ` with its
-strong Markov property.
+only in expectation.  `Coalescent.LaplaceTransform` and `Coalescent.TransitTransform` then supply the instrument
+the converse runs on, and a headline of the paper the corpus lacked: the clock's transform is
+`d/(d+θ)`, and independence of the coordinates -- `iIndepFun_infinitePi`, which is K-C
+(1.12)'s premise proved of the construction rather than assumed -- makes the transit time's
+transform their product,
+
+  `E(e^{-θ Σ τ}) = ∏ d_r/(d_r + θ)`,     K-G (5.9),
+
+from which K-G reads off the density `Rates.transitDensityTerm` sums.  STILL ABSENT: the
+converse of Schweinsberg's equivalence, which needs the passage from these finite products to
+the infinite one, a monotone-convergence step over a decreasing sequence; and Pólya's renewal
+identity, which needs a walk on `ℤ` with its strong Markov property.
 
 ## Beyond Kingman
 

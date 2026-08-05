@@ -167,6 +167,7 @@ import Descent.Coalescent.DescentTime
 import Descent.Coalescent.TrajectoryLaw
 import Descent.Coalescent.EntranceLaw
 import Descent.Coalescent.LaplaceTransform
+import Descent.Coalescent.TransitTransform
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
@@ -485,8 +486,8 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
 /-- The true derivative of expected Brier score with respect to `p`,
     proved via the quadratic-form derivative in `Conclusions`. -/
 theorem expectedBrierScore_deriv_proved (p π : ℝ) :
-    deriv (fun x ↦ expectedBrierScore x π) p = 2 * (p - π) :=
-  expectedBrierScore_deriv p π
+    deriv (fun x ↦ Program.expectedBrierScore x π) p = 2 * (p - π) :=
+  Program.expectedBrierScore_deriv p π
 
 /-- Concrete 2x2 matrix representing independent LD. -/
 def sigmaS : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 0], ![0, 1]]

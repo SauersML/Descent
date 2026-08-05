@@ -816,7 +816,7 @@ def noSharedArchitecture {p q : ℕ} (sourceWeights : Fin p → ℝ)
   traitBSpecificEffect := traitBSpecificEffect
   rg := rg
 
-instance instNonempty (p q : ℕ) : Nonempty (CrossTraitBorrowingModel p q) :=
+instance Program.instNonempty (p q : ℕ) : Nonempty (CrossTraitBorrowingModel p q) :=
   ⟨noSharedArchitecture (fun _ ↦ 0) (fun _ ↦ 0) (fun _ ↦ 0) 0⟩
 
 /-- Trait-B cross-covariance component borrowed from trait A through shared

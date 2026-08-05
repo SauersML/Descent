@@ -53,9 +53,9 @@ open scoped BigOperators
 is the corpus-wide `hweGenotypeVariance`, which is built from the single `ploidy`
 constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : HardyWeinbergModel) :
-    h.genotypeVariance = hweGenotypeVariance h.altFreq := by
+    h.genotypeVariance = Program.hweGenotypeVariance h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold hweGenotypeVariance HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Program.hweGenotypeVariance HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
@@ -64,7 +64,7 @@ variance, with no second convention introduced. -/
 theorem standardizedSquare_eq_over_hweGenotypeVariance
     (h : HardyWeinbergModel) (g : DiploidGenotype) :
     h.standardizedSquare g =
-      (h.centeredAltAlleleCount g) ^ 2 / hweGenotypeVariance h.altFreq := by
+      (h.centeredAltAlleleCount g) ^ 2 / Program.hweGenotypeVariance h.altFreq := by
   unfold HardyWeinbergModel.standardizedSquare
   rw [mellinDrift_uses_ploidy]
 
@@ -293,7 +293,7 @@ compiling. -/
 theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
-      1 / hweGenotypeVariance h.altFreq := by
+      1 / Program.hweGenotypeVariance h.altFreq := by
   rw [standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
 
 /-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
@@ -459,8 +459,8 @@ theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
 
 /-- At the blind frequency the genotype variance is exactly `1/3`. -/
 theorem gaussianKurtosisMaf_genotypeVariance :
-    hweGenotypeVariance gaussianKurtosisMaf = 1 / 3 := by
-  unfold hweGenotypeVariance gaussianKurtosisMaf Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    Program.hweGenotypeVariance gaussianKurtosisMaf = 1 / 3 := by
+  unfold Program.hweGenotypeVariance gaussianKurtosisMaf Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sqrt_three_sq]
 
 /-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**

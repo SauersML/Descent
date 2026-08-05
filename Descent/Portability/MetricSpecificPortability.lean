@@ -231,7 +231,7 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
     population AUC functional, not on a liability-model surrogate. -/
 theorem r2_less_portable_than_auc_from_decomposition
     {Z : Type*} [MeasurableSpace Z]
-    (pop : BinaryPopulation Z)
+    (pop : Program.BinaryPopulation Z)
     (scoreSource scoreTarget : Z → ℝ)
     (source target : R2DecompositionData)
     (g : ℝ → ℝ)
@@ -244,9 +244,9 @@ theorem r2_less_portable_than_auc_from_decomposition
     -- Discrimination transfers perfectly, so the only `R²` loss comes from
     -- calibration.
     (hDiscPreserved : target.discrimination = source.discrimination) :
-    populationAUC pop scoreTarget = populationAUC pop scoreSource ∧
-    |ENNReal.toReal (populationAUC pop scoreTarget) -
-        ENNReal.toReal (populationAUC pop scoreSource)| = 0 ∧
+    Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource ∧
+    |ENNReal.toReal (Program.populationAUC pop scoreTarget) -
+        ENNReal.toReal (Program.populationAUC pop scoreSource)| = 0 ∧
     target.r2 / source.r2 = target.calibration ∧
     0 < 1 - target.r2 / source.r2 := by
   have h_src_r2 : source.r2 = source.discrimination * source.calibration :=
@@ -264,13 +264,13 @@ theorem r2_less_portable_than_auc_from_decomposition
   have h_r2_ratio : target.r2 / source.r2 = target.calibration := by
     rw [h_tgt_r2, h_src_r2_eq, hDiscPreserved]
     field_simp [ne_of_gt source.disc_pos]
-  have h_auc_eq : populationAUC pop scoreTarget = populationAUC pop scoreSource := by
+  have h_auc_eq : Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource := by
     rw [hScoreTarget]
     simpa [Function.comp] using
-      (populationAUC_strictMono_invariant pop scoreSource g hg)
+      (Program.populationAUC_strictMono_invariant pop scoreSource g hg)
   have h_auc_gap_zero :
-      |ENNReal.toReal (populationAUC pop scoreTarget) -
-          ENNReal.toReal (populationAUC pop scoreSource)| = 0 := by
+      |ENNReal.toReal (Program.populationAUC pop scoreTarget) -
+          ENNReal.toReal (Program.populationAUC pop scoreSource)| = 0 := by
     rw [h_auc_eq]
     simp
   have h_r2_gap_pos : 0 < 1 - target.r2 / source.r2 := by
@@ -2591,8 +2591,8 @@ theorem f1_le_one
     (precision sens : ℝ)
     (h_p : 0 < precision) (h_r : 0 < sens)
     (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
-    f1Score precision sens ≤ 1 := by
-  unfold f1Score
+    Program.f1Score precision sens ≤ 1 := by
+  unfold Program.f1Score
   rw [div_le_one (by linarith)]
   nlinarith [mul_nonneg (le_of_lt h_p) (by linarith : 0 ≤ 1 - sens),
              mul_nonneg (le_of_lt h_r) (by linarith : 0 ≤ 1 - precision)]
@@ -2897,17 +2897,17 @@ section ProperScoringRules
 
 /-- **Brier score is a proper scoring rule.**
     Brier(p, y) = (p - y)². The unique minimizer is p = P(Y=1|X). -/
-noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := brierScore p y
+noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := Program.brierScore p y
 
 /-- The local metric surface is exactly the core Brier score object from
     `Conclusions`. -/
 @[simp] theorem brierScoreMetric_eq_core (p y : ℝ) :
-    brierScoreMetric p y = brierScore p y := by
+    brierScoreMetric p y = Program.brierScore p y := by
   rfl
 
 /-- Brier score is nonneg. -/
 theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := by
-  simpa [brierScoreMetric, brierScore] using sq_nonneg (y - p)
+  simpa [brierScoreMetric, Program.brierScore] using sq_nonneg (y - p)
 
 /-- **Brier score is bounded above by 1 (derived from definition).**
     Since `brierFromR2 π r2 = π(1-π)(1-r2)`, and π(1-π) ≤ 1/4 (AM-GM)

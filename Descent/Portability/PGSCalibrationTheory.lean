@@ -379,14 +379,14 @@ section CalibrationVsDiscrimination
     numbers, not a computation of the AUC-invariant score's calibration. -/
 theorem auc_invariant_and_citl_shifts_under_score_offset
     {Z : Type*} [MeasurableSpace Z]
-    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
     (mean_obs mean_pred c : ℝ) :
-    populationAUC pop (fun z ↦ score z + c) = populationAUC pop score ∧
+    Program.populationAUC pop (fun z ↦ score z + c) = Program.populationAUC pop score ∧
       calibrationInTheLarge mean_obs (mean_pred + c) =
         calibrationInTheLarge mean_obs mean_pred - c := by
   constructor
   · simpa [Function.comp] using
-      populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
+      Program.populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
         intro a b hab
         linarith)
   · unfold calibrationInTheLarge Descent.Core.difference
@@ -1883,13 +1883,13 @@ theorem logistic_recalibration_corrects_citl_and_slope
     affine transform when the fitted slope is positive. -/
 theorem logistic_recalibration_preserves_auc
     {Z : Type*} [MeasurableSpace Z]
-    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    populationAUC pop (fun z ↦ logisticRecalibrated (score z) a b) =
-      populationAUC pop score := by
+    Program.populationAUC pop (fun z ↦ logisticRecalibrated (score z) a b) =
+      Program.populationAUC pop score := by
   simpa [logisticRecalibrated, Function.comp] using
-    (populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
+    (Program.populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos]))
 
@@ -2119,12 +2119,12 @@ theorem rarer_target_prevalence_requires_larger_recalibration_cohort
     orderings, so population AUC is unchanged. -/
 theorem recalibration_preserves_auc
     {Z : Type*} [MeasurableSpace Z]
-    (pop : BinaryPopulation Z) (score : Z → ℝ)
+    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    populationAUC pop (fun z ↦ a + b * score z) = populationAUC pop score := by
+    Program.populationAUC pop (fun z ↦ a + b * score z) = Program.populationAUC pop score := by
   simpa [Function.comp] using
-    populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
+    Program.populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos])
 

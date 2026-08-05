@@ -128,20 +128,20 @@ requirement.
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is `hudsonFst` evaluated on a supplied frequency
 field. -/
 noncomputable def alleleFrequencyDivergence (frequency : Pop → ℝ) (s t : Pop) : ℝ :=
-  hudsonFst (frequency s) (frequency t)
+  Program.hudsonFst (frequency s) (frequency t)
 
 /-- **The divergence is symmetric**, as a divergence between unordered populations must be.  This
 is the hypothesis the twin theorems above require, discharged for the biological metric. -/
 theorem alleleFrequencyDivergence_symm (frequency : Pop → ℝ) (s t : Pop) :
     alleleFrequencyDivergence frequency s t = alleleFrequencyDivergence frequency t s := by
-  unfold alleleFrequencyDivergence hudsonFst
+  unfold alleleFrequencyDivergence Program.hudsonFst
   congr 1 <;> ring
 
 /-- **The divergence vanishes on the diagonal, pinned.**  A population does not diverge from
 itself, whatever its allele frequency. -/
 @[simp] theorem alleleFrequencyDivergence_self (frequency : Pop → ℝ) (s : Pop) :
     alleleFrequencyDivergence frequency s s = 0 := by
-  unfold alleleFrequencyDivergence hudsonFst
+  unfold alleleFrequencyDivergence Program.hudsonFst
   simp
 
 /-- **Equal allele frequencies make profile twins.**  Two populations with the same frequency are

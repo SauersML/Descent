@@ -5951,8 +5951,8 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (hvar_int : Integrable (fun z ↦ (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
-    exactBrierRiskOfCalibrated μ η = TransportedMetrics.calibratedBrier π r2 := by
-  rw [exactBrierRiskOfCalibrated_eq_integral]
+    Program.exactBrierRiskOfCalibrated μ η = TransportedMetrics.calibratedBrier π r2 := by
+  rw [Program.exactBrierRiskOfCalibrated_eq_integral]
   have hdiff_int : Integrable (fun z ↦ η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
   have hlin_zero : ∫ z, (η z - π) ∂μ = 0 := by
@@ -6011,7 +6011,7 @@ theorem targetBrier_ge_source_of_neutralAF_benchmark
 
 /-- Pointwise Brier regret relative to the true Bernoulli probability. -/
 noncomputable def brierRegretPoint (η q : ℝ) : ℝ :=
-  brierBernoulliRisk η q - brierBernoulliRisk η η
+  Program.brierBernoulliRisk η q - Program.brierBernoulliRisk η η
 
 /-- Pointwise Brier regret ratio between target and source predictors. -/
 noncomputable def brierRegretRatio (η qSource qTarget : ℝ) : ℝ :=
@@ -6031,7 +6031,7 @@ theorem brierRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem brierRegretPoint_eq_sq_error (η q : ℝ) :
     brierRegretPoint η q = (q - η) ^ 2 := by
   unfold brierRegretPoint
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using brier_regret_pointwise η q
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Program.brier_regret_pointwise η q
 
 /-- Ratio form in present-day units: Brier-regret ratio is a squared-error ratio. -/
 theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
@@ -6042,7 +6042,7 @@ theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
 
 /-- Pointwise log-loss regret relative to truth. -/
 noncomputable def logLossRegretPoint (η q : ℝ) : ℝ :=
-  bernoulliLogLoss η q - bernoulliLogLoss η η
+  Program.bernoulliLogLoss η q - Program.bernoulliLogLoss η η
 
 /-- **The pointwise regret vanishes exactly on a matching forecast.**
 
@@ -6074,9 +6074,9 @@ theorem logLossRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem logLossRegretPoint_eq_kl (η q : ℝ)
     (hη0 : 0 < η) (hη1 : η < 1)
     (hq0 : 0 < q) (hq1 : q < 1) :
-    logLossRegretPoint η q = bernoulliKLReal η q := by
+    logLossRegretPoint η q = Program.bernoulliKLReal η q := by
   unfold logLossRegretPoint
-  simpa using logLoss_regret_eq_kl_pointwise η q hη0 hη1 hq0 hq1
+  simpa using Program.logLoss_regret_eq_kl_pointwise η q hη0 hη1 hq0 hq1
 
 /-- Ratio form in present-day units: log-loss regret ratio is a KL ratio. -/
 theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
@@ -6084,7 +6084,7 @@ theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
     (hqS0 : 0 < qSource) (hqS1 : qSource < 1)
     (hqT0 : 0 < qTarget) (hqT1 : qTarget < 1) :
     logLossRegretRatio η qSource qTarget =
-      bernoulliKLReal η qTarget / bernoulliKLReal η qSource := by
+      Program.bernoulliKLReal η qTarget / Program.bernoulliKLReal η qSource := by
   unfold logLossRegretRatio
   rw [logLossRegretPoint_eq_kl η qTarget hη0 hη1 hqT0 hqT1,
     logLossRegretPoint_eq_kl η qSource hη0 hη1 hqS0 hqS1]
