@@ -276,7 +276,7 @@ revision:
 ## Verification status
 
 Every module in this group compiles against the pinned Mathlib
-(`lake build Descent.Coalescent.*`, 3211 jobs, clean).  That is worth recording because
+(`lake build Descent.Coalescent.*`, 58 modules, 3370 jobs, clean).  That is worth recording because
 it was not true for most of this group's life, and because of what the first build found.
 
 Six defects had been caught by re-reading, over many passes.  The first ten minutes of
