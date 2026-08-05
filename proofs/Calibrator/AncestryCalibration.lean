@@ -502,7 +502,7 @@ noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem epistaticVariancePairwise_at_reference_point :
-    epistaticVariancePairwise 1 1 1 = 0 := by
+    epistaticVariancePairwise 1 (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [epistaticVariancePairwise]
 
 

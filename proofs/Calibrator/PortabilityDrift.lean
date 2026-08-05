@@ -6526,7 +6526,7 @@ noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem islandFstMultiplicativeStep_at_reference_point :
-    islandFstMultiplicativeStep 1 1 1 = 0 := by
+    islandFstMultiplicativeStep 1 (1 / 2) 0 = 1 / 8 := by
   norm_num [islandFstMultiplicativeStep, ibdRecurrenceStep]
 
 

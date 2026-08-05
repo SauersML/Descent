@@ -632,7 +632,7 @@ noncomputable def combinedPortability
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem combinedPortability_at_reference_point :
-    combinedPortability 0 0 0 0 = 0 := by
+    combinedPortability 1 0 0 1 = 1 := by
   norm_num [combinedPortability, ldTaggingDecay]
 
 

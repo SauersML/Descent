@@ -760,7 +760,7 @@ noncomputable def introgressionVariants (N₀ introgressionRate t : ℝ) : ℝ :
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem introgressionVariants_at_reference_point :
-    introgressionVariants 0 0 0 = 0 := by
+    introgressionVariants 1 1 1 = 1 - Real.exp (-1) := by
   norm_num [introgressionVariants]
 
 

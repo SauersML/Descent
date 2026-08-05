@@ -445,7 +445,7 @@ noncomputable def localizationResidual (localValue mixtureValue : ℝ) : ℝ :=
 /-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
 An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
 theorem localizationResidual_at_reference_point :
-    localizationResidual 2 2 = 0 := by
+    localizationResidual 2 1 = 1 := by
   norm_num [localizationResidual]
 
 
