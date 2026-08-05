@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.TrafficInvariantSeparation.MesoscopicAmplification
+import Descent.Blindness.TrafficInvariantSeparation.InvariantSeparation
 
 namespace Descent.Blindness
 namespace TrafficInvariantSeparation
@@ -13,12 +13,13 @@ open scoped Matrix Topology
 
 Part of the split of `Descent/Blindness/TrafficInvariantSeparation.lean`, which was 6,618 lines.
 
-The parts are a CHAIN: each imports the one before, in the order the original was written.
-That is the conservative choice, deliberately. A monolith's declarations depend on each
-other in whatever order they happen to appear, and cutting it into modules that import only
-what they use means discovering that order first -- worth doing, and not what this does.
-The chain preserves every resolution the single file had, so the split cannot change what
-any proof sees.
+The parts are a FAN: each imports the parts that declare the symbols it names, and nothing
+else. The split first made them a CHAIN -- each importing the one before, in the order the
+original text ran -- which preserved every resolution the single file had and charged every
+part a dependency on everything written above it, used or not. Recovering the real order is
+the work that chain deferred: each part's identifiers were resolved against its siblings'
+declarations, and the imports above are the answer, so what a part rests on is readable
+from its header instead of inherited from its position in a file that no longer exists.
 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
