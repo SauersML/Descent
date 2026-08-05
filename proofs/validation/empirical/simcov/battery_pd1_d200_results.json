@@ -1,0 +1,151 @@
+[
+ {
+  "name": "ibdRecurrenceFixedPoint / fstIslandMultiplicativeEquilibrium",
+  "file": "PortabilityDrift.lean",
+  "source": "(1-rate)^2 / ((1-rate)^2 + 2*Ne*rate*(2-rate))",
+  "note": "control C1 panmictic F_ST = -0.00000 +/- 0.00001 (0.05 sems from 0); control C2 Beta(a,a) Var(p): a=1.00 17.46 sems, a=0.25 5.77 sems; control C3 Wright/Latter 1/(1+4Nm(d/(d-1))^2) at the small-m cell: 0.11012 predicted vs 0.10897 +/- 0.00005 measured, 25.25 sems",
+  "regime": "explicit Wright-Fisher symmetric island model, 200 demes, migration then reproduction with the census read post-migration (the recurrence's declared composition convention); identity-probability F_ST on DISTINCT pairs as a ratio of averages over loci; 10 independent replicate metapopulations per cell, sem across replicates. m is swept 50-fold at fixed 4*Ne*m by shrinking Ne, which is what separates the two closed forms; 4*Ne*m is swept 4-fold so the rival has a span. rel_floor 0.05 absorbs the O(1/d) finite-deme term.",
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=2 m=0.2500 (4Nm=2.0)",
+   "lean": 0.24324324324324326,
+   "truth": 0.23978264231869167,
+   "sem": 1.3134577666475596e-05,
+   "sems_off": 263.47256930722205,
+   "rel_err": 0.014432241179293316
+  },
+  "cells": [
+   {
+    "design": "Ne=200 m=0.0100 (4Nm=8.0)",
+    "lean": 0.1096296462008255,
+    "truth": 0.10896617331325856,
+    "sem": 4.58872777704861e-05,
+    "sems_off": 14.458754578675029,
+    "rel_err": 0.006088796801733884
+   },
+   {
+    "design": "Ne=50 m=0.0100 (4Nm=2.0)",
+    "lean": 0.32998888926298775,
+    "truth": 0.327143700715068,
+    "sem": 8.808663851108745e-05,
+    "sems_off": 32.29988788324168,
+    "rel_err": 0.008697060471287614
+   },
+   {
+    "design": "Ne=13 m=0.1538 (4Nm=8.0)",
+    "lean": 0.08838568298027756,
+    "truth": 0.08768850981626002,
+    "sem": 1.0816106204463594e-05,
+    "sems_off": 64.45694511855248,
+    "rel_err": 0.007950564623328433
+   },
+   {
+    "design": "Ne=4 m=0.5000 (4Nm=8.0)",
+    "lean": 0.04,
+    "truth": 0.0393616631875192,
+    "sem": 9.843698043830323e-06,
+    "sems_off": 64.8472565532308,
+    "rel_err": 0.016217221549804966
+   },
+   {
+    "design": "Ne=2 m=0.2500 (4Nm=2.0)",
+    "lean": 0.24324324324324326,
+    "truth": 0.23978264231869167,
+    "sem": 1.3134577666475596e-05,
+    "sems_off": 263.47256930722205,
+    "rel_err": 0.014432241179293316
+   }
+  ],
+  "argument_source": "model",
+  "oracle_independent": true,
+  "sem_source": "replicates",
+  "span": 0.8787837975716765,
+  "guard": "PD1-FRESHNESS-ISLAND-FIXEDPOINT-v3"
+ },
+ {
+  "name": "[competing] fstMigrationDriftEquilibrium / fstEqLimitLowMutationManyDemes / fstMigDriftEq",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m)",
+  "note": "positive control 'panmictic pool, 200 labelled demes, F_ST = 0' passed at 0.05 sems; control C1 panmictic F_ST = -0.00000 +/- 0.00001 (0.05 sems from 0); control C2 Beta(a,a) Var(p): a=1.00 17.46 sems, a=0.25 5.77 sems; control C3 Wright/Latter 1/(1+4Nm(d/(d-1))^2) at the small-m cell: 0.11012 predicted vs 0.10897 +/- 0.00005 measured, 25.25 sems",
+  "regime": "explicit Wright-Fisher symmetric island model, 200 demes, migration then reproduction with the census read post-migration (the recurrence's declared composition convention); identity-probability F_ST on DISTINCT pairs as a ratio of averages over loci; 10 independent replicate metapopulations per cell, sem across replicates. m is swept 50-fold at fixed 4*Ne*m by shrinking Ne, which is what separates the two closed forms; 4*Ne*m is swept 4-fold so the rival has a span. rel_floor 0.05 absorbs the O(1/d) finite-deme term.",
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=4 m=0.5000 (4Nm=8.0)",
+   "lean": 0.1111111111111111,
+   "truth": 0.0393616631875192,
+   "sem": 9.843698043830323e-06,
+   "sems_off": 7288.871276233619,
+   "rel_err": 1.8228256154161246
+  },
+  "cells": [
+   {
+    "design": "Ne=200 m=0.0100 (4Nm=8.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.10896617331325856,
+    "sem": 4.58872777704861e-05,
+    "sems_off": 46.743627037124746,
+    "rel_err": 0.019684437221505695
+   },
+   {
+    "design": "Ne=50 m=0.0100 (4Nm=2.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.327143700715068,
+    "sem": 8.808663851108745e-05,
+    "sems_off": 70.2675538865777,
+    "rel_err": 0.01892022559118846
+   },
+   {
+    "design": "Ne=13 m=0.1538 (4Nm=8.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.08768850981626002,
+    "sem": 1.0816106204463594e-05,
+    "sems_off": 2165.5298914488326,
+    "rel_err": 0.26711140768534136
+   },
+   {
+    "design": "Ne=4 m=0.5000 (4Nm=8.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.0393616631875192,
+    "sem": 9.843698043830323e-06,
+    "sems_off": 7288.871276233619,
+    "rel_err": 1.8228256154161246
+   },
+   {
+    "design": "Ne=2 m=0.2500 (4Nm=2.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.23978264231869167,
+    "sem": 1.3134577666475596e-05,
+    "sems_off": 7122.474234814443,
+    "rel_err": 0.3901478860605129
+   }
+  ],
+  "argument_source": "model",
+  "oracle_independent": true,
+  "sem_source": "replicates",
+  "span": 0.6666666666666666,
+  "guard": "PD1-FRESHNESS-ISLAND-FIXEDPOINT-v3"
+ },
+ {
+  "name": "[controls]",
+  "file": "PortabilityDrift.lean",
+  "panmictic": {
+   "mean": -3.659869271735649e-07,
+   "sem": 7.118345508161182e-06
+  },
+  "beta": [
+   {
+    "a": 1.0,
+    "mean": 0.08500696288333334,
+    "sem": 9.58475350679591e-05,
+    "predicted": 0.08333333333333333
+   },
+   {
+    "a": 0.25,
+    "mean": 0.16782160809999996,
+    "sem": 0.00020000915453503233,
+    "predicted": 0.16666666666666666
+   }
+  ],
+  "guard": "PD1-FRESHNESS-ISLAND-FIXEDPOINT-v3"
+ }
+]

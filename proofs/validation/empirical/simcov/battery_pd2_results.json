@@ -1,0 +1,272 @@
+[
+ {
+  "name": "signalRetentionMigrationDrift [as written: (1-F_eq)*M/(1+M)]",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'one panmictic population split three ways [retention = 1]' passed at 1.02 sems",
+  "regime": "two-deme island model at migration-drift balance, Ne=1000, 5 Mb with recombination 1e-08, 300 diploids per deme, 200 causal sites; retention is w'Sigma_T beta / w'Sigma_B beta with w = Sigma_A beta fitted on an INDEPENDENT half of the source sample, so no panmictic ceiling is estimated and none is divided out; 40 replicates, sem across replicates",
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.08163265306122451,
+    "truth": 0.17133186706020398,
+    "sem": 0.02778617797324755,
+    "sems_off": 3.2281954749351134,
+    "rel_err": 0.5235407489457885
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.4444444444444444,
+    "truth": 0.3533730996741483,
+    "sem": 0.02549075399944062,
+    "sems_off": 3.572720711686073,
+    "rel_err": 0.2577200835442048
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.7901234567901234,
+    "truth": 0.5232012456233914,
+    "sem": 0.02897546696771296,
+    "sems_off": 9.212007228879536,
+    "rel_err": 0.510171207350043
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.9518143961927423,
+    "truth": 0.7981580957001906,
+    "sem": 0.03751003558778097,
+    "sems_off": 4.096405084259794,
+    "rel_err": 0.19251361518516644
+   }
+  ],
+  "worst": {
+   "design": "4Nm=8.0",
+   "lean": 0.7901234567901234,
+   "truth": 0.5232012456233914,
+   "sem": 0.02897546696771296,
+   "sems_off": 9.212007228879536,
+   "rel_err": 0.510171207350043
+  },
+  "guard": "PD2-FRESHNESS-RETENTION-SPLITSAMPLE-v1",
+  "argument_source": "model",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.9142346938775511
+ },
+ {
+  "name": "signalRetentionMigrationDrift [measured F_ST, measured shared LD]",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'one panmictic population split three ways [retention = 1]' passed at 1.02 sems",
+  "regime": "two-deme island model at migration-drift balance, Ne=1000, 5 Mb with recombination 1e-08, 300 diploids per deme, 200 causal sites; retention is w'Sigma_T beta / w'Sigma_B beta with w = Sigma_A beta fitted on an INDEPENDENT half of the source sample, so no panmictic ceiling is estimated and none is divided out; 40 replicates, sem across replicates",
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.19808579218632968,
+    "truth": 0.17133186706020398,
+    "sem": 0.02778617797324755,
+    "sems_off": 0.9628501318851518,
+    "rel_err": 0.1561526503223402
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.2953686800969573,
+    "truth": 0.3533730996741483,
+    "sem": 0.02549075399944062,
+    "sems_off": 2.2755081932242516,
+    "rel_err": 0.16414497773225498
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.44787896819506373,
+    "truth": 0.5232012456233914,
+    "sem": 0.02897546696771296,
+    "sems_off": 2.599519017666168,
+    "rel_err": 0.14396425478418273
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.6609946384516706,
+    "truth": 0.7981580957001906,
+    "sem": 0.03751003558778097,
+    "sems_off": 3.6567135994187505,
+    "rel_err": 0.17184998559488673
+   }
+  ],
+  "worst": {
+   "design": "4Nm=40.0",
+   "lean": 0.6609946384516706,
+   "truth": 0.7981580957001906,
+   "sem": 0.03751003558778097,
+   "sems_off": 3.6567135994187505,
+   "rel_err": 0.17184998559488673
+  },
+  "guard": "PD2-FRESHNESS-RETENTION-SPLITSAMPLE-v1",
+  "argument_source": "sample",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.7003216355123083
+ },
+ {
+  "name": "[competing] 1 - F_ST alone",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'one panmictic population split three ways [retention = 1]' passed at 1.02 sems",
+  "regime": "two-deme island model at migration-drift balance, Ne=1000, 5 Mb with recombination 1e-08, 300 diploids per deme, 200 causal sites; retention is w'Sigma_T beta / w'Sigma_B beta with w = Sigma_A beta fitted on an INDEPENDENT half of the source sample, so no panmictic ceiling is estimated and none is divided out; 40 replicates, sem across replicates",
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.5258047439423364,
+    "truth": 0.17133186706020398,
+    "sem": 0.02778617797324755,
+    "sems_off": 12.75716571107469,
+    "rel_err": 2.068925547619083
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.8017179137446435,
+    "truth": 0.3533730996741483,
+    "sem": 0.02549075399944062,
+    "sems_off": 17.588526964731365,
+    "rel_err": 1.268757623271047
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.9396585444566226,
+    "truth": 0.5232012456233914,
+    "sem": 0.02897546696771296,
+    "sems_off": 14.372755382934288,
+    "rel_err": 0.7959791807013467
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.9886223828622049,
+    "truth": 0.7981580957001906,
+    "sem": 0.03751003558778097,
+    "sems_off": 5.0776887885454,
+    "rel_err": 0.23862977546438094
+   }
+  ],
+  "worst": {
+   "design": "4Nm=2.0",
+   "lean": 0.8017179137446435,
+   "truth": 0.3533730996741483,
+   "sem": 0.02549075399944062,
+   "sems_off": 17.588526964731365,
+   "rel_err": 1.268757623271047
+  },
+  "guard": "PD2-FRESHNESS-RETENTION-SPLITSAMPLE-v1",
+  "argument_source": "sample",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.46814400214159063
+ },
+ {
+  "name": "[competing] shared LD alone",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'one panmictic population split three ways [retention = 1]' passed at 1.02 sems",
+  "regime": "two-deme island model at migration-drift balance, Ne=1000, 5 Mb with recombination 1e-08, 300 diploids per deme, 200 causal sites; retention is w'Sigma_T beta / w'Sigma_B beta with w = Sigma_A beta fitted on an INDEPENDENT half of the source sample, so no panmictic ceiling is estimated and none is divided out; 40 replicates, sem across replicates",
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.3767288037402211,
+    "truth": 0.17133186706020398,
+    "sem": 0.02778617797324755,
+    "sems_off": 7.392054311239663,
+    "rel_err": 1.1988250650875303
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.3684197085198669,
+    "truth": 0.3533730996741483,
+    "sem": 0.02549075399944062,
+    "sems_off": 0.5902771195410209,
+    "rel_err": 0.04257994980261179
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.4766401272433054,
+    "truth": 0.5232012456233914,
+    "sem": 0.02897546696771296,
+    "sems_off": 1.6069152028496578,
+    "rel_err": 0.0889927513926476
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.668601732987266,
+    "truth": 0.7981580957001906,
+    "sem": 0.03751003558778097,
+    "sems_off": 3.453912018018134,
+    "rel_err": 0.16231917387152509
+   }
+  ],
+  "worst": {
+   "design": "4Nm=0.4",
+   "lean": 0.3767288037402211,
+   "truth": 0.17133186706020398,
+   "sem": 0.02778617797324755,
+   "sems_off": 7.392054311239663,
+   "rel_err": 1.1988250650875303
+  },
+  "guard": "PD2-FRESHNESS-RETENTION-SPLITSAMPLE-v1",
+  "argument_source": "sample",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.44896985702715236
+ },
+ {
+  "name": "[controls]",
+  "guard": "PD2-FRESHNESS-RETENTION-SPLITSAMPLE-v1",
+  "panmictic_retention": {
+   "mean": 1.0302480032009202,
+   "sem": 0.029601518578381548
+  },
+  "panmictic_fst": {
+   "mean": 1.6908888510029272e-05,
+   "sem": 9.507501636287942e-05
+  },
+  "measured": [
+   {
+    "M": 0.4,
+    "retention": 0.17133186706020398,
+    "retention_sem": 0.02778617797324755,
+    "fst": 0.47419525605766355,
+    "fst_sem": 0.012028575048698717,
+    "shared_ld": 0.3767288037402211,
+    "shared_ld_sem": 0.017912639209703807,
+    "n": 40
+   },
+   {
+    "M": 2.0,
+    "retention": 0.3533730996741483,
+    "retention_sem": 0.02549075399944062,
+    "fst": 0.19828208625535643,
+    "fst_sem": 0.00603537208690586,
+    "shared_ld": 0.3684197085198669,
+    "shared_ld_sem": 0.008107360790460929,
+    "n": 40
+   },
+   {
+    "M": 8.0,
+    "retention": 0.5232012456233914,
+    "retention_sem": 0.02897546696771296,
+    "fst": 0.06034145554337744,
+    "fst_sem": 0.0026395006586556664,
+    "shared_ld": 0.4766401272433054,
+    "shared_ld_sem": 0.005758336317191637,
+    "n": 40
+   },
+   {
+    "M": 40.0,
+    "retention": 0.7981580957001906,
+    "retention_sem": 0.03751003558778097,
+    "fst": 0.011377617137795063,
+    "fst_sem": 0.0004378505347575151,
+    "shared_ld": 0.668601732987266,
+    "shared_ld_sem": 0.004964385915471641,
+    "n": 40
+   }
+  ]
+ }
+]
