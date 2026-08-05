@@ -432,11 +432,8 @@
   "Descent/PopGen/PopulationGeneticsFoundations.lean::fstIslandEquilibriumFiniteDemes": {
    "quantity": "fst",
    "convention": "identity-probability",
-   "constants": [
-    "4",
-    "4"
-   ],
-   "note": "Two independent 4s: 4*Ne*m and 4*Ne*mu.  Either one dropping to 2 halves the corresponding scaled rate."
+   "constants": [],
+   "note": "Carries no constants of its own: the body is now `Core.fstIslandEquilibrium Ne m mu nDemes`. The two independent 4s -- 4*Ne*m and 4*Ne*mu, either one dropping to 2 halving the corresponding scaled rate -- moved with the arithmetic into `Core/Fst.lean::scaledMigrationRate` and `::scaledMutationRate`, where each is `2 * ploidy * Ne * rate` and the ploidy convention is the single place that fixes them. That is the point of the wrapper: the factor cannot be edited here without editing the convention."
   },
   "Descent/PopGen/PopulationGeneticsFoundations.lean::fstMigrationMutationEquilibriumManyDemes": {
    "quantity": "fst",

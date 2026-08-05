@@ -967,7 +967,7 @@ no-mutation recurrence; at demographic equilibrium simulation measures a retenti
 (`DriftRegime`). Agreeing on `2 Nₑ` is exactly the kind of cross-check that cannot see
 that, since every identity here holds *in* the shared premise whatever its value.
 
-`heterozygosityLossDerived` and `wrightFisherDriftRetention` are attached to the named
+`heterozygosityLossFromDrift` and `wrightFisherDriftRetention` are attached to the named
 regime at the end of this file. `neutralDriftFactor` is **not** attached and carries a
 FALSIFIED status of its own in `PhenomeWidePortability`. Note that
 `ldRetainedFraction_uses_timeScale` below is the one guard in this group that states
@@ -986,9 +986,9 @@ theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
       = ((1 - r) * (1 - 1 / coalescentTimeScale Ne)) ^ t := by
   unfold PopGen.ldRetainedFraction PopGen.ldRetentionPerGen; rw [coalescentTimeScale_eq]
 
-theorem heterozygosityLossDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
-    PopGen.heterozygosityLossDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold PopGen.heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [coalescentTimeScale_eq]
+theorem heterozygosityLossFromDrift_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
+  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [coalescentTimeScale_eq]
 
 theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
     Portability.wrightFisherDriftRetention N t
@@ -1381,28 +1381,21 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
   unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rfl
 
-/-- **The same body, read as a between-population `F_ST`.**
+/-! **The argument-order hazard this section documented is gone with the second copy.**
 
-`heterozygosityLossDerived` and `heterozygosityLossFromDrift` share a body, and `DriftRegime` names
-that
-coincidence as the defect rather than a convenience: a within-population heterozygosity
-loss and a between-population variance ratio are different quantities, and the shared body
-is what let one be substituted for the other. They are deliberately *not* merged. This
-theorem records that `heterozygosityLossDerived` inherits the closed-population regime through that
-shared body — which is the fact a reader needs in order to see that its `F_ST` reading is
-only available in the regime where the loss reading is.
+This section carried a theorem restating, for `heterozygosityLossDerived`, the
+closed-population regime that `heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss`
+already records for the surviving name -- and a note that the two took their arguments in
+opposite orders, "so the same call spelled the same way means different things depending on
+which is in scope".
 
-Note the argument orders differ: `heterozygosityLossFromDrift` takes `(t, Ne)` and
-`heterozygosityLossDerived` takes `(Ne, t)`, so the same call spelled the same way means different
-things
-depending on which is in scope. That is the hazard `equilibriumFst` carried before it was
-collapsed, still live here because these two must *not* be collapsed. -/
-theorem heterozygosityLossDerived_eq_closedPopulation_measuredLoss
-    (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
-    PopGen.heterozygosityLossDerived Ne t = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t := by
-  rw [PopGen.measuredLoss_closedPopulation]
-  unfold PopGen.heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
-  rfl
+That note argued the two "must *not* be collapsed", to keep a within-population loss and a
+between-population `F_ST` from being substituted for one another. Both definitions' own
+docstrings opened by denying the `F_ST` reading, so the shared body was carrying one reading
+under two names, and the hazard was the duplication rather than a defence against it.
+Deleting the second copy removes the hazard the note described. `DriftRegime` still separates
+the two READINGS, which is where that separation belongs.
+-/
 
 /-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.
 

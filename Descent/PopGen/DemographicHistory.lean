@@ -861,7 +861,7 @@ section FounderEffects
     simulation in branch mode -- which removes mutational noise analytically -- finds
     unbiased across the tested grid.
 
-    `heterozygosityLossFromDrift` and `heterozygosityLossDerived` in
+    `heterozygosityLossFromDrift` in
     `PopulationGeneticsFoundations` are this same quantity.
 
     Regime: closed population, no mutation. `founderHeterozygosityLoss_eq_derived`

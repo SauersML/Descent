@@ -447,7 +447,7 @@ theorem hetRecurrence_eq_pairDistinct {Ne : ℕ} (hNe : 0 < Ne) (H₀ : ℝ) (t 
 
 /-- The same statement for the heterozygosity-loss scalar: the loss is the probability that
 two lineages HAVE met within `t` generations, under the mechanism. -/
-theorem heterozygosityLossDerived_eq_pairCoalesced {Ne : ℕ} (hNe : 0 < Ne) (t : ℕ) :
+theorem heterozygosityLoss_eq_pairCoalesced {Ne : ℕ} (hNe : 0 < Ne) (t : ℕ) :
     Descent.Core.heterozygosityLoss (Ne : ℝ) t = 1 - pairDistinct (2 * Ne) t := by
   have h2 : 0 < 2 * Ne := by omega
   unfold Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
@@ -483,7 +483,7 @@ theorem deployedR2_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne) (V_A V_E
     (Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)).r2
       = (Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E
           (Descent.Core.heterozygosityLoss (Ne : ℝ) t)).r2 := by
-  rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
+  rw [heterozygosityLoss_eq_pairCoalesced hNe]
 
 /-- **The same for the whole moment record**, not only its `R²`: mean, variance and slope
 all read off the counted differentiation. -/
@@ -492,7 +492,7 @@ theorem momentsUnderDrift_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne)
     Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)
       = Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E
           (Descent.Core.heterozygosityLoss (Ne : ℝ) t) := by
-  rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
+  rw [heterozygosityLoss_eq_pairCoalesced hNe]
 
 end Coalescent
 

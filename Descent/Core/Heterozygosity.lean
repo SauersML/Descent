@@ -75,7 +75,7 @@ theorem hetRecurrence_eq_geometricDecay (Ne H₀ : ℝ) (t : ℕ) :
 
 This is `proportionalReduction` of the retained heterozygosity against the ancestral
 one, and it is written under two names in `PopGen` -- `heterozygosityLossFromDrift` and
-`heterozygosityLossDerived`, which differ only in argument order. Both call this.
+`heterozygosityLossDerived`. The second has since been deleted; the first calls this.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
     A kernel asserts nothing about a population, so no measurement can bear on it.
