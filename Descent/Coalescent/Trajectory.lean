@@ -279,6 +279,30 @@ theorem chainLaw_blocks_at {n : ℕ} :
               simp only [List.getD_cons_succ]
               omega
 
+/-- A trajectory read as the chain function `Path` takes: `chainOfList l k` is the state with
+`k` blocks, which on a full trajectory sits at position `k - 1`. -/
+noncomputable def chainOfList {n : ℕ} (l : List (ER n)) (k : ℕ) : ER n :=
+  l.getD (k - 1) (Delta n)
+
+/-- **A full trajectory really does give the chain `Path` wants.**  On a trajectory of `n - 1`
+jumps the state at index `k` has `k` blocks, which is `Path.blocks_pathState`'s hypothesis
+`hblocks`.
+
+The other hypothesis `Path` takes -- that consecutive states are covers -- is
+`chainLaw_support_chain'` read at positions rather than as a `List.Chain'`, and converting
+between those needs list-indexing lemmas this file does not develop.  So the connector is
+half-built, and saying which half is better than implying it is whole. -/
+theorem blocks_chainOfList {n : ℕ} (hn : 1 ≤ n) {l : List (ER n)}
+    (hl : l ∈ (chainLaw n (n - 1)).support) {k : ℕ} (hk1 : 1 ≤ k) (hkn : k ≤ n) :
+    blocks (chainOfList l k) = k := by
+  have hlen : l.length = n := by
+    have := chainLaw_length (n - 1) hl
+    omega
+  have hpos : blocks (l.getD (k - 1) (Delta n)) = n - (n - 1) + (k - 1) :=
+    chainLaw_blocks_at (n - 1) (by omega) hl (k - 1) (by omega)
+  unfold chainOfList
+  omega
+
 /-- **K-C (1.13) in full: the chain runs from `Δ` to `Θ` in `n - 1` jumps.**
 
 `Δ = ℛ_n ≺ ℛ_{n-1} ≺ ⋯ ≺ ℛ_1 = Θ`.  The trajectory starts at `Δ`
