@@ -1,7 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.OpenQuestions
+import Descent.Foundations.TransportIdentities
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Mathlib.Analysis.SpecialFunctions.Sigmoid
+import Mathlib.Data.Matrix.Basic
 -- For `LevelSetCoordinates`, `IsLevelSetFunctional` and
 -- `levelSet_metrics_agree_of_coords_eq`: the section on genetic/environmental
 -- identifiability below upgrades a calibration-level non-identifiability into a
