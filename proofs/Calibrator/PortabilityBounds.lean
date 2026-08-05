@@ -178,7 +178,8 @@ section EvolutionaryModels
     from the fit of anything else. Do not treat it as the neutral expectation
     without saying why.
 
-    Empirical status: **CORRECTED, and the corrected body is VALIDATED**
+    Empirical status: **VALIDATED** (the body was corrected first; the
+    superseded one and its refutation are recorded below)
     (`simcov/battery_bulk56.py`). The body is now the deployed chart written in
     this signature, and it needs no regime restriction.
 
