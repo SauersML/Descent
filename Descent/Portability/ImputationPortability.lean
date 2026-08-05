@@ -181,7 +181,38 @@ theorem panelAdjustedImputationQuality_eq_zero_iff
     what makes this a quality measure at every LD extent; the theorems below
     that need the unclamped branch say so with a hypothesis `c < ld_extent`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED as a shape in distance**
+    (`simcov/battery_gap01.py`, `group_imputation`).
+
+    THE FIRST DESIGN WAS CIRCULAR AND IS RECORDED SO IT IS NOT REBUILT. It generated a
+    tag whose CORRELATION with the target fell linearly in `c / ld_extent`, then measured
+    imputation `r²` -- that correlation squared -- and reported this body wrong by 400%.
+    The finding was entirely the modelling choice: had the `r²` been made to fall linearly
+    instead, the body would have matched to machine precision and the design would have
+    been a SELF-TEST. A definition of the form `f(c / ld_extent)` cannot be tested against
+    a simulation that stipulates `f`.
+
+    So the decay comes from a coalescent instead: msprime, one panmictic population at
+    `Nₑ = 2000` over 4 Mb at recombination `1e-8`, 12 replicates, with the observable the
+    realised imputation `r²` between common site pairs binned by physical separation and
+    `c` reported in Morgans. `ld_extent` is FITTED by weighted least squares -- it has to
+    be, since nothing in the corpus says what an LD extent is in base pairs and the body
+    carries it as a free argument -- so what is on trial is the SHAPE and not the scale.
+
+    Worst cell 15.3 sems at 100% relative, and the 100% is the whole finding: `max 0`
+    sends this body to EXACTLY zero beyond the fitted extent, while measured `r²` has a
+    long tail there. No choice of `ld_extent` fits both ends, which is the signature of a
+    wrong shape rather than a wrong constant.
+
+    The rival is the shape coalescent theory actually gives, Sved's
+    `r² = 1/(1 + 4·Nₑ·c)`, fitted with its own free rate so neither is handicapped. It is
+    closer -- 10.8 sems at 59% -- and is also refused, so this run names a direction and
+    not a replacement. Control: a pair with an imposed correlation of 0.6 returns 0.36
+    through the same `r²` code path.
+
+    The clamp is still what makes the body a quality measure at every LD extent, and the
+    junk-point theorem below still stands. What is now measured is that the LINEAR
+    approach to zero is not how LD decays. -/
 noncomputable def ldExtentImputationQuality (c ld_extent : ℝ) : ℝ :=
   max 0 (1 - c / ld_extent)
 

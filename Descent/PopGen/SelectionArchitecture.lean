@@ -95,13 +95,28 @@ theorem equilibriumEffectVariance_eq_zero_iff (v_mutation s : ℝ) :
     of strength s removes a fraction s of the standing variance V.
     The recurrence is: V(t+1) = (1 - s) × V(t) + v_mut.
 
-    Empirical status: **NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS**
-    (`validation/empirical/simcov/battery_bulk9.py`). The oracle was one
+    Empirical status: **VALIDATED** (`simcov/battery_gap01.py`,
+    `group_msbalance`). The design the paragraph below asks for has been run:
+    40000 effect-carrying loci per replicate, 12 replicates, under stabilising
+    selection of strength `s` -- each standing effect shrunk by `√(1-s)`, so the
+    VARIANCE is shrunk by `1-s` -- with new mutational effects of total variance
+    `v_mut` arriving each generation. Burned in for 60 generations, then ONE
+    step is taken and the realised variance measured before and after. Worst
+    cell 0.58 sems at 0.10% relative over `(s, v_mut)` = (0.05, 0.02),
+    (0.20, 0.05), (0.02, 0.01).
+
+    The prediction is evaluated at the REALISED `V(t)`, which is the whole
+    difference from the design below: applying the recurrence to its own output
+    is this expression evaluated twice.
+
+    Power: dropping the selection term is FALSIFIED at 112 sems and a
+    multiplicative mutational input at 90 sems. Control: with `s = 0` and
+    `v_mut = 0` the variance is unchanged over a step.
+
+    THE EARLIER NON-TEST, kept so it is not repeated
+    (`validation/empirical/simcov/battery_bulk9.py`). Its oracle was one
     step of this same recurrence applied to a state fifty iterations in, which is
-    this expression evaluated twice; the harness returns SELF-TEST. What would
-    test it is a simulated population under stabilising selection and recurrent
-    mutation, with the realised effect variance measured from generation to
-    generation. -/
+    this expression evaluated twice; the harness returns SELF-TEST. -/
 noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
   (1 - s) * V + v_mut
 

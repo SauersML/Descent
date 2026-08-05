@@ -475,14 +475,40 @@ theorem fst_causal_lt_fst_neutral_of_stabilizing_selection
 /-- Effect-size-weighted retained causal portability from a locus-specific
 causal-`F_ST` profile, resolved per locus rather than as a trait-wide scalar.
 
-    Empirical status: **NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS**
+    Empirical status: **VALIDATED** (`simcov/battery_gap01.py`,
+    `group_turnover`), with one thing the design does NOT separate, stated
+    below.
+
+    The independent test the paragraph after this one asks for has been run. 800
+    causal loci are drifted by explicit Wright-Fisher for `t` generations at
+    census `Nₑ`, so the per-locus `F_ST` profile is REALISED rather than drawn;
+    the observable is the ratio of realised predictive covariance in the drifted
+    population to that in the source -- the retained causal signal -- and the
+    body is evaluated at the realised drift indices. Worst cell 1.10 sems at
+    0.70% relative over `(Nₑ, t)` = (200, 40), (100, 60), (400, 40).
+
+    Power: the PAIRWISE reading, effect-mass-weighted `1 - 2·F`, is FALSIFIED at
+    22.3 sems and 30% relative. NOT separated: the UNWEIGHTED mean of `1 - F`
+    matches at 2.58 sems. Effect sizes and drift indices are independent in this
+    design, so the weighting has nothing to bite on; a design correlating `β²`
+    with `F` -- which is what selection would produce -- is what would separate
+    them, and this run does not claim to have.
+
+    Two details that were faults in earlier attempts and are now design
+    decisions. Both populations are scaled by the SOURCE heterozygosity, because
+    a transported score carries the weights it was fitted with on the scale it
+    was fitted on; restandardising the target divides out exactly the
+    heterozygosity loss `1 - fstCausal` is a claim about, and the measured ratio
+    then returns 1 whatever the drift was. And the realised `F` is NOT clipped
+    to `[0, 1]`: drift raises heterozygosity at some loci, and clipping those to
+    zero feeds the body a profile the simulation did not realise -- worth 15
+    sems on its own.
+
+    THE EARLIER NON-TEST, kept so it is not repeated
     (`validation/empirical/simcov/battery_bulk6.py`). That battery built
     the oracle by evaluating this same effect-mass-weighted average over drawn
     per-locus drift indices, so the oracle WAS the formula: it agreed to machine
-    precision in every cell and the harness now returns SELF-TEST. An
-    independent test would have to drift the loci and measure the retained
-    causal signal, not recompute the weighted mean. Recorded so the same
-    non-test is not run again and read as a validation. -/
+    precision in every cell and the harness returns SELF-TEST. -/
 noncomputable def causalPortabilityFromLocalFst {m : ℕ}
     (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=
   (∑ i, sourceSquaredEffect i * (1 - fstCausal i)) /

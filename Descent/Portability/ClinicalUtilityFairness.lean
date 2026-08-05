@@ -168,7 +168,33 @@ noncomputable def liabilitySensitivity
     (typically negative). This is also monotone increasing in R² by the
     same argument: higher R² increases separation between cases and controls.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED**, and what was measured is that this signature does
+    not determine the quantity (`simcov/battery_gap01.py`, `group_clinical`).
+
+    `T'` and `μ_control` are free ARGUMENTS and nothing here says which scale either
+    lives on. On one simulated population under the liability threshold model this
+    definition declares -- 4×10⁶ individuals per cell, a PGS-explained component of
+    variance `R²·h²`, independent residual liability of variance
+    `h²(1-R²) + (1-h²)`, disease above the prevalence threshold -- three
+    self-consistent readings of "the specificity of a PGS-based classifier at `T'`"
+    give, at `h² = 0.5, R² = 0.2, K = 0.05`:
+
+      rule applied to a re-drawn residual        0.908
+      rule applied to the individual's liability 0.953
+      rule applied to the PGS component alone    0.99999
+
+    and the body, at the model's own truncated control mean, gives 0.923. It is
+    within 1.5% of the first, 3% of the second, and 8% of the third; at these error
+    bars all three are refused.
+
+    So this is not a falsification of the arithmetic. It is a measurement of the
+    declaration: a consumer who states which scale `T'` and `μ_control` are on gets a
+    determinate answer, and one who does not is choosing between 0.91 and 0.99999. The
+    same shape as `AncestryCalibration.ancestryRecalibratedSlope`, where a third
+    convention had to be written down before either measurement meant anything.
+
+    What would settle it is an argument list that carries the scale, not a new
+    simulation. -/
 noncomputable def liabilitySpecificity
     (Φ : ℝ → ℝ) (m : LiabilityThresholdModel)
     (R2 : ℝ) (T' : ℝ) (μ_control : ℝ) : ℝ :=

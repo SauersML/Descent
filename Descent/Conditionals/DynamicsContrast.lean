@@ -111,10 +111,24 @@ end CohortLandscapeSuperposition
 /-- The active sparse-LD correlation after pooling two environments with correlations `rho`
 and `-rho`.  This is the biological name for the landscape parameter itself.
 
-    Empirical status: UNTESTED. The pooling formula is arithmetic on the two
-    environment correlations; what is untested is the modelling step before it, that an
-    ancestry-environment mixture is described by two correlations of equal size and
-    opposite sign. No dataset here bears on that. -/
+    Empirical status: **VALIDATED AS ARITHMETIC**, and the modelling step it rests on
+    is still untested (`simcov/battery_gap01.py`, `group_mixture`).
+
+    What is measured: 1e5 pairs per block and 20 blocks per cell drawn from TWO
+    environments with correlations `+rho` and `-rho` and pooled at mass `mix`, with the
+    observable the realised Pearson correlation of the POOLED sample. Worst cell 2.06 sems
+    at 0.27% relative over `(rho, mix)` = (0.8, 0.5), (0.8, 0.75), (0.4, 0.25), (0.6, 0.9)
+    -- the balanced cell included because exact cancellation is the one prediction a reader
+    will check by hand. Reading the positive environment's mass alone is FALSIFIED at 473
+    sems and the negative environment's at 730. The same cells measure
+    `LandscapeSuperposition.mixedEnvironmentCorrelation`, which this instantiates.
+
+    What is NOT measured, and the sentence below is unchanged because it is still true: that
+    an ancestry-environment mixture IS described by two correlations of equal size and
+    opposite sign is a modelling step no simulation can settle, and no dataset here bears on
+    it. The pooling formula is arithmetic on the two environment correlations; what was
+    untested until now was that arithmetic, and what remains untested is the model it is
+    arithmetic about. -/
 noncomputable def ancestryMixtureCorrelation (rho positiveEnvironmentMass : ℝ) : ℝ :=
   mixedEnvironmentCorrelation rho positiveEnvironmentMass
 
