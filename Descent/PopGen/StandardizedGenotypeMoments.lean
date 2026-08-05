@@ -55,7 +55,7 @@ constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : HardyWeinbergModel) :
     h.genotypeVariance = hweGenotypeVariance h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold hweGenotypeVariance ploidy HardyWeinbergModel.refFreq
+  unfold hweGenotypeVariance ploidy HardyWeinbergModel.refFreq Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
@@ -460,7 +460,7 @@ theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
 /-- At the blind frequency the genotype variance is exactly `1/3`. -/
 theorem gaussianKurtosisMaf_genotypeVariance :
     hweGenotypeVariance gaussianKurtosisMaf = 1 / 3 := by
-  unfold hweGenotypeVariance ploidy gaussianKurtosisMaf
+  unfold hweGenotypeVariance ploidy gaussianKurtosisMaf Descent.Core.ploidy
   nlinarith [sqrt_three_sq]
 
 /-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**
