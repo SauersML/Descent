@@ -95,7 +95,11 @@ def approx(label, got, want, tol=1e-12):
 # ---- PopulationGeneticsFoundations.lean, read by hand ---------------------
 
 d = BY_NAME["Descent.neiFst"]
-check("neiFst file", d["file"], "Descent/PopGen/PopulationGeneticsFoundations.lean")
+# REPOINTED: the monolith was split into a directory and `neiFst` moved to
+# `FstDefinitions.lean`. The old path is now a twelve-line head that imports
+# the chain, which is why the line check below started reporting "line 60 is
+# outside ... (12 lines)" rather than a wrong line.
+check("neiFst file", d["file"], "Descent/PopGen/PopulationGeneticsFoundations/FstDefinitions.lean")
 # The recorded line is checked against the SOURCE, not against a constant.  It
 # used to be pinned at 42; every edit above the definition moved it, and the
 # gate failed for a reason unrelated to what it tests ("got 46, want 42"), which
@@ -103,13 +107,19 @@ check("neiFst file", d["file"], "Descent/PopGen/PopulationGeneticsFoundations.le
 # assertion is actually for is that the parser attributes a declaration to the
 # right line, and that is checkable without a magic number.
 check("neiFst line points at its own `def` in the source",
-      _source_line_of("Descent/PopGen/PopulationGeneticsFoundations.lean",
+      _source_line_of("Descent/PopGen/PopulationGeneticsFoundations/FstDefinitions.lean",
                       d["line"], "def neiFst"), True)
 check("neiFst noncomputable", d["noncomputable"], True)
 check("neiFst args", [(a["names"], a["type"]) for a in d["args"]],
       [(["H_T", "H_S"], "ℝ")])
-check("neiFst ret", d["ret_type"], "ℝ")
-check("neiFst body", d["body"].strip(), "(H_T - H_S) / H_T")
+# REPOINTED with the body below: the return type is the estimator type now.
+check("neiFst ret", d["ret_type"], "Descent.Core.NeiFst")
+# REPOINTED: `neiFst` now returns a `Core.NeiFst`, so its body is the structure
+# literal `⟨(H_T - H_S) / H_T⟩`. The quotient is unchanged and
+# `neiFst_value` states it; what changed is that handing this estimator to
+# something expecting a Hudson one is now a type error rather than a
+# factor-of-two-to-four mistake found later.
+check("neiFst body", d["body"].strip(), "⟨(H_T - H_S) / H_T⟩")
 # REPOINTED: this def has since been measured (battery_bulk25) and its
 # docstring now records `Empirical status: **MEASURED, and NOT interchangeable
 # with Hudson's F_ST**`. It read "" here for a different reason -- the status
@@ -152,7 +162,10 @@ check("coalFst hypotheses mined", sorted(d["constraints"]["hypotheses"]),
       ["0 < Ne", "0 ≤ t", "100 * Ne < t"])
 
 d = BY_NAME["Descent.expectedHeterozygosity"]
-check("expectedHeterozygosity body", d["body"].strip(), "θ / (1 + θ)")
+# REPOINTED: the body now CALLS `Core.saturation` instead of restating
+# `θ / (1 + θ)`. Same quotient; the point of the move is that this and the
+# corpus's other saturation-shaped quantities can no longer drift apart.
+check("expectedHeterozygosity body", d["body"].strip(), "Descent.Core.saturation θ")
 check("expectedHeterozygosity docstring mentions mutation-drift",
       "mutation-drift balance" in d["docstring"], True)
 
@@ -219,7 +232,13 @@ evaluates("equilibriumFst(0.01, 1000)", "Descent.equilibriumFst",
           (0.01, 1000.0), 1 / (1 + 4 * 1000 * 0.01))
 
 # Mathlib totality: these are exactly the cases a hand transcription gets wrong
-approx("Lean division by zero is 0", lean_defs.neiFst(0.0, 0.0), 0.0)
+# REPOINTED from `neiFst`, which now returns a `Core.NeiFst` and so is emitted
+# as a structure rather than a callable real -- the retyping that makes passing
+# a Nei estimate where a Hudson one is wanted a type error. The fact under test
+# is Lean's `x / 0 = 0`, and `Core.ratio` is the kernel that division goes
+# through, so the check moves to it rather than to a definition chosen for
+# having once been convenient.
+approx("Lean division by zero is 0", lean_defs.ratio(0.0, 0.0), 0.0)
 approx("Real.sqrt of a negative is 0", __import__("lean_rt").rsqrt(-1.0), 0.0)
 approx("Real.log 0 is 0", __import__("lean_rt").rlog(0.0), 0.0)
 approx("Real.log of a negative is log|x|", __import__("lean_rt").rlog(-math.e), 1.0)
