@@ -32,6 +32,13 @@ obvious simplification of its rules:
     necessary reported ~4x more laundering than exists.
   * a premise may bind a variable whose name collides with a corpus definition.
 
+It also calibrates the other guards in `check.py` against fixture corpora, in both
+directions.  The `conventions` guard is calibrated hardest, because its ledger is a
+COMMITTED snapshot of a corpus that changes daily and therefore has failure modes the
+other guards do not: wrong by omission, wrong by staleness, wrong by contradiction, and
+wrong in its recorded data.  All four are planted here, together with the substring trap
+that would let a careless matcher demand an F_ST estimator from a meeting time.
+
 Run:  python3 proofs/validation/code/test_check.py
 """
 import json
@@ -369,6 +376,84 @@ def clean_plus(rel: str, text: str) -> dict:
     return files
 
 
+# --------------------------------------------------------------------------------------
+# Convention-ledger fixtures.
+#
+# The ledger is a COMMITTED snapshot of a corpus that changes daily, so its
+# failure modes are not the usual ones.  A ledger can be wrong by omission (a new
+# declaration nobody classified), wrong by staleness (an entry for a declaration
+# that is gone), wrong by contradiction (two conventions in one module with
+# nothing relating them), or wrong in its data (a constant that drifted).  All
+# four are asserted below, and so is the substring trap that would make the
+# matcher pull unrelated declarations into a quantity family.
+# --------------------------------------------------------------------------------------
+
+CONVENTION_LEAN = HEADER + """
+namespace Calibrator
+
+/-- A model carrying data, not a conclusion. -/
+structure CleanModel where
+  rate : ℝ
+
+/-- Hudson-flavoured. -/
+noncomputable def sampleHudsonFst (p : ℝ) : ℝ := p / (1 + p)
+
+/-- Nei-flavoured, in the same module. -/
+noncomputable def sampleNeiGst (p : ℝ) : ℝ := p * p
+
+/-- Merely transforms whatever it is handed. -/
+noncomputable def retentionFromFst (f : ℝ) : ℝ := 1 - f
+
+/-- A name that CONTAINS the letters `gSt` and is not an F_ST at all. -/
+noncomputable def steppingStoneMeetingTime (x : ℝ) : ℝ := x
+
+theorem sample_bridge (p : ℝ) : sampleHudsonFst p = p / (1 + p) := rfl
+
+end Calibrator
+"""
+
+
+def convention_ledger(entries: dict, bridges: list | None = None,
+                      verified: dict | None = None) -> str:
+    return json.dumps({
+        "verified_constants": verified or {},
+        "conventions": {
+            "hudson": {"means": "between-subgroup denominator", "source": "Hudson (1992)"},
+            "nei-gst": {"means": "total-pool denominator", "source": "Nei (1973)"},
+            "inherited": {"means": "commits to nothing", "source": "n/a"},
+        },
+        "bridges": [{"between": ["nei-gst", "hudson"], "theorem": "sample_bridge",
+                     "says": "fixture bridge"}] if bridges is None else bridges,
+        "quantities": {
+            "fst": {"words": ["fst", "gst"], "scope": "complete",
+                    "conventions": ["hudson", "nei-gst", "inherited"],
+                    "incompatible": [["nei-gst", "hudson"]],
+                    "why": "fixture"},
+        },
+        "declarations": entries,
+    }, indent=2)
+
+
+CONVENTION_ENTRIES = {
+    "Calibrator/Sub.lean::sampleHudsonFst": {
+        "quantity": "fst", "convention": "hudson", "constants": ["1"]},
+    "Calibrator/Sub.lean::sampleNeiGst": {
+        "quantity": "fst", "convention": "nei-gst"},
+    "Calibrator/Sub.lean::retentionFromFst": {
+        "quantity": "fst", "convention": "inherited", "constants": ["1"]},
+}
+
+
+def convention_corpus_files(entries=None, bridges=None, lean=None, ledger=True,
+                            verified=None) -> dict:
+    files = dict(CLEAN)
+    files["Calibrator/Sub.lean"] = CONVENTION_LEAN if lean is None else lean
+    if ledger:
+        files["validation/conventions.json"] = convention_ledger(
+            CONVENTION_ENTRIES if entries is None else entries, bridges, verified)
+    return files
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
     ("style", "line over 100 characters",
@@ -580,6 +665,69 @@ theorem clean_rate_at_one_second : cleanRate 1 = 1 := by
   unfold cleanRate
 """),
      "same proposition under different names"),
+
+    # --- conventions: the four rules, one planted defect each -------------------
+    ("conventions", "a definition carrying a ledgered quantity with no ledger entry",
+     convention_corpus_files(
+         entries={k: v for k, v in CONVENTION_ENTRIES.items()
+                  if not k.endswith("sampleNeiGst")}),
+     "has no ledger entry"),
+    ("conventions", "two incompatible conventions in one module with no bridge",
+     convention_corpus_files(bridges=[]),
+     "declares incompatible"),
+    ("conventions", "a ledgered constant the body no longer carries",
+     convention_corpus_files(
+         entries=dict(CONVENTION_ENTRIES,
+                      **{"Calibrator/Sub.lean::sampleHudsonFst": {
+                          "quantity": "fst", "convention": "hudson",
+                          "constants": ["4"]}})),
+     "ledger records constants"),
+    ("conventions", "a ledger entry whose declaration no longer exists",
+     convention_corpus_files(
+         entries=dict(CONVENTION_ENTRIES,
+                      **{"Calibrator/Sub.lean::deletedFst": {
+                          "quantity": "fst", "convention": "hudson"}})),
+     "is no longer a `def`"),
+    ("conventions", "a bridge naming a theorem the corpus does not have",
+     convention_corpus_files(
+         bridges=[{"between": ["nei-gst", "hudson"], "theorem": "vanished_bridge"}]),
+     "is not in the corpus"),
+    ("conventions", "a ledger naming a convention it never defines",
+     convention_corpus_files(
+         entries=dict(CONVENTION_ENTRIES,
+                      **{"Calibrator/Sub.lean::sampleNeiGst": {
+                          "quantity": "fst", "convention": "nei-fst-typo"}})),
+     "is not in `conventions`"),
+    ("conventions", "no ledger at all",
+     convention_corpus_files(ledger=False),
+     "CANNOT RUN"),
+    # `verified_constants` is the record of values read against a published
+    # source.  Its whole purpose is that a 4 turning into a 2 fails here, so that
+    # is planted directly -- on a definition carrying NO ledgered quantity, which
+    # is the case the `declarations` rules cannot reach.
+    ("conventions", "a source-verified constant the body no longer carries",
+     convention_corpus_files(
+         verified={"Calibrator/Sub.lean::steppingStoneMeetingTime": {
+             "constants": ["4"], "source": "fixture"}}),
+     "ledger records constants"),
+    ("conventions", "a source-verified record naming a declaration that is gone",
+     convention_corpus_files(
+         verified={"Calibrator/Sub.lean::vanishedDef": {
+             "constants": ["4"], "source": "fixture"}}),
+     "is no longer a `def`"),
+    # One definition recorded twice can have its two records disagree, and only
+    # one of them would ever be read.  This fired on the real ledger the first
+    # time it ran, on `liabilityScaleH2`.
+    ("conventions", "one definition recorded in both tables",
+     convention_corpus_files(
+         verified={"Calibrator/Sub.lean::sampleHudsonFst": {
+             "constants": ["1"], "source": "fixture"}}),
+     "appears in both"),
+    ("conventions", "a source-verified record that pins nothing",
+     convention_corpus_files(
+         verified={"Calibrator/Sub.lean::steppingStoneMeetingTime": {
+             "source": "fixture"}}),
+     "pins no constants"),
 ]
 
 # Duplication traps: mathematics that LOOKS repeated to a careless screen and is
@@ -805,6 +953,37 @@ theorem closers_only_second (m : CleanModel) : m.rate + 0 = m.rate := by
   simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul]
   norm_num
 """)),
+
+    # --- conventions: the traps ------------------------------------------------
+    # A complete ledger over a module that legitimately mixes conventions, with
+    # the bridge present.  If this fired, the guard would be demanding that no
+    # module ever discuss two estimators -- which would delete `Conventions.lean`,
+    # the module whose entire job is relating them.
+    ("conventions", "incompatible conventions coexisting WITH a bridge theorem",
+     convention_corpus_files()),
+    # `steppingStoneMeetingTime` contains the letters `gSt`.  A substring matcher
+    # pulls it into the F_ST family and then demands a ledger entry declaring
+    # which F_ST estimator a meeting time is, which is not a question. This is the
+    # trap that decides between substring and camel-case-word matching.
+    #
+    # Asserted against a corpus where the guard IS reporting -- the `sampleNeiGst`
+    # entry is withheld so the unledgered list is non-empty. On a silent run the
+    # absence of a name proves nothing, because every name is absent.
+    ("conventions", "a name merely CONTAINING the quantity's letters",
+     convention_corpus_files(
+         entries={k: v for k, v in CONVENTION_ENTRIES.items()
+                  if not k.endswith("sampleNeiGst")}),
+     "steppingStoneMeetingTime"),
+    # `inherited` commits to no convention, so it can sit beside anything. A guard
+    # that counted it as a third convention would report every module that carries
+    # a retention factor.
+    ("conventions", "an `inherited` entry beside a committed one",
+     convention_corpus_files(
+         entries={k: v for k, v in CONVENTION_ENTRIES.items()
+                  if not k.endswith("sampleNeiGst")}
+         | {"Calibrator/Sub.lean::sampleNeiGst": {
+             "quantity": "fst", "convention": "inherited"}}),
+     "declares incompatible"),
 ]
 
 
@@ -874,7 +1053,7 @@ def calibrate_others() -> list:
     r = subprocess.run([sys.executable, str(CHECK), "--list"],
                        capture_output=True, text=True)
     for guard in ("style", "identifications", "duplication", "laundering",
-                  "regimes", "closure", "wiring", "field-proofs"):
+                  "regimes", "closure", "wiring", "conventions", "field-proofs"):
         if guard not in r.stdout:
             failures.append(f"DISPATCH        --list does not name the {guard!r} guard")
 
@@ -919,7 +1098,14 @@ def main() -> int:
     print(f"  {len(NEGATIVE_CASES)} traps -- idiom, an explicit tie, a trivial "
           f"coincidence, a specialisation, a type-forced field block and a tactic "
           f"macro -- each accepted")
-    print("  wiring --json keys asserted by name; --list names all eight guards")
+    conv_pos = sum(1 for guard, *_ in CASES if guard == "conventions")
+    conv_neg = sum(1 for case in NEGATIVE_CASES if case[0] == "conventions")
+    print(f"  conventions: {conv_pos} planted ledger defects reported "
+          f"(omission, staleness, contradiction, drifted constant, malformed "
+          f"ledger, absent ledger), {conv_neg} traps accepted (a bridged "
+          f"module, an `inherited` neighbour, and a name that merely CONTAINS "
+          f"the quantity's letters)")
+    print("  wiring --json keys asserted by name; --list names all nine guards")
     return 0
 
 

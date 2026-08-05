@@ -54,6 +54,12 @@ THE GUARDS, and what each one catches:
                   `lake build Calibrator` cannot validate and so cannot fail on.
   wiring          an upstream-arc module with no biological dependent: a result
                   adjacent to the corpus rather than wired into it.
+  conventions     a quantity used under an unstated or contradictory convention,
+                  and a numeric constant that has drifted from the value a source
+                  paper gives.  Checked against `validation/conventions.json`,
+                  which is the corpus's convention ledger; a definition whose name
+                  carries a ledgered quantity and whose entry is missing FAILS, and
+                  so does a ledger entry whose declaration no longer exists.
   field-proofs    theorems whose ENTIRE proof is a structure-field projection,
                   measured on origin/main rather than the worktree.  DIAGNOSTIC,
                   not a gate: it has known false positives and never fails the
@@ -5140,6 +5146,303 @@ def run_mathlib() -> int:
     return 0
 
 # ======================================================================================
+# CONVENTIONS -- the convention ledger, and the four ways it can be violated
+# ======================================================================================
+#
+# WHAT THIS IS FOR.  A convention is invisible to Lean.  Nei's `G_ST`, Hudson's
+# `F_ST` and the per-branch drift `F` are all reals in `[0,1)`, all named `fst`,
+# and every one of them type-checks in the others' place.  This corpus has paid
+# for that three times: the factor-of-four `F_ST` error, a Nei body carrying the
+# name `hudsonFst`, and a within-population heterozygosity loss documented as a
+# between-population variance ratio.  Each was caught by a person reading the
+# corpus against a paper.  `proofs/validation/conventions.json` is that reading
+# written down as DATA; this guard is what makes the data load-bearing.
+#
+# THE FOUR RULES, all at budget 0:
+#
+#   UNLEDGERED   a `def` whose name carries a ledgered quantity's word, under a
+#                quantity whose scope is `complete`, with no ledger entry.  The
+#                ledger is where the convention is stated, so "no entry" and
+#                "no stated convention" are the same condition.
+#   STALE        a ledger entry naming a declaration the corpus no longer has,
+#                or a bridge naming a theorem the corpus no longer has.  A
+#                committed snapshot of a moving corpus goes stale by
+#                construction; the only safe design is to make staleness LOUD.
+#   UNBRIDGED    one module carrying two conventions the ledger declares
+#                incompatible, with no chain of existing bridge theorems
+#                connecting them.  `Conventions.lean` may hold both `hudsonFst`
+#                and `neiGst` precisely because `hudsonFst_eq_of_neiGst` exists.
+#   CONSTANT     a ledgered `constants` multiset that the definition's body no
+#                longer has.  This is the durable half of a constant audit: a
+#                future edit turning a `4` into a `2` fails here instead of
+#                waiting for somebody to re-read the source paper.
+#
+# ANCHORED TO NAMES, NEVER TO OFFSETS.  Every ledger key is
+# `<module>::<declaration>`.  A ledger pinned to line numbers fails on edits
+# that have nothing to do with it, which is exactly how `extract/test_parser.py`
+# came to be red, and a gate that is red for an unrelated reason stops being
+# read.
+#
+# NOT A REFERENCE COUNT.  This guard never counts citations and never requires
+# one.  That shape is deliberately absent from this file (family F14): it has
+# twice deleted correct work here.  A ledger entry's `source` is free text that
+# no rule inspects.
+
+CONVENTION_UNLEDGERED_BUDGET = 0   # complete-scope declarations with no ledger entry
+CONVENTION_STALE_BUDGET = 0        # ledger entries naming declarations that are gone
+CONVENTION_UNBRIDGED_BUDGET = 0    # incompatible conventions sharing a module, unrelated
+CONVENTION_CONSTANT_BUDGET = 0     # ledgered constants the body no longer carries
+
+CONVENTION_LEDGER = "validation/conventions.json"
+
+# Split a declaration name into camel-case words.  `[A-Z]+[0-9]*(?![a-z])` is
+# what keeps `narrowSenseH2` yielding `h2` rather than `h` and `2` -- without the
+# `[0-9]*` the entire heritability family is invisible to the matcher.
+CONVENTION_WORD = re.compile(r"[A-Z]+[0-9]*(?![a-z])|[A-Z][a-z0-9']*|[a-z][a-z0-9']*")
+
+CONVENTION_DEF = re.compile(r"^(?:noncomputable\s+)?def\s+([A-Za-z_0-9'.]+)", re.M)
+CONVENTION_THM = re.compile(
+    r"^(?:@\[[^\]]*\]\s*)?(?:noncomputable\s+)?(?:theorem|lemma)\s+([A-Za-z_0-9'.]+)", re.M)
+CONVENTION_NEXT_DECL = re.compile(
+    r"^(?:@\[|/-|noncomputable\s|def\s|theorem\s|lemma\s|abbrev\s|structure\s|class\s|"
+    r"instance\s|inductive\s|section\b|end\b|namespace\b|open\b|variable\b)", re.M)
+CONVENTION_NUMBER = re.compile(r"(?<![A-Za-z_0-9'₀-₉.])([0-9]+(?:\.[0-9]+)?)")
+
+
+def convention_words(name: str) -> set:
+    """The camel-case words of a declaration's LAST dotted component, lowered.
+
+    Matching on words rather than substrings is not fussiness: `steppingStone`
+    contains the letters `gSt`, and a substring matcher pulls
+    `steppingStoneMeetingTimeOnLattice` into the `F_ST` family, where a ledger
+    entry for it would be a lie.
+    """
+    return {w.lower() for w in CONVENTION_WORD.findall(name.split(".")[-1])}
+
+
+def convention_body(src: str, name: str) -> str | None:
+    """The body of `def name`, comments already stripped, or None if absent."""
+    m = re.search(r"^(?:noncomputable\s+)?def\s+" + re.escape(name) + r"(?![A-Za-z_0-9'])",
+                  src, re.M)
+    if not m:
+        return None
+    tail = src[m.end():]
+    assign = tail.find(":=")
+    if assign < 0:
+        return ""
+    rest = tail[assign + 2:]
+    nxt = CONVENTION_NEXT_DECL.search(rest)
+    return rest[:nxt.start()] if nxt else rest
+
+
+def convention_corpus() -> tuple[dict, dict, set]:
+    """(defs by `module::name`, module source by module, every theorem short name)."""
+    defs, sources, theorems = {}, {}, set()
+    for path in ident_lean_files():
+        rel = os.path.relpath(path, IDENT_ROOT)
+        src = ident_strip_comments(read_source(Path(path)))
+        sources[rel] = src
+        for m in CONVENTION_DEF.finditer(src):
+            defs[f"{rel}::{m.group(1)}"] = m.group(1)
+        for m in CONVENTION_THM.finditer(src):
+            theorems.add(m.group(1).split(".")[-1])
+    return defs, sources, theorems
+
+
+def convention_connected(present: set, edges: set) -> list:
+    """Every declared-incompatible pair inside `present` that `edges` fails to connect.
+
+    Connectivity rather than a direct edge, because the corpus relates
+    conventions in a chain: Nei's `G_ST` to Hudson's `F_ST` to the per-branch
+    drift `F`.  Demanding a direct bridge for the outer pair would ask for a
+    theorem that adds nothing, and asking for a theorem nobody needs is how a
+    guard gets satisfied with a stub.
+    """
+    parent = {c: c for c in present}
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for a, b in edges:
+        if a in parent and b in parent:
+            parent[find(a)] = find(b)
+    return sorted({(a, b) for a in present for b in present
+                   if a < b and find(a) != find(b)})
+
+
+def run_conventions() -> int:
+    ledger_path = PROOFS / CONVENTION_LEDGER
+    if not ledger_path.exists():
+        print(f"conventions guard CANNOT RUN: no ledger at {ledger_path}")
+        print("  The ledger IS the statement of convention for every quantity this "
+              "guard covers, so with no ledger there is nothing to check against. "
+              "This is reported as a failure rather than a pass for the same reason "
+              "the mathlib guard fails when Mathlib is absent: a screen that cannot "
+              "look is not a screen that found nothing.")
+        return 1
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"conventions guard CANNOT RUN: {ledger_path} is not parseable JSON: {exc}")
+        return 1
+
+    quantities = ledger.get("quantities", {})
+    entries = ledger.get("declarations", {})
+    known_conventions = set(ledger.get("conventions", {}))
+    defs, sources, theorems = convention_corpus()
+
+    # `verified_constants` records values read against a published source that
+    # fall OUTSIDE the ledgered quantity families -- the Ohta-Kimura 10/2/11, the
+    # LDSC `+1`, the `4` in `4*Ne*mu`.  They carry no convention and take part in
+    # only two rules, staleness and constants, which is why they are merged into
+    # one dictionary rather than kept on a separate code path: one extractor, one
+    # comparison, one place to be wrong.
+    verified = {k: v for k, v in ledger.get("verified_constants", {}).items()
+                if not k.startswith("$")}
+
+    stale, unledgered, unbridged, constants, malformed = [], [], [], [], []
+
+    for key in sorted(set(verified) & set(entries)):
+        malformed.append(f"{key}: appears in both `declarations` and "
+                         f"`verified_constants`; two records of one definition can "
+                         f"disagree and only one of them would be read")
+    for key, entry in sorted(verified.items()):
+        if not entry.get("constants"):
+            malformed.append(f"{key}: is in `verified_constants` and pins no "
+                             f"constants, so it records nothing")
+    checked = dict(entries)
+    checked.update(verified)
+
+    # A ledger that names a convention it never defines, or a quantity no entry
+    # uses, is a ledger nobody has read.  Cheap, and it fires on a typo.
+    for key, entry in sorted(entries.items()):
+        if entry.get("quantity") not in quantities:
+            malformed.append(f"{key}: quantity {entry.get('quantity')!r} is not in `quantities`")
+        if entry.get("convention") not in known_conventions:
+            malformed.append(f"{key}: convention {entry.get('convention')!r} is not in `conventions`")
+
+    # STALE.  Entries first, then bridges.
+    for key in sorted(checked):
+        if key not in defs:
+            module, _, name = key.partition("::")
+            if module not in sources:
+                stale.append(f"{key}: module {module} is not in the corpus")
+            else:
+                stale.append(f"{key}: `{name}` is no longer a `def` in {module}")
+    bridge_edges = set()
+    for bridge in ledger.get("bridges", []):
+        pair = tuple(bridge.get("between", []))
+        thm = bridge.get("theorem", "")
+        if len(pair) != 2:
+            malformed.append(f"bridge {bridge!r} does not name exactly two conventions")
+            continue
+        if thm.split(".")[-1] not in theorems:
+            stale.append(f"bridge {pair[0]} <-> {pair[1]}: theorem `{thm}` is not in the corpus")
+            continue
+        bridge_edges.add(pair)
+
+    # UNLEDGERED.  Only `complete` quantities can produce this finding; an
+    # `unscoped` quantity is recorded so a later pass has somewhere to put the
+    # work, and it is not allowed to look like coverage it does not have.
+    complete = {q: set(spec.get("words", []))
+                for q, spec in quantities.items() if spec.get("scope") == "complete"}
+    matched = 0
+    for key, name in sorted(defs.items()):
+        words = convention_words(name)
+        for quantity, quantity_words in complete.items():
+            if not (words & quantity_words):
+                continue
+            matched += 1
+            if key not in entries:
+                unledgered.append(
+                    f"{key}: carries the `{quantity}` word "
+                    f"{sorted(words & quantity_words)} and has no ledger entry, so "
+                    f"which {quantity} it is is stated nowhere a machine can read")
+            break
+
+    # UNBRIDGED.  `inherited` commits to no convention and is excluded: a body
+    # that returns whatever it was handed cannot disagree with anything.
+    by_module: dict = {}
+    for key, entry in entries.items():
+        module = key.partition("::")[0]
+        conv = entry.get("convention")
+        if conv and conv != "inherited":
+            by_module.setdefault((module, entry.get("quantity")), set()).add(conv)
+    for (module, quantity), present in sorted(by_module.items()):
+        spec = quantities.get(quantity, {})
+        incompatible = {tuple(sorted(p)) for p in spec.get("incompatible", [])}
+        if not incompatible or len(present) < 2:
+            continue
+        edges = {tuple(sorted(p)) for p in bridge_edges}
+        for a, b in convention_connected(present, edges):
+            if (a, b) in incompatible:
+                unbridged.append(
+                    f"{module}: carries both `{a}` and `{b}` for `{quantity}`, which the "
+                    f"ledger declares incompatible, and no chain of existing bridge "
+                    f"theorems relates them")
+
+    # CONSTANT.
+    for key, entry in sorted(checked.items()):
+        want = entry.get("constants")
+        if want is None or key not in defs:
+            continue
+        module, _, name = key.partition("::")
+        body = convention_body(sources[module], name)
+        if body is None:
+            continue
+        got = sorted(CONVENTION_NUMBER.findall(body))
+        if got != sorted(want):
+            constants.append(
+                f"{key}: ledger records constants {sorted(want)}, body now has {got}"
+                + (f"; {entry['note']}" if "note" in entry else ""))
+
+    failures = []
+    for label, found, budget, advice in (
+        ("ledger entries that no longer match the corpus", stale,
+         CONVENTION_STALE_BUDGET,
+         "repoint the entry, or delete it if the declaration is gone for good"),
+        ("declarations carrying a ledgered quantity with no ledger entry", unledgered,
+         CONVENTION_UNLEDGERED_BUDGET,
+         "add an entry naming which convention it uses and where that convention "
+         "comes from"),
+        ("modules mixing incompatible conventions with nothing relating them", unbridged,
+         CONVENTION_UNBRIDGED_BUDGET,
+         "prove a bridge theorem and name it in `bridges`, or move one of the "
+         "declarations"),
+        ("ledgered constants the body no longer carries", constants,
+         CONVENTION_CONSTANT_BUDGET,
+         "if the body is right the ledger is stale and the SOURCE should be "
+         "re-read before updating it; that re-reading is the point"),
+        ("malformed ledger entries", malformed, 0,
+         "fix the ledger; a name it does not define is a name nobody checked"),
+    ):
+        if len(found) > budget:
+            failures.append(f"conventions guard FAILS: {label}: {len(found)}, "
+                            f"budget {budget}; {advice}")
+            failures.extend("    " + x for x in found)
+
+    if failures:
+        for line in failures:
+            print(line)
+        return 1
+
+    scoped = sorted(q for q, s in quantities.items() if s.get("scope") == "complete")
+    unscoped = sorted(q for q, s in quantities.items() if s.get("scope") != "complete")
+    with_constants = sum(1 for e in checked.values() if e.get("constants"))
+    print(f"conventions guard passes: {len(entries)} ledger entries over "
+          f"{matched} matching declarations in {len(defs)} corpus definitions; "
+          f"quantities scoped complete: {', '.join(scoped)}; "
+          f"registered but unscoped (checked for nothing): "
+          f"{', '.join(unscoped) or 'none'}; "
+          f"{len(verified)} source-verified constant records outside those "
+          f"families; {with_constants} entries pin a constant multiset; "
+          f"{len(bridge_edges)} bridge theorem(s) present")
+    return 0
+
+# ======================================================================================
 # DISPATCHER
 # ======================================================================================
 
@@ -5162,6 +5465,7 @@ GUARDS = {
     "regimes":         dict(fn=run_regimes,         gated=True,  takes_argv=False),
     "closure":         dict(fn=run_closure,         gated=True,  takes_argv=False),
     "wiring":          dict(fn=run_wiring,          gated=True,  takes_argv=True),
+    "conventions":     dict(fn=run_conventions,     gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
 }
 
