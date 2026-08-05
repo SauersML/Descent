@@ -35,6 +35,14 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
+import Descent.Blindness.TrafficInvariantSeparation.CurieWeissWindow
+import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
+import Descent.Blindness.TrafficInvariantSeparation.InvariantSeparation
+import Descent.Blindness.TrafficInvariantSeparation.MatchedBayesBoundary
+import Descent.Blindness.TrafficInvariantSeparation.MesoscopicAmplification
+import Descent.Blindness.TrafficInvariantSeparation.PolynomialTraffic
+import Descent.Blindness.TrafficInvariantSeparation.RankOneInvisibility
+import Descent.Blindness.TrafficInvariantSeparation.SpectralSDPSeparation
 import Descent.Blindness.XiFromMarkedBreakouts
 
 /-!

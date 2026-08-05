@@ -1,0 +1,165 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Program.OpenQuestions
+import Descent.Core.Fst
+import Descent.Core.Heterozygosity
+import Descent.PopGen.PopulationGeneticsFoundations.SelectionMigrationBalance
+
+namespace Descent.PopGen
+
+open MeasureTheory
+
+/-!
+# `PopulationGeneticsFoundations.WrightFStatistics`
+
+Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,726 lines.
+
+The parts are a CHAIN: each imports the one before, in the order the original was written.
+That is the conservative choice, deliberately. A monolith's declarations depend on each
+other in whatever order they happen to appear, and cutting it into modules that import only
+what they use means discovering that order first -- worth doing, and not what this does.
+The chain preserves every resolution the single file had, so the split cannot change what
+any proof sees.
+
+Where a cut falls inside a section, the section is reopened and reclosed by name. A section
+scopes `variable`s and this file declares none at that level, so the reopening is exact.
+-/
+
+
+
+/-!
+## Wright's Fixation Indices
+
+Wright's F-statistics partition genetic variation into hierarchical
+levels: individual, subpopulation, total.
+-/
+
+section WrightFStatistics
+
+/-- **Wright's hierarchical F-statistics.**
+    F_IT = 1 - (1 - F_IS)(1 - F_ST).
+    F_IS: inbreeding within subpopulations.
+    F_ST: differentiation between subpopulations (= Fst).
+    F_IT: overall inbreeding. -/
+noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
+  Descent.Core.complementaryComposition f_IS f_ST
+
+/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with `pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
+free. Two independent halves compound to three quarters, not to one -- the inbreeding
+coefficients multiply as retained heterozygosities rather than adding. -/
+theorem wrightFIT_compounds_two_halves :
+    wrightFIT (1 / 2) (1 / 2) = 3 / 4 := by
+  unfold wrightFIT Descent.Core.complementaryComposition
+  norm_num
+
+/-- Wright's decomposition identity. -/
+theorem wright_decomposition (f_IS f_ST : ℝ) :
+    wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
+  unfold wrightFIT Descent.Core.complementaryComposition; ring
+
+/-- **The multiplicative-complement composition `1 - (1-a)(1-b)` occurs twice, and the two
+occurrences do not have the same status.**
+
+`wrightFIT` composes `F_IS` with `F_ST` across *nested* levels — individual within
+subpopulation within total — and there the composition is exact, because the two
+complements are the retention factors of a genuine hierarchy.
+`PortabilityDrift.pairwiseFstFromBranches` applies the same algebra to two *sibling*
+branches, and `PortabilityDrift` records it as CONDITIONALLY VALID for exactly that
+reason: composing multiplicatively in `F_ST` inserts a spurious `tauS * tauT` of divergence
+time, because coalescence times add along a path while `F_ST` values do not, and near
+`tau = 1` that term doubles the divergence time.
+
+So the shared body is not a coincidence and not an identification either: it is one
+algebraic move that is *correct across levels and wrong across branches*.  This theorem
+exists so the arithmetic agreement is on the record and cannot drift, and so that anyone
+repairing one of the two is forced to look at the other. `pairwiseFstFromBranchTaus` is the
+composition PortabilityDrift offers in place of the branch case. -/
+theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
+    wrightFIT a b = Portability.pairwiseFstFromBranches a b := rfl
+
+/-- **Within-population heterozygosity loss after `t` generations of drift.**
+    `1 - (1 - 1/(2 Nₑ))^t`.
+
+    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with branch-mode
+    divergence, which removes mutational noise analytically, shows the split
+    quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
+    tested grid, while this formula is biased upward in eleven of twelve cells
+    by up to 28 percent. The formula is correct for what it now says, and
+    `heterozygosityLossFromDrift_eq_het_loss` is the theorem that says it; only the name and
+    docstring were reassigning it to a different observable.
+
+    Regime: closed population, no mutation. See `Descent.PopGen.DriftRegime`.
+
+    Empirical status: VALIDATED as heterozygosity loss against the drift-only
+    recurrence it restates (0.9048/0.6065/0.1353 retention at t = 200/1000/4000
+    with Ne = 1000); FALSIFIED as split `F_ST`, and FALSIFIED as *measured*
+    heterozygosity loss at mutation-drift balance, where the simulated retention
+    is 1.025 ± 0.02 at every one of those times. The first clause is an identity
+    and carries no empirical weight on its own — a cross-check cannot measure the
+    premise it shares, `DriftRegime.crossChecks_blind_to_retention`.
+
+    In-regime detail, carried over from the deleted second copy of this
+    definition, which is where `battery_falsrepair` recorded it: forward
+    Wright-Fisher at `Ne = 1000` measures the retention `1 - L(t)` as
+    0.90445 ± 0.00094, 0.60311 ± 0.00372 and 0.13699 ± 0.00272 at
+    `t = 200`, `1000`, `4000` against this expression's 0.90481, 0.60645 and
+    0.13527 -- worst 0.90 sems -- with the halved-rate reading `(1 - 1/(4 Nₑ))^t`
+    excluded at 84.90 sems and the haploid reading `(1 - 1/Nₑ)^t` at 91.51.
+    Those two exclusions are what make the ploidy convention in this body a
+    measured fact rather than a stipulation.
+
+    Denotes: within-population heterozygosity loss. The same formula appears under
+    `heterozygosityLossFromDrift` here and `founderHeterozygosityLoss` in
+    `DemographicHistory`; all three now name the quantity rather than leaving the
+    formula to fix it, which it cannot.
+
+    Power: the retention this formula predicts spans `0.9048`, `0.6065` and
+    `0.1353` at `t = 200`, `1000` and `4000` with `Ne = 1000` — nearly the whole
+    unit interval — while the measurement at mutation-drift balance stays at
+    `1.025` across all three times. The design therefore has the power to
+    separate the two regimes, which is how the falsification was reached. -/
+noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
+  Descent.Core.heterozygosityLoss Ne t
+
+/-- **heterozygosityLossFromDrift at its junk point, named.** An empty population loses all
+heterozygosity in one generation. The per-generation retention is junk-one, so the loss is `0` at
+every generation count -- no drift at all, reported for the strongest drift possible. Consumers
+must exclude the argument that makes the guard vanish. -/
+theorem heterozygosityLossFromDrift_empty_population_is_junk (t : ℕ) :
+    heterozygosityLossFromDrift t 0 = 0 := by
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  simp
+
+/-- **One generation of drift in a population of one, pinned.** This definition carries no result
+of its own. At `Ne = 1` a single generation loses half the heterozygosity, which fixes the
+per-generation rate at `1 / (2 Ne)` against `1 / Ne` and against `1 / (4 Ne)`. -/
+theorem heterozygosityLossFromDrift_one_generation :
+    heterozygosityLossFromDrift 1 1 = 1 / 2 := by
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  norm_num
+
+/-- Fst from drift is nonneg. -/
+theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
+    0 ≤ heterozygosityLossFromDrift t Ne := by
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  rw [sub_nonneg]
+  apply pow_le_one₀
+  · rw [sub_nonneg, div_le_one (by linarith)]; linarith
+  · rw [sub_le_self_iff]; positivity
+
+/-- Fst from drift increases with time. -/
+theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
+    (h_time : t₁ < t₂) :
+    heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne := by
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  rw [sub_lt_sub_iff_left]
+  have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
+    rw [sub_pos, div_lt_one (by linarith)]; linarith
+  have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
+    rw [sub_lt_self_iff]; positivity
+  exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_time
+
+end WrightFStatistics
+
+end Descent.PopGen

@@ -18,6 +18,14 @@ import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.PolygenicAdaptation
 import Descent.PopGen.PolygenicArchitecture
 import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
+import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
+import Descent.PopGen.PopulationGeneticsFoundations.FstDerivationFromDrift
+import Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations
+import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
+import Descent.PopGen.PopulationGeneticsFoundations.SelectionMigrationBalance
+import Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation
+import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.SerialFounderChain
 import Descent.PopGen.StandardizedGenotypeMoments
