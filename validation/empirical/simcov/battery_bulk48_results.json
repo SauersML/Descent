@@ -1,5 +1,5 @@
 {
- "_battery_sha": "52c94e9ef76c1893",
+ "_battery_sha": "28f189deba814c56",
  "results": [
   {
    "name": "neutralPortabilityRatioLD",
@@ -125,15 +125,15 @@
    "source": "rareCount * rareVariance / (rareCount * rareVariance + commonCount * commonVariance), at the realised masses",
    "note": "",
    "regime": "500000 individuals per cell (10 blocks of 50000) with standardised independent genotypes in a rare and a common class; the observable is the realised share of genetic variance carried by the rare class. Counts and per-variant variances move in OPPOSITE directions across the design, which is the only regime where the counts are visible; at equal class sizes the body and the bare variance ratio coincide exactly. The prediction is evaluated at the REALISED sums of squares",
-   "span": 0.13655920836759639,
+   "span": 0.15843364551010117,
    "verdict": "MATCH",
    "worst": {
-    "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
-    "lean": 0.49553890855888855,
-    "truth": 0.4940778874752696,
-    "sem": 0.004007622124319812,
-    "sems_off": 0.36456058937116526,
-    "rel_err": 0.002957066326292697
+    "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+    "lean": 0.48628191115525377,
+    "truth": 0.4850543639864431,
+    "sem": 0.009104769393869174,
+    "sems_off": 0.13482463044448656,
+    "rel_err": 0.00253074141777022
    },
    "cells": [
     {
@@ -146,27 +146,27 @@
     },
     {
      "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
-     "lean": 0.4959211982945133,
-     "truth": 0.4965420171152239,
-     "sem": 0.010221789719804248,
-     "sems_off": 0.06073484563156001,
-     "rel_err": 0.0012502845666865598
+     "lean": 0.5172433626076515,
+     "truth": 0.516945559207593,
+     "sem": 0.010760377215365756,
+     "sems_off": 0.027675925676026506,
+     "rel_err": 0.0005760827126844144
     },
     {
      "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
-     "lean": 0.49553890855888855,
-     "truth": 0.4940778874752696,
-     "sem": 0.004007622124319812,
-     "sems_off": 0.36456058937116526,
-     "rel_err": 0.002957066326292697
+     "lean": 0.49550050558427927,
+     "truth": 0.4952609581939715,
+     "sem": 0.004013907738758661,
+     "sems_off": 0.05967934638723785,
+     "rel_err": 0.0004836791318688455
     },
     {
      "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
-     "lean": 0.5631908011154987,
-     "truth": 0.5627625338493031,
-     "sem": 0.003034284422815699,
-     "sems_off": 0.1411427560894861,
-     "rel_err": 0.0007610088455360551
+     "lean": 0.5778295538561606,
+     "truth": 0.5774464237835254,
+     "sem": 0.006029211938179838,
+     "sems_off": 0.06354563026870537,
+     "rel_err": 0.0006634902509654631
     }
    ]
   },
@@ -174,17 +174,17 @@
    "name": "rareHeritabilityShare [bare variance ratio, counts dropped, competing]",
    "file": "RareVariantPortability.lean",
    "source": "rareVariance / (rareVariance + commonVariance)",
-   "note": "the positive control 'total genetic variance = realised sum of squares' missed by 11459312973.4 sems on the same code path, so this design cannot support any verdict",
+   "note": "positive control 'total genetic variance = realised sum of squares' passed at 0.55 sems",
    "regime": "500000 individuals per cell (10 blocks of 50000) with standardised independent genotypes in a rare and a common class; the observable is the realised share of genetic variance carried by the rare class. Counts and per-variant variances move in OPPOSITE directions across the design, which is the only regime where the counts are visible; at equal class sizes the body and the bare variance ratio coincide exactly. The prediction is evaluated at the REALISED sums of squares",
    "span": 0.9,
-   "verdict": "VOID (control failed)",
+   "verdict": "FALSIFIED",
    "worst": {
-    "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
-    "lean": 0.8,
-    "truth": 0.5627625338493031,
-    "sem": 0.003034284422815699,
-    "sems_off": 78.18563888303844,
-    "rel_err": 0.42155874259785847
+    "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+    "lean": 0.09090909090909091,
+    "truth": 0.4850543639864431,
+    "sem": 0.009104769393869174,
+    "sems_off": 43.28997869432646,
+    "rel_err": 0.8125795835296685
    },
    "cells": [
     {
@@ -198,26 +198,26 @@
     {
      "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
      "lean": 0.9090909090909092,
-     "truth": 0.4965420171152239,
-     "sem": 0.010221789719804248,
-     "sems_off": 40.35975140208478,
-     "rel_err": 0.8308438717280843
+     "truth": 0.516945559207593,
+     "sem": 0.010760377215365756,
+     "sems_off": 36.44345751404838,
+     "rel_err": 0.7585815235252654
     },
     {
      "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
      "lean": 0.5,
-     "truth": 0.4940778874752696,
-     "sem": 0.004007622124319812,
-     "sems_off": 1.4777123044592253,
-     "rel_err": 0.011986192207451965
+     "truth": 0.4952609581939715,
+     "sem": 0.004013907738758661,
+     "sems_off": 1.180655389825705,
+     "rel_err": 0.009568777283212482
     },
     {
      "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
      "lean": 0.8,
-     "truth": 0.5627625338493031,
-     "sem": 0.003034284422815699,
-     "sems_off": 78.18563888303844,
-     "rel_err": 0.42155874259785847
+     "truth": 0.5774464237835254,
+     "sem": 0.006029211938179838,
+     "sems_off": 36.91254819011412,
+     "rel_err": 0.38540991345702075
     }
    ]
   },
@@ -230,12 +230,12 @@
    "span": 0.12499999999999994,
    "verdict": "MATCH",
    "worst": {
-    "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
-    "lean": 0.5714285714285714,
-    "truth": 0.5627625338493031,
-    "sem": 0.003034284422815699,
-    "sems_off": 2.8560399658337126,
-    "rel_err": 0.015399101855613068
+    "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+    "lean": 0.5,
+    "truth": 0.4850543639864431,
+    "sem": 0.009104769393869174,
+    "sems_off": 1.6415172495879768,
+    "rel_err": 0.03081229058682304
    },
    "cells": [
     {
@@ -249,26 +249,26 @@
     {
      "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
      "lean": 0.5,
-     "truth": 0.4965420171152239,
-     "sem": 0.010221789719804248,
-     "sems_off": 0.3382952476586785,
-     "rel_err": 0.0069641294504462405
+     "truth": 0.516945559207593,
+     "sem": 0.010760377215365756,
+     "sems_off": 1.5748108889151988,
+     "rel_err": 0.03278016206110413
     },
     {
      "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
      "lean": 0.5,
-     "truth": 0.4940778874752696,
-     "sem": 0.004007622124319812,
-     "sems_off": 1.4777123044592253,
-     "rel_err": 0.011986192207451965
+     "truth": 0.4952609581939715,
+     "sem": 0.004013907738758661,
+     "sems_off": 1.180655389825705,
+     "rel_err": 0.009568777283212482
     },
     {
      "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
      "lean": 0.5714285714285714,
-     "truth": 0.5627625338493031,
-     "sem": 0.003034284422815699,
-     "sems_off": 2.8560399658337126,
-     "rel_err": 0.015399101855613068
+     "truth": 0.5774464237835254,
+     "sem": 0.006029211938179838,
+     "sems_off": 0.9981159091200787,
+     "rel_err": 0.010421490387842437
     }
    ]
   }

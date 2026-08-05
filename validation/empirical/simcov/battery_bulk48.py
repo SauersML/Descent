@@ -163,17 +163,25 @@ def group_rare():
         c_nominal.append(dict(design=lab, lean=nominal, truth=got,
                               sem=max(sem, 1e-12)))
         if control is None:
-            # POSITIVE CONTROL: the total genetic variance must equal the total
-            # realised effect mass, since the genotypes are standardised and
-            # independent. Independently known, on the same draws, and nothing
-            # to do with the SHARE.
+            # POSITIVE CONTROL: the total genetic variance must equal the
+            # total realised effect mass, since the genotypes are standardised
+            # and independent. Independently known, and nothing to do with the
+            # SHARE.
+            #
+            # FRESH GENOTYPES EACH REPLICATE, which the first version of this
+            # control did not draw: it recomputed `np.var(g_r @ b_r)` three
+            # times over the SAME matrix, so the three values were identical,
+            # the across-block sem was exactly zero, and the control missed by
+            # 1.1e10 sems and VOIDed the whole group. A control with no scatter
+            # is not a tight control, it is an undefined one.
             b_r = rng.standard_normal(rc) * math.sqrt(rv)
-            g_r = rng.standard_normal((n_ind, rc))
-            tot = [float(np.var(g_r @ b_r)) for _ in range(3)]
+            mass = float(b_r @ b_r)
+            tot = [float(np.var(rng.standard_normal((n_ind, rc)) @ b_r))
+                   for _ in range(n_blocks)]
             cmean, csem = blocked(tot)
             control = dict(
                 design="total genetic variance = realised sum of squares",
-                lean=float(b_r @ b_r), truth=cmean, sem=max(csem, 1e-12))
+                lean=mass, truth=cmean, sem=max(csem, 1e-12))
 
     reg = ("500000 individuals per cell (10 blocks of 50000) with standardised "
            "independent genotypes in a rare and a common class; the observable "

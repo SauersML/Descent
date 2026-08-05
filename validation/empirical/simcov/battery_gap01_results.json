@@ -1,0 +1,875 @@
+{
+ "_battery_sha": "32123bc3b8d11b2c",
+ "results": [
+  {
+   "name": "causalPortabilityFromLocalFst",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(sum_i sourceSquaredEffect i * (1 - fstCausal i)) / (sum_i sourceSquaredEffect i)",
+   "note": "",
+   "regime": "800 causal loci drifted by explicit Wright-Fisher for t generations at census Ne, so the per-locus F_ST profile is REALISED and not drawn; 400000 individuals per population in 8 blocks of 40000, standardised genotypes. The observable is the ratio of realised predictive covariance in the drifted population to that in the source -- the retained causal signal -- and the body is evaluated at the realised drift indices. The oracle never recomputes the weighted mean, which is what made the earlier design a SELF-TEST. BOTH populations are scaled by the SOURCE heterozygosity, because a transported score carries the weights it was fitted with on the scale it was fitted on; restandardising the target divides out the very heterozygosity loss the 1 - fstCausal factor is a claim about",
+   "span": 0.19545143371514814,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=40",
+    "lean": 0.9158837624693505,
+    "truth": 0.9223513532444356,
+    "sem": 0.005899730747160259,
+    "sems_off": 1.096251854916963,
+    "rel_err": 0.007012068397075443
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40",
+     "lean": 0.9158837624693505,
+     "truth": 0.9223513532444356,
+     "sem": 0.005899730747160259,
+     "sems_off": 1.096251854916963,
+     "rel_err": 0.007012068397075443
+    },
+    {
+     "design": "Ne=100 t=60",
+     "lean": 0.7684255799556743,
+     "truth": 0.7667793381257533,
+     "sem": 0.010295119226073169,
+     "sems_off": 0.15990507674275217,
+     "rel_err": 0.00214695642940111
+    },
+    {
+     "design": "Ne=400 t=40",
+     "lean": 0.9551015465778754,
+     "truth": 0.9559472942906917,
+     "sem": 0.00618992065978776,
+     "sems_off": 0.1366330457691703,
+     "rel_err": 0.000884722115819005
+    }
+   ]
+  },
+  {
+   "name": "causalPortabilityFromLocalFst [unweighted mean of 1 - fst, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "mean_i (1 - fstCausal i)",
+   "note": "",
+   "regime": "800 causal loci drifted by explicit Wright-Fisher for t generations at census Ne, so the per-locus F_ST profile is REALISED and not drawn; 400000 individuals per population in 8 blocks of 40000, standardised genotypes. The observable is the ratio of realised predictive covariance in the drifted population to that in the source -- the retained causal signal -- and the body is evaluated at the realised drift indices. The oracle never recomputes the weighted mean, which is what made the earlier design a SELF-TEST. BOTH populations are scaled by the SOURCE heterozygosity, because a transported score carries the weights it was fitted with on the scale it was fitted on; restandardising the target divides out the very heterozygosity loss the 1 - fstCausal factor is a claim about",
+   "span": 0.20641779133721183,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=40",
+    "lean": 0.9071304267962914,
+    "truth": 0.9223513532444356,
+    "sem": 0.005899730747160259,
+    "sems_off": 2.5799357801998952,
+    "rel_err": 0.016502308360695234
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40",
+     "lean": 0.9071304267962914,
+     "truth": 0.9223513532444356,
+     "sem": 0.005899730747160259,
+     "sems_off": 2.5799357801998952,
+     "rel_err": 0.016502308360695234
+    },
+    {
+     "design": "Ne=100 t=60",
+     "lean": 0.7540899442580096,
+     "truth": 0.7667793381257533,
+     "sem": 0.010295119226073169,
+     "sems_off": 1.2325640518671073,
+     "rel_err": 0.01654895122599485
+    },
+    {
+     "design": "Ne=400 t=40",
+     "lean": 0.9502354463423212,
+     "truth": 0.9559472942906917,
+     "sem": 0.00618992065978776,
+     "sems_off": 0.9227659387424828,
+     "rel_err": 0.005975065761976663
+    }
+   ]
+  },
+  {
+   "name": "causalPortabilityFromLocalFst [pairwise 1 - 2*fst, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(sum_i sourceSquaredEffect i * (1 - 2 * fstCausal i)) / (sum_i sourceSquaredEffect i)",
+   "note": "positive control 't=0 [no drift: retained fraction is 1]' passed at 1.25 sems",
+   "regime": "800 causal loci drifted by explicit Wright-Fisher for t generations at census Ne, so the per-locus F_ST profile is REALISED and not drawn; 400000 individuals per population in 8 blocks of 40000, standardised genotypes. The observable is the ratio of realised predictive covariance in the drifted population to that in the source -- the retained causal signal -- and the body is evaluated at the realised drift indices. The oracle never recomputes the weighted mean, which is what made the earlier design a SELF-TEST. BOTH populations are scaled by the SOURCE heterozygosity, because a transported score carries the weights it was fitted with on the scale it was fitted on; restandardising the target divides out the very heterozygosity loss the 1 - fstCausal factor is a claim about",
+   "span": 0.41018530485318355,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=100 t=60",
+    "lean": 0.5368511599113486,
+    "truth": 0.7667793381257533,
+    "sem": 0.010295119226073169,
+    "sems_off": 22.333707183506352,
+    "rel_err": 0.2998622508222777
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40",
+     "lean": 0.8317675249387011,
+     "truth": 0.9223513532444356,
+     "sem": 0.005899730747160259,
+     "sems_off": 15.353891929616552,
+     "rel_err": 0.09820967680819197
+    },
+    {
+     "design": "Ne=100 t=60",
+     "lean": 0.5368511599113486,
+     "truth": 0.7667793381257533,
+     "sem": 0.010295119226073169,
+     "sems_off": 22.333707183506352,
+     "rel_err": 0.2998622508222777
+    },
+    {
+     "design": "Ne=400 t=40",
+     "lean": 0.9102030931557509,
+     "truth": 0.9559472942906917,
+     "sem": 0.00618992065978776,
+     "sems_off": 7.390111061053455,
+     "rel_err": 0.04785222094161875
+    }
+   ]
+  },
+  {
+   "name": "effectVarianceRecurrence",
+   "file": "SelectionArchitecture.lean",
+   "source": "(1 - s) * V + v_mut",
+   "note": "",
+   "regime": "40000 effect-carrying loci per replicate, 12 replicates, under stabilising selection of strength s (each standing effect shrunk by sqrt(1-s), so the VARIANCE is shrunk by 1-s) with new mutational effects of total variance v_mut arriving each generation. Burned in for 60 generations, then ONE step is taken and the realised variance measured before and after. The prediction is evaluated at the REALISED V(t), which is what distinguishes this from applying the recurrence to its own output",
+   "span": 0.4359715122982615,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "s=0.20 v_mut=0.05",
+    "lean": 0.2502768126149332,
+    "truth": 0.25001903946302967,
+    "sem": 0.00044677164465190423,
+    "sems_off": 0.5769684692150657,
+    "rel_err": 0.0010310140877955952
+   },
+   "cells": [
+    {
+     "design": "s=0.05 v_mut=0.02",
+     "lean": 0.3956634854812642,
+     "truth": 0.39554859292716854,
+     "sem": 0.000852573456540099,
+     "sems_off": 0.13475971274298296,
+     "rel_err": 0.00029046381696215697
+    },
+    {
+     "design": "s=0.20 v_mut=0.05",
+     "lean": 0.2502768126149332,
+     "truth": 0.25001903946302967,
+     "sem": 0.00044677164465190423,
+     "sems_off": 0.5769684692150657,
+     "rel_err": 0.0010310140877955952
+    },
+    {
+     "design": "s=0.02 v_mut=0.01",
+     "lean": 0.44373080096493456,
+     "truth": 0.44365645602979087,
+     "sem": 0.0010048412720353316,
+     "sems_off": 0.07398674518324781,
+     "rel_err": 0.00016757320700117688
+    }
+   ]
+  },
+  {
+   "name": "effectVarianceRecurrence [no selection term, competing]",
+   "file": "SelectionArchitecture.lean",
+   "source": "V + v_mut",
+   "note": "positive control 's=0, v_mut=0 [variance is unchanged]' passed at 0.78 sems",
+   "regime": "40000 effect-carrying loci per replicate, 12 replicates, under stabilising selection of strength s (each standing effect shrunk by sqrt(1-s), so the VARIANCE is shrunk by 1-s) with new mutational effects of total variance v_mut arriving each generation. Burned in for 60 generations, then ONE step is taken and the realised variance measured before and after. The prediction is evaluated at the REALISED V(t), which is what distinguishes this from applying the recurrence to its own output",
+   "span": 0.411764705882353,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "s=0.20 v_mut=0.05",
+    "lean": 0.3,
+    "truth": 0.25001903946302967,
+    "sem": 0.00044677164465190423,
+    "sems_off": 111.87138023477804,
+    "rel_err": 0.19990861753694966
+   },
+   "cells": [
+    {
+     "design": "s=0.05 v_mut=0.02",
+     "lean": 0.42,
+     "truth": 0.39554859292716854,
+     "sem": 0.000852573456540099,
+     "sems_off": 28.679531230141485,
+     "rel_err": 0.061816443061734325
+    },
+    {
+     "design": "s=0.20 v_mut=0.05",
+     "lean": 0.3,
+     "truth": 0.25001903946302967,
+     "sem": 0.00044677164465190423,
+     "sems_off": 111.87138023477804,
+     "rel_err": 0.19990861753694966
+    },
+    {
+     "design": "s=0.02 v_mut=0.01",
+     "lean": 0.51,
+     "truth": 0.44365645602979087,
+     "sem": 0.0010048412720353316,
+     "sems_off": 66.02390428871279,
+     "rel_err": 0.14953810108818583
+    }
+   ]
+  },
+  {
+   "name": "effectVarianceRecurrence [multiplicative input, competing]",
+   "file": "SelectionArchitecture.lean",
+   "source": "(1 - s) * V * (1 + v_mut)",
+   "note": "positive control 's=0, v_mut=0 [variance is unchanged]' passed at 0.78 sems",
+   "regime": "40000 effect-carrying loci per replicate, 12 replicates, under stabilising selection of strength s (each standing effect shrunk by sqrt(1-s), so the VARIANCE is shrunk by 1-s) with new mutational effects of total variance v_mut arriving each generation. Burned in for 60 generations, then ONE step is taken and the realised variance measured before and after. The prediction is evaluated at the REALISED V(t), which is what distinguishes this from applying the recurrence to its own output",
+   "span": 0.5756718528995757,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "s=0.20 v_mut=0.05",
+    "lean": 0.21000000000000002,
+    "truth": 0.25001903946302967,
+    "sem": 0.00044677164465190423,
+    "sems_off": 89.57381235375829,
+    "rel_err": 0.16006396772413514
+   },
+   "cells": [
+    {
+     "design": "s=0.05 v_mut=0.02",
+     "lean": 0.38759999999999994,
+     "truth": 0.39554859292716854,
+     "sem": 0.000852573456540099,
+     "sems_off": 9.323059340159919,
+     "rel_err": 0.020095111117313852
+    },
+    {
+     "design": "s=0.20 v_mut=0.05",
+     "lean": 0.21000000000000002,
+     "truth": 0.25001903946302967,
+     "sem": 0.00044677164465190423,
+     "sems_off": 89.57381235375829,
+     "rel_err": 0.16006396772413514
+    },
+    {
+     "design": "s=0.02 v_mut=0.01",
+     "lean": 0.4949,
+     "truth": 0.44365645602979087,
+     "sem": 0.0010048412720353316,
+     "sems_off": 50.99665528906275,
+     "rel_err": 0.11550275731086895
+    }
+   ]
+  },
+  {
+   "name": "ancestryMixtureCorrelation",
+   "file": "DynamicsContrast.lean",
+   "source": "rho * (2 * mix - 1)",
+   "note": "",
+   "regime": "1e5 pairs per block and 20 blocks per cell, drawn from TWO environments with correlations +rho and -rho and pooled at mass `mix`; the observable is the realised Pearson correlation of the pooled sample. WHAT THIS DOES NOT SETTLE, and the docstring is right about it: that an ancestry-environment mixture IS two correlations of equal size and opposite sign is a modelling step no simulation can reach. Given the model, the pooling arithmetic is what is measured here, and it had not been. The balanced cell mix = 1/2 is included because exact cancellation is the one prediction a reader will check by hand",
+   "span": 1.4166666666666665,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rho=0.6 mix=0.90",
+    "lean": 0.48,
+    "truth": 0.48132184166934644,
+    "sem": 0.0006406703933622299,
+    "sems_off": 2.063216410562457,
+    "rel_err": 0.0027462740206469225
+   },
+   "cells": [
+    {
+     "design": "rho=0.8 mix=0.50",
+     "lean": 0.0,
+     "truth": 0.0006198480238775646,
+     "sem": 0.000844404574928975,
+     "sems_off": 0.7340652126733227,
+     "rel_err": 1.0
+    },
+    {
+     "design": "rho=0.8 mix=0.75",
+     "lean": 0.4,
+     "truth": 0.40098724547531744,
+     "sem": 0.0007864767155966163,
+     "sems_off": 1.2552761648747652,
+     "rel_err": 0.002462037100823925
+    },
+    {
+     "design": "rho=0.4 mix=0.25",
+     "lean": -0.2,
+     "truth": -0.19921011178468448,
+     "sem": 0.0006841372451619607,
+     "sems_off": 1.1545756657767343,
+     "rel_err": 0.003965101009376871
+    },
+    {
+     "design": "rho=0.6 mix=0.90",
+     "lean": 0.48,
+     "truth": 0.48132184166934644,
+     "sem": 0.0006406703933622299,
+     "sems_off": 2.063216410562457,
+     "rel_err": 0.0027462740206469225
+    }
+   ]
+  },
+  {
+   "name": "ancestryMixtureCorrelation [positive environment only, competing]",
+   "file": "DynamicsContrast.lean",
+   "source": "rho * mix",
+   "note": "positive control 'pooled marginal variance [known to be 1]' passed at 1.55 sems",
+   "regime": "1e5 pairs per block and 20 blocks per cell, drawn from TWO environments with correlations +rho and -rho and pooled at mass `mix`; the observable is the realised Pearson correlation of the pooled sample. WHAT THIS DOES NOT SETTLE, and the docstring is right about it: that an ancestry-environment mixture IS two correlations of equal size and opposite sign is a modelling step no simulation can reach. Given the model, the pooling arithmetic is what is measured here, and it had not been. The balanced cell mix = 1/2 is included because exact cancellation is the one prediction a reader will check by hand",
+   "span": 0.8333333333333334,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.8 mix=0.50",
+    "lean": 0.4,
+    "truth": 0.0006198480238775646,
+    "sem": 0.000844404574928975,
+    "sems_off": 472.97251084850575,
+    "rel_err": 644.3194728245354
+   },
+   "cells": [
+    {
+     "design": "rho=0.8 mix=0.50",
+     "lean": 0.4,
+     "truth": 0.0006198480238775646,
+     "sem": 0.000844404574928975,
+     "sems_off": 472.97251084850575,
+     "rel_err": 644.3194728245354
+    },
+    {
+     "design": "rho=0.8 mix=0.75",
+     "lean": 0.6000000000000001,
+     "truth": 0.40098724547531744,
+     "sem": 0.0007864767155966163,
+     "sems_off": 253.0434157528908,
+     "rel_err": 0.49630694434876427
+    },
+    {
+     "design": "rho=0.4 mix=0.25",
+     "lean": 0.1,
+     "truth": -0.19921011178468448,
+     "sem": 0.0006841372451619607,
+     "sems_off": 437.3539284706687,
+     "rel_err": 1.5019825505046884
+    },
+    {
+     "design": "rho=0.6 mix=0.90",
+     "lean": 0.54,
+     "truth": 0.48132184166934644,
+     "sem": 0.0006406703933622299,
+     "sems_off": 91.5886841948656,
+     "rel_err": 0.12191044172677233
+    }
+   ]
+  },
+  {
+   "name": "ancestryMixtureCorrelation [negative environment only, competing]",
+   "file": "DynamicsContrast.lean",
+   "source": "rho * (1 - mix)",
+   "note": "positive control 'pooled marginal variance [known to be 1]' passed at 1.55 sems",
+   "regime": "1e5 pairs per block and 20 blocks per cell, drawn from TWO environments with correlations +rho and -rho and pooled at mass `mix`; the observable is the realised Pearson correlation of the pooled sample. WHAT THIS DOES NOT SETTLE, and the docstring is right about it: that an ancestry-environment mixture IS two correlations of equal size and opposite sign is a modelling step no simulation can reach. Given the model, the pooling arithmetic is what is measured here, and it had not been. The balanced cell mix = 1/2 is included because exact cancellation is the one prediction a reader will check by hand",
+   "span": 0.85,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.4 mix=0.25",
+    "lean": 0.30000000000000004,
+    "truth": -0.19921011178468448,
+    "sem": 0.0006841372451619607,
+    "sems_off": 729.692931228299,
+    "rel_err": 2.5059476515140657
+   },
+   "cells": [
+    {
+     "design": "rho=0.8 mix=0.50",
+     "lean": 0.4,
+     "truth": 0.0006198480238775646,
+     "sem": 0.000844404574928975,
+     "sems_off": 472.97251084850575,
+     "rel_err": 644.3194728245354
+    },
+    {
+     "design": "rho=0.8 mix=0.75",
+     "lean": 0.2,
+     "truth": 0.40098724547531744,
+     "sem": 0.0007864767155966163,
+     "sems_off": 255.55396808264027,
+     "rel_err": 0.501231018550412
+    },
+    {
+     "design": "rho=0.4 mix=0.25",
+     "lean": 0.30000000000000004,
+     "truth": -0.19921011178468448,
+     "sem": 0.0006841372451619607,
+     "sems_off": 729.692931228299,
+     "rel_err": 2.5059476515140657
+    },
+    {
+     "design": "rho=0.6 mix=0.90",
+     "lean": 0.059999999999999984,
+     "truth": 0.48132184166934644,
+     "sem": 0.0006406703933622299,
+     "sems_off": 657.6265206485583,
+     "rel_err": 0.8753432842525809
+    }
+   ]
+  },
+  {
+   "name": "mixedEnvironmentCorrelation",
+   "file": "LandscapeSuperposition.lean",
+   "source": "rho * (2 * mix - 1)",
+   "note": "",
+   "regime": "1e5 pairs per block and 20 blocks per cell, drawn from TWO environments with correlations +rho and -rho and pooled at mass `mix`; the observable is the realised Pearson correlation of the pooled sample. WHAT THIS DOES NOT SETTLE, and the docstring is right about it: that an ancestry-environment mixture IS two correlations of equal size and opposite sign is a modelling step no simulation can reach. Given the model, the pooling arithmetic is what is measured here, and it had not been. The balanced cell mix = 1/2 is included because exact cancellation is the one prediction a reader will check by hand",
+   "span": 1.4166666666666665,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rho=0.6 mix=0.90",
+    "lean": 0.48,
+    "truth": 0.48132184166934644,
+    "sem": 0.0006406703933622299,
+    "sems_off": 2.063216410562457,
+    "rel_err": 0.0027462740206469225
+   },
+   "cells": [
+    {
+     "design": "rho=0.8 mix=0.50",
+     "lean": 0.0,
+     "truth": 0.0006198480238775646,
+     "sem": 0.000844404574928975,
+     "sems_off": 0.7340652126733227,
+     "rel_err": 1.0
+    },
+    {
+     "design": "rho=0.8 mix=0.75",
+     "lean": 0.4,
+     "truth": 0.40098724547531744,
+     "sem": 0.0007864767155966163,
+     "sems_off": 1.2552761648747652,
+     "rel_err": 0.002462037100823925
+    },
+    {
+     "design": "rho=0.4 mix=0.25",
+     "lean": -0.2,
+     "truth": -0.19921011178468448,
+     "sem": 0.0006841372451619607,
+     "sems_off": 1.1545756657767343,
+     "rel_err": 0.003965101009376871
+    },
+    {
+     "design": "rho=0.6 mix=0.90",
+     "lean": 0.48,
+     "truth": 0.48132184166934644,
+     "sem": 0.0006406703933622299,
+     "sems_off": 2.063216410562457,
+     "rel_err": 0.0027462740206469225
+    }
+   ]
+  },
+  {
+   "name": "mixedEnvironmentCorrelation [positive environment only, competing]",
+   "file": "LandscapeSuperposition.lean",
+   "source": "rho * mix",
+   "note": "positive control 'pooled marginal variance [known to be 1]' passed at 1.55 sems",
+   "regime": "1e5 pairs per block and 20 blocks per cell, drawn from TWO environments with correlations +rho and -rho and pooled at mass `mix`; the observable is the realised Pearson correlation of the pooled sample. WHAT THIS DOES NOT SETTLE, and the docstring is right about it: that an ancestry-environment mixture IS two correlations of equal size and opposite sign is a modelling step no simulation can reach. Given the model, the pooling arithmetic is what is measured here, and it had not been. The balanced cell mix = 1/2 is included because exact cancellation is the one prediction a reader will check by hand",
+   "span": 0.8333333333333334,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.8 mix=0.50",
+    "lean": 0.4,
+    "truth": 0.0006198480238775646,
+    "sem": 0.000844404574928975,
+    "sems_off": 472.97251084850575,
+    "rel_err": 644.3194728245354
+   },
+   "cells": [
+    {
+     "design": "rho=0.8 mix=0.50",
+     "lean": 0.4,
+     "truth": 0.0006198480238775646,
+     "sem": 0.000844404574928975,
+     "sems_off": 472.97251084850575,
+     "rel_err": 644.3194728245354
+    },
+    {
+     "design": "rho=0.8 mix=0.75",
+     "lean": 0.6000000000000001,
+     "truth": 0.40098724547531744,
+     "sem": 0.0007864767155966163,
+     "sems_off": 253.0434157528908,
+     "rel_err": 0.49630694434876427
+    },
+    {
+     "design": "rho=0.4 mix=0.25",
+     "lean": 0.1,
+     "truth": -0.19921011178468448,
+     "sem": 0.0006841372451619607,
+     "sems_off": 437.3539284706687,
+     "rel_err": 1.5019825505046884
+    },
+    {
+     "design": "rho=0.6 mix=0.90",
+     "lean": 0.54,
+     "truth": 0.48132184166934644,
+     "sem": 0.0006406703933622299,
+     "sems_off": 91.5886841948656,
+     "rel_err": 0.12191044172677233
+    }
+   ]
+  },
+  {
+   "name": "liabilitySpecificity",
+   "file": "ClinicalUtilityFairness.lean",
+   "source": "Phi((T' - R * h * mu_control) / sigma_resid), against the re-drawn-residual reading",
+   "note": "positive control 'h2=0.5 R2=0.2 K=0.05 [realised prevalence recovers K]' passed at 0.19 sems",
+   "regime": "4e6 individuals per cell in 20 blocks of 2e5 under the liability threshold model the definition declares: a PGS-explained component of variance R^2*h^2, independent residual liability of variance h^2(1-R^2) + (1-h^2), disease above the prevalence threshold. THREE readings of 'specificity at T'' are measured on the same draws, because the signature does not say which scale T' and mu_control live on: the rule applied to a re-drawn residual, to the individual's own liability, and to the PGS component alone. mu_control is the model's own truncated mean, not a fitted quantity. What is recorded is the SPREAD across readings",
+   "span": 0.12611954851885898,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.5 R2=0.5 K=0.20",
+    "lean": 0.8363338775335444,
+    "truth": 0.7797601900367196,
+    "sem": 0.00020434826871147568,
+    "sems_off": 276.84936042547326,
+    "rel_err": 0.0725526748091111
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 R2=0.2 K=0.05",
+     "lean": 0.9226681972608158,
+     "truth": 0.9079465662224283,
+     "sem": 0.00014541584040437703,
+     "sems_off": 101.23815257986438,
+     "rel_err": 0.016214204212080283
+    },
+    {
+     "design": "h2=0.3 R2=0.4 K=0.10",
+     "lean": 0.8779740453496031,
+     "truth": 0.8531020141947334,
+     "sem": 0.00017630473733583953,
+     "sems_off": 141.07409438177166,
+     "rel_err": 0.029154814712689534
+    },
+    {
+     "design": "h2=0.7 R2=0.1 K=0.02",
+     "lean": 0.957034656303435,
+     "truth": 0.9502999698075026,
+     "sem": 0.00011052936655576098,
+     "sems_off": 60.931195987038954,
+     "rel_err": 0.007086905934866599
+    },
+    {
+     "design": "h2=0.5 R2=0.5 K=0.20",
+     "lean": 0.8363338775335444,
+     "truth": 0.7797601900367196,
+     "sem": 0.00020434826871147568,
+     "sems_off": 276.84936042547326,
+     "rel_err": 0.0725526748091111
+    }
+   ]
+  },
+  {
+   "name": "liabilitySpecificity [rule on the individual's own liability, competing reading]",
+   "file": "ClinicalUtilityFairness.lean",
+   "source": "the same body, against P(own liability <= T' | control)",
+   "note": "the simulated truth moves by only 3.3% across the design",
+   "regime": "4e6 individuals per cell in 20 blocks of 2e5 under the liability threshold model the definition declares: a PGS-explained component of variance R^2*h^2, independent residual liability of variance h^2(1-R^2) + (1-h^2), disease above the prevalence threshold. THREE readings of 'specificity at T'' are measured on the same draws, because the signature does not say which scale T' and mu_control live on: the rule applied to a re-drawn residual, to the individual's own liability, and to the PGS component alone. mu_control is the model's own truncated mean, not a fitted quantity. What is recorded is the SPREAD across readings",
+   "span": 0.12611954851885898,
+   "verdict": "DEGENERATE ORACLE",
+   "worst": {
+    "design": "h2=0.5 R2=0.5 K=0.20",
+    "lean": 0.8363338775335444,
+    "truth": 0.936937706154386,
+    "sem": 0.00015224478805619766,
+    "sems_off": 660.8031046928583,
+    "rel_err": 0.1073751520085204
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 R2=0.2 K=0.05",
+     "lean": 0.9226681972608158,
+     "truth": 0.953681631772352,
+     "sem": 7.099016551009032e-05,
+     "sems_off": 436.8694492919305,
+     "rel_err": 0.03251969365699097
+    },
+    {
+     "design": "h2=0.3 R2=0.4 K=0.10",
+     "lean": 0.8779740453496031,
+     "truth": 0.9416081917984529,
+     "sem": 0.00013659068627856085,
+     "sems_off": 465.87471065981276,
+     "rel_err": 0.06758028127103466
+    },
+    {
+     "design": "h2=0.7 R2=0.1 K=0.02",
+     "lean": 0.957034656303435,
+     "truth": 0.9692464857167356,
+     "sem": 6.915593526879017e-05,
+     "sems_off": 176.58396731728857,
+     "rel_err": 0.012599302234529331
+    },
+    {
+     "design": "h2=0.5 R2=0.5 K=0.20",
+     "lean": 0.8363338775335444,
+     "truth": 0.936937706154386,
+     "sem": 0.00015224478805619766,
+     "sems_off": 660.8031046928583,
+     "rel_err": 0.1073751520085204
+    }
+   ]
+  },
+  {
+   "name": "liabilitySpecificity [rule on the PGS component alone, competing reading]",
+   "file": "ClinicalUtilityFairness.lean",
+   "source": "the same body, against P(PGS component <= T' | control)",
+   "note": "positive control 'h2=0.5 R2=0.2 K=0.05 [realised prevalence recovers K]' passed at 0.19 sems",
+   "regime": "4e6 individuals per cell in 20 blocks of 2e5 under the liability threshold model the definition declares: a PGS-explained component of variance R^2*h^2, independent residual liability of variance h^2(1-R^2) + (1-h^2), disease above the prevalence threshold. THREE readings of 'specificity at T'' are measured on the same draws, because the signature does not say which scale T' and mu_control live on: the rule applied to a re-drawn residual, to the individual's own liability, and to the PGS component alone. mu_control is the model's own truncated mean, not a fitted quantity. What is recorded is the SPREAD across readings",
+   "span": 0.12611954851885898,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.7 R2=0.1 K=0.02",
+    "lean": 0.957034656303435,
+    "truth": 1.0,
+    "sem": 1e-12,
+    "sems_off": 42965343696.56502,
+    "rel_err": 0.04296534369656502
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 R2=0.2 K=0.05",
+     "lean": 0.9226681972608158,
+     "truth": 0.9999892105226614,
+     "sem": 1.5962193348310093e-06,
+     "sems_off": 48440.09314674259,
+     "rel_err": 0.07732184752416724
+    },
+    {
+     "design": "h2=0.3 R2=0.4 K=0.10",
+     "lean": 0.8779740453496031,
+     "truth": 0.9990074498668647,
+     "sem": 1.7462738619011778e-05,
+     "sems_off": 6930.952077899849,
+     "rel_err": 0.12115365559425154
+    },
+    {
+     "design": "h2=0.7 R2=0.1 K=0.02",
+     "lean": 0.957034656303435,
+     "truth": 1.0,
+     "sem": 1e-12,
+     "sems_off": 42965343696.56502,
+     "rel_err": 0.04296534369656502
+    },
+    {
+     "design": "h2=0.5 R2=0.5 K=0.20",
+     "lean": 0.8363338775335444,
+     "truth": 0.9474876592960296,
+     "sem": 8.749060118796508e-05,
+     "sems_off": 1270.465401462748,
+     "rel_err": 0.11731422638799432
+    }
+   ]
+  },
+  {
+   "name": "ldExtentImputationQuality",
+   "file": "ImputationPortability.lean",
+   "source": "max 0 (1 - c / ld_extent), ld_extent fitted",
+   "note": "positive control 'imposed correlation 0.6 [r2 must be 0.36]' passed at 1.22 sems",
+   "regime": "msprime, one panmictic population of Ne = 2000 over 4 Mb at recombination 1e-8 and mu = 1e-8, 12 replicates; the observable is the realised imputation r-squared between common site pairs binned by physical separation, with c reported in Morgans as the realised mean separation times the recombination rate. `ld_extent` is FITTED by weighted least squares, because the corpus nowhere says what an LD extent is in base pairs and the body carries it as a free argument; Sved's hyperbolic rides along with its own free rate, so what is on trial is the SHAPE and not the scale. The panel size and the frequency filter are held fixed throughout, which is the restriction the definition's own name carries",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=1.37e-04 M",
+    "lean": 0.0,
+    "truth": 0.27770220910614446,
+    "sem": 0.01812719710798869,
+    "sems_off": 15.319644148612506,
+    "rel_err": 1.0
+   },
+   "cells": [
+    {
+     "design": "c=2.86e-05 M",
+     "lean": 0.3639767777982553,
+     "truth": 0.36337384161762204,
+     "sem": 0.019894909045340754,
+     "sems_off": 0.03030605363709807,
+     "rel_err": 0.0016592723844655656
+    },
+    {
+     "design": "c=1.37e-04 M",
+     "lean": 0.0,
+     "truth": 0.27770220910614446,
+     "sem": 0.01812719710798869,
+     "sems_off": 15.319644148612506,
+     "rel_err": 1.0
+    },
+    {
+     "design": "c=4.43e-04 M",
+     "lean": 0.0,
+     "truth": 0.1610389331297258,
+     "sem": 0.013584215912267276,
+     "sems_off": 11.854856707945801,
+     "rel_err": 1.0
+    },
+    {
+     "design": "c=1.24e-03 M",
+     "lean": 0.0,
+     "truth": 0.09484326299851321,
+     "sem": 0.00642529029814431,
+     "sems_off": 14.76093041677898,
+     "rel_err": 1.0
+    },
+    {
+     "design": "c=4.05e-03 M",
+     "lean": 0.0,
+     "truth": 0.04107271264184074,
+     "sem": 0.0034448306505339876,
+     "sems_off": 11.92299906977256,
+     "rel_err": 1.0
+    }
+   ]
+  },
+  {
+   "name": "ldExtentImputationQuality [Sved 1/(1 + 4*Ne*c), competing shape]",
+   "file": "ImputationPortability.lean",
+   "source": "1 / (1 + 4*Ne*c), rate fitted",
+   "note": "positive control 'imposed correlation 0.6 [r2 must be 0.36]' passed at 1.22 sems",
+   "regime": "msprime, one panmictic population of Ne = 2000 over 4 Mb at recombination 1e-8 and mu = 1e-8, 12 replicates; the observable is the realised imputation r-squared between common site pairs binned by physical separation, with c reported in Morgans as the realised mean separation times the recombination rate. `ld_extent` is FITTED by weighted least squares, because the corpus nowhere says what an LD extent is in base pairs and the body carries it as a free argument; Sved's hyperbolic rides along with its own free rate, so what is on trial is the SHAPE and not the scale. The panel size and the frequency filter are held fixed throughout, which is the restriction the definition's own name carries",
+   "span": 0.9833726087766825,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=2.86e-05 M",
+    "lean": 0.5789986215974265,
+    "truth": 0.36337384161762204,
+    "sem": 0.019894909045340754,
+    "sems_off": 10.838188779269755,
+    "rel_err": 0.5933965390021284
+   },
+   "cells": [
+    {
+     "design": "c=2.86e-05 M",
+     "lean": 0.5789986215974265,
+     "truth": 0.36337384161762204,
+     "sem": 0.019894909045340754,
+     "sems_off": 10.838188779269755,
+     "rel_err": 0.5933965390021284
+    },
+    {
+     "design": "c=1.37e-04 M",
+     "lean": 0.22282998051164374,
+     "truth": 0.27770220910614446,
+     "sem": 0.01812719710798869,
+     "sems_off": 3.0270663615346485,
+     "rel_err": 0.19759377777771742
+    },
+    {
+     "design": "c=4.43e-04 M",
+     "lean": 0.0815916659399241,
+     "truth": 0.1610389331297258,
+     "sem": 0.013584215912267276,
+     "sems_off": 5.848498559129685,
+     "rel_err": 0.49334198659775347
+    },
+    {
+     "design": "c=1.24e-03 M",
+     "lean": 0.030664149574917678,
+     "truth": 0.09484326299851321,
+     "sem": 0.00642529029814431,
+     "sems_off": 9.988515762802363,
+     "rel_err": 0.6766860543863997
+    },
+    {
+     "design": "c=4.05e-03 M",
+     "lean": 0.009627236599061941,
+     "truth": 0.04107271264184074,
+     "sem": 0.0034448306505339876,
+     "sems_off": 9.128308248739133,
+     "rel_err": 0.7656050457876336
+    }
+   ]
+  },
+  {
+   "name": "expectedSqMeanPGSDiff_IMEquilibrium",
+   "file": "PortabilityDrift.lean",
+   "source": "Var_Delta_Mu V_A (2 * twoDemeIMEquilibriumDelta M), at realised delta",
+   "note": "",
+   "regime": "two-deme island model at Ne = 2000 over 10 Mb with recombination, 8 replicates per cell, up to 600 loci common in both demes; the observable is the realised squared difference in mean PGS between the demes. `delta` is measured on the SAME replicates as the realised between-to-within divergence ratio, which is the design this definition's docstring says it owes -- the body is evaluated at that realised delta rather than at the equilibrium 1/(2M+1), because the derivation holds per locus and both delta and the F_ST ratio are averages over loci, where Jensen enters",
+   "span": 0.9439608632496164,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "bigM=0.5",
+    "lean": 1.4587895094118013,
+    "truth": 1.197295868517939,
+    "sem": 0.5842427619970991,
+    "sems_off": 0.44757703116424874,
+    "rel_err": 0.21840352728983337
+   },
+   "cells": [
+    {
+     "design": "bigM=0.5",
+     "lean": 1.4587895094118013,
+     "truth": 1.197295868517939,
+     "sem": 0.5842427619970991,
+     "sems_off": 0.44757703116424874,
+     "rel_err": 0.21840352728983337
+    },
+    {
+     "design": "bigM=2.0",
+     "lean": 0.3570141730831059,
+     "truth": 0.38697239319653287,
+     "sem": 0.10079581350933023,
+     "sems_off": 0.2972169088218517,
+     "rel_err": 0.07741694405112769
+    },
+    {
+     "design": "bigM=8.0",
+     "lean": 0.08174930480795291,
+     "truth": 0.08829214146202616,
+     "sem": 0.03957934786333301,
+     "sems_off": 0.16530935973643585,
+     "rel_err": 0.07410440550801771
+    }
+   ]
+  },
+  {
+   "name": "expectedSqMeanPGSDiff_IMEquilibrium [delta not doubled, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "Var_Delta_Mu V_A delta",
+   "note": "",
+   "regime": "two-deme island model at Ne = 2000 over 10 Mb with recombination, 8 replicates per cell, up to 600 loci common in both demes; the observable is the realised squared difference in mean PGS between the demes. `delta` is measured on the SAME replicates as the realised between-to-within divergence ratio, which is the design this definition's docstring says it owes -- the body is evaluated at that realised delta rather than at the equilibrium 1/(2M+1), because the derivation holds per locus and both delta and the F_ST ratio are averages over loci, where Jensen enters",
+   "span": 0.9439608632496164,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "bigM=2.0",
+    "lean": 0.17850708654155295,
+    "truth": 0.38697239319653287,
+    "sem": 0.10079581350933023,
+    "sems_off": 2.068194098514649,
+    "rel_err": 0.5387084720255638
+   },
+   "cells": [
+    {
+     "design": "bigM=0.5",
+     "lean": 0.7293947547059006,
+     "truth": 1.197295868517939,
+     "sem": 0.5842427619970991,
+     "sems_off": 0.8008676260063988,
+     "rel_err": 0.3907982363550833
+    },
+    {
+     "design": "bigM=2.0",
+     "lean": 0.17850708654155295,
+     "truth": 0.38697239319653287,
+     "sem": 0.10079581350933023,
+     "sems_off": 2.068194098514649,
+     "rel_err": 0.5387084720255638
+    },
+    {
+     "design": "bigM=8.0",
+     "lean": 0.040874652403976454,
+     "truth": 0.08829214146202616,
+     "sem": 0.03957934786333301,
+     "sems_off": 1.1980361379824067,
+     "rel_err": 0.5370522027540089
+    }
+   ]
+  }
+ ]
+}

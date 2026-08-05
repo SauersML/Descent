@@ -611,8 +611,14 @@ def group_imputation():
 def group_impgap():
     print("\n===== GROUP IMPGAP  expectedSqMeanPGSDiff_IMEquilibrium")
     import msprime
-    ne, m_loci, n_ind = 500, 600, 4000
-    reps = 10
+    # Ne = 2000 over 10 Mb, NOT Ne = 500 over 2 Mb. The first version asked for
+    # 600 common sites from a scaled mutation rate of 4*Ne*mu = 2e-5 over 2 Mb,
+    # which yields a few dozen; every replicate failed the site-count guard and
+    # the group reported "no usable replicates" -- a silent zero, which is the
+    # failure mode `run_groups` exists to make loud and which a guard that skips
+    # rather than raises slips past anyway.
+    ne, m_loci = 2000, 600
+    reps = 8
 
     cells, c_nodouble, c_nofactor2 = [], [], []
     control = None
@@ -623,11 +629,11 @@ def group_impgap():
                                                   migration_rate=bigM / (4.0 * ne))
             ts = msprime.sim_ancestry(
                 samples={"pop_0": 40, "pop_1": 40}, demography=dem,
-                sequence_length=2e6, recombination_rate=1e-8,
+                sequence_length=1e7, recombination_rate=1e-8,
                 random_seed=71000 + int(10 * bigM) + r)
             ts = msprime.sim_mutations(ts, rate=1e-8,
                                        random_seed=71500 + r)
-            if ts.num_sites < m_loci:
+            if ts.num_sites < 100:
                 continue
             gm = ts.genotype_matrix()
             A, B = ts.samples(population=0), ts.samples(population=1)
@@ -692,7 +698,7 @@ def group_impgap():
     for r in range(6):
         ts = msprime.sim_ancestry(
             samples={"pop_0": 40, "pop_1": 40}, demography=dem_c,
-            sequence_length=2e6, recombination_rate=1e-8,
+            sequence_length=1e7, recombination_rate=1e-8,
             random_seed=71777 + r)
         A, B = ts.samples(population=0), ts.samples(population=1)
         da = ts.diversity([A], mode="branch")[0]
@@ -705,7 +711,7 @@ def group_impgap():
     control = dict(design="bigM=400 [one population: realised delta is 0]",
                    lean=0.0, truth=cmean, sem=max(csem, 1e-12))
 
-    reg = ("two-deme island model at Ne = 500 over 2 Mb with recombination, 10 "
+    reg = ("two-deme island model at Ne = 2000 over 10 Mb with recombination, 8 "
            "replicates per cell, up to 600 loci common in both demes; the "
            "observable is the realised squared difference in mean PGS between "
            "the demes. `delta` is measured on the SAME replicates as the "

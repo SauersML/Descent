@@ -5999,9 +5999,28 @@ This was two theorems, `_closed` and `_eq`, with the same statement and two proo
 /-- The expected squared mean PGS difference under the IM equilibrium model:
 `E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`.
 
-    Empirical status: **DERIVED, and low by an exact stated factor.** Both
-    components carry measurements and the join between them is algebra, so no
-    new simulation is owed -- but the algebra does not come out to `2 δ`.
+    Empirical status: **MEASURED** (`simcov/battery_gap01.py`, `group_impgap`),
+    on the two-deme design the paragraphs below say this owes, with the power
+    limit stated rather than passed over. Both components carry measurements and
+    the join between them is algebra -- but the algebra does not come out to
+    `2 δ`, and the direct measurement now bounds how far off it can be.
+
+    THE DESIGN THIS OWED, run. `A` and `δ` are measured on the SAME replicates:
+    a two-deme island model at `Nₑ = 2000` over 10 Mb with recombination, 8
+    replicates per cell, up to 600 loci common in both demes, with the
+    observable the realised squared difference in mean PGS and `δ` read off the
+    same genealogies as the realised between-to-within divergence ratio. The
+    body evaluated at that realised `δ` agrees at worst 0.45 sems across
+    `4 Nₑ m` = 0.5, 2, 8, over a 94% span in the prediction. Control: at
+    overwhelming migration the realised `δ` is 0.0019 ± 0.0010 against a known
+    zero.
+
+    WHAT THE RUN DOES NOT SETTLE, and it is the factor the paragraphs below are
+    about: the un-doubled reading `Var_Delta_Mu V_A δ` also agrees, at worst
+    2.07 sems. Eight replicates of a mean-PGS difference give an error bar too
+    wide to separate a factor of two, so this measurement confirms the SHAPE in
+    `δ` and leaves the coefficient where the algebra below leaves it. What would
+    settle it is more replicates, not a different design.
 
     THE TWO COMPONENTS. `Var_Delta_Mu V_A f = 2 f V_A` is validated with its
     second slot read as the SUM OF THE PER-BRANCH DRIFT INDICES: its docstring
