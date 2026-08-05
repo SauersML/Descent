@@ -336,7 +336,8 @@ theorem diploid_massAt_reflect (q v : ℝ) :
   rw [hmod, hmass]
 
 /-- The panel with every frequency reflected: `q ↦ 1 - q` at every locus. -/
-def _root_.Descent.Blindness.Panel.reflect {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
+def _root_.Descent.Blindness.LocusSpectrum.reflect {n : ℕ}
+    (panel : Blindness.LocusSpectrum n) : Blindness.LocusSpectrum n :=
   { support := fun i ↦ 1 - panel.support i, weight := panel.weight }
 
 /-- **THE ALLELE-LABEL GAUGE THEOREM (the folded spectrum).**
@@ -353,12 +354,12 @@ formalism is wired up correctly.
 
 **It is a gauge, not a non-identifiability.** Which allele is labelled "alternate" changes
 no biology. So the identifiability question worth asking is about the *folded* spectrum,
-on `q ∈ (0, 1/2]`, which is where minor allele frequency lives and which `Panel.fold`
+on `q ∈ (0, 1/2]`, which is where minor allele frequency lives and which `LocusSpectrum.fold`
 below constructs. -/
-theorem foldedSpectrum_gauge {n : ℕ} (panel : Blindness.Panel n) (v : ℝ) :
+theorem foldedSpectrum_gauge {n : ℕ} (panel : Blindness.LocusSpectrum n) (v : ℝ) :
     Blindness.spectrumModulusLaw diploidFamily panel.reflect v =
       Blindness.spectrumModulusLaw diploidFamily panel v := by
-  unfold Blindness.spectrumModulusLaw Blindness.Panel.reflect
+  unfold Blindness.spectrumModulusLaw Blindness.LocusSpectrum.reflect
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   simp only
   rw [diploid_massAt_reflect]
@@ -367,7 +368,7 @@ theorem foldedSpectrum_gauge {n : ℕ} (panel : Blindness.Panel n) (v : ℝ) :
 
 `L(ν - τ_*ν) = 0` for every panel `ν`, with `τ(q) = 1 - q`. This is the abstract
 statement of the same fact: the odd part in the polarization coordinate is invisible. -/
-theorem reflection_odd_in_kernel {n : ℕ} (panel : Blindness.Panel n) (v : ℝ) :
+theorem reflection_odd_in_kernel {n : ℕ} (panel : Blindness.LocusSpectrum n) (v : ℝ) :
     Blindness.spectrumModulusLaw diploidFamily panel v -
       Blindness.spectrumModulusLaw diploidFamily panel.reflect v = 0 := by
   rw [foldedSpectrum_gauge, sub_self]
@@ -375,16 +376,18 @@ theorem reflection_odd_in_kernel {n : ℕ} (panel : Blindness.Panel n) (v : ℝ)
 /-! ## 3. Folding to minor allele frequency -/
 
 /-- The folded panel: every locus moved to `min q (1-q)`, its minor allele frequency. -/
-noncomputable def _root_.Descent.Blindness.Panel.fold {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
+noncomputable def _root_.Descent.Blindness.LocusSpectrum.fold {n : ℕ}
+    (panel : Blindness.LocusSpectrum n) : Blindness.LocusSpectrum n :=
   { support := fun i ↦ min (panel.support i) (1 - panel.support i),
     weight := panel.weight }
 
 /-- Folding chooses the same canonical representative from both allele-label orientations. -/
-theorem _root_.Descent.Blindness.Panel.reflect_fold {n : ℕ} (panel : Blindness.Panel n) :
+theorem _root_.Descent.Blindness.LocusSpectrum.reflect_fold {n : ℕ}
+    (panel : Blindness.LocusSpectrum n) :
     panel.reflect.fold = panel.fold := by
   cases panel with
   | mk support weight =>
-      simp only [Blindness.Panel.reflect, Blindness.Panel.fold]
+      simp only [Blindness.LocusSpectrum.reflect, Blindness.LocusSpectrum.fold]
       congr 1
       funext i
       simp [min_comm]
@@ -398,38 +401,39 @@ theorem diploid_massAt_fold (q v : ℝ) :
 /-- **Folding changes no modulus statistic.** Every panel is modulus-equivalent to a panel
 supported on minor allele frequencies, so nothing is lost by asking the identifiability
 question on `(0, 1/2]`. -/
-theorem fold_preserves_modulusLaw {n : ℕ} (panel : Blindness.Panel n) (v : ℝ) :
+theorem fold_preserves_modulusLaw {n : ℕ} (panel : Blindness.LocusSpectrum n) (v : ℝ) :
     Blindness.spectrumModulusLaw diploidFamily panel.fold v =
       Blindness.spectrumModulusLaw diploidFamily panel v := by
-  unfold Blindness.spectrumModulusLaw Blindness.Panel.fold
+  unfold Blindness.spectrumModulusLaw Blindness.LocusSpectrum.fold
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   simp only
   rw [diploid_massAt_fold]
 
 /-- The folded panel really is a minor-allele-frequency panel. -/
-theorem fold_support_le_half {n : ℕ} (panel : Blindness.Panel n) (i : Fin n) :
+theorem fold_support_le_half {n : ℕ} (panel : Blindness.LocusSpectrum n) (i : Fin n) :
     panel.fold.support i ≤ 1 / 2 := by
-  unfold Blindness.Panel.fold
+  unfold Blindness.LocusSpectrum.fold
   simp only
   rcases le_total (panel.support i) (1 - panel.support i) with h | h
   · rw [min_eq_left h]; linarith
   · rw [min_eq_right h]; linarith
 
-theorem fold_support_nonneg {n : ℕ} (panel : Blindness.Panel n) (i : Fin n)
+theorem fold_support_nonneg {n : ℕ} (panel : Blindness.LocusSpectrum n) (i : Fin n)
     (h0 : 0 ≤ panel.support i) (h1 : panel.support i ≤ 1) :
     0 ≤ panel.fold.support i := by
-  unfold Blindness.Panel.fold
+  unfold Blindness.LocusSpectrum.fold
   simp only
   exact le_min h0 (by linarith)
 
 /-- **Folding is a projection on admissible allele-frequency panels.** Once every locus has been
 moved to minor-allele frequency, folding again changes neither its support nor its weights. -/
-theorem _root_.Descent.Blindness.Panel.fold_idempotent {n : ℕ} (panel : Blindness.Panel n)
+theorem _root_.Descent.Blindness.LocusSpectrum.fold_idempotent {n : ℕ}
+    (panel : Blindness.LocusSpectrum n)
     (h0 : ∀ i, 0 ≤ panel.support i) (h1 : ∀ i, panel.support i ≤ 1) :
     panel.fold.fold = panel.fold := by
   cases panel with
   | mk support weight =>
-      simp only [Blindness.Panel.fold] at h0 h1 ⊢
+      simp only [Blindness.LocusSpectrum.fold] at h0 h1 ⊢
       congr 1
       funext i
       have hminor0 : 0 ≤ min (support i) (1 - support i) :=
@@ -466,7 +470,7 @@ identifiability is unavailable on such a panel. This is a hypothesis check a
 methodologist can run: duplicate entries in the frequency column void the rigidity
 theorem. -/
 theorem not_separating_of_frequencyTie {k n : ℕ} (family : Blindness.BundleFamily k)
-    (panel : Blindness.Panel n) (i l : Fin n) (hne : i ≠ l)
+    (panel : Blindness.LocusSpectrum n) (i l : Fin n) (hne : i ≠ l)
     (htie : panel.support i = panel.support l) :
     ¬ Blindness.Separating family panel := by
   intro hsep
@@ -484,7 +488,8 @@ two loci are the same locus as far as `|U|` is concerned — so no moment-based 
 LD-score-based statistic can tell the panels apart. On an ascertained array, the *split*
 of weight among markers sharing a frequency is not estimable at all, and any procedure
 reporting it is reporting its prior. -/
-theorem frequencyTie_gives_kernel {n : ℕ} (panel : Blindness.Panel n) (i l : Fin n) (hne : i ≠ l)
+theorem frequencyTie_gives_kernel {n : ℕ} (panel : Blindness.LocusSpectrum n)
+    (i l : Fin n) (hne : i ≠ l)
     (htie : panel.support i = panel.support l) (c : ℝ) (w : Fin n → ℝ)
     (hi : w i = c) (hl : w l = -c) (hrest : ∀ m : Fin n, m ≠ i → m ≠ l → w m = 0) (v : ℝ) :
     Blindness.spectrumModulusLaw diploidFamily { support := panel.support, weight := w } v = 0 := by
@@ -885,8 +890,9 @@ premises were dead for the same reason, so the two have been merged there. -/
 /-- An estimator **reads through a finite list of spectrum functionals** when it is a
 fixed linear combination of the panel averages of finitely many test functions. Most
 summary-statistic methods are of this shape by construction. -/
-def ReadsThroughFunctionals {n m : ℕ} (T : Blindness.Panel n → ℝ) (φ : Fin m → ℝ → ℝ) : Prop :=
-  ∃ c : Fin m → ℝ, ∀ panel : Blindness.Panel n,
+def ReadsThroughFunctionals {n m : ℕ} (T : Blindness.LocusSpectrum n → ℝ)
+    (φ : Fin m → ℝ → ℝ) : Prop :=
+  ∃ c : Fin m → ℝ, ∀ panel : Blindness.LocusSpectrum n,
     T panel = ∑ a : Fin m, c a * ∑ i : Fin n, panel.weight i * φ a (panel.support i)
 
 /-- Every fixed linear combination of panel averages reads through its functionals.
@@ -897,14 +903,14 @@ def ReadsThroughFunctionals {n m : ℕ} (T : Blindness.Panel n → ℝ) (φ : Fi
 theorem readsThroughFunctionals_of_linearCombination {n m : ℕ} (c : Fin m → ℝ)
     (φ : Fin m → ℝ → ℝ) :
     ReadsThroughFunctionals
-      (fun panel : Blindness.Panel n ↦
+      (fun panel : Blindness.LocusSpectrum n ↦
         ∑ a : Fin m, c a * ∑ i : Fin n, panel.weight i * φ a (panel.support i)) φ :=
   ⟨c, fun _ ↦ rfl⟩
 
 /-- **No leakage: matching finitely many functionals matches every estimator built from
 them.** -/
-theorem matched_functionals_give_equal_estimates {n m : ℕ} (T : Blindness.Panel n → ℝ)
-    (φ : Fin m → ℝ → ℝ) (hT : ReadsThroughFunctionals T φ) (panel other : Blindness.Panel n)
+theorem matched_functionals_give_equal_estimates {n m : ℕ} (T : Blindness.LocusSpectrum n → ℝ)
+    (φ : Fin m → ℝ → ℝ) (hT : ReadsThroughFunctionals T φ) (panel other : Blindness.LocusSpectrum n)
     (hmatch : ∀ a : Fin m,
       ∑ i : Fin n, panel.weight i * φ a (panel.support i)
         = ∑ i : Fin n, other.weight i * φ a (other.support i)) :
@@ -935,7 +941,7 @@ and it is the same open problem flagged at the top of this file. -/
 theorem portability_gap_not_attributable_to_spectrum (q₁ q₂ q₃ : ℝ)
     (hmean : invHeterozygosity q₁ + invHeterozygosity q₂
       = invHeterozygosity q₃ + invHeterozygosity q₃)
-    (T : Blindness.Panel 2 → ℝ) (hT : ReadsThroughFunctionals T ![invHeterozygosity]) :
+    (T : Blindness.LocusSpectrum 2 → ℝ) (hT : ReadsThroughFunctionals T ![invHeterozygosity]) :
     T { support := ![q₁, q₂], weight := ![1 / 2, 1 / 2] }
       = T { support := ![q₃, q₃], weight := ![1 / 2, 1 / 2] } := by
   refine matched_functionals_give_equal_estimates T _ hT _ _ (fun a ↦ ?_)
@@ -972,7 +978,7 @@ Practical reading: frequency-spectrum inference from summary statistics is on fi
 ground than usually assumed, and effect-size asymmetry should not be inferred from
 moment-based summaries at all — the signs are in the data, and the summaries in use
 discard them (`odd_summary_detects_transfer` says which statistics recover them). -/
-theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Blindness.Panel n)
+theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Blindness.LocusSpectrum n)
     (hsep : Blindness.Separating diploidFamily panel)
     (hkernel : ∀ v : ℝ, Blindness.spectrumModulusLaw diploidFamily panel v = 0)
     (F : Blindness.Fiber) (shift : ℝ) {summary : ℝ → ℝ} (heven : Blindness.IsEvenSummary summary) :
@@ -1125,7 +1131,7 @@ unformalized gap. Do not quote the headline as a theorem.
 The separation hypothesis is not window dressing and is not vacuous: by
 `not_separating_of_frequencyTie` it fails exactly when two markers share a frequency, which
 is the ascertainment case of §4. -/
-theorem maf_spectrum_identifiable {n : ℕ} (panel : Blindness.Panel n)
+theorem maf_spectrum_identifiable {n : ℕ} (panel : Blindness.LocusSpectrum n)
     (hsep : Blindness.Separating diploidFamily panel)
     (hkernel : ∀ v : ℝ, Blindness.spectrumModulusLaw diploidFamily panel v = 0) (i : Fin n) :
     panel.weight i = 0 :=

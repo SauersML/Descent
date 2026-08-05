@@ -103,12 +103,21 @@ noncomputable def BundleFamily.massAt {k : ℕ} (family : BundleFamily k)
     (t v : ℝ) : ℝ :=
   ∑ j : Fin k, if family.modulus j t = v then family.atomMass j t else 0
 
-/-- A **panel**: finitely many loci, each at a parameter value, each with a weight.
+/-- A **locus spectrum**: finitely many loci, each at a parameter value, each with a weight.
+
+NOT `Descent.Core.Panel`, which this was called until the two names met. That one is a
+genotype matrix -- `nSamples` individuals each CALLED at `nLoci` sites -- and it is the
+object the empirical claims are about. This one has no individuals in it at all: a locus
+here is an allele frequency and a weight, which is what remains of a genotype matrix after
+the samples have been summed away. The traffic runs one way, from that panel to this
+spectrum, and never back, because the individuals are not recoverable from the summary.
+Everything below is a statement about what survives that summing, so taking a genotype
+matrix here would claim a resolution these theorems do not have.
 
 The weights are unconstrained here — nothing below needs them non-negative or summing to
 one, because the statements are about *differences* of spectra, where those constraints
 do not survive anyway. -/
-structure Panel (locusCount : ℕ) where
+structure LocusSpectrum (locusCount : ℕ) where
   /-- The parameter — the allele frequency — of each locus. -/
   support : Fin locusCount → ℝ
   /-- The weight of each locus. -/
@@ -119,23 +128,23 @@ structure Panel (locusCount : ℕ) where
 This is the map from a panel's allele-frequency spectrum to what second-moment and
 heterozygosity-weighted statistics can read. -/
 noncomputable def spectrumModulusLaw {k n : ℕ} (family : BundleFamily k)
-    (panel : Panel n) (v : ℝ) : ℝ :=
+    (panel : LocusSpectrum n) (v : ℝ) : ℝ :=
   ∑ i : Fin n, panel.weight i * family.massAt (panel.support i) v
 
 /-- Two panels on the same loci, with weights added. -/
-def Panel.addWeights {n : ℕ} (panel other : Panel n) : Panel n :=
+def LocusSpectrum.addWeights {n : ℕ} (panel other : LocusSpectrum n) : LocusSpectrum n :=
   { support := panel.support, weight := fun i ↦ panel.weight i + other.weight i }
 
 /-- A panel with its weights rescaled. -/
-def Panel.smulWeights {n : ℕ} (c : ℝ) (panel : Panel n) : Panel n :=
+def LocusSpectrum.smulWeights {n : ℕ} (c : ℝ) (panel : LocusSpectrum n) : LocusSpectrum n :=
   { support := panel.support, weight := fun i ↦ c * panel.weight i }
 
 /-- **The modulus law is additive in the weights.** -/
 theorem spectrumModulusLaw_add {k n : ℕ} (family : BundleFamily k)
-    (panel other : Panel n) (hsupport : panel.support = other.support) (v : ℝ) :
+    (panel other : LocusSpectrum n) (hsupport : panel.support = other.support) (v : ℝ) :
     spectrumModulusLaw family (panel.addWeights other) v =
       spectrumModulusLaw family panel v + spectrumModulusLaw family other v := by
-  unfold spectrumModulusLaw Panel.addWeights
+  unfold spectrumModulusLaw LocusSpectrum.addWeights
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [hsupport]
@@ -143,17 +152,17 @@ theorem spectrumModulusLaw_add {k n : ℕ} (family : BundleFamily k)
 
 /-- **The modulus law is homogeneous in the weights.** -/
 theorem spectrumModulusLaw_smul {k n : ℕ} (family : BundleFamily k)
-    (c : ℝ) (panel : Panel n) (v : ℝ) :
-    spectrumModulusLaw family (Panel.smulWeights c panel) v =
+    (c : ℝ) (panel : LocusSpectrum n) (v : ℝ) :
+    spectrumModulusLaw family (LocusSpectrum.smulWeights c panel) v =
       c * spectrumModulusLaw family panel v := by
-  unfold spectrumModulusLaw Panel.smulWeights
+  unfold spectrumModulusLaw LocusSpectrum.smulWeights
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   ring
 
 /-- **Locus `i` covers the modulus value `v`** when one of its atoms lands there with non-zero mass.
 -/
-def Covers {k n : ℕ} (family : BundleFamily k) (panel : Panel n) (i : Fin n)
+def Covers {k n : ℕ} (family : BundleFamily k) (panel : LocusSpectrum n) (i : Fin n)
     (v : ℝ) : Prop :=
   family.massAt (panel.support i) v ≠ 0
 
@@ -163,7 +172,7 @@ contributes anything there.
 This is the condition the peeling argument runs on, and for a diploid panel the largest
 modulus value is singly covered by the rarest locus — the extreme atom has nobody to
 trade with. -/
-def SinglyCoveredBy {k n : ℕ} (family : BundleFamily k) (panel : Panel n) (i : Fin n)
+def SinglyCoveredBy {k n : ℕ} (family : BundleFamily k) (panel : LocusSpectrum n) (i : Fin n)
     (v : ℝ) : Prop :=
   Covers family panel i v ∧
     ∀ l : Fin n, l ≠ i → family.massAt (panel.support l) v = 0
@@ -174,7 +183,7 @@ noncomputable def singleAtomFamily : BundleFamily 1 where
   atomMass := fun _ _ ↦ 1
 
 /-- One locus of unit weight. -/
-noncomputable def singleLocusPanel : Panel 1 where
+noncomputable def singleLocusSpectrum : LocusSpectrum 1 where
   support := fun _ ↦ 0
   weight := fun _ ↦ 1
 
@@ -188,10 +197,10 @@ noncomputable def singleLocusPanel : Panel 1 where
     establish that single coverage occurs on a panel with competitors, which is
     the case the peeling argument is actually for. -/
 theorem singlyCoveredBy_singleAtom :
-    SinglyCoveredBy singleAtomFamily singleLocusPanel 0 1 := by
+    SinglyCoveredBy singleAtomFamily singleLocusSpectrum 0 1 := by
   refine ⟨?_, fun l hl ↦ absurd (Subsingleton.elim l 0) hl⟩
   norm_num [Covers, BundleFamily.massAt, BundleFamily.modulus, singleAtomFamily,
-    singleLocusPanel]
+    singleLocusSpectrum]
 
 /-- **The forcing step, which is the whole mechanism.**
 
@@ -204,7 +213,7 @@ locus contributing at the same value, and single coverage says there is none —
 question of whether some reparametrisation could move mass between two branches never
 arises, because there is only one branch. -/
 theorem kernel_vanishes_at_singly_covered {k n : ℕ} (family : BundleFamily k)
-    (panel : Panel n) (i : Fin n) (v : ℝ)
+    (panel : LocusSpectrum n) (i : Fin n) (v : ℝ)
     (hsingle : SinglyCoveredBy family panel i v)
     (hkernel : spectrumModulusLaw family panel v = 0) :
     panel.weight i = 0 := by
@@ -226,7 +235,7 @@ reaches.
 For diploid genotypes the rarest locus owns the largest modulus value outright, and
 peeling it off leaves a smaller panel in which the next rarest does the same. This
 condition is the simultaneous form of that, and it is what the theorem below consumes. -/
-def Separating {k n : ℕ} (family : BundleFamily k) (panel : Panel n) : Prop :=
+def Separating {k n : ℕ} (family : BundleFamily k) (panel : LocusSpectrum n) : Prop :=
   ∀ i : Fin n, ∃ v : ℝ, SinglyCoveredBy family panel i v
 
 /-- **Rigidity: a separating panel's spectrum is determined by its modulus law.**
@@ -244,7 +253,7 @@ The finiteness is in the hypothesis rather than in a remark, and it is doing rea
 The continuum idealization of the same panel need not be separating — for the diploid
 family it is not — and this theorem says nothing about it. -/
 theorem spectrum_determined_of_separating {k n : ℕ} (family : BundleFamily k)
-    (panel : Panel n) (hsep : Separating family panel)
+    (panel : LocusSpectrum n) (hsep : Separating family panel)
     (hkernel : ∀ v : ℝ, spectrumModulusLaw family panel v = 0) (i : Fin n) :
     panel.weight i = 0 := by
   obtain ⟨v, hv⟩ := hsep i
@@ -253,7 +262,7 @@ theorem spectrum_determined_of_separating {k n : ℕ} (family : BundleFamily k)
 /-- The same statement as a comparison of two panels: same loci, same modulus law, hence
 the same spectrum. -/
 theorem panels_agree_of_modulus_law_agree {k n : ℕ} (family : BundleFamily k)
-    (panel other : Panel n) (hsupport : panel.support = other.support)
+    (panel other : LocusSpectrum n) (hsupport : panel.support = other.support)
     (hdiff : Separating family
       { support := panel.support, weight := fun i ↦ panel.weight i - other.weight i })
     (hlaw : ∀ v : ℝ, spectrumModulusLaw family panel v =
