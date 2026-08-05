@@ -1120,7 +1120,7 @@ noncomputable def commonAndRarePortableModel : Portability.CrossPopulationMetric
   -- common-variant-only witness; the other fifteen fields were copied verbatim, so the
   -- two witnesses could drift apart in a field neither of them is about.  Stated as an
   -- override, the comparison the section makes is what the definition says.
-  { commonOnlyPortableModel with beta := Pop.pair (![1, 1]) (![1, 0]),
+  { commonOnlyPortableModel with beta := Pop.pair (![1, 1]) (![1, 0])
     directCausal := Pop.pair 1 1 }
 
 /-- Evaluate a witness model's SOURCE `R²` by unfolding the source-weight chain.
