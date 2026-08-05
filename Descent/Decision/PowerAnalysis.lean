@@ -425,7 +425,8 @@ Removed.  This section defined `winnersCurseInflation true_beta sigma n` as
 `β + σ/√n`: inflation of exactly one standard error, with no significance
 threshold anywhere in the signature.  The true conditional mean is pinned by
 the threshold and sits near `5.6` to `5.9` standard errors at genome-wide
-significance, so the error runs from `-73%` to `+23%` and changes sign with the regime; at `β = 0` it claims one standard error of inflation where the
+significance, so the error runs from `-73%` to `+23%` and changes sign with the regime; at `β = 0`
+it claims one standard error of inflation where the
 truth is zero.  As with `singletonProportion` and the old `approxPower`, no
 constant repairs it, because the signature omits an argument the observable
 depends on.

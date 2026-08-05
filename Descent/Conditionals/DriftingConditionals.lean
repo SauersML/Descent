@@ -48,7 +48,8 @@ condition; mass conservation needs only this normalization equation. -/
 def IsMassPreservingKernel (P : ι → ι → ℝ) : Prop :=
   ∀ x, ∑ y, P x y = 1
 
-/-- Every transition weight is nonnegative. Together with `IsMassPreservingKernel`, this is the finite Markov-kernel condition. -/
+/-- Every transition weight is nonnegative. Together with `IsMassPreservingKernel`, this is the
+finite Markov-kernel condition. -/
 def IsNonnegativeKernel (P : ι → ι → ℝ) : Prop :=
   ∀ x y, 0 ≤ P x y
 
@@ -581,7 +582,8 @@ theorem singleMode_errorEnergy_forward_eq (weight gap t delta : ℝ) :
 /-! ## The drifting probit index, and the constraint tying its two surfaces
 
 Under Ornstein-Uhlenbeck drift of the covariate the probit single-index family
-`Phi (a t * x + b t)` is carried to itself, with `a t = a0 * exp (-lam * t) / sqrt (1 + a0 ^ 2 * ouVariance lam t)`,
+`Phi (a t * x + b t)` is carried to itself, with `a t = a0 * exp (-lam * t) / sqrt (1 + a0 ^ 2 *
+ouVariance lam t)`,
   `b t = b0 / sqrt (1 + a0 ^ 2 * ouVariance lam t)`.
 
 The two surfaces share one denominator. That the family is invariant is an analytic fact

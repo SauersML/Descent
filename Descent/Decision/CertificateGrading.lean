@@ -766,7 +766,8 @@ theorem constantObservationExperiment_modulus_eq
           ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
         rfl⟩
 
-/-- Ratio between the unrestricted modulus and the certificates available with at most `K` total atoms.  A quantitative incompleteness theorem for a concrete
+/-- Ratio between the unrestricted modulus and the certificates available with at most `K` total
+atoms.  A quantitative incompleteness theorem for a concrete
 experiment is a lower bound on this derived number; it is not an input field. -/
 noncomputable def atomCertificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /

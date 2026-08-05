@@ -29,7 +29,8 @@ section RankOneInvisibility
 
 /-- **The rank-one spike's normalised graph sum, bounded.**
 
-    For a balanced sign vector scaled by `p^(-1/2)`, a connected test graph with every vertex degree even contributes `p ^ (|V| - |E| - 1)`. Such a graph has
+    For a balanced sign vector scaled by `p^(-1/2)`, a connected test graph with every vertex degree
+    even contributes `p ^ (|V| - |E| - 1)`. Such a graph has
     `|E| ≥ |V|`, so the exponent is at most `-1`.
 
     The graph-theoretic input is the hypothesis `hev : v ≤ e`; what is proved is
@@ -211,7 +212,8 @@ theorem finiteRankOneTrafficCorrection_tendsto_zero
     (fun term _hterm ↦ hterm term)
   simpa [finiteRankOneTrafficCorrection] using hsum
 
-/-- The finite traffic correction vanishes from graph-local degree data, with no pre-assumed cardinal inequality.  Each all-even contracted term supplies
+/-- The finite traffic correction vanishes from graph-local degree data, with no pre-assumed
+cardinal inequality.  Each all-even contracted term supplies
 its degree function, minimum degree two, and handshaking identity; odd-degree
 terms require no graph bound because balancedness kills them exactly. -/
 theorem finiteRankOneTrafficCorrection_tendsto_zero_of_degreeData

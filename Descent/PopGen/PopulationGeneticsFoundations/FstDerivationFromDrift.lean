@@ -50,7 +50,8 @@ section FstDerivationFromDrift
 
 /-! **`hetRecurrence` is deleted here.**  It was
 `Descent.Core.hetRecurrence` under a second name, and every reference now
-calls the kernel.  Nothing referenced the wrapper; `Core.hetRecurrence` is the recurrence, and `Coalescent.WrightFisher.hetRecurrence_eq_pairDistinct` is where it stops being a stipulation. -/
+calls the kernel.  Nothing referenced the wrapper; `Core.hetRecurrence` is the recurrence, and
+`Coalescent.WrightFisher.hetRecurrence_eq_pairDistinct` is where it stops being a stipulation. -/
 
 
 /-- **Closed-form solution by induction.**

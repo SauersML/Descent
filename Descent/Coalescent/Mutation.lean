@@ -65,7 +65,8 @@ mutation.
 
 Empirical status: DERIVED from the mechanism, given the pair coalescence law that
 `Descent.Coalescent.WrightFisher.pairDistinct_eq_pow` counts off uniform parent choice.  The
-one modelling input beyond that is that mutation hits each birth independently with probability `β`. -/
+one modelling input beyond that is that mutation hits each birth independently with probability `β`.
+-/
 noncomputable def identityByDescent (N : ℕ) (β : ℝ) : ℝ :=
   ∑' s : ℕ, (1 / (N : ℝ)) * (1 - 1 / (N : ℝ)) ^ s * (1 - β) ^ (2 * (s + 1))
 

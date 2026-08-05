@@ -58,7 +58,8 @@ were a straight contradiction inside one section. The linear form is the one
 this corpus's `F_ST` convention has: see the attribution note on
 `islandFstFiniteDemes` for which published statistic each form belongs to.
 
-The correction factor `d/(d-1)` is `2` at `d = 2` and `1.5` at `d = 3`, so with two demes the limit understates the migration pressure by a factor of two in
+The correction factor `d/(d-1)` is `2` at `d = 2` and `1.5` at `d = 3`, so with two demes the limit
+understates the migration pressure by a factor of two in
 the scaled rate and overstates `F_ST` correspondingly. Nothing about the
 expression `1/(1+4Nm)`
 announces this, which is why every theorem below is a theorem about the limit
@@ -72,7 +73,8 @@ common case in this corpus, and `d = 2` is exactly where the limit is worst. -/
 
 /-! **`islandDemeCorrection` is deleted here.**  It was
 `Descent.Core.islandDemeCorrection` under a second name, and every reference now
-calls the kernel.  The deme correction `d/(d-1)` is one quantity; two names for it is how a factor-of-two disagreement survives unnoticed. -/
+calls the kernel.  The deme correction `d/(d-1)` is one quantity; two names for it is how a
+factor-of-two disagreement survives unnoticed. -/
 
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
@@ -323,7 +325,8 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     construction.
 
     **A FIRST, LOOSER RUN OF THIS DESIGN SAID MATCH, AND THE DIFFERENCE WAS THE
-    ERROR BARS.** `battery_falsrepair.py`'s `group_c` used 24 replicates with recombination switched off -- one genealogy per replicate -- and got sems
+    ERROR BARS.** `battery_falsrepair.py`'s `group_c` used 24 replicates with recombination switched
+    off -- one genealogy per replicate -- and got sems
     five times wider, on which this body passed at 1.57 sems and the record
     above was nearly written as CONDITIONALLY VALID. The point estimates agree
     between the two runs; only the resolution changed. A verdict that flips on
@@ -528,7 +531,8 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 
 /-- **Characteristic length of one-dimensional isolation by distance.**
     `L = √(m·σ² / (2·μ))`, in units of the deme spacing. This is the Malécot /
-    Kimura-Weiss decay scale: in an infinite linear array of demes with nearest-neighbour migration rate `m`, dispersal variance `σ²` and mutation
+    Kimura-Weiss decay scale: in an infinite linear array of demes with nearest-neighbour migration
+    rate `m`, dispersal variance `σ²` and mutation
     rate `μ`, the probability that two genes sampled `d` demes apart are
     identical by descent falls off as `exp(-d/L)`.
 
@@ -671,7 +675,8 @@ The contradiction is decidable without simulation, and it is decided against
 the exponential. `demoSteppingStoneFst` is derived from the coalescent in
 `DemographicHistory`: the meeting time of two lineages `d` demes apart is
 linear in `d`, `T(d) = d/(2σ²m)`, and `F_ST = T/(T + 2Nₑ)` then gives the
-hyperbolic `d/(d + 4Nₑσ²m)` exactly, with `steppingStoneFst_from_coalescence_time` proving that equality. A linear
+hyperbolic `d/(d + 4Nₑσ²m)` exactly, with `steppingStoneFst_from_coalescence_time` proving that
+equality. A linear
 meeting time under the `T/(T+2Nₑ)` map cannot produce `1 - exp(-d/L)` for any
 `L`: the two agree only to first order in `d`, and there they agree only if
 `L = 4·Nₑ·m·σ²`, which is not the scale the corpus passed and is not a
@@ -694,7 +699,8 @@ should use `demoSteppingStoneFst`. -/
     The deviation from the continental frequency decays geometrically.
 
     Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk16.py`). Wright-Fisher with migration toward a fixed continent, `N = 40000` so drift stays far below the
+    (`validation/empirical/simcov/battery_bulk16.py`). Wright-Fisher with migration toward a fixed
+    continent, `N = 40000` so drift stays far below the
     deterministic signal, 400 replicates, four times per parameter set:
 
       m        p0     p_c    worst of t in {5,15,30,60}     rel err

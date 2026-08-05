@@ -25,7 +25,8 @@ whose norm is at most the same series in `‖x‖`, which is `e^{‖x‖} - 1 - 
 applications of `tsum_eq_zero_add` and the triangle inequality for sums do it.
 
 The corollary `norm_exp_sub_one_sub_self_le_sq` is the form K-G's argument consumes: for
-`‖x‖ ≤ 1` the remainder is at most `‖x‖²`, so a one-generation operator agreeing with `1 + N⁻¹Q` to order `N⁻²` agrees with `exp(N⁻¹Q)` to the same order, and
+`‖x‖ ≤ 1` the remainder is at most `‖x‖²`, so a one-generation operator agreeing with `1 + N⁻¹Q` to
+order `N⁻²` agrees with `exp(N⁻¹Q)` to the same order, and
 `SemigroupLimit.tendsto_pow_self_exp` applies.
 
 What this does NOT supply is the many-state transition matrix itself.  The corpus counts the

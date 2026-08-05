@@ -214,7 +214,8 @@ theorem infoBottleneckObjective_reference :
   norm_num
 
 /-- Closed-form normalized Gaussian source residual risk from mutual information.
-    For a jointly Gaussian source trait `Y` and representation `φ(X)` with `Var(Y)=1`, the residual variance fraction is under this model `exp(-2 I(φ(X);Y))`.
+    For a jointly Gaussian source trait `Y` and representation `φ(X)` with `Var(Y)=1`, the residual
+    variance fraction is under this model `exp(-2 I(φ(X);Y))`.
 
     Empirical status: UNTESTED. -/
 noncomputable def gaussianSourceResidualRisk (I_phi_Y : ℝ) : ℝ :=

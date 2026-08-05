@@ -11,7 +11,8 @@ namespace Descent
 # Tajima's `Var(π)`, derived
 
 `Descent.Coalescent.SpectrumMoments` wrote Tajima (1989)'s expression down in order to check
-it, verified it at `n = 2`, and recorded the general case as open.  `Descent.Coalescent.PairwiseTimes`
+it, verified it at `n = 2`, and recorded the general case as open.
+`Descent.Coalescent.PairwiseTimes`
 then computed the two coalescence-time covariances it needs.  This file supplies the last
 ingredient -- the SHARED PATH LENGTHS -- and assembles everything into
 

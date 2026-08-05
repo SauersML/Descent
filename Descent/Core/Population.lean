@@ -29,7 +29,8 @@ other:
 
   * `Program.Conclusions.BinaryPopulation` -- a pair of measures, cases and controls, on
     which an AUC is an integral. It has no source/target structure at all.
-  * `Portability.DeploymentPopulation` -- an expectation functional together with genotype codings, causal effects and a residual. It is a whole model.
+  * `Portability.DeploymentPopulation` -- an expectation functional together with genotype codings,
+  causal effects and a residual. It is a whole model.
 
 A census that saw three names containing "population" and proposed collapsing them would
 be reading the word and not the type. They are kept apart, and this note is why.

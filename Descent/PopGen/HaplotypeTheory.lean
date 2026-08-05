@@ -700,7 +700,8 @@ theorem haplotype_less_portable_when_effects_shift
   rw [hval]
   exact abs_pos.mpr h_e
 
-/-! **Deleted: `haplotypeEffectEstimationVariance σ2 n freq = σ2 / (n * freq)`, together with `haplotypeEffectEstimationVariance_lt_ols`.**
+/-! **Deleted: `haplotypeEffectEstimationVariance σ2 n freq = σ2 / (n * freq)`, together with
+`haplotypeEffectEstimationVariance_lt_ols`.**
 
 This definition is absent on purpose. Regressing on a binary haplotype indicator of
 frequency `f` gives `Var(β̂) = σ²/(n·f·(1-f))`, not `σ²/(n·f)`. Dropping the `(1-f)`

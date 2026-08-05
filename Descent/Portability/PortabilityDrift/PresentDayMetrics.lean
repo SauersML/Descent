@@ -517,7 +517,8 @@ noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
 `presentDayR2` takes `fst` as a parameter, which is right: the metric is a function of
 differentiation however that differentiation arose. But the corpus also DERIVES an `F_ST`
 from raw demography, and nothing in this module said the two compose. Supplying the island
-equilibrium for the parameter gives exactly `Core.ScoreMoments.deployedR2FromIsland`, the composition
+equilibrium for the parameter gives exactly `Core.ScoreMoments.deployedR2FromIsland`, the
+composition
 that runs `(Nₑ, m, μ, d)` to a deployed metric.
 
 The parameter is deliberately not replaced. A metric that only accepted a derived `F_ST`
@@ -1808,7 +1809,8 @@ to be implicit in the fact that only a `target` version existed.
     (`validation/empirical/simcov/battery_transport.py`). This body is the
     denominator of `r2FromSourceWeights`, which is measured against the squared
     correlation of the transported score with the outcome at 0.06 sems in the
-    source and 2.50 in the target, on one end-to-end transport simulation with 400000 individuals per population and second moments SET rather than
+    source and 2.50 in the target, on one end-to-end transport simulation with 400000 individuals
+    per population and second moments SET rather than
     estimated. The two populations are what makes this a test of THIS body
     rather than of the numerator alone: `residualBurden` is zero in the source
     and the whole irreducible burden in the target, so the source cell fixes the
@@ -1817,7 +1819,8 @@ to be implicit in the fact that only a `target` version existed.
 
     What is NOT established: the internal structure of the burden. The four
     residuals enter only through their sum, as recorded at
-    `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with the burden is what the target cell tests, at 2.50 sems, which is a pass and
+    `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with the burden is what
+    the target cell tests, at 2.50 sems, which is a pass and
     not a comfortable one.
 
     argument_source: model. -/
@@ -2363,7 +2366,8 @@ correlation decays exponentially with recombination distance and divergence.
     coalescent theory gives Sved's `r² ≈ 1/(1 + 4·Nₑ·c)`, which is
     HYPERBOLIC in distance, not exponential, and the two differ in shape rather
     than scale. Measured `r²` between common SNP pairs binned over an
-    eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with BOTH laws fitted to the same curve with one free rate and one free
+    eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with BOTH laws fitted to
+    the same curve with one free rate and one free
     amplitude each so neither is handicapped:
 
       distance    measured r²        exponential fit   hyperbolic fit

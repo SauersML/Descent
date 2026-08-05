@@ -42,7 +42,8 @@ namespace Coalescent
 /-- A cover has exactly one block fewer.  K-C (1.4). -/
 theorem blocks_of_covers {n : ℕ} {ξ η : ER n} (h : Covers ξ η) : blocks η + 1 = blocks ξ := h.2
 
-/-- **K-G (5.1) vanishes off the diagonal below.**  There is no transition from a state with `k` blocks to one with anything but `k - 1`, so the lumped sum is zero unless `v = k - 1`.
+/-- **K-G (5.1) vanishes off the diagonal below.**  There is no transition from a state with `k`
+blocks to one with anything but `k - 1`, so the lumped sum is zero unless `v = k - 1`.
 This is Kingman's "the sum (5.1) is 0 unless `u = f(ξ) = v + 1`". -/
 theorem no_cover_of_blocks_ne {n : ℕ} {ξ η : ER n} (h : Covers ξ η) {v : ℕ}
     (hv : v + 1 ≠ blocks ξ) : blocks η ≠ v := by

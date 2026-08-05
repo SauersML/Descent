@@ -19,16 +19,26 @@ and then proves the thing the collection is for.
 
 | # | probe | witness pair | kind | module |
 |---|---|---|---|---|
-| 1 | joint cumulant tensors of order `≤ K` | Gaussian vs. `tanh`-tilted blocks | mathematical | `CumulantBlindness` |
-| 2 | normalized cumulant contractions, all orders | Gaussian vs. i.i.d. Rademacher | mathematical | `CumulantBlindness` |
-| 3 | data on unions of `≤ r` cover elements | bipartite vs. non-bipartite Ramanujan twins | mathematical | `LocalToGlobalCoherence` |
-| 4 | limits of disjoint-support chaos designs | Gaussian vs. a chameleon law | mathematical | `JetBarrier` |
-| 5 | any complete invariant of the fiber relation | `ℓ∞`-divergent coded decay profiles | mathematical | `HiddenConeAmbiguity` |
-| 6 | the cluster's internal cross-checks | two retention values | **methodological** | `DriftRegime` |
-| 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime` |
-| 8 | Fisher's average effect | additive vs. dominant locus at `p = 1/2` | **genotypic** | this file |
-| 9 | any statistic of normalised pairwise coalescence times | Kingman vs. Beta vs. Dirac coalescents | **methodological** | this file |
-| 10 | total selected-allele frequency | one-origin vs. two-origin sweep | **genealogical** | `XiFromMarkedBreakouts` |
+| 1 | joint cumulant tensors of order `≤ K` | Gaussian vs. `tanh`-tilted blocks | mathematical |
+`CumulantBlindness` |
+| 2 | normalized cumulant contractions, all orders | Gaussian vs. i.i.d. Rademacher | mathematical |
+`CumulantBlindness` |
+| 3 | data on unions of `≤ r` cover elements | bipartite vs. non-bipartite Ramanujan twins |
+mathematical | `LocalToGlobalCoherence` |
+| 4 | limits of disjoint-support chaos designs | Gaussian vs. a chameleon law | mathematical |
+`JetBarrier` |
+| 5 | any complete invariant of the fiber relation | `ℓ∞`-divergent coded decay profiles |
+mathematical | `HiddenConeAmbiguity` |
+| 6 | the cluster's internal cross-checks | two retention values | **methodological** |
+`DriftRegime` |
+| 7 | a symmetric validation design | the ratio vs. its square | **methodological** | `DriftRegime`
+|
+| 8 | Fisher's average effect | additive vs. dominant locus at `p = 1/2` | **genotypic** | this file
+|
+| 9 | any statistic of normalised pairwise coalescence times | Kingman vs. Beta vs. Dirac
+coalescents | **methodological** | this file |
+| 10 | total selected-allele frequency | one-origin vs. two-origin sweep | **genealogical** |
+`XiFromMarkedBreakouts` |
 
 Instances 1-5 are theorems about the mathematics. Instances 6 and 7 are theorems about
 the **development's own quality process**, and that is the point of assembling them in
@@ -305,7 +315,8 @@ noncomputable def OneLocusArchitecture.witness : OneLocusArchitecture where
 
     Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_a`). The docstring's
     claim -- that this is what a dosage regression recovers -- is now the thing that was
-    measured. One diploid locus in Hardy-Weinberg proportions over 4×10⁶ individuals with genotypic values `-a / d / a` transcribed from `genotypicValue`; the observable is the
+    measured. One diploid locus in Hardy-Weinberg proportions over 4×10⁶ individuals with genotypic
+    values `-a / d / a` transcribed from `genotypicValue`; the observable is the
     realised least-squares slope of that value on alt-allele dosage, and the prediction uses
     the REALISED allele frequency.
 
@@ -552,7 +563,8 @@ theorem dominance_resolution_bound (a d d' p δ : ℝ) (hp : 1 - 2 * p ≠ 0)
 /-! ### Instance 9: normalised pairwise coalescence times
 
 The mathematical core, stated on the survival function so it needs no measure theory.
-With two lineages the only possible event is coalescence, so the time is exponential with some rate `λ > 0` that carries the whole of the reproductive regime, and the mean is
+With two lineages the only possible event is coalescence, so the time is exponential with some rate
+`λ > 0` that carries the whole of the reproductive regime, and the mean is
 `1 / λ`. Evaluating the survival function at `x` MEANS of that law gives `exp (-x)` for
 every `λ`: the rate cancels. -/
 

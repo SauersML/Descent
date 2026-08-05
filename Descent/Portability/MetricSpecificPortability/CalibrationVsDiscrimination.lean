@@ -102,7 +102,8 @@ theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
     The pairing is the point, and only now does it have two working halves: discrimination
     can survive exactly the perturbation that destroys calibration, so reporting AUC alone
     hides the failure. Note also that this is the **equal-variance** AUC; on a dichotomised
-    trait the discrimination half would have to be restated with `liabilityThresholdAUCFromExplainedR2` at a named prevalence, where preservation is a
+    trait the discrimination half would have to be restated with
+    `liabilityThresholdAUCFromExplainedR2` at a named prevalence, where preservation is a
     stronger claim because the conditional variances differ. -/
 theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (V_A V_E fst V_A' fst' mean_obs mean_pred δ : ℝ)

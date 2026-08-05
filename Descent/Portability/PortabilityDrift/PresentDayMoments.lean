@@ -1609,7 +1609,8 @@ prevalence scale.
 
     THE INTERNAL INCONSISTENCY IS THE FINDING, and it is the same one
     `neutralAFBenchmarkMetricProfile` is documented for: this record takes a
-    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with a chart that has nowhere to put one. So a profile assembled to compare
+    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with a chart that has
+    nowhere to put one. So a profile assembled to compare
     source and target Brier "on the same prevalence scale" is binary in one
     field and continuous in another.
 

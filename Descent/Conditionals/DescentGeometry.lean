@@ -44,7 +44,8 @@ of that set against the functional.
 * `admissible_interaction_join_obstruction`, `admissible_confounding_meet_obstruction` — the two
   order-theoretic failures, stated over genuine probability-law families rather than as
   arithmetic.  The conditional risks driving them are `interactionRisk` and
-  `confoundedConditionalRisk` from `Descent.Conditionals.FunctionalDescent`, so these are those witnesses,
+  `confoundedConditionalRisk` from `Descent.Conditionals.FunctionalDescent`, so these are those
+  witnesses,
   promoted without extending their parameters beyond the probability simplex.
 * `kernelSufficient_componentPosterior` — the posterior component vector of a mixture is
   kernel-sufficient for the family of all mixing weights, so *every* functional descends along

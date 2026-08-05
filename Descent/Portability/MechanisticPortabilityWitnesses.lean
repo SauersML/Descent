@@ -569,7 +569,8 @@ noncomputable def baselineGenerationalPopGen : Descent.Core.PopGenParameters := 
   V_A_pos := by norm_num
 }
 
-/-- Nondegenerate generation-indexed population-genetic parameters with positive mutation, migration, and recombination. This witness is used to show
+/-- Nondegenerate generation-indexed population-genetic parameters with positive mutation,
+migration, and recombination. This witness is used to show
 that the public generational portability API changes because of explicit
 population-genetic coordinates, not only because of hand-injected AF/effect
 paths. -/
@@ -630,7 +631,8 @@ noncomputable def popgenDrivenTagScale : ℝ :=
   (7 / 6 : ℝ) * Real.exp (-(1 : ℝ))
 
 /-- The LD decay exponent this witness carries across one tag-causal unit of
-distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with `lambda` and the gap READ OFF the witness's own population-genetic parameters
+distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with `lambda` and the gap READ
+OFF the witness's own population-genetic parameters
 rather than copied out as numbers, and `distance = 1` from the model's
 `tagCausalDistance` below.
 

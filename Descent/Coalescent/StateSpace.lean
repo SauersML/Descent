@@ -429,7 +429,8 @@ theorem coverOfPair_bijective {n : ℕ} (ξ : ER n) : Function.Bijective (coverO
 
 /-- **K-C (1.6): a state with `k` blocks has exactly `C(k,2)` covers.**
 
-Every cover is the merge of a unique unordered pair of blocks, so the covers biject with the two-element subsets of the block set.  K-C (1.3) puts rate `1` on each, so the total
+Every cover is the merge of a unique unordered pair of blocks, so the covers biject with the
+two-element subsets of the block set.  K-C (1.3) puts rate `1` on each, so the total
 rate out of the state is `C(k,2) = k(k-1)/2`.  That is the ladder `d_k` -- counted, not
 assumed. -/
 theorem card_covers {n : ℕ} (ξ : ER n) :

@@ -757,7 +757,8 @@ variable {ι : Type*} [Fintype ι] {n : ℕ}
 
 /-! ### The coordinate: what a standardized genotype contributes -/
 
-/-- **The standardized genotype is centered**, at every allele frequency and with no symmetry hypothesis: `E[(g - 2q) / sqrt (2q(1-q))] = 0`.
+/-- **The standardized genotype is centered**, at every allele frequency and with no symmetry
+hypothesis: `E[(g - 2q) / sqrt (2q(1-q))] = 0`.
 
 This is the first of the two coordinate-level inputs the disjoint licence needs,
 and it is the reason that licence is not frequency-gated. -/
@@ -784,7 +785,8 @@ allele frequency, again with no symmetry hypothesis: the normalization divides b
 `sqrt` of exactly the variance `HardyWeinbergModel.genotypeVariance` is defined
 to be.
 
-This is the second coordinate-level input of the disjoint licence. Together with `standardizedGenotype_expectation_zero` it says the genotype coordinate meets the
+This is the second coordinate-level input of the disjoint licence. Together with
+`standardizedGenotype_expectation_zero` it says the genotype coordinate meets the
 hypotheses of the chaos theory at every frequency in `(0, 1)` — which is why
 Theorem D, unlike everything in §`SignErasure`, is not restricted to `q = 1/2`. -/
 theorem standardizedGenotype_second_moment_one (h : Foundations.HardyWeinbergModel)

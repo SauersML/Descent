@@ -19,7 +19,8 @@ antisymmetric part `A` separates what changes from what does not.
 
 The Dirichlet form does not see `A`. The quadratic form of an antisymmetric operator vanishes
 identically (`driftGeneratorForm_independent_of_circulation`), so the energy governing degradation
-is the energy of `S`, and the construction rule holds verbatim for nonreversible couplings with `S` in place of `-L`.
+is the energy of `S`, and the construction rule holds verbatim for nonreversible couplings with `S`
+in place of `-L`.
 
 The autocorrelation time does see `A`. The asymptotic variance of a time-average is governed by
 the symmetric part of the resolvent, `s/(s² + a²)`, not by the inverse of the symmetric part,

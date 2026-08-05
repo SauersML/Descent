@@ -22,7 +22,8 @@ This file isolates the algebraic core used by the portability arguments:
 - binary metric identities relating prevalence, recall, FPR, and precision.
 
 The point is to keep these results independent of any particular probability
-space representation. Downstream modules can instantiate `ExpFunctional` with an actual expectation operator.
+space representation. Downstream modules can instantiate `ExpFunctional` with an actual expectation
+operator.
 -/
 
 /--
@@ -286,7 +287,8 @@ theorem covariance_finset_sum_right
 /-- Covariance is symmetric.
 
     Previously duplicated in `Blindness.ImitationRigidity`, which is where the corpus
-    first needed it.  It is a fact about any positive linear functional and belongs with the rest of the covariance algebra; the copy is gone and its seven uses point here.
+    first needed it.  It is a fact about any positive linear functional and belongs with the rest of
+    the covariance algebra; the copy is gone and its seven uses point here.
 
     The `_exp` suffix is not decoration.  Mathlib has `ProbabilityTheory.covariance_comm`
     for its measure-theoretic `covariance`, and these four names -- this one,

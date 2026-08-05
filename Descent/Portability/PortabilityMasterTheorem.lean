@@ -283,7 +283,8 @@ theorem scoreVariance_eq : P.scoreVariance w = Foundations.dot w (P.sigmaX.mulVe
 
 /-- **Exact predictive-covariance law.**  `Cov(S, Y) = wᵀ K β + wᵀ c_X`.
 
-    The first term is the genetic signal the score captures: tagging (`K`) composed with this population's effects (`β`).  The second is the part of the score's predictive
+    The first term is the genetic signal the score captures: tagging (`K`) composed with this
+    population's effects (`β`).  The second is the part of the score's predictive
     covariance that runs through the residual rather than through `C` -- stratification
     and ancestry-correlated environment live here, and they contribute to a measured
     `R²` exactly as genuine signal does.  Nothing in the metric separates them, which is
@@ -755,7 +756,8 @@ theorem calibrationSlope_eq_core (P : DeploymentPopulation Ω J L) (w : J → �
 /-- `R²` as an explicit function of the statistic.
 
     Empirical status: **EXACT BY CONSTRUCTION**.  It is the textbook squared-correlation
-    formula written on a triple, and `r2_factors_through_statistic` proves it agrees with the generative `R²` by `rfl` -- the two are the same expression, so no measurement can
+    formula written on a triple, and `r2_factors_through_statistic` proves it agrees with the
+    generative `R²` by `rfl` -- the two are the same expression, so no measurement can
     bear on the agreement.  The empirical content lives in the three components of
     `portabilityStatistic`, each of which carries its own status.
 
@@ -1231,7 +1233,8 @@ def bestAffineScore : Ω → ℝ :=
   P.recalibratedScore w (P.calibrationIntercept w) (P.calibrationSlope w)
 
 /-- The algebraic step behind `bestAffine_mse_eq`: rescaling the outcome variance by the
-unexplained fraction is subtracting the explained variance.  Stated for plain reals with the Cauchy-Schwarz premise, because it has to hold at `V = 0` too, where the ratio is the
+unexplained fraction is subtracting the explained variance.  Stated for plain reals with the
+Cauchy-Schwarz premise, because it has to hold at `V = 0` too, where the ratio is the
 totalised `0` and the premise forces `c = 0`. -/
 theorem outcomeVariance_mul_one_sub_ratio (V c v : ℝ) (hv : v ≠ 0) (hcs : c ^ 2 ≤ v * V) :
     V * (1 - c ^ 2 / (v * V)) = V - c ^ 2 / v := by

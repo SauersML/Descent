@@ -74,7 +74,8 @@ mass function on parent maps, and it is the ONLY probabilistic input in this fil
 
 Empirical status: THIS IS THE MODEL, not a claim about a population.  K-G (2.2) shows the
 symmetric multinomial family-size law is equivalent to this backwards prescription, and
-K-G section 4 shows the same limit follows from any exchangeable family-size law with bounded moments, with the family-size variance `σ²` rescaling time.  Whether a given
+K-G section 4 shows the same limit follows from any exchangeable family-size law with bounded
+moments, with the family-size variance `σ²` rescaling time.  Whether a given
 population reproduces this way is the empirical question, and `Descent.Blindness` records
 which statistics could tell. -/
 noncomputable def parentAssignment (N k : ℕ) [NeZero N] : PMF (Fin k → Fin N) :=
@@ -293,7 +294,8 @@ theorem sum_range_div_eq_deathRate (N k : ℕ) :
   ring
 
 /-- **Upper bound: the one-generation coalescence probability is at most `d_k/N`.**  The
-union bound over the `d_k = k(k-1)/2` pairs of lineages, each of which collides with probability `1/N`. -/
+union bound over the `d_k = k(k-1)/2` pairs of lineages, each of which collides with probability
+`1/N`. -/
 theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     1 - noCoalescenceProb N k ≤ deathRate k / (N : ℝ) := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
@@ -307,7 +309,8 @@ theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith
 
-/-- **Lower bound: and by no more than `(d_k/N)²/2` less.**  Together with `coalescenceProb_le` this is the `q N⁻¹ + O(N⁻²)` of K-G (2.9), with the error constant
+/-- **Lower bound: and by no more than `(d_k/N)²/2` less.**  Together with `coalescenceProb_le` this
+is the `q N⁻¹ + O(N⁻²)` of K-G (2.9), with the error constant
 exhibited. -/
 theorem le_coalescenceProb {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     deathRate k / (N : ℝ) - (deathRate k / (N : ℝ)) ^ 2 / 2 ≤ 1 - noCoalescenceProb N k := by
@@ -346,7 +349,8 @@ one premise this file does not derive.  The head is `MIXED` because that is the 
 vocabulary term for a definition whose parts carry different verdicts, and because a head
 that opens with lower-case prose is a head no scanner can read: the two halves below are
 the two verdicts the term promises.  K-G section 4 is the statement that the conclusion
-survives replacing multinomial reproduction by any exchangeable family-size law with bounded moments and variance `σ²`, at the cost of rescaling time by `σ⁻²`. -/
+survives replacing multinomial reproduction by any exchangeable family-size law with bounded moments
+and variance `σ²`, at the cost of rescaling time by `σ⁻²`. -/
 noncomputable def pairDistinct (N : ℕ) : ℕ → ℝ
   | 0 => 1
   | s + 1 => noCoalescenceProb N 2 * pairDistinct N s
@@ -436,7 +440,8 @@ theorem hetRecurrence_factor_eq_mechanism {Ne : ℕ} (hNe : 0 < Ne) :
   ring
 
 /-- **The corpus's heterozygosity recurrence is the Wright-Fisher pair-survival
-probability.**  `Descent.Core.hetRecurrence Nₑ H₀ t = pairDistinct (2 Nₑ) t · H₀`: the scalar model and
+probability.**  `Descent.Core.hetRecurrence Nₑ H₀ t = pairDistinct (2 Nₑ) t · H₀`: the scalar model
+and
 the mechanism agree at every generation, and the mechanism is what says why. -/
 theorem hetRecurrence_eq_pairDistinct {Ne : ℕ} (hNe : 0 < Ne) (H₀ : ℝ) (t : ℕ) :
     Descent.Core.hetRecurrence (Ne : ℝ) H₀ t = pairDistinct (2 * Ne) t * H₀ := by

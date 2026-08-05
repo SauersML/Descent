@@ -26,7 +26,8 @@ The split is deliberate and is stated rather than hidden:
 
 * DERIVED here.  `jumpProb_eq` and `card_covers_mul_jumpProb`: the jump chain is UNIFORM on
   the `C(k,2)` covers of its current state, each getting `2/(k(k-1))`, and those weights
-  sum to one.  The uniformity is not an extra assumption -- it is `q_{ξη}/q_ξ` with `q_{ξη} = 1` (K-C (1.3)) and `q_ξ` counted by `Descent.Coalescent.StateSpace.card_covers`.
+  sum to one.  The uniformity is not an extra assumption -- it is `q_{ξη}/q_ξ` with `q_{ξη} = 1`
+  (K-C (1.3)) and `q_ξ` counted by `Descent.Coalescent.StateSpace.card_covers`.
 * DERIVED here, and it is the load-bearing step of K-C's Theorem 1: `absoluteProb_recursion`,
   the backward induction from `k` to `k-1`.  Kingman's displayed calculation has two moving
   parts -- the factorial prefactor `jumpCoeff_recursion`, and the fact that splitting a class
@@ -107,7 +108,8 @@ noncomputable def absoluteProb (n k : ℕ) (lam : Multiset ℕ) : ℝ :=
   jumpCoeff n k * (((lam.map Nat.factorial).prod : ℕ) : ℝ)
 
 /-- **The base of K-C's backward induction.**  At `k = n` the chain is at `Δ`, whose classes
-are `n` singletons, and (2.3) gives probability one -- as it must, since `ℛ_n = Δ` with certainty. -/
+are `n` singletons, and (2.3) gives probability one -- as it must, since `ℛ_n = Δ` with certainty.
+-/
 theorem absoluteProb_top (n : ℕ) (hn : 1 ≤ n) :
     absoluteProb n n (Multiset.replicate n 1) = 1 := by
   have hfac : ((Multiset.replicate n 1).map Nat.factorial).prod = 1 := by

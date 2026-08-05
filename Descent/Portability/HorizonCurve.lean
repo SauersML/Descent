@@ -13,7 +13,8 @@ open scoped BigOperators
 
 Self-contained: imports only Mathlib.
 
-`Descent.Spectral.DirichletTransfer` builds a horizon calculus on a decay curve and reads a crossover
+`Descent.Spectral.DirichletTransfer` builds a horizon calculus on a decay curve and reads a
+crossover
 `τ_c = log 2 / λ` off it. Three facts about that curve are checked here.
 
 ## The naive estimator is flat

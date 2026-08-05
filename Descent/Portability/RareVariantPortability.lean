@@ -481,7 +481,8 @@ admissible parameter, including the weak-constraint regime `s < mu` where
 
     This body remains the exact fixed point of `mutationSelectionStepRare` --
     `mutationSelectionBalance_isFixedPoint` is a theorem and is not in question.
-    What the measurement rejects is the identification of that fixed point with the standing frequency of a real population, at `mu` comparable to `h s`.
+    What the measurement rejects is the identification of that fixed point with the standing
+    frequency of a real population, at `mu` comparable to `h s`.
     Where `mu << h s` the two forms agree to `O(mu / (h s))` and the top table
     applies.
 
@@ -527,7 +528,8 @@ def DeterministicMutationSelectionRegime (Ne s h : ℝ) : Prop :=
   10 ≤ mutationSelectionDriftParameter Ne s h
 
 /-- **The regime is exactly a lower bound on the compound parameter**, and it is
-strictly weaker than any bound on `s` or on `Nₑ` alone: a large population with nearly neutral alleles and a small population with strongly selected ones can sit
+strictly weaker than any bound on `s` or on `Nₑ` alone: a large population with nearly neutral
+alleles and a small population with strongly selected ones can sit
 at the same point. That is why the restriction is stated on the product. -/
 theorem deterministicMutationSelectionRegime_iff (Ne s h : ℝ) :
     DeterministicMutationSelectionRegime Ne s h ↔ 10 ≤ 4 * Ne * h * s := by
@@ -868,7 +870,8 @@ theorem mutationSelectionBalanceRecessive_sq_le (mu s : ℝ)
     (purifying selection maintains them rare). The comparison is made on the
     dominant mutation-selection balance derived above, at a common dominance
     coefficient `h`, so both arms are frequencies in `[0, 1]` whatever the
-    selection coefficients are — including the weakly constrained arm with `s < mu`, where `mu / s` exceeds one and is therefore not a frequency at all.
+    selection coefficients are — including the weakly constrained arm with `s < mu`, where `mu / s`
+    exceeds one and is therefore not a frequency at all.
 
     Worked example: Genes with high constraint (e.g., pLI > 0.9) show
     this pattern most clearly, and `haploinsufficiency_consistent_direction`

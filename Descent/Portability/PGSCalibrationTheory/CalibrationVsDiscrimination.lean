@@ -804,7 +804,8 @@ transport of a hypothesis, not a discovery:
   to AUC and to calibrated Brier through the monotone charts — a real and reusable step,
   but a conditional one.
 - `|sourceProfile.citl| < |targetProfile.citl|` is immediate from `h_src_cal`, which
-  assumes the source is perfectly calibrated in the large, together with `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
+  assumes the source is perfectly calibrated in the large, together with `h_shift_nonzero`. Against
+  a source CITL pinned to `0`, any nonzero shift is worse.
 
 This theorem carries **no** `hPhiStrict : StrictMono Phi` hypothesis, and needs none.
 `Probability.strictMono_Phi` proves it: `Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`,

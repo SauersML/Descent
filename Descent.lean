@@ -1,25 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
--- ELEVEN HEADS, NOT 171 MODULES.  Each `Descent.X` below imports every file under
--- `Descent/X/`, so the build still covers the whole corpus -- which is what the list this
--- replaces existed to guarantee.  What changes is who guarantees it.
---
--- THE BUILD MUST COVER ITS OWN CORPUS.  A module the build never reaches is not clean, it
--- is UNBUILT, and that is not hypothetical: `ResonanceSpectrum` failed all day on a
--- missing `Real.log` import while every whole-corpus build reported zero errors, because
--- no target ever named it.  It showed up only as a line in `MODULES_ABSENT`, a truthful
--- report in a format nobody interrogated.
---
--- The old remedy was to name orphans HERE, by hand, with a comment asking future readers
--- to remember.  A list somebody maintains by hand has the same failure mode as no list,
--- one lapse later, and the comment even recorded the near-miss: four `BundleRigidity`
--- modules were reachable only transitively and one, `DeploymentCeiling`, was not reachable
--- at all.  Distinguishing those needed a transitive-closure check run by a person.
---
--- A head does not need remembering.  `validation/code/check.py --only heads` reads each
--- directory off disk and fails if a file in it is missing from its head, so a new module
--- is either imported or the build names it.  Coverage stopped being a promise.
 import Descent.Blindness
 import Descent.Coalescent
 import Descent.Conditionals
@@ -32,13 +13,37 @@ import Descent.Portability
 import Descent.Program
 import Descent.Spectral
 
+/-!
+# The corpus root
+
+ELEVEN HEADS, NOT 171 MODULES.  Each `Descent.X` below imports every file under
+`Descent/X/`, so the build still covers the whole corpus -- which is what the list this
+replaces existed to guarantee.  What changes is who guarantees it.
+
+THE BUILD MUST COVER ITS OWN CORPUS.  A module the build never reaches is not clean, it
+is UNBUILT, and that is not hypothetical: `ResonanceSpectrum` failed all day on a
+missing `Real.log` import while every whole-corpus build reported zero errors, because
+no target ever named it.  It showed up only as a line in `MODULES_ABSENT`, a truthful
+report in a format nobody interrogated.
+
+The old remedy was to name orphans HERE, by hand, with a comment asking future readers
+to remember.  A list somebody maintains by hand has the same failure mode as no list,
+one lapse later, and the comment even recorded the near-miss: four `BundleRigidity`
+modules were reachable only transitively and one, `DeploymentCeiling`, was not reachable
+at all.  Distinguishing those needed a transitive-closure check run by a person.
+
+A head does not need remembering.  `validation/code/check.py --only heads` reads each
+directory off disk and fails if a file in it is missing from its head, so a new module
+is either imported or the build names it.  Coverage stopped being a promise.
+-/
+
 namespace Descent
 
 /-- The pioneer share map is the same saturation coordinate already used for coalescent time.
 The arguments have different biological meanings, but the common algebraic map is made explicit
 rather than left as two silently parallel formulas. -/
 theorem pioneerWeightFraction_eq_fstFromTau (w : ℝ) :
-    Blindness.XiFromMarks.pioneerWeightFraction w = Portability.fstFromTau w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = Descent.Core.fstFromTau w := rfl
 
 /-- The same saturation coordinate also appears in the migration/LD chart; this identity keeps
 the shared formula explicit without conflating the three scientific arguments. -/
@@ -434,7 +439,8 @@ section NoAxioms
 variable {t : ℕ}
 
 /-! `covariance_mismatch_pos_of_fst_and_sparse_array` and
-`target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.PopGen.DGP`
+`target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with their
+binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.PopGen.DGP`
 and a one-line proof citing the original.
 
 The restatements bought nothing.  Both originals are already in the `Descent` namespace,

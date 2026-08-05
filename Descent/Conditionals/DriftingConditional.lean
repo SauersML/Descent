@@ -23,7 +23,8 @@ in principle, what survives the drift, and how much an interior estimate can be 
 
 ## The threshold gauge, and why statics cannot break it
 
-In a liability-threshold model `Y = 1[Z > θ]` — the standard reading of a polygenic score, with `Z` liability and `θ` a diagnostic threshold — apply any strictly increasing `h` to the liability
+In a liability-threshold model `Y = 1[Z > θ]` — the standard reading of a polygenic score, with `Z`
+liability and `θ` a diagnostic threshold — apply any strictly increasing `h` to the liability
 axis. `indicator_lt_eq_of_strictMono` records that the indicator is unchanged. Every observable is
 unchanged; the threshold path is changed into an arbitrary increasing relabelling, and can be
 flattened to zero. **From response curves alone the threshold path is identifiable at most up to
@@ -553,7 +554,8 @@ one has an invariant MANIFOLD.
 
 The whole content sits in one Gaussian identity, `gaussianAverage_probit`, and that identity is
 proved below. The proof is the standard coupling — `E[Φ(α + βZ)]` is
-`P(W ≤ α + βZ)` for an independent standard normal `W`, and `W - βZ` is centred Gaussian with variance `1 + β²`.  The formal argument supplies both pieces: Mathlib's Gaussian convolution and
+`P(W ≤ α + βZ)` for an independent standard normal `W`, and `W - βZ` is centred Gaussian with
+variance `1 + β²`.  The formal argument supplies both pieces: Mathlib's Gaussian convolution and
 the conditioning step that turns the expectation of a cdf into a probability of a linear
 combination.
 
@@ -797,7 +799,8 @@ theorem affineProbit_strictMono (p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) :
   nlinarith
 
 /-- The natural floor/ceiling constraints put every affine-probit risk strictly between zero and
-one. Endpoints may equal zero and one because `Foundations.Phi` never attains either at a finite liability. -/
+one. Endpoints may equal zero and one because `Foundations.Phi` never attains either at a finite
+liability. -/
 theorem affineProbit_mem_Ioo (p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q)
     (hpq : p + q ≤ 1) (u : ℝ) :
     0 < p + q * Foundations.Phi (α * u + β) ∧ p + q * Foundations.Phi (α * u + β) < 1 := by
@@ -1128,7 +1131,8 @@ of the two steps composed, while the right-hand side produces the induced parame
 single combined scale.  Uniqueness (`link_invariance_params_unique`) then equates them, and
 what is left is an equation in one real variable.
 
-For the probit the resulting law is `α(√(s²+t²)) = α(s) · α(α(s) t)` with `α(s) = 1/√(1+s²)`, which one verifies directly:
+For the probit the resulting law is `α(√(s²+t²)) = α(s) · α(α(s) t)` with `α(s) = 1/√(1+s²)`, which
+one verifies directly:
 `α(s) · α(α(s) t) = (1/√(1+s²)) · √(1+s²)/√(1+s²+t²)`.  Pinning `α` pins the link. -/
 theorem link_average_semigroup (L : ℝ → ℝ) (hmono : StrictMono L)
     (hbdd : ∀ u, 0 < L u ∧ L u < 1) (x s t : ℝ) :
@@ -1533,7 +1537,8 @@ open MeasureTheory ProbabilityTheory in
 /-- **The classification, reduced to one equation on one function.**
 
 Everything above collapses into this.  Write `φ` for the characteristic function of the
-liability distribution `ν`.  If the link's averaging family is closed at scale `s` with parameters `(α, β)`, then
+liability distribution `ν`.  If the link's averaging family is closed at scale `s` with parameters
+`(α, β)`, then
 
 `e^{-s²t²/2} · φ(t) = φ(t/α) · e^{-iβt/α}`  for every `t`.
 
@@ -1860,7 +1865,8 @@ point `αⁿ u` runs to zero, where a characteristic function is its total mass.
 evaluates the characteristic function in closed form and it is Gaussian.
 
 That argument needs `α < 1`, which the invariance does not state. It is forced. Taking moduli in
-the functional equation gives `‖ψ(u)‖ = ‖ψ(α u)‖ · exp(-(sαu)²/2)`, and iterating that bound with `α ≥ 1` drives `‖ψ(u)‖` below `M · exp(-n (su)²/2)` for every `n`. So `ψ` would vanish off the
+the functional equation gives `‖ψ(u)‖ = ‖ψ(α u)‖ · exp(-(sαu)²/2)`, and iterating that bound with `α
+≥ 1` drives `‖ψ(u)‖` below `M · exp(-n (su)²/2)` for every `n`. So `ψ` would vanish off the
 origin while equalling the total mass at it, and a characteristic function of a finite measure is
 continuous. Mathlib does not carry that continuity, so it is proved here by dominated convergence
 against the constant bound one. -/

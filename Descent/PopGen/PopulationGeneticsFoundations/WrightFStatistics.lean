@@ -42,7 +42,8 @@ section WrightFStatistics
 noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
   Descent.Core.complementaryComposition f_IS f_ST
 
-/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with `pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
+/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with
+`pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
 free. Two independent halves compound to three quarters, not to one -- the inbreeding
 coefficients multiply as retained heterozygosities rather than adding. -/
 theorem wrightFIT_compounds_two_halves :
@@ -103,7 +104,8 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
 
-    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with branch-mode
+    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with
+    branch-mode
     divergence, which removes mutational noise analytically, shows the split
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells

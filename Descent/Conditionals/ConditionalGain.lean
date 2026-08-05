@@ -124,7 +124,8 @@ theorem conditionalGainFunctional_ge_of_freshness_decay {m : ℕ}
 /-- **A uniform per-step factor gives a conditional-gain floor that is LINEAR in
 the number of steps.**
 
-`conditionalGainFunctional_ge_of_freshness_decay` takes an exponential bound with a freshness budget `D` baked into the exponent, which is the shape the telescope
+`conditionalGainFunctional_ge_of_freshness_decay` takes an exponential bound with a freshness budget
+`D` baked into the exponent, which is the shape the telescope
 produces. This is the other shape a contraction can arrive in: a bound `ρ^k`
 with `ρ` the per-step factor and `k` the number of steps, which is what a
 symbolic-dynamics or per-locus recombination argument produces. The two are the

@@ -47,7 +47,8 @@ theorem scalar_summary_insufficient_for_accuracy
 
 /-! The conditional-noise-floor and Gaussian-floor bounds on the explainable fraction answer
 this question, and they are `explainable_fraction_bound_of_conditional_noise_floor` and
-`explainable_fraction_bound_of_conditional_gaussian_floor` in `Descent.Foundations.TransportIdentities`.
+`explainable_fraction_bound_of_conditional_gaussian_floor` in
+`Descent.Foundations.TransportIdentities`.
 
 They were also restated here, suffixed `_exact`, each copying its original's eight-line
 measure-theoretic binder block and citing the original as its proof.  Both live in the
@@ -823,7 +824,8 @@ theorem mul_sum_lt_sum_mul_of_nonneg_of_exists_pos
     The genetics reading is that a genome-wide `F_ST` is a biased proxy for the
     effect-weighted average of local `F_ST`, so global and local carry
     different information. What is proved is that the weighted mean of `x`
-    exceeds `c` when `∑ β²(x - c) > 0` — an arithmetic fact about weights, with no ancestry, no locus, no LD and no accuracy in it, and in particular no
+    exceeds `c` when `∑ β²(x - c) > 0` — an arithmetic fact about weights, with no ancestry, no
+    locus, no LD and no accuracy in it, and in particular no
     comparison of how informative two quantities are. -/
 theorem lt_weighted_mean_of_weighted_deviation_pos
     {m : ℕ} (β : Fin m → ℝ) (fst_local : Fin m → ℝ) (fst_global : ℝ)

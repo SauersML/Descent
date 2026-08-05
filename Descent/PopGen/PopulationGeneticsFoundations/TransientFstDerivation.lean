@@ -73,7 +73,8 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_bulk15.py`). Measured against the
-    same infinite-alleles trajectories as `hetMutationDriftRecurrence`, with `lam = 1 - 1/(2 Ne) - 2 mu` and `Hstar = theta/(1 + theta)`, iterated fifteen
+    same infinite-alleles trajectories as `hetMutationDriftRecurrence`, with `lam = 1 - 1/(2 Ne) - 2
+    mu` and `Hstar = theta/(1 + theta)`, iterated fifteen
     generations from a measured start: worst cell 1.01 sems, 6.5% relative,
     across `theta` of 0.80 and 1.00 and `Ne` of 50, 100 and 200.
 
@@ -238,7 +239,8 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     `exp(-(1+theta) t/(2 Ne))` by `hetDecayFactor^t` and the substitution is
     exact only to O(1/Ne). The design reached down to `Ne = 50`, where the two
     predictions differ by about a percent, and the measurement's own noise is
-    six percent. They therefore did NOT separate, and neither is credited with beating the other. What is established is the common content: the plateau
+    six percent. They therefore did NOT separate, and neither is credited with beating the other.
+    What is established is the common content: the plateau
     and the rate at which it is approached.
 
     Separating them needs about a hundredfold increase in replicates at small

@@ -26,7 +26,8 @@ blind residual — is bounded by every one of them.
 The forward conjunct is then **short, and that is the honest headline**:
 `perpRisk_eq_zero_of_blind_eq_zero` says that if blindness vanishes at *any single* finite
 order, the absolutely-blind residual is zero. Combined with the coverage-invariance
-theorem — peelable base plus `η > 0` gives coupled `k`-point injectivity with `σ_min ≥ (η/C)^k`, and injectivity at order `k` is exactly `blind k = 0` — this gives
+theorem — peelable base plus `η > 0` gives coupled `k`-point injectivity with `σ_min ≥ (η/C)^k`, and
+injectivity at order `k` is exactly `blind k = 0` — this gives
 
 > **`η > 0` ⟹ `perpRisk = 0`.**
 

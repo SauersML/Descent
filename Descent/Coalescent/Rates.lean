@@ -55,7 +55,8 @@ namespace Coalescent
 
 open Filter MeasureTheory
 
-/-- Kingman's death rate `d_k = k(k-1)/2`: the total rate at which a coalescent state with `k` blocks leaves that state.
+/-- Kingman's death rate `d_k = k(k-1)/2`: the total rate at which a coalescent state with `k`
+blocks leaves that state.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  `d_k` is the number of unordered pairs of blocks
 times the per-pair rate `1`, and the per-pair rate is `1` by the choice of time unit

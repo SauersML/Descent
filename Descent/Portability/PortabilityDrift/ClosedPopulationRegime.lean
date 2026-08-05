@@ -113,7 +113,8 @@ This is the number the closed-population model sets to zero.
     saturation is an INFINITE-ALLELES statement, and reading it under infinite
     sites is what an earlier attempt got wrong: per-site heterozygosity there is
     approximately `θ` and the `1 / (1 + θ)` denominator never shows. Measured on
-    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with 100 sampled chromosomes and 40 independent replicates, with heterozygosity
+    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with 100 sampled
+    chromosomes and 40 independent replicates, with heterozygosity
     taken as the unbiased `1 - ∑ pᵢ²` over the WHOLE sample -- never conditioned
     on the locus being polymorphic, which inflates it exactly where `θ` is
     small. Over `θ` = 0.1, 0.5, 1, 3, 10 the body predicts 0.09091, 0.33333,

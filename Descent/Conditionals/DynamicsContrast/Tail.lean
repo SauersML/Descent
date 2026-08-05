@@ -138,7 +138,8 @@ theorem crossStatePerformance_switching_eq_zero :
 
 /-! ## The stationarity repair is a descent failure
 
-The repair above says a target-only average cannot see the dynamics.  `Descent.Conditionals.DescentGeometry`
+The repair above says a target-only average cannot see the dynamics.
+`Descent.Conditionals.DescentGeometry`
 says what kind of statement that is: the target context is a *label*, the two dynamics are two
 *populations* on source-target pairs, and a criterion is reportable by target context exactly
 when it descends along that label.  The target-only annotation descends; the source-adapted

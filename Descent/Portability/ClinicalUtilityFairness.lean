@@ -428,7 +428,8 @@ correct risk category) when PGS is added to clinical risk models.
 Portability loss reduces NRI in non-source populations.
 
 We model sensitivity and specificity as functions of R² (coefficient of
-determination of the PGS).  Under a liability-threshold model, a PGS with higher R² yields a score distribution with greater separation between cases
+determination of the PGS).  Under a liability-threshold model, a PGS with higher R² yields a score
+distribution with greater separation between cases
 and controls, so both sensitivity and specificity at any fixed classification
 threshold improve monotonically with R².
 
@@ -713,7 +714,8 @@ theorem pgs_useful_when_exceeds_treat_all
     classification threshold, and the net benefit at any treatment threshold
     `t` is reduced.
 
-    The net benefit formula NB = TP/N − FP/N × t/(1−t), with TP = sens(R²) × π and FP = (1 − spec(R²)) × (1 − π), is strictly
+    The net benefit formula NB = TP/N − FP/N × t/(1−t), with TP = sens(R²) × π and FP = (1 −
+    spec(R²)) × (1 − π), is strictly
     increasing in both the exact sensitivity and the exact specificity. -/
 theorem portability_narrows_useful_range
     (m : LiabilityThresholdModel) (T' μ_control r2_source r2_target π t : ℝ)

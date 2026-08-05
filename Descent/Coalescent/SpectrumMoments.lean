@@ -128,7 +128,8 @@ noncomputable def varTotalBranchLength (n : ℕ) : ℝ :=
   ∑ j ∈ range (n - 1), expectedSegmentLength (j + 2) ^ 2
 
 /-- **`Var(L_n) = 4 b_{n-1}`.**  Each phase contributes `(2/(k-1))²`, and the sum of those is
-four times the reciprocal-square sum.  Note the contrast with `BranchLength.expectedTotalBranchLength_eq_harmonic`: the mean is `2 a_{n-1}` and diverges,
+four times the reciprocal-square sum.  Note the contrast with
+`BranchLength.expectedTotalBranchLength_eq_harmonic`: the mean is `2 a_{n-1}` and diverges,
 the variance is `4 b_{n-1}` and does not. -/
 theorem varTotalBranchLength_eq (n : ℕ) :
     varTotalBranchLength n = 4 * harmonicSumSq (n - 1) := by

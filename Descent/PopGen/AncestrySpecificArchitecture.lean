@@ -128,7 +128,8 @@ drift variances.
     escapes the identity above by never feeding the sample's own heterozygosity loss back
     in. `F` is the MODEL's `1-(1-1/(2Nₑ))^t`, computed from the simulation's `Nₑ` and `t`
     alone; the observable is the realised `Var(p₁ - p₀)` over 2×10⁵ independent loci under
-    Wright-Fisher binomial sampling in two demes from a common ancestor at `p₀ = 0.3`, with no mutation and no migration.
+    Wright-Fisher binomial sampling in two demes from a common ancestor at `p₀ = 0.3`, with no
+    mutation and no migration.
 
       Nₑ    t     F        this body   realised Var   sems
       200    50   0.1176    0.02470      0.02464      0.85

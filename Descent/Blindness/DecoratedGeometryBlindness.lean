@@ -12,7 +12,8 @@ open scoped BigOperators
 /-!
 # What a distance array cannot see, and what alignment can
 
-A family of populations carrying ancestry-specific outcome fields is a metric measure space with a decoration: allele-frequency divergence supplies the metric, sampling weight the measure, and
+A family of populations carrying ancestry-specific outcome fields is a metric measure space with a
+decoration: allele-frequency divergence supplies the metric, sampling weight the measure, and
 the population-specific conditional risk the mark.  Three finite facts about that object, each
 stated exactly and each with a biological reading.
 
@@ -438,7 +439,8 @@ noncomputable def witnessWeight (_p : Fin 3) : ℝ := 1 / 3
 
 /-! **The two decorations are `Portability.ancestryScore` and
 `Portability.ancestryScoreSwapped`.** They used to be redeclared here as
-`Portability.ancestryScore := ![0, 1, 2]` and `Portability.ancestryScoreSwapped := ![0, 2, 1]`, with two
+`Portability.ancestryScore := ![0, 1, 2]` and `Portability.ancestryScoreSwapped := ![0, 2, 1]`, with
+two
 theorems establishing that each equals the canonical definition it had copied -- and
 `ancestryScoreSwapped` is `![0, 2, 1]`, the identical body. A witness that redeclares
 what it is a witness ABOUT can drift from it, and the theorems recording that it had not

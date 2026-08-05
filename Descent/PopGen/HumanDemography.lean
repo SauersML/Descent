@@ -297,7 +297,8 @@ quantitative form of "the loss is in the linkage disequilibrium".
 -/
 
 /-! **Deleted: `taggedDriftR2Ratio V_A V_E fst shared_ld =
-presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with `taggedDriftR2Ratio_ge_retention`.**
+presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with
+`taggedDriftR2Ratio_ge_retention`.**
 
 This definition is absent on purpose. It applies the tagging factor to the denominator as
 well. Loss of shared LD attenuates the score's covariance with the phenotype. It does
@@ -445,7 +446,8 @@ end AttributionToTagging
 /-! ## A demographic parameter this file could never have fitted
 
 The results above attribute the portability gap between measured parameters: `F_ST`, effective
-size, migration rate, shared tagging. `Descent.Blindness.LumpedRateBlindness` marks off a parameter that
+size, migration rate, shared tagging. `Descent.Blindness.LumpedRateBlindness` marks off a parameter
+that
 is not merely hard to measure but absent from the observable law.
 
 Take three demes in which two share a covariance signature. The direct exchange rate between those
@@ -460,7 +462,8 @@ data. And it is symmetry rather than degeneracy — the invisible direction is t
 mode of the two lumped demes — so the repair is to break the lumping with any observable that
 separates them, not to collect more samples under it.
 
-This is `Descent.Conditionals.DeclaredInteractionClass` in demography: identification here is relative to a
+This is `Descent.Conditionals.DeclaredInteractionClass` in demography: identification here is
+relative to a
 declaration or it does not exist. -/
 
 section UnidentifiableExchange

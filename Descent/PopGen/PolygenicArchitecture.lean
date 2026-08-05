@@ -996,7 +996,8 @@ how many architectures it mixes buys nothing. The catalogue below settles it.
 Three one-locus architectures: a unit effect, the null, and the sign-flip of the
 first. The target is mean **absolute** effect, so the two nonnull architectures
 are indistinguishable targets and the null sits a full unit away. Their
-observation laws are not indistinguishable -- the three emit the observation with probabilities `0`, `1/2` and `1` -- and at information radius zero a certificate
+observation laws are not indistinguishable -- the three emit the observation with probabilities `0`,
+`1/2` and `1` -- and at information radius zero a certificate
 must hold the prior-predictive law fixed.
 
 A point-versus-point certificate then has to compare an architecture with itself,
@@ -1151,7 +1152,8 @@ section HeritabilityPartitioning
     High enrichment means the category harbors more causal signal
     per variant.
 
-    Regime: a partition of variants into a category and its complement, with heritability read as a sum of squared effects. The PER-VARIANT
+    Regime: a partition of variants into a category and its complement, with heritability read as a
+    sum of squared effects. The PER-VARIANT
     normalisation is the whole content -- a category holding half the
     heritability is enriched only relative to how many variants it holds.
 

@@ -44,7 +44,8 @@ reason it appears in the count -- it is the number of ordered pairs -- and
 
 It closes the convergence of the SURVIVAL PROBABILITIES, for every `k`, which is what every
 downstream result in this group uses.  It does not prove convergence of the processes in the
-Skorokhod sense, nor Möhle's lemma in its matrix form for general exchangeable models with separated time scales; those need the semigroup machinery K-G (2.11)-(2.13) sketches and
+Skorokhod sense, nor Möhle's lemma in its matrix form for general exchangeable models with separated
+time scales; those need the semigroup machinery K-G (2.11)-(2.13) sketches and
 `Coalescent.Generator` has only the contraction half of.
 
 ## Main results

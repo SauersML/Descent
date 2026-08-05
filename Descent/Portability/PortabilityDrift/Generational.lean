@@ -121,7 +121,8 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     carried entirely by `fstEquilibrium`'s measurement and this record does not
     claim it twice.
 
-    Note that `Descent.Core.PopGenParameters.hetDecayFactor` itself is untouched and remains correct for what
+    Note that `Descent.Core.PopGenParameters.hetDecayFactor` itself is untouched and remains correct
+    for what
     it is: migration does not destroy heterozygosity, it relocates it. The error
     was in using a within-deme decay for a between-deme transient.
 
@@ -259,7 +260,8 @@ noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGe
   rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
 
-/-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with the generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
+/-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with the
+generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
 discrete differentiation recursion. Both were corrected together: an identity
 between two coordinates survives a common wrong factor on both sides, so this
 theorem constrained them jointly and could not have caught the decay base. -/

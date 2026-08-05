@@ -6,7 +6,8 @@ import Descent.Blindness.BundleRigidity.Realizability
 /-!
 # Effective independence dimension and the master decay bound
 
-This module imports targeted Mathlib modules **and** `Descent.Blindness.BundleRigidity.Realizability`.
+This module imports targeted Mathlib modules **and**
+`Descent.Blindness.BundleRigidity.Realizability`.
 It is therefore **not self-contained**: it does not rest on Mathlib alone, and any claim
 that it does contradicts the import block above.
 
@@ -191,7 +192,8 @@ theorem master_decay_bound (E : ℕ → ℝ) (θ : ℝ) (ε γ : ℕ → ℝ)
 
 /-- **The master bound in terms of the freshness floor `D`.**
 
-If the oscillation gain is uniform, `γ k = γ`, then the exponent is `θ · γ · D` with `D = ∑ ε k` the freshness floor along the chosen ordering. Taking the
+If the oscillation gain is uniform, `γ k = γ`, then the exponent is `θ · γ · D` with `D = ∑ ε k` the
+freshness floor along the chosen ordering. Taking the
 maximum over orderings gives `D` and hence the sharpest form of the bound.
 
 For independent coordinates every `ε k = 1`, so `D = n` and the bound recovers the

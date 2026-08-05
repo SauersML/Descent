@@ -205,7 +205,8 @@ theorem positive_nri_means_improvement
       π=0.05 band (0.0, 0.4]     0.02279     0.02266±0.00019     0.68
       π=0.20 band (-0.5, 0.1]    0.13563     0.13583±0.00037     0.54
 
-    The identity gate: the prior-free `f_e / (f_e + f_n)` — the same ratio with the cohort prevalence dropped, which is the ordinary base-rate mistake — is
+    The identity gate: the prior-free `f_e / (f_e + f_n)` — the same ratio with the cohort
+    prevalence dropped, which is the ordinary base-rate mistake — is
     rejected at up to 1486 sems and a factor of thirteen. The positive control,
     the simulated cohort reproducing its own nominal event rate, passes at 0.26
     sems. -/
@@ -1531,7 +1532,8 @@ noncomputable def expectedThresholdQalyLoss {Z : Type*} [MeasurableSpace Z]
     (trueRisk predictedRisk : Z → ℝ) : ℝ :=
   ∫ z, thresholdQalyLoss model (trueRisk z) (predictedRisk z) ∂μ
 
-/-- The expected loss under the threshold specialization agrees exactly with the general pathway expected loss. -/
+/-- The expected loss under the threshold specialization agrees exactly with the general pathway
+expected loss. -/
 theorem expectedQalyLoss_threshold_eq_expectedThresholdQalyLoss
     {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)

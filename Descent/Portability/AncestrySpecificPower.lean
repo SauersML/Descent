@@ -502,7 +502,8 @@ section DiscoveryBias
 
 /-! **`hweHeterozygosity` is deleted here.**  It was
 `Descent.Core.hweHeterozygosity` under a second name, and every reference now
-calls the kernel.  `Core.Genome.hweProb_het` now proves that this body IS the probability of drawing a heterozygote, which is what earns the name -- and it earns it once. -/
+calls the kernel.  `Core.Genome.hweProb_het` now proves that this body IS the probability of drawing
+a heterozygote, which is what earns the name -- and it earns it once. -/
 
 
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the

@@ -175,7 +175,8 @@ theorem ldsrExpectedBetaSq_at_n0_is_junk (h2 : ℝ) (M : ℝ) (ell_j : ℝ) :
     `χ²_j = (N h²/M) ℓ_j + N a + 1`, with intercept above one indicating
     confounding and slope proportional to `h²/M`.
 
-    **The confounding term is not divided by `M`.** Simulation with pure stratification and no genetic effect holds the confounding fixed and
+    **The confounding term is not divided by `M`.** Simulation with pure stratification and no
+    genetic effect holds the confounding fixed and
     varies `M` sixteenfold: the excess over one is flat, so the reference law's
     `a` is constant to within noise while the divided form's implied `a` grows
     with `M`, contradicting its definition as a property of the confounding

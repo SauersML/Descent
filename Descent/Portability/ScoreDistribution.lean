@@ -140,7 +140,8 @@ individuals fall in extreme categories.
 section TailProbabilities
 
 
-/-- Standardized benchmark threshold coordinate for a Gaussian score law with mean `μ` and standard deviation `σ`. This is a score-summary object, not by
+/-- Standardized benchmark threshold coordinate for a Gaussian score law with mean `μ` and standard
+deviation `σ`. This is a score-summary object, not by
 itself a clinical decision or misclassification theorem.
 
     Empirical status: UNTESTED. -/
@@ -188,7 +189,8 @@ theorem benchmarkHighScoreRate_at_reference_point (μ σ : ℝ) :
     This is the coordinate step, and it says nothing about probability: `Phi` and
     `benchmarkHighScoreRate` do not appear. The tail-rate claim — that a rightward shift puts
     strictly more of the distribution above a fixed raw threshold — is
-    `mean_shift_changes_benchmark_high_score_rate` below, which is this lemma composed with strict monotonicity of `Phi`. Read this one as arithmetic on a z-score. -/
+    `mean_shift_changes_benchmark_high_score_rate` below, which is this lemma composed with strict
+    monotonicity of `Phi`. Read this one as arithmetic on a z-score. -/
 theorem mean_shift_increases_tail
     (threshold μ₁ μ₂ σ : ℝ)
     (h_σ : 0 < σ)

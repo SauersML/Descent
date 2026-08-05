@@ -199,7 +199,8 @@ theorem graphShapeCoefficient_comp_of_shapeInvariant
   rw [graphShapeCoefficient, dif_pos h]
   exact hinvariant _ _ (Classical.choose_spec h)
 
-/-- **Permutation-invariant polynomial factorization, after equality patterns are identified with graphs.**  Invariance makes each monomial coefficient constant on its shape class; the resulting
+/-- **Permutation-invariant polynomial factorization, after equality patterns are identified with
+graphs.**  Invariance makes each monomial coefficient constant on its shape class; the resulting
 polynomial is exactly a linear combination of the corresponding graph sums.  Taking `Graph` to
 be rooted equality patterns gives the equivariant vector version without changing the proof. -/
 theorem invariantPolynomial_graphSum_factorization_of_shapeInvariant

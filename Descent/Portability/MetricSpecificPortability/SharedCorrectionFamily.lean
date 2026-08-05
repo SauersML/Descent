@@ -303,7 +303,8 @@ haplotype, imputation, or short-window mismatch.  A single pair of populations c
 order when the deployment task changes bands.
 -/
 
--- `HasTaskIndependentSpectralPortabilityScalar` is defined in `Descent.Spectral.SpectralDegradation`,
+-- `HasTaskIndependentSpectralPortabilityScalar` is defined in
+-- `Descent.Spectral.SpectralDegradation`,
 -- beside the two-band witness it quantifies over.  It was written out again here, `let`
 -- bindings and all, which is how the biological consumer and the spectral witness came to
 -- carry two copies of one predicate.

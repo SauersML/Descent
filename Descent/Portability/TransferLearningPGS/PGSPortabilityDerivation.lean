@@ -77,7 +77,8 @@ theorem sharedLDHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ)
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_transfer.py`,
-    `test_transfer_chain`). Against the squared correlation of score with phenotype, source and transported: 0.02 and 1.35 sems over a prediction
+    `test_transfer_chain`). Against the squared correlation of score with phenotype, source and
+    transported: 0.02 and 1.35 sems over a prediction
     spanning 0.11581 to 0.23227, a factor of two. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   Descent.Core.squaredShare cov_pgs_y var_pgs var_y
@@ -247,7 +248,8 @@ noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :
 
     Empirical status: **VALIDATED** (`simcov/battery_bulk18.py`,
     `test_architecture_scalars`). Measured as a REALISED variance ratio and not
-    as the parameter it was simulated at: 40000 individuals are drawn with standardized genotypes and effects at three architectures, and the body's
+    as the parameter it was simulated at: 40000 individuals are drawn with standardized genotypes
+    and effects at three architectures, and the body's
     `∑ βᵢ² / var_y` is compared against `Var(g) / Var(y)` computed from the
     realised phenotypes through an independent path. The body predicts 0.19968,
     0.48808 and 0.76970 against measured 0.20023 ± 0.00142, 0.48524 ± 0.00343
@@ -304,7 +306,8 @@ noncomputable def sourceSelfR2DiagonalLD {m : ℕ}
     the covariance left unsquared, `cov / (var_pgs · var_y)`, misses by up to
     1364 sems (468% relative), and the score variance omitted,
     `cov² / var_y`, by up to 212 sems (73%). An oracle algebraically pinned to
-    the body could not reject either, since the measurement would move with whatever prediction was fed in. Both the square and the divisor are
+    the body could not reject either, since the measurement would move with whatever prediction was
+    fed in. Both the square and the divisor are
     therefore chosen by the data.
 
     The `rg = 1` cell was carried as a control and is DEGENERATE: there the

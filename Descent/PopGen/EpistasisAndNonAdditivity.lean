@@ -66,7 +66,8 @@ theorem half_le_div_of_half_le
     **Heritability convention, corrected.** The docstring used to read
     `r2_additive ≤ V_A / V_P ≤ h²_narrow = V_A / (V_A + V_E)`, naming the RIGHT
     side narrow-sense heritability. That is the wrong label and it points the
-    wrong way. Narrow-sense heritability is `h² = V_A / V_P` with `V_P = V_A + V_D + V_I + V_E` -- the LEFT side here. `V_A / (V_A + V_E)` is
+    wrong way. Narrow-sense heritability is `h² = V_A / V_P` with `V_P = V_A + V_D + V_I + V_E` --
+    the LEFT side here. `V_A / (V_A + V_E)` is
     what `h²` would be in a model with no dominance and no epistasis, and it is
     strictly LARGER whenever `V_D + V_I > 0`. A reader taking the old label
     would set the additive-PGS ceiling above the true narrow-sense heritability,
@@ -160,7 +161,8 @@ theorem pairwiseModel_at_reference_point :
 
 
 /-- **The interaction coefficient is exactly the departure from additivity.** This is what makes
-`beta12` estimable: subtract the additive prediction and what remains is the product term, with no part of it absorbable into the marginal effects. -/
+`beta12` estimable: subtract the additive prediction and what remains is the product term, with no
+part of it absorbable into the marginal effects. -/
 theorem pairwiseModel_sub_additive (beta1 beta2 beta12 g1 g2 : ℝ) :
     pairwiseModel beta1 beta2 beta12 g1 g2 - (beta1 * g1 + beta2 * g2)
       = beta12 * g1 * g2 := by

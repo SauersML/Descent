@@ -46,7 +46,8 @@ namespace Coalescent
 
 open MeasureTheory
 
-/-- **The law of a coupled trajectory and clock.**  The jump chain's law, producted with `m` independent copies of a holding-time law.
+/-- **The law of a coupled trajectory and clock.**  The jump chain's law, producted with `m`
+independent copies of a holding-time law.
 
 Empirical status: NOT AN EMPIRICAL CLAIM, and in particular the independence of the two
 factors is BUILT IN rather than derived -- see the module docstring.  Kingman's Theorem 3

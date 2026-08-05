@@ -279,7 +279,8 @@ with two independent expectation functionals and two independent predictor laws,
 nothing is assumed common except the effects. No allele-frequency divergence, however
 large, moves them.
 
-`Core.ScoreMoments.deployedR2_mono_in_migration` proves that a demographic history with less gene flow deploys a strictly worse `R²`.
+`Core.ScoreMoments.deployedR2_mono_in_migration` proves that a demographic history with less gene
+flow deploys a strictly worse `R²`.
 
 Both hold at once, and the conjunction is the constraint: the loss is real and it is NOT
 in the optimal weights. What drift erodes is the moment tuple those weights are evaluated

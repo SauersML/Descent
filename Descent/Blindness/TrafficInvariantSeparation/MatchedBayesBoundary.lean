@@ -341,7 +341,8 @@ theorem matchedInformationPath_nuclear_bound
     certificate.immseDerivative hderivative
   simpa only [Real.norm_eq_abs] using hpath
 
-/-- Combining the pathwise nuclear estimate with `nuclearDistance ≤ operatorBound * rankFraction` gives the normalized low-rank
+/-- Combining the pathwise nuclear estimate with `nuclearDistance ≤ operatorBound * rankFraction`
+gives the normalized low-rank
 bound used in the matched-Bayes obstruction. -/
 theorem matchedInformationPath_lowRank_bound
     (certificate : MatchedInformationPathCertificate)

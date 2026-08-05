@@ -780,7 +780,8 @@ The superposition decomposition above says a barrier persists unless some
 allocation satisfies every cohort at once. This records the population geometry
 where that escape is available, and how much minority data it takes.
 
-For a design whose covariance couples the planted support to a decoy support with strength `α`, the population loss at overlap fraction `x` away from the truth is
+For a design whose covariance couples the planted support to a decoy support with strength `α`, the
+population loss at overlap fraction `x` away from the truth is
 `φ_q(x) = x(1 - qx) / (1 - qx(1-x))` with `q = α²`. A barrier exists exactly when
 that profile has an interior maximum, which happens exactly when `1 - 3q + q²`
 turns negative -- so the transition is at the root of that quadratic.

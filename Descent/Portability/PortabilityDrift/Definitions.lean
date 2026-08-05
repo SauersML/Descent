@@ -155,7 +155,8 @@ theorem coalescentTau_zero_population_is_junk (t : ℝ) :
 
 /-! **`fstFromTau` is deleted here.**  It was
 `Descent.Core.fstFromTau` under a second name, and every reference now
-calls the kernel.  `Core.fstFromTau` is the split law `tau/(1+tau)`; the wrapper added a second place for the convention to be got wrong. -/
+calls the kernel.  `Core.fstFromTau` is the split law `tau/(1+tau)`; the wrapper added a second
+place for the convention to be got wrong. -/
 
 
 /-- **fstFromTau at `tau = -1`, named.** A coalescent time of minus one is outside the admissible
@@ -664,7 +665,8 @@ theorem twoDemeIMEquilibriumDelta_negative_half_migration_is_junk :
   norm_num
 
 /-- **The within-deme coalescence time is a fixed point of first-step
-analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with `ETst = 1/M + ETss` forces `ETss = 2` for every `M > 0`. -/
+analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with `ETst = 1/M + ETss` forces `ETss
+= 2` for every `M > 0`. -/
 theorem twoDemeIMEquilibriumETss_isFixedPoint (M : ℝ) (hM : 0 < M) :
     twoDemeIMFirstStepSame M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M) =
       twoDemeIMEquilibriumETss M := by

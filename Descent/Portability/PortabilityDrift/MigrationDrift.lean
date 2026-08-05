@@ -504,7 +504,8 @@ theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
 This theorem is absent on purpose. Its hypothesis is
 `1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)` and its conclusion is
 `fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne)`. Since
-`fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same Descent.Core.fstFromFlow
+`fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same
+Descent.Core.fstFromFlow
 proposition and the proof is `unfold; exact h_large_t` — the hypothesis, returned. The
 remaining three hypotheses (`0 < Ne`, `0 < m`, `0 < t`) go unused.
 
@@ -709,7 +710,8 @@ theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ)
 `steppingStoneFst_eq_one_of_saturated`, which said the opposite, and the replacement is
 forced by the measurement rather than chosen for elegance. The linear body reached `1` at
 finite separation and the clamp then held it there, so complete differentiation was
-attainable at a finite number of steps. A saturating form cannot do that: with `α (1 - fst_neighbor) > 0` the value is strictly below one at every finite `d` and tends to
+attainable at a finite number of steps. A saturating form cannot do that: with `α (1 - fst_neighbor)
+> 0` the value is strictly below one at every finite `d` and tends to
 one only as `d → ∞`, which is the correct behaviour of isolation by distance -- demes an
 arbitrary but finite distance apart still share ancestry. -/
 theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
@@ -866,7 +868,8 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
       2000   2.5e-4    0.75    0.5711      0.7197 ± 0.0098   -20.7%
 
     So: within `c ≲ m/5` the body is right to 3% on ten of eleven cells and to
-    7% on the last, under an ascertainment systematic of 12% (the same run with a pooled-frequency filter instead of a per-deme one moves the measured ratio
+    7% on the last, under an ascertainment systematic of 12% (the same run with a pooled-frequency
+    filter instead of a per-deme one moves the measured ratio
     by that much on average). Past `c ≈ m/2` the body reads LOW and the shortfall
     grows to 21% at `c = 0.75·m` and to 41% out to `c = 80·m`; the shape that
     tracks the measurement there is `2·m/(2·m + c)`, off by at worst 9.7%
@@ -1196,12 +1199,14 @@ name/quantity mismatch, so the two are separated rather than bounded.
     hundreds of replicates rather than six, or an estimator that needs no
     calibration at all.
 
-    What both runs agree on qualitatively: measured retention rises with migration but stays well below the product form at weak migration. That is
+    What both runs agree on qualitatively: measured retention rises with migration but stays well
+    below the product form at weak migration. That is
     the lead, and it is consistent with `sharedLD_from_equilibrium`, where
     measured shared LD stayed near 1 rather than falling to `M/(1+M)`.
 
     The table below is the FIRST run, kept for the record:
-    Measured at `Nₑ = 1000` over 5 Mb with recombination, 80 causal sites segregating in both demes, weights taken as
+    Measured at `Nₑ = 1000` over 5 Mb with recombination, 80 causal sites segregating in both demes,
+    weights taken as
     the deme-0 LD projection `Σ_A·β` (itself VALIDATED at
     `targetSourceEffectProjection`):
 
@@ -1661,7 +1666,8 @@ theorem harmonicMigrationMean_eq_iff_symmetric (m₁₂ m₂₁ : ℝ)
 
 /-- **Hence the equilibrium `F_ST` computed from this mean is never above the one the
 harmonic mean would give.** `fstMigrationDriftEquilibrium` is decreasing in the migration
-rate, so substituting the larger mean returns the smaller `F_ST`. Composed with `presentDayR2`, which is decreasing in `F_ST`, the arithmetic mean is the optimistic
+rate, so substituting the larger mean returns the smaller `F_ST`. Composed with `presentDayR2`,
+which is decreasing in `F_ST`, the arithmetic mean is the optimistic
 choice at every pair of asymmetric rates: it reports better cross-population portability
 than the harmonic mean does. Stated so the direction of the bias is checkable rather than
 left in prose. -/

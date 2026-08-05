@@ -15,7 +15,8 @@ Self-contained: imports only Mathlib.
 `Descent.Spectral.ErgodicCovariancePencil` builds source and target covariance operators as two time
 slices of one stationary field, which raises the identification question: given the observable
 covariance process, which parameters of the underlying demography are recoverable?
-`Descent.Blindness.HiddenConeAmbiguity` answers the abstract version — the gauge freedom is large and
+`Descent.Blindness.HiddenConeAmbiguity` answers the abstract version — the gauge freedom is large
+and
 carried by the unbounded-distortion escape rather than by a wild symmetry. This is the finite
 instance, and it is stronger than a stability statement.
 

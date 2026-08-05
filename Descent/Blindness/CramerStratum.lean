@@ -51,7 +51,8 @@ atomic law fails by recurrence rather than by periodicity, but it fails.
 Two halves, with different status here:
 
 * **Lattice atoms: proved outright.** If all gaps lie in `h ℤ` then `charFnSq` is
-  *exactly* one at every `t = 2πn/h` (`charFnSq_eq_one_of_lattice`), so (C) fails with no analytic input at all (`not_cramer_of_lattice`). This is not a toy case: it is the
+  *exactly* one at every `t = 2πn/h` (`charFnSq_eq_one_of_lattice`), so (C) fails with no analytic
+  input at all (`not_cramer_of_lattice`). This is not a toy case: it is the
   sharpest instance the corpus has, since
   `Descent.PolygenicSpectroscopy.hardCall_arithmeticProgression_at_critical_maf`
   proves that at `q* = (2 - √2)/4` the three values of `log x²` for a hard-called
@@ -107,7 +108,8 @@ variable {V : Type*} [Fintype V]
 written without complex numbers:
 `∑_u ∑_v w_u w_v cos(t (a_u - a_v))`.
 
-Expanding `|∑_v w_v e^{i t a_v}|²` and pairing conjugate terms gives exactly this, with the imaginary parts cancelling because the sum is over ordered pairs both ways.
+Expanding `|∑_v w_v e^{i t a_v}|²` and pairing conjugate terms gives exactly this, with the
+imaginary parts cancelling because the sum is over ordered pairs both ways.
 
 Empirical status: DERIVED. This is an algebraic identity for the squared modulus of a
 characteristic function, not a modelling choice; it has no free parameter. -/

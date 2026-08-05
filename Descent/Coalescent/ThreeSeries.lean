@@ -20,7 +20,8 @@ The instrument is `Descent.Coalescent.TransitTransform`'s product.  At `θ = 1`,
 
 and `1 - x ≤ e^{-x}` bounds that product by `exp(-Σ_{k<m} (γ_k+1)⁻¹)`.  When the reciprocals
 diverge so does that sum, so the products tend to zero; monotone convergence over the
-decreasing sequence carries the limit inside the integral, and a nonnegative function with zero integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.
+decreasing sequence carries the limit inside the integral, and a nonnegative function with zero
+integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.
 
 Together with `EntranceLaw.ae_totalDescentTime_lt_top` this is an equivalence:
 
@@ -195,7 +196,8 @@ theorem clippedTransform_antitone : Antitone clippedTransform := by
     exact Finset.mem_range.mpr (lt_of_lt_of_le (Finset.mem_range.mp hx) hab)
   exact Finset.sum_le_sum_of_subset_of_nonneg hsub (fun k _ _ ↦ le_max_right _ _)
 
-/-- The clipped transform integrates to the same product: it agrees almost everywhere with the transform `TransitTransform` computes. -/
+/-- The clipped transform integrates to the same product: it agrees almost everywhere with the
+transform `TransitTransform` computes. -/
 theorem lintegral_clippedTransform {γ : ℕ → ℝ} (hγ : ∀ k, 0 < γ (k + 2)) (m : ℕ) :
     ∫⁻ ω, clippedTransform m ω ∂(holdProduct γ hγ)
       = ∏ k ∈ range m, ENNReal.ofReal (γ (k + 2) / (γ (k + 2) + 1)) := by

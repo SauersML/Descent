@@ -245,7 +245,8 @@ noncomputable def explainedVarianceFraction (varSignal varNoise : ℝ) : ℝ :=
   Descent.Core.share varSignal varNoise
 
 /-- **A nonnegative part of a positive total is at most the whole of it:**
-    `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with both parts nonnegative.
+    `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with both parts
+    nonnegative.
 
     This is not the spline bound `R²_spline ≤ Var(E[ε²|d]) / Var(ε²)`, which
     relates a fitted `R²` to a conditional-variance ratio: no conditional

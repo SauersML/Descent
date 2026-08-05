@@ -207,7 +207,8 @@ come back: it is false precisely at balance.
 
 At `q = 1/2`
 the standardized genotype takes values `-√2, 0, √2` with masses `1/4, 1/2, 1/4`; then
-`X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with single-atom modulus law (`diploid_modulus_at_half`). This is the `v = 1` endpoint:
+`X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with single-atom modulus
+law (`diploid_modulus_at_half`). This is the `v = 1` endpoint:
 `√(1-v) = 0`, so the two atoms `±√(1-v)` collapse into the single atom `0` carrying the
 combined mass `1/2`.
 
@@ -1133,7 +1134,8 @@ theorem maf_spectrum_identifiable {n : ℕ} (panel : Blindness.Panel n)
 /-! ## 8. Correlated frequencies along the genome: what regeneration buys
 
 **The model, and its scope, first.** A *Markov-modulated bundle chain* lets the parameter
-`t_i` — the allele frequency at site `i` — follow a Markov chain along the sequence, with the genotype coordinates conditionally independent **given the parameters**. Read that
+`t_i` — the allele frequency at site `i` — follow a Markov chain along the sequence, with the
+genotype coordinates conditionally independent **given the parameters**. Read that
 again before quoting anything below: this is dependence *in the frequency profile along
 the genome*, not correlation between genotypes at fixed frequencies. Linkage
 disequilibrium is the latter. Nothing in this section covers it.

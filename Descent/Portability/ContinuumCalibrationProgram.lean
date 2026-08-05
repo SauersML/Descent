@@ -8,7 +8,8 @@ import Descent.Portability.PGSCalibrationTheory
 /-!
 # Resolving the drifting index: strata, gauge, unqueried populations, and decisions
 
-`Descent.Portability.ContinuumCalibration` fixes one predictor class and answers the first question about
+`Descent.Portability.ContinuumCalibration` fixes one predictor class and answers the first question
+about
 a family of populations whose conditional risk moves along the family: index-wise calibration
 energy is aggregate energy plus an irreducible drift defect, the posterior mean attains the
 defect, and the two demands are nested rather than opposed.
@@ -1597,7 +1598,8 @@ theorem effectiveStratumCount_empty_is_junk (n : Empty → ℝ) :
 
 /-- **An unsampled stratum is a junk branch, named.**  At `n s = 0` the reciprocal is `0` by
 Lean's convention, so a stratum with no data contributes nothing to the effective count instead of
-making it infinite: the penalty for abandoning a stratum entirely is silently waived.  Read with `effectiveStratumCount_ge_card`, which is why that theorem requires a positive allocation. -/
+making it infinite: the penalty for abandoning a stratum entirely is silently waived.  Read with
+`effectiveStratumCount_ge_card`, which is why that theorem requires a positive allocation. -/
 theorem effectiveStratumCount_unsampled_stratum_contributes_zero :
     (1 : ℝ) / (0 : ℝ) = 0 := by
   norm_num

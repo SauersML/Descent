@@ -2204,7 +2204,12 @@ def run_identifications() -> int:
                        f"({raw.count('/-')} open, {raw.count('-/')} close)")
         for err in ident_block_structure_errors(ident_strip_comments(raw)):
             bad.append(f"{rel}: {err}")
-        for imp in re.findall(r"^import (Descent[A-Za-z.]*)", raw, re.M):
+        # `[A-Za-z.]*` stopped at the first digit, so a module whose name
+        # contains one -- `MetricSpecificPortability.R2Decomposition` -- was read
+        # as `...MetricSpecificPortability.R` and reported as an import of a
+        # module that does not exist.  The corpus had no such name until a split
+        # produced one from `section R2Decomposition`.
+        for imp in re.findall(r"^import (Descent[\w.]*)", raw, re.M):
             if not os.path.exists(os.path.join(IDENT_ROOT, imp.replace(".", "/") + ".lean")):
                 bad.append(f"{rel}: imports {imp}, which does not exist")
 

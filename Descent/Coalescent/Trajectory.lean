@@ -279,7 +279,8 @@ theorem chainLaw_blocks_at {n : ℕ} :
               simp only [List.getD_cons_succ]
               omega
 
-/-- A trajectory read as the chain function `Path` takes: `chainOfList l k` is the state with `k` blocks, which on a full trajectory sits at position `k - 1`. -/
+/-- A trajectory read as the chain function `Path` takes: `chainOfList l k` is the state with `k`
+blocks, which on a full trajectory sits at position `k - 1`. -/
 noncomputable def chainOfList {n : ℕ} (l : List (ER n)) (k : ℕ) : ER n :=
   l.getD (k - 1) (Delta n)
 

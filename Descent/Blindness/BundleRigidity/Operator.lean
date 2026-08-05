@@ -35,7 +35,8 @@ for it; reason 2 is about what happens the next time it is absent.
 
 ## What is here
 
-A **bundle family** on a parameter space `T` is a finite list of atoms `atom j t` with masses `mass j t > 0` summing to one, standardized so that `∑ mass j t * atom j t = 0`
+A **bundle family** on a parameter space `T` is a finite list of atoms `atom j t` with masses `mass
+j t > 0` summing to one, standardized so that `∑ mass j t * atom j t = 0`
 and `∑ mass j t * atom j t ^ 2 = 1`. One parameter `t` fixes every atom and every mass
 simultaneously — that is what *bundle* means, and it is the entire source of rigidity.
 The atoms cannot be reweighted one at a time.
@@ -348,7 +349,8 @@ No hypothesis on the family beyond `IsSymmetry`; no analyticity, no coverage con
 nothing about the core. The proof is one line of algebra: `L* f` is `τ`-invariant because
 `TT ∘ τ = TT`, and a `τ`-odd measure annihilates every `τ`-invariant function.
 
-**This is the detector.** Any search for kernel elements that works only with `L*`-functionals and reports nothing on a symmetric family is inconsistent with this
+**This is the detector.** Any search for kernel elements that works only with `L*`-functionals and
+reports nothing on a symmetric family is inconsistent with this
 theorem and is therefore broken. It is the positive control every rigidity search must
 pass before its null results mean anything. -/
 theorem transfer_eq_zero_of_tauOdd {τ : C(T, T)} (hsym : F.IsSymmetry τ)

@@ -1200,7 +1200,8 @@ theorem permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs
   Blindness.TrafficInvariantSeparation.rootedInvariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
 
 /-- A genomic polynomial of total degree at most `D`, decomposed into its
-homogeneous degrees, factors exactly through canonical LD traffic graphs with at most `D` ordered edges. -/
+homogeneous degrees, factors exactly through canonical LD traffic graphs with at most `D` ordered
+edges. -/
 theorem degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
     {D : ℕ} {Locus : Type*} [Fintype Locus]
     (coefficient value : (degree : Fin (D + 1)) →

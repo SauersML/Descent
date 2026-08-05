@@ -2062,7 +2062,8 @@ theorem privateArchitectureTransferCeiling_at_reference_point :
 
 
 /-- **A positive private causal fraction lowers the transferable `R²` ceiling.**
-    In the architecture-aware transfer model above, compare a trait with private causal fraction `f_private` to the same trait with no private
+    In the architecture-aware transfer model above, compare a trait with private causal fraction
+    `f_private` to the same trait with no private
     architecture (`f_private = 0`) at the same migration-drift LD sharing level
     `sharedLDFromMigration M`.
 
@@ -2124,7 +2125,8 @@ estimated reference linkage structure and deployed against the target's true one
 whether that is tolerable is not the error in the estimated objective — which moves at first order
 and always will — but the loss from transplanting the optimizer.
 
-`Descent.Portability.TransplantationStability` answers with one number the fit already contains: `γ`, the
+`Descent.Portability.TransplantationStability` answers with one number the fit already contains:
+`γ`, the
 margin by which the selected panel beats the runner-up in the fitted objective. With `δ` an error
 budget for the operator, the deployment loss is `min(2δ, 8δ²/γ)`, and the quadratic branch binds
 exactly when `4δ < γ`.

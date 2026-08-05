@@ -139,7 +139,8 @@ step" are different states.
   which the factorials cancel to `1/i`.  `SiteFrequencySpectrum`'s `ASSERTED` marker is
   discharged.
 * **Second moments of the spectrum** -- CLOSED, both sides.  `Coalescent.SpectrumMoments`
-  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with `Var(L_n) = 4 b_{n-1}` from the squared segment lengths and `b` bounded while `a` diverges,
+  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with `Var(L_n) = 4
+  b_{n-1}` from the squared segment lengths and `b` bounded while `a` diverges,
   so Watterson's estimator is consistent at rate `1/log n`; `Coalescent.HoldingSecondMoment`
   removes the last quoted constant by integrating K-C (1.7)'s density twice (`Γ(3) = 2!`).
   `Coalescent.PairwiseTimes` and `Coalescent.TajimaVariance` then close `Var(π)`.  Restriction
@@ -161,7 +162,8 @@ step" are different states.
   `exp(N⁻¹Q)`, the `N`-th powers converge to `exp Q`.  `Generator`'s contraction estimate does
   the accumulation and `exp(N⁻¹Q)^N = exp Q` is exact, so there is no continuity argument at
   all: the whole limit lives at `t = 1`, which is what "`N` generations are one coalescent
-  unit" means.  `Coalescent.PairChainLimit` then instantiates it for the case the group is built on, and
+  unit" means.  `Coalescent.PairChainLimit` then instantiates it for the case the group is built on,
+  and
   does so without ever exponentiating a matrix.  The two-state generator satisfies `Q² = -Q`
   -- that IS a `Q`-matrix on two states -- and from that one identity every power of `1 + aQ`
   has a closed form, so the comparison family `1 + (1-e^{-1/N})Q` is a semigroup by algebra
@@ -169,7 +171,8 @@ step" are different states.
   comparison family left open.  The conclusion is
   `(1 + N⁻¹Q)^N → 1 + (1 - e^{-1})Q`, whose coefficient is the chance two lineages have met
   in one coalescent unit -- the operator statement of what
-  `Convergence.tendsto_pairDistinct_pow` counts off the parent law.  `Coalescent.ExpRemainder` then removes the ANALYTIC obstacle to the many-state case, which
+  `Convergence.tendsto_pairDistinct_pow` counts off the parent law.  `Coalescent.ExpRemainder` then
+  removes the ANALYTIC obstacle to the many-state case, which
   was a gap in Mathlib rather than in genealogy: `‖exp x - 1 - x‖ ≤ e^{‖x‖} - 1 - ‖x‖` in any
   Banach algebra, hence `≤ ‖x‖²` on the unit ball, proved by peeling two terms off the
   exponential series and comparing it with itself.  Mathlib had that bound only for `ℝ` and
@@ -181,7 +184,8 @@ step" are different states.
   (`card_two_collisions_le'`, five overlap cases), and a union bound over the `≤ k⁴` quadruples
   gives `twoDropProb_le`: the chance of dropping two or more is at most `k⁴/N²`.  With
   `WrightFisher.coalescenceProb_le` on the diagonal, that is every entry of the row to the
-  order K-G (2.11) asks for.  `Coalescent.BlockMatrixLimit` assembles them: the entries become a `Matrix` in the row-sum
+  order K-G (2.11) asks for.  `Coalescent.BlockMatrixLimit` assembles them: the entries become a
+  `Matrix` in the row-sum
   norm (K-G (2.12)'s norm, scoped in Mathlib as `Matrix.Norms.Operator`), each row is a
   probability distribution so the operator is a contraction, and `row_diff_bound` puts the row
   within `(d_k/N)² + 2k⁴/N²` of `1 + N⁻¹Q` -- the diagonal from `WrightFisher`'s sandwich, the
@@ -207,7 +211,8 @@ step" are different states.
   restriction commutes with looking down, at or above it the operation is invisible.  That is
   why all `n` coalescents fit on one space without a projective limit.
   `Coalescent.LookdownClocks` supplies the driving clocks from `CompetingRates`: the covers of
-  `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with probability `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
+  `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with probability
+  `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
   same first factor for every pair -- minimum exponential at rate `d_n`, argmin uniform.
   The path-level law is NOT re-derived for levels, and deliberately: at `Δ` the covers ARE the
   pairs (`NeutralMutation.card_covers_delta`), so `Law.coalescentLaw` transported along that
@@ -219,7 +224,8 @@ step" are different states.
   balanced, so `P(S_{2n}=0) = C(2n,n)/4^n` -- and proves the series diverges, which is Pólya's
   criterion in one dimension.  A return IS a coalescence by `SpatialCoalescent`'s iff, so the
   dependency is now one implication (the renewal identity turning divergence into almost-sure
-  return) rather than the whole question.  Below, the mechanism.  `Coalescent.SpatialCoalescent` proves
+  return) rather than the whole question.  Below, the mechanism.  `Coalescent.SpatialCoalescent`
+  proves
   the voter-model duality `c_t = c₀ ∘ A_t` by induction, presents the dual AS a pedigree so
   that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise coalescence to
   a hitting time via `walk_sub`.  STILL ABSENT: recurrence of the difference walk, hence
@@ -256,7 +262,8 @@ nonnegative series with summable means is finite almost everywhere.  So
 
 That is the forward direction of the equivalence, and the statement K-C (2.8) and K-G (6.1)
 rely on when they start the death process from infinity -- which the corpus previously had
-only in expectation.  `Coalescent.LaplaceTransform` and `Coalescent.TransitTransform` then supply the instrument
+only in expectation.  `Coalescent.LaplaceTransform` and `Coalescent.TransitTransform` then supply
+the instrument
 the converse runs on, and a headline of the paper the corpus lacked: the clock's transform is
 `d/(d+θ)`, and independence of the coordinates -- `iIndepFun_infinitePi`, which is K-C
 (1.12)'s premise proved of the construction rather than assumed -- makes the transit time's
@@ -264,7 +271,8 @@ transform their product,
 
   `E(e^{-θ Σ τ}) = ∏ d_r/(d_r + θ)`,     K-G (5.9),
 
-from which K-G reads off the density `Rates.transitDensityTerm` sums.  `Coalescent.ThreeSeries` then closes the converse and with it the equivalence.  At `θ = 1`
+from which K-G reads off the density `Rates.transitDensityTerm` sums.  `Coalescent.ThreeSeries` then
+closes the converse and with it the equivalence.  At `θ = 1`
 the product is `∏(1 - (γ_k+1)⁻¹) ≤ exp(-Σ(γ_k+1)⁻¹)`, which vanishes when the reciprocals
 diverge; the clock is almost surely positive, so the truncated transforms decrease; monotone
 convergence carries the vanishing inside the integral, and a nonnegative function with zero
@@ -273,7 +281,8 @@ integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.  S
   **the descent time is almost surely finite exactly when `Σ γ_k⁻¹` converges**
   (`ae_descent_dichotomy`),
 
-with Kingman on one side and the star coalescent on the other, both proved.  `DecreaseRate` then separates the two rates the multiple-merger case confuses.
+with Kingman on one side and the star coalescent on the other, both proved.  `DecreaseRate` then
+separates the two rates the multiple-merger case confuses.
 `Lambda.totalRate` is the rate of LEAVING a level, `decreaseRate` is Schweinsberg's expected
 rate of DECREASE, and `totalRate_le_decreaseRate` is the correction in one line: every merger
 destroys at least one block, so `λ_b ≤ γ_b`.  Hence
@@ -311,7 +320,8 @@ the pair rate to be sample-size independent, so K-C (1.3)'s `1` is not a modelli
 (`eq_kingmanRate`).
 
 `Coalescent.MultiMerge` gives the state space the moves that family needs -- `mergeSet` folds
-any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -- with `StateSpace.merge` recovered as the two-element case.  So `𝓔ₙ` now carries multiple-merger
+any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -- with
+`StateSpace.merge` recovered as the two-element case.  So `𝓔ₙ` now carries multiple-merger
 coalescents as well as Kingman's, and `Descent.Blindness.MultipleMergerBlindness`, which had
 the rates but no state space, has one.
 
@@ -381,7 +391,8 @@ revision:
   parameterised by an arbitrary `Preorder`, and Mathlib does instantiate it at an order dual
   elsewhere (`cylinderEventsCompl : Filtration (Finset α)ᵒᵈ`), so a decreasing filtration is
   expressible as `Filtration ℕᵒᵈ`.  But the convergence results are not: every theorem in
-  `Martingale/Convergence.lean` fixes `ℱ : Filtration ℕ m0` and argues along `atTop` with upcrossing counts, and the downward theorem is not that argument dualised -- it turns on a
+  `Martingale/Convergence.lean` fixes `ℱ : Filtration ℕ m0` and argues along `atTop` with upcrossing
+  counts, and the downward theorem is not that argument dualised -- it turns on a
   reversed martingale being automatically uniformly integrable, which the forward proof never
   needs.  It is a separate development, not an instantiation.
 * **Kolmogorov extension, general form**: absent.  `ProjectiveFamilyContent` and
@@ -458,7 +469,8 @@ and a product of factorised terms factorises, so the whole path's density splits
 trajectory factor and a clock factor.  For ONE step the passage from a factorised
 density to independent random objects is `StepLaw`: `stepLaw_prod` is independence as a
 statement about measures rather than densities, and the density it corresponds to is the one
-competing clocks produce, so the arranged product is the right one.  For the WHOLE path the same passage is
+competing clocks produce, so the arranged product is the right one.  For the WHOLE path the same
+passage is
 `Law.coalescentLaw_prod`, which is independence in measure for the coupled trajectory and
 clock.  So the constructive direction is complete: densities factorise, one step factorises
 in measure, the whole path factorises in measure.  OPEN, and now the only thing open in this

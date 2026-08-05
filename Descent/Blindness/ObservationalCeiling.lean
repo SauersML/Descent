@@ -19,7 +19,8 @@ guard of the same kind cannot help.
 Several separate results in this development have the same skeleton, and until this file
 they each carried their own copy of it. The skeleton:
 
-> A **probe** reports what some class of experiments can see. Exhibit two objects with > identical probe data and opposite status for the property in question. Then no
+> A **probe** reports what some class of experiments can see. Exhibit two objects with > identical
+probe data and opposite status for the property in question. Then no
 > criterion built from probe data decides the property — for *any* criterion, of any
 > logical complexity, deterministic or randomized, hierarchical or not, because the
 > criterion is a function and functions respect equality.

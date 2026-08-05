@@ -82,7 +82,8 @@ theorem het_increases_with_ne
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_fix.py`,
-    `test_fst_composition`). msprime coalescent simulation of a clean split with no migration, ancestral and both daughter sizes `Ne = 1000`, recombining at
+    `test_fst_composition`). msprime coalescent simulation of a clean split with no migration,
+    ancestral and both daughter sizes `Ne = 1000`, recombining at
     `1e-8` so a replicate carries many independent genealogies, Hudson `F_ST` as
     a ratio of averages, 25 replicates of 20 Mb, 50 diploids per deme:
 

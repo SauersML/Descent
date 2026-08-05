@@ -31,11 +31,13 @@ finite, possibly randomized measurement `Data → FinitePrior n`. The observatio
 `same_data` then says the two observation laws are equal on the nose, and
 `half_separation_le_minimaxRisk_of_observation_eq` gives a floor of `1 / 2`: no rule, at
 any sample size, with any randomization, beats a coin flip on the worst of the two
-hypotheses. `Blindness.ProbeBlindness.blindReadoutProblem_minimaxRisk` shows the floor is exactly attained, so the
+hypotheses. `Blindness.ProbeBlindness.blindReadoutProblem_minimaxRisk` shows the floor is exactly
+attained, so the
 cost of blindness is a coin flip and not more.
 
 Nothing here restricts the readout. It may be noisy, it may quantize, it may be the whole
-downstream pipeline folded into one map; `Blindness.ProbeBlindness.half_le_garbled_readoutProblem_minimaxRisk`
+downstream pipeline folded into one map;
+`Blindness.ProbeBlindness.half_le_garbled_readoutProblem_minimaxRisk`
 adds the further channel-monotonicity statement on top. This is the sense in which the
 ceiling is a ceiling.
 
@@ -296,7 +298,8 @@ theorem no_totalFamilyFraction_criterion_for_originMultiplicity {finalFrequency 
   (totalFamilyFraction_blind_to_originMultiplicity hfrequency).no_criterion_of_factors combine
 
 /-- **The sweep-origin blind spot costs a coin flip.** Every rule reading any finite readout
-of the total selected-allele frequency calls one-origin versus two-origin wrong with probability at least one half at one of the two sweeps. The registry's identification of
+of the total selected-allele frequency calls one-origin versus two-origin wrong with probability at
+least one half at one of the two sweeps. The registry's identification of
 the escape route is unchanged and now quantified: the missing half of the information is
 ancestry from four lineages, and no amount of extra precision on the frequency trajectory
 substitutes for it. -/

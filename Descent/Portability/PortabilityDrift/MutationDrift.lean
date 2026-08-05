@@ -482,7 +482,8 @@ theorem covarianceRetentionFactorFromFst_at_reference_point :
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_correct.py`,
     `correct_freq_corr`). Wright-Fisher forward simulation, `Ne = 200`, 4000
-    loci, 400 replicate deme pairs, four ancestral distributions crossed with two drift depths -- eight cells that a formula in `fst` alone must get wrong
+    loci, 400 replicate deme pairs, four ancestral distributions crossed with two drift depths --
+    eight cells that a formula in `fst` alone must get wrong
     and this one gets right:
 
       ancestral p0          gens    1 - fst   this def   measured      sems
@@ -548,7 +549,8 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     simulation.
 
     A marker claiming an unpaid measurement debt here would be reporting one
-    that does not exist; it inflates the count of things owed a measurement with an item that can never receive one. And the word for that debt must not
+    that does not exist; it inflates the count of things owed a measurement with an item that can
+    never receive one. And the word for that debt must not
     appear anywhere in this docstring even as prose: `simcov/inventory.py` falls
     back to scanning the status note for state words when the head is not one of
     them, so the single word in the sentence this replaces made a declaration
@@ -910,7 +912,8 @@ This theorem is absent on purpose. It states `presentDayPGSVarianceMutationDrift
 ld = ld * presentDayPGSVariance V_A fst` and closes by `ring`. All six of its hypotheses go
 unused — `0 < V_A`, `0 < V_E`, `0 ≤ fst`, `fst < 1`, `0 < ld`, `ld ≤ 1` — and `V_E` is a
 phantom parameter appearing nowhere in the statement, present only so the signature reads
-like a statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with the factors reassociated, and `mutationDrift_variance_ratio` just above states the same
+like a statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with the
+factors reassociated, and `mutationDrift_variance_ratio` just above states the same
 content as a ratio with the hypotheses it genuinely needs.
 
 Two of those hypotheses are worse than unused. `0 ≤ fst` and `fst < 1` are the range in

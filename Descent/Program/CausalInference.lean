@@ -300,7 +300,8 @@ section NoiseReductionMonotonicity
 /-- **`R²` is strictly lower when drift variance is positive.**
     If the training GWAS had been done in the target ancestry,
     there is no drift divergence (fst = 0), so presentDayR2
-    equals V_A/(V_A + V_E).  Cross-ancestry training with fst > 0 gives strictly lower R².  The gap is the
+    equals V_A/(V_A + V_E).  Cross-ancestry training with fst > 0 gives strictly lower R².  The gap
+    is the
     portability loss attributable to ancestry mismatch. -/
 theorem r2_lt_of_drift_variance_pos
     (V_A V_E fst : ℝ)

@@ -169,7 +169,8 @@ close.
 
 The instrument is exact linear algebra on the AR(1) kernel `Σᵢⱼ = ρ^|i-j|`, not
 a simulation: the surviving whitened detection weight of a retained panel `S` is
-`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with agreement to five digits between panel sizes, so nothing here is a finite-`n`
+`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with agreement to five digits
+between panel sizes, so nothing here is a finite-`n`
 artefact.
 
   ρ    κ      this body   uniform thinning   random panel   contiguous panel
