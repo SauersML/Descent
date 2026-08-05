@@ -78,10 +78,19 @@ Strobeck's invariance: within-deme coalescence time is `2` whatever the migratio
 Kingman's coalescent is now simultaneously the `Λ = δ₀` fibre, the identity-map fibre, and
 the `ρ = 0` fibre -- three generalisations, each recovering the base development exactly.
 
+`Coalescent.SeedBank` adds dormancy (Blath, González Casanova, Kurt and Spanò, J. Appl.
+Prob. 50, 2013) and puts it beside `Structured` for the contrast: migration leaves the
+coalescence time at the panmictic value, dormancy strictly inflates it, and the reason is
+that migration moves a lineage somewhere it can still coalesce while dormancy moves it
+somewhere it cannot.  `Coalescent.Selection` adds the ancestral selection graph of Krone and
+Neuhauser (Theor. Popul. Biol. 51, 1997) at the same rate level, with the fact that makes
+Kingman's model robust: coalescence is quadratic in the lineage count and branching is
+linear, so their ratio `σ/(k-1)` vanishes as the sample grows.
+
 Still absent, and not claimed: the `Ξ` measure on the infinite simplex and the rates it
 assigns (only the state-space half of Schweinsberg is here); the Beta-coalescent as an
-explicit `Λ`; seed banks; and every model with selection, which is not a neutral genealogy at
-all and which K-G section 4 explicitly excludes.
+explicit `Λ`; and the forward resolution of the ASG that decides which parent was real,
+which is a different process rather than a harder case of this one.
 
 ## Verification status
 
