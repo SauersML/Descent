@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Trajectory
+import Descent.Coalescent.Path
 import Mathlib.MeasureTheory.Constructions.Prod.Basic
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.Tactic
@@ -92,6 +93,22 @@ theorem coalescentLaw_hold_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
     (chainLaw n k).toMeasure.isProbabilityMeasure
   rw [coalescentLaw_prod, measure_univ, one_mul]
+
+/-- **K-C (2.5): the finite-dimensional distribution factorises.**
+
+`P{R_t = ξ} = P{D_t = k} · P{ℛ_k = ξ}`.  The event "the trajectory does `A` and the clock has
+brought the count to `j` by time `t`" is a rectangle, because the first condition constrains
+only the trajectory and the second only the clock.  Under the coupled law its probability is
+the product -- which is what makes Kingman's factorisation a computation: the death process
+supplies `P{D_t = k}` by convolving the holding times (K-C (2.6)) and the jump chain supplies
+`P{ℛ_k = ξ}` by (2.3), and neither has to know about the other. -/
+theorem coalescentLaw_finiteDimensional (n k m : ℕ) (holdLaw : Measure ℝ)
+    [IsProbabilityMeasure holdLaw] (A : Set (List (ER n))) (t : ℝ) (j : ℕ) :
+    coalescentLaw n k m holdLaw
+        (A ×ˢ {h : Fin m → ℝ | blockCountAt n (extendHold h) t = j})
+      = (chainLaw n k).toMeasure A
+        * (Measure.pi fun _ : Fin m => holdLaw) {h | blockCountAt n (extendHold h) t = j} :=
+  coalescentLaw_prod n k m holdLaw A _
 
 /-- **Almost every coupled path is a genuine coalescent path.**  Whatever the clock does,
 the trajectory component is a descending chain of covers (`Trajectory.chainLaw_support_chain'`),
