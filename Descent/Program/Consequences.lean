@@ -19,6 +19,8 @@ import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Program.CausalInference
 import Descent.Portability.PolygenicContinuumCalibration
 import Descent.Portability.GenerativePortabilityLaw
+import Descent.Portability.PCCorrectability.EndToEnd
+import Descent.Spectral.ProjectionSolve
 
 /-!
 # What the separate results say when they are put together
@@ -38,7 +40,7 @@ measurements are recorded on those results, and nothing new is asserted about a
 population.
 -/
 
-namespace Descent
+namespace Descent.Program
 
 /-! ### A reported improvement has two possible causes, and they are not distinguishable
 from the number alone -/
@@ -496,4 +498,38 @@ theorem calibration_floor_and_spectral_floor_are_different_floors
   ⟨polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior ancestryRisk,
    historyDegradation_equal_amplitude h h' ha⟩
 
-end Descent
+/-! ### Below the edge correction does nothing, and a zero ridge cannot rescue it -/
+
+/-- **Below the spectral edge PC correction removes exactly none of the target axis, and
+at zero ridge the solve keeps the null direction it would need to remove. Two independent
+failures at the same configuration.**
+
+`PCCorrectability.EndToEnd.modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold`
+proves the first: at a spike below the BBP proxy threshold the residual susceptibility
+EQUALS the uncorrected susceptibility -- not approximately, exactly. Nothing is corrected.
+
+`Spectral.ProjectionSolve.ridged_infoQuadraticForm_zero_ridge_degenerate` proves the
+second: with the ridge at zero, a direction the information matrix already annihilates is
+still annihilated, so a rank-deficient design keeps its null direction and the
+factorization has a zero pivot to find.
+
+Composed, they close off the obvious response to the first. Sub-threshold correction fails
+because the axis is not in the recovered subspace; adding no regularisation does not put
+it there, and the solve that would expose the deficiency is the one that degenerates. The
+fix has to be more signal or a positive ridge, not a better solve -- and neither module
+can say that, because one is about a spectral threshold and the other about a linear
+algebra guard. -/
+theorem subthreshold_correction_fails_and_zero_ridge_does_not_help
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (markerAxisVariance ancestryVariance nSample markers spike : ℝ)
+    (hsubthreshold : spike ≤ bbpProxyThreshold nSample markers)
+    (A : Matrix n n ℝ) (x : n → ℝ) (hnull : infoQuadraticForm A x = 0) :
+    modeledPCResidualSusceptibility markerAxisVariance ancestryVariance
+        nSample markers spike
+      = ancestryGradientSusceptibility markerAxisVariance ancestryVariance ∧
+    infoQuadraticForm (ridgedInfoMatrix A 0) x = 0 :=
+  ⟨modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold
+      markerAxisVariance ancestryVariance nSample markers spike hsubthreshold,
+   ridged_infoQuadraticForm_zero_ridge_degenerate A x hnull⟩
+
+end Descent.Program
