@@ -131,7 +131,7 @@ symbolic-dynamics or per-locus recombination argument produces. The two are the
 same statement in different currencies, and
 `BundleRigidity.linear_gain_of_uniform_factor` is the conversion; carrying it
 here is what makes this module's declared dependency on
-`Descent.BundleRigidity.EntropySplit` an actual one.
+`Descent.Blindness.BundleRigidity.EntropySplit` an actual one.
 
 Biologically the reading is the module's own: `ρ < 1` per step is *new*
 multilocus randomness at every step -- recombination or haplotype innovation --

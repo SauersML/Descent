@@ -6,7 +6,7 @@ import Descent.Blindness.BundleRigidity.Telescope
 /-!
 # The corrected kernel dichotomy for trip semigroups
 
-This module imports Mathlib and `Descent.BundleRigidity.Telescope`, from which it takes
+This module imports Mathlib and `Descent.Blindness.BundleRigidity.Telescope`, from which it takes
 `prodWeight`. **Do not add a local copy of the word-weight product**; one definition, one
 place to change it.
 

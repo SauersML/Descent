@@ -589,8 +589,8 @@ theorem parity_and_commutativity_admit_no_escape
     (P Q : ι → ℝ) (i j : ι)
     (hP : P i ≠ 0) (hP' : P j ≠ 0) (hQ : Q i ≠ 0) (hQ' : Q j ≠ 0) :
     (¬ ∃ x : ℕ → ℝ, x 0 ≠ 0 ∧ (∀ s, x (s + 1) = -ρ s * x s) ∧ x n = x 0) ∧
-      Descent.BundleRigidity.defect P Q [i, j] [j, i] = 1 :=
-  ⟨Descent.BundleRigidity.no_odd_cycle_of_pos ρ hρ n hodd,
-   Descent.BundleRigidity.commutation_defect_eq_one P Q i j hP hP' hQ hQ'⟩
+      Descent.Blindness.BundleRigidity.defect P Q [i, j] [j, i] = 1 :=
+  ⟨Descent.Blindness.BundleRigidity.no_odd_cycle_of_pos ρ hρ n hodd,
+   Descent.Blindness.BundleRigidity.commutation_defect_eq_one P Q i j hP hP' hQ hQ'⟩
 
 end Descent.Program

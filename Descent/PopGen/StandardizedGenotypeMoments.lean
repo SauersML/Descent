@@ -52,20 +52,20 @@ open scoped BigOperators
 /-- **Ploidy guard.** The genotype variance used to standardize the Mellin coordinate
 is the corpus-wide `hweGenotypeVariance`, which is built from the single `ploidy`
 constant. Drift between the two is now a compile error. -/
-theorem mellinDrift_uses_ploidy (h : HardyWeinbergModel) :
+theorem mellinDrift_uses_ploidy (h : Foundations.HardyWeinbergModel) :
     h.genotypeVariance = Program.hweGenotypeVariance h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold Program.hweGenotypeVariance HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Program.hweGenotypeVariance Foundations.HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
 standardized genotype is the squared centered dosage divided by the corpus genotype
 variance, with no second convention introduced. -/
 theorem standardizedSquare_eq_over_hweGenotypeVariance
-    (h : HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
+    (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.standardizedSquare g =
       (h.centeredAltAlleleCount g) ^ 2 / Program.hweGenotypeVariance h.altFreq := by
-  unfold HardyWeinbergModel.standardizedSquare
+  unfold Foundations.HardyWeinbergModel.standardizedSquare
   rw [mellinDrift_uses_ploidy]
 
 /-- **Scale invariance of the multiplicative coordinate.** Rescaling the dosage by any
@@ -206,7 +206,7 @@ in this development is therefore not the whole story for a genome, and the overl
 case remains exactly what `Descent.Blindness.JetBarrier` says it is: the direction where the
 observable algebra grows beyond the triple, and which is not proved here. -/
 theorem no_signSymmetric_nondegenerate_locus
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (∀ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) →
         (∀ g, coding.value g = h.centeredAltAlleleCount g) →
@@ -290,7 +290,7 @@ This is the over-determination tie for the new observable: the fourth moment is 
 free constant but the reciprocal of the same `hweGenotypeVariance` that
 `mellinDrift_uses_ploidy` pins to `ploidy`. Change the ploidy convention and this stops
 compiling. -/
-theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : HardyWeinbergModel)
+theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
       1 / Program.hweGenotypeVariance h.altFreq := by
@@ -298,13 +298,13 @@ theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : HardyWeinber
 
 /-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
 coordinate of the tower is an object this development already had. -/
-theorem standardizedGenotype_sq_eq_standardizedSquare (h : HardyWeinbergModel)
+theorem standardizedGenotype_sq_eq_standardizedSquare (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : Foundations.DiploidGenotype) :
     h.standardizedGenotype g ^ 2 = h.standardizedSquare g := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
-  unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.standardizedSquare
+  unfold Foundations.HardyWeinbergModel.standardizedGenotype Foundations.HardyWeinbergModel.standardizedSquare
   rw [div_pow, hsq]
 
 /-- **The level-two coordinate is never symmetric.** `x²` takes the three values
@@ -335,7 +335,7 @@ level-one statement or a naive reading of this theorem suggests. The distinction
 level-one data and looks like a new floor. This theorem is a true statement about the
 uncentered object, and inferring the floor-two channel from it is the mistake the trap
 predicts. -/
-theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
+theorem standardizedSquare_never_symmetric (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ¬ ∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
@@ -355,7 +355,7 @@ theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
   have hvar : 0 < h.genotypeVariance := by
     rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     nlinarith [hq0, hcomp]
   have hnonneg : ∀ g : Foundations.DiploidGenotype,
       0 ≤ h.genotypeProb g * h.standardizedSquare g ^ 3 := by
@@ -483,7 +483,7 @@ is available only at `MAF = 1/2` (`standardizedGenotype_symmetric_iff`), the dri
 like `log (1/2q)` for rare variants (`rare_variant_drift_lower_bound`), and the hub
 channel closes at this one interior frequency. No single frequency is blind in all
 channels, but each channel has its own blind set, and this one is a point. -/
-theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : HardyWeinbergModel)
+theorem standardizedGenotype_kurtosis_gaussian_at_blind_maf (h : Foundations.HardyWeinbergModel)
     (hmaf : h.altFreq = gaussianKurtosisMaf) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 = 3 := by
   have hq0 : 0 < h.altFreq := by
@@ -557,7 +557,7 @@ theorem hweLevelOne_components (q : ℝ) :
 
 /-- **The symmetry slot of floor one is the corpus's proved characterization**, so it is
 not a slot awaiting work: it is decided, and decided negatively away from `q = 1/2`. -/
-theorem hweLevelOne_symmetry (h : HardyWeinbergModel)
+theorem hweLevelOne_symmetry (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (hweLevelOne h.altFreq).isSignSymmetric = true ↔
       (∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
@@ -590,7 +590,7 @@ parameter.
 
 Empirical status: UNTESTED. A field update on a design; no modelling content and no free -/
 def _root_.Descent.Blindness.GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDesign n ι)
-    (model : Fin n → HardyWeinbergModel) : Blindness.GenotypeDesign n ι :=
+    (model : Fin n → Foundations.HardyWeinbergModel) : Blindness.GenotypeDesign n ι :=
   { design with model := model }
 
 /-- **What "holding the design fixed" means**, stated rather than left to the field update:
@@ -598,7 +598,7 @@ re-modelling moves the coordinate law and leaves the combinatorics alone, so the
 interaction order of every tested set is unchanged. Without this, `reModel` is a record
 update no statement distinguishes from an arbitrary design. -/
 @[simp] theorem _root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
-    (design : Blindness.GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) (s : ι) :
+    (design : Blindness.GenotypeDesign n ι) (model : Fin n → Foundations.HardyWeinbergModel) (s : ι) :
     (design.reModel model).interactionOrder s = design.interactionOrder s := rfl
 
 /-! No observable-tower record is exported: accepting the Vertex-Weight Law and the
@@ -643,7 +643,7 @@ effective coordinate law of the panel is the corresponding mixture of standardiz
 genotype laws. -/
 structure MafSpectrum (m : ℕ) where
   /-- The Hardy-Weinberg model of each spectrum atom. -/
-  model : Fin m → HardyWeinbergModel
+  model : Fin m → Foundations.HardyWeinbergModel
   /-- The weight of each atom. -/
   weight : Fin m → ℝ
   /-- Weights are non-negative. -/
@@ -655,7 +655,7 @@ structure MafSpectrum (m : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def MafSpectrum.witness (m : ℕ) : MafSpectrum (m + 1) where
-  model := fun _ ↦ HardyWeinbergModel.witness
+  model := fun _ ↦ Foundations.HardyWeinbergModel.witness
   weight := fun j ↦ if j = 0 then 1 else 0
   weight_nonneg := fun j ↦ by split <;> norm_num
   weight_sum := by simp
@@ -1010,7 +1010,7 @@ theorem gaussianFloorTwoScaleSq :
 This is `standardizedSquare_second_cumulant` read as the first entry of the genotype's own
 scale sequence. It exceeds the Gaussian's `2` for rare variants — about `49` at MAF `0.01`
 — and falls below it for common ones. -/
-theorem hweFloorOneScaleSq_eq (h : HardyWeinbergModel)
+theorem hweFloorOneScaleSq_eq (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.genotypeVariance *
         squaringScaleSq
@@ -1034,7 +1034,7 @@ kurtosis are one observable**, differing by the constant `1`. What survives inde
 of the framing is the direction — `σ₁² = 1/V - 1` is about `49` at MAF `0.01` and `1` at
 MAF `0.5`, so rare variants start the tower further from the Gaussian and are harder to
 read at every floor. -/
-theorem hweFloorOneScaleSq_eq_gaussian_at_blind_maf (h : HardyWeinbergModel)
+theorem hweFloorOneScaleSq_eq_gaussian_at_blind_maf (h : Foundations.HardyWeinbergModel)
     (hmaf : h.altFreq = gaussianKurtosisMaf) :
     squaringScaleSq
         (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
@@ -1242,15 +1242,15 @@ is open upstream, so nothing here should be read as "a design can measure the fo
 
 /-- The genotype variance is at most one half, with equality at the balanced locus:
 `2q(1-q) ≤ 1/2` because `(2q-1)² ≥ 0`. -/
-theorem hweGenotypeVariance_le_half (h : HardyWeinbergModel) :
+theorem hweGenotypeVariance_le_half (h : Foundations.HardyWeinbergModel) :
     h.genotypeVariance ≤ 1 / 2 := by
   rw [h.genotypeVariance_eq]
-  unfold HardyWeinbergModel.refFreq
+  unfold Foundations.HardyWeinbergModel.refFreq
   nlinarith [sq_nonneg (h.altFreq - 1 / 2)]
 
 /-- **Every polymorphic genotype coordinate has `E[x⁴] ≥ 2`**, so it lies inside or on the
 rigidity phase boundary. -/
-theorem standardizedGenotype_fourth_moment_ge_two (h : HardyWeinbergModel)
+theorem standardizedGenotype_fourth_moment_ge_two (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 ≤ ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
@@ -1261,14 +1261,14 @@ theorem standardizedGenotype_fourth_moment_ge_two (h : HardyWeinbergModel)
 /-- **Equality holds exactly at the balanced locus.** `E[x⁴] = 2` iff `q = 1/2`, so the
 balanced genotype sits precisely on the phase boundary where the rigidity mechanism's
 one-sided image collapses. -/
-theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
+theorem standardizedGenotype_fourth_moment_eq_two_iff (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 2 ↔
       h.altFreq = 1 / 2 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hveq : h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq) := by
     rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     ring
   rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, div_eq_iff (ne_of_gt hvar)]
   constructor
@@ -1293,7 +1293,7 @@ satisfiable (`hwe_rigidity_hypotheses_unsatisfiable`).
 Note also that the phase inequality holds exactly where the symmetry hypothesis fails —
 they are complementary on the frequency spectrum, not cooperative
 (`phase_strict_iff_not_symmetric`). -/
-theorem hwe_phase_inequality_off_balanced (h : HardyWeinbergModel)
+theorem hwe_phase_inequality_off_balanced (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hunbalanced : h.altFreq ≠ 1 / 2) :
     2 < ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hge := standardizedGenotype_fourth_moment_ge_two h hq0 hq1
@@ -1308,7 +1308,7 @@ relabelling are complementary: the first holds off `q = 1/2`, the second only at
 
 So the two hypotheses select disjoint frequency sets, which is the structural reason the
 rigidity theorem cannot be applied to genotype data. -/
-theorem phase_strict_iff_not_symmetric (h : HardyWeinbergModel)
+theorem phase_strict_iff_not_symmetric (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 < (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ↔
       ¬ (∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
@@ -1336,7 +1336,7 @@ So the headline rigidity result never gets a satisfied hypothesis on a standardi
 Hardy-Weinberg coordinate — at any allele frequency. This is stronger than saying the
 theorem applies away from a single point, and it is the honest statement of what the tower
 result does and does not say about genotypes. -/
-theorem hwe_rigidity_hypotheses_unsatisfiable (h : HardyWeinbergModel)
+theorem hwe_rigidity_hypotheses_unsatisfiable (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hsym : ∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
       (∀ g, coding.weight g = h.genotypeProb g) ∧
@@ -1359,7 +1359,7 @@ theorem gaussianKurtosisMaf_ne_half : gaussianKurtosisMaf ≠ 1 / 2 := by
 
 /-- The fourth moment is reflection-invariant, being even data: this is
 `reflect_even_moment` at `k = 2`. -/
-theorem fourthMoment_reflection_invariant (h : HardyWeinbergModel) :
+theorem fourthMoment_reflection_invariant (h : Foundations.HardyWeinbergModel) :
     (∑ g : Foundations.DiploidGenotype,
         h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ 4) =
       ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
@@ -1374,9 +1374,9 @@ the coordinate to its negative, so a law equals its own negation exactly at the 
 — that is the symmetry — while every even moment is reflection-invariant and so takes its
 extremum there — that is the kurtosis boundary. Two different statements, one symmetry of
 `Binomial(2, q)`. -/
-theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
+theorem balanced_locus_is_reflection_fixed_point (h : Foundations.HardyWeinbergModel) :
     h.reflect.altFreq = h.altFreq ↔ h.altFreq = 1 / 2 := by
-  rw [HardyWeinbergModel.reflect_altFreq]
+  rw [Foundations.HardyWeinbergModel.reflect_altFreq]
   constructor
   · intro hfix
     linarith [hfix]
@@ -1527,7 +1527,7 @@ theorem ladderMomentOrder_doubles (rung : ℕ) :
 /-- The genotype moments at the first three computed orders, collected so the growth
 pattern `1`, `V⁻¹`, `V⁻²` is visible in one place and a later change to any of them
 contradicts this theorem rather than drifting silently. -/
-theorem hweLadderMoments (h : HardyWeinbergModel)
+theorem hweLadderMoments (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) = 1 ∧
       (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
@@ -1640,14 +1640,14 @@ is now exact and rejects duplicate frequencies rather than merging them.
 -/
 
 /-- The centered square as an offset of the corpus's `standardizedSquare`. -/
-theorem centeredSquare_eq_standardizedSquare_sub_one (h : HardyWeinbergModel)
+theorem centeredSquare_eq_standardizedSquare_sub_one (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : Foundations.DiploidGenotype) :
     h.centeredSquare g = h.standardizedSquare g - 1 := by
-  unfold HardyWeinbergModel.centeredSquare
+  unfold Foundations.HardyWeinbergModel.centeredSquare
   rw [standardizedGenotype_sq_eq_standardizedSquare h hq0 hq1]
 
 /-- The rare-homozygote atom in closed form: `u_alt = (2 - 3q)/q`. -/
-theorem centeredSquare_homAlt_eq (h : HardyWeinbergModel)
+theorem centeredSquare_homAlt_eq (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.centeredSquare Descent.Core.Genotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq := by
   obtain ⟨_, _, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
@@ -1658,7 +1658,7 @@ theorem centeredSquare_homAlt_eq (h : HardyWeinbergModel)
 /-- **The rare-homozygote atom is strictly decreasing in the allele frequency.** This is
 half the peeling argument: rarer loci carry strictly larger atoms, so the rarest locus in
 a panel is identifiable from the `|u|` law alone. -/
-theorem centeredSquare_homAlt_strictAnti (h h' : HardyWeinbergModel)
+theorem centeredSquare_homAlt_strictAnti (h h' : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
     (hrarer : h.altFreq < h'.altFreq) :
@@ -1674,7 +1674,7 @@ At `q ≤ 1/2` every atom of a locus is at most `u_alt` in absolute value, with 
 only at the balanced locus, where all three coincide at `1` — the Rademacher case. This is
 the other half of the peeling argument: the largest atom of a panel comes from the rarest
 locus and from its rare homozygote. -/
-theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
+theorem abs_centeredSquare_le_homAlt (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) (g : Foundations.DiploidGenotype) :
     |h.centeredSquare g| ≤ h.centeredSquare Descent.Core.Genotype.homAlt := by
   have hq1 : h.altFreq < 1 := by linarith
@@ -1720,7 +1720,7 @@ forces its weight, and by induction the whole spectrum.
 
 This is the peeling step, and with it the matrix sending MAF weights to the `|u|` law has
 trivial nullspace: **no fiber splitting exists over genotype panels**. -/
-theorem rarest_locus_owns_largest_atom (h h' : HardyWeinbergModel)
+theorem rarest_locus_owns_largest_atom (h h' : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq)
     (hq0' : 0 < h'.altFreq) (hhalf' : h'.altFreq ≤ 1 / 2)
     (hrarer : h.altFreq < h'.altFreq) (g : Foundations.DiploidGenotype) :

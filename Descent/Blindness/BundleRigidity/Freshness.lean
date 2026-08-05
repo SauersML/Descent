@@ -6,7 +6,7 @@ import Descent.Blindness.BundleRigidity.Realizability
 /-!
 # Effective independence dimension and the master decay bound
 
-This module imports targeted Mathlib modules **and** `Descent.BundleRigidity.Realizability`.
+This module imports targeted Mathlib modules **and** `Descent.Blindness.BundleRigidity.Realizability`.
 It is therefore **not self-contained**: it does not rest on Mathlib alone, and any claim
 that it does contradicts the import block above.
 

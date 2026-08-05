@@ -91,7 +91,7 @@ arithmetic, not consequences of a causal model**. The file name overstates the c
 is retained only because a rename touches every importer.
 
 The causal content this file is named for is built in
-`Descent.BundleRigidity.LinearSCM`, which has structural equations, intervention as
+`Descent.Blindness.BundleRigidity.LinearSCM`, which has structural equations, intervention as
 graph surgery, and the mediation identity as a derived theorem rather than a hypothesis.
 
 The corpus-wide no-external-theorem-parameter rule warns that giving a biological name to a

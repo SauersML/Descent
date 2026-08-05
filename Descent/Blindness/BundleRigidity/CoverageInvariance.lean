@@ -6,7 +6,7 @@ import Descent.Blindness.BundleRigidity.Coverage
 /-!
 # Support-level coverage invariance and slotwise bookkeeping
 
-This module imports targeted Mathlib modules **and** `Descent.BundleRigidity.Coverage`,
+This module imports targeted Mathlib modules **and** `Descent.Blindness.BundleRigidity.Coverage`,
 whose one-parameter coverage sets are the one-slot case of the charged tuples defined here
 (`chargedTuples_one_eq_coverers`).
 

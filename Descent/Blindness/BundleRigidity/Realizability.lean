@@ -7,7 +7,7 @@ import Descent.Blindness.BundleRigidity.SingleModulus
 # Realizability: a conditional symmetric lift and a fold obstruction
 
 This module imports targeted Mathlib modules **and**
-`Descent.BundleRigidity.SingleModulus`, whose atoms are the `B = 1` case of the lift
+`Descent.Blindness.BundleRigidity.SingleModulus`, whose atoms are the `B = 1` case of the lift
 built here (`atom_sq_eq_symmetric_atom_sq`, `symmetric_atoms_realize_fourAtom`).
 
 This file isolates the finite algebra that is valid inside the proposed monodromy
