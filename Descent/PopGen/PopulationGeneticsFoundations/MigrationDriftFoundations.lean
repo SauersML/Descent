@@ -459,6 +459,30 @@ noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
   Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
 
+/-- **This body and `Core.fstIslandEquilibrium` are the same function.**
+
+Not a resemblance. The master is `fstFromFlow (scaledMigrationRate·correction +
+scaledMutationRate)`, and each scaled rate is `2 · ploidy · Nₑ · rate`, which at the
+diploid convention is the `4` written out here twice. Expanding the master gives this body
+character for character.
+
+The wrapper was tried and reverted when this module was split out of the monolith, and
+`Program.Conventions` has since been written against the inlined form, so the bodies stay
+as they are and the identity is stated instead. That is enough for the purpose: an edit to
+`Core.ploidy` that this body failed to follow would now break THIS theorem, which is the
+protection the wrapper would have given.
+
+It was rediscovered numerically before it was written down --
+`validation/empirical/extract/semantic_duplicates.py` reports the two agreeing at every one
+of 200 sampled points, from the values alone. -/
+theorem fstIslandEquilibriumFiniteDemes_eq_master (Ne m μ nDemes : ℝ) :
+    fstIslandEquilibriumFiniteDemes Ne m μ nDemes
+      = Descent.Core.fstIslandEquilibrium Ne m μ nDemes := by
+  unfold fstIslandEquilibriumFiniteDemes islandDemeCorrection
+    Descent.Core.fstIslandEquilibrium Descent.Core.fstFromFlow Descent.Core.scaledFlow
+    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  ring_nf
+
 /-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
 `nDemes / (nDemes - 1)`, whose divisor vanishes at one deme. The migration term is junk-zero
 there, so the equilibrium reduces to the mutation-only form -- a single population reported as
