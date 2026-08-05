@@ -160,7 +160,13 @@ instance blockHoldMeasure_isProbabilityMeasure {k : ℕ} (hk : 2 ≤ k) :
 The jump chain of `Descent.Coalescent.Trajectory`, coupled to independent copies of
 Kingman's own clock.  Independence is arranged, as it is in K-C Theorem 3 -- see
 `Descent.Coalescent.Law` for why that is the honest description and what it does not
-settle. -/
+settle.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  It is a coupling: `Descent.Coalescent.Trajectory`'s
+jump chain paired with independent copies of `blockHoldMeasure`.  Constructing a joint law
+whose marginals are two given objects asserts nothing about a population -- what it asserts
+is about the two objects, and `Descent.Coalescent.Law` states exactly what the independence
+does and does not settle. -/
 noncomputable def coalescentLawExp (n k m : ℕ) (rate : ℕ) :
     Measure (List (ER n) × (Fin m → ℝ)) :=
   coalescentLaw n k m (blockHoldMeasure rate)

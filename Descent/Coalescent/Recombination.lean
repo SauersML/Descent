@@ -76,11 +76,19 @@ theorem argEventRate_pos {k : ℕ} (hk : 2 ≤ k) {rho : ℝ} (hrho : 0 ≤ rho)
   linarith
 
 /-- The chance that the next event is a recombination rather than a coalescence: rates in
-proportion, as competing exponentials always are. -/
+proportion, as competing exponentials always are.
+
+Empirical status: DERIVED from `recombRate` and `argEventRate`.  For competing exponentials
+the probability that one fires first is its rate over the total, which is a fact about
+exponentials and not about a genome; the empirical content is in `recombRate`, whose own
+marker carries it. -/
 noncomputable def recombFirstProb (k : ℕ) (rho : ℝ) : ℝ :=
   recombRate k rho / argEventRate k rho
 
-/-- The complementary chance, that the next event is a coalescence. -/
+/-- The complementary chance, that the next event is a coalescence.
+
+Empirical status: DERIVED from `deathRate` and `argEventRate`, by the same competing-
+exponential argument as `recombFirstProb`, of which this is the complement. -/
 noncomputable def coalesceFirstProb (k : ℕ) (rho : ℝ) : ℝ :=
   deathRate k / argEventRate k rho
 

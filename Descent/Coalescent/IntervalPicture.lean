@@ -81,7 +81,8 @@ theorem cellIndex_eq_iff (V : Finset ℝ) {u w : ℝ} (h : u ≤ w) :
     exact ⟨hv.1, lt_of_lt_of_le hv.2 h⟩
   have hcard : (V.filter (fun v => u ≤ v ∧ v < w)).card
       = cellIndex V w - cellIndex V u := by
-    rw [← filter_sdiff_filter V, Finset.card_sdiff hsub]
+    rw [← filter_sdiff_filter V, Finset.card_sdiff, Finset.inter_eq_left.mpr hsub]
+    rfl
   constructor
   · intro heq v hv hbet
     have hzero : (V.filter (fun v => u ≤ v ∧ v < w)).card = 0 := by

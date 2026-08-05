@@ -95,7 +95,14 @@ def ancestralPartition {k N : ℕ} (f : Fin k → Fin N) : Setoid (Fin k) := Set
 
 /-- **The partition-valued step.**  Pushing the mechanism forward through the ancestral
 partition gives a genuine law on equivalence relations -- the object the corpus previously
-lacked, and the one Kingman's whole theory is about. -/
+lacked, and the one Kingman's whole theory is about.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  It is the pushforward of `parentAssignment`
+along `ancestralPartition`, and both of those carry that verdict for the same reason: a
+kernel of a map is a definition of "common ancestor", not an assertion about one.  What
+is empirically at stake is whether a population reproduces by `parentAssignment`, which
+`parentAssignment`'s own docstring states and `Descent.Blindness` records the statistics
+for. -/
 noncomputable def ancestralPartitionLaw (N k : ℕ) [NeZero N] : PMF (Setoid (Fin k)) :=
   (parentAssignment N k).map ancestralPartition
 
@@ -324,10 +331,13 @@ the recursive step of `pairDistinct`, and is flagged there rather than buried. -
 /-- The probability that two sampled lineages still have distinct ancestors `s` generations
 back.
 
-Empirical status: the per-step factor is DERIVED (`noCoalescenceProb_two`, counted off the
-mechanism).  The RECURSION -- multiplying one step's factor by the previous total -- is the
-Wright-Fisher independence-between-generations assumption of K-G (2.2), and is the one
-premise this file does not derive.  K-G section 4 is the statement that the conclusion
+Empirical status: MIXED.  The per-step factor is DERIVED (`noCoalescenceProb_two`, counted
+off the mechanism); the RECURSION -- multiplying one step's factor by the previous total --
+is the Wright-Fisher independence-between-generations assumption of K-G (2.2), and is the
+one premise this file does not derive.  The head is `MIXED` because that is the closed-
+vocabulary term for a definition whose parts carry different verdicts, and because a head
+that opens with lower-case prose is a head no scanner can read: the two halves below are
+the two verdicts the term promises.  K-G section 4 is the statement that the conclusion
 survives replacing multinomial reproduction by any exchangeable family-size law with
 bounded moments and variance `σ²`, at the cost of rescaling time by `σ⁻²`. -/
 noncomputable def pairDistinct (N : ℕ) : ℕ → ℝ

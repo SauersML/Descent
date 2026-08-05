@@ -67,7 +67,7 @@ theorem betaFn_split {a b : ℝ} (ha : a ≠ 0) (hb : b ≠ 0) (hab : a + b ≠ 
 
 /-- **The Beta-coalescent's merger rates**, `Λ = Beta(2-α, α)`.
 
-Empirical status: THIS IS A MODEL, and a substantive one: Schweinsberg (2003) derives it
+Empirical status: THIS IS THE MODEL, and a substantive one: Schweinsberg (2003) derives it
 from offspring numbers with a heavy tail of index `α`, so choosing it is choosing a
 reproduction mechanism, not a convention.  Whether a population has such a tail is the
 empirical question, and `Descent.Blindness.MultipleMergerBlindness` records which statistics

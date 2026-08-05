@@ -97,7 +97,12 @@ theorem meanTimeSame_eq_two_mul_meanTransitTime (M : ℝ) :
   ring
 
 /-- `F_ST` from the two coalescence times: the fraction of the total time that is between
-demes rather than within. -/
+demes rather than within.
+
+Empirical status: DERIVED from `meanTimeSame` and `meanTimeDiff`, which this file derives
+from the structured coalescent's rates by first-step analysis.  It asserts nothing beyond
+them: it is the standard ratio-of-times reading of `F_ST` applied to two numbers that are
+already fixed, so a measurement of it is a measurement of those. -/
 noncomputable def fstFromMigration (M : ℝ) : ℝ :=
   (meanTimeDiff M - meanTimeSame M) / meanTimeDiff M
 

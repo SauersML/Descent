@@ -379,7 +379,15 @@ theorem merge_eq_merge_iff {n : ℕ} (ξ : ER n) {a b c d : Quotient ξ}
       · rw [ha, hb, merge_comm ξ (Ne.symm hcd)]
       · exact absurd (ha.trans hb.symm) hab
 
-/-- The first named block of a two-element set of blocks. -/
+/-- The first named block of a two-element set of blocks.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A choice function on a two-element `Finset`.
+
+The name is `pair` + `Fst` for FIRST, and has nothing to do with `F_ST`; it is screened as
+a population-genetic claim because the screen matches the letters, which is the screen
+being right to be blunt rather than the name being wrong.  Kept explicit because the same
+letters make `validation/conventions.json` ask for a ledger entry saying which `F_ST` this
+is, and the answer is that it is not one. -/
 noncomputable def pairFst {n : ℕ} {ξ : ER n} {s : Finset (Quotient ξ)} (h : s.card = 2) :
     Quotient ξ := (Finset.card_eq_two.mp h).choose
 
