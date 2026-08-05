@@ -319,7 +319,19 @@ def build_context(blob):
                 raise Untranslatable(
                     f"ambiguous call to {short!r} with {nargs} argument(s): "
                     f"{[t['name'] for t in cands]}")
-            return pynames[cands[0]["name"]]
+            target = cands[0]
+            out = pynames[target["name"]]
+            # A NULLARY definition (`def ploidy : ℝ := 2`) is emitted as a
+            # zero-argument function, so a bare mention of it in another body
+            # must be CALLED, not named. Left uncalled it puts a function object
+            # into arithmetic and the self-check dies with a TypeError -- which
+            # is how `neiGst`, `hweGenotypeVariance`, `coalescentTimeScale` and
+            # `neiContrastSpike` all became invisible to the empirical tier over
+            # one `ploidy` factor, leaving the corpus's headline F_ST convention
+            # executable only through `neiGstFromFrequencies`.
+            if nargs == 0 and not any(not a["implicit"] for a in target["args"]):
+                out = f"{out}()"
+            return out
         return resolve
 
     # Enumerations, read from the Lean declarations: {type: {ctor: ordinal}}.
