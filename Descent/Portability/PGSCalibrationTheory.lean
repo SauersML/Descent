@@ -1905,7 +1905,7 @@ theorem refit_attains_reordered_target :
     number of calibration parameters. -/
 noncomputable def requiredEventsForRecalibration
     (nParams infoPerEvent targetTraceMSE : ℝ) : ℝ :=
-  nParams / (infoPerEvent * targetTraceMSE)
+  Descent.Core.ratioOfProduct nParams infoPerEvent targetTraceMSE
 
 /-- **requiredEventsForRecalibration at zero infoPerEvent, named.** With no information per event,
 no number of events recalibrates the model. Lean returns `0`, reporting that recalibration needs no
@@ -1913,7 +1913,7 @@ events at all. Consumers must require `infoPerEvent ≠ 0`. -/
 theorem requiredEventsForRecalibration_zero_infoperevent_is_junk
     (nParams targetTraceMSE : ℝ) :
     requiredEventsForRecalibration nParams 0 targetTraceMSE = 0 := by
-  unfold requiredEventsForRecalibration
+  unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct
   simp
 
 /-- **Sample size needed for recalibration.**
@@ -1930,7 +1930,7 @@ theorem recalibration_needs_events
     (h_target : 0 < targetTraceMSE) :
     recalibrationTraceMSELowerBound nEvents nParams infoPerEvent ≤ targetTraceMSE ↔
       requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE ≤ nEvents := by
-  unfold recalibrationTraceMSELowerBound requiredEventsForRecalibration
+  unfold recalibrationTraceMSELowerBound requiredEventsForRecalibration Descent.Core.ratioOfProduct
   constructor
   · intro h
     rw [div_le_iff₀ (mul_pos h_n h_info)] at h
@@ -1952,7 +1952,7 @@ theorem required_events_increase_with_recalibration_dimension
     (h_target : 0 < targetTraceMSE) :
     requiredEventsForRecalibration nParams₁ infoPerEvent targetTraceMSE <
       requiredEventsForRecalibration nParams₂ infoPerEvent targetTraceMSE := by
-  unfold requiredEventsForRecalibration
+  unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct
   exact div_lt_div_of_pos_right h_dim (mul_pos h_info h_target)
 
 /-- **Required event count decreases with per-event information.**
@@ -1967,7 +1967,7 @@ theorem required_events_decrease_with_event_information
     (h_target : 0 < targetTraceMSE) :
     requiredEventsForRecalibration nParams info₂ targetTraceMSE <
       requiredEventsForRecalibration nParams info₁ targetTraceMSE := by
-  unfold requiredEventsForRecalibration
+  unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct
   have hden₁ : 0 < info₁ * targetTraceMSE := mul_pos h_info₁ h_target
   exact div_lt_div_of_pos_left h_params hden₁ (by nlinarith)
 
@@ -2028,7 +2028,7 @@ theorem rarer_target_prevalence_requires_larger_recalibration_cohort
     requiredTargetCohortSizeForRecalibration nParams π₂ infoPerEvent targetTraceMSE <
       requiredTargetCohortSizeForRecalibration nParams π₁ infoPerEvent targetTraceMSE := by
   have h_required_pos : 0 < requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE := by
-    unfold requiredEventsForRecalibration
+    unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct
     exact div_pos h_params (mul_pos h_info h_target)
   have hπ₂ : 0 < π₂ := lt_trans hπ₁ hπ
   unfold requiredTargetCohortSizeForRecalibration

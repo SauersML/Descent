@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -256,19 +257,19 @@ section CrypticRelatedness
     (kinship coefficient K), the PGS benefits from shared
     family-level environment and rare genetic variants. -/
 noncomputable def kinshipInflation (r2_true K h2_family : ℝ) : ℝ :=
-  r2_true + K * h2_family
+  Descent.Core.affineStep r2_true K h2_family
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem kinshipInflation_at_reference_point :
     kinshipInflation (1 / 2) (1 / 2) (1 / 2) = 3 / 4 := by
-  unfold kinshipInflation
+  unfold kinshipInflation Descent.Core.affineStep
   norm_num
 
 /-- Kinship inflation exceeds true R² when K > 0. -/
 theorem kinship_inflates (r2_true K h2_family : ℝ)
     (h_K : 0 < K) (h_h2 : 0 < h2_family) :
     r2_true < kinshipInflation r2_true K h2_family := by
-  unfold kinshipInflation; linarith [mul_pos h_K h_h2]
+  unfold kinshipInflation Descent.Core.affineStep; linarith [mul_pos h_K h_h2]
 
 /-- **GRM-based exclusion: bias-variance tradeoff.**
     Removing individuals with GRM off-diagonal > threshold reduces
@@ -288,7 +289,7 @@ theorem grm_threshold_tradeoff
     -- Stricter threshold gives smaller kinship inflation
     kinshipInflation r2_true K_strict h2_family <
       kinshipInflation r2_true K_lenient h2_family := by
-  unfold kinshipInflation
+  unfold kinshipInflation Descent.Core.affineStep
   linarith [mul_lt_mul_of_pos_right h_strict_lt h_h2_pos]
 
 /-- **Cross-ancestry naturally avoids cryptic relatedness.**

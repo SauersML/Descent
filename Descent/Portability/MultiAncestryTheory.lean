@@ -475,7 +475,7 @@ private theorem transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogona
     transportedTargetR2DiagonalLD β_shared (fun i ↦ β_shared i + β_private i) var_y =
       additiveHeritability β_shared var_y := by
   unfold transportedTargetR2DiagonalLD transportedTargetR2SharedLD pgsR2
-    sharedLDGeneticVariance additiveHeritability
+    sharedLDGeneticVariance additiveHeritability Descent.Core.squaredShare
   rw [pgsPhenoCov_standardizedDiagonalLD, pgsPhenoCov_self_standardizedDiagonalLD]
   have hdot_zero : (∑ i : Fin m, β_shared i * β_private i) = 0 := by
     simpa [dotProduct] using h_orth
@@ -534,7 +534,7 @@ theorem no_free_lunch_portability
     (h_orth : dotProduct β_source β_target = 0) :
     transportedTargetR2DiagonalLD β_source β_target var_y = 0 := by
   unfold transportedTargetR2DiagonalLD transportedTargetR2SharedLD pgsR2
-    sharedLDGeneticVariance
+    sharedLDGeneticVariance Descent.Core.squaredShare
   rw [pgsPhenoCov_standardizedDiagonalLD, pgsPhenoCov_self_standardizedDiagonalLD]
   have hcross : (∑ i : Fin m, β_source i * β_target i) = 0 := by
     simpa [dotProduct] using h_orth

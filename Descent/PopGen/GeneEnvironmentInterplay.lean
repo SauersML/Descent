@@ -11,6 +11,7 @@ import Descent.Spectral.FoldedSpectrum
 -- `mechanismCount_not_identified_of_range`: the mechanism-count section below is the
 -- gene-environment reading of the latent-mechanism collapse.
 import Descent.Conditionals.LatentMechanismCollapse
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -286,14 +287,14 @@ section NormOfReaction
     Y(G, E) = a(G) + b(G) × E.
     The slope b(G) is the genotype-specific environmental sensitivity. -/
 noncomputable def linearNormOfReaction (a b E : ℝ) : ℝ :=
-  a + b * E
+  Descent.Core.affineStep a b E
 
 /-- **The intercept cancels in an environmental contrast.** Only the slope is identified from a
 difference of environments, which is why a genotype's baseline needs a reference environment and
 cannot be read off a reaction-norm comparison. -/
 theorem linearNormOfReaction_sub (a b E₁ E₂ : ℝ) :
     linearNormOfReaction a b E₁ - linearNormOfReaction a b E₂ = b * (E₁ - E₂) := by
-  unfold linearNormOfReaction
+  unfold linearNormOfReaction Descent.Core.affineStep
   ring
 
 /-- **Different genotypes have different slopes.**
@@ -310,7 +311,7 @@ theorem crossover_gxe_possible
     linearNormOfReaction a₂ b₂ 0 < linearNormOfReaction a₁ b₁ 0 ∧
     -- There exists E where genotype 2 overtakes genotype 1
       ∃ E : ℝ, linearNormOfReaction a₁ b₁ E < linearNormOfReaction a₂ b₂ E := by
-  unfold linearNormOfReaction
+  unfold linearNormOfReaction Descent.Core.affineStep
   simp only [mul_zero, add_zero]
   constructor
   · linarith

@@ -535,7 +535,7 @@ and total outcome variance. This is the exact moment-level coordinate used for
 explicit source/target transport witnesses. -/
 noncomputable def explainedR2FromTransportMoments
     (scoreOutcomeCov scoreVariance outcomeVariance : ℝ) : ℝ :=
-  scoreOutcomeCov ^ 2 / (scoreVariance * outcomeVariance)
+  Descent.Core.squaredShare scoreOutcomeCov scoreVariance outcomeVariance
 
 /-- **explainedR2FromTransportMoments at zero scoreVariance, named.** A score with no variance
 explains nothing, and the ratio is undefined rather than zero -- there is no denominator to
@@ -544,7 +544,7 @@ varies and predicts nothing. Consumers must require `scoreVariance ≠ 0`. -/
 theorem explainedR2FromTransportMoments_zero_scorevariance_is_junk
     (scoreOutcomeCov outcomeVariance : ℝ) :
     explainedR2FromTransportMoments scoreOutcomeCov 0 outcomeVariance = 0 := by
-  unfold explainedR2FromTransportMoments
+  unfold explainedR2FromTransportMoments Descent.Core.squaredShare
   simp
 
 /-- **A score that is the outcome explains all of it.** When the covariance and both variances
@@ -552,7 +552,7 @@ coincide the explained fraction is exactly one, which fixes the normalisation; e
 multiple of this ratio is a squared covariance over a variance product and would miss it. -/
 theorem explainedR2FromTransportMoments_perfect (v : ℝ) (h : v ≠ 0) :
     explainedR2FromTransportMoments v v v = 1 := by
-  unfold explainedR2FromTransportMoments
+  unfold explainedR2FromTransportMoments Descent.Core.squaredShare
   field_simp
 
 /-- **Rescaling the score leaves the explained fraction alone.** Multiplying the score by `c`
@@ -563,7 +563,7 @@ theorem explainedR2FromTransportMoments_scale_invariant
     (scoreOutcomeCov scoreVariance outcomeVariance c : ℝ) (hc : c ≠ 0) :
     explainedR2FromTransportMoments (c * scoreOutcomeCov) (c ^ 2 * scoreVariance) outcomeVariance
       = explainedR2FromTransportMoments scoreOutcomeCov scoreVariance outcomeVariance := by
-  unfold explainedR2FromTransportMoments
+  unfold explainedR2FromTransportMoments Descent.Core.squaredShare
   rw [mul_pow, show c ^ 2 * scoreVariance * outcomeVariance
         = c ^ 2 * (scoreVariance * outcomeVariance) by ring,
     mul_div_mul_left _ _ (pow_ne_zero 2 hc)]
@@ -678,7 +678,8 @@ theorem target_ld_shift_changes_explainedR2_under_fixed_source_weights :
         4 := by
   rw [ldWitnessSourceWeights_eq]
   norm_num [explainedR2FromTransportMoments, ldWitnessTargetCross, ldWitnessSigmaTargetCorrelated,
-    ldWitnessSigmaTargetIndependent, Matrix.mulVec, dotProduct]
+    ldWitnessSigmaTargetIndependent, Matrix.mulVec, dotProduct,
+      Descent.Core.squaredShare]
 
 /-- Core mismatch theorem:
 if target excess MSE is lower-bounded by `λ * ‖ΣS-ΣT‖_F²` with `λ>0`

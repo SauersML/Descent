@@ -185,14 +185,14 @@ section LDTagging
     Reading the variances as allelic `p(1-p)` scales the result by four, the
     same hazard `ldCorrelationSq` carries. -/
 noncomputable def tagR2 (D_sq var_tag var_causal : ℝ) : ℝ :=
-  D_sq / (var_tag * var_causal)
+  Descent.Core.ratioOfProduct D_sq var_tag var_causal
 
 /-- **Tag `r²` normalises by both variances, pinned.** This definition carries no result of its
 own. The squared covariance is divided by the product of the two variances, not by their sum or
 by either alone; unit `D²` against two unit-and-a-half variances gives a quarter. -/
 theorem tagR2_reference :
     tagR2 1 2 2 = 1 / 4 := by
-  unfold tagR2
+  unfold tagR2 Descent.Core.ratioOfProduct
   norm_num
 
 /-- **Tag `r²` at a monomorphic tag, named.** A tag with no variance cannot be in linkage
@@ -202,7 +202,7 @@ segregating -- so a monomorphic marker enters a pruning or scoring pipeline as a
 useless one instead of being dropped. Consumers must require `var_tag ≠ 0`. -/
 theorem tagR2_monomorphic_tag_is_junk (D_sq var_causal : ℝ) :
     tagR2 D_sq 0 var_causal = 0 := by
-  unfold tagR2
+  unfold tagR2 Descent.Core.ratioOfProduct
   simp
 
 /-- Tag r² is bounded by 1, given that the squared disequilibrium does not exceed the
@@ -217,7 +217,7 @@ theorem tag_r2_le_one (D_sq var_tag var_causal : ℝ)
     (h_dsq_le : D_sq ≤ var_tag * var_causal)
     (h_vt : 0 < var_tag) (h_vc : 0 < var_causal) :
     tagR2 D_sq var_tag var_causal ≤ 1 := by
-  unfold tagR2
+  unfold tagR2 Descent.Core.ratioOfProduct
   rw [div_le_one (mul_pos h_vt h_vc)]
   exact h_dsq_le
 
@@ -228,7 +228,7 @@ theorem tag_r2_decreases_with_ld_change
     (h_vt : 0 < var_tag) (h_vc : 0 < var_causal)
     (h_ld_drop : D_sq_target < D_sq_source) :
     tagR2 D_sq_target var_tag var_causal < tagR2 D_sq_source var_tag var_causal := by
-  unfold tagR2
+  unfold tagR2 Descent.Core.ratioOfProduct
   exact div_lt_div_of_pos_right h_ld_drop (mul_pos h_vt h_vc)
 
 /-- **Total PGS accuracy is the product of tag accuracies.**

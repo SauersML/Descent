@@ -490,4 +490,50 @@ gap and the order parameter is just the mass. -/
 @[simp] theorem overlapProfile_at_zero (x : ℝ) : overlapProfile 0 x = x := by
   unfold overlapProfile; simp
 
+/-! ### Three more shapes the census kept finding
+
+Each was written out in two modules that do not import each other. None is deep; what
+makes them worth naming is that a second copy of a body is a copied derivation, and a
+copied derivation drifts. -/
+
+/-- Scaled square, `a² / b`. A moment permeability and an importance-weight effective
+sample size are the same map: a squared total against a sum of squares. -/
+noncomputable def scaledSquare (a b : ℝ) : ℝ := a ^ 2 / b
+
+/-- **scaledSquare at a zero divisor, named.** Consumers must require `b ≠ 0`. -/
+theorem scaledSquare_zero_divisor_is_junk (a : ℝ) : scaledSquare a 0 = 0 := by
+  unfold scaledSquare; simp
+
+/-- Ratio against a product, `a / (b · c)`. The events required for a recalibration and a
+tag `r²` are the same map. -/
+noncomputable def ratioOfProduct (a b c : ℝ) : ℝ := a / (b * c)
+
+/-- **ratioOfProduct where either factor vanishes, named.** -/
+theorem ratioOfProduct_zero_factor_is_junk (a c : ℝ) : ratioOfProduct a 0 c = 0 := by
+  unfold ratioOfProduct; simp
+
+/-- Squared ratio against a product, `a² / (b · c)`. The `R²` shape: a squared covariance
+against a product of variances. Distinct from `scaledSquare` because the denominator is a
+PRODUCT of two quantities that must both be positive, which is what confines the value to
+the unit interval under Cauchy--Schwarz. -/
+noncomputable def squaredShare (a b c : ℝ) : ℝ := a ^ 2 / (b * c)
+
+/-- **What `squaredShare` has and `scaledSquare` does not.** Under Cauchy--Schwarz on the
+two factors the value is at most one -- the bound that makes this an `R²` and not merely
+a quotient. -/
+theorem squaredShare_le_one (a b c : ℝ) (hb : 0 < b) (hc : 0 < c)
+    (h : a ^ 2 ≤ b * c) : squaredShare a b c ≤ 1 := by
+  unfold squaredShare
+  rw [div_le_one (mul_pos hb hc)]
+  exact h
+
+/-- Affine step, `a + b · c`. A kinship inflation and a linear norm of reaction are the
+same map: a baseline displaced by a scaled increment. -/
+noncomputable def affineStep (a b c : ℝ) : ℝ := a + b * c
+
+/-- **At a zero increment the affine step is its baseline**, which is the property that
+makes `a` the baseline rather than one term among three. -/
+@[simp] theorem affineStep_at_zero (a b : ℝ) : affineStep a b 0 = a := by
+  unfold affineStep; ring
+
 end Descent.Core

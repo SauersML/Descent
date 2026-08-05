@@ -105,14 +105,14 @@ theorem sharedLDHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ)
     phenotype, source and transported: 0.02 and 1.35 sems over a prediction
     spanning 0.11581 to 0.23227, a factor of two. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
-  cov_pgs_y ^ 2 / (var_pgs * var_y)
+  Descent.Core.squaredShare cov_pgs_y var_pgs var_y
 
 /-- **pgsR2 at zero var_pgs, named.** A score with no variance has no `R²`. Lean returns `0`,
 which reads as a score that varies and fails, rather than a score that is constant. Consumers
 must require `var_pgs ≠ 0`. -/
 theorem pgsR2_zero_varpgs_is_junk (cov_pgs_y : ℝ) (var_y : ℝ) :
     pgsR2 cov_pgs_y 0 var_y = 0 := by
-  unfold pgsR2
+  unfold pgsR2 Descent.Core.squaredShare
   simp
 
 /-- **`R²` is invariant under rescaling the score.** Multiplying the polygenic score by `c`
@@ -122,7 +122,7 @@ across scores on different scales, and a body that failed it would depend on the
 the score happens to be reported in. -/
 theorem pgsR2_scale_invariant (cov_pgs_y var_pgs var_y c : ℝ) (hc : c ≠ 0) :
     pgsR2 (c * cov_pgs_y) (c ^ 2 * var_pgs) var_y = pgsR2 cov_pgs_y var_pgs var_y := by
-  unfold pgsR2
+  unfold pgsR2 Descent.Core.squaredShare
   rw [mul_pow, show c ^ 2 * var_pgs * var_y = c ^ 2 * (var_pgs * var_y) by ring,
     mul_div_mul_left _ _ (pow_ne_zero 2 hc)]
 
@@ -382,7 +382,7 @@ theorem sourceTruthR2_eq_sharedLDHeritability {m : ℕ}
     (h_var_y : 0 < var_y)
     (h_beta_nonzero : 0 < sharedLDGeneticVariance β ld) :
     sourceTruthR2SharedLD β ld var_y = sharedLDHeritability β ld var_y := by
-  unfold sourceTruthR2SharedLD pgsR2 sharedLDHeritability
+  unfold sourceTruthR2SharedLD pgsR2 sharedLDHeritability Descent.Core.squaredShare
   field_simp [ne_of_gt h_var_y, ne_of_gt h_beta_nonzero]
 
 /-- **Exact transported `R²` identity under a shared LD kernel.**
@@ -407,7 +407,7 @@ theorem transportedTargetR2_eq_ldRgSq_mul_targetH2_sharedLD
     transportedTargetR2SharedLD β_s β_t ld var_y =
       (ldEffectGeneticCorrelation β_s β_t ld) ^ 2 * sharedLDHeritability β_t ld var_y := by
   unfold transportedTargetR2SharedLD ldEffectGeneticCorrelation sharedLDHeritability
-    sharedLDGeneticVariance pgsR2
+    sharedLDGeneticVariance pgsR2 Descent.Core.squaredShare
   rw [div_pow]
   have hsqrt :
       Real.sqrt (pgsPhenoCov β_s β_s ld * pgsPhenoCov β_t β_t ld) ^ 2 =
@@ -844,7 +844,7 @@ section ImportanceWeighting
     The effective sample size decreases with the divergence
     between source and target (larger weights). -/
 noncomputable def importanceWeightESS (sum_w sum_w_sq : ℝ) : ℝ :=
-  sum_w ^ 2 / sum_w_sq
+  Descent.Core.scaledSquare sum_w sum_w_sq
 
 /-- **importanceWeightESS at zero sum_w_sq, named.** With zero total squared weight there are no
 samples and the effective sample size is undefined. Lean returns `0`, which is the correct-looking
@@ -852,13 +852,13 @@ answer for the wrong reason and hides the empty-sample case inside the degenerat
 Consumers must require `sum_w_sq ≠ 0`. -/
 theorem importanceWeightESS_zero_sumwsq_is_junk (sum_w : ℝ) :
     importanceWeightESS sum_w 0 = 0 := by
-  unfold importanceWeightESS
+  unfold importanceWeightESS Descent.Core.scaledSquare
   simp
 
 /-- **The effective size recovers the squared total weight.** -/
 theorem importanceWeightESS_mul_sumSq (sum_w sum_w_sq : ℝ) (h : sum_w_sq ≠ 0) :
     importanceWeightESS sum_w sum_w_sq * sum_w_sq = sum_w ^ 2 := by
-  unfold importanceWeightESS
+  unfold importanceWeightESS Descent.Core.scaledSquare
   field_simp
 
 /-- **IW ESS ≤ n, from an actual weight vector, with Cauchy-Schwarz proved.**
@@ -877,7 +877,7 @@ theorem importanceWeightESS_mul_sumSq (sum_w sum_w_sq : ℝ) (h : sum_w_sq ≠ 0
 theorem importanceWeightESS_le_card {n : ℕ} (w : Fin n → ℝ)
     (h_sq_pos : 0 < ∑ i, w i ^ 2) :
     importanceWeightESS (∑ i, w i) (∑ i, w i ^ 2) ≤ (n : ℝ) := by
-  unfold importanceWeightESS
+  unfold importanceWeightESS Descent.Core.scaledSquare
   rw [div_le_iff₀ h_sq_pos]
   simpa using (sq_sum_le_card_mul_sum_sq (s := (Finset.univ : Finset (Fin n))) (f := w))
 
@@ -885,7 +885,7 @@ theorem importanceWeightESS_le_card {n : ℕ} (w : Fin n → ℝ)
 theorem importanceWeightESS_nonneg {n : ℕ} (w : Fin n → ℝ)
     (h_sq_pos : 0 < ∑ i, w i ^ 2) :
     0 ≤ importanceWeightESS (∑ i, w i) (∑ i, w i ^ 2) := by
-  unfold importanceWeightESS
+  unfold importanceWeightESS Descent.Core.scaledSquare
   positivity
 
 /-- **Equal weights attain the bound**: the ESS of a constant weight vector is exactly
@@ -894,7 +894,7 @@ theorem importanceWeightESS_nonneg {n : ℕ} (w : Fin n → ℝ)
 theorem importanceWeightESS_of_const {n : ℕ} (c : ℝ) (hc : c ≠ 0) (hn : 0 < n) :
     importanceWeightESS (∑ _i : Fin n, c) (∑ _i : Fin n, c ^ 2) = (n : ℝ) := by
   have hn' : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
-  unfold importanceWeightESS
+  unfold importanceWeightESS Descent.Core.scaledSquare
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   rw [mul_pow]
   field_simp

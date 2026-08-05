@@ -130,14 +130,14 @@ theorem covarianceScoreInformation_kurtosis
 has local mean derivative `Γ` and variance `V`, then averaging independent copies estimates
 the tangent with reciprocal-variance information `Γ²/V`. -/
 noncomputable def momentPermeability (response noiseVariance : ℝ) : ℝ :=
-  response ^ 2 / noiseVariance
+  Descent.Core.scaledSquare response noiseVariance
 
 /-- **The permeability's junk branch, named.** At zero noise the permeability diverges and Lean
 returns `0`, so a noiseless channel is reported as carrying no information. Consumers must
 require `noiseVariance ≠ 0`. -/
 theorem momentPermeability_zero_noise_is_junk (response : ℝ) :
     momentPermeability response 0 = 0 := by
-  unfold momentPermeability; simp
+  unfold momentPermeability Descent.Core.scaledSquare; simp
 
 /-- Rescaling a scalar moment and its response by the same nonzero factor leaves
 permeability unchanged: response squares and noise variance scale together. -/
@@ -145,7 +145,7 @@ theorem momentPermeability_scale
     (response noiseVariance scale : ℝ) (hscale : scale ≠ 0) :
     momentPermeability (scale * response) (scale ^ 2 * noiseVariance) =
       momentPermeability response noiseVariance := by
-  unfold momentPermeability
+  unfold momentPermeability Descent.Core.scaledSquare
   field_simp [hscale]
 
 /-- **Permeability of the named covariance-moment experiment.**  A centered-square
@@ -202,14 +202,16 @@ two-orientation experiment, not a universal claim about arbitrary non-reversible
 theorem binaryOrientationArrowPermeability_eq (θ : ℝ) :
     binaryOrientationArrowPermeability θ = 1 / (1 - θ ^ 2) := by
   simp [binaryOrientationArrowPermeability, momentPermeability,
-    binaryOrientationArrowVariance]
+    binaryOrientationArrowVariance,
+      Descent.Core.scaledSquare]
 
 /-- At the reversible center `θ = 0`, one ordered pair carries one unit of arrow
 information in the natural normalization. -/
 theorem binaryOrientationArrowPermeability_zero :
     binaryOrientationArrowPermeability 0 = 1 := by
   norm_num [binaryOrientationArrowPermeability, momentPermeability,
-    binaryOrientationArrowVariance]
+    binaryOrientationArrowVariance,
+      Descent.Core.scaledSquare]
 
 /-- `m` independent ordered pairs carry `m/(1-θ²)` total arrow permeability. -/
 noncomputable def totalBinaryOrientationArrowPermeability (m θ : ℝ) : ℝ :=
