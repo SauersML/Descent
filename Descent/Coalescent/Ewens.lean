@@ -47,17 +47,17 @@ open scoped Classical
 is the base of the Chinese-restaurant induction: Kingman's `θ^{k-1}` normalisation makes the
 first class free, so the recursion starts at `n = 1`, not at `n = 0`. -/
 instance subsingleton_ER_one : Subsingleton (ER 1) :=
-  ⟨fun ξ η => Setoid.ext fun x y => by
+  ⟨fun ξ η ↦ Setoid.ext fun x y ↦ by
     have hxy : x = y := Subsingleton.elim x y
     subst hxy
-    exact ⟨fun _ => η.iseqv.refl x, fun _ => ξ.iseqv.refl x⟩⟩
+    exact ⟨fun _ ↦ η.iseqv.refl x, fun _ ↦ ξ.iseqv.refl x⟩⟩
 
 theorem sum_ER_one {M : Type*} [AddCommMonoid M] (w : ER 1 → M) :
     ∑ ξ : ER 1, w ξ = w ⊥ := by
   classical
-  rw [Finset.sum_congr rfl (fun ξ _ => congrArg w (Subsingleton.elim ξ (⊥ : ER 1)))]
+  rw [Finset.sum_congr rfl (fun ξ _ ↦ congrArg w (Subsingleton.elim ξ (⊥ : ER 1)))]
   rw [Finset.sum_const, Finset.card_univ]
-  have hcard : Fintype.card (ER 1) = 1 := Fintype.card_eq_one_iff.mpr ⟨⊥, fun ξ => Subsingleton.elim ξ ⊥⟩
+  have hcard : Fintype.card (ER 1) = 1 := Fintype.card_eq_one_iff.mpr ⟨⊥, fun ξ ↦ Subsingleton.elim ξ ⊥⟩
   rw [hcard, one_smul]
 
 /-- **The fibre of restriction sums as a sum over seatings.**
@@ -67,10 +67,10 @@ sum wants one indexed by `Quotient ξ`.  Inside the fibre `ρ ζ = ξ`, so the t
 by a hypothesis rather than definitionally, and it has to be substituted. -/
 theorem sum_fiber_eq_sum_seatings {n : ℕ} (ξ : ER n) (w : ER (n + 1) → ℝ) :
     ∑ o : Option (Quotient ξ), w (extend ξ o)
-      = ∑ ζ ∈ Finset.univ.filter (fun ζ : ER (n + 1) =>
+      = ∑ ζ ∈ Finset.univ.filter (fun ζ : ER (n + 1) ↦
           restrict (Nat.le_succ n) ζ = ξ), w ζ := by
   classical
-  refine Finset.sum_bij (fun (o : Option (Quotient ξ)) _ => extend ξ o) ?_ ?_ ?_ ?_
+  refine Finset.sum_bij (fun (o : Option (Quotient ξ)) _ ↦ extend ξ o) ?_ ?_ ?_ ?_
   · intro o _
     exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, restrict_extend ξ o⟩
   · intro o _ o' _ h
@@ -97,10 +97,10 @@ theorem sum_ER_succ {n : ℕ} (w : ER (n + 1) → ℝ) :
   classical
   have hmaps : ∀ ζ ∈ (Finset.univ : Finset (ER (n + 1))),
       restrict (Nat.le_succ n) ζ ∈ (Finset.univ : Finset (ER n)) :=
-    fun ζ _ => Finset.mem_univ _
+    fun ζ _ ↦ Finset.mem_univ _
   have hfib := Finset.sum_fiberwise_of_maps_to hmaps w
   rw [← hfib]
-  exact Finset.sum_congr rfl fun ξ _ => (sum_fiber_eq_sum_seatings ξ w).symm
+  exact Finset.sum_congr rfl fun ξ _ ↦ (sum_fiber_eq_sum_seatings ξ w).symm
 
 /-- The seatings of a sample into `k` existing classes number `k + 1`: join one of the `k`,
 or start a new one.  This is the `θ + n` of the recursion before the weights are attached --
@@ -120,21 +120,21 @@ missing piece of the Ewens item, and with it the class-size facts of
 /-- The size of the class of `x` is the size of the fibre of `f` over `f x`. -/
 theorem classSize_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (x : Fin m) :
     classSize (Setoid.ker f) (Quotient.mk _ x)
-      = (Finset.univ.filter fun y => f y = f x).card := by
+      = (Finset.univ.filter fun y ↦ f y = f x).card := by
   classical
   unfold classSize
   congr 1
   ext y
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-  exact ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
+  exact ⟨fun h ↦ Quotient.exact h, fun h ↦ Quotient.sound h⟩
 
 /-- **A product over classes is a product over the distinct values of the defining map.** -/
 theorem prod_quotient_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (g : ℕ → ℝ) :
     ∏ d : Quotient (Setoid.ker f), g (classSize (Setoid.ker f) d)
-      = ∏ v ∈ Finset.univ.image f, g ((Finset.univ.filter fun y => f y = v).card) := by
+      = ∏ v ∈ Finset.univ.image f, g ((Finset.univ.filter fun y ↦ f y = v).card) := by
   classical
   refine Finset.prod_bij
-    (fun (d : Quotient (Setoid.ker f)) _ => Quotient.liftOn d f fun _ _ h => h) ?_ ?_ ?_ ?_
+    (fun (d : Quotient (Setoid.ker f)) _ ↦ Quotient.liftOn d f fun _ _ h ↦ h) ?_ ?_ ?_ ?_
   · intro d _
     induction d using Quotient.inductionOn with
     | _ x => exact Finset.mem_image.mpr ⟨x, Finset.mem_univ x, rfl⟩
@@ -156,7 +156,7 @@ theorem prod_quotient_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m →
 /-- Fibre cardinalities, as `Finset` cards rather than `Nat.card` of subtypes, which is what
 the transfer above consumes. -/
 theorem card_filter_eq_card {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (v : β) :
-    (Finset.univ.filter fun y => f y = v).card = Nat.card {x : Fin m // f x = v} := by
+    (Finset.univ.filter fun y ↦ f y = v).card = Nat.card {x : Fin m // f x = v} := by
   classical
   rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
 
@@ -213,14 +213,14 @@ theorem ewensWeight_extend_none {n : ℕ} (θ : ℝ) (ξ : ER n) (hb : 1 ≤ blo
   have hprod : ∏ d : Quotient (extend ξ none), (((classSize (extend ξ none) d - 1)! : ℕ) : ℝ)
       = ∏ c : Quotient ξ, (((classSize ξ c - 1)! : ℕ) : ℝ) := by
     rw [show extend ξ none = Setoid.ker (extendMap ξ none) from rfl,
-      prod_quotient_ker (extendMap ξ none) (fun k => (((k - 1)! : ℕ) : ℝ)),
+      prod_quotient_ker (extendMap ξ none) (fun k ↦ (((k - 1)! : ℕ) : ℝ)),
       image_extendMap_none]
     rw [Fintype.prod_option]
-    have hnone : (Finset.univ.filter fun y => extendMap ξ none y = none).card = 1 := by
+    have hnone : (Finset.univ.filter fun y ↦ extendMap ξ none y = none).card = 1 := by
       rw [card_filter_eq_card]
       exact card_fiber_none_new ξ
     have hsome : ∀ d : Quotient ξ,
-        (Finset.univ.filter fun y => extendMap ξ none y = some d).card = classSize ξ d := by
+        (Finset.univ.filter fun y ↦ extendMap ξ none y = some d).card = classSize ξ d := by
       intro d
       rw [card_filter_eq_card, card_fiber_none_old ξ d, ← card_filter_eq_card]
       rfl
@@ -243,7 +243,7 @@ theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient �
     ewensWeight θ (extend ξ (some c)) = (classSize ξ c : ℝ) * ewensWeight θ ξ := by
   classical
   have hfib : ∀ d : Quotient ξ,
-      (Finset.univ.filter fun y => extendMap ξ (some c) y = some d).card
+      (Finset.univ.filter fun y ↦ extendMap ξ (some c) y = some d).card
         = classSize ξ d + (if d = c then 1 else 0) := by
     intro d
     by_cases hd : d = c
@@ -256,15 +256,15 @@ theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient �
         (((classSize (extend ξ (some c)) d - 1)! : ℕ) : ℝ)
       = ∏ d : Quotient ξ, ((((classSize ξ d + (if d = c then 1 else 0)) - 1)! : ℕ) : ℝ) := by
     rw [show extend ξ (some c) = Setoid.ker (extendMap ξ (some c)) from rfl,
-      prod_quotient_ker (extendMap ξ (some c)) (fun k => (((k - 1)! : ℕ) : ℝ)),
+      prod_quotient_ker (extendMap ξ (some c)) (fun k ↦ (((k - 1)! : ℕ) : ℝ)),
       image_extendMap_some]
-    rw [Finset.prod_image (fun a _ b _ h => Option.some_injective _ h)]
-    exact Finset.prod_congr rfl fun d _ => by rw [hfib d]
+    rw [Finset.prod_image (fun a _ b _ h ↦ Option.some_injective _ h)]
+    exact Finset.prod_congr rfl fun d _ ↦ by rw [hfib d]
   have hsplit : ∏ d : Quotient ξ, ((((classSize ξ d + (if d = c then 1 else 0)) - 1)! : ℕ) : ℝ)
       = (classSize ξ c : ℝ) * ∏ d : Quotient ξ, (((classSize ξ d - 1)! : ℕ) : ℝ) := by
     rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ c),
       ← Finset.mul_prod_erase Finset.univ
-        (fun d => (((classSize ξ d - 1)! : ℕ) : ℝ)) (Finset.mem_univ c)]
+        (fun d ↦ (((classSize ξ d - 1)! : ℕ) : ℝ)) (Finset.mem_univ c)]
     have hc : ((((classSize ξ c + (if c = c then 1 else 0)) - 1)! : ℕ) : ℝ)
         = (classSize ξ c : ℝ) * (((classSize ξ c - 1)! : ℕ) : ℝ) := by
       rw [if_pos rfl]
@@ -279,7 +279,7 @@ theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient �
     have herase : ∏ d ∈ Finset.univ.erase c,
           ((((classSize ξ d + (if d = c then 1 else 0)) - 1)! : ℕ) : ℝ)
         = ∏ d ∈ Finset.univ.erase c, (((classSize ξ d - 1)! : ℕ) : ℝ) :=
-      Finset.prod_congr rfl fun d hd => by
+      Finset.prod_congr rfl fun d hd ↦ by
         rw [if_neg (Finset.ne_of_mem_erase hd)]
         norm_num
     rw [hc, herase]
@@ -329,7 +329,7 @@ theorem sum_ewensWeight {n : ℕ} (θ : ℝ) (hn : 1 ≤ n) :
       rw [sum_ER_one]
       have hblocks : blocks (⊥ : ER 1) = 1 := blocks_bot 1
       have hprod : ∏ c : Quotient (⊥ : ER 1), (((classSize (⊥ : ER 1) c - 1)! : ℕ) : ℝ) = 1 := by
-        refine Finset.prod_eq_one fun c _ => ?_
+        refine Finset.prod_eq_one fun c _ ↦ ?_
         rw [classSize_ER_one]
         norm_num
       unfold ewensWeight
@@ -341,7 +341,7 @@ theorem sum_ewensWeight {n : ℕ} (θ : ℝ) (hn : 1 ≤ n) :
       have hterm : ∀ ξ : ER m,
           ∑ o : Option (Quotient ξ), ewensWeight θ (extend ξ o)
             = (θ + (m : ℝ)) * ewensWeight θ ξ :=
-        fun ξ => sum_seatings_ewensWeight θ ξ (blocks_pos ξ)
+        fun ξ ↦ sum_seatings_ewensWeight θ ξ (blocks_pos ξ)
       simp only [hterm]
       rw [← Finset.mul_sum, ih, Finset.prod_Ico_succ_top hm]
       ring

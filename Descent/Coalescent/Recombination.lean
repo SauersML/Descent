@@ -126,15 +126,15 @@ theorem pairCoalesceFirstProb_antitone {rho rho' : ℝ} (h0 : 0 ≤ rho) (h : rh
 recombination vanishes: the two sides of the breakpoint have independent genealogies, which
 is the limit in which two-locus statistics carry no linkage information at all. -/
 theorem tendsto_pairCoalesceFirstProb :
-    Tendsto (fun rho : ℝ => coalesceFirstProb 2 rho) atTop (nhds 0) := by
+    Tendsto (fun rho : ℝ ↦ coalesceFirstProb 2 rho) atTop (nhds 0) := by
   have hcongr : ∀ᶠ rho : ℝ in atTop, coalesceFirstProb 2 rho = 1 / (1 + rho) := by
     filter_upwards [eventually_ge_atTop (0 : ℝ)] with rho hrho
     exact pairCoalesceFirstProb_eq hrho
-  have hlim : Tendsto (fun rho : ℝ => 1 / (1 + rho)) atTop (nhds 0) := by
-    have h : Tendsto (fun rho : ℝ => 1 + rho) atTop atTop :=
+  have hlim : Tendsto (fun rho : ℝ ↦ 1 / (1 + rho)) atTop (nhds 0) := by
+    have h : Tendsto (fun rho : ℝ ↦ 1 + rho) atTop atTop :=
       tendsto_atTop_add_const_left _ 1 tendsto_id
-    exact h.inv_tendsto_atTop.congr fun rho => (one_div _).symm
-  exact hlim.congr' (hcongr.mono fun rho h => h.symm)
+    exact h.inv_tendsto_atTop.congr fun rho ↦ (one_div _).symm
+  exact hlim.congr' (hcongr.mono fun rho h ↦ h.symm)
 
 /-- At zero recombination the pair coalesces first with certainty -- there is nothing else
 that can happen, and the ARG is Kingman's tree. -/

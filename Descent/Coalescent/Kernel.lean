@@ -49,19 +49,19 @@ observation that a relation is determined by the family of sets `{y ; y ~ x}`. -
 instance instFiniteER (n : ℕ) : Finite (ER n) := by
   classical
   refine Finite.of_injective
-    (fun ξ : ER n => fun y => Finset.univ.filter (fun z => ξ.r z y)) ?_
+    (fun ξ : ER n ↦ fun y ↦ Finset.univ.filter (fun z ↦ ξ.r z y)) ?_
   intro ξ η h
-  refine Setoid.ext fun x y => ?_
-  have hxy : Finset.univ.filter (fun z => ξ.r z y) = Finset.univ.filter (fun z => η.r z y) :=
+  refine Setoid.ext fun x y ↦ ?_
+  have hxy : Finset.univ.filter (fun z ↦ ξ.r z y) = Finset.univ.filter (fun z ↦ η.r z y) :=
     congrFun h y
   constructor
   · intro hr
-    have hmem : x ∈ Finset.univ.filter (fun z => ξ.r z y) :=
+    have hmem : x ∈ Finset.univ.filter (fun z ↦ ξ.r z y) :=
       Finset.mem_filter.mpr ⟨Finset.mem_univ x, hr⟩
     rw [hxy] at hmem
     exact (Finset.mem_filter.mp hmem).2
   · intro hr
-    have hmem : x ∈ Finset.univ.filter (fun z => η.r z y) :=
+    have hmem : x ∈ Finset.univ.filter (fun z ↦ η.r z y) :=
       Finset.mem_filter.mpr ⟨Finset.mem_univ x, hr⟩
     rw [← hxy] at hmem
     exact (Finset.mem_filter.mp hmem).2
@@ -93,7 +93,7 @@ noncomputable def jumpKernel (n : ℕ) : Kernel (ER n) (ER n) where
 /-- Every row is a probability measure, so the jump chain loses no mass: it is a Markov
 kernel. -/
 instance jumpKernel_isMarkovKernel (n : ℕ) : IsMarkovKernel (jumpKernel n) :=
-  ⟨fun ξ => by
+  ⟨fun ξ ↦ by
     rw [jumpKernel_apply]
     exact inferInstance⟩
 

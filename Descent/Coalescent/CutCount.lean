@@ -70,7 +70,7 @@ theorem isCutSetOf_iff {n : ℕ} (η : ER n) (c : Quotient η) (S : Finset (Fin 
     (IsCutSet η S ∧ ∀ x ∈ S, Quotient.mk η x = c) ↔ (S.Nonempty ∧ S ⊆ cutBase η c) := by
   constructor
   · rintro ⟨⟨hne, hcl, hrep⟩, hall⟩
-    refine ⟨hne, fun y hy => ?_⟩
+    refine ⟨hne, fun y hy ↦ ?_⟩
     refine Finset.mem_erase.mpr ⟨?_, ?_⟩
     · intro hcontra
       have := hrep y hy
@@ -78,9 +78,9 @@ theorem isCutSetOf_iff {n : ℕ} (η : ER n) (c : Quotient η) (S : Finset (Fin 
       exact this (hcontra ▸ hy)
     · exact (mem_classFinset_out η c y).mpr (hall y hy)
   · rintro ⟨hne, hsub⟩
-    have hall : ∀ x ∈ S, Quotient.mk η x = c := fun x hx =>
+    have hall : ∀ x ∈ S, Quotient.mk η x = c := fun x hx ↦
       (mem_classFinset_out η c x).mp (Finset.mem_of_mem_erase (hsub hx))
-    refine ⟨⟨hne, fun x hx y hy => ?_, fun x hx hmem => ?_⟩, hall⟩
+    refine ⟨⟨hne, fun x hx y hy ↦ ?_, fun x hx hmem ↦ ?_⟩, hall⟩
     · exact Quotient.exact ((hall x hx).trans (hall y hy).symm)
     · rw [hall x hx] at hmem
       exact (Finset.mem_erase.mp (hsub hmem)).1 rfl
@@ -88,19 +88,19 @@ theorem isCutSetOf_iff {n : ℕ} (η : ER n) (c : Quotient η) (S : Finset (Fin 
 /-- **There are `2^{λ_c - 1} - 1` cut sets of a class of size `λ_c`.**  A count of subsets:
 every nonempty subset of the `λ_c - 1` non-representative elements, and no others. -/
 theorem card_cutSetsOf {n : ℕ} (η : ER n) (c : Quotient η) :
-    (Finset.univ.filter fun S : Finset (Fin n) =>
+    (Finset.univ.filter fun S : Finset (Fin n) ↦
         IsCutSet η S ∧ ∀ x ∈ S, Quotient.mk η x = c).card
       = 2 ^ (classSize η c - 1) - 1 := by
   classical
-  have hset : (Finset.univ.filter fun S : Finset (Fin n) =>
+  have hset : (Finset.univ.filter fun S : Finset (Fin n) ↦
       IsCutSet η S ∧ ∀ x ∈ S, Quotient.mk η x = c)
       = (cutBase η c).powerset.erase ∅ := by
     ext S
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase,
       Finset.mem_powerset]
     rw [isCutSetOf_iff η c S]
-    exact ⟨fun h => ⟨Finset.nonempty_iff_ne_empty.mp h.1, h.2⟩,
-      fun h => ⟨Finset.nonempty_iff_ne_empty.mpr h.1, h.2⟩⟩
+    exact ⟨fun h ↦ ⟨Finset.nonempty_iff_ne_empty.mp h.1, h.2⟩,
+      fun h ↦ ⟨Finset.nonempty_iff_ne_empty.mpr h.1, h.2⟩⟩
   rw [hset, Finset.card_erase_of_mem (Finset.empty_mem_powerset _),
     Finset.card_powerset, card_cutBase]
 
@@ -118,21 +118,21 @@ theorem cutClass_eq {n : ℕ} [NeZero n] {η : ER n} {S : Finset (Fin n)} (hS : 
 /-- **The cut sets of `η` number `Σ_c (2^{λ_c - 1} - 1)`.**  Fibred over the class each one
 cuts, and counted class by class. -/
 theorem card_cutSets {n : ℕ} [NeZero n] (η : ER n) :
-    (Finset.univ.filter fun S : Finset (Fin n) => IsCutSet η S).card
+    (Finset.univ.filter fun S : Finset (Fin n) ↦ IsCutSet η S).card
       = ∑ c : Quotient η, (2 ^ (classSize η c - 1) - 1) := by
   classical
   have hfib := Finset.card_eq_sum_card_fiberwise
-    (f := cutClass η) (s := Finset.univ.filter fun S : Finset (Fin n) => IsCutSet η S)
-    (t := (Finset.univ : Finset (Quotient η))) (fun S _ => Finset.mem_univ _)
+    (f := cutClass η) (s := Finset.univ.filter fun S : Finset (Fin n) ↦ IsCutSet η S)
+    (t := (Finset.univ : Finset (Quotient η))) (fun S _ ↦ Finset.mem_univ _)
   rw [hfib]
-  refine Finset.sum_congr rfl fun c _ => ?_
+  refine Finset.sum_congr rfl fun c _ ↦ ?_
   rw [← card_cutSetsOf η c]
   congr 1
   ext S
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   constructor
   · rintro ⟨hS, hc⟩
-    refine ⟨hS, fun x hx => ?_⟩
+    refine ⟨hS, fun x hx ↦ ?_⟩
     rw [← cutClass_eq hS hx, hc]
   · rintro ⟨hS, hall⟩
     obtain ⟨x, hx⟩ := hS.1
@@ -145,10 +145,10 @@ theorem card_covers_eq_card_cutSets {n : ℕ} (η : ER n) :
       = Nat.card {S : Finset (Fin n) // IsCutSet η S} := by
   classical
   refine (Nat.card_eq_of_bijective
-    (fun S : {S : Finset (Fin n) // IsCutSet η S} =>
+    (fun S : {S : Finset (Fin n) // IsCutSet η S} ↦
       (⟨splitBy η S.1, ?_⟩ : {ξ : ER n // Covers ξ η})) ?_).symm
   · obtain ⟨x, hx⟩ := S.2.1
-    refine splitBy_covers η S.1 (a := x) (fun y hy => S.2.2.1 y hy x hx) ⟨x, hx⟩ ?_
+    refine splitBy_covers η S.1 (a := x) (fun y hy ↦ S.2.2.1 y hy x hx) ⟨x, hx⟩ ?_
     refine ⟨(Quotient.mk η x).out, ?_, out_not_mem_cutSet S.2 x⟩
     exact Quotient.exact (Quotient.out_eq (Quotient.mk η x))
   · constructor

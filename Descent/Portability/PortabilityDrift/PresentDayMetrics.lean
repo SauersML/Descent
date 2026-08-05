@@ -2478,12 +2478,12 @@ theorem ldCorrelationDecay_strictAnti_fst
 
 /-! ### Generation-indexed population-genetic parameters
 
-The record itself is `Core.PopGenParameters`. It used to be written out here as
-`Descent.Core.PopGenParameters` -- the same fields and the same positivity proofs as
+The record itself is `Core.PopGenParameters`, and this module writes out no second copy of
+it. A local record with the same fields and the same positivity proofs as
 `DGP.EvolutionaryParameters`, differing only in spelling `μ` for `mu` and in dropping the
-divergence time. Two records meant a constraint tightened on one reached the other only
-if someone noticed. The accessors below are the generation-indexed laws this module adds
-to the shared record, not a second record.
+divergence time, would mean a constraint tightened on one reaches the other only if someone
+noticed. The accessors below are the generation-indexed laws this module adds to the shared
+record, not a second record.
 -/
 end PresentDayMetrics
 

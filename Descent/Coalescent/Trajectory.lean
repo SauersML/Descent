@@ -75,7 +75,7 @@ scoped instance instMeasurableSpaceListER (n : ℕ) : MeasurableSpace (List (ER 
 
 instance instMeasurableSingletonClassListER (n : ℕ) :
     MeasurableSingletonClass (List (ER n)) :=
-  ⟨fun _ => trivial⟩
+  ⟨fun _ ↦ trivial⟩
 
 /-- **The law of a whole trajectory of the jump chain**, newest state at the head.
 
@@ -83,10 +83,10 @@ Empirical status: NOT AN EMPIRICAL CLAIM.  It is `Kernel.jumpLaw` iterated; ever
 the uniform choice among covers that K-C (1.3) forces. -/
 noncomputable def chainLaw (n : ℕ) : ℕ → PMF (List (ER n))
   | 0 => PMF.pure [Delta n]
-  | k + 1 => (chainLaw n k).bind fun l =>
+  | k + 1 => (chainLaw n k).bind fun l ↦
       match l with
       | [] => PMF.pure []
-      | x :: rest => (jumpLaw x).map fun y => y :: x :: rest
+      | x :: rest => (jumpLaw x).map fun y ↦ y :: x :: rest
 
 /-- A trajectory after `k` jumps has `k + 1` entries. -/
 theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chainLaw n k).support) :
@@ -137,7 +137,7 @@ covers, and a total kernel cannot terminate, so it repeats.  Before absorption t
 descriptions agree exactly. -/
 theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
     (hl : l ∈ (chainLaw n k).support) :
-    List.Chain' (fun y x => Covers x y ∨ y = x) l := by
+    List.Chain' (fun y x ↦ Covers x y ∨ y = x) l := by
   classical
   induction k generalizing l with
   | zero =>
@@ -211,7 +211,7 @@ This is the object K-C (2.3) computes.  `Descent.Coalescent.JumpChain.absolutePr
 down Kingman's formula for it; `blockLaw` is the law itself, so the two now have somewhere to
 meet. -/
 noncomputable def blockLaw (n k : ℕ) : PMF (ER n) :=
-  (chainLaw n k).bind fun l =>
+  (chainLaw n k).bind fun l ↦
     match l with
     | [] => PMF.pure (Delta n)
     | x :: _ => PMF.pure x

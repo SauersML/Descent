@@ -50,7 +50,7 @@ same side of `S`.  Written as a kernel, so it is an equivalence relation by cons
 Empirical status: NOT AN EMPIRICAL CLAIM.  This is the inverse operation to `merge`, i.e.
 a description of the coalescent's transition graph, not of a population. -/
 noncomputable def splitBy {n : ℕ} (η : ER n) (S : Finset (Fin n)) : ER n :=
-  Setoid.ker fun x => (Quotient.mk η x, decide (x ∈ S))
+  Setoid.ker fun x ↦ (Quotient.mk η x, decide (x ∈ S))
 
 theorem splitBy_rel_iff {n : ℕ} (η : ER n) (S : Finset (Fin n)) (x y : Fin n) :
     (splitBy η S).r x y ↔ (η.r x y ∧ (x ∈ S ↔ y ∈ S)) := by
@@ -73,7 +73,7 @@ theorem splitBy_le {n : ℕ} (η : ER n) (S : Finset (Fin n)) : splitBy η S ≤
 every class contributes its `false` side, and the cut class contributes a `true` side too. -/
 theorem range_splitMap {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
     (hSa : ∀ x ∈ S, η.r x a) (hSne : ∃ x, x ∈ S) (hSproper : ∃ x, η.r x a ∧ x ∉ S) :
-    Set.range (fun x : Fin n => (Quotient.mk η x, decide (x ∈ S)))
+    Set.range (fun x : Fin n ↦ (Quotient.mk η x, decide (x ∈ S)))
       = {p | p.2 = false} ∪ {(Quotient.mk η a, true)} := by
   classical
   ext p
@@ -110,12 +110,12 @@ theorem blocks_splitBy {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
   classical
   letI : Fintype (Quotient η) := Fintype.ofFinite _
   have hrange := range_splitMap η S hSa hSne hSproper
-  have hequiv : Nat.card (Set.range (fun x : Fin n => (Quotient.mk η x, decide (x ∈ S))))
+  have hequiv : Nat.card (Set.range (fun x : Fin n ↦ (Quotient.mk η x, decide (x ∈ S))))
       = Nat.card ({p : Quotient η × Bool | p.2 = false} ∪ {(Quotient.mk η a, true)} : Set _) :=
     Nat.card_congr (Equiv.setCongr hrange)
   have hfalse : Nat.card ({p : Quotient η × Bool | p.2 = false} : Set _)
       = Nat.card (Quotient η) := by
-    refine Nat.card_congr ⟨fun p => p.1.1, fun c => ⟨(c, false), rfl⟩, ?_, ?_⟩
+    refine Nat.card_congr ⟨fun p ↦ p.1.1, fun c ↦ ⟨(c, false), rfl⟩, ?_, ?_⟩
     · rintro ⟨⟨c, b⟩, hb⟩
       simp only [Set.mem_setOf_eq] at hb
       subst hb
@@ -144,9 +144,9 @@ theorem splitBy_covers {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
 characterisation below needs, exposed rather than left inside its proof: `ξ` is exactly the
 cut of `merge ξ a b` along the class `a`. -/
 theorem eq_splitBy_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
-    ξ = splitBy (merge ξ a b) (Finset.univ.filter fun x => Quotient.mk ξ x = a) := by
+    ξ = splitBy (merge ξ a b) (Finset.univ.filter fun x ↦ Quotient.mk ξ x = a) := by
   classical
-  refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
+  refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩
   · refine (splitBy_rel_iff _ _ x y).mpr ⟨le_merge ξ a b hxy, ?_⟩
     have hcl : Quotient.mk ξ x = Quotient.mk ξ y := Quotient.sound hxy
     simp [hcl]
@@ -155,20 +155,20 @@ theorem eq_splitBy_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ 
     rcases (mergeMap_eq_iff ξ hab _ _).mp hmm with h | ⟨hx, hy⟩ | ⟨hx, hy⟩
     · exact Quotient.exact h
     · exfalso
-      have hxs : x ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
+      have hxs : x ∈ Finset.univ.filter fun z ↦ Quotient.mk ξ z = a :=
         Finset.mem_filter.mpr ⟨Finset.mem_univ x, hx⟩
-      have hys : y ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
+      have hys : y ∉ Finset.univ.filter fun z ↦ Quotient.mk ξ z = a := by
         simp only [Finset.mem_filter, Finset.mem_univ, true_and]
         rw [hy]
-        exact fun h => hab h.symm
+        exact fun h ↦ hab h.symm
       exact hys (hside.mp hxs)
     · exfalso
-      have hys : y ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
+      have hys : y ∈ Finset.univ.filter fun z ↦ Quotient.mk ξ z = a :=
         Finset.mem_filter.mpr ⟨Finset.mem_univ y, hy⟩
-      have hxs : x ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
+      have hxs : x ∉ Finset.univ.filter fun z ↦ Quotient.mk ξ z = a := by
         simp only [Finset.mem_filter, Finset.mem_univ, true_and]
         rw [hx]
-        exact fun h => hab h.symm
+        exact fun h ↦ hab h.symm
       exact hxs (hside.mpr hys)
 
 /-- **Every cover is a cut.**  Kingman's `ξ ≺ η` -- "`η` is obtained from `ξ` by combining
@@ -195,29 +195,29 @@ only in the balanced case `2ν = λ` is the count `C(λ, ν)/2`.  Both readings 
 total, `Σ_ν ½C(λ,ν) = 2^{λ-1} - 1`, which is `Coalescent.Program`. -/
 theorem splitBy_compl {n : ℕ} (η : ER n) (S : Finset (Fin n)) (a : Fin n)
     (hSa : ∀ x ∈ S, η.r x a) :
-    splitBy η S = splitBy η ((Finset.univ.filter fun z => η.r z a) \ S) := by
+    splitBy η S = splitBy η ((Finset.univ.filter fun z ↦ η.r z a) \ S) := by
   classical
   have key : ∀ x y : Fin n, η.r x y →
-      ((x ∈ S ↔ y ∈ S) ↔ (x ∈ (Finset.univ.filter fun z => η.r z a) \ S
-        ↔ y ∈ (Finset.univ.filter fun z => η.r z a) \ S)) := by
+      ((x ∈ S ↔ y ∈ S) ↔ (x ∈ (Finset.univ.filter fun z ↦ η.r z a) \ S
+        ↔ y ∈ (Finset.univ.filter fun z ↦ η.r z a) \ S)) := by
     intro x y hxy
     by_cases hx : η.r x a
     · have hy : η.r y a := η.iseqv.trans (η.iseqv.symm hxy) hx
-      have hmx : (x ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ x ∉ S := by
+      have hmx : (x ∈ (Finset.univ.filter fun z ↦ η.r z a) \ S) ↔ x ∉ S := by
         simp [Finset.mem_sdiff, hx]
-      have hmy : (y ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ y ∉ S := by
+      have hmy : (y ∈ (Finset.univ.filter fun z ↦ η.r z a) \ S) ↔ y ∉ S := by
         simp [Finset.mem_sdiff, hy]
       rw [hmx, hmy]
       tauto
-    · have hy : ¬ η.r y a := fun h => hx (η.iseqv.trans hxy h)
-      have hxS : x ∉ S := fun h => hx (hSa x h)
-      have hyS : y ∉ S := fun h => hy (hSa y h)
-      have hmx : x ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+    · have hy : ¬ η.r y a := fun h ↦ hx (η.iseqv.trans hxy h)
+      have hxS : x ∉ S := fun h ↦ hx (hSa x h)
+      have hyS : y ∉ S := fun h ↦ hy (hSa y h)
+      have hmx : x ∉ (Finset.univ.filter fun z ↦ η.r z a) \ S := by
         simp [Finset.mem_sdiff, hx]
-      have hmy : y ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+      have hmy : y ∉ (Finset.univ.filter fun z ↦ η.r z a) \ S := by
         simp [Finset.mem_sdiff, hy]
       simp [hxS, hyS, hmx, hmy]
-  refine Setoid.ext fun x y => ?_
+  refine Setoid.ext fun x y ↦ ?_
   rw [splitBy_rel_iff, splitBy_rel_iff]
   constructor
   · rintro ⟨h1, h2⟩
@@ -230,7 +230,7 @@ theorem exists_rel_ne_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
     ∃ x y : Fin n, x ≠ y ∧ ξ.r x y := by
   by_contra hcon
   push_neg at hcon
-  refine h (Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩)
+  refine h (Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩)
   · by_contra hne
     exact hcon x y hne hxy
   · have hxy' : x = y := hxy
@@ -255,7 +255,7 @@ theorem exists_covers_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
   have hSproper : ∃ z, ξ.r z x ∧ z ∉ ({x} : Finset (Fin n)) := by
     refine ⟨y, ξ.iseqv.symm hrel, ?_⟩
     rw [Finset.mem_singleton]
-    exact fun hcontra => hxy hcontra.symm
+    exact fun hcontra ↦ hxy hcontra.symm
   exact ⟨splitBy ξ {x}, splitBy_covers ξ {x} hSa hSne hSproper⟩
 
 /-- **A cut is determined by its set, up to swapping the two pieces.**  Cutting a class
@@ -274,7 +274,7 @@ theorem splitBy_eq_iff {n : ℕ} (η : ER n) (S T : Finset (Fin n)) :
       exact ((splitBy_rel_iff η S x y).mp
         (h ▸ (splitBy_rel_iff η T x y).mpr ⟨hxy, hT⟩)).2
   · intro h
-    refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
+    refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩
     · obtain ⟨h1, h2⟩ := (splitBy_rel_iff η S x y).mp hxy
       exact (splitBy_rel_iff η T x y).mpr ⟨h1, (h x y h1).mp h2⟩
     · obtain ⟨h1, h2⟩ := (splitBy_rel_iff η T x y).mp hxy

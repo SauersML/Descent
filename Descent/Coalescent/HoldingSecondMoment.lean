@@ -49,7 +49,7 @@ theorem integral_sq_mul_exp_neg : ∫ x in Ioi (0 : ℝ), x ^ 2 * Real.exp (-x) 
     simpa using h
   rw [htwo] at hgamma
   rw [hgamma]
-  refine setIntegral_congr_fun measurableSet_Ioi fun x _ => ?_
+  refine setIntegral_congr_fun measurableSet_Ioi fun x _ ↦ ?_
   rw [show (3 : ℝ) - 1 = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
   ring
 
@@ -60,18 +60,18 @@ theorem integral_sq_mul_holdDensity {d : ℝ} (hd : 0 < d) :
     ∫ t in Ioi (0 : ℝ), t ^ 2 * (d * Real.exp (-(d * t))) = 2 / d ^ 2 := by
   have hdne : d ≠ 0 := ne_of_gt hd
   have hpt : ∀ t : ℝ, t ^ 2 * (d * Real.exp (-(d * t)))
-      = d⁻¹ * ((fun x : ℝ => x ^ 2 * Real.exp (-x)) (d * t)) := by
+      = d⁻¹ * ((fun x : ℝ ↦ x ^ 2 * Real.exp (-x)) (d * t)) := by
     intro t
     show t ^ 2 * (d * Real.exp (-(d * t)))
       = d⁻¹ * ((d * t) ^ 2 * Real.exp (-(d * t)))
     field_simp
-  have hcomp : ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x ^ 2 * Real.exp (-x)) (d * t)
+  have hcomp : ∫ t in Ioi (0 : ℝ), (fun x : ℝ ↦ x ^ 2 * Real.exp (-x)) (d * t)
       = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x ^ 2 * Real.exp (-x) :=
-    integral_comp_mul_left_Ioi (fun x : ℝ => x ^ 2 * Real.exp (-x)) 0 hd
+    integral_comp_mul_left_Ioi (fun x : ℝ ↦ x ^ 2 * Real.exp (-x)) 0 hd
   calc ∫ t in Ioi (0 : ℝ), t ^ 2 * (d * Real.exp (-(d * t)))
-      = ∫ t in Ioi (0 : ℝ), d⁻¹ * ((fun x : ℝ => x ^ 2 * Real.exp (-x)) (d * t)) := by
-        exact setIntegral_congr_fun measurableSet_Ioi fun t _ => hpt t
-    _ = d⁻¹ * ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x ^ 2 * Real.exp (-x)) (d * t) := by
+      = ∫ t in Ioi (0 : ℝ), d⁻¹ * ((fun x : ℝ ↦ x ^ 2 * Real.exp (-x)) (d * t)) := by
+        exact setIntegral_congr_fun measurableSet_Ioi fun t _ ↦ hpt t
+    _ = d⁻¹ * ∫ t in Ioi (0 : ℝ), (fun x : ℝ ↦ x ^ 2 * Real.exp (-x)) (d * t) := by
         rw [integral_const_mul]
     _ = d⁻¹ * (d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x ^ 2 * Real.exp (-x)) := by rw [hcomp]
     _ = 2 / d ^ 2 := by

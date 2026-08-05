@@ -170,10 +170,10 @@ theorem ldDecayPerGeneration_at_reference_point :
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
 and `ldDecayPerGeneration_eq_admixtureLDDecay` are absent here as redundant, not as wrong.
 All four spellings CALL the shared kernel
-`Core.geometricDecay`, and these two are its consequences. The hub used to be a
-definition in `Program.Conventions` at depth 12, related to its four spellings by
-three identity theorems; it is now a kernel at depth 0 and the spellings CALL it, so a
-divergence is not a failed proof but a body that no longer says what it says. The four
+`Core.geometricDecay`, and these two are its consequences. The hub is a kernel at depth 0
+and the spellings CALL it, so a divergence between them is not a failed identity theorem
+but a body that no longer says what it says -- which is what a hub at depth 12 related to
+its spellings by three identity theorems could not deliver. The four
 names are kept -- `admixtureLDDecay` carries a measured one-sided bias against
 finite-population retention that a bare primitive has nowhere to put.
 -/

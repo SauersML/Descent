@@ -225,18 +225,18 @@ is the sense in which the many-deme equilibrium below is a specialisation of the
 finite-deme one. -/
 theorem islandDemeCorrection_tendsto_one :
     Tendsto islandDemeCorrection atTop (𝓝 1) := by
-  have hEq : islandDemeCorrection =ᶠ[atTop] fun d : ℝ => 1 + 1 / (d - 1) := by
+  have hEq : islandDemeCorrection =ᶠ[atTop] fun d : ℝ ↦ 1 + 1 / (d - 1) := by
     filter_upwards [eventually_gt_atTop (1 : ℝ)] with d hd
     have h : d - 1 ≠ 0 := by intro hc; rw [sub_eq_zero] at hc; exact absurd hc (by linarith)
     unfold islandDemeCorrection ratio
     field_simp
     ring
   rw [tendsto_congr' hEq]
-  have hsub : Tendsto (fun d : ℝ => d - 1) atTop atTop :=
+  have hsub : Tendsto (fun d : ℝ ↦ d - 1) atTop atTop :=
     (tendsto_atTop_add_const_right atTop (-1 : ℝ) tendsto_id).congr
-      (fun x => by show x + -1 = x - 1; ring)
-  have h : Tendsto (fun d : ℝ => 1 / (d - 1)) atTop (𝓝 0) :=
-    (tendsto_inv_atTop_zero.comp hsub).congr (fun x => (one_div (x - 1)).symm)
+      (fun x ↦ by show x + -1 = x - 1; ring)
+  have h : Tendsto (fun d : ℝ ↦ 1 / (d - 1)) atTop (𝓝 0) :=
+    (tendsto_inv_atTop_zero.comp hsub).congr (fun x ↦ (one_div (x - 1)).symm)
   simpa using tendsto_const_nhds.add h
 
 /-! ### The master equilibrium -/

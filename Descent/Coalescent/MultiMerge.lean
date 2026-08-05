@@ -42,7 +42,7 @@ open scoped Classical
 
 /-- Fold every block in `S` onto `a`. -/
 noncomputable def mergeSetMap {n : ℕ} (ξ : ER n) (S : Finset (Quotient ξ)) (a : Quotient ξ) :
-    Quotient ξ → Quotient ξ := fun c => if c ∈ S then a else c
+    Quotient ξ → Quotient ξ := fun c ↦ if c ∈ S then a else c
 
 /-- **Merge a whole set of blocks at once.**  The `Λ`-coalescent's move: `|S|` blocks become
 one.  Written as a kernel, so it is an equivalence relation with no argument.
@@ -51,7 +51,7 @@ Empirical status: NOT AN EMPIRICAL CLAIM.  It is the edge set of the multiple-me
 coalescent's transition graph, not a claim about any population. -/
 noncomputable def mergeSet {n : ℕ} (ξ : ER n) (S : Finset (Quotient ξ)) (a : Quotient ξ) :
     ER n :=
-  Setoid.ker fun x => mergeSetMap ξ S a (Quotient.mk ξ x)
+  Setoid.ker fun x ↦ mergeSetMap ξ S a (Quotient.mk ξ x)
 
 theorem mergeSetMap_of_mem {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)} {a c : Quotient ξ}
     (h : c ∈ S) : mergeSetMap ξ S a c = a := by
@@ -71,7 +71,7 @@ theorem le_mergeSet {n : ℕ} (ξ : ER n) (S : Finset (Quotient ξ)) (a : Quotie
 /-- The image of the fold: everything outside `S`, plus the block they all became. -/
 theorem range_mergeSetMap {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)} {a : Quotient ξ}
     (ha : a ∈ S) :
-    Set.range (fun x : Fin n => mergeSetMap ξ S a (Quotient.mk ξ x))
+    Set.range (fun x : Fin n ↦ mergeSetMap ξ S a (Quotient.mk ξ x))
       = {c | c ∉ S} ∪ {a} := by
   ext c
   simp only [Set.mem_range, Set.mem_union, Set.mem_setOf_eq, Set.mem_singleton_iff]
@@ -124,7 +124,7 @@ theorem blocks_mergeSet {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)} {a : Qu
 onto `a`. -/
 theorem mergeSet_pair {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     mergeSet ξ {a, b} a = merge ξ a b := by
-  refine Setoid.ext fun x y => ?_
+  refine Setoid.ext fun x y ↦ ?_
   have hmap : ∀ c : Quotient ξ, mergeSetMap ξ {a, b} a c = mergeMap ξ a b c := by
     intro c
     by_cases hc : c = b

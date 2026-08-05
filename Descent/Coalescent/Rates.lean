@@ -101,11 +101,12 @@ theorem deathRate_ne_zero {k : ℕ} (hk : 2 ≤ k) : deathRate k ≠ 0 :=
 
 /-- The reciprocal ladder telescopes, indexed from the smallest informative sample.
 
-This identity used to be imported from `Blindness.SpectrumIdentifiability`, which reasons
-about the same `k(k-1)/2` under the name `coalescentRate` -- so the 12,000-line derivation
-of the coalescent depended on an applied module about spectrum identifiability, and
-nothing in the applied layer depended on the coalescent.  The dependency is now the other
-way round, which is the only direction in which the derivation can be load-bearing. -/
+This identity is proved here, in the coalescent's own derivation.
+`Blindness.SpectrumIdentifiability` reasons about the same `k(k-1)/2` under the name
+`coalescentRate` and imports it from here, which is the only direction in which the
+derivation can be load-bearing: a 12,000-line derivation resting on an applied module
+about spectrum identifiability would be an applied result the derivation cannot do
+without. -/
 theorem one_div_deathRate_add_two (k : ℕ) :
     1 / deathRate (k + 2) = 2 * (1 / ((k : ℝ) + 1) - 1 / ((k : ℝ) + 2)) := by
   have h1 : ((k : ℝ) + 1) ≠ 0 := by positivity
@@ -194,14 +195,14 @@ theorem meanTransitTime_lt_two (n : ℕ) : meanTransitTime n < 2 := by
 
 theorem meanTransitTime_nonneg (n : ℕ) : 0 ≤ meanTransitTime n := by
   unfold meanTransitTime
-  refine Finset.sum_nonneg fun k _ => ?_
+  refine Finset.sum_nonneg fun k _ ↦ ?_
   exact one_div_nonneg.mpr (deathRate_pos (by omega)).le
 
 /-- The mean transit time increases to `2`: doubling and redoubling the sample buys the
 remaining `2/n`, and no more. -/
 theorem tendsto_meanTransitTime :
-    Tendsto (fun n : ℕ => meanTransitTime (n + 1)) atTop (nhds 2) := by
-  have hzero : Tendsto (fun n : ℕ => 2 / ((n : ℝ) + 1)) atTop (nhds 0) := by
+    Tendsto (fun n : ℕ ↦ meanTransitTime (n + 1)) atTop (nhds 2) := by
+  have hzero : Tendsto (fun n : ℕ ↦ 2 / ((n : ℝ) + 1)) atTop (nhds 0) := by
     simpa [div_eq_mul_inv] using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul (2 : ℝ)
   simpa only [meanTransitTime_succ, sub_zero] using tendsto_const_nhds.sub hzero
 
@@ -215,10 +216,10 @@ the process enters from `∞` instantly and is in a finite state at every positi
 /-- A shifted reciprocal tends to zero; used twice below, for the tail sum and for the
 product limit. -/
 theorem tendsto_two_div_shift {c : ℝ} (hc : 2 ≤ c) :
-    Tendsto (fun m : ℕ => 2 / (c + (m : ℝ) - 1)) atTop (nhds 0) := by
-  have hlim : Tendsto (fun m : ℕ => 2 * (1 / ((m : ℝ) + 1))) atTop (nhds 0) := by
+    Tendsto (fun m : ℕ ↦ 2 / (c + (m : ℝ) - 1)) atTop (nhds 0) := by
+  have hlim : Tendsto (fun m : ℕ ↦ 2 * (1 / ((m : ℝ) + 1))) atTop (nhds 0) := by
     simpa using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul (2 : ℝ)
-  refine squeeze_zero (fun m => ?_) (fun m => ?_) hlim
+  refine squeeze_zero (fun m ↦ ?_) (fun m ↦ ?_) hlim
   · have hm : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
     have hpos : (0 : ℝ) < c + (m : ℝ) - 1 := by linarith
     positivity
@@ -248,15 +249,15 @@ theorem sum_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) (m : ℕ) :
 many lineages to `k` of them.  For `k = 2` it is `2`, the mean of the transit time `T`
 itself, matching `meanTransitTime_lt_two` in the limit. -/
 theorem hasSum_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) :
-    HasSum (fun j : ℕ => 1 / deathRate (k + j)) (2 / ((k : ℝ) - 1)) := by
+    HasSum (fun j : ℕ ↦ 1 / deathRate (k + j)) (2 / ((k : ℝ) - 1)) := by
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   rw [hasSum_iff_tendsto_nat_of_nonneg
-    (fun j => one_div_nonneg.mpr (deathRate_pos (le_trans hk (Nat.le_add_right k j))).le)]
+    (fun j ↦ one_div_nonneg.mpr (deathRate_pos (le_trans hk (Nat.le_add_right k j))).le)]
   simpa only [sum_one_div_deathRate_tail hk, sub_zero] using
     tendsto_const_nhds.sub (tendsto_two_div_shift hk')
 
 theorem summable_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) :
-    Summable fun j : ℕ => 1 / deathRate (k + j) :=
+    Summable fun j : ℕ ↦ 1 / deathRate (k + j) :=
   (hasSum_one_div_deathRate_tail hk).summable
 
 theorem tsum_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) :
@@ -342,10 +343,10 @@ theorem survivalFactor_partialProd_eq_mul {x : ℕ} (hx : 2 ≤ x) (m : ℕ) :
 
 /-- **The infinite product of K-G (5.11) converges to `(x-1)/(x+1)`.** -/
 theorem tendsto_survivalFactor_partialProd {x : ℕ} (hx : 2 ≤ x) :
-    Tendsto (fun m : ℕ => ∏ j ∈ Finset.range m, (1 - 1 / deathRate (x + 1 + j)))
+    Tendsto (fun m : ℕ ↦ ∏ j ∈ Finset.range m, (1 - 1 / deathRate (x + 1 + j)))
       atTop (nhds (survivalFactor x)) := by
   have hx' : (2 : ℝ) ≤ (x : ℝ) := by exact_mod_cast hx
-  have hcorr : Tendsto (fun m : ℕ => 1 + 2 / ((x : ℝ) + (m : ℝ) - 1)) atTop (nhds 1) := by
+  have hcorr : Tendsto (fun m : ℕ ↦ 1 + 2 / ((x : ℝ) + (m : ℝ) - 1)) atTop (nhds 1) := by
     simpa using tendsto_const_nhds.add (tendsto_two_div_shift hx')
   simpa only [survivalFactor_partialProd_eq_mul hx, mul_one] using
     tendsto_const_nhds.mul hcorr
@@ -381,7 +382,7 @@ alone. -/
 theorem measure_two_le_le_three_mul_integral {Ω : Type*} [MeasurableSpace Ω]
     (μ : Measure Ω) [IsFiniteMeasure μ] (K : Ω → ℕ) (hK : ∀ ω, 1 ≤ K ω)
     (hmeas : MeasurableSet {ω | 2 ≤ K ω})
-    (hint : Integrable (fun ω => survivalFactor (K ω)) μ) :
+    (hint : Integrable (fun ω ↦ survivalFactor (K ω)) μ) :
     (μ {ω | 2 ≤ K ω}).toReal ≤ 3 * ∫ ω, survivalFactor (K ω) ∂μ := by
   have hpt : ∀ ω, Set.indicator {ω | 2 ≤ K ω} (1 : Ω → ℝ) ω ≤ 3 * survivalFactor (K ω) := by
     intro ω

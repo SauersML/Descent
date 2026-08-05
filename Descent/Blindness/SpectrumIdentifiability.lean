@@ -85,10 +85,11 @@ open Filter
 /-! ## The Kingman rate ladder and its reciprocal sum -/
 
 /-! The ladder itself -- `d_m = m(m-1)/2`, its telescoping reciprocal and the exact
-partial sums -- is `Descent.Coalescent.Rates`, imported above.  It used to be defined
-HERE, under the name `coalescentRate`, with `Rates` importing this module to
-get it: the 12,000-line derivation of the coalescent depended on a module about spectrum
-identifiability, and nothing in the applied layer depended on the coalescent at all.
+partial sums -- is `Descent.Coalescent.Rates`, imported above.  The direction of that
+import is the point: this applied module rests on the 12,000-line derivation of the
+coalescent, and the derivation rests on nothing here.  Naming the ladder locally, as
+`coalescentRate`, would reverse the edge and make the derivation depend on a module about
+spectrum identifiability.
 
 The empirical record for the ladder does not move with the arithmetic, because it is a
 statement about THIS module's use of it.
