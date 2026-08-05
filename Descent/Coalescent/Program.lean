@@ -44,10 +44,15 @@ combinatorial half.  `JumpChain.absoluteProb_recursion` carries the factor as a 
 weight until that is done.
 
 **2. Ewens normalisation for general `n`.**  `Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`.
-The natural proof is the Chinese-restaurant recursion: adding an `(n+1)`-th element to a
-state either starts a new class (weight `θ`) or joins a class of size `λ` (weight `λ`), so
-the total gains a factor `θ + n`.  Formalising it needs the bijection
-`𝓔_{n+1} ≃ Σ_{ξ ∈ 𝓔ₙ} Option (blocks of ξ)`, which the group does not have.
+The proof is the Chinese-restaurant recursion: adding an `(n+1)`-th element either starts a
+new class (weight `θ`) or joins a class of size `λ` (weight `λ`), so the total gains a
+factor `θ + n`.  `Descent.Coalescent.Extend` now supplies everything except the assembly:
+the fibre of restriction over `ξ` is `Option (Quotient ξ)` (`restrict_extend`,
+`extend_injective`, `exists_extend`), seating changes the block count as required
+(`blocks_extend_none`, `blocks_extend_some`), it changes exactly one class size and by one
+(`card_fiber_self`, `card_fiber_of_ne`, `card_fiber_none_old`, `card_fiber_none_new`), and
+the sizes sum to `n` (`sum_classSize`).  What is left is to run the fibrewise sum with those
+weights, and that has not been done.
 
 **3. K-C Theorem 2, the paintbox representation.**  Every exchangeable random equivalence
 relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the

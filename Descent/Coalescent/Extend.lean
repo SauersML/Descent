@@ -311,6 +311,133 @@ theorem blocks_extend_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _), Nat.card_congr (Equiv.setCongr hrange)]
   exact (Nat.card_congr (Equiv.ofInjective _ (Option.some_injective (Quotient ξ)))).symm
 
+/-! ### Class sizes across a seating
+
+The other half of the Chinese-restaurant weight.  Kingman's `λ₁, …, λ_k` are the class
+sizes, and what the recursion needs is that seating the new element at class `c` raises
+`λ_c` by one and leaves every other class alone.  Each statement below is the cardinality of
+one fibre of `extendMap`, and the fibres of `extendMap` ARE the classes of the extension --
+that is what `Setoid.ker` means. -/
+
+/-- `λ_c`, the size of a class.  Kingman's `λ` in K-C (2.3) and K-G (3.8). -/
+noncomputable def classSize {n : ℕ} (ξ : ER n) (c : Quotient ξ) : ℕ :=
+  (Finset.univ.filter fun x : Fin n => Quotient.mk ξ x = c).card
+
+/-- **`λ₁ + ⋯ + λ_k = n`.**  The class sizes of a relation on a sample of `n` sum to `n`.
+`Descent.Coalescent.JumpChain.absoluteProb_recursion` takes this as a hypothesis on its
+multiset of sizes; here it is a theorem about the relation those sizes come from. -/
+theorem sum_classSize {n : ℕ} (ξ : ER n) :
+    ∑ c : Quotient ξ, classSize ξ c = n := by
+  classical
+  letI : Fintype (Quotient ξ) := Fintype.ofFinite _
+  have h := Fintype.card_eq_sum_card_fiberwise
+    (f := fun x : Fin n => Quotient.mk ξ x) (t := (Finset.univ : Finset (Quotient ξ)))
+    (fun x _ => Finset.mem_univ _)
+  rw [Fintype.card_fin] at h
+  exact h.symm
+
+/-- Seating at `c` leaves every other class untouched. -/
+theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ c) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ (some c) x = some d}
+      = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
+  classical
+  refine (Nat.card_eq_of_bijective
+    (fun p : {x : Fin n // Quotient.mk ξ x = d} =>
+      (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
+        {x : Fin (n + 1) // extendMap ξ (some c) x = some d})) ?_).symm
+  constructor
+  · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
+    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q => (q.1 : ℕ)) h
+    exact Subtype.ext (Fin.ext hval)
+  · rintro ⟨y, hy⟩
+    rcases lt_or_ge (y : ℕ) n with hylt | hyge
+    · refine ⟨⟨⟨y, hylt⟩, ?_⟩, ?_⟩
+      · rw [extendMap_of_lt ξ _ y hylt] at hy
+        exact Option.some_injective _ hy
+      · exact Subtype.ext (Fin.ext rfl)
+    · exfalso
+      rw [eq_last_of_not_lt (by omega), extendMap_last] at hy
+      exact hne (Option.some_injective _ hy).symm
+
+/-- Seating at `c` raises `λ_c` by exactly one. -/
+theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ (some c) x = some c}
+      = Nat.card {x : Fin n // Quotient.mk ξ x = c} + 1 := by
+  classical
+  have hbij : Function.Bijective
+      (fun p : Option {x : Fin n // Quotient.mk ξ x = c} =>
+        (match p with
+          | none => ⟨Fin.last n, by rw [extendMap_last]⟩
+          | some q => ⟨Fin.castLE (Nat.le_succ n) q.1, by rw [extendMap_castLE, q.2]⟩ :
+            {x : Fin (n + 1) // extendMap ξ (some c) x = some c})) := by
+    constructor
+    · intro p q h
+      match p, q with
+      | none, none => rfl
+      | none, some b =>
+          exfalso
+          have hval : (n : ℕ) = (b.1 : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
+          exact absurd b.1.isLt (by omega)
+      | some a, none =>
+          exfalso
+          have hval : (a.1 : ℕ) = (n : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
+          exact absurd a.1.isLt (by omega)
+      | some a, some b =>
+          have hval : (a.1 : ℕ) = (b.1 : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
+          exact congrArg some (Subtype.ext (Fin.ext hval))
+    · rintro ⟨y, hy⟩
+      rcases lt_or_ge (y : ℕ) n with hylt | hyge
+      · refine ⟨some ⟨⟨y, hylt⟩, ?_⟩, ?_⟩
+        · rw [extendMap_of_lt ξ _ y hylt] at hy
+          exact Option.some_injective _ hy
+        · exact Subtype.ext (Fin.ext rfl)
+      · exact ⟨none, Subtype.ext (Fin.ext (by simp [eq_last_of_not_lt (by omega : ¬ (y : ℕ) < n)]))⟩
+  rw [← Nat.card_eq_of_bijective _ hbij, Nat.card_option]
+
+/-- Starting a new class leaves every old class untouched. -/
+theorem card_fiber_none_old {n : ℕ} (ξ : ER n) (d : Quotient ξ) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ none x = some d}
+      = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
+  classical
+  refine (Nat.card_eq_of_bijective
+    (fun p : {x : Fin n // Quotient.mk ξ x = d} =>
+      (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
+        {x : Fin (n + 1) // extendMap ξ none x = some d})) ?_).symm
+  constructor
+  · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
+    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q => (q.1 : ℕ)) h
+    exact Subtype.ext (Fin.ext hval)
+  · rintro ⟨y, hy⟩
+    rcases lt_or_ge (y : ℕ) n with hylt | hyge
+    · refine ⟨⟨⟨y, hylt⟩, ?_⟩, ?_⟩
+      · rw [extendMap_of_lt ξ _ y hylt] at hy
+        exact Option.some_injective _ hy
+      · exact Subtype.ext (Fin.ext rfl)
+    · exfalso
+      rw [eq_last_of_not_lt (by omega), extendMap_last] at hy
+      exact Option.noConfusion hy
+
+/-- And the class it starts is a singleton -- the `(λ - 1)! = 0! = 1` that leaves the
+factorial product unchanged when a new class opens. -/
+theorem card_fiber_none_new {n : ℕ} (ξ : ER n) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ none x = none} = 1 := by
+  classical
+  have hbij : Function.Bijective
+      (fun _ : Unit => (⟨Fin.last n, by rw [extendMap_last]⟩ :
+        {x : Fin (n + 1) // extendMap ξ none x = none})) := by
+    constructor
+    · rintro ⟨⟩ ⟨⟩ _
+      rfl
+    · rintro ⟨y, hy⟩
+      refine ⟨(), Subtype.ext (Fin.ext ?_)⟩
+      rcases lt_or_ge (y : ℕ) n with hylt | hyge
+      · exfalso
+        rw [extendMap_of_lt ξ _ y hylt] at hy
+        exact Option.noConfusion hy
+      · simp [eq_last_of_not_lt (by omega : ¬ (y : ℕ) < n)]
+  rw [← Nat.card_eq_of_bijective _ hbij]
+  simp
+
 end Coalescent
 
 end Descent
