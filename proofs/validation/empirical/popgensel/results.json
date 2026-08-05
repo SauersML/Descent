@@ -915,5 +915,138 @@
     }
    }
   ]
+ },
+ "H": {
+  "cell": "H",
+  "target": "ibdFst",
+  "guard": "PGSEL_H1",
+  "argument_source": "msprime ring stepping-stone; observable is Rousset's a_r from identity probabilities, discriminated by its SLOPE in distance, so no F_ST estimator convention enters",
+  "detail": [
+   {
+    "D": 40,
+    "Nd": 20,
+    "m": 0.05,
+    "sigma_sq": 0.1,
+    "seeds": 6,
+    "a_r_mean": {
+     "1": 0.12091945383352515,
+     "2": 0.26960297634633384,
+     "3": 0.38219166670692667,
+     "4": 0.4992318680915236,
+     "5": 0.6043555984337653,
+     "6": 0.7287142898695972
+    },
+    "a_r_sem": {
+     "1": 0.014230982925781599,
+     "2": 0.029883488796477845,
+     "3": 0.05137730615593565,
+     "4": 0.06402555740819221,
+     "5": 0.07072251010908465,
+     "6": 0.08187872973363478
+    },
+    "slope": 0.12459198613921035,
+    "slope_sem": 0.010367924651382596,
+    "positive_control_intercept": 0.00022767662169071297,
+    "positive_control_intercept_sem": 0.02035628393564262,
+    "pred": {
+     "corpus 1/(4 N sigma^2)": 0.125,
+     "COMP 1/(2 N sigma^2)": 0.25,
+     "COMP 1/(8 N sigma^2)": 0.0625,
+     "PLANTED 1.4x corpus": 0.175
+    },
+    "sems": {
+     "corpus 1/(4 N sigma^2)": 0.03935347473182463,
+     "COMP 1/(2 N sigma^2)": 12.095768254263508,
+     "COMP 1/(8 N sigma^2)": -5.988853915034016,
+     "PLANTED 1.4x corpus": 4.861919386544496
+    }
+   },
+   {
+    "D": 40,
+    "Nd": 40,
+    "m": 0.1,
+    "sigma_sq": 0.2,
+    "seeds": 6,
+    "a_r_mean": {
+     "1": 0.030953392022113824,
+     "2": 0.06276875376190587,
+     "3": 0.0862732129899985,
+     "4": 0.1129724247997466,
+     "5": 0.12491892265425338,
+     "6": 0.1501782785285925
+    },
+    "a_r_sem": {
+     "1": 0.007386499013466613,
+     "2": 0.006686672587411297,
+     "3": 0.010540255274177237,
+     "4": 0.014035911766495927,
+     "5": 0.010636633304980552,
+     "6": 0.014840801397796102
+    },
+    "slope": 0.023523614861438554,
+    "slope_sem": 0.002429315769788626,
+    "positive_control_intercept": 0.012186615360986947,
+    "positive_control_intercept_sem": 0.007528086310942192,
+    "pred": {
+     "corpus 1/(4 N sigma^2)": 0.03125,
+     "COMP 1/(2 N sigma^2)": 0.0625,
+     "COMP 1/(8 N sigma^2)": 0.015625,
+     "PLANTED 1.4x corpus": 0.04375
+    },
+    "sems": {
+     "corpus 1/(4 N sigma^2)": 3.180477908490964,
+     "COMP 1/(2 N sigma^2)": 16.044182326265787,
+     "COMP 1/(8 N sigma^2)": -3.2513743003964484,
+     "PLANTED 1.4x corpus": 8.325959675600894
+    }
+   }
+  ]
+ },
+ "H_large_ring": {
+  "cell": "H",
+  "target": "ibdFst",
+  "guard": "PGSEL_H1",
+  "argument_source": "msprime ring stepping-stone; observable is Rousset's a_r from identity probabilities, discriminated by its SLOPE in distance, so no F_ST estimator convention enters",
+  "detail": [
+   {
+    "D": 100,
+    "Nd": 40,
+    "m": 0.1,
+    "sigma_sq": 0.2,
+    "seeds": 6,
+    "a_r_mean": {
+     "1": 0.024307249315927856,
+     "2": 0.054619694043488265,
+     "3": 0.07732960623714641,
+     "4": 0.10848674289387872,
+     "5": 0.13692818603082949,
+     "6": 0.16628577536378145
+    },
+    "a_r_sem": {
+     "1": 0.004462846454866384,
+     "2": 0.004955246414452092,
+     "3": 0.00637817308588978,
+     "4": 0.00775600598546203,
+     "5": 0.008699042937865898,
+     "6": 0.011770437432099707
+    },
+    "slope": 0.027974335607425148,
+    "slope_sem": 0.0017207897011317314,
+    "positive_control_intercept": -0.0033241575720152354,
+    "positive_control_intercept_sem": 0.00500467185090738,
+    "pred": {
+     "corpus 1/(4 N sigma^2)": 0.03125,
+     "COMP 1/(2 N sigma^2)": 0.0625,
+     "COMP 1/(8 N sigma^2)": 0.015625,
+     "PLANTED 1.4x corpus": 0.04375
+    },
+    "sems": {
+     "corpus 1/(4 N sigma^2)": 1.9035820532982668,
+     "COMP 1/(2 N sigma^2)": 20.063848807247023,
+     "COMP 1/(8 N sigma^2)": -7.176551323676112,
+     "PLANTED 1.4x corpus": 9.167688754877767
+    }
+   }
+  ]
  }
 }

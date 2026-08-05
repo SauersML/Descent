@@ -33,9 +33,11 @@ covariance structure under AM. The key parameters are:
 The heritability `h2` is not among them. It is `V_A / V_P`, so it is computed rather than
 supplied, and `0 < h2 < 1` is a theorem rather than an assumption.
 
-At AM equilibrium, the additive variance inflates to V_A / (1 - r*h2),
-the observed heritability inflates to h2 / (1 - r*h2), and PGS R²
-inflates proportionally.
+At AM equilibrium, the additive variance inflates to V_A / (1 - r*h2), and the
+observed heritability and PGS R² inflate by the SMALLER factor
+1 / (1 - r*h2*(1 - h2)) — smaller because they are ratios to the phenotypic
+variance, which inflates along with its additive part. Reading the additive
+inflation as the R² inflation is measurably wrong; see `pgsR2AM`.
 
 Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
 substantiates nothing below. It is an empirical study of the polygenic-score portability
@@ -336,13 +338,47 @@ portability comparisons. We derive all results from the AM model.
 
 section AMAndHeritability
 
+/-- **The R² and heritability denominator under AM.**
+
+The additive variance inflates by `1/(1 - r·h²)` (`equilibriumVariance`, the
+fixed point of `amVarianceStep`) while the environmental variance is untouched,
+so the TOTAL variance inflates too — by `1 + h²(I - 1)` with `I = 1/(1 - r·h²)`.
+A ratio to the total variance therefore inflates by `I / (1 + h²(I - 1))`, which
+is `1 / (1 - r·h²(1 - h²))`. The `(1 - h²)` factor is the whole content: it is
+the share of the phenotypic variance that does NOT inflate.
+
+Positivity is a theorem rather than a field because `r·h²(1 - h²) ≤ 1/4` for any
+model in the class, so no stability hypothesis beyond the structure's own is
+needed. -/
+theorem AssortativeMatingModel.ratio_denom_pos (m : AssortativeMatingModel) :
+    0 < 1 - m.r * m.h2 * (1 - m.h2) := by
+  have h0 : 0 < m.h2 := m.h2_pos
+  have h1 : m.h2 < 1 := m.h2_lt_one
+  have hr : m.r < 1 := m.r_lt_one
+  have hr0 : 0 < m.r := m.r_pos
+  nlinarith [sq_nonneg (m.h2 - 1 / 2), mul_pos hr0 h0]
+
 /-- **AM-inflated observed heritability.**
-    Under AM, h2_observed = V_A(AM) / V_P(AM).
-    Since V_A inflates by 1/(1-r*h2) and V_P increases by the same
-    additive variance increase, h2_obs = h2 / (1 - r*h2) approximately
-    (exact when environmental variance is unchanged). -/
+    Under AM, h2_observed = V_A(AM) / V_P(AM) = h2 / (1 - r*h2*(1 - h2)).
+
+    **The denominator is not `1 - r*h2`.** That is the inflation factor of the
+    NUMERATOR alone. With the environmental variance unchanged — which is
+    Fisher's model, and what makes assortment a redistribution rather than a
+    creation of variance — the phenotypic variance in the denominator inflates
+    as well, and the two inflations partly cancel. Writing `h2 / (1 - r*h2)`
+    here reports the numerator's inflation as if the denominator were fixed;
+    at `r = 0.5, h2 = 0.8` it returns `1.05`, a heritability above one.
+
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_am01.py`). The measured
+    quantity is the realised squared score-phenotype correlation of the true
+    breeding value, which IS the observed heritability, so the `frac = 1` cells
+    of that battery measure this definition and `pgsR2AM` at once: worst 2.1
+    sems over four cells spanning 0.540 to 0.869, against the previous body
+    `h2 / (1 - r*h2)` rejected on the same cells at up to 275 sems and 54%.
+    See `pgsR2AM` for the full table and the design. -/
 noncomputable def AssortativeMatingModel.observedH2 (m : AssortativeMatingModel) : ℝ :=
-  m.h2 / (1 - m.r * m.h2)
+  m.h2 / (1 - m.r * m.h2 * (1 - m.h2))
 
 /-- **AM inflates observed heritability.**
     The observed heritability under AM exceeds the true (RM) heritability.
@@ -350,33 +386,74 @@ noncomputable def AssortativeMatingModel.observedH2 (m : AssortativeMatingModel)
 theorem AssortativeMatingModel.inflates_observed_h2 (m : AssortativeMatingModel) :
     m.h2 < m.observedH2 := by
   unfold observedH2
-  rw [lt_div_iff₀ m.denom_pos]
-  nlinarith [m.rh2_pos, mul_pos m.h2_pos m.rh2_pos]
+  rw [lt_div_iff₀ m.ratio_denom_pos]
+  nlinarith [m.rh2_pos, m.h2_pos, m.h2_lt_one,
+    mul_pos (mul_pos m.r_pos m.h2_pos) (sub_pos.mpr m.h2_lt_one)]
 
 /-- Standalone version: AM inflates observed h2.
 
 The observed heritability is written out rather than carried as a free variable
-pinned by a hypothesis `h2_observed = h2_true / (1 - r * h2_true)`.  That
-hypothesis stated the inflation law this module itself defines
+pinned by a hypothesis `h2_observed = h2_true / (1 - r * h2_true * (1 - h2_true))`.
+That hypothesis stated the inflation law this module itself defines
 (`AssortativeMatingModel.observedH2`) and handed it to the theorem as a gift;
-substituting it changes nothing about what is proved and removes the gift. -/
+substituting it changes nothing about what is proved and removes the gift.
+
+The denominator carries the `(1 - h2_true)` factor for the reason given at
+`AssortativeMatingModel.ratio_denom_pos`: the phenotypic variance in the
+denominator of a heritability inflates along with the additive variance in its
+numerator. -/
 theorem am_inflates_observed_h2
     (h2_true r : ℝ)
     (h_r : 0 < r) (h_r_le : r < 1)
     (h_h2 : 0 < h2_true) (h_h2_le : h2_true < 1) :
-    h2_true < h2_true / (1 - r * h2_true) := by
-  rw [lt_div_iff₀ (by nlinarith [mul_pos h_r h_h2])]
-  nlinarith [mul_pos h_r h_h2, mul_pos h_h2 (mul_pos h_r h_h2)]
+    h2_true < h2_true / (1 - r * h2_true * (1 - h2_true)) := by
+  rw [lt_div_iff₀ (by nlinarith [sq_nonneg (h2_true - 1 / 2), mul_pos h_r h_h2])]
+  nlinarith [mul_pos (mul_pos h_r h_h2) (sub_pos.mpr h_h2_le)]
 
 /-- **PGS R² inflation under AM.**
     A PGS with accuracy R2_rm under random mating has inflated accuracy
-    under AM: R2_am = R2_rm / (1 - r*h2).
-    This is because the PGS captures the AM-induced LD variance.
+    under AM: R2_am = R2_rm / (1 - r*h2*(1 - h2)).
+    The score captures the AM-induced LD variance, so its covariance with the
+    phenotype inflates by `1/(1 - r*h2)`; the phenotype's own variance inflates
+    by `1 + h2*(1/(1 - r*h2) - 1)` at the same time, and R² is a ratio to THAT.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, and the previous body — `R2_rm / (1 - r*h2)`,
+    the numerator's inflation with the denominator held fixed — is FALSIFIED on
+    the same cells (`proofs/validation/empirical/simcov/battery_am01.py`).
+    Fisher assortative mating with the environmental variance held fixed, 120
+    unlinked loci, 8000 individuals, 12 generations of Gaussian-copula mate
+    pairing on BREEDING VALUE at the transmission coefficient `r*h2` that
+    `amVarianceStep` holds at its random-mating value — so what is on trial here
+    is the R² step alone, over this module's own declared variance law. `r` and
+    `h2` are REALISED, read on four replicates, while the oracle — the realised
+    squared score-phenotype correlation in generation 12 — is measured on eight
+    DISJOINT ones, so no input is estimated from the replicates it is tested
+    against:
+
+      r     h2   R2_rm   this body   old body   measured             sems: this/old
+      0.3   0.5  0.500     0.539       0.585    0.5375±0.0035        0.4 / 13.3
+      0.5   0.5  0.502     0.574       0.669    0.5751±0.0029        0.5 / 32.7
+      0.3   0.8  0.801     0.842       1.051    0.8383±0.0012        3.1 / 179.4
+      0.5   0.8  0.801     0.872       1.341    0.8661±0.0017        3.3 / 277.8
+      0.5   0.5  0.269     0.308       0.359    0.3261±0.0133        1.3 /   2.5
+
+    The old body's 1.341 is a squared correlation above one, which no
+    measurement was needed to reject. The inverted competitor
+    `R2_rm * (1 - r*h2)` is rejected at 227 sems, and the last cell puts the
+    score on half the causal loci so `R2_rm` (0.269) is far from `h2`. The
+    positive control — at `r = 0` the realised R² must reproduce
+    `V_A/(V_A + V_E)` from the realised allele frequencies — passes at 0.78
+    sems.
+
+    Under the LITERAL field reading instead — mates paired on phenotype at
+    correlation `r`, so the transmission coefficient tracks the inflating
+    heritability, which is the reading `amVarianceStep` disowns — the same run
+    gives 0.5379 against a measured 0.5456 and 0.8737 against 0.8724, while the
+    old body gives 0.5838 and 1.3269. The repair does not depend on which
+    reading is taken; the defect did not either. -/
 noncomputable def AssortativeMatingModel.pgsR2AM (m : AssortativeMatingModel)
     (R2_rm : ℝ) : ℝ :=
-  R2_rm / (1 - m.r * m.h2)
+  R2_rm / (1 - m.r * m.h2 * (1 - m.h2))
 
 /-- **AM inflates PGS R².**
     The PGS appears more predictive under AM than under RM.
@@ -386,8 +463,9 @@ theorem AssortativeMatingModel.inflates_pgs_r2
     (m : AssortativeMatingModel) (R2_rm : ℝ) (hR2 : 0 < R2_rm) :
     R2_rm < m.pgsR2AM R2_rm := by
   unfold pgsR2AM
-  rw [lt_div_iff₀ m.denom_pos]
-  nlinarith [m.rh2_pos, mul_pos hR2 m.rh2_pos]
+  rw [lt_div_iff₀ m.ratio_denom_pos]
+  nlinarith [mul_pos hR2 (mul_pos (mul_pos m.r_pos m.h2_pos)
+    (sub_pos.mpr m.h2_lt_one))]
 
 /-- **PGS R² inflation factor equals h2 inflation factor.**
     Both are inflated by the same 1/(1-r*h2) factor. -/
@@ -395,13 +473,13 @@ theorem AssortativeMatingModel.pgs_r2_inflation_eq_h2_inflation
     (m : AssortativeMatingModel) (R2_rm : ℝ) (hR2 : 0 < R2_rm) :
     m.pgsR2AM R2_rm / R2_rm = m.observedH2 / m.h2 := by
   unfold pgsR2AM observedH2
-  have hden : 1 - m.r * m.h2 ≠ 0 := ne_of_gt m.denom_pos
+  have hden : 1 - m.r * m.h2 * (1 - m.h2) ≠ 0 := ne_of_gt m.ratio_denom_pos
   field_simp [hden, ne_of_gt hR2, ne_of_gt m.h2_pos]
 
 /-- **The PGS R² inflation gap under assortative mating.**
     Stronger AM (higher r) creates a larger gap from the random-mating
     baseline.
-    gap(r) = R2_rm * r*h2 / (1 - r*h2). -/
+    gap(r) = R2_rm * r*h2*(1 - h2) / (1 - r*h2*(1 - h2)). -/
 noncomputable def AssortativeMatingModel.amGap
     (m : AssortativeMatingModel) (R2_rm : ℝ) : ℝ :=
   m.pgsR2AM R2_rm - R2_rm
@@ -412,13 +490,14 @@ theorem AssortativeMatingModel.am_gap_positive
   unfold amGap
   linarith [m.inflates_pgs_r2 R2_rm hR2]
 
-/-- **AM gap equals R2_rm * r*h2 / (1 - r*h2).**
-    This is derived algebraically: R2/(1-rh2) - R2 = R2 * rh2/(1-rh2). -/
+/-- **AM gap equals R2_rm * r*h2*(1 - h2) / (1 - r*h2*(1 - h2)).**
+    Derived algebraically: R2/(1-q) - R2 = R2 * q/(1-q) at q = r*h2*(1 - h2). -/
 theorem AssortativeMatingModel.am_gap_formula
     (m : AssortativeMatingModel) (R2_rm : ℝ) :
-    m.amGap R2_rm = R2_rm * (m.r * m.h2) / (1 - m.r * m.h2) := by
+    m.amGap R2_rm =
+      R2_rm * (m.r * m.h2 * (1 - m.h2)) / (1 - m.r * m.h2 * (1 - m.h2)) := by
   unfold amGap pgsR2AM
-  have hden : 1 - m.r * m.h2 ≠ 0 := ne_of_gt m.denom_pos
+  have hden : 1 - m.r * m.h2 * (1 - m.h2) ≠ 0 := ne_of_gt m.ratio_denom_pos
   field_simp [hden]
   ring_nf
 
@@ -749,9 +828,42 @@ section PopulationStructure
     carries a spurious factor of generations and cannot be added to `d` — and nothing in
     the body itself does, which is why the convention is stated here.
 
-    Empirical status: UNTESTED. The dimensional check above is a consistency argument,
-    not a measurement: it rules out the deme-size reading and says nothing about whether
-    the density reading holds in any simulated or real population. -/
+    Empirical status: **VALIDATED under the density reading**
+    (`proofs/validation/empirical/popgensel/ibdcell.py`, cell H). The dimensional check
+    above rules out the deme-size reading; this measurement is about the density reading it
+    leaves standing.
+
+    The body is equivalent to `F/(1-F) = d/(4·N·σ²)`, so what is measured is Rousset's
+    regression statistic against distance on a RING of demes -- every deme equivalent, no
+    edges -- under the stepping-stone reparametrisation that IS the density reading:
+    `N` is the deme size per unit spacing and `σ² = 2m` for nearest-neighbour migration at
+    rate `m` each way. The observable is Rousset's own
+    `a_r = (π_between(d) - π_within)/π_within`, built from probabilities of identity and
+    NOT from any named `F_ST` estimator, and the discrimination is its SLOPE in `d`. Both
+    choices are deliberate: Nei's `G_ST` between two demes is a quarter of the corpus's
+    pairwise `F_ST`, so a cell reporting a factor of four here would be reporting an
+    estimator convention, and a slope is immune to an additive offset.
+
+    | demes | `N` | `m` | `σ²` | fitted slope | this def `1/(4Nσ²)` | sems |
+    |---|---|---|---|---|---|---|
+    | 40 | 20 | 0.05 | 0.1 | 0.12459 ± 0.01037 | 0.12500 | 0.04 |
+    | 100 | 40 | 0.10 | 0.2 | 0.02797 ± 0.00172 | 0.03125 | 1.90 |
+
+    The competitors are rejected on both rows: `1/(2Nσ²)` at 12.1 and 20.1 sems and
+    `1/(8Nσ²)` at 6.0 and 7.2 sems, so the constant `4` is pinned rather than tolerated,
+    and the `PLANTED` arm at `1.4x` is rejected at 4.9 and 9.2 sems.
+
+    The positive control is the fitted intercept, which Rousset's law requires to
+    extrapolate to zero: `0.00023 ± 0.02036` and `-0.00332 ± 0.00500`.
+
+    That control is also what diagnosed the one cell that did not pass. At 40 demes rather
+    than 100, the second design read `0.02352 ± 0.00243` -- 25 percent low, 3.18 sems --
+    with an intercept of `0.01219 ± 0.00753`, 1.6 sems from the zero it must have.
+    Enlarging the ring at unchanged `N` and `m` moved the slope UP to `0.02797` and the
+    intercept back to zero, which is what finite-habitat saturation predicts and what a
+    genuine failure of the law would not have done: if the shortfall had been the body's, a
+    larger habitat would not have repaired it. The higher-`Nσ²` design needs a habitat
+    larger than the neighbourhood size, and at 40 demes it did not have one. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
 

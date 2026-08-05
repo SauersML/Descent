@@ -10,7 +10,9 @@ control that could have failed.
 | `selcell.py` | E `effectCorrelationStabilizing`, divergence-time axis | `PGSEL_E1` |
 | `selpower.py` | E's positive control: the selection axis, where the design must move | `PGSEL_E2` |
 | `fluctcell.py` | F `effectCorrelationStabilizingDriftSelection` and `effectCorrelationFluctuating`, with a fluctuating-optimum arm | `PGSEL_F1` |
-| `results.json` | the committed output of all three | |
+| `admixcell.py` | G `admixtureLDMagnitude`, a single admixture pulse at gamete level | `PGSEL_G1` |
+| `ibdcell.py` | H `ibdFst`, Rousset's law on a ring stepping-stone | `PGSEL_H1` |
+| `results.json` | the committed output of all of them | |
 
 ## Verdicts
 
@@ -23,6 +25,8 @@ control that could have failed.
 | E | `SelectionArchitecture.effectCorrelationStabilizing` | FALSIFIED twice: the quantity depends on divergence time and the body has none, and the `Ns` dependence has the wrong sign |
 | F | `PolygenicAdaptation.effectCorrelationStabilizingDriftSelection` | FALSIFIED in sign at 42-51 sems: stabilizing selection ACCELERATES decorrelation rather than damping it |
 | F | `PolygenicAdaptation.effectCorrelationFluctuating` | FALSIFIED at 48-172 sems: the `-1` clamp binds on every cell with `f > 0`, so the body predicts perfect anticorrelation where 0.08 to 0.54 is observed |
+| G | `CovarianceStructure.admixtureLDMagnitude` | VALIDATED within 1.42 sems; `alpha^2` rejected at 40-120 sems and `exp(-rg)` at 9.3 |
+| H | `AssortativeMatingPGS.ibdFst` | VALIDATED under the density reading; the slope pins the constant 4 with 2 and 8 rejected at 12-20 and 6-7 sems |
 
 Cell F feeds `d` REALIZED from a neutral arm run on the same loci, seeds and
 divergence time, because the whole predicted effect is the gap between the
@@ -64,3 +68,14 @@ taskset -c 32-47 ./fwenv/bin/python selpower.py 150
 
 Calibrated against msprime 1.4.2, numpy 2.5.1, Python 3.12.13. Every run prints
 `FRESHNESS=OK` with its guard string; a run that does not print it is stale.
+
+## The control that diagnosed a design failure rather than a corpus one
+
+Cell H's second design read 25 percent low at 3.18 sems, which looks like a
+finding. Its own positive control -- the fitted intercept, which Rousset's law
+requires to extrapolate to zero -- was 1.6 sems off zero at the same time.
+Enlarging the ring from 40 demes to 100 at unchanged `N` and `m` moved the slope
+back toward the body and the intercept back to zero. A genuine failure of the
+law would not have been repaired by a larger habitat, so the shortfall was
+finite-habitat saturation. A cell whose control degrades alongside its headline
+number is reporting on itself.
