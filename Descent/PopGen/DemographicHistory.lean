@@ -914,8 +914,13 @@ theorem smaller_founder_larger_heterozygosity_loss
     derived in `PopulationGeneticsFoundations`. -/
 theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
     founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
-  unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-    Descent.PopGen.hetDecayFactor hetDecayFromScaled
+  -- `simp only` rather than `unfold`: two declarations bear the name
+  -- `hetDecayFactor` -- this module's `(Ne θ : ℝ)` one and the method on
+  -- `Core.PopGenParameters` -- and `unfold` fails outright when the name it is
+  -- handed is not the one the term carries, where `simp only` just does not fire.
+  simp only [founderHeterozygosityLoss, fstMutationDriftTransientDiscrete,
+    fstMutationDriftEquilibrium, Descent.Core.fstFromFlow,
+    Descent.PopGen.hetDecayFactor, hetDecayFromScaled]
   simp
 
 end FounderEffects

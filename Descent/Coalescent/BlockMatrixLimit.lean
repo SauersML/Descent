@@ -195,6 +195,178 @@ theorem row_diff_bound {N k : ℕ} (hN : 0 < N) (hk : 2 ≤ k) (hkN : k ≤ N) :
     constructor <;> linarith
   linarith
 
+/-! ### The row bound as a norm bound -/
+
+/-- Rows `0` and `1` are exact: with no pair to merge, the generation cannot lose a lineage,
+so the operator agrees with `1 + N⁻¹Q` there on the nose. -/
+theorem row_small {N k : ℕ} (hN : 0 < N) (hk : k ≤ 1) : blockTransition N k k = 1 := by
+  rw [blockTransition_diag hN]
+  interval_cases k
+  · simp
+  · exact noCoalescenceProb_one hN
+
+/-- **Every row of the difference is `O(N⁻²)`**, with a constant depending only on the state
+count.  For `k ≥ 2` this is `row_diff_bound` with `d_k ≤ n²`; for `k ≤ 1` the row vanishes,
+because a generation with fewer than two lineages cannot lose one. -/
+theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1)) :
+    ∑ j : Fin (n + 1),
+        |blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+          + (1 / (N : ℝ)) • blockGenerator n) k j|
+      ≤ 3 * (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
+  classical
+  have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+  have hkn : (k : ℕ) ≤ n := Nat.lt_succ_iff.mp k.isLt
+  have hnR : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
+  -- the entries of the comparison operator
+  have hentry : ∀ j : Fin (n + 1),
+      ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) + (1 / (N : ℝ)) • blockGenerator n) k j
+        = (if (k : ℕ) = (j : ℕ) then 1 else 0)
+          + (1 / (N : ℝ)) * (if (j : ℕ) = (k : ℕ) then -deathRate (k : ℕ)
+              else if (j : ℕ) + 1 = (k : ℕ) then deathRate (k : ℕ) else 0) := by
+    intro j
+    simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, blockGenerator]
+    congr 1
+    rw [Matrix.one_apply]
+    by_cases h : k = j
+    · simp [h]
+    · have : (k : ℕ) ≠ (j : ℕ) := fun hc ↦ h (Fin.ext hc)
+      simp [h, this]
+  by_cases hk1 : (k : ℕ) ≤ 1
+  · -- the row is exact
+    have hdiag : blockTransition N (k : ℕ) (k : ℕ) = 1 := row_small hN hk1
+    have hd0 : deathRate (k : ℕ) = 0 := by
+      unfold deathRate
+      interval_cases h : (k : ℕ) <;> norm_num
+    have hzero : ∀ j : Fin (n + 1),
+        blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+          + (1 / (N : ℝ)) • blockGenerator n) k j = 0 := by
+      intro j
+      rw [hentry j]
+      unfold blockMatrix
+      by_cases h : (j : ℕ) = (k : ℕ)
+      · rw [h, hdiag, hd0]
+        simp
+      · have hother : blockTransition N (k : ℕ) (j : ℕ) = 0 := by
+          have hsum := sum_row_blockMatrix hN k
+          have hnn : ∀ i : Fin (n + 1), 0 ≤ blockMatrix n N k i := fun i ↦
+            blockTransition_nonneg hN
+          have hle : blockMatrix n N k j + blockMatrix n N k k
+              ≤ ∑ i : Fin (n + 1), blockMatrix n N k i := by
+            have hjk : j ≠ k := fun hc ↦ h (by rw [hc])
+            calc blockMatrix n N k j + blockMatrix n N k k
+                = ∑ i ∈ ({j, k} : Finset (Fin (n + 1))), blockMatrix n N k i := by
+                  rw [Finset.sum_insert (by simpa using hjk), Finset.sum_singleton]
+              _ ≤ _ := Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _)
+                  (fun i _ _ ↦ hnn i)
+          have hkk : blockMatrix n N k k = 1 := hdiag
+          have := hnn j
+          unfold blockMatrix at hle hkk
+          linarith
+        rw [hother, hd0]
+        simp [h, Ne.symm h, show ¬((k : ℕ) = (j : ℕ)) from fun hc ↦ h hc.symm]
+    simp only [hzero, abs_zero, Finset.sum_const_zero]
+    positivity
+  · -- the row with a subdiagonal
+    push_neg at hk1
+    have hk2 : 2 ≤ (k : ℕ) := hk1
+    have hkN : (k : ℕ) ≤ N := le_trans hkn hnN
+    have hbound := row_diff_bound (N := N) (k := (k : ℕ)) hN hk2 hkN
+    -- the index one below `k`
+    have hk1lt : (k : ℕ) - 1 < n + 1 := by omega
+    set k' : Fin (n + 1) := ⟨(k : ℕ) - 1, hk1lt⟩ with hk'
+    have hkk' : k ≠ k' := by
+      intro hc
+      have : (k : ℕ) = (k : ℕ) - 1 := congrArg Fin.val hc
+      omega
+    have hsplit : ∑ j : Fin (n + 1),
+        |blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+          + (1 / (N : ℝ)) • blockGenerator n) k j|
+        = |blockMatrix n N k k - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+            + (1 / (N : ℝ)) • blockGenerator n) k k|
+          + |blockMatrix n N k k' - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+            + (1 / (N : ℝ)) • blockGenerator n) k k'|
+          + ∑ j ∈ (Finset.univ.erase k).erase k',
+              |blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+                + (1 / (N : ℝ)) • blockGenerator n) k j| := by
+      rw [← Finset.sum_erase_add _ _ (Finset.mem_univ k),
+        ← Finset.sum_erase_add _ _ (Finset.mem_erase.mpr ⟨Ne.symm hkk', Finset.mem_univ k'⟩)]
+      ring
+    have hrest : ∀ j ∈ (Finset.univ.erase k).erase k',
+        |blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+          + (1 / (N : ℝ)) • blockGenerator n) k j| = blockMatrix n N k j := by
+      intro j hj
+      have hjk' : j ≠ k' := (Finset.mem_erase.mp hj).1
+      have hjk : j ≠ k := (Finset.mem_erase.mp (Finset.mem_erase.mp hj).2).1
+      have h2 : ¬((j : ℕ) = (k : ℕ)) := fun hc ↦ hjk (Fin.ext hc)
+      have h1 : ¬((k : ℕ) = (j : ℕ)) := fun hc ↦ h2 hc.symm
+      have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by
+        intro hc
+        exact hjk' (Fin.ext (by simp only [hk']; omega))
+      rw [hentry j]
+      simp only [h1, h2, h3, if_false, mul_zero, add_zero, sub_zero]
+      exact abs_of_nonneg (blockTransition_nonneg hN)
+    have hdiagval : ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+        + (1 / (N : ℝ)) • blockGenerator n) k k = 1 - deathRate (k : ℕ) / (N : ℝ) := by
+      rw [hentry k]
+      simp
+      ring
+    have hsubval : ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+        + (1 / (N : ℝ)) • blockGenerator n) k k' = deathRate (k : ℕ) / (N : ℝ) := by
+      have h1 : ¬((k : ℕ) = (k' : ℕ)) := by simp only [hk']; omega
+      have h2 : ¬((k' : ℕ) = (k : ℕ)) := fun hc ↦ h1 hc.symm
+      have h3 : (k' : ℕ) + 1 = (k : ℕ) := by simp only [hk']; omega
+      rw [hentry k']
+      simp only [h1, h2, h3, if_false, if_true, if_pos]
+      ring
+    have hk'val : (k' : ℕ) = (k : ℕ) - 1 := rfl
+    have hTeq : ∑ j ∈ (Finset.univ.erase k).erase k', blockMatrix n N k j
+        = ∑ j ∈ Finset.range ((k : ℕ) - 1), blockTransition N (k : ℕ) j := by
+      have hall : ∑ j : Fin (n + 1), blockMatrix n N k j = 1 := sum_row_blockMatrix hN k
+      have hsp : ∑ j : Fin (n + 1), blockMatrix n N k j
+          = blockMatrix n N k k + blockMatrix n N k k'
+            + ∑ j ∈ (Finset.univ.erase k).erase k', blockMatrix n N k j := by
+        rw [← Finset.sum_erase_add _ _ (Finset.mem_univ k),
+          ← Finset.sum_erase_add _ _ (Finset.mem_erase.mpr ⟨Ne.symm hkk', Finset.mem_univ k'⟩)]
+        ring
+      have hsum2 : ∑ j ∈ Finset.range ((k : ℕ) + 1), blockTransition N (k : ℕ) j = 1 :=
+        sum_blockTransition hN
+      have hsp2 : ∑ j ∈ Finset.range ((k : ℕ) + 1), blockTransition N (k : ℕ) j
+          = (∑ j ∈ Finset.range ((k : ℕ) - 1), blockTransition N (k : ℕ) j)
+            + blockTransition N (k : ℕ) ((k : ℕ) - 1) + blockTransition N (k : ℕ) (k : ℕ) := by
+        have h1 : (k : ℕ) + 1 = ((k : ℕ) - 1) + 1 + 1 := by omega
+        rw [h1, Finset.sum_range_succ, Finset.sum_range_succ]
+        congr 2
+        omega
+      rw [hsp] at hall
+      rw [hsp2] at hsum2
+      unfold blockMatrix at hall
+      rw [hk'val] at hall
+      linarith
+    rw [hsplit, hdiagval, hsubval, Finset.sum_congr rfl hrest, hTeq]
+    unfold blockMatrix
+    rw [hk'val]
+    have hdle : deathRate (k : ℕ) ≤ (n : ℝ) ^ 2 := by
+      unfold deathRate
+      have hkR : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hkn
+      have hk0 : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg _
+      nlinarith
+    have hd0 : 0 ≤ deathRate (k : ℕ) := le_of_lt (deathRate_pos hk2)
+    have hsq : (deathRate (k : ℕ) / (N : ℝ)) ^ 2 ≤ (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
+      rw [div_pow, div_le_div_iff₀ (by positivity) (by positivity)]
+      nlinarith [sq_nonneg (deathRate (k : ℕ)), pow_le_pow_left hd0 hdle 2]
+    have hk4 : ((k : ℕ) : ℝ) ^ 4 ≤ (n : ℝ) ^ 4 := by
+      have hkR : ((k : ℕ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast hkn
+      have hk0 : (0 : ℝ) ≤ ((k : ℕ) : ℝ) := Nat.cast_nonneg _
+      exact pow_le_pow_left hk0 hkR 4
+    have hNsq : (0 : ℝ) < (N : ℝ) ^ 2 := by positivity
+    have hdiv : 2 * (((k : ℕ) : ℝ) ^ 4 / (N : ℝ) ^ 2) ≤ 2 * ((n : ℝ) ^ 4 / (N : ℝ) ^ 2) := by
+      have := div_le_div_of_nonneg_right hk4 hNsq
+      linarith [div_le_div_of_nonneg_right hk4 hNsq]
+    have hfinal : 3 * (n : ℝ) ^ 4 / (N : ℝ) ^ 2
+        = (n : ℝ) ^ 4 / (N : ℝ) ^ 2 + 2 * ((n : ℝ) ^ 4 / (N : ℝ) ^ 2) := by ring
+    rw [hfinal]
+    linarith [hbound]
+
 end Coalescent
 
 end Descent

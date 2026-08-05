@@ -116,7 +116,7 @@ theorem abs_moment_sub_le_momentDist (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (
   exact Finset.le_sup'_of_le _ (Finset.mem_range.mpr (Nat.lt_succ_of_le hp)) (le_refl _)
 
 /-- The moment sequence of a spectrum, as the counting invariant. -/
-def momentInvariant (m : ℕ) (lam : ℕ → ℝ) : ℕ → ℝ := fun p ↦ normalizedMoment m lam p
+def momentInvariant (m : ℕ) (lam : ℕ → ℝ) : ℕ → ℝ := fun p ↦ Portability.normalizedMoment m lam p
 
 /-- **The `m_eff` witness, as an approximate blindness witness.**
 

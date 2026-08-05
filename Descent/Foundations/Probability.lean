@@ -365,7 +365,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   -- one -- it left `Core.Genotype.homRef.dosage` standing in the goal and the
   -- `ring_nf` below had nothing to close. `dosage_homRef`/`_het`/`_homAlt` are
   -- the `rfl` lemmas declared beside the definition for exactly this.
-  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount,
+  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount, Descent.Core.Genotype.dosage,
     Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
     Descent.Core.Genotype.dosage_homAlt, HardyWeinbergModel.refFreq]
   ring_nf

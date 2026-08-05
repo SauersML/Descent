@@ -419,7 +419,7 @@ theorem averageEffect_eq_regression_slope
     Foundations.HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
   rw [h.expectedAltAlleleCount_eq, h.genotypeVariance_eq]
   rw [Foundations.sum_over_genotypes, Foundations.sum_over_genotypes]
-  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.altAlleleCount,
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
     OneLocusArchitecture.genotypicValue, Foundations.HardyWeinbergModel.refFreq]
   rw [← hq]
   ring_nf

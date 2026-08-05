@@ -266,17 +266,17 @@ theorem standardizedSquare_values (h : Foundations.HardyWeinbergModel)
   · -- homRef: `(0 - 2q)² / (2q(1-q)) = 2q / (1-q)`
     unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [Foundations.altAlleleCount]
+    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage]
     field_simp
     ring
   · -- het: `(1 - 2q)² / (2q(1-q))` is already the target, up to `altAlleleCount het = 1`
     unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [Foundations.altAlleleCount]
+    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage]
   · -- homAlt: `(2 - 2q)² / (2q(1-q)) = 2(1-q) / q`
     unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [Foundations.altAlleleCount]
+    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage]
     field_simp
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
