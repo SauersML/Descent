@@ -211,7 +211,26 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H�
     (`proofs/validation/empirical/simcov/unmeasurable_scan.py`) finds this is
     the ONLY definition still marked UNTESTED whose docstring admits its own
     parameter is unpinned, so the category is one definition rather than the
-    class it first appeared to be. -/
+    class it first appeared to be.
+
+    Empirical status: **VALIDATED at `s_correction = 0`**
+    (`simcov/battery_bulk47.py`, `group_a`). An explicit Wright-Fisher forward
+    simulation over 3000 replicate populations and 400 loci; the observable is
+    the realised heterozygosity ratio `H_t/H_0`, which IS the drift factor.
+    Over `Nₑ` = 50, 100, 200 and `t` = 30, 40, 80, 120 swept independently, the
+    body predicts 0.81832, 0.81853, 0.54799 and 0.73970 against measured
+    0.81828 ± 0.00003, 0.81855 ± 0.00006, 0.54785 ± 0.00020 and 0.73975 ±
+    0.00012 -- worst cell 1.69 sems at 0.01% relative.
+
+    Power: the HAPLOID slip `(1 - 1/Nₑ + s)ᵗ`, which is this law with the
+    diploid factor of two dropped, is FALSIFIED at 5848 sems. The two `Nₑ = 100`
+    cells at `t = 40` and `t = 120` pin the exponent, and the `(Nₑ, t)` pairs
+    (100, 40) and (200, 80) reach nearly the same factor by different routes, so
+    a body depending on them separately would separate there.
+
+    The `s_correction` parameter is NOT pinned by this run: it was held at zero
+    throughout, which is exactly the gap the paragraph above already records.
+    What is established is the drift half of the law. -/
 noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne) + s_correction) ^ t
 
@@ -247,7 +266,21 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
     Empirical status: UNTESTED.
 
     Denotes: the reading its name carries. The same formula appears under
-    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant. -/
+    names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk47.py`, `group_a`), on
+    the same Wright-Fisher runs that measure `selectedDriftFactor`. The
+    observable is `1 - H_t/H_0`, the realised fraction of ancestral
+    heterozygosity lost, against `1 - driftFactor`; worst cell 1.69 sems at
+    0.02% relative.
+
+    Which `F` this is, since the docstring above warns the formula does not fix
+    it: the PER-BRANCH drift coefficient, Wright's `F` measured against the
+    ancestor within ONE lineage. It is not the pairwise Hudson `F_ST` of
+    `PortabilityDrift.fstFromTau`, which is `τ/(1+τ)` and which this corpus
+    proves is strictly smaller at every positive `τ`. The simulation measures a
+    single population losing heterozygosity, so it measures the per-branch
+    reading and nothing else. -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 

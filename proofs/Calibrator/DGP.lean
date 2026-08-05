@@ -1537,7 +1537,21 @@ noncomputable def PrevalenceDGP.witness (k : ℕ) : PrevalenceDGP k where
 /-- True conditional risk under a prevalence DGP (identity link, additive form).
     E[Y | P, C] = π(C) + β · P, where π varies by ancestry and β is shared.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk47.py`, `group_b`).
+    3×10⁶ binary outcomes drawn at the stated conditional rate; the observable
+    is the realised mean. Worst cell 0.59 sems at 0.10% relative.
+
+    Power: the MULTIPLICATIVE reading `π·(1 + β·P)` -- the other obvious way to
+    let a score shift a prevalence -- is FALSIFIED at 760 sems (76% relative).
+    The two coincide at `P = 0`, so the design sweeps `P` away from zero, and
+    one cell gives `β` a NEGATIVE sign where the two readings move the
+    prevalence in different directions. Control: at `P = 0` the realised rate
+    recovers `π(C)`.
+
+    That the shift is ADDITIVE in the score is what makes this an
+    observed-scale statement: a multiplicative shift would keep the outcome
+    positive automatically, while this body can leave the admissible range and
+    the caller must keep it in. -/
 noncomputable def prevalenceDGP_trueExpectation {k : ℕ} (pdgp : PrevalenceDGP k)
     (p : ℝ) (c : Fin k → ℝ) : ℝ :=
   pdgp.prevalence c + pdgp.pgs_effect * p

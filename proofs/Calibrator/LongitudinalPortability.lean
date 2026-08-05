@@ -401,8 +401,24 @@ noncomputable def ageDependentMetricProfile
 
 /-- Observed cohort-specific effect after an environmental modifier acts on a genetic effect.
 
-Empirical status: UNTESTED. Multiplication is the declared interaction model, not a conclusion
-drawn from cohort data in this corpus. -/
+Empirical status: **VALIDATED as the declared model**
+(`simcov/battery_bulk46.py`, `group_cohort`). Multiplication remains a
+DECLARED interaction model rather than a conclusion drawn from cohort data --
+that caveat stands and is the important one. What the simulation adds is that,
+given the declaration, the body is the right function of it: 2×10⁶ individuals
+whose genetic effect is scaled by the environment modifier, with the observable
+the realised marginal OLS effect. Worst cell 1.81 sems at 1.00% relative.
+
+Power: the SUM `geneticEffect + environmentModifier` is FALSIFIED at 1356 sems
+(205% relative). The modifier is swept across 1 -- 0.5, 0.6, 1.0, 1.8 -- which
+is the only value where a sum and a product can be confused for one another,
+and one cell gives the genetic effect a NEGATIVE sign, where the two readings
+differ in sign as well as magnitude. Control: at a modifier of 1 the observed
+effect recovers the raw genetic effect.
+
+So the arithmetic is pinned and the modelling assumption is not. A cohort study
+showing effects that combine additively would contradict the declaration, not
+this body. -/
 noncomputable def cohortObservedEffect (geneticEffect environmentModifier : ℝ) : ℝ :=
   geneticEffect * environmentModifier
 
