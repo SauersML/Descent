@@ -76,6 +76,42 @@ ADDITIVE = {
 
 ROUNDTRIP_IDS = ["amCorrectedPortability-inverts-the-AM-artifact"]
 
+# --------------------------------------------------------------------------
+# The squaring flow's next floor.  Same defect family, different shape: not a
+# reciprocal but a ratio whose numerator and divisor were stated at DIFFERENT
+# generality, so the quotient was right on one slice of moment space and
+# meaningless off it.
+# --------------------------------------------------------------------------
+SQUARING_ID = "nextFloorFourthMoment-is-the-standardized-fourth-moment-of-Y"
+
+SQUARING_CORRECT = {
+    "nextFloorFourthMoment":
+        lambda m2, m4, m6, m8:
+            (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 2 * m2 + 1) ** 2,
+}
+
+SQUARING_UNIT_VARIANCE_DIVISOR = {
+    # the historical body: divisor (m4 - 1)^2, which is (E[Y^2])^2 only at
+    # m2 = 1.  Returns 9/25 where the true value is 1 on the two-point law.
+    "nextFloorFourthMoment":
+        lambda m2, m4, m6, m8:
+            (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ** 2,
+}
+
+SQUARING_UNIT_VARIANCE_NUMERATOR = {
+    # the mirrored mistake: divisor general, numerator pinned to m2 = 1
+    "nextFloorFourthMoment":
+        lambda m2, m4, m6, m8:
+            (m8 - 4 * m6 + 6 * m4 - 3) / (m4 - 2 * m2 + 1) ** 2,
+}
+
+SQUARING_UNSQUARED_DIVISOR = {
+    # E[Y^4]/E[Y^2] rather than E[Y^4]/(E[Y^2])^2: not standardized at all
+    "nextFloorFourthMoment":
+        lambda m2, m4, m6, m8:
+            (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 2 * m2 + 1),
+}
+
 failures: list[str] = []
 
 
@@ -94,10 +130,10 @@ def verdict_of(chk: checks.Check, D: dict) -> tuple[str, float | None]:
     return run.classify(chk, res), res["max_rel_err"]
 
 
-def expect_clean(cid: str) -> None:
+def expect_clean(cid: str, clean: dict = None) -> None:
     """The correct definition must produce no finding at gating severity."""
     chk = _check(cid)
-    v, err = verdict_of(chk, CORRECT)
+    v, err = verdict_of(chk, CORRECT if clean is None else clean)
     if v != "AGREE":
         failures.append(
             f"{cid}: the CORRECT definition was reported as {v} "
@@ -136,10 +172,10 @@ def expect_caught(cid: str, label: str, D: dict, floor: float = 1e-3) -> None:
         )
 
 
-def expect_can_fail(cid: str) -> None:
+def expect_can_fail(cid: str, clean: dict = None) -> None:
     """run.py's own mutant screen must also rate the check non-vacuous."""
     chk = _check(cid)
-    vac = run.prove_can_fail(chk, CORRECT)
+    vac = run.prove_can_fail(chk, CORRECT if clean is None else clean)
     if not vac["can_fail"]:
         failures.append(
             f"{cid}: run.py rates this check VACUOUS against the correct "
@@ -158,14 +194,24 @@ def main() -> int:
         expect_caught(cid, "target inflation term dropped", NO_TARGET_TERM)
         expect_caught(cid, "additive instead of multiplicative", ADDITIVE)
 
+    expect_clean(SQUARING_ID, SQUARING_CORRECT)
+    expect_can_fail(SQUARING_ID, SQUARING_CORRECT)
+    expect_caught(SQUARING_ID,
+                  "divisor pinned to unit variance (the historical body)",
+                  SQUARING_UNIT_VARIANCE_DIVISOR)
+    expect_caught(SQUARING_ID,
+                  "numerator pinned to unit variance (the mirrored mistake)",
+                  SQUARING_UNIT_VARIANCE_NUMERATOR)
+    expect_caught(SQUARING_ID, "divisor not squared", SQUARING_UNSQUARED_DIVISOR)
+
     if failures:
         print("ROUND-TRIP CALIBRATION FAILED")
         for f in failures:
             print("  * " + f)
         return 1
-    print(f"round-trip calibration OK: {len(ROUNDTRIP_IDS)} check(s); "
-          f"correct definition clean, 4 planted defects each reported as a "
-          f"verdict regression")
+    print(f"round-trip/direction calibration OK: {len(ROUNDTRIP_IDS) + 1} "
+          f"checks; each correct definition clean and non-vacuous, 7 planted "
+          f"defects each reported as a verdict regression above a 1e-3 floor")
     return 0
 
 

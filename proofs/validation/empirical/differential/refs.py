@@ -392,3 +392,35 @@ def am_measured_portability(true_ratio: float, r_source: float,
     r2rm_target = true_ratio
     return (am_inflated_r2(r2rm_target, r_target, h2)
             / am_inflated_r2(r2rm_source, r_source, h2))
+
+
+# ===========================================================================
+# Squaring flow: the next floor's fourth moment, from an explicit law
+# ===========================================================================
+
+def _three_point_moments(a: float, p: float):
+    """Raw even moments (m2, m4, m6, m8) of the law P(X = +-a) = p, P(X = 0) = 1-2p.
+
+    MODEL: none -- an explicit finite distribution.  Chosen because its moments
+    are a real law's rather than four free parameters, so a body that is only
+    correct on a slice of moment space cannot be rescued by picking arguments.
+    """
+    return (2 * p * a ** 2, 2 * p * a ** 4, 2 * p * a ** 6, 2 * p * a ** 8)
+
+
+def squaring_flow_next_fourth_moment(a: float, p: float) -> float:
+    """E[Y^4]/(E[Y^2])^2 for Y = X^2 - 1 under the three-point law above.
+
+    MODEL: the squaring flow's next floor.  Computed from the realised values of
+    Y, never from a binomial expansion in the raw moments of X, so it is
+    independent of the corpus body it checks AND free of that body's
+    cancellation.
+
+    Note E[Y^2] = m4 - 2*m2 + 1 in general and m4 - 1 only at unit variance;
+    a divisor written the second way agrees with this only when 2*p*a^2 = 1.
+    """
+    ys = (a ** 2 - 1, a ** 2 - 1, -1.0)
+    ws = (p, p, 1 - 2 * p)
+    e2 = sum(w * y ** 2 for y, w in zip(ys, ws))
+    e4 = sum(w * y ** 4 for y, w in zip(ys, ws))
+    return e4 / e2 ** 2

@@ -906,20 +906,39 @@ The stable evaluation never expands the power: form `Y = X² - 1` first and take
 `E[Y⁴] / (E[Y²])²` from CENTERED moments of `Y`. That is the same number and it
 has no cancellation in it. This body states which number is meant; it is not the
 recipe for computing it. Consumers restricted to raw moments must additionally
-require `m₄ - 1` bounded away from zero -- `nextFloorFourthMoment_unit_m4_is_junk`
+require `m₄ - 2m₂ + 1` bounded away from zero -- `nextFloorFourthMoment_degenerate_is_junk`
 below names the exact-zero case, but the whole neighbourhood is unusable, not
-just the point. -/
-noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
-  (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 1) ^ 2
+just the point.
 
-/-- **nextFloorFourthMoment at unit m4, named.** A fourth moment of one is the Gaussian floor
-itself, where the recurrence has nothing left to descend and the next floor is undefined. The
-divisor `(m4 - 1) ^ 2` is zero and Lean returns `0`, a floor BELOW the Gaussian one, which the
-moment hierarchy forbids. Consumers must require `m4 ≠ 1`. -/
-theorem nextFloorFourthMoment_unit_m4_is_junk (m2 : ℝ) (m6 : ℝ) (m8 : ℝ) :
-    nextFloorFourthMoment m2 1 m6 m8 = 0 := by
+**The divisor carries `m₂`, and did not always.** `E[Y²] = m₄ - 2m₂ + 1`, which
+is `m₄ - 1` only at unit variance. This body's numerator is the general
+`E[(X² - 1)⁴]` and its divisor was written `(m₄ - 1)²`, so the two halves were
+stated at different generality and the quotient was `E[Y⁴]/(E[Y²])²` on the
+`m₂ = 1` slice alone. Off that slice it returned a number that is not the
+standardised fourth moment of anything: on the two-point law `X = ±2`, where
+`Y` is constant and the true value is exactly `1`, it returned `9/25`. Every
+call site in the corpus passes `m₂ = 1`, so nothing computed a wrong number --
+but the signature took an `m₂` it then ignored in half the expression, which is
+a trap rather than a convention. With the divisor written out the body is
+correct at every `m₂` and identical at `m₂ = 1`, so no call site moves. -/
+noncomputable def nextFloorFourthMoment (m2 m4 m6 m8 : ℝ) : ℝ :=
+  (m8 - 4 * m6 + 6 * m4 - 4 * m2 + 1) / (m4 - 2 * m2 + 1) ^ 2
+
+/-- **nextFloorFourthMoment where its divisor vanishes, named.** The divisor is
+`(m₄ - 2m₂ + 1) ^ 2 = (E[Y²])²`, so it is zero exactly when `Y = X² - 1` is degenerate. At unit
+variance that is `m₄ = 1`: a fourth moment of one is the Gaussian floor itself, where the
+recurrence has nothing left to descend and the next floor is undefined. Lean returns `0`, a floor
+BELOW the Gaussian one, which the moment hierarchy forbids. Consumers must require
+`m₄ - 2m₂ + 1 ≠ 0`, which at `m₂ = 1` reads `m₄ ≠ 1`.
+
+Stated at `m₂ = 1` rather than for a free `m₂`. It used to quantify over every `m₂`, which was
+sound only because the divisor was `(m₄ - 1)²` and so ignored `m₂` -- the very defect the
+definition above now fixes. With the divisor written out, `m₄ = 1` is a junk point at unit
+variance and nowhere else. -/
+theorem nextFloorFourthMoment_degenerate_is_junk (m6 : ℝ) (m8 : ℝ) :
+    nextFloorFourthMoment 1 1 m6 m8 = 0 := by
   unfold nextFloorFourthMoment
-  simp
+  norm_num
 
 /-- **The next floor's fourth moment from the NEXT floor's own moments**: with
 `Y = X² - 1`, it is just `E[Y⁴] / (E[Y²])²`.
