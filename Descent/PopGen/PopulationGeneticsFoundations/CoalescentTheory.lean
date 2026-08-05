@@ -137,7 +137,7 @@ theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
   have hsum : t + 2 * Ne ≠ 0 := by
     have hs : 0 < t + 2 * Ne := by linarith
     exact ne_of_gt hs
-  unfold coalFst Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.saturation Descent.Core.oddsLike
+  unfold coalFst Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.oddsLike
   field_simp
   ring
 

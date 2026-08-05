@@ -1439,7 +1439,7 @@ theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
     PopGen.islandFstFiniteDemes Ne m d
       = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection d) := by
   unfold PopGen.islandFstFiniteDemes PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow
-    Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.ploidy
+    Descent.Core.islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 end Descent.PopGen
