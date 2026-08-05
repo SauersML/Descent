@@ -954,6 +954,54 @@ parameters for different trait classes.
 
 section ArchitecturePredictions
 
+/-- **The selection coefficient** `s`: the fitness of a variant relative to a reference,
+written as a proportional shortfall, `s = 1 - w_variant / w_reference`.
+
+The sign convention is the whole of what a reader needs here, and it is the thing the corpus
+was leaving to context. `s` is measured AGAINST the variant: `s > 0` is purifying, the
+variant leaving proportionally fewer offspring, and `s < 0` is advantageous. The competing
+convention writes `w = 1 + s` and makes positive `s` advantageous. The two differ by a sign,
+no correction converts a body written in one into a body written in the other, and a corpus
+that takes `s` in twenty hypotheses while defining it in none cannot say which of them any
+hypothesis meant. `selectionPortabilityTimescale` below is one of those hypotheses, and its
+own docstring already has to spend a paragraph on which `s` it means and what the factor of
+two costs.
+
+This is `Core.proportionalReduction` at fitnesses -- a selection coefficient IS a
+proportional reduction -- so it sits under the same kernel as every other proportional
+shortfall here instead of under a second copy of the arithmetic.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this fixes a coordinate and a sign, and
+    asserts nothing about any population.  Which populations carry which coefficients is
+    measured elsewhere; no value of `s` is claimed here. -/
+noncomputable def selectionCoefficient (variantFitness referenceFitness : ℝ) : ℝ :=
+  Descent.Core.proportionalReduction variantFitness referenceFitness
+
+/-- **Equal fitness is no selection**, the property that makes `s = 0` neutrality rather
+than an arbitrary origin. -/
+theorem selectionCoefficient_self (w : ℝ) (hw : w ≠ 0) :
+    selectionCoefficient w w = 0 := by
+  unfold selectionCoefficient Descent.Core.proportionalReduction
+  field_simp
+
+/-- **selectionCoefficient at a zero reference fitness, named.** A reference genotype that
+leaves no offspring does not give a coefficient of one, but `w / 0` is junk-zero so Lean
+returns `1`, and no type error marks the point. Consumers must require
+`referenceFitness ≠ 0`. -/
+theorem selectionCoefficient_zero_reference_is_junk (w : ℝ) :
+    selectionCoefficient w 0 = 1 := by
+  unfold selectionCoefficient Descent.Core.proportionalReduction
+  simp
+
+/-- **A fitter variant carries a smaller coefficient.** Strict antitonicity in the variant's
+fitness is what makes `s` an ordering of variants rather than a label attached to them, and
+it is the direction the sign convention above commits to. -/
+theorem selectionCoefficient_strictAnti (w₁ w₂ wRef : ℝ) (hRef : 0 < wRef) (h : w₁ < w₂) :
+    selectionCoefficient w₂ wRef < selectionCoefficient w₁ wRef := by
+  unfold selectionCoefficient Descent.Core.proportionalReduction
+  have hlt : w₁ / wRef < w₂ / wRef := div_lt_div_of_pos_right h hRef
+  linarith
+
 /-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
 
 Empirical status: **FALSIFIED by a factor of two as a selection timescale**
@@ -984,8 +1032,8 @@ says the pun costs a factor of two, which is not a convention.
 
 Denotes: a characteristic timescale indexed by selection strength. Its numerical formula
 matches a drift-rate chart, and the coincidence is not benign. -/
-noncomputable def selectionPortabilityTimescale (selectionCoefficient : ℝ) : ℝ :=
-  driftLDCreationRate selectionCoefficient
+noncomputable def selectionPortabilityTimescale (s : ℝ) : ℝ :=
+  driftLDCreationRate s
 
 /-- The selection-decay timescale is pinned at `s = 1/2`. -/
 theorem selectionPortabilityTimescale_at_reference_point :
