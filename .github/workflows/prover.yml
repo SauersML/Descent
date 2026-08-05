@@ -339,6 +339,24 @@ jobs:
       - name: Corpus/implementation correspondence
         run: python3 proofs/validation/empirical/lean_code_map/map_check.py
 
+      # A reference evaluation states a VALUE so that a body with the wrong
+      # constant in front fails it. A stated value of ZERO fails nothing:
+      # `c * 0 = 0` is that same value for every `c`, whatever the arguments
+      # are. So a theorem named `_at_reference_point` whose value is zero reads
+      # as scale-pinning evidence while providing none.
+      #
+      # The corpus had 45 of them. They were not scattered mistakes: the naming
+      # convention had been applied to every evaluation a definition admitted,
+      # including the ones that can only ever be zero, so every discrepancy
+      # measure, regret, energy and empty sum acquired one. 17 of 17 audited in
+      # one pass were identities rather than mislocated reference points.
+      #
+      # Budget 0, so the corpus cannot re-acquire one. The failure message names
+      # BOTH repairs, because the wrong one is destructive: moving a metric off
+      # its own diagonal does not fix `d P P = 0`, it deletes it.
+      - name: Vacuous reference evaluations
+        run: python3 proofs/validation/empirical/lean_code_map/degenerate.py --gate
+
       # Now also the numeric differential: every mapped Calibrator definition
       # evaluated against the REAL map/correctability.rs on the committed
       # boundary/degenerate fixture grid, ~12800 comparisons in under a tenth of

@@ -275,7 +275,34 @@ def _evaluate_conjunct(api, conjunct):
     return result, head
 
 
+# Budget 0, and it must stay 0.  Pinning it to the current count would record
+# how many the corpus was carrying on the day somebody was in a hurry, which is
+# the opposite of what this guard is for.
+DEGENERATE_REFERENCE_BUDGET = 0
+
+REPAIR_ADVICE = """
+  A reference evaluation exists to reject a rescaled competitor: it states a
+  VALUE so that a body with the wrong constant in front fails it.  A stated
+  value of ZERO rejects nothing, because `c * 0 = 0` is that same value for
+  every `c`, whatever the arguments are.  There are two repairs and they are
+  NOT interchangeable:
+
+    * If the theorem was meant to pin a scale and picked a collapse point by
+      accident, MOVE THE POINT so the body is nonzero there.
+    * If it is genuinely an identity -- a metric vanishing on its diagonal, a
+      regret vanishing at the truth, a sum over an empty index -- RENAME it to
+      say what it is.  Moving such a point does not repair the theorem, it
+      deletes it and writes a different one.
+
+  Read the docstring before choosing.  If it describes a degenerate
+  configuration in words ("with no ...", "... against itself", "... matching
+  the truth"), it is an identity and moving the point destroys it.  All
+  seventeen audited under this rule so far were identities.
+"""
+
+
 def main():
+    gate = "--gate" in sys.argv[1:]
     rows = scan()
     counts = {}
     for _, verdict, _, _ in rows:
@@ -294,6 +321,18 @@ def main():
     if readable == 0:
         print("\nFAIL: no reference evaluation could be read; this census has no evidence")
         return 1
+    if not gate:
+        return 0
+
+    degenerate = counts.get("DEGENERATE", 0)
+    print(f"\nvacuous reference evaluations: {degenerate}, "
+          f"budget {DEGENERATE_REFERENCE_BUDGET}")
+    if degenerate > DEGENERATE_REFERENCE_BUDGET:
+        print(REPAIR_ADVICE)
+        print("FAIL: the corpus states a reference value of zero somewhere, so that "
+              "theorem pins nothing.")
+        return 1
+    print("PASS: no theorem named `_at_reference_point` states a value of zero.")
     return 0
 
 

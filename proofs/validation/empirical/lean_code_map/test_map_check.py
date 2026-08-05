@@ -232,6 +232,46 @@ def main():
     expect(degenerate._stated_zero("E.someBody P P = 0", "someBody"),
            "a structure-projected head still resolves to the subject")
 
+    #     THE GATE'S false-positive direction. `degenerate.py --gate` fails the
+    #     build when any `_at_reference_point` theorem states zero, so the two
+    #     ways it could punish correct work are:
+    #
+    #       - firing on a reference evaluation whose value is NOT zero, and
+    #       - firing on a theorem that states zero but is honestly named as the
+    #         identity it is.
+    #
+    #     The second is the one that would undo the seventeen renames: if the
+    #     scan looked at every theorem rather than only the suffixed ones, every
+    #     `_self_eq_zero` and `_empty_eq_zero` would come straight back as a
+    #     finding, and the corpus would be pushed to move metrics off their own
+    #     diagonals. Both are asserted against the live corpus.
+    scanned = {name for name, _, _, _ in clean["reference_points"]}
+    misscoped = [name for name in scanned
+                 if not name.split(".")[-1].endswith(degenerate.SUFFIX)]
+    expect(not misscoped,
+           f"the gate looks only at theorems named `{degenerate.SUFFIX}` "
+           f"(out of scope: {misscoped[:3]})")
+
+    # Matched by suffix rather than by a fixed fully-qualified name: these live
+    # inside namespaces (`Calibrator.CertificateGrading.FiniteMixtureExperiment.
+    # totalVariation_self_eq_zero`), and pinning the full path would make this
+    # assertion break on a namespace move rather than on the property it checks.
+    identity_suffixes = ("_self_eq_zero", "_empty_eq_zero", "_zero_measure_eq_zero")
+    renamed_identities = [name for name in api.theorems()
+                          if name.split(".")[-1].endswith(identity_suffixes)]
+    expect(renamed_identities,
+           f"there are honestly-named vanishing identities in the corpus, so this "
+           f"assertion is about something (found {len(renamed_identities)})")
+    expect(not [name for name in renamed_identities if name in scanned],
+           "a theorem that states zero but is named as the identity it is does "
+           "NOT come back as a finding")
+
+    live_suffixed = [name for name, verdict, _, _ in clean["reference_points"]
+                     if verdict == "LIVE"]
+    expect(live_suffixed,
+           f"there are live reference evaluations to be left alone "
+           f"(found {len(live_suffixed)})")
+
     unsupported = []
     for name, verdict, _, _ in clean["reference_points"]:
         if verdict != "LIVE":
