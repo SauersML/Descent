@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Split
 import Descent.Coalescent.Extend
+import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
 import Descent.Coalescent.Kernel
 import Mathlib.Tactic
@@ -52,8 +53,12 @@ the fibre of restriction over `ξ` is `Option (Quotient ξ)` (`restrict_extend`,
 `extend_injective`, `exists_extend`), seating changes the block count as required
 (`blocks_extend_none`, `blocks_extend_some`), it changes exactly one class size and by one
 (`card_fiber_self`, `card_fiber_of_ne`, `card_fiber_none_old`, `card_fiber_none_new`), and
-the sizes sum to `n` (`sum_classSize`).  What is left is to run the fibrewise sum with those
-weights, and that has not been done.
+the sizes sum to `n` (`sum_classSize`), and the fibrewise sum itself is available
+(`Ewens.sum_ER_succ`, whose dependent-transport step is `Ewens.sum_fiber_eq_sum_seatings`).
+What is left is one identity: that seating multiplies the Ewens weight by `θ` or by `λ_o`.
+Its ingredients are all proved; turning them into a statement about the product over
+`Quotient (extend ξ o)` needs a transfer of products along `Quotient (Setoid.ker f) ≃ range f`,
+and that is not written.
 
 **3. K-C Theorem 2, the paintbox representation.**  Every exchangeable random equivalence
 relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the
