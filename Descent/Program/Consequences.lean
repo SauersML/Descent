@@ -11,6 +11,7 @@ import Descent.Portability.EquityAndImplementation
 import Descent.PopGen.HumanDemography
 import Descent.PopGen.DemographicCapacity
 import Descent.Portability.CorrectionBiology
+import Descent.PopGen.AdditiveInvariance
 
 /-!
 # What the separate results say when they are put together
@@ -253,5 +254,47 @@ behind is therefore a claim about the demography. -/
 theorem nothing_missed_at_no_divergence (p : ℝ) :
     contrastSpikeLevel p p = 0 :=
   contrastSpikeLevel_self p
+
+/-! ### Where the loss cannot come from, and what that leaves -/
+
+/-- **Under a shared additive causal map the optimal weights are transport-invariant, so
+every deployed loss the corpus proves must come from somewhere else.**
+
+`AdditiveInvariance.additive_architecture_weights_agree_across_populations` proves that
+two populations sharing one causal effect vector have the SAME optimal weights -- stated
+with two independent expectation functionals and two independent predictor laws, so
+nothing is assumed common except the effects. No allele-frequency divergence, however
+large, moves them.
+
+`Core.ScoreMoments.deployedR2_mono_in_migration` proves that a demographic history with
+less gene flow deploys a strictly worse `R²`.
+
+Both hold at once, and the conjunction is the constraint: the loss is real and it is NOT
+in the optimal weights. What drift erodes is the moment tuple those weights are evaluated
+against -- the score variance and the predictive covariance -- while the weights
+themselves are the same vector in both populations. A programme that responds to a
+portability gap by refitting weights is answering a question the invariance says is
+already settled.
+
+This is the trichotomy `AdditiveInvariance` states, closed from the other side: if the
+weights do differ in practice, then additivity, a shared causal map, or direct (rather
+than tagging) predictors has failed -- and that is a claim about the architecture, not
+about the demography. -/
+theorem loss_is_not_in_the_weights
+    {Ω J : Type*} [Fintype J] [DecidableEq J]
+    (sigmaInvP sigmaInvQ : Matrix J J ℝ)
+    (EP EQ : ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
+    (hP : covarianceMatrix EP XP * sigmaInvP = 1)
+    (hQ : covarianceMatrix EQ XQ * sigmaInvQ = 1)
+    (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    optimalWeightsFromMoments sigmaInvP EP XP (causalSignal β XP) =
+      optimalWeightsFromMoments sigmaInvQ EQ XQ (causalSignal β XQ) ∧
+    Descent.Core.ScoreMoments.deployedR2 p V_E
+      < Descent.Core.ScoreMoments.deployedR2 q V_E :=
+  ⟨additive_architecture_weights_agree_across_populations
+      sigmaInvP sigmaInvQ EP EQ XP XQ β hP hQ,
+   Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow⟩
 
 end Descent
