@@ -1,0 +1,209 @@
+{
+ "_battery_sha": "62b251af7120dafc",
+ "results": [
+  {
+   "name": "effectMutualInformation",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-(m/2) * log(1 - rho^2)",
+   "note": "",
+   "regime": "m = 40 independent coordinate pairs with Gaussian dependence, 2e5 draws per coordinate; mutual information is additive over independent pairs so the estimate is m times a two-dimensional Kraskov-Stogbauer-Grassberger estimate, which uses neighbour counts only and assumes no density model. rho is the REALISED Pearson correlation of the drawn pairs. The standard error is over 8 independent blocks",
+   "span": 0.9423493790046225,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Gaussian rho=0.7 (realised 0.6993)",
+    "lean": 13.429156459312239,
+    "truth": 13.555979668681841,
+    "sem": 0.07259867143853581,
+    "sems_off": 1.7469081300885065,
+    "rel_err": 0.009355517820862483
+   },
+   "cells": [
+    {
+     "design": "Gaussian rho=0.3 (realised 0.3022)",
+     "lean": 1.9152199635888192,
+     "truth": 1.8614250282012712,
+     "sem": 0.060722059292590384,
+     "sems_off": 0.8859208006819412,
+     "rel_err": 0.02889986680770646
+    },
+    {
+     "design": "Gaussian rho=0.5 (realised 0.5021)",
+     "lean": 5.809943337490372,
+     "truth": 5.9103512177633455,
+     "sem": 0.06547027697842264,
+     "sems_off": 1.533640682566002,
+     "rel_err": 0.016988479461457567
+    },
+    {
+     "design": "Gaussian rho=0.7 (realised 0.6993)",
+     "lean": 13.429156459312239,
+     "truth": 13.555979668681841,
+     "sem": 0.07259867143853581,
+     "sems_off": 1.7469081300885065,
+     "rel_err": 0.009355517820862483
+    },
+    {
+     "design": "Gaussian rho=0.9 (realised 0.9000)",
+     "lean": 33.2211506228594,
+     "truth": 33.306010559985985,
+     "sem": 0.08588795456075327,
+     "sems_off": 0.9880307146744494,
+     "rel_err": 0.0025478865736186023
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation [factor m not m/2, competing]",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-m * log(1 - rho^2)",
+   "note": "positive control 'Gaussian rho=0.50 [KSG against the closed form -0.5*log(1-rho^2), one coordinate]' passed at 0.03 sems",
+   "regime": "m = 40 independent coordinate pairs with Gaussian dependence, 2e5 draws per coordinate; mutual information is additive over independent pairs so the estimate is m times a two-dimensional Kraskov-Stogbauer-Grassberger estimate, which uses neighbour counts only and assumes no density model. rho is the REALISED Pearson correlation of the drawn pairs. The standard error is over 8 independent blocks",
+   "span": 0.9423493790046225,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Gaussian rho=0.9 (realised 0.9000)",
+    "lean": 66.4423012457188,
+    "truth": 33.306010559985985,
+    "sem": 0.08588795456075327,
+    "sems_off": 385.8083575886499,
+    "rel_err": 0.9949042268527628
+   },
+   "cells": [
+    {
+     "design": "Gaussian rho=0.3 (realised 0.3022)",
+     "lean": 3.8304399271776384,
+     "truth": 1.8614250282012712,
+     "sem": 0.060722059292590384,
+     "sems_off": 32.426681866776484,
+     "rel_err": 1.057799733615413
+    },
+    {
+     "design": "Gaussian rho=0.5 (realised 0.5021)",
+     "lean": 11.619886674980744,
+     "truth": 5.9103512177633455,
+     "sem": 0.06547027697842264,
+     "sems_off": 87.20805410826532,
+     "rel_err": 0.9660230410770849
+    },
+    {
+     "design": "Gaussian rho=0.7 (realised 0.6993)",
+     "lean": 26.858312918624478,
+     "truth": 13.555979668681841,
+     "sem": 0.07259867143853581,
+     "sems_off": 183.2310837975153,
+     "rel_err": 0.9812889643582751
+    },
+    {
+     "design": "Gaussian rho=0.9 (realised 0.9000)",
+     "lean": 66.4423012457188,
+     "truth": 33.306010559985985,
+     "sem": 0.08588795456075327,
+     "sems_off": 385.8083575886499,
+     "rel_err": 0.9949042268527628
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation [rho not squared, competing]",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-(m/2) * log(1 - rho)",
+   "note": "positive control 'Gaussian rho=0.50 [KSG against the closed form -0.5*log(1-rho^2), one coordinate]' passed at 0.03 sems",
+   "regime": "m = 40 independent coordinate pairs with Gaussian dependence, 2e5 draws per coordinate; mutual information is additive over independent pairs so the estimate is m times a two-dimensional Kraskov-Stogbauer-Grassberger estimate, which uses neighbour counts only and assumes no density model. rho is the REALISED Pearson correlation of the drawn pairs. The standard error is over 8 independent blocks",
+   "span": 0.8437605226842686,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Gaussian rho=0.9 (realised 0.9000)",
+    "lean": 46.058590859511845,
+    "truth": 33.306010559985985,
+    "sem": 0.08588795456075327,
+    "sems_off": 148.4792642314617,
+    "rel_err": 0.38289125851797084
+   },
+   "cells": [
+    {
+     "design": "Gaussian rho=0.3 (realised 0.3022)",
+     "lean": 7.196170161789253,
+     "truth": 1.8614250282012712,
+     "sem": 0.060722059292590384,
+     "sems_off": 87.85514186668821,
+     "rel_err": 2.8659468164253936
+    },
+    {
+     "design": "Gaussian rho=0.5 (realised 0.5021)",
+     "lean": 13.947278182265828,
+     "truth": 5.9103512177633455,
+     "sem": 0.06547027697842264,
+     "sems_off": 122.75688045662693,
+     "rel_err": 1.3598053090902265
+    },
+    {
+     "design": "Gaussian rho=0.7 (realised 0.6993)",
+     "lean": 24.033622239899508,
+     "truth": 13.555979668681841,
+     "sem": 0.07259867143853581,
+     "sems_off": 144.32278667920735,
+     "rel_err": 0.77291666314785
+    },
+    {
+     "design": "Gaussian rho=0.9 (realised 0.9000)",
+     "lean": 46.058590859511845,
+     "truth": 33.306010559985985,
+     "sem": 0.08588795456075327,
+     "sems_off": 148.4792642314617,
+     "rel_err": 0.38289125851797084
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation [non-Gaussian dependence at the same realised rho: the body is a strict lower bound]",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-(m/2) * log(1 - rho^2)",
+   "note": "positive control 'Gaussian rho=0.50 [KSG against the closed form -0.5*log(1-rho^2), one coordinate]' passed at 0.03 sems",
+   "regime": "the same estimator and the same m, but the coupling strength is itself random -- y = A x + sqrt(1-A^2) z with A drawn from two values -- so each component is Gaussian and the mixture is not, while the Pearson correlation is the mean of the two couplings. The Gaussian is the maximum-entropy joint at fixed correlation and therefore the minimum-mutual-information one, so the body is a strict LOWER BOUND here and the measurement must exceed it. The last cell has A symmetric about zero: the realised correlation is ~0 and the body predicts NO information, while the dependence is total",
+   "span": 0.9999297782150917,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "mixture A in {+0.45, +0.95} (realised rho 0.7014)",
+    "lean": 13.544402917208032,
+    "truth": 17.127952763497376,
+    "sem": 0.07395221657039658,
+    "sems_off": 48.45763943908418,
+    "rel_err": 0.2092223102066528
+   },
+   "cells": [
+    {
+     "design": "mixture A in {+0.10, +0.90} (realised rho 0.5006)",
+     "lean": 5.76839691182816,
+     "truth": 8.829655567329002,
+     "sem": 0.08660587524458227,
+     "sems_off": 35.34700904361963,
+     "rel_err": 0.3467019332926123
+    },
+    {
+     "design": "mixture A in {+0.45, +0.95} (realised rho 0.7014)",
+     "lean": 13.544402917208032,
+     "truth": 17.127952763497376,
+     "sem": 0.07395221657039658,
+     "sems_off": 48.45763943908418,
+     "rel_err": 0.2092223102066528
+    },
+    {
+     "design": "mixture A in {-0.20, +0.80} (realised rho 0.3013)",
+     "lean": 1.9031909762509596,
+     "truth": 3.9832962674068284,
+     "sem": 0.07362303084647932,
+     "sems_off": 28.253459104303367,
+     "rel_err": 0.5222070244124827
+    },
+    {
+     "design": "mixture A in {-0.60, +0.60} (realised rho -0.0069)",
+     "lean": 0.0009511121483647901,
+     "truth": 2.140446636540574,
+     "sem": 0.07524580009526594,
+     "sems_off": 28.43342115684161,
+     "rel_err": 0.9995556478110091
+    }
+   ]
+  }
+ ]
+}

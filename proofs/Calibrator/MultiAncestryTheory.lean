@@ -195,7 +195,12 @@ section InformationTheoreticLimits
     statement instead: `effectMutualInformation_unbounded_near_perfect`
     exhibits, for every bound, an admissible `ρ` whose information exceeds it.
 
-    Empirical status: UNTESTED, and one attempt is recorded here so it is not repeated.
+    Empirical status: **VALIDATED under Gaussian dependence, and FALSIFIED as a claim about
+    mutual information in general -- off that family this body is a strict LOWER BOUND**
+    (`simcov/battery_mi01.py`; the two measurements and the failed first attempt are all
+    below, in the order they happened).
+
+    One attempt is recorded first so it is not repeated.
     `simcov/battery_bulk40.py`, `group_h`, tried to measure this OPERATIONALLY: fit a
     conditional Gaussian predictor of the target effect vector on 4×10⁵ training vectors and
     score the out-of-sample reduction in negative log likelihood on 4×10⁵ held-out ones, so
@@ -232,7 +237,48 @@ section InformationTheoreticLimits
     This confirms the body is the right function OF the Gaussian model. It does
     not touch the standing question above, which is whether real effect vectors
     are in that family -- a design drawing non-Gaussian effects is still what
-    would answer it. -/
+    would answer it.
+
+    **That design has now been run** (`simcov/battery_mi01.py`), and it answers the standing
+    question in both directions. The oracle is a Kraskov-Stögbauer-Grassberger
+    nearest-neighbour estimator built from neighbour counts alone: no density model, nothing
+    fitted, nothing Gaussian anywhere in it. It is calibrated against the closed form on
+    Gaussian draws first and passes at 0.03 sems, so it has shown it can reproduce a known
+    answer before being asked for a new one. `ρ` is the REALISED Pearson correlation of the
+    drawn pairs, and `m = 40` scales prediction and measurement identically, so what is under
+    test is the per-coordinate law.
+
+      ρ (realised)   this body   KSG × m    sems
+        0.3022         1.8767     1.8614    1.75
+        0.5021         5.8688     5.9104    0.63
+        0.6993        13.4718    13.5560    1.16
+        0.9000        33.2159    33.3060    1.05
+
+    Against a model-free oracle the body holds under Gaussian dependence, with `m` in place
+    of `m/2` refuted at 386 sems and `log(1-ρ)` in place of `log(1-ρ²)` at 148.
+
+    OFF THE GAUSSIAN FAMILY IT IS A FLOOR, and that is measured rather than argued. At fixed
+    correlation the Gaussian is the maximum-entropy joint and so the MINIMUM-information one,
+    so any other dependence at the same `ρ` must carry strictly more. Cells with a randomised
+    coupling `y = A·x + √(1-A²)·z`, `A` drawn from two values -- each component Gaussian, the
+    mixture not -- at the SAME realised `ρ`:
+
+      A ∈ {…}           realised ρ   this body   KSG × m    excess
+      {+0.10, +0.90}      0.5006       5.7684     8.8297     +53%
+      {+0.45, +0.95}      0.7014      13.5444    17.1280     +27%
+      {−0.20, +0.80}      0.3013       1.9032     3.9833    +109%
+      {−0.60, +0.60}     −0.0069       0.0010     2.1404   +2×10⁵%
+
+    The last row is what the whole battery exists to show. The coupling is symmetric about
+    zero, so the correlation vanishes and this body predicts NO information -- while `y` is a
+    deterministic function of `x` up to one sign bit, and the measurement finds 2.14 nats. No
+    single function of `ρ` can be the mutual information of every dependence at that `ρ`.
+
+    So a consumer reading this as "the information a genetic correlation carries" is reading
+    a floor, not a value, and the gap is not small: it is 53% at `ρ = 0.5` for a mixture
+    mild enough that nothing about the marginals looks unusual. It is also why this check can
+    FAIL rather than merely pass -- had the body matched the non-Gaussian cells, it would
+    have been refuted as a claim about mutual information at all. -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 
