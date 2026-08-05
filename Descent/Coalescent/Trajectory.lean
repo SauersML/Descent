@@ -67,6 +67,17 @@ theorem mem_support_jumpLaw_of_absorbed {n : ℕ} {ξ η : ER n} (hk : blocks ξ
   classical
   rw [jumpLaw, dif_neg (by omega), PMF.mem_support_pure_iff]
 
+/-- Trajectories are countable, so the discrete σ-algebra is the right one and costs nothing.
+
+This instance is needed, not decorative: `Descent.Coalescent.Law` takes `PMF.toMeasure` of a
+law on trajectories, and `toMeasure` requires a measurable structure on its type.  Without it
+that file does not even typecheck. -/
+scoped instance instMeasurableSpaceListER (n : ℕ) : MeasurableSpace (List (ER n)) := ⊤
+
+instance instMeasurableSingletonClassListER (n : ℕ) :
+    MeasurableSingletonClass (List (ER n)) :=
+  ⟨fun _ => trivial⟩
+
 /-- **The law of a whole trajectory of the jump chain**, newest state at the head.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is `Kernel.jumpLaw` iterated; every step is
