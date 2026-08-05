@@ -1,8 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.AncestrySpecificPower
-import Descent.PopGen.DemographicHistory
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -361,7 +360,8 @@ theorem haplotypeFreqAdmixed_same (alpha p q : ℝ) :
 
 /-! **Marginal allele frequency at either locus in the admixed population.**
 
-This is `admixedAlleleFreq` from `Descent.PopGen.DemographicHistory` -- one function of a
+This is `Descent.Core.convexCombination`, which `PopGen.DemographicHistory.admixedAlleleFreq`
+also calls -- one function of a
 mixing weight and two parental frequencies, applied once per locus. Do not add a
 per-locus copy; two copies differing only in bound-variable names is what that invites.
 
@@ -382,7 +382,7 @@ per-locus copy; two copies differing only in bound-variable names is what that i
     the admixed generation: worst 0.19 sems over 0.06000 to 0.07560. -/
 noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   haplotypeFreqAdmixed alpha p_A q_A p_B q_B
-    - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B
+    - Descent.Core.convexCombination alpha p_A p_B * Descent.Core.convexCombination alpha q_A q_B
 
 /-- **Admixture LD is the haplotype frequency minus the product of the two
 marginal admixed allele frequencies**, where the marginal is
@@ -392,7 +392,7 @@ theorem admixtureLDTwoLocus_eq_haplotype_sub_marginals
     (alpha p_A q_A p_B q_B : ℝ) :
     admixtureLDTwoLocus alpha p_A q_A p_B q_B =
       haplotypeFreqAdmixed alpha p_A q_A p_B q_B
-        - admixedAlleleFreq alpha p_A p_B * admixedAlleleFreq alpha q_A q_B :=
+        - Descent.Core.convexCombination alpha p_A p_B * Descent.Core.convexCombination alpha q_A q_B :=
   rfl
 
 /-- **Core algebraic identity (Step 4): D_admix = α(1−α)(p_A − p_B)(q_A − q_B).**
@@ -402,7 +402,8 @@ theorem admixtureLDTwoLocus_eq_haplotype_sub_marginals
 theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
     admixtureLDTwoLocus alpha p_A q_A p_B q_B =
       alpha * (1 - alpha) * (p_A - p_B) * (q_A - q_B) := by
-  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq Descent.Core.convexCombination
+  unfold admixtureLDTwoLocus haplotypeFreqAdmixed
+  simp only [Descent.Core.convexCombination]
   ring
 
 /-- **Recombination decay of admixture LD (Step 5).**
@@ -421,7 +422,7 @@ noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : �
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem admixtureLDAtGen_at_reference_point :
     admixtureLDAtGen (1 / 2) 1 1 0 0 0 1 = 1 / 4 := by
-  norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed, Descent.Core.convexCombination]
+  norm_num [admixtureLDAtGen, Descent.Core.convexCombination, admixtureLDTwoLocus, haplotypeFreqAdmixed, Descent.Core.convexCombination]
 
 
 /-- **Full admixture LD formula at generation g.**
