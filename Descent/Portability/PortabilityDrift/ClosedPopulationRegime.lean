@@ -1,0 +1,401 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Program.Conclusions
+import Descent.PopGen.DGP
+import Descent.Spectral.CirculationDefect
+import Descent.Core.Fst
+import Descent.Core.Parameters
+import Descent.Core.Moments
+import Descent.Portability.PortabilityDrift.Definitions
+
+namespace Descent.Portability
+
+open MeasureTheory
+
+open PopGen.TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
+  equalVarianceGaussianAUCFromSignalVariance
+  equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
+
+/-!
+# `PortabilityDrift.ClosedPopulationRegime`
+
+Part of the split of `Portability/PortabilityDrift.lean`, which was 9,208 lines and 555
+declarations -- the largest file in the corpus by both measures, and large enough that
+nothing in it could be read without reading past most of it.
+
+The parts are a CHAIN: each imports the one before, in the order the original was written.
+That is the conservative choice, deliberately. A monolith's declarations depend on each
+other in whatever order they happen to appear, and cutting it into modules that import only
+what they use means discovering that order first -- worth doing, and not what this does.
+The chain preserves every resolution the single file had, so the split cannot change what
+any proof sees.
+
+Sections are reopened and reclosed by name where a cut falls inside one: the original
+opened `section PortabilityDrift` and closed it 8,000 lines later. A section scopes
+`variable`s, and this file declares none at that level, so the reopening is exact.
+-/
+
+section ClosedPopulationRegime
+
+/-- **One generation of the heterozygosity recurrence, with mutation.**
+
+Drift removes a fraction `1/(2 Nₑ)` of the standing heterozygosity, and
+mutation converts a fraction `2 mu` of the identical pairs -- one chance per
+lineage -- back into non-identical ones. Dropping the second term is the
+closed-population assumption, and it is dropped nowhere in this definition.
+
+Composition convention: drift and mutation are applied to the same input state
+and added, which is the first-order model. The unlinearised infinite-alleles
+recursion multiplies `(1 - mu)²` against the drift factor and differs at
+`O(mu², mu/Nₑ)`.
+
+    Regime: none. This is the general recurrence; the closed population is the
+    special case `mu = 0`, recorded by `hetTrajectory_of_no_mutation`.
+
+    Empirical status: **VALIDATED**, with a stated bias
+    (`validation/empirical/simcov/battery_max.py`,
+    `test_het_recurrences`). One Wright-Fisher generation with two-way allele
+    mutation `p' = p(1-mu) + (1-p)mu`, 4000 loci, 400 replicates, predicted from
+    the measured `H` of the preceding generation:
+
+      Ne      mu      this def   simulated            sems    relative
+      100    1e-3      0.36462   0.36391±0.00010      6.82      +0.20%
+      500    1e-3      0.39493   0.39414±0.00008     10.09      +0.20%
+      100    5e-3      0.40047   0.39650±0.00008     47.66      +1.00%
+
+    High in every cell and growing with `mu`: the recursion drops the
+    `mu/(2 Ne)` and `mu^2` cross terms, so it is a linearisation and not an
+    identity. One percent at `mu = 5e-3` is small for a per-generation step and
+    compounds over a run. 
+    **Re-measured on the correct oracle**
+    (`validation/empirical/simcov/battery_bulk15.py`). The status above was
+    earned against a BIALLELIC Wright-Fisher, whose exact input term is
+    `2 mu (1 - 2 H)` rather than the `2 mu (1 - H)` this body carries: under
+    biallelic two-way mutation `p - 1/2` contracts by `1 - 2 mu` and
+    `H = 1/2 - 2 (p - 1/2)^2`. The `2 mu (1 - H)` form is the infinite-alleles
+    one. The discrepancy is `2 mu H`, O(mu) per step, so it hides under the noise
+    of a SINGLE generation, which is exactly what a one-step design measures --
+    the error was found only by iterating the same map fifteen times, where it
+    reached 632 sems.
+
+    Re-run on infinite-alleles trajectories, this body holds at worst 0.71 sems
+    over nine cells spanning `theta` 0.80 to 1.00 and `Ne` 50 to 200. The status
+    stands, but it now stands on an oracle that matches the model the body
+    describes, rather than on one that agreed with it to first order in `mu`.
+-/
+noncomputable def hetStepWithMutation (Ne mu H : ℝ) : ℝ :=
+  (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
+
+/-- **hetStepWithMutation at its junk point, named.** At `Ne = 0` the drift term is junk-zero, so
+heterozygosity is carried forward in full and only mutation moves it. An empty population is
+reported as one in which drift removes nothing, and iterating the step compounds that. Consumers
+must exclude the argument that makes the guard vanish. -/
+theorem hetStepWithMutation_empty_population_is_junk (mu H : ℝ) :
+    hetStepWithMutation 0 mu H = H + 2 * mu * (1 - H) := by
+  unfold hetStepWithMutation
+  simp
+
+/-- The heterozygosity trajectory generated by `hetStepWithMutation` from `H₀`.
+
+    Regime: none; carries whatever `mu` it is given.
+
+    Empirical status: UNTESTED. -/
+noncomputable def hetTrajectory (Ne mu H₀ : ℝ) : ℕ → ℝ
+  | 0 => H₀
+  | t + 1 => hetStepWithMutation Ne mu (hetTrajectory Ne mu H₀ t)
+
+/-- **The heterozygosity floor that mutation holds.**
+
+`theta / (1 + theta)` with `theta = 4 Nₑ mu`: the level at which mutational
+input balances drift loss. Below it the recurrence gains heterozygosity, above
+it the recurrence loses heterozygosity, and it is never crossed from above.
+This is the number the closed-population model sets to zero.
+
+    Regime: none. Its `mu = 0` value is `0`, which is the closed-population
+    assumption itself, and is why that model predicts unbounded loss.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk20b.py`). The
+    saturation is an INFINITE-ALLELES statement, and reading it under infinite
+    sites is what an earlier attempt got wrong: per-site heterozygosity there is
+    approximately `θ` and the `1 / (1 + θ)` denominator never shows. Measured on
+    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with 100 sampled chromosomes and 40 independent replicates, with heterozygosity
+    taken as the unbiased `1 - ∑ pᵢ²` over the WHOLE sample -- never conditioned
+    on the locus being polymorphic, which inflates it exactly where `θ` is
+    small. Over `θ` = 0.1, 0.5, 1, 3, 10 the body predicts 0.09091, 0.33333,
+    0.50000, 0.75000 and 0.90909 against measured 0.11943 ± 0.02958, 0.37403 ±
+    0.03421, 0.49994 ± 0.03388, 0.76355 ± 0.01782 and 0.91824 ± 0.00421, worst
+    cell 2.17 sems at 1.0% relative, over a prediction spanning 90%.
+
+    Control: Ewens' sampling formula for the expected number of distinct
+    alleles, `∑ᵢ θ/(θ+i-1)`, evaluated on the same samples. It shares no algebra
+    with the body and passed at worst 1.10 sems (1.50/1.53, 3.28/3.45,
+    5.19/5.38, 11.12/11.40, 24.44/25.05). It earned its place: on the first run
+    the control returned exactly 2 alleles in every cell, which the sampling
+    formula cannot produce, and it voided a design whose heterozygosity cells
+    would otherwise have been read as a 21-sem falsification of this body.
+
+    The observation the body explains is measured too: at demographic
+    equilibrium the retention stays at `1.025 ± 0.020` out to `T = 4000` where
+    the floorless model predicts `0.135`.
+
+    INDEPENDENTLY CONFIRMED, and with the competitor gate the run above lacks
+    (`simcov/battery_ia02.py`). 200 replicates rather than 40, same regime, and
+    two competing readings carried on the same cells: `θ/(1+2θ)` misses by up to
+    182 sems and `2θ/(1+2θ)` by 18, while the body sits at worst 0.68 sems. The
+    Ewens control tracks `E[K]` from 1.5 to 24.4 alleles across the hundredfold
+    sweep at 0.09 to 1.45 sems. A validation with no rejected competitor is
+    arithmetic; this one is not.
+
+    THE SAME TRAP HAS NOW BITTEN THIS DEFINITION THREE TIMES, in three
+    directions, and it is worth naming so it stops. `msprime.InfiniteAlleles()`
+    requires a DISCRETE genome. Under `discrete_genome=False` each mutation
+    lands at its own real-valued position, so one locus carrying `k` mutations
+    is reported as `k` biallelic SITES instead of one site with `k+1` allelic
+    states -- and a design reading the FIRST variant then sees two alleles
+    however large `θ` is. That produced a 21-sem falsification once, a VOID in
+    `battery_bulk20.py` `group_b` once, and correct numbers only when
+    `sequence_length = 1` is used with msprime's default discrete genome. The
+    Ewens control is what caught it every time, because `∑ᵢ θ/(θ+i-1)` cannot
+    return 2 for every `θ`. Do not drop that control. -/
+noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
+  4 * Ne * mu / (1 + 4 * Ne * mu)
+
+/-- The trajectory inherits the equilibrium's junk point: where `1 + 4 Nₑ mu` vanishes the
+mutation step divides by zero and Mathlib returns `0`, so the recursion reports a monomorphic
+population rather than an inadmissible parameter. -/
+theorem hetTrajectory_inherits_zero_denominator_junk (Ne mu : ℝ)
+    (hzero : 1 + 4 * Ne * mu = 0) :
+    4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
+  rw [hzero, div_zero]
+
+
+/-- At the excluded parameter the equilibrium heterozygosity divides by zero and Mathlib
+returns `0`, reporting a monomorphic equilibrium rather than an undefined one. -/
+theorem hetEquilibriumWithMutation_at_zero_denominator_is_junk (Ne mu : ℝ)
+    (hzero : 1 + 4 * Ne * mu = 0) :
+    4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
+  rw [hzero, div_zero]
+
+
+/-- **The floor is the rest point of the recurrence.**  Solving
+`(1 - 1/(2 Nₑ)) H + 2 mu (1 - H) = H` gives `H (1/(2 Nₑ) + 2 mu) = 2 mu`, i.e.
+`H = 4 Nₑ mu / (1 + 4 Nₑ mu)`. -/
+theorem hetMutationFloor_isFixedPoint (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 ≤ mu) :
+    hetStepWithMutation Ne mu (hetMutationFloor Ne mu) = hetMutationFloor Ne mu := by
+  have hNe' : Ne ≠ 0 := ne_of_gt hNe
+  have hprod : (0 : ℝ) ≤ 4 * Ne * mu := by positivity
+  have hd : (0 : ℝ) < 1 + 4 * Ne * mu := by linarith
+  have hd' : (1 : ℝ) + 4 * Ne * mu ≠ 0 := ne_of_gt hd
+  unfold hetStepWithMutation hetMutationFloor
+  field_simp
+  ring
+
+/-- **The closed-population recurrence is the `mu = 0` case, and nothing else.**
+This is the theorem that turns the assumption from a habit into a hypothesis:
+the geometric decay formula used throughout is the trajectory at exactly one
+value of the mutation rate. -/
+theorem hetTrajectory_of_no_mutation (Ne H₀ : ℝ) (t : ℕ) :
+    hetTrajectory Ne 0 H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
+  induction t with
+  | zero => simp [hetTrajectory]
+  | succ n ih =>
+      simp only [hetTrajectory, hetStepWithMutation, ih]
+      ring
+
+/-- With mutation present the floor is absorbing from above: one step from a
+state at or above the floor lands at or above the floor. The contraction
+hypothesis `1/(2 Nₑ) + 2 mu ≤ 1` says only that the two forces together do not
+overshoot in a single generation. -/
+theorem hetStepWithMutation_ge_hetMutationFloor_of_ge_floor (Ne mu H : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH : hetMutationFloor Ne mu ≤ H) :
+    hetMutationFloor Ne mu ≤ hetStepWithMutation Ne mu H := by
+  have hfp := hetMutationFloor_isFixedPoint Ne mu hNe hmu
+  have hslope : (0 : ℝ) ≤ 1 - 1 / (2 * Ne) - 2 * mu := by linarith
+  have hdiff : (0 : ℝ) ≤ H - hetMutationFloor Ne mu := by linarith
+  have key : hetStepWithMutation Ne mu H -
+      hetStepWithMutation Ne mu (hetMutationFloor Ne mu) =
+      (1 - 1 / (2 * Ne) - 2 * mu) * (H - hetMutationFloor Ne mu) := by
+    unfold hetStepWithMutation
+    ring
+  have hprod : (0 : ℝ) ≤
+      (1 - 1 / (2 * Ne) - 2 * mu) * (H - hetMutationFloor Ne mu) :=
+    mul_nonneg hslope hdiff
+  linarith [hfp, key, hprod]
+
+/-- **Heterozygosity never falls below the mutation floor, at any horizon.**
+This is the qualitative fact the closed-population model denies: it predicts
+decay to zero, and the simulated population at demographic equilibrium loses
+nothing in four thousand generations. -/
+theorem hetTrajectory_ge_hetMutationFloor_of_init_ge_floor (Ne mu H₀ : ℝ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH₀ : hetMutationFloor Ne mu ≤ H₀) (t : ℕ) :
+    hetMutationFloor Ne mu ≤ hetTrajectory Ne mu H₀ t := by
+  induction t with
+  | zero => simpa [hetTrajectory] using hH₀
+  | succ n ih =>
+      simp only [hetTrajectory]
+      exact hetStepWithMutation_ge_hetMutationFloor_of_ge_floor Ne mu _ hNe hmu hcontract ih
+
+/-- **The quantitative cost of the closed-population assumption.**
+
+Once the drift-only prediction has fallen below the floor that mutation holds,
+it is strictly below the true heterozygosity -- for every mutation rate,
+starting value and horizon in range. This is the inequality that separates the
+drift-only quantity from the equilibrium one, in the same shape as
+`fstFromTau_lt_coalescenceCdf`, so the two cannot be interchanged
+silently. -/
+theorem driftOnly_lt_hetTrajectory_of_below_floor (Ne mu H₀ : ℝ) (t : ℕ)
+    (hNe : 0 < Ne) (hmu : 0 ≤ mu)
+    (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
+    (hH₀ : hetMutationFloor Ne mu ≤ H₀)
+    (hbelow : (1 - 1 / (2 * Ne)) ^ t * H₀ < hetMutationFloor Ne mu) :
+    (1 - 1 / (2 * Ne)) ^ t * H₀ < hetTrajectory Ne mu H₀ t :=
+  lt_of_lt_of_le hbelow
+    (hetTrajectory_ge_hetMutationFloor_of_init_ge_floor Ne mu H₀ hNe hmu hcontract hH₀ t)
+
+/-- **The regime, as an object a use site must construct.**
+
+Any quantity computed from the geometric retention `(1 - 1/(2 Nₑ))^t` is a
+quantity about a population in this regime and about no other. Making the regime
+a structure puts the assumption in the type: `mutation_negligible` is the
+dimensionless condition, and it is stated against the floor that the recurrence
+actually has, not against a rate. If a caller cannot supply it, the
+closed-population answer is not available to them -- which is the whole point,
+since the falsified uses were all callers who could not have supplied it. -/
+structure ClosedPopulationNoMutation where
+  /-- Effective population size. -/
+  Ne : ℝ
+  /-- Mutation rate per generation. -/
+  mu : ℝ
+  /-- Ancestral heterozygosity. -/
+  H₀ : ℝ
+  /-- Number of generations the model is used over. -/
+  horizon : ℕ
+  /-- The fraction of `H₀` that the caller is willing to be wrong by. -/
+  tolerance : ℝ
+  Ne_pos : 0 < Ne
+  mu_nonneg : 0 ≤ mu
+  H₀_pos : 0 < H₀
+  tolerance_pos : 0 < tolerance
+  /-- Drift and mutation together do not overshoot in one generation. -/
+  forces_contract : 1 / (2 * Ne) + 2 * mu ≤ 1
+  /-- **The standing assumption, in the type.** The heterozygosity floor that
+  mutation holds is a negligible fraction of the ancestral heterozygosity. At
+  `Ne = 1000` and the mutation rate of the simulation this fails outright: the
+  floor is the whole of `H₀`, which is why the measured retention is `1.025`. -/
+  mutation_negligible : hetMutationFloor Ne mu ≤ tolerance * H₀
+
+/-- **The regime is inhabited**, at zero mutation rate.
+
+    `mutation_negligible` is the field that makes this structure a regime rather
+    than a wrapper, and at `mu = 0` the floor `4·Ne·mu/(1 + 4·Ne·mu)` is exactly
+    `0`, so it holds with room to spare. That is the regime's interior, not its
+    boundary: a closed population with no mutation is precisely what the name
+    says, and the falsified callers are the ones at `Ne = 1000` and a nonzero
+    rate where the floor is the whole of `H₀`. -/
+noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutation where
+  Ne := 1
+  mu := 0
+  H₀ := 1
+  horizon := 0
+  tolerance := 1
+  Ne_pos := by norm_num
+  mu_nonneg := le_rfl
+  H₀_pos := by norm_num
+  tolerance_pos := by norm_num
+  forces_contract := by norm_num
+  mutation_negligible := by norm_num [hetMutationFloor]
+
+/-- The closed-population retention over the model's horizon.
+
+    Regime: closed population, no mutation -- carried by the structure's
+    `mutation_negligible` field rather than assumed.
+
+    Empirical status: **VALIDATED** in the regime it names
+    (`simcov/battery_wf_drift.py`, guard `wf-drift-in-regime-v1`). Forward
+    Wright-Fisher on 5000 independent biallelic loci at mutation rate ZERO,
+    starting from standing variation, 40 replicates, heterozygosity averaged
+    over ALL loci including those that have fixed:
+
+      Ne    t     measured             this body   sems   haploid   doubled
+      100    25   0.88354 ± 0.00060      0.88222    2.20     176.5     175.7
+      100    50   0.77973 ± 0.00080      0.77831    1.76     217.2     216.2
+      100   100   0.60728 ± 0.00101      0.60577    1.49     238.1     237.2
+      100   200   0.36777 ± 0.00104      0.36696    0.79     225.5     224.8
+      250    62   0.88378 ± 0.00073      0.88327    0.70     141.9     141.7
+      250   125   0.77898 ± 0.00101      0.77861    0.37     171.7     171.4
+      250   250   0.60647 ± 0.00115      0.60623    0.21     209.0     208.6
+      250   500   0.36749 ± 0.00115      0.36751    0.01     202.7     202.4
+
+    Worst cell 2.20 sems over eight. Competitors carried on the SAME cells: the
+    haploid reading `(1 - 1/Nₑ)^t` and the doubled exponent
+    `(1 - 1/(2 Nₑ))^(2t)` are excluded at 142 to 238 sems, so this is a
+    discrimination and not an algebraic identity.
+
+    What the design does NOT separate: the diffusion form `exp(-t/(2 Nₑ))`
+    sits within 1.7 sems everywhere, because it differs from this body by
+    `O(1/Nₑ)` and these `Nₑ` are too large to resolve it. Discrete against
+    continuous is not decided here and is not claimed.
+
+    Control, and it is the one that matters: the same ratio computed over only
+    the still-SEGREGATING loci lands 74 to 536 sems from the all-loci value.
+    Conditioning on polymorphism inflates heterozygosity exactly where drift
+    has done its work, so the denominator must be the whole sequence. The
+    control fires, so the design is sensitive to the trap it had to avoid.
+
+    Residual named rather than hidden: the measurement sits above the body in
+    seven of eight cells, with the offset shrinking as `Nₑ` grows -- 2.20 sems
+    at `Nₑ = 100` against 0.01 at `Nₑ = 250`. That is the shape of an `O(1/Nₑ)`
+    finite-size term rather than a wrong law, and no cell reaches the three-sem
+    gate.
+
+    HISTORY, and why the verdict moved. This carried a FALSIFIED verdict from a
+    run that measured at demographic equilibrium
+    with `Ne = 1000`, `t = 4000`, where this body gives `0.135` against a
+    measured `1.025 ± 0.020`. That run is outside the regime this definition
+    states, and the regime is not a docstring caveat: it is the
+    `mutation_negligible` field of `ClosedPopulationNoMutation`, which a caller
+    must discharge to build the structure at all.
+
+    The disagreement is the size of the excluded mechanism. At mutation-drift
+    equilibrium heterozygosity is replenished as fast as drift removes it, so
+    retention sits at one; drift alone takes it to `(1 - 1/(2 Nₑ))^t`. A body
+    that omits mutation, measured where mutation dominates, reports the term it
+    omits rather than an error in the term it keeps.
+
+    The body is unchanged. What settled the verdict was running the test the
+    old one had not: the table above is that run, and it agrees. -/
+noncomputable def ClosedPopulationNoMutation.retention
+    (r : ClosedPopulationNoMutation) : ℝ :=
+  (1 - 1 / (2 * r.Ne)) ^ r.horizon
+
+/-- Target heterozygosity after the horizon.
+
+    Regime: closed population, no mutation.
+
+    Empirical status: **VALIDATED** in its regime, inherited from
+    `ClosedPopulationNoMutation.retention`, which this multiplies by `H₀`. The
+    earlier FALSIFIED verdict came from a run outside the regime the structure
+    enforces; see there for the in-regime table, the rejected competitors and
+    the segregating-sites control. -/
+noncomputable def ClosedPopulationNoMutation.targetHet
+    (r : ClosedPopulationNoMutation) : ℝ :=
+  r.H₀ * r.retention
+
+/-- The regime's own prediction is the trajectory at `mu = 0`, which is the
+statement that the structure and the recurrence describe the same model. -/
+theorem ClosedPopulationNoMutation.targetHet_eq_trajectory_of_no_mutation
+    (r : ClosedPopulationNoMutation) :
+    r.targetHet = hetTrajectory r.Ne 0 r.H₀ r.horizon := by
+  rw [hetTrajectory_of_no_mutation]
+  unfold ClosedPopulationNoMutation.targetHet ClosedPopulationNoMutation.retention
+  ring
+
+end ClosedPopulationRegime
+
+
+end Descent.Portability

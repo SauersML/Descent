@@ -34,6 +34,15 @@ import Descent.Portability.PhenomeWidePortability
 import Descent.Portability.PolygenicContinuumCalibration
 import Descent.Portability.PortabilityBounds
 import Descent.Portability.PortabilityDrift
+import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
+import Descent.Portability.PortabilityDrift.Definitions
+import Descent.Portability.PortabilityDrift.Generational
+import Descent.Portability.PortabilityDrift.MigrationDrift
+import Descent.Portability.PortabilityDrift.MigrationDriftRecurrence
+import Descent.Portability.PortabilityDrift.MutationDrift
+import Descent.Portability.PortabilityDrift.NonreversibleFlow
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
+import Descent.Portability.PortabilityDrift.PresentDayMoments
 import Descent.Portability.PortabilityMasterTheorem
 import Descent.Portability.RareVariantPortability
 import Descent.Portability.SampleOverlapBias
