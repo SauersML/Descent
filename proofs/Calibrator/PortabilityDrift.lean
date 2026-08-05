@@ -3690,14 +3690,38 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
 
 /-- Per-tag allele-frequency retention at generation `t`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED**, inherited. This body is
+    `alleleFreqMismatchPenalty` applied to this tag's source and time-`t` target
+    frequencies, and that function is falsified at 560 sems: retention is not a
+    function of the frequency GAP at all. Three source/target pairs sharing
+    `|Δp| = 0.2` measure retention 0.842, 0.428 and 1.193, where the penalty
+    predicts one number for all three.
+
+    The failure is not softened by the generational wrapper. If anything it is
+    sharpened: `tagAlleleFreqTargetAt` moves the target frequency with `t`, so a
+    tag drifting from 0.3 toward 0.1 and one drifting from 0.7 toward 0.5 travel
+    the same distance and are assigned the same retention, while the measured
+    values differ by a factor of nearly three and one of them EXCEEDS ONE.
+
+    What fits is the genotype-variance ratio
+    `2·p_t(1-p_t) / (2·p_source(1-p_source))`, which matches at 2.12 sems. -/
 noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   alleleFreqMismatchPenalty (m.tagAlleleFreqSource i) (tagAlleleFreqTargetAt m t i)
 
 /-- Per-causal-variant allele-frequency retention at generation `t`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED**, inherited, on the same grounds as
+    `tagAlleleFreqRetentionAt` above: this is `alleleFreqMismatchPenalty` applied
+    to a causal variant's source and time-`t` target frequencies, and that
+    function is falsified at 560 sems because retention is not a function of the
+    frequency gap.
+
+    The causal case is the one where it matters most. A causal variant's
+    contribution to the transported score scales with its genotype variance, so
+    a variant drifting TOWARD 0.5 contributes MORE in the target than in the
+    source -- retention above one, which a penalty bounded by one cannot express
+    and which this body will always report as a loss. -/
 noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   alleleFreqMismatchPenalty (m.causalAlleleFreqSource j) (causalAlleleFreqTargetAt m t j)
@@ -3716,7 +3740,22 @@ noncomputable def novelVariantInnovationAt (g : GenerationalPopGenParameters) (t
 and tag-SNP allele-frequency drift meet; the mechanistic model does not treat
 them as independent global scalars.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED**, inherited. The first factor is
+    `ldCorrelationDecay` at the transient `F_ST`, and that body's `fstGap`
+    dependence is falsified at 4.73 sems: the fitted decay rate tracks
+    `√fstGap`, not `fstGap`, across a ninetyfold span of `F_ST`. So this kernel
+    attenuates LD with divergence at roughly twice the rate the simulation
+    supports, and the error compounds with `t` because `fstTransientAt` grows.
+
+    The composition is where the damage concentrates rather than cancels. This
+    kernel MULTIPLIES the LD-decay factor by the mutation-retention factor, so a
+    kernel whose first factor decays too fast in divergence produces a joint
+    transport estimate that is too pessimistic at every generation and
+    increasingly so.
+
+    The second lead on `ldCorrelationDecay` -- whether the decay in DISTANCE is
+    exponential at all, or hyperbolic as Sved's relation gives -- is still open,
+    so this body may carry two faults. Only one is established. -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
   ldCorrelationDecay (m.tagDistance i j)
