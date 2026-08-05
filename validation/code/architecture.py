@@ -255,8 +255,20 @@ def gate_duplicate_bodies(code):
     version of this gate counted them, which would have penalised exactly the fix
     it exists to encourage. What is counted is a body that RE-TYPES a shape some
     other body also re-types, with nothing joining them.
+
+    The wrappers are returned rather than discarded, keyed by the kernel they
+    delegate to. They are the other half of the same measurement and they read in
+    the opposite direction: an unwrapped duplicate is a defect and its budget is
+    zero, while a wrapper over a kernel is the repaired state and its count going
+    UP is the repair working. Reporting only the defect count made the healthy
+    structure invisible, so a corpus that had fixed a duplicate by introducing a
+    kernel and a corpus that had simply deleted the second name were
+    indistinguishable in these numbers. Fan-out per kernel is the figure worth
+    watching: it says how much reaches a given kernel, and therefore how far an
+    edit to that kernel travels.
     """
     bodies = collections.defaultdict(list)
+    wrappers = collections.defaultdict(list)
     head = re.compile(
         r"^\s*(?:noncomputable\s+)?(def|abbrev)\s+([A-Za-z_][\w.'₀-₉]*)")
     stop = re.compile(
@@ -320,10 +332,13 @@ def gate_duplicate_bodies(code):
             # print `a ^ b` and both return `ℝ`, and collapsing them would be an
             # rpow/npow confusion wearing a shared notation.
             btypes = ";".join(sorted(re.findall(r"\([^()]*?:\s*([^()]*?)\)", sig)))
-            if "@" in norm and not delegation:
-                bodies[(norm, result, btypes)].append((name, mod))
+            if "@" in norm:
+                if delegation:
+                    wrappers[norm.split()[0]].append((name, mod))
+                else:
+                    bodies[(norm, result, btypes)].append((name, mod))
     groups = [v for v in bodies.values() if len(v) > 1]
-    return sum(len(v) - 1 for v in groups), len(groups)
+    return sum(len(v) - 1 for v in groups), len(groups), wrappers
 
 
 def gate_cross_module_reuse(code, decls):
@@ -770,7 +785,7 @@ def measure():
     indeg = in_degrees(graph)
     decls = declarations(code)
 
-    dup_extra, dup_groups = gate_duplicate_bodies(code)
+    dup_extra, dup_groups, wrappers = gate_duplicate_bodies(code)
     reused, total_thms = gate_cross_module_reuse(code, decls)
     comps = gate_composition_count(code, decls)
     inverted, thin = gate_foundation_position(raw, graph, depth, indeg)
@@ -788,6 +803,9 @@ def measure():
         "cross_module_reuse_pct": round(100.0 * reused / total_thms, 2) if total_thms else 0.0,
         "duplicate_body_groups": dup_groups,
         "duplicate_body_extras": dup_extra,
+        "kernels_with_wrappers": len(wrappers),
+        "wrappers_over_kernels": sum(len(v) for v in wrappers.values()),
+        "widest_kernel_fan_out": max((len(v) for v in wrappers.values()), default=0),
         "composition_theorems": len(comps),
         "foundation_inverted": len(inverted),
         "foundation_not_yet_load_bearing": len(thin),
@@ -814,6 +832,7 @@ def measure():
         "_unused_imports": unused_imports,
         "_silent_defs": silent_defs,
         "_terminal_kinds": terminal_kinds,
+        "_wrappers": wrappers,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -882,7 +901,15 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             "defs_no_theorem_names",
             # See `classify_terminal_theorems`: a terminal theorem is usually
             # terminal on purpose, and a consumer for one would be a restatement.
-            "terminal_theorem_pct", "terminal_deliberate", "terminal_unclassified")
+            "terminal_theorem_pct", "terminal_deliberate", "terminal_unclassified",
+            # See `gate_duplicate_bodies`: these three count the REPAIRED state,
+            # so zero is the wrong target and gating them would penalise the fix
+            # the duplicate gate exists to encourage. They are here to be watched
+            # for growth -- a rising fan-out means more of the corpus reaches a
+            # kernel, and a kernel whose fan-out is large is one whose edits
+            # travel furthest and whose docstring is worth the most care.
+            "kernels_with_wrappers", "wrappers_over_kernels",
+            "widest_kernel_fan_out")
 
 
 def main() -> int:
