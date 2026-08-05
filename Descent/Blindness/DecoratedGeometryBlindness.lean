@@ -436,78 +436,64 @@ noncomputable def witnessWeight (_p : Fin 3) : ℝ := 1 / 3
 @[simp] theorem witnessWeight_at_reference_point (p : Fin 3) : witnessWeight p = 1 / 3 := rfl
 
 
-/-- The aligned assignment: risk increases with position.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite decoration. -/
-noncomputable def witnessAlignedField : Fin 3 → ℝ := ![0, 1, 2]
+/-! **The two decorations are `Portability.ancestryScore` and
+`Portability.ancestryScoreSwapped`.** They used to be redeclared here as
+`Portability.ancestryScore := ![0, 1, 2]` and `Portability.ancestryScoreSwapped := ![0, 2, 1]`, with two
+theorems establishing that each equals the canonical definition it had copied -- and
+`ancestryScoreSwapped` is `![0, 2, 1]`, the identical body. A witness that redeclares
+what it is a witness ABOUT can drift from it, and the theorems recording that it had not
+drifted yet were the corpus paying to check its own copy. The canonical names are used
+directly below. -/
 
 /-- The third population's risk under the aligned assignment, pinned. -/
-@[simp] theorem witnessAlignedField_two : witnessAlignedField 2 = 2 := rfl
-
-/-- The aligned decoration is the canonical three-ancestry score. -/
-theorem witnessAlignedField_eq_ancestryScore : witnessAlignedField = Portability.ancestryScore := by
-  funext i
-  fin_cases i <;>
-    norm_num [witnessAlignedField, Portability.ancestryScore, Portability.threeAncestryConditional,
-      Matrix.cons_val_two, Matrix.tail_cons]
+@[simp] theorem ancestryScore_two : Portability.ancestryScore 2 = 2 := rfl
 
 /-- Equivalently, the aligned decoration is the canonical three-ancestry conditional itself. -/
-theorem witnessAlignedField_eq_threeAncestryConditional :
-    witnessAlignedField = Portability.threeAncestryConditional := by
-  simpa only [Portability.ancestryScore] using witnessAlignedField_eq_ancestryScore
+theorem ancestryScore_eq_threeAncestryConditional :
+    Portability.ancestryScore = Portability.threeAncestryConditional := by
+  simpa only [Portability.ancestryScore, Portability.threeAncestryConditional] using Portability.ancestryScore_eq_ancestryScore
 
-/-- The transposed assignment: the same three risks, the top two exchanged.
-
-Empirical status: NOT AN EMPIRICAL CLAIM -- this is the relabelling of `witnessAlignedField`. -/
-noncomputable def witnessSwappedField : Fin 3 → ℝ := ![0, 2, 1]
 
 /-- The third population's risk under the transposed assignment, pinned. -/
-@[simp] theorem witnessSwappedField_two : witnessSwappedField 2 = 1 := rfl
-
-/-- The swapped decoration is the canonical permuted ancestry score. -/
-theorem witnessSwappedField_eq_ancestryScoreSwapped :
-    witnessSwappedField = Portability.ancestryScoreSwapped := by
-  funext i
-  fin_cases i <;>
-    norm_num [witnessSwappedField, Portability.ancestryScoreSwapped, Matrix.cons_val_two, Matrix.tail_cons]
+@[simp] theorem ancestryScoreSwapped_two : Portability.ancestryScoreSwapped 2 = 1 := rfl
 
 /-- The two assignments carry the same three risks: they differ only in which population holds
 which, so every functional of the decoration alone must agree on them. -/
-theorem witnessSwappedField_is_relabelling :
-    witnessSwappedField 0 = witnessAlignedField 0 ∧
-      witnessSwappedField 1 = witnessAlignedField 2 ∧
-        witnessSwappedField 2 = witnessAlignedField 1 := by
+theorem ancestryScoreSwapped_is_relabelling :
+    Portability.ancestryScoreSwapped 0 = Portability.ancestryScore 0 ∧
+      Portability.ancestryScoreSwapped 1 = Portability.ancestryScore 2 ∧
+        Portability.ancestryScoreSwapped 2 = Portability.ancestryScore 1 := by
   refine ⟨?_, ?_, ?_⟩ <;>
-    norm_num [witnessSwappedField, witnessAlignedField, Matrix.cons_val_two, Matrix.tail_cons]
+    norm_num [Portability.ancestryScoreSwapped, Portability.ancestryScore, Portability.threeAncestryConditional, Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- Both assignments carry the same margin energy: the two decorations are the same multiset of
 risks under the same weights. -/
 theorem marginEnergy_witness_eq :
-    marginEnergy witnessWeight witnessAlignedField =
-      marginEnergy witnessWeight witnessSwappedField := by
+    marginEnergy witnessWeight Portability.ancestryScore =
+      marginEnergy witnessWeight Portability.ancestryScoreSwapped := by
   rw [marginEnergy_eq, marginEnergy_eq]
-  norm_num [witnessWeight, witnessAlignedField, witnessSwappedField, Fin.sum_univ_three,
+  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional, Portability.ancestryScoreSwapped, Fin.sum_univ_three,
     Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- The margin energy of the witness, evaluated: two thirds. -/
 theorem marginEnergy_witnessAligned_eq :
-    marginEnergy witnessWeight witnessAlignedField = 2 / 3 := by
+    marginEnergy witnessWeight Portability.ancestryScore = 2 / 3 := by
   rw [marginEnergy_eq]
-  norm_num [witnessWeight, witnessAlignedField, Fin.sum_univ_three, Matrix.cons_val_two,
+  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional, Fin.sum_univ_three, Matrix.cons_val_two,
     Matrix.tail_cons]
 
 /-- The alignment energy of the increasing assignment: ten thirds. -/
 theorem alignmentEnergy_witnessAligned_eq :
-    alignmentEnergy witnessWeight witnessDivergence witnessAlignedField = 10 / 3 := by
+    alignmentEnergy witnessWeight witnessDivergence Portability.ancestryScore = 10 / 3 := by
   unfold alignmentEnergy
-  norm_num [witnessWeight, witnessDivergence, witnessAlignedField, Fin.sum_univ_three,
+  norm_num [witnessWeight, witnessDivergence, Portability.ancestryScore, Portability.threeAncestryConditional, Fin.sum_univ_three,
     Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- The alignment energy of the transposed assignment: two. -/
 theorem alignmentEnergy_witnessSwapped_eq :
-    alignmentEnergy witnessWeight witnessDivergence witnessSwappedField = 2 := by
+    alignmentEnergy witnessWeight witnessDivergence Portability.ancestryScoreSwapped = 2 := by
   unfold alignmentEnergy
-  norm_num [witnessWeight, witnessDivergence, witnessSwappedField, Fin.sum_univ_three,
+  norm_num [witnessWeight, witnessDivergence, Portability.ancestryScoreSwapped, Fin.sum_univ_three,
     Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- **Alignment sees what the margin cannot.**  Two decorations with identical margins -- the same
@@ -517,10 +503,10 @@ genetic geometry, and a claim about the latter cannot be supported by a measurem
 former.  This is the gauge obstruction of `ContinuumCalibrationProgram` with the metric supplying
 the weights. -/
 theorem alignment_separates_what_margin_identifies :
-    marginEnergy witnessWeight witnessAlignedField =
-        marginEnergy witnessWeight witnessSwappedField ∧
-      alignmentEnergy witnessWeight witnessDivergence witnessAlignedField ≠
-        alignmentEnergy witnessWeight witnessDivergence witnessSwappedField := by
+    marginEnergy witnessWeight Portability.ancestryScore =
+        marginEnergy witnessWeight Portability.ancestryScoreSwapped ∧
+      alignmentEnergy witnessWeight witnessDivergence Portability.ancestryScore ≠
+        alignmentEnergy witnessWeight witnessDivergence Portability.ancestryScoreSwapped := by
   refine ⟨marginEnergy_witness_eq, ?_⟩
   rw [alignmentEnergy_witnessAligned_eq, alignmentEnergy_witnessSwapped_eq]
   norm_num
