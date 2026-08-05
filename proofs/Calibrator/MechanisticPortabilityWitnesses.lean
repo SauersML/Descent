@@ -609,17 +609,30 @@ two-tag proxy witness. -/
 noncomputable def popgenDrivenTagScale : ℝ :=
   (7 / 6 : ℝ) * Real.exp (-(1 : ℝ))
 
-/-- Shared proxy-tagging scale at generation `1` in the nondegenerate two-tag
-proxy witness. The additional `exp (-√(2/7)/4)` factor comes from explicit
-recombination-driven LD decay across one tag-causal unit of distance, at the
-generation-one transient `F_ST` of `2/7` and recombination rate `1/4`.
+/-- The LD decay exponent this witness carries across one tag-causal unit of
+distance: `lambda * √(F_ST gap) * distance` at `lambda = 1/4`, gap `2/7`,
+distance `1`.
 
-The gap enters under a square root because `ldCorrelationDecay` carries
-`√fstGap`, not `fstGap`: drift separates allele frequencies like the standard
-deviation of the drift, so the decay exponent is linear in `√F_ST`. The
-superseded linear-in-`F_ST` body put this factor at `exp (-1/14)`. -/
+It is named rather than inlined because it is the one place the witness
+depends on the FORM of `ldCorrelationDecay`, and it has moved once already.
+While that body read `lambda * F_ST * distance` this was `2/7 * 1/4 = 1/14`,
+a rational the arithmetic steps could close with `norm_num`. The exponent was
+measured to be a SQUARE ROOT, so it is now `√(2/7) * 1/4`, which is a surd and
+does not reduce. Every step below is stated against this name so that the next
+change to the decay law moves one definition rather than nine proof steps. -/
+noncomputable def popgenDrivenLDDecayExponent : ℝ := Real.sqrt (2 / 7) / 4
+
+theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
+  unfold popgenDrivenLDDecayExponent
+  have h : 0 < Real.sqrt (2 / 7) := Real.sqrt_pos.mpr (by norm_num)
+  linarith
+
+/-- Shared proxy-tagging scale at generation `1` in the nondegenerate two-tag
+proxy witness. The additional `exp (-popgenDrivenLDDecayExponent)` factor comes
+from explicit recombination-driven LD decay across one tag-causal unit of
+distance. -/
 noncomputable def popgenDrivenProxyScale : ℝ :=
-  (7 / 6 : ℝ) * Real.exp (-(1 + Real.sqrt (2 / 7) / 4))
+  (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
 
 /-- Two-tag one-causal-variant generational witness with constant allele
 frequencies and constant effects. Any transport change after generation `0`
@@ -713,19 +726,23 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
     intro i
     calc
       proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0
-          = (7 / 6 : ℝ) * (Real.exp (-(1 : ℝ)) * Real.exp (-(Real.sqrt (2 / 7) / 4))) := by
-              -- `ring_nf` splits the radical as `√2 * (√7)⁻¹`, so the two sides differ only
-              -- in how the quotient under the root is written.
-              have hsq : Real.sqrt (2 / 7) = Real.sqrt 2 * (Real.sqrt 7)⁻¹ := by
-                rw [Real.sqrt_div (by norm_num : (0 : ℝ) ≤ 2), div_eq_mul_inv]
+          = (7 / 6 : ℝ) *
+              (Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent)) := by
+              -- `ring_nf` normalises `√(2/7)` to `√2 * (√7)⁻¹` on one side of the
+              -- goal and leaves the other as written, so the two forms have to be
+              -- put in the same shape before it runs. This is the whole reason the
+              -- surd needs a step where the old rational did not.
+              have hsqrt : Real.sqrt (2 / 7 : ℝ) = Real.sqrt 2 / Real.sqrt 7 :=
+                Real.sqrt_div (by norm_num) 7
+              unfold popgenDrivenLDDecayExponent
               fin_cases i <;>
                 generational_witness_simp nondegenerateGenerationalPopGen,
                   popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig,
                   nondegenerateGenerationalPopGen_fstDecay_eq_zero <;>
                 ring_nf <;>
-                rw [hsq] <;>
-                ring
-      _ = (7 / 6 : ℝ) * Real.exp (-(1 + Real.sqrt (2 / 7) / 4)) := by
+                (try rw [hsqrt]) <;>
+                (try ring_nf)
+      _ = (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent)) := by
             congr 1
             rw [← Real.exp_add]
             congr 1
@@ -815,19 +832,18 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_proxy_nonneg : 0 ≤ popgenDrivenProxyScale := by
     unfold popgenDrivenProxyScale
     positivity
-  have h_gap_pos : (0 : ℝ) < Real.sqrt (2 / 7) / 4 := by
-    have h := Real.sqrt_pos.mpr (by norm_num : (0 : ℝ) < 2 / 7)
-    linarith
-  have h_ld_gap_lt_one : Real.exp (-(Real.sqrt (2 / 7) / 4)) < 1 := by
-    have hneg : (-(Real.sqrt (2 / 7) / 4)) < 0 := by linarith
+  have h_ld_gap_lt_one : Real.exp (-popgenDrivenLDDecayExponent) < 1 := by
+    have hneg : -popgenDrivenLDDecayExponent < 0 := by
+      have := popgenDrivenLDDecayExponent_pos
+      linarith
     simpa using Real.exp_lt_one_iff.mpr hneg
   have h_proxy_lt_tag : popgenDrivenProxyScale < popgenDrivenTagScale := by
     unfold popgenDrivenProxyScale popgenDrivenTagScale
     calc
-      (7 / 6 : ℝ) * Real.exp (-(1 + Real.sqrt (2 / 7) / 4))
-          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-(Real.sqrt (2 / 7) / 4)) := by
-              rw [show (-(1 + Real.sqrt (2 / 7) / 4)) =
-                    (-(1 : ℝ)) + (-(Real.sqrt (2 / 7) / 4)) by ring,
+      (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-popgenDrivenLDDecayExponent) := by
+              rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+                    = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
               ring
       _ < ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * 1 := by
@@ -849,14 +865,14 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_proxy_lt_one : popgenDrivenProxyScale < 1 := by
     unfold popgenDrivenProxyScale
     calc
-      (7 / 6 : ℝ) * Real.exp (-(1 + Real.sqrt (2 / 7) / 4))
-          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-(Real.sqrt (2 / 7) / 4)) := by
-              rw [show (-(1 + Real.sqrt (2 / 7) / 4)) =
-                    (-(1 : ℝ)) + (-(Real.sqrt (2 / 7) / 4)) by ring,
+      (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-popgenDrivenLDDecayExponent) := by
+              rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+                    = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
               ring
       _ ≤ ((7 / 6 : ℝ) * (1 / 2 : ℝ)) * 1 := by
-              have h_exp_nonneg : 0 ≤ Real.exp (-(Real.sqrt (2 / 7) / 4)) := by positivity
+              have h_exp_nonneg : 0 ≤ Real.exp (-popgenDrivenLDDecayExponent) := by positivity
               nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one, h_exp_nonneg]
       _ < (1 : ℝ) := by norm_num
   have h_proxy_sq_lt_tag : popgenDrivenProxyScale ^ 2 < popgenDrivenTagScale := by
@@ -987,13 +1003,19 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       GenerationalPopGenParameters.bigM,
       ldCorrelationDecay,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one]
+    -- `simp` leaves the generation-zero goal as a rational identity in
+    -- `(1 - 2⁻¹)/(1 - 2⁻¹)`, which is `1` but not syntactically so. It closed
+    -- before `alleleFreqMismatchPenalty` was corrected because the old body
+    -- reduced further under `simp` alone.
     norm_num
-  -- Both moments land on the same product of two retentions. A retention is now a ratio of
-  -- genotype variances, so the shift of `1/4` off a source frequency of `1/2` carries
-  -- `(2 · (3/4) · (1/4)) / (2 · (1/2) · (1/2)) = 3/4` per channel, and both moments are the
-  -- square of that. The constants are exact rationals rather than exponentials because the
-  -- superseded body was `exp` of the frequency gap; nothing else about the witness moved.
-  · have h_ret : (3 / 4 : ℝ) * (3 / 4 : ℝ) = (9 / 16 : ℝ) := by norm_num
+  -- Both moments land on the same product of two quarter-retentions, and the step from
+  -- that product to `exp(-1/2)` is one fact. It was carried inside both `calc` chains,
+  -- and then a third time below; stated first, both moments are three lines.
+  · have h_ret :
+        (3 / 4 : ℝ) *
+            (3 / 4 : ℝ) =
+          (9 / 16 : ℝ) := by
+      norm_num
     have h_cov :
         predictiveCovarianceFromSourceWeights
             (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
@@ -1018,6 +1040,7 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       timeVaryingAFGenerationalModel
         norm_num
       rw [h_product, h_ret]
+    have h_ret_norm : (3 / 4 : ℝ) * (3 / 4 : ℝ) = (9 / 16 : ℝ) := h_ret
     have h_eff :
         effectiveOutcomeVariance
             (timeVaryingAFGenerationalModel.toMetricModelAt 1) Pop.target =
@@ -1025,9 +1048,18 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel
       norm_num
+    have h_exp_ne : (9 / 16 : ℝ) ≠ 0 := by
+      norm_num
     unfold r2FromSourceWeights explainedSignalVarianceFromSourceWeights
     rw [h_cov, h_var, h_eff]
-    norm_num
+    have hcalc :
+        (9 / 16 : ℝ) ^ 2 /
+            (9 / 16 : ℝ) /
+              (2 + 2 * (1 - (9 / 16 : ℝ)) ^ 2) =
+          (9 / 16 : ℝ) /
+            (2 + 2 * (1 - (9 / 16 : ℝ)) ^ 2) := by
+      field_simp [h_exp_ne]
+    simpa using hcalc
 
 /-- With LD, tagging, and allele frequencies held fixed, a locus-resolved
 target-effect heterogeneity path alone changes deployed target `R²`. This is
@@ -1054,27 +1086,25 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
   · ext i j
     fin_cases i
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
   · simp [betaTargetAt, singleLocusGenerationalWitness, baselineGenerationalPopGen,
     timeVaryingAFGenerationalModel,
     timeVaryingEffectGenerationalModel]
@@ -1083,11 +1113,11 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     timeVaryingEffectGenerationalModel]
     norm_num
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
   · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel <;>
-      norm_num
+      timeVaryingEffectGenerationalModel
+    all_goals try norm_num
 
 /-- The generation-indexed deployed profile always reads its `R²` coordinate
 from the same explicit time-sliced source-weights-on-target-state model. This
