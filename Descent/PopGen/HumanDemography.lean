@@ -144,10 +144,10 @@ either module importing the other's laws.
 this module and a number proved in `Core` are the same number by construction rather than
 by agreement. -/
 
-/-- **The moment tuple of a human demographic history**, at additive variance `V_A`,
-environmental variance `V_E` and the differentiation the history produces. -/
-noncomputable def humanDriftMoments (V_A V_E fst : ℝ) : Descent.Core.ScoreMoments :=
-  Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E fst
+/-! There is deliberately no `humanDriftMoments` here. One was written and removed: it
+would have been a third name for the tuple `PortabilityDrift.driftMoments` already
+produces, and the theorems below reach that tuple through `presentDayR2_eq_core` without
+it. A module that adds a name and no claim adds nothing a reader can be wrong about. -/
 
 /-- **This module's reported ratio IS the Core portability ratio.**
 
