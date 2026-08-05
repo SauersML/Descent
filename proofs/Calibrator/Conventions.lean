@@ -313,8 +313,8 @@ noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
 /-- **The textbook spelling, kept as a theorem rather than as the body.**
 
 `G_ST = 1 - H_S/H_T` is how the quantity is defined in the literature and it is
-what the name means; it is not how it should be computed, and it used to be the
-body. As `p₁ → p₂` the ratio tends to `1` and `G_ST` is whatever survives the
+what the name means; it is not how it should be computed. As `p₁ → p₂` the ratio
+tends to `1` and `G_ST` is whatever survives the
 subtraction, so its float64 relative error is machine epsilon divided by the
 answer. Measured float64 against a 60-digit reference over `p₂ = p₁ + δ` for
 `p₁ ∈ {0.01, 0.1, 0.3, 0.5}` and `δ` from `10⁻²` to `10⁻¹⁴`, arguments rounded to
@@ -323,9 +323,8 @@ this form, against **0 of 52, worst 1.9·10⁻¹⁶** for the body above. Human 
 is `O(10⁻³)` genome-wide and smaller per variant, so the failing region was the
 use case.
 
-The hypothesis is the one point at which the two spellings genuinely differ, and
-that difference was the second reason to swap them -- see
-`neiGst_at_zero_mean_heterozygosity`. -/
+The hypothesis is the one point at which the two spellings genuinely differ --
+see `neiGst_at_zero_mean_heterozygosity`. -/
 theorem neiGst_eq_oneMinusRatio (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
     neiGst p₁ p₂ =
@@ -340,16 +339,14 @@ theorem neiGst_eq_oneMinusRatio (p₁ p₂ : ℝ)
 
 /-- **Two identical monomorphic populations are not differentiated.**
 
-This used to be a junk-value theorem. With the `1 - H_S/H_T` body, a vanishing
-mean-frequency heterozygosity made the ratio divide by zero, Mathlib returned
-`0`, and the statistic reported `1` -- COMPLETE differentiation -- for a pair of
-populations that are both fixed for the same allele and could not be more alike.
-The docstring named it as junk and told consumers to exclude the point.
-
-Rewriting the body into the cancellation-free form removed the defect instead of
-documenting it: the numerator `(p₁ - p₂)²` vanishes there too, so the value is
-now `0`, which is the right answer and not a junk one. The stable spelling and
-the correct boundary turn out to be the same spelling. -/
+Two populations fixed for the same allele could not be more alike, and the
+statistic reports `0`. This is a real value, not a junk branch: the numerator
+`(p₁ - p₂)²` vanishes with the denominator, so the cancellation-free body is
+defined here by the same algebra that makes it stable elsewhere. Under the
+`1 - H_S/H_T` spelling the ratio divides by zero, Mathlib returns `0`, and the
+statistic reads `1` -- COMPLETE differentiation -- so that spelling requires
+consumers to exclude the point. The stable spelling and the correct boundary are
+the same spelling. -/
 theorem neiGst_at_zero_mean_heterozygosity (p₁ p₂ : ℝ)
     (hzero : ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) :
     neiGst p₁ p₂ = 0 := by
