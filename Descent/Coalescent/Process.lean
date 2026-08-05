@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.JumpChain
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+import Mathlib.Probability.Distributions.Uniform
 import Mathlib.Tactic
 
 namespace Descent
@@ -69,7 +70,7 @@ theorem covers_nonempty {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
   have hcard : 2 ≤ Fintype.card (Quotient ξ) := by
     rw [← Nat.card_eq_fintype_card]
     exact hk
-  obtain ⟨a, b, hab⟩ := Fintype.exists_pair_of_one_lt_card (by omega)
+  obtain ⟨a, b, hab⟩ := Fintype.exists_pair_of_one_lt_card (α := Quotient ξ) (by omega)
   exact ⟨⟨merge ξ a b, merge_covers ξ hab⟩⟩
 
 /-- **The partition-valued transition law of the `n`-coalescent's jump chain.**

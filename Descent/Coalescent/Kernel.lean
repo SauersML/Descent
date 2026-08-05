@@ -95,7 +95,7 @@ kernel. -/
 instance jumpKernel_isMarkovKernel (n : ℕ) : IsMarkovKernel (jumpKernel n) :=
   ⟨fun ξ => by
     rw [jumpKernel_apply]
-    exact (jumpLaw ξ).toMeasure.isProbabilityMeasure⟩
+    exact inferInstance⟩
 
 /-- **The absorbing convention, stated.**  At a state with one block -- `Θ` when the sample
 is nonempty, K-C (1.10) -- there is no cover to move to, and the total kernel holds where it

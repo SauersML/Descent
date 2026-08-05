@@ -207,7 +207,6 @@ theorem wattersonProb_div_restrictionFullProb {k n : ℕ} (hkn : k ≤ n) (lam :
   rw [hcard, Nat.sub_self, Nat.factorial_zero]
   push_cast
   field_simp
-  ring
 
 /-- **K-C: "the right-hand side of (3.20) tends to 1 as `n → ∞`".**  This is Kingman's
 stated ground for calling `𝒫_k` the limiting form of the jump chain's absolute law: a large
@@ -234,9 +233,7 @@ theorem tendsto_restrictionFullProb_two :
       simpa [hshift] using this
     refine squeeze_zero (fun n => by positivity) (fun n => ?_) hbound
     have hn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-    gcongr
-    · linarith
-    · linarith
+    gcongr <;> linarith
   simpa only [hcongr, hform, sub_zero] using tendsto_const_nhds.sub hzero
 
 end Coalescent

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Restriction
 import Descent.Coalescent.Kernel
+import Mathlib.Data.Finite.Card
 import Mathlib.Tactic
 
 namespace Descent
@@ -179,7 +180,14 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
           have h' : extendMap ξ (some (Quotient.mk ξ x₀)) u
               = extendMap ξ (some (Quotient.mk ξ x₀)) v := huv
           rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv] at h'
-          exact Quotient.exact (Option.some_injective _ h')
+          have h2 : Quotient.mk ξ (⟨(u : ℕ), hu⟩ : Fin n)
+              = Quotient.mk ξ (⟨(v : ℕ), hv⟩ : Fin n) := Option.some_injective _ h'
+          have h3ξ : ξ.r (⟨(u : ℕ), hu⟩ : Fin n) (⟨(v : ℕ), hv⟩ : Fin n) := Quotient.exact h2
+          have h3 : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
+              (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) := h3ξ
+          have hu' : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
+          have hv' : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
+          rwa [hu', hv'] at h3
       · -- `v` is the new element
         have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
@@ -195,9 +203,10 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
               = extendMap ξ (some (Quotient.mk ξ x₀)) (Fin.last n) := huv
           rw [extendMap_of_lt ξ _ u hu, extendMap_last] at h'
           have hq : Quotient.mk ξ ⟨u, hu⟩ = Quotient.mk ξ x₀ := Option.some_injective _ h'
-          have hux₀ : ζ.r (Fin.castLE (Nat.le_succ n) ⟨u, hu⟩)
-              (Fin.castLE (Nat.le_succ n) x₀) := Quotient.exact hq
-          have huu : (Fin.castLE (Nat.le_succ n) (⟨u, hu⟩ : Fin n)) = u := Fin.ext rfl
+          have huξ : ξ.r (⟨(u : ℕ), hu⟩ : Fin n) x₀ := Quotient.exact hq
+          have hux₀ : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
+              (Fin.castLE (Nat.le_succ n) x₀) := huξ
+          have huu : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
           rw [huu] at hux₀
           exact ζ.iseqv.trans hux₀ hx₀
     · -- `u` is the new element; symmetric
@@ -215,9 +224,10 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
               = extendMap ξ (some (Quotient.mk ξ x₀)) v := huv
           rw [extendMap_of_lt ξ _ v hv, extendMap_last] at h'
           have hq : Quotient.mk ξ ⟨v, hv⟩ = Quotient.mk ξ x₀ := (Option.some_injective _ h').symm
-          have hvx₀ : ζ.r (Fin.castLE (Nat.le_succ n) ⟨v, hv⟩)
-              (Fin.castLE (Nat.le_succ n) x₀) := Quotient.exact hq
-          have hvv : (Fin.castLE (Nat.le_succ n) (⟨v, hv⟩ : Fin n)) = v := Fin.ext rfl
+          have hvξ : ξ.r (⟨(v : ℕ), hv⟩ : Fin n) x₀ := Quotient.exact hq
+          have hvx₀ : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n))
+              (Fin.castLE (Nat.le_succ n) x₀) := hvξ
+          have hvv : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
           rw [hvv] at hvx₀
           exact ζ.iseqv.symm (ζ.iseqv.trans hvx₀ hx₀)
       · have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
@@ -238,14 +248,23 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
           have h' : extendMap ξ (none : Option (Quotient ξ)) u
               = extendMap ξ none v := huv
           rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv] at h'
-          exact Quotient.exact (Option.some_injective _ h')
+          have h2 : Quotient.mk ξ (⟨(u : ℕ), hu⟩ : Fin n)
+              = Quotient.mk ξ (⟨(v : ℕ), hv⟩ : Fin n) := Option.some_injective _ h'
+          have h3ξ : ξ.r (⟨(u : ℕ), hu⟩ : Fin n) (⟨(v : ℕ), hv⟩ : Fin n) := Quotient.exact h2
+          have h3 : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
+              (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) := h3ξ
+          have hu' : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
+          have hv' : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
+          rwa [hu', hv'] at h3
       · have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
         constructor
         · intro huv
           exfalso
-          have huu : (Fin.castLE (Nat.le_succ n) (⟨u, hu⟩ : Fin n)) = u := Fin.ext rfl
-          exact hjoin ⟨⟨u, hu⟩, by rw [huu]; exact huv⟩
+          refine hjoin (⟨(u : ℕ), hu⟩ : Fin n) ?_
+          have huu : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
+          rw [huu]
+          exact huv
         · intro huv
           exfalso
           have h' : extendMap ξ (none : Option (Quotient ξ)) u
@@ -258,8 +277,10 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
       · constructor
         · intro huv
           exfalso
-          have hvv : (Fin.castLE (Nat.le_succ n) (⟨v, hv⟩ : Fin n)) = v := Fin.ext rfl
-          exact hjoin ⟨⟨v, hv⟩, by rw [hvv]; exact ζ.iseqv.symm huv⟩
+          refine hjoin (⟨(v : ℕ), hv⟩ : Fin n) ?_
+          have hvv : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
+          rw [hvv]
+          exact ζ.iseqv.symm huv
         · intro huv
           exfalso
           have h' : extendMap ξ (none : Option (Quotient ξ)) (Fin.last n)
@@ -288,8 +309,8 @@ theorem blocks_extend_none {n : ℕ} (ξ : ER n) : blocks (extend ξ none) = blo
         exact ⟨Fin.castLE (Nat.le_succ n) x, by rw [extendMap_castLE, hx]⟩
   unfold blocks extend
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _),
-    Nat.card_congr (Equiv.setCongr hrange), Nat.card_congr (Equiv.Set.univ _),
-    Nat.card_option]
+    Nat.card_congr (Equiv.setCongr hrange), Nat.card_congr (Equiv.Set.univ _)]
+  simp
 
 /-- Joining an existing class does not. -/
 theorem blocks_extend_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
@@ -302,7 +323,7 @@ theorem blocks_extend_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
     · rintro ⟨x, rfl⟩
       rcases lt_or_ge (x : ℕ) n with hx | hx
       · exact ⟨Quotient.mk ξ ⟨x, hx⟩, (extendMap_of_lt ξ _ x hx).symm⟩
-      · rw [eq_last_of_not_lt (by omega), extendMap_last]
+      · rw [eq_last_of_not_lt (x := x) (by omega), extendMap_last]
         exact ⟨c, rfl⟩
     · rintro ⟨d, rfl⟩
       obtain ⟨x, hx⟩ := quotient_mk_surjective ξ d
@@ -329,11 +350,10 @@ multiset of sizes; here it is a theorem about the relation those sizes come from
 theorem sum_classSize {n : ℕ} (ξ : ER n) :
     ∑ c : Quotient ξ, classSize ξ c = n := by
   classical
-  letI : Fintype (Quotient ξ) := Fintype.ofFinite _
-  have h := Fintype.card_eq_sum_card_fiberwise
-    (f := fun x : Fin n => Quotient.mk ξ x) (t := (Finset.univ : Finset (Quotient ξ)))
-    (fun x _ => Finset.mem_univ _)
-  rw [Fintype.card_fin] at h
+  have h := Finset.card_eq_sum_card_fiberwise
+    (f := fun x : Fin n => Quotient.mk ξ x) (s := (Finset.univ : Finset (Fin n)))
+    (t := (Finset.univ : Finset (Quotient ξ))) (fun x _ => Finset.mem_univ _)
+  rw [Finset.card_univ, Fintype.card_fin] at h
   exact h.symm
 
 /-- Seating at `c` leaves every other class untouched. -/
@@ -356,7 +376,7 @@ theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ 
         exact Option.some_injective _ hy
       · exact Subtype.ext (Fin.ext rfl)
     · exfalso
-      rw [eq_last_of_not_lt (by omega), extendMap_last] at hy
+      rw [eq_last_of_not_lt (x := y) (by omega), extendMap_last] at hy
       exact hne (Option.some_injective _ hy).symm
 
 /-- Seating at `c` raises `λ_c` by exactly one. -/
@@ -392,7 +412,8 @@ theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
           exact Option.some_injective _ hy
         · exact Subtype.ext (Fin.ext rfl)
       · exact ⟨none, Subtype.ext (Fin.ext (by simp [eq_last_of_not_lt (by omega : ¬ (y : ℕ) < n)]))⟩
-  rw [← Nat.card_eq_of_bijective _ hbij, Nat.card_option]
+  rw [← Nat.card_eq_of_bijective _ hbij]
+  simp
 
 /-- Starting a new class leaves every old class untouched. -/
 theorem card_fiber_none_old {n : ℕ} (ξ : ER n) (d : Quotient ξ) :
@@ -414,7 +435,7 @@ theorem card_fiber_none_old {n : ℕ} (ξ : ER n) (d : Quotient ξ) :
         exact Option.some_injective _ hy
       · exact Subtype.ext (Fin.ext rfl)
     · exfalso
-      rw [eq_last_of_not_lt (by omega), extendMap_last] at hy
+      rw [eq_last_of_not_lt (x := y) (by omega), extendMap_last] at hy
       exact Option.noConfusion hy
 
 /-- And the class it starts is a singleton -- the `(λ - 1)! = 0! = 1` that leaves the

@@ -61,7 +61,7 @@ instance coalescentLaw_isProbabilityMeasure (n k m : ℕ) (holdLaw : Measure ℝ
     IsProbabilityMeasure (coalescentLaw n k m holdLaw) := by
   unfold coalescentLaw
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
-    (chainLaw n k).toMeasure.isProbabilityMeasure
+    inferInstance
   infer_instance
 
 /-- **Independence, in the form the construction arranges it.**  The law of a rectangle is
@@ -73,7 +73,7 @@ theorem coalescentLaw_prod (n k m : ℕ) (holdLaw : Measure ℝ) [IsProbabilityM
     coalescentLaw n k m holdLaw (A ×ˢ B)
       = (chainLaw n k).toMeasure A * (Measure.pi fun _ : Fin m => holdLaw) B := by
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
-    (chainLaw n k).toMeasure.isProbabilityMeasure
+    inferInstance
   unfold coalescentLaw
   exact Measure.prod_prod A B
 
@@ -92,7 +92,7 @@ theorem coalescentLaw_hold_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
     coalescentLaw n k m holdLaw (Set.univ ×ˢ B)
       = (Measure.pi fun _ : Fin m => holdLaw) B := by
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
-    (chainLaw n k).toMeasure.isProbabilityMeasure
+    inferInstance
   rw [coalescentLaw_prod, measure_univ, one_mul]
 
 /-- **K-C (2.5): the finite-dimensional distribution factorises.**

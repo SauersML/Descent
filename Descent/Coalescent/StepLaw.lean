@@ -55,7 +55,7 @@ instance stepLaw_isProbabilityMeasure {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks �
   haveI : IsProbabilityMeasure (holdMeasure (deathRate (blocks ξ))) :=
     holdMeasure_isProbabilityMeasure (deathRate_pos hk)
   haveI : IsProbabilityMeasure (jumpStep ξ hk).toMeasure :=
-    (jumpStep ξ hk).toMeasure.isProbabilityMeasure
+    inferInstance
   unfold stepLaw
   infer_instance
 
@@ -72,7 +72,7 @@ theorem stepLaw_prod {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
   haveI : IsProbabilityMeasure (holdMeasure (deathRate (blocks ξ))) :=
     holdMeasure_isProbabilityMeasure (deathRate_pos hk)
   haveI : IsProbabilityMeasure (jumpStep ξ hk).toMeasure :=
-    (jumpStep ξ hk).toMeasure.isProbabilityMeasure
+    inferInstance
   unfold stepLaw
   exact Measure.prod_prod A B
 
@@ -89,7 +89,7 @@ theorem stepLaw_destination_marginal {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ
 theorem stepLaw_time_marginal {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) (B : Set ℝ) :
     stepLaw ξ hk (Set.univ ×ˢ B) = holdMeasure (deathRate (blocks ξ)) B := by
   haveI : IsProbabilityMeasure (jumpStep ξ hk).toMeasure :=
-    (jumpStep ξ hk).toMeasure.isProbabilityMeasure
+    inferInstance
   rw [stepLaw_prod, measure_univ, one_mul]
 
 /-- **Every destination is equally likely, whatever the clock does.**  The destination

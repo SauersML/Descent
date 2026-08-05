@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Infinite
+import Descent.Coalescent.Kernel
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.Tactic
 
@@ -41,6 +42,7 @@ than because the state space had no measurable structure to state it in.
 namespace Coalescent
 
 open MeasureTheory
+open scoped Classical
 
 /-- **K-C section 3: `𝓔` as a subset of `2^{ℕ×ℕ}`.** -/
 noncomputable def encode (R : EInf) : ℕ × ℕ → Bool := fun p => decide (R.r p.1 p.2)
@@ -49,7 +51,17 @@ theorem encode_injective : Function.Injective encode := by
   intro R S h
   refine Setoid.ext fun i j => ?_
   have hij : decide (R.r i j) = decide (S.r i j) := congrFun h (i, j)
-  simpa using decide_eq_decide.mp hij
+  by_cases hR : R.r i j
+  · have hS : S.r i j := by
+      by_contra hS
+      rw [decide_eq_true hR, decide_eq_false hS] at hij
+      exact Bool.noConfusion hij
+    exact ⟨fun _ => hS, fun _ => hR⟩
+  · have hS : ¬ S.r i j := by
+      intro hS
+      rw [decide_eq_false hR, decide_eq_true hS] at hij
+      exact Bool.noConfusion hij
+    exact ⟨fun h' => absurd h' hR, fun h' => absurd h' hS⟩
 
 /-- The σ-algebra `𝓔` inherits from `2^{ℕ×ℕ}` -- the one K-C's topology induces, and the one
 a projective limit argument would produce a measure on. -/
@@ -57,21 +69,18 @@ scoped instance measurableSpace_EInf : MeasurableSpace EInf :=
   MeasurableSpace.comap encode inferInstance
 
 /-- Each coordinate is measurable: whether `i` and `j` are related is a measurable event. -/
-theorem measurable_rel (i j : ℕ) :
-    MeasurableSet {R : EInf | R.r i j} := by
-  refine ⟨{f : ℕ × ℕ → Bool | f (i, j) = true}, ?_, ?_⟩
-  · exact measurableSet_eq_fun (measurable_pi_apply _) measurable_const
+theorem measurable_rel (i j : ℕ) : MeasurableSet {R : EInf | R.r i j} := by
+  refine ⟨(fun f : ℕ × ℕ → Bool => f (i, j)) ⁻¹' {true}, ?_, ?_⟩
+  · exact (measurable_pi_apply (i, j)) (measurableSet_singleton true)
   · ext R
-    simp [encode, Set.mem_preimage]
+    simp [encode]
 
 /-- Its complement, likewise -- stated because the restriction preimages below are built from
 both. -/
-theorem measurable_not_rel (i j : ℕ) :
-    MeasurableSet {R : EInf | ¬ R.r i j} := by
-  have := (measurable_rel i j).compl
-  convert this using 1
-  ext R
-  simp
+theorem measurable_not_rel (i j : ℕ) : MeasurableSet {R : EInf | ¬ R.r i j} := by
+  have h := (measurable_rel i j).compl
+  have hset : {R : EInf | R.r i j}ᶜ = {R : EInf | ¬ R.r i j} := rfl
+  rwa [hset] at h
 
 /-- **Every restriction map is measurable.**
 
@@ -81,10 +90,8 @@ finitely many coordinate conditions that define it.  With `𝓔ₙ` finite -- an
 
 This is the hypothesis Kingman's projective limit needs: without it, "the finite-dimensional
 distributions of a process on `𝓔`" is not a well-formed phrase. -/
-theorem measurable_restrictInf (n : ℕ) :
-    @Measurable EInf (ER n) measurableSpace_EInf ⊤ (restrictInf n) := by
-  classical
-  refine @measurable_to_countable' (ER n) EInf ⊤ measurableSpace_EInf _ _ _ fun ξ => ?_
+theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
+  refine measurable_to_countable' fun ξ => ?_
   have hpre : (restrictInf n) ⁻¹' {ξ}
       = ⋂ (p : Fin n × Fin n),
           (if ξ.r p.1 p.2 then {R : EInf | R.r (p.1 : ℕ) (p.2 : ℕ)}
