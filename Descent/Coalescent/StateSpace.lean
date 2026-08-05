@@ -65,16 +65,16 @@ abbrev Theta (n : ℕ) : ER n := ⊤
 
 theorem quotient_mk_surjective {n : ℕ} (ξ : ER n) :
     Function.Surjective (Quotient.mk ξ) :=
-  fun q ↦ Quotient.inductionOn q fun a ↦ ⟨a, rfl⟩
+  fun q => Quotient.inductionOn q fun a => ⟨a, rfl⟩
 
 /-- A sample of `n` starts with `n` blocks: nobody has yet been shown to share an
 ancestor. -/
 theorem blocks_bot (n : ℕ) : blocks (Delta n) = n := by
   have e : Quotient (⊥ : ER n) ≃ Fin n :=
-    { toFun := fun q ↦ Quotient.liftOn q id fun _ _ h ↦ h
-      invFun := fun a ↦ Quotient.mk _ a
-      left_inv := fun q ↦ Quotient.inductionOn q fun _ ↦ rfl
-      right_inv := fun _ ↦ rfl }
+    { toFun := fun q => Quotient.liftOn q id fun _ _ h => h
+      invFun := fun a => Quotient.mk _ a
+      left_inv := fun q => Quotient.inductionOn q fun _ => rfl
+      right_inv := fun _ => rfl }
   unfold blocks Delta
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_fin]
 
@@ -82,7 +82,7 @@ theorem blocks_bot (n : ℕ) : blocks (Delta n) = n := by
 theorem blocks_top (n : ℕ) [NeZero n] : blocks (Theta n) = 1 := by
   unfold blocks Theta
   have hsub : Subsingleton (Quotient (⊤ : ER n)) :=
-    ⟨fun p q ↦ Quotient.inductionOn₂ p q fun _ _ ↦ Quotient.sound trivial⟩
+    ⟨fun p q => Quotient.inductionOn₂ p q fun _ _ => Quotient.sound trivial⟩
   have hne : Nonempty (Quotient (⊤ : ER n)) :=
     ⟨Quotient.mk _ ⟨0, Nat.pos_of_ne_zero (NeZero.ne n)⟩⟩
   exact Nat.card_eq_one_iff_unique.mpr ⟨hsub, hne⟩
@@ -96,7 +96,7 @@ theorem blocks_eq_one_iff {n : ℕ} [NeZero n] (ξ : ER n) : blocks ξ = 1 ↔ �
     have hsub : Subsingleton (Quotient ξ) := by
       have := (Nat.card_eq_one_iff_unique.mp h).1
       exact this
-    refine Setoid.ext fun x y ↦ ⟨fun _ ↦ trivial, fun _ ↦ ?_⟩
+    refine Setoid.ext fun x y => ⟨fun _ => trivial, fun _ => ?_⟩
     exact Quotient.exact (Subsingleton.elim (Quotient.mk ξ x) (Quotient.mk ξ y))
   · intro h
     rw [h]
@@ -108,7 +108,7 @@ theorem blocks_pos {n : ℕ} [NeZero n] (ξ : ER n) : 0 < blocks ξ := by
 
 /-- The map on blocks induced by a coarsening. -/
 noncomputable def blockMap {n : ℕ} {ξ η : ER n} (h : ξ ≤ η) : Quotient ξ → Quotient η :=
-  Quotient.lift (fun x ↦ Quotient.mk η x) fun _ _ hab ↦ Quotient.sound (h hab)
+  Quotient.lift (fun x => Quotient.mk η x) fun _ _ hab => Quotient.sound (h hab)
 
 theorem blockMap_surjective {n : ℕ} {ξ η : ER n} (h : ξ ≤ η) :
     Function.Surjective (blockMap h) := by
@@ -126,7 +126,7 @@ equality is.  Every structural fact below is then a fact about that fold. -/
 
 /-- Fold the class `b` onto the class `a`, fixing every other class. -/
 noncomputable def mergeMap {n : ℕ} (ξ : ER n) (a b : Quotient ξ) : Quotient ξ → Quotient ξ :=
-  fun c ↦ if c = b then a else c
+  fun c => if c = b then a else c
 
 /-- **Combining two equivalence classes.**  `merge ξ a b` relates `x` and `y` exactly when
 they land in the same class after `b` has been folded onto `a`.  K-C section 1.
@@ -134,7 +134,7 @@ they land in the same class after `b` has been folded onto `a`.  K-C section 1.
 Empirical status: NOT AN EMPIRICAL CLAIM.  This is Kingman's `≺`: a definition of which
 states the process can move to, not an assertion about any population. -/
 noncomputable def merge {n : ℕ} (ξ : ER n) (a b : Quotient ξ) : ER n :=
-  Setoid.ker fun x ↦ mergeMap ξ a b (Quotient.mk ξ x)
+  Setoid.ker fun x => mergeMap ξ a b (Quotient.mk ξ x)
 
 theorem mergeMap_apply_of_ne {n : ℕ} (ξ : ER n) (a b c : Quotient ξ) (h : c ≠ b) :
     mergeMap ξ a b c = c := by
@@ -195,7 +195,7 @@ theorem merge_rel {n : ℕ} (ξ : ER n) (a b : Quotient ξ) {x y : Fin n}
 
 /-- The image of the fold is everything but the class that was folded away. -/
 theorem range_mergeMap {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
-    Set.range (fun x : Fin n ↦ mergeMap ξ a b (Quotient.mk ξ x)) = {c | c ≠ b} := by
+    Set.range (fun x : Fin n => mergeMap ξ a b (Quotient.mk ξ x)) = {c | c ≠ b} := by
   ext c
   simp only [Set.mem_range, Set.mem_setOf_eq]
   constructor
@@ -224,7 +224,7 @@ theorem blocks_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     exact Nat.card_congr (Equiv.setCongr (range_mergeMap ξ hab))
   have hsub : Nat.card {c : Quotient ξ // c ≠ b} = Fintype.card (Quotient ξ) - 1 := by
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
-    have hfilter : (Finset.univ.filter fun c : Quotient ξ ↦ c ≠ b)
+    have hfilter : (Finset.univ.filter fun c : Quotient ξ => c ≠ b)
         = Finset.univ.erase b := by
       ext c
       simp [Finset.mem_erase]
@@ -259,7 +259,7 @@ theorem eq_of_le_of_blocks_eq {n : ℕ} {ξ η : ER n} (h : ξ ≤ η) (hb : blo
     exact hb
   have hbij : Function.Bijective (blockMap h) :=
     (Fintype.bijective_iff_surjective_and_card _).mpr ⟨blockMap_surjective h, hcard⟩
-  refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ h hxy, fun hxy ↦ ?_⟩
+  refine Setoid.ext fun x y => ⟨fun hxy => h hxy, fun hxy => ?_⟩
   have hmk : blockMap h (Quotient.mk ξ x) = blockMap h (Quotient.mk ξ y) :=
     Quotient.sound hxy
   exact Quotient.exact (hbij.1 hmk)
@@ -284,7 +284,7 @@ theorem covers_iff_exists_merge {n : ℕ} (ξ η : ER n) :
     obtain ⟨a, b, hFab, hab⟩ : ∃ a b : Quotient ξ, blockMap hle a = blockMap hle b ∧ a ≠ b := by
       by_contra hcon
       push_neg at hcon
-      exact hninj fun a b hEq ↦ by
+      exact hninj fun a b hEq => by
         by_contra hne
         exact hne (hcon a b hEq)
     refine ⟨a, b, hab, ?_⟩
@@ -318,7 +318,7 @@ This is where the factor of two in `k(k-1)/2` comes from: covers are indexed by 
 pairs of blocks. -/
 theorem merge_comm {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     merge ξ a b = merge ξ b a := by
-  refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩
+  refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
   · have h := (mergeMap_eq_iff ξ hab _ _).mp hxy
     refine (mergeMap_eq_iff ξ (Ne.symm hab) _ _).mpr ?_
     rcases h with h | ⟨hx, hy⟩ | ⟨hx, hy⟩

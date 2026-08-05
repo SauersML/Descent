@@ -71,7 +71,7 @@ theorem integral_exp_neg_mul_holdDensity {d θ : ℝ} (hd : 0 < d) (hθ : 0 ≤ 
     fun t ↦ exp_neg_mul_holdDensity_eq hdθ t
   calc ∫ t in Ioi (0 : ℝ), Real.exp (-(θ * t)) * (d * Real.exp (-(d * t)))
       = ∫ t in Ioi (0 : ℝ), (d / (d + θ)) * ((d + θ) * Real.exp (-((d + θ) * t))) := by
-        exact setIntegral_congr_fun measurableSet_Ioi fun t _ ↦ hpt t
+        exact setIntegral_congr_fun measurableSet_Ioi fun t _ => hpt t
     _ = (d / (d + θ)) * ∫ t in Ioi (0 : ℝ), (d + θ) * Real.exp (-((d + θ) * t)) := by
         rw [integral_const_mul]
     _ = d / (d + θ) := by

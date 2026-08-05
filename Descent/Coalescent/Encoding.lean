@@ -45,23 +45,23 @@ open MeasureTheory
 open scoped Classical
 
 /-- **K-C section 3: `𝓔` as a subset of `2^{ℕ×ℕ}`.** -/
-noncomputable def encode (R : EInf) : ℕ × ℕ → Bool := fun p ↦ decide (R.r p.1 p.2)
+noncomputable def encode (R : EInf) : ℕ × ℕ → Bool := fun p => decide (R.r p.1 p.2)
 
 theorem encode_injective : Function.Injective encode := by
   intro R S h
-  refine Setoid.ext fun i j ↦ ?_
+  refine Setoid.ext fun i j => ?_
   have hij : decide (R.r i j) = decide (S.r i j) := congrFun h (i, j)
   by_cases hR : R.r i j
   · have hS : S.r i j := by
       by_contra hS
       rw [decide_eq_true hR, decide_eq_false hS] at hij
       exact Bool.noConfusion hij
-    exact ⟨fun _ ↦ hS, fun _ ↦ hR⟩
+    exact ⟨fun _ => hS, fun _ => hR⟩
   · have hS : ¬ S.r i j := by
       intro hS
       rw [decide_eq_false hR, decide_eq_true hS] at hij
       exact Bool.noConfusion hij
-    exact ⟨fun h' ↦ absurd h' hR, fun h' ↦ absurd h' hS⟩
+    exact ⟨fun h' => absurd h' hR, fun h' => absurd h' hS⟩
 
 /-- The σ-algebra `𝓔` inherits from `2^{ℕ×ℕ}` -- the one K-C's topology induces, and the one
 a projective limit argument would produce a measure on. -/
@@ -70,7 +70,7 @@ scoped instance measurableSpace_EInf : MeasurableSpace EInf :=
 
 /-- Each coordinate is measurable: whether `i` and `j` are related is a measurable event. -/
 theorem measurable_rel (i j : ℕ) : MeasurableSet {R : EInf | R.r i j} := by
-  refine ⟨(fun f : ℕ × ℕ → Bool ↦ f (i, j)) ⁻¹' {true}, ?_, ?_⟩
+  refine ⟨(fun f : ℕ × ℕ → Bool => f (i, j)) ⁻¹' {true}, ?_, ?_⟩
   · exact (measurable_pi_apply (i, j)) (measurableSet_singleton true)
   · ext R
     simp [encode]
@@ -91,7 +91,7 @@ finitely many coordinate conditions that define it.  With `𝓔ₙ` finite -- an
 This is the hypothesis Kingman's projective limit needs: without it, "the finite-dimensional
 distributions of a process on `𝓔`" is not a well-formed phrase. -/
 theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
-  refine measurable_to_countable' fun ξ ↦ ?_
+  refine measurable_to_countable' fun ξ => ?_
   have hpre : (restrictInf n) ⁻¹' {ξ}
       = ⋂ (p : Fin n × Fin n),
           (if ξ.r p.1 p.2 then {R : EInf | R.r (p.1 : ℕ) (p.2 : ℕ)}
@@ -107,15 +107,15 @@ theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
       · rw [if_neg hp]
         exact hp
     · intro hR
-      refine Setoid.ext fun x y ↦ ?_
+      refine Setoid.ext fun x y => ?_
       have hxy := hR (x, y)
       by_cases hp : ξ.r x y
       · rw [if_pos hp] at hxy
-        exact ⟨fun _ ↦ hp, fun _ ↦ hxy⟩
+        exact ⟨fun _ => hp, fun _ => hxy⟩
       · rw [if_neg hp] at hxy
-        exact ⟨fun h ↦ absurd h hxy, fun h ↦ absurd h hp⟩
+        exact ⟨fun h => absurd h hxy, fun h => absurd h hp⟩
   rw [hpre]
-  refine MeasurableSet.iInter fun p ↦ ?_
+  refine MeasurableSet.iInter fun p => ?_
   by_cases hp : ξ.r p.1 p.2
   · rw [if_pos hp]
     exact measurable_rel _ _

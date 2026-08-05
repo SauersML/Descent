@@ -164,16 +164,16 @@ population, and the coalescent becomes Kingman's.  With `meanTimeSame_eq_two` th
 full picture -- migration never touches the within-deme time, and erases the between-deme
 excess. -/
 theorem tendsto_fstFromMigration :
-    Tendsto (fun M : ℝ ↦ fstFromMigration M) atTop (nhds 0) := by
+    Tendsto (fun M : ℝ => fstFromMigration M) atTop (nhds 0) := by
   have hcongr : ∀ᶠ M : ℝ in atTop, fstFromMigration M = 1 / (1 + 2 * M) := by
     filter_upwards [eventually_gt_atTop (0 : ℝ)] with M hM
     exact fstFromMigration_eq hM
-  have hlim : Tendsto (fun M : ℝ ↦ 1 / (1 + 2 * M)) atTop (nhds 0) := by
-    have h : Tendsto (fun M : ℝ ↦ 1 + 2 * M) atTop atTop := by
+  have hlim : Tendsto (fun M : ℝ => 1 / (1 + 2 * M)) atTop (nhds 0) := by
+    have h : Tendsto (fun M : ℝ => 1 + 2 * M) atTop atTop := by
       apply tendsto_atTop_add_const_left
       exact tendsto_id.const_mul_atTop (by norm_num : (0 : ℝ) < 2)
-    exact h.inv_tendsto_atTop.congr fun M ↦ (one_div _).symm
-  exact hlim.congr' (hcongr.mono fun M h ↦ h.symm)
+    exact h.inv_tendsto_atTop.congr fun M => (one_div _).symm
+  exact hlim.congr' (hcongr.mono fun M h => h.symm)
 
 end Coalescent
 

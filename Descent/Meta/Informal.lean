@@ -125,8 +125,8 @@ the layer order. -/
 initialize gapExtension : SimplePersistentEnvExtension GapInfo (Array GapInfo) ←
   registerSimplePersistentEnvExtension {
     name := `Descent.Meta.gapExtension
-    addEntryFn := fun arr gap ↦ arr.push gap
-    addImportedFn := fun es ↦ es.foldl (· ++ ·) #[]
+    addEntryFn := fun arr gap => arr.push gap
+    addImportedFn := fun es => es.foldl (· ++ ·) #[]
   }
 
 /-- The shared tail of every gap command: locate the syntax, then push the record.
@@ -144,7 +144,7 @@ def recordGap (stx : Syntax) (kind : GapKind) (tag : String) (name : Name)
     let modName := env.mainModule
     let fileMap ← getFileMap
     let line := (fileMap.toPosition pos).line
-    modifyEnv fun env ↦ gapExtension.addEntry env
+    modifyEnv fun env => gapExtension.addEntry env
       { kind := kind, tag := tag, name := name, content := content, deps := deps,
         fileName := modName, line := line }
   | none => throwError "a gap command must have a source position"
@@ -162,7 +162,7 @@ syntax (name := todoCmd) "TODO " str str : command
 /-- Elaborator for `TODO "tag" "text"`.  Records the note and adds nothing to the
 environment, so a `TODO` is a line in the ledger and not a claim anything can rest on. -/
 @[command_elab todoCmd]
-def elabTODO : CommandElab := fun stx ↦
+def elabTODO : CommandElab := fun stx =>
   match stx with
   | `(TODO $t $s) => recordGap stx GapKind.todo t.getString Name.anonymous s.getString []
   | _ => throwError "invalid `TODO` command"
@@ -186,21 +186,21 @@ syntax (name := informalLemmaCmd)
 /-- Elaborator for `informal_definition`.  Adds no constant: the docstring is the whole
 content, and it goes into the ledger. -/
 @[command_elab informalDefinitionCmd]
-def elabInformalDefinition : CommandElab := fun stx ↦
+def elabInformalDefinition : CommandElab := fun stx =>
   match stx with
   | `($doc:docComment informal_definition $t $n:ident [$deps,*]) =>
     recordGap stx GapKind.informalDefinition t.getString n.getId doc.getDocString
-      (deps.getElems.toList.map (fun d ↦ d.getId))
+      (deps.getElems.toList.map (fun d => d.getId))
   | _ => throwError "invalid `informal_definition` command"
 
 /-- Elaborator for `informal_lemma`.  Adds no constant, which is the point: an unproved
 claim must be impossible to cite, not merely marked. -/
 @[command_elab informalLemmaCmd]
-def elabInformalLemma : CommandElab := fun stx ↦
+def elabInformalLemma : CommandElab := fun stx =>
   match stx with
   | `($doc:docComment informal_lemma $t $n:ident [$deps,*]) =>
     recordGap stx GapKind.informalLemma t.getString n.getId doc.getDocString
-      (deps.getElems.toList.map (fun d ↦ d.getId))
+      (deps.getElems.toList.map (fun d => d.getId))
   | _ => throwError "invalid `informal_lemma` command"
 
 /-! ### `withdrawn`
@@ -223,10 +223,10 @@ initialize withdrawnAttribute : Unit ←
     name := `withdrawn
     descr := "records a retracted instruction about this declaration, with its reason"
     applicationTime := AttributeApplicationTime.afterCompilation
-    add := fun declName stx _ ↦ do
+    add := fun declName stx _ => do
       match stx with
       | `(attr| withdrawn $t $r) =>
-        modifyEnv fun env ↦ gapExtension.addEntry env
+        modifyEnv fun env => gapExtension.addEntry env
           { kind := GapKind.withdrawn, tag := t.getString, name := declName,
             content := r.getString, deps := [], fileName := env.mainModule, line := 0 }
       | _ => throwError "invalid `withdrawn` attribute"
@@ -234,7 +234,7 @@ initialize withdrawnAttribute : Unit ←
 
 /-- Elaborator for the free-standing `withdrawn "tag" "reason"` command. -/
 @[command_elab withdrawnCmd]
-def elabWithdrawn : CommandElab := fun stx ↦
+def elabWithdrawn : CommandElab := fun stx =>
   match stx with
   | `(withdrawn $t $r) =>
     recordGap stx GapKind.withdrawn t.getString Name.anonymous r.getString []
@@ -253,7 +253,7 @@ def depClosed (env : Environment) (n : Name) : Bool := env.contains n
 
 /-- The deps of a gap that are not yet in the environment. -/
 def openDeps (env : Environment) (g : GapInfo) : List Name :=
-  g.deps.filter fun d ↦ !depClosed env d
+  g.deps.filter fun d => !depClosed env d
 
 /-- Every gap in the import closure. -/
 def allGaps (env : Environment) : Array GapInfo := gapExtension.getState env

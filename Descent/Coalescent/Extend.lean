@@ -54,7 +54,7 @@ open scoped Classical
 choice `o` for the new one. -/
 noncomputable def extendMap {n : ℕ} (ξ : ER n) (o : Option (Quotient ξ)) :
     Fin (n + 1) → Option (Quotient ξ) :=
-  fun x ↦ if h : (x : ℕ) < n then some (Quotient.mk ξ ⟨x, h⟩) else o
+  fun x => if h : (x : ℕ) < n then some (Quotient.mk ξ ⟨x, h⟩) else o
 
 /-- **Seat the `(n+1)`-th sample.**  `extend ξ (some c)` puts it in class `c`; `extend ξ none`
 gives it a class of its own.
@@ -89,7 +89,7 @@ theorem eq_last_of_not_lt {n : ℕ} {x : Fin (n + 1)} (h : ¬ (x : ℕ) < n) : x
 started from, so `extend` really does parametrise the fibre of restriction. -/
 theorem restrict_extend {n : ℕ} (ξ : ER n) (o : Option (Quotient ξ)) :
     restrict (Nat.le_succ n) (extend ξ o) = ξ := by
-  refine Setoid.ext fun x y ↦ ?_
+  refine Setoid.ext fun x y => ?_
   constructor
   · intro h
     have h' : extendMap ξ o (Fin.castLE (Nat.le_succ n) x)
@@ -166,7 +166,7 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
   by_cases hjoin : ∃ x : Fin n, ζ.r (Fin.castLE (Nat.le_succ n) x) (Fin.last n)
   · obtain ⟨x₀, hx₀⟩ := hjoin
     refine ⟨some (Quotient.mk ξ x₀), ?_⟩
-    refine Setoid.ext fun u v ↦ ?_
+    refine Setoid.ext fun u v => ?_
     rcases lt_or_ge (u : ℕ) n with hu | hu
     · rcases lt_or_ge (v : ℕ) n with hv | hv
       · -- both old: the relation is `ξ`, and both maps agree there
@@ -232,10 +232,10 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
           exact ζ.iseqv.symm (ζ.iseqv.trans hvx₀ hx₀)
       · have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
-        exact ⟨fun _ ↦ (extend ξ _).iseqv.refl _, fun _ ↦ ζ.iseqv.refl _⟩
+        exact ⟨fun _ => (extend ξ _).iseqv.refl _, fun _ => ζ.iseqv.refl _⟩
   · push_neg at hjoin
     refine ⟨none, ?_⟩
-    refine Setoid.ext fun u v ↦ ?_
+    refine Setoid.ext fun u v => ?_
     rcases lt_or_ge (u : ℕ) n with hu | hu
     · rcases lt_or_ge (v : ℕ) n with hv | hv
       · constructor
@@ -289,7 +289,7 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
           exact Option.noConfusion h'.symm
       · have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
-        exact ⟨fun _ ↦ (extend ξ _).iseqv.refl _, fun _ ↦ ζ.iseqv.refl _⟩
+        exact ⟨fun _ => (extend ξ _).iseqv.refl _, fun _ => ζ.iseqv.refl _⟩
 
 /-! ### The block count across a seating
 
@@ -342,7 +342,7 @@ that is what `Setoid.ker` means. -/
 
 /-- `λ_c`, the size of a class.  Kingman's `λ` in K-C (2.3) and K-G (3.8). -/
 noncomputable def classSize {n : ℕ} (ξ : ER n) (c : Quotient ξ) : ℕ :=
-  (Finset.univ.filter fun x : Fin n ↦ Quotient.mk ξ x = c).card
+  (Finset.univ.filter fun x : Fin n => Quotient.mk ξ x = c).card
 
 /-- **`λ₁ + ⋯ + λ_k = n`.**  The class sizes of a relation on a sample of `n` sum to `n`.
 `Descent.Coalescent.JumpChain.absoluteProb_recursion` takes this as a hypothesis on its
@@ -351,8 +351,8 @@ theorem sum_classSize {n : ℕ} (ξ : ER n) :
     ∑ c : Quotient ξ, classSize ξ c = n := by
   classical
   have h := Finset.card_eq_sum_card_fiberwise
-    (f := fun x : Fin n ↦ Quotient.mk ξ x) (s := (Finset.univ : Finset (Fin n)))
-    (t := (Finset.univ : Finset (Quotient ξ))) (fun x _ ↦ Finset.mem_univ _)
+    (f := fun x : Fin n => Quotient.mk ξ x) (s := (Finset.univ : Finset (Fin n)))
+    (t := (Finset.univ : Finset (Quotient ξ))) (fun x _ => Finset.mem_univ _)
   rw [Finset.card_univ, Fintype.card_fin] at h
   exact h.symm
 
@@ -362,12 +362,12 @@ theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ 
       = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
   classical
   refine (Nat.card_eq_of_bijective
-    (fun p : {x : Fin n // Quotient.mk ξ x = d} ↦
+    (fun p : {x : Fin n // Quotient.mk ξ x = d} =>
       (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
         {x : Fin (n + 1) // extendMap ξ (some c) x = some d})) ?_).symm
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
-    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q ↦ (q.1 : ℕ)) h
+    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q => (q.1 : ℕ)) h
     exact Subtype.ext (Fin.ext hval)
   · rintro ⟨y, hy⟩
     rcases lt_or_ge (y : ℕ) n with hylt | hyge
@@ -385,7 +385,7 @@ theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
       = Nat.card {x : Fin n // Quotient.mk ξ x = c} + 1 := by
   classical
   have hbij : Function.Bijective
-      (fun p : Option {x : Fin n // Quotient.mk ξ x = c} ↦
+      (fun p : Option {x : Fin n // Quotient.mk ξ x = c} =>
         (match p with
         | none => ⟨Fin.last n, by rw [extendMap_last]⟩
           | some q => ⟨Fin.castLE (Nat.le_succ n) q.1, by rw [extendMap_castLE, q.2]⟩ :
@@ -396,14 +396,14 @@ theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
       | none, none => rfl
       | none, some b =>
           exfalso
-          have hval : (n : ℕ) = (b.1 : ℕ) := congrArg (fun r ↦ (r.1 : ℕ)) h
+          have hval : (n : ℕ) = (b.1 : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
           exact absurd b.1.isLt (by omega)
       | some a, none =>
           exfalso
-          have hval : (a.1 : ℕ) = (n : ℕ) := congrArg (fun r ↦ (r.1 : ℕ)) h
+          have hval : (a.1 : ℕ) = (n : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
           exact absurd a.1.isLt (by omega)
       | some a, some b =>
-          have hval : (a.1 : ℕ) = (b.1 : ℕ) := congrArg (fun r ↦ (r.1 : ℕ)) h
+          have hval : (a.1 : ℕ) = (b.1 : ℕ) := congrArg (fun r => (r.1 : ℕ)) h
           exact congrArg some (Subtype.ext (Fin.ext hval))
     · rintro ⟨y, hy⟩
       rcases lt_or_ge (y : ℕ) n with hylt | hyge
@@ -421,12 +421,12 @@ theorem card_fiber_none_old {n : ℕ} (ξ : ER n) (d : Quotient ξ) :
       = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
   classical
   refine (Nat.card_eq_of_bijective
-    (fun p : {x : Fin n // Quotient.mk ξ x = d} ↦
+    (fun p : {x : Fin n // Quotient.mk ξ x = d} =>
       (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
         {x : Fin (n + 1) // extendMap ξ none x = some d})) ?_).symm
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
-    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q ↦ (q.1 : ℕ)) h
+    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q => (q.1 : ℕ)) h
     exact Subtype.ext (Fin.ext hval)
   · rintro ⟨y, hy⟩
     rcases lt_or_ge (y : ℕ) n with hylt | hyge
@@ -444,7 +444,7 @@ theorem card_fiber_none_new {n : ℕ} (ξ : ER n) :
     Nat.card {x : Fin (n + 1) // extendMap ξ none x = none} = 1 := by
   classical
   have hbij : Function.Bijective
-      (fun _ : Unit ↦ (⟨Fin.last n, by rw [extendMap_last]⟩ :
+      (fun _ : Unit => (⟨Fin.last n, by rw [extendMap_last]⟩ :
         {x : Fin (n + 1) // extendMap ξ none x = none})) := by
     constructor
     · rintro ⟨⟩ ⟨⟩ _

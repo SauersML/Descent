@@ -96,7 +96,7 @@ theorem measurableSet_cylinders {s : Set EInf} (hs : s ∈ cylinders) :
     MeasurableSet[cylinderSpace] s := by
   obtain ⟨n, ξ, rfl⟩ := hs
   have hle : MeasurableSpace.comap (restrictInf n) ⊤ ≤ cylinderSpace :=
-    le_iSup (fun n : ℕ ↦ MeasurableSpace.comap (restrictInf n) ⊤) n
+    le_iSup (fun n : ℕ => MeasurableSpace.comap (restrictInf n) ⊤) n
   exact hle _ ⟨{ξ}, trivial, rfl⟩
 
 /-- The cylinders generate the σ-algebra: a subset of a finite `𝓔ₙ` is a finite union of
@@ -104,15 +104,15 @@ singletons, so a `ρ_n`-preimage is a finite union of cylinders. -/
 theorem cylinderSpace_eq_generateFrom :
     cylinderSpace = MeasurableSpace.generateFrom cylinders := by
   refine le_antisymm ?_ ?_
-  · refine iSup_le fun n ↦ ?_
+  · refine iSup_le fun n => ?_
     rintro _ ⟨A, -, rfl⟩
     have hunion : (restrictInf n) ⁻¹' A = ⋃ ξ ∈ A, (restrictInf n) ⁻¹' {ξ} := by
       ext S
       simp
     rw [hunion]
-    refine MeasurableSet.biUnion (Set.to_countable A) fun ξ _ ↦ ?_
+    refine MeasurableSet.biUnion (Set.to_countable A) fun ξ _ => ?_
     exact MeasurableSpace.measurableSet_generateFrom ⟨n, ξ, rfl⟩
-  · exact MeasurableSpace.generateFrom_le fun s hs ↦ measurableSet_cylinders hs
+  · exact MeasurableSpace.generateFrom_le fun s hs => measurableSet_cylinders hs
 
 /-- **K-C section 4's uniqueness: a coalescent is determined by its finite-dimensional
 distributions.**

@@ -43,7 +43,7 @@ variable {Ω : Type*}
 /-- The indicator that ball `i` received colour `r`.  Summed over `i < n` it is `λ_r(n)`,
 the size of the `r`-th class of `ρ_n R`. -/
 noncomputable def colourIndicator (Z : ℕ → Ω → ℕ) (r i : ℕ) : Ω → ℝ :=
-  fun ω ↦ if Z i ω = r then (1 : ℝ) else 0
+  fun ω => if Z i ω = r then (1 : ℝ) else 0
 
 theorem measurable_colourIndicator [MeasurableSpace Ω] {Z : ℕ → Ω → ℕ} (hZ : ∀ i, Measurable (Z i))
     (r i : ℕ) : Measurable (colourIndicator Z r i) := by
@@ -60,7 +60,7 @@ theorem integrable_colourIndicator [MeasureSpace Ω] [IsProbabilityMeasure (ℙ 
     Integrable (colourIndicator Z r i) := by
   refine Integrable.mono' (integrable_const (1 : ℝ))
     (measurable_colourIndicator hZ r i).aestronglyMeasurable ?_
-  exact Eventually.of_forall fun ω ↦ colourIndicator_le_one r i ω
+  exact Eventually.of_forall fun ω => colourIndicator_le_one r i ω
 
 /-- The mean of the indicator is the colour's probability, so the limit below is the paintbox
 parameter and not merely some number. -/
@@ -83,13 +83,13 @@ box was built from.  Theorem 2's content is the converse -- that an arbitrary ex
 relation is such a box -- and that is not this. -/
 theorem tendsto_colourFrequency [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : Measure Ω)]
     {Z : ℕ → Ω → ℕ} (hZ : ∀ i, Measurable (Z i))
-    (hindep : Pairwise fun i j ↦ IndepFun (Z i) (Z j))
+    (hindep : Pairwise fun i j => IndepFun (Z i) (Z j))
     (hident : ∀ i, IdentDistrib (Z i) (Z 0))
     (r : ℕ) :
     ∀ᵐ ω, Tendsto
-      (fun n : ℕ ↦ (n : ℝ)⁻¹ • ∑ i ∈ Finset.range n, colourIndicator Z r i ω)
+      (fun n : ℕ => (n : ℝ)⁻¹ • ∑ i ∈ Finset.range n, colourIndicator Z r i ω)
       atTop (nhds ((ℙ {ω | Z 0 ω = r}).toReal)) := by
-  have hindep' : Pairwise fun i j ↦ IndepFun (colourIndicator Z r i) (colourIndicator Z r j) := by
+  have hindep' : Pairwise fun i j => IndepFun (colourIndicator Z r i) (colourIndicator Z r j) := by
     intro i j hij
     exact (hindep hij).comp
       (measurable_const.ite (measurable_id (measurableSet_singleton r)) measurable_const)

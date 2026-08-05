@@ -84,13 +84,13 @@ The integrability hypotheses are the honest cost of stating it for a general fin
 on `[0,1]` the integrands are bounded and the hypotheses are automatic, but `Λ` here is any
 measure on `ℝ`, as `Descent.Blindness.MultipleMergerBlindness` defines it. -/
 theorem lambdaRate_consistent (Λ : Measure ℝ) {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b)
-    (h1 : Integrable (fun x : ℝ ↦ x ^ (k - 2) * (1 - x) ^ (b + 1 - k)) Λ)
-    (h2 : Integrable (fun x : ℝ ↦ x ^ (k + 1 - 2) * (1 - x) ^ (b + 1 - (k + 1))) Λ) :
+    (h1 : Integrable (fun x : ℝ => x ^ (k - 2) * (1 - x) ^ (b + 1 - k)) Λ)
+    (h2 : Integrable (fun x : ℝ => x ^ (k + 1 - 2) * (1 - x) ^ (b + 1 - (k + 1))) Λ) :
     Blindness.lambdaCoalescentMergerRate Λ b k
       = Blindness.lambdaCoalescentMergerRate Λ (b + 1) k + Blindness.lambdaCoalescentMergerRate Λ (b + 1) (k + 1) := by
   unfold Blindness.lambdaCoalescentMergerRate
   rw [← integral_add h1 h2]
-  exact integral_congr_ae (Filter.Eventually.of_forall fun x ↦ lambdaIntegrand_split hk hkb x)
+  exact integral_congr_ae (Filter.Eventually.of_forall fun x => lambdaIntegrand_split hk hkb x)
 
 /-- Kingman's array: binary mergers at unit rate, nothing else.  K-C (1.3) as a member of
 Pitman's family. -/

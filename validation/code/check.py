@@ -6924,6 +6924,39 @@ def run_shape_routes() -> int:
 #              ten-module interior and back out to `Program.Conclusions`.  All three
 #              are fixed and this rule is at zero.
 #
+#              WHAT THIS RULE DOES NOT SEE, stated here so its zero is not read as
+#              more than it is.  It matches QUALIFIED names only -- `Portability.foo`
+#              written from outside `Descent/Portability/`.  A file sitting in
+#              `namespace Descent.Portability` writes `presentDayR2` bare, and that
+#              resolves through the same accidental chains and breaks the same way.
+#              `necklace-B` measured the difference on one commit: cutting
+#              `PGSCalibrationTheory`'s head lost 42 names in
+#              `CalibrationVsDiscrimination`, of which this rule sees the 3 that were
+#              written with a `Program.` prefix.  So: fourteen to one, on the one
+#              commit where both numbers are known.
+#
+#              THE OBVIOUS EXTENSION IS NOISE, WHICH IS WHY IT IS NOT HERE.  Dropping
+#              the prefix requirement -- every identifier of 12 characters or more
+#              that exactly one corpus module declares must be reachable -- runs in
+#              0.3s and reports 34 findings on the corpus today.  Every one that has
+#              been checked is a false positive of the same three kinds:
+#              `outcomeVariance` and `predictiveCovariance` are FIELDS of
+#              `Core/Moments.lean`'s own structure; `driftVariance` is a binder inside
+#              `def effectiveSize`; `genotypeVarianceHWE` is attributed to
+#              `Portability.AncestrySpecificPower` by a regex that cannot see a
+#              `_root_.` declaration or an `open ... renaming`.  Held against the
+#              corpus at `62bbadb`, all 34 are unreachable THERE TOO, in a tree that
+#              compiled.  A gate at 34 false positives is worse than no gate.
+#
+#              THE MEASUREMENT THAT DOES WORK IS A DIFF, not a threshold, and it is
+#              `necklace-B`'s: build the pre-change tree, compute the unresolved-name
+#              set for every module in both, and report only what the change ADDED.
+#              The false positives are identical in both trees and cancel exactly.
+#              That needs a base revision, which makes it a reviewer's instrument
+#              rather than a guard's -- `field-proofs` is the precedent for shelling
+#              out to git, and the honest place for this is beside it rather than
+#              inside a rule whose zero is supposed to mean something.
+#
 # EVERY VIOLATION IS A NAMED EXCEPTION OR IT IS NOT A VIOLATION ANYONE HAS THOUGHT
 # ABOUT.  `LAYER_PENDING` below carries one sentence per outstanding edge saying what
 # the edge is made of and what repair retires it.  An edge NOT in that table is
@@ -7462,7 +7495,12 @@ GUARDS = {
     # the ones that went were not fixed by moving anything, they were imports carrying
     # Mathlib or the programme narrative and naming nothing from what they imported.
     #
-    # REACHABLE: 17, and this one is URGENT rather than aspirational. Each is a file
+    # REACHABLE: 0, and read that zero narrowly -- it covers qualified cross-directory
+    # names and not the unqualified ones, which on the one commit where both were
+    # counted outnumbered them fourteen to one. The rule's own comment says why the
+    # obvious widening is not here and what instrument does cover it.
+    #
+    # It was 17 and the history is the point rather than the number. Each is a file
     # naming a declaration it does not reach, which means it does not compile, and
     # every one arrived this release from an import repair -- the count against
     # `62bbadb` is zero. The fix is one import line per file, naming the module that

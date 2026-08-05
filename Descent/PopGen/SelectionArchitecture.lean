@@ -721,11 +721,11 @@ section PolygenicAdaptation
 /-- **Polygenic adaptation score shift.**
     Under polygenic adaptation, the mean PGS shifts by
     Δμ = Σᵢ βᵢ · 2 · Δpᵢ where Δpᵢ are coordinated frequency changes. The `2` is
-    `Descent.Core.ploidy`, written as a literal.  Nothing forces the literal: `ploidy`
-    lives in `Core/Scaling.lean` at depth 1, and this body could call it.  What holds the
-    literal to the convention while it stays a literal is
-    `polygenicAdaptationShift_uses_ploidy` below, which is in this file rather than in an
-    audit layer;
+    `Descent.Core.ploidy`, written as a literal.  That used to be because importing
+    `Conventions` here closed an import cycle, and it no longer is: `ploidy` lives in
+    `Core/Scaling.lean` at depth 1 and nothing prevents this body from calling it.  What
+    holds the literal to the convention meanwhile is `polygenicAdaptationShift_uses_ploidy`
+    below, which is in this file rather than in an audit layer;
     `ScoreDistribution.pgsMeanShift` carries the same factor.
 
     **The ploidy factor was missing and the body has been corrected.** The mean
@@ -1153,10 +1153,10 @@ theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
 
 /-- **The two in the polygenic-adaptation shift is the ploidy.** The mean score is
 `Σᵢ βᵢ · ploidy · pᵢ`, so its shift carries the same factor; the body writes the `2` as a
-literal, and this theorem is what stops it from drifting away from `ploidy`.  `ploidy` is a
-`Core` kernel, visible from here, so the edge is stated next to the literal it is about
-rather than from `Program/Conventions.lean` -- an audit module far enough down the graph to
-see both sides is the wrong place to keep a fact about this line. -/
+literal, and this theorem is what stops it from drifting away from `ploidy`.  It used to be
+stated from `Program/Conventions.lean` because that was the only module that could see both
+sides; `ploidy` is a `Core` kernel now, so the edge is stated here, next to the literal it
+is about. -/
 theorem polygenicAdaptationShift_uses_ploidy {m : ℕ} (β Δp : Fin m → ℝ) :
     PopGen.polygenicAdaptationShift β Δp = ∑ i, β i * Descent.Core.ploidy * Δp i := by
   unfold PopGen.polygenicAdaptationShift Descent.Core.ploidy

@@ -48,7 +48,7 @@ namespace Coalescent
 open Finset
 
 /-- How many cuts lie below a point: the index of the cell it falls in. -/
-noncomputable def cellIndex (V : Finset ℝ) (u : ℝ) : ℕ := (V.filter (fun v ↦ v < u)).card
+noncomputable def cellIndex (V : Finset ℝ) (u : ℝ) : ℕ := (V.filter (fun v => v < u)).card
 
 theorem cellIndex_mono (V : Finset ℝ) {u w : ℝ} (h : u ≤ w) :
     cellIndex V u ≤ cellIndex V w := by
@@ -60,8 +60,8 @@ theorem cellIndex_mono (V : Finset ℝ) {u w : ℝ} (h : u ≤ w) :
 
 /-- The cuts strictly below `w` and not below `u` are exactly the cuts in `[u, w)`. -/
 theorem filter_sdiff_filter (V : Finset ℝ) {u w : ℝ} :
-    (V.filter (fun v ↦ v < w)) \ (V.filter (fun v ↦ v < u))
-      = V.filter (fun v ↦ u ≤ v ∧ v < w) := by
+    (V.filter (fun v => v < w)) \ (V.filter (fun v => v < u))
+      = V.filter (fun v => u ≤ v ∧ v < w) := by
   classical
   ext v
   simp only [mem_sdiff, mem_filter, not_and, not_lt]
@@ -69,30 +69,30 @@ theorem filter_sdiff_filter (V : Finset ℝ) {u w : ℝ} :
   · rintro ⟨⟨hv, hvw⟩, hnot⟩
     exact ⟨hv, hnot hv, hvw⟩
   · rintro ⟨hv, huv, hvw⟩
-    exact ⟨⟨hv, hvw⟩, fun _ ↦ huv⟩
+    exact ⟨⟨hv, hvw⟩, fun _ => huv⟩
 
 /-- Two points fall in the same cell exactly when no cut separates them. -/
 theorem cellIndex_eq_iff (V : Finset ℝ) {u w : ℝ} (h : u ≤ w) :
     cellIndex V u = cellIndex V w ↔ ∀ v ∈ V, ¬ (u ≤ v ∧ v < w) := by
   classical
-  have hsub : (V.filter (fun v ↦ v < u)) ⊆ (V.filter (fun v ↦ v < w)) := by
+  have hsub : (V.filter (fun v => v < u)) ⊆ (V.filter (fun v => v < w)) := by
     intro v hv
     rw [mem_filter] at hv ⊢
     exact ⟨hv.1, lt_of_lt_of_le hv.2 h⟩
-  have hcard : (V.filter (fun v ↦ u ≤ v ∧ v < w)).card
+  have hcard : (V.filter (fun v => u ≤ v ∧ v < w)).card
       = cellIndex V w - cellIndex V u := by
     rw [← filter_sdiff_filter V, Finset.card_sdiff, Finset.inter_eq_left.mpr hsub]
     rfl
   constructor
   · intro heq v hv hbet
-    have hzero : (V.filter (fun v ↦ u ≤ v ∧ v < w)).card = 0 := by
+    have hzero : (V.filter (fun v => u ≤ v ∧ v < w)).card = 0 := by
       rw [hcard, heq]
       omega
-    have hmem : v ∈ V.filter (fun v ↦ u ≤ v ∧ v < w) := mem_filter.mpr ⟨hv, hbet⟩
+    have hmem : v ∈ V.filter (fun v => u ≤ v ∧ v < w) := mem_filter.mpr ⟨hv, hbet⟩
     rw [Finset.card_eq_zero] at hzero
     simp [hzero] at hmem
   · intro hno
-    have hempty : V.filter (fun v ↦ u ≤ v ∧ v < w) = ∅ := by
+    have hempty : V.filter (fun v => u ≤ v ∧ v < w) = ∅ := by
       refine Finset.filter_false_of_mem ?_
       intro v hv
       exact hno v hv
@@ -109,7 +109,7 @@ betweenness relation Kingman writes down.
 Empirical status: NOT AN EMPIRICAL CLAIM.  A construction of equivalence relations from
 points and cuts. -/
 noncomputable def intervalRel {n : ℕ} (V : Finset ℝ) (U : Fin n → ℝ) : ER n :=
-  Setoid.ker fun i ↦ cellIndex V (U i)
+  Setoid.ker fun i => cellIndex V (U i)
 
 /-- **The kernel is Kingman's betweenness relation.**  For balls in the given order, `i` and
 `j` are related exactly when no cut lies between them. -/
@@ -128,11 +128,11 @@ theorem intervalRel_mono {n : ℕ} {V W : Finset ℝ} (hVW : V ⊆ W) (U : Fin n
   rcases le_total (U i) (U j) with h | h
   · refine (cellIndex_eq_iff V h).mpr ?_
     have hW := (cellIndex_eq_iff W h).mp hij
-    exact fun v hv ↦ hW v (hVW hv)
+    exact fun v hv => hW v (hVW hv)
   · have hji : (intervalRel W U).r j i := (intervalRel W U).iseqv.symm hij
     have hW := (cellIndex_eq_iff W h).mp hji
     have hV : cellIndex V (U j) = cellIndex V (U i) :=
-      (cellIndex_eq_iff V h).mpr fun v hv ↦ hW v (hVW hv)
+      (cellIndex_eq_iff V h).mpr fun v hv => hW v (hVW hv)
     exact hV.symm
 
 /-- **`|R_k| = k`.**  The blocks are the cells, so there are `|V| + 1` of them -- provided
@@ -144,7 +144,7 @@ theorem blocks_intervalRel {n : ℕ} (V : Finset ℝ) (U : Fin n → ℝ)
     (hle : ∀ i : Fin n, cellIndex V (U i) ≤ V.card) :
     blocks (intervalRel V U) = V.card + 1 := by
   classical
-  have hrange : Set.range (fun i : Fin n ↦ cellIndex V (U i)) = {c | c ≤ V.card} := by
+  have hrange : Set.range (fun i : Fin n => cellIndex V (U i)) = {c | c ≤ V.card} := by
     ext c
     constructor
     · rintro ⟨i, rfl⟩

@@ -55,7 +55,7 @@ def «semiformal_result» := leading_parser
 against a placeholder proof inside `withoutModifyingEnv`, so the statement is checked and
 nothing is added. -/
 @[command_elab «semiformal_result»]
-def elabSemiformalResult : CommandElab := fun stx ↦
+def elabSemiformalResult : CommandElab := fun stx =>
   match stx with
   | `($doc:docComment semiformal_result $s $name $args* : $res) => do
     let declName := (Lean.Elab.expandDeclIdCore name).1

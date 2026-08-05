@@ -48,7 +48,7 @@ restricting to `l`.  This is the identity the projective limit of K-G section 7 
 so the reason `n`-coalescents for all `n` can live on one probability space. -/
 theorem restrict_restrict {l m n : ℕ} (h1 : l ≤ m) (h2 : m ≤ n) (ξ : ER n) :
     restrict h1 (restrict h2 ξ) = restrict (le_trans h1 h2) ξ :=
-  Setoid.ext fun _ _ ↦ Iff.rfl
+  Setoid.ext fun _ _ => Iff.rfl
 
 /-- Restriction preserves coarsening, so it carries a coalescent path to a path. -/
 theorem restrict_mono {m n : ℕ} (h : m ≤ n) {ξ η : ER n} (hle : ξ ≤ η) :
@@ -58,7 +58,7 @@ theorem restrict_mono {m n : ℕ} (h : m ≤ n) {ξ η : ER n} (hle : ξ ≤ η)
 
 /-- Restricting the starting state gives the starting state. -/
 theorem restrict_bot {m n : ℕ} (h : m ≤ n) : restrict h (Delta n) = Delta m := by
-  refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩
+  refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
   · have hcast : Fin.castLE h x = Fin.castLE h y := hxy
     exact Fin.ext (by simpa using congrArg Fin.val hcast)
   · show Fin.castLE h x = Fin.castLE h y
@@ -66,7 +66,7 @@ theorem restrict_bot {m n : ℕ} (h : m ≤ n) : restrict h (Delta n) = Delta m 
 
 /-- Restricting the absorbing state gives the absorbing state. -/
 theorem restrict_top {m n : ℕ} (h : m ≤ n) : restrict h (Theta n) = Theta m :=
-  Setoid.ext fun _ _ ↦ ⟨fun _ ↦ trivial, fun _ ↦ trivial⟩
+  Setoid.ext fun _ _ => ⟨fun _ => trivial, fun _ => trivial⟩
 
 /-- Restriction never manufactures blocks: a sub-sample has at most as many ancestral
 lineages as the sample it came from. -/
@@ -76,8 +76,8 @@ theorem blocks_restrict_le {m n : ℕ} (h : m ≤ n) (ξ : ER n) :
   letI : Fintype (Quotient (restrict h ξ)) := Fintype.ofFinite _
   letI : Fintype (Quotient ξ) := Fintype.ofFinite _
   have hinj : Function.Injective
-      (Quotient.lift (fun x : Fin m ↦ Quotient.mk ξ (Fin.castLE h x))
-        (fun _ _ hab ↦ Quotient.sound hab) : Quotient (restrict h ξ) → Quotient ξ) := by
+      (Quotient.lift (fun x : Fin m => Quotient.mk ξ (Fin.castLE h x))
+        (fun _ _ hab => Quotient.sound hab) : Quotient (restrict h ξ) → Quotient ξ) := by
     intro p q hpq
     induction p using Quotient.inductionOn with
     | _ x =>

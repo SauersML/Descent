@@ -55,7 +55,7 @@ coalescent's transition graph -- Kingman's binary merge, Pitman's `k`-merge and
 Schweinsberg's simultaneous merge are the cases where `f` has one non-trivial fibre of size
 two, one of size `k`, and several respectively. -/
 noncomputable def mergeIdem {n : ℕ} (ξ : ER n) (f : Quotient ξ → Quotient ξ) : ER n :=
-  Setoid.ker fun x ↦ f (Quotient.mk ξ x)
+  Setoid.ker fun x => f (Quotient.mk ξ x)
 
 /-- Merging coarsens, whatever the merger. -/
 theorem le_mergeIdem {n : ℕ} (ξ : ER n) (f : Quotient ξ → Quotient ξ) :
@@ -114,7 +114,7 @@ theorem blocks_mergeIdem_add_card_absorbed {n : ℕ} (ξ : ER n) (f : Quotient �
 /-- A merger that moves nothing changes nothing: the identity map fixes the state, which is
 the `Ξ`-coalescent's "no collision" and the reason the family contains a trivial move. -/
 theorem mergeIdem_id {n : ℕ} (ξ : ER n) : mergeIdem ξ id = ξ := by
-  refine Setoid.ext fun x y ↦ ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  refine Setoid.ext fun x y => ⟨fun h => ?_, fun h => ?_⟩
   · exact Quotient.exact (show Quotient.mk ξ x = Quotient.mk ξ y from h)
   · show id (Quotient.mk ξ x) = id (Quotient.mk ξ y)
     exact congrArg _ (Quotient.sound h)

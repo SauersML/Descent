@@ -68,10 +68,11 @@ and the wrapper costs a rewrite rather than an argument. -/
 /-- **This body, typed as a Nei estimate, converts to Hudson by the Möbius map.**
 
 `Core.NeiFst` and `Core.HudsonFst` exist so that a Nei value cannot be passed where a
-Hudson one is required, and a guarantee exercised only inside `Core.Fst` protects nothing
-outside it.  `neiFst` RETURNS a `Core.NeiFst`, so handing it to something expecting a
-Hudson value is a type error rather than a factor-of-two-to-four mistake found later --
-which is what the docstring above records this corpus having already paid for once.
+Hudson one is required, and nothing outside `Core.Fst` used to be typed with them: the
+guarantee was built and left unexercised on the one definition it was built to protect.
+`neiFst` now RETURNS a `Core.NeiFst`, so handing it to something expecting a Hudson value
+is a type error rather than a factor-of-two-to-four mistake found later -- which is what
+the docstring above records this corpus having already paid for once.
 
 The cost is one `.value` at each use, and `neiFst_value` above discharges it in a rewrite,
 so the statements below say the same things about the same quotient. -/

@@ -103,11 +103,11 @@ def geno (t : RefTree) (h : Hap) (e : Allele) : Nat :=
 
 /-- The genotype column of edge `e` across the sample. -/
 def column (t : RefTree) (sample : List Hap) (e : Allele) : List Nat :=
-  sample.map (fun h ↦ geno t h e)
+  sample.map (fun h => geno t h e)
 
 /-- A column is polymorphic iff two entries differ. -/
 def nonConstant (l : List Nat) : Bool :=
-  l.any (fun x ↦ l.any (fun y ↦ x != y))
+  l.any (fun x => l.any (fun y => x != y))
 
 /-- An edge is segregating under `t` iff it is a variant edge (not the tree edge)
 and its genotype column is polymorphic. -/
@@ -121,7 +121,7 @@ def S (t : RefTree) (sample : List Hap) : Nat :=
 /-- Unordered pairs of a list, with multiplicity. -/
 def unorderedPairs : List Hap → List (Hap × Hap)
   | [] => []
-  | x :: xs => xs.map (fun y ↦ (x, y)) ++ unorderedPairs xs
+  | x :: xs => xs.map (fun y => (x, y)) ++ unorderedPairs xs
 
 /-- Sequence-level distance between two haplotypes: the number of base positions at
 which their walks spell different sequences.  One base here, so `0` or `1`.
@@ -133,10 +133,10 @@ def seqDist (h₁ h₂ : Hap) : Nat := if h₁ = h₂ then 0 else 1
 /-- Row-counting distance: the number of VCF rows at which two haplotypes carry
 different genotypes.  Unlike `seqDist` this *does* take a reference tree. -/
 def rowDist (t : RefTree) (h₁ h₂ : Hap) : Nat :=
-  (allEdges.filter (fun e ↦ geno t h₁ e != geno t h₂ e)).length
+  (allEdges.filter (fun e => geno t h₁ e != geno t h₂ e)).length
 
 private def sumOver (l : List (Hap × Hap)) (f : Hap → Hap → Nat) : Nat :=
-  (l.map (fun p ↦ f p.1 p.2)).foldr (· + ·) 0
+  (l.map (fun p => f p.1 p.2)).foldr (· + ·) 0
 
 /-- Six times sequence-level `π`, the mean pairwise sequence divergence.
 For `subsample` below, `π = 2/3`. -/

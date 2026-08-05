@@ -78,8 +78,8 @@ grows.  This is the quantitative content of K-G section 4's remark that the coal
 survives weak selection: selection does not change the order of growth of the event rate,
 only its constant. -/
 theorem tendsto_branchDeathRatio (sigma : ℝ) :
-    Tendsto (fun k : ℕ ↦ sigma / ((k : ℝ) + 1)) atTop (nhds 0) := by
-  have h : Tendsto (fun k : ℕ ↦ (k : ℝ) + 1) atTop atTop :=
+    Tendsto (fun k : ℕ => sigma / ((k : ℝ) + 1)) atTop (nhds 0) := by
+  have h : Tendsto (fun k : ℕ => (k : ℝ) + 1) atTop atTop :=
     tendsto_atTop_add_const_right _ 1 tendsto_natCast_atTop_atTop
   exact h.const_div_atTop sigma
 

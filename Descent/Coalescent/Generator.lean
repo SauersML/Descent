@@ -124,14 +124,14 @@ is the whole convergence argument, minus the entrywise expansion that
 `Descent.Coalescent.WrightFisher` supplies. -/
 theorem pow_sub_pow_le {M : Type*} [NormedRing M] [NormOneClass M] (A B : M)
     (hA : ‖A‖ ≤ 1) (hB : ‖B‖ ≤ 1) (r : ℕ) :
-    ‖prodUpTo (fun _ ↦ A) r - prodUpTo (fun _ ↦ B) r‖ ≤ (r : ℝ) * ‖A - B‖ := by
-  have h := norm_prodUpTo_sub_le (fun _ ↦ A) (fun _ ↦ B) (fun _ ↦ hA) (fun _ ↦ hB) r
+    ‖prodUpTo (fun _ => A) r - prodUpTo (fun _ => B) r‖ ≤ (r : ℝ) * ‖A - B‖ := by
+  have h := norm_prodUpTo_sub_le (fun _ => A) (fun _ => B) (fun _ => hA) (fun _ => hB) r
   simpa [Finset.sum_const, Finset.card_range, nsmul_eq_mul] using h
 
 /-- The ordered product of a constant sequence is the power, so `pow_sub_pow_le` really is
 about `A^r`. -/
 theorem prodUpTo_const {M : Type*} [Monoid M] (A : M) (r : ℕ) :
-    prodUpTo (fun _ ↦ A) r = A ^ r := by
+    prodUpTo (fun _ => A) r = A ^ r := by
   induction r with
   | zero => simp
   | succ m ih =>

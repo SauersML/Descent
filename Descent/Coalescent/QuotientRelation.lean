@@ -78,7 +78,7 @@ present at time `s`, which is K-C (4.10)'s reason for calling it an `n`-coalesce
 the current block count. -/
 theorem quotientRelation_self {n : ℕ} (ξ : ER n) :
     quotientRelation (le_refl ξ) = ⊥ := by
-  refine Setoid.ext fun c d ↦ ⟨fun hcd ↦ ?_, fun hcd ↦ ?_⟩
+  refine Setoid.ext fun c d => ⟨fun hcd => ?_, fun hcd => ?_⟩
   · induction c using Quotient.inductionOn with
   | _ x =>
         induction d using Quotient.inductionOn with

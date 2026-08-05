@@ -55,14 +55,14 @@ theorem integral_holdDensity {d : ℝ} (hd : 0 < d) :
     ∫ t in Ioi (0 : ℝ), d * Real.exp (-(d * t)) = 1 := by
   have hscale : ∫ t in Ioi (0 : ℝ), Real.exp (-(d * t))
       = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), Real.exp (-x) :=
-    integral_comp_mul_left_Ioi (fun x ↦ Real.exp (-x)) 0 hd
+    integral_comp_mul_left_Ioi (fun x => Real.exp (-x)) 0 hd
   rw [integral_const_mul, hscale, mul_zero, integral_exp_neg_Ioi, smul_eq_mul]
   simp
   field_simp
 
 theorem holdDensity_integrable {d : ℝ} (hd : 0 < d) :
-    IntegrableOn (fun t ↦ d * Real.exp (-(d * t))) (Ioi (0 : ℝ)) := by
-  have hbase : IntegrableOn (fun t : ℝ ↦ Real.exp (-(d * t))) (Ioi (0 : ℝ)) := by
+    IntegrableOn (fun t => d * Real.exp (-(d * t))) (Ioi (0 : ℝ)) := by
+  have hbase : IntegrableOn (fun t : ℝ => Real.exp (-(d * t))) (Ioi (0 : ℝ)) := by
     simpa using exp_neg_integrableOn_Ioi (0 : ℝ) hd
   exact hbase.const_mul d
 
@@ -78,7 +78,7 @@ instance holdMeasure_isProbabilityMeasure {d : ℝ} (hd : 0 < d) :
   constructor
   have hdens : ∫⁻ t, holdDensity d t = 1 := by
     have hind : ∀ t : ℝ, holdDensity d t
-        = (Ioi (0 : ℝ)).indicator (fun t ↦ ENNReal.ofReal (d * Real.exp (-(d * t)))) t := by
+        = (Ioi (0 : ℝ)).indicator (fun t => ENNReal.ofReal (d * Real.exp (-(d * t)))) t := by
       intro t
       unfold holdDensity
       by_cases ht : 0 < t
@@ -90,7 +90,7 @@ instance holdMeasure_isProbabilityMeasure {d : ℝ} (hd : 0 < d) :
           rw [lintegral_indicator measurableSet_Ioi]
       _ = ENNReal.ofReal (∫ t in Ioi (0 : ℝ), d * Real.exp (-(d * t))) := by
           rw [← ofReal_integral_eq_lintegral_ofReal (holdDensity_integrable hd)
-            (Filter.Eventually.of_forall fun t ↦ holdDensity_nonneg hd t)]
+            (Filter.Eventually.of_forall fun t => holdDensity_nonneg hd t)]
       _ = 1 := by
           rw [integral_holdDensity hd, ENNReal.ofReal_one]
   rw [holdMeasure, withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ]
@@ -112,7 +112,7 @@ theorem integral_id_mul_exp_neg : ∫ x in Ioi (0 : ℝ), x * Real.exp (-x) = 1 
     simpa using h
   rw [hone] at hgamma
   rw [hgamma]
-  refine setIntegral_congr_fun measurableSet_Ioi fun x hx ↦ ?_
+  refine setIntegral_congr_fun measurableSet_Ioi fun x hx => ?_
   rw [show (2 : ℝ) - 1 = 1 by norm_num, Real.rpow_one]
   ring
 
@@ -123,16 +123,16 @@ rests on the density K-C (1.7) rather than on K-G's assertion of its mean. -/
 theorem integral_id_mul_holdDensity {d : ℝ} (hd : 0 < d) :
     ∫ t in Ioi (0 : ℝ), t * (d * Real.exp (-(d * t))) = 1 / d := by
   have hpt : ∀ t : ℝ, t * (d * Real.exp (-(d * t)))
-      = (fun x : ℝ ↦ x * Real.exp (-x)) (d * t) := by
+      = (fun x : ℝ => x * Real.exp (-x)) (d * t) := by
     intro t
     simp only
     ring
-  have hcomp : ∫ t in Ioi (0 : ℝ), (fun x : ℝ ↦ x * Real.exp (-x)) (d * t)
+  have hcomp : ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x * Real.exp (-x)) (d * t)
       = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x * Real.exp (-x) :=
-    integral_comp_mul_left_Ioi (fun x : ℝ ↦ x * Real.exp (-x)) 0 hd
+    integral_comp_mul_left_Ioi (fun x : ℝ => x * Real.exp (-x)) 0 hd
   calc ∫ t in Ioi (0 : ℝ), t * (d * Real.exp (-(d * t)))
-      = ∫ t in Ioi (0 : ℝ), (fun x : ℝ ↦ x * Real.exp (-x)) (d * t) := by
-        exact setIntegral_congr_fun measurableSet_Ioi fun t _ ↦ hpt t
+      = ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x * Real.exp (-x)) (d * t) := by
+        exact setIntegral_congr_fun measurableSet_Ioi fun t _ => hpt t
     _ = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x * Real.exp (-x) := hcomp
     _ = 1 / d := by
         rw [mul_zero, integral_id_mul_exp_neg, smul_eq_mul, mul_one, one_div]

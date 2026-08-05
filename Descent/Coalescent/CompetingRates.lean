@@ -112,14 +112,14 @@ theorem pathDensity_eq_prod_exp {K : ℕ → ℕ} (hK : ∀ i, 2 ≤ K i) (t : �
     ∏ i ∈ Finset.range m, Real.exp (-(deathRate (K i) * t i))
       = ∏ i ∈ Finset.range m,
           (jumpProb (K i) * (deathRate (K i) * Real.exp (-(deathRate (K i) * t i)))) :=
-  Finset.prod_congr rfl fun i _ ↦ jointDensity_factors (hK i) (t i)
+  Finset.prod_congr rfl fun i _ => jointDensity_factors (hK i) (t i)
 
 /-- The trajectory factor, written out: the probability of a given sequence of choices is the
 product of the uniform weights, and it carries no dependence on the clock at all. -/
 theorem pathDensity_chain_factor {K : ℕ → ℕ} (hK : ∀ i, 2 ≤ K i) (m : ℕ) :
     ∏ i ∈ Finset.range m, jumpProb (K i)
       = ∏ i ∈ Finset.range m, 2 / ((K i : ℝ) * ((K i : ℝ) - 1)) :=
-  Finset.prod_congr rfl fun i _ ↦ jumpProb_eq (hK i)
+  Finset.prod_congr rfl fun i _ => jumpProb_eq (hK i)
 
 /-- The total density over all covers is the holding density: nothing leaks.  This is the
 consistency check that the factorisation is a probability statement and not just an

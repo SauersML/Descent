@@ -99,7 +99,7 @@ def gapReport (env : Environment) : String := Id.run do
     else
       blocked := blocked.push
         (g.locator ++ "\n      waiting on: "
-          ++ String.intercalate ", " (open_.map (fun d ↦ toString d)))
+          ++ String.intercalate ", " (open_.map (fun d => toString d)))
   let mut out := s!"Descent gap ledger: {gaps.size} objects\n"
   out := out ++ s!"  informal_definition: {nDef}\n"
   out := out ++ s!"  informal_lemma: {nLem}\n"
@@ -127,7 +127,7 @@ It must be invoked from a module that imports the corpus, because a gap is recor
 module that declares it and this one sits at the bottom of the layer order: run from here it
 would truthfully report zero, which is the shape of report `Descent.lean` warns about. -/
 @[command_elab informalReportCmd]
-def elabInformalReport : CommandElab := fun _ ↦ do
+def elabInformalReport : CommandElab := fun _ => do
   let env ← getEnv
   logInfo m!"{gapReport env}"
   let dups := duplicateTags (allGaps env)

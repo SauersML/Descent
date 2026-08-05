@@ -160,11 +160,11 @@ Berry-Esseen-style error term rather than as exact biology.
 /-- **A diploid genotype at a biallelic locus** -- `Descent.Core.Genotype`, under the name
 this module introduced it with.
 
-The type lives at the bottom of the import graph, in `Core/Genome`, beside the alleles a
-genotype is made of and the panel it is measured in -- one encoding of a genotype, with one
-`Fin 3` equivalence and one sum expansion, rather than one per module that needs a
-genotype.  `DiploidGenotype` is a reducible abbreviation for it, so the name this module's
-statements are written in still reads.
+The type used to be declared here, with its own `Fin 3` equivalence and sum expansion, and
+two other encodings of a genotype existed elsewhere with nothing shared between them.  It
+now lives at the bottom of the import graph, in `Core/Genome`, beside the alleles a
+genotype is made of and the panel it is measured in; `DiploidGenotype` stays as a reducible
+abbreviation so the name this module's statements are written in still reads.
 
 The constructors and the equivalence are reached under the type's own name --
 `Descent.Core.Genotype.homRef`, `Descent.Core.Genotype.equivFin3` -- because Lean resolves a
