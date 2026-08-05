@@ -87,10 +87,18 @@ Neuhauser (Theor. Popul. Biol. 51, 1997) at the same rate level, with the fact t
 Kingman's model robust: coalescence is quadratic in the lineage count and branching is
 linear, so their ratio `σ/(k-1)` vanishes as the sample grows.
 
+`Coalescent.Beta` closes the other end of Pitman's family: the Beta-coalescents
+`Λ = Beta(2-α, α)` of Schweinsberg (Stoch. Proc. Appl. 106, 2003), whose consistency is a
+two-line identity about the Beta function itself, `B(a,b) = B(a+1,b) + B(a,b+1)`.  Read at
+the rates that identity IS Pitman's condition.  At `α = 1` it gives the Bolthausen-Sznitman
+rates `(k-2)!(b-k)!/(b-1)!`, which `Descent.Blindness.MultipleMergerBlindness` already
+studies through its own chart -- that file asks which statistics can see `Λ`, and this one
+says why the family it is looking at is a family.
+
 Still absent, and not claimed: the `Ξ` measure on the infinite simplex and the rates it
-assigns (only the state-space half of Schweinsberg is here); the Beta-coalescent as an
-explicit `Λ`; and the forward resolution of the ASG that decides which parent was real,
-which is a different process rather than a harder case of this one.
+assigns (only the state-space half of Schweinsberg 2000 is here), and the forward resolution
+of the ASG that decides which parent was real -- a different process rather than a harder
+case of this one.
 
 ## Verification status
 
