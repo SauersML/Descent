@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Split
+import Descent.Coalescent.CutSets
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -39,13 +40,19 @@ reads as a covered one.
 
 (Item 2 below is settled; it is kept in place with its proof named.)
 
-**1. The split count.**  `Split` makes cuts of a class available and shows each is counted
-twice by `ν ↦ (ν, λ-ν)`, which is where Kingman's factor `½ C(λ, ν)` comes from.  The
-arithmetic half is proved below (`sum_choose_interior_add_two`): the cuts of a class of size
-`λ` number `2^{λ-1} - 1`, and `Σ_{ν=1}^{λ-1} ½C(λ,ν)` is that number.  What is missing is
-the bijection between cuts of a class and the states `ξ ≺ η` refining `η` there -- the
-combinatorial half.  `JumpChain.absoluteProb_recursion` carries the factor as a written
-weight until that is done.
+**1. The split count.**  `#{ξ ; ξ ≺ η} = Σ_c (2^{λ_c - 1} - 1)`.  The arithmetic half is
+proved below (`sum_choose_interior_add_two`, `two_mul_cutCount_add_two`).  The double-naming
+that Kingman's `½` corrects is proved in `Split.splitBy_compl`, and `CutSets` removes it by
+breaking the tie with each class's representative rather than by dividing by two: a cut set
+omits it, `splitBy` is injective on cut sets (`CutSets.splitBy_injective_on_cutSets`), and a
+cut set sits inside its class with the representative deleted
+(`CutSets.cutSet_subset_erase`), which is the `λ - 1` the count is over.
+
+Two things are still missing.  `CutSets.exists_cutSet_of_covers` normalises a cut to a cut
+set, but takes the nonemptiness and properness of the original cut as a HYPOTHESIS --
+`Split.covers_iff_exists_splitBy` does not yet produce those witnesses, though its proof
+constructs them.  And the assembly of injectivity, surjectivity and the subset count into
+the cardinality is not written.
 
 **2. Ewens normalisation for general `n`.**  SETTLED, by `Ewens.sum_ewensWeight`:
 `Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, which is what makes K-G (3.8) a
