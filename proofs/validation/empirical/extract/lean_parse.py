@@ -88,7 +88,19 @@ MODIFIERS = ("noncomputable", "private", "protected", "partial", "unsafe",
              "scoped", "local", "nonrec", "@[simp]")
 
 DECL_RE = re.compile(
-    r"^(?P<mods>(?:(?:noncomputable|private|protected|partial|unsafe|scoped|local|nonrec)\s+)*)"
+    # An INLINE attribute must be skipped, not treated as a non-declaration.
+    # `@[simp] theorem foo : ...` on one line is extremely common here, and
+    # without this group the whole declaration is invisible: it never becomes a
+    # theorem, so every definition it mentions loses it from `mentioned_by`.
+    # Sampled 4 for 4 wrong -- `coalescenceCdfFromHazard`, `tagAlleleFreqTargetAt`,
+    # `causalAlleleFreqTargetAt` and `expectedSqMeanPGSDiff_pureSplit` each
+    # looked theorem-less while carrying an inline `@[simp] theorem`. The same
+    # shape independently broke a free-definition scan and a
+    # tautological-restatement scan, both of which read `mentioned_by`, so the
+    # fix belongs here rather than in each consumer. Note `MODIFIERS` above
+    # already listed `@[simp]`; this regex had drifted from it.
+    r"^(?P<attrs>(?:@\[[^\]]*\]\s*)*)"
+    r"(?P<mods>(?:(?:noncomputable|private|protected|partial|unsafe|scoped|local|nonrec)\s+)*)"
     r"(?P<kind>def|theorem|lemma|structure|inductive|abbrev|instance|example|class|opaque|axiom)"
     r"(?:\s+(?P<name>[^\s:({\[⦃]+))?",
 )
