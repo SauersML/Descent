@@ -100,6 +100,22 @@ def rexp(x):
     return math.exp(x)
 
 
+def factorial(n):
+    """`Nat.factorial n`, on a value that arrives as a real.
+
+    Lean's factorial is on `ℕ`, and a body reaching here has already coerced --
+    `((classSize ξ c - 1)! : ℕ) : ℝ` in `ewensWeight`. A negative or fractional
+    argument cannot come from `Nat` and means the surrounding arithmetic put
+    something else there, so it returns Mathlib's junk `0` rather than raising:
+    the definition stays evaluable and a wrong value is what a battery catches.
+    """
+    if not isinstance(n, (int, float)) or isinstance(n, bool):
+        return 0.0
+    if n < 0 or abs(n - round(n)) > 1e-9:
+        return 0.0
+    return float(math.factorial(int(round(n))))
+
+
 def lpow(a, b):
     """`^` with Mathlib semantics, dispatching on whether the exponent is a
     natural/integer literal (monoid pow) or a real (rpow)."""

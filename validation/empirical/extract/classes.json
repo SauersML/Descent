@@ -22209,7 +22209,7 @@
  },
  "Descent.Coalescent.ewensWeight": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "indexed product",
   "file": "Descent/Coalescent/Ewens.lean",
   "line": 171,
   "short": "ewensWeight",
@@ -23415,15 +23415,18 @@
   }
  },
  "Descent.Coalescent.jumpCoeff": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/JumpChain.lean",
   "line": 98,
   "short": "jumpCoeff",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "jumpCoeff",
+  "args": [
+   "n",
+   "k"
+  ],
   "box": {
    "n": [
     1.0,
@@ -23434,7 +23437,11 @@
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -24096,7 +24103,7 @@
  },
  "Descent.Coalescent.ewensProb": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "qualified name Multiset.card",
   "file": "Descent/Coalescent/Mutation.lean",
   "line": 190,
   "short": "ewensProb",
@@ -24211,7 +24218,7 @@
  },
  "Descent.Coalescent.wattersonProb": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "qualified name Multiset.card",
   "file": "Descent/Coalescent/Paintbox.lean",
   "line": 130,
   "short": "wattersonProb",
@@ -24257,15 +24264,18 @@
   }
  },
  "Descent.Coalescent.restrictionFullProb": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/Paintbox.lean",
   "line": 158,
   "short": "restrictionFullProb",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "restrictionFullProb",
+  "args": [
+   "n",
+   "k"
+  ],
   "box": {
    "n": [
     2.0,
@@ -24276,7 +24286,11 @@
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -29276,7 +29290,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 3,
+   "finite_points": 5,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29347,7 +29361,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 7,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -53540,7 +53554,7 @@
  },
  "Descent.Pangenome.Gauge.polymorphic": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "qualified name sample.any",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 135,
   "short": "polymorphic",
@@ -53582,7 +53596,7 @@
  },
  "Descent.Pangenome.Gauge.segregatingCount": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unrecognised character '&'",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 140,
   "short": "segregatingCount",
@@ -53625,7 +53639,7 @@
  },
  "Descent.Pangenome.Gauge.variantCount": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unsupported token '!'",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 145,
   "short": "variantCount",
@@ -53672,7 +53686,7 @@
  },
  "Descent.Pangenome.Gauge.hiddenCount": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unrecognised character '&'",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 150,
   "short": "hiddenCount",
@@ -53707,7 +53721,7 @@
  },
  "Descent.Pangenome.Gauge.walkDist": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unsupported token '!'",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 208,
   "short": "walkDist",
@@ -53733,7 +53747,7 @@
  },
  "Descent.Pangenome.Gauge.rowDist": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unrecognised character '&'",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 212,
   "short": "rowDist",
@@ -121343,7 +121357,7 @@
  },
  "Descent.Spectral.coordinatewiseMarginalPreserver": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "unsupported token '!'",
   "file": "Descent/Spectral/ErgodicCovariancePencil.lean",
   "line": 153,
   "short": "coordinatewiseMarginalPreserver",

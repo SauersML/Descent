@@ -63,7 +63,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
   | (?P<matlit>!!\[)
   | (?P<veclit>!\[)
-  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹])
+  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹!])
   | (?P<other>.)
 """, re.X)
 
@@ -338,6 +338,15 @@ class Parser:
             if p.text == "⁻¹":
                 self.next()
                 head = f"_rt.rinv({self._dep(head, 0)})"
+                continue
+            if p.text == "!":
+                # POSTFIX FACTORIAL, `(n)!`. `Nat.factorial` is what `ewensWeight`
+                # and `ewensProb` multiply over their blocks, and it is a suffix
+                # operator rather than a bracket -- which is why it survived the
+                # vector- and matrix-literal work and still read as an
+                # unrecognised character.
+                self.next()
+                head = f"_rt.factorial({self._dep(head, 0)})"
                 continue
             if p.kind == "proj":                      # (e).1 / (e).field
                 self.next()
