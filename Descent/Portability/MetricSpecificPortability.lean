@@ -3602,7 +3602,7 @@ theorem clumping_minimizes_detection_on_ld_kernel
   refine Spectral.topVariance_minimizes_detection
     (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M S
     (Blindness.ldKernelSymbol decay cutAngle)
-    (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
+    (fun i ↦ Blindness.ldKernelSymbol_pos habs) (Blindness.ldKernelSymbol_pos habs)
     hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
@@ -3631,7 +3631,7 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
   refine Spectral.topVariance_maximizes_reconstruction
     (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M S
     (Blindness.ldKernelSymbol decay cutAngle)
-    (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_
+    (fun i ↦ Blindness.ldKernelSymbol_pos habs) hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
   · intro i hi

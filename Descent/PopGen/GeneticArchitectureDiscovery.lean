@@ -1136,7 +1136,7 @@ local macro "source_r2_of " m:term : tactic =>
       Portability.predictiveCovarianceFromSourceWeights,
       Portability.scoreVarianceFromSourceWeights,
       Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
-      sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec])
+      sigmaTagCausal, dotProduct, Portability.totalEffect, Matrix.mulVec])
 
 /-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
 terms the source chain has no need of, and is otherwise the same list. -/
@@ -1150,7 +1150,7 @@ local macro "target_r2_of " m:term : tactic =>
       Portability.effectiveOutcomeVariance, Portability.irreducibleTargetResidualBurden,
       Portability.brokenTaggingResidual, Portability.ancestrySpecificLDResidual, Portability.sourceSpecificOverfitResidual,
       Portability.novelUntaggablePhenotypeResidual, sigmaTagCausal,
-      dotProduct, totalEffect, Matrix.mulVec])
+      dotProduct, Portability.totalEffect, Matrix.mulVec])
 
 theorem commonOnlyPortableModel_sourceR2 :
     Portability.r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by

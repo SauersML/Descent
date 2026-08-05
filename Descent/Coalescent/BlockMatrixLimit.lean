@@ -42,7 +42,7 @@ and `P_N^N → exp Q` for the whole chain.
 
 namespace Coalescent
 
-open Finset Matrix
+open Finset NormedSpace Matrix
 open scoped Matrix.Norms.Operator NNReal
 
 /-- A bound on every row sum is a bound on the row-sum norm. -/
@@ -392,7 +392,11 @@ theorem deathRate_mono {k n : ℕ} (h : k ≤ n) : deathRate k ≤ deathRate n :
   simp only [deathRate, Descent.Core.pairCount]
   have hkR : ((k : ℕ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast h
   have hk0 : (0 : ℝ) ≤ ((k : ℕ) : ℝ) := Nat.cast_nonneg _
-  nlinarith
+  rcases Nat.eq_zero_or_pos n with hn0 | hn0
+  · rw [hn0] at h ⊢
+    rw [Nat.le_zero.mp h]
+  · have h1 : (1 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn0
+    nlinarith
 
 /-- **The stochastic matrix `Q` factors through**, `S = 1 + Q/d_n`.
 
@@ -432,15 +436,19 @@ theorem norm_blockStochastic_le_one {n : ℕ} (hn : 2 ≤ n) : ‖blockStochasti
     (div_le_one han).mpr (deathRate_mono hkn)
   have hratio0 : 0 ≤ deathRate (k : ℕ) / deathRate n := by positivity
   by_cases hk0 : (k : ℕ) = 0
-  · have hall : ∀ j : Fin (n + 1), |blockStochastic n k j| = if k = j then 1 else 0 := by
+  · have hdz : deathRate (k : ℕ) = 0 := by
+      rw [hk0]; simp [deathRate, Descent.Core.pairCount]
+    have hall : ∀ j : Fin (n + 1), |blockStochastic n k j| = if k = j then 1 else 0 := by
       intro j
-      rw [blockStochastic_apply]
+      rw [blockStochastic_apply, hdz]
       by_cases h : (j : ℕ) = (k : ℕ)
       · have hkj : k = j := Fin.ext h.symm
-        simp [h, hkj, hk0, deathRate, Descent.Core.pairCount]
+        simp [h, hkj]
       · have hkj : ¬ k = j := fun hc ↦ h (by rw [hc])
         have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by omega
-        simp [h, h3, hkj, fun hc : (k : ℕ) = (j : ℕ) ↦ h hc.symm]
+        simp only [h, h3, hkj, if_false, ite_false, mul_zero, add_zero, neg_zero, mul_zero]
+        rw [if_neg (fun hc : (k : ℕ) = (j : ℕ) ↦ h hc.symm)]
+        simp
     simp only [hall]
     rw [Finset.sum_ite_eq Finset.univ k (fun _ ↦ (1 : ℝ))]
     simp
@@ -464,14 +472,16 @@ theorem norm_blockStochastic_le_one {n : ℕ} (hn : 2 ≤ n) : ‖blockStochasti
       simp [h1, h2, h3]
     have hdiag : blockStochastic n k k = 1 - deathRate (k : ℕ) / deathRate n := by
       rw [blockStochastic_apply]
-      simp only [if_pos rfl]
-      field_simp
+      simp only [if_pos rfl, if_true]
+      rw [div_eq_inv_mul]
+      ring
     have hsub : blockStochastic n k k' = deathRate (k : ℕ) / deathRate n := by
       have h1 : ¬((k : ℕ) = (k' : ℕ)) := by simp only [hk']; omega
       have h2 : ¬((k' : ℕ) = (k : ℕ)) := fun hc ↦ h1 hc.symm
       have h3 : (k' : ℕ) + 1 = (k : ℕ) := by simp only [hk']; omega
       rw [blockStochastic_apply, if_neg h1, if_neg h2, if_pos h3]
-      field_simp
+      rw [div_eq_inv_mul]
+      ring
     rw [← Finset.sum_erase_add _ _ (Finset.mem_univ k),
       ← Finset.sum_erase_add _ _ (Finset.mem_erase.mpr ⟨Ne.symm hkk', Finset.mem_univ k'⟩),
       Finset.sum_congr rfl hrest]
@@ -533,6 +543,10 @@ theorem tendsto_blockOperator_pow {n : ℕ} (hn : 2 ≤ n) :
     have hN1 : 0 < N := lt_of_lt_of_le Nat.zero_lt_one (le_trans (le_max_left _ _) hN)
     have hnN : n ≤ N := le_trans (le_max_right _ _) hN
     have hC : (0 : ℝ) ≤ 3 * (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by positivity
+    have hop : blockOperator n N = blockMatrix n N := by
+      unfold blockOperator
+      rw [if_neg (by omega)]
+    rw [hop]
     refine linfty_norm_le_of_rows' hC fun k ↦ ?_
     simpa using row_sum_diff_le hN1 hnN k
 
