@@ -173,13 +173,13 @@ theorem neutralDriftR2Ratio_mem_unit (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 
 this module's vocabulary, from `(Nₑ, m, μ)` to the number a paper prints. -/
 theorem neutralDriftR2Ratio_mono_in_migration
     (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     neutralDriftR2Ratio p.V_A V_E p.fstEquilibrium
       < neutralDriftR2Ratio q.V_A V_E q.fstEquilibrium := by
   rw [neutralDriftR2Ratio_eq_core, neutralDriftR2Ratio_eq_core]
   have := Descent.Core.ScoreMoments.deployedPortabilityRatio_mono_in_migration p q V_E hE
-    hNe hmu hV hlt hflow
+    hNe hmu hd hV hlt hflow
   unfold Descent.Core.ScoreMoments.deployedPortabilityRatio at this
   exact this
 

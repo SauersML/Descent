@@ -431,12 +431,17 @@ theorem deployedR2_eq_deployedR2FromTau (p : PopGenParameters) (V_E tau : ℝ)
 /-- **And that is a real constraint, not a tautology**: the two routes agree on `F_ST`
 exactly when the scaled coalescence time is the reciprocal of the total scaled flow.
 `τ = 1/x` is the conversion between the corpus's two `F_ST` coordinates, and it is
-recorded here rather than left for a reader to rediscover. -/
+recorded here rather than left for a reader to rediscover.
+
+The flow is `scaledFlow`, which carries the deme correction. Written as `θ + 2M` this is
+that flow at two demes and no other lattice size; the conversion is the same map either
+way, and the coordinate it converts is the one the record computes. -/
 theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
-    (hx : 1 + (p.theta + 2 * p.bigM) ≠ 0) (ht : 1 + tau ≠ 0) :
+    (hx : 1 + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0) (ht : 1 + tau ≠ 0) :
     p.fstEquilibrium = fstFromTau tau ↔
-      1 = tau * (p.theta + 2 * p.bigM) := by
-  unfold PopGenParameters.fstEquilibrium fstFromFlow fstFromTau saturation
+      1 = tau * scaledFlow p.Ne p.mig p.mu p.nDemes := by
+  unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow fstFromTau
+    saturation
   rw [div_eq_div_iff hx ht]
   constructor <;> intro h <;> nlinarith [h]
 
@@ -444,13 +449,18 @@ theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
 the migration rate in the demographic parameters and the deployed `R²` goes up, with every step --
 equilibrium, moments, metric -- a named map rather than an assumption.
 
-This is the statement the corpus's two layers were built to support and could not make. -/
+This is the statement the corpus's two layers were built to support and could not make.
+
+Each of these laws now fixes the deme count across the comparison. That hypothesis is
+what makes them statements about ONE demographic parameter moving: a comparison that let
+the lattice change too would be about two changes, and `deployedR2_anti_in_demes` below
+is the separate law for the other one. -/
 theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedR2 p V_E < deployedR2 q V_E := by
   have hfst : q.fstEquilibrium < p.fstEquilibrium :=
-    PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt
+    PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt
   unfold deployedR2
   rw [hV]
   exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
@@ -459,23 +469,28 @@ theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 
 /-- **More mutation, higher deployed `R²`** -- the second end-to-end law, and one the
 corpus could not previously state at all. -/
 theorem deployedR2_mono_in_mutation (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     deployedR2 p V_E < deployedR2 q V_E := by
   have hfst : q.fstEquilibrium < p.fstEquilibrium :=
-    PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hlt
+    PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt
   unfold deployedR2
   rw [hV]
   exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
     q.V_A_pos hE hfst (p.fstEquilibrium_lt_one hflow)
 
-/-- **Larger effective size, higher deployed `R²`** -- the third. -/
+/-- **Larger effective size, higher deployed `R²`** -- the third.
+
+This used to carry two flow hypotheses, `0 < mu + 2 mig` and `0 < mu + mig`, of which the
+first was the two-deme migration coefficient written into an assumption. With the deme
+correction carried as a field there is one hypothesis, because `d/(d-1)` is above one at
+every admissible record and the two conditions have the same content. -/
 theorem deployedR2_mono_in_Ne (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     deployedR2 p V_E < deployedR2 q V_E := by
   have hfst : q.fstEquilibrium < p.fstEquilibrium :=
-    PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hflow2 hlt
+    PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt
   unfold deployedR2
   rw [hV]
   exact r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
@@ -669,40 +684,40 @@ noncomputable def deployedBrier (π : ℝ) (p : PopGenParameters) (V_E : ℝ) : 
 /-- **More migration, better Brier score.** -/
 theorem deployedBrier_mono_in_migration (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
     (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
   unfold deployedBrier
   rw [hV]
   exact brier_anti_in_r2 π _ _ hπ hπ1
     (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
       (p.fstEquilibrium_lt_one hflow))
 
 /-- **More mutation, better Brier score.** -/
 theorem deployedBrier_mono_in_mutation (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
     (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
   unfold deployedBrier
   rw [hV]
   exact brier_anti_in_r2 π _ _ hπ hπ1
     (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hlt)
+      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
       (p.fstEquilibrium_lt_one hflow))
 
 /-- **Larger effective size, better Brier score.** -/
 theorem deployedBrier_mono_in_Ne (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
     (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
-    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
   unfold deployedBrier
   rw [hV]
   exact brier_anti_in_r2 π _ _ hπ hπ1
     (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hflow2 hlt)
+      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
       (p.fstEquilibrium_lt_one hflow))
 
 /-- **Deployed Brier at the source is the heritability complement**, scaled by the
@@ -734,89 +749,102 @@ theorem brier_deployedR2FromTau_anti (π V_A V_E t₁ t₂ : ℝ) (hπ : 0 < π)
 /-! ### The deme count reaches the metric
 
 The island lattice is not decoration: the deme correction is a factor of two at the
-two-population split, and a factor of two on the migration term is a factor on the
-deployed metric. These theorems carry `nDemes` all the way through. -/
+two-population split and falls towards one as the lattice grows, and a factor on the
+migration term is a factor on the deployed metric.
 
-/-- **Deployed `R²` from raw island parameters.** The composition that takes
-`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric.
+These are theorems about two HISTORIES differing in their lattice, and that is the point.
+The deme count reached the metric through a SECOND function, `deployedR2FromIsland`,
+taking six raw reals -- because the parameter record carried no deme count, so
+`deployedR2` could express the two-deme case alone. Two routes from a demography to one
+metric, in the two files written to end exactly that pattern, and a constraint added to
+one reached the other only if someone noticed. `nDemes` is a field of `PopGenParameters`
+now and the raw route is deleted. `deployedR2FromIsland_slope` and
+`deployedR2FromIsland_mse` went with it: they said what `deployedSlope_eq_one` and
+`deployedMse_eq` already say, in the other coordinates. -/
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ) : ℝ :=
-  (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).r2
+/-- **The two-deme reading, recovered.** At `p.nDemes = 2` the deployed metric is the one
+this record produced before it carried a deme count: `1/(1 + θ + 2M)` into the moment
+tuple, and on into `R²`.
 
-/-- **The two-deme reading and the record's reading agree.** `PopGenParameters`'
-`1/(1 + θ + 2M)` is the island law at `d = 2`, so the metric it produces is the island
-metric at two demes -- and a reader who took the record for the many-deme law was reading
-the wrong deployment. -/
-theorem deployedR2_eq_island_two_demes (p : PopGenParameters) (V_E : ℝ) :
-    deployedR2 p V_E = deployedR2FromIsland p.Ne p.mig p.mu 2 p.V_A V_E := by
-  unfold deployedR2 deployedR2FromIsland
-  rw [p.fstEquilibrium_eq_island_two_demes]
+This is the theorem that says what the batteries on `fstEquilibrium` measured. They
+measured the two-deme member, so the deployment they bear on is this one, and a
+deployment at any other lattice size inherits the SHAPE and not the verdict. -/
+theorem deployedR2_at_two_demes (p : PopGenParameters) (V_E : ℝ) (hd : p.nDemes = 2) :
+    deployedR2 p V_E
+      = (momentsUnderDrift p.V_A V_E (fstFromFlow (p.theta + 2 * p.bigM))).r2 := by
+  unfold deployedR2
+  rw [p.fstEquilibrium_eq_scaled_two_demes hd]
+
+/-- **The deployed metric reads five fields of the record and no others.**
+
+`Ne`, `mu`, `mig`, `nDemes`, `V_A`. Not `t_div`, not `recomb`, and nothing a later hand
+adds without a law to read it.
+
+This is the machine-checkable form of the rule that a field must earn its place. A
+selection coefficient, a locus count and a sample size were each considered for
+`PopGenParameters` and each rejected, and this theorem is why the rejection is a fact
+rather than a preference: under pure drift the chain sees genetic architecture only
+through `V_A`, and a sample size is a property of an ESTIMATE of this metric rather than
+of the metric, which is a population quantity with no sampling error. A field added with
+nothing to do would leave this theorem true, and that is precisely what makes it a slot
+rather than a parameter. -/
+theorem deployedR2_congr (p q : PopGenParameters) (V_E : ℝ)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) :
+    deployedR2 p V_E = deployedR2 q V_E := by
+  unfold deployedR2
+  rw [hV, PopGenParameters.fstEquilibrium_congr p q hNe hmu hmig hd]
 
 /-- **More demes, more differentiation between any two of them, less transferable score.**
 
 The deme correction `d/(d-1)` FALLS with `d`, so the effective migration between a given
 pair falls, so `F_ST` rises and the metric drops. Counter-intuitive read as "more
 populations means more mixing" and correct read as "a fixed per-pair migration rate
-spreads a deme's immigration over more sources". -/
-theorem deployedR2FromIsland_anti_in_demes (Ne m μ d₁ d₂ V_A V_E : ℝ)
-    (hV : 0 < V_A) (hE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 ≤ μ)
-    (h1 : 1 < d₁) (hlt : d₁ < d₂) :
-    deployedR2FromIsland Ne m μ d₂ V_A V_E < deployedR2FromIsland Ne m μ d₁ V_A V_E := by
-  have hc : ∀ d : ℝ, 1 < d → 0 < islandDemeCorrection d := by
-    intro d hd
-    unfold islandDemeCorrection ratio
-    exact div_pos (by linarith) (by linarith)
-  have hflowpos : ∀ d : ℝ, 1 < d → 0 < scaledFlow Ne m μ d := by
-    intro d hd
-    have hcd := hc d hd
-    have h4 : (0:ℝ) < 4 * Ne := by linarith
-    have p1 : 0 < 4 * Ne * m * islandDemeCorrection d :=
-      mul_pos (mul_pos h4 hm) hcd
-    have p2 : 0 ≤ 4 * Ne * μ := by positivity
-    unfold scaledFlow
-    rw [scaledMigrationRate_eq, scaledMutationRate_eq]
-    linarith
-  have hlt1 : ∀ d : ℝ, 1 < d → fstIslandEquilibrium Ne m μ d < 1 := by
-    intro d hd
-    have := hflowpos d hd
-    unfold fstIslandEquilibrium fstFromFlow
-    rw [div_lt_one (by linarith)]
-    linarith
-  have hcorr : islandDemeCorrection d₂ < islandDemeCorrection d₁ := by
-    unfold islandDemeCorrection ratio
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-    nlinarith
-  have hf : fstIslandEquilibrium Ne m μ d₁ < fstIslandEquilibrium Ne m μ d₂ := by
-    unfold fstIslandEquilibrium
-    have hd2 : (1:ℝ) < d₂ := by linarith
-    refine fstFromFlow_lt_of_lt _ _ (le_of_lt (hflowpos d₂ hd2)) ?_
-    have h4 : (0:ℝ) < 4 * Ne := by linarith
-    have key : 4 * Ne * m * islandDemeCorrection d₂ < 4 * Ne * m * islandDemeCorrection d₁ :=
-      by
-        have hm4 : 0 < 4 * Ne * m := mul_pos h4 hm
-        exact (mul_lt_mul_left hm4).mpr hcorr
-    unfold scaledFlow
-    rw [scaledMigrationRate_eq, scaledMutationRate_eq]
-    linarith
-  exact r2_momentsUnderDrift_anti V_A V_E (fstIslandEquilibrium Ne m μ d₁)
-    (fstIslandEquilibrium Ne m μ d₂) hV hE hf (hlt1 d₂ (by linarith : (1:ℝ) < d₂))
+spreads a deme's immigration over more sources".
 
-/-- **The calibration slope is one on the island route too.** Third statement of the same
-warning, now with the deme count carried: no island configuration produces a
-miscalibrated score under pure drift. -/
-theorem deployedR2FromIsland_slope (Ne m μ nDemes V_A V_E : ℝ) (hV : 0 < V_A)
-    (hf : fstIslandEquilibrium Ne m μ nDemes < 1) :
-    (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).calibrationSlope = 1 :=
-  calibrationSlope_momentsUnderDrift V_A V_E _ hV hf
+The end-to-end deme law, and the fourth demographic parameter to reach the metric by a
+named chain rather than by a coincidence between two files. It is stated on two records
+differing only in `nDemes`, which is what makes it comparable to the migration, mutation
+and effective-size laws above rather than a statement in a parallel vocabulary.
 
-/-- **And the mean squared error is the environmental variance on the island route.** -/
-theorem deployedR2FromIsland_mse (Ne m μ nDemes V_A V_E : ℝ) :
-    (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).mse = V_E :=
-  mse_momentsUnderDrift V_A V_E _
+Migration must be strictly positive: at `m = 0` the deme count multiplies nothing, the
+equilibrium is the pure mutation-drift balance at every lattice size, and there is no
+monotonicity to state. That is a real case rather than an edge excluded by fiat.
+
+This closes the question the empirical ledger raised.
+`simcov/battery_falsrepair_c2.py` FALSIFIES the many-deme limit at `d = 20` at 3.92 sems
+where the finite-deme form matches the same cells at 2.47: the deme count moves the
+measured differentiation, and this says which way that moves the deployed metric. -/
+theorem deployedR2_anti_in_demes (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    deployedR2 q V_E < deployedR2 p V_E := by
+  have hfst := PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt
+  have hqmu := q.mu_nonneg
+  have hflow : 0 < q.mu + q.mig := by
+    rw [← hmig]
+    linarith
+  unfold deployedR2
+  rw [hV]
+  exact r2_momentsUnderDrift_anti q.V_A V_E p.fstEquilibrium q.fstEquilibrium
+    q.V_A_pos hE hfst (q.fstEquilibrium_lt_one hflow)
+
+/-- **More demes, worse Brier score**, by the same chain into the binary coordinate. -/
+theorem deployedBrier_anti_in_demes (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    deployedBrier π p V_E < deployedBrier π q V_E := by
+  have hfst := PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt
+  have hqmu := q.mu_nonneg
+  have hflow : 0 < q.mu + q.mig := by
+    rw [← hmig]
+    linarith
+  unfold deployedBrier
+  rw [hV]
+  exact brier_anti_in_r2 π _ _ hπ hπ1
+    (r2_momentsUnderDrift_anti q.V_A V_E p.fstEquilibrium q.fstEquilibrium q.V_A_pos hE
+      hfst (q.fstEquilibrium_lt_one hflow))
 
 /-! ### The split route, for the rest of the family -/
 
@@ -911,8 +939,8 @@ theorem deployedPortabilityRatio_mem_unit (p : PopGenParameters) (V_E : ℝ)
 /-- **More migration, a higher portability ratio.** The reported quantity, moved by a
 demographic parameter, with every step a named map. -/
 theorem deployedPortabilityRatio_mono_in_migration (p q : PopGenParameters) (V_E : ℝ)
-    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
   have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
     rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
@@ -923,7 +951,7 @@ theorem deployedPortabilityRatio_mono_in_migration (p q : PopGenParameters) (V_E
   rw [hV]
   exact div_lt_div_of_pos_right
     (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
       (p.fstEquilibrium_lt_one hflow)) hsrc
 
 /-- **A history with no flow transfers nothing.** At zero migration and zero mutation the
@@ -934,8 +962,7 @@ theorem deployedR2_at_no_flow (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0
     (hmig : p.mig = 0) (hE : 0 < V_E) :
     deployedR2 p V_E = 0 := by
   have hf : p.fstEquilibrium = 1 := by
-    unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
-      fstFromFlow
+    unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow scaledFlow
     rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
     norm_num
   unfold deployedR2
@@ -950,8 +977,7 @@ theorem deployedBrier_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
     (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) :
     deployedBrier π p V_E = π * (1 - π) := by
   have hf : p.fstEquilibrium = 1 := by
-    unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
-      fstFromFlow
+    unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow scaledFlow
     rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
     norm_num
   unfold deployedBrier

@@ -82,6 +82,16 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
 noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (t : ℝ) / (2 * g.Ne)
 
+/-- **The `2 Nₑ` in `tauAt` is the coalescent time scale.**  The denominator is
+`ploidy · Nₑ`, the mean pairwise coalescence time, and not an independently chosen two.
+Stated here, beside the definition, rather than in the audit layer at the top of the
+graph. -/
+theorem _root_.Descent.Core.PopGenParameters.tauAt_uses_timeScale (g : Descent.Core.PopGenParameters) (t : ℕ) :
+    Descent.Core.PopGenParameters.tauAt g t
+      = (t : ℝ) / Descent.Core.coalescentTimeScale g.Ne := by
+  unfold Descent.Core.PopGenParameters.tauAt; rw [Descent.Core.coalescentTimeScale_eq]
+
+
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
@@ -228,12 +238,19 @@ noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGe
   Ne := m.Ne
   mu := m.mu
   mig := m.mig
+  -- `EvolutionaryParameters` carries no deme count, and the quantity it computes is
+  -- `DGP.fstEquilibrium`'s `1/(1 + θ + 2M)`, whose migration coefficient IS
+  -- `islandDemeCorrection 2`.  So two is the count that record already assumes, and
+  -- writing it here states the assumption rather than inheriting it: this bridge is
+  -- about a two-population split and says so.
+  nDemes := 2
   t_div := m.t_div
   recomb := m.recomb
   V_A := m.V_A
   Ne_pos := m.Ne_pos
   mu_nonneg := m.mu_nonneg
   mig_nonneg := m.mig_nonneg
+  nDemes_ge_two := by norm_num
   t_div_nonneg := m.t_div_nonneg
   recomb_nonneg := m.recomb_nonneg
   recomb_le_half := m.recomb_le_half

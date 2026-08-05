@@ -518,28 +518,37 @@ noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
 `presentDayR2` takes `fst` as a parameter, which is right: the metric is a function of
 differentiation however that differentiation arose. But the corpus also DERIVES an `F_ST`
 from raw demography, and nothing in this module said the two compose. Supplying the island
-equilibrium for the parameter gives exactly `Core.ScoreMoments.deployedR2FromIsland`, the
-composition
-that runs `(Nₑ, m, μ, d)` to a deployed metric.
+equilibrium of a parameter record for the parameter gives exactly
+`Core.ScoreMoments.deployedR2`, the composition that runs `(Nₑ, m, μ, d)` to a deployed
+metric.
 
-The parameter is deliberately not replaced. A metric that only accepted a derived `F_ST`
-would be unable to state what happens at a MEASURED one, which is most of what this module
-is for. What was missing was the edge, not the generality: with it, a reader can see which
-`F_ST`s in this file have a demographic origin and follow it, and the ones that do not are
-the ones with no such theorem. -/
-theorem presentDayR2_at_island_eq_deployedR2FromIsland
-    (Ne m μ nDemes V_A V_E : ℝ) :
-    presentDayR2 V_A V_E (Descent.Core.fstIslandEquilibrium Ne m μ nDemes)
-      = Descent.Core.ScoreMoments.deployedR2FromIsland Ne m μ nDemes V_A V_E := by
-  unfold presentDayR2 Descent.Core.ScoreMoments.deployedR2FromIsland presentDayPGSVariance
+It used to give `Core.ScoreMoments.deployedR2FromIsland`, a SECOND composition taking six
+raw reals, which existed only because the parameter record carried no deme count and so
+`deployedR2` could express the two-deme case alone. `nDemes` is a field of that record
+now, the raw-real composition is deleted, and this edge lands on the one route.
+
+The `fst` parameter is deliberately not replaced. A metric that only accepted a derived
+`F_ST` would be unable to state what happens at a MEASURED one, which is most of what this
+module is for. What was missing was the edge, not the generality: with it, a reader can
+see which `F_ST`s in this file have a demographic origin and follow it, and the ones that
+do not are the ones with no such theorem. -/
+theorem presentDayR2_at_island_eq_deployedR2
+    (p : Descent.Core.PopGenParameters) (V_E : ℝ) :
+    presentDayR2 p.V_A V_E
+        (Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes)
+      = Descent.Core.ScoreMoments.deployedR2 p V_E := by
+  unfold presentDayR2 Descent.Core.ScoreMoments.deployedR2 presentDayPGSVariance
     pgsVarianceFromHet Descent.Core.product
     PopGen.TransportedMetrics.r2FromSignalVariance
     Descent.Core.ScoreMoments.r2 Descent.Core.ScoreMoments.momentsUnderDrift
     Descent.Core.share Descent.Core.retainedFraction
+    Descent.Core.PopGenParameters.fstEquilibrium
   -- The two sides write the retained variance in opposite orders, `V_A * (1 - F)` against
   -- `(1 - F) * V_A`, so the zero case has to be rewritten on both.
-  by_cases h : (1 - Descent.Core.fstIslandEquilibrium Ne m μ nDemes) * V_A = 0
-  · have h' : V_A * (1 - Descent.Core.fstIslandEquilibrium Ne m μ nDemes) = 0 := by
+  by_cases h :
+      (1 - Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes) * p.V_A = 0
+  · have h' :
+        p.V_A * (1 - Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes) = 0 := by
       rw [mul_comm]; exact h
     rw [h, h']; simp
   · field_simp
@@ -575,21 +584,15 @@ effect turnover the score's covariance with the outcome equals its own variance 
 is exactly why the calibration slope does not move, and why a deployment judged only by
 calibration reports no problem. -/
 theorem driftMoments_predictiveCovariance (V_A V_E fst : ℝ) :
-    (driftMoments V_A V_E fst).predictiveCovariance = presentDayPGSVariance V_A fst := by
-  unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
-    pgsVarianceFromHet Descent.Core.retainedFraction
-  simp only [Descent.Core.product]
-  ring
+    (driftMoments V_A V_E fst).predictiveCovariance = presentDayPGSVariance V_A fst :=
+  driftMoments_scoreVariance V_A V_E fst
 
 /-- **The outcome variance carries the SAME erosion.** The target's own additive variance
 is eroded by drift too, so the denominator is `V_A(1-F) + V_E`, not `V_A + V_E`. Using the
 ancestral additive variance here understates the deployed `R²`. -/
 theorem driftMoments_outcomeVariance (V_A V_E fst : ℝ) :
-    (driftMoments V_A V_E fst).outcomeVariance = presentDayPGSVariance V_A fst + V_E := by
-  unfold driftMoments Descent.Core.ScoreMoments.momentsUnderDrift presentDayPGSVariance
-    pgsVarianceFromHet Descent.Core.retainedFraction
-  simp only [Descent.Core.product]
-  ring
+    (driftMoments V_A V_E fst).outcomeVariance = presentDayPGSVariance V_A fst + V_E :=
+  congrArg (· + V_E) (driftMoments_scoreVariance V_A V_E fst)
 
 /-- **`presentDayR2` IS the Core metric law on this module's tuple.**
 
@@ -662,11 +665,12 @@ theorem presentDayR2_at_equilibrium (p : Descent.Core.PopGenParameters) (V_E : �
 the demographic parameters and `presentDayR2` rises. Every step -- equilibrium, moment
 tuple, metric -- is a named map. -/
 theorem presentDayR2_mono_in_migration (p q : Descent.Core.PopGenParameters) (V_E : ℝ)
-    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     presentDayR2 p.V_A V_E p.fstEquilibrium < presentDayR2 q.V_A V_E q.fstEquilibrium := by
   rw [presentDayR2_at_equilibrium, presentDayR2_at_equilibrium]
-  exact Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow
+  exact Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV
+    hlt hflow
 
 /-! ### The rest of the deployment report, at an equilibrium
 
@@ -699,15 +703,15 @@ noncomputable def deployedBrierAtEquilibrium (π : ℝ)
 /-- **More migration, better deployed Brier score.** -/
 theorem deployedBrierAtEquilibrium_mono_in_migration (π : ℝ)
     (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
-    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedBrierAtEquilibrium π q V_E < deployedBrierAtEquilibrium π p V_E := by
   unfold deployedBrierAtEquilibrium driftMoments
   rw [hV]
   exact Descent.Core.ScoreMoments.brier_anti_in_r2 π _ _ hπ hπ1
     (Descent.Core.ScoreMoments.r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium
       p.fstEquilibrium q.V_A_pos hE
-      (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
       (p.fstEquilibrium_lt_one hflow))
 
 /-- **The deployed AUC argument at an equilibrium falls with differentiation.** Carried by
@@ -715,7 +719,8 @@ the argument rather than a closed form for `Φ`, which this corpus has no Mathli
 for -- the same discipline `calibratedBrierFromVariances` records for the liability
 scale. -/
 theorem deployedAucArgument_mono_in_migration (p q : Descent.Core.PopGenParameters)
-    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hflowq : 0 < q.mu + q.mig) :
     Descent.Core.ScoreMoments.aucArgument (driftMoments p.V_A V_E p.fstEquilibrium)
       < Descent.Core.ScoreMoments.aucArgument (driftMoments q.V_A V_E q.fstEquilibrium) := by
@@ -723,7 +728,7 @@ theorem deployedAucArgument_mono_in_migration (p q : Descent.Core.PopGenParamete
   rw [hV]
   exact Descent.Core.ScoreMoments.aucArgument_momentsUnderDrift_anti q.V_A V_E
     q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-    (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+    (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
     (p.fstEquilibrium_lt_one hflow) q.fstEquilibrium_mem_unit.1
 
 /-- **The deployed report is bounded by the heritability at every history.** The ceiling

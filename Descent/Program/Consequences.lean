@@ -164,13 +164,14 @@ reals and nothing connected them to a history. -/
 theorem demography_becomes_a_benefit_gap
     (p q : Descent.Core.PopGenParameters) (V_E α : ℝ)
     (hα : 0 < α) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     0 < α * Descent.Core.ScoreMoments.deployedR2 q V_E
           - α * Descent.Core.ScoreMoments.deployedR2 p V_E :=
   Portability.mul_sub_mul_pos_of_lt α (Descent.Core.ScoreMoments.deployedR2 q V_E)
     (Descent.Core.ScoreMoments.deployedR2 p V_E) hα
-    (Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+    (Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV
+      hlt hflow)
 
 /-- **And the gap a health system can close is bounded by the heritability, not by
 effort.**
@@ -300,15 +301,16 @@ theorem loss_is_not_in_the_weights
     (hP : Foundations.covarianceMatrix EP XP * sigmaInvP = 1)
     (hQ : Foundations.covarianceMatrix EQ XQ * sigmaInvQ = 1)
     (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     Foundations.optimalWeightsFromMoments sigmaInvP EP XP (Foundations.causalSignal β XP) =
       Foundations.optimalWeightsFromMoments sigmaInvQ EQ XQ (Foundations.causalSignal β XQ) ∧
     Descent.Core.ScoreMoments.deployedR2 p V_E
       < Descent.Core.ScoreMoments.deployedR2 q V_E :=
   ⟨PopGen.additive_architecture_weights_agree_across_populations
       sigmaInvP sigmaInvQ EP EQ XP XQ β hP hQ,
-   Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow⟩
+   Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV
+     hlt hflow⟩
 
 /-! ### `F_ST` determines the deployed metric and does NOT determine correctability -/
 
@@ -456,15 +458,16 @@ is not in the optimal weights under a SHARED causal map; this one is what happen
 causal map is not shared. -/
 theorem drift_and_turnover_are_separate_channels
     (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig)
     (V_A fst ρ : ℝ) (hVA : 0 < V_A) (hVE : 0 < V_E) (hfst_lt : fst < 1)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     Descent.Core.ScoreMoments.deployedR2 p V_E
         < Descent.Core.ScoreMoments.deployedR2 q V_E ∧
       PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fst) V_E <
         PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E :=
-  ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow,
+  ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV
+      hlt hflow,
    r2_strictMono_under_effect_turnover V_A V_E fst ρ hVA hVE hfst_lt hρ_pos hρ_lt⟩
 
 /-! ### Two floors that are not the same floor -/
