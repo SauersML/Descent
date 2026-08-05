@@ -151,6 +151,9 @@ SWEPT_MODULES = (
     "Calibrator/DGP.lean",
     "Calibrator/MetricSpecificPortability.lean",
     "Calibrator/RareVariantPortability.lean",
+    "Calibrator/PGSCalibrationTheory.lean",
+    "Calibrator/SelectionArchitecture.lean",
+    "Calibrator/HaplotypeTheory.lean",
 )
 
 # ---------------------------------------------------------------------------
@@ -796,6 +799,154 @@ RELATIONS = {
     "Calibrator.mutationSelectionBalanceRecessive": [
         jointly_scales(["mu", "s"], 0),
     ],
+    # --- PGSCalibrationTheory ----------------------------------------------
+    "Calibrator.calibrationInTheLarge": [
+        jointly_scales(["mean_observed", "mean_predicted"], 1),
+        odd_under_negation(["mean_observed", "mean_predicted"]),
+    ],
+    "Calibrator.hosmerLemeshowContrib": [
+        scales("n_group", 1),
+    ],
+    "Calibrator.prevalenceLogit": [
+        # `log(π/(1-π))` is ODD about π = 1/2: complementing the prevalence
+        # negates the log-odds. That is what makes it a logit rather than any
+        # other monotone map of a probability to the line.
+        negated_under_allele_swap(["pi"]),
+    ],
+    "Calibrator.prevalenceCITLShift": [
+        negated_under_allele_swap(["pi_source", "pi_target"]),
+    ],
+    "Calibrator.interceptRecalibrated": [
+        symmetric_in("pgs", "new_intercept"),
+        jointly_scales(["pgs", "new_intercept"], 1),
+        odd_under_negation(["pgs", "new_intercept"]),
+    ],
+    "Calibrator.logisticRecalibrated": [
+        # Scaling the intercept AND the slope together scales the recalibrated
+        # score; scaling either alone does not, because the score itself is held.
+        jointly_scales(["a", "b"], 1),
+    ],
+    "Calibrator.recalibratedCalibrationSlope": [
+        jointly_scales(["slope", "fittedSlope"], 0),
+        scales("slope", 1),
+        scales("fittedSlope", -1),
+    ],
+    "Calibrator.recalibrationTraceMSELowerBound": [
+        scales("nParams", 1),
+        # Both arguments sit in the DENOMINATOR, so scaling the pair by c
+        # divides by c**2, not by c. Declared as -1 on first writing -- the
+        # single power belongs to each argument separately -- and caught here.
+        jointly_scales(["nEvents", "infoPerEvent"], -2),
+    ],
+    "Calibrator.requiredEventsForRecalibration": [
+        scales("nParams", 1),
+        jointly_scales(["infoPerEvent", "targetTraceMSE"], -2),
+    ],
+    "Calibrator.requiredTargetCohortSizeForRecalibration": [
+        scales("nParams", 1),
+        scales("prevalence", -1),
+    ],
+    "Calibrator.nri": [
+        # A reclassification index: the four counts and the two denominators are
+        # in the same units, so a common rescaling of everything leaves it alone
+        # and a rescaling of the numerators alone scales it linearly.
+        jointly_scales(["up_events", "down_events", "up_nonevents",
+                        "down_nonevents", "n_events", "n_nonevents"], 0),
+        jointly_scales(["up_events", "down_events",
+                        "up_nonevents", "down_nonevents"], 1),
+    ],
+    "Calibrator.screeningBreakEvenPrevalence": [
+        # A prevalence, so scale-free in the utilities: only benefit/harm is read.
+        jointly_scales(["benefit", "harm"], 0),
+    ],
+
+    # --- SelectionArchitecture ---------------------------------------------
+    "Calibrator.equilibriumEffectVariance": [
+        scales("v_mutation", 1),
+        scales("s", -1),
+        jointly_scales(["v_mutation", "s"], 0),
+    ],
+    "Calibrator.stabilizingSelectedArchitectureVariance": [
+        scales("v_mutation", 1),
+        jointly_scales(["v_mutation", "s"], 0),
+    ],
+    "Calibrator.effectVarianceRecurrence": [
+        jointly_scales(["V", "v_mut"], 1),
+    ],
+    "Calibrator.fluctuatingEffectCorrelation": [
+        # `exp(-t/τ)` reads only the ratio, so time units cancel.
+        jointly_scales(["t", "τ"], 0),
+    ],
+    "Calibrator.optimumOUVariance": [
+        scales("sigmaTheta", 2),
+        scales("tau", 1),
+    ],
+    "Calibrator.tauFromObservedEffectCorrelation": [
+        scales("t", 1),
+    ],
+    "Calibrator.pleiotropicTargetR2": [
+        scales("sourceR2", 1),
+        # The shared fraction and the turnover enter only as a product, so they
+        # are interchangeable -- half the loci turning over completely is the
+        # same as all of them turning over half way.
+        symmetric_in("sharedFraction", "turnover"),
+    ],
+
+    # --- HaplotypeTheory ---------------------------------------------------
+    "Calibrator.averagePhaseInteraction": [
+        jointly_scales(["interaction_cis", "interaction_trans"], 1),
+        odd_under_negation(["interaction_cis", "interaction_trans"]),
+    ],
+    "Calibrator.dosagePhaseMisspecificationError": [
+        # A squared misspecification: quadratic in the interactions and EVEN in
+        # them, so a body carrying a stray linear term fails here while passing
+        # every scaling relation.
+        jointly_scales(["interaction_cis", "interaction_trans"], 2),
+        even_under_negation(["interaction_cis", "interaction_trans"]),
+    ],
+    "Calibrator.haplotypePhasePredictionError": [
+        jointly_scales(["pred_cis", "pred_trans",
+                        "interaction_cis", "interaction_trans"], 2),
+        even_under_negation(["pred_cis", "pred_trans",
+                             "interaction_cis", "interaction_trans"]),
+    ],
+    "Calibrator.dosageTransportBias": [
+        symmetric_in("freq_cis_source", "freq_cis_target"),
+        jointly_scales(["interaction_cis", "interaction_trans"], 1),
+        even_under_negation(["interaction_cis", "interaction_trans"]),
+    ],
+    "Calibrator.haplotypeTransportBias": [
+        jointly_scales(["pred_cis", "pred_trans",
+                        "interaction_cis", "interaction_trans"], 1),
+        even_under_negation(["pred_cis", "pred_trans",
+                             "interaction_cis", "interaction_trans"]),
+    ],
+    "Calibrator.haplotypeEffectVarianceOLS": [
+        scales("σ2", 1),
+        scales("n", -1),
+        invariant_under_allele_swap(["freq"]),
+    ],
+    "Calibrator.phaseAttenuation": [
+        # `(1 - 2s)²` is even about s = 1/2, so a switch rate and its complement
+        # attenuate identically -- phasing backwards is as good as phasing right.
+        invariant_under_allele_swap(["s"]),
+    ],
+    "Calibrator.ancestrySpecificEffect": [
+        jointly_scales(["beta_pop1", "beta_pop2"], 1),
+        odd_under_negation(["beta_pop1", "beta_pop2"]),
+    ],
+    "Calibrator.globalAncestryAveragedEffect": [
+        jointly_scales(["beta₁", "beta₂"], 1),
+        odd_under_negation(["beta₁", "beta₂"]),
+    ],
+    "Calibrator.localAncestryMisspecification": [
+        jointly_scales(["beta₁", "beta₂"], 2),
+        even_under_negation(["beta₁", "beta₂"]),
+    ],
+    "Calibrator.expectedTractLength": [
+        scales("g", -1),
+    ],
+
     "Calibrator.recessiveMutationSelectionDriftParameter": [
         scales("Ne", 1),
         symmetric_in("mu", "s"),
@@ -1075,6 +1226,41 @@ NO_RELATIONS = {
         "exponent is itself an argument -- which is precisely why α is the "
         "parameter the architecture literature argues about.",
 
+    # --- PGSCalibrationTheory ----------------------------------------------
+    "Calibrator.calibrationSlopeDeviation":
+        "|slope - 1| measures distance from a FIXED anchor, and an anchor is "
+        "not a scale: rescaling the slope moves it toward or away from one "
+        "rather than multiplying the deviation. It is even about slope = 1, "
+        "which is a reflection this table's negation kinds cannot express -- "
+        "they reflect about zero.",
+
+    # --- SelectionArchitecture ---------------------------------------------
+    "Calibrator.effectCorrelationStabilizing":
+        "1 - 1/(2·Ns) is affine in the reciprocal of a single already-compound "
+        "argument; the `1` is an anchor, not a scale, and there is no second "
+        "argument to trade Ns against.",
+    "Calibrator.fluctuatingSelectedArchitectureVariance":
+        "A SUM of the stabilizing equilibrium `v_mut/s` and the OU term "
+        "`σ_θ²τ/2`. The two summands are homogeneous of different degrees in "
+        "disjoint arguments, so no common factor acts on the sum. Both "
+        "components ARE declared separately above, which is the honest split: "
+        "the relations belong to the pieces and not to their sum.",
+    "Calibrator.stabilizingNsFromObservedCorrelation":
+        "1/(2(1-ρ)) inverts an affine map of a correlation. ρ is bounded and "
+        "carries no unit, and the `1` is an anchor.",
+    "Calibrator.sigmaThetaFromObservedSelectedVariance":
+        "A square root of a DIFFERENCE of two variances divided by a fitted "
+        "timescale. The subtraction blocks homogeneity in the variances -- "
+        "scaling both would scale the difference but the timescale is estimated "
+        "from a correlation that does not move with them -- and the whole point "
+        "of the body is that it inverts a measurement rather than expressing a "
+        "law.",
+    "Calibrator.selectionPortabilityTimescale":
+        "A wrapper around driftLDCreationRate; the relations belong to that "
+        "body rather than to this name. Left undeclared here on purpose rather "
+        "than duplicating a neighbour's declaration, which would create two "
+        "entries that must be kept in step by hand.",
+
     "Calibrator.selectionMigrationEquilibriumMigrationFirst":
         "The same max-0 clip as the selection-first ordering, and the same "
         "consequence: on the half of the domain where migration overwhelms "
@@ -1117,6 +1303,17 @@ NOT_EXTRACTABLE = {
     "Calibrator.liabilityThresholdAUCFromExplainedR2":
         "Composes the whole liability family under `Phi`; same gap. This is the "
         "one a consumer actually calls, which is what makes the hole matter.",
+    # PGSCalibrationTheory's two screening-utility wrappers. Both route through
+    # a ScreeningDecisionModel structure argument that `extract/api.py` builds no
+    # numeric inhabitant for, so no relation can be evaluated for either.
+    "Calibrator.screeningQalyGain":
+        "Routes through `screeningUtilityFromRates` applied to a "
+        "`qalyScreeningDecisionModel` STRUCTURE, and the extraction has no "
+        "numeric inhabitant for it. Not evaluable, so no relation can run.",
+    "Calibrator.decisionCurveNetBenefit":
+        "Routes through `screeningUtilityFromCounts` applied to a "
+        "`decisionCurveScreeningModel` structure; same extraction gap.",
+
     "Calibrator.targetLiabilityAUCFromNeutralAFBenchmark":
         "Composes liabilityThresholdAUCFromExplainedR2 with presentDayR2, so it "
         "inherits the gap from the liability half while the F_ST half is "
