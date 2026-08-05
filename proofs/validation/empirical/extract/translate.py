@@ -520,7 +520,14 @@ class Parser:
             # quadratic scaling relation that its Lean body plainly satisfies.
             if name in CONSTS and name not in self.locals:
                 return CONSTS[name]
-            if name in FUNCS:
+            # Same shadowing rule for FUNCS, one line below where it was needed
+            # for CONSTS.  Currently LATENT -- the 37 definitions that bind a
+            # table name all bind `π` -- but `max`, `min`, `id` and `trace` are
+            # ordinary mathematical binder names, and the failure mode is the
+            # one that took 23 definitions silently: a plausible number of the
+            # right sign and magnitude, no error, every consumer affected.
+            # Closed before it is reached rather than after.
+            if name in FUNCS and name not in self.locals:
                 fn, ar = FUNCS[name]
                 return f"_FN:{fn}|{ar}"
             if "." in name:                     # projection or qualified name
