@@ -6317,6 +6317,98 @@ def run_shape_depth() -> int:
     return 0
 
 
+def run_shape_chains() -> int:
+    """A module's one internal import may not be a sibling it uses nothing from.
+
+    WHAT THIS CAUGHT.  Thirty-eight modules import exactly one thing from this
+    corpus, that one thing is a file in their own directory, and they name not a
+    single declaration it makes.  `Coalescent.Beta` imports `Coalescent.Lambda` and
+    uses nothing from it.  `PortabilityDrift.Generational` imports
+    `PortabilityDrift.PresentDayMetrics`, uses nothing from it, and uses twenty-five
+    declarations of `PopGen.DGP`.  `PopulationGeneticsFoundations` has six such
+    files in a row, each importing its predecessor: the directory is a chapter list.
+
+    WHY THESE RULES RATHER THAN "NO UNUSED IMPORTS".  Lean imports are transitive,
+    so a module may legitimately import `X` to reach a name that `X`'s own
+    dependency declares -- `architecture.py` reports 149 imports naming nothing used
+    and deliberately does not gate them, because seven removed from
+    `Foundations/Conventions` on that reasoning had to be put back.  Three
+    conditions together take the population from 149 to 38 and make every one of
+    them a real finding:
+
+      * EXACTLY ONE internal import.  A module with several imports is expressing
+        some dependency structure, right or wrong.  A module with one is expressing
+        an ordering.
+      * The import is a SIBLING, in the same directory.  A single import that
+        crosses directories is a real dependency on another layer.  A single import
+        of the file next to you is where you were in the manuscript.
+      * It names NOTHING the sibling declares.  This is what rules out the
+        legitimate case, and it is why the guard prints where the symbols the
+        module DOES name actually live: that module is the import it wanted.
+
+    The fix is never to delete the import -- that breaks the build, because the
+    sibling is the conduit.  It is to import the modules named below it directly,
+    after which the sibling is either used or genuinely removable.
+    """
+    _raw, code, _graph, decls, _arch = _shape_corpus()
+    graph = _shape_graph_without_toc()
+
+    reach, findings = {}, []
+
+    def above(mod, seen):
+        if mod in reach:
+            return reach[mod]
+        if mod in seen:
+            return set()
+        out = set()
+        for dep in graph.get(mod, ()):
+            out.add(dep)
+            out |= above(dep, seen | {mod})
+        reach[mod] = out
+        return out
+
+    for mod in sorted(graph):
+        deps = graph[mod]
+        if len(deps) != 1:
+            continue
+        sibling = next(iter(deps))
+        if mod.rsplit(".", 1)[0] != sibling.rsplit(".", 1)[0]:
+            continue
+        theirs = {n for _kind, n in decls.get(sibling, ())}
+        mine = set(SHAPE_IDENT.findall(code.get(mod, "")))
+        if theirs & mine:
+            continue
+        wanted = collections.Counter()
+        for up in above(sibling, frozenset()):
+            for _kind, n in decls.get(up, ()):
+                if n in mine:
+                    wanted[up] += 1
+        if wanted:
+            where = "; ".join(f"{n} from {m}" for m, n in wanted.most_common(3))
+            findings.append(f"{mod}\n        imports only {sibling}, and names "
+                            f"nothing it declares; it names {where}")
+        else:
+            findings.append(f"{mod}\n        imports only {sibling}, and names "
+                            f"nothing it declares, nor anything reachable through it")
+
+    if findings:
+        print(f"modules whose one internal import is an unused sibling: "
+              f"{len(findings)}, budget 0; import the module whose declarations the "
+              f"file actually names, then the sibling is used or removable")
+        for line in findings:
+            print("    " + line)
+        print(f"shape-chains guard FAILS. A directory in which each file imports "
+              f"the one before it is a directory split by reading order, and the "
+              f"import graph is the only place that ordering is recorded -- so it "
+              f"is load-bearing, it is invisible, and rearranging the chapters "
+              f"breaks the build for reasons no declaration explains.")
+        return 1
+
+    print(f"shape-chains guard passes: no module's only internal import is a "
+          f"sibling it names nothing from ({len(graph)} modules checked)")
+    return 0
+
+
 # ======================================================================================
 # DISPATCHER
 # ======================================================================================
@@ -6436,6 +6528,12 @@ GUARDS = {
     # the chain repairs land, so do not trust the number in this comment -- run
     # `--only shape-depth` and read the chain it prints.
     "shape-depth":     dict(fn=run_shape_depth,      gated=False, takes_argv=False),
+    # `shape-chains`: flip when no module's only internal import is a sibling it
+    # names nothing from. Measured 38 when the audit asked for this, six of them
+    # consecutive files in `PopGen/PopulationGeneticsFoundations`; 32 as the repair
+    # lands. Run `--only shape-chains` for the outstanding list, which is also the
+    # work list -- each line names the module the file should have imported.
+    "shape-chains":    dict(fn=run_shape_chains,     gated=False, takes_argv=False),
 }
 
 
