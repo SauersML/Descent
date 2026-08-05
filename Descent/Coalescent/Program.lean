@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Split
 import Descent.Coalescent.CutSets
 import Descent.Coalescent.CutCount
+import Descent.Coalescent.Path
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -68,14 +69,21 @@ Doob VII.4.25), and nothing in this corpus is close to it.
 
 **4. K-C Theorem 1's real content: independence.**  The factorisation `R_t = ℛ_{D_t}` with
 the jump chain independent of the death process is what makes the finite-dimensional
-distributions computable.  Both halves exist here separately -- the death process
-arithmetically in `Rates`, the jump chain as a kernel in `Kernel` -- and their independence
-does not.  It needs the continuous-time process on path space, which is not built.
+distributions computable.  `Coalescent.Path` now supplies the object this was blocked on:
+the path of ONE trajectory, `pathState`, with `|R_t| = D(n,t)` (K-G (6.6),
+`Path.blocks_pathState`), `R_0 = Δ`, absorption at the transit time, and monotone coarsening.
+What is still missing is the LAW.  Taking the chain and the holds independent makes
+independence true by construction -- that is Theorem 3's direction -- while Theorem 1's
+direction, that an ARBITRARY `n`-coalescent factorises, needs the general theory of jump
+chains for continuous-time Markov chains, which this corpus does not have.
 
 **5. K-G section 6, the temporal coupling, and K-C Theorem 3, the infinite coalescent.**
-Both construct processes.  The estimate that makes them possible -- `Σ_{r≥k} d_r⁻¹ = 2/(k-1)`,
-so the death process enters from infinity -- IS proved
-(`Rates.hasSum_one_div_deathRate_tail`); the constructions are not attempted.
+The deterministic half of the temporal coupling is now `Coalescent.Path`: K-G (6.1)'s
+`descentTime`, (6.2)'s death process as a step function, (6.5)'s `R_t = ℛ_{D(n,t)}` and
+(6.6).  The estimate that lets the death process start from infinity --
+`Σ_{r≥k} d_r⁻¹ = 2/(k-1)` -- is `Rates.hasSum_one_div_deathRate_tail`.  What is not done is
+putting a measure on the path space, and the passage to `n = ∞` that Theorem 3 needs on top
+of it.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.
