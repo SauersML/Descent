@@ -248,17 +248,22 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
 
 /-- **Pairwise `F_ST` composed in coalescent time instead of in `F_ST`.**
 
-    Under the coalescent, two demes that split `tauS` and `tauT` ago from a
-    common ancestor have `E[T_between] = 1 + tauS + tauT` in units where
-    `E[T_within] = 1`, because expected coalescence times add along the path.
-    Hudson's ratio then gives `fstFromTau (tauS + tauT)` directly.
+    Under the coalescent, two demes that split from a common ancestor have
+    `E[T_between] = 1 + tau` in units where `E[T_within] = 1`, with `tau` the
+    time to that ancestor. The path is traversed ONCE, so the branch taus enter
+    through their MEAN and not their sum, and Hudson's ratio gives
+    `fstFromTau ((tauS + tauT) / 2)`.
 
-    This is offered as a candidate for `pairwiseFstFromBranches`, not
-    substituted for it: recomputed against the four rows tabulated on that
-    definition it errs -5.4%, -1.2%, +3.4%, +2.4% where the multiplicative map
-    errs +0.6%, +7.0%, +13.0%, +14.7%.
+    Empirical status: CONDITIONALLY VALID. Validated for equal branch lengths
+    and falsified for unequal ones, with the boundary measured rather than
+    asserted; both tables are below. The residual on unequal branches is a
+    SIGNATURE limitation and not a repairable constant: with unequal daughter
+    sizes the between-deme coalescence also depends on the ANCESTRAL size, and
+    two branch taus cannot carry it. Use `hudsonFstFromCoalescenceTimes` there.
 
-    Empirical status: **FALSIFIED**
+    History, kept because it is the evidence for the body above. This
+    definition previously read `fstFromTau (tauS + tauT)`, summing both branch
+    taus, and was **FALSIFIED** in that form
     (`proofs/validation/empirical/simcov/battery_fix.py`, `test_fst_composition`).
     Measured against msprime coalescent simulation of a clean split, recombining
     at `1e-8` so that each replicate carries many independent genealogies,
@@ -294,12 +299,9 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
        600    600   1200      0.66667       0.50000  0.49410±0.00385   1.5
        500   2000   1000      0.55556       0.38462  0.36592±0.00330   5.7
 
-    Empirical status: **VALIDATED for equal branch lengths** (worst 1.5 sems
-    over four designs spanning 0.19682 to 0.49999), and **still wrong for
-    unequal ones** -- the last row misses by 5.7 sems. That residual is a
-    signature limitation and not a repairable constant: with unequal daughter
-    sizes the between-deme coalescence also depends on the ANCESTRAL size, and
-    two branch taus cannot carry it. Use `hudsonFstFromCoalescenceTimes` there.
+    So: validated for equal branch lengths at worst 1.5 sems over four designs
+    spanning 0.19682 to 0.49999, and wrong for unequal ones -- the last row
+    misses by 5.7 sems. That is the boundary the status at the top records.
 
     Power: the prediction spans 0.20000 to 0.50000 across the symmetric designs,
     a factor of two and a half, and the superseded sum form is excluded at 40 to
@@ -3029,7 +3031,12 @@ correlation decays exponentially with recombination distance and divergence.
     estimated from 60 sampled chromosomes. A design with an independently known
     anchor is needed before either shape earns a verdict.
 
-    THE `fstGap` FACTOR IS **FALSIFIED**, and the exponent is a SQUARE ROOT
+    THE `fstGap` FACTOR WAS FALSIFIED AND IS NOW **CORRECTED**: the body carries
+    `Real.sqrt fstGap`, which is what the measurement supports. The superseded
+    form used `fstGap` itself. Details, since the correction is a factor a
+    reader will want to check:
+
+    The exponent is a SQUARE ROOT
     (`simcov/battery_bulk54.py`). `lambda` is free, so the absolute rate is not
     refutable; the SHAPE of the rate-versus-divergence relation is, with no free
     constant left once each candidate is anchored at one cell. Five migration
@@ -3058,7 +3065,7 @@ correlation decays exponentially with recombination distance and divergence.
     A body carrying both faults would be wrong twice over, and only one of them
     is now established. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
-  Real.exp (-(lambda * fstGap * distance))
+  Real.exp (-(lambda * Real.sqrt fstGap * distance))
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
@@ -3071,26 +3078,37 @@ theorem ldCorrelationDecay_at_reference_point :
 /-- For positive divergence scale, LD correlation strictly decreases with distance. -/
 theorem ldCorrelationDecay_strictAnti_distance
     (d1 d2 fstGap lambda : ℝ)
-    (hScale : 0 < lambda * fstGap)
+    (hScale : 0 < lambda * Real.sqrt fstGap)
     (hDist : d1 < d2) :
     ldCorrelationDecay d2 fstGap lambda < ldCorrelationDecay d1 fstGap lambda := by
   unfold ldCorrelationDecay
   apply Real.exp_lt_exp.mpr
   nlinarith [mul_lt_mul_of_pos_left hDist hScale]
 
-/-- For positive distance and decay scale, LD correlation strictly decreases with `F_ST`. -/
+/-- For positive distance and decay scale, LD correlation strictly decreases with `F_ST`.
+
+    The monotonicity survives the correction from `fstGap` to `Real.sqrt fstGap`
+    because the square root is strictly monotone on the nonnegatives -- which is
+    why the empirical correction changed the RATE without disturbing any
+    ordering theorem stated about this body. The nonnegativity hypothesis is new
+    and is what `Real.sqrt` needs: below zero it is junk-zero and the ordering
+    would fail. -/
 theorem ldCorrelationDecay_strictAnti_fst
     (distance lambda fstSource fstTarget : ℝ)
     (hDist : 0 < distance)
     (hLambda : 0 < lambda)
+    (hSourceNonneg : 0 ≤ fstSource)
     (hFst : fstSource < fstTarget) :
     ldCorrelationDecay distance fstTarget lambda <
       ldCorrelationDecay distance fstSource lambda := by
   unfold ldCorrelationDecay
   apply Real.exp_lt_exp.mpr
   have h_pos : 0 < lambda * distance := mul_pos hLambda hDist
-  have h_lt : fstSource * (lambda * distance) < fstTarget * (lambda * distance) :=
-    mul_lt_mul_of_pos_right hFst h_pos
+  have hsqrt : Real.sqrt fstSource < Real.sqrt fstTarget :=
+    Real.sqrt_lt_sqrt hSourceNonneg hFst
+  have h_lt : Real.sqrt fstSource * (lambda * distance) <
+      Real.sqrt fstTarget * (lambda * distance) :=
+    mul_lt_mul_of_pos_right hsqrt h_pos
   linarith
 
 /-- Generation-indexed population-genetic parameters that drive explicit
@@ -3418,8 +3436,15 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
 allele frequencies drift away from the source frequencies, even if the source
 score itself is unchanged.
 
-    Empirical status: **FALSIFIED** (`simcov/battery_bulk52.py`). Retention
-    cannot be a function of the GAP alone, which is all this body is.
+    Empirical status: **CORRECTED, and the corrected body is VALIDATED**
+    (`simcov/battery_bulk52.py`). The body is now the genotype-variance ratio,
+    which matches the measured retention at worst 2.12 sems (0.35% relative).
+    What follows records the superseded body and why it failed, because the
+    name still says "penalty" and a reader needs to know that the quantity is a
+    RATIO which can exceed one.
+
+    THE SUPERSEDED BODY was `exp (-|pTarget - pSource|)`. Retention cannot be a
+    function of the GAP alone, which is all that was.
 
     The observable is the fraction of a variant's predictive contribution that
     survives transport: with a fixed effect, the ratio of realised
@@ -3443,7 +3468,8 @@ score itself is unchanged.
     so its contribution -- and a quantity called a penalty, bounded above by one
     for every argument, cannot represent that at all.
 
-    WHAT FITS: the genotype-variance ratio `2·p_t(1-p_t) / (2·p_s(1-p_s))`,
+    WHAT FITS, and is now the body: the genotype-variance ratio
+    `2·p_t(1-p_t) / (2·p_s(1-p_s))`,
     carried on the same cells, MATCHES at worst 2.12 sems (0.35% relative). Its
     square root -- what a STANDARDIZED score would give -- is also falsified, at
     411 sems, so the exponent is settled too. Control: the counted source allele
@@ -3452,37 +3478,46 @@ score itself is unchanged.
     Consequence: `tagAlleleFreqRetentionAt` and `causalAlleleFreqRetentionAt`
     are this body applied to their own frequencies and inherit the failure. -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
-  Real.exp (-|pTarget - pSource|)
+  (2 * pTarget * (1 - pTarget)) / (2 * pSource * (1 - pSource))
 
-/-- **The penalty is a distance in disguise: symmetric, at most one, and exactly one on
-agreement.** A directed penalty would fail the first, and a penalty that could exceed one would
-reward mismatch. -/
-theorem alleleFreqMismatchPenalty_symm (pSource pTarget : ℝ) :
-    alleleFreqMismatchPenalty pSource pTarget = alleleFreqMismatchPenalty pTarget pSource := by
-  unfold alleleFreqMismatchPenalty
-  rw [abs_sub_comm]
-
-theorem alleleFreqMismatchPenalty_le_one (pSource pTarget : ℝ) :
-    alleleFreqMismatchPenalty pSource pTarget ≤ 1 := by
-  unfold alleleFreqMismatchPenalty
-  rw [Real.exp_le_one_iff]
-  exact neg_nonpos.mpr (abs_nonneg (pTarget - pSource))
-
-@[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ) :
+/-- **A variant whose frequency does not move keeps its whole contribution.** This is the one
+property the superseded exponential body shared with the corrected one, and it survives because
+both agree at zero mismatch. -/
+@[simp] theorem alleleFreqMismatchPenalty_self (p : ℝ)
+    (hp : p ≠ 0) (hp1 : p ≠ 1) :
     alleleFreqMismatchPenalty p p = 1 := by
-  simp [alleleFreqMismatchPenalty]
-
-/-- **The mismatch penalty's decay rate, pinned.** `alleleFreqMismatchPenalty_symm` and
-`alleleFreqMismatchPenalty_le_one` fix the symmetry and the ceiling, and both are satisfied by
-`exp (-2 * |Δp|)` and by `exp (-|Δp|) / 2`. Evaluating at a unit frequency gap fixes the
-coefficient in the exponent: one full unit of allele-frequency mismatch costs exactly one
-e-fold. -/
-theorem alleleFreqMismatchPenalty_unit_gap (pSource : ℝ) :
-    alleleFreqMismatchPenalty pSource (pSource + 1) = Real.exp (-1) := by
   unfold alleleFreqMismatchPenalty
-  have h : pSource + 1 - pSource = 1 := by ring
-  rw [h]
-  norm_num
+  have h : 2 * p * (1 - p) ≠ 0 := by
+    intro hzero
+    rcases mul_eq_zero.mp hzero with h' | h'
+    · rcases mul_eq_zero.mp h' with h'' | h''
+      · norm_num at h''
+      · exact hp h''
+    · exact hp1 (by linarith)
+  exact div_self h
+
+/-- **The retention is a RATIO, so it is neither symmetric nor bounded by one**, and the two
+theorems that said otherwise were deleted with the exponential body they described.
+
+`alleleFreqMismatchPenalty_symm` asserted `f p q = f q p` and
+`alleleFreqMismatchPenalty_le_one` asserted `f p q ≤ 1`. Both are true of `exp (-|Δp|)` and both
+are FALSE of what transport retention actually does, which is why the measurement that refuted
+the body refutes them too: a variant moving from `0.7` to `0.5` retains `1.19` of its
+contribution, not less than one, because its genotype variance ROSE. Swapping source and target
+inverts the ratio rather than preserving it.
+
+Keeping either theorem beside the corrected body would have been the laundering this corpus
+warns about: a true statement about a superseded formula, left standing where a reader would
+take it for a property of the quantity. The measurement is at the definition above. -/
+theorem alleleFreqMismatchPenalty_swap_inverts (pSource pTarget : ℝ)
+    (hs : 2 * pSource * (1 - pSource) ≠ 0)
+    (ht : 2 * pTarget * (1 - pTarget) ≠ 0) :
+    alleleFreqMismatchPenalty pSource pTarget *
+        alleleFreqMismatchPenalty pTarget pSource = 1 := by
+  unfold alleleFreqMismatchPenalty
+  rw [div_mul_div_comm,
+    mul_comm (2 * pTarget * (1 - pTarget)) (2 * pSource * (1 - pSource))]
+  exact div_self (mul_ne_zero hs ht)
 
 /-- **The outcome scale of a generational transport model**, as one object.
 
@@ -3701,9 +3736,13 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
 
 /-- Per-tag allele-frequency retention at generation `t`.
 
-    Empirical status: **FALSIFIED**, inherited. This body is
-    `alleleFreqMismatchPenalty` applied to this tag's source and time-`t` target
-    frequencies, and that function is falsified at 560 sems: retention is not a
+    Empirical status: **MATCHES** at worst 2.12 sems (0.35% relative), on the
+    cells of `battery_verify.py` that refuted the previous body at 560. The
+    verdict moved because the BODY moved; the design is the same one.
+
+    WHAT THE PREVIOUS BODY WAS AND WHY IT FAILED. It applied
+    `alleleFreqMismatchPenalty` to this tag's source and time-`t` target
+    frequencies, and that function is refuted at 560 sems: retention is not a
     function of the frequency GAP at all. Three source/target pairs sharing
     `|Δp| = 0.2` measure retention 0.842, 0.428 and 1.193, where the penalty
     predicts one number for all three.
@@ -3714,28 +3753,55 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
     the same distance and are assigned the same retention, while the measured
     values differ by a factor of nearly three and one of them EXCEEDS ONE.
 
-    What fits is the genotype-variance ratio
-    `2·p_t(1-p_t) / (2·p_source(1-p_source))`, which matches at 2.12 sems. -/
+    CORRECTED to the form that fits: the genotype-variance ratio
+    `2·p_t(1-p_t) / (2·p_source(1-p_source))`, which matches at worst 2.12 sems
+    (0.35% relative) on the same cells that falsified the gap penalty at 560.
+    The exponent is settled by the same design: the SQUARE ROOT of this ratio --
+    what a standardized score would give -- is falsified at 411 sems, so the
+    ratio is of variances and not of standard deviations. Control: the counted
+    source allele frequency recovers `pSource` at 1.13 sems.
+
+    Written out rather than routed through `alleleFreqMismatchPenalty`, because
+    that body is the falsified one and this definition should not inherit
+    whatever becomes of it.
+
+    Two things the corrected body gets right that the penalty could not. It is
+    not a function of the frequency GAP, so the three pairs sharing `|Δp| = 0.2`
+    that measured 0.842, 0.428 and 1.193 are now given three different values.
+    And it is unbounded above, so a variant drifting toward `1/2` -- which raises
+    its genotype variance and therefore its contribution -- is reported as
+    retention above one instead of as a loss. -/
 noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
-  alleleFreqMismatchPenalty (m.tagAlleleFreqSource i) (tagAlleleFreqTargetAt m t i)
+  (2 * tagAlleleFreqTargetAt m t i * (1 - tagAlleleFreqTargetAt m t i)) /
+    (2 * m.tagAlleleFreqSource i * (1 - m.tagAlleleFreqSource i))
 
 /-- Per-causal-variant allele-frequency retention at generation `t`.
 
-    Empirical status: **FALSIFIED**, inherited, on the same grounds as
-    `tagAlleleFreqRetentionAt` above: this is `alleleFreqMismatchPenalty` applied
-    to a causal variant's source and time-`t` target frequencies, and that
-    function is falsified at 560 sems because retention is not a function of the
-    frequency gap.
+    Empirical status: **MATCHES** at worst 2.12 sems, on the same corrected
+    footing as `tagAlleleFreqRetentionAt` above and measured on the same cells.
+
+    WHAT THE PREVIOUS BODY WAS AND WHY IT FAILED. It was
+    `alleleFreqMismatchPenalty` applied to a causal variant's source and time-`t`
+    target frequencies, and that function is refuted at 560 sems because
+    retention is not a function of the frequency gap.
 
     The causal case is the one where it matters most. A causal variant's
     contribution to the transported score scales with its genotype variance, so
     a variant drifting TOWARD 0.5 contributes MORE in the target than in the
     source -- retention above one, which a penalty bounded by one cannot express
-    and which this body will always report as a loss. -/
+    and which the old body always reported as a loss.
+
+    CORRECTED to the genotype-variance ratio, as `tagAlleleFreqRetentionAt` is
+    and for the same measurement: 2.12 sems against the penalty's 560, with the
+    square-root form rejected at 411 sems so the exponent is fixed. That the
+    corrected body is exactly the quantity this docstring already said the
+    contribution scales with is the point -- the diagnosis was written down here
+    before the body was changed to match it. -/
 noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
-  alleleFreqMismatchPenalty (m.causalAlleleFreqSource j) (causalAlleleFreqTargetAt m t j)
+  (2 * causalAlleleFreqTargetAt m t j * (1 - causalAlleleFreqTargetAt m t j)) /
+    (2 * m.causalAlleleFreqSource j * (1 - m.causalAlleleFreqSource j))
 
 /-- Fraction of target-side novel variation accumulated by generation `t`.
 This is the complement of shared ancestral variation retained after mutation. -/
@@ -5899,10 +5965,22 @@ Therefore the divergence (fraction of covariance lost) is:
 noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
   freq_corr * ld_overlap
 
-/-- Allele frequency correlation equals `1 - Fst`, where Fst measures the
-    fraction of genetic variance due to population divergence.
+/-- The covariance-retention factor `1 - F_ST`.
 
-    Empirical status: **FALSIFIED** as a function of `F_ST`
+    ONE STATUS MARKER, at the foot of this docstring. This block used to open
+    with a second one carrying a refutation verdict, which described the
+    SUPERSEDED definition `freqCorrFromFst` rather than this one, and every
+    scanner that reads the first marker in a docstring reported this body as
+    currently falsified. It is not. (The duplicate is removed rather than
+    reworded: a marker quoted in prose is still a marker to a scanner, which is
+    the same class of mistake as the one being corrected.) The refuted claim was
+    an IDENTIFICATION --
+    that `1 - F_ST` *is* the allele-frequency correlation -- and that claim was
+    already repaired, by renaming this definition and by giving the correlation
+    its own body with the arguments it actually depends on. What follows is the
+    history of that repair, not a verdict on the body below.
+
+    THE MEASUREMENT THAT KILLED THE IDENTIFICATION
     (`proofs/validation/empirical/simcov/battery_verify.py`,
     `test_freq_corr_killer`). Two Wright-Fisher designs were run to the SAME
     differentiation -- `G_ST` 0.0749 and 0.0750, so `1 - Fst` is 0.9251 and
