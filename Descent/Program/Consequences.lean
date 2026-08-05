@@ -255,9 +255,9 @@ misstates the unrecoverable component by a factor that moves with the data. The
 convention is why the two results can be composed at all. -/
 theorem unrecoverable_component_is_the_divergence
     (β : Bool → ℝ) (p₁ p₂ : ℝ)
-    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
     β = Portability.dynamicsPooledProjector β + Portability.dynamicsContrastCoefficient β • Conditionals.dynamicsContrast ∧
-      PopGen.contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ :=
+      PopGen.contrastSpikeLevel p₁ p₂ = 4 * Descent.Core.neiGst p₁ p₂ :=
   ⟨Portability.dynamics_common_contrast_decomposition β,
    PopGen.contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
 
