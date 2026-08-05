@@ -95,6 +95,40 @@ bias/no-bias split, not of identity detection. **Never use it to clear a MATCH.*
 The thing that clears a MATCH is a rejected competitor, which is what the ledger
 gate enforces.
 
+## Coverage is over what is OWED, not over what is screened
+
+`inventory.py` prints three numbers and the third is the one that means
+something. `validation/conventions.json` defines the closed vocabulary, and it
+says of three of its terms that no measurement is claimed or needed:
+
+| term | what it says |
+|---|---|
+| `DERIVED` | Follows from other results in the corpus. |
+| `VACUOUS` | The measurement was an algebraic identity. |
+| `ASSERTED` | An input taken from external literature. |
+
+A denominator counting those as debt reports the corpus as less covered than it
+is. **The exclusion is not free.** A `DERIVED` marker that names nothing it
+follows from is an assertion, not a derivation, so the scan requires a
+backticked identifier in the status paragraph and keeps the rest in the
+denominator. Five markers failed that on the first run and each was either
+substantiated or reclassified.
+
+Two parsing faults were fixed at the same time: `CONVENTION PINNED` is a
+two-word head and was being read as the bare state word `CONVENTION`, and the
+head rule never reached the vocabulary branch for any two-word term whose first
+word is also a state word.
+
+## Outstanding, and not this harness's to close
+
+`Descent/Core/` and `Descent/Coalescent/` were created after this scan was last
+run and their declarations carry no per-declaration `Empirical status:` marker.
+`Core/Fst.lean` states one at MODULE level -- "None. The bodies here are
+algebra" -- which is the right verdict and which neither this scan nor
+`check.py`'s `ident` guard can see, because both anchor on the docstring
+immediately above a `def`. Fifteen declarations are in that state. They are the
+whole of the remaining coverage debt.
+
 ## Regenerating
 
 ```

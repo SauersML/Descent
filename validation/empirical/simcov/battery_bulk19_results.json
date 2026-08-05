@@ -1,14 +1,14 @@
 {
- "_battery_sha": "52aab412c34bb00f",
+ "_battery_sha": "b2f3a8e5a709bd8c",
  "results": [
   {
    "name": "scaledMutationRate [haploid 2*Ne*mu, competing]",
    "file": "DGP.lean",
    "source": "2 * Ne * mu",
-   "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+   "note": "positive control 'Ewens E[K] at theta=1.0 [independent of every body under test]' passed at 1.23 sems",
    "regime": "same cells, factor halved",
    "span": 0.5,
-   "verdict": "LEAD (no control)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
     "lean": 0.3333333333333333,
@@ -56,10 +56,10 @@
    "name": "scaledMutationRate [8*Ne*mu, competing]",
    "file": "DGP.lean",
    "source": "8 * Ne * mu",
-   "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+   "note": "positive control 'Ewens E[K] at theta=1.0 [independent of every body under test]' passed at 1.23 sems",
    "regime": "same cells, factor doubled",
    "span": 0.6666666666666666,
-   "verdict": "LEAD (no control)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
     "lean": 0.1111111111111111,
@@ -107,7 +107,7 @@
    "name": "scaledMutationRate",
    "file": "DGP.lean",
    "source": "4 * Ne * mu",
-   "note": "control 'mu=0 [population fixes: homozygosity is 1]' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+   "note": "",
    "regime": "tested through the infinite-alleles equilibrium identity 1/(1+theta), which is independently validated; theta spans a factor of four and Ne spans a factor of four INDEPENDENTLY, so a wrong numeric factor or a wrong Ne-dependence would both show, which a sweep at fixed 4*Ne*mu could not detect",
    "span": 0.6,
    "verdict": "MATCH",
@@ -151,6 +151,312 @@
      "sem": 0.008006393762545234,
      "sems_off": 1.6146921571464594,
      "rel_err": 0.0607147469646054
+    }
+   ]
+  },
+  {
+   "name": "scaledMigrationRate [2*Ne*m, competing]",
+   "file": "DGP.lean",
+   "source": "2 * Ne * m",
+   "note": "positive control 't_div=1 [one population: F_ST is 0]' passed at 0.56 sems",
+   "regime": "same cells, factor halved",
+   "span": 0.6,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=2000 m=5.00e-04 (bigM=4.0)",
+    "lean": 0.2,
+    "truth": 0.10890714977720539,
+    "sem": 0.0046747439129167815,
+    "sems_off": 19.486169065025365,
+    "rel_err": 0.8364267213782197
+   },
+   "cells": [
+    {
+     "design": "Ne=500 m=5.00e-04 (bigM=1.0)",
+     "lean": 0.5,
+     "truth": 0.3196692141041389,
+     "sem": 0.018085749225718085,
+     "sems_off": 9.970877271671402,
+     "rel_err": 0.5641168368409558
+    },
+    {
+     "design": "Ne=2000 m=1.25e-04 (bigM=1.0)",
+     "lean": 0.5,
+     "truth": 0.3066139597705497,
+     "sem": 0.011384666298206702,
+     "sems_off": 16.986535675614153,
+     "rel_err": 0.6307150541161531
+    },
+    {
+     "design": "Ne=500 m=2.00e-03 (bigM=4.0)",
+     "lean": 0.2,
+     "truth": 0.10482266920890347,
+     "sem": 0.006113490540949147,
+     "sems_off": 15.56841057552693,
+     "rel_err": 0.9079842319357035
+    },
+    {
+     "design": "Ne=2000 m=5.00e-04 (bigM=4.0)",
+     "lean": 0.2,
+     "truth": 0.10890714977720539,
+     "sem": 0.0046747439129167815,
+     "sems_off": 19.486169065025365,
+     "rel_err": 0.8364267213782197
+    }
+   ]
+  },
+  {
+   "name": "scaledMigrationRate [8*Ne*m, competing]",
+   "file": "DGP.lean",
+   "source": "8 * Ne * m",
+   "note": "positive control 't_div=1 [one population: F_ST is 0]' passed at 0.56 sems",
+   "regime": "same cells, factor doubled",
+   "span": 0.7058823529411764,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=2000 m=5.00e-04 (bigM=4.0)",
+    "lean": 0.058823529411764705,
+    "truth": 0.10890714977720539,
+    "sem": 0.0046747439129167815,
+    "sems_off": 10.71366074771597,
+    "rel_err": 0.45987449371228833
+   },
+   "cells": [
+    {
+     "design": "Ne=500 m=5.00e-04 (bigM=1.0)",
+     "lean": 0.2,
+     "truth": 0.3196692141041389,
+     "sem": 0.018085749225718085,
+     "sems_off": 6.616768407579614,
+     "rel_err": 0.3743532652636176
+    },
+    {
+     "design": "Ne=2000 m=1.25e-04 (bigM=1.0)",
+     "lean": 0.2,
+     "truth": 0.3066139597705497,
+     "sem": 0.011384666298206702,
+     "sems_off": 9.364697829337642,
+     "rel_err": 0.34771397835353873
+    },
+    {
+     "design": "Ne=500 m=2.00e-03 (bigM=4.0)",
+     "lean": 0.058823529411764705,
+     "truth": 0.10482266920890347,
+     "sem": 0.006113490540949147,
+     "sems_off": 7.524202334006915,
+     "rel_err": 0.4388281670777343
+    },
+    {
+     "design": "Ne=2000 m=5.00e-04 (bigM=4.0)",
+     "lean": 0.058823529411764705,
+     "truth": 0.10890714977720539,
+     "sem": 0.0046747439129167815,
+     "sems_off": 10.71366074771597,
+     "rel_err": 0.45987449371228833
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.tau [t_div / (4 * Ne), competing]",
+   "file": "DGP.lean",
+   "source": "t_div / (4 * Ne)",
+   "note": "positive control 't_div=1 [one population: F_ST is 0]' passed at 0.56 sems",
+   "regime": "same cells, tau halved",
+   "span": 0.8235294117647058,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=4000 t_div=2000 (tau=0.25)",
+    "lean": 0.1111111111111111,
+    "truth": 0.19904770071580033,
+    "sem": 0.004404795232258756,
+    "sems_off": 19.96383145365779,
+    "rel_err": 0.44178651292357707
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t_div=500 (tau=0.25)",
+     "lean": 0.1111111111111111,
+     "truth": 0.20058444876521062,
+     "sem": 0.007030682698561865,
+     "sems_off": 12.726123691003918,
+     "rel_err": 0.44606318288827274
+    },
+    {
+     "design": "Ne=4000 t_div=2000 (tau=0.25)",
+     "lean": 0.1111111111111111,
+     "truth": 0.19904770071580033,
+     "sem": 0.004404795232258756,
+     "sems_off": 19.96383145365779,
+     "rel_err": 0.44178651292357707
+    },
+    {
+     "design": "Ne=1000 t_div=2000 (tau=1.00)",
+     "lean": 0.3333333333333333,
+     "truth": 0.49656922195473907,
+     "sem": 0.008424955671752898,
+     "sems_off": 19.375281601623296,
+     "rel_err": 0.3287273584513143
+    },
+    {
+     "design": "Ne=4000 t_div=1000 (tau=0.12)",
+     "lean": 0.058823529411764705,
+     "truth": 0.11492971014105867,
+     "sem": 0.002922100328080336,
+     "sems_off": 19.20063462234123,
+     "rel_err": 0.4881782148448142
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.tau [t_div / Ne, competing]",
+   "file": "DGP.lean",
+   "source": "t_div / Ne",
+   "note": "positive control 't_div=1 [one population: F_ST is 0]' passed at 0.56 sems",
+   "regime": "same cells, tau doubled",
+   "span": 0.7,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=4000 t_div=2000 (tau=0.25)",
+    "lean": 0.3333333333333333,
+    "truth": 0.19904770071580033,
+    "sem": 0.004404795232258756,
+    "sems_off": 30.48623727933705,
+    "rel_err": 0.6746404612292688
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t_div=500 (tau=0.25)",
+     "lean": 0.3333333333333333,
+     "truth": 0.20058444876521062,
+     "sem": 0.007030682698561865,
+     "sems_off": 18.881364763520995,
+     "rel_err": 0.6618104513351819
+    },
+    {
+     "design": "Ne=4000 t_div=2000 (tau=0.25)",
+     "lean": 0.3333333333333333,
+     "truth": 0.19904770071580033,
+     "sem": 0.004404795232258756,
+     "sems_off": 30.48623727933705,
+     "rel_err": 0.6746404612292688
+    },
+    {
+     "design": "Ne=1000 t_div=2000 (tau=1.00)",
+     "lean": 0.6666666666666666,
+     "truth": 0.49656922195473907,
+     "sem": 0.008424955671752898,
+     "sems_off": 20.189713909383343,
+     "rel_err": 0.3425452830973714
+    },
+    {
+     "design": "Ne=4000 t_div=1000 (tau=0.12)",
+     "lean": 0.2,
+     "truth": 0.11492971014105867,
+     "sem": 0.002922100328080336,
+     "sems_off": 29.11272040916815,
+     "rel_err": 0.7401940695276318
+    }
+   ]
+  },
+  {
+   "name": "scaledMigrationRate",
+   "file": "DGP.lean",
+   "source": "4 * Ne * m",
+   "note": "",
+   "regime": "tested through the two-deme island F_ST read from coalescence times against 1/(1 + 2 bigM), the factor 2 being islandDemeCorrection at n=2; bigM spans a factor of four and Ne spans a factor of four INDEPENDENTLY",
+   "span": 0.6666666666666666,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=2000 m=1.25e-04 (bigM=1.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.3066139597705497,
+    "sem": 0.011384666298206702,
+    "sems_off": 2.3469615061964872,
+    "rel_err": 0.0871433694107687
+   },
+   "cells": [
+    {
+     "design": "Ne=500 m=5.00e-04 (bigM=1.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.3196692141041389,
+     "sem": 0.018085749225718085,
+     "sems_off": 0.7555185609763916,
+     "rel_err": 0.0427445578939705
+    },
+    {
+     "design": "Ne=2000 m=1.25e-04 (bigM=1.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.3066139597705497,
+     "sem": 0.011384666298206702,
+     "sems_off": 2.3469615061964872,
+     "rel_err": 0.0871433694107687
+    },
+    {
+     "design": "Ne=500 m=2.00e-03 (bigM=4.0)",
+     "lean": 0.1111111111111111,
+     "truth": 0.10482266920890347,
+     "sem": 0.006113490540949147,
+     "sems_off": 1.0286172621167293,
+     "rel_err": 0.05999123996427963
+    },
+    {
+     "design": "Ne=2000 m=5.00e-04 (bigM=4.0)",
+     "lean": 0.1111111111111111,
+     "truth": 0.10890714977720539,
+     "sem": 0.0046747439129167815,
+     "sems_off": 0.4714614051511889,
+     "rel_err": 0.02023706743234418
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.tau",
+   "file": "DGP.lean",
+   "source": "t_div / (2 * Ne)",
+   "note": "",
+   "regime": "tested through the pure-split F_ST = tau/(1+tau) from coalescence times; tau spans a factor of four and Ne spans a factor of four independently, so the 2 in 2*Ne is under test and not just the ratio",
+   "span": 0.7777777777777778,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=4000 t_div=1000 (tau=0.12)",
+    "lean": 0.1111111111111111,
+    "truth": 0.11492971014105867,
+    "sem": 0.002922100328080336,
+    "sems_off": 1.3067994254859072,
+    "rel_err": 0.03322551692909359
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t_div=500 (tau=0.25)",
+     "lean": 0.2,
+     "truth": 0.20058444876521062,
+     "sem": 0.007030682698561865,
+     "sems_off": 0.08312830919394985,
+     "rel_err": 0.0029137291988907735
+    },
+    {
+     "design": "Ne=4000 t_div=2000 (tau=0.25)",
+     "lean": 0.2,
+     "truth": 0.19904770071580033,
+     "sem": 0.004404795232258756,
+     "sems_off": 0.2161960395401507,
+     "rel_err": 0.004784276737561371
+    },
+    {
+     "design": "Ne=1000 t_div=2000 (tau=1.00)",
+     "lean": 0.5,
+     "truth": 0.49656922195473907,
+     "sem": 0.008424955671752898,
+     "sems_off": 0.4072161538800264,
+     "rel_err": 0.0069089623230286215
+    },
+    {
+     "design": "Ne=4000 t_div=1000 (tau=0.12)",
+     "lean": 0.1111111111111111,
+     "truth": 0.11492971014105867,
+     "sem": 0.002922100328080336,
+     "sems_off": 1.3067994254859072,
+     "rel_err": 0.03322551692909359
     }
    ]
   },
