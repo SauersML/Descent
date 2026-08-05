@@ -209,11 +209,21 @@ whose kernel needs `𝒫_k` on the simplex, and wrong about the JUMP CHAIN at fi
 kernel is `Kernel.jumpKernel` and needs no simplex at all.  The distinction had not been
 drawn; drawing it is what unblocked this.
 
-What it unblocks, in turn, is the shape of the two remaining process-level gaps: Pólya's
-renewal identity and Schweinsberg's almost-sure equivalence are now blocked on specific
-constructions -- a walk on `ℤ` with its strong Markov property, and the continuous-time
-process built by composing `chainTraj` with a clock -- rather than on the absence of any
-process whatsoever.
+`Coalescent.EntranceLaw` then builds the clock -- an infinite product of `HoldingTime`'s
+holding-time laws, one per level -- and takes the step the corpus had been unable to take:
+Tonelli exchanges the sum and the integral, each coordinate's mean is `γ_k⁻¹`, and a
+nonnegative series with summable means is finite almost everywhere.  So
+
+  **a coalescent satisfying Schweinsberg's condition comes down from infinity in finite time,
+  almost surely** (`ae_totalDescentTime_lt_top`), and Kingman's does
+  (`kingman_ae_comesDownFromInfinity`).
+
+That is the forward direction of the equivalence, and the statement K-C (2.8) and K-G (6.1)
+rely on when they start the death process from infinity -- which the corpus previously had
+only in expectation.  STILL ABSENT: the converse, that failing the condition forces an
+infinite descent time almost surely, which is Kolmogorov's three-series theorem applied to
+independent exponentials; and Pólya's renewal identity, which needs a walk on `ℤ` with its
+strong Markov property.
 
 ## Beyond Kingman
 

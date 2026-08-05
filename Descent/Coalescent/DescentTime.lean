@@ -22,9 +22,9 @@ to level `b` is
 
   `Σ_{k > b} γ_k⁻¹`,
 
-and the condition is exactly the statement that this is finite.  `descentTime` is that sum,
-`kingman_descentTime` evaluates it at Kingman's ladder against `Rates` -- `2/(b-1)`, K-C
-p.239 -- and `descentTime_tendsto_atTop_of_not_comesDown` is the converse: when the condition
+and the condition is exactly the statement that this is finite.  `meanDescentTime` is that sum,
+`kingman_meanDescentTime` evaluates it at Kingman's ladder against `Rates` -- `2/(b-1)`, K-C
+p.239 -- and `meanDescentTime_tendsto_atTop_of_not_comesDown` is the converse: when the condition
 fails, the partial sums diverge, so there is no finite time by which the count is finite.
 
 ## What is proved, and what is not
@@ -46,10 +46,10 @@ theorem and it is not here.
 
 ## Main results
 
-- `descentTime`: `Σ_{k ≥ b} γ_k⁻¹`, the mean time to come down to level `b`.
-- `kingman_descentTime`: **`2/(b-1)` for Kingman**, K-C p.239, from `Rates`.
+- `meanDescentTime`: `Σ_{k ≥ b} γ_k⁻¹`, the mean time to come down to level `b`.
+- `kingman_meanDescentTime`: **`2/(b-1)` for Kingman**, K-C p.239, from `Rates`.
 - `comesDownFromInfinity_iff_summable_descent`: the condition is finiteness of that time.
-- `descentTime_tendsto_atTop_of_not_comesDown`: **and when it fails, the time is infinite**.
+- `meanDescentTime_tendsto_atTop_of_not_comesDown`: **and when it fails, the time is infinite**.
 -/
 
 namespace Coalescent
@@ -62,23 +62,23 @@ level `k` at rate `γ_k`: the sum of the mean sojourns.
 Empirical status: DERIVED given the rates.  Each summand is the mean of an exponential of
 rate `γ_k`, which `Descent.Coalescent.HoldingTime.integral_id_mul_holdDensity` computes from
 K-C (1.7)'s density. -/
-noncomputable def descentTime (γ : ℕ → ℝ) (b : ℕ) : ℝ := ∑' j : ℕ, 1 / γ (b + j)
+noncomputable def meanDescentTime (γ : ℕ → ℝ) (b : ℕ) : ℝ := ∑' j : ℕ, 1 / γ (b + j)
 
 /-- **Kingman's descent time is `2/(b-1)`.**  K-C p.239, which `Rates` proves as a tail sum;
 here it is read as the time to come down from infinity to `b` lineages. -/
-theorem kingman_descentTime {b : ℕ} (hb : 2 ≤ b) :
-    descentTime deathRate b = 2 / ((b : ℝ) - 1) :=
+theorem kingman_meanDescentTime {b : ℕ} (hb : 2 ≤ b) :
+    meanDescentTime deathRate b = 2 / ((b : ℝ) - 1) :=
   tsum_one_div_deathRate_tail hb
 
 /-- At `b = 2` it is `2`, the mean transit time of the whole coalescent -- the bound
 `Rates.meanTransitTime_lt_two` proves uniform in the sample size, now read as a descent from
 infinity rather than from a sample. -/
-theorem kingman_descentTime_two : descentTime deathRate 2 = 2 := by
-  rw [kingman_descentTime (le_refl 2)]
+theorem kingman_meanDescentTime_two : meanDescentTime deathRate 2 = 2 := by
+  rw [kingman_meanDescentTime (le_refl 2)]
   norm_num
 
 /-- **The condition is the finiteness of the descent time.**  Definitionally: Schweinsberg's
-`Σ γ_b⁻¹ < ∞` is the summability of the sojourn means, which is what makes `descentTime` a
+`Σ γ_b⁻¹ < ∞` is the summability of the sojourn means, which is what makes `meanDescentTime` a
 real number rather than a divergent sum. -/
 theorem comesDownFromInfinity_iff_summable_descent (γ : ℕ → ℝ) :
     comesDownFromInfinity γ ↔ Summable fun j : ℕ ↦ 1 / γ (j + 2) :=
@@ -90,7 +90,7 @@ sojourn means tend to infinity, so no level is reached in bounded expected time.
 This is the direction that makes the condition a dichotomy rather than a definition: a
 coalescent failing it does not merely lack a proof of coming down, it has no finite expected
 time in which to do so. -/
-theorem descentTime_tendsto_atTop_of_not_comesDown {γ : ℕ → ℝ}
+theorem meanDescentTime_tendsto_atTop_of_not_comesDown {γ : ℕ → ℝ}
     (hpos : ∀ j : ℕ, 0 < γ (j + 2)) (h : ¬ comesDownFromInfinity γ) :
     Tendsto (fun m : ℕ ↦ ∑ j ∈ Finset.range m, 1 / γ (j + 2)) atTop atTop := by
   rw [← not_summable_iff_tendsto_nat_atTop_of_nonneg]
@@ -100,16 +100,16 @@ theorem descentTime_tendsto_atTop_of_not_comesDown {γ : ℕ → ℝ}
 
 /-- The star coalescent has no finite descent time: `γ_b = b - 1`, and the harmonic series
 diverges.  `ComingDownCriterion.star_not_comesDownFromInfinity` supplies the failure. -/
-theorem star_descentTime_tendsto_atTop :
+theorem star_meanDescentTime_tendsto_atTop :
     Tendsto (fun m : ℕ ↦ ∑ j ∈ Finset.range m, 1 / ((((j + 2 : ℕ)) : ℝ) - 1)) atTop atTop :=
-  descentTime_tendsto_atTop_of_not_comesDown (γ := fun b : ℕ ↦ (b : ℝ) - 1)
+  meanDescentTime_tendsto_atTop_of_not_comesDown (γ := fun b : ℕ ↦ (b : ℝ) - 1)
     (fun j ↦ by push_cast; linarith) star_not_comesDownFromInfinity
 
 /-- And neither has the Bolthausen-Sznitman coalescent, whose `γ_b = b(H_b - 1)` grows like
 `b log b` -- `BertrandDescent.bolthausenSznitman_not_comesDownFromInfinity`. -/
-theorem bolthausenSznitman_descentTime_tendsto_atTop :
+theorem bolthausenSznitman_meanDescentTime_tendsto_atTop :
     Tendsto (fun m : ℕ ↦ ∑ j ∈ Finset.range m, 1 / bsRate (j + 2)) atTop atTop := by
-  refine descentTime_tendsto_atTop_of_not_comesDown (γ := bsRate) ?_ ?_
+  refine meanDescentTime_tendsto_atTop_of_not_comesDown (γ := bsRate) ?_ ?_
   · exact fun j ↦ bsRate_pos j
   · exact bolthausenSznitman_not_comesDownFromInfinity
 
