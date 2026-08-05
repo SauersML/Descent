@@ -1237,6 +1237,6 @@ end ConfusionMatrix
 
 end BinaryMetrics
 
-end Descent.Foundations
+end
 
-end Descent
+end Descent.Foundations

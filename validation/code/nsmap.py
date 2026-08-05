@@ -44,7 +44,10 @@ DECL = re.compile(
     r"(def|abbrev|theorem|lemma|structure|inductive|instance|class|opaque|axiom)\s+"
     r"([A-Za-z_][A-Za-z0-9_.'!?₀-₉]*)")
 NAMESPACE = re.compile(r"^namespace\s+([A-Za-z_][A-Za-z0-9_.'₀-₉]*)\s*$")
-SECTION = re.compile(r"^section\b")
+# `noncomputable section` opens a scope too, and misreading it as ordinary code
+# undercounts the stack by one -- which is how a rewrite renamed the bare `end`
+# closing the section instead of the one closing the namespace.
+SECTION = re.compile(r"^(?:noncomputable\s+|private\s+|protected\s+)*section\b")
 END = re.compile(r"^end\b\s*([A-Za-z_][A-Za-z0-9_.'₀-₉]*)?\s*$")
 
 # The directories that are meant to be namespaces.  `Descent/Core/` is listed so

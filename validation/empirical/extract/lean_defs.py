@@ -36,12 +36,6 @@ def genotypicValue(*_a):
     _t = [(-_rt._proj(m, 'a')), _rt._proj(m, 'd'), _rt._proj(m, 'a')]
     return _t[_rt._ix(_e, 3, 'genotypicValue')]
 
-def meanValue(m, h):
-    return sum(((genotypeProb(h, g) * genotypicValue(m, g))) for g in range(int(3)))
-
-def valueDosageCovariance(m, h):
-    return sum((((genotypeProb(h, g) * ((genotypicValue(m, g) - meanValue(m, h)))) * centeredAltAlleleCount(h, g))) for g in range(int(3)))
-
 def pairwiseCoalescentSurvival(lam, t):
     return _rt.rexp(((-((lam * t)))))
 
@@ -146,18 +140,6 @@ def rareField():
 
 def clippedModeError(rootSource, rootGain, budget):
     return (rootSource * _rt.rmax(0.0, ((1.0 - (budget * rootGain)))))
-
-def hweThirdCentralMoment(h):
-    return sum(((genotypeProb(h, g) * _rt.lpow(centeredAltAlleleCount(h, g), 3.0))) for g in range(int(3)))
-
-def standardizedGenotype(h, g):
-    return _rt.rdiv(centeredAltAlleleCount(h, g), _rt.rsqrt(genotypeVariance(h)))
-
-def centeredSquare(h, g):
-    return (_rt.lpow(standardizedGenotype(h, g), 2.0) - 1.0)
-
-def signBias(h):
-    return sum(((genotypeProb(h, g) * ((standardizedGenotype(h, g) * _rt.rabs(standardizedGenotype(h, g)))))) for g in range(int(3)))
 
 def fourthCumulantFromMoments(secondMoment, fourthMoment):
     return (fourthMoment - (3.0 * _rt.lpow(secondMoment, 2.0)))
@@ -813,6 +795,9 @@ def disjointCount(n):
 def varPairwiseFromTree(θ, n):
     return ((_rt.rdiv((((Descent_Coalescent_pairCount(n) + sharingCount(n)) + ((_rt.rdiv(2.0, 3.0)) * disjointCount(n)))), _rt.lpow(Descent_Coalescent_pairCount(n), 2.0)) * θ) + (_rt.rdiv(((Descent_Coalescent_pairCount(n) + (2.0 * ((_rt.rdiv(sharingCount(n), 3.0) + ((_rt.rdiv(2.0, 9.0)) * disjointCount(n))))))), _rt.lpow(Descent_Coalescent_pairCount(n), 2.0)) * _rt.lpow(θ, 2.0)))
 
+def chainTrajFrom(n, ξ):
+    return chainTraj(n, ((lambda _: ξ)))
+
 def relativeSize(β, t):
     return _rt.rexp(((-((β * t)))))
 
@@ -1294,7 +1279,7 @@ def probability(P, i):
 def Δ(M, K, h):
     return _rt.rabs(_rt._proj(M, 'raw')(K, h))
 
-def Descent_CertificateGrading_GradedModulus_zero():
+def Descent_Decision_CertificateGrading_GradedModulus_zero():
     return (lambda _grade, _step: 0.0)
 
 def liftGarbledRule(channel, δ):
@@ -1422,23 +1407,20 @@ def genotypeVariance(h):
 def genotypeThirdAbsMoment(h):
     return sum(((genotypeProb(h, g) * _rt.lpow(_rt.rabs(centeredAltAlleleCount(h, g)), 3.0))) for g in range(int(3)))
 
-def Descent_HWEScoreModel_scoreMean(model):
+def Descent_Foundations_HWEScoreModel_scoreMean(model):
     return sum(((_rt._proj(model, 'effect')(i) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'expectedAltAlleleCount'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
 
-def Descent_HWEScoreModel_scoreVariance(model):
+def Descent_Foundations_HWEScoreModel_scoreVariance(model):
     return sum(((_rt.lpow((_rt._proj(model, 'effect')(i)), 2.0) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'genotypeVariance'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
 
 def scoreThirdAbsMomentBound(model):
     return sum(((_rt.lpow(_rt.rabs(_rt._proj(model, 'effect')(i)), 3.0) * _rt._proj((_rt._proj(model, 'alleleFreq')(i)), 'genotypeThirdAbsMoment'))) for i in range(int(_rt.sumdim('i', len(_rt._proj(model, 'effect')), len(_rt._proj(model, 'alleleFreq'))))))
 
-def Descent_berryEsseenErrorBound(berryEsseenConstant, variance, thirdMomentSum):
+def Descent_Foundations_berryEsseenErrorBound(berryEsseenConstant, variance, thirdMomentSum):
     return _rt.rdiv((berryEsseenConstant * thirdMomentSum), ((variance * _rt.rsqrt(variance))))
 
-def Descent_HWEScoreModel_berryEsseenErrorBound(model, berryEsseenConstant):
-    return Descent_berryEsseenErrorBound(berryEsseenConstant, Descent_HWEScoreModel_scoreVariance(model), scoreThirdAbsMomentBound(model))
-
-def Phi(x):
-    return _rt.Phi(x)
+def Descent_Foundations_HWEScoreModel_berryEsseenErrorBound(model, berryEsseenConstant):
+    return Descent_Foundations_berryEsseenErrorBound(berryEsseenConstant, Descent_Foundations_HWEScoreModel_scoreVariance(model), scoreThirdAbsMomentBound(model))
 
 def homoscedastic(sigma2):
     return (lambda _: sigma2)
@@ -1448,9 +1430,6 @@ def latentLiability(s, e):
 
 def etaLiabilityThreshold(hN, T, s, x):
     return _rt._proj((noiseMeasureGivenX(hN, x, (diseaseEvent(T, x, s)))), 'toReal')
-
-def Descent_ReferenceEvaluation_witness():
-    return ofScale(((lambda x: x)), 1.0, 2.0, (by(norm_num)), (by(norm_num)))
 
 def variance(E, Z):
     return E(((lambda ω: _rt.lpow((_rt.sub(Z[int(ω)], E(Z))), 2.0))))
@@ -1686,12 +1665,6 @@ def measureBias(μ, Y, S):
 
 def signalVariance(dgp, signal):
     return var(dgp, signal)
-
-def outcomeMeanVariance(dgp):
-    return var(dgp, _rt._proj(dgp, 'trueExpectation'))
-
-def signalOutcomeCovariance(dgp, signal):
-    return measureCovariance(_rt._proj(dgp, 'jointMeasure'), ((lambda pc: signal(_rt._proj(pc, '1'), _rt._proj(pc, '2')))), ((lambda pc: _rt._proj(dgp, 'trueExpectation')(_rt._proj(pc, '1'), _rt._proj(pc, '2')))))
 
 def trueExp(hdgp):
     return (lambda p, c: ((_rt._proj(hdgp, 'alpha')(c) * p) + _rt._proj(hdgp, 'baseline')(c)))
@@ -2084,9 +2057,6 @@ def architectureMoment(P, r, i):
 def finiteProblem(P):
     return _rt._proj(_rt._proj(P, 'mixtureExperiment'), 'certificateProblem')
 
-def momentConstraintCalculus(P):
-    return explicitCalculus(_rt._proj(_rt._proj(P, 'finiteProblem'), 'modulus'), _rt._proj(P, 'logScale'))
-
 def Descent_MeanAbsoluteEffectCertificateProblem_atomCertificationGap(P, K, h):
     return _rt.rdiv(_rt._proj(_rt._proj(P, 'finiteProblem'), 'modulus')(0.0, h), _rt._proj(_rt._proj(P, 'finiteProblem'), 'atomModulus')(K, h))
 
@@ -2415,10 +2385,10 @@ def netReclassificationImprovement(event_nri, nonevent_nri):
     return Descent_Core_sum(event_nri, nonevent_nri)
 
 def sensFromR2(m, r2, T_p):
-    return liabilitySensitivity(Phi(), m, r2, T_p)
+    return liabilitySensitivity(Phi, m, r2, T_p)
 
 def specFromR2(m, r2, T_p, μ_control):
-    return liabilitySpecificity(Phi(), m, r2, T_p, μ_control)
+    return liabilitySpecificity(Phi, m, r2, T_p, μ_control)
 
 def ppv(prev, tpr, fpr):
     return _rt.rdiv((prev * tpr), (((prev * tpr) + (((1.0 - prev)) * fpr))))
@@ -3666,7 +3636,7 @@ def benchmarkHighScoreRate(threshold, μ, σ):
     return (1.0 - Phi((thresholdStandardizedCoordinate(threshold, μ, σ))))
 
 def berryEsseenBound(C, ρ, σ_sq, m):
-    return _rt.rdiv(Descent_berryEsseenErrorBound(C, σ_sq, ρ), _rt.rsqrt(m))
+    return _rt.rdiv(Descent_Foundations_berryEsseenErrorBound(C, σ_sq, ρ), _rt.rsqrt(m))
 
 def effectiveBlockCount(markers, correlationLength):
     return ratio(markers, correlationLength)
@@ -3951,20 +3921,20 @@ def logBayesRisk(μ, η, F):
 def brierBayesRisk(μ, η, F):
     return BayesRisk((brierRisk(μ, η)), F)
 
-def Descent_ploidy():
+def Descent_Program_ploidy():
     return Descent_Core_ploidy
 
 def hweGenotypeVariance(p):
     return Descent_Core_hweHeterozygosity(p)
 
 def coalescentTimeScale(Ne):
-    return (Descent_ploidy() * Ne)
+    return (Descent_Program_ploidy() * Ne)
 
 def meanAlleleFreq(p_1, p_2):
     return midpoint(p_1, p_2)
 
 def neiGst(p_1, p_2):
-    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((_rt.lpow(Descent_ploidy(), 2.0) * meanAlleleFreq(p_1, p_2)) * ((1.0 - meanAlleleFreq(p_1, p_2))))))
+    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((_rt.lpow(Descent_Program_ploidy(), 2.0) * meanAlleleFreq(p_1, p_2)) * ((1.0 - meanAlleleFreq(p_1, p_2))))))
 
 def hudsonFst(p_1, p_2):
     return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((p_1 * ((1.0 - p_2))) + (p_2 * ((1.0 - p_1))))))
@@ -4077,9 +4047,6 @@ def weightedBandEnsembleLoss(weight, target, deployment):
 def weightedBandPredictorLoss(weight, target, predictor):
     return sum((sum((_rt.mul(weight[int(i)][int(b)], _rt.lpow((_rt.sub(target[int(i)][int(b)], predictor[int(i)][int(b)])), 2.0))) for b in range(int(len(weight))))) for i in range(int(len(weight))))
 
-def Descent_StationaryTwoSliceField_witness(K):
-    return _rt._proj((Descent_StationarySpaceTimeField_witness(K)), 'twoSlice')(0.0)
-
 def coupledBinarySource(ω, _):
     return ω
 
@@ -4104,7 +4071,7 @@ def diploidAtomMass(j, q):
 def diploidFamily():
     return {'atomValue': diploidAtomValue, 'atomMass': diploidAtomMass}
 
-def Descent_Panel_reflect(panel):
+def Descent_Spectral_Panel_reflect(panel):
     return {'support': (lambda i: (1.0 - _rt._proj(panel, 'support')(i))), 'weight': _rt._proj(panel, 'weight')}
 
 def fold(panel):
@@ -4238,12 +4205,6 @@ def lagCompletionPermeability(covariance, lag, covarianceDerivative, tangent):
 def quadraticChannel(θ):
     return _rt.lpow(θ, 2.0)
 
-def standardizedSquare(h, g):
-    return _rt.rdiv(_rt.lpow((centeredAltAlleleCount(h, g)), 2.0), genotypeVariance(h))
-
-def mellinDrift(h):
-    return sum((((genotypeProb(h, g) * standardizedSquare(h, g)) * _rt.rlog((standardizedSquare(h, g))))) for g in range(int(3)))
-
 def hweMellinDrift(q):
     return ((_rt.lpow(((1.0 - (2.0 * q))), 2.0) * _rt.rlog((_rt.rdiv(_rt.lpow(((1.0 - (2.0 * q))), 2.0), (((2.0 * q) * ((1.0 - q)))))))) + (((4.0 * q) * ((1.0 - q))) * _rt.rlog(2.0)))
 
@@ -4255,9 +4216,6 @@ def hweLatticeCondition(q):
 
 def latticeCriticalMaf():
     return _rt.rdiv(((2.0 - _rt.rsqrt(2.0))), 4.0)
-
-def mellinJetVariance(h):
-    return ((sum((((genotypeProb(h, g) * standardizedSquare(h, g)) * _rt.lpow((_rt.rlog((standardizedSquare(h, g)))), 2.0))) for g in range(int(3)))) - _rt.lpow(mellinDrift(h), 2.0))
 
 def hweMellinJetVariance(q):
     return ((((((2.0 * q) * ((1.0 - q))) * _rt.lpow((_rt.rlog((_rt.rdiv((2.0 * q), ((1.0 - q)))))), 2.0)) + (_rt.lpow(((1.0 - (2.0 * q))), 2.0) * _rt.lpow((_rt.rlog((_rt.rdiv(_rt.lpow(((1.0 - (2.0 * q))), 2.0), (((2.0 * q) * ((1.0 - q)))))))), 2.0))) + (((2.0 * q) * ((1.0 - q))) * _rt.lpow((_rt.rlog((_rt.rdiv((2.0 * ((1.0 - q))), q)))), 2.0))) - _rt.lpow(hweMellinDrift(q), 2.0))
@@ -4271,9 +4229,6 @@ def hardCallLatticeIndex(*_a):
     _e, = _a[:1]
     _t = [(-1.0), 0.0, 1.0]
     return _t[_rt._ix(_e, 3, 'hardCallLatticeIndex')]
-
-def standardizedFourthMoment(h):
-    return sum(((genotypeProb(h, g) * _rt.lpow(standardizedSquare(h, g), 2.0))) for g in range(int(3)))
 
 def chiSquareBudget(P, densityRatio):
     return P(((lambda ω: _rt.lpow((_rt.sub(densityRatio[int(ω)], 1.0)), 2.0))))
@@ -4326,11 +4281,11 @@ def rawCrossMoment(E, X, Y):
 def optimalReadout(P, b):
     return _rt.rdiv(_rt._proj(P, 'crossSpectrum')(b), _rt._proj(P, 'featureSpectrum')(b))
 
-def Descent_FiniteSpectralModel_risk(P, readout):
+def Descent_Spectral_FiniteSpectralModel_risk(P, readout):
     return sum(((_rt.add(_rt.sub(_rt.mul(_rt._proj(P, 'featureSpectrum')(b), _rt.lpow(readout[int(b)], 2.0)), _rt.mul(_rt.mul(2.0, _rt._proj(P, 'crossSpectrum')(b)), readout[int(b)])), _rt._proj(P, 'targetPower')(b)))) for b in range(int(len(readout))))
 
 def degradation(source, target):
-    return (Descent_FiniteSpectralModel_risk(target, (optimalReadout(source))) - Descent_FiniteSpectralModel_risk(target, (optimalReadout(target))))
+    return (Descent_Spectral_FiniteSpectralModel_risk(target, (optimalReadout(source))) - Descent_Spectral_FiniteSpectralModel_risk(target, (optimalReadout(target))))
 
 def degradationProfile(source, target, b):
     return (_rt.lpow(((optimalReadout(source, b) - optimalReadout(target, b))), 2.0) * _rt._proj(target, 'featureSpectrum')(b))

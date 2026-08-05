@@ -162,9 +162,18 @@ step" are different states.
   `exp(N⁻¹Q)`, the `N`-th powers converge to `exp Q`.  `Generator`'s contraction estimate does
   the accumulation and `exp(N⁻¹Q)^N = exp Q` is exact, so there is no continuity argument at
   all: the whole limit lives at `t = 1`, which is what "`N` generations are one coalescent
-  unit" means.  STILL ABSENT: the instantiation at the coalescent's own transition matrix,
-  because this corpus has the chain as a KERNEL and not as a matrix; and Möhle's lemma proper,
-  the `A + B/N` form with `A` a projection, for models whose two time scales separate.
+  unit" means.  `Coalescent.PairChainLimit` then instantiates it for the case the group is built on, and
+  does so without ever exponentiating a matrix.  The two-state generator satisfies `Q² = -Q`
+  -- that IS a `Q`-matrix on two states -- and from that one identity every power of `1 + aQ`
+  has a closed form, so the comparison family `1 + (1-e^{-1/N})Q` is a semigroup by algebra
+  rather than by exponentiation.  That is why `tendsto_pow_of_close` was stated with the
+  comparison family left open.  The conclusion is
+  `(1 + N⁻¹Q)^N → 1 + (1 - e^{-1})Q`, whose coefficient is the chance two lineages have met
+  in one coalescent unit -- the operator statement of what
+  `Convergence.tendsto_pairDistinct_pow` counts off the parent law.  STILL ABSENT: the
+  many-state instantiation, which needs the block-count transition matrix this corpus does not
+  build; and Möhle's lemma proper, the `A + B/N` form with `A` a projection, for models whose
+  two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
   restriction commutes with looking down, at or above it the operation is invisible.  That is

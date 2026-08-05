@@ -1139,9 +1139,9 @@ argument is formalized.
 the lattice condition says exactly that its squared standardized value is the geometric
 mean of the two homozygotes'. -/
 def hardCallLatticeIndex : Foundations.DiploidGenotype → ℤ
-  | Foundations.DiploidGenotype.homRef => -1
-  | Foundations.DiploidGenotype.het => 0
-  | Foundations.DiploidGenotype.homAlt => 1
+  | DiploidGenotype.homRef => -1
+  | DiploidGenotype.het => 0
+  | DiploidGenotype.homAlt => 1
 
 /-- **The heterozygote's squared standardized value is exactly `2` at a lattice frequency.**
 

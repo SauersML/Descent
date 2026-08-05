@@ -765,6 +765,6 @@ theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
     weight covariance reference (fun environment ↦ (hweight environment).le) hpsd shift
       hreference ⟨environment, hweight environment, hdetect⟩
 
-end Descent.Spectral
+end
 
-end Descent
+end Descent.Spectral

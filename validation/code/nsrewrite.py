@@ -190,6 +190,12 @@ def introduces(text: str, a: int, b: int) -> bool:
     cannot be left to the compiler to find one at a time:
 
       * a declaration head or binder keyword immediately before it,
+      * a match/induction ALTERNATIVE -- `| zero =>`, `case succ =>`.  Lean
+        checks alternative names against the inductive's constructors, so a
+        prefix there does not fail to resolve, it reports "invalid alternative
+        name `Conditionals.zero`: expected `zero`" and then, separately, that
+        `zero` was never provided.  Nine of those came from one `induction ..
+        with` block,
       * `foo := ...` opening a line or following `{` / `,` -- a structure
         instance field, which names a FIELD and not a global,
       * `  foo : T` at an indent with no `:=` -- a structure field declaration.
@@ -198,6 +204,8 @@ def introduces(text: str, a: int, b: int) -> bool:
     pre = text[line_start:a]
     post = text[b:]
     if _DECL_KEYWORD.search(pre):
+        return True
+    if pre.strip() in ("|", "case", "|>"):
         return True
     if post.lstrip(" ").startswith(":="):
         stripped = pre.rstrip()
@@ -264,7 +272,8 @@ def namespaces_opened_here(text: str) -> set[str]:
     return out
 
 
-def rewrite_opens(text: str, directory: str, tokens: set[str]) -> str:
+def rewrite_opens(text: str, directory: str, tokens: set[str],
+                  inside: bool = False) -> str:
     """Repoint `open`/`export` of a namespace that has just moved.
 
     `Decision/FiniteMinimax.lean` opens `Descent.CertificateGrading`, which no
@@ -281,6 +290,13 @@ def rewrite_opens(text: str, directory: str, tokens: set[str]) -> str:
             head = f"{m.group(1)}{m.group(2) or ''} "
             parts = []
             for word in m.group(3).split():
+                if inside:
+                    parts.append(
+                        f"Descent.{directory}.{word[len('Descent.'):]}"
+                        if word.startswith("Descent.")
+                        and word[len("Descent."):].split(".")[0] in tokens
+                        else word)
+                    continue
                 if word.split(".")[0] in tokens:
                     parts.append(f"{directory}.{word}")
                 elif word.startswith("Descent.") and \
@@ -514,7 +530,8 @@ def main() -> int:
         with open(path, encoding="utf-8", errors="ignore") as fh:
             text = fh.read()
         new, _abs = rewrite_absolute(
-            rewrite_opens(rewrite_namespace(text, d), d, tokens), d, names)
+            rewrite_opens(rewrite_namespace(text, d), d, tokens, inside=True),
+            d, names)
         if new != text and args.write:
             with open(path, "w", encoding="utf-8") as fh:
                 fh.write(new)

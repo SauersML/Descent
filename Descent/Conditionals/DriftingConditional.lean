@@ -14,7 +14,7 @@ open scoped BigOperators
 /-!
 # A drifting response curve: what a moving threshold hides, and what the dynamics give back
 
-Imports Mathlib and `Descent.Foundations.Probability`, for the standard normal `Phi`.
+Imports Mathlib and `Descent.Foundations.Probability`, for the standard normal `Foundations.Phi`.
 
 A response curve is `c_t(s) = P(Y = 1 | S = s)` at time `t` — disease risk as a function of a
 polygenic score, ancestry coordinate, or any covariate, in a population that is itself moving.
@@ -116,7 +116,7 @@ theorem `link_rigidity`, and it is proved too.
 section ProbitRigidity
 
 /-- The probit response curve: `Φ (a x + b)` in the covariate `x`. -/
-noncomputable def probitCurve (a b x : ℝ) : ℝ := Phi (a * x + b)
+noncomputable def probitCurve (a b x : ℝ) : ℝ := Foundations.Phi (a * x + b)
 
 /-- **Probit rigidity: two points determine the curve.**
 
@@ -459,13 +459,13 @@ theorem reconstruct_between {n : ℕ} (M : Fin n → Fin n → ℝ) (p κ : Fin 
     this proof invokes is `tendsto_nhds_unique` on `ℝ`, the codomain, whose separation is
     ambient, and the argument never needs limits in `H` to be unique. -/
 theorem continuousInvariant_eq_at_limit {H : Type*} [TopologicalSpace H]
-    (Phi : H → ℝ) (hPhi : Continuous Phi) (flow : ℝ → H) (limit : H)
-    (hinv : ∀ t, Phi (flow t) = Phi (flow 0))
+    (invariant : H → ℝ) (hPhi : Continuous invariant) (flow : ℝ → H) (limit : H)
+    (hinv : ∀ t, invariant (flow t) = invariant (flow 0))
     (hconv : Filter.Tendsto flow Filter.atTop (nhds limit)) :
-    Phi (flow 0) = Phi limit := by
-  have hcomp : Filter.Tendsto (fun t ↦ Phi (flow t)) Filter.atTop (nhds (Phi limit)) :=
+    invariant (flow 0) = invariant limit := by
+  have hcomp : Filter.Tendsto (fun t ↦ invariant (flow t)) Filter.atTop (nhds (invariant limit)) :=
     (hPhi.tendsto limit).comp hconv
-  have hconst : Filter.Tendsto (fun t ↦ Phi (flow t)) Filter.atTop (nhds (Phi (flow 0))) := by
+  have hconst : Filter.Tendsto (fun t ↦ invariant (flow t)) Filter.atTop (nhds (invariant (flow 0))) := by
     simp [hinv]
   exact tendsto_nhds_unique hconst hcomp
 
@@ -572,7 +572,7 @@ standard one evaluated at the scaled argument.
     change of variable: `N(0,v)` is the pushforward of `N(0,1)` under multiplication by `√v`, so
     the measure of a half-line is the standard measure of the scaled half-line. -/
 theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
-    cdf (gaussianReal 0 v) x = Phi (x / Real.sqrt (v : ℝ)) := by
+    cdf (gaussianReal 0 v) x = Foundations.Phi (x / Real.sqrt (v : ℝ)) := by
   have hvpos : (0 : ℝ) < (v : ℝ) := by
     rcases v.coe_nonneg.lt_or_eq with h | h
     · exact h
@@ -606,7 +606,7 @@ open MeasureTheory ProbabilityTheory in
     the difference. The proof includes the passage from the lower integral of measures to the
     Bochner integral of the cdf. -/
 theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
-    ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1)
+    ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1)
       = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α := by
   set γ : Measure ℝ := gaussianReal 0 1 with hγdef
   set S : Set (ℝ × ℝ) := {p : ℝ × ℝ | p.2 - β * p.1 ≤ α} with hSdef
@@ -622,15 +622,15 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     constructor
     · intro h; linarith
     · intro h; linarith
-  have hPhi : ∀ t : ℝ, Phi t = (γ (Set.Iic t)).toReal := by
+  have hPhi : ∀ t : ℝ, Foundations.Phi t = (γ (Set.Iic t)).toReal := by
     intro t
     show cdf (gaussianReal 0 1) t = _
     rw [cdf_eq_real, measureReal_def]
   have hmono : Monotone (fun t : ℝ ↦ γ (Set.Iic t)) := fun a b hab ↦
     measure_mono (Set.Iic_subset_Iic.mpr hab)
-  have hlhs : ∫ z, Phi (α + β * z) ∂γ
+  have hlhs : ∫ z, Foundations.Phi (α + β * z) ∂γ
       = (∫⁻ z, γ (Set.Iic (α + β * z)) ∂γ).toReal := by
-    have hfun : (fun z ↦ Phi (α + β * z))
+    have hfun : (fun z ↦ Foundations.Phi (α + β * z))
         = fun z ↦ (γ (Set.Iic (α + β * z))).toReal := funext fun z ↦ hPhi _
     rw [hfun]
     refine integral_toReal ?_ ?_
@@ -684,7 +684,7 @@ open MeasureTheory ProbabilityTheory in
     centred Gaussian cdf, and `cdf_gaussianReal_zero_mean` — which IS proved — standardises it.
     So Theorem 3 rests on one measure-theoretic assembly, not on the identity as a whole. -/
 theorem gaussianAverage_probit (α β : ℝ) :
-    ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = Phi (α / Real.sqrt (1 + β ^ 2)) := by
+    ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1) = Foundations.Phi (α / Real.sqrt (1 + β ^ 2)) := by
   have hne : (⟨1 + β ^ 2, by positivity⟩ : NNReal) ≠ 0 := by
     intro h
     have h' : (1 + β ^ 2 : ℝ) = 0 := by simpa using congrArg NNReal.toReal h
@@ -702,11 +702,11 @@ by `a ↦ a e^{-λt} / √(1 + a²σ²)`.
     resulting slope is the one whose inverse square linearises to `Ȧ = 2λA + 1`, which is
     `inverseSquare_linearises_probit_flow` below. -/
 theorem probit_invariant_under_ou (lam t a₀ b₀ x sigma : ℝ) :
-    ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1)
-      = Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀)
+    ∫ z, Foundations.Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1)
+      = Foundations.Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀)
           / Real.sqrt (1 + a₀ ^ 2 * sigma ^ 2)) := by
-  have hshape : (fun z ↦ Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀))
-      = fun z ↦ Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) + (a₀ * sigma) * z) := by
+  have hshape : (fun z ↦ Foundations.Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀))
+      = fun z ↦ Foundations.Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) + (a₀ * sigma) * z) := by
     funext z
     congr 1
     ring
@@ -745,8 +745,8 @@ parameters exhibited rather than merely asserted to exist. This is Theorem 3 rea
 single-index form rigidity is stated against. -/
 theorem probit_link_invariant (lam t a₀ b₀ σ : ℝ) :
     ∃ a' b' : ℝ, ∀ x,
-      ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1)
-        = Phi (a' * x + b') := by
+      ∫ z, Foundations.Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1)
+        = Foundations.Phi (a' * x + b') := by
   refine ⟨a₀ * Real.exp (-(lam * t)) / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
     b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x ↦ ?_⟩
   rw [probit_invariant_under_ou]
@@ -763,13 +763,13 @@ cannot distinguish a genuine penetrance ceiling from persistent label noise or i
 ascertainment without separate tail calibration. -/
 theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
     ∃ a' b' : ℝ, ∀ x,
-      ∫ z, (p + q * Phi (a₀ * (x + σ * z) + b₀)) ∂(gaussianReal 0 1)
-        = p + q * Phi (a' * x + b') := by
+      ∫ z, (p + q * Foundations.Phi (a₀ * (x + σ * z) + b₀)) ∂(gaussianReal 0 1)
+        = p + q * Foundations.Phi (a' * x + b') := by
   refine ⟨a₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
     b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x ↦ ?_⟩
-  have hPhiMeas : Measurable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀)) :=
+  have hPhiMeas : Measurable (fun z : ℝ ↦ Foundations.Phi (a₀ * (x + σ * z) + b₀)) :=
     Foundations.strictMono_Phi.monotone.measurable.comp (by fun_prop)
-  have hPhiInt : Integrable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀))
+  have hPhiInt : Integrable (fun z : ℝ ↦ Foundations.Phi (a₀ * (x + σ * z) + b₀))
       (gaussianReal 0 1) := by
     refine Integrable.mono' (integrable_const (1 : ℝ)) hPhiMeas.aestronglyMeasurable ?_
     filter_upwards with z
@@ -779,8 +779,8 @@ theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
   rw [integral_add (integrable_const p) (hPhiInt.const_mul q), integral_const,
     integral_const_mul]
   simp only [measureReal_def, measure_univ, ENNReal.toReal_one, one_smul]
-  have hshape : (fun z ↦ Phi (a₀ * (x + σ * z) + b₀)) =
-      fun z ↦ Phi ((a₀ * x + b₀) + (a₀ * σ) * z) := by
+  have hshape : (fun z ↦ Foundations.Phi (a₀ * (x + σ * z) + b₀)) =
+      fun z ↦ Foundations.Phi ((a₀ * x + b₀) + (a₀ * σ) * z) := by
     funext z
     congr 1
     ring
@@ -791,7 +791,7 @@ theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
 /-- A positive horizontal and vertical scaling preserves the strict ordering of genetic or
 environmental liability. -/
 theorem affineProbit_strictMono (p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) :
-    StrictMono (fun u ↦ p + q * Phi (α * u + β)) := by
+    StrictMono (fun u ↦ p + q * Foundations.Phi (α * u + β)) := by
   intro u v huv
   apply add_lt_add_left
   apply mul_lt_mul_of_pos_left _ hq
@@ -799,15 +799,15 @@ theorem affineProbit_strictMono (p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) :
   nlinarith
 
 /-- The natural floor/ceiling constraints put every affine-probit risk strictly between zero and
-one. Endpoints may equal zero and one because `Phi` never attains either at a finite liability. -/
+one. Endpoints may equal zero and one because `Foundations.Phi` never attains either at a finite liability. -/
 theorem affineProbit_mem_Ioo (p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q)
     (hpq : p + q ≤ 1) (u : ℝ) :
-    0 < p + q * Phi (α * u + β) ∧ p + q * Phi (α * u + β) < 1 := by
-  have hPhiPos : 0 < Phi (α * u + β) := by
-    have hnonneg : 0 ≤ Phi (α * u + β - 1) := ProbabilityTheory.cdf_nonneg _ _
+    0 < p + q * Foundations.Phi (α * u + β) ∧ p + q * Foundations.Phi (α * u + β) < 1 := by
+  have hPhiPos : 0 < Foundations.Phi (α * u + β) := by
+    have hnonneg : 0 ≤ Foundations.Phi (α * u + β - 1) := ProbabilityTheory.cdf_nonneg _ _
     exact lt_of_le_of_lt hnonneg (Foundations.strictMono_Phi (by linarith))
-  have hPhiLtOne : Phi (α * u + β) < 1 := by
-    have hle : Phi (α * u + β + 1) ≤ 1 := ProbabilityTheory.cdf_le_one _ _
+  have hPhiLtOne : Foundations.Phi (α * u + β) < 1 := by
+    have hle : Foundations.Phi (α * u + β + 1) ≤ 1 := ProbabilityTheory.cdf_le_one _ _
     exact lt_of_lt_of_le (Foundations.strictMono_Phi (by linarith)) hle
   constructor <;> nlinarith
 
@@ -1579,7 +1579,7 @@ Everything here is proved. -/
 open Filter Topology in
 /-- The probit tends to the floor at low liability. -/
 theorem tendsto_affineProbit_atBot (p q α β : ℝ) (hα : 0 < α) :
-    Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atBot (𝓝 p) := by
+    Filter.Tendsto (fun u ↦ p + q * Foundations.Phi (α * u + β)) Filter.atBot (𝓝 p) := by
   have harg : Filter.Tendsto (fun u : ℝ ↦ α * u + β) Filter.atBot Filter.atBot := by
     rw [Filter.tendsto_atBot]
     intro c
@@ -1587,7 +1587,7 @@ theorem tendsto_affineProbit_atBot (p q α β : ℝ) (hα : 0 < α) :
     have h1 : α * u ≤ α * ((c - β) / α) := mul_le_mul_of_nonneg_left hu (le_of_lt hα)
     have h2 : α * ((c - β) / α) = c - β := by field_simp
     linarith
-  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Phi (α * u + β)) Filter.atBot (𝓝 0) :=
+  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Foundations.Phi (α * u + β)) Filter.atBot (𝓝 0) :=
     (ProbabilityTheory.tendsto_cdf_atBot _).comp harg
   have := (hPhi.const_mul q).const_add p
   simpa using this
@@ -1595,7 +1595,7 @@ theorem tendsto_affineProbit_atBot (p q α β : ℝ) (hα : 0 < α) :
 open Filter Topology in
 /-- The probit tends to the ceiling at high liability. -/
 theorem tendsto_affineProbit_atTop (p q α β : ℝ) (hα : 0 < α) :
-    Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atTop (𝓝 (p + q)) := by
+    Filter.Tendsto (fun u ↦ p + q * Foundations.Phi (α * u + β)) Filter.atTop (𝓝 (p + q)) := by
   have harg : Filter.Tendsto (fun u : ℝ ↦ α * u + β) Filter.atTop Filter.atTop := by
     rw [Filter.tendsto_atTop]
     intro c
@@ -1603,7 +1603,7 @@ theorem tendsto_affineProbit_atTop (p q α β : ℝ) (hα : 0 < α) :
     have h1 : α * ((c - β) / α) ≤ α * u := mul_le_mul_of_nonneg_left hu (le_of_lt hα)
     have h2 : α * ((c - β) / α) = c - β := by field_simp
     linarith
-  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Phi (α * u + β)) Filter.atTop (𝓝 1) :=
+  have hPhi : Filter.Tendsto (fun u : ℝ ↦ Foundations.Phi (α * u + β)) Filter.atTop (𝓝 1) :=
     (ProbabilityTheory.tendsto_cdf_atTop _).comp harg
   have := (hPhi.const_mul q).const_add p
   simpa using this
@@ -1611,24 +1611,24 @@ theorem tendsto_affineProbit_atTop (p q α β : ℝ) (hα : 0 < α) :
 /-- **The floor is identified**: it is the low-liability limit, so two affine-probit curves that
 agree everywhere have the same penetrance floor. -/
 theorem affineProbit_floor_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α')
-    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) :
     p = p' := by
   have h1 := tendsto_affineProbit_atBot p q α β hα
   have h2 := tendsto_affineProbit_atBot p' q' α' β' hα'
-  have hfun : (fun u ↦ p + q * Phi (α * u + β))
-      = fun u ↦ p' + q' * Phi (α' * u + β') := funext h
+  have hfun : (fun u ↦ p + q * Foundations.Phi (α * u + β))
+      = fun u ↦ p' + q' * Foundations.Phi (α' * u + β') := funext h
   rw [hfun] at h1
   exact tendsto_nhds_unique h1 h2
 
 /-- **The scale is identified**: it is the distance between the two tail limits. -/
 theorem affineProbit_scale_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α')
-    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) :
     q = q' := by
   have hp : p = p' := affineProbit_floor_unique p q α β p' q' α' β' hα hα' h
   have h1 := tendsto_affineProbit_atTop p q α β hα
   have h2 := tendsto_affineProbit_atTop p' q' α' β' hα'
-  have hfun : (fun u ↦ p + q * Phi (α * u + β))
-      = fun u ↦ p' + q' * Phi (α' * u + β') := funext h
+  have hfun : (fun u ↦ p + q * Foundations.Phi (α * u + β))
+      = fun u ↦ p' + q' * Foundations.Phi (α' * u + β') := funext h
   rw [hfun] at h1
   have := tendsto_nhds_unique h1 h2
   rw [hp] at this
@@ -1636,21 +1636,21 @@ theorem affineProbit_scale_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α)
 
 /-- With floor and scale pinned, the two probit arguments agree pointwise. -/
 theorem affineProbit_arg_eq (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α')
-    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) (u : ℝ) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) (u : ℝ) :
     α * u + β = α' * u + β' := by
   have hp : p = p' := affineProbit_floor_unique p q α β p' q' α' β' hα hα' h
   have hqq : q = q' := affineProbit_scale_unique p q α β p' q' α' β' hα hα' h
   have hu := h u
   rw [← hp, ← hqq] at hu
-  have : Phi (α * u + β) = Phi (α' * u + β') := by
-    have hcancel : q * Phi (α * u + β) = q * Phi (α' * u + β') := by linarith
+  have : Foundations.Phi (α * u + β) = Foundations.Phi (α' * u + β') := by
+    have hcancel : q * Foundations.Phi (α * u + β) = q * Foundations.Phi (α' * u + β') := by linarith
     exact mul_left_cancel₀ (ne_of_gt hq) hcancel
   exact Foundations.strictMono_Phi.injective this
 
 /-- **The slope is identified.** -/
 theorem affineProbit_slope_unique (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α)
     (hα' : 0 < α')
-    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) :
     α = α' := by
   have h0 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 0
   have h1 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 1
@@ -1662,7 +1662,7 @@ rigidity theorem produces is the only one, so its floor and ceiling are properti
 rather than of the parametrisation chosen for it. -/
 theorem affineProbit_intercept_unique (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α)
     (hα' : 0 < α')
-    (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) :
     β = β' := by
   have h0 := affineProbit_arg_eq p q α β p' q' α' β' hq hα hα' h 0
   simpa using h0
@@ -2158,7 +2158,7 @@ open MeasureTheory ProbabilityTheory Complex in
 `cdf_gaussianReal_zero_mean` does the centred case, which is pure change of variable. The mean is
 a translation, and translating the half-line is the whole of the general case. -/
 theorem cdf_gaussianReal_eq_Phi (m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
-    ((gaussianReal m v) (Set.Iic x)).toReal = Phi ((x - m) / Real.sqrt (v : ℝ)) := by
+    ((gaussianReal m v) (Set.Iic x)).toReal = Foundations.Phi ((x - m) / Real.sqrt (v : ℝ)) := by
   have hmap : (gaussianReal 0 v).map (fun y ↦ y + m) = gaussianReal m v := by
     have h := gaussianReal_map_add_const (μ := (0 : ℝ)) (v := v) m
     rwa [zero_add] at h
@@ -2199,7 +2199,7 @@ theorem liability_cdf_eq_affineProbit_of_charFun_selfSimilar
         = charFun ν (t / a) *
           Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) :
     ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧
-      ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Phi (α * u + β) := by
+      ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Foundations.Phi (α * u + β) := by
   obtain ⟨a, b, ha, heq⟩ := hself 1 one_pos
   have hmassR : 0 < ν.real Set.univ := hmass
   have ha1 : a < 1 := selfSimilar_alpha_lt_one ν hmassR one_ne_zero heq
@@ -2250,7 +2250,7 @@ theorem link_rigidity (L : ℝ → ℝ) (hmono : StrictMono L)
     (hbdd : ∀ u, 0 < L u ∧ L u < 1)
     (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ,
       ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) :
-    ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Phi (α * u + β) := by
+    ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Foundations.Phi (α * u + β) := by
   have hcont : Continuous L := link_continuous L hmono hbdd hinv
   obtain ⟨ν, hνfin, huniv, hrep⟩ := link_stieltjes_representation L hmono hbdd hcont
   letI : IsFiniteMeasure ν := hνfin

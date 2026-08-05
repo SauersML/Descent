@@ -239,6 +239,6 @@ theorem mean_nonlinear_conditional_excess_eq_quadratic
   rw [hpointwise, E.add_eval, E.smul_eval, horth]
   ring
 
-end Descent.Spectral
+end
 
-end Descent
+end Descent.Spectral
