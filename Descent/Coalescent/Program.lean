@@ -49,9 +49,9 @@ reads as a covered one.
 ## The mechanism layer, added after the two papers were covered
 
 The group's first pass proved statements of the form *given this formula, these consequences
-follow*.  Six modules now supply the layer under that -- *this formula follows from this
+follow*.  Seven modules now supply the layer under that -- *this formula follows from this
 explicitly defined stochastic mechanism* -- and they are listed together because the point is
-the layer, not the six results.
+the layer, not the seven results.
 
 * `Coalescent.Pedigree` writes down the sentence K-G section 2 defines the subject with: an
   explicit sequence of parent maps, an explicit sample, and `ℛ_s` as the kernel of "who is
