@@ -418,4 +418,76 @@ theorem survivalWeightedMix_at_reference_point :
     survivalWeightedMix 1 0 0 = 1 / 2 := by
   norm_num [survivalWeightedMix]
 
+/-! ### Discrete shapes
+
+Two indicator maps and one overlap profile, each written out in more than one module
+before this. They are not `ℝ`-arithmetic in the sense of the kernels above, but they are
+the same kind of object: a shape several named quantities instantiate. -/
+
+/-- Kronecker delta, `1` when the arguments agree and `0` otherwise.
+
+Instantiated by a persistence transition, a context-match quality, and a stay kernel --
+three names in two modules for "did the state stay the same". -/
+noncomputable def kronecker {α : Type*} [DecidableEq α] (x y : α) : ℝ :=
+  if x = y then 1 else 0
+
+/-- **The delta is one exactly on the diagonal.** -/
+@[simp] theorem kronecker_self {α : Type*} [DecidableEq α] (x : α) :
+    kronecker x x = 1 := by
+  unfold kronecker; simp
+
+/-- **And zero off it.** -/
+theorem kronecker_of_ne {α : Type*} [DecidableEq α] {x y : α} (h : x ≠ y) :
+    kronecker x y = 0 := by
+  unfold kronecker; simp [h]
+
+/-- **The delta is symmetric**, which is the property that makes it a transition kernel
+of a reversible chain rather than an arbitrary indicator. -/
+theorem kronecker_comm {α : Type*} [DecidableEq α] (x y : α) :
+    kronecker x y = kronecker y x := by
+  unfold kronecker
+  by_cases h : x = y
+  · simp [h]
+  · simp [h, Ne.symm h]
+
+/-- The complementary indicator, `0` on the diagonal and `1` off it: a switching
+transition, a sequence distance, a swap kernel. -/
+noncomputable def antiKronecker {α : Type*} [DecidableEq α] (x y : α) : ℝ :=
+  if x = y then 0 else 1
+
+/-- **The two indicators are complementary**, which is what makes a pair of them a
+probability distribution over "stayed" and "switched" rather than two unrelated
+functions. -/
+theorem kronecker_add_antiKronecker {α : Type*} [DecidableEq α] (x y : α) :
+    kronecker x y + antiKronecker x y = 1 := by
+  unfold kronecker antiKronecker
+  by_cases h : x = y <;> simp [h]
+
+/-- **The delta unfolds on sight.**
+
+Marked `simp` deliberately. `DynamicsContrast.contextMatchQuality` used to write this body
+out rather than delegate, and its docstring gave the reason: the witness proofs below
+evaluate the definition by `simp`, and a delegation stops them one unfolding short. That
+was a correct objection to delegating WITHOUT this lemma. With it, a wrapper evaluates
+exactly as an inlined body does, and the objection is answered rather than overruled. -/
+@[simp] theorem kronecker_eq {α : Type*} [DecidableEq α] (x y : α) :
+    kronecker x y = if x = y then 1 else 0 := rfl
+
+/-- **The complementary indicator unfolds likewise**, for the same reason. -/
+@[simp] theorem antiKronecker_eq {α : Type*} [DecidableEq α] (x y : α) :
+    antiKronecker x y = if x = y then 0 else 1 := rfl
+
+/-- Overlap profile, `x(1 - qx) / (1 - qx(1 - x))`.
+
+The overlap-gap order parameter of a superposed landscape, written out under two names in
+two modules that do not import each other. Not an arithmetic shape anyone would arrive at
+twice by accident -- two copies of this body is a copied derivation. -/
+noncomputable def overlapProfile (q x : ℝ) : ℝ :=
+  x * (1 - q * x) / (1 - q * x * (1 - x))
+
+/-- **At zero coupling the profile is the identity.** With `q = 0` there is no overlap
+gap and the order parameter is just the mass. -/
+@[simp] theorem overlapProfile_at_zero (x : ℝ) : overlapProfile 0 x = x := by
+  unfold overlapProfile; simp
+
 end Descent.Core

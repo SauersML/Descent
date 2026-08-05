@@ -19,6 +19,7 @@ import Descent.Conditionals.FunctionalDescent
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -1600,7 +1601,8 @@ noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
 
 /-- A transition that preserves the context. -/
 noncomputable def persistentTransition
-    (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
+    (x y : BinaryBiologicalState) : ℝ :=
+  Descent.Core.kronecker x y
 
 /-- Reference evaluations: the persistent kernel is the identity matrix on two states. -/
 theorem persistentTransition_at_reference_point :
@@ -1610,7 +1612,8 @@ theorem persistentTransition_at_reference_point :
 
 /-- A transition that swaps the two contexts. -/
 noncomputable def switchingTransition
-    (x y : BinaryBiologicalState) : ℝ := if x = y then 0 else 1
+    (x y : BinaryBiologicalState) : ℝ :=
+  Descent.Core.antiKronecker x y
 
 /-- Reference evaluations: the switching kernel is the exchange matrix. -/
 theorem switchingTransition_at_reference_point :
@@ -1635,7 +1638,8 @@ transition.  `Descent.contextMatchQuality_eq_persistentTransition` says so; the 
 written out here rather than delegating, because the witness proofs below evaluate this
 definition by `simp` and a delegation stops them one unfolding short. -/
 noncomputable def contextMatchQuality
-    (x y : BinaryBiologicalState) : ℝ := if x = y then 1 else 0
+    (x y : BinaryBiologicalState) : ℝ :=
+  Descent.Core.kronecker x y
 
 /-- Reference evaluations: quality one on a match, zero on a mismatch. -/
 theorem contextMatchQuality_at_reference_point :

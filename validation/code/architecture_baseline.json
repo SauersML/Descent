@@ -1,11 +1,11 @@
 {
  "composition_theorems": 23,
  "cross_module_reuse_pct": 8.82,
- "duplicate_body_extras": 37,
- "duplicate_body_groups": 32,
+ "duplicate_body_extras": 33,
+ "duplicate_body_groups": 30,
  "foundation_inverted": 3,
  "foundation_not_yet_load_bearing": 4,
  "modules": 185,
  "silent_falsifications": 0,
- "theorems": 6034
+ "theorems": 6042
 }

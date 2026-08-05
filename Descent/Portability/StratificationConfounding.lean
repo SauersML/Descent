@@ -827,7 +827,7 @@ noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : �
 /-- Heterozygosity is maximized at p = 0.5 and decreasing as p moves away. -/
 theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
     0 < hweHeterozygosity p := by
-  unfold hweHeterozygosity
+  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have : 0 < 1 - p := by linarith
   positivity
 

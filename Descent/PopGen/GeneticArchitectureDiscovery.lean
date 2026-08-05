@@ -67,13 +67,14 @@ section GWASDiscovery
     `0.76` to `1.33` of this form across that design, and exactly `1.00` where
     the two frequencies coincide, so a grid at matched frequencies would have
     had no power and this one does. -/
-def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
+noncomputable def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
   n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem discoveryNCP_at_reference_point :
     discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [discoveryNCP, genotypeVarianceHWE]
+  norm_num [discoveryNCP, genotypeVarianceHWE,
+      Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
@@ -126,7 +127,7 @@ the other -- and the noncentrality parameter is even in the first and, through
 of the variant, and which allele the assembly happens to call reference is not. -/
 theorem discoveryNCP_allele_swap (n β maf ld : ℝ) :
     discoveryNCP n (-β) (1 - maf) ld = discoveryNCP n β maf ld := by
-  unfold discoveryNCP genotypeVarianceHWE
+  unfold discoveryNCP genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- **Rescaling every effect size by `c` scales the noncentrality parameter by `c²`.**
@@ -167,7 +168,8 @@ theorem discoveryNCP_increases_with_n
     have h_var : 0 < 2 * p * (1 - p) := by
       nlinarith
     exact mul_pos (mul_pos hβ2 hld2) h_var
-  simpa [genotypeVarianceHWE, mul_assoc] using
+  simpa [genotypeVarianceHWE, mul_assoc,
+      Descent.Core.hweHeterozygosity, Descent.Core.ploidy] using
     mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) h_factor
 
 /-- On the left half of the allele-frequency spectrum, genotype variance is
@@ -181,7 +183,7 @@ theorem genotypeVarianceHWE_strictMono_left_half
   -- `two_mul_one_sub_strictMono_le_half` in `Descent.Foundations.Probability`, where it is about a
   -- real number rather than about a minor allele.  This theorem is that fact read through
   -- the name the genotype variance carries here.
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   exact two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
@@ -210,7 +212,7 @@ theorem different_populations_different_hits
     exact genotypeVarianceHWE_strictMono_left_half
       maf₁ maf₂ h_maf_order h_maf₁_half
   have h_var_pos : 0 < genotypeVarianceHWE maf₂ := by
-    unfold genotypeVarianceHWE
+    unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
     have h_maf₂_lt_one : maf₂ < 1 := by
       have h_maf₂_lt_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_maf_order h_maf₁_half
       linarith
@@ -763,7 +765,8 @@ noncomputable def multiTraitDiscoveryNCP
 theorem multiTraitDiscoveryNCP_at_reference_point :
     multiTraitDiscoveryNCP 1 1 0 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,
-    multiTraitEffectiveSampleSize]
+    multiTraitEffectiveSampleSize,
+      Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 
 /-- Genetic correlation is bounded by [-1, 1] (Cauchy-Schwarz). -/
@@ -1039,7 +1042,7 @@ theorem multi_trait_increases_effective_n
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
     have h_ld_sq : 0 < ld ^ 2 := sq_pos_of_ne_zero h_ld
     have h_var : 0 < genotypeVarianceHWE maf := by
-      unfold genotypeVarianceHWE
+      unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
       nlinarith [mul_pos h_maf (sub_pos.mpr h_maf_lt_one)]
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor

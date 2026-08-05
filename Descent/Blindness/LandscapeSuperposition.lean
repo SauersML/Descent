@@ -506,26 +506,28 @@ theorem goldenCorrelationThreshold_sq_add_self :
 /-- Population overlap profile for the rank-two correlated sparse-design witness.  Here `x`
 is the missed-support fraction and `q` is the squared active correlation. -/
 noncomputable def populationOverlapProfile (q x : ℝ) : ℝ :=
-  x * (1 - q * x) / (1 - q * x * (1 - x))
+  Descent.Core.overlapProfile q x
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem populationOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
     (hzero : (1 - q * x * (1 - x)) = 0) :
     populationOverlapProfile q x = 0 := by
-  unfold populationOverlapProfile
+  unfold populationOverlapProfile Descent.Core.overlapProfile
   rw [hzero, div_zero]
 
 
 /-- The far, disjoint candidate has normalized loss `1 - q`. -/
 @[simp] theorem populationOverlapProfile_one (q : ℝ) :
     populationOverlapProfile q 1 = 1 - q := by
-  simp [populationOverlapProfile]
+  simp [populationOverlapProfile,
+      Descent.Core.overlapProfile]
 
 /-- The planted support has zero excess population loss. -/
 @[simp] theorem populationOverlapProfile_zero (q : ℝ) :
     populationOverlapProfile q 0 = 0 := by
-  simp [populationOverlapProfile]
+  simp [populationOverlapProfile,
+      Descent.Core.overlapProfile]
 
 /-- Endpoint derivative numerator of the overlap profile.  Its sign detects whether the
 profile turns down before reaching the disjoint-support endpoint. -/

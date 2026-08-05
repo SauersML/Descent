@@ -880,7 +880,8 @@ noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
   norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
-      Descent.Core.product]
+      Descent.Core.product,
+      Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 
 /-- GWAS non-centrality vanishes exactly for an empty study, null effect, or
@@ -934,7 +935,7 @@ theorem ncp_ratio_from_maf
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
-  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   simp only [mul_one]
   apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
   apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hn)

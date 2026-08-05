@@ -340,4 +340,26 @@ satisfied by an estimator that agreed to within a percent. -/
 theorem hudsonOfNei_at_half : (hudsonOfNei ⟨1 / 2⟩).value = 2 / 3 := by
   unfold hudsonOfNei; norm_num
 
+/-- Hardy--Weinberg heterozygosity, `2p(1-p)`.
+
+Two names in the corpus carry this body -- `hweHeterozygosity` and
+`genotypeVarianceHWE` -- and they are NOT one quantity: the first is the probability a
+diploid is heterozygous, the second the variance of a `0/1/2` dosage. Under
+Hardy--Weinberg those numbers coincide, and that coincidence is a fact about the
+proportions rather than about the arithmetic. Both call this. -/
+noncomputable def hweHeterozygosity (p : ℝ) : ℝ := ploidy * p * (1 - p)
+
+/-- **The maximum is at `p = 1/2`, where it is `1/2`.** The value that fixes the
+coefficient: a body carrying any other multiple is still positive, still symmetric about
+one half, and still vanishes at the boundaries. -/
+theorem hweHeterozygosity_at_half : hweHeterozygosity (1 / 2) = 1 / 2 := by
+  unfold hweHeterozygosity ploidy; norm_num
+
+/-- **Symmetric under relabelling the allele.** Which allele is called the reference is a
+convention, and a heterozygosity that changed when it flipped would be reporting the
+convention. -/
+theorem hweHeterozygosity_allele_swap (p : ℝ) :
+    hweHeterozygosity (1 - p) = hweHeterozygosity p := by
+  unfold hweHeterozygosity; ring
+
 end Descent.Core

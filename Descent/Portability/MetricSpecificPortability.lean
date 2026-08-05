@@ -1736,14 +1736,14 @@ held fixed while this happens.
 /-- Population loss profile at overlap fraction `x` from the truth, for coupling
 strength squared `q`. -/
 noncomputable def ogpOverlapProfile (q x : ℝ) : ℝ :=
-  x * (1 - q * x) / (1 - q * x * (1 - x))
+  Descent.Core.overlapProfile q x
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem ogpOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
     (hzero : (1 - q * x * (1 - x)) = 0) :
     ogpOverlapProfile q x = 0 := by
-  unfold ogpOverlapProfile
+  unfold ogpOverlapProfile Descent.Core.overlapProfile
   rw [hzero, div_zero]
 
 
@@ -1751,7 +1751,7 @@ theorem ogpOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
 the fraction of the loss that the coupling cannot explain away. -/
 theorem ogpOverlapProfile_at_zero_overlap (q : ℝ) :
     ogpOverlapProfile q 1 = 1 - q := by
-  unfold ogpOverlapProfile
+  unfold ogpOverlapProfile Descent.Core.overlapProfile
   norm_num
 
 /-- The sign of this quadratic decides whether the loss profile has an interior

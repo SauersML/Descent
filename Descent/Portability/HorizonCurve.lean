@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -105,7 +106,8 @@ end Flatness
 noncomputable def uniformTwo : Fin 2 → ℝ := fun _ ↦ 1 / 2
 
 /-- The kernel that never moves. -/
-def stayKernel (i j : Fin 2) : ℝ := if i = j then 1 else 0
+noncomputable def stayKernel (i j : Fin 2) : ℝ :=
+  Descent.Core.kronecker i j
 
 /-- Reference evaluations: the stay kernel is the identity matrix on two states. -/
 theorem stayKernel_at_reference_point :
@@ -114,7 +116,8 @@ theorem stayKernel_at_reference_point :
 
 
 /-- The kernel that always moves. -/
-def swapKernel (i j : Fin 2) : ℝ := if i = j then 0 else 1
+noncomputable def swapKernel (i j : Fin 2) : ℝ :=
+  Descent.Core.antiKronecker i j
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem swapKernel_at_reference_point :
@@ -127,7 +130,7 @@ for, none at the other. This is the two-endpoint integrand the naive average can
 
 It is `stayKernel` under the reading this file uses it for -- one function, two names for
 what it means here -- and it calls that definition rather than restating its body. -/
-def agreement (i j : Fin 2) : ℝ := stayKernel i j
+noncomputable def agreement (i j : Fin 2) : ℝ := stayKernel i j
 
 /-- Reference evaluations: agreement is one on a match and zero otherwise. -/
 theorem agreement_at_reference_point :

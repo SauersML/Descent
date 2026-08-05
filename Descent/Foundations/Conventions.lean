@@ -600,7 +600,7 @@ spellings of one. Without an exhibited point the conflation can be
 reintroduced by anyone who reads the `neiGst` name and believes it. -/
 theorem neiGst_ne_hudsonFst :
     neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy
   norm_num
 
 /-- **A witness ON the `p̄ = 1/2` slice**, where the estimators are sometimes
@@ -614,7 +614,7 @@ from `neiGst_ne_hudsonFst` because that witness sits at `p̄ = 2/5` and
 so cannot exclude the slice that was actually claimed. -/
 theorem neiGst_ne_hudsonFst_at_mean_half :
     neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy
   norm_num
 
 /-- **NO FIXED FACTOR CONVERTS NEI'S `G_ST` INTO HUDSON'S `F_ST`.**
@@ -645,7 +645,7 @@ theorem no_constant_scales_neiGst_to_hudsonFst :
   rintro ⟨c, hc⟩
   have h₁ := hc (1/5) (3/5) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   have h₂ := hc (9/10) (1/10) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint at h₁ h₂
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy at h₁ h₂
   norm_num at h₁ h₂
   linarith
 
@@ -680,7 +680,7 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold neiGst betweenSubgroupVariance ploidy Descent.Core.ploidy Descent.Core.halfDiffSq
+  unfold neiGst betweenSubgroupVariance ploidy Descent.Core.halfDiffSq Descent.Core.ploidy
   field_simp
   ring
 
@@ -788,7 +788,7 @@ theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
     hudsonBbpSpike 4 2 (9/10) (1/10) ≠
       neiContrastSpike 4 2 (9/10) (1/10) := by
   unfold hudsonBbpSpike neiContrastSpike demographicSpike hudsonFst neiGst
-    effectiveSubgroupSize ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
+    effectiveSubgroupSize ploidy meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy
   norm_num
 
 end Differentiation
@@ -853,11 +853,11 @@ The two inlinings are `genotypeVarianceHWE` and `hweHeterozygosity`, both in
 
 theorem genotypeVarianceHWE_eq_hwe (p : ℝ) :
     genotypeVarianceHWE p = hweGenotypeVariance p := by
-  unfold genotypeVarianceHWE hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold genotypeVarianceHWE hweGenotypeVariance ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 theorem hweHeterozygosity_eq_hwe (p : ℝ) :
     hweHeterozygosity p = hweGenotypeVariance p := by
-  unfold hweHeterozygosity hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold hweHeterozygosity hweGenotypeVariance ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-! ### Tying the island-model equilibrium back to the scaled rate
 
@@ -1043,13 +1043,13 @@ theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
   unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.ploidy Descent.Core.product
+    hweGenotypeVariance ploidy Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.ploidy Descent.Core.product
+    hweGenotypeVariance ploidy Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 
 theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
@@ -1604,7 +1604,7 @@ is `1/2`, and `G_ST` collapses to `(1 - ploidy · p)²`. This is the only place 
 denominator's `ploidy` is visible as a number, and it is what makes the next theorem an
 identity rather than a proportionality. -/
 theorem neiGst_at_fold (p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2 := by
-  unfold neiGst meanAlleleFreq ploidy Descent.Core.ploidy Descent.Core.midpoint; ring
+  unfold neiGst meanAlleleFreq ploidy Descent.Core.midpoint Descent.Core.ploidy; ring
 
 /-- **The two-atom modulus curves are Nei's `G_ST` at the fold, divided by the product of
 the two masses.**

@@ -115,18 +115,18 @@ theorem fisherInformation_at_reference_point :
     conceptually the heterozygote frequency `hweHeterozygosity`; the formula
     alone does not fix which is meant, so the identity is stated as
     `hweHeterozygosity_eq_genotypeVarianceHWE` below. -/
-def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
+noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem genotypeVarianceHWE_at_reference_point :
     genotypeVarianceHWE (1 / 2) = 1 / 2 := by
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   norm_num
 
 /-- Genotype variance is nonnegative exactly on the biological frequency interval. -/
 theorem genotypeVariance_nonneg_iff (p : ℝ) :
     0 ≤ genotypeVarianceHWE p ↔ 0 ≤ p ∧ p ≤ 1 := by
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   constructor
   · intro h
     constructor <;> nlinarith
@@ -136,7 +136,7 @@ theorem genotypeVariance_nonneg_iff (p : ℝ) :
 /-- Genotype variance is positive exactly at polymorphic loci. -/
 theorem genotypeVariance_pos_iff (p : ℝ) :
     0 < genotypeVarianceHWE p ↔ 0 < p ∧ p < 1 := by
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   constructor
   · intro h
     constructor <;> nlinarith
@@ -146,7 +146,7 @@ theorem genotypeVariance_pos_iff (p : ℝ) :
 /-- Genotype variance vanishes exactly for an absent or fixed alternate allele. -/
 theorem genotypeVariance_eq_zero_iff (p : ℝ) :
     genotypeVarianceHWE p = 0 ↔ p = 0 ∨ p = 1 := by
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   constructor
   · intro h
     rcases mul_eq_zero.mp h with h | h
@@ -159,7 +159,7 @@ theorem genotypeVariance_eq_zero_iff (p : ℝ) :
 /-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
 theorem genotypeVariance_max (p : ℝ) :
     genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2 : ℝ) := by
-  unfold genotypeVarianceHWE
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sq_nonneg (p - 1/2)]
 
 /-- **Effective Fisher information under imperfect tagging.**
@@ -203,14 +203,15 @@ noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
 theorem effectiveFisherInformation_at_reference_point :
     effectiveFisherInformation 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
-      Descent.Core.product]
+      Descent.Core.product,
+      Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 
 
 /-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- Effective information vanishes exactly when the study is empty, the locus is
@@ -226,7 +227,7 @@ theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
 at a polymorphic locus. -/
 theorem fullyTaggedFisherInformation_pos_iff (n : ℕ) (p : ℝ) :
     0 < effectiveFisherInformation n p 1 ↔ 0 < n ∧ 0 < p ∧ p < 1 := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   simp only [mul_one]
   constructor
   · intro h
@@ -342,7 +343,7 @@ remains. A bare-stem substitution here would have corrupted both. -/
 theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) :
     0 ≤ effectiveFisherInformation n p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   apply mul_nonneg
   · apply mul_nonneg
     · exact Nat.cast_nonneg n
@@ -357,7 +358,7 @@ theorem effective_information_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
     (h_n : 0 < n) (h_p : 0 < p) (h_p_lt : p < 1)
     (h_r2 : r2_a < r2_b) :
     effectiveFisherInformation n p r2_a < effectiveFisherInformation n p r2_b := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_coeff : 0 < ↑n * (2 * p * (1 - p)) := by
     apply mul_pos
@@ -372,7 +373,7 @@ theorem effective_information_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
     (h_r2 : 0 < r2_ld)
     (h_n : n_a < n_b) :
     effectiveFisherInformation n_a p r2_ld < effectiveFisherInformation n_b p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_cast : (↑n_a : ℝ) < ↑n_b := Nat.cast_lt.mpr h_n
   have h_suffix : 0 < 2 * p * (1 - p) * r2_ld := mul_pos h_het h_r2
@@ -400,7 +401,7 @@ theorem source_higher_effective_information
   by_cases h_nt : n_target = 0
   · -- When n_target = 0, LHS is 0; RHS is positive since n_source ≥ 1
     have h_ns_pos : 0 < n_source := by omega
-    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
     rw [h_nt]; simp
     have h_het : 0 < 2 * p_target * (1 - p_target) := by nlinarith
     have h_cast : (0 : ℝ) < ↑n_source := Nat.cast_pos.mpr h_ns_pos
@@ -514,14 +515,14 @@ section DiscoveryBias
     than left implicit in the shared formula, because conflating the two with
     the allelic variance `p(1-p)` is what produced the factor-of-four defect
     this corpus already had to repair. -/
-def hweHeterozygosity (p : ℝ) : ℝ := 2 * p * (1 - p)
+noncomputable def hweHeterozygosity (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
 genotype variance recorded below is an identity between two bodies and does not fix either of
 them; the value at the interior maximum does, and it is the only point at which a mistaken factor
 of two is visible. -/
 theorem hweHeterozygosity_at_half : hweHeterozygosity (1 / 2) = 1 / 2 := by
-  unfold hweHeterozygosity
+  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
   norm_num
 
 /-- **The heterozygote frequency and the genotype variance coincide under
@@ -530,7 +531,7 @@ a second moment — and this is the only thing that licenses writing either
 formula where the other is meant. -/
 theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
     hweHeterozygosity p = genotypeVarianceHWE p := by
-  unfold hweHeterozygosity genotypeVarianceHWE; ring
+  unfold hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
@@ -539,7 +540,7 @@ theorem het_strict_mono_on_lower_half (p q : ℝ)
     (h_p_lt : p < 1/2) (h_q_lt : q < 1/2)
     (h_pq : p < q) :
     hweHeterozygosity p < hweHeterozygosity q := by
-  unfold hweHeterozygosity
+  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sq_nonneg p, sq_nonneg q]
 
 /-- **Discovered variants are biased toward EUR-common.**
