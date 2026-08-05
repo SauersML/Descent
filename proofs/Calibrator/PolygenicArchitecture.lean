@@ -409,8 +409,14 @@ noncomputable def lostEffectMass {q : ℕ}
     (model : SNPArchitecturePortabilityModel q) : ℝ :=
   model.sourceEffectMass - model.targetRetainedEffectMass
 
-/-- Reference evaluation: nothing is lost when the target retains the whole source mass. -/
-theorem lostEffectMass_at_reference_point {q : ℕ} (model : SNPArchitecturePortabilityModel q)
+/-- **Nothing is lost when the target retains the whole source mass.**
+
+An identity under its own hypothesis, not a reference evaluation. It states zero, so a
+competitor scaled by any factor satisfies it too and it pins no coefficient. Renamed
+rather than moved: the fact IS the accounting identity the definition exists to express,
+and choosing a different `model` to make the value nonzero would have thrown it away to
+satisfy a checker. -/
+theorem lostEffectMass_of_full_retention_eq_zero {q : ℕ} (model : SNPArchitecturePortabilityModel q)
     (hfull : model.targetRetainedEffectMass = model.sourceEffectMass) :
     lostEffectMass model = 0 := by
   unfold lostEffectMass

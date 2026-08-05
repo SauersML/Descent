@@ -5399,8 +5399,14 @@ theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
 noncomputable def logLossRegretPoint (η q : ℝ) : ℝ :=
   bernoulliLogLoss η q - bernoulliLogLoss η η
 
-/-- Reference evaluation: the pointwise regret vanishes exactly on a matching forecast. -/
-theorem logLossRegretPoint_at_reference_point (η : ℝ) :
+/-- **The pointwise regret vanishes exactly on a matching forecast.**
+
+A self-application identity, not a reference evaluation: `f x x = 0` rejects no rescaling
+of `f`. The vanishing on the diagonal is what makes this quantity a regret at all, so the
+fact is kept and only the name corrected. Contrast `brierRegretPoint`, whose regret is a
+squared deviation and therefore carries genuine scaling relations -- the two regrets have
+different homogeneity, and this one has none. -/
+theorem logLossRegretPoint_self_eq_zero (η : ℝ) :
     logLossRegretPoint η η = 0 := by
   unfold logLossRegretPoint
   ring

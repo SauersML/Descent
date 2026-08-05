@@ -790,10 +790,29 @@ positive displacement scale. -/
 noncomputable def frontSpeedTiltFromTripleRate (rate γ : ℝ) : ℝ :=
   γ * speedBiasParameterFromTripleRate rate
 
-/-- Reference evaluation: at the Bolthausen--Sznitman triple rate the recovered front tilt is
-zero, which is the untilted genealogy. -/
-theorem frontSpeedTiltFromTripleRate_at_reference_point (γ : ℝ) :
+/-- **At the Bolthausen--Sznitman triple rate the recovered front tilt is zero, which is the
+untilted genealogy.**
+
+The zero of the readout, and a real fact about where the Bolthausen--Sznitman point sits --
+but not a reference evaluation. It holds for EVERY `γ`, which is the tell: the displacement
+scale drops out entirely, so the theorem says nothing about how `γ` enters and a competitor
+scaled by any factor satisfies it. Renamed rather than moved, with the evaluation that does
+pin the form supplied below. -/
+theorem frontSpeedTiltFromTripleRate_at_bolthausen_sznitman (γ : ℝ) :
     frontSpeedTiltFromTripleRate (1 / 2) γ = 0 := by
+  unfold frontSpeedTiltFromTripleRate speedBiasParameterFromTripleRate
+  norm_num
+
+/-- **Reference evaluation, off the Bolthausen--Sznitman point.** At a normalized triple rate
+of one quarter the bias parameter is `4 - 2 = 2`, and a displacement scale of three carries
+it to six.
+
+The rate and the scale are given DIFFERENT values on purpose. The tilt is the product of the
+two, so a body that added them gives five, one that squared the scale gives eighteen, and one
+that read the rate without inverting gives `3 · (1/4 - 2)`; all three agree with the
+zero above and disagree here. -/
+theorem frontSpeedTiltFromTripleRate_at_reference_point :
+    frontSpeedTiltFromTripleRate (1 / 4) 3 = 6 := by
   unfold frontSpeedTiltFromTripleRate speedBiasParameterFromTripleRate
   norm_num
 

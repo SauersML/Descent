@@ -793,8 +793,13 @@ noncomputable def totalDiploidCovarianceMomentInformation
     (m q covarianceDerivative : ℝ) : ℝ :=
   m * diploidCovarianceMomentPermeability q covarianceDerivative
 
-/-- Reference evaluation: no samples, no information. -/
-theorem totalDiploidCovarianceMomentInformation_at_reference_point
+/-- **No samples, no information.**
+
+Its own wording gives it away: this describes a degenerate configuration rather than
+evaluating the body, and stating zero pins no coefficient -- every `c · information`
+vanishes at `m = 0` too. The proportionality to `m` is real and worth keeping; only the
+name claimed more than the theorem delivers. -/
+theorem totalDiploidCovarianceMomentInformation_zero_samples_eq_zero
     (q covarianceDerivative : ℝ) :
     totalDiploidCovarianceMomentInformation 0 q covarianceDerivative = 0 := by
   unfold totalDiploidCovarianceMomentInformation

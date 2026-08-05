@@ -132,9 +132,27 @@ theorem imbalance_at_reference_point : F.imbalance = F.massPos - F.massNeg := rf
 Empirical status: DERIVED. The fiber's share of an expectation; no free parameter. -/
 def contribution (f : ℝ → ℝ) : ℝ := F.massPos * f F.level + F.massNeg * f (-F.level)
 
-/-- Reference evaluation: against the zero test function the folded atom contributes nothing. -/
-theorem contribution_at_reference_point : F.contribution (fun _ ↦ 0) = 0 := by
+/-- **Against the zero test function the folded atom contributes nothing.**
+
+An identity about the zero function, not a reference evaluation: it states zero, so a
+competitor scaled by any factor satisfies it too. Kept under an honest name; the
+evaluation that pins the body is `contribution_at_reference_point` below. -/
+theorem contribution_zero_test_function_eq_zero :
+    F.contribution (fun _ ↦ 0) = 0 := by
   unfold contribution
+  ring
+
+/-- **Reference evaluation: against the identity test function the fiber contributes its
+signed mass times its level.**
+
+`massPos · level + massNeg · (-level) = level · (massPos - massNeg)`, which is
+`F.level * F.imbalance`. This is what the zero test function could not say: the two masses
+enter with OPPOSITE signs and the level enters linearly, so a body that added the two
+masses, or that used `level ^ 2`, satisfies the zero-function identity above and fails
+here. A test function is a probe, and the zero probe reads nothing. -/
+theorem contribution_at_reference_point :
+    F.contribution (fun x ↦ x) = F.level * F.imbalance := by
+  unfold contribution imbalance
   ring
 
 
