@@ -103,6 +103,8 @@ import Descent.Coalescent.StateSpace
 import Descent.Coalescent.WrightFisher
 import Descent.Coalescent.JumpChain
 import Descent.Coalescent.Mutation
+import Descent.Coalescent.Restriction
+import Descent.Coalescent.Paintbox
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
