@@ -77,6 +77,17 @@ structure ObservationModel (Context Probe Param : Type*) where
   /-- The declared class of admissible nuisances. -/
   nuisance : Set (Context → Probe → ℝ)
 
+/-- **The observation model is inhabited**, at the smallest configuration that makes
+identification a real question: one real parameter read by one probe, seen exactly, with
+the constant functions as the declared nuisance class.
+
+A theorem quantified over an uninhabited structure is true, kernel-checked, and empty.
+The nuisance class is deliberately non-trivial -- an empty class would make every model
+identifiable for the wrong reason, since there would be nothing to confound with. -/
+def ObservationModel.witness : ObservationModel Unit Unit ℝ where
+  action := fun _ θ _ ↦ θ
+  nuisance := {h | ∃ c : ℝ, h = fun _ _ ↦ c}
+
 /-- What is actually observed, given a parameter field and a nuisance. -/
 def observable (M : ObservationModel Context Probe Param)
     (θ : Context → Param) (h : Context → Probe → ℝ) : Context → Probe → ℝ :=

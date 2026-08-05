@@ -248,6 +248,27 @@ structure SerialFounderChain where
   supplies it. -/
   approachOpen : Bool
 
+/-- **The chain is inhabited**, at a five-deme serial founder expansion: demes of a
+thousand from an ancestral ten thousand, migration `10⁻³` between neighbours, a founder
+event every two thousand generations with the most recent one two thousand generations
+back, and the separation recurrence advanced by neighbour migration alone.
+
+A theorem quantified over an uninhabited structure is true and empty. The two audit
+flags are set to the values the docstrings above record -- the ceiling VALIDATED, the
+approach OPEN -- rather than both to `true`, because a witness that asserted the open
+question was settled would be the one thing this record exists to prevent. -/
+noncomputable def SerialFounderChain.witness : SerialFounderChain where
+  demeCount := 5
+  demeSize := 1000
+  ancestralSize := 10000
+  migration := 1 / 1000
+  splitStep := 2000
+  founderOffset := 2000
+  separationStep := fun m u k ↦ (1 - m) * u k
+  ceiling := 2000
+  ceilingValidated := true
+  approachOpen := true
+
 namespace SerialFounderChain
 
 variable (C : SerialFounderChain)

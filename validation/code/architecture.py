@@ -363,6 +363,15 @@ def gate_orphans(code, decls):
 
     A structure with no constructed witness is the other half: a theorem quantified over
     an uninhabited structure is true, kernel-checked, and empty.
+
+    `Prop`-valued structures are excluded, and the exclusion is not a convenience. A
+    `structure ... : Prop` is a bundle of HYPOTHESES -- `DynamicsObstructions` bundles
+    eight independent obstruction claims, `PolygenicContinuumCalibrationLaw` is
+    parameterised over arbitrary weight and posterior families. Demanding a constructed
+    inhabitant of each would demand discharging every theorem the corpus states
+    conditionally, which is not what this gate is about. What it is about is a DATA
+    record with fields no value ever fills: there, the fields describe a thing that has
+    never been exhibited.
     """
     owner = {}
     for mod, found in decls.items():
@@ -377,14 +386,48 @@ def gate_orphans(code, decls):
     # one occurrence is the declaration itself
     orphans = sorted(n for n, (m, k) in owner.items() if used[n] <= 1 and n)
 
-    structures = {n for n, (m, k) in owner.items() if k == "structure"}
-    witnessed = set()
+    # A structure header may wrap over several lines before its `: Prop where`.
+    # Scan line-wise from each header rather than with a multi-line regex: the
+    # obvious backtracking pattern for this is exponential on real headers.
+    prop_structures = set()
     for mod, text in code.items():
-        for n in structures:
-            # a witness is a `def ... : N ... where` or an anonymous constructor typed at N
-            if re.search(r":\s*" + re.escape(n) + r"\b[^\n]*\bwhere\b", text) or \
-               re.search(r":\s*" + re.escape(n) + r"\b[^\n]*:=\s*[⟨{]", text):
-                witnessed.add(n)
+        lines = text.split("\n")
+        for i, line in enumerate(lines):
+            m = re.match(r"\s*structure\s+([A-Za-z_][\w.'₀-₉]*)", line)
+            if not m:
+                continue
+            header = " ".join(lines[i:i + 6])
+            head = header.split(" where")[0]
+            if re.search(r":\s*Prop\b", head):
+                prop_structures.add(m.group(1).split(".")[-1])
+    structures = {n for n, (m, k) in owner.items()
+                  if k == "structure" and n not in prop_structures}
+    # Scan declaration blocks rather than the flat text.  A witness declaration
+    # routinely wraps -- `def N.witness :` on one line, `N (args) where` on the next --
+    # so a per-line match misses it, and a flat regex either crosses into the next
+    # declaration or trips over the colons inside a type ascription.  Both failure modes
+    # were live: one reported an inhabited structure as empty, the other the reverse.
+    witnessed = set()
+    starter = re.compile(r"^\s*(?:noncomputable\s+)?(?:def|abbrev|instance)\b")
+    ender = re.compile(r"^\s*(?:@\[|noncomputable |def |abbrev |theorem |lemma |structure "
+                       r"|inductive |instance |class |end |namespace |section )")
+    for mod, text in code.items():
+        lines = text.split("\n")
+        i = 0
+        while i < len(lines):
+            if not starter.match(lines[i]):
+                i += 1
+                continue
+            j = i + 1
+            while j < len(lines) and lines[j].strip() and not ender.match(lines[j]):
+                j += 1
+            block = " ".join(" ".join(lines[i:j]).split())
+            head = block.split(":=")[0]
+            for n in structures:
+                if re.search(r"(?<![\w.'])" + re.escape(n) + r"(?![\w'])", head) and \
+                   ("where" in block or re.search(r":=\s*[⟨{]", block)):
+                    witnessed.add(n)
+            i = j
     witnessless = sorted(structures - witnessed)
     return orphans, witnessless
 
