@@ -27,13 +27,13 @@ api = corpus.api
 
 # The slice this agent owns, by Lean source file.
 SLICE_FILES = [
-    "Descent/PortabilityDrift.lean",
-    "Descent/DGP.lean",
-    "Descent/PopulationGeneticsFoundations.lean",
-    "Descent/LDDecayTheory.lean",
-    "Descent/DemographicHistory.lean",
-    "Descent/PhenomeWidePortability.lean",
-    "Descent/PortabilityBounds.lean",
+    "Descent/Portability/PortabilityDrift.lean",
+    "Descent/PopGen/DGP.lean",
+    "Descent/PopGen/PopulationGeneticsFoundations.lean",
+    "Descent/PopGen/LDDecayTheory.lean",
+    "Descent/PopGen/DemographicHistory.lean",
+    "Descent/Portability/PhenomeWidePortability.lean",
+    "Descent/Portability/PortabilityBounds.lean",
 ]
 
 # ---------------------------------------------------------------------------

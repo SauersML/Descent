@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Test the two RATES named (not proved) in the MomentBodyEntropy section of
-Descent/PolygenicArchitecture.lean.
+Descent/PopGen/PolygenicArchitecture.lean.
 
 Class C(M, alpha): positive measures mu on [0,1] with boundary tail
     mu([1-t, 1]) <= M t^alpha   for all t in (0,1].

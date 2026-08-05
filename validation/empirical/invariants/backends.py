@@ -106,7 +106,7 @@ class FloatBackend:
 
     @staticmethod
     def Phi(x):
-        """Standard normal CDF -- Descent/Probability.lean:487 `Phi`."""
+        """Standard normal CDF -- Descent/Foundations/Probability.lean:487 `Phi`."""
         return 0.5 * math.erfc(-x / math.sqrt(2.0))
 
     @staticmethod

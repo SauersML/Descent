@@ -110,7 +110,7 @@ WHAT IS COVERED, AND WHAT IS NOT IN THE CORPUS
   NOT FOUND IN THE CORPUS: `expectedR2`, listed as a member of this family in
   differential/cluster/families.py, DOES NOT EXIST at the revision below. There
   is no `def expectedR2` anywhere under proofs/. The only similar name is
-  `expectedR2FromN (n h2 M)` in Descent/EquityAndImplementation.lean, which
+  `expectedR2FromN (n h2 M)` in Descent/Portability/EquityAndImplementation.lean, which
   takes a sample size and a SNP count and is a different estimand; this file
   does NOT treat it as the replacement, because guessing which declaration
   replaced a deleted one is how an instrument ends up checking a corpus that is
@@ -140,7 +140,7 @@ NO AUC IS TOUCHED BY THIS FILE. neutralAFBenchmarkMetricProfile reaches
 TRANSCRIPTION PROVENANCE
   Bodies quoted beside their transcriptions with file and declaration name and
   NO LINE NUMBER. Transcribed against revision 0acbc1d7, re-read from the
-  working tree immediately before commit. Descent/PortabilityDrift.lean is
+  working tree immediately before commit. Descent/Portability/PortabilityDrift.lean is
   under active edit by other sessions; if you are reading this at a later
   revision, re-read the eight declarations before trusting the transcription.
 
@@ -274,7 +274,7 @@ def resolved_config():
 # ===========================================================================
 
 def corpus_pgsVarianceFromHet(beta_sq_sum, het):
-    """Descent/PortabilityDrift.lean, decl `pgsVarianceFromHet`
+    """Descent/Portability/PortabilityDrift.lean, decl `pgsVarianceFromHet`
 
         noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
           β_sq_sum * het
@@ -283,7 +283,7 @@ def corpus_pgsVarianceFromHet(beta_sq_sum, het):
 
 
 def corpus_presentDayPGSVariance(V_A, fst):
-    """Descent/PortabilityDrift.lean, decl `presentDayPGSVariance`
+    """Descent/Portability/PortabilityDrift.lean, decl `presentDayPGSVariance`
 
         noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
           pgsVarianceFromHet V_A (1 - fst)
@@ -297,7 +297,7 @@ def corpus_presentDayPGSVariance(V_A, fst):
 
 
 def corpus_realWorldPGSVariance(V_A, fst, rhoSq):
-    """Descent/PortabilityDrift.lean, decl `realWorldPGSVariance`
+    """Descent/Portability/PortabilityDrift.lean, decl `realWorldPGSVariance`
 
         noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
           rhoSq * (1 - fst) * V_A
@@ -306,7 +306,7 @@ def corpus_realWorldPGSVariance(V_A, fst, rhoSq):
 
 
 def corpus_r2FromSignalVariance(vSignal, vNoise):
-    """Descent/DGP.lean, decl `r2FromSignalVariance`
+    """Descent/PopGen/DGP.lean, decl `r2FromSignalVariance`
 
         noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
           vSignal / (vSignal + vNoise)
@@ -315,7 +315,7 @@ def corpus_r2FromSignalVariance(vSignal, vNoise):
 
 
 def corpus_presentDayR2(V_A, V_E, fst):
-    """Descent/PortabilityDrift.lean, decl `presentDayR2`
+    """Descent/Portability/PortabilityDrift.lean, decl `presentDayR2`
 
         noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
           r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
@@ -329,7 +329,7 @@ def corpus_presentDayR2(V_A, V_E, fst):
 
 
 def corpus_presentDaySignalToNoise(V_A, V_E, fst):
-    """Descent/PortabilityDrift.lean, decl `presentDaySignalToNoise`
+    """Descent/Portability/PortabilityDrift.lean, decl `presentDaySignalToNoise`
 
         noncomputable def presentDaySignalToNoise (V_A V_E fst : ℝ) : ℝ :=
           presentDayPGSVariance V_A fst / V_E
@@ -338,7 +338,7 @@ def corpus_presentDaySignalToNoise(V_A, V_E, fst):
 
 
 def corpus_Var_Delta_Mu(V_A, fst):
-    """Descent/PortabilityDrift.lean, decl `Var_Delta_Mu`
+    """Descent/Portability/PortabilityDrift.lean, decl `Var_Delta_Mu`
 
         noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ := 2 * fst * V_A
     """
@@ -346,7 +346,7 @@ def corpus_Var_Delta_Mu(V_A, fst):
 
 
 def corpus_expectedSqMeanPGSDiff_pureSplit(V_A, fstS, fstT):
-    """Descent/PortabilityDrift.lean, decl `expectedSqMeanPGSDiff_pureSplit`
+    """Descent/Portability/PortabilityDrift.lean, decl `expectedSqMeanPGSDiff_pureSplit`
 
         noncomputable def expectedSqMeanPGSDiff_pureSplit (V_A fstS fstT : ℝ) : ℝ :=
           Var_Delta_Mu V_A (fstS + fstT)
@@ -355,7 +355,7 @@ def corpus_expectedSqMeanPGSDiff_pureSplit(V_A, fstS, fstT):
 
 
 def corpus_Expected_Abs_Shift(V_A, fstS, fstT):
-    """Descent/PortabilityDrift.lean, decl `Expected_Abs_Shift`
+    """Descent/Portability/PortabilityDrift.lean, decl `Expected_Abs_Shift`
 
         noncomputable def Expected_Abs_Shift (V_A fstS fstT : ℝ) : ℝ :=
           Real.sqrt (Var_Delta_Mu V_A (fstS + fstT)) * Real.sqrt (2 / Real.pi)
@@ -369,7 +369,7 @@ def corpus_Expected_Abs_Shift(V_A, fstS, fstT):
 
 
 def corpus_causalPortabilityFromLocalFst(source_sq_effect, fst_causal):
-    """Descent/PhenomeWidePortability.lean, decl `causalPortabilityFromLocalFst`
+    """Descent/Portability/PhenomeWidePortability.lean, decl `causalPortabilityFromLocalFst`
 
         noncomputable def causalPortabilityFromLocalFst {m : ℕ}
             (sourceSquaredEffect fstCausal : Fin m → ℝ) : ℝ :=

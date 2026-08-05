@@ -17,7 +17,7 @@
   {
    "rank": 1,
    "decl": "Descent.PopulationGeneticsFoundations.fstMutationDriftTransient",
-   "site": "Descent/PopulationGeneticsFoundations.lean:719",
+   "site": "Descent/PopGen/PopulationGeneticsFoundations.lean:719",
    "lean": "fstMutationDriftEquilibrium theta * (1 - exp(-(1+theta) t / (2 Ne)))",
    "verdict": "REGIME UNSTATED / DOCSTRING UNDERSPECIFIED; numerically WRONG for the standard split",
    "simulation": "two isolated WF demes, Ne=100, infinite alleles, 320 replicates, Fst=(Qs-Qb)/(1-Qb)",
@@ -38,7 +38,7 @@
   {
    "rank": 2,
    "decl": "Descent.LDDecayTheory.driftRatePerGen  (and its identical twin Descent.DemographicHistory.driftLDCreationRate)",
-   "site": "Descent/LDDecayTheory.lean:872 ; Descent/DemographicHistory.lean:841",
+   "site": "Descent/PopGen/LDDecayTheory.lean:872 ; Descent/PopGen/DemographicHistory.lean:841",
    "lean": "1 / (2 Ne)",
    "docstring_claim": "the fraction of LD that decays per generation is 1/(2Ne)",
    "verdict": "DOCSTRING NUMERICALLY WRONG (definition body is a bare rate and survives; the reading attached to it does not)",
@@ -54,7 +54,7 @@
   {
    "rank": 3,
    "decl": "Descent.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
-   "site": "Descent/PopulationGeneticsFoundations.lean:825",
+   "site": "Descent/PopGen/PopulationGeneticsFoundations.lean:825",
    "lean": "exp(-(expectedNewMutations theta t)) = exp(-theta t/2)",
    "verdict": "DOCSTRING OVERCLAIMS; the body is not a fraction of anything",
    "evidence": "the exponent is, by the corpus's own composition, a COUNT of mutations. Simulation (SIM4) measures that count: 599.9 arisen at theta=1,t=1200, so the body evaluates to exp(-600) = 1e-261, and 2423.8 at theta=4, giving exp(-2424). A quantity described as 'the fraction of LD that is shared between populations' is identically 0 to machine precision for any locus older than roughly 60/theta generations.",
@@ -63,7 +63,7 @@
   {
    "rank": 4,
    "decl": "Descent.PopulationGeneticsFoundations.expectedNewMutations",
-   "site": "Descent/PopulationGeneticsFoundations.lean:795",
+   "site": "Descent/PopGen/PopulationGeneticsFoundations.lean:795",
    "lean": "theta/2 * t",
    "verdict": "BODY CORRECT as a count of mutations ARISING; DOCSTRING'S SECOND SENTENCE WRONG",
    "simulation": "infinite-sites WF, Ne=50, 16 replicates, t=1200",
@@ -76,7 +76,7 @@
   {
    "rank": 5,
    "decl": "Descent.DemographicHistory.steppingStoneDiffusionTimescale",
-   "site": "Descent/DemographicHistory.lean:249",
+   "site": "Descent/PopGen/DemographicHistory.lean:249",
    "lean": "d / (2 sigma^2 m)",
    "verdict": "CONFIRMS the corpus's own recorded defect, independently and at a different lattice size",
    "simulation": "direct two-lineage Monte Carlo, circle D=64, Ne=25, m=0.2, sigma^2=1, 48000 replicates per d",
@@ -90,7 +90,7 @@
   {
    "rank": 6,
    "decl": "Descent.DemographicHistory.steppingStoneMeetingTimeOnLattice (d D sigma_sq m)",
-   "site": "Descent/DemographicHistory.lean:257",
+   "site": "Descent/PopGen/DemographicHistory.lean:257",
    "verdict": "NUMERICALLY CORRECT (VERIFIED); the case-only d/D collision is a live, uncaught hazard",
    "simulation_agreement": "measured/predicted = 1.026 at d=4, 1.027 at d=8, 1.006 at d=16, 1.004 at d=32; 1.163 at d=1 (lattice discreteness at one step)",
    "call_site_audit": "the only consumers in the corpus are steppingStoneMeetingTime_eq_scaled and steppingStoneMeetingTime_eq_perDeme_iff (DemographicHistory.lean:264,276) and differential/checks.py:641. No call site currently swaps them.",
@@ -106,7 +106,7 @@
   {
    "rank": 7,
    "decl": "Descent.DemographicHistory.demoSteppingStoneFst",
-   "site": "Descent/DemographicHistory.lean:124",
+   "site": "Descent/PopGen/DemographicHistory.lean:124",
    "lean": "d / (d + 4 Ne m sigma_sq)",
    "verdict": "HYPERBOLIC FORM VERIFIED by direct simulation, independently of the corpus's own solver; the exponential is confirmed beaten; the d << D regime bound is confirmed and quantified",
    "simulation": "two-lineage stepping-stone coalescent run forward as a process (lineages walk, coalesce with prob 1/(2Ne) when co-located), circle D=64, Ne=25, m=0.2, sigma^2=1; Fst = 1 - T_within/T_between",
@@ -130,7 +130,7 @@
   {
    "rank": 8,
    "decl": "Descent.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium",
-   "site": "Descent/PopulationGeneticsFoundations.lean:1022",
+   "site": "Descent/PopGen/PopulationGeneticsFoundations.lean:1022",
    "lean": "1 / (1 + 4 Ne m + 4 Ne mu)",
    "verdict": "VERIFIED CORRECT",
    "simulation": "n=20 deme island model, Ne=25, infinite-alleles mutation, time-averaged equilibrium Fst=(Qs-Qb)/(1-Qb), 16 independent replicates x 4000 sampled generations after 1500 burn-in",
@@ -146,7 +146,7 @@
   {
    "rank": 9,
    "decl": "Descent.LDDecayTheory.admixtureLD  and  Descent.DemographicHistory.admixedAlleleFreq",
-   "site": "Descent/LDDecayTheory.lean:169 ; Descent/DemographicHistory.lean:504",
+   "site": "Descent/PopGen/LDDecayTheory.lean:169 ; Descent/PopGen/DemographicHistory.lean:504",
    "lean": "alpha*(1-alpha)*dp1*dp2  ;  alpha*p_A + (1-alpha)*p_B",
    "verdict": "VERIFIED CORRECT -- this is the clean finding",
    "simulation": "3.2 million simulated admixed haplotypes per cell, ancestry drawn per haplotype then alleles drawn independently within source",

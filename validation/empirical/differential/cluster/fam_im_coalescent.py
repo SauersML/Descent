@@ -109,7 +109,7 @@ WHAT IS COVERED
 
   `delta` is a SHORT NAME and short names collide in this corpus. The
   declaration transcribed here is `DemographicCoalescenceScalars.delta` in
-  Descent/PortabilityDrift.lean, reached through
+  Descent/Portability/PortabilityDrift.lean, reached through
   `twoDemeIMEquilibriumScalars`. If a `delta` elsewhere in the corpus is meant,
   this simulator does not cover it.
 
@@ -137,7 +137,7 @@ TRANSCRIPTION PROVENANCE
   Transcribed against revision a4bc5385. The eight bodies were re-read from
   the working tree at three successive revisions while this file was being
   written -- 48ff8c05, 9eee6e05, a4bc5385 -- and were byte-identical at all
-  three. Descent/PortabilityDrift.lean was being edited by other sessions
+  three. Descent/Portability/PortabilityDrift.lean was being edited by other sessions
   throughout, and one read of it failed outright because the file was mid-write
   at that instant, so the agreement across three revisions is the evidence
   here, not any single read. If this file is being read at a later revision,
@@ -273,13 +273,13 @@ def resolved_config():
 # ===========================================================================
 # THE CORPUS, TRANSCRIBED.
 #
-# Each function below is one declaration from Descent/PortabilityDrift.lean,
+# Each function below is one declaration from Descent/Portability/PortabilityDrift.lean,
 # quoted above its transcription. Nothing in this section computes anything the
 # corpus does not; nothing in the measurement sections calls anything but these.
 # ===========================================================================
 
 def corpus_ETss(M):
-    """Descent/PortabilityDrift.lean, decl `twoDemeIMEquilibriumETss`
+    """Descent/Portability/PortabilityDrift.lean, decl `twoDemeIMEquilibriumETss`
 
         noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
@@ -291,7 +291,7 @@ def corpus_ETss(M):
 
 
 def corpus_ETst(M):
-    """Descent/PortabilityDrift.lean, decl `twoDemeIMEquilibriumETst`
+    """Descent/Portability/PortabilityDrift.lean, decl `twoDemeIMEquilibriumETst`
 
         noncomputable def twoDemeIMEquilibriumETst (M : ℝ) : ℝ :=
           (2 * M + 1) / M
@@ -315,7 +315,7 @@ def families_spec_ETst(M):
 
 
 def corpus_first_step_same(M, ETss, ETst):
-    """Descent/PortabilityDrift.lean, decl `twoDemeIMFirstStepSame`
+    """Descent/Portability/PortabilityDrift.lean, decl `twoDemeIMFirstStepSame`
 
         noncomputable def twoDemeIMFirstStepSame (M _ETss ETst : ℝ) : ℝ :=
           1 / (1 + M) + (M / (1 + M)) * ETst
@@ -328,7 +328,7 @@ def corpus_first_step_same(M, ETss, ETst):
 
 
 def corpus_first_step_diff(M, ETss, ETst):
-    """Descent/PortabilityDrift.lean, decl `twoDemeIMFirstStepDiff`
+    """Descent/Portability/PortabilityDrift.lean, decl `twoDemeIMFirstStepDiff`
 
         noncomputable def twoDemeIMFirstStepDiff (M ETss _ETst : ℝ) : ℝ :=
           1 / M + ETss
@@ -337,7 +337,7 @@ def corpus_first_step_diff(M, ETss, ETst):
 
 
 def corpus_delta_from_scalars(ETss, ETst):
-    """Descent/PortabilityDrift.lean, decls `DemographicCoalescenceScalars.delta`
+    """Descent/Portability/PortabilityDrift.lean, decls `DemographicCoalescenceScalars.delta`
     and `hudsonFstFromCoalescenceTimes`
 
         noncomputable def DemographicCoalescenceScalars.delta
@@ -356,7 +356,7 @@ def corpus_delta_from_scalars(ETss, ETst):
 
 
 def corpus_delta_closed(M):
-    """Descent/PortabilityDrift.lean, decl `twoDemeIMEquilibriumDelta`
+    """Descent/Portability/PortabilityDrift.lean, decl `twoDemeIMEquilibriumDelta`
 
         noncomputable def twoDemeIMEquilibriumDelta (M : ℝ) : ℝ :=
           1 / (2 * M + 1)
@@ -365,7 +365,7 @@ def corpus_delta_closed(M):
 
 
 def corpus_var_delta_mu(V_A, fst):
-    """Descent/PortabilityDrift.lean, decl `Var_Delta_Mu`
+    """Descent/Portability/PortabilityDrift.lean, decl `Var_Delta_Mu`
 
         noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ := 2 * fst * V_A
 
@@ -381,7 +381,7 @@ def corpus_var_delta_mu(V_A, fst):
 
 
 def corpus_expected_sq_mean_pgs_diff_im(V_A, M):
-    """Descent/PortabilityDrift.lean, decl `expectedSqMeanPGSDiff_IMEquilibrium`
+    """Descent/Portability/PortabilityDrift.lean, decl `expectedSqMeanPGSDiff_IMEquilibrium`
     (body quoted above). The doubling of delta is the corpus's, not mine."""
     return corpus_var_delta_mu(V_A, 2.0 * corpus_delta_closed(M))
 
@@ -980,7 +980,7 @@ def main(argv=None):
         "members_reported_not_scored": ["expectedSqMeanPGSDiff_IMEquilibrium"],
         "transcribed_against_revision": "a4bc5385",
         "transcription_caveat":
-            "Descent/PortabilityDrift.lean differed from origin/main by "
+            "Descent/Portability/PortabilityDrift.lean differed from origin/main by "
             "uncommitted edits from other sessions at transcription time; the "
             "eight bodies were re-read from the working tree immediately "
             "before commit"}

@@ -2,7 +2,7 @@
 """
 Measure the staleness crossover tau_c = log2/lambda and the shrinkage-rule premiums.
 
-Claims under test (Descent/DirichletTransfer.lean, StalenessCrossover/ShrinkageRule):
+Claims under test (Descent/Spectral/DirichletTransfer.lean, StalenessCrossover/ShrinkageRule):
   damped premium over blind  =  exp(-2 lam tau) * V      (positive at every horizon)
   stale  premium over blind  =  (2 exp(-lam tau) - 1) * V (negative past tau_c = log2/lam)
   price of myopia            =  (1 - exp(-lam tau))^2 * V

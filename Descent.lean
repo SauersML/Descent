@@ -1,102 +1,102 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Probability
-import Descent.DGP
-import Descent.Conclusions
-import Descent.PortabilityDrift
-import Descent.HumanDemography
-import Descent.AdditiveInvariance
-import Descent.ImitationRigidity
-import Descent.Conventions
-import Descent.DemographicCapacity
-import Descent.DriftRegime
-import Descent.BlindnessRegistry
-import Descent.OpenQuestions
-import Descent.TrafficInvariantSeparation
-import Descent.TransportIdentities
-import Descent.SecondMomentShift
-import Descent.QuadraticShift
-import Descent.ProjectionShiftBounds
-import Descent.ProjectionSolve
-import Descent.WhiteningEquivalence
-import Descent.PortabilityBounds
-import Descent.MultiAncestryTheory
-import Descent.StratificationConfounding
-import Descent.AncestryCalibration
-import Descent.LDDecayTheory
-import Descent.SelectionArchitecture
-import Descent.DemographicHistory
-import Descent.SerialFounderChain
-import Descent.ClinicalUtilityFairness
-import Descent.VarianceComponents
-import Descent.ScoreDistribution
-import Descent.ValidationStatistics
-import Descent.MechanisticPortabilityWitnesses
-import Descent.SelectionValidation
-import Descent.GeneticArchitectureDiscovery
-import Descent.BayesianPGSTheory
-import Descent.PhenomeWidePortability
-import Descent.TransferLearningPGS
-import Descent.MetricSpecificPortability
-import Descent.PopulationGeneticsFoundations
-import Descent.GeneEnvironmentInterplay
-import Descent.RareVariantPortability
-import Descent.StatisticalGeneticsMethodology
-import Descent.EquityAndImplementation
-import Descent.EpistasisAndNonAdditivity
-import Descent.PolygenicAdaptation
-import Descent.AssortativeMatingPGS
-import Descent.ImputationPortability
-import Descent.LongitudinalPortability
-import Descent.PowerAnalysis
-import Descent.CovarianceStructure
-import Descent.CausalInference
-import Descent.CertificateGrading
-import Descent.ContinuumCalibration
-import Descent.ContinuumCalibrationProgram
-import Descent.DecoratedGeometryBlindness
-import Descent.CorrectionBiology
-import Descent.CorrectionWidths
-import Descent.FiniteMinimax
-import Descent.BlindnessMinimaxFloors
-import Descent.PencilEnvironment
-import Descent.DirichletTransfer
-import Descent.DeclaredInteractionClass
-import Descent.CountingInvariantBlindness
-import Descent.CountingInvariantInstances
-import Descent.PolygenicArchitecture
-import Descent.PolygenicContinuumCalibration
-import Descent.SampleOverlapBias
-import Descent.HaplotypeTheory
-import Descent.AncestrySpecificArchitecture
-import Descent.AncestrySpecificPower
-import Descent.PGSCalibrationTheory
-import Descent.ObservationalCeiling
-import Descent.Condensation
-import Descent.CumulantBlindness
-import Descent.JetBarrier
-import Descent.LocalToGlobalCoherence
-import Descent.HiddenConeAmbiguity
-import Descent.LatentMechanismCollapse
-import Descent.PolygenicSpectroscopy
-import Descent.EpistaticChaos
-import Descent.StandardizedGenotypeMoments
-import Descent.CramerStratum
-import Descent.FoldedSpectrum
-import Descent.SpectralDegradation
-import Descent.SpectralUniversalityFailure
-import Descent.SpectrumIdentifiability
-import Descent.XiFromMarkedBreakouts
-import Descent.EnsembleChannel
-import Descent.Permeability
-import Descent.ErgodicCovariancePencil
-import Descent.HorizonCurve
-import Descent.DriftingConditionals
-import Descent.CirculationDefect
-import Descent.LumpedRateBlindness
-import Descent.TransplantationStability
-import Descent.DynamicsContrast
+import Descent.Foundations.Probability
+import Descent.PopGen.DGP
+import Descent.Program.Conclusions
+import Descent.Portability.PortabilityDrift
+import Descent.PopGen.HumanDemography
+import Descent.PopGen.AdditiveInvariance
+import Descent.Blindness.ImitationRigidity
+import Descent.Foundations.Conventions
+import Descent.PopGen.DemographicCapacity
+import Descent.PopGen.DriftRegime
+import Descent.Blindness.BlindnessRegistry
+import Descent.Program.OpenQuestions
+import Descent.Blindness.TrafficInvariantSeparation
+import Descent.Foundations.TransportIdentities
+import Descent.Spectral.SecondMomentShift
+import Descent.Spectral.QuadraticShift
+import Descent.Spectral.ProjectionShiftBounds
+import Descent.Spectral.ProjectionSolve
+import Descent.Spectral.WhiteningEquivalence
+import Descent.Portability.PortabilityBounds
+import Descent.Portability.MultiAncestryTheory
+import Descent.Portability.StratificationConfounding
+import Descent.Portability.AncestryCalibration
+import Descent.PopGen.LDDecayTheory
+import Descent.PopGen.SelectionArchitecture
+import Descent.PopGen.DemographicHistory
+import Descent.PopGen.SerialFounderChain
+import Descent.Portability.ClinicalUtilityFairness
+import Descent.PopGen.VarianceComponents
+import Descent.Portability.ScoreDistribution
+import Descent.Decision.ValidationStatistics
+import Descent.Portability.MechanisticPortabilityWitnesses
+import Descent.Decision.SelectionValidation
+import Descent.PopGen.GeneticArchitectureDiscovery
+import Descent.Portability.BayesianPGSTheory
+import Descent.Portability.PhenomeWidePortability
+import Descent.Portability.TransferLearningPGS
+import Descent.Portability.MetricSpecificPortability
+import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.PopGen.GeneEnvironmentInterplay
+import Descent.Portability.RareVariantPortability
+import Descent.Portability.StatisticalGeneticsMethodology
+import Descent.Portability.EquityAndImplementation
+import Descent.PopGen.EpistasisAndNonAdditivity
+import Descent.PopGen.PolygenicAdaptation
+import Descent.PopGen.AssortativeMatingPGS
+import Descent.Portability.ImputationPortability
+import Descent.Portability.LongitudinalPortability
+import Descent.Decision.PowerAnalysis
+import Descent.Foundations.CovarianceStructure
+import Descent.Foundations.CausalInference
+import Descent.Decision.CertificateGrading
+import Descent.Portability.ContinuumCalibration
+import Descent.Portability.ContinuumCalibrationProgram
+import Descent.Blindness.DecoratedGeometryBlindness
+import Descent.Portability.CorrectionBiology
+import Descent.Portability.CorrectionWidths
+import Descent.Decision.FiniteMinimax
+import Descent.Decision.BlindnessMinimaxFloors
+import Descent.Spectral.PencilEnvironment
+import Descent.Spectral.DirichletTransfer
+import Descent.Conditionals.DeclaredInteractionClass
+import Descent.Blindness.CountingInvariantBlindness
+import Descent.Blindness.CountingInvariantInstances
+import Descent.PopGen.PolygenicArchitecture
+import Descent.Portability.PolygenicContinuumCalibration
+import Descent.Portability.SampleOverlapBias
+import Descent.PopGen.HaplotypeTheory
+import Descent.PopGen.AncestrySpecificArchitecture
+import Descent.Portability.AncestrySpecificPower
+import Descent.Portability.PGSCalibrationTheory
+import Descent.Blindness.ObservationalCeiling
+import Descent.Blindness.Condensation
+import Descent.Blindness.CumulantBlindness
+import Descent.Blindness.JetBarrier
+import Descent.Conditionals.LocalToGlobalCoherence
+import Descent.Blindness.HiddenConeAmbiguity
+import Descent.Conditionals.LatentMechanismCollapse
+import Descent.Spectral.PolygenicSpectroscopy
+import Descent.Blindness.EpistaticChaos
+import Descent.PopGen.StandardizedGenotypeMoments
+import Descent.Blindness.CramerStratum
+import Descent.Spectral.FoldedSpectrum
+import Descent.Spectral.SpectralDegradation
+import Descent.Blindness.SpectralUniversalityFailure
+import Descent.Blindness.SpectrumIdentifiability
+import Descent.Blindness.XiFromMarkedBreakouts
+import Descent.Spectral.EnsembleChannel
+import Descent.Spectral.Permeability
+import Descent.Spectral.ErgodicCovariancePencil
+import Descent.Portability.HorizonCurve
+import Descent.Conditionals.DriftingConditionals
+import Descent.Spectral.CirculationDefect
+import Descent.Blindness.LumpedRateBlindness
+import Descent.Portability.TransplantationStability
+import Descent.Conditionals.DynamicsContrast
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
@@ -119,16 +119,16 @@ import Descent.DynamicsContrast
 -- closure anyway, via `FoldedSpectrum -> ConditionalGain`. Only a genuine transitive
 -- closure distinguishes an orphan from a module someone else already imports;
 -- `DeploymentCeiling`, added above, was the only real one.
-import Descent.ResonanceSpectrum
-import Descent.BundleRigidity.Coverage
-import Descent.BundleRigidity.Cycles
-import Descent.BundleRigidity.DeploymentCeiling
-import Descent.BundleRigidity.Dichotomy
-import Descent.BundleRigidity.LinearSCM
-import Descent.BundleRigidity.Operator
-import Descent.BundleRigidity.SingleModulus
-import Descent.BundleRigidity.Telescope
-import Descent.BundleRigidity.TwoAtom
+import Descent.Spectral.ResonanceSpectrum
+import Descent.Blindness.BundleRigidity.Coverage
+import Descent.Blindness.BundleRigidity.Cycles
+import Descent.Blindness.BundleRigidity.DeploymentCeiling
+import Descent.Blindness.BundleRigidity.Dichotomy
+import Descent.Blindness.BundleRigidity.LinearSCM
+import Descent.Blindness.BundleRigidity.Operator
+import Descent.Blindness.BundleRigidity.SingleModulus
+import Descent.Blindness.BundleRigidity.Telescope
+import Descent.Blindness.BundleRigidity.TwoAtom
 
 namespace Descent
 
@@ -374,7 +374,7 @@ verified the hard way:
 -/
 
 /-- The two-locus block has exactly two loci, so the `2 ≤ t` premise carried by the
-two-locus coalescent theorems in `Descent.DGP` is discharged here by computation.
+two-locus coalescent theorems in `Descent.PopGen.DGP` is discharged here by computation.
 It was previously supplied as a `local instance : Fact (2 ≤ 2)`; a `Fact` instance is
 resolved silently and so kept the premise out of every signature that depended on it. -/
 theorem two_le_two : (2 : ℕ) ≤ 2 := le_refl 2
@@ -544,7 +544,7 @@ variable {t : ℕ}
 
 /-! `covariance_mismatch_pos_of_fst_and_sparse_array` and
 `target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with
-their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.DGP`
+their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.PopGen.DGP`
 and a one-line proof citing the original.
 
 The restatements bought nothing.  Both originals are already in the `Descent` namespace,
@@ -556,7 +556,7 @@ specialisations above do, instantiating `t := 2` -- and these did neither. -/
 /-! ### `ld_decay_implies_nonlinear_calibration_of_exp_tagging` -- READ BEFORE TOUCHING ITS INPUTS
 
 This theorem is the consumer of `LDDecayMechanism` and `decaySlope` in
-`Descent.DGP`, and it is the ONLY one. It also lives in `Descent.lean`, the
+`Descent.PopGen.DGP`, and it is the ONLY one. It also lives in `Descent.lean`, the
 corpus root, one directory *above* `Descent/`.
 
 That combination has already destroyed both definitions once. A dead-code scan walking
@@ -672,7 +672,7 @@ theorem at genuine numbers, not restatements.
 
 /-- A genome-scale **additive** score at a balanced locus is strictly subcritical:
 `1 < log (10 ^ 6) / c(1/2)`. The Gaussian score apparatus of
-`Descent.ScoreDistribution` applies with enormous margin, and this is the concrete
+`Descent.Portability.ScoreDistribution` applies with enormous margin, and this is the concrete
 witness that the condensation theory does not disturb it. -/
 theorem additive_score_subcritical_at_balanced_locus_proved :
     1 < maxSafeEpistaticOrder 1000000 (1 / 2) := by

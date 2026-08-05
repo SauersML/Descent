@@ -862,7 +862,7 @@
    "Descent.admixedFst": {
     "fq": "Descent.admixedFst",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:544",
+    "source": "Descent/PopGen/DemographicHistory.lean:544",
     "checksum": "sha256:40a69e536352754f2a241faf8f7e3309",
     "empirical_status": "MIXED -- NUMERATOR VALIDATED",
     "admissible_box": {
@@ -880,7 +880,7 @@
    "Descent.admixtureLDDecay": {
     "fq": "Descent.admixtureLDDecay",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:8637",
+    "source": "Descent/Portability/PortabilityDrift.lean:8637",
     "checksum": "sha256:c7cd62a2caef6defa6c8cfa8de73cf59",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -898,7 +898,7 @@
    "Descent.alleleFreqAfterMigration": {
     "fq": "Descent.alleleFreqAfterMigration",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:1979",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1979",
     "checksum": "sha256:5b81709af858b9926b2a37e5efb6a60b",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -920,7 +920,7 @@
    "Descent.alleleFreqMismatchPenalty": {
     "fq": "Descent.alleleFreqMismatchPenalty",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:3751",
+    "source": "Descent/Portability/PortabilityDrift.lean:3751",
     "checksum": "sha256:1cb6648c54ae8c11836ab0f25e961cc8",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -938,7 +938,7 @@
    "Descent.amCorrectedPortability": {
     "fq": "Descent.amCorrectedPortability",
     "translator": "extract",
-    "source": "Descent/AssortativeMatingPGS.lean:608",
+    "source": "Descent/PopGen/AssortativeMatingPGS.lean:608",
     "checksum": "sha256:55cbabd71585d21c668db15b70e70e3b",
     "empirical_status": "",
     "admissible_box": {
@@ -964,7 +964,7 @@
    "Descent.coalFst": {
     "fq": "Descent.coalFst",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:346",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:346",
     "checksum": "sha256:0d6878ab9a0086bc1237c31c0153721b",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -982,7 +982,7 @@
    "Descent.coalescentTau": {
     "fq": "Descent.coalescentTau",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:111",
+    "source": "Descent/Portability/PortabilityDrift.lean:111",
     "checksum": "sha256:a98806090fb443cc5d41da87c7b4db3e",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1000,7 +1000,7 @@
    "Descent.cumulativeDrift": {
     "fq": "Descent.cumulativeDrift",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:979",
+    "source": "Descent/PopGen/DemographicHistory.lean:979",
     "checksum": "sha256:095aedb0a2e738639c7d9888db87f080",
     "empirical_status": "VALIDATED",
     "admissible_box": {},
@@ -1009,7 +1009,7 @@
    "Descent.demoSteppingStoneFst": {
     "fq": "Descent.demoSteppingStoneFst",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:99",
+    "source": "Descent/PopGen/DemographicHistory.lean:99",
     "checksum": "sha256:a94a45644ca859bbfb301c6369cb39ce",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1031,7 +1031,7 @@
    "Descent.demographicCovarianceGapLowerBound": {
     "fq": "Descent.demographicCovarianceGapLowerBound",
     "translator": "extract",
-    "source": "Descent/DGP.lean:743",
+    "source": "Descent/PopGen/DGP.lean:743",
     "checksum": "sha256:72cd18d2a68299ff9be8107a8eb8bd83",
     "empirical_status": "",
     "admissible_box": {
@@ -1061,7 +1061,7 @@
    "Descent.driftLDEquilibrium": {
     "fq": "Descent.driftLDEquilibrium",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:535",
+    "source": "Descent/PopGen/LDDecayTheory.lean:535",
     "checksum": "sha256:3b4c0d02c60f3bfcf7609ff1526bb67a",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1079,7 +1079,7 @@
    "Descent.driftLDTrajectory": {
     "fq": "Descent.driftLDTrajectory",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:827",
+    "source": "Descent/PopGen/LDDecayTheory.lean:827",
     "checksum": "sha256:294b4c8553827f6eeb3b970ab937cd5c",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1101,7 +1101,7 @@
    "Descent.driftVariance": {
     "fq": "Descent.driftVariance",
     "translator": "extract",
-    "source": "Descent/AncestrySpecificArchitecture.lean:145",
+    "source": "Descent/PopGen/AncestrySpecificArchitecture.lean:145",
     "checksum": "sha256:a2bc5831c5d361ca101e6818960f5bbe",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1119,7 +1119,7 @@
    "Descent.expectedFreqDiffSq": {
     "fq": "Descent.expectedFreqDiffSq",
     "translator": "extract",
-    "source": "Descent/AncestrySpecificArchitecture.lean:276",
+    "source": "Descent/PopGen/AncestrySpecificArchitecture.lean:276",
     "checksum": "sha256:1b3bf73edd969889667aa0cd6a361f3d",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1137,7 +1137,7 @@
    "Descent.expectedHeterozygosity": {
     "fq": "Descent.expectedHeterozygosity",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:273",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:273",
     "checksum": "sha256:80414a49ca64246da873fc67869ac456",
     "empirical_status": "",
     "admissible_box": {
@@ -1151,7 +1151,7 @@
    "Descent.explainedR2FromTransportMoments": {
     "fq": "Descent.explainedR2FromTransportMoments",
     "translator": "extract",
-    "source": "Descent/DGP.lean:525",
+    "source": "Descent/PopGen/DGP.lean:525",
     "checksum": "sha256:f12409bcadf29d4a82d644e9017abb09",
     "empirical_status": "",
     "admissible_box": {
@@ -1173,7 +1173,7 @@
    "Descent.fejerChannel3": {
     "fq": "Descent.fejerChannel3",
     "translator": "extract",
-    "source": "Descent/EnsembleChannel.lean:40",
+    "source": "Descent/Spectral/EnsembleChannel.lean:40",
     "checksum": "sha256:0efd7efc47374af982bfeae08516785a",
     "empirical_status": "",
     "admissible_box": {
@@ -1195,7 +1195,7 @@
    "Descent.fstFromGenerations": {
     "fq": "Descent.fstFromGenerations",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:192",
+    "source": "Descent/Portability/PortabilityDrift.lean:192",
     "checksum": "sha256:cebd0ae0459cd589aa5d9dd7e5baa6ec",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1213,7 +1213,7 @@
    "Descent.fstFromHetRatio": {
     "fq": "Descent.fstFromHetRatio",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2554",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2554",
     "checksum": "sha256:f71b20e507ba8f7e28f0669f3d889d1a",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1231,7 +1231,7 @@
    "Descent.fstIslandMultiplicativeEquilibrium": {
     "fq": "Descent.fstIslandMultiplicativeEquilibrium",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:7348",
+    "source": "Descent/Portability/PortabilityDrift.lean:7348",
     "checksum": "sha256:7db8e84753c2562d20a05220b68d4100",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1245,7 +1245,7 @@
    "Descent.fstMigDriftNext": {
     "fq": "Descent.fstMigDriftNext",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:8822",
+    "source": "Descent/Portability/PortabilityDrift.lean:8822",
     "checksum": "sha256:fa6f5c0783c48f660f4c085cc7e0ac40",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1267,7 +1267,7 @@
    "Descent.fstMigrationDriftEquilibrium": {
     "fq": "Descent.fstMigrationDriftEquilibrium",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:7012",
+    "source": "Descent/Portability/PortabilityDrift.lean:7012",
     "checksum": "sha256:85cba214b6faeb34ea50e3285eded5df",
     "empirical_status": "CONDITIONALLY VALID",
     "admissible_box": {
@@ -1285,7 +1285,7 @@
    "Descent.fstMutationDriftTransient": {
     "fq": "Descent.fstMutationDriftTransient",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:1082",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1082",
     "checksum": "sha256:bf4abc5473e7fd3e0af574ea342b4bf9",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1307,7 +1307,7 @@
    "Descent.fstMutationDriftTransientDiscrete": {
     "fq": "Descent.fstMutationDriftTransientDiscrete",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2638",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2638",
     "checksum": "sha256:eb4d471484b2233a1f0898cffb07cd6f",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1329,7 +1329,7 @@
    "Descent.gaussianPairSquareChannel3": {
     "fq": "Descent.gaussianPairSquareChannel3",
     "translator": "extract",
-    "source": "Descent/EnsembleChannel.lean:62",
+    "source": "Descent/Spectral/EnsembleChannel.lean:62",
     "checksum": "sha256:a020d7dce2bcfac83c806d4d7849892f",
     "empirical_status": "",
     "admissible_box": {
@@ -1351,7 +1351,7 @@
    "Descent.harmonicMeanNe": {
     "fq": "Descent.harmonicMeanNe",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:957",
+    "source": "Descent/PopGen/LDDecayTheory.lean:957",
     "checksum": "sha256:ea5175ed0dc29982f549d1f861f4f57b",
     "empirical_status": "",
     "admissible_box": {},
@@ -1360,7 +1360,7 @@
    "Descent.hetDecayFactor": {
     "fq": "Descent.hetDecayFactor",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2474",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2474",
     "checksum": "sha256:258d832ef7bf95ff62a095a8cdcbdc6b",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -1378,7 +1378,7 @@
    "Descent.hetMutationDriftRecurrence": {
     "fq": "Descent.hetMutationDriftRecurrence",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2325",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2325",
     "checksum": "sha256:12df8e964af09039e870afc95245bc25",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1400,7 +1400,7 @@
    "Descent.hetRecurrence": {
     "fq": "Descent.hetRecurrence",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2149",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2149",
     "checksum": "sha256:749237a26c0e78e60ac07db60b8a7174",
     "empirical_status": "",
     "admissible_box": {
@@ -1418,7 +1418,7 @@
    "Descent.hetTrajectory": {
     "fq": "Descent.hetTrajectory",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:856",
+    "source": "Descent/Portability/PortabilityDrift.lean:856",
     "checksum": "sha256:1566e5116988fce9be25d7e445a94ee8",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -1440,7 +1440,7 @@
    "Descent.heterozygosityLossDerived": {
     "fq": "Descent.heterozygosityLossDerived",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2197",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2197",
     "checksum": "sha256:82b5d213bd2ea97e7e70b268dd34805a",
     "empirical_status": "CONDITIONALLY VALID --",
     "admissible_box": {
@@ -1458,7 +1458,7 @@
    "Descent.heterozygosityLossFromDrift": {
     "fq": "Descent.heterozygosityLossFromDrift",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:802",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:802",
     "checksum": "sha256:7697a22f404547d715def22f37165813",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1476,7 +1476,7 @@
    "Descent.heterozygosityLossVariableNe": {
     "fq": "Descent.heterozygosityLossVariableNe",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:1004",
+    "source": "Descent/PopGen/DemographicHistory.lean:1004",
     "checksum": "sha256:4d3e92a3744e5a47e2fbcfdc495ed0f5",
     "empirical_status": "MIXED --",
     "admissible_box": {},
@@ -1485,7 +1485,7 @@
    "Descent.hudsonFst": {
     "fq": "Descent.hudsonFst",
     "translator": "extract",
-    "source": "Descent/Conventions.lean:462",
+    "source": "Descent/Foundations/Conventions.lean:462",
     "checksum": "sha256:6eee44fba5bb169d00f54ad78d3a62e2",
     "empirical_status": "VALIDATED --",
     "admissible_box": {
@@ -1503,7 +1503,7 @@
    "Descent.ibdFlowStep": {
     "fq": "Descent.ibdFlowStep",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:6140",
+    "source": "Descent/Portability/PortabilityDrift.lean:6140",
     "checksum": "sha256:60fc5d7cd6f52ab17e0127cb316013b2",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1525,7 +1525,7 @@
    "Descent.ibdFst": {
     "fq": "Descent.ibdFst",
     "translator": "extract",
-    "source": "Descent/AssortativeMatingPGS.lean:867",
+    "source": "Descent/PopGen/AssortativeMatingPGS.lean:867",
     "checksum": "sha256:ebce2a1f7dac34858c6234e8dd3021aa",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1547,7 +1547,7 @@
    "Descent.ibdRecurrenceFixedPoint": {
     "fq": "Descent.ibdRecurrenceFixedPoint",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:7145",
+    "source": "Descent/Portability/PortabilityDrift.lean:7145",
     "checksum": "sha256:457671501864e715159e7cad8fe8f393",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1565,7 +1565,7 @@
    "Descent.ibdRecurrenceStep": {
     "fq": "Descent.ibdRecurrenceStep",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:7077",
+    "source": "Descent/Portability/PortabilityDrift.lean:7077",
     "checksum": "sha256:8b5cad9fc0ee1289f6d7941df6781dbd",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1587,7 +1587,7 @@
    "Descent.islandFstFiniteDemes": {
     "fq": "Descent.islandFstFiniteDemes",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:1418",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1418",
     "checksum": "sha256:9fd319020876566752bac035726d6927",
     "empirical_status": "VALIDATED --",
     "admissible_box": {
@@ -1605,7 +1605,7 @@
    "Descent.ldCorrelationMigrationAnsatz": {
     "fq": "Descent.ldCorrelationMigrationAnsatz",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:2071",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2071",
     "checksum": "sha256:97273d159364803aa7de1a125626dbad",
     "empirical_status": "FALSIFIED",
     "admissible_box": {
@@ -1619,7 +1619,7 @@
    "Descent.ldHalfLife": {
     "fq": "Descent.ldHalfLife",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:1304",
+    "source": "Descent/PopGen/LDDecayTheory.lean:1304",
     "checksum": "sha256:37ae758409b05f372a26127d0e037825",
     "empirical_status": "DERIVED",
     "admissible_box": {
@@ -1637,7 +1637,7 @@
    "Descent.ldMismatchFrobenius": {
     "fq": "Descent.ldMismatchFrobenius",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:881",
+    "source": "Descent/PopGen/LDDecayTheory.lean:881",
     "checksum": "sha256:9534d6a12c807c45d9b782c8974d6f13",
     "empirical_status": "NOT AN EMPIRICAL CLAIM",
     "admissible_box": {},
@@ -1646,7 +1646,7 @@
    "Descent.ldRecurrence": {
     "fq": "Descent.ldRecurrence",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:1564",
+    "source": "Descent/PopGen/LDDecayTheory.lean:1564",
     "checksum": "sha256:757875b9daecf8851aab0ef94847b6ff",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1664,7 +1664,7 @@
    "Descent.ldRetainedFraction": {
     "fq": "Descent.ldRetainedFraction",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:1437",
+    "source": "Descent/PopGen/LDDecayTheory.lean:1437",
     "checksum": "sha256:fabb68555fa59810fa3ff4ef1a834604",
     "empirical_status": "DERIVED",
     "admissible_box": {
@@ -1686,7 +1686,7 @@
    "Descent.ldRetentionPerGen": {
     "fq": "Descent.ldRetentionPerGen",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:80",
+    "source": "Descent/PopGen/LDDecayTheory.lean:80",
     "checksum": "sha256:3c01ac817924e11aecda5477fe300ab3",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1704,7 +1704,7 @@
    "Descent.neiFst": {
     "fq": "Descent.neiFst",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:71",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:71",
     "checksum": "sha256:ae45cb0004c41d61fb37e580c7ac5096",
     "empirical_status": "MEASURED",
     "admissible_box": {
@@ -1722,7 +1722,7 @@
    "Descent.neiGstFromFrequencies": {
     "fq": "Descent.neiGstFromFrequencies",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:166",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:166",
     "checksum": "sha256:f7b8e3e7009b1a9960f9ccb3a5039303",
     "empirical_status": "CONVENTION PINNED",
     "admissible_box": {
@@ -1766,7 +1766,7 @@
    "Descent.ohtaKimuraSigmaDSq": {
     "fq": "Descent.ohtaKimuraSigmaDSq",
     "translator": "extract",
-    "source": "Descent/LDDecayTheory.lean:578",
+    "source": "Descent/PopGen/LDDecayTheory.lean:578",
     "checksum": "sha256:71b4699d013a2e537e8b408f4c9231f4",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1784,7 +1784,7 @@
    "Descent.pairwiseFstFromBranchTaus": {
     "fq": "Descent.pairwiseFstFromBranchTaus",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:309",
+    "source": "Descent/Portability/PortabilityDrift.lean:309",
     "checksum": "sha256:063f26bf079f75057d9417cef8ec107b",
     "empirical_status": "CONDITIONALLY VALID",
     "admissible_box": {
@@ -1802,7 +1802,7 @@
    "Descent.pairwiseFstFromBranches": {
     "fq": "Descent.pairwiseFstFromBranches",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:246",
+    "source": "Descent/Portability/PortabilityDrift.lean:246",
     "checksum": "sha256:29040f8a3bd633131b9c0942a88f706e",
     "empirical_status": "CONDITIONALLY VALID",
     "admissible_box": {
@@ -1820,7 +1820,7 @@
    "Descent.scaledIdentityStep": {
     "fq": "Descent.scaledIdentityStep",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:878",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:878",
     "checksum": "sha256:379c6aefa16f840a9a08db584037e41d",
     "empirical_status": "UNTESTED",
     "admissible_box": {
@@ -1838,7 +1838,7 @@
    "Descent.scaledMutationRate": {
     "fq": "Descent.scaledMutationRate",
     "translator": "extract",
-    "source": "Descent/DGP.lean:50",
+    "source": "Descent/PopGen/DGP.lean:50",
     "checksum": "sha256:f217abb4ad9a36773403bd6e1fc9ad73",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1856,7 +1856,7 @@
    "Descent.selectionMigrationEquilibrium": {
     "fq": "Descent.selectionMigrationEquilibrium",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:531",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:531",
     "checksum": "sha256:48d4ae823cc7718e4196ccb9b114412e",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -1870,7 +1870,7 @@
    "Descent.sharedLDFromMigration": {
     "fq": "Descent.sharedLDFromMigration",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:7966",
+    "source": "Descent/Portability/PortabilityDrift.lean:7966",
     "checksum": "sha256:808ad8dcd7cb12101896c3c6f5482ab1",
     "empirical_status": "AN IDENTITY",
     "admissible_box": {
@@ -1884,7 +1884,7 @@
    "Descent.steppingStoneCharacteristicLength": {
     "fq": "Descent.steppingStoneCharacteristicLength",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:1846",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1846",
     "checksum": "sha256:6f417be0b90742f8451cedb23656648e",
     "empirical_status": "MEASURED",
     "admissible_box": {
@@ -1906,7 +1906,7 @@
    "Descent.steppingStoneDiffusionTimescale": {
     "fq": "Descent.steppingStoneDiffusionTimescale",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:351",
+    "source": "Descent/PopGen/DemographicHistory.lean:351",
     "checksum": "sha256:f0fed2ee1d4a4fd5675bbb744960ba89",
     "empirical_status": "MEASURED",
     "admissible_box": {
@@ -1924,7 +1924,7 @@
    "Descent.steppingStoneFstQuadratic": {
     "fq": "Descent.steppingStoneFstQuadratic",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:224",
+    "source": "Descent/PopGen/DemographicHistory.lean:224",
     "checksum": "sha256:1ef762d7fb8b1eb3a4fc30fd3f9a8102",
     "empirical_status": "FALSIFIED",
     "admissible_box": {
@@ -1950,7 +1950,7 @@
    "Descent.steppingStoneMeetingTimeOnLattice": {
     "fq": "Descent.steppingStoneMeetingTimeOnLattice",
     "translator": "extract",
-    "source": "Descent/DemographicHistory.lean:373",
+    "source": "Descent/PopGen/DemographicHistory.lean:373",
     "checksum": "sha256:309cd212a2d7af361ef1404ed8620568",
     "empirical_status": "",
     "admissible_box": {
@@ -1972,7 +1972,7 @@
    "Descent.targetHetFromFst": {
     "fq": "Descent.targetHetFromFst",
     "translator": "extract",
-    "source": "Descent/PortabilityDrift.lean:1229",
+    "source": "Descent/Portability/PortabilityDrift.lean:1229",
     "checksum": "sha256:be656ae3581cc33416621435b6976358",
     "empirical_status": "VACUOUS WITH A SAMPLE-ESTIMATED",
     "admissible_box": {
@@ -1990,7 +1990,7 @@
    "Descent.twoPopDriftVariance": {
     "fq": "Descent.twoPopDriftVariance",
     "translator": "extract",
-    "source": "Descent/AncestrySpecificArchitecture.lean:208",
+    "source": "Descent/PopGen/AncestrySpecificArchitecture.lean:208",
     "checksum": "sha256:2177e0047d4d7ac6bd4f7aea356a0597",
     "empirical_status": "VALIDATED",
     "admissible_box": {
@@ -2008,7 +2008,7 @@
    "Descent.wrightFIT": {
     "fq": "Descent.wrightFIT",
     "translator": "extract",
-    "source": "Descent/PopulationGeneticsFoundations.lean:733",
+    "source": "Descent/PopGen/PopulationGeneticsFoundations.lean:733",
     "checksum": "sha256:18c818484874cb14f3dde25aa994c622",
     "empirical_status": "",
     "admissible_box": {
@@ -2109,7 +2109,7 @@
  "checks": {
   "simpleFst-is-nei": {
    "definition": "Descent.neiGstFromFrequencies",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:166",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:166",
    "definition_checksum": "sha256:f7b8e3e7009b1a9960f9ccb3a5039303",
    "translator": "extract",
    "numeric_standin": null,
@@ -2294,7 +2294,7 @@
   },
   "simpleFst-vs-hudson": {
    "definition": "Descent.neiGstFromFrequencies",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:166",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:166",
    "definition_checksum": "sha256:f7b8e3e7009b1a9960f9ccb3a5039303",
    "translator": "extract",
    "numeric_standin": null,
@@ -2546,7 +2546,7 @@
   },
   "hudsonFst-is-hudson": {
    "definition": "Descent.hudsonFst",
-   "definition_source": "Descent/Conventions.lean:462",
+   "definition_source": "Descent/Foundations/Conventions.lean:462",
    "definition_checksum": "sha256:6eee44fba5bb169d00f54ad78d3a62e2",
    "translator": "extract",
    "numeric_standin": null,
@@ -2731,7 +2731,7 @@
   },
   "neiFst-identity": {
    "definition": "Descent.neiFst",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:71",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:71",
    "definition_checksum": "sha256:ae45cb0004c41d61fb37e580c7ac5096",
    "translator": "extract",
    "numeric_standin": null,
@@ -3296,7 +3296,7 @@
   },
   "coalFst-exact-split": {
    "definition": "Descent.coalFst",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:346",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:346",
    "definition_checksum": "sha256:0d6878ab9a0086bc1237c31c0153721b",
    "translator": "extract",
    "numeric_standin": null,
@@ -3473,7 +3473,7 @@
   },
   "coalFst-asymmetric-sizes": {
    "definition": "Descent.coalFst",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:346",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:346",
    "definition_checksum": "sha256:0d6878ab9a0086bc1237c31c0153721b",
    "translator": "extract",
    "numeric_standin": null,
@@ -3610,7 +3610,7 @@
   },
   "heterozygosityLossDerived-is-not-split-fst": {
    "definition": "Descent.heterozygosityLossDerived",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2197",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2197",
    "definition_checksum": "sha256:82b5d213bd2ea97e7e70b268dd34805a",
    "translator": "extract",
    "numeric_standin": null,
@@ -3833,7 +3833,7 @@
   },
   "heterozygosityLossDerived-is-coalescence-prob": {
    "definition": "Descent.heterozygosityLossDerived",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2197",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2197",
    "definition_checksum": "sha256:82b5d213bd2ea97e7e70b268dd34805a",
    "translator": "extract",
    "numeric_standin": null,
@@ -4010,7 +4010,7 @@
   },
   "hetLossFromDrift-duplicates-heterozygosityLossDerived": {
    "definition": "Descent.heterozygosityLossFromDrift",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:802",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:802",
    "definition_checksum": "sha256:7697a22f404547d715def22f37165813",
    "translator": "extract",
    "numeric_standin": null,
@@ -4187,7 +4187,7 @@
   },
   "fstFromGenerations-equals-coalFst": {
    "definition": "Descent.fstFromGenerations",
-   "definition_source": "Descent/PortabilityDrift.lean:192",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:192",
    "definition_checksum": "sha256:cebd0ae0459cd589aa5d9dd7e5baa6ec",
    "translator": "extract",
    "numeric_standin": null,
@@ -4364,7 +4364,7 @@
   },
   "pairwiseFstFromBranches": {
    "definition": "Descent.pairwiseFstFromBranches",
-   "definition_source": "Descent/PortabilityDrift.lean:246",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:246",
    "definition_checksum": "sha256:29040f8a3bd633131b9c0942a88f706e",
    "translator": "extract",
    "numeric_standin": null,
@@ -4518,7 +4518,7 @@
   },
   "hetEquilibrium-vs-exact-iam": {
    "definition": "Descent.expectedHeterozygosity",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:273",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:273",
    "definition_checksum": "sha256:80414a49ca64246da873fc67869ac456",
    "translator": "extract",
    "numeric_standin": null,
@@ -4667,7 +4667,7 @@
   },
   "hetDecayFactor-vs-exact-eigenvalue": {
    "definition": "Descent.hetDecayFactor",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2474",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2474",
    "definition_checksum": "sha256:258d832ef7bf95ff62a095a8cdcbdc6b",
    "translator": "extract",
    "numeric_standin": null,
@@ -4817,7 +4817,7 @@
   },
   "hetMutationDriftRecurrence-trajectory": {
    "definition": "Descent.hetMutationDriftRecurrence",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2325",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2325",
    "definition_checksum": "sha256:12df8e964af09039e870afc95245bc25",
    "translator": "extract",
    "numeric_standin": null,
@@ -5039,7 +5039,7 @@
   },
   "transient-discrete-vs-continuous": {
    "definition": "Descent.fstMutationDriftTransientDiscrete",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2638",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2638",
    "definition_checksum": "sha256:eb4d471484b2233a1f0898cffb07cd6f",
    "translator": "extract",
    "numeric_standin": null,
@@ -5249,7 +5249,7 @@
   },
   "islandModelFst-finite-demes": {
    "definition": "Descent.fstMigrationDriftEquilibrium",
-   "definition_source": "Descent/PortabilityDrift.lean:7012",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7012",
    "definition_checksum": "sha256:85cba214b6faeb34ea50e3285eded5df",
    "translator": "extract",
    "numeric_standin": null,
@@ -5609,7 +5609,7 @@
   },
   "islandFstFiniteDemes-is-the-finite-form": {
    "definition": "Descent.islandFstFiniteDemes",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:1418",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1418",
    "definition_checksum": "sha256:9fd319020876566752bac035726d6927",
    "translator": "extract",
    "numeric_standin": null,
@@ -5803,7 +5803,7 @@
   },
   "fstIslandMultiplicative-exact-fixedpoint": {
    "definition": "Descent.fstIslandMultiplicativeEquilibrium",
-   "definition_source": "Descent/PortabilityDrift.lean:7348",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7348",
    "definition_checksum": "sha256:7db8e84753c2562d20a05220b68d4100",
    "translator": "extract",
    "numeric_standin": null,
@@ -5917,7 +5917,7 @@
   },
   "islandModelFst-vs-exact-in-m": {
    "definition": "Descent.fstMigrationDriftEquilibrium",
-   "definition_source": "Descent/PortabilityDrift.lean:7012",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7012",
    "definition_checksum": "sha256:85cba214b6faeb34ea50e3285eded5df",
    "translator": "extract",
    "numeric_standin": null,
@@ -6228,7 +6228,7 @@
   },
   "steppingStoneLength-missing-mutation": {
    "definition": "Descent.steppingStoneCharacteristicLength",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:1846",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1846",
    "definition_checksum": "sha256:6f417be0b90742f8451cedb23656648e",
    "translator": "extract",
    "numeric_standin": null,
@@ -6390,7 +6390,7 @@
   },
   "steppingStoneLength-missing-sigma-squared": {
    "definition": "Descent.steppingStoneCharacteristicLength",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:1846",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1846",
    "definition_checksum": "sha256:6f417be0b90742f8451cedb23656648e",
    "translator": "extract",
    "numeric_standin": null,
@@ -6552,7 +6552,7 @@
   },
   "steppingStoneMeetingTime-lattice-form": {
    "definition": "Descent.steppingStoneMeetingTimeOnLattice",
-   "definition_source": "Descent/DemographicHistory.lean:373",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:373",
    "definition_checksum": "sha256:309cd212a2d7af361ef1404ed8620568",
    "translator": "extract",
    "numeric_standin": null,
@@ -6728,7 +6728,7 @@
   },
   "demoSteppingStoneFst-exact": {
    "definition": "Descent.demoSteppingStoneFst",
-   "definition_source": "Descent/DemographicHistory.lean:99",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:99",
    "definition_checksum": "sha256:a94a45644ca859bbfb301c6369cb39ce",
    "translator": "extract",
    "numeric_standin": null,
@@ -7036,7 +7036,7 @@
   },
   "steppingStoneDiffusionTimescale-lattice-scale": {
    "definition": "Descent.steppingStoneDiffusionTimescale",
-   "definition_source": "Descent/DemographicHistory.lean:351",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:351",
    "definition_checksum": "sha256:f0fed2ee1d4a4fd5675bbb744960ba89",
    "translator": "extract",
    "numeric_standin": null,
@@ -7445,7 +7445,7 @@
   },
   "ldRetentionPerGen-exact": {
    "definition": "Descent.ldRetentionPerGen",
-   "definition_source": "Descent/LDDecayTheory.lean:80",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:80",
    "definition_checksum": "sha256:3c01ac817924e11aecda5477fe300ab3",
    "translator": "extract",
    "numeric_standin": null,
@@ -7595,7 +7595,7 @@
   },
   "ldHalfLife-drops-recombination": {
    "definition": "Descent.ldHalfLife",
-   "definition_source": "Descent/LDDecayTheory.lean:1304",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:1304",
    "definition_checksum": "sha256:37ae758409b05f372a26127d0e037825",
    "translator": "extract",
    "numeric_standin": null,
@@ -7745,7 +7745,7 @@
   },
   "ldRetainedFraction-inconsistent-with-retention": {
    "definition": "Descent.ldRetainedFraction",
-   "definition_source": "Descent/LDDecayTheory.lean:1437",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:1437",
    "definition_checksum": "sha256:fabb68555fa59810fa3ff4ef1a834604",
    "translator": "extract",
    "numeric_standin": null,
@@ -7867,7 +7867,7 @@
   },
   "driftLDEquilibrium-exact-fixedpoint": {
    "definition": "Descent.driftLDEquilibrium",
-   "definition_source": "Descent/LDDecayTheory.lean:535",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:535",
    "definition_checksum": "sha256:3b4c0d02c60f3bfcf7609ff1526bb67a",
    "translator": "extract",
    "numeric_standin": null,
@@ -7981,7 +7981,7 @@
   },
   "driftLDEquilibrium-vs-ohta-kimura": {
    "definition": "Descent.driftLDEquilibrium",
-   "definition_source": "Descent/LDDecayTheory.lean:535",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:535",
    "definition_checksum": "sha256:3b4c0d02c60f3bfcf7609ff1526bb67a",
    "translator": "extract",
    "numeric_standin": null,
@@ -8191,7 +8191,7 @@
   },
   "ohtaKimuraSigmaDSq-matches-simulation": {
    "definition": "Descent.ohtaKimuraSigmaDSq",
-   "definition_source": "Descent/LDDecayTheory.lean:578",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:578",
    "definition_checksum": "sha256:71b4699d013a2e537e8b408f4c9231f4",
    "translator": "extract",
    "numeric_standin": null,
@@ -8268,7 +8268,7 @@
   },
   "driftLDTrajectory-converges": {
    "definition": "Descent.driftLDTrajectory",
-   "definition_source": "Descent/LDDecayTheory.lean:827",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:827",
    "definition_checksum": "sha256:294b4c8553827f6eeb3b970ab937cd5c",
    "translator": "extract",
    "numeric_standin": null,
@@ -8345,7 +8345,7 @@
   },
   "selectionMigrationEquilibrium": {
    "definition": "Descent.selectionMigrationEquilibrium",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:531",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:531",
    "definition_checksum": "sha256:48d4ae823cc7718e4196ccb9b114412e",
    "translator": "extract",
    "numeric_standin": null,
@@ -8495,7 +8495,7 @@
   },
   "alleleFreqAfterMigration": {
    "definition": "Descent.alleleFreqAfterMigration",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:1979",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:1979",
    "definition_checksum": "sha256:5b81709af858b9926b2a37e5efb6a60b",
    "translator": "extract",
    "numeric_standin": null,
@@ -8803,7 +8803,7 @@
   },
   "admixedFst-ratio-not-numerator": {
    "definition": "Descent.admixedFst",
-   "definition_source": "Descent/DemographicHistory.lean:544",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:544",
    "definition_checksum": "sha256:40a69e536352754f2a241faf8f7e3309",
    "translator": "extract",
    "numeric_standin": null,
@@ -9045,7 +9045,7 @@
   },
   "admixedFst-over-a-spectrum": {
    "definition": "Descent.admixedFst",
-   "definition_source": "Descent/DemographicHistory.lean:544",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:544",
    "definition_checksum": "sha256:40a69e536352754f2a241faf8f7e3309",
    "translator": "extract",
    "numeric_standin": null,
@@ -9173,7 +9173,7 @@
   },
   "admixtureLDDecay-is-the-infinite-Ne-limit": {
    "definition": "Descent.admixtureLDDecay",
-   "definition_source": "Descent/PortabilityDrift.lean:8637",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:8637",
    "definition_checksum": "sha256:c7cd62a2caef6defa6c8cfa8de73cf59",
    "translator": "extract",
    "numeric_standin": null,
@@ -9338,7 +9338,7 @@
   },
   "pairwiseFstFromBranchTaus-correct-composition": {
    "definition": "Descent.pairwiseFstFromBranchTaus",
-   "definition_source": "Descent/PortabilityDrift.lean:309",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:309",
    "definition_checksum": "sha256:063f26bf079f75057d9417cef8ec107b",
    "translator": "extract",
    "numeric_standin": null,
@@ -9492,7 +9492,7 @@
   },
   "ldCorrelationMigrationAnsatz-vs-sharedLD-squared": {
    "definition": "Descent.ldCorrelationMigrationAnsatz",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2071",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2071",
    "definition_checksum": "sha256:97273d159364803aa7de1a125626dbad",
    "translator": "extract",
    "numeric_standin": null,
@@ -9564,7 +9564,7 @@
   },
   "targetHetFromFst-tautology": {
    "definition": "Descent.targetHetFromFst",
-   "definition_source": "Descent/PortabilityDrift.lean:1229",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:1229",
    "definition_checksum": "sha256:be656ae3581cc33416621435b6976358",
    "translator": "extract",
    "numeric_standin": null,
@@ -9660,7 +9660,7 @@
   },
   "wrightFIT-composition": {
    "definition": "Descent.wrightFIT",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:733",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:733",
    "definition_checksum": "sha256:18c818484874cb14f3dde25aa994c622",
    "translator": "extract",
    "numeric_standin": null,
@@ -9809,7 +9809,7 @@
   },
   "hetRecurrence-at-mutation-drift-balance": {
    "definition": "Descent.hetRecurrence",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:2149",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:2149",
    "definition_checksum": "sha256:749237a26c0e78e60ac07db60b8a7174",
    "translator": "extract",
    "numeric_standin": null,
@@ -9970,7 +9970,7 @@
   },
   "ldRecurrence-drops-drift": {
    "definition": "Descent.ldRecurrence",
-   "definition_source": "Descent/LDDecayTheory.lean:1564",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:1564",
    "definition_checksum": "sha256:757875b9daecf8851aab0ef94847b6ff",
    "translator": "extract",
    "numeric_standin": null,
@@ -10186,7 +10186,7 @@
   },
   "hetTrajectory-vs-exact-iam": {
    "definition": "Descent.hetTrajectory",
-   "definition_source": "Descent/PortabilityDrift.lean:856",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:856",
    "definition_checksum": "sha256:1566e5116988fce9be25d7e445a94ee8",
    "translator": "extract",
    "numeric_standin": null,
@@ -10408,7 +10408,7 @@
   },
   "harmonicMeanNe-is-harmonic-mean": {
    "definition": "Descent.harmonicMeanNe",
-   "definition_source": "Descent/LDDecayTheory.lean:957",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:957",
    "definition_checksum": "sha256:ea5175ed0dc29982f549d1f861f4f57b",
    "translator": "extract",
    "numeric_standin": null,
@@ -10641,7 +10641,7 @@
   },
   "cumulativeDrift-first-order": {
    "definition": "Descent.cumulativeDrift",
-   "definition_source": "Descent/DemographicHistory.lean:979",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:979",
    "definition_checksum": "sha256:095aedb0a2e738639c7d9888db87f080",
    "translator": "extract",
    "numeric_standin": null,
@@ -10886,7 +10886,7 @@
   },
   "heterozygosityLossVariableNe-vs-exact-product": {
    "definition": "Descent.heterozygosityLossVariableNe",
-   "definition_source": "Descent/DemographicHistory.lean:1004",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:1004",
    "definition_checksum": "sha256:4d3e92a3744e5a47e2fbcfdc495ed0f5",
    "translator": "extract",
    "numeric_standin": null,
@@ -11124,7 +11124,7 @@
   },
   "heterozygosityLossVariableNe-equals-harmonic-mean-substitution": {
    "definition": "Descent.heterozygosityLossVariableNe",
-   "definition_source": "Descent/DemographicHistory.lean:1004",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:1004",
    "definition_checksum": "sha256:4d3e92a3744e5a47e2fbcfdc495ed0f5",
    "translator": "extract",
    "numeric_standin": null,
@@ -11357,7 +11357,7 @@
   },
   "ldMismatchFrobenius-exact": {
    "definition": "Descent.ldMismatchFrobenius",
-   "definition_source": "Descent/LDDecayTheory.lean:881",
+   "definition_source": "Descent/PopGen/LDDecayTheory.lean:881",
    "definition_checksum": "sha256:9534d6a12c807c45d9b782c8974d6f13",
    "translator": "extract",
    "numeric_standin": null,
@@ -11497,7 +11497,7 @@
   },
   "ibdRecurrenceFixedPoint-is-fixed-point": {
    "definition": "Descent.ibdRecurrenceFixedPoint",
-   "definition_source": "Descent/PortabilityDrift.lean:7145",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7145",
    "definition_checksum": "sha256:457671501864e715159e7cad8fe8f393",
    "translator": "extract",
    "numeric_standin": null,
@@ -11645,7 +11645,7 @@
   },
   "ibdRecurrenceFixedPoint-mutation-reading-exact": {
    "definition": "Descent.ibdRecurrenceFixedPoint",
-   "definition_source": "Descent/PortabilityDrift.lean:7145",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7145",
    "definition_checksum": "sha256:457671501864e715159e7cad8fe8f393",
    "translator": "extract",
    "numeric_standin": null,
@@ -11795,7 +11795,7 @@
   },
   "ibdRecurrenceFixedPoint-migration-reading": {
    "definition": "Descent.fstIslandMultiplicativeEquilibrium",
-   "definition_source": "Descent/PortabilityDrift.lean:7348",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7348",
    "definition_checksum": "sha256:7db8e84753c2562d20a05220b68d4100",
    "translator": "extract",
    "numeric_standin": null,
@@ -11927,7 +11927,7 @@
   },
   "fstIslandMultiplicativeEquilibrium-missing-deme-count": {
    "definition": "Descent.fstIslandMultiplicativeEquilibrium",
-   "definition_source": "Descent/PortabilityDrift.lean:7348",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:7348",
    "definition_checksum": "sha256:7db8e84753c2562d20a05220b68d4100",
    "translator": "extract",
    "numeric_standin": null,
@@ -12032,7 +12032,7 @@
   },
   "ibdFlowStep-linearisation-gap": {
    "definition": "Descent.ibdFlowStep",
-   "definition_source": "Descent/PortabilityDrift.lean:6140",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:6140",
    "definition_checksum": "sha256:60fc5d7cd6f52ab17e0127cb316013b2",
    "translator": "extract",
    "numeric_standin": null,
@@ -12216,7 +12216,7 @@
   },
   "fstMigDriftNext-duplicates-ibdFlowStep": {
    "definition": "Descent.fstMigDriftNext",
-   "definition_source": "Descent/PortabilityDrift.lean:8822",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:8822",
    "definition_checksum": "sha256:fa6f5c0783c48f660f4c085cc7e0ac40",
    "translator": "extract",
    "numeric_standin": null,
@@ -12525,7 +12525,7 @@
   },
   "scaledIdentityStep-fixed-point": {
    "definition": "Descent.scaledIdentityStep",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:878",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:878",
    "definition_checksum": "sha256:379c6aefa16f840a9a08db584037e41d",
    "translator": "extract",
    "numeric_standin": null,
@@ -12673,7 +12673,7 @@
   },
   "scaledIdentityStep-is-the-balance": {
    "definition": "Descent.scaledIdentityStep",
-   "definition_source": "Descent/PopulationGeneticsFoundations.lean:878",
+   "definition_source": "Descent/PopGen/PopulationGeneticsFoundations.lean:878",
    "definition_checksum": "sha256:379c6aefa16f840a9a08db584037e41d",
    "translator": "extract",
    "numeric_standin": null,
@@ -12761,7 +12761,7 @@
   },
   "explainedR2FromTransportMoments-is-squared-correlation": {
    "definition": "Descent.explainedR2FromTransportMoments",
-   "definition_source": "Descent/DGP.lean:525",
+   "definition_source": "Descent/PopGen/DGP.lean:525",
    "definition_checksum": "sha256:f12409bcadf29d4a82d644e9017abb09",
    "translator": "extract",
    "numeric_standin": null,
@@ -13444,7 +13444,7 @@
   },
   "demographicCovarianceGapLowerBound-vacuous-at-equal-divergence": {
    "definition": "Descent.demographicCovarianceGapLowerBound",
-   "definition_source": "Descent/DGP.lean:743",
+   "definition_source": "Descent/PopGen/DGP.lean:743",
    "definition_checksum": "sha256:72cd18d2a68299ff9be8107a8eb8bd83",
    "translator": "extract",
    "numeric_standin": null,
@@ -13589,7 +13589,7 @@
   },
   "alleleFreqMismatchPenalty-is-not-the-variance-retention": {
    "definition": "Descent.alleleFreqMismatchPenalty",
-   "definition_source": "Descent/PortabilityDrift.lean:3751",
+   "definition_source": "Descent/Portability/PortabilityDrift.lean:3751",
    "definition_checksum": "sha256:1cb6648c54ae8c11836ab0f25e961cc8",
    "translator": "extract",
    "numeric_standin": null,
@@ -13753,7 +13753,7 @@
   },
   "fejerChannel3-is-the-depth-3-sample-mean-channel": {
    "definition": "Descent.fejerChannel3",
-   "definition_source": "Descent/EnsembleChannel.lean:40",
+   "definition_source": "Descent/Spectral/EnsembleChannel.lean:40",
    "definition_checksum": "sha256:0efd7efc47374af982bfeae08516785a",
    "translator": "extract",
    "numeric_standin": null,
@@ -14156,7 +14156,7 @@
   },
   "fejerChannel3-is-not-the-long-run-variance": {
    "definition": "Descent.fejerChannel3",
-   "definition_source": "Descent/EnsembleChannel.lean:40",
+   "definition_source": "Descent/Spectral/EnsembleChannel.lean:40",
    "definition_checksum": "sha256:0efd7efc47374af982bfeae08516785a",
    "translator": "extract",
    "numeric_standin": null,
@@ -14255,7 +14255,7 @@
   },
   "gaussianPairSquareChannel3-separates-equal-fejer-profiles": {
    "definition": "Descent.gaussianPairSquareChannel3",
-   "definition_source": "Descent/EnsembleChannel.lean:62",
+   "definition_source": "Descent/Spectral/EnsembleChannel.lean:62",
    "definition_checksum": "sha256:a020d7dce2bcfac83c806d4d7849892f",
    "translator": "extract",
    "numeric_standin": null,
@@ -14343,7 +14343,7 @@
   },
   "driftVariance-is-the-oracle-estimator": {
    "definition": "Descent.driftVariance",
-   "definition_source": "Descent/AncestrySpecificArchitecture.lean:145",
+   "definition_source": "Descent/PopGen/AncestrySpecificArchitecture.lean:145",
    "definition_checksum": "sha256:a2bc5831c5d361ca101e6818960f5bbe",
    "translator": "extract",
    "numeric_standin": null,
@@ -14493,7 +14493,7 @@
   },
   "twoPopDriftVariance-is-twice-the-oracle-estimator": {
    "definition": "Descent.twoPopDriftVariance",
-   "definition_source": "Descent/AncestrySpecificArchitecture.lean:208",
+   "definition_source": "Descent/PopGen/AncestrySpecificArchitecture.lean:208",
    "definition_checksum": "sha256:2177e0047d4d7ac6bd4f7aea356a0597",
    "translator": "extract",
    "numeric_standin": null,
@@ -14643,7 +14643,7 @@
   },
   "expectedFreqDiffSq-is-twice-the-oracle-estimator": {
    "definition": "Descent.expectedFreqDiffSq",
-   "definition_source": "Descent/AncestrySpecificArchitecture.lean:276",
+   "definition_source": "Descent/PopGen/AncestrySpecificArchitecture.lean:276",
    "definition_checksum": "sha256:1b3bf73edd969889667aa0cd6a361f3d",
    "translator": "extract",
    "numeric_standin": null,
@@ -14793,7 +14793,7 @@
   },
   "demoSteppingStoneFst-scale-invariant": {
    "definition": "Descent.demoSteppingStoneFst",
-   "definition_source": "Descent/DemographicHistory.lean:99",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:99",
    "definition_checksum": "sha256:a94a45644ca859bbfb301c6369cb39ce",
    "translator": "extract",
    "numeric_standin": null,
@@ -14836,7 +14836,7 @@
   },
   "steppingStoneFstQuadratic-scale-VIOLATION": {
    "definition": "Descent.steppingStoneFstQuadratic",
-   "definition_source": "Descent/DemographicHistory.lean:224",
+   "definition_source": "Descent/PopGen/DemographicHistory.lean:224",
    "definition_checksum": "sha256:1ef762d7fb8b1eb3a4fc30fd3f9a8102",
    "translator": "extract",
    "numeric_standin": null,
@@ -14924,7 +14924,7 @@
   },
   "ibdFst-scale-VIOLATION-under-the-deme-size-reading": {
    "definition": "Descent.ibdFst",
-   "definition_source": "Descent/AssortativeMatingPGS.lean:867",
+   "definition_source": "Descent/PopGen/AssortativeMatingPGS.lean:867",
    "definition_checksum": "sha256:ebce2a1f7dac34858c6234e8dd3021aa",
    "translator": "extract",
    "numeric_standin": null,
@@ -15022,7 +15022,7 @@
   },
   "amCorrectedPortability-inverts-the-AM-artifact": {
    "definition": "Descent.amCorrectedPortability",
-   "definition_source": "Descent/AssortativeMatingPGS.lean:608",
+   "definition_source": "Descent/PopGen/AssortativeMatingPGS.lean:608",
    "definition_checksum": "sha256:55cbabd71585d21c668db15b70e70e3b",
    "translator": "extract",
    "numeric_standin": null,

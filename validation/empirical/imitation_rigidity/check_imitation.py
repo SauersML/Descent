@@ -1,4 +1,4 @@
-"""Simulation checks of the definitions in `Descent/ImitationRigidity.lean`.
+"""Simulation checks of the definitions in `Descent/Blindness/ImitationRigidity.lean`.
 
 Every definition is transcribed literally from the Lean source (file and line
 quoted below) and compared against a simulation of the quantity its *name*

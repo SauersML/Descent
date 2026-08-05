@@ -1,5 +1,5 @@
 {
- "target": "Descent/CertificateGrading.lean",
+ "target": "Descent/Decision/CertificateGrading.lean",
  "instance": {
   "model": "Gaussian location mixture, unit noise, priors on [-A,A]",
   "functional": "F(pi) = E_pi |theta|  (canonical nonsmooth functional)",

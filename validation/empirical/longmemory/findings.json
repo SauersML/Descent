@@ -1,5 +1,5 @@
 {
- "target": "Descent/TransportedMinimax.lean, section LongMemoryGeometry",
+ "target": "Descent/Decision/TransportedMinimax.lean, section LongMemoryGeometry",
  "model_choice": {
   "chosen": "near-unit-root AR(1), rho = 1 - delta, innovation sd eps; plus ARFIMA(0,d,0)",
   "why": "the compendium's pair (eps = amplitude, delta = memory rate) with a metric eps^2/delta^3 is the signature of a Lorentzian/Ornstein-Uhlenbeck spectral density eps^2/(delta^2 + lambda^2), whose exact discrete-time analogue is the near-unit-root AR(1). Long memory is delta -> 0. ARFIMA(0,d,0) is included as the cleanest long-range-dependent alternative, where the Whittle information for d is analytically pi^2/6 per observation.",

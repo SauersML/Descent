@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test the width law of Descent/TransportedMinimax.lean (WidthLaw).
+"""Test the width law of Descent/Decision/TransportedMinimax.lean (WidthLaw).
 
 The Lean structure asserts, for a band of width w and a single shape constant c:
 

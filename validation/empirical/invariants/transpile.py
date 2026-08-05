@@ -57,7 +57,7 @@ BUILTINS = {
     "abs": ("_b.absv", 1),
     "Real.pi": ("_b.pi", 0),
     "Real.exp1": ("_b.e", 0),
-    # Descent/Probability.lean:487 -- standard normal CDF, used in 8 files
+    # Descent/Foundations/Probability.lean:487 -- standard normal CDF, used in 8 files
     "Phi": ("_b.Phi", 1),
     "phiPdf": ("_b.phi", 1),
     "probitInv": ("_b.probit", 1),

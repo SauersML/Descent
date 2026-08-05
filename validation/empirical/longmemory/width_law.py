@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The width law, and whether its w^-3 is the same object as the metric's delta^-3.
 
-Target: Descent/TransportedMinimax.lean, section "The width law".
+Target: Descent/Decision/TransportedMinimax.lean, section "The width law".
 
 Claims under test:
   (W1) for a spectral band of width w,  ||B||^2 = shape/w      -- shape-free exponent

@@ -1,5 +1,5 @@
 {
- "target": "Descent/DirichletTransfer.lean, sections StalenessCrossover and ShrinkageRule",
+ "target": "Descent/Spectral/DirichletTransfer.lean, sections StalenessCrossover and ShrinkageRule",
  "date": "2026-08-03",
  "model": "LQ design problem J(c; x_T) = 2<c, x_T>_w - ||c||^2_w on a reversible environment; blind c=0, stale c=x_S, damped c=P_tau x_S, oracle c=x_T. Payoffs evaluated on simulated states; the premium formulas are never fed into the payoff computation.",
  "harnesses": {

@@ -1,6 +1,6 @@
 """
 Empirical validation of `meff_lipschitz_predictor_error_ge`
-(Descent/CountingInvariantInstances.lean).
+(Descent/Blindness/CountingInvariantInstances.lean).
 
 CLAIM UNDER TEST
 ----------------

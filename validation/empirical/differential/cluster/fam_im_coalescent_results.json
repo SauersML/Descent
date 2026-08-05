@@ -88,7 +88,7 @@
   "expectedSqMeanPGSDiff_IMEquilibrium"
  ],
  "transcribed_against_revision": "a4bc5385",
- "transcription_caveat": "Descent/PortabilityDrift.lean differed from origin/main by uncommitted edits from other sessions at transcription time; the eight bodies were re-read from the working tree immediately before commit",
+ "transcription_caveat": "Descent/Portability/PortabilityDrift.lean differed from origin/main by uncommitted edits from other sessions at transcription time; the eight bodies were re-read from the working tree immediately before commit",
  "base_grid": [
   {
    "M": 0.1,

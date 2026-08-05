@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.12
 """Independent reproduction of the sigma_k quadrature table in
-Descent/StandardizedGenotypeMoments.lean (ScaleSequence.doubly_exponential docstring):
+Descent/PopGen/StandardizedGenotypeMoments.lean (ScaleSequence.doubly_exponential docstring):
 
     1.414, 3.742, 19.07, 294.1, 7.276e4, 4.699e9, 2.005e19
 

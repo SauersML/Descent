@@ -30,17 +30,17 @@ WHAT IS ACTUALLY FALSIFIABLE HERE, AND IT IS THE BRIDGE.
   The corpus expresses a time-varying population size TWICE, in two different
   languages, and never checks that the two readings agree.
 
-    (1) As a PROCESS. Descent/PortabilityDrift.lean defines survival from an
+    (1) As a PROCESS. Descent/Portability/PortabilityDrift.lean defines survival from an
         integrated hazard: with Ne(t) varying, the hazard is 1/(2 Ne(t)) and
         Lambda(t) = integral of it. Nothing is averaged.
 
-    (2) As a NUMBER. Descent/LDDecayTheory.lean defines
+    (2) As a NUMBER. Descent/PopGen/LDDecayTheory.lean defines
 
             harmonicMeanNe (Ne : Fin T -> R) := T / (sum of 1 / Ne i)
 
         and the drift-retention work throughout the corpus uses that single
         harmonic mean in place of the trajectory. `bottleneck_dominates_harmonic_mean`
-        and `harmonicMeanNe_lt_timeWeightedArithmeticMeanNe` (Descent/DGP.lean)
+        and `harmonicMeanNe_lt_timeWeightedArithmeticMeanNe` (Descent/PopGen/DGP.lean)
         are the corpus's own statements that a bottleneck pulls it down.
 
   THE QUESTION THIS FILE ASKS. Does the constant-size population of size
@@ -110,7 +110,7 @@ ALSO FALSIFIABLE, AND CHECKED SEPARATELY.
 
 WHAT THE FAMILY LISTING NAMES THAT THIS FILE DOES NOT COVER AS A MEMBER.
   differential/cluster/families.py lists `twoLocusIdx0` and `twoLocusIdx1`
-  alongside the six. Both are `private def` in Descent/DGP.lean and return
+  alongside the six. Both are `private def` in Descent/PopGen/DGP.lean and return
   `Fin t`, not a number. They are exercised only through the matrix: C5's
   off-block zeros are what would fail if those indices named the wrong
   positions. They are reported as COVERED INDIRECTLY, not as scored members,
@@ -193,12 +193,12 @@ TRANSCRIPTION PROVENANCE
   inside one hour today and have already sent one instrument chasing
   declarations that had moved.
 
-  Declarations read from Descent/PortabilityDrift.lean
+  Declarations read from Descent/Portability/PortabilityDrift.lean
   (integratedCoalescentHazard, coalescenceSurvivalFromHazard,
-  coalescenceCdfFromHazard), Descent/DGP.lean
+  coalescenceCdfFromHazard), Descent/PopGen/DGP.lean
   (discreteRecombinationSurvival, twoLocusIBDCovariance,
   twoLocusCoalescentCovarianceMatrix, twoLocusIdx0, twoLocusIdx1) and
-  Descent/LDDecayTheory.lean (harmonicMeanNe). Three of those files carried
+  Descent/PopGen/LDDecayTheory.lean (harmonicMeanNe). Three of those files carried
   uncommitted edits from other sessions at transcription time; re-read them
   before trusting this transcription at a later revision.
 
@@ -436,7 +436,7 @@ def resolved_config():
 # ===========================================================================
 
 def corpus_integrated_hazard(hazard_values, dt):
-    """Descent/PortabilityDrift.lean, decl `integratedCoalescentHazard`
+    """Descent/Portability/PortabilityDrift.lean, decl `integratedCoalescentHazard`
 
         noncomputable def integratedCoalescentHazard (hazard : R -> R) (t : R) : R :=
           integral of s in (0)..t, hazard s
@@ -452,7 +452,7 @@ def corpus_integrated_hazard(hazard_values, dt):
 
 
 def corpus_survival(integrated):
-    """Descent/PortabilityDrift.lean, decl `coalescenceSurvivalFromHazard`
+    """Descent/Portability/PortabilityDrift.lean, decl `coalescenceSurvivalFromHazard`
 
         noncomputable def coalescenceSurvivalFromHazard (hazard : R -> R) (t : R) : R :=
           Real.exp (-(integratedCoalescentHazard hazard t))
@@ -463,7 +463,7 @@ def corpus_survival(integrated):
 
 
 def corpus_cdf(integrated):
-    """Descent/PortabilityDrift.lean, decl `coalescenceCdfFromHazard`
+    """Descent/Portability/PortabilityDrift.lean, decl `coalescenceCdfFromHazard`
 
         noncomputable def coalescenceCdfFromHazard (hazard : R -> R) (t : R) : R :=
           1 - coalescenceSurvivalFromHazard hazard t
@@ -474,7 +474,7 @@ def corpus_cdf(integrated):
 
 
 def corpus_harmonic_mean_ne(ne_values):
-    """Descent/LDDecayTheory.lean, decl `harmonicMeanNe`
+    """Descent/PopGen/LDDecayTheory.lean, decl `harmonicMeanNe`
 
         noncomputable def harmonicMeanNe {T : N} (Ne : Fin T -> R) : R :=
           (T : R) / sum i, (1 / Ne i)
@@ -504,7 +504,7 @@ def corpus_harmonic_mean_ne_from_reciprocals(recip_ne):
 
 
 def corpus_discrete_recombination_survival(recomb_rate, tmrca):
-    """Descent/DGP.lean, decl `discreteRecombinationSurvival`
+    """Descent/PopGen/DGP.lean, decl `discreteRecombinationSurvival`
 
         noncomputable def discreteRecombinationSurvival (recombRate : R) (tmrca : N) : R :=
           (1 - recombRate) ^ tmrca
@@ -516,7 +516,7 @@ def corpus_discrete_recombination_survival(recomb_rate, tmrca):
 
 
 def corpus_two_locus_ibd_covariance(ibd_weight, recomb_rate, tmrca):
-    """Descent/DGP.lean, decl `twoLocusIBDCovariance`
+    """Descent/PopGen/DGP.lean, decl `twoLocusIBDCovariance`
 
         noncomputable def twoLocusIBDCovariance (ibdWeight recombRate : R) (tmrca : N) : R :=
           ibdWeight * discreteRecombinationSurvival recombRate tmrca
@@ -531,7 +531,7 @@ def corpus_two_locus_ibd_covariance(ibd_weight, recomb_rate, tmrca):
 
 
 def corpus_two_locus_covariance_matrix(t, ibd_weight, recomb_rate, tmrca):
-    """Descent/DGP.lean, decl `twoLocusCoalescentCovarianceMatrix`
+    """Descent/PopGen/DGP.lean, decl `twoLocusCoalescentCovarianceMatrix`
 
         noncomputable def twoLocusCoalescentCovarianceMatrix {t : N} (ht : 2 <= t)
             (ibdWeight recombRate : R) (tmrca : N) : Matrix (Fin t) (Fin t) R :=
@@ -1846,7 +1846,7 @@ def main(argv=None):
             "the INSTRUMENT flag, and is excluded from CORPUS_FINDINGS. "
             "Agreement in C0 is NOT evidence for the corpus.",
         "the_falsifiable_claim":
-            "C3: whether harmonicMeanNe (Descent/LDDecayTheory.lean), the "
+            "C3: whether harmonicMeanNe (Descent/PopGen/LDDecayTheory.lean), the "
             "single number the corpus's drift-retention work substitutes for a "
             "time-varying Ne, yields the same TMRCA DISTRIBUTION as the "
             "integrated hazard of the true trajectory. The two are pinned "
@@ -1854,11 +1854,11 @@ def main(argv=None):
             "harmonic mean, so only a distributional statistic can separate "
             "them; the mean is reported and explicitly not scored.",
         "external_declarations_used": {
-            "harmonicMeanNe": "Descent/LDDecayTheory.lean -- the other side "
+            "harmonicMeanNe": "Descent/PopGen/LDDecayTheory.lean -- the other side "
                               "of the bridge; not a member of this family"},
         "transcription_note":
             "Bodies transcribed by declaration name, never by line number. "
-            "Descent/DGP.lean and Descent/PortabilityDrift.lean carried "
+            "Descent/PopGen/DGP.lean and Descent/Portability/PortabilityDrift.lean carried "
             "uncommitted edits from other sessions at transcription time; "
             "re-read the declarations before trusting this at a later "
             "revision."}

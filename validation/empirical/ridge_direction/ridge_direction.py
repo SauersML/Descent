@@ -5,7 +5,7 @@
 
 Two candidates for the effective ridge eta in the filter phi = S^2/(S^2 + eta):
 
-    DEFLATED (Descent/TransportedMinimax.lean):  eta = tau^2 a/(a+r)
+    DEFLATED (Descent/Decision/TransportedMinimax.lean):  eta = tau^2 a/(a+r)
     INFLATED (upstream manuscript):                        eta = tau^2 (1 + r/a)
 
 with a = ||(phi-1)S|| at the optimum.  They are reciprocal about tau^2.

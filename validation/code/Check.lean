@@ -107,7 +107,7 @@ source text.  That is a scan of what a person typed, and the question is what
 the KERNEL accepted.  The two come apart in the direction that matters:
 
   * A declaration can depend on `sorryAx` with no `sorry` in its source.  On
-    2026-08-03 `Descent/ConditionalGain.lean` reopened the namespace
+    2026-08-03 `Descent/Conditionals/ConditionalGain.lean` reopened the namespace
     `FiniteCoupledPhaseLaw` without re-declaring its `variable {n d : ℕ}`, so
     `toFiberCoupling` mentioned two unbound identifiers.  Lean recovered from
     the elaboration error by inserting synthetic sorries, and reported

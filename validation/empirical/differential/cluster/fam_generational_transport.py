@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Family simulator: GENERATIONAL TRANSPORT KERNEL. numpy only.
 
-The `...At` / `...AtGeneration` layer of Descent/PortabilityDrift.lean: the
+The `...At` / `...AtGeneration` layer of Descent/Portability/PortabilityDrift.lean: the
 composition of the popgen families (drift, mutation, migration, LD) with the
 metric families (score variance, predictive covariance, R2, slope). Because it
 is a COMPOSITION, an error in the popgen half and a compensating error in the

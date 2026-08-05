@@ -224,7 +224,7 @@
       "record disagree, and the way to settle that is to re-read the cited source --",
       "which is the entire point of writing the value down."
     ],
-    "Descent/LDDecayTheory.lean::ohtaKimuraSigmaDSq": {
+    "Descent/PopGen/LDDecayTheory.lean::ohtaKimuraSigmaDSq": {
       "constants": [
         "10",
         "11",
@@ -233,37 +233,37 @@
       ],
       "source": "Ohta & Kimura (1971): sigma_d^2 = (10 + rho)/((2 + rho)(11 + rho)), rho = 4*Ne*c.  Value 5/11 at rho = 0."
     },
-    "Descent/DGP.lean::scaledMutationRate": {
+    "Descent/PopGen/DGP.lean::scaledMutationRate": {
       "constants": [
         "4"
       ],
       "source": "theta = 4*Ne*mu, the diploid coalescent scaling."
     },
-    "Descent/DGP.lean::scaledMigrationRate": {
+    "Descent/PopGen/DGP.lean::scaledMigrationRate": {
       "constants": [
         "4"
       ],
       "source": "M = 4*Ne*m, the same scaling applied to gene flow."
     },
-    "Descent/TransferLearningPGS.lean::pinskerAncestryDivergenceCap": {
+    "Descent/Portability/TransferLearningPGS.lean::pinskerAncestryDivergenceCap": {
       "constants": [
         "2"
       ],
       "source": "sqrt(2*KL), the L1-convention Pinsker bound.  Deliberately NOT the tight sqrt(KL/2): the definition's own docstring records that it is loose by exactly a factor of two, measured over 200000 distribution pairs."
     },
-    "Descent/TransferLearningPGS.lean::gaussianSourceResidualRisk": {
+    "Descent/Portability/TransferLearningPGS.lean::gaussianSourceResidualRisk": {
       "constants": [
         "2"
       ],
       "source": "exp(-2*I) is the Gaussian residual-variance fraction; the 2 is fixed by half a nat costing exactly one e-fold."
     },
-    "Descent/LDDecayTheory.lean::admixtureLD": {
+    "Descent/PopGen/LDDecayTheory.lean::admixtureLD": {
       "constants": [
         "1"
       ],
       "source": "Chakraborty & Weiss (1988) hybrid-isolation model: D = alpha*(1-alpha)*dp1*dp2.  The weight is the VARIANCE alpha(1-alpha), not alpha; simulation excludes the linear form at 1627 sems."
     },
-    "Descent/LDDecayTheory.lean::driftLDRetention": {
+    "Descent/PopGen/LDDecayTheory.lean::driftLDRetention": {
       "constants": [
         "1",
         "1",
@@ -273,7 +273,7 @@
       ],
       "source": "(1-c)^2 * (1 - 1/(2*Ne)).  The exponent 2 on (1-c) is the two lineage pairs; the 2*Ne is the diploid coalescent scale."
     },
-    "Descent/LDDecayTheory.lean::ldRetentionPerGen": {
+    "Descent/PopGen/LDDecayTheory.lean::ldRetentionPerGen": {
       "constants": [
         "1",
         "1",
@@ -282,14 +282,14 @@
       ],
       "source": "The elementary two-locus recursion (1-r)*(1 - 1/(2*Ne)).  NOT Ohta-Kimura, which is the sigma_d^2 form above."
     },
-    "Descent/EpistasisAndNonAdditivity.lean::fisherAverageEffect": {
+    "Descent/PopGen/EpistasisAndNonAdditivity.lean::fisherAverageEffect": {
       "constants": [
         "1",
         "2"
       ],
       "source": "Falconer & Mackay: alpha = a + d*(1 - 2p).  The dominance term vanishes at p = 1/2 and reverses across it."
     },
-    "Descent/EpistasisAndNonAdditivity.lean::dominanceVariance": {
+    "Descent/PopGen/EpistasisAndNonAdditivity.lean::dominanceVariance": {
       "constants": [
         "1",
         "2",
@@ -297,7 +297,7 @@
       ],
       "source": "Falconer & Mackay: V_D = sum (2pq*d)^2."
     },
-    "Descent/EpistasisAndNonAdditivity.lean::epistaticVariance": {
+    "Descent/PopGen/EpistasisAndNonAdditivity.lean::epistaticVariance": {
       "constants": [
         "1",
         "1",
@@ -307,7 +307,7 @@
       ],
       "source": "V_AA = beta12^2 * 2p1q1 * 2p2q2 under HWE and linkage equilibrium; the two 2s are genotypic variances, not allelic."
     },
-    "Descent/PowerAnalysis.lean::noncentralityParam": {
+    "Descent/Decision/PowerAnalysis.lean::noncentralityParam": {
       "constants": [
         "1",
         "2",
@@ -315,19 +315,19 @@
       ],
       "source": "NCP = n*beta^2*2p(1-p): beta enters quadratically and p through the GENOTYPE variance 2p(1-p), not the allelic p(1-p)."
     },
-    "Descent/PopulationGeneticsFoundations.lean::steppingStoneCharacteristicLength": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::steppingStoneCharacteristicLength": {
       "constants": [
         "2"
       ],
       "source": "Malecot / Kimura-Weiss (1964) 1-D decay scale L = sqrt(m*sigma^2/(2*mu)); the mutation rate is mandatory and the deme size does not enter."
     },
-    "Descent/PCCorrectability/Threshold.lean::demographicSpike": {
+    "Descent/Portability/PCCorrectability/Threshold.lean::demographicSpike": {
       "constants": [
         "4"
       ],
       "source": "4*F*effectiveSubgroupSize.  The 4 is recovered as 3.9920 +- 0.0045 by inverting the BBP eigenvalue law on simulated genotypes with F measured as genuine Hudson F_ST."
     },
-    "Descent/PortabilityDrift.lean::hetMutationFloor": {
+    "Descent/Portability/PortabilityDrift.lean::hetMutationFloor": {
       "constants": [
         "1",
         "4",
@@ -335,7 +335,7 @@
       ],
       "source": "theta/(1+theta) with theta = 4*Ne*mu: the infinite-alleles equilibrium heterozygosity, complement of Malecot's identity probability."
     },
-    "Descent/PortabilityDrift.lean::coalescentTau": {
+    "Descent/Portability/PortabilityDrift.lean::coalescentTau": {
       "constants": [
         "2"
       ],
@@ -343,7 +343,7 @@
     }
   },
   "declarations": {
-    "Descent/Conventions.lean::hudsonFst": {
+    "Descent/Foundations/Conventions.lean::hudsonFst": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -353,17 +353,17 @@
       ],
       "source": "Bhatia, Patterson, Sankararaman & Price (2013), Genome Research 23:1514-1521."
     },
-    "Descent/Conventions.lean::neiGst": {
+    "Descent/Foundations/Conventions.lean::neiGst": {
       "quantity": "fst",
       "convention": "nei-gst",
       "source": "Nei (1973), PNAS 70:3321-3323."
     },
-    "Descent/PopulationGeneticsFoundations.lean::neiFst": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::neiFst": {
       "quantity": "fst",
       "convention": "nei-gst",
       "note": "The heterozygosity form (H_T - H_S)/H_T; same statistic as `neiGst`, different arguments."
     },
-    "Descent/PopulationGeneticsFoundations.lean::neiGstFromFrequencies": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::neiGstFromFrequencies": {
       "quantity": "fst",
       "convention": "nei-gst",
       "constants": [
@@ -374,7 +374,7 @@
       ],
       "note": "The 4 is the total-pool denominator 4*pbar*(1-pbar).  Changing it to 2 turns this into a different statistic that still type-checks."
     },
-    "Descent/PopulationGeneticsFoundations.lean::coalFst": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::coalFst": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -382,7 +382,7 @@
       ],
       "note": "t/(t + 2*Ne) is tau/(1+tau) with tau = t/(2*Ne); the 2 is the ploidy in the coalescent time scale."
     },
-    "Descent/PopulationGeneticsFoundations.lean::fstFromHetRatio": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::fstFromHetRatio": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "constants": [
@@ -390,7 +390,7 @@
       ],
       "note": "1 - H/H0 with H0 the ANCESTRAL heterozygosity.  Its own docstring measures it against the classical (1 - 1/(2Ne))^t decay, which is the per-branch reading and not an estimator."
     },
-    "Descent/PopulationGeneticsFoundations.lean::islandFstFiniteDemes": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::islandFstFiniteDemes": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -401,7 +401,7 @@
       "source": "Slatkin (1991), Genetics Research 58:167-175, via 1 - E[T_within]/E[T_between].",
       "note": "The deme correction enters LINEARLY here.  Crow & Aoki (1984) square it, but that is the correction for Nei's G_ST, a different statistic."
     },
-    "Descent/PopulationGeneticsFoundations.lean::fstIslandEquilibriumFiniteDemes": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::fstIslandEquilibriumFiniteDemes": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -412,7 +412,7 @@
       ],
       "note": "Two independent 4s: 4*Ne*m and 4*Ne*mu.  Either one dropping to 2 halves the corresponding scaled rate."
     },
-    "Descent/PopulationGeneticsFoundations.lean::fstMigrationMutationEquilibriumManyDemes": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::fstMigrationMutationEquilibriumManyDemes": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -422,7 +422,7 @@
         "4"
       ]
     },
-    "Descent/PopulationGeneticsFoundations.lean::fstMutationDriftTransient": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::fstMutationDriftTransient": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -431,14 +431,14 @@
         "2"
       ]
     },
-    "Descent/PopulationGeneticsFoundations.lean::fstMutationDriftTransientDiscrete": {
+    "Descent/PopGen/PopulationGeneticsFoundations.lean::fstMutationDriftTransientDiscrete": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
         "1"
       ]
     },
-    "Descent/DGP.lean::fstMutationDriftEquilibrium": {
+    "Descent/PopGen/DGP.lean::fstMutationDriftEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -448,7 +448,7 @@
       "source": "Malecot; Kimura & Crow (1964), Genetics 49:725-738.",
       "note": "NOT the Wright island-model result despite the shared shape; that one is in the migration rate."
     },
-    "Descent/DGP.lean::fstDriftFlowStep": {
+    "Descent/PopGen/DGP.lean::fstDriftFlowStep": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -458,7 +458,7 @@
       ],
       "note": "The leading 2 on (mig + mu) is the two lineages that can independently escape the identity class.  A 1 there halves both homogenising forces."
     },
-    "Descent/DGP.lean::fstDriftMigrationManyDemes": {
+    "Descent/PopGen/DGP.lean::fstDriftMigrationManyDemes": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -466,7 +466,7 @@
         "1"
       ]
     },
-    "Descent/DGP.lean::fstDemeCorrectedFlowStep": {
+    "Descent/PopGen/DGP.lean::fstDemeCorrectedFlowStep": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -477,7 +477,7 @@
       ],
       "note": "fstDriftFlowStep with the migration rate at the two-deme exchange rate.  The inner 2 on mig is islandDemeCorrection at d = 2: the homogenising rate is emigration plus immigration, not emigration alone.  The outer 2 is the two lineages, as in fstDriftFlowStep.  Mutation carries no such factor -- it destroys identity wherever the lineage sits."
     },
-    "Descent/DGP.lean::fstEquilibrium": {
+    "Descent/PopGen/DGP.lean::fstEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -487,7 +487,7 @@
       ],
       "note": "The 2 multiplies bigM and nothing else: it is islandDemeCorrection at the two demes this body's regime declares, measured on battery_falsrepair group_a, where the uncorrected 1/(1 + theta + bigM) is excluded at 7.58 sems and the squared correction 1/(1 + theta + 4 bigM) at 5.37."
     },
-    "Descent/DGP.lean::fstTransientDecayFromScaled": {
+    "Descent/PopGen/DGP.lean::fstTransientDecayFromScaled": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -495,11 +495,11 @@
         "2"
       ]
     },
-    "Descent/DGP.lean::PGSEvolutionaryModel.fstTransient": {
+    "Descent/PopGen/DGP.lean::PGSEvolutionaryModel.fstTransient": {
       "quantity": "fst",
       "convention": "identity-probability"
     },
-    "Descent/PortabilityDrift.lean::fstFromTau": {
+    "Descent/Portability/PortabilityDrift.lean::fstFromTau": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -507,11 +507,11 @@
       ],
       "note": "tau/(1+tau).  The saturation law; `fstFromTau_lt_coalescenceCdf` is what keeps it distinct from 1 - exp(-tau)."
     },
-    "Descent/PortabilityDrift.lean::fstFromGenerations": {
+    "Descent/Portability/PortabilityDrift.lean::fstFromGenerations": {
       "quantity": "fst",
       "convention": "hudson"
     },
-    "Descent/PortabilityDrift.lean::pairwiseFstFromBranchTaus": {
+    "Descent/Portability/PortabilityDrift.lean::pairwiseFstFromBranchTaus": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -519,7 +519,7 @@
       ],
       "note": "The 2 is the MEAN of the branch taus.  A sum instead of a mean double-counts the split time and was measured 50 percent high at up to 59 sems."
     },
-    "Descent/PortabilityDrift.lean::pairwiseFstFromBranches": {
+    "Descent/Portability/PortabilityDrift.lean::pairwiseFstFromBranches": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -529,19 +529,19 @@
       ],
       "note": "Output is pairwise; the two ARGUMENTS are per-branch drift values.  Recorded in open_questions: the ledger has one slot per declaration and cannot carry both."
     },
-    "Descent/PortabilityDrift.lean::hudsonFstFromCoalescenceTimes": {
+    "Descent/Portability/PortabilityDrift.lean::hudsonFstFromCoalescenceTimes": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
         "1"
       ]
     },
-    "Descent/PortabilityDrift.lean::steppingStoneFst": {
+    "Descent/Portability/PortabilityDrift.lean::steppingStoneFst": {
       "quantity": "fst",
       "convention": "inherited",
       "note": "Takes `fst_neighbor` and returns a distance-`d` value in whatever convention that was."
     },
-    "Descent/PortabilityDrift.lean::asymmetricFst": {
+    "Descent/Portability/PortabilityDrift.lean::asymmetricFst": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -550,7 +550,7 @@
         "4"
       ]
     },
-    "Descent/PortabilityDrift.lean::fstMigrationDriftEquilibrium": {
+    "Descent/Portability/PortabilityDrift.lean::fstMigrationDriftEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -561,7 +561,7 @@
       "source": "Wright (1931).",
       "note": "The infinite-island LIMIT.  `islandFstFiniteDemes` carries the finite-deme correction."
     },
-    "Descent/PortabilityDrift.lean::fstMigDriftNext": {
+    "Descent/Portability/PortabilityDrift.lean::fstMigDriftNext": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -574,21 +574,21 @@
       ],
       "note": "The linearised step: (1-m)^2 approximated as 1-2m, so the 2 on m is the linearisation and not a ploidy."
     },
-    "Descent/PortabilityDrift.lean::fstIslandMultiplicativeEquilibrium": {
+    "Descent/Portability/PortabilityDrift.lean::fstIslandMultiplicativeEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability"
     },
-    "Descent/PortabilityDrift.lean::islandFstMultiplicativeStep": {
+    "Descent/Portability/PortabilityDrift.lean::islandFstMultiplicativeStep": {
       "quantity": "fst",
       "convention": "identity-probability"
     },
-    "Descent/PortabilityDrift.lean::MutationDriftModelAssumptions.fstEquilibrium": {
+    "Descent/Portability/PortabilityDrift.lean::MutationDriftModelAssumptions.fstEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
       "source": "Malecot; Kimura & Crow (1964).",
       "note": "Within-population identity probability despite the `fst` in the name."
     },
-    "Descent/PortabilityDrift.lean::MutationDriftModelAssumptions.fstTransient": {
+    "Descent/Portability/PortabilityDrift.lean::MutationDriftModelAssumptions.fstTransient": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -597,7 +597,7 @@
         "2"
       ]
     },
-    "Descent/PortabilityDrift.lean::SplitMigrationModel.fstEqLimitLowMutationManyDemes": {
+    "Descent/Portability/PortabilityDrift.lean::SplitMigrationModel.fstEqLimitLowMutationManyDemes": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -605,11 +605,11 @@
         "1"
       ]
     },
-    "Descent/PortabilityDrift.lean::SplitMigrationModel.fstMigDriftEq": {
+    "Descent/Portability/PortabilityDrift.lean::SplitMigrationModel.fstMigDriftEq": {
       "quantity": "fst",
       "convention": "identity-probability"
     },
-    "Descent/PortabilityDrift.lean::fstTransientAt": {
+    "Descent/Portability/PortabilityDrift.lean::fstTransientAt": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
@@ -620,21 +620,21 @@
       ],
       "note": "The 2 on bigM is the same islandDemeCorrection at d = 2 that DGP::fstEquilibrium carries; this body spells the equilibrium level out because it cannot reach an EvolutionaryParameters, and toGenerationalPopGenParameters_fstTransientAt_floor is what forces the two spellings to move together."
     },
-    "Descent/PortabilityDrift.lean::covarianceRetentionFactorFromFst": {
+    "Descent/Portability/PortabilityDrift.lean::covarianceRetentionFactorFromFst": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
         "1"
       ]
     },
-    "Descent/PortabilityDrift.lean::targetHetFromFst": {
+    "Descent/Portability/PortabilityDrift.lean::targetHetFromFst": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
         "1"
       ]
     },
-    "Descent/DemographicHistory.lean::demoSteppingStoneFst": {
+    "Descent/PopGen/DemographicHistory.lean::demoSteppingStoneFst": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -642,7 +642,7 @@
       ],
       "note": "Built on `coalFst`, hence Hudson.  The 4 is the scaled migration rate 4*Ne*m; the superseded quadratic sibling squares both m and sigma."
     },
-    "Descent/DemographicHistory.lean::steppingStoneFstQuadratic": {
+    "Descent/PopGen/DemographicHistory.lean::steppingStoneFstQuadratic": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -652,7 +652,7 @@
       ],
       "note": "A superseded candidate kept as a discriminand: quadratic in m and in sigma where the surviving form is linear."
     },
-    "Descent/DemographicHistory.lean::admixedFst": {
+    "Descent/PopGen/DemographicHistory.lean::admixedFst": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
@@ -661,7 +661,7 @@
       ],
       "note": "(1-alpha)^2 scaling of a supplied fst_AB.  The exponent 2 is the admixture weight and a 1 there is a different model."
     },
-    "Descent/DemographicHistory.lean::admixedFstExact": {
+    "Descent/PopGen/DemographicHistory.lean::admixedFstExact": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
@@ -669,7 +669,7 @@
         "2"
       ]
     },
-    "Descent/AssortativeMatingPGS.lean::ibdFst": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::ibdFst": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -677,25 +677,25 @@
       ],
       "note": "Isolation by distance; its own docstring pins `N` as a DENSITY rather than a deme size by dimensional analysis."
     },
-    "Descent/AncestrySpecificArchitecture.lean::geneFlowFstStep": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::geneFlowFstStep": {
       "quantity": "fst",
       "convention": "identity-probability"
     },
-    "Descent/PhenomeWidePortability.lean::fstFromDriftFactor": {
+    "Descent/Portability/PhenomeWidePortability.lean::fstFromDriftFactor": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "constants": [
         "1"
       ]
     },
-    "Descent/PhenomeWidePortability.lean::causalPortabilityFromLocalFst": {
+    "Descent/Portability/PhenomeWidePortability.lean::causalPortabilityFromLocalFst": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
         "1"
       ]
     },
-    "Descent/PolygenicArchitecture.lean::rgFstWeightedUpperBound": {
+    "Descent/PopGen/PolygenicArchitecture.lean::rgFstWeightedUpperBound": {
       "quantity": "fst",
       "convention": "inherited",
       "constants": [
@@ -703,28 +703,28 @@
         "1"
       ]
     },
-    "Descent/SerialFounderChain.lean::serialFounderCeilingFst": {
+    "Descent/PopGen/SerialFounderChain.lean::serialFounderCeilingFst": {
       "quantity": "fst",
       "convention": "hudson",
       "note": "tau/(T_within + tau), the coalescence-time ratio for the chain."
     },
-    "Descent/SerialFounderChain.lean::ceilingFst": {
+    "Descent/PopGen/SerialFounderChain.lean::ceilingFst": {
       "quantity": "fst",
       "convention": "hudson",
       "note": "An instantiation of serialFounderCeilingFst at the chain's own fields, so it inherits that entry's Hudson coalescence-time reading and has no free parameter of its own. This entry has been added, removed and added again: the definition was deleted from the corpus, f80af3de correctly dropped the stale entry, and the definition was then reintroduced. Neither edit was wrong; the churn is what a committed snapshot of a moving corpus costs, and it is the intended cost."
     },
-    "Descent/VarianceComponents.lean::narrowSenseH2": {
+    "Descent/PopGen/VarianceComponents.lean::narrowSenseH2": {
       "quantity": "h2",
       "convention": "narrow-sense",
       "source": "Falconer & Mackay, 4th ed.",
       "note": "V_A/(V_A+V_D+V_I+V_E).  V_A/(V_A+V_E) is NOT this quantity and is larger whenever V_D+V_I > 0."
     },
-    "Descent/VarianceComponents.lean::snpH2": {
+    "Descent/PopGen/VarianceComponents.lean::snpH2": {
       "quantity": "h2",
       "convention": "snp",
       "source": "Yang et al. (2010), Nature Genetics 42:565-569."
     },
-    "Descent/VarianceComponents.lean::liabilityScaleH2": {
+    "Descent/PopGen/VarianceComponents.lean::liabilityScaleH2": {
       "quantity": "h2",
       "convention": "liability-scale",
       "constants": [
@@ -734,11 +734,11 @@
       "source": "Dempster & Lerner (1950); Lee et al. (2011), AJHG 88:294-305.",
       "note": "The exponent 2 is the squared threshold height z^2.  A 1 there is a different scale conversion entirely."
     },
-    "Descent/AssortativeMatingPGS.lean::AssortativeMatingModel.h2": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::AssortativeMatingModel.h2": {
       "quantity": "h2",
       "convention": "narrow-sense"
     },
-    "Descent/AssortativeMatingPGS.lean::AssortativeMatingModel.observedH2": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::AssortativeMatingModel.observedH2": {
       "quantity": "h2",
       "convention": "am-inflated",
       "constants": [
@@ -748,267 +748,267 @@
       "source": "Fisher (1918).",
       "note": "Two constants because the body is h2 / (1 - r*h2*(1 - h2)); the second `1` is the (1 - h2) factor. The one-constant entry pinned the superseded h2 / (1 - r*h2), which battery_am01 rejects at up to 275 sems and 54% on the cells where the current body is validated at 2.1 sems worst. Re-pinned against the measured body, not merely against the diff."
     },
-    "Descent/TransferLearningPGS.lean::additiveHeritability": {
+    "Descent/Portability/TransferLearningPGS.lean::additiveHeritability": {
       "quantity": "h2",
       "convention": "narrow-sense"
     },
-    "Descent/TransferLearningPGS.lean::sharedLDHeritability": {
+    "Descent/Portability/TransferLearningPGS.lean::sharedLDHeritability": {
       "quantity": "h2",
       "convention": "narrow-sense",
       "note": "Additive variance computed through a shared LD kernel, still divided by the phenotypic variance."
     },
-    "Descent/AncestrySpecificArchitecture.lean::gwasHeritability": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::gwasHeritability": {
       "quantity": "h2",
       "convention": "snp",
       "note": "h2_true * mean tagging r-squared is the tagged share, which is what h2_SNP measures."
     },
-    "Descent/PolygenicArchitecture.lean::heritabilityEnrichment": {
+    "Descent/PopGen/PolygenicArchitecture.lean::heritabilityEnrichment": {
       "quantity": "h2",
       "convention": "derived-share"
     },
-    "Descent/PowerAnalysis.lean::heritabilityFractionFromN": {
+    "Descent/Decision/PowerAnalysis.lean::heritabilityFractionFromN": {
       "quantity": "h2",
       "convention": "derived-share",
       "note": "n/(n+C) is the FRACTION of heritability recovered at sample size n, not a heritability."
     },
-    "Descent/RareVariantPortability.lean::rareHeritabilityShare": {
+    "Descent/Portability/RareVariantPortability.lean::rareHeritabilityShare": {
       "quantity": "h2",
       "convention": "derived-share"
     },
-    "Descent/SelectionArchitecture.lean::equalPerLocusHeritability": {
+    "Descent/PopGen/SelectionArchitecture.lean::equalPerLocusHeritability": {
       "quantity": "h2",
       "convention": "derived-share",
       "note": "Total heritability divided by the locus count: a per-locus share."
     },
-    "Descent/AncestrySpecificArchitecture.lean::driftVariance": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::driftVariance": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Audited: Wright's F against the ancestor. Exactly twice Nei's G_ST."
     },
-    "Descent/AncestrySpecificArchitecture.lean::expectedFreqDiffSq": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::expectedFreqDiffSq": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Audited with driftVariance; the 2 counts independently drifting branches."
     },
-    "Descent/AncestrySpecificArchitecture.lean::portabilityFromArchitecture": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::portabilityFromArchitecture": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/AncestrySpecificArchitecture.lean::twoPopDriftVariance": {
+    "Descent/PopGen/AncestrySpecificArchitecture.lean::twoPopDriftVariance": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Audited with driftVariance."
     },
-    "Descent/DGP.lean::demographicCovarianceGapLowerBound": {
+    "Descent/PopGen/DGP.lean::demographicCovarianceGapLowerBound": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/DriftRegime.lean::benchmarkRatio": {
+    "Descent/PopGen/DriftRegime.lean::benchmarkRatio": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/DriftRegime.lean::benchmarkRatioSquared": {
+    "Descent/PopGen/DriftRegime.lean::benchmarkRatioSquared": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/HumanDemography.lean::neutralDriftR2Ratio": {
+    "Descent/PopGen/HumanDemography.lean::neutralDriftR2Ratio": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/HumanDemography.lean::taggedDriftR2RatioCorrected": {
+    "Descent/PopGen/HumanDemography.lean::taggedDriftR2RatioCorrected": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PhenomeWidePortability.lean::neutralPortabilityRatioLD": {
+    "Descent/Portability/PhenomeWidePortability.lean::neutralPortabilityRatioLD": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PolygenicAdaptation.lean::expectedPGSDiffVariance": {
+    "Descent/PopGen/PolygenicAdaptation.lean::expectedPGSDiffVariance": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Docstring is written in branch F."
     },
-    "Descent/PolygenicAdaptation.lean::pgsDiffVariance_two_pop": {
+    "Descent/PopGen/PolygenicAdaptation.lean::pgsDiffVariance_two_pop": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PolygenicAdaptation.lean::pgsDriftVarianceFromLoci": {
+    "Descent/PopGen/PolygenicAdaptation.lean::pgsDriftVarianceFromLoci": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Docstring is written in branch F."
     },
-    "Descent/PolygenicAdaptation.lean::pgsDriftVariance_one_pop": {
+    "Descent/PopGen/PolygenicAdaptation.lean::pgsDriftVariance_one_pop": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityBounds.lean::neutralPortability": {
+    "Descent/Portability/PortabilityBounds.lean::neutralPortability": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::Expected_Abs_Shift": {
+    "Descent/Portability/PortabilityDrift.lean::Expected_Abs_Shift": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Composes Var_Delta_Mu on the SUM of two branch values."
     },
-    "Descent/PortabilityDrift.lean::Var_Delta_Mu": {
+    "Descent/Portability/PortabilityDrift.lean::Var_Delta_Mu": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Its own evidence table is indexed by F_branch."
     },
-    "Descent/PortabilityDrift.lean::alleleFreqCorrelation": {
+    "Descent/Portability/PortabilityDrift.lean::alleleFreqCorrelation": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::covarianceDivergenceFromRetention": {
+    "Descent/Portability/PortabilityDrift.lean::covarianceDivergenceFromRetention": {
       "quantity": "fst",
       "convention": "inherited",
       "role": "consumer",
       "note": "Routes through covarianceRetentionFactorFromFst, which commits to nothing."
     },
-    "Descent/PortabilityDrift.lean::covarianceDivergenceMutationDrift": {
+    "Descent/Portability/PortabilityDrift.lean::covarianceDivergenceMutationDrift": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::expectedSqMeanPGSDiff_pureSplit": {
+    "Descent/Portability/PortabilityDrift.lean::expectedSqMeanPGSDiff_pureSplit": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Docstring is written in branch F."
     },
-    "Descent/PortabilityDrift.lean::ldCorrelationDecay": {
+    "Descent/Portability/PortabilityDrift.lean::ldCorrelationDecay": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::neutralAFBenchmarkLiabilityMetricProfile": {
+    "Descent/Portability/PortabilityDrift.lean::neutralAFBenchmarkLiabilityMetricProfile": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::neutralAFBenchmarkMetricProfile": {
+    "Descent/Portability/PortabilityDrift.lean::neutralAFBenchmarkMetricProfile": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::neutralAFSharedLDBenchmarkRatio": {
+    "Descent/Portability/PortabilityDrift.lean::neutralAFSharedLDBenchmarkRatio": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::presentDayEqualVarianceGaussianAUC": {
+    "Descent/Portability/PortabilityDrift.lean::presentDayEqualVarianceGaussianAUC": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Composes presentDayPGSVariance."
     },
-    "Descent/PortabilityDrift.lean::presentDayPGSVariance": {
+    "Descent/Portability/PortabilityDrift.lean::presentDayPGSVariance": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Its docstring declares the heterozygosity-retention reading explicitly and says it is NOT the between-population Hudson F_ST."
     },
-    "Descent/PortabilityDrift.lean::presentDayPGSVarianceMutationDrift": {
+    "Descent/Portability/PortabilityDrift.lean::presentDayPGSVarianceMutationDrift": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::presentDayR2": {
+    "Descent/Portability/PortabilityDrift.lean::presentDayR2": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Composes presentDayPGSVariance; inherits its declared heterozygosity-retention reading."
     },
-    "Descent/PortabilityDrift.lean::presentDayR2MutationDrift": {
+    "Descent/Portability/PortabilityDrift.lean::presentDayR2MutationDrift": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::presentDaySignalToNoise": {
+    "Descent/Portability/PortabilityDrift.lean::presentDaySignalToNoise": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Composes presentDayPGSVariance."
     },
-    "Descent/PortabilityDrift.lean::realWorldPGSVariance": {
+    "Descent/Portability/PortabilityDrift.lean::realWorldPGSVariance": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
       "note": "Same (1 - fst) heterozygosity-retention shape as presentDayPGSVariance."
     },
-    "Descent/PortabilityDrift.lean::targetBrierFromNeutralAFBenchmark": {
+    "Descent/Portability/PortabilityDrift.lean::targetBrierFromNeutralAFBenchmark": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::targetExactCalibratedBrierRisk": {
+    "Descent/Portability/PortabilityDrift.lean::targetExactCalibratedBrierRisk": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::targetLiabilityAUCFromNeutralAFBenchmark": {
+    "Descent/Portability/PortabilityDrift.lean::targetLiabilityAUCFromNeutralAFBenchmark": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PortabilityDrift.lean::targetR2FromNeutralAFBenchmark": {
+    "Descent/Portability/PortabilityDrift.lean::targetR2FromNeutralAFBenchmark": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/AncestryCalibration.lean::prevalenceScaledR2": {
+    "Descent/Portability/AncestryCalibration.lean::prevalenceScaledR2": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/AssortativeMatingPGS.lean::amCorrectedPortability": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::amCorrectedPortability": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/AssortativeMatingPGS.lean::amEquilibriumVariance": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::amEquilibriumVariance": {
       "quantity": "h2",
       "convention": "narrow-sense",
       "role": "consumer",
@@ -1018,13 +1018,13 @@
       ],
       "source": "V_A/(1 - r*h2), the fixed point of amVarianceStep, with h2 held at its random-mating value."
     },
-    "Descent/AssortativeMatingPGS.lean::amInducedLD": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::amInducedLD": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/AssortativeMatingPGS.lean::amVarianceStep": {
+    "Descent/PopGen/AssortativeMatingPGS.lean::amVarianceStep": {
       "quantity": "h2",
       "convention": "narrow-sense",
       "role": "consumer",
@@ -1035,7 +1035,7 @@
       ],
       "source": "Fisher (1918) linearisation: mid-parent variance (1/2)V(1 + r*h2) plus segregation (1/2)V0.  The segregation term uses the RANDOM-MATING V0; using V collapses the recursion to one whose only fixed point is 0."
     },
-    "Descent/CovarianceStructure.lean::ldsrExpectedBetaSq": {
+    "Descent/Foundations/CovarianceStructure.lean::ldsrExpectedBetaSq": {
       "quantity": "h2",
       "convention": "snp",
       "role": "consumer",
@@ -1045,7 +1045,7 @@
       ],
       "source": "Same paper, per-SNP form: E[beta_hat^2] = (h2/M)*l + 1/N."
     },
-    "Descent/CovarianceStructure.lean::ldsrExpectedChi2": {
+    "Descent/Foundations/CovarianceStructure.lean::ldsrExpectedChi2": {
       "quantity": "h2",
       "convention": "snp",
       "role": "consumer",
@@ -1055,37 +1055,37 @@
       ],
       "source": "Bulik-Sullivan et al. (2015), Nature Genetics 47:291-295: E[chi2] = N*h2*l/M + N*a + 1.  The 1 is the null expectation of a 1-df statistic and is what makes the LDSC intercept a confounding diagnostic; the confounding term is NOT divided by M."
     },
-    "Descent/EquityAndImplementation.lean::expectedR2FromN": {
+    "Descent/Portability/EquityAndImplementation.lean::expectedR2FromN": {
       "quantity": "h2",
       "convention": "snp",
       "role": "consumer",
       "note": "Daetwyler-Dudbridge: the h2 a PGS can reach is the tagged one."
     },
-    "Descent/GeneticArchitectureDiscovery.lean::perCausalLocusSignal": {
+    "Descent/PopGen/GeneticArchitectureDiscovery.lean::perCausalLocusSignal": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PolygenicArchitecture.lean::expectedSquaredEffect": {
+    "Descent/PopGen/PolygenicArchitecture.lean::expectedSquaredEffect": {
       "quantity": "h2",
       "convention": "snp",
       "role": "consumer",
       "note": "Per-SNP variance h2/M over a marker panel."
     },
-    "Descent/SampleOverlapBias.lean::kinshipInflation": {
+    "Descent/Portability/SampleOverlapBias.lean::kinshipInflation": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/SampleOverlapBias.lean::partialOverlapR2": {
+    "Descent/Portability/SampleOverlapBias.lean::partialOverlapR2": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/TransferLearningPGS.lean::privateArchitectureTransferCeiling": {
+    "Descent/Portability/TransferLearningPGS.lean::privateArchitectureTransferCeiling": {
       "quantity": "h2",
       "convention": "undetermined",
       "role": "consumer",

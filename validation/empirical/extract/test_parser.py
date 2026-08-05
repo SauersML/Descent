@@ -65,7 +65,7 @@ def approx(label, got, want, tol=1e-12):
 # ---- PopulationGeneticsFoundations.lean, read by hand ---------------------
 
 d = BY_NAME["Descent.neiFst"]
-check("neiFst file", d["file"], "Descent/PopulationGeneticsFoundations.lean")
+check("neiFst file", d["file"], "Descent/PopGen/PopulationGeneticsFoundations.lean")
 # The recorded line is checked against the SOURCE, not against a constant.  It
 # used to be pinned at 42; every edit above the definition moved it, and the
 # gate failed for a reason unrelated to what it tests ("got 46, want 42"), which
@@ -73,7 +73,7 @@ check("neiFst file", d["file"], "Descent/PopulationGeneticsFoundations.lean")
 # assertion is actually for is that the parser attributes a declaration to the
 # right line, and that is checkable without a magic number.
 check("neiFst line points at its own `def` in the source",
-      _source_line_of("Descent/PopulationGeneticsFoundations.lean",
+      _source_line_of("Descent/PopGen/PopulationGeneticsFoundations.lean",
                       d["line"], "def neiFst"), True)
 check("neiFst noncomputable", d["noncomputable"], True)
 check("neiFst args", [(a["names"], a["type"]) for a in d["args"]],

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 """Simulation of the blind-frequency prediction (MATH_LEDGER row 9 / gap #4).
 
-Claim under test (Descent/StandardizedGenotypeMoments.lean:563, `gaussianKurtosisMaf`):
+Claim under test (Descent/PopGen/StandardizedGenotypeMoments.lean:563, `gaussianKurtosisMaf`):
 
     "the prediction that an interaction statistic relying on fourth-cumulant
      separation loses power near this frequency has not been checked in simulation.

@@ -788,72 +788,72 @@
  ],
  "ambiguous_short_names": {
   "witness": [
-   "Descent.BundleRigidity.LinearSCM.witness @ Descent/BundleRigidity/LinearSCM.lean",
-   "Descent.LiabilityThresholdModel.witness @ Descent/ClinicalUtilityFairness.lean",
-   "Descent.EvolutionaryParameters.witness @ Descent/DGP.lean",
-   "Descent.PGSEvolutionaryModel.witness @ Descent/DGP.lean",
-   "Descent.TransportedMetrics.IrreducibleTargetPenalty.witness @ Descent/DGP.lean",
-   "Descent.SymmetricCoding.witness @ Descent/EpistaticChaos.lean",
-   "Descent.ScalarSecondMoments.witness @ Descent/FoldedSpectrum.lean",
-   "Descent.R2DecompositionData.witness @ Descent/MetricSpecificPortability.lean",
-   "Descent.FrequencyResolvedCohort.witness @ Descent/PCCorrectability/Frequency.lean",
-   "Descent.ThresholdTreatmentModel.witness @ Descent/PGSCalibrationTheory.lean",
-   "Descent.SNPArchitecturePortabilityModel.witness @ Descent/PolygenicArchitecture.lean",
-   "Descent.MutationDriftModelAssumptions.witness @ Descent/PortabilityDrift.lean",
-   "Descent.HardyWeinbergModel.witness @ Descent/Probability.lean",
-   "Descent.ConfusionMatrix.witness @ Descent/TransportIdentities.lean"
+   "Descent.BundleRigidity.LinearSCM.witness @ Descent/Blindness/BundleRigidity/LinearSCM.lean",
+   "Descent.LiabilityThresholdModel.witness @ Descent/Portability/ClinicalUtilityFairness.lean",
+   "Descent.EvolutionaryParameters.witness @ Descent/PopGen/DGP.lean",
+   "Descent.PGSEvolutionaryModel.witness @ Descent/PopGen/DGP.lean",
+   "Descent.TransportedMetrics.IrreducibleTargetPenalty.witness @ Descent/PopGen/DGP.lean",
+   "Descent.SymmetricCoding.witness @ Descent/Blindness/EpistaticChaos.lean",
+   "Descent.ScalarSecondMoments.witness @ Descent/Spectral/FoldedSpectrum.lean",
+   "Descent.R2DecompositionData.witness @ Descent/Portability/MetricSpecificPortability.lean",
+   "Descent.FrequencyResolvedCohort.witness @ Descent/Portability/PCCorrectability/Frequency.lean",
+   "Descent.ThresholdTreatmentModel.witness @ Descent/Portability/PGSCalibrationTheory.lean",
+   "Descent.SNPArchitecturePortabilityModel.witness @ Descent/PopGen/PolygenicArchitecture.lean",
+   "Descent.MutationDriftModelAssumptions.witness @ Descent/Portability/PortabilityDrift.lean",
+   "Descent.HardyWeinbergModel.witness @ Descent/Foundations/Probability.lean",
+   "Descent.ConfusionMatrix.witness @ Descent/Foundations/TransportIdentities.lean"
   ],
   "totalEffect": [
-   "Descent.BundleRigidity.ChainSCM.totalEffect @ Descent/BundleRigidity/LinearSCM.lean",
-   "Descent.totalEffect @ Descent/PortabilityDrift.lean"
+   "Descent.BundleRigidity.ChainSCM.totalEffect @ Descent/Blindness/BundleRigidity/LinearSCM.lean",
+   "Descent.totalEffect @ Descent/Portability/PortabilityDrift.lean"
   ],
   "scoreMean": [
-   "Descent.HWEPolygenicScoreDGP.scoreMean @ Descent/DGP.lean",
-   "Descent.CrossPopulationMechanisticCalibrationModel.scoreMean @ Descent/PGSCalibrationTheory.lean",
-   "Descent.HWEScoreModel.scoreMean @ Descent/Probability.lean"
+   "Descent.HWEPolygenicScoreDGP.scoreMean @ Descent/PopGen/DGP.lean",
+   "Descent.CrossPopulationMechanisticCalibrationModel.scoreMean @ Descent/Portability/PGSCalibrationTheory.lean",
+   "Descent.HWEScoreModel.scoreMean @ Descent/Foundations/Probability.lean"
   ],
   "scoreVariance": [
-   "Descent.HWEPolygenicScoreDGP.scoreVariance @ Descent/DGP.lean",
-   "Descent.HWEScoreModel.scoreVariance @ Descent/Probability.lean"
+   "Descent.HWEPolygenicScoreDGP.scoreVariance @ Descent/PopGen/DGP.lean",
+   "Descent.HWEScoreModel.scoreVariance @ Descent/Foundations/Probability.lean"
   ],
   "sigmaTagCausal": [
-   "Descent.sigmaTagCausal @ Descent/DGP.lean",
-   "Descent.SourceTaggedMoments.sigmaTagCausal @ Descent/DGP.lean"
+   "Descent.sigmaTagCausal @ Descent/PopGen/DGP.lean",
+   "Descent.SourceTaggedMoments.sigmaTagCausal @ Descent/PopGen/DGP.lean"
   ],
   "toDGP": [
-   "Descent.PrevalenceDGP.toDGP @ Descent/DGP.lean",
-   "Descent.HeterogeneousEffectDGP.toDGP @ Descent/DGP.lean",
-   "Descent.ConditionalMeanDGP.toDGP @ Descent/Probability.lean"
+   "Descent.PrevalenceDGP.toDGP @ Descent/PopGen/DGP.lean",
+   "Descent.HeterogeneousEffectDGP.toDGP @ Descent/PopGen/DGP.lean",
+   "Descent.ConditionalMeanDGP.toDGP @ Descent/Foundations/Probability.lean"
   ],
   "theta": [
-   "Descent.EvolutionaryParameters.theta @ Descent/DGP.lean",
-   "Descent.GenerationalPopGenParameters.theta @ Descent/PortabilityDrift.lean",
-   "Descent.MutationDriftModelAssumptions.theta @ Descent/PortabilityDrift.lean"
+   "Descent.EvolutionaryParameters.theta @ Descent/PopGen/DGP.lean",
+   "Descent.GenerationalPopGenParameters.theta @ Descent/Portability/PortabilityDrift.lean",
+   "Descent.MutationDriftModelAssumptions.theta @ Descent/Portability/PortabilityDrift.lean"
   ],
   "bigM": [
-   "Descent.EvolutionaryParameters.bigM @ Descent/DGP.lean",
-   "Descent.GenerationalPopGenParameters.bigM @ Descent/PortabilityDrift.lean"
+   "Descent.EvolutionaryParameters.bigM @ Descent/PopGen/DGP.lean",
+   "Descent.GenerationalPopGenParameters.bigM @ Descent/Portability/PortabilityDrift.lean"
   ],
   "fstEquilibrium": [
-   "Descent.fstEquilibrium @ Descent/DGP.lean",
-   "Descent.MutationDriftModelAssumptions.fstEquilibrium @ Descent/PortabilityDrift.lean"
+   "Descent.fstEquilibrium @ Descent/PopGen/DGP.lean",
+   "Descent.MutationDriftModelAssumptions.fstEquilibrium @ Descent/Portability/PortabilityDrift.lean"
   ],
   "coordinateSummary": [
-   "Descent.EvolutionaryParameters.coordinateSummary @ Descent/DGP.lean",
-   "Descent.PGSEvolutionaryModel.coordinateSummary @ Descent/DGP.lean"
+   "Descent.EvolutionaryParameters.coordinateSummary @ Descent/PopGen/DGP.lean",
+   "Descent.PGSEvolutionaryModel.coordinateSummary @ Descent/PopGen/DGP.lean"
   ],
   "hetDecayFactor": [
-   "Descent.PGSEvolutionaryModel.hetDecayFactor @ Descent/DGP.lean",
-   "Descent.hetDecayFactor @ Descent/PopulationGeneticsFoundations.lean",
-   "Descent.GenerationalPopGenParameters.hetDecayFactor @ Descent/PortabilityDrift.lean"
+   "Descent.PGSEvolutionaryModel.hetDecayFactor @ Descent/PopGen/DGP.lean",
+   "Descent.hetDecayFactor @ Descent/PopGen/PopulationGeneticsFoundations.lean",
+   "Descent.GenerationalPopGenParameters.hetDecayFactor @ Descent/Portability/PortabilityDrift.lean"
   ],
   "fstTransient": [
-   "Descent.PGSEvolutionaryModel.fstTransient @ Descent/DGP.lean",
-   "Descent.MutationDriftModelAssumptions.fstTransient @ Descent/PortabilityDrift.lean"
+   "Descent.PGSEvolutionaryModel.fstTransient @ Descent/PopGen/DGP.lean",
+   "Descent.MutationDriftModelAssumptions.fstTransient @ Descent/Portability/PortabilityDrift.lean"
   ],
   "total": [
-   "Descent.TransportedMetrics.IrreducibleTargetPenalty.total @ Descent/DGP.lean",
-   "Descent.Fiber.total @ Descent/EffectSizeSurgery.lean"
+   "Descent.TransportedMetrics.IrreducibleTargetPenalty.total @ Descent/PopGen/DGP.lean",
+   "Descent.Fiber.total @ Descent/Blindness/EffectSizeSurgery.lean"
   ]
  },
  "counts": {

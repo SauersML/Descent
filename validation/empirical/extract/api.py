@@ -25,7 +25,7 @@ Definition fields (see also defs.json, which is this table serialised):
     short           str    last component, e.g. "coalFst"
     kind            str    "def" | "abbrev"
     noncomputable   bool
-    file            str    repo-relative, e.g. "Descent/PopulationGeneticsFoundations.lean"
+    file            str    repo-relative, e.g. "Descent/PopGen/PopulationGeneticsFoundations.lean"
     line            int    1-based line of the declaration header
     signature       str    source text between the name and the top-level ":="
     args            list   ORDERED binder groups, each:

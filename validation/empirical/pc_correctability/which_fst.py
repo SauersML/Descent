@@ -3,7 +3,7 @@
 
 THE QUESTION
 
-`Descent/Conventions.lean`'s `neiGst` computes Nei's `G_ST`, not Hudson's
+`Descent/Foundations/Conventions.lean`'s `neiGst` computes Nei's `G_ST`, not Hudson's
 `F_ST`: it divides by the total-pool heterozygosity `2 p̄(1-p̄)` where Hudson
 divides by the between-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`.  The Lean
 identity `4F = standardized contrast variance` was derived for the Nei quantity.

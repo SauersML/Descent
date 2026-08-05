@@ -1,6 +1,6 @@
 """
 Empirical validation of the perfect-LD coverage boundary
-(Descent/ConditionalGain.lean, section "The boundary: where coverage
+(Descent/Conditionals/ConditionalGain.lean, section "The boundary: where coverage
 invariance stops": copyWitnessFamily, modulusCopyCoupling,
 copyWitness_not_coversTuple, coverage_invariance_sharp).
 

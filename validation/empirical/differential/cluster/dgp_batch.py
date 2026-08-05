@@ -57,7 +57,7 @@ if EXTRACT not in sys.path:
 
 import api  # noqa: E402
 
-TARGET_FILE = "Descent/DGP.lean"
+TARGET_FILE = "Descent/PopGen/DGP.lean"
 RTOL = 1e-9
 
 

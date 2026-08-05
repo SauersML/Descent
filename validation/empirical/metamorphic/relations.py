@@ -171,20 +171,20 @@ def even_under_negation(args):
 # ---------------------------------------------------------------------------
 
 SWEPT_MODULES = (
-    "Descent/Conventions.lean",
-    "Descent/PopulationGeneticsFoundations.lean",
-    "Descent/AncestrySpecificPower.lean",
-    "Descent/GeneticArchitectureDiscovery.lean",
-    "Descent/BlindnessRegistry.lean",
-    "Descent/TransferLearningPGS.lean",
-    "Descent/Permeability.lean",
-    "Descent/PortabilityDrift.lean",
-    "Descent/DGP.lean",
-    "Descent/MetricSpecificPortability.lean",
-    "Descent/RareVariantPortability.lean",
-    "Descent/PGSCalibrationTheory.lean",
-    "Descent/SelectionArchitecture.lean",
-    "Descent/HaplotypeTheory.lean",
+    "Descent/Foundations/Conventions.lean",
+    "Descent/PopGen/PopulationGeneticsFoundations.lean",
+    "Descent/Portability/AncestrySpecificPower.lean",
+    "Descent/PopGen/GeneticArchitectureDiscovery.lean",
+    "Descent/Blindness/BlindnessRegistry.lean",
+    "Descent/Portability/TransferLearningPGS.lean",
+    "Descent/Spectral/Permeability.lean",
+    "Descent/Portability/PortabilityDrift.lean",
+    "Descent/PopGen/DGP.lean",
+    "Descent/Portability/MetricSpecificPortability.lean",
+    "Descent/Portability/RareVariantPortability.lean",
+    "Descent/Portability/PGSCalibrationTheory.lean",
+    "Descent/PopGen/SelectionArchitecture.lean",
+    "Descent/PopGen/HaplotypeTheory.lean",
 )
 
 # ---------------------------------------------------------------------------

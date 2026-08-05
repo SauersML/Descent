@@ -252,7 +252,7 @@ def resolved_config():
 # ===========================================================================
 
 def corpus_freqCorrFromFst(fst):
-    """Descent/PortabilityDrift.lean, decl `freqCorrFromFst`
+    """Descent/Portability/PortabilityDrift.lean, decl `freqCorrFromFst`
 
         noncomputable def freqCorrFromFst (fst : ℝ) : ℝ := 1 - fst
     """
@@ -260,7 +260,7 @@ def corpus_freqCorrFromFst(fst):
 
 
 def corpus_ldOverlapFromSharedLD(shared_ld):
-    """Descent/PortabilityDrift.lean, decl `ldOverlapFromSharedLD`
+    """Descent/Portability/PortabilityDrift.lean, decl `ldOverlapFromSharedLD`
 
         noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
 
@@ -274,7 +274,7 @@ def corpus_ldOverlapFromSharedLD(shared_ld):
 
 
 def corpus_covarianceRetention(freq_corr, ld_overlap):
-    """Descent/PortabilityDrift.lean, decl `covarianceRetention`
+    """Descent/Portability/PortabilityDrift.lean, decl `covarianceRetention`
 
         noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
           freq_corr * ld_overlap
@@ -283,7 +283,7 @@ def corpus_covarianceRetention(freq_corr, ld_overlap):
 
 
 def corpus_covarianceDivergenceFromRetention(fst, shared_ld):
-    """Descent/PortabilityDrift.lean, decl `covarianceDivergenceFromRetention`
+    """Descent/Portability/PortabilityDrift.lean, decl `covarianceDivergenceFromRetention`
 
         noncomputable def covarianceDivergenceFromRetention (fst shared_ld : ℝ) : ℝ :=
           1 - covarianceRetention (freqCorrFromFst fst) (ldOverlapFromSharedLD shared_ld)
@@ -293,7 +293,7 @@ def corpus_covarianceDivergenceFromRetention(fst, shared_ld):
 
 
 def corpus_neutralAFSharedLDBenchmarkRatio(fstS, fstT, sldS, sldT):
-    """Descent/PortabilityDrift.lean, decl `neutralAFSharedLDBenchmarkRatio`
+    """Descent/Portability/PortabilityDrift.lean, decl `neutralAFSharedLDBenchmarkRatio`
 
         noncomputable def neutralAFSharedLDBenchmarkRatio
             (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
@@ -303,7 +303,7 @@ def corpus_neutralAFSharedLDBenchmarkRatio(fstS, fstT, sldS, sldT):
 
 
 def corpus_r2FromSignalVariance(vSignal, vNoise):
-    """Descent/DGP.lean, decl `r2FromSignalVariance`
+    """Descent/PopGen/DGP.lean, decl `r2FromSignalVariance`
 
         noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
           vSignal / (vSignal + vNoise)
@@ -312,7 +312,7 @@ def corpus_r2FromSignalVariance(vSignal, vNoise):
 
 
 def corpus_calibratedBrier(pi, r2):
-    """Descent/DGP.lean, decl `calibratedBrier`
+    """Descent/PopGen/DGP.lean, decl `calibratedBrier`
 
         def calibratedBrier (π r2 : ℝ) : ℝ := π * (1 - π) * (1 - r2)
     """
@@ -320,7 +320,7 @@ def corpus_calibratedBrier(pi, r2):
 
 
 def corpus_calibratedBrierFromVariances(pi, vSignal, vResidual):
-    """Descent/DGP.lean, decl `calibratedBrierFromVariances`
+    """Descent/PopGen/DGP.lean, decl `calibratedBrierFromVariances`
 
         noncomputable def calibratedBrierFromVariances (π vSignal vResidual : ℝ) : ℝ :=
           π * (1 - π) * (1 - vSignal / (vSignal + vResidual))
@@ -334,7 +334,7 @@ def phi(x):
 
 
 def corpus_equalVarianceGaussianAUC(vSignal, vNoise):
-    """Descent/DGP.lean, decl `equalVarianceGaussianAUCFromSignalVariance`
+    """Descent/PopGen/DGP.lean, decl `equalVarianceGaussianAUCFromSignalVariance`
 
         noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
           if vNoise = 0 then if 0 < vSignal then 1 else Phi 0
@@ -355,7 +355,7 @@ def corpus_equalVarianceGaussianAUC(vSignal, vNoise):
 
 
 def corpus_profileFromSignalVariance(pi, vNoise, vSignal):
-    """Descent/DGP.lean, decl `profileFromSignalVariance`
+    """Descent/PopGen/DGP.lean, decl `profileFromSignalVariance`
 
         noncomputable def profileFromSignalVariance
             (π vNoise vSignal : ℝ) : Profile where
@@ -371,7 +371,7 @@ def corpus_profileFromSignalVariance(pi, vNoise, vSignal):
 
 
 def corpus_pgsVarianceFromHet(beta_sq_sum, het):
-    """Descent/PortabilityDrift.lean, decl `pgsVarianceFromHet`
+    """Descent/Portability/PortabilityDrift.lean, decl `pgsVarianceFromHet`
 
         noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
           β_sq_sum * het
@@ -380,7 +380,7 @@ def corpus_pgsVarianceFromHet(beta_sq_sum, het):
 
 
 def corpus_presentDayPGSVariance(V_A, fst):
-    """Descent/PortabilityDrift.lean, decl `presentDayPGSVariance`
+    """Descent/Portability/PortabilityDrift.lean, decl `presentDayPGSVariance`
 
         noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
           pgsVarianceFromHet V_A (1 - fst)
@@ -389,7 +389,7 @@ def corpus_presentDayPGSVariance(V_A, fst):
 
 
 def corpus_neutralAFBenchmarkMetricProfile(pi, V_A, V_E, fstTarget):
-    """Descent/PortabilityDrift.lean, decl `neutralAFBenchmarkMetricProfile`
+    """Descent/Portability/PortabilityDrift.lean, decl `neutralAFBenchmarkMetricProfile`
 
         noncomputable def neutralAFBenchmarkMetricProfile
             (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
@@ -400,7 +400,7 @@ def corpus_neutralAFBenchmarkMetricProfile(pi, V_A, V_E, fstTarget):
 
 
 def corpus_targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget):
-    """Descent/PortabilityDrift.lean, decl `targetR2FromNeutralAFBenchmark`
+    """Descent/Portability/PortabilityDrift.lean, decl `targetR2FromNeutralAFBenchmark`
 
         noncomputable def targetR2FromNeutralAFBenchmark
             (V_A V_E fstTarget : ℝ) : ℝ :=
@@ -415,7 +415,7 @@ def corpus_targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget):
 
 
 def corpus_targetExactCalibratedBrierRisk(pi, V_A, V_E, fstTarget):
-    """Descent/PortabilityDrift.lean, decl `targetExactCalibratedBrierRisk`
+    """Descent/Portability/PortabilityDrift.lean, decl `targetExactCalibratedBrierRisk`
 
         noncomputable def targetExactCalibratedBrierRisk
             (π V_A V_E fstTarget : ℝ) : ℝ :=
@@ -427,7 +427,7 @@ def corpus_targetExactCalibratedBrierRisk(pi, V_A, V_E, fstTarget):
 
 
 def corpus_targetBrierFromNeutralAFBenchmark(pi, V_A, V_E, fstTarget):
-    """Descent/PortabilityDrift.lean, decl `targetBrierFromNeutralAFBenchmark`
+    """Descent/Portability/PortabilityDrift.lean, decl `targetBrierFromNeutralAFBenchmark`
 
         noncomputable def targetBrierFromNeutralAFBenchmark
             (π V_A V_E fstTarget : ℝ) : ℝ :=

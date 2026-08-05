@@ -3,7 +3,7 @@
 
 47 members, the largest unsimulated family in the corpus, and the one carrying
 the most "Empirical status: UNTESTED" markers. Every member is matrix algebra
-over `CrossPopulationMetricModel` (Descent/PortabilityDrift.lean ~1119).
+over `CrossPopulationMetricModel` (Descent/Portability/PortabilityDrift.lean ~1119).
 The whole point of this file is that the structure is INSTANTIATED FROM A
 SIMULATED TWO-POPULATION GENOTYPE PROCESS, not from hand-chosen matrices --
 hand-chosen matrices are what `witnessSigmaObs` / `witnessCross` /

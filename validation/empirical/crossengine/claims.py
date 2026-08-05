@@ -88,7 +88,7 @@ def msbr_planted(mu, s):
 CLAIMS = {
     # ------------------------------------------------------------------
     "mutationSelectionBalance": {
-        "lean_file": "Descent/RareVariantPortability.lean",
+        "lean_file": "Descent/Portability/RareVariantPortability.lean",
         "def_name": "mutationSelectionBalance",
         "observable": "carrier_frequency",
         "args": ("MU", "S", "H"),
@@ -122,7 +122,7 @@ CLAIMS = {
     # corpus and classical are 10, 33 and 50 percent apart across them, and
     # 4*N*h*s stays large so drift is not the thing being measured.
     "mutationSelectionBalance_guard": {
-        "lean_file": "Descent/RareVariantPortability.lean",
+        "lean_file": "Descent/Portability/RareVariantPortability.lean",
         "def_name": "mutationSelectionBalance",
         "observable": "carrier_frequency",
         "args": ("MU", "S", "H"),
@@ -151,7 +151,7 @@ CLAIMS = {
     },
     # ------------------------------------------------------------------
     "mutationSelectionBalanceRecessive": {
-        "lean_file": "Descent/RareVariantPortability.lean",
+        "lean_file": "Descent/Portability/RareVariantPortability.lean",
         "def_name": "mutationSelectionBalanceRecessive",
         "observable": "carrier_frequency",
         "args": ("MU", "S"),

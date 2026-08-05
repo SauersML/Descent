@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Whittle estimation of a memory parameter, and the transported estimation floor.
 
-Claims under test (Descent/TransportedMinimax.lean, section LongMemoryGeometry):
+Claims under test (Descent/Decision/TransportedMinimax.lean, section LongMemoryGeometry):
 
   (a) the conformal metric is  g = eps^2 / delta^3 ;
   (b) the memory-parameter variance is  V = 3 delta^3 / (n eps^2) ;

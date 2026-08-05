@@ -2,7 +2,7 @@
 
 Balding-Nichols two-deme model with independent markers -> HWE-standardized
 genotype PCA -> compare the observed leading eigenvalue and eigenvector overlap
-against the Lean definitions in `Descent/PCCorrectability/`:
+against the Lean definitions in `Descent/Portability/PCCorrectability/`:
 
     effectiveSubgroupSize n m = m (n - m) / n
     demographicSpike n F m    = 2 F * effectiveSubgroupSize n m

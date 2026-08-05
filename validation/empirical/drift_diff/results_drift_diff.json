@@ -13,7 +13,7 @@
 
   "positive_control": {
     "target": "Descent.HumanDemography.neutralDriftR2Ratio",
-    "file_line": "Descent/HumanDemography.lean:66",
+    "file_line": "Descent/PopGen/HumanDemography.lean:66",
     "design": "ctrl_anc: source = ancestral (t_s=0), target drifted t=250 gens at 2N=2000, L=1500 loci, 8 replicates, source h2 = 0.5",
     "result": "err_pgs = 0.00000000 in EXACT rational arithmetic in all 8/8 replicates",
     "note": "Reproduces (and exceeds) the prior sweep's 0.03% agreement. Harness validated.",
@@ -25,7 +25,7 @@
     {
       "rank": 1,
       "target": "Descent.HumanDemography.taggedDriftR2Ratio",
-      "file_line": "Descent/HumanDemography.lean:183",
+      "file_line": "Descent/PopGen/HumanDemography.lean:183",
       "verdict": "Lean numerically WRONG",
       "lean_computes": "R2T/R2S = [k*V_A/(k*V_A+V_E)] / [V_A/(V_A+V_E)] with k = (1-fst)*shared_ld",
       "simulation_gives": "R2T/R2S = k*(V_A+V_E) / ((1-fst)*V_A + V_E)",
@@ -54,7 +54,7 @@
     {
       "rank": 2,
       "target": "Descent.DriftRegime.benchmarkRatio / benchmarkRatioSquared",
-      "file_line": "Descent/DriftRegime.lean:280, :284",
+      "file_line": "Descent/PopGen/DriftRegime.lean:280, :284",
       "verdict": "Lean NUMERICALLY CORRECT; the family's FALSIFIED marker is misattributed. The defect is in the ARGUMENT SUPPLIED, not the body -- i.e. NAME wrong on the fst slot.",
       "lean_computes": "(1 - fstT) / (1 - fstS)",
       "simulation_gives": "Exactly the heterozygosity ratio H_T/H_S, PROVIDED fst is read as the branch-specific drift coefficient F_i = 1 - H_i/H_ancestral, not as a between-population pairwise F_ST.",
@@ -78,7 +78,7 @@
     {
       "rank": 3,
       "target": "Descent.HumanDemography, the file-level F_ST numbers",
-      "file_line": "Descent/HumanDemography.lean:20 (module docstring), :36, :116, :137",
+      "file_line": "Descent/PopGen/HumanDemography.lean:20 (module docstring), :36, :116, :137",
       "verdict": "DOCSTRING overclaims -- the stated floor 0.88 is not what the model predicts at the cited inputs. Conclusion unaffected (strengthened).",
       "detail": "The module docstring supplies 'Pairwise F_ST between continental groups ... roughly 0.10 to 0.15' to neutralDriftR2Ratio, whose fst slot means 1 - H_target/H_source. Those are different quantities.",
       "evidence": [
@@ -99,7 +99,7 @@
     {
       "rank": 4,
       "target": "Descent.DriftRegime.closedPopulation and the FALSIFIED scope",
-      "file_line": "Descent/DriftRegime.lean:103",
+      "file_line": "Descent/PopGen/DriftRegime.lean:103",
       "verdict": "Marker scope is CORRECT. The definition is exactly right inside its stated regime.",
       "evidence": [
         {"design": "regime, mu=0, Ne=1000, t=4000, L=400, 5 reps",
@@ -119,7 +119,7 @@
 
   "not_reached": {
     "AncestrySpecificArchitecture.geneFlowFstStep": {
-      "file_line": "Descent/AncestrySpecificArchitecture.lean:351",
+      "file_line": "Descent/PopGen/AncestrySpecificArchitecture.lean:351",
       "status": "NOT DECIDED. Reported honestly as underpowered.",
       "structural_note": "geneFlowFstStep m Ne F is rfl-equal to ibdFlowStep Ne m F (theorem at :355), so it carries zero independent content; its UNTESTED marker sits on a definitional alias and the empirical content is in ibdFlowStep / fstMigrationDriftEquilibrium. Its argument order (m Ne F) is REVERSED relative to ibdFlowStep (Ne rate F) -- documented in the docstring as 'the architecture file's argument order', and the rfl theorem pins it, so a swap would not typecheck silently here.",
       "simulation": "Two-deme island model, no mutation. Measured F_ST plateaus at 0.21-0.22 (2N=200, m=0.01 and 2N=400, m=0.005, 8 reps each, L=800) against 1/(1+4*Ne*m) = 0.20. But: (a) my migration convention (each deme draws fraction m from the global mean) makes the effective pairwise rate m/2, so the intended comparand is ambiguous between 0.20, 0.333 and 0.111; (b) without mutation there is no true stationary F_ST -- the simulated trajectory erodes to 0 as loci fix (flow_long traj ends 0.0512, 0.0277, 0.0059, 0.0). The plateau reading is therefore a transient, not an equilibrium. This run does not separate the linearised fixed point from its rivals and should not be cited as validation or falsification."

@@ -1,5 +1,5 @@
 {
- "target": "Descent/TransportedMinimax.lean, section 'The width law'",
+ "target": "Descent/Decision/TransportedMinimax.lean, section 'The width law'",
  "question": "is the w^-3 the width law produces the same object as the delta^-3 in longMemoryMetric? (a) category error, or (b) wrong exponent in the width law",
  "verdict": "(a). The width law's exponents are CORRECT and shape-free; the identification theorem connects two different objects. There is also a separate, smaller defect in the shape-freedom claim -- see widthLaw_ratio below.",
  "method": "exact symbolic integration (sympy) for five band shapes plus a rectangular band handled analytically; independent quadrature cross-check on a width sweep. No exponent is fitted where it can be read off exactly.",

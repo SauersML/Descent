@@ -12,7 +12,7 @@ spike per replicate, and report the implied KAPPA.
 
 WHICH KAPPA, AND WHICH F_ST -- BOTH WERE WRONG HERE
 
-This docstring said KAPPA = 2, contradicting `Descent/PCCorrectability/
+This docstring said KAPPA = 2, contradicting `Descent/Portability/PCCorrectability/
 Threshold.lean` and `analyze_b.py`, which both use 4. The constant is 4:
 inverting BBP on simulated genotypes recovers 3.9920 +/- 0.0045 with F measured
 as Hudson's F_ST on the same data. A constant of 2 corresponds to reading F as

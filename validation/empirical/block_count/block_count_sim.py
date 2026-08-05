@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Empirical test of the BLOCK-COUNT reduction asserted in
-Descent/ScoreDistribution.lean, section `BlockCount`.
+Descent/Portability/ScoreDistribution.lean, section `BlockCount`.
 
 THE CLAIM UNDER TEST (the Lean file carries it as an unproved analytic input):
 

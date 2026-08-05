@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.12
-"""Exact-rational checks on Descent/StatisticalGeneticsMethodology.lean:281
+"""Exact-rational checks on Descent/Portability/StatisticalGeneticsMethodology.lean:281
 `geneticCorrelationLDSC`.  No floats decide anything here: every comparison is
 between Fractions (squared cosines, so no sqrt is needed).
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.12
-"""Differential test of Descent/StatisticalGeneticsMethodology.lean:281
+"""Differential test of Descent/Portability/StatisticalGeneticsMethodology.lean:281
 geneticCorrelationLDSC against genuine bivariate LD score regression.
 
 Pure stdlib (cluster python3.12 has no numpy/sympy).
