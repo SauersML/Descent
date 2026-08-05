@@ -22,6 +22,7 @@ import Descent.Portability.PortabilityBounds
 import Descent.Portability.StratificationConfounding
 import Descent.Portability.TransferLearningPGS
 import Descent.Portability.RareVariantPortability
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -263,7 +264,7 @@ theorem fstDemeCorrectedFlowStep_constants_named (p : EvolutionaryParameters)
       F + (1 - F) / coalescentTimeScale p.Ne
         - 2 * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
   unfold fstDemeCorrectedFlowStep coalescentTimeScale islandDemeCorrection
-    Core.islandDemeCorrection Core.ratio ploidy
+    Descent.Core.islandDemeCorrection Descent.Core.ratio ploidy
   norm_num
 
 end Ploidy
@@ -866,7 +867,7 @@ need its own bridge theorem, which is a reason not to add one. -/
 theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m =
       fstMutationDriftEquilibrium (scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
 /-! ### Per-generation drift rate, written out in three modules
@@ -1115,7 +1116,7 @@ theorem fstTransientDecayFromScaled_uses_timeScale (Ne θ bigM : ℝ) :
 theorem asymmetricFst_eq_scaled (Ne m₁₂ m₂₁ : ℝ) :
     asymmetricFst Ne m₁₂ m₂₁
       = fstMutationDriftEquilibrium (scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
-  unfold asymmetricFst fstMutationDriftEquilibrium
+  unfold asymmetricFst fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [scaledMigrationRate_eq_ploidy_form]; unfold ploidy; ring_nf
 
 /-! The bridge from the migration-drift equilibrium to the scaled mutation-drift form is
@@ -1127,7 +1128,7 @@ add one."  The spelling is gone from `PortabilityDrift` and its bridge with it. 
 theorem fstMigrationMutationEquilibriumManyDemes_eq_scaled (Ne m μ : ℝ) :
     fstMigrationMutationEquilibriumManyDemes Ne m μ
       = 1 / (1 + scaledMigrationRate Ne m + scaledMutationRate Ne μ) := by
-  unfold fstMigrationMutationEquilibriumManyDemes
+  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy; ring_nf
 
@@ -1139,7 +1140,7 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = 1 / (1 + scaledMigrationRate Ne m * islandDemeCorrection nDemes
               + scaledMutationRate Ne μ) := by
-  unfold fstIslandEquilibriumFiniteDemes
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
   rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy; ring_nf
 
@@ -1635,7 +1636,7 @@ theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale (p : EvolutionaryParam
       = F + (1 - F) / coalescentTimeScale p.Ne
           - ploidy * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
   unfold fstDemeCorrectedFlowStep ploidy islandDemeCorrection
-    Core.islandDemeCorrection Core.ratio
+    Descent.Core.islandDemeCorrection Descent.Core.ratio
   rw [coalescentTimeScale_eq]; norm_num
 
 /-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
@@ -1704,8 +1705,8 @@ different conventions. -/
 theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d
       = fstMutationDriftEquilibrium (scaledMigrationRate Ne m * islandDemeCorrection d) := by
-  unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate
-    islandDemeCorrection Core.islandDemeCorrection Core.ratio
+  unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow
+    islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
   ring
 
 /-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a

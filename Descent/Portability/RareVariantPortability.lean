@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.PolygenicAdaptation
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -564,7 +565,7 @@ disagreeing about a shape they both claim. -/
 theorem mutationSelectionBalance_eq_fstFromTau (mu s h : ℝ)
     (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) :
     mutationSelectionBalance mu s h = fstFromTau (mu / (h * s)) := by
-  unfold mutationSelectionBalance fstFromTau
+  unfold mutationSelectionBalance fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   have hden : (h * s + mu) / (h * s) = 1 + mu / (h * s) := by
     rw [add_div, div_self hhs]
   rw [← hden, div_eq_div_iff hsum (div_ne_zero hsum hhs)]
@@ -587,7 +588,7 @@ theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu �
   have hsum : (1 : ℝ) + h * s / mu = (h * s + mu) / mu := by
     field_simp
     ring
-  unfold mutationSelectionBalance fstMutationDriftEquilibrium
+  unfold mutationSelectionBalance fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [hsum, one_div_div]
 
 /-- **The dominant balance is a fixed point of the dominant map.** This is what

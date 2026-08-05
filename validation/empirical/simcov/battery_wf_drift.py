@@ -16,14 +16,15 @@ tighter bars than a linked one.
 THE DENOMINATOR TRAP, handled explicitly.  H is averaged over ALL loci,
 including those that have fixed (which contribute 0). Conditioning on loci that
 are still segregating inflates H exactly where drift has done its work, which
-is this regime. The conditioned estimator is carried alongside as a COMPETITOR
-that must be rejected: if it is not, the design is not sensitive to the trap and
-the agreement of the main estimator means less. It is deliberately not the
-`control=` argument -- `verdict.classify` requires a control to PASS, because a
-positive control is a cell whose answer is independently known and which the
-code path must reproduce. The trap is the opposite instrument. The positive
-control is the martingale `E[p_t] = p_0`, which no ploidy or normalisation slip
-in the resampling loop can survive.
+is this regime. The conditioned estimator is printed in sems from the all-loci
+value, so a reader can see the design is sensitive to the trap. It is neither
+the `control=` argument nor a ledger row, and both exclusions are deliberate:
+`verdict.classify` requires a control to PASS, and the trap is built to fail;
+and as a competitor its oracle is nearly constant across the design (0.9174
+against 0.9173), so the DEGENERATE ORACLE gate fires and the row asserts
+nothing in either direction. The positive control is instead the martingale
+`E[p_t] = p_0`, which no ploidy or normalisation slip in the resampling loop
+can survive.
 
 COMPETITORS, on the same cells, because a match against no alternative is not a
 measurement:
@@ -188,10 +189,19 @@ def main():
            "exp(-t / (2 * Ne))", c_diffusion, **MODEL)
     record("retention [no decay at all, competing]", "PortabilityDrift.lean",
            "1", c_nodecay, **MODEL)
-    record("retention [segregating-only denominator, competing]",
-           "PortabilityDrift.lean",
-           "(1 - 1 / (2 * Ne))^t, against H conditioned on segregating loci",
-           c_segonly, **MODEL)
+    # NOT recorded as a competitor row. The conditioned estimator is not a
+    # competing FORMULA -- it is the same body read against a different
+    # denominator -- and its oracle is nearly constant across the design
+    # (0.9174 at Ne=250 t=250 against 0.9173 at t=500), so `verdict.classify`
+    # correctly calls it a DEGENERATE ORACLE and it asserts nothing either way.
+    # The trap is real and the design is sensitive to it; that is what the
+    # printed `segOnly` column above shows, in sems, and it is quoted in the
+    # docstring. A row that can carry no verdict does not belong in the ledger.
+    print("\ntrap sensitivity (NOT a ledger row): the same ratio over only "
+          "the still-segregating loci, in sems from the all-loci value:")
+    for c in c_segonly:
+        print("  %-14s %8.1f sems" % (c["design"],
+                                      abs(c["lean"] - c["truth"]) / c["sem"]))
 
     dump_results("battery_wf_drift_results.json")
     print("\n================ SUMMARY ================")

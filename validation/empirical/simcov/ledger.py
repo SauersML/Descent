@@ -121,11 +121,35 @@ def freshness_of(directory: str, battery: str,
     return "UNVERIFIED (no recorded source hash)", sha
 
 
+def source_battery(directory: str, key: str) -> str:
+    """The battery SOURCE a results file belongs to.
+
+    A battery may legitimately emit more than one results file -- `battery_pd1`
+    runs the same design at two deme counts and writes `battery_pd1_d200_` and
+    `battery_pd1_d500_results.json`. The ledger used to take the whole stem as
+    the battery name, so it recorded batteries `pd1_d200` and `pd1_d500`, and
+    the four docstrings citing `simcov/battery_pd1.py` all dangled against a
+    battery that had in fact run. The guard was right that the citation did not
+    resolve and wrong about why: nothing was missing, the key was.
+
+    So the key is resolved back to a source that exists, longest suffix first,
+    and a stem with no source at all is left as it is -- that case IS a missing
+    battery and must stay visible.
+    """
+    parts = key.split("_")
+    for n in range(len(parts), 0, -1):
+        cand = "_".join(parts[:n])
+        if os.path.exists(os.path.join(directory, "battery_%s.py" % cand)):
+            return cand
+    return key
+
+
 def build(directory: str) -> dict:
     records = []
     for path in sorted(glob.glob(os.path.join(directory,
                                               "battery_*_results.json"))):
-        battery = os.path.basename(path)[len("battery_"):-len("_results.json")]
+        stem = os.path.basename(path)[len("battery_"):-len("_results.json")]
+        battery = source_battery(directory, stem)
         try:
             rows = json.load(open(path))
         except Exception as exc:                       # noqa: BLE001
@@ -143,6 +167,7 @@ def build(directory: str) -> dict:
             # a citation that resolves to nothing.
             records.append(dict(
                 declaration=None, against=None, battery=battery,
+                results_file="battery_%s_results.json" % stem,
                 battery_sha=sha, role="data", tag="",
                 source=", ".join(sorted(rows)[:6]),
                 verdict_raw="", verdict="DATA ONLY (no verdict records)",
@@ -238,7 +263,11 @@ def build(directory: str) -> dict:
                               "reject anything")
             records.append(dict(
                 declaration=p["short"], against=p.get("against"),
-                battery=battery, battery_sha=sha,
+                battery=battery,
+                # WHICH FILE this row came from, kept separate from the battery
+                # it belongs to: one battery may emit several.
+                results_file="battery_%s_results.json" % stem,
+                battery_sha=sha,
                 role=p["role"], tag=p["tag"], source=p["source"],
                 verdict_raw=p["verdict"], verdict=gated,
                 downgraded_because=downgraded,

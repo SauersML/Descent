@@ -6,6 +6,7 @@ import Descent.Foundations.TransportIdentities
 -- positivity certificate for excess target risk that does not read an F_ST difference.
 -- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
 import Descent.Spectral.SpectralDegradation
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -111,7 +112,7 @@ not find it.
     expected-allele-count control passing at 1.10 sems. Two runs, two
     complementary observables, one law. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
-  1 / (1 + θ)
+  Descent.Core.fstFromFlow θ
 
 /-- **fstMutationDriftEquilibrium at its junk point, named.** A negative scaled mutation rate is
 inadmissible, and the divisor `1 + θ` vanishes exactly there. Lean returns `0`: no
@@ -120,7 +121,7 @@ gives. The two ends of the parameter range meet at the same reported value. Cons
 exclude it by hypothesis. -/
 theorem fstMutationDriftEquilibrium_negative_unit_theta_is_junk :
     fstMutationDriftEquilibrium (-1) = 0 := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
 /-- **The mutation-drift equilibrium `Fst`, pinned.** This definition carries no theorem of its
@@ -128,7 +129,7 @@ own. At `θ = 1` mutation and drift contribute equally and the equilibrium diffe
 half, which fixes the `1 + θ` denominator against `1 / (1 + 2 * θ)` and `1 / (1 + θ) ^ 2`. -/
 theorem fstMutationDriftEquilibrium_at_unit_theta :
     fstMutationDriftEquilibrium 1 = 1 / 2 := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
 /-- **Per-generation heterozygosity decay** at effective size `Nₑ` and scaled mutation
@@ -2743,7 +2744,7 @@ theorem fstDemeCorrectedFlowStep_eq_of_no_migration (p : EvolutionaryParameters)
     0.3333, passing at 0.94 sems. That factor of two in the control is the same
     deme correction this body now carries in its migration term. -/
 noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
-  1 / (1 + p.theta + 2 * p.bigM)
+  Descent.Core.fstFromFlow (p.theta + 2 * p.bigM)
 
 /-!
 ### Note for anyone editing the Fst cluster below
@@ -2755,7 +2756,7 @@ moves have not been catching them.
 
 **Stale unfold targets.** `unfold X` is an error, not a no-op, when `X` does not
 occur in the goal. So when a definition stops routing through another, *every*
-`unfold` list naming the inner one breaks at once. `fstEquilibrium` above is
+`unfold` list naming the inner one breaks at once. `fstEquilibrium` above is Descent.Core.fstFromFlow
 `1 / (1 + θ + 2 M)` and `fstDriftMigrationManyDemes` is `1 / (1 + M)`; neither calls
 `fstMutationDriftEquilibrium`, and only `fstDriftMutation` did. One stale name
 in the lists below produced seven simultaneous failures, which reads like a
@@ -2797,7 +2798,8 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
       scaledMigrationRate
     ring
-  unfold fstDemeCorrectedFlowStep fstEquilibrium
+  unfold fstDemeCorrectedFlowStep fstEquilibrium Descent.Core.fstFromFlow
+  rw [← add_assoc]
   rw [hscaled] at hd' ⊢
   field_simp
   ring
@@ -2815,14 +2817,14 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
   have hM : p.bigM = 0 := by
     unfold EvolutionaryParameters.bigM scaledMigrationRate
     rw [hmig]; ring
-  unfold fstEquilibrium
+  unfold fstEquilibrium Descent.Core.fstFromFlow
   rw [hθ, hM]
   norm_num
 
 /-- Full equilibrium Fst is positive. -/
 theorem fstEquilibrium_pos (p : EvolutionaryParameters) :
     0 < fstEquilibrium p := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium Descent.Core.fstFromFlow
   apply div_pos one_pos
   linarith [p.theta_nonneg, p.bigM_nonneg]
 
@@ -2832,7 +2834,8 @@ and the reciprocal is at most one.  No force needs to be present: the no-flow
 boundary `θ = M = 0` attains the value `1` rather than exceeding it. -/
 theorem fstEquilibrium_le_one (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ 1 := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium Descent.Core.fstFromFlow
+  rw [← add_assoc]
   rw [div_le_one (by linarith [p.theta_nonneg, p.bigM_nonneg] :
     (0 : ℝ) < 1 + p.theta + 2 * p.bigM)]
   linarith [p.theta_nonneg, p.bigM_nonneg]
@@ -2841,7 +2844,8 @@ theorem fstEquilibrium_le_one (p : EvolutionaryParameters) :
 theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
     (h : 0 < p.theta + p.bigM) :
     fstEquilibrium p < 1 := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium Descent.Core.fstFromFlow
+  rw [← add_assoc]
   rw [div_lt_one (by linarith [p.theta_nonneg, p.bigM_nonneg] :
     (0 : ℝ) < 1 + p.theta + 2 * p.bigM)]
   linarith [p.bigM_nonneg]
@@ -2849,13 +2853,13 @@ theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
 /-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta := by
-  unfold fstEquilibrium fstMutationDriftEquilibrium
+  unfold fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
 theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
     fstEquilibrium p ≤ fstDriftMigrationManyDemes p := by
-  unfold fstEquilibrium fstDriftMigrationManyDemes
+  unfold fstEquilibrium fstDriftMigrationManyDemes Descent.Core.fstFromFlow
   apply one_div_le_one_div_of_le
   · linarith [p.bigM_nonneg]
   · linarith [p.theta_nonneg, p.bigM_nonneg]
@@ -2867,7 +2871,7 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     fstMutationDriftEquilibrium p.theta < 1 := by
   constructor
   · exact fstEquilibrium_le_driftMutation p
-  · unfold fstMutationDriftEquilibrium
+  · unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
     rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
     linarith
 
@@ -3150,9 +3154,10 @@ theorem fstEquilibrium_decreasing_in_theta
       ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
     scaledMigrationRate
   simp only
+  rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu₂ + 2 * (4 * Ne * mig))
     (by nlinarith : 0 < 1 + 4 * Ne * mu₁ + 2 * (4 * Ne * mig))]
@@ -3169,9 +3174,10 @@ theorem fstEquilibrium_decreasing_in_migration
       ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
     scaledMigrationRate
   simp only
+  rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 2 * (4 * Ne * mig₂))
     (by nlinarith : 0 < 1 + 4 * Ne * mu + 2 * (4 * Ne * mig₁))]
@@ -3919,7 +3925,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
   ext <;>
     simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
       PGSEvolutionaryModel.toEvo,
-      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium]
+      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium, Descent.Core.fstFromFlow]
 
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
 

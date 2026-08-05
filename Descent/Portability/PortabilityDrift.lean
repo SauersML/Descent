@@ -161,7 +161,7 @@ never equal.
     curve, so a form that is linear in `tau`, or one saturating at a different
     rate, separates from this one on the grid rather than only at its ends. -/
 noncomputable def fstFromTau (tau : ℝ) : ℝ :=
-  tau / (1 + tau)
+  Descent.Core.fstFromTau tau
 
 /-- **fstFromTau at `tau = -1`, named.** A coalescent time of minus one is outside the admissible
 range, which is exactly why it must be excluded by hypothesis rather than left to the totality
@@ -169,7 +169,7 @@ convention: the saturation curve's divisor vanishes there and Lean returns `0`, 
 value that no downstream range check will reject. Consumers must exclude it by hypothesis. -/
 theorem fstFromTau_negative_unit_tau_is_junk :
     fstFromTau (-1) = 0 := by
-  unfold fstFromTau
+  unfold fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   norm_num
 
 /-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
@@ -211,7 +211,7 @@ theorem one_div_transferTimeInflation_eq_one_sub_fstFromTau (s a : ℝ) :
     1 / transferTimeInflation s a = 1 - fstFromTau ((a / s) ^ 2) := by
   have hpos : (0 : ℝ) < 1 + (a / s) ^ 2 := by positivity
   have hne : (1 : ℝ) + (a / s) ^ 2 ≠ 0 := ne_of_gt hpos
-  unfold transferTimeInflation fstFromTau
+  unfold transferTimeInflation fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   field_simp
   ring
 
@@ -332,7 +332,7 @@ theorem pairwiseFstFromBranches_eq_fstFromTau_add_mul (a b : ℝ)
   have hb1' : (1 : ℝ) + b ≠ 0 := ne_of_gt hb1
   have hab : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   have hab' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt hab
-  unfold pairwiseFstFromBranches fstFromTau
+  unfold pairwiseFstFromBranches fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   field_simp
   ring
 
@@ -344,7 +344,7 @@ theorem pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches (a b : ℝ)
     pairwiseFstFromBranchTaus a b <
       pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) := by
   rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha.le hb.le]
-  unfold pairwiseFstFromBranchTaus fstFromTau
+  unfold pairwiseFstFromBranchTaus fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   have h1 : (0 : ℝ) < 1 + (a + b) / 2 := by linarith
   have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   rw [div_lt_div_iff₀ h1 h2]
@@ -370,7 +370,7 @@ theorem pairwiseFst_composition_gap_eq (a : ℝ) (ha : 0 ≤ a) :
         pairwiseFstFromBranchTaus a a = a / (1 + a) ^ 2 := by
   have h1 : (1 : ℝ) + a ≠ 0 := by positivity
   rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a a ha ha]
-  unfold pairwiseFstFromBranchTaus fstFromTau
+  unfold pairwiseFstFromBranchTaus fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   have h2 : (1 : ℝ) + (a + a + a * a) ≠ 0 := by nlinarith
   have h3 : (1 : ℝ) + (a + a) / 2 ≠ 0 := by linarith
   field_simp
@@ -389,7 +389,7 @@ theorem fst_from_tau_nonneg_of_nonneg (tau : ℝ) (htau : 0 ≤ tau) :
   div_nonneg htau (by linarith)
 
 theorem fst_from_tau_lt_one (tau : ℝ) (htau : 0 ≤ tau) : fstFromTau tau < 1 := by
-  unfold fstFromTau
+  unfold fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -405,7 +405,7 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
   have hexp : tau + 1 < Real.exp tau := Real.add_one_lt_exp (by linarith)
   have h1t : (0 : ℝ) < 1 + tau := by linarith
   rw [← sub_pos]
-  unfold fstFromTau
+  unfold fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   rw [Real.exp_neg]
   have hrw : 1 - (Real.exp tau)⁻¹ - tau / (1 + tau) =
       (Real.exp tau - 1 - tau) / (Real.exp tau * (1 + tau)) := by
@@ -422,7 +422,7 @@ above by the coalescence CDF and is satisfied by any body below that curve, incl
 its half-saturation exactly where the separation reaches the drift timescale. -/
 theorem fstFromTau_at_one_time_unit :
     fstFromTau 1 = 1 / 2 := by
-  unfold fstFromTau
+  unfold fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   norm_num
 
 /-- A split with ongoing migration.
@@ -3644,9 +3644,11 @@ theorem constrained them jointly and could not have caught the decay base. -/
   unfold GenerationalPopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
     fstTransientDecayFromScaled hetDecayFromScaled
   simp [PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
+    Descent.Core.fstFromFlow,
     GenerationalPopGenParameters.theta, GenerationalPopGenParameters.bigM,
     PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta,
     EvolutionaryParameters.bigM, scaledMutationRate, scaledMigrationRate]
+  exact Or.inl (by ring)
 
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
@@ -3696,7 +3698,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
   refine ⟨?_, ?_, ?_⟩
   · rw [PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate]
     exact congrArg (fun x ↦ 1 - x)
-      (PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m)
+      (PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
   · rw [PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
     exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
       m h_disc).symm
@@ -6223,7 +6225,7 @@ be positive too. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
     (m : MutationDriftModelAssumptions) (h : 1 + m.theta ≠ 0) :
     m.fstEquilibrium * (1 + m.theta) = 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   field_simp
 
 /-- **The mutation-drift equilibrium is the fixed point of the identity
@@ -6239,7 +6241,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : 0 < 1 + m.theta := by
     nlinarith [m.theta_pos]
   exact div_pos one_pos hden
@@ -6248,7 +6250,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
 theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     (m : MutationDriftModelAssumptions) :
     m.fstEquilibrium < 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium
+  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_one (by linarith [m.theta_pos])]
   linarith [m.theta_pos]
 
@@ -6963,9 +6965,9 @@ section MigrationDriftPortability
     Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
     This is the classical Wright (1931) result.
 
-    Regime: the infinite-island limit. `Core.islandDemeCorrection` carries the
+    Regime: the infinite-island limit. `Descent.Core.islandDemeCorrection` carries the
     finite-deme factor this drops, and the identity below places this body inside
-    `Core.fstIslandEquilibrium` so the discrepancy is a substitution rather than a
+    `Descent.Core.fstIslandEquilibrium` so the discrepancy is a substitution rather than a
     comparison of two independent formulas. Simulation puts the law within 2% at 40
     demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is the
     two-ancestry comparison this development is mostly about, so the law is off
@@ -6976,14 +6978,14 @@ section MigrationDriftPortability
     Empirical status: CONDITIONALLY VALID. Accurate in the limit it was derived
     for; frequently violated in use. Neither validated nor falsified. -/
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m)
+  Descent.Core.fstFromFlow (4 * Ne * m)
 
 /-- **fstMigrationDriftEquilibrium at `4 * Ne * m = -1`, named.** A negative migration rate is
 inadmissible, and at `4 Ne m = -1` the divisor vanishes. Lean returns `0`: no differentiation at
 all, the value for free gene flow. Consumers must exclude it by hypothesis. -/
 theorem fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk :
     fstMigrationDriftEquilibrium 1 (-(1/4)) = 0 := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
 /-- **No migration leaves complete differentiation.** At `m = 0` the island model fixes
@@ -6992,7 +6994,7 @@ constant term, and it is what a body with the wrong intercept would miss. It is 
 boundary the closed form attains, which was a second theorem with this statement. -/
 @[simp] theorem fstMigrationDriftEquilibrium_no_migration (Ne : ℝ) :
     fstMigrationDriftEquilibrium Ne 0 = 1 := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
 /-- **The island-model F_ST is the rest point of the identity balance** driven
@@ -7336,7 +7338,7 @@ left implicit so that the approximation cannot be mistaken for an identity. -/
 theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
     fstIslandMultiplicativeEquilibrium 1 (1 / 2) ≠ fstMigrationDriftEquilibrium 1 (1 / 2) := by
   unfold fstIslandMultiplicativeEquilibrium ibdRecurrenceFixedPoint
-    fstMigrationDriftEquilibrium
+    fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
 
@@ -7349,20 +7351,20 @@ theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
 /-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
 theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium scaledMigrationRate
+  unfold fstMigrationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow
   ring
 
 /-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
 theorem fstMigrationDriftEquilibrium_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     0 < fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have : 0 ≤ 4 * Ne * m := by positivity
   positivity
 
 /-- Equilibrium Fst under migration-drift is at most 1. -/
 theorem fstMigrationDriftEquilibrium_le_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m ≤ 1 := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_le_one (by nlinarith)]
   nlinarith
 
@@ -7370,7 +7372,7 @@ theorem fstMigrationDriftEquilibrium_le_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 
     This is the key qualitative result: migration prevents complete fixation. -/
 theorem fstMigrationDriftEquilibrium_lt_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
     fstMigrationDriftEquilibrium Ne m < 1 := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_one (by nlinarith)]
   nlinarith
 
@@ -7388,7 +7390,7 @@ caller's business.  Stated separately, each carried the same three-line proof. -
 theorem fstMigrationDriftEquilibrium_strictAnti_product (Ne₁ m₁ Ne₂ m₂ : ℝ)
     (h_pos : 0 < Ne₁ * m₁) (h_more : Ne₁ * m₁ < Ne₂ * m₂) :
     fstMigrationDriftEquilibrium Ne₂ m₂ < fstMigrationDriftEquilibrium Ne₁ m₁ := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
@@ -7414,7 +7416,7 @@ theorem fstMigrationDriftEquilibrium_decreases_with_Ne (Ne₁ Ne₂ m : ℝ)
 This theorem is absent on purpose. Its hypothesis is
 `1 / (1 + 4 * Ne * m) < t / (t + 2 * Ne)` and its conclusion is
 `fstMigrationDriftEquilibrium Ne m < t / (t + 2 * Ne)`. Since
-`fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same
+`fstMigrationDriftEquilibrium Ne m` unfolds to `1 / (1 + 4 * Ne * m)`, the two are the same Descent.Core.fstFromFlow
 proposition and the proof is `unfold; exact h_large_t` — the hypothesis, returned. The
 remaining three hypotheses (`0 < Ne`, `0 < m`, `0 < t`) go unused.
 
@@ -7466,13 +7468,13 @@ the denominator back does, and any other coefficient would satisfy the limit ide
 theorem SplitMigrationModel.fstMigDriftEq_mul_denom (s : SplitMigrationModel)
     (h : 1 + 4 * s.Ne * s.mig ≠ 0) :
     s.fstMigDriftEq * (1 + 4 * s.Ne * s.mig) = 1 := by
-  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
+  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   field_simp
 
 /-- SplitMigrationModel equilibrium Fst equals the limit Fst for many demes. -/
 theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
-  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium
+  unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
     scaledMigrationRate
   ring
@@ -7998,7 +8000,7 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
     This parallels the mutation-drift complementarity. -/
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1 := by
-  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate
+  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate Descent.Core.fstFromFlow
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
   field_simp [hden]
 
@@ -8179,7 +8181,7 @@ theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     signalRetentionMigrationDrift Ne m =
       (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 := by
-  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
     scaledMigrationRate
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
@@ -8214,7 +8216,7 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
-  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     sharedLDFromMigration scaledMigrationRate
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
@@ -8251,7 +8253,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
   rintro ⟨c, hc⟩
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
-  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     sharedLDFromMigration scaledMigrationRate at h1 h2
   norm_num at h1 h2
   linarith
@@ -8418,7 +8420,7 @@ two appears in the symmetric case without being written anywhere: at `m₁₂ = 
 `2 m`. -/
 theorem asymmetricFst_eq_migrationDriftEq (Ne m₁₂ m₂₁ : ℝ) :
     asymmetricFst Ne m₁₂ m₂₁ = fstMigrationDriftEquilibrium Ne (m₁₂ + m₂₁) := by
-  unfold asymmetricFst fstMigrationDriftEquilibrium
+  unfold asymmetricFst fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rfl
 
 /-- **The two-deme `Fst`'s scale, pinned.** The identity with `migrationDriftEq` constrains the
@@ -8553,7 +8555,7 @@ theorem effectiveSymmetricMigration_fst_le_harmonic_fst (Ne m₁₂ m₂₁ : �
     (hNe : 0 < Ne) (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁) :
     fstMigrationDriftEquilibrium Ne (effectiveSymmetricMigration m₁₂ m₂₁) ≤
       fstMigrationDriftEquilibrium Ne (2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁)) := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hHM_pos : 0 < 2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) := by positivity
   have hle := harmonicMigrationMean_le_effectiveSymmetricMigration m₁₂ m₂₁ h₁ h₂
   have hden_pos : 0 < 1 + 4 * Ne * (2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁)) := by positivity
@@ -8849,7 +8851,7 @@ theorem fstMigrationDriftEquilibrium_ratio_form (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m =
       (1 / (2 * Ne)) / (2 * m + 1 / (2 * Ne)) := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hNe2 : (0 : ℝ) < 2 * Ne := by positivity
   have hden : 2 * m + 1 / (2 * Ne) ≠ 0 := by
     have : 0 < 2 * m + 1 / (2 * Ne) := by positivity
@@ -8881,7 +8883,7 @@ noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
 theorem neutralAFBenchmarkFromRecurrence_eq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
-  unfold neutralAFBenchmarkFromRecurrence fstMigrationDriftEquilibrium
+  unfold neutralAFBenchmarkFromRecurrence fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
   ring_nf

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift
 import Descent.Blindness.LumpedRateBlindness
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -157,7 +158,7 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
     fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold fstFromGenerations fstFromTau coalescentTau
+  unfold fstFromGenerations fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
   nlinarith

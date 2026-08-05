@@ -159,6 +159,26 @@ theorem one_div_one_add_eq_complement_saturation (x : ℝ) (h : 1 + x ≠ 0) :
   field_simp
   ring
 
+/-- **`F_ST` from a total scaled flow**, `1 / (1 + x)`.
+
+Every equilibrium `F_ST` in this corpus is this map applied to a different flow. Naming
+the map separates the two questions -- what counts as flow, and how flow becomes a
+differentiation -- and it is what lets the five bodies the corpus had be five flows
+rather than five formulas. -/
+noncomputable def fstFromFlow (x : ℝ) : ℝ := 1 / (1 + x)
+
+/-- **No flow, no differentiation is lost.** At zero migration and zero mutation the
+equilibrium is one: two demes with nothing connecting them are completely differentiated. -/
+@[simp] theorem fstFromFlow_zero : fstFromFlow 0 = 1 := by
+  unfold fstFromFlow; norm_num
+
+/-- **Flow drives differentiation down.** Strictly decreasing on non-negative flows,
+which is the qualitative content every named equilibrium below inherits. -/
+theorem fstFromFlow_lt_of_lt (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) :
+    fstFromFlow y < fstFromFlow x := by
+  unfold fstFromFlow
+  apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
+
 /-- **Island-model `F_ST` at migration-mutation-drift equilibrium, with the deme count
 carried.**
 
@@ -167,14 +187,14 @@ carried.**
 This is the only place the formula is written. Every other `F_ST` equilibrium in the
 corpus is a theorem below placing a named body inside this family. -/
 noncomputable def fstIslandEquilibrium (Ne m μ nDemes : ℝ) : ℝ :=
-  1 / (1 + scaledFlow Ne m μ nDemes)
+  fstFromFlow (scaledFlow Ne m μ nDemes)
 
 /-- **The master, in the raw coordinates the subsystem modules wrote it in.** This is the
 bridge that lets `fstIslandEquilibriumFiniteDemes` be a wrapper rather than a copy. -/
 theorem fstIslandEquilibrium_eq (Ne m μ nDemes : ℝ) :
     fstIslandEquilibrium Ne m μ nDemes
       = 1 / (1 + 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ) := by
-  unfold fstIslandEquilibrium scaledFlow
+  unfold fstIslandEquilibrium fstFromFlow scaledFlow
   rw [scaledMigrationRate_eq, scaledMutationRate_eq]
   ring_nf
 
@@ -186,7 +206,7 @@ theorem fstIslandEquilibrium_eq_complement_saturation (Ne m μ nDemes : ℝ)
     (h : 1 + scaledFlow Ne m μ nDemes ≠ 0) :
     fstIslandEquilibrium Ne m μ nDemes
       = complement (saturation (scaledFlow Ne m μ nDemes)) := by
-  unfold fstIslandEquilibrium
+  unfold fstIslandEquilibrium fstFromFlow
   exact one_div_one_add_eq_complement_saturation _ h
 
 /-! ### The specialisation lattice
@@ -214,7 +234,7 @@ migration term dropped and `θ = 4 Ne μ` substituted -- the pure mutation-drift
 single isolated population reaches. -/
 theorem fstIslandEquilibrium_no_migration (Ne μ nDemes : ℝ) :
     fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + scaledMutationRate Ne μ) := by
-  unfold fstIslandEquilibrium scaledFlow scaledMigrationRate
+  unfold fstIslandEquilibrium fstFromFlow scaledFlow scaledMigrationRate
   ring_nf
 
 /-- **The `θ` reparameterisation.** The scaled coordinates are not a different model:
@@ -256,6 +276,15 @@ theorem fstFromTau_add_equilibrium (x : ℝ) (h : 1 + x ≠ 0) :
   unfold fstFromTau saturation
   field_simp
   ring
+
+/-- **The equilibrium law and the split law are complements.** `fstFromFlow x` and
+`fstFromTau x` sum to one away from the pole, so a result in either coordinate transfers
+to the other. -/
+theorem fstFromFlow_add_fstFromTau (x : ℝ) (h : 1 + x ≠ 0) :
+    fstFromFlow x + fstFromTau x = 1 := by
+  unfold fstFromFlow
+  rw [add_comm]
+  exact fstFromTau_add_equilibrium x h
 
 /-- **`F_ST` from a scaled time lands in the unit interval.** -/
 theorem fstFromTau_mem_unit (tau : ℝ) (h : 0 ≤ tau) :

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -365,7 +366,7 @@ theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
   have hsum : t + 2 * Ne ≠ 0 := by
     have hs : 0 < t + 2 * Ne := by linarith
     exact ne_of_gt hs
-  unfold coalFst fstFromTau coalescentTau
+  unfold coalFst fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
   field_simp
   ring
 
@@ -907,13 +908,13 @@ theorem fstMutationDriftEquilibrium_isFixedPoint (θ : ℝ) (hθ : 0 ≤ θ) :
 /-- Equilibrium Fst is positive for nonneg θ. -/
 theorem fstMutationDriftEquilibrium_pos (θ : ℝ) (hθ : 0 ≤ θ) :
     0 < fstMutationDriftEquilibrium θ := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   positivity
 
 /-- Equilibrium Fst is at most 1. -/
 theorem fstMutationDriftEquilibrium_le_one (θ : ℝ) (hθ : 0 ≤ θ) :
     fstMutationDriftEquilibrium θ ≤ 1 := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_le_one (by linarith)]
   linarith
 
@@ -922,7 +923,7 @@ theorem fstMutationDriftEquilibrium_le_one (θ : ℝ) (hθ : 0 ≤ θ) :
     complete fixation. -/
 theorem fstMutationDriftEquilibrium_lt_one (θ : ℝ) (hθ : 0 < θ) :
     fstMutationDriftEquilibrium θ < 1 := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -930,7 +931,7 @@ theorem fstMutationDriftEquilibrium_lt_one (θ : ℝ) (hθ : 0 < θ) :
 theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
     (ha : 0 ≤ a) (hab : a < b) :
     fstMutationDriftEquilibrium b < fstMutationDriftEquilibrium a := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : 0 < 1 + a := by linarith
   have hden_lt : 1 + a < 1 + b := by linarith
   simpa using div_lt_div_of_pos_left one_pos hden hden_lt
@@ -988,7 +989,7 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     `nei_fst_equilibrium_consistent` which connects the two. -/
 theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
     expectedHeterozygosity θ + fstMutationDriftEquilibrium θ = 1 := by
-  unfold expectedHeterozygosity fstMutationDriftEquilibrium
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
   ring
@@ -1010,7 +1011,7 @@ theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
     Fst = 1/(1+θ) = `fstMutationDriftEquilibrium θ`. -/
 theorem nei_fst_equilibrium_consistent (θ : ℝ) (hθ : 0 ≤ θ) :
     neiFst 1 (expectedHeterozygosity θ) = fstMutationDriftEquilibrium θ := by
-  unfold neiFst expectedHeterozygosity fstMutationDriftEquilibrium
+  unfold neiFst expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
   ring
@@ -1044,7 +1045,7 @@ theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
 theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
     (hθ_pos : 0 < θ) (hθ_small : θ < 1) :
     1 / 2 < fstMutationDriftEquilibrium θ := by
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [lt_div_iff₀ (by linarith : 0 < 1 + θ)]
   linarith
 
@@ -1328,7 +1329,7 @@ carried implicitly.
     its evidence: 17.66 sems adrift at two demes and 0.65 sems at twenty-five,
     which is what a many-deme limit should look like.
 -/
-noncomputable def islandDemeCorrection (d : ℝ) : ℝ := Core.islandDemeCorrection d
+noncomputable def islandDemeCorrection (d : ℝ) : ℝ := Descent.Core.islandDemeCorrection d
 
 /-- **islandDemeCorrection pinned at a reference point.** No theorem in the corpus evaluated this
 definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
@@ -1336,14 +1337,14 @@ it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a 
 or an invariance leaves free. -/
 theorem islandDemeCorrection_at_reference_point :
     islandDemeCorrection (1 / 2) = -1 := by
-  unfold islandDemeCorrection Core.islandDemeCorrection Core.ratio
+  unfold islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
   norm_num
 
 /-- **The deme correction's junk branch, named.** At a single deme the correction diverges and
 Lean returns `0`. Consumers must require `d ≠ 1`, and `islandFstFiniteDemes_one_deme_is_junk`
 shows what the `0` does downstream. -/
 theorem islandDemeCorrection_one_deme_is_junk : islandDemeCorrection 1 = 0 := by
-  unfold islandDemeCorrection; exact Core.islandDemeCorrection_one_is_junk
+  unfold islandDemeCorrection; exact Descent.Core.islandDemeCorrection_one_is_junk
 
 /-- **Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
 
@@ -1404,13 +1405,13 @@ corpus actually uses, and it is where the measurement separates the candidates
 most sharply -- simulated `0.09743 ± 0.00432` against `0.11111` here and
 `0.05882` for the superseded square. -/
 theorem islandDemeCorrection_at_two : islandDemeCorrection 2 = 2 :=
-  Core.islandDemeCorrection_two
+  Descent.Core.islandDemeCorrection_two
 
 /-- The correction is strictly above `1` at every finite number of demes, so
 the limit is never exact for a real population. -/
 theorem one_lt_islandDemeCorrection (d : ℝ) (hd : 1 < d) :
     1 < islandDemeCorrection d := by
-  unfold islandDemeCorrection Core.islandDemeCorrection Core.ratio
+  unfold islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
   have hpos : 0 < d - 1 := by linarith
   rw [lt_div_iff₀ hpos]; linarith
 
@@ -1421,7 +1422,7 @@ is what stops the limit from being read as the general answer. -/
 theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
     islandFstFiniteDemes Ne m d < fstMigrationDriftEquilibrium Ne m := by
-  unfold islandFstFiniteDemes fstMigrationDriftEquilibrium
+  unfold islandFstFiniteDemes fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hc : 1 < islandDemeCorrection d := one_lt_islandDemeCorrection d hd
   have hNm : 0 < 4 * Ne * m := by positivity
   apply div_lt_div_of_pos_left one_pos (by nlinarith)
@@ -1432,18 +1433,18 @@ theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
 the definition rather than a claim in a comment.
 
 The limit is proved once, on the kernel, and this is the wrapper's inheritance of
-it. `Core.islandDemeCorrection_sub_one` carries the sharper statement the proof of
+it. `Descent.Core.islandDemeCorrection_sub_one` carries the sharper statement the proof of
 the limit throws away: the correction exceeds one by exactly `1/(d-1)`, which is
 what a reader deciding whether the many-deme form is usable at a given `d` actually
 needs. -/
 theorem islandDemeCorrection_tendsto_one :
     Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) :=
-  Core.islandDemeCorrection_tendsto_one
+  Descent.Core.islandDemeCorrection_tendsto_one
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [one_div]
 
 /-- **Island model Fst is strictly decreasing in migration rate.**
@@ -1451,7 +1452,7 @@ theorem islandModelFst_eq_inv (Ne m : ℝ) :
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     (ha : 0 ≤ a) (hab : a < b) :
     fstMigrationDriftEquilibrium Ne b < fstMigrationDriftEquilibrium Ne a := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
   have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -1461,7 +1462,7 @@ theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
 theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (ha : 0 ≤ a) (hab : a < b) :
     fstMigrationDriftEquilibrium b m < fstMigrationDriftEquilibrium a m := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
   have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -1472,7 +1473,7 @@ theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
 theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
     (h_threshold : 1 < 4 * Ne * m) :
     fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith : 0 < 1 + 4 * Ne * m) (by norm_num : (0:ℝ) < 2)]
   linarith
 
@@ -1481,7 +1482,7 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
     fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by linarith) (by nlinarith)
 
 /-! ### Relationship between Migration and Mutation Effects on Fst -/
@@ -1493,7 +1494,7 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     The key parameter is the scaled rate 4N × (rate). -/
 theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
-  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   ring
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
@@ -1603,7 +1604,7 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     excluded at 79.9.
 -/
 noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m + 4 * Ne * μ)
+  Descent.Core.fstFromFlow (4 * Ne * m + 4 * Ne * μ)
 
 /-- **The island-model equilibrium with the deme count carried explicitly.**
 
@@ -1635,7 +1636,7 @@ noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ
     deme counts while the limit form is constant at 0.20000, so the design
     separates them by construction. -/
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
+  Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
 
 /-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
 `nDemes / (nDemes - 1)`, whose divisor vanishes at one deme. The migration term is junk-zero
@@ -1644,7 +1645,7 @@ differentiated from itself at the mutation-drift level, where in fact there is n
 differentiate from. Consumers must exclude it by hypothesis. -/
 theorem fstIslandEquilibriumFiniteDemes_single_deme_is_junk (Ne m μ : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ 1 = 1 / (1 + 4 * Ne * μ) := by
-  unfold fstIslandEquilibriumFiniteDemes
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
   rw [islandDemeCorrection_one_deme_is_junk]
   norm_num
 
@@ -1664,8 +1665,8 @@ theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
     add_nonneg (mul_nonneg (mul_nonneg h4 hm) hcorr) (mul_nonneg h4 hμ)
   have hbody : fstIslandEquilibriumFiniteDemes Ne m μ nDemes =
       1 / (1 + (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)) := by
-    unfold fstIslandEquilibriumFiniteDemes
-    rw [add_assoc]
+    unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+    ring
   rw [hbody]
   exact scaledIdentityStep_fixedPoint _ h
 
@@ -1676,7 +1677,7 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
     (Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
-  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes
+  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   rw [h]; ring_nf
 
 /-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**
@@ -1686,7 +1687,7 @@ differentiation -- where the formula has no value at all. Consumers must exclude
 hypothesis. -/
 theorem fstMigrationMutationEquilibriumManyDemes_cancelling_terms_is_junk :
     fstMigrationMutationEquilibriumManyDemes 1 (-(1/4)) 0 = 0 := by
-  unfold fstMigrationMutationEquilibriumManyDemes
+  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   norm_num
 
 /-- **The migration term's coefficient, pinned.**
@@ -1695,7 +1696,7 @@ it should exclude. At `4 Ne m = 1` with no mutation the equilibrium `Fst` is one
 the factor four on the migration term. -/
 theorem fstMigrationMutationEquilibriumManyDemes_migration_only :
     fstMigrationMutationEquilibriumManyDemes 1 (1 / 4) 0 = 1 / 2 := by
-  unfold fstMigrationMutationEquilibriumManyDemes
+  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   norm_num
 
 /-- **The mutation term enters with the same coefficient, pinned.** Mutation and migration are
@@ -1704,7 +1705,7 @@ interchangeable at this order: `4 Ne mu = 1` with no migration gives the same eq
 coefficient free. -/
 theorem fstMigrationMutationEquilibriumManyDemes_mutation_only :
     fstMigrationMutationEquilibriumManyDemes 1 0 (1 / 4) = 1 / 2 := by
-  unfold fstMigrationMutationEquilibriumManyDemes
+  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   norm_num
 
 /-- **The combined equilibrium is the rest point of the scaled identity balance
@@ -1720,8 +1721,8 @@ theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
     add_nonneg (mul_nonneg h4 hm) (mul_nonneg h4 hμ)
   have hbody : fstMigrationMutationEquilibriumManyDemes Ne m μ =
       1 / (1 + (4 * Ne * m + 4 * Ne * μ)) := by
-    unfold fstMigrationMutationEquilibriumManyDemes
-    rw [add_assoc]
+    unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
+    ring
   rw [hbody]
   exact scaledIdentityStep_fixedPoint _ h
 
@@ -1729,14 +1730,14 @@ theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
     fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationMutationEquilibriumManyDemes fstMigrationDriftEquilibrium
+  unfold fstMigrationMutationEquilibriumManyDemes fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- Combined Fst is below mutation-only Fst. -/
 theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
     fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMutationDriftEquilibrium (4 * Ne * μ) := by
-  unfold fstMigrationMutationEquilibriumManyDemes fstMutationDriftEquilibrium
+  unfold fstMigrationMutationEquilibriumManyDemes fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-! ### Stepping-Stone Model Foundations -/
@@ -2365,7 +2366,7 @@ theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
     1 - hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
-  unfold fstMutationDriftEquilibrium
+  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
@@ -2637,7 +2638,7 @@ satisfying it, and a value does not. -/
 theorem fstMutationDriftTransientDiscrete_at_reference_point :
     fstMutationDriftTransientDiscrete 1 1 1 = 3 / 8 := by
   norm_num [fstMutationDriftTransientDiscrete, fstMutationDriftEquilibrium, hetDecayFactor,
-    hetDecayFromScaled]
+    hetDecayFromScaled, Descent.Core.fstFromFlow]
 
 
 /-- **Derivation of transient Fst from the heterozygosity recurrence.**
@@ -2738,7 +2739,7 @@ theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ
 theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
       1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
-  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor Descent.Core.fstFromFlow
     hetDecayFromScaled
   rfl
 

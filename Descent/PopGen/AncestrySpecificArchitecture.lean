@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -810,7 +811,7 @@ theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 ≤ m₁)
     (h_m : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
-  unfold fstMigrationDriftEquilibrium
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 

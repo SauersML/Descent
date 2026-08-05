@@ -36,9 +36,14 @@ FALSE NEGATIVES -- a defect missed:
       not evidence; it is the same expression evaluated twice. Detected and
       reported as SELF-TEST, which counts as no measurement at all.
 
-  NO POWER. A design whose prediction barely moves cannot reject a wrong
-      functional form. This was already detected but reported alongside passes,
-      where it reads as one. It is now a distinct failing verdict.
+  NO POWER. A design whose prediction barely moves AND AGREES cannot reject a
+      wrong functional form. This was already detected but reported alongside
+      passes, where it reads as one. It is now a distinct failing verdict.
+      The "and agrees" clause was added later and is the whole content of the
+      gate: a flat prediction that misses by six hundred sems has been
+      rejected, and filing that as NO POWER hid competitor rejections from
+      `ledger.py`'s gate, which then downgraded the corpus MATCHes those
+      rivals existed to clear.
 
   DEGENERATE ORACLE. If the simulated truth barely moves across the design, the
       oracle is not exercising the definition even if the prediction does.
@@ -213,15 +218,32 @@ def classify(cells, control=None, sem_source="replicates", selected_from=1,
             worst = c
 
     # --- FN gates: power ----------------------------------------------------
-    if span_pred < 0.05:
-        return "NO POWER", ("the prediction moves by %.1f%% across the design, "
-                            "so it could not have rejected a wrong functional "
-                            "form" % (100 * span_pred)), worst
     if span_true < 0.05:
         return "DEGENERATE ORACLE", ("the simulated truth moves by only %.1f%% "
                                      "across the design" % (100 * span_true)), worst
 
     disagrees = worst["sems_off"] > sem_gate and worst["rel_err"] > rel_floor
+
+    # A FLAT PREDICTION MAKES AN AGREEMENT WORTHLESS AND A DISAGREEMENT REAL,
+    # and this gate used to fire before it knew which it was looking at. The
+    # rationale it carries -- "could not have rejected a wrong functional form"
+    # -- is about a body that AGREES over a design it barely moves across:
+    # matching a truth that also barely moves is arithmetic. It says nothing
+    # about a formula that stays flat while the oracle sweeps 60% and misses by
+    # six hundred sems. That is a rejection, and it was being filed as NO POWER.
+    #
+    # The cost was not cosmetic. Most flat predictions in this harness are
+    # COMPETITORS -- `retention [no decay at all]` is the literal constant 1 --
+    # and `ledger.py` clears a corpus MATCH only when a competitor was
+    # REJECTED. Every rival buried under NO POWER left the body it was supposed
+    # to discriminate against looking uncompeted, and the ledger then downgraded
+    # that body's MATCH to UNINFORMATIVE. A gate against false validation was
+    # manufacturing the appearance of one.
+    if span_pred < 0.05 and not disagrees:
+        return "NO POWER", ("the prediction moves by %.1f%% across the design "
+                            "and agrees with the oracle, so the design could "
+                            "not have rejected a wrong functional form"
+                            % (100 * span_pred)), worst
 
     # An unreliable error bar invalidates a PASS as surely as a failure: if the
     # scatter is understated, "agrees to 0.4 percent" carries no more weight
