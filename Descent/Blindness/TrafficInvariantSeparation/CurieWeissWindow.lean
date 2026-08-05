@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.RankOneInvisibility
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.CurieWeissWindow`
@@ -2612,4 +2614,5 @@ theorem rankOneTraffic_groundState_pressure_counterexample
 
 end CurieWeissWindow
 
+end TrafficInvariantSeparation
 end Descent.Blindness

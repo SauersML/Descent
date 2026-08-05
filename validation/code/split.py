@@ -166,30 +166,61 @@ def main() -> int:
 
     header = [l for l in lines[:ns_at] if IMPORT.match(l)]
 
+    # A file may open more than one namespace before its first section --
+    # `TrafficInvariantSeparation` opens `Descent.Blindness` and then
+    # `TrafficInvariantSeparation` -- and every `open` it needs may sit inside
+    # them.  Carrying only the outermost silently renames every declaration in
+    # every part, which no error message says out loud.  So the PREAMBLE is every
+    # scope-opening and every `open` before the first cut, and each part closes
+    # them in reverse.
+    #
     # A `variable` INSIDE a top-level section is scoped to that section, and the
-    # cuts are section boundaries, so it never crosses one.  Only a variable at
-    # namespace level would leak into the later parts, and that is the one case
-    # a chain split cannot reproduce.
+    # cuts are section boundaries, so it never crosses one.  A variable in the
+    # preamble is the one case a chain split cannot reproduce.
     code = blank_comments("\n".join(lines))
-    depth, opens = 0, []
+    depth, opens, ns_stack = 0, [], []
+    first_section = None
     for i, l in enumerate(code, 1):
-        if nsmap.NAMESPACE.match(l) or nsmap.SECTION.match(l):
+        m = nsmap.NAMESPACE.match(l)
+        if m:
             depth += 1
-        elif nsmap.END.match(l):
+            if first_section is None:
+                ns_stack.append((i, m.group(1)))
+            continue
+        if nsmap.SECTION.match(l):
+            if first_section is None and len(l.split()) > 1:
+                first_section = i
+            depth += 1
+            continue
+        if nsmap.END.match(l):
             depth -= 1
-        elif VARIABLE.match(l) and depth <= 1 and i > ns_at:
-            print(f"REFUSED: namespace-level `variable` at line {i}; a chain split "
-                  f"would change what the later parts see", file=sys.stderr)
+            continue
+        if first_section is not None:
+            continue
+        if VARIABLE.match(l):
+            print(f"REFUSED: preamble `variable` at line {i}; a chain split would "
+                  f"change what the later parts see", file=sys.stderr)
             return 2
-        elif FILE_OPEN.match(l) and depth <= 1:
+        if FILE_OPEN.match(l):
             opens.append(i)
 
-    # The namespace's own `end` is not part of any section; keep it out of the
-    # last part so the balancer does not try to reopen the namespace as a section.
-    ns_name = ns_line_name(lines[ns_at - 1])
-    last = next((i for i in range(len(lines), 0, -1)
-                 if lines[i - 1].strip() in (f"end {ns_name}", "end")), len(lines))
-    total_body = last - 1
+    if first_section is None:
+        print(f"{args.path}: no top-level section -- nothing to cut along")
+        return 0
+
+    preamble = [lines[i - 1] for i, _n in ns_stack] 
+    closers = [f"end {n}" for _i, n in reversed(ns_stack)]
+    open_lines = [lines[i - 1] for i in opens]
+
+    # The outermost namespace's `end` is not part of any section; keep it and the
+    # inner closers out of the last part so the balancer does not try to reopen a
+    # namespace as a section.
+    total_body = len(lines)
+    for _i, n in ns_stack:
+        for k in range(total_body, 0, -1):
+            if lines[k - 1].strip() == f"end {n}":
+                total_body = k - 1
+                break
 
     tops = scan(lines)
     if len(tops) < 2:
@@ -229,15 +260,13 @@ def main() -> int:
     outdir = args.path[:-len(".lean")]
     os.makedirs(outdir, exist_ok=True)
     lic = L(1, 3)
-    ns_line = lines[ns_at - 1]
-    open_lines = [lines[i - 1] for i in opens]
     prev = None
     for name, a, b in merged:
         pre, suf = balance(L(a, b))
         imports = list(header) + ([f"import {stem_mod(args.path)}.{prev}"] if prev else [])
-        out = (lic + imports + ["", ns_line, ""] + open_lines + [""]
+        out = (lic + imports + [""] + preamble + [""] + open_lines + [""]
                + [WHY.format(stem=stem, name=name, path=args.path, total=total), ""]
-               + pre + L(a, b) + suf + ["", f"end {ns_line.split()[1]}", ""])
+               + pre + L(a, b) + suf + [""] + closers + [""])
         open(os.path.join(outdir, name + ".lean"), "w").write("\n".join(out))
         prev = name
 

@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.SpectralSDPSeparation
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.PolynomialTraffic`
@@ -1053,4 +1055,5 @@ theorem exists_probabilityPair_blindToEveryTruncatedTrafficRisk (D : ℕ) :
 
 end PolynomialTraffic
 
+end TrafficInvariantSeparation
 end Descent.Blindness

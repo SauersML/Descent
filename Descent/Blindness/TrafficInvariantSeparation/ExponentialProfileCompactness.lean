@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.PolynomialTraffic
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.ExponentialProfileCompactness`
@@ -572,4 +574,5 @@ theorem exponentialProfilePoint_isSeqCompact_univ (bound : ℝ) :
 
 end ExponentialProfileCompactness
 
+end TrafficInvariantSeparation
 end Descent.Blindness

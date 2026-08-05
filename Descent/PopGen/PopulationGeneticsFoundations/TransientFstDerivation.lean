@@ -13,7 +13,7 @@ open MeasureTheory
 /-!
 # `PopulationGeneticsFoundations.TransientFstDerivation`
 
-Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,726 lines.
+Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,740 lines.
 
 The parts are a CHAIN: each imports the one before, in the order the original was written.
 That is the conservative choice, deliberately. A monolith's declarations depend on each

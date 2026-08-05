@@ -13,7 +13,7 @@ open MeasureTheory
 /-!
 # `PopulationGeneticsFoundations.WrightFStatistics`
 
-Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,726 lines.
+Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,740 lines.
 
 The parts are a CHAIN: each imports the one before, in the order the original was written.
 That is the conservative choice, deliberately. A monolith's declarations depend on each
@@ -86,7 +86,7 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
     by up to 28 percent. The formula is correct for what it now says, and
-    `heterozygosityLossFromDrift_eq_het_loss` is the theorem that says it; only the name and
+    `heterozygosityLossDerived_eq_het_loss` is the theorem that says it; only the name and
     docstring were reassigning it to a different observable.
 
     Regime: closed population, no mutation. See `Descent.PopGen.DriftRegime`.
@@ -98,16 +98,6 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
     is 1.025 ± 0.02 at every one of those times. The first clause is an identity
     and carries no empirical weight on its own — a cross-check cannot measure the
     premise it shares, `DriftRegime.crossChecks_blind_to_retention`.
-
-    In-regime detail, carried over from the deleted second copy of this
-    definition, which is where `battery_falsrepair` recorded it: forward
-    Wright-Fisher at `Ne = 1000` measures the retention `1 - L(t)` as
-    0.90445 ± 0.00094, 0.60311 ± 0.00372 and 0.13699 ± 0.00272 at
-    `t = 200`, `1000`, `4000` against this expression's 0.90481, 0.60645 and
-    0.13527 -- worst 0.90 sems -- with the halved-rate reading `(1 - 1/(4 Nₑ))^t`
-    excluded at 84.90 sems and the haploid reading `(1 - 1/Nₑ)^t` at 91.51.
-    Those two exclusions are what make the ploidy convention in this body a
-    measured fact rather than a stipulation.
 
     Denotes: within-population heterozygosity loss. The same formula appears under
     `heterozygosityLossFromDrift` here and `founderHeterozygosityLoss` in

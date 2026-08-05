@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.InvariantSeparation
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.RankOneInvisibility`
@@ -567,4 +569,5 @@ theorem rankOne_groundState_certificate
 
 end RankOneInvisibility
 
+end TrafficInvariantSeparation
 end Descent.Blindness

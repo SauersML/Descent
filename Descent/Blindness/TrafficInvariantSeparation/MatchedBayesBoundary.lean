@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.MatchedBayesBoundary`
@@ -45,7 +47,6 @@ Where a cut falls inside a section, the section is reopened and reclosed by name
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
 
-section TrafficInvariantSeparation
 
 section MatchedBayesBoundary
 
@@ -1114,6 +1115,4 @@ theorem matchedInformationPath_persistentGap_requires_extensiveRank
 end MatchedBayesBoundary
 
 end TrafficInvariantSeparation
-
-
 end Descent.Blindness

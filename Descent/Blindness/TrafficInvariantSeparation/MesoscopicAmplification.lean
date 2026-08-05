@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.CurieWeissWindow
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.MesoscopicAmplification`
@@ -359,4 +361,5 @@ theorem limitingTraffic_insufficient_for_unstableDegreeOne (baseline : ℝ) :
 
 end MesoscopicAmplification
 
+end TrafficInvariantSeparation
 end Descent.Blindness

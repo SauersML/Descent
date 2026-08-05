@@ -13,7 +13,7 @@ open MeasureTheory
 /-!
 # `PopulationGeneticsFoundations.MigrationDriftFoundations`
 
-Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,726 lines.
+Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,740 lines.
 
 The parts are a CHAIN: each imports the one before, in the order the original was written.
 That is the conservative choice, deliberately. A monolith's declarations depend on each
@@ -440,24 +440,7 @@ noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ
     deme counts while the limit form is constant at 0.20000, so the design
     separates them by construction. -/
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
-  Descent.Core.fstIslandEquilibrium Ne m μ nDemes
-
-/-- **The wrapper in the raw coordinates this module writes it in.** The body is now
-`Core.fstIslandEquilibrium`, whose own body is built from `scaledFlow` and the ploidy
-convention, so a proof here can no longer reach the arithmetic by unfolding one name. This
-states the quotient once, and the proofs below rewrite with it rather than each unfolding a
-four-deep chain and re-deriving the same normalisation. It is the local half of
-`Core.fstIslandEquilibrium_eq`, whose docstring calls itself "the bridge that lets
-`fstIslandEquilibriumFiniteDemes` be a wrapper rather than a copy". -/
-theorem fstIslandEquilibriumFiniteDemes_eq (Ne m μ nDemes : ℝ) :
-    fstIslandEquilibriumFiniteDemes Ne m μ nDemes
-      = 1 / (1 + 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ) := by
-  -- `unfold` fails outright when one of its names is absent from the goal, and
-  -- the shim over `Core.islandDemeCorrection` may already have been unfolded by
-  -- the first name.  `simp only` just does not fire.
-  unfold fstIslandEquilibriumFiniteDemes
-  simp only [islandDemeCorrection]
-  exact Descent.Core.fstIslandEquilibrium_eq Ne m μ nDemes
+  Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
 
 /-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
 `nDemes / (nDemes - 1)`, whose divisor vanishes at one deme. The migration term is junk-zero
@@ -466,7 +449,8 @@ differentiated from itself at the mutation-drift level, where in fact there is n
 differentiate from. Consumers must exclude it by hypothesis. -/
 theorem fstIslandEquilibriumFiniteDemes_single_deme_is_junk (Ne m μ : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ 1 = 1 / (1 + 4 * Ne * μ) := by
-  rw [fstIslandEquilibriumFiniteDemes_eq, islandDemeCorrection_one_deme_is_junk]
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+  rw [islandDemeCorrection_one_deme_is_junk]
   norm_num
 
 /-- **The finite-deme equilibrium is the fixed point of the same identity balance**,
@@ -485,7 +469,7 @@ theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
     add_nonneg (mul_nonneg (mul_nonneg h4 hm) hcorr) (mul_nonneg h4 hμ)
   have hbody : fstIslandEquilibriumFiniteDemes Ne m μ nDemes =
       1 / (1 + (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)) := by
-    rw [fstIslandEquilibriumFiniteDemes_eq]
+    unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
     ring
   rw [hbody]
   exact scaledIdentityStep_fixedPoint _ h
@@ -497,9 +481,8 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
     (Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
-  rw [fstIslandEquilibriumFiniteDemes_eq, h]
-  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
-  ring_nf
+  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
+  rw [h]; ring_nf
 
 /-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**
 Migration and mutation enter the divisor additively, so an inadmissible negative migration rate

@@ -27,7 +27,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.TrafficInvariantSeparation.MesoscopicAmplification
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.SpectralSDPSeparation`
@@ -288,4 +290,5 @@ theorem bulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
 
 end SpectralSDPSeparation
 
+end TrafficInvariantSeparation
 end Descent.Blindness

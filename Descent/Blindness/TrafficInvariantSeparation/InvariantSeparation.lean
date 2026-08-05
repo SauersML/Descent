@@ -26,7 +26,9 @@ import Mathlib.Tactic
 import Descent.Blindness.ObservationalCeiling
 
 namespace Descent.Blindness
+namespace TrafficInvariantSeparation
 
+open scoped Matrix Topology
 
 /-!
 # `TrafficInvariantSeparation.InvariantSeparation`
@@ -224,4 +226,5 @@ theorem no_invariant_criterion_for_optimum {Design Invariant : Type*}
 
 end InvariantSeparation
 
+end TrafficInvariantSeparation
 end Descent.Blindness

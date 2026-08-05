@@ -55,7 +55,9 @@ import Descent.Coalescent.Program
 import Descent.Coalescent.QuotientRelation
 import Descent.Coalescent.Rates
 import Descent.Coalescent.Recombination
+import Descent.Coalescent.RenewalCriterion
 import Descent.Coalescent.Restriction
+import Descent.Coalescent.SchweinsbergBound
 import Descent.Coalescent.SeedBank
 import Descent.Coalescent.SegregatingSites
 import Descent.Coalescent.Selection
