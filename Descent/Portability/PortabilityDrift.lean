@@ -3800,7 +3800,8 @@ theorem constrained them jointly and could not have caught the decay base. -/
       m.fstTransient := by
   unfold Descent.Core.PopGenParameters.fstTransientAt PopGen.PGSEvolutionaryModel.fstTransient
     PopGen.fstTransientDecayFromScaled PopGen.hetDecayFromScaled
-  simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
+  simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    Descent.Core.PopGenParameters.fstEquilibrium,
     Descent.Core.fstFromFlow,
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,

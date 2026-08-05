@@ -360,8 +360,14 @@ theorem HardyWeinbergModel.genotypeVariance_eq
   rw [h.expectedAltAlleleCount_eq, sum_over_genotypes]
   -- `altAlleleCount` now delegates to `Core.Genotype.dosage`, so unfolding the
   -- wrapper alone leaves the coding unexpanded and the arithmetic unfinished.
+  -- The THREE EQUATION LEMMAS, not the definition: `dosage` is defined by cases
+  -- on the constructor, and `simp only [dosage]` does not reduce it applied to
+  -- one -- it left `Core.Genotype.homRef.dosage` standing in the goal and the
+  -- `ring_nf` below had nothing to close. `dosage_homRef`/`_het`/`_homAlt` are
+  -- the `rfl` lemmas declared beside the definition for exactly this.
   simp only [HardyWeinbergModel.genotypeProb, altAlleleCount,
-    Descent.Core.Genotype.dosage, HardyWeinbergModel.refFreq]
+    Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
+    Descent.Core.Genotype.dosage_homAlt, HardyWeinbergModel.refFreq]
   ring_nf
 
 /-- **A polymorphic locus has positive genotype variance.**
