@@ -381,6 +381,41 @@ def gate_falsified_acknowledged(raw):
     return silent
 
 
+def externally_silent(code, decls):
+    """Modules no other module cites a single declaration of.
+
+    REPORTED, NEVER GATED, and the distinction is the point. A module whose
+    results nothing uses is the "island" shape the corpus was diagnosed with --
+    92% of theorems had no cross-module consumer -- but not every leaf is a
+    defect. A module can legitimately state a FINDING that is the endpoint of an
+    argument rather than an input to one: `MultiAncestryTheory` proving that
+    mixing ancestries raises the deployed metric is a conclusion, and nothing
+    downstream needing it does not make it wrong.
+
+    Gating this at zero would demand a consumer for every conclusion, which
+    would be satisfied by writing restatements -- the exact anti-pattern the
+    duplicate gate exists to stop. So the number is tracked and a human decides
+    which leaves should feed something.
+    """
+    silent = []
+    for mod, found in decls.items():
+        if mod == "Descent":
+            continue
+        mine = {n for _, n in found}
+        if not mine:
+            continue
+        cited = False
+        for other, text in code.items():
+            if other == mod:
+                continue
+            if mine & set(IDENT.findall(text)):
+                cited = True
+                break
+        if not cited:
+            silent.append(mod)
+    return sorted(silent)
+
+
 def gate_orphans(code, decls):
     """Definitions and structures nothing in the CODE refers to, and structures with no
     constructed witness.
@@ -480,6 +515,7 @@ def measure():
     inverted, thin = gate_foundation_position(raw, graph, depth, indeg)
     silent = gate_falsified_acknowledged(raw)
     orphans, witnessless = gate_orphans(code, decls)
+    silent_modules = externally_silent(code, decls)
 
     return {
         "modules": len(graph),
@@ -493,11 +529,13 @@ def measure():
         "silent_falsifications": len(silent),
         "orphan_definitions": len(orphans),
         "witnessless_structures": len(witnessless),
+        "externally_silent_modules": len(silent_modules),
         "_offenders": inverted,
         "_thin": thin,
         "_silent": silent,
         "_orphans": orphans,
         "_witnessless": witnessless,
+        "_silent_modules": silent_modules,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -523,6 +561,9 @@ DEFECTS = {
 # there is no value of "theorems cited across modules" that is correct, and a
 # threshold on one would be a number someone picked.
 REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theorems",
+            # See `externally_silent`: gating this would demand a consumer for
+            # every conclusion, and restatements would satisfy it.
+            "externally_silent_modules",
             # Correct position, few consumers.  A new foundation starts here and
             # earns callers as they move over; it is not the inversion above.
             "foundation_not_yet_load_bearing")
@@ -565,6 +606,11 @@ def main() -> int:
             print("\ndefinitions no code refers to:")
             for n in now["_orphans"]:
                 print("  " + n)
+        if now["_silent_modules"]:
+            print(f"\nmodules nothing else cites ({len(now['_silent_modules'])}) "
+                  "-- reported, not gated:")
+            for m in now["_silent_modules"]:
+                print("  " + m)
         if now["_witnessless"]:
             print(f"\nstructures with no constructed inhabitant ({len(now['_witnessless'])}):")
             for n in now["_witnessless"]:
