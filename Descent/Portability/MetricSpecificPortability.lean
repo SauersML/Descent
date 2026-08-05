@@ -1733,26 +1733,12 @@ about better conditioning -- the eigenvalue extremes and the coherence can be
 held fixed while this happens.
 -/
 
-/-- Population loss profile at overlap fraction `x` from the truth, for coupling
-strength squared `q`. -/
-noncomputable def ogpOverlapProfile (q x : ℝ) : ℝ :=
-  Descent.Core.overlapProfile q x
-
-/-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
-take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem ogpOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
-    (hzero : (1 - q * x * (1 - x)) = 0) :
-    ogpOverlapProfile q x = 0 := by
-  unfold ogpOverlapProfile Descent.Core.overlapProfile
-  rw [hzero, div_zero]
-
-
-/-- **At zero overlap the profile is `1 - q`.** The best distant candidate keeps
-the fraction of the loss that the coupling cannot explain away. -/
-theorem ogpOverlapProfile_at_zero_overlap (q : ℝ) :
-    ogpOverlapProfile q 1 = 1 - q := by
-  unfold ogpOverlapProfile Descent.Core.overlapProfile
-  norm_num
+/-! **`ogpOverlapProfile` is deleted.** It was `Core.overlapProfile q x`, and so is
+`Blindness.populationOverlapProfile` -- the same profile named twice, in two modules that
+do not import each other, each having separately proved the same junk-denominator branch
+and the same `q 1 = 1 - q` endpoint. Those two facts are about the kernel, not about
+either reading of it, and they now live beside it in `Core.Ratios` as
+`overlapProfile_at_zero_denominator_is_junk` and `overlapProfile_at_one`. -/
 
 /-- The sign of this quadratic decides whether the loss profile has an interior
 maximum, and so whether the landscape has a barrier. -/

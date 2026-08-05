@@ -585,6 +585,24 @@ gap and the order parameter is just the mass. -/
 @[simp] theorem overlapProfile_at_zero (x : ℝ) : overlapProfile 0 x = x := by
   unfold overlapProfile; simp
 
+/-- **At a vanishing denominator Mathlib returns `0`**, which is a value this profile can
+also take legitimately, so the branch is named rather than left to be inferred from the
+result. Both subsystems that wrap this kernel had proved this separately, with the same
+hypothesis and the same two-line proof. -/
+theorem overlapProfile_at_zero_denominator_is_junk (q x : ℝ)
+    (hzero : (1 - q * x * (1 - x)) = 0) : overlapProfile q x = 0 := by
+  unfold overlapProfile
+  rw [hzero, div_zero]
+
+/-- **At full mass the profile is `1 - q`**: the distant candidate keeps the fraction of
+the loss the coupling cannot explain away. -/
+@[simp] theorem overlapProfile_at_one (q : ℝ) : overlapProfile q 1 = 1 - q := by
+  unfold overlapProfile; norm_num
+
+/-- **At zero mass the profile vanishes.** -/
+@[simp] theorem overlapProfile_at_zero_mass (q : ℝ) : overlapProfile q 0 = 0 := by
+  unfold overlapProfile; norm_num
+
 /-! ### Three more shapes the census kept finding
 
 Each was written out in two modules that do not import each other. None is deep; what

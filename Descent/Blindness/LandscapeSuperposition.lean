@@ -512,21 +512,18 @@ take legitimately, so the branch is named rather than left to be inferred from t
 theorem populationOverlapProfile_at_zero_denominator_is_junk (q x : ℝ)
     (hzero : (1 - q * x * (1 - x)) = 0) :
     populationOverlapProfile q x = 0 := by
-  unfold populationOverlapProfile Descent.Core.overlapProfile
-  rw [hzero, div_zero]
+  exact Descent.Core.overlapProfile_at_zero_denominator_is_junk q x hzero
 
 
 /-- The far, disjoint candidate has normalized loss `1 - q`. -/
 @[simp] theorem populationOverlapProfile_one (q : ℝ) :
     populationOverlapProfile q 1 = 1 - q := by
-  simp [populationOverlapProfile,
-      Descent.Core.overlapProfile]
+  exact Descent.Core.overlapProfile_at_one q
 
 /-- The planted support has zero excess population loss. -/
 @[simp] theorem populationOverlapProfile_zero (q : ℝ) :
     populationOverlapProfile q 0 = 0 := by
-  simp [populationOverlapProfile,
-      Descent.Core.overlapProfile]
+  exact Descent.Core.overlapProfile_at_zero_mass q
 
 /-- Endpoint derivative numerator of the overlap profile.  Its sign detects whether the
 profile turns down before reaching the disjoint-support endpoint. -/
