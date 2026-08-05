@@ -125,14 +125,14 @@ is twice the coalescent time scale times the mutation rate**, rather than an
 independently chosen `4`. -/
 theorem scaledMutationRate_eq_ploidy_form (Ne mu : ℝ) :
     scaledMutationRate Ne mu = 2 * ploidy * Ne * mu := by
-  unfold scaledMutationRate ploidy scaledMutationRate ploidy; ring
+  unfold scaledMutationRate ploidy; ring
 
 /-- **Cross-check: the scaled migration rate in `PortabilityDrift` uses the
 same convention.** These two were written in different files, each spelling
 out its own `4`. -/
 theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
     scaledMigrationRate Ne m = 2 * ploidy * Ne * m := by
-  unfold scaledMigrationRate ploidy scaledMigrationRate ploidy; ring
+  unfold scaledMigrationRate ploidy; ring
 
 /-! ### The named rates and the wrapped types are the same arithmetic
 
