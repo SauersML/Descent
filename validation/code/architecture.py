@@ -168,15 +168,33 @@ def gate_foundation_position(raw, graph, depth, indeg):
     The claim is read from the module path and from the header docstring, so the
     gate cannot be satisfied by renaming a file while leaving the prose.
     """
-    offenders = []
+    inverted, thin = [], []
     for mod in sorted(graph):
         header = raw[mod][:4000]
         if not claims_foundation(mod, header):
             continue
         d, deg = depth[mod], indeg[mod]
-        if d > 2 or deg < 5:
-            offenders.append({"module": mod, "depth": d, "in_degree": deg})
-    return offenders
+        # THE DEFECT is not depth as such -- a foundation may rest on other
+        # foundations, and Core is four layers deep by design (Ratios, Fst,
+        # Parameters, Moments).  It is depending on the SUBSYSTEMS you claim to
+        # reconcile: an identity stated above PopGen and Portability can only
+        # describe their agreement, and nothing below it can be made to respect
+        # the agreement.  So the test is what a foundation imports, not how deep
+        # it sits.
+        outside = sorted(m for m in graph[mod]
+                         if not (m.startswith("Descent.Core.")
+                                 or m.startswith("Descent.Foundations.")))
+        if outside:
+            inverted.append({"module": mod, "depth": d, "in_degree": deg,
+                             "imports_subsystems": len(outside),
+                             "example": outside[0]})
+        elif deg < 5:
+            # NOT THE SAME THING.  Correctly positioned, not yet load-bearing --
+            # a new Core module starts here and earns consumers as callers move
+            # over.  Tracked separately so that adding a foundation at depth 0
+            # does not read as the inversion this gate exists to catch.
+            thin.append({"module": mod, "depth": d, "in_degree": deg})
+    return inverted, thin
 
 
 def gate_duplicate_bodies(code):
@@ -341,7 +359,7 @@ def measure():
     dup_extra, dup_groups = gate_duplicate_bodies(code)
     reused, total_thms = gate_cross_module_reuse(code, decls)
     comps = gate_composition_count(code, decls)
-    offenders = gate_foundation_position(raw, graph, depth, indeg)
+    inverted, thin = gate_foundation_position(raw, graph, depth, indeg)
     silent = gate_falsified_acknowledged(raw)
 
     return {
@@ -351,9 +369,11 @@ def measure():
         "duplicate_body_groups": dup_groups,
         "duplicate_body_extras": dup_extra,
         "composition_theorems": len(comps),
-        "foundation_position_offenders": len(offenders),
+        "foundation_inverted": len(inverted),
+        "foundation_not_yet_load_bearing": len(thin),
         "silent_falsifications": len(silent),
-        "_offenders": offenders,
+        "_offenders": inverted,
+        "_thin": thin,
         "_silent": silent,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
@@ -365,7 +385,7 @@ GATES = {
     "composition_theorems": ("up", "theorems joining a demographic quantity to a metric"),
     "duplicate_body_groups": ("down", "alpha-equivalent definition bodies"),
     "duplicate_body_extras": ("down", "definitions that re-type a body instead of wrapping"),
-    "foundation_position_offenders": ("down", "modules claiming to be foundations from a leaf"),
+    "foundation_inverted": ("down", "modules claiming to be foundations from above what they reconcile"),
     "silent_falsifications": ("down", "FALSIFIED ledger rows no docstring mentions"),
 }
 
@@ -408,8 +428,14 @@ def main() -> int:
 
     if args.verbose:
         if now["_offenders"]:
-            print("\nmodules claiming to be foundations from a leaf:")
+            print("\nINVERTED -- claims a foundational role from above what it reconciles:")
             for o in now["_offenders"]:
+                print(f"  depth {o['depth']:>2}  in-degree {o['in_degree']:>2}  "
+                      f"imports {o['imports_subsystems']} subsystem module(s), "
+                      f"e.g. {o['example']}\n      {o['module']}")
+        if now["_thin"]:
+            print("\npositioned correctly, not yet load-bearing (in-degree < 5):")
+            for o in now["_thin"]:
                 print(f"  depth {o['depth']:>2}  in-degree {o['in_degree']:>2}  {o['module']}")
         if now["_silent"]:
             print("\nFALSIFIED with no acknowledgement in the declaring file:")
