@@ -6409,6 +6409,96 @@ def run_shape_chains() -> int:
     return 0
 
 
+def run_shape_components() -> int:
+    """Every module must lie in the corpus's one weak component.
+
+    WHAT THIS CAUGHT, TWICE.  `Coalescent` was a self-contained development in the
+    previous release -- seventy-nine modules importing each other and nothing else
+    importing them.  It was wired in by hand.  `Pangenome` was the same shape in
+    this one: `GaugeCounterexample` and `GaugeInvariance` imported each other and
+    nothing in the corpus imported either, so a gauge-invariance result and the
+    population genetics it is about could not be made to contradict each other.  It
+    too was wired in by hand, while this guard was being written.  A third subsystem
+    will start as an island unless something fails when it does, and that is the
+    entire argument for the guard: both repairs were correct, both were found by
+    reading, and reading is not a mechanism.
+
+    WHAT IS LEFT ARE SINGLETONS, and they are the same defect at its smallest.
+    `Blindness/BundleRigidity/LinearSCM`, `BundleRigidity/Operator` and
+    `Spectral/ResonanceSpectrum` import nothing from this corpus and nothing here
+    imports them; each is reachable only through its directory head, which is to
+    say only by `lake build`.  `ResonanceSpectrum` is the module the root file's own
+    comment records as having failed all day on a missing import while every
+    whole-corpus build reported zero errors.
+
+    The component is WEAK -- direction ignored.  A subsystem that only imports the
+    corpus and is imported by nothing is wired in for this purpose: something below
+    it can be edited and break it.  What this catches is the strictly worse case
+    where neither direction exists at all.
+
+    THE TABLES OF CONTENTS MUST COME OUT FIRST, and this is the whole reason the
+    check has to be written rather than eyeballed.  `Descent/Pangenome.lean` imports
+    both Pangenome modules and `Descent.lean` imports it, so on the raw graph the
+    corpus is one component and always will be, no matter how disconnected the
+    mathematics is.  The heads are what a build needs; they are not what a
+    dependency is.  With them removed the corpus splits, and everything outside the
+    largest piece is the finding.
+    """
+    graph = _shape_graph_without_toc()
+    if not graph:
+        print("shape-components guard CANNOT RUN: no Lean modules found under "
+              f"{CORPUS / 'Descent'}")
+        return 1
+
+    adjacent = collections.defaultdict(set)
+    for mod, deps in graph.items():
+        adjacent.setdefault(mod, set())
+        for dep in deps:
+            adjacent[mod].add(dep)
+            adjacent[dep].add(mod)
+
+    seen, components = set(), []
+    for start in sorted(graph):
+        if start in seen:
+            continue
+        stack, comp = [start], []
+        seen.add(start)
+        while stack:
+            cur = stack.pop()
+            comp.append(cur)
+            for nxt in sorted(adjacent[cur]):
+                if nxt not in seen:
+                    seen.add(nxt)
+                    stack.append(nxt)
+        components.append(sorted(comp))
+    components.sort(key=len, reverse=True)
+
+    stranded = [c for c in components[1:]]
+    if stranded:
+        n = sum(len(c) for c in stranded)
+        print(f"modules outside the corpus's largest weak component: {n} in "
+              f"{len(stranded)} island(s), budget 0; give each a theorem relating "
+              f"its quantities to something the corpus already deploys, and import "
+              f"what that theorem needs -- an island is wired in when an edit "
+              f"elsewhere can break it")
+        for comp in stranded:
+            subsystems = sorted({m.split(".")[1] for m in comp if "." in m})
+            print(f"    island of {len(comp)} module(s) under "
+                  f"{', '.join(subsystems)}:")
+            for m in comp:
+                print(f"        {m}")
+        print(f"shape-components guard FAILS. {len(components)} weak components "
+              f"means {len(components)} developments sharing a repository. Nothing "
+              f"in an island can be contradicted by anything outside it, so a "
+              f"divergence between an island and the corpus is not a failing build, "
+              f"it is a fact nobody has occasion to notice.")
+        return 1
+
+    print(f"shape-components guard passes: all {len(graph)} modules lie in one "
+          f"weak component once the directory heads are removed")
+    return 0
+
+
 # ======================================================================================
 # DISPATCHER
 # ======================================================================================
@@ -6534,6 +6624,12 @@ GUARDS = {
     # lands. Run `--only shape-chains` for the outstanding list, which is also the
     # work list -- each line names the module the file should have imported.
     "shape-chains":    dict(fn=run_shape_chains,     gated=False, takes_argv=False),
+    # `shape-components`: flip when every module lies in the corpus's one weak
+    # component. `Pangenome`'s island closed while this was being written; three
+    # singletons remain -- `BundleRigidity/LinearSCM`, `BundleRigidity/Operator`
+    # and `Spectral/ResonanceSpectrum` -- each importing nothing from the corpus and
+    # imported by nothing in it.
+    "shape-components": dict(fn=run_shape_components, gated=False, takes_argv=False),
 }
 
 
