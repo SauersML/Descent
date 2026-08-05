@@ -173,10 +173,17 @@ step" are different states.
   was a gap in Mathlib rather than in genealogy: `‖exp x - 1 - x‖ ≤ e^{‖x‖} - 1 - ‖x‖` in any
   Banach algebra, hence `≤ ‖x‖²` on the unit ball, proved by peeling two terms off the
   exponential series and comparing it with itself.  Mathlib had that bound only for `ℝ` and
-  `ℂ`.  STILL ABSENT: the many-state instantiation itself, which now needs only a
-  CONSTRUCTION -- the block-count transition matrix, whose off-diagonal entries need the
-  multinomial merge counts the corpus does not have, having counted only the diagonal
-  (`WrightFisher.noCoalescenceProb`); and Möhle's lemma proper, the `A + B/N` form with `A` a
+  `ℂ`.  `Coalescent.BlockCountMatrix` then counts the row.  The classical route is the occupancy
+  distribution -- Stirling numbers times a falling factorial -- and the corpus has no Stirling
+  numbers and does not need them: a generation dropping two lineages has two DISTINCT colliding
+  pairs (`exists_two_collisions`, whose proof is that a single repeated pair leaves `f`
+  injective off one point), each prescribed pair of pairs has at most `N^{k-2}` witnesses
+  (`card_two_collisions_le'`, five overlap cases), and a union bound over the `≤ k⁴` quadruples
+  gives `twoDropProb_le`: the chance of dropping two or more is at most `k⁴/N²`.  With
+  `WrightFisher.coalescenceProb_le` on the diagonal, that is every entry of the row to the
+  order K-G (2.11) asks for.  STILL ABSENT: assembling those entries into a `Matrix` and
+  feeding it to `SemigroupLimit.tendsto_pow_of_expansion` -- bookkeeping in the row-sum norm,
+  with no mathematics left in it; and Möhle's lemma proper, the `A + B/N` form with `A` a
   projection, for models whose two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut

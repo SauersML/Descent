@@ -39,8 +39,9 @@ two distinct colliding pairs.
   which is what a union bound needs.
 
 - `card_filter_le_of_determined`: **two determined coordinates leave `N^{k-2}` maps**.
-- `card_two_collisions_le`: hence a prescribed pair of pairs has at most `N^{k-2}` witnesses,
+- `card_two_collisions_le'`: hence a prescribed pair of pairs has at most `N^{k-2}` witnesses,
   disjoint or overlapping.
+- `card_two_drop_le`, `twoDropProb_le`: **the tail of the row is `k⁴/N²`**, counted.
 
 ## What the union bound is
 
@@ -245,6 +246,33 @@ theorem card_two_drop_le {k N : ℕ} :
             ≤ (Finset.univ : Finset (Fin k × Fin k × Fin k × Fin k)).card :=
           Finset.card_le_card (Finset.filter_subset _ _)
         simpa [Finset.card_univ, pow_succ, Nat.mul_assoc] using hle
+
+/-- **The same as a probability: `O(N⁻²)` with a constant in `k` alone.**  Dividing by the
+`N^k` parent maps, the chance a generation drops two or more of `k` lineages is at most
+`k⁴/N²`.
+
+This is the `O(N⁻²)` of K-G (2.9)-(2.11) for everything below the subdiagonal, and it is
+counted rather than asserted -- as `WrightFisher.coalescenceProb_le` counts the diagonal. -/
+theorem twoDropProb_le {k N : ℕ} (hN : 0 < N) (hk : 2 ≤ k) :
+    ((Finset.univ.filter fun f : Fin k → Fin N ↦
+        (Finset.univ.image f).card + 2 ≤ k).card : ℝ) / (N : ℝ) ^ k
+      ≤ (k : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
+  have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+  have hcard := card_two_drop_le (k := k) (N := N)
+  have hcardR : ((Finset.univ.filter fun f : Fin k → Fin N ↦
+      (Finset.univ.image f).card + 2 ≤ k).card : ℝ) ≤ (k : ℝ) ^ 4 * (N : ℝ) ^ (k - 2) := by
+    exact_mod_cast hcard
+  have hpow : (N : ℝ) ^ (k - 2) * (N : ℝ) ^ 2 = (N : ℝ) ^ k := by
+    rw [← pow_add]
+    congr 1
+    omega
+  rw [div_le_div_iff₀ (by positivity) (by positivity)]
+  calc ((Finset.univ.filter fun f : Fin k → Fin N ↦
+        (Finset.univ.image f).card + 2 ≤ k).card : ℝ) * (N : ℝ) ^ 2
+      ≤ ((k : ℝ) ^ 4 * (N : ℝ) ^ (k - 2)) * (N : ℝ) ^ 2 := by
+        exact mul_le_mul_of_nonneg_right hcardR (by positivity)
+    _ = (k : ℝ) ^ 4 * ((N : ℝ) ^ (k - 2) * (N : ℝ) ^ 2) := by ring
+    _ = (k : ℝ) ^ 4 * (N : ℝ) ^ k := by rw [hpow]
 
 end Coalescent
 
