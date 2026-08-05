@@ -1804,6 +1804,54 @@ AGREEMENTS = [
      "that justifies the second name; if it is not, one should be deleted.",
      None),
 
+    # THE `oneMinusRatio` FAMILY. `Conventions.oneMinusRatio a b = 1 - a/b` is a
+    # NAMED PRIMITIVE with ZERO consumers -- it appears nowhere in the corpus
+    # outside its own file -- while at least four definitions independently
+    # reimplement it. That is the fork pattern at its clearest: one canonical
+    # name nobody calls, and four copies free to drift from it and from each
+    # other.
+    #
+    # Related rather than collapsed, which is the corpus's own doctrine:
+    # identical arithmetic is not identical meaning, so each keeps its name and
+    # can be measured separately, and these entries are what catch them moving
+    # apart. Relating them also gives the primitive the consumers it lacked.
+    #
+    # None of the four is PROVED equal to the primitive, so the theorem field
+    # records the absence rather than naming a proof. A Lean theorem for each
+    # would be strictly better and is blocked on an import-graph question:
+    # `Conventions` sits DOWNSTREAM (it imports GeneticArchitectureDiscovery,
+    # AssortativeMatingPGS and seven more), so the theorems cannot live beside
+    # the primitive without pulling those modules into the importers, and
+    # cannot live beside each consumer without those importing Conventions.
+    # Whoever resolves that should replace these four entries with proofs.
+    ("Calibrator.oneMinusRatio", "Calibrator.r2FromMSE",
+     "NO THEOREM RELATES THESE (recorded as a fork, not as a proved equality)",
+     "`1 - mse/varY` IS `oneMinusRatio mse varY`, argument for argument. R² from "
+     "mean squared error is the primitive read with an outcome variance as the "
+     "denominator, and nothing in the corpus says so.",
+     None),
+    ("Calibrator.oneMinusRatio", "Calibrator.fstFromHetRatio",
+     "NO THEOREM RELATES THESE (recorded as a fork, not as a proved equality)",
+     "`1 - H/H₀` IS `oneMinusRatio H H₀`. This is the F_ST-from-heterozygosity "
+     "form, and the F_ST family is where this corpus has paid most for "
+     "unrelated duplicates -- three separate repairs, including a Nei body "
+     "living under the name hudsonFst.",
+     None),
+    ("Calibrator.oneMinusRatio", "Calibrator.hudsonFstFromCoalescenceTimes",
+     "NO THEOREM RELATES THESE (recorded as a fork, not as a proved equality)",
+     "`1 - ETss/ETst` IS `oneMinusRatio ETss ETst`. Hudson's F_ST from "
+     "coalescence times is the same primitive again, in the same family as the "
+     "entry above and with the same history behind it.",
+     None),
+    ("Calibrator.oneMinusRatio", "Calibrator.pcTargetAxisEfficacy",
+     "NO THEOREM RELATES THESE (recorded as a fork, not as a proved equality)",
+     "`1 - residual/uncorrected` is `oneMinusRatio` with its two arguments "
+     "TRANSPOSED -- the numerator is the second parameter here and the first "
+     "there. Exactly the case that would have been reported as a body "
+     "divergence before this table supported argument permutations, and a "
+     "concrete reason that support is not a convenience.",
+     (1, 0)),
+
     ("Calibrator.neiGst", "Calibrator.neiGstFromFrequencies",
      "Conventions.neiGstFromFrequencies_eq_neiGst",
      "The corpus's two spellings of Nei's G_ST: `1 - H_S/H_T` and "
