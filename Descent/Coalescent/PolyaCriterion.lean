@@ -118,9 +118,10 @@ theorem returnProb_gt_one_div {n : ℕ} (hn : 4 ≤ n) : 1 / (n : ℝ) < returnP
 
 /-- **Pólya's criterion, one dimension: the return probabilities are not summable.**
 
-Hence the simple random walk on `ℤ` is recurrent -- given the renewal identity, which is the
-step this corpus cites rather than proves.  What it does prove is the divergence, from a
-count and the harmonic series. -/
+Hence the simple random walk on `ℤ` is recurrent.  `Coalescent.RenewalCriterion` supplies the
+step from divergence to recurrence -- `polya_certain_return` -- so what was once a citation is
+now a named hypothesis (the renewal identity) with the whole deduction around it proved.  This
+theorem is the half that needs no probability: a count and the harmonic series. -/
 theorem not_summable_returnProb : ¬ Summable returnProb := by
   intro hsum
   have hshift : Summable fun k : ℕ ↦ returnProb (k + 4) := (summable_nat_add_iff 4).mpr hsum
