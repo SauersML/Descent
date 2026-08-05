@@ -7,6 +7,7 @@ import Descent.Program.OpenQuestions
 -- `expanderAgreementFloor`: the window-audit section below is what the twin
 -- construction says about neighbourhood-consistency QC.
 import Descent.Conditionals.LocalToGlobalCoherence
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -52,31 +53,32 @@ section IncrementalR2
 /-- **Incremental R² definition.**
     ΔR² = R²(covariates + PGS) - R²(covariates only). -/
 noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
-  r2_full - r2_covariates
+  Descent.Core.difference r2_full r2_covariates
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem incrementalR2_at_reference_point :
     incrementalR2 (3 / 4) (1 / 4) = 1 / 2 := by
-  norm_num [incrementalR2]
+  norm_num [incrementalR2,
+      Descent.Core.difference]
 
 
 /-- **Increments telescope.** The gain from covariates to full equals the gain through any
 intermediate model plus the gain from there. A body that failed this would not be an increment. -/
 theorem incrementalR2_telescope (a b c : ℝ) :
     incrementalR2 a b + incrementalR2 b c = incrementalR2 a c := by
-  unfold incrementalR2; ring
+  unfold incrementalR2 Descent.Core.difference; ring
 
 /-- Incremental R² vanishes exactly when the full and covariate-only fits explain the
 same fraction of variance. -/
 theorem incrementalR2_eq_zero_iff (r2_full r2_covariates : ℝ) :
     incrementalR2 r2_full r2_covariates = 0 ↔ r2_full = r2_covariates := by
-  unfold incrementalR2
+  unfold incrementalR2 Descent.Core.difference
   exact sub_eq_zero
 
 /-- Nesting the models makes the increment nonnegative. -/
 theorem incrementalR2_nonneg (r2_full r2_covariates : ℝ)
     (h : r2_covariates ≤ r2_full) : 0 ≤ incrementalR2 r2_full r2_covariates := by
-  unfold incrementalR2; linarith
+  unfold incrementalR2 Descent.Core.difference; linarith
 
 /-- **Incremental R² is nonneg from nested model theory.**
     In a nested linear regression, adding predictors can only increase R²
@@ -97,7 +99,7 @@ theorem incrementalR2_nonneg_of_rss_le
     let r2_cov := 1 - rss_cov / tss
     0 ≤ incrementalR2 r2_full r2_cov := by
   simp only
-  unfold incrementalR2
+  unfold incrementalR2 Descent.Core.difference
   -- (1 - rss_full/tss) - (1 - rss_cov/tss) = (rss_cov - rss_full)/tss ≥ 0
   have : rss_cov / tss - rss_full / tss = (rss_cov - rss_full) / tss := by ring
   linarith [div_nonneg (by linarith : 0 ≤ rss_cov - rss_full) (le_of_lt h_tss)]
@@ -106,7 +108,7 @@ theorem incrementalR2_nonneg_of_rss_le
     Port = ΔR²_target / ΔR²_source.
     SE(Port) ≈ Port × √(SE²_target/ΔR²²_target + SE²_source/ΔR²²_source). -/
 noncomputable def portabilityRatio (dr2_target dr2_source : ℝ) : ℝ :=
-  dr2_target / dr2_source
+  Descent.Core.ratio dr2_target dr2_source
 
 /-- **portabilityRatio at zero dr2_source, named.** A source cohort with no explained variance
 gives no baseline to be portable from. Lean returns `0`, complete failure to transfer, which is
@@ -114,14 +116,14 @@ indistinguishable from a real transfer failure against a working source. Consume
 `dr2_source ≠ 0`. -/
 theorem portabilityRatio_zero_dr2source_is_junk (dr2_target : ℝ) :
     portabilityRatio dr2_target 0 = 0 := by
-  unfold portabilityRatio
+  unfold portabilityRatio Descent.Core.ratio
   simp
 
 /-- Portability ratio ≤ 1 when target PGS is weaker. -/
 theorem portabilityRatio_le_one
     (dr2_t dr2_s : ℝ) (h_s : 0 < dr2_s) (h_weaker : dr2_t ≤ dr2_s) :
     portabilityRatio dr2_t dr2_s ≤ 1 := by
-  unfold portabilityRatio
+  unfold portabilityRatio Descent.Core.ratio
   rw [div_le_one h_s]; exact h_weaker
 
 /-- **The portability ratio reaches one exactly at full transport.**
@@ -133,7 +135,7 @@ theorem portabilityRatio_le_one
 theorem portabilityRatio_eq_one_iff
     (dr2_t dr2_s : ℝ) (h_s : 0 < dr2_s) :
     portabilityRatio dr2_t dr2_s = 1 ↔ dr2_t = dr2_s := by
-  unfold portabilityRatio
+  unfold portabilityRatio Descent.Core.ratio
   rw [div_eq_iff (ne_of_gt h_s), one_mul]
 
 /-- Against a nonzero source increment, zero portability is exactly zero target
@@ -141,7 +143,7 @@ increment rather than an artifact of division by zero. -/
 theorem portabilityRatio_eq_zero_iff
     (dr2_t dr2_s : ℝ) (h_s : dr2_s ≠ 0) :
     portabilityRatio dr2_t dr2_s = 0 ↔ dr2_t = 0 := by
-  unfold portabilityRatio
+  unfold portabilityRatio Descent.Core.ratio
   constructor
   · intro h
     calc
@@ -165,11 +167,12 @@ section CrossValidation
 /-- Approximate upward R² bias from using `predictorCount` fitted predictors in an
 evaluation sample with `overlapCount` overlapping observations. -/
 noncomputable def sampleOverlapBias (predictorCount overlapCount : ℝ) : ℝ :=
-  predictorCount / overlapCount
+  Descent.Core.ratio predictorCount overlapCount
 
 /-- The overlap-bias scale is pinned away from both denominator boundaries. -/
 theorem sampleOverlapBias_at_reference_point : sampleOverlapBias 1 4 = 1 / 4 := by
-  norm_num [sampleOverlapBias]
+  norm_num [sampleOverlapBias,
+      Descent.Core.ratio]
 
 /-- **Overfitting bias from sample overlap is positive.**
     If the GWAS sample overlaps with the evaluation sample,
@@ -179,7 +182,7 @@ theorem sampleOverlapBias_pos
     (p_snps n_overlap : ℝ)
     (h_p : 0 < p_snps) (h_n : 0 < n_overlap) :
     0 < sampleOverlapBias p_snps n_overlap := by
-  unfold sampleOverlapBias
+  unfold sampleOverlapBias Descent.Core.ratio
   exact div_pos h_p h_n
 
 /-- The approximate overlap bias is below one exactly when the number of fitted
@@ -187,7 +190,7 @@ predictors is smaller than the positive overlap sample. -/
 theorem sampleOverlapBias_lt_one_iff
     (p_snps n_overlap : ℝ) (h_n : 0 < n_overlap) :
     sampleOverlapBias p_snps n_overlap < 1 ↔ p_snps < n_overlap := by
-  unfold sampleOverlapBias
+  unfold sampleOverlapBias Descent.Core.ratio
   rw [div_lt_one h_n]
 
 end CrossValidation
@@ -754,7 +757,7 @@ theorem same_sourceR2_different_targetR2_two_signal_witness :
     sourceR2 = stableTargetR2 ∧
     brokenTargetR2 < stableTargetR2 ∧
     brokenTargetR2 / sourceR2 = (3 : ℝ) / 4 := by
-  simp [TransportedMetrics.r2FromSignalVariance]
+  simp [TransportedMetrics.r2FromSignalVariance, Descent.Core.share]
   norm_num
 
 end SourceR2Insufficiency

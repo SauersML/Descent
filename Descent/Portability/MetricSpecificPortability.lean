@@ -9,6 +9,7 @@ import Descent.Blindness.ImitationRigidity
 -- "What the metric split is, and is not" below. That section is the reason this
 -- import exists: `levelSet_metrics_agree_of_coords_eq` is not provable here.
 import Descent.Spectral.FoldedSpectrum
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -426,7 +427,7 @@ theorem neutralAF_benchmark_auc_preserved_citl_shift_at_fixed_fst
     (mean_obs mean_pred δ : ℝ) :
     calibrationInTheLarge mean_obs (mean_pred + δ) =
       calibrationInTheLarge mean_obs mean_pred - δ := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- **THE DISCRIMINATION CONJUNCT REMOVED FROM THE TWO THEOREMS BELOW WAS VACUOUS, AND
@@ -578,7 +579,7 @@ theorem mechanistic_transport_disrupts_slope_and_brier
     be estimated more precisely from the same effective sample size. -/
 noncomputable def adaptationDifficultyIndex
     (nParams infoPerSample : ℝ) : ℝ :=
-  nParams / infoPerSample
+  Descent.Core.ratio nParams infoPerSample
 
 /-- **Adaptation difficulty at zero information per sample, named.** A sample carrying no
 information about the target distribution makes adaptation impossible, so the number of samples
@@ -587,7 +588,7 @@ adaptation problem where the truth is that no amount of data suffices. Consumers
 `infoPerSample ≠ 0`. -/
 theorem adaptationDifficultyIndex_no_information_is_junk (nParams : ℝ) :
     adaptationDifficultyIndex nParams 0 = 0 := by
-  unfold adaptationDifficultyIndex
+  unfold adaptationDifficultyIndex Descent.Core.ratio
   simp
 
 /-- **The index times the information per sample is the parameter count.** That is what makes it
@@ -595,7 +596,7 @@ a sample requirement rather than a bare ratio. -/
 theorem adaptationDifficultyIndex_mul_info (nParams infoPerSample : ℝ)
     (h : infoPerSample ≠ 0) :
     adaptationDifficultyIndex nParams infoPerSample * infoPerSample = nParams := by
-  unfold adaptationDifficultyIndex
+  unfold adaptationDifficultyIndex Descent.Core.ratio
   field_simp
 
 /-- **Trace-MSE lower bound under an orthogonal Fisher model.**
@@ -664,7 +665,7 @@ theorem fisherTraceMSELowerBound_le_target_iff
     (h_target : 0 < targetTraceMSE) :
     fisherTraceMSELowerBound nEff nParams infoPerSample ≤ targetTraceMSE ↔
       requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample targetTraceMSE ≤ nEff := by
-  unfold fisherTraceMSELowerBound requiredEffectiveSampleSizeForTraceMSE adaptationDifficultyIndex
+  unfold fisherTraceMSELowerBound requiredEffectiveSampleSizeForTraceMSE adaptationDifficultyIndex Descent.Core.ratio
   constructor
   · intro h
     rw [div_le_iff₀ h_target]
@@ -771,7 +772,7 @@ theorem adaptationDifficultyIndex_recal_lt_rediscovery
     (h_more_params : 2 < m) :
     adaptationDifficultyIndex 2 infoCal <
       adaptationDifficultyIndex m infoDisc := by
-  unfold adaptationDifficultyIndex
+  unfold adaptationDifficultyIndex Descent.Core.ratio
   have h_two_over_cal_le_disc : 2 / infoCal ≤ 2 / infoDisc := by
     have h_inv : 1 / infoCal ≤ 1 / infoDisc :=
       one_div_le_one_div_of_le h_infoDisc h_info_order

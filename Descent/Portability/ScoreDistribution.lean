@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PGSCalibrationTheory
 import Descent.Blindness.Condensation
 import Descent.Blindness.JetBarrier
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -303,7 +304,7 @@ theorem identity_citl_shift_eq_neg_pgsMeanShift
     calibrationInTheLarge mean_observed (pgsMean β p_target) -
       calibrationInTheLarge mean_observed (pgsMean β p_source) =
         -pgsMeanShift β p_source p_target := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   rw [mean_shift_eq_diff]
   ring
 
@@ -554,7 +555,7 @@ section BlockCount
     count from the variance of a block sum against fully independent markers,
     400000 draws: worst 1.69 sems over a prediction spanning 10.0 to 50.0. -/
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
-  markers / correlationLength
+  Descent.Core.ratio markers correlationLength
 
 /-- **effectiveBlockCount at zero correlationLength, named.** A correlation length of zero means
 every marker is independent, so the block count should be the marker count. Lean returns `0`: no
@@ -562,7 +563,7 @@ blocks at all, and any per-block correction built on it silently divides by noth
 must require `correlationLength ≠ 0`. -/
 theorem effectiveBlockCount_zero_correlationlength_is_junk (markers : ℝ) :
     effectiveBlockCount markers 0 = 0 := by
-  unfold effectiveBlockCount
+  unfold effectiveBlockCount Descent.Core.ratio
   simp
 
 /-- **The block count is a ratio of lengths, so it does not depend on the unit.** Counting
@@ -571,7 +572,7 @@ unchanged, which is what makes it a count rather than a length. -/
 theorem effectiveBlockCount_unit_invariant (markers correlationLength t : ℝ) (ht : t ≠ 0) :
     effectiveBlockCount (t * markers) (t * correlationLength)
       = effectiveBlockCount markers correlationLength := by
-  unfold effectiveBlockCount
+  unfold effectiveBlockCount Descent.Core.ratio
   exact mul_div_mul_left _ _ ht
 
 /-- **The blocks tile the markers.** Unit invariance does not say how many markers a block holds;
@@ -579,7 +580,7 @@ this does, and it is the statement a miscounted block size would break. -/
 theorem effectiveBlockCount_mul_correlationLength (markers correlationLength : ℝ)
     (hl : correlationLength ≠ 0) :
     effectiveBlockCount markers correlationLength * correlationLength = markers := by
-  unfold effectiveBlockCount
+  unfold effectiveBlockCount Descent.Core.ratio
   field_simp
 
 /-- **Residual discreteness of the freezing transition.**
@@ -709,7 +710,7 @@ theorem marker_count_understates_berry_esseen (C ρ σ_sq b ℓ κ : ℝ)
     returns `b`. -/
 theorem effectiveBlockCount_of_blocks (b ℓ : ℝ) (hℓ : ℓ ≠ 0) :
     effectiveBlockCount (b * ℓ) ℓ = b := by
-  unfold effectiveBlockCount
+  unfold effectiveBlockCount Descent.Core.ratio
   field_simp
 
 end BlockCount

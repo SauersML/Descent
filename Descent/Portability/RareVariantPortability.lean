@@ -162,7 +162,7 @@ theorem variantGeneticVarianceContribution_eq_zero_iff
 
 /-- Ratio of rare-variant counts between two populations. -/
 noncomputable def rareVariantCountRatio (sourceCount targetCount : ℝ) : ℝ :=
-  sourceCount / targetCount
+  Descent.Core.ratio sourceCount targetCount
 
 /-- **Exact fold-difference criterion for rare-variant counts.**  With positive target count,
 the cross-population count ratio exceeds a factor exactly when the source count exceeds that
@@ -171,7 +171,7 @@ theorem rareVariantCountRatio_gt_iff
     (sourceCount targetCount factor : ℝ) (h_target : 0 < targetCount) :
     factor < rareVariantCountRatio sourceCount targetCount ↔
       factor * targetCount < sourceCount := by
-  unfold rareVariantCountRatio
+  unfold rareVariantCountRatio Descent.Core.ratio
   exact lt_div_iff₀ h_target
 
 end RareVariantSpecificity

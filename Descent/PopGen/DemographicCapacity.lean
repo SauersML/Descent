@@ -61,7 +61,7 @@ reading this line does not reveal that a branch exists. Consumers must exclude t
 makes the guard vanish. -/
 theorem contrastSpikeLevel_monomorphic_is_junk :
     contrastSpikeLevel 0 0 = 0 := by
-  unfold contrastSpikeLevel meanAlleleFreq
+  unfold contrastSpikeLevel meanAlleleFreq Descent.Core.midpoint
   norm_num
 
 /-- **No contrast, no spike.** Two populations at the same allele frequency produce a level of

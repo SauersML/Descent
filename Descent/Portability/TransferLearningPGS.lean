@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Algebra.Order.Chebyshev
 import Descent.Program.OpenQuestions
 import Descent.Portability.TransplantationStability
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -1025,9 +1026,9 @@ theorem pcaSignalLossPenalty_reference :
   norm_num
 
 /-- Reduction in ancestry-induced target bias achieved by removing ancestry PCs. -/
-def pcaBiasReduction
+noncomputable def pcaBiasReduction
     (ancestryBiasWith ancestryBiasWithout : ℝ) : ℝ :=
-  ancestryBiasWith - ancestryBiasWithout
+  Descent.Core.difference ancestryBiasWith ancestryBiasWithout
 
 /-- **The bias-reduction sign convention, pinned.** This definition carries no result of its own,
 and the whole content of the definition is which way the subtraction runs. A reduction is
@@ -1035,7 +1036,7 @@ positive when correcting for principal components leaves LESS ancestry bias than
 the reversed body reports successful correction as damage. -/
 theorem pcaBiasReduction_positive_when_correction_helps :
     pcaBiasReduction 3 1 = 2 := by
-  unfold pcaBiasReduction
+  unfold pcaBiasReduction Descent.Core.difference
   norm_num
 
 /-- Linearized target error after PCA adjustment: ancestry bias plus a
@@ -1058,7 +1059,7 @@ theorem pca_target_error_difference
         pcaNetTargetError ancestry_bias_with signal_with signal_with lossWeight =
       pcaSignalLossPenalty signal_with signal_without lossWeight -
         pcaBiasReduction ancestry_bias_with ancestry_bias_without := by
-  unfold pcaNetTargetError pcaSignalLossPenalty pcaBiasReduction
+  unfold pcaNetTargetError pcaSignalLossPenalty pcaBiasReduction Descent.Core.difference
   ring
 
 /-- **PCA removal improves target error iff bias reduction exceeds weighted signal loss.**
@@ -1373,8 +1374,8 @@ theorem fineTunedTargetR2_cancels (r2_source d : ℝ) :
   ring
 
 /-- Target-trained `R²` in a simple additive estimation-penalty model. -/
-def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
-  oracle_target_r2 - estimation_penalty
+noncomputable def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
+  Descent.Core.difference oracle_target_r2 estimation_penalty
 
 /-- Canonical deployed target `R²` for transfer/adaptation methods: start from
     an explicit transported target baseline, add any target-specific adaptation
@@ -1410,14 +1411,14 @@ theorem oracleTransportAdaptationGain_positive_when_oracle_wins :
     explicitly supplied transported target baseline. -/
 noncomputable def transportPenalty
     (source_r2 transported_r2 : ℝ) : ℝ :=
-  source_r2 - transported_r2
+  Descent.Core.difference source_r2 transported_r2
 
 /-- **The transport penalty's orientation, pinned.** This definition carries no result of its
 own. The penalty is what transporting COSTS relative to performance in the source population, so
 it is positive when the score does worse after transport. -/
 theorem transportPenalty_positive_when_transport_costs :
     transportPenalty 3 1 = 2 := by
-  unfold transportPenalty
+  unfold transportPenalty Descent.Core.difference
   norm_num
 
 /-- The additive fine-tuning model is exactly the transported target baseline
@@ -1429,7 +1430,7 @@ theorem fineTunedTargetR2_eq_transportedR2_plus_adaptation
         (transportPenalty source_r2 transported_r2)
         adaptationGain =
       transported_r2 + adaptationGain := by
-  unfold fineTunedTargetR2 transportPenalty
+  unfold fineTunedTargetR2 transportPenalty Descent.Core.difference
   ring
 
 /-- Fine-tuning is exactly the canonical deployed-transfer target `R²` with an
@@ -1476,7 +1477,7 @@ theorem scratchTargetR2_eq_targetHeritability_minus_estimationPenalty_diagonalLD
     (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
     scratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) estimation_penalty =
       additiveHeritability β_target var_y - estimation_penalty := by
-  unfold scratchTargetR2 targetOracleR2DiagonalLD
+  unfold scratchTargetR2 targetOracleR2DiagonalLD Descent.Core.difference
   rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
 
 /-- Scratch training is also exactly the canonical deployed-transfer target
@@ -1489,7 +1490,7 @@ theorem scratchTargetR2_eq_deployedTransferTargetR2
       deployedTransferTargetR2 transported_r2
         (oracleTransportAdaptationGain transported_r2 oracle_target_r2)
         estimation_penalty := by
-  unfold scratchTargetR2 deployedTransferTargetR2 oracleTransportAdaptationGain
+  unfold scratchTargetR2 deployedTransferTargetR2 oracleTransportAdaptationGain Descent.Core.difference
   ring
 
 /-- The canonical deployed-transfer target `R²` can always be rewritten as the
@@ -1524,7 +1525,7 @@ theorem fine_tuned_target_r2_exceeds_scratch_of_penalty_gap
     (h_penalty : divergence_penalty < estimation_penalty) :
     scratchTargetR2 oracle_target_r2 estimation_penalty <
       fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
-  unfold scratchTargetR2 fineTunedTargetR2
+  unfold scratchTargetR2 fineTunedTargetR2 Descent.Core.difference
   linarith
 
 /-- Scratch-trained target `R²` with finite-sample estimation noise
@@ -1555,7 +1556,7 @@ theorem sampleLimitedScratchTargetR2_negative_of_small_sample
     (oracle_target_r2 noiseVar nTarget : ℝ)
     (h : oracle_target_r2 < noiseVar / nTarget) :
     sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget < 0 := by
-  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 Descent.Core.difference
   linarith
 
 /-- **The condition that keeps it an `R²`.**  This is the regime declared on the
@@ -1564,7 +1565,7 @@ theorem sampleLimitedScratchTargetR2_nonneg
     (oracle_target_r2 noiseVar nTarget : ℝ)
     (h : noiseVar / nTarget ≤ oracle_target_r2) :
     0 ≤ sampleLimitedScratchTargetR2 oracle_target_r2 noiseVar nTarget := by
-  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 Descent.Core.difference
   linarith
 
 /-- **Clamped scratch-trained target `R²`.**
@@ -1607,7 +1608,7 @@ theorem usableScratchTargetR2_eq_zero_of_exhausted
     usableScratchTargetR2 oracle_target_r2 noiseVar nTarget = 0 := by
   unfold usableScratchTargetR2
   apply max_eq_left
-  unfold sampleLimitedScratchTargetR2 scratchTargetR2
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 Descent.Core.difference
   linarith
 
 /-- Sample-limited scratch training is the exact target heritability ceiling
@@ -1619,7 +1620,7 @@ theorem sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_di
     (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
     sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget =
       additiveHeritability β_target var_y - noiseVar / nTarget := by
-  unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOracleR2DiagonalLD
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOracleR2DiagonalLD Descent.Core.difference
   rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
 
 /-- Sample-limited scratch training is the canonical deployed-transfer target
@@ -1686,7 +1687,7 @@ theorem scratchTargetR2_eq_fineTunedTargetR2_at_critical_sample_size
           r2_source divergence_penalty adaptation_gain oracle_target_r2 noiseVar) =
       fineTunedTargetR2 r2_source divergence_penalty adaptation_gain := by
   unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
-    scratchTargetR2 fineTunedTargetR2
+    scratchTargetR2 fineTunedTargetR2 Descent.Core.difference
   have h_gap_pos :
       0 < oracle_target_r2 - (r2_source - divergence_penalty + adaptation_gain) := by
     unfold fineTunedTargetR2 at h_gap
@@ -1716,7 +1717,7 @@ theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
   constructor
   · intro h
     unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
-      scratchTargetR2 at *
+      scratchTargetR2 Descent.Core.difference at *
     have hineq :
         noiseVar / nTarget <
           oracle_target_r2 -
@@ -1733,7 +1734,7 @@ theorem scratch_beats_fine_tuning_iff_target_sample_exceeds_critical
     simpa [mul_comm, mul_left_comm, mul_assoc] using hcross
   · intro h
     unfold sampleLimitedScratchTargetR2 scratchVsFineTuningCriticalSampleSize
-      scratchTargetR2 at *
+      scratchTargetR2 Descent.Core.difference at *
     have hcross :
         noiseVar <
           nTarget *
@@ -3379,7 +3380,8 @@ noncomputable def privateArchitectureTransferCeiling
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem privateArchitectureTransferCeiling_at_reference_point :
     privateArchitectureTransferCeiling 1 (1 / 2) 1 = 1 / 4 := by
-  norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration]
+  norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration,
+      Descent.Core.saturation]
 
 
 
@@ -3405,7 +3407,7 @@ theorem private_causal_fraction_lowers_transfer_ceiling
     r2_target < privateArchitectureTransferCeiling h2_target 0 M ∧
     r2_target < h2_target := by
   have h_shared_pos : 0 < sharedLDFromMigration M := by
-    unfold sharedLDFromMigration
+    unfold sharedLDFromMigration Descent.Core.saturation
     have h_den_pos : 0 < 1 + M := by linarith
     exact div_pos hM h_den_pos
   have h_shared_lt_one : sharedLDFromMigration M < 1 :=

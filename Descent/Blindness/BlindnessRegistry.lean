@@ -156,7 +156,8 @@ right one. -/
 theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdict r := by
   cases g <;>
     · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,
-        targetPgsVarOfRetention]
+        targetPgsVarOfRetention,
+      Descent.Core.complement, Descent.Core.product]
       try ring
 
 /-!

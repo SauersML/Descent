@@ -6,6 +6,7 @@ import Mathlib.MeasureTheory.Measure.WithDensity
 import Mathlib.Topology.Instances.ENNReal.Lemmas
 import Mathlib.Tactic
 import Descent.Blindness.MarkedBreakoutUniversality
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -648,14 +649,15 @@ theorem oneSuccessfulAncestor_produces_onePaintboxAtom (x : ℝ) :
 /-! ## The pioneer change of variables -/
 
 /-- Population fraction reached by a pioneer of reproductive weight `w`. -/
-noncomputable def pioneerWeightFraction (w : ℝ) : ℝ := w / (1 + w)
+noncomputable def pioneerWeightFraction (w : ℝ) : ℝ :=
+  Descent.Core.saturation w
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem pioneerWeightFraction_at_zero_denominator_is_junk (w : ℝ)
     (hzero : (1 + w) = 0) :
     pioneerWeightFraction w = 0 := by
-  unfold pioneerWeightFraction
+  unfold pioneerWeightFraction Descent.Core.saturation
   rw [hzero, div_zero]
 
 
@@ -676,11 +678,13 @@ theorem pioneerWeightDisplacement_at_zero_rate_is_junk (w : ℝ) :
 
 
 @[simp] theorem pioneerWeightFraction_zero : pioneerWeightFraction 0 = 0 := by
-  simp [pioneerWeightFraction]
+  simp [pioneerWeightFraction,
+      Descent.Core.saturation]
 
 /-- Reference value: unit reproductive weight reaches exactly half the population. -/
 theorem pioneerWeightFraction_one : pioneerWeightFraction 1 = 1 / 2 := by
-  norm_num [pioneerWeightFraction]
+  norm_num [pioneerWeightFraction,
+      Descent.Core.saturation]
 
 @[simp] theorem pioneerWeightDisplacement_zero (gamma : ℝ) :
     pioneerWeightDisplacement gamma 0 = 0 := by
@@ -709,7 +713,7 @@ theorem pioneerDisplacement_eq_logDisplacement (gamma w : ℝ) (hw : 0 < w) :
   have hpos : (0 : ℝ) < 1 + w := by linarith
   have hne : (1 : ℝ) + w ≠ 0 := ne_of_gt hpos
   have hsub : 1 - pioneerWeightFraction w = (1 + w)⁻¹ := by
-    unfold pioneerWeightFraction
+    unfold pioneerWeightFraction Descent.Core.saturation
     field_simp
     ring
   unfold pioneerWeightDisplacement MarkedBreakout.logDisplacement

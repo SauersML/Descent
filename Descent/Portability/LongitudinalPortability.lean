@@ -253,25 +253,25 @@ section EnvironmentalEpochs
     phenotype distribution. The PGS, being fixed at training time,
     becomes progressively miscalibrated. -/
 noncomputable def secularTrendBias (trend_rate t : ℝ) : ℝ :=
-  trend_rate * t
+  Descent.Core.product trend_rate t
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem secularTrendBias_at_reference_point :
     secularTrendBias (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold secularTrendBias
+  unfold secularTrendBias Descent.Core.product
   norm_num
 
 /-- Secular trend bias vanishes exactly when the trend rate or elapsed time vanishes. -/
 theorem secularTrendBias_eq_zero_iff (trend_rate t : ℝ) :
     secularTrendBias trend_rate t = 0 ↔ trend_rate = 0 ∨ t = 0 := by
-  unfold secularTrendBias
+  unfold secularTrendBias Descent.Core.product
   exact mul_eq_zero
 
 /-- Secular trend bias grows linearly with time. -/
 theorem secularTrendBias_lt_of_time_lt (trend_rate t₁ t₂ : ℝ)
     (h_rate : 0 < trend_rate) (h_t : t₁ < t₂) :
     secularTrendBias trend_rate t₁ < secularTrendBias trend_rate t₂ := by
-  unfold secularTrendBias; nlinarith
+  unfold secularTrendBias Descent.Core.product; nlinarith
 
 /-- **Environmental variance can increase or decrease over time.**
     Changing environmental variance alters heritability and hence
@@ -418,12 +418,13 @@ Multiplication remains a DECLARED interaction model -- that caveat is the import
 and is unchanged.
 -/
 noncomputable def cohortObservedEffect (geneticEffect environmentModifier : ℝ) : ℝ :=
-  geneticEffect * environmentModifier
+  Descent.Core.product geneticEffect environmentModifier
 
 /-- The cohort-effect scale is pinned at an interior reference point. -/
 theorem cohortObservedEffect_at_reference_point :
     cohortObservedEffect (1 / 2) (1 / 2) = 1 / 4 := by
-  norm_num [cohortObservedEffect]
+  norm_num [cohortObservedEffect,
+      Descent.Core.product]
 
 /-- **PGS effect sizes are cohort-dependent.**
     A PGS trained on one birth cohort may have different
@@ -435,7 +436,7 @@ theorem cohortObservedEffect_eq_iff
     (geneticEffect env₁ env₂ : ℝ) :
     cohortObservedEffect geneticEffect env₁ = cohortObservedEffect geneticEffect env₂ ↔
       geneticEffect = 0 ∨ env₁ = env₂ := by
-  unfold cohortObservedEffect
+  unfold cohortObservedEffect Descent.Core.product
   constructor
   · intro h
     by_cases h_effect : geneticEffect = 0
@@ -554,7 +555,8 @@ noncomputable def temporalCalibrationInTheLarge (π_obs π_pred : ℝ) : ℝ :=
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem temporalCalibrationInTheLarge_at_reference_point :
     temporalCalibrationInTheLarge 1 (1 / 2) = 1 / 2 := by
-  norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge]
+  norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge,
+      Descent.Core.difference]
 
 
 /-- Exact temporal calibration drift from a prevalence shift with fixed mean

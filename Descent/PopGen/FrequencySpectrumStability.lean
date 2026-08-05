@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.Data.Nat.Choose.Sum
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -409,12 +410,13 @@ theorem alternatingBinomialResponse_one_sub (order : ℕ) (resolution : ℝ) :
 
 /-- A normalized pair of collision histories differs at first order in `resolution`. -/
 noncomputable def collisionHistoryDistance (scale resolution : ℝ) : ℝ :=
-  scale * resolution
+  Descent.Core.product scale resolution
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem collisionHistoryDistance_at_reference_point :
     collisionHistoryDistance 2 2 = 4 := by
-  norm_num [collisionHistoryDistance]
+  norm_num [collisionHistoryDistance,
+      Descent.Core.product]
 
 
 /-- Its normalized frequency-spectrum discrepancy is order `order`. -/
@@ -430,7 +432,7 @@ theorem collisionSpectrumDiscrepancy_eq_distance_pow
     collisionSpectrumDiscrepancy order scale resolution =
       collisionHistoryDistance scale resolution ^ order := by
   rw [collisionSpectrumDiscrepancy, alternatingBinomialResponse_one_sub,
-    collisionHistoryDistance, mul_pow]
+    collisionHistoryDistance, Descent.Core.product, mul_pow]
 
 /-- Specialization to the sharp collision order of a `K`-epoch model. -/
 theorem fixedEpochCollision_spectrum_eq_history_pow

@@ -6,6 +6,7 @@ import Descent.Spectral.WhiteningEquivalence
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -330,12 +331,14 @@ theorem scalarRowResolvent_mul_denom (latent quadraticForm : ℝ)
   rw [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2)]
 
 /-- Variance of a fair two-point law. -/
-def fairTwoPointVariance (a b : ℝ) : ℝ := (a - b) ^ 2 / 4
+noncomputable def fairTwoPointVariance (a b : ℝ) : ℝ :=
+  Descent.Core.halfDiffSq a b
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fairTwoPointVariance_at_reference_point :
     fairTwoPointVariance 3 1 = 1 := by
-  norm_num [fairTwoPointVariance]
+  norm_num [fairTwoPointVariance,
+      Descent.Core.halfDiffSq]
 
 
 /-- **Exact nonconcentration witness.** If the leave-one-out quadratic form is
@@ -352,7 +355,7 @@ theorem deadSensor_resolvent_variance_pos
     intro h
     field_simp [ne_of_gt hden] at h
     linarith
-  unfold fairTwoPointVariance
+  unfold fairTwoPointVariance Descent.Core.halfDiffSq
   exact div_pos (sq_pos_of_ne_zero (sub_ne_zero.mpr hneq)) (by norm_num)
 
 end DeadSensors
@@ -1748,7 +1751,7 @@ theorem dropout_floor_caps_explainable_fraction
           fairTwoPointVariance (scalarRowResolvent 0 quadraticForm)
             (scalarRowResolvent (Real.sqrt 2) quadraticForm)) < 1 := by
   have hfloor := deadSensor_resolvent_variance_pos quadraticForm hquadratic
-  unfold explainableFraction
+  unfold explainableFraction Descent.Core.ratio
   rw [div_lt_one (by linarith)]
   linarith
 

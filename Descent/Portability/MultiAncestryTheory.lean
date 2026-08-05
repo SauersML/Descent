@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.TransferLearningPGS
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -56,7 +57,8 @@ private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
     presentDayR2 V_A V_E fst = r2FromSignalVariance ((1 - fst) * V_A) V_E := by
   simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet,
-    r2FromSignalVariance, mul_comm]
+    r2FromSignalVariance, mul_comm,
+      Descent.Core.share]
 
 /-- Exact gain from adding `δ` units of taggable signal variance to a deployed
 target state with baseline signal variance `x`. -/
@@ -67,7 +69,7 @@ private theorem expectedR2_gain_eq
     (hδ : 0 < δ) :
     r2FromSignalVariance (x + δ) V_E - r2FromSignalVariance x V_E =
       δ * V_E / ((x + δ + V_E) * (x + V_E)) := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   have hxE : x + V_E ≠ 0 := by
     linarith
   have hxdE : x + δ + V_E ≠ 0 := by
@@ -555,12 +557,13 @@ section EquityImplications
     The portability gap = R²_source - R²_target measures the
     disadvantage faced by individuals in the target population. -/
 noncomputable def portabilityGap (r2_source r2_target : ℝ) : ℝ :=
-  r2_source - r2_target
+  Descent.Core.difference r2_source r2_target
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem portabilityGap_at_reference_point :
     portabilityGap 3 1 = 2 := by
-  norm_num [portabilityGap]
+  norm_num [portabilityGap,
+      Descent.Core.difference]
 
 
 /-- **Portability gap is always non-negative under drift.** -/
@@ -569,7 +572,7 @@ theorem portability_gap_nonneg
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS ≤ fstT) (hfstT : fstT ≤ 1) :
     0 ≤ portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT) := by
-  unfold portabilityGap
+  unfold portabilityGap Descent.Core.difference
   by_cases h : fstS = fstT
   · simp [h]
   · have hfst_strict : fstS < fstT := lt_of_le_of_ne hfst h
@@ -583,7 +586,7 @@ theorem portability_gap_increases_with_distance
     (hfst₂ : fstT₁ < fstT₂) (hfstT₂ : fstT₂ ≤ 1) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT₁) <
       portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fstT₂) := by
-  unfold portabilityGap
+  unfold portabilityGap Descent.Core.difference
   have h1 : presentDayR2 V_A V_E fstT₂ < presentDayR2 V_A V_E fstT₁ :=
     drift_degrades_R2 V_A V_E fstT₁ fstT₂ hVA hVE hfst₂ hfstT₂
   linarith

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -65,7 +66,7 @@ structure CalibrationMoments where
     CITL = mean(observed) - mean(predicted).
     CITL = 0 means the average prediction matches the average outcome. -/
 noncomputable def calibrationInTheLarge (mean_observed mean_predicted : ℝ) : ℝ :=
-  mean_observed - mean_predicted
+  Descent.Core.difference mean_observed mean_predicted
 
 /-- **Calibration-in-the-large's sign convention, pinned.** This definition carries no result of
 its own, and its entire content is which way the subtraction runs. It is negative when the model
@@ -73,7 +74,7 @@ predicts a higher mean than is observed, so a negative value reports over-predic
 reversed body reports over-prediction as under-prediction. -/
 theorem calibrationInTheLarge_negative_when_overpredicting :
     calibrationInTheLarge 1 3 = -2 := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   norm_num
 
 /-- **Calibration slope.**
@@ -227,7 +228,7 @@ theorem CalibrationMoments.shifted_toProfile_citl_eq_source_citl_add_shift_budge
     ((mom.shifted observedShift predictedShift slope).toProfile link).citl =
       (mom.toProfile link).citl + observedShift - predictedShift := by
   unfold CalibrationMoments.shifted CalibrationMoments.toProfile
-    calibrationProfile calibrationInTheLarge
+    calibrationProfile calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- Shared absolute-deviation identity for any subunit calibration slope. -/
@@ -388,7 +389,7 @@ theorem auc_invariant_and_citl_shifts_under_score_offset
       populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
         intro a b hab
         linarith)
-  · unfold calibrationInTheLarge
+  · unfold calibrationInTheLarge Descent.Core.difference
     ring
 
 /-- **At a fixed mean prediction, the CITL difference is exactly the prevalence
@@ -405,7 +406,7 @@ theorem prevalence_shift_changes_calibration
     (mean_pred π₁ π₂ : ℝ) :
     calibrationInTheLarge π₂ mean_pred -
       calibrationInTheLarge π₁ mean_pred = π₂ - π₁ := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- Explicit cross-population calibration-shift budget.
@@ -835,7 +836,8 @@ theorem sourceCalibrationProfile_exact_mechanistic_portability_law
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
       CalibrationMoments.toProfile, Descent.calibrationProfile,
-      calibrationSlopeFromSourceWeights, calibrationInTheLarge]
+      calibrationSlopeFromSourceWeights, calibrationInTheLarge,
+      Descent.Core.difference]
 
 /-- Exact mechanistic target calibration-profile portability law. The target
 predicted mean is the deployed source weights applied to the target tag mean,
@@ -862,7 +864,8 @@ theorem targetCalibrationProfile_exact_mechanistic_portability_law
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
       CalibrationMoments.toProfile,
       Descent.calibrationProfile, calibrationSlopeFromSourceWeights,
-      calibrationInTheLarge, sub_eq_add_neg, add_assoc] <;> ring
+      calibrationInTheLarge, sub_eq_add_neg, add_assoc,
+      Descent.Core.difference] <;> ring
 
 /-- Exact mechanistic CITL law: calibration-in-the-large is source CITL plus
 observed-mean drift minus the source-weighted score-mean drift and deployment
@@ -1542,7 +1545,7 @@ noncomputable def prevalenceLogisticCalibrationProfile
       prevalenceCITLShift pi_source pi_target := by
   unfold prevalenceLogisticCalibrationProfile prevalenceCITLShift
     logisticCalibrationProfile calibrationProfile prevalenceLogit
-    calibrationInTheLarge
+    calibrationInTheLarge Descent.Core.difference
   ring
 
 @[simp] theorem prevalenceLogisticCalibrationProfile_slope
@@ -1555,7 +1558,8 @@ theorem no_citl_shift_same_prevalence (pi : ℝ) :
     prevalenceCITLShift pi pi = 0 := by
   rw [← prevalenceLogisticCalibrationProfile_citl pi pi (1 : ℝ)]
   simp [prevalenceLogisticCalibrationProfile, logisticCalibrationProfile,
-    calibrationProfile, calibrationInTheLarge]
+    calibrationProfile, calibrationInTheLarge,
+      Descent.Core.difference]
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence
@@ -1583,7 +1587,7 @@ theorem env_differences_shift_calibration
     (mean_obs mean_pred env_effect : ℝ) :
     calibrationInTheLarge (mean_obs + env_effect) mean_pred =
       calibrationInTheLarge mean_obs mean_pred + env_effect := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- Under a source model calibrated in the large, any nonzero environmental
@@ -1609,7 +1613,7 @@ theorem genetic_distribution_shift
     calibrationInTheLarge mean_obs_t mean_pgs_t =
       calibrationInTheLarge mean_obs_s mean_pgs_s +
         (mean_obs_t - mean_obs_s) + (mean_pgs_s - mean_pgs_t) := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- If the source model is calibrated in the large, the target CITL equals the
@@ -1665,7 +1669,7 @@ theorem intercept_recalibration_shifts_citl
     calibrationInTheLarge mean_obs
         (interceptRecalibrated mean_pgs new_intercept) =
       calibrationInTheLarge mean_obs mean_pgs - new_intercept := by
-  unfold calibrationInTheLarge interceptRecalibrated
+  unfold calibrationInTheLarge interceptRecalibrated Descent.Core.difference
   ring
 
 /-- Intercept recalibration corrects CITL when the intercept is the fitted one.
@@ -1700,7 +1704,7 @@ theorem logistic_recalibration_shifts_citl
     (mean_obs mean_pgs a b : ℝ) :
     calibrationInTheLarge mean_obs (logisticRecalibrated mean_pgs a b) =
       calibrationInTheLarge mean_obs mean_pgs - a - (b - 1) * mean_pgs := by
-  unfold calibrationInTheLarge logisticRecalibrated
+  unfold calibrationInTheLarge logisticRecalibrated Descent.Core.difference
   ring
 
 /-- Choosing the fitted intercept `a = mean_obs - b * mean_pgs` makes the
@@ -1711,7 +1715,7 @@ theorem logistic_recalibration_corrects_citl
     calibrationInTheLarge mean_obs
       (logisticRecalibrated mean_pgs (mean_obs - b * mean_pgs) b) = 0 := by
   rw [logistic_recalibration_shifts_citl]
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   ring
 
 /-- Effective calibration slope after logistic recalibration.
@@ -1721,14 +1725,14 @@ theorem logistic_recalibration_corrects_citl
     `slope / fittedSlope`. -/
 noncomputable def recalibratedCalibrationSlope
     (slope fittedSlope : ℝ) : ℝ :=
-  slope / fittedSlope
+  Descent.Core.ratio slope fittedSlope
 
 /-- **The recalibrated slope's orientation, pinned.** This definition carries no result of its
 own. Dividing by a fitted slope below one inflates the calibration slope rather than deflating
 it, which is the direction that makes refitting correct an under-dispersed score. -/
 theorem recalibratedCalibrationSlope_inflates_when_fit_shallow :
     recalibratedCalibrationSlope 3 2 = 3 / 2 := by
-  unfold recalibratedCalibrationSlope
+  unfold recalibratedCalibrationSlope Descent.Core.ratio
   norm_num
 
 /-- **The recalibrated slope at a null fit, named.** A fitted slope of zero means the score
@@ -1738,7 +1742,7 @@ slope of zero -- which reads downstream as a well-behaved, if useless, score rat
 failed fit. Consumers must require `fittedSlope ≠ 0`. -/
 theorem recalibratedCalibrationSlope_null_fit_is_junk (slope : ℝ) :
     recalibratedCalibrationSlope slope 0 = 0 := by
-  unfold recalibratedCalibrationSlope
+  unfold recalibratedCalibrationSlope Descent.Core.ratio
   norm_num
 
 /-- Exact affine representation of the target linear predictor in terms of the
@@ -1751,7 +1755,7 @@ theorem target_linear_predictor_eq_affine_in_logistic_recalibrated
           recalibratedCalibrationSlope slope fittedSlope * fittedIntercept) +
         recalibratedCalibrationSlope slope fittedSlope *
           logisticRecalibrated pgs fittedIntercept fittedSlope := by
-  unfold recalibratedCalibrationSlope logisticRecalibrated
+  unfold recalibratedCalibrationSlope logisticRecalibrated Descent.Core.ratio
   field_simp [h_fit_nonzero]
   ring
 
@@ -1764,9 +1768,9 @@ theorem logistic_recalibration_corrects_slope
       calibrationSlopeDeviation
         (recalibratedCalibrationSlope slope slope) = 0 := by
   constructor
-  · unfold recalibratedCalibrationSlope
+  · unfold recalibratedCalibrationSlope Descent.Core.ratio
     exact div_self h_slope_nonzero
-  · unfold calibrationSlopeDeviation recalibratedCalibrationSlope
+  · unfold calibrationSlopeDeviation recalibratedCalibrationSlope Descent.Core.ratio
     rw [div_self h_slope_nonzero, sub_self, abs_zero]
 
 /-- Shared logistic calibration profile of the fully recalibrated predictor. -/

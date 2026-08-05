@@ -118,12 +118,12 @@ ancestry gradient.  This is `H` before correction and `H'` when
     spurious falsification of `spikeAndSlabVariance` into the noise it was. -/
 noncomputable def ancestryGradientSusceptibility
     (markerAxisVariance ancestryVariance : ℝ) : ℝ :=
-  markerAxisVariance * ancestryVariance
+  Descent.Core.product markerAxisVariance ancestryVariance
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ancestryGradientSusceptibility_at_reference_point :
     ancestryGradientSusceptibility (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold ancestryGradientSusceptibility
+  unfold ancestryGradientSusceptibility Descent.Core.product
   norm_num
 
 /-- A lower bound on residual ancestry energy immediately induces a lower
@@ -134,7 +134,7 @@ theorem residual_susceptibility_lower_bound
     (hfloor : residualFloor ≤ residualAncestryVariance) :
     markerAxisVariance * residualFloor ≤
       ancestryGradientSusceptibility markerAxisVariance residualAncestryVariance := by
-  unfold ancestryGradientSusceptibility
+  unfold ancestryGradientSusceptibility Descent.Core.product
   exact mul_le_mul_of_nonneg_left hfloor hmarker
 
 /-- The sub-threshold overlap envelope therefore gives a directly reportable

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.DGP
 import Descent.Spectral.EnsembleChannel
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -744,13 +745,13 @@ theorem twoChannelMomentInformation_eq_first_iff
 
 /-- Information delivered per unit acquisition cost. -/
 noncomputable def informationPerUnitCost (information cost : ℝ) : ℝ :=
-  information / cost
+  Descent.Core.ratio information cost
 
 /-- **informationPerUnitCost at zero cost, named.** Free information has unbounded value per unit
 cost. Lean returns `0`, ranking the free measurement last. Consumers must require `cost ≠ 0`. -/
 theorem informationPerUnitCost_zero_cost_is_junk (information : ℝ) :
     informationPerUnitCost information 0 = 0 := by
-  unfold informationPerUnitCost
+  unfold informationPerUnitCost Descent.Core.ratio
   simp
 
 /-- **The rate does not depend on the units.** Measuring both information and cost in units `t`
@@ -758,14 +759,14 @@ times smaller leaves the rate unchanged, which is what makes it a rate rather th
 theorem informationPerUnitCost_scale_invariant (information cost t : ℝ) (ht : t ≠ 0) :
     informationPerUnitCost (t * information) (t * cost)
       = informationPerUnitCost information cost := by
-  unfold informationPerUnitCost
+  unfold informationPerUnitCost Descent.Core.ratio
   exact mul_div_mul_left _ _ ht
 
 /-- **Spending the cost back recovers the information.** Scale invariance holds for every rate of
 the same degree and so leaves the constant free; this fixes it at one. -/
 theorem informationPerUnitCost_mul_cost (information cost : ℝ) (hc : cost ≠ 0) :
     informationPerUnitCost information cost * cost = information := by
-  unfold informationPerUnitCost
+  unfold informationPerUnitCost Descent.Core.ratio
   field_simp
 
 /-- Total information attainable by spending a fixed budget on exchangeable units of one
@@ -809,7 +810,7 @@ theorem augmented_informationPerUnitCost_gt_iff
           (baseInformation + gain) (baseCost + addedCost) ↔
       informationPerUnitCost baseInformation baseCost <
         informationPerUnitCost gain addedCost := by
-  unfold informationPerUnitCost
+  unfold informationPerUnitCost Descent.Core.ratio
   constructor
   · intro h
     rw [div_lt_div_iff₀ hbaseCost (add_pos hbaseCost haddedCost)] at h

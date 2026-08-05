@@ -143,7 +143,7 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
   unfold neutralDriftR2Ratio presentDayR2 presentDayPGSVariance pgsVarianceFromHet
-    TransportedMetrics.r2FromSignalVariance
+    TransportedMetrics.r2FromSignalVariance Descent.Core.share
   field_simp [hden, hsum, hVA']
   ring
 

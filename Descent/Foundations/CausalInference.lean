@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -183,7 +184,7 @@ theorem indirect_eq_total_sub_direct_of_sum
     Empirical status: NOT AN EMPIRICAL CLAIM -- a ratio of two of its own
     arguments. -/
 noncomputable def effectShare (indirect_effect total_effect : ℝ) : ℝ :=
-  indirect_effect / total_effect
+  Descent.Core.ratio indirect_effect total_effect
 
 /-- **effectShare at zero total_effect, named.** A total effect of zero leaves no denominator for
 the indirect share -- mediation is undefined when nothing is mediated. Lean returns `0`, reporting
@@ -191,7 +192,7 @@ a purely direct effect, which is the same value a genuinely unmediated pathway p
 Consumers must require `total_effect ≠ 0`. -/
 theorem effectShare_zero_totaleffect_is_junk (indirect_effect : ℝ) :
     effectShare indirect_effect 0 = 0 := by
-  unfold effectShare
+  unfold effectShare Descent.Core.ratio
   simp
 
 /-- **The share and the proportional reduction are one ratio, read from the two ends.**
@@ -206,7 +207,7 @@ numerator is large; a proportional reduction is large when it is small. Writing 
 relation down is what stops the sign being carried by the reader. -/
 theorem r2FromMSE_eq_one_sub_effectShare (mse varY : ℝ) :
     r2FromMSE mse varY = 1 - effectShare mse varY := by
-  unfold r2FromMSE effectShare Descent.Core.proportionalReduction; ring
+  unfold r2FromMSE effectShare Descent.Core.proportionalReduction Descent.Core.ratio; ring
 
 /-- `effectShare ie te` lies in [0,1] when `0 ≤ ie`, `0 < te` and `ie ≤ te`. A statement about
     a ratio of reals; "mediated" is not established anywhere. -/
@@ -214,7 +215,7 @@ theorem effectShare_mem_unit
     (ie te : ℝ)
     (h_ie : 0 ≤ ie) (h_te : 0 < te) (h_le : ie ≤ te) :
     0 ≤ effectShare ie te ∧ effectShare ie te ≤ 1 := by
-  unfold effectShare
+  unfold effectShare Descent.Core.ratio
   constructor
   · exact div_nonneg h_ie (le_of_lt h_te)
   · rw [div_le_one h_te]; exact h_le
@@ -243,11 +244,11 @@ theorem r2_strictMono_under_ld_noise_reduction
   constructor
   · -- Corrected noise = V_E + (1-α)·V_ld < V_E + V_ld = uncorrected noise
     -- since α > 0 implies (1-α) < 1, so (1-α)·V_ld < V_ld.
-    unfold r2FromSignalVariance
+    unfold r2FromSignalVariance Descent.Core.share
     exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · -- If α < 1, then (1-α)·V_ld > 0, so corrected noise > V_E = source noise.
     intro h_α_lt
-    unfold r2FromSignalVariance
+    unfold r2FromSignalVariance Descent.Core.share
     exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
 /-- **Removing part of the environment noise term strictly raises `R²`.** Monotonicity, not
@@ -267,7 +268,7 @@ theorem r2_strictMono_under_environment_noise_reduction
     (h_gen : 0 < V_genetic) (h_env : 0 < V_env) :
     -- Phenotypic R² is strictly less than 1 (perfect genetic prediction)
     r2FromSignalVariance V_genetic V_env < 1 := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   rw [div_lt_one (by linarith : 0 < V_genetic + V_env)]
   linarith
 
@@ -319,7 +320,7 @@ theorem r2_lt_of_added_noise_pos
     (vSignal V_E vNoiseAdded : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_added : 0 < vNoiseAdded) :
     r2FromSignalVariance vSignal (V_E + vNoiseAdded) < r2FromSignalVariance vSignal V_E := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   have h_denom_clean : 0 < vSignal + V_E := by linarith
   have h_denom_noisy : 0 < vSignal + (V_E + vNoiseAdded) := by linarith
   rw [div_lt_div_iff₀ h_denom_noisy h_denom_clean]
@@ -365,7 +366,7 @@ theorem r2_chain_strictMono_of_decreasing_noise
       r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) ∧
     r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) <
       r2FromSignalVariance vSig V_E := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   refine ⟨?_, ?_, ?_, ?_⟩
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
@@ -384,7 +385,7 @@ theorem r2_increments_strictAnti_in_signal
     -- Second increment gives less R² gain than the first
     r2FromSignalVariance (v + 2 * Δ) V_E - r2FromSignalVariance (v + Δ) V_E <
       r2FromSignalVariance (v + Δ) V_E - r2FromSignalVariance v V_E := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   have ha : 0 < v + V_E := by linarith
   have hb : 0 < v + Δ + V_E := by linarith
   have hc : 0 < v + 2 * Δ + V_E := by linarith
@@ -421,14 +422,14 @@ theorem r2_increments_strictAnti_in_signal
     costs -- and neither is fixed by this body. The docstring's ranking of strategies is
     prose about plausible arguments, not a consequence of the quotient. -/
 noncomputable def costEffectiveness (improvement cost : ℝ) : ℝ :=
-  improvement / cost
+  Descent.Core.ratio improvement cost
 
 /-- **costEffectiveness at zero cost, named.** A free intervention has unbounded
 cost-effectiveness. Lean returns `0`, the WORST possible ratio, for the intervention that should
 rank first. Consumers must require `cost ≠ 0`. -/
 theorem costEffectiveness_zero_cost_is_junk (improvement : ℝ) :
     costEffectiveness improvement 0 = 0 := by
-  unfold costEffectiveness
+  unfold costEffectiveness Descent.Core.ratio
   simp
 
 /-- **Cost-effectiveness does not depend on the currency.** Measuring improvement and cost in
@@ -436,7 +437,7 @@ units `t` times smaller leaves the ratio unchanged, which is what makes it a rat
 margin. -/
 theorem costEffectiveness_unit_invariant (improvement cost t : ℝ) (ht : t ≠ 0) :
     costEffectiveness (t * improvement) (t * cost) = costEffectiveness improvement cost := by
-  unfold costEffectiveness
+  unfold costEffectiveness Descent.Core.ratio
   exact mul_div_mul_left _ _ ht
 
 /-- **The rate recovers the improvement it was divided out of.** Unit invariance is shared by
@@ -444,7 +445,7 @@ every ratio of the same degree -- twice this one satisfies it too -- so it does 
 value. Multiplying the cost back does. -/
 theorem costEffectiveness_mul_cost (improvement cost : ℝ) (hc : cost ≠ 0) :
     costEffectiveness improvement cost * cost = improvement := by
-  unfold costEffectiveness
+  unfold costEffectiveness Descent.Core.ratio
   field_simp
 
 /-- **Cross-multiplication:** with both costs positive, ordering the two
@@ -459,7 +460,7 @@ theorem mul_lt_mul_of_costEffectiveness_lt
     (h_ce₁ : costEffectiveness improv₂ cost₂ < costEffectiveness improv₁ cost₁)
     (h_c₁ : 0 < cost₁) (h_c₂ : 0 < cost₂) :
     improv₁ * cost₂ > improv₂ * cost₁ := by
-  unfold costEffectiveness at h_ce₁
+  unfold costEffectiveness Descent.Core.ratio at h_ce₁
   rwa [div_lt_div_iff₀ h_c₂ h_c₁] at h_ce₁
 
 end InterventionsForPortability

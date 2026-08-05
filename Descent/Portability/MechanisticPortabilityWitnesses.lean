@@ -40,7 +40,9 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       Descent.Core.PopGenParameters.migrationSharedBoostAt,
       ldCorrelationDecay, Matrix.one_mulVec, Matrix.mulVec, dotProduct,
       Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy])
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      Descent.Core.share, Descent.Core.ratio, Descent.Core.product, Descent.Core.difference,
+      Descent.Core.sum, Descent.Core.complement])
 
 /-!
 # Mechanistic Witness Models for Portability
@@ -390,7 +392,9 @@ macro "metric_witness_simp" : tactic =>
       targetCalibratedBrierFromSourceWeights,
       TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy])
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      Descent.Core.share, Descent.Core.ratio, Descent.Core.product, Descent.Core.difference,
+      Descent.Core.sum, Descent.Core.complement])
 
 /-- The baseline witness has exact source and target metrics that can be read
 off from the explicit state. -/

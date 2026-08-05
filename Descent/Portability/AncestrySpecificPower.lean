@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
 import Descent.Spectral.Permeability
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -76,12 +77,14 @@ This is the formula implemented below.
 /-- **Fisher information for β in linear regression Y = βG + ε.**
     At a biallelic locus with sample size n and genotype variance v,
     the Fisher information is n × v (with σ² = 1). -/
-noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
+noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ :=
+  Descent.Core.product n v
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fisherInformation_at_reference_point :
     fisherInformation 1 1 = 1 := by
-  norm_num [fisherInformation]
+  norm_num [fisherInformation,
+      Descent.Core.product]
 
 
 
@@ -199,14 +202,15 @@ noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectiveFisherInformation_at_reference_point :
     effectiveFisherInformation 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
+  norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
+      Descent.Core.product]
 
 
 
 /-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   ring
 
 /-- Effective information vanishes exactly when the study is empty, the locus is
@@ -215,13 +219,14 @@ theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = 0 ↔
       n = 0 ∨ p = 0 ∨ p = 1 ∨ r2_ld = 0 := by
   simp [effectiveFisherInformation, fisherInformation, genotypeVariance_eq_zero_iff,
-    mul_eq_zero, or_assoc]
+    mul_eq_zero, or_assoc,
+      Descent.Core.product]
 
 /-- With perfect tagging, Fisher information is positive exactly for a nonempty study
 at a polymorphic locus. -/
 theorem fullyTaggedFisherInformation_pos_iff (n : ℕ) (p : ℝ) :
     0 < effectiveFisherInformation n p 1 ↔ 0 < n ∧ 0 < p ∧ p < 1 := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   simp only [mul_one]
   constructor
   · intro h
@@ -256,7 +261,7 @@ theorem information_loss_from_tagging (n : ℕ) (p r2_ld : ℝ)
     effectiveFisherInformation n p r2_ld ≤ fisherInformation n (genotypeVarianceHWE p) := by
   unfold effectiveFisherInformation
   have h_info_nonneg : 0 ≤ fisherInformation n (genotypeVarianceHWE p) := by
-    unfold fisherInformation
+    unfold fisherInformation Descent.Core.product
     apply mul_nonneg
     · exact Nat.cast_nonneg n
     · exact (genotypeVariance_nonneg_iff p).2 ⟨h_p, h_p_le⟩
@@ -337,7 +342,7 @@ remains. A bare-stem substitution here would have corrupted both. -/
 theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) :
     0 ≤ effectiveFisherInformation n p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   apply mul_nonneg
   · apply mul_nonneg
     · exact Nat.cast_nonneg n
@@ -352,7 +357,7 @@ theorem effective_information_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
     (h_n : 0 < n) (h_p : 0 < p) (h_p_lt : p < 1)
     (h_r2 : r2_a < r2_b) :
     effectiveFisherInformation n p r2_a < effectiveFisherInformation n p r2_b := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_coeff : 0 < ↑n * (2 * p * (1 - p)) := by
     apply mul_pos
@@ -367,7 +372,7 @@ theorem effective_information_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
     (h_r2 : 0 < r2_ld)
     (h_n : n_a < n_b) :
     effectiveFisherInformation n_a p r2_ld < effectiveFisherInformation n_b p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_cast : (↑n_a : ℝ) < ↑n_b := Nat.cast_lt.mpr h_n
   have h_suffix : 0 < 2 * p * (1 - p) * r2_ld := mul_pos h_het h_r2
@@ -395,7 +400,7 @@ theorem source_higher_effective_information
   by_cases h_nt : n_target = 0
   · -- When n_target = 0, LHS is 0; RHS is positive since n_source ≥ 1
     have h_ns_pos : 0 < n_source := by omega
-    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
+    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
     rw [h_nt]; simp
     have h_het : 0 < 2 * p_target * (1 - p_target) := by nlinarith
     have h_cast : (0 : ℝ) < ↑n_source := Nat.cast_pos.mpr h_ns_pos
@@ -591,7 +596,7 @@ theorem discovery_bias_inflates_source_r2
     the part that uses causal variants shared across populations.
     portable_fraction = r²_causal / r²_total. -/
 noncomputable def portableFraction (r2_causal r2_total : ℝ) : ℝ :=
-  r2_causal / r2_total
+  Descent.Core.ratio r2_causal r2_total
 
 /-- **portableFraction at zero r2_total, named.** With no total explained variance there is
 nothing to be portable, and the fraction is undefined. Lean returns `0`: none of the signal
@@ -599,14 +604,14 @@ transfers, which is the reading a consumer takes for a score that transfers badl
 a score with nothing to transfer. Consumers must require `r2_total ≠ 0`. -/
 theorem portableFraction_zero_r2total_is_junk (r2_causal : ℝ) :
     portableFraction r2_causal 0 = 0 := by
-  unfold portableFraction
+  unfold portableFraction Descent.Core.ratio
   simp
 
 /-- Portable fraction is ≤ 1. -/
 theorem portable_fraction_le_one (r2_causal r2_total : ℝ)
     (h_le : r2_causal ≤ r2_total) (h_total : 0 < r2_total) :
     portableFraction r2_causal r2_total ≤ 1 := by
-  unfold portableFraction
+  unfold portableFraction Descent.Core.ratio
   rw [div_le_one h_total]
   exact h_le
 

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.Probability
 import Mathlib.Probability.CondVar
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -942,7 +943,8 @@ theorem normalized_transport_constant_factor
 
 end TraitTransport
 
-def explainableFraction (between total : ℝ) : ℝ := between / total
+noncomputable def explainableFraction (between total : ℝ) : ℝ :=
+  Descent.Core.ratio between total
 
 /-- **explainableFraction at zero total, named.** With no total variance nothing is explainable
 and the fraction is undefined. Lean returns `0`, reporting that none of the variance is
@@ -950,7 +952,7 @@ between-group, which is what a genuinely homogeneous population also gives. Cons
 require `total ≠ 0`. -/
 theorem explainableFraction_zero_total_is_junk (between : ℝ) :
     explainableFraction between 0 = 0 := by
-  unfold explainableFraction
+  unfold explainableFraction Descent.Core.ratio
   simp
 
 section NoiseFloor
@@ -964,7 +966,7 @@ theorem explainable_fraction_bound_of_noise_floor
     (hnoise_le : noiseFloor ≤ within) :
     explainableFraction between total
       ≤ between / (between + noiseFloor) := by
-  unfold explainableFraction
+  unfold explainableFraction Descent.Core.ratio
   by_cases hbetween_zero : between = 0
   · simp [hbetween_zero]
   · have hbetween_pos : 0 < between :=

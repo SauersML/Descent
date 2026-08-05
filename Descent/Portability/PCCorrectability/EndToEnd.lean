@@ -56,7 +56,7 @@ theorem modeledPCResidualSusceptibility_pos_and_lt_uncorrected
         ancestryGradientSusceptibility markerAxisVariance ancestryVariance := by
   have hresidual := samplePCResidualAxisFraction_pos_and_lt_one
     n markers spike hn hmarkers hsuperthreshold
-  unfold modeledPCResidualSusceptibility ancestryGradientSusceptibility
+  unfold modeledPCResidualSusceptibility ancestryGradientSusceptibility Descent.Core.product
   constructor
   · exact mul_pos hmarkerAxis (mul_pos hancestry hresidual.1)
   · have haxis : ancestryVariance * samplePCResidualAxisFraction n markers spike <

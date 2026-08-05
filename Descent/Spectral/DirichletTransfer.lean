@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 import Mathlib.Data.Real.Sqrt
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -182,7 +183,8 @@ theorem localizedTransferVariance_at_reference_point :
 
 
 /-- Limit variance for a **delocalized** weight, which averages over `k` sites. -/
-noncomputable def delocalizedTransferVariance (v : ℝ) (k : ℕ) : ℝ := v / k
+noncomputable def delocalizedTransferVariance (v : ℝ) (k : ℕ) : ℝ :=
+  Descent.Core.ratio v k
 
 /-- **delocalizedTransferVariance at its junk point, named.** Spreading variance over no blocks
 leaves it undefined. Lean returns `0`: perfectly delocalised, the value for variance spread over
@@ -190,7 +192,7 @@ unboundedly many blocks, which is the opposite regime. Consumers must exclude th
 makes the guard vanish. -/
 theorem delocalizedTransferVariance_zero_blocks_is_junk (v : ℝ) :
     delocalizedTransferVariance v 0 = 0 := by
-  unfold delocalizedTransferVariance
+  unfold delocalizedTransferVariance Descent.Core.ratio
   simp
 
 /-- **Local typing does not reduce a localized scheme's transfer variance.** -/
@@ -207,7 +209,7 @@ theorem delocalizedTransferVariance_strictAnti (v : ℝ) (hv : 0 < v) (k₁ k₂
     delocalizedTransferVariance v k₂ < delocalizedTransferVariance v k₁ := by
   have h1 : (0 : ℝ) < (k₁ : ℝ) := by exact_mod_cast hk
   have h2 : ((k₁ : ℝ)) < (k₂ : ℝ) := by exact_mod_cast h
-  unfold delocalizedTransferVariance
+  unfold delocalizedTransferVariance Descent.Core.ratio
   exact div_lt_div_of_pos_left hv h1 h2
 
 /-- **Averaging over the sites recovers the total.** Strict antitonicity in the site count is
@@ -215,7 +217,7 @@ shared by every `c * v / k`; multiplying the count back fixes `c`. -/
 theorem delocalizedTransferVariance_mul_sites (v : ℝ) (k : ℕ) (hk : k ≠ 0) :
     delocalizedTransferVariance v k * k = v := by
   have hkr : (k : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hk
-  unfold delocalizedTransferVariance
+  unfold delocalizedTransferVariance Descent.Core.ratio
   field_simp
 
 /-- **A localized scheme is a delocalized one that never averages.** The constancy theorem above
@@ -223,7 +225,7 @@ holds for every body that ignores `k`, including a body carrying the wrong varia
 which value it is constant at. -/
 theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
     localizedTransferVariance v k = delocalizedTransferVariance v 1 := by
-  unfold localizedTransferVariance delocalizedTransferVariance
+  unfold localizedTransferVariance delocalizedTransferVariance Descent.Core.ratio
   norm_num
 
 /-! ### The two correction factors -/

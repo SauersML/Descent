@@ -729,13 +729,13 @@ mismatch in observable tag space. It includes an explicit recombination/array sp
 
 /-- Effective mismatch scale from recombination and array sparsity (tag density inverse). -/
 noncomputable def taggingMismatchScale (recombRate arraySparsity : ℝ) : ℝ :=
-  recombRate * arraySparsity
+  Descent.Core.product recombRate arraySparsity
 
 /-- **A fully dense array leaves only the recombination rate.** Sparsity one is the reference
 point, and it fixes the proportionality constant that a rescaled body would change. -/
 theorem taggingMismatchScale_dense (recombRate : ℝ) :
     taggingMismatchScale recombRate 1 = recombRate := by
-  unfold taggingMismatchScale
+  unfold taggingMismatchScale Descent.Core.product
   ring
 
 /-- Demography-to-LD lower bound template used in portability theorems.
@@ -1029,7 +1029,7 @@ theorem covariance_mismatch_pos_of_fst_and_sparse_array
     (h_kappa_pos : 0 < kappa) :
     0 < frobeniusNormSq (sigmaSource - sigmaTarget) := by
   have h_scale_pos : 0 < taggingMismatchScale recombRate arraySparsity := by
-    unfold taggingMismatchScale
+    unfold taggingMismatchScale Descent.Core.product
     exact mul_pos h_recomb_pos h_sparse_pos
   have h_delta_pos : 0 < fstTarget - fstSource := sub_pos.mpr h_fst
   have h_lb_pos :
@@ -3481,7 +3481,7 @@ namespace TransportedMetrics
 
     Empirical status: UNTESTED. -/
 noncomputable def r2FromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
-  vSignal / (vSignal + vNoise)
+  Descent.Core.share vSignal vNoise
 
 /-- **r2FromSignalVariance where its denominator vanishes, named.** The guard `vSignal + vNoise` is
 zero at `vSignal = 0`, `vNoise = 0`. With neither signal nor noise there is no variance to
@@ -3489,7 +3489,7 @@ explain. Lean returns `0` there rather than the value the modelled quantity take
 error marks the point. Consumers must require `vSignal + vNoise ≠ 0`. -/
 theorem r2FromSignalVariance_at_vsignal0vnoise0_is_junk :
     r2FromSignalVariance 0 0 = 0 := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   norm_num
 
 /-- **The explained-variance ratio really is the `R²` of a data-generating process** —
@@ -3521,7 +3521,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     r2FromSignalVariance V_signal V_E = rsquared dgp signal dgp.trueExpectation := by
   rw [rsquared_eq_process_moments dgp signal,
     h_signal, h_additive, h_split]
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   have hs : V_signal ≠ 0 := ne_of_gt h_signal_pos
   have ho : V_signal + V_E ≠ 0 := ne_of_gt h_outcome_pos
   field_simp

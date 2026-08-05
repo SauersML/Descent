@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PolygenicArchitecture
 import Descent.Blindness.BundleRigidity.DeploymentCeiling
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -456,7 +457,8 @@ section OptimalAllocation
     three. That is what makes this a test of the shape `n/(n + C)` rather than
     of a constant fitted to the curve it is being checked against -- a fit to
     all four points would agree with almost any monotone saturating form. -/
-noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ := n / (n + C)
+noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ :=
+  Descent.Core.share n C
 
 /-- **heritabilityFractionFromN where its denominator vanishes, named.** The guard `n + C` is zero
 at `n = 0`, `C = 0`. At zero sample size and zero constant the recovered heritability fraction
@@ -465,14 +467,14 @@ returns `0` there rather than the value the modelled quantity takes, and no type
 point. Consumers must require `n + C ≠ 0`. -/
 theorem heritabilityFractionFromN_at_n0c0_is_junk :
     heritabilityFractionFromN 0 0 = 0 := by
-  unfold heritabilityFractionFromN
+  unfold heritabilityFractionFromN Descent.Core.share
   norm_num
 
 /-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n : n₁ < n₂) :
     heritabilityFractionFromN n₁ C < heritabilityFractionFromN n₂ C := by
-  unfold heritabilityFractionFromN
+  unfold heritabilityFractionFromN Descent.Core.share
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
@@ -480,7 +482,7 @@ theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
 theorem r2_scaling_bounded (n C : ℝ)
     (h_C : 0 < C) (h_n : 0 ≤ n) :
     heritabilityFractionFromN n C < 1 := by
-  unfold heritabilityFractionFromN
+  unfold heritabilityFractionFromN Descent.Core.share
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -493,7 +495,7 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
     (h_delta : 0 < delta) (h_n : n₁ < n₂) :
     heritabilityFractionFromN (n₂ + delta) C - heritabilityFractionFromN n₂ C <
       heritabilityFractionFromN (n₁ + delta) C - heritabilityFractionFromN n₁ C := by
-  unfold heritabilityFractionFromN
+  unfold heritabilityFractionFromN Descent.Core.share
   -- Need: (n₂+δ)/(n₂+δ+C) - n₂/(n₂+C) < (n₁+δ)/(n₁+δ+C) - n₁/(n₁+C)
   -- Each difference = δC/((n+δ+C)(n+C))
   -- Since n₁ < n₂, denominator is smaller for n₁ → larger fraction

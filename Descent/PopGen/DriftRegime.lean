@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.ObservationalCeiling
 import Mathlib.Tactic.Linarith
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -216,12 +217,13 @@ carried into a regime where it is false without anything failing.
 
     Empirical status: VACUOUS. It is a function of the shared retention, so it
     carries no evidence independent of it. -/
-noncomputable def lossOfRetention (r : ℝ) : ℝ := 1 - r
+noncomputable def lossOfRetention (r : ℝ) : ℝ :=
+  Descent.Core.complement r
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem lossOfRetention_at_reference_point :
     lossOfRetention (1 / 2) = 1 / 2 := by
-  unfold lossOfRetention
+  unfold lossOfRetention Descent.Core.complement
   norm_num
 
 /-- **Loss and retention partition one.** The cluster below is built from three quantities that
@@ -229,17 +231,18 @@ all move with the retention factor, and the monotonicity relations among them ho
 decreasing function of `r`. This identity says which one: the loss is the exact complement, so a
 population retaining nine tenths of its variation has lost one tenth and not some multiple of it. -/
 theorem lossOfRetention_add_retention (r : ℝ) : lossOfRetention r + r = 1 := by
-  unfold lossOfRetention
+  unfold lossOfRetention Descent.Core.complement
   ring
 
 /-- Cluster member: target heterozygosity. -/
-noncomputable def targetHetOfRetention (H₀ r : ℝ) : ℝ := H₀ * r
+noncomputable def targetHetOfRetention (H₀ r : ℝ) : ℝ :=
+  Descent.Core.product H₀ r
 
 /-- **Full retention returns the ancestral heterozygosity unchanged.** The cluster's shared
 monotonicity in `r` is satisfied by every increasing map fixing zero; the value at `r = 1` fixes
 the scale, and it is the reference point at which a spurious factor becomes visible. -/
 theorem targetHetOfRetention_full (H₀ : ℝ) : targetHetOfRetention H₀ 1 = H₀ := by
-  unfold targetHetOfRetention
+  unfold targetHetOfRetention Descent.Core.product
   ring
 
 /-- Cluster member: target PGS variance.
@@ -247,12 +250,13 @@ theorem targetHetOfRetention_full (H₀ : ℝ) : targetHetOfRetention H₀ 1 = H
     Empirical status: VACUOUS. It is a function of the shared retention, so it
     carries no evidence independent of it; see
     `cluster_identities_hold_at_every_retention`. -/
-noncomputable def targetPgsVarOfRetention (V_A r : ℝ) : ℝ := V_A * r
+noncomputable def targetPgsVarOfRetention (V_A r : ℝ) : ℝ :=
+  Descent.Core.product V_A r
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem targetPgsVarOfRetention_at_reference_point :
     targetPgsVarOfRetention (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold targetPgsVarOfRetention
+  unfold targetPgsVarOfRetention Descent.Core.product
   norm_num
 
 /-- **Every internal identity of the cluster holds at every retention value.**
@@ -274,9 +278,9 @@ theorem cluster_identities_hold_at_every_retention (H₀ V_A r : ℝ) :
     targetHetOfRetention H₀ r = H₀ * (1 - lossOfRetention r) ∧
       targetPgsVarOfRetention V_A r = V_A * (1 - lossOfRetention r) := by
   constructor
-  · unfold targetHetOfRetention lossOfRetention
+  · unfold targetHetOfRetention lossOfRetention Descent.Core.product Descent.Core.complement
     ring
-  · unfold targetPgsVarOfRetention lossOfRetention
+  · unfold targetPgsVarOfRetention lossOfRetention Descent.Core.product Descent.Core.complement
     ring
 
 /-- The cluster's internal cross-check, as a probe: what an over-determination check

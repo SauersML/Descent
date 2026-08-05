@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.Probability
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -440,12 +441,13 @@ noncomputable def componentRepresentationResidual (localValue : ℝ)
 
 /-- Change caused by localizing a mixture to one posterior fiber. -/
 noncomputable def localizationResidual (localValue mixtureValue : ℝ) : ℝ :=
-  localValue - mixtureValue
+  Descent.Core.difference localValue mixtureValue
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem localizationResidual_at_reference_point :
     localizationResidual 2 1 = 1 := by
-  norm_num [localizationResidual]
+  norm_num [localizationResidual,
+      Descent.Core.difference]
 
 
 /-- Failure of a functional to commute with component mixing. -/
@@ -477,7 +479,7 @@ theorem componentRepresentationResidual_decomposition (localValue mixtureValue :
     componentRepresentationResidual localValue a componentValue =
       localizationResidual localValue mixtureValue +
         jensenResidual mixtureValue a componentValue := by
-  unfold componentRepresentationResidual localizationResidual jensenResidual
+  unfold componentRepresentationResidual localizationResidual jensenResidual Descent.Core.difference
   ring
 
 end Residual

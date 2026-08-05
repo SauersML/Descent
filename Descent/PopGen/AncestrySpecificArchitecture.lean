@@ -453,11 +453,12 @@ causal variant.
     ledger for this name and not for its `source` reaches the opposite
     conclusion, and the ledger cannot say this about itself. -/
 noncomputable def taggedEffect (causalEffect tagR : ℝ) : ℝ :=
-  causalEffect * tagR
+  Descent.Core.product causalEffect tagR
 
 /-- The tagged-effect scale is pinned at an interior reference point. -/
 theorem taggedEffect_at_reference_point : taggedEffect (1 / 2) (1 / 2) = 1 / 4 := by
-  norm_num [taggedEffect]
+  norm_num [taggedEffect,
+      Descent.Core.product]
 
 /-- **Tag SNP may differ across populations.**
     If tag_source is the best proxy for causal variant C in the source,
@@ -472,7 +473,7 @@ theorem taggedEffect_eq_iff
     (causalEffect sourceTagR targetTagR : ℝ) :
     taggedEffect causalEffect sourceTagR = taggedEffect causalEffect targetTagR ↔
       causalEffect = 0 ∨ sourceTagR = targetTagR := by
-  unfold taggedEffect
+  unfold taggedEffect Descent.Core.product
   constructor
   · intro h
     by_cases h_effect : causalEffect = 0
@@ -523,18 +524,18 @@ theorem taggedEffect_eq_iff
     it recovers the EFFECT itself through `r` -- see `taggedEffect`, where the
     corpus had the exponents the other way round. -/
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
-  h2_true * avg_r2_tag
+  Descent.Core.product h2_true avg_r2_tag
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasHeritability_at_reference_point :
     gwasHeritability (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold gwasHeritability
+  unfold gwasHeritability Descent.Core.product
   norm_num
 
 /-- GWAS heritability vanishes exactly when there is no heritable signal or no tagging. -/
 theorem gwasHeritability_eq_zero_iff (h2_true avg_r2_tag : ℝ) :
     gwasHeritability h2_true avg_r2_tag = 0 ↔ h2_true = 0 ∨ avg_r2_tag = 0 := by
-  unfold gwasHeritability
+  unfold gwasHeritability Descent.Core.product
   exact mul_eq_zero
 
 /-- Perfect tagging recovers the true heritability; equality also holds vacuously when
@@ -542,7 +543,7 @@ the true heritability itself is zero. -/
 theorem gwasHeritability_eq_true_iff (h2_true avg_r2_tag : ℝ) :
     gwasHeritability h2_true avg_r2_tag = h2_true ↔
       h2_true = 0 ∨ avg_r2_tag = 1 := by
-  unfold gwasHeritability
+  unfold gwasHeritability Descent.Core.product
   constructor
   · intro h
     have h_factor : h2_true * (avg_r2_tag - 1) = 0 := by nlinarith
@@ -556,7 +557,7 @@ tagging efficiency at most one. -/
 theorem gwasHeritability_le_true (h2_true avg_r2_tag : ℝ)
     (h_h2 : 0 ≤ h2_true) (h_r2_le : avg_r2_tag ≤ 1) :
     gwasHeritability h2_true avg_r2_tag ≤ h2_true := by
-  unfold gwasHeritability
+  unfold gwasHeritability Descent.Core.product
   nlinarith
 
 
@@ -622,7 +623,7 @@ theorem allelicHeterogeneityRetainedSignal_eq_full_iff
 
 /-- Total gene-level variance is the sum of shared and population-specific components. -/
 noncomputable def populationGeneVariance (shared specific : ℝ) : ℝ :=
-  shared + specific
+  Descent.Core.sum shared specific
 
 /-- Fraction of a target population's gene-level variance carried by shared variants. -/
 noncomputable def crossPopulationGeneTransferFraction (shared targetSpecific : ℝ) : ℝ :=
@@ -645,7 +646,7 @@ noncomputable def crossPopulationGeneTransferFraction (shared targetSpecific : �
 theorem populationGeneVariance_gt_shared
     (shared specific : ℝ) (h_specific : 0 < specific) :
     shared < populationGeneVariance shared specific := by
-  unfold populationGeneVariance
+  unfold populationGeneVariance Descent.Core.sum
   linarith
 
 /-- A positive target-specific component makes the shared transfer fraction strictly
@@ -654,7 +655,7 @@ theorem crossPopulationGeneTransferFraction_lt_one
     (shared targetSpecific : ℝ)
     (h_shared : 0 < shared) (h_target : 0 < targetSpecific) :
     crossPopulationGeneTransferFraction shared targetSpecific < 1 := by
-  unfold crossPopulationGeneTransferFraction populationGeneVariance
+  unfold crossPopulationGeneTransferFraction populationGeneVariance Descent.Core.sum
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -663,7 +664,7 @@ has no population-specific variance component. -/
 theorem crossPopulationGeneTransferFraction_eq_one_iff
     (shared targetSpecific : ℝ) (h_shared : 0 < shared) :
     crossPopulationGeneTransferFraction shared targetSpecific = 1 ↔ targetSpecific = 0 := by
-  unfold crossPopulationGeneTransferFraction populationGeneVariance
+  unfold crossPopulationGeneTransferFraction populationGeneVariance Descent.Core.sum
   constructor
   · intro h
     by_cases h_denom : shared + targetSpecific = 0
@@ -883,7 +884,7 @@ theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
       rg ^ 2 * covarianceRetention (covarianceRetentionFactorFromFst fst)
         (ldOverlapFromSharedLD tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst
-    ldOverlapFromSharedLD
+    ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
@@ -895,7 +896,7 @@ theorem portabilityFromArchitecture_from_divergence
     portabilityFromArchitecture rg fst tagging_ratio =
       rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceDivergenceFromRetention
-    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
   ring
 
 /-- Architecture portability is zero exactly when cross-population effect correlation

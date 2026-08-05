@@ -1968,7 +1968,7 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 /-- Effective migration equals both rates when migration is symmetric. -/
 theorem effectiveMigration_symmetric (m : ℝ) :
     effectiveSymmetricMigration m m = m := by
-  unfold effectiveSymmetricMigration
+  unfold effectiveSymmetricMigration Descent.Core.midpoint
   ring
 
 /-- **Asymmetric migration yields asymmetric Fst.**

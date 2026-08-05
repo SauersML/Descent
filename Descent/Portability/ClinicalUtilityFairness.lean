@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -446,12 +447,12 @@ section NRI
     Non-event NRI: proportion of controls correctly moved down -/
 noncomputable def netReclassificationImprovement
     (event_nri nonevent_nri : ℝ) : ℝ :=
-  event_nri + nonevent_nri
+  Descent.Core.sum event_nri nonevent_nri
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem netReclassificationImprovement_at_reference_point :
     netReclassificationImprovement (1 / 2) (1 / 2) = 1 := by
-  unfold netReclassificationImprovement
+  unfold netReclassificationImprovement Descent.Core.sum
   norm_num
 
 /-- **The two components are recoverable from each other and the total.** This is why a single
@@ -459,7 +460,7 @@ NRI cannot be read: a positive total is consistent with a gain among events and 
 non-events, and the identity is what forces the two to be reported separately. -/
 theorem netReclassificationImprovement_sub_event (event_nri nonevent_nri : ℝ) :
     netReclassificationImprovement event_nri nonevent_nri - event_nri = nonevent_nri := by
-  unfold netReclassificationImprovement
+  unfold netReclassificationImprovement Descent.Core.sum
   ring
 
 /-- Exact operating-point sensitivity under the liability-threshold model. -/
@@ -560,7 +561,7 @@ theorem nri_positive_when_pgs_adds_value
     0 < netReclassificationImprovement
       (sensFromR2 m r2_new T' - sensFromR2 m r2_old T')
       (specFromR2 m r2_new T' μ_control - specFromR2 m r2_old T' μ_control) := by
-  unfold netReclassificationImprovement
+  unfold netReclassificationImprovement Descent.Core.sum
   obtain ⟨h1, h2⟩ := sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_old r2_new
     hμ_control_neg h_r2_old h_r2_new h_r2_improves h_sens_num_nonneg h_spec_num_nonneg
   linarith
@@ -592,7 +593,7 @@ theorem nri_decreases_with_portability_loss
   have h_spec_num_nonneg := hregime.spec_num_nonneg
   have h := nri_positive_when_pgs_adds_value m T' μ_control r2_target r2_source
     h_r2_loss h_r2_target h_r2_source hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
-  unfold netReclassificationImprovement at h ⊢
+  unfold netReclassificationImprovement Descent.Core.sum at h ⊢
   linarith
 
 /-- **NRI can become negative in target populations.**
@@ -615,7 +616,7 @@ theorem nri_can_be_negative
   -- instance of it.
   have h := nri_decreases_with_portability_loss m T' μ_control r2_old r2_old r2_target
     hregime
-  unfold netReclassificationImprovement at h ⊢
+  unfold netReclassificationImprovement Descent.Core.sum at h ⊢
   linarith
 
 end NRI

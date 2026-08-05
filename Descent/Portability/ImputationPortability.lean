@@ -131,7 +131,7 @@ section ReferencePanel
 
 /-- Imputation quality after multiplying the local LD ceiling by reference-panel match. -/
 noncomputable def panelAdjustedImputationQuality (r2_LD panelMatch : ℝ) : ℝ :=
-  r2_LD * panelMatch
+  Descent.Core.product r2_LD panelMatch
 
 /-- Panel mismatch cannot exceed the local LD imputation ceiling when LD signal is nonnegative
 and panel match is at most one. -/
@@ -139,7 +139,7 @@ theorem panelAdjustedImputationQuality_le_ld
     (r2_LD panel_match : ℝ)
     (h_r2 : 0 ≤ r2_LD) (h_pm_le : panel_match ≤ 1) :
     panelAdjustedImputationQuality r2_LD panel_match ≤ r2_LD := by
-  unfold panelAdjustedImputationQuality
+  unfold panelAdjustedImputationQuality Descent.Core.product
   calc r2_LD * panel_match ≤ r2_LD * 1 :=
         mul_le_mul_of_nonneg_left h_pm_le h_r2
     _ = r2_LD := mul_one _
@@ -149,7 +149,7 @@ perfectly matched reference panel. -/
 theorem panelAdjustedImputationQuality_eq_ld_iff
     (r2_LD panelMatch : ℝ) (h_ld : r2_LD ≠ 0) :
     panelAdjustedImputationQuality r2_LD panelMatch = r2_LD ↔ panelMatch = 1 := by
-  unfold panelAdjustedImputationQuality
+  unfold panelAdjustedImputationQuality Descent.Core.product
   constructor
   · intro h_equal
     apply mul_left_cancel₀ h_ld
@@ -164,7 +164,7 @@ match vanishes. -/
 theorem panelAdjustedImputationQuality_eq_zero_iff
     (r2_LD panelMatch : ℝ) (h_ld : r2_LD ≠ 0) :
     panelAdjustedImputationQuality r2_LD panelMatch = 0 ↔ panelMatch = 0 := by
-  unfold panelAdjustedImputationQuality
+  unfold panelAdjustedImputationQuality Descent.Core.product
   rw [mul_eq_zero]
   simp [h_ld]
 
@@ -327,7 +327,8 @@ theorem panelAdjustedImputationQuality_eq_zero_of_panel_absent
     (r2_LD : ℝ) (variant_in_panel : ℝ)
     (h_missing : variant_in_panel = 0) :
     panelAdjustedImputationQuality r2_LD variant_in_panel = 0 := by
-  simp [panelAdjustedImputationQuality, h_missing]
+  simp [panelAdjustedImputationQuality, h_missing,
+      Descent.Core.product]
 
 /-- **At unit imputation quality the attenuation factor is one.**
 
@@ -373,24 +374,26 @@ section ArrayAscertainment
     to the source-population score performance. -/
 noncomputable def apparent_portability_loss
     (r2_source r2_target_array : ℝ) : ℝ :=
-  r2_source - r2_target_array
+  Descent.Core.difference r2_source r2_target_array
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem apparent_portability_loss_at_reference_point :
     apparent_portability_loss 2 1 = 1 := by
-  norm_num [apparent_portability_loss]
+  norm_num [apparent_portability_loss,
+      Descent.Core.difference]
 
 
 /-- Difference in `R²` corresponding to true biological portability loss,
     as measured with an ideal non-ascertained array or sequencing design. -/
 noncomputable def true_portability_loss
     (r2_source r2_target_ideal : ℝ) : ℝ :=
-  r2_source - r2_target_ideal
+  Descent.Core.difference r2_source r2_target_ideal
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem true_portability_loss_at_reference_point :
     true_portability_loss 2 1 = 1 := by
-  norm_num [true_portability_loss]
+  norm_num [true_portability_loss,
+      Descent.Core.difference]
 
 
 /-- **Ascertainment creates artificial portability loss.**
@@ -422,9 +425,11 @@ theorem ascertainment_artificial_loss
         apparent_portability_loss r2_source r2_target_array -
           true_portability_loss r2_source r2_target_ideal := by
   constructor
-  · dsimp [apparent_portability_loss, true_portability_loss]
+  · dsimp [apparent_portability_loss, true_portability_loss,
+      Descent.Core.difference]
     ring
-  · dsimp [apparent_portability_loss, true_portability_loss]
+  · dsimp [apparent_portability_loss, true_portability_loss,
+      Descent.Core.difference]
     linarith
 
 /-- Ascertainment loss from incompletely tagged causal variation. -/
@@ -470,12 +475,13 @@ theorem multi_ethnic_arrays_reduce_bias
 
 /-- Total portability loss as the sum of biological and technical components. -/
 noncomputable def total_portability_loss (loss_genetic loss_technical : ℝ) : ℝ :=
-  loss_genetic + loss_technical
+  Descent.Core.sum loss_genetic loss_technical
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem total_portability_loss_at_reference_point :
     total_portability_loss 2 2 = 4 := by
-  norm_num [total_portability_loss]
+  norm_num [total_portability_loss,
+      Descent.Core.sum]
 
 
 /-- **Decomposing portability loss: genetic vs technical.**
@@ -492,9 +498,11 @@ theorem portability_loss_decomposition
   constructor
   · rfl
   constructor
-  · dsimp [total_portability_loss]
+  · dsimp [total_portability_loss,
+      Descent.Core.sum]
     linarith
-  · dsimp [total_portability_loss]
+  · dsimp [total_portability_loss,
+      Descent.Core.sum]
     linarith
 
 

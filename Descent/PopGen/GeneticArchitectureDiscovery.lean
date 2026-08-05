@@ -6,6 +6,7 @@ import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.HaplotypeTheory
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -496,7 +497,7 @@ noncomputable def lassoActiveLoci {m : ℕ}
 spread over `k` causal loci. -/
 noncomputable def perCausalLocusSignal
     (h2 k : ℝ) : ℝ :=
-  h2 / k
+  Descent.Core.ratio h2 k
 
 /-- **perCausalLocusSignal at zero k, named.** With no causal loci the heritability has nowhere to
 sit and the per-locus signal diverges. Lean returns `0`, an infinitely polygenic architecture,
@@ -504,13 +505,13 @@ which is the opposite architecture to the one the argument describes. Consumers 
 `k ≠ 0`. -/
 theorem perCausalLocusSignal_zero_k_is_junk (h2 : ℝ) :
     perCausalLocusSignal h2 0 = 0 := by
-  unfold perCausalLocusSignal
+  unfold perCausalLocusSignal Descent.Core.ratio
   simp
 
 /-- **The loci partition the heritability.** -/
 theorem perCausalLocusSignal_mul_count (h2 k : ℝ) (hk : k ≠ 0) :
     perCausalLocusSignal h2 k * k = h2 := by
-  unfold perCausalLocusSignal
+  unfold perCausalLocusSignal Descent.Core.ratio
   field_simp
 
 /-- **OLS effect estimates are unbiased but noisy.**
@@ -595,7 +596,7 @@ theorem estimation_trait_interaction
   rcases h_between with ⟨h_poly_drop, h_oligo_keep⟩
   have h_signal_order :
       perCausalLocusSignal h2 k_poly < perCausalLocusSignal h2 k_oligo := by
-    unfold perCausalLocusSignal
+    unfold perCausalLocusSignal Descent.Core.ratio
     exact div_lt_div_of_pos_left h_h2 h_oligo (by linarith)
   exact ⟨not_le_of_gt h_poly_drop, h_oligo_keep, h_signal_order⟩
 

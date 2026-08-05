@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -68,14 +69,14 @@ theorem narrow_h2_in_unit (V_A V_D V_I V_E : ℝ)
     h²_SNP = V_A_tagged / V_P ≤ h²_narrow.
     Only the variance tagged by genotyped SNPs is captured. -/
 noncomputable def snpH2 (V_A_tagged V_P : ℝ) : ℝ :=
-  V_A_tagged / V_P
+  Descent.Core.ratio V_A_tagged V_P
 
 /-- **snpH2 at zero V_P, named.** A trait with no phenotypic variance has no heritability to
 estimate. Lean returns `0`, reporting a trait with no genetic basis rather than a trait with no
 variance at all. Consumers must require `V_P ≠ 0`. -/
 theorem snpH2_zero_vp_is_junk (V_A_tagged : ℝ) :
     snpH2 V_A_tagged 0 = 0 := by
-  unfold snpH2
+  unfold snpH2 Descent.Core.ratio
   simp
 
 /-- SNP heritability ≤ narrow-sense heritability. -/
@@ -85,7 +86,7 @@ theorem snp_h2_le_narrow_h2
     (h_total : 0 < V_A_total + V_D + V_I + V_E) :
     snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) ≤
       narrowSenseH2 V_A_total V_D V_I V_E := by
-  unfold snpH2 narrowSenseH2
+  unfold snpH2 narrowSenseH2 Descent.Core.ratio
   exact div_le_div_of_nonneg_right h_tagged (le_of_lt h_total)
 
 /-- **The tagging gap, as an identity rather than an inequality.**
@@ -101,7 +102,7 @@ theorem narrow_h2_sub_snp_h2_eq
     narrowSenseH2 V_A_total V_D V_I V_E -
         snpH2 V_A_tagged (V_A_total + V_D + V_I + V_E) =
       (V_A_total - V_A_tagged) / (V_A_total + V_D + V_I + V_E) := by
-  unfold snpH2 narrowSenseH2
+  unfold snpH2 narrowSenseH2 Descent.Core.ratio
   rw [div_sub_div_same]
 
 /-- **The missing heritability gap.**

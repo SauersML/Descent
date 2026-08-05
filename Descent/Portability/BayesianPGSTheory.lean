@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -620,12 +621,12 @@ section PosteriorPredictive
     uncertainty. -/
 noncomputable def posteriorPredictiveVariance
     (residual_var estimation_var : ℝ) : ℝ :=
-  residual_var + estimation_var
+  Descent.Core.sum residual_var estimation_var
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem posteriorPredictiveVariance_at_reference_point :
     posteriorPredictiveVariance (1 / 2) (1 / 2) = 1 := by
-  unfold posteriorPredictiveVariance
+  unfold posteriorPredictiveVariance Descent.Core.sum
   norm_num
 
 /-- **Removing the estimation variance leaves the residual variance.** The two sources of
@@ -633,7 +634,7 @@ predictive uncertainty are separable, which is what licenses reporting them apar
 combined them any other way would not admit this decomposition. -/
 theorem posteriorPredictiveVariance_sub_estimation (residual_var estimation_var : ℝ) :
     posteriorPredictiveVariance residual_var estimation_var - estimation_var = residual_var := by
-  unfold posteriorPredictiveVariance
+  unfold posteriorPredictiveVariance Descent.Core.sum
   ring
 
 /-- Posterior predictive variance ≥ residual variance. -/
@@ -641,7 +642,7 @@ theorem posterior_predictive_wider_than_residual
     (residual_var estimation_var : ℝ)
     (h_est : 0 ≤ estimation_var) :
     residual_var ≤ posteriorPredictiveVariance residual_var estimation_var := by
-  unfold posteriorPredictiveVariance
+  unfold posteriorPredictiveVariance Descent.Core.sum
   linarith
 
 /-- **Estimation variance decreases with sample size.**
@@ -667,7 +668,7 @@ theorem cross_population_posterior_wider
     (h_est : est_s ≤ est_t) :
     posteriorPredictiveVariance resid_s est_s ≤
       posteriorPredictiveVariance resid_t est_t := by
-  unfold posteriorPredictiveVariance
+  unfold posteriorPredictiveVariance Descent.Core.sum
   linarith
 
 

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -144,7 +145,7 @@ because in general `R²_target = rho² · h²_target` while `r2Source = h²_sour
 small to separate the readings. That is a limit of this design, not a licence -- at small `m`
 the equal-heritability condition would bind. -/
 noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
-  r2Source * rhoSq
+  Descent.Core.product r2Source rhoSq
 
 /-- Source `R²` lost to non-recoverable effect turnover.
 
@@ -181,7 +182,7 @@ theorem ancestryRecalibratedR2_add_effectTurnoverR2Loss
     (r2_source ρ_sq : ℝ) :
     ancestryRecalibratedR2 r2_source ρ_sq +
       effectTurnoverR2Loss r2_source ρ_sq = r2_source := by
-  unfold ancestryRecalibratedR2 effectTurnoverR2Loss
+  unfold ancestryRecalibratedR2 effectTurnoverR2Loss Descent.Core.product
   ring
 
 
@@ -241,7 +242,7 @@ theorem splineCalibrationMSE_lt_iff
 
 /-- Fraction of total variance carried by a signal component. -/
 noncomputable def explainedVarianceFraction (varSignal varNoise : ℝ) : ℝ :=
-  varSignal / (varSignal + varNoise)
+  Descent.Core.share varSignal varNoise
 
 /-- **A nonnegative part of a positive total is at most the whole of it:**
     `var_signal / var_total ≤ 1` when `var_total = var_signal + var_noise` with
@@ -257,7 +258,7 @@ theorem explainedVarianceFraction_le_one
     (h_total_pos : 0 < var_signal + var_noise)
     (h_noise_nn : 0 ≤ var_noise) :
     explainedVarianceFraction var_signal var_noise ≤ 1 := by
-  unfold explainedVarianceFraction
+  unfold explainedVarianceFraction Descent.Core.share
   rw [div_le_one h_total_pos]
   linarith
 

@@ -536,7 +536,7 @@ theorem calibrationInTheLarge_eq_zero_of_isStratumCalibrated
     calibrationInTheLarge
         (∑ x, covariateWeight x * ∑ t, posterior x t * conditional t x)
         (∑ x, covariateWeight x * ∑ t, posterior x t * predictor (stratify t) x) = 0 := by
-  unfold calibrationInTheLarge
+  unfold calibrationInTheLarge Descent.Core.difference
   rw [← Finset.sum_sub_distrib]
   apply Finset.sum_eq_zero
   intro x _
@@ -1561,7 +1561,7 @@ theorem aggregateCalibrationMoment_one_eq_calibrationInTheLarge
       calibrationInTheLarge
         (∑ x, covariateWeight x * posteriorMean posterior conditional x)
         (∑ x, covariateWeight x * predictor x) := by
-  unfold aggregateCalibrationMoment calibrationInTheLarge
+  unfold aggregateCalibrationMoment calibrationInTheLarge Descent.Core.difference
   rw [← Finset.sum_sub_distrib]
   apply Finset.sum_congr rfl
   intro x _

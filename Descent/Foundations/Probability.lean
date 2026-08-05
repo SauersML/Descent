@@ -10,6 +10,7 @@ import Mathlib.Probability.CDF
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.InformationTheory.KullbackLeibler.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+import Descent.Core.Ratios
 
 open scoped InnerProductSpace
 open InnerProductSpace
@@ -788,14 +789,15 @@ theorem noise_integrated_cdf_zero {k : ℕ} (hN : GaussianNoiseAssumption k)
     `s + e` as the definition of the sum. The testable consequences live in the
     threshold quantities built on it -- `etaLiabilityThreshold`, the prevalence
     and the observed-scale `R²` -- where a wrong decomposition would show. -/
-def latentLiability (s e : ℝ) : ℝ := s + e
+noncomputable def latentLiability (s e : ℝ) : ℝ :=
+  Descent.Core.sum s e
 
 /-- **Liability is additive, so the genetic part is recoverable given the environment.** This is
 what makes the threshold model identifiable at all, and it is the decomposition a body carrying
 an interaction term would break. -/
 theorem latentLiability_sub_environment (s e : ℝ) :
     latentLiability s e - e = s := by
-  unfold latentLiability
+  unfold latentLiability Descent.Core.sum
   ring
 
 /-- Disease event under an ancestry-dependent threshold: `L > T(x)`. -/
@@ -814,7 +816,8 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
       noiseMeasureGivenX hN x {e : ℝ | latentLiability s e ≤ T x} =
         ENNReal.ofReal (ProbabilityTheory.cdf
           (ProbabilityTheory.gaussianReal s (hN.sigma2 x)) (T x)) := by
-    simpa [latentLiability] using noise_integrated_cdf hN x s (T x)
+    simpa [latentLiability,
+      Descent.Core.sum] using noise_integrated_cdf hN x s (T x)
   have h_le_set :
       ({e : ℝ | latentLiability s e ≤ T x} : Set ℝ) = Set.Iic (T x - s) := by
     ext e
@@ -822,12 +825,14 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
     · intro h
       change e ≤ T x - s
       have hsle : latentLiability s e ≤ T x := by simpa using h
-      dsimp [latentLiability] at hsle
+      dsimp [latentLiability,
+      Descent.Core.sum] at hsle
       linarith
     · intro h
       change latentLiability s e ≤ T x
       have hle : e ≤ T x - s := by simpa [Set.mem_Iic] using h
-      dsimp [latentLiability]
+      dsimp [latentLiability,
+      Descent.Core.sum]
       linarith
   have h_event :
       diseaseEvent T x s = (Set.Iic (T x - s))ᶜ := by

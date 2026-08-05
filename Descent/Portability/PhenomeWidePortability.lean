@@ -344,12 +344,12 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
     haploid drift factor is FALSIFIED at 532 sems.
     -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
-  1 - driftFactor
+  Descent.Core.complement driftFactor
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fstFromDriftFactor_at_reference_point :
     fstFromDriftFactor (1 / 2) = 1 / 2 := by
-  unfold fstFromDriftFactor
+  unfold fstFromDriftFactor Descent.Core.complement
   norm_num
 
 /-- **Cross-check: `1 - F_ST` read forwards and backwards.**
@@ -359,7 +359,7 @@ back to `F_ST`. They are the same involution, and stating it keeps the two
 directions from acquiring different conventions. -/
 theorem fstFromDriftFactor_eq_covarianceRetentionFactorFromFst (driftFactor : ℝ) :
     fstFromDriftFactor driftFactor = covarianceRetentionFactorFromFst driftFactor := by
-  unfold fstFromDriftFactor covarianceRetentionFactorFromFst; ring
+  unfold fstFromDriftFactor covarianceRetentionFactorFromFst Descent.Core.complement; ring
 
 /-- **The third spelling of the same involution.**
 
@@ -381,7 +381,7 @@ theorem lossOfRetention_eq_fstFromDriftFactor_eq_covarianceRetentionFactorFromFs
 theorem fstFromDriftFactor_mem_unit (driftFactor : ℝ)
     (h_pos : 0 < driftFactor) (h_le : driftFactor ≤ 1) :
     0 ≤ fstFromDriftFactor driftFactor ∧ fstFromDriftFactor driftFactor < 1 := by
-  unfold fstFromDriftFactor
+  unfold fstFromDriftFactor Descent.Core.complement
   exact ⟨by linarith, by linarith⟩
 
 /-- **The neutral drift factor is an admissible input**: it lies in `(0, 1]`. -/
@@ -453,7 +453,7 @@ theorem stabilizing_selection_reduces_fst (Ne : ℝ) (t : ℕ) (s_correction : �
   constructor
   · exact (fst_from_selectedDriftFactor_mem_unit Ne t s_correction
       h_s_pos h_s_lt h_base_pos).1
-  · unfold fstFromDriftFactor
+  · unfold fstFromDriftFactor Descent.Core.complement
     linarith [selected_drift_factor_gt_neutral Ne t s_correction
       h_s_pos h_t_pos h_base_pos]
 

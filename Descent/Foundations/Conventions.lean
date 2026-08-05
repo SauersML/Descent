@@ -278,7 +278,8 @@ section Differentiation
     consequence of choosing equal weights over sample-size weights shows up in the `F_ST`
     that consumes it, and the note below records that `effectiveSymmetricMigration` must
     share this convention or the two disagree. -/
-noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ := (p₁ + p₂) / 2
+noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ :=
+  Descent.Core.midpoint p₁ p₂
 
 /-! ### The arithmetic mean of two, shared with the migration rates
 
@@ -298,12 +299,12 @@ migration map constrains the two definitions jointly. Taken alone: a fixed and a
 average to one half, which fixes the two-population mean as the arithmetic midpoint. -/
 theorem meanAlleleFreq_fixed_and_absent :
     meanAlleleFreq 0 1 = 1 / 2 := by
-  unfold meanAlleleFreq
+  unfold meanAlleleFreq Descent.Core.midpoint
   norm_num
 
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁ := by
-  unfold effectiveSymmetricMigration meanAlleleFreq; ring
+  unfold effectiveSymmetricMigration meanAlleleFreq Descent.Core.midpoint; ring
 
 /-- **Nei's `G_ST`, explicitly distinguished from Hudson's `F_ST`.** One minus the ratio
 of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
@@ -425,7 +426,7 @@ theorem neiGst_eq_oneMinusRatio (p₁ p₂ : ℝ)
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
   unfold neiGst ploidy Descent.Core.ploidy
   field_simp
-  unfold meanAlleleFreq
+  unfold meanAlleleFreq Descent.Core.midpoint
   ring
 
 /-- **Two identical monomorphic populations are not differentiated.**
@@ -498,7 +499,7 @@ within-population heterozygosity `p(1-p)` and the mean-frequency heterozygosity 
 even about `p = 1/2`, so relabelling the alleles cannot move the statistic. -/
 theorem neiGst_allele_swap (p₁ p₂ : ℝ) :
     neiGst (1 - p₁) (1 - p₂) = neiGst p₁ p₂ := by
-  unfold neiGst meanAlleleFreq
+  unfold neiGst meanAlleleFreq Descent.Core.midpoint
   have hnum : ((1 - p₁) - (1 - p₂)) ^ 2 = (p₁ - p₂) ^ 2 := by ring
   have hden : ploidy ^ 2 * ((1 - p₁ + (1 - p₂)) / 2) * (1 - (1 - p₁ + (1 - p₂)) / 2)
       = ploidy ^ 2 * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by ring
@@ -573,7 +574,7 @@ theorem hudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
         p₁ * (1 - p₂) + p₂ * (1 - p₁) := by
     unfold neiGst ploidy Descent.Core.ploidy
     field_simp [hD]
-    unfold meanAlleleFreq
+    unfold meanAlleleFreq Descent.Core.midpoint
     ring
   have htwo :
       2 * neiGst p₁ p₂ =
@@ -599,7 +600,7 @@ spellings of one. Without an exhibited point the conflation can be
 reintroduced by anyone who reads the `neiGst` name and believes it. -/
 theorem neiGst_ne_hudsonFst :
     neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
   norm_num
 
 /-- **A witness ON the `p̄ = 1/2` slice**, where the estimators are sometimes
@@ -613,7 +614,7 @@ from `neiGst_ne_hudsonFst` because that witness sits at `p̄ = 2/5` and
 so cannot exclude the slice that was actually claimed. -/
 theorem neiGst_ne_hudsonFst_at_mean_half :
     neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
   norm_num
 
 /-- **NO FIXED FACTOR CONVERTS NEI'S `G_ST` INTO HUDSON'S `F_ST`.**
@@ -644,12 +645,13 @@ theorem no_constant_scales_neiGst_to_hudsonFst :
   rintro ⟨c, hc⟩
   have h₁ := hc (1/5) (3/5) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   have h₂ := hc (9/10) (1/10) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
-  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy at h₁ h₂
+  unfold neiGst hudsonFst ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint at h₁ h₂
   norm_num at h₁ h₂
   linarith
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
-noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ := (p₁ - p₂) ^ 2 / 4
+noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ :=
+  Descent.Core.halfDiffSq p₁ p₂
 
 /-- **The between-subgroup variance's normalisation, pinned.** The identity with the fair
 two-point variance constrains the two definitions jointly and leaves a shared wrong factor free.
@@ -657,7 +659,7 @@ Two subgroups at the extremes of the frequency range have between-group variance
 the variance of a fair coin -- not one. -/
 theorem betweenSubgroupVariance_extremes :
     betweenSubgroupVariance 1 0 = 1 / 4 := by
-  unfold betweenSubgroupVariance
+  unfold betweenSubgroupVariance Descent.Core.halfDiffSq
   norm_num
 
 /-- **Cross-check: the fair two-point variance in `ImitationRigidity` is the
@@ -667,7 +669,7 @@ a resolvent and the other as the numerator of `F_ST`, and neither file knew the
 other existed. -/
 theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
     fairTwoPointVariance a b = betweenSubgroupVariance a b := by
-  unfold fairTwoPointVariance betweenSubgroupVariance; ring
+  unfold fairTwoPointVariance betweenSubgroupVariance Descent.Core.halfDiffSq; ring
 
 /-- **Cross-check: the heterozygosity form and the variance form of `F_ST`
 agree.** The corpus contained both shapes and never related them. -/
@@ -678,7 +680,7 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold neiGst betweenSubgroupVariance ploidy Descent.Core.ploidy
+  unfold neiGst betweenSubgroupVariance ploidy Descent.Core.ploidy Descent.Core.halfDiffSq
   field_simp
   ring
 
@@ -711,7 +713,7 @@ theorem four_neiGst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
     4 * neiGst p₁ p₂ =
       (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   rw [neiGst_eq_varianceRatio p₁ p₂ h]
-  unfold betweenSubgroupVariance
+  unfold betweenSubgroupVariance Descent.Core.halfDiffSq
   field_simp
 
 /-- **The allele-frequency-contrast normalization.**
@@ -786,7 +788,7 @@ theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
     hudsonBbpSpike 4 2 (9/10) (1/10) ≠
       neiContrastSpike 4 2 (9/10) (1/10) := by
   unfold hudsonBbpSpike neiContrastSpike demographicSpike hudsonFst neiGst
-    effectiveSubgroupSize ploidy meanAlleleFreq Descent.Core.ploidy
+    effectiveSubgroupSize ploidy meanAlleleFreq Descent.Core.ploidy Descent.Core.midpoint
   norm_num
 
 end Differentiation
@@ -1041,13 +1043,13 @@ theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
   unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.ploidy
+    hweGenotypeVariance ploidy Descent.Core.ploidy Descent.Core.product
   ring_nf
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.ploidy
+    hweGenotypeVariance ploidy Descent.Core.ploidy Descent.Core.product
   ring_nf
 
 theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
@@ -1602,7 +1604,7 @@ is `1/2`, and `G_ST` collapses to `(1 - ploidy · p)²`. This is the only place 
 denominator's `ploidy` is visible as a number, and it is what makes the next theorem an
 identity rather than a proportionality. -/
 theorem neiGst_at_fold (p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2 := by
-  unfold neiGst meanAlleleFreq ploidy Descent.Core.ploidy; ring
+  unfold neiGst meanAlleleFreq ploidy Descent.Core.ploidy Descent.Core.midpoint; ring
 
 /-- **The two-atom modulus curves are Nei's `G_ST` at the fold, divided by the product of
 the two masses.**

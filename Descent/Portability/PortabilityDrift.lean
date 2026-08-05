@@ -1669,7 +1669,7 @@ theorem presentDayR2_eq_statistical_rsquared_of_moments
     unfold rsquared
     simp [h_vf, h_vg, h_cov, h_if_not]
   rw [h_rs]
-  unfold presentDayR2 r2FromSignalVariance
+  unfold presentDayR2 r2FromSignalVariance Descent.Core.share
   field_simp [h_vsig_ne, h_vtrue_ne]
 
 
@@ -1726,7 +1726,7 @@ private theorem r2FromSignalVariance_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
     r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
-  unfold r2FromSignalVariance
+  unfold r2FromSignalVariance Descent.Core.share
   have hxE : 0 < x + V_E := by linarith
   have hyE : 0 < y + V_E := by linarith [hx, hxy]
   have hxyE : x + V_E < y + V_E := by linarith
@@ -2896,7 +2896,7 @@ construction of source Brier. -/
           (residualVarianceFromSourceWeights m Pop.source) =
         r2FromSourceWeights m Pop.source := by
     unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
-      r2FromSourceWeights
+      r2FromSourceWeights Descent.Core.share
     field_simp [h_source_ne]
     ring
   rw [hr2]
@@ -3013,7 +3013,7 @@ construction of transported Brier. -/
           (residualVarianceFromSourceWeights m Pop.target) =
         r2FromSourceWeights m Pop.target := by
     unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
-      r2FromSourceWeights
+      r2FromSourceWeights Descent.Core.share
     field_simp [h_eff_ne]
     -- The residual variance is `Y - X`, so the denominator is `X + (Y - X)`.
     -- `ring` alone cannot finish: after collapsing that to `Y` the goal is
@@ -4418,7 +4418,7 @@ theorem portability_ratio_with_target_ld_decay_any_source
     unfold realWorldPGSVariance
     simpa [mul_assoc] using mul_pos (mul_pos hRhoS_pos (by linarith : 0 < 1 - fstS)) hVA
   have h_den_pos : 0 < r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
-    unfold r2FromSignalVariance
+    unfold r2FromSignalVariance Descent.Core.share
     exact div_pos hsource_sig_pos (by linarith)
   -- Divide both sides by positive denominator
   simpa [div_eq_mul_inv] using
@@ -4465,7 +4465,7 @@ theorem portability_ratio_with_ld_decay
     have h1s : 0 < 1 - fstS := by linarith
     exact mul_pos hVA h1s
   have hR2Source_pos : 0 < r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
-    unfold r2FromSignalVariance
+    unfold r2FromSignalVariance Descent.Core.share
     have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
     exact div_pos hSourcePos hden
   have hL :
@@ -4521,7 +4521,7 @@ theorem portability_ratio_lt_one_of_positive_drift
   -- Source positivity is not a hypothesis: `fstS < fstT ≤ 1` already forces
   -- `0 < 1 - fstS`, and the signal variance is `V_A * (1 - fstS)`.
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
-    unfold presentDayR2 r2FromSignalVariance
+    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstS := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstS := by linarith
@@ -4551,7 +4551,7 @@ theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
-    unfold presentDayR2 r2FromSignalVariance
+    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
@@ -5290,11 +5290,11 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
       equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
   have h_total : 0 < vSignal + vEnv := add_pos_of_nonneg_of_pos h_signal h_env
   have h_r2_lt : r2FromSignalVariance vSignal vEnv < 1 := by
-    unfold r2FromSignalVariance
+    unfold r2FromSignalVariance Descent.Core.share
     exact (div_lt_one h_total).2 (lt_add_of_pos_right vSignal h_env)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2_lt]
   rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv (ne_of_gt h_env)]
-  unfold equalVarianceGaussianAUCFromSNR r2FromSignalVariance
+  unfold equalVarianceGaussianAUCFromSNR r2FromSignalVariance Descent.Core.share
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
   -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
@@ -5713,12 +5713,12 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     linarith
   have hve_ne : V_E ≠ 0 := ne_of_gt hVE
   have hr2_lt : presentDayR2 V_A V_E fst < 1 := by
-    unfold presentDayR2 r2FromSignalVariance
+    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
     exact (div_lt_one (add_pos hv_pos hVE)).2 (lt_add_of_pos_right _ hVE)
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
-    unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise
+    unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise Descent.Core.share
     field_simp [hsum_ne, hve_ne]
     ring
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
@@ -6395,7 +6395,7 @@ Therefore the divergence (fraction of covariance lost) is:
     factors are independent: frequency drift scales per-locus genetic variance,
     while LD decay scales tagging efficiency. -/
 noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
-  freq_corr * ld_overlap
+  Descent.Core.product freq_corr ld_overlap
 
 /-- The covariance-retention factor `1 - F_ST`.
 
@@ -6469,12 +6469,13 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     correlation. The same body `1 - fst` appears under names from 'correlation',
     'retention' and 'drift factor', and the formula alone does not fix which is
     meant; `alleleFreqCorrelation` is the correlation. -/
-noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
+noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ :=
+  Descent.Core.complement fst
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem covarianceRetentionFactorFromFst_at_reference_point :
     covarianceRetentionFactorFromFst (1 / 2) = 1 / 2 := by
-  unfold covarianceRetentionFactorFromFst
+  unfold covarianceRetentionFactorFromFst Descent.Core.complement
   norm_num
 
 /-- **The allele-frequency correlation between two drifted demes.**
@@ -6535,7 +6536,7 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     alleleFreqCorrelation fst varAncestral meanHetAncestral =
         covarianceRetentionFactorFromFst fst ↔
       varAncestral * fst = (1 - fst) * fst * meanHetAncestral := by
-  unfold alleleFreqCorrelation covarianceRetentionFactorFromFst
+  unfold alleleFreqCorrelation covarianceRetentionFactorFromFst Descent.Core.complement
   rw [div_eq_iff hden]
   constructor <;> intro h <;> nlinarith [h]
 
@@ -6579,7 +6580,7 @@ theorem ldOverlapFromSharedLD_at_reference_point :
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
     covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld) =
       (1 - fst) * shared_ld := by
-  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
   ring
 
 /-- **Covariance divergence derived from retention.**
@@ -6791,7 +6792,7 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
-  unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance
+  unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance Descent.Core.share
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst_lt hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld :=
@@ -7816,12 +7817,13 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
     panmictic control passes at 0.956 against 1.
     -/
 noncomputable def sharedLD_from_equilibrium (m c : ℝ) : ℝ :=
-  m / (m + c)
+  Descent.Core.share m c
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem sharedLD_from_equilibrium_at_reference_point :
     sharedLD_from_equilibrium 1 1 = 1 / 2 := by
-  norm_num [sharedLD_from_equilibrium]
+  norm_num [sharedLD_from_equilibrium,
+      Descent.Core.share]
 
 /-- **Complete linkage: the shared fraction is 1.** Two sites that never
 recombine apart carry the same ancestral association in both demes however far
@@ -7830,7 +7832,7 @@ could not reach: it answered `4·Nₑ·m/(1 + 4·Nₑ·m)` here, a number that h
 nothing to do with linkage. -/
 theorem sharedLD_from_equilibrium_no_recombination (m : ℝ) (hm : m ≠ 0) :
     sharedLD_from_equilibrium m 0 = 1 := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   rw [add_zero, div_self hm]
 
 /-- **No migration, no shared disequilibrium.** With the demes closed, two
@@ -7838,7 +7840,7 @@ lineages in different demes never meet, so nothing renews the association
 between them. -/
 theorem sharedLD_from_equilibrium_no_migration (c : ℝ) :
     sharedLD_from_equilibrium 0 c = 0 := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   simp
 
 /-- **Both rates zero, named.** With `m = c = 0` the body is `0/0`, reported as
@@ -7846,7 +7848,7 @@ theorem sharedLD_from_equilibrium_no_migration (c : ℝ) :
 `c → 0` limit above. Consumers must exclude it by requiring `0 < m + c`. -/
 theorem sharedLD_from_equilibrium_both_rates_zero_is_junk :
     sharedLD_from_equilibrium 0 0 = 0 := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   norm_num
 
 /-- **Only the ratio of the two rates is read.** Scaling migration and
@@ -7856,7 +7858,7 @@ the invariance the old body did not have and the new one must be tested against
 -- a design that scales `m` alone moves it, and one that scales both does not. -/
 theorem sharedLD_from_equilibrium_scale_invariant (k m c : ℝ) (hk : k ≠ 0) :
     sharedLD_from_equilibrium (k * m) (k * c) = sharedLD_from_equilibrium m c := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   rw [← mul_add, mul_div_mul_left _ _ hk]
 
 /-- **Tighter linkage shares more.** Strictly decreasing in the recombination
@@ -7865,7 +7867,7 @@ orders of magnitude in `c`, and the direction no function of `F_ST` has at all. 
 theorem sharedLD_from_equilibrium_decreasing_in_recombination
     (m c₁ c₂ : ℝ) (hm : 0 < m) (hc₁ : 0 ≤ c₁) (hlt : c₁ < c₂) :
     sharedLD_from_equilibrium m c₂ < sharedLD_from_equilibrium m c₁ := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   have h₁ : 0 < m + c₁ := by linarith
   have h₂ : 0 < m + c₂ := by linarith
   rw [div_lt_div_iff₀ h₂ h₁]
@@ -7876,7 +7878,7 @@ fixed recombination. -/
 theorem sharedLD_from_equilibrium_increasing_in_migration
     (m₁ m₂ c : ℝ) (hc : 0 < c) (hm₁ : 0 ≤ m₁) (hlt : m₁ < m₂) :
     sharedLD_from_equilibrium m₁ c < sharedLD_from_equilibrium m₂ c := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   have h₁ : 0 < m₁ + c := by linarith
   have h₂ : 0 < m₂ + c := by linarith
   rw [div_lt_div_iff₀ h₁ h₂]
@@ -7885,13 +7887,13 @@ theorem sharedLD_from_equilibrium_increasing_in_migration
 /-- **It is a fraction.** Nonnegative for nonnegative rates. -/
 theorem sharedLD_from_equilibrium_nonneg (m c : ℝ) (hm : 0 ≤ m) (hc : 0 ≤ c) :
     0 ≤ sharedLD_from_equilibrium m c := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   exact div_nonneg hm (by linarith)
 
 /-- **It is a fraction: below one whenever the loci can recombine apart.** -/
 theorem sharedLD_from_equilibrium_lt_one (m c : ℝ) (hm : 0 ≤ m) (hc : 0 < c) :
     sharedLD_from_equilibrium m c < 1 := by
-  unfold sharedLD_from_equilibrium
+  unfold sharedLD_from_equilibrium Descent.Core.share
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -7939,14 +7941,14 @@ theorem sharedLD_from_equilibrium_lt_one (m c : ℝ) (hm : 0 ≤ m) (hc : 0 < c)
     unfalsifiable, the interpretation is not, and the interpretation is what
     downstream consumers use. -/
 noncomputable def sharedLDFromMigration (M : ℝ) : ℝ :=
-  M / (1 + M)
+  Descent.Core.saturation M
 
 /-- **sharedLDFromMigration at `M = -1`, named.** A negative scaled migration rate is
 inadmissible; the divisor vanishes there and the shared disequilibrium is reported as zero, which
 is what complete isolation also gives. Consumers must exclude it by hypothesis. -/
 theorem sharedLDFromMigration_negative_unit_migration_is_junk :
     sharedLDFromMigration (-1) = 0 := by
-  unfold sharedLDFromMigration
+  unfold sharedLDFromMigration Descent.Core.saturation
   norm_num
 
 /-- **The migration shared-LD map and the coalescent `F_ST` map are one function.**
@@ -7967,7 +7969,7 @@ theorem sharedLDFromMigration_eq_fstFromTau (M : ℝ) :
     `4·Nₑ·m` may be fed to this map as a shared-LD fraction. -/
 theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (m c : ℝ) (hc : 0 < c) :
     sharedLD_from_equilibrium m c = sharedLDFromMigration (m / c) := by
-  unfold sharedLD_from_equilibrium sharedLDFromMigration
+  unfold sharedLD_from_equilibrium sharedLDFromMigration Descent.Core.share Descent.Core.saturation
   have hc' : c ≠ 0 := ne_of_gt hc
   have h1 : 1 + m / c = (m + c) / c := by field_simp; ring
   rw [h1]
@@ -7983,13 +7985,13 @@ theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (m c : ℝ) (hc : 0 <
 /-- Shared LD fraction is nonneg for nonneg M. -/
 theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
     0 ≤ sharedLDFromMigration M := by
-  unfold sharedLDFromMigration
+  unfold sharedLDFromMigration Descent.Core.saturation
   exact div_nonneg hM (by linarith)
 
 /-- Shared LD fraction is at most 1. -/
 theorem sharedLDFromMigration_lt_one (M : ℝ) (hM : 0 ≤ M) :
     sharedLDFromMigration M < 1 := by
-  unfold sharedLDFromMigration
+  unfold sharedLDFromMigration Descent.Core.saturation
   rw [div_lt_one (by linarith : 0 < 1 + M)]
   linarith
 
@@ -7998,7 +8000,7 @@ theorem sharedLDFromMigration_lt_one (M : ℝ) (hM : 0 ≤ M) :
 theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
     (hM₁ : 0 < M₁) (h_more : M₁ < M₂) :
     sharedLDFromMigration M₁ < sharedLDFromMigration M₂ := by
-  unfold sharedLDFromMigration
+  unfold sharedLDFromMigration Descent.Core.saturation
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
@@ -8008,7 +8010,7 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
     fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1 := by
   unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate
-    Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.saturation
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
   have hden' : 1 + Ne * m * 4 ≠ 0 := by intro hc; apply hden; linarith
   field_simp
@@ -8192,7 +8194,7 @@ theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
-    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.saturation
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
   ring
@@ -8227,7 +8229,7 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.saturation
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
   ring
@@ -8264,7 +8266,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy at h1 h2
+    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.saturation at h1 h2
   norm_num at h1 h2
   linarith
 
@@ -8525,7 +8527,7 @@ theorem asymmetric_migration_portability_directionless
     defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic
     mean and says -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
-  (m₁₂ + m₂₁) / 2
+  Descent.Core.midpoint m₁₂ m₂₁
 
 /-- **The arithmetic mean used here is never below the harmonic mean**, with equality
 exactly when the two directional rates agree. This is AM-GM-HM for two positive reals, and
@@ -8533,7 +8535,7 @@ it fixes the sign of the discrepancy between the two means. -/
 theorem harmonicMigrationMean_le_effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ)
     (h₁ : 0 < m₁₂) (h₂ : 0 < m₂₁) :
     2 * m₁₂ * m₂₁ / (m₁₂ + m₂₁) ≤ effectiveSymmetricMigration m₁₂ m₂₁ := by
-  unfold effectiveSymmetricMigration
+  unfold effectiveSymmetricMigration Descent.Core.midpoint
   rw [div_le_div_iff₀ (by linarith) (by norm_num : (0:ℝ) < 2)]
   nlinarith [sq_nonneg (m₁₂ - m₂₁)]
 
@@ -8548,7 +8550,7 @@ theorem harmonicMigrationMean_eq_iff_symmetric (m₁₂ m₂₁ : ℝ)
     m₁₂ = m₂₁ := by
   have hsum : (0 : ℝ) < m₁₂ + m₂₁ := by linarith
   have hne : m₁₂ + m₂₁ ≠ 0 := ne_of_gt hsum
-  unfold effectiveSymmetricMigration at heq
+  unfold effectiveSymmetricMigration Descent.Core.midpoint at heq
   field_simp at heq
   have hsq : (m₁₂ - m₂₁) ^ 2 = 0 := by nlinarith [heq]
   have hzero : m₁₂ - m₂₁ = 0 := sq_eq_zero_iff.mp hsq
@@ -8576,7 +8578,7 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ)
     (h_asym : m₂₁ < m₁₂) :
     m₂₁ < effectiveSymmetricMigration m₁₂ m₂₁ ∧
     effectiveSymmetricMigration m₁₂ m₂₁ < m₁₂ := by
-  unfold effectiveSymmetricMigration
+  unfold effectiveSymmetricMigration Descent.Core.midpoint
   constructor <;> linarith
 
 /-! ### 7. Recent migration (admixture): transient LD from migration pulses -/

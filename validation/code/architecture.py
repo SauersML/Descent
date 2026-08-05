@@ -183,10 +183,18 @@ def gate_duplicate_bodies(code):
     """Alpha-equivalent definition bodies: the same map under a second name.
 
     Binder names are replaced positionally, so `1 - a/b` and `1 - x/y` collide.
-    A collision is not automatically a defect -- four names for `(1-r)^t` is four
-    referents and the corpus is right to keep them -- but each collision must be
-    a WRAPPER over a shared kernel rather than a re-typed body, and a wrapper's
-    body mentions the kernel, so it does not collide with anything.
+
+    A collision is not automatically a defect: four names for `(1-r)^t` is four
+    REFERENTS, and the corpus is right to keep them -- `admixtureLDDecay` carries
+    a measured one-sided bias a bare primitive has nowhere to put. What matters
+    is whether the shared shape is in the BODIES or only in a census.
+
+    So a body that calls a `Core` kernel is not counted. Three definitions whose
+    bodies all read `Core.geometricDecay r t` are the repaired state, not the
+    defect -- an edit to the kernel reaches all three by construction. An earlier
+    version of this gate counted them, which would have penalised exactly the fix
+    it exists to encourage. What is counted is a body that RE-TYPES a shape some
+    other body also re-types, with nothing joining them.
     """
     bodies = collections.defaultdict(list)
     head = re.compile(
@@ -223,7 +231,7 @@ def gate_duplicate_bodies(code):
             for k, b in enumerate(binders):
                 norm = re.sub(r"(?<![\w'.])" + re.escape(b) + r"(?![\w'])",
                               "@%d" % k, norm)
-            if "@" in norm:
+            if "@" in norm and "Descent.Core." not in norm:
                 bodies[norm].append((name, mod))
     groups = [v for v in bodies.values() if len(v) > 1]
     return sum(len(v) - 1 for v in groups), len(groups)

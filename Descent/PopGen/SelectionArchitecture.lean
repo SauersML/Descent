@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.DemographicHistory
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -53,14 +54,14 @@ section StabilizingSelection
 
     Power: the prediction spans 0.10000 to 0.50000 across the design. -/
 noncomputable def equilibriumEffectVariance (v_mutation s : ℝ) : ℝ :=
-  v_mutation / s
+  Descent.Core.ratio v_mutation s
 
 /-- **equilibriumEffectVariance at zero s, named.** Without selection there is no equilibrium:
 mutational input accumulates without bound. Lean returns `0`, reporting no standing variance where
 the truth is unbounded standing variance. Consumers must require `s ≠ 0`. -/
 theorem equilibriumEffectVariance_zero_s_is_junk (v_mutation : ℝ) :
     equilibriumEffectVariance v_mutation 0 = 0 := by
-  unfold equilibriumEffectVariance
+  unfold equilibriumEffectVariance Descent.Core.ratio
   simp
 
 /-- **Selection removes exactly the standing variance it is charged with.**
@@ -72,14 +73,14 @@ the form `c · v_mutation / s`, whatever `c` is, because the same `c` appears on
 identity fixes it at one. -/
 theorem equilibriumEffectVariance_mul_selection (v_mutation s : ℝ) (h : s ≠ 0) :
     equilibriumEffectVariance v_mutation s * s = v_mutation := by
-  unfold equilibriumEffectVariance
+  unfold equilibriumEffectVariance Descent.Core.ratio
   field_simp
 
 /-- The algebraic equilibrium vanishes exactly when mutational input or selection strength
 vanishes. The `s = 0` branch is the named junk boundary above, not a biological equilibrium. -/
 theorem equilibriumEffectVariance_eq_zero_iff (v_mutation s : ℝ) :
     equilibriumEffectVariance v_mutation s = 0 ↔ v_mutation = 0 ∨ s = 0 := by
-  unfold equilibriumEffectVariance
+  unfold equilibriumEffectVariance Descent.Core.ratio
   constructor
   · intro h
     by_cases h_s : s = 0
@@ -126,7 +127,7 @@ noncomputable def effectVarianceRecurrence (V v_mut s : ℝ) : ℝ :=
 theorem effectVarianceRecurrence_eq_self_iff
     (V v_mut s : ℝ) (hs : s ≠ 0) :
     effectVarianceRecurrence V v_mut s = V ↔ V = equilibriumEffectVariance v_mut s := by
-  unfold effectVarianceRecurrence equilibriumEffectVariance
+  unfold effectVarianceRecurrence equilibriumEffectVariance Descent.Core.ratio
   rw [eq_div_iff hs]
   constructor <;> intro h <;> nlinarith
 
@@ -145,7 +146,7 @@ theorem equilibriumEffectVariance_lt_of_selection_lt
     (h_s₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :
     equilibriumEffectVariance v_mutation s₂ < equilibriumEffectVariance v_mutation s₁ := by
-  unfold equilibriumEffectVariance
+  unfold equilibriumEffectVariance Descent.Core.ratio
   exact div_lt_div_of_pos_left h_vm h_s₁ h_stronger
 
 /-- **Effect correlation under stabilizing selection.**
@@ -222,12 +223,13 @@ is whether real architectures allocate equally, and that is a claim about the IN
 takes, not about this map. -/
 noncomputable def polygenicAveragingVariance (architectureVariance : ℝ)
     (locusCount : ℕ) : ℝ :=
-  architectureVariance / locusCount
+  Descent.Core.ratio architectureVariance locusCount
 
 /-- The polygenic averaging scale is pinned at four equal loci. -/
 theorem polygenicAveragingVariance_at_reference_point :
     polygenicAveragingVariance 1 4 = 1 / 4 := by
-  norm_num [polygenicAveragingVariance]
+  norm_num [polygenicAveragingVariance,
+      Descent.Core.ratio]
 
 /-- A positive architecture variance contributes strictly less per locus when spread over
 strictly more nonzero causal loci. -/
@@ -369,7 +371,8 @@ noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) :
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem stabilizingSelectedArchitectureVariance_at_reference_point :
     stabilizingSelectedArchitectureVariance 1 1 = 1 := by
-  norm_num [stabilizingSelectedArchitectureVariance, equilibriumEffectVariance]
+  norm_num [stabilizingSelectedArchitectureVariance, equilibriumEffectVariance,
+      Descent.Core.ratio]
 
 
 
@@ -406,7 +409,8 @@ noncomputable def fluctuatingSelectedArchitectureVariance
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
     fluctuatingSelectedArchitectureVariance 1 1 1 1 = 3 / 2 := by
-  norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance]
+  norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance,
+      Descent.Core.ratio]
 
 
 theorem effectCorrelationStabilizing_pos_iff
@@ -430,7 +434,7 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
       fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta tau := by
   unfold stabilizingSelectedArchitectureVariance
     fluctuatingSelectedArchitectureVariance optimumOUVariance
-    equilibriumEffectVariance
+    equilibriumEffectVariance Descent.Core.ratio
   have h_extra : 0 < sigmaTheta ^ 2 * tau / 2 := by
     have hsq : 0 < sigmaTheta ^ 2 := sq_pos_of_pos h_sigma
     nlinarith
@@ -875,7 +879,8 @@ noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
-  norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
+  norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
+      Descent.Core.product]
 
 
 /-- GWAS non-centrality vanishes exactly for an empty study, null effect, or
@@ -929,7 +934,7 @@ theorem ncp_ratio_from_maf
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
-  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
+  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
   simp only [mul_one]
   apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
   apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hn)
