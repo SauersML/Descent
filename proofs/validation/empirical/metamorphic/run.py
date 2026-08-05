@@ -351,7 +351,17 @@ def analyse(table, callable_for, R_=None):
                        if len(fails) > 3 else ""))
 
     # 5. cross-body agreements: execute the equalities the corpus proves.
-    for left, right, theorem, note in getattr(R_, "AGREEMENTS", ()):
+    for entry in getattr(R_, "AGREEMENTS", ()):
+        # A fifth element, when present, permutes the RIGHT body's arguments to
+        # match the left's. Positional comparison is not enough: the corpus's
+        # strongest proved equality relates `multiAncestryEffectiveN
+        # (n_target, rg, n_other, priorVariance)` to
+        # `multiTraitEffectiveSampleSize (n₁, n₂, rg, priorVariance)`, the same
+        # function with two arguments transposed. Comparing them positionally
+        # would have manufactured a disagreement out of the argument ORDER and
+        # reported it as a body divergence.
+        left, right, theorem, note = entry[:4]
+        order = entry[4] if len(entry) > 4 else None
         missing = [n for n in (left, right) if n not in table]
         if missing:
             findings.append(
@@ -371,12 +381,18 @@ def analyse(table, callable_for, R_=None):
                 f"AGREEMENT ARITY: {left}{al} and {right}{ar} are paired by "
                 f"{theorem} but take different numbers of arguments.")
             continue
+        if order is not None and sorted(order) != list(range(len(al))):
+            findings.append(
+                f"BAD AGREEMENT ORDER: {theorem} gives {order} for {right}, "
+                f"which is not a permutation of 0..{len(al) - 1}.")
+            continue
         agreed += 1
         for k in range(len(GRID_POINTS)):
             point = _assign(al, k)
             args = [float(point[a]) for a in al]
+            rargs = args if order is None else [args[i] for i in order]
             try:
-                gl, gr = fl(*args), fr(*args)
+                gl, gr = fl(*args), fr(*rargs)
             except (ZeroDivisionError, ValueError, OverflowError):
                 continue
             if not _close(gl, gr):

@@ -319,15 +319,25 @@ def agreements_integrity():
     """The cross-body agreement list must name real theorems and real reasons,
     and must not pair a definition with itself -- which would pass always and
     check nothing."""
-    for left, right, theorem, note in getattr(R, "AGREEMENTS", ()):
+    for entry in getattr(R, "AGREEMENTS", ()):
+        left, right, theorem, note = entry[:4]
+        order = entry[4] if len(entry) > 4 else None
         expect(left != right,
                f"AGREEMENT pairs {left} with itself; it can never fail")
-        expect("." in theorem and len(theorem) > 8,
-               f"AGREEMENT {left} vs {right} names no Lean theorem "
-               f"({theorem!r}); an executed equality must say which proof it "
-               f"is executing")
+        # Either it names a Lean theorem, or it says explicitly that no theorem
+        # relates the pair -- a recorded FORK. What must not happen is a blank
+        # or a vague field, which would read as a proof that does not exist.
+        expect(("." in theorem and len(theorem) > 8)
+               or theorem.startswith("NO THEOREM RELATES THESE"),
+               f"AGREEMENT {left} vs {right} names neither a Lean theorem nor "
+               f"an explicit absence ({theorem!r}); an executed equality must "
+               f"say whether it is executing a proof or recording a fork")
         expect(len(note) > 40,
                f"AGREEMENT {left} vs {right} has no substantive note")
+        expect(order is None
+               or sorted(order) == list(range(len(order))),
+               f"AGREEMENT {left} vs {right} has argument order {order}, which "
+               f"is not a permutation")
 
 
 def no_stale_excuses():

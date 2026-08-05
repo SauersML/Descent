@@ -1764,6 +1764,46 @@ NOT_EXTRACTABLE = {
 # ---------------------------------------------------------------------------
 
 AGREEMENTS = [
+    # An optional FIFTH element permutes the right body's arguments onto the
+    # left's. Needed because two definitions can be the same function with their
+    # arguments in a different order, and comparing those positionally would
+    # manufacture a disagreement out of the ORDER and report it as a divergence
+    # of the bodies.
+    ("Calibrator.multiTraitEffectiveSampleSize",
+     "Calibrator.multiAncestryEffectiveN",
+     "GeneticArchitectureDiscovery.multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN",
+     "Borrowing across TRAITS and borrowing across ANCESTRIES are the same "
+     "inverse-variance arithmetic, and the corpus proves it unrestrictedly. The "
+     "prior-variance term was derived on the ancestry side -- it is what "
+     "reproduces the cells the old body missed by 2.3%, 5.0%, 12% and 31% -- and "
+     "BayesianPGSTheory says of the trait-side body, in as many words, that it "
+     "'is the SAME formula and inherits this'. The two are the same expression "
+     "up to the name and ORDER of their arguments, which is exactly why both "
+     "names are kept and why this entry needs the permutation below: they are "
+     "MEASURED separately, against different designs, and this is what catches "
+     "them drifting apart. One arity change was repaired twice in opposite "
+     "directions today and left main with a three-argument call against a "
+     "four-argument definition; that is the failure this executes against.",
+     (0, 2, 1, 3)),
+
+    # PROVED EQUAL BY NOBODY. These two are pointwise identical and no theorem
+    # relates them, which makes them a FORK: two names for one body, free to
+    # drift with nothing watching. The F_ST family cost this corpus three
+    # separate repairs for exactly that reason. Recorded here so the divergence
+    # is caught even though the corpus has not claimed the equality -- and the
+    # theorem field says so rather than naming a proof that does not exist.
+    ("Calibrator.brierFromR2", "Calibrator.sourceBrierFromR2",
+     "NO THEOREM RELATES THESE (recorded as a fork, not as a proved equality)",
+     "Both are `TransportedMetrics.calibratedBrier π r2` with the same argument "
+     "order, in the same module, differing only in whether the R² is called the "
+     "source's. Nothing in the corpus states they are equal, so nothing would "
+     "notice if one were corrected and the other left behind -- which is the "
+     "precise shape of the alleleFreqMismatchPenalty repair earlier today, where "
+     "one body was fixed and two callers had to be decoupled by hand. If the "
+     "distinction is real, one of them should carry the source-specific content "
+     "that justifies the second name; if it is not, one should be deleted.",
+     None),
+
     ("Calibrator.neiGst", "Calibrator.neiGstFromFrequencies",
      "Conventions.neiGstFromFrequencies_eq_neiGst",
      "The corpus's two spellings of Nei's G_ST: `1 - H_S/H_T` and "
@@ -1772,5 +1812,6 @@ AGREEMENTS = [
      "behaviour differs by eleven orders of magnitude as p₁ -> p₂ (see "
      "precision/precision_map.py). On the benign grid used here they must agree "
      "to rounding; that they do is what localises the precision finding to the "
-     "cancellation rather than to a disagreement between the bodies."),
+     "cancellation rather than to a disagreement between the bodies.",
+     None),
 ]
