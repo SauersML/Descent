@@ -45,13 +45,13 @@ standardized allele-frequency contrast between the two subgroups.
 This is the level of the exact Nei-normalized allele-frequency contrast. It is
 written as a quantity rather than as an ambiguously named `F_ST` multiple:
 `contrastSpikeLevel_eq_four_neiGst` derives it from
-`Conventions.four_neiGst_eq_standardizedContrastVariance` instead of
+`Core.four_neiGst_eq_standardizedContrastVariance` instead of
 stipulating it.
 
     Empirical status: DERIVED as an identity for Nei's `G_ST`; distinct from
     the empirically validated Hudson BBP level. -/
 noncomputable def contrastSpikeLevel (p₁ p₂ : ℝ) : ℝ :=
-  (p₁ - p₂) ^ 2 / (Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂))
+  (p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))
 
 /-- **contrastSpikeLevel at its junk point, named.** The divisor is `p̄ (1 - p̄)` inside
 `meanAlleleFreq`, which vanishes when both populations are fixed. Numerator and denominator
@@ -61,7 +61,7 @@ reading this line does not reveal that a branch exists. Consumers must exclude t
 makes the guard vanish. -/
 theorem contrastSpikeLevel_monomorphic_is_junk :
     contrastSpikeLevel 0 0 = 0 := by
-  unfold contrastSpikeLevel Program.meanAlleleFreq Descent.Core.midpoint
+  unfold contrastSpikeLevel Descent.Core.meanAlleleFreq Descent.Core.midpoint
   norm_num
 
 /-- **No contrast, no spike.** Two populations at the same allele frequency produce a level of
@@ -74,10 +74,10 @@ theorem contrastSpikeLevel_self (p : ℝ) :
 
 /-- **The level is four times Nei's `G_ST`, derived rather than stipulated.** -/
 theorem contrastSpikeLevel_eq_four_neiGst (p₁ p₂ : ℝ)
-    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0) :
-    contrastSpikeLevel p₁ p₂ = 4 * Program.neiGst p₁ p₂ := by
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
+    contrastSpikeLevel p₁ p₂ = 4 * Descent.Core.neiGst p₁ p₂ := by
   unfold contrastSpikeLevel
-  exact (Program.four_neiGst_eq_standardizedContrastVariance p₁ p₂ h).symm
+  exact (Descent.Core.four_neiGst_eq_standardizedContrastVariance p₁ p₂ h).symm
 
 /-- **The exact Nei contrast law composed with the certificate load.**
 
@@ -88,7 +88,7 @@ subgroup-contrast direction is the load, pinned to `effectiveSubgroupSize` by
 numeral appears. -/
 theorem neiContrastSpike_eq_contrastSpikeLevel_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       contrastSpikeLevel p₁ p₂ *
@@ -108,10 +108,10 @@ subgroup-contrast direction, pinned by `dot_demographicSpikeDirection`.  Both
 factors are quantities rather than names, and their equality is proved directly. -/
 theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (h : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      ((p₁ - p₂) ^ 2 / (Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂))) *
+      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [Program.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
@@ -122,7 +122,7 @@ theorem hudsonBbpSpike_eq_level_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      (4 * Program.hudsonFst p₁ p₂) *
+      (4 * Descent.Core.hudsonFst p₁ p₂) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
@@ -135,10 +135,10 @@ wrong differentiation estimator. -/
 theorem hudsonBbpSpike_eq_nei_conversion_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
-    (hbar : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0)
+    (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      (8 * Program.neiGst p₁ p₂ / (1 + Program.neiGst p₁ p₂)) *
+      (8 * Descent.Core.neiGst p₁ p₂ / (1 + Descent.Core.neiGst p₁ p₂)) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
@@ -151,9 +151,9 @@ rescales the complete PC-correction certificate, not merely a descriptive scalar
 theorem hudsonBbpSpike_eq_nei_multiplier_mul_neiContrastSpike
     (N m p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
-    (hbar : Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂) ≠ 0) :
+    (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
     Program.hudsonBbpSpike N m p₁ p₂ =
-      (2 / (1 + Program.neiGst p₁ p₂)) * Program.neiContrastSpike N m p₁ p₂ := by
+      (2 / (1 + Descent.Core.neiGst p₁ p₂)) * Program.neiContrastSpike N m p₁ p₂ := by
   rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
     N m p₁ p₂ hpos hbar]
   unfold Program.neiContrastSpike Portability.demographicSpike
@@ -181,15 +181,15 @@ inside the budget.  Nothing here is a spectral quantity: `bbpProxyThreshold`
 does not appear, because the imitation question does not involve it. -/
 theorem hudsonCalibrated_stratification_imitable_if_within_budget
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
-    (hfst : 0 ≤ Program.hudsonFst p₁ p₂)
+    (hfst : 0 ≤ Descent.Core.hudsonFst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : Blindness.VarianceNonneg (S₀ - base))
     (hbudget : Portability.traceForm S₀ +
       Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
     (Portability.traceWindowBudgetClass base budget).IsNull
-      ((Portability.traceWindowBudgetClass base budget).spiked S₀ (4 * Program.hudsonFst p₁ p₂)
+      ((Portability.traceWindowBudgetClass base budget).spiked S₀ (4 * Descent.Core.hudsonFst p₁ p₂)
         (Portability.demographicSpikeDirection N m)) :=
-  Portability.imitable_within_traceWindowBudget m (Program.hudsonFst p₁ p₂)
+  Portability.imitable_within_traceWindowBudget m (Descent.Core.hudsonFst p₁ p₂)
     hfst hmn hN base S₀ budget hbase hbudget
 
 /-- **The correction to the empirically Hudson-calibrated
@@ -203,14 +203,14 @@ quantity omits. -/
 theorem hudsonCalibrated_rigid_pcCorrectabilityMargin_is_the_criterion
     {N : ℕ} (m : ℕ) (p₁ p₂ markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
-    0 < Portability.pcCorrectabilityMargin (N : ℝ) markerCount (Program.hudsonFst p₁ p₂) (m : ℝ) ↔
+    0 < Portability.pcCorrectabilityMargin (N : ℝ) markerCount (Descent.Core.hudsonFst p₁ p₂) (m : ℝ) ↔
       (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).bound a +
           Portability.bbpProxyThreshold (N : ℝ) markerCount <
         (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).form a
           ((Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).spiked S₀
-            (4 * Program.hudsonFst p₁ p₂) (Portability.demographicSpikeDirection N m)) :=
+            (4 * Descent.Core.hudsonFst p₁ p₂) (Portability.demographicSpikeDirection N m)) :=
   Portability.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos m
-    (Program.hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
+    (Descent.Core.hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
 
 end DemographicCapacity
 

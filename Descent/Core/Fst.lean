@@ -514,4 +514,411 @@ theorem hweHeterozygosity_allele_swap (p : ℝ) :
     hweHeterozygosity (1 - p) = hweHeterozygosity p := by
   unfold hweHeterozygosity; ring
 
+/-! ## The two estimators on allele frequencies
+
+`hudsonFromTau` and `hudsonOfNei` above wrap the two estimators as one-field types and
+relate them at that level.  What follows is the same pair written on the arguments the
+data actually supplies -- a pair of subgroup allele frequencies -- together with the
+witnesses that they are two functions and not two spellings of one.
+
+These arrived here from `Program.Conventions`, which is where the corpus put statements it
+could only make after importing everything.  None of them needed that.  `neiGst`,
+`hudsonFst`, `meanAlleleFreq` and `betweenSubgroupVariance` are built from `ploidy`,
+`midpoint` and `halfDiffSq` and from nothing else, so their home is here, below the
+subsystems that consume them, and a module wanting Hudson's `F_ST` no longer has to import
+the audit layer at the top of the graph to get it. -/
+
+/-- Mean allele frequency across two subgroups of equal weight.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM. This file exists to fix conventions, and the
+    equal-weight arithmetic mean is one: `(p₁ + p₂)/2` DEFINES what "the mean frequency"
+    denotes downstream rather than predicting anything a sample could refute. The empirical
+    consequence of choosing equal weights over sample-size weights shows up in the `F_ST`
+    that consumes it, and the note below records that `effectiveSymmetricMigration` must
+    share this convention or the two disagree. -/
+noncomputable def meanAlleleFreq (p₁ p₂ : ℝ) : ℝ :=
+  midpoint p₁ p₂
+
+/-- **The mean allele frequency is unweighted, pinned.** The identity with the symmetric
+migration map constrains the two definitions jointly. Taken alone: a fixed and an absent allele
+average to one half, which fixes the two-population mean as the arithmetic midpoint. -/
+theorem meanAlleleFreq_fixed_and_absent :
+    meanAlleleFreq 0 1 = 1 / 2 := by
+  unfold meanAlleleFreq midpoint
+  norm_num
+
+/-- **Nei's `G_ST`, explicitly distinguished from Hudson's `F_ST`.** One minus the ratio
+of mean within-subgroup heterozygosity to TOTAL heterozygosity is the
+definition of `G_ST`. Hudson's `F_ST`
+divides by the BETWEEN-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`, not by
+the total-pool `2·p̄·(1-p̄)`. The two denominators differ by exactly
+`(p₁-p₂)²/2`, so THE DENOMINATORS agree iff `p₁ = p₂`, and the two ESTIMATORS
+agree iff `G_ST = 0` or `G_ST = 1` -- that is, only where the differentiation
+is degenerate.
+
+**They agree when `p₁ = p₂`, and NOT when `p̄ = 1/2`**; the second is a tempting
+disjunct and it is false in both readings.
+The denominators differ by `(p₁-p₂)²/2`, which does not vanish at `p̄ = 1/2`;
+and by the corpus's own `hudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,
+which equals `G` only at `G = 0` or `G = 1`. So there is no interior
+`p̄ = 1/2` slice on which the two coincide. Witness, on `p̄ = 1/2` exactly:
+at `p₁ = 0.9, p₂ = 0.1` the Nei denominator is `1`, `G_ST = 0.64`, and Hudson
+is `0.64/0.82 = 0.7805` -- a ratio of `1.22`. Nearer the middle it is worse:
+`1.995` at `(0.525, 0.475)`, `1.923` at `(0.6, 0.4)`, `1.724` at `(0.7, 0.3)`.
+
+The error is worth naming because it is cheap to half-check and wrong: at
+`p̄ = 1/2` the Nei denominator `4·p̄·(1-p̄)` is exactly `1`, which feels like it
+should settle the comparison and does not -- it makes `G_ST = (p₁-p₂)²`, while
+Hudson still divides by `1 - 2p₁p₂`. A DENOMINATOR COINCIDENCE IS NOT AN
+ESTIMATOR COINCIDENCE, and here there was not even a denominator coincidence.
+The claim had propagated into three `checks.py` can-fail clauses and out of the
+corpus into status reporting before anyone tested the slice it names.
+
+    Derivation, since this is decidable without any simulation. With
+    `d = p₁ - p₂` and `p̄ = (p₁+p₂)/2`,
+    `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = d²/2`, so this body is
+    `d² / (4·p̄·(1-p̄))`, which is Nei's `G_ST` and is also exactly the body of
+    `PopulationGeneticsFoundations.neiGstFromFrequencies` --
+    `neiGstFromFrequencies_eq_neiGst` below proves the two agree, and what
+    it actually proves is that both are Nei.
+    Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `hudsonFst` states it and
+    `hudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,
+    `p₂ = 0.6` this body gives `0.1667` where Hudson gives `0.2857`, the
+    +71.4% the differential tier measured against an independent
+    implementation.
+
+    The old `hudsonFst` name on the Nei body was removed rather than retained as
+    a compatibility alias: that alias would preserve the biological category
+    error. The genuine Hudson body now owns `hudsonFst`. Read every `neiGst` in the
+    *contrast-normalization* chain --
+    including `four_neiGst_eq_standardizedContrastVariance` -- as Nei's `G_ST`.
+    The algebra is unaffected: `4·G_ST` is the standardized allele-frequency
+    contrast variance for THIS body. It is not the empirically calibrated BBP
+    spike. That law uses genuine Hudson `F_ST` and is named `hudsonBbpSpike`
+    below. At weak differentiation the latter is almost twice
+    `neiContrastSpike`; silently exchanging them is therefore a biologically
+    material error, not a harmless change of notation.
+
+    **There is no exception at `p̄ = 1/2`. Do not add one.** The factor does not
+    vanish there: measured ratios along that exact slice are `1.995`, `1.923`,
+    `1.724`, `1.220` -- monotone in `|p₁ - p₂|` and never reaching `1`. The
+    identity in this file settles it without any measurement:
+    `hudsonFst_eq_of_neiGst` gives `Hudson = 2G/(1+G)`, which equals `G` only at
+    `G = 0` or `G = 1`. `neiGst_ne_hudsonFst_at_mean_half` certifies it at
+    `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41` -- and exists to stop an
+    "except at `p̄ = 1/2`" caveat being reintroduced.
+
+    Note which witness does the work: `neiGst_ne_hudsonFst` sits at `p̄ = 2/5`,
+    OUTSIDE that slice, and cannot refute a claim about it. A witness outside an
+    exception never refutes the exception.
+
+    **Numerical warning -- this body must not be evaluated as written.** It is
+    `1` minus a ratio that tends to `1` as the two populations become similar,
+    so its floating-point relative error is the machine epsilon divided by the
+    answer. Between human populations `G_ST` is `O(10⁻³)` genome-wide and much
+    smaller at an individual variant, which is exactly the regime that has no
+    digits left. Measured float64 against a 60-digit reference over
+    `p₂ = p₁ + δ` for `p₁ ∈ {0.01, 0.1, 0.3, 0.5}` and `δ` from `10⁻²` down to
+    `10⁻¹⁴`, arguments rounded to float64 FIRST so input representation cannot
+    be charged to the formula: **36 of 52 cells exceed 1e-6 relative error,
+    worst 9.3·10¹¹** -- the returned `G_ST` is wrong by eleven orders of
+    magnitude, and at `δ ≲ 10⁻⁸` it is pure rounding noise of either sign.
+
+    `PopulationGeneticsFoundations.neiGstFromFrequencies` is the SAME quantity
+    written as `(p₁-p₂)² / (4 p̄ (1-p̄))`, with the cancellation done by hand;
+    `neiGstFromFrequencies_eq_neiGst` proves they are equal over `ℝ`. On the
+    same 52 cells that body gives **0 over tolerance, worst 1.9·10⁻¹⁶**. The
+    equality theorem is what makes the substitution safe and it is also what
+    made the difference invisible: two provably equal bodies are not two equally
+    usable programs. Evaluate `neiGstFromFrequencies`; read `neiGst` as the
+    definition of what is being computed.
+
+    Metamorphic relations this body satisfies, all exactly:
+    population relabelling `(p₁, p₂) ↦ (p₂, p₁)`, invariant;
+    reference/alternate allele swap `(p₁, p₂) ↦ (1-p₁, 1-p₂)`, invariant
+    (`neiGst_allele_swap`); and `p₁ = p₂`, zero.
+
+    Empirical status: CONVENTION PINNED (Nei's `G_ST`; the name was corrected with it). -/
+noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
+  (p₁ - p₂) ^ 2 /
+    (ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
+
+/-- **The textbook spelling, kept as a theorem rather than as the body.**
+
+`G_ST = 1 - H_S/H_T` is how the quantity is defined in the literature and it is
+what the name means; it is not how it should be computed. As `p₁ → p₂` the ratio
+tends to `1` and `G_ST` is whatever survives the
+subtraction, so its float64 relative error is machine epsilon divided by the
+answer. Measured float64 against a 60-digit reference over `p₂ = p₁ + δ` for
+`p₁ ∈ {0.01, 0.1, 0.3, 0.5}` and `δ` from `10⁻²` to `10⁻¹⁴`, arguments rounded to
+float64 first: **36 of 52 cells over 1e-6 relative error, worst 9.3·10¹¹** for
+this form, against **0 of 52, worst 1.9·10⁻¹⁶** for the body above. Human `G_ST`
+is `O(10⁻³)` genome-wide and smaller per variant, so the failing region was the
+use case.
+
+The hypothesis is the one point at which the two spellings genuinely differ --
+see `neiGst_at_zero_mean_heterozygosity`. -/
+theorem neiGst_eq_oneMinusRatio (p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    neiGst p₁ p₂ =
+      1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
+        (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
+  unfold neiGst ploidy
+  field_simp
+  unfold meanAlleleFreq midpoint
+  ring
+
+/-- **Two identical monomorphic populations are not differentiated.**
+
+Two populations fixed for the same allele could not be more alike, and the
+statistic reports `0`. This is a real value, not a junk branch: the numerator
+`(p₁ - p₂)²` vanishes with the denominator, so the cancellation-free body is
+defined here by the same algebra that makes it stable elsewhere. Under the
+`1 - H_S/H_T` spelling the ratio divides by zero, Mathlib returns `0`, and the
+statistic reads `1` -- COMPLETE differentiation -- so that spelling requires
+consumers to exclude the point. The stable spelling and the correct boundary are
+the same spelling. -/
+theorem neiGst_at_zero_mean_heterozygosity (p₁ p₂ : ℝ)
+    (hzero : ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) :
+    neiGst p₁ p₂ = 0 := by
+  unfold neiGst
+  rw [hzero, div_zero]
+
+/-- **Hudson's `F_ST` for two subgroups, parametric limit** (Bhatia, Patterson,
+Sankararaman & Price 2013, eq. 10, at infinite sample size):
+
+  `F_ST = (p₁ - p₂)² / (p₁(1-p₂) + p₂(1-p₁))`
+
+The denominator is the probability that two genes drawn from DIFFERENT
+subgroups differ -- the between-subgroup heterozygosity -- which is what makes
+this a ratio of averages and what distinguishes it from Nei's `G_ST`. Added
+alongside `neiGst` rather than replacing it, because the corpus's arithmetic
+is Nei's throughout and changing the arithmetic would silently move every
+downstream number; what was missing was a name for the quantity the corpus kept
+saying it meant.
+
+    Empirical status: VALIDATED -- matches `validation/differential/refs.fst_hudson`, which
+    is checked against scikit-allel. -/
+noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
+  (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
+
+/-- **hudsonFst where its denominator vanishes, named.** The guard `p₁ * (1 - p₂) + p₂ * (1 - p₁)`
+is zero at `p₁ = 0`, `p₂ = 0`. Two populations both fixed for the reference allele have no
+polymorphism to partition. Lean returns `0` there rather than the value the modelled quantity
+takes, and no type error marks the point. Consumers must require `p₁ * (1 - p₂) + p₂ * (1 - p₁)
+≠ 0`. -/
+theorem hudsonFst_at_p0p0_is_junk :
+    hudsonFst 0 0 = 0 := by
+  unfold hudsonFst
+  norm_num
+
+/-- **Hudson's `F_ST` does not care which population is called first.** Both the squared
+frequency difference and the denominator `p₁ + p₂ - 2p₁p₂` are symmetric, so the statistic is
+too. A body that broke this would be measuring a directed quantity under a symmetric name. -/
+theorem hudsonFst_symm (p₁ p₂ : ℝ) : hudsonFst p₁ p₂ = hudsonFst p₂ p₁ := by
+  unfold hudsonFst; ring_nf
+
+/-- Two populations at the same frequency are not differentiated. -/
+theorem hudsonFst_self (p : ℝ) : hudsonFst p p = 0 := by
+  unfold hudsonFst; simp
+
+/-- **Nei's `G_ST` is invariant under the reference/alternate allele swap.** Both the
+within-population heterozygosity `p(1-p)` and the mean-frequency heterozygosity are
+even about `p = 1/2`, so relabelling the alleles cannot move the statistic. -/
+theorem neiGst_allele_swap (p₁ p₂ : ℝ) :
+    neiGst (1 - p₁) (1 - p₂) = neiGst p₁ p₂ := by
+  unfold neiGst meanAlleleFreq midpoint
+  have hnum : ((1 - p₁) - (1 - p₂)) ^ 2 = (p₁ - p₂) ^ 2 := by ring
+  have hden : ploidy ^ 2 * ((1 - p₁ + (1 - p₂)) / 2) * (1 - (1 - p₁ + (1 - p₂)) / 2)
+      = ploidy ^ 2 * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by ring
+  rw [hnum, hden]
+
+/-- **Hudson's `F_ST` is invariant under the reference/alternate allele swap.** The
+numerator is a squared difference and the between-population denominator
+`p₁(1-p₂) + p₂(1-p₁)` is the probability that two genes drawn from different demes
+differ, which is a statement about disagreement and so cannot depend on the labels. -/
+theorem hudsonFst_allele_swap (p₁ p₂ : ℝ) :
+    hudsonFst (1 - p₁) (1 - p₂) = hudsonFst p₁ p₂ := by
+  unfold hudsonFst
+  have hnum : ((1 - p₁) - (1 - p₂)) ^ 2 = (p₁ - p₂) ^ 2 := by ring
+  have hden : (1 - p₁) * (1 - (1 - p₂)) + (1 - p₂) * (1 - (1 - p₁))
+      = p₁ * (1 - p₂) + p₂ * (1 - p₁) := by ring
+  rw [hnum, hden]
+
+/-- **The exact conversion between the two conventions**, which is what turns
+"they disagree by about 72% somewhere in this range" into a statement that
+holds everywhere: `F_ST^Hudson = 2·G_ST / (1 + G_ST)`. Note it is not a
+constant factor -- the discrepancy is 2× as `G_ST → 0` and vanishes as
+`G_ST → 1` -- so no recalibration constant can absorb a convention mix-up.
+
+WHAT IS AND IS NOT NEW HERE, stated so nobody reports the wrong half. THAT NEI
+AND HUDSON DISAGREE IS TEXTBOOK: Bhatia, Patterson, Sankararaman & Price (2013)
+is the standard reference, it is cited on `hudsonFst` above, and the
+disagreement is not a finding of this corpus. What belongs to this development
+is narrower and worth exactly what it is: the algebraic bridge between them
+written down explicitly, MACHINE-CHECKED in Lean rather than asserted, and then
+confirmed numerically against simulation to the last reported digit. A
+well-known fact and a proved identity are different objects, and only the
+second is ours.
+
+    Empirical status: VALIDATED, and it is currently the cleanest
+    theory-to-measurement match in this corpus. Inverting the identity to
+    `G = H/(2 - H)` predicts the Nei estimate from the Hudson estimate on the
+    same simulated data at **0.00% relative error across all eight cells**,
+    while Hudson itself tracks the true `F_ST` (`0.0501` measured against
+    `0.050` simulated). The identity is exact in practice as well as in Lean,
+    which is the strongest form this kind of claim can take: a conversion that
+    is proved and then found to hold to the last reported digit on data it was
+    not fitted to.
+
+    Power: across the eight frequency cells of
+    `validation/empirical/differential/cluster/fam_fst_allel_crosscheck.py`
+    (`(p₁, p₂)` from `(0.70, 0.75)` to `(0.10, 0.90)`) the predicted Nei
+    estimate spans `0.0031` to `0.6400` and the Hudson estimate `0.0063` to
+    `0.7805`, so the ratio between the conventions runs from `2.0` at the
+    small-divergence end to `1.22` at the large one. A conversion off by any
+    constant factor, and any conversion linear in `G`, separates on that
+    design. -/
+theorem hudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
+    (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
+    (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    hudsonFst p₁ p₂ = 2 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂) := by
+  have hne : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0 := ne_of_gt hpos
+  have hmean : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul hbar
+  have hcomp : 1 - meanAlleleFreq p₁ p₂ ≠ 0 := right_ne_zero_of_mul hbar
+  have hD : 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0 :=
+    mul_ne_zero (mul_ne_zero two_ne_zero hmean) hcomp
+  have hlink :
+      (1 + neiGst p₁ p₂) *
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) =
+        p₁ * (1 - p₂) + p₂ * (1 - p₁) := by
+    unfold neiGst ploidy
+    field_simp [hD]
+    unfold meanAlleleFreq midpoint
+    ring
+  have htwo :
+      2 * neiGst p₁ p₂ =
+        (p₁ - p₂) ^ 2 /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+    unfold neiGst ploidy
+    field_simp [hD]
+  have hone :
+      1 + neiGst p₁ p₂ =
+        (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) :=
+    (eq_div_iff hD).2 hlink
+  have hquot :
+      (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
+          (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) ≠ 0 :=
+    div_ne_zero hne hD
+  unfold hudsonFst
+  rw [htwo, hone]
+  field_simp [hne, hD, hquot]
+
+/-- **Witness that the two estimators are different functions**, not two
+spellings of one. Without an exhibited point the conflation can be
+reintroduced by anyone who reads the `neiGst` name and believes it. -/
+theorem neiGst_ne_hudsonFst :
+    neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5) := by
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy
+  norm_num
+
+/-- **A witness ON the `p̄ = 1/2` slice**, where the estimators are sometimes
+claimed to agree. They do not.
+
+`p₁ = 9/10, p₂ = 1/10` has `p̄ = 1/2` exactly. `neiGst` (Nei's `G_ST`) is
+`16/25` and `hudsonFst` is `(16/25)/(41/50)`, a ratio of `50/41 ≈ 1.22`.
+The false claim is therefore refuted at a point, not merely argued against:
+`p̄ = 1/2` makes the Nei denominator `1` and nothing more. Stated separately
+from `neiGst_ne_hudsonFst` because that witness sits at `p̄ = 2/5` and
+so cannot exclude the slice that was actually claimed. -/
+theorem neiGst_ne_hudsonFst_at_mean_half :
+    neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy
+  norm_num
+
+/-- **NO FIXED FACTOR CONVERTS NEI'S `G_ST` INTO HUDSON'S `F_ST`.**
+
+This closes the fork rather than documenting it. The two witnesses above exhibit
+points where the estimators disagree, and `hudsonFst_eq_of_neiGst` gives the exact
+map `Hudson = 2·G/(1 + G)`. Neither shuts the door this theorem shuts: a reader
+who accepts that the two differ can still believe the difference is a calibration
+constant to be divided out, and that belief is what a factor-of-two-to-four error
+looks like from the inside.
+
+There is no such constant, anywhere on the interior of the frequency range, and
+the witnesses say why. The map `Hudson = 2G/(1 + G)` has slope `2` at `G = 0` and
+slope `1` at `G = 1`, so the RATIO moves with the differentiation: at
+`p₁ = 1/5, p₂ = 3/5` it is `12/7`, and at `p₁ = 9/10, p₂ = 1/10` it is `50/41`.
+
+This is the machine-checked form of what `PopulationGeneticsFoundations.neiFst`
+records in prose -- that the measured ratio runs `0.60, 0.60, 0.68, 0.82` across a
+`τ` sweep, so no rescaling reconciles the two. A docstring paragraph can be read
+past; a theorem cannot. After this, substituting one estimator for the other is
+not a judgement call about tolerable error, it is a claim this file refutes.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an arithmetic fact about two
+    definitions, with both witnesses exhibited rather than sampled. -/
+theorem no_constant_scales_neiGst_to_hudsonFst :
+    ¬ ∃ c : ℝ, ∀ p₁ p₂ : ℝ, 0 < p₁ → p₁ < 1 → 0 < p₂ → p₂ < 1 →
+      hudsonFst p₁ p₂ = c * neiGst p₁ p₂ := by
+  rintro ⟨c, hc⟩
+  have h₁ := hc (1/5) (3/5) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  have h₂ := hc (9/10) (1/10) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy at h₁ h₂
+  norm_num at h₁ h₂
+  linarith
+
+/-- Between-subgroup allele-frequency variance for an equal-weight split. -/
+noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ :=
+  halfDiffSq p₁ p₂
+
+/-- **The between-subgroup variance's normalisation, pinned.** The identity with the fair
+two-point variance constrains the two definitions jointly and leaves a shared wrong factor free.
+Two subgroups at the extremes of the frequency range have between-group variance one quarter --
+the variance of a fair coin -- not one. -/
+theorem betweenSubgroupVariance_extremes :
+    betweenSubgroupVariance 1 0 = 1 / 4 := by
+  unfold betweenSubgroupVariance halfDiffSq
+  norm_num
+
+/-- **Cross-check: the heterozygosity form and the variance form of `F_ST`
+agree.** The corpus contained both shapes and never related them. -/
+theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    neiGst p₁ p₂ =
+      betweenSubgroupVariance p₁ p₂ /
+        (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
+  unfold neiGst betweenSubgroupVariance ploidy halfDiffSq ploidy
+  field_simp
+  ring
+
+/-- **The allele-frequency contrast constant is forced, not chosen.**
+
+Four times `neiGst` -- which is Nei's `G_ST`, see its docstring; the `4` is
+derived for THAT quantity and is not an empirical constant for Hudson's
+estimator -- is exactly the variance of the standardized allele-frequency
+contrast. The BBP inversion that recovered `3.9920 ± 0.0045` used genuine
+Hudson `F_ST`; it validates `hudsonBbpSpike`, not this identity. Keeping those
+two facts separate is the point of the named specializations below. -/
+theorem four_neiGst_eq_standardizedContrastVariance (p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    4 * neiGst p₁ p₂ =
+      (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+  rw [neiGst_eq_varianceRatio p₁ p₂ h]
+  unfold betweenSubgroupVariance halfDiffSq
+  field_simp
+
+/-- **Nei's `G_ST` between a frequency and its fold is the squared contrast.** At
+`p₂ = 1 - p` the mean frequency is `1/2`, the total heterozygosity `ploidy · p̄ (1 - p̄)`
+is `1/2`, and `G_ST` collapses to `(1 - ploidy · p)²`. This is the only place the
+denominator's `ploidy` is visible as a number, and it is what makes the next theorem an
+identity rather than a proportionality. -/
+theorem neiGst_at_fold (p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2 := by
+  unfold neiGst meanAlleleFreq ploidy midpoint ploidy; ring
+
 end Descent.Core

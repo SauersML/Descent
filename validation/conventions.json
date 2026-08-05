@@ -272,7 +272,7 @@
         "2",
         "4"
       ],
-      "note": "(a-b)^2/4. The 4 is 2^2 from the half-weighting on each of two equal groups; it is not free. Formerly recorded on Conventions.betweenSubgroupVariance.",
+      "note": "(a-b)^2/4. The 4 is 2^2 from the half-weighting on each of two equal groups; it is not free. Formerly recorded on Conventions.betweenSubgroupVariance, now Core.betweenSubgroupVariance.",
       "source": "Standard two-group variance decomposition."
     },
     "Descent/Core/Ratios.lean::halfLineageRate": {
@@ -447,10 +447,8 @@
     "Descent/Core/Parameters.lean::fstEquilibrium": {
       "quantity": "fst",
       "convention": "hudson",
-      "constants": [
-        "2"
-      ],
-      "note": "Hudson. The corpus's standing rule: every F_ST written in tau/(1+tau) coordinates is a Hudson F_ST, because Nei's G_ST is FALSIFIED at up to 18.59 sems against the split law on genotype matrices where Hudson's matches at 0.03, and the ratio between them moves with the data so no correction factor converts one to the other. 1/(1 + theta + 2M). fstEquilibrium_eq_island_two_demes proves the 2 IS the two-deme island correction, so this is the island law at d = 2 and nowhere else."
+      "constants": [],
+      "note": "Hudson. The corpus's standing rule: every F_ST written in tau/(1+tau) coordinates is a Hudson F_ST, because Nei's G_ST is FALSIFIED at up to 18.59 sems against the split law on genotype matrices where Hudson's matches at 0.03, and the ratio between them moves with the data so no correction factor converts one to the other. fstIslandEquilibrium Ne mig mu nDemes -- the island master at the record's own deme count. The body carries NO numeric literal now: the migration coefficient that used to be a bare 2 is islandDemeCorrection p.nDemes, and the 2 it evaluated to is the two-deme case rather than a constant of the law. fstEquilibrium_eq_scaled_two_demes recovers 1/(1 + theta + 2M) at p.nDemes = 2, which is the member the batteries measured; fstEquilibrium_ne_island_manyDemes is the witness that the deme count is not droppable."
     },
     "Descent/Decision/PowerAnalysis.lean::heritabilityFractionFromN": {
       "quantity": "h2",
@@ -1161,7 +1159,7 @@
       "convention": "narrow-sense",
       "note": "Additive variance computed through a shared LD kernel, still divided by the phenotypic variance."
     },
-    "Descent/Program/Conventions.lean::hudsonFst": {
+    "Descent/Core/Fst.lean::hudsonFst": {
       "quantity": "fst",
       "convention": "hudson",
       "constants": [
@@ -1171,7 +1169,7 @@
       ],
       "source": "Bhatia, Patterson, Sankararaman & Price (2013), Genome Research 23:1514-1521."
     },
-    "Descent/Program/Conventions.lean::neiGst": {
+    "Descent/Core/Fst.lean::neiGst": {
       "quantity": "fst",
       "convention": "nei-gst",
       "source": "Nei (1973), PNAS 70:3321-3323."
