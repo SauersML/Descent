@@ -23,6 +23,8 @@ import Descent.Portability.PCCorrectability.EndToEnd
 import Descent.Spectral.ProjectionSolve
 import Descent.Portability.PCCorrectability.Design
 import Descent.Blindness.CountingInvariantInstances
+import Descent.Blindness.BundleRigidity.Cycles
+import Descent.Blindness.BundleRigidity.Dichotomy
 
 /-!
 # What the separate results say when they are put together
