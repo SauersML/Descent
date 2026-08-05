@@ -250,6 +250,80 @@ theorem joinTime_const (j k : ℕ) (hj : j ≠ 0) (hk : k ≠ 0) :
     C.joinTime j = C.joinTime k :=
   serialFounderJoinTime_const _ _ _ _ _ hj hk
 
+/-- **The chain's own within-deme coalescent time**, `serialFounderWithinTime`
+evaluated at the chain's deme size and ancestral size.
+
+`demeSize` and `ancestralSize` are the two sizes the corrected two-epoch
+expectation is a function of, and until this definition existed the structure
+carried them without ever feeding them to it -- so the recorded model and the
+validated law referred to the same population only by the reader's assumption.
+`ancestralEpoch` stays a parameter because the structure records a chain, not an
+epoch boundary.
+
+    Empirical status: DERIVED. An instantiation of `serialFounderWithinTime` at
+    the chain's own two sizes, introducing no free parameter of its own. The
+    evidence is the one recorded there, and this definition neither adds to it
+    nor weakens it. -/
+noncomputable def withinTime (ancestralEpoch : ℝ) : ℝ :=
+  serialFounderWithinTime C.demeSize C.ancestralSize ancestralEpoch
+
+/-- **The chain's own saturated far-deme `F_ST`**: the ratio the audit field
+`ceilingValidated` is a flag about, now written where the flag can point at it.
+Measured `0.18497` against the analytic `0.19248` at the recorded design point;
+the status of that measurement is the one carried by `serialFounderCeilingFst`,
+which this only instantiates and does not strengthen.
+
+    Empirical status: DERIVED. An instantiation of `serialFounderCeilingFst` at
+    the chain's own fields, with no free parameter of its own. That definition
+    is MEASURED at one design point and its power is NOT established -- a single
+    configuration cannot reject a wrong functional form -- and instantiating it
+    here does not improve that standing. -/
+noncomputable def ceilingFst (ancestralEpoch : ℝ) : ℝ :=
+  serialFounderCeilingFst C.demeSize C.ancestralSize ancestralEpoch C.ceiling
+
+/-- The chain's ceiling `F_ST` is a genuine variance ratio: in `[0, 1)` whenever
+the ceiling is nonnegative and the within-deme time is positive. Both hypotheses
+are needed and neither is automatic -- `demeSize = 0` sends the within-deme time
+to the junk branch named at
+`serialFounderWithinTime_at_zero_size_is_junk`. -/
+theorem ceilingFst_mem_Ico (ancestralEpoch : ℝ) (hceiling : 0 ≤ C.ceiling)
+    (hwithin : 0 < C.withinTime ancestralEpoch) :
+    C.ceilingFst ancestralEpoch ∈ Set.Ico (0 : ℝ) 1 := by
+  refine ⟨serialFounderCeilingFst_nonneg _ _ _ _ hceiling ?_,
+    serialFounderCeilingFst_lt_one _ _ _ _ hceiling ?_⟩ <;> exact hwithin
+
+/-- **The approach is not a function of the closed-form fields.** Two chains can
+agree on every field that has a closed form -- deme count, both sizes, migration,
+the split schedule, the founder offset, the ceiling, and both audit flags -- and
+still disagree on `separationStep`.
+
+This is the module's thesis stated where it can be checked. The header argues
+that the meeting problem is time-inhomogeneous and that no algebraic function of
+`k` can supply the approach; the corresponding formal fact is that the approach
+is genuinely extra information, so a chain cannot be reconstructed from its
+demographic parameters. Without it, `separationStep` is a field nothing reads,
+and the claim that it is irreducible rests on prose alone. -/
+theorem separationStep_not_determined_by_closedForm_fields :
+    ∃ C₁ C₂ : SerialFounderChain,
+      C₁.demeCount = C₂.demeCount ∧ C₁.demeSize = C₂.demeSize ∧
+        C₁.ancestralSize = C₂.ancestralSize ∧ C₁.migration = C₂.migration ∧
+        C₁.splitStep = C₂.splitStep ∧ C₁.founderOffset = C₂.founderOffset ∧
+        C₁.ceiling = C₂.ceiling ∧ C₁.ceilingValidated = C₂.ceilingValidated ∧
+        C₁.approachOpen = C₂.approachOpen ∧
+        C₁.separationStep ≠ C₂.separationStep := by
+  refine ⟨{ demeCount := 0, demeSize := 0, ancestralSize := 0, migration := 0,
+            splitStep := 0, founderOffset := 0,
+            separationStep := fun _ separation ↦ separation,
+            ceiling := 0, ceilingValidated := false, approachOpen := true },
+          { demeCount := 0, demeSize := 0, ancestralSize := 0, migration := 0,
+            splitStep := 0, founderOffset := 0,
+            separationStep := fun _ _ ↦ fun _ ↦ 0,
+            ceiling := 0, ceilingValidated := false, approachOpen := true },
+          rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  intro hstep
+  have hpoint := congrFun (congrFun (congrFun hstep 0) (fun _ ↦ (1 : ℝ))) 0
+  norm_num at hpoint
+
 end SerialFounderChain
 
 end Calibrator

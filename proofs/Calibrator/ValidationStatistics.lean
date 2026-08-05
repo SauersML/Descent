@@ -85,6 +85,43 @@ theorem gaussianProfileLogLik_lt_iff_sqResidual_gt
     exact (div_lt_div_iff_of_pos_right hDen).mp hdiv
   · exact gaussianProfileLogLik_strictAnti_sqResidual observed variance mean₁ mean₂ hVariance
 
+/-- **The profile log-likelihood is the log of a Gaussian density**, not a
+formula that resembles one.
+
+`gaussianProfileLogLik` is written as an algebraic expression, and every theorem
+above is an ordering fact that would hold for `-(observed - mean)² · k` at any
+positive `k`, constant offset included. So nothing above pins the `2 · variance`
+in the denominator or the `log(2π · variance)/2` normaliser to a Gaussian
+model, and the name would carry the modelling claim on its own. This identifies
+the body with `ProbabilityTheory.gaussianPDFReal` at the same mean and variance,
+which is what the name asserts.
+
+Positive variance is required and is not cosmetic: at `variance = 0` the body
+lands on the junk branch named at
+`gaussianProfileLogLik_at_zero_variance_is_junk`, reporting the log-likelihood
+of a perfect fit, while the density on the right is not a density at all.
+
+This is also what makes the module's dependency on `Calibrator.Probability` a
+real one rather than a declared one -- the Gaussian machinery it provides is
+what the goodness-of-fit tools here are goodness-of-fit *to*.
+
+    Empirical status: DERIVED. An identity between two closed forms, with no
+    free parameter and nothing to measure. -/
+theorem gaussianProfileLogLik_eq_log_gaussianPDFReal
+    (observed mean : ℝ) (variance : NNReal) (hvariance : 0 < (variance : ℝ)) :
+    gaussianProfileLogLik observed mean (variance : ℝ) =
+      Real.log (ProbabilityTheory.gaussianPDFReal mean variance observed) := by
+  have hnorm : 0 < 2 * Real.pi * (variance : ℝ) := by positivity
+  have hsqrt : Real.sqrt (2 * Real.pi * (variance : ℝ)) ≠ 0 :=
+    Real.sqrt_ne_zero'.mpr hnorm
+  have hdensity : ProbabilityTheory.gaussianPDFReal mean variance observed =
+      (Real.sqrt (2 * Real.pi * (variance : ℝ)))⁻¹ *
+        Real.exp (-(observed - mean) ^ 2 / (2 * (variance : ℝ))) := rfl
+  rw [hdensity, Real.log_mul (inv_ne_zero hsqrt) (Real.exp_ne_zero _), Real.log_inv,
+    Real.log_sqrt hnorm.le, Real.log_exp]
+  unfold gaussianProfileLogLik
+  ring
+
 /-- Likelihood-ratio statistic comparing a null and alternative fit.
 
     Empirical status: UNTESTED. -/
@@ -92,11 +129,19 @@ noncomputable def likelihoodRatioStat
     (logLNull logLAlt : ℝ) : ℝ :=
   -2 * (logLNull - logLAlt)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation, at a point where the body is NONZERO.
+
+The previous point was `likelihoodRatioStat 1 1 = 0`, and it rejected nothing: at
+equal log-likelihoods the difference vanishes, so every rescaling `c * body`
+satisfies the theorem exactly and the `-2` was pinned by nothing. A reference
+value discriminates against a wrong constant factor if and only if the body is
+nonzero there -- `scale_competitor_ne_iff`.
+
+`1` and `3` separate the two arguments, so the point also fixes the ORIENTATION:
+the null minus the alternative, not the reverse. A body carrying `-1` gives `2`
+here and a body carrying `+2` gives `-4`. -/
 theorem likelihoodRatioStat_at_reference_point :
-    likelihoodRatioStat 1 1 = 0 := by
+    likelihoodRatioStat 1 3 = 4 := by
   norm_num [likelihoodRatioStat]
 
 

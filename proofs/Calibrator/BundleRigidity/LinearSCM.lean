@@ -246,6 +246,32 @@ theorem totalEffect_indep_of_nY (x x' nM nY nY' : ℝ) :
     S.totalEffect x x' nM nY = S.totalEffect x x' nM nY' := by
   rw [totalEffect_eq, totalEffect_eq]
 
+/-- **The pure-mediation chain**: no direct edge from `X` to `Y`, with the two
+path coefficients left free.
+
+`ChainSCM` had no exhibited inhabitant, so `total_eq_indirect_of_b_eq_zero` was
+a conditional whose hypothesis nothing had been shown to satisfy -- and a
+complete-mediation theorem about no complete mediator is the least useful form
+that statement could take. This is the family that satisfies it, at every pair
+of path coefficients rather than at one. -/
+def pureMediation (a c : ℝ) : ChainSCM where
+  a := a
+  b := 0
+  c := c
+
+instance instNonempty : Nonempty ChainSCM := ⟨pureMediation 0 0⟩
+
+/-- The pure-mediation chain has no direct edge, by construction. -/
+theorem pureMediation_b (a c : ℝ) : (pureMediation a c).b = 0 := rfl
+
+/-- **Complete mediation holds on the pure-mediation chain.** The hypothesis of
+`total_eq_indirect_of_b_eq_zero` is discharged rather than assumed, so the whole
+of the total effect is carried through `M` on a model that exists. -/
+theorem totalEffect_pureMediation_eq_indirectEffect (a c x x' nM nY : ℝ) :
+    (pureMediation a c).totalEffect x x' nM nY =
+      (pureMediation a c).indirectEffect x x' nM :=
+  total_eq_indirect_of_b_eq_zero _ (pureMediation_b a c) x x' nM nY
+
 end ChainSCM
 
 end Calibrator.BundleRigidity

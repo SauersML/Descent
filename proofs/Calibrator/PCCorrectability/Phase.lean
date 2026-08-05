@@ -99,4 +99,61 @@ theorem more_markers_increase_uncorrectable_bias_danger
   apply Real.sqrt_lt_sqrt (div_nonneg (le_of_lt hmarkers₁) (le_of_lt hn))
   exact (div_lt_div_iff_of_pos_right hn).2 hmore
 
+/-- **The danger index is the confounding energy measured in units of the BBP
+threshold.** The two aspect-ratio factors are exact reciprocals --
+`markerDangerIndex` carries `√(M/n)` and `bbpProxyThreshold` carries `√(n/M)` --
+so their product is the confounding energy alone, with the design dropping out
+entirely.
+
+This is why the two quantities belong in one phase diagram rather than two.
+`more_markers_increase_uncorrectable_bias_danger` says the danger grows with the
+panel and `bbpProxyThreshold_aspect_invariant` says detectability depends only
+on `n/M`; stated separately those are two monotonicities in the same variable
+with no stated relation, and a reader has no way to tell whether the danger
+index is a second, independent scaling or the same one read from the other side.
+It is the same one. Until this identity existed the module imported
+`Calibrator.PCCorrectability.Threshold` and used nothing from it, so the
+dependency was declared and never honoured. -/
+theorem markerDangerIndex_mul_bbpProxyThreshold
+    (confounding n markers : ℝ) (hn : 0 < n) (hmarkers : 0 < markers) :
+    markerDangerIndex confounding n markers * bbpProxyThreshold n markers =
+      confounding := by
+  unfold markerDangerIndex bbpProxyThreshold
+  have hproduct : markers / n * (n / markers) = 1 := by
+    field_simp
+  rw [mul_assoc, ← Real.sqrt_mul (div_nonneg hmarkers.le hn.le), hproduct,
+    Real.sqrt_one, mul_one]
+
+/-- **The detectable side of the phase diagram is exactly `danger index < 1`.**
+A design corrects the confounder when the spike clears the BBP proxy threshold;
+the identity above turns that comparison into a single dimensionless number, so
+the phase boundary is at one rather than at a design-dependent value.
+
+Note which direction is which: a LARGER danger index is the undetectable side.
+The index rises with the panel, so adding effectively independent markers at
+fixed sample size moves a design across the boundary in the wrong direction --
+the content of `more_markers_increase_uncorrectable_bias_danger`, now located on
+the phase diagram instead of standing alone. -/
+theorem markerDangerIndex_lt_one_iff_confounding_lt_bbpProxyThreshold
+    (confounding n markers : ℝ) (hn : 0 < n) (hmarkers : 0 < markers) :
+    markerDangerIndex confounding n markers < 1 ↔
+      confounding < bbpProxyThreshold n markers := by
+  have hthreshold : 0 < bbpProxyThreshold n markers := by
+    unfold bbpProxyThreshold
+    exact Real.sqrt_pos.mpr (div_pos hn hmarkers)
+  have hmul := markerDangerIndex_mul_bbpProxyThreshold confounding n markers hn hmarkers
+  constructor
+  · intro hdanger
+    have hgap : 0 < (1 - markerDangerIndex confounding n markers) *
+        bbpProxyThreshold n markers :=
+      mul_pos (by linarith) hthreshold
+    nlinarith [hmul, hgap]
+  · intro hconfounding
+    by_contra hdanger
+    push_neg at hdanger
+    have hgap : 0 ≤ (markerDangerIndex confounding n markers - 1) *
+        bbpProxyThreshold n markers :=
+      mul_nonneg (by linarith) hthreshold.le
+    nlinarith [hmul, hgap]
+
 end Calibrator

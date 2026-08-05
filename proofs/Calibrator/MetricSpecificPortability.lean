@@ -2623,6 +2623,33 @@ structure ScreeningDeployment where
   /-- Outcome-side base rate. Deliberately **not** part of `readout`. -/
   prevalence : ℝ
 
+/-- **Two deployments sharing a readout and differing only in prevalence.**
+
+The result below is that everything separating a pair of deployments here is a
+prevalence effect; stated over the class alone it is a conditional about objects
+none of which had been exhibited. This is the pair the statement is about, built
+so that the shared readout is shared BY CONSTRUCTION rather than by hypothesis
+-- which is the point, since the readout is what threshold metrics factor
+through and the prevalence is what they do not.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a pair of deployment records. The
+    claim with content is that real source and target deployments differ this
+    way, which this does not assert. -/
+def ScreeningDeployment.atPrevalence (readout : LevelSetCoordinates)
+    (prevalence : ℝ) : ScreeningDeployment where
+  readout := readout
+  prevalence := prevalence
+
+instance ScreeningDeployment.instNonempty : Nonempty ScreeningDeployment :=
+  ⟨ScreeningDeployment.atPrevalence LevelSetCoordinates.undegraded 0⟩
+
+/-- The constructed pair does share its readout, so the shared-readout hypothesis
+of the split result is discharged rather than assumed for this family. -/
+theorem ScreeningDeployment.atPrevalence_readout_eq (readout : LevelSetCoordinates)
+    (prevalence prevalence' : ℝ) :
+    (ScreeningDeployment.atPrevalence readout prevalence).readout =
+      (ScreeningDeployment.atPrevalence readout prevalence').readout := rfl
+
 /-- **The metric split is a prevalence effect, not a metric-choice effect.**
 
 `sens` and `spec` are any threshold metrics of the readout, i.e. any level-set functionals
@@ -2688,6 +2715,31 @@ theorem metric_split_is_prevalence_not_metric_choice
   · intro h_se h_sp1 h_K1 h_K1' h_K2' h_order
     rw [← hs, ← hp]
     exact ppv_increases_with_prevalence _ _ _ _ h_se h_sp1 h_K1 h_K1' h_K2' h_order
+
+/-- **The collapse, exhibited on a concrete pair of deployments.**
+
+`metric_split_is_prevalence_not_metric_choice` is conditioned on two deployments
+sharing a readout. `ScreeningDeployment.atPrevalence` builds exactly such a pair
+-- same readout coordinates, different prevalence -- so the hypothesis is
+discharged by construction rather than assumed, and the sensitivity/specificity
+agreement becomes an unconditional statement about deployments that exist.
+
+The scope narrowing on the theorem above carries over unchanged: this is about
+discrimination metrics, and it is false for proper scoring rules, which carry a
+reliability term neither readout coordinate sees. -/
+theorem ScreeningDeployment.metric_split_atPrevalence
+    (sens spec : ScreeningDeployment → ℝ)
+    (hsens : IsLevelSetFunctional sens ScreeningDeployment.readout)
+    (hspec : IsLevelSetFunctional spec ScreeningDeployment.readout)
+    (readout : LevelSetCoordinates) (prevalence prevalence' : ℝ) :
+    sens (ScreeningDeployment.atPrevalence readout prevalence) =
+        sens (ScreeningDeployment.atPrevalence readout prevalence') ∧
+      spec (ScreeningDeployment.atPrevalence readout prevalence) =
+        spec (ScreeningDeployment.atPrevalence readout prevalence') := by
+  have hsplit := metric_split_is_prevalence_not_metric_choice sens spec hsens hspec
+    (ScreeningDeployment.atPrevalence readout prevalence)
+    (ScreeningDeployment.atPrevalence readout prevalence') rfl
+  exact ⟨hsplit.1, hsplit.2.1⟩
 
 /-- **Decision curve analysis: Brier score is population-specific (from definition).**
     At fixed prevalence, any nonzero `R²` shift induces a strictly positive

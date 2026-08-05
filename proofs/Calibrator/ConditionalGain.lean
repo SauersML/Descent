@@ -120,6 +120,39 @@ theorem conditionalGainFunctional_ge_of_freshness_decay {m : ℕ}
   rw [C.conditionalGainFunctional_eq_coe (ne_of_gt hpos), WithTop.coe_le_coe]
   linarith
 
+/-- **A uniform per-step factor gives a conditional-gain floor that is LINEAR in
+the number of steps.**
+
+`conditionalGainFunctional_ge_of_freshness_decay` takes an exponential bound with
+a freshness budget `D` baked into the exponent, which is the shape the telescope
+produces. This is the other shape a contraction can arrive in: a bound `ρ^k`
+with `ρ` the per-step factor and `k` the number of steps, which is what a
+symbolic-dynamics or per-locus recombination argument produces. The two are the
+same statement in different currencies, and
+`BundleRigidity.linear_gain_of_uniform_factor` is the conversion; carrying it
+here is what makes this module's declared dependency on
+`Calibrator.BundleRigidity.EntropySplit` an actual one.
+
+Biologically the reading is the module's own: `ρ < 1` per step is *new*
+multilocus randomness at every step -- recombination or haplotype innovation --
+and the gain it buys grows in proportion to the number of such steps. A regime
+that supplies no fresh randomness supplies `ρ = 1`, `log(1/ρ) = 0`, and a floor
+of zero, which is the correct answer for perfect LD rather than a vacuous one.
+
+As with the freshness floor, this is one direction only: the hypothesis is the
+per-step bound itself, carried explicitly, so a coupling with no contraction
+yields no floor. -/
+theorem conditionalGainFunctional_ge_linear_of_uniform_factor
+    (ρ s : ℝ) (steps : ℕ)
+    (hpos : 0 < C.characteristicAmplitude s)
+    (hbound : C.characteristicAmplitude s ≤ ρ ^ steps) :
+    (((steps : ℝ) * Real.log (1 / ρ) : ℝ) : WithTop ℝ) ≤
+      C.conditionalGainFunctional s := by
+  have hgain := BundleRigidity.linear_gain_of_uniform_factor ρ
+    (C.characteristicAmplitude s) steps hpos hbound
+  rw [C.conditionalGainFunctional_eq_coe (ne_of_gt hpos), WithTop.coe_le_coe]
+  linarith
+
 end FiniteCoupledPhaseLaw
 
 /-! ## Support and oscillatory gain are different axes

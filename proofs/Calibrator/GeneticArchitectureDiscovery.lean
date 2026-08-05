@@ -73,7 +73,7 @@ def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem discoveryNCP_at_reference_point :
-    discoveryNCP 1 1 1 1 = 0 := by
+    discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [discoveryNCP, genotypeVarianceHWE]
 
 
@@ -611,20 +611,34 @@ measurement (`simcov/battery_bulk40b.py`, `group_f`): the exact contributed prec
 31% at 3.60.
 
 The MATCH previously recorded from `simcov/battery_bulk23.py` is worthless: that design set
-the other trait's effect to EXACTLY `rg` times the target's, with no scatter, under which
-this body is an algebraic identity for the inverse-variance combination and no data could
+the other trait's effect to EXACTLY `rg` times the target's, with no scatter, under which the
+old body was an algebraic identity for the inverse-variance combination and no data could
 have rejected it. Genetic correlation below one MEANS scatter; a design without it is testing
-a different claim. -/
+a different claim.
+
+CORRECTED. The body is the exact contributed precision; `n₁ + rg²·n₂` is its
+`n₂ · priorVariance → 0` limit and is recovered by `multiTraitEffectiveSampleSize_smallPrior`
+below. -/
 noncomputable def multiTraitEffectiveSampleSize
-    (n₁ n₂ rg : ℝ) : ℝ :=
-  n₁ + rg ^ 2 * n₂
+    (n₁ n₂ rg priorVariance : ℝ) : ℝ :=
+  n₁ + rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n₂)
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem multiTraitEffectiveSampleSize_at_reference_point :
-    multiTraitEffectiveSampleSize 1 1 1 = 2 := by
+    multiTraitEffectiveSampleSize 1 1 1 0 = 2 := by
   norm_num [multiTraitEffectiveSampleSize]
+
+/-- **The old body is this one's vanishing-prior limit**, as for
+`BayesianPGSTheory.multiAncestryEffectiveN`.  Stating it keeps the previous form available to
+a caller who knows they are in the polygenic regime `n₂ · priorVariance ≪ 1`, and keeps the
+correction auditable rather than silent. -/
+theorem multiTraitEffectiveSampleSize_smallPrior
+    (n₁ n₂ rg : ℝ) (h_n₂ : n₂ ≠ 0) :
+    multiTraitEffectiveSampleSize n₁ n₂ rg 0 = n₁ + rg ^ 2 * n₂ := by
+  unfold multiTraitEffectiveSampleSize
+  field_simp
 
 
 /-- **Cross-check: borrowing across traits and borrowing across ancestries are
@@ -633,8 +647,10 @@ the same arithmetic.** `BayesianPGSTheory.multiAncestryEffectiveN` adds
 *ancestry*; this adds it for a genetically correlated *trait*. They are
 different claims about different data, and they had better not drift apart in
 the exponent on `rg`, which is what this theorem pins. -/
-theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN (n₁ n₂ rg : ℝ) :
-    multiTraitEffectiveSampleSize n₁ n₂ rg = multiAncestryEffectiveN n₁ rg n₂ := by
+theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
+    (n₁ n₂ rg priorVariance : ℝ) :
+    multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance =
+      multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
   unfold multiTraitEffectiveSampleSize multiAncestryEffectiveN; ring
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
@@ -645,14 +661,14 @@ theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN (n₁ n₂ rg :
     Convention: `maf_causal` is the causal variant's frequency, as in
     `discoveryNCP`. -/
 noncomputable def multiTraitDiscoveryNCP
-    (n₁ n₂ rg β maf ld : ℝ) : ℝ :=
-  discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg) β maf ld
+    (n₁ n₂ rg priorVariance β maf ld : ℝ) : ℝ :=
+  discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance) β maf ld
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem multiTraitDiscoveryNCP_at_reference_point :
-    multiTraitDiscoveryNCP 1 1 1 1 1 1 = 0 := by
+    multiTraitDiscoveryNCP 1 1 0 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,
     multiTraitEffectiveSampleSize]
 
@@ -685,11 +701,46 @@ structure CrossTraitBorrowingModel (p q : ℕ) where
 
 namespace CrossTraitBorrowingModel
 
+/-- **The unshared-architecture model**: no tag-causal coupling at all, with every
+other field left free.
+
+`CrossTraitBorrowingModel` had no exhibited inhabitant, so the borrowing results
+were quantified over a class nothing had been shown to belong to. This is the
+null member -- the case where trait A's architecture reaches trait B through
+nothing -- and it is the reference the borrowed component is measured against:
+whatever `rg` is set to, no signal transfers without shared architecture to carry
+it. -/
+def noSharedArchitecture {p q : ℕ} (sourceWeights : Fin p → ℝ)
+    (sharedTraitEffect traitBSpecificEffect : Fin q → ℝ) (rg : ℝ) :
+    CrossTraitBorrowingModel p q where
+  sourceWeights := sourceWeights
+  sigmaTagCausal := 0
+  sharedTraitEffect := sharedTraitEffect
+  traitBSpecificEffect := traitBSpecificEffect
+  rg := rg
+
+instance instNonempty (p q : ℕ) : Nonempty (CrossTraitBorrowingModel p q) :=
+  ⟨noSharedArchitecture (fun _ ↦ 0) (fun _ ↦ 0) (fun _ ↦ 0) 0⟩
+
 /-- Trait-B cross-covariance component borrowed from trait A through shared
 genetic architecture. -/
 noncomputable def borrowedTraitBCrossCov {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : Fin p → ℝ :=
   m.sigmaTagCausal.mulVec (fun j ↦ m.rg * m.sharedTraitEffect j)
+
+/-- **Genetic correlation alone borrows nothing.** With no shared tag-causal
+architecture the borrowed component vanishes at every `rg`, so `rg` is a
+modifier of a transfer channel rather than a transfer channel itself. A
+cross-trait method that reads `rg` without also establishing shared architecture
+is reading a coefficient on zero. -/
+theorem borrowedTraitBCrossCov_noSharedArchitecture {p q : ℕ}
+    (sourceWeights : Fin p → ℝ) (sharedTraitEffect traitBSpecificEffect : Fin q → ℝ)
+    (rg : ℝ) :
+    borrowedTraitBCrossCov
+        (noSharedArchitecture sourceWeights sharedTraitEffect traitBSpecificEffect rg) =
+      0 := by
+  unfold borrowedTraitBCrossCov noSharedArchitecture
+  simp
 
 /-- Trait-B cross-covariance component specific to trait B after removing the
 shared trait-A component. -/
@@ -808,18 +859,24 @@ theorem cross_trait_portability_gain
     then the effective sample size for trait A strictly increases, and so does
     the trait-A discovery noncentrality parameter for the same tag SNP. -/
 theorem multi_trait_increases_effective_n
-    (n₁ n₂ rg β maf ld : ℝ)
+    (n₁ n₂ rg priorVariance β maf ld : ℝ)
     (h_n₂ : 0 < n₂)
-    (h_rg : 0 < rg)
+    (h_rg : 0 < rg) (h_rg_le : rg ≤ 1)
+    (h_pv : 0 ≤ priorVariance)
     (h_beta : β ≠ 0)
     (h_maf : 0 < maf) (h_maf_lt_one : maf < 1)
     (h_ld : ld ≠ 0) :
-    n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg ∧
+    n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance ∧
       discoveryNCP n₁ β maf ld <
-        multiTraitDiscoveryNCP n₁ n₂ rg β maf ld := by
-  have h_gain : 0 < rg ^ 2 * n₂ := by
-    exact mul_pos (sq_pos_of_ne_zero (ne_of_gt h_rg)) h_n₂
-  have h_n : n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg := by
+        multiTraitDiscoveryNCP n₁ n₂ rg priorVariance β maf ld := by
+  have h_den : 0 < (1 - rg ^ 2) * priorVariance + 1 / n₂ := by
+    have h1 : 0 ≤ (1 - rg ^ 2) * priorVariance :=
+      mul_nonneg (by nlinarith) h_pv
+    have h2 : 0 < 1 / n₂ := by positivity
+    linarith
+  have h_gain : 0 < rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n₂) :=
+    div_pos (by positivity) h_den
+  have h_n : n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance := by
     unfold multiTraitEffectiveSampleSize
     linarith
   have h_factor : 0 < β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf := by
@@ -831,11 +888,12 @@ theorem multi_trait_increases_effective_n
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor
   · exact h_n
-  · unfold multiTraitDiscoveryNCP discoveryNCP multiTraitEffectiveSampleSize
+  · unfold multiTraitDiscoveryNCP discoveryNCP
     have h_ncp :
         n₁ * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) <
-          (n₁ + rg ^ 2 * n₂) * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) := by
-      exact mul_lt_mul_of_pos_right h_n h_factor
+          multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance *
+            (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) :=
+      mul_lt_mul_of_pos_right h_n h_factor
     simpa [mul_assoc, mul_left_comm, mul_comm] using h_ncp
 
 /-- **Genetic correlation may differ across populations.**

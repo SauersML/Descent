@@ -801,6 +801,22 @@ noncomputable def Δ (M : GradedModulus) (K : ℕ) (h : ℝ) : ℝ := |M.raw K h
 @[simp] theorem Δ_nonneg (M : GradedModulus) (K : ℕ) (h : ℝ) :
     0 ≤ M.Δ K h := abs_nonneg _
 
+/-- **The vanishing modulus**: no deviation at any grade or step.
+
+`GradedModulus` had no exhibited inhabitant, so `Δ_nonneg` was a lower bound on a
+quantity nothing had been shown to have. -/
+def zero : GradedModulus where
+  raw := fun _grade _step ↦ 0
+
+instance instNonempty : Nonempty GradedModulus := ⟨zero⟩
+
+/-- **The nonnegativity floor is attained.** `Δ_nonneg` alone is compatible with a
+strictly positive floor -- an irreducible modulus no certificate could beat --
+and this rules that out: zero is a value the graded modulus actually takes. -/
+@[simp] theorem Δ_zero (K : ℕ) (h : ℝ) : zero.Δ K h = 0 := by
+  unfold Δ zero
+  simp
+
 end GradedModulus
 
 /-- A graded calculus has only numerical data.  The value-formula constant is

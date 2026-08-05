@@ -469,6 +469,59 @@ structure CohortGradients (n : ℕ) where
   /-- Measured environmental contrast of each cohort. -/
   environmentalGradient : Fin n → ℝ
 
+/-- **The single-gradient panel**: cohorts strung along one ancestry gradient,
+with the environment tracking genetics at a fixed slope.
+
+This is the recruitment pattern the section is a warning about -- biobank cohorts
+collected along one ancestry axis, where SES happens to move with ancestry -- and
+it is exhibited rather than described so that `shift_blind_to_split_of_collinear`
+has a panel it demonstrably applies to. `CohortGradients` previously had no
+inhabitant at all, so both the negative and the positive identifiability results
+were quantified over a class nothing had been shown to belong to.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a study design, not a claim about
+    data. Whether real cohorts are collinear in this way is a fact about
+    recruitment, and this fixes only what the collinear case looks like. -/
+def CohortGradients.singleGradient {n : ℕ} (geneticGradient : Fin n → ℝ)
+    (environmentSlope : ℝ) : CohortGradients n where
+  geneticGradient := geneticGradient
+  environmentalGradient := fun i ↦ environmentSlope * geneticGradient i
+
+instance CohortGradients.instNonempty (n : ℕ) : Nonempty (CohortGradients n) :=
+  ⟨CohortGradients.singleGradient (fun _ ↦ 0) 0⟩
+
+/-- The single-gradient panel is collinear by construction, at the slope it was
+built with -- which is the hypothesis the blindness result consumes. -/
+theorem CohortGradients.singleGradient_collinear {n : ℕ}
+    (geneticGradient : Fin n → ℝ) (environmentSlope : ℝ) (k : Fin n) :
+    (CohortGradients.singleGradient geneticGradient environmentSlope).environmentalGradient k =
+      environmentSlope *
+        (CohortGradients.singleGradient geneticGradient environmentSlope).geneticGradient k :=
+  rfl
+
+/-- **The matched-genetics pair**: two cohorts at the same genetic distance and
+different environments -- the design the section names as the most quotable
+sufficient condition for identifiability.
+
+Exhibiting it matters for the same reason as above, and for one more: the
+positive result and the negative result are then statements about two panels
+that both exist, rather than about one that does and one that might not. -/
+def CohortGradients.matchedGenetics (geneticDistance environment₁ environment₂ : ℝ) :
+    CohortGradients 2 where
+  geneticGradient := fun _ ↦ geneticDistance
+  environmentalGradient := fun i ↦ if i = 0 then environment₁ else environment₂
+
+/-- The genetics really are matched: both cohorts sit at the same genetic
+distance, which is the half of the design condition the name asserts. The other
+half -- that the environments differ -- is a condition on the arguments rather
+than a property of the construction, so it is left where a user supplies it. -/
+theorem CohortGradients.matchedGenetics_geneticGradient
+    (geneticDistance environment₁ environment₂ : ℝ) (i j : Fin 2) :
+    (CohortGradients.matchedGenetics geneticDistance environment₁ environment₂).geneticGradient i =
+      (CohortGradients.matchedGenetics geneticDistance environment₁
+        environment₂).geneticGradient j :=
+  rfl
+
 /-- **The one number a per-cohort calibration sees**: the sum of the genetic and
 environmental contributions. `gamma` and `eta` are the per-unit effects to be attributed. -/
 def cohortShift {n : ℕ} (G : CohortGradients n) (gamma eta : ℝ) (i : Fin n) : ℝ :=
@@ -566,6 +619,32 @@ theorem split_identified_of_matched_genetics {n : ℕ} (G : CohortGradients n) (
   · exact absurd h hgne
   · linarith [sub_eq_zero.mp h]
 
+/-- **The matched-genetics design identifies the split.**
+
+`split_identified_of_matched_genetics` is the section's most quotable positive
+result, and it is a conditional: it asks for a cohort pair with matched nonzero
+genetics and differing environments. This discharges those hypotheses on
+`CohortGradients.matchedGenetics`, which is built to have them, so the positive
+result is exhibited on a panel rather than only stated about panels that might
+exist.
+
+Read against `GxEDeployment.shift_eq_of_matched_combination`, which shows the
+attribution is entirely free on a single-gradient panel, this is the whole design
+message: two cohorts at one ancestry distance with different environments recover
+what any number of cohorts along one gradient cannot. -/
+theorem CohortGradients.matchedGenetics_split_identified
+    (geneticDistance environment₁ environment₂ : ℝ)
+    (hdistance : geneticDistance ≠ 0) (henvironments : environment₁ ≠ environment₂)
+    (gamma eta gamma' eta' : ℝ)
+    (hagree : ∀ k : Fin 2,
+      cohortShift (CohortGradients.matchedGenetics geneticDistance environment₁ environment₂)
+          gamma eta k =
+        cohortShift (CohortGradients.matchedGenetics geneticDistance environment₁ environment₂)
+          gamma' eta' k) :
+    gamma = gamma' ∧ eta = eta' := by
+  refine split_identified_of_matched_genetics _ 0 1 rfl hdistance ?_ gamma eta gamma' eta' hagree
+  simpa [CohortGradients.matchedGenetics] using henvironments
+
 /-- **The dual study design: matched nonzero environment with different genetic positions.**
 Holding environment fixed while ancestry varies also supplies a non-collinear cohort pair and
 therefore identifies the two attribution coefficients. -/
@@ -641,6 +720,46 @@ structure GxEDeployment (n : ℕ) where
 /-- The shift vector a deployment presents to a per-cohort calibration. -/
 def GxEDeployment.shift {n : ℕ} (D : GxEDeployment n) (i : Fin n) : ℝ :=
   cohortShift D.gradients D.gamma D.eta i
+
+/-- **A deployment on a single-gradient panel**, with the genetic and
+environmental per-unit effects left free. This is the family the collinearity
+results are about, and it is the inhabitant `GxEDeployment` lacked. -/
+def GxEDeployment.onSingleGradient {n : ℕ} (geneticGradient : Fin n → ℝ)
+    (environmentSlope gamma eta : ℝ) : GxEDeployment n where
+  gradients := CohortGradients.singleGradient geneticGradient environmentSlope
+  gamma := gamma
+  eta := eta
+
+instance GxEDeployment.instNonempty (n : ℕ) : Nonempty (GxEDeployment n) :=
+  ⟨GxEDeployment.onSingleGradient (fun _ ↦ 0) 0 0 0⟩
+
+/-- **On a single-gradient panel the two effects enter only through one
+combination**, `gamma + eta · slope`. -/
+theorem GxEDeployment.shift_onSingleGradient {n : ℕ} (geneticGradient : Fin n → ℝ)
+    (environmentSlope gamma eta : ℝ) (i : Fin n) :
+    (GxEDeployment.onSingleGradient geneticGradient environmentSlope gamma eta).shift i =
+      (gamma + eta * environmentSlope) * geneticGradient i := by
+  unfold GxEDeployment.shift GxEDeployment.onSingleGradient
+    CohortGradients.singleGradient cohortShift
+  ring
+
+/-- **The confounding, exhibited on concrete deployments.** Two deployments on
+the same single-gradient panel that attribute the shift differently -- more
+genetics and less environment, or the reverse -- present an IDENTICAL shift to
+every cohort, provided the one combination they enter through agrees.
+
+The section proves this as a blindness statement about the class; this is the
+same fact carried by two objects that exist, which is what makes it a statement
+about deployments rather than about an empty family. Biologically: along one
+ancestry gradient, a study can move the entire attribution between genetics and
+environment without changing anything a per-cohort calibration observes. -/
+theorem GxEDeployment.shift_eq_of_matched_combination {n : ℕ}
+    (geneticGradient : Fin n → ℝ) (environmentSlope gamma eta gamma' eta' : ℝ)
+    (hmatched : gamma + eta * environmentSlope = gamma' + eta' * environmentSlope)
+    (i : Fin n) :
+    (GxEDeployment.onSingleGradient geneticGradient environmentSlope gamma eta).shift i =
+      (GxEDeployment.onSingleGradient geneticGradient environmentSlope gamma' eta').shift i := by
+  rw [GxEDeployment.shift_onSingleGradient, GxEDeployment.shift_onSingleGradient, hmatched]
 
 /-- **No threshold metric separates them either.**
 

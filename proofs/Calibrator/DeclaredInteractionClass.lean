@@ -117,6 +117,41 @@ theorem not_identifiable_of_unrestricted_nuisance
     simp only [observable, actionGap, Pi.zero_apply, add_zero]
     ring
 
+/-- Observational equivalence is exactly the statement that the action gap is realized as a
+    difference of the two nuisances. -/
+theorem observable_eq_iff_gap (M : ObservationModel Context Probe Param)
+    (θ θ' : Context → Param) (h h' : Context → Probe → ℝ) :
+    observable M θ h = observable M θ' h' ↔
+      actionGap M θ θ' = fun x p ↦ h' x p - h x p := by
+  constructor
+  · intro hobs
+    funext x p
+    have hx := congrFun (congrFun hobs x) p
+    simp only [observable] at hx
+    simp only [actionGap]
+    linarith
+  · intro hgap
+    funext x p
+    have hx := congrFun (congrFun hgap x) p
+    simp only [actionGap] at hx
+    simp only [observable]
+    linarith
+
+/-- **The exact repair: identifiability is transversality against the declared class.**
+
+    `θ` is identifiable if and only if no gap between distinct parameter fields is realized as
+    a difference of admissible nuisances. Stated in the direction a designer uses it: to
+    identify, the declared class must **miss** every action gap. -/
+theorem identifiable_iff_transversal (M : ObservationModel Context Probe Param) :
+    Identifiable M ↔
+      ∀ θ θ' h h', h ∈ M.nuisance → h' ∈ M.nuisance →
+        actionGap M θ θ' = (fun x p ↦ h' x p - h x p) → θ = θ' := by
+  constructor
+  · intro hid θ θ' h h' hh hh' hgap
+    exact hid θ θ' h h' hh hh' ((observable_eq_iff_gap M θ θ' h h').mpr hgap)
+  · intro htr θ θ' h h' hh hh' hobs
+    exact htr θ θ' h h' hh hh' ((observable_eq_iff_gap M θ θ' h h').mp hobs)
+
 /-- **Identifiability is a property of the declaration, not of the data.**
 
     Two models with the **same action** — hence generating the same observations from the same

@@ -4518,6 +4518,35 @@ noncomputable def TruncatedTrafficRisk.evaluate
     {D : ℕ} (risk : TruncatedTrafficRisk D) (traffic : Fin (D + 1) → ℝ) : ℝ :=
   ∑ graph, risk.coefficient graph * traffic graph
 
+/-- **The total-traffic functional**: unit weight on every retained graph
+coordinate.
+
+`TruncatedTrafficRisk` had no exhibited inhabitant, so the stability bound below
+was stated over an empty-for-all-we-knew class. This member also fixes the
+orientation of the bound: its coefficient `ℓ¹` mass is the number of retained
+coordinates, so the bound reads "degree controls the number of coordinates, and
+therefore the amplification" on a functional where that is visible.
+
+Convention: `D` is polynomial/edge degree, not the population-genetic
+linkage-disequilibrium coefficient traditionally also denoted `D`. The two differ
+by ploidy and nothing here is about haplotype frequencies; the same note is
+carried by `TruncatedTrafficRisk.evaluate` above, and it is repeated rather than
+cross-referenced because this definition takes the argument on its own. -/
+def TruncatedTrafficRisk.totalTraffic (D : ℕ) : TruncatedTrafficRisk D where
+  coefficient := fun _graph ↦ 1
+
+instance TruncatedTrafficRisk.instNonempty (D : ℕ) :
+    Nonempty (TruncatedTrafficRisk D) :=
+  ⟨TruncatedTrafficRisk.totalTraffic D⟩
+
+/-- The total-traffic functional evaluates to the traffic sum, which is what
+makes it the one whose amplification is exactly the coordinate count. -/
+theorem TruncatedTrafficRisk.evaluate_totalTraffic {D : ℕ}
+    (traffic : Fin (D + 1) → ℝ) :
+    (TruncatedTrafficRisk.totalTraffic D).evaluate traffic = ∑ graph, traffic graph := by
+  unfold TruncatedTrafficRisk.evaluate TruncatedTrafficRisk.totalTraffic
+  simp
+
 /-- **Quantitative finite-traffic stability.**  If every retained graph
 coordinate changes by at most `epsilon`, the value of a graph polynomial
 changes by at most `epsilon` times the coefficient `ℓ¹` mass.  This is the
@@ -5536,9 +5565,19 @@ structure FiniteLowRankSingularSpectrum
   active_card_le_rank : active.card ≤ rank
 
 /-- The zero spectrum is a concrete inhabitant of the low-rank certificate
-type; its support, rank, and operator bound all vanish. -/
-noncomputable def zeroFiniteLowRankSingularSpectrum :
-    FiniteLowRankSingularSpectrum PUnit where
+type; its support, rank, and operator bound all vanish.
+
+Stated at an arbitrary finite coordinate type rather than at `PUnit`, because
+what it is for is `finiteLowRankSingularSpectrum_nonempty` just below: every
+result in this section is universally quantified over
+`FiniteLowRankSingularSpectrum Coordinate`, and a universally quantified
+statement about an uninhabited type is true for reasons that have nothing to do
+with singular values. Pinning the witness to a one-point coordinate space would
+have established non-vacuity at one dimension only, which is the dimension none
+of the asymptotic results are about. -/
+noncomputable def zeroFiniteLowRankSingularSpectrum
+    (Coordinate : Type*) [Fintype Coordinate] :
+    FiniteLowRankSingularSpectrum Coordinate where
   singularValue := fun _coordinate ↦ 0
   active := ∅
   rank := 0
@@ -5548,6 +5587,13 @@ noncomputable def zeroFiniteLowRankSingularSpectrum :
   singularValue_le_operatorBound := by simp
   inactive_zero := by simp
   active_card_le_rank := by simp
+
+/-- **The low-rank certificate type is inhabited at every finite dimension**, so
+the inequalities proved for it below are not vacuously true. -/
+instance finiteLowRankSingularSpectrum_nonempty
+    (Coordinate : Type*) [Fintype Coordinate] :
+    Nonempty (FiniteLowRankSingularSpectrum Coordinate) :=
+  ⟨zeroFiniteLowRankSingularSpectrum Coordinate⟩
 
 /-- Raw nuclear distance represented by the sum of the certified singular
 values. -/
@@ -5645,6 +5691,20 @@ theorem finiteRankOneSingularSpectrum_rawNuclearDistance
   simp [FiniteLowRankSingularSpectrum.rawNuclearDistance,
     finiteRankOneSingularSpectrum, FiniteOutlierCoordinate]
 
+/-- **The nuclear/rank inequality is attained, so nothing in it can be
+tightened.** `rawNuclearDistance_le_rank_mul_operatorBound` holds for every
+certificate; the rank-one spike turns it into an equality, which is what rules
+out a strictly better constant, a strictly smaller power of the rank, or an
+additive slack. An inequality with no attaining model is compatible with a
+sharper law that the corpus would then be understating. -/
+theorem finiteRankOneSingularSpectrum_rawNuclearDistance_eq_bound
+    (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
+    (finiteRankOneSingularSpectrum population spikeStrength hspike).rawNuclearDistance =
+      (finiteRankOneSingularSpectrum population spikeStrength hspike).operatorBound *
+        (finiteRankOneSingularSpectrum population spikeStrength hspike).rank := by
+  rw [finiteRankOneSingularSpectrum_rawNuclearDistance]
+  simp [finiteRankOneSingularSpectrum]
+
 /-- Its normalized nuclear distance is exactly `spikeStrength/(p+1)`. -/
 theorem finiteRankOneSingularSpectrum_normalizedNuclearDistance
     (population : ℕ) (spikeStrength : ℝ) (hspike : 0 ≤ spikeStrength) :
@@ -5712,6 +5772,70 @@ noncomputable def zeroMatchedInformationPathCertificate :
     intro interpolation _hinterpolation
     simpa using (hasDerivAt_const interpolation (0 : ℝ)).hasDerivWithinAt
   posteriorCovarianceTraceBound := by simp
+
+/-- **The matched-information certificate type is inhabited**, so every bound
+below is a bound on something. The premises are four nontrivial fields --- a
+derivative identity holding on all of `[0,1]` and a trace bound holding on
+`[0,1)` --- and a structure whose fields cannot be simultaneously satisfied
+would make `matchedInformationPath_nuclear_bound` and everything downstream of
+it true by having no models. -/
+instance : Nonempty MatchedInformationPathCertificate :=
+  ⟨zeroMatchedInformationPathCertificate⟩
+
+/-- **The certificate that runs at the maximum rate the trace bound allows.**
+The information path is linear with slope `variance · nuclearDistance / 2`, and
+the trace pairing sits at the boundary of `posteriorCovarianceTraceBound`
+throughout.
+
+`zeroMatchedInformationPathCertificate` is the degenerate member of this family,
+at `variance = nuclearDistance = 0`; this is the family it is degenerate in.
+Its purpose is `saturatingMatchedInformationPathCertificate_attains_bound`. -/
+noncomputable def saturatingMatchedInformationPathCertificate
+    (variance nuclearDistance : ℝ) (hvariance : 0 ≤ variance)
+    (hnuclear : 0 ≤ nuclearDistance) : MatchedInformationPathCertificate where
+  informationPath := fun interpolation ↦
+    variance * nuclearDistance / 2 * interpolation
+  tracePairing := fun _interpolation ↦ variance * nuclearDistance
+  variance := variance
+  nuclearDistance := nuclearDistance
+  variance_nonnegative := hvariance
+  nuclearDistance_nonnegative := hnuclear
+  immseDerivative := by
+    intro interpolation _hinterpolation
+    have hderivative :
+        HasDerivAt (fun t : ℝ ↦ variance * nuclearDistance / 2 * t)
+          (variance * nuclearDistance / 2) interpolation := by
+      simpa using (hasDerivAt_id interpolation).const_mul
+        (variance * nuclearDistance / 2)
+    exact hderivative.hasDerivWithinAt
+  posteriorCovarianceTraceBound := by
+    intro _interpolation _hinterpolation
+    exact le_of_eq (abs_of_nonneg (mul_nonneg hvariance hnuclear))
+
+/-- **The pathwise nuclear estimate is attained, so the factor `1/2` is
+optimal.** `matchedInformationPath_nuclear_bound` says the information change
+along the covariance segment is at most `variance/2 · nuclearDistance`; this
+exhibits, at every admissible pair of values, a certificate that changes by
+exactly that much. No smaller multiplier than `1/2` is available, so the `1/2`
+is the I--MMSE factor of one half and not a slack constant carried through the
+calculus. -/
+theorem saturatingMatchedInformationPathCertificate_attains_bound
+    (variance nuclearDistance : ℝ) (hvariance : 0 ≤ variance)
+    (hnuclear : 0 ≤ nuclearDistance) :
+    |(saturatingMatchedInformationPathCertificate variance nuclearDistance
+        hvariance hnuclear).informationPath 1 -
+      (saturatingMatchedInformationPathCertificate variance nuclearDistance
+        hvariance hnuclear).informationPath 0| =
+      (saturatingMatchedInformationPathCertificate variance nuclearDistance
+        hvariance hnuclear).variance / 2 *
+        (saturatingMatchedInformationPathCertificate variance nuclearDistance
+          hvariance hnuclear).nuclearDistance := by
+  have hnonneg : 0 ≤ variance * nuclearDistance / 2 :=
+    div_nonneg (mul_nonneg hvariance hnuclear) (by norm_num)
+  simp only [saturatingMatchedInformationPathCertificate, mul_one, mul_zero,
+    sub_zero]
+  rw [abs_of_nonneg hnonneg]
+  ring
 
 /-- **Matrix-path derivation of the nuclear estimate.**  The I--MMSE
 directional derivative and posterior-covariance trace bound imply that the

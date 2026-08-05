@@ -616,7 +616,13 @@ theorem symmetric_half_separation_sub_l1_le_minimaxRisk
     (hcaps : E.SeparatedLossCaps θ₁ θ₂ separation maxLoss₁ maxLoss₂) :
     max 0 ((separation - min maxLoss₁ maxLoss₂ *
       E.observationL1Distance θ₁ θ₂) / 2) ≤ E.minimaxRisk := by
-  obtain ⟨hloss, hloss₁, hloss₂⟩ := hcaps
+  -- Named projections rather than a positional `obtain`: `capped₁` and `capped₂`
+  -- have the same shape at the two parameters, so a positional pattern that
+  -- swapped them would still typecheck and would prove the theorem for the wrong
+  -- cap.
+  have hloss := hcaps.separated
+  have hloss₁ := hcaps.capped₁
+  have hloss₂ := hcaps.capped₂
   rcases le_total maxLoss₁ maxLoss₂ with hle | hle
   · rw [min_eq_left hle]
     have hswapped := E.half_separation_sub_l1_le_minimaxRisk
@@ -662,7 +668,9 @@ theorem symmetric_half_separation_sub_l1_le_garbled_minimaxRisk
     max 0 ((separation - min maxLoss₁ maxLoss₂ *
       E.observationL1Distance θ₁ θ₂) / 2) ≤
         (E.garbleObservations summaryCount channel).minimaxRisk := by
-  obtain ⟨hloss, hloss₁, hloss₂⟩ := hcaps
+  have hloss := hcaps.separated
+  have hloss₁ := hcaps.capped₁
+  have hloss₂ := hcaps.capped₂
   rcases le_total maxLoss₁ maxLoss₂ with hle | hle
   · rw [min_eq_left hle]
     have hswapped := E.half_separation_sub_l1_le_garbled_minimaxRisk

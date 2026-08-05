@@ -1201,12 +1201,14 @@ noncomputable def BinaryPopulation.ofPoints {Z : Type u} [MeasurableSpace Z]
   μpos := Measure.dirac zpos
   μneg := Measure.dirac zneg
 
-/-- Inhabitation without assuming the sample space has a point: the zero
-population. It is degenerate -- every AUC term vanishes on it -- and is recorded
-only so the class is inhabited at every `Z`, including empty ones. -/
-instance BinaryPopulation.instNonempty {Z : Type u} [MeasurableSpace Z] :
+/-- The class is inhabited whenever the sample space has a point. The side
+condition is not an artefact: an AUC compares a case value with a control value,
+so an empty sample space has no population for it to be about, and requiring
+`Nonempty Z` says so rather than substituting a zero measure on which every AUC
+term vanishes. -/
+instance BinaryPopulation.instNonempty {Z : Type u} [MeasurableSpace Z] [Nonempty Z] :
     Nonempty (BinaryPopulation Z) :=
-  ⟨⟨0, 0⟩⟩
+  ⟨BinaryPopulation.ofPoints (Classical.arbitrary Z) (Classical.arbitrary Z)⟩
 
 /-- Population AUC of a score:
 `P(s(Z⁺) > s(Z⁻)) + 1/2 P(s(Z⁺)=s(Z⁻))`. -/

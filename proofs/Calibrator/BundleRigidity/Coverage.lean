@@ -81,6 +81,18 @@ namespace ModulusFamily
 
 variable (F : ModulusFamily T d)
 
+/-- **The constant family**: every branch a constant modulus curve.
+
+`ModulusFamily` had no exhibited inhabitant, so the coverage and window results
+were quantified over a class nothing had been shown to belong to. Constants are
+the right member to name: a constant branch covers a value either everywhere or
+nowhere, which is the degenerate extreme the single-window construction is built
+to exclude, and having it in hand says the exclusion is doing work. -/
+def const (values : Fin d → ℝ) : ModulusFamily T d where
+  curve := fun j ↦ ContinuousMap.const T (values j)
+
+instance instNonempty : Nonempty (ModulusFamily T d) := ⟨const (fun _ ↦ 0)⟩
+
 /-- **The coverers of `v` within `S`**: the parameters of `S` at which some branch takes
 the value `v`. -/
 def coverers (F : ModulusFamily T d) (S : Set T) (v : ℝ) : Set T :=
@@ -105,6 +117,28 @@ def peel (F : ModulusFamily T d) (S : Set T) : Set T := S \ F.peelSet S
 union of all peel-stable subsets. -/
 def core (F : ModulusFamily T d) (K : Set T) : Set T :=
   ⋃₀ {S | S ⊆ K ∧ S ⊆ F.peel S}
+
+/-- **A constant family covers a value everywhere in `S`.** If some branch sits at
+`v`, every parameter of `S` is a coverer, so the coverer set is all of `S`. -/
+theorem coverers_const_of_exists (values : Fin d → ℝ) (S : Set T) (v : ℝ)
+    (hv : ∃ j, values j = v) :
+    (const values).coverers S v = S := by
+  ext t
+  simp [coverers, const, ContinuousMap.const_apply, hv]
+
+/-- **...or nowhere.** If no branch sits at `v`, no parameter is a coverer.
+
+Together with the previous theorem this is the sense in which constants are the
+degenerate extreme: the coverer set never depends on the parameter, so it is
+never a singleton unless `S` itself is, and `singleWindow` therefore sees an
+all-or-nothing condition. That is exactly the behaviour the peeling construction
+is built to exclude, and having it proved says the exclusion is doing work
+rather than guarding against nothing. -/
+theorem coverers_const_of_not_exists (values : Fin d → ℝ) (S : Set T) (v : ℝ)
+    (hv : ¬ ∃ j, values j = v) :
+    (const values).coverers S v = ∅ := by
+  ext t
+  simp [coverers, const, ContinuousMap.const_apply, hv]
 
 /-! ## Monotonicity, which is what makes the coinductive definition work -/
 

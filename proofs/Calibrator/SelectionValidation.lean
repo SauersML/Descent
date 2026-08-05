@@ -44,6 +44,27 @@ structure SelectionModelSummary where
   predictedEffectCorrelation : ℝ
   predictedSelectedVariance : ℝ
 
+/-- **The matching summary**: the candidate that predicts exactly what was
+observed.
+
+`SelectionValidationModel` carries a `witness` for the stated reason that a
+theorem quantified over an uninhabited structure is true and empty;
+`SelectionModelSummary` had none, so the same gap sat on the other half of every
+statement here. This is the inhabitant, and it is the one the likelihood machinery
+is oriented around rather than an arbitrary pair of reals.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a relabelling of the validation
+    model's own observations as predictions. It exhibits the exact-fit point; it
+    does not assert that any selection model attains it. -/
+def SelectionModelSummary.matching (validation : SelectionValidationModel) :
+    SelectionModelSummary where
+  predictedEffectCorrelation := validation.observedEffectCorrelation
+  predictedSelectedVariance := validation.observedSelectedVariance
+
+noncomputable instance SelectionModelSummary.instNonempty :
+    Nonempty SelectionModelSummary :=
+  ⟨SelectionModelSummary.matching SelectionValidationModel.witness⟩
+
 /-- Validation log-likelihood of a candidate summary under Gaussian measurement
 noise on the observed effect-correlation and selected-variance summaries.
 
@@ -72,6 +93,17 @@ theorem missedSelectedVariance_nonneg
     0 ≤ missedSelectedVariance validation summary := by
   unfold missedSelectedVariance
   positivity
+
+/-- **The matching summary misses by nothing**, so the floor of
+`missedSelectedVariance_nonneg` is attained. A nonnegativity bound with no
+attaining case is compatible with a strictly positive floor -- an irreducible
+validation miss -- and this rules that out: the miss is zero for at least one
+candidate, so any positive miss a real model shows is the model's, not the
+metric's. -/
+theorem missedSelectedVariance_matching (validation : SelectionValidationModel) :
+    missedSelectedVariance validation (SelectionModelSummary.matching validation) = 0 := by
+  unfold missedSelectedVariance SelectionModelSummary.matching
+  simp
 
 /-- Likelihood-ratio statistic comparing two selection summaries on the same
 observed validation target.
