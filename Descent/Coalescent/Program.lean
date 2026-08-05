@@ -72,8 +72,11 @@ SETTLED.  `CompetingRates`: unit rate on each cover makes the survivals multiply
 factorises as `(1/d_k) · d_k e^{-d_k t}` (`jointDensity_factors`), the same first factor for
 every cover.  A density that splits is independence.  `Trajectory.chainLaw_head_blocks` adds
 the structural reason it can hold at all: after `k` jumps the block count is `n - k` on every
-trajectory, so the death process learns nothing from it.  OPEN: the induction over steps,
-and the passage from densities to the joint law of the path.
+trajectory, so the death process learns nothing from it.  The induction over steps is
+`CompetingRates.pathDensity_factors`: the path's density is a product of one-step densities,
+and a product of factorised terms factorises, so the whole path's density splits into a
+trajectory factor and a clock factor.  OPEN: the passage from a factorised density to
+independent random objects, which needs the continuous-time process.
 
 **5. K-G section 6 and K-C Theorem 3, the constructions.**  FINITE `n` SETTLED.
 `Trajectory.chainLaw` is a law on whole trajectories, with K-C (1.13) as

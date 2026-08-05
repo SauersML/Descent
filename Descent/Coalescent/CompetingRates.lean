@@ -84,6 +84,44 @@ theorem jointDensity_indep_of_cover {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
         * (deathRate (blocks ξ) * Real.exp (-(deathRate (blocks ξ) * t))) := by
   rw [jumpStep_apply_eq_jumpProb ξ hk η, jumpStep_apply_eq_jumpProb ξ hk η']
 
+/-! ### All the steps at once
+
+`jointDensity_factors` splits one step.  Kingman's Theorem 1 is about the whole path, and
+the passage from one step to all of them is a product identity: a product of factorised
+terms factorises. -/
+
+/-- **The whole path's density factorises.**  Along a trajectory visiting block counts
+`K 0, K 1, …` with holding times `t 0, t 1, …`, the joint density is a product of one-step
+densities, and it splits into a factor depending only on the trajectory and a factor
+depending only on the clock.
+
+That is K-C Theorem 1's independence at the level of densities, for every step rather than
+one -- the induction the one-step case needed.  What it is not is a statement about
+measures; turning a factorised density into independent random objects needs the
+continuous-time process, which `Descent.Coalescent.Program` still lists. -/
+theorem pathDensity_factors (K : ℕ → ℕ) (t : ℕ → ℝ) (m : ℕ) :
+    ∏ i ∈ Finset.range m,
+        (jumpProb (K i) * (deathRate (K i) * Real.exp (-(deathRate (K i) * t i))))
+      = (∏ i ∈ Finset.range m, jumpProb (K i))
+        * ∏ i ∈ Finset.range m, (deathRate (K i) * Real.exp (-(deathRate (K i) * t i))) :=
+  Finset.prod_mul_distrib
+
+/-- **And the density being factorised is the one the competing clocks give.**  Each step's
+density is `e^{-d_k t}` -- one clock rings, the others have not -- so the path density is
+`∏ e^{-d_{K i} t_i}`, and `pathDensity_factors` splits exactly that. -/
+theorem pathDensity_eq_prod_exp {K : ℕ → ℕ} (hK : ∀ i, 2 ≤ K i) (t : ℕ → ℝ) (m : ℕ) :
+    ∏ i ∈ Finset.range m, Real.exp (-(deathRate (K i) * t i))
+      = ∏ i ∈ Finset.range m,
+          (jumpProb (K i) * (deathRate (K i) * Real.exp (-(deathRate (K i) * t i)))) :=
+  Finset.prod_congr rfl fun i _ => jointDensity_factors (hK i) (t i)
+
+/-- The trajectory factor, written out: the probability of a given sequence of choices is the
+product of the uniform weights, and it carries no dependence on the clock at all. -/
+theorem pathDensity_chain_factor {K : ℕ → ℕ} (hK : ∀ i, 2 ≤ K i) (m : ℕ) :
+    ∏ i ∈ Finset.range m, jumpProb (K i)
+      = ∏ i ∈ Finset.range m, 2 / ((K i : ℝ) * ((K i : ℝ) - 1)) :=
+  Finset.prod_congr rfl fun i _ => jumpProb_eq (hK i)
+
 /-- The total density over all covers is the holding density: nothing leaks.  This is the
 consistency check that the factorisation is a probability statement and not just an
 algebraic identity -- summing the joint density over destinations returns the marginal in
