@@ -504,6 +504,14 @@ def externally_silent(code, decls):
 # whose whole job is to be an endpoint: naming the value at a junk argument,
 # pinning a body to a number, exhibiting an inhabitant, or recording a proved
 # failure.  A consumer for any of them would be a restatement.
+_TERMINAL_POINT = re.compile(
+    r"(_at_|_zero$|_one$|_half$|_two$|_endpoint|_boundary)")
+_TERMINAL_RANGE = re.compile(
+    r"(_nonneg$|_pos$|_le_one$|_lt_one$|_in_unit$|_bounded|_bound$|_cap$|_floor$"
+    r"|_ceiling$)")
+_TERMINAL_STRUCTURAL = re.compile(
+    r"(_mono$|_anti|_symm$|_comm$|_assoc$|_idem|_invariant$|_tendsto|_continuous$)")
+
 TERMINAL_KINDS = (
     ("junk-value naming", lambda n: "_is_junk" in n),
     ("reference evaluation", lambda n: n.endswith("_at_reference_point")),
@@ -513,6 +521,24 @@ TERMINAL_KINDS = (
      lambda n: n.startswith("no_") or any(k in n for k in
                                           ("_ne_", "_not_", "_cannot_", "_fails"))),
     ("primed restatement", lambda n: n.endswith("'")),
+    # THREE MORE KINDS WHOSE TERMINALITY IS THE POINT, added after the five above
+    # so an existing classification still wins. Together they take 726 of the
+    # 3,110 that were landing in "unclassified leaf", which was doing the job the
+    # headline `61.8% terminal` did: one undifferentiated number standing in for
+    # several different things.
+    #
+    # A value pinned at a distinguished argument, a range a definition cannot
+    # leave, and a structural property are all statements ABOUT a definition
+    # rather than steps toward something else. Nothing downstream needing them is
+    # what they look like when they are working -- they are the contract, and a
+    # consumer for one would be a restatement, which is what `duplicate_body_*`
+    # exists to forbid. This is the same argument the five above rest on.
+    ("value at a named point",
+     lambda n: bool(_TERMINAL_POINT.search(n))),
+    ("range or bound",
+     lambda n: bool(_TERMINAL_RANGE.search(n))),
+    ("structural property",
+     lambda n: bool(_TERMINAL_STRUCTURAL.search(n))),
 )
 
 
