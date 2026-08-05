@@ -2144,7 +2144,7 @@
  },
  "Descent.Blindness.BundleRigidity.ContinuousBundleFamily.evenPart": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "qualified name κ.comp",
   "file": "Descent/Blindness/BundleRigidity/Operator.lean",
   "line": 367,
   "short": "evenPart",
@@ -2185,7 +2185,7 @@
  },
  "Descent.Blindness.BundleRigidity.ContinuousBundleFamily.oddPart": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "qualified name κ.comp",
   "file": "Descent/Blindness/BundleRigidity/Operator.lean",
   "line": 371,
   "short": "oddPart",
@@ -8020,17 +8020,29 @@
   "short": "BelowCeiling",
   "ret_type": "Prop",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "BelowCeiling",
+  "args": [
+   "ceiling",
+   "K"
+  ],
   "box": {
    "ceiling": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'VarianceNonneg' is not defined\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "K": {
+    "dim": "ι",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.belowCeiling_add_rankOne_iff",
    "Descent.Blindness.spiked_genotype_covariance_belowCeiling_of_threshold"
@@ -18862,7 +18874,7 @@
  },
  "Descent.Blindness.TrafficInvariantSeparation.balancedRankOneProjector": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "qualified name Matrix.vecMulVec",
   "file": "Descent/Blindness/TrafficInvariantSeparation/RankOneInvisibility.lean",
   "line": 293,
   "short": "balancedRankOneProjector",
@@ -18896,7 +18908,7 @@
  },
  "Descent.Blindness.TrafficInvariantSeparation.balancedRankOneCovariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "qualified name Matrix.diagonal",
   "file": "Descent/Blindness/TrafficInvariantSeparation/RankOneInvisibility.lean",
   "line": 308,
   "short": "balancedRankOneCovariance",
@@ -19818,7 +19830,7 @@
  },
  "Descent.Blindness.XiFromMarks.addKingmanComponent": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "qualified name Measure.dirac",
   "file": "Descent/Blindness/XiFromMarkedBreakouts.lean",
   "line": 162,
   "short": "addKingmanComponent",
@@ -21344,21 +21356,27 @@
  },
  "Descent.Coalescent.blockStochastic": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for *: 'float' and 'function'\"))",
   "file": "Descent/Coalescent/BlockMatrixLimit.lean",
   "line": 406,
   "short": "blockStochastic",
   "ret_type": "Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "blockStochastic",
+  "args": [
+   "n"
+  ],
   "box": {
    "n": [
     2.0,
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"unsupported operand type(s) for *: 'float' and 'function'\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -29361,7 +29379,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 7,
+   "finite_points": 3,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -79754,16 +79772,23 @@
  },
  "Descent.Portability.combinedPostprocessor": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ₗ[𝕜] H'\")",
   "file": "Descent/Portability/CorrectionWidths.lean",
   "line": 197,
   "short": "combinedPostprocessor",
   "ret_type": "Y →ₗ[𝕜] H",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "combinedPostprocessor",
+  "args": [
+   "T",
+   "a"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ₗ[𝕜] H'\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -88252,23 +88277,41 @@
  },
  "Descent.Portability.BackgroundClass.spiked": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for *: 'float' and 'function'\"))",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 293,
   "short": "spiked",
   "ret_type": "Matrix ι ι ℝ",
   "empirical_status": "DERIVED",
-  "python": null,
-  "args": [],
+  "python": "spiked",
+  "args": [
+   "_K",
+   "S_0",
+   "t",
+   "v"
+  ],
   "box": {
    "t": [
     1.0,
     1000.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"unsupported operand type(s) for *: 'float' and 'function'\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "S_0": {
+    "dim": "ι",
+    "rank": 2
+   },
+   "v": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.PopGen.hudsonCalibrated_rigid_pcCorrectabilityMargin_is_the_criterion",
    "Descent.PopGen.hudsonCalibrated_stratification_imitable_if_within_budget",
@@ -126825,24 +126868,36 @@
   }
  },
  "Descent.Spectral.ridgedInfoMatrix": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '•'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/ProjectionSolve.lean",
   "line": 46,
   "short": "ridgedInfoMatrix",
   "ret_type": "Matrix n n ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "ridgedInfoMatrix",
+  "args": [
+   "A",
+   "ridge"
+  ],
   "box": {
    "ridge": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "A": {
+    "dim": "n",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Program.subthreshold_correction_fails_and_zero_ridge_does_not_help",
    "Descent.Spectral.infoQuadraticForm_ridged",

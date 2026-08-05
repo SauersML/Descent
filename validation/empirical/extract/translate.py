@@ -63,7 +63,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
   | (?P<matlit>!!\[)
   | (?P<veclit>!\[)
-  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹!])
+  | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙•∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹!])
   | (?P<other>.)
 """, re.X)
 
@@ -77,6 +77,12 @@ BINOPS = {
     "<=": (50, "none", "<="), ">=": (50, "none", ">="),
     "+": (65, "left", "+"), "-": (65, "left", "-"),
     "*": (70, "left", "*"),
+    # `a • b` is Mathlib's scalar multiplication. It is `*` for the cases this
+    # corpus writes -- a real scaling a real, a vector or a matrix -- and
+    # `lift_arith` already routes `*` through `_rt.mul`, which multiplies a
+    # scalar into a vector elementwise. Same precedence, because `•` binds like
+    # multiplication in Lean too.
+    "•": (70, "left", "*"),
     "/": (70, "left", "DIV"),
     "%": (70, "left", "%"),
     "^": (75, "right", "POW"),
