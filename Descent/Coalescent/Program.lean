@@ -5,6 +5,7 @@ import Descent.Coalescent.Split
 import Descent.Coalescent.CutSets
 import Descent.Coalescent.CutCount
 import Descent.Coalescent.Path
+import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -81,9 +82,13 @@ chains for continuous-time Markov chains, which this corpus does not have.
 The deterministic half of the temporal coupling is now `Coalescent.Path`: K-G (6.1)'s
 `descentTime`, (6.2)'s death process as a step function, (6.5)'s `R_t = ℛ_{D(n,t)}` and
 (6.6).  The estimate that lets the death process start from infinity --
-`Σ_{r≥k} d_r⁻¹ = 2/(k-1)` -- is `Rates.hasSum_one_div_deathRate_tail`.  What is not done is
-putting a measure on the path space, and the passage to `n = ∞` that Theorem 3 needs on top
-of it.
+`Σ_{r≥k} d_r⁻¹ = 2/(k-1)` -- is `Rates.hasSum_one_div_deathRate_tail`.  The discrete half of the measure is now `Coalescent.Trajectory`: `chainLaw` is a law on
+whole TRAJECTORIES, and `Trajectory.chainLaw_support_chain'` is K-C (1.13) -- every
+trajectory in its support is a descending chain of covers (repeating once absorbed, which is
+`Kernel.jumpKernel_absorbing`'s convention).  What is not done is the continuous half: a
+measure on hold sequences with independent exponential coordinates.  With it,
+`Path.pathState` of a `chainLaw` trajectory and an independent hold sequence is K-G section
+6 outright.  The passage to `n = ∞` that Theorem 3 needs sits on top of that.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.
