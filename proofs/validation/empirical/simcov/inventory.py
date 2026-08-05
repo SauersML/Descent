@@ -53,6 +53,24 @@ STATUS_RE = re.compile(r"Empirical status:\s*[*_ ]*([A-Za-z_]+)")
 STATE_WORDS = ("UNTESTED", "VALIDATED", "FALSIFIED", "DERIVED", "MEASURED",
                "VACUOUS", "CONVENTION", "TESTED", "REFUTED")
 
+# Complete verdicts from the closed vocabulary that are NOT single state words.
+# A docstring leading with one of these has already classified itself, so the
+# prose after it must not be mined for a state word: the note is explaining the
+# verdict, and it very often names the state it is REFUTING.  Kept in sync with
+# `empirical_status_vocabulary` in `proofs/validation/conventions.json`.
+VOCAB_NONSTATE = (
+    "NOT AN EMPIRICAL CLAIM",
+    "NOT EMPIRICALLY TESTABLE",
+    "NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS",
+    "CONDITIONALLY VALID",
+    "EXACT BY CONSTRUCTION",
+    "AN IDENTITY",
+    "DISAGREES WITH AN EXISTING MEASUREMENT",
+    "CONVENTION PINNED",
+    "ASSERTED",
+    "MIXED",
+)
+
 
 def strip_comments(src):
     """Remove block comments but keep line count, so indices stay aligned."""
@@ -121,8 +139,24 @@ def main():
             if status not in STATE_WORDS:
                 # "NOT ..." / "CONDITIONALLY ..." / free prose: not a state on
                 # its own, but the note may still name one further along.
-                status = states[0] if states else (
-                    "FREETEXT:" + status if status else None)
+                #
+                # UNLESS the headline is itself a COMPLETE verdict from the
+                # closed vocabulary.  Scanning the tail then reads a state word
+                # the note MENTIONS rather than asserts, and the two are not
+                # distinguishable to a regex.  That is not hypothetical: every
+                # `ldWitness*` in DGP declares `NOT AN EMPIRICAL CLAIM` and then
+                # explains "an UNTESTED marker here reads as an unpaid debt and
+                # is not one" -- so the word it is REFUTING became its status,
+                # and nine definitions that can never receive a measurement were
+                # counted as owing one.  A docstring is penalised for arguing
+                # its own case.
+                if any(tail_head.startswith(v) for v in VOCAB_NONSTATE
+                       for tail_head in (re.sub(r"^Empirical status:\s*[*_ ]*", "",
+                                                tail).upper(),)):
+                    status = "FREETEXT:" + status
+                else:
+                    status = states[0] if states else (
+                        "FREETEXT:" + status if status else None)
             empirical = bool(DOMAIN.search(short) or DOMAIN_CASED.search(short)
                              or MULT.search(re.sub(r"\^\s*[0-9]+", "", body)))
             records.append({
@@ -161,8 +195,18 @@ def main():
     for k, v in sorted(by_status.items(), key=lambda kv: -kv[1]):
         print("  %-22s %4d" % (k, v))
 
-    measured = sum(v for k, v in by_status.items()
-                   if k in {"VALIDATED", "FALSIFIED", "MEASURED", "TESTED"})
+    # A verdict from the closed vocabulary counts as measured even when it is
+    # not a single state word.  CONDITIONALLY VALID, MIXED, AN IDENTITY and
+    # DISAGREES WITH AN EXISTING MEASUREMENT are all the OUTCOME of a
+    # measurement -- a regime-restricted validation is a validation, and a
+    # two-part verdict is two findings, not none.  Only the NOT-family is
+    # outside this, and that family leaves the denominator entirely rather than
+    # sitting in it unmeasured.
+    MEASURED_STATES = {"VALIDATED", "FALSIFIED", "MEASURED", "TESTED",
+                       "FREETEXT:CONDITIONALLY", "FREETEXT:MIXED",
+                       "FREETEXT:AN", "FREETEXT:DISAGREES",
+                       "FREETEXT:EXACT", "FREETEXT:CONVENTION"}
+    measured = sum(v for k, v in by_status.items() if k in MEASURED_STATES)
     # A definition that declares itself NOT AN EMPIRICAL CLAIM is not owed a
     # measurement, so counting it in the denominator understates what has been
     # established. The screen that builds `emp` reads names and bodies, not
@@ -174,8 +218,7 @@ def main():
     # non-claim is whatever state word its prose quotes, which is history and
     # not a verdict.  Counting one in the numerator credits the corpus with a
     # measurement nobody made.
-    measured -= sum(1 for r in nonclaim
-                    if r["status"] in {"VALIDATED", "FALSIFIED", "MEASURED", "TESTED"})
+    measured -= sum(1 for r in nonclaim if r["status"] in MEASURED_STATES)
     claimable = len(emp) - len(nonclaim)
     print("\ndeclared NOT AN EMPIRICAL CLAIM (witnesses): %d" % len(nonclaim))
     for r in nonclaim:
