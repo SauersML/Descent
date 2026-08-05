@@ -142,6 +142,25 @@ theorem selectedFixation_generator_eq_zero (α x : ℝ) :
   unfold selectedFixationDeriv selectedFixationDeriv2
   ring
 
+/-- **The coefficient in the fixation equation is the pair coalescence rate.**  The factor
+`x(1-x)` multiplying both `u''` and `u'` is `Duality.diffusionOnPow 0`, which
+`Duality.duality_two` identifies with the `n = 2` duality term -- the rate at which two
+lineages coalesce.
+
+So the forward equation whose solution is a fixation probability and the backward rate at
+which a sample of two finds its common ancestor are built from one quantity, and this states
+it rather than leaving a reader to notice that two expressions coincide. -/
+theorem fixationCoefficient_eq_duality (x : ℝ) : x * (1 - x) = diffusionOnPow 0 x :=
+  (duality_two x).symm
+
+/-- The generator identity written on that coefficient, so the dependence is in the statement
+and not only in the prose. -/
+theorem selectedFixation_generator_eq_zero_duality (α x : ℝ) :
+    diffusionOnPow 0 x / 2 * selectedFixationDeriv2 α x
+      + α / 2 * diffusionOnPow 0 x * selectedFixationDeriv α x = 0 := by
+  rw [← fixationCoefficient_eq_duality]
+  exact selectedFixation_generator_eq_zero α x
+
 /-- The named first derivative is the derivative. -/
 theorem hasDerivAt_selectedFixation (α x : ℝ) :
     HasDerivAt (selectedFixation α) (selectedFixationDeriv α x) x := by
