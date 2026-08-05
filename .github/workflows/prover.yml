@@ -23,9 +23,22 @@ on:
       - '.github/workflows/prover.yml'
   workflow_dispatch:
 
+# CANCEL PULL REQUESTS, NEVER MAIN. This condition was `== 'push'`, which is
+# exactly backwards, and the cost is that main HAD NO VERDICT AT ALL: pushes
+# arrive in bursts, each one cancelled the last, and the most recent completed
+# run on main dated from before a repository-wide refactor. A gate whose result
+# is "cancelled" for a whole day of commits is not a gate.
+#
+# Nothing queues without bound under this setting. GitHub's concurrency group
+# keeps at most one running and one pending run, and a newer pending run
+# replaces the older one -- so a burst of ten commits still yields a verdict on
+# the tenth, it just also finishes the one already in flight.
+#
+# A pull request is the opposite case: only the head commit's result is ever
+# read, so cancelling superseded runs there is free.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
