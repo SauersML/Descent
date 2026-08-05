@@ -46,15 +46,23 @@ section AdditiveApproximation
     the name makes; dividing through by `V_G` adds nothing to it. `V_D` and
     `V_I` are unconstrained apart from nonnegativity and do not enter the
     conclusion, and there is no trait, no variance component and no
-    decomposition below beyond the equation `h_total` that names one.
+    decomposition below beyond the equation `_h_total` that names one.
+
+    The three are spelled with a leading underscore because the unused-binder
+    scan in `proofs/validation/code/Check.lean` gates on exactly that: a Prop
+    binder absent from the kernel-accepted proof term is FATAL unless its name
+    marks it deliberate. Here it is deliberate -- the decomposition is what the
+    statement is nominally *about*, and stating it without one would hide that
+    the arithmetic never consults it -- so the underscore is the admission, not
+    a way around the gate.
 
     Whether `V_A / V_G ≥ 1/2` actually holds for quantitative traits is a
     measurement, and this file makes none. -/
 theorem half_le_div_of_half_le
     (V_A V_D V_I V_G : ℝ)
-    (h_total : V_G = V_A + V_D + V_I)
+    (_h_total : V_G = V_A + V_D + V_I)
     (h_A_large : V_A ≥ V_G / 2)
-    (h_D : 0 ≤ V_D) (h_I : 0 ≤ V_I) (h_G : 0 < V_G) :
+    (_h_D : 0 ≤ V_D) (_h_I : 0 ≤ V_I) (h_G : 0 < V_G) :
     V_A / V_G ≥ 1 / 2 := by
   rw [ge_iff_le, div_le_div_iff₀ (by norm_num : (0:ℝ) < 2) h_G]
   linarith
@@ -233,14 +241,29 @@ theorem epistatic_variance_nonneg
     and there is nonzero epistasis (β₁₂ ≠ 0), the epistatic
     variance differs between populations.
 
-    The four frequencies range over all of `ℝ`, not over `(0,1)`. This
-    statement carried eight `0 < p` and `p < 1` premises until a scan of the
-    kernel-accepted proof term found that none of the eight occurs in the
-    proof: the argument cancels `4 β₁₂²` off both sides of an equality and
-    never asks where a frequency sits. Reinstating them would narrow the
-    theorem without adding content. The biological reading is unchanged --
-    on the frequency range it is about, the hypothesis `h_freq_diff` is the
-    heterozygosity-product mismatch and it is what does the work. -/
+    **Read the paragraph above as a description of the definition, not as a
+    summary of this theorem. The theorem is a cancellation identity.**
+    `epistaticVariance β p₁ p₂` unfolds to `β² · 2p₁(1-p₁) · 2p₂(1-p₂)`, which
+    is `4β²` times the heterozygosity product. The hypothesis `h_freq_diff`
+    says two heterozygosity products differ; the conclusion says `4β²` times
+    those same two products differ. Everything between them is
+    `mul_right_cancel₀`. No step is about epistasis, about populations, or
+    about portability: the biological content is entirely in the ASSUMPTION
+    that the heterozygosity products differ across populations, which this file
+    asserts and does not derive.
+
+    That was found by deleting hypotheses. The statement carried eight `0 < p`
+    and `p < 1` premises, and a scan of the kernel-accepted proof term found
+    that not one of the eight occurs in it. A frequency-indexed claim that
+    survives dropping every constraint saying its arguments are frequencies is
+    the signature of a statement whose arguments are not doing any work, and
+    checking why led to the cancellation above. The premises are gone, because
+    reinstating them would restore the appearance of a claim about allele
+    frequencies without restoring the substance.
+
+    What would make this a result: deriving `h_freq_diff` from a demographic
+    model rather than assuming it, or bounding the size of the variance gap
+    rather than only its nonvanishing. Neither is here. -/
 theorem epistasis_portability_loss
     (beta12 p1_src p2_src p1_tgt p2_tgt : ℝ)
     (h_beta : beta12 ≠ 0)

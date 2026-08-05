@@ -250,7 +250,7 @@ theorem superposedLandscape_oneHot
 /-- Consequently the near-optimal set at a simplex vertex is the component near-optimal set.
 Any statement claiming uniform destruction up to the boundary must therefore fail. -/
 theorem nearOptimalSet_superposition_oneHot
-    [LinearOrder R] [IsStrictOrderedRing R]
+    [LinearOrder R]
     (active : Finset Index) (energy : Index → Config → R) (selected : Index)
     (hselected : selected ∈ active) (target : R) :
     NearOptimalSet (superposedLandscape active (oneHotWeight selected) energy) target =

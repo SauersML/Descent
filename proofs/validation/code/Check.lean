@@ -484,8 +484,28 @@ saying so in `exempt` is the whole cost of clearing it.
 
 namespace Junk
 
-/-- The totalised partial operations. -/
-def junkOps : List Name := [``HDiv.hDiv, ``Inv.inv, ``Real.log, ``Real.sqrt]
+/-- The totalised partial operations, each paired with the position of the
+operand that can reach its junk point.
+
+The position differs per operation: `HDiv.hDiv` and `Inv.inv` are
+heterogeneous-operation classes carrying type and instance arguments ahead of
+the values, while `Real.log` and `Real.sqrt` take their argument first.
+
+ONE LIST, NOT TWO. This was previously a bare list of the four names alongside a
+separate per-operation `match` in `riskyHere` that recovered the positions, and
+the list was read by nothing. That arrangement has a silent false negative in
+it: adding a fifth totalised operation to the documented list changes no
+behaviour, so the scan goes on reporting a clean corpus for an operation it
+never looks at, and the list -- being the part a reader checks -- says
+otherwise. `riskyHere` now reads this table, so an operation is scanned exactly
+when it is listed here. -/
+def junkOps : List (Name × Nat) :=
+  [(``HDiv.hDiv, 5), (``Inv.inv, 2), (``Real.log, 0), (``Real.sqrt, 0)]
+
+/-- The junk operand position of an application head, if this scan totalises
+it. -/
+def junkOperandPosition (head : Name) : Option Nat :=
+  (junkOps.find? (fun entry ↦ entry.fst == head)).map Prod.snd
 
 /-- Definitions checked by hand whose guard cannot vanish anywhere in the type,
 so there is no branch to name.  A list with reasons rather than a pattern:
@@ -565,25 +585,16 @@ partial def isLiteral (e : Expr) : Bool :=
   | _ => e.isRawNatLit
 
 /-- Does this application totalise a partial operation on a NON-CONSTANT
-operand?  The operand position differs per operation: `HDiv.hDiv` and `Inv.inv`
-are heterogeneous-operation classes carrying instance arguments ahead of the
-values, while `Real.log` and `Real.sqrt` take their argument first. -/
+operand?  Which operations count, and where each one keeps the operand that can
+vanish, is `junkOps` and nothing else; see the note there on why the table is
+read rather than restated. -/
 def riskyHere (e : Expr) : Bool :=
-  let args := e.getAppArgs
-  match e.getAppFn.constName? with
-  | some ``HDiv.hDiv => match args[5]? with
-      | some d => !isLiteral d
+  match e.getAppFn.constName?.bind junkOperandPosition with
+  | some position =>
+      match e.getAppArgs[position]? with
+      | some operand => !isLiteral operand
       | none => false
-  | some ``Inv.inv => match args[2]? with
-      | some d => !isLiteral d
-      | none => false
-  | some ``Real.log => match args[0]? with
-      | some d => !isLiteral d
-      | none => false
-  | some ``Real.sqrt => match args[0]? with
-      | some d => !isLiteral d
-      | none => false
-  | _ => false
+  | none => false
 
 /-- Does this value apply a totalised partial operation to something that can
 vanish?  Walks the definition body only; theorem proof terms are never scanned,
@@ -658,7 +669,164 @@ def namedBranches (env : Environment) : Array String := Id.run do
 
 end Junk
 
+/-! ## UNUSED: a hypothesis no proof term mentions
+
+A Prop binder whose bound variable occurs neither in the rest of the theorem's
+TYPE nor in the rest of its kernel-accepted proof VALUE is a binder the theorem
+does not need.  That does not make the theorem false -- it makes it *weaker*
+than it reads, and it misdescribes what the result depends on.  Three shapes
+turned up the first time this ran:
+
+  * a modelling premise nobody uses.  Three of `FoldedSpectrum`'s
+    identifiability results took an `InLinkageEquilibrium` premise, and a joint
+    genotype distribution as a parameter purely to state it, while the proofs
+    are functions of the panel's frequencies and weights alone.  The signature
+    advertised a scope limit the results do not have.
+  * an instance binder narrower than the upstream lemma.  `integrable_prod_mul`
+    was `Integrable.mul_prod` with two unused `SigmaFinite` instances attached;
+    their deadness is precisely the evidence that the corpus copy was less
+    general than the Mathlib original it duplicated.
+  * a conclusion that is a hypothesis in heavier notation.  Five dead premises
+    on `am_ld_breaks_cross_population` were the tell: after the shared term
+    cancels, the inequality IS the premise `r_t < r_s`.
+
+**Severity, and why it is split on the binder name.**  Some unused hypotheses
+are deliberate and are the point of the theorem --
+`imitable_despite_positive_pcCorrectabilityMargin` exhibits a premise that does
+NOT help, and `recurrence_matching_leaves_fourth_cycle_density_free_of_palindromic_pair`
+shows that matching recurrence preserves nothing.  Lean already has a
+convention for "unused on purpose": the leading underscore, which is what its
+own `unusedVariables` linter respects.  So a dead binder is FATAL when its name
+does not begin with `_`, and reported without failing when it does.  That keeps
+the gate at budget zero without an allow-list, and it makes the underscore an
+admission a reader can grep for rather than a way around the check.
+
+**The known blind spot, stated because a gate that hides one is worse than no
+gate.**  `omega`, `linarith` and `simp_all` splice every hypothesis in scope
+into the certificate they emit, so a hypothesis they did not need still occurs
+in the term.  This scan cannot see those, `Calibrator.ZZCalib.zz_unused_tac` is
+the committed proof that it cannot, and `UNUSED_FATAL` is therefore a lower
+bound.  There is no false-positive direction: occurrence-freedom in a term the
+kernel accepted is a proof that the binder is deletable.
+
+**Validity.**  The result is computed against the statement as it stands in this
+environment, so it expires whenever a statement changes.  That is automatic
+here, since the scan reruns from the built corpus on every invocation; the type
+hash is reported alongside each finding so an out-of-band record of one can be
+checked against the declaration it was computed from.
+-/
+namespace UnusedHyp
+
+/-- Positions of `forallE` binders whose bound variable does not occur in the
+rest of the TYPE.  Index 0 is the outermost binder. -/
+partial def typeUnused (e : Expr) (i : Nat := 0)
+    (acc : Array Nat := #[]) : Array Nat :=
+  match e with
+  | .forallE _ _ b _ =>
+      typeUnused b (i + 1) (if b.hasLooseBVar 0 then acc else acc.push i)
+  | _ => acc
+
+/-- Positions of `lam` binders whose bound variable does not occur in the rest
+of the proof TERM, and how many binders the term abstracts.
+
+The count matters.  A term may be eta-short of its type's telescope, and a
+binder the term never abstracts is passed on to whatever the term reduces to
+rather than discarded, so positions at or beyond the count are not reported.
+That is the conservative direction. -/
+partial def valUnused (e : Expr) (i : Nat := 0)
+    (acc : Array Nat := #[]) : (Array Nat × Nat) :=
+  match e with
+  | .lam _ _ b _ =>
+      valUnused b (i + 1) (if b.hasLooseBVar 0 then acc else acc.push i)
+  | _ => (acc, i)
+
+/-- Deliberate, by Lean's own convention for an intentionally unused binder.
+
+Instance binders elaborated from `[...]` get inaccessible machine names such as
+`inst._@.Calibrator.Foo.123._hygCtx._hyg.6`, which do NOT begin with `_` at the
+first character but are not something an author chose either.  They are treated
+as accidental on purpose: an unused instance binder is exactly the
+narrower-than-upstream case above, and is the one shape here that is always
+worth deleting. -/
+def deliberate (n : Name) : Bool :=
+  n.toString.startsWith "_"
+
+end UnusedHyp
+
 end Check
+
+/-! ## Calibration of the UNUSED scan
+
+An uncalibrated detector is worse than no detector: this corpus has already had
+four laundering families sit silently dead until a calibration was written for
+them.  So the unused-binder scan is checked against declarations with known
+answers BEFORE it is run over the corpus, and a calibration failure is a
+`logError` like any other -- the detector gates on its own calibration.
+
+These live in the `Check.Calib` namespace rather than in a `Calibrator` module
+on purpose.  `Check.isOurs` keys on the name root, so the corpus scan does not
+see them, and planting a deliberately defective theorem inside `Calibrator` to
+test a corpus gate would put a defect in the corpus to check for defects.
+
+Both directions are asserted, and so is the KNOWN MISS.  If a future change
+made the scan see through `omega`, `calib_unused_tac` would start being
+reported and this calibration would fail -- which is correct: that is a
+behaviour change in a gate, and it should be noticed and the expectation
+updated deliberately rather than absorbed silently.
+-/
+namespace Check.Calib
+
+/-- Calibration: `h` IS used.  The scan must not report it. -/
+theorem calib_used (n : Nat) (h : 0 < n) : n ≠ 0 := Nat.pos_iff_ne_zero.mp h
+
+/-- Calibration: `h` is NOT used, and is not marked deliberate.  FATAL. -/
+theorem calib_unused (n : Nat) (h : 0 < n) : 0 < n + 1 := Nat.succ_pos n
+
+/-- Calibration: `_h` is not used and IS marked deliberate.  Reported, not fatal. -/
+theorem calib_deliberate (n : Nat) (_h : 0 < n) : 0 < n + 1 := Nat.succ_pos n
+
+/-- Calibration: tactic proof, `h` used.  Must not be reported. -/
+theorem calib_used_tac (n : Nat) (h : 2 < n) : 1 < n := by omega
+
+/-- Calibration: tactic proof, `h` unused.  The KNOWN MISS -- `omega` splices
+every hypothesis in scope into its certificate, so `h` occurs in the term. -/
+theorem calib_unused_tac (n : Nat) (h : 2 < n) : 0 < n + 1 := by omega
+
+end Check.Calib
+
+open Check in
+run_cmd do
+  let env ← getEnv
+  -- (declaration, expected fatal binders, expected deliberate binders)
+  let cases : Array (Name × List String × List String) :=
+    #[ (``Check.Calib.calib_used, [], []),
+       (``Check.Calib.calib_unused, ["h"], []),
+       (``Check.Calib.calib_deliberate, [], ["_h"]),
+       (``Check.Calib.calib_used_tac, [], []),
+       -- The documented blind spot: expected to report NOTHING.
+       (``Check.Calib.calib_unused_tac, [], []) ]
+  let mut failures := 0
+  for (n, wantFatal, wantDelib) in cases do
+    let some ci := env.find? n | continue
+    let some val := ci.value? | continue
+    let tSet := UnusedHyp.typeUnused ci.type
+    let (vSet, nLam) := UnusedHyp.valUnused val
+    let info ← liftTermElabM <|
+      Meta.forallTelescope ci.type fun args _ ↦ args.mapM fun a ↦ do
+        pure (← isProp (← inferType a), ← a.fvarId!.getUserName)
+    let mut gotFatal : List String := []
+    let mut gotDelib : List String := []
+    for h : i in [0:info.size] do
+      let (isP, bn) := info[i]
+      if isP && tSet.contains i && vSet.contains i && i < nLam then
+        if UnusedHyp.deliberate bn then gotDelib := gotDelib ++ [bn.toString]
+        else gotFatal := gotFatal ++ [bn.toString]
+    if gotFatal != wantFatal || gotDelib != wantDelib then
+      failures := failures + 1
+      logError m!"UNUSED_CALIB\t{n}\texpected fatal {wantFatal} deliberate \
+        {wantDelib}, got fatal {gotFatal} deliberate {gotDelib}"
+  logInfo m!"UNUSED_CALIB_CASES\t{cases.size}"
+  logInfo m!"UNUSED_CALIB_FAILURES\t{failures}"
 
 /-! ## Driver
 
@@ -961,8 +1129,66 @@ run_cmd do
   logInfo m!"JUNK_OPEN\t{junkOpen.size}"
 
   ---------------------------------------------------------------------------
+  -- UNUSED
+  ---------------------------------------------------------------------------
+  let mut uScanned := 0
+  let mut uProps := 0
+  let mut uFatal : Array (Name × Name × Name × String × String) := #[]
+  let mut uDeliberate := 0
+  let mut uJson : Array Json := #[]
+  for (name, ci) in env.constants.toList do
+    unless isOurs name do continue
+    unless ci.isTheorem do continue
+    unless userWritten env name do continue
+    let some val := ci.value? | continue
+    uScanned := uScanned + 1
+    let mod := (env.getModuleFor? name).getD `«unknown»
+    let tSet := UnusedHyp.typeUnused ci.type
+    let (vSet, nLam) := UnusedHyp.valUnused val
+    let info ← liftTermElabM <|
+      Meta.forallTelescope ci.type fun args _ ↦ args.mapM fun a ↦ do
+        let ty ← inferType a
+        pure ((← ppExpr ty).pretty, ← isProp ty, ← a.fvarId!.getUserName)
+    for h : i in [0:info.size] do
+      let (tyStr, isP, bn) := info[i]
+      if isP then
+        uProps := uProps + 1
+        if tSet.contains i && vSet.contains i && i < nLam then
+          if UnusedHyp.deliberate bn then
+            uDeliberate := uDeliberate + 1
+            uJson := uJson.push <| Json.mkObj
+              [ ("module", toJson mod.toString), ("declaration", toJson name.toString),
+                ("binder", toJson bn.toString), ("type", toJson tyStr),
+                ("fatal", toJson false), ("typeHash", toJson (toString ci.type.hash)) ]
+          else
+            uFatal := uFatal.push (mod, name, bn, tyStr, toString ci.type.hash)
+            uJson := uJson.push <| Json.mkObj
+              [ ("module", toJson mod.toString), ("declaration", toJson name.toString),
+                ("binder", toJson bn.toString), ("type", toJson tyStr),
+                ("fatal", toJson true), ("typeHash", toJson (toString ci.type.hash)) ]
+  for (m, n, bn, ty, hsh) in uFatal do
+    logError m!"UNUSED\t{m}\t{n}\t{bn} : {ty}\tthe proof term never mentions it; \
+      delete it, or rename it to `_{bn}` if it is deliberately unused\t[type {hsh}]"
+  logInfo m!"UNUSED_SCANNED\t{uScanned}"
+  logInfo m!"UNUSED_PROP_BINDERS\t{uProps}"
+  -- Printed even at zero: a missing line reads as "not measured", and the whole
+  -- point of the underscore split is that the deliberate ones stay counted.
+  logInfo m!"UNUSED_DELIBERATE\t{uDeliberate}"
+  logInfo m!"UNUSED_FATAL\t{uFatal.size}"
+
+  ---------------------------------------------------------------------------
   -- Stored results
   ---------------------------------------------------------------------------
+  Shared.Results.write "proofs/validation/code/results/unused.json" "UnusedHypScan"
+    [ ("scanned", toJson uScanned),
+      ("propBinders", toJson uProps),
+      ("fatalCount", toJson uFatal.size),
+      -- Deliberate hits are stored, not discarded: the underscore is an
+      -- admission the corpus should be able to enumerate, exactly as the
+      -- `sorry` ledger is.
+      ("deliberateCount", toJson uDeliberate),
+      ("findings", Json.arr uJson) ]
+
   Shared.Results.write "proofs/validation/code/results/inflation.json" "Inflation"
     [ ("theoremsExamined", toJson nthm),
       ("assumptionCarryingStructures", toJson carriers.size),

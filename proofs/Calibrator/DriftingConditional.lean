@@ -1908,7 +1908,7 @@ open MeasureTheory ProbabilityTheory Complex in
 /-- **With a scale factor at least one, the characteristic function is squeezed to nothing.**
 Each substitution of the equation into itself contributes another factor `exp(-(su)²/2)`, and
 `α ≥ 1` keeps every contribution at least that large. -/
-theorem norm_charFun_le_geometric (ν : Measure ℝ) [IsFiniteMeasure ν]
+theorem norm_charFun_le_geometric (ν : Measure ℝ)
     {s α β : ℝ} (hα1 : 1 ≤ α)
     (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
       = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I))
@@ -1992,7 +1992,7 @@ theorem charFun_selfSimilar_step (ν : Measure ℝ)
 open MeasureTheory ProbabilityTheory Complex in
 /-- **`n` substitutions.** The Gaussian exponents and the phases each accumulate as a partial sum
 of a geometric series; this is the identity the limit is taken in. -/
-theorem charFun_selfSimilar_iterate (ν : Measure ℝ) [IsFiniteMeasure ν]
+theorem charFun_selfSimilar_iterate (ν : Measure ℝ)
     {s α β : ℝ} (hα : 0 < α)
     (heq : ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t
       = charFun ν (t / α) * Complex.exp (((-(β * t / α) : ℝ) : ℂ) * Complex.I))

@@ -119,8 +119,7 @@ theorem each_component_le_total_of_sum_decomp
 theorem half_lt_share_of_half_lt_part
     (delta_total delta_LD : ℝ)
     (h_total : 0 < delta_total)
-    (h_LD_large : delta_total / 2 < delta_LD)
-    (h_LD_le : delta_LD ≤ delta_total) :
+    (h_LD_large : delta_total / 2 < delta_LD) :
     1 / 2 < delta_LD / delta_total := by
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 2) h_total]
   linarith

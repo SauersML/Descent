@@ -521,7 +521,7 @@ theorem diminishing_returns (n₁ n₂ delta C : ℝ)
     If population A already has a large GWAS and B has none,
     the next sample should go to B. -/
 theorem invest_in_undersampled (n_large n_small delta C : ℝ)
-    (h_C : 0 < C) (h_small : 0 ≤ n_small) (h_large : 0 ≤ n_large)
+    (h_C : 0 < C) (h_small : 0 ≤ n_small)
     (h_delta : 0 < delta) (h_gap : n_small < n_large) :
     heritabilityFractionFromN (n_large + delta) C - heritabilityFractionFromN n_large C <
       heritabilityFractionFromN (n_small + delta) C - heritabilityFractionFromN n_small C :=
