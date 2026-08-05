@@ -1,12 +1,24 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Tactic
-import Descent.Coalescent.Encoding
-import Descent.Coalescent.Extend
+import Descent.Coalescent.Split
+import Descent.Coalescent.CutSets
+import Descent.Coalescent.CutCount
+import Descent.Coalescent.Path
+import Descent.Coalescent.Trajectory
+import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
+import Descent.Coalescent.Infinite
+import Descent.Coalescent.Encoding
+import Descent.Coalescent.CompetingRates
+import Descent.Coalescent.StepLaw
 import Descent.Coalescent.PaintboxFrequency
-import Descent.Coalescent.WrightFisher
+import Descent.Coalescent.Extend
+import Descent.Coalescent.Ewens
+import Descent.Coalescent.Mutation
+import Descent.Coalescent.Kernel
+import Descent.Meta.Informal
+import Mathlib.Tactic
 
 namespace Descent
 
@@ -485,6 +497,29 @@ theorem about measures -- rather than for want of a space to state it in.
 Nothing above is asserted where it is open.  Where a result depends on an open item, the
 dependence is a written hypothesis.
 
+## Open, and why -- as objects rather than as this prose
+
+EVERY "OPEN" AND "STILL ABSENT" ABOVE IS ALSO AN OBJECT BELOW.  The prose stays, because it
+carries the argument and the objects carry only the claim, but the prose alone had the
+failure mode this whole file is written against: it could not be counted, could not be
+cited, and could not become false.  `Descent.Meta.Informal`'s `informal_lemma` and
+`informal_definition` record each open item with a stable tag and the fully qualified names
+it WAITS ON, add no constant to the environment, and let `#informal_report` answer the
+question the prose cannot -- which of these has acquired all of its prerequisites since it
+was written.
+
+The dependency chains matter more here than anywhere else in the corpus, because this
+group's open items are not independent.  Pólya's renewal identity waits on a strong Markov
+property for a walk on `ℤ`; spatial coalescence waits on the renewal identity; Theorem 2
+waits on Lévy's DOWNWARD martingale theorem and on nothing else, which is the single most
+useful sentence in this section and was, until now, a sentence.  A reader who wants to know
+what to work on next reads the chain, not the paragraphs.
+
+Three retractions in this file also become objects.  Two are the Ionescu-Tulcea entry's own
+corrections of earlier optimistic claims, and one is a mathematical error the enumeration
+caught.  All three are recorded with `withdrawn`, which is the command form for a retracted
+instruction that named no declaration -- which is most of them.
+
 ## Main results
 
 - `sum_choose_interior_add_two`: `Σ_{ν=1}^{λ-1} C(λ,ν) = 2^λ - 2`.
@@ -495,6 +530,213 @@ dependence is a written hypothesis.
 namespace Coalescent
 
 open Finset
+
+/-! ### The open items, as objects
+
+Each carries the tag it will be cited by, and the names it waits on.  A dep that is already
+a constant is closed; one that is not is either an object below or a piece of mathematics
+nobody has written.  Nothing here adds a declaration, so no result in this group can rest
+on any of it. -/
+
+/-- **Lévy's DOWNWARD martingale convergence theorem**, the single Mathlib lemma that
+unblocks the paintbox representation.
+
+`Probability/Martingale/Convergence.lean` has Lévy's UPWARD theorem,
+`Integrable.tendsto_ae_condExp`, along an INCREASING filtration, together with the
+upcrossing estimates behind it.  What is absent is convergence of `E[g | 𝒢ₙ]` along a
+DECREASING filtration to `E[g | ⋂ₙ 𝒢ₙ]`, which is what K-C's Theorem 2 uses (he cites Doob
+VII.4.25).
+
+The shortcut is ruled out and the ruling-out is the content.  `Filtration` is parameterised
+by an arbitrary `Preorder` and Mathlib does instantiate it at an order dual, so a decreasing
+filtration is expressible as `Filtration ℕᵒᵈ`.  The convergence results are not: every
+theorem there fixes `Filtration ℕ` and argues along `atTop` with upcrossing counts, and the
+downward theorem turns on a reversed martingale being automatically uniformly integrable,
+which the forward proof never needs.  It is a separate development, not an instantiation.
+
+It waits on nothing in this corpus. -/
+informal_lemma "coalescent-levy-downward"
+  Descent.Coalescent.tendsto_condExp_of_antitone
+  []
+
+/-- **K-C Theorem 2, the converse: every exchangeable random equivalence relation is a
+paintbox mixture.**
+
+The forward half is done.  `tendsto_colourFrequency` is K-C (3.8) by the strong law -- a
+paintbox HAS asymptotic frequencies and they are its own parameters -- and
+`paintboxRel_perm` is the permutation equivariance, which is the exchangeability that needs
+no probability.
+
+The converse is what is open, and it has exactly one prerequisite: the downward martingale
+theorem above.  Not de Finetti, which is also absent from Mathlib and is the wrong place to
+start; K-C proves this by reversed martingale convergence directly. -/
+informal_lemma "coalescent-KC-thm2-paintbox-converse"
+  Descent.Coalescent.exchangeable_isPaintboxMixture
+  [Descent.Coalescent.tendsto_colourFrequency,
+   Descent.Coalescent.paintboxRel_perm,
+   Descent.Coalescent.tendsto_condExp_of_antitone]
+
+/-- **The jump chain of a general continuous-time Markov chain.**
+
+The constructive direction of K-C Theorem 1 is complete: densities factorise
+(`pathDensity_factors`), one step factorises in measure (`stepLaw_prod`), and the whole
+path factorises in measure (`coalescentLaw_prod`).  All three are about a process BUILT as
+a product.
+
+Theorem 1 proper is the converse, about a process given by its RATES, and it needs the
+general theory this definition names: the embedded jump chain of a continuous-time Markov
+chain, and the holding times it is independent of.  Mathlib has no such construction, and
+this is the object the converse below is a statement about. -/
+informal_definition "coalescent-jump-chain-of-markov-chain"
+  Descent.Coalescent.jumpChainOfMarkovChain
+  [Descent.Coalescent.jumpKernel]
+
+/-- **K-C Theorem 1, the converse: an `n`-coalescent given by its rates factorises with
+independent factors.**
+
+`chainLaw_head_blocks` is the structural reason it can hold at all -- after `k` jumps the
+block count is `n - k` on every trajectory, so the death process learns nothing from the
+chain -- and it is proved.  What is missing is not a coalescent fact but a Markov-chain
+fact, which is why this waits on the jump-chain construction and not on anything in this
+group. -/
+informal_lemma "coalescent-KC-thm1-independence-converse"
+  Descent.Coalescent.coalescent_factorises_of_rates
+  [Descent.Coalescent.coalescentLaw_prod,
+   Descent.Coalescent.stepLaw_prod,
+   Descent.Coalescent.chainLaw_head_blocks,
+   Descent.Coalescent.jumpChainOfMarkovChain]
+
+/-- **The projective limit of a consistent family of measures on `𝓔ₙ`.**
+
+`Infinite` proves `𝓔` is the projective limit of the `𝓔ₙ` AS A SET, and `Encoding` supplies
+the measurable structure by embedding `𝓔` in `2^{ℕ×ℕ}`: the embedding is injective, the
+σ-algebra is the pullback, and every `ρₙ` is measurable.  So "the finite-dimensional
+distributions of a process on `𝓔`" is a well-formed phrase and the space is there.
+
+What is absent is the extension theorem itself.  Mathlib has `ProjectiveFamilyContent` and
+`ClosedCompactCylinders`, which name this as their goal, and `IsProjectiveLimit.unique`,
+which is what `Uniqueness` used -- but not the existence theorem for a general consistent
+family. -/
+informal_definition "coalescent-projective-limit-measure"
+  Descent.Coalescent.projectiveLimitMeasure
+  [Descent.Coalescent.encode_injective]
+
+/-- **K-C Theorem 3 and K-G section 6: the construction at `n = ∞`.**
+
+Finite `n` is settled -- `chainLaw` is a law on whole trajectories, `Path` turns a
+trajectory and holds into `R_t` with the death process pinned down pathwise, `Law` couples
+them.  Open is the Kakutani-Nelson step, the extension of a consistent family of MEASURES
+to `n = ∞`, and it is open for a stated reason: a theorem about measures, not the want of a
+space to state it in. -/
+informal_lemma "coalescent-KC-thm3-kakutani-nelson"
+  Descent.Coalescent.extend_consistent_coalescent_measures
+  [Descent.Coalescent.chainLaw,
+   Descent.Coalescent.encode_injective,
+   Descent.Coalescent.projectiveLimitMeasure]
+
+/-- **The strong Markov property of a random walk on `ℤ`.**
+
+Absent from the corpus, and the reason the renewal identity below is not simply proved.  It
+waits on nothing here. -/
+informal_lemma "coalescent-strong-markov-walk"
+  Descent.Coalescent.strongMarkov_of_randomWalk
+  []
+
+/-- **Pólya's renewal identity, `uₙ = Σ_k f_k u_{n-k}`.**
+
+`RenewalCriterion` proves the whole deduction FROM the identity with no probability in it:
+summing over `n ≤ N` and exchanging the order gives `U_N ≤ u₀ + q·U_N`, so a first-return
+mass `q < 1` bounds the partial sums and forces summability, and `not_summable_returnProb`
+therefore forces `q = 1`.  `PolyaCriterion` supplies the divergence by counting returning
+paths.
+
+What remains is the identity itself -- that the walk restarts at a first return -- which is
+the strong Markov property above and nothing else. -/
+informal_lemma "coalescent-polya-renewal-identity"
+  Descent.Coalescent.renewalIdentity
+  [Descent.Coalescent.returnProb,
+   Descent.Coalescent.sum_le_of_renewal,
+   Descent.Coalescent.not_summable_returnProb,
+   Descent.Coalescent.strongMarkov_of_randomWalk]
+
+/-- **Recurrence of the difference walk, hence whether spatial lineages coalesce at all.**
+
+`SpatialCoalescent` proves the voter-model duality by induction, presents the dual AS a
+pedigree so that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise
+coalescence to a hitting time via `walk_sub`.  A return IS a coalescence by that iff, so
+what is left is a theorem about random walks and not about genealogy: almost-sure return in
+one dimension, which is the renewal identity applied to the divergence
+`PolyaCriterion` already proves. -/
+informal_lemma "coalescent-spatial-difference-walk-recurrence"
+  Descent.Coalescent.recurrent_differenceWalk
+  [Descent.Coalescent.walk_sub,
+   Descent.Coalescent.not_summable_returnProb,
+   Descent.Coalescent.renewalIdentity]
+
+/-- **A measure on the infinite simplex.**
+
+Needed for `Ξ`, and absent: the corpus has no infinite-dimensional measure at all.  This is
+also the obstacle one layer under Ionescu-Tulcea for the paintbox kernel, which is the
+correction the `withdrawn` note below records. -/
+informal_definition "coalescent-infinite-simplex-measure"
+  Descent.Coalescent.infiniteSimplexMeasure
+  []
+
+/-- **Schweinsberg's `Ξ`: the measure on the infinite simplex, and the integral assigning a
+rate to each merger shape.**
+
+`XiRates` supplies the index set such a function would be defined on -- a merger's SHAPE,
+the multiset of merging group sizes, with `shapeDrop` the block count it costs -- and `Xi`
+supplies the state-space move, every merger being an idempotent map on blocks.  What is
+absent is the measure, and with it the integral.  `XiRates` provides only the index set,
+which the file says and this records. -/
+informal_definition "coalescent-xi-measure"
+  Descent.Coalescent.xiRateOfShape
+  [Descent.Coalescent.shapeDrop,
+   Descent.Coalescent.blocks_mergeIdem,
+   Descent.Coalescent.infiniteSimplexMeasure]
+
+/-- **The forward resolution of the ancestral selection graph.**
+
+`Selection` adds Krone and Neuhauser's ASG at the rate level, with the fact that makes
+Kingman's model robust: coalescence is quadratic in the lineage count and branching linear,
+so their ratio vanishes as the sample grows.  What is absent is the forward step deciding
+which parent was real, and it is absent for a reason worth keeping separate from the
+others -- it is a DIFFERENT PROCESS, not a harder case of this one. -/
+informal_lemma "coalescent-asg-forward-resolution"
+  Descent.Coalescent.asg_forward_resolution
+  []
+
+/-! ### Three retractions
+
+Written with `withdrawn` rather than as prose because a retracted claim that cannot be
+listed is a retracted claim the next reader re-derives.  None of the three named a
+declaration, which is why they are commands and not attributes. -/
+
+withdrawn "coalescent-ionescu-tulcea-most-promising"
+  "an earlier revision of the Mathlib entry called Ionescu-Tulcea 'the most \
+   promising unexplored route' to K-C Theorem 3. Scoping it retracts that: \
+   Ionescu-Tulcea needs the kernels, and the kernel from R_k to R_{k+1} is a \
+   splitting kernel whose probabilities are K-C (3.19)'s Dirichlet structure, \
+   which is the paintbox measure on the simplex. It avoids Kolmogorov's \
+   topological hypotheses and not the missing simplex measure -- the same \
+   obstacle, one layer down. Recorded because an optimistic claim in a ledger \
+   is worse than none."
+
+withdrawn "coalescent-ionescu-tulcea-jump-chain-scope"
+  "the verdict that Ionescu-Tulcea 'avoids Kolmogorov's topological hypotheses \
+   and not the missing simplex measure' was right about the PAINTBOX, whose \
+   kernel needs the simplex measure, and wrong about the JUMP CHAIN at finite \
+   n, whose kernel is Kernel.jumpKernel and needs no simplex at all. The \
+   distinction had not been drawn; drawing it is what unblocked \
+   Coalescent.TrajectoryLaw."
+
+withdrawn "coalescent-disjoint-pairs-never-share-tree"
+  "an earlier pass asserted that DISJOINT pairs never share tree. That is true \
+   of the pairing that respects the cherries and false of the other two, and it \
+   would have made Tajima's theta coefficient vanish like 2/n instead of \
+   tending to 1/3. The enumeration in TajimaVariance found it; re-reading had \
+   not."
 
 /-- The interior binomial coefficients of row `λ` sum to `2^λ - 2`.  Stated additively to
 keep it clear of truncated subtraction. -/
