@@ -209,7 +209,7 @@ def introduces(text: str, a: int, b: int) -> bool:
         return True
     if post.lstrip(" ").startswith(":="):
         stripped = pre.rstrip()
-        if stripped == "" or stripped[-1] in "{,|" or stripped.endswith("with"):
+        if stripped == "" or stripped[-1] in "{,|(" or stripped.endswith("with"):
             return True
     if pre.strip() == "" and pre.startswith(" "):
         rest = post.lstrip(" ")

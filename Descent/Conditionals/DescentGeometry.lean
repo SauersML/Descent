@@ -801,7 +801,7 @@ theorem admissible_confounding_meet_obstruction :
       exact crude_exposure_frequency 1
     rw [hvalue0] at h0
     rw [hvalue1] at h1
-    exact confoundedMarginalRisk_separates (beta := 0) (Spectral.gamma := 1) (by norm_num)
+    exact confoundedMarginalRisk_separates (beta := 0) (gamma := 1) (by norm_num)
       (h0.trans h1.symm)
 
 end Confounding
