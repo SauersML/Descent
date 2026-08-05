@@ -326,10 +326,19 @@ export ELAN_HOME=$ROOT/.elan
 # log written there is invisible to the next call -- and the relay does not land
 # on the same node twice, which makes that a silent cause of an empty log. On
 # acn112/116 /tmp is also RAM-backed tmpfs shared with other users.
+#
+# WIDTH IS A PARAMETER AND IT HAS TO BE, because the two builds this script
+# serves are not the same size. A few named modules against a warm tree wants
+# eight cores; a cold corpus after a rename -- when every module name changed
+# and not one olean is reusable -- wants as many as the partition will spare,
+# and eight cores turns that into an hour of waiting that measures nothing.
+CPUS=${CPUS:-8}
+MEM=${MEM:-32g}
+TIMELIMIT=${TIMELIMIT:-2:00:00}
 if [ -z "${SLURM_JOB_ID:-}" ]; then
   exec sbatch --job-name=leanbld --partition="${PARTITION:-agsmall}" \
     --nodes=1 --ntasks=1 \
-    --cpus-per-task=8 --mem=32g --time=2:00:00 \
+    --cpus-per-task="$CPUS" --mem="$MEM" --time="$TIMELIMIT" \
     --output="$ROOT/leanbuild-%j.out" "$0" "$@"
 fi
 
@@ -380,7 +389,15 @@ echo "LAUNDER_GUARD_EXIT=$?"
 "$GUARD_PY" -S validation/code/check.py --only laundering --summary 2>&1 \
   | sed -n '3,20p' | sed 's/^/LAUNDER_/'
 
-lake build "${TARGETS[@]}"
+# `-j` EXPLICITLY, because lake's default is the NODE's core count and not the
+# allocation's. Inside a `--cpus-per-task=8` cgroup on a 128-core node lake
+# still counts 128 and launches 128 elaborators, which the cgroup then timeshares
+# onto 8 cores. That is slower than 8 processes on 8 cores and it is unneighbourly
+# on a shared node, and neither symptom announces itself: the build finishes, so
+# nothing looks wrong.
+_jobs=${SLURM_CPUS_PER_TASK:-$CPUS}
+echo "LAKE_JOBS=$_jobs"
+lake build -j "$_jobs" "${TARGETS[@]}"
 _lake_exit=$?
 echo "LAKE_EXIT=$_lake_exit"
 
