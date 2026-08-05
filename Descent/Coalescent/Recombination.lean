@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -51,7 +52,7 @@ open Filter
 Empirical status: THIS IS THE MODEL.  `ρ = 4 N_e r` is the scaled rate, and the `1/2` is the
 same time-unit convention that makes the per-pair coalescence rate `1`; see
 `Descent.Program.Conventions`. -/
-noncomputable def recombRate (k : ℕ) (rho : ℝ) : ℝ := (k : ℝ) * rho / 2
+noncomputable def recombRate (k : ℕ) (rho : ℝ) : ℝ := Descent.Core.halfLineageRate k rho
 
 /-- The total rate of the next event in the ancestral recombination graph: a coalescence or
 a recombination, whichever comes first. -/
@@ -61,11 +62,11 @@ noncomputable def argEventRate (k : ℕ) (rho : ℝ) : ℝ := deathRate k + reco
 event rate is `deathRate` exactly, so `Descent.Coalescent`'s whole development is the
 zero-recombination case of the ARG. -/
 @[simp] theorem argEventRate_zero_recomb (k : ℕ) : argEventRate k 0 = deathRate k := by
-  unfold argEventRate recombRate
+  unfold argEventRate recombRate Descent.Core.halfLineageRate
   ring
 
 theorem recombRate_nonneg {k : ℕ} {rho : ℝ} (h : 0 ≤ rho) : 0 ≤ recombRate k rho := by
-  unfold recombRate
+  unfold recombRate Descent.Core.halfLineageRate
   positivity
 
 theorem argEventRate_pos {k : ℕ} (hk : 2 ≤ k) {rho : ℝ} (hrho : 0 ≤ rho) :
@@ -99,7 +100,7 @@ theorem recombFirstProb_add_coalesceFirstProb {k : ℕ} (hk : 2 ≤ k) {rho : �
   have hne : argEventRate k rho ≠ 0 := ne_of_gt hpos
   unfold recombFirstProb coalesceFirstProb
   rw [div_add_div_same, div_eq_one_iff_eq hne]
-  unfold argEventRate
+  unfold argEventRate recombRate Descent.Core.halfLineageRate
   ring
 
 /-- **Hudson's `1/(1+ρ)`.**  Two lineages coalesce at rate `1` and recombine at rate `ρ`, so
@@ -110,7 +111,7 @@ the shape in which linkage disequilibrium decays with distance. -/
 theorem pairCoalesceFirstProb_eq {rho : ℝ} (hrho : 0 ≤ rho) :
     coalesceFirstProb 2 rho = 1 / (1 + rho) := by
   have hne : (1 : ℝ) + rho ≠ 0 := by linarith
-  unfold coalesceFirstProb argEventRate recombRate
+  unfold coalesceFirstProb argEventRate recombRate Descent.Core.halfLineageRate
   rw [deathRate_two]
   push_cast
   field_simp

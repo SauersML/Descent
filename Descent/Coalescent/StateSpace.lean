@@ -466,7 +466,8 @@ theorem card_covers_eq_deathRate {n : ℕ} (ξ : ER n) :
   have hint : 2 * (blocks ξ).choose 2 = blocks ξ * (blocks ξ - 1) := two_mul_choose_two _
   rcases Nat.eq_zero_or_pos (blocks ξ) with hb | hb
   · rw [hb]
-    norm_num [deathRate]
+    norm_num [deathRate,
+      Descent.Core.pairCount]
   · have hcast : ((blocks ξ * (blocks ξ - 1) : ℕ) : ℝ)
         = (blocks ξ : ℝ) * ((blocks ξ : ℝ) - 1) := by
       push_cast [Nat.cast_sub hb]
@@ -476,7 +477,7 @@ theorem card_covers_eq_deathRate {n : ℕ} (ξ : ER n) :
       rw [← hcast, ← hint]
       push_cast
       ring
-    unfold deathRate
+    unfold deathRate Descent.Core.pairCount
     linear_combination h2 / 2
 
 end Coalescent

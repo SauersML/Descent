@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -49,7 +50,7 @@ open Filter
 
 Empirical status: THIS IS THE MODEL.  `σ = 2 N_e s` is the scaled selection coefficient; the
 `1/2` is the same time-unit convention that makes the per-pair coalescence rate `1`. -/
-noncomputable def branchRate (k : ℕ) (sigma : ℝ) : ℝ := (k : ℝ) * sigma / 2
+noncomputable def branchRate (k : ℕ) (sigma : ℝ) : ℝ := Descent.Core.halfLineageRate k sigma
 
 /-- The total rate of the next event in the ancestral selection graph. -/
 noncomputable def asgEventRate (k : ℕ) (sigma : ℝ) : ℝ := deathRate k + branchRate k sigma
@@ -58,7 +59,7 @@ noncomputable def asgEventRate (k : ℕ) (sigma : ℝ) : ℝ := deathRate k + br
 Kingman's tree, so this group's whole development is the zero-selection case -- as it is the
 zero-recombination case in `Recombination` and the `δ₀` case in `Lambda`. -/
 @[simp] theorem asgEventRate_zero_selection (k : ℕ) : asgEventRate k 0 = deathRate k := by
-  unfold asgEventRate branchRate
+  unfold asgEventRate branchRate Descent.Core.halfLineageRate
   ring
 
 /-- **The ratio of the two rates is `σ/(k-1)`.**  Everything else cancels: the sample size
@@ -69,7 +70,7 @@ theorem branchDeathRatio_eq {k : ℕ} (hk : 2 ≤ k) (sigma : ℝ) :
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   have hkne : (k : ℝ) ≠ 0 := by linarith
   have h1 : ((k : ℝ) - 1) ≠ 0 := by linarith
-  unfold branchRate deathRate
+  unfold branchRate deathRate Descent.Core.pairCount Descent.Core.halfLineageRate
   field_simp
 
 /-- **Selection is a lower-order perturbation.**  The branching rate is linear in the number
@@ -91,14 +92,14 @@ theorem branchRate_lt_deathRate {k : ℕ} (hk : 2 ≤ k) {sigma : ℝ} (hsig : 0
     (hlarge : sigma < (k : ℝ) - 1) : branchRate k sigma < deathRate k := by
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   have hkpos : (0 : ℝ) < (k : ℝ) := by linarith
-  unfold branchRate deathRate
+  unfold branchRate deathRate Descent.Core.pairCount Descent.Core.halfLineageRate
   rw [div_lt_div_iff_of_pos_right (by norm_num : (0:ℝ) < 2)]
   nlinarith
 
 /-- At zero selection the branching rate is zero: nothing branches, and the graph is a
 tree. -/
 @[simp] theorem branchRate_zero (k : ℕ) : branchRate k 0 = 0 := by
-  unfold branchRate
+  unfold branchRate Descent.Core.halfLineageRate
   ring
 
 /-- The total event rate is at least the coalescence rate: selection adds events, it never
@@ -107,7 +108,7 @@ which selection speeds the ancestry up rather than slowing it. -/
 theorem deathRate_le_asgEventRate {k : ℕ} {sigma : ℝ} (hsig : 0 ≤ sigma) :
     deathRate k ≤ asgEventRate k sigma := by
   have hb : 0 ≤ branchRate k sigma := by
-    unfold branchRate
+    unfold branchRate Descent.Core.halfLineageRate
     positivity
   unfold asgEventRate
   linarith

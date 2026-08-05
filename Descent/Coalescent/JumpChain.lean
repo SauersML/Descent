@@ -78,7 +78,7 @@ theorem jumpProb_eq {k : ℕ} (hk : 2 ≤ k) :
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   have h1 : ((k : ℝ) - 1) ≠ 0 := by linarith
   have h0 : (k : ℝ) ≠ 0 := by linarith
-  unfold jumpProb deathRate
+  unfold jumpProb deathRate Descent.Core.pairCount
   field_simp
 
 /-- **The uniform weights are a probability distribution.**  The number of covers times the
@@ -140,7 +140,7 @@ theorem jumpCoeff_recursion {n k : ℕ} (hk : 2 ≤ k) (hkn : k ≤ n) :
   have hfj' : (j + 1)! = (j + 1) * j ! := Nat.factorial_succ j
   have hj1 : (1 + (j : ℝ)) ≠ 0 := by positivity
   have hj2 : (2 + (j : ℝ)) ≠ 0 := by positivity
-  unfold jumpCoeff deathRate
+  unfold jumpCoeff deathRate Descent.Core.pairCount
   rw [hk2, hsub, hstep, hfj, hfj']
   push_cast
   field_simp

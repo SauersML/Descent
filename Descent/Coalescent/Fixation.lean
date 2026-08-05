@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Duality
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -74,7 +75,7 @@ namespace Coalescent
 
 Empirical status: DERIVED.  It is the function the neutral generator annihilates with the
 right boundary values, which `neutralFixation_generator_eq_zero` proves. -/
-noncomputable def neutralFixation (x : ℝ) : ℝ := x
+noncomputable def neutralFixation (x : ℝ) : ℝ := Descent.Core.identifiedWith x
 
 /-- **`u(x) = x` is harmonic for the neutral diffusion.**  The second derivative of the
 identity is zero, so `½x(1-x)u'' = 0` whatever `x` is -- the diffusion coefficient never
@@ -84,7 +85,7 @@ theorem neutralFixation_generator_eq_zero (x : ℝ) :
     x * (1 - x) / 2 * deriv (deriv neutralFixation) x = 0 := by
   have h1 : deriv neutralFixation = fun _ : ℝ ↦ (1 : ℝ) := by
     funext y
-    unfold neutralFixation
+    unfold neutralFixation Descent.Core.identifiedWith
     simp
   rw [h1]
   simp

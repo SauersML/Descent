@@ -106,6 +106,16 @@ for. -/
 noncomputable def ancestralPartitionLaw (N k : ℕ) [NeZero N] : PMF (Setoid (Fin k)) :=
   (parentAssignment N k).map ancestralPartition
 
+/-- **The law is a pushforward, and that is its whole content.**
+
+`ancestralPartitionLaw` is `parentAssignment` mapped through `ancestralPartition`, so
+every probability it assigns is a probability the parent assignment already assigned to
+a fibre. Stated because a definition nothing says anything about is a definition nothing
+can be wrong about: the empirical claim lives in `parentAssignment`, and this records that
+the partition law adds no assumption of its own on top of it. -/
+theorem ancestralPartitionLaw_eq_map (N k : ℕ) [NeZero N] :
+    ancestralPartitionLaw N k = (parentAssignment N k).map ancestralPartition := rfl
+
 /-- No coalescence in the step means the parent map was injective: `k` lineages, `k`
 distinct parents.  This is what makes the counting below a counting of embeddings. -/
 theorem ancestralPartition_eq_bot_iff {k N : ℕ} (f : Fin k → Fin N) :
@@ -279,7 +289,7 @@ theorem sum_range_div_eq_deathRate (N k : ℕ) :
         push_cast
         ring
   rw [← sum_div, hsum]
-  unfold deathRate
+  unfold deathRate Descent.Core.pairCount
   ring
 
 /-- **Upper bound: the one-generation coalescence probability is at most `d_k/N`.**  The

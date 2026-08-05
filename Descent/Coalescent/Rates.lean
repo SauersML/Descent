@@ -5,6 +5,7 @@ import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -63,7 +64,7 @@ times the per-pair rate `1`, and the per-pair rate is `1` by the choice of time 
 where a family-size variance `σ²` rescales it to `N σ⁻²`).  What is empirical is whether a
 given population's genealogy has ANY such ladder -- multiple-merger regimes do not, and
 `Descent.Blindness.MultipleMergerBlindness` records which statistics can tell. -/
-noncomputable def deathRate (k : ℕ) : ℝ := (k : ℝ) * ((k : ℝ) - 1) / 2
+noncomputable def deathRate (k : ℕ) : ℝ := Descent.Core.pairCount k
 
 /-- **Cross-check: the ladder is the corpus's existing one.**  `SpectrumIdentifiability`
 already reasons about `k(k-1)/2` under the name `coalescentRate`, and every telescoping
@@ -72,18 +73,22 @@ theorem deathRate_eq_coalescentRate (k : ℕ) :
     deathRate k = SpectrumIdentifiability.coalescentRate k := by
   simp [deathRate, SpectrumIdentifiability.coalescentRate, Descent.Core.pairCount]
 
-@[simp] theorem deathRate_zero : deathRate 0 = 0 := by norm_num [deathRate]
+@[simp] theorem deathRate_zero : deathRate 0 = 0 := by norm_num [deathRate,
+      Descent.Core.pairCount]
 
 /-- One lineage never coalesces: the absorbing state of the death process.  K-C (1.10). -/
-@[simp] theorem deathRate_one : deathRate 1 = 0 := by norm_num [deathRate]
+@[simp] theorem deathRate_one : deathRate 1 = 0 := by norm_num [deathRate,
+      Descent.Core.pairCount]
 
-@[simp] theorem deathRate_two : deathRate 2 = 1 := by norm_num [deathRate]
+@[simp] theorem deathRate_two : deathRate 2 = 1 := by norm_num [deathRate,
+      Descent.Core.pairCount]
 
-@[simp] theorem deathRate_three : deathRate 3 = 3 := by norm_num [deathRate]
+@[simp] theorem deathRate_three : deathRate 3 = 3 := by norm_num [deathRate,
+      Descent.Core.pairCount]
 
 theorem deathRate_succ_succ (k : ℕ) :
     deathRate (k + 2) = ((k : ℝ) + 2) * ((k : ℝ) + 1) / 2 := by
-  unfold deathRate
+  unfold deathRate Descent.Core.pairCount
   push_cast
   ring
 
@@ -281,7 +286,7 @@ theorem survivalFactor_partialProd {x : ℕ} (hx : 2 ≤ x) (m : ℕ) :
       have h3 : ((x : ℝ) + (m : ℝ)) ≠ 0 := by linarith
       have h4 : ((x : ℝ) + (m : ℝ) + 1) ≠ 0 := by linarith
       have hd : deathRate (x + 1 + m) = ((x : ℝ) + (m : ℝ) + 1) * ((x : ℝ) + (m : ℝ)) / 2 := by
-        unfold deathRate
+        unfold deathRate Descent.Core.pairCount
         push_cast
         ring
       have hfac : (1 : ℝ) - 1 / (((x : ℝ) + (m : ℝ) + 1) * ((x : ℝ) + (m : ℝ)) / 2)

@@ -171,6 +171,15 @@ noncomputable def coalescentLawExp (n k m : ℕ) (rate : ℕ) :
     Measure (List (ER n) × (Fin m → ℝ)) :=
   coalescentLaw n k m (blockHoldMeasure rate)
 
+/-- **The exponential holding-time law is the general law at an exponential block hold.**
+
+`coalescentLawExp` is `coalescentLaw` with one argument fixed, so it inherits everything
+the general law states and asserts nothing further. Recorded because the docstring above
+is careful that a product measure asserts something about its two marginals and not about
+a population -- and a definition with no theorem about it cannot be held to even that. -/
+theorem coalescentLawExp_eq (n k m : ℕ) (rate : ℕ) :
+    coalescentLawExp n k m rate = coalescentLaw n k m (blockHoldMeasure rate) := rfl
+
 end Coalescent
 
 end Descent

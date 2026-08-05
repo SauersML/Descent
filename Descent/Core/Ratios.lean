@@ -629,4 +629,27 @@ noncomputable def pairCount (k : ℕ) : ℝ := (k : ℝ) * ((k : ℝ) - 1) / 2
 @[simp] theorem pairCount_two : pairCount 2 = 1 := by
   unfold pairCount; norm_num
 
+/-- Per-lineage half rate, `k · x / 2`.
+
+The rate at which one of `k` lineages does something at scaled per-lineage rate `x`. The
+half is the same time-unit convention that makes the per-pair coalescence rate one -- it
+is not a modelling choice made independently at each use, which is why it is written once
+here rather than in each ancestral graph. Instantiated by the recombination rate of an
+ancestral recombination graph and the branching rate of an ancestral selection graph. -/
+noncomputable def halfLineageRate (k : ℕ) (x : ℝ) : ℝ := (k : ℝ) * x / 2
+
+/-- **No lineages, no events.** -/
+@[simp] theorem halfLineageRate_zero (x : ℝ) : halfLineageRate 0 x = 0 := by
+  unfold halfLineageRate; norm_num
+
+/-- **The rate is linear in the lineage count**, which is what makes it a PER-LINEAGE
+rate rather than a per-pair one -- and is exactly how it differs from `pairCount`, whose
+growth is quadratic. That contrast is the whole reason an ancestral recombination graph
+does not reduce to a coalescent. -/
+theorem halfLineageRate_succ (k : ℕ) (x : ℝ) :
+    halfLineageRate (k + 1) x = halfLineageRate k x + x / 2 := by
+  unfold halfLineageRate
+  push_cast
+  ring
+
 end Descent.Core

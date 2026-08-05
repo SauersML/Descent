@@ -93,7 +93,7 @@ backward generator applied to `xⁿ` in `n`.  This is the whole of the connectio
 diffusion and the coalescent, and it is an identity between polynomials -- no limits, no
 measure theory, no approximation. -/
 theorem duality_identity (m : ℕ) (x : ℝ) : diffusionOnPow m x = coalescentOnPow m x := by
-  unfold diffusionOnPow coalescentOnPow deathRate
+  unfold diffusionOnPow coalescentOnPow deathRate Descent.Core.pairCount
   push_cast
   ring
 

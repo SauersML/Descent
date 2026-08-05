@@ -77,7 +77,7 @@ theorem varTransitTime_nonneg (n : ℕ) : 0 ≤ varTransitTime n := by
 /-- The ladder is at least `1` from `k = 2` on, so its reciprocal is at most `1`.  This is
 what makes the variance smaller than the mean rather than larger. -/
 theorem one_le_deathRate_succ_succ (k : ℕ) : (1 : ℝ) ≤ deathRate (k + 2) := by
-  unfold deathRate
+  unfold deathRate Descent.Core.pairCount
   have hk : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg k
   push_cast
   nlinarith

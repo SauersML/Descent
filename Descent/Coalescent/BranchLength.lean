@@ -113,7 +113,7 @@ noncomputable def expectedSegmentLength (k : ℕ) : ℝ := (k : ℝ) / deathRate
 theorem expectedSegmentLength_eq (j : ℕ) :
     expectedSegmentLength (j + 2) = 2 / ((j : ℝ) + 1) := by
   have hd : deathRate (j + 2) = ((j : ℝ) + 2) * ((j : ℝ) + 1) / 2 := by
-    unfold deathRate
+    unfold deathRate Descent.Core.pairCount
     push_cast
     ring
   unfold expectedSegmentLength
