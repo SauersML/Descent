@@ -122,13 +122,15 @@ revision:
   `ClosedCompactCylinders` exist and name it as their goal, but the existence theorem for a
   general consistent family is not there.  `IsProjectiveLimit.unique` IS, which is what
   `Uniqueness` used.
-* **Ionescu-Tulcea**: PRESENT, in `Probability/Kernel/IonescuTulcea/Traj.lean`.  It builds a
+* **Ionescu-Tulcea**: PRESENT, in `Probability/Kernel/IonescuTulcea/Traj.lean` -- it builds a
   measure on infinite trajectories from a sequence of kernels without Kolmogorov's
-  topological hypotheses.  That is a plausible route to Theorem 3's `{ℛ_k}` -- the jump
-  chain is exactly a sequence of kernels -- with one obstacle: Kingman's chain runs from
-  `ℛ_{k}` to `ℛ_{k-1}`, and Ionescu-Tulcea wants the refining direction, whose transition
-  probabilities are K-G section 8's backward combinatorics.  Not attempted; recorded as the
-  most promising unexplored route rather than as blocked.
+  topological hypotheses.  This entry previously called it "the most promising unexplored
+  route" to Theorem 3.  Scoping it properly retracts that.  Ionescu-Tulcea needs the kernels,
+  and the kernel from `ℛ_k` to `ℛ_{k+1}` is a SPLITTING kernel whose probabilities are K-C
+  (3.19)'s Dirichlet structure -- that is, the paintbox measure `𝒫_k` on the simplex.  So it
+  avoids Kolmogorov's topological hypotheses and not the missing simplex measure: the same
+  obstacle, one layer down.  Recorded because an optimistic claim in a ledger is worse than
+  none, and this one was mine.
 
 ## Verification status
 
