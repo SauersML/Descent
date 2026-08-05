@@ -892,7 +892,7 @@ is `ploidy · Nₑ` generations. Writing the two inline left the constant free;
 this states which two it is. -/
 theorem coalFst_uses_coalescentTimeScale (t Ne : ℝ) :
     coalFst t Ne = t / (t + coalescentTimeScale Ne) := by
-  unfold coalFst; rw [coalescentTimeScale_eq]
+  unfold coalFst Descent.Core.oddsLike; rw [coalescentTimeScale_eq]
 
 /-! ### The coalescent `F_ST` map, written out once
 
@@ -914,7 +914,7 @@ written once for the two branches of a split and once for the two levels of
 the `F`-statistic hierarchy. -/
 theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
     pairwiseFstFromBranches a b = wrightFIT a b := by
-  unfold pairwiseFstFromBranches wrightFIT; ring_nf
+  unfold pairwiseFstFromBranches wrightFIT Descent.Core.complementaryComposition; ring_nf
 
 /-! ### The per-generation retention factor, written out in four modules
 
@@ -1373,11 +1373,11 @@ theorem oneMinusRatio_zero_denominator_is_junk (a : ℝ) :
 
 theorem fstFromHetRatio_eq_oneMinusRatio (H H₀ : ℝ) :
     fstFromHetRatio H H₀ = oneMinusRatio H H₀ := by
-  unfold fstFromHetRatio oneMinusRatio; ring_nf
+  unfold fstFromHetRatio oneMinusRatio Descent.Core.proportionalReduction; ring_nf
 
 theorem hudsonFstFromCoalescenceTimes_eq_oneMinusRatio (ETss ETst : ℝ) :
     hudsonFstFromCoalescenceTimes ETss ETst = oneMinusRatio ETss ETst := by
-  unfold hudsonFstFromCoalescenceTimes oneMinusRatio; ring_nf
+  unfold hudsonFstFromCoalescenceTimes oneMinusRatio Descent.Core.proportionalReduction; ring_nf
 
 /-- The PC-correction efficacy is the same `1 - a/b` map: what is corrected
 away is one minus the fraction of the ancestry axis that survives correction,
@@ -1598,7 +1598,7 @@ theorem ibdRecurrenceStep_uses_coalescentTimeScale (Ne rate x : ℝ) :
     ibdRecurrenceStep Ne rate x
       = (1 - rate) ^ 2 * (1 / coalescentTimeScale Ne
           + (1 - 1 / coalescentTimeScale Ne) * x) := by
-  unfold ibdRecurrenceStep; rw [coalescentTimeScale_eq]
+  unfold ibdRecurrenceStep Descent.Core.survivalWeightedMix; rw [coalescentTimeScale_eq]
 
 /-- **The rest point of that recurrence carries it too**, in both of its constants: the
 `2 Nₑ` is the coalescent time scale and the `2 - rate` is `ploidy - rate`, the two lineages
@@ -1670,7 +1670,7 @@ theorem driftLDStep_uses_coalescentTimeScale (Ne c Q : ℝ) :
     driftLDStep Ne c Q
       = (1 - c) ^ 2 * (1 / coalescentTimeScale Ne
           + (1 - 1 / coalescentTimeScale Ne) * Q) := by
-  unfold driftLDStep; rw [coalescentTimeScale_eq]
+  unfold driftLDStep Descent.Core.survivalWeightedMix; rw [coalescentTimeScale_eq]
 
 /-- **Its slope in `Q` carries it too.** -/
 theorem driftLDRetention_uses_coalescentTimeScale (Ne c : ℝ) :

@@ -70,12 +70,9 @@ theorem integral_colourIndicator [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : 
   have hmeas : MeasurableSet {ω | Z i ω = r} := (hZ i) (measurableSet_singleton r)
   have hind : colourIndicator Z r i = Set.indicator {ω | Z i ω = r} (1 : Ω → ℝ) := by
     funext ω
-    unfold colourIndicator
-    by_cases h : Z i ω = r
-    · rw [if_pos h, Set.indicator_of_mem (show ω ∈ {ω | Z i ω = r} from h)]
-      rfl
-    · rw [if_neg h, Set.indicator_of_not_mem (show ω ∉ {ω | Z i ω = r} from h)]
+    simp only [colourIndicator, Set.indicator_apply, Set.mem_setOf_eq, Pi.one_apply]
   rw [hind, integral_indicator_one hmeas]
+  simp [MeasureTheory.measureReal_def]
 
 /-- **K-C (3.8) for the paintbox.**  The frequency of colour `r` among the first `n` balls
 converges almost surely, and its limit is the colour's own probability.
@@ -90,7 +87,7 @@ theorem tendsto_colourFrequency [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : M
     (hident : ∀ i, IdentDistrib (Z i) (Z 0))
     (r : ℕ) :
     ∀ᵐ ω, Tendsto
-      (fun n : ℕ => (∑ i ∈ Finset.range n, colourIndicator Z r i ω) / n)
+      (fun n : ℕ => (n : ℝ)⁻¹ • ∑ i ∈ Finset.range n, colourIndicator Z r i ω)
       atTop (nhds ((ℙ {ω | Z 0 ω = r}).toReal)) := by
   have hindep' : Pairwise fun i j => IndepFun (colourIndicator Z r i) (colourIndicator Z r j) := by
     intro i j hij

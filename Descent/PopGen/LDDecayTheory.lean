@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -419,7 +420,7 @@ because it had no other place to go.
     Power: the prediction spans 0.09651 to 0.41197 across the design, a factor
     of four and a quarter. -/
 noncomputable def driftLDStep (Ne c Q : ℝ) : ℝ :=
-  (1 - c) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * Q)
+  Descent.Core.survivalWeightedMix Ne c Q
 
 /-- **driftLDStep at its junk point, named.** The same junk-one drift factor as `driftLDRetention`,
 in the recurrence: at `Ne = 0` the drift-generated term vanishes and the retained term keeps its
@@ -427,7 +428,7 @@ full weight, so iterating the step reports disequilibrium decaying by recombinat
 population that has none. Consumers must guard the argument that makes the divisor vanish. -/
 theorem driftLDStep_zero_population_is_junk (c Q : ℝ) :
     driftLDStep 0 c Q = (1 - c) ^ 2 * Q := by
-  unfold driftLDStep
+  unfold driftLDStep Descent.Core.survivalWeightedMix
   simp
 
 /-- **Cross-check: the Sved drift-recombination step and the island-model
@@ -438,7 +439,7 @@ and the same map, so the `1/(2 Nₑ)` inside them has to be the same
 `1/(2 Nₑ)`. -/
 theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
     driftLDStep Ne c Q = islandFstMultiplicativeStep Ne c Q := by
-  unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep
+  unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep Descent.Core.survivalWeightedMix
   ring
 
 /-- **`driftLDStep` is the rate-neutral recurrence, stated directly.**
@@ -455,7 +456,7 @@ stated here anyway, in the direct form. A two-step route is a route a reader has
 reconstruct, and the guard that looks for these pairs cannot follow it. -/
 theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
     driftLDStep Ne c Q = ibdRecurrenceStep Ne c Q := by
-  unfold driftLDStep ibdRecurrenceStep
+  unfold driftLDStep ibdRecurrenceStep Descent.Core.survivalWeightedMix
   ring
 
 /-- **Per-generation retention factor of the two-locus identity measure**,
@@ -621,7 +622,7 @@ theorem ohtaKimuraSigmaDSq_at_zero (Ne : ℝ) :
 theorem driftLDStep_affine (Ne c Q : ℝ) :
     driftLDStep Ne c Q =
       (1 - c) ^ 2 * (1 / (2 * Ne)) + driftLDRetention Ne c * Q := by
-  unfold driftLDStep driftLDRetention
+  unfold driftLDStep driftLDRetention Descent.Core.survivalWeightedMix
   ring
 
 /-- **The two equilibria are one equilibrium too.**  The step-level identity

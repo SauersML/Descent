@@ -354,4 +354,46 @@ theorem halfDiffSq_eq_zero_iff (a b : ℝ) : halfDiffSq a b = 0 ↔ a = b := by
 theorem halfDiffSq_at_reference_point : halfDiffSq 1 0 = 1 / 4 := by
   norm_num [halfDiffSq]
 
+/-- Survival-weighted mix, `(1 - c)² · (1/(2N) + (1 - 1/(2N)) · x)`.
+
+Two lineages both escape an event of per-lineage probability `c` -- hence the square -- and
+what they carry forward is a convex mix of a freshly generated `1/(2N)` and the retained
+`x`. Instantiated by the drift step for linkage disequilibrium and by the
+identity-by-descent recurrence, which are the same map: LD decay under drift IS the IBD
+recurrence, with `c` reading as recombination in one and as mutation in the other. The
+corpus had the two bodies written out separately in two modules with nothing relating
+them. -/
+noncomputable def survivalWeightedMix (N c x : ℝ) : ℝ :=
+  (1 - c) ^ 2 * (1 / (2 * N) + (1 - 1 / (2 * N)) * x)
+
+/-- **survivalWeightedMix at an empty population, named.** At `N = 0` the freshly generated
+term is junk-zero and the retained term keeps its full weight, so an empty population is
+reported as generating nothing new while losing nothing either. Consumers must require
+`N ≠ 0`. -/
+theorem survivalWeightedMix_empty_is_junk (c x : ℝ) :
+    survivalWeightedMix 0 c x = (1 - c) ^ 2 * x := by
+  unfold survivalWeightedMix; simp
+
+/-- **No survival, nothing carried.** At `c = 1` the step returns zero whatever the state
+was: if neither lineage survives the event, no information about the previous generation
+reaches the next. -/
+@[simp] theorem survivalWeightedMix_full_loss (N x : ℝ) :
+    survivalWeightedMix N 1 x = 0 := by
+  unfold survivalWeightedMix; ring
+
+/-- **The mix is convex in the retained value**, so the step is monotone: a larger state in
+carries a larger state out. -/
+theorem survivalWeightedMix_mono (N c x y : ℝ) (hN : 1 / (2 * N) ≤ 1) (hxy : x ≤ y) :
+    survivalWeightedMix N c x ≤ survivalWeightedMix N c y := by
+  unfold survivalWeightedMix
+  have h1 : 0 ≤ 1 - 1 / (2 * N) := by linarith
+  have h2 : (1 - 1 / (2 * N)) * x ≤ (1 - 1 / (2 * N)) * y :=
+    mul_le_mul_of_nonneg_left hxy h1
+  exact mul_le_mul_of_nonneg_left (by linarith) (sq_nonneg _)
+
+/-- Reference evaluation. -/
+theorem survivalWeightedMix_at_reference_point :
+    survivalWeightedMix 1 0 0 = 1 / 2 := by
+  norm_num [survivalWeightedMix]
+
 end Descent.Core

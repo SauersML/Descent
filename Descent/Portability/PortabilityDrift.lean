@@ -245,7 +245,7 @@ ancestor.**
 
     Empirical status: CONDITIONALLY VALID. -/
 noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
-  1 - (1 - fstS) * (1 - fstT)
+  Descent.Core.complementaryComposition fstS fstT
 
 /-- **Pairwise `F_ST` composed in coalescent time instead of in `F_ST`.**
 
@@ -312,7 +312,7 @@ noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
 
 @[simp] theorem pairwise_fst_decomposition (fstS fstT : ℝ) :
     pairwiseFstFromBranches fstS fstT = fstS + fstT - fstS * fstT := by
-  unfold pairwiseFstFromBranches
+  unfold pairwiseFstFromBranches Descent.Core.complementaryComposition
   ring_nf
 
 /-- **What the multiplicative composition actually computes.**
@@ -332,7 +332,7 @@ theorem pairwiseFstFromBranches_eq_fstFromTau_add_mul (a b : ℝ)
   have hb1' : (1 : ℝ) + b ≠ 0 := ne_of_gt hb1
   have hab : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   have hab' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt hab
-  unfold pairwiseFstFromBranches fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
+  unfold pairwiseFstFromBranches fstFromTau Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.complementaryComposition
   field_simp
   ring
 
@@ -510,7 +510,7 @@ of the within-population time to the total time.
     0.66607 ± 0.00875 and 0.80065 ± 0.00447, worst cell 0.37 sems over a
     prediction spanning 86%. -/
 noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
-  1 - ETss / ETst
+  Descent.Core.proportionalReduction ETss ETst
 
 structure DemographicCoalescenceScalars where
   ETss : ℝ
@@ -521,7 +521,7 @@ drawn between populations takes twice as long to coalesce as a pair drawn within
 coalescent history is population-specific and `Fst` is one half. -/
 theorem hudsonFstFromCoalescenceTimes_double_between :
     hudsonFstFromCoalescenceTimes 1 2 = 1 / 2 := by
-  unfold hudsonFstFromCoalescenceTimes
+  unfold hudsonFstFromCoalescenceTimes Descent.Core.proportionalReduction
   norm_num
 
 /-- **Hudson's estimator at zero between-population coalescence time, named.** If a pair drawn
@@ -532,7 +532,7 @@ is the one that inverts rather than flattens, so it cannot be spotted as an impl
 Consumers must require `ETst ≠ 0`. -/
 theorem hudsonFstFromCoalescenceTimes_instant_between_is_junk (ETss : ℝ) :
     hudsonFstFromCoalescenceTimes ETss 0 = 1 := by
-  unfold hudsonFstFromCoalescenceTimes
+  unfold hudsonFstFromCoalescenceTimes Descent.Core.proportionalReduction
   simp
 
 noncomputable def DemographicCoalescenceScalars.delta
@@ -722,7 +722,7 @@ theorem twoDemeIMEquilibriumDelta_isFixedPoint (M : ℝ) (hM : 0 < M) :
   have hM' : M ≠ 0 := ne_of_gt hM
   have h2 : (0 : ℝ) < 2 * M + 1 := by linarith
   have h2' : (2 : ℝ) * M + 1 ≠ 0 := ne_of_gt h2
-  unfold hudsonFstFromCoalescenceTimes twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
+  unfold hudsonFstFromCoalescenceTimes twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst Descent.Core.proportionalReduction
     twoDemeIMEquilibriumDelta
   field_simp
   ring
@@ -739,7 +739,7 @@ theorem twoDemeIMEquilibriumDelta_eq (M : ℝ) (h2M1 : 2 * M + 1 ≠ 0) :
     (twoDemeIMEquilibriumScalars M).delta = twoDemeIMEquilibriumDelta M := by
   simp [DemographicCoalescenceScalars.delta, hudsonFstFromCoalescenceTimes,
     twoDemeIMEquilibriumScalars, twoDemeIMEquilibriumETss,
-    twoDemeIMEquilibriumETst, twoDemeIMEquilibriumDelta]
+    twoDemeIMEquilibriumETst, twoDemeIMEquilibriumDelta, Descent.Core.proportionalReduction]
   field_simp [h2M1]
   ring
 
@@ -6933,7 +6933,7 @@ is no evidence that the admissible ones are the intended domain. -/
     is bounded above by 2 × Fst_eq (since each branch contributes at most Fst_eq). -/
 theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
     pairwiseFstFromBranches (1 / (1 + θ)) (1 / (1 + θ)) ≤ 2 / (1 + θ) := by
-  simp [pairwiseFstFromBranches]
+  simp [pairwiseFstFromBranches, Descent.Core.complementaryComposition]
   ring_nf
   have h1 : 0 < 1 + θ := by linarith
   have hsq : 0 ≤ (1 / (1 + θ)) ^ 2 := sq_nonneg (1 / (1 + θ))
@@ -7043,7 +7043,7 @@ difference from `ibdFlowStep`, which linearises `(1 - rate)² (1 - 1/(2 Nₑ))` 
 
     Power: the prediction spans 0.07603 to 0.27083 across the design. -/
 noncomputable def ibdRecurrenceStep (Ne rate x : ℝ) : ℝ :=
-  (1 - rate) ^ 2 * (1 / (2 * Ne) + (1 - 1 / (2 * Ne)) * x)
+  Descent.Core.survivalWeightedMix Ne rate x
 
 /-- **ibdRecurrenceStep at its junk point, named.** At `Ne = 0` the identity-by-descent input
 term is junk-zero and the retained term keeps full weight, so an empty population is reported as
@@ -7051,7 +7051,7 @@ generating no new identity by descent. Iterating the recurrence compounds the er
 must exclude the argument that makes the guard vanish. -/
 theorem ibdRecurrenceStep_empty_population_is_junk (rate x : ℝ) :
     ibdRecurrenceStep 0 rate x = (1 - rate) ^ 2 * x := by
-  unfold ibdRecurrenceStep
+  unfold ibdRecurrenceStep Descent.Core.survivalWeightedMix
   simp
 
 /-- **The rest point of the identity-by-descent recurrence.**
@@ -7146,7 +7146,7 @@ theorem ibdRecurrenceFixedPoint_isFixedPoint (Ne rate : ℝ)
       ring
     rw [hbridge]
     exact hd'
-  unfold ibdRecurrenceStep ibdRecurrenceFixedPoint
+  unfold ibdRecurrenceStep ibdRecurrenceFixedPoint Descent.Core.survivalWeightedMix
   -- Clear the fixed-point denominator while it is still in its factored form;
   -- only then clear the coalescence denominator. Expanding first made the
   -- nonzero hypothesis syntactically unusable and left an inverse in the goal.
@@ -7270,7 +7270,7 @@ the theorem states a number: an inequality or an invariance leaves a family of b
 satisfying it, and a value does not. -/
 theorem islandFstMultiplicativeStep_at_reference_point :
     islandFstMultiplicativeStep 1 (1 / 2) 0 = 1 / 8 := by
-  norm_num [islandFstMultiplicativeStep, ibdRecurrenceStep]
+  norm_num [islandFstMultiplicativeStep, ibdRecurrenceStep, Descent.Core.survivalWeightedMix]
 
 
 

@@ -465,7 +465,7 @@ theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
     (hd : 0 < d) (hNe : 0 < Ne) (hm : 0 < m) (hσ : 0 < σ_sq) :
     coalFst (steppingStoneDiffusionTimescale d σ_sq m) Ne =
       demoSteppingStoneFst d Ne m σ_sq := by
-  unfold coalFst steppingStoneDiffusionTimescale demoSteppingStoneFst
+  unfold coalFst steppingStoneDiffusionTimescale demoSteppingStoneFst Descent.Core.oddsLike
   have hσm : (0 : ℝ) < 2 * σ_sq * m := by
     have h := mul_pos hσ hm; linarith
   have hσm' : (2 : ℝ) * σ_sq * m ≠ 0 := ne_of_gt hσm
@@ -506,7 +506,7 @@ theorem steppingStoneCoalescenceTime_pos (d σ_sq m : ℝ)
 theorem fstFromCoalescenceTime_in_unit (T Ne : ℝ)
     (hT : 0 < T) (hNe : 0 < Ne) :
     0 < coalFst T Ne ∧ coalFst T Ne < 1 := by
-  unfold coalFst
+  unfold coalFst Descent.Core.oddsLike
   constructor
   · positivity
   · rw [div_lt_one (by linarith)]; linarith

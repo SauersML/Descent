@@ -345,7 +345,7 @@ theorem het_increases_with_ne
     Power: the prediction spans 0.20000 to 0.50000 across the design, a factor
     of two and a half. -/
 noncomputable def coalFst (t Ne : ℝ) : ℝ :=
-  t / (t + 2 * Ne)
+  Descent.Core.oddsLike t Ne
 
 /-- **coalFst where its denominator vanishes, named.** The guard `t + 2 * Ne` is zero at `t = 0`,
 `Ne = 0`. At zero separation and zero effective size the coalescent chart is degenerate at both
@@ -353,7 +353,7 @@ ends at once. Lean returns `0` there rather than the value the modelled quantity
 type error marks the point. Consumers must require `t + 2 * Ne ≠ 0`. -/
 theorem coalFst_at_t0ne0_is_junk :
     coalFst 0 0 = 0 := by
-  unfold coalFst
+  unfold coalFst Descent.Core.oddsLike
   norm_num
 
 /-- **One quantity, one definition.**  `coalFst` and `fstFromTau` are the same
@@ -366,14 +366,14 @@ theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
   have hsum : t + 2 * Ne ≠ 0 := by
     have hs : 0 < t + 2 * Ne := by linarith
     exact ne_of_gt hs
-  unfold coalFst fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
+  unfold coalFst fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.oddsLike
   field_simp
   ring
 
 /-- Coalescent Fst is nonneg. -/
 theorem coal_fst_nonneg (t Ne : ℝ) (h_t : 0 ≤ t) (h_Ne : 0 < Ne) :
     0 ≤ coalFst t Ne := by
-  unfold coalFst
+  unfold coalFst Descent.Core.oddsLike
   exact div_nonneg h_t (by linarith)
 
 /-- Coalescent Fst increases with separation time. -/
@@ -381,7 +381,7 @@ theorem coal_fst_increases_with_time
     (Ne : ℝ) (t₁ t₂ : ℝ) (h_Ne : 0 < Ne)
     (h_t₁ : 0 ≤ t₁) (h_more : t₁ < t₂) :
     coalFst t₁ Ne < coalFst t₂ Ne := by
-  unfold coalFst
+  unfold coalFst Descent.Core.oddsLike
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
@@ -390,7 +390,7 @@ theorem coal_fst_approaches_one
     (Ne t : ℝ) (h_Ne : 0 < Ne)
     (h_large : 100 * Ne < t) :
     49 / 50 < coalFst t Ne := by
-  unfold coalFst
+  unfold coalFst Descent.Core.oddsLike
   rw [div_lt_div_iff₀ (by norm_num : (0:ℝ) < 50) (by linarith)]
   nlinarith
 
@@ -732,7 +732,7 @@ section WrightFStatistics
     F_ST: differentiation between subpopulations (= Fst).
     F_IT: overall inbreeding. -/
 noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
-  1 - (1 - f_IS) * (1 - f_ST)
+  Descent.Core.complementaryComposition f_IS f_ST
 
 /-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with
 `pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
@@ -740,13 +740,13 @@ free. Two independent halves compound to three quarters, not to one -- the inbre
 coefficients multiply as retained heterozygosities rather than adding. -/
 theorem wrightFIT_compounds_two_halves :
     wrightFIT (1 / 2) (1 / 2) = 3 / 4 := by
-  unfold wrightFIT
+  unfold wrightFIT Descent.Core.complementaryComposition
   norm_num
 
 /-- Wright's decomposition identity. -/
 theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
-  unfold wrightFIT; ring
+  unfold wrightFIT Descent.Core.complementaryComposition; ring
 
 /-- **The multiplicative-complement composition `1 - (1-a)(1-b)` occurs twice, and the two
 occurrences do not have the same status.**
@@ -2537,14 +2537,14 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     scored MATCH at 0.00 sems in three cells. The heterozygosity decay above is
     the only one of the four that a simulation can refute. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
-  1 - H / H₀
+  Descent.Core.proportionalReduction H H₀
 
 /-- **fstFromHetRatio where its denominator vanishes, named.** The guard `H₀` is zero at `H₀ = 0`.
 Lean returns `1` there rather than the value the modelled quantity takes, and no type error
 marks the point. Consumers must require `H₀ ≠ 0`. -/
 theorem fstFromHetRatio_at_h0_is_junk (H : ℝ) :
     fstFromHetRatio H 0 = 1 := by
-  unfold fstFromHetRatio
+  unfold fstFromHetRatio Descent.Core.proportionalReduction
   norm_num
 
 /-- **The proportional-reduction form, written three times in this corpus, related here so
@@ -2588,7 +2588,7 @@ theorem fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE (a b : ℝ
 theorem fst_from_closed_form_het (lam Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
     fstFromHetRatio (hetMutationRecurrence lam Hstar H₀ t) H₀ =
       (1 - Hstar / H₀) * (1 - lam ^ t) := by
-  unfold fstFromHetRatio
+  unfold fstFromHetRatio Descent.Core.proportionalReduction
   rw [hetMutationRecurrence_closed_form]
   field_simp
   ring

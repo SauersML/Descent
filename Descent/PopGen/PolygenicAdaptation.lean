@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -47,7 +48,7 @@ section QSTFSTTest
 
     Empirical status: UNTESTED. -/
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
-  V_between / (V_between + 2 * V_within)
+  Descent.Core.oddsLike V_between V_within
 
 /-- **qst pinned at a reference point.** No theorem in the corpus evaluated this definition, so
 every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
@@ -55,7 +56,7 @@ arguments equal to `1 / 2` it is `1 / 3`, which fixes the
 coefficients a one-sided bound or an invariance leaves free. -/
 theorem qst_at_reference_point :
     qst (1 / 2) (1 / 2) = 1 / 3 := by
-  unfold qst
+  unfold qst Descent.Core.oddsLike
   norm_num
 
 /-- **qst where its denominator vanishes, named.** The guard `V_between + 2 * V_within` is zero at
@@ -65,7 +66,7 @@ quantity takes, and no type error marks the point. Consumers must require `V_bet
 V_within ≠ 0`. -/
 theorem qst_at_vbetween0vwithin0_is_junk :
     qst 0 0 = 0 := by
-  unfold qst
+  unfold qst Descent.Core.oddsLike
   norm_num
 
 /-- **No within-population variance makes the statistic one.**
@@ -78,7 +79,7 @@ the numerator, or on `V_between` -- fails. It is also the reading that makes `Q_
 all of the additive variation is between populations exactly when none is within. -/
 theorem qst_no_within (V_between : ℝ) (h : V_between ≠ 0) :
     qst V_between 0 = 1 := by
-  unfold qst
+  unfold qst Descent.Core.oddsLike
   norm_num
   exact div_self h
 
@@ -91,13 +92,13 @@ factor of two to be the same factor of two in both. This theorem makes a
 divergence between them a failed proof rather than a silent recalibration. -/
 theorem qst_eq_coalFst_form (V_between V_within : ℝ) :
     qst V_between V_within = coalFst V_between V_within := by
-  unfold qst coalFst; ring
+  unfold qst coalFst Descent.Core.oddsLike; ring
 
 /-- QST is in [0, 1] for nonneg components with positive denominator. -/
 theorem qst_in_unit (V_b V_w : ℝ)
     (h_b : 0 ≤ V_b) (h_w : 0 < V_w) :
     0 ≤ qst V_b V_w ∧ qst V_b V_w ≤ 1 := by
-  unfold qst
+  unfold qst Descent.Core.oddsLike
   have h_denom : 0 < V_b + 2 * V_w := by linarith
   constructor
   · exact div_nonneg h_b (le_of_lt h_denom)
