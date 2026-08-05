@@ -10357,15 +10357,19 @@
   }
  },
  "Descent.Blindness.symmetricTwoCoordinateCovariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/LandscapeSuperposition.lean",
   "line": 938,
   "short": "symmetricTwoCoordinateCovariance",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "symmetricTwoCoordinateCovariance",
+  "args": [
+   "firstVariance",
+   "secondVariance",
+   "correlation"
+  ],
   "box": {
    "firstVariance": [
     0.05,
@@ -10380,7 +10384,11 @@
     0.98
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -10413,8 +10421,8 @@
   }
  },
  "Descent.Blindness.overlapEnergyWitnessCovariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition symmetricTwoCoordinateCovariance",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/LandscapeSuperposition.lean",
   "line": 999,
   "short": "overlapEnergyWitnessCovariance",
@@ -10424,9 +10432,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'symmetricTwoCoordinateCovariance' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -13254,22 +13262,28 @@
   }
  },
  "Descent.Blindness.localizedCovarianceBlock": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/SpectralUniversalityFailure.lean",
   "line": 397,
   "short": "localizedCovarianceBlock",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "localizedCovarianceBlock",
+  "args": [
+   "a"
+  ],
   "box": {
    "a": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -13310,22 +13324,28 @@
   }
  },
  "Descent.Blindness.rotatedCovarianceBlock": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/SpectralUniversalityFailure.lean",
   "line": 401,
   "short": "rotatedCovarianceBlock",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "rotatedCovarianceBlock",
+  "args": [
+   "a"
+  ],
   "box": {
    "a": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -29256,7 +29276,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 3,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29327,7 +29347,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 6,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -57507,17 +57527,21 @@
   }
  },
  "Descent.PopGen.ldWitnessSigmaTargetIndependent": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DGP.lean",
   "line": 647,
   "short": "ldWitnessSigmaTargetIndependent",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
-  "python": null,
+  "python": "ldWitnessSigmaTargetIndependent",
   "args": [],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -57531,17 +57555,21 @@
   }
  },
  "Descent.PopGen.ldWitnessSigmaTargetCorrelated": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DGP.lean",
   "line": 660,
   "short": "ldWitnessSigmaTargetCorrelated",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
-  "python": null,
+  "python": "ldWitnessSigmaTargetCorrelated",
   "args": [],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -102214,7 +102242,7 @@
  },
  "Descent.Portability.witnessSigmaObs": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '!'",
+  "note": "trailing tokens after expression: matlit:!![",
   "file": "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean",
   "line": 1184,
   "short": "witnessSigmaObs",

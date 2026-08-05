@@ -61,6 +61,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<num>\d+\.\d+(?:[eE][-+]?\d+)?|\d+(?:[eE][-+]?\d+)?)
   | (?P<ident>[A-Za-z_Α-ωϑ-ϵᴀ-ᵿ℀-⅏Ḁ-ỿ][A-Za-z0-9_'Α-ωϑ-ϵ₀-₉ₐ-ₜḀ-ỿ]*(?:\.[A-Za-z0-9_'₀-₉]+)*)
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
+  | (?P<matlit>!!\[)
   | (?P<veclit>!\[)
   | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹])
   | (?P<other>.)
@@ -395,6 +396,32 @@ class Parser:
             raise Untranslatable("unexpected end of body")
         if p.text in HARD_STOP:
             raise Untranslatable(HARD_STOP[p.text])
+        if p.kind == "matlit":
+            # `!![a, b; c, d]` is Mathlib's MATRIX literal: comma within a row,
+            # semicolon between rows. It becomes a `VecFn` of `VecFn`s, which is
+            # what `mulVec` and `dotProduct` in the runtime already consume.
+            # Lexed before the vector literal because `!![` starts with `![`'s
+            # first character and the longer token has to win.
+            self.next()
+            rows, row = [], []
+            if not self.at("]"):
+                while True:
+                    row.append(self.expr(0))
+                    if self.at(","):
+                        self.next()
+                        continue
+                    if self.at(";"):
+                        self.next()
+                        rows.append(row)
+                        row = []
+                        continue
+                    break
+            rows.append(row)
+            if not self.at("]"):
+                raise Untranslatable("matrix literal with no closing `]`")
+            self.next()
+            body = ", ".join("_rt.VecFn([" + ", ".join(r) + "])" for r in rows)
+            return "_rt.VecFn([" + body + "])"
         if p.kind == "veclit":
             # `![a, b, c]` is Mathlib's vector literal, and it translates: the
             # runtime's `VecFn` is a list that also answers to `v i`, which is
