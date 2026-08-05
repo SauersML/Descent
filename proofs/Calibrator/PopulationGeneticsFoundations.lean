@@ -330,8 +330,11 @@ theorem het_increases_with_ne
     no more information about `F_ST` than a single site; two runs of this same
     demography then differed by 2.4 sems and neither error bar was usable.
 
-    On these same runs `pairwiseFstFromBranchTaus` -- the sibling composition
-    that sums both branch taus -- errs by 51 to 59 sems, and is falsified there.
+    On these same runs the sibling composition that SUMS both branch taus errs
+    by 51 to 59 sems. `pairwiseFstFromBranchTaus` was that body and has since
+    been corrected to their MEAN, which counts the split time once; on a
+    symmetric split it then reduces to this definition, which is why the two
+    agree here rather than differing by half.
 
     Regime: symmetric split. This definition takes a single `Ne` and so says
     nothing about unequal daughter sizes; substituting a harmonic mean for an
