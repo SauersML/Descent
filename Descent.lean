@@ -101,10 +101,18 @@ context-preserving transition is the Kronecker delta -- survives as
 `contextMatchQuality_eq_oneHotWeight` below, which is the same statement with the surviving
 name. -/
 
-/-- The readout quality is the one-hot weight: one Kronecker delta, two names. -/
-theorem contextMatchQuality_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
+/-- The readout quality is the one-hot weight: one Kronecker delta, two names.
+
+Proved directly rather than through the two deleted theorems the note above records. The
+deltas are written with their arguments in opposite orders -- `kronecker x y` tests `x = y`
+and `oneHotWeight` tests `k = selected` -- so this is `eq_comm` on the branch condition and
+not a `rfl`. -/
+theorem contextMatchQuality_eq_oneHotWeight (x y : BinaryState) :
     Conditionals.contextMatchQuality x y = Blindness.oneHotWeight (R := ℝ) x y := by
-  rw [contextMatchQuality_eq_persistentTransition, persistentTransition_eq_oneHotWeight]
+  unfold Conditionals.contextMatchQuality Core.kronecker Blindness.oneHotWeight
+  by_cases h : x = y
+  · simp [h]
+  · simp [h, Ne.symm h]
 
 /-- The stable sieve dimension and the condensation critical degree are the same logarithmic
 law, at different arguments: `log L / κ` and `log N / c`. -/

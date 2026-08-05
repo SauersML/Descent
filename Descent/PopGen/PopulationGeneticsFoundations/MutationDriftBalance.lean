@@ -186,8 +186,8 @@ theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
     the identity holds for *any* H_T ≠ 0.  This is the general form of the
     variance partition that `het_plus_fst_eq_one` instantiates at equilibrium. -/
 theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
-    H_S / H_T + neiFst H_T H_S = 1 := by
-  unfold neiFst
+    H_S / H_T + (neiFst H_T H_S).value = 1 := by
+  simp only [neiFst_value]
   field_simp [hHT]
   ring_nf
 
@@ -196,8 +196,9 @@ theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
     heterozygosity under the infinite-alleles model), Nei's formula gives
     Fst = 1/(1+θ) = `fstMutationDriftEquilibrium θ`. -/
 theorem nei_fst_equilibrium_consistent (θ : ℝ) (hθ : 0 ≤ θ) :
-    neiFst 1 (expectedHeterozygosity θ) = fstMutationDriftEquilibrium θ := by
-  unfold neiFst expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    (neiFst 1 (expectedHeterozygosity θ)).value = fstMutationDriftEquilibrium θ := by
+  simp only [neiFst_value]
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : (1 + θ) ≠ 0 := by linarith
   field_simp [hden]
   ring

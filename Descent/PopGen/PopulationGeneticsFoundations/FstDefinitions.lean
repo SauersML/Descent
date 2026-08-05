@@ -57,23 +57,28 @@ section FstDefinitions
     in this corpus stated as `τ/(1+τ)`, or derived from it, is a HUDSON result;
     substituting this body into one of them is the factor-of-two-to-four error
     the corpus has already paid for once. -/
-noncomputable def neiFst (H_T H_S : ℝ) : ℝ :=
-  (H_T - H_S) / H_T
+noncomputable def neiFst (H_T H_S : ℝ) : Descent.Core.NeiFst :=
+  ⟨(H_T - H_S) / H_T⟩
+
+/-- The number inside, so that a proof about this estimator is a proof about `(H_T - H_S)/H_T`
+and the wrapper costs a rewrite rather than an argument. -/
+@[simp] theorem neiFst_value (H_T H_S : ℝ) :
+    (neiFst H_T H_S).value = (H_T - H_S) / H_T := rfl
 
 /-- **This body, typed as a Nei estimate, converts to Hudson by the Möbius map.**
 
 `Core.NeiFst` and `Core.HudsonFst` exist so that a Nei value cannot be passed where a
-Hudson one is required, and until now nothing outside `Core.Fst` was typed with them: the
-guarantee was available and unexercised, and this definition -- the one the docstring above
-says it is "the factor-of-two-to-four error the corpus has already paid for once" to
-substitute -- returned a bare real like every other `F_ST` in the corpus.
+Hudson one is required, and nothing outside `Core.Fst` used to be typed with them: the
+guarantee was built and left unexercised on the one definition it was built to protect.
+`neiFst` now RETURNS a `Core.NeiFst`, so handing it to something expecting a Hudson value
+is a type error rather than a factor-of-two-to-four mistake found later -- which is what
+the docstring above records this corpus having already paid for once.
 
-Wrapping it here does not retype the corpus. What it does is state the conversion at the
-measured body rather than at an abstract type, so the two are joined by a theorem
-somewhere. -/
+The cost is one `.value` at each use, and `neiFst_value` above discharges it in a rewrite,
+so the statements below say the same things about the same quotient. -/
 theorem neiFst_toHudson (H_T H_S : ℝ) :
-    (Descent.Core.hudsonOfNei ⟨neiFst H_T H_S⟩).value
-      = 2 * neiFst H_T H_S / (1 + neiFst H_T H_S) := rfl
+    (Descent.Core.hudsonOfNei (neiFst H_T H_S)).value
+      = 2 * (neiFst H_T H_S).value / (1 + (neiFst H_T H_S).value) := rfl
 
 /-- **And it differs from its Hudson conversion except at the two degenerate values.**
 
@@ -83,9 +88,9 @@ partially differentiated -- every case of interest -- reading this number as a H
 `F_ST` reads a different quantity, and the measured ratios (0.62, 0.60, 0.68, 0.81) are
 what that difference looks like. -/
 theorem neiFst_eq_hudson_iff_degenerate (H_T H_S : ℝ)
-    (h : 1 + neiFst H_T H_S ≠ 0) :
-    (Descent.Core.hudsonOfNei ⟨neiFst H_T H_S⟩).value = neiFst H_T H_S
-      ↔ neiFst H_T H_S = 0 ∨ neiFst H_T H_S = 1 :=
+    (h : 1 + (neiFst H_T H_S).value ≠ 0) :
+    (Descent.Core.hudsonOfNei (neiFst H_T H_S)).value = (neiFst H_T H_S).value
+      ↔ (neiFst H_T H_S).value = 0 ∨ (neiFst H_T H_S).value = 1 :=
   Descent.Core.hudsonOfNei_eq_iff _ h
 
 /-- **Nei's `Fst` is a proportion of total heterozygosity, pinned.** This definition carries no
@@ -93,8 +98,7 @@ result of its own. Subpopulations holding half the total heterozygosity give `Fs
 deficit is measured against the total, not against the subpopulation value, and it runs total
 minus subpopulation so that structure raises it. -/
 theorem neiFst_half_heterozygosity_retained :
-    neiFst 2 1 = 1 / 2 := by
-  unfold neiFst
+    (neiFst 2 1).value = 1 / 2 := by
   norm_num
 
 /-- **Nei's `Fst` at zero total heterozygosity, named.** Two monomorphic populations have no
@@ -102,15 +106,14 @@ heterozygosity to partition and `Fst` is undefined, but the divisor is zero and 
 -- reporting perfect genetic identity where the data say nothing at all. The two cases are not
 distinguishable downstream. Consumers must require `H_T ≠ 0`. -/
 theorem neiFst_monomorphic_is_junk :
-    neiFst 0 0 = 0 := by
-  unfold neiFst
+    (neiFst 0 0).value = 0 := by
   norm_num
 
 /-- Nei's Fst is in [0, 1] when H_T > 0 and H_S ≤ H_T. -/
 theorem nei_fst_in_unit (H_T H_S : ℝ)
     (h_HT : 0 < H_T) (h_HS : 0 ≤ H_S) (h_le : H_S ≤ H_T) :
-    0 ≤ neiFst H_T H_S ∧ neiFst H_T H_S ≤ 1 := by
-  unfold neiFst
+    0 ≤ (neiFst H_T H_S).value ∧ (neiFst H_T H_S).value ≤ 1 := by
+  simp only [neiFst_value]
   constructor
   · exact div_nonneg (by linarith) (le_of_lt h_HT)
   · rw [div_le_one h_HT]; linarith
@@ -119,8 +122,8 @@ theorem nei_fst_in_unit (H_T H_S : ℝ)
 observed `F_ST` value determines the retained within-population heterozygosity exactly. -/
 theorem neiFst_eq_iff_within_heterozygosity_eq
     (H_T H_S fst : ℝ) (h_HT : H_T ≠ 0) :
-    neiFst H_T H_S = fst ↔ H_S = (1 - fst) * H_T := by
-  unfold neiFst
+    (neiFst H_T H_S).value = fst ↔ H_S = (1 - fst) * H_T := by
+  simp only [neiFst_value]
   rw [div_eq_iff h_HT]
   constructor <;> intro h <;> nlinarith
 
@@ -128,14 +131,14 @@ theorem neiFst_eq_iff_within_heterozygosity_eq
 all of the pooled heterozygosity. -/
 theorem neiFst_eq_zero_iff
     (H_T H_S : ℝ) (h_HT : H_T ≠ 0) :
-    neiFst H_T H_S = 0 ↔ H_S = H_T := by
+    (neiFst H_T H_S).value = 0 ↔ H_S = H_T := by
   simpa using neiFst_eq_iff_within_heterozygosity_eq H_T H_S 0 h_HT
 
 /-- With nonzero total heterozygosity, Nei's `F_ST` equals one exactly when no within-population
 heterozygosity remains. -/
 theorem neiFst_eq_one_iff
     (H_T H_S : ℝ) (h_HT : H_T ≠ 0) :
-    neiFst H_T H_S = 1 ↔ H_S = 0 := by
+    (neiFst H_T H_S).value = 1 ↔ H_S = 0 := by
   simpa using neiFst_eq_iff_within_heterozygosity_eq H_T H_S 1 h_HT
 
 
