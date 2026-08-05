@@ -262,6 +262,9 @@ theorem altFreq_le_one (P : Panel) (hP : 0 < P.nSamples) (l : Locus P.nLoci) :
       _ = (P.nSamples : ℝ) * ploidy := by
           simp [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
       _ = ploidy * (P.nSamples : ℝ) := by ring
+  -- `rw` is syntactic, and the goal is a `def` until it is unfolded: `div_le_one`
+  -- has no division to match against `P.altFreq l ≤ 1`.
+  unfold altFreq
   rw [div_le_one (mul_pos hp hn)]
   exact hsum
 
