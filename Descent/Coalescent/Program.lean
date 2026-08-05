@@ -168,8 +168,11 @@ step" are different states.
   `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with
   probability `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
   same first factor for every pair -- minimum exponential at rate `d_n`, argmin uniform.
-  STILL ABSENT: the composition of the path-level law `Law.coalescentLaw` with the level maps,
-  which is bookkeeping over pairs rather than covers and is not the same arithmetic twice.
+  The path-level law is NOT re-derived for levels, and deliberately: at `Δ` the covers ARE the
+  pairs (`NeutralMutation.card_covers_delta`), so `Law.coalescentLaw` transported along that
+  bijection is the lookdown's path law, and writing it out would be a second name for one
+  object -- the failure mode this corpus exists to prevent.  The item is closed by declining
+  to duplicate, not by an absence.
 * **Spatial coalescents** -- CLOSED at the mechanism.  `Coalescent.SpatialCoalescent` proves
   the voter-model duality `c_t = c₀ ∘ A_t` by induction, presents the dual AS a pedigree so
   that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise coalescence to
