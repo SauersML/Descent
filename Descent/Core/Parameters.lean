@@ -376,7 +376,7 @@ theorem fstEquilibrium_ne_island_manyDemes :
         + scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu) := by
   unfold fstEquilibrium witness
   norm_num [fstIslandEquilibrium, scaledFlow, fstFromFlow, scaledMutationRate,
-    scaledMigrationRate, islandDemeCorrection, ratio, ploidy]
+    scaledMigrationRate, islandDemeCorrection, Descent.Core.ratio, ratio, ploidy]
 
 /-- **Equilibrium differentiation lies in the unit interval.** Immediate from the flow
 being non-negative, and stated because every consumer of `fstEquilibrium` needs it. -/
@@ -470,7 +470,7 @@ theorem fstEquilibrium_lt_of_Ne_lt (p q : PopGenParameters)
   unfold fstEquilibrium fstIslandEquilibrium
   refine fstFromFlow_lt_of_lt _ _ p.scaledFlow_nonneg ?_
   rw [p.scaledFlow_eq, q.scaledFlow_eq, ← hmu, ← hmig, ← hd]
-  have hrate : 0 < 4 * p.mig * islandDemeCorrection p.nDemes + 4 * p.mu := by
+  have hrate : 0 < 4 * p.mig * islandDemeCorrection Descent.Core.ratio p.nDemes + 4 * p.mu := by
     have h1 : 4 * p.mig * 1 ≤ 4 * p.mig * islandDemeCorrection p.nDemes :=
       mul_le_mul_of_nonneg_left (le_of_lt hc) (by linarith [p.mig_nonneg])
     linarith [p.mu_nonneg, p.mig_nonneg]
@@ -501,7 +501,7 @@ theorem fstEquilibrium_lt_of_nDemes_lt (p q : PopGenParameters)
   have hq := q.nDemes_ge_two
   have hNepos := q.Ne_pos
   have hcorr : islandDemeCorrection q.nDemes < islandDemeCorrection p.nDemes := by
-    unfold islandDemeCorrection ratio
+    unfold islandDemeCorrection Descent.Core.ratio ratio
     rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     nlinarith
   unfold fstEquilibrium fstIslandEquilibrium
