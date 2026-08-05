@@ -78,6 +78,47 @@ def fingerprint(fn, arity, points):
     return tuple(out)
 
 
+def _all_joined_by_theorem(shorts: set) -> bool:
+    """Does a theorem STATEMENT name two of these, connecting all of them?"""
+    if len(shorts) < 2:
+        return False
+    edges = set()
+    for stmt in _theorem_statements():
+        present = tuple(sorted(n for n in shorts if re.search(rf'\b{re.escape(n)}\b', stmt)))
+        for i in range(len(present)):
+            for j in range(i + 1, len(present)):
+                edges.add((present[i], present[j]))
+    if not edges:
+        return False
+    seen, stack = set(), [next(iter(shorts))]
+    while stack:
+        cur = stack.pop()
+        if cur in seen:
+            continue
+        seen.add(cur)
+        for a, b in edges:
+            if a == cur and b not in seen:
+                stack.append(b)
+            if b == cur and a not in seen:
+                stack.append(a)
+    return seen == shorts
+
+
+_STATEMENTS = None
+
+
+def _theorem_statements():
+    """Every theorem's statement text, once."""
+    global _STATEMENTS
+    if _STATEMENTS is None:
+        root = HERE.parent.parent.parent
+        pat = re.compile(r'^\s*(?:@\[[^\]]*\]\s*)?theorem\s+[\w.\'₀-₉]+(.*?):=',
+                         re.S | re.M)
+        _STATEMENTS = [m.group(1) for f in root.glob('Descent/**/*.lean')
+                       for m in pat.finditer(f.read_text(errors='ignore'))]
+    return _STATEMENTS
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--points", type=int, default=200)
@@ -135,10 +176,36 @@ def main() -> int:
             except Exception:                                    # noqa: BLE001
                 bodies[n] = ""
         shorts = {n.rsplit(".", 1)[-1] for n in names}
-        kernels = [set(re.findall(r'Descent\.Core\.(\w+)', b)) | (shorts & set(re.findall(r'\b(\w+)\b', b)))
-                   for b in bodies.values()]
-        # every member routing through one shared name is the repaired shape
+        # (a) every member routing through one shared Core kernel, or
+        # (b) the members connected by CALLS -- `logBernoulliRisk` is
+        #     `bernoulliLogLoss η q`, and a callee's body never mentions its
+        #     caller, so requiring a name common to ALL of them missed the very
+        #     delegations this is meant to skip.
+        kernels = [set(re.findall(r'Descent\.Core\.(\w+)', b)) for b in bodies.values()]
         if kernels and set.intersection(*kernels):
+            continue
+        called = {a: (shorts - {a.rsplit(".", 1)[-1]}) & set(re.findall(r'\b(\w+)\b', b))
+                  for a, b in bodies.items()}
+        seen, stack = set(), [next(iter(names))]
+        while stack:                      # connected component over the call edges
+            cur = stack.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            for other in names:
+                o = other.rsplit(".", 1)[-1]
+                if other not in seen and (o in called[cur]
+                                          or cur.rsplit(".", 1)[-1] in called[other]):
+                    stack.append(other)
+        if len(seen) == len(names):
+            continue
+        # (c) RELATED BY THEOREM is the corpus's accepted resolution, not a
+        #     defect awaiting one. `genotypeVarianceHWE` and `hweHeterozygosity`
+        #     stay apart on purpose and are joined by
+        #     `hweHeterozygosity_eq_genotypeVarianceHWE`; a detector that kept
+        #     reporting them would be asking for the merge the corpus refused,
+        #     and would re-report every pair the moment it was settled.
+        if _all_joined_by_theorem(shorts):
             continue
         interesting.append((arity, sorted(shorts)))
 
