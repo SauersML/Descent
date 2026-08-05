@@ -1,0 +1,229 @@
+[
+ {
+  "name": "expectedSqMeanPGSDiff_IMEquilibrium [body: A = 2*delta]",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'pure split Ne=250 t=200, A = 2F/(1-F/2), F = 1-(1-1/(2Ne))^t' passed at 0.18 sems",
+  "regime": "two-deme Wright-Fisher island model at migration-drift balance, Ne=250, 4*Ne*m swept 20-fold, 4000 unlinked loci, 4*Ne*mu = 0.02, 1200 generations past a 1400-generation burn-in, 12 independent replicates, sem across replicates. The observable is A = E[dp^2]/E[pbar(1-pbar)] as a ratio of averages -- the argument Var_Delta_Mu's validated reading takes -- so no V_A convention enters.",
+  "cells": [
+   {
+    "design": "M=0.5 (Ne=250)",
+    "lean": 1.0,
+    "truth": 1.5258190094635227,
+    "sem": 0.004521265510293432,
+    "sems_off": 116.29907782818904,
+    "rel_err": 0.34461427351622814
+   },
+   {
+    "design": "M=1.0 (Ne=250)",
+    "lean": 0.6666666666666666,
+    "truth": 0.8903591213720817,
+    "sem": 0.0046755036764742795,
+    "sems_off": 47.84349883649282,
+    "rel_err": 0.251238460230177
+   },
+   {
+    "design": "M=2.0 (Ne=250)",
+    "lean": 0.4,
+    "truth": 0.4734595104578119,
+    "sem": 0.0010618854789656294,
+    "sems_off": 69.17837366922842,
+    "rel_err": 0.15515478902679597
+   },
+   {
+    "design": "M=4.0 (Ne=250)",
+    "lean": 0.2222222222222222,
+    "truth": 0.24474855039119284,
+    "sem": 0.0009922009908612962,
+    "sems_off": 22.703392131685217,
+    "rel_err": 0.09203865817781459
+   },
+   {
+    "design": "M=10.0 (Ne=250)",
+    "lean": 0.09523809523809523,
+    "truth": 0.10001115813368554,
+    "sem": 0.00019638794863723226,
+    "sems_off": 24.30425557531081,
+    "rel_err": 0.04772530370271407
+   }
+  ],
+  "worst": {
+   "design": "M=0.5 (Ne=250)",
+   "lean": 1.0,
+   "truth": 1.5258190094635227,
+   "sem": 0.004521265510293432,
+   "sems_off": 116.29907782818904,
+   "rel_err": 0.34461427351622814
+  },
+  "guard": "PD3-FRESHNESS-IM-DELTA-JOIN-v2",
+  "argument_source": "model",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.9047619047619048
+ },
+ {
+  "name": "[derived] A = 2*delta/(1 - delta/2)",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'pure split Ne=250 t=200, A = 2F/(1-F/2), F = 1-(1-1/(2Ne))^t' passed at 0.18 sems",
+  "regime": "two-deme Wright-Fisher island model at migration-drift balance, Ne=250, 4*Ne*m swept 20-fold, 4000 unlinked loci, 4*Ne*mu = 0.02, 1200 generations past a 1400-generation burn-in, 12 independent replicates, sem across replicates. The observable is A = E[dp^2]/E[pbar(1-pbar)] as a ratio of averages -- the argument Var_Delta_Mu's validated reading takes -- so no V_A convention enters.",
+  "cells": [
+   {
+    "design": "M=0.5 (Ne=250)",
+    "lean": 1.3333333333333333,
+    "truth": 1.5258190094635227,
+    "sem": 0.004521265510293432,
+    "sems_off": 42.57340686848913,
+    "rel_err": 0.1261523646883042
+   },
+   {
+    "design": "M=1.0 (Ne=250)",
+    "lean": 0.7999999999999999,
+    "truth": 0.8903591213720817,
+    "sem": 0.0046755036764742795,
+    "sems_off": 19.32607214635325,
+    "rel_err": 0.10148615227621244
+   },
+   {
+    "design": "M=2.0 (Ne=250)",
+    "lean": 0.4444444444444445,
+    "truth": 0.4734595104578119,
+    "sem": 0.0010618854789656294,
+    "sems_off": 27.32410093942588,
+    "rel_err": 0.06128309891866217
+   },
+   {
+    "design": "M=4.0 (Ne=250)",
+    "lean": 0.23529411764705882,
+    "truth": 0.24474855039119284,
+    "sem": 0.0009922009908612962,
+    "sems_off": 9.52874753322605,
+    "rel_err": 0.03862916748239188
+   },
+   {
+    "design": "M=10.0 (Ne=250)",
+    "lean": 0.0975609756097561,
+    "truth": 0.10001115813368554,
+    "sem": 0.00019638794863723226,
+    "sems_off": 12.476236657756495,
+    "rel_err": 0.02449909159790213
+   }
+  ],
+  "worst": {
+   "design": "M=0.5 (Ne=250)",
+   "lean": 1.3333333333333333,
+   "truth": 1.5258190094635227,
+   "sem": 0.004521265510293432,
+   "sems_off": 42.57340686848913,
+   "rel_err": 0.1261523646883042
+  },
+  "guard": "PD3-FRESHNESS-IM-DELTA-JOIN-v2",
+  "argument_source": "model",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.9268292682926829
+ },
+ {
+  "name": "[competing] A = delta, the pairwise-is-per-branch reading",
+  "file": "PortabilityDrift.lean",
+  "verdict": "FALSIFIED",
+  "note": "positive control 'pure split Ne=250 t=200, A = 2F/(1-F/2), F = 1-(1-1/(2Ne))^t' passed at 0.18 sems",
+  "regime": "two-deme Wright-Fisher island model at migration-drift balance, Ne=250, 4*Ne*m swept 20-fold, 4000 unlinked loci, 4*Ne*mu = 0.02, 1200 generations past a 1400-generation burn-in, 12 independent replicates, sem across replicates. The observable is A = E[dp^2]/E[pbar(1-pbar)] as a ratio of averages -- the argument Var_Delta_Mu's validated reading takes -- so no V_A convention enters.",
+  "cells": [
+   {
+    "design": "M=0.5 (Ne=250)",
+    "lean": 0.5,
+    "truth": 1.5258190094635227,
+    "sem": 0.004521265510293432,
+    "sems_off": 226.88758426773893,
+    "rel_err": 0.672307136758114
+   },
+   {
+    "design": "M=1.0 (Ne=250)",
+    "lean": 0.3333333333333333,
+    "truth": 0.8903591213720817,
+    "sem": 0.0046755036764742795,
+    "sems_off": 119.13706556184175,
+    "rel_err": 0.6256192301150885
+   },
+   {
+    "design": "M=2.0 (Ne=250)",
+    "lean": 0.2,
+    "truth": 0.4734595104578119,
+    "sem": 0.0010618854789656294,
+    "sems_off": 257.52260095333986,
+    "rel_err": 0.577577394513398
+   },
+   {
+    "design": "M=4.0 (Ne=250)",
+    "lean": 0.1111111111111111,
+    "truth": 0.24474855039119284,
+    "sem": 0.0009922009908612962,
+    "sems_off": 134.68787121858807,
+    "rel_err": 0.5460193290889073
+   },
+   {
+    "design": "M=10.0 (Ne=250)",
+    "lean": 0.047619047619047616,
+    "truth": 0.10001115813368554,
+    "sem": 0.00019638794863723226,
+    "sems_off": 266.7786433851733,
+    "rel_err": 0.523862651851357
+   }
+  ],
+  "worst": {
+   "design": "M=10.0 (Ne=250)",
+   "lean": 0.047619047619047616,
+   "truth": 0.10001115813368554,
+   "sem": 0.00019638794863723226,
+   "sems_off": 266.7786433851733,
+   "rel_err": 0.523862651851357
+  },
+  "guard": "PD3-FRESHNESS-IM-DELTA-JOIN-v2",
+  "argument_source": "model",
+  "sem_source": "replicates",
+  "oracle_independent": true,
+  "span": 0.9047619047619048
+ },
+ {
+  "name": "[controls]",
+  "guard": "PD3-FRESHNESS-IM-DELTA-JOIN-v2",
+  "pure_split": {
+   "predicted": 0.7902711114986541,
+   "measured": 0.789561825873685,
+   "sem": 0.004017699967354496
+  },
+  "hudson_vs_closed": [
+   {
+    "M": 0.5,
+    "closed": 0.5,
+    "measured": 0.55224014508359,
+    "sem": 0.0011848572368781285
+   },
+   {
+    "M": 1.0,
+    "closed": 0.3333333333333333,
+    "measured": 0.36411189789354786,
+    "sem": 0.001561369064786638
+   },
+   {
+    "M": 2.0,
+    "closed": 0.2,
+    "measured": 0.21167377470956605,
+    "sem": 0.00042465867304306975
+   },
+   {
+    "M": 4.0,
+    "closed": 0.1111111111111111,
+    "measured": 0.11531714693065975,
+    "sem": 0.0004405736970499881
+   },
+   {
+    "M": 10.0,
+    "closed": 0.047619047619047616,
+    "measured": 0.0487857487874509,
+    "sem": 9.345181704068291e-05
+   }
+  ]
+ }
+]
