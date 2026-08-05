@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.Conclusions
 import Descent.PopGen.DGP
 import Descent.Spectral.CirculationDefect
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -6958,50 +6959,14 @@ section MigrationDriftPortability
 
 /-! ### 1. Fst under migration-drift balance: Fst = 1/(1 + 4Nm) -/
 
-/-- The finite-island correction factor `d/(d-1)` for `demes` demes.
-
-Convention: this is the correction as it enters the HUDSON coalescence-time
-`F_ST`, where it appears LINEARLY: `1/(1 + 4·Nₑ·m·d/(d-1))`. The widely quoted
-Crow--Aoki (1984) finite-island formula carries `(d/(d-1))²`, but that is the
-correction for Nei's `G_ST`, a different statistic. Do not read this factor as
-the square's base and then square it; `PopulationGeneticsFoundations`'
-`islandDemeCorrection` carries the measurement that excludes the square under
-this corpus's convention, at 9.04 sems, and `islandFstFiniteDemes` carries the
-attribution for both forms.
-
-This is data, not a packaged claim that an approximation is adequate.  Any biological
-use of the infinite-island approximation must compare this explicit quantity with its
-own scientifically justified tolerance. -/
-noncomputable def finiteIslandCorrection (demes : ℝ) : ℝ :=
-  demes / (demes - 1)
-
-/-- **The finite-island correction's junk branch, named.** At a single deme the correction
-diverges and Lean returns `0`. Consumers must require `demes ≠ 1`. -/
-theorem finiteIslandCorrection_one_deme_is_junk : finiteIslandCorrection 1 = 0 := by
-  unfold finiteIslandCorrection; norm_num
-
-/-- With two demes the finite-island correction is exactly two.
-
-    It was stated as four while the body carried a square. Measurement put the
-    exponent at one, not two: at `4 Ne m = 4.0` and two demes the simulated
-    `F_ST` is `0.09743 ± 0.00432`, against `0.11111` for this correction and
-    `0.05882` for the square, which is 8.9 sems low. See
-    `PopulationGeneticsFoundations.islandDemeCorrection`. -/
-@[simp] theorem finiteIslandCorrection_two : finiteIslandCorrection 2 = 2 := by
-  norm_num [finiteIslandCorrection]
-
-/-- Consequently its excess over the infinite-island value is exactly one. -/
-@[simp] theorem finiteIslandCorrection_two_excess :
-    finiteIslandCorrection 2 - 1 = 1 := by
-  rw [finiteIslandCorrection_two]
-  norm_num
-
 /-- **Island model equilibrium Fst under migration-drift balance.**
     Fst_eq = 1 / (1 + 4Nm) where N is effective size and m is migration rate.
     This is the classical Wright (1931) result.
 
-    Regime: the infinite-island limit. The explicit `finiteIslandCorrection`
-    above makes the finite-deme discrepancy inspectable. Simulation puts the law within 2% at 40
+    Regime: the infinite-island limit. `Core.islandDemeCorrection` carries the
+    finite-deme factor this drops, and the identity below places this body inside
+    `Core.fstIslandEquilibrium` so the discrepancy is a substitution rather than a
+    comparison of two independent formulas. Simulation puts the law within 2% at 40
     demes, but +17% at 10, +31% at 5 and +95% at 2. The two-deme case is the
     two-ancestry comparison this development is mostly about, so the law is off
     by roughly twofold in its primary application. The finite-deme correction

@@ -262,7 +262,8 @@ theorem fstDemeCorrectedFlowStep_constants_named (p : EvolutionaryParameters)
     fstDemeCorrectedFlowStep p F =
       F + (1 - F) / coalescentTimeScale p.Ne
         - 2 * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
-  unfold fstDemeCorrectedFlowStep coalescentTimeScale islandDemeCorrection ploidy
+  unfold fstDemeCorrectedFlowStep coalescentTimeScale islandDemeCorrection
+    Core.islandDemeCorrection Core.ratio ploidy
   norm_num
 
 end Ploidy
@@ -1446,7 +1447,6 @@ departure rather than an oversight:
   A citation or caller-supplied proposition cannot manufacture that theorem.
 * **As a proved failure.** The departure is itself a theorem, so the limit is checkable
   rather than described: `benchmarkRatioForm_cannot_reach_measured`,
-  `finiteIslandCorrection_two_excess`,
   `demoSteppingStoneFst_indistinguishable_from_quadratic`,
   `pairwiseFstFromBranches_eq_fstFromTau_add_mul`,
   `sampleLimitedScratchTargetR2_negative_of_small_sample`.
@@ -1635,6 +1635,7 @@ theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale (p : EvolutionaryParam
       = F + (1 - F) / coalescentTimeScale p.Ne
           - ploidy * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
   unfold fstDemeCorrectedFlowStep ploidy islandDemeCorrection
+    Core.islandDemeCorrection Core.ratio
   rw [coalescentTimeScale_eq]; norm_num
 
 /-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
@@ -1703,7 +1704,9 @@ different conventions. -/
 theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d
       = fstMutationDriftEquilibrium (scaledMigrationRate Ne m * islandDemeCorrection d) := by
-  unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate; ring
+  unfold islandFstFiniteDemes fstMutationDriftEquilibrium scaledMigrationRate
+    islandDemeCorrection Core.islandDemeCorrection Core.ratio
+  ring
 
 /-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a
 sampled pair.** Mutation destroys the identity of a pair at rate `ploidy · μ`, so

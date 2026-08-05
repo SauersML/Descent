@@ -26,17 +26,39 @@ Group D  calibratedBrierFromVariances.  Falsified under a liability threshold.
          Measure in the regime the body is written for: p a calibrated
          probability with mean pi and variance r2*pi*(1-pi) on the OBSERVED
          scale.  The liability-scale form rides along and must be rejected.
+
+NAMING, and why it had to change.  Every row here used to be recorded as
+`<decl> -- <candidate>`, which `ledger.split_name` reads as a TAGGED row.  A
+battery in which no row is bare has no CORPUS row at all: `ledger.build` then
+files all four candidates as competitors against nothing, `against` is `None`,
+and the corpus body's own verdict never enters the ledger.  The row that
+transcribes the body in the Lean file is now named BARE and only the rivals
+carry tags.
+
+`realised_inputs=True`, and why it is not a fudge: in every group the prediction
+is evaluated at EXACT MODEL CONSTANTS -- `theta` and `bigM` are what the
+demography was built from, `Ne` and `t` are an integer and a loop counter, and
+`pi`/`r2` in group D are the parameters the calibrated probabilities were drawn
+with.  None is estimated from the same replicates the oracle measures, so there
+is no nominal/realised gap of size O(1/sqrt(m)) for a finding to be confused
+with.  Undeclared, every disagreement this battery finds -- including the
+competitor REJECTIONS the whole design turns on -- is downgraded to LEAD, and a
+downgraded rejection leaves the corpus MATCH looking uncompeted.
 """
 import json
 import math
+import os
 import sys
 
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
 
 GUARD = "FALSREPAIR_GUARD_20260804_A"
+
+# See the module docstring. Passed to every `record` call in this file.
+MODEL = dict(realised_inputs=True)
 
 # ---------------------------------------------------------------------------
 # Group A -- fstEquilibrium, the bulk38 design at new seeds
@@ -92,8 +114,12 @@ def group_a():
     # more than it is at bigM = 1.
     grid = [(1.0, 1.0), (2.0, 0.5), (0.5, 2.0), (3.0, 3.0),
             (1.0, 4.0), (0.5, 6.0)]
+    # The FIRST key is the corpus body as it now stands in DGP.lean
+    # (`1 / (1 + p.theta + 2 * p.bigM)`); it is recorded BARE so the ledger
+    # files it as the corpus row. The rest are rivals and carry tags.
+    CORPUS_A = "corrected [1/(1+theta+2*bigM)], islandDemeCorrection 2 on migration"
     cands = {
-        "corrected [1/(1+theta+2*bigM)], islandDemeCorrection 2 on migration":
+        CORPUS_A:
             lambda th, M: 1.0 / (1 + th + 2 * M),
         "superseded body [1/(1+theta+bigM)]":
             lambda th, M: 1.0 / (1 + th + M),
@@ -127,8 +153,9 @@ def group_a():
            "state, 60 replicates.  This is battery_bulk38's design at new "
            "seeds with two extra migration cells")
     for k, c in cells.items():
-        record("EvolutionaryParameters.fstEquilibrium -- " + k, "DGP.lean",
-               k, c, regime=reg, control=control)
+        name = ("EvolutionaryParameters.fstEquilibrium" if k == CORPUS_A
+                else "EvolutionaryParameters.fstEquilibrium [%s]" % k)
+        record(name, "DGP.lean", k, c, regime=reg, control=control, **MODEL)
 
 
 # ---------------------------------------------------------------------------
@@ -184,10 +211,37 @@ def group_b():
            "NO mutation and no migration -- the closed-population regime these "
            "bodies declare -- 24 replicates, retention H_t/H_0 measured per "
            "replicate")
-    for k, c in cells.items():
-        record("DriftRegime.closedPopulation / neutralDriftFactor / "
-               "heterozygosityLossDerived -- " + k, "DriftRegime.lean", k, c,
-               regime=reg, control=control)
+    # THREE declarations, three sets of rows -- not one row naming all three.
+    # `ledger.split_name` takes everything up to the first space or bracket as
+    # the declaration, so `"closedPopulation / neutralDriftFactor / ..."` was
+    # filed entirely under `closedPopulation` and the other two got no record
+    # at all while their docstrings cited this battery.
+    BODY_B = "body [(1 - 1/(2*Ne))^t]"
+    for decl, lean_file, src in (
+            ("DriftRegime.closedPopulation", "DriftRegime.lean",
+             "(1 - 1 / (2 * Ne))^t * H0"),
+            ("neutralDriftFactor", "PhenomeWidePortability.lean",
+             "(1 - 1 / (2 * Ne))^t")):
+        for k, c in cells.items():
+            record(decl if k == BODY_B else "%s [%s]" % (decl, k),
+                   lean_file, src if k == BODY_B else k, c,
+                   regime=reg, control=control, **MODEL)
+
+    # `heterozygosityLossDerived` is `1 - retention`, so it needs its own cells:
+    # the same replicates read as a LOSS. Recording it against the retention
+    # cells would have been transcribing a body the file does not contain.
+    loss_control = dict(control, lean=1 - control["lean"],
+                        truth=1 - control["truth"])
+    loss_cells = {k: [dict(cell, lean=1 - cell["lean"],
+                           truth=1 - cell["truth"]) for cell in c]
+                  for k, c in cells.items()}
+    for k, c in loss_cells.items():
+        record("heterozygosityLossDerived" if k == BODY_B
+               else "heterozygosityLossDerived [%s]" % k,
+               "PopulationGeneticsFoundations.lean",
+               "1 - (1 - 1 / (2 * Ne))^t" if k == BODY_B else "1 - " + k, c,
+               regime=reg + "; read as the LOSS 1 - H_t/H_0",
+               control=loss_control, **MODEL)
 
 
 # ---------------------------------------------------------------------------
@@ -232,10 +286,14 @@ def group_c():
            "emigration rate m spread over the 19 other demes, mu = 1e-8, 1 Mb, "
            "Hudson F_ST between demes 0 and 1, 24 replicates.  4*Ne*m is swept "
            "sixteenfold so the prediction spans 0.5 to 0.059")
+    # The first key transcribes the body in PopulationGeneticsFoundations.lean
+    # (`1 / (1 + 4*Ne*m + 4*Ne*mu)`) and is recorded BARE; the rest are rivals.
+    CORPUS_C = "body [1/(1 + 4*Ne*m + 4*Ne*mu)], the many-deme limit"
     for k, c in cells.items():
-        record("fstMigrationMutationEquilibriumManyDemes -- " + k,
+        record("fstMigrationMutationEquilibriumManyDemes" if k == CORPUS_C
+               else "fstMigrationMutationEquilibriumManyDemes [%s]" % k,
                "PopulationGeneticsFoundations.lean", k, c, regime=reg,
-               control=control)
+               control=control, **MODEL)
 
 
 # ---------------------------------------------------------------------------
@@ -292,26 +350,31 @@ def group_d():
            "error over 8e5 draws, sem from 20 blocks of 1e4.  This is the "
            "additive-noise regime; the liability-threshold design that "
            "falsified the body is a different regime")
-    record("calibratedBrierFromVariances -- body, observed scale", "DGP.lean",
+    record("calibratedBrierFromVariances", "DGP.lean",
            "pi*(1-pi)*(1 - vSignal/(vSignal+vResidual))", cells_body,
-           regime=reg, control=control)
-    record("calibratedBrierFromVariances -- liability form, competing",
+           regime=reg, control=control, **MODEL)
+    record("calibratedBrierFromVariances [liability form, competing]",
            "DGP.lean", "pi - Phi2(z, z; r2)", cells_liab, regime=reg,
-           control=control)
-    record("calibratedBrierFromVariances -- squared factor, competing",
+           control=control, **MODEL)
+    record("calibratedBrierFromVariances [squared factor, competing]",
            "DGP.lean", "pi*(1-pi)*(1 - r2)^2", cells_sq, regime=reg,
-           control=control)
+           control=control, **MODEL)
 
 
 if __name__ == "__main__":
+    # FRESHNESS: the token is a literal in this file and nowhere else, so a log
+    # carrying it is evidence about WHICH source produced the numbers. It is
+    # printed unconditionally only because `dump_results` now also records this
+    # file's SHA inside the results, which is the signal a file copy cannot
+    # flip; the token is the fallback for readers of the log alone.
     print("FRESHNESS=OK %s" % GUARD)
     which = sys.argv[1] if len(sys.argv) > 1 else "abcd"
     if "a" in which: group_a()
     if "b" in which: group_b()
     if "c" in which: group_c()
     if "d" in which: group_d()
-    json.dump(RESULTS, open("battery_falsrepair_results.json", "w"), indent=1,
-              default=str)
+    dump_results("battery_falsrepair_results.json",
+                 battery_source=os.path.abspath(__file__))
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         print("%-8s %-90s worst %s" % (r["verdict"], r["name"], r["worst"]))

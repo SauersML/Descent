@@ -1480,7 +1480,7 @@ NO_RELATIONS = {
     "Descent.covarianceDivergenceMutationDrift":
         "fst + (1-fst)(1-shared_ld) is affine in each argument separately with "
         "a cross term; the intercept blocks every homogeneity.",
-    "Descent.finiteIslandCorrection":
+    "Descent.Core.islandDemeCorrection":
         "d/(d-1) is a pure deme-count correction; d is a cardinality, so there "
         "is no unit to rescale and no second argument to exchange with it.",
     "Descent.ibdRecurrenceStep":

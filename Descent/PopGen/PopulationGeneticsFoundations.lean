@@ -1328,7 +1328,7 @@ carried implicitly.
     its evidence: 17.66 sems adrift at two demes and 0.65 sems at twenty-five,
     which is what a many-deme limit should look like.
 -/
-noncomputable def islandDemeCorrection (d : ℝ) : ℝ := d / (d - 1)
+noncomputable def islandDemeCorrection (d : ℝ) : ℝ := Core.islandDemeCorrection d
 
 /-- **islandDemeCorrection pinned at a reference point.** No theorem in the corpus evaluated this
 definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
@@ -1336,47 +1336,14 @@ it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a 
 or an invariance leaves free. -/
 theorem islandDemeCorrection_at_reference_point :
     islandDemeCorrection (1 / 2) = -1 := by
-  unfold islandDemeCorrection
+  unfold islandDemeCorrection Core.islandDemeCorrection Core.ratio
   norm_num
 
 /-- **The deme correction's junk branch, named.** At a single deme the correction diverges and
 Lean returns `0`. Consumers must require `d ≠ 1`, and `islandFstFiniteDemes_one_deme_is_junk`
 shows what the `0` does downstream. -/
 theorem islandDemeCorrection_one_deme_is_junk : islandDemeCorrection 1 = 0 := by
-  unfold islandDemeCorrection; norm_num
-
-/-! **`PortabilityDrift.finiteIslandCorrection` is this same quantity written a second
-time, and `islandDemeCorrection_eq_finiteIslandCorrection` below is what says so.**
-
-Both are `d/(d-1)`, both are documented as *the* standard finite-island correction
-factor in the number of demes, and both exist to isolate the entire gap between the
-infinite-island limit and the finite-`d` result.  This is one quantity defined twice, not
-two quantities that coincide — the failure mode this corpus already hit with three
-definitions of `F_ST`, where repairing one left the other two standing.
-
-The identity theorem was written and then withdrawn once, because `finiteIslandCorrection`
-was present in `PortabilityDrift.lean`'s source but absent from its compiled `olean`, so
-the statement did not elaborate against a stale build.  That was a build-cache condition,
-not a defect in either definition, and it is gone: `PortabilityDrift` compiles and this
-file imports it.  The withdrawal is worth recording because of *how* it failed — loudly,
-and only because the statement applies the name to an argument.  A bare occurrence would
-have been auto-bound as an implicit variable and stayed green, which is the hazard
-`DGP.LDDecayMechanism` documents.
-
-Stating the identity is the weaker of the two available repairs.  The stronger one is to
-delete a definition and have the survivor's callers move over; that is a cross-module
-rename this pass did not attempt.  What the theorem buys in the meantime is the property
-the duplicate-body guard exists to enforce: if either body is edited, this line stops
-compiling. -/
-
-/-- **The two finite-island corrections are one quantity.**  `islandDemeCorrection` here
-and `PortabilityDrift.finiteIslandCorrection` are both `d/(d-1)` under two names in two
-modules; until one of them is retired, this is what makes a divergence between them a
-compile error rather than a silent fork. -/
-theorem islandDemeCorrection_eq_finiteIslandCorrection (d : ℝ) :
-    islandDemeCorrection d = finiteIslandCorrection d := by
-  unfold islandDemeCorrection finiteIslandCorrection
-  ring
+  unfold islandDemeCorrection; exact Core.islandDemeCorrection_one_is_junk
 
 /-- **Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
 
@@ -1436,18 +1403,16 @@ theorem islandFstFiniteDemes_one_deme_is_junk (Ne m : ℝ) :
 corpus actually uses, and it is where the measurement separates the candidates
 most sharply -- simulated `0.09743 ± 0.00432` against `0.11111` here and
 `0.05882` for the superseded square. -/
-theorem islandDemeCorrection_at_two : islandDemeCorrection 2 = 2 := by
-  unfold islandDemeCorrection; norm_num
+theorem islandDemeCorrection_at_two : islandDemeCorrection 2 = 2 :=
+  Core.islandDemeCorrection_two
 
 /-- The correction is strictly above `1` at every finite number of demes, so
 the limit is never exact for a real population. -/
 theorem one_lt_islandDemeCorrection (d : ℝ) (hd : 1 < d) :
     1 < islandDemeCorrection d := by
-  unfold islandDemeCorrection
+  unfold islandDemeCorrection Core.islandDemeCorrection Core.ratio
   have hpos : 0 < d - 1 := by linarith
-  have h1 : 1 < d / (d - 1) := by
-    rw [lt_div_iff₀ hpos]; linarith
-  nlinarith
+  rw [lt_div_iff₀ hpos]; linarith
 
 /-- **The infinite-island limit overstates `F_ST` at every finite `d`.** This is
 the claim the section header makes, made machine-checked: a definition that is
@@ -1464,24 +1429,16 @@ theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
 
 /-- **And the two agree only in the limit.** Without this the phrase
 "infinite-island limit" is prose; with it, the regime is a proved property of
-the definition rather than a claim in a comment. -/
+the definition rather than a claim in a comment.
+
+The limit is proved once, on the kernel, and this is the wrapper's inheritance of
+it. `Core.islandDemeCorrection_sub_one` carries the sharper statement the proof of
+the limit throws away: the correction exceeds one by exactly `1/(d-1)`, which is
+what a reader deciding whether the many-deme form is usable at a given `d` actually
+needs. -/
 theorem islandDemeCorrection_tendsto_one :
-    Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) := by
-  have h1 : Filter.Tendsto (fun d : ℝ ↦ d - 1) Filter.atTop Filter.atTop := by
-    simpa using Filter.tendsto_atTop_add_const_right Filter.atTop (-1)
-      (Filter.tendsto_id (α := ℝ))
-  have h2 : Filter.Tendsto (fun d : ℝ ↦ (d - 1)⁻¹) Filter.atTop (nhds 0) :=
-    tendsto_inv_atTop_zero.comp h1
-  have h3 : Filter.Tendsto (fun d : ℝ ↦ 1 + (d - 1)⁻¹) Filter.atTop (nhds 1) := by
-    simpa using (tendsto_const_nhds (α := ℝ) (x := (1 : ℝ))
-      (f := Filter.atTop)).add h2
-  have h4 : Filter.Tendsto (fun d : ℝ ↦ d / (d - 1)) Filter.atTop (nhds 1) := by
-    apply h3.congr'
-    filter_upwards [Filter.eventually_gt_atTop (1 : ℝ)] with d hd
-    have hne : d - 1 ≠ 0 := by intro h; linarith [sub_eq_zero.mp h]
-    field_simp
-    ring
-  simpa [islandDemeCorrection] using h4
+    Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) :=
+  Core.islandDemeCorrection_tendsto_one
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :

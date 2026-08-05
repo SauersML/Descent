@@ -177,8 +177,8 @@ FAMILIES = [
         "status": "SIMULATED. The standing complaint -- that the simulator "
                   "varies a deme count no member takes as an argument -- is "
                   "RETIRED by membership, not by new code: islandFstFiniteDemes "
-                  "(Ne m d), islandDemeCorrection (d) and finiteIslandCorrection "
-                  "(demes) all take the deme count, and fam_coalescent.py's "
+                  "(Ne m d) and islandDemeCorrection (d) both take the deme "
+                  "count, and fam_coalescent.py's "
                   "finite_deme_theory column is 1/(1 + 4 Ne m (d/(d-1))^2), "
                   "which is islandFstFiniteDemes' body with islandDemeCorrection "
                   "inlined. The d grid is 2, 5, 20, so the correction is "
@@ -214,8 +214,7 @@ FAMILIES = [
                     "migrationSharedBoostAt", "migBoost", "migrationLDBoost",
                     # finite-deme corrections -- the members that DO take the
                     # deme count the simulator varies
-                    "islandFstFiniteDemes", "islandDemeCorrection",
-                    "finiteIslandCorrection"],
+                    "islandFstFiniteDemes", "islandDemeCorrection"],
     },
     {
         "name": "split_fst",
