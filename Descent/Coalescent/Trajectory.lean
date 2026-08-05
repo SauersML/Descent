@@ -233,6 +233,52 @@ theorem blocks_of_mem_support_blockLaw {n : ℕ} {k : ℕ} (hk : k < n) {x : ER 
       subst hmem
       exact chainLaw_head_blocks k hk hl List.head?_cons
 
+/-- **The block count at every position, not just the head.**  Entry `i` of a trajectory
+after `k` jumps is the state the chain was in `i` jumps ago, so it has `n - k + i` blocks.
+
+`chainLaw_head_blocks` is the `i = 0` case.  The general statement is what a construction
+like `Path.pathState` needs, because it reads the trajectory at whatever level the clock has
+reached rather than always at the head. -/
+theorem chainLaw_blocks_at {n : ℕ} :
+    ∀ (k : ℕ), k < n → ∀ {l : List (ER n)}, l ∈ (chainLaw n k).support →
+      ∀ i, i < l.length → blocks (l.getD i (Delta n)) = n - k + i := by
+  intro k
+  induction k with
+  | zero =>
+      intro _ l hl i hi
+      rw [chainLaw, PMF.mem_support_pure_iff] at hl
+      subst hl
+      have hi0 : i = 0 := by
+        simp only [List.length_cons, List.length_nil] at hi
+        omega
+      subst hi0
+      simpa using blocks_bot n
+  | succ m ih =>
+      intro hmn l hl i hi
+      rw [chainLaw, PMF.mem_support_bind_iff] at hl
+      obtain ⟨l', hl', hmem⟩ := hl
+      have hlen := chainLaw_length m hl'
+      match l' with
+      | y :: rest =>
+          rw [PMF.mem_support_map_iff] at hmem
+          obtain ⟨z, hz, rfl⟩ := hmem
+          match i with
+          | 0 =>
+              have hhead : blocks z + (m + 1) = n :=
+                chainLaw_head_blocks (m + 1) hmn
+                  (by rw [chainLaw, PMF.mem_support_bind_iff]
+                      exact ⟨y :: rest, hl', by rw [PMF.mem_support_map_iff]; exact ⟨z, hz, rfl⟩⟩)
+                  List.head?_cons
+              simp only [List.getD_cons_zero, Nat.add_zero]
+              omega
+          | j + 1 =>
+              have hj : j < (y :: rest).length := by
+                simp only [List.length_cons] at hi ⊢
+                omega
+              have hrec := ih (by omega) hl' j hj
+              simp only [List.getD_cons_succ]
+              omega
+
 /-- **K-C (1.13) in full: the chain runs from `Δ` to `Θ` in `n - 1` jumps.**
 
 `Δ = ℛ_n ≺ ℛ_{n-1} ≺ ⋯ ≺ ℛ_1 = Θ`.  The trajectory starts at `Δ`
