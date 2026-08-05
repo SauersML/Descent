@@ -1,10 +1,10 @@
 /-
-Released under Apache 2.0 license as described in the file LICENSE.
+Released under the GNU Affero General Public License v3.0 as described in the file LICENSE.
 -/
 import Lake
 
 /-!
-# Gnomon build configuration
+# Descent build configuration
 
 Defines the proof library and validation executables against a pinned Mathlib revision.
 -/

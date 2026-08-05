@@ -141,7 +141,7 @@ def test_emitter_gate() -> None:
 # ---------------------------------------------------------------------------
 
 CLEAN_DEF = '''/-
-Released under Apache 2.0 license as described in the file LICENSE.
+Released under the GNU Affero General Public License v3.0 as described in the file LICENSE.
 -/
 namespace Descent
 

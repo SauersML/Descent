@@ -309,7 +309,7 @@ def families(out: str) -> set[str]:
 # to pass by changing the corpus.
 
 HEADER = """/-
-Released under Apache 2.0 license as described in the file LICENSE.
+Released under the GNU Affero General Public License v3.0 as described in the file LICENSE.
 -/
 import Mathlib
 
@@ -595,7 +595,7 @@ CASES = [
                 CLEAN_SUB + "\n-- " + "x" * 120 + "\n"),
      "characters"),
     ("style", "missing license header",
-     clean_plus("Descent/Sub.lean", CLEAN_SUB.replace("Released under Apache", "Licensed under")),
+     clean_plus("Descent/Sub.lean", CLEAN_SUB.replace("Released under the GNU", "Licensed under the GNU")),
      "license header"),
     ("style", "lambda written with =>",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + "\ndef f := fun x => x\n"),

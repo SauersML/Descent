@@ -15,4 +15,4 @@ All contributions are welcome.
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE).
+GNU Affero General Public License v3.0. See [LICENSE](LICENSE).
