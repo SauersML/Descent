@@ -759,9 +759,23 @@ def translate_enum_match(d, enums, struct_arg_names=(), fname=None,
     ctors = enums[ty]
     explicit = [n for a in d["args"] if not a["implicit"] for n in a["names"]]
     binders = [n for a in d["args"] for n in a["names"]]
-    scrut = "_e"
-    while pyname(scrut) in {pyname(n) for n in binders}:
-        scrut += "_"
+    # DO NOT INVENT A SCRUTINEE THE DEFINITION ALREADY HAS.  In the
+    # pipe-equation form the matched value is the unnamed final argument and a
+    # fresh name is needed for it. In the `match p with` form `p` is a declared
+    # parameter, and appending `_e` beside it made the table take FOUR arguments
+    # where Lean's `Pop.pair` takes three -- so `Pop.pair 0 x P` supplied three,
+    # fell into the partial-application branch, and returned a lambda. Callers
+    # then tried to add that lambda to a float: `residualBurden` and the whole
+    # cone above it, eighteen definitions, died on "unsupported operand type(s)
+    # for +: 'float' and 'function'". Nothing was wrong with any of them.
+    scrut_arg = d.get("_scrut_is_arg")
+    if scrut_arg and explicit and explicit[-1] == scrut_arg:
+        scrut, extra = scrut_arg, []
+    else:
+        scrut, extra = "_e", None
+        while pyname(scrut) in {pyname(n) for n in binders}:
+            scrut += "_"
+        extra = [pyname(scrut)]
     branches = {}
     for e in d["equations"]:
         _base, _, ctor = e["pattern"].strip().rpartition(".")
@@ -770,7 +784,7 @@ def translate_enum_match(d, enums, struct_arg_names=(), fname=None,
         if stmts:
             raise Untranslatable("enum branch needs `let`, not supported here")
         branches[ctors[ctor]] = ret
-    args = [pyname(n) for n in explicit] + [pyname(scrut)]
+    args = [pyname(n) for n in explicit] + extra
     fn = fname or pyname(d["short"])
     # PARTIAL APPLICATION IS NOT AN ERROR IN LEAN, and this dispatch table is a
     # function like any other.  `Pop.withTarget f t = Pop.pair (f Pop.source) t`
@@ -1027,6 +1041,11 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
             if parsed and explicit and explicit[-1] == scrut:
                 d = dict(d)
                 d["equations"] = parsed
+                # The scrutinee is a DECLARED PARAMETER here, unlike the
+                # pipe-equation form where it is the unnamed final argument.
+                # Recording which one it is stops the dispatch compiler from
+                # appending a second scrutinee beside it -- see below.
+                d["_scrut_is_arg"] = scrut
                 d["args"] = [a for a in d["args"]
                              if a["implicit"] or scrut not in a["names"]] + \
                             [a for a in d["args"]

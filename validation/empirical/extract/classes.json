@@ -40059,8 +40059,7 @@
   "args": [
    "s",
    "t",
-   "p",
-   "_e"
+   "p"
   ],
   "box": {},
   "selfcheck": {
@@ -81410,8 +81409,8 @@
   }
  },
  "Descent.mechanisticPortabilityRatio": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MechanisticPortabilityWitnesses.lean",
   "line": 93,
   "short": "mechanisticPortabilityRatio",
@@ -81423,9 +81422,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82660,8 +82659,8 @@
   }
  },
  "Descent.brierDiscriminationLoss": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 849,
   "short": "brierDiscriminationLoss",
@@ -82673,9 +82672,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82714,8 +82713,8 @@
   }
  },
  "Descent.brierCalibrationLoss": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 857,
   "short": "brierCalibrationLoss",
@@ -82733,9 +82732,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -90989,8 +90988,8 @@
   }
  },
  "Descent.shiftedObservedMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 463,
   "short": "shiftedObservedMean",
@@ -91013,9 +91012,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91234,8 +91233,8 @@
   }
  },
  "Descent.CrossPopulationCalibrationShiftModel.observedMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 500,
   "short": "observedMean",
@@ -91248,9 +91247,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91283,8 +91282,8 @@
   }
  },
  "Descent.CrossPopulationCalibrationShiftModel.predictedMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 505,
   "short": "predictedMean",
@@ -91297,9 +91296,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91608,8 +91607,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 748,
   "short": "deploymentIntercept",
@@ -91622,9 +91621,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91842,8 +91841,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.predictedMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 771,
   "short": "predictedMean",
@@ -91856,9 +91855,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91887,8 +91886,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.observedMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 776,
   "short": "observedMean",
@@ -91901,9 +91900,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -92419,8 +92418,8 @@
   }
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1258,
   "short": "deploymentInterceptAt",
@@ -92439,9 +92438,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -92594,7 +92593,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "note": "self-check: structure projection unavailable (KeyError('toMetricModelAt'))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1279,
   "short": "predictedMeanAt",
@@ -92615,7 +92614,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": "KeyError('toMetricModelAt')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -92634,8 +92633,8 @@
   }
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1284,
   "short": "observedMeanAt",
@@ -92654,9 +92653,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99694,8 +99693,8 @@
   }
  },
  "Descent.effectiveOutcomeVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2914,
   "short": "effectiveOutcomeVariance",
@@ -99708,9 +99707,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99873,8 +99872,8 @@
   }
  },
  "Descent.r2FromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3019,
   "short": "r2FromSourceWeights",
@@ -99887,9 +99886,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -100041,8 +100040,8 @@
   }
  },
  "Descent.residualVarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3037,
   "short": "residualVarianceFromSourceWeights",
@@ -100055,9 +100054,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -100101,8 +100100,8 @@
   }
  },
  "Descent.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3062,
   "short": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
@@ -100120,9 +100119,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -100160,8 +100159,8 @@
   }
  },
  "Descent.targetCalibratedBrierFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3146,
   "short": "targetCalibratedBrierFromSourceWeights",
@@ -100173,9 +100172,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -102854,7 +102853,7 @@
  },
  "Descent.equalVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
+  "note": "self-check: calls untranslated definition Phi",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 5552,
   "short": "equalVarianceGaussianAUCFromSourceWeights",
@@ -102869,7 +102868,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
+   "error": "NameError(\"name 'Phi' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -124339,11 +124338,11 @@
    }
   }
  },
- "Descent.Spectral.HardyWeinbergModel.standardizedSquare": {
+ "Descent.Foundations.HardyWeinbergModel.standardizedSquare": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name h.centeredAltAlleleCount",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 183,
+  "line": 193,
   "short": "standardizedSquare",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -124411,11 +124410,11 @@
    }
   }
  },
- "Descent.Spectral.HardyWeinbergModel.mellinDrift": {
+ "Descent.Foundations.HardyWeinbergModel.mellinDrift": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name h.genotypeProb",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 200,
+  "line": 210,
   "short": "mellinDrift",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -124453,7 +124452,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 213,
+  "line": 225,
   "short": "hweMellinDrift",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -124584,7 +124583,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 672,
+  "line": 684,
   "short": "maxSafeEpistaticOrder",
   "ret_type": "ℝ",
   "empirical_status": "MIXED",
@@ -124676,7 +124675,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 879,
+  "line": 891,
   "short": "hweLatticeCondition",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -124722,7 +124721,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 882,
+  "line": 894,
   "short": "latticeCriticalMaf",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -124775,11 +124774,11 @@
    "range_lo": 0
   }
  },
- "Descent.Spectral.HardyWeinbergModel.mellinJetVariance": {
+ "Descent.Foundations.HardyWeinbergModel.mellinJetVariance": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name h.genotypeProb",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 940,
+  "line": 962,
   "short": "mellinJetVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -124812,7 +124811,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 949,
+  "line": 973,
   "short": "hweMellinJetVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -124866,7 +124865,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 987,
+  "line": 1011,
   "short": "hardCallLatticeSpan",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -124911,7 +124910,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 1058,
+  "line": 1082,
   "short": "hardCallObservables",
   "ret_type": "MellinObservables where drift",
   "empirical_status": "",
@@ -124940,7 +124939,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 1141,
+  "line": 1165,
   "short": "hardCallLatticeIndex",
   "ret_type": "Foundations.DiploidGenotype → ℤ",
   "empirical_status": "",
@@ -124975,7 +124974,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 1393,
+  "line": 1417,
   "short": "hweCodingInvariants",
   "ret_type": "CodingInvariants where drift",
   "empirical_status": "DERIVED",
@@ -125006,7 +125005,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name h.genotypeProb",
   "file": "Descent/Spectral/PolygenicSpectroscopy.lean",
-  "line": 1466,
+  "line": 1490,
   "short": "standardizedFourthMoment",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
