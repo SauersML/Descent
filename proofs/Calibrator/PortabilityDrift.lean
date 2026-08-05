@@ -3029,22 +3029,34 @@ correlation decays exponentially with recombination distance and divergence.
     estimated from 60 sampled chromosomes. A design with an independently known
     anchor is needed before either shape earns a verdict.
 
-    A SECOND LEAD, against the `fstGap` factor (`simcov/battery_bulk53.py`).
-    `lambda` is free, so no absolute rate is refutable, but the claim that the
-    rate is PROPORTIONAL to `fstGap` needs no free constant: fit the decay rate
-    at two migration rates and the ratio of fitted rates must equal the ratio of
-    `F_ST` values. Measured on the cross-deme LD correlation with a passing
-    `F_ST = 0` control, the rate ratio is 0.272 ± 0.095 where the `F_ST` ratio
-    is 0.055. So the rate does fall with divergence -- a rate INDEPENDENT of
-    `fstGap` would give 1.0 and sits 7.6 sems away -- but it falls SUB-
-    proportionally, and strict proportionality sits 2.3 sems off in the other
-    direction. Neither reading is comfortable.
+    THE `fstGap` FACTOR IS **FALSIFIED**, and the exponent is a SQUARE ROOT
+    (`simcov/battery_bulk54.py`). `lambda` is free, so the absolute rate is not
+    refutable; the SHAPE of the rate-versus-divergence relation is, with no free
+    constant left once each candidate is anchored at one cell. Five migration
+    rates spanning 120-fold in `m` give `F_ST` = 0.5558, 0.2374, 0.0951, 0.0322,
+    0.0062 -- a ninetyfold span -- and the fitted decay rate tracks
+    `√fstGap`, not `fstGap`:
 
-    That run earns no verdict either, and for a reason worth naming: it carried
-    one cell per record, so the prediction span is zero and the power gate fires
-    correctly. A design sweeping several migration rates and regressing fitted
-    rate on `F_ST` would decide it, and is the obvious next step for both leads
-    at once, since it produces the distance profile the shape question needs. -/
+      rate ∝ fstGap        FALSIFIED, worst 4.73 sems (95% relative)
+      rate ∝ √fstGap       MATCH, worst 2.42 sems
+      rate independent     19.35 sems off, though formally NO POWER since a
+                           constant prediction has no span
+
+    So the body is wrong in its `fstGap` dependence and right that there IS
+    one: divergence does slow LD-correlation decay, at half the rate this body
+    claims in the exponent. Replacing `fstGap` by `Real.sqrt fstGap` is what the
+    measurement supports, and `lambda` absorbs the rest.
+
+    An earlier run (`battery_bulk53.py`) reached the same conclusion and could
+    not report it: it compared ONE fitted-rate ratio against ONE `F_ST` ratio,
+    so the prediction span was zero and the power gate correctly refused a
+    verdict. The fix was more cells, not a better estimator.
+
+    The two leads are therefore in different states: the SHAPE in distance --
+    exponential versus Sved's hyperbolic -- remains open for want of an
+    independently anchored control, while the `fstGap` factor is settled here.
+    A body carrying both faults would be wrong twice over, and only one of them
+    is now established. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * fstGap * distance))
 
