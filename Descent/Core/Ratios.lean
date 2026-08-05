@@ -652,4 +652,15 @@ theorem halfLineageRate_succ (k : ℕ) (x : ℝ) :
   push_cast
   ring
 
+/-- Triple sum, `a + b + c`. Instantiated by the total observed-mean shift across three
+calibration channels and by the Ben-David domain-adaptation bound's three terms. Those
+are unrelated quantities that happen to add three things; naming the shape costs nothing
+and stops a fourth copy. -/
+noncomputable def sum3 (a b c : ℝ) : ℝ := a + b + c
+
+/-- **A vanishing term contributes nothing**, which is what makes the three summands
+independent contributions rather than a single pooled number. -/
+@[simp] theorem sum3_zero_middle (a c : ℝ) : sum3 a 0 c = a + c := by
+  unfold sum3; ring
+
 end Descent.Core

@@ -778,8 +778,8 @@ section DomainAdaptation
     an argument named `divergence` against a cited theorem whose divergence is
     twice it is exactly the unstated-convention defect this corpus has already
     paid for over `F_ST`. -/
-def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
-  err_source + divergence + lambda_star
+noncomputable def benDavidUpperBound (err_source divergence lambda_star : ℝ) : ℝ :=
+  Descent.Core.sum3 err_source divergence lambda_star
 
 /-! **Deleted: `divergence_increases_with_fst`.**
 
@@ -795,7 +795,7 @@ bound below is one-sided and holds for any body dominated by it. The three terms
 and with equal weight: source error, domain divergence and the joint-optimal residual. -/
 theorem benDavidUpperBound_reference :
     benDavidUpperBound 1 2 3 = 6 := by
-  unfold benDavidUpperBound
+  unfold benDavidUpperBound Descent.Core.sum3
   norm_num
 
 /-- **Larger `λ*` worsens the Ben-David upper bound.**
@@ -811,7 +811,7 @@ theorem larger_lambda_star_worsens_ben_david_bound
     (h_lambda : lambda₁ < lambda₂) :
     benDavidUpperBound err_source divergence lambda₁ <
       benDavidUpperBound err_source divergence lambda₂ := by
-  unfold benDavidUpperBound
+  unfold benDavidUpperBound Descent.Core.sum3
   linarith
 
 /-- **A relative tightness certificate gives a two-sided envelope around a bound.**
@@ -1319,7 +1319,7 @@ theorem benDavidUpperBound_le_infoCertifiedBenDavidUpperBound_of_dominated_compo
     (h_div : divergence ≤ pinskerAncestryDivergenceCap I_phi_A) :
     benDavidUpperBound err_source divergence lambda_star ≤
       infoCertifiedBenDavidUpperBound I_phi_Y I_phi_A lambda_star := by
-  unfold benDavidUpperBound infoCertifiedBenDavidUpperBound
+  unfold benDavidUpperBound infoCertifiedBenDavidUpperBound Descent.Core.sum3
   linarith
 
 /-- **Improving the information-bottleneck objective tightens the transfer bound.**

@@ -453,7 +453,7 @@ prevalence is a different finding from one attributable to a genetic mean differ
 a model that carried only the total could not tell them apart. -/
 noncomputable def totalObservedMeanShift
     (prevalence environmental genetic : ℝ) : ℝ :=
-  prevalence + environmental + genetic
+  Descent.Core.sum3 prevalence environmental genetic
 
 /-- **Observed mean in a population**: the base mean, shifted in the target only.
 
@@ -537,7 +537,8 @@ noncomputable def CrossPopulationCalibrationShiftModel.identityCalibrationProfil
     (m : CrossPopulationCalibrationShiftModel) :
     m.observedMean Pop.source = m.baseObservedMean := by
   simp [CrossPopulationCalibrationShiftModel.observedMean,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.predictedMean_source
     (m : CrossPopulationCalibrationShiftModel) :
@@ -554,7 +555,8 @@ theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted
   simp [CrossPopulationCalibrationShiftModel.calibrationMoments,
     CrossPopulationCalibrationShiftModel.observedMean,
     CrossPopulationCalibrationShiftModel.predictedMean, CalibrationMoments.shifted,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.sourceCalibrationMoments_meanObserved
     (m : CrossPopulationCalibrationShiftModel) :
@@ -598,7 +600,8 @@ theorem CrossPopulationCalibrationShiftModel.targetCalibrationMoments_eq_shifted
   simp [CrossPopulationCalibrationShiftModel.observedMean,
     CrossPopulationCalibrationShiftModel.observedMeanShift, add_left_comm,
     add_comm,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 @[simp] theorem CrossPopulationCalibrationShiftModel.targetPredictedMean_eq
     (m : CrossPopulationCalibrationShiftModel) :
@@ -668,7 +671,8 @@ theorem source_calibrated_target_citl_eq_prevalence_shift_of_no_other_shifts
   simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift,
     h_env, h_genetic, h_score, h_intercept,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 /-- The absolute pure-prevalence formula is likewise only a zero-other-shifts
 special case of the full calibration budget. -/
@@ -684,7 +688,8 @@ theorem source_calibrated_target_abs_citl_eq_abs_prevalence_shift_of_no_other_sh
   simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift,
     h_env, h_genetic, h_score, h_intercept,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 /-- Prevalence equality does not force zero target CITL. If the source is
 calibrated and non-prevalence calibration shifts remain, then target CITL
@@ -699,7 +704,8 @@ theorem source_calibrated_target_citl_eq_nonprevalence_shift_when_prevalence_pre
   rw [source_calibrated_target_citl_eq_shift_budget m h_src_cal]
   simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift, h_prev,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
   ring
 
 /-- Mechanistic calibration state on top of the explicit SNP-level portability
@@ -835,7 +841,8 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.identityCalibration
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.observedMean,
     CrossPopulationCalibrationShiftModel.observedMeanShift, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 @[simp] theorem CrossPopulationMechanisticCalibrationModel.toShiftModel_targetPredictedMean
     {p q : ℕ} (m : CrossPopulationMechanisticCalibrationModel p q) :
@@ -887,7 +894,8 @@ theorem sourceCalibrationProfile_exact_mechanistic_portability_law
       CalibrationMoments.toProfile, Descent.calibrationProfile,
       calibrationSlopeFromSourceWeights, calibrationInTheLarge,
       Descent.Core.difference,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 /-- Exact mechanistic target calibration-profile portability law. The target
 predicted mean is the deployed source weights applied to the target tag mean,
@@ -932,7 +940,8 @@ theorem target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_bu
     CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
     CrossPopulationCalibrationShiftModel.observedMeanShift,
     CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean] using
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using
     CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
       m.toShiftModel link
 
@@ -1150,7 +1159,8 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.observedMean,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean] using
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using
       h_target_mean_eq_prevalence
   have h_src_cal_shift :
       ((cal.toShiftModel.identityCalibrationProfile Pop.source)).citl = 0 := by
@@ -1165,7 +1175,8 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
       sub_eq_add_neg, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean] using h_shift_nonzero
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using h_shift_nonzero
   have h_main :=
     source_to_target_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
       h_target_mean_eq_prevalence_shift h_source_r2_unit h_target_r2_unit h_r2_drop
@@ -1181,7 +1192,8 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean] using h_citl
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using h_citl
   · simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile,
       CrossPopulationMechanisticCalibrationModel.toShiftModel,
@@ -1189,14 +1201,16 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
       CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean] using h_abs
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using h_abs
   · exact h_worse
   · simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMean,
       CrossPopulationMechanisticCalibrationModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.observedMean,
       CrossPopulationCalibrationShiftModel.observedMeanShift, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean] using h_brier
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using h_brier
 
 /-- Generation-indexed mechanistic calibration state tied directly to the
 generation-indexed SNP/popgen transport model. -/
@@ -1312,7 +1326,8 @@ score of a tag-mean difference; defining it as the difference makes it `rfl`. -/
     CrossPopulationGenerationalCalibrationModel.observedMeanShiftAt,
     CrossPopulationMechanisticCalibrationModel.observedMean,
     CrossPopulationMechanisticCalibrationModel.observedMeanShift, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 @[simp] theorem
     CrossPopulationGenerationalCalibrationModel.toMechanisticCalibrationModelAt_targetPredictedMean
@@ -1376,7 +1391,8 @@ theorem targetCalibrationProfileAtGeneration_exact_mechanistic_popgen_portabilit
     CrossPopulationMechanisticCalibrationModel.observedMeanShift,
     CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
     calibrationSlopeFromSourceWeights,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
 
 /-- Exact generation-indexed target CITL law on the explicit population-genetic
 state slice. -/
@@ -1392,7 +1408,8 @@ theorem targetIdentityCalibrationProfileAtGeneration_citl_eq_exact_biological_sh
     CrossPopulationGenerationalCalibrationModel.scoreMeanShiftAt,
     CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
     CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      totalObservedMeanShift, shiftedObservedMean] using
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3] using
     source_calibrated_target_citl_eq_shift_budget
       (m.toMechanisticCalibrationModelAt t).toShiftModel
       (by simpa only [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
@@ -1510,7 +1527,8 @@ theorem auc_drop_and_baseRate_only_citl_worsening_of_r2_drop
     simp [CrossPopulationCalibrationShiftModel.observedMeanShift,
       CrossPopulationCalibrationShiftModel.predictedMeanShift,
       h_env, h_genetic, h_score, h_intercept, h_prev_shift,
-      totalObservedMeanShift, shiftedObservedMean]
+      totalObservedMeanShift, shiftedObservedMean,
+      Descent.Core.sum3]
   have h_main :=
     auc_drop_and_citl_worsening_of_r2_drop_and_shift_budget
       metric cal h_source_r2_unit h_target_r2_unit h_r2_drop
