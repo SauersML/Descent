@@ -3328,7 +3328,7 @@ noncomputable def privateArchitectureTransferCeiling
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem privateArchitectureTransferCeiling_at_reference_point :
-    privateArchitectureTransferCeiling 1 1 1 = 0 := by
+    privateArchitectureTransferCeiling 1 (1 / 2) 1 = 1 / 4 := by
   norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration]
 
 

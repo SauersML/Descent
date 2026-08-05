@@ -4248,7 +4248,25 @@ theorem standardNormalPdf_zero :
 
 /-- The liability threshold `T = Φ⁻¹(1 - K)` for prevalence `K`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk43.py`, `group_a`).
+    The observable is exact and needs no modelling: the empirical `(1-K)`
+    quantile of 4×10⁶ standard-normal liabilities. Over `K` = 0.01, 0.05, 0.2,
+    0.5, 0.8 the body predicts +2.32635, +1.64485, +0.84162, 0 and -0.84162
+    against measured +2.32785 ± 0.00187, +1.64453 ± 0.00106, +0.84052 ±
+    0.00071, -0.00094 ± 0.00063 and -0.84119 ± 0.00071 -- worst cell 1.54 sems
+    at 0.13% relative.
+
+    Power: `K` is swept from the far tail to above the median, so the threshold
+    CHANGES SIGN across the design. The sign slip `Φ⁻¹(K)` -- which is what
+    writing the tail the wrong way round produces -- misses by up to 3113 sems
+    and 200% relative, and coincides with the body only at `K = 1/2` where both
+    are zero. That is the one place the two readings are indistinguishable, and
+    the design does not rest there.
+
+    The competing form is recorded as a lead rather than a falsification
+    because this run's control was DEGENERATE: it counted the tail mass above
+    the MEASURED quantile, which is `K` by construction of a quantile and so
+    cannot fail. The harness detected that. The MATCH above needs no control. -/
 noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
 
 /-- Mean liability among cases, `i = φ(T)/K`.
@@ -5553,9 +5571,23 @@ The closed form takes that value exactly, rather than approaching it. -/
     Not stipulated: `MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint`
     derives it as the rest point of `ibdFlowStep` with `rate = μ`.
 
-    Empirical status: UNTESTED here; the identical body at
-    `DGP.fstMutationDriftEquilibrium` is VALIDATED against `msprime`'s
-    `InfiniteAlleles` model at worst 2.40 sems. -/
+    Empirical status: **VALIDATED**, by projection. This body IS
+    `DGP.fstMutationDriftEquilibrium m.theta` -- not an analogue of it, the same
+    function applied to this structure's field -- so the measurement there
+    transfers without a separate design. That run is `simcov/battery_bulk19.py`
+    against `msprime`'s `InfiniteAlleles` model, worst cell 2.40 sems, with `Nₑ`
+    and `μ` swept by a factor of four INDEPENDENTLY so each `θ` is reached twice
+    by different routes; `simcov/battery_bulk20b.py` corroborates from the
+    complementary side, measuring `θ/(1+θ)` over a hundredfold `θ` sweep at
+    worst 2.17 sems with an Ewens allele-count control passing at 1.10 sems.
+
+    What does NOT transfer is the reading of the name: `fst` here is the
+    probability that two alleles drawn WITHIN a population are identical by
+    state, the complement of heterozygosity, and not a between-population
+    differentiation. The measurement above is of that within-population
+    quantity. A consumer wanting differentiation wants
+    `DGP.EvolutionaryParameters.fstEquilibrium`, which is separately FALSIFIED
+    -- so the two must not be substituted for one another. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
   fstMutationDriftEquilibrium m.theta
@@ -7069,8 +7101,30 @@ name/quantity mismatch, so the two are separated rather than bounded.
     retention" read as the fraction of a score's covariance with the genetic
     value that survives transfer from the deme its weights came from.
 
-    Empirical status: **FALSIFIED as a product**
-    (`simcov/battery_bulk35.py`). Measured at `Nₑ = 1000` over 5 Mb with
+    Empirical status: UNTESTED, with a LEAD against the product form.
+    DOWNGRADED from a falsification after a replication check: a second run of
+    the same design (`simcov/battery_bulk36.py`) returned retention 0.736 at
+    `4·Nₑ·m = 40` where the first returned 0.993, and 0.614 against 0.781 at
+    `4·Nₑ·m = 8`. Those gaps are an order of magnitude larger than the ±0.08
+    error bars either run quotes, so the quoted bars understate the true
+    variability and no verdict here is safe.
+
+    The instability is in the CALIBRATION, not the biology. Retention is divided
+    by the estimator's panmictic ceiling, and that ceiling came out 0.8905 in
+    the first run and 1.0430 in the second -- a 17% swing on six replicates,
+    applied to every cell. A ceiling above one is itself the tell: attenuation
+    can only pull it below one, so the second estimate is noise-dominated. A
+    usable design needs the ceiling pinned to a few percent, which means
+    hundreds of replicates rather than six, or an estimator that needs no
+    calibration at all.
+
+    What both runs agree on qualitatively: measured retention rises with
+    migration but stays well below the product form at weak migration. That is
+    the lead, and it is consistent with `sharedLD_from_equilibrium`, where
+    measured shared LD stayed near 1 rather than falling to `M/(1+M)`.
+
+    The table below is the FIRST run, kept for the record:
+    Measured at `Nₑ = 1000` over 5 Mb with
     recombination, 80 causal sites segregating in both demes, weights taken as
     the deme-0 LD projection `Σ_A·β` (itself VALIDATED at
     `targetSourceEffectProjection`):
@@ -7111,13 +7165,14 @@ noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
 
     Denotes: a variance, in the units of `V_A`.
 
-    Empirical status: **FALSIFIED**, inherited. This body is
-    `signalRetentionMigrationDrift Ne m * V_A`, and that fraction is falsified
-    as a product at 4.97 sems by `simcov/battery_bulk35.py` -- see there for the
-    table, the surviving single-factor candidate, and the calibration. Scaling a
-    wrong fraction by `V_A` leaves it wrong; the `V_A` factor itself is not what
-    the measurement addresses, and `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA`
-    remains true as algebra. -/
+    Empirical status: UNTESTED, inherited. This body is
+    `signalRetentionMigrationDrift Ne m * V_A`, and that fraction carries a LEAD
+    against its product form which two runs could not replicate stably -- see
+    there for the tables and for why the calibration, not the biology, is what
+    moved. An earlier version of this docstring recorded the falsification as
+    inherited; that was withdrawn when the replication check came back.
+    `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` is unaffected: it
+    is algebra and holds whatever the fraction turns out to be. -/
 noncomputable def retainedSignalVarianceMigrationDrift (V_A Ne m : ℝ) : ℝ :=
   signalRetentionMigrationDrift Ne m * V_A
 

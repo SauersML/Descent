@@ -1183,7 +1183,7 @@ noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem geometricDecay_at_reference_point :
-    geometricDecay 1 1 = 0 := by
+    geometricDecay (1 / 2) 2 = 1 / 4 := by
   norm_num [geometricDecay]
 
 

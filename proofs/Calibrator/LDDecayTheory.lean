@@ -141,9 +141,18 @@ noncomputable def ldAfterGenerations (D₀ r Ne : ℝ) (t : ℕ) : ℝ :=
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+satisfying it, and a value does not.
+
+**Moved off a collapse point.** This read `ldAfterGenerations 1 1 1 1 = 0`, where
+`r = 1` sends `ldRetentionPerGen 1 1 = (1-1)·(1-1/2)` to zero and the whole body
+with it, so the stated value survived every rescaling of the body and pinned
+nothing. The point is now `D₀ = 1`, `r = 1/2`, `Nₑ = 2`, `t = 2`: the retention
+per generation is `(1-1/2)·(1-1/4) = 3/8`, and two generations give `9/64`. Both
+factors of the retention are live, and the EXPONENT is pinned too -- `t = 2`
+rather than `t = 1` is what makes a linear reading of the decay give `3/8` and
+fail. -/
 theorem ldAfterGenerations_at_reference_point :
-    ldAfterGenerations 1 1 1 1 = 0 := by
+    ldAfterGenerations 1 (1 / 2) 2 2 = 9 / 64 := by
   norm_num [ldAfterGenerations, ldRetentionPerGen]
 
 

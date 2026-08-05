@@ -214,7 +214,25 @@ section InformationTheoreticLimits
     What would settle it is an estimator of mutual information that does not assume the
     Gaussian family, run on effect vectors that were not drawn Gaussian. Until then this is
     an exact property of the declared model: something the corpus can prove, and has not
-    measured. -/
+    measured.
+
+    **Measured WITHIN the Gaussian model** (`simcov/battery_bulk44.py`,
+    `group_b`), which is less than the paragraph above asks for but more than
+    nothing. The oracle never puts `ρ` into a formula: it regresses one vector
+    on the other and builds the information from the measured VARIANCE
+    REDUCTION, `(m/2)·log(Var / Var_residual)` -- two measured variances. Over
+    `m` = 1, 4, 10 and `ρ` = 0.3, 0.5, 0.7, 0.9 swept independently, worst cell
+    0.97 sems at 1.08% relative, on 400000 pairs.
+
+    Power: dropping the factor `1/2` is FALSIFIED at 526 sems (100% relative),
+    and leaving `ρ` unsquared inside the log at 204 sems (39%). So both the
+    coefficient and the exponent are chosen by the data. Control: the realised
+    per-coordinate correlation recovers `ρ`.
+
+    This confirms the body is the right function OF the Gaussian model. It does
+    not touch the standing question above, which is whether real effect vectors
+    are in that family -- a design drawing non-Gaussian effects is still what
+    would answer it. -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 
@@ -482,9 +500,16 @@ noncomputable def portabilityGap (r2_source r2_target : ℝ) : ℝ :=
   r2_source - r2_target
 
 /-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+An inequality or an invariance leaves a family of bodies satisfying it; a value does not.
+
+**Moved off a collapse point.** This read `portabilityGap 2 2 = 0`, evaluated on the
+diagonal where source and target `R²` are equal and every antisymmetric body
+vanishes. `c·(a-b)`, `(a-b)³` and `a-b` all give `0` there, so the stated value
+rejected none of them. The point is now off the diagonal, where the difference is
+the whole content: `3 - 1 = 2` fixes the SIGN (which of the two is subtracted) and
+the unit coefficient at once, neither of which the diagonal could see. -/
 theorem portabilityGap_at_reference_point :
-    portabilityGap 2 2 = 0 := by
+    portabilityGap 3 1 = 2 := by
   norm_num [portabilityGap]
 
 

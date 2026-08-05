@@ -22,7 +22,28 @@ nonzero residual axis can provide such a uniform guarantee.
 /-- Bias in a PGS association statistic along a residual cross-panel ancestry
 axis.  `scale` collects the positive locus- and panel-count factors.
 
-    Empirical status: UNTESTED. -/
+    Regime: the residual axis CENTRED, which is what PC correction leaves
+    behind. That is load-bearing and is the whole content of the comparison
+    below.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk41.py`, `group_b`).
+    200000 individuals; the expected phenotype carries a gradient along the
+    residual axis plus an offset, and the observable is the realised
+    association of the DRAWN phenotype with that axis. Worst cell 1.78 sems at
+    1.31% relative, over designs where the offset runs 0 to 1 and the axis
+    spread 0.5 to 2.
+
+    Power, and the practical warning: the same inner product with the axis left
+    UNCENTRED misses by up to 894 sems (1333% relative). The two agree exactly
+    when the offset is zero and diverge without bound as it grows -- at
+    `shift = 1.0` the uncentred form reads 1.075 where the truth is 0.075, a
+    fourteenfold overstatement. This is the error that makes a PC-corrected
+    test look catastrophically biased when it is nearly clean, and it is
+    invisible in any design that only ever centres its phenotype. The competing
+    form is recorded as a LEAD rather than a falsification because this run's
+    control was DEGENERATE: the axis is centred by construction, so "the axis
+    has mean zero" compares a number against itself and cannot fail. The
+    harness detected that and voided it; the MATCH above does not rest on it. -/
 noncomputable def pgsTestAxisBias {d : ℕ} (scale : ℝ)
     (expectedPhenotype residualTargetAxis : Fin d → ℝ) : ℝ :=
   scale * ∑ i, expectedPhenotype i * residualTargetAxis i
@@ -72,7 +93,28 @@ ascertainment to determine the critical confounding magnitude.
 ancestry gradient.  This is `H` before correction and `H'` when
 `ancestryVariance` is the residual variance after correction.
 
-    Empirical status: UNTESTED. -/
+    Regime: the marker's loading on the axis and the ancestry coordinate
+    independent and centred. Independence is what makes the variance of their
+    product the product of their variances; correlated loadings would add a
+    covariance term this body has no room for.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk41.py`, `group_a`).
+    400000 individuals with an ancestry coordinate and a marker loading drawn
+    independently; the observable is the realised variance of their product,
+    which is the confounding component an ancestry gradient induces. Worst cell
+    1.02 sems at 0.69% relative.
+
+    Power: the two variances are swept in OPPOSITE directions -- (1, 1),
+    (4, 0.25), (0.5, 2), (2, 3) -- so a body that is merely monotone in each
+    argument cannot survive. The SUM is FALSIFIED at 483 sems (324% relative)
+    and the GEOMETRIC MEAN at 88 sems (59%), which is what fixes the
+    combination as multiplicative rather than either of the obvious
+    alternatives.
+
+    The error bar is inflated threefold over the normal formula for a variance,
+    because the product of two centred normals is heavy-tailed and the normal
+    sem understates its own scatter -- the same correction that turned a
+    spurious falsification of `spikeAndSlabVariance` into the noise it was. -/
 noncomputable def ancestryGradientSusceptibility
     (markerAxisVariance ancestryVariance : ℝ) : ℝ :=
   markerAxisVariance * ancestryVariance
