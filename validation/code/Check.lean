@@ -514,7 +514,9 @@ guard genuinely can vanish.  `scalarRowResolvent` divides by
 `1 + latent ^ 2 * quadraticForm`, which looks exactly like `sigmoid`'s
 denominator and is not, because `quadraticForm` may be negative. -/
 def exempt : List (Name × String) :=
-  [ (`Descent.sigmoid, "1 + Real.exp (-x) ≥ 1"),
+  [ (`Descent.uniformExp,
+      "(Fintype.card Ω : ℝ)⁻¹ under a [Nonempty Ω] instance, so the card is ≥ 1"),
+    (`Descent.sigmoid, "1 + Real.exp (-x) ≥ 1"),
     (`Descent.standardNormalPdf, "Real.sqrt (2 * Real.pi) ≠ 0"),
     (`Descent.squaringFixedPoint, "scale ^ 2 + 4 ≥ 4"),
     (`Descent.characteristicAmplitude, "a sum of squares is nonnegative"),

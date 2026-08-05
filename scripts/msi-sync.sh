@@ -9,7 +9,7 @@ REMOTE="/projects/standard/hsiehph/sauer354/descent"
 MSI="${MSI:-$HOME/msi-node/msi}"
 TAR="$(mktemp -t descent-src).tar.gz"
 cd "$ROOT"
-tar czf "$TAR" Descent Descent.lean lakefile.lean lean-toolchain lake-manifest.json
+tar czf "$TAR" Descent Descent.lean lakefile.lean lean-toolchain lake-manifest.json validation
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"
 # Overlay, never delete: the remote checkout is shared with other sessions, and a

@@ -1016,6 +1016,7 @@ theorem bestAffine_mse_eq (hv : P.scoreVariance w ≠ 0) :
   field_simp
   ring
 
+omit [DecidableEq J] [DecidableEq L] in
 /-- **The prescribed correction is optimal**: no affine rescaling does better.
 
     So the number in `bestAffine_mse_eq` is not one correction's score, it is the floor
@@ -1152,6 +1153,152 @@ theorem outcomeFactor_at_zero_target_outcomeVariance_is_junk
   rw [hzero, div_zero]
 
 end JunkBranches
+
+section Training
+
+/-!
+## §7 Where the weights come from, and the exact gap they leave
+
+`§2` to `§6` never ask how `w` was produced, which is what makes them cover every scoring
+pipeline.  This section closes the loop at the one end that has a canonical answer: the
+weights a population's own second moments prescribe, `Σ⁻¹ Σ_{XY}`.
+
+Three exact facts follow, and together they are the classic
+train-in-source-deploy-in-target story with no approximation in it:
+
+* a score fitted to a population is **exactly** calibrated in it -- slope `1`, and `R²`
+  equal to the score's own variance share of the outcome variance;
+* deploying **any** weights in a population costs exactly the target-oracle MSE plus the
+  target LD quadratic form of the weight error, with no cross term;
+* the weight error of a source-trained score is exactly
+  `Σ_T⁻¹(K_Tβ_T + c_T) - Σ_S⁻¹(K_Sβ_S + c_S)`, which is where every channel of `§3`
+  reappears -- and it is a difference of two matrix inverses applied to two different
+  vectors, so no scalar shrinkage of the source weights reaches it.
+-/
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L]
+
+namespace DeploymentPopulation
+
+variable (P : DeploymentPopulation Ω J L)
+
+/-- The weights this population's own moments prescribe. -/
+def optimalWeights (sigmaInv : Matrix J J ℝ) : J → ℝ :=
+  optimalWeightsFromMoments sigmaInv P.E P.X P.phenotype
+
+/-- The predictive covariance is the weights read against the cross-covariance vector.
+    A restatement of `covariance_linScore_eq_dot_crossCov` in this file's names, needed
+    because `crossCovVector` and `contextCrossCovVector` are the same function under two
+    names, one for each argument's intended role. -/
+theorem predictiveCovariance_eq_dot_crossCov (w : J → ℝ) :
+    P.predictiveCovariance w = dot w (crossCovVector P.E P.X P.phenotype) :=
+  covariance_linScore_eq_dot_crossCov P.E P.X w P.phenotype
+
+/-- **The prescribed weights make predictive covariance and score variance coincide.**
+
+    This is the normal equations in metric form, and every calibration statement below is
+    a corollary of it. -/
+theorem predictiveCovariance_optimalWeights (sigmaInv : Matrix J J ℝ)
+    (hsigmaInv : P.sigmaX * sigmaInv = 1) :
+    P.predictiveCovariance (P.optimalWeights sigmaInv)
+      = P.scoreVariance (P.optimalWeights sigmaInv) := by
+  have hmul : P.sigmaX.mulVec (P.optimalWeights sigmaInv)
+      = crossCovVector P.E P.X P.phenotype := by
+    unfold optimalWeights optimalWeightsFromMoments
+    have h := Matrix.mulVec_mulVec (crossCovVector P.E P.X P.phenotype) P.sigmaX sigmaInv
+    rw [hsigmaInv, Matrix.one_mulVec] at h
+    simpa using h
+  rw [predictiveCovariance_eq_dot_crossCov, P.scoreVariance_eq, hmul]
+
+/-- **A score is exactly calibrated in the population it was fitted to.**
+
+    Slope exactly `1`, not approximately: the source calibration slope carries no error
+    at all, so every departure from `1` measured in a target population is transport and
+    nothing else. -/
+theorem calibrationSlope_optimalWeights (sigmaInv : Matrix J J ℝ)
+    (hsigmaInv : P.sigmaX * sigmaInv = 1)
+    (hvar : P.scoreVariance (P.optimalWeights sigmaInv) ≠ 0) :
+    P.calibrationSlope (P.optimalWeights sigmaInv) = 1 := by
+  unfold calibrationSlope
+  rw [predictiveCovariance_optimalWeights P sigmaInv hsigmaInv]
+  exact div_self hvar
+
+/-- **In-sample `R²` is the score's variance share of the outcome variance.** -/
+theorem r2_optimalWeights (sigmaInv : Matrix J J ℝ)
+    (hsigmaInv : P.sigmaX * sigmaInv = 1)
+    (hvar : P.scoreVariance (P.optimalWeights sigmaInv) ≠ 0) :
+    P.r2 (P.optimalWeights sigmaInv)
+      = P.scoreVariance (P.optimalWeights sigmaInv) / P.outcomeVariance := by
+  unfold r2
+  rw [predictiveCovariance_optimalWeights P sigmaInv hsigmaInv, pow_two,
+    mul_div_mul_left _ _ hvar]
+
+/-- **Exact excess-MSE law.**  Deploying any weights costs the oracle MSE for this
+    population plus the LD quadratic form of the weight error -- no cross term, because
+    the oracle residual is orthogonal to every direction in the score's span.
+
+    The centering hypothesis is the standardisation convention every polygenic score
+    already applies to its genotypes, and it is the only place in this module where a
+    convention on the inputs is used. -/
+theorem deployedMse_excess (sigmaInv : Matrix J J ℝ) (w : J → ℝ)
+    (hcentered : ∀ j, P.E (fun ω ↦ P.X ω j) = 0)
+    (hsigmaInv : P.sigmaX * sigmaInv = 1) :
+    P.deployedMse w
+      = P.deployedMse (P.optimalWeights sigmaInv)
+        + dot (fun j ↦ w j - P.optimalWeights sigmaInv j)
+            (P.sigmaX.mulVec (fun j ↦ w j - P.optimalWeights sigmaInv j)) :=
+  master_transport_identity_closed_form sigmaInv P.E P.X P.phenotype w hcentered hsigmaInv
+
+end DeploymentPopulation
+
+variable {ΩS ΩT : Type*}
+
+namespace Deployment
+
+variable (D : Deployment ΩS ΩT J L)
+
+/-- **The exact deployment gap.**
+
+    A source-trained score deployed in a target costs the target oracle's MSE plus the
+    target LD quadratic form of the weight error, exactly.  `weightError` below names
+    that error, and `weightError_eq` writes it in the transport channels of `§3`. -/
+theorem target_deployedMse_excess (sigmaInvT : Matrix J J ℝ)
+    (hcentered : ∀ j, D.target.E (fun ω ↦ D.target.X ω j) = 0)
+    (hsigmaInv : D.target.sigmaX * sigmaInvT = 1) :
+    D.target.deployedMse D.w
+      = D.target.deployedMse (D.target.optimalWeights sigmaInvT)
+        + dot (fun j ↦ D.w j - D.target.optimalWeights sigmaInvT j)
+            (D.target.sigmaX.mulVec
+              (fun j ↦ D.w j - D.target.optimalWeights sigmaInvT j)) :=
+  D.target.deployedMse_excess sigmaInvT D.w hcentered hsigmaInv
+
+omit [DecidableEq J] in
+variable [DecidableEq L] in
+/-- **The weight error of a source-trained score, in the channels of `§3`.**
+
+    `Σ_T⁻¹(K_Tβ_T + c_T) - Σ_S⁻¹(K_Sβ_S + c_S)`.  Every object that differs between the
+    two populations appears, and they appear inside two different matrix inverses.  That
+    is the exact reason `mulVec_smul_ne_of_not_aligned` in `Program.OpenQuestions` finds
+    no scalar recalibration that repairs an LD mismatch: `Σ_T⁻¹ v` is not a multiple of
+    `Σ_S⁻¹ v` unless `v` happens to be a common eigenvector. -/
+theorem weightError_eq (sigmaInvS sigmaInvT : Matrix J J ℝ) :
+    (fun j ↦ D.target.optimalWeights sigmaInvT j - D.source.optimalWeights sigmaInvS j)
+      = sigmaInvT.mulVec (D.target.kappa.mulVec D.target.β + D.target.contextX)
+        - sigmaInvS.mulVec (D.source.kappa.mulVec D.source.β + D.source.contextX) := by
+  funext j
+  unfold DeploymentPopulation.optimalWeights optimalWeightsFromMoments
+  have hT : crossCovVector D.target.E D.target.X D.target.phenotype
+      = D.target.kappa.mulVec D.target.β + D.target.contextX :=
+    crossCovVector_decomposition D.target.E D.target.X D.target.C D.target.β D.target.h
+  have hS : crossCovVector D.source.E D.source.X D.source.phenotype
+      = D.source.kappa.mulVec D.source.β + D.source.contextX :=
+    crossCovVector_decomposition D.source.E D.source.X D.source.C D.source.β D.source.h
+  rw [hT, hS]
+  rfl
+
+end Deployment
+
+end Training
 
 end
 
