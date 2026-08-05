@@ -68,6 +68,13 @@ THE GUARDS, and what each one catches:
                   `validation/empirical/simcov/ledger.json`, which is generated
                   and committed; the simulations themselves are NOT gated, and
                   `prover.yml` says why.  Calibrated by `test_ledger.py`.
+  core-empirics   the same verdict record held against `Descent/Core/` alone,
+                  at a standard the whole corpus could not carry: a Core
+                  declaration with a FALSIFIED row that never names the battery,
+                  one that has been measured and states no status of its own,
+                  and one whose status head denies that any measurement can bear
+                  on it.  Depth 0-1 is where an unstated verdict is an unstated
+                  premise, so these are GATED at zero rather than reported.
   field-proofs    theorems whose ENTIRE proof is a structure-field projection,
                   measured on origin/main rather than the worktree.  DIAGNOSTIC,
                   not a gate: it has known false positives and never fails the
@@ -5871,6 +5878,219 @@ def run_ledger() -> int:
 
 
 # ======================================================================================
+# CORE-EMPIRICS -- the load-bearing layer gets the strictest standard, not the same one
+# ======================================================================================
+#
+# `Descent/Core/` is depth 0-1: `Core.Ratios` has 46 consumers, `Core.Fst` 22,
+# and `Core.PopGenParameters.fstEquilibrium` is the input to
+# `Core.Moments.deployedR2` and so to every demography-to-metric theorem in the
+# corpus.  A wrong body in a leaf is one wrong claim.  A wrong body here is the
+# premise of the corpus's headline chain.
+#
+# The `ledger` guard is the right standard for a leaf and the wrong one for
+# this layer.  It reports its two sharpest findings -- a docstring asserting
+# agreement against a disagreeing record, a citation to a battery that emits no
+# verdict -- as REPORTED, NOT GATED, because telling a stale docstring from a
+# corrected body needs a human and a budget pinned to the count would be worse
+# than none.  That reasoning is sound across 2164 definitions.  Across the
+# seven files in `Core/` it is not: the population is small enough to hold at
+# zero by hand, and the cost of a silent one is the whole chain.
+#
+# WHAT THIS GUARD ACTUALLY CAUGHT, and why the rules are these three rather
+# than "read the status and think about it".  `Core.PopGenParameters.
+# fstEquilibrium` carried `Empirical status: NOT AN EMPIRICAL CLAIM`, inherited
+# from the module's reading that a parameter record asserts nothing.  That
+# reading is right for the FIELDS and wrong for a LAW computed from them, and
+# the ledger held four corpus rows against the name: one FALSIFIED (`bulk38`,
+# against the superseded body `1/(1 + theta + bigM)`) and two MATCH (`bulk38b`
+# at 1.03 sems, `falsrepair` at 1.10, both against the body actually in the
+# file).  Every existing guard passed.  `ledger`'s `contradicted` rule could not
+# fire because the docstring asserted no agreement to contradict, and
+# `conventions` checks that the head is IN the vocabulary, never that it is the
+# RIGHT term.  A declaration that denies being an empirical claim is invisible
+# to a guard that reads what declarations claim.
+#
+# So the three rules below are about the ABSENCE of a claim, which is what the
+# other guards structurally cannot see:
+#
+#   SILENT     a disagreeing corpus row whose battery the docstring never
+#              names.  Acknowledgement means naming the run, not gesturing at
+#              it: `adjudications.json` settling the row is not enough, because
+#              a reader of the Lean never opens that file.
+#   UNMARKED   a measured body with no `Empirical status:` of its own.  A
+#              module-level `## Empirical status` section is the right host for
+#              a file of shapes, and the wrong one for the single law in that
+#              file that is on trial.
+#   DENIED     a measured body whose status head says no measurement can bear
+#              on it.  The row exists; the head says it cannot.
+#
+# SCOPE IS BY NAME AND BY PATH, because Core's surface is not its directory.
+# `Descent.Core.PopGenParameters.migrationSharedBoostAt` is a Core declaration
+# housed in `Portability/PortabilityDrift/Generational.lean` under a `_root_.`
+# prefix, it is FALSIFIED at 15.61 sems, and a path-scoped guard would not look
+# at it.  It passes -- its docstring names `simcov/battery_bulk55.py` and says
+# FALSIFIED -- which is the point: the rule is satisfiable, and it is satisfied
+# by the declarations that already did the work.
+
+CORE_PATH = "Descent/Core/"
+CORE_NAMESPACE = "Descent.Core."
+
+# Heads asserting that nothing measurable is at stake.  A corpus row carrying a
+# real verdict is a measurement that bore on the body, so these are refuted by
+# the row's existence.  `VACUOUS`, `AN IDENTITY` and `NOT TESTED BY THE DESIGN
+# THAT LOOKED LIKE IT WAS` are NOT here: each describes an existing measurement
+# honestly rather than denying it, and each is the correct head for a row that
+# could not have failed.
+CORE_DENIES_MEASUREMENT = {
+    "NOT AN EMPIRICAL CLAIM",
+    "NOT EMPIRICALLY TESTABLE",
+    "EXACT BY CONSTRUCTION",
+    "THIS IS THE MODEL",
+    "UNTESTED",
+}
+
+
+def _core_docstrings():
+    """[(qualified name, file, docstring)] for every `def` on Core's surface.
+
+    Same scan as `_ledger_docstrings` -- column 0, same file set -- and it keeps
+    the QUALIFIED name, which that one discards.  A second idea of what a
+    definition is would put this guard and the ledger guard into disagreement
+    about which declarations exist, which is the failure `_ledger_docstrings`
+    records in its own docstring.
+    """
+    out = []
+    for path in ident_lean_files():
+        rel = str(path).replace("\\", "/")
+        in_core_dir = CORE_PATH in rel
+        try:
+            raw = Path(path).read_text(errors="ignore")
+        except OSError:
+            continue
+        lines = raw.split("\n")
+        for i, line in enumerate(lines):
+            m = re.match(r"^(?:noncomputable\s+)?def\s+([A-Za-z_][\w.']*)", line)
+            if not m:
+                continue
+            qualified = m.group(1)
+            if not (in_core_dir or CORE_NAMESPACE in qualified):
+                continue
+            j = i - 1
+            while j >= 0 and (not lines[j].strip()
+                              or lines[j].lstrip().startswith("@[")):
+                j -= 1
+            if j < 0 or not lines[j].rstrip().endswith("-/"):
+                out.append((qualified, Path(path).name, ""))
+                continue
+            end = j
+            while j >= 0 and "/--" not in lines[j]:
+                if "/-!" in lines[j] or ("-/" in lines[j] and j != end):
+                    j = -1
+                    break
+                j -= 1
+            if j < 0:
+                out.append((qualified, Path(path).name, ""))
+                continue
+            out.append((qualified, Path(path).name, "\n".join(lines[j:end + 1])))
+    return out
+
+
+def run_core_empirics() -> int:
+    if not LEDGER_PATH.exists():
+        print(f"core-empirics guard CANNOT RUN: {LEDGER_PATH} is absent. The "
+              f"ledger is the only record of what has been measured, so with no "
+              f"ledger there is nothing to hold Core against; regenerate it with "
+              f"`python3 validation/empirical/simcov/ledger.py <results-dir>`.")
+        return 1
+    try:
+        led = json.loads(LEDGER_PATH.read_text())
+    except (OSError, ValueError) as exc:
+        print(f"core-empirics guard CANNOT RUN: {LEDGER_PATH} is unreadable: {exc}")
+        return 1
+
+    # Rows about the CORPUS body only.  A competitor row is a formula the corpus
+    # does not have, and a `data` row states no verdict; neither is evidence
+    # about a declaration in this layer.
+    rows = {}
+    for r in led.get("records", []):
+        if r.get("role") == "corpus":
+            rows.setdefault(r["declaration"], []).append(r)
+
+    silent, unmarked, denied = [], [], []
+    covered = []
+
+    for qualified, fname, doc in _core_docstrings():
+        short = qualified.split(".")[-1]
+        mine = rows.get(short, [])
+        # Only rows that said yes or no.  UNINFORMATIVE, NO POWER, LEAD and
+        # SELF-TEST assert nothing, and a declaration is not obliged to answer
+        # a run that concluded nothing.
+        verdicts = {r["verdict"] for r in mine}
+        spoke = verdicts & (LEDGER_AGREES | LEDGER_DISAGREES)
+        if not spoke:
+            continue
+        covered.append(f"{short} ({fname}): {', '.join(sorted(verdicts))}")
+
+        cited = set(BATTERY_CITE.findall(doc))
+        for r in mine:
+            if r["verdict"] in LEDGER_DISAGREES and r["battery"] not in cited:
+                sems = r.get("worst_sems")
+                where = f" at {sems:.2f} sems" if isinstance(sems, float) else ""
+                silent.append(
+                    f"{short} ({fname}) is {r['verdict']}{where} in "
+                    f"simcov/battery_{r['battery']}.py and its docstring never "
+                    f"names that battery")
+
+        m = CONVENTION_STATUS.search(doc)
+        if not m:
+            unmarked.append(
+                f"{short} ({fname}) has {', '.join(sorted(spoke))} in the ledger "
+                f"and carries no `Empirical status:` of its own")
+            continue
+        head = convention_status_head(m.group(1))
+        if head in CORE_DENIES_MEASUREMENT:
+            denied.append(
+                f"{short} ({fname}) says {head!r} while the ledger holds "
+                f"{', '.join(sorted(spoke))} against it from "
+                f"{', '.join(sorted(r['battery'] for r in mine))}")
+
+    bad = []
+    for label, found, advice in (
+        ("Core declarations with an unacknowledged FALSIFIED ledger row",
+         silent, "cite the battery in the docstring and say what it rejected -- "
+                 "if it rejected a body this one has since replaced, say that, "
+                 "and name the run that put the current body back on those cells"),
+        ("Core declarations that have been measured and state no status",
+         unmarked, "give the declaration its own `Empirical status:` line; the "
+                   "module-level section covers the file's shapes, not the law "
+                   "in it that is on trial"),
+        ("Core declarations denying that any measurement can bear on them, "
+         "against a ledger row that did",
+         denied, "replace the head with the verdict the rows carry, or, if the "
+                 "rows are about a different quantity, say which and use "
+                 "`NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS`"),
+    ):
+        if found:
+            bad.append(f"{label}: {len(found)}, budget 0; {advice}")
+            bad.extend("    " + x for x in sorted(set(found)))
+
+    if bad:
+        for line in bad:
+            print(line)
+        print(f"core-empirics guard FAILS. This layer is depth 0-1 and the "
+              f"corpus's headline chain reads through it, so a silent verdict "
+              f"here is not one unstated claim, it is an unstated premise.")
+        return 1
+
+    print(f"core-empirics guard passes: {len(covered)} declaration(s) on Core's "
+          f"surface carry a corpus verdict, every FALSIFIED row among them names "
+          f"its battery in the Lean, and none denies being measurable:")
+    for line in sorted(covered):
+        print("    " + line)
+    return 0
+
+
+# ======================================================================================
 # DISPATCHER
 # ======================================================================================
 
@@ -5972,6 +6192,11 @@ GUARDS = {
     # The budgets are 0 and stay 0.  Flip `gated` when
     # `battery_bulk19_results.json` and `battery_bulk20_results.json` land.
     "ledger":          dict(fn=run_ledger,          gated=False, takes_argv=False),
+    # GATED, where `ledger` is not, and the difference is the population.  This
+    # one reads seven files' worth of declarations at depth 0-1, small enough to
+    # hold at zero by hand; `ledger` reads 2164 and reports its sharpest rules
+    # because a budget pinned to their count would be worse than none.
+    "core-empirics":   dict(fn=run_core_empirics,   gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
 }
 
