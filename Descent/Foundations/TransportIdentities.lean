@@ -714,6 +714,18 @@ theorem master_transport_identity_closed_form
   · exact hcentered
 
 omit [Fintype L] [DecidableEq L] in
+/-- The mean of a linear score is the score read against the coordinate means. -/
+theorem eval_linScore (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) :
+    E (linScore w X) = dot w (fun j ↦ E (fun ω ↦ X ω j)) := by
+  have hsum : linScore w X
+      = Finset.univ.sum (fun j ↦ (w j) • (fun ω ↦ X ω j)) := by
+    funext ω
+    simp [linScore, dot, Finset.sum_apply, mul_comm]
+  rw [hsum, ExpFunctional.eval_sum]
+  unfold dot
+  exact Finset.sum_congr rfl fun j _ ↦ E.smul_eval (w j) _
+
+omit [Fintype L] [DecidableEq L] in
 /-- A covariance against a linear score expands into the coordinate covariances. -/
 theorem covariance_linScore_left
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :

@@ -45,7 +45,9 @@ The results are of five kinds.
    input moments.  These are identities, not bounds.
 2. **The transport decomposition** (`§3`).  The source-to-target movement of each metric
    splits into named channels with *no remainder term*, and the `R²` ratio factors into
-   exactly three factors -- not the four the informal decomposition posits.
+   three factors -- alignment, dispersion, outcome variance -- with allele-frequency
+   change not among them, because it enters only through the objects the first two are
+   built from.
 3. **Completeness** (`§4`).  A three-real statistic is proved to determine `R²` and the
    calibration slope (sufficiency); its achievable set is proved to be exactly the
    Cauchy-Schwarz cone (range); and each of its three coordinates is proved separately
@@ -299,6 +301,22 @@ theorem predictiveCovariance_eq :
   unfold dot
   simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
+omit [Fintype L] [DecidableEq L] in
+/-- **Exact score-mean law.**  `E[S] = wᵀ μ_X`. -/
+theorem eval_score_eq : P.E (P.score w) = dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) :=
+  eval_linScore P.E P.X w
+
+omit [Fintype J] [DecidableEq J] in
+/-- **Exact phenotype-mean law.**  `E[Y] = βᵀ μ_C + E[h]`. -/
+theorem eval_phenotype_eq :
+    P.E P.phenotype = dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h := by
+  unfold phenotype
+  have hsplit : (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
+      = causalSignal P.β P.C + P.h := rfl
+  rw [hsplit, P.E.add_eval]
+  congr 1
+  exact eval_linScore P.E P.C P.β
+
 omit [Fintype J] [DecidableEq J] in
 /-- **Exact outcome-variance law.**  `Var(Y) = βᵀ Σ_C β + 2 βᵀ c_C + Var(h)`.
 
@@ -339,6 +357,20 @@ theorem calibrationSlope_eq :
       (dot w (P.kappa.mulVec P.β) + dot w P.contextX) / dot w (P.sigmaX.mulVec w) := by
   unfold calibrationSlope
   rw [P.predictiveCovariance_eq w, P.scoreVariance_eq w]
+
+/-- **Exact calibration-intercept law.**
+
+    The intercept is the only metric here that reads the population's *first* moments.
+    A score can therefore be perfectly discriminating and perfectly sloped and still sit
+    at the wrong level in a target, purely because the mean genotype moved -- which is
+    what an allele-frequency shift does and what an `R²` comparison cannot see. -/
+theorem calibrationIntercept_eq :
+    P.calibrationIntercept w
+      = (dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h)
+        - ((dot w (P.kappa.mulVec P.β) + dot w P.contextX) / dot w (P.sigmaX.mulVec w))
+          * dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) := by
+  unfold calibrationIntercept
+  rw [P.eval_phenotype_eq, P.calibrationSlope_eq w, P.eval_score_eq w]
 
 /-- **Exact deployed-MSE law.**  `E[(Y-S)²] = Var Y + Var S - 2 Cov(S,Y) + (E S - E Y)²`,
     then each term by its own law.
@@ -484,11 +516,17 @@ omit [DecidableEq J] [DecidableEq L] in
     This is the theorem the informal "portability ratio = AF × LD × effect × env"
     decomposition is reaching for, and it differs from it in two ways that matter.
     First, it is proved rather than posited, from the generative model of `§1` with no
-    shape assumption anywhere.  Second, the correct grouping is *three* factors, not
-    four: allele-frequency change and LD change are not separate multiplicative channels
-    of `R²`, because they enter through `Σ_X` and `K` which are the same two objects the
-    alignment and dispersion factors are built from.  There is no factorisation of `R²`
-    in which `F_ST` appears as its own factor.
+    shape assumption anywhere.  Second, the factorisation that comes out has *three*
+    factors, not four, and allele-frequency change is not one of them: allele
+    frequencies enter this identity only through `Σ_X` and `K`, which are also where LD
+    and tagging enter, so on the right-hand side above there is no place an `F_ST` could
+    occupy on its own.
+
+    Read that as a fact about this identity, which is what is proved, and not as a
+    nonexistence theorem about all possible factorisations, which is not.  What rules
+    out an `F_ST`-indexed prediction of `R²` is `§4`'s
+    `no_score_side_summary_determines_r2`, and it rules out considerably more than
+    `F_ST`.
 
     The hypotheses are exactly the non-degeneracy of the *source* deployment: a score
     with no variance, in a population with no phenotypic variance, or with no covariance
