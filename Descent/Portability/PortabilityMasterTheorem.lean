@@ -574,10 +574,9 @@ omit [DecidableEq J] [DecidableEq L] in
 
     Note what the condition is *not*.  It is not that the populations are similar, nor
     that any channel is small, nor that the genetic distance between them is short.  It
-    is one polynomial equation in six numbers, and its solution set has codimension one:
-    portable deployments are a thin set, and the thin set is not the set of nearby
-    populations.  Any theory that predicts portability from a distance is predicting
-    membership of this surface from a coordinate that does not cut it. -/
+    is one polynomial equation in six numbers, none of which is a measure of nearness,
+    and `no_score_side_summary_determines_r2` says no function of the two coordinates
+    the score itself supplies decides it. -/
 theorem r2_portable_iff
     (hvS : D.source.scoreVariance D.w ≠ 0) (hoS : D.source.outcomeVariance ≠ 0)
     (hvT : D.target.scoreVariance D.w ≠ 0) (hoT : D.target.outcomeVariance ≠ 0) :
