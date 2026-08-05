@@ -68,15 +68,14 @@ open Finset
 /-- **`H(b) - H(c) ≥ (b - c)/γ_b`.**  The difference is a sum of `b - c` reciprocals, each of
 them at least `γ_b⁻¹` because `γ` is non-decreasing.  This is the whole of the multiple-merger
 correction: a jump that skips `b - c` levels is credited with `b - c` of them. -/
-theorem sum_inv_diff_ge {gam : ℕ → ℝ} (hpos : ∀ b, 2 ≤ b → 0 < gam b)
-    (hmono : ∀ i j, 2 ≤ i → i ≤ j → gam i ≤ gam j) {c b : ℕ} (hc : 1 ≤ c) (hcb : c ≤ b) :
+theorem sum_inv_diff_ge {gam : ℕ → ℝ} (hpos : ∀ b : ℕ, 2 ≤ b → 0 < gam b)
+    (hmono : ∀ i j : ℕ, 2 ≤ i → i ≤ j → gam i ≤ gam j) {c b : ℕ} (hc : 1 ≤ c) (hcb : c ≤ b) :
     ((b : ℝ) - (c : ℝ)) / gam b
       ≤ (∑ j ∈ Finset.Icc 2 b, 1 / gam j) - ∑ j ∈ Finset.Icc 2 c, 1 / gam j := by
   classical
   rcases Nat.eq_or_lt_of_le hcb with hEq | hlt
-  · subst hEq
-    have hb2 : ((b : ℝ) - (b : ℝ)) = 0 := by ring
-    rw [hb2, zero_div, sub_self]
+  · rw [← hEq]
+    simp
   · have hb2 : 2 ≤ b := by omega
     have hgb : 0 < gam b := hpos b hb2
     have hsub : Finset.Icc 2 c ⊆ Finset.Icc 2 b := by
@@ -122,13 +121,13 @@ Nothing here is an inequality except `γ`'s monotonicity: the drift identity tur
 into an equality at the last step, which is why the bound is `Σγ_j⁻¹` and not a multiple of
 it. -/
 theorem meanTime_le_sum {h gam lamb : ℕ → ℝ} {p : ℕ → ℕ → ℝ}
-    (hpos : ∀ b, 2 ≤ b → 0 < gam b) (hmono : ∀ i j, 2 ≤ i → i ≤ j → gam i ≤ gam j)
-    (hlamb : ∀ b, 2 ≤ b → 0 < lamb b)
-    (hp0 : ∀ b k, 0 ≤ p b k)
-    (hp1 : ∀ b, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
-    (hdrift : ∀ b, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k = gam b / lamb b)
+    (hpos : ∀ b : ℕ, 2 ≤ b → 0 < gam b) (hmono : ∀ i j : ℕ, 2 ≤ i → i ≤ j → gam i ≤ gam j)
+    (hlamb : ∀ b : ℕ, 2 ≤ b → 0 < lamb b)
+    (hp0 : ∀ b k : ℕ, 0 ≤ p b k)
+    (hp1 : ∀ b : ℕ, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
+    (hdrift : ∀ b : ℕ, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k = gam b / lamb b)
     (h1 : h 1 = 0)
-    (hrec : ∀ b, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
+    (hrec : ∀ b : ℕ, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
     (b : ℕ) (hb : 1 ≤ b) : h b ≤ ∑ j ∈ Finset.Icc 2 b, 1 / gam j := by
   classical
   induction b using Nat.strong_induction_on with
@@ -163,9 +162,12 @@ theorem meanTime_le_sum {h gam lamb : ℕ → ℝ} {p : ℕ → ℕ → ℝ}
           push_cast [Nat.cast_sub hkb]
           ring
         rw [hcast] at hd
-        have hres : ((k : ℝ) - 1) * (1 / gam b) ≤ H b - H (b - k + 1) := by
-          rw [hH]
-          simpa [div_eq_mul_one_div] using hd
+        have hd' : ((k : ℝ) - 1) * (1 / gam b)
+            ≤ (∑ j ∈ Finset.Icc 2 b, 1 / gam j)
+              - ∑ j ∈ Finset.Icc 2 (b - k + 1), 1 / gam j := by
+          rw [← div_eq_mul_one_div]
+          exact hd
+        have hres : ((k : ℝ) - 1) * (1 / gam b) ≤ H b - H (b - k + 1) := hd'
         nlinarith [hp0 b k]
       -- assemble
       have hsum : ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1)
@@ -175,10 +177,8 @@ theorem meanTime_le_sum {h gam lamb : ℕ → ℝ} {p : ℕ → ℕ → ℝ}
       have hexp : ∑ k ∈ Finset.Icc 2 b, (p b k * H b - p b k * (((k : ℝ) - 1) * (1 / gam b)))
           = (∑ k ∈ Finset.Icc 2 b, p b k) * H b
             - (∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k) * (1 / gam b) := by
-        rw [Finset.sum_sub_distrib, ← Finset.sum_mul, ← Finset.sum_mul]
-        congr 2
-        refine Finset.sum_congr rfl fun k _ ↦ ?_
-        ring
+        rw [Finset.sum_mul, Finset.sum_mul, ← Finset.sum_sub_distrib]
+        exact Finset.sum_congr rfl fun k _ ↦ by ring
       rw [hexp, hp1 b hb2, hdrift b hb2, one_mul] at hsum
       have hcancel : gam b / lamb b * (1 / gam b) = 1 / lamb b := by
         field_simp
@@ -194,13 +194,13 @@ That uniformity is what coming down from infinity means: no matter how many line
 process starts with, it reaches one in bounded expected time, so it can be started from
 infinitely many. -/
 theorem meanTime_bddAbove {h gam lamb : ℕ → ℝ} {p : ℕ → ℕ → ℝ}
-    (hpos : ∀ b, 2 ≤ b → 0 < gam b) (hmono : ∀ i j, 2 ≤ i → i ≤ j → gam i ≤ gam j)
-    (hlamb : ∀ b, 2 ≤ b → 0 < lamb b)
-    (hp0 : ∀ b k, 0 ≤ p b k)
-    (hp1 : ∀ b, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
-    (hdrift : ∀ b, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k = gam b / lamb b)
+    (hpos : ∀ b : ℕ, 2 ≤ b → 0 < gam b) (hmono : ∀ i j : ℕ, 2 ≤ i → i ≤ j → gam i ≤ gam j)
+    (hlamb : ∀ b : ℕ, 2 ≤ b → 0 < lamb b)
+    (hp0 : ∀ b k : ℕ, 0 ≤ p b k)
+    (hp1 : ∀ b : ℕ, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
+    (hdrift : ∀ b : ℕ, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k = gam b / lamb b)
     (h1 : h 1 = 0)
-    (hrec : ∀ b, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
+    (hrec : ∀ b : ℕ, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
     (hcdi : comesDownFromInfinity gam) :
     ∀ b, 1 ≤ b → h b ≤ ∑' i : ℕ, 1 / gam (i + 2) := by
   classical
@@ -209,9 +209,9 @@ theorem meanTime_bddAbove {h gam lamb : ℕ → ℝ} {p : ℕ → ℕ → ℝ}
   have hreindex : ∑ j ∈ Finset.Icc 2 b, 1 / gam j
       = ∑ i ∈ Finset.range (b - 1), 1 / gam (i + 2) := by
     rw [← Nat.Ico_succ_right, Finset.sum_Ico_eq_sum_range]
-    refine Finset.sum_congr (by congr 1; omega) fun i _ ↦ ?_
-    congr 1
-    omega
+    have hr : b + 1 - 2 = b - 1 := by omega
+    rw [hr]
+    exact Finset.sum_congr rfl fun i _ ↦ by rw [Nat.add_comm]
   rw [hreindex]
   have hnn : ∀ i : ℕ, 0 ≤ 1 / gam (i + 2) := by
     intro i
@@ -228,15 +228,15 @@ stronger.
     times.  Which rates a population's genealogy has is the empirical question, and
     `Blindness.MultipleMergerBlindness` records which statistics could tell. -/
 theorem schweinsberg_comesDownFromInfinity {h lamb : ℕ → ℝ} {lam : ℕ → ℕ → ℝ} {p : ℕ → ℕ → ℝ}
-    (hpos : ∀ b, 2 ≤ b → 0 < decreaseRate lam b)
-    (hmono : ∀ i j, 2 ≤ i → i ≤ j → decreaseRate lam i ≤ decreaseRate lam j)
-    (hlamb : ∀ b, 2 ≤ b → 0 < lamb b)
-    (hp0 : ∀ b k, 0 ≤ p b k)
-    (hp1 : ∀ b, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
-    (hdrift : ∀ b, 2 ≤ b →
+    (hpos : ∀ b : ℕ, 2 ≤ b → 0 < decreaseRate lam b)
+    (hmono : ∀ i j : ℕ, 2 ≤ i → i ≤ j → decreaseRate lam i ≤ decreaseRate lam j)
+    (hlamb : ∀ b : ℕ, 2 ≤ b → 0 < lamb b)
+    (hp0 : ∀ b k : ℕ, 0 ≤ p b k)
+    (hp1 : ∀ b : ℕ, 2 ≤ b → ∑ k ∈ Finset.Icc 2 b, p b k = 1)
+    (hdrift : ∀ b : ℕ, 2 ≤ b →
       ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * p b k = decreaseRate lam b / lamb b)
     (h1 : h 1 = 0)
-    (hrec : ∀ b, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
+    (hrec : ∀ b : ℕ, 2 ≤ b → h b = 1 / lamb b + ∑ k ∈ Finset.Icc 2 b, p b k * h (b - k + 1))
     (hcdi : comesDownFromInfinity (decreaseRate lam)) :
     ∃ M : ℝ, ∀ b, 1 ≤ b → h b ≤ M :=
   ⟨_, meanTime_bddAbove hpos hmono hlamb hp0 hp1 hdrift h1 hrec hcdi⟩

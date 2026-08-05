@@ -285,7 +285,12 @@ level sum charges `k-1`.  With only pairwise mergers the two rates coincide
 (`decreaseRate_eq_totalRate_of_binary`), and Kingman is that case (`kingman_rates_eq`), which
 is why everything else in this group is exact rather than approximate.  STILL ABSENT:
 Schweinsberg's theorem proper, that the weaker condition suffices, which is a comparison
-argument on the process rather than a sum over levels; and Pólya's renewal identity -- NOW REDUCED by
+argument on the process rather than a sum over levels -- NOW CLOSED by
+`Coalescent.SchweinsbergBound`, whose `meanTime_le_sum` proves `h(b) ≤ Σ_{j=2}^b γ_j⁻¹` by
+strong induction on the mean-time recursion, the step being an exact cancellation: the sojourn
+a multiple merger does not pay is paid by the levels it skips, since `Σ_k (k-1) p_{b,k} =
+γ_b/λ_b`.  What it assumes is the recursion itself, that `p` is a distribution, and that `γ` is
+non-decreasing; and Pólya's renewal identity -- NOW REDUCED by
 `Coalescent.RenewalCriterion`, which proves the whole deduction from the identity to certain
 return with no probability in it: summing `uₙ = Σ f_k u_{n-k}` over `n ≤ N` and exchanging the
 order gives `U_N ≤ u₀ + q·U_N`, so a first-return mass `q < 1` bounds the partial sums and

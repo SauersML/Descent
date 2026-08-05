@@ -36,7 +36,12 @@ merger destroys at least one block, so `λ_b ≤ γ_b` and `γ_b⁻¹ ≤ λ_b�
 coming down under a condition STRICTLY STRONGER than Schweinsberg's, and the gap between them
 is exactly the levels a multiple merger skips: the count can fall from `b` to `b - k + 1` in
 one jump, paying one sojourn instead of `k - 1` of them.  Closing it needs a comparison
-argument on the process, not a sum over levels, and that is Schweinsberg's theorem.
+argument on the process, not a sum over levels, and that is Schweinsberg's theorem --
+NOW PROVED, in `Coalescent.SchweinsbergBound`.  The comparison turns out to be deterministic:
+on the jump chain's mean-time recursion, the sojourn `λ_b⁻¹` a multiple merger fails to pay is
+exactly recovered from the `k - 1` levels it skips, because `Σ_k (k-1) p_{b,k} = γ_b/λ_b` is
+the definition of `γ_b` divided by `λ_b`.  The two cancel to an equality, giving
+`h(b) ≤ Σ_{j=2}^b γ_j⁻¹`.
 
 `decreaseRate_eq_totalRate_of_binary` is the other half of the picture: when only pairs
 merge, the two rates coincide and there is nothing to correct.  Kingman is that case
