@@ -195,6 +195,33 @@ theorem chainLaw_head_blocks {n : ℕ} :
           have := hcov.2
           omega
 
+/-- **The law of `ℛ_k`**, the jump chain's state after `k` jumps: the head of the trajectory.
+
+This is the object K-C (2.3) computes.  `Descent.Coalescent.JumpChain.absoluteProb` writes
+down Kingman's formula for it; `blockLaw` is the law itself, so the two now have somewhere to
+meet. -/
+noncomputable def blockLaw (n k : ℕ) : PMF (ER n) :=
+  (chainLaw n k).bind fun l =>
+    match l with
+    | [] => PMF.pure (Delta n)
+    | x :: _ => PMF.pure x
+
+/-- **`ℛ_k` has exactly `n - k` blocks**, with probability one.  The support of the law is
+confined to one level of the state space, which is `Trajectory.chainLaw_head_blocks` read as a
+statement about the law rather than about trajectories -- and is why the death process and
+the jump chain can be independent. -/
+theorem blocks_of_mem_support_blockLaw {n : ℕ} {k : ℕ} (hk : k < n) {x : ER n}
+    (hx : x ∈ (blockLaw n k).support) : blocks x + k = n := by
+  classical
+  rw [blockLaw, PMF.mem_support_bind_iff] at hx
+  obtain ⟨l, hl, hmem⟩ := hx
+  have hlen := chainLaw_length k hl
+  match l with
+  | y :: rest =>
+      rw [PMF.mem_support_pure_iff] at hmem
+      subst hmem
+      exact chainLaw_head_blocks k hk hl List.head?_cons
+
 /-- **K-C (1.13) in full: the chain runs from `Δ` to `Θ` in `n - 1` jumps.**
 
 `Δ = ℛ_n ≺ ℛ_{n-1} ≺ ⋯ ≺ ℛ_1 = Θ`.  The trajectory starts at `Δ`
