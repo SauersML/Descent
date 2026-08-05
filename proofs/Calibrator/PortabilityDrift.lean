@@ -3508,7 +3508,8 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
 allele frequencies drift away from the source frequencies, even if the source
 score itself is unchanged.
 
-    Empirical status: **CORRECTED, and the corrected body is VALIDATED**
+    Empirical status: **VALIDATED** (the body was corrected first; the
+    superseded one and its refutation are recorded below)
     (`simcov/battery_bulk52.py`). The body is now the genotype-variance ratio,
     which matches the measured retention at worst 2.12 sems (0.35% relative).
     What follows records the superseded body and why it failed, because the
@@ -3808,7 +3809,7 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
 
 /-- Per-tag allele-frequency retention at generation `t`.
 
-    Empirical status: **MATCHES** at worst 2.12 sems (0.35% relative), on the
+    Empirical status: **VALIDATED** at worst 2.12 sems (0.35% relative), on the
     cells of `battery_verify.py` that refuted the previous body at 560. The
     verdict moved because the BODY moved; the design is the same one.
 
@@ -3850,7 +3851,7 @@ noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
 
 /-- Per-causal-variant allele-frequency retention at generation `t`.
 
-    Empirical status: **MATCHES** at worst 2.12 sems, on the same corrected
+    Empirical status: **VALIDATED** at worst 2.12 sems, on the same corrected
     footing as `tagAlleleFreqRetentionAt` above and measured on the same cells.
 
     WHAT THE PREVIOUS BODY WAS AND WHY IT FAILED. It was
