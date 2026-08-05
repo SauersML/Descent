@@ -1623,12 +1623,13 @@ theorem switchingTransition_at_reference_point :
 
 /-- A target-only annotation distinguishing state `1`. -/
 noncomputable def targetAnnotation (y : BinaryBiologicalState) : ℝ :=
-  if y = 1 then 1 else 0
+  Descent.Core.kronecker y 1
 
 /-- Reference evaluations: the annotation is the indicator of the distinguished state. -/
 theorem targetAnnotation_at_reference_point :
     targetAnnotation 1 = 1 ∧ targetAnnotation 0 = 0 := by
-  constructor <;> norm_num [targetAnnotation]
+  constructor <;> norm_num [targetAnnotation,
+      Descent.Core.kronecker]
 
 
 /-- Quality of a source-adapted readout: one exactly when source and target contexts match.

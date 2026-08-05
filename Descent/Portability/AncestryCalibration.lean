@@ -161,7 +161,7 @@ What this body adds over the subtraction is the word "non-recoverable", and that
 still untested: the claim is that no linear recalibration recovers this component, which the
 design assumes by measuring `R²` as a squared correlation rather than testing. -/
 noncomputable def effectTurnoverR2Loss (r2Source rhoSq : ℝ) : ℝ :=
-  r2Source * (1 - rhoSq)
+  Descent.Core.retainedFraction rhoSq r2Source
 
 /-- Effect-turnover loss and the retained-heterozygosity chart are the same
 two-argument arithmetic map, with different biological interpretations. -/
@@ -182,7 +182,7 @@ theorem ancestryRecalibratedR2_add_effectTurnoverR2Loss
     (r2_source ρ_sq : ℝ) :
     ancestryRecalibratedR2 r2_source ρ_sq +
       effectTurnoverR2Loss r2_source ρ_sq = r2_source := by
-  unfold ancestryRecalibratedR2 effectTurnoverR2Loss Descent.Core.product
+  unfold ancestryRecalibratedR2 effectTurnoverR2Loss Descent.Core.product Descent.Core.retainedFraction
   ring
 
 

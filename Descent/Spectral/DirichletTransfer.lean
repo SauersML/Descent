@@ -174,12 +174,14 @@ theorem driftHorizon_strictMono (D₁ D₂ D₂' C : ℝ) (hC : 0 < C) (h : D₂
 
 /-- Limit variance of the efficiency ratio for a **localized** weight: a local observable of
     the infinite-volume field, so it does not see the local marker count at all. -/
-noncomputable def localizedTransferVariance (v : ℝ) (_k : ℕ) : ℝ := v
+noncomputable def localizedTransferVariance (v : ℝ) (_k : ℕ) : ℝ :=
+  Descent.Core.identifiedWith v
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem localizedTransferVariance_at_reference_point :
     localizedTransferVariance 1 1 = 1 := by
-  norm_num [localizedTransferVariance]
+  norm_num [localizedTransferVariance,
+      Descent.Core.identifiedWith]
 
 
 /-- Limit variance for a **delocalized** weight, which averages over `k` sites. -/
@@ -225,7 +227,7 @@ holds for every body that ignores `k`, including a body carrying the wrong varia
 which value it is constant at. -/
 theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
     localizedTransferVariance v k = delocalizedTransferVariance v 1 := by
-  unfold localizedTransferVariance delocalizedTransferVariance Descent.Core.ratio
+  unfold localizedTransferVariance delocalizedTransferVariance Descent.Core.ratio Descent.Core.identifiedWith
   norm_num
 
 /-! ### The two correction factors -/

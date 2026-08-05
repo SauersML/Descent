@@ -437,7 +437,7 @@ variable {Component : Type*} [Fintype Component]
 /-- Failure of the component-affine ansatz at posterior coordinate `a`. -/
 noncomputable def componentRepresentationResidual (localValue : ℝ)
     (a componentValue : Component → ℝ) : ℝ :=
-  localValue - ∑ k, a k * componentValue k
+  Descent.Core.residualAgainst localValue a componentValue
 
 /-- Change caused by localizing a mixture to one posterior fiber. -/
 noncomputable def localizationResidual (localValue mixtureValue : ℝ) : ℝ :=
@@ -453,12 +453,12 @@ theorem localizationResidual_at_reference_point :
 /-- Failure of a functional to commute with component mixing. -/
 noncomputable def jensenResidual (mixtureValue : ℝ)
     (a componentValue : Component → ℝ) : ℝ :=
-  mixtureValue - ∑ k, a k * componentValue k
+  Descent.Core.residualAgainst mixtureValue a componentValue
 
 /-- Reference evaluation: with no component weight the residual is the mixture value itself. -/
 theorem jensenResidual_at_zero_weights (componentValue : Component → ℝ) :
     jensenResidual 5 (fun _ ↦ 0) componentValue = 5 := by
-  unfold jensenResidual
+  unfold jensenResidual Descent.Core.residualAgainst Descent.Core.innerSum
   simp
 
 
@@ -466,7 +466,7 @@ theorem jensenResidual_at_zero_weights (componentValue : Component → ℝ) :
 theorem jensenResidual_at_reference_point (a componentValue : Component → ℝ)
     (hzero : ∑ k, a k * componentValue k = 0) (mixtureValue : ℝ) :
     jensenResidual mixtureValue a componentValue = mixtureValue := by
-  unfold jensenResidual
+  unfold jensenResidual Descent.Core.residualAgainst Descent.Core.innerSum
   rw [hzero, sub_zero]
 
 
@@ -479,7 +479,7 @@ theorem componentRepresentationResidual_decomposition (localValue mixtureValue :
     componentRepresentationResidual localValue a componentValue =
       localizationResidual localValue mixtureValue +
         jensenResidual mixtureValue a componentValue := by
-  unfold componentRepresentationResidual localizationResidual jensenResidual Descent.Core.difference
+  unfold componentRepresentationResidual localizationResidual jensenResidual Descent.Core.difference Descent.Core.residualAgainst Descent.Core.innerSum
   ring
 
 end Residual

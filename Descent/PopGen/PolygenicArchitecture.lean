@@ -1092,7 +1092,8 @@ section MomentBodyEntropy
 
     Both classes below are of this shape and differ only in the exponent, which is why the
     comparison reduces to a comparison of exponents. -/
-noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ := t ^ e
+noncomputable def logCoveringAtExponent (t e : ℝ) : ℝ :=
+  t ^ e
 
 /-- **logCoveringAtExponent pinned at unit exponent.** No theorem in the corpus
 evaluated this definition. A reference point with a fractional exponent is not

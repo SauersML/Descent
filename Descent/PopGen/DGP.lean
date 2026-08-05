@@ -2145,7 +2145,7 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
     intro ω
     calc
       dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
-        unfold dot
+        unfold dot Descent.Core.innerSum
         refine Finset.sum_congr rfl ?_
         intro i hi
         ring
@@ -2154,7 +2154,7 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
         intro i hi
         ring
       _ = dot wStar (X ω) + dot (fun i ↦ w i - wStar i) (X ω) := by
-        unfold dot
+        unfold dot Descent.Core.innerSum
         rw [Finset.sum_add_distrib]
   have h_expand :
       (fun ω ↦ (Y ω - dot w (X ω)) ^ 2) =

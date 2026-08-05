@@ -617,7 +617,7 @@ vector.**  Everything downstream — `effectiveSubgroupSize`, `demographicSpike`
 the AR(1) whitening gain — is a computation of this one quantity in a
 particular basis. -/
 theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = dot v v := by
-  unfold traceForm dot
+  unfold traceForm dot Descent.Core.innerSum
   exact Finset.sum_congr rfl (fun i _ ↦ by simp only [spikeOuter])
 
 /-- **The trace-window background class**: every legal background carries total
@@ -1261,7 +1261,7 @@ theorem dot_demographicSpikeDirection (n m : ℕ) (hmn : m ≤ n) (hn : 0 < n) :
     ring
   have hsq : dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
       ∑ i ∈ Finset.range n, (subgroupContrast n m i) ^ 2 := by
-    unfold dot
+    unfold dot Descent.Core.innerSum
     rw [Finset.sum_congr rfl (fun i _ ↦ hpoint i)]
     exact Fin.sum_univ_eq_sum_range (fun i ↦ (subgroupContrast n m i) ^ 2) n
   have hsplit : m + (n - m) = n := by omega

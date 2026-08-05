@@ -283,12 +283,13 @@ transported linear score: each locus contributes its target genotype variance
 times the MSE of the learned effect estimate. -/
 noncomputable def taggedScoreEstimationRisk {m : ℕ}
     (targetTagVariance estimatorMSE : Fin m → ℝ) : ℝ :=
-  ∑ i, targetTagVariance i * estimatorMSE i
+  Descent.Core.innerSum targetTagVariance estimatorMSE
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem taggedScoreEstimationRisk_at_reference_point :
     taggedScoreEstimationRisk ![1, 3] ![1, 3] = 10 := by
-  norm_num [taggedScoreEstimationRisk, Fin.sum_univ_two]
+  norm_num [taggedScoreEstimationRisk, Fin.sum_univ_two,
+      Descent.Core.innerSum]
 
 
 /-- C+T-to-dense-model gap measured as target causal signal mass missed by the
@@ -322,7 +323,7 @@ theorem ct_more_variable_than_bayesian
           (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
       taggedScoreEstimationRisk targetTagVariance
         (fun i ↦ jamesSteinMSE 1 (σSq i) (βSq i)) := by
-  unfold taggedScoreEstimationRisk
+  unfold taggedScoreEstimationRisk Descent.Core.innerSum
   refine Finset.sum_lt_sum ?_ ?_
   · intro i _
     have h_mse :

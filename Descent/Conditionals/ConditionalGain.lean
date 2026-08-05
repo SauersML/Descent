@@ -5,6 +5,7 @@ import Descent.Blindness.BundleRigidity
 import Descent.Blindness.BundleRigidity.CoverageInvariance
 import Descent.Blindness.BundleRigidity.EntropySplit
 import Descent.Blindness.BundleRigidity.Freshness
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -597,12 +598,13 @@ theorem gainPolynomialRow_injective_exponent (n : ℝ) (hn : 1 < n) :
   (gainPolynomialRow_strictMono_exponent n hn).injective
 
 /-- Row four: linear gain, the fully fresh case. -/
-noncomputable def gainLinear (n : ℝ) : ℝ := n
+noncomputable def gainLinear (n : ℝ) : ℝ :=
+  Descent.Core.identifiedWith n
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gainLinear_at_reference_point :
     gainLinear (1 / 2) = 1 / 2 := by
-  unfold gainLinear
+  unfold gainLinear Descent.Core.identifiedWith
   norm_num
 
 /-- Row one is eventually below row two. -/
@@ -644,7 +646,7 @@ theorem gainPower_lt_gainLinear (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1) :
   have hsplit : n ^ β * n ^ (1 - β) = n := by
     rw [← Real.rpow_add hn0]
     simp
-  unfold gainPolynomialRow gainLinear
+  unfold gainPolynomialRow gainLinear Descent.Core.identifiedWith
   calc n ^ β * Real.log n < n ^ β * n ^ (1 - β) :=
         mul_lt_mul_of_pos_left hstrict hpowpos
     _ = n := hsplit

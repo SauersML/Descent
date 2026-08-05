@@ -42,12 +42,13 @@ section ImputationQuality
     When a PGS variant has imputation r²_imp < 1, the contribution
     to PGS variance is attenuated by r²_imp. -/
 noncomputable def attenuatedVariance (beta_sq het r2_imp : ℝ) : ℝ :=
-  beta_sq * het * r2_imp
+  Descent.Core.product3 beta_sq het r2_imp
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem attenuatedVariance_at_reference_point :
     attenuatedVariance 2 2 2 = 8 := by
-  norm_num [attenuatedVariance]
+  norm_num [attenuatedVariance,
+      Descent.Core.product3]
 
 
 /-- Attenuated ≤ true variance. -/
@@ -55,7 +56,7 @@ theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het)
     (h_r2_le : r2_imp ≤ 1) :
     attenuatedVariance beta_sq het r2_imp ≤ beta_sq * het := by
-  unfold attenuatedVariance
+  unfold attenuatedVariance Descent.Core.product3
   calc beta_sq * het * r2_imp ≤ beta_sq * het * 1 :=
         mul_le_mul_of_nonneg_left h_r2_le (mul_nonneg h_bsq h_het)
     _ = beta_sq * het := by ring
@@ -88,7 +89,7 @@ theorem imputation_error_nonneg (beta_sq het r2_imp : ℝ)
 theorem imputed_pgs_variance_decomposition (beta_sq het r2_imp : ℝ) :
     attenuatedVariance beta_sq het r2_imp +
       imputationErrorVariance beta_sq het r2_imp = beta_sq * het := by
-  unfold attenuatedVariance imputationErrorVariance
+  unfold attenuatedVariance imputationErrorVariance Descent.Core.product3
   ring
 
 /-- **Perfect imputation is exactly the no-attenuation boundary.**  For a variant with nonzero
@@ -97,7 +98,7 @@ quality is one. -/
 theorem attenuatedVariance_eq_true_iff
     (beta_sq het r2_imp : ℝ) (h_true : beta_sq * het ≠ 0) :
     attenuatedVariance beta_sq het r2_imp = beta_sq * het ↔ r2_imp = 1 := by
-  unfold attenuatedVariance
+  unfold attenuatedVariance Descent.Core.product3
   constructor
   · intro h_equal
     apply mul_left_cancel₀ h_true
@@ -340,7 +341,8 @@ theorem panelAdjustedImputationQuality_eq_zero_of_panel_absent
 theorem wgs_preserves_true_variance
     (beta_sq het r2_imp_wgs : ℝ) (h_perfect : r2_imp_wgs = 1) :
     attenuatedVariance beta_sq het r2_imp_wgs = beta_sq * het := by
-  simp [attenuatedVariance, h_perfect]
+  simp [attenuatedVariance, h_perfect,
+      Descent.Core.product3]
 
 /-- **Cost-benefit of WGS vs arrays.**
     WGS costs more per sample → smaller sample sizes.

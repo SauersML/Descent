@@ -70,7 +70,7 @@ already reasons about `k(k-1)/2` under the name `coalescentRate`, and every tele
 result proved there is reused below rather than reproved. -/
 theorem deathRate_eq_coalescentRate (k : ℕ) :
     deathRate k = SpectrumIdentifiability.coalescentRate k := by
-  simp [deathRate, SpectrumIdentifiability.coalescentRate]
+  simp [deathRate, SpectrumIdentifiability.coalescentRate, Descent.Core.pairCount]
 
 @[simp] theorem deathRate_zero : deathRate 0 = 0 := by norm_num [deathRate]
 

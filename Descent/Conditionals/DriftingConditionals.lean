@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Conditionals.DriftingConditional
 import Descent.Conditionals.DynamicsContrast
+import Descent.Core.Ratios
 
 /-!
 # Drifting conditionals in finite biological state spaces
@@ -366,12 +367,14 @@ theorem stateZeroResponse_at_reference_point :
 
 
 /-- A response concentrated in ancestry state one. -/
-def stateOneResponse (i : Fin 2) : ℝ := if i = 1 then 1 else 0
+noncomputable def stateOneResponse (i : Fin 2) : ℝ :=
+  Descent.Core.kronecker i 1
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem stateOneResponse_at_reference_point :
     stateOneResponse 0 = 0 ∧ stateOneResponse 1 = 1 := by
-  constructor <;> simp [stateOneResponse]
+  constructor <;> simp [stateOneResponse,
+      Descent.Core.kronecker]
 
 
 /-- The ancestry-state-one response IS `DynamicsContrast.targetAnnotation`.
@@ -409,7 +412,8 @@ theorem stationaryMarginal_does_not_identify_conditional :
       norm_num [transportMass, stayKernel, uniformTwo, Fin.sum_univ_two]
   · constructor <;>
       norm_num [transportedResponse, transportMass, markedMass, uniformTwo,
-        stayKernel, stateZeroResponse, stateOneResponse, Fin.sum_univ_two]
+        stayKernel, stateZeroResponse, stateOneResponse, Fin.sum_univ_two,
+      Descent.Core.kronecker]
 
 /-! ## Two-state local-ancestry switching -/
 

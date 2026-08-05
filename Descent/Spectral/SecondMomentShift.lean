@@ -33,7 +33,7 @@ theorem dot_rawCrossMoment
     (Y : Ω → ℝ) (u : ι → ℝ) :
     dot u (rawCrossMoment E X Y) =
       E (fun ω ↦ dot u (X ω) * Y ω) := by
-  unfold dot rawCrossMoment
+  unfold dot rawCrossMoment Descent.Core.innerSum
   have hexpand :
       (fun ω ↦ (∑ i, u i * X ω i) * Y ω) =
         ∑ i, (u i) • (fun ω ↦ X ω i * Y ω) := by
@@ -60,7 +60,8 @@ theorem rawCrossMoment_annihilates_secondMoment_kernel
   rw [dot_rawCrossMoment]
   apply hzeroProduct
   rw [secondMoment_quadratic_form, hkernel]
-  simp [dot]
+  simp [dot,
+      Descent.Core.innerSum]
 
 /-- Cauchy--Schwarz supplies the zero-product premise above.  Consequently the
 range-compatibility statement holds for any expectation model with its usual
@@ -96,7 +97,8 @@ theorem rawCrossMoment_linScore
       (fun ω ↦ X ω i * dot w (X ω)) =
         ∑ j, (w j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
+    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm,
+      Descent.Core.innerSum]
   rw [hexpand, ExpFunctional.eval_sum]
   simp [Matrix.mulVec, dotProduct, E.smul_eval, mul_comm]
 

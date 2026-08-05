@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.MeasureTheory.Measure.WithDensity
 import Descent.Blindness.MultipleMergerBlindness
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -418,13 +419,15 @@ theorem pioneerIntensity_eq_inverseSquare
   field_simp
 
 /-- Genealogical timescale produced by the pioneer substitution. -/
-noncomputable def genealogicalTimescale (width : ℝ) (p : ℕ) : ℝ := width ^ p
+noncomputable def genealogicalTimescale (width : ℝ) (p : ℕ) : ℝ :=
+  Descent.Core.power width p
 
 /-- Width powers compose exactly, locating the clock exponent entirely in front susceptibility. -/
 theorem genealogicalTimescale_add (width : ℝ) (p q : ℕ) :
     genealogicalTimescale width (p + q) =
       genealogicalTimescale width p * genealogicalTimescale width q := by
-  simp [genealogicalTimescale, pow_add]
+  simp [genealogicalTimescale, pow_add,
+      Descent.Core.power]
 
 /-- With susceptibility exponent three, the pioneer clock is the front-width cube. -/
 @[simp] theorem genealogicalTimescale_three (width : ℝ) :
@@ -507,11 +510,13 @@ theorem pioneerFraction_at_zero_width_is_junk (advantage : ℝ) (p : ℕ) (hp : 
 
 /-- The timescale at unit front width is one, whatever the susceptibility exponent. -/
 @[simp] theorem genealogicalTimescale_one (p : ℕ) : genealogicalTimescale 1 p = 1 := by
-  simp [genealogicalTimescale]
+  simp [genealogicalTimescale,
+      Descent.Core.power]
 
 /-- Reference value: front width two with the cubic susceptibility exponent gives clock `8`. -/
 theorem genealogicalTimescale_at_two : genealogicalTimescale 2 3 = 8 := by
-  norm_num [genealogicalTimescale]
+  norm_num [genealogicalTimescale,
+      Descent.Core.power]
 
 
 end MarkedBreakout

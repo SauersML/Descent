@@ -363,37 +363,43 @@ section LinearAlgebraicPortability
 variable {Ω : Type*}
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-def dot (x y : ι → ℝ) : ℝ := ∑ i, x i * y i
+noncomputable def dot (x y : ι → ℝ) : ℝ :=
+  Descent.Core.innerSum x y
 
 omit [DecidableEq ι] in
 theorem dot_add_left (x y z : ι → ℝ) :
     dot (fun i ↦ x i + y i) z = dot x z + dot y z := by
-  simp [dot, add_mul, Finset.sum_add_distrib]
+  simp [dot, add_mul, Finset.sum_add_distrib,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 theorem dot_sub_left (x y z : ι → ℝ) :
     dot (fun i ↦ x i - y i) z = dot x z - dot y z := by
-  simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib]
+  simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 /-- Previously `dot_add_right_shift` in `Spectral.ProjectionShiftBounds`.  It is a fact
 about `dot`, which is defined here, so it lives here. -/
 theorem dot_add_right (x y z : ι → ℝ) :
     dot x (y + z) = dot x y + dot x z := by
-  simp [dot, mul_add, Finset.sum_add_distrib]
+  simp [dot, mul_add, Finset.sum_add_distrib,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 /-- Previously duplicated in `Spectral.QuadraticShift`. -/
 theorem dot_sub_right (x y z : ι → ℝ) :
     dot x (fun i ↦ y i - z i) = dot x y - dot x z := by
-  simp [dot, mul_sub, Finset.sum_sub_distrib]
+  simp [dot, mul_sub, Finset.sum_sub_distrib,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 /-- The `Pi.sub` phrasing of `dot_sub_right`, for callers whose subtraction arrives from
 `Matrix.mulVec_sub` rather than from a written lambda. -/
 theorem dot_sub_right' (x y z : ι → ℝ) :
     dot x (y - z) = dot x y - dot x z := by
-  simp [dot, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
+  simp [dot, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib,
+      Descent.Core.innerSum]
 
 theorem normal_equations_orthogonality
     (E : ExpFunctional Ω)
@@ -405,7 +411,8 @@ theorem normal_equations_orthogonality
       (fun ω ↦ (Y ω - dot wStar (X ω)) * dot u (X ω))
         = ∑ i, (u i) • (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm]
+    simp [dot, Finset.mul_sum, smul_eq_mul, mul_assoc, mul_left_comm, mul_comm,
+      Descent.Core.innerSum]
   rw [h_expand, ExpFunctional.eval_sum]
   rw [show (∑ i, E ((u i) • (fun ω ↦ X ω i * (Y ω - dot wStar (X ω)))))
         = ∑ i, u i * E (fun ω ↦ X ω i * (Y ω - dot wStar (X ω))) by
@@ -528,7 +535,7 @@ theorem covariance_with_causal_signal
     (E : ExpFunctional Ω) (Xj : Ω → ℝ) (C : Ω → L → ℝ) (β : L → ℝ) :
     covariance E Xj (causalSignal β C)
       = dot (fun l ↦ covariance E Xj (fun ω ↦ C ω l)) β := by
-  unfold causalSignal dot
+  unfold causalSignal dot Descent.Core.innerSum
   have hsum :
       (fun ω ↦ ∑ l, β l * C ω l)
         = (fun ω ↦ ∑ l, ((β l) • (fun ω' ↦ C ω' l)) ω) := by
@@ -552,7 +559,8 @@ theorem crossCovVector_decomposition
   unfold crossCovVector predictorCausalCovariance contextCrossCovVector
   rw [covariance_add_right]
   rw [covariance_with_causal_signal]
-  simp [Matrix.mulVec, dotProduct, dot]
+  simp [Matrix.mulVec, dotProduct, dot,
+      Descent.Core.innerSum]
 
 omit [DecidableEq J] in
 theorem optimalWeightsFromMoments_decomposition
@@ -576,7 +584,8 @@ theorem secondMoment_quadratic_form
       (fun ω ↦ (dot u (X ω)) ^ 2)
         = ∑ i, ∑ j, (u i * u j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, pow_two, Finset.sum_mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
+    simp [dot, pow_two, Finset.sum_mul_sum, smul_eq_mul, mul_left_comm, mul_comm,
+      Descent.Core.innerSum]
   rw [h_expand, ExpFunctional.eval_sum]
   rw [show (∑ i, E (∑ j, (u i * u j) • fun ω ↦ X ω i * X ω j))
         = ∑ i, ∑ j, E ((u i * u j) • fun ω ↦ X ω i * X ω j) by
@@ -590,7 +599,7 @@ theorem secondMoment_quadratic_form
         apply Finset.sum_congr rfl
         intro j hj
         rw [E.smul_eval]]
-  unfold dot secondMomentMatrix
+  unfold dot secondMomentMatrix Descent.Core.innerSum
   simp [Matrix.mulVec, dotProduct]
   apply Finset.sum_congr rfl
   intro i hi
@@ -648,7 +657,8 @@ theorem expected_coordinate_dot_eq_covariance_mulVec
       (fun ω ↦ X ω i * dot w (X ω))
         = ∑ j, (w j) • (fun ω ↦ X ω i * X ω j) := by
     funext ω
-    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm]
+    simp [dot, Finset.mul_sum, smul_eq_mul, mul_left_comm, mul_comm,
+      Descent.Core.innerSum]
   rw [h_expand, ExpFunctional.eval_sum]
   rw [show (∑ j, E ((w j) • fun ω ↦ X ω i * X ω j))
         = ∑ j, w j * E (fun ω ↦ X ω i * X ω j) by
@@ -727,9 +737,10 @@ theorem eval_linScore (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → �
   have hsum : linScore w X
       = Finset.univ.sum (fun j ↦ (w j) • (fun ω ↦ X ω j)) := by
     funext ω
-    simp [linScore, dot, Finset.sum_apply, mul_comm]
+    simp [linScore, dot, Finset.sum_apply, mul_comm,
+      Descent.Core.innerSum]
   rw [hsum, ExpFunctional.eval_sum]
-  unfold dot
+  unfold dot Descent.Core.innerSum
   exact Finset.sum_congr rfl fun j _ ↦ E.smul_eval (w j) _
 
 omit [Fintype L] [DecidableEq L] in
@@ -740,7 +751,8 @@ theorem covariance_linScore_left
   rw [covariance_comm_exp]
   have hsum : linScore w X = (fun ω ↦ ∑ j, ((w j) • (fun ω' ↦ X ω' j)) ω) := by
     funext ω
-    simp [linScore, dot, mul_comm]
+    simp [linScore, dot, mul_comm,
+      Descent.Core.innerSum]
   rw [hsum, covariance_finset_sum_right]
   refine Finset.sum_congr rfl fun j _ ↦ ?_
   rw [covariance_smul_right, covariance_comm_exp]
@@ -753,7 +765,7 @@ theorem covariance_linScore_linScore
     covariance E (linScore w X) (linScore v X)
       = dot w ((covarianceMatrix E X).mulVec v) := by
   rw [covariance_linScore_left]
-  unfold dot covarianceMatrix
+  unfold dot covarianceMatrix Descent.Core.innerSum
   simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
   refine Finset.sum_congr rfl fun j _ ↦ ?_
   congr 1

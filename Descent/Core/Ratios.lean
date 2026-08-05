@@ -536,4 +536,97 @@ makes `a` the baseline rather than one term among three. -/
 @[simp] theorem affineStep_at_zero (a b : ℝ) : affineStep a b 0 = a := by
   unfold affineStep; ring
 
+/-! ### Identifications, sums and small arities
+
+The last shapes the census finds. Several look too thin to name; naming them is still the
+cheapest way to make a second copy impossible, and one of them -- `identifiedWith` -- is
+not thin at all. -/
+
+/-- **An identification**: a named quantity defined to BE another number.
+
+A definition whose body is its own argument is not a computation, it is a CLAIM -- that
+the quantity this name denotes is the quantity that argument denotes. The corpus has five
+of them (`ldOverlapFromSharedLD`, `gainLinear`, `reconstructionWeight`,
+`localizedTransferVariance`, `neutralFixation`), each asserting a different
+identification, and written as a bare `:= x` the claim is invisible: it reads as a
+renaming.
+
+Routing them through this makes the claim greppable, and the docstring on each is where
+the justification has to live. Nothing here justifies any of them. -/
+noncomputable def identifiedWith (x : ℝ) : ℝ := x
+
+/-- **An identification is transparent**, which is the whole of its computational
+content, and exactly why the content is in the docstring instead. -/
+@[simp] theorem identifiedWith_eq (x : ℝ) : identifiedWith x = x := rfl
+
+/-- Power, `a ^ n`. A stationary LD entry, a genealogical timescale and a log-covering
+number at an exponent are one map. -/
+noncomputable def power (a : ℝ) (n : ℕ) : ℝ := a ^ n
+
+/-- **The power at zero is one**, whatever the base -- the property that makes the
+exponent a count of steps rather than a scale. -/
+@[simp] theorem power_zero (a : ℝ) : power a 0 = 1 := by
+  unfold power; norm_num
+
+/-- **And it steps by one factor**, which is what the three referents all need. -/
+theorem power_succ (a : ℝ) (n : ℕ) : power a (n + 1) = a * power a n := by
+  unfold power; ring
+
+/-- Inner sum, `∑ i, f i * g i` over a finite index. A dot product and a tagged-score
+estimation risk are one map. -/
+noncomputable def innerSum {ι : Type*} [Fintype ι] (f g : ι → ℝ) : ℝ :=
+  ∑ i, f i * g i
+
+/-- **The inner sum is symmetric.** -/
+theorem innerSum_comm {ι : Type*} [Fintype ι] (f g : ι → ℝ) :
+    innerSum f g = innerSum g f := by
+  unfold innerSum
+  exact Finset.sum_congr rfl fun i _ ↦ mul_comm (f i) (g i)
+
+/-- **A zero factor contributes nothing.** -/
+@[simp] theorem innerSum_zero {ι : Type*} [Fintype ι] (g : ι → ℝ) :
+    innerSum (fun _ ↦ 0) g = 0 := by
+  unfold innerSum; simp
+
+/-- Residual against a representation, `x - ∑ k, c k · b k`: what a finite expansion in a
+basis fails to capture. A component-representation residual and a Jensen residual are one
+map. -/
+noncomputable def residualAgainst {ι : Type*} [Fintype ι] (x : ℝ) (c b : ι → ℝ) : ℝ :=
+  x - innerSum c b
+
+/-- **A residual against nothing is the whole quantity.** -/
+@[simp] theorem residualAgainst_zero {ι : Type*} [Fintype ι] (x : ℝ) (b : ι → ℝ) :
+    residualAgainst x (fun _ ↦ 0) b = x := by
+  unfold residualAgainst; simp
+
+/-- Triple product, `a · b · c`. An attenuated variance and an allelic-heterogeneity
+retained signal are one map: two independent attenuations applied to a variance. -/
+noncomputable def product3 (a b c : ℝ) : ℝ := a * b * c
+
+/-- **A unit factor changes nothing**, which is what makes the other two attenuations. -/
+@[simp] theorem product3_one (a c : ℝ) : product3 a 1 c = a * c := by
+  unfold product3; ring
+
+/-- Paired epoch count, `2k - 2`: the sample size of a `k`-epoch comparison, which counts
+PAIRS of boundaries and drops the two endpoints. Two modules wrote it out. Natural
+subtraction truncates at zero, which is the right answer here -- a single epoch has no
+boundary pair -- and `paired_at_one` records it. -/
+def pairedEpochCount (k : ℕ) : ℕ := 2 * k - 2
+
+/-- **One epoch has no pair**, by truncation and not by accident. -/
+@[simp] theorem pairedEpochCount_at_one : pairedEpochCount 1 = 0 := by
+  unfold pairedEpochCount; norm_num
+
+/-- Unordered pair count, `k(k-1)/2` on a real-valued cast. Kingman's pair-coalescence
+rate and the spectrum-identifiability collision rate are the same count. -/
+noncomputable def pairCount (k : ℕ) : ℝ := (k : ℝ) * ((k : ℝ) - 1) / 2
+
+/-- **A lone lineage has no pair to coalesce**, which is where the rate ladder starts. -/
+@[simp] theorem pairCount_one : pairCount 1 = 0 := by
+  unfold pairCount; norm_num
+
+/-- **Two lineages make exactly one pair.** -/
+@[simp] theorem pairCount_two : pairCount 2 = 1 := by
+  unfold pairCount; norm_num
+
 end Descent.Core

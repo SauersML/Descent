@@ -1912,7 +1912,8 @@ Two epochs are Lipschitz-stable. Three already have cube-root instability, four
 fifth-root. -/
 
 /-- Sample size whose spectrum resolves a `K`-epoch history. -/
-def epochSampleSize (K : ℕ) : ℕ := 2 * K - 2
+def epochSampleSize (K : ℕ) : ℕ :=
+  Descent.Core.pairedEpochCount K
 
 /-- Number of unfolded spectrum entries at that sample size. -/
 def spectrumEntries (n : ℕ) : ℕ := n - 1
@@ -1922,7 +1923,7 @@ Not a coincidence of the parameterisation: it says the recoverable resolution is
 set by how many numbers the spectrum has, and each epoch consumes two of them. -/
 theorem spectrumEntries_epochSampleSize (K : ℕ) (hK : 2 ≤ K) :
     spectrumEntries (epochSampleSize K) = 2 * K - 3 := by
-  unfold spectrumEntries epochSampleSize
+  unfold spectrumEntries epochSampleSize Descent.Core.pairedEpochCount
   omega
 
 /-- **Two epochs are Lipschitz-stable.** -/
@@ -3682,7 +3683,7 @@ leaves the file green, which is why an identifier grep is not enough to justify
 removing them.
 
 Empirical status: UNTESTED. -/
-def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
+noncomputable def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
     (beta : J → ℝ) : ι → ℝ :=
   fun i ↦ weight i * coefficientEnergy (B i) beta
 

@@ -1230,12 +1230,12 @@ which carries the assumption in its type;
     not its pairwise cousin -- which is the substitution the section note above exists to
     prevent. Control: drift is unbiased, `E[p_t] = p₀`, at 0.74 sems. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
-  het_source * (1 - fst)
+  Descent.Core.retainedFraction fst het_source
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem targetHetFromFst_at_reference_point :
     targetHetFromFst (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold targetHetFromFst
+  unfold targetHetFromFst Descent.Core.retainedFraction
   norm_num
 
 /-- **Endpoints of the drift-retention map.** No divergence retains all heterozygosity; complete
@@ -1243,13 +1243,13 @@ divergence retains none. Two anchors rather than one, because a single one is me
 bodies. -/
 theorem targetHetFromFst_endpoints (het_source : ℝ) :
     targetHetFromFst het_source 0 = het_source ∧ targetHetFromFst het_source 1 = 0 := by
-  constructor <;> unfold targetHetFromFst <;> ring
+  constructor <;> unfold targetHetFromFst Descent.Core.retainedFraction <;> ring
 
 /-- The map is linear in the source heterozygosity: it is a retained FRACTION, so doubling the
 source doubles the target at fixed divergence. -/
 theorem targetHetFromFst_linear (het_source fst c : ℝ) :
     targetHetFromFst (c * het_source) fst = c * targetHetFromFst het_source fst := by
-  unfold targetHetFromFst; ring
+  unfold targetHetFromFst Descent.Core.retainedFraction; ring
 
 /-- **The bridge named in the paragraph above**, which until now was named and not stated.
 
@@ -1261,7 +1261,7 @@ regime supplies. It is a within-population loss, not a between-population `F_ST`
 theorem ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst
     (r : ClosedPopulationNoMutation) :
     r.targetHet = targetHetFromFst r.H₀ (1 - r.retention) := by
-  unfold ClosedPopulationNoMutation.targetHet targetHetFromFst
+  unfold ClosedPopulationNoMutation.targetHet targetHetFromFst Descent.Core.retainedFraction
   ring
 
 /-- **Present-day PGS variance after drift** from an ancestral variance `V_A`.
@@ -6767,19 +6767,20 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     lives: `covarianceDivergenceMutationDrift` and
     `presentDayPGSVarianceMutationDrift` both consume this fraction and both
     make claims a simulation can reach. -/
-noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
+noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ :=
+  Descent.Core.identifiedWith shared_ld
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldOverlapFromSharedLD_at_reference_point :
     ldOverlapFromSharedLD (1 / 2) = 1 / 2 := by
-  unfold ldOverlapFromSharedLD
+  unfold ldOverlapFromSharedLD Descent.Core.identifiedWith
   norm_num
 
 /-- Covariance retention in terms of Fst and shared_LD. -/
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
     covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld) =
       (1 - fst) * shared_ld := by
-  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- **Covariance divergence derived from retention.**

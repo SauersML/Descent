@@ -8,6 +8,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -113,18 +114,20 @@ open Filter
     Kingman model. Whether a given real population's genealogy is Kingman at all is a
     different question, and it is the one the identifiability results below leave open. -/
 noncomputable def coalescentRate (m : ℕ) : ℝ :=
-  (m : ℝ) * ((m : ℝ) - 1) / 2
+  Descent.Core.pairCount m
 
 @[simp] theorem coalescentRate_two : coalescentRate 2 = 1 := by
-  norm_num [coalescentRate]
+  norm_num [coalescentRate,
+      Descent.Core.pairCount]
 
 @[simp] theorem coalescentRate_three : coalescentRate 3 = 3 := by
-  norm_num [coalescentRate]
+  norm_num [coalescentRate,
+      Descent.Core.pairCount]
 
 /-- The rate ladder, indexed from the smallest informative sample. -/
 theorem coalescentRate_add_two (k : ℕ) :
     coalescentRate (k + 2) = ((k : ℝ) + 2) * ((k : ℝ) + 1) / 2 := by
-  unfold coalescentRate
+  unfold coalescentRate Descent.Core.pairCount
   push_cast
   ring
 

@@ -576,12 +576,13 @@ section AllelicHeterogeneity
 /-- Signal retained after causal tagging and allelic sharing are applied. -/
 noncomputable def allelicHeterogeneityRetainedSignal
     (r2_causal r2_tag sharedFraction : ℝ) : ℝ :=
-  r2_causal * r2_tag * sharedFraction
+  Descent.Core.product3 r2_causal r2_tag sharedFraction
 
 /-- The retained-signal definition is pinned at an interior reference point. -/
 theorem allelicHeterogeneityRetainedSignal_at_reference_point :
     allelicHeterogeneityRetainedSignal (1 / 2) (1 / 2) (1 / 2) = 1 / 8 := by
-  norm_num [allelicHeterogeneityRetainedSignal]
+  norm_num [allelicHeterogeneityRetainedSignal,
+      Descent.Core.product3]
 
 /-- **Allelic heterogeneity reduces portability via variance decomposition.**
     Total locus variance in source = V_shared + V_source_specific.
@@ -598,7 +599,7 @@ theorem allelicHeterogeneityRetainedSignal_lt_full
     (h_causal : 0 < r2_causal) (h_tag : 0 < r2_tag)
     (h_ρ_lt : ρ < 1) :
     allelicHeterogeneityRetainedSignal r2_causal r2_tag ρ < r2_causal * r2_tag := by
-  unfold allelicHeterogeneityRetainedSignal
+  unfold allelicHeterogeneityRetainedSignal Descent.Core.product3
   have h_prod_pos : 0 < r2_causal * r2_tag := mul_pos h_causal h_tag
   calc r2_causal * r2_tag * ρ
       < r2_causal * r2_tag * 1 := by nlinarith
@@ -610,7 +611,7 @@ theorem allelicHeterogeneityRetainedSignal_eq_full_iff
     (r2_causal r2_tag ρ : ℝ) :
     allelicHeterogeneityRetainedSignal r2_causal r2_tag ρ = r2_causal * r2_tag ↔
       r2_causal = 0 ∨ r2_tag = 0 ∨ ρ = 1 := by
-  unfold allelicHeterogeneityRetainedSignal
+  unfold allelicHeterogeneityRetainedSignal Descent.Core.product3
   constructor
   · intro h
     have h_factor : r2_causal * r2_tag * (ρ - 1) = 0 := by nlinarith
@@ -884,7 +885,7 @@ theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
       rg ^ 2 * covarianceRetention (covarianceRetentionFactorFromFst fst)
         (ldOverlapFromSharedLD tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst
-    ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+    ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
@@ -896,7 +897,7 @@ theorem portabilityFromArchitecture_from_divergence
     portabilityFromArchitecture rg fst tagging_ratio =
       rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
   unfold portabilityFromArchitecture covarianceDivergenceFromRetention
-    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- Architecture portability is zero exactly when cross-population effect correlation

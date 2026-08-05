@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Spectral.SecondMomentShift
 import Descent.Spectral.QuadraticShift
+import Descent.Core.Ratios
 
 namespace Descent
 
@@ -54,7 +55,7 @@ theorem dot_weightedResidualMoment
     dot direction (weightedResidualMoment P densityRatio X residual) =
       P (fun ω ↦
         (densityRatio ω - 1) * (dot direction (X ω) * residual ω)) := by
-  unfold weightedResidualMoment rawCrossMoment dot
+  unfold weightedResidualMoment rawCrossMoment dot Descent.Core.innerSum
   have hexpand :
       (fun ω ↦
         (densityRatio ω - 1) *
@@ -280,12 +281,13 @@ rank-`k` truncation maximising `∑ σᵢ` over retained directions is what
 principal-component truncation does.
 
 Empirical status: UNTESTED. -/
-def reconstructionWeight (s : ℝ) : ℝ := s
+noncomputable def reconstructionWeight (s : ℝ) : ℝ :=
+  Descent.Core.identifiedWith s
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem reconstructionWeight_at_reference_point :
     reconstructionWeight (1 / 2) = 1 / 2 := by
-  unfold reconstructionWeight
+  unfold reconstructionWeight Descent.Core.identifiedWith
   norm_num
 
 /-- **Wiener (denoising) weight** `σ / (σ + noise)`: the shrinkage factor of the
@@ -609,11 +611,11 @@ theorem topVariance_maximizes_reconstruction
       reconstructionEfficiency spectrum (pruneAllocation S) := by
   have hin' : ∀ i ∈ S, t ≤ reconstructionWeight (spectrum i) := by
     intro i hi
-    unfold reconstructionWeight
+    unfold reconstructionWeight Descent.Core.identifiedWith
     exact hin i hi
   have hout' : ∀ i ∉ S, reconstructionWeight (spectrum i) ≤ t := by
     intro i hi
-    unfold reconstructionWeight
+    unfold reconstructionWeight Descent.Core.identifiedWith
     exact hout i hi
   have hcap : spectralCapture (fun i ↦ reconstructionWeight (spectrum i)) M ≤
       spectralCapture (fun i ↦ reconstructionWeight (spectrum i))

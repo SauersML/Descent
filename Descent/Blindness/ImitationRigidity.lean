@@ -502,7 +502,7 @@ projection of the weights on the signal direction. -/
 theorem quadForm_rankOneCovarianceBump (scale : ℝ) (loading x : ι → ℝ) :
     quadForm (rankOneCovarianceBump scale loading) x =
       scale ^ 2 * dot loading x ^ 2 := by
-  unfold quadForm gramForm rankOneCovarianceBump dot
+  unfold quadForm gramForm rankOneCovarianceBump dot Descent.Core.innerSum
   have hrow : ∀ i : ι,
       (∑ j, x i * (scale ^ 2 * loading i * loading j) * x j) =
         (scale ^ 2 * (x i * loading i)) * ∑ j, loading j * x j := by
@@ -654,7 +654,8 @@ Ohta–Kimura law `ldAfterGenerations`, with separation in place of elapsed
 generations; `stationaryLDEntry_eq_ldAfterGenerations` below is the statement
 relating the two. Whether a real chromosome's LD is Markov at the scale of
 interest is exactly what the symbol analysis below can be falsified against. -/
-def stationaryLDEntry (decay : ℝ) (separation : ℕ) : ℝ := decay ^ separation
+noncomputable def stationaryLDEntry (decay : ℝ) (separation : ℕ) : ℝ :=
+  Descent.Core.power decay separation
 
 /-- **One site of propagation along the chromosome.**
 
@@ -691,10 +692,12 @@ theorem stationaryLDEntry_isFixedPoint (decay : ℝ) (separation : ℕ) :
     markovLDStep decay (stationaryLDEntry decay) separation =
       stationaryLDEntry decay separation := by
   cases separation with
-  | zero => simp [markovLDStep, stationaryLDEntry]
+  | zero => simp [markovLDStep, stationaryLDEntry,
+      Descent.Core.power]
   | succ n =>
       have hne : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
-      simp only [markovLDStep, stationaryLDEntry, if_neg hne, Nat.add_sub_cancel]
+      simp only [markovLDStep, stationaryLDEntry, if_neg hne, Nat.add_sub_cancel,
+      Descent.Core.power]
       ring
 
 /-- **The independent-sites boundary is attained.**  At `decay = 0` the kernel
@@ -703,7 +706,7 @@ small.  This is the regime in which whitening is free, and a decay law that
 could never reach it would be qualitatively wrong about it. -/
 theorem stationaryLDEntry_of_no_decay (separation : ℕ) (h : separation ≠ 0) :
     stationaryLDEntry 0 separation = 0 := by
-  unfold stationaryLDEntry
+  unfold stationaryLDEntry Descent.Core.power
   exact zero_pow h
 
 /-- **The complete-LD boundary is attained.**  At `decay = 1` every pair of
@@ -712,7 +715,7 @@ matrix, and the hard edge `ldHardEdge 1 = 0` is exactly zero: whitening is not
 merely ill-conditioned but undefined. -/
 theorem stationaryLDEntry_of_complete_ld (separation : ℕ) :
     stationaryLDEntry 1 separation = 1 := by
-  unfold stationaryLDEntry
+  unfold stationaryLDEntry Descent.Core.power
   exact one_pow separation
 
 /-- **Symbol (spectral density) of the stationary LD kernel.** The Poisson
@@ -827,7 +830,7 @@ theorem ldWhiteningGain_one_is_junk : ldWhiteningGain 1 = 0 := by
 theorem stationaryLDEntry_eq_ldAfterGenerations (r Ne : ℝ) (separation : ℕ) :
     stationaryLDEntry (ldRetentionPerGen r Ne) separation =
       ldAfterGenerations 1 r Ne separation := by
-  unfold stationaryLDEntry ldAfterGenerations
+  unfold stationaryLDEntry ldAfterGenerations Descent.Core.power
   rw [one_mul]
 
 theorem ldKernelSymbol_denom_pos {decay angle : ℝ} (hd : |decay| < 1) :
@@ -1008,10 +1011,12 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
       if separation = 0 then 1 - decay ^ 2 else 0 := by
   cases separation with
   | zero =>
-      simp [adjacentBoundarySeparation, stationaryLDEntry]
+      simp [adjacentBoundarySeparation, stationaryLDEntry,
+      Descent.Core.power]
       ring
   | succ d =>
-      simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ, mul_comm]
+      simp [adjacentBoundarySeparation, stationaryLDEntry, pow_succ, mul_comm,
+      Descent.Core.power]
 
 /-- **Interior three-term identity.** Away from the ends of the chromosome the
 geometric LD sequence is annihilated by the tridiagonal AR(1) precision
@@ -1022,7 +1027,7 @@ theorem stationaryLD_three_term (decay : ℝ) (separation : ℕ) (h : 1 ≤ sepa
       - decay * stationaryLDEntry decay (separation - 1)
       - decay * stationaryLDEntry decay (separation + 1) = 0 := by
   obtain ⟨e, rfl⟩ := Nat.exists_eq_add_of_le h
-  unfold stationaryLDEntry
+  unfold stationaryLDEntry Descent.Core.power
   simp only [Nat.add_sub_cancel_left, pow_add, pow_succ]
   ring
 
@@ -1032,7 +1037,7 @@ theorem stationaryLD_three_term_diagonal (decay : ℝ) :
     (1 + decay ^ 2) * stationaryLDEntry decay 0
       - decay * stationaryLDEntry decay 1
       - decay * stationaryLDEntry decay 1 = 1 - decay ^ 2 := by
-  unfold stationaryLDEntry
+  unfold stationaryLDEntry Descent.Core.power
   ring
 
 /-- **Complete interior-row inverse identity.**  Combining the diagonal and
@@ -1642,7 +1647,8 @@ theorem mulVec_add_rankOneCovarianceBump
       K.mulVec weights + (scale ^ 2 * dot loading weights) • loading := by
   funext i
   simp only [Matrix.mulVec, dotProduct, Matrix.add_apply, Pi.add_apply,
-    rankOneCovarianceBump, Pi.smul_apply, smul_eq_mul, dot, add_mul]
+    rankOneCovarianceBump, Pi.smul_apply, smul_eq_mul, dot, add_mul,
+      Descent.Core.innerSum]
   rw [Finset.sum_add_distrib]
   congr 1
   have hterm : ∀ j : ι,

@@ -60,7 +60,8 @@ theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ}
     (hB : Matrix.IsSymm B) :
     IsSymmetricBilinearMatrix B := by
   intro x y
-  simp only [dot, Matrix.mulVec, dotProduct, Finset.mul_sum]
+  simp only [dot, Matrix.mulVec, dotProduct, Finset.mul_sum,
+      Descent.Core.innerSum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun i _ ↦ ?_
   rw [Matrix.IsSymm.apply hB i j]
@@ -71,7 +72,8 @@ theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ}
 theorem isSymmetricBilinearMatrix_one :
     IsSymmetricBilinearMatrix (1 : Matrix ι ι ℝ) := by
   intro x y
-  simp [dot, Matrix.one_mulVec, mul_comm]
+  simp [dot, Matrix.one_mulVec, mul_comm,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
@@ -91,12 +93,14 @@ theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
 omit [DecidableEq ι] in
 theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
     dot (c • x) y = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_assoc]
+  simp [dot, Finset.mul_sum, mul_assoc,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
     dot x (c • y) = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_left_comm]
+  simp [dot, Finset.mul_sum, mul_left_comm,
+      Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 /-- The usual excess-risk identity remains exact for singular `B`.  The only
@@ -158,7 +162,8 @@ theorem singular_minimizer_kernel_invariance
       funext i
       ring
     rw [hdiff, hkernel]
-    simp [dot]
+    simp [dot,
+      Descent.Core.innerSum]
   linarith
 
 /-- Quadratic-form distance between two coefficient vectors. -/
@@ -178,7 +183,7 @@ no direction to scale. Lean returns `0`, which reads as the correct answer being
 all, rather than as an ill-posed problem. Consumers must exclude it by hypothesis. -/
 theorem bestScalarCorrection_null_direction_is_junk (B : Matrix ι ι ℝ) (v : ι → ℝ) :
     bestScalarCorrection B (fun _ ↦ 0) v = 0 := by
-  unfold bestScalarCorrection dot
+  unfold bestScalarCorrection dot Descent.Core.innerSum
   simp
 
 /-- Irreducible quadratic risk after optimizing over scalar rescalings. -/
@@ -282,7 +287,8 @@ theorem weightedCovariancePool_energy
       weightLeft * dot shift (left.mulVec shift) +
         weightRight * dot shift (right.mulVec shift) := by
   rw [weightedCovariancePool_mulVec]
-  simp only [dot, mul_add]
+  simp only [dot, mul_add,
+      Descent.Core.innerSum]
   rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
   apply congrArg₂ (fun x y : ℝ ↦ x + y) <;>
     apply Finset.sum_congr rfl <;>
@@ -313,7 +319,8 @@ theorem weightedCovariancePool_mulVec_eq_zero_iff
     have henergy : weightLeft * dot shift (left.mulVec shift) +
         weightRight * dot shift (right.mulVec shift) = 0 := by
       rw [← weightedCovariancePool_energy weightLeft weightRight left right shift, hpool]
-      simp [dot]
+      simp [dot,
+      Descent.Core.innerSum]
     have hleftEnergy : dot shift (left.mulVec shift) = 0 := by
       nlinarith [hleftNonneg shift, hrightNonneg shift]
     have hrightEnergy : dot shift (right.mulVec shift) = 0 := by
@@ -359,7 +366,8 @@ theorem finiteEnvironmentCovariancePool_energy
         dot shift ((covariance environment).mulVec shift) := by
   classical
   rw [finiteEnvironmentCovariancePool_mulVec]
-  simp only [dot]
+  simp only [dot,
+      Descent.Core.innerSum]
   simp_rw [Finset.mul_sum]
   rw [Finset.sum_comm]
   apply Finset.sum_congr rfl
@@ -391,11 +399,13 @@ theorem positiveSemidefiniteFamily_one {κ : Type*} :
     PositiveSemidefiniteFamily (fun _ : κ ↦ (1 : Matrix ι ι ℝ)) where
   energy_nonneg := by
     intro _ shift
-    simp only [Matrix.one_mulVec, dot]
+    simp only [Matrix.one_mulVec, dot,
+      Descent.Core.innerSum]
     exact Finset.sum_nonneg fun i _ ↦ mul_self_nonneg (shift i)
   energy_eq_zero_iff := by
     intro _ shift
-    simp only [Matrix.one_mulVec, dot]
+    simp only [Matrix.one_mulVec, dot,
+      Descent.Core.innerSum]
     constructor
     · intro h
       funext i
@@ -508,7 +518,8 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active :
     have hpoolEnergy :
         dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 := by
       rw [hpool]
-      simp [dot]
+      simp [dot,
+      Descent.Core.innerSum]
     have henergyZero :=
       (finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
         weight covariance hweight hpsd shift).mp hpoolEnergy environment hactive
@@ -658,7 +669,8 @@ theorem target_energy_eq_zero_of_uniformPortability_of_source_kernel
   apply le_antisymm
   · have h := hbound shift
     rw [hsourceKernel] at h
-    simpa [dot] using h
+    simpa [dot,
+      Descent.Core.innerSum] using h
   · exact htarget shift
 
 omit [DecidableEq ι] in
@@ -689,8 +701,9 @@ theorem no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
   rintro ⟨constant, hbound⟩
   have h := hbound shift
   rw [hsourceKernel] at h
-  simp [dot] at h
-  unfold dot at htargetPos
+  simp [dot,
+      Descent.Core.innerSum] at h
+  unfold dot Descent.Core.innerSum at htargetPos
   exact (not_lt_of_ge h) htargetPos
 
 omit [DecidableEq ι] in

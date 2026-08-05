@@ -943,7 +943,8 @@ Two shape intuitions both fail here.  The residual does not vanish at a balanced
 posterior at this genome is exactly balanced and the residual is maximal — and it is not a
 small-overlap correction that a nonlinearity budget could absorb. -/
 theorem exampleComponentResidual_eq_neg_one : exampleComponentResidual = -1 := by
-  rw [exampleComponentResidual, componentRepresentationResidual, componentWeighted_example_zero,
+  rw [exampleComponentResidual, componentRepresentationResidual,
+    Descent.Core.residualAgainst, Descent.Core.innerSum, componentWeighted_example_zero,
     fiberConditional_of_separating _ _ (0 : Fin 3) componentPosterior_example_separating
       (by rw [componentMixtureDensity_example_zero]; norm_num),
     conditionalSectionMean_pointLaw]

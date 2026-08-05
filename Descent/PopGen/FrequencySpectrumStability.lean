@@ -63,7 +63,7 @@ def epochSpectrumCoordinateCount (K : ℕ) : ℕ :=
 
 /-- Smallest lineage sample size supplying `2K - 3` unfolded spectrum entries. -/
 def epochLineageSampleSize (K : ℕ) : ℕ :=
-  2 * K - 2
+  Descent.Core.pairedEpochCount K
 
 /-- The fixed-epoch inverse Hölder exponent. -/
 noncomputable def fixedEpochInverseExponent (K : ℕ) : ℝ :=
@@ -80,14 +80,14 @@ theorem fixedEpochInverseExponent_at_one_epoch_is_junk :
 /-- A sample of size `2K - 2` has exactly `2K - 3` nontrivial unfolded spectrum entries. -/
 theorem epochLineageSampleSize_sub_one (K : ℕ) (hK : 2 ≤ K) :
     epochLineageSampleSize K - 1 = epochSpectrumCoordinateCount K := by
-  unfold epochLineageSampleSize epochSpectrumCoordinateCount
+  unfold epochLineageSampleSize epochSpectrumCoordinateCount Descent.Core.pairedEpochCount
   omega
 
 /-- Adding `extra` demographic epochs requires exactly `2 * extra` additional sampled
 lineages in the minimal identifying SFS design. -/
 theorem epochLineageSampleSize_add_epochs (K extra : ℕ) (hK : 1 ≤ K) :
     epochLineageSampleSize (K + extra) = epochLineageSampleSize K + 2 * extra := by
-  unfold epochLineageSampleSize
+  unfold epochLineageSampleSize Descent.Core.pairedEpochCount
   omega
 
 /-- The collision order is positive for every model with at least two epochs. -/

@@ -299,7 +299,7 @@ theorem predictiveCovariance_eq :
     have h := crossCovVector_decomposition P.E P.X P.C P.β P.h
     simpa [contextCrossCovVector, crossCovVector, kappa, contextX] using h
   rw [hsplit]
-  unfold dot
+  unfold dot Descent.Core.innerSum
   simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
 omit [Fintype L] [DecidableEq L] in
@@ -866,7 +866,8 @@ theorem twoContrast_scoreVariance (α γ δ : ℝ) :
   show variance (uniformExp (Fin 4)) _ = _
   rw [variance_uniformExp_four]
   simp [DeploymentPopulation.score, twoContrastPopulation, linScore, dot, unitWeight,
-    rad1]
+    rad1,
+      Descent.Core.innerSum]
   ring
 
 theorem twoContrast_predictiveCovariance (α γ δ : ℝ) :
@@ -874,7 +875,8 @@ theorem twoContrast_predictiveCovariance (α γ δ : ℝ) :
   show covariance (uniformExp (Fin 4)) _ _ = _
   rw [covariance_uniformExp_four]
   simp [DeploymentPopulation.score, DeploymentPopulation.phenotype, twoContrastPopulation,
-    linScore, causalSignal, dot, unitWeight, rad1, rad2]
+    linScore, causalSignal, dot, unitWeight, rad1, rad2,
+      Descent.Core.innerSum]
   ring
 
 theorem twoContrast_outcomeVariance (α γ δ : ℝ) :
@@ -882,7 +884,8 @@ theorem twoContrast_outcomeVariance (α γ δ : ℝ) :
   show variance (uniformExp (Fin 4)) _ = _
   rw [variance_uniformExp_four]
   simp [DeploymentPopulation.phenotype, twoContrastPopulation, causalSignal, dot,
-    rad1, rad2]
+    rad1, rad2,
+      Descent.Core.innerSum]
   ring
 
 theorem twoContrast_statistic (α γ δ : ℝ) :
@@ -993,16 +996,19 @@ theorem twoContrastDeployment_channels (αS γS δS αT γT δT : ℝ) :
         (twoContrastPopulation αS γS δS).β) = (αT - αS) * γS
     rw [twoContrast_kappa, twoContrast_kappa]
     simp [dot, unitWeight, Matrix.mulVec, dotProduct, Matrix.sub_apply,
-      twoContrastPopulation]
+      twoContrastPopulation,
+      Descent.Core.innerSum]
   · show dot unitWeight ((twoContrastPopulation αT γT δT).kappa.mulVec
         ((twoContrastPopulation αT γT δT).β - (twoContrastPopulation αS γS δS).β))
       = αT * (γT - γS)
     rw [twoContrast_kappa]
-    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Pi.sub_apply, twoContrastPopulation]
+    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Pi.sub_apply, twoContrastPopulation,
+      Descent.Core.innerSum]
   · show dot unitWeight ((twoContrastPopulation αT γT δT).contextX
         - (twoContrastPopulation αS γS δS).contextX) = 0
     rw [twoContrast_contextX, twoContrast_contextX]
-    simp [dot, unitWeight]
+    simp [dot, unitWeight,
+      Descent.Core.innerSum]
 
 /-- **Two loud channels that cancel exactly.**
 
@@ -1594,10 +1600,12 @@ theorem oneContrast_statistic (v : Fin 4 → ℝ) :
           variance (uniformExp (Fin 4)) v) := by
   have hscore : (oneContrastPopulation v).score unitWeight = v := by
     funext ω
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+      Descent.Core.innerSum]
   have hpheno : (oneContrastPopulation v).phenotype = v := by
     funext ω
-    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, dot]
+    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, dot,
+      Descent.Core.innerSum]
   unfold portabilityStatistic DeploymentPopulation.scoreVariance
     DeploymentPopulation.predictiveCovariance DeploymentPopulation.outcomeVariance
   rw [hscore, hpheno, ← variance_eq_covariance_self]
@@ -1624,7 +1632,8 @@ theorem exceedance_balancedContrast :
   unfold exceedance
   have hscore : ∀ ω, (oneContrastPopulation balancedContrast).score unitWeight ω
       = balancedContrast ω := fun ω ↦ by
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+      Descent.Core.innerSum]
   simp only [hscore]
   show uniformExp (Fin 4) _ = _
   rw [uniformExp_four]
@@ -1637,7 +1646,8 @@ theorem exceedance_spreadContrast :
   unfold exceedance
   have hscore : ∀ ω, (oneContrastPopulation spreadContrast).score unitWeight ω
       = spreadContrast ω := fun ω ↦ by
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight]
+    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+      Descent.Core.innerSum]
   simp only [hscore]
   show uniformExp (Fin 4) _ = _
   rw [uniformExp_four]

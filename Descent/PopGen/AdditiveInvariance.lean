@@ -69,7 +69,7 @@ theorem crossCovVector_causalSignal_self
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ) :
     crossCovVector E X (causalSignal β X) = (covarianceMatrix E X).mulVec β := by
   funext i
-  unfold crossCovVector causalSignal dot covarianceMatrix Matrix.mulVec
+  unfold crossCovVector causalSignal dot covarianceMatrix Matrix.mulVec Descent.Core.innerSum
   rw [covariance_finset_sum_right]
   simp only [Matrix.of_apply, dotProduct]
   refine Finset.sum_congr rfl ?_
