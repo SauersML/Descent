@@ -77,4 +77,16 @@ def Pop.withTarget {α : Sort*} (f : Pop → α) (t : α) : Pop → α := Pop.pa
 @[simp] theorem Pop.withTarget_target {α : Sort*} (f : Pop → α) (t : α) :
     Pop.withTarget f t Pop.target = t := rfl
 
+/-- A real vector of length `n`.
+
+`PopGen.DGP` carried this twice, as `CausalVec` and `TagVec`. The two names are worth
+keeping -- a causal-effect vector and a tag-weight vector are indexed by different things
+and a theorem that swapped them would be wrong -- but the TYPE is one type, and writing
+it twice meant a change to the coding convention had two places to reach.
+
+Lean's abbreviations are transparent, so this buys no type safety: `CausalVec c` and
+`TagVec c` are interchangeable to the elaborator either way. What it buys is that the
+convention has one home. -/
+abbrev RealVec (n : ℕ) := Fin n → ℝ
+
 end Descent

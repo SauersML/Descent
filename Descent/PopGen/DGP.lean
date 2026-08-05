@@ -241,8 +241,14 @@ section AllClaims
 
 variable {p k : ℕ}
 
-abbrev CausalVec (c : ℕ) := Fin c → ℝ
-abbrev TagVec (t : ℕ) := Fin t → ℝ
+/-- Causal effects, indexed by causal variant. -/
+abbrev CausalVec (c : ℕ) := Descent.RealVec c
+
+/-- Score weights, indexed by scored (tag) variant. Not `CausalVec`: the index sets are
+different, and a theorem that swapped them would be about the wrong variants. Lean's
+abbreviations are transparent so the distinction is documentary, which is why it is
+written down here rather than left to the names. -/
+abbrev TagVec (t : ℕ) := Descent.RealVec t
 
 /-! ### Discrete HWE Score DGP
 

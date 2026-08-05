@@ -398,11 +398,18 @@ section OracleAndRegret
 
 /-! ### Oracle Comparison at Population Level -/
 
-/-- True conditional probability on feature space `Z`. -/
-abbrev TrueCondProb (Z : Type u) := Z → UnitProb
+/-- A map from a feature space to a probability. Both names below are this type; they
+differ in what the map is CLAIMED to be, and the whole oracle comparison is about the
+gap between the two claims. -/
+abbrev ProbMap (Z : Type u) := Z → UnitProb
 
-/-- Predictor on feature space `Z`. -/
-abbrev ProbPredictor (Z : Type u) := Z → UnitProb
+/-- True conditional probability on feature space `Z`: the map nature supplies. -/
+abbrev TrueCondProb (Z : Type u) := ProbMap Z
+
+/-- Predictor on feature space `Z`: the map a method fits. Same type as `TrueCondProb`
+and never the same object -- that they are indistinguishable to the type checker is the
+reason the comparison below has to be stated rather than assumed. -/
+abbrev ProbPredictor (Z : Type u) := ProbMap Z
 
 /-- Population risk under Bernoulli mixing with true probability `p(z)`. -/
 noncomputable def populationRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)

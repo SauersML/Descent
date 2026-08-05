@@ -257,8 +257,23 @@ def gate_duplicate_bodies(code):
             # `if a = b then 0 else 1`, and collapsing them would be a type error
             # wearing an arithmetic coincidence. The result type joins the key.
             result = sig.rsplit(":", 1)[-1].strip() if ":" in sig else ""
-            if "@" in norm and "Descent.Core." not in norm:
-                bodies[(norm, result)].append((name, mod))
+            # A body that is a bare application of a NAMED function to its own
+            # binders is a wrapper, and two wrappers over the same function are
+            # the repaired state, not the defect -- `rightWhiten` and
+            # `rightColor` both read `rightTransform t d`, and an edit to
+            # `rightTransform` reaches both by construction. The kernel need not
+            # live in `Core` for that to be true; what matters is that the shape
+            # is in the bodies rather than in a census.
+            delegation = re.fullmatch(
+                r"(?:[A-Za-z_][\w.'₀-₉]*|@\d+\.[\w.'₀-₉]+)"
+                r"(?:\s+[@\w.'₀-₉()]+)+", norm)
+            # Binder TYPES join the key alongside the result type.  `power` takes
+            # a natural exponent and `logCoveringAtExponent` a real one; both
+            # print `a ^ b` and both return `ℝ`, and collapsing them would be an
+            # rpow/npow confusion wearing a shared notation.
+            btypes = ";".join(sorted(re.findall(r"\([^()]*?:\s*([^()]*?)\)", sig)))
+            if "@" in norm and not delegation:
+                bodies[(norm, result, btypes)].append((name, mod))
     groups = [v for v in bodies.values() if len(v) > 1]
     return sum(len(v) - 1 for v in groups), len(groups)
 
