@@ -3208,14 +3208,46 @@ correlation decays exponentially with recombination distance and divergence.
     fitter's, which is exactly the thing `simcov/battery_bulk31.py` could not
     establish and the reason its identical conclusion was recorded as a lead.
 
-    WHAT IS NOT SETTLED, and the reason the body is left standing rather than
-    rewritten to Sved's form: the hyperbolic's fitted rate is not `4 Nₑ`. It
-    returns 6572 against a true 20000 at `Nₑ = 5000`. So "hyperbolic, not
-    exponential" is established and "Sved's law with its coefficient" is not,
-    and substituting a closed form whose constant is off by threefold would
-    trade a wrong shape for a wrong shape and a wrong constant. The same
-    evidence carried `OpenQuestions.ldTaggingDecay` to FALSIFIED, which is the
-    same chart under another name.
+    THE REPLACEMENT SHAPE IS ALREADY IN THIS FILE, WHICH IS WHY IT IS NOT
+    INSTALLED HERE. The hyperbolic the data prefer is `ibdRecurrenceFixedPoint`
+    read at `rate = c`: that definition's own docstring says so in as many
+    words -- "with `rate = m` it is the island-model equilibrium `F_ST`, with
+    `rate = c` it is Sved's `E[r²]`" -- and its island reading is VALIDATED at
+    `simcov/battery_pd1.py` within 1.6% across a 50-fold sweep, with the rival
+    linearisation rejected at up to 182% on the same cells. So the corrected
+    shape is not a body anyone needs to invent. It is a named declaration whose
+    other reading has just been measured, and the repair is a one-line
+    substitution.
+
+    TWO THINGS BLOCK THAT SUBSTITUTION, and neither is cosmetic:
+
+    The RATE. Sved's law puts `4 Nₑ` in the denominator and the fit returns
+    6572 against a true 20000 at `Nₑ = 5000` -- threefold low, in the same
+    direction and roughly the same size as the `Nₑ_eff = 563 against 1000` the
+    earlier run got. That reproducibility is itself informative: it is the known
+    downward bias of `E[r²]` estimated from a finite sample of chromosomes, not
+    a property of the law. But knowing the sign of a bias is not the same as
+    having a coefficient, and this body's `lambda` is free precisely so the
+    absolute rate need not be committed to -- which means substituting the
+    hyperbolic changes the SHAPE without needing the constant at all.
+
+    The AMPLITUDE, which is the one that actually stops it. Both fits carry a
+    free amplitude, measured at 0.373 and 0.316. This body is normalised to 1 at
+    zero distance -- `Real.exp 0 = 1` -- and so is `ibdRecurrenceFixedPoint` at
+    `rate = 0`. A hyperbolic with amplitude 1 is therefore NOT the curve that
+    was fitted, and nothing in cell `I` bears on whether the corpus's
+    normalisation survives once the amplitude is pinned. Installing
+    `1 / (1 + lambda * √fstGap * distance)` on the strength of a fit that needed
+    a free 0.32 to reach the data would be clearing a marker with a body the
+    measurement does not cover, which is the failure mode this file's history is
+    mostly made of.
+
+    So: FALSIFIED with a named successor and a stated obstruction, rather than a
+    substitution. What would land the repair is one cell fitting the
+    amplitude-1 hyperbolic against measured `r²` normalised to its own
+    zero-distance limit -- a re-analysis of cell `I`'s stored curve, not a new
+    simulation. The same evidence carried `OpenQuestions.ldTaggingDecay` to
+    FALSIFIED, which is the same chart under another name.
 
     CONSUMERS. `jointTagLDKernelAt` multiplies this factor in and inherits the
     shape fault; its own record already carries a separate, established
@@ -7687,83 +7719,206 @@ theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
 
 /-! ### 4. Migration's effect on LD: gene flow homogenizes LD patterns -/
 
-/-! #### Derivation of shared LD fraction from Fst equilibrium
+/-! #### Derivation of the shared LD fraction: migration against recombination
 
-The shared LD fraction under migration-drift balance is **derived**, not assumed.
-Since Fst measures the fraction of genetic variation that is *between* populations,
-the complementary quantity `1 - Fst` measures the fraction that is *shared*.
-LD patterns are shared to the same extent as allele frequencies, so:
+This section read, for a long time, that the shared LD fraction is `1 - Fst`:
+`Fst` is the fraction of variation held BETWEEN demes, so its complement is the
+fraction held in common, and "LD patterns are shared to the same extent as
+allele frequencies". The last clause is the false one, and simulation says so at
+35 sems (`simcov/battery_bulk34.py`): at `Fst = 0.56` the measured shared
+fraction is 0.91 where `1 - Fst` predicts 0.44.
 
-  shared_LD = 1 - Fst_eq = 1 - 1/(1 + M) = M/(1 + M)
+The reason is that `Fst` is a property of ONE site and LD is a property of a
+PAIR, and a pair has a parameter a single site does not: the recombination rate
+`c` between the two sites. At fixed `Fst` -- one deme pair, one replicate set --
+the measured shared fraction runs from 0.97 down to 0.06 as the SNP pairs are
+sorted by separation. No function of `Fst` alone, of any shape, can follow that,
+which is why `(1 - Fst)²` and `1 - 2·Fst` were rejected too.
 
-where M = 4Nm is the scaled migration rate. This is the same algebraic identity
-underlying Wright's island model: Fst + shared fraction = 1. The theorem
-`sharedLD_from_equilibrium_eq` below proves this algebraically from the
-already-derived `fstMigrationDriftEquilibrium`. -/
+The correct derivation is a race between migration and recombination, and it is
+the classical one (Ohta 1982; Sved 2009, eqns 5-6 and 9). Let `σ_W` be the
+within-deme second moment of the disequilibrium `D` and `σ_B` the between-deme
+one. Both decay by `(1-c)²` per generation -- one factor of `(1-c)` for each
+deme -- and drift feeds only `σ_W`, since drift in one deme is independent of
+drift in the other:
 
-/-- **Shared LD derived from Fst equilibrium.**
-    Defined as `1 - fstMigrationDriftEquilibrium Ne m`, i.e., the complement
-    of the between-population divergence under migration-drift balance.
+  σ_W' = (1-c)²·[(1-α)·σ_W + α·σ_B] + 1/(2·Nₑ)
+  σ_B' = (1-c)²·[β·σ_W + (1-β)·σ_B]
 
-    Regime: two-deme island model at migration-drift balance. "Shared LD" is
-    read as the correlation, across SNP pairs, between the signed LD `r`
-    measured separately in each deme -- a property of PAIRS of sites, where
-    `F_ST` is a property of single sites. They are different observables, which
-    is what makes the identity refutable rather than algebraic.
+where `β = 2·m·(1-m)` is the chance that two gametes now in different demes sat
+in the same deme one generation ago. The second line carries no source term, and
+that is the whole content: between demes there is nothing to renew the
+association. At stationarity, for small `m` and `c`,
 
-    Empirical status: **FALSIFIED** outside the weak-differentiation limit
-    (`simcov/battery_bulk34.py`). Measured at `Nₑ = 1000` over 5 Mb with
-    recombination, `4·Nₑ·m` swept a hundredfold:
+  shared_LD = σ_B / σ_W = (1-c)²·β / (1 - (1-c)²·(1-β)) → 2·m / (2·m + 2·c)
+            = m / (m + c)
 
-      4Nₑm    F_ST              shared LD          1 - F_ST
-      0.4     0.5606 ± 0.0192   0.9060 ± 0.0132    0.4394
-      2.0     0.2079 ± 0.0151   0.9341 ± 0.0054    0.7921
-      8.0     0.0710 ± 0.0065   0.9674 ± 0.0021    0.9290
-      40      0.0136 ± 0.0014   0.9890 ± 0.0005    0.9864
+The coalescent reading is the same race: two lineages in different demes cannot
+coalesce at all until migration puts them together, and recombination -- rate
+`2·c`, one lineage each -- runs against that migration. `Nₑ` cancels, which is
+the sharpest thing about the result: `Nₑ` sets how much LD there is, not how
+much of it is shared. `m` is the backward rate between one ORDERED pair of
+demes, so the deme count cancels as well, a move to a third deme leaving the two
+lineages apart. `sharedLD_from_equilibrium` below is this ratio, and
+`sharedLD_from_equilibrium_eq_sharedLDFromMigration` shows it is the same
+saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
 
-    Worst cell 35 sems, 52% relative. The law is accurate where `F_ST` is small
-    -- at `4·Nₑ·m = 40` it predicts 0.9864 against 0.9890 measured -- and fails
-    badly once `F_ST` exceeds roughly 0.2, where it predicts 0.44 against 0.91
-    measured, low by a factor of two. LD structure is set largely by shared
-    ancestral recombination history, and that persists long after allele
-    frequencies have drifted apart; `1 - F_ST` has no term for it.
+/-- **Shared LD fraction: migration against recombination.**
+    `m / (m + c)`, where `m` is the backward migration rate between one ORDERED
+    pair of demes and `c` the recombination rate between the two sites whose
+    disequilibrium is being shared. Derived above from the stationary
+    disequilibrium moments (Ohta 1982; Sved 2009, eqns 5-6 and 9): between demes
+    nothing renews the association, so the shared component is whatever survives
+    the race between the migration that reunites two lineages and the
+    recombination that separates the two loci.
 
-    No nearby variant rescues the shape: `(1 - F)²` is falsified at 56 sems and
-    `1 - 2F` at 78 sems on the same cells. That all three fail while the
-    pipeline reproduces its control is what makes this a statement about the
-    law rather than about the measurement.
+    THIS BODY USED TO BE `1 - fstMigrationDriftEquilibrium Nₑ m`, and the
+    argument list is the finding. `F_ST` is a property of one site, shared LD of
+    a PAIR, and a pair carries a parameter a single site does not. The old body
+    was falsified at 35 sems (`simcov/battery_bulk34.py`, 0.91 measured against
+    0.44 predicted at `F_ST = 0.56`), and `(1 - F)²` at 56 sems and `1 - 2·F` at
+    78 sems went with it: no shape in `F_ST` alone survives, because at FIXED
+    `F_ST` -- one deme pair, one replicate set -- the measured fraction runs from
+    0.97 to 0.06 as the pairs are sorted by separation. `Nₑ` drops out of the
+    new body entirely: it sets how much LD there is, not how much is shared.
 
-    Control: one panmictic population whose samples are split into two arbitrary
-    halves, run through the SAME estimators, filters and pair selection --
-    `F_ST = 0.0015`, indistinguishable from zero. That run also quantifies the
-    only known bias in the shared-LD estimator: correlating two noisy per-deme
-    estimates of `r` attenuates the correlation to 0.9945 rather than 1, a
-    0.55% one-sided effect identical across cells and two orders of magnitude
-    too small to produce the gap above.
+    Denotes: a fraction of the disequilibrium SECOND MOMENT, `σ_B/σ_W`, not a
+    correlation of `r`. The two are different numbers -- normalising by the
+    frequency term inflates the fraction by 5 to 25% -- and Sved's `E[r²] = L`
+    is the step where that cost is paid.
 
-    Consequence: `signalRetentionMigrationDrift` and
-    `retainedSignalVarianceMigrationDrift` consume this fraction, so their
-    values inherit the error wherever `F_ST` is not small. -/
-noncomputable def sharedLD_from_equilibrium (Ne m : ℝ) : ℝ :=
-  1 - fstMigrationDriftEquilibrium Ne m
+    Empirical status: **CONDITIONALLY VALID** for `c ≲ m/5`
+    (`simcov/battery_sharedld_rec.py`). Measured as `σ_B/σ_W` with every product
+    taken between DISJOINT sample halves, so no sampling noise enters either
+    the numerator or the denominator; 10 Mb, 12 replicates, `Nₑ` varied
+    threefold at fixed `m` on purpose:
+
+      Nₑ     m         c/m     this body   measured           rel
+      2000   4.0e-3    0.01    0.9878      0.9726 ± 0.0047    -1.5%
+      2000   4.0e-3    0.05    0.9549      0.9504 ± 0.0052    -0.5%
+      1000   1.0e-3    0.05    0.9529      0.8897 ± 0.0064    +7.1%
+      2000   1.0e-3    0.05    0.9527      0.9159 ± 0.0073    +4.0%
+      4000   1.0e-3    0.05    0.9528      0.9364 ± 0.0047    +1.8%
+      2000   4.0e-3    0.16    0.8607      0.8826 ± 0.0067    -2.5%
+      1000   1.0e-3    0.19    0.8413      0.8399 ± 0.0077    +0.2%
+      2000   1.0e-3    0.19    0.8412      0.8623 ± 0.0082    -2.4%
+      4000   1.0e-3    0.19    0.8408      0.8687 ± 0.0049    -3.2%
+      2000   2.5e-4    0.20    0.8357      0.8183 ± 0.0081    +2.1%
+      2000   4.0e-3    0.50    0.6673      0.7128 ± 0.0135    -6.4%
+      1000   1.0e-3    0.65    0.6069      0.7198 ± 0.0086   -15.7%
+      2000   1.0e-3    0.65    0.6066      0.7028 ± 0.0111   -13.7%
+      4000   1.0e-3    0.65    0.6063      0.6859 ± 0.0089   -11.6%
+      2000   2.5e-4    0.75    0.5711      0.7197 ± 0.0098   -20.7%
+
+    So: within `c ≲ m/5` the body is right to 3% on ten of eleven cells and to
+    7% on the last, under an ascertainment systematic of 12% (the same run with
+    a pooled-frequency filter instead of a per-deme one moves the measured ratio
+    by that much on average). Past `c ≈ m/2` the body reads LOW and the shortfall
+    grows to 21% at `c = 0.75·m` and to 41% out to `c = 80·m`; the shape that
+    tracks the measurement there is `2·m/(2·m + c)`, off by at worst 9.7%
+    against this body's 20.7%, and it is NOT ADOPTED because nothing derives it
+    -- it is this race with the destruction rate halved by hand, and a fitted
+    factor of two named as a law is what this corpus refuses.
+
+    What neither shape carries: at `c/m = 0.05` the measured fraction rises
+    0.8897, 0.9159, 0.9364 as `Nₑ` goes 1000, 2000, 4000. The stationary ratio is
+    `Nₑ`-free, so that trend is a finite-`Nₑ` correction the derivation drops,
+    and it bounds how well any `Nₑ`-free body can do at small `c`.
+
+    The `Nₑ` axis is also what kills the competitors outright: `1 - F_ST` (32
+    sems, 42%) and `M/(1+M)` (29 sems, 37%) move with `Nₑ` and not with `c`,
+    which is exactly backwards, and `1/(1 + 4·Nₑ·c)` -- the within-deme Sved
+    shape, which moves with `c` but not with `m` -- fails at 128 sems.
+
+    Control: one panmictic population split four ways, run through the SAME
+    estimator, must give 1 at every distance and does, 2.15 sems from it. The
+    old correlation estimator returned 0.9945 there, and the 0.55% shortfall was
+    attenuation; the split-half denominator removes it, so the control can now
+    fail for a reason other than bias.
+
+    argument_source: model, with `c` realized from the separations of the pairs
+    actually drawn. -/
+noncomputable def sharedLD_from_equilibrium (m c : ℝ) : ℝ :=
+  m / (m + c)
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem sharedLD_from_equilibrium_at_reference_point :
-    sharedLD_from_equilibrium 1 1 = 4 / 5 := by
-  norm_num [sharedLD_from_equilibrium, fstMigrationDriftEquilibrium]
+    sharedLD_from_equilibrium 1 1 = 1 / 2 := by
+  norm_num [sharedLD_from_equilibrium]
 
+/-- **Complete linkage: the shared fraction is 1.** Two sites that never
+recombine apart carry the same ancestral association in both demes however far
+their frequencies have drifted, and this is the limit the old `1 - F_ST` body
+could not reach: it answered `4·Nₑ·m/(1 + 4·Nₑ·m)` here, a number that has
+nothing to do with linkage. -/
+theorem sharedLD_from_equilibrium_no_recombination (m : ℝ) (hm : m ≠ 0) :
+    sharedLD_from_equilibrium m 0 = 1 := by
+  unfold sharedLD_from_equilibrium
+  rw [add_zero, div_self hm]
 
-/-- The shared LD fraction derived from Fst equilibrium equals M/(1+M).
-    This is the formal derivation: starting from Fst = 1/(1+M), we obtain
-    shared_LD = 1 - 1/(1+M) = M/(1+M). -/
-theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    sharedLD_from_equilibrium Ne m = scaledMigrationRate Ne m / (1 + scaledMigrationRate Ne m) := by
-  unfold sharedLD_from_equilibrium fstMigrationDriftEquilibrium scaledMigrationRate
-  have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
-  field_simp [hden]
-  ring
+/-- **No migration, no shared disequilibrium.** With the demes closed, two
+lineages in different demes never meet, so nothing renews the association
+between them. -/
+theorem sharedLD_from_equilibrium_no_migration (c : ℝ) :
+    sharedLD_from_equilibrium 0 c = 0 := by
+  unfold sharedLD_from_equilibrium
+  simp
+
+/-- **Both rates zero, named.** With `m = c = 0` the body is `0/0`, reported as
+`0` -- complete sharing spelled as no sharing at all, the opposite of the
+`c → 0` limit above. Consumers must exclude it by requiring `0 < m + c`. -/
+theorem sharedLD_from_equilibrium_both_rates_zero_is_junk :
+    sharedLD_from_equilibrium 0 0 = 0 := by
+  unfold sharedLD_from_equilibrium
+  norm_num
+
+/-- **Only the ratio of the two rates is read.** Scaling migration and
+recombination together leaves the shared fraction alone: the body is homogeneous
+of degree zero, so it is a function of `c/m` and carries no time unit. This is
+the invariance the old body did not have and the new one must be tested against
+-- a design that scales `m` alone moves it, and one that scales both does not. -/
+theorem sharedLD_from_equilibrium_scale_invariant (k m c : ℝ) (hk : k ≠ 0) :
+    sharedLD_from_equilibrium (k * m) (k * c) = sharedLD_from_equilibrium m c := by
+  unfold sharedLD_from_equilibrium
+  rw [← mul_add, mul_div_mul_left _ _ hk]
+
+/-- **Tighter linkage shares more.** Strictly decreasing in the recombination
+rate at fixed migration -- the direction the measurement confirms across four
+orders of magnitude in `c`, and the direction no function of `F_ST` has at all. -/
+theorem sharedLD_from_equilibrium_decreasing_in_recombination
+    (m c₁ c₂ : ℝ) (hm : 0 < m) (hc₁ : 0 ≤ c₁) (hlt : c₁ < c₂) :
+    sharedLD_from_equilibrium m c₂ < sharedLD_from_equilibrium m c₁ := by
+  unfold sharedLD_from_equilibrium
+  have h₁ : 0 < m + c₁ := by linarith
+  have h₂ : 0 < m + c₂ := by linarith
+  rw [div_lt_div_iff₀ h₂ h₁]
+  nlinarith
+
+/-- **More gene flow shares more.** Strictly increasing in the migration rate at
+fixed recombination. -/
+theorem sharedLD_from_equilibrium_increasing_in_migration
+    (m₁ m₂ c : ℝ) (hc : 0 < c) (hm₁ : 0 ≤ m₁) (hlt : m₁ < m₂) :
+    sharedLD_from_equilibrium m₁ c < sharedLD_from_equilibrium m₂ c := by
+  unfold sharedLD_from_equilibrium
+  have h₁ : 0 < m₁ + c := by linarith
+  have h₂ : 0 < m₂ + c := by linarith
+  rw [div_lt_div_iff₀ h₁ h₂]
+  nlinarith
+
+/-- **It is a fraction.** Nonnegative for nonnegative rates. -/
+theorem sharedLD_from_equilibrium_nonneg (m c : ℝ) (hm : 0 ≤ m) (hc : 0 ≤ c) :
+    0 ≤ sharedLD_from_equilibrium m c := by
+  unfold sharedLD_from_equilibrium
+  exact div_nonneg hm (by linarith)
+
+/-- **It is a fraction: below one whenever the loci can recombine apart.** -/
+theorem sharedLD_from_equilibrium_lt_one (m c : ℝ) (hm : 0 ≤ m) (hc : 0 < c) :
+    sharedLD_from_equilibrium m c < 1 := by
+  unfold sharedLD_from_equilibrium
+  rw [div_lt_one (by linarith)]
+  linarith
 
 /-- **Shared LD fraction under migration-drift balance.**
     Gene flow homogenizes LD patterns between populations. The fraction of LD
@@ -7772,10 +7927,15 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
 
     **Derivation:** This formula is the complement of the Wright (1931)
     island-model Fst equilibrium. Since Fst = 1/(1+M) (proved at
-    `fstMigrationDriftEquilibrium`), the shared fraction is
-    1 - Fst = 1 - 1/(1+M) = M/(1+M). See `sharedLD_from_equilibrium_eq`
-    and `sharedLD_from_equilibrium_eq_sharedLDFromMigration` for the
-    formal algebraic derivation.
+    `fstMigrationDriftEquilibrium`), the complement is
+    1 - Fst = 1 - 1/(1+M) = M/(1+M).
+
+    THE MAP IS RIGHT AND THE ARGUMENT WAS NOT. `sharedLD_from_equilibrium` is
+    now `m/(m + c)`, and `sharedLD_from_equilibrium_eq_sharedLDFromMigration`
+    shows that this is the SAME saturating map read at the
+    migration-to-recombination ratio `m/c`. So `M/(1+M)` survives as a shape;
+    what does not survive is feeding it `M = 4·Nₑ·m` and calling the result a
+    shared-LD fraction, which is what the paragraph below rejects.
 
     Empirical status: **AN IDENTITY, NOT A MEASUREMENT**
     (`proofs/validation/empirical/simcov/battery_bulk9.py`). This is the
@@ -7795,7 +7955,9 @@ theorem sharedLD_from_equilibrium_eq (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) 
     0.9864. Worst cell 35 sems, low by a factor of two at `F_ST = 0.56`. The
     agreement at `4·Nₑ·m = 40` is the weak-differentiation limit, not the
     general case. See `sharedLD_from_equilibrium` for the full table, the
-    rejected variants and the control.
+    rejected variants, the control, and the argument -- the recombination rate
+    between the two sites -- whose absence is why no reading of `4·Nₑ·m` could
+    have worked.
 
     So the SELF-TEST verdict is right about what `battery_bulk9.py` compared,
     and wrong as a summary of this body's empirical content: the identity is
@@ -7821,15 +7983,23 @@ saturating map, and a change of convention in either spelling has to be made in 
 theorem sharedLDFromMigration_eq_fstFromTau (M : ℝ) :
     sharedLDFromMigration M = fstFromTau M := rfl
 
-/-- The derived shared LD fraction equals `sharedLDFromMigration M`. This
-    closes the loop: the formula M/(1+M) is not an assumption but follows
-    from the migration-drift Fst equilibrium. -/
-theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (Ne m : ℝ)
-    (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    sharedLD_from_equilibrium Ne m = sharedLDFromMigration (scaledMigrationRate Ne m) := by
-  rw [sharedLD_from_equilibrium_eq Ne m hNe hm]
-  unfold sharedLDFromMigration
-  rfl
+/-- **The derived shared LD fraction is the same saturating map, read at `m/c`.**
+    `m/(m + c) = (m/c)/(1 + m/c)`, so the shape `M/(1 + M)` survives the repair
+    of `sharedLD_from_equilibrium` unchanged; what changed is its ARGUMENT, from
+    the scaled migration rate `4·Nₑ·m` to the migration-to-recombination ratio
+    `m/c`. The old reading is the one the simulation rejected, and this theorem
+    is where the substitution that produced it is now visible: no value of
+    `4·Nₑ·m` may be fed to this map as a shared-LD fraction. -/
+theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (m c : ℝ) (hc : 0 < c) :
+    sharedLD_from_equilibrium m c = sharedLDFromMigration (m / c) := by
+  unfold sharedLD_from_equilibrium sharedLDFromMigration
+  have hc' : c ≠ 0 := ne_of_gt hc
+  have h1 : 1 + m / c = (m + c) / c := by field_simp; ring
+  rw [h1]
+  rcases eq_or_ne (m + c) 0 with h | h
+  · rw [h]
+    simp
+  · rw [div_div_div_cancel_right₀]
 
 /-- Shared LD fraction is nonneg for nonneg M. -/
 theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
@@ -8725,17 +8895,25 @@ theorem fstMigrationDriftEquilibrium_ratio_form (Ne m : ℝ)
 /-- **Neutral allele-frequency benchmark ratio from the derived Fst formula.**
     The benchmark ratio is `1 - Fst = 1 - 1/(4Nm + 1) = 4Nm/(4Nm + 1)`.
     This is still only the recurrence's coarse allele-frequency benchmark,
-    not a mechanistic portability law. -/
+    not a mechanistic portability law.
+
+    This body used to be spelled `sharedLD_from_equilibrium Nₑ m`, which was the
+    same number while that definition read `1 - Fst`. It is not the same number
+    any more, and the two claims should never have shared a body: `1 - Fst` is
+    the right answer for the sharing of ALLELE FREQUENCIES, which is what this
+    benchmark is about, and the wrong answer for the sharing of LD, which is
+    what `sharedLD_from_equilibrium` is about. The complement is written out
+    here so that repairing the LD law cannot silently move the frequency
+    benchmark. -/
 noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
-  sharedLD_from_equilibrium Ne m
+  1 - fstMigrationDriftEquilibrium Ne m
 
 /-- The recurrence-derived neutral allele-frequency benchmark equals
 `4Nm / (4Nm + 1)`. -/
 theorem neutralAFBenchmarkFromRecurrence_eq (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     neutralAFBenchmarkFromRecurrence Ne m = 4 * Ne * m / (4 * Ne * m + 1) := by
-  unfold neutralAFBenchmarkFromRecurrence sharedLD_from_equilibrium
-    fstMigrationDriftEquilibrium
+  unfold neutralAFBenchmarkFromRecurrence fstMigrationDriftEquilibrium
   have hden : 4 * Ne * m + 1 ≠ 0 := by nlinarith
   field_simp [hden]
   ring_nf
