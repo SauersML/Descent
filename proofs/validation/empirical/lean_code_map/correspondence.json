@@ -561,6 +561,49 @@
    "correspondence": "absent",
    "lean": null,
    "note": "UNGUARDED. Deserialisation and I/O; no mathematical content and no corpus counterpart is wanted."
+  },
+  {
+   "code": {
+    "body_sha256": "sha256:dbac474ac76a441b3c1b1dabfee9ef75a75ef8fb8c2853670dd40a547da14158",
+    "field": "the ridged information matrix",
+    "file": "map/project.rs",
+    "guard_surface": [],
+    "symbol": "build_dense_lower_info_matrix"
+   },
+   "correspondence": "approximate",
+   "lean": {
+    "body_checksum": "sha256:afca8b1134caa53aed765458f5f180e2",
+    "name": "Calibrator.ridgedInfoMatrix"
+   },
+   "note": "The code adds WLS_RIDGE = 1e-5 to the diagonal of a Gram information matrix. The corpus states what that constant has to satisfy -- strictly positive -- and proves that it is what stops a rank-deficient design from producing a nonpositive Cholesky pivot. NOT a model of the projection solve: the missing-axis renormalization, the sparse/dense missingness split and the per-sample downdate are unformalized and deliberately unclaimed."
+  },
+  {
+   "code": {
+    "body_sha256": "sha256:b3f8651545eff6be7aa8d56676d16e63ae81c86cb2cf2c7167348feb4021416b",
+    "field": "the `!diag.is_finite() || diag <= 0.0` failure branch",
+    "file": "map/project.rs",
+    "guard_surface": [
+     [
+      "is_finite",
+      1
+     ],
+     [
+      "recip",
+      1
+     ],
+     [
+      "sqrt",
+      1
+     ]
+    ],
+    "symbol": "factorize_spd_lower_in_place"
+   },
+   "correspondence": "approximate",
+   "lean": {
+    "body_checksum": "stmt:e922c984edf1e6b5e69c54ee164dbc8a",
+    "name": "Calibrator.ridged_infoQuadraticForm_pos"
+   },
+   "note": "The branch exists because a pivot can be nonpositive. With a strictly positive ridge on a positive-semidefinite matrix it cannot be, for arithmetic reasons; what remains is numerical. Finiteness is not representable over Lean's reals, so the `is_finite` half has no counterpart and is not claimed."
   }
  ]
 }

@@ -18,6 +18,20 @@
 //! `m = n`, where the spike collapses to zero and every constant satisfies them.
 //! A `4 -> 2` spike constant passes all sixteen reference points. It does not
 //! survive one pass over this grid.
+//!
+//! # Where the calibration is placed, and why that is the whole point
+//!
+//! A calibration certifies an instrument only over the region it occupies.
+//! Elsewhere in this project a mutation harness placed all three of its probes
+//! in the first ten lines of each file, while the failure mode it needed to
+//! catch -- Lean truncating after 100 errors -- can only ever affect the tail;
+//! it passed 3/3 while 24 of 101 files were being scored as compiling without
+//! being read.
+//!
+//! So `the_differential_rejects_a_wrong_corpus_value` below plants its defect in
+//! the **last** fixture as well as the first. A comparison loop that stopped
+//! early, capped its findings, or ran out of fixtures would still pass a
+//! head-only calibration, and would fail this one.
 
 use correctability_calculator_contract::correctability::{calculate, CorrectabilityInput};
 use serde::Deserialize;
@@ -39,7 +53,7 @@ struct Fixture {
     input: CorrectabilityInput,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 struct ExpectedReport {
     effective_subgroup_size: f64,
     total_frequency_information: f64,
@@ -47,7 +61,7 @@ struct ExpectedReport {
     marker_classes: Vec<ExpectedClass>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 struct ExpectedClass {
     aspect_ratio: f64,
     bbp_spike: f64,
@@ -84,8 +98,7 @@ fn close_opt(actual: Option<f64>, expected: Option<f64>) -> bool {
     }
 }
 
-#[test]
-fn every_lean_body_agrees_with_the_shipped_calculator() {
+fn load() -> (Vec<Fixture>, Vec<ExpectedReport>) {
     let fixtures: Vec<Fixture> = serde_json::from_str(FIXTURES).expect("fixtures.json");
     let expected: Vec<ExpectedReport> = serde_json::from_str(EXPECTED).expect("expected.json");
     assert_eq!(
@@ -100,7 +113,21 @@ fn every_lean_body_agrees_with_the_shipped_calculator() {
          constant is worse than no differential, because it reports PASS",
         fixtures.len()
     );
+    (fixtures, expected)
+}
 
+/// Compare the whole grid. Returns `(comparisons made, disagreements)`.
+///
+/// Nothing here aborts early, and that is deliberate. This function used to
+/// `assert_eq!` on the marker-class count inside the loop, which would panic on
+/// the first structural mismatch and hide every finding after it -- the same
+/// head-only blindness the calibration above exists to rule out. A structural
+/// mismatch is now a recorded disagreement like any other, so one bad fixture
+/// cannot conceal the state of the remaining four hundred.
+///
+/// The returned count is complete; only the *rendering* of the failure message
+/// is truncated, and it prints the full total alongside the sample.
+fn compare(fixtures: &[Fixture], expected: &[ExpectedReport]) -> (usize, Vec<String>) {
     let mut disagreements = Vec::new();
     let mut comparisons = 0usize;
 
@@ -141,12 +168,16 @@ fn every_lean_body_agrees_with_the_shipped_calculator() {
             want.combined_information_index,
         );
 
-        assert_eq!(
-            report.marker_classes.len(),
-            want.marker_classes.len(),
-            "{}: marker class count",
-            fixture.tag
-        );
+        if report.marker_classes.len() != want.marker_classes.len() {
+            disagreements.push(format!(
+                "{} marker class count: implementation {}, corpus {}",
+                fixture.tag,
+                report.marker_classes.len(),
+                want.marker_classes.len()
+            ));
+            continue;
+        }
+
         for (index, (got, wanted)) in report
             .marker_classes
             .iter()
@@ -233,15 +264,26 @@ fn every_lean_body_agrees_with_the_shipped_calculator() {
         }
     }
 
+    (comparisons, disagreements)
+}
+
+#[test]
+fn every_lean_body_agrees_with_the_shipped_calculator() {
+    let (fixtures, expected) = load();
+    let (comparisons, disagreements) = compare(&fixtures, &expected);
+
     assert!(
         comparisons >= 3000,
-        "only {comparisons} comparisons ran; the grid is not exercising the report"
+        "only {comparisons} comparisons ran over {} fixtures; the grid is not \
+         exercising the report",
+        fixtures.len()
     );
     assert!(
         disagreements.is_empty(),
         "{} of {comparisons} comparisons disagree between the corpus and the \
          implementation. Decide which side is right and fix that side; do not \
-         re-bless expected.json to make this pass.\n{}",
+         re-bless expected.json to make this pass.\nFirst 20 of {}:\n{}",
+        disagreements.len(),
         disagreements.len(),
         disagreements
             .iter()
@@ -249,6 +291,76 @@ fn every_lean_body_agrees_with_the_shipped_calculator() {
             .cloned()
             .collect::<Vec<_>>()
             .join("\n")
+    );
+}
+
+/// Both directions, committed rather than run by hand once.
+///
+/// A differential that has only ever been observed to pass is indistinguishable
+/// from one that cannot fail. Each perturbation below is a single field of a
+/// single fixture, and each must be reported.
+///
+/// The perturbations are applied at the **last** fixture and at the **first**.
+/// The tail is the half that matters: any early `break`, any cap on the
+/// disagreement list, any short read of the fixture file would leave a
+/// head-only calibration passing while the tail went unexamined.
+#[test]
+fn the_differential_rejects_a_wrong_corpus_value() {
+    let (fixtures, expected) = load();
+    let last = expected.len() - 1;
+
+    let (_, clean) = compare(&fixtures, &expected);
+    assert!(
+        clean.is_empty(),
+        "the unperturbed grid must be silent before a perturbed one means anything"
+    );
+
+    // (label, index, mutation) -- one field, one fixture, each way.
+    let mutations: Vec<(&str, usize, fn(&mut ExpectedReport))> = vec![
+        ("head: effective_subgroup_size", 0, |report| {
+            report.effective_subgroup_size += 1.0;
+        }),
+        ("head: combined_information_index", 0, |report| {
+            report.combined_information_index *= 0.5;
+        }),
+        ("TAIL: effective_subgroup_size", last, |report| {
+            report.effective_subgroup_size += 1.0;
+        }),
+        ("TAIL: combined_information_index", last, |report| {
+            report.combined_information_index *= 0.5;
+        }),
+        ("TAIL: bbp_spike", last, |report| {
+            report.marker_classes[0].bbp_spike *= 0.5;
+        }),
+        ("TAIL: sample_pc_overlap_squared", last, |report| {
+            report.marker_classes[0].sample_pc_overlap_squared += 1e-9;
+        }),
+        ("TAIL: detectable_by_sample_pca", last, |report| {
+            let flag = report.marker_classes[0].detectable_by_sample_pca;
+            report.marker_classes[0].detectable_by_sample_pca = !flag;
+        }),
+        ("TAIL: an Option-valued application field", last, |report| {
+            report.marker_classes[0].critical_confounding = Some(-1.0);
+        }),
+        ("TAIL: marker class dropped", last, |report| {
+            report.marker_classes.pop();
+        }),
+    ];
+
+    let mut undetected = Vec::new();
+    for (label, index, mutate) in mutations {
+        let mut perturbed = expected.clone();
+        mutate(&mut perturbed[index]);
+        let (_, found) = compare(&fixtures, &perturbed);
+        if found.is_empty() {
+            undetected.push(label);
+        }
+    }
+
+    assert!(
+        undetected.is_empty(),
+        "the differential did not report these planted defects, so it is not \
+         calibrated over the region they occupy: {undetected:?}"
     );
 }
 
@@ -263,13 +375,19 @@ fn every_lean_body_agrees_with_the_shipped_calculator() {
 /// `overlap < 1` guarantee that keeps it finite.
 #[test]
 fn no_shipped_output_is_non_finite_or_out_of_range() {
-    let fixtures: Vec<Fixture> = serde_json::from_str(FIXTURES).expect("fixtures.json");
+    let (fixtures, _) = load();
     let mut problems = Vec::new();
+    // A fixture the calculator rejects is skipped, so this test could pass by
+    // examining nothing at all if the validator ever started refusing the grid.
+    // Counting what was actually looked at, and requiring a floor, is the
+    // difference between "found no problems" and "did not look".
+    let mut examined = 0usize;
 
     for fixture in &fixtures {
         let Ok(report) = calculate(&fixture.input) else {
             continue;
         };
+        examined += 1;
         for value in [
             report.effective_subgroup_size,
             report.total_frequency_information,
@@ -321,5 +439,12 @@ fn no_shipped_output_is_non_finite_or_out_of_range() {
         }
     }
 
+    assert!(
+        examined >= fixtures.len(),
+        "only {examined} of {} fixtures produced a report; the rest were rejected \
+         by the validator and silently skipped, so this audit did not look at the \
+         grid it claims to cover",
+        fixtures.len()
+    );
     assert!(problems.is_empty(), "{}", problems.join("\n"));
 }

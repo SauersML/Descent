@@ -46,6 +46,7 @@ to declaration names plus a content hash.
 """
 
 import argparse
+import hashlib
 import json
 import math
 import pathlib
@@ -123,9 +124,24 @@ def corpus_names():
     names = {}
     for name in definitions:
         names[name] = api.body_checksum(name)
-    for name in theorems:
-        names.setdefault(name, None)
+    for name, row in theorems.items():
+        names.setdefault(name, _statement_checksum(row))
     return names
+
+
+def _statement_checksum(theorem_row):
+    """Checksum for a mapped THEOREM.
+
+    `api.body_checksum` covers definitions only, so a table entry naming a
+    theorem used to record `None` and silently opt out of CORPUS-STALE. A
+    correspondence often lands on a theorem rather than a definition -- what
+    `map/project.rs`'s Cholesky failure branch corresponds to is the positivity
+    RESULT, not any one body -- so the statement is hashed instead. An entry
+    that cannot be checksummed at all must fail, not opt out.
+    """
+    statement = theorem_row.get("statement", "")
+    normalized = " ".join(statement.split())
+    return "stmt:" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:32]
 
 
 def load_sources():
@@ -174,11 +190,12 @@ def mapped_lean_files(table):
 
     files = set()
     definitions = api.definition_table()
+    theorems = api.theorems()
     for entry in table["entries"]:
         lean = entry.get("lean")
         if lean is None:
             continue
-        row = definitions.get(lean["name"])
+        row = definitions.get(lean["name"]) or theorems.get(lean["name"])
         if row is not None:
             files.add(row["file"])
     return files
@@ -365,7 +382,10 @@ def bless():
             # declaration has no numeric body but still has a checksum; if a
             # name genuinely cannot be resolved, that is a finding about the
             # table, so let it raise here rather than at check time.
-            lean["body_checksum"] = api.body_checksum(lean["name"])
+            if lean["name"] in api.theorems():
+                lean["body_checksum"] = _statement_checksum(api.theorems()[lean["name"]])
+            else:
+                lean["body_checksum"] = api.body_checksum(lean["name"])
         code = entry.get("code")
         if code is not None:
             path = code["file"]

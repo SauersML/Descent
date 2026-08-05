@@ -18,6 +18,7 @@ import Calibrator.TransportIdentities
 import Calibrator.SecondMomentShift
 import Calibrator.QuadraticShift
 import Calibrator.ProjectionShiftBounds
+import Calibrator.ProjectionSolve
 import Calibrator.WhiteningEquivalence
 import Calibrator.PortabilityBounds
 import Calibrator.MultiAncestryTheory
