@@ -184,16 +184,13 @@ theorem hudsonCalibrated_stratification_imitable_if_within_budget
     (hfst : 0 ≤ hudsonFst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : VarianceNonneg (S₀ - base))
-    (markerCount : ℝ)
-    (hmargin : 0 < pcCorrectabilityMargin (N : ℝ) markerCount
-      (hudsonFst p₁ p₂) (m : ℝ))
     (hbudget : traceForm S₀ +
       hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull
       ((traceWindowBudgetClass base budget).spiked S₀ (4 * hudsonFst p₁ p₂)
         (demographicSpikeDirection N m)) :=
-  imitable_despite_positive_pcCorrectabilityMargin m (hudsonFst p₁ p₂) markerCount
-    hfst hmn hN base S₀ budget hbase hbudget hmargin
+  imitable_within_traceWindowBudget m (hudsonFst p₁ p₂)
+    hfst hmn hN base S₀ budget hbase hbudget
 
 /-- **The correction to the empirically Hudson-calibrated
 `pcCorrectabilityMargin`, stated on genotypes.**
