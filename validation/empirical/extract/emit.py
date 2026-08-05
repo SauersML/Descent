@@ -293,8 +293,20 @@ def build_context(blob):
         """Resolve an unqualified call the way Lean would, or refuse.
 
         Preference: same file AND namespace, then same file, then same
-        namespace, then (within the surviving set) matching explicit arity.
-        A remaining tie raises rather than guessing.
+        namespace, then an ENCLOSING namespace of the caller, then (within the
+        surviving set) matching explicit arity.  A remaining tie raises rather
+        than guessing.
+
+        The enclosing-namespace step is what Lean does and what a kernel layer
+        needs.  `Core.PopGenParameters.theta` calls `scaledMutationRate`, and two
+        declarations bear that short name: `Descent.Core.scaledMutationRate`, the
+        kernel, and `Descent.scaledMutationRate`, a wrapper that CALLS the
+        kernel.  Neither shares the caller's namespace exactly, so without this
+        step the resolver refused the pair as ambiguous and eight declarations
+        in `Core` died at self-check.  Lean resolves it to the kernel, because
+        `Descent.Core` encloses `Descent.Core.PopGenParameters` and `Descent`
+        does not enclose it as tightly.  Longest enclosing prefix wins, which is
+        the same rule and not a guess.
         """
         def resolve(short, nargs):
             group = by_short.get(short)
@@ -309,6 +321,20 @@ def build_context(blob):
                 if narrowed:
                     cands = narrowed
                     break
+            else:
+                # No exact-namespace match.  Keep only candidates whose namespace
+                # ENCLOSES the caller's, and among those the longest -- Lean's
+                # own rule, and the one that tells a kernel from a wrapper over
+                # it.
+                cn = caller["namespace"] or ""
+                enclosing = [t for t in cands
+                             if (t["namespace"] or "") == ""
+                             or cn == t["namespace"]
+                             or cn.startswith((t["namespace"] or "") + ".")]
+                if enclosing:
+                    best = max(len(t["namespace"] or "") for t in enclosing)
+                    cands = [t for t in enclosing
+                             if len(t["namespace"] or "") == best]
             if len(cands) > 1:
                 arity = [t for t in cands
                          if sum(len(a["names"]) for a in t["args"]

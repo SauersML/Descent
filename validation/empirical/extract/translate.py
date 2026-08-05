@@ -985,9 +985,21 @@ def translate_def(d, struct_arg_names=(), fname=None, resolver=None,
     if d.get("equations"):
         pats = [e["pattern"].strip() for e in d.get("equations") or []]
         if enums and _enum_of(pats, enums):
+            # `struct_types`, `fields_of` and `dot_resolver` MUST be forwarded.
+            # Without them a branch of an enum match sees no structure types, so
+            # `ty` is None at the dot-notation test below and every `h.foo`
+            # becomes `_proj(h, 'foo')` -- a structure projection -- even when
+            # `foo` is a DERIVED definition and not a field. The inhabitant then
+            # has no such key and the definition dies with a KeyError at
+            # self-check. `HardyWeinbergModel.genotypeProb` reading `h.refFreq`
+            # is the case that showed it: `refFreq` is `1 - h.altFreq`, a def,
+            # and `fields_of` correctly does not list it.
             return translate_enum_match(d, enums, struct_arg_names, fname,
                                         resolver,
-                                        qualified_resolver=qualified_resolver)
+                                        qualified_resolver=qualified_resolver,
+                                        struct_types=struct_types,
+                                        fields_of=fields_of,
+                                        dot_resolver=dot_resolver)
         return translate_recursion(d, struct_arg_names, fname, resolver)
     argnames = uniquify([pyname(n) for a in d["args"] if not a["implicit"]
                          for n in a["names"]])
