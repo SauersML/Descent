@@ -453,6 +453,56 @@ def build_flag_scope():
            f"discovery walked into a vendored or generated tree "
            f"({[p for p in found if any(x in p for x in B.SKIP_DIRS)][:3]})")
 
+    # The source-level opt-ins, which had never been observed to fire either.
+    for token, _why in B.FORBIDDEN_SOURCE:
+        expect(B.scan_source_text(KERNEL_STUB_NAME, f"let x = {token}(a, b);"),
+               f"the source scan did not report {token!r}; that entry of "
+               f"FORBIDDEN_SOURCE is decoration")
+    expect(not B.scan_source_text(KERNEL_STUB_NAME,
+                                  "let x = a.mul_add(2.0, acc);\n"
+                                  "let y = w + w;\n"),
+           "the source scan fired on the ordinary fused and doubling forms")
+
+    # THE ACCUMULATION SHAPE. Three checks pinned to the real scoring kernel,
+    # none of which had ever been observed to fire -- and one of them, the
+    # KERNEL_MINI_BATCH_SIZE ceiling, guards the single measured claim this
+    # whole guard exists for: the f32 accumulation error is flat in the variant
+    # count ONLY because the accumulator is drained every 256 variants, and
+    # pure f32 accumulation was measured at 1.2e-5 cohort SD and growing.
+    good_kernel = ("pub type SimdVec = f32x8;\n"
+                   "acc = w.mul_add(TWO, acc);\n")
+    good_batch = "pub const KERNEL_MINI_BATCH_SIZE: usize = 256;\n"
+    expect(not B.scan_kernel_shape(good_kernel, good_batch),
+           "the accumulation-shape scan fired on a kernel that has all three "
+           "properties; every plant below would then prove nothing")
+    for label, kernel, batch, needle in (
+        ("the accumulator widened to f64x8",
+         "pub type SimdVec = f64x8;\nacc = w.mul_add(TWO, acc);\n",
+         good_batch, "SimdVec"),
+        ("the flush period deleted",
+         good_kernel, "// nothing here\n", "KERNEL_MINI_BATCH_SIZE is gone"),
+        ("the flush period raised past the measured region",
+         good_kernel,
+         "pub const KERNEL_MINI_BATCH_SIZE: usize = 1000000;\n",
+         "KERNEL_MINI_BATCH_SIZE = 1000000"),
+        ("the single-rounding doubling replaced by two operations",
+         "pub type SimdVec = f32x8;\nacc = TWO * w + acc;\n",
+         good_batch, "neither the fused nor the doubling form"),
+    ):
+        result = B.scan_kernel_shape(kernel, batch)
+        expect(any(needle in f for f in result),
+               f"ACCUMULATION-SHAPE PLANT NOT CAUGHT: {label} (got {result})")
+
+    # ... and the ceiling must not fire at the value the kernel actually uses,
+    # or it is pinned to today's constant rather than to the measured region.
+    expect(not B.scan_kernel_shape(good_kernel,
+                                   "pub const KERNEL_MINI_BATCH_SIZE: usize = 4096;\n"),
+           "the flush-period ceiling fires at 4096, which it is written to "
+           "allow; the boundary is off by one")
+
+
+KERNEL_STUB_NAME = "score/kernel.rs"
+
 
 def agreements_integrity():
     """The cross-body agreement list must name real theorems and real reasons,

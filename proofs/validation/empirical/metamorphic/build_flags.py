@@ -184,6 +184,13 @@ def check_configs():
                         f".github/workflows/{name}: build flag {flag!r}. {why}.")
 
 
+def scan_source_text(rel, text):
+    """Findings for one scoring-kernel source file.  Injectable, so the
+    calibration can plant a fast-math intrinsic without editing the kernel."""
+    return [f"{rel}: uses {token}. {why}."
+            for token, why in FORBIDDEN_SOURCE if token in text]
+
+
 def check_sources():
     for rel in (KERNEL, BATCH):
         text = read(rel)
@@ -191,9 +198,7 @@ def check_sources():
             findings.append(f"MISSING: {rel} does not exist; this guard is "
                             f"pinned to a file that moved.")
             continue
-        for token, why in FORBIDDEN_SOURCE:
-            if token in text:
-                findings.append(f"{rel}: uses {token}. {why}.")
+        findings.extend(scan_source_text(rel, text))
 
 
 def check_kernel_shape():
@@ -202,6 +207,14 @@ def check_kernel_shape():
     batch = read(BATCH)
     if kernel is None or batch is None:
         return
+    findings.extend(scan_kernel_shape(kernel, batch))
+
+
+def scan_kernel_shape(kernel, batch):
+    """Findings for the accumulation shape.  Injectable for the same reason:
+    these three checks are pinned to the real kernel and had never been
+    observed to fire, which is indistinguishable from being unable to."""
+    findings = []
 
     # 1. The accumulator is f32x8 and the widening target is f64. Anchored to
     #    the declaration, not to a line number.
@@ -238,6 +251,8 @@ def check_kernel_shape():
             f"{KERNEL}: neither the fused nor the doubling form of the dosage-2 "
             f"accumulation is present. The bit-for-bit equivalence documented "
             f"at the top of that file no longer describes the code.")
+
+    return findings
 
 
 def workflow_run_paths(text):
