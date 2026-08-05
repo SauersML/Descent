@@ -84,7 +84,7 @@ theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssump
     (h : m.μ ≠ 0) :
     m.theta / m.μ = 4 * m.Ne := by
   unfold MutationDriftModelAssumptions.theta Descent.Core.scaledMutationRate
-    Descent.Core.scaledMutationRate Descent.Core.ploidy
+    Descent.Core.ploidy
   field_simp
   ring
 
@@ -224,7 +224,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
   have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := by
     unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
       PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-      Descent.Core.scaledMutationRate Descent.Core.ploidy
+      Descent.Core.ploidy
     ring_nf
   rw [hθ]
   exact ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
@@ -722,7 +722,7 @@ theorem presentDayPGSVarianceMutationDrift_eq (V_A fst_drift shared_ld : ℝ) :
 theorem presentDayPGSVarianceMutationDrift_pure_drift (V_A fst_drift : ℝ) :
     presentDayPGSVarianceMutationDrift V_A fst_drift 1 = presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   ring
 
 /-- Signal retention is nonneg under valid parameters. -/
@@ -741,7 +741,7 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
     presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld <
       presentDayPGSVariance V_A fst_drift := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have h1 : 0 < 1 - fst_drift := by linarith
   have h_factor : (1 - fst_drift) * shared_ld < (1 - fst_drift) * 1 :=
     mul_lt_mul_of_pos_left hld_lt h1
@@ -873,7 +873,7 @@ theorem equilibrium_drift_component_improves_with_theta
     (h_more : θ₁ < θ₂) :
     presentDayPGSVariance V_A (1 / (1 + θ₁)) <
       presentDayPGSVariance V_A (1 / (1 + θ₂)) := by
-  unfold presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have h1 : 0 < 1 + θ₁ := by linarith
   have h2 : 0 < 1 + θ₂ := by linarith
   -- 1/(1+θ₂) < 1/(1+θ₁), so 1 - 1/(1+θ₁) < 1 - 1/(1+θ₂)
@@ -903,7 +903,7 @@ theorem mutationDrift_variance_ratio (V_A fst shared_ld : ℝ)
     presentDayPGSVarianceMutationDrift V_A fst shared_ld /
       presentDayPGSVariance V_A fst = shared_ld := by
   rw [presentDayPGSVarianceMutationDrift_eq]
-  unfold presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have hfst_ne : 1 - fst ≠ 0 := by linarith
   have hVA_ne : V_A ≠ 0 := ne_of_gt hVA
   field_simp [hfst_ne, hVA_ne]

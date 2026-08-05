@@ -804,4 +804,50 @@ theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
     Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig :=
   rfl
 
+/-! ### `genotypeVarianceHWE`, moved here so two modules that cannot see each other can name it
+
+`PortabilityDrift/PresentDayMoments` states the allele-frequency retention as a ratio of
+these, and `AncestrySpecificPower` -- where this used to live -- imports the
+`PortabilityDrift` head, so the definition could not stay there without a cycle. It is the
+same declaration in the same namespace, so every existing caller resolves unchanged:
+anything that reached `AncestrySpecificPower` reaches this file through that same head
+import. -/
+/-- **Genotype variance under HWE.**
+    For a biallelic locus with MAF p, the dosage G ∈ {0, 1, 2}
+    follows Binomial(2, p). Its variance is 2p(1-p), and this equals the
+    per-locus information content.
+
+    This is the corpus-wide genotype variance at a biallelic locus. It was
+    written out independently in `CovarianceStructure`, `StratificationConfounding`
+    and `GeneticArchitectureDiscovery`; those definitions are gone and their
+    references point here, so the ploidy convention is stated in one place.
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below ties it to the kernel it
+    calls, which derives the factor of two from `ploidy`.
+
+    Empirical status: **VALIDATED**
+    (`validation/empirical/simcov/battery_ldsc.py`, `test_hwe_fork`).
+    Two million Hardy-Weinberg genotypes per cell against the realised dosage
+    variance: worst 1.72 sems over a prediction spanning 0.09500 to 0.50000.
+
+    Independently VALIDATED again by `validation/empirical/simcov/battery_core.py`,
+    `test_hwe_variance`: realised dosage variance over 400000 Hardy-Weinberg
+    genotypes per cell, worst 0.88 sems over a prediction spanning 0.09500 to
+    0.50000. That battery was recorded against a third name for this body, in
+    Program/Conventions, which has since been deleted; both records measure
+    this quantity against the same oracle, so they belong on one declaration
+    rather than one apiece.
+
+    This body is `hweHeterozygosity` as well -- two names in two files, both
+    measured against that oracle, so a divergence between them would show up.
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below joins them, so the ploidy
+    convention has exactly one place to change. The two names are kept because
+    they denote two different things that coincide -- see below.
+
+    Denotes: a variance — the variance of the dosage `G ∈ {0, 1, 2}`. It is
+    *not* the allelic variance `p(1-p)`, and it is numerically but not
+    conceptually the heterozygote frequency `hweHeterozygosity`; the formula
+    alone does not fix which is meant, so the identity is stated as
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below. -/
+noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
+
 end Descent.Portability
