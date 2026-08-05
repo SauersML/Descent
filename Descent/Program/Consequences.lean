@@ -9,6 +9,8 @@ import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.EquityAndImplementation
 import Descent.PopGen.HumanDemography
+import Descent.PopGen.DemographicCapacity
+import Descent.Portability.CorrectionBiology
 
 /-!
 # What the separate results say when they are put together
@@ -214,5 +216,42 @@ theorem the_bounded_quantity_is_one_quantity
     0 ≤ neutralDriftR2Ratio V_A V_E fst ∧ neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
   ⟨neutralDriftR2Ratio_eq_core V_A V_E fst,
    neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
+
+/-! ### What correction cannot reach, and what the convention says the number is -/
+
+/-- **Pooled correction misses exactly one direction, and that direction is where the
+demographic contrast lives.**
+
+`CorrectionBiology.dynamics_common_contrast_decomposition` proves the normal form: every
+two-dynamics effect field is its pooled, recoverable component plus one scalar multiple of
+a single contrast direction, and the pooled projector is blind to that multiple.
+`DemographicCapacity.contrastSpikeLevel_eq_four_neiGst` proves what the contrast's
+magnitude IS -- four times Nei's `G_ST` between the two populations.
+
+So the unrecoverable component is not an unknown residual: it is a named function of the
+allele-frequency divergence, and it grows with it. Correcting harder does not shrink it,
+because the projector's blindness is structural rather than statistical.
+
+**And the four matters.** `contrastSpikeLevel` is `4 · G_ST`, NOT `G_ST` and not
+`F_ST` -- the corpus records that Nei's `G_ST` is FALSIFIED against the split law at up
+to 18.59 sems where Hudson's matches at 0.03, so reading this level as a Hudson `F_ST`
+misstates the unrecoverable component by a factor that moves with the data. The
+convention is why the two results can be composed at all. -/
+theorem unrecoverable_component_is_the_divergence
+    (β : Bool → ℝ) (p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • dynamicsContrast ∧
+      contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ :=
+  ⟨dynamics_common_contrast_decomposition β,
+   contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
+
+/-- **At no divergence there is nothing to miss.** The boundary that makes the previous
+theorem a statement about divergence rather than about the projector: two populations at
+the same allele frequency have contrast level exactly zero, so the blind direction carries
+nothing and pooled correction is complete. Every claim that correction leaves something
+behind is therefore a claim about the demography. -/
+theorem nothing_missed_at_no_divergence (p : ℝ) :
+    contrastSpikeLevel p p = 0 :=
+  contrastSpikeLevel_self p
 
 end Descent
