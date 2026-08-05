@@ -306,6 +306,8 @@ theorem sum_blockTransition {N k : ℕ} (hN : 0 < N) :
     Finset.card_eq_sum_card_fiberwise fun f _ ↦ hmaps f
   have htotal : ((Finset.univ : Finset (Fin k → Fin N)).card : ℝ) = (N : ℝ) ^ k := by
     rw [Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
+    push_cast
+    ring
   unfold blockTransition
   rw [← Finset.sum_div, ← Nat.cast_sum, ← hpart, htotal, div_self (ne_of_gt hNR)]
 
