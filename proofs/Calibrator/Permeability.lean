@@ -1140,7 +1140,7 @@ noncomputable def covarianceTangentEstimatorVarianceFromMoments
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem covarianceTangentEstimatorVarianceFromMoments_at_reference_point :
-    covarianceTangentEstimatorVarianceFromMoments 1 1 1 1 = 0 := by
+    covarianceTangentEstimatorVarianceFromMoments 1 1 1 3 = 2 := by
   norm_num [covarianceTangentEstimatorVarianceFromMoments, centeredSquareVarianceFromMoments]
 
 

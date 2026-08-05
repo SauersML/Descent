@@ -541,7 +541,7 @@ noncomputable def temporalCalibrationInTheLarge (π_obs π_pred : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem temporalCalibrationInTheLarge_at_reference_point :
-    temporalCalibrationInTheLarge 1 1 = 0 := by
+    temporalCalibrationInTheLarge 1 (1 / 2) = 1 / 2 := by
   norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge]
 
 
@@ -627,7 +627,7 @@ noncomputable def modelStaleness (lambda t : ℝ) : ℝ :=
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem modelStaleness_at_reference_point :
-    modelStaleness 0 0 = 0 := by
+    modelStaleness 1 1 = 1 - Real.exp (-1) := by
   norm_num [modelStaleness]
 
 

@@ -348,7 +348,7 @@ noncomputable def apparent_portability_loss
 /-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
 An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
 theorem apparent_portability_loss_at_reference_point :
-    apparent_portability_loss 2 2 = 0 := by
+    apparent_portability_loss 2 1 = 1 := by
   norm_num [apparent_portability_loss]
 
 
@@ -361,7 +361,7 @@ noncomputable def true_portability_loss
 /-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
 An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
 theorem true_portability_loss_at_reference_point :
-    true_portability_loss 2 2 = 0 := by
+    true_portability_loss 2 1 = 1 := by
   norm_num [true_portability_loss]
 
 
