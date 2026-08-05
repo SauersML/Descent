@@ -8902,14 +8902,12 @@ theorem fstMigrationDriftEquilibrium_ratio_form (Ne m : ℝ)
     This is still only the recurrence's coarse allele-frequency benchmark,
     not a mechanistic portability law.
 
-    This body used to be spelled `sharedLD_from_equilibrium Nₑ m`, which was the
-    same number while that definition read `1 - Fst`. It is not the same number
-    any more, and the two claims should never have shared a body: `1 - Fst` is
-    the right answer for the sharing of ALLELE FREQUENCIES, which is what this
-    benchmark is about, and the wrong answer for the sharing of LD, which is
-    what `sharedLD_from_equilibrium` is about. The complement is written out
-    here so that repairing the LD law cannot silently move the frequency
-    benchmark. -/
+    THIS BODY MUST NOT BE SHARED WITH `sharedLD_from_equilibrium Nₑ m`, however
+    close the two spellings look. `1 - Fst` is the right answer for the sharing
+    of ALLELE FREQUENCIES, which is what this benchmark is about, and the wrong
+    answer for the sharing of LD, which is what `sharedLD_from_equilibrium` is
+    about. The complement is written out here so that repairing the LD law
+    cannot silently move the frequency benchmark. -/
 noncomputable def neutralAFBenchmarkFromRecurrence (Ne m : ℝ) : ℝ :=
   1 - fstMigrationDriftEquilibrium Ne m
 
