@@ -148,10 +148,8 @@ convention fixes them in a single place. Without this theorem an edit to that co
 would silently stop reaching this definition. -/
 theorem islandFstFiniteDemes_eq_islandEquilibrium_no_mutation (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d = Descent.Core.fstIslandEquilibrium Ne m 0 d := by
-  unfold islandFstFiniteDemes Descent.Core.islandDemeCorrection Descent.Core.ratio
-    Descent.Core.fstIslandEquilibrium
-    Descent.Core.fstFromFlow Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
-    Descent.Core.scaledMutationRate Descent.Core.ploidy
+  rw [Descent.Core.fstIslandEquilibrium_eq]
+  unfold islandFstFiniteDemes
   ring_nf
 
 /-- **The junk value here is not merely wrong, it is inverted.**
@@ -425,9 +423,8 @@ of 200 sampled points, from the values alone. -/
 theorem fstIslandEquilibriumFiniteDemes_eq_master (Ne m μ nDemes : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = Descent.Core.fstIslandEquilibrium Ne m μ nDemes := by
-  unfold fstIslandEquilibriumFiniteDemes Descent.Core.islandDemeCorrection Descent.Core.ratio
-    Descent.Core.fstIslandEquilibrium Descent.Core.fstFromFlow Descent.Core.scaledFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  rw [Descent.Core.fstIslandEquilibrium_eq]
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
   ring_nf
 
 /-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
