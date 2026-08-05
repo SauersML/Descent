@@ -74,6 +74,17 @@ def negative_direction():
     expect(not check(correct_coal_fst, ["t", "ne"],
                      R.jointly_scales(["t", "ne"], 0)),
            "clean coalescent F_ST was reported as not rescaling-invariant")
+    # The two relation kinds that had no plant, in the clean direction too.
+    expect(not check(lambda b, w: b * w, ["b", "w"], R.odd_under_negation(["b"])),
+           "a body genuinely odd in its effect size was reported as violating "
+           "odd-under-negation")
+    # `t -> c*t, Ne -> Ne/c` leaves the PRODUCT alone, not the ratio, so the
+    # clean body here is a function of `t * Ne` -- the scaled-time parameter
+    # the corpus's reciprocal declarations are about.
+    expect(not check(lambda t, ne: (t * ne) / (t * ne + 2), ["t", "ne"],
+                     R.invariant_under_reciprocal_scaling(["t"], ["ne"])),
+           "a body genuinely invariant under reciprocal rescaling was reported "
+           "as violating it")
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +127,27 @@ def planted_order_dependence(p1, p2):
     return p1 * 0.75 + p2 * 0.25
 
 
+def planted_even_not_odd(b, w):
+    """Declared ODD in its effect sizes and actually EVEN in one of them: the
+    shape of a body that squared a signed effect somewhere it should not have,
+    so flipping the sign of every allele's effect no longer flips the score.
+
+    `negate` was one of two relation KINDS with 37 and 20 real declarations
+    between them and no planted defect anywhere -- the transform and the
+    expected-value arm for both had only ever been observed silent, which is
+    indistinguishable from being unable to fire."""
+    return b * b * w
+
+
+def planted_lost_reciprocal(t, ne):
+    """Declared invariant under `t -> c*t, Ne -> Ne/c` and actually a function
+    of `t` alone: the scaled-time parameter has come apart from the pair it is
+    built out of. Same defect class as `planted_broken_rescaling`, but through
+    the `reciprocal_scale` transform, which multiplies one argument and divides
+    the other rather than scaling both."""
+    return t / (t + 2)
+
+
 def planted_cancellation(h_t, h_s):
     """A ratio written so the units do NOT cancel: multiplying both
     heterozygosities by a common factor moves the answer, which is the signature
@@ -137,6 +169,10 @@ def positive_direction():
          ["p1", "p2"], R.symmetric_in("p1", "p2")),
         ("lost normalisation / cancellation", planted_cancellation,
          ["h_t", "h_s"], R.jointly_scales(["h_t", "h_s"], 0)),
+        ("even where the corpus declares odd", planted_even_not_odd,
+         ["b", "w"], R.odd_under_negation(["b"])),
+        ("lost reciprocal pairing", planted_lost_reciprocal,
+         ["t", "ne"], R.invariant_under_reciprocal_scaling(["t"], ["ne"])),
     ]
     for label, fn, args, rel in plants:
         expect(bool(check(fn, args, rel)),
@@ -656,8 +692,8 @@ def main():
         for f in FAILURES:
             print("  " + f)
         return 1
-    print("metamorphic gate calibration passed: 6 planted defects all caught, "
-          "3 clean bodies all silent, specificity holds, table integrity, "
+    print("metamorphic gate calibration passed: 8 planted defects all caught, "
+          "5 clean bodies all silent, specificity holds, table integrity, "
           f"{len(getattr(R, 'AGREEMENTS', ()))} cross-body agreements "
           "well-formed, no stale excuses; and the table-level probes -- empty "
           "extraction diagnosed rather than silent, coverage check fires on an "
