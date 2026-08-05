@@ -166,6 +166,7 @@ import Descent.Coalescent.SemigroupLimit
 import Descent.Coalescent.DescentTime
 import Descent.Coalescent.TrajectoryLaw
 import Descent.Coalescent.EntranceLaw
+import Descent.Coalescent.LaplaceTransform
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
