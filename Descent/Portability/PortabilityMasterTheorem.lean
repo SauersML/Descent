@@ -565,6 +565,31 @@ theorem r2_transport_of_no_shift
   rw [hcov, hvar, hout]
 
 omit [DecidableEq J] [DecidableEq L] in
+/-- **Exactly when `R²` is portable.**
+
+    An iff, so it settles the question the one-directional
+    `r2_transport_of_no_shift` only half answers: a score's `R²` survives transport
+    precisely when the cross-multiplied statistic balances, and channels that individually
+    shout can balance against each other.
+
+    Note what the condition is *not*.  It is not that the populations are similar, nor
+    that any channel is small, nor that the genetic distance between them is short.  It
+    is one polynomial equation in six numbers, and its solution set has codimension one:
+    portable deployments are a thin set, and the thin set is not the set of nearby
+    populations.  Any theory that predicts portability from a distance is predicting
+    membership of this surface from a coordinate that does not cut it. -/
+theorem r2_portable_iff
+    (hvS : D.source.scoreVariance D.w ≠ 0) (hoS : D.source.outcomeVariance ≠ 0)
+    (hvT : D.target.scoreVariance D.w ≠ 0) (hoT : D.target.outcomeVariance ≠ 0) :
+    D.target.r2 D.w = D.source.r2 D.w ↔
+      D.target.predictiveCovariance D.w ^ 2
+          * (D.source.scoreVariance D.w * D.source.outcomeVariance)
+        = D.source.predictiveCovariance D.w ^ 2
+          * (D.target.scoreVariance D.w * D.target.outcomeVariance) := by
+  unfold DeploymentPopulation.r2
+  rw [div_eq_div_iff (mul_ne_zero hvT hoT) (mul_ne_zero hvS hoS)]
+
+omit [DecidableEq J] [DecidableEq L] in
 /-- **A pure dispersion shift lowers both the calibration slope and `R²`.**
 
     Fix the signal (`Cov(S,Y)` unchanged) and the phenotype (`Var Y` unchanged), and let
