@@ -589,6 +589,11 @@ class Parser:
             # one that took 23 definitions silently: a plausible number of the
             # right sign and magnitude, no error, every consumer affected.
             # Closed before it is reached rather than after.
+            if name == "Matrix.of":
+                # `Matrix.of f` wraps a function as a `Matrix`, and a `Matrix`
+                # in this runtime IS the function -- a `VecFn` of `VecFn`s
+                # answering to `M i j`. The constructor is the identity.
+                return "_FN:_rt.identity|1"
             if name in FUNCS and name not in self.locals:
                 fn, ar = FUNCS[name]
                 return f"_FN:{fn}|{ar}"
@@ -629,6 +634,15 @@ class Parser:
                     got = self.qualified_resolver(name)
                     if got is not None:
                         return f"_QUAL:{got}"
+                # `i.val` on a `Fin` is the integer, and this harness ALREADY
+                # represents a `Fin` as one -- `admissible.type_value` returns
+                # `rng.randrange(card)` for it. So the projection is the
+                # identity here, not an unmodelled name. Six definitions were
+                # refused for reading the coordinate they were handed.
+                if len(flds) == 1 and flds[0] == "val" \
+                        and (base in self.locals or base in self.struct_args
+                             or base in self.vector_args):
+                    return pyname(base)
                 raise Untranslatable(f"qualified name {name}")
             if name in self.vector_args:
                 dim, rank = self.vector_args[name]

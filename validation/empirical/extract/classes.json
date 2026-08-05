@@ -51448,19 +51448,31 @@
   }
  },
  "Descent.Foundations.secondMomentMatrix": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Matrix.of",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 495,
   "short": "secondMomentMatrix",
   "ret_type": "Matrix J J ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "secondMomentMatrix",
+  "args": [
+   "E",
+   "X"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "X": {
+    "dim": "Ω",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.secondMoment_imitation_invisible_to_orthogonal_score",
    "Descent.Blindness.secondMoment_imitation_shift",
@@ -51522,19 +51534,31 @@
   }
  },
  "Descent.Foundations.covarianceMatrix": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Matrix.of",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 499,
   "short": "covarianceMatrix",
   "ret_type": "Matrix J J ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "covarianceMatrix",
+  "args": [
+   "E",
+   "X"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "X": {
+    "dim": "Ω",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.covarianceMatrix_addRankOneSignal",
    "Descent.Blindness.covariance_imitation_of_rankOne_closed",
@@ -51677,19 +51701,36 @@
   }
  },
  "Descent.Foundations.predictorCausalCovariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Matrix.of",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 507,
   "short": "predictorCausalCovariance",
   "ret_type": "Matrix J L ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "predictorCausalCovariance",
+  "args": [
+   "E",
+   "X",
+   "C"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "X": {
+    "dim": "Ω",
+    "rank": 2
+   },
+   "C": {
+    "dim": "Ω",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Foundations.crossCovVector_decomposition",
    "Descent.Foundations.optimalWeightsFromMoments_decomposition",
@@ -56812,17 +56853,23 @@
   }
  },
  "Descent.PopGen.sigmaTagCausal": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Matrix.of",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DGP.lean",
   "line": 400,
   "short": "sigmaTagCausal",
   "ret_type": "Matrix (Fin t) (Fin c) ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "Descent_PopGen_sigmaTagCausal",
+  "args": [
+   "dgp"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -77369,7 +77416,7 @@
  },
  "Descent.Portability.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition false",
+  "note": "self-check: calls untranslated definition true",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -77393,7 +77440,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'false' is not defined\")"
+   "error": "NameError(\"name 'true' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -86015,16 +86062,22 @@
  },
  "Descent.Portability.PCCorrectionModel.residualBias": {
   "class": "NOT-EXTRACTABLE",
-  "note": "qualified name i.val",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'int' object has no attribute 'val'\"))",
   "file": "Descent/Portability/PCCorrectability/Core.lean",
   "line": 61,
   "short": "residualBias",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "residualBias",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "AttributeError(\"'int' object has no attribute 'val'\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -119949,17 +120002,23 @@
   }
  },
  "Descent.Spectral.threeCycleFeatureA": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name i.val",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/EnsembleChannel.lean",
   "line": 267,
   "short": "threeCycleFeatureA",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "threeCycleFeatureA",
+  "args": [
+   "i"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -119975,17 +120034,23 @@
   }
  },
  "Descent.Spectral.threeCycleFeatureB": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name i.val",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/EnsembleChannel.lean",
   "line": 276,
   "short": "threeCycleFeatureB",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "threeCycleFeatureB",
+  "args": [
+   "i"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -124185,17 +124250,23 @@
   }
  },
  "Descent.Spectral.firstTwoLags": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name i.val",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/Permeability.lean",
   "line": 1425,
   "short": "firstTwoLags",
   "ret_type": "ℕ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "firstTwoLags",
+  "args": [
+   "i"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [

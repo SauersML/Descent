@@ -100,6 +100,16 @@ def rexp(x):
     return math.exp(x)
 
 
+def identity(x):
+    """`Matrix.of f = f`: the wrapper that makes a function a `Matrix`.
+
+    A `Matrix` in this runtime is already a function of its indices -- a
+    `VecFn` of `VecFn`s answering to `M i j` -- so the constructor has nothing
+    to do.
+    """
+    return x
+
+
 def factorial(n):
     """`Nat.factorial n`, on a value that arrives as a real.
 
