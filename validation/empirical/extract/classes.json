@@ -5788,17 +5788,24 @@
   }
  },
  "Descent.Blindness.magnitudeProfile": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/EpistaticChaos.lean",
   "line": 345,
   "short": "magnitudeProfile",
   "ret_type": "Fin n → ℝ",
   "empirical_status": "DERIVED",
-  "python": null,
-  "args": [],
+  "python": "magnitudeProfile",
+  "args": [
+   "coding",
+   "x"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -7000,21 +7007,28 @@
  },
  "Descent.Blindness.GenotypeDesign.cycleDensity": {
   "class": "NOT-EXTRACTABLE",
-  "note": "arity mismatch for _rt.trace: got 2",
+  "note": "self-check: calls untranslated definition overlapMatrix",
   "file": "Descent/Blindness/EpistaticChaos.lean",
   "line": 2343,
   "short": "cycleDensity",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "cycleDensity",
+  "args": [
+   "design",
+   "p"
+  ],
   "box": {
    "p": [
     1.0,
     20.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'overlapMatrix' is not defined\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -29379,7 +29393,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 3,
+   "finite_points": 5,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -51156,19 +51170,35 @@
   }
  },
  "Descent.Foundations.dot": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "WRAPPER",
+  "note": "delegates to Descent.Core.innerSum",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 364,
   "short": "dot",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "dot",
+  "args": [
+   "x",
+   "y"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "x": {
+    "dim": "ι",
+    "rank": 1
+   },
+   "y": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.gramForm_witness",
    "Descent.Blindness.mulVec_add_rankOneCovarianceBump",
@@ -51793,18 +51823,40 @@
  },
  "Descent.Foundations.optimalWeightsFromMoments": {
   "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not iterable\"))",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 521,
   "short": "optimalWeightsFromMoments",
   "ret_type": "J → ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "optimalWeightsFromMoments",
+  "args": [
+   "sigmaInv",
+   "E",
+   "X",
+   "Y"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"'function' object is not iterable\")"
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "sigmaInv": {
+    "dim": "J",
+    "rank": 2
+   },
+   "X": {
+    "dim": "Ω",
+    "rank": 2
+   },
+   "Y": {
+    "dim": "Ω",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Foundations.master_transport_identity_closed_form",
    "Descent.Foundations.optimalWeightsFromMoments_decomposition",
@@ -51895,19 +51947,41 @@
   }
  },
  "Descent.Foundations.locusTerm": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "β: indexed with 2 of 1 indices (partial application of a vector is not modelled)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 874,
   "short": "locusTerm",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "locusTerm",
+  "args": [
+   "w",
+   "K",
+   "β",
+   "l"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "w": {
+    "dim": "J",
+    "rank": 1
+   },
+   "K": {
+    "dim": "J",
+    "rank": 2
+   },
+   "β": {
+    "dim": "L",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Foundations.transported_covariance_decomposes"
   ],
@@ -77451,19 +77525,40 @@
   }
  },
  "Descent.Portability.calibrationDriftDefectSq": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 75,
   "short": "calibrationDriftDefectSq",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
-  "python": null,
-  "args": [],
+  "python": "calibrationDriftDefectSq",
+  "args": [
+   "covariateWeight",
+   "posterior",
+   "conditional"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "covariateWeight": {
+    "dim": "Covariate",
+    "rank": 1
+   },
+   "posterior": {
+    "dim": "Covariate",
+    "rank": 2
+   },
+   "conditional": {
+    "dim": "Index",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Conditionals.binaryContextMatch_calibrationDriftDefectSq_eq_quarter",
    "Descent.Conditionals.binaryContextMatch_calibrationDriftDefectSq_eq_quarter_oscillationSq",
@@ -77544,19 +77639,36 @@
   }
  },
  "Descent.Portability.posteriorPairwiseDriftEnergy": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 168,
   "short": "posteriorPairwiseDriftEnergy",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
-  "python": null,
-  "args": [],
+  "python": "posteriorPairwiseDriftEnergy",
+  "args": [
+   "posterior",
+   "conditional",
+   "x"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "posterior": {
+    "dim": "Covariate",
+    "rank": 2
+   },
+   "conditional": {
+    "dim": "Index",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.marginEnergy_eq",
    "Descent.Conditionals.binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter",
@@ -77614,8 +77726,8 @@
   }
  },
  "Descent.Portability.pairwiseCalibrationDriftEnergy": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition posteriorPairwiseDriftEnergy",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 314,
   "short": "pairwiseCalibrationDriftEnergy",
@@ -77629,9 +77741,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'posteriorPairwiseDriftEnergy' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -77819,19 +77931,37 @@
   }
  },
  "Descent.Portability.twoIndexConditional": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "lower: indexed with 2 of 1 indices (partial application of a vector is not modelled)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 464,
   "short": "twoIndexConditional",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "twoIndexConditional",
+  "args": [
+   "upper",
+   "lower",
+   "t",
+   "x"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "upper": {
+    "dim": "Covariate",
+    "rank": 1
+   },
+   "lower": {
+    "dim": "Covariate",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Conditionals.binaryContextMatch_calibrationDriftDefectSq_eq_quarter",
    "Descent.Portability.crossing_forces_defect_and_regret",
@@ -77900,7 +78030,7 @@
  },
  "Descent.Portability.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition true",
+  "note": "self-check: calls untranslated definition false",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -77924,7 +78054,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'true' is not defined\")"
+   "error": "NameError(\"name 'false' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -96203,8 +96333,8 @@
   }
  },
  "Descent.Portability.polygenicCalibrationFloor": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition calibrationDriftDefectSq",
+  "class": "WRAPPER",
+  "note": "delegates to calibrationDriftDefectSq",
   "file": "Descent/Portability/PolygenicContinuumCalibration.lean",
   "line": 28,
   "short": "polygenicCalibrationFloor",
@@ -96218,9 +96348,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'calibrationDriftDefectSq' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -108180,16 +108310,22 @@
  },
  "Descent.Portability.slopeOfStatistic": {
   "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℝ × ℝ × ℝ'\")",
   "file": "Descent/Portability/PortabilityMasterTheorem.lean",
   "line": 773,
   "short": "slopeOfStatistic",
   "ret_type": "ℝ",
   "empirical_status": "EXACT BY CONSTRUCTION",
-  "python": null,
-  "args": [],
+  "python": "slopeOfStatistic",
+  "args": [
+   "s"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ℝ × ℝ × ℝ'\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -126083,8 +126219,8 @@
   }
  },
  "Descent.Spectral.coefficientEnergy": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dot",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/ProjectionShiftBounds.lean",
   "line": 102,
   "short": "coefficientEnergy",
@@ -126097,9 +126233,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'dot' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -126686,8 +126822,8 @@
   }
  },
  "Descent.Spectral.sharedCorrectionOptimum": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dot",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/ProjectionShiftBounds.lean",
   "line": 1035,
   "short": "sharedCorrectionOptimum",
@@ -126701,9 +126837,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'dot' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -126754,19 +126890,40 @@
   }
  },
  "Descent.Spectral.irreducibleDegradation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/ProjectionShiftBounds.lean",
   "line": 1046,
   "short": "irreducibleDegradation",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "irreducibleDegradation",
+  "args": [
+   "B",
+   "beta",
+   "theta"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "B": {
+    "dim": "ι",
+    "rank": 2
+   },
+   "beta": {
+    "dim": "ι",
+    "rank": 1
+   },
+   "theta": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.irreducibleDegradation_at_zero_energy_is_junk",
    "Descent.Spectral.irreducibleDegradation_le_rescaled",
@@ -126936,8 +127093,8 @@
   }
  },
  "Descent.Spectral.quadraticRisk": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dot",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 41,
   "short": "quadraticRisk",
@@ -126957,9 +127114,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "NameError(\"name 'dot' is not defined\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -127119,7 +127276,7 @@
  },
  "Descent.Spectral.quadraticCoefficientDistance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition dot",
+  "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not iterable\"))",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 170,
   "short": "quadraticCoefficientDistance",
@@ -127135,7 +127292,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'dot' is not defined\")"
+   "error": "TypeError(\"'function' object is not iterable\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -127175,19 +127332,40 @@
   }
  },
  "Descent.Spectral.bestScalarCorrection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 175,
   "short": "bestScalarCorrection",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "bestScalarCorrection",
+  "args": [
+   "B",
+   "u",
+   "v"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "B": {
+    "dim": "ι",
+    "rank": 2
+   },
+   "u": {
+    "dim": "ι",
+    "rank": 1
+   },
+   "v": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.bestScalarCorrection_null_direction_is_junk",
    "Descent.Spectral.best_scalar_correction_attains_floor",
@@ -127213,19 +127391,40 @@
   }
  },
  "Descent.Spectral.scalarCorrectionFloor": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 190,
   "short": "scalarCorrectionFloor",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "scalarCorrectionFloor",
+  "args": [
+   "B",
+   "u",
+   "v"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "B": {
+    "dim": "ι",
+    "rank": 2
+   },
+   "u": {
+    "dim": "ι",
+    "rank": 1
+   },
+   "v": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.best_scalar_correction_attains_floor",
    "Descent.Spectral.quadraticCoefficientDistance_eq_floor_add_sq",
@@ -127253,15 +127452,20 @@
   }
  },
  "Descent.Spectral.weightedCovariancePool": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "right: indexed with 3 of 2 indices (partial application of a vector is not modelled)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 262,
   "short": "weightedCovariancePool",
   "ret_type": "Matrix ι ι ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "weightedCovariancePool",
+  "args": [
+   "weightLeft",
+   "weightRight",
+   "left",
+   "right"
+  ],
   "box": {
    "weightLeft": [
     0.05,
@@ -127272,9 +127476,22 @@
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "left": {
+    "dim": "ι",
+    "rank": 2
+   },
+   "right": {
+    "dim": "ι",
+    "rank": 2
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.weightedCovariancePool_energy",
    "Descent.Spectral.weightedCovariancePool_mulVec",
@@ -127307,19 +127524,31 @@
   }
  },
  "Descent.Spectral.finiteEnvironmentCovariancePool": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/QuadraticShift.lean",
   "line": 335,
   "short": "finiteEnvironmentCovariancePool",
   "ret_type": "Matrix ι ι ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "finiteEnvironmentCovariancePool",
+  "args": [
+   "weight",
+   "covariance"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "weight": {
+    "dim": "κ",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.finiteEnvironmentCovariancePool_energy",
    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_eq_zero_iff_active",
@@ -128229,19 +128458,32 @@
   }
  },
  "Descent.Spectral.FiniteSpectralModel.taskDegradation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "trailing tokens after expression: op:[",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/SpectralDegradation.lean",
   "line": 74,
   "short": "taskDegradation",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "taskDegradation",
+  "args": [
+   "source",
+   "target",
+   "taskWeight"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "taskWeight": {
+    "dim": "Band",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Spectral.FiniteSpectralModel.taskDegradation_eq_forall_iff_profile_eq"
   ],

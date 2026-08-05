@@ -106,6 +106,13 @@ DECL_RE = re.compile(
 )
 BOUNDARY_RE = re.compile(
     r"^(?:namespace|end|section|open|import|variable|universe|attribute|set_option|@\[|"
+    # `omit [DecidableEq ι] in` and `include h in` are declaration MODIFIERS and
+    # start a new declaration, but they are neither a keyword this list had nor
+    # an attribute. Without them the previous definition's body ran on through
+    # the modifier, and the `[` of `omit [...]` surfaced as "trailing tokens
+    # after expression: op:[" on fourteen definitions whose own bodies are one
+    # clean line -- `dot` is `Core.innerSum x y`.
+    r"omit|include|"
     r"noncomputable|private|protected|partial|unsafe|scoped|local|nonrec|"
     r"def|theorem|lemma|structure|inductive|abbrev|instance|example|class|opaque|axiom)\b")
 
