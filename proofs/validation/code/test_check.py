@@ -339,6 +339,126 @@ def run_guard(guard: str, files: dict, *args: str):
         return r.returncode, r.stdout + r.stderr
 
 
+def run_mathlib_guard(files: dict, mathlib: dict | None):
+    """Run the `mathlib` guard against a fixture corpus AND a fixture Mathlib.
+
+    `check.mathlib_root()` honours `GNOMON_MATHLIB` "so the guard can be
+    calibrated against a fixture tree" -- that hook was built and never used,
+    which is why this guard was the one guard with no calibration.  Passing
+    `mathlib=None` points the override at a path that does not exist, which is
+    how the cannot-run direction is exercised.
+
+    Fixture Mathlib declarations must sit at ROOT level: the guard keys upstream
+    names by their namespace stack, so a declaration written inside
+    `namespace Mathlib` is stored as `Mathlib.foo` and can never collide with a
+    corpus root name.  A fixture that wraps them reports a clean zero and looks
+    like a blind spot in the guard rather than a mistake in the fixture.
+    """
+    import os
+    with tempfile.TemporaryDirectory() as td:
+        corpus = Path(td) / "proofs"
+        corpus.mkdir()
+        write_corpus(corpus, files)
+        env = dict(os.environ, GNOMON_CORPUS=str(corpus))
+        if mathlib is None:
+            env["GNOMON_MATHLIB"] = str(Path(td) / "no-such-mathlib")
+        else:
+            root = Path(td) / "Mathlib"
+            root.mkdir()
+            write_corpus(root, mathlib)
+            env["GNOMON_MATHLIB"] = str(root)
+        r = subprocess.run(
+            [sys.executable, str(CHECK), "--only", "mathlib"],
+            capture_output=True, text=True, env=env)
+        return r.returncode, r.stdout + r.stderr
+
+
+# A fixture Mathlib: two root-level declarations the corpus can collide with.
+FAKE_MATHLIB = {
+    "Algebra/Fake.lean": (
+        "/-! A fixture stand-in for Mathlib. -/\n"
+        "theorem gnomonFakeUpstreamLemma (a b : Nat) : a + b = b + a := by\n"
+        "  omega\n"
+        "def gnomonFakeUpstreamDef (x : Nat) : Nat := x + 1\n"
+    ),
+}
+
+# A corpus that declares only its own names.
+MATHLIB_CLEAN = {
+    "Calibrator.lean": HEADER + "\nimport Calibrator.Sub\n",
+    "Calibrator/Sub.lean": HEADER + (
+        "\nnamespace Calibrator\n\n"
+        "/-- A definition with a declared status.\n\n"
+        "Empirical status: UNTESTED. -/\n"
+        "noncomputable def gnomonOwnRate (x : ℝ) : ℝ := x\n\n"
+        "theorem gnomon_own_rate_eq (x : ℝ) : gnomonOwnRate x = x := rfl\n\n"
+        "end Calibrator\n"
+    ),
+}
+
+# The same corpus, but restating an upstream declaration under its own name.
+MATHLIB_COLLIDES = {
+    "Calibrator.lean": HEADER + "\nimport Calibrator.Sub\n",
+    "Calibrator/Sub.lean": HEADER + (
+        "\nnamespace Calibrator\n\n"
+        "/-- Restates an upstream lemma.\n\n"
+        "Empirical status: UNTESTED. -/\n"
+        "theorem gnomonFakeUpstreamLemma (a b : Nat) : a + b = b + a := by\n"
+        "  omega\n\n"
+        "end Calibrator\n"
+    ),
+}
+
+
+def calibrate_mathlib() -> list:
+    """Both directions for the `mathlib` guard, plus cannot-run.
+
+    WHY THIS EXISTS.  A mutation test -- neuter each `run_<guard>()` in
+    check.py so it returns 0 with no findings, then re-run this file -- found
+    that eight of the nine guards were covered and `mathlib` was not: silencing
+    it entirely left this calibration green.  Its planted defects were being
+    reported by other guards or not at all, so the guard that proves the corpus
+    does not duplicate Mathlib could have gone blind without anything noticing.
+
+    The cannot-run case is asserted first and is the one worth having most.  The
+    guard already refuses to report a clean zero when it has no Mathlib to
+    compare against; that behaviour is the difference between "found nothing"
+    and "could not look", and it is exactly what an absent or renamed
+    `.lake/packages/mathlib` would silently turn into a pass.
+    """
+    failures = []
+
+    code, out = run_mathlib_guard(MATHLIB_CLEAN, None)
+    if code == 0:
+        failures.append(
+            "CANNOT-RUN AS CLEAN  mathlib: with no Mathlib source the guard "
+            "exited 0. A screen that cannot look must not report that it "
+            "found nothing.")
+    elif "CANNOT RUN" not in out:
+        failures.append(
+            "MISREPORTED     mathlib: no Mathlib source was reported as a "
+            "finding rather than as an inability to run")
+
+    code, out = run_mathlib_guard(MATHLIB_CLEAN, FAKE_MATHLIB)
+    if code != 0:
+        failures.append(
+            "FALSE POSITIVE  mathlib: a corpus declaring only its own names "
+            "was rejected\n"
+            + "\n".join("      " + l for l in out.strip().split("\n")[:8]))
+
+    code, out = run_mathlib_guard(MATHLIB_COLLIDES, FAKE_MATHLIB)
+    if code == 0:
+        failures.append(
+            "FALSE NEGATIVE  mathlib: a corpus declaration whose name Mathlib "
+            "already uses was not reported")
+    elif "gnomonFakeUpstreamLemma" not in out:
+        failures.append(
+            "MISREPORTED     mathlib: the collision was reported without "
+            "naming the colliding declaration")
+
+    return failures
+
+
 # A minimal corpus every guard is willing to call clean: license header, module
 # docstring, short lines, one imported module, no forbidden shapes.
 CLEAN_ROOT = HEADER + """
@@ -1135,6 +1255,10 @@ def main() -> int:
     # The other seven guards, both directions, against fixture corpora.
     failures.extend(calibrate_others())
 
+    # The ninth guard, which had no calibration at all until a mutation test
+    # found that silencing it left this file green.
+    failures.extend(calibrate_mathlib())
+
     for f in failures:
         print(f"FAIL  {f}")
     if failures:
@@ -1163,6 +1287,9 @@ def main() -> int:
           f"letters, a status term carrying its own qualifier, and a vocabulary "
           f"word used as ordinary prose inside an evidence table")
     print("  wiring --json keys asserted by name; --list names all nine guards")
+    print("  mathlib: a planted name collision reported and named, a corpus "
+          "declaring only its own names accepted, and an absent Mathlib "
+          "reported as CANNOT RUN rather than as a clean zero")
     return 0
 
 
