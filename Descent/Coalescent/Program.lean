@@ -6,6 +6,7 @@ import Descent.Coalescent.CutSets
 import Descent.Coalescent.CutCount
 import Descent.Coalescent.Path
 import Descent.Coalescent.Trajectory
+import Descent.Coalescent.Law
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -85,10 +86,13 @@ The deterministic half of the temporal coupling is now `Coalescent.Path`: K-G (6
 `Σ_{r≥k} d_r⁻¹ = 2/(k-1)` -- is `Rates.hasSum_one_div_deathRate_tail`.  The discrete half of the measure is now `Coalescent.Trajectory`: `chainLaw` is a law on
 whole TRAJECTORIES, and `Trajectory.chainLaw_support_chain'` is K-C (1.13) -- every
 trajectory in its support is a descending chain of covers (repeating once absorbed, which is
-`Kernel.jumpKernel_absorbing`'s convention).  What is not done is the continuous half: a
-measure on hold sequences with independent exponential coordinates.  With it,
-`Path.pathState` of a `chainLaw` trajectory and an independent hold sequence is K-G section
-6 outright.  The passage to `n = ∞` that Theorem 3 needs sits on top of that.
+`Kernel.jumpKernel_absorbing`'s convention).  `Coalescent.Law` then couples the trajectory to a clock: `coalescentLaw` is the product of
+`chainLaw` with `m` independent copies of a holding-time law, and `coalescentLaw_prod` is
+the independence K-G section 6 needs -- ARRANGED, not derived, which is exactly what
+Theorem 3 does and exactly what Theorem 1 does not.  One parameter is left open: the
+holding-time law is an argument, and instantiating it with K-C (1.7)'s exponential density
+`d_k e^{-d_k t}` needs an integral this corpus has not done.  The passage to `n = ∞` that
+Theorem 3 needs sits on top of that.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.

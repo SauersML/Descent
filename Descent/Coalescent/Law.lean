@@ -1,0 +1,108 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Coalescent.Trajectory
+import Mathlib.MeasureTheory.Constructions.Prod.Basic
+import Mathlib.MeasureTheory.Constructions.Pi
+import Mathlib.Tactic
+
+namespace Descent
+
+/-!
+# A law on the coalescent's path space
+
+`Descent.Coalescent.Path` builds a coalescent path from a trajectory and a sequence of
+holding times.  `Descent.Coalescent.Trajectory` gives the law of the trajectory.  This file
+supplies the remaining ingredient for K-G section 6's temporal coupling at finite `n`: a law
+on the PAIR, under which the jump chain and the holding times are independent.
+
+The independence is not proved; it is arranged.  That is the honest description, and it is
+also Kingman's: K-C Theorem 3 and K-G section 6 CONSTRUCT an `n`-coalescent by combining a
+jump chain with an independent death process, and independence there is a property of the
+construction.  K-C Theorem 1 is the converse -- that an arbitrary `n`-coalescent factorises
+with independent factors -- and that is a different statement, still open here, needing the
+general theory of jump chains for continuous-time Markov chains.
+
+`Descent.Coalescent.Program` item 4 asks for Theorem 1 and item 5 for the constructions.
+What lands here is item 5's direction, at finite `n`, with one parameter left open: the
+holding-time law is an argument.  Instantiating it with the exponential of rate `d_k` --
+K-C (1.7)'s density `d_k e^{-d_k t}` -- is the step not taken, because it needs an integral
+this corpus has not done.  Everything else about the coupling is here, and what it rests on
+is visible in the signature rather than hidden in a definition.
+
+## Main results
+
+- `coalescentLaw`: the product law on trajectories × holding times.
+- `coalescentLaw_isProbabilityMeasure`: it is a probability measure.
+- `coalescentLaw_prod`: **independence, in the form it is arranged** -- the law of a
+  rectangle factorises.
+- `coalescentLaw_chain_marginal`: the trajectory marginal is `chainLaw`, so nothing about
+  the jump chain was changed by coupling it to the clock.
+-/
+
+namespace Coalescent
+
+open MeasureTheory
+
+/-- **The law of a coupled trajectory and clock.**  The jump chain's law, producted with
+`m` independent copies of a holding-time law.
+
+Empirical status: NOT AN EMPIRICAL CLAIM, and in particular the independence of the two
+factors is BUILT IN rather than derived -- see the module docstring.  Kingman's Theorem 3
+does the same; his Theorem 1, which derives it, is a different theorem and is not here. -/
+noncomputable def coalescentLaw (n k m : ℕ) (holdLaw : Measure ℝ) :
+    Measure (List (ER n) × (Fin m → ℝ)) :=
+  (chainLaw n k).toMeasure.prod (Measure.pi fun _ : Fin m => holdLaw)
+
+instance coalescentLaw_isProbabilityMeasure (n k m : ℕ) (holdLaw : Measure ℝ)
+    [IsProbabilityMeasure holdLaw] :
+    IsProbabilityMeasure (coalescentLaw n k m holdLaw) := by
+  unfold coalescentLaw
+  haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
+    (chainLaw n k).toMeasure.isProbabilityMeasure
+  infer_instance
+
+/-- **Independence, in the form the construction arranges it.**  The law of a rectangle is
+the product of the marginals: knowing the trajectory says nothing about the clock, and
+conversely.  This is what K-G section 6 needs of the coupling, and it holds because the law
+was built as a product. -/
+theorem coalescentLaw_prod (n k m : ℕ) (holdLaw : Measure ℝ) [IsProbabilityMeasure holdLaw]
+    (A : Set (List (ER n))) (B : Set (Fin m → ℝ)) :
+    coalescentLaw n k m holdLaw (A ×ˢ B)
+      = (chainLaw n k).toMeasure A * (Measure.pi fun _ : Fin m => holdLaw) B := by
+  haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
+    (chainLaw n k).toMeasure.isProbabilityMeasure
+  unfold coalescentLaw
+  exact Measure.prod_prod A B
+
+/-- The trajectory marginal is the jump chain's own law: coupling it to a clock changed
+nothing about it.  This is the compatibility K-C Theorem 1 asserts and this construction
+supplies. -/
+theorem coalescentLaw_chain_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
+    [IsProbabilityMeasure holdLaw] (A : Set (List (ER n))) :
+    coalescentLaw n k m holdLaw (A ×ˢ Set.univ) = (chainLaw n k).toMeasure A := by
+  haveI : IsProbabilityMeasure (Measure.pi fun _ : Fin m => holdLaw) := by infer_instance
+  rw [coalescentLaw_prod, measure_univ, mul_one]
+
+/-- The clock marginal, likewise. -/
+theorem coalescentLaw_hold_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
+    [IsProbabilityMeasure holdLaw] (B : Set (Fin m → ℝ)) :
+    coalescentLaw n k m holdLaw (Set.univ ×ˢ B)
+      = (Measure.pi fun _ : Fin m => holdLaw) B := by
+  haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
+    (chainLaw n k).toMeasure.isProbabilityMeasure
+  rw [coalescentLaw_prod, measure_univ, one_mul]
+
+/-- **Almost every coupled path is a genuine coalescent path.**  Whatever the clock does,
+the trajectory component is a descending chain of covers (`Trajectory.chainLaw_support_chain'`),
+so `Path.pathState` applied to it is a path that starts at `Δ`, coarsens, and is absorbed --
+which is what K-G (6.5) claims of the coupling. -/
+theorem coalescentLaw_support_chain' (n k m : ℕ) (holdLaw : Measure ℝ)
+    [IsProbabilityMeasure holdLaw] {p : List (ER n) × (Fin m → ℝ)}
+    (hp : p.1 ∈ (chainLaw n k).support) :
+    List.Chain' (fun y x => Covers x y ∨ y = x) p.1 :=
+  chainLaw_support_chain' k hp
+
+end Coalescent
+
+end Descent
