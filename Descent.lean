@@ -113,6 +113,7 @@ import Descent.Coalescent.Split
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.CutSets
+import Descent.Coalescent.CutCount
 import Descent.Coalescent.Program
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never

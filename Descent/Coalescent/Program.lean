@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Split
 import Descent.Coalescent.CutSets
+import Descent.Coalescent.CutCount
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -38,21 +39,17 @@ reads as a covered one.
 
 ## Open, and why
 
-(Item 2 below is settled; it is kept in place with its proof named.)
+(Items 1 and 2 below are settled; they are kept in place with their proofs named.)
 
-**1. The split count.**  `#{ξ ; ξ ≺ η} = Σ_c (2^{λ_c - 1} - 1)`.  The arithmetic half is
-proved below (`sum_choose_interior_add_two`, `two_mul_cutCount_add_two`).  The double-naming
-that Kingman's `½` corrects is proved in `Split.splitBy_compl`, and `CutSets` removes it by
-breaking the tie with each class's representative rather than by dividing by two: a cut set
-omits it, `splitBy` is injective on cut sets (`CutSets.splitBy_injective_on_cutSets`), and a
-cut set sits inside its class with the representative deleted
-(`CutSets.cutSet_subset_erase`), which is the `λ - 1` the count is over.
-
-Both halves of the bijection are now proved: `CutSets.splitBy_injective_on_cutSets` and
-`CutSets.exists_cutSet_of_covers`, the latter with its witnesses supplied by
-`CutSets.exists_properCut_of_covers` rather than assumed.  What is still missing is only the
-assembly: counting cut sets as `Σ_c (2^{λ_c - 1} - 1)` by fibring them over the class they
-cut.  That is a sum over classes of a count of subsets, and it is not written.
+**1. The split count.**  SETTLED, by `CutCount.card_covers_below`:
+`#{ξ ; ξ ≺ η} = Σ_c (2^{λ_c - 1} - 1)`.  The route was to stop dividing by two.
+`Split.splitBy_compl` shows each cut is named twice; `CutSets` breaks the tie with each
+class's canonical representative, so that a CUT SET -- a nonempty subset of one class
+omitting its representative -- names each state exactly once
+(`CutSets.splitBy_injective_on_cutSets`, `CutSets.exists_cutSet_of_covers`).  Counting cut
+sets is then counting subsets (`CutCount.isCutSetOf_iff`, `CutCount.card_cutSetsOf`), and
+`sum_choose_interior_eq_two_mul_cutCount` below checks the total against Kingman's
+`Σ_ν ½C(λ,ν)`.
 
 **2. Ewens normalisation for general `n`.**  SETTLED, by `Ewens.sum_ewensWeight`:
 `Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, which is what makes K-G (3.8) a
