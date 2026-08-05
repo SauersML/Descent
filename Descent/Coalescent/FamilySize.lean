@@ -75,7 +75,7 @@ open Finset
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is the cardinality of a fibre: "how many
 offspring have `j` as their parent", written down. -/
 def familySize {N : ℕ} (f : Fin N → Fin N) (j : Fin N) : ℕ :=
-  (univ.filter fun i => f i = j).card
+  (univ.filter fun i ↦ f i = j).card
 
 /-- **K-G (2.1): `Σ_j ν_j = N`.**  Kingman writes this as a constraint on the family-size
 distribution ("subject of course to the constraint"); under a pedigree map it is not a
@@ -83,7 +83,7 @@ constraint at all but a consequence of every offspring having exactly one parent
 modelling assumption has become a theorem about functions, which is the whole difference
 between positing the multinomial and deriving it. -/
 theorem sum_familySize {N : ℕ} (f : Fin N → Fin N) : ∑ j, familySize f j = N := by
-  have h := Finset.sum_fiberwise (univ : Finset (Fin N)) f (fun _ => 1)
+  have h := Finset.sum_fiberwise (univ : Finset (Fin N)) f (fun _ ↦ 1)
   simpa [familySize] using h
 
 /-! ### The sibling count
@@ -99,7 +99,7 @@ offspring side: for each `a`, the number of others in its sibship.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is a count on a given pedigree. -/
 def sameParentCount {N : ℕ} (f : Fin N → Fin N) : ℕ :=
-  ∑ a, ((univ.filter fun b => f b = f a).card - 1)
+  ∑ a, ((univ.filter fun b ↦ f b = f a).card - 1)
 
 /-- **The count, from the parent side: `Σ_j ν_j(ν_j - 1)`.**  This is the identity that puts
 the family-size variance into the coalescence rate, and it holds for every pedigree map --
@@ -107,13 +107,13 @@ no exchangeability, no independence, no distributional assumption of any kind. -
 theorem sameParentCount_eq_sum_familySize {N : ℕ} (f : Fin N → Fin N) :
     sameParentCount f = ∑ j, familySize f j * (familySize f j - 1) := by
   have h := Finset.sum_fiberwise (univ : Finset (Fin N)) f
-    (fun a => (univ.filter fun b => f b = f a).card - 1)
+    (fun a ↦ (univ.filter fun b ↦ f b = f a).card - 1)
   unfold sameParentCount
   rw [← h]
-  refine Finset.sum_congr rfl fun j _ => ?_
-  have hconst : ∀ a ∈ univ.filter (fun a => f a = j),
-      (univ.filter fun b => f b = f a).card - 1
-        = (univ.filter fun b => f b = j).card - 1 := by
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  have hconst : ∀ a ∈ univ.filter (fun a ↦ f a = j),
+      (univ.filter fun b ↦ f b = f a).card - 1
+        = (univ.filter fun b ↦ f b = j).card - 1 := by
     intro a ha
     have hfa : f a = j := (Finset.mem_filter.mp ha).2
     rw [hfa]
@@ -130,8 +130,8 @@ population without that variance has none.  `Descent.Core.PopGenParameters`'s `N
 scalar that stands in for this, and the mechanism says what it is standing in for. -/
 theorem sameParentCount_id {N : ℕ} : sameParentCount (id : Fin N → Fin N) = 0 := by
   unfold sameParentCount
-  refine Finset.sum_eq_zero fun a _ => ?_
-  have hfilter : (univ.filter fun b : Fin N => (id b) = (id a)) = {a} := by
+  refine Finset.sum_eq_zero fun a _ ↦ ?_
+  have hfilter : (univ.filter fun b : Fin N ↦ (id b) = (id a)) = {a} := by
     ext b
     simp
   rw [hfilter]

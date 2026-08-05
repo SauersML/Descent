@@ -76,11 +76,11 @@ theorem harmonicSum_succ (m : ℕ) :
 
 theorem harmonicSum_nonneg (m : ℕ) : 0 ≤ harmonicSum m := by
   unfold harmonicSum
-  refine sum_nonneg fun i _ => ?_
+  refine sum_nonneg fun i _ ↦ ?_
   positivity
 
 theorem harmonicSum_strictMono : StrictMono harmonicSum := by
-  refine strictMono_nat_of_lt_succ fun m => ?_
+  refine strictMono_nat_of_lt_succ fun m ↦ ?_
   rw [harmonicSum_succ]
   have : (0 : ℝ) < 1 / ((m : ℝ) + 1) := by positivity
   linarith
@@ -89,7 +89,7 @@ theorem harmonicSum_strictMono : StrictMono harmonicSum := by
 of the file rests on, and it is Mathlib's, not the corpus's. -/
 theorem tendsto_harmonicSum_atTop : Tendsto harmonicSum atTop atTop := by
   have h := Real.tendsto_sum_range_one_div_nat_succ_atTop
-  refine h.congr fun n => ?_
+  refine h.congr fun n ↦ ?_
   simp [harmonicSum]
 
 /-! ### Length accrues at the lineage count
@@ -146,7 +146,7 @@ theorem expectedTotalBranchLength_eq_harmonic (n : ℕ) :
     expectedTotalBranchLength n = 2 * harmonicSum (n - 1) := by
   unfold expectedTotalBranchLength harmonicSum
   rw [mul_sum]
-  refine sum_congr rfl fun j _ => ?_
+  refine sum_congr rfl fun j _ ↦ ?_
   rw [expectedSegmentLength_eq]
   ring
 
@@ -185,8 +185,8 @@ theorem expectedTotalBranchLength_succ_sub (n : ℕ) :
   ring
 
 theorem expectedTotalBranchLength_strictMono :
-    StrictMono fun n : ℕ => expectedTotalBranchLength (n + 1) := by
-  refine strictMono_nat_of_lt_succ fun n => ?_
+    StrictMono fun n : ℕ ↦ expectedTotalBranchLength (n + 1) := by
+  refine strictMono_nat_of_lt_succ fun n ↦ ?_
   have h := expectedTotalBranchLength_succ_sub n
   have hpos : (0 : ℝ) < 2 / ((n : ℝ) + 1) := by positivity
   linarith
@@ -194,13 +194,13 @@ theorem expectedTotalBranchLength_strictMono :
 /-- **The total length diverges.**  A sample of `n` has a tree whose expected length grows
 like `2 log n` without bound. -/
 theorem tendsto_expectedTotalBranchLength_atTop :
-    Tendsto (fun n : ℕ => expectedTotalBranchLength (n + 1)) atTop atTop := by
-  have hcomp : (fun n : ℕ => expectedTotalBranchLength (n + 1))
-      = fun n : ℕ => 2 * harmonicSum n := by
+    Tendsto (fun n : ℕ ↦ expectedTotalBranchLength (n + 1)) atTop atTop := by
+  have hcomp : (fun n : ℕ ↦ expectedTotalBranchLength (n + 1))
+      = fun n : ℕ ↦ 2 * harmonicSum n := by
     funext n
     rw [expectedTotalBranchLength_eq_harmonic, show n + 1 - 1 = n from rfl]
   rw [hcomp]
-  refine tendsto_atTop_mono (fun n => ?_) tendsto_harmonicSum_atTop
+  refine tendsto_atTop_mono (fun n ↦ ?_) tendsto_harmonicSum_atTop
   have := harmonicSum_nonneg n
   linarith
 

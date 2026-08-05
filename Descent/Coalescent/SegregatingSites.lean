@@ -185,13 +185,13 @@ and does keep finding new variants. -/
 expected number of segregating sites in a sample of `n` exceeds any bound for `n` large --
 this is `E(L_n) → ∞` with a positive factor. -/
 theorem tendsto_expectedSegregatingSites_atTop {θ : ℝ} (hθ : 0 < θ) :
-    Tendsto (fun n : ℕ => expectedSegregatingSites θ (n + 1)) atTop atTop := by
-  have hcomp : (fun n : ℕ => expectedSegregatingSites θ (n + 1))
-      = fun n : ℕ => θ * harmonicSum n := by
+    Tendsto (fun n : ℕ ↦ expectedSegregatingSites θ (n + 1)) atTop atTop := by
+  have hcomp : (fun n : ℕ ↦ expectedSegregatingSites θ (n + 1))
+      = fun n : ℕ ↦ θ * harmonicSum n := by
     funext n
     rw [expectedSegregatingSites_eq, show n + 1 - 1 = n from rfl]
   rw [hcomp]
-  refine tendsto_atTop.2 fun b => ?_
+  refine tendsto_atTop.2 fun b ↦ ?_
   filter_upwards [tendsto_harmonicSum_atTop.eventually_ge_atTop (b / θ)] with n hn
   have hmul : θ * (b / θ) ≤ θ * harmonicSum n := mul_le_mul_of_nonneg_left hn hθ.le
   have hbe : θ * (b / θ) = b := by field_simp

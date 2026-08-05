@@ -77,6 +77,13 @@ the layer, not the six results.
   Pólya-urn count is missing, and subjects it to the check the corpus can make: the classes
   sum to the derived tree length.  Two consequences that are derived: the spectrum's shape
   carries no information about `θ`, and singletons are a `1/a_{n-1}` share.
+* `Coalescent.VariableSize` removes the constant-size assumption in the standard way
+  (Griffiths and Tavaré 1994): a varying size is the same coalescent on the clock
+  `τ(t) = ∫₀ᵗ ds/λ(s)`, because every rate in the ladder is divided by the same `λ(t)`
+  (`deathRate_mul_deriv_timeChange`).  The exponential history's `τ` is computed and its
+  defining ODE `τ' = 1/λ` proved through `deriv`, and the demographic content is one
+  inequality, `e^u ≥ 1 + u`: growth speeds the clock, so an expanding population's lineages
+  coalesce sooner than a constant one's at every time, uniformly.
 * `Coalescent.Duality` supplies the only forward-time statement in the group, and the reason
   any of this describes an allele frequency: `½x(1-x)·(xⁿ)'' = d_n(x^{n-1} - xⁿ)`.  The
   Wright-Fisher diffusion's generator applied to `xⁿ` in `x` IS the coalescent's block-count

@@ -105,7 +105,7 @@ theorem sum_spectrumBranchLength (n : ℕ) :
   rw [expectedTotalBranchLength_eq_harmonic]
   unfold harmonicSum spectrumBranchLength
   rw [mul_sum]
-  refine sum_congr rfl fun j _ => ?_
+  refine sum_congr rfl fun j _ ↦ ?_
   push_cast
   ring
 

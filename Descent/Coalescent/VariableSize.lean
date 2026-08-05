@@ -109,14 +109,32 @@ change rather than an expression with the right shape, and it is the only place 
 exponential form is used. -/
 theorem deriv_timeChange {β : ℝ} (hβ : β ≠ 0) (t : ℝ) :
     deriv (timeChange β) t = 1 / relativeSize β t := by
-  have hf : HasDerivAt (fun s : ℝ => β * s) β t := by
+  have hf : HasDerivAt (fun s : ℝ ↦ β * s) β t := by
     simpa using (hasDerivAt_id t).const_mul β
-  have hexp : HasDerivAt (fun s : ℝ => Real.exp (β * s)) (Real.exp (β * t) * β) t := hf.exp
+  have hexp : HasDerivAt (fun s : ℝ ↦ Real.exp (β * s)) (Real.exp (β * t) * β) t := hf.exp
   have hd : HasDerivAt (timeChange β) (Real.exp (β * t) * β / β) t :=
     (hexp.sub_const 1).div_const β
   rw [hd.deriv]
   unfold relativeSize
   rw [Real.exp_neg, one_div, inv_inv, mul_div_assoc, div_self hβ, mul_one]
+
+/-- **The rate the clock encodes is the corpus's own ladder, divided by the size.**  A pair
+of lineages coalesces at `d_2/λ(t)` rather than `d_2`, and `Rates.deathRate_two` is the
+statement that `d_2 = 1`.  Recorded so that the time change is tied to the rate ladder the
+rest of the group derives, rather than to a `1` that happens to appear in `deriv_timeChange`.
+
+The `k`-lineage version needs no separate proof: every rate in the ladder is multiplied by
+the same `1/λ(t)`, which is exactly why a varying size is a time change and not a different
+process. -/
+theorem deriv_timeChange_eq_deathRate_div {β : ℝ} (hβ : β ≠ 0) (t : ℝ) :
+    deriv (timeChange β) t = deathRate 2 / relativeSize β t := by
+  rw [deriv_timeChange hβ, deathRate_two]
+
+/-- The whole ladder, time-changed: `d_k` becomes `d_k/λ(t)` for every `k` at once. -/
+theorem deathRate_mul_deriv_timeChange {β : ℝ} (hβ : β ≠ 0) (t : ℝ) (k : ℕ) :
+    deathRate k * deriv (timeChange β) t = deathRate k / relativeSize β t := by
+  rw [deriv_timeChange hβ]
+  ring
 
 /-- The clock runs forwards. -/
 theorem timeChange_strictMono {β : ℝ} (hβ : 0 < β) : StrictMono (timeChange β) := by
@@ -177,7 +195,7 @@ rather than preventing it.  A population that grew fast enough for lineages to e
 coalescence entirely would need `τ` to be bounded, which the exponential history is not. -/
 theorem timeChange_tendsto_atTop {β : ℝ} (hβ : 0 < β) :
     Tendsto (timeChange β) atTop atTop := by
-  exact tendsto_atTop_mono (fun t => timeChange_ge hβ t) tendsto_id
+  exact tendsto_atTop_mono (fun t ↦ timeChange_ge hβ t) tendsto_id
 
 /-- The constant-size coalescent is the `β → 0` boundary of this family, in the only sense
 available without a limit: the clock's derivative at the present is `1` for every `β`, so no

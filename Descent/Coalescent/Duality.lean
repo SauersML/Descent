@@ -133,8 +133,8 @@ two lemmas below compute the derivative and re-prove the identity through it. -/
 
 /-- The second derivative of `x^{m+2}` is `(m+2)(m+1)x^m`. -/
 theorem deriv_deriv_pow (m : ℕ) (x : ℝ) :
-    deriv (deriv fun y : ℝ => y ^ (m + 2)) x = ((m : ℝ) + 2) * ((m : ℝ) + 1) * x ^ m := by
-  have h1 : (deriv fun y : ℝ => y ^ (m + 2)) = fun y : ℝ => ((m : ℝ) + 2) * y ^ (m + 1) := by
+    deriv (deriv fun y : ℝ ↦ y ^ (m + 2)) x = ((m : ℝ) + 2) * ((m : ℝ) + 1) * x ^ m := by
+  have h1 : (deriv fun y : ℝ ↦ y ^ (m + 2)) = fun y : ℝ ↦ ((m : ℝ) + 2) * y ^ (m + 1) := by
     funext y
     rw [deriv_pow]
     push_cast
@@ -148,14 +148,14 @@ theorem deriv_deriv_pow (m : ℕ) (x : ℝ) :
 evaluated at `f = xⁿ` gives `diffusionOnPow`, so the identity above is about the generator
 and not about a formula chosen to resemble one. -/
 theorem diffusionGenerator_pow (m : ℕ) (x : ℝ) :
-    x * (1 - x) / 2 * deriv (deriv fun y : ℝ => y ^ (m + 2)) x = diffusionOnPow m x := by
+    x * (1 - x) / 2 * deriv (deriv fun y : ℝ ↦ y ^ (m + 2)) x = diffusionOnPow m x := by
   rw [deriv_deriv_pow]
 
 /-- **Duality, stated with the operator.**  The composite of the two lemmas above: the
 Wright-Fisher generator applied to `xⁿ` is the coalescent's death-rate combination.  This is
 the form in which the result is usually quoted, and now the form in which it is proved. -/
 theorem duality_deriv (m : ℕ) (x : ℝ) :
-    x * (1 - x) / 2 * deriv (deriv fun y : ℝ => y ^ (m + 2)) x
+    x * (1 - x) / 2 * deriv (deriv fun y : ℝ ↦ y ^ (m + 2)) x
       = deathRate (m + 2) * (x ^ (m + 1) - x ^ (m + 2)) := by
   rw [diffusionGenerator_pow, duality_identity]
   rfl
