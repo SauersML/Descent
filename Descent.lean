@@ -7,7 +7,6 @@ import Descent.Conditionals
 import Descent.Core
 import Descent.Decision
 import Descent.Foundations
-import Descent.Meta
 import Descent.Pangenome
 import Descent.PopGen
 import Descent.Portability
@@ -17,7 +16,7 @@ import Descent.Spectral
 /-!
 # The corpus root
 
-TWELVE HEADS, NOT 171 MODULES.  Each `Descent.X` below imports every file under
+ELEVEN HEADS, NOT 171 MODULES.  Each `Descent.X` below imports every file under
 `Descent/X/`, so the build still covers the whole corpus -- which is what the list this
 replaces existed to guarantee.  What changes is who guarantees it.
 

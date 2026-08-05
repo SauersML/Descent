@@ -1097,15 +1097,50 @@ theorem clean_rate_via_macro (x : ℝ) : cleanRate x = x := by
      "installs custom syntax"),
     # Long enough to clear the token floor and made entirely of closers: a reflex,
     # not a shared argument.
+    #
+    # The lemma list is long ON PURPOSE.  With a shorter one this fixture cleared
+    # nothing: the pair fell under the ten-token floor and was accepted without the
+    # reflex rule ever being consulted, so the rule could be -- and was -- broken by
+    # the `by` that opens every tactic proof while this test went on passing.
     ("duplication", "two long proofs made only of closing tactics",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + """
 theorem closers_only_first (m : CleanModel) : m.rate * 1 = m.rate := by
-  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul]
+  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul, mul_zero, zero_add]
   norm_num
 
 theorem closers_only_second (m : CleanModel) : m.rate + 0 = m.rate := by
-  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul]
+  simp [CleanModel.rate, mul_one, add_zero, sub_zero, one_mul, mul_zero, zero_add]
   norm_num
+""")),
+    # A structure instance repeats the FIELD NAMES its structure declares, and a
+    # `Prop`-valued structure with four fields is four goals whatever inhabits it.
+    # The names are the shape, not a shared argument, and "name the repeated script
+    # and apply it" has nothing to name: the corpus's four named operating points
+    # were reported for agreeing that `norm_num` discharges a numeric bound.
+    ("duplication", "two structure instances whose fields are all closers",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+namespace Descent
+
+/-- A Prop-valued structure: inhabiting it is inhabiting its fields. -/
+structure CleanBounded (m : CleanModel) : Prop where
+  rate_nonneg : 0 ≤ m.rate
+  rate_le_one : m.rate ≤ 1
+
+/-- One named point. -/
+noncomputable def cleanFloor : CleanModel := ⟨0⟩
+
+/-- Another named point. -/
+noncomputable def cleanCeiling : CleanModel := ⟨1⟩
+
+theorem cleanFloor_bounded : CleanBounded cleanFloor where
+  rate_nonneg := by norm_num [cleanFloor, CleanModel.rate]
+  rate_le_one := by norm_num [cleanFloor, CleanModel.rate]
+
+theorem cleanCeiling_bounded : CleanBounded cleanCeiling where
+  rate_nonneg := by norm_num [cleanCeiling, CleanModel.rate]
+  rate_le_one := by norm_num [cleanCeiling, CleanModel.rate]
+
+end Descent
 """)),
 
     # --- conventions: the traps ------------------------------------------------

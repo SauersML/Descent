@@ -4189,6 +4189,49 @@ DUP_CLOSING_TACTICS = {
     "bound", "gcongr", "fin_cases", "constructor", "exact", "assumption",
 }
 
+# Words that are tactic SYNTAX rather than a tactic: `simp only [...] at h`
+# chooses `simp`, and `only` and `at` are how one says which `simp`.
+DUP_TACTIC_MODIFIERS = {"by", "only", "at", "with", "using"}
+
+
+def dup_chosen_steps(tokens: list) -> list:
+    """The tokens of a proof that are STEPS -- what a reader would say it does.
+
+    Three kinds of token are not steps, and counting them made the reflex rule
+    below answer "argument" for proofs that this file's own comment offers as
+    reflexes:
+
+    `by`, `only`, `at` -- syntax.  Every tactic proof opens with `by`, so with
+    `by` counted as a step the reflex rule could never fire for a tactic proof
+    at all, and the pair of `simp`-and-`norm_num` proofs in `test_check.py` was
+    passing only because its lemma list was short enough to fall under the token
+    floor before the rule was ever consulted.
+
+    A name being BOUND -- `field := ...` in a structure instance, `have h := ...`
+    in a script.  The remedy this screen asks for is "name the repeated script and
+    apply it", and a binder is a name already: `Admissible where sensitivity_nonneg
+    := by norm_num ...` is four `norm_num`s plus the four field names the structure
+    demands of anything that inhabits it, and the four named operating points of
+    `Core.Decision` were reported as sharing an argument that was the structure's
+    own shape.
+
+    The contents of `[...]` -- a lemma list is what a search tactic searches, not a
+    step someone took.  `simp [a, b, c, d, e, f, g]` is the comment's own example
+    of a reflex however long the list runs, and with the list counted it became an
+    argument at seven lemmas.  The tactic in front of the bracket is still a step,
+    so `rw [h]` -- the comment's example of an argument -- is unaffected.
+    """
+    steps, depth = [], 0
+    for i, token in enumerate(tokens):
+        opened = depth
+        depth += token.count("[") - token.count("]")
+        if opened or "[" in token:
+            continue
+        if token in DUP_TACTIC_MODIFIERS or tokens[i + 1:i + 2] == [":="]:
+            continue
+        steps.append(token)
+    return steps
+
 
 def dup_alpha(text: str, bound: set) -> str:
     """`text` with the declaration's own binder names renamed by order of first use.
@@ -4617,10 +4660,12 @@ def run_duplication() -> int:
             continue
         # A proof made only of closers is a reflex, however long its lemma lists
         # run; a proof that names a step someone chose is an argument, and two
-        # theorems sharing one are sharing that choice.
+        # theorems sharing one are sharing that choice.  `dup_chosen_steps` says
+        # which tokens those are; the rest is syntax, binders and lemma lists,
+        # and counting them made this rule unable to fire for any tactic proof.
         if not any(re.sub(r"[^\w']", "", t) not in DUP_CLOSING_TACTICS and
                    re.match(r"^[a-z]", re.sub(r"[^\w']", "", t) or "_")
-                   for t in tokens):
+                   for t in dup_chosen_steps(tokens)):
             continue
         # Already factored: a short script naming a corpus theorem is that
         # theorem being applied, and the shared step is the lemma it names.
