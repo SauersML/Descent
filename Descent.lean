@@ -148,6 +148,7 @@ import Descent.Coalescent.VariableSize
 import Descent.Coalescent.AlleleCount
 import Descent.Coalescent.ComingDownFromInfinity
 import Descent.Coalescent.Fixation
+import Descent.Coalescent.TransitVariance
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`

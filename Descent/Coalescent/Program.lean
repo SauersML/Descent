@@ -90,6 +90,54 @@ the layer, not the seven results.
   generator applied in `n`, so the forward and backward descriptions are one calculation, and
   the moment hierarchy closes because lineages only merge.
 
+## The classical results the two papers do not contain
+
+Four more modules cover results every coalescent course teaches and neither 1982 paper
+states.  Each is anchored to something the corpus already derives, so none of them is a new
+constant:
+
+* `Coalescent.AlleleCount` divides out the seating weights `Ewens` had computed and never
+  normalised: the `(n+1)`-st sample member opens a new allelic class with probability
+  `θ/(θ+n)`, the configuration cancelling between numerator and denominator.  Hence
+  `E(K_n) = Σ_{i<n} θ/(θ+i)` (Ewens 1972).  Two bridges: at `θ = 1` this IS `BranchLength`'s
+  harmonic number, reached from the mutation side; at `n = 2` it is `2 - 1/(1+θ)`, whose
+  `1/(1+θ)` is the identity-by-descent probability `Mutation.tendsto_identityByDescent` proves
+  by a geometric sum over coalescence times.
+* `Coalescent.ComingDownFromInfinity` supplies the rate the entrance boundary lacked.  The
+  descent equation `n' = -n²/2` is verified through `deriv` and its solution `n(t) = 2/t`
+  tested against `Rates.tsum_one_div_deathRate_tail`: at the exact mean entrance time
+  `2/(k-1)` the curve reads `k - 1`, displaced by exactly the one lineage that `n²` versus
+  `n(n-1)` drops.
+* `Coalescent.Fixation` answers the forward model's other classical question.  The neutral
+  generator kills affine functions, so `u(x) = x`; with a selective drift it kills Kimura's
+  `(1-e^{-αx})/(1-e^{-α})`, and the cancellation is exhibited as algebra with both derivatives
+  computed.  `selectedFixation_half_gt_half` is the substantive consequence: selection biases
+  fixation at every strength, with no threshold.
+* `Coalescent.TransitVariance` states what the bounded mean does not say.  `Var(T_n) ≥ 1` for
+  every `n` while `E(T_n) < 2`, so `E(T_n)²/4 < Var(T_n)`: the tree height never concentrates,
+  at any sample size.  More individuals resolve one tree better; they do not average anything,
+  which is why inference runs across loci.
+
+## What of coalescent theory is still absent
+
+Named so the coverage above is not read as completeness:
+
+* **Fu's Pólya urn.**  `SiteFrequencySpectrum` asserts `E(ξ_i) = θ/i` and can only check its
+  total.  The count that derives it -- the chance a branch in the `k`-lineage phase subtends
+  `i` of `n` leaves -- is not here.
+* **Second moments of the spectrum**, hence the calibration of Tajima's `D`.  The corpus has
+  the mean-zero null and no variance, so it can state the test and not size it.
+* **Möhle's lemma** and the general convergence of exchangeable models to a coalescent.
+  `FamilySize` does the one-generation identity for an arbitrary pedigree; the limit theorem
+  that turns it into a process is not attempted.
+* **Coming down from infinity for `Λ`-coalescents**, Schweinsberg's criterion.  Kingman's case
+  is settled by the summability `Rates` proves; the criterion separating the family's members
+  is a statement about `Λ` near zero that the corpus has no integral to express.
+* **The lookdown construction** of Donnelly and Kurtz, and with it the coupling of the whole
+  family on one probability space.
+* **Spatial coalescents** -- coalescing random walks, the voter model, stepping stone beyond
+  `Structured`'s rate-level statements.
+
 ## Beyond Kingman
 
 The two 1982 papers are not the whole of coalescent theory, and the group no longer stops
