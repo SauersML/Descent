@@ -482,8 +482,9 @@ omit [Fintype L] [DecidableEq L] in
     matrix can move it: neither the effects nor the residual appear.
 
     This is why a score's variance changes across populations even when nothing about
-    the trait's genetics has changed, and it is the term that makes `R²` and the
-    calibration slope move in *opposite* directions under a pure LD shift. -/
+    the trait's genetics has changed.  It is also the only channel that moves the
+    calibration slope without moving the signal, which is what
+    `dispersion_shift_lowers_slope_and_r2` isolates. -/
 theorem scoreVariance_transport :
     D.target.scoreVariance D.w - D.source.scoreVariance D.w = D.scoreVarianceShift := by
   rw [D.target.scoreVariance_eq D.w, D.source.scoreVariance_eq D.w]
@@ -551,10 +552,10 @@ omit [DecidableEq J] [DecidableEq L] in
 /-- **Three quiet channels give a portable `R²`.**
 
     Only the one direction is proved, and only the one direction is true: `R²` is a
-    ratio, so channels can cancel.  A deployment whose alignment and dispersion both
-    halve reports the same `R²` as one where neither moved, and
-    `r2_eq_slope_differs` exhibits exactly that.  The name says "of no shift" rather
-    than "iff" for that reason. -/
+    ratio, so channels cancel.  The pair in `§4`'s `r2_eq_slope_differs` has an
+    alignment factor of `4` against a dispersion factor of `1/4` and an unchanged
+    outcome factor, so all three channels are loud and `R²` does not move at all.  The
+    name says "of no shift" rather than "iff" for that reason. -/
 theorem r2_transport_of_no_shift
     (hcov : D.target.predictiveCovariance D.w = D.source.predictiveCovariance D.w)
     (hvar : D.target.scoreVariance D.w = D.source.scoreVariance D.w)
