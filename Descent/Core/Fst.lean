@@ -120,6 +120,20 @@ theorem scaledMutationRate_eq (Ne μ : ℝ) : scaledMutationRate Ne μ = 4 * Ne 
 theorem scaledMigrationRate_eq (Ne m : ℝ) : scaledMigrationRate Ne m = 4 * Ne * m := by
   unfold scaledMigrationRate ploidy; ring
 
+/-- **Cross-check: the scaled mutation rate in `PopulationGeneticsFoundations`
+is twice the coalescent time scale times the mutation rate**, rather than an
+independently chosen `4`. -/
+theorem scaledMutationRate_eq_ploidy_form (Ne mu : ℝ) :
+    scaledMutationRate Ne mu = 2 * ploidy * Ne * mu := by
+  unfold scaledMutationRate ploidy scaledMutationRate ploidy; ring
+
+/-- **Cross-check: the scaled migration rate in `PortabilityDrift` uses the
+same convention.** These two were written in different files, each spelling
+out its own `4`. -/
+theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
+    scaledMigrationRate Ne m = 2 * ploidy * Ne * m := by
+  unfold scaledMigrationRate ploidy scaledMigrationRate ploidy; ring
+
 /-! ### The named rates and the wrapped types are the same arithmetic
 
 `Core/Scaling.lean` carries `θ` and `M` as one-field types so that one cannot be passed

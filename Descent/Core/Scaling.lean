@@ -81,6 +81,11 @@ namespace Descent.Core
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def ploidy : ℝ := 2
 
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
+theorem ploidy_at_reference_point :
+    ploidy = 2 := by
+  norm_num [ploidy]
+
 /-- **The four in `4·Ne·μ`, as a name.** It is `2 · ploidy`: two lineages, each diploid.
 Every constructor below multiplies by this and no constructor writes a literal, so the
 factor has one site and a ploidy change is a one-line edit.
