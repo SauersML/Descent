@@ -5,6 +5,8 @@ import Descent.Portability.MultiAncestryTheory
 import Descent.Portability.SampleOverlapBias
 import Descent.Portability.PortabilityBounds
 import Descent.Core.Moments
+import Descent.Portability.ImputationPortability
+import Descent.Portability.LongitudinalPortability
 
 /-!
 # What the separate results say when they are put together
@@ -89,5 +91,41 @@ theorem reduction_pays_most_where_divergence_is_worst
     presentDayR2 V_A V_E (fst₂ - Δ) - presentDayR2 V_A V_E fst₂ >
       presentDayR2 V_A V_E (fst₁ - Δ) - presentDayR2 V_A V_E fst₁ :=
   portability_concave_in_fst_reduction V_A V_E fst₁ fst₂ Δ hVA hVE hfst hfst₂_le_one hΔ
+
+/-! ### Two erosions with different shapes, and what follows from the difference -/
+
+/-- **Imputation attenuates by a bounded factor; time attenuates without bound but never
+to zero. Neither module states the contrast, and the contrast is the design advice.**
+
+`ImputationPortability.attenuated_le_true` proves the first: an imputation quality
+`r²_imp ≤ 1` can only shrink the signal a score carries, and the shrinkage is a
+MULTIPLICATIVE cap -- improve the panel and you recover the factor exactly.
+`LongitudinalPortability.portabilityAtTime_pos_iff` proves the second: the exponential
+decay in divergence time is strictly positive at every finite time, so time never takes
+the score to zero, but no finite improvement recovers what it has taken.
+
+One is a ceiling you can raise. The other is a slope you cannot. A programme that treats
+them as one "attenuation" budget will spend on the wrong one. -/
+theorem imputation_is_recoverable_time_is_not
+    (beta_sq het r2_imp r2_initial lambda_total t : ℝ)
+    (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het) (h_r2_le : r2_imp ≤ 1)
+    (h_init : 0 < r2_initial) :
+    attenuatedVariance beta_sq het r2_imp ≤ beta_sq * het ∧
+      0 < portabilityAtTime r2_initial lambda_total t :=
+  ⟨attenuated_le_true beta_sq het r2_imp h_bsq h_het h_r2_le,
+   (portabilityAtTime_pos_iff r2_initial lambda_total t).mpr h_init⟩
+
+/-- **A score that carries no signal carries none at any time**, so a vanishing
+longitudinal report is not evidence about the decay rate.
+
+`portabilityAtTime_eq_zero_iff` says the exponential never manufactures a zero: the
+deployed value is zero exactly when the initial `R²` was. Composed with the cap above,
+this is the reading rule -- a zero at follow-up says the score never worked, not that it
+decayed, and the two are routinely confused in a longitudinal report. -/
+theorem zero_at_followup_means_zero_at_baseline
+    (r2_initial lambda_total t : ℝ)
+    (h : portabilityAtTime r2_initial lambda_total t = 0) :
+    r2_initial = 0 :=
+  (portabilityAtTime_eq_zero_iff r2_initial lambda_total t).mp h
 
 end Descent
