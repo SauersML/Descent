@@ -8000,6 +8000,10 @@ theorem sharedLD_from_equilibrium_eq_sharedLDFromMigration (m c : ℝ) (hc : 0 <
   · rw [h]
     simp
   · rw [div_div_div_cancel_right₀]
+    -- `div_div_div_cancel_right₀` discharges the equality but leaves its own
+    -- side condition, which is `hc'` from three lines up. Left open, this was
+    -- the single module that failed to build.
+    exact hc'
 
 /-- Shared LD fraction is nonneg for nonneg M. -/
 theorem sharedLDFromMigration_nonneg (M : ℝ) (hM : 0 ≤ M) :
