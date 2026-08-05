@@ -122,6 +122,7 @@ import Descent.Coalescent.Infinite
 import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Moran
+import Descent.Coalescent.Lumping
 import Descent.Coalescent.Program
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
