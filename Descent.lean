@@ -533,7 +533,7 @@ it leaves two files whose numbers happen to agree. This is the statement that ca
 a change to either side is a contradiction rather than a divergence nobody notices. -/
 theorem sigmaT_mulVec_crossS_eq_ldWitnessTargetCross :
     sigmaT.mulVec crossS = PopGen.ldWitnessTargetCross := by
-  PopGen.ext i
+  ext i
   fin_cases i <;>
     simp [sigmaT, crossS, PopGen.ldWitnessTargetCross, Matrix.mulVec, dotProduct]
 

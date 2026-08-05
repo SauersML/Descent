@@ -1,0 +1,118 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Coalescent.WrightFisher
+import Mathlib.Tactic
+
+namespace Descent
+
+/-!
+# Two collisions, and the `O(N⁻²)` row of the block-count matrix
+
+`Descent.Coalescent.SemigroupLimit.tendsto_pow_of_expansion` now takes K-G (2.11)'s
+hypothesis directly -- `P_N = 1 + N⁻¹Q + O(N⁻²)` -- so the many-state instantiation needs one
+thing: the block-count transition matrix's rows, to that order.
+
+Two of the three parts are already counted.  `WrightFisher.noCoalescenceProb` is the diagonal
+entry exactly, and `WrightFisher.coalescenceProb_le` with `.le_coalescenceProb` put it within
+`(d_k/N)²/2` of `1 - d_k/N`.  What was missing is the tail: the chance that a generation
+drops TWO or more lineages, which must be `O(N⁻²)` for the expansion to hold.
+
+The classical route is the occupancy distribution -- Stirling numbers of the second kind
+times a falling factorial -- and this corpus has no Stirling numbers.  It does not need them.
+A generation that drops two lineages has two DISTINCT colliding pairs, and the chance of any
+one prescribed pair of pairs colliding is at most `N⁻²`, so a union bound over the
+`C(C(k,2),2)` pairs of pairs finishes it.
+
+`exists_two_collisions` is the combinatorial step, and it is shorter than the occupancy
+formula it replaces.  Suppose every collision were the same pair `{a,b}`.  Then `f` restricted
+to everything but `b` is injective -- a collision avoiding `b` would be a second pair -- so the
+image has at least `k - 1` elements.  Contrapositive: an image of size `k - 2` or less forces
+two distinct colliding pairs.
+
+## Main results
+
+- `injOn_erase_of_unique_collision`: if every collision is the pair `{a,b}`, then `f` is
+  injective off `b`.
+- `card_image_ge_of_unique_collision`: hence the image has at least `k - 1` elements.
+- `exists_two_collisions`: **an image of size `≤ k - 2` gives two distinct colliding pairs**,
+  which is what a union bound needs.
+
+## What the union bound still needs
+
+One count: `#{f : Fin k → Fin N | f a = f b ∧ f c = f d} ≤ N^{k-2}` for distinct pairs, which
+is the observation that two coincidences leave `k - 2` free coordinates.  With it, summing
+over the at most `k⁴` quadruples gives the tail bound `O(N⁻²)` and, with the diagonal already
+counted in `WrightFisher`, the row of `P_N` to the order K-G (2.11) asks for.  That count is a
+bijection with `Fin (k-2) → Fin N`, and it is the last piece.
+-/
+
+namespace Coalescent
+
+open Finset
+
+/-- If every collision of `f` is the single pair `{a,b}`, then `f` is injective on everything
+but `b`: a collision among the rest would be a second pair. -/
+theorem injOn_erase_of_unique_collision {k N : ℕ} (f : Fin k → Fin N) {a b : Fin k}
+    (hab : a ≠ b)
+    (huniq : ∀ x y : Fin k, x ≠ y → f x = f y → (x = a ∧ y = b) ∨ (x = b ∧ y = a)) :
+    Set.InjOn f ((univ.erase b : Finset (Fin k)) : Set (Fin k)) := by
+  intro x hx y hy hxy
+  by_contra hne
+  rcases huniq x y hne hxy with ⟨hxa, hyb⟩ | ⟨hxb, hya⟩
+  · have : y ∈ univ.erase b := by simpa using hy
+    exact (Finset.mem_erase.mp this).1 hyb
+  · have : x ∈ univ.erase b := by simpa using hx
+    exact (Finset.mem_erase.mp this).1 hxb
+
+/-- **A single collision costs a single lineage.**  With every collision the same pair, the
+image has at least `k - 1` elements. -/
+theorem card_image_ge_of_unique_collision {k N : ℕ} (f : Fin k → Fin N) {a b : Fin k}
+    (hab : a ≠ b)
+    (huniq : ∀ x y : Fin k, x ≠ y → f x = f y → (x = a ∧ y = b) ∨ (x = b ∧ y = a)) :
+    k - 1 ≤ (univ.image f).card := by
+  have hinj := injOn_erase_of_unique_collision f hab huniq
+  have hcard : ((univ.erase b).image f).card = (univ.erase b).card :=
+    Finset.card_image_of_injOn hinj
+  have hsub : (univ.erase b).image f ⊆ univ.image f :=
+    Finset.image_subset_image (Finset.erase_subset _ _)
+  have hle : ((univ.erase b).image f).card ≤ (univ.image f).card :=
+    Finset.card_le_card hsub
+  have herase : (univ.erase b : Finset (Fin k)).card = k - 1 := by
+    rw [Finset.card_erase_of_mem (Finset.mem_univ b), Finset.card_univ, Fintype.card_fin]
+  rw [hcard, herase] at hle
+  exact hle
+
+/-- **Two dropped lineages mean two distinct collisions.**  The contrapositive of
+`card_image_ge_of_unique_collision`, and the combinatorial content the `O(N⁻²)` tail bound
+needs: the event "this generation lost two or more lineages" is contained in the union, over
+pairs of distinct pairs, of "both collided", and each of those has probability at most `N⁻²`.
+
+This replaces the occupancy distribution -- Stirling numbers times a falling factorial --
+which the corpus does not have and, for the expansion K-G (2.11) asks for, does not need. -/
+theorem exists_two_collisions {k N : ℕ} (f : Fin k → Fin N)
+    (h : (univ.image f).card + 2 ≤ k) :
+    ∃ a b c d : Fin k, a ≠ b ∧ c ≠ d ∧ f a = f b ∧ f c = f d ∧
+      ¬ ((a = c ∧ b = d) ∨ (a = d ∧ b = c)) := by
+  classical
+  by_contra hcon
+  push_neg at hcon
+  -- `f` is not injective, so some collision exists
+  have hnotinj : ¬ Function.Injective f := by
+    intro hinj
+    have : (univ.image f).card = k := by
+      rw [Finset.card_image_of_injective _ hinj, Finset.card_univ, Fintype.card_fin]
+    omega
+  obtain ⟨a, b, hfab, hab⟩ := Function.not_injective_iff.mp hnotinj
+  -- every collision is that pair, by the contradiction hypothesis
+  have huniq : ∀ x y : Fin k, x ≠ y → f x = f y → (x = a ∧ y = b) ∨ (x = b ∧ y = a) := by
+    intro x y hxy hfxy
+    rcases hcon a b x y hab hxy hfab hfxy with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact Or.inl ⟨h1.symm, h2.symm⟩
+    · exact Or.inr ⟨h2.symm, h1.symm⟩
+  have hge := card_image_ge_of_unique_collision f hab huniq
+  omega
+
+end Coalescent
+
+end Descent
