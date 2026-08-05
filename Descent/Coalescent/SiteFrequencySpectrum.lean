@@ -18,10 +18,11 @@ count, and Fu (1995) computes those expectations:
 
   `E(L_i) = 2/i`  for `i = 1, …, n-1`,     hence     `E(ξ_i) = θ/i`.
 
-That `2/i` is NOT derived here, and the docstring of `spectrumBranchLength` says so: it needs
-the Pólya-urn combinatorics that gives the chance a branch in the `k`-lineage phase subtends
-`i` of the `n` leaves, and the corpus has no such count.  What IS derived here is the sum
-rule, `sum_spectrumBranchLength`:
+That `2/i` is not derived in THIS file: it needs the Pólya-urn combinatorics giving the
+chance that a branch in the `k`-lineage phase subtends `i` of the `n` leaves.  That count is
+supplied downstream, in `Descent.Coalescent.FuUrn`, where `spectrumBranchLength_eq_urn`
+proves the value below IS the urn expectation and `fu_sum` reduces the whole identity to the
+hockey stick.  What is derived HERE is the sum rule, `sum_spectrumBranchLength`:
 
   `Σ_{i=1}^{n-1} 2/i = 2 a_{n-1} = E(L_n)`,
 
@@ -52,7 +53,8 @@ exists to record.
 
 ## Main results
 
-- `spectrumBranchLength`, `expectedSpectrum`: Fu (1995)'s `2/i` and `θ/i`, ASSERTED.
+- `spectrumBranchLength`, `expectedSpectrum`: Fu (1995)'s `2/i` and `θ/i`, derived in
+  `Descent.Coalescent.FuUrn`.
 - `sum_spectrumBranchLength`: **the sum rule** -- the pieces are `E(L_n)`.
 - `sum_expectedSpectrum`: and therefore the spectrum totals Watterson's `E(S_n)`.
 - `spectrum_shape_independent_of_theta`: the shape does not see `θ`.
@@ -68,10 +70,11 @@ open Finset
 /-- `E(L_i)`, the expected total length of the branches subtending exactly `i` of the `n`
 sampled leaves.
 
-Empirical status: ASSERTED, with referent `Descent.Coalescent.BranchLength`.  Fu (1995,
-Theor. Popul. Biol. 48, 172-197) derives `2/i` from the probability that a branch in the
-`k`-lineage phase subtends `i` leaves, which is a Pólya-urn count this corpus does not have.
-It is asserted rather than derived, and the check it passes is `sum_spectrumBranchLength`:
+Empirical status: DERIVED, with referent `Descent.Coalescent.FuUrn`.  Fu (1995, Theor.
+Popul. Biol. 48, 172-197) obtains `2/i` from the probability that a branch in the `k`-lineage
+phase subtends `i` leaves; that Pólya-urn count and the resulting identity are proved in
+`FuUrn.fu_sum`, and `FuUrn.spectrumBranchLength_eq_urn` identifies this value with the
+expectation.  A second, independent check is `sum_spectrumBranchLength`:
 its total over `i` is the tree length the corpus DOES derive.  Note that `E(L_i)` does not
 depend on `n` -- adding sample members adds new classes rather than changing the old ones,
 which is the property the sum rule turns into a telescoping statement. -/
@@ -80,11 +83,10 @@ noncomputable def spectrumBranchLength (i : ℕ) : ℝ := 2 / (i : ℝ)
 /-- `E(ξ_i)`, the expected number of segregating sites at which exactly `i` of the `n`
 sampled sequences carry the derived allele: `θ/i`.
 
-Empirical status: MIXED.  The `1/i` shape is ASSERTED with `spectrumBranchLength` as its
-referent; the factor `θ/2` converting branch length to mutations is the Poisson mutation
-premise flagged at `Descent.Coalescent.SegregatingSites.expectedSegregatingSites`, i.e.
-ASSUMED.  The head is `MIXED` because those are two different verdicts and this definition
-depends on both. -/
+Empirical status: MIXED.  The `1/i` shape is DERIVED, in `Descent.Coalescent.FuUrn`; the
+factor `θ/2` converting branch length to mutations is the Poisson mutation premise flagged at
+`Descent.Coalescent.SegregatingSites.expectedSegregatingSites`, i.e. ASSUMED.  The head is
+`MIXED` because those are two different verdicts and this definition depends on both. -/
 noncomputable def expectedSpectrum (θ : ℝ) (i : ℕ) : ℝ := θ / 2 * spectrumBranchLength i
 
 theorem expectedSpectrum_eq (θ : ℝ) (i : ℕ) : expectedSpectrum θ i = θ / (i : ℝ) := by
