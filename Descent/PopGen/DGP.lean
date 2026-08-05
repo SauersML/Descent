@@ -2562,13 +2562,13 @@ noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ
 theorem EvolutionaryParameters_theta_eq_ploidy_form (p : PopGen.EvolutionaryParameters) :
     PopGen.EvolutionaryParameters.theta p = 2 * Descent.Core.ploidy * p.Ne * p.mu := by
   unfold PopGen.EvolutionaryParameters.theta Descent.Core.ploidy
-    Descent.Core.scaledMutationRate Descent.Core.ploidy
+    Descent.Core.scaledMutationRate
   ring
 
 theorem EvolutionaryParameters_bigM_eq_ploidy_form (p : PopGen.EvolutionaryParameters) :
     PopGen.EvolutionaryParameters.bigM p = 2 * Descent.Core.ploidy * p.Ne * p.mig := by
   unfold PopGen.EvolutionaryParameters.bigM Descent.Core.ploidy
-    Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate
   ring
 
 theorem EvolutionaryParameters_tau_uses_timeScale (p : PopGen.EvolutionaryParameters) :

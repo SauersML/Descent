@@ -945,7 +945,7 @@ heterozygosity that has become between-population variance. Its heterozygosity f
 one `ploidy` apart, and writing it inline left that scale choice free. -/
 theorem driftVariance_uses_genotypeVarianceHWE (p0 fst : ℝ) :
     PopGen.driftVariance p0 fst = genotypeVarianceHWE p0 * fst / Descent.Core.ploidy := by
-  unfold PopGen.driftVariance genotypeVarianceHWE Descent.Core.ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold PopGen.driftVariance genotypeVarianceHWE Descent.Core.ploidy Descent.Core.hweHeterozygosity
   ring
 
 end Descent.PopGen

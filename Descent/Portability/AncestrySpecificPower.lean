@@ -486,7 +486,7 @@ a second moment — and this is the only thing that licenses writing either
 formula where the other is meant. -/
 theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
     Descent.Core.hweHeterozygosity p = genotypeVarianceHWE p := by
-  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.ploidy; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
