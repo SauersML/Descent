@@ -229,25 +229,33 @@ def group_b():
            "Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates "
            "are carried as competitors, which is what the definition's own "
            "section note says must be discriminated")
+    # `argument_source="model"` is the whole difference between this design and
+    # `battery_bulk21`, which ran the same definitions against the same oracle
+    # and produced three vacuous MATCHes. There `fst` was estimated from the
+    # replicates the oracle measures, so `p0(1-p0)(1 - H_t/H_0)` reduces
+    # identically to `Var(p_t)` and nothing was on trial. Here `F` is
+    # `1-(1-1/(2Ne))^t`, computed from the simulation's `Ne` and `t` and nothing
+    # else, so agreement is a prediction. Vacuity is a property of the DESIGN,
+    # not of the definition, and this declaration is where the design says so.
+    MODEL = dict(regime=reg, control=control, argument_source="model")
     record("driftVariance", "AncestrySpecificArchitecture.lean",
-           "p0 * (1 - p0) * fst   [fst = per-branch Wright F]", cells1,
-           regime=reg, control=control)
+           "p0 * (1 - p0) * fst   [fst = per-branch Wright F]", cells1, **MODEL)
     record("driftVariance [Hudson pairwise F_ST fed in, competing]",
            "AncestrySpecificArchitecture.lean", "p0*(1-p0)*F_ST_Hudson",
-           c1_hud, regime=reg, control=control)
+           c1_hud, **MODEL)
     record("driftVariance [Nei G_ST fed in, competing]",
            "AncestrySpecificArchitecture.lean", "p0*(1-p0)*G_ST_Nei", c1_nei,
-           regime=reg, control=control)
+           **MODEL)
     record("twoPopDriftVariance", "AncestrySpecificArchitecture.lean",
-           "2 * driftVariance p0 fst", cells2, regime=reg, control=control)
+           "2 * driftVariance p0 fst", cells2, **MODEL)
     record("expectedFreqDiffSq", "AncestrySpecificArchitecture.lean",
-           "2 * fst * p0 * (1 - p0)", cells2, regime=reg, control=control)
+           "2 * fst * p0 * (1 - p0)", cells2, **MODEL)
     record("twoPopDriftVariance [factor of two dropped, competing]",
            "AncestrySpecificArchitecture.lean", "p0 * (1 - p0) * fst", c2_half,
-           regime=reg, control=control)
+           **MODEL)
     record("twoPopDriftVariance [Hudson F_ST fed in, competing]",
            "AncestrySpecificArchitecture.lean", "2*p0*(1-p0)*F_ST_Hudson",
-           c2_hud, regime=reg, control=control)
+           c2_hud, **MODEL)
 
 
 # ---------------------------------------------------------------------------

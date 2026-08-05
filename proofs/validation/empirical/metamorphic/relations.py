@@ -275,7 +275,21 @@ RELATIONS = {
         scales("ld", 2),
     ],
     "Calibrator.multiTraitEffectiveSampleSize": [
-        jointly_scales(["n₁", "n₂"], 1),
+        # `jointly_scales(["n₁", "n₂"], 1)` WAS here and is now FALSE, which is
+        # the point rather than an oversight. It held of the old body
+        # `n₁ + rg²·n₂`, which has no absolute scale: double both sample sizes
+        # and the effective one doubles. The corrected body
+        # `n₁ + rg²/((1-rg²)·priorVariance + 1/n₂)` carries the effect prior
+        # variance, and a variance IS an absolute scale -- the borrowed
+        # precision saturates at `rg²/((1-rg²)·priorVariance)` however large the
+        # other study grows, because past that point the limit is the other
+        # trait's effect scatter and not its sampling error. Degree-1
+        # homogeneity returns only if `priorVariance` is scaled by `1/c` at the
+        # same time, and no relation in this file expresses a mixed-direction
+        # joint scaling. Asserting the old relation against the new body would
+        # fail this gate for the correct body, which is worse than not
+        # asserting it.
+        #
         # Deliberately asymmetric: only the SECOND trait is discounted by rg².
         symmetric_in("n₁", "n₂"),
     ],
@@ -465,9 +479,11 @@ RELATIONS = {
 
 EXPECTED_VIOLATIONS = {
     ("Calibrator.multiTraitEffectiveSampleSize", "swap/n₁<->n₂"):
-        "n₁ + rg²·n₂ is deliberately NOT symmetric: n₁ is the target trait's "
+        "The body is deliberately NOT symmetric: n₁ is the target trait's "
         "own sample and enters undiscounted, while the second trait's sample is "
-        "discounted by the squared genetic correlation. A body symmetric in the "
+        "discounted by the squared genetic correlation and, since the "
+        "correction to `n₁ + rg²·n₂`, further by the other trait's effect "
+        "scatter `(1-rg²)·priorVariance`. A body symmetric in the "
         "two would be claiming that borrowing strength from a correlated trait "
         "is as good as having the observations, which is the whole error the "
         "definition exists to avoid. Pinned rather than dropped so that a body "

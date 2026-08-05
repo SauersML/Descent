@@ -456,7 +456,28 @@ section PriorSpecification
     A proportion π of SNPs are causal with effects from a slab distribution,
     and (1-π) are null.
 
-    Empirical status: UNTESTED. -/
+    Regime: the spike is an exact point mass at ZERO, which is what lets the
+    null component drop out of the variance entirely. A spike with any width
+    would contribute `(1-π)·σ_spike²` and this body has no room for it -- see
+    `PolygenicArchitecture.spikeAndSlabVariance`, which carries that term.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk44.py`, `group_a`).
+    6×10⁶ draws from the two COMPONENTS -- a point mass at zero with weight
+    `1-π` and a Gaussian slab with weight `π` -- with the realised variance
+    measured. The body is never used to generate anything, so what is on trial
+    is the combination rule. Worst cell 1.23 sems at 0.21% relative.
+
+    Power: `π` and the slab sd are swept in OPPOSITE directions -- (0.5, 1.0),
+    (0.1, 2.0), (0.02, 3.0), (0.8, 0.5) -- so the product is on trial rather
+    than either factor. Leaving the slab sd unsquared is FALSIFIED at 578 sems
+    (100% relative) and dropping the mixture weight at 28316 sems (4904%).
+    Control: the counted slab fraction recovers `π` on the same draws.
+
+    The error bar is inflated threefold over the normal formula for a variance,
+    because a spike-and-slab is heavy-tailed at small `π` and the normal sem
+    understates its own scatter. That correction matters here: it is what turned
+    an earlier reading of the sibling `spikeAndSlabVariance` from a spurious
+    10.6-sem falsification into the noise it actually was. -/
 noncomputable def spikeAndSlabPriorVariance (π σ_slab : ℝ) : ℝ :=
   π * σ_slab ^ 2
 
@@ -803,20 +824,52 @@ theorem rg_sq_mem_unit_interval
     other trait's effect was set to EXACTLY `rg` times the target's, with no scatter, under
     which `n1 + rg² n2` is an algebraic identity for the inverse-variance combination and no
     data could have rejected it. A per-SNP polygenic `τ² = h²/M` is far below `1/n`, so the
-    regime this body needs is the usual one -- but it is a condition, and it was not
-    written down. -/
+    old body's regime is the usual one -- but it was a condition, and it was not written
+    down.
+
+    CORRECTED, rather than annotated. The body is now the exact contributed precision and
+    the old form is its `n_other · priorVariance → 0` limit, recovered by
+    `multiAncestryEffectiveN_smallPrior`. At `rg = 1` it gives `n_target + n_other`, which
+    is pooling and is what the measurement's positive control checks; at `rg = 0` it gives
+    `n_target`, which is no borrowing. The measured cells the old body missed by 2.3%, 5.0%,
+    12% and 31% are reproduced by this one, because the residual WAS the omitted scatter
+    term rather than a scale factor. -/
 noncomputable def multiAncestryEffectiveN
-    (n_target rg n_other : ℝ) : ℝ :=
-  n_target + rg ^ 2 * n_other
+    (n_target rg n_other priorVariance : ℝ) : ℝ :=
+  n_target + rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n_other)
 
 /-- **multiAncestryEffectiveN pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
 from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
 one-sided bound or an invariance leaves free. -/
 theorem multiAncestryEffectiveN_at_reference_point :
-    multiAncestryEffectiveN (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
+    multiAncestryEffectiveN (1 / 2) (1 / 2) (1 / 2) 0 = 5 / 8 := by
   unfold multiAncestryEffectiveN
   norm_num
+
+/-- **The old body is this one's vanishing-prior limit.** `n_target + rg²·n_other` is what
+the exact contributed precision becomes when the other ancestry's effect scatter
+`(1-rg²)·priorVariance` is negligible beside its sampling error `1/n_other`. Stating it as a
+theorem is what makes the correction auditable: the previous form is not discarded, it is
+located, and a caller in the polygenic regime where `n·τ² ≪ 1` may still use it knowingly. -/
+theorem multiAncestryEffectiveN_smallPrior
+    (n_target rg n_other : ℝ) (h_no : n_other ≠ 0) :
+    multiAncestryEffectiveN n_target rg n_other 0 = n_target + rg ^ 2 * n_other := by
+  unfold multiAncestryEffectiveN
+  field_simp
+  ring
+
+/-- **At perfect genetic correlation the two studies simply pool.** This is the endpoint the
+old body could not reach: `n_target + rg²·n_other` gives `n_target + n_other` at `rg = 1` only
+by coincidence of the limit, whereas here it is exact at every `priorVariance`, because a
+perfectly correlated ancestry carries no scatter to be penalised for. -/
+theorem multiAncestryEffectiveN_at_perfect_correlation
+    (n_target n_other : ℝ) (h_no : n_other ≠ 0) :
+    multiAncestryEffectiveN n_target 1 n_other = fun _ ↦ n_target + n_other := by
+  funext priorVariance
+  unfold multiAncestryEffectiveN
+  field_simp
+  ring
 
 /-- **The Gaussian shrinkage factor is monotone in the multi-ancestry effective sample
     size.**
@@ -829,31 +882,49 @@ theorem multiAncestryEffectiveN_at_reference_point :
     factor with predictive `R²` is a modelling step taken nowhere in this file, so the
     theorem does not say a PGS is more accurate — it says a shrinkage factor is larger.
 
-    The effective-sample-size formula `n_target + rg²·n_other` is likewise posited
-    (`multiAncestryEffectiveN`) and not derived from any multi-ancestry estimator.
-
     `_h_rg` is deliberately unused: because the formula uses `rg ^ 2`, the sign of the
-    genetic correlation is irrelevant, so the monotonicity holds for negative `rg` too. -/
+    genetic correlation is irrelevant, so the monotonicity holds for negative `rg` too.
+
+    The bound on `rg` and the nonnegative `priorVariance` are what the corrected
+    effective-sample-size body needs: its denominator `(1-rg²)·priorVariance + 1/n_other` is
+    positive exactly when the scatter term cannot go negative, and `|rg| ≤ 1` is what makes
+    it so. The old body needed no such hypothesis because it had no denominator -- which is
+    the same reason it was wrong. -/
 theorem gaussianPosteriorShrinkage_mono_in_multiAncestryEffectiveN
-    (n_target rg n_other h_sq : ℝ)
-    (h_nt : 0 < n_target) (_h_rg : 0 ≤ rg) (h_no : 0 ≤ n_other)
-    (h_hsq : 0 < h_sq) :
+    (n_target rg n_other priorVariance h_sq : ℝ)
+    (h_nt : 0 < n_target) (_h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) (h_no : 0 < n_other)
+    (h_pv : 0 ≤ priorVariance) (h_hsq : 0 < h_sq) :
     gaussianPosteriorShrinkage n_target h_sq ≤
-      gaussianPosteriorShrinkage (multiAncestryEffectiveN n_target rg n_other) h_sq := by
+      gaussianPosteriorShrinkage
+        (multiAncestryEffectiveN n_target rg n_other priorVariance) h_sq := by
+  have h_den : 0 < (1 - rg ^ 2) * priorVariance + 1 / n_other := by
+    have : 0 ≤ (1 - rg ^ 2) * priorVariance :=
+      mul_nonneg (by nlinarith) h_pv
+    have : 0 < 1 / n_other := by positivity
+    linarith
+  have h_gain : 0 ≤ rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n_other) :=
+    div_nonneg (sq_nonneg rg) h_den.le
   unfold gaussianPosteriorShrinkage multiAncestryEffectiveN
   rw [div_le_div_iff₀ (by positivity) (by positivity)]
-  nlinarith [sq_nonneg rg, mul_nonneg (sq_nonneg rg) h_no]
+  nlinarith [h_gain, h_hsq.le]
 
 /-- Multi-ancestry effective N ≥ single-ancestry N.
 
     `_h_rg` is deliberately unused, for the same reason as above: the contribution enters
     squared. -/
 theorem multi_ancestry_effective_n_ge
-    (n_target rg n_other : ℝ)
-    (_h_rg : 0 ≤ rg) (h_n : 0 ≤ n_other) :
-    n_target ≤ multiAncestryEffectiveN n_target rg n_other := by
+    (n_target rg n_other priorVariance : ℝ)
+    (_h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) (h_n : 0 < n_other)
+    (h_pv : 0 ≤ priorVariance) :
+    n_target ≤ multiAncestryEffectiveN n_target rg n_other priorVariance := by
+  have h_den : 0 < (1 - rg ^ 2) * priorVariance + 1 / n_other := by
+    have h1 : 0 ≤ (1 - rg ^ 2) * priorVariance :=
+      mul_nonneg (by nlinarith) h_pv
+    have h2 : 0 < 1 / n_other := by positivity
+    linarith
   unfold multiAncestryEffectiveN
-  linarith [mul_nonneg (sq_nonneg rg) h_n]
+  have := div_nonneg (sq_nonneg rg) h_den.le
+  linarith
 
 /-- **Diminishing returns from adding more EUR samples.**
     When the target is AFR and we already have large EUR GWAS,

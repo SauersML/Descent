@@ -27,7 +27,7 @@ RESULTS = []
 
 def record(name, lean_file, source, cells, note="", regime="",
            control=None, sem_source="replicates", selected_from=1,
-           oracle_independent=True):
+           oracle_independent=True, argument_source=None):
     """Classify through `verdict.classify`, so the gates actually gate.
 
     The gates were written after twelve batteries and calibrated against the
@@ -36,11 +36,21 @@ def record(name, lean_file, source, cells, note="", regime="",
     self-test in `causalPortabilityFromLocalFst` -- where the oracle WAS the
     formula -- was reported as NO POWER rather than as the SELF-TEST it is. A
     guard nothing calls is a guard that does not exist.
+
+    `argument_source` is passed through to the oracle-identity gate, and the
+    passthrough is the point: `verdict.classify` grew the parameter and this
+    function did not, so every battery calling `record` -- which is all of them
+    -- silently sent `None` and every registered definition came back LEAD. A
+    parameter a caller cannot reach is a parameter that does not exist. The
+    declaration names where the identity-bearing argument came from: "model"
+    for the simulation's own parameters, "sample" for an estimate off the same
+    replicates the oracle measures.
     """
     import verdict
     v, gate_note, worst = verdict.classify(
         cells, control=control, sem_source=sem_source,
-        selected_from=selected_from, oracle_independent=oracle_independent)
+        selected_from=selected_from, oracle_independent=oracle_independent,
+        name=name, argument_source=argument_source)
     full_note = "; ".join(x for x in (note, gate_note) if x)
     preds = [c["lean"] for c in cells]
     span = (max(preds) - min(preds)) / max(abs(max(preds)), 1e-12)

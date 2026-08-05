@@ -639,19 +639,27 @@ theorem multiTraitEffectiveSampleSize_smallPrior
     multiTraitEffectiveSampleSize n₁ n₂ rg 0 = n₁ + rg ^ 2 * n₂ := by
   unfold multiTraitEffectiveSampleSize
   field_simp
+  ring
 
 
 /-- **Cross-check: borrowing across traits and borrowing across ancestries are
-the same arithmetic.** `BayesianPGSTheory.multiAncestryEffectiveN` adds
-`rg² · n_other` to the target sample size for a genetically correlated
-*ancestry*; this adds it for a genetically correlated *trait*. They are
-different claims about different data, and they had better not drift apart in
-the exponent on `rg`, which is what this theorem pins. -/
+the same arithmetic, in the vanishing-prior limit.**
+`BayesianPGSTheory.multiAncestryEffectiveN` adds `rg² · n_other` to the target
+sample size for a genetically correlated *ancestry*; this adds it for a
+genetically correlated *trait*. They are different claims about different data,
+and they had better not drift apart in the exponent on `rg`, which is what this
+theorem pins.
+
+Stated at `priorVariance = 0` because that is where it is TRUE. This body
+carries a prior-variance correction and `multiAncestryEffectiveN` does not, so
+the two agree exactly when the correction vanishes and nowhere else; the
+unrestricted equality was stated briefly and does not hold. -/
 theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
-    (n₁ n₂ rg priorVariance : ℝ) :
-    multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance =
-      multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
-  unfold multiTraitEffectiveSampleSize multiAncestryEffectiveN; ring
+    (n₁ n₂ rg : ℝ) (h_n₂ : n₂ ≠ 0) :
+    multiTraitEffectiveSampleSize n₁ n₂ rg 0 = multiAncestryEffectiveN n₁ rg n₂ := by
+  unfold multiTraitEffectiveSampleSize multiAncestryEffectiveN
+  field_simp
+  ring
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
 
