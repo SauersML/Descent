@@ -57,8 +57,9 @@ theorem moranMass_sum {N : ℕ} (hN : 0 < N) :
     have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     linarith
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  show 1 / (N : ℝ) + (1 - 2 / (N : ℝ)) + 1 / (N : ℝ) = 1
+  simp only [moranMass]
   field_simp
+  ring
 
 /-- **`E(ν) = 1`.**  Forced by K-G (2.1), `Σ ν_j = N`: with a constant population size the
 mean family size is one whatever the model.  The Moran law satisfies it, which is the check
@@ -69,8 +70,10 @@ theorem moranMean {N : ℕ} (hN : 0 < N) :
     have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     linarith
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  show (0 : ℝ) * (1 / (N : ℝ)) + (1 : ℝ) * (1 - 2 / (N : ℝ)) + (2 : ℝ) * (1 / (N : ℝ)) = 1
+  simp only [moranMass]
+  push_cast
   field_simp
+  ring
 
 /-- The second moment, `E(ν²) = 1 + 2/N`. -/
 theorem moranSecondMoment {N : ℕ} (hN : 0 < N) :
@@ -79,8 +82,8 @@ theorem moranSecondMoment {N : ℕ} (hN : 0 < N) :
     have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     linarith
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  show (0 : ℝ) ^ 2 * (1 / (N : ℝ)) + (1 : ℝ) ^ 2 * (1 - 2 / (N : ℝ))
-      + (2 : ℝ) ^ 2 * (1 / (N : ℝ)) = 1 + 2 / (N : ℝ)
+  simp only [moranMass]
+  push_cast
   field_simp
   ring
 
@@ -104,7 +107,6 @@ theorem moranTimeScale {N : ℕ} (hN : 0 < N) :
     have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     linarith
   field_simp
-  ring
 
 /-- **Wright-Fisher's clock, for contrast: `N` generations.**  The variance is one, so
 `N σ⁻² = N`.  The two theorems together are K-G section 4's point: the model enters the
