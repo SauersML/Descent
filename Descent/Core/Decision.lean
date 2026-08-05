@@ -1374,62 +1374,62 @@ report goes up, with every step -- equilibrium, moments, `R²`, operating point,
 a named map rather than an assumption. -/
 theorem deployedPPV_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
   exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV hlt hflow)
 
 /-- **More mutation, a higher predictive value.** -/
 theorem deployedPPV_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
   exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hd hV hlt hflow)
 
 /-- **A larger effective size, a higher predictive value.** -/
 theorem deployedPPV_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     L.deployedPPV p V_E prevalence < L.deployedPPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
   exact deployedPPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hd hV hlt hflow)
 
 /-- **More migration, a higher negative predictive value.** -/
 theorem deployedNPV_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
   exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV hlt hflow)
 
 /-- **More mutation, a higher negative predictive value.** -/
 theorem deployedNPV_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
   exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hd hV hlt hflow)
 
 /-- **A larger effective size, a higher negative predictive value.** -/
 theorem deployedNPV_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
-    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     L.deployedNPV p V_E prevalence < L.deployedNPV q V_E prevalence := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
   exact deployedNPV_lt_of_deployedR2_lt L p q V_E prevalence hπ hπ1 (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hd hV hlt hflow)
 
 /-- **More migration, a higher net benefit.** The decision-curve coordinate moved by a
 demographic parameter: whether deploying the score is worth doing at a given threshold
@@ -1437,65 +1437,67 @@ depends on the migration history of the two populations. -/
 theorem deployedNetBenefit_mono_in_migration (L : OperatingPointLaw)
     (p q : PopGenParameters) (V_E prevalence t : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
   exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
     (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV hlt hflow)
 
 /-- **More mutation, a higher net benefit.** -/
 theorem deployedNetBenefit_mono_in_mutation (L : OperatingPointLaw)
     (p q : PopGenParameters) (V_E prevalence t : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
-    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
   have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
   exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
     (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hd hV hlt hflow)
 
 /-- **A larger effective size, a higher net benefit.** -/
 theorem deployedNetBenefit_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E prevalence t : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
-    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
-    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     L.deployedNetBenefit p V_E prevalence t < L.deployedNetBenefit q V_E prevalence t := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
   exact deployedNetBenefit_lt_of_deployedR2_lt L p q V_E prevalence t hπ hπ1 ht ht1
     (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hd hV hlt hflow)
 
 /-- **More migration, a higher recall.** -/
 theorem deployedRecall_mono_in_migration (L : OperatingPointLaw) (p q : PopGenParameters)
-    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
-    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig)
+    (hflow : 0 < p.mu + p.mig) :
     L.deployedRecall p V_E < L.deployedRecall q V_E := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu]; linarith
   exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV hlt hflow)
 
 /-- **More mutation, a higher recall.** -/
 theorem deployedRecall_mono_in_mutation (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig)
-    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu)
+    (hflow : 0 < p.mu + p.mig) :
     L.deployedRecall p V_E < L.deployedRecall q V_E := by
   have hq : 0 < q.mu + q.mig := by rw [← hmig]; linarith
   exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hV hlt hflow)
+    (ScoreMoments.deployedR2_mono_in_mutation p q V_E hE hNe hmig hd hV hlt hflow)
 
 /-- **A larger effective size, a higher recall.** -/
 theorem deployedRecall_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameters)
     (V_E : ℝ) (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
-    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne)
     (hflow : 0 < p.mu + p.mig) :
     L.deployedRecall p V_E < L.deployedRecall q V_E := by
   have hq : 0 < q.mu + q.mig := by rw [← hmu, ← hmig]; exact hflow
   exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
-    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hV hlt hflow2 hflow)
+    (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hd hV hlt hflow)
 
 /-! ### Bounds and boundaries -/
 
