@@ -134,8 +134,7 @@ theorem abs_le_prod_of_step (E : ℕ → ℝ) (a : ℕ → ℝ)
     (h0 : |E 0| ≤ 1)
     (hstep : ∀ k, |E (k + 1)| ≤ (1 - a k) * |E k|) (n : ℕ) :
     |E n| ≤ ∏ k ∈ range n, (1 - a k) := by
-  induction n with
-  | zero => simpa using h0
+  induction n with | zero => simpa using h0
   | succ n ih =>
     have hfac : (0 : ℝ) ≤ 1 - a n := by linarith [ha1 n]
     calc |E (n + 1)| ≤ (1 - a n) * |E n| := hstep n
@@ -191,8 +190,7 @@ theorem master_decay_bound (E : ℕ → ℝ) (θ : ℝ) (ε γ : ℕ → ℝ)
 
 /-- **The master bound in terms of the freshness floor `D`.**
 
-If the oscillation gain is uniform, `γ k = γ`, then the exponent is `θ · γ · D` with
-`D = ∑ ε k` the freshness floor along the chosen ordering. Taking the
+If the oscillation gain is uniform, `γ k = γ`, then the exponent is `θ · γ · D` with `D = ∑ ε k` the freshness floor along the chosen ordering. Taking the
 maximum over orderings gives `D` and hence the sharpest form of the bound.
 
 For independent coordinates every `ε k = 1`, so `D = n` and the bound recovers the

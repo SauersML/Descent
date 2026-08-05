@@ -397,8 +397,7 @@ theorem benchmarkRatioSquared_target_more_drifted :
   unfold benchmarkRatioSquared
   norm_num
 
-/-- **The benchmark ratio at a fully differentiated source, named.** A source population with
-`Fst = 1` is fixed, so the benchmark it provides is degenerate and the ratio diverges. The divisor
+/-- **The benchmark ratio at a fully differentiated source, named.** A source population with `Fst = 1` is fixed, so the benchmark it provides is degenerate and the ratio diverges. The divisor
 is zero and Lean returns `0`, reporting that the target retains none of the source benchmark --
 a plausible-looking number that a consumer cannot distinguish from a genuine total loss.
 Consumers must require `fstS ≠ 1`. -/

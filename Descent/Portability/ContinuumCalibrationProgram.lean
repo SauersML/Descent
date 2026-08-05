@@ -1597,8 +1597,7 @@ theorem effectiveStratumCount_empty_is_junk (n : Empty → ℝ) :
 
 /-- **An unsampled stratum is a junk branch, named.**  At `n s = 0` the reciprocal is `0` by
 Lean's convention, so a stratum with no data contributes nothing to the effective count instead of
-making it infinite: the penalty for abandoning a stratum entirely is silently waived.  Read with
-`effectiveStratumCount_ge_card`, which is why that theorem requires a positive allocation. -/
+making it infinite: the penalty for abandoning a stratum entirely is silently waived.  Read with `effectiveStratumCount_ge_card`, which is why that theorem requires a positive allocation. -/
 theorem effectiveStratumCount_unsampled_stratum_contributes_zero :
     (1 : ℝ) / (0 : ℝ) = 0 := by
   norm_num

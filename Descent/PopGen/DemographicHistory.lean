@@ -969,8 +969,7 @@ section VariableNeFst
     factor of twenty-three. 
     **A retraction** (`validation/empirical/simcov/battery_bulk17.py`).
     That battery reported this body FALSIFIED at 78 sems against the realised
-    `F = 1 - H/H_ancestral`, and proposed replacing it with
-    `1 - prod (1 - 1/(2 Ne_i))`. The report is withdrawn. It tested the bare sum
+    `F = 1 - H/H_ancestral`, and proposed replacing it with `1 - prod (1 - 1/(2 Ne_i))`. The report is withdrawn. It tested the bare sum
     AS the heterozygosity loss, which is a reading this docstring already
     disowns: the sum is consumed as an EXPONENT, by
     `heterozygosityLossVariableNe = 1 - exp(-cumulativeDrift)`, and the table
@@ -1130,8 +1129,7 @@ the coalescent time scale, and because it is a correct statement about drift in
 isolation. It is not a model of LD.
 
 The replacement lives in `LDDecayTheory.lean`: `driftLDStep` (the Sved
-drift-recombination recurrence, which does take `c`), `driftLDEquilibrium` with
-`driftLDEquilibrium_isFixedPoint`, and `driftLDTrajectory` with
+drift-recombination recurrence, which does take `c`), `driftLDEquilibrium` with `driftLDEquilibrium_isFixedPoint`, and `driftLDTrajectory` with
 `driftLDTrajectory_closedForm`. `bottleneckExcessLD` below is now defined as a
 trajectory of that process and its closed form is proved, not asserted.
 -/

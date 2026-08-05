@@ -225,8 +225,7 @@ noncomputable def expectedR2FromN (n h2 M : ℝ) : ℝ :=
   h2 * (n * h2 / (n * h2 + M))
 
 /-- **expectedR2FromN at its junk point, named.** With no samples and no markers the expected
-`R²` is undefined. Numerator and denominator vanish together and the result is `0`: a study with
-nothing in it is reported as explaining none of the variance, which is what a genuinely powerless
+`R²` is undefined. Numerator and denominator vanish together and the result is `0`: a study with nothing in it is reported as explaining none of the variance, which is what a genuinely powerless
 study also gives. Consumers must exclude the argument that makes the guard vanish. -/
 theorem expectedR2FromN_empty_study_is_junk (h2 : ℝ) :
     expectedR2FromN 0 h2 0 = 0 := by

@@ -73,8 +73,7 @@ mass function on parent maps, and it is the ONLY probabilistic input in this fil
 
 Empirical status: THIS IS THE MODEL, not a claim about a population.  K-G (2.2) shows the
 symmetric multinomial family-size law is equivalent to this backwards prescription, and
-K-G section 4 shows the same limit follows from any exchangeable family-size law with
-bounded moments, with the family-size variance `σ²` rescaling time.  Whether a given
+K-G section 4 shows the same limit follows from any exchangeable family-size law with bounded moments, with the family-size variance `σ²` rescaling time.  Whether a given
 population reproduces this way is the empirical question, and `Descent.Blindness` records
 which statistics could tell. -/
 noncomputable def parentAssignment (N k : ℕ) [NeZero N] : PMF (Fin k → Fin N) :=
@@ -247,8 +246,7 @@ is here an explicit `(d_k/N)²/2` rather than an asymptotic gesture. -/
 /-- Weierstrass's product inequality, the first Bonferroni bound. -/
 theorem one_sub_sum_le_prod {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i) (h1 : ∀ i < k, a i ≤ 1) :
     1 - ∑ i ∈ range k, a i ≤ ∏ i ∈ range k, (1 - a i) := by
-  induction k with
-  | zero => simp
+  induction k with | zero => simp
   | succ m ih =>
       have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
@@ -265,8 +263,7 @@ theorem prod_le_one_sub_sum_add_sq {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 �
     (h1 : ∀ i < k, a i ≤ 1) :
     ∏ i ∈ range k, (1 - a i)
       ≤ 1 - ∑ i ∈ range k, a i + (∑ i ∈ range k, a i) ^ 2 / 2 := by
-  induction k with
-  | zero => simp
+  induction k with | zero => simp
   | succ m ih =>
       have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
@@ -282,8 +279,7 @@ from, and it comes from counting pairs, not from a postulate. -/
 theorem sum_range_div_eq_deathRate (N k : ℕ) :
     ∑ i ∈ range k, (i : ℝ) / (N : ℝ) = deathRate k / (N : ℝ) := by
   have hsum : ∑ i ∈ range k, (i : ℝ) = (k : ℝ) * ((k : ℝ) - 1) / 2 := by
-    induction k with
-    | zero => norm_num
+    induction k with | zero => norm_num
     | succ m ih =>
         rw [sum_range_succ, ih]
         push_cast
@@ -293,8 +289,7 @@ theorem sum_range_div_eq_deathRate (N k : ℕ) :
   ring
 
 /-- **Upper bound: the one-generation coalescence probability is at most `d_k/N`.**  The
-union bound over the `d_k = k(k-1)/2` pairs of lineages, each of which collides with
-probability `1/N`. -/
+union bound over the `d_k = k(k-1)/2` pairs of lineages, each of which collides with probability `1/N`. -/
 theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     1 - noCoalescenceProb N k ≤ deathRate k / (N : ℝ) := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
@@ -308,8 +303,7 @@ theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith
 
-/-- **Lower bound: and by no more than `(d_k/N)²/2` less.**  Together with
-`coalescenceProb_le` this is the `q N⁻¹ + O(N⁻²)` of K-G (2.9), with the error constant
+/-- **Lower bound: and by no more than `(d_k/N)²/2` less.**  Together with `coalescenceProb_le` this is the `q N⁻¹ + O(N⁻²)` of K-G (2.9), with the error constant
 exhibited. -/
 theorem le_coalescenceProb {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     deathRate k / (N : ℝ) - (deathRate k / (N : ℝ)) ^ 2 / 2 ≤ 1 - noCoalescenceProb N k := by
@@ -348,8 +342,7 @@ one premise this file does not derive.  The head is `MIXED` because that is the 
 vocabulary term for a definition whose parts carry different verdicts, and because a head
 that opens with lower-case prose is a head no scanner can read: the two halves below are
 the two verdicts the term promises.  K-G section 4 is the statement that the conclusion
-survives replacing multinomial reproduction by any exchangeable family-size law with
-bounded moments and variance `σ²`, at the cost of rescaling time by `σ⁻²`. -/
+survives replacing multinomial reproduction by any exchangeable family-size law with bounded moments and variance `σ²`, at the cost of rescaling time by `σ⁻²`. -/
 noncomputable def pairDistinct (N : ℕ) : ℕ → ℝ
   | 0 => 1
   | s + 1 => noCoalescenceProb N 2 * pairDistinct N s
@@ -358,8 +351,7 @@ noncomputable def pairDistinct (N : ℕ) : ℕ → ℝ
 `G_{r-s}` is `(1 - N⁻¹)^s`" -- now with the `1 - N⁻¹` counted rather than asserted. -/
 theorem pairDistinct_eq_pow {N : ℕ} (hN : 0 < N) (s : ℕ) :
     pairDistinct N s = (1 - 1 / (N : ℝ)) ^ s := by
-  induction s with
-  | zero => simp [pairDistinct]
+  induction s with | zero => simp [pairDistinct]
   | succ m ih =>
       rw [pairDistinct, ih, noCoalescenceProb_two hN]
       ring

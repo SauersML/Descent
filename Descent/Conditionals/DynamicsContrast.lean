@@ -77,8 +77,7 @@ open scoped BigOperators
 
 /-! ## Cohort landscape superposition
 
-Independent cohort objectives add as landscapes, while their covariance kernels add with
-squared row weights.  The exact level-resolved calculus therefore gives only a persistence
+Independent cohort objectives add as landscapes, while their covariance kernels add with squared row weights.  The exact level-resolved calculus therefore gives only a persistence
 theorem: a common forbidden overlap at every admissible pair of cohort levels remains
 forbidden after pooling.  It does not prove dissolution.  The explicit spherical calculation
 below records the complementary biological mechanism: genetic structure shared by cohorts
@@ -1279,8 +1278,7 @@ theorem permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs
   Blindness.TrafficInvariantSeparation.rootedInvariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
 
 /-- A genomic polynomial of total degree at most `D`, decomposed into its
-homogeneous degrees, factors exactly through canonical LD traffic graphs with
-at most `D` ordered edges. -/
+homogeneous degrees, factors exactly through canonical LD traffic graphs with at most `D` ordered edges. -/
 theorem degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
     {D : ℕ} {Locus : Type*} [Fintype Locus]
     (coefficient value : (degree : Fin (D + 1)) →
@@ -2498,8 +2496,7 @@ structure DynamicsObstructions : Prop where
           Filter.atTop (nhds 0) ∧
         ∀ iteration,
           Blindness.TrafficInvariantSeparation.amplifiedDegreeOneTrafficDifference baseline iteration = 2
-  /-- The genuine finite diagonal iteration realizes the same separation with
-  ambient dimension `16^k`, exceptional rank `4^k`, fixed-time decay, and
+  /-- The genuine finite diagonal iteration realizes the same separation with ambient dimension `16^k`, exceptional rank `4^k`, fixed-time decay, and
   unit logarithmic-time normalized output. -/
   rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime :
     Blindness.TrafficInvariantSeparation.ConcreteGFOMLogRuntimeSeparation

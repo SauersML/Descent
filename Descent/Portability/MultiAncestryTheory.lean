@@ -604,8 +604,7 @@ theorem diversity_reduces_max_gap
     (h_improvement : fst_worst_multi < fst_worst_single) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_multi) <
       portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single) :=
-  -- Diversification lowers the worst population's effective `Fst`, and "the gap grows with
-  -- distance" read backwards is exactly that. The two were one theorem with the target pair
+  -- Diversification lowers the worst population's effective `Fst`, and "the gap grows with -- distance" read backwards is exactly that. The two were one theorem with the target pair
   -- renamed, proved twice.
   portability_gap_increases_with_distance V_A V_E fstS fst_worst_multi fst_worst_single
     hVA hVE h_improvement h_single_bound

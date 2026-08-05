@@ -40,8 +40,7 @@ atoms   =  ( √(1+v),  -√(1+v),  -√(1-v) )
 masses  =  ( 1/4 + B/(4A),  1/4 - B/(4A),  1/2 )      A = √(1+v),  B = √(1-v)
 ```
 
-Every mass is strictly positive, because `B < A`. At `v = 3/5` this is `A = 2B` with
-`B² = 2/5`, and the masses are exactly `(3/8, 1/8, 1/2)` — see
+Every mass is strictly positive, because `B < A`. At `v = 3/5` this is `A = 2B` with `B² = 2/5`, and the masses are exactly `(3/8, 1/8, 1/2)` — see
 `threeAtomWitness_threeFifths`, which is rational arithmetic and needs no square-root
 manipulation at all.
 
@@ -522,8 +521,7 @@ noncomputable def threeAtom (v A B r : ℝ) (hv : 0 ≤ v) (hA : A ^ 2 = 1 + v)
     · exact modulus_of_sq_eq_one_add hv (by simpa using hA)
     · exact modulus_of_sq_eq_one_sub hv (by simpa using hB)
 
-/-- **The rational witness at `v = 3/5`**, which needs no square-root manipulation: with
-`B² = 2/5` and `A = 2B`, the masses are exactly `(3/8, 1/8, 1/2)`.
+/-- **The rational witness at `v = 3/5`**, which needs no square-root manipulation: with `B² = 2/5` and `A = 2B`, the masses are exactly `(3/8, 1/8, 1/2)`.
 
 This is the positive control. A search that reports "no `d = 3` family exists for `v > 0`"
 must find this one, and the upstream search did not. -/

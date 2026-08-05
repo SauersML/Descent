@@ -196,7 +196,7 @@ theorem merge_rel {n : ℕ} (ξ : ER n) (a b : Quotient ξ) {x y : Fin n}
 /-- The image of the fold is everything but the class that was folded away. -/
 theorem range_mergeMap {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     Set.range (fun x : Fin n => mergeMap ξ a b (Quotient.mk ξ x)) = {c | c ≠ b} := by
-  PopGen.ext c
+  ext c
   simp only [Set.mem_range, Set.mem_setOf_eq]
   constructor
   · rintro ⟨x, rfl⟩
@@ -226,7 +226,7 @@ theorem blocks_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     have hfilter : (Finset.univ.filter fun c : Quotient ξ => c ≠ b)
         = Finset.univ.erase b := by
-      PopGen.ext c
+      ext c
       simp [Finset.mem_erase]
     rw [hfilter, Finset.card_erase_of_mem (Finset.mem_univ b), Finset.card_univ]
   have hcard : blocks ξ = Fintype.card (Quotient ξ) := Nat.card_eq_fintype_card
@@ -429,8 +429,7 @@ theorem coverOfPair_bijective {n : ℕ} (ξ : ER n) : Function.Bijective (coverO
 
 /-- **K-C (1.6): a state with `k` blocks has exactly `C(k,2)` covers.**
 
-Every cover is the merge of a unique unordered pair of blocks, so the covers biject with
-the two-element subsets of the block set.  K-C (1.3) puts rate `1` on each, so the total
+Every cover is the merge of a unique unordered pair of blocks, so the covers biject with the two-element subsets of the block set.  K-C (1.3) puts rate `1` on each, so the total
 rate out of the state is `C(k,2) = k(k-1)/2`.  That is the ladder `d_k` -- counted, not
 assumed. -/
 theorem card_covers {n : ℕ} (ξ : ER n) :
@@ -444,15 +443,13 @@ theorem card_covers {n : ℕ} (ξ : ER n) :
 
 /-- `2 C(k,2) = k(k-1)`, the integer form of the halving. -/
 theorem two_mul_choose_two (k : ℕ) : 2 * k.choose 2 = k * (k - 1) := by
-  induction k with
-  | zero => simp
+  induction k with | zero => simp
   | succ m ih =>
       have hsplit : (m + 1).choose 2 = m + m.choose 2 := by
         rw [Nat.choose_succ_succ, Nat.choose_one_right]
       rw [hsplit, Nat.add_sub_cancel, Nat.mul_add]
       rw [ih]
-      cases m with
-      | zero => simp
+      cases m with | zero => simp
       | succ p =>
           simp only [Nat.add_sub_cancel]
           ring

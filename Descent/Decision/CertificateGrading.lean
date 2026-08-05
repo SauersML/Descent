@@ -209,7 +209,7 @@ theorem atomCount_pos (P : FinitePrior n) : 0 < P.atomCount := by
   unfold atomCount activeAtoms probability
   have hfilter : Finset.univ.filter
       (fun j : Fin (n + 1) ↦ ((PMF.pure i) j).toReal ≠ 0) = {i} := by
-    PopGen.ext j
+    ext j
     by_cases hji : j = i
     · subst j
       simp [PMF.pure_apply]
@@ -750,7 +750,7 @@ theorem constantObservationExperiment_modulus_eq
       (constantObservationExperiment target moment law).certificateProblem.modulus K h₂ := by
   unfold FiniteMomentCertificateProblem.modulus
   apply congrArg sSup
-  PopGen.ext d
+  ext d
   simp only [Set.mem_insert_iff, FiniteMomentCertificateProblem.admissibleGaps]
   constructor
   · rintro (rfl | ⟨P, Q, hfeasible, rfl⟩)
@@ -766,8 +766,7 @@ theorem constantObservationExperiment_modulus_eq
           ((constantObservationExperiment_feasible_iff target moment law K h₂ P Q).1 hfeasible),
         rfl⟩
 
-/-- Ratio between the unrestricted modulus and the certificates available with
-at most `K` total atoms.  A quantitative incompleteness theorem for a concrete
+/-- Ratio between the unrestricted modulus and the certificates available with at most `K` total atoms.  A quantitative incompleteness theorem for a concrete
 experiment is a lower bound on this derived number; it is not an input field. -/
 noncomputable def atomCertificationGap (K : ℕ) (h : ℝ) : ℝ :=
   E.certificateProblem.modulus 0 h /
@@ -1013,7 +1012,7 @@ theorem admissibleGaps_zero_congr {n : ℕ} (E F : FiniteMomentCertificateProble
     E.admissibleGaps 0 h = F.admissibleGaps 0 h := by
   have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
     intro P Q; unfold targetGap; rw [ht]
-  PopGen.ext d
+  ext d
   constructor
   · rintro ⟨P, Q, hf, rfl⟩
     exact ⟨P, Q, ⟨F.momentMatched_zero P Q, by rw [← hd]; exact hf.2⟩, hgap P Q⟩
@@ -1032,7 +1031,7 @@ theorem admissibleAtomGaps_congr {n : ℕ} (E F : FiniteMomentCertificateProblem
     E.admissibleAtomGaps K h = F.admissibleAtomGaps K h := by
   have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
     intro P Q; unfold targetGap; rw [ht]
-  PopGen.ext d
+  ext d
   constructor
   · rintro ⟨P, Q, hf, rfl⟩
     exact ⟨P, Q, ⟨hf.1, by rw [← hd]; exact hf.2⟩, hgap P Q⟩

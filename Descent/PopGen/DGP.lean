@@ -1385,8 +1385,7 @@ selection and the field was carried without being read. The convention IS this
 displacement, so it is written as one, and the three theorems below are the
 convention restated where a proof can check it.
 
-    Regime: an ancestry-indexed LD environment at fixed allele frequencies, with
-    selection entering as an additive displacement of the between-population
+    Regime: an ancestry-indexed LD environment at fixed allele frequencies, with selection entering as an additive displacement of the between-population
     variance rather than through a change in the frequencies themselves. That is
     what makes it a decomposition and not a dynamic: a model in which selection
     moved the frequencies would move `V_genic` too, and the displacement could
@@ -1529,8 +1528,7 @@ calibrated to produce risk predictions, the normalization step implicitly assume
 disease prevalence across ancestry groups. If prevalences actually differ, the calibrated
 predictions are biased toward the prevalence of the majority training population.
 
-**Mathematical formulation**: Consider ancestry groups indexed by c ∈ Fin k → ℝ with
-ancestry-specific disease prevalence π(c). Normalization forces E[score | c] = constant
+**Mathematical formulation**: Consider ancestry groups indexed by c ∈ Fin k → ℝ with ancestry-specific disease prevalence π(c). Normalization forces E[score | c] = constant
 for all c, but the true conditional risk E[Y | P, C=c] depends on π(c). The residual
 bias after normalization is exactly (π(c) - π̄), where π̄ is the population-average
 prevalence (weighted by the training distribution).
@@ -1725,8 +1723,7 @@ fixed both would tie a general statement to one design.
     the mechanism this corpus's nonlinearity result assumes, not one derived
     here.
 
-    Empirical status: UNTESTED. An assumed functional form for LD decay with
-    distance; the corpus result it feeds is about the SHAPE being non-affine,
+    Empirical status: UNTESTED. An assumed functional form for LD decay with distance; the corpus result it feeds is about the SHAPE being non-affine,
     which is a property of this body rather than a measurement of it. -/
 noncomputable def LDDecayMechanism.exponentialTagging {k : ℕ}
     (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) : LDDecayMechanism k where
@@ -2594,8 +2591,7 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
     Migration homogenizes populations, reducing Fst. 
     Empirical status: **VALIDATED as the many-deme limit, and FALSIFIED as the
     island equilibrium simpliciter** -- which is why the name now says which
-    (`validation/empirical/simcov/battery_bulk18b.py`). Island model with
-    the TOTAL emigration rate held fixed at `4 Ne m = 2.0`, deme count swept,
+    (`validation/empirical/simcov/battery_bulk18b.py`). Island model with the TOTAL emigration rate held fixed at `4 Ne m = 2.0`, deme count swept,
     `F_ST` from coalescence times:
 
       demes    this def    simulated             sems
@@ -2631,8 +2627,7 @@ noncomputable def fstDriftMigrationManyDemes (p : EvolutionaryParameters) : ℝ 
 forces.**
 
 `F` is the probability that two gene copies drawn from the same population are
-identical by descent.  In one generation drift makes a pair identical with
-probability `1/(2 Nₑ)` among the pairs that are not already identical, and each
+identical by descent.  In one generation drift makes a pair identical with probability `1/(2 Nₑ)` among the pairs that are not already identical, and each
 of the two lineages independently leaves the local identity class at rate
 `mig + mu` -- by being replaced by a migrant, or by mutating away from its
 ancestral allelic state.  Migration and mutation enter through their *sum*
@@ -3054,8 +3049,7 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
 
     The direction survives, which is why this is a magnitude failure and not a
     shape one. A boost of exactly 1 -- no restoration from migration at all --
-    sits 11.13 sems from the measurements, and the measured boost does rise with
-    both `τ` and `bigM`, saturating in `bigM` as the body says. So migration
+    sits 11.13 sems from the measurements, and the measured boost does rise with both `τ` and `bigM`, saturating in `bigM` as the body says. So migration
     does restore shared LD; it restores roughly a third of what this factor
     claims.
 
@@ -3234,8 +3228,7 @@ mean.**  Given the harmonic-mean relation `T/Ne_h = T_b/Ne_small + (T-T_b)/Ne_la
 hypothesis, `Ne_h < (T_b·Ne_small + (T-T_b)·Ne_large)/T` — the two-term AM–HM inequality,
 strict because `Ne_small ≠ Ne_large`.
 
-This was `harmonic_mean_governs_drift`, documented as "Fst ≈ 1 - exp(-T/(2 Ne_h))" with
-bottlenecks "disproportionately increasing Fst".  No Fst, no exponential and no drift
+This was `harmonic_mean_governs_drift`, documented as "Fst ≈ 1 - exp(-T/(2 Ne_h))" with bottlenecks "disproportionately increasing Fst".  No Fst, no exponential and no drift
 recurrence appears below; the inequality is about two means of `Ne` and says nothing about
 how either maps to Fst. -/
 theorem harmonicMeanNe_lt_timeWeightedArithmeticMeanNe
@@ -3569,8 +3562,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
 
     A second, independent measurement of the same claim
     (`simcov/battery_bulk33.py`, `group_a`).
-    The AUC is COUNTED, not computed: two Gaussian score distributions with
-    equal variance and a mean separation of `√vSignal`, and the observable is
+    The AUC is COUNTED, not computed: two Gaussian score distributions with equal variance and a mean separation of `√vSignal`, and the observable is
     the fraction of 800000 case/control pairs the score orders correctly.
     Predicted 0.76025, 0.84134, 0.69146 and 0.69146 against counted 0.76058 ±
     0.00048, 0.84098 ± 0.00041, 0.69207 ± 0.00052 and 0.69200 ± 0.00052 --
@@ -3681,8 +3673,7 @@ chart is a derived algebraic identity.
     directions rather than by argument, and the two regimes disagree by 9% to
     47% wherever `r²` is neither 0 nor 1.
 
-    Where it is exact. If the calibrated probability `p` is itself a random variable with
-    `E[p] = π` and `Var(p) = σ²`, then `Brier = E[p(1-p)] = π(1-π) - σ²` identically, so the
+    Where it is exact. If the calibrated probability `p` is itself a random variable with `E[p] = π` and `Var(p) = σ²`, then `Brier = E[p(1-p)] = π(1-π) - σ²` identically, so the
     body is right when `vSignal/(vSignal+vResidual)` is `σ²/(π(1-π))`. That is the
     additive-noise regime `r2FromSignalVariance_eq_rsquared` states, on the OBSERVED scale.
 
@@ -4097,8 +4088,7 @@ theorem alleleFreqDivergenceRate_independent_of_mutation_and_migration
 
 /-- LD breakage rate from recombination.
 
-    Regime: a RATE, first order in `r`. Two lineages each recombine with
-    probability `r`, and to first order the chance that either does is their sum.
+    Regime: a RATE, first order in `r`. Two lineages each recombine with probability `r`, and to first order the chance that either does is their sum.
 
     Empirical status: **VALIDATED as a rate, FALSIFIED as an exact
     per-generation probability** (`validation/empirical/simcov/battery_traj.py`).

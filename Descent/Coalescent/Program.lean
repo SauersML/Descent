@@ -139,8 +139,7 @@ step" are different states.
   which the factorials cancel to `1/i`.  `SiteFrequencySpectrum`'s `ASSERTED` marker is
   discharged.
 * **Second moments of the spectrum** -- CLOSED, both sides.  `Coalescent.SpectrumMoments`
-  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with
-  `Var(L_n) = 4 b_{n-1}` from the squared segment lengths and `b` bounded while `a` diverges,
+  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with `Var(L_n) = 4 b_{n-1}` from the squared segment lengths and `b` bounded while `a` diverges,
   so Watterson's estimator is consistent at rate `1/log n`; `Coalescent.HoldingSecondMoment`
   removes the last quoted constant by integrating K-C (1.7)'s density twice (`Γ(3) = 2!`).
   `Coalescent.PairwiseTimes` and `Coalescent.TajimaVariance` then close `Var(π)`.  Restriction
@@ -184,8 +183,7 @@ step" are different states.
   restriction commutes with looking down, at or above it the operation is invisible.  That is
   why all `n` coalescents fit on one space without a projective limit.
   `Coalescent.LookdownClocks` supplies the driving clocks from `CompetingRates`: the covers of
-  `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with
-  probability `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
+  `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with probability `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
   same first factor for every pair -- minimum exponential at rate `d_n`, argmin uniform.
   The path-level law is NOT re-derived for levels, and deliberately: at `Δ` the covers ARE the
   pairs (`NeutralMutation.card_covers_delta`), so `Law.coalescentLaw` transported along that
@@ -251,7 +249,7 @@ integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.  S
   **the descent time is almost surely finite exactly when `Σ γ_k⁻¹` converges**
   (`ae_descent_dichotomy`),
 
-with Kingman on one side and the star coalescent on the other, both proved.  `Coalescent.DecreaseRate` then separates the two rates the multiple-merger case confuses.
+with Kingman on one side and the star coalescent on the other, both proved.  `DecreaseRate` then separates the two rates the multiple-merger case confuses.
 `Lambda.totalRate` is the rate of LEAVING a level, `decreaseRate` is Schweinsberg's expected
 rate of DECREASE, and `totalRate_le_decreaseRate` is the correction in one line: every merger
 destroys at least one block, so `λ_b ≤ γ_b`.  Hence
@@ -279,8 +277,7 @@ the pair rate to be sample-size independent, so K-C (1.3)'s `1` is not a modelli
 (`eq_kingmanRate`).
 
 `Coalescent.MultiMerge` gives the state space the moves that family needs -- `mergeSet` folds
-any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -- with
-`StateSpace.merge` recovered as the two-element case.  So `𝓔ₙ` now carries multiple-merger
+any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -- with `StateSpace.merge` recovered as the two-element case.  So `𝓔ₙ` now carries multiple-merger
 coalescents as well as Kingman's, and `Descent.Blindness.MultipleMergerBlindness`, which had
 the rates but no state space, has one.
 
@@ -350,8 +347,7 @@ revision:
   parameterised by an arbitrary `Preorder`, and Mathlib does instantiate it at an order dual
   elsewhere (`cylinderEventsCompl : Filtration (Finset α)ᵒᵈ`), so a decreasing filtration is
   expressible as `Filtration ℕᵒᵈ`.  But the convergence results are not: every theorem in
-  `Martingale/Convergence.lean` fixes `ℱ : Filtration ℕ m0` and argues along `atTop` with
-  upcrossing counts, and the downward theorem is not that argument dualised -- it turns on a
+  `Martingale/Convergence.lean` fixes `ℱ : Filtration ℕ m0` and argues along `atTop` with upcrossing counts, and the downward theorem is not that argument dualised -- it turns on a
   reversed martingale being automatically uniformly integrable, which the forward proof never
   needs.  It is a separate development, not an instantiation.
 * **Kolmogorov extension, general form**: absent.  `ProjectiveFamilyContent` and

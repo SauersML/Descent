@@ -354,8 +354,7 @@ because it had no other place to go.
     the two-locus identity-by-descent measure `Q` (the quantity whose
     equilibrium is the familiar `E[r²] ≈ 1/(1 + 4 N c)`).
 
-    Two lineage pairs stay non-recombinant across the generation with
-    probability `(1 - c)²`; conditional on that, they are identical either
+    Two lineage pairs stay non-recombinant across the generation with probability `(1 - c)²`; conditional on that, they are identical either
     because they coalesced this generation (probability `1/(2 Nₑ)`) or because
     they were already identical (probability `Q`).
 
@@ -373,8 +372,7 @@ because it had no other place to go.
     recurrence, which is why the two formulas have always looked alike.
 
     **Pending refactor.** The owner of `PortabilityDrift.lean` is extracting the
-    shared map under a rate-neutral name (`ibdRecurrenceStep Ne rate x`), with
-    the fixed point and the weak-rate linearisation stated there as
+    shared map under a rate-neutral name (`ibdRecurrenceStep Ne rate x`), with the fixed point and the weak-rate linearisation stated there as
     theorems. Once that lands this body should become
     `ibdRecurrenceStep Ne c Q`, keeping the recombination reading in this
     docstring and inheriting the fixed-point theorem instead of restating it.
@@ -838,8 +836,7 @@ theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
     driftLDTrajectory Ne c Q₀ t =
       driftLDEquilibrium Ne c +
         (Q₀ - driftLDEquilibrium Ne c) * driftLDRetention Ne c ^ t := by
-  induction t with
-  | zero =>
+  induction t with | zero =>
       rw [driftLDTrajectory_zero, pow_zero, mul_one]
       ring
   | succ n ih =>
@@ -1379,8 +1376,7 @@ end ExpansionLD
 /-!
 ## LD Half-Life Depends on Ne Trajectory
 
-After a perturbation (bottleneck, admixture, etc.), LD decays with
-half-life proportional to the current Ne. Populations with larger modern
+After a perturbation (bottleneck, admixture, etc.), LD decays with half-life proportional to the current Ne. Populations with larger modern
 Ne have slower LD decay toward equilibrium.
 -/
 
@@ -1559,8 +1555,7 @@ theorem ldRecurrence_succ (r D₀ : ℝ) (t : ℕ) :
                     = (1-r)^(t+1) · D₀ -/
 theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
     ldRecurrence r D₀ t = (1 - r) ^ t * D₀ := by
-  induction t with
-  | zero =>
+  induction t with | zero =>
     simp
   | succ n ih =>
     simp [ih, pow_succ, mul_left_comm, mul_comm]

@@ -130,8 +130,7 @@ theorem dirichlet_ordering_survives_remainder
 
         Empirical status: **VALIDATED** (`simcov/battery_bulk50.py`, `group_b`).
     A walk closing the gap at expected rate `2·C` per generation with symmetric
-    multiplicative noise, 4000 replicates, the observable the crossing time with
-    the last step INTERPOLATED. Gap and `C` are swept independently over a 88%
+    multiplicative noise, 4000 replicates, the observable the crossing time with the last step INTERPOLATED. Gap and `C` are swept independently over a 88%
     span in the prediction; worst cell 1.68 sems at 0.07% relative. Dropping the
     factor two -- `(D₂ - D₁)/C` -- misses by 6588 sems and 99.98% relative, so
     the `2` is not decoration: it is the two-sided contribution the paragraph
@@ -659,8 +658,7 @@ would be no sign flip to claim.
 crossing solves `E[2e^{-λτ_c}] = 1`, which the measurement confirms; quoting `log 2/λ_slowest`
 overstates `τ_c` by `+71%`, `+285%` and `+715%` in the three configurations tested.
 
-**Estimating `λ` inherits its whole sampling error.** From 50 observations of an AR(1) with
-`λ = 1`, `τ_c` has a 95% range of `[0.18, 2.29]` — a factor of `12.7`; even 1000 observations
+**Estimating `λ` inherits its whole sampling error.** From 50 observations of an AR(1) with `λ = 1`, `τ_c` has a 95% range of `[0.18, 2.29]` — a factor of `12.7`; even 1000 observations
 give `[0.51, 0.92]`.
 
 **Which is why the rule to carry is the damping, not the threshold.** The safe shrinkage region

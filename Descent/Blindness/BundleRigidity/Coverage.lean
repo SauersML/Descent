@@ -123,7 +123,7 @@ def core (F : ModulusFamily T d) (K : Set T) : Set T :=
 theorem coverers_const_of_exists (values : Fin d → ℝ) (S : Set T) (v : ℝ)
     (hv : ∃ j, values j = v) :
     (const values).coverers S v = S := by
-  PopGen.ext t
+  ext t
   simp [coverers, const, ContinuousMap.const_apply, hv]
 
 /-- **...or nowhere.** If no branch sits at `v`, no parameter is a coverer.
@@ -137,7 +137,7 @@ rather than guarding against nothing. -/
 theorem coverers_const_of_not_exists (values : Fin d → ℝ) (S : Set T) (v : ℝ)
     (hv : ¬ ∃ j, values j = v) :
     (const values).coverers S v = ∅ := by
-  PopGen.ext t
+  ext t
   simp [coverers, const, ContinuousMap.const_apply, hv]
 
 /-! ## Monotonicity, which is what makes the coinductive definition work -/

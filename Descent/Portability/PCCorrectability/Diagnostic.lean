@@ -86,8 +86,7 @@ diagnostic.  If `σf²` is variance along the GWAS-panel target axis and `σr²`
 is marker variance along the corresponding prediction-panel contrast, then
 `H = σf² σr²`.  After correction, the same definition with residual ancestry
 variance gives `H'`.  This section makes explicit how an upstream overlap
-lower bound becomes a lower bound on `H'`, and how `H'` combines with
-ascertainment to determine the critical confounding magnitude.
+lower bound becomes a lower bound on `H'`, and how `H'` combines with ascertainment to determine the critical confounding magnitude.
 -/
 
 /-- Genetic variance in the GWAS panel explained by a specified external
@@ -353,7 +352,7 @@ theorem more_exact_population_pcs_reduce_modeled_residual
   apply mul_lt_mul_of_pos_left _ h_c
   apply Finset.sum_lt_sum
   · intro i _
-    split_ifs with h1 PopGen.AssortativeMatingModel.h2
+    split_ifs with h1 h2
     · exact le_refl _
     · exfalso
       exact PopGen.AssortativeMatingModel.h2 (lt_trans (Nat.lt_succ_self k) h1)

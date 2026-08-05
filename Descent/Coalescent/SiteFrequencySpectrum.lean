@@ -100,8 +100,7 @@ possible leaf counts gives the total branch length, which
 `BranchLength.expectedTotalBranchLength_eq_harmonic` derives from the rate ladder.
 
 This is the check that Fu's asserted `2/i` is consistent with everything the corpus proves:
-each `2/i` is a summand of `2 a_{n-1}`, so the classes partition the length exactly, with
-nothing left over and nothing double counted. -/
+each `2/i` is a summand of `2 a_{n-1}`, so the classes partition the length exactly, with nothing left over and nothing double counted. -/
 theorem sum_spectrumBranchLength (n : ℕ) :
     ∑ j ∈ range (n - 1), spectrumBranchLength (j + 1) = expectedTotalBranchLength n := by
   rw [expectedTotalBranchLength_eq_harmonic]

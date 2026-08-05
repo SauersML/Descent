@@ -536,7 +536,7 @@ theorem worstRisk_liftGarbledRule_eq
       (E.garbleObservations summaryCount channel).worstRisk δ := by
   unfold worstRisk
   congr 1
-  PopGen.ext value
+  ext value
   constructor
   · rintro ⟨θ, rfl⟩
     exact ⟨θ, (E.risk_liftGarbledRule_eq channel δ θ).symm⟩
@@ -797,7 +797,7 @@ theorem indistinguishableBinaryProblem_worstRisk_fair (separation : ℝ) :
   unfold worstRisk
   have hrange : Set.range ((indistinguishableBinaryProblem separation).risk fairBinaryRule) =
       {separation / 2} := by
-    PopGen.ext value
+    ext value
     constructor
     · rintro ⟨θ, rfl⟩
       exact indistinguishableBinaryProblem_risk_fair separation θ
@@ -1136,7 +1136,7 @@ theorem isOpen_belowLevel (v : ℝ) :
     IsOpen (belowLevel (parameterCount := parameterCount) v) := by
   have hset : belowLevel (parameterCount := parameterCount) v
       = ⋂ θ, {y : Fin (parameterCount + 1) → ℝ | y θ < v} := by
-    PopGen.ext y
+    ext y
     simp [belowLevel]
   rw [hset]
   exact isOpen_iInter_of_finite fun θ ↦ isOpen_lt (continuous_apply θ) continuous_const
@@ -1265,7 +1265,7 @@ theorem minimax_eq_of_equalizer (δstar : Rule actionCount observationCount)
   have hworst : E.worstRisk δstar = value := by
     unfold worstRisk
     have hrange : Set.range (E.risk δstar) = {value} := by
-      PopGen.ext y
+      ext y
       constructor
       · rintro ⟨θ, rfl⟩; exact hconst θ
       · rintro rfl; exact ⟨0, hconst 0⟩

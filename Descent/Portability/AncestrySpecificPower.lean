@@ -512,8 +512,7 @@ section DiscoveryBias
     heterozygote. It is a *probability*, not a variance, and it is a different
     concept from `genotypeVarianceHWE` even though the two coincide as numbers
     under Hardy-Weinberg. That coincidence is stated as a theorem below rather
-    than left implicit in the shared formula, because conflating the two with
-    the allelic variance `p(1-p)` is what produced the factor-of-four defect
+    than left implicit in the shared formula, because conflating the two with the allelic variance `p(1-p)` is what produced the factor-of-four defect
     this corpus already had to repair. -/
 noncomputable def hweHeterozygosity (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 

@@ -515,8 +515,7 @@ structure LevelChannels where
   /-- Whether that floor's coordinate admits a value-negating relabelling. -/
   isSignSymmetric : Bool
 
-/-- **The channel record is inhabited.** A lattice-supported, sign-symmetric floor with
-unit drift and unit increment variance: the two Boolean flags are set to opposite values
+/-- **The channel record is inhabited.** A lattice-supported, sign-symmetric floor with unit drift and unit increment variance: the two Boolean flags are set to opposite values
 here rather than both to `true`, so a theorem that reads only one of them cannot pass by
 reading the other. -/
 noncomputable def LevelChannels.witness : LevelChannels where
@@ -872,8 +871,7 @@ estimating it from data needs a sample size growing like `σ_k²`, hence like
 of order `4·10²`, `9·10⁴`, `5·10⁹`. **The observable algebra is infinite in principle and
 finite in practice, truncated at about floor three no matter how large the study.**
 
-For genotypes the first floor's scale is not the Gaussian's. It is `σ₁² = 1/V - 1` with
-`V = 2q(1-q)` (`hweFloorOneScaleSq_eq`), about `49` at MAF `0.01` and `1` at MAF `0.5`, so
+For genotypes the first floor's scale is not the Gaussian's. It is `σ₁² = 1/V - 1` with `V = 2q(1-q)` (`hweFloorOneScaleSq_eq`), about `49` at MAF `0.01` and `1` at MAF `0.5`, so
 rare variants start the tower further from the Gaussian and are harder to read at every
 floor.
 
@@ -886,8 +884,7 @@ scale and coordinate kurtosis are one observable.
 /-- The squared scale of the normalized squaring flow at a unit-variance coordinate:
 `σ² = Var(X²) = E[X⁴] - 1`.
 
-Empirical status: DERIVED. The variance of the square of a unit-variance coordinate, with
-no free parameter; for genotypes it is `standardizedSquare_second_cumulant`. -/
+Empirical status: DERIVED. The variance of the square of a unit-variance coordinate, with no free parameter; for genotypes it is `standardizedSquare_second_cumulant`. -/
 noncomputable def squaringScaleSq (fourthMoment : ℝ) : ℝ := fourthMoment - 1
 
 /-- **The scale is the excess fourth moment over the Gaussian-normalised unit.** -/
@@ -951,8 +948,7 @@ theorem nextFloorFourthMoment_degenerate_is_junk (m6 : ℝ) (m8 : ℝ) :
   unfold nextFloorFourthMoment
   norm_num
 
-/-- **The next floor's fourth moment from the NEXT floor's own moments**: with
-`Y = X² - 1`, it is just `E[Y⁴] / (E[Y²])²`.
+/-- **The next floor's fourth moment from the NEXT floor's own moments**: with `Y = X² - 1`, it is just `E[Y⁴] / (E[Y²])²`.
 
 This is the same number as `nextFloorFourthMoment` -- `nextFloorFourthMoment_eq_ofY`
 below proves it at unit variance -- and it is the form an implementation must
@@ -1000,8 +996,7 @@ theorem gaussianFloorTwoFourthMoment : nextFloorFourthMoment 1 3 15 105 = 15 := 
 
 /-- **Floor two of the Gaussian tower has `σ₂² = 14`**, so `σ₂ = √14 = 3.74166…`.
 
-This is the second entry of a sequence nobody has written down, and with
-`gaussianFloorOneScaleSq` it anchors the doubly-exponential growth carried below as a
+This is the second entry of a sequence nobody has written down, and with `gaussianFloorOneScaleSq` it anchors the doubly-exponential growth carried below as a
 hypothesis. -/
 theorem gaussianFloorTwoScaleSq :
     squaringScaleSq (nextFloorFourthMoment 1 3 15 105) = 14 := by
@@ -1163,8 +1158,7 @@ mechanism is a contraction argument, and it is cited here, as it is in
 Everything proved in this section is a moment computation about genotypes that stands
 whatever becomes of the rigidity claim.
 
-A *corollary* of the same proof gives rigidity of the tower fibre at any base law with
-`E[x⁴] > 2`, the condition that keeps the confined squares below one — `1/σ₁² < 1`, that
+A *corollary* of the same proof gives rigidity of the tower fibre at any base law with `E[x⁴] > 2`, the condition that keeps the confined squares below one — `1/σ₁² < 1`, that
 is `σ₁² > 1`. Below that threshold the images straddle zero and the argument yields
 nothing, so `E[x⁴] = 2` is a phase boundary.
 
@@ -1461,8 +1455,7 @@ read fourth moments, which is `σ₁`; floor two sits near `θ = 2` and floor th
 `θ = 4`. The rungs are dyadic in *moment order*: successive floors probe moments of order
 `2, 4, 8, 16, …`.
 
-That is the mechanism. Reading a moment of order `2m` costs a sample budget growing with
-the size of that moment, and for a standardized genotype those moments diverge — **at every
+That is the mechanism. Reading a moment of order `2m` costs a sample budget growing with the size of that moment, and for a standardized genotype those moments diverge — **at every
 order, by proof rather than by pattern**:
 
 > `Descent.EpistaticChaos.standardizedGenotype_even_moment_lower_bound` :
@@ -1689,8 +1682,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
   obtain ⟨href, hhet, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
   have haltval : h.centeredSquare Foundations.DiploidGenotype.homAlt =
       (2 - 3 * h.altFreq) / h.altFreq := centeredSquare_homAlt_eq h hq0 hq1
-  cases g with
-  | homRef =>
+  cases g with | homRef =>
       have hval : h.centeredSquare Foundations.DiploidGenotype.homRef =
           (3 * h.altFreq - 1) / (1 - h.altFreq) := by
         rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href, div_sub_one (ne_of_gt hp)]
@@ -1709,8 +1701,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
         ring
       have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by positivity
       rw [hval, haltval, abs_div, abs_of_pos hden, div_le_div_iff₀ hden hq0]
-      rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with
-        ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
+      rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
         nlinarith [hq0, hhalf, hp, sq_nonneg (2 * h.altFreq - 1)]
   | homAlt =>
       have hnonneg : 0 ≤ h.centeredSquare Foundations.DiploidGenotype.homAlt := by

@@ -330,8 +330,7 @@ locus, but nothing here needs that form. The **influence** of locus `j` is its s
 the total, and polygenicity is the statement that no share is large.
 
 What is proved: the shares are nonnegative and sum to one, and if every share lies
-between `d > 0` and `c` then no influence exceeds `c / (m · d)`. Composing that with
-Section 2 gives the bound in score units — as a score is spread over more loci, the
+between `d > 0` and `c` then no influence exceeds `c / (m · d)`. Composing that with Section 2 gives the bound in score units — as a score is spread over more loci, the
 fixed-order normalized contraction bound tends to zero, whatever the per-locus law is.
 
 The direction of the conclusion is worth stating plainly, because it is the reverse of
@@ -424,8 +423,7 @@ this says that ceiling is reached, so the bound is sharp rather than a bound no
 configuration approaches.
 
 This matters for reading the vanishing result below. If the ceiling were unattainable,
-"influence at most `c / (m · d)`" could hold for a reason having nothing to do with
-polygenicity, and the limit would be an artifact of a loose estimate. It is not: the
+"influence at most `c / (m · d)`" could hold for a reason having nothing to do with polygenicity, and the limit would be an artifact of a loose estimate. It is not: the
 balanced score sits exactly on it. -/
 theorem locusInfluence_of_shares_const
     (β h : Fin m → ℝ) (v : ℝ) (hv : 0 < v) (hm : 0 < m)
@@ -456,8 +454,7 @@ theorem locusVarianceShare_hwe_eq_zero_of_monomorphic
   -- appear syntactically and `rw [h]` finds nothing; `simp only` beta-reduces first.
   rcases hj with h | h <;> simp [locusVarianceShare, h]
 
-/-- **Cumulant blindness in score units.**  As a score is spread over more loci with
-per-locus variance shares between `d > 0` and `c`, the fixed-order normalized
+/-- **Cumulant blindness in score units.**  As a score is spread over more loci with per-locus variance shares between `d > 0` and `c`, the fixed-order normalized
 contraction bound of Section 2 tends to zero.
 
 The conclusion runs the opposite way from how such a diagnostic is normally read. A

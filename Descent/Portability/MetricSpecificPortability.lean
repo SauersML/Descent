@@ -477,8 +477,7 @@ theorem neutralAF_benchmark_auc_depends_only_on_attenuated_signal
     The pairing is the point, and only now does it have two working halves: discrimination
     can survive exactly the perturbation that destroys calibration, so reporting AUC alone
     hides the failure. Note also that this is the **equal-variance** AUC; on a dichotomised
-    trait the discrimination half would have to be restated with
-    `liabilityThresholdAUCFromExplainedR2` at a named prevalence, where preservation is a
+    trait the discrimination half would have to be restated with `liabilityThresholdAUCFromExplainedR2` at a named prevalence, where preservation is a
     stronger claim because the conditional variances differ. -/
 theorem neutralAF_benchmark_discrimination_preserved_calibration_lost
     (V_A V_E fst V_A' fst' mean_obs mean_pred δ : ℝ)
@@ -1713,8 +1712,7 @@ The superposition decomposition above says a barrier persists unless some
 allocation satisfies every cohort at once. This records the population geometry
 where that escape is available, and how much minority data it takes.
 
-For a design whose covariance couples the planted support to a decoy support with
-strength `α`, the population loss at overlap fraction `x` away from the truth is
+For a design whose covariance couples the planted support to a decoy support with strength `α`, the population loss at overlap fraction `x` away from the truth is
 `φ_q(x) = x(1 - qx) / (1 - qx(1-x))` with `q = α²`. A barrier exists exactly when
 that profile has an interior maximum, which happens exactly when `1 - 3q + q²`
 turns negative -- so the transition is at the root of that quadratic.
@@ -3342,8 +3340,7 @@ close.
 
 The instrument is exact linear algebra on the AR(1) kernel `Σᵢⱼ = ρ^|i-j|`, not
 a simulation: the surviving whitened detection weight of a retained panel `S` is
-`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with
-agreement to five digits between panel sizes, so nothing here is a finite-`n`
+`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with agreement to five digits between panel sizes, so nothing here is a finite-`n`
 artefact.
 
   ρ    κ      this body   uniform thinning   random panel   contiguous panel

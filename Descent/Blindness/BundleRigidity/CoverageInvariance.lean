@@ -68,7 +68,7 @@ theorem chargedTuples_one_eq_coverers [TopologicalSpace T] (F : ModulusFamily T 
     (fun t : Fin 1 → T ↦ t 0) ''
         chargedTuples (fun j t ↦ F.curve j t) {u : Fin 1 → T | ∀ l, u l ∈ S} v
       = F.coverers S (v 0) := by
-  PopGen.ext x
+  ext x
   constructor
   · rintro ⟨t, ⟨hmem, hcov⟩, rfl⟩
     exact ⟨hmem 0, hcov 0⟩
@@ -95,7 +95,7 @@ theorem support_eq_product {Sup : Set (Fin k → T)} {S : Fin k → Set T}
     (hsub : ∀ t ∈ Sup, ∀ i, t i ∈ S i)
     (hfull : ∀ t : Fin k → T, (∀ i, t i ∈ S i) → t ∈ Sup) :
     Sup = {t : Fin k → T | ∀ i, t i ∈ S i} := by
-  PopGen.ext t
+  ext t
   constructor
   · intro ht
     exact hsub t ht
@@ -148,8 +148,7 @@ theorem sigmaMin_pow_le (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (σ : ℕ → �
     (hbase : 1 ≤ σ 0) (hstep : ∀ n, (η / C) * σ n ≤ σ (n + 1)) (m : ℕ) :
     (η / C) ^ m ≤ σ m := by
   have hr : 0 < η / C := div_pos hη hC
-  induction m with
-  | zero => simpa using hbase
+  induction m with | zero => simpa using hbase
   | succ n ih =>
     calc (η / C) ^ (n + 1) = (η / C) * (η / C) ^ n := by ring
       _ ≤ (η / C) * σ n := mul_le_mul_of_nonneg_left ih (le_of_lt hr)

@@ -48,8 +48,7 @@ condition; mass conservation needs only this normalization equation. -/
 def IsMassPreservingKernel (P : ι → ι → ℝ) : Prop :=
   ∀ x, ∑ y, P x y = 1
 
-/-- Every transition weight is nonnegative. Together with
-`IsMassPreservingKernel`, this is the finite Markov-kernel condition. -/
+/-- Every transition weight is nonnegative. Together with `IsMassPreservingKernel`, this is the finite Markov-kernel condition. -/
 def IsNonnegativeKernel (P : ι → ι → ℝ) : Prop :=
   ∀ x y, 0 ≤ P x y
 
@@ -488,8 +487,7 @@ noncomputable def applyKernelIter (P : ι → ι → ℝ) : ℕ → (ι → ℝ)
 theorem applyKernelIter_const (P : ι → ι → ℝ) (hP : IsMassPreservingKernel P) (c : ℝ) :
     ∀ n, applyKernelIter P n (fun _ ↦ c) = fun _ ↦ c := by
   intro n
-  induction n with
-  | zero => rfl
+  induction n with | zero => rfl
   | succ n ih =>
       funext i
       simp only [applyKernelIter, ih, applyKernel]
@@ -529,8 +527,7 @@ theorem applyKernelIter_twoStateCurve (switch baseline amplitude : ℝ) (n : ℕ
     applyKernelIter (symmetricTwoStateKernel switch) n
         (twoStateCurve baseline amplitude) =
       twoStateCurve baseline (Spectral.twoStatePersistence switch switch ^ n * amplitude) := by
-  induction n with
-  | zero => simp [applyKernelIter]
+  induction n with | zero => simp [applyKernelIter]
   | succ n ih =>
       rw [applyKernelIter, ih, applyKernel_twoStateCurve]
       congr 1
@@ -582,9 +579,7 @@ theorem singleMode_errorEnergy_forward_eq (weight gap t delta : ℝ) :
 /-! ## The drifting probit index, and the constraint tying its two surfaces
 
 Under Ornstein-Uhlenbeck drift of the covariate the probit single-index family
-`Phi (a t * x + b t)` is carried to itself, with
-
-  `a t = a0 * exp (-lam * t) / sqrt (1 + a0 ^ 2 * ouVariance lam t)`,
+`Phi (a t * x + b t)` is carried to itself, with `a t = a0 * exp (-lam * t) / sqrt (1 + a0 ^ 2 * ouVariance lam t)`,
   `b t = b0 / sqrt (1 + a0 ^ 2 * ouVariance lam t)`.
 
 The two surfaces share one denominator. That the family is invariant is an analytic fact

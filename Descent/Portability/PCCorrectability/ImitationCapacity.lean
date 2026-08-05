@@ -111,7 +111,7 @@ def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j ↦ v i * v j
 
 theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
     spikeOuter v = Blindness.rankOneCovarianceBump 1 v := by
-  PopGen.ext i j
+  ext i j
   simp [spikeOuter, Blindness.rankOneCovarianceBump]
 
 /-- The score variance a unit spike contributes to a weighting `x` is the
@@ -182,8 +182,7 @@ def twoBlock (k : ℕ) (a b : ℝ) : ℕ → ℝ := fun i ↦ if i < k then a el
 theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
     ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
       (k : ℝ) * a + (j : ℝ) * b := by
-  induction j with
-  | zero =>
+  induction j with | zero =>
       have hcongr : ∀ i ∈ Finset.range (k + 0), (if i < k then a else b) = a := by
         intro i hi
         have hi' : i < k := by
@@ -314,8 +313,7 @@ theorem form_spiked (a : cidx) (S₀ : Matrix ι ι ℝ) (t : ℝ) (v : ι → �
   unfold spiked spikeLoad
   rw [K.form_add, K.form_smul]
 
-/-- The set of *exit levels*: for each constraint and each spike direction with
-positive load, the level at which that constraint is first violated.  The
+/-- The set of *exit levels*: for each constraint and each spike direction with positive load, the level at which that constraint is first violated.  The
 capacity is the infimum of this set — the linear program.
 
     Empirical status: UNTESTED. -/
@@ -403,7 +401,7 @@ theorem isNull_convex {S T : Matrix ι ι ℝ} (hS : K.IsNull S) (hT : K.IsNull 
   constructor
   · have hrewrite : w • S + (1 - w) • T - K.base
         = w • (S - K.base) + (1 - w) • (T - K.base) := by
-      PopGen.ext i j
+      ext i j
       simp only [Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
       ring
     rw [hrewrite]
@@ -441,8 +439,7 @@ theorem not_isNull_spiked_of_active {S₀ : Matrix ι ι ℝ} {a : cidx} {v : ι
   have hpos : 0 < t * K.spikeLoad a v := mul_pos ht hload
   linarith
 
-/-- **Rigidity, as a linear-programming value.**  An active constraint with
-positive spike load in some supported direction drives the capacity to zero:
+/-- **Rigidity, as a linear-programming value.**  An active constraint with positive spike load in some supported direction drives the capacity to zero:
 the background class can imitate nothing at all. -/
 theorem imitationCapacity_eq_zero_of_active {S₀ : Matrix ι ι ℝ}
     {support : Set (ι → ℝ)} (hnull : K.IsNull S₀)
@@ -703,8 +700,7 @@ noncomputable def diagonalEntryClass : BackgroundClass (Fin 1) Unit where
     infimum to be taken against, so `binds` reduces to reflexivity.
 
     That is the honest reading of this witness. It shows the theorems over
-    `EquiExit` are not vacuous; it does not show equi-exit holds for a class with
-    several constraints, which is where the hypothesis has force. -/
+    `EquiExit` are not vacuous; it does not show equi-exit holds for a class with several constraints, which is where the hypothesis has force. -/
 noncomputable def EquiExit.witness (S₀ : Matrix (Fin 1) (Fin 1) ℝ) :
     EquiExit diagonalEntryClass S₀ {fun _ ↦ 1} where
   binding := ()
@@ -913,8 +909,7 @@ witnessing pair.
 
 This section is the statement that the pointwise hypothesis *is* the
 certificate condition of this file: the diagonal gap is a linear functional,
-its spike load is `vᵢ² - vⱼ²`, and an active diagonal-gap constraint with
-positive load drives the imitation capacity to zero.  The mechanism generalizes
+its spike load is `vᵢ² - vⱼ²`, and an active diagonal-gap constraint with positive load drives the imitation capacity to zero.  The mechanism generalizes
 off stationary classes entirely, which matters because a standardized genotype
 panel has unit diagonal — the constraint is active automatically — so the
 loading condition is the whole of what rigidity requires there.
@@ -930,7 +925,7 @@ bump's scale multiplies the effect vector while the level multiplies the
 covariance. -/
 theorem rankOneCovarianceBump_eq_smul_spikeOuter (scale : ℝ) (v : ι → ℝ) :
     Blindness.rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by
-  PopGen.ext i j
+  ext i j
   simp only [Blindness.rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]
   ring
 
@@ -1907,8 +1902,7 @@ theorem energyWeightedVariance_le (w c : tgt → ℝ) (hw : ∑ t, w t = 1) (s :
   rw [weighted_dispersion_eq w c hw s]
   nlinarith [sq_nonneg (s - weightedMean w c)]
 
-/-- **And the floor is attained, at the energy-weighted mean.**  Together with
-the previous theorem this is the exact law: the obstruction to one correction
+/-- **And the floor is attained, at the energy-weighted mean.**  Together with the previous theorem this is the exact law: the obstruction to one correction
 serving several targets is the energy-weighted variance, no more and no
 less. -/
 theorem energyWeightedVariance_attained (w c : tgt → ℝ) :

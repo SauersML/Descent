@@ -297,8 +297,7 @@ theorem hasBetaTiltInvariant_iff_centeredTransformIndependent
 
 /-! ## A displacement law with the same unconditioned genealogy and a different tilt -/
 
-/-- Normalized three-lineage merger rate for the same unconditioned uniform `Λ₀`, but with
-linear response `r(x)=x`.  This is
+/-- Normalized three-lineage merger rate for the same unconditioned uniform `Λ₀`, but with linear response `r(x)=x`.  This is
 `∫₀¹ x exp(-θx) dx / ∫₀¹ exp(-θx) dx` in closed form. -/
 noncomputable def linearDisplacementTripleRate (theta : ℝ) : ℝ :=
   (1 - (1 + theta) * Real.exp (-theta)) / (theta * (1 - Real.exp (-theta)))

@@ -513,7 +513,7 @@ theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
     `test_ou_effect_correlation`). Recovering `tau` from the measured
     autocorrelation of an Ornstein-Uhlenbeck process built with a known `tau`:
 
-      tau    t     recovered   built with   sems
+      tau    t     recovered   built with sems
        5     10      4.94210     5.00000     0.39
       20     10     19.90689    20.00000     0.16
       20     40     20.27384    20.00000     0.46
@@ -892,8 +892,7 @@ theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
   constructor
   · intro h
     rcases (Portability.ncp_eq_zero_iff _ _).1 h with h_information | h_effect
-    · rcases (Portability.effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with
-        h_n | h_p_zero | h_p_one | h_impossible
+    · rcases (Portability.effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with h_n | h_p_zero | h_p_one | h_impossible
       · exact Or.inl h_n
       · exact Or.inr (Or.inr (Or.inl h_p_zero))
       · exact Or.inr (Or.inr (Or.inr h_p_one))

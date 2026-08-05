@@ -87,7 +87,7 @@ open Filter
 
 /-! The ladder itself -- `d_m = m(m-1)/2`, its telescoping reciprocal and the exact
 partial sums -- is `Descent.Coalescent.Rates`, imported above.  It used to be defined
-HERE, under the name `coalescentRate`, with `Coalescent.Rates` importing this module to
+HERE, under the name `coalescentRate`, with `Rates` importing this module to
 get it: the 12,000-line derivation of the coalescent depended on a module about spectrum
 identifiability, and nothing in the applied layer depended on the coalescent at all.
 
@@ -110,8 +110,7 @@ statement about THIS module's use of it.
     control and it passes.
 
     The ratio form is deliberate. A first attempt compared the absolute rate and
-    reported a clean factor of two, which was `ploidy = 1` with
-    `population_size = Ne` making msprime measure time in units of `Ne` rather
+    reported a clean factor of two, which was `ploidy = 1` with `population_size = Ne` making msprime measure time in units of `Ne` rather
     than `2 Ne`. A ratio of two quantities measured the same way removes the
     convention rather than requiring it to be got right -- the same move that
     settled the stepping-stone exponent.
@@ -222,8 +221,7 @@ theorem not_summable_one_div_scaled_natSucc_rpow_iff
 
 /-! ## Fixed sample size: a linear count, and analyticity does not help -/
 
-/-- **At a fixed sample size the spectrum imposes only `n` linear conditions.**  Any family with
-`n + 1` free parameters therefore contains a nonzero perturbation the spectrum cannot see,
+/-- **At a fixed sample size the spectrum imposes only `n` linear conditions.**  Any family with `n + 1` free parameters therefore contains a nonzero perturbation the spectrum cannot see,
 whatever regularity the family has — the polynomial-times-exponential construction is the
 instance where the family is real analytic.
 

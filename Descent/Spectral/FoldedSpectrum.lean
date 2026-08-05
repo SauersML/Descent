@@ -207,8 +207,7 @@ come back: it is false precisely at balance.
 
 At `q = 1/2`
 the standardized genotype takes values `-√2, 0, √2` with masses `1/4, 1/2, 1/4`; then
-`X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with
-single-atom modulus law (`diploid_modulus_at_half`). This is the `v = 1` endpoint:
+`X² - 1` takes values `1, -1, 1`, so `|X² - 1| ≡ 1` — a three-atom family with single-atom modulus law (`diploid_modulus_at_half`). This is the `v = 1` endpoint:
 `√(1-v) = 0`, so the two atoms `±√(1-v)` collapse into the single atom `0` carrying the
 combined mass `1/2`.
 
@@ -382,8 +381,7 @@ noncomputable def Panel.fold {n : ℕ} (panel : Blindness.Panel n) : Blindness.P
 /-- Folding chooses the same canonical representative from both allele-label orientations. -/
 theorem Panel.reflect_fold {n : ℕ} (panel : Blindness.Panel n) :
     panel.reflect.fold = panel.fold := by
-  cases panel with
-  | mk support weight =>
+  cases panel with | mk support weight =>
       simp only [Blindness.Panel.reflect, Blindness.Panel.fold]
       congr 1
       funext i
@@ -427,8 +425,7 @@ moved to minor-allele frequency, folding again changes neither its support nor i
 theorem Panel.fold_idempotent {n : ℕ} (panel : Blindness.Panel n)
     (h0 : ∀ i, 0 ≤ panel.support i) (h1 : ∀ i, panel.support i ≤ 1) :
     panel.fold.fold = panel.fold := by
-  cases panel with
-  | mk support weight =>
+  cases panel with | mk support weight =>
       simp only [Blindness.Panel.fold] at h0 h1 ⊢
       congr 1
       funext i
@@ -1134,8 +1131,7 @@ theorem maf_spectrum_identifiable {n : ℕ} (panel : Blindness.Panel n)
 /-! ## 8. Correlated frequencies along the genome: what regeneration buys
 
 **The model, and its scope, first.** A *Markov-modulated bundle chain* lets the parameter
-`t_i` — the allele frequency at site `i` — follow a Markov chain along the sequence, with
-the genotype coordinates conditionally independent **given the parameters**. Read that
+`t_i` — the allele frequency at site `i` — follow a Markov chain along the sequence, with the genotype coordinates conditionally independent **given the parameters**. Read that
 again before quoting anything below: this is dependence *in the frequency profile along
 the genome*, not correlation between genotypes at fixed frequencies. Linkage
 disequilibrium is the latter. Nothing in this section covers it.
@@ -1728,7 +1724,7 @@ order-free channels separating at up to `18.1σ`, predictions matching measureme
 digits — and identified `Σγ(k)²` as the even-channel invariant. The analytical refutation
 arrived afterwards and independently, by Hermite expansion:
 
-`Σ_k Cov(f(F₀), f(F_k)) = Σ_r (c_r(f)²/r!) · π_r`,  with  `π_r := Σ_{k≥1} ρ(k)^r`,
+`Σ_k Cov(f(F₀), f(F_k)) = Σ_r (c_r(f)²/r!) · π_r`,  with `π_r := Σ_{k≥1} ρ(k)^r`,
 
 and varying the test function `f` is expected to expose the power family `{π_r}` under the
 required summability and identifiability hypotheses. **The measured `Σγ(k)²` is literally

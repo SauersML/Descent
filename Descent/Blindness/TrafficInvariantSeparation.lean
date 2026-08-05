@@ -375,8 +375,7 @@ section RankOneInvisibility
 
 /-- **The rank-one spike's normalised graph sum, bounded.**
 
-    For a balanced sign vector scaled by `p^(-1/2)`, a connected test graph with
-    every vertex degree even contributes `p ^ (|V| - |E| - 1)`. Such a graph has
+    For a balanced sign vector scaled by `p^(-1/2)`, a connected test graph with every vertex degree even contributes `p ^ (|V| - |E| - 1)`. Such a graph has
     `|E| ≥ |V|`, so the exponent is at most `-1`.
 
     The graph-theoretic input is the hypothesis `hev : v ≤ e`; what is proved is
@@ -507,8 +506,7 @@ theorem balancedRankOneTrafficCoordinate_tendsto_zero
     Filter.Tendsto
       (fun p : ℕ ↦ balancedRankOneTrafficCoordinate hasOddDegree (p + 1) vertices edges)
       Filter.atTop (nhds 0) := by
-  cases hodd : hasOddDegree with
-  | false =>
+  cases hodd : hasOddDegree with | false =>
       simpa [balancedRankOneTrafficCoordinate, hodd] using
         balancedRankOneGraphSum_tendsto_zero vertices edges (hev hodd)
   | true =>
@@ -558,8 +556,7 @@ theorem finiteRankOneTrafficCorrection_tendsto_zero
     (fun term _hterm ↦ hterm term)
   simpa [finiteRankOneTrafficCorrection] using hsum
 
-/-- The finite traffic correction vanishes from graph-local degree data, with
-no pre-assumed cardinal inequality.  Each all-even contracted term supplies
+/-- The finite traffic correction vanishes from graph-local degree data, with no pre-assumed cardinal inequality.  Each all-even contracted term supplies
 its degree function, minimum degree two, and handshaking identity; odd-degree
 terms require no graph bound because balancedness kills them exactly. -/
 theorem finiteRankOneTrafficCorrection_tendsto_zero_of_degreeData
@@ -690,7 +687,7 @@ theorem balancedRankOneCovariance_quadraticForm
   have hdiagonalMulVec :
       Matrix.diagonal (fun _coordinate ↦ baseline) *ᵥ vector =
         baseline • vector := by
-    PopGen.ext coordinate
+    ext coordinate
     simp [Matrix.mulVec]
   have hdiagonal :
       vector ⬝ᵥ
@@ -1559,8 +1556,7 @@ theorem biasedBinomialTypeWeight_firstMoment
     (∑ upSpins ∈ Finset.range (population + 1),
       biasedBinomialTypeWeight population q r upSpins * upSpins) =
         population * q := by
-  induction population with
-  | zero => simp [biasedBinomialTypeWeight]
+  induction population with | zero => simp [biasedBinomialTypeWeight]
   | succ population ih =>
       have hsplit := Finset.sum_choose_succ_mul (R := ℝ)
         (fun upSpins downSpins ↦
@@ -3542,8 +3538,7 @@ theorem mesoscopicGFOMIterate_succ_apply
     mesoscopicGFOMIterate iteration (runtime + 1) vector coordinate =
       if coordinate.2.val = 0 then
         (2 : ℝ) ^ (runtime + 1) * vector coordinate else 0 := by
-  induction runtime with
-  | zero =>
+  induction runtime with | zero =>
       simp [mesoscopicGFOMIterate, mesoscopicGFOMStep]
   | succ runtime ih =>
       by_cases hexceptional : coordinate.2.val = 0
@@ -3892,8 +3887,7 @@ theorem finiteOutlierDiagonal_hasMaximum
       (baseline + spikeStrength) := by
   constructor
   · intro coordinate
-    cases coordinate with
-    | none => exact le_rfl
+    cases coordinate with | none => exact le_rfl
     | some coordinate =>
         simp only [finiteOutlierDiagonal]
         linarith
@@ -4189,8 +4183,7 @@ theorem graphShapeCoefficient_comp_of_shapeInvariant
   rw [graphShapeCoefficient, dif_pos h]
   exact hinvariant _ _ (Classical.choose_spec h)
 
-/-- **Permutation-invariant polynomial factorization, after equality patterns are identified with
-graphs.**  Invariance makes each monomial coefficient constant on its shape class; the resulting
+/-- **Permutation-invariant polynomial factorization, after equality patterns are identified with graphs.**  Invariance makes each monomial coefficient constant on its shape class; the resulting
 polynomial is exactly a linear combination of the corresponding graph sums.  Taking `Graph` to
 be rooted equality patterns gives the equivariant vector version without changing the proof. -/
 theorem invariantPolynomial_graphSum_factorization_of_shapeInvariant
@@ -5226,7 +5219,7 @@ theorem isClosed_boundedLipschitzPressureFamily
       {profile | ∀ x y,
         dist (profile x) (profile y) ≤ (K : ℝ) * dist x y} ∩
       {profile | ∀ x, profile x ∈ Set.Icc (-bound) bound} by
-    PopGen.ext profile
+    ext profile
     simp only [boundedLipschitzPressureFamily, Set.mem_setOf_eq, Set.mem_inter_iff]
     rw [lipschitzWith_iff_dist_le_mul]]
   apply IsClosed.inter
@@ -5681,8 +5674,7 @@ noncomputable def finiteRankOneSingularSpectrum
     cases coordinate <;> simp_all
   inactive_zero := by
     intro coordinate hinactive
-    cases coordinate with
-    | none => simp at hinactive
+    cases coordinate with | none => simp at hinactive
     | some coordinate => rfl
   active_card_le_rank := by simp
 
@@ -5865,8 +5857,7 @@ theorem matchedInformationPath_nuclear_bound
     certificate.immseDerivative hderivative
   simpa only [Real.norm_eq_abs] using hpath
 
-/-- Combining the pathwise nuclear estimate with
-`nuclearDistance ≤ operatorBound * rankFraction` gives the normalized low-rank
+/-- Combining the pathwise nuclear estimate with `nuclearDistance ≤ operatorBound * rankFraction` gives the normalized low-rank
 bound used in the matched-Bayes obstruction. -/
 theorem matchedInformationPath_lowRank_bound
     (certificate : MatchedInformationPathCertificate)

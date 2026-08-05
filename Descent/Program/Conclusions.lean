@@ -104,7 +104,7 @@ theorem expectedBrierScore_quadratic (p π : ℝ) :
 theorem expectedBrierScore_deriv (p π : ℝ) :
     deriv (fun x : ℝ ↦ expectedBrierScore x π) p = 2 * (p - π) := by
   have h_eq : (fun x : ℝ ↦ expectedBrierScore x π) = fun x : ℝ ↦ π - 2 * π * x + x ^ 2 := by
-    PopGen.ext x
+    ext x
     exact expectedBrierScore_quadratic x π
   rw [h_eq]
   have hd1 : DifferentiableAt ℝ (fun x : ℝ ↦ π - 2 * π * x) p := by
@@ -1230,11 +1230,11 @@ theorem populationAUC_strictMono_invariant {Z : Type u} [MeasurableSpace Z]
   unfold populationAUC
   have h_gt :
       {zz : Z × Z | g (s zz.1) > g (s zz.2)} = {zz : Z × Z | s zz.1 > s zz.2} := by
-    PopGen.ext zz
+    ext zz
     exact hg.lt_iff_lt
   have h_eq :
       {zz : Z × Z | g (s zz.1) = g (s zz.2)} = {zz : Z × Z | s zz.1 = s zz.2} := by
-    PopGen.ext zz
+    ext zz
     constructor <;> intro h
     · exact hg.injective h
     · simpa using congrArg g h

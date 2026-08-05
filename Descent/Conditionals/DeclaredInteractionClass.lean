@@ -78,8 +78,7 @@ structure ObservationModel (Context Probe Param : Type*) where
   nuisance : Set (Context → Probe → ℝ)
 
 /-- **The observation model is inhabited**, at the smallest configuration that makes
-identification a real question: one real parameter read by one probe, seen exactly, with
-the constant functions as the declared nuisance class.
+identification a real question: one real parameter read by one probe, seen exactly, with the constant functions as the declared nuisance class.
 
 A theorem quantified over an uninhabited structure is true, kernel-checked, and empty.
 The nuisance class is deliberately non-trivial -- an empty class would make every model

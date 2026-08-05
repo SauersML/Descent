@@ -845,8 +845,7 @@ full heritability.**
 
 `StratificationConfounding` carried `amInflationFactor r = 1/(1 - r)` and
 `AssortativeMatingPGS` carries `amEquilibriumVariance V_A r h² = V_A/(1 - r h²)`
-for the same quantity, and no theorem related them. Forward simulation with
-the spousal correlation measured rather than assumed puts the second within
+for the same quantity, and no theorem related them. Forward simulation with the spousal correlation measured rather than assumed puts the second within
 -5% to +1% and the first between +3% and +82% high, so the first is deleted.
 This theorem records why the disagreement was invisible: the two coincide
 exactly when `h² = 1`, which is the only case anyone would have checked by

@@ -88,8 +88,7 @@ about spatial models is downstream of this line. -/
 theorem voterConfig_eq_ancestor {n : ℕ} {α : Type*} (u : ℕ → Fin n × Fin n)
     (c₀ : Fin n → α) (t : ℕ) :
     voterConfig u c₀ t = c₀ ∘ voterAncestor u t := by
-  induction t with
-  | zero => rfl
+  induction t with | zero => rfl
   | succ p ih =>
       funext l
       show lookdownApply (u p).1 (u p).2 (voterConfig u c₀ p) l
@@ -172,8 +171,7 @@ increments -- so two lineages moving independently are one lineage moving with t
 step, and everything about their meeting is a statement about a single walk. -/
 theorem walk_sub (x₀ y₀ : ℤ) (ξ η : ℕ → ℤ) (t : ℕ) :
     walk x₀ ξ t - walk y₀ η t = walk (x₀ - y₀) (fun s ↦ ξ s - η s) t := by
-  induction t with
-  | zero => rfl
+  induction t with | zero => rfl
   | succ p ih =>
       show walk x₀ ξ p + ξ p - (walk y₀ η p + η p)
         = walk (x₀ - y₀) (fun s ↦ ξ s - η s) p + (ξ p - η p)
@@ -194,8 +192,7 @@ theorem meet_iff_difference_walk_zero (x₀ y₀ : ℤ) (ξ η : ℕ → ℤ) (t
 still, which is the panmictic case `Descent.Coalescent.Structured` contrasts migration
 against. -/
 @[simp] theorem walk_zero_step (x₀ : ℤ) (t : ℕ) : walk x₀ (fun _ ↦ 0) t = x₀ := by
-  induction t with
-  | zero => rfl
+  induction t with | zero => rfl
   | succ p ih =>
       show walk x₀ (fun _ ↦ 0) p + 0 = x₀
       rw [ih]

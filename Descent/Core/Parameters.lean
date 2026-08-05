@@ -174,8 +174,7 @@ noncomputable def fstEquilibrium (p : PopGenParameters) : ℝ :=
 when `d/(d-1) = 2`, which is `d = 2`.
 
 This is worth stating rather than assuming, in both directions. The corpus wrote the two
-laws in two modules that do not import each other, both called "equilibrium `F_ST`", with
-nothing relating them -- and the free-looking `2` in `1/(1 + θ + 2M)` turns out not to be
+laws in two modules that do not import each other, both called "equilibrium `F_ST`", with nothing relating them -- and the free-looking `2` in `1/(1 + θ + 2M)` turns out not to be
 free at all: it IS the finite-deme correction, evaluated at the two-population split that
 most of this corpus's portability results are about. A reader who took `fstEquilibrium`
 for the many-deme law was wrong by exactly that factor, and

@@ -29,8 +29,7 @@ other:
 
   * `Program.Conclusions.BinaryPopulation` -- a pair of measures, cases and controls, on
     which an AUC is an integral. It has no source/target structure at all.
-  * `Portability.DeploymentPopulation` -- an expectation functional together with
-    genotype codings, causal effects and a residual. It is a whole model.
+  * `Portability.DeploymentPopulation` -- an expectation functional together with genotype codings, causal effects and a residual. It is a whole model.
 
 A census that saw three names containing "population" and proposed collapsing them would
 be reading the word and not the type. They are kept apart, and this note is why.
@@ -59,8 +58,7 @@ inductive Pop where
 fields with this, so a field that genuinely differs between populations still reads as one
 line rather than two. -/
 def Pop.pair {α : Sort*} (s t : α) (p : Pop) : α :=
-  match p with
-  | Pop.source => s
+  match p with | Pop.source => s
   | Pop.target => t
 
 @[simp] theorem Pop.pair_source {α : Sort*} (s t : α) : Pop.pair s t Pop.source = s := rfl

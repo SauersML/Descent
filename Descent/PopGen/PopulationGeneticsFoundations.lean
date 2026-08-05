@@ -317,8 +317,7 @@ theorem het_increases_with_ne
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_fix.py`,
-    `test_fst_composition`). msprime coalescent simulation of a clean split with
-    no migration, ancestral and both daughter sizes `Ne = 1000`, recombining at
+    `test_fst_composition`). msprime coalescent simulation of a clean split with no migration, ancestral and both daughter sizes `Ne = 1000`, recombining at
     `1e-8` so a replicate carries many independent genealogies, Hudson `F_ST` as
     a ratio of averages, 25 replicates of 20 Mb, 50 diploids per deme:
 
@@ -735,8 +734,7 @@ section WrightFStatistics
 noncomputable def wrightFIT (f_IS f_ST : ℝ) : ℝ :=
   Descent.Core.complementaryComposition f_IS f_ST
 
-/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with
-`pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
+/-- **Wright's `F_IT` compounds the two levels, pinned.** The identity with `pairwiseFstFromBranches` constrains the two definitions jointly and leaves a shared wrong factor
 free. Two independent halves compound to three quarters, not to one -- the inbreeding
 coefficients multiply as retained heterozygosities rather than adding. -/
 theorem wrightFIT_compounds_two_halves :
@@ -772,8 +770,7 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
 
-    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with
-    branch-mode
+    **This is *not* between-population `F_ST` after a split.** Coalescent simulation with branch-mode
     divergence, which removes mutational noise analytically, shows the split
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
@@ -1252,8 +1249,7 @@ were a straight contradiction inside one section. The linear form is the one
 this corpus's `F_ST` convention has: see the attribution note on
 `islandFstFiniteDemes` for which published statistic each form belongs to.
 
-The correction factor `d/(d-1)` is `2` at `d = 2` and `1.5` at `d = 3`, so with
-two demes the limit understates the migration pressure by a factor of two in
+The correction factor `d/(d-1)` is `2` at `d = 2` and `1.5` at `d = 3`, so with two demes the limit understates the migration pressure by a factor of two in
 the scaled rate and overstates `F_ST` correspondingly. Nothing about the
 expression `1/(1+4Nm)`
 announces this, which is why every theorem below is a theorem about the limit
@@ -1297,8 +1293,7 @@ carried implicitly.
     at two demes and converge to 0.19598 against 0.19202 at forty, so the design
     separates them where they differ and not where they do not. 
     **Validated across five deme counts, and the squared form excluded**
-    (`validation/empirical/simcov/battery_bulk18b.py`). Island model with
-    the TOTAL emigration rate held fixed at `4 Ne m = 2.0` while the deme count
+    (`validation/empirical/simcov/battery_bulk18b.py`). Island model with the TOTAL emigration rate held fixed at `4 Ne m = 2.0` while the deme count
     runs 2, 3, 5, 10, 25, `F_ST` from coalescence times so no estimator
     convention enters:
 
@@ -1560,8 +1555,7 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     construction.
 
     **A FIRST, LOOSER RUN OF THIS DESIGN SAID MATCH, AND THE DIFFERENCE WAS THE
-    ERROR BARS.** `battery_falsrepair.py`'s `group_c` used 24 replicates with
-    recombination switched off -- one genealogy per replicate -- and got sems
+    ERROR BARS.** `battery_falsrepair.py`'s `group_c` used 24 replicates with recombination switched off -- one genealogy per replicate -- and got sems
     five times wider, on which this body passed at 1.57 sems and the record
     above was nearly written as CONDITIONALLY VALID. The point estimates agree
     between the two runs; only the resolution changed. A verdict that flips on
@@ -1742,8 +1736,7 @@ theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
 
 /-- **Characteristic length of one-dimensional isolation by distance.**
     `L = √(m·σ² / (2·μ))`, in units of the deme spacing. This is the Malécot /
-    Kimura-Weiss decay scale: in an infinite linear array of demes with
-    nearest-neighbour migration rate `m`, dispersal variance `σ²` and mutation
+    Kimura-Weiss decay scale: in an infinite linear array of demes with nearest-neighbour migration rate `m`, dispersal variance `σ²` and mutation
     rate `μ`, the probability that two genes sampled `d` demes apart are
     identical by descent falls off as `exp(-d/L)`.
 
@@ -1886,8 +1879,7 @@ The contradiction is decidable without simulation, and it is decided against
 the exponential. `demoSteppingStoneFst` is derived from the coalescent in
 `DemographicHistory`: the meeting time of two lineages `d` demes apart is
 linear in `d`, `T(d) = d/(2σ²m)`, and `F_ST = T/(T + 2Nₑ)` then gives the
-hyperbolic `d/(d + 4Nₑσ²m)` exactly, with
-`steppingStoneFst_from_coalescence_time` proving that equality. A linear
+hyperbolic `d/(d + 4Nₑσ²m)` exactly, with `steppingStoneFst_from_coalescence_time` proving that equality. A linear
 meeting time under the `T/(T+2Nₑ)` map cannot produce `1 - exp(-d/L)` for any
 `L`: the two agree only to first order in `d`, and there they agree only if
 `L = 4·Nₑ·m·σ²`, which is not the scale the corpus passed and is not a
@@ -1910,8 +1902,7 @@ should use `demoSteppingStoneFst`. -/
     The deviation from the continental frequency decays geometrically.
 
     Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk16.py`). Wright-Fisher with
-    migration toward a fixed continent, `N = 40000` so drift stays far below the
+    (`validation/empirical/simcov/battery_bulk16.py`). Wright-Fisher with migration toward a fixed continent, `N = 40000` so drift stays far below the
     deterministic signal, 400 replicates, four times per parameter set:
 
       m        p0     p_c    worst of t in {5,15,30,60}     rel err
@@ -2365,8 +2356,7 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
   field_simp
   ring
 
-/-- **The equilibrium derived from the recurrence agrees with
-    `fstMutationDriftEquilibrium`.** -/
+/-- **The equilibrium derived from the recurrence agrees with `fstMutationDriftEquilibrium`.** -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
     1 - Portability.hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
@@ -2461,8 +2451,7 @@ noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_bulk15.py`). Measured against the
-    same infinite-alleles trajectories as `hetMutationDriftRecurrence`, with
-    `lam = 1 - 1/(2 Ne) - 2 mu` and `Hstar = theta/(1 + theta)`, iterated fifteen
+    same infinite-alleles trajectories as `hetMutationDriftRecurrence`, with `lam = 1 - 1/(2 Ne) - 2 mu` and `Hstar = theta/(1 + theta)`, iterated fifteen
     generations from a measured start: worst cell 1.01 sems, 6.5% relative,
     across `theta` of 0.80 and 1.00 and `Ne` of 50, 100 and 200.
 
@@ -2505,8 +2494,7 @@ theorem hetMutationRecurrence_zero (lam Hstar H₀ : ℝ) :
     the fact that the constant term (1-λ)H* absorbs the equilibrium part. -/
 theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     hetMutationRecurrence lam Hstar H₀ t = Hstar + (H₀ - Hstar) * lam ^ t := by
-  induction t with
-  | zero =>
+  induction t with | zero =>
     simp [hetMutationRecurrence]
   | succ n ih =>
     simp only [hetMutationRecurrence, ih]
@@ -2627,8 +2615,7 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     `exp(-(1+theta) t/(2 Ne))` by `hetDecayFactor^t` and the substitution is
     exact only to O(1/Ne). The design reached down to `Ne = 50`, where the two
     predictions differ by about a percent, and the measurement's own noise is
-    six percent. They therefore did NOT separate, and neither is credited with
-    beating the other. What is established is the common content: the plateau
+    six percent. They therefore did NOT separate, and neither is credited with beating the other. What is established is the common content: the plateau
     and the rate at which it is approached.
 
     Separating them needs about a hundredfold increase in replicates at small

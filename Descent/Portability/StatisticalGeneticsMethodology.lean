@@ -206,8 +206,7 @@ individual-level data. This introduces specific challenges.
 section SummaryStatPGS
 
 
-/-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with
-`effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
+/-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with `effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
 
 | `p` | `1/SE²` | `effectiveSampleSizeFromSE` | error |
 |---|---|---|---|
@@ -430,8 +429,7 @@ noncomputable def LDSCModel.witness (m : ℕ) : LDSCModel m where
   h_ld_adj_pos := fun _ ↦ by norm_num
   h_ld_adj_le_one := fun _ ↦ by norm_num
 
-/-! **Deleted: `geneticCorrelationLDSC`, together with
-`genetic_correlation_predicts_portability` and
+/-! **Deleted: `geneticCorrelationLDSC`, together with `genetic_correlation_predicts_portability` and
 `genetic_correlation_portability_bound_attained`.**
 
 * **LD alone breaks it.** Two SNPs at `r = 1/2` with joint effects `(1,0)` and `(0,1)` are
@@ -627,7 +625,7 @@ theorem disjointWindow_limit_variances_eq_segment :
     {v : ℝ | ∃ (w : ℕ) (share : Fin w → ℝ),
         (∀ j, 0 ≤ share j) ∧ (∑ j, share j) ≤ 1 ∧
           disjointWindowLimitVariance share = v} = Set.Icc (0 : ℝ) 1 := by
-  PopGen.ext v
+  ext v
   constructor
   · rintro ⟨w, share, h_nn, h_le, rfl⟩
     exact disjointWindowLimitVariance_mem_segment share h_nn h_le

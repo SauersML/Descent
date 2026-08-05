@@ -75,8 +75,7 @@ theorem prodUpTo_succ {M : Type*} [Monoid M] (A : ℕ → M) (r : ℕ) :
 /-- A product of contractions is a contraction. -/
 theorem norm_prodUpTo_le_one {M : Type*} [NormedRing M] [NormOneClass M] (A : ℕ → M)
     (hA : ∀ s, ‖A s‖ ≤ 1) (r : ℕ) : ‖prodUpTo A r‖ ≤ 1 := by
-  induction r with
-  | zero => simp
+  induction r with | zero => simp
   | succ m ih =>
       rw [prodUpTo_succ]
       calc ‖prodUpTo A m * A m‖ ≤ ‖prodUpTo A m‖ * ‖A m‖ := norm_mul_le _ _
@@ -91,8 +90,7 @@ and the induction is the telescoping `A₀⋯A_r - B₀⋯B_r = (A₀⋯A_{r-1})
 theorem norm_prodUpTo_sub_le {M : Type*} [NormedRing M] [NormOneClass M] (A B : ℕ → M)
     (hA : ∀ s, ‖A s‖ ≤ 1) (hB : ∀ s, ‖B s‖ ≤ 1) (r : ℕ) :
     ‖prodUpTo A r - prodUpTo B r‖ ≤ ∑ s ∈ range r, ‖A s - B s‖ := by
-  induction r with
-  | zero => simp
+  induction r with | zero => simp
   | succ m ih =>
       have hsplit : prodUpTo A (m + 1) - prodUpTo B (m + 1)
           = prodUpTo A m * (A m - B m) + (prodUpTo A m - prodUpTo B m) * B m := by
@@ -132,8 +130,7 @@ theorem pow_sub_pow_le {M : Type*} [NormedRing M] [NormOneClass M] (A B : M)
 about `A^r`. -/
 theorem prodUpTo_const {M : Type*} [Monoid M] (A : M) (r : ℕ) :
     prodUpTo (fun _ => A) r = A ^ r := by
-  induction r with
-  | zero => simp
+  induction r with | zero => simp
   | succ m ih =>
       rw [prodUpTo_succ, ih, pow_succ]
 

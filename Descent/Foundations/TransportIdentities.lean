@@ -22,8 +22,7 @@ This file isolates the algebraic core used by the portability arguments:
 - binary metric identities relating prevalence, recall, FPR, and precision.
 
 The point is to keep these results independent of any particular probability
-space representation. Downstream modules can instantiate `ExpFunctional` with
-an actual expectation operator.
+space representation. Downstream modules can instantiate `ExpFunctional` with an actual expectation operator.
 -/
 
 /--
@@ -163,8 +162,7 @@ theorem cauchy_schwarz (E : ExpFunctional Ω) (f g : Ω → ℝ) :
 @[simp] theorem eval_sum {ι : Type*} [DecidableEq ι]
     (E : ExpFunctional Ω) (s : Finset ι) (f : ι → Ω → ℝ) :
     E (Finset.sum s f) = Finset.sum s (fun i ↦ E (f i)) := by
-  induction s using Finset.induction with
-  | empty =>
+  induction s using Finset.induction with | empty =>
       simp [eval_zero]
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, E.add_eval, hs]
@@ -278,8 +276,7 @@ theorem covariance_finset_sum_right
     (E : ExpFunctional Ω) (X : Ω → ℝ) (s : Finset ι) (Y : ι → Ω → ℝ) :
     covariance E X (fun ω ↦ Finset.sum s (fun i ↦ Y i ω))
       = Finset.sum s (fun i ↦ covariance E X (Y i)) := by
-  induction s using Finset.induction with
-  | empty =>
+  induction s using Finset.induction with | empty =>
       simp [covariance_eq_expect_mul_sub_means]
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, covariance_add_right, hs]
@@ -287,8 +284,7 @@ theorem covariance_finset_sum_right
 /-- Covariance is symmetric.
 
     Previously duplicated in `Blindness.ImitationRigidity`, which is where the corpus
-    first needed it.  It is a fact about any positive linear functional and belongs with
-    the rest of the covariance algebra; the copy is gone and its seven uses point here.
+    first needed it.  It is a fact about any positive linear functional and belongs with the rest of the covariance algebra; the copy is gone and its seven uses point here.
 
     The `_exp` suffix is not decoration.  Mathlib has `ProbabilityTheory.covariance_comm`
     for its measure-theoretic `covariance`, and these four names -- this one,
@@ -528,7 +524,7 @@ def optimalWeightsFromMoments
 omit [DecidableEq J] in
 theorem matrix_mulVec_add (A : Matrix J J ℝ) (x y : J → ℝ) :
     A.mulVec (fun i ↦ x i + y i) = A.mulVec x + A.mulVec y := by
-  PopGen.ext j
+  ext j
   simp [Matrix.mulVec, dotProduct, left_distrib, Finset.sum_add_distrib]
 
 theorem covariance_with_causal_signal
@@ -555,7 +551,7 @@ theorem crossCovVector_decomposition
     (β : L → ℝ) (h : Ω → ℝ) :
     crossCovVector E X (fun ω ↦ causalSignal β C ω + h ω)
       = (predictorCausalCovariance E X C).mulVec β + contextCrossCovVector E X h := by
-  PopGen.ext j
+  ext j
   unfold crossCovVector predictorCausalCovariance contextCrossCovVector
   rw [covariance_add_right]
   rw [covariance_with_causal_signal]
@@ -621,7 +617,7 @@ theorem secondMoment_eq_covariance_of_centered
     (E : ExpFunctional Ω) (X : Ω → J → ℝ)
     (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0) :
     secondMomentMatrix E X = covarianceMatrix E X := by
-  PopGen.ext i j
+  ext i j
   unfold secondMomentMatrix covarianceMatrix
   simp [covariance_eq_expect_mul_sub_means, hcentered]
 
@@ -816,7 +812,7 @@ theorem scalar_summary_factorization_of_kernel_inclusion
     ∃ c : ℝ, A = c • f := by
   by_cases hf : f = 0
   · refine ⟨0, ?_⟩
-    PopGen.ext θ
+    ext θ
     have hAθ : A θ = 0 := by
       apply hker θ
       simp [hf]
@@ -825,11 +821,11 @@ theorem scalar_summary_factorization_of_kernel_inclusion
       by_contra hnone
       push_neg at hnone
       apply hf
-      PopGen.ext v
+      ext v
       exact hnone v
     rcases hnonzero with ⟨v, hv⟩
     refine ⟨A v / f v, ?_⟩
-    PopGen.ext θ
+    ext θ
     let η : V := θ - (f θ / f v) • v
     have hfη : f η = 0 := by
       dsimp [η]

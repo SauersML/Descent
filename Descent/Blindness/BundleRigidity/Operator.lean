@@ -35,8 +35,7 @@ for it; reason 2 is about what happens the next time it is absent.
 
 ## What is here
 
-A **bundle family** on a parameter space `T` is a finite list of atoms `atom j t` with
-masses `mass j t > 0` summing to one, standardized so that `∑ mass j t * atom j t = 0`
+A **bundle family** on a parameter space `T` is a finite list of atoms `atom j t` with masses `mass j t > 0` summing to one, standardized so that `∑ mass j t * atom j t = 0`
 and `∑ mass j t * atom j t ^ 2 = 1`. One parameter `t` fixes every atom and every mass
 simultaneously — that is what *bundle* means, and it is the entire source of rigidity.
 The atoms cannot be reweighted one at a time.
@@ -208,12 +207,12 @@ noncomputable def coTransfer (F : ContinuousBundleFamily T d) (f : C(ℝ, ℝ)) 
 noncomputable def coTransferₗ (F : ContinuousBundleFamily T d) : C(ℝ, ℝ) →ₗ[ℝ] C(T, ℝ) where
   toFun := F.coTransfer
   map_add' f g := by
-    PopGen.ext t
+    ext t
     simp only [coTransfer_apply, ContinuousMap.add_apply]
     rw [← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun j _ ↦ by ring
   map_smul' c f := by
-    PopGen.ext t
+    ext t
     simp only [coTransfer_apply, ContinuousMap.smul_apply, RingHom.id_apply,
       ContinuousMap.smul_apply, smul_eq_mul]
     rw [Finset.mul_sum]
@@ -224,7 +223,7 @@ noncomputable def coTransferₗ (F : ContinuousBundleFamily T d) : C(ℝ, ℝ) �
 /-- **`L*` fixes the constant function `1`.** This is the standardization identity
 `∑ mass j t = 1` and nothing else, and it is the whole content of the mass identity. -/
 @[simp] theorem coTransfer_one : F.coTransfer 1 = 1 := by
-  PopGen.ext t
+  ext t
   simp only [coTransfer_apply, ContinuousMap.one_apply, mul_one]
   exact F.mass_sum t
 
@@ -295,7 +294,7 @@ difference of point masses is a kernel element. This is the cheapest possible so
 non-rigidity: an exact coincidence of whole bundles. -/
 theorem transfer_dirac_sub_eq_zero {t₁ t₂ : T} (h : F.SameTransfer t₁ t₂) :
     F.transfer (diracAt t₁ - diracAt t₂) = 0 := by
-  PopGen.ext f
+  ext f
   simp only [transfer_apply, LinearMap.sub_apply, diracAt_apply, LinearMap.zero_apply]
   rw [h f, sub_self]
 
@@ -349,16 +348,15 @@ No hypothesis on the family beyond `IsSymmetry`; no analyticity, no coverage con
 nothing about the core. The proof is one line of algebra: `L* f` is `τ`-invariant because
 `TT ∘ τ = TT`, and a `τ`-odd measure annihilates every `τ`-invariant function.
 
-**This is the detector.** Any search for kernel elements that works only with
-`L*`-functionals and reports nothing on a symmetric family is inconsistent with this
+**This is the detector.** Any search for kernel elements that works only with `L*`-functionals and reports nothing on a symmetric family is inconsistent with this
 theorem and is therefore broken. It is the positive control every rigidity search must
 pass before its null results mean anything. -/
 theorem transfer_eq_zero_of_tauOdd {τ : C(T, T)} (hsym : F.IsSymmetry τ)
     {κ : C(T, ℝ) →ₗ[ℝ] ℝ} (hodd : IsTauOdd τ κ) :
     F.transfer κ = 0 := by
-  PopGen.ext f
+  ext f
   have hinv : pullback τ (F.coTransfer f) = F.coTransfer f := by
-    PopGen.ext t; exact hsym f t
+    ext t; exact hsym f t
   have h := congrArg (fun L ↦ L (F.coTransfer f)) hodd
   simp only [LinearMap.comp_apply, LinearMap.neg_apply] at h
   rw [hinv] at h
@@ -376,7 +374,7 @@ noncomputable def oddPart (τ : C(T, T)) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : C(T,
 /-- **Every measure splits into its `τ`-even and `τ`-odd parts.** -/
 theorem evenPart_add_oddPart (τ : C(T, T)) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
     evenPart τ κ + oddPart τ κ = κ := by
-  PopGen.ext f
+  ext f
   simp only [evenPart, oddPart, LinearMap.add_apply, LinearMap.sub_apply,
     LinearMap.smul_apply, smul_eq_mul]
   ring
@@ -384,7 +382,7 @@ theorem evenPart_add_oddPart (τ : C(T, T)) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
 /-- The even part is even, provided `τ` is an involution. -/
 theorem isTauEven_evenPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauEven τ (evenPart τ κ) := by
-  PopGen.ext f
+  ext f
   have hff : pullback τ (pullback τ f) = f := by PopGen.ext t; simp [hinv t]
   simp only [evenPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.add_apply, smul_eq_mul]
@@ -394,7 +392,7 @@ theorem isTauEven_evenPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
 /-- The odd part is odd, provided `τ` is an involution. -/
 theorem isTauOdd_oddPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauOdd τ (oddPart τ κ) := by
-  PopGen.ext f
+  ext f
   have hff : pullback τ (pullback τ f) = f := by PopGen.ext t; simp [hinv t]
   simp only [oddPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.sub_apply, LinearMap.neg_apply, smul_eq_mul]
@@ -409,7 +407,7 @@ theorem transfer_eq_transfer_evenPart {τ : C(T, T)} (hsym : F.IsSymmetry τ)
     (hinv : ∀ t : T, τ (τ t) = t) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
     F.transfer κ = F.transfer (evenPart τ κ) := by
   have hodd := F.transfer_eq_zero_of_tauOdd hsym (isTauOdd_oddPart hinv κ)
-  PopGen.ext f
+  ext f
   -- No `hsplit` at `f` here: after `ext`, `f : C(ℝ, ℝ)`, whereas `evenPart τ κ` eats
   -- `C(T, ℝ)`. The split is only ever needed at `F.coTransfer f`, which is where `h1`
   -- applies it.
@@ -444,7 +442,7 @@ theorem mem_ker_iff_evenPart_mem_ker {τ : C(T, T)} (hsym : F.IsSymmetry τ)
 /-- The odd and even summands intersect only in zero. -/
 theorem eq_zero_of_tauOdd_of_tauEven {τ : C(T, T)} {κ : C(T, ℝ) →ₗ[ℝ] ℝ}
     (hodd : IsTauOdd τ κ) (heven : IsTauEven τ κ) : κ = 0 := by
-  PopGen.ext f
+  ext f
   have h1 := congrArg (fun L ↦ L f) hodd
   have h2 := congrArg (fun L ↦ L f) heven
   simp only [LinearMap.comp_apply, LinearMap.neg_apply] at h1
@@ -473,7 +471,7 @@ is what Theorem E settles for `d = 2`. -/
 theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     {κ κ' : C(T, ℝ) →ₗ[ℝ] ℝ} (hκ : IsTauEven τ κ) (hκ' : IsTauEven τ κ')
     (hagree : ∀ f : C(T, ℝ), IsInvariantFn τ f → κ f = κ' f) : κ = κ' := by
-  PopGen.ext f
+  ext f
   -- Split `f` into its `τ`-invariant and `τ`-anti-invariant parts.
   set g : C(T, ℝ) := (2 : ℝ)⁻¹ • (f + pullback τ f) with hg
   set h : C(T, ℝ) := (2 : ℝ)⁻¹ • (f - pullback τ f) with hh
@@ -486,7 +484,7 @@ theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ
   -- The odd part is antiinvariant under the pullback, and that computation is what makes
   -- BOTH functionals vanish on it. It was written out once per functional, identically.
   have hodd : pullback τ h = -h := by
-    PopGen.ext t
+    ext t
     simp only [hh, pullback_apply, ContinuousMap.smul_apply, ContinuousMap.sub_apply,
       ContinuousMap.neg_apply, smul_eq_mul, hinv t]
     ring

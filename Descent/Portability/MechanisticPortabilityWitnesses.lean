@@ -165,7 +165,7 @@ theorem identityDirectMetricModel_source_weights {q : ℕ}
     sourceWeightsFromExplicitDrivers
         (identityDirectMetricModel β outcomeVariance targetPrevalence
           h_out h_prev_pos h_prev_lt) = β := by
-  PopGen.ext i
+  ext i
   simp [identityDirectMetricModel, sourceWeightsFromExplicitDrivers, sourceERMWeights,
     crossCovariance, PopGen.sigmaTagCausal, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
@@ -196,12 +196,12 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
       identityDirectMetricModel_source_weights β outcomeVariance targetPrevalence
         h_out h_prev_pos h_prev_lt
   have h_source_cross : crossCovariance m Pop.source = β := by
-    PopGen.ext i
+    ext i
     simp [m, identityDirectMetricModel, crossCovariance, PopGen.sigmaTagCausal,
       Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   have h_target_cross : crossCovariance m Pop.target = β := by
-    PopGen.ext i
+    ext i
     simp [m, identityDirectMetricModel, crossCovariance, PopGen.sigmaTagCausal,
       Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
@@ -298,21 +298,18 @@ noncomputable def baselineMetricModel : CrossPopulationMetricModel 1 1 := {
     which is worse than no marker: it inflates the count of things owed a
     measurement with items that can never receive one. -/
 noncomputable def targetLDShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      sigmaTag := Pop.withTarget baselineMetricModel.sigmaTag !![2] }
+  { baselineMetricModel with sigmaTag := Pop.withTarget baselineMetricModel.sigmaTag !![2] }
 
 /-- Proxy-tag baseline witness: the scored SNP is not itself causal, but is a
 perfect source and target proxy for the unscored causal variant. -/
 noncomputable def baselineProxyTagMetricModel : CrossPopulationMetricModel 1 1 := {
-  baselineMetricModel with
-    directCausal := Pop.pair !![0] !![0]
+  baselineMetricModel with directCausal := Pop.pair !![0] !![0]
     proxyTagging := Pop.pair !![1] !![1] }
 
 /-- Target tagging-shift witness: only the target proxy-tagging alignment
 changes. -/
 noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineProxyTagMetricModel with
-      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![1 / 2] }
+  { baselineProxyTagMetricModel with proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![1 / 2] }
 
 /-- Target effect-shift witness: only the target causal effect size changes.
 
@@ -325,14 +322,12 @@ noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1
     which is worse than no marker: it inflates the count of things owed a
     measurement with items that can never receive one. -/
 noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      beta := Pop.withTarget baselineMetricModel.beta ![1 / 2] }
+  { baselineMetricModel with beta := Pop.withTarget baselineMetricModel.beta ![1 / 2] }
 
 /-- Target context-shift witness: only the target context/environment
 cross-covariance changes. -/
 noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
+  { baselineMetricModel with contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
 
 /-- Irreducible target mismatch witness.
 
@@ -345,24 +340,21 @@ noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1
     which is worse than no marker: it inflates the count of things owed a
     measurement with items that can never receive one. -/
 noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      targetPrevalence := 1 / 4
+  { baselineMetricModel with targetPrevalence := 1 / 4
       targetPrevalence_pos := by norm_num
       targetPrevalence_lt_one := by norm_num }
 
 /-- Novel target-only proxy-tagging witness: source fit is unchanged, but
 target portability changes because new post-split tagging links appear. -/
 noncomputable def novelTargetOnlyTaggingMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineProxyTagMetricModel with
-      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![0]
+  { baselineProxyTagMetricModel with proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![0]
       novelProxyTagging := Pop.withTarget baselineProxyTagMetricModel.novelProxyTagging !![1 / 2] }
 
 /-- Target-only novel untaggable phenotype variance witness: transported score
 moments are unchanged, but target `R²` drops because new target-only causal
 variance enters the phenotype and is not captured by the score. -/
 noncomputable def novelUntaggablePhenotypeMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      novelUntaggablePhenotypeVarianceTarget := 1 / 2
+  { baselineMetricModel with novelUntaggablePhenotypeVarianceTarget := 1 / 2
       novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num }
 
 /-- **Evaluate a witness model's metrics from its explicit state.**
@@ -531,8 +523,7 @@ derived deployed `R²`, change under the mechanistic state. -/
 theorem target_ld_shift_changes_liability_auc :
     equalVarianceGaussianAUCFromSourceWeights targetLDShiftMetricModel Pop.target <
       equalVarianceGaussianAUCFromSourceWeights baselineMetricModel Pop.target := by
-  rcases target_ld_shift_changes_portability_without_changing_source_r2 with
-    ⟨_, _, h_target_shift, h_target_base, _⟩
+  rcases target_ld_shift_changes_portability_without_changing_source_r2 with ⟨_, _, h_target_shift, h_target_base, _⟩
   rw [target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_shift, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow] using
       (show (1 / 6 : ℝ) < 1 by norm_num)),
     target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_base, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow] using
@@ -573,8 +564,7 @@ noncomputable def baselineGenerationalPopGen : Descent.Core.PopGenParameters := 
   V_A_pos := by norm_num
 }
 
-/-- Nondegenerate generation-indexed population-genetic parameters with
-positive mutation, migration, and recombination. This witness is used to show
+/-- Nondegenerate generation-indexed population-genetic parameters with positive mutation, migration, and recombination. This witness is used to show
 that the public generational portability API changes because of explicit
 population-genetic coordinates, not only because of hand-injected AF/effect
 paths. -/
@@ -635,8 +625,7 @@ noncomputable def popgenDrivenTagScale : ℝ :=
   (7 / 6 : ℝ) * Real.exp (-(1 : ℝ))
 
 /-- The LD decay exponent this witness carries across one tag-causal unit of
-distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with
-`lambda` and the gap READ OFF the witness's own population-genetic parameters
+distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with `lambda` and the gap READ OFF the witness's own population-genetic parameters
 rather than copied out as numbers, and `distance = 1` from the model's
 `tagCausalDistance` below.
 
@@ -741,7 +730,7 @@ theorem popgenDrivenProxyGenerationalModel_source_weights (t : ℕ) :
     sourceWeightsFromExplicitDrivers
         (CrossPopulationGenerationalModel.toMetricModelAt
           popgenDrivenProxyGenerationalModel t) = ![1, 1] := by
-  PopGen.ext i
+  ext i
   fin_cases i <;>
     simp [popgenDrivenProxyGenerationalModel,
       CrossPopulationGenerationalModel.toMetricModelAt,
@@ -774,8 +763,7 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
       popgenDrivenProxyScale ∧
     proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 1 0 =
       popgenDrivenProxyScale := by
-  rcases nondegenerateGenerationalPopGen_coordinates_at_one with
-    ⟨h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig⟩
+  rcases nondegenerateGenerationalPopGen_coordinates_at_one with ⟨h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig⟩
   -- Both tags carry the same proxy scale at generation one, and the calculation that shows
   -- it does not depend on which: it was written out once per tag, `calc` step for `calc`
   -- step. Proved for an arbitrary tag, the last two goals are two instances of it.
@@ -829,11 +817,10 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     simpa [m1, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow] using popgenDrivenProxyGenerationalModel_source_weights 1
   have h_cov :
       predictiveCovarianceFromSourceWeights m1 Pop.target = 2 * popgenDrivenProxyScale := by
-    rcases popgenDrivenProxyGenerationalModel_generation_one_scales with
-      ⟨_, _, h_proxy0, h_proxy1⟩
+    rcases popgenDrivenProxyGenerationalModel_generation_one_scales with ⟨_, _, h_proxy0, h_proxy1⟩
     have h_cross :
         crossCovariance m1 Pop.target = ![popgenDrivenProxyScale, popgenDrivenProxyScale] := by
-      PopGen.ext i
+      ext i
       fin_cases i
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
@@ -855,11 +842,10 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     ring
   have h_var :
       scoreVarianceFromSourceWeights m1 Pop.target = 2 * popgenDrivenTagScale := by
-    rcases popgenDrivenProxyGenerationalModel_generation_one_scales with
-      ⟨h_ld0, h_ld1, _, _⟩
+    rcases popgenDrivenProxyGenerationalModel_generation_one_scales with ⟨h_ld0, h_ld1, _, _⟩
     have h_sigma :
         (m1.sigmaTag Pop.target) = !![popgenDrivenTagScale, 0; 0, popgenDrivenTagScale] := by
-      PopGen.ext i j
+      ext i j
       fin_cases i <;> fin_cases j
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,

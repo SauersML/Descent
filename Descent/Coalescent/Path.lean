@@ -125,7 +125,7 @@ theorem blockCountAt_zero (n : ℕ) {hold : ℕ → ℝ} (hn : 1 ≤ n)
   classical
   have hset : ((Finset.Icc 1 n).filter fun k => (0 : ℝ) < descentTime n hold k)
       = Finset.Icc 1 (n - 1) := by
-    PopGen.ext k
+    ext k
     rw [mem_filter, mem_Icc, mem_Icc]
     constructor
     · rintro ⟨⟨hk1, hkn⟩, hlt⟩
@@ -254,8 +254,7 @@ noncomputable def pathState (n : ℕ) (chain : ℕ → ER n) (hold : ℕ → ℝ
 theorem chain_antitone {n : ℕ} {chain : ℕ → ER n}
     (hchain : ∀ k, 1 ≤ k → k < n → Covers (chain (k + 1)) (chain k)) {k k' : ℕ}
     (h1 : 1 ≤ k) (hk : k ≤ k') (hk' : k' ≤ n) : chain k' ≤ chain k := by
-  induction k' with
-  | zero => omega
+  induction k' with | zero => omega
   | succ m ih =>
       rcases Nat.lt_or_ge k (m + 1) with hlt | hge
       · have hm : k ≤ m := by omega

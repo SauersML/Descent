@@ -287,8 +287,7 @@ theorem sum_hweProb (q : ℝ) : (∑ g : Genotype, hweProb q g) = 1 := by
 
 /-- **The heterozygote probability IS `hweHeterozygosity`.**
 
-`Core.Fst.hweHeterozygosity q = ploidy · q · (1 - q)` was written as a scalar formula with
-a biological name and no genotype anywhere in its type.  This is the statement that the
+`Core.Fst.hweHeterozygosity q = ploidy · q · (1 - q)` was written as a scalar formula with a biological name and no genotype anywhere in its type.  This is the statement that the
 name is earned: it is the probability that a Hardy-Weinberg individual is a heterozygote. -/
 theorem hweProb_het (q : ℝ) : hweProb q Genotype.het = hweHeterozygosity q := by
   unfold hweProb hweHeterozygosity ploidy

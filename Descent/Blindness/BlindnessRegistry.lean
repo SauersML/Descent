@@ -305,8 +305,7 @@ noncomputable def OneLocusArchitecture.witness : OneLocusArchitecture where
 
     Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_a`). The docstring's
     claim -- that this is what a dosage regression recovers -- is now the thing that was
-    measured. One diploid locus in Hardy-Weinberg proportions over 4×10⁶ individuals with
-    genotypic values `-a / d / a` transcribed from `genotypicValue`; the observable is the
+    measured. One diploid locus in Hardy-Weinberg proportions over 4×10⁶ individuals with genotypic values `-a / d / a` transcribed from `genotypicValue`; the observable is the
     realised least-squares slope of that value on alt-allele dosage, and the prediction uses
     the REALISED allele frequency.
 
@@ -553,8 +552,7 @@ theorem dominance_resolution_bound (a d d' p δ : ℝ) (hp : 1 - 2 * p ≠ 0)
 /-! ### Instance 9: normalised pairwise coalescence times
 
 The mathematical core, stated on the survival function so it needs no measure theory.
-With two lineages the only possible event is coalescence, so the time is exponential with
-some rate `λ > 0` that carries the whole of the reproductive regime, and the mean is
+With two lineages the only possible event is coalescence, so the time is exponential with some rate `λ > 0` that carries the whole of the reproductive regime, and the mean is
 `1 / λ`. Evaluating the survival function at `x` MEANS of that law gives `exp (-x)` for
 every `λ`: the rate cancels. -/
 

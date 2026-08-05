@@ -124,7 +124,7 @@ theorem classSize_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β)
   classical
   unfold classSize
   congr 1
-  PopGen.ext y
+  ext y
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   exact ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
 
@@ -136,19 +136,15 @@ theorem prod_quotient_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m →
   refine Finset.prod_bij
     (fun (d : Quotient (Setoid.ker f)) _ => Quotient.liftOn d f fun _ _ h => h) ?_ ?_ ?_ ?_
   · intro d _
-    induction d using Quotient.inductionOn with
-    | _ x => exact Finset.mem_image.mpr ⟨x, Finset.mem_univ x, rfl⟩
+    induction d using Quotient.inductionOn with | _ x => exact Finset.mem_image.mpr ⟨x, Finset.mem_univ x, rfl⟩
   · intro d _ d' _ h
-    induction d using Quotient.inductionOn with
-    | _ x =>
-        induction d' using Quotient.inductionOn with
-        | _ y => exact Quotient.sound (show f x = f y from h)
+    induction d using Quotient.inductionOn with | _ x =>
+        induction d' using Quotient.inductionOn with | _ y => exact Quotient.sound (show f x = f y from h)
   · intro v hv
     obtain ⟨x, _, hx⟩ := Finset.mem_image.mp hv
     exact ⟨Quotient.mk _ x, Finset.mem_univ _, hx⟩
   · intro d _
-    induction d using Quotient.inductionOn with
-    | _ x =>
+    induction d using Quotient.inductionOn with | _ x =>
         show g (classSize (Setoid.ker f) (Quotient.mk _ x)) = _
         rw [classSize_ker]
         rfl
@@ -180,10 +176,9 @@ the Chinese restaurant, and it is what makes the normalisation an induction. -/
 theorem image_extendMap_none {n : ℕ} (ξ : ER n) :
     Finset.univ.image (extendMap ξ none) = Finset.univ := by
   classical
-  PopGen.ext v
+  ext v
   simp only [Finset.mem_univ, iff_true]
-  match v with
-  | none => exact Finset.mem_image.mpr ⟨Fin.last n, Finset.mem_univ _, extendMap_last ξ none⟩
+  match v with | none => exact Finset.mem_image.mpr ⟨Fin.last n, Finset.mem_univ _, extendMap_last ξ none⟩
   | some c =>
       obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
       exact Finset.mem_image.mpr ⟨Fin.castLE (Nat.le_succ n) x, Finset.mem_univ _, by
@@ -193,7 +188,7 @@ theorem image_extendMap_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
     Finset.univ.image (extendMap ξ (some c))
       = Finset.univ.image (some : Quotient ξ → Option (Quotient ξ)) := by
   classical
-  PopGen.ext v
+  ext v
   simp only [Finset.mem_image, Finset.mem_univ, true_and]
   constructor
   · rintro ⟨x, -, rfl⟩
@@ -324,8 +319,7 @@ sum by seating, and `sum_seatings_ewensWeight` values each seating at `θ + n`. 
 theorem sum_ewensWeight {n : ℕ} (θ : ℝ) (hn : 1 ≤ n) :
     ∑ ξ : ER n, ewensWeight θ ξ = ∏ i ∈ Finset.Ico 1 n, (θ + (i : ℝ)) := by
   classical
-  induction n, hn using Nat.le_induction with
-  | base =>
+  induction n, hn using Nat.le_induction with | base =>
       rw [sum_ER_one]
       have hblocks : blocks (⊥ : ER 1) = 1 := blocks_bot 1
       have hprod : ∏ c : Quotient (⊥ : ER 1), (((classSize (⊥ : ER 1) c - 1)! : ℕ) : ℝ) = 1 := by

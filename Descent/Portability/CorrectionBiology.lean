@@ -28,7 +28,7 @@ theorem dynamicsPooledProjector_apply (β : Bool → ℝ) (persists : Bool) :
 /-- Pooling and rebroadcasting is an idempotent correction. -/
 theorem dynamicsPooledProjector_idempotent :
     dynamicsPooledProjector.comp dynamicsPooledProjector = dynamicsPooledProjector := by
-  PopGen.ext β persists
+  ext β persists
   simp only [LinearMap.comp_apply, dynamicsPooledProjector_apply]
   ring
 

@@ -309,8 +309,7 @@ theorem no_totalFamilyFraction_criterion_for_originMultiplicity {finalFrequency 
   (totalFamilyFraction_blind_to_originMultiplicity hfrequency).no_criterion_of_factors combine
 
 /-- **The sweep-origin blind spot costs a coin flip.** Every rule reading any finite readout
-of the total selected-allele frequency calls one-origin versus two-origin wrong with
-probability at least one half at one of the two sweeps. The registry's identification of
+of the total selected-allele frequency calls one-origin versus two-origin wrong with probability at least one half at one of the two sweeps. The registry's identification of
 the escape route is unchanged and now quantified: the missing half of the information is
 ancestry from four lineages, and no amount of extra precision on the frequency trajectory
 substitutes for it. -/

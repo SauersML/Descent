@@ -55,8 +55,7 @@ namespace Coalescent
 
 open Filter MeasureTheory
 
-/-- Kingman's death rate `d_k = k(k-1)/2`: the total rate at which a coalescent state with
-`k` blocks leaves that state.
+/-- Kingman's death rate `d_k = k(k-1)/2`: the total rate at which a coalescent state with `k` blocks leaves that state.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  `d_k` is the number of unordered pairs of blocks
 times the per-pair rate `1`, and the per-pair rate is `1` by the choice of time unit
@@ -117,8 +116,7 @@ theorem one_div_deathRate_add_two (k : ℕ) :
 /-- Exact partial sums of the reciprocal ladder: `Σ_{r=2}^{n+1} d_r⁻¹ = 2 - 2/(n+1)`. -/
 theorem sum_one_div_deathRate_range (n : ℕ) :
     ∑ k ∈ Finset.range n, 1 / deathRate (k + 2) = 2 - 2 / ((n : ℝ) + 1) := by
-  induction n with
-  | zero => norm_num
+  induction n with | zero => norm_num
   | succ n ih =>
       have h1 : ((n : ℝ) + 1) ≠ 0 := by positivity
       have h2 : ((n : ℝ) + 2) ≠ 0 := by positivity
@@ -185,8 +183,7 @@ theorem meanTransitTime_eq_two_sub {n : ℕ} (hn : 1 ≤ n) :
 ancestor is under two.  K-G (5.8): this is why `T = Σ_{r≥2} τ_r` converges, and hence why
 the death process can be started from infinity at all. -/
 theorem meanTransitTime_lt_two (n : ℕ) : meanTransitTime n < 2 := by
-  cases n with
-  | zero => norm_num [meanTransitTime]
+  cases n with | zero => norm_num [meanTransitTime]
   | succ m =>
       rw [meanTransitTime_succ]
       have h : 0 < 2 / ((m : ℝ) + 1) := by positivity
@@ -232,8 +229,7 @@ theorem sum_one_div_deathRate_tail {k : ℕ} (hk : 2 ≤ k) (m : ℕ) :
     ∑ j ∈ Finset.range m, 1 / deathRate (k + j)
       = 2 / ((k : ℝ) - 1) - 2 / ((k : ℝ) + (m : ℝ) - 1) := by
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
-  induction m with
-  | zero => norm_num
+  induction m with | zero => norm_num
   | succ m ih =>
       have hm : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg m
       have hkm : (2 : ℕ) ≤ k + m := le_trans hk (Nat.le_add_right k m)
@@ -299,8 +295,7 @@ theorem survivalFactor_partialProd {x : ℕ} (hx : 2 ≤ x) (m : ℕ) :
       = (((x : ℝ) - 1) * ((x : ℝ) + (m : ℝ) + 1))
           / (((x : ℝ) + 1) * ((x : ℝ) + (m : ℝ) - 1)) := by
   have hx' : (2 : ℝ) ≤ (x : ℝ) := by exact_mod_cast hx
-  induction m with
-  | zero =>
+  induction m with | zero =>
       have h1 : ((x : ℝ) + 1) ≠ 0 := by linarith
       have h2 : ((x : ℝ) - 1) ≠ 0 := by linarith
       simp only [Finset.range_zero, Finset.prod_empty, Nat.cast_zero, add_zero]

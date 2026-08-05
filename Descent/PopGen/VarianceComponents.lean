@@ -491,7 +491,7 @@ section LiabilityScale
     prevalence `K`, the observed-scale heritability is fitted by regression on
     the 0/1 outcome, and the transform is applied to it.
 
-      h2_liab   K       recovered   built with   sems
+      h2_liab   K       recovered   built with sems
       0.5       0.05      0.50157     0.50000     1.92
       0.5       0.20      0.49912     0.50000     1.07
       0.3       0.10      0.29998     0.30000     0.04

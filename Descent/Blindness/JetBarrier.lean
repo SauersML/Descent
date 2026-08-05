@@ -220,7 +220,7 @@ theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
     exact hpreimageZero
   have hoffProgression :
       {x : ℝ | ∀ k : ℤ, x ≠ offset + span * k} = progressionᶜ := by
-    PopGen.ext x
+    ext x
     simp only [progression, Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_range,
       not_exists, ne_eq]
     constructor

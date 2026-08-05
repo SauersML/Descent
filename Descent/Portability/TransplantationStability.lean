@@ -45,8 +45,7 @@ arithmetic: it is named for what it does rather than for the conclusion it contr
 The degenerate branch is not a technicality. `crossing_loss_linear` is a witness at `γ = 0`: two
 designs whose true values differ by `δ`, and an approximate model within `δ` of the truth
 everywhere that ranks them the other way. The transplanted optimizer lands on the wrong branch and
-pays the full `δ`. Near-ties between candidate designs are common — two variant panels with
-almost equal source performance, two shrinkage levels, two ancestry-weighting schemes — and there
+pays the full `δ`. Near-ties between candidate designs are common — two variant panels with almost equal source performance, two shrinkage levels, two ancestry-weighting schemes — and there
 the usual argument that stationarity at the optimum makes small model error cost second order
 fails.
 

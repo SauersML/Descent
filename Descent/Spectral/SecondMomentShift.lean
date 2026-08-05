@@ -91,7 +91,7 @@ theorem rawCrossMoment_linScore
     (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ) (w : ι → ℝ) :
     rawCrossMoment E X (Foundations.linScore w X) =
       (Foundations.secondMomentMatrix E X).mulVec w := by
-  PopGen.ext i
+  ext i
   unfold rawCrossMoment Foundations.linScore Foundations.secondMomentMatrix
   have hexpand :
       (fun ω ↦ X ω i * Foundations.dot w (X ω)) =
@@ -109,7 +109,7 @@ theorem residualScoreMoment_eq_cross_sub_secondMoment
     (Y : Ω → ℝ) (w : ι → ℝ) :
     residualScoreMoment E X Y w =
       rawCrossMoment E X Y - (Foundations.secondMomentMatrix E X).mulVec w := by
-  PopGen.ext i
+  ext i
   unfold residualScoreMoment rawCrossMoment
   have hexpand :
       (fun ω ↦ X ω i * (Y ω - Foundations.dot w (X ω))) =
@@ -136,7 +136,7 @@ theorem residual_score_identifies_projection_shift
   have hcross : rawCrossMoment E X Y = (Foundations.secondMomentMatrix E X).mulVec v := by
     exact sub_eq_zero.mp hnormal
   rw [hcross]
-  PopGen.ext i
+  ext i
   change
     (∑ j, Foundations.secondMomentMatrix E X i j * v j) -
         (∑ j, Foundations.secondMomentMatrix E X i j * w j) =
@@ -169,7 +169,7 @@ theorem residualScoreMoment_outcome_change
       residualScoreMoment E X hOld w +
         rawCrossMoment E X (fun ω ↦ hNew ω - hOld ω) := by
   classical
-  PopGen.ext i
+  ext i
   unfold residualScoreMoment rawCrossMoment
   have hexpand :
       (fun ω ↦ X ω i * (hNew ω - Foundations.dot w (X ω))) =

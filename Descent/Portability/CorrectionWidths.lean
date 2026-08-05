@@ -125,7 +125,7 @@ theorem factorsThrough_iff_ker_le
       ((LinearMap.ker A).liftQ C hker).comp A.quotKerEquivRange.symm.toLinearMap
     rcases f.exists_extend with ⟨T, hT⟩
     refine ⟨T, ?_⟩
-    PopGen.ext β
+    ext β
     have hAβ : A β ∈ LinearMap.range A := ⟨β, rfl⟩
     have hTβ := DFunLike.congr_fun hT ⟨A β, hAβ⟩
     simpa [f] using hTβ.symm
@@ -206,7 +206,7 @@ def UniformCorrectionFamily (A : H →ₗ[𝕜] Y) (k : ℕ) : Set (H →ₗ[�
 /-- At order zero the only representable uniform correction is the zero map. -/
 theorem uniformCorrectionFamily_zero (A : H →ₗ[𝕜] Y) :
     UniformCorrectionFamily A 0 = {0} := by
-  PopGen.ext C
+  ext C
   constructor
   · rintro ⟨T, a, rfl⟩
     simp [combinedPostprocessor]
@@ -271,7 +271,7 @@ def adaptiveCorrectionSet {k : ℕ} (A : H →ₗ[𝕜] Y)
 /-- With no adaptive dictionary entries, the only achievable vector is zero. -/
 theorem adaptiveCorrectionSet_zero_order (A : H →ₗ[𝕜] Y) (β : H) :
     adaptiveCorrectionSet A (fun j : Fin 0 ↦ Fin.elim0 j) β = {0} := by
-  PopGen.ext z
+  ext z
   constructor
   · rintro ⟨a, rfl⟩
     simp
@@ -287,7 +287,7 @@ theorem adaptiveCorrectionSet_smul {k : ℕ} (A : H →ₗ[𝕜] Y)
     (T : Fin k → Y →ₗ[𝕜] H) (β : H) (c : 𝕜) (hc : c ≠ 0) :
     adaptiveCorrectionSet A T (c • β) = adaptiveCorrectionSet A T β := by
   classical
-  PopGen.ext z
+  ext z
   constructor
   · rintro ⟨a, rfl⟩
     refine ⟨fun j ↦ a j * c, ?_⟩
@@ -304,7 +304,7 @@ theorem adaptiveCorrectionSet_smul {k : ℕ} (A : H →ₗ[𝕜] Y)
 theorem adaptiveCorrectionSet_of_mem_ker {k : ℕ} (A : H →ₗ[𝕜] Y)
     (T : Fin k → Y →ₗ[𝕜] H) (β : H) (hβ : β ∈ LinearMap.ker A) :
     adaptiveCorrectionSet A T β = {0} := by
-  PopGen.ext z
+  ext z
   constructor
   · rintro ⟨a, rfl⟩
     simp [LinearMap.mem_ker.mp hβ]
@@ -416,7 +416,7 @@ theorem conjugateLinearOperator_comp (U : H ≃ₗ[𝕜] H')
     (T A : H →ₗ[𝕜] H) :
     conjugateLinearOperator U (T.comp A) =
       (conjugateLinearOperator U T).comp (conjugateLinearOperator U A) := by
-  PopGen.ext x
+  ext x
   simp [conjugateLinearOperator]
 
 /-- Conjugation preserves and reflects the factor-through relation. -/
@@ -427,7 +427,7 @@ theorem factorsThrough_conjugate_iff (U : H ≃ₗ[𝕜] H')
   constructor
   · rintro ⟨T', hT'⟩
     refine ⟨conjugateLinearOperator U.symm T', ?_⟩
-    PopGen.ext x
+    ext x
     apply LinearEquiv.injective U
     have hx := LinearMap.congr_fun hT' (U x)
     simpa [conjugateLinearOperator] using hx

@@ -131,8 +131,7 @@ below exhibits an explicit allele frequency,
 
   `q* = (2 - sqrt 2) / 4 = 0.146447...`,
 
-at which the three values of `log x ^ 2` form an **exact arithmetic progression** with
-span `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2) = 1.7627...`, so the hard-call law
+at which the three values of `log x ^ 2` form an **exact arithmetic progression** with span `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2) = 1.7627...`, so the hard-call law
 is lattice with that span. `Descent.JetBarrier.one_lt_latticeInflation` gives
 `h / (1 - exp (-h)) = 2.128... > 1` for that span — an inequality about a real function,
 which is all it is. Reading it as a *Poisson exceedance intensity* inflated relative to
@@ -1202,8 +1201,7 @@ theorem hweLatticeCondition_het_standardizedSquare (h : Foundations.HardyWeinber
 `log x_g ^ 2 = log 2 + log ((1 - q) / q) * index g`, whenever `hweLatticeCondition q`
 holds. Stated for a general `q` satisfying the condition rather than only at `q*`,
 because the proof uses the condition and nothing else about `q*`; the `q*` instance is
-below and is obtained by discharging the hypothesis with
-`hardCall_arithmeticProgression_at_critical_maf`. -/
+below and is obtained by discharging the hypothesis with `hardCall_arithmeticProgression_at_critical_maf`. -/
 theorem hardCall_logSquare_eq_of_latticeCondition (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hlat : hweLatticeCondition h.altFreq) (g : Foundations.DiploidGenotype) :
@@ -1219,8 +1217,7 @@ theorem hardCall_logSquare_eq_of_latticeCondition (h : Foundations.HardyWeinberg
   obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
   have hspan : Real.log ((1 - h.altFreq) / h.altFreq)
       = Real.log (1 - h.altFreq) - Real.log h.altFreq := Real.log_div hpne hqne
-  cases g with
-  | homRef =>
+  cases g with | homRef =>
     rw [hX0, Real.log_div h2q hpne, Real.log_mul two_ne_zero hqne, hspan]
     simp only [hardCallLatticeIndex]
     push_cast

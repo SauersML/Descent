@@ -446,8 +446,7 @@ theorem cohortObservedEffect_eq_iff
 
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different
-    predictive power at different ages. This interacts with
-    cohort effects when comparing across time. This public `R²` surface is
+    predictive power at different ages. This interacts with cohort effects when comparing across time. This public `R²` surface is
     the `r2` field of the canonical age-indexed metric profile. -/
 noncomputable def ageDependentR2 (sourceSignalPeak age age_peak width : ℝ) : ℝ :=
   temporalR2 (ageDependentSignalVariance sourceSignalPeak age age_peak width)
@@ -584,8 +583,7 @@ theorem temporal_calibration_drift_nonzero_of_prevalence_shift
   exact h_shift (by linarith)
 
 
-/-- Exact temporal Brier risk under a calibrated Bernoulli model with
-prevalence `π` and explicit time-indexed signal variance. This is the `brier`
+/-- Exact temporal Brier risk under a calibrated Bernoulli model with prevalence `π` and explicit time-indexed signal variance. This is the `brier`
 field of the canonical time-indexed metric profile. -/
 noncomputable def temporalExactBrierRisk
     (π signalAtTime : ℝ) : ℝ :=

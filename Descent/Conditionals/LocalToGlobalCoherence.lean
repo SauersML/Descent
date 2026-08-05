@@ -16,8 +16,7 @@ overlapping probability laws, and its transport to genome-wide summary statistic
 
 ## The mathematical statement
 
-A *local law system* prescribes a probability law on each element of a cover, with
-exact agreement on overlaps. It is *globally realizable* if some law on the whole index
+A *local law system* prescribes a probability law on each element of a cover, with exact agreement on overlaps. It is *globally realizable* if some law on the whole index
 set has all the prescribed marginals. The question is whether asymptotic realizability
 is decided by data visible in bounded unions of cover elements.
 
@@ -119,8 +118,7 @@ theorem lt_sqrt_five : (2.236 : ℝ) < Real.sqrt 5 := by
 /-- **The frustration floor is a genuine constant, at least `0.127`.**
 
 This is the number quoted in the resolution: every global law leaves at least
-`12.7%` of edges in agreement, while the prescription demands disagreement with
-probability `1 - 10 ^ (-20)`. -/
+`12.7%` of edges in agreement, while the prescription demands disagreement with probability `1 - 10 ^ (-20)`. -/
 theorem expanderAgreementFloor_gt : (0.127 : ℝ) < expanderAgreementFloor := by
   have h := sqrt_five_lt
   unfold expanderAgreementFloor

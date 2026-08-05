@@ -124,8 +124,7 @@ theorem conditionalGainFunctional_ge_of_freshness_decay {m : ℕ}
 /-- **A uniform per-step factor gives a conditional-gain floor that is LINEAR in
 the number of steps.**
 
-`conditionalGainFunctional_ge_of_freshness_decay` takes an exponential bound with
-a freshness budget `D` baked into the exponent, which is the shape the telescope
+`conditionalGainFunctional_ge_of_freshness_decay` takes an exponential bound with a freshness budget `D` baked into the exponent, which is the shape the telescope
 produces. This is the other shape a contraction can arrive in: a bound `ρ^k`
 with `ρ` the per-step factor and `k` the number of steps, which is what a
 symbolic-dynamics or per-locus recombination argument produces. The two are the
@@ -659,7 +658,7 @@ theorem gainLandscape_strictly_ordered (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1
       gainBounded n < gainLog n ∧ gainLog n < gainPolynomialRow β n ∧
         gainPolynomialRow β n < gainLinear n := by
   filter_upwards [gainBounded_lt_gainLog, gainLog_lt_gainPower β hβ0,
-    gainPower_lt_gainLinear β hβ0 hβ1] with n h1 PopGen.AssortativeMatingModel.h2 h3
+    gainPower_lt_gainLinear β hβ0 hβ1] with n h1 h2 h3
   exact ⟨h1, PopGen.AssortativeMatingModel.h2, h3⟩
 
 end GainLandscape

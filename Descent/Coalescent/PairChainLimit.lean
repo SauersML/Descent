@@ -91,8 +91,7 @@ theorem one_add_smul_mul {Q : 𝔸} (hQ : Q * Q = -Q) (a b : ℝ) :
 complement of a survival probability, compounded. -/
 theorem one_add_smul_pow {Q : 𝔸} (hQ : Q * Q = -Q) (a : ℝ) (N : ℕ) :
     (1 + a • Q) ^ N = 1 + (1 - (1 - a) ^ N) • Q := by
-  induction N with
-  | zero => simp
+  induction N with | zero => simp
   | succ m ih =>
       rw [pow_succ, ih, one_add_smul_mul hQ]
       congr 1

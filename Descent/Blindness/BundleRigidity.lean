@@ -151,8 +151,7 @@ theorem spectrumModulusLaw_smul {k n : ℕ} (family : BundleFamily k)
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   ring
 
-/-- **Locus `i` covers the modulus value `v`** when one of its atoms lands there with
-non-zero mass. -/
+/-- **Locus `i` covers the modulus value `v`** when one of its atoms lands there with non-zero mass. -/
 def Covers {k n : ℕ} (family : BundleFamily k) (panel : Panel n) (i : Fin n)
     (v : ℝ) : Prop :=
   family.massAt (panel.support i) v ≠ 0

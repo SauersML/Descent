@@ -75,7 +75,7 @@ theorem blocks_mergeIdem {n : ℕ} (ξ : ER n) (f : Quotient ξ → Quotient ξ)
   unfold blocks mergeIdem
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _)]
   refine Nat.card_congr (Equiv.setCongr ?_)
-  PopGen.ext c
+  ext c
   simp only [Set.mem_range]
   constructor
   · rintro ⟨x, rfl⟩

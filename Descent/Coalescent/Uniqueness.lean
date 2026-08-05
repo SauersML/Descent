@@ -62,7 +62,7 @@ theorem isPiSystem_cylinders : IsPiSystem cylinders := by
   obtain ⟨R, hR⟩ := hst
   rcases le_total m n with hmn | hnm
   · refine ⟨n, η, ?_⟩
-    PopGen.ext S
+    ext S
     simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff]
     constructor
     · rintro ⟨-, h2⟩
@@ -76,7 +76,7 @@ theorem isPiSystem_cylinders : IsPiSystem cylinders := by
       rw [hR.1, hR.2] at hRes
       rw [← hres, h2, hRes]
   · refine ⟨m, ξ, ?_⟩
-    PopGen.ext S
+    ext S
     simp only [Set.mem_inter_iff, Set.mem_preimage, Set.mem_singleton_iff]
     constructor
     · rintro ⟨h1, -⟩
@@ -107,7 +107,7 @@ theorem cylinderSpace_eq_generateFrom :
   · refine iSup_le fun n => ?_
     rintro _ ⟨A, -, rfl⟩
     have hunion : (restrictInf n) ⁻¹' A = ⋃ ξ ∈ A, (restrictInf n) ⁻¹' {ξ} := by
-      PopGen.ext S
+      ext S
       simp
     rw [hunion]
     refine MeasurableSet.biUnion (Set.to_countable A) fun ξ _ => ?_

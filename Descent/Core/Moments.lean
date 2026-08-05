@@ -231,8 +231,7 @@ demography-to-metric chain exists to state, at the level of the tuple.
 `V_E` must be STRICTLY positive, and that is not a technical convenience. At `V_E = 0`
 the trait is purely additive, the score explains all of it, and `R² = 1` at every
 differentiation -- drift erodes the numerator and the denominator by exactly the same
-factor and they cancel. So the monotone law is a statement about traits with
-environmental variance, and a corpus that stated it without the hypothesis would be
+factor and they cancel. So the monotone law is a statement about traits with environmental variance, and a corpus that stated it without the hypothesis would be
 claiming portability loss for a case that has none. -/
 theorem r2_momentsUnderDrift_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
     (h1 : f₁ < f₂) (h2 : f₂ < 1) :
@@ -332,8 +331,7 @@ theorem portabilityRatio_mem_unit (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤
   rw [div_le_one hsrc]
   exact r2_momentsUnderDrift_le_source V_A V_E fst hV hE hf0 hf
 
-/-- **The portability ratio is one exactly at no differentiation** on a trait with
-environmental variance. A reported ratio below one is therefore evidence of
+/-- **The portability ratio is one exactly at no differentiation** on a trait with environmental variance. A reported ratio below one is therefore evidence of
 differentiation and not of a measurement artefact. -/
 theorem portabilityRatio_at_source (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
     portabilityRatio V_A V_E 0 = 1 := by
@@ -441,8 +439,7 @@ theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
   constructor <;> intro h <;> nlinarith [h]
 
 /-- **More migration, more transferable score.** The end-to-end monotone law: increase
-the migration rate in the demographic parameters and the deployed `R²` goes up, with
-every step -- equilibrium, moments, metric -- a named map rather than an assumption.
+the migration rate in the demographic parameters and the deployed `R²` goes up, with every step -- equilibrium, moments, metric -- a named map rather than an assumption.
 
 This is the statement the corpus's two layers were built to support and could not make. -/
 theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
@@ -519,8 +516,7 @@ theorem deployedR2_le_heritability (p : PopGenParameters) (V_E : ℝ) (hE : 0 �
 
 `R²` is one coordinate of a deployment report. A calibration slope, a mean squared error,
 a Brier score and an AUC are the others, and they do not move together -- the slope does
-not move at all under drift. Each is a function of the same tuple, so each composes with
-the same demographic chain, and each needs its own statement. -/
+not move at all under drift. Each is a function of the same tuple, so each composes with the same demographic chain, and each needs its own statement. -/
 
 /-- **Mean squared error under drift.** A score whose weights were fitted in the source is
 deployed raw in the target: the error is `Var(Y) - 2Cov(S,Y) + Var(S)`, which under drift
@@ -642,8 +638,7 @@ theorem aucArgument_momentsUnderDrift_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V
 Each of the four metrics, evaluated on the tuple a demographic history produces. These
 are the compositions the layer contract promised. -/
 
-/-- **Deployed calibration slope from a demographic history.** One at every history with
-some flow -- which is the sharpest form of the warning: no demographic history produces a
+/-- **Deployed calibration slope from a demographic history.** One at every history with some flow -- which is the sharpest form of the warning: no demographic history produces a
 miscalibrated score under pure drift, so calibration cannot detect this failure mode. -/
 theorem deployedSlope_eq_one (p : PopGenParameters) (V_E : ℝ)
     (hflow : 0 < p.mu + p.mig) :

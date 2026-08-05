@@ -1057,8 +1057,7 @@ transport of a hypothesis, not a discovery:
   to AUC and to calibrated Brier through the monotone charts — a real and reusable step,
   but a conditional one.
 - `|sourceProfile.citl| < |targetProfile.citl|` is immediate from `h_src_cal`, which
-  assumes the source is perfectly calibrated in the large, together with
-  `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
+  assumes the source is perfectly calibrated in the large, together with `h_shift_nonzero`. Against a source CITL pinned to `0`, any nonzero shift is worse.
 
 This theorem carries **no** `hPhiStrict : StrictMono Phi` hypothesis, and needs none.
 `Probability.strictMono_Phi` proves it: `Phi` is `ProbabilityTheory.cdf (gaussianReal 0 1)`,
@@ -2244,7 +2243,7 @@ theorem downReclassificationRate_eq_thresholdBandRate
       {score | classifiedHighRisk threshold score ∧
           ¬ classifiedHighRisk threshold (score - δ)} =
         Set.Ioc threshold (threshold + δ) := by
-    PopGen.ext score
+    ext score
     exact down_reclassified_after_downward_shift_iff_mem_band threshold score δ
   rw [hset]
 
@@ -2310,8 +2309,7 @@ theorem positive_nri_means_improvement
       π=0.05 band (0.0, 0.4]     0.02279     0.02266±0.00019     0.68
       π=0.20 band (-0.5, 0.1]    0.13563     0.13583±0.00037     0.54
 
-    The identity gate: the prior-free `f_e / (f_e + f_n)` — the same ratio with
-    the cohort prevalence dropped, which is the ordinary base-rate mistake — is
+    The identity gate: the prior-free `f_e / (f_e + f_n)` — the same ratio with the cohort prevalence dropped, which is the ordinary base-rate mistake — is
     rejected at up to 1486 sems and a factor of thirteen. The positive control,
     the simulated cohort reproducing its own nominal event rate, passes at 0.26
     sems. -/
@@ -3637,8 +3635,7 @@ noncomputable def expectedThresholdQalyLoss {Z : Type*} [MeasurableSpace Z]
     (trueRisk predictedRisk : Z → ℝ) : ℝ :=
   ∫ z, thresholdQalyLoss model (trueRisk z) (predictedRisk z) ∂μ
 
-/-- The expected loss under the threshold specialization agrees exactly with
-    the general pathway expected loss. -/
+/-- The expected loss under the threshold specialization agrees exactly with the general pathway expected loss. -/
 theorem expectedQalyLoss_threshold_eq_expectedThresholdQalyLoss
     {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)

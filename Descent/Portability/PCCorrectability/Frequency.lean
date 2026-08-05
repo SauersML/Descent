@@ -242,7 +242,7 @@ theorem FrequencyResolvedCohort.combinedInformationIndex_mul_threshold_eq_spike
     simp
   unfold FrequencyResolvedCohort.combinedInformationIndex
   rw [htotal]
-  exact _root_.Descent.combinedInformationIndex_mul_threshold_eq_spike cohort.sampleSize
+  exact _root_.Descent.Portability.combinedInformationIndex_mul_threshold_eq_spike cohort.sampleSize
     (cohort.effectiveMarkers 0) (cohort.differentiation 0) cohort.subgroupSize
     cohort.sampleSize_pos (cohort.effectiveMarkers_pos 0) (cohort.differentiation_nonneg 0)
 

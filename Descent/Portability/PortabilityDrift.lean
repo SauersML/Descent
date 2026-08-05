@@ -671,8 +671,7 @@ theorem twoDemeIMEquilibriumDelta_negative_half_migration_is_junk :
   norm_num
 
 /-- **The within-deme coalescence time is a fixed point of first-step
-analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with
-`ETst = 1/M + ETss` forces `ETss = 2` for every `M > 0`. -/
+analysis.**  Solving `ETss = 1/(1+M) + (M/(1+M)) ETst` jointly with `ETst = 1/M + ETss` forces `ETss = 2` for every `M > 0`. -/
 theorem twoDemeIMEquilibriumETss_isFixedPoint (M : ℝ) (hM : 0 < M) :
     twoDemeIMFirstStepSame M (twoDemeIMEquilibriumETss M) (twoDemeIMEquilibriumETst M) =
       twoDemeIMEquilibriumETss M := by
@@ -871,8 +870,7 @@ This is the number the closed-population model sets to zero.
     saturation is an INFINITE-ALLELES statement, and reading it under infinite
     sites is what an earlier attempt got wrong: per-site heterozygosity there is
     approximately `θ` and the `1 / (1 + θ)` denominator never shows. Measured on
-    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with
-    100 sampled chromosomes and 40 independent replicates, with heterozygosity
+    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with 100 sampled chromosomes and 40 independent replicates, with heterozygosity
     taken as the unbiased `1 - ∑ pᵢ²` over the WHOLE sample -- never conditioned
     on the locus being polymorphic, which inflates it exactly where `θ` is
     small. Over `θ` = 0.1, 0.5, 1, 3, 10 the body predicts 0.09091, 0.33333,
@@ -950,8 +948,7 @@ the geometric decay formula used throughout is the trajectory at exactly one
 value of the mutation rate. -/
 theorem hetTrajectory_of_no_mutation (Ne H₀ : ℝ) (t : ℕ) :
     hetTrajectory Ne 0 H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
-  induction t with
-  | zero => simp [hetTrajectory]
+  induction t with | zero => simp [hetTrajectory]
   | succ n ih =>
       simp only [hetTrajectory, hetStepWithMutation, ih]
       ring
@@ -987,8 +984,7 @@ theorem hetTrajectory_ge_hetMutationFloor_of_init_ge_floor (Ne mu H₀ : ℝ)
     (hcontract : 1 / (2 * Ne) + 2 * mu ≤ 1)
     (hH₀ : hetMutationFloor Ne mu ≤ H₀) (t : ℕ) :
     hetMutationFloor Ne mu ≤ hetTrajectory Ne mu H₀ t := by
-  induction t with
-  | zero => simpa [hetTrajectory] using hH₀
+  induction t with | zero => simpa [hetTrajectory] using hH₀
   | succ n ih =>
       simp only [hetTrajectory]
       exact hetStepWithMutation_ge_hetMutationFloor_of_ge_floor Ne mu _ hNe hmu hcontract ih
@@ -2289,7 +2285,7 @@ noncomputable def witnessW_opt : Pop → Fin 2 → ℝ :=
 private theorem witnessSigmaObs_mulVec_witnessW_opt (P : Pop) :
     (witnessSigmaObs P).mulVec (witnessW_opt P) = witnessCross P := by
   cases P <;>
-    PopGen.ext i <;>
+    ext i <;>
       fin_cases i <;>
         norm_num [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec,
           Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
@@ -2380,7 +2376,7 @@ effects. -/
 theorem totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     totalEffect m Pop.target = (m.beta Pop.source) + targetEffectHeterogeneity m := by
-  PopGen.ext j
+  ext j
   simp [targetEffectHeterogeneity]
 
 /-- Target tagging projection of the source effect vector through the target
@@ -2505,7 +2501,7 @@ contributions** — in either population, from the one statement. -/
 theorem taggingProjection_eq_direct_plus_proxy {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
     taggingProjection m P = directCausalProjection m P + proxyTaggingProjection m P := by
-  PopGen.ext i
+  ext i
   simp [taggingProjection, directCausalProjection, proxyTaggingProjection,
     sigmaTagCausalSourceAt, Matrix.add_mulVec, add_assoc, Pi.add_apply]
 
@@ -2528,7 +2524,7 @@ theorem taggingProjection_target_eq_standing_plus_novelMutationEffect {p q : ℕ
     taggingProjection m Pop.target =
       (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m := by
-  PopGen.ext i
+  ext i
   simp [taggingProjection, targetNovelMutationEffectProjection,
     totalEffect, Matrix.mulVec_add, Pi.add_apply]
 
@@ -2896,8 +2892,7 @@ to be implicit in the fact that only a `target` version existed.
     (`validation/empirical/simcov/battery_transport.py`). This body is the
     denominator of `r2FromSourceWeights`, which is measured against the squared
     correlation of the transported score with the outcome at 0.06 sems in the
-    source and 2.50 in the target, on one end-to-end transport simulation with
-    400000 individuals per population and second moments SET rather than
+    source and 2.50 in the target, on one end-to-end transport simulation with 400000 individuals per population and second moments SET rather than
     estimated. The two populations are what makes this a test of THIS body
     rather than of the numerator alone: `residualBurden` is zero in the source
     and the whole irreducible burden in the target, so the source cell fixes the
@@ -2906,8 +2901,7 @@ to be implicit in the fact that only a `target` version existed.
 
     What is NOT established: the internal structure of the burden. The four
     residuals enter only through their sum, as recorded at
-    `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with
-    the burden is what the target cell tests, at 2.50 sems, which is a pass and
+    `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with the burden is what the target cell tests, at 2.50 sems, which is a pass and
     not a comfortable one.
 
     argument_source: model. -/
@@ -3453,8 +3447,7 @@ correlation decays exponentially with recombination distance and divergence.
     coalescent theory gives Sved's `r² ≈ 1/(1 + 4·Nₑ·c)`, which is
     HYPERBOLIC in distance, not exponential, and the two differ in shape rather
     than scale. Measured `r²` between common SNP pairs binned over an
-    eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with
-    BOTH laws fitted to the same curve with one free rate and one free
+    eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with BOTH laws fitted to the same curve with one free rate and one free
     amplitude each so neither is handicapped:
 
       distance    measured r²        exponential fit   hyperbolic fit
@@ -3791,8 +3784,7 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
   rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
 
-/-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with
-the generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
+/-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with the generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
 discrete differentiation recursion. Both were corrected together: an identity
 between two coordinates survives a common wrong factor on both sides, so this
 theorem constrained them jointly and could not have caught the decay base. -/
@@ -5151,7 +5143,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
       { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
       , auc := presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
       , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
-  PopGen.ext
+  ext
   · change
       PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
         targetR2FromNeutralAFBenchmark V_A V_E fstTarget
@@ -5682,8 +5674,7 @@ prevalence scale.
 
     THE INTERNAL INCONSISTENCY IS THE FINDING, and it is the same one
     `neutralAFBenchmarkMetricProfile` is documented for: this record takes a
-    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with
-    a chart that has nowhere to put one. So a profile assembled to compare
+    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with a chart that has nowhere to put one. So a profile assembled to compare
     source and target Brier "on the same prevalence scale" is binary in one
     field and continuous in another.
 
@@ -5810,7 +5801,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
             (effectiveOutcomeVariance m Pop.target -
               (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights m Pop.target) } := by
-  PopGen.ext
+  ext
   · rw [targetMetricProfileFromSourceWeights_r2,
       targetR2FromSourceWeights_exact_metric_portability_law]
   · rw [targetMetricProfileFromSourceWeights_auc,
@@ -5884,7 +5875,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
-  PopGen.ext
+  ext
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
   · rw [targetMetricProfileAtGeneration_eq_slice,
@@ -6699,8 +6690,7 @@ theorem covarianceRetentionFactorFromFst_at_reference_point :
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_correct.py`,
     `correct_freq_corr`). Wright-Fisher forward simulation, `Ne = 200`, 4000
-    loci, 400 replicate deme pairs, four ancestral distributions crossed with
-    two drift depths -- eight cells that a formula in `fst` alone must get wrong
+    loci, 400 replicate deme pairs, four ancestral distributions crossed with two drift depths -- eight cells that a formula in `fst` alone must get wrong
     and this one gets right:
 
       ancestral p0          gens    1 - fst   this def   measured      sems
@@ -6766,8 +6756,7 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     simulation.
 
     A marker claiming an unpaid measurement debt here would be reporting one
-    that does not exist; it inflates the count of things owed a measurement with
-    an item that can never receive one. And the word for that debt must not
+    that does not exist; it inflates the count of things owed a measurement with an item that can never receive one. And the word for that debt must not
     appear anywhere in this docstring even as prose: `simcov/inventory.py` falls
     back to scanning the status note for state words when the head is not one of
     them, so the single word in the sentence this replaces made a declaration
@@ -7129,8 +7118,7 @@ This theorem is absent on purpose. It states `presentDayPGSVarianceMutationDrift
 ld = ld * presentDayPGSVariance V_A fst` and closes by `ring`. All six of its hypotheses go
 unused — `0 < V_A`, `0 < V_E`, `0 ≤ fst`, `fst < 1`, `0 < ld`, `ld ≤ 1` — and `V_E` is a
 phantom parameter appearing nowhere in the statement, present only so the signature reads
-like a statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with
-the factors reassociated, and `mutationDrift_variance_ratio` just above states the same
+like a statement about `R²`. The identity is `presentDayPGSVarianceMutationDrift_eq` with the factors reassociated, and `mutationDrift_variance_ratio` just above states the same
 content as a ratio with the hypotheses it genuinely needs.
 
 Two of those hypotheses are worse than unused. `0 ≤ fst` and `fst < 1` are the range in
@@ -7830,8 +7818,7 @@ theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ)
 `steppingStoneFst_eq_one_of_saturated`, which said the opposite, and the replacement is
 forced by the measurement rather than chosen for elegance. The linear body reached `1` at
 finite separation and the clamp then held it there, so complete differentiation was
-attainable at a finite number of steps. A saturating form cannot do that: with
-`α (1 - fst_neighbor) > 0` the value is strictly below one at every finite `d` and tends to
+attainable at a finite number of steps. A saturating form cannot do that: with `α (1 - fst_neighbor) > 0` the value is strictly below one at every finite `d` and tends to
 one only as `d → ∞`, which is the correct behaviour of isolation by distance -- demes an
 arbitrary but finite distance apart still share ancestry. -/
 theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
@@ -7988,8 +7975,7 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
       2000   2.5e-4    0.75    0.5711      0.7197 ± 0.0098   -20.7%
 
     So: within `c ≲ m/5` the body is right to 3% on ten of eleven cells and to
-    7% on the last, under an ascertainment systematic of 12% (the same run with
-    a pooled-frequency filter instead of a per-deme one moves the measured ratio
+    7% on the last, under an ascertainment systematic of 12% (the same run with a pooled-frequency filter instead of a per-deme one moves the measured ratio
     by that much on average). Past `c ≈ m/2` the body reads LOW and the shortfall
     grows to 21% at `c = 0.75·m` and to 41% out to `c = 80·m`; the shape that
     tracks the measurement there is `2·m/(2·m + c)`, off by at worst 9.7%
@@ -8319,14 +8305,12 @@ name/quantity mismatch, so the two are separated rather than bounded.
     hundreds of replicates rather than six, or an estimator that needs no
     calibration at all.
 
-    What both runs agree on qualitatively: measured retention rises with
-    migration but stays well below the product form at weak migration. That is
+    What both runs agree on qualitatively: measured retention rises with migration but stays well below the product form at weak migration. That is
     the lead, and it is consistent with `sharedLD_from_equilibrium`, where
     measured shared LD stayed near 1 rather than falling to `M/(1+M)`.
 
     The table below is the FIRST run, kept for the record:
-    Measured at `Nₑ = 1000` over 5 Mb with
-    recombination, 80 causal sites segregating in both demes, weights taken as
+    Measured at `Nₑ = 1000` over 5 Mb with recombination, 80 causal sites segregating in both demes, weights taken as
     the deme-0 LD projection `Σ_A·β` (itself VALIDATED at
     `targetSourceEffectProjection`):
 
@@ -8769,8 +8753,7 @@ theorem harmonicMigrationMean_eq_iff_symmetric (m₁₂ m₂₁ : ℝ)
 
 /-- **Hence the equilibrium `F_ST` computed from this mean is never above the one the
 harmonic mean would give.** `fstMigrationDriftEquilibrium` is decreasing in the migration
-rate, so substituting the larger mean returns the smaller `F_ST`. Composed with
-`presentDayR2`, which is decreasing in `F_ST`, the arithmetic mean is the optimistic
+rate, so substituting the larger mean returns the smaller `F_ST`. Composed with `presentDayR2`, which is decreasing in `F_ST`, the arithmetic mean is the optimistic
 choice at every pair of asymmetric rates: it reports better cross-population portability
 than the harmonic mean does. Stated so the direction of the bias is checkable rather than
 left in prose. -/

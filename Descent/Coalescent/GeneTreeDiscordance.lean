@@ -69,8 +69,7 @@ have three possible first coalescences, the chain chooses among them with probab
 `jumpProb 3 = 1/3` each (K-C (2.2)), and exactly one of the three recovers the species
 topology.
 
-The symmetry is not assumed: it is `JumpChain.jumpProb_eq` at `k = 3`, which is `1/d_3` with
-`d_3 = 3`, and `StateSpace.card_covers` counting the three covers it is uniform on. -/
+The symmetry is not assumed: it is `JumpChain.jumpProb_eq` at `k = 3`, which is `1/d_3` with `d_3 = 3`, and `StateSpace.card_covers` counting the three covers it is uniform on. -/
 theorem discordanceGivenFailure_eq_two_thirds : 1 - jumpProb 3 = 2 / 3 := by
   have h : jumpProb 3 = 2 / (3 * (3 - 1)) := jumpProb_eq (by norm_num)
   rw [h]

@@ -129,8 +129,7 @@ theorem extend_none_last_not_rel {n : ℕ} (ξ : ER n) (x : Fin n) :
 element to different elements, and starting a new class relates it to none of them. -/
 theorem extend_injective {n : ℕ} (ξ : ER n) : Function.Injective (extend ξ) := by
   intro o o' h
-  match o, o' with
-  | none, none => rfl
+  match o, o' with | none, none => rfl
   | none, some c =>
       exfalso
       obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
@@ -300,10 +299,9 @@ one and joining a class leaves it alone.  Both come from the image of `extendMap
 theorem blocks_extend_none {n : ℕ} (ξ : ER n) : blocks (extend ξ none) = blocks ξ + 1 := by
   classical
   have hrange : Set.range (extendMap ξ none) = Set.univ := by
-    PopGen.ext y
+    ext y
     simp only [Set.mem_univ, iff_true]
-    match y with
-    | none => exact ⟨Fin.last n, extendMap_last ξ none⟩
+    match y with | none => exact ⟨Fin.last n, extendMap_last ξ none⟩
     | some c =>
         obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
         exact ⟨Fin.castLE (Nat.le_succ n) x, by rw [extendMap_castLE, hx]⟩
@@ -318,7 +316,7 @@ theorem blocks_extend_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
   classical
   have hrange : Set.range (extendMap ξ (some c))
       = Set.range (some : Quotient ξ → Option (Quotient ξ)) := by
-    PopGen.ext y
+    ext y
     constructor
     · rintro ⟨x, rfl⟩
       rcases lt_or_ge (x : ℕ) n with hx | hx
@@ -386,14 +384,12 @@ theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
   classical
   have hbij : Function.Bijective
       (fun p : Option {x : Fin n // Quotient.mk ξ x = c} =>
-        (match p with
-          | none => ⟨Fin.last n, by rw [extendMap_last]⟩
+        (match p with | none => ⟨Fin.last n, by rw [extendMap_last]⟩
           | some q => ⟨Fin.castLE (Nat.le_succ n) q.1, by rw [extendMap_castLE, q.2]⟩ :
             {x : Fin (n + 1) // extendMap ξ (some c) x = some c})) := by
     constructor
     · intro p q h
-      match p, q with
-      | none, none => rfl
+      match p, q with | none, none => rfl
       | none, some b =>
           exfalso
           have hval : (n : ℕ) = (b.1 : ℕ) := congrArg (fun r => (r.1 : ℕ)) h

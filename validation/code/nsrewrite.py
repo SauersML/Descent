@@ -71,6 +71,19 @@ BINDER = re.compile(
 PAREN_BINDER = re.compile(r"[(\{⦃]([^():{}\n]{0,80}):(?!=)")
 NAMES = re.compile(r"[a-zA-Z_][A-Za-z0-9_'₀-₉]*")
 
+# A TACTIC is an identifier in a syntactic position where no namespace applies.
+# `ext`, `symm` and `constructor` are also declaration names in this corpus, and
+# qualifying the tactic gives "unknown tactic" -- 119 of them, 117 from `ext`
+# alone.  Position cannot tell them apart without parsing `by` blocks, so the
+# names are listed.  Over-listing costs a missed qualification, which the
+# compiler reports; under-listing costs a broken proof.
+TACTIC_NAMES = frozenset("""
+ext symm trans constructor left right use rfl ring simp omega decide positivity
+linarith nlinarith norm_num field_simp push_cast assumption trivial aesop gcongr
+bound funext exfalso swap change subst abel group module measurability continuity
+fun_prop norm_cast ring_nf simp_all congr convert specialize
+""".split())
+
 
 def all_files():
     out = []
@@ -359,6 +372,10 @@ def defined_in(directory: str, table):
     return names
 
 
+def line_start_of(text: str, a: int) -> int:
+    return text.rfind("\n", 0, a) + 1
+
+
 def qualify(text: str, names: set[str], prefix: str,
             tokens: set[str] = frozenset(),
             forced: bool = False,
@@ -388,6 +405,8 @@ def qualify(text: str, names: set[str], prefix: str,
         a, b = m.span()
         if not mask[a]:
             continue
+        if m.group(0) in TACTIC_NAMES and text[line_start_of(text, a):a].strip() == "":
+            continue                            # a tactic, not a reference
         if m.group(0) not in movable:
             # A namespace segment is prefixed only where it is USED as one.
             # It must obey the same local hold as a declaration name: this file

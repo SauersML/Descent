@@ -53,7 +53,7 @@ theorem card_classFinset_out {n : ℕ} (η : ER n) (c : Quotient η) :
     (classFinset η c.out).card = classSize η c := by
   unfold classSize
   congr 1
-  PopGen.ext y
+  ext y
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   exact mem_classFinset_out η c y
 
@@ -95,7 +95,7 @@ theorem card_cutSetsOf {n : ℕ} (η : ER n) (c : Quotient η) :
   have hset : (Finset.univ.filter fun S : Finset (Fin n) =>
       IsCutSet η S ∧ ∀ x ∈ S, Quotient.mk η x = c)
       = (cutBase η c).powerset.erase ∅ := by
-    PopGen.ext S
+    ext S
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_erase,
       Finset.mem_powerset]
     rw [isCutSetOf_iff η c S]
@@ -128,7 +128,7 @@ theorem card_cutSets {n : ℕ} [NeZero n] (η : ER n) :
   refine Finset.sum_congr rfl fun c _ => ?_
   rw [← card_cutSetsOf η c]
   congr 1
-  PopGen.ext S
+  ext S
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   constructor
   · rintro ⟨hS, hc⟩

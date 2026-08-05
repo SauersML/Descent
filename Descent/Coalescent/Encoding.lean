@@ -96,7 +96,7 @@ theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
       = ⋂ (p : Fin n × Fin n),
           (if ξ.r p.1 p.2 then {R : EInf | R.r (p.1 : ℕ) (p.2 : ℕ)}
             else {R : EInf | ¬ R.r (p.1 : ℕ) (p.2 : ℕ)}) := by
-    PopGen.ext R
+    ext R
     simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_iInter]
     constructor
     · intro hR p

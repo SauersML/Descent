@@ -182,8 +182,7 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
 
 @[simp] theorem DiploidGenotype.equivFin3_symm_apply (i : Fin 3) :
     DiploidGenotype.equivFin3.symm i =
-      match i with
-      | ⟨0, _⟩ => DiploidGenotype.homRef
+      match i with | ⟨0, _⟩ => DiploidGenotype.homRef
       | ⟨1, _⟩ => DiploidGenotype.het
       | ⟨2, _⟩ => DiploidGenotype.homAlt := by
   fin_cases i <;> rfl
@@ -290,8 +289,7 @@ def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype �
 theorem HardyWeinbergModel.genotypeProb_nonneg
     (h : HardyWeinbergModel) (g : DiploidGenotype) :
     0 ≤ h.genotypeProb g := by
-  cases g with
-  | homRef =>
+  cases g with | homRef =>
       simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
   | het =>
       simp [HardyWeinbergModel.genotypeProb]
@@ -726,7 +724,7 @@ theorem noise_integrated_cdf {k : ℕ} (hN : GaussianNoiseAssumption k)
           simp [noiseMeasureGivenX, ProbabilityTheory.gaussianReal_map_const_add]
     _ = ENNReal.ofReal (ProbabilityTheory.cdf
           (ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t) := by
-          Blindness.BoundedLogDistortion.symm
+          symm
           simpa using (ProbabilityTheory.ofReal_cdf
             (μ := ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t)
 
@@ -782,7 +780,7 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
       Descent.Core.sum] using noise_integrated_cdf hN x s (T x)
   have h_le_set :
       ({e : ℝ | latentLiability s e ≤ T x} : Set ℝ) = Set.Iic (T x - s) := by
-    PopGen.ext e
+    ext e
     constructor
     · intro h
       change e ≤ T x - s
@@ -798,7 +796,7 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
       linarith
   have h_event :
       diseaseEvent T x s = (Set.Iic (T x - s))ᶜ := by
-    PopGen.ext e
+    ext e
     constructor
     · intro h
       change ¬ e ≤ T x - s

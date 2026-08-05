@@ -93,8 +93,7 @@ variable [Algebra ℝ R]
 Peeling the first letter of the word extracts the `k = 1` term `A i * (Q^u • Φ_u)` and
 rescales every later term by `-P i`, which is exactly the recursion below. -/
 noncomputable def altSum (P Q : ι → ℝ) (Φ A : ι → R) (w : List ι) : R :=
-  match w with
-  | [] => 0
+  match w with | [] => 0
   | i :: u => A i * (prodWeight Q u • prodOp Φ u) - P i • altSum P Q Φ A u
 
 @[simp] theorem altSum_nil (P Q : ι → ℝ) (Φ A : ι → R) :
@@ -117,8 +116,7 @@ theorem altSum_eq (P Q : ι → ℝ) (Φ A : ι → R)
     altSum P Q Φ A w
       = prodWeight Q w • prodOp Φ w
         + ((-1 : ℝ) ^ (w.length + 1) * prodWeight P w) • (1 : R) := by
-  induction w with
-  | nil => simp
+  induction w with | nil => simp
   | cons i u ih =>
     rw [altSum_cons, ih, hA i]
     have hexpand :

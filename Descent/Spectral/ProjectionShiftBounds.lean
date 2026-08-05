@@ -215,8 +215,7 @@ Fix a background covariance already diagonalised, with eigenvalues
 `spectrum i > 0`.  Two tasks are run on the same reduced data.
 
 * **Detection** of a weak spike.  The optimal linear certificate weights each
-  eigendirection by the inverse background variance, `1 / σᵢ`: a direction with
-  little background noise is a direction in which a small signal is visible.
+  eigendirection by the inverse background variance, `1 / σᵢ`: a direction with little background noise is a direction in which a small signal is visible.
   Detection power is therefore carried by the *smallest*-variance directions.
 * **Reconstruction / denoising.**  The optimal weights are the signal-variance
   shares, increasing in `σᵢ`; the fraction of variance retained is exactly what
@@ -342,8 +341,7 @@ theorem wienerWeight_strictMono {noise s₁ s₂ : ℝ}
   rw [div_lt_div_iff₀ d₁ d₂]
   nlinarith [mul_pos hn (sub_pos.mpr h)]
 
-/-- **The two weight profiles are inversely ordered.**  On a background with
-distinct eigenvalues, moving to a higher-variance direction strictly increases
+/-- **The two weight profiles are inversely ordered.**  On a background with distinct eigenvalues, moving to a higher-variance direction strictly increases
 the reconstruction weight and strictly decreases the detection weight.  No
 reduction can therefore be greedy for both tasks at once, and the rest of this
 section quantifies the resulting loss. -/
@@ -788,8 +786,7 @@ you have spent `1 - m` of it on detection.  There is no allocation, fractional
 or not, that escapes.
 -/
 
-/-- **Exact two-coordinate frontier.**  For a two-direction background with
-variances `σ₁, σ₂` and a rank-one budget split as `(m, 1 - m)`, the
+/-- **Exact two-coordinate frontier.**  For a two-direction background with variances `σ₁, σ₂` and a rank-one budget split as `(m, 1 - m)`, the
 reconstruction and detection efficiencies sum to exactly `1`.
 
 The trade-off is therefore not asymptotic, not a large-`n` phenomenon, and not

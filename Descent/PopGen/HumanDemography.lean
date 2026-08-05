@@ -297,8 +297,7 @@ quantitative form of "the loss is in the linkage disequilibrium".
 -/
 
 /-! **Deleted: `taggedDriftR2Ratio V_A V_E fst shared_ld =
-presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with
-`taggedDriftR2Ratio_ge_retention`.**
+presentDayR2MutationDrift V_A V_E fst shared_ld / presentDayR2 V_A V_E 0`, together with `taggedDriftR2Ratio_ge_retention`.**
 
 This definition is absent on purpose. It applies the tagging factor to the denominator as
 well. Loss of shared LD attenuates the score's covariance with the phenotype. It does

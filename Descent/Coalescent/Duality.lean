@@ -83,8 +83,7 @@ noncomputable def diffusionOnPow (m : ℕ) (x : ℝ) : ℝ :=
 lineage count drops from `n` to `n - 1`, changing `xⁿ` to `x^{n-1}`.
 
 Empirical status: DERIVED.  `deathRate` is a cardinality of the state space
-(`Descent.Coalescent.StateSpace.card_covers_eq_deathRate`), and the jump is to a state with
-one fewer block, which is K-C (1.4). -/
+(`Descent.Coalescent.StateSpace.card_covers_eq_deathRate`), and the jump is to a state with one fewer block, which is K-C (1.4). -/
 noncomputable def coalescentOnPow (m : ℕ) (x : ℝ) : ℝ :=
   deathRate (m + 2) * (x ^ (m + 1) - x ^ (m + 2))
 

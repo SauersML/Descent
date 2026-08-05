@@ -774,8 +774,7 @@ section MultiAncestryBayesian
 /-- **`rg²` lies in `[0,1]` whenever `rg` does.**
 
     Previously `info_borrowing_proportional_to_rg`, "Genetic correlation determines
-    information borrowing". It introduced a second variable `info_gain` and pinned it with
-    `h_relation : info_gain = rg ^ 2`, then proved bounds on it. Naming a quantity and
+    information borrowing". It introduced a second variable `info_gain` and pinned it with `h_relation : info_gain = rg ^ 2`, then proved bounds on it. Naming a quantity and
     supplying its definition as a hypothesis adds nothing to the bound on `rg ^ 2`, and it
     makes an unproved modelling identification — that squared genetic correlation *is* the
     fraction of information shared — look like part of the theorem. -/

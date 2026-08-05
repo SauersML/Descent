@@ -128,8 +128,7 @@ drift variances.
     escapes the identity above by never feeding the sample's own heterozygosity loss back
     in. `F` is the MODEL's `1-(1-1/(2Nₑ))^t`, computed from the simulation's `Nₑ` and `t`
     alone; the observable is the realised `Var(p₁ - p₀)` over 2×10⁵ independent loci under
-    Wright-Fisher binomial sampling in two demes from a common ancestor at `p₀ = 0.3`, with
-    no mutation and no migration.
+    Wright-Fisher binomial sampling in two demes from a common ancestor at `p₀ = 0.3`, with no mutation and no migration.
 
       Nₑ    t     F        this body   realised Var   sems
       200    50   0.1176    0.02470      0.02464      0.85
@@ -359,8 +358,7 @@ theorem freq_change_alters_pgs_variance
     beta_sq * (2 * p_source * (1 - p_source)) ≠
       beta_sq * (2 * p_target * (1 - p_target)) := by
   intro h
-  rcases (weighted_heterozygosity_eq_iff beta_sq p_source p_target h_beta).1 h with
-    h_same | h_complement
+  rcases (weighted_heterozygosity_eq_iff beta_sq p_source p_target h_beta).1 h with h_same | h_complement
   · exact h_diff h_same
   · exact h_not_complement h_complement
 

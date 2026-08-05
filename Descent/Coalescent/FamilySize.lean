@@ -132,7 +132,7 @@ theorem sameParentCount_id {N : ℕ} : sameParentCount (id : Fin N → Fin N) = 
   unfold sameParentCount
   refine Finset.sum_eq_zero fun a _ ↦ ?_
   have hfilter : (univ.filter fun b : Fin N ↦ (id b) = (id a)) = {a} := by
-    PopGen.ext b
+    ext b
     simp
   rw [hfilter]
   simp

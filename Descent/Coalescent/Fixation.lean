@@ -39,8 +39,7 @@ except through `α`.
 
 ## What the formula says, proved
 
-`selectedFixation_half_gt_half`: a beneficial allele at frequency one half fixes with
-probability strictly above one half.  The proof is the factorisation
+`selectedFixation_half_gt_half`: a beneficial allele at frequency one half fixes with probability strictly above one half.  The proof is the factorisation
 `1 - e^{-α} = (1 - e^{-α/2})(1 + e^{-α/2})`, which collapses the whole expression to
 `1/(1 + e^{-α/2})`, and that exceeds `½` exactly when `e^{-α/2} < 1`.
 

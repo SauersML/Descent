@@ -99,8 +99,7 @@ theorem ancestralRel_rel {n N : ℕ} (P : Pedigree N) (sample : Fin n → Fin N)
     (ancestralRel P sample s).r i j
       ↔ ancestor P s (sample i) = ancestor P s (sample j) := Iff.rfl
 
-/-- **K-G (2.5): `ℛ_0 = Δ`.**  At the moment of sampling nobody shares an ancestor with
-anybody but themselves -- provided the `n` individuals sampled are distinct, which is the
+/-- **K-G (2.5): `ℛ_0 = Δ`.**  At the moment of sampling nobody shares an ancestor with anybody but themselves -- provided the `n` individuals sampled are distinct, which is the
 hypothesis, and is what "select `n` particular individuals" means. -/
 theorem ancestralRel_zero {n N : ℕ} (P : Pedigree N) {sample : Fin n → Fin N}
     (hs : Function.Injective sample) : ancestralRel P sample 0 = Delta n := by

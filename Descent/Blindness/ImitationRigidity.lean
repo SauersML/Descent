@@ -69,7 +69,7 @@ theorem covarianceMatrix_addRankOneSignal
     (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0) :
     Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) =
       Foundations.covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
-  PopGen.ext i j
+  ext i j
   simp only [Foundations.covarianceMatrix, Matrix.of_apply, addRankOneSignal,
     Matrix.add_apply, rankOneCovarianceBump]
   have hi :
@@ -591,7 +591,7 @@ theorem belowCeiling_add_rankOne_iff
   have hrewrite :
       ceiling • (1 : Matrix ι ι ℝ) - (K + rankOneCovarianceBump scale loading) =
         (ceiling • (1 : Matrix ι ι ℝ) - K) - rankOneCovarianceBump scale loading := by
-    PopGen.ext i j; simp [Matrix.sub_apply, Matrix.add_apply]; ring
+    ext i j; simp [Matrix.sub_apply, Matrix.add_apply]; ring
   unfold BelowCeiling
   rw [hrewrite]
   exact varianceNonneg_sub_rankOne_iff hsymm hgap hwitness scale
@@ -691,8 +691,7 @@ hard-edge and whitening-gain results that follow. -/
 theorem stationaryLDEntry_isFixedPoint (decay : ℝ) (separation : ℕ) :
     markovLDStep decay (stationaryLDEntry decay) separation =
       stationaryLDEntry decay separation := by
-  cases separation with
-  | zero => simp [markovLDStep, stationaryLDEntry,
+  cases separation with | zero => simp [markovLDStep, stationaryLDEntry,
       Descent.Core.power]
   | succ n =>
       have hne : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
@@ -1009,8 +1008,7 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
     stationaryLDEntry decay separation -
         decay * stationaryLDEntry decay (adjacentBoundarySeparation separation) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
-  cases separation with
-  | zero =>
+  cases separation with | zero =>
       simp [adjacentBoundarySeparation, stationaryLDEntry,
       Descent.Core.power]
       ring
@@ -1049,8 +1047,7 @@ theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
         - decay * stationaryLDEntry decay (adjacentBoundarySeparation separation)
         - decay * stationaryLDEntry decay (separation + 1) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
-  cases separation with
-  | zero =>
+  cases separation with | zero =>
       have hif : (if (0 : ℕ) = 0 then 1 - decay ^ 2 else 0) = 1 - decay ^ 2 :=
         if_pos rfl
       rw [hif]
@@ -1693,7 +1690,7 @@ theorem rankOneCovarianceBump_conjugate
     (transform : Matrix ι ι ℝ) (scale : ℝ) (loading : ι → ℝ) :
     transform.transpose * rankOneCovarianceBump scale loading * transform =
       rankOneCovarianceBump scale (transform.transpose.mulVec loading) := by
-  PopGen.ext i j
+  ext i j
   have hinner : ∀ a : ι,
       (∑ b, transform b i * (scale ^ 2 * loading b * loading a) * transform a j) =
         (∑ b, transform b i * loading b) *

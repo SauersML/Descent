@@ -295,8 +295,7 @@ noncomputable def replicatesForEqualPermeability
     (sourceReplicates sourcePermeability targetPermeability : ℝ) : ℝ :=
   sourceReplicates * sourcePermeability / targetPermeability
 
-/-- **replicatesForEqualPermeability at zero targetPermeability, named.** A target channel with
-zero permeability cannot be matched at any number of replicates. Lean returns `0`, reporting that
+/-- **replicatesForEqualPermeability at zero targetPermeability, named.** A target channel with zero permeability cannot be matched at any number of replicates. Lean returns `0`, reporting that
 no replication is needed to match an unmatchable channel. Consumers must require
 `targetPermeability ≠ 0`. -/
 theorem replicatesForEqualPermeability_zero_targetpermeability_is_junk
@@ -1019,7 +1018,7 @@ theorem multivariateGaussianPermeability_eq_zero_iff {d : ℕ}
       whitenedCovarianceDerivative = 0 := by
   constructor
   · intro hzero
-    PopGen.ext i j
+    ext i j
     by_contra hentry
     have hpositive : 0 < PopGen.frobeniusNormSq whitenedCovarianceDerivative :=
       PopGen.frobeniusNormSq_pos_of_exists_ne_zero

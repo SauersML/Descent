@@ -79,10 +79,8 @@ the current block count. -/
 theorem quotientRelation_self {n : ℕ} (ξ : ER n) :
     quotientRelation (le_refl ξ) = ⊥ := by
   refine Setoid.ext fun c d => ⟨fun hcd => ?_, fun hcd => ?_⟩
-  · induction c using Quotient.inductionOn with
-    | _ x =>
-        induction d using Quotient.inductionOn with
-        | _ y =>
+  · induction c using Quotient.inductionOn with | _ x =>
+        induction d using Quotient.inductionOn with | _ y =>
             have : ξ.r x y := (quotientRelation_mk (le_refl ξ) x y).mp hcd
             exact Quotient.sound this
   · show blockMap (le_refl ξ) c = blockMap (le_refl ξ) d

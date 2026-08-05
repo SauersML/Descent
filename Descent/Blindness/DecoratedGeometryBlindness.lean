@@ -11,8 +11,7 @@ open scoped BigOperators
 /-!
 # What a distance array cannot see, and what alignment can
 
-A family of populations carrying ancestry-specific outcome fields is a metric measure space with
-a decoration: allele-frequency divergence supplies the metric, sampling weight the measure, and
+A family of populations carrying ancestry-specific outcome fields is a metric measure space with a decoration: allele-frequency divergence supplies the metric, sampling weight the measure, and
 the population-specific conditional risk the mark.  Three finite facts about that object, each
 stated exactly and each with a biological reading.
 

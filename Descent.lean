@@ -606,8 +606,7 @@ section NoAxioms
 variable {t : ℕ}
 
 /-! `covariance_mismatch_pos_of_fst_and_sparse_array` and
-`target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with
-their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.PopGen.DGP`
+`target_r2_drop_of_fst_and_sparse_array` were each restated here under a primed name, with their binder blocks -- sixteen lines of hypotheses -- copied verbatim from `Descent.PopGen.DGP`
 and a one-line proof citing the original.
 
 The restatements bought nothing.  Both originals are already in the `Descent` namespace,

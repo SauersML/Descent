@@ -257,8 +257,7 @@ theorem fstIslandEquilibrium_manyDemes (Ne m μ nDemes : ℝ)
     fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + 4 * Ne * m + 4 * Ne * μ) := by
   rw [fstIslandEquilibrium_eq, hd]; ring_nf
 
-/-- **No mutation: `μ = 0`.** `fstMigrationDriftEquilibrium` is the many-deme master with
-the mutation term dropped. Migration alone. -/
+/-- **No mutation: `μ = 0`.** `fstMigrationDriftEquilibrium` is the many-deme master with the mutation term dropped. Migration alone. -/
 theorem fstIslandEquilibrium_no_mutation (Ne m nDemes : ℝ)
     (hd : islandDemeCorrection nDemes = 1) :
     fstIslandEquilibrium Ne m 0 nDemes = 1 / (1 + 4 * Ne * m) := by

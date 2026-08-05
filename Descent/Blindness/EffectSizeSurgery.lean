@@ -208,7 +208,7 @@ theorem odd_summary_detects_transfer {f : ℝ → ℝ} (hf : IsOddSummary f) {sh
   have hzero : 2 * shift * f F.level = 0 := by nlinarith [hcontra]
   rcases mul_eq_zero.mp hzero with htwo | hf0
   · rcases mul_eq_zero.mp htwo with h2 | hs
-    · norm_num at PopGen.AssortativeMatingModel.h2
+    · norm_num at h2
     · exact hshift hs
   · exact hlevel hf0
 
