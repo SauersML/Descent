@@ -137,40 +137,47 @@ theorem splitBy_covers {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
     Covers (splitBy η S) η :=
   ⟨splitBy_le η S, by rw [blocks_splitBy η S hSa hSne hSproper]⟩
 
-/-- **Every cover is a cut.**  Given `ξ ≺ η`, the set `S` is one of the two `ξ`-classes that
-`η` merges; `covers_iff_exists_merge` supplies the pair, and this turns it into a set.  With
-this, the states below `η` in Kingman's induction are exactly the cuts of its classes. -/
+/-- **A merge is the cut along one of the two classes it merged.**  The witness that the
+characterisation below needs, exposed rather than left inside its proof: `ξ` is exactly the
+cut of `merge ξ a b` along the class `a`. -/
+theorem eq_splitBy_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
+    ξ = splitBy (merge ξ a b) (Finset.univ.filter fun x => Quotient.mk ξ x = a) := by
+  classical
+  refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
+  · refine (splitBy_rel_iff _ _ x y).mpr ⟨le_merge ξ a b hxy, ?_⟩
+    have hcl : Quotient.mk ξ x = Quotient.mk ξ y := Quotient.sound hxy
+    simp [hcl]
+  · obtain ⟨hmerge, hside⟩ := (splitBy_rel_iff _ _ x y).mp hxy
+    have hmm : mergeMap ξ a b (Quotient.mk ξ x) = mergeMap ξ a b (Quotient.mk ξ y) := hmerge
+    rcases (mergeMap_eq_iff ξ hab _ _).mp hmm with h | ⟨hx, hy⟩ | ⟨hx, hy⟩
+    · exact Quotient.exact h
+    · exfalso
+      have hxs : x ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
+        Finset.mem_filter.mpr ⟨Finset.mem_univ x, hx⟩
+      have hys : y ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        rw [hy]
+        exact fun h => hab h.symm
+      exact hys (hside.mp hxs)
+    · exfalso
+      have hys : y ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
+        Finset.mem_filter.mpr ⟨Finset.mem_univ y, hy⟩
+      have hxs : x ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        rw [hx]
+        exact fun h => hab h.symm
+      exact hxs (hside.mpr hys)
+
+/-- **Every cover is a cut.**  Kingman's `ξ ≺ η` -- "`η` is obtained from `ξ` by combining
+two of its equivalence classes" -- seen from above: `ξ` refines `η` by cutting exactly one of
+its classes in two. -/
 theorem covers_iff_exists_splitBy {n : ℕ} (ξ η : ER n) :
     Covers ξ η ↔ ∃ S : Finset (Fin n), ξ = splitBy η S ∧ Covers (splitBy η S) η := by
   classical
   constructor
   · intro hcov
     obtain ⟨a, b, hab, rfl⟩ := (covers_iff_exists_merge ξ η).mp hcov
-    have hS : ξ = splitBy (merge ξ a b) (Finset.univ.filter fun x => Quotient.mk ξ x = a) := by
-      refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
-      · refine (splitBy_rel_iff _ _ x y).mpr ⟨le_merge ξ a b hxy, ?_⟩
-        have hcl : Quotient.mk ξ x = Quotient.mk ξ y := Quotient.sound hxy
-        simp [hcl]
-      · obtain ⟨hmerge, hside⟩ := (splitBy_rel_iff _ _ x y).mp hxy
-        have hmm : mergeMap ξ a b (Quotient.mk ξ x) = mergeMap ξ a b (Quotient.mk ξ y) := hmerge
-        rcases (mergeMap_eq_iff ξ hab _ _).mp hmm with h | ⟨hx, hy⟩ | ⟨hx, hy⟩
-        · exact Quotient.exact h
-        · exfalso
-          have hxs : x ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
-            Finset.mem_filter.mpr ⟨Finset.mem_univ x, hx⟩
-          have hys : y ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-            rw [hy]
-            exact fun h => hab h.symm
-          exact hys (hside.mp hxs)
-        · exfalso
-          have hys : y ∈ Finset.univ.filter fun z => Quotient.mk ξ z = a :=
-            Finset.mem_filter.mpr ⟨Finset.mem_univ y, hy⟩
-          have hxs : x ∉ Finset.univ.filter fun z => Quotient.mk ξ z = a := by
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-            rw [hx]
-            exact fun h => hab h.symm
-          exact hxs (hside.mpr hys)
+    have hS := eq_splitBy_merge ξ hab
     exact ⟨_, hS, hS ▸ hcov⟩
   · rintro ⟨S, rfl, hcov⟩
     exact hcov

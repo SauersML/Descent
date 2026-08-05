@@ -48,11 +48,11 @@ omits it, `splitBy` is injective on cut sets (`CutSets.splitBy_injective_on_cutS
 cut set sits inside its class with the representative deleted
 (`CutSets.cutSet_subset_erase`), which is the `λ - 1` the count is over.
 
-Two things are still missing.  `CutSets.exists_cutSet_of_covers` normalises a cut to a cut
-set, but takes the nonemptiness and properness of the original cut as a HYPOTHESIS --
-`Split.covers_iff_exists_splitBy` does not yet produce those witnesses, though its proof
-constructs them.  And the assembly of injectivity, surjectivity and the subset count into
-the cardinality is not written.
+Both halves of the bijection are now proved: `CutSets.splitBy_injective_on_cutSets` and
+`CutSets.exists_cutSet_of_covers`, the latter with its witnesses supplied by
+`CutSets.exists_properCut_of_covers` rather than assumed.  What is still missing is only the
+assembly: counting cut sets as `Σ_c (2^{λ_c - 1} - 1)` by fibring them over the class they
+cut.  That is a sum over classes of a count of subsets, and it is not written.
 
 **2. Ewens normalisation for general `n`.**  SETTLED, by `Ewens.sum_ewensWeight`:
 `Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, which is what makes K-G (3.8) a
