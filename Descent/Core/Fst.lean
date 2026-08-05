@@ -1,9 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Ratios
+import Descent.Core.Scaling
 import Mathlib.Order.Filter.AtTopBot.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
-import Descent.Core.Scaling
 
 /-!
 # Core: one island-model `F_ST`, and the lattice its specialisations form
@@ -119,19 +120,21 @@ theorem scaledMutationRate_eq (Ne μ : ℝ) : scaledMutationRate Ne μ = 4 * Ne 
 theorem scaledMigrationRate_eq (Ne m : ℝ) : scaledMigrationRate Ne m = 4 * Ne * m := by
   unfold scaledMigrationRate ploidy; ring
 
-/-- **Cross-check: the scaled mutation rate in `PopulationGeneticsFoundations`
-is twice the coalescent time scale times the mutation rate**, rather than an
-independently chosen `4`. -/
-theorem scaledMutationRate_eq_ploidy_form (Ne mu : ℝ) :
-    scaledMutationRate Ne mu = 2 * ploidy * Ne * mu := by
-  unfold scaledMutationRate ploidy; ring
+/-- **The scaled mutation rate is `2 · ploidy · Nₑ · μ`, and that is its body.**
 
-/-- **Cross-check: the scaled migration rate in `PortabilityDrift` uses the
-same convention.** These two were written in different files, each spelling
-out its own `4`. -/
+This states the definition against itself, so it is `rfl` and it cannot fail. Kept
+rather than deleted because it names the shape at the point a reader meets the rate, but
+it is NOT the theorem that protects the constant: `scaledMutationRate_eq` above is, since
+that one relates the body to the literal `4` and so breaks if `ploidy` changes and the
+rate does not follow. -/
+theorem scaledMutationRate_eq_ploidy_form (Ne mu : ℝ) :
+    scaledMutationRate Ne mu = 2 * ploidy * Ne * mu := rfl
+
+/-- **The scaled migration rate carries the same shape**, and likewise by `rfl`. The two
+rates were written in different files, each spelling out its own `4`; what pins them
+together now is `scaledRates_share_constant`, not this. -/
 theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
-    scaledMigrationRate Ne m = 2 * ploidy * Ne * m := by
-  unfold scaledMigrationRate ploidy; ring
+    scaledMigrationRate Ne m = 2 * ploidy * Ne * m := rfl
 
 /-! ### The named rates and the wrapped types are the same arithmetic
 
@@ -225,18 +228,18 @@ is the sense in which the many-deme equilibrium below is a specialisation of the
 finite-deme one. -/
 theorem islandDemeCorrection_tendsto_one :
     Tendsto islandDemeCorrection atTop (𝓝 1) := by
-  have hEq : islandDemeCorrection =ᶠ[atTop] fun d : ℝ => 1 + 1 / (d - 1) := by
+  have hEq : islandDemeCorrection =ᶠ[atTop] fun d : ℝ ↦ 1 + 1 / (d - 1) := by
     filter_upwards [eventually_gt_atTop (1 : ℝ)] with d hd
     have h : d - 1 ≠ 0 := by intro hc; rw [sub_eq_zero] at hc; exact absurd hc (by linarith)
     unfold islandDemeCorrection ratio
     field_simp
     ring
   rw [tendsto_congr' hEq]
-  have hsub : Tendsto (fun d : ℝ => d - 1) atTop atTop :=
+  have hsub : Tendsto (fun d : ℝ ↦ d - 1) atTop atTop :=
     (tendsto_atTop_add_const_right atTop (-1 : ℝ) tendsto_id).congr
-      (fun x => by show x + -1 = x - 1; ring)
-  have h : Tendsto (fun d : ℝ => 1 / (d - 1)) atTop (𝓝 0) :=
-    (tendsto_inv_atTop_zero.comp hsub).congr (fun x => (one_div (x - 1)).symm)
+      (fun x ↦ by show x + -1 = x - 1; ring)
+  have h : Tendsto (fun d : ℝ ↦ 1 / (d - 1)) atTop (𝓝 0) :=
+    (tendsto_inv_atTop_zero.comp hsub).congr (fun x ↦ (one_div (x - 1)).symm)
   simpa using tendsto_const_nhds.add h
 
 /-! ### The master equilibrium -/
