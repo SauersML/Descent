@@ -125,6 +125,15 @@ revision:
   is precisely the statement K-C's Theorem 2 uses (he cites Doob VII.4.25), and it is the
   single Mathlib lemma that would unblock the paintbox representation.  A reader wanting to
   finish item 3 should start there, not with de Finetti.
+
+  One shortcut is worth ruling out before anyone spends a day on it.  `Filtration` is
+  parameterised by an arbitrary `Preorder`, and Mathlib does instantiate it at an order dual
+  elsewhere (`cylinderEventsCompl : Filtration (Finset α)ᵒᵈ`), so a decreasing filtration is
+  expressible as `Filtration ℕᵒᵈ`.  But the convergence results are not: every theorem in
+  `Martingale/Convergence.lean` fixes `ℱ : Filtration ℕ m0` and argues along `atTop` with
+  upcrossing counts, and the downward theorem is not that argument dualised -- it turns on a
+  reversed martingale being automatically uniformly integrable, which the forward proof never
+  needs.  It is a separate development, not an instantiation.
 * **Kolmogorov extension, general form**: absent.  `ProjectiveFamilyContent` and
   `ClosedCompactCylinders` exist and name it as their goal, but the existence theorem for a
   general consistent family is not there.  `IsProjectiveLimit.unique` IS, which is what

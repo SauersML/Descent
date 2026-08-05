@@ -185,6 +185,24 @@ theorem fstEquilibrium_mem_unit (p : PopGenParameters) :
   · positivity
   · rw [div_le_one hpos]; linarith
 
+/-- **Some flow means incomplete differentiation.** `F_ST = 1` exactly when nothing
+connects the demes: no migration and no mutation. Stated with the hypothesis rather than
+without, because the no-flow population is a real case and there the equilibrium IS one --
+two populations with nothing passing between them are completely differentiated, which is
+the right answer and not a junk value. -/
+theorem fstEquilibrium_lt_one (p : PopGenParameters) (h : 0 < p.mu + p.mig) :
+    p.fstEquilibrium < 1 := by
+  have hNe := p.Ne_pos
+  have hmu := p.mu_nonneg
+  have hmig := p.mig_nonneg
+  have hflow : 0 < p.theta + 2 * p.bigM := by
+    unfold theta bigM
+    rw [scaledMutationRate_eq, scaledMigrationRate_eq]
+    nlinarith
+  unfold fstEquilibrium fstFromFlow
+  rw [div_lt_one (by linarith)]
+  linarith
+
 /-- **More migration means less differentiation.** The qualitative law the whole
 demography-to-metric chain rests on, proved once on the record rather than once per
 consumer. -/
