@@ -155,6 +155,89 @@ theorem expected_pairTime {e3 e2 : ℝ} (h3 : e3 = 1 / 3) (h2 : e2 = 1) :
   subst h3 h2
   norm_num
 
+
+/-! ### The four-sample, where the topology stops being invisible
+
+Two DISJOINT pairs live in a four-sample, and there the trick above fails: the symmetric sums
+are not topology-free, and an average over the second merger is needed.  Fixing the first
+merger as the pair `01` costs no generality -- relabelling is a symmetry of the coalescent --
+and the second merger is uniform on the three pairs of the three remaining blocks.
+
+Writing `A = τ₄`, `B = τ₄+τ₃`, `C = τ₄+τ₃+τ₂` for the three heights, the three ways to
+resolve the second merger give
+
+  balanced `{2,3}`:      `T₀₁ = A`, `T₂₃ = B`, the rest `C`;
+  caterpillar `{01},2`:  `T₀₁ = A`, `T₀₂ = T₁₂ = B`, the rest `C`;
+  caterpillar `{01},3`:  `T₀₁ = A`, `T₀₃ = T₁₃ = B`, the rest `C`.
+
+`sum_disjointProducts` computes the three disjoint products in each case -- `AB + 2C²` for
+the balanced tree and `AC + 2BC` for either caterpillar, which are different polynomials, so
+there is no topology-free shortcut.  Averaging over the three, `sum_over_second_merger` gives
+a polynomial in the holding times, and the moments turn it into `E(T_ij T_kl) = 11/9`, hence
+`Cov = 2/9`.
+
+Pairs indexed as `01, 02, 03, 12, 13, 23` in `Fin 6`; the disjoint pairings are
+`(01,23)`, `(02,13)`, `(03,12)`.
+-/
+
+/-- The pairwise times of a four-sample whose first merger is the pair `01`, indexed by the
+second merger `s` (`0` balanced, `1` and `2` the two caterpillars).
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  As in `pairTime`, it reads the tree off the jump
+chain and the clock. -/
+def pairTime4 (s : Fin 3) (p : Fin 6) (t₄ t₃ t₂ : ℝ) : ℝ :=
+  if p = 0 then t₄
+  else if (s = 0 ∧ p = 5) ∨ (s = 1 ∧ (p = 1 ∨ p = 3)) ∨ (s = 2 ∧ (p = 2 ∨ p = 4)) then
+    t₄ + t₃
+  else t₄ + t₃ + t₂
+
+/-- **The three disjoint products, per topology.**  `AB + 2C²` for the balanced tree,
+`AC + 2BC` for either caterpillar -- different polynomials, which is why the four-sample
+needs the average the three-sample did not. -/
+theorem sum_disjointProducts (s : Fin 3) (t₄ t₃ t₂ : ℝ) :
+    pairTime4 s 0 t₄ t₃ t₂ * pairTime4 s 5 t₄ t₃ t₂
+        + pairTime4 s 1 t₄ t₃ t₂ * pairTime4 s 4 t₄ t₃ t₂
+        + pairTime4 s 2 t₄ t₃ t₂ * pairTime4 s 3 t₄ t₃ t₂
+      = if s = 0 then t₄ * (t₄ + t₃) + 2 * (t₄ + t₃ + t₂) ^ 2
+        else t₄ * (t₄ + t₃ + t₂) + 2 * (t₄ + t₃) * (t₄ + t₃ + t₂) := by
+  fin_cases s <;> norm_num [pairTime4, Fin.ext_iff] <;> ring
+
+/-- **Summed over the three resolutions.**  `(AB + 2C²) + 2(AC + 2BC)`, expanded in the
+holding times.  Dividing by three is the average the jump chain's uniform choice imposes. -/
+theorem sum_over_second_merger (t₄ t₃ t₂ : ℝ) :
+    (t₄ * (t₄ + t₃) + 2 * (t₄ + t₃ + t₂) ^ 2)
+        + 2 * (t₄ * (t₄ + t₃ + t₂) + 2 * (t₄ + t₃) * (t₄ + t₃ + t₂))
+      = 9 * t₄ ^ 2 + 6 * t₃ ^ 2 + 2 * t₂ ^ 2 + 15 * (t₄ * t₃) + 10 * (t₄ * t₂)
+          + 8 * (t₃ * t₂) := by
+  ring
+
+/-- **`E(T_ij T_kl) = 11/9` for disjoint pairs.**
+
+The hypotheses are the moments of K-C (1.7)'s clock at the three rates a four-sample passes
+through, `d₄ = 6`, `d₃ = 3`, `d₂ = 1`, from `HoldingSecondMoment`: `E τ = 1/d`, `E τ² = 2/d²`.
+Independence of the clocks turns each cross moment into a product, as at `expected_cross_pairTime`.
+
+The polynomial is divided by nine: three for the average over the second merger, three for
+the three disjoint pairings the sum ranges over. -/
+theorem expected_disjoint_pairTime_product {e4 e4sq e3 e3sq e2 e2sq : ℝ}
+    (h4 : e4 = 1 / 6) (h4sq : e4sq = 1 / 18) (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9)
+    (h2 : e2 = 1) (h2sq : e2sq = 2) :
+    (9 * e4sq + 6 * e3sq + 2 * e2sq + 15 * (e4 * e3) + 10 * (e4 * e2) + 8 * (e3 * e2)) / 9
+      = 11 / 9 := by
+  subst h4 h4sq h3 h3sq h2 h2sq
+  norm_num
+
+/-- **`Cov(T_ij, T_kl) = 2/9` for disjoint pairs.**  Positively correlated, but less than the
+`1/3` of two pairs sharing a lineage -- they share only the part of the tree above both their
+most recent common ancestors, and that is less of it. -/
+theorem covariance_disjoint_pairTime {e4 e4sq e3 e3sq e2 e2sq : ℝ}
+    (h4 : e4 = 1 / 6) (h4sq : e4sq = 1 / 18) (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9)
+    (h2 : e2 = 1) (h2sq : e2sq = 2) :
+    (9 * e4sq + 6 * e3sq + 2 * e2sq + 15 * (e4 * e3) + 10 * (e4 * e2) + 8 * (e3 * e2)) / 9 - 1
+      = 2 / 9 := by
+  rw [expected_disjoint_pairTime_product h4 h4sq h3 h3sq h2 h2sq]
+  norm_num
+
 end Coalescent
 
 end Descent
