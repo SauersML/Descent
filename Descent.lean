@@ -163,6 +163,7 @@ import Descent.Coalescent.PairwiseTimes
 import Descent.Coalescent.TajimaVariance
 import Descent.Coalescent.PolyaCriterion
 import Descent.Coalescent.SemigroupLimit
+import Descent.Coalescent.MohleLemma
 import Descent.Coalescent.DescentTime
 import Descent.Coalescent.TrajectoryLaw
 import Descent.Coalescent.EntranceLaw
@@ -244,9 +245,10 @@ profile: one formula, read once as a metric and once as a landscape. -/
 theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
     Portability.ogpOverlapProfile q x = Blindness.populationOverlapProfile q x := rfl
 
-/-- The epoch sample size of the metric chart is the epoch lineage sample size. -/
-theorem epochSampleSize_eq_epochLineageSampleSize (K : ℕ) :
-    Portability.epochSampleSize K = PopGen.epochLineageSampleSize K := rfl
+/-! **`epochSampleSize_eq_epochLineageSampleSize` is deleted.** It related two names for
+`Core.pairedEpochCount`, and `MetricSpecificPortability` has since deleted the first of
+them, naming the kernel directly instead. An identity between a kernel and a name that no
+longer exists is not a reconciliation; it is the residue of one. -/
 
 /-- **The overlap and the squared norm are one inner product, at their own dimensions.**
 
