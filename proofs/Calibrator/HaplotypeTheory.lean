@@ -132,9 +132,24 @@ theorem uniformOccupancyDistinctHaplotypes_strictMono
     Regime: haplotypes drawn independently, so this is the identity-by-state
     match probability and not an identity-by-descent one.
 
-    Empirical status: UNTESTED. The displayed formula follows algebraically from
-    independence: the probability that two draws match is the sum, over
-    haplotypes, of the product of their two marginal probabilities. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk41.py`, `group_c`). The displayed
+    formula follows algebraically from independence -- the probability that two draws match
+    is the sum, over haplotypes, of the product of their two marginal probabilities -- and
+    the design measures the LEFT-hand side of that statement without evaluating the right:
+    a frequency vector is drawn from a Dirichlet, then 8×10⁶ independent PAIRS of haplotypes
+    are drawn from it and the observable is the realised fraction of pairs that MATCH.
+
+      k    conc   this body   realised match rate   sems
+       4    0.4    0.49446         0.49454          0.42
+       6    1.0    0.30011         0.29983          1.72
+      10    0.3    0.22531         0.22542          0.77
+       3    3.0    0.45615         0.45590          1.44
+
+    Counting matches is an independent route to the sum of squares, which is what makes this
+    a measurement rather than the same expression twice. The identity gate: the uniform
+    reading `1/k` misses by up to 1383 sems, the complement `1 - ∑f²` by 3718, and `(∑f²)/k`
+    by 2098. The positive control -- a UNIFORM frequency vector, where the match rate must
+    be `1/k` -- passes at 1.19 sems. -/
 noncomputable def haplotypeHomozygosity {α : Type*} [Fintype α] (freq : α → ℝ) : ℝ :=
   ∑ i, freq i ^ 2
 

@@ -195,7 +195,26 @@ section InformationTheoreticLimits
     statement instead: `effectMutualInformation_unbounded_near_perfect`
     exhibits, for every bound, an admissible `ρ` whose information exceeds it.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: UNTESTED, and one attempt is recorded here so it is not repeated.
+    `simcov/battery_bulk40.py`, `group_h`, tried to measure this OPERATIONALLY: fit a
+    conditional Gaussian predictor of the target effect vector on 4×10⁵ training vectors and
+    score the out-of-sample reduction in negative log likelihood on 4×10⁵ held-out ones, so
+    that the correlation the predictor uses is estimated rather than handed over. It agreed
+    with this body to six decimal places in every cell -- 0.00 sems at ρ = 0.3, 0.5, 0.7 and
+    0.9 -- which is the tell for an ALGEBRAIC IDENTITY and not a triumph.
+
+    It is one. The out-of-sample mean log-likelihood gain is
+    `(m/2)·log(σ̂²_marginal / σ̂²_conditional)` plus two terms that cancel as the test moments
+    approach the fitted ones, and both variance ratios reduce to the same sample correlation
+    the prediction is evaluated at. The oracle was the formula. The competitors -- `m` in
+    place of `m/2`, and `log(1-ρ)` in place of `log(1-ρ²)` -- were duly refuted at 3690 and
+    1744 sems, but refuting a competitor against an identity establishes nothing about the
+    world.
+
+    What would settle it is an estimator of mutual information that does not assume the
+    Gaussian family, run on effect vectors that were not drawn Gaussian. Until then this is
+    an exact property of the declared model: something the corpus can prove, and has not
+    measured. -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 

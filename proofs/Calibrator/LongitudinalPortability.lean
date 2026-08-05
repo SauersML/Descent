@@ -139,7 +139,27 @@ it. -/
     LD between linked loci decays as (1-r)^t per generation,
     where r is recombination rate. For small r: λ_LD ≈ r.
 
-    Empirical status: UNTESTED. -/
+    Convention: `r` is the per-generation recombination FRACTION between the two loci and
+    `t` is generations elapsed, so the retention is `(1-r)` applied once per generation.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk41.py`, `group_d`). 4×10⁵ diploids,
+    two loci at recombination fraction `r`, random mating with one gamete from each of two
+    random parents and a recombinant gamete with probability `r`; started in complete
+    disequilibrium, and `D` is MEASURED from the haplotype counts each generation rather
+    than iterated through the recursion. `r` is swept eightfold so `(1-r)^t` and `exp(-rt)`
+    separate.
+
+      r      t    this body   realised D_t/D_0   sems
+      0.05   2     0.90250        0.90223        0.08
+      0.05   8     0.66342        0.66395        0.16
+      0.20   2     0.64000        0.63924        0.23
+      0.20   8     0.16777        0.16940        0.49
+      0.40   2     0.36000        0.35846        0.46
+      0.40   8     0.01680        0.01905        0.67
+
+    The identity gate: the exponential reading `exp(-rt)` misses by up to 27 sems, `(1-r)^2t`
+    by 68, and the linear `1 - rt` by 98. The positive control -- NO recombination, where the
+    disequilibrium must persist unchanged -- passes on the identical `evolve` path. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   (1 - r) ^ t
 

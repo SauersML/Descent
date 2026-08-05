@@ -767,7 +767,44 @@ theorem rg_sq_mem_unit_interval
     n_eff = n_target + Σ_k (rg_k² × n_k × h_k / h_target)
     where h_k is heritability in population k.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED as an unconditional claim; VALIDATED only in the limit
+    where the other ancestry's SAMPLING error dominates its EFFECT scatter**
+    (`simcov/battery_bulk40b.py`, `group_f`).
+
+    Convention, stated because the whole question turns on it: `N_eff` is the posterior
+    PRECISION of the target effect minus the prior precision, i.e. the precision the data
+    contributed. Under that reading target data alone contributes exactly `n_target`, which
+    is what makes the quantity comparable with `n_target` and `n_other` at all, and it is
+    checked as the positive control (0.34 sems).
+
+    A genetic correlation below one means the other ancestry's effect is `rg` times the
+    target's PLUS INDEPENDENT SCATTER of variance `(1-rg²)τ²`, with `τ²` the effect prior
+    variance. The borrowed estimate therefore carries `(1-rg²)τ² + 1/n_other` of noise, not
+    `1/n_other`, and the exact contributed precision is
+
+      n_target + rg² / ((1 - rg²)·τ² + 1/n_other)
+
+    which reduces to this body only when `n_other·τ² ≪ 1`. 6×10⁵ replicates, `n_other·τ²`
+    swept across 1:
+
+      n_t    n_o     rg    n_o·τ²   this body   measured N_eff   sems   off
+      6000   6000   0.7     0.18      8940           8735        2.7    2.3%
+      3000  12000   0.9     0.36     12719          12079        7.7    5.0%
+      3000  12000   0.6     0.36      7329           6449       12.1   12.0%
+      3000  12000   0.9     3.60     12722           8775      178.6   31.0%
+
+    The error grows monotonically with `n_other·τ²`, which is the signature of the missing
+    scatter term rather than of a scale factor. Every competitor is refuted too --
+    `n_t + rg·n_o` by 227 sems, `n_t + n_o` by 282, `n_t` alone by 261 -- so the body is the
+    best of the four and still wrong outside its regime.
+
+    `GeneticArchitectureDiscovery.multiTraitEffectiveSampleSize` is the SAME formula and
+    inherits this. Its MATCH in `simcov/battery_bulk23.py` came from a design in which the
+    other trait's effect was set to EXACTLY `rg` times the target's, with no scatter, under
+    which `n1 + rg² n2` is an algebraic identity for the inverse-variance combination and no
+    data could have rejected it. A per-SNP polygenic `τ² = h²/M` is far below `1/n`, so the
+    regime this body needs is the usual one -- but it is a condition, and it was not
+    written down. -/
 noncomputable def multiAncestryEffectiveN
     (n_target rg n_other : ℝ) : ℝ :=
   n_target + rg ^ 2 * n_other

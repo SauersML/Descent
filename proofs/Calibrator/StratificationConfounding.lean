@@ -796,7 +796,24 @@ noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
     variance here would divide one regression's numerator by another's denominator and the
     quantity would not be an F-statistic of anything.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk40.py`, `group_d`). 4000
+    independent first-stage regressions of 800 individuals each, exposure
+    `X = β_inst · dosage + N(0,1)`; the observable is the realised MEAN first-stage `F`
+    MINUS ONE, because `E[F] = 1 + ncp` under the alternative and this body is the
+    noncentrality rather than the statistic. That subtraction is the convention and is
+    stated rather than absorbed.
+
+      p      H = 2p(1-p)   this body   measured ncp   sems
+      0.05     0.0950        0.4864       0.4664       0.64
+      0.15     0.2550        1.3056       1.2775       0.65
+      0.30     0.4200        2.1504       2.1124       0.75
+      0.50     0.5000        2.5600       2.6051       0.82
+
+    The identity gate: reading the genotype variance as `p(1-p)` misses by 24 sems (51%
+    low) and as `4p(1-p)` by 46 sems (97% high), so the ploidy factor in `hweHeterozygosity`
+    is carried by the data. The positive control -- a NULL instrument, whose `F` must have
+    mean 1 -- passes at 0.88 sems, which is what makes the minus-one convention checkable
+    rather than assumed. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_X_resid
 

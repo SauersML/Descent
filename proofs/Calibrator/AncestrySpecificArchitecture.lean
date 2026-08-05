@@ -123,7 +123,28 @@ drift variances.
     spent: it was pointed at a definition rather than at a claim. UNTESTED as a claim about
     the world. What is actually open is the convention question the paragraph above states --
     which of the three `F`s the caller supplies -- and an identity cannot settle it, because
-    the estimator carries the same convention the body does. -/
+    the estimator carries the same convention the body does.
+
+    THE CONVENTION QUESTION IS NOW SETTLED, and the answer is the per-branch `F` this
+    docstring names: **VALIDATED** (`simcov/battery_bulk41.py`, `group_b`). The design
+    escapes the identity above by never feeding the sample's own heterozygosity loss back
+    in. `F` is the MODEL's `1-(1-1/(2Nₑ))^t`, computed from the simulation's `Nₑ` and `t`
+    alone; the observable is the realised `Var(p₁ - p₀)` over 2×10⁵ independent loci under
+    Wright-Fisher binomial sampling in two demes from a common ancestor at `p₀ = 0.3`, with
+    no mutation and no migration.
+
+      Nₑ    t     F        this body   realised Var   sems
+      200    50   0.1176    0.02470      0.02464      0.85
+      200   150   0.3130    0.06574      0.06556      0.96
+      500   100   0.0952    0.01999      0.01997      0.44
+      100    40   0.1817    0.03815      0.03817      0.14
+
+    The identity gate carries the two substitutions the paragraph above warns about, each
+    MEASURED on the same replicates rather than converted. Nei's `G_ST` misses by up to 157
+    sems, 47% low, which is the promised factor of two. The Hudson pairwise `F_ST` misses by
+    7.8 sems, 2.3% -- the first-order agreement the note predicts, and small enough to
+    explain why that substitution has gone unnoticed elsewhere in the corpus. The positive
+    control, drift is unbiased so `E[p_t] = p₀`, passes at 0.95 sems. -/
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
@@ -164,12 +185,28 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
     The factor of 2 comes from independence of drift.
 
     Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
-    carries no information, for the reason given at `driftVariance`, of which this is twice the body.
+    carries no information, for the reason given at `driftVariance`, of which this is
+    twice the body.
     Substituting the simulator's own `F_ST := Var(p)/(p₀(1-p₀))` collapses this onto
     `2·Var(p)`, which is what the simulator computes for `Var(p₁ - p₂)` once the two
     lineages are drawn independently — residual exactly `0`. The factor of `2` the docstring
     argues for is therefore assumed by the estimator, not tested by it. UNTESTED as a claim
-    about the world. -/
+    about the world.
+
+    THE FACTOR OF TWO IS NOW TESTED: **VALIDATED** (`simcov/battery_bulk41.py`, `group_b`),
+    by the design described at `driftVariance` -- `F` from the model's `Nₑ` and `t`, never
+    from the sample -- with the observable being the realised `E[(p₁ - p₂)²]` over 2×10⁵
+    independent loci in two independently drifting demes.
+
+      Nₑ    t     F        this body   realised E[(p₁-p₂)²]   sems
+      200    50   0.1176    0.04941         0.04932           0.61
+      200   150   0.3130    0.13147         0.13129           0.46
+      500   100   0.0952    0.03999         0.03991           0.61
+      100    40   0.1817    0.07631         0.07636           0.23
+
+    Dropping the factor of two on the SAME cells misses by up to 168 sems, 50% low, so the
+    two is now carried by data rather than by the estimator's definition. Feeding the
+    measured Hudson `F_ST` instead misses by 7.6 sems, 2.3%. -/
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
@@ -216,7 +253,26 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
     precisely what the simulation could NOT answer, because the estimator it compared
     against carried the corpus's own convention in its definition of `fst`. UNTESTED as a
     claim about the world; the convention is open and a simulation pinned to the convention
-    cannot close it. -/
+    cannot close it.
+
+    A SIMULATION NOT PINNED TO THE CONVENTION CLOSES IT: **VALIDATED**
+    (`simcov/battery_bulk41.py`, `group_b`). The escape is to take `F` from the model --
+    `1-(1-1/(2Nₑ))^t`, a function of the simulation's parameters and nothing else -- and to
+    MEASURE the Hudson `F_ST` and Nei `G_ST` separately on the same replicates as
+    competitors, so all three conventions are numbers the run produced rather than one
+    convention evaluated twice.
+
+      Nₑ    t     F        this body   realised E[(p₁-p₂)²]   sems
+      200    50   0.1176    0.04941         0.04932           0.61
+      200   150   0.3130    0.13147         0.13129           0.46
+      500   100   0.0952    0.03999         0.03991           0.61
+      100    40   0.1817    0.07631         0.07636           0.23
+
+    Both questions the paragraph above called unanswerable are answered on these cells: the
+    factor of two is confirmed, since halving misses by 168 sems, and the Nei reading is
+    refuted at 157 sems and 47% low -- the promised halving. The Hudson reading misses by
+    only 2.3%, which is the first-order agreement and the reason it is a trap rather than an
+    obvious error. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
 

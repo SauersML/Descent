@@ -213,7 +213,26 @@ theorem effectGeneticCorrelation_empty_panel_is_junk (β_source β_target : Fin 
 def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
   fun i j ↦ if i = j then 1 else 0
 
-/-- Additive genetic variance in the standardized diagonal-LD model. -/
+/-- Additive genetic variance in the standardized diagonal-LD model.
+
+    Empirical status: **VALIDATED IN THE DECLARED REGIME** (`simcov/battery_bulk41.py`,
+    `group_c`). `m` standardized causal variants in LINKAGE EQUILIBRIUM over 4×10⁵
+    individuals; the observable is the realised sample variance of the genetic value `Gβ`.
+
+      m     this body   realised Var(Gβ)   sems
+       50    0.53004        0.52709        2.50
+      200    0.47943        0.47806        1.28
+      100    0.61262        0.61106        1.14
+
+    The identity gate: `∑|βᵢ|` misses by 7040 sems and the per-variant mean `(∑βᵢ²)/m` by
+    445 sems on the same cells. The positive control -- a SINGLE standardized variant, whose
+    genetic value has variance exactly `β²` -- passes at 0.45 sems.
+
+    THE REGIME IS A CONDITION, and the same run shows it. Putting the identical variants in
+    exchangeable LD at pairwise correlation 0.5 leaves this body 9.2% off the realised
+    variance, because outside linkage equilibrium the variance is `βᵀΣβ` and the cross terms
+    do not vanish. `standardizedDiagonalLD` is what makes `Σ = I` here; a caller who
+    substitutes a real LD matrix and keeps this body has changed the claim. -/
 noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, β i ^ 2
 

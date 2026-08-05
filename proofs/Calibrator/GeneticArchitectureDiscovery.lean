@@ -602,7 +602,19 @@ theorem geneticCorrelation_no_genetic_variance_is_junk (cov_g vg₂ : ℝ) :
 /-- Effective discovery-sample size for trait A after borrowing information
 from a genetically correlated trait B.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED as an unconditional claim; VALIDATED only where the other
+trait's SAMPLING error dominates its EFFECT scatter.** See
+`BayesianPGSTheory.multiAncestryEffectiveN`, which is the same formula and carries the
+measurement (`simcov/battery_bulk40b.py`, `group_f`): the exact contributed precision is
+`n₁ + rg²/((1-rg²)·τ² + 1/n₂)` with `τ²` the effect prior variance, and this body is its
+`n₂·τ² ≪ 1` limit. The error grows monotonically with `n₂·τ²` -- 2.3% at 0.18, 5.0% at 0.36,
+31% at 3.60.
+
+The MATCH previously recorded from `simcov/battery_bulk23.py` is worthless: that design set
+the other trait's effect to EXACTLY `rg` times the target's, with no scatter, under which
+this body is an algebraic identity for the inverse-variance combination and no data could
+have rejected it. Genetic correlation below one MEANS scatter; a design without it is testing
+a different claim. -/
 noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg : ℝ) : ℝ :=
   n₁ + rg ^ 2 * n₂

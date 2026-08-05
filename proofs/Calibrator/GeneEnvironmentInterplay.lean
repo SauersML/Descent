@@ -52,7 +52,28 @@ section GxEInteraction
     The interaction term β_GxE × G × E makes the genetic effect
     environment-dependent: effective β_G = β_G + β_GxE × E.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_c`), against the
+    file's own model as displayed above. 2×10⁶ individuals, `G` standardized and `E` drawn
+    independently of `G` with unit variance; the observable is the realised marginal OLS
+    slope of `Y` on `G`, and the prediction uses the REALISED mean of `E`.
+
+      E_mean   this body   realised slope   sems
+       -1.5     0.02506       0.02497       0.11
+       -0.5     0.27493       0.27536       0.56
+        0.0     0.40008       0.39956       0.69
+       +1.0     0.65017       0.65085       0.90
+       +2.5     1.02471       1.02563       1.21
+
+    `E_mean` is swept through zero and negative, so the body's prediction spans 98% and both
+    competitors MOVE with the design rather than sitting constant: reading the environment's
+    second moment in as well, `β_G + β_GxE(E_mean + Var E)`, misses by 330 sems, and halving
+    the interaction by 413. A constant competitor would have been reported NO POWER and would
+    have rejected nothing, which is what happened on the first attempt. The positive control
+    is the realised mean of `E` against the `E_mean` fed in.
+
+    What is NOT established is the model: that real gene-environment interplay is linear in
+    `G·E` with `E` independent of `G`. The simulation enacts that model, so it establishes
+    the marginal slope GIVEN it. -/
 noncomputable def effectiveGeneticEffect (β_G β_GxE E_mean : ℝ) : ℝ :=
   β_G + β_GxE * E_mean
 

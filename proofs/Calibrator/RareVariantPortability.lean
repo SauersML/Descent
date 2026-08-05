@@ -89,8 +89,25 @@ theorem rareHeritabilityShare_mem_Ioo
 /-- Additive genetic-variance contribution of a variant with effect `β` and allele frequency
 `p` under Hardy--Weinberg genotype variance `2p(1-p)`.
 
-Empirical status: DERIVED under Hardy--Weinberg equilibrium; that equilibrium assumption is not
-empirically checked here. -/
+Empirical status: **VALIDATED** (`simcov/battery_bulk40.py`, `group_b`). One diploid locus in Hardy-Weinberg proportions over
+4×10⁶ individuals; the observable is the realised sample variance of `β` times the
+alt-allele dosage, and the prediction is evaluated at the REALISED allele frequency.
+
+  p       this body   realised Var   sems
+  0.02     0.00480      0.00480      0.07
+  0.10     0.02206      0.02207      0.19
+  0.30     0.05146      0.05146      0.00
+  0.50     0.06125      0.06125      0.02
+  0.80     0.03921      0.03918      0.27
+
+The identity gate is carried on the same cells and it is the factor-of-two gate this corpus
+keeps failing: `β²·p(1-p)` misses by up to 236 sems (50% low) and `β²·4p(1-p)` by 472 sems
+(100% high). The positive control -- the sampler's mean dosage against `2p` -- passes at
+0.74 sems.
+
+The Hardy-Weinberg assumption is what was SIMULATED, not what was checked: the design draws
+two independent alleles per individual, so it establishes the variance formula GIVEN
+Hardy-Weinberg and says nothing about whether a real population is in it. -/
 noncomputable def variantGeneticVarianceContribution (β p : ℝ) : ℝ :=
   β ^ 2 * (2 * p * (1 - p))
 
@@ -365,16 +382,100 @@ The fixed point of `mutationSelectionStepRare`. It is `mu / (h * s + mu)`, not
 admissible parameter, including the weak-constraint regime `s < mu` where
 `mu / s` is not a frequency at all.
 
-    Empirical status: **VALIDATED**
-    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
-    `test_mutation_selection`). It is the fixed point of
-    `mutationSelectionStepRare`, and iterating that recursion to convergence from
-    `p = 0.5` -- three hundred times the equilibrium -- reproduces it to every
-    digit carried, at `mu` from 1e-05 to 1e-04 and `h*s` from 0.005 to 0.05.
+    Empirical status: **VALIDATED IN THE DETERMINISTIC REGIME ONLY**, and
+    FALSIFIED outside it. The regime boundary is `4 Nₑ h s`, a quantity this
+    definition does not contain; see `mutationSelectionDriftParameter` below.
 
-    Power: the prediction spans 0.00100 to 0.00200 across the design. -/
+    The earlier VALIDATED reading rested on
+    `simcov/battery_bulk2.py`, `test_mutation_selection`, which iterated
+    `mutationSelectionStepRare` to convergence and recovered this body "to every
+    digit carried". That is an algebraic identity -- this body IS that map's
+    fixed point, by `mutationSelectionBalance_isFixedPoint` -- and no
+    deterministic recursion can report the drift its own state variable does not
+    carry. There is no population in that measurement.
+
+    Two INDEPENDENT FORWARD, individual-based simulators (SLiM 4.3 in Eidos and
+    fwdpy11 0.24.7 in C++, `proofs/validation/empirical/crossengine/`) put a
+    real finite Wright-Fisher population under recurrent mutation, viability
+    selection and drift at one biallelic site, and measured the time-averaged
+    carrier frequency, `mu = 1e-04`, `s = 0.05`, `h = 0.5`, `Nₑ` swept:
+
+      4 Nₑ h s   this def   SLiM                 fwdpy11              sems
+      200         0.003984  0.004032 ± 0.000146  0.003902 ± 0.000041  0.3 / -2.0
+      50          0.003984  0.004200 ± 0.000105  0.003957 ± 0.000210  2.1 / -0.1
+      10          0.003984  0.004330 ± 0.000197  0.003728 ± 0.000210  1.8 / -1.2
+      2.5         0.003984  0.884    ± 0.040     0.660    ± 0.164     22 / 4.0
+      1           0.003984  0.924    ± 0.045     0.804    ± 0.042     20 / 19
+
+    At `4 Nₑ h s ≥ 10` the body holds on both engines. At `4 Nₑ h s ≤ 2.5` it is
+    low by a factor of 170 to 230: selection no longer holds the allele down,
+    the site drifts to near-fixation for the deleterious allele, and a formula
+    with no `Nₑ` in it cannot see that happen. The failure is not a coefficient
+    error, so no reparametrisation repairs it -- the deterministic fixed point
+    is simply not the stationary mean of the stochastic process.
+
+    Both engines are FORWARD simulators. A coalescent simulator cannot produce
+    this table at all: msprime, which produced every other empirical verdict in
+    this corpus, has no selection.
+
+    Power, and the competitor that earns the match: on the same cells the
+    per-diploid form `2 mu / (h s)` is rejected at 19 to 99 sems and the halved
+    form `mu / (2 h s)` at 8 to 46, so the agreement in the top three rows is a
+    measurement rather than a tautology. The `+ mu` guard in the denominator is
+    NOT exercised by these cells -- `mu / (h s + mu)` and the classical
+    `mu / (h s)` differ by 0.4 percent at `mu / (h s) = 0.004`, well inside the
+    error bars, so this table does not distinguish them. -/
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
+
+/-- **The drift parameter the deterministic balance omits.**
+
+`4 Nₑ h s` is the ratio of the selective force holding a partially dominant
+deleterious allele down to the drift that pushes it around. It is the argument
+`mutationSelectionBalance` does not take, and it is the whole of that
+definition's regime of validity.
+
+This is data, not a packaged claim that the deterministic approximation is
+adequate. Any biological use of `mutationSelectionBalance` must compare this
+explicit quantity with its own scientifically justified tolerance; measurement
+puts the balance within measurement error at `4 Nₑ h s ≥ 10` and low by more
+than two orders of magnitude at `4 Nₑ h s ≤ 2.5`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is the compound parameter
+    itself, named so that a consumer has to confront it. The measurement that
+    fixes where it matters is recorded on `mutationSelectionBalance`. -/
+noncomputable def mutationSelectionDriftParameter (Ne s h : ℝ) : ℝ :=
+  4 * Ne * h * s
+
+/-- **The regime in which the deterministic balance was validated.**
+
+Stated as a `Prop` rather than left in prose so that a consumer can be made to
+carry it. The cross-engine measurement recorded on `mutationSelectionBalance`
+holds this at `4 Nₑ h s ≥ 10` and fails it at `4 Nₑ h s ≤ 2.5`; the threshold
+below is the conservative end of that bracket.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a hypothesis a consumer
+    discharges, not a prediction about data. -/
+def DeterministicMutationSelectionRegime (Ne s h : ℝ) : Prop :=
+  10 ≤ mutationSelectionDriftParameter Ne s h
+
+/-- **The regime is exactly a lower bound on the compound parameter**, and it is
+strictly weaker than any bound on `s` or on `Nₑ` alone: a large population with
+nearly neutral alleles and a small population with strongly selected ones can sit
+at the same point. That is why the restriction is stated on the product. -/
+theorem deterministicMutationSelectionRegime_iff (Ne s h : ℝ) :
+    DeterministicMutationSelectionRegime Ne s h ↔ 10 ≤ 4 * Ne * h * s := by
+  unfold DeterministicMutationSelectionRegime mutationSelectionDriftParameter
+  exact Iff.rfl
+
+/-- **The drift parameter at a reference point.** No theorem evaluated it, so every
+body agreeing with it in sign and monotonicity was indistinguishable from it. At
+`Nₑ = 1000`, `s = 1 / 100` and `h = 1 / 2` it is `20`, which is inside the
+validated regime and fixes the coefficient `4`. -/
+theorem mutationSelectionDriftParameter_at_reference_point :
+    mutationSelectionDriftParameter 1000 (1 / 100) (1 / 2) = 20 := by
+  unfold mutationSelectionDriftParameter
+  norm_num
 
 /-- **Without selection nothing holds the allele down.**
 

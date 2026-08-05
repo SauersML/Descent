@@ -171,10 +171,33 @@ theorem genotypeVariance_max (p : ℝ) :
 
     Derivation: Under imperfect tagging, the observed genotype G_tag
     satisfies Cov(G_tag, G_causal)² / (Var(G_tag) × Var(G_causal)) = r².
-    The regression of Y on G_tag recovers β_tag = β × r², and the
-    information about β through G_tag is I × r².
+    The regression of Y on G_tag recovers β_tag = β × r, NOT β × r² -- the
+    covariance carries one factor of r and the tag's own variance divides out
+    no second one, which is the correction `AncestrySpecificArchitecture.taggedEffect`
+    records and which battery 22 measured at up to 159 sems. The INFORMATION
+    about β through G_tag is nonetheless I × r², because recovering β from the
+    tag divides by that single r and squares it in the variance.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_e`). Two linked
+    diploid loci from an explicit haplotype-frequency table, so the dosage correlation is
+    constructed and then REMEASURED; 6000 independent studies per cell,
+    `Y = β · causal dosage + N(0,1)`; the observable is the inverse variance across studies
+    of the CAUSAL effect estimated through the tag with realised moments.
+
+      r     n      realised r²   this body   measured 1/Var(β̂)   sems
+      0.6    600     0.3600         98.3           97.0          0.71
+      0.6   2400     0.3602        393.3          385.9          1.05
+      0.6   9600     0.3602       1573.4         1558.7          0.52
+      0.9   2400     0.8099        884.4          854.8          1.90
+
+    The identity gate: an `r¹` attenuation misses by up to 38 sems (70%) and an `r⁴` one by
+    35 sems (64%). The positive control -- observe the causal variant directly, where the
+    information must be the full `n·2p(1-p)` -- passes at 1.67 sems.
+
+    `n` is swept SIXTEENFOLD at fixed `r` on purpose. An earlier run at `n = 600` alone read
+    FALSIFIED at 3.2 sems and 7%, which is the estimator and not the body: the tag-based
+    estimate is a RATIO, biased at order `1/n`, and the residual shrinks as `n` grows. A
+    single sample size could not have told those apart. -/
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
 

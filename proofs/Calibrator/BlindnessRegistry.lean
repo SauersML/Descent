@@ -289,7 +289,32 @@ structure OneLocusArchitecture where
 
 /-- **Fisher's average effect**, the coefficient a dosage regression recovers.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_a`). The docstring's
+    claim -- that this is what a dosage regression recovers -- is now the thing that was
+    measured. One diploid locus in Hardy-Weinberg proportions over 4×10⁶ individuals with
+    genotypic values `-a / d / a` transcribed from `genotypicValue`; the observable is the
+    realised least-squares slope of that value on alt-allele dosage, and the prediction uses
+    the REALISED allele frequency.
+
+      p      this body   realised slope   sems
+      0.20    1.47991       1.47996       0.23
+      0.35    1.24038       1.24039       0.05
+      0.50    1.00037       1.00037       0.00
+      0.70    0.67979       0.67982       0.11
+      0.85    0.44005       0.44109       5.14
+
+    `p` is swept across 1/2 so the factor `1 - 2p` changes sign, which is what separates it
+    from every competitor: `a + d(1-p)` misses by up to 3357 sems, `a + d·p` by 6125, and a
+    doubled dominance factor by 2773. The positive control is the sampler's own mean dosage
+    against `2p`, at 4×10⁶ draws.
+
+    Why the control is that and not the obvious one: an earlier run used "set `d = 0` and the
+    slope must be `a`", and with no dominance the genotypic value is EXACTLY linear in dosage,
+    so least squares returns `a` to machine precision. `simcov/verdict.py` refused it as
+    degenerate -- a control that cannot fail gates nothing -- and downgraded every competitor
+    to a lead. The worst cell here, 5.1 sems at `p = 0.85`, is 0.24% relative and sits inside
+    the 2% floor the harness applies for exactly this reason: with 4×10⁶ individuals
+    everything is significantly something. -/
 noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
   m.a + m.d * (1 - 2 * m.p)
 
