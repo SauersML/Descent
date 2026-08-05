@@ -119,6 +119,7 @@ import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
+import Descent.Coalescent.Encoding
 import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Moran

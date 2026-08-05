@@ -9,6 +9,7 @@ import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
+import Descent.Coalescent.Encoding
 import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Extend
@@ -85,8 +86,12 @@ into `R_t = ℛ_{D(n,t)}` with `|R_t| = D(n,t)` (K-G (6.6)) and the death proces
 pathwise (`blockCountAt_eq`, K-C (2.6)); `Law` couples them; `HoldingTime` supplies K-C
 (1.7)'s clock and proves both its integrals, so `E(T_n) = 2 - 2/n` runs from the density.
 `Infinite` proves `𝓔` is the projective limit of the `𝓔ₙ` as a set, so specifying a process
-by its restrictions is well posed.  OPEN: the extension of a consistent family of MEASURES
-to `n = ∞`, which is Theorem 3's Kakutani-Nelson step.
+by its restrictions is well posed.  `Encoding` supplies the measurable structure K-C
+section 3 gets from viewing `𝓔` inside `2^{ℕ×ℕ}`: the embedding is injective, the σ-algebra
+is the pullback, and every `ρ_n` is measurable -- so "the finite-dimensional distributions of
+a process on `𝓔`" is now a well-formed phrase.  OPEN: the extension of a consistent family of
+MEASURES to `n = ∞`, Theorem 3's Kakutani-Nelson step.  It is open for a stated reason -- a
+theorem about measures -- rather than for want of a space to state it in.
 
 Nothing above is asserted where it is open.  Where a result depends on an open item, the
 dependence is a written hypothesis.
