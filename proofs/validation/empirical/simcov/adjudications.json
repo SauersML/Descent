@@ -80,6 +80,41 @@
    ]
   }
  },
+ "effectMutualInformation": {
+  "authoritative": "mi01",
+  "reason": [
+   "The MATCH and the FALSIFIED are both from battery_mi01 and they are not in",
+   "conflict: they are the two halves of a bound, and recording only one would",
+   "be the misreading.",
+   "",
+   "Under GAUSSIAN dependence the body is the mutual information, measured",
+   "against a Kraskov-Stogbauer-Grassberger estimator that assumes no density",
+   "model -- worst 1.75 sems, 0.94% relative -- with the factor m in place of",
+   "m/2 refuted at 386 sems and log(1-rho) in place of log(1-rho^2) at 148.",
+   "",
+   "OFF that family the same body is a strict LOWER BOUND, because at fixed",
+   "correlation the Gaussian is the maximum-entropy joint and therefore the",
+   "minimum-information one. Cells with a randomised coupling at the SAME",
+   "realised rho exceed it by 53%, 27% and 109%, and in the cell where the",
+   "coupling is symmetric about zero the correlation vanishes, the body",
+   "predicts no information, and the estimator finds 2.14 nats.",
+   "",
+   "So the FALSIFIED row is not a defect in the design and not a rival to the",
+   "MATCH. It is the measurement of the condition, and it is what makes the",
+   "check able to fail: had the body matched non-Gaussian dependence it would",
+   "have been refuted as a claim about mutual information at all."
+  ],
+  "superseded": {
+   "bulk40": [
+    "group_h fitted a conditional Gaussian and scored the out-of-sample",
+    "log-likelihood gain, which reduces to (m/2)log(var_marginal /",
+    "var_conditional) with both ratios collapsing onto the same sample",
+    "correlation the prediction is evaluated at. Agreement to six decimal",
+    "places in every cell was the tell. The oracle was the formula wearing an",
+    "estimator."
+   ]
+  }
+ },
  "gwasHeritability": {
   "authoritative": "bulk29",
   "reason": [
