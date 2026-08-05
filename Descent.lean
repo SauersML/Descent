@@ -61,10 +61,11 @@ nothing could depend on them. All four now call `Core.convexCombination`, so the
 theorems hold by `rfl` and say nothing a reader of the bodies cannot see. The agreement
 they described is now in the definitions. -/
 
-/-- The overlap-gap profile of the metric chart is the landscape's population overlap
-profile: one formula, read once as a metric and once as a landscape. -/
-theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
-    Portability.ogpOverlapProfile q x = Blindness.populationOverlapProfile q x := rfl
+/-! **`ogpOverlapProfile_eq_populationOverlapProfile` is deleted.** It related the metric
+chart's overlap-gap profile to the landscape's population overlap profile, and
+`MetricSpecificPortability` has since deleted the first of them, calling `Core.overlapProfile`
+directly.  The reconciliation was real while there were two names; with one name there is
+nothing left to reconcile. -/
 
 /-! **`epochSampleSize_eq_epochLineageSampleSize` is deleted.** It related two names for
 `Core.pairedEpochCount`, and `MetricSpecificPortability` has since deleted the first of
@@ -93,19 +94,14 @@ theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
   · simp [h]
   · simp [h, Ne.symm h]
 
-/-- The context-preserving transition is that same one-hot weight. -/
-theorem persistentTransition_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
-    Conditionals.persistentTransition x y = Blindness.oneHotWeight (R := ℝ) x y := by
-  unfold Conditionals.persistentTransition Blindness.oneHotWeight
-  by_cases h : x = y
-  · simp [h]
-  · simp [h, Ne.symm h]
+/-! **`persistentTransition_eq_oneHotWeight` and `contextMatchQuality_eq_persistentTransition`
+are deleted.** Both named `Conditionals.persistentTransition`, which `Conditionals` has since
+deleted as a duplicate of the readout quality.  What the pair of them established -- that the
+context-preserving transition is the Kronecker delta -- survives as
+`contextMatchQuality_eq_oneHotWeight` below, which is the same statement with the surviving
+name. -/
 
-/-- The readout quality and the context-preserving transition are one Kronecker delta. -/
-theorem contextMatchQuality_eq_persistentTransition (x y : Conditionals.BinaryBiologicalState) :
-    Conditionals.contextMatchQuality x y = Conditionals.persistentTransition x y := rfl
-
-/-- And it is the one-hot weight, which is the third name for that delta. -/
+/-- The readout quality is the one-hot weight: one Kronecker delta, two names. -/
 theorem contextMatchQuality_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
     Conditionals.contextMatchQuality x y = Blindness.oneHotWeight (R := ℝ) x y := by
   rw [contextMatchQuality_eq_persistentTransition, persistentTransition_eq_oneHotWeight]

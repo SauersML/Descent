@@ -193,8 +193,15 @@ step" are different states.
   the stochastic `S = 1 + Q/d_n`, and `SemigroupLimit.norm_exp_smul_sub_one_le_one` turns that
   into a contraction semigroup in any Banach algebra.  That in turn needed `‖exp x‖ ≤ e^{‖x‖}`,
   which Mathlib does not state; `ExpRemainder.norm_exp_le_exp_norm` is the second gap this
-  group has had to close there.  STILL ABSENT: Möhle's lemma proper, the `A + B/N` form with
-  `A` a projection, for models whose two time scales separate.
+  group has had to close there.  `Coalescent.MohleLemma` then closes the other shape a
+  transition operator comes in.  `mohle_limit`: if `P_N = A + N⁻¹B + O(N⁻²)` with `A` a
+  PROJECTION rather than the identity -- diploidy, strong selfing, subdivision with fast
+  internal migration -- then `P_N^N → A·exp(ABA)`.  The `ABA` is derived, not posited, and the
+  reason is one line: `(1 - A)P_N = (1 - A)(P_N - A)`, because `A - A² = 0`.  Whatever the
+  fast dynamics does outside the projection's range it does immediately and once, so only the
+  part of `B` carrying the range back to itself can accumulate over `N` generations.  Kingman
+  is `A = 1`, where `ABA = B` and this degenerates to K-G (2.14): the projection is trivial
+  exactly when nothing happens on the fast scale.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
   restriction commutes with looking down, at or above it the operation is invisible.  That is
