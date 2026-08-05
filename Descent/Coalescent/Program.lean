@@ -170,10 +170,15 @@ step" are different states.
   comparison family left open.  The conclusion is
   `(1 + N⁻¹Q)^N → 1 + (1 - e^{-1})Q`, whose coefficient is the chance two lineages have met
   in one coalescent unit -- the operator statement of what
-  `Convergence.tendsto_pairDistinct_pow` counts off the parent law.  STILL ABSENT: the
-  many-state instantiation, which needs the block-count transition matrix this corpus does not
-  build; and Möhle's lemma proper, the `A + B/N` form with `A` a projection, for models whose
-  two time scales separate.
+  `Convergence.tendsto_pairDistinct_pow` counts off the parent law.  `Coalescent.ExpRemainder` then removes the ANALYTIC obstacle to the many-state case, which
+  was a gap in Mathlib rather than in genealogy: `‖exp x - 1 - x‖ ≤ e^{‖x‖} - 1 - ‖x‖` in any
+  Banach algebra, hence `≤ ‖x‖²` on the unit ball, proved by peeling two terms off the
+  exponential series and comparing it with itself.  Mathlib had that bound only for `ℝ` and
+  `ℂ`.  STILL ABSENT: the many-state instantiation itself, which now needs only a
+  CONSTRUCTION -- the block-count transition matrix, whose off-diagonal entries need the
+  multinomial merge counts the corpus does not have, having counted only the diagonal
+  (`WrightFisher.noCoalescenceProb`); and Möhle's lemma proper, the `A + B/N` form with `A` a
+  projection, for models whose two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
   restriction commutes with looking down, at or above it the operation is invisible.  That is
