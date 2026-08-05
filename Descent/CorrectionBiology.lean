@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.UnifiedBiology
+import Descent.DynamicsContrast
 
 /-!
 # Exact pooled-correction normal form in biology
@@ -248,7 +248,7 @@ structure BiologicalCorrectionNormalForm : Prop where
 
 /-- **Biological correction theorem.**  Pooling is exactly a projection onto shared biology; its
 entire complement is the one-dimensional dynamics contrast already identified with calibration
-drift in `UnifiedBiology`. -/
+drift in `DynamicsContrast`. -/
 theorem biologicalCorrectionNormalForm : BiologicalCorrectionNormalForm where
   projector_idempotent := dynamicsPooledProjector_idempotent
   fixed_exactly_on_common_fields := dynamicsPooledProjector_fixed_iff

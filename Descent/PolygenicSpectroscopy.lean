@@ -144,7 +144,7 @@ are not exchangeable at high epistatic order even after matching every moment �
 distinct mechanism from the `r ^ 2`-attenuation of
 `Descent.ImputationPortability`, which is an additive second-moment effect fully
 repaired by rescaling, whereas support is invariant under rescaling
-(`CondensationUnification.standardizedSquare_scale_invariant`). The rescaling-invariance
+(`StandardizedGenotypeMoments.standardizedSquare_scale_invariant`). The rescaling-invariance
 is proved; the intensity reading is not.
 
 ## The third claim: the loading-decay convention is irreducible
@@ -1305,7 +1305,7 @@ and `hweMellinJetVariance` remain independently informative and the critical-deg
 results are untouched — the redundancy never gets a chance to bite.
 
 A converse reading was asserted here and is **false**. It said that
-`Descent.CondensationUnification.standardizedSquare_never_symmetric` shows the odd part
+`Descent.StandardizedGenotypeMoments.standardizedSquare_never_symmetric` shows the odd part
 of the floor-two law nonzero at every polymorphic frequency including `q = 1/2`, hence
 that symmetry fails one floor up, always. That theorem is about the *uncentered* square
 `x²`, which is non-negative and so trivially never symmetric; its own docstring says in

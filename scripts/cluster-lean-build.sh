@@ -488,7 +488,7 @@ echo "MODULES_ABSENT=$_absent"
 # closure of `Descent.lean`, so `lake build Descent` never reached
 # them. Naming them as explicit targets produced errors immediately -- a missing
 # `Real.log` import that had been red all day. The root module itself was also
-# never elaborated until `CondensationUnification` compiled, and it was carrying
+# never elaborated until `StandardizedGenotypeMoments` compiled, and it was carrying
 # a theorem over two names that have never been defined in this corpus.
 #
 # So every "0 errors" excluded the one file that transitively covers everything.

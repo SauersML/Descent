@@ -817,7 +817,7 @@ moment `n q (1-q) (1 + 3 (n - 2) q (1-q))` has its correction term vanish at
 
 This is the fourth channel of the observable algebra, and unlike the drift and the
 jet variance it is a rational function of a quantity the corpus already owns:
-`Descent.CondensationUnification.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance`
+`Descent.StandardizedGenotypeMoments.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance`
 states it against `hweGenotypeVariance` itself. It diverges as the allele
 frequency goes to zero, so rare variants have heavy-tailed standardized
 coordinates in the precise sense that the fourth channel is large. -/
@@ -994,7 +994,7 @@ For a single locus this is the collapse made quantitative: floor two's data is a
 the mixture average of a quadratic is not the quadratic of the mixture average,
 and the gap is exactly the across-locus dispersion of `E[x⁴]`. That gap is the
 panel's floor-two datum, and it is what
-`Descent.CondensationUnification.MafSpectrum.fourthMomentDispersion` names. -/
+`Descent.StandardizedGenotypeMoments.MafSpectrum.fourthMomentDispersion` names. -/
 theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
@@ -1221,7 +1221,7 @@ mixes a level-two normalization into a level-one computation. At the correct wei
 solo-factor mean is `E[(x² - 1) x²] = σ₁² = 2` rather than zero. The first-order cross
 term exposes `Λ(2)` data, that is `E[x⁴]`, which the hub channel already exposes. The
 term is therefore **hub-redundant, not a new channel**. See
-`Descent.CondensationUnification` §5j for the full record.
+`Descent.StandardizedGenotypeMoments` §5j for the full record.
 
 `b` itself is untouched: it is well defined, it vanishes exactly on symmetric laws,
 and for genotypes it is `(1 - 2q)²`. What is **open** is whether any admissible design
@@ -1321,7 +1321,7 @@ at `q`, since the genotype values reverse while the probabilities swap.
 So every even moment agrees across the pair, and floor two is built entirely from
 even data: it is the law of `x²`, which is invariant under the flip. The tower
 collapses to floor one for a single locus. Panels are where it bites, and that is
-`Descent.CondensationUnification`.
+`Descent.StandardizedGenotypeMoments`.
 -/
 
 /-- The reflected locus, at allele frequency `1 - q`. -/
@@ -1441,7 +1441,7 @@ the second case agree with the first on all even data.
 So the tower is not a refinement of single-locus genotype theory. Where it bites
 is panels, whose effective coordinate law is a *mixture* over allele frequencies,
 and mixtures are not determined by their low-order data. See
-`Descent.CondensationUnification`. -/
+`Descent.StandardizedGenotypeMoments`. -/
 theorem singleLocus_tower_collapses (h h' : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
@@ -1690,7 +1690,7 @@ def VariantDisjoint : Prop :=
 
 /-- **The variant-recurrence profile**: how many tested sets a variant enters.
 This is the statistic permutation and resampling schemes preserve, and
-`Descent.CondensationUnification` shows it does not fix the null.
+`Descent.StandardizedGenotypeMoments` shows it does not fix the null.
 nothing fitted.
 
 Empirical status: UNTESTED. A count read off the design; no free parameter and -/
@@ -1806,7 +1806,7 @@ single verdict — it is yes for unweighted scans and no for effect-weighted one
 
 Either way the randomization buys exactly one floor: squaring kills the sign, so floor
 two is untouched and remains never symmetric away from `q = 1/2`
-(`Descent.CondensationUnification.centeredSquare_third_moment_zero_iff_balanced`).
+(`Descent.StandardizedGenotypeMoments.centeredSquare_third_moment_zero_iff_balanced`).
 -/
 
 omit [Fintype ι] in
@@ -2196,7 +2196,7 @@ that resistance to imitation is a normal-cone condition — an active constraint
 with positive load on the spike direction — and needs no transitive symmetry at
 all, so a symmetry hypothesis carried for *that* purpose would be removable.
 Here there is nothing to remove: the methodological conclusion,
-`Descent.CondensationUnification.recurrence_preserving_resampling_is_not_a_calibration`,
+`Descent.StandardizedGenotypeMoments.recurrence_preserving_resampling_is_not_a_calibration`,
 carries no symmetry hypothesis of any kind. It takes the change of null under
 resampling as an argument, and the circulant pair is one way to discharge that
 argument; any other pair of designs with equal recurrence profile and different

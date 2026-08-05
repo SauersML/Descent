@@ -81,7 +81,7 @@ import Descent.HiddenConeAmbiguity
 import Descent.LatentMechanismCollapse
 import Descent.PolygenicSpectroscopy
 import Descent.EpistaticChaos
-import Descent.CondensationUnification
+import Descent.StandardizedGenotypeMoments
 import Descent.CramerStratum
 import Descent.FoldedSpectrum
 import Descent.SpectralDegradation
@@ -96,7 +96,7 @@ import Descent.DriftingConditionals
 import Descent.CirculationDefect
 import Descent.LumpedRateBlindness
 import Descent.TransplantationStability
-import Descent.UnifiedBiology
+import Descent.DynamicsContrast
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`

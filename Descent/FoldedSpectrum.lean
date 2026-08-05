@@ -1035,7 +1035,7 @@ so the largest modulus value in any finite configuration comes from its rarest l
 Its only possible partner under the trip map `ψ(s) = (1 - √(1-s))/2` (inverse `4u(1-u)`)
 satisfies `ψ(s) < s` strictly — `s - ψ(s)` has no roots — so the partner lies below the
 minimum and is not in the configuration. Top value singly covered, peeling fires, induction
-finishes. This is the same argument as `CondensationUnification.rarest_locus_owns_largest_atom`
+finishes. This is the same argument as `StandardizedGenotypeMoments.rarest_locus_owns_largest_atom`
 and is not reproved here.
 
 **(iii) The upstream transversality theorem does not apply to our family, and the

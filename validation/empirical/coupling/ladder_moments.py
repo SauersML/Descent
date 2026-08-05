@@ -2,7 +2,7 @@
 
 THE CONJECTURE UNDER TEST
 
-Descent.CondensationUnification section 5k states that successive rungs of the
+Descent.StandardizedGenotypeMoments section 5k states that successive rungs of the
 tower probe moments of order 2, 4, 8, 16, and that the sample cost climbs doubly
 exponentially because the genotype's even moments diverge with rung. The corpus
 computes three orders in closed form and observes a pattern:

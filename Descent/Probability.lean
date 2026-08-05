@@ -428,7 +428,7 @@ theorem HardyWeinbergModel.genotypeVariance_eq
 
 /-- **A polymorphic locus has positive genotype variance.**
 
-Ten proofs across `CondensationUnification` and `EpistaticChaos` opened by deriving this
+Ten proofs across `StandardizedGenotypeMoments` and `EpistaticChaos` opened by deriving this
 from `genotypeVariance_eq` in the same four lines.  It is one fact about the model and it is
 named here, beside the identity it comes from. -/
 theorem HardyWeinbergModel.genotypeVariance_pos

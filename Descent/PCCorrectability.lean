@@ -5,7 +5,7 @@ import Descent.PCCorrectability.Design
 import Descent.PCCorrectability.Frequency
 import Descent.PCCorrectability.ImitationCapacity
 import Descent.PCCorrectability.Nonidentifiability
-import Descent.PCCorrectability.Unified
+import Descent.PCCorrectability.EndToEnd
 
 /-!
 # Population-structure correctability for PC and mixed-model adjustment

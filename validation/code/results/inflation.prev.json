@@ -206,7 +206,7 @@
    "location": "Descent.ClinicalUtilityFairness:259",
    "field": "Descent.LiabilityThresholdModel.h_sq_pos"},
   {"theorem": "Descent.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
-   "location": "Descent.CondensationUnification:699",
+   "location": "Descent.StandardizedGenotypeMoments:699",
    "field": "Descent.MafSpectrum.weight_sum"},
   {"theorem":
    "Descent.targetTaggingProjectionAtGeneration_eq_source_effect_plus_effectHeterogeneity",

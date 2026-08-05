@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.DriftingConditional
-import Descent.UnifiedBiology
+import Descent.DynamicsContrast
 
 /-!
 # Drifting conditionals in finite biological state spaces
@@ -375,7 +375,7 @@ theorem stateOneResponse_at_reference_point :
   constructor <;> simp [stateOneResponse]
 
 
-/-- The ancestry-state-one response IS `UnifiedBiology.targetAnnotation`.
+/-- The ancestry-state-one response IS `DynamicsContrast.targetAnnotation`.
 
     Both are the indicator of state one on two states. Stating the identity rather than
     leaving two alpha-equivalent bodies is what makes a later edit to either one a compile

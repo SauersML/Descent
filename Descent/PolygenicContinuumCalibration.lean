@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.ContinuumCalibrationProgram
-import Descent.UnifiedBiology
+import Descent.DynamicsContrast
 
 /-!
 # Polygenic-score calibration over an ancestry continuum

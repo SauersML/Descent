@@ -1,4 +1,4 @@
-"""Unified, machine-readable coverage and findings report.
+"""Machine-readable coverage and findings report.
 
 Consumes results_ranges.json, results_invariants.json and
 results_falsifiability.json and emits `coverage.json`, keyed by

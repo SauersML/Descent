@@ -40,7 +40,7 @@ KNOWN_IN_FLUX = {
         "coupling-coefficient variance correction 2b^2/(1-b^2) retracted by its "
         "author's own audit (tilt-bookkeeping error); the definition of b, its "
         "vanishing iff symmetry, and E[x|x|] = (1-2q)^2 all stand"),
-    "Descent.CondensationUnification": (
+    "Descent.StandardizedGenotypeMoments": (
         "same retracted coupling correction; statements being weakened upstream"),
 }
 

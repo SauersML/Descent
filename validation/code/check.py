@@ -1019,7 +1019,7 @@ def run_identifications() -> int:
                               f"alternative but carries no discriminating measurement")
     if unresolved:
         bad.append(f"self-declared alternatives never discriminated from their sibling: "
-                   f"{len(unresolved)}measure the "
+                   f"{len(unresolved)}; measure the "
                    f"two apart or drop one")
         bad.extend("    " + x for x in unresolved)
 
@@ -1288,7 +1288,7 @@ def run_identifications() -> int:
                 stipulated.append(f"{rel}:{line}  {short}  (no fixed-point theorem)")
     if stipulated:
         bad.append(f"equilibrium definitions with no theorem deriving them as the fixed point "
-                   f"of a process in the same file: {len(stipulated)}"
+                   f"of a process in the same file: {len(stipulated)}; "
                    f"define the one-step map and prove `<name>_isFixedPoint`")
         bad.extend("    " + x for x in stipulated)
 
@@ -1448,7 +1448,7 @@ def run_identifications() -> int:
                 # reader and a single edit can see both and still miss it.
                 # Measured on the corpus when the skip was removed: `HorizonCurve`
                 # defines the Kronecker delta on `Fin 2` twice, as `stayKernel`
-                # and as `agreement`, and `UnifiedBiology` does the same as
+                # and as `agreement`, and `DynamicsContrast` does the same as
                 # `persistentTransition` and `contextMatchQuality`. Both were
                 # invisible while the five CROSS-file pairings of those very
                 # definitions were reported. A check that reports the weaker
@@ -1471,7 +1471,7 @@ def run_identifications() -> int:
     duplicates.sort()
     if duplicates:
         bad.append(f"alpha-equivalent definition bodies tied by neither a call nor a theorem: "
-                   f"{len(duplicates)}make one call the "
+                   f"{len(duplicates)}; make one call the "
                    f"other, or state the identity as a theorem")
         bad.extend("    " + x for x in duplicates)
 
@@ -1539,7 +1539,7 @@ def run_identifications() -> int:
                         f"retention factor in its body and declares no Regime")
     if regimeless:
         bad.append(f"definitions encoding a drift regime with no declared Regime: "
-                   f"{len(regimeless)}name the "
+                   f"{len(regimeless)}; name the "
                    f"data-generating assumption, see Descent.DriftRegime")
         bad.extend("    " + x for x in regimeless)
 
@@ -1661,7 +1661,7 @@ def run_identifications() -> int:
                     f"\"{claim}\"")
     if underdelivered:
         bad.append(f"docstrings attributing an identity the statement does not deliver: "
-                   f"{len(underdelivered)}state the "
+                   f"{len(underdelivered)}; state the "
                    f"identity in the conclusion, or stop claiming it in the prose")
         bad.extend("    " + x for x in underdelivered)
 
@@ -1733,7 +1733,7 @@ def run_identifications() -> int:
                                  f"only {max(nums) - min(nums):.4f}; a near-constant prediction "
                                  f"cannot reject a wrong functional form")
     if powerless:
-        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}, "
+        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}; "
                    f"record the spread of the prediction "
                    f"across the design, see Descent.DriftRegime")
         bad.extend("    " + x for x in powerless)
@@ -2256,7 +2256,7 @@ def run_identifications() -> int:
         # of these screens were pinned at a measured number and then zeroed in one
         # edit; printing the old numbers next to the failures is what stops a
         # reader mistaking progress for regression, or the reverse.
-        print("\nPREVIOUSLY PINNED (budget is now 0 for all; nothing is grandfathered)\n")
+        print("\nPREVIOUSLY PINNED (budgets are gone; nothing is grandfathered)\n")
         for name, (was, commit, when) in sorted(LAST_PINNED_BEFORE_ZEROING.items()):
             print(f"  {name:32s} was {was:3d}  pinned {commit} {when}")
         return 1
@@ -3770,7 +3770,7 @@ WIRING_ARC = {
     "XiFromMarkedBreakouts",
     "TrafficInvariantSeparation",
     "Condensation",
-    "CondensationUnification",
+    "StandardizedGenotypeMoments",
     "CumulantBlindness",
     "EpistaticChaos",
     "HiddenConeAmbiguity",
@@ -4594,7 +4594,7 @@ def run_duplication() -> int:
     if dup_statements:
         failures.append(
             f"theorems stating the same proposition under different names: "
-            f"{len(dup_statements)}delete all "
+            f"{len(dup_statements)}; delete all "
             f"but one, or -- if both names are wanted -- prove one FROM the other so "
             f"the corpus records that they are the same claim")
         for key, members in dup_statements:
@@ -4612,7 +4612,7 @@ def run_duplication() -> int:
                 failures.append(f"        {d.file}:{d.line}  {d.name}")
     if clones:
         failures.append(
-            f"verbatim repeated source blocks of {CLONE_WINDOW}+ lines: {len(clones)}, "
+            f"verbatim repeated source blocks of {CLONE_WINDOW}+ lines: {len(clones)}; "
             f"factor the repeated text, or say in the "
             f"corpus what makes the two copies different")
         for length, sites in clones:
@@ -5108,7 +5108,7 @@ def run_mathlib() -> int:
     if collisions:
         bad = True
         print(f"mathlib guard FAILS: corpus declarations whose name Mathlib already "
-              f"uses: {len(collisions)}import the "
+              f"uses: {len(collisions)}; import the "
               f"Mathlib declaration and delete the local one, or -- if the two really "
               f"state different things -- rename the local one and record why in "
               f"MATHLIB_EXEMPT")

@@ -3413,7 +3413,7 @@ theorem finiteRankOneTraffic_invisible_finitePressure_visible
 
 /-- **The four properties one positive rank-one spike has at once**, as one proposition.
 
-The theorem below establishes it, `UnifiedBiology` restates it in genomic vocabulary and
+The theorem below establishes it, `DynamicsContrast` restates it in genomic vocabulary and
 cites that theorem, and the obstruction registry carries it as a field.  Written out, the
 conjunction stood in the corpus three times, and a change to any one copy would have been a
 silent divergence between them rather than a build error.

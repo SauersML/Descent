@@ -28,7 +28,7 @@ open TrafficInvariantSeparation
 open scoped Matrix Topology
 
 /-!
-# Unified biology: state, geometry, value, and observation
+# The dynamics contrast: state, geometry, value, and observation, kept apart
 
 This module gives the operator program a biological dictionary without conflating four
 mathematically different layers.
@@ -735,7 +735,7 @@ theorem positiveLDSpike_pressure_convergesUniformlyOnNonnegativeStrength
   finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
     baseline temperature htemperature
 
-/-- **Unified genomic counterexample to C2 and C3.**  A single positive LD
+/-- **One genomic counterexample to both C2 and C3.**  A single positive LD
 rank-one spike is invisible to every fixed traffic graph, preserves the exact
 lower genotype ground state through an orthogonal genotype, changes the upper
 energy through an aligned genotype, and has positive variational pressure once
@@ -2265,12 +2265,12 @@ theorem geometry_and_effect_recovery_gates
   exact ⟨covariancePencil_det_zero_iff_precisionPencil_det_zero A B lambda hA hB,
     identifiable_iff_transversal M⟩
 
-/-! ## The unified obstruction bundle -/
+/-! ## The obstruction bundle -/
 
 /-- Twenty-four logically distinct failures and boundaries that a biological transport theory must
 not collapse into one scalar "portability" parameter.  The final six fields make continuum
 calibration and finite correction part of the core theorem rather than adjacent examples. -/
-structure UnifiedBiologyObstructions : Prop where
+structure DynamicsObstructions : Prop where
   /-- Stationary target averaging cannot distinguish persistence from switching. -/
   targetOnlyBlind :
     targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation =
@@ -3213,10 +3213,10 @@ structure UnifiedBiologyObstructions : Prop where
     ∀ persists y, dynamicsContrast persists =
       2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y
 
-/-- **Unified finite obstruction theorem.**  Dynamics, dependence, value allocation, and
+/-- **The finite obstruction theorem.**  Dynamics, dependence, value allocation, and
 local operator geometry each carry information invisible to a tempting scalar reduction.
 The witnesses coexist; none is a fallback explanation for another. -/
-theorem unifiedBiology_obstructions : UnifiedBiologyObstructions := by
+theorem dynamicsContrast_obstructions : DynamicsObstructions := by
   refine
     { targetOnlyBlind := targetOnlyPerformance_blind_to_binary_dynamics
       crossStateSeparates := ?_

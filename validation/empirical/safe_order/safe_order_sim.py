@@ -4,7 +4,7 @@
 Chosen because the corpus states this claim "so it can be falsified", marks it
 `Empirical status: UNTESTED`, and every gate in the condensation arc
 (`additive_score_is_subcritical`, `epistatic_order_safe_iff`,
-`epistatic_order_unsafe_iff`, the CondensationUnification design gate) reads off it.
+`epistatic_order_unsafe_iff`, the StandardizedGenotypeMoments design gate) reads off it.
 It is also the only unsimulated claim in the ledger whose falsification can be checked
 in exact arithmetic as well as by simulation.
 

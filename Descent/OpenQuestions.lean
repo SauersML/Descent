@@ -435,14 +435,14 @@ end Question7
 
 
 /-!
-## Unified Portability Theory: Four-Factor Decomposition
+## Portability: the four-factor decomposition
 
 Portability ratio = AF_factor × LD_factor × Effect_factor × Env_factor.
 Genetic distance (Fst) captures only the AF factor, explaining why it
 poorly predicts individual-level accuracy.
 -/
 
-section UnifiedTheory
+section FourFactorDecomposition
 
 /-- **The four-factor product is strictly below its AF factor alone.**
 
@@ -490,7 +490,7 @@ theorem af_variance_fraction_lt_one
   rw [div_lt_one (by linarith)]
   linarith
 
-end UnifiedTheory
+end FourFactorDecomposition
 
 
 /-!
