@@ -134,6 +134,43 @@ theorem tendsto_pow_self_exp {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸
   refine tendsto_pow_of_close (exp ℝ Q) C P (fun N ↦ exp ℝ ((1 / (N : ℝ)) • Q)) hP hE
     (fun N hN ↦ exp_smul_pow_self Q hN) hC (Filter.Eventually.of_forall hclose)
 
+
+/-- **A `Q`-matrix generates a contraction semigroup**, in the algebraic form that makes it
+true in any Banach algebra: if `Q = a·(S - 1)` with `a ≥ 0` and `S` a contraction, then
+`exp Q` is a contraction.
+
+The proof is the classical uniformisation argument.  `a·S` and `-a·1` commute, so
+`exp(a(S-1)) = e^{-a}·exp(aS)`, and `‖exp(aS)‖ ≤ e^{a‖S‖} ≤ e^{a}`.  The two factors cancel.
+
+For a coalescent this is exactly what is needed: `Q` has non-negative off-diagonal entries
+and zero row sums, so `1 + Q/a` is stochastic for `a` at least the largest exit rate, and
+`‖exp(Q)‖ ≤ 1` follows without ever computing the exponential. -/
+theorem norm_exp_smul_sub_one_le_one {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸]
+    [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] (S : 𝔸) (hS : ‖S‖ ≤ 1) (a : ℝ) (ha : 0 ≤ a) :
+    ‖exp ℝ (a • (S - 1))‖ ≤ 1 := by
+  have hdecomp : a • (S - (1 : 𝔸)) = a • S + (-a) • (1 : 𝔸) := by
+    rw [smul_sub, neg_smul]
+    abel
+  have hcomm : Commute (a • S) ((-a) • (1 : 𝔸)) := by
+    unfold Commute SemiconjBy
+    simp [smul_smul, mul_comm]
+  rw [hdecomp, exp_add_of_commute hcomm]
+  have hone : exp ℝ ((-a) • (1 : 𝔸)) = Real.exp (-a) • (1 : 𝔸) := by
+    rw [← Algebra.algebraMap_eq_smul_one, ← Algebra.algebraMap_eq_smul_one, exp_algebraMap,
+      Real.exp_eq_exp_ℝ]
+  rw [hone]
+  calc ‖exp ℝ (a • S) * Real.exp (-a) • (1 : 𝔸)‖
+      ≤ ‖exp ℝ (a • S)‖ * ‖Real.exp (-a) • (1 : 𝔸)‖ := norm_mul_le _ _
+    _ ≤ Real.exp ‖a • S‖ * (Real.exp (-a) * 1) := by
+        gcongr
+        · exact norm_exp_le_exp_norm _
+        · rw [norm_smul, norm_one, Real.norm_of_nonneg (le_of_lt (Real.exp_pos _))]
+    _ ≤ Real.exp a * (Real.exp (-a) * 1) := by
+        gcongr
+        rw [norm_smul, Real.norm_of_nonneg ha]
+        nlinarith [norm_nonneg S]
+    _ = 1 := by rw [mul_one, ← Real.exp_add]; simp
+
 /-- **K-G (2.11) as the hypothesis, which is how Kingman writes it.**  If the one-generation
 operator is `1 + N⁻¹Q + O(N⁻²)` -- not "close to `exp(N⁻¹Q)`", which is a statement nobody
 verifies directly -- then `N` generations converge to `exp Q`.
@@ -147,12 +184,12 @@ now a counting problem rather than an analytic one. -/
 theorem tendsto_pow_of_expansion {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸]
     [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] (Q : 𝔸) (C : ℝ) (hC : 0 ≤ C) (P : ℕ → 𝔸)
     (hP : ∀ N : ℕ, ‖P N‖ ≤ 1) (hE : ∀ N : ℕ, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1)
-    (hclose : ∀ N : ℕ, ‖P N - (1 + (1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) :
+    (hclose : ∀ᶠ N in atTop, ‖P N - (1 + (1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) :
     Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds (exp ℝ Q)) := by
   refine tendsto_pow_of_close (exp ℝ Q) (C + ‖Q‖ ^ 2) P
     (fun N ↦ exp ℝ ((1 / (N : ℝ)) • Q)) hP hE (fun N hN ↦ exp_smul_pow_self Q hN)
     (by positivity) ?_
-  filter_upwards [eventually_ge_atTop (max 1 ⌈‖Q‖⌉₊)] with N hN
+  filter_upwards [hclose, eventually_ge_atTop (max 1 ⌈‖Q‖⌉₊)] with N hclN hN
   have hN1 : 1 ≤ N := le_trans (le_max_left _ _) hN
   have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN1
   have hQN : ‖(1 / (N : ℝ)) • Q‖ ≤ 1 := by
@@ -179,7 +216,7 @@ theorem tendsto_pow_of_expansion {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 
         simpa [sub_add_sub_cancel] using norm_sub_le_norm_sub_add_norm_sub
           (P N) (1 + (1 / (N : ℝ)) • Q) (exp ℝ ((1 / (N : ℝ)) • Q))
     _ ≤ C / (N : ℝ) ^ 2 + ‖Q‖ ^ 2 / (N : ℝ) ^ 2 := by
-        refine add_le_add (hclose N) ?_
+        refine add_le_add hclN ?_
         rw [← norm_neg]
         simpa using hrem
     _ = (C + ‖Q‖ ^ 2) / (N : ℝ) ^ 2 := by ring

@@ -21,7 +21,7 @@ much, whatever it does with the data afterwards*.
 
 ## The reduction
 
-A `ProbeBlindness probe P` supplies two objects with `probe positive = probe negative`.
+A `Blindness.ProbeBlindness probe P` supplies two objects with `probe positive = probe negative`.
 Turn it into a two-point decision problem by choosing any **readout** of the probe — a
 finite, possibly randomized measurement `Data → FinitePrior n`. The observation kernel is
 `readout ∘ probe` at the two witnesses, the action set is the binary verdict `P` holds /
@@ -42,7 +42,7 @@ ceiling is a ceiling.
 ## Instances
 
 The three biological instances of the registry that carry an exact witness pair are pushed
-through, and two of them are packaged as `ProbeBlindness` witnesses here for the first
+through, and two of them are packaged as `Blindness.ProbeBlindness` witnesses here for the first
 time -- previously they existed only as bare equations:
 
 - instance 8, `half_le_averageEffect_minimaxRisk`: no procedure reading the dosage
@@ -57,17 +57,6 @@ time -- previously they existed only as bare equations:
 namespace Descent.Decision
 
 open Descent.Decision.FiniteMinimax
-
--- `ProbeBlindness` is a structure in `Descent.Blindness.ObservationalCeiling`,
--- and these are methods on it.  A declaration's namespace is relative to the
--- enclosing one, so writing this from inside `Descent.Decision` would name them
--- `Descent.Decision.ProbeBlindness.*` -- a namespace dot notation on the
--- structure never looks in.
-end Descent.Decision
-
-namespace Descent.Blindness.ProbeBlindness
-
-open Descent.Decision
 
 variable {Object Data : Type*} {probe : Object → Data} {P : Object → Prop}
 
@@ -84,14 +73,14 @@ observations. Quantization, added noise, repeated sampling folded into a summary
 entire analysis pipeline are all instances. What it may not do is see anything other than
 the probe -- which is what makes the floor below a statement about the probe rather than
 about the analyst. -/
-noncomputable def readoutProblem (B : ProbeBlindness probe P)
+noncomputable def _root_.Descent.Blindness.ProbeBlindness.readoutProblem (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ} (readout : Data → CertificateGrading.FinitePrior observationCount) :
     Problem 1 1 observationCount where
   observation := fun θ ↦ readout (probe (if θ = 0 then B.positive else B.negative))
   loss := fun θ action ↦ if θ = action then 0 else 1
 
 /-- The readout of the `P`-satisfying witness. -/
-@[simp] theorem readoutProblem_observation_zero (B : ProbeBlindness probe P)
+@[simp] theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_observation_zero (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount) :
     (B.readoutProblem readout).observation 0 = readout (probe B.positive) := by
@@ -99,7 +88,7 @@ noncomputable def readoutProblem (B : ProbeBlindness probe P)
   rw [if_pos rfl]
 
 /-- The readout of the `P`-failing witness. -/
-@[simp] theorem readoutProblem_observation_one (B : ProbeBlindness probe P)
+@[simp] theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_observation_one (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount) :
     (B.readoutProblem readout).observation 1 = readout (probe B.negative) := by
@@ -109,7 +98,7 @@ noncomputable def readoutProblem (B : ProbeBlindness probe P)
 /-- **Blindness is exact observational equivalence.** The two hypotheses emit literally the
 same observation law under every readout of the probe. This is the hypothesis that the
 finite Le Cam theorems consume, and `same_data` is the whole of its content. -/
-theorem readoutProblem_observation_eq (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_observation_eq (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount) :
     (B.readoutProblem readout).observation 0 = (B.readoutProblem readout).observation 1 := by
@@ -117,7 +106,7 @@ theorem readoutProblem_observation_eq (B : ProbeBlindness probe P)
 
 /-- The zero-one loss separates the two hypotheses by one at every action: whichever verdict
 is returned, it is wrong at one of them. -/
-theorem readoutProblem_loss_add (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_loss_add (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount)
     (action : Fin (1 + 1)) :
@@ -128,7 +117,7 @@ theorem readoutProblem_loss_add (B : ProbeBlindness probe P)
 /-- **Risk is error probability.** With the zero-one verdict loss, the risk of a rule at a
 hypothesis is one minus the chance it returns that hypothesis' own verdict. Stated so that
 the floor below reads as a misclassification rate and not as an abstract loss. -/
-theorem risk_readoutProblem (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.risk_readoutProblem (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount)
     (rule : Rule 1 observationCount) (θ : Fin (1 + 1)) :
@@ -165,7 +154,7 @@ theorem risk_readoutProblem (B : ProbeBlindness probe P)
 /-- **Every rule is at coin-flip error on the worse hypothesis.** No randomized decision
 rule reading any finite readout of a blind probe has worst-case error probability below
 one half. -/
-theorem half_le_readoutProblem_worstRisk (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.half_le_readoutProblem_worstRisk (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount)
     (rule : Rule 1 observationCount) :
@@ -181,7 +170,7 @@ This is the quantitative form of `no_criterion_of_factors`. That theorem says no
 *decides* the property; this one says every criterion is wrong at least half the time at
 one of the two witnesses, which is what an empirical claim about a blind probe actually
 costs. -/
-theorem half_le_readoutProblem_minimaxRisk (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.half_le_readoutProblem_minimaxRisk (B : Blindness.ProbeBlindness probe P)
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount) :
     (1 : ℝ) / 2 ≤ (B.readoutProblem readout).minimaxRisk :=
@@ -191,7 +180,7 @@ theorem half_le_readoutProblem_minimaxRisk (B : ProbeBlindness probe P)
 /-- **Downstream processing does not help.** Passing the readout through any further
 parameter-independent stochastic channel -- binning, compression, feature extraction, a
 second-stage model -- leaves the same floor. -/
-theorem half_le_garbled_readoutProblem_minimaxRisk (B : ProbeBlindness probe P)
+theorem _root_.Descent.Blindness.ProbeBlindness.half_le_garbled_readoutProblem_minimaxRisk (B : Blindness.ProbeBlindness probe P)
     {observationCount summaryCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount)
     (channel : Fin (observationCount + 1) → CertificateGrading.FinitePrior summaryCount) :
@@ -204,7 +193,7 @@ theorem half_le_garbled_readoutProblem_minimaxRisk (B : ProbeBlindness probe P)
 /-- The readout that records nothing is the corpus's canonical uninformative experiment.
 Definitional: a constant observation kernel with the zero-one verdict loss *is*
 `indistinguishableBinaryProblem 1`. -/
-theorem uninformativeReadoutProblem_eq (B : ProbeBlindness probe P) :
+theorem _root_.Descent.Blindness.ProbeBlindness.uninformativeReadoutProblem_eq (B : Blindness.ProbeBlindness probe P) :
     B.readoutProblem (fun _ ↦ (PMF.pure 0 : CertificateGrading.FinitePrior 0)) =
       Problem.indistinguishableBinaryProblem 1 :=
   rfl
@@ -212,14 +201,12 @@ theorem uninformativeReadoutProblem_eq (B : ProbeBlindness probe P) :
 /-- **The floor is exactly a coin flip, not more.** Sharpness matters here: without it the
 bound would be compatible with the blindness being arbitrarily worse than a coin flip, and
 the registry's instances would carry no calibrated cost. The fair rule attains it. -/
-theorem blindReadoutProblem_minimaxRisk (B : ProbeBlindness probe P) :
+theorem _root_.Descent.Blindness.ProbeBlindness.blindReadoutProblem_minimaxRisk (B : Blindness.ProbeBlindness probe P) :
     (B.readoutProblem (fun _ ↦ (PMF.pure 0 : CertificateGrading.FinitePrior 0))).minimaxRisk
       = 1 / 2 := by
   rw [B.uninformativeReadoutProblem_eq, Problem.indistinguishableBinaryProblem_minimaxRisk]
 
-end Descent.Blindness.ProbeBlindness
 
-namespace Descent.Decision
 
 /-! ## Instance 8: the dominance blind spot costs a coin flip -/
 
@@ -241,14 +228,14 @@ theorem half_le_averageEffect_minimaxRisk {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ)
 /-- **Instance 9 as a witness pair.** The registry proved the equation
 `normalised_pairwise_blind_to_rate` and stopped there; the blindness was stated in prose.
 This packages it in the registry's own standard form, so it can be consumed by the
-`ProbeBlindness` law and by the minimax floor below.
+`Blindness.ProbeBlindness` law and by the minimax floor below.
 
 Objects are nonzero coalescence rates, the probe is the entire normalised pairwise survival
 curve `x ↦ exp(-x)` -- not a summary of it, the whole function -- and the property is being
 the first of the two rates. -/
 noncomputable def normalisedPairwiseSurvival_blind_to_rate
     {rate₁ rate₂ : ℝ} (h₁ : rate₁ ≠ 0) (h₂ : rate₂ ≠ 0) (hne : rate₁ ≠ rate₂) :
-    ProbeBlindness
+    Blindness.ProbeBlindness
       (fun r : {r : ℝ // r ≠ 0} ↦ fun x : ℝ ↦ pairwiseCoalescentSurvival r.1 (x / r.1))
       (fun r : {r : ℝ // r ≠ 0} ↦ r.1 = rate₁) where
   positive := ⟨rate₁, h₁⟩
@@ -283,10 +270,10 @@ theorem half_le_normalisedPairwiseSurvival_minimaxRisk
 /-- **Instance 10 as a witness pair.** Objects are marked breakout configurations of any
 family count, the probe is the total selected-allele frequency, and the property is having
 a single origin. The underlying content is `XiFromMarks`'s own theorem; what is new is the
-`ProbeBlindness` packaging, which is what the law and the minimax floor consume. -/
+`Blindness.ProbeBlindness` packaging, which is what the law and the minimax floor consume. -/
 noncomputable def totalFamilyFraction_blind_to_originMultiplicity {finalFrequency : ℝ}
     (hfrequency : 0 < finalFrequency) :
-    ProbeBlindness
+    Blindness.ProbeBlindness
       (fun c : (k : ℕ) × (Fin k → ℝ) ↦ Blindness.XiFromMarks.totalFamilyFraction c.2)
       (fun c : (k : ℕ) × (Fin k → ℝ) ↦ ¬ Blindness.XiFromMarks.HasTwoPositiveFamilies c.2) where
   positive := ⟨1, ![finalFrequency]⟩

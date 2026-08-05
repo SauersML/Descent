@@ -320,23 +320,23 @@ theorem ct_more_variable_than_bayesian
     (h_sigma : ∀ i, 0 < σSq i)
     (h_beta : ∀ i, 0 < βSq i) :
     taggedScoreEstimationRisk targetTagVariance
-        (fun i ↦ jamesSteinMSE
+        (fun i ↦ Portability.jamesSteinMSE
           (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
       taggedScoreEstimationRisk targetTagVariance
-        (fun i ↦ jamesSteinMSE 1 (σSq i) (βSq i)) := by
+        (fun i ↦ Portability.jamesSteinMSE 1 (σSq i) (βSq i)) := by
   unfold taggedScoreEstimationRisk Descent.Core.innerSum
   refine Finset.sum_lt_sum ?_ ?_
   · intro i _
     have h_mse :
-        jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
-          jamesSteinMSE 1 (σSq i) (βSq i) := by
+        Portability.jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+          Portability.jamesSteinMSE 1 (σSq i) (βSq i) := by
       exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact le_of_lt (mul_lt_mul_of_pos_left h_mse (h_tag i))
   · rcases h_nonempty with ⟨i⟩
     refine ⟨i, Finset.mem_univ i, ?_⟩
     have h_mse :
-        jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
-          jamesSteinMSE 1 (σSq i) (βSq i) := by
+        Portability.jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+          Portability.jamesSteinMSE 1 (σSq i) (βSq i) := by
       exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact mul_lt_mul_of_pos_left h_mse (h_tag i)
 
@@ -1120,7 +1120,7 @@ noncomputable def commonAndRarePortableModel : Portability.CrossPopulationMetric
   -- common-variant-only witness; the other fifteen fields were copied verbatim, so the
   -- two witnesses could drift apart in a field neither of them is about.  Stated as an
   -- override, the comparison the section makes is what the definition says.
-  { commonOnlyPortableModel with beta := Pop.pair (![1, 1]) (![1, 0])
+  { commonOnlyPortableModel with beta := Pop.pair (![1, 1]) (![1, 0]),
     directCausal := Pop.pair 1 1 }
 
 /-- Evaluate a witness model's SOURCE `R²` by unfolding the source-weight chain.

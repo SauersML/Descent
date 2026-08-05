@@ -197,6 +197,11 @@ theorem row_diff_bound {N k : ℕ} (hN : 0 < N) (hk : 2 ≤ k) (hkN : k ≤ N) :
 
 /-! ### The row bound as a norm bound -/
 
+/-- Dividing both sides of an inequality by a fixed positive number. -/
+private theorem div_le_div_of_nonneg_right' {a b c : ℝ} (h : a ≤ b) (hc : 0 < c) :
+    a / c ≤ b / c := by
+  gcongr
+
 /-- Rows `0` and `1` are exact: with no pair to merge, the generation cannot lose a lineage,
 so the operator agrees with `1 + N⁻¹Q` there on the nose. -/
 theorem row_small {N k : ℕ} (hN : 0 < N) (hk : k ≤ 1) : blockTransition N k k = 1 := by
@@ -235,8 +240,9 @@ theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1
   · -- the row is exact
     have hdiag : blockTransition N (k : ℕ) (k : ℕ) = 1 := row_small hN hk1
     have hd0 : deathRate (k : ℕ) = 0 := by
-      unfold deathRate
-      interval_cases h : (k : ℕ) <;> norm_num
+      have h01 : (k : ℕ) = 0 ∨ (k : ℕ) = 1 := by omega
+      rcases h01 with h | h <;> rw [h] <;>
+        simp [deathRate, Descent.Core.pairCount]
     have hzero : ∀ j : Fin (n + 1),
         blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
           + (1 / (N : ℝ)) • blockGenerator n) k j = 0 := by
@@ -258,9 +264,10 @@ theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1
                   rw [Finset.sum_insert (by simpa using hjk), Finset.sum_singleton]
               _ ≤ _ := Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _)
                   (fun i _ _ ↦ hnn i)
+          rw [hsum] at hle
           have hkk : blockMatrix n N k k = 1 := hdiag
-          have := hnn j
-          unfold blockMatrix at hle hkk
+          have hj := hnn j
+          simp only [blockMatrix, Matrix.of_apply] at hle hkk hj
           linarith
         rw [hother, hd0]
         simp [h, Ne.symm h, show ¬((k : ℕ) = (j : ℕ)) from fun hc ↦ h hc.symm]
@@ -339,29 +346,29 @@ theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1
         omega
       rw [hsp] at hall
       rw [hsp2] at hsum2
-      unfold blockMatrix at hall
+      simp only [blockMatrix, Matrix.of_apply] at hall ⊢
       rw [hk'val] at hall
       linarith
     rw [hsplit, hdiagval, hsubval, Finset.sum_congr rfl hrest, hTeq]
-    unfold blockMatrix
+    simp only [blockMatrix, Matrix.of_apply]
     rw [hk'val]
+    have hkR : ((k : ℕ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast hkn
+    have hk0 : (0 : ℝ) ≤ ((k : ℕ) : ℝ) := Nat.cast_nonneg _
     have hdle : deathRate (k : ℕ) ≤ (n : ℝ) ^ 2 := by
-      unfold deathRate
-      have hkR : (k : ℝ) ≤ (n : ℝ) := by exact_mod_cast hkn
-      have hk0 : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg _
-      nlinarith
+      simp only [deathRate, Descent.Core.pairCount]
+      nlinarith [sq_nonneg (((k : ℕ) : ℝ) - (n : ℝ)), sq_nonneg ((n : ℝ) - 1)]
     have hd0 : 0 ≤ deathRate (k : ℕ) := le_of_lt (deathRate_pos hk2)
-    have hsq : (deathRate (k : ℕ) / (N : ℝ)) ^ 2 ≤ (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
-      rw [div_pow, div_le_div_iff₀ (by positivity) (by positivity)]
-      nlinarith [sq_nonneg (deathRate (k : ℕ)), pow_le_pow_left hd0 hdle 2]
-    have hk4 : ((k : ℕ) : ℝ) ^ 4 ≤ (n : ℝ) ^ 4 := by
-      have hkR : ((k : ℕ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast hkn
-      have hk0 : (0 : ℝ) ≤ ((k : ℕ) : ℝ) := Nat.cast_nonneg _
-      exact pow_le_pow_left hk0 hkR 4
     have hNsq : (0 : ℝ) < (N : ℝ) ^ 2 := by positivity
-    have hdiv : 2 * (((k : ℕ) : ℝ) ^ 4 / (N : ℝ) ^ 2) ≤ 2 * ((n : ℝ) ^ 4 / (N : ℝ) ^ 2) := by
-      have := div_le_div_of_nonneg_right hk4 hNsq
-      linarith [div_le_div_of_nonneg_right hk4 hNsq]
+    have hsq : (deathRate (k : ℕ) / (N : ℝ)) ^ 2 ≤ (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
+      rw [div_pow]
+      have : deathRate (k : ℕ) ^ 2 ≤ (n : ℝ) ^ 4 := by nlinarith
+      exact div_le_div_of_nonneg_right' this hNsq
+    have hk4 : 2 * (((k : ℕ) : ℝ) ^ 4 / (N : ℝ) ^ 2) ≤ 2 * ((n : ℝ) ^ 4 / (N : ℝ) ^ 2) := by
+      have h4 : ((k : ℕ) : ℝ) ^ 4 ≤ (n : ℝ) ^ 4 := by
+        have hsq2 : ((k : ℕ) : ℝ) ^ 2 ≤ (n : ℝ) ^ 2 := by nlinarith
+        nlinarith [sq_nonneg (((k : ℕ) : ℝ) ^ 2), sq_nonneg ((n : ℝ) ^ 2)]
+      have := div_le_div_of_nonneg_right' h4 hNsq
+      linarith
     have hfinal : 3 * (n : ℝ) ^ 4 / (N : ℝ) ^ 2
         = (n : ℝ) ^ 4 / (N : ℝ) ^ 2 + 2 * ((n : ℝ) ^ 4 / (N : ℝ) ^ 2) := by ring
     rw [hfinal]
