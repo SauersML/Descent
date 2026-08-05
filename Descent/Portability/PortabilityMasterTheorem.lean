@@ -605,20 +605,22 @@ section Completeness
 /-!
 ## §4 Completeness of the metric statistic
 
-`§2` writes every metric as a closed form in six input objects.  That alone does not say
-the six are the right inputs: a formula can be exact and still be written in redundant
-or insufficient coordinates.  This section pins the coordinates down.
+`§2` writes every metric as a closed form in the population's moment tuple.  That alone
+does not say the tuple is the right coordinate system: a formula can be exact and still
+be written in redundant or insufficient coordinates.  This section pins the coordinates
+down.
 
 * **Sufficiency.**  Three reals -- `(Var S, Cov(S,Y), Var Y)` -- determine `R²` and the
   calibration slope exactly, through explicit functions.  Everything else about the
   population and the score is irrelevant to those two metrics.
-* **Range.**  The achievable set of those three reals is exactly the Cauchy-Schwarz cone
-  `Cov² ≤ Var S · Var Y`.  Both directions: the bound is forced (so `R² ≤ 1` is a
-  theorem, not a convention), and every point of the cone is realised by an actual finite
-  population.
+* **Range.**  Both directions of the Cauchy-Schwarz bound `Cov² ≤ Var S · Var Y`: it is
+  forced on any achievable triple (so `R² ≤ 1` is a theorem, not a convention), and
+  every triple obeying it with positive score variance is realised by an actual
+  four-individual population.
 * **Minimality.**  Each of the three coordinates is separately necessary: for each one
   there are two realisable deployments agreeing on the other two whose `R²` differs.  So
-  no two of the three, and a fortiori no single scalar summary, determines `R²`.
+  no two of the three determine `R²`, and no summary computed from the two the score
+  itself provides does either.
 
 The three together are what "complete theory" means here.  Sufficiency alone is
 satisfied by the whole input tuple; minimality alone by any three unrelated numbers;
