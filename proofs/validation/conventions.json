@@ -685,6 +685,11 @@
       "convention": "hudson",
       "note": "tau/(T_within + tau), the coalescence-time ratio for the chain."
     },
+    "Calibrator/SerialFounderChain.lean::ceilingFst": {
+      "quantity": "fst",
+      "convention": "hudson",
+      "note": "An instantiation of serialFounderCeilingFst at the chain's own fields, so it inherits that entry's Hudson coalescence-time reading and has no free parameter of its own. This entry has been added, removed and added again: the definition was deleted from the corpus, f80af3de correctly dropped the stale entry, and the definition was then reintroduced. Neither edit was wrong; the churn is what a committed snapshot of a moving corpus costs, and it is the intended cost."
+    },
     "Calibrator/VarianceComponents.lean::narrowSenseH2": {
       "quantity": "h2",
       "convention": "narrow-sense",
