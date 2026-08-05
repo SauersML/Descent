@@ -9,6 +9,7 @@ import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
+import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -71,7 +72,13 @@ construction equivariant, which is the direction that needs no probability.  The
 a de Finetti theorem proved through a reversed martingale convergence argument (K-C cites
 Doob VII.4.25), and nothing in this corpus is close to it.
 
-**4. K-C Theorem 1's real content: independence.**  The factorisation `R_t = ℛ_{D_t}` with
+**4. K-C Theorem 1's real content: independence.**  The ONE-STEP case is settled by
+`Coalescent.CompetingRates`: with unit rate on each cover (K-C (1.3)), the clocks' survival
+multiplies to `e^{-d_k t}` (`prod_survival_covers`, using `card_covers_eq_deathRate`), and
+the joint density of "cover `η` at time `t`" factorises as `(1/d_k) · d_k e^{-d_k t}`
+(`jointDensity_factors`) with the same first factor for every cover
+(`jointDensity_indep_of_cover`).  A density that splits is independence.  What is left is
+the induction over steps and the passage from densities to the joint law of the path.  The factorisation `R_t = ℛ_{D_t}` with
 the jump chain independent of the death process is what makes the finite-dimensional
 distributions computable.  `Coalescent.Path` now supplies the object this was blocked on:
 the path of ONE trajectory, `pathState`, with `|R_t| = D(n,t)` (K-G (6.6),
