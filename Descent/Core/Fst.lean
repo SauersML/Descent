@@ -377,7 +377,7 @@ theorem hudsonOfNei_eq_iff (g : NeiFst) (h : 1 + g.value ≠ 0) :
   constructor
   · intro hg
     have hz : g.value * (g.value - 1) = 0 := by nlinarith
-    rcases mul_eq_zero.mp hz with h1 | PopGen.AssortativeMatingModel.h2
+    rcases mul_eq_zero.mp hz with h1 | h2
     · exact Or.inl h1
     · exact Or.inr (by linarith)
   · rintro (h0 | h0) <;> rw [h0] <;> ring

@@ -674,7 +674,7 @@ theorem hardCall_coding_dichotomy
     intro hzero
     rcases mul_eq_zero.mp hzero with hleft | hright
     · rcases mul_eq_zero.mp hleft with h2 | hone
-      · rcases mul_eq_zero.mp PopGen.AssortativeMatingModel.h2 with htwo | hq0'
+      · rcases mul_eq_zero.mp h2 with htwo | hq0'
         · norm_num at htwo
         · exact absurd hq0' (ne_of_gt hq0)
       · exact absurd hone (by intro hc; linarith)

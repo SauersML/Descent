@@ -784,8 +784,8 @@ theorem twoMode_effectiveRate_nonincreasing
 theorem cohortCrossover_may_be_threefold :
     horizonPolynomial (3 / 10) < 0 ∧ 0 < horizonPolynomial (9 / 20) ∧
       horizonPolynomial (11 / 20) < 0 := by
-  obtain ⟨-, -, -, h1, PopGen.AssortativeMatingModel.h2, h3, -⟩ := horizon_three_crossings
-  exact ⟨h1, PopGen.AssortativeMatingModel.h2, h3⟩
+  obtain ⟨-, -, -, h1, h2, h3, -⟩ := horizon_three_crossings
+  exact ⟨h1, h2, h3⟩
 
 end HorizonShape
 

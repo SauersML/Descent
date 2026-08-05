@@ -896,9 +896,9 @@ theorem haploinsufficiency_consistent_direction
     (h_same_direction : 0 < effect_pop1 ∧ 0 < effect_pop2
       ∨ effect_pop1 < 0 ∧ effect_pop2 < 0) :
     effect_pop1 * effect_pop2 > 0 := by
-  rcases h_same_direction with ⟨h1, h2⟩ | ⟨h1, PopGen.AssortativeMatingModel.h2⟩
-  · exact mul_pos h1 PopGen.AssortativeMatingModel.h2
-  · exact mul_pos_of_neg_of_neg h1 PopGen.AssortativeMatingModel.h2
+  rcases h_same_direction with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · exact mul_pos h1 h2
+  · exact mul_pos_of_neg_of_neg h1 h2
 
 /-! **Deleted: `gene_lof_maximally_portable_rare`.**
 
