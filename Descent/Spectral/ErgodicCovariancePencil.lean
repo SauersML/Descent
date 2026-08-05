@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.MeasureTheory.Measure.Map
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
-import Descent.Blindness.ImitationRigidity
+import Descent.Spectral.PencilEnvironment
 
 /-!
 # Ergodic covariance pencils: the law-preserving formulation

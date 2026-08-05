@@ -2,9 +2,10 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Descent.Foundations.TransportIdentities
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.Data.Matrix.Basic
-import Descent.Foundations.TransportIdentities
+import Descent.Core.Fst
 
 namespace Descent.PopGen
 

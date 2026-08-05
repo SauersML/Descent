@@ -1,8 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.PolygenicAdaptation
+import Descent.Portability.PortabilityDrift
 import Descent.Portability.AncestrySpecificPower
+import Descent.PopGen.PolygenicAdaptation
+import Descent.Core.Fst
 
 namespace Descent.Portability
 

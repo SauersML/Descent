@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Tactic.Linarith
 import Descent.Blindness.ObservationalCeiling
+import Mathlib.Tactic.Linarith
+import Descent.Core.Ratios
 
 namespace Descent.PopGen
 

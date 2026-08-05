@@ -3,6 +3,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 import Descent.Portability.PortabilityDrift
+-- `Program.BinaryPopulation`, `Program.populationAUC` and
+-- `Program.populationAUC_strictMono_invariant` are named below.  They used to arrive
+-- through `CalibrationDefinitions -> Program.OpenQuestions -> Portability.PortabilityDrift
+-- -> ... -> PortabilityDrift.Definitions -> Program.Conclusions`, a fifteen-module path
+-- that no longer exists now that the head of this chain imports what it uses.  The
+-- dependency is real, so it is written.  The `layers` guard reports the edge: the repair
+-- is to move the AUC apparatus out of the narrative module it is housed in.
+import Descent.Program.Conclusions
 
 namespace Descent.Portability
 

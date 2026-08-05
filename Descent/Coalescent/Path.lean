@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Tactic
 import Descent.Coalescent.StateSpace
+import Descent.Coalescent.Rates
+import Mathlib.Tactic
 
 namespace Descent
 
@@ -64,26 +65,26 @@ noncomputable def transitTime (n : ℕ) (hold : ℕ → ℝ) : ℝ := descentTim
 /-- Reaching fewer blocks takes longer. -/
 theorem descentTime_antitone (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j) {k k' : ℕ}
     (h : k ≤ k') : descentTime n hold k' ≤ descentTime n hold k := by
-  refine Finset.sum_le_sum_of_subset_of_nonneg ?_ fun j _ _ => hpos j
+  refine Finset.sum_le_sum_of_subset_of_nonneg ?_ fun j _ _ ↦ hpos j
   intro j hj
   rw [mem_Ico] at hj ⊢
   exact ⟨le_trans (by omega) hj.1, hj.2⟩
 
 theorem descentTime_nonneg (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j) (k : ℕ) :
     0 ≤ descentTime n hold k :=
-  Finset.sum_nonneg fun j _ => hpos j
+  Finset.sum_nonneg fun j _ ↦ hpos j
 
 /-- **The pure death process `D(n,t)` of K-G (6.2), as a step function of one trajectory.**
 The count is one more than the number of levels not yet reached. -/
 noncomputable def blockCountAt (n : ℕ) (hold : ℕ → ℝ) (t : ℝ) : ℕ :=
-  ((Finset.Icc 1 n).filter fun k => t < descentTime n hold k).card + 1
+  ((Finset.Icc 1 n).filter fun k ↦ t < descentTime n hold k).card + 1
 
 /-- **The death process only descends.**  K-G: `D(n,t)` is nonincreasing in `t`. -/
 theorem blockCountAt_antitone (n : ℕ) (hold : ℕ → ℝ) {t t' : ℝ} (h : t ≤ t') :
     blockCountAt n hold t' ≤ blockCountAt n hold t := by
   unfold blockCountAt
-  have hsub : ((Finset.Icc 1 n).filter fun k => t' < descentTime n hold k)
-      ⊆ ((Finset.Icc 1 n).filter fun k => t < descentTime n hold k) := by
+  have hsub : ((Finset.Icc 1 n).filter fun k ↦ t' < descentTime n hold k)
+      ⊆ ((Finset.Icc 1 n).filter fun k ↦ t < descentTime n hold k) := by
     intro k hk
     rw [mem_filter] at hk ⊢
     exact ⟨hk.1, lt_of_le_of_lt h hk.2⟩
@@ -95,7 +96,7 @@ theorem blockCountAt_le (n : ℕ) {hold : ℕ → ℝ} {t : ℝ} (ht : 0 ≤ t) 
     blockCountAt n hold t ≤ n := by
   classical
   unfold blockCountAt
-  have hsub : ((Finset.Icc 1 n).filter fun k => t < descentTime n hold k)
+  have hsub : ((Finset.Icc 1 n).filter fun k ↦ t < descentTime n hold k)
       ⊆ Finset.Icc 1 (n - 1) := by
     intro k hk
     rw [mem_filter, mem_Icc] at hk
@@ -122,7 +123,7 @@ theorem blockCountAt_zero (n : ℕ) {hold : ℕ → ℝ} (hn : 1 ≤ n)
     (hpos : ∀ j, 2 ≤ j → j ≤ n → 0 < hold j) :
     blockCountAt n hold 0 = n := by
   classical
-  have hset : ((Finset.Icc 1 n).filter fun k => (0 : ℝ) < descentTime n hold k)
+  have hset : ((Finset.Icc 1 n).filter fun k ↦ (0 : ℝ) < descentTime n hold k)
       = Finset.Icc 1 (n - 1) := by
     ext k
     rw [mem_filter, mem_Icc, mem_Icc]
@@ -139,7 +140,7 @@ theorem blockCountAt_zero (n : ℕ) {hold : ℕ → ℝ} (hn : 1 ≤ n)
         rw [mem_Ico]
         omega
       refine lt_of_lt_of_le (hpos (k + 1) (by omega) (by omega)) ?_
-      refine Finset.single_le_sum (f := hold) (fun j hj => ?_) hmem
+      refine Finset.single_le_sum (f := hold) (fun j hj ↦ ?_) hmem
       rw [mem_Ico] at hj
       exact le_of_lt (hpos j (by omega) (by omega))
   unfold blockCountAt
@@ -151,8 +152,8 @@ which in block-count form is `D(n,t) = 1`. -/
 theorem blockCountAt_of_transit_le (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j) {t : ℝ}
     (ht : transitTime n hold ≤ t) : blockCountAt n hold t = 1 := by
   classical
-  have hempty : ((Finset.Icc 1 n).filter fun k => t < descentTime n hold k) = ∅ := by
-    refine Finset.filter_false_of_mem fun k hk => ?_
+  have hempty : ((Finset.Icc 1 n).filter fun k ↦ t < descentTime n hold k) = ∅ := by
+    refine Finset.filter_false_of_mem fun k hk ↦ ?_
     rw [mem_Icc] at hk
     have hle : descentTime n hold k ≤ transitTime n hold :=
       descentTime_antitone n hpos hk.1
@@ -167,7 +168,7 @@ theorem blockCountAt_le_of_descentTime_le (n : ℕ) {hold : ℕ → ℝ} (hpos :
     blockCountAt n hold t ≤ k := by
   classical
   unfold blockCountAt
-  have hsub : ((Finset.Icc 1 n).filter fun j => t < descentTime n hold j)
+  have hsub : ((Finset.Icc 1 n).filter fun j ↦ t < descentTime n hold j)
       ⊆ Finset.Icc 1 (k - 1) := by
     intro j hj
     rw [mem_filter, mem_Icc] at hj
@@ -189,7 +190,7 @@ theorem lt_blockCountAt_of_lt_descentTime (n : ℕ) {hold : ℕ → ℝ} (hpos :
     k < blockCountAt n hold t := by
   classical
   unfold blockCountAt
-  have hsub : Finset.Icc 1 k ⊆ ((Finset.Icc 1 n).filter fun j => t < descentTime n hold j) := by
+  have hsub : Finset.Icc 1 k ⊆ ((Finset.Icc 1 n).filter fun j ↦ t < descentTime n hold j) := by
     intro j hj
     rw [mem_Icc] at hj
     rw [mem_filter, mem_Icc]
@@ -225,7 +226,7 @@ on `Fin m → ℝ` -- finitely many coordinates, which is all an `n`-coalescent 
 path construction indexes holds by block count; this is the bridge, and it is what lets the
 two compose. -/
 noncomputable def extendHold {m : ℕ} (hold : Fin m → ℝ) : ℕ → ℝ :=
-  fun j => if hj : j < m then hold ⟨j, hj⟩ else 0
+  fun j ↦ if hj : j < m then hold ⟨j, hj⟩ else 0
 
 theorem extendHold_nonneg {m : ℕ} {hold : Fin m → ℝ} (h : ∀ i, 0 ≤ hold i) (j : ℕ) :
     0 ≤ extendHold hold j := by

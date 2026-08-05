@@ -1,9 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Duality
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Tactic
-import Descent.Coalescent.Duality
+import Descent.Core.Ratios
 
 namespace Descent
 

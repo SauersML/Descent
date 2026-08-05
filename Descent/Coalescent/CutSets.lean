@@ -78,16 +78,16 @@ theorem splitBy_injective_on_cutSets {n : ℕ} (η : ER n) {S T : Finset (Fin n)
     have hnotiff : ¬ (x ∈ A ↔ r ∈ A) := by
       intro hiffA
       exact hrA (hiffA.mp hx)
-    have hnotiffB : ¬ (x ∈ B ↔ r ∈ B) := fun hc => hnotiff ((hiff x r hrx).mpr hc)
+    have hnotiffB : ¬ (x ∈ B ↔ r ∈ B) := fun hc ↦ hnotiff ((hiff x r hrx).mpr hc)
     by_contra hxB
-    exact hnotiffB ⟨fun hc => absurd hc hxB, fun hc => absurd hc hrB⟩
+    exact hnotiffB ⟨fun hc ↦ absurd hc hxB, fun hc ↦ absurd hc hrB⟩
   refine Finset.Subset.antisymm (hforward hS hT hkey) (hforward hT hS ?_)
   intro x y hxy
   exact (hkey x y hxy).symm
 
 /-- The class of `x`, as a `Finset`. -/
 noncomputable def classFinset {n : ℕ} (η : ER n) (x : Fin n) : Finset (Fin n) :=
-  Finset.univ.filter fun y => η.r y x
+  Finset.univ.filter fun y ↦ η.r y x
 
 theorem mem_classFinset {n : ℕ} (η : ER n) (x y : Fin n) :
     y ∈ classFinset η x ↔ η.r y x := by
@@ -108,7 +108,7 @@ theorem exists_properCut_of_covers {n : ℕ} {ξ η : ER n} (hcov : Covers ξ η
   obtain ⟨a, b, hab, rfl⟩ := (covers_iff_exists_merge ξ η).mp hcov
   obtain ⟨x₀, hx₀⟩ := quotient_mk_surjective ξ a
   obtain ⟨w, hw⟩ := quotient_mk_surjective ξ b
-  refine ⟨Finset.univ.filter fun x => Quotient.mk ξ x = a, eq_splitBy_merge ξ hab,
+  refine ⟨Finset.univ.filter fun x ↦ Quotient.mk ξ x = a, eq_splitBy_merge ξ hab,
     ⟨x₀, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx₀⟩⟩, x₀, ?_, w, ?_, ?_⟩
   · intro x hx
     have hxa : Quotient.mk ξ x = a := (Finset.mem_filter.mp hx).2
@@ -116,7 +116,7 @@ theorem exists_properCut_of_covers {n : ℕ} {ξ η : ER n} (hcov : Covers ξ η
   · exact (merge ξ a b).iseqv.symm (merge_rel ξ a b hx₀ hw)
   · simp only [Finset.mem_filter, Finset.mem_univ, true_and]
     rw [hw]
-    exact fun h => hab h.symm
+    exact fun h ↦ hab h.symm
 
 /-- **Every state below `η` is the cut along a cut set.**  `exists_properCut_of_covers` gives
 a cut; if it contains its class's representative, `splitBy_compl` swaps to the other side,

@@ -54,7 +54,7 @@ factors is BUILT IN rather than derived -- see the module docstring.  Kingman's 
 does the same; his Theorem 1, which derives it, is a different theorem and is not here. -/
 noncomputable def coalescentLaw (n k m : ℕ) (holdLaw : Measure ℝ) :
     Measure (List (ER n) × (Fin m → ℝ)) :=
-  (chainLaw n k).toMeasure.prod (Measure.pi fun _ : Fin m => holdLaw)
+  (chainLaw n k).toMeasure.prod (Measure.pi fun _ : Fin m ↦ holdLaw)
 
 instance coalescentLaw_isProbabilityMeasure (n k m : ℕ) (holdLaw : Measure ℝ)
     [IsProbabilityMeasure holdLaw] :
@@ -71,7 +71,7 @@ was built as a product. -/
 theorem coalescentLaw_prod (n k m : ℕ) (holdLaw : Measure ℝ) [IsProbabilityMeasure holdLaw]
     (A : Set (List (ER n))) (B : Set (Fin m → ℝ)) :
     coalescentLaw n k m holdLaw (A ×ˢ B)
-      = (chainLaw n k).toMeasure A * (Measure.pi fun _ : Fin m => holdLaw) B := by
+      = (chainLaw n k).toMeasure A * (Measure.pi fun _ : Fin m ↦ holdLaw) B := by
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
     inferInstance
   unfold coalescentLaw
@@ -83,14 +83,14 @@ supplies. -/
 theorem coalescentLaw_chain_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
     [IsProbabilityMeasure holdLaw] (A : Set (List (ER n))) :
     coalescentLaw n k m holdLaw (A ×ˢ Set.univ) = (chainLaw n k).toMeasure A := by
-  haveI : IsProbabilityMeasure (Measure.pi fun _ : Fin m => holdLaw) := by infer_instance
+  haveI : IsProbabilityMeasure (Measure.pi fun _ : Fin m ↦ holdLaw) := by infer_instance
   rw [coalescentLaw_prod, measure_univ, mul_one]
 
 /-- The clock marginal, likewise. -/
 theorem coalescentLaw_hold_marginal (n k m : ℕ) (holdLaw : Measure ℝ)
     [IsProbabilityMeasure holdLaw] (B : Set (Fin m → ℝ)) :
     coalescentLaw n k m holdLaw (Set.univ ×ˢ B)
-      = (Measure.pi fun _ : Fin m => holdLaw) B := by
+      = (Measure.pi fun _ : Fin m ↦ holdLaw) B := by
   haveI : IsProbabilityMeasure (chainLaw n k).toMeasure :=
     inferInstance
   rw [coalescentLaw_prod, measure_univ, one_mul]
@@ -108,7 +108,7 @@ theorem coalescentLaw_finiteDimensional (n k m : ℕ) (holdLaw : Measure ℝ)
     coalescentLaw n k m holdLaw
         (A ×ˢ {h : Fin m → ℝ | blockCountAt n (extendHold h) t = j})
       = (chainLaw n k).toMeasure A
-        * (Measure.pi fun _ : Fin m => holdLaw) {h | blockCountAt n (extendHold h) t = j} :=
+        * (Measure.pi fun _ : Fin m ↦ holdLaw) {h | blockCountAt n (extendHold h) t = j} :=
   coalescentLaw_prod n k m holdLaw A _
 
 /-- **Almost every coupled path is a genuine coalescent path.**  Whatever the clock does,
@@ -118,7 +118,7 @@ which is what K-G (6.5) claims of the coupling. -/
 theorem coalescentLaw_support_chain' (n k m : ℕ) (holdLaw : Measure ℝ)
     [IsProbabilityMeasure holdLaw] {p : List (ER n) × (Fin m → ℝ)}
     (hp : p.1 ∈ (chainLaw n k).support) :
-    List.Chain' (fun y x => Covers x y ∨ y = x) p.1 :=
+    List.Chain' (fun y x ↦ Covers x y ∨ y = x) p.1 :=
   chainLaw_support_chain' k hp
 
 end Coalescent

@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Probability.CondVar
 import Descent.Foundations.Probability
+import Mathlib.Probability.CondVar
+import Descent.Core.Ratios
 
 namespace Descent.Foundations
 

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.DGP
 import Descent.Spectral.EnsembleChannel
+import Descent.Core.Ratios
 
 namespace Descent.Spectral
 

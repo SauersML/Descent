@@ -1,8 +1,16 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.ContinuumCalibration
+import Descent.Core.Population
+-- `witnessDivergence_eq_threeAncestryDistance` and the two decoration lemmas name
+-- `Portability.threeAncestryDistance`, `ancestryPosition`, `ancestryScore`,
+-- `ancestryScoreSwapped` and `threeAncestryConditional`, and `Spectral.binarySecondAnnotation`.
+-- All six used to arrive through `Descent.Program.Conventions`, which this file no longer
+-- imports; the modules that DEFINE them are named instead.
 import Descent.Portability.MetricSpecificPortability.PrecisionRecall
+import Descent.Spectral.EnsembleChannel
+import Descent.Portability.ContinuumCalibration
+import Descent.Core.Fst
 
 namespace Descent.Blindness
 
@@ -437,13 +445,10 @@ noncomputable def witnessWeight (_p : Fin 3) : ℝ := 1 / 3
 
 
 /-! **The two decorations are `Portability.ancestryScore` and
-`Portability.ancestryScoreSwapped`.** They used to be redeclared here as
-`Portability.ancestryScore := ![0, 1, 2]` and `Portability.ancestryScoreSwapped := ![0, 2, 1]`, with
-two
-theorems establishing that each equals the canonical definition it had copied -- and
-`ancestryScoreSwapped` is `![0, 2, 1]`, the identical body. A witness that redeclares
-what it is a witness ABOUT can drift from it, and the theorems recording that it had not
-drifted yet were the corpus paying to check its own copy. The canonical names are used
+`Portability.ancestryScoreSwapped`.** This module names them; it does not redeclare their
+bodies `![0, 1, 2]` and `![0, 2, 1]` under local names. A witness that carries its own copy
+of what it is a witness ABOUT can drift from it, and a theorem recording that the copy has
+not drifted yet is the corpus paying to check its own copy. The canonical names are used
 directly below. -/
 
 /-- The third population's risk under the aligned assignment, pinned. -/

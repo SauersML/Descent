@@ -78,7 +78,8 @@ theorem harmonicSum_succ (m : ℕ) :
 the literature's `a_n` is `Σ_{i<n} i⁻¹`, which is `harmonicSum (n - 1)` here -- and a
 consumer that computes `3/2` for itself has taken Watterson's constant on trust. -/
 theorem harmonicSum_two : harmonicSum 2 = 3 / 2 := by
-  rw [show (2 : ℕ) = 1 + 1 from rfl, harmonicSum_succ, harmonicSum_one]
+  show harmonicSum (1 + 1) = 3 / 2
+  rw [harmonicSum_succ, harmonicSum_one]
   norm_num
 
 theorem harmonicSum_nonneg (m : ℕ) : 0 ≤ harmonicSum m := by

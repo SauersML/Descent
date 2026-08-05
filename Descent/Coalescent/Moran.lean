@@ -61,30 +61,33 @@ theorem moranMass_sum {N : ℕ} (hN : 0 < N) :
   field_simp
   ring
 
+/-- **Every moment of (4.5) is this one expansion.**  `range 3` has three elements and
+`moranMass` is given case by case, so a moment `Σ w(k) P{ν = k}` is three products and
+nothing else; the two families of size `0` and `2` carry the same mass `N⁻¹`, which is why
+they appear here summed.  Naming the expansion once leaves each moment below with only its
+own arithmetic, and that arithmetic needs no hypothesis on `N`: `x / 0 = 0` in Lean, so the
+cancellations are identities in `N⁻¹` rather than facts about a nonzero `N`. -/
+theorem moranMass_moment {N : ℕ} (w : ℕ → ℝ) :
+    ∑ k ∈ range 3, w k * moranMass N k
+      = w 1 * (1 - 2 / (N : ℝ)) + (w 0 + w 2) * (1 / (N : ℝ)) := by
+  rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
+  simp only [moranMass]
+  ring
+
 /-- **`E(ν) = 1`.**  Forced by K-G (2.1), `Σ ν_j = N`: with a constant population size the
 mean family size is one whatever the model.  The Moran law satisfies it, which is the check
 that (4.5) describes a population that neither grows nor shrinks. -/
 theorem moranMean {N : ℕ} (hN : 0 < N) :
     ∑ k ∈ range 3, (k : ℝ) * moranMass N k = 1 := by
-  have hN' : (N : ℝ) ≠ 0 := by
-    have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
-    linarith
-  rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  simp only [moranMass]
+  rw [moranMass_moment]
   push_cast
-  field_simp
   ring
 
 /-- The second moment, `E(ν²) = 1 + 2/N`. -/
 theorem moranSecondMoment {N : ℕ} (hN : 0 < N) :
     ∑ k ∈ range 3, (k : ℝ) ^ 2 * moranMass N k = 1 + 2 / (N : ℝ) := by
-  have hN' : (N : ℝ) ≠ 0 := by
-    have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
-    linarith
-  rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  simp only [moranMass]
+  rw [moranMass_moment]
   push_cast
-  field_simp
   ring
 
 /-- **K-G (4.5): `Var(ν) = 2/N`.**  Not a constant, which is the whole point of Kingman's

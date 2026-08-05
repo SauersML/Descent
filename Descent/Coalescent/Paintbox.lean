@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Tactic
+import Descent.Coalescent.Restriction
 import Descent.Coalescent.JumpChain
+import Mathlib.Tactic
 
 namespace Descent
 
@@ -108,7 +109,7 @@ nothing to do with probability, and it is where the special colour `0` would bre
 if it were not handled uniformly -- it is not, so it does not. -/
 theorem paintboxRel_perm (σ : Equiv.Perm ℕ) (Z : ℕ → ℕ) :
     permAction σ (paintboxRel Z) = paintboxRel (Z ∘ σ.symm) := by
-  refine Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩
+  refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ ?_, fun hxy ↦ ?_⟩
   · rcases hxy with h | ⟨h, hz⟩
     · exact Or.inl (σ.symm.injective h)
     · exact Or.inr ⟨h, hz⟩
@@ -211,7 +212,7 @@ theorem wattersonProb_div_restrictionFullProb {k n : ℕ} (hkn : k ≤ n) (lam :
 stated ground for calling `𝒫_k` the limiting form of the jump chain's absolute law: a large
 enough sample sees every colour. -/
 theorem tendsto_restrictionFullProb_two :
-    Tendsto (fun n : ℕ => restrictionFullProb (n + 2) 2) atTop (nhds 1) := by
+    Tendsto (fun n : ℕ ↦ restrictionFullProb (n + 2) 2) atTop (nhds 1) := by
   have hcongr : ∀ n : ℕ, restrictionFullProb (n + 2) 2 = survivalFactor (n + 2) := by
     intro n
     exact restrictionFullProb_two_eq_survivalFactor (by omega)
@@ -222,15 +223,15 @@ theorem tendsto_restrictionFullProb_two :
     push_cast
     field_simp
     ring
-  have hzero : Tendsto (fun n : ℕ => 2 / ((n : ℝ) + 3)) atTop (nhds 0) := by
+  have hzero : Tendsto (fun n : ℕ ↦ 2 / ((n : ℝ) + 3)) atTop (nhds 0) := by
     have h2 : (2 : ℝ) ≤ 3 := by norm_num
     have := tendsto_two_div_shift (c := 3) (by norm_num)
     have hshift : ∀ n : ℕ, (3 : ℝ) + (n : ℝ) - 1 = (n : ℝ) + 2 := by
       intro n
       ring
-    have hbound : Tendsto (fun n : ℕ => 2 / ((n : ℝ) + 2)) atTop (nhds 0) := by
+    have hbound : Tendsto (fun n : ℕ ↦ 2 / ((n : ℝ) + 2)) atTop (nhds 0) := by
       simpa [hshift] using this
-    refine squeeze_zero (fun n => by positivity) (fun n => ?_) hbound
+    refine squeeze_zero (fun n ↦ by positivity) (fun n ↦ ?_) hbound
     have hn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
     gcongr <;> linarith
   simpa only [hcongr, hform, sub_zero] using tendsto_const_nhds.sub hzero

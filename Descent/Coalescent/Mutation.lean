@@ -118,23 +118,23 @@ the identity-by-descent probability tends to `(1+θ)⁻¹`.  This is Kingman's c
 it is proved here for the EXACT finite-`N` expression, so the `O(β²)` discrepancy in the
 displayed denominator is shown to be immaterial rather than assumed to be. -/
 theorem tendsto_identityByDescent {θ : ℝ} (hθ : 0 ≤ θ) :
-    Tendsto (fun N : ℕ => (1 - θ / (2 * (N : ℝ))) ^ 2
+    Tendsto (fun N : ℕ ↦ (1 - θ / (2 * (N : ℝ))) ^ 2
         / (1 + ((N : ℝ) - 1) * (2 * (θ / (2 * (N : ℝ))) - (θ / (2 * (N : ℝ))) ^ 2)))
       atTop (nhds (1 / (1 + θ))) := by
-  have hinv : Tendsto (fun N : ℕ => 1 / (N : ℝ)) atTop (nhds 0) :=
+  have hinv : Tendsto (fun N : ℕ ↦ 1 / (N : ℝ)) atTop (nhds 0) :=
     tendsto_one_div_atTop_nhds_zero_nat
-  have hnum : Tendsto (fun N : ℕ => (1 - θ / (2 * (N : ℝ))) ^ 2) atTop (nhds 1) := by
-    have h : Tendsto (fun N : ℕ => 1 - θ / (2 * (N : ℝ))) atTop (nhds 1) := by
-      have hz : Tendsto (fun N : ℕ => θ / (2 * (N : ℝ))) atTop (nhds 0) := by
-        have hc : Tendsto (fun N : ℕ => (θ / 2) * (1 / (N : ℝ))) atTop (nhds 0) := by
+  have hnum : Tendsto (fun N : ℕ ↦ (1 - θ / (2 * (N : ℝ))) ^ 2) atTop (nhds 1) := by
+    have h : Tendsto (fun N : ℕ ↦ 1 - θ / (2 * (N : ℝ))) atTop (nhds 1) := by
+      have hz : Tendsto (fun N : ℕ ↦ θ / (2 * (N : ℝ))) atTop (nhds 0) := by
+        have hc : Tendsto (fun N : ℕ ↦ (θ / 2) * (1 / (N : ℝ))) atTop (nhds 0) := by
           simpa using hinv.const_mul (θ / 2)
-        refine hc.congr fun N => ?_
+        refine hc.congr fun N ↦ ?_
         rcases eq_or_ne ((N : ℝ)) 0 with hN | hN
         · simp [hN]
         · field_simp
       simpa using tendsto_const_nhds.sub hz
     simpa using h.pow 2
-  have hden : Tendsto (fun N : ℕ =>
+  have hden : Tendsto (fun N : ℕ ↦
       1 + ((N : ℝ) - 1) * (2 * (θ / (2 * (N : ℝ))) - (θ / (2 * (N : ℝ))) ^ 2))
       atTop (nhds (1 + θ)) := by
     have hev : ∀ᶠ N : ℕ in atTop,
@@ -147,18 +147,18 @@ theorem tendsto_identityByDescent {θ : ℝ} (hθ : 0 ≤ θ) :
         linarith
       field_simp
       ring
-    have hlim : Tendsto (fun N : ℕ => 1 + θ - θ * (1 / (N : ℝ)) - (θ ^ 2 / 4) * (1 / (N : ℝ))
+    have hlim : Tendsto (fun N : ℕ ↦ 1 + θ - θ * (1 / (N : ℝ)) - (θ ^ 2 / 4) * (1 / (N : ℝ))
         + (θ ^ 2 / 4) * (1 / (N : ℝ)) ^ 2) atTop (nhds (1 + θ)) := by
-      have h1 : Tendsto (fun N : ℕ => θ * (1 / (N : ℝ))) atTop (nhds 0) := by
+      have h1 : Tendsto (fun N : ℕ ↦ θ * (1 / (N : ℝ))) atTop (nhds 0) := by
         simpa using hinv.const_mul θ
-      have h2 : Tendsto (fun N : ℕ => (θ ^ 2 / 4) * (1 / (N : ℝ))) atTop (nhds 0) := by
+      have h2 : Tendsto (fun N : ℕ ↦ (θ ^ 2 / 4) * (1 / (N : ℝ))) atTop (nhds 0) := by
         simpa using hinv.const_mul (θ ^ 2 / 4)
-      have h3 : Tendsto (fun N : ℕ => (θ ^ 2 / 4) * (1 / (N : ℝ)) ^ 2) atTop (nhds 0) := by
-        have : Tendsto (fun N : ℕ => (1 / (N : ℝ)) ^ 2) atTop (nhds 0) := by
+      have h3 : Tendsto (fun N : ℕ ↦ (θ ^ 2 / 4) * (1 / (N : ℝ)) ^ 2) atTop (nhds 0) := by
+        have : Tendsto (fun N : ℕ ↦ (1 / (N : ℝ)) ^ 2) atTop (nhds 0) := by
           simpa using hinv.pow 2
         simpa using this.const_mul (θ ^ 2 / 4)
       simpa using ((tendsto_const_nhds.sub h1).sub h2).add h3
-    exact hlim.congr' (hev.mono fun N h => h.symm)
+    exact hlim.congr' (hev.mono fun N h ↦ h.symm)
   have hne : (1 : ℝ) + θ ≠ 0 := by linarith
   simpa using hnum.div hden hne
 
@@ -190,27 +190,32 @@ it more than a stipulation is that it is a consequence of the coalescent plus Po
 mutation, and that it normalises; the normalisation is checked below at `n = 2, 3`. -/
 noncomputable def ewensProb (θ : ℝ) (n : ℕ) (lam : Multiset ℕ) : ℝ :=
   θ ^ (Multiset.card lam - 1) / ewensDenominator θ n
-    * (((lam.map fun l => (l - 1)!).prod : ℕ) : ℝ)
+    * (((lam.map fun l ↦ (l - 1)!).prod : ℕ) : ℝ)
+
+/-- **K-G (3.8) at `n = 2`, with the normalisation already done.**  The rising factorial is
+`θ + 1` for a sample of two whatever the class sizes are, so both cases below differ only in
+what the numerator computes to; that is the step they were sharing, and it is here. -/
+theorem ewensProb_two (θ : ℝ) (lam : Multiset ℕ) :
+    ewensProb θ 2 lam
+      = θ ^ (Multiset.card lam - 1) * (((lam.map fun l ↦ (l - 1)!).prod : ℕ) : ℝ)
+        / (1 + θ) := by
+  unfold ewensProb
+  rw [ewensDenominator_two]
+  ring
 
 /-- Both sampled individuals carry the same allele: `(1+θ)⁻¹`.  This is the number the
 finite-`N` mechanism converges to in `tendsto_identityByDescent`, so formula and mechanism
 agree at the one point where both are available in closed form. -/
 theorem ewensProb_two_merged {θ : ℝ} (hθ : 0 ≤ θ) :
     ewensProb θ 2 {2} = 1 / (1 + θ) := by
-  have hne : (θ : ℝ) + 1 ≠ 0 := by linarith
-  unfold ewensProb
-  simp [ewensDenominator_two]
-  field_simp
-  ring
+  rw [ewensProb_two]
+  simp
 
 /-- The two sampled individuals carry different alleles: `θ/(1+θ)`. -/
 theorem ewensProb_two_split {θ : ℝ} (hθ : 0 ≤ θ) :
     ewensProb θ 2 {1, 1} = θ / (1 + θ) := by
-  have hne : (θ : ℝ) + 1 ≠ 0 := by linarith
-  unfold ewensProb
-  simp [ewensDenominator_two]
-  field_simp
-  ring
+  rw [ewensProb_two]
+  simp
 
 /-- **The formula normalises at `n = 2`.**  There are exactly two equivalence relations on a
 two-element set, and K-G (3.8) gives them total probability one. -/

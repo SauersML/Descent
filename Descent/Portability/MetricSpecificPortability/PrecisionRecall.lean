@@ -1,8 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.ClinicalUtilityFairness
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
+-- `f1_le_one` is stated about `Program.f1Score` and the prose above it says "which this
+-- file imports".  It did not: the name arrived through
+-- `R2Decomposition -> PopGen.LDDecayTheory -> Program.OpenQuestions`, and when
+-- `LDDecayTheory` stopped importing the programme narrative the name went with it.  The
+-- import is now written where the prose already claimed it was.  This is a Portability
+-- to Program edge and the `layers` guard reports it: the repair is to move `f1Score`
+-- down, since an F1 formula is a classifier metric and carries no programme content.
 import Descent.Program.OpenQuestions
 
 namespace Descent.Portability

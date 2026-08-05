@@ -1,8 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.PopGen.SelectionArchitecture
 import Descent.Decision.ValidationStatistics
-import Descent.Portability.AncestrySpecificPower
 
 namespace Descent.Decision
 

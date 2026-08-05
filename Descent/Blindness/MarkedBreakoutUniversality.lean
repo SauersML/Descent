@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.MeasureTheory.Measure.WithDensity
 import Descent.Blindness.MultipleMergerBlindness
+import Descent.Core.Ratios
 
 namespace Descent.Blindness
 

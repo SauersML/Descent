@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.BundleRigidity.SingleModulus
+import Descent.Blindness.BundleRigidity.Realizability
 
 /-!
 # Effective independence dimension and the master decay bound

@@ -1,11 +1,20 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Foundations.TransportIdentities
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.Data.Matrix.Basic
-import Descent.Conditionals.LatentMechanismCollapse
+-- For `LevelSetCoordinates`, `IsLevelSetFunctional` and
+-- `levelSet_metrics_agree_of_coords_eq`: the section on genetic/environmental
+-- identifiability below upgrades a calibration-level non-identifiability into a
+-- statement about every threshold metric at once, which is not provable here.
 import Descent.Spectral.FoldedSpectrum
+-- For `twoMechanismMixture`, `mechanismCount_not_identified` and
+-- `mechanismCount_not_identified_of_range`: the mechanism-count section below is the
+-- gene-environment reading of the latent-mechanism collapse.
+import Descent.Conditionals.LatentMechanismCollapse
+import Descent.Core.Ratios
 
 namespace Descent.PopGen
 

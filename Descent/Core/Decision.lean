@@ -745,6 +745,35 @@ theorem netBenefit_le_prevalence (o : OperatingPoint) (prevalence t : ℝ)
   unfold netBenefit
   linarith [mul_nonneg hfp hodds]
 
+/-- **What a rule gives up against treating everyone**, as one expression.
+
+`π(1 - sens)` is the cases the rule misses that treat-all would have caught;
+`(1-π)·spec·t/(1-t)` is the unnecessary treatments it avoids, priced at what the threshold
+says they cost. The whole of decision curve analysis is the comparison of those two terms,
+and writing the difference as an identity rather than deriving it at each use is what makes
+the comparison a `linarith` away everywhere below. -/
+theorem treatAll_netBenefit_sub (o : OperatingPoint) (prevalence t : ℝ) :
+    treatAll.netBenefit prevalence t - o.netBenefit prevalence t
+      = prevalence * (1 - o.sensitivity)
+        - (1 - prevalence) * o.specificity * thresholdOdds t := by
+  unfold netBenefit
+  rw [treatAll_sensitivity, treatAll_specificity]
+  ring
+
+/-- **Exactly when a rule is not worth using**, at a given threshold and prevalence.
+
+The rule loses to treating everyone precisely when the cases it misses outweigh the
+unnecessary treatments it avoids, at the exchange rate the threshold declares. A rule can
+be on the wrong side of this at one threshold and the right side at another with nothing
+about the rule changing, which is why a decision curve is reported as a curve rather than
+as a number. -/
+theorem netBenefit_lt_treatAll_iff (o : OperatingPoint) (prevalence t : ℝ) :
+    o.netBenefit prevalence t < treatAll.netBenefit prevalence t ↔
+      (1 - prevalence) * o.specificity * thresholdOdds t
+        < prevalence * (1 - o.sensitivity) := by
+  have hid := treatAll_netBenefit_sub o prevalence t
+  constructor <;> intro h <;> linarith
+
 /-! ### Reclassification
 
 The index a paper reports when it replaces one rule with another. It is two numbers, and
@@ -1509,6 +1538,111 @@ theorem deployedRecall_mono_in_Ne (L : OperatingPointLaw) (p q : PopGenParameter
   exact deployedRecall_lt_of_deployedR2_lt L p q V_E (le_of_lt hE) hflow hq
     (ScoreMoments.deployedR2_mono_in_Ne p q V_E hE hmu hmig hd hV hlt hflow)
 
+/-! ### The fourth demographic parameter
+
+`nDemes` is a field of `PopGenParameters` and `Core.Moments.deployedR2_anti_in_demes`
+carries it to `R²`. These carry it the rest of the way. The empirical stake is on the
+record: `simcov/battery_falsrepair_c2.py` falsifies the many-deme limit at `d = 20` where
+the finite-deme form matches the same cells, so the deme count moves the measured
+differentiation -- and these say which way it moves the number a patient is told.
+
+Migration must be strictly positive in all four: at `m = 0` the deme count multiplies
+nothing and there is no monotonicity to state. -/
+
+/-- **More demes, a lower predictive value.** -/
+theorem deployedPPV_anti_in_demes (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    L.deployedPPV q V_E prevalence < L.deployedPPV p V_E prevalence := by
+  have hp : 0 < p.mu + p.mig := by have := p.mu_nonneg; linarith
+  have hq : 0 < q.mu + q.mig := by
+    have hqm : (0:ℝ) < q.mig := by rw [← hmig]; exact hmigpos
+    linarith [q.mu_nonneg]
+  exact deployedPPV_lt_of_deployedR2_lt L q p V_E prevalence hπ hπ1 (le_of_lt hE) hq hp
+    (ScoreMoments.deployedR2_anti_in_demes p q V_E hE hNe hmu hmig hV hmigpos hlt)
+
+/-- **More demes, a lower negative predictive value.** -/
+theorem deployedNPV_anti_in_demes (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    L.deployedNPV q V_E prevalence < L.deployedNPV p V_E prevalence := by
+  have hp : 0 < p.mu + p.mig := by have := p.mu_nonneg; linarith
+  have hq : 0 < q.mu + q.mig := by
+    have hqm : (0:ℝ) < q.mig := by rw [← hmig]; exact hmigpos
+    linarith [q.mu_nonneg]
+  exact deployedNPV_lt_of_deployedR2_lt L q p V_E prevalence hπ hπ1 (le_of_lt hE) hq hp
+    (ScoreMoments.deployedR2_anti_in_demes p q V_E hE hNe hmu hmig hV hmigpos hlt)
+
+/-- **More demes, a lower net benefit.** -/
+theorem deployedNetBenefit_anti_in_demes (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence t : ℝ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    L.deployedNetBenefit q V_E prevalence t < L.deployedNetBenefit p V_E prevalence t := by
+  have hp : 0 < p.mu + p.mig := by have := p.mu_nonneg; linarith
+  have hq : 0 < q.mu + q.mig := by
+    have hqm : (0:ℝ) < q.mig := by rw [← hmig]; exact hmigpos
+    linarith [q.mu_nonneg]
+  exact deployedNetBenefit_lt_of_deployedR2_lt L q p V_E prevalence t hπ hπ1 ht ht1
+    (le_of_lt hE) hq hp
+    (ScoreMoments.deployedR2_anti_in_demes p q V_E hE hNe hmu hmig hV hmigpos hlt)
+
+/-- **More demes, a lower recall.** -/
+theorem deployedRecall_anti_in_demes (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes) :
+    L.deployedRecall q V_E < L.deployedRecall p V_E := by
+  have hp : 0 < p.mu + p.mig := by have := p.mu_nonneg; linarith
+  have hq : 0 < q.mu + q.mig := by
+    have hqm : (0:ℝ) < q.mig := by rw [← hmig]; exact hmigpos
+    linarith [q.mu_nonneg]
+  exact deployedRecall_lt_of_deployedR2_lt L q p V_E (le_of_lt hE) hq hp
+    (ScoreMoments.deployedR2_anti_in_demes p q V_E hE hNe hmu hmig hV hmigpos hlt)
+
+/-! ### The clinical report reads five fields and no others
+
+`Core.Moments.deployedR2_congr` proves the deployed `R²` is a function of `Ne`, `mu`,
+`mig`, `nDemes` and `V_A` alone. Everything in this file factors through that `R²`, so the
+same is true of the whole clinical report -- and saying it explicitly is what makes the
+rejection of a locus count and a sample size from `PopGenParameters` a fact rather than a
+preference. Neither `t_div` nor `recomb` reaches a patient. -/
+
+/-- **The deployed predictive value reads five fields.** -/
+theorem deployedPPV_congr (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) :
+    L.deployedPPV p V_E prevalence = L.deployedPPV q V_E prevalence := by
+  unfold deployedPPV
+  rw [ScoreMoments.deployedR2_congr p q V_E hNe hmu hmig hd hV]
+
+/-- **And so does the deployed negative predictive value.** -/
+theorem deployedNPV_congr (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence : ℝ) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) :
+    L.deployedNPV p V_E prevalence = L.deployedNPV q V_E prevalence := by
+  unfold deployedNPV
+  rw [ScoreMoments.deployedR2_congr p q V_E hNe hmu hmig hd hV]
+
+/-- **And the deployed net benefit.** -/
+theorem deployedNetBenefit_congr (L : OperatingPointLaw) (p q : PopGenParameters)
+    (V_E prevalence t : ℝ) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) :
+    L.deployedNetBenefit p V_E prevalence t = L.deployedNetBenefit q V_E prevalence t := by
+  unfold deployedNetBenefit
+  rw [ScoreMoments.deployedR2_congr p q V_E hNe hmu hmig hd hV]
+
+/-- **And the deployed reclassification index.** -/
+theorem deployedNRI_congr (L : OperatingPointLaw) (p q : PopGenParameters) (V_E : ℝ)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) :
+    L.deployedNRI p V_E = L.deployedNRI q V_E := by
+  unfold deployedNRI
+  rw [ScoreMoments.deployedR2_congr p q V_E hNe hmu hmig hd hV, hV]
+
 /-! ### Bounds and boundaries -/
 
 /-- **The deployed predictive value lies in the unit interval at every history**, away
@@ -1544,6 +1678,128 @@ theorem deployedNetBenefit_le_prevalence (L : OperatingPointLaw) (p : PopGenPara
   OperatingPoint.netBenefit_le_prevalence _ prevalence t
     (L.point_admissible _ (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).1
       (ScoreMoments.deployedR2_mem_unit p V_E hE hflow).2) hπ0 hπ1 ht ht1
+
+/-! ### The threshold and the prevalence, at a fixed history
+
+The three demographic parameters and the deme count move the report by moving `R²`. Two
+more axes move it without touching the demography at all: the decision threshold, which
+is a clinical choice, and the prevalence of the population deployed into, which is neither
+a property of the score nor of the demography that produced it.
+
+They are here rather than in the operating-point section because at a fixed history the
+deployed point is pinned, and the strictness these need -- a sensitivity strictly above
+zero, a specificity strictly below one -- is available only once the history has pinned
+the `R²` strictly inside the unit interval. Those two facts come first. -/
+
+/-- **The deployed `R²` is strictly positive at every history with flow.** -/
+theorem deployedR2_pos (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig) : 0 < ScoreMoments.deployedR2 p V_E := by
+  have hlt := p.fstEquilibrium_lt_one hflow
+  have hge := p.fstEquilibrium_mem_unit.1
+  have hV := p.V_A_pos
+  have hr : 0 < retainedFraction p.fstEquilibrium p.V_A := by
+    unfold retainedFraction; nlinarith
+  rw [ScoreMoments.deployedR2_eq p V_E hE hflow]
+  unfold share
+  exact div_pos hr (by linarith)
+
+/-- **And strictly below one**, on a trait with environmental variance. -/
+theorem deployedR2_lt_one (p : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hflow : 0 < p.mu + p.mig) : ScoreMoments.deployedR2 p V_E < 1 := by
+  unfold ScoreMoments.deployedR2
+  exact r2_momentsUnderDrift_lt_one p.V_A V_E p.fstEquilibrium p.V_A_pos hE
+    (p.fstEquilibrium_lt_one hflow)
+
+/-- **A deployed score calls some cases.** Strictly positive sensitivity at every history
+with flow, because the law is strictly increasing and the deployed `R²` is strictly above
+zero. -/
+theorem deployedPoint_sensitivity_pos (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    0 < (L.point (ScoreMoments.deployedR2 p V_E)).sensitivity := by
+  have hpos := deployedR2_pos p V_E (le_of_lt hE) hflow
+  have hle := (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).2
+  have h0 := (L.point_admissible 0 le_rfl zero_le_one).sensitivity_nonneg
+  have := L.sensitivity_strictMono 0 (ScoreMoments.deployedR2 p V_E) le_rfl hpos hle
+  linarith
+
+/-- **And it makes some false positives.** Strictly sub-unit specificity, because the
+deployed `R²` is strictly below one and the law is strictly increasing up to it. This is
+what makes the threshold matter: a rule with no false positives is worth using at every
+threshold, and no deployed score is that rule. -/
+theorem deployedPoint_specificity_lt_one (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    (L.point (ScoreMoments.deployedR2 p V_E)).specificity < 1 := by
+  have hlt := deployedR2_lt_one p V_E hE hflow
+  have h0 := (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).1
+  have h1 := (L.point_admissible 1 zero_le_one le_rfl).specificity_le_one
+  have := L.specificity_strictMono (ScoreMoments.deployedR2 p V_E) 1 h0 hlt le_rfl
+  linarith
+
+/-- **A higher decision threshold is a lower deployed net benefit.**
+
+The decision curve of a deployed score, sloping down, at a fixed demographic history. The
+history enters only through the guarantee that the score makes false positives at all --
+which `deployedPoint_specificity_lt_one` supplies and which no deployed score escapes. -/
+theorem deployedNetBenefit_anti_in_threshold (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t₁ t₂ : ℝ) (hπ1 : prevalence < 1) (hE : 0 < V_E)
+    (hflow : 0 < p.mu + p.mig) (h0 : 0 ≤ t₁) (h : t₁ < t₂) (h1 : t₂ < 1) :
+    L.deployedNetBenefit p V_E prevalence t₂ < L.deployedNetBenefit p V_E prevalence t₁ :=
+  OperatingPoint.netBenefit_lt_of_threshold_lt _ prevalence t₁ t₂ hπ1
+    (deployedPoint_specificity_lt_one L p V_E hE hflow) h0 h h1
+
+/-- **A commoner disease raises the deployed predictive value at the same history.**
+
+The prevalence axis, and the reason a deployed predictive value is not transportable even
+between two populations with the SAME demographic relationship to the training set. Two
+clinics differing only in how common the disease is report different numbers from the same
+score at the same threshold, and nothing has gone wrong. -/
+theorem deployedPPV_mono_in_prevalence (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E π₁ π₂ : ℝ) (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig)
+    (h0 : 0 < π₁) (h : π₁ < π₂) (h1 : π₂ ≤ 1) :
+    L.deployedPPV p V_E π₁ < L.deployedPPV p V_E π₂ :=
+  OperatingPoint.positivePredictiveValue_lt_of_prevalence_lt _ π₁ π₂
+    (deployedPoint_sensitivity_pos L p V_E hE hflow)
+    (deployedPoint_specificity_lt_one L p V_E hE hflow) h0 h h1
+
+/-- **And LOWERS the deployed negative predictive value**, at the same history and the same
+threshold. The two run opposite ways, so a deployment cannot be defended on both by
+choosing where to deploy -- which is the sharpest form of the warning, because the
+demographic results above might otherwise be read as saying the deployment population is
+the free parameter. -/
+theorem deployedNPV_anti_in_prevalence (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E π₁ π₂ : ℝ) (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig)
+    (h0 : 0 < π₁) (h : π₁ < π₂) (h1 : π₂ < 1) :
+    L.deployedNPV p V_E π₂ < L.deployedNPV p V_E π₁ := by
+  have hq : 0 < (L.point (ScoreMoments.deployedR2 p V_E)).specificity := by
+    have hpos := deployedR2_pos p V_E (le_of_lt hE) hflow
+    have hle := (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).2
+    have h0' := (L.point_admissible 0 le_rfl zero_le_one).specificity_nonneg
+    have := L.specificity_strictMono 0 (ScoreMoments.deployedR2 p V_E) le_rfl hpos hle
+    linarith
+  have hs : (L.point (ScoreMoments.deployedR2 p V_E)).sensitivity < 1 := by
+    have hlt := deployedR2_lt_one p V_E hE hflow
+    have h0' := (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).1
+    have h1' := (L.point_admissible 1 zero_le_one le_rfl).sensitivity_le_one
+    have := L.sensitivity_strictMono (ScoreMoments.deployedR2 p V_E) 1 h0' hlt le_rfl
+    linarith
+  exact OperatingPoint.negativePredictiveValue_lt_of_prevalence_lt _ π₁ π₂ hq hs h0 h h1
+
+/-- **Exactly when a deployed score is not worth using**, as a function of the demographic
+history, the threshold and the prevalence.
+
+The decision-analytic bottom line. A polygenic score deployed across a differentiation is
+worse than treating everyone precisely when the cases its lost discrimination causes it to
+miss outweigh the unnecessary treatments it still avoids, at the exchange rate the
+clinician's threshold declares. Every quantity in the condition is reachable from
+`(Nₑ, m, μ, d)`, which is what the rest of this file was for. -/
+theorem deployedNetBenefit_lt_treatAll_iff (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t : ℝ) :
+    L.deployedNetBenefit p V_E prevalence t
+        < OperatingPoint.treatAll.netBenefit prevalence t ↔
+      (1 - prevalence) * (L.point (ScoreMoments.deployedR2 p V_E)).specificity
+          * OperatingPoint.thresholdOdds t
+        < prevalence * (1 - (L.point (ScoreMoments.deployedR2 p V_E)).sensitivity) :=
+  OperatingPoint.netBenefit_lt_treatAll_iff _ prevalence t
 
 /-- **Deploying across a differentiation reclassifies patients the wrong way.**
 

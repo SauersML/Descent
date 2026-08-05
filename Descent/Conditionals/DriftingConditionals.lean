@@ -2,8 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Conditionals.DriftingConditional
-import Descent.Conditionals.DynamicsContrast
+-- `Spectral.twoStatePersistence` is named in three theorems below. It used to arrive
+-- along a twenty-two module path out through `PopGen.LDDecayTheory`,
+-- `Program.OpenQuestions` and the whole `PortabilityDrift` interior; the module that
+-- defines it is one line.
 import Descent.Spectral.ReversibleMarkovSpectrum
+import Descent.Conditionals.DynamicsContrast
+import Descent.Core.Ratios
 
 /-!
 # Drifting conditionals in finite biological state spaces

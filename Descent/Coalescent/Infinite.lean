@@ -43,7 +43,7 @@ namespace Coalescent
 abbrev EInf := Setoid ℕ
 
 /-- **K-C (2.7): `ρ_n`**, the restriction of a relation on `ℕ` to `{1, …, n}`. -/
-def restrictInf (n : ℕ) (R : EInf) : ER n := Setoid.comap (fun i : Fin n => (i : ℕ)) R
+def restrictInf (n : ℕ) (R : EInf) : ER n := Setoid.comap (fun i : Fin n ↦ (i : ℕ)) R
 
 theorem restrictInf_rel (n : ℕ) (R : EInf) (x y : Fin n) :
     (restrictInf n R).r x y ↔ R.r (x : ℕ) (y : ℕ) := Iff.rfl
@@ -53,7 +53,7 @@ to `m`: the consistency that makes "a process on `𝓔` is its family of restric
 meaningful. -/
 theorem restrictInf_restrict {m n : ℕ} (h : m ≤ n) (R : EInf) :
     restrict h (restrictInf n R) = restrictInf m R :=
-  Setoid.ext fun _ _ => Iff.rfl
+  Setoid.ext fun _ _ ↦ Iff.rfl
 
 /-- **A compatible family gives the same answer at every large enough index.**  This is the
 only place compatibility is used, and it is what makes the limit relation well defined. -/
@@ -119,7 +119,7 @@ def ofCompatible (ξ : ∀ n, ER n)
 theorem restrictInf_ofCompatible (ξ : ∀ n, ER n)
     (hcomp : ∀ (m n : ℕ) (h : m ≤ n), restrict h (ξ n) = ξ m) (n : ℕ) :
     restrictInf n (ofCompatible ξ hcomp) = ξ n := by
-  refine Setoid.ext fun x y => ?_
+  refine Setoid.ext fun x y ↦ ?_
   show (ξ (max (x : ℕ) (y : ℕ) + 1)).r ⟨(x : ℕ), by omega⟩ ⟨(y : ℕ), by omega⟩ ↔ (ξ n).r x y
   have hx : (x : ℕ) < n := x.isLt
   have hy : (y : ℕ) < n := y.isLt
@@ -134,7 +134,7 @@ restrictions are equal, because any pair of naturals is inside some initial segm
 `restrictInf_ofCompatible`, this is the projective limit property in full, and it is what
 K-C Theorem 3's measure-theoretic argument sits on top of. -/
 theorem eq_ofCompatible {R S : EInf} (h : ∀ n, restrictInf n R = restrictInf n S) : R = S := by
-  refine Setoid.ext fun i j => ?_
+  refine Setoid.ext fun i j ↦ ?_
   have hn := h (max i j + 1)
   constructor
   · intro hr

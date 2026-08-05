@@ -1,10 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Mathlib.Analysis.PSeries
-import Mathlib.Tactic
+import Descent.Coalescent.Rates
+import Descent.Coalescent.Lambda
 import Descent.Coalescent.Beta
 import Descent.Coalescent.BranchLength
+import Mathlib.Analysis.PSeries
+import Mathlib.Tactic
 
 namespace Descent
 

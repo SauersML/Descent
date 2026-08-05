@@ -1,8 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Xi
 import Mathlib.Tactic
-import Descent.Coalescent.Lambda
 
 namespace Descent
 
@@ -51,7 +51,7 @@ def IsShape (s : MergerShape) : Prop := ∀ k ∈ s, 2 ≤ k
 
 /-- **The block count a shape costs.**  Each group of size `kᵢ` leaves one block behind, so
 `kᵢ - 1` are lost; summing over groups gives the drop. -/
-def shapeDrop (s : MergerShape) : ℕ := (s.map fun k => k - 1).sum
+def shapeDrop (s : MergerShape) : ℕ := (s.map fun k ↦ k - 1).sum
 
 @[simp] theorem shapeDrop_zero : shapeDrop 0 = 0 := rfl
 

@@ -127,7 +127,7 @@ theorem ancestralPartition_eq_bot_iff {k N : ℕ} (f : Fin k → Fin N) :
     rw [h] at hr
     exact hr
   · intro hf
-    refine Setoid.ext fun x y => ⟨fun hxy => hf hxy, fun hxy => ?_⟩
+    refine Setoid.ext fun x y ↦ ⟨fun hxy ↦ hf hxy, fun hxy ↦ ?_⟩
     show f x = f y
     rw [hxy]
 
@@ -251,8 +251,8 @@ theorem one_sub_sum_le_prod {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i) 
   induction k with
   | zero => simp
   | succ m ih =>
-      have ihm := ih fun i hi => h1 i (by omega)
-      have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
+      have ihm := ih fun i hi ↦ h1 i (by omega)
+      have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ ↦ h0 i
       have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m (by omega)]
       have hmul : (1 - ∑ i ∈ range m, a i) * (1 - a m)
           ≤ (∏ i ∈ range m, (1 - a i)) * (1 - a m) :=
@@ -269,8 +269,8 @@ theorem prod_le_one_sub_sum_add_sq {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 �
   induction k with
   | zero => simp
   | succ m ih =>
-      have ihm := ih fun i hi => h1 i (by omega)
-      have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
+      have ihm := ih fun i hi ↦ h1 i (by omega)
+      have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ ↦ h0 i
       have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m (by omega)]
       have hmul : (∏ i ∈ range m, (1 - a i)) * (1 - a m)
           ≤ (1 - ∑ i ∈ range m, a i + (∑ i ∈ range m, a i) ^ 2 / 2) * (1 - a m) :=
@@ -299,13 +299,13 @@ union bound over the `d_k = k(k-1)/2` pairs of lineages, each of which collides 
 theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     1 - noCoalescenceProb N k ≤ deathRate k / (N : ℝ) := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
-  have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i => by positivity
+  have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i ↦ by positivity
   have h1 : ∀ i < k, (i : ℝ) / (N : ℝ) ≤ 1 := by
     intro i hi
     rw [div_le_one hN']
     have : i ≤ N := le_trans (le_of_lt hi) hkN
     exact_mod_cast this
-  have := one_sub_sum_le_prod (k := k) (fun i => (i : ℝ) / (N : ℝ)) h0 h1
+  have := one_sub_sum_le_prod (k := k) (fun i ↦ (i : ℝ) / (N : ℝ)) h0 h1
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith
 
@@ -315,13 +315,13 @@ exhibited. -/
 theorem le_coalescenceProb {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     deathRate k / (N : ℝ) - (deathRate k / (N : ℝ)) ^ 2 / 2 ≤ 1 - noCoalescenceProb N k := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
-  have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i => by positivity
+  have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i ↦ by positivity
   have h1 : ∀ i < k, (i : ℝ) / (N : ℝ) ≤ 1 := by
     intro i hi
     rw [div_le_one hN']
     have : i ≤ N := le_trans (le_of_lt hi) hkN
     exact_mod_cast this
-  have := prod_le_one_sub_sum_add_sq (k := k) (fun i => (i : ℝ) / (N : ℝ)) h0 h1
+  have := prod_le_one_sub_sum_add_sq (k := k) (fun i ↦ (i : ℝ) / (N : ℝ)) h0 h1
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith
 

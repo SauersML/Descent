@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.PopGen.LDDecayTheory
+import Descent.Core.Fst
 
 namespace Descent.PopGen
 

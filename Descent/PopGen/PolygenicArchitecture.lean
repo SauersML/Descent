@@ -1,9 +1,17 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Decision.CertificateGrading
-import Descent.Decision.TransportedMinimax
 import Descent.PopGen.HaplotypeTheory
+import Descent.Decision.CertificateGrading
+-- `momentBodyEntropyExponent`, `hyperrectangleEntropyExponent` and
+-- `momentBody_entropy_exponent_lt` are used in the covering-exponent section
+-- below.  They were previously reached by accident, through
+-- `CertificateGrading → … → SpectralDegradation → TransportedMinimax`, and
+-- `SpectralDegradation` itself referenced nothing from `TransportedMinimax` --
+-- so dropping that unused import removed this file's only path to names it
+-- genuinely uses.  Declared here, where the use is.
+import Descent.Decision.TransportedMinimax
+import Descent.Core.Fst
 
 namespace Descent.PopGen
 

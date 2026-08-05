@@ -1,8 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Population
 import Descent.Portability.PCCorrectability
-import Descent.Spectral.EnsembleChannel
+import Descent.Portability.AncestrySpecificPower
+import Descent.Core.Ratios
 
 namespace Descent.Portability
 

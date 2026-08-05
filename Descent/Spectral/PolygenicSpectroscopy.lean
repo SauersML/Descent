@@ -2,8 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.CramerStratum
-import Descent.Blindness.HiddenConeAmbiguity
 import Descent.Blindness.JetBarrier
+import Descent.Conditionals.LocalToGlobalCoherence
+import Descent.Blindness.HiddenConeAmbiguity
 
 namespace Descent.Spectral
 

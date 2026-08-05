@@ -1,28 +1,31 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.BundleRigidity.Cycles
-import Descent.Blindness.BundleRigidity.Dichotomy
-import Descent.Blindness.CountingInvariantInstances
-import Descent.Blindness.DecoratedGeometryBlindness
-import Descent.Foundations.CovarianceStructure
-import Descent.PopGen.AdditiveInvariance
-import Descent.PopGen.DemographicCapacity
-import Descent.PopGen.HumanDemography
-import Descent.Portability.CorrectionBiology
-import Descent.Portability.EquityAndImplementation
-import Descent.Portability.GenerativePortabilityLaw
+import Descent.Portability.MultiAncestryTheory
+import Descent.Portability.SampleOverlapBias
+import Descent.Portability.PortabilityBounds
+import Descent.Core.Moments
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
-import Descent.Portability.MultiAncestryTheory
-import Descent.Portability.PCCorrectability.Design
-import Descent.Portability.PCCorrectability.EndToEnd
+import Descent.Portability.EquityAndImplementation
+import Descent.PopGen.HumanDemography
+import Descent.PopGen.DemographicCapacity
+import Descent.Portability.CorrectionBiology
+import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
-import Descent.Portability.PolygenicContinuumCalibration
-import Descent.Portability.PortabilityBounds
-import Descent.Portability.SampleOverlapBias
+import Descent.Portability.PCCorrectability.Diagnostic
+import Descent.Foundations.CovarianceStructure
+import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Program.CausalInference
+import Descent.Portability.PolygenicContinuumCalibration
+import Descent.Portability.GenerativePortabilityLaw
+import Descent.Portability.PCCorrectability.EndToEnd
 import Descent.Spectral.ProjectionSolve
+import Descent.Portability.PCCorrectability.Design
+import Descent.Blindness.CountingInvariantInstances
+import Descent.Blindness.BundleRigidity.Cycles
+import Descent.Blindness.BundleRigidity.Dichotomy
+import Descent.Blindness.BundleRigidity.TwoAtom
 
 /-!
 # What the separate results say when they are put together
@@ -594,5 +597,60 @@ theorem parity_and_commutativity_admit_no_escape
       Descent.Blindness.BundleRigidity.defect P Q [i, j] [j, i] = 1 :=
   ⟨Descent.Blindness.BundleRigidity.no_odd_cycle_of_pos ρ hρ n hodd,
    Descent.Blindness.BundleRigidity.commutation_defect_eq_one P Q i j hP hP' hQ hQ'⟩
+
+/-- **The fourth proportional-reduction body, and the one that could not be reached from
+its siblings.**
+
+`PopulationGeneticsFoundations.fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE`
+already relates
+three spellings of `1 - residual/baseline`: a heterozygosity ratio, a coalescence-time
+ratio, and an error-to-variance ratio.  `PCCorrectability.Diagnostic.pcTargetAxisEfficacy`
+is the fourth — the fraction of a target ancestry axis captured by correction, written in
+its own docstring as `V_K = 1 - H'/H`, deliberately echoing `F_ST` — and it could not join
+them there, because `Diagnostic` imports nothing outside `PCCorrectability` and none of the
+other three files imports `Diagnostic`.
+
+This module reaches all four, through `StratificationConfounding → PCCorrectability`.  That
+is the whole reason the statement is here and not beside any of the definitions: **the
+tying theorem belongs wherever both sides are visible, not in one of the two files.**  A
+guard demanding the latter reported this pair as unfixable when the only thing missing was
+permission to speak from a third module.
+
+As with its siblings these are four different quantities and no value of one may be
+substituted for another; what is shared is the measure, and sharing it silently is what
+this section exists to prevent. -/
+theorem pcTargetAxisEfficacy_eq_proportionalReduction (residual baseline : ℝ) :
+    Portability.pcTargetAxisEfficacy baseline residual = PopGen.fstFromHetRatio residual baseline ∧
+      Portability.pcTargetAxisEfficacy baseline residual =
+        Portability.hudsonFstFromCoalescenceTimes residual baseline ∧
+      Portability.pcTargetAxisEfficacy baseline residual = PopGen.r2FromMSE residual baseline := by
+  refine ⟨rfl, rfl, rfl⟩
+
+/-- **The two-atom modulus curves are Nei's `G_ST` at the fold, divided by the product of
+the two masses.**
+
+`BundleRigidity.mOne` and `BundleRigidity.mTwo` share the numerator `|1 - 2p|`, and their
+product is `(1 - 2p)² / (p (1 - p))`. The numerator is `neiGst p (1 - p)` by `neiGst_at_fold`
+and the denominator is the product of the family's two masses, so the constant inside the
+modulus curves is forced by the `ploidy` in `neiGst`'s normalisation rather than chosen.
+
+This is the folded-spectrum reading of that module stated as an equation: `τ p = 1 - p` is
+the ancestral/derived swap, `neiGst p (1 - p)` is symmetric under it, and the two modulus
+curves are exchanged by it. `TwoAtom` imports only Mathlib and that is deliberate; the
+statement therefore lives here, where both sides are visible. -/
+theorem mOne_mul_mTwo_eq_neiGst_at_fold (p : ℝ) :
+    Blindness.BundleRigidity.mOne p * Blindness.BundleRigidity.mTwo p = Descent.Core.neiGst p (1 - p) / (p * (1 - p)) := by
+  rw [Descent.Core.neiGst_at_fold]
+  unfold Blindness.BundleRigidity.mOne Blindness.BundleRigidity.mTwo Descent.Core.ploidy
+  rw [div_mul_div_comm, ← sq_abs (1 - 2 * p), pow_two]
+
+/-- **The importance-weighting effective sample size is a response-to-noise
+permeability.** `(Σ w)² / Σ w²` is `Γ² / V` at `Γ = Σ w` and `V = Σ w²`: the reciprocal
+variance with which averaging independent copies of a summary estimates its tangent.
+`TransferLearningPGS` reads it as a sample count and `Permeability` reads it as
+information; the arithmetic is one map, so a change of convention in either is a change in
+both. -/
+theorem importanceWeightESS_eq_momentPermeability (sum_w sum_w_sq : ℝ) :
+    Portability.importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq := rfl
 
 end Descent.Program

@@ -173,7 +173,7 @@ theorem inner_split_sum (lam : ℕ) (hlam : 1 ≤ lam) :
 
 /-- A constant factor comes out of a sum over classes. -/
 theorem sum_map_mul_const (s : Multiset ℕ) (f : ℕ → ℝ) (c : ℝ) :
-    (s.map (fun l => f l * c)).sum = (s.map f).sum * c := by
+    (s.map (fun l ↦ f l * c)).sum = (s.map f).sum * c := by
   refine Multiset.induction_on s ?_ ?_
   · simp
   · intro a t ih
@@ -183,7 +183,7 @@ theorem sum_map_mul_const (s : Multiset ℕ) (f : ℕ → ℝ) (c : ℝ) :
 /-- `Σ_l (λ_l - 1) = Σ_l λ_l - (number of classes)`: the identity K-C's induction closes
 with, once the class sizes are known to be positive. -/
 theorem sum_map_sub_one (s : Multiset ℕ) :
-    (s.map (fun l : ℕ => (l : ℝ) - 1)).sum = ((s.sum : ℕ) : ℝ) - (Multiset.card s : ℝ) := by
+    (s.map (fun l : ℕ ↦ (l : ℝ) - 1)).sum = ((s.sum : ℕ) : ℝ) - (Multiset.card s : ℝ) := by
   refine Multiset.induction_on s ?_ ?_
   · simp
   · intro a t ih
@@ -205,7 +205,7 @@ Kingman's displayed algebra. -/
 theorem absoluteProb_recursion {n k : ℕ} (hk : 2 ≤ k) (hkn : k ≤ n) (lam : Multiset ℕ)
     (hcard : Multiset.card lam = k - 1) (hsum : lam.sum = n) :
     jumpProb k * jumpCoeff n k *
-        (lam.map (fun l : ℕ =>
+        (lam.map (fun l : ℕ ↦
           ((l : ℝ) - 1) * ((((lam.map Nat.factorial).prod : ℕ) : ℝ) / 2))).sum
       = absoluteProb n (k - 1) lam := by
   have hone : (1 : ℕ) ≤ k := le_trans one_le_two hk
@@ -219,7 +219,7 @@ theorem absoluteProb_recursion {n k : ℕ} (hk : 2 ≤ k) (hkn : k ≤ n) (lam :
     push_cast [h1]
     ring
   -- Kingman's `Σ_l (λ_l - 1) = n - (k-1)`, with the class-size product factored out
-  rw [sum_map_mul_const lam (fun l : ℕ => (l : ℝ) - 1), sum_map_sub_one lam, hcard, hsum, hk1]
+  rw [sum_map_mul_const lam (fun l : ℕ ↦ (l : ℝ) - 1), sum_map_sub_one lam, hcard, hsum, hk1]
   have hrec := jumpCoeff_recursion hk hkn
   have hd : deathRate k ≠ 0 := deathRate_ne_zero hk
   unfold absoluteProb jumpProb

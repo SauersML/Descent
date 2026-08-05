@@ -1,7 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
+-- `Portability.hudsonFstFromCoalescenceTimes`, `hetDecayFromScaled` and `r2FromMSE` are
+-- named below; the first is Portability's, the others `PopGen.DGP`'s.
+import Descent.PopGen.DGP
+import Descent.Portability.PortabilityDrift
 
 namespace Descent.PopGen
 

@@ -1,9 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.HoldingTime
+import Descent.Coalescent.CompetingRates
 import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.Tactic
-import Descent.Coalescent.HoldingTime
 
 namespace Descent
 
@@ -91,14 +92,15 @@ theorem stepLaw_time_marginal {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) (B : 
     inferInstance
   rw [stepLaw_prod, measure_univ, one_mul]
 
-/-- **Every destination is equally likely, whatever the clock does.**  The destination
-marginal assigns each cover `1/C(k,2)`, which is `jumpProb` -- so conditioning on the
-holding time would not change it.  That is the content of independence stated the way K-C
-(2.2) states its conclusion. -/
-theorem stepLaw_destination_uniform {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η : {η : ER n // Covers ξ η}) :
-    ((jumpStep ξ hk) η).toReal = jumpProb (blocks ξ) :=
-  jumpStep_apply_eq_jumpProb ξ hk η
+/-! ### `stepLaw_destination_uniform` is deleted
+
+It claimed that every destination is equally likely whatever the clock does, and its
+statement `((jumpStep ξ hk) η).toReal = jumpProb (blocks ξ)` named neither `stepLaw` nor
+the clock: it was `Process.jumpStep_apply_eq_jumpProb` restated, word for word and proof
+for proof, and `Kernel.jumpKernel_apply_cover` is the same restatement in a third module.
+The uniformity of the destination under the coupled law is `stepLaw_destination_marginal`
+composed with the parent theorem, and a reader who wants it should be sent to those two
+rather than to a third name that hides which one is doing the work. -/
 
 end Coalescent
 

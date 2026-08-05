@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Moments
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
+import Descent.Core.Ratios
+import Descent.PopGen.AssortativeMatingPGS
 
 namespace Descent.Portability
 
@@ -2478,12 +2479,12 @@ theorem ldCorrelationDecay_strictAnti_fst
 
 /-! ### Generation-indexed population-genetic parameters
 
-The record itself is `Core.PopGenParameters`. It used to be written out here as
-`Descent.Core.PopGenParameters` -- the same fields and the same positivity proofs as
+The record itself is `Core.PopGenParameters`, and this module writes out no second copy of
+it. A local record with the same fields and the same positivity proofs as
 `DGP.EvolutionaryParameters`, differing only in spelling `μ` for `mu` and in dropping the
-divergence time. Two records meant a constraint tightened on one reached the other only
-if someone noticed. The accessors below are the generation-indexed laws this module adds
-to the shared record, not a second record.
+divergence time, would mean a constraint tightened on one reaches the other only if someone
+noticed. The accessors below are the generation-indexed laws this module adds to the shared
+record, not a second record.
 -/
 end PresentDayMetrics
 
@@ -2519,5 +2520,19 @@ its four siblings. -/
 theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
     Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
   unfold Portability.realWorldPGSVariance Descent.Core.retainedFraction; ring
+
+/-- **Cross-check spanning the mating and drift modules: assortative mating and
+drift act multiplicatively on the additive variance.**
+
+`amEquilibriumVariance` inflates by `1/(1 - r h²)` and `presentDayPGSVariance`
+deflates by `(1 - F_ST)`, and composing them gives the product. Stated because
+the two modules described the same variance and were never related, which is
+the condition under which a falsified companion of `amEquilibriumVariance`
+survived. -/
+theorem amEquilibrium_then_drift (V_A r h2 fst : ℝ) :
+    Portability.presentDayPGSVariance (PopGen.amEquilibriumVariance V_A r h2) fst =
+      (1 - fst) * (V_A / (1 - r * h2)) := by
+  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet PopGen.amEquilibriumVariance
+  ring
 
 end Descent.Portability

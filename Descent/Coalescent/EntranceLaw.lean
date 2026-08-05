@@ -1,10 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.DescentTime
+import Descent.Coalescent.HoldingTime
 import Mathlib.Probability.ProductMeasure
 import Mathlib.Tactic
-import Descent.Coalescent.BertrandDescent
-import Descent.Coalescent.HoldingTime
 
 namespace Descent
 
