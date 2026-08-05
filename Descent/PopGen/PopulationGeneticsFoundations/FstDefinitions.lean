@@ -60,6 +60,34 @@ section FstDefinitions
 noncomputable def neiFst (H_T H_S : ℝ) : ℝ :=
   (H_T - H_S) / H_T
 
+/-- **This body, typed as a Nei estimate, converts to Hudson by the Möbius map.**
+
+`Core.NeiFst` and `Core.HudsonFst` exist so that a Nei value cannot be passed where a
+Hudson one is required, and until now nothing outside `Core.Fst` was typed with them: the
+guarantee was available and unexercised, and this definition -- the one the docstring above
+says it is "the factor-of-two-to-four error the corpus has already paid for once" to
+substitute -- returned a bare real like every other `F_ST` in the corpus.
+
+Wrapping it here does not retype the corpus. What it does is state the conversion at the
+measured body rather than at an abstract type, so the two are joined by a theorem
+somewhere. -/
+theorem neiFst_toHudson (H_T H_S : ℝ) :
+    (Descent.Core.hudsonOfNei ⟨neiFst H_T H_S⟩).value
+      = 2 * neiFst H_T H_S / (1 + neiFst H_T H_S) := rfl
+
+/-- **And it differs from its Hudson conversion except at the two degenerate values.**
+
+`Core.hudsonOfNei_eq_iff` says a Nei estimate equals its Hudson conversion only at `0` or
+`1`; instantiated here, that is a statement about THIS body. Anywhere a population is
+partially differentiated -- every case of interest -- reading this number as a Hudson
+`F_ST` reads a different quantity, and the measured ratios (0.62, 0.60, 0.68, 0.81) are
+what that difference looks like. -/
+theorem neiFst_eq_hudson_iff_degenerate (H_T H_S : ℝ)
+    (h : 1 + neiFst H_T H_S ≠ 0) :
+    (Descent.Core.hudsonOfNei ⟨neiFst H_T H_S⟩).value = neiFst H_T H_S
+      ↔ neiFst H_T H_S = 0 ∨ neiFst H_T H_S = 1 :=
+  Descent.Core.hudsonOfNei_eq_iff _ h
+
 /-- **Nei's `Fst` is a proportion of total heterozygosity, pinned.** This definition carries no
 result of its own. Subpopulations holding half the total heterozygosity give `Fst = 1/2`: the
 deficit is measured against the total, not against the subpopulation value, and it runs total
