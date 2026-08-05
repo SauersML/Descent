@@ -1034,9 +1034,46 @@ noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutatio
     Regime: closed population, no mutation -- carried by the structure's
     `mutation_negligible` field rather than assumed.
 
-    Empirical status: NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS.
+    Empirical status: **VALIDATED** in the regime it names
+    (`simcov/battery_wf_drift.py`, guard `wf-drift-in-regime-v1`). Forward
+    Wright-Fisher on 5000 independent biallelic loci at mutation rate ZERO,
+    starting from standing variation, 40 replicates, heterozygosity averaged
+    over ALL loci including those that have fixed:
 
-    The run carrying the FALSIFIED verdict measured at demographic equilibrium
+      Ne    t     measured             this body   sems   haploid   doubled
+      100    25   0.88354 ± 0.00060      0.88222    2.20     176.5     175.7
+      100    50   0.77973 ± 0.00080      0.77831    1.76     217.2     216.2
+      100   100   0.60728 ± 0.00101      0.60577    1.49     238.1     237.2
+      100   200   0.36777 ± 0.00104      0.36696    0.79     225.5     224.8
+      250    62   0.88378 ± 0.00073      0.88327    0.70     141.9     141.7
+      250   125   0.77898 ± 0.00101      0.77861    0.37     171.7     171.4
+      250   250   0.60647 ± 0.00115      0.60623    0.21     209.0     208.6
+      250   500   0.36749 ± 0.00115      0.36751    0.01     202.7     202.4
+
+    Worst cell 2.20 sems over eight. Competitors carried on the SAME cells: the
+    haploid reading `(1 - 1/Nₑ)^t` and the doubled exponent
+    `(1 - 1/(2 Nₑ))^(2t)` are excluded at 142 to 238 sems, so this is a
+    discrimination and not an algebraic identity.
+
+    What the design does NOT separate: the diffusion form `exp(-t/(2 Nₑ))`
+    sits within 1.7 sems everywhere, because it differs from this body by
+    `O(1/Nₑ)` and these `Nₑ` are too large to resolve it. Discrete against
+    continuous is not decided here and is not claimed.
+
+    Control, and it is the one that matters: the same ratio computed over only
+    the still-SEGREGATING loci lands 74 to 536 sems from the all-loci value.
+    Conditioning on polymorphism inflates heterozygosity exactly where drift
+    has done its work, so the denominator must be the whole sequence. The
+    control fires, so the design is sensitive to the trap it had to avoid.
+
+    Residual named rather than hidden: the measurement sits above the body in
+    seven of eight cells, with the offset shrinking as `Nₑ` grows -- 2.20 sems
+    at `Nₑ = 100` against 0.01 at `Nₑ = 250`. That is the shape of an `O(1/Nₑ)`
+    finite-size term rather than a wrong law, and no cell reaches the three-sem
+    gate.
+
+    HISTORY, and why the verdict moved. This carried a FALSIFIED verdict from a
+    run that measured at demographic equilibrium
     with `Ne = 1000`, `t = 4000`, where this body gives `0.135` against a
     measured `1.025 ± 0.020`. That run is outside the regime this definition
     states, and the regime is not a docstring caveat: it is the
@@ -1049,13 +1086,8 @@ noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutatio
     that omits mutation, measured where mutation dominates, reports the term it
     omits rather than an error in the term it keeps.
 
-    So the verdict is overturned as a design fault, not repaired: the body is
-    unchanged and no new measurement is claimed for it. What is OWED is the
-    in-regime test -- a Wright-Fisher run at mutation rate zero, heterozygosity
-    divided by the WHOLE sequence rather than by segregating sites, comparing
-    `H_t / H_0` against `(1 - 1/(2 Nₑ))^t` across several `t`. Until that runs
-    this is untested inside its regime, which is a debt and is not the same
-    thing as a falsification. -/
+    The body is unchanged. What settled the verdict was running the test the
+    old one had not: the table above is that run, and it agrees. -/
 noncomputable def ClosedPopulationNoMutation.retention
     (r : ClosedPopulationNoMutation) : ℝ :=
   (1 - 1 / (2 * r.Ne)) ^ r.horizon
@@ -1064,10 +1096,11 @@ noncomputable def ClosedPopulationNoMutation.retention
 
     Regime: closed population, no mutation.
 
-    Empirical status: NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS; see
-    `ClosedPopulationNoMutation.retention`, whose verdict this inherits. The
-    falsifying run was outside the regime the structure enforces, and the
-    in-regime test is owed rather than failed. -/
+    Empirical status: **VALIDATED** in its regime, inherited from
+    `ClosedPopulationNoMutation.retention`, which this multiplies by `H₀`. The
+    earlier FALSIFIED verdict came from a run outside the regime the structure
+    enforces; see there for the in-regime table, the rejected competitors and
+    the segregating-sites control. -/
 noncomputable def ClosedPopulationNoMutation.targetHet
     (r : ClosedPopulationNoMutation) : ℝ :=
   r.H₀ * r.retention
