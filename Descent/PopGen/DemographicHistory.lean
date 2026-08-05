@@ -718,14 +718,14 @@ This is `admixedFst α fst_AB`.
     read `α` as the same mixing proportion, so a design that fixed the weight
     for one fixes the reading for the other. -/
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
-  α * p_A + (1 - α) * p_B
+  Descent.Core.convexCombination α p_A p_B
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem admixedAlleleFreq_at_reference_point :
     admixedAlleleFreq 1 1 1 = 1 := by
-  norm_num [admixedAlleleFreq]
+  norm_num [admixedAlleleFreq, Descent.Core.convexCombination]
 
 
 /-- **Key algebraic identity**: the difference between admixed and source A
@@ -733,7 +733,7 @@ theorem admixedAlleleFreq_at_reference_point :
     This is the core of the (1-α)² derivation. -/
 theorem admixed_freq_diff (α p_A p_B : ℝ) :
     admixedAlleleFreq α p_A p_B - p_A = (1 - α) * (p_B - p_A) := by
-  unfold admixedAlleleFreq
+  unfold admixedAlleleFreq Descent.Core.convexCombination
   ring
 
 /-- **Derivation**: If variance of allele frequency differences satisfies

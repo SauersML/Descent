@@ -206,7 +206,7 @@ numerator is large; a proportional reduction is large when it is small. Writing 
 relation down is what stops the sign being carried by the reader. -/
 theorem r2FromMSE_eq_one_sub_effectShare (mse varY : ℝ) :
     r2FromMSE mse varY = 1 - effectShare mse varY := by
-  unfold r2FromMSE effectShare; ring
+  unfold r2FromMSE effectShare Descent.Core.proportionalReduction; ring
 
 /-- `effectShare ie te` lies in [0,1] when `0 ≤ ie`, `0 < te` and `ie ≤ te`. A statement about
     a ratio of reals; "mediated" is not established anywhere. -/

@@ -402,7 +402,7 @@ theorem admixtureLDTwoLocus_eq_haplotype_sub_marginals
 theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
     admixtureLDTwoLocus alpha p_A q_A p_B q_B =
       alpha * (1 - alpha) * (p_A - p_B) * (q_A - q_B) := by
-  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq
+  unfold admixtureLDTwoLocus haplotypeFreqAdmixed admixedAlleleFreq Descent.Core.convexCombination
   ring
 
 /-- **Recombination decay of admixture LD (Step 5).**
@@ -423,7 +423,7 @@ the theorem states a number: an inequality or an invariance leaves a family of b
 satisfying it, and a value does not. -/
 theorem admixtureLDAtGen_at_reference_point :
     admixtureLDAtGen (1 / 2) 1 1 0 0 0 1 = 1 / 4 := by
-  norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed]
+  norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed, Descent.Core.convexCombination]
 
 
 /-- **Full admixture LD formula at generation g.**

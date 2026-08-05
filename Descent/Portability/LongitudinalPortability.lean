@@ -5,6 +5,7 @@ import Descent.Portability.PGSCalibrationTheory
 import Descent.PopGen.LDDecayTheory
 import Descent.Portability.HorizonCurve
 import Descent.Conditionals.DriftingConditional
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -161,14 +162,14 @@ it. -/
     by 68, and the linear `1 - rt` by 98. The positive control -- NO recombination, where the
     disequilibrium must persist unchanged -- passes on the identical `evolve` path. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
-  (1 - r) ^ t
+  Descent.Core.geometricDecay r t
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem ldDecayPerGeneration_at_reference_point :
     ldDecayPerGeneration (1 / 2) 2 = 1 / 4 := by
-  norm_num [ldDecayPerGeneration]
+  norm_num [ldDecayPerGeneration, Descent.Core.geometricDecay]
 
 /-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
@@ -190,20 +191,20 @@ in-flight work. -/
 theorem ldDecayPerGeneration_nonneg (r : ℝ) (t : ℕ)
     (h_r_le : r ≤ 1) :
     0 ≤ ldDecayPerGeneration r t := by
-  unfold ldDecayPerGeneration
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay
   exact pow_nonneg (by linarith) t
 
 /-- LD retention is at most one for a nonnegative recombination fraction. -/
 theorem ldDecayPerGeneration_le_one (r : ℝ) (t : ℕ)
     (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
     ldDecayPerGeneration r t ≤ 1 := by
-  unfold ldDecayPerGeneration
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay
   exact pow_le_one₀ (by linarith) (by linarith)
 
 /-- Discrete LD retention vanishes exactly after positive time at complete recombination. -/
 theorem ldDecayPerGeneration_eq_zero_iff (r : ℝ) (t : ℕ) :
     ldDecayPerGeneration r t = 0 ↔ r = 1 ∧ 0 < t := by
-  unfold ldDecayPerGeneration
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay
   constructor
   · intro h
     have h_t : t ≠ 0 := by
@@ -220,7 +221,7 @@ recombination or at elapsed time zero. -/
 theorem ldDecayPerGeneration_eq_one_iff (r : ℝ) (t : ℕ)
     (h_r : 0 ≤ r) (h_r_le : r ≤ 1) :
     ldDecayPerGeneration r t = 1 ↔ r = 0 ∨ t = 0 := by
-  unfold ldDecayPerGeneration
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay
   constructor
   · intro h
     by_cases h_t : t = 0
@@ -238,7 +239,7 @@ theorem ldDecayPerGeneration_lt_of_recombination_lt (r₁ r₂ : ℝ) (t : ℕ)
     (h_r₂ : r₂ ≤ 1)
     (h_lt : r₁ < r₂) (h_t : 0 < t) :
     ldDecayPerGeneration r₂ t < ldDecayPerGeneration r₁ t := by
-  unfold ldDecayPerGeneration
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay
   exact pow_lt_pow_left₀ (by linarith) (by linarith) (by omega)
 
 end GenerationalDecay

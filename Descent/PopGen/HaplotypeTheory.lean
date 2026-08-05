@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Descent.Program.OpenQuestions
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -287,7 +288,7 @@ section PhaseDependentEffects
 frequency `freq_cis` and trans frequency `1 - freq_cis`. -/
 noncomputable def averagePhaseInteraction
     (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
-  freq_cis * interaction_cis + (1 - freq_cis) * interaction_trans
+  Descent.Core.convexCombination freq_cis interaction_cis interaction_trans
 
 /-! `averagePhaseInteraction` -- **Empirical status: VALIDATED**
 (`simcov/battery_bulk43.py`, `group_c`). 3×10⁶ individuals, a fraction
@@ -317,7 +318,7 @@ combination and would fail here. This is also the reference the transport-bias d
 are differences of, so fixing it fixes what those differences measure. -/
 theorem averagePhaseInteraction_all_cis (interaction_cis interaction_trans : ℝ) :
     averagePhaseInteraction 1 interaction_cis interaction_trans = interaction_cis := by
-  unfold averagePhaseInteraction
+  unfold averagePhaseInteraction Descent.Core.convexCombination
   ring
 
 /-- Structural error from using a dosage-only predictor that cannot distinguish
@@ -464,7 +465,7 @@ weighting them differently -- or taking a signed difference where the name says
 bias -- gives a different number here. -/
 theorem haplotypeTransportBias_at_reference_point :
     haplotypeTransportBias (1 / 2) 1 1 0 0 = 1 := by
-  unfold haplotypeTransportBias averagePhaseInteraction
+  unfold haplotypeTransportBias averagePhaseInteraction Descent.Core.convexCombination
   norm_num
 
 
@@ -477,7 +478,7 @@ theorem dosagePhaseMisspecificationError_eq
     (freq_cis interaction_cis interaction_trans : ℝ) :
     dosagePhaseMisspecificationError freq_cis interaction_cis interaction_trans =
       freq_cis * (1 - freq_cis) * (interaction_cis - interaction_trans) ^ 2 := by
-  unfold dosagePhaseMisspecificationError averagePhaseInteraction
+  unfold dosagePhaseMisspecificationError averagePhaseInteraction Descent.Core.convexCombination
   ring
 
 /-- The structural dosage transport bias is exactly the shift in phase
@@ -486,7 +487,7 @@ theorem dosageTransportBias_eq
     (freq_cis_source freq_cis_target interaction_cis interaction_trans : ℝ) :
     dosageTransportBias freq_cis_source freq_cis_target interaction_cis interaction_trans =
       |freq_cis_target - freq_cis_source| * |interaction_cis - interaction_trans| := by
-  unfold dosageTransportBias averagePhaseInteraction
+  unfold dosageTransportBias averagePhaseInteraction Descent.Core.convexCombination
   have h_factor :
       freq_cis_target * interaction_cis + (1 - freq_cis_target) * interaction_trans -
         (freq_cis_source * interaction_cis + (1 - freq_cis_source) * interaction_trans) =
@@ -545,7 +546,7 @@ theorem haplotypeTransportBias_eq
         interaction_trans =
       |freq_cis_target * (pred_cis - interaction_cis) +
         (1 - freq_cis_target) * (pred_trans - interaction_trans)| := by
-  unfold haplotypeTransportBias averagePhaseInteraction
+  unfold haplotypeTransportBias averagePhaseInteraction Descent.Core.convexCombination
   have h_factor :
       freq_cis_target * pred_cis + (1 - freq_cis_target) * pred_trans -
           (freq_cis_target * interaction_cis +
@@ -896,24 +897,24 @@ section LocalAncestryHaplotypes
     Denotes: the reading its name carries. The same formula appears under
     names from 'frequency', 'variance', and the formula alone does not fix which is meant. -/
 noncomputable def ancestrySpecificEffect (beta_pop1 beta_pop2 alpha : ℝ) : ℝ :=
-  alpha * beta_pop1 + (1 - alpha) * beta_pop2
+  Descent.Core.convexCombination alpha beta_pop1 beta_pop2
 
 /-- With the same effect in both ancestries the average is that effect, at every mixing
 fraction: the ancestry weighting cannot manufacture a difference that is not there. -/
 theorem ancestrySpecificEffect_const (b alpha : ℝ) :
     ancestrySpecificEffect b b alpha = b := by
-  unfold ancestrySpecificEffect; ring
+  unfold ancestrySpecificEffect Descent.Core.convexCombination; ring
 
 /-- **The ancestry-averaged effect is a convex combination.** At the two pure ancestries it
 returns the corresponding effect, and swapping the two populations together with the ancestry
 fraction leaves it unchanged. A body not affine in the fraction fails the endpoints. -/
 theorem ancestrySpecificEffect_endpoints (b₁ b₂ : ℝ) :
     ancestrySpecificEffect b₁ b₂ 1 = b₁ ∧ ancestrySpecificEffect b₁ b₂ 0 = b₂ := by
-  constructor <;> unfold ancestrySpecificEffect <;> ring
+  constructor <;> unfold ancestrySpecificEffect Descent.Core.convexCombination <;> ring
 
 theorem ancestrySpecificEffect_relabel (b₁ b₂ alpha : ℝ) :
     ancestrySpecificEffect b₂ b₁ (1 - alpha) = ancestrySpecificEffect b₁ b₂ alpha := by
-  unfold ancestrySpecificEffect; ring
+  unfold ancestrySpecificEffect Descent.Core.convexCombination; ring
 
 /-- Ancestry-specific effect is a weighted average. -/
 theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
@@ -921,7 +922,7 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
     (h_order : beta₁ ≤ beta₂) :
     beta₁ ≤ ancestrySpecificEffect beta₁ beta₂ alpha ∧
     ancestrySpecificEffect beta₁ beta₂ alpha ≤ beta₂ := by
-  unfold ancestrySpecificEffect
+  unfold ancestrySpecificEffect Descent.Core.convexCombination
   constructor <;> nlinarith
 
 /-- Single-effect predictor obtained by averaging ancestry-specific effects
@@ -953,7 +954,7 @@ the theorem states a number: an inequality or an invariance leaves a family of b
 satisfying it, and a value does not. -/
 theorem globalAncestryAveragedEffect_at_reference_point :
     globalAncestryAveragedEffect 1 1 1 = 1 := by
-  norm_num [globalAncestryAveragedEffect, ancestrySpecificEffect]
+  norm_num [globalAncestryAveragedEffect, ancestrySpecificEffect, Descent.Core.convexCombination]
 
 
 
@@ -987,7 +988,7 @@ theorem localAncestryMisspecification_eq
     (beta₁ beta₂ alpha : ℝ) :
     localAncestryMisspecification beta₁ beta₂ alpha =
       alpha * (1 - alpha) * (beta₁ - beta₂) ^ 2 := by
-  unfold localAncestryMisspecification globalAncestryAveragedEffect ancestrySpecificEffect
+  unfold localAncestryMisspecification globalAncestryAveragedEffect ancestrySpecificEffect Descent.Core.convexCombination
   ring
 
 /-- **Local ancestry deconvolution for haplotypes.**

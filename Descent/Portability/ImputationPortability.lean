@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PhenomeWidePortability
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -401,7 +402,7 @@ theorem ascertainment_artificial_loss
 
 /-- Ascertainment loss from incompletely tagged causal variation. -/
 noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
-  (1 - coverage) * v_causal
+  Descent.Core.retainedFraction coverage v_causal
 
 /-- **ascertainment_loss pinned at a reference point.** No theorem in the corpus evaluated this
 definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
@@ -409,7 +410,7 @@ it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficient
 bound or an invariance leaves free. -/
 theorem ascertainment_loss_at_reference_point :
     ascertainment_loss (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold ascertainment_loss
+  unfold ascertainment_loss Descent.Core.retainedFraction
   norm_num
 
 /-- **Cross-check: incomplete tagging attenuates exactly as drift does.**
@@ -421,12 +422,12 @@ change in one goes unnoticed in the others. -/
 theorem ascertainment_loss_eq_presentDayPGSVariance (coverage v_causal : ℝ) :
     ascertainment_loss coverage v_causal =
       presentDayPGSVariance v_causal coverage := by
-  unfold ascertainment_loss presentDayPGSVariance pgsVarianceFromHet; ring
+  unfold ascertainment_loss presentDayPGSVariance pgsVarianceFromHet Descent.Core.retainedFraction; ring
 
 theorem ascertainment_loss_eq_neutralPortabilityRatioLD (coverage v_causal : ℝ) :
     ascertainment_loss coverage v_causal =
       neutralPortabilityRatioLD coverage v_causal := by
-  unfold ascertainment_loss neutralPortabilityRatioLD; ring
+  unfold ascertainment_loss neutralPortabilityRatioLD Descent.Core.retainedFraction; ring
 
 /-- **Multi-ethnic arrays reduce ascertainment bias.**
     Arrays designed with variants from multiple populations
@@ -440,7 +441,7 @@ theorem multi_ethnic_arrays_reduce_bias
     (h_better : cover_std < cover_multi) :
     ascertainment_loss cover_multi V_causal <
       ascertainment_loss cover_std V_causal := by
-  dsimp [ascertainment_loss]
+  dsimp [ascertainment_loss, Descent.Core.retainedFraction]
   exact mul_lt_mul_of_pos_right (by linarith) h_V
 
 /-- Total portability loss as the sum of biological and technical components. -/

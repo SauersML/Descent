@@ -8607,7 +8607,7 @@ theorem effectiveSymmetricMigration_between (m₁₂ m₂₁ : ℝ)
     and `0.506154`. The grid straddles `1/(2Ne)`, so the drift factor is visible
     rather than swamped, and the prediction covers half the unit interval. -/
 noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
-  (1 - r) ^ generations_since
+  Descent.Core.geometricDecay r generations_since
 
 /-- **The omission is one-sided: this body is never below the finite-population
     retention.** The finite-`Nₑ` retention per generation is
@@ -8623,7 +8623,7 @@ noncomputable def admixtureLDDecay (r : ℝ) (generations_since : ℕ) : ℝ :=
 theorem admixtureLDDecay_ge_finitePopulation (r Ne : ℝ) (t : ℕ)
     (hr1 : r ≤ 1) (hNe : 1 ≤ Ne) :
     ((1 - r) * (1 - 1 / (2 * Ne))) ^ t ≤ admixtureLDDecay r t := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   have hdrift_nn : (0 : ℝ) ≤ 1 - 1 / (2 * Ne) := by
     rw [sub_nonneg, div_le_one (by linarith)]; linarith
   have hdrift_le : (1 : ℝ) - 1 / (2 * Ne) ≤ 1 := by
@@ -8647,21 +8647,21 @@ theorem admixtureLDDecay_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
 theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
     (hr1 : r ≤ 1) :
     0 ≤ admixtureLDDecay r t := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   exact pow_nonneg (by linarith) t
 
 /-- Admixture LD decay is at most 1 for valid recombination rate. -/
 theorem admixtureLDDecay_le_one (r : ℝ) (t : ℕ)
     (hr : 0 ≤ r) (hr1 : r ≤ 1) :
     admixtureLDDecay r t ≤ 1 := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   exact pow_le_one₀ (by linarith) (by linarith)
 
 /-- **Admixture LD decays over time** (for positive recombination rate). -/
 theorem admixtureLDDecay_decreases_with_time (r : ℝ) (t₁ t₂ : ℕ)
     (hr : 0 < r) (hr1 : r < 1) (ht : t₁ < t₂) :
     admixtureLDDecay r t₂ < admixtureLDDecay r t₁ := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   have h_base_pos : 0 < 1 - r := by linarith
   have h_base_lt : 1 - r < 1 := by linarith
   exact pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt ht
@@ -8671,13 +8671,13 @@ theorem admixtureLDDecay_decreases_with_recombination (r₁ r₂ : ℝ) (t : ℕ
     (hr₂1 : r₂ < 1)
     (h_more : r₁ < r₂) (ht : 0 < t) :
     admixtureLDDecay r₂ t < admixtureLDDecay r₁ t := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   exact pow_lt_pow_left₀ (by linarith : 1 - r₂ < 1 - r₁) (by linarith) (by omega)
 
 /-- **At time 0 since admixture, LD is fully preserved.** -/
 theorem admixtureLDDecay_at_zero (r : ℝ) :
     admixtureLDDecay r 0 = 1 := by
-  unfold admixtureLDDecay
+  unfold admixtureLDDecay Descent.Core.geometricDecay
   simp
 
 /-- **Admixture LD creates a transient boost to portability.**

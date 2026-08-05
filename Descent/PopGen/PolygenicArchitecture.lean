@@ -11,6 +11,7 @@ import Descent.Decision.CertificateGrading
 -- so dropping that unused import removed this file's only path to names it
 -- genuinely uses.  Declared here, where the use is.
 import Descent.Decision.TransportedMinimax
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -112,7 +113,7 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     Denotes: a variance. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
-  pi * sigma_sq_large + (1 - pi) * sigma_sq_small
+  Descent.Core.convexCombination pi sigma_sq_large sigma_sq_small
 
 /-- **spikeAndSlabVariance pinned at a reference point.** No theorem in the corpus evaluated this
 definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
@@ -120,7 +121,7 @@ it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficient
 bound or an invariance leaves free. -/
 theorem spikeAndSlabVariance_at_reference_point :
     spikeAndSlabVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
-  unfold spikeAndSlabVariance
+  unfold spikeAndSlabVariance Descent.Core.convexCombination
   norm_num
 
 /-! ### The mixture map, shared with `HaplotypeTheory`
@@ -128,18 +129,18 @@ theorem spikeAndSlabVariance_at_reference_point :
 The spike-and-slab variance, the average phase interaction and the
 ancestry-specific effect are three different quantities — a variance, an
 interaction contribution and an effect size — that are all the same convex
-combination of two values at a mixing weight. `Conventions.convexMix` names
+combination of two values at a mixing weight. `Core.convexCombination` names
 that map; these two theorems record the coincidence in one of the two files
 each pair lives in, so that a change to the mixture convention in either file
 fails to compile rather than quietly disagreeing. -/
 
 theorem spikeAndSlabVariance_eq_averagePhaseInteraction (pi a b : ℝ) :
     spikeAndSlabVariance pi a b = averagePhaseInteraction pi a b := by
-  unfold spikeAndSlabVariance averagePhaseInteraction; ring
+  unfold spikeAndSlabVariance averagePhaseInteraction Descent.Core.convexCombination; ring
 
 theorem spikeAndSlabVariance_eq_ancestrySpecificEffect (pi a b : ℝ) :
     spikeAndSlabVariance pi a b = ancestrySpecificEffect a b pi := by
-  unfold spikeAndSlabVariance ancestrySpecificEffect; ring
+  unfold spikeAndSlabVariance ancestrySpecificEffect Descent.Core.convexCombination; ring
 
 /-- **The spike-and-slab formula is a variance only on `0 ≤ pi ≤ 1`.**
 
@@ -159,7 +160,7 @@ theorem spikeAndSlabVariance_mem_interval
     (h_order : sigma_sq_small ≤ sigma_sq_large) :
     sigma_sq_small ≤ spikeAndSlabVariance pi sigma_sq_large sigma_sq_small ∧
       spikeAndSlabVariance pi sigma_sq_large sigma_sq_small ≤ sigma_sq_large := by
-  unfold spikeAndSlabVariance
+  unfold spikeAndSlabVariance Descent.Core.convexCombination
   constructor <;> nlinarith
 
 /-- On the mixture interval, and only there, the spike-and-slab variance is
@@ -169,7 +170,7 @@ theorem spikeAndSlabVariance_nonneg
     (h_pi_nonneg : 0 ≤ pi) (h_pi_le : pi ≤ 1)
     (h_large : 0 ≤ sigma_sq_large) (h_small : 0 ≤ sigma_sq_small) :
     0 ≤ spikeAndSlabVariance pi sigma_sq_large sigma_sq_small := by
-  unfold spikeAndSlabVariance
+  unfold spikeAndSlabVariance Descent.Core.convexCombination
   have h_one_minus : 0 ≤ 1 - pi := by linarith
   nlinarith
 
@@ -180,7 +181,7 @@ rather than assumed away. -/
 theorem spikeAndSlabVariance_neg_off_interval
     (sigma_sq_small : ℝ) (h_small : 0 < sigma_sq_small) :
     spikeAndSlabVariance 2 0 sigma_sq_small < 0 := by
-  unfold spikeAndSlabVariance
+  unfold spikeAndSlabVariance Descent.Core.convexCombination
   linarith
 
 /-- Spike-and-slab variance increases with polygenicity
@@ -194,7 +195,7 @@ theorem sas_variance_monotone_in_pi
     (h_pi : pi₁ < pi₂) :
     spikeAndSlabVariance pi₁ sigma_sq_large sigma_sq_small <
       spikeAndSlabVariance pi₂ sigma_sq_large sigma_sq_small := by
-  unfold spikeAndSlabVariance; nlinarith
+  unfold spikeAndSlabVariance Descent.Core.convexCombination; nlinarith
 
 /-- **BayesR mixture components.**
     BayesR uses a 4-component mixture:

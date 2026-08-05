@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.DriftRegime
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -66,7 +67,7 @@ section TraitClassification
     the panel, not the parameters; a larger panel is the test that would settle
     it. -/
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
-  (1 - fst_additional) * ld_factor
+  Descent.Core.retainedFraction fst_additional ld_factor
 
 /-- **neutralPortabilityRatioLD pinned at a reference point.** No theorem in the corpus evaluated
 this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
@@ -74,7 +75,7 @@ from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coeffi
 one-sided bound or an invariance leaves free. -/
 theorem neutralPortabilityRatioLD_at_reference_point :
     neutralPortabilityRatioLD (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold neutralPortabilityRatioLD
+  unfold neutralPortabilityRatioLD Descent.Core.retainedFraction
   norm_num
 
 /-- **Cross-check: the neutral transport summary and the post-drift score
@@ -86,7 +87,7 @@ theorem neutralPortabilityRatioLD_eq_presentDayPGSVariance
     (fst_additional ld_factor : ℝ) :
     neutralPortabilityRatioLD fst_additional ld_factor =
       presentDayPGSVariance ld_factor fst_additional := by
-  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet; ring
+  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet Descent.Core.retainedFraction; ring
 
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)
@@ -94,7 +95,7 @@ theorem neutral_ratio_in_unit (fst ld : ℝ)
     (h_ld : 0 ≤ ld) (h_ld1 : ld ≤ 1) :
     0 ≤ neutralPortabilityRatioLD fst ld ∧
       neutralPortabilityRatioLD fst ld ≤ 1 := by
-  unfold neutralPortabilityRatioLD
+  unfold neutralPortabilityRatioLD Descent.Core.retainedFraction
   constructor
   · exact mul_nonneg (by linarith) h_ld
   · calc (1 - fst) * ld ≤ 1 * 1 := by

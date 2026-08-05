@@ -507,13 +507,13 @@ theorem frobeniusNormSq_pos_of_exists_ne_zero {t : ℕ}
 
 /-- Source/target `R²` represented from MSE and total phenotype variance. -/
 noncomputable def r2FromMSE (mse varY : ℝ) : ℝ :=
-  1 - mse / varY
+  Descent.Core.proportionalReduction mse varY
 
 /-- **`R²` from mean squared error, pinned.** This definition carries no theorem of its own. A
 predictor whose error variance is half the outcome variance explains half of it. -/
 theorem r2FromMSE_half_variance :
     r2FromMSE 1 2 = 1 / 2 := by
-  unfold r2FromMSE
+  unfold r2FromMSE Descent.Core.proportionalReduction
   norm_num
 
 /-- **`R²` against a constant outcome, named.** An outcome with no variance cannot be explained
@@ -524,7 +524,7 @@ and be investigated, whereas a junk `R²` of one looks like a success. Consumers
 `varY ≠ 0`. -/
 theorem r2FromMSE_constant_outcome_is_junk (mse : ℝ) :
     r2FromMSE mse 0 = 1 := by
-  unfold r2FromMSE
+  unfold r2FromMSE Descent.Core.proportionalReduction
   simp
 
 /-- Explained-variance fraction from score/outcome covariance, score variance,
@@ -707,7 +707,7 @@ theorem target_r2_strictly_decreases_of_covariance_mismatch
   have hmse : mseSource < mseTarget :=
     target_mse_strictly_increases_of_covariance_mismatch
       mseSource mseTarget lam sigmaSource sigmaTarget h_gap_lb hlam h_mismatch
-  unfold r2FromMSE
+  unfold r2FromMSE Descent.Core.proportionalReduction
   have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
   have hdiv : mseSource / varY < mseTarget / varY := by
       have hmul : mseSource * (1 / varY) < mseTarget * (1 / varY) :=
@@ -785,7 +785,7 @@ private def twoLocusIdx1 {t : ℕ} (ht : 2 ≤ t) : Fin t :=
 
     Power: the prediction spans 0.12851 to 0.81791, a factor of six. -/
 noncomputable def discreteRecombinationSurvival (recombRate : ℝ) (tmrca : ℕ) : ℝ :=
-  (1 - recombRate) ^ tmrca
+  Descent.Core.geometricDecay recombRate tmrca
 
 /-- Two-locus covariance induced by IBD persistence up to the MRCA. -/
 noncomputable def twoLocusIBDCovariance (ibdWeight recombRate : ℝ) (tmrca : ℕ) : ℝ :=
@@ -887,7 +887,7 @@ theorem twoLocusIBDCovariance_gap_eq
       discreteRecombinationSurvival recombRate tTarget =
         discreteRecombinationSurvival recombRate tSource *
           discreteRecombinationSurvival recombRate (tTarget - tSource) := by
-    unfold discreteRecombinationSurvival
+    unfold discreteRecombinationSurvival Descent.Core.geometricDecay
     rw [← pow_add, Nat.add_sub_of_le h_time]
   unfold twoLocusIBDCovariance
   rw [h_split]
@@ -949,11 +949,11 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent
   have h_base_lt_one : 1 - recombRate < 1 := by linarith
   have h_delta_ne : tTarget - tSource ≠ 0 := Nat.sub_ne_zero_of_lt h_time
   have h_survival_pos : 0 < discreteRecombinationSurvival recombRate tSource := by
-    unfold discreteRecombinationSurvival
+    unfold discreteRecombinationSurvival Descent.Core.geometricDecay
     exact pow_pos h_base_pos _
   have h_decay_lt_one :
       discreteRecombinationSurvival recombRate (tTarget - tSource) < 1 := by
-    unfold discreteRecombinationSurvival
+    unfold discreteRecombinationSurvival Descent.Core.geometricDecay
     exact pow_lt_one₀ h_base_nonneg h_base_lt_one h_delta_ne
   have h_tail_pos :
       0 < 1 - discreteRecombinationSurvival recombRate (tTarget - tSource) := by
@@ -1139,7 +1139,7 @@ theorem target_r2_drop_of_bandwise_readout_mismatch
       FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) <
         FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) := by
     linarith
-  unfold r2FromMSE
+  unfold r2FromMSE Descent.Core.proportionalReduction
   have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
   have hdiv :
       FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) / varY <
@@ -4150,22 +4150,22 @@ which is why these are the theorems the gap scanners look for. -/
 /-- No elapsed generations, no recombination: survival is certain. -/
 @[simp] theorem discreteRecombinationSurvival_at_zero_time (recombRate : ℝ) :
     discreteRecombinationSurvival recombRate 0 = 1 := by
-  simp [discreteRecombinationSurvival]
+  simp [discreteRecombinationSurvival, Descent.Core.geometricDecay]
 
 /-- A zero recombination rate never breaks the haplotype, however long the branch. -/
 @[simp] theorem discreteRecombinationSurvival_at_zero_rate (tmrca : ℕ) :
     discreteRecombinationSurvival 0 tmrca = 1 := by
-  simp [discreteRecombinationSurvival]
+  simp [discreteRecombinationSurvival, Descent.Core.geometricDecay]
 
 /-- Certain recombination destroys the haplotype in one generation. -/
 theorem discreteRecombinationSurvival_at_certain_rate (tmrca : ℕ) :
     discreteRecombinationSurvival 1 (tmrca + 1) = 0 := by
-  simp [discreteRecombinationSurvival]
+  simp [discreteRecombinationSurvival, Descent.Core.geometricDecay]
 
 /-- Reference value: a one-per-cent rate over two generations retains `0.9801`. -/
 theorem discreteRecombinationSurvival_at_one_percent :
     discreteRecombinationSurvival (1 / 100) 2 = 9801 / 10000 := by
-  norm_num [discreteRecombinationSurvival]
+  norm_num [discreteRecombinationSurvival, Descent.Core.geometricDecay]
 
 /-- The zero matrix has no Frobenius energy. -/
 @[simp] theorem frobeniusNormSq_zero {t : ℕ} :

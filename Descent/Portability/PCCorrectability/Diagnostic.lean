@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PCCorrectability.Phase
+import Descent.Core.Fst
 
 namespace Descent
 
@@ -159,7 +160,7 @@ theorem subthreshold_overlap_implies_susceptibility_floor
 form `V_K = 1 - H'/H`. -/
 noncomputable def pcTargetAxisEfficacy
     (uncorrectedSusceptibility residualSusceptibility : ℝ) : ℝ :=
-  1 - residualSusceptibility / uncorrectedSusceptibility
+  Descent.Core.proportionalReduction residualSusceptibility uncorrectedSusceptibility
 
 /-- **Principal-component correction efficacy against a null susceptibility, named.** If the
 uncorrected susceptibility is zero there was nothing to correct and the efficacy is undefined.
@@ -168,7 +169,7 @@ susceptibility that was not there. A diagnostic that scores its own inapplicabil
 the wrong way round. Consumers must require `uncorrectedSusceptibility ≠ 0`. -/
 theorem pcTargetAxisEfficacy_null_susceptibility_is_junk (residualSusceptibility : ℝ) :
     pcTargetAxisEfficacy 0 residualSusceptibility = 1 := by
-  unfold pcTargetAxisEfficacy
+  unfold pcTargetAxisEfficacy Descent.Core.proportionalReduction
   simp
 
 /-- Rearranging the efficacy definition recovers the residual susceptibility
@@ -176,7 +177,7 @@ exactly. -/
 theorem residual_susceptibility_eq_one_sub_efficacy_mul
     (H Hres : ℝ) (hH : H ≠ 0) :
     Hres = (1 - pcTargetAxisEfficacy H Hres) * H := by
-  unfold pcTargetAxisEfficacy
+  unfold pcTargetAxisEfficacy Descent.Core.proportionalReduction
   field_simp
   ring
 

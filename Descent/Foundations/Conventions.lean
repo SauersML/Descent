@@ -1277,149 +1277,16 @@ naming the map once and relating them makes a divergence a failed proof. This
 is the same device as `ploidy`, applied to structure rather than to a
 constant. -/
 
-/-- Convex combination, `α x + (1 - α) y`. -/
-noncomputable def convexMix (α x y : ℝ) : ℝ := α * x + (1 - α) * y
-
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
-theorem convexMix_at_reference_point :
-    convexMix 1 1 1 = 1 := by
-  norm_num [convexMix]
-
-
-theorem spikeAndSlabVariance_eq_convexMix (pi sl sm : ℝ) :
-    spikeAndSlabVariance pi sl sm = convexMix pi sl sm := by
-  unfold spikeAndSlabVariance convexMix; ring
-
-theorem admixedAlleleFreq_eq_convexMix (α p_A p_B : ℝ) :
-    admixedAlleleFreq α p_A p_B = convexMix α p_A p_B := by
-  unfold admixedAlleleFreq convexMix; ring
-
-theorem averagePhaseInteraction_eq_convexMix (freq_cis i_cis i_trans : ℝ) :
-    averagePhaseInteraction freq_cis i_cis i_trans = convexMix freq_cis i_cis i_trans := by
-  unfold averagePhaseInteraction convexMix; ring
-
-theorem ancestrySpecificEffect_eq_convexMix (b1 b2 alpha : ℝ) :
-    ancestrySpecificEffect b1 b2 alpha = convexMix alpha b1 b2 := by
-  unfold ancestrySpecificEffect convexMix; ring
-
-/-- Geometric decay, `(1 - r)^t`: LD across generations, recombination
-survival along a genealogy, and admixture-LD decay are one map.
-
-**THIS IS THE HUB. Route new spellings through it, and do not add pairwise theorems.**
-`(1 - r)^t` is currently written out under FOUR names in four files — `geometricDecay`,
-`LongitudinalPortability.ldDecayPerGeneration`, `DGP.discreteRecombinationSurvival` and
-`PortabilityDrift.admixtureLDDecay` — and once carried SIX pairwise equalities between
-them. Three are kept, immediately below: each ties one spelling to this primitive, and
-together they make a divergence between any two spellings a failed proof. The other three
-were pairwise restatements implied by these by transitivity, and are deleted.
-
-**DO NOT FOLD THESE FOUR NAMES INTO ONE.** They are one FUNCTION under four
-REFERENTS, and a name census sees only the arithmetic:
-
-  * `geometricDecay` -- the bare primitive, and the hub.
-  * `PortabilityDrift.admixtureLDDecay` -- admixture LD decay. VALIDATED as the
-    `Nₑ → ∞` limit and MEASURED high by `+0.24%` to `+0.37%` against
-    finite-population retention, with `admixtureLDDecay_ge_finitePopulation`
-    proving the bias is one-sided. Folding it into a bare primitive would detach
-    a measured regime and a proved error direction from the name they describe.
-  * `DGP.discreteRecombinationSurvival` -- survival of two linked loci to the
-    MRCA, a genealogical probability rather than an LD quantity.
-  * `LongitudinalPortability.ldDecayPerGeneration` -- per-generation LD decay.
-
-Identical arithmetic is not identical meaning. `hweHeterozygosity` and
-`genotypeVarianceHWE` are both `2p(1-p)` and are heterozygosity and dosage
-variance respectively; the same holds here at larger scale.
-
-The three hub theorems below are the right amount of machinery: a divergence
-between any two spellings fails one of them. -/
-noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
-
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
-theorem geometricDecay_at_reference_point :
-    geometricDecay (1 / 2) 2 = 1 / 4 := by
-  norm_num [geometricDecay]
-
-
-
-theorem ldDecayPerGeneration_eq_geometricDecay (r : ℝ) (t : ℕ) :
-    ldDecayPerGeneration r t = geometricDecay r t := by
-  unfold ldDecayPerGeneration geometricDecay; ring_nf
-
-theorem admixtureLDDecay_eq_geometricDecay (r : ℝ) (t : ℕ) :
-    admixtureLDDecay r t = geometricDecay r t := by
-  unfold admixtureLDDecay geometricDecay; ring_nf
-
-theorem discreteRecombinationSurvival_eq_geometricDecay (r : ℝ) (t : ℕ) :
-    discreteRecombinationSurvival r t = geometricDecay r t := by
-  unfold discreteRecombinationSurvival geometricDecay; ring_nf
-
-/-- One minus a ratio, `1 - a / b`: `F_ST` from a heterozygosity ratio, `F_ST`
-from coalescence times, `R²` from a mean squared error, and residual efficacy
-are one map. -/
-noncomputable def oneMinusRatio (a b : ℝ) : ℝ := 1 - a / b
-
-/-- **The complementary ratio at a zero denominator, named.** With `b = 0` the ratio is undefined
-and so is its complement. Lean returns `1`, the value that means "`a` is entirely accounted for" --
-the strongest possible claim, produced by the case where nothing is known at all. Consumers must
-require `b ≠ 0`. -/
-theorem oneMinusRatio_zero_denominator_is_junk (a : ℝ) :
-    oneMinusRatio a 0 = 1 := by
-  unfold oneMinusRatio
-  simp
-
-theorem fstFromHetRatio_eq_oneMinusRatio (H H₀ : ℝ) :
-    fstFromHetRatio H H₀ = oneMinusRatio H H₀ := by
-  unfold fstFromHetRatio oneMinusRatio Descent.Core.proportionalReduction; ring_nf
-
-theorem hudsonFstFromCoalescenceTimes_eq_oneMinusRatio (ETss ETst : ℝ) :
-    hudsonFstFromCoalescenceTimes ETss ETst = oneMinusRatio ETss ETst := by
-  unfold hudsonFstFromCoalescenceTimes oneMinusRatio Descent.Core.proportionalReduction; ring_nf
-
-/-- The PC-correction efficacy is the same `1 - a/b` map: what is corrected
-away is one minus the fraction of the ancestry axis that survives correction,
-exactly as `F_ST` is one minus the fraction of heterozygosity that survives
-subdivision. The two are different quantities and must not drift into different
-shapes. -/
-theorem pcTargetAxisEfficacy_eq_oneMinusRatio (H Hres : ℝ) :
-    pcTargetAxisEfficacy H Hres = oneMinusRatio Hres H := by
-  unfold pcTargetAxisEfficacy oneMinusRatio; ring_nf
-
-theorem r2FromMSE_eq_oneMinusRatio (mse varY : ℝ) :
-    r2FromMSE mse varY = oneMinusRatio mse varY := by
-  unfold r2FromMSE oneMinusRatio; ring_nf
-
 /-! ### Retention and ratio maps
 
 Three further groups are one map under several names. -/
 
-/-- Retained fraction, `(1 - loss) · total`: the ascertainment-loss survivor,
-the neutral portability ratio and the present-day PGS variance are one map. -/
-noncomputable def retainedFraction (loss total : ℝ) : ℝ := (1 - loss) * total
-
-/-- **retainedFraction pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
-theorem retainedFraction_at_reference_point :
-    retainedFraction (1 / 2) (1 / 2) = 1 / 4 := by
-  unfold retainedFraction
-  norm_num
-
-theorem ascertainment_loss_eq_retainedFraction (coverage v_causal : ℝ) :
-    ascertainment_loss coverage v_causal = retainedFraction coverage v_causal := by
-  unfold ascertainment_loss retainedFraction; ring
-
-theorem neutralPortabilityRatioLD_eq_retainedFraction (fst ld : ℝ) :
-    neutralPortabilityRatioLD fst ld = retainedFraction fst ld := by
-  unfold neutralPortabilityRatioLD retainedFraction; ring
-
+/-- **Present-day PGS variance is a retained fraction of the ancestral variance.**
+`presentDayPGSVariance` is not a wrapper over the kernel -- it routes through
+`pgsVarianceFromHet` -- so this is a real identity and not a restatement of a body. -/
 theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
-    presentDayPGSVariance V_A fst = retainedFraction fst V_A := by
-  unfold presentDayPGSVariance pgsVarianceFromHet retainedFraction; ring
+    presentDayPGSVariance V_A fst = Descent.Core.retainedFraction fst V_A := by
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.retainedFraction; ring
 
 /-! `explainedR2FromTransportMoments` and `pgsR2` are the same term; the identity is
 stated once, next to `pgsR2` in `TransferLearningPGS`. -/
@@ -1797,8 +1664,8 @@ by the transported correlation. The first factor is `retainedFraction`, the same
 `(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio,
 so drift between the drift erosion and its siblings fails here. -/
 theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
-    realWorldPGSVariance V_A fst rhoSq = rhoSq * retainedFraction fst V_A := by
-  unfold realWorldPGSVariance retainedFraction; ring
+    realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
+  unfold realWorldPGSVariance Descent.Core.retainedFraction; ring
 
 end SharedMaps
 
