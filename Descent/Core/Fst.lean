@@ -302,16 +302,37 @@ theorem fstIslandEquilibrium_no_migration_scaled (Ne μ nDemes θ : ℝ)
     fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + θ) := by
   rw [fstIslandEquilibrium_no_migration, hθ]
 
-/-- **The structure-field coordinates, `1/(1 + θ + 2M)`.** `DGP.fstEquilibrium` writes
-the master with `θ = 4 Ne μ` and `M = 2 Ne m`, so `2M = 4 Ne m` is the migration term at
-a deme correction of one. The factor of two is where the two parameterisations differ,
-and it is the whole content of this theorem: `bigM` is `2 Ne m`, NOT `4 Ne m`, so reading
-`M` for the scaled migration rate doubles the flow. -/
+/-- **The structure-field coordinates, `1/(1 + θ + 2M)`.** The bridge to the two
+parameter records that write the equilibrium in scaled rates rather than in
+`(Nₑ, m, μ)` -- `Core.PopGenParameters.fstEquilibrium` and `PopGen.DGP.fstEquilibrium`,
+which are the same body in two records' fields.
+
+**The `2` is the deme correction, and the deme count is `2`.** Both records define
+`bigM` as `scaledMigrationRate`, which is `4 Nₑ m` -- `PopGenParameters.bigM` by
+definition and `EvolutionaryParameters.bigM` by
+`Program.EvolutionaryParameters_bigM_eq_ploidy_form` -- so `2M` is `8 Nₑ m`, while the
+master carries `4 Nₑ m · d/(d-1)`. Those agree exactly at `d = 2`. So the free-looking
+coefficient on `M` is not a coordinate artefact and not a many-deme reading: it is
+`islandDemeCorrection` evaluated at the two-population split that most of this corpus's
+portability results are stated for, and a reader who takes `1/(1 + θ + 2M)` for the
+many-deme law is wrong by that factor.
+
+This statement was previously written with hypotheses `bigM = 2 Nₑ m` and a deme
+correction of one. Those are mutually consistent and describe no declaration in the
+corpus: no `bigM` here is `2 Nₑ m`. The theorem was true and bridged nothing, and its
+docstring asserted the inverted convention -- `bigM` is `2 Nₑ m`, NOT `4 Nₑ m` -- in a
+file whose purpose is to hold the scaling constants. -/
 theorem fstIslandEquilibrium_structure_coords (Ne m μ nDemes θ bigM : ℝ)
-    (hd : islandDemeCorrection nDemes = 1)
-    (hθ : θ = 4 * Ne * μ) (hM : bigM = 2 * Ne * m) :
+    (hd : islandDemeCorrection nDemes = 2)
+    (hθ : θ = scaledMutationRate Ne μ) (hM : bigM = scaledMigrationRate Ne m) :
     fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + θ + 2 * bigM) := by
-  rw [fstIslandEquilibrium_manyDemes Ne m μ nDemes hd, hθ, hM]; ring_nf
+  have hflow : scaledFlow Ne m μ nDemes = θ + 2 * bigM := by
+    unfold scaledFlow
+    rw [hd, hθ, hM]
+    ring
+  unfold fstIslandEquilibrium fstFromFlow
+  rw [hflow]
+  ring
 
 /-! ### `F_ST` from a scaled coalescence time
 
