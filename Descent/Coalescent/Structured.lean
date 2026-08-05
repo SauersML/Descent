@@ -32,7 +32,7 @@ invisible to within-deme coalescence times, and shows up only in the between-dem
 `E[T_d] = 2 + 1/M` and hence in `F_ST`.
 
 `fstFromMigration` records the consequence `F_ST = 1/(1 + 2M)`, which is Wright's island
-formula in coalescent dress: the corpus's `Descent.Foundations.Conventions` carries the same
+formula in coalescent dress: the corpus's `Descent.Program.Conventions` carries the same
 shape as a scalar, and this is where it comes from.
 
 ## Main results
@@ -108,7 +108,7 @@ noncomputable def fstFromMigration (M : ℝ) : ℝ :=
 
 /-- **Wright's island formula, in coalescent dress: `F_ST = 1/(1 + 2M)`.**
 
-The corpus carries this shape as a scalar in `Descent.Foundations.Conventions`; here is
+The corpus carries this shape as a scalar in `Descent.Program.Conventions`; here is
 where it comes from -- the ratio of two mean coalescence times, each of which came from the
 structured coalescent's competing rates. -/
 theorem fstFromMigration_eq {M : ℝ} (hM : 0 < M) :

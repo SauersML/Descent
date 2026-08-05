@@ -155,7 +155,7 @@ exactly when the mixing is bounded below. In the genotype setting the "complete
 second-order observable" is the noiseless infinite-sample LD/covariance operator, and
 the hidden decay profile is the ancestry-loading spectrum. So the choice of how many
 principal components to include is a convention in the exact sense of
-`Descent.Foundations.Conventions`, and `Descent.Portability.PCCorrectability` quantifies what correction
+`Descent.Program.Conventions`, and `Descent.Portability.PCCorrectability` quantifies what correction
 achieves *given* that convention — which is the right division of labour.
 -/
 

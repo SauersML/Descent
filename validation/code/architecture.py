@@ -144,14 +144,26 @@ def declarations(code):
 # The gates
 # --------------------------------------------------------------------------
 
-# A module claims a foundational role by SITTING in Core/ or Foundations/, or by
-# saying so in a strong, deliberate phrase in its header.  An earlier version of
-# this gate matched any header containing "convention" or "kernel" and flagged 82
-# modules, most of which merely discuss one -- a gate that fires on almost
-# everything teaches everyone to ignore it, which is worse than no gate.
+# A module claims a BASE role by sitting in Core/ or Foundations/, or by saying
+# in its header that things depend on it.
+#
+# Describing a reconciliation is NOT that claim, and three of the phrases this
+# regex used to carry -- "is the reconciliation", "the entire risk of this",
+# "the hub" -- describe an AUDIT role instead. An audit module relates quantities
+# that live in different subsystems, which REQUIRES importing them, so it can
+# never sit below them and flagging it as inverted is flagging it for doing its
+# job. `Program/Conventions` is one: 114 theorems relating fifteen subsystems,
+# correctly filed in the program layer rather than under `Foundations/`.
+#
+# What remains is the claim that cannot be true from above: "this module is
+# depth 0", "must be imported by". A base that imports the subsystems it is
+# supposed to underlie cannot be depended on by them, whatever it says.
+#
+# An earlier version matched any header containing "convention" or "kernel" and
+# flagged 82 modules. A gate that fires on almost everything teaches everyone to
+# ignore it, which is worse than no gate.
 FOUNDATION_HINT = re.compile(
-    r"(this module is depth|is the reconciliation|the entire risk of this"
-    r"|shared primitive|must be imported by|the hub\b)", re.I)
+    r"(this module is depth|must be imported by)", re.I)
 
 
 def claims_foundation(mod: str, header: str) -> bool:

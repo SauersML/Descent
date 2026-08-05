@@ -172,7 +172,7 @@ admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombination
 and `ldDecayPerGeneration_eq_admixtureLDDecay` are absent here as redundant, not as wrong.
 All four spellings CALL the shared kernel
 `Core.geometricDecay`, and these two are its consequences. The hub used to be a
-definition in `Foundations.Conventions` at depth 12, related to its four spellings by
+definition in `Program.Conventions` at depth 12, related to its four spellings by
 three identity theorems; it is now a kernel at depth 0 and the spellings CALL it, so a
 divergence is not a failed proof but a body that no longer says what it says. The four
 names are kept -- `admixtureLDDecay` carries a measured one-sided bias against

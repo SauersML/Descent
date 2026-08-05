@@ -125,25 +125,51 @@ constant:
   tree is one of the two WRONG ones, so a majority vote across loci converges to the wrong
   species tree as the number of loci grows.
 
-## What of coalescent theory is still absent
+## The six gaps this group recorded, and what closed them
 
-Named so the coverage above is not read as completeness:
+An earlier revision of this file listed six areas of coalescent theory the group did not
+have.  All six now have modules; what remains in each is a single named theorem rather than
+an area, and the difference is worth recording because "absent" and "absent except for one
+step" are different states.
 
-* **Fu's Pólya urn.**  `SiteFrequencySpectrum` asserts `E(ξ_i) = θ/i` and can only check its
-  total.  The count that derives it -- the chance a branch in the `k`-lineage phase subtends
-  `i` of `n` leaves -- is not here.
-* **Second moments of the spectrum**, hence the calibration of Tajima's `D`.  The corpus has
-  the mean-zero null and no variance, so it can state the test and not size it.
-* **Möhle's lemma** and the general convergence of exchangeable models to a coalescent.
-  `FamilySize` does the one-generation identity for an arbitrary pedigree; the limit theorem
-  that turns it into a process is not attempted.
-* **Coming down from infinity for `Λ`-coalescents**, Schweinsberg's criterion.  Kingman's case
-  is settled by the summability `Rates` proves; the criterion separating the family's members
-  is a statement about `Λ` near zero that the corpus has no integral to express.
-* **The lookdown construction** of Donnelly and Kurtz, and with it the coupling of the whole
-  family on one probability space.
-* **Spatial coalescents** -- coalescing random walks, the voter model, stepping stone beyond
-  `Structured`'s rate-level statements.
+* **Fu's Pólya urn** -- CLOSED.  `Coalescent.FuUrn` derives `E(L_i) = 2/i`.  K-C (2.3) times
+  the number of set partitions with given class sizes leaves the ordered size vector uniform
+  on compositions, so a block subtends `i` leaves with probability `C(n-i-1,k-2)/C(n-1,k-1)`;
+  clearing both binomials leaves `Σ_{b≤m} C(a+b,a) = C(a+m+1,a+1)`, the hockey stick, after
+  which the factorials cancel to `1/i`.  `SiteFrequencySpectrum`'s `ASSERTED` marker is
+  discharged.
+* **Second moments of the spectrum** -- CLOSED on the `S` side.  `Coalescent.SpectrumMoments`
+  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with
+  `Var(L_n) = 4 b_{n-1}` from the squared segment lengths, and `b` bounded while `a` diverges
+  -- so Watterson's estimator is consistent, at rate `1/log n`.  STILL ABSENT: `Var(π)` and
+  `Cov(π, θ_W)`, hence Tajima's exact denominator.  Those need the joint law of pairwise
+  differences across pairs, which is not a function of the tree's total length.
+* **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
+  K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
+  exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix
+  form for models with separated time scales, and Skorokhod convergence of the processes.
+* **Schweinsberg's criterion** -- CLOSED as a criterion.
+  `Coalescent.ComingDownCriterion` defines `Σ γ_b⁻¹ < ∞` and proves it separates the family:
+  Kingman satisfies it, the star coalescent `Λ = δ₁` does not.  STILL ABSENT: the equivalence
+  itself, which is a theorem about a process this corpus has only at rate level, and the
+  Bolthausen-Sznitman case, whose `γ_b = b(H_b-1)` needs Cauchy condensation.
+* **The lookdown construction** -- CLOSED for what it is for.  `Coalescent.Lookdown` proves
+  the level structure's consistency pathwise: below the cut restriction commutes with looking
+  down, at or above it the operation is invisible.  That is why all `n` coalescents fit on one
+  space without a projective limit.  STILL ABSENT: the Poisson clocks that make the resulting
+  partition process a coalescent.
+* **Spatial coalescents** -- CLOSED at the mechanism.  `Coalescent.SpatialCoalescent` proves
+  the voter-model duality `c_t = c₀ ∘ A_t` by induction, presents the dual AS a pedigree so
+  that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise coalescence to
+  a hitting time via `walk_sub`.  STILL ABSENT: recurrence of the difference walk, hence
+  whether spatial lineages coalesce at all in a given dimension -- a theorem about random
+  walks, not about genealogy.
+
+Everything above compiles against the pinned Mathlib.  The build found eight defects in this
+batch that re-reading had not, of which the instructive ones were `deriv_pow` having a
+`DifferentiableAt` hypothesis and a shape nothing like the one written from memory, and two
+hypotheses in `ComingDownFromInfinity` that were never used -- `2/(2/x) = x` holds at `x = 0`
+too, because division by zero is zero.
 
 ## Beyond Kingman
 

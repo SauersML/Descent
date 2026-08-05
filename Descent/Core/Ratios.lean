@@ -14,7 +14,7 @@ write the same map out for the third time under a fourth name.
 ## Why this file and not a theorem
 
 The corpus previously related its repeated maps with identity theorems collected in
-`Foundations/Conventions`. That file sits near the TOP of the import graph: it imports
+`Program/Conventions`. That file sits near the TOP of the import graph: it imports
 twenty-two modules and is imported by three. An identity stated above the things it
 relates can only *describe* their agreement. Nothing below it can depend on the
 agreement, so a divergence between two spellings is caught only if someone re-runs the

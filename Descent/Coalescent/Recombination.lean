@@ -50,7 +50,7 @@ open Filter
 
 Empirical status: THIS IS THE MODEL.  `ρ = 4 N_e r` is the scaled rate, and the `1/2` is the
 same time-unit convention that makes the per-pair coalescence rate `1`; see
-`Descent.Foundations.Conventions`. -/
+`Descent.Program.Conventions`. -/
 noncomputable def recombRate (k : ℕ) (rho : ℝ) : ℝ := (k : ℝ) * rho / 2
 
 /-- The total rate of the next event in the ancestral recombination graph: a coalescence or

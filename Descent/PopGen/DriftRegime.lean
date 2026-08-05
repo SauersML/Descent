@@ -35,7 +35,7 @@ reads as several independent confirmations.
 
 ## Defect 1: over-determination cannot see common-mode error
 
-`Descent.Foundations.Conventions` states the standing defence:
+`Descent.Program.Conventions` states the standing defence:
 
 > Against a wrong constant: over-determination. Derive the quantity from a primitive so
 > the constant is forced, and relate independently written formulas so that drift

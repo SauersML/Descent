@@ -137,9 +137,9 @@ theorem restrict_ker_lookdown {m n : ℕ} (h : m ≤ n) {α : Type*} (c : Fin n 
 after the operation depend only on data at levels below `m`.  Stated as the disjunction the
 two lemmas above prove, because that IS the coupling. -/
 theorem lookdown_consistent {m n : ℕ} (h : m ≤ n) {α : Type*} (i j : Fin n) (c : Fin n → α) :
-    ((j : ℕ) < m → ∀ hi : (i : ℕ) < m,
+    (∀ hj : (j : ℕ) < m, ∀ hi : (i : ℕ) < m,
         restrict h (Setoid.ker (lookdownApply i j c))
-          = Setoid.ker (lookdownApply (⟨i, hi⟩ : Fin m) ⟨j, by omega⟩ (c ∘ Fin.castLE h)))
+          = Setoid.ker (lookdownApply (⟨i, hi⟩ : Fin m) ⟨j, hj⟩ (c ∘ Fin.castLE h)))
       ∧ (m ≤ (j : ℕ) →
         restrict h (Setoid.ker (lookdownApply i j c)) = restrict h (Setoid.ker c)) := by
   constructor

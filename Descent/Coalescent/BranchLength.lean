@@ -134,7 +134,7 @@ same phases without the lineage-count weight.
 
 Empirical status: DERIVED, not posited -- it is `Σ_k k · d_k⁻¹` with both factors supplied
 elsewhere; see `expectedSegmentLength`.  In generations, multiply by `2 N_e`, the factor
-`Descent.Foundations.Conventions.coalescentTimeScale` fixes. -/
+`Descent.Program.Conventions.coalescentTimeScale` fixes. -/
 noncomputable def expectedTotalBranchLength (n : ℕ) : ℝ :=
   ∑ j ∈ range (n - 1), expectedSegmentLength (j + 2)
 

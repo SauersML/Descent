@@ -28,6 +28,24 @@ import Descent.Core.Parameters
 namespace Descent
 
 /-!
+
+**This is an audit layer, not a foundation, and it used to be filed as one.**
+
+Its 114 theorems relate quantities that live in fifteen different subsystem modules --
+`driftVariance` against `hweGenotypeVariance`, `amEquilibriumVariance` against `ibdFst`,
+the `F_ST` spellings against each other. Doing that REQUIRES importing all fifteen, so it
+can never sit below them, and nothing below it can be made to respect anything it proves.
+
+That is not a defect in this file; checking agreement after the fact is a real job. The
+defect was calling it a foundation. What genuinely belonged at the bottom has been moved
+there -- `ploidy`, `convexMix`, `geometricDecay`, `oneMinusRatio` and `retainedFraction`
+are now `Core` kernels that their referents CALL, and the fifteen identity theorems that
+used to state their agreement are gone with them, because the agreement is in the bodies.
+
+What is left here is what cannot be moved: relations between quantities that are genuinely
+defined in different subsystems for different reasons. Those are worth stating and they
+are worth re-reading when either side changes -- which is what an audit layer is for.
+
 # Identifications: making a named quantity carry its obligation
 
 A Lean `def` cannot be wrong internally, so the entire risk of this

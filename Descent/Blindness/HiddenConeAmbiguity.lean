@@ -100,7 +100,7 @@ The instant that fails — which is the realistic case for continuous population
 structure, where loadings decay without a gap — the ambiguity jumps from trivial to
 maximal, with nothing in between. Choosing a number of PCs is then a **convention**,
 not an inference, and this is the same object as the normalization convention
-formalized in `Descent.Foundations.Conventions`: what one must inject is a section of the
+formalized in `Descent.Program.Conventions`: what one must inject is a section of the
 diagonal-distortion ambiguity, and no covariant test can see it.
 
 This does not make PC correction useless — `Descent.Portability.PCCorrectability` quantifies

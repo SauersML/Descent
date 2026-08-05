@@ -9,7 +9,7 @@ import Descent.Portability.PortabilityMasterTheorem
 import Descent.PopGen.HumanDemography
 import Descent.PopGen.AdditiveInvariance
 import Descent.Blindness.ImitationRigidity
-import Descent.Foundations.Conventions
+import Descent.Program.Conventions
 import Descent.PopGen.DemographicCapacity
 import Descent.PopGen.DriftRegime
 import Descent.Blindness.BlindnessRegistry
@@ -155,6 +155,7 @@ import Descent.Coalescent.Convergence
 import Descent.Coalescent.FuUrn
 import Descent.Coalescent.ComingDownCriterion
 import Descent.Coalescent.Lookdown
+import Descent.Coalescent.SpatialCoalescent
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
