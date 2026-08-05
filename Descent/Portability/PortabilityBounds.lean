@@ -337,7 +337,12 @@ theorem z_score_strictMono_in_rho
     (h_more_turnover : ρ₂ < ρ₁) :
     -- z-score for sign concordance is smaller with more turnover
     ρ₂ * β / σ < ρ₁ * β / σ := by
-  exact Program.sign_flip_z_decreases_with_turnover β σ ρ₁ ρ₂ hβ hσ h_more_turnover
+  -- This was `exact Program.sign_flip_z_decreases_with_turnover ...`, a citation of
+  -- `Descent.Program.OpenQuestions` whose entire proof is the term below.  The programme
+  -- narrative is written against the corpus and cannot also be underneath it, so the
+  -- two-line proof is carried here rather than borrowed from there.  `nlinarith` closes
+  -- `ρ₂ * β < ρ₁ * β` from `hβ` and `h_more_turnover`, exactly as it did there.
+  exact div_lt_div_of_pos_right (by nlinarith) hσ
 
 end ConcreteWitnesses
 
