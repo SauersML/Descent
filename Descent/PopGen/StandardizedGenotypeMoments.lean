@@ -367,14 +367,14 @@ theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
       rw [hdef]
       exact div_nonneg (sq_nonneg _) hvar.le
     exact mul_nonneg hp (pow_nonneg hs 3)
-  have hpos : 0 < h.genotypeProb Foundations.DiploidGenotype.homAlt *
-      h.standardizedSquare Foundations.DiploidGenotype.homAlt ^ 3 := by
+  have hpos : 0 < h.genotypeProb Descent.Core.Genotype.homAlt *
+      h.standardizedSquare Descent.Core.Genotype.homAlt ^ 3 := by
     rw [halt, hprob.2.2]
     have hnum : (0 : ℝ) < 2 * (1 - h.altFreq) := by linarith
     have hval : 0 < 2 * (1 - h.altFreq) / h.altFreq := div_pos hnum hq0
     exact mul_pos (pow_pos hq0 2) (pow_pos hval 3)
   rw [Foundations.sum_over_genotypes] at hzero
-  linarith [hzero, hnonneg Foundations.DiploidGenotype.homRef, hnonneg Foundations.DiploidGenotype.het, hpos]
+  linarith [hzero, hnonneg Descent.Core.Genotype.homRef, hnonneg Descent.Core.Genotype.het, hpos]
 
 /-- **The allele frequency at which the hub channel is blind**, `(3 - √3)/6 = 0.211324…`.
 
@@ -1649,7 +1649,7 @@ theorem centeredSquare_eq_standardizedSquare_sub_one (h : HardyWeinbergModel)
 /-- The rare-homozygote atom in closed form: `u_alt = (2 - 3q)/q`. -/
 theorem centeredSquare_homAlt_eq (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    h.centeredSquare Foundations.DiploidGenotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq := by
+    h.centeredSquare Descent.Core.Genotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq := by
   obtain ⟨_, _, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
   rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, halt, div_sub_one (ne_of_gt hq0)]
   congr 1
@@ -1662,8 +1662,8 @@ theorem centeredSquare_homAlt_strictAnti (h h' : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
     (hrarer : h.altFreq < h'.altFreq) :
-    h'.centeredSquare Foundations.DiploidGenotype.homAlt <
-      h.centeredSquare Foundations.DiploidGenotype.homAlt := by
+    h'.centeredSquare Descent.Core.Genotype.homAlt <
+      h.centeredSquare Descent.Core.Genotype.homAlt := by
   rw [centeredSquare_homAlt_eq h hq0 hq1, centeredSquare_homAlt_eq h' hq0' hq1']
   rw [div_lt_div_iff₀ hq0' hq0]
   nlinarith [hq0, hq0', hrarer]
@@ -1676,15 +1676,15 @@ the other half of the peeling argument: the largest atom of a panel comes from t
 locus and from its rare homozygote. -/
 theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) (g : Foundations.DiploidGenotype) :
-    |h.centeredSquare g| ≤ h.centeredSquare Foundations.DiploidGenotype.homAlt := by
+    |h.centeredSquare g| ≤ h.centeredSquare Descent.Core.Genotype.homAlt := by
   have hq1 : h.altFreq < 1 := by linarith
   have hp : (0 : ℝ) < 1 - h.altFreq := by linarith
   obtain ⟨href, hhet, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
-  have haltval : h.centeredSquare Foundations.DiploidGenotype.homAlt =
+  have haltval : h.centeredSquare Descent.Core.Genotype.homAlt =
       (2 - 3 * h.altFreq) / h.altFreq := centeredSquare_homAlt_eq h hq0 hq1
   cases g with
   | homRef =>
-      have hval : h.centeredSquare Foundations.DiploidGenotype.homRef =
+      have hval : h.centeredSquare Descent.Core.Genotype.homRef =
           (3 * h.altFreq - 1) / (1 - h.altFreq) := by
         rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href, div_sub_one (ne_of_gt hp)]
         congr 1
@@ -1693,7 +1693,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
       rcases abs_cases (3 * h.altFreq - 1) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
         nlinarith [hq0, hhalf, hp]
   | het =>
-      have hval : h.centeredSquare Foundations.DiploidGenotype.het =
+      have hval : h.centeredSquare Descent.Core.Genotype.het =
           (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) /
             (2 * h.altFreq * (1 - h.altFreq)) := by
         have hden : 2 * h.altFreq * (1 - h.altFreq) ≠ 0 := by positivity
@@ -1705,7 +1705,7 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
       rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
         nlinarith [hq0, hhalf, hp, sq_nonneg (2 * h.altFreq - 1)]
   | homAlt =>
-      have hnonneg : 0 ≤ h.centeredSquare Foundations.DiploidGenotype.homAlt := by
+      have hnonneg : 0 ≤ h.centeredSquare Descent.Core.Genotype.homAlt := by
         rw [haltval]
         apply div_nonneg _ hq0.le
         linarith
@@ -1724,12 +1724,12 @@ theorem rarest_locus_owns_largest_atom (h h' : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq)
     (hq0' : 0 < h'.altFreq) (hhalf' : h'.altFreq ≤ 1 / 2)
     (hrarer : h.altFreq < h'.altFreq) (g : Foundations.DiploidGenotype) :
-    |h'.centeredSquare g| < h.centeredSquare Foundations.DiploidGenotype.homAlt := by
+    |h'.centeredSquare g| < h.centeredSquare Descent.Core.Genotype.homAlt := by
   have hq1 : h.altFreq < 1 := by linarith
   have hq1' : h'.altFreq < 1 := by linarith
-  calc |h'.centeredSquare g| ≤ h'.centeredSquare Foundations.DiploidGenotype.homAlt :=
+  calc |h'.centeredSquare g| ≤ h'.centeredSquare Descent.Core.Genotype.homAlt :=
         abs_centeredSquare_le_homAlt h' hq0' hhalf' g
-    _ < h.centeredSquare Foundations.DiploidGenotype.homAlt :=
+    _ < h.centeredSquare Descent.Core.Genotype.homAlt :=
         centeredSquare_homAlt_strictAnti h h' hq0 hq1 hq0' hq1' hrarer
 
 /-!

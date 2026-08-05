@@ -3745,14 +3745,14 @@ noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
 
 @[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
-  simp [migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, PopGen.EvolutionaryParameters.bigM]
+  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, PopGen.EvolutionaryParameters.bigM]
 
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
 generation-indexed population-genetic parameter block used by the mechanistic
 transport model. This carries only the shared popgen primitives; the
 SNP/LD-aware state still lives in `CrossPopulationGenerationalModel`. -/
-noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
+noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters
     (m : PopGen.PGSEvolutionaryModel) : Descent.Core.PopGenParameters where
   Ne := m.Ne
   mu := m.mu
@@ -3768,21 +3768,21 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
   recomb_le_half := m.recomb_le_half
   V_A_pos := m.V_A_pos
 
-@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_theta
+@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).theta = m.theta := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.theta, PopGen.EvolutionaryParameters.theta,
     PopGen.scaledMutationRate]
 
-@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
+@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).bigM = m.bigM := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.bigM, PopGen.EvolutionaryParameters.bigM,
     PopGen.scaledMigrationRate]
 
-@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
+@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
   unfold Descent.Core.PopGenParameters.hetDecayFactor PopGen.PGSEvolutionaryModel.hetDecayFactor
@@ -3794,7 +3794,7 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
 discrete differentiation recursion. Both were corrected together: an identity
 between two coordinates survives a common wrong factor on both sides, so this
 theorem constrained them jointly and could not have caught the decay base. -/
-@[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
+@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
@@ -3811,7 +3811,7 @@ theorem constrained them jointly and could not have caught the decay base. -/
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
-theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
@@ -3827,7 +3827,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetent
 /-- When divergence time is an integer number of generations, the coarse
 migration-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
-theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
@@ -3844,7 +3844,7 @@ theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoost
 coordinates for the fields that genuinely match. The LD coordinate is
 deliberately excluded here because the mechanistic model uses a joint
 locus-specific kernel rather than a single global LD scalar. -/
-theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
+theorem _root_.Descent.PopGen.PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     m.coordinateSummary.alleleFreqCoordinate =

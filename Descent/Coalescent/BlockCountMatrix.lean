@@ -198,6 +198,54 @@ theorem card_two_collisions_le' {k N : ℕ} {a b c d : Fin k} (hab : a ≠ b) (h
         exact ⟨hf.1, hf.2.symm⟩
       · exact card_two_collisions_le hab hcd hbd had (Ne.symm hbc)
 
+/-! ### The union bound, and the tail of the row -/
+
+/-- The quadruples a union bound must range over: two pairs, each a genuine pair, and
+distinct as unordered pairs. -/
+noncomputable def collisionQuadruples (k : ℕ) : Finset (Fin k × Fin k × Fin k × Fin k) :=
+  Finset.univ.filter fun q ↦ q.1 ≠ q.2.1 ∧ q.2.2.1 ≠ q.2.2.2 ∧
+    ¬((q.1 = q.2.2.1 ∧ q.2.1 = q.2.2.2) ∨ (q.1 = q.2.2.2 ∧ q.2.1 = q.2.2.1))
+
+/-- **The tail of the block-count row is `O(N⁻²)`.**  The maps that drop two or more lineages
+number at most `k⁴ N^{k-2}`, so their share of the `N^k` maps is at most `k⁴/N²`.
+
+`exists_two_collisions` puts each such map inside one of the `≤ k⁴` two-collision events, and
+`card_two_collisions_le'` bounds each event by `N^{k-2}`.  That is the last ingredient of
+K-G (2.11) for the block-count chain: the diagonal is `WrightFisher.noCoalescenceProb`, within
+`(d_k/N)²/2` of `1 - d_k/N`; the subdiagonal is what is left; and everything below it is
+this. -/
+theorem card_two_drop_le {k N : ℕ} :
+    (Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card + 2 ≤ k).card
+      ≤ k ^ 4 * N ^ (k - 2) := by
+  classical
+  set inner : (Fin k × Fin k × Fin k × Fin k) → Finset (Fin k → Fin N) := fun q ↦
+    Finset.univ.filter fun f ↦ f q.1 = f q.2.1 ∧ f q.2.2.1 = f q.2.2.2 with hinner
+  have hsub : (Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card + 2 ≤ k)
+      ⊆ (collisionQuadruples k).biUnion inner := by
+    intro f hf
+    have hcard : (Finset.univ.image f).card + 2 ≤ k := (Finset.mem_filter.mp hf).2
+    obtain ⟨a, b, c, d, hab, hcd, h1, h2, hne⟩ := exists_two_collisions f hcard
+    refine Finset.mem_biUnion.mpr ⟨(a, b, c, d), ?_, ?_⟩
+    · simp only [collisionQuadruples, Finset.mem_filter, Finset.mem_univ, true_and]
+      exact ⟨hab, hcd, hne⟩
+    · simp only [hinner, Finset.mem_filter, Finset.mem_univ, true_and]
+      exact ⟨h1, h2⟩
+  calc (Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card + 2 ≤ k).card
+      ≤ ((collisionQuadruples k).biUnion inner).card := Finset.card_le_card hsub
+    _ ≤ ∑ q ∈ collisionQuadruples k, (inner q).card := Finset.card_biUnion_le
+    _ ≤ ∑ _q ∈ collisionQuadruples k, N ^ (k - 2) := by
+        refine Finset.sum_le_sum fun q hq ↦ ?_
+        have hq' := (Finset.mem_filter.mp hq).2
+        exact card_two_collisions_le' hq'.1 hq'.2.1 hq'.2.2
+    _ = (collisionQuadruples k).card * N ^ (k - 2) := by
+        rw [Finset.sum_const, smul_eq_mul]
+    _ ≤ k ^ 4 * N ^ (k - 2) := by
+        refine Nat.mul_le_mul_right _ ?_
+        have hle : (collisionQuadruples k).card
+            ≤ (Finset.univ : Finset (Fin k × Fin k × Fin k × Fin k)).card :=
+          Finset.card_le_card (Finset.filter_subset _ _)
+        simpa [Finset.card_univ, pow_succ, Nat.mul_assoc] using hle
+
 end Coalescent
 
 end Descent

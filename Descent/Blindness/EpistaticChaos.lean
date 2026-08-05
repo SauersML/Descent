@@ -528,13 +528,13 @@ def genotypeFlip : Foundations.DiploidGenotype ≃ Foundations.DiploidGenotype w
   right_inv g := by cases g <;> rfl
 
 @[simp] theorem genotypeFlip_homRef :
-    genotypeFlip Foundations.DiploidGenotype.homRef = Foundations.DiploidGenotype.homAlt := rfl
+    genotypeFlip Descent.Core.Genotype.homRef = Descent.Core.Genotype.homAlt := rfl
 
 @[simp] theorem genotypeFlip_het :
-    genotypeFlip Foundations.DiploidGenotype.het = Foundations.DiploidGenotype.het := rfl
+    genotypeFlip Descent.Core.Genotype.het = Descent.Core.Genotype.het := rfl
 
 @[simp] theorem genotypeFlip_homAlt :
-    genotypeFlip Foundations.DiploidGenotype.homAlt = Foundations.DiploidGenotype.homRef := rfl
+    genotypeFlip Descent.Core.Genotype.homAlt = Descent.Core.Genotype.homRef := rfl
 
 /-- **The balanced locus really is sign-symmetric: the converse direction.**
 
@@ -642,9 +642,9 @@ lies inside every lattice. The one frequency at which dosage coding is
 sign-symmetric is the frequency at which it is maximally lattice. -/
 theorem centeredDosageSquare_two_valued_at_half
     (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
-    h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧
-      h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧
-      h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1 := by
+    h.centeredAltAlleleCount Descent.Core.Genotype.homRef ^ 2 = 1 ∧
+      h.centeredAltAlleleCount Descent.Core.Genotype.het ^ 2 = 0 ∧
+      h.centeredAltAlleleCount Descent.Core.Genotype.homAlt ^ 2 = 1 := by
   refine ⟨?_, ?_, ?_⟩ <;>
     · simp only [Foundations.HardyWeinbergModel.centeredAltAlleleCount,
         Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount, hhalf]
@@ -660,9 +660,9 @@ Gaussian surrogate by symmetry alone contains no genotype coding. -/
 theorem hardCall_coding_dichotomy
     (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (h.altFreq = 1 / 2 ∧
-        h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧
-        h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧
-        h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1) ∨
+        h.centeredAltAlleleCount Descent.Core.Genotype.homRef ^ 2 = 1 ∧
+        h.centeredAltAlleleCount Descent.Core.Genotype.het ^ 2 = 0 ∧
+        h.centeredAltAlleleCount Descent.Core.Genotype.homAlt ^ 2 = 1) ∨
       hweThirdCentralMoment h ≠ 0 := by
   by_cases hhalf : h.altFreq = 1 / 2
   · exact Or.inl ⟨hhalf, centeredDosageSquare_two_valued_at_half h hhalf⟩
@@ -919,13 +919,13 @@ level-one increments, because `u` is not a product of squares. Contrast
 `uncentered_square_log_additive`. -/
 theorem centeredSquare_negative_at_half (h : Foundations.HardyWeinbergModel)
     (hhalf : h.altFreq = 1 / 2) :
-    h.centeredSquare Foundations.DiploidGenotype.het = -1 := by
+    h.centeredSquare Descent.Core.Genotype.het = -1 := by
   have hvar : h.genotypeVariance = 1 / 2 := by
     rw [h.genotypeVariance_eq]
     unfold Foundations.HardyWeinbergModel.refFreq
     rw [hhalf]
     norm_num
-  have hcentered : h.centeredAltAlleleCount Foundations.DiploidGenotype.het = 0 := by
+  have hcentered : h.centeredAltAlleleCount Descent.Core.Genotype.het = 0 := by
     unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq, hhalf]
     simp only [Foundations.altAlleleCount]
@@ -1043,9 +1043,9 @@ At `q = 1/2` the standardized coordinate takes `-√2, 0, √2`, so `x²` takes 
 `u = x² - 1` takes `1, -1, 1`. Note `σ₁² = E[x⁴] - 1 = 1` there, so the unnormalized and
 normalized floor-two coordinates coincide at this frequency. -/
 theorem centeredSquare_values_at_half (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
-    h.centeredSquare Foundations.DiploidGenotype.homRef = 1 ∧
-      h.centeredSquare Foundations.DiploidGenotype.het = -1 ∧
-      h.centeredSquare Foundations.DiploidGenotype.homAlt = 1 := by
+    h.centeredSquare Descent.Core.Genotype.homRef = 1 ∧
+      h.centeredSquare Descent.Core.Genotype.het = -1 ∧
+      h.centeredSquare Descent.Core.Genotype.homAlt = 1 := by
   have hvar : h.genotypeVariance = 1 / 2 := by
     rw [h.genotypeVariance_eq]
     unfold Foundations.HardyWeinbergModel.refFreq
@@ -1080,8 +1080,8 @@ strictly stronger than symmetry of the law, and the coding-level detector used b
 settles them. -/
 theorem centeredSquare_rademacher_at_half (h : Foundations.HardyWeinbergModel)
     (hhalf : h.altFreq = 1 / 2) :
-    h.genotypeProb Foundations.DiploidGenotype.homRef + h.genotypeProb Foundations.DiploidGenotype.homAlt = 1 / 2 ∧
-      h.genotypeProb Foundations.DiploidGenotype.het = 1 / 2 := by
+    h.genotypeProb Descent.Core.Genotype.homRef + h.genotypeProb Descent.Core.Genotype.homAlt = 1 / 2 ∧
+      h.genotypeProb Descent.Core.Genotype.het = 1 / 2 := by
   constructor <;>
     · simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq, hhalf]
       norm_num
@@ -1181,10 +1181,10 @@ theorem standardizedGenotype_even_moment_lower_bound (h : Foundations.HardyWeinb
     intro g
     rw [pow_mul]
     exact pow_nonneg (sq_nonneg _) m
-  have hhet : h.genotypeProb Foundations.DiploidGenotype.het *
-      h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ (2 * m) =
+  have hhet : h.genotypeProb Descent.Core.Genotype.het *
+      h.centeredAltAlleleCount Descent.Core.Genotype.het ^ (2 * m) =
         h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) := by
-    have hcentered : h.centeredAltAlleleCount Foundations.DiploidGenotype.het =
+    have hcentered : h.centeredAltAlleleCount Descent.Core.Genotype.het =
         1 - 2 * h.altFreq := by
       unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
       rw [h.expectedAltAlleleCount_eq]
@@ -1193,8 +1193,8 @@ theorem standardizedGenotype_even_moment_lower_bound (h : Foundations.HardyWeinb
     simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq]
     ring
   calc h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m)
-      = h.genotypeProb Foundations.DiploidGenotype.het *
-          h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ (2 * m) := hhet.symm
+      = h.genotypeProb Descent.Core.Genotype.het *
+          h.centeredAltAlleleCount Descent.Core.Genotype.het ^ (2 * m) := hhet.symm
     _ ≤ ∑ g : Foundations.DiploidGenotype,
           h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) :=
         Finset.single_le_sum
@@ -1268,16 +1268,16 @@ theorem hweSignBias_eq (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq
     unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [abs_div, abs_of_pos hs, div_mul_div_comm, hss]
     ring
-  have hcref : h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef = -(2 * h.altFreq) := by
+  have hcref : h.centeredAltAlleleCount Descent.Core.Genotype.homRef = -(2 * h.altFreq) := by
     unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [Foundations.altAlleleCount]
     ring
-  have hchet : h.centeredAltAlleleCount Foundations.DiploidGenotype.het = 1 - 2 * h.altFreq := by
+  have hchet : h.centeredAltAlleleCount Descent.Core.Genotype.het = 1 - 2 * h.altFreq := by
     unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [Foundations.altAlleleCount]
-  have hcalt : h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt = 2 - 2 * h.altFreq := by
+  have hcalt : h.centeredAltAlleleCount Descent.Core.Genotype.homAlt = 2 - 2 * h.altFreq := by
     unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
     simp only [Foundations.altAlleleCount]
@@ -1330,7 +1330,7 @@ def _root_.Descent.Foundations.HardyWeinbergModel.reflect (h : Foundations.Hardy
   altFreq_nonneg := by linarith [h.altFreq_le_one]
   altFreq_le_one := by linarith [h.altFreq_nonneg]
 
-@[simp] theorem HardyWeinbergModel.reflect_altFreq (h : Foundations.HardyWeinbergModel) :
+@[simp] theorem _root_.Descent.Foundations.HardyWeinbergModel.reflect_altFreq (h : Foundations.HardyWeinbergModel) :
     h.reflect.altFreq = 1 - h.altFreq := rfl
 
 /-- Reflection swaps the two homozygote probabilities and fixes the heterozygote:

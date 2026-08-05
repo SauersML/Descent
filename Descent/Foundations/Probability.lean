@@ -12,6 +12,7 @@ import Mathlib.InformationTheory.KullbackLeibler.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 import Descent.Core.Ratios
 import Descent.Core.Population
+import Descent.Core.Genome
 
 open scoped InnerProductSpace
 open InnerProductSpace
@@ -158,39 +159,19 @@ The Gaussian score formulas are then interpreted as approximations with an expli
 Berry-Esseen-style error term rather than as exact biology.
 -/
 
-/-- Diploid genotype state at a biallelic locus. -/
-inductive DiploidGenotype
-  | homRef
-  | het
-  | homAlt
-  deriving DecidableEq, Fintype, Repr
+/-- **A diploid genotype at a biallelic locus** -- `Descent.Core.Genotype`, under the name
+this module introduced it with.
 
-/-- Concrete enumeration of diploid genotypes by `Fin 3`. -/
-def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
-  toFun
-    | .homRef => 0
-    | .het => 1
-    | .homAlt => 2
-  invFun
-    | ⟨0, _⟩ => .homRef
-    | ⟨1, _⟩ => .het
-    | ⟨2, _⟩ => .homAlt
-  left_inv g := by
-    cases g <;> rfl
-  right_inv i := by
-    fin_cases i <;> rfl
+The type used to be declared here, with its own `Fin 3` equivalence and sum expansion, and
+two other encodings of a genotype existed elsewhere with nothing shared between them.  It
+now lives at the bottom of the import graph, in `Core/Genome`, beside the alleles a
+genotype is made of and the panel it is measured in; `DiploidGenotype` stays as a reducible
+abbreviation so the name this module's statements are written in still reads.
 
-@[simp] theorem DiploidGenotype.equivFin3_symm_apply (i : Fin 3) :
-    DiploidGenotype.equivFin3.symm i =
-      match i with
-      | ⟨0, _⟩ => DiploidGenotype.homRef
-      | ⟨1, _⟩ => DiploidGenotype.het
-      | ⟨2, _⟩ => DiploidGenotype.homAlt := by
-  fin_cases i <;> rfl
-
-@[simp] theorem DiploidGenotype.equivFin3_symm_apply_apply (g : DiploidGenotype) :
-    DiploidGenotype.equivFin3.symm (DiploidGenotype.equivFin3 g) = g :=
-  DiploidGenotype.equivFin3.left_inv g
+The constructors and the equivalence are reached under the type's own name --
+`Descent.Core.Genotype.homRef`, `Descent.Core.Genotype.equivFin3` -- because Lean resolves a
+dotted NAME against the literal namespace and does not unfold an abbreviation to find it. -/
+abbrev DiploidGenotype := Descent.Core.Genotype
 
 /-- **A sum over genotypes is its three terms.**
 
@@ -204,15 +185,9 @@ It belongs here, beside the equivalence it uses and above every module that comp
 genotype moment. -/
 theorem sum_over_genotypes (f : DiploidGenotype → ℝ) :
     (∑ g : DiploidGenotype, f g) =
-      f DiploidGenotype.homRef + f DiploidGenotype.het + f DiploidGenotype.homAlt := by
-  have hrewrite :
-      (∑ g : DiploidGenotype, f g) =
-        ∑ i : Fin 3, f (DiploidGenotype.equivFin3.symm i) :=
-    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
-      intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
-  rw [hrewrite, Fin.sum_univ_three]
-  rfl
+      f Descent.Core.Genotype.homRef + f Descent.Core.Genotype.het
+        + f Descent.Core.Genotype.homAlt :=
+  Descent.Core.Genotype.sum_univ f
 
 /-- Number of alternative alleles carried by a diploid genotype.
 
@@ -223,10 +198,7 @@ theorem sum_over_genotypes (f : DiploidGenotype → ℝ) :
     is tested where it is used -- `BlindnessRegistry.averageEffect` is the
     least-squares slope of genotypic value on THIS dosage, and a different
     coding would move that slope. -/
-def altAlleleCount : DiploidGenotype → ℝ
-  | .homRef => 0
-  | .het => 1
-  | .homAlt => 2
+def altAlleleCount : DiploidGenotype → ℝ := Descent.Core.Genotype.dosage
 
 /-- One-locus Hardy-Weinberg model with alternative-allele frequency `q ∈ [0,1]`. -/
 structure HardyWeinbergModel where
@@ -307,13 +279,13 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
     ring
   have hrewrite :
       (∑ g : DiploidGenotype, h.genotypeProb g) =
-        ∑ i : Fin 3, h.genotypeProb (DiploidGenotype.equivFin3.symm i) :=
-    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+        ∑ i : Fin 3, h.genotypeProb (Descent.Core.Genotype.equivFin3.symm i) :=
+    Fintype.sum_equiv Descent.Core.Genotype.equivFin3 _ _ (by
       intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
+      rw [Descent.Core.Genotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
+  simp [Descent.Core.Genotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
         = (h.refFreq + h.altFreq) ^ 2 := by ring
@@ -337,18 +309,18 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
   unfold HardyWeinbergModel.expectedAltAlleleCount
   have hrewrite :
       (∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g) =
-        ∑ i : Fin 3, altAlleleCount (DiploidGenotype.equivFin3.symm i) *
-          h.genotypeProb (DiploidGenotype.equivFin3.symm i) :=
-    Fintype.sum_equiv DiploidGenotype.equivFin3 _ _ (by
+        ∑ i : Fin 3, altAlleleCount (Descent.Core.Genotype.equivFin3.symm i) *
+          h.genotypeProb (Descent.Core.Genotype.equivFin3.symm i) :=
+    Fintype.sum_equiv Descent.Core.Genotype.equivFin3 _ _ (by
       intro x
-      rw [DiploidGenotype.equivFin3_symm_apply_apply])
+      rw [Descent.Core.Genotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
+  simp [Descent.Core.Genotype.equivFin3, HardyWeinbergModel.genotypeProb]
   calc
-    altAlleleCount DiploidGenotype.homRef * h.refFreq ^ 2 +
-        altAlleleCount DiploidGenotype.het * (2 * h.refFreq * h.altFreq) +
-        altAlleleCount DiploidGenotype.homAlt * h.altFreq ^ 2
+    altAlleleCount Descent.Core.Genotype.homRef * h.refFreq ^ 2 +
+        altAlleleCount Descent.Core.Genotype.het * (2 * h.refFreq * h.altFreq) +
+        altAlleleCount Descent.Core.Genotype.homAlt * h.altFreq ^ 2
         = 2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2 := by
           simp [altAlleleCount]
           ring

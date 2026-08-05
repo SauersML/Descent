@@ -2217,7 +2217,7 @@ theorem conditionalMeanApproximationRisk_at_conditional_mean {k : ℕ} [Fintype 
   simp
 
 
-theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
+theorem _root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
     {k : ℕ} [Fintype (Fin k)]
     (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hResidualSq_int :
@@ -2262,7 +2262,7 @@ theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanAp
   rw [horth]
   ring
 
-theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
+theorem _root_.Descent.Foundations.ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
     {k : ℕ} [Fintype (Fin k)]
     (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hGapSq_meas :
@@ -2278,7 +2278,7 @@ theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
       (f := fun pc : ℝ × (Fin k → ℝ) ↦ (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
       (by fun_prop) hGapSq_meas).symm
 
-theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
+theorem _root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     {k : ℕ} [Fintype (Fin k)]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (cmdgp : Foundations.ConditionalMeanDGP k)

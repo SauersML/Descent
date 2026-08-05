@@ -102,6 +102,14 @@ def equivFin3 : Genotype ≃ Fin 3 where
   right_inv i := by
     fin_cases i <;> rfl
 
+@[simp] theorem equivFin3_symm_apply (i : Fin 3) :
+    equivFin3.symm i =
+      match i with
+      | ⟨0, _⟩ => Genotype.homRef
+      | ⟨1, _⟩ => Genotype.het
+      | ⟨2, _⟩ => Genotype.homAlt := by
+  fin_cases i <;> rfl
+
 @[simp] theorem equivFin3_symm_apply_apply (g : Genotype) :
     equivFin3.symm (equivFin3 g) = g :=
   equivFin3.left_inv g
