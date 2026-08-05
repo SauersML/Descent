@@ -441,7 +441,27 @@ theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
     where α is admixture proportion, g is generations since
     admixture, r is recombination rate.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`proofs/validation/empirical/popgensel/admixcell.py`,
+    cell G). A single admixture pulse simulated with a finite-`N` individual-based two-locus
+    GAMETE model at `N = 3000`, 400 replicate populations: the decay is realised by actual
+    recombination events rather than by iterating the closed form, and drift is present.
+    This body is the equal-frequency-difference case `q_A = p_A`, `q_B = p_B` of
+    `admixture_ld_at_gen_eq`, so the cells are run at that specialization.
+
+    | `α` | `p_A` | `p_B` | `r` | `g` | measured `D` | this def | sems |
+    |---|---|---|---|---|---|---|---|
+    | 0.30 | 0.80 | 0.20 | 0.05 | 4 | 0.06865 ± 0.00033 | 0.06851 | -0.42 |
+    | 0.50 | 0.90 | 0.10 | 0.10 | 3 | 0.11630 ± 0.00024 | 0.11664 | 1.42 |
+    | 0.20 | 0.70 | 0.30 | 0.02 | 8 | 0.02168 ± 0.00040 | 0.02178 | 0.24 |
+
+    Three competitors are carried on the same cells and rejected. `α²` in place of
+    `α(1-α)`, the admixture-fraction slip, at 120 and 40 sems on rows one and three -- row
+    two is at `α = 1/2`, where the two coincide, which is why the design does not sit
+    there. Dropping the decay factor entirely, at 9.7 to 181 sems. And the continuous-time
+    approximation `exp(-r·g)` in place of `(1-r)^g`, at 9.3 sems in the `r = 0.10` row,
+    which is the row with the recombination rate large enough to separate the discrete and
+    continuous forms; the two low-`r` rows cannot, and read 0.3 to 0.7 sems there. The
+    `PLANTED` control at `1.4x` this body is rejected at 21.8 to 195 sems. -/
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
 

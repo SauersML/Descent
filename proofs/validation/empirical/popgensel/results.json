@@ -832,5 +832,88 @@
     "fluctuating_sems": -48.4087750996308
    }
   ]
+ },
+ "G": {
+  "cell": "G",
+  "target": "admixtureLDMagnitude",
+  "guard": "PGSEL_G1",
+  "argument_source": "finite-N individual-based two-locus gamete simulation of a single admixture pulse; decay realised by recombination events, not by iterating the closed form",
+  "detail": [
+   {
+    "alpha": 0.3,
+    "pA": 0.8,
+    "pB": 0.2,
+    "r": 0.05,
+    "g": 4,
+    "N": 3000,
+    "reps": 400,
+    "measured": 0.06169851826388889,
+    "sem": 0.00029318667354962674,
+    "pred": {
+     "corpus": 0.061576672500000006,
+     "COMP alpha^2": 0.0263900025,
+     "COMP exp(-rg)": 0.06189604493269544,
+     "COMP no decay": 0.07560000000000001,
+     "PLANTED 1.4x": 0.0862073415
+    },
+    "sems": {
+     "corpus": -0.4155910717690265,
+     "COMP alpha^2": -120.43015235449417,
+     "COMP exp(-rg)": 0.6737232167311097,
+     "COMP no decay": 47.415121457619954,
+     "PLANTED 1.4x": 83.59460182613856
+    }
+   },
+   {
+    "alpha": 0.5,
+    "pA": 0.9,
+    "pB": 0.1,
+    "r": 0.1,
+    "g": 3,
+    "N": 3000,
+    "reps": 400,
+    "measured": 0.11629904881944444,
+    "sem": 0.00024080543453968697,
+    "pred": {
+     "corpus": 0.11664000000000004,
+     "COMP alpha^2": 0.11664000000000004,
+     "COMP exp(-rg)": 0.11853091530907488,
+     "COMP no decay": 0.16000000000000003,
+     "PLANTED 1.4x": 0.16329600000000005
+    },
+    "sems": {
+     "corpus": 1.415878263741587,
+     "COMP alpha^2": 1.415878263741587,
+     "COMP exp(-rg)": 9.2683393707321,
+     "COMP no decay": 181.47825967504593,
+     "PLANTED 1.4x": 195.16565840963224
+    }
+   },
+   {
+    "alpha": 0.2,
+    "pA": 0.7,
+    "pB": 0.3,
+    "r": 0.02,
+    "g": 8,
+    "N": 3000,
+    "reps": 400,
+    "measured": 0.021682535694444446,
+    "sem": 0.00040472063591523693,
+    "pred": {
+     "corpus": 0.02177953337809371,
+     "COMP alpha^2": 0.005444883344523427,
+     "COMP exp(-rg)": 0.02181488099753501,
+     "COMP no decay": 0.0256,
+     "PLANTED 1.4x": 0.030491346729331185
+    },
+    "sems": {
+     "corpus": 0.239665771995818,
+     "COMP alpha^2": -40.12064349820246,
+     "COMP exp(-rg)": 0.3270040896019036,
+     "COMP no decay": 9.679428123788611,
+     "PLANTED 1.4x": 21.765164049434883
+    }
+   }
+  ]
  }
 }
