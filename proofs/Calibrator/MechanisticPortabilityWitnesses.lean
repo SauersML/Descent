@@ -617,40 +617,55 @@ noncomputable def popgenDrivenTagScale : ℝ :=
   (7 / 6 : ℝ) * Real.exp (-(1 : ℝ))
 
 /-- The LD decay exponent this witness carries across one tag-causal unit of
-distance: `lambda * √(F_ST gap) * distance` at `lambda = 1/4`, gap `2/7`,
-distance `1`.
+distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with
+`lambda` and the gap READ OFF the witness's own population-genetic parameters
+rather than copied out as numbers, and `distance = 1` from the model's
+`tagCausalDistance` below.
 
-It is named rather than inlined because it is the one place the witness
-depends on the FORM of `ldCorrelationDecay`, and it has moved TWICE. While that
-body read `lambda * F_ST * distance` this was `2/7 * 1/4 = 1/14`; the exponent
-was measured to be a SQUARE ROOT and it became `√(2/7) * 1/4`, a surd that did
-not reduce; and the witness's `F_ST` gap then moved from `2/7` to `1/4` when
-`fstTransientAt` picked up the two-deme correction on its migration term, which
-makes the surd rational again at `1/8`. It is left written as a square root
-rather than as `1/8` because the SHAPE is the empirical content and a rational
-literal would hide the next move of it. Every step below is stated against this
-name so that a change to the decay law moves one definition rather than nine
-proof steps.
+**Why it is written this way, and not as a literal.** This is the one place the
+witness depends on the FORM of `ldCorrelationDecay`, and the number has moved
+three times. While that body read `lambda * F_ST * distance` it was
+`2/7 * 1/4 = 1/14`; the exponent was measured to be a SQUARE ROOT and it became
+`√(2/7) * 1/4`, a surd that did not reduce; then the gap moved from `2/7` to
+`1/4` when `fstTransientAt` picked up the two-deme correction on its migration
+term. Each time, the repair upstream was correct and this constant was left
+behind -- still syntactically well-formed, no longer true, and the build broke
+on a file that had not been touched. A literal cannot fail with the body it
+came from, so the body now supplies it: `popgenDrivenLDDecayExponent_eq_eighth`
+carries the value `1/8` exactly once, as a CONSEQUENCE of the fields, and every
+proof below rewrites with that theorem instead of unfolding a number. Move the
+decay law, the recombination rate or the `F_ST` gap and the theorem fails
+immediately, at the one place that names the value.
 
-Empirical status: NOT AN EMPIRICAL CLAIM. This is `ldCorrelationDecay`'s
-exponent evaluated at three literal fields of the witness beside it, and a
-witness's own coordinates are not measurable quantities. The reason it is not a
-MEMORISED constant -- the failure this file has had twice -- is
-`popgenDrivenProxyGenerationalModel_coordinates` below, which proves the model's
-generation-1 proxy scale equals `(7/6) * exp (-(1 + this))` by unfolding both
-sides through `ldCorrelationDecay` itself: move the decay law, the `F_ST` gap or
-the recombination rate and that proof stops compiling rather than leaving this
-number silently stale. The empirical content -- that the exponent goes as
-`√fstGap` and not as `fstGap` -- belongs to `PortabilityDrift.ldCorrelationDecay`,
-where it was measured across a ninetyfold span of `F_ST` and is what moved this
-constant from `1/14` to a surd; the `F_ST` gap itself belongs to
-`DGP.fstEquilibrium`, whose two-deme correction moved the gap to `1/4`. -/
-noncomputable def popgenDrivenLDDecayExponent : ℝ := Real.sqrt (1 / 4) / 4
+Empirical status: NOT AN EMPIRICAL CLAIM. It is a function of a witness's own
+coordinates, and a witness's coordinates are stipulated rather than measured.
+The empirical content -- that the exponent goes as `√fstGap` and not as
+`fstGap` -- belongs to `PortabilityDrift.ldCorrelationDecay`, where it was
+measured across a ninetyfold span of `F_ST`; the `F_ST` gap itself belongs to
+`DGP.fstEquilibrium`, whose two-deme correction last moved it. -/
+noncomputable def popgenDrivenLDDecayExponent : ℝ :=
+  nondegenerateGenerationalPopGen.recomb *
+    Real.sqrt (nondegenerateGenerationalPopGen.fstTransientAt 1)
+
+/-- **The exponent's value, DERIVED rather than restated.** This is the step that
+makes the definition above safe to depend on: the number `1/8` appears once, as a
+consequence of the witness's own fields, and every proof below rewrites with this
+theorem instead of unfolding a literal. Move `fstTransientAt`, the recombination
+rate or the decay law and this theorem fails, which is the whole point -- the
+three times this file broke the build, it was because a corrected body upstream
+left a memorised constant behind that was still syntactically well-formed and no
+longer true. -/
+theorem popgenDrivenLDDecayExponent_eq_eighth :
+    popgenDrivenLDDecayExponent = 1 / 8 := by
+  obtain ⟨-, -, -, h_fst, -, -⟩ := nondegenerateGenerationalPopGen_coordinates_at_one
+  unfold popgenDrivenLDDecayExponent
+  rw [h_fst, show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num,
+    Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 1 / 2)]
+  norm_num [nondegenerateGenerationalPopGen]
 
 theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
-  unfold popgenDrivenLDDecayExponent
-  have h : 0 < Real.sqrt (2 / 7) := Real.sqrt_pos.mpr (by norm_num)
-  linarith
+  rw [popgenDrivenLDDecayExponent_eq_eighth]
+  norm_num
 
 /-- Shared proxy-tagging scale at generation `1` in the nondegenerate two-tag
 proxy witness. The additional `exp (-popgenDrivenLDDecayExponent)` factor comes
@@ -759,7 +774,7 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
               have hsqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
                 rw [show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num]
                 exact Real.sqrt_sq (by norm_num)
-              unfold popgenDrivenLDDecayExponent
+              rw [popgenDrivenLDDecayExponent_eq_eighth]
               fin_cases i <;>
                 generational_witness_simp nondegenerateGenerationalPopGen,
                   popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig,
