@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Algebra.Order.Chebyshev
-import Descent.Program.OpenQuestions
+import Descent.Portability.PortabilityDrift
 import Descent.Portability.TransplantationStability
 import Descent.Core.Ratios
 
