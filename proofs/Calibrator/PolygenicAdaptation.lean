@@ -417,7 +417,40 @@ decorrelates effects by `d`; stabilizing selection toward a shared optimum damps
 that decorrelation by the factor `1 / (1 + s·N)`, where `s` is the selection
 strength and `N` the effective population size.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED, including in sign**
+    (`proofs/validation/empirical/popgensel/fluctcell.py`, cell F). Forward,
+    individual-based Wright-Fisher with Gaussian stabilizing selection toward a
+    SHARED optimum -- the setting this docstring describes -- 60 unlinked causal
+    loci, two populations split from one ancestor for 20 generations, 150
+    replicates per cell. `d` is fed REALIZED from a neutral arm run on the same
+    loci, seeds and divergence time, not from a nominal parameter, because the
+    predicted effect IS the gap between the neutral and selected arms.
+
+    | `N` | `s` | `s·N` | realized `d` | measured `ρ` | this body | sems |
+    |---|---|---|---|---|---|---|
+    | 30 | 0.1 | 3 | 0.7305 | 0.2464 ± 0.0127 | 0.8174 | 45.0 |
+    | 30 | 0.5 | 15 | 0.7305 | 0.2121 ± 0.0145 | 0.9543 | 51.3 |
+    | 30 | 2.0 | 60 | 0.7305 | 0.1427 ± 0.0184 | 0.9880 | 45.8 |
+    | 60 | 0.5 | 30 | 0.4618 | 0.4143 ± 0.0114 | 0.9851 | 49.9 |
+    | 60 | 2.0 | 120 | 0.4618 | 0.3545 ± 0.0152 | 0.9962 | 42.1 |
+
+    The damping has the wrong SIGN. This body is increasing in `s·N` -- stronger
+    selection, better-preserved effects, rising to 0.996 -- while the measurement
+    falls monotonically, because a shared optimum is reachable by different
+    allelic routes and stronger selection lets the two populations take different
+    ones faster. Neutral drift is not damped by stabilizing selection; it is
+    accelerated by it.
+
+    The positive control is the `s = 0` arm, where this body returns exactly the
+    measured neutral correlation by construction, so the instrument agrees where
+    it must; and the sweep moves 22 sems along the selection axis, so the
+    disagreement is the measurement rather than the design's blindness.
+
+    What survives is the ORDERING against `effectCorrelationFluctuating`: at
+    matched strength the fluctuating arm decorrelates further than the
+    stabilizing one (0.0844 against 0.3545 at `N = 60`, `s = 2`), which is what
+    `fluctuating_selection_worst_portability` orders. The magnitudes
+    are not to be read off either body. -/
 noncomputable def effectCorrelationStabilizingDriftSelection (d s N : ℝ) : ℝ :=
   1 - d / (1 + s * N)
 
@@ -444,7 +477,41 @@ range. Fluctuating selection accelerates decorrelation by the factor
 `(1 + f·N)`; the clamp at `-1` is what keeps the quantity a correlation for every
 parameter value rather than only on the range the ordering theorem wants.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED, and the clamp is where it fails**
+    (`proofs/validation/empirical/popgensel/fluctcell.py`, cell F). Measured on a
+    fluctuating-selection arm: the same forward Wright-Fisher as
+    `effectCorrelationStabilizingDriftSelection`, except the optimum is a fresh
+    `N(0, V_g)` draw every generation and INDEPENDENTLY in each population, which
+    is what fluctuating selection is. `d` is fed REALIZED from the neutral arm of
+    that same sweep.
+
+    | `N` | `f` | `f·N` | realized `d` | measured `ρ` | this body | sems |
+    |---|---|---|---|---|---|---|
+    | 30 | 0.1 | 3 | 0.7377 | 0.2306 ± 0.0116 | -1 (clamped) | 106.5 |
+    | 30 | 0.5 | 15 | 0.7377 | 0.1525 ± 0.0157 | -1 (clamped) | 73.6 |
+    | 60 | 0.1 | 6 | 0.4411 | 0.5442 ± 0.0090 | -1 (clamped) | 171.8 |
+    | 60 | 0.5 | 30 | 0.4411 | 0.3953 ± 0.0125 | -1 (clamped) | 111.4 |
+    | 60 | 2.0 | 120 | 0.4411 | 0.0844 ± 0.0224 | -1 (clamped) | 48.4 |
+
+    The clamp binds on EVERY cell with `f > 0`, because `d·(1 + f·N) > 2` as soon
+    as `f·N > 1.7` at these realized `d`, and the docstring above already names
+    that as "an ordinary parameter regime". So across the whole swept range this
+    body returns the boundary value `-1` while the measurement sits between 0.08
+    and 0.54 -- perfect anticorrelation predicted where a positive correlation is
+    observed, at 48 to 172 sems. The clamp does keep the output inside `[-1, 1]`;
+    what it does not do is make it right. It converts a formula that leaves the
+    correlation range into one that is wrong while inside it, which is harder to
+    notice.
+
+    The positive control is the `f = 0` arm, where this body returns the measured
+    neutral correlation exactly; and the sweep moves 21 sems along the selection
+    axis, so the design can see fluctuating selection acting.
+
+    What survives is the ORDERING: fluctuating selection does decorrelate further
+    than stabilizing at matched strength (0.0844 against 0.3545 at `N = 60`,
+    strength 2), which is the direction
+    `fluctuating_selection_worst_portability` orders. The multiplicative
+    form `(1 + f·N)` and the clamped value are not supported. -/
 noncomputable def effectCorrelationFluctuating (d f N : ℝ) : ℝ :=
   max (-1) (1 - d * (1 + f * N))
 

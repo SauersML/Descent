@@ -9,6 +9,7 @@ control that could have failed.
 | `popgensel.py` | A `driftLDCreationRate`, B `bottleneckExcessLD`, C `freeRecombinationStep`, D `selectionPortabilityTimescale` | `PGSEL_V1` |
 | `selcell.py` | E `effectCorrelationStabilizing`, divergence-time axis | `PGSEL_E1` |
 | `selpower.py` | E's positive control: the selection axis, where the design must move | `PGSEL_E2` |
+| `fluctcell.py` | F `effectCorrelationStabilizingDriftSelection` and `effectCorrelationFluctuating`, with a fluctuating-optimum arm | `PGSEL_F1` |
 | `results.json` | the committed output of all three | |
 
 ## Verdicts
@@ -20,6 +21,13 @@ control that could have failed.
 | C | `EpistaticChaos.freeRecombinationStep` | FALSIFIED as a one-generation step: `D' = (1-r) D`, so free recombination halves `D` rather than removing it |
 | D | `SelectionArchitecture.selectionPortabilityTimescale` | FALSIFIED by a factor of two: the e-folding time is `1/log(1+s)`, not `1/(2s)` |
 | E | `SelectionArchitecture.effectCorrelationStabilizing` | FALSIFIED twice: the quantity depends on divergence time and the body has none, and the `Ns` dependence has the wrong sign |
+| F | `PolygenicAdaptation.effectCorrelationStabilizingDriftSelection` | FALSIFIED in sign at 42-51 sems: stabilizing selection ACCELERATES decorrelation rather than damping it |
+| F | `PolygenicAdaptation.effectCorrelationFluctuating` | FALSIFIED at 48-172 sems: the `-1` clamp binds on every cell with `f > 0`, so the body predicts perfect anticorrelation where 0.08 to 0.54 is observed |
+
+Cell F feeds `d` REALIZED from a neutral arm run on the same loci, seeds and
+divergence time, because the whole predicted effect is the gap between the
+neutral and selected arms. A nominal `d` would have made the comparison
+meaningless.
 
 ## Discipline
 

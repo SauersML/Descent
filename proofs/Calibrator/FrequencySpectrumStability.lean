@@ -211,10 +211,14 @@ theorem independentSampleMultiplier_add_epochs (K extra factor : ℕ) (hK : 2 �
 `kappa`. This prices the linear core only; boundary collisions still impose the separate
 Hölder law formalized above.
 
-Empirical status: UNTESTED. The exponential is the conditioning law read off the Laplace
-core, and the theorems below fix how it scales with the epoch count. What no measurement
-here supports is the value of `kappa` for any real inference problem; it is a parameter of
-the statement, not a number this corpus has pinned. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. The body raises the supplied `factor` to
+`kappa * (2K - 3)`, where `2K - 3` is `epochSpectrumCoordinateCount` -- a count read off the
+model's own parametrisation -- and `kappa` is a free argument. Given both, the multiplier is
+arithmetic, and no inference problem can make it a different number. The theorems below fix
+how it scales with the epoch count, and that scaling is algebra on the exponent. The one
+thing with observable content, the value of `kappa` for any real inference problem, is a
+parameter of the statement and not a number this corpus has pinned; it is an input, so the
+claim about it is a claim about consumers of this definition rather than about this body. -/
 noncomputable def canonicalGenomeMultiplierForEpochCoordinates
     (kappa : ℝ) (K : ℕ) : ℝ :=
   Real.exp (kappa * epochSpectrumCoordinateCount K)

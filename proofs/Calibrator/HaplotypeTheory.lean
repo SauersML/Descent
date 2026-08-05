@@ -428,7 +428,14 @@ fitted cis/trans effects agree with the target's, which is the content of
 the effects themselves do not transport — see
 `haplotype_less_portable_when_effects_shift`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is the absolute gap between two
+    evaluations of `averagePhaseInteraction` at the SAME configuration frequency, which is
+    the DEFINITION of "the bias the fitted cis/trans pair carries into the target". No
+    population can make that distance a different number once the four inputs are fixed.
+    What is empirical is whether real cis and trans interaction effects transport -- a claim
+    about the INPUTS `interaction_cis` and `interaction_trans` relative to `pred_cis` and
+    `pred_trans` -- and `haplotypeTransportBias_of_matched_predictor` is the corpus saying
+    exactly when this vanishes, which is algebra on that input rather than a measurement. -/
 noncomputable def haplotypeTransportBias
     (freq_cis_target pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
   |averagePhaseInteraction freq_cis_target pred_cis pred_trans -

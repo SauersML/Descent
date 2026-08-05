@@ -68,7 +68,13 @@ noncomputable instance SelectionModelSummary.instNonempty :
 /-- Validation log-likelihood of a candidate summary under Gaussian measurement
 noise on the observed effect-correlation and selected-variance summaries.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is the DEFINITION of a Gaussian
+    log-likelihood on two independent summaries: given the noise scales the validation model
+    already carries, no population can make the sum of two `gaussianProfileLogLik` terms a
+    different number. It is an objective a consumer optimizes, not a prediction about data.
+    The empirical content sits in its INPUTS -- that the two summary errors are Gaussian,
+    independent, and have the stated noise scales -- and those are hypotheses the
+    `SelectionValidationModel` supplies. -/
 noncomputable def selectionSummaryLogLik
     (validation : SelectionValidationModel)
     (summary : SelectionModelSummary) : ℝ :=
@@ -108,7 +114,11 @@ theorem missedSelectedVariance_matching (validation : SelectionValidationModel) 
 /-- Likelihood-ratio statistic comparing two selection summaries on the same
 observed validation target.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is `likelihoodRatioStat` applied to
+    two `selectionSummaryLogLik` values, which is the DEFINITION of the statistic and not a
+    claim about its sampling distribution. Nothing here asserts that it is asymptotically
+    chi-squared, or that any critical value calibrates a test -- that is where the empirical
+    content of a likelihood-ratio test lives, and this declaration does not reach it. -/
 noncomputable def selectionModelLRT
     (validation : SelectionValidationModel)
     (nullSummary altSummary : SelectionModelSummary) : ℝ :=

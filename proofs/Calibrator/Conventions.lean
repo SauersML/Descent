@@ -658,7 +658,15 @@ This is deliberately not called the BBP spike: its input is Nei's `G_ST`, and
 its interpretation is the standardized allele-frequency contrast
 variance times the subgroup load.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: CONVENTION PINNED as Nei's `G_ST`, and no measurement bears on the
+    constant here. The `4` in `demographicSpike` is DERIVED for this input --
+    `four_neiGst_eq_standardizedContrastVariance` proves `4·G_ST` IS the standardized
+    allele-frequency contrast variance, as algebra with no population in it -- so this
+    specialization inherits an identity rather than an empirical calibration. The BBP
+    inversion that recovered `3.9920 ± 0.0045` supplied genuine Hudson `F_ST` and therefore
+    calibrates `hudsonBbpSpike`; because `Hudson = 2G/(1+G)` is nonlinear, that measurement
+    does NOT transfer here, which is the whole reason the two specializations are named
+    apart. -/
 noncomputable def neiContrastSpike (n m p₁ p₂ : ℝ) : ℝ :=
   demographicSpike n (neiGst p₁ p₂) m
 
@@ -668,7 +676,18 @@ The `F` supplied to the validation experiment was the ratio-of-averages Hudson
 estimator. This named specialization prevents that empirical law from being
 silently reinterpreted as the different Nei functional.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**, and this specialization is the one the measurement was
+    made on. Inverting the BBP eigenvalue law on simulated genotypes recovers the constant
+    as `3.9920 ± 0.0045` against the derived `4`, with `F` measured as genuine Hudson
+    `F_ST` on the same simulated data
+    (`validation/empirical/differential/cluster/fam_im_coalescent_results.json`, which
+    records `3.99240`). That is 1.8 sems from `4` and 442 sems from the `2` the constant
+    might otherwise have been, so the run discriminates the constant rather than tolerating
+    it.
+
+    The competitor on the same cells is `neiContrastSpike`: supplying Nei's `G_ST` to the
+    same body moves the answer by a factor approaching two at weak differentiation, so the
+    measurement identifies the ESTIMATOR as well as the constant. -/
 noncomputable def hudsonBbpSpike (n m p₁ p₂ : ℝ) : ℝ :=
   demographicSpike n (hudsonFst p₁ p₂) m
 
