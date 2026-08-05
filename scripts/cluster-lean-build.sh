@@ -395,9 +395,15 @@ echo "LAUNDER_GUARD_EXIT=$?"
 # onto 8 cores. That is slower than 8 processes on 8 cores and it is unneighbourly
 # on a shared node, and neither symptom announces itself: the build finishes, so
 # nothing looks wrong.
+#
+# `-j` IS A GLOBAL OPTION AND MUST PRECEDE THE SUBCOMMAND. `lake build -j 32`
+# exits 1 with `error: unknown short option '-j'`, which the reader below counts
+# as one Lean error -- a build that never started, reported as a corpus with one
+# defect in it. That is the failure shape this script's header is about, and it
+# happened here on the very commit that added the flag.
 _jobs=${SLURM_CPUS_PER_TASK:-$CPUS}
 echo "LAKE_JOBS=$_jobs"
-lake build -j "$_jobs" "${TARGETS[@]}"
+lake -j "$_jobs" build "${TARGETS[@]}"
 _lake_exit=$?
 echo "LAKE_EXIT=$_lake_exit"
 
