@@ -106,6 +106,21 @@ theorem jumpKernel_absorbing {n : ℕ} (ξ : ER n) (h : blocks ξ < 2) :
   rw [jumpKernel_apply, jumpLaw, dif_neg (by omega)]
   exact PMF.toMeasure_pure ξ
 
+/-- **The weight the trajectory law puts on one step.**  Pushing the uniform choice of cover
+forward into the whole state space keeps its value: each cover of a `k`-block state gets
+`1/C(k,2)`, and every other state gets nothing.  This is what makes the weights in
+`Descent.Coalescent.Trajectory.chainLaw` explicit rather than implicit in a `bind`. -/
+theorem jumpLaw_apply_cover {n : ℕ} {ξ η : ER n} (hk : 2 ≤ blocks ξ) (h : Covers ξ η) :
+    jumpLaw ξ η = (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ := by
+  classical
+  rw [jumpLaw, dif_pos hk, PMF.map_apply]
+  rw [tsum_eq_single ⟨η, h⟩ ?_]
+  · rw [if_pos rfl, jumpStep_apply]
+  · rintro ⟨ζ, hζ⟩ hne
+    rw [if_neg]
+    intro heq
+    exact hne (Subtype.ext heq.symm)
+
 /-- The mass the kernel puts on a single cover is Kingman's `2/(k(k-1))`.  The kernel is not
 a new model: it is `Descent.Coalescent.Process.jumpStep` with its values placed in the state
 space they belong to. -/
