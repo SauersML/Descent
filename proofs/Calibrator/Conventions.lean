@@ -1074,9 +1074,20 @@ theorem fisherAverageEffect_uses_ploidy (a d p : ℝ) :
     fisherAverageEffect a d p = a + d * (1 - ploidy * p) := by
   unfold fisherAverageEffect ploidy; ring
 
-theorem neutralPortability_uses_ploidy (r2_0 fst : ℝ) :
-    neutralPortability r2_0 fst = r2_0 * max 0 (1 - ploidy * fst) := by
-  rfl
+/-! `neutralPortability_uses_ploidy` has been DELETED, not restated. It asserted
+`neutralPortability r2_0 fst = r2_0 * max 0 (1 - ploidy * fst)`, reading the `2`
+in the old `1 - 2·fst` body as the ploidy convention.
+
+It was not ploidy. That `2` was the leading coefficient of a first-order
+expansion of a heterozygosity ratio, and the expansion is what
+`battery_bulk56` falsified: the linear form is off by 12 sems at `fst = 0.05`,
+well inside the `fst ≪ 0.5` regime it claimed for itself. The corrected body,
+`r2_0 * (1 - fst) / ((1 - fst) * r2_0 + (1 - r2_0))`, carries no such constant,
+so there is no convention here to pin -- the theorem existed only because the
+superseded body happened to contain a `2`.
+
+What the corrected definition does claim about `fst` is stated where it is
+measured, at `PortabilityBounds.neutralPortability_pos_beyond_half`. -/
 
 /-! ### The last entangled uses
 

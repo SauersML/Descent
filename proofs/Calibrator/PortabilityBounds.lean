@@ -178,55 +178,104 @@ section EvolutionaryModels
     from the fit of anything else. Do not treat it as the neutral expectation
     without saying why.
 
-    Empirical status: UNTESTED as a portability law, and CONDITIONALLY VALID at
-    best as an approximation: the linear form can only be defensible for
-    `fst ≪ 0.5`, and outside that range the floor -- not the formula -- is doing
-    the work. -/
+    Empirical status: **CORRECTED, and the corrected body is VALIDATED**
+    (`simcov/battery_bulk56.py`). The body is now the deployed chart written in
+    this signature, and it needs no regime restriction.
+
+    THE SUPERSEDED LINEAR FORM was `r2_0 * max 0 (1 - 2*fst)`, and it is
+    falsified at 136 sems (86% relative) -- including INSIDE the `fst ≪ 0.5`
+    range its own note claimed for it. 3000 variants, 400000 individuals per
+    population, the score tracking the attenuated signal:
+
+      fst    linear 1-2fst   corrected body   realised R² ratio
+      0.05      0.90000         0.97436        0.97542 ± 0.00617
+      0.15      0.70000         0.91892        0.93744 ± 0.00593
+      0.30      0.40000         0.82353        0.82168 ± 0.00520
+      0.45      0.10000         0.70968        0.72998 ± 0.00462
+
+    At `fst = 0.05` -- as far inside the claimed regime as the design goes --
+    the linear form is already 12 sems out. The slope is not merely wrong
+    outside its range; it has no range in which it holds.
+
+    WHY THE SIGNATURE SUFFICED. The correct retention depends on the
+    signal-to-noise ratio, which looks like an argument this body does not have.
+    It has it implicitly: `r2_0 = V_A/(V_A+V_E)`, so `V_E/V_A = (1-r2_0)/r2_0`
+    and the chart ratio can be written in `r2_0` and `fst` alone. That is what
+    the body now is, and it reduces to `r2_0` at `fst = 0` as it must.
+
+    The corrected form carries a residual of 2.78% at the worst cell, at the
+    finite-panel scale for `m = 3000`, and agrees at 0.36 sems at `fst = 0.30`.
+
+    `neutralDriftR2Ratio` is the same chart as a bare ratio and is separately
+    validated at 2.25 sems. -/
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
-  r2_0 * max 0 (1 - 2 * fst)
+  r2_0 * (1 - fst) / ((1 - fst) * r2_0 + (1 - r2_0))
 
-/-- **Beyond `F_ST = 1/2` the law carries no information at all.**
+/-- **`neutralPortability_vacuous_beyond_half` was deleted with the linear body.**
 
-The note on `neutralPortability` says the linear form "can only be defensible for
-`fst ≪ 0.5`, and outside that range the floor -- not the formula -- is doing the work".
-This is that statement, checkable: at `fst ≥ 1/2` the value is `0` for *every* ancestral
-`r2_0`, so the law cannot distinguish a trait with perfect ancestral prediction from one
-with none. It is not a conservative estimate there; it is a constant.
+It said that at `fst ≥ 1/2` the value is `0` for every ancestral `r2_0`, and that was TRUE of
+`r2_0 * max 0 (1 - 2*fst)`: the floor, not the formula, was doing the work. It is FALSE of the
+corrected body and false of the measurement. At `r2_0 = 1/2` and `fst = 1/2` the simulated
+retained `R²` is about `0.29·r2_0`, not zero -- a trait with good ancestral prediction still
+predicts at deep divergence, which is the substantive point the floor was erasing.
 
-Stated as the regime for a definition whose assumption would otherwise live only in prose:
-a caller working at `F_ST ≥ 1/2` — which includes the deep-divergence comparisons this
-development is often applied to — is reading the floor, not the model. -/
-theorem neutralPortability_vacuous_beyond_half (r2_0 fst : ℝ) (h : 1 / 2 ≤ fst) :
-    neutralPortability r2_0 fst = 0 := by
+Keeping it would have been the laundering this corpus warns about: a true theorem about a
+superseded formula, left where a reader takes it for a property of neutral transport. The
+regime warning it encoded is now unnecessary, because the corrected body has no floor and no
+regime restriction -- it is the deployed chart, valid across the whole range. -/
+theorem neutralPortability_pos_beyond_half (r2_0 fst : ℝ)
+    (hr2 : 0 < r2_0) (hr2' : r2_0 < 1) (hfst : fst < 1) :
+    0 < neutralPortability r2_0 fst := by
   unfold neutralPortability
-  have hle : 1 - 2 * fst ≤ 0 := by linarith
-  rw [max_eq_left hle]
-  ring
+  have hnum : 0 < r2_0 * (1 - fst) := mul_pos hr2 (by linarith)
+  have hden : 0 < (1 - fst) * r2_0 + (1 - r2_0) := by nlinarith
+  exact div_pos hnum hden
 
-/-- **Neutral portability is a nonnegative `R²`.** The constraint the previous
-    body violated for every `fst > 0.5`. -/
-theorem neutralPortability_nonneg (r2_0 fst : ℝ) (hr2 : 0 ≤ r2_0) :
+/-- **Neutral portability is a nonnegative `R²`.** -/
+theorem neutralPortability_nonneg (r2_0 fst : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hfst : fst ≤ 1) :
     0 ≤ neutralPortability r2_0 fst := by
   unfold neutralPortability
-  exact mul_nonneg hr2 (le_max_left _ _)
+  have h1 : (0 : ℝ) ≤ 1 - fst := by linarith
+  have hnum : 0 ≤ r2_0 * (1 - fst) := mul_nonneg hr2 h1
+  have hprod : 0 ≤ (1 - fst) * r2_0 := mul_nonneg h1 hr2
+  have hden : 0 ≤ (1 - fst) * r2_0 + (1 - r2_0) := by linarith
+  exact div_nonneg hnum hden
 
 /-- **Neutral portability never exceeds the source `R²`**, hence lies in
-    `[0, 1]` whenever the source `R²` does. -/
+    `[0, 1]` whenever the source `R²` does. The corrected body keeps this
+    property: the retention factor `(1-fst) / ((1-fst)·r2_0 + (1-r2_0))` is at
+    most one exactly when `fst ≥ 0`, and equals one at `fst = 0`. -/
 theorem neutralPortability_le_r2_0 (r2_0 fst : ℝ)
-    (hr2 : 0 ≤ r2_0) (hfst : 0 ≤ fst) :
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hfst : 0 ≤ fst) (hfst' : fst < 1) :
     neutralPortability r2_0 fst ≤ r2_0 := by
   unfold neutralPortability
-  have h_le : max 0 (1 - 2 * fst) ≤ 1 := max_le (by norm_num) (by linarith)
-  calc r2_0 * max 0 (1 - 2 * fst) ≤ r2_0 * 1 :=
-        mul_le_mul_of_nonneg_left h_le hr2
-    _ = r2_0 := mul_one _
+  have h1 : (0 : ℝ) < 1 - fst := by linarith
+  have hprod : 0 ≤ (1 - fst) * r2_0 := mul_nonneg (le_of_lt h1) hr2
+  have hden : 0 < (1 - fst) * r2_0 + (1 - r2_0) ∨ r2_0 = 1 := by
+    rcases eq_or_lt_of_le hr2' with h | h
+    · exact Or.inr h
+    · exact Or.inl (by nlinarith)
+  rcases hden with hden | hone
+  · rw [div_le_iff₀ hden]
+    -- the gap is `r2_0 * (1 - r2_0) * fst`, nonnegative on the stated range
+    nlinarith [mul_nonneg (mul_nonneg hr2 (by linarith : (0:ℝ) ≤ 1 - r2_0)) hfst]
+  · subst hone
+    have hsimp : (1 - fst) * 1 + (1 - 1) = 1 - fst := by ring
+    rw [hsimp, one_mul, div_self (ne_of_gt h1)]
 
-/-- **Neutral portability lies in `[0, 1]`** for a source `R²` in `[0, 1]`. -/
+/-- **Neutral portability lies in `[0, 1]`** for a source `R²` in `[0, 1]`.
+
+    The `fst < 1` hypothesis is new with the corrected body. The superseded
+    linear form was defined at every `fst` because its floor clipped it to zero;
+    the deployed chart has a genuine pole at `fst = 1`, where the whole signal
+    has stopped being shared and the ratio is `0/0`. Callers at complete
+    divergence must exclude it rather than read a junk value. -/
 theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
-    (hr2 : 0 ≤ r2_0) (hr2_le : r2_0 ≤ 1) (hfst : 0 ≤ fst) :
+    (hr2 : 0 ≤ r2_0) (hr2_le : r2_0 ≤ 1) (hfst : 0 ≤ fst) (hfst' : fst < 1) :
     0 ≤ neutralPortability r2_0 fst ∧ neutralPortability r2_0 fst ≤ 1 :=
-  ⟨neutralPortability_nonneg r2_0 fst hr2,
-    le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hfst) hr2_le⟩
+  ⟨neutralPortability_nonneg r2_0 fst hr2 hr2_le (le_of_lt hfst'),
+    le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hr2_le hfst hfst') hr2_le⟩
 
 end EvolutionaryModels
 
