@@ -202,6 +202,20 @@ jobs:
         working-directory: proofs/validation/empirical/extract
         run: python3 test_parser.py
 
+      # The battery's own GATE, as opposed to its checks. test_identity_gate.py
+      # and test_roundtrip.py calibrate two families of CHECK; nothing
+      # calibrated the code that decides, from the table of per-check results,
+      # whether the battery passed. That code was calibrated in practice at
+      # exactly one boundary -- a check whose EVERY grid point raised was
+      # reported -- and a check evaluable at ONE of fifteen points took its
+      # verdict from that survivor, read AGREE and returned 0, with head and
+      # tail survivors alike. Both directions, with the partial-grid probes at
+      # both ends of the victim's grid, because several checks say in their own
+      # `canfail_clause` that their discrimination lives at one end of it.
+      - name: Calibrate the differential battery gate
+        working-directory: proofs/validation/empirical/differential
+        run: python3 test_battery_gate.py
+
       - name: Differential battery
         # 67 checks comparing each transcribed Lean body against an
         # independently written reference, plus a totality audit over ~160k

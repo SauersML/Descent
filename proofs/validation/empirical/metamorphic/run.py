@@ -182,9 +182,21 @@ def _expected(rel, base, factor, c):
     raise Violation(f"unknown relation kind {rel['kind']!r}")
 
 
-def check_relation(fqn, rel, fn, argnames):
-    """Return list of failure strings (empty if the relation holds)."""
+def check_relation(fqn, rel, fn, argnames, stats=None):
+    """Return list of failure strings (empty if the relation holds).
+
+    `stats`, when given, receives `{"compared": n}` -- the number of (grid
+    point, scale factor) pairs at which the relation was actually EVALUATED.
+    An empty failure list means "the relation held" only if that count is
+    positive: the ZeroDivisionError arm below skips a point rather than
+    reporting it, which is right for a body with an isolated pole and wrong
+    for a body that raises everywhere. A transcription that divides by zero on
+    the whole grid produces no failures, and without this count the caller
+    reads that silence as agreement -- the same "measured nothing" verdict the
+    empty extraction table produced. The caller gates on it.
+    """
     fails = []
+    compared = 0
     rel = resolve_args(rel, argnames)
     factors = SCALE_FACTORS if rel["kind"] in ("scale", "joint_scale",
                                                "reciprocal_scale") else (Q(1),)
@@ -201,11 +213,14 @@ def check_relation(fqn, rel, fn, argnames):
             except (ValueError, OverflowError) as exc:
                 fails.append(f"grid[{k}] c={c}: evaluation error {exc}")
                 continue
+            compared += 1
             if not _close(got, want):
                 fails.append(
                     f"grid[{k}] c={c} at "
                     + ", ".join(f"{a}={float(point[a]):g}" for a in argnames)
                     + f": f(T x)={got!r} but relation requires {want!r}")
+    if stats is not None:
+        stats["compared"] = compared
     return fails
 
 
@@ -329,12 +344,29 @@ def analyse(table, callable_for, R_=None):
 
         for rel in rels:
             key = (fqn, rel["id"])
+            stats = {}
             try:
-                fails = check_relation(fqn, rel, fn, argnames)
+                fails = check_relation(fqn, rel, fn, argnames, stats)
             except Violation as exc:
                 findings.append(f"BAD DECLARATION: {fqn}: {exc}")
                 continue
             checked += 1
+            if not stats.get("compared"):
+                # Not "the relation holds" -- the relation was never evaluated.
+                # `check_relation` skips a ZeroDivisionError so an isolated pole
+                # does not read as a violation; a body that raises at every
+                # point therefore returns no failures at all, and both branches
+                # below would then score it as satisfied (or, if pinned, as an
+                # UNEXPECTED AGREEMENT). The vacuity screen above does not cover
+                # it either: `constant_on_grid` skips the same exceptions and
+                # returns False when fewer than two points evaluated.
+                findings.append(
+                    f"UNEVALUATED: {fqn} could not be evaluated at any grid "
+                    f"point for {rel['id']}, so the relation neither holds nor "
+                    f"fails -- it was never applied. Either the transcription "
+                    f"divides by zero across the whole grid, or the grid has "
+                    f"drifted outside this body's domain.")
+                continue
             if key in R_.EXPECTED_VIOLATIONS:
                 if not fails:
                     findings.append(
@@ -387,6 +419,7 @@ def analyse(table, callable_for, R_=None):
                 f"which is not a permutation of 0..{len(al) - 1}.")
             continue
         agreed += 1
+        compared = 0
         for k in range(len(GRID_POINTS)):
             point = _assign(al, k)
             args = [float(point[a]) for a in al]
@@ -395,6 +428,7 @@ def analyse(table, callable_for, R_=None):
                 gl, gr = fl(*args), fr(*rargs)
             except (ZeroDivisionError, ValueError, OverflowError):
                 continue
+            compared += 1
             if not _close(gl, gr):
                 findings.append(
                     f"PROVED EQUAL BUT DISAGREE: {theorem} proves {left} = "
@@ -403,6 +437,18 @@ def analyse(table, callable_for, R_=None):
                     + f" they give {gl!r} and {gr!r}. Either a body changed "
                       f"without its partner, or a transcription is wrong.")
                 break
+        else:
+            # Reached only when no point disagreed. If no point was COMPARED
+            # either, the equality was counted as executed and never executed:
+            # the `except` arm above skips a point silently, so two bodies that
+            # both raise across the whole grid are indistinguishable here from
+            # two bodies that agree on it.
+            if not compared:
+                findings.append(
+                    f"UNEVALUATED AGREEMENT: {theorem} proves {left} = {right}, "
+                    f"but neither side could be evaluated at any grid point, so "
+                    f"the equality was counted as executed without being "
+                    f"executed.")
 
     return findings, checked, agreed, scope
 

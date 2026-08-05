@@ -51,6 +51,7 @@ def evaluate(chk: checks.Check, D) -> dict:
         "min_rel_err": min(errs) if errs else None,
         "worst_point": worst,
         "n_errors": sum(1 for r in rows if "error" in r),
+        "n_evaluated": len(errs),
     }
 
 
@@ -305,6 +306,8 @@ def main() -> int:
                 else None
             ),
             "n_grid": len(chk.grid),
+            "n_grid_errors": res["n_errors"],
+            "n_evaluated": res["n_evaluated"],
             "rows": res["rows"],
         }
 
@@ -386,19 +389,64 @@ def main() -> int:
     #
     # An ERROR against a PINNED expectation is already caught as a regression
     # above; this catches the unpinned ones, which are the ones that hid.
-    errored = [
-        (cid, c["definition"],
-         next((r["error"] for r in c["rows"] if "error" in r), "?"))
-        for cid, c in out["checks"].items() if c["verdict"] == "ERROR"
-    ]
+    #
+    # `classify` calls it ERROR only when EVERY point raised (`n_errors ==
+    # len(grid)`), so the gate was calibrated at exactly one boundary of this
+    # failure and blind everywhere inside it.  A check evaluable at ONE of
+    # fifteen grid points took its verdict from that one survivor, read AGREE,
+    # passed `prove_can_fail`, and returned 0 -- measured with head and tail
+    # survivors alike.  The grid is not decoration: `canfail_clause` on many of
+    # these checks says in words that the discrimination lives at particular
+    # ends of it, so fourteen points silently dropping is the whole check
+    # dropping.  A point that raised is therefore a finding at budget 0,
+    # whatever the surviving points say.
+    errored, partial = [], []
+    for cid, c in out["checks"].items():
+        n_err = c["n_grid_errors"]
+        if not n_err:
+            continue
+        first = next((r["error"] for r in c["rows"] if "error" in r), "?")
+        (errored if n_err == c["n_grid"] else partial).append(
+            (cid, c["definition"], n_err, c["n_grid"], first))
     if errored:
         print("FAIL: checks that could not be evaluated at any grid point. An "
               "ERROR is not a pass -- repoint the check, fix its lambda, or "
               "retire it:")
-        for cid, fq, err in errored:
+        for cid, fq, n_err, n_grid, err in errored:
             print(f"    {cid:<52} {fq}\n        {err}")
+    if partial:
+        print("FAIL: checks evaluated on only PART of their grid. The verdict "
+              "printed above was computed from the surviving points alone, and "
+              "the points that raised are exactly where the check was not "
+              "applied -- several of these grids discriminate only at one end:")
+        for cid, fq, n_err, n_grid, err in partial:
+            print(f"    {cid:<52} {fq}\n        {n_err} of {n_grid} grid points "
+                  f"raised; first: {err}")
 
-    return 1 if (n_vac or n_unresolved or regressions or errored) else 0
+    # A comparison that compared nothing is not a comparison that agreed. Both
+    # of these report a count and were gated only on the DISAGREEMENTS found in
+    # them, which is zero both when the two translators agree everywhere and
+    # when there was nothing to translate: with the extraction table emptied,
+    # the cross-check compares 0 definitions and the totality audit visits 0
+    # points, and neither said so. Floors at "did anything at all", not budgets
+    # pinned to today's counts.
+    empty_instruments = []
+    if not cv["n_definitions_compared"]:
+        empty_instruments.append(
+            "the leanexpr/extract cross-check compared 0 definitions; it is the "
+            "only protection this battery has against a mistranslated "
+            "definition, and it did not run on any")
+    if not out["contract_totality"]["points_checked"]:
+        empty_instruments.append(
+            "the totality audit visited 0 points and reported CLEAN")
+    if empty_instruments:
+        print("FAIL: an instrument in this battery measured nothing and "
+              "reported no problem:")
+        for line in empty_instruments:
+            print(f"    {line}")
+
+    return 1 if (n_vac or n_unresolved or regressions or errored or partial
+                 or empty_instruments) else 0
 
 
 if __name__ == "__main__":

@@ -266,6 +266,86 @@ def vacuity_screen_fires():
            "the vacuity screen fired on a genuinely varying body")
 
 
+def unevaluatable_is_not_agreement():
+    """A body that cannot be EVALUATED must not be scored as satisfying its
+    relations.
+
+    `check_relation` skips a ZeroDivisionError rather than reporting it, which
+    is right for an isolated pole and wrong for a body that raises across the
+    whole grid: the failure list comes back empty and the caller reads that as
+    "the relation holds". `constant_on_grid` does not cover the case either --
+    it skips the same exceptions and returns False when fewer than two points
+    evaluated. Measured before the fix: a body raising at every grid point
+    passed both a `swap` and a `scale` relation with `checked=2`, and a pair of
+    such bodies passed a proved cross-body equality with `agreed=1`.
+
+    Both directions, because the skip itself is load-bearing: a body with ONE
+    pole on the grid must still be checked on the rest and must still be caught
+    when it violates there.
+    """
+    def entry(module="Fake/Mod.lean", args=("x", "y")):
+        return {"ret_type": "ℝ", "file": module,
+                "args": [{"names": [a], "type": "ℝ", "implicit": False}
+                         for a in args]}
+
+    class Rels(_FakeRelations):
+        SWEPT_MODULES = ()
+        RELATIONS = {"Fake.f": [R.symmetric_in("x", "y")]}
+
+    table = {"Fake.f": entry()}
+    table.update({f"Filler.d{i}": entry("Other/Mod.lean") for i in range(600)})
+
+    def nowhere(_x, _y):
+        raise ZeroDivisionError("planted: undefined on the whole grid")
+
+    findings, _, _, _ = G.analyse(table, lambda _n: (nowhere, ["x", "y"]), Rels)
+    expect(any("UNEVALUATED" in f and "Fake.f" in f for f in findings),
+           "A BODY THAT RAISES AT EVERY GRID POINT WAS SCORED AS SATISFYING "
+           "ITS RELATIONS. An unevaluatable transcription is indistinguishable "
+           "here from a correct one.")
+
+    # NEGATIVE: an isolated pole must still be skipped, and the rest of the
+    # grid still checked. GRID_POINTS[0] is 3/10; this body is undefined there
+    # and asymmetric everywhere else, so it must be VIOLATED, not UNEVALUATED.
+    def one_pole(x, y):
+        if x == float(G.GRID_POINTS[0]):
+            raise ZeroDivisionError("planted: one pole")
+        return 0.75 * x + 0.25 * y
+
+    findings2, _, _, _ = G.analyse(table, lambda _n: (one_pole, ["x", "y"]), Rels)
+    expect(any("VIOLATED" in f and "Fake.f" in f for f in findings2),
+           "a body with a single pole on the grid was not checked on the rest "
+           "of it; the skip has swallowed the whole relation")
+    expect(not any("UNEVALUATED" in f for f in findings2),
+           "a body evaluable at seven of eight grid points was reported as "
+           "unevaluated; the floor is placed wrong")
+
+    # The same failure at the cross-body agreement tier, where the count that
+    # gets printed is `agreed`.
+    class AgreeRels(_FakeRelations):
+        SWEPT_MODULES = ()
+        RELATIONS = {}
+        AGREEMENTS = (("Fake.left", "Fake.right", "Calibrator.stub_agreement",
+                       "a stub agreement whose note is long enough to satisfy "
+                       "the substantive-reason rule asserted elsewhere in this "
+                       "file"),)
+
+    pair = {"Fake.left": entry(), "Fake.right": entry()}
+    pair.update({f"Filler.d{i}": entry("Other/Mod.lean") for i in range(600)})
+    fns = {"Fake.left": nowhere, "Fake.right": nowhere}
+    findings3, _, agreed, _ = G.analyse(
+        pair, lambda n: (fns[n], ["x", "y"]), AgreeRels)
+    expect(any("UNEVALUATED AGREEMENT" in f for f in findings3),
+           f"A PROVED EQUALITY WHOSE TWO SIDES BOTH RAISE EVERYWHERE WAS "
+           f"COUNTED AS EXECUTED (agreed={agreed}) WITHOUT BEING EXECUTED.")
+
+    live = {"Fake.left": lambda x, y: x + y, "Fake.right": lambda x, y: x + y}
+    findings4, _, _, _ = G.analyse(
+        pair, lambda n: (live[n], ["x", "y"]), AgreeRels)
+    expect(not any("UNEVALUATED AGREEMENT" in f for f in findings4),
+           "two genuinely agreeing bodies were reported as unevaluated")
+
+
 def workflow_path_extraction():
     """Both directions for the workflow-path guard in build_flags.py.
 
@@ -433,6 +513,20 @@ def calib_tail():
            "does not reach the end of the table, so every entry after the cut "
            "is being scored as passing.")
 
+    # (c) The unevaluatable-body floor, placed at the tail of the real table as
+    #     well. `analyse` sorts RELATIONS, so this name is reached last; a
+    #     failure that only ever fires on a short synthetic table would not be
+    #     evidence about the run CI performs.
+    def nowhere(*_a):
+        raise ZeroDivisionError("planted: undefined on the whole grid")
+
+    findings2, _, _, _ = G.analyse(
+        table, lambda name: ((nowhere, ["x"]) if name == "ZZZ.tailProbe"
+                             else (lambda *a: sum(a), ["x"])), TailProbe)
+    expect(any("UNEVALUATED" in f and "ZZZ.tailProbe" in f for f in findings2),
+           "CALIB-TAIL: a body that raises at every grid point, declared LAST "
+           "in the real relation table, was scored as satisfying its relation.")
+
 
 def main():
     negative_direction()
@@ -441,6 +535,7 @@ def main():
     table_integrity()
     agreements_integrity()
     no_stale_excuses()
+    unevaluatable_is_not_agreement()
     workflow_path_extraction()
     broken_table_is_not_silent()
     coverage_check_fires()
@@ -457,8 +552,10 @@ def main():
           "well-formed, no stale excuses; and the table-level probes -- empty "
           "extraction diagnosed rather than silent, coverage check fires on an "
           "undeclared def, empty sweep reported, vacuity screen catches a "
-          "collapsed body, CALIB-TAIL reaches the end of both the relation "
-          "table and the real prover.yml.")
+          "collapsed body, a body that raises across the whole grid is "
+          "UNEVALUATED rather than satisfied while a single pole is still "
+          "skipped, CALIB-TAIL reaches the end of both the relation table and "
+          "the real prover.yml.")
     return 0
 
 
