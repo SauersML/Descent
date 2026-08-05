@@ -61,6 +61,7 @@ TOKEN_RE = re.compile(r"""
   | (?P<num>\d+\.\d+(?:[eE][-+]?\d+)?|\d+(?:[eE][-+]?\d+)?)
   | (?P<ident>[A-Za-z_Α-ωϑ-ϵᴀ-ᵿ℀-⅏Ḁ-ỿ][A-Za-z0-9_'Α-ωϑ-ϵ₀-₉ₐ-ₜḀ-ỿ]*(?:\.[A-Za-z0-9_'₀-₉]+)*)
   | (?P<proj>\.[A-Za-z_][A-Za-z0-9_'₀-₉]*|\.[0-9]+)
+  | (?P<veclit>!\[)
   | (?P<op>⁻¹|<=|>=|!=|:=|=>|<\||\|>|\.\.|[-+*/%^()\[\]{},:;<>=|↦→←≤≥≠∧∨¬⁻¹↑√⌊⌋‖∑∏∫∘⟨⟩·×∙∈∉⊆∩∪ℝℕℤ∞πΦ∀∃↔⁻¹])
   | (?P<other>.)
 """, re.X)
@@ -131,7 +132,6 @@ HARD_STOP = {
 # "unrecognised character '∂'" does not.
 NONARITH = {
     "∂": "measure-theoretic integral (∫ … ∂μ)",
-    "!": "Matrix/vector literal (![…])",
     "μ": "measure argument", "σ": "sigma-algebra / measure argument",
     "ω": "sample-space argument", "η": "measure-theoretic predictor",
     "β": "vector-valued effect argument",
@@ -395,6 +395,26 @@ class Parser:
             raise Untranslatable("unexpected end of body")
         if p.text in HARD_STOP:
             raise Untranslatable(HARD_STOP[p.text])
+        if p.kind == "veclit":
+            # `![a, b, c]` is Mathlib's vector literal, and it translates: the
+            # runtime's `VecFn` is a list that also answers to `v i`, which is
+            # exactly what `![…]` is. This used to be refused outright as
+            # "Matrix/vector literal", which took 68 definitions with it --
+            # every explicit witness vector in the corpus, and those are the
+            # objects the witness theorems are ABOUT.
+            self.next()
+            items = []
+            if not self.at("]"):
+                while True:
+                    items.append(self.expr(0))
+                    if self.at(","):
+                        self.next()
+                        continue
+                    break
+            if not self.at("]"):
+                raise Untranslatable("vector literal with no closing `]`")
+            self.next()
+            return "_rt.VecFn([" + ", ".join(items) + "])"
         if p.text in ("∀", "∃"):
             return self.bounded_quantifier(p.text)
         if p.text == "∑":
