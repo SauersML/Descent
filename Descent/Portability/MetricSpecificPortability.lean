@@ -5,6 +5,7 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Descent.Core.Population
 import Descent.Portability.ClinicalUtilityFairness
 import Descent.Spectral.ProjectionShiftBounds
+import Descent.PopGen.LDDecayTheory
 import Descent.Blindness.ImitationRigidity
 -- `FoldedSpectrum` supplies the Gaussian level-set collapse used in
 -- "What the metric split is, and is not" below. That section is the reason this
@@ -3292,7 +3293,7 @@ is an admissible AR(1) decay.  This is the compatibility check that lets the two
 corpus modules be chained at all. -/
 theorem ldRetentionPerGen_abs_lt_one {recomb Ne : ℝ}
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne) :
-    |ldRetentionPerGen recomb Ne| < 1 := by
+    |PopGen.ldRetentionPerGen recomb Ne| < 1 := by
   have hnn : 0 ≤ PopGen.ldRetentionPerGen recomb Ne :=
     PopGen.ld_retention_nonneg recomb Ne hr1 (le_of_lt hNe)
   have hlt : PopGen.ldRetentionPerGen recomb Ne < 1 := by
@@ -3649,7 +3650,7 @@ closed form: it is the curvature-weighted variance of the per-target optimal
 corrections, zero exactly when they agree.
 
 The curvature weight is not a free parameter — it is
-`weight i * coefficientEnergy (B i) beta`, the deployment weight times the
+`weight i * Spectral.coefficientEnergy (B i) beta`, the deployment weight times the
 transported direction's energy in that target's own second-moment matrix.  So a
 target with little signal energy in the score's direction pulls the shared
 correction weakly, which is the right behaviour and is forced rather than
@@ -3683,7 +3684,7 @@ removing them.
 Empirical status: UNTESTED. -/
 noncomputable def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
     (beta : J → ℝ) : ι → ℝ :=
-  fun i ↦ weight i * coefficientEnergy (B i) beta
+  fun i ↦ weight i * Spectral.coefficientEnergy (B i) beta
 
 /-- **The curvature is the energy scaled by the target's weight**, evaluated where the
 family is not degenerate.
@@ -3695,7 +3696,7 @@ zero. At weight one the curvature IS the coefficient energy of that target's ope
 which is the claim the name makes. -/
 theorem targetCorrectionCurvature_at_unit_weight (B : ι → Matrix J J ℝ) (beta : J → ℝ)
     (i : ι) :
-    targetCorrectionCurvature (fun _ ↦ 1) B beta i = coefficientEnergy (B i) beta := by
+    targetCorrectionCurvature (fun _ ↦ 1) B beta i = Spectral.coefficientEnergy (B i) beta := by
   unfold targetCorrectionCurvature
   ring
 
@@ -3707,8 +3708,8 @@ the `optimum` that `sharedCorrectionConsensus` and `sharedCorrectionSpread`
 average and take the variance of; without it the "per-target optimal
 corrections" their docstrings name have no referent in the corpus.
 
-`noncomputable` because `sharedCorrectionOptimum` is: it divides by
-`coefficientEnergy`, and it sits inside a `noncomputable section` in
+`noncomputable` because `Spectral.sharedCorrectionOptimum` is: it divides by
+`Spectral.coefficientEnergy`, and it sits inside a `noncomputable section` in
 `ProjectionShiftBounds`, so it carries no executable code. That section marker does not
 travel with the name, so this definition -- outside such a section -- has to say so
 itself, or the compiler IR check fails here rather than at the real-division site.
@@ -3716,14 +3717,14 @@ itself, or the compiler IR check fails here rather than at the real-division sit
 Empirical status: UNTESTED. -/
 noncomputable def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
     ι → ℝ :=
-  fun i ↦ sharedCorrectionOptimum (B i) beta theta
+  fun i ↦ Spectral.sharedCorrectionOptimum (B i) beta theta
 
 /-- **Each target's own optimum is the shared optimum for that target's operator.**
 The definition unfolded, stated so the indexed family is tied to the scalar it indexes
 rather than merely resembling it. -/
 theorem targetCorrectionOptimum_apply (B : ι → Matrix J J ℝ) (beta theta : J → ℝ)
     (i : ι) :
-    targetCorrectionOptimum B beta theta i = sharedCorrectionOptimum (B i) beta theta :=
+    targetCorrectionOptimum B beta theta i = Spectral.sharedCorrectionOptimum (B i) beta theta :=
   rfl
 
 /-- The curvature-weighted mean of the per-target optimal corrections: the

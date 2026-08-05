@@ -33,10 +33,10 @@ the scoped namespace `Matrix.Norms.Operator`, so they are opened here rather tha
 - `row_diff_bound`: **the row is within `(d_k/N)² + 2k⁴/N²` of `1 + N⁻¹Q`**, which is
   K-G (2.11) for the block-count chain.
 
-What is left is to read `row_diff_bound` as a norm bound through `linfty_norm_le_of_rows` --
-the same conversion `norm_blockMatrix_le_one` already makes -- and hand the result to
-`SemigroupLimit.tendsto_pow_of_expansion`.  The `Fin (n+1)` index arithmetic that conversion
-needs, matching `k - 1` against the generator's subdiagonal, is the only thing between here
+`tendsto_blockOperator_pow` is the conclusion: `P_N^N -> exp Q`, K-G (2.14) for the block
+count.  Nothing in its hypotheses is assumed -- the contraction, the limit semigroup's
+contraction, and the one-generation expansion are all theorems above.  The route was, and
+this was the only thing between here
 and `P_N^N → exp Q` for the whole chain.
 -/
 
