@@ -781,8 +781,21 @@ noncomputable def borrowedTraitBProjection {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : ℝ :=
   dotProduct m.sourceWeights (borrowedTraitBCrossCov m)
 
-/-- Reference evaluation: a model with no source weights projects nothing. -/
-theorem borrowedTraitBProjection_at_reference_point {p q : ℕ}
+/-- **A zero score projects nothing, which is a fact about `dotProduct`.**
+
+Not a reference evaluation, and it was named as one until the collapse was
+looked at: `borrowedTraitBProjection m = m.sourceWeights ⬝ᵥ borrowedTraitBCrossCov m`,
+so at `sourceWeights = 0` the second argument is never evaluated. The statement
+holds for EVERY function in that slot -- a transposed `sigmaTagCausal`, an
+`rg` dropped or applied twice, the trait-B-specific effect substituted for the
+shared one -- because none of them is consulted. It pins nothing about the
+borrowing model and cannot fail unless `dotProduct` itself changes.
+
+Renamed rather than deleted: a zero score projecting nothing is worth
+recording, and the point of recording it is lost if it keeps a name that
+claims it evaluates the model at a reference. The evaluation that does pin the
+functional form is `borrowedTraitBProjection_at_witness` below. -/
+theorem borrowedTraitBProjection_zero_weights {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) (hzero : m.sourceWeights = 0) :
     borrowedTraitBProjection m = 0 := by
   unfold borrowedTraitBProjection
@@ -795,13 +808,63 @@ noncomputable def totalTraitBProjection {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : ℝ :=
   dotProduct m.sourceWeights (totalTraitBCrossCov m)
 
-/-- The same at zero source weights for the total projection. -/
-theorem totalTraitBProjection_at_reference_point {p q : ℕ}
+/-- The same fact about `dotProduct` for the total projection, and the same
+non-claim: at `sourceWeights = 0` neither the borrowed nor the specific
+component is evaluated, so this holds for any pair of them. See
+`totalTraitBProjection_at_witness` for the evaluation that pins the form. -/
+theorem totalTraitBProjection_zero_weights {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) (hzero : m.sourceWeights = 0) :
     totalTraitBProjection m = 0 := by
   unfold totalTraitBProjection
   rw [hzero]
   simp
+
+
+/-- **A witness chosen so that a wrong functional form gives a wrong number.**
+
+The zero-weight statements above are satisfied by any borrowing model at all.
+This one is not. Its fields are picked so that each way the cross-covariance
+could plausibly be miswritten moves the answer:
+
+  * `rg = 1/2`, neither `0` nor `1`, so an `rg` that is dropped is visible
+    (the borrowed projection would read `1` instead of `1/2`);
+  * `sigmaTagCausal` is NOT symmetric, so a transposed `mulVec` is visible
+    (it would read `5/2`);
+  * `sharedTraitEffect` and `traitBSpecificEffect` have disjoint support, so
+    substituting one for the other is visible (it would read `4`);
+  * the two projections are pinned together, so `rg` wrongly applied to the
+    specific component as well is visible in the total (`9/2` against `17/2`)
+    even though the borrowed component alone would not move.
+
+Pinning both values also pins the scale: a body wrong by a common factor `c`
+would have to satisfy `c/2 = 1/2` and `17c/2 = 17/2` at once. That is the
+weakest of the discriminations here and is listed last on purpose -- a witness
+that only rejects a scale factor is a witness that has not been designed. -/
+noncomputable def borrowingWitness : CrossTraitBorrowingModel 2 2 where
+  sourceWeights := ![1, 2]
+  sigmaTagCausal := !![1, 2; 0, 3]
+  sharedTraitEffect := ![1, 0]
+  traitBSpecificEffect := ![0, 1]
+  rg := 1 / 2
+
+/-- **Reference evaluation of the borrowed projection.**
+`Σ (rg · β_shared) = (1/2, 0)` and `w ⬝ᵥ (1/2, 0) = 1/2`. -/
+theorem borrowedTraitBProjection_at_witness :
+    borrowedTraitBProjection borrowingWitness = 1 / 2 := by
+  norm_num [borrowedTraitBProjection, borrowedTraitBCrossCov, borrowingWitness,
+    dotProduct, Matrix.mulVec, Fin.sum_univ_two]
+
+/-- **Reference evaluation of the total projection.**
+The specific component contributes `Σ β_specific = (2, 3)`, so the total
+cross-covariance is `(5/2, 3)` and `w ⬝ᵥ (5/2, 3) = 17/2`. The gap from
+`1 / 2` is exactly the trait-B-specific channel, which is what makes the pair
+of evaluations separate `rg` applied to the shared component alone from `rg`
+applied to both. -/
+theorem totalTraitBProjection_at_witness :
+    totalTraitBProjection borrowingWitness = 17 / 2 := by
+  norm_num [totalTraitBProjection, totalTraitBCrossCov, borrowedTraitBCrossCov,
+    traitBSpecificCrossCov, borrowingWitness, dotProduct, Matrix.mulVec,
+    Fin.sum_univ_two]
 
 
 theorem traitBSpecificCrossCov_nonneg {p q : ℕ}
