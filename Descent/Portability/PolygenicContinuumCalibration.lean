@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Population
 import Descent.Portability.ContinuumCalibrationProgram
 import Descent.Conditionals.DynamicsContrast
 
@@ -122,7 +123,7 @@ same binary direction, despite reversing their argument roles. -/
 theorem gaugeAlignedPredictor_eq_persistentOnlyDynamicsPosterior
     (persists : Bool) (x : Unit) :
     gaugeAlignedPredictor persists x =
-      Conditionals.persistentOnlyDynamicsPosterior (0 : Conditionals.BinaryBiologicalState) persists := by
+      Conditionals.persistentOnlyDynamicsPosterior (0 : Descent.Core.BinaryState) persists := by
   cases persists <;>
     norm_num [gaugeAlignedPredictor, Conditionals.persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 

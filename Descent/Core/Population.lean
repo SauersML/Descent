@@ -102,4 +102,17 @@ other is a measured factor-of-two-to-four error. Here the index sets differ, so 
 mistake does not typecheck for a different reason, and the abbreviation is enough. -/
 theorem realVec_is_one_type (n : ℕ) : RealVec n = (Fin n → ℝ) := rfl
 
+/-- **A two-state index**, for a witness that contrasts exactly two of something.
+
+`Conditionals.DynamicsContrast` abbreviated `Fin 2` as `BinaryBiologicalState` and
+`Conditionals.FunctionalDescent` abbreviated it as `BinaryDescentCovariate`, in sibling
+modules neither of which imports the other. Same type, same purpose -- two states a witness
+contrasts -- named twice because neither module could see the other's name.
+
+The same reading as `RealVec` above applies: this is transparent, so it buys no type
+safety, and the biological reading each module attaches -- a context, a covariate -- stays
+documentary and stays in that module. What it buys is that `Fin 2` is not independently
+renamed a third time. -/
+abbrev BinaryState := Fin 2
+
 end Descent

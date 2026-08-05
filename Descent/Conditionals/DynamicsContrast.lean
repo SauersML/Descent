@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Conditionals.DeclaredInteractionClass
+import Descent.Core.Population
 import Descent.Portability.ContinuumCalibration
 import Descent.Portability.CorrectionWidths
 import Descent.Conditionals.DescentGeometry
@@ -1582,24 +1583,23 @@ end StationarityRepair
 
 /-! ## An exact two-state biological witness -/
 
-abbrev BinaryBiologicalState := Fin 2
 
 /-- Uniform invariant law on two biological contexts. -/
-noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
+noncomputable def binaryStateWeight (_ : Descent.Core.BinaryState) : ℝ := 1 / 2
 
 /-- Reference evaluation: the two states are equally weighted. -/
-@[simp] theorem binaryStateWeight_at_reference_point (x : BinaryBiologicalState) :
+@[simp] theorem binaryStateWeight_at_reference_point (x : Descent.Core.BinaryState) :
     binaryStateWeight x = 1 / 2 := rfl
 
 
 /-- The biological context law is the canonical balanced calibration weight. -/
-@[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : BinaryBiologicalState) :
+@[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : Descent.Core.BinaryState) :
     binaryStateWeight x = Portability.balancedBinaryWeight x := by
   rfl
 
 /-- A transition that swaps the two contexts. -/
 noncomputable def switchingTransition
-    (x y : BinaryBiologicalState) : ℝ :=
+    (x y : Descent.Core.BinaryState) : ℝ :=
   Descent.Core.antiKronecker x y
 
 /-- Reference evaluations: the switching kernel is the exchange matrix. -/
@@ -1609,7 +1609,7 @@ theorem switchingTransition_at_reference_point :
 
 
 /-- A target-only annotation distinguishing state `1`. -/
-noncomputable def targetAnnotation (y : BinaryBiologicalState) : ℝ :=
+noncomputable def targetAnnotation (y : Descent.Core.BinaryState) : ℝ :=
   Descent.Core.kronecker y 1
 
 /-- Reference evaluations: the annotation is the indicator of the distinguished state. -/
@@ -1629,7 +1629,7 @@ cited a bridging theorem, `contextMatchQuality_eq_contextMatchQuality`, that was
 declared anywhere in the corpus. A distinction with no theorem behind it and no difference
 in the body is a comment, so it is a comment now. -/
 noncomputable def contextMatchQuality
-    (x y : BinaryBiologicalState) : ℝ :=
+    (x y : Descent.Core.BinaryState) : ℝ :=
   Descent.Core.kronecker x y
 
 /-- Reference evaluations: quality one on a match, zero on a mismatch. -/
@@ -1647,22 +1647,22 @@ efficiency. Four readings, one matrix: the biological witness is not a second tw
 example but the horizon example under biological names, and a change to either file's
 delta contradicts this. -/
 theorem contextMatchQuality_agreement_eq_stayKernel
-    (x y : BinaryBiologicalState) :
+    (x y : Descent.Core.BinaryState) :
     contextMatchQuality x y = Portability.stayKernel x y ∧
       Portability.agreement x y = Portability.stayKernel x y :=
   ⟨rfl, rfl⟩
 
 /-- **Complete context switching is the horizon curve's swap kernel**, the off-diagonal
 counterpart of the identification above. -/
-theorem switchingTransition_eq_swapKernel (x y : BinaryBiologicalState) :
+theorem switchingTransition_eq_swapKernel (x y : Descent.Core.BinaryState) :
     switchingTransition x y = Portability.swapKernel x y := rfl
 
-theorem binaryStateWeight_stationary_persistent (y : BinaryBiologicalState) :
+theorem binaryStateWeight_stationary_persistent (y : Descent.Core.BinaryState) :
     ∑ x, binaryStateWeight x * contextMatchQuality x y = binaryStateWeight y := by
   fin_cases y <;>
     norm_num [binaryStateWeight, contextMatchQuality, Fin.sum_univ_two]
 
-theorem binaryStateWeight_stationary_switching (y : BinaryBiologicalState) :
+theorem binaryStateWeight_stationary_switching (y : Descent.Core.BinaryState) :
     ∑ x, binaryStateWeight x * switchingTransition x y = binaryStateWeight y := by
   fin_cases y <;>
     norm_num [binaryStateWeight, switchingTransition, Fin.sum_univ_two]
@@ -1700,11 +1700,11 @@ quality does not.  So the quantity a cross-state criterion measures is a functio
 target average recovers it. -/
 
 /-- A source-target pair of biological contexts. -/
-abbrev TransportPair := BinaryBiologicalState × BinaryBiologicalState
+abbrev TransportPair := Descent.Core.BinaryState × Descent.Core.BinaryState
 
 /-- The joint law of source and target contexts under a transition. -/
 noncomputable def jointTransportLaw
-    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ) (g : TransportPair) : ℝ :=
+    (transition : Descent.Core.BinaryState → Descent.Core.BinaryState → ℝ) (g : TransportPair) : ℝ :=
   binaryStateWeight g.1 * transition g.1 g.2
 
 /-- Reference evaluation: half the mass of the persistent kernel sits on each diagonal pair. -/
@@ -1727,8 +1727,8 @@ theorem binaryTransportFamily_nonneg (persists : Bool) (g : TransportPair) :
 
 /-- Target-only performance is the mean of a target-measurable kernel under the joint law. -/
 theorem targetOnlyTransportPerformance_eq_conditionalSectionMean
-    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ)
-    (score : BinaryBiologicalState → ℝ) :
+    (transition : Descent.Core.BinaryState → Descent.Core.BinaryState → ℝ)
+    (score : Descent.Core.BinaryState → ℝ) :
     targetOnlyTransportPerformance binaryStateWeight transition score =
       conditionalSectionMean (fun g : TransportPair ↦ score g.2)
         (jointTransportLaw transition) := by
@@ -1741,8 +1741,8 @@ theorem targetOnlyTransportPerformance_eq_conditionalSectionMean
 
 /-- Cross-state performance is the mean of a kernel that reads both coordinates. -/
 theorem crossStatePerformance_eq_conditionalSectionMean
-    (transition : BinaryBiologicalState → BinaryBiologicalState → ℝ)
-    (quality : BinaryBiologicalState → BinaryBiologicalState → ℝ) :
+    (transition : Descent.Core.BinaryState → Descent.Core.BinaryState → ℝ)
+    (quality : Descent.Core.BinaryState → Descent.Core.BinaryState → ℝ) :
     crossStatePerformance binaryStateWeight transition quality =
       conditionalSectionMean (fun g : TransportPair ↦ quality g.1 g.2)
         (jointTransportLaw transition) := by
@@ -1754,7 +1754,7 @@ theorem crossStatePerformance_eq_conditionalSectionMean
   ring
 
 /-- Both dynamics put half the mass on each target context. -/
-theorem labelMass_binaryTransportFamily (persists : Bool) (y : BinaryBiologicalState) :
+theorem labelMass_binaryTransportFamily (persists : Bool) (y : Descent.Core.BinaryState) :
     labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y = 1 / 2 := by
   cases persists <;> fin_cases y <;>
     norm_num [labelMass, binaryTransportFamily, jointTransportLaw, binaryStateWeight,
@@ -1767,7 +1767,7 @@ Both diameter theorems below open by establishing this for `true` and for `false
 did it by rewriting `labelMass_binaryTransportFamily` and calling `norm_num`, twice each.
 Stated once, the four copies become four applications. -/
 theorem labelMass_binaryTransportFamily_ne_zero (persists : Bool)
-    (y : BinaryBiologicalState) :
+    (y : Descent.Core.BinaryState) :
     labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0 := by
   rw [labelMass_binaryTransportFamily]
   norm_num
@@ -1779,7 +1779,7 @@ theorem descends_targetAnnotation_along_targetState :
   descendsAlong_sectionMean_of_labelFunction _ binaryTransportFamily targetAnnotation
 
 /-- Under persistence, the source-adapted readout is perfect on every target fiber. -/
-theorem contextMatchQuality_value_persistent (y : BinaryBiologicalState) :
+theorem contextMatchQuality_value_persistent (y : Descent.Core.BinaryState) :
     conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y) = 1 := by
   rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
@@ -1788,7 +1788,7 @@ theorem contextMatchQuality_value_persistent (y : BinaryBiologicalState) :
       contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
 
 /-- Under complete switching, the same readout is worthless on the same fiber. -/
-theorem contextMatchQuality_value_switching (y : BinaryBiologicalState) :
+theorem contextMatchQuality_value_switching (y : Descent.Core.BinaryState) :
     conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y) = 0 := by
   rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
@@ -1827,7 +1827,7 @@ theorem not_descends_contextMatchQuality_along_targetState :
 dynamics at one target state.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite section oscillation. -/
-noncomputable def contextMatchSectionOscillation (y : BinaryBiologicalState) : ℝ :=
+noncomputable def contextMatchSectionOscillation (y : Descent.Core.BinaryState) : ℝ :=
   finiteSectionOscillation
     (fun persists y ↦
       labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
@@ -1839,7 +1839,7 @@ noncomputable def contextMatchSectionOscillation (y : BinaryBiologicalState) : �
 /-- The total-variation diameter of supported dynamics on one biological target-state fiber.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite section diameter. -/
-noncomputable def contextMatchTotalVariationDiameter (y : BinaryBiologicalState) : ℝ :=
+noncomputable def contextMatchTotalVariationDiameter (y : Descent.Core.BinaryState) : ℝ :=
   finiteSectionDiameter
     (fun persists y ↦
       labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y ≠ 0)
@@ -1853,7 +1853,7 @@ bounded by half the `ℓ¹` total-variation diameter.  The factor `1/2` uses bot
 conditionals are probability laws and that quality lies in `[0,1]`; the cruder sup-norm argument
 loses this factor.  The maximum is over the whole finite family, not a pointwise restatement. -/
 theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
-    (y : BinaryBiologicalState) :
+    (y : Descent.Core.BinaryState) :
     contextMatchSectionOscillation y ≤ contextMatchTotalVariationDiameter y / 2 := by
   unfold contextMatchSectionOscillation contextMatchTotalVariationDiameter
   apply finiteSectionOscillation_le_modulus_diameter
@@ -1880,7 +1880,7 @@ theorem contextMatch_sectionOscillation_le_half_totalVariationDiameter
 
 /-- The two biological conditionals are opposite point masses on every target fiber, so their
 `ℓ¹` total-variation diameter is exactly two. -/
-theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
+theorem contextMatch_totalVariationDiameter_eq_two (y : Descent.Core.BinaryState) :
     contextMatchTotalVariationDiameter y = 2 := by
   unfold contextMatchTotalVariationDiameter
   apply le_antisymm
@@ -1924,7 +1924,7 @@ theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
 readout changes from one under persistence to zero under switching, so the section oscillation is
 exactly one.  Together with `contextMatch_totalVariationDiameter_eq_two`, this proves equality in
 the sharp range-sensitive bound above rather than merely exhibiting non-descent. -/
-theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
+theorem contextMatch_sectionOscillation_eq_one (y : Descent.Core.BinaryState) :
     contextMatchSectionOscillation y = 1 := by
   unfold contextMatchSectionOscillation
   apply le_antisymm
@@ -1965,37 +1965,37 @@ theorem contextMatch_sectionOscillation_eq_one (y : BinaryBiologicalState) :
 /-- With no information favoring persistence over switching after observing the target context,
 the posterior on the two biological dynamics is uniform. -/
 noncomputable def binaryDynamicsPosterior
-    (_ : BinaryBiologicalState) (_ : Bool) : ℝ := 1 / 2
+    (_ : Descent.Core.BinaryState) (_ : Bool) : ℝ := 1 / 2
 
 /-- The uninformative dynamics posterior is the canonical balanced calibration weight. -/
 @[simp] theorem binaryDynamicsPosterior_eq_balancedBinaryWeight
-    (y : BinaryBiologicalState) (persists : Bool) :
+    (y : Descent.Core.BinaryState) (persists : Bool) :
     binaryDynamicsPosterior y persists = Portability.balancedBinaryWeight persists := by
   rfl
 
 /-- Conditional source-adapted quality for one dynamics and one target context, constructed from
 the same fiber conditional used by the descent theorem above. -/
 noncomputable def binaryConditionalContextMatch
-    (persists : Bool) (y : BinaryBiologicalState) : ℝ :=
+    (persists : Bool) (y : Descent.Core.BinaryState) : ℝ :=
   conditionalSectionMean (fun g : TransportPair ↦ contextMatchQuality g.1 g.2)
     (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y)
 
 /-- The constructed conditional-quality field is one for persistence and zero for switching. -/
 @[simp] theorem binaryConditionalContextMatch_eq_indicator
-    (persists : Bool) (y : BinaryBiologicalState) :
+    (persists : Bool) (y : Descent.Core.BinaryState) :
     binaryConditionalContextMatch persists y = if persists then 1 else 0 := by
   cases persists
   · simp [binaryConditionalContextMatch, contextMatchQuality_value_switching]
   · simp [binaryConditionalContextMatch, contextMatchQuality_value_persistent]
 
 /-- The binary dynamics posterior is normalized on every biological target context. -/
-theorem binaryDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
+theorem binaryDynamicsPosterior_sum_eq_one (y : Descent.Core.BinaryState) :
     ∑ persists, binaryDynamicsPosterior y persists = 1 := by
   norm_num [binaryDynamicsPosterior]
 
 /-- Pooling persistence and switching makes the source-adapted quality look exactly one-half on
 every target context.  This is the posterior-mean predictor of the calibration core. -/
-theorem posteriorMean_binaryConditionalContextMatch_eq_half (y : BinaryBiologicalState) :
+theorem posteriorMean_binaryConditionalContextMatch_eq_half (y : Descent.Core.BinaryState) :
     Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch y = 1 / 2 := by
   norm_num [Portability.posteriorMean, binaryDynamicsPosterior]
 
@@ -2006,12 +2006,12 @@ theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter :
     Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch = 1 / 4 := by
   have hposterior : binaryDynamicsPosterior =
-      Portability.twoIndexPosterior (fun _ : BinaryBiologicalState ↦ 1 / 2) := by
+      Portability.twoIndexPosterior (fun _ : Descent.Core.BinaryState ↦ 1 / 2) := by
     funext y persists
     cases persists <;> norm_num [binaryDynamicsPosterior, Portability.twoIndexPosterior]
   have hconditional : binaryConditionalContextMatch =
-      Portability.twoIndexConditional (fun _ : BinaryBiologicalState ↦ 1)
-        (fun _ : BinaryBiologicalState ↦ 0) := by
+      Portability.twoIndexConditional (fun _ : Descent.Core.BinaryState ↦ 1)
+        (fun _ : Descent.Core.BinaryState ↦ 0) := by
     funext persists y
     rw [binaryConditionalContextMatch_eq_indicator]
     cases persists <;> norm_num [Portability.twoIndexConditional]
@@ -2034,7 +2034,7 @@ theorem binaryContextMatch_pairwiseCalibrationDriftEnergy_eq_quarter :
 /-- At each target context, the same pairwise disagreement price is already `1/4`; averaging over
 contexts does not create the obstruction, it only preserves a pointwise ancestry/dynamics defect. -/
 theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
-    (y : BinaryBiologicalState) :
+    (y : Descent.Core.BinaryState) :
     Portability.posteriorPairwiseDriftEnergy binaryDynamicsPosterior
       binaryConditionalContextMatch y = 1 / 4 := by
   rw [Portability.posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
@@ -2047,16 +2047,16 @@ theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
 assigns zero posterior mass to switching dynamics.  The conditional field is unchanged; only its
 represented support changes. -/
 noncomputable def persistentOnlyDynamicsPosterior
-    (_ : BinaryBiologicalState) (persists : Bool) : ℝ := Spectral.binarySecondAnnotation persists
+    (_ : Descent.Core.BinaryState) (persists : Bool) : ℝ := Spectral.binarySecondAnnotation persists
 
 /-- The support-sealed biological posterior remains normalized. -/
-theorem persistentOnlyDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
+theorem persistentOnlyDynamicsPosterior_sum_eq_one (y : Descent.Core.BinaryState) :
     ∑ persists, persistentOnlyDynamicsPosterior y persists = 1 := by
   norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
 /-- Its posterior masses are nonnegative. -/
 theorem persistentOnlyDynamicsPosterior_nonnegative
-    (y : BinaryBiologicalState) (persists : Bool) :
+    (y : Descent.Core.BinaryState) (persists : Bool) :
     0 ≤ persistentOnlyDynamicsPosterior y persists := by
   cases persists <;> norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
@@ -2129,7 +2129,7 @@ theorem uniform_pooled_correction_residual_eq_dynamicsContrast
 context-match example.  This equality wires the two obstruction theories to the same biological
 direction rather than merely placing their theorems in one file. -/
 theorem dynamicsContrast_eq_two_mul_contextMatchDrift
-    (persists : Bool) (y : BinaryBiologicalState) :
+    (persists : Bool) (y : Descent.Core.BinaryState) :
     dynamicsContrast persists =
       2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y := by
   cases persists <;>
@@ -2183,7 +2183,7 @@ theorem dynamicsCommonMode_mem_adaptive_pooled_correctionSet :
 /-- The biological conditional-quality field decomposes into one half common mode plus one half
 contrast.  Pooling retains the former and erases the latter. -/
 theorem binaryConditionalContextMatch_eq_half_common_add_contrast
-    (persists : Bool) (y : BinaryBiologicalState) :
+    (persists : Bool) (y : Descent.Core.BinaryState) :
     binaryConditionalContextMatch persists y =
       (1 / 2) * dynamicsCommonMode persists + (1 / 2) * dynamicsContrast persists := by
   cases persists <;>
@@ -2194,7 +2194,7 @@ theorem binaryConditionalContextMatch_eq_half_common_add_contrast
 `L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
 model, rather than merely evaluating the two theories on unrelated witnesses. -/
 theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter_oscillationSq
-    (y : BinaryBiologicalState) :
+    (y : Descent.Core.BinaryState) :
     Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch =
         (1 / 4) * contextMatchSectionOscillation y ^ 2 := by
@@ -2206,7 +2206,7 @@ theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter_oscillationSq
 separated in total variation, the same obstruction is one sixteenth of the squared fiber
 diameter. -/
 theorem binaryContextMatch_calibrationDriftDefectSq_eq_sixteenth_tvDiameterSq
-    (y : BinaryBiologicalState) :
+    (y : Descent.Core.BinaryState) :
     Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch =
         (1 / 16) * contextMatchTotalVariationDiameter y ^ 2 := by

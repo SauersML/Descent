@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Population
 import Descent.Foundations.Probability
 import Mathlib.Tactic
 import Descent.Core.Ratios
@@ -296,21 +297,20 @@ end Affine
 
 /-! ## Effect modification: each margin descends, their join does not -/
 
-abbrev BinaryDescentCovariate := Fin 2
 
 /-- A binary interaction with no main effects.  `theta` is an ancestry-by-environment or
 genotype-by-environment interaction invisible after averaging either coordinate separately. -/
 noncomputable def interactionRisk (theta : ℝ)
-    (u v : BinaryDescentCovariate) : ℝ :=
+    (u v : Descent.Core.BinaryState) : ℝ :=
   if u = v then 1 / 2 + theta else 1 / 2 - theta
 
 /-- Averaging over the second balanced covariate kills the interaction exactly. -/
-theorem interactionRisk_average_second (theta : ℝ) (u : BinaryDescentCovariate) :
+theorem interactionRisk_average_second (theta : ℝ) (u : Descent.Core.BinaryState) :
     (interactionRisk theta u 0 + interactionRisk theta u 1) / 2 = 1 / 2 := by
   fin_cases u <;> norm_num [interactionRisk]
 
 /-- Averaging over the first balanced covariate also kills it. -/
-theorem interactionRisk_average_first (theta : ℝ) (v : BinaryDescentCovariate) :
+theorem interactionRisk_average_first (theta : ℝ) (v : Descent.Core.BinaryState) :
     (interactionRisk theta 0 v + interactionRisk theta 1 v) / 2 = 1 / 2 := by
   fin_cases v <;> norm_num [interactionRisk]
 
@@ -327,7 +327,7 @@ theorem interactionRisk_joint_separates {theta eta : ℝ} (hne : theta ≠ eta) 
 /-! ## Confounding: two informative reductions descend, their meet does not -/
 
 /-- Outcome risk conditional on a binary confounder. -/
-noncomputable def confoundedConditionalRisk (v : BinaryDescentCovariate) : ℝ :=
+noncomputable def confoundedConditionalRisk (v : Descent.Core.BinaryState) : ℝ :=
   if v = 0 then 1 / 4 else 3 / 4
 
 /-- Reference evaluations: the two covariate strata carry a quarter and three quarters. -/
