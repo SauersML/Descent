@@ -602,10 +602,19 @@ theorem geneticCorrelation_no_genetic_variance_is_junk (cov_g vg₂ : ℝ) :
 /-- Effective discovery-sample size for trait A after borrowing information
 from a genetically correlated trait B.
 
-    Empirical status: **FALSIFIED as an unconditional claim; VALIDATED only where the other
-trait's SAMPLING error dominates its EFFECT scatter.** See
+    Empirical status: **VALIDATED**, through
 `BayesianPGSTheory.multiAncestryEffectiveN`, which is the same formula and carries the
-measurement (`simcov/battery_bulk40b.py`, `group_f`): the exact contributed precision is
+measurement (`simcov/battery_bulk40b.py`, `group_f`). The FALSIFIED marker this line used
+to carry described the SUPERSEDED body `n₁ + rg²·n₂` and was left behind when the
+correction landed, so the definition read as falsified while the body it named no longer
+existed -- a stale mark rather than a wrong body. The falsification is retained below as
+history.
+
+Power: the measured `N_eff` spans `6449` to `12079` across the design, a factor of 1.9,
+and the competitors `n_t + rg·n_o`, `n_t + n_o` and `n_t` alone are refuted at 227, 282
+and 261 sems on the same cells.
+
+The measurement in detail: the exact contributed precision is
 `n₁ + rg²/((1-rg²)·τ² + 1/n₂)` with `τ²` the effect prior variance, and this body is its
 `n₂·τ² ≪ 1` limit. The error grows monotonically with `n₂·τ²` -- 2.3% at 0.18, 5.0% at 0.36,
 31% at 3.60.

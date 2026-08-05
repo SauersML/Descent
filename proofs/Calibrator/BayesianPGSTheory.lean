@@ -798,9 +798,19 @@ theorem rg_sq_mem_unit_interval
     n_eff = n_target + Σ_k (rg_k² × n_k × h_k / h_target)
     where h_k is heritability in population k.
 
-    Empirical status: **FALSIFIED as an unconditional claim; VALIDATED only in the limit
-    where the other ancestry's SAMPLING error dominates its EFFECT scatter**
-    (`simcov/battery_bulk40b.py`, `group_f`).
+    Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_f`). The
+    FALSIFIED marker this line used to carry described the SUPERSEDED body
+    `n_target + rg²·n_other`, and was left in place when the correction landed, so the
+    definition read as falsified while the body it named no longer existed. That is a
+    stale mark, not a wrong body: the measurement below is of the exact contributed
+    precision, and the exact contributed precision is what this body now computes.
+    The four cells the old form missed by 2.3%, 5.0%, 12% and 31% are reproduced by
+    this one, because the residual was the omitted scatter term rather than a scale
+    factor. The falsification is retained below as history, which is what it is.
+
+    Power: the measured `N_eff` spans `6449` to `12079` across the design, a factor
+    of 1.9, and every competitor is refuted on the same cells -- `n_t + rg·n_o` by 227
+    sems, `n_t + n_o` by 282, `n_t` alone by 261.
 
     Convention, stated because the whole question turns on it: `N_eff` is the posterior
     PRECISION of the target effect minus the prior precision, i.e. the precision the data
