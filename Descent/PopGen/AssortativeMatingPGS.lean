@@ -939,4 +939,26 @@ theorem founder_effect_excess_fst
 
 end PopulationStructure
 
+/-- **Cross-check: the two assortative-mating inflation claims agree only at
+full heritability.**
+
+`StratificationConfounding` carried `amInflationFactor r = 1/(1 - r)` and
+`AssortativeMatingPGS` carries `amEquilibriumVariance V_A r h² = V_A/(1 - r h²)`
+for the same quantity, and no theorem related them. Forward simulation with the spousal correlation
+measured rather than assumed puts the second within
+-5% to +1% and the first between +3% and +82% high, so the first is deleted.
+This theorem records why the disagreement was invisible: the two coincide
+exactly when `h² = 1`, which is the only case anyone would have checked by
+inspection, and diverge with `h²` everywhere else. Assortative mating is a
+forward-time phenomenon, so no coalescent simulation could have separated
+them. -/
+theorem amEquilibriumVariance_at_full_heritability (V_A r : ℝ) :
+    PopGen.amEquilibriumVariance V_A r 1 = V_A / (1 - r) := by
+  unfold PopGen.amEquilibriumVariance
+  ring_nf
+
+theorem ibdFst_eq_ploidy_form (d N sigma_sq : ℝ) :
+    PopGen.ibdFst d N sigma_sq = d / (2 * Descent.Core.ploidy * N * sigma_sq + d) := by
+  unfold PopGen.ibdFst Descent.Core.ploidy; ring_nf
+
 end Descent.PopGen

@@ -1,13 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PortabilityDrift
 -- `driftLDStep` is proved equal to `Portability.ibdRecurrenceStep` and
 -- `Portability.islandFstMultiplicativeStep` by unfolding both, and the Frobenius mismatch
 -- lemmas name `frobeniusNormSq` and `alleleFreqDivergenceRate` from `PopGen.DGP`.  Both
 -- arrive through `PortabilityDrift`, which is the single import
 -- `Descent.Program.OpenQuestions` used to carry here; the programme narrative was never
 -- supplying anything and is no longer in the path.
-import Descent.Portability.PortabilityDrift
 import Descent.Core.Fst
 
 namespace Descent.PopGen
@@ -1699,5 +1699,63 @@ theorem markerLayout_not_translate (t : ℕ) (ht : t ≤ 17) :
     markerLayoutA.image (· + t) ≠ markerLayoutB := by
   interval_cases t <;> decide
 
+
+theorem driftRatePerGen_eq_inv_timeScale (Ne : ℝ) :
+    PopGen.driftRatePerGen Ne = 1 / Descent.Core.coalescentTimeScale Ne := by
+  unfold PopGen.driftRatePerGen PopGen.alleleFreqDivergenceRate
+  rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The drift channel enters through `2·Nₑ`, and drift is not the whole retention.**
+The recombination factor `(1 - r)` is part of the retained fraction, so
+`(1 - 1/Descent.Core.coalescentTimeScale Ne)^t` alone is NOT this quantity -- it is the `r = 0`
+slice. This theorem pins the `2·Nₑ` convention inside the full expression. -/
+theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
+    PopGen.ldRetainedFraction r Ne t
+      = ((1 - r) * (1 - 1 / Descent.Core.coalescentTimeScale Ne)) ^ t := by
+  unfold PopGen.ldRetainedFraction PopGen.ldRetentionPerGen; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **Do not simplify this to `Descent.Core.coalescentTimeScale Ne * log 2`.** That is the `r → 0`
+limit and is false at every `r > 0`. The `2·Nₑ` convention appears inside the retention
+whose logarithm sets the half-life, which is what this states. -/
+theorem ldHalfLife_uses_timeScale (r Ne : ℝ) :
+    PopGen.ldHalfLife r Ne
+      = Real.log 2 / (-Real.log ((1 - r) * (1 - 1 / Descent.Core.coalescentTimeScale Ne))) := by
+  unfold PopGen.ldHalfLife PopGen.ldRetentionPerGen; rw [Descent.Core.coalescentTimeScale_eq]
+
+theorem ldRetentionPerGen_uses_timeScale (r Ne : ℝ) :
+    PopGen.ldRetentionPerGen r Ne = (1 - r) * (1 - 1 / Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.ldRetentionPerGen; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The two-locus drift step carries the coalescent time scale.** `driftLDStep` creates
+identity at `1 / (ploidy · Nₑ)`, the same rate `driftLDCreationRate` names. -/
+theorem driftLDStep_uses_coalescentTimeScale (Ne c Q : ℝ) :
+    PopGen.driftLDStep Ne c Q
+      = (1 - c) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne
+          + (1 - 1 / Descent.Core.coalescentTimeScale Ne) * Q) := by
+  unfold PopGen.driftLDStep Descent.Core.survivalWeightedMix; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **Its slope in `Q` carries it too.** -/
+theorem driftLDRetention_uses_coalescentTimeScale (Ne c : ℝ) :
+    PopGen.driftLDRetention Ne c = (1 - c) ^ 2 * (1 - 1 / Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.driftLDRetention; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **And so does its equilibrium**, which is a ratio of two expressions in that one
+scale rather than an independently chosen constant. -/
+theorem driftLDEquilibrium_uses_coalescentTimeScale (Ne c : ℝ) :
+    PopGen.driftLDEquilibrium Ne c
+      = (1 - c) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne) / (1 - PopGen.driftLDRetention Ne c) := by
+  unfold PopGen.driftLDEquilibrium; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The `ρ` of the Ohta-Kimura approximation is the coalescent-scaled recombination
+rate**, `2 · ploidy · Nₑ · c`, the same scaling `scaledMutationRate` applies to `μ` and
+`scaledMigrationRate` to `m`. The remaining `2`, `10` and `11` are coefficients of the
+moment recursion and are deliberately left as literals: they are not conventions, and
+tying them to `ploidy` would assert a derivation this corpus does not have. -/
+theorem ohtaKimuraSigmaDSq_uses_ploidy (Ne c : ℝ) :
+    PopGen.ohtaKimuraSigmaDSq Ne c
+      = (10 + 2 * Descent.Core.ploidy * Ne * c)
+          / ((2 + 2 * Descent.Core.ploidy * Ne * c) * (11 + 2 * Descent.Core.ploidy * Ne * c)) := by
+  simp only [PopGen.ohtaKimuraSigmaDSq, Descent.Core.ploidy, Descent.Core.ploidy]
+  ring
 
 end Descent.PopGen

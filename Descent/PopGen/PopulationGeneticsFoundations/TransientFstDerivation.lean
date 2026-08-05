@@ -366,4 +366,36 @@ theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
 
 end TransientFstDerivation
 
+/-- **Hudson's frequency form IS `1 - H_w/H_b`**, which is what puts it in the lattice.
+
+`hudsonFst` is written `(p₁ - p₂)² / (p₁(1-p₂) + p₂(1-p₁))`, and nothing related that shape
+to the heterozygosity-ratio reading the rest of the corpus states `F_ST` results in. It is
+the same number: with `H_w = p₁(1-p₁) + p₂(1-p₂)` the mean within-subgroup heterozygosity
+and `H_b = p₁(1-p₂) + p₂(1-p₁)` the between-subgroup one, `H_b - H_w = (p₁ - p₂)²` exactly,
+so the squared frequency difference in the numerator is not a separate convention -- it is
+the heterozygosity excess, already reduced.
+
+This is the edge that was missing. `fstFromHetRatio` is `Core.proportionalReduction`, and
+`slatkin_hetRatio_eq_coalescenceRatio` carries that to
+`hudsonFstFromCoalescenceTimes`, so the chain now runs frequencies to heterozygosities to
+coalescence times without leaving the Hudson convention -- which is the claim the corpus's
+`τ/(1+τ)` results have been resting on.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an algebraic identity between two
+    spellings of one estimator. The measurement that matters is the one in `neiFst`'s
+    docstring, where Hudson tracks the split law at 0.03 sems and Nei does not. -/
+theorem hudsonFst_eq_fstFromHetRatio (p₁ p₂ : ℝ)
+    (h : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0) :
+    Descent.Core.hudsonFst p₁ p₂
+      = PopGen.fstFromHetRatio (p₁ * (1 - p₁) + p₂ * (1 - p₂))
+          (p₁ * (1 - p₂) + p₂ * (1 - p₁)) := by
+  unfold Descent.Core.hudsonFst PopGen.fstFromHetRatio Descent.Core.proportionalReduction
+  field_simp
+  ring
+
+theorem hetDecayFactor_uses_timeScale (Ne θ : ℝ) :
+    PopGen.hetDecayFactor Ne θ
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * (1 - θ / Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.hetDecayFactor PopGen.hetDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.PopGen

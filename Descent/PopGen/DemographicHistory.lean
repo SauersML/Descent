@@ -1366,4 +1366,80 @@ theorem mul_sq_lt_mul_sq_of_lt_of_nonneg
 
 end DemographicPortability
 
+theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
+    PopGen.driftLDCreationRate Ne = 1 / Descent.Core.coalescentTimeScale Ne := by
+  unfold PopGen.driftLDCreationRate PopGen.driftRatePerGen PopGen.alleleFreqDivergenceRate
+  rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- Wright's compounding identity: one minus the product of retentions. It is
+written once for the two branches of a split and once for the two levels of
+the `F`-statistic hierarchy. -/
+theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
+    Portability.pairwiseFstFromBranches a b = PopGen.wrightFIT a b := by
+  unfold Portability.pairwiseFstFromBranches PopGen.wrightFIT Descent.Core.complementaryComposition; ring_nf
+
+theorem cumulativeDrift_uses_timeScale {T : ℕ} (Ne : Fin T → ℝ) :
+    PopGen.cumulativeDrift Ne = ∑ i, 1 / Descent.Core.coalescentTimeScale (Ne i) := by
+  unfold PopGen.cumulativeDrift
+  simp only [Descent.Core.coalescentTimeScale_eq]
+
+theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :
+    PopGen.demoSteppingStoneFst d Ne m σ_sq
+      = d / (d + Descent.Core.scaledMigrationRate Ne m * σ_sq) := by
+  unfold PopGen.demoSteppingStoneFst
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
+
+theorem fstMutationDriftTransient_uses_timeScale (θ t Ne : ℝ) :
+    PopGen.fstMutationDriftTransient θ t Ne
+      = PopGen.fstMutationDriftEquilibrium θ *
+          (1 - Real.exp (-(1 + θ) * t / Descent.Core.coalescentTimeScale Ne)) := by
+  unfold PopGen.fstMutationDriftTransient; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **Slatkin's identity**: `1 - H_w/H_b = 1 - E[T_w]/E[T_b]`.
+
+The heterozygosity reading of `F_ST` and the coalescence-time reading are the same number
+whenever the two RATIOS agree -- which is the content, and it is a premise here rather than
+a theorem. Under the infinite-sites limit expected heterozygosity is proportional to
+expected coalescence time, so the constant cancels in the ratio; away from that limit it
+does not, and this statement correctly says nothing.
+
+What the corpus gets from it is a lattice edge. `fstFromHetRatio` and
+`hudsonFstFromCoalescenceTimes` are both `Core.proportionalReduction`, so at EQUAL
+arguments they agree by `rfl` and that is what
+`pcTargetAxisEfficacy_eq_proportionalReduction` above records. This says the harder thing:
+at DIFFERENT arguments -- heterozygosities on one side, coalescence times on the other --
+they still agree, provided the population genetics that relates those arguments holds. Both
+are Hudson-convention readings, so the edge is inside one convention and needs no bridge.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the algebra is `rw [h]`. The premise
+    `H_w/H_b = E[T_w]/E[T_b]` is where all the biology is, and it is supplied by the
+    caller, not established here. -/
+theorem slatkin_hetRatio_eq_coalescenceRatio
+    (Hw Hb ETw ETb : ℝ) (h : Hw / Hb = ETw / ETb) :
+    PopGen.fstFromHetRatio Hw Hb = Portability.hudsonFstFromCoalescenceTimes ETw ETb := by
+  unfold PopGen.fstFromHetRatio Portability.hudsonFstFromCoalescenceTimes
+    Descent.Core.proportionalReduction
+  rw [h]
+
+/-- **The four in the quadratic stepping-stone form is twice the ploidy**, the same
+`4 Nₑ` scaling as every other migration-drift denominator in the corpus. Only the powers of
+`m` and `σ²` distinguish this form from `demoSteppingStoneFst`; the constant does not. -/
+theorem steppingStoneFstQuadratic_uses_ploidy (d Ne m σ_sq : ℝ) :
+    PopGen.steppingStoneFstQuadratic d Ne m σ_sq
+      = d / (d + 2 * Descent.Core.ploidy * Ne * σ_sq ^ 2 * m ^ 2) := by
+  unfold PopGen.steppingStoneFstQuadratic Descent.Core.ploidy; ring
+
+/-- **The finite-deme island `F_ST` is the identity fraction at the deme-corrected scaled
+migration rate.** Its `4 Nₑ m` is `scaledMigrationRate`, which
+`scaledMigrationRate_eq_ploidy_form` already forces to `2 · ploidy · Nₑ · m`; the deme
+correction multiplies that rate and does not touch the constant. This is the second
+consumer of the one bridge, so the finite-`d` form and its `d → ∞` limit cannot acquire
+different conventions. -/
+theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
+    PopGen.islandFstFiniteDemes Ne m d
+      = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection d) := by
+  unfold PopGen.islandFstFiniteDemes PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow
+    Descent.Core.islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  ring
+
 end Descent.PopGen

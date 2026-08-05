@@ -280,4 +280,20 @@ theorem neiGstFromFrequencies_symmetric (p₁ p₂ : ℝ) :
 
 end FstDefinitions
 
+/-- **Cross-check: the two spellings of Nei's `G_ST` in this corpus agree.**
+
+What this proves is that two independently written spellings of NEI's `G_ST`
+coincide. **Neither side is Hudson's estimator.** That one is `hudsonFst`, and
+`neiGst_ne_hudsonFst` exhibits a point where it differs from both of these, so
+do not read either name here as Hudson's. -/
+theorem neiGstFromFrequencies_eq_neiGst (p₁ p₂ : ℝ)
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
+    PopGen.neiGstFromFrequencies p₁ p₂ = Descent.Core.neiGst p₁ p₂ := by
+  rw [Descent.Core.neiGst_eq_varianceRatio p₁ p₂ h]
+  change (p₁ - p₂) ^ 2 /
+      (4 * Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂)) =
+    ((p₁ - p₂) ^ 2 / 4) /
+      (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))
+  field_simp [h]
+
 end Descent.PopGen

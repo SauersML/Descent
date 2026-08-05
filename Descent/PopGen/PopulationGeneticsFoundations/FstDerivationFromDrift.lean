@@ -299,4 +299,16 @@ theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
 
 end FstDerivationFromDrift
 
+theorem hetMutationDriftRecurrence_step_uses_timeScale
+    (Ne mu H₀ : ℝ) (t : ℕ) :
+    PopGen.hetMutationDriftRecurrence Ne mu H₀ (t + 1)
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * PopGen.hetMutationDriftRecurrence Ne mu H₀ t
+        + Descent.Core.ploidy * mu * (1 - PopGen.hetMutationDriftRecurrence Ne mu H₀ t) := by
+  change
+    (1 - 1 / (2 * Ne)) * PopGen.hetMutationDriftRecurrence Ne mu H₀ t +
+        2 * mu * (1 - PopGen.hetMutationDriftRecurrence Ne mu H₀ t) = _
+  rw [Descent.Core.coalescentTimeScale_eq]
+  unfold Descent.Core.ploidy
+  rfl
+
 end Descent.PopGen

@@ -934,4 +934,18 @@ theorem portability_bounded_by_rg_sq
 
 end ArchitectureConvergence
 
+theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
+    PopGen.expectedFreqDiffSq fst p0 = fst * genotypeVarianceHWE p0 := by
+  unfold PopGen.expectedFreqDiffSq genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+
+/-- **The `p (1 - p)` in the drift variance is half the diploid genotype variance.**
+`AncestrySpecificArchitecture.driftVariance` is `p₀ (1 - p₀) · F_ST`, the ancestral
+heterozygosity that has become between-population variance. Its heterozygosity factor is
+`genotypeVarianceHWE` on the allele scale rather than the dosage scale, which is exactly
+one `ploidy` apart, and writing it inline left that scale choice free. -/
+theorem driftVariance_uses_genotypeVarianceHWE (p0 fst : ℝ) :
+    PopGen.driftVariance p0 fst = genotypeVarianceHWE p0 * fst / Descent.Core.ploidy := by
+  unfold PopGen.driftVariance genotypeVarianceHWE Descent.Core.ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  ring
+
 end Descent.PopGen

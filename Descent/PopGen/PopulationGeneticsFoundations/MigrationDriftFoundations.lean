@@ -872,4 +872,37 @@ theorem ldCorrelationFromMigration_increases (M₁ M₂ : ℝ)
 
 end MigrationDriftFoundations
 
+theorem fstMigrationMutationEquilibriumManyDemes_eq_scaled (Ne m μ : ℝ) :
+    PopGen.fstMigrationMutationEquilibriumManyDemes Ne m μ
+      = 1 / (1 + Descent.Core.scaledMigrationRate Ne m + Descent.Core.scaledMutationRate Ne μ) := by
+  unfold PopGen.fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form, Descent.Core.scaledMutationRate_eq_ploidy_form]
+  unfold Descent.Core.ploidy; ring_nf
+
+/-- **The finite-deme island equilibrium carries the same two scaled rates.** Its
+`4 Nₑ m` is `scaledMigrationRate` and its `4 Nₑ μ` is `scaledMutationRate`, exactly as in
+the deme-blind limit form; the deme correction multiplies the migration rate and does not
+touch either constant. Without this the `4` would be a third inlined ploidy convention. -/
+theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
+    PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes
+      = 1 / (1 + Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection nDemes
+              + Descent.Core.scaledMutationRate Ne μ) := by
+  -- The bridge this used to go through, `fstIslandEquilibriumFiniteDemes_eq`, was
+  -- deleted when the body was repointed at `Core.fstFromFlow`, which is `1/(1+x)`
+  -- and needs no normalisation lemma of its own. What is left to say is that the
+  -- two `4`s in the flow are the two scaled rates and not a third inlined ploidy
+  -- convention, which is exactly what the two `_eq_ploidy_form` rewrites state.
+  unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form, Descent.Core.scaledMutationRate_eq_ploidy_form]
+  unfold Descent.Core.ploidy; ring_nf
+
+/-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a
+sampled pair.** Mutation destroys the identity of a pair at rate `ploidy · μ`, so
+`1 / (ploidy · μ)` is the time available to the diffusion and `L² = m σ² / (ploidy · μ)`
+is the balance. Written inline the two read as arbitrary; it is the same two that
+`Descent.Core.coalescentTimeScale` puts in front of `Nₑ`. -/
+theorem steppingStoneCharacteristicLength_uses_ploidy (m σ_sq μ : ℝ) :
+    PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (Descent.Core.ploidy * μ)) := by
+  unfold PopGen.steppingStoneCharacteristicLength Descent.Core.ploidy; ring
+
 end Descent.PopGen

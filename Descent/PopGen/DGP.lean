@@ -134,6 +134,14 @@ Two accessors on two structures used to write this product out separately.
 noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
 
+/-- **Both denominators in the scaled heterozygosity decay are the coalescent time
+scale**, so `θ / (2 Nₑ)` is `θ` measured in coalescent units and not a second convention. -/
+theorem hetDecayFromScaled_uses_coalescentTimeScale (Ne θ : ℝ) :
+    PopGen.hetDecayFromScaled Ne θ
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne)
+          * (1 - θ / Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.hetDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
+
 /-- **The two channels factor.** Heterozygosity decay is drift times mutation, and at zero scaled
 mutation only the drift factor survives. A body that added the two channels instead of
 multiplying them would fail this, and would also predict decay exceeding one for large `θ`. -/
@@ -190,6 +198,14 @@ heterozygosity family; the formula does not fix which is meant, and the whole
 content of this one is that the two families take different forces. -/
 noncomputable def fstTransientDecayFromScaled (Ne θ bigM : ℝ) : ℝ :=
   hetDecayFromScaled Ne θ * (1 - bigM / (2 * Ne))
+
+/-- The differentiation transient's decay factor is on the same coalescent clock as the
+heterozygosity one it extends: the migration channel divides by the timescale, not by a
+free constant. -/
+theorem fstTransientDecayFromScaled_uses_timeScale (Ne θ bigM : ℝ) :
+    PopGen.fstTransientDecayFromScaled Ne θ bigM
+      = PopGen.hetDecayFromScaled Ne θ * (1 - bigM / Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.fstTransientDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **At zero migration the differentiation transient decays at the heterozygosity rate.**
 This is the boundary at which the superseded body was right, and it is the only one. -/
@@ -2543,6 +2559,22 @@ noncomputable def EvolutionaryParameters.theta (p : EvolutionaryParameters) : �
 noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ :=
   Descent.Core.scaledMigrationRate p.Ne p.mig
 
+theorem EvolutionaryParameters_theta_eq_ploidy_form (p : PopGen.EvolutionaryParameters) :
+    PopGen.EvolutionaryParameters.theta p = 2 * Descent.Core.ploidy * p.Ne * p.mu := by
+  unfold PopGen.EvolutionaryParameters.theta Descent.Core.ploidy
+    Descent.Core.scaledMutationRate Descent.Core.ploidy
+  ring
+
+theorem EvolutionaryParameters_bigM_eq_ploidy_form (p : PopGen.EvolutionaryParameters) :
+    PopGen.EvolutionaryParameters.bigM p = 2 * Descent.Core.ploidy * p.Ne * p.mig := by
+  unfold PopGen.EvolutionaryParameters.bigM Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  ring
+
+theorem EvolutionaryParameters_tau_uses_timeScale (p : PopGen.EvolutionaryParameters) :
+    PopGen.EvolutionaryParameters.tau p = p.t_div / Descent.Core.coalescentTimeScale p.Ne := by
+  unfold PopGen.EvolutionaryParameters.tau; rw [Descent.Core.coalescentTimeScale_eq]
+
 /-- θ ≥ 0. -/
 theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.theta := by
@@ -2641,6 +2673,15 @@ within-generation ordering does not matter.  This is the first-order
 noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
   F + (1 - F) / (2 * p.Ne) - 2 * (p.mig + p.mu) * F
 
+/-- **The `F_ST` flow step is `ibdFlowStep` at the summed rate, with the same two twos.**
+Migration and mutation enter through their sum, and the `ploidy` in front of that sum is
+the same "either lineage" factor as in `ibdFlowStep`. -/
+theorem fstDriftFlowStep_uses_coalescentTimeScale (p : PopGen.EvolutionaryParameters) (F : ℝ) :
+    PopGen.fstDriftFlowStep p F
+      = F + (1 - F) / Descent.Core.coalescentTimeScale p.Ne
+          - Descent.Core.ploidy * (p.mig + p.mu) * F := by
+  unfold PopGen.fstDriftFlowStep Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+
 /-- **At fixation drift contributes nothing and only flow pulls back.** With `F = 1` the
 `(1 - F)` drift term vanishes identically, so the step is one minus twice the total flow rate --
 the reference point that separates the drift term from the flow term. -/
@@ -2671,6 +2712,56 @@ difference between this step and the one above, and it is what
     `fstEquilibrium` below. -/
 noncomputable def fstDemeCorrectedFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
   F + (1 - F) / (2 * p.Ne) - 2 * (2 * p.mig + p.mu) * F
+
+/-- **The deme-corrected flow step restates neither convention.** Its `2 Nₑ` is the same
+`Descent.Core.coalescentTimeScale` and its leading `2` on the rate sum is the same `ploidy` "either
+lineage" factor as in `fstDriftFlowStep`. The only new constant is the `2` INSIDE the rate
+sum, multiplying `mig` alone, and that one is not a ploidy convention at all: it is
+`PopulationGeneticsFoundations.islandDemeCorrection` at two demes, the emigration rate plus
+the immigration rate. Mutation carries no such factor, and this theorem is where that
+asymmetry is visible as an asymmetry rather than as an inlined constant. -/
+theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale
+    (p : PopGen.EvolutionaryParameters) (F : ℝ) :
+    PopGen.fstDemeCorrectedFlowStep p F
+      = F + (1 - F) / Descent.Core.coalescentTimeScale p.Ne
+          - Descent.Core.ploidy * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F := by
+  unfold PopGen.fstDemeCorrectedFlowStep Descent.Core.ploidy
+    Descent.Core.islandDemeCorrection Descent.Core.ploidy
+    Descent.Core.islandDemeCorrection Descent.Core.ratio
+  rw [Descent.Core.coalescentTimeScale_eq]; norm_num
+
+/-- **The three twos in the deme-corrected flow step are three different twos,
+and only one of them is the ploidy.**
+
+`DGP.fstDemeCorrectedFlowStep` is `F + (1 - F)/(2 Nₑ) - 2(2 mig + mu) F`, and
+the constants are:
+
+* `2 Nₑ` -- the GENE-COPY COUNT, `Descent.Core.coalescentTimeScale Nₑ = ploidy · Nₑ`. Drift
+  makes a pair identical at rate one over the number of copies, so this two is
+  the ploidy and is stated as such.
+* the inner `2` on `mig` -- the DEME-COUNT correction, `islandDemeCorrection 2`.
+  A pair of lineages switches between the same-deme and different-deme states at
+  emigration plus immigration, which at `d` demes is `m · d/(d - 1)` and at two
+  demes is `2 m`. It would be `3/2 m` at three demes; nothing about ploidy moves
+  when it changes.
+* the outer `2` on the whole flow term -- the PAIR of lineages, either of which
+  can leave the identity class. A pair is two gene copies whatever the ploidy of
+  the organism carrying them, so this one is left inline: tying it to `ploidy`
+  would make a haploid corpus compute a different number for the same event, and
+  it does not.
+
+Distinguishing them is the point. All three are the numeral `2` in one line of
+source, and the guard that counts convention restatements cannot tell them
+apart. -/
+theorem fstDemeCorrectedFlowStep_constants_named (p : PopGen.EvolutionaryParameters)
+    (F : ℝ) :
+    PopGen.fstDemeCorrectedFlowStep p F =
+      F + (1 - F) / Descent.Core.coalescentTimeScale p.Ne
+        - 2 * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F := by
+  unfold PopGen.fstDemeCorrectedFlowStep Descent.Core.coalescentTimeScale
+    Descent.Core.islandDemeCorrection
+    Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.ploidy Descent.Core.ploidy
+  norm_num
 
 /-- **The two flow steps differ only in the migration channel**, and coincide
 exactly when there is no migration to correct. Without this the corrected step
@@ -2934,6 +3025,16 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     Power: the prediction spans 0.01832 to 0.67032 across the design. -/
 noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
   (1 - p.recomb) ^ (2 * p.t_div)
+
+/-- The factor of two in the shared-LD exponent is the PLOIDY: two lineages must
+independently avoid recombination, so the per-meiosis survival `1 - r` is raised to
+`ploidy · t_div` and not to `t_div`. The statement survived the body's correction from
+`exp(-2·r·t_div)` to `(1-r)^(2·t_div)` with the exponential replaced by the exact survival,
+which is the point of stating the convention separately from the functional form: the
+convention is about the EXPONENT, and the correction was to the base. -/
+theorem sharedLDRetention_uses_ploidy (p : PopGen.EvolutionaryParameters) :
+    PopGen.sharedLDRetention p = (1 - p.recomb) ^ (Descent.Core.ploidy * p.t_div) := by
+  unfold PopGen.sharedLDRetention Descent.Core.ploidy; ring_nf
 
 /-- Shared LD retention is positive. -/
 theorem sharedLDRetention_pos (p : EvolutionaryParameters) :
@@ -4047,6 +4148,14 @@ they are not added or multiplied into a single portability law. -/
     accumulates on the coalescent clock and on no other. -/
 noncomputable def alleleFreqDivergenceRate (Ne _mu _m_rate : ℝ) : ℝ :=
   1 / (2 * Ne)
+
+/-- The divergence rate is the reciprocal of the coalescent timescale, and the scaled mutation
+and migration rates do not appear. This theorem previously carried them in the denominator; the
+body they came from was falsified at up to 1620 sems and the convention statement follows it. -/
+theorem alleleFreqDivergenceRate_eq_scaled (Ne mu m_rate : ℝ) :
+    PopGen.alleleFreqDivergenceRate Ne mu m_rate = 1 / Descent.Core.coalescentTimeScale Ne := by
+  unfold PopGen.alleleFreqDivergenceRate
+  rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **The allele-frequency divergence rate at zero effective size, named.** Drift is
 instantaneous in an empty population, so the divergence rate diverges. The divisor is zero and

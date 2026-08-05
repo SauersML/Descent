@@ -179,4 +179,25 @@ theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
 
 end WrightFStatistics
 
+/-- **Cross-check: `heterozygosityLossFromDrift` uses the coalescent time scale**, so the
+`2 Nₑ` inside it is the same `ploidy · Nₑ` and not a separate choice.
+
+The name of this theorem calls that body "the drift `F_ST`", and `DriftRegime` names
+precisely that reading as the defect: a within-population heterozygosity loss and a
+between-population variance ratio are different quantities, and the shared body is what
+let one be substituted for the other. What is pinned here is the constant. The regime is
+pinned separately, by
+`heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` at the end of this file. -/
+theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
+    PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / Descent.Core.coalescentTimeScale Ne) ^ t := by
+  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-! `heterozygosityLossFromDrift_uses_timeScale` stood beside the theorem above with the
+same statement, the same proof and a different binder order, under a second name.  Both
+arrived here from `Program/Conventions.lean`, which had accumulated one restatement per
+reading of the body rather than one per fact.  A restatement that differs only in the order
+of two universally quantified arguments is not a second cross-check; it is the same edge
+between the same literal and the same convention, and deleting it removes nothing that
+could fail independently. -/
+
 end Descent.PopGen

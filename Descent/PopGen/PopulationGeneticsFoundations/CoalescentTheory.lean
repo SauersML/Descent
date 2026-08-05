@@ -247,4 +247,12 @@ theorem ne_affects_pgs_variance
 
 end EffectivePopulationSize
 
+/-- **Cross-check: the `2 Nₑ` inside `coalFst` is the coalescent time scale.**
+`coalFst t Ne = t / (t + 2 Nₑ)` is `t / (t + E[T_within])`, and `E[T_within]`
+is `ploidy · Nₑ` generations. Writing the two inline left the constant free;
+this states which two it is. -/
+theorem coalFst_uses_coalescentTimeScale (t Ne : ℝ) :
+    PopGen.coalFst t Ne = t / (t + Descent.Core.coalescentTimeScale Ne) := by
+  unfold PopGen.coalFst Descent.Core.oddsLike; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.PopGen

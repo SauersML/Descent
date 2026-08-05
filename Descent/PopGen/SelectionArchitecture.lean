@@ -723,8 +723,11 @@ section PolygenicAdaptation
 /-- **Polygenic adaptation score shift.**
     Under polygenic adaptation, the mean PGS shifts by
     Δμ = Σᵢ βᵢ · 2 · Δpᵢ where Δpᵢ are coordinated frequency changes. The `2` is
-    `Conventions.ploidy`, written as a literal only because importing
-    `Conventions` here closes an import cycle;
+    `Descent.Core.ploidy`, written as a literal.  That used to be because importing
+    `Conventions` here closed an import cycle, and it no longer is: `ploidy` lives in
+    `Core/Scaling.lean` at depth 1 and nothing prevents this body from calling it.  What
+    holds the literal to the convention meanwhile is `polygenicAdaptationShift_uses_ploidy`
+    below, which is in this file rather than in an audit layer;
     `ScoreDistribution.pgsMeanShift` carries the same factor.
 
     **The ploidy factor was missing and the body has been corrected.** The mean
@@ -1143,5 +1146,22 @@ theorem cross_trait_portability_bound
     _ = 1 := by ring
 
 end Pleiotropy
+
+theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
+    PopGen.gwasNCP n β p = n * β ^ 2 * genotypeVarianceHWE p := by
+  unfold PopGen.gwasNCP Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation genotypeVarianceHWE
+    genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  ring_nf
+
+/-- **The two in the polygenic-adaptation shift is the ploidy.** The mean score is
+`Σᵢ βᵢ · ploidy · pᵢ`, so its shift carries the same factor; the body writes the `2` as a
+literal, and this theorem is what stops it from drifting away from `ploidy`.  It used to be
+stated from `Program/Conventions.lean` because that was the only module that could see both
+sides; `ploidy` is a `Core` kernel now, so the edge is stated here, next to the literal it
+is about. -/
+theorem polygenicAdaptationShift_uses_ploidy {m : ℕ} (β Δp : Fin m → ℝ) :
+    PopGen.polygenicAdaptationShift β Δp = ∑ i, β i * Descent.Core.ploidy * Δp i := by
+  unfold PopGen.polygenicAdaptationShift Descent.Core.ploidy
+  simp
 
 end Descent.PopGen

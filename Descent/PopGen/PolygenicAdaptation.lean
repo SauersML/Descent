@@ -664,4 +664,20 @@ theorem stratification_reduces_adaptation_signal
 
 end DetectingAdaptation
 
+/-- **The one-population PGS drift variance carries the same ploidy factor.**
+
+`pgsDriftVariance_one_pop` is the single-population form of `Var_Delta_Mu`, and its `2` is
+the same convention: `ploidy · F_ST · V_A`.  The two definitions are alpha-equivalent, and
+this pair of theorems is what says so rather than leaving it to the reader. -/
+theorem pgsDriftVariance_one_pop_eq_ploidy_form (V_A fst : ℝ) :
+    PopGen.pgsDriftVariance_one_pop V_A fst = Descent.Core.ploidy * fst * V_A := by
+  unfold PopGen.pgsDriftVariance_one_pop Portability.Var_Delta_Mu Descent.Core.ploidy
+  ring
+
+/-- The between-population drift variance of the score, carrying the same
+ploidy factor as `Var_Delta_Mu`. -/
+theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
+    PopGen.expectedPGSDiffVariance V_A fst = Descent.Core.ploidy * Descent.Core.ploidy * fst * V_A := by
+  unfold PopGen.expectedPGSDiffVariance Descent.Core.ploidy; ring
+
 end Descent.PopGen

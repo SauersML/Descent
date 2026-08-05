@@ -546,4 +546,16 @@ theorem prevalence_confounds_h2_portability
 
 end LiabilityScale
 
+/-- **`additiveVariance` is a sum over loci and therefore assumes linkage equilibrium**;
+this theorem pins its `2 p (1 - p)` to `ploidy` and says nothing about that assumption.
+
+The qualifier is load-bearing. The per-locus sum drops the cross term
+`Σ_{i≠j} 4 α_i α_j D_ij`, and the sign of the resulting error flips with the sign of the
+effect product, so no constant repairs it: at `p = 1/2`, `D = 1/8`, `α = (1,1)` gives `1`
+against a true `3/2`, while `α = (1,-1)` gives `1` against a true `1/2`. The
+unconditional reading is FALSIFIED (`VarianceComponents.additiveVariance`). -/
+theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
+    PopGen.additiveVariance p α = ∑ i, genotypeVarianceHWE (p i) * (α i) ^ 2 := by
+  unfold PopGen.additiveVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+
 end Descent.PopGen
