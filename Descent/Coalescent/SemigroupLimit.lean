@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Generator
+import Descent.Coalescent.ExpRemainder
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Tactic
 
@@ -132,6 +133,56 @@ theorem tendsto_pow_self_exp {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸
     linarith [h1 ▸ h]
   refine tendsto_pow_of_close (exp ℝ Q) C P (fun N ↦ exp ℝ ((1 / (N : ℝ)) • Q)) hP hE
     (fun N hN ↦ exp_smul_pow_self Q hN) hC (Filter.Eventually.of_forall hclose)
+
+/-- **K-G (2.11) as the hypothesis, which is how Kingman writes it.**  If the one-generation
+operator is `1 + N⁻¹Q + O(N⁻²)` -- not "close to `exp(N⁻¹Q)`", which is a statement nobody
+verifies directly -- then `N` generations converge to `exp Q`.
+
+`Descent.Coalescent.ExpRemainder.norm_exp_sub_one_sub_self_le_sq` is what makes the two
+hypotheses interchangeable: `1 + N⁻¹Q` and `exp(N⁻¹Q)` differ by at most `‖Q‖²/N²` once
+`‖Q‖ ≤ N`, so an expansion to order `N⁻²` is a comparison to order `N⁻²`.
+
+This is the form a transition matrix would be fed to, and the reason the many-state case is
+now a counting problem rather than an analytic one. -/
+theorem tendsto_pow_of_expansion {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸]
+    [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] (Q : 𝔸) (C : ℝ) (hC : 0 ≤ C) (P : ℕ → 𝔸)
+    (hP : ∀ N : ℕ, ‖P N‖ ≤ 1) (hE : ∀ N : ℕ, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1)
+    (hclose : ∀ N : ℕ, ‖P N - (1 + (1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) :
+    Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds (exp ℝ Q)) := by
+  refine tendsto_pow_of_close (exp ℝ Q) (C + ‖Q‖ ^ 2) P
+    (fun N ↦ exp ℝ ((1 / (N : ℝ)) • Q)) hP hE (fun N hN ↦ exp_smul_pow_self Q hN)
+    (by positivity) ?_
+  filter_upwards [eventually_ge_atTop (max 1 ⌈‖Q‖⌉₊)] with N hN
+  have hN1 : 1 ≤ N := le_trans (le_max_left _ _) hN
+  have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN1
+  have hQN : ‖(1 / (N : ℝ)) • Q‖ ≤ 1 := by
+    rw [norm_smul, Real.norm_eq_abs, abs_of_pos (by positivity)]
+    rw [div_mul_eq_mul_div, one_mul, div_le_one hNR]
+    have hceil : ⌈‖Q‖⌉₊ ≤ N := le_trans (le_max_right _ _) hN
+    exact le_trans (Nat.le_ceil ‖Q‖) (by exact_mod_cast hceil)
+  have hrem : ‖exp ℝ ((1 / (N : ℝ)) • Q) - (1 + (1 / (N : ℝ)) • Q)‖
+      ≤ ‖Q‖ ^ 2 / (N : ℝ) ^ 2 := by
+    have h := norm_exp_sub_one_sub_self_le_sq (x := (1 / (N : ℝ)) • Q) hQN
+    have hnorm : ‖(1 / (N : ℝ)) • Q‖ ^ 2 = ‖Q‖ ^ 2 / (N : ℝ) ^ 2 := by
+      rw [norm_smul, Real.norm_eq_abs, abs_of_pos (by positivity), mul_pow, div_pow, one_pow]
+      ring
+    rw [hnorm] at h
+    have hcomm : exp ℝ ((1 / (N : ℝ)) • Q) - (1 + (1 / (N : ℝ)) • Q)
+        = exp ℝ ((1 / (N : ℝ)) • Q) - 1 - (1 / (N : ℝ)) • Q := by abel
+    rw [hcomm]
+    exact h
+  calc ‖P N - exp ℝ ((1 / (N : ℝ)) • Q)‖
+      ≤ ‖P N - (1 + (1 / (N : ℝ)) • Q)‖
+          + ‖(1 + (1 / (N : ℝ)) • Q) - exp ℝ ((1 / (N : ℝ)) • Q)‖ := by
+        have := norm_sub_le (P N - (1 + (1 / (N : ℝ)) • Q))
+          ((1 + (1 / (N : ℝ)) • Q) - exp ℝ ((1 / (N : ℝ)) • Q))
+        simpa [sub_add_sub_cancel] using norm_sub_le_norm_sub_add_norm_sub
+          (P N) (1 + (1 / (N : ℝ)) • Q) (exp ℝ ((1 / (N : ℝ)) • Q))
+    _ ≤ C / (N : ℝ) ^ 2 + ‖Q‖ ^ 2 / (N : ℝ) ^ 2 := by
+        refine add_le_add (hclose N) ?_
+        rw [← norm_neg]
+        simpa using hrem
+    _ = (C + ‖Q‖ ^ 2) / (N : ℝ) ^ 2 := by ring
 
 end Coalescent
 
