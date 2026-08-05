@@ -616,8 +616,8 @@ noncomputable def pooledEnvironmentCorrelations
     (mass correlation : Environment → ℝ) : ℝ :=
   ∑ environment ∈ active, mass environment * correlation environment
 
-/-- Reference evaluation: with no active environments there is nothing to pool. -/
-theorem pooledEnvironmentCorrelations_at_reference_point {Environment : Type*}
+/-- Vanishing identity: with no active environments there is nothing to pool. -/
+theorem pooledEnvironmentCorrelations_empty_eq_zero {Environment : Type*}
     (mass correlation : Environment → ℝ) :
     pooledEnvironmentCorrelations (∅ : Finset Environment) mass correlation = 0 := by
   unfold pooledEnvironmentCorrelations
@@ -915,8 +915,8 @@ noncomputable def covarianceDisplacementEnergy
     (candidate truth : TwoCoordinateConfiguration) : ℝ :=
   dotProduct (candidate - truth) (sigma.mulVec (candidate - truth))
 
-/-- Reference evaluation: a candidate at the truth carries no displacement energy. -/
-theorem covarianceDisplacementEnergy_at_reference_point
+/-- Vanishing identity: a candidate at the truth carries no displacement energy. -/
+theorem covarianceDisplacementEnergy_self_eq_zero
     (sigma : Matrix (Fin 2) (Fin 2) ℝ) (truth : TwoCoordinateConfiguration) :
     covarianceDisplacementEnergy sigma truth truth = 0 := by
   unfold covarianceDisplacementEnergy

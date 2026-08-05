@@ -345,8 +345,8 @@ variable {ι : Type*} (s : Finset ι) (w lam : ι → ℝ)
 /-- Total adaptive value: the mass of the rate measure. -/
 noncomputable def valueMass : ℝ := ∑ i ∈ s, w i
 
-/-- Reference evaluation: an empty rate measure carries no value mass. -/
-theorem valueMass_at_reference_point (w : ι → ℝ) :
+/-- Vanishing identity: an empty rate measure carries no value mass. -/
+theorem valueMass_empty_eq_zero (w : ι → ℝ) :
     valueMass (∅ : Finset ι) w = 0 := by
   unfold valueMass
   simp
@@ -355,8 +355,8 @@ theorem valueMass_at_reference_point (w : ι → ℝ) :
 /-- **Integrated autocorrelation time** of the value signal, `Σ wᵢ/λᵢ`. -/
 noncomputable def autocorrTime : ℝ := ∑ i ∈ s, w i / lam i
 
-/-- Reference evaluation: an empty rate measure has no integrated autocorrelation time. -/
-theorem autocorrTime_at_reference_point (w lam : ι → ℝ) :
+/-- Vanishing identity: an empty rate measure has no integrated autocorrelation time. -/
+theorem autocorrTime_empty_eq_zero (w lam : ι → ℝ) :
     autocorrTime (∅ : Finset ι) w lam = 0 := by
   unfold autocorrTime
   simp

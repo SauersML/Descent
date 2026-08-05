@@ -324,8 +324,8 @@ noncomputable def diagonalCovarianceMomentPermeability {ι : Type*} [Fintype ι]
   ∑ i, covarianceMomentPermeability
     (covarianceDerivative i) (secondMoment i) (fourthMoment i)
 
-/-- Reference evaluation: a design with no covariance sensitivity is impermeable. -/
-theorem diagonalCovarianceMomentPermeability_at_reference_point {ι : Type*} [Fintype ι]
+/-- Vanishing identity: a design with no covariance sensitivity is impermeable. -/
+theorem diagonalCovarianceMomentPermeability_zero_sensitivity_eq_zero {ι : Type*} [Fintype ι]
     (secondMoment fourthMoment : ι → ℝ) :
     diagonalCovarianceMomentPermeability 0 secondMoment fourthMoment = 0 := by
   unfold diagonalCovarianceMomentPermeability covarianceMomentPermeability
@@ -847,8 +847,8 @@ noncomputable def twoChannelMomentInnovationInformation
       firstNoise sharedNoise firstResponse secondResponse ^ 2 /
     twoChannelConditionalMomentNoise firstNoise secondNoise sharedNoise
 
-/-- Reference evaluation: with no response in either channel there is no innovation to read. -/
-theorem twoChannelMomentInnovationInformation_at_reference_point
+/-- Vanishing identity: with no response in either channel there is no innovation to read. -/
+theorem twoChannelMomentInnovationInformation_no_response_eq_zero
     (firstNoise secondNoise sharedNoise : ℝ) :
     twoChannelMomentInnovationInformation firstNoise secondNoise sharedNoise 0 0 = 0 := by
   unfold twoChannelMomentInnovationInformation twoChannelConditionalMomentResponse
@@ -1069,8 +1069,8 @@ noncomputable def totalMultivariateGaussianInformation {d : ℕ}
     (m : ℝ) (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) : ℝ :=
   m * multivariateGaussianPermeability whitenedCovarianceDerivative
 
-/-- Reference evaluation: no samples, no information. -/
-theorem totalMultivariateGaussianInformation_at_reference_point {d : ℕ}
+/-- Vanishing identity: no samples, no information. -/
+theorem totalMultivariateGaussianInformation_zero_samples_eq_zero {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
     totalMultivariateGaussianInformation 0 whitenedCovarianceDerivative = 0 := by
   unfold totalMultivariateGaussianInformation

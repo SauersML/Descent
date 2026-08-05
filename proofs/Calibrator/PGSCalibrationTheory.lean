@@ -2547,8 +2547,8 @@ noncomputable def pathwayNetBenefitError {T : ℕ}
       (predictedPath.treatmentBenefit t - truePath.treatmentBenefit t) -
     (predictedPath.treatmentHarm t - truePath.treatmentHarm t)
 
-/-- Reference evaluation: a predicted pathway that matches the truth has no net-benefit error. -/
-theorem pathwayNetBenefitError_at_reference_point {T : ℕ}
+/-- Vanishing identity: a predicted pathway that matches the truth has no net-benefit error. -/
+theorem pathwayNetBenefitError_self_eq_zero {T : ℕ}
     (truePath : ClinicalPathway T) (t : Fin T) :
     pathwayNetBenefitError truePath truePath t = 0 := by
   unfold pathwayNetBenefitError
@@ -2564,12 +2564,12 @@ noncomputable def treatmentMarginErrorTerm {T : ℕ} (model : LongitudinalTreatm
         (truePath.eventProb t * truePath.treatmentBenefit t - truePath.treatmentHarm t) +
       predictedPath.followupWeight t * pathwayNetBenefitError truePath predictedPath t)
 
-/-- Reference evaluation: matching pathways leave no margin error term. -/
-theorem treatmentMarginErrorTerm_at_reference_point {T : ℕ}
+/-- Vanishing identity: matching pathways leave no margin error term. -/
+theorem treatmentMarginErrorTerm_self_eq_zero {T : ℕ}
     (model : LongitudinalTreatmentModel T) (truePath : ClinicalPathway T) (t : Fin T) :
     treatmentMarginErrorTerm model truePath truePath t = 0 := by
   unfold treatmentMarginErrorTerm
-  rw [pathwayNetBenefitError_at_reference_point]
+  rw [pathwayNetBenefitError_self_eq_zero]
   ring
 
 
@@ -2912,9 +2912,9 @@ noncomputable def screeningUtilityFromRates
   sens * prevalence * model.benefit -
     (1 - spec) * (1 - prevalence) * model.harm
 
-/-- Reference evaluation: a perfectly specific test on a zero-prevalence population has no
+/-- Vanishing identity: a perfectly specific test on a zero-prevalence population has no
 utility, whatever its sensitivity -- there is nobody to benefit and nobody to harm. -/
-theorem screeningUtilityFromRates_at_reference_point (model : ScreeningDecisionModel)
+theorem screeningUtilityFromRates_zero_prevalence_eq_zero (model : ScreeningDecisionModel)
     (sens : ℝ) :
     screeningUtilityFromRates model sens 1 0 = 0 := by
   unfold screeningUtilityFromRates

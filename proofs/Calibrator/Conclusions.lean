@@ -409,9 +409,9 @@ noncomputable def populationRisk {Z : Type u} [MeasurableSpace Z] (μ : Measure 
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) : ℝ :=
   ∫ z, (p z).1 * ℓ (q z).1 true + (1 - (p z).1) * ℓ (q z).1 false ∂μ
 
-/-- Reference evaluation: against the zero measure every predictor has zero risk, which is the
+/-- Vanishing identity: against the zero measure every predictor has zero risk, which is the
 degenerate end of the experiment rather than a good predictor. -/
-theorem populationRisk_at_reference_point {Z : Type u} [MeasurableSpace Z]
+theorem populationRisk_zero_measure_eq_zero {Z : Type u} [MeasurableSpace Z]
     (ℓ : ℝ → Bool → ℝ) (p : TrueCondProb Z) (q : ProbPredictor Z) :
     populationRisk 0 ℓ p q = 0 := by
   unfold populationRisk
@@ -758,8 +758,8 @@ noncomputable def logLossRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliLogLoss (p z) (q z) - bernoulliLogLoss (p z) (p z) ∂μ
 
-/-- Reference evaluation: a predictor that matches the truth has zero regret. -/
-theorem logLossRegret_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+/-- Vanishing identity: a predictor that matches the truth has zero regret. -/
+theorem logLossRegret_self_eq_zero {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p : Z → ℝ) :
     logLossRegret μ p p = 0 := by
   unfold logLossRegret
@@ -771,8 +771,8 @@ noncomputable def logLossKLCertificate {Z : Type u} [MeasurableSpace Z] (μ : Me
     (p q : Z → ℝ) : ℝ :=
   ∫ z, bernoulliKLReal (p z) (q z) ∂μ
 
-/-- Reference evaluation: against the zero measure the certificate is zero. -/
-theorem logLossKLCertificate_at_reference_point {Z : Type u} [MeasurableSpace Z] (p q : Z → ℝ) :
+/-- Vanishing identity: against the zero measure the certificate is zero. -/
+theorem logLossKLCertificate_zero_measure_eq_zero {Z : Type u} [MeasurableSpace Z] (p q : Z → ℝ) :
     logLossKLCertificate 0 p q = 0 := by
   unfold logLossKLCertificate
   simp
@@ -873,8 +873,8 @@ noncomputable def brierRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
   ∫ z, expectedBrierScore (q z) (p z) - expectedBrierScore (p z) (p z) ∂μ
 
-/-- Reference evaluation: a predictor that matches the truth has zero regret. -/
-theorem brierRegret_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+/-- Vanishing identity: a predictor that matches the truth has zero regret. -/
+theorem brierRegret_self_eq_zero {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p : Z → ℝ) :
     brierRegret μ p p = 0 := by
   unfold brierRegret
@@ -886,8 +886,8 @@ noncomputable def brierL2Certificate {Z : Type u} [MeasurableSpace Z] (μ : Meas
     (p q : Z → ℝ) : ℝ :=
   ∫ z, (q z - p z) ^ 2 ∂μ
 
-/-- Reference evaluation: the certificate vanishes exactly on a matching predictor. -/
-theorem brierL2Certificate_at_reference_point {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
+/-- Vanishing identity: the certificate vanishes exactly on a matching predictor. -/
+theorem brierL2Certificate_self_eq_zero {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p : Z → ℝ) :
     brierL2Certificate μ p p = 0 := by
   unfold brierL2Certificate

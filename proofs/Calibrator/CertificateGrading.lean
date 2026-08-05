@@ -268,8 +268,8 @@ def Feasible (K : ℕ) (h : ℝ) (P Q : FinitePrior n) : Prop :=
 noncomputable def targetGap (P Q : FinitePrior n) : ℝ :=
   |FinitePrior.mean P E.target - FinitePrior.mean Q E.target|
 
-/-- Reference evaluation: a prior compared with itself has no target gap. -/
-theorem targetGap_at_reference_point (P : FinitePrior n) :
+/-- Vanishing identity: a prior compared with itself has no target gap. -/
+theorem targetGap_self_eq_zero (P : FinitePrior n) :
     E.targetGap P P = 0 := by
   unfold targetGap
   simp
@@ -482,8 +482,8 @@ noncomputable def totalVariation
   (1 / 2 : ℝ) * ∑ x,
     |(E.mixture P).probability x - (E.mixture Q).probability x|
 
-/-- Reference evaluation: a prior compared with itself has no total variation. -/
-theorem totalVariation_at_reference_point (P : FinitePrior parameterCount) :
+/-- Vanishing identity: a prior compared with itself has no total variation. -/
+theorem totalVariation_self_eq_zero (P : FinitePrior parameterCount) :
     E.totalVariation P P = 0 := by
   unfold totalVariation
   simp
