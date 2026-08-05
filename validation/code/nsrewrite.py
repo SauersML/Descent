@@ -438,8 +438,15 @@ def rewrite_namespace(text: str, directory: str) -> str:
     is the right name for a group inside a group.
     """
     lines = text.split("\n")
+    # Classify against a comment-BLANKED copy, edit the real lines.  A docstring
+    # that begins a line with "section." or "end of" is prose, and counting it as
+    # a scope pushed the depth by one -- which is how an `end Descent` came to be
+    # renamed in the wrong place.
+    blanked = nsmap.strip_comments(text).split("\n")
+    if len(blanked) != len(lines):
+        blanked = lines                      # stripping merged lines; fall back
     depth, opened_name = 0, None
-    for i, line in enumerate(lines):
+    for i, line in enumerate(blanked):
         m = nsmap.NAMESPACE.match(line)
         if m:
             if depth == 0:

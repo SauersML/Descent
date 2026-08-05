@@ -977,7 +977,7 @@ theorem spectrum_recoverable_architecture_not {n : ℕ} (panel : Blindness.Panel
     (F : Blindness.Fiber) (shift : ℝ) {summary : ℝ → ℝ} (heven : Blindness.IsEvenSummary summary) :
     (∀ i : Fin n, panel.weight i = 0) ∧
       (F.transfer shift).contribution summary = F.contribution summary :=
-  ⟨fun i ↦ spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
+  ⟨fun i ↦ Blindness.spectrum_determined_of_separating diploidFamily panel hsep hkernel i,
     F.even_summary_blind_to_transfer heven shift⟩
 
 /-! ## 7b. CONJECTURE (NOT FORMALIZED): every finite MAF panel is identifiable
@@ -1128,7 +1128,7 @@ theorem maf_spectrum_identifiable {n : ℕ} (panel : Blindness.Panel n)
     (hsep : Blindness.Separating diploidFamily panel)
     (hkernel : ∀ v : ℝ, Blindness.spectrumModulusLaw diploidFamily panel v = 0) (i : Fin n) :
     panel.weight i = 0 :=
-  spectrum_determined_of_separating diploidFamily panel hsep hkernel i
+  Blindness.spectrum_determined_of_separating diploidFamily panel hsep hkernel i
 
 /-! ## 8. Correlated frequencies along the genome: what regeneration buys
 

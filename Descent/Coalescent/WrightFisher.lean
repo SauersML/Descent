@@ -480,8 +480,8 @@ no theorem inside it mentioned a deployed metric: 12,214 lines whose conclusions
 reach the quantity the development is named for. -/
 theorem deployedR2_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne) (V_A V_E : ℝ)
     (t : ℕ) :
-    (Descent.Core.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)).r2
-      = (Descent.Core.momentsUnderDrift V_A V_E
+    (Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)).r2
+      = (Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E
           (Descent.Core.heterozygosityLoss (Ne : ℝ) t)).r2 := by
   rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
 
@@ -489,8 +489,8 @@ theorem deployedR2_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne) (V_A V_E
 all read off the counted differentiation. -/
 theorem momentsUnderDrift_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne)
     (V_A V_E : ℝ) (t : ℕ) :
-    Descent.Core.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)
-      = Descent.Core.momentsUnderDrift V_A V_E
+    Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)
+      = Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E
           (Descent.Core.heterozygosityLoss (Ne : ℝ) t) := by
   rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
 

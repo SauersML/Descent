@@ -168,6 +168,36 @@ theorem card_two_collisions_le {k N : ℕ} {a b c d : Fin k} (hab : a ≠ b) (hc
   intro f hf
   exact ⟨hf.1.symm, hf.2.symm⟩
 
+/-- **Every prescribed pair of distinct pairs has at most `N^{k-2}` witnesses.**  Five
+configurations -- disjoint, or sharing any one of the four positions -- and in each the two
+constraints determine two coordinates from two others.  Which two depends on the overlap,
+which is the only reason this needs a case split at all. -/
+theorem card_two_collisions_le' {k N : ℕ} {a b c d : Fin k} (hab : a ≠ b) (hcd : c ≠ d)
+    (hne : ¬((a = c ∧ b = d) ∨ (a = d ∧ b = c))) :
+    (univ.filter fun f : Fin k → Fin N ↦ f a = f b ∧ f c = f d).card ≤ N ^ (k - 2) := by
+  classical
+  by_cases hbd : b = d
+  · subst hbd
+    have hac : a ≠ c := fun h ↦ hne (Or.inl ⟨h, rfl⟩)
+    refine card_filter_le_of_determined (y := a) (z := c) (u := b) (v := b) hac
+      (Ne.symm hab) (Ne.symm hcd) (Ne.symm hab) (Ne.symm hcd) _ ?_
+    intro f hf
+    exact ⟨hf.1, hf.2⟩
+  · by_cases had : a = d
+    · subst had
+      have hbc : b ≠ c := fun h ↦ hne (Or.inr ⟨rfl, h⟩)
+      refine card_filter_le_of_determined (y := b) (z := c) (u := a) (v := a) hbc
+        hab (Ne.symm hcd) hab (Ne.symm hcd) _ ?_
+      intro f hf
+      exact ⟨hf.1.symm, hf.2⟩
+    · by_cases hbc : b = c
+      · subst hbc
+        refine card_filter_le_of_determined (y := a) (z := d) (u := b) (v := b) had
+          (Ne.symm hab) hcd (Ne.symm hab) hcd _ ?_
+        intro f hf
+        exact ⟨hf.1, hf.2.symm⟩
+      · exact card_two_collisions_le hab hcd hbd had (Ne.symm hbc)
+
 end Coalescent
 
 end Descent

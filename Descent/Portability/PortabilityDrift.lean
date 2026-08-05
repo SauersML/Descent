@@ -3561,17 +3561,13 @@ divergence time. Two records meant a constraint tightened on one reached the oth
 if someone noticed. The accessors below are the generation-indexed laws this module adds
 to the shared record, not a second record.
 -/
+-- These are METHODS on `Descent.Core.PopGenParameters`, added by this module.  A
+-- declaration's namespace is relative to the enclosing one, so `namespace
+-- Core.PopGenParameters` from inside `Descent.Portability` named them
+-- `Descent.Portability.Core.PopGenParameters.*` and dot notation on the structure
+-- stopped finding them -- `g.tauAt` among others.  Rooting each declaration says
+-- where it goes without closing the directory namespace around a nested section.
 
--- These are METHODS on `Descent.Core.PopGenParameters`. A declaration's
--- namespace is relative to the enclosing one, so from inside
--- `Descent.Portability` this block would name them
--- `Descent.Portability.Core.PopGenParameters.*` and dot notation on the
--- structure would never find them.
-end Descent.Portability
-
-namespace Descent.Core.PopGenParameters
-
-open Descent.Portability
 
 /-- Coalescent time coordinate at generation `t`.
 
@@ -3613,27 +3609,27 @@ open Descent.Portability
     check. Halving or doubling this factor moves `exp(-theta * tau)` from 0.135
     to 0.368 or 0.018 in the bottom rows, which the measurement excludes by
     hundreds of sems. -/
-noncomputable def tauAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (t : ℝ) / (2 * g.Ne)
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
+theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
     (hzero : (2 * g.Ne) = 0) :
-    tauAt g t = 0 := by
-  unfold tauAt
+    Descent.Core.PopGenParameters.tauAt g t = 0 := by
+  unfold Descent.Core.PopGenParameters.tauAt
   rw [hzero, div_zero]
 
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
-noncomputable def hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
+noncomputable def _root_.Descent.Core.PopGenParameters.hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
   PopGen.hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary
 layer, but now exposed directly to the mechanistic SNP/LD state.
 
-    **The decay base was `hetDecayFactor` and has been corrected to
+    **The decay base was `Descent.Core.PopGenParameters.hetDecayFactor` and has been corrected to
     `fstTransientDecayFromScaled`, which carries migration as well.** The level
     this coordinate settles at depends on the migration rate; the rate at which
     it got there did not, and that is not a possible process. Measured as a
@@ -3656,7 +3652,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     carried entirely by `fstEquilibrium`'s measurement and this record does not
     claim it twice.
 
-    Note that `hetDecayFactor` itself is untouched and remains correct for what
+    Note that `Descent.Core.PopGenParameters.hetDecayFactor` itself is untouched and remains correct for what
     it is: migration does not destroy heterozygosity, it relocates it. The error
     was in using a within-deme decay for a between-deme transient.
 
@@ -3666,7 +3662,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     table are recorded on `DGP.fstTransientDecayFromScaled`. Power: the
     half-life prediction spans 32.62 to 69.31 across the design where the
     superseded base spans 69.31 to 554.52. -/
-noncomputable def fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta + 2 * g.bigM)) *
     (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
@@ -3704,7 +3700,7 @@ generations.
     on it -- correctly, since a prediction that never moves cannot reject a
     wrong functional form no matter what else the design shows. The numbers
     above are from the redone design. -/
-noncomputable def mutationSharedRetentionAt
+noncomputable def _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   Real.exp (-g.theta * g.tauAt t)
 
@@ -3731,29 +3727,26 @@ noncomputable def mutationSharedRetentionAt
     FALSIFIED at worst 15.6 sems (62% relative) on the same run that falsifies
     `DGP.migrationLDBoost`, of which this is the generation-t reading.
     -/
-noncomputable def migrationSharedBoostAt
+noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM * g.tauAt t / (1 + g.bigM)
 
-@[simp] theorem tauAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.tauAt_zero (g : Descent.Core.PopGenParameters) :
     g.tauAt 0 = 0 := by
-  simp [tauAt]
+  simp [Descent.Core.PopGenParameters.tauAt]
 
-@[simp] theorem fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
     g.fstTransientAt 0 = 0 := by
-  simp [fstTransientAt, PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled]
+  simp [Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled]
 
-@[simp] theorem mutationSharedRetentionAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt_zero (g : Descent.Core.PopGenParameters) :
     g.mutationSharedRetentionAt 0 = 1 := by
-  simp [mutationSharedRetentionAt, tauAt]
+  simp [Descent.Core.PopGenParameters.mutationSharedRetentionAt, Descent.Core.PopGenParameters.tauAt]
 
-@[simp] theorem migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
-  simp [migrationSharedBoostAt, tauAt, PopGen.EvolutionaryParameters.bigM]
+  simp [migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, PopGen.EvolutionaryParameters.bigM]
 
-end Descent.Core.PopGenParameters
-
-namespace Descent.Portability
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
 generation-indexed population-genetic parameter block used by the mechanistic
