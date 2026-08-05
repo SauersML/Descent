@@ -36,8 +36,10 @@ having to be excluded at each theorem.
 
 ## Empirical status
 
-None. A parameter record asserts nothing; what carries a status is a law computed from
-it.
+A parameter record asserts nothing, and the fields, the witness and `atOrigin` carry no
+status for that reason. `fstEquilibrium` is the exception and states its own: it is a
+LAW computed from the record, it has been measured, and it is what
+`Core.Moments.deployedR2` reads. Nothing else in this file is on trial.
 -/
 
 namespace Descent.Core
@@ -159,11 +161,40 @@ theorem bigM_nonneg (p : PopGenParameters) : 0 ≤ p.bigM := by
 /-- **Equilibrium `F_ST` in this record's coordinates**, `1/(1 + θ + 2M)`.
 
 This is `Core.fstFromFlow` applied to the total scaled flow, so it is the same law as
-`fstIslandEquilibrium` at a many-deme correction and not a second formula.
+`fstIslandEquilibrium` and not a second formula -- at TWO demes, which
+`fstEquilibrium_eq_island_two_demes` below proves and `fstEquilibrium_ne_island_manyDemes`
+shows is not the many-deme member. The free-looking `2` on `M` is `islandDemeCorrection 2`.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
-    laws computed from it. What carries a status is a claim that a population
-    reaches these values, which is asked where the demography is. -/
+    Empirical status: **VALIDATED** (`simcov/battery_falsrepair.py` `group_a`,
+    and `simcov/battery_bulk38b.py`). This body is what those batteries
+    transcribe, in these coordinates: the battery sets `m = bigM / (4 Nₑ)`, so
+    its `bigM` is `4 Nₑ m`, which is this record's `bigM`, and its corpus
+    candidate is `1/(1 + theta + 2*bigM)` character for character. msprime
+    infinite alleles at `Nₑ = 500`, `F_ST` built per replicate from identity by
+    state as `(F_within - F_between)/(1 - F_between)` -- both terms measured,
+    neither computed from the body -- 60 replicates over six `(θ, M)` cells:
+    worst 1.10 sems. `bulk38b` re-runs `bulk38`'s own four cells and matches at
+    1.03. Three competitors are excluded on the same cells: the superseded body
+    `1/(1 + θ + M)` at 7.58 sems, the multiplicative composition
+    `1/((1 + θ)(1 + M))` at 5.37, and the squared correction `1/(1 + θ + 4M)`
+    at 5.37. The cell table is on `PopGen.DGP.fstEquilibrium`, which is this
+    body in the other parameter record's coordinates.
+
+    THE LEDGER ALSO CARRIES A FALSIFICATION UNDER THIS NAME, AND IT IS NOT
+    AGAINST THIS BODY. `simcov/battery_bulk38.py` rejects `1/(1 + θ + M)` at
+    3.30 sems and 57% relative -- the body this one replaced, before the
+    migration term carried the deme-count correction. That row is what moved the
+    body. `simcov/adjudications.json` names `falsrepair` authoritative and
+    records `bulk38` as superseded, and `bulk38b` re-runs bulk38's cells with
+    the old body as a NAMED COMPETITOR, where it fails at the same 3.30 -- which
+    is the check that the two rows are about two formulas and not two
+    measurements. `simcov/battery_transfer.py`'s row is UNINFORMATIVE and also
+    transcribes the old body.
+
+    Why this declaration states its own evidence rather than inheriting the
+    module's "a record asserts nothing": it is the input to
+    `Core.Moments.deployedR2`, and so to every demography-to-metric theorem in
+    the corpus. A silent status here is a silent status on the spine. -/
 noncomputable def fstEquilibrium (p : PopGenParameters) : ℝ :=
   fstFromFlow (p.theta + 2 * p.bigM)
 
