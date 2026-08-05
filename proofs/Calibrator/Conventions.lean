@@ -1046,8 +1046,14 @@ theorem EvolutionaryParameters_tau_uses_timeScale (p : EvolutionaryParameters) :
     EvolutionaryParameters.tau p = p.t_div / coalescentTimeScale p.Ne := by
   unfold EvolutionaryParameters.tau; rw [coalescentTimeScale_eq]
 
+/-- The factor of two in the shared-LD exponent is the PLOIDY: two lineages must
+independently avoid recombination, so the per-meiosis survival `1 - r` is raised to
+`ploidy · t_div` and not to `t_div`. The statement survived the body's correction from
+`exp(-2·r·t_div)` to `(1-r)^(2·t_div)` with the exponential replaced by the exact survival,
+which is the point of stating the convention separately from the functional form: the
+convention is about the EXPONENT, and the correction was to the base. -/
 theorem sharedLDRetention_uses_ploidy (p : EvolutionaryParameters) :
-    sharedLDRetention p = Real.exp (-ploidy * p.recomb * p.t_div) := by
+    sharedLDRetention p = (1 - p.recomb) ^ (ploidy * p.t_div) := by
   unfold sharedLDRetention ploidy; ring_nf
 
 theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :

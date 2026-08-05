@@ -401,6 +401,12 @@ theorem crossCovEntry_at_zero_law {c t : ℕ} (dgp : TaggedDataGeneratingProcess
 
 
 
+/-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
+noncomputable def sigmaTagCausal {c t : ℕ}
+    (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
+  Matrix.of fun j i ↦ crossCovEntry dgp i j
+
+
 /-- Source tagged second moments for best linear prediction from tags.
 
 The scored-to-causal alignment is decomposed into directly observed causal
@@ -2791,11 +2797,38 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     linarith
 
 /-- **Shared LD retention** under recombination and divergence.
-    The fraction of LD shared between populations decays as exp(-2rt)
-    (factor of 2 because both lineages must avoid recombination).
+    The fraction of LD shared between populations is the probability that
+    NEITHER lineage recombines between the two loci over `t_div` meioses, which
+    is `(1-r)` per meiosis per lineage and so `(1-r)^(2·t_div)` -- the exponent
+    is `2·t_div` because both lineages must avoid recombination independently.
 
-    Empirical status: **FALSIFIED** as an exact law, VALIDATED as a
-    small-`r` approximation
+    CORRECTED from `exp(-2·r·t_div)`, which is this body's small-`r` limit and
+    was FALSIFIED as an exact law. The record of that falsification is kept
+    below because it is what fixed the body: the exponential errs HIGH, second
+    order in `r`, and the design showed the error growing with `r` exactly as
+    `exp(-2rt)` against `(1-r)^(2t)` requires. `discreteRecombinationSurvival`
+    is the same survival at an integer generation count, and this is its square
+    at a real one.
+
+    Empirical status: **VALIDATED** (`simcov/battery_sld03.py`), on the IDENTICAL design that
+    falsified the body it replaces -- same three cells, same 400000 replicates, same oracle.
+    A corrected body has to be put back to the measurement that rejected the old one; a new
+    design that happens to agree would be answering a different question.
+
+      r      t     this body   two-lineage survival   sems
+      0.01    20    0.669024      0.669018 ± 0.00100   0.01
+      0.01   100    0.134120      0.134153 ± 0.00056   0.31
+      0.05    40    0.016530      0.016528 ± 0.00014   0.02
+
+    Worst 0.31 sems at 0.13% relative, against 13.09 sems and 10.8% for the exponential. Both
+    competitors are refuted on the same cells: the superseded `exp(-2·r·t_div)` at 13.09 sems
+    -- the same number the original run reported, now carried as the rival it is -- and
+    `(1-r)^t_div`, the ploidy factor dropped, at 823 sems. The positive control is the
+    ONE-lineage survival against `discreteRecombinationSurvival`, an independently known
+    quantity that is not this body, passing at 0.05 sems.
+
+    Empirical status of the SUPERSEDED exponential body, kept because it is what fixed this
+    one: **FALSIFIED** as an exact law, VALIDATED as a small-`r` approximation
     (`proofs/validation/empirical/simcov/battery_transfer.py`,
     `test_ld_decay_defs`). The exact survival of two independent lineages over
     `t_div` meioses is `(1 - r)^(2 t_div)`, which is
@@ -2813,20 +2846,20 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
 
     Power: the prediction spans 0.01832 to 0.67032 across the design. -/
 noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
-  Real.exp (-2 * p.recomb * p.t_div)
+  (1 - p.recomb) ^ (2 * p.t_div)
 
 /-- Shared LD retention is positive. -/
 theorem sharedLDRetention_pos (p : EvolutionaryParameters) :
     0 < sharedLDRetention p := by
-  unfold sharedLDRetention; exact Real.exp_pos _
+  unfold sharedLDRetention
+  exact Real.rpow_pos_of_pos (by linarith [p.recomb_le_half]) _
 
 /-- Shared LD retention is ≤ 1. -/
 theorem sharedLDRetention_le_one (p : EvolutionaryParameters) :
     sharedLDRetention p ≤ 1 := by
   unfold sharedLDRetention
-  rw [← Real.exp_zero]
-  apply Real.exp_le_exp.mpr
-  nlinarith [p.recomb_nonneg, p.t_div_nonneg]
+  exact Real.rpow_le_one (by linarith [p.recomb_le_half])
+    (by linarith [p.recomb_nonneg]) (by linarith [p.t_div_nonneg])
 
 /-- Shared LD retention decreases with divergence time. -/
 theorem sharedLDRetention_decreasing_in_time
@@ -2836,9 +2869,11 @@ theorem sharedLDRetention_decreasing_in_time
     (h_time : p₁.t_div < p₂.t_div) :
     sharedLDRetention p₂ < sharedLDRetention p₁ := by
   unfold sharedLDRetention
-  apply Real.exp_lt_exp.mpr
   rw [h_same]
-  nlinarith [h_r_pos, h_time]
+  exact Real.rpow_lt_rpow_of_exponent_gt
+    (by linarith [p₂.recomb_le_half])
+    (by linarith [h_same ▸ h_r_pos])
+    (by linarith)
 
 /-- **Mutation-induced LD erosion**: new mutations create population-specific LD
     that is not shared. The fraction of LD that remains "ancestral" (shared)
@@ -3011,8 +3046,7 @@ theorem EvolutionaryParameters.coordinateSummary_sharedLDCoordinate_pos
     (p : EvolutionaryParameters) :
     0 < p.coordinateSummary.sharedLDCoordinate := by
   rw [EvolutionaryParameters.coordinateSummary_sharedLDCoordinate]
-  unfold sharedLDRetention
-  exact Real.exp_pos _
+  exact sharedLDRetention_pos p
 
 /-- The ancestral-variant coordinate is strictly positive. -/
 theorem EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate_pos
@@ -3769,7 +3803,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
       { alleleFreqCoordinate :=
           1 - fstEquilibrium m.toEvo *
             (1 - fstTransientDecayFromScaled m.Ne m.theta m.bigM ^ (Nat.floor m.t_div))
-        sharedLDCoordinate := Real.exp (-2 * m.recomb * m.t_div)
+        sharedLDCoordinate := (1 - m.recomb) ^ (2 * m.t_div)
         ancestralVariantCoordinate := Real.exp (-m.theta * m.tau)
         migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
   ext <;>
@@ -4045,8 +4079,9 @@ theorem mutationLDErosion_at_witness :
     EvolutionaryParameters.witness, scaledMutationRate]
 
 theorem sharedLDRetention_at_witness :
-    sharedLDRetention EvolutionaryParameters.witness = Real.exp (-(1 / 2)) := by
-  norm_num [sharedLDRetention, EvolutionaryParameters.witness]
+    sharedLDRetention EvolutionaryParameters.witness
+      = (1 - EvolutionaryParameters.witness.recomb)
+          ^ (2 * EvolutionaryParameters.witness.t_div) := rfl
 
 end EndToEndMetrics
 

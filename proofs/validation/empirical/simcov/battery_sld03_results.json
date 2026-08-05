@@ -1,0 +1,177 @@
+{
+ "_battery_sha": "f35d07cf3763df64",
+ "results": [
+  {
+   "name": "sharedLDRetention",
+   "file": "DGP.lean",
+   "source": "(1 - recomb)^(2 * t_div)",
+   "note": "",
+   "regime": "two lineages each surviving t_div meioses without recombination, 400000 replicates, drawn as an exact Bernoulli count with no model slack; the observable is the single-lineage survival SQUARED. This is the identical design that falsified the superseded exponential body, re-run against the corrected one -- same cells, same replicate count, same oracle",
+   "span": 0.9753122995500962,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r=0.01 t=100",
+    "lean": 0.13397967485796172,
+    "truth": 0.134150050225,
+    "sem": 0.0005580164170549967,
+    "sems_off": 0.30532321600405044,
+    "rel_err": 0.0012700358050744742
+   },
+   "cells": [
+    {
+     "design": "r=0.01 t=20",
+     "lean": 0.6689717585696803,
+     "truth": 0.669017664225,
+     "sem": 0.00099813991074799,
+     "sems_off": 0.04599120306220316,
+     "rel_err": 6.861650711850478e-05
+    },
+    {
+     "design": "r=0.01 t=100",
+     "lean": 0.13397967485796172,
+     "truth": 0.134150050225,
+     "sem": 0.0005580164170549967,
+     "sems_off": 0.30532321600405044,
+     "rel_err": 0.0012700358050744742
+    },
+    {
+     "design": "r=0.05 t=40",
+     "lean": 0.01651537438501358,
+     "truth": 0.016534102225,
+     "sem": 0.00013611249017687083,
+     "sems_off": 0.1375908997189348,
+     "rel_err": 0.0011326795813626543
+    }
+   ]
+  },
+  {
+   "name": "sharedLDRetention [superseded exp(-2*r*t) body, competing]",
+   "file": "DGP.lean",
+   "source": "exp(-2 * recomb * t_div)",
+   "note": "positive control 'r=0.01 t=20 [one lineage: discreteRecombinationSurvival]' passed at 0.05 sems",
+   "regime": "two lineages each surviving t_div meioses without recombination, 400000 replicates, drawn as an exact Bernoulli count with no model slack; the observable is the single-lineage survival SQUARED. This is the identical design that falsified the superseded exponential body, re-run against the corrected one -- same cells, same replicate count, same oracle",
+   "span": 0.9726762775527074,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r=0.05 t=40",
+    "lean": 0.01831563888873418,
+    "truth": 0.016534102225,
+    "sem": 0.00013611249017687083,
+    "sems_off": 13.088708181146112,
+    "rel_err": 0.10774922275734139
+   },
+   "cells": [
+    {
+     "design": "r=0.01 t=20",
+     "lean": 0.6703200460356393,
+     "truth": 0.669017664225,
+     "sem": 0.00099813991074799,
+     "sems_off": 1.304808871597338,
+     "rel_err": 0.001946707658531036
+    },
+    {
+     "design": "r=0.01 t=100",
+     "lean": 0.1353352832366127,
+     "truth": 0.134150050225,
+     "sem": 0.0005580164170549967,
+     "sems_off": 2.1240110064644875,
+     "rel_err": 0.00883512909331593
+    },
+    {
+     "design": "r=0.05 t=40",
+     "lean": 0.01831563888873418,
+     "truth": 0.016534102225,
+     "sem": 0.00013611249017687083,
+     "sems_off": 13.088708181146112,
+     "rel_err": 0.10774922275734139
+    }
+   ]
+  },
+  {
+   "name": "sharedLDRetention [ploidy factor dropped, competing]",
+   "file": "DGP.lean",
+   "source": "(1 - recomb)^t_div",
+   "note": "positive control 'r=0.01 t=20 [one lineage: discreteRecombinationSurvival]' passed at 0.05 sems",
+   "regime": "two lineages each surviving t_div meioses without recombination, 400000 replicates, drawn as an exact Bernoulli count with no model slack; the observable is the single-lineage survival SQUARED. This is the identical design that falsified the superseded exponential body, re-run against the corrected one -- same cells, same replicate count, same oracle",
+   "span": 0.8428767984990642,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r=0.05 t=40",
+    "lean": 0.12851215656510312,
+    "truth": 0.016534102225,
+    "sem": 0.00013611249017687083,
+    "sems_off": 822.6875740396322,
+    "rel_err": 6.772551228744028
+   },
+   "cells": [
+    {
+     "design": "r=0.01 t=20",
+     "lean": 0.8179069375972308,
+     "truth": 0.669017664225,
+     "sem": 0.00099813991074799,
+     "sems_off": 149.16673681613992,
+     "rel_err": 0.22254909150224955
+    },
+    {
+     "design": "r=0.01 t=100",
+     "lean": 0.3660323412732292,
+     "truth": 0.134150050225,
+     "sem": 0.0005580164170549967,
+     "sems_off": 415.5474354536337,
+     "rel_err": 1.728529289846035
+    },
+    {
+     "design": "r=0.05 t=40",
+     "lean": 0.12851215656510312,
+     "truth": 0.016534102225,
+     "sem": 0.00013611249017687083,
+     "sems_off": 822.6875740396322,
+     "rel_err": 6.772551228744028
+    }
+   ]
+  },
+  {
+   "name": "discreteRecombinationSurvival",
+   "file": "DGP.lean",
+   "source": "(1 - recombRate)^tmrca",
+   "note": "",
+   "regime": "probability no recombination occurs in tmrca meioses, on the same draws",
+   "span": 0.8428767984990642,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r=0.01 t=100",
+    "lean": 0.3660323412732292,
+    "truth": 0.366265,
+    "sem": 0.0007617659577832945,
+    "sems_off": 0.3054202204674958,
+    "rel_err": 0.0006352196545419489
+   },
+   "cells": [
+    {
+     "design": "r=0.01 t=20",
+     "lean": 0.8179069375972308,
+     "truth": 0.817935,
+     "sem": 0.0006101584543686172,
+     "sems_off": 0.04599199202810489,
+     "rel_err": 3.430884210750517e-05
+    },
+    {
+     "design": "r=0.01 t=100",
+     "lean": 0.3660323412732292,
+     "truth": 0.366265,
+     "sem": 0.0007617659577832945,
+     "sems_off": 0.3054202204674958,
+     "rel_err": 0.0006352196545419489
+    },
+    {
+     "design": "r=0.05 t=40",
+     "lean": 0.12851215656510312,
+     "truth": 0.128585,
+     "sem": 0.0005292704832479325,
+     "sems_off": 0.13762988340077612,
+     "rel_err": 0.0005665002519491805
+    }
+   ]
+  }
+ ]
+}
