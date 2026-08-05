@@ -2893,7 +2893,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
   have hd' : (1 : ℝ) + p.theta + 2 * p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + 2 * p.bigM = 1 + 4 * p.Ne * (2 * p.mig + p.mu) := by
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate
-      Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+      Descent.Core.scaledMigrationRate Descent.Core.ploidy
     ring
   unfold fstDemeCorrectedFlowStep fstEquilibrium Descent.Core.fstFromFlow
   rw [← add_assoc]
@@ -3272,7 +3272,7 @@ theorem fstEquilibrium_decreasing_in_theta
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
@@ -3292,7 +3292,7 @@ theorem fstEquilibrium_decreasing_in_migration
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀

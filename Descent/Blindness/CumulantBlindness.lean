@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.Condensation
+import Descent.Blindness.ObservationalCeiling
 import Descent.PopGen.VarianceComponents
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
