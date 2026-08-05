@@ -8,6 +8,7 @@ import Descent.Coalescent.Path
 import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
+import Descent.Coalescent.Infinite
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -95,8 +96,11 @@ probability measure (`integral_holdDensity`, the one genuine integral in this gr
 `HoldingTime.coalescentLawExp` is the coupling with no parameter left open.  The mean `E(τ_r) = d_r⁻¹` of K-G (5.6) is proved too
 (`HoldingTime.integral_id_mul_holdDensity`, a second integral against the same density,
 rescaling to `Γ(2) = 1`), so `Rates.meanTransitTime_eq_two_sub` -- `E(T_n) = 2 - 2/n` -- now
-runs from K-C (1.7)'s density rather than from a cited mean.  What is not done: the passage
-to `n = ∞` that Theorem 3 needs on top of the finite construction.
+runs from K-C (1.7)'s density rather than from a cited mean.  The set-level half of the passage to `n = ∞` is
+`Coalescent.Infinite`: `𝓔` really is the projective limit of the `𝓔ₙ`
+(`restrictInf_ofCompatible`, `eq_ofCompatible`), so specifying a process by its restrictions
+is well posed.  What remains is the extension of a consistent family of MEASURES, which is
+Theorem 3's Kakutani-Nelson step.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.
