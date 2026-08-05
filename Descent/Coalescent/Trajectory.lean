@@ -157,6 +157,44 @@ theorem chainLaw_ne_nil {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
   rw [hnil] at this
   simp at this
 
+/-- **The block count is a deterministic function of the number of jumps.**  After `k` jumps
+the chain has `n - k` blocks, on every trajectory, because K-C (1.4) makes every transition
+drop the count by exactly one.
+
+This is the structural reason K-C Theorem 1's independence is even possible: the death
+process cannot learn anything about the jump chain from the block count, since the block
+count is not random given the jump count.  Kingman notes it in passing at (1.9) -- "the
+transition from `ξ` must be to a state `η` with `|η| = |ξ| - 1`" -- and it is doing real work
+there. -/
+theorem chainLaw_head_blocks {n : ℕ} :
+    ∀ (k : ℕ), k < n → ∀ {l : List (ER n)}, l ∈ (chainLaw n k).support →
+      ∀ {x : ER n}, l.head? = some x → blocks x + k = n := by
+  intro k
+  induction k with
+  | zero =>
+      intro _ l hl x hx
+      rw [chainLaw, PMF.mem_support_pure_iff] at hl
+      subst hl
+      rw [List.head?_cons, Option.some_inj] at hx
+      subst hx
+      simpa using blocks_bot n
+  | succ m ih =>
+      intro hmn l hl x hx
+      rw [chainLaw, PMF.mem_support_bind_iff] at hl
+      obtain ⟨l', hl', hmem⟩ := hl
+      have hlen := chainLaw_length m hl'
+      match l' with
+      | y :: rest =>
+          rw [PMF.mem_support_map_iff] at hmem
+          obtain ⟨z, hz, rfl⟩ := hmem
+          rw [List.head?_cons, Option.some_inj] at hx
+          subst hx
+          have hy : blocks y + m = n := ih (by omega) hl' (List.head?_cons)
+          have hy2 : 2 ≤ blocks y := by omega
+          have hcov : Covers y x := (mem_support_jumpLaw hy2).mp hz
+          have := hcov.2
+          omega
+
 end Coalescent
 
 end Descent
