@@ -74,6 +74,13 @@ theorem harmonicSum_succ (m : ℕ) :
   unfold harmonicSum
   rw [sum_range_succ]
 
+/-- `a_2 = 3/2`.  Stated because it is the normaliser a sample of THREE divides `S` by --
+the literature's `a_n` is `Σ_{i<n} i⁻¹`, which is `harmonicSum (n - 1)` here -- and a
+consumer that computes `3/2` for itself has taken Watterson's constant on trust. -/
+theorem harmonicSum_two : harmonicSum 2 = 3 / 2 := by
+  rw [show (2 : ℕ) = 1 + 1 from rfl, harmonicSum_succ, harmonicSum_one]
+  norm_num
+
 theorem harmonicSum_nonneg (m : ℕ) : 0 ≤ harmonicSum m := by
   unfold harmonicSum
   refine sum_nonneg fun i _ ↦ ?_
@@ -134,7 +141,7 @@ same phases without the lineage-count weight.
 
 Empirical status: DERIVED, not posited -- it is `Σ_k k · d_k⁻¹` with both factors supplied
 elsewhere; see `expectedSegmentLength`.  In generations, multiply by `2 N_e`, the factor
-`Descent.Program.Conventions.coalescentTimeScale` fixes. -/
+`Descent.Core.coalescentTimeScale` fixes. -/
 noncomputable def expectedTotalBranchLength (n : ℕ) : ℝ :=
   ∑ j ∈ range (n - 1), expectedSegmentLength (j + 2)
 
