@@ -122,6 +122,7 @@ import Descent.Coalescent.Infinite
 import Descent.Coalescent.Encoding
 import Descent.Coalescent.QuotientRelation
 import Descent.Coalescent.CompetingRates
+import Descent.Coalescent.StepLaw
 import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Moran
 import Descent.Coalescent.Lumping
@@ -159,6 +160,7 @@ import Descent.Blindness.BundleRigidity.Operator
 import Descent.Blindness.BundleRigidity.SingleModulus
 import Descent.Blindness.BundleRigidity.Telescope
 import Descent.Blindness.BundleRigidity.TwoAtom
+import Descent.Pangenome.GaugeCounterexample
 
 namespace Descent
 

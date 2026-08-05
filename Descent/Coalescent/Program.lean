@@ -11,6 +11,7 @@ import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
 import Descent.Coalescent.Encoding
 import Descent.Coalescent.CompetingRates
+import Descent.Coalescent.StepLaw
 import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
@@ -76,8 +77,12 @@ the structural reason it can hold at all: after `k` jumps the block count is `n 
 trajectory, so the death process learns nothing from it.  The induction over steps is
 `CompetingRates.pathDensity_factors`: the path's density is a product of one-step densities,
 and a product of factorised terms factorises, so the whole path's density splits into a
-trajectory factor and a clock factor.  OPEN: the passage from a factorised density to
-independent random objects, which needs the continuous-time process.
+trajectory factor and a clock factor.  For ONE step the passage from a factorised
+density to independent random objects is `StepLaw`: `stepLaw_prod` is independence as a
+statement about measures rather than densities, and the density it corresponds to is the one
+competing clocks produce, so the arranged product is the right one.  OPEN: the same passage
+for the whole path, which needs the continuous-time process, and the converse -- that an
+ARBITRARY `n`-coalescent factorises -- which needs the general theory of jump chains.
 
 **5. K-G section 6 and K-C Theorem 3, the constructions.**  FINITE `n` SETTLED.
 `Trajectory.chainLaw` is a law on whole trajectories, with K-C (1.13) as
