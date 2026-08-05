@@ -296,9 +296,12 @@ theorem translatedForbiddenBand_endpoint_displacement
 
 /-- The concrete unit-width band used to refute the endpoint-disjointness heuristic.
 
-    Empirical status: UNTESTED, and deliberately so: this is a counterexample, chosen for
-    its arithmetic and not offered as a description of any migrating population. Its job is
-    to show that a heuristic fails, which one instance suffices to do. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a counterexample, chosen
+    for its arithmetic and not offered as a description of any migrating
+    population. Its job is to show that a heuristic fails, which one instance
+    suffices to do -- and a measurement finding no real population shaped like
+    this would leave the refutation untouched, which is what makes it a
+    counterexample rather than a claim. -/
 def migratingForbiddenBand (mix : ℝ) : Set ℝ :=
   translatedForbiddenBand 0 2 1 mix
 

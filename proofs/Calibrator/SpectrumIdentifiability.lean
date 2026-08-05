@@ -503,10 +503,12 @@ The literal integrand `log ((θ² + x²) / |θ² - x²|)` integrates to
 The regrouping below performs that cancellation symbolically, so the profile is finite on
 all of `[0, 1]`.
 
-Empirical status: UNTESTED, and not the kind of thing a dataset tests: this is the closed
-form of an integral, checked by the theorems below rather than by measurement. It is named
-here because it carries the conditioning of a Cauchy matrix, which a numerical experiment
-COULD measure. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. This is the closed form of an
+integral, checked by the theorems below rather than by measurement: an integral
+either equals its closed form or does not, and no population bears on which.
+The conditioning of the Cauchy matrix it carries IS numerically measurable, but
+that is a property of a computation rather than of this identity, and it belongs
+to whatever definition states it. -/
 noncomputable def cauchyConditioningProfile (θ : ℝ) : ℝ :=
   2 * (Real.log (1 + θ ^ 2) + (θ - 1) * Real.log (1 - θ)
     - (1 + θ) * Real.log (1 + θ) + 2 * θ * Real.arctan (1 / θ))

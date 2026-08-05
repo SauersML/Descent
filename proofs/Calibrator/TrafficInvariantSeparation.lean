@@ -3365,9 +3365,11 @@ it, the genomic restatement that cites that theorem, and the obstruction registr
 carried the conjunction in full, so a change to one copy would have been a silent divergence
 rather than a build error.
 
-Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names four
-claims, each proved below at finite volume on an explicit spike.  What a measurement could
-bear on is whether a real LD spike is rank-one, which nothing here asserts. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. This names four propositions, each
+proved below at finite volume on an explicit spike, so there is no measurement
+that could agree or disagree with it. What a measurement could bear on is
+whether a real LD spike is rank-one, which nothing here asserts. An UNTESTED
+marker would read as a measurement owed, and none is. -/
 def RankOneSpikeInvisibleWithFinitePressure {Term : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
     (vertices edges : Term → ℕ) (tlam : ℝ) : Prop :=
@@ -3416,9 +3418,11 @@ cites that theorem, and the obstruction registry carries it as a field.  Written
 conjunction stood in the corpus three times, and a change to any one copy would have been a
 silent divergence between them rather than a build error.
 
-Empirical status: UNTESTED, and not the kind of thing a dataset tests: this names a
-conjunction of four claims, each proved below on an explicit spike.  What a measurement
-could bear on is whether a real LD spike is rank-one, which nothing here asserts. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. This names a conjunction of four
+propositions, each proved below on an explicit spike, so there is no measurement
+that could agree or disagree with it. What a measurement could bear on is
+whether a real LD spike is rank-one, which nothing here asserts. An UNTESTED
+marker would read as a measurement owed, and none is. -/
 def RankOneSpikeRefutesBothDichotomies
     {Term Spin : Type*} [Fintype Term]
     (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
