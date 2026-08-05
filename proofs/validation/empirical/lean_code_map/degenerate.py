@@ -170,6 +170,18 @@ def scan():
 
         if not evaluated:
             rows.append((name, "UNREADABLE", "; ".join(reasons[:2]) or "unparsed", source_file))
+        elif reasons:
+            # PARTIALLY read: some conjuncts evaluated, others did not. Calling
+            # this DEGENERATE would be a false positive in the direction that
+            # damages the corpus -- it dispatches somebody to "repair" a
+            # reference point that is already live, because the live conjunct is
+            # one this reader could not evaluate. A census whose output other
+            # lanes act on without being able to check it must never guess in
+            # that direction, so a partial read is reported as unread.
+            rows.append((name, "UNREADABLE",
+                         f"only {len(evaluated)} of {len(evaluated) + len(reasons)} "
+                         f"conjuncts could be evaluated ({reasons[0]}); a partial read "
+                         f"is not evidence of degeneracy", source_file))
         elif all(value == 0 for _, value in evaluated):
             heads = ", ".join(head for head, _ in evaluated)
             rows.append((name, "DEGENERATE",

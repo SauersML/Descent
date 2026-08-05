@@ -179,7 +179,69 @@ def main():
            f"a reference-evaluation census that reads nothing is a finding "
            f"(got {kinds(result)})")
 
-    # 10. An empty corpus must be an error, never a silent pass. A check that
+    # 10. THE FALSE-POSITIVE DIRECTION, which is the one that damages the corpus.
+    #
+    #     Every other case here plants a defect and checks it fires. This census
+    #     is different in kind: other lanes act on its output and cannot
+    #     independently check it, so a theorem wrongly called DEGENERATE
+    #     dispatches somebody to move a reference point that was already live --
+    #     breaking a sound theorem and booking it as progress. The
+    #     both-directions rule applies with more force here than anywhere else
+    #     in this file.
+    #
+    #     These are self-consistency properties rather than fixed expected
+    #     verdicts, so they keep working as lanes repair reference points and the
+    #     corpus-wide counts move underneath them.
+    print()
+    print("CALIBRATION: the census must not report a live reference point as degenerate")
+    import degenerate
+    import api
+
+    mislabelled = []
+    for name, verdict, _, _ in clean["reference_points"]:
+        if verdict != "DEGENERATE":
+            continue
+        proposition = degenerate._proposition(api.theorems()[name].get("statement", ""))
+        conjuncts = degenerate._conjuncts(proposition)
+        values, unread = [], 0
+        for conjunct in conjuncts:
+            value, _ = degenerate._evaluate_conjunct(api, conjunct)
+            if value is None:
+                unread += 1
+            else:
+                values.append(value)
+        if unread or not values or any(value != 0 for value in values):
+            mislabelled.append((name, values, unread))
+    expect(not mislabelled,
+           f"every DEGENERATE verdict re-evaluates to all-zero with nothing unread "
+           f"(mislabelled: {mislabelled[:3]})")
+
+    unsupported = []
+    for name, verdict, _, _ in clean["reference_points"]:
+        if verdict != "LIVE":
+            continue
+        proposition = degenerate._proposition(api.theorems()[name].get("statement", ""))
+        values = [v for v, _ in
+                  (degenerate._evaluate_conjunct(api, c)
+                   for c in degenerate._conjuncts(proposition)) if v is not None]
+        if not any(value != 0 for value in values):
+            unsupported.append(name)
+    expect(not unsupported,
+           f"every LIVE verdict has a nonzero evaluation behind it "
+           f"(unsupported: {unsupported[:3]})")
+
+    #     A partially-read theorem must NOT be degenerate. This is the concrete
+    #     shape the false positive would take: a conjunction whose zero-valued
+    #     half this reader can evaluate and whose live half it cannot.
+    partial = ": stubZeroBody 0 = 0 ∧ stubLiveBody (Matrix.of ![![1]]) = 1"
+    conjuncts = degenerate._conjuncts(degenerate._proposition(partial))
+    expect(len(conjuncts) == 2,
+           f"the two-conjunct stub splits into two conjuncts (got {len(conjuncts)})")
+    readable = [degenerate._evaluate_conjunct(api, c)[0] for c in conjuncts]
+    expect(any(value is None for value in readable),
+           "the stub's second conjunct is genuinely unreadable, as the case requires")
+
+    # 11. An empty corpus must be an error, never a silent pass. A check that
     #    cannot report its own absence reports someone else's answer as its own.
     print()
     print("CALIBRATION: an unreadable corpus must not pass")
