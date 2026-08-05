@@ -173,6 +173,153 @@ theorem ae_holdProduct_pos {γ : ℕ → ℝ} (hγ : ∀ k, 0 < γ (k + 2)) :
   filter_upwards [measure_zero_iff_ae_notMem.mp hnull] with ω hω
   exact lt_of_not_ge hω
 
+/-! ### From the vanishing products to an infinite descent time -/
+
+/-- The truncated transform, with the coordinates clipped at zero so the sequence is
+decreasing everywhere rather than only almost everywhere.  Clipping changes nothing on the
+full-measure set where the clock is positive (`ae_holdProduct_pos`). -/
+noncomputable def clippedTransform (m : ℕ) (ω : ℕ → ℝ) : ENNReal :=
+  ENNReal.ofReal (Real.exp (-∑ k ∈ range m, max (ω k) 0))
+
+theorem clippedTransform_measurable (m : ℕ) : Measurable (clippedTransform m) := by
+  unfold clippedTransform
+  refine (Measurable.exp ?_).ennreal_ofReal
+  exact (Finset.measurable_sum _ fun k _ ↦ (measurable_pi_apply k).max measurable_const).neg
+
+theorem clippedTransform_antitone : Antitone clippedTransform := by
+  intro a b hab ω
+  unfold clippedTransform
+  refine ENNReal.ofReal_le_ofReal ?_
+  rw [Real.exp_le_exp, neg_le_neg_iff]
+  have hsub : range a ⊆ range b := by
+    intro x hx
+    exact Finset.mem_range.mpr (lt_of_lt_of_le (Finset.mem_range.mp hx) hab)
+  exact Finset.sum_le_sum_of_subset_of_nonneg hsub (fun k _ _ ↦ le_max_right _ _)
+
+/-- The clipped transform integrates to the same product: it agrees almost everywhere with
+the transform `TransitTransform` computes. -/
+theorem lintegral_clippedTransform {γ : ℕ → ℝ} (hγ : ∀ k, 0 < γ (k + 2)) (m : ℕ) :
+    ∫⁻ ω, clippedTransform m ω ∂(holdProduct γ hγ)
+      = ∏ k ∈ range m, ENNReal.ofReal (γ (k + 2) / (γ (k + 2) + 1)) := by
+  rw [← lintegral_exp_neg_partialSum hγ (θ := 1) zero_le_one m]
+  refine lintegral_congr_ae ?_
+  filter_upwards [ae_holdProduct_pos hγ] with ω hω
+  unfold clippedTransform
+  congr 2
+  rw [one_mul]
+  congr 1
+  exact Finset.sum_congr rfl fun k _ ↦ max_eq_left (le_of_lt (hω k))
+
+/-- **The descent time is infinite, almost surely, when the condition fails.**
+
+The products vanish (`tendsto_prod_ratio_zero`), monotone convergence over the decreasing
+clipped transforms carries that inside the integral, and a nonnegative function with zero
+integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.
+
+With `EntranceLaw.ae_totalDescentTime_lt_top` this is an equivalence: the descent time is
+almost surely finite exactly when `Σ γ_k⁻¹` converges. -/
+theorem ae_totalDescentTime_eq_top {γ : ℕ → ℝ} (hγ1 : ∀ k, 1 ≤ γ (k + 2))
+    (h : ¬ comesDownFromInfinity γ) :
+    ∀ᵐ ω ∂(holdProduct γ (fun k ↦ lt_of_lt_of_le zero_lt_one (hγ1 k))),
+      (∑' k : ℕ, ENNReal.ofReal (ω k)) = ⊤ := by
+  set hγ : ∀ k, 0 < γ (k + 2) := fun k ↦ lt_of_lt_of_le zero_lt_one (hγ1 k) with hγdef
+  haveI : ∀ k : ℕ, IsProbabilityMeasure (holdMeasure (γ (k + 2))) := fun k ↦
+    holdMeasure_isProbabilityMeasure (hγ k)
+  -- the products vanish, in `ℝ≥0∞`
+  have hreal := tendsto_prod_ratio_zero hγ1 h
+  have hnn : ∀ k : ℕ, (0 : ℝ) ≤ γ (k + 2) / (γ (k + 2) + 1) := by
+    intro k
+    have h1 : (0 : ℝ) < γ (k + 2) := hγ k
+    have h2 : (0 : ℝ) < γ (k + 2) + 1 := by linarith
+    positivity
+  have hEN : Filter.Tendsto
+      (fun m : ℕ ↦ ∏ k ∈ range m, ENNReal.ofReal (γ (k + 2) / (γ (k + 2) + 1)))
+      Filter.atTop (nhds 0) := by
+    have hof : ∀ m : ℕ, ∏ k ∈ range m, ENNReal.ofReal (γ (k + 2) / (γ (k + 2) + 1))
+        = ENNReal.ofReal (∏ k ∈ range m, (γ (k + 2) / (γ (k + 2) + 1))) := by
+      intro m
+      rw [ENNReal.ofReal_prod_of_nonneg (fun k _ ↦ hnn k)]
+    simp only [hof]
+    have := (ENNReal.continuous_ofReal.tendsto 0).comp hreal
+    simpa using this
+  -- monotone convergence over the decreasing clipped transforms
+  have hfin : ∫⁻ ω, clippedTransform 0 ω ∂(holdProduct γ hγ) ≠ ⊤ := by
+    rw [lintegral_clippedTransform hγ 0]
+    simp
+  have hiInf : ∫⁻ ω, (⨅ m : ℕ, clippedTransform m ω) ∂(holdProduct γ hγ) = 0 := by
+    rw [lintegral_iInf clippedTransform_measurable clippedTransform_antitone hfin]
+    have hanti : Antitone fun m : ℕ ↦
+        ∫⁻ ω, clippedTransform m ω ∂(holdProduct γ hγ) := by
+      intro a b hab
+      exact lintegral_mono (clippedTransform_antitone hab)
+    have hlim := tendsto_atTop_iInf hanti
+    have hlim2 : Filter.Tendsto
+        (fun m : ℕ ↦ ∫⁻ ω, clippedTransform m ω ∂(holdProduct γ hγ))
+        Filter.atTop (nhds 0) := by
+      refine hEN.congr fun m ↦ ?_
+      exact (lintegral_clippedTransform hγ m).symm
+    exact tendsto_nhds_unique hlim hlim2
+  have hzero : ∀ᵐ ω ∂(holdProduct γ hγ), (⨅ m : ℕ, clippedTransform m ω) = 0 := by
+    have h0 := (lintegral_eq_zero_iff
+      (Measurable.iInf clippedTransform_measurable)).mp hiInf
+    filter_upwards [h0] with ω hω
+    exact hω
+  -- a vanishing infimum forces unbounded partial sums
+  filter_upwards [hzero, ae_holdProduct_pos hγ] with ω hω hpos
+  by_contra hfinite
+  have hlt : (∑' k : ℕ, ENNReal.ofReal (ω k)) < ⊤ := lt_of_le_of_ne le_top hfinite
+  set C : ℝ := (∑' k : ℕ, ENNReal.ofReal (ω k)).toReal with hC
+  have hbound : ∀ m : ℕ, ∑ k ∈ range m, max (ω k) 0 ≤ C := by
+    intro m
+    have hpart : (∑ k ∈ range m, ENNReal.ofReal (ω k))
+        ≤ ∑' k : ℕ, ENNReal.ofReal (ω k) := ENNReal.sum_le_tsum _
+    have hsum : ENNReal.ofReal (∑ k ∈ range m, max (ω k) 0)
+        = ∑ k ∈ range m, ENNReal.ofReal (ω k) := by
+      rw [ENNReal.ofReal_sum_of_nonneg (fun k _ ↦ le_max_right _ _)]
+      exact Finset.sum_congr rfl fun k _ ↦ by rw [max_eq_left (le_of_lt (hpos k))]
+    rw [hC]
+    refine (ENNReal.ofReal_le_iff_le_toReal hlt.ne).mp ?_
+    rw [hsum]
+    exact hpart
+  have hlow : ∀ m : ℕ, ENNReal.ofReal (Real.exp (-C)) ≤ clippedTransform m ω := by
+    intro m
+    unfold clippedTransform
+    refine ENNReal.ofReal_le_ofReal ?_
+    rw [Real.exp_le_exp, neg_le_neg_iff]
+    exact hbound m
+  have hpos' : (0 : ENNReal) < ENNReal.ofReal (Real.exp (-C)) := by
+    simp [ENNReal.ofReal_pos, Real.exp_pos]
+  have : ENNReal.ofReal (Real.exp (-C)) ≤ ⨅ m : ℕ, clippedTransform m ω :=
+    le_iInf hlow
+  rw [hω] at this
+  exact absurd (le_antisymm this (zero_le _)) (ne_of_gt hpos')
+
+/-- **The dichotomy, both directions.**  For a block count that drops one level at a time at
+rate `γ_k`, the descent time from infinity is almost surely finite when `Σ γ_k⁻¹` converges
+and almost surely infinite when it does not.  There is no middle case, and no set of positive
+probability on which the answer differs from the series'.
+
+`EntranceLaw.ae_totalDescentTime_lt_top` is the first half and `ae_totalDescentTime_eq_top`
+the second.  Together they are Schweinsberg's criterion, for the binary case, as a statement
+about the process rather than about its mean. -/
+theorem ae_descent_dichotomy {γ : ℕ → ℝ} (hγ1 : ∀ k, 1 ≤ γ (k + 2)) :
+    (comesDownFromInfinity γ →
+        ∀ᵐ ω ∂(holdProduct γ (fun k ↦ lt_of_lt_of_le zero_lt_one (hγ1 k))),
+          (∑' k : ℕ, ENNReal.ofReal (ω k)) < ⊤)
+      ∧ (¬ comesDownFromInfinity γ →
+        ∀ᵐ ω ∂(holdProduct γ (fun k ↦ lt_of_lt_of_le zero_lt_one (hγ1 k))),
+          (∑' k : ℕ, ENNReal.ofReal (ω k)) = ⊤) :=
+  ⟨fun h ↦ ae_totalDescentTime_lt_top _ h, fun h ↦ ae_totalDescentTime_eq_top hγ1 h⟩
+
+/-- **The star coalescent does not come down from infinity, almost surely.**  Its rate is
+`γ_b = b - 1`, at least one from `b = 2`, and the harmonic series diverges. -/
+theorem star_ae_totalDescentTime_eq_top :
+    ∀ᵐ ω ∂(holdProduct (fun b : ℕ ↦ (b : ℝ) - 1)
+        (fun k ↦ lt_of_lt_of_le zero_lt_one (by push_cast; linarith))),
+      (∑' k : ℕ, ENNReal.ofReal (ω k)) = ⊤ :=
+  ae_totalDescentTime_eq_top (fun k ↦ by push_cast; linarith)
+    star_not_comesDownFromInfinity
+
 end Coalescent
 
 end Descent

@@ -228,10 +228,20 @@ transform their product,
 
   `E(e^{-θ Σ τ}) = ∏ d_r/(d_r + θ)`,     K-G (5.9),
 
-from which K-G reads off the density `Rates.transitDensityTerm` sums.  STILL ABSENT: the
-converse of Schweinsberg's equivalence, which needs the passage from these finite products to
-the infinite one, a monotone-convergence step over a decreasing sequence; and Pólya's renewal
-identity, which needs a walk on `ℤ` with its strong Markov property.
+from which K-G reads off the density `Rates.transitDensityTerm` sums.  `Coalescent.ThreeSeries` then closes the converse and with it the equivalence.  At `θ = 1`
+the product is `∏(1 - (γ_k+1)⁻¹) ≤ exp(-Σ(γ_k+1)⁻¹)`, which vanishes when the reciprocals
+diverge; the clock is almost surely positive, so the truncated transforms decrease; monotone
+convergence carries the vanishing inside the integral, and a nonnegative function with zero
+integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.  So
+
+  **the descent time is almost surely finite exactly when `Σ γ_k⁻¹` converges**
+  (`ae_descent_dichotomy`),
+
+with Kingman on one side and the star coalescent on the other, both proved.  STILL ABSENT:
+the multiple-merger correction -- for a `Λ`-coalescent that drops several levels at once,
+`γ_b` is an expected DECREASE rate rather than a rate of leaving, so the mean sojourn is not
+`γ_b⁻¹` and the identity becomes an inequality, which is Schweinsberg's theorem proper -- and
+Pólya's renewal identity, which needs a walk on `ℤ` with its strong Markov property.
 
 ## Beyond Kingman
 
