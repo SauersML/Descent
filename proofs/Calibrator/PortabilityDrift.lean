@@ -3270,7 +3270,18 @@ noncomputable def mutationSharedRetentionAt
 
 /-- Migration-driven restoration of shared variation after `t` generations.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED in magnitude** (`simcov/battery_bulk55.py`).
+    This is `DGP.migrationLDBoost` evaluated at generation `t`, and the same run
+    falsifies both: the measured boost in cross-deme LD correlation from ongoing
+    migration is roughly a third of what this factor claims, with the gap
+    widening in both `τ` and `bigM`. At `τ = 1, bigM = 16` the body predicts a
+    94% boost against a measured 32%, worst cell 18.17 sems.
+
+    The direction is right -- no boost at all sits 11 sems away, and the
+    measured value does rise with `t` and saturate in `bigM` as written. See
+    `DGP.migrationLDBoost` for the table and for why the overstatement is
+    expected: most LD sharing is inherited from before the split, so there is
+    less for migration to restore than a model starting from zero assumes. -/
 noncomputable def migrationSharedBoostAt
     (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM * g.tauAt t / (1 + g.bigM)

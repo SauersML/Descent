@@ -263,16 +263,6 @@ noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP 
   berryEsseenConstant := 0
   berryEsseenConstant_nonneg := le_refl 0
 
-/-- Exact score mean under the discrete HWE architecture. -/
-noncomputable def HWEPolygenicScoreDGP.scoreMean {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m) : ℝ :=
-  dgp.scoreModel.scoreMean
-
-/-- Exact score variance under the discrete HWE architecture. -/
-noncomputable def HWEPolygenicScoreDGP.scoreVariance {m : ℕ} [Fintype (Fin m)]
-    (dgp : HWEPolygenicScoreDGP m) : ℝ :=
-  dgp.scoreModel.scoreVariance
-
 /-- Berry-Esseen error radius for the discrete HWE score. -/
 noncomputable def HWEPolygenicScoreDGP.scoreApproximationError {m : ℕ} [Fintype (Fin m)]
     (dgp : HWEPolygenicScoreDGP m) : ℝ :=
@@ -409,12 +399,6 @@ theorem crossCovEntry_at_zero_law {c t : ℕ} (dgp : TaggedDataGeneratingProcess
   rw [hzero]
   simp
 
-
-
-/-- Cross-covariance matrix `Σ_tc` between tag and causal coordinates. -/
-noncomputable def sigmaTagCausal {c t : ℕ}
-    (dgp : TaggedDataGeneratingProcess c t) : Matrix (Fin t) (Fin c) ℝ :=
-  Matrix.of fun j i ↦ crossCovEntry dgp i j
 
 
 /-- Source tagged second moments for best linear prediction from tags.
@@ -2914,7 +2898,39 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
 /-- **Migration LD boost**: migration increases shared LD by introducing
     alleles from the other population. Models as a correction factor ≥ 1.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED in magnitude; the direction is right**
+    (`simcov/battery_bulk55.py`). Two demes split at the same time, with and
+    WITHOUT ongoing migration, and the observable is the RATIO of their
+    cross-deme LD correlation -- a ratio, so no scale has to be fixed. The
+    control, a split at `t = 1` where the two demes are effectively one
+    population, gives `F_ST = 0.0002`.
+
+      τ     bigM    this body   measured boost
+      0.5    0.5     1.1667      1.0669 ± 0.0162
+      0.5    4.0     1.4000      1.1406 ± 0.0166
+      0.5   16.0     1.4706      1.1788 ± 0.0161
+      1.0    0.5     1.3333      1.1197 ± 0.0454
+      1.0    4.0     1.8000      1.2624 ± 0.0450
+      1.0   16.0     1.9412      1.3189 ± 0.0465
+
+    Worst cell 18.17 sems at 24.8% relative, and the gap WIDENS with both
+    arguments -- at `τ = 1, bigM = 16` the body predicts a 94% boost against a
+    measured 32%.
+
+    The direction survives, which is why this is a magnitude failure and not a
+    shape one. A boost of exactly 1 -- no restoration from migration at all --
+    sits 11.13 sems from the measurements, and the measured boost does rise with
+    both `τ` and `bigM`, saturating in `bigM` as the body says. So migration
+    does restore shared LD; it restores roughly a third of what this factor
+    claims.
+
+    Read together with `PortabilityDrift.sharedLD_from_equilibrium`, which finds
+    LD already largely shared without any migration, the picture is consistent:
+    most of the sharing is inherited from before the split, so there is less
+    left for migration to restore than a model starting from zero would expect.
+
+    `PortabilityDrift.migrationSharedBoostAt` is the same expression at
+    generation `t` and is falsified by the same run. -/
 noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
   1 + p.bigM * p.tau / (1 + p.bigM)
 
