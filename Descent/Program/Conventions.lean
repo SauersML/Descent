@@ -84,15 +84,22 @@ The two failures therefore need two different mechanisms.
 
 section Ploidy
 
-/-! **`ploidy` is deleted here.**  It was
-`Descent.Core.ploidy` under a second name, and every reference now
-calls the kernel.  A module whose subject is conventions is the last place that should keep its own copy of one. -/
+/-! **`ploidy` is deleted here.**  It was `Descent.Core.ploidy` under a second name, and
+every reference now calls the kernel.  A module whose subject is conventions is the last
+place that should keep its own copy of one.
+
+Its docstring recorded the census that gives this section its job, and that does not go
+with it: every non-exponent factor of two in this development traces to the ploidy, and
+every factor of four to twice it.  Forty-eight definition bodies outside this file carry
+such a two and fourteen carry such a four.  The theorems below tie the independently
+written ones back to the kernel, so that drift between them is a compile error rather than
+a silent disagreement -- which is exactly what the local copy was in the way of. -/
 
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ploidy_at_reference_point :
-    Descent.Core.ploidy  = 2 := by
-  norm_num [Descent.Core.ploidy, Descent.Core.ploidy]
+    Descent.Core.ploidy = 2 := by
+  norm_num [Descent.Core.ploidy]
 
 
 

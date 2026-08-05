@@ -4186,17 +4186,17 @@ divergence time. -/
 theorem fstDriftMigrationManyDemes_at_witness :
     fstDriftMigrationManyDemes EvolutionaryParameters.witness = 1 / 5 := by
   norm_num [fstDriftMigrationManyDemes, EvolutionaryParameters.bigM,
-    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem migrationLDBoost_at_witness :
     migrationLDBoost EvolutionaryParameters.witness = 7 / 5 := by
   norm_num [migrationLDBoost, EvolutionaryParameters.bigM, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem mutationLDErosion_at_witness :
     mutationLDErosion EvolutionaryParameters.witness = Real.exp (-2) := by
   norm_num [mutationLDErosion, EvolutionaryParameters.theta, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, Descent.Core.scaledMutationRate, Descent.Core.scaledMutationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMutationRate, Descent.Core.ploidy]
 
 theorem sharedLDRetention_at_witness :
     sharedLDRetention EvolutionaryParameters.witness
