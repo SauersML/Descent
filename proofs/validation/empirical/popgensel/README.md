@@ -12,6 +12,7 @@ control that could have failed.
 | `fluctcell.py` | F `effectCorrelationStabilizingDriftSelection` and `effectCorrelationFluctuating`, with a fluctuating-optimum arm | `PGSEL_F1` |
 | `admixcell.py` | G `admixtureLDMagnitude`, a single admixture pulse at gamete level | `PGSEL_G1` |
 | `ibdcell.py` | H `ibdFst`, Rousset's law on a ring stepping-stone | `PGSEL_H1` |
+| `ldshapecell.py` | I `ldTaggingDecay`, the exponential-vs-hyperbolic shape test with the control the earlier run lacked | `PGSEL_I1` |
 | `results.json` | the committed output of all of them | |
 
 ## Verdicts
@@ -27,6 +28,7 @@ control that could have failed.
 | F | `PolygenicAdaptation.effectCorrelationFluctuating` | FALSIFIED at 48-172 sems: the `-1` clamp binds on every cell with `f > 0`, so the body predicts perfect anticorrelation where 0.08 to 0.54 is observed |
 | G | `CovarianceStructure.admixtureLDMagnitude` | VALIDATED within 1.42 sems; `alpha^2` rejected at 40-120 sems and `exp(-rg)` at 9.3 |
 | H | `AssortativeMatingPGS.ibdFst` | VALIDATED under the density reading; the slope pins the constant 4 with 2 and 8 rejected at 12-20 and 6-7 sems |
+| I | `OpenQuestions.ldTaggingDecay` | FALSIFIED as a shape: hyperbolic beats exponential at chi2/point 4.16 vs 28.49 and 1.95 vs 79.66, and the positive control fires |
 
 Cell F feeds `d` REALIZED from a neutral arm run on the same loci, seeds and
 divergence time, because the whole predicted effect is the gap between the

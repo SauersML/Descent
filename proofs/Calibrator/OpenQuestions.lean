@@ -593,15 +593,39 @@ theorem faster_decay_lower_correlation
     Nothing identifies `λ_LD` with `Nₑ` or with a recombination rate, so this
     body cannot be inverted for a demographic parameter.
 
-    Empirical status: UNTESTED here, with a **LEAD AGAINST THE EXPONENTIAL
-    SHAPE** carried by the sibling body `PortabilityDrift.ldCorrelationDecay`,
-    which is the same exponential chart. Read that docstring before using this
-    one: with both shapes fitted to the same simulated `r²` curve at one free
-    rate and one free amplitude each, the exponential misses at BOTH ends --
-    21.7 sems at 10 kb and 14.2 sems at 1200 kb -- while the hyperbolic stays
-    within a few sems across the range. A two-sided failure is the signature of
-    a wrong shape, so no choice of `λ_LD` repairs it. That run carried no valid
-    positive control, which is why it is a lead and not a falsification. -/
+    Empirical status: **FALSIFIED as a shape**
+    (`proofs/validation/empirical/popgensel/ldshapecell.py`, cell I). This
+    supersedes the LEAD the sibling body `PortabilityDrift.ldCorrelationDecay`
+    carried -- the same exponential chart, fitted against the same kind of
+    simulated `r²` curve, missing at BOTH ends at 21.7 and 14.2 sems. That run
+    was recorded as a lead rather than a verdict for one reason: it carried no
+    valid positive control. Cell I supplies exactly that control and changes
+    nothing else.
+
+    Both shapes are fitted to the SAME binned msprime `r²` values with a free
+    amplitude AND a free rate each, so neither is handicapped and any upward
+    bias in the `r²` estimator is common to both. The discrimination is the
+    shape, which no estimator convention moves.
+
+    | design | exponential χ²/point | hyperbolic χ²/point | worst exp. residual | worst hyp. |
+    |---|---|---|---|---|
+    | `Nₑ = 2000`, 4 Mb | 28.49 | 4.16 | 8.87 sems | 3.91 sems |
+    | `Nₑ = 5000`, 2 Mb | 79.66 | 1.95 | 12.56 sems | 3.46 sems |
+
+    **The positive control, which is the whole point of this cell.** A fitter
+    that prefers the hyperbolic on real data proves nothing unless it prefers the
+    EXPONENTIAL on data that is genuinely exponential. Run on a true exponential
+    with the same `x` grid and matched per-point noise, the same fitter prefers
+    the exponential by a sum-of-squares ratio of 168 and 197. So the preference
+    reported above is the data's and not the fitter's, and the lead becomes a
+    verdict.
+
+    This does not identify the hyperbolic's fitted rate with `4·Nₑ`: at
+    `Nₑ = 5000` the fit returns `b = 6572` against Sved's `20000`. What is
+    established is that the decay is hyperbolic in genetic distance and not
+    exponential in it, which is what this body gets wrong -- and, as the
+    paragraph above already says, no choice of `λ_LD` repairs a two-sided
+    failure. -/
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
   Real.exp (-lam_LD * d)
 
