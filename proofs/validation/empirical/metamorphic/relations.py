@@ -1164,6 +1164,85 @@ RELATIONS = {
         invariant_under_allele_swap(["p₁", "p₂"]),
     ],
 
+    # --- TARGETED, no verdict: AncestrySpecificArchitecture ----------------
+    # Joint exponents below are computed as NUMERATOR DEGREE MINUS DENOMINATOR
+    # DEGREE and written down before choosing the constructor. Three times in
+    # this table I composed one from the per-argument exponents instead and got
+    # it wrong in three different directions; the order of operations is the fix.
+    "Calibrator.allelicHeterogeneityRetainedSignal": [
+        # Product of three, degree 3 over 1.
+        jointly_scales(["r2_causal", "r2_tag", "sharedFraction"], 3),
+        symmetric_in("r2_causal", "r2_tag"),
+    ],
+    "Calibrator.populationGeneVariance": [
+        symmetric_in("shared", "specific"),
+        jointly_scales(["shared", "specific"], 1),
+        odd_under_negation(["shared", "specific"]),
+    ],
+    "Calibrator.crossPopulationGeneTransferFraction": [
+        # A share: numerator degree 1, denominator degree 1, so net 0.
+        jointly_scales(["shared", "targetSpecific"], 0),
+    ],
+    "Calibrator.portabilityFromArchitecture": [
+        scales("rg", 2),
+        scales("tagging_ratio", 1),
+        jointly_scales(["rg", "tagging_ratio"], 3),
+    ],
+
+    # --- TARGETED, no verdict: AssortativeMatingPGS ------------------------
+    "Calibrator.amVarianceStep": [
+        # Both variances enter the numerator linearly; r and h2 sit in a factor.
+        jointly_scales(["V₀", "V"], 1),
+    ],
+    "Calibrator.amEquilibriumVariance": [
+        scales("V_A", 1),
+    ],
+    "Calibrator.amCorrectedPortability": [
+        scales("port_measured", 1),
+    ],
+    "Calibrator.ibdFst": [
+        # `d / (4Nσ² + d)`. Two independent invariances, and they are different
+        # statements: the deme separation trades against the population size,
+        # and the population size trades against the dispersal variance because
+        # only the product Nσ² is read.
+        jointly_scales(["d", "N"], 0),
+        invariant_under_reciprocal_scaling(["N"], ["sigma_sq"]),
+    ],
+
+    # --- TARGETED, no verdict: DirichletTransfer ---------------------------
+    "Calibrator.dirichletEfficiency": [
+        # `1 + τ·energy`: the two enter only as a product, so they trade freely.
+        symmetric_in("τ", "energy"),
+    ],
+    "Calibrator.driftHorizon": [
+        # `(D₂ - D₁)/(2C)`: numerator degree 1, denominator degree 1, net 0.
+        jointly_scales(["D₁", "D₂", "C"], 0),
+        jointly_scales(["D₁", "D₂"], 1),
+        scales("C", -1),
+        odd_under_negation(["D₁", "D₂"]),
+    ],
+    "Calibrator.stalePremium": [
+        scales("V", 1),
+        invariant_under_reciprocal_scaling(["lam"], ["τ"]),
+    ],
+    "Calibrator.dampedAdjustment": [
+        scales("g", 1),
+        invariant_under_reciprocal_scaling(["lam"], ["τ"]),
+    ],
+    "Calibrator.dampedPremium": [
+        scales("V", 1),
+        invariant_under_reciprocal_scaling(["lam"], ["τ"]),
+    ],
+    "Calibrator.myopiaPrice": [
+        scales("V", 1),
+        invariant_under_reciprocal_scaling(["lam"], ["τ"]),
+    ],
+    "Calibrator.shrinkagePremium": [
+        # `α(2ρ - α)V`: both terms in the bracket are degree 2 in the pair.
+        scales("V", 1),
+        jointly_scales(["α", "ρ"], 2),
+    ],
+
     "Calibrator.recessiveMutationSelectionDriftParameter": [
         scales("Ne", 1),
         symmetric_in("mu", "s"),
@@ -1442,6 +1521,14 @@ NO_RELATIONS = {
         "No relation in this table's vocabulary can carry a scaling whose "
         "exponent is itself an argument -- which is precisely why α is the "
         "parameter the architecture literature argues about.",
+
+    "Calibrator.sampleInverseInflation":
+        "`n/(n - m - 1)` carries a bare `-1` in the denominator, which is an "
+        "ANCHOR and not a scale: it counts one fitted degree of freedom, so "
+        "rescaling n and m together moves the answer rather than fixing it. "
+        "Without that term the body would be homogeneous of degree 0; with it, "
+        "nothing. The same shape as calibrationSlopeDeviation, and the same "
+        "reason -- see the vocabulary gaps in this file's header.",
 
     "Calibrator.circulationQuadraticForm":
         "`x(ay) + y(-(ax))` is IDENTICALLY ZERO -- the quadratic form of an "
