@@ -85,7 +85,7 @@ theorem jumpProb_eq {k : ℕ} (hk : 2 ≤ k) :
 weight on each is one -- so nothing is assumed about where the jump chain goes beyond
 K-C (1.3)'s unit rates, and the count in `card_covers` does the normalising. -/
 theorem card_covers_mul_jumpProb {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
-    (Nat.card {η : ER n // Blindness.Covers ξ η} : ℝ) * jumpProb (blocks ξ) = 1 := by
+    (Nat.card {η : ER n // Covers ξ η} : ℝ) * jumpProb (blocks ξ) = 1 := by
   rw [card_covers_eq_deathRate]
   unfold jumpProb
   field_simp [deathRate_ne_zero hk]

@@ -49,14 +49,14 @@ open scoped Classical
 /-- The covers of a state form a finite type: they biject with the two-element subsets of
 its block set.  This is `coverOfPair_bijective` cashed in as an instance rather than left as
 a counting fact. -/
-noncomputable instance coversFintype {n : ℕ} (ξ : ER n) : Fintype {η : ER n // Blindness.Covers ξ η} := by
+noncomputable instance coversFintype {n : ℕ} (ξ : ER n) : Fintype {η : ER n // Covers ξ η} := by
   classical
   letI : Fintype (Quotient ξ) := Fintype.ofFinite _
   exact Fintype.ofEquiv {s : Finset (Quotient ξ) // s.card = 2}
     (Equiv.ofBijective _ (coverOfPair_bijective ξ))
 
 theorem card_covers_fintype {n : ℕ} (ξ : ER n) :
-    Fintype.card {η : ER n // Blindness.Covers ξ η} = (blocks ξ).choose 2 := by
+    Fintype.card {η : ER n // Covers ξ η} = (blocks ξ).choose 2 := by
   rw [← Nat.card_eq_fintype_card]
   exact card_covers ξ
 
@@ -64,7 +64,7 @@ theorem card_covers_fintype {n : ℕ} (ξ : ER n) :
 them.  Without this the jump chain would have no next state, which is exactly the absorbing
 case `k = 1`. -/
 theorem covers_nonempty {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
-    Nonempty {η : ER n // Blindness.Covers ξ η} := by
+    Nonempty {η : ER n // Covers ξ η} := by
   classical
   letI : Fintype (Quotient ξ) := Fintype.ofFinite _
   have hcard : 2 ≤ Fintype.card (Quotient ξ) := by
@@ -83,13 +83,13 @@ Empirical status: NOT AN EMPIRICAL CLAIM.  Uniformity is forced by K-C (1.3)'s u
 together with `card_covers`, not assumed: see `jumpStep_apply_eq_jumpProb`, which recovers
 Kingman's `q_{ξη}/q_ξ`. -/
 noncomputable def jumpStep {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
-    PMF {η : ER n // Blindness.Covers ξ η} :=
+    PMF {η : ER n // Covers ξ η} :=
   letI := covers_nonempty ξ hk
-  PMF.uniformOfFintype {η : ER n // Blindness.Covers ξ η}
+  PMF.uniformOfFintype {η : ER n // Covers ξ η}
 
 /-- Every cover gets the same mass, `1/C(k,2)`. -/
 theorem jumpStep_apply {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η : {η : ER n // Blindness.Covers ξ η}) :
+    (η : {η : ER n // Covers ξ η}) :
     jumpStep ξ hk η = (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ := by
   letI := covers_nonempty ξ hk
   rw [jumpStep, PMF.uniformOfFintype_apply, card_covers_fintype]
@@ -98,7 +98,7 @@ theorem jumpStep_apply {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
 `jumpProb` of `Descent.Coalescent.JumpChain`, which was introduced there as `q_{ξη}/q_ξ`.
 The formula and the law agree. -/
 theorem jumpStep_apply_eq_jumpProb {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η : {η : ER n // Blindness.Covers ξ η}) :
+    (η : {η : ER n // Covers ξ η}) :
     (jumpStep ξ hk η).toReal = jumpProb (blocks ξ) := by
   have hd : deathRate (blocks ξ) ≠ 0 := deathRate_ne_zero hk
   have hchoose : ((blocks ξ).choose 2 : ℝ) = deathRate (blocks ξ) := by

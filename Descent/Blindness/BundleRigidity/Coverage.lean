@@ -91,7 +91,7 @@ to exclude, and having it in hand says the exclusion is doing work. -/
 def const (values : Fin d → ℝ) : ModulusFamily T d where
   curve := fun j ↦ ContinuousMap.const T (values j)
 
-instance Program.instNonempty : Nonempty (ModulusFamily T d) := ⟨const (fun _ ↦ 0)⟩
+instance instNonempty : Nonempty (ModulusFamily T d) := ⟨const (fun _ ↦ 0)⟩
 
 /-- **The coverers of `v` within `S`**: the parameters of `S` at which some branch takes
 the value `v`. -/

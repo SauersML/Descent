@@ -43,7 +43,7 @@ namespace Coalescent
 /-- The covers of `Δ` are the mergers of two of the `n` sampled lineages, and there are
 `C(n,2)` of them. -/
 theorem card_covers_delta (n : ℕ) :
-    Nat.card {η : ER n // Blindness.Covers (Delta n) η} = n.choose 2 := by
+    Nat.card {η : ER n // Covers (Delta n) η} = n.choose 2 := by
   rw [card_covers, blocks_bot]
 
 /-- **The (3.6) balance.**  The right-hand side of the Ohta-Kimura recursion has one term for
@@ -54,7 +54,7 @@ That is Kingman's "exactly what one would expect from the theory of the `n`-coal
 made arithmetic: (3.6) is a backward equation, and a backward equation balances the rate out
 of a state against the rates into its successors. -/
 theorem ohtaKimura_rate_balance (n : ℕ) :
-    (Nat.card {η : ER n // Blindness.Covers (Delta n) η} : ℝ) = deathRate n := by
+    (Nat.card {η : ER n // Covers (Delta n) η} : ℝ) = deathRate n := by
   have h := card_covers_eq_deathRate (Delta n)
   rwa [blocks_bot] at h
 
@@ -75,7 +75,7 @@ theorem ewensDenominator_succ (θ : ℝ) (n : ℕ) (hn : 1 ≤ n) :
 /-- At the smallest informative sample the balance is `d_2 = 1`: a single pair, a single
 merger, unit rate.  K-C (1.3)'s normalisation, seen from the mutation side. -/
 theorem ohtaKimura_rate_balance_two :
-    (Nat.card {η : ER 2 // Blindness.Covers (Delta 2) η} : ℝ) = 1 := by
+    (Nat.card {η : ER 2 // Covers (Delta 2) η} : ℝ) = 1 := by
   rw [ohtaKimura_rate_balance, deathRate_two]
 
 end Coalescent

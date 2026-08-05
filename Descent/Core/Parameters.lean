@@ -124,7 +124,7 @@ theorem witness_not_atOrigin : ¬ witness.atOrigin := by
     Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
     laws computed from it. What carries a status is a claim that a population
     reaches these values, which is asked where the demography is. -/
-noncomputable def theta (p : PopGenParameters) : ℝ := PopGen.scaledMutationRate p.Ne p.mu
+noncomputable def theta (p : PopGenParameters) : ℝ := scaledMutationRate p.Ne p.mu
 
 /-- Scaled migration rate in this record's coordinates, `M = 4 Nₑ m`.
 
@@ -134,11 +134,11 @@ corpus's convention and not a choice made here.
     Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
     laws computed from it. What carries a status is a claim that a population
     reaches these values, which is asked where the demography is. -/
-noncomputable def bigM (p : PopGenParameters) : ℝ := PopGen.scaledMigrationRate p.Ne p.mig
+noncomputable def bigM (p : PopGenParameters) : ℝ := scaledMigrationRate p.Ne p.mig
 
 /-- **`M` is the scaled migration rate, not half of it.** -/
 theorem bigM_eq_scaledMigrationRate (p : PopGenParameters) :
-    p.bigM = PopGen.scaledMigrationRate p.Ne p.mig := rfl
+    p.bigM = scaledMigrationRate p.Ne p.mig := rfl
 
 /-- Both scaled rates are non-negative, which every equilibrium below needs. -/
 theorem theta_nonneg (p : PopGenParameters) : 0 ≤ p.theta := by
@@ -194,11 +194,11 @@ substituted for `fstMigrationMutationEquilibriumManyDemes`, and the deme count i
 detail either law can drop. -/
 theorem fstEquilibrium_ne_island_manyDemes :
     PopGenParameters.witness.fstEquilibrium
-      ≠ fstFromFlow (PopGen.scaledMigrationRate PopGenParameters.witness.Ne
+      ≠ fstFromFlow (scaledMigrationRate PopGenParameters.witness.Ne
           PopGenParameters.witness.mig
-        + PopGen.scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu) := by
+        + scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu) := by
   unfold fstEquilibrium theta bigM witness
-  norm_num [fstFromFlow, PopGen.scaledMutationRate, PopGen.scaledMigrationRate, ploidy]
+  norm_num [fstFromFlow, scaledMutationRate, scaledMigrationRate, ploidy]
 
 /-- **Equilibrium differentiation lies in the unit interval.** Immediate from the flow
 being non-negative, and stated because every consumer of `fstEquilibrium` needs it. -/

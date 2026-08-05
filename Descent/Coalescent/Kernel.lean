@@ -110,7 +110,7 @@ theorem jumpKernel_absorbing {n : ℕ} (ξ : ER n) (h : blocks ξ < 2) :
 forward into the whole state space keeps its value: each cover of a `k`-block state gets
 `1/C(k,2)`, and every other state gets nothing.  This is what makes the weights in
 `Descent.Coalescent.Trajectory.chainLaw` explicit rather than implicit in a `bind`. -/
-theorem jumpLaw_apply_cover {n : ℕ} {ξ η : ER n} (hk : 2 ≤ blocks ξ) (h : Blindness.Covers ξ η) :
+theorem jumpLaw_apply_cover {n : ℕ} {ξ η : ER n} (hk : 2 ≤ blocks ξ) (h : Covers ξ η) :
     jumpLaw ξ η = (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ := by
   classical
   rw [jumpLaw, dif_pos hk, PMF.map_apply]
@@ -125,7 +125,7 @@ theorem jumpLaw_apply_cover {n : ℕ} {ξ η : ER n} (hk : 2 ≤ blocks ξ) (h :
 a new model: it is `Descent.Coalescent.Process.jumpStep` with its values placed in the state
 space they belong to. -/
 theorem jumpKernel_apply_cover {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η : {η : ER n // Blindness.Covers ξ η}) :
+    (η : {η : ER n // Covers ξ η}) :
     ((jumpStep ξ hk) η).toReal = jumpProb (blocks ξ) :=
   jumpStep_apply_eq_jumpProb ξ hk η
 

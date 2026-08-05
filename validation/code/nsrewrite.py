@@ -361,7 +361,8 @@ def defined_in(directory: str, table):
 
 def qualify(text: str, names: set[str], prefix: str,
             tokens: set[str] = frozenset(),
-            forced: bool = False) -> tuple[str, int, set[str]]:
+            forced: bool = False,
+            own: set[str] = frozenset()) -> tuple[str, int, set[str]]:
     """Prefix bare uses of `names` with `prefix.`; return (text, hits, held).
 
     `tokens` are namespace segments, prefixed only where they are USED as a
@@ -371,8 +372,14 @@ def qualify(text: str, names: set[str], prefix: str,
     `held` is the subset this file binds locally, which is left alone and
     reported so the file can be qualified by hand.
     """
+    # `own` is what the file's OWN directory defines.  A file in `Core/` that
+    # writes `fstFromTau` means `Descent.Core.fstFromTau`, and `Portability.` in
+    # front of it points at the delegating shim over it -- inverting the layering
+    # and, since Core cannot import Portability, failing to build at all.  This
+    # is the same hold as `local`, one level out: a directory's own names are
+    # never another directory's.
     local = set() if forced else (bound_locally(text) | namespaces_opened_here(text))
-    held = (names | tokens) & local
+    held = ((names | tokens) & local) | ((names | tokens) & set(own))
     movable = names - held
     live_tokens = tokens - held
     mask = code_mask(text)
@@ -609,7 +616,8 @@ def main() -> int:
     for path in outside:
         with open(path, encoding="utf-8", errors="ignore") as fh:
             text = fh.read()
-        new, hits, held = qualify(text, names, d, tokens)
+        own = defined_in(nsmap.directory_of(nsmap.module_of(path)) or "", table)
+        new, hits, held = qualify(text, names, d, tokens, own=own)
         for n in held:
             all_held[n].add(nsmap.module_of(path))
         if hits:

@@ -137,7 +137,7 @@ theorem blocks_splitBy {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
 /-- **A cut of one class is a cover, from above.** -/
 theorem splitBy_covers {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
     (hSa : ∀ x ∈ S, η.r x a) (hSne : ∃ x, x ∈ S) (hSproper : ∃ x, η.r x a ∧ x ∉ S) :
-    Blindness.Covers (splitBy η S) η :=
+    Covers (splitBy η S) η :=
   ⟨splitBy_le η S, by rw [blocks_splitBy η S hSa hSne hSproper]⟩
 
 /-- **A merge is the cut along one of the two classes it merged.**  The witness that the
@@ -175,7 +175,7 @@ theorem eq_splitBy_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ 
 two of its equivalence classes" -- seen from above: `ξ` refines `η` by cutting exactly one of
 its classes in two. -/
 theorem covers_iff_exists_splitBy {n : ℕ} (ξ η : ER n) :
-    Blindness.Covers ξ η ↔ ∃ S : Finset (Fin n), ξ = splitBy η S ∧ Blindness.Covers (splitBy η S) η := by
+    Covers ξ η ↔ ∃ S : Finset (Fin n), ξ = splitBy η S ∧ Covers (splitBy η S) η := by
   classical
   constructor
   · intro hcov
@@ -244,7 +244,7 @@ so the sample paths of K-C (1.13) pass through every level and every state is re
 `Δ`.  Without it, "the chain runs from `Δ` to `Θ`" would leave open whether it could get
 stuck somewhere with no predecessor. -/
 theorem exists_covers_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
-    ∃ ξ' : ER n, Blindness.Covers ξ' ξ := by
+    ∃ ξ' : ER n, Covers ξ' ξ := by
   classical
   obtain ⟨x, y, hxy, hrel⟩ := exists_rel_ne_of_ne_bot h
   have hSa : ∀ z ∈ ({x} : Finset (Fin n)), ξ.r z x := by

@@ -259,7 +259,7 @@ def pureMediation (a c : ℝ) : ChainSCM where
   b := 0
   c := c
 
-instance Program.instNonempty : Nonempty ChainSCM := ⟨pureMediation 0 0⟩
+instance instNonempty : Nonempty ChainSCM := ⟨pureMediation 0 0⟩
 
 /-- The pure-mediation chain has no direct edge, by construction. -/
 theorem pureMediation_b (a c : ℝ) : (pureMediation a c).b = 0 := rfl
