@@ -289,6 +289,25 @@ noncomputable def averagePhaseInteraction
     (freq_cis interaction_cis interaction_trans : ℝ) : ℝ :=
   freq_cis * interaction_cis + (1 - freq_cis) * interaction_trans
 
+/-! `averagePhaseInteraction` -- **Empirical status: VALIDATED**
+(`simcov/battery_bulk43.py`, `group_c`). 3×10⁶ individuals, a fraction
+`freq_cis` of them in cis; the observable is the realised mean interaction
+across the population, which is exact and needs no modelling. Worst cell 1.41
+sems at 0.05% relative.
+
+Power: the UNWEIGHTED mean `(i_cis + i_trans)/2` rides on the same draws and is
+FALSIFIED at 1299 sems (75% relative). The two coincide only at
+`freq_cis = 1/2`, so the design sweeps across it -- 0.2, 0.35, 0.5, 0.8 -- and
+one cell gives the two interactions OPPOSITE signs, where an unweighted average
+lands on the wrong side of zero. Control: the realised cis fraction recovers
+`freq_cis` on the same draws.
+
+`haplotypeTransportBias`, the absolute gap between the predicted and true phase
+averages, is measured on those same draws at worst 1.41 sems. Its relative
+error reaches 100% in one cell, which is not a defect: that cell's true gap is
+near zero, and a relative error against a vanishing denominator carries no
+information. The absolute agreement is what the sems report. -/
+
 /-- **A population entirely in cis carries the cis interaction.**
 
 The weights sum to one by construction, so the average is an interpolation and the two endpoints
@@ -339,11 +358,20 @@ noncomputable def haplotypePhasePredictionError
       ((1 - switch_err) * (interaction_trans - pred_trans) ^ 2 +
         switch_err * (interaction_trans - pred_cis) ^ 2)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation, at a point where the body is NONZERO.
+
+The previous point was all ones, and every squared difference in the body is a
+prediction minus an interaction: at `pred = interaction` all four vanish, the
+error is `0`, and every rescaling `c * body` satisfies the theorem. It pinned
+nothing -- `scale_competitor_ne_iff` is the general statement, that a reference
+value rejects a wrong constant factor exactly when the body is nonzero there.
+
+This point makes all four squared differences nonzero and DISTINCT, both phase
+weights nonzero, and the cis fraction away from one half so that swapping
+`freq_cis` for `1 - freq_cis` changes the value: `(1/3)(13/4) + (2/3)(21/4)`.
+Value confirmed against the corpus's own executable form. -/
 theorem haplotypePhasePredictionError_at_reference_point :
-    haplotypePhasePredictionError 1 1 1 1 1 1 = 0 := by
+    haplotypePhasePredictionError (1 / 3) (1 / 4) 0 1 2 3 = 55 / 12 := by
   norm_num [haplotypePhasePredictionError]
 
 
@@ -854,7 +882,23 @@ theorem ancestry_effect_between_pops (beta₁ beta₂ alpha : ℝ)
 /-- Single-effect predictor obtained by averaging ancestry-specific effects
 according to the admixture proportion `alpha`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk43.py`, `group_b`).
+    2×10⁶ individuals, a fraction `alpha` carrying the first ancestry's effect
+    and the rest the second; the observable is the realised MARGINAL OLS effect
+    of the variant across the whole admixed sample -- exactly what a GWAS
+    ignoring local ancestry would estimate. Worst cell 0.59 sems at 0.26%
+    relative.
+
+    Power: the weights SWAPPED, `(1-alpha)·β₁ + alpha·β₂`, is FALSIFIED at 294
+    sems and 805% relative. That is the error the name invites -- which
+    ancestry `alpha` counts -- and the two readings coincide only at
+    `alpha = 1/2`, so the design sweeps 0.2, 0.3, 0.5, 0.8 across it. One cell
+    gives the two ancestries effects of OPPOSITE SIGN, where the swap lands the
+    average on the wrong side of zero. Control: the realised ancestry-1
+    fraction recovers `alpha` on the same draws.
+
+    This measures `ancestrySpecificEffect` too, since this body is that
+    function applied to the same three arguments. -/
 noncomputable def globalAncestryAveragedEffect
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   ancestrySpecificEffect beta₁ beta₂ alpha

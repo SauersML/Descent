@@ -925,24 +925,49 @@ noncomputable def cwObjective (tlam m : ℝ) : ℝ :=
 noncomputable def cwPinskerGap (m : ℝ) : ℝ :=
   cwRate m - m ^ 2 / 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation, at a point where the body is NONZERO.
+
+The previous point was `cwPinskerGap 0 = 0`. Zero magnetisation is where the
+rate function and the quadratic both vanish, so every rescaling `c * body`
+satisfied it and the theorem rejected nothing -- `scale_competitor_ne_iff`.
+
+The endpoint is the one place a transcendental body has an exact rational-plus-
+log value: `cwRate_one` gives `cwRate 1 = log 2`, so the gap is `log 2 - 1/2`,
+about `0.1931`. Being nonzero is the whole point; a body with `m ^ 2` in place of
+`m ^ 2 / 2` gives `log 2 - 1` here instead. -/
 theorem cwPinskerGap_at_reference_point :
-    cwPinskerGap 0 = 0 := by
-  norm_num [cwPinskerGap, cwRate]
+    cwPinskerGap 1 = Real.log 2 - 1 / 2 := by
+  unfold cwPinskerGap
+  rw [cwRate_one]
+  norm_num
 
 
 /-- Derivative of the Pinsker gap on the open magnetisation interval. -/
 noncomputable def cwPinskerGapDerivative (m : ℝ) : ℝ :=
   (Real.log (1 + m) - Real.log (1 - m)) / 2 - m
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation, at a point where the body is NONZERO.
+
+The previous point was `cwPinskerGapDerivative 0 = 0`, the unique zero of this
+function on `[0, 1)` -- `cwPinskerGapDerivative_nonneg` and the strict growth
+above it are what make it unique. So the old point was the ONE place no
+rescaling could be rejected.
+
+`m = 1/2` is chosen rather than the endpoint on purpose: at `m = 1` the body
+evaluates `Real.log 0`, which Mathlib sends to junk-zero, and a reference value
+read off a junk branch certifies nothing. At `m = 1/2` the two logarithms
+combine exactly, `log (3/2) - log (1/2) = log 3`, giving `log 3 / 2 - 1/2`,
+about `0.0493`. Value confirmed against the corpus's own executable form. -/
 theorem cwPinskerGapDerivative_at_reference_point :
-    cwPinskerGapDerivative 0 = 0 := by
-  norm_num [cwPinskerGapDerivative]
+    cwPinskerGapDerivative (1 / 2) = Real.log 3 / 2 - 1 / 2 := by
+  have h : Real.log (1 + 1 / 2) - Real.log (1 - 1 / 2) = Real.log 3 := by
+    rw [show (1 : ℝ) + 1 / 2 = 3 / 2 by norm_num,
+      show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num,
+      Real.log_div (by norm_num) (by norm_num),
+      Real.log_div (by norm_num) (by norm_num), Real.log_one]
+    ring
+  unfold cwPinskerGapDerivative
+  rw [h]
 
 
 /-- Exact derivative of the Bernoulli Pinsker gap away from the two endpoints. -/
