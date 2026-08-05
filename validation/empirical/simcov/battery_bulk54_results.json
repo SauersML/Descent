@@ -1,0 +1,158 @@
+{
+ "_battery_sha": "0013b46df9a59c0d",
+ "results": [
+  {
+   "name": "ldCorrelationDecay",
+   "file": "PortabilityDrift.lean",
+   "source": "rate proportional to sqrt(fstGap) -- exp(-(lambda * sqrt fstGap * distance))",
+   "note": "positive control 'fitter on a known exponential [recovers its rate]' passed at 0.25 sems",
+   "regime": "two-deme island model at Ne = 1000 over 4 Mb with recombination 1e-8 and mu = 1e-8, 10 replicates per arm, 4*Ne*m swept 240-fold; per replicate the cross-deme correlation of signed r is binned by physical separation and a decay RATE is fitted, so the error bar comes from independent simulations rather than from a curve fit. Each candidate's constant is ANCHORED at the first arm, which is what makes the SHAPE of the rate-versus-divergence relation refutable while the free lambda leaves the absolute rate not",
+   "span": 0.8082112173598095,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "4Nem=8.0 (F_ST=0.0505)",
+    "lean": 1.0440803563979147e-06,
+    "truth": 2.3093790298195348e-06,
+    "sem": 2.9333049560794465e-07,
+    "sems_off": 4.313559934500551,
+    "rel_err": 0.5478956278218635
+   },
+   "cells": [
+    {
+     "design": "4Nem=2.0 (F_ST=0.1792)",
+     "lean": 1.9676643491496817e-06,
+     "truth": 3.181502355762344e-06,
+     "sem": 4.921546001401467e-07,
+     "sems_off": 2.4663754159099764,
+     "rel_err": 0.3815298154389722
+    },
+    {
+     "design": "4Nem=8.0 (F_ST=0.0505)",
+     "lean": 1.0440803563979147e-06,
+     "truth": 2.3093790298195348e-06,
+     "sem": 2.9333049560794465e-07,
+     "sems_off": 4.313559934500551,
+     "rel_err": 0.5478956278218635
+    },
+    {
+     "design": "4Nem=30.0 (F_ST=0.0164)",
+     "lean": 5.950145443781693e-07,
+     "truth": 8.676346679051734e-07,
+     "sem": 9.444705207841695e-08,
+     "sems_off": 2.8864863172294104,
+     "rel_err": 0.3142107313268395
+    },
+    {
+     "design": "4Nem=120.0 (F_ST=0.0066)",
+     "lean": 3.7737595016792035e-07,
+     "truth": 7.669447854978716e-07,
+     "sem": 1.5019348610543198e-07,
+     "sems_off": 2.5937798331445876,
+     "rel_err": 0.5079489980195352
+    }
+   ]
+  },
+  {
+   "name": "ldCorrelationDecay [rate proportional to fstGap, superseded, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "exp(-(lambda * fstGap * distance))",
+   "note": "positive control 'fitter on a known exponential [recovers its rate]' passed at 0.25 sems",
+   "regime": "two-deme island model at Ne = 1000 over 4 Mb with recombination 1e-8 and mu = 1e-8, 10 replicates per arm, 4*Ne*m swept 240-fold; per replicate the cross-deme correlation of signed r is binned by physical separation and a decay RATE is fitted, so the error bar comes from independent simulations rather than from a curve fit. Each candidate's constant is ANCHORED at the first arm, which is what makes the SHAPE of the rate-versus-divergence relation refutable while the free lambda leaves the absolute rate not",
+   "span": 0.9632170628533938,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "4Nem=30.0 (F_ST=0.0164)",
+    "lean": 1.0811762478914779e-07,
+    "truth": 8.676346679051734e-07,
+    "sem": 9.444705207841695e-08,
+    "sems_off": 8.041723128482806,
+    "rel_err": 0.8753880765850584
+   },
+   "cells": [
+    {
+     "design": "4Nem=2.0 (F_ST=0.1792)",
+     "lean": 1.1823426799071662e-06,
+     "truth": 3.181502355762344e-06,
+     "sem": 4.921546001401467e-07,
+     "sems_off": 4.062056262983002,
+     "rel_err": 0.6283696984332875
+    },
+    {
+     "design": "4Nem=8.0 (F_ST=0.0505)",
+     "lean": 3.328964644752869e-07,
+     "truth": 2.3093790298195348e-06,
+     "sem": 2.9333049560794465e-07,
+     "sems_off": 6.738073930049012,
+     "rel_err": 0.8558502263262948
+    },
+    {
+     "design": "4Nem=30.0 (F_ST=0.0164)",
+     "lean": 1.0811762478914779e-07,
+     "truth": 8.676346679051734e-07,
+     "sem": 9.444705207841695e-08,
+     "sems_off": 8.041723128482806,
+     "rel_err": 0.8753880765850584
+    },
+    {
+     "design": "4Nem=120.0 (F_ST=0.0066)",
+     "lean": 4.349003648077531e-08,
+     "truth": 7.669447854978716e-07,
+     "sem": 1.5019348610543198e-07,
+     "sems_off": 4.816818410548441,
+     "rel_err": 0.9432944361795964
+    }
+   ]
+  },
+  {
+   "name": "ldCorrelationDecay [rate independent of fstGap, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "exp(-(lambda * distance))",
+   "note": "positive control 'fitter on a known exponential [recovers its rate]' passed at 0.25 sems",
+   "regime": "two-deme island model at Ne = 1000 over 4 Mb with recombination 1e-8 and mu = 1e-8, 10 replicates per arm, 4*Ne*m swept 240-fold; per replicate the cross-deme correlation of signed r is binned by physical separation and a decay RATE is fitted, so the error bar comes from independent simulations rather than from a curve fit. Each candidate's constant is ANCHORED at the first arm, which is what makes the SHAPE of the rate-versus-divergence relation refutable while the free lambda leaves the absolute rate not",
+   "span": 0.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "4Nem=30.0 (F_ST=0.0164)",
+    "lean": 3.2746030881830584e-06,
+    "truth": 8.676346679051734e-07,
+    "sem": 9.444705207841695e-08,
+    "sems_off": 25.484844336691857,
+    "rel_err": 2.7741727126802065
+   },
+   "cells": [
+    {
+     "design": "4Nem=2.0 (F_ST=0.1792)",
+     "lean": 3.2746030881830584e-06,
+     "truth": 3.181502355762344e-06,
+     "sem": 4.921546001401467e-07,
+     "sems_off": 0.18916968853730654,
+     "rel_err": 0.029263134836939514
+    },
+    {
+     "design": "4Nem=8.0 (F_ST=0.0505)",
+     "lean": 3.2746030881830584e-06,
+     "truth": 2.3093790298195348e-06,
+     "sem": 2.9333049560794465e-07,
+     "sems_off": 3.2905683957716025,
+     "rel_err": 0.41795826752568654
+    },
+    {
+     "design": "4Nem=30.0 (F_ST=0.0164)",
+     "lean": 3.2746030881830584e-06,
+     "truth": 8.676346679051734e-07,
+     "sem": 9.444705207841695e-08,
+     "sems_off": 25.484844336691857,
+     "rel_err": 2.7741727126802065
+    },
+    {
+     "design": "4Nem=120.0 (F_ST=0.0066)",
+     "lean": 3.2746030881830584e-06,
+     "truth": 7.669447854978716e-07,
+     "sem": 1.5019348610543198e-07,
+     "sems_off": 16.69618548520057,
+     "rel_err": 3.2696725371922435
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,420 @@
+{
+ "_battery_sha": "c5e61a041ffb44a1",
+ "results": [
+  {
+   "name": "ClosedPopulationNoMutation.retention",
+   "file": "PortabilityDrift.lean",
+   "source": "(1 - 1 / (2 * Ne))^t",
+   "note": "",
+   "regime": "forward Wright-Fisher on 5000 independent biallelic loci per replicate, 40 replicates, MUTATION RATE ZERO -- the closed-population no-mutation regime `mutation_negligible` enforces, not the demographic equilibrium at which the superseded FALSIFIED verdict was taken. Per generation each locus draws Binomial(2Ne, p)/(2Ne); H is averaged over ALL loci including fixed ones. Ne in {100, 250}, t in {Ne/4, Ne/2, Ne, 2Ne}",
+   "span": 0.5845463399757249,
+   "verdict": "MATCH",
+   "worst": {
+    "lean": 0.3675112548571586,
+    "design": "Ne=250 t=500",
+    "truth": 0.36591087515969484,
+    "sem": 0.0010188600730097598,
+    "sems_off": 1.5707551408272804,
+    "rel_err": 0.0043736871629335514
+   },
+   "cells": [
+    {
+     "lean": 0.8822202429488012,
+     "design": "Ne=100 t=25",
+     "truth": 0.882528882456538,
+     "sem": 0.0004464370896059964,
+     "sems_off": 0.6913393060805996,
+     "rel_err": 0.00034972170755221896
+    },
+    {
+     "lean": 0.7783125570686419,
+     "design": "Ne=100 t=50",
+     "truth": 0.7785243629355973,
+     "sem": 0.0008150745556564666,
+     "sems_off": 0.2598607274458118,
+     "rel_err": 0.0002720606792018693
+    },
+    {
+     "lean": 0.6057704364907279,
+     "design": "Ne=100 t=100",
+     "truth": 0.6043676387092753,
+     "sem": 0.000998503409997698,
+     "sems_off": 1.4049003412575372,
+     "rel_err": 0.002321100091408735
+    },
+    {
+     "lean": 0.36695782172616703,
+     "design": "Ne=100 t=200",
+     "truth": 0.3664881160188008,
+     "sem": 0.0010489958213346661,
+     "sems_off": 0.44776699564788414,
+     "rel_err": 0.0012816396680707437
+    },
+    {
+     "lean": 0.8832701623202105,
+     "design": "Ne=250 t=62",
+     "truth": 0.8841722010933996,
+     "sem": 0.0007052161497511984,
+     "sems_off": 1.279095456772088,
+     "rel_err": 0.001020207118108405
+    },
+    {
+     "lean": 0.7786058472858807,
+     "design": "Ne=250 t=125",
+     "truth": 0.7788843571255124,
+     "sem": 0.0009065715876976724,
+     "sems_off": 0.3072121864518592,
+     "rel_err": 0.0003575753410423869
+    },
+    {
+     "lean": 0.6062270654277641,
+     "design": "Ne=250 t=250",
+     "truth": 0.6048781606925488,
+     "sem": 0.0011712240435696895,
+     "sems_off": 1.1517051264623772,
+     "rel_err": 0.0022300437061089987
+    },
+    {
+     "lean": 0.3675112548571586,
+     "design": "Ne=250 t=500",
+     "truth": 0.36591087515969484,
+     "sem": 0.0010188600730097598,
+     "sems_off": 1.5707551408272804,
+     "rel_err": 0.0043736871629335514
+    }
+   ]
+  },
+  {
+   "name": "retention [haploid ploidy, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "(1 - 1 / Ne)^t",
+   "note": "positive control 'Ne=100 t=25 [E[p_t]/p_0, martingale]' passed at 0.93 sems",
+   "regime": "forward Wright-Fisher on 5000 independent biallelic loci per replicate, 40 replicates, MUTATION RATE ZERO -- the closed-population no-mutation regime `mutation_negligible` enforces, not the demographic equilibrium at which the superseded FALSIFIED verdict was taken. Per generation each locus draws Binomial(2Ne, p)/(2Ne); H is averaged over ALL loci including fixed ones. Ne in {100, 250}, t in {Ne/4, Ne/2, Ne, 2Ne}",
+   "span": 0.8282250078995689,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.3660323412732292,
+    "design": "Ne=100 t=100",
+    "truth": 0.6043676387092753,
+    "sem": 0.000998503409997698,
+    "sems_off": 238.6925222785124,
+    "rel_err": 0.3943548300253959
+   },
+   "cells": [
+    {
+     "lean": 0.7778213593991467,
+     "design": "Ne=100 t=25",
+     "truth": 0.882528882456538,
+     "sem": 0.0004464370896059964,
+     "sems_off": 234.5403764499073,
+     "rel_err": 0.11864486833103496
+    },
+    {
+     "lean": 0.6050060671375364,
+     "design": "Ne=100 t=50",
+     "truth": 0.7785243629355973,
+     "sem": 0.0008150745556564666,
+     "sems_off": 212.8864097080152,
+     "rel_err": 0.2228810093286896
+    },
+    {
+     "lean": 0.3660323412732292,
+     "design": "Ne=100 t=100",
+     "truth": 0.6043676387092753,
+     "sem": 0.000998503409997698,
+     "sems_off": 238.6925222785124,
+     "rel_err": 0.3943548300253959
+    },
+    {
+     "lean": 0.13397967485796172,
+     "design": "Ne=100 t=200",
+     "truth": 0.3664881160188008,
+     "sem": 0.0010489958213346661,
+     "sems_off": 221.64858661211085,
+     "rel_err": 0.6344228666582777
+    },
+    {
+     "lean": 0.7799719459723699,
+     "design": "Ne=250 t=62",
+     "truth": 0.8841722010933996,
+     "sem": 0.0007052161497511984,
+     "sems_off": 147.75647885799518,
+     "rel_err": 0.11785063474306462
+    },
+    {
+     "lean": 0.6059228115579096,
+     "design": "Ne=250 t=125",
+     "truth": 0.7788843571255124,
+     "sem": 0.0009065715876976724,
+     "sems_off": 190.78641765826308,
+     "rel_err": 0.22206319074877903
+    },
+    {
+     "lean": 0.3671424535662421,
+     "design": "Ne=250 t=250",
+     "truth": 0.6048781606925488,
+     "sem": 0.0011712240435696895,
+     "sems_off": 202.98055562600064,
+     "rel_err": 0.3930307334192952
+    },
+    {
+     "lean": 0.13479358121064025,
+     "design": "Ne=250 t=500",
+     "truth": 0.36591087515969484,
+     "sem": 0.0010188600730097598,
+     "sems_off": 226.83909211038508,
+     "rel_err": 0.6316218227954767
+    }
+   ]
+  },
+  {
+   "name": "retention [doubled exponent, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "(1 - 1 / (2 * Ne))^(2 * t)",
+   "note": "positive control 'Ne=100 t=25 [E[p_t]/p_0, martingale]' passed at 0.93 sems",
+   "regime": "forward Wright-Fisher on 5000 independent biallelic loci per replicate, 40 replicates, MUTATION RATE ZERO -- the closed-population no-mutation regime `mutation_negligible` enforces, not the demographic equilibrium at which the superseded FALSIFIED verdict was taken. Per generation each locus draws Binomial(2Ne, p)/(2Ne); H is averaged over ALL loci including fixed ones. Ne in {100, 250}, t in {Ne/4, Ne/2, Ne, 2Ne}",
+   "span": 0.8273982563724339,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.36695782172616703,
+    "design": "Ne=100 t=100",
+    "truth": 0.6043676387092753,
+    "sem": 0.000998503409997698,
+    "sems_off": 237.76565468480035,
+    "rel_err": 0.39282350969376073
+   },
+   "cells": [
+    {
+     "lean": 0.7783125570686419,
+     "design": "Ne=100 t=25",
+     "truth": 0.882528882456538,
+     "sem": 0.0004464370896059964,
+     "sems_off": 233.44011466402222,
+     "rel_err": 0.1180882886209999
+    },
+    {
+     "lean": 0.6057704364907279,
+     "design": "Ne=100 t=50",
+     "truth": 0.7785243629355973,
+     "sem": 0.0008150745556564666,
+     "sems_off": 211.94861898950117,
+     "rel_err": 0.22189919117426557
+    },
+    {
+     "lean": 0.36695782172616703,
+     "design": "Ne=100 t=100",
+     "truth": 0.6043676387092753,
+     "sem": 0.000998503409997698,
+     "sems_off": 237.76565468480035,
+     "rel_err": 0.39282350969376073
+    },
+    {
+     "lean": 0.1346580429260134,
+     "design": "Ne=100 t=200",
+     "truth": 0.3664881160188008,
+     "sem": 0.0010489958213346661,
+     "sems_off": 221.00190332295477,
+     "rel_err": 0.6325718705729998
+    },
+    {
+     "lean": 0.780166179645171,
+     "design": "Ne=250 t=62",
+     "truth": 0.8841722010933996,
+     "sem": 0.0007052161497511984,
+     "sems_off": 147.48105454607372,
+     "rel_err": 0.11763095618660135
+    },
+    {
+     "lean": 0.6062270654277641,
+     "design": "Ne=250 t=125",
+     "truth": 0.7788843571255124,
+     "sem": 0.0009065715876976724,
+     "sems_off": 190.45080834292247,
+     "rel_err": 0.22167256296550028
+    },
+    {
+     "lean": 0.3675112548571586,
+     "design": "Ne=250 t=250",
+     "truth": 0.6048781606925488,
+     "sem": 0.0011712240435696895,
+     "sems_off": 202.6656702776838,
+     "rel_err": 0.39242102172050575
+    },
+    {
+     "lean": 0.13506452244668338,
+     "design": "Ne=250 t=500",
+     "truth": 0.36591087515969484,
+     "sem": 0.0010188600730097598,
+     "sems_off": 226.5731662553825,
+     "rel_err": 0.630881365885239
+    }
+   ]
+  },
+  {
+   "name": "retention [diffusion limit, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "exp(-t / (2 * Ne))",
+   "note": "",
+   "regime": "forward Wright-Fisher on 5000 independent biallelic loci per replicate, 40 replicates, MUTATION RATE ZERO -- the closed-population no-mutation regime `mutation_negligible` enforces, not the demographic equilibrium at which the superseded FALSIFIED verdict was taken. Per generation each locus draws Binomial(2Ne, p)/(2Ne); H is averaged over ALL loci including fixed ones. Ne in {100, 250}, t in {Ne/4, Ne/2, Ne, 2Ne}",
+   "span": 0.5835546339796199,
+   "verdict": "MATCH",
+   "worst": {
+    "lean": 0.6065306597126334,
+    "design": "Ne=100 t=100",
+    "truth": 0.6043676387092753,
+    "sem": 0.000998503409997698,
+    "sems_off": 2.1662630109225818,
+    "rel_err": 0.00357898217048411
+   },
+   "cells": [
+    {
+     "lean": 0.8824969025845955,
+     "design": "Ne=100 t=25",
+     "truth": 0.882528882456538,
+     "sem": 0.0004464370896059964,
+     "sems_off": 0.07163354633194316,
+     "rel_err": 3.623662928013454e-05
+    },
+    {
+     "lean": 0.7788007830714049,
+     "design": "Ne=100 t=50",
+     "truth": 0.7785243629355973,
+     "sem": 0.0008150745556564666,
+     "sems_off": 0.3391347869826468,
+     "rel_err": 0.0003550565004352958
+    },
+    {
+     "lean": 0.6065306597126334,
+     "design": "Ne=100 t=100",
+     "truth": 0.6043676387092753,
+     "sem": 0.000998503409997698,
+     "sems_off": 2.1662630109225818,
+     "rel_err": 0.00357898217048411
+    },
+    {
+     "lean": 0.36787944117144233,
+     "design": "Ne=100 t=200",
+     "truth": 0.3664881160188008,
+     "sem": 0.0010489958213346661,
+     "sems_off": 1.3263400333390158,
+     "rel_err": 0.0037963718107850855
+    },
+    {
+     "lean": 0.8833798408827509,
+     "design": "Ne=250 t=62",
+     "truth": 0.8841722010933996,
+     "sem": 0.0007052161497511984,
+     "sems_off": 1.1235707108071806,
+     "rel_err": 0.0008961605099875292
+    },
+    {
+     "lean": 0.7788007830714049,
+     "design": "Ne=250 t=125",
+     "truth": 0.7788843571255124,
+     "sem": 0.0009065715876976724,
+     "sems_off": 0.0921869328816839,
+     "rel_err": 0.00010729969518961528
+    },
+    {
+     "lean": 0.6065306597126334,
+     "design": "Ne=250 t=250",
+     "truth": 0.6048781606925488,
+     "sem": 0.0011712240435696895,
+     "sems_off": 1.410916236869627,
+     "rel_err": 0.0027319535196849614
+    },
+    {
+     "lean": 0.36787944117144233,
+     "design": "Ne=250 t=500",
+     "truth": 0.36591087515969484,
+     "sem": 0.0010188600730097598,
+     "sems_off": 1.9321259747987392,
+     "rel_err": 0.00537990572400548
+    }
+   ]
+  },
+  {
+   "name": "retention [no decay at all, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1",
+   "note": "positive control 'Ne=100 t=25 [E[p_t]/p_0, martingale]' passed at 0.93 sems",
+   "regime": "forward Wright-Fisher on 5000 independent biallelic loci per replicate, 40 replicates, MUTATION RATE ZERO -- the closed-population no-mutation regime `mutation_negligible` enforces, not the demographic equilibrium at which the superseded FALSIFIED verdict was taken. Per generation each locus draws Binomial(2Ne, p)/(2Ne); H is averaged over ALL loci including fixed ones. Ne in {100, 250}, t in {Ne/4, Ne/2, Ne, 2Ne}",
+   "span": 0.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 1.0,
+    "design": "Ne=250 t=500",
+    "truth": 0.36591087515969484,
+    "sem": 0.0010188600730097598,
+    "sems_off": 622.3515295551591,
+    "rel_err": 1.732905928427432
+   },
+   "cells": [
+    {
+     "lean": 1.0,
+     "design": "Ne=100 t=25",
+     "truth": 0.882528882456538,
+     "sem": 0.0004464370896059964,
+     "sems_off": 263.130282582785,
+     "rel_err": 0.1331073915864131
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=100 t=50",
+     "truth": 0.7785243629355973,
+     "sem": 0.0008150745556564666,
+     "sems_off": 271.7243907657314,
+     "rel_err": 0.2844813182586606
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=100 t=100",
+     "truth": 0.6043676387092753,
+     "sem": 0.000998503409997698,
+     "sems_off": 396.2253481854776,
+     "rel_err": 0.6546220147320618
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=100 t=200",
+     "truth": 0.3664881160188008,
+     "sem": 0.0010489958213346661,
+     "sems_off": 603.922218846558,
+     "rel_err": 1.7286014369663765
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=250 t=62",
+     "truth": 0.8841722010933996,
+     "sem": 0.0007052161497511984,
+     "sems_off": 164.24439364791166,
+     "rel_err": 0.13100140307890654
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=250 t=125",
+     "truth": 0.7788843571255124,
+     "sem": 0.0009065715876976724,
+     "sems_off": 243.90312455746874,
+     "rel_err": 0.28388764115191517
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=250 t=250",
+     "truth": 0.6048781606925488,
+     "sem": 0.0011712240435696895,
+     "sems_off": 337.35803280061407,
+     "rel_err": 0.6532255005785969
+    },
+    {
+     "lean": 1.0,
+     "design": "Ne=250 t=500",
+     "truth": 0.36591087515969484,
+     "sem": 0.0010188600730097598,
+     "sems_off": 622.3515295551591,
+     "rel_err": 1.732905928427432
+    }
+   ]
+  }
+ ]
+}

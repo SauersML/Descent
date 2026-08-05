@@ -1,0 +1,273 @@
+{
+ "_battery_sha": "1e60b1640fe745a1",
+ "results": [
+  {
+   "name": "migrationLDBoost",
+   "file": "DGP.lean",
+   "source": "1 + bigM * tau / (1 + bigM)",
+   "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "span": 0.39898989898989895,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=1.0 bigM=16.0",
+    "lean": 1.9411764705882353,
+    "truth": 1.1972292442878267,
+    "sem": 0.04766044834181859,
+    "sems_off": 15.60932077190824,
+    "rel_err": 0.6213907903184794
+   },
+   "cells": [
+    {
+     "design": "tau=0.5 bigM=0.5",
+     "lean": 1.1666666666666667,
+     "truth": 1.0238048340411292,
+     "sem": 0.019894492572888077,
+     "sems_off": 7.180973935481398,
+     "rel_err": 0.1395401036168563
+    },
+    {
+     "design": "tau=0.5 bigM=4.0",
+     "lean": 1.4,
+     "truth": 1.1269174415718926,
+     "sem": 0.020951837778409046,
+     "sems_off": 13.033823634770599,
+     "rel_err": 0.24232703155893595
+    },
+    {
+     "design": "tau=0.5 bigM=16.0",
+     "lean": 1.4705882352941178,
+     "truth": 1.1738649999784971,
+     "sem": 0.0210621416938201,
+     "sems_off": 14.087989703472699,
+     "rel_err": 0.2527745825295549
+    },
+    {
+     "design": "tau=1.0 bigM=0.5",
+     "lean": 1.3333333333333333,
+     "truth": 1.0111518215851947,
+     "sem": 0.041721533510838175,
+     "sems_off": 7.722187672330984,
+     "rel_err": 0.31862822661294404
+    },
+    {
+     "design": "tau=1.0 bigM=4.0",
+     "lean": 1.8,
+     "truth": 1.145615145259064,
+     "sem": 0.04579560594968111,
+     "sems_off": 14.289249834579223,
+     "rel_err": 0.5712082783201654
+    },
+    {
+     "design": "tau=1.0 bigM=16.0",
+     "lean": 1.9411764705882353,
+     "truth": 1.1972292442878267,
+     "sem": 0.04766044834181859,
+     "sems_off": 15.60932077190824,
+     "rel_err": 0.6213907903184794
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBoost [no restoration at all, competing]",
+   "file": "DGP.lean",
+   "source": "1",
+   "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "span": 0.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=0.5 bigM=16.0",
+    "lean": 1.0,
+    "truth": 1.1738649999784971,
+    "sem": 0.0210621416938201,
+    "sems_off": 8.254858527967805,
+    "rel_err": 0.14811328387990272
+   },
+   "cells": [
+    {
+     "design": "tau=0.5 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0238048340411292,
+     "sem": 0.019894492572888077,
+     "sems_off": 1.1965539685877733,
+     "rel_err": 0.02325133975698038
+    },
+    {
+     "design": "tau=0.5 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.1269174415718926,
+     "sem": 0.020951837778409046,
+     "sems_off": 6.057580385749334,
+     "rel_err": 0.11262354888647427
+    },
+    {
+     "design": "tau=0.5 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.1738649999784971,
+     "sem": 0.0210621416938201,
+     "sems_off": 8.254858527967805,
+     "rel_err": 0.14811328387990272
+    },
+    {
+     "design": "tau=1.0 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0111518215851947,
+     "sem": 0.041721533510838175,
+     "sems_off": 0.26729174713335313,
+     "rel_err": 0.011028830040291905
+    },
+    {
+     "design": "tau=1.0 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.145615145259064,
+     "sem": 0.04579560594968111,
+     "sems_off": 3.179675041729149,
+     "rel_err": 0.12710651204435258
+    },
+    {
+     "design": "tau=1.0 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.1972292442878267,
+     "sem": 0.04766044834181859,
+     "sems_off": 4.138216301980784,
+     "rel_err": 0.1647380777147227
+    }
+   ]
+  },
+  {
+   "name": "migrationSharedBoostAt",
+   "file": "PortabilityDrift.lean",
+   "source": "1 + bigM * tauAt t / (1 + bigM)",
+   "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; this is migrationLDBoost at generation t, so the same cells measure both",
+   "span": 0.39898989898989895,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=1.0 bigM=16.0",
+    "lean": 1.9411764705882353,
+    "truth": 1.1972292442878267,
+    "sem": 0.04766044834181859,
+    "sems_off": 15.60932077190824,
+    "rel_err": 0.6213907903184794
+   },
+   "cells": [
+    {
+     "design": "tau=0.5 bigM=0.5",
+     "lean": 1.1666666666666667,
+     "truth": 1.0238048340411292,
+     "sem": 0.019894492572888077,
+     "sems_off": 7.180973935481398,
+     "rel_err": 0.1395401036168563
+    },
+    {
+     "design": "tau=0.5 bigM=4.0",
+     "lean": 1.4,
+     "truth": 1.1269174415718926,
+     "sem": 0.020951837778409046,
+     "sems_off": 13.033823634770599,
+     "rel_err": 0.24232703155893595
+    },
+    {
+     "design": "tau=0.5 bigM=16.0",
+     "lean": 1.4705882352941178,
+     "truth": 1.1738649999784971,
+     "sem": 0.0210621416938201,
+     "sems_off": 14.087989703472699,
+     "rel_err": 0.2527745825295549
+    },
+    {
+     "design": "tau=1.0 bigM=0.5",
+     "lean": 1.3333333333333333,
+     "truth": 1.0111518215851947,
+     "sem": 0.041721533510838175,
+     "sems_off": 7.722187672330984,
+     "rel_err": 0.31862822661294404
+    },
+    {
+     "design": "tau=1.0 bigM=4.0",
+     "lean": 1.8,
+     "truth": 1.145615145259064,
+     "sem": 0.04579560594968111,
+     "sems_off": 14.289249834579223,
+     "rel_err": 0.5712082783201654
+    },
+    {
+     "design": "tau=1.0 bigM=16.0",
+     "lean": 1.9411764705882353,
+     "truth": 1.1972292442878267,
+     "sem": 0.04766044834181859,
+     "sems_off": 15.60932077190824,
+     "rel_err": 0.6213907903184794
+    }
+   ]
+  },
+  {
+   "name": "migrationSharedBoostAt [no restoration at all, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1",
+   "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "span": 0.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=0.5 bigM=16.0",
+    "lean": 1.0,
+    "truth": 1.1738649999784971,
+    "sem": 0.0210621416938201,
+    "sems_off": 8.254858527967805,
+    "rel_err": 0.14811328387990272
+   },
+   "cells": [
+    {
+     "design": "tau=0.5 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0238048340411292,
+     "sem": 0.019894492572888077,
+     "sems_off": 1.1965539685877733,
+     "rel_err": 0.02325133975698038
+    },
+    {
+     "design": "tau=0.5 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.1269174415718926,
+     "sem": 0.020951837778409046,
+     "sems_off": 6.057580385749334,
+     "rel_err": 0.11262354888647427
+    },
+    {
+     "design": "tau=0.5 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.1738649999784971,
+     "sem": 0.0210621416938201,
+     "sems_off": 8.254858527967805,
+     "rel_err": 0.14811328387990272
+    },
+    {
+     "design": "tau=1.0 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0111518215851947,
+     "sem": 0.041721533510838175,
+     "sems_off": 0.26729174713335313,
+     "rel_err": 0.011028830040291905
+    },
+    {
+     "design": "tau=1.0 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.145615145259064,
+     "sem": 0.04579560594968111,
+     "sems_off": 3.179675041729149,
+     "rel_err": 0.12710651204435258
+    },
+    {
+     "design": "tau=1.0 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.1972292442878267,
+     "sem": 0.04766044834181859,
+     "sems_off": 4.138216301980784,
+     "rel_err": 0.1647380777147227
+    }
+   ]
+  }
+ ]
+}

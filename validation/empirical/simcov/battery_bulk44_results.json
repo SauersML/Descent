@@ -1,0 +1,503 @@
+{
+ "_battery_sha": "6babf99ce343efe5",
+ "results": [
+  {
+   "name": "spikeAndSlabPriorVariance",
+   "file": "BayesianPGSTheory.lean",
+   "source": "pi * sigma_slab^2",
+   "note": "",
+   "regime": "6e6 draws in 30 independent blocks of 2e5 from the two COMPONENTS -- a point mass at zero with weight 1-pi and a Gaussian slab with weight pi. The body generates nothing; what is on trial is the combination rule. pi and the slab sd move in OPPOSITE directions across the design so the product is under test rather than either factor. The across-block sem is inflated threefold because a spike-and-slab is heavy-tailed at small pi",
+   "span": 0.64,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "pi=0.50 sd=1.0",
+    "lean": 0.5,
+    "truth": 0.5010782754672574,
+    "sem": 0.0013778100678296821,
+    "sems_off": 0.7826009494587699,
+    "rel_err": 0.002151910230496154
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 sd=1.0",
+     "lean": 0.5,
+     "truth": 0.5010782754672574,
+     "sem": 0.0013778100678296821,
+     "sems_off": 0.7826009494587699,
+     "rel_err": 0.002151910230496154
+    },
+    {
+     "design": "pi=0.10 sd=2.0",
+     "lean": 0.4,
+     "truth": 0.3997825465500305,
+     "sem": 0.0024595895632978128,
+     "sems_off": 0.08841046214148797,
+     "rel_err": 0.0005439293231935205
+    },
+    {
+     "design": "pi=0.02 sd=3.0",
+     "lean": 0.18,
+     "truth": 0.17983927750481374,
+     "sem": 0.002310041426928264,
+     "sems_off": 0.06957558999276173,
+     "rel_err": 0.0008937007388831014
+    },
+    {
+     "design": "pi=0.80 sd=0.5",
+     "lean": 0.2,
+     "truth": 0.1998114988899255,
+     "sem": 0.0004042129929847601,
+     "sems_off": 0.4663410462949162,
+     "rel_err": 0.0009433947051183292
+    }
+   ]
+  },
+  {
+   "name": "spikeAndSlabPriorVariance [slab sd unsquared, competing]",
+   "file": "BayesianPGSTheory.lean",
+   "source": "pi * sigma_slab",
+   "note": "positive control 'pi=0.50 sd=1.0 [counted slab fraction]' passed at 0.02 sems",
+   "regime": "6e6 draws in 30 independent blocks of 2e5 from the two COMPONENTS -- a point mass at zero with weight 1-pi and a Gaussian slab with weight pi. The body generates nothing; what is on trial is the combination rule. pi and the slab sd move in OPPOSITE directions across the design so the product is under test rather than either factor. The across-block sem is inflated threefold because a spike-and-slab is heavy-tailed at small pi",
+   "span": 0.88,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi=0.80 sd=0.5",
+    "lean": 0.4,
+    "truth": 0.1998114988899255,
+    "sem": 0.0004042129929847601,
+    "sems_off": 495.25498829678185,
+    "rel_err": 1.0018867894102366
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 sd=1.0",
+     "lean": 0.5,
+     "truth": 0.5010782754672574,
+     "sem": 0.0013778100678296821,
+     "sems_off": 0.7826009494587699,
+     "rel_err": 0.002151910230496154
+    },
+    {
+     "design": "pi=0.10 sd=2.0",
+     "lean": 0.2,
+     "truth": 0.3997825465500305,
+     "sem": 0.0024595895632978128,
+     "sems_off": 81.22596937765601,
+     "rel_err": 0.49972803533840326
+    },
+    {
+     "design": "pi=0.02 sd=3.0",
+     "lean": 0.06,
+     "truth": 0.17983927750481374,
+     "sem": 0.002310041426928264,
+     "sems_off": 51.87754475215964,
+     "rel_err": 0.6663687664203723
+    },
+    {
+     "design": "pi=0.80 sd=0.5",
+     "lean": 0.4,
+     "truth": 0.1998114988899255,
+     "sem": 0.0004042129929847601,
+     "sems_off": 495.25498829678185,
+     "rel_err": 1.0018867894102366
+    }
+   ]
+  },
+  {
+   "name": "spikeAndSlabPriorVariance [mixture weight dropped, competing]",
+   "file": "BayesianPGSTheory.lean",
+   "source": "sigma_slab^2",
+   "note": "positive control 'pi=0.50 sd=1.0 [counted slab fraction]' passed at 0.02 sems",
+   "regime": "6e6 draws in 30 independent blocks of 2e5 from the two COMPONENTS -- a point mass at zero with weight 1-pi and a Gaussian slab with weight pi. The body generates nothing; what is on trial is the combination rule. pi and the slab sd move in OPPOSITE directions across the design so the product is under test rather than either factor. The across-block sem is inflated threefold because a spike-and-slab is heavy-tailed at small pi",
+   "span": 0.9722222222222222,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi=0.02 sd=3.0",
+    "lean": 9.0,
+    "truth": 0.17983927750481374,
+    "sem": 0.002310041426928264,
+    "sems_off": 3818.1829207381948,
+    "rel_err": 49.04468503694416
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 sd=1.0",
+     "lean": 1.0,
+     "truth": 0.5010782754672574,
+     "sem": 0.0013778100678296821,
+     "sems_off": 362.1121199372865,
+     "rel_err": 0.9956961795390077
+    },
+    {
+     "design": "pi=0.10 sd=2.0",
+     "lean": 4.0,
+     "truth": 0.3997825465500305,
+     "sem": 0.0024595895632978128,
+     "sems_off": 1463.7472475784964,
+     "rel_err": 9.005439293231934
+    },
+    {
+     "design": "pi=0.02 sd=3.0",
+     "lean": 9.0,
+     "truth": 0.17983927750481374,
+     "sem": 0.002310041426928264,
+     "sems_off": 3818.1829207381948,
+     "rel_err": 49.04468503694416
+    },
+    {
+     "design": "pi=0.80 sd=0.5",
+     "lean": 0.25,
+     "truth": 0.1998114988899255,
+     "sem": 0.0004042129929847601,
+     "sems_off": 124.16350285891662,
+     "rel_err": 0.25117924338139785
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-(m / 2) * log(1 - rho^2)",
+   "note": "",
+   "regime": "400000 Gaussian pairs per cell in 20 independent blocks; m and rho are swept INDEPENDENTLY (m in 1, 4, 10 and rho in 0.3, 0.5, 0.7, 0.9). The oracle is (m/2) log(Var / Var_residual) from two MEASURED variances per coordinate -- rho enters the prediction and nothing else. This measures the body as a function of the GAUSSIAN MODEL; whether real effect vectors are in that family is the separate question battery_mi01 answers",
+   "span": 0.9943211352274318,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "m=1 rho=0.7",
+    "lean": 0.3366722766318828,
+    "truth": 0.3334500346089676,
+    "sem": 0.0010582195415966614,
+    "sems_off": 3.0449655258240957,
+    "rel_err": 0.009663342895417275
+   },
+   "cells": [
+    {
+     "design": "m=1 rho=0.3",
+     "lean": 0.047155339735620645,
+     "truth": 0.047183976133446416,
+     "sem": 0.0004801584609593699,
+     "sems_off": 0.059639473536620725,
+     "rel_err": 0.0006069093826425521
+    },
+    {
+     "design": "m=1 rho=0.5",
+     "lean": 0.14384103622589045,
+     "truth": 0.14363027796473662,
+     "sem": 0.0009471505853295186,
+     "sems_off": 0.22251821876930186,
+     "rel_err": 0.0014673665200701652
+    },
+    {
+     "design": "m=1 rho=0.7",
+     "lean": 0.3366722766318828,
+     "truth": 0.3334500346089676,
+     "sem": 0.0010582195415966614,
+     "sems_off": 3.0449655258240957,
+     "rel_err": 0.009663342895417275
+    },
+    {
+     "design": "m=1 rho=0.9",
+     "lean": 0.8303656034108255,
+     "truth": 0.8304172333431754,
+     "sem": 0.0017485057737505747,
+     "sems_off": 0.029528030804905136,
+     "rel_err": 6.217348373420021e-05
+    },
+    {
+     "design": "m=4 rho=0.3",
+     "lean": 0.18862135894248258,
+     "truth": 0.18884487898049312,
+     "sem": 0.000971127999350262,
+     "sems_off": 0.23016537280367902,
+     "rel_err": 0.0011836171529630553
+    },
+    {
+     "design": "m=4 rho=0.5",
+     "lean": 0.5753641449035618,
+     "truth": 0.574262484584947,
+     "sem": 0.001931116642832369,
+     "sems_off": 0.5704783927494924,
+     "rel_err": 0.001918391586055007
+    },
+    {
+     "design": "m=4 rho=0.7",
+     "lean": 1.3466891065275313,
+     "truth": 1.345815230282321,
+     "sem": 0.002036030824498916,
+     "sems_off": 0.42920580312204276,
+     "rel_err": 0.0006493285449199242
+    },
+    {
+     "design": "m=4 rho=0.9",
+     "lean": 3.321462413643302,
+     "truth": 3.317807963490897,
+     "sem": 0.0031076507184598255,
+     "sems_off": 1.1759526676203649,
+     "rel_err": 0.0011014652422981328
+    },
+    {
+     "design": "m=10 rho=0.3",
+     "lean": 0.47155339735620644,
+     "truth": 0.4695115252858585,
+     "sem": 0.0014629973800399083,
+     "sems_off": 1.3956771886305432,
+     "rel_err": 0.004348928536109463
+    },
+    {
+     "design": "m=10 rho=0.5",
+     "lean": 1.4384103622589044,
+     "truth": 1.4338642678917894,
+     "sem": 0.0025975318753867116,
+     "sems_off": 1.750159222372639,
+     "rel_err": 0.003170519322445403
+    },
+    {
+     "design": "m=10 rho=0.7",
+     "lean": 3.366722766318828,
+     "truth": 3.3699833552165592,
+     "sem": 0.003165429644917101,
+     "sems_off": 1.0300620337484885,
+     "rel_err": 0.0009675385763208126
+    },
+    {
+     "design": "m=10 rho=0.9",
+     "lean": 8.303656034108256,
+     "truth": 8.296805516730961,
+     "sem": 0.004615902751401437,
+     "sems_off": 1.4841121544891556,
+     "rel_err": 0.0008256813255993966
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation [factor 1/2 dropped, competing]",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-m * log(1 - rho^2)",
+   "note": "positive control 'm=1 rho=0.3 [realised per-coordinate correlation]' passed at 0.00 sems",
+   "regime": "400000 Gaussian pairs per cell in 20 independent blocks; m and rho are swept INDEPENDENTLY (m in 1, 4, 10 and rho in 0.3, 0.5, 0.7, 0.9). The oracle is (m/2) log(Var / Var_residual) from two MEASURED variances per coordinate -- rho enters the prediction and nothing else. This measures the body as a function of the GAUSSIAN MODEL; whether real effect vectors are in that family is the separate question battery_mi01 answers",
+   "span": 0.9943211352274318,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "m=10 rho=0.9",
+    "lean": 16.607312068216512,
+    "truth": 8.296805516730961,
+    "sem": 0.004615902751401437,
+    "sems_off": 1800.407634013172,
+    "rel_err": 1.0016513626511987
+   },
+   "cells": [
+    {
+     "design": "m=1 rho=0.3",
+     "lean": 0.09431067947124129,
+     "truth": 0.047183976133446416,
+     "sem": 0.0004801584609593699,
+     "sems_off": 98.1482305729538,
+     "rel_err": 0.9987861812347149
+    },
+    {
+     "design": "m=1 rho=0.5",
+     "lean": 0.2876820724517809,
+     "truth": 0.14363027796473662,
+     "sem": 0.0009471505853295186,
+     "sems_off": 152.08964310245125,
+     "rel_err": 1.0029347330401404
+    },
+    {
+     "design": "m=1 rho=0.7",
+     "lean": 0.6733445532637656,
+     "truth": 0.3334500346089676,
+     "sem": 0.0010582195415966614,
+     "sems_off": 321.1947098821846,
+     "rel_err": 1.0193266857908345
+    },
+    {
+     "design": "m=1 rho=0.9",
+     "lean": 1.660731206821651,
+     "truth": 0.8304172333431754,
+     "sem": 0.0017485057737505747,
+     "sems_off": 474.87059290484245,
+     "rel_err": 0.9998756530325316
+    },
+    {
+     "design": "m=4 rho=0.3",
+     "lean": 0.37724271788496516,
+     "truth": 0.18884487898049312,
+     "sem": 0.000971127999350262,
+     "sems_off": 193.99897750916517,
+     "rel_err": 0.9976327656940739
+    },
+    {
+     "design": "m=4 rho=0.5",
+     "lean": 1.1507282898071236,
+     "truth": 0.574262484584947,
+     "sem": 0.001931116642832369,
+     "sems_off": 298.514233908043,
+     "rel_err": 1.00383678317211
+    },
+    {
+     "design": "m=4 rho=0.7",
+     "lean": 2.6933782130550625,
+     "truth": 1.345815230282321,
+     "sem": 0.002036030824498916,
+     "sems_off": 661.8578493792636,
+     "rel_err": 1.00129865708984
+    },
+    {
+     "design": "m=4 rho=0.9",
+     "lean": 6.642924827286604,
+     "truth": 3.317807963490897,
+     "sem": 0.0031076507184598255,
+     "sems_off": 1069.9776664230978,
+     "rel_err": 1.0022029304845963
+    },
+    {
+     "design": "m=10 rho=0.3",
+     "lean": 0.9431067947124129,
+     "truth": 0.4695115252858585,
+     "sem": 0.0014629973800399083,
+     "sems_off": 323.7157331161013,
+     "rel_err": 1.008697857072219
+    },
+    {
+     "design": "m=10 rho=0.5",
+     "lean": 2.876820724517809,
+     "truth": 1.4338642678917894,
+     "sem": 0.0025975318753867116,
+     "sems_off": 555.5105869148177,
+     "rel_err": 1.0063410386448908
+    },
+    {
+     "design": "m=10 rho=0.7",
+     "lean": 6.733445532637656,
+     "truth": 3.3699833552165592,
+     "sem": 0.003165429644917101,
+     "sems_off": 1062.5610279546056,
+     "rel_err": 0.9980649228473584
+    },
+    {
+     "design": "m=10 rho=0.9",
+     "lean": 16.607312068216512,
+     "truth": 8.296805516730961,
+     "sem": 0.004615902751401437,
+     "sems_off": 1800.407634013172,
+     "rel_err": 1.0016513626511987
+    }
+   ]
+  },
+  {
+   "name": "effectMutualInformation [rho unsquared in the log, competing]",
+   "file": "MultiAncestryTheory.lean",
+   "source": "-(m / 2) * log(1 - rho)",
+   "note": "positive control 'm=1 rho=0.3 [realised per-coordinate correlation]' passed at 0.00 sems",
+   "regime": "400000 Gaussian pairs per cell in 20 independent blocks; m and rho are swept INDEPENDENTLY (m in 1, 4, 10 and rho in 0.3, 0.5, 0.7, 0.9). The oracle is (m/2) log(Var / Var_residual) from two MEASURED variances per coordinate -- rho enters the prediction and nothing else. This measures the body as a function of the GAUSSIAN MODEL; whether real effect vectors are in that family is the separate question battery_mi01 answers",
+   "span": 0.9845098040014257,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "m=10 rho=0.3",
+    "lean": 1.7833747196936622,
+    "truth": 0.4695115252858585,
+    "sem": 0.0014629973800399083,
+    "sems_off": 898.062575048469,
+    "rel_err": 2.798361964826887
+   },
+   "cells": [
+    {
+     "design": "m=1 rho=0.3",
+     "lean": 0.17833747196936622,
+     "truth": 0.047183976133446416,
+     "sem": 0.0004801584609593699,
+     "sems_off": 273.14627669763746,
+     "rel_err": 2.779619408610024
+    },
+    {
+     "design": "m=1 rho=0.5",
+     "lean": 0.34657359027997264,
+     "truth": 0.14363027796473662,
+     "sem": 0.0009471505853295186,
+     "sems_off": 214.26720888804707,
+     "rel_err": 1.4129563431260757
+    },
+    {
+     "design": "m=1 rho=0.7",
+     "lean": 0.601986402162968,
+     "truth": 0.3334500346089676,
+     "sem": 0.0010582195415966614,
+     "sems_off": 253.76243491858756,
+     "rel_err": 0.8053271545432866
+    },
+    {
+     "design": "m=1 rho=0.9",
+     "lean": 1.151292546497023,
+     "truth": 0.8304172333431754,
+     "sem": 0.0017485057737505747,
+     "sems_off": 183.51401406331334,
+     "rel_err": 0.3864025218528235
+    },
+    {
+     "design": "m=4 rho=0.3",
+     "lean": 0.7133498878774649,
+     "truth": 0.18884487898049312,
+     "sem": 0.000971127999350262,
+     "sems_off": 540.0987400712311,
+     "rel_err": 2.777438349022697
+    },
+    {
+     "design": "m=4 rho=0.5",
+     "lean": 1.3862943611198906,
+     "truth": 0.574262484584947,
+     "sem": 0.001931116642832369,
+     "sems_off": 420.498616460545,
+     "rel_err": 1.4140430523192655
+    },
+    {
+     "design": "m=4 rho=0.7",
+     "lean": 2.407945608651872,
+     "truth": 1.345815230282321,
+     "sem": 0.002036030824498916,
+     "sems_off": 521.6671405900497,
+     "rel_err": 0.789209658555239
+    },
+    {
+     "design": "m=4 rho=0.9",
+     "lean": 4.605170185988092,
+     "truth": 3.317807963490897,
+     "sem": 0.0031076507184598255,
+     "sems_off": 414.25576396025,
+     "rel_err": 0.38801589382607643
+    },
+    {
+     "design": "m=10 rho=0.3",
+     "lean": 1.7833747196936622,
+     "truth": 0.4695115252858585,
+     "sem": 0.0014629973800399083,
+     "sems_off": 898.062575048469,
+     "rel_err": 2.798361964826887
+    },
+    {
+     "design": "m=10 rho=0.5",
+     "lean": 3.4657359027997265,
+     "truth": 1.4338642678917894,
+     "sem": 0.0025975318753867116,
+     "sems_off": 782.2316461873789,
+     "rel_err": 1.4170599549812326
+    },
+    {
+     "design": "m=10 rho=0.7",
+     "lean": 6.0198640216296795,
+     "truth": 3.3699833552165592,
+     "sem": 0.003165429644917101,
+     "sems_off": 837.1314366971242,
+     "rel_err": 0.7863186215181872
+    },
+    {
+     "design": "m=10 rho=0.9",
+     "lean": 11.51292546497023,
+     "truth": 8.296805516730961,
+     "sem": 0.004615902751401437,
+     "sems_off": 696.7477699270898,
+     "rel_err": 0.3876335225351237
+    }
+   ]
+  }
+ ]
+}

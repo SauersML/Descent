@@ -1,0 +1,311 @@
+{
+ "_battery_sha": "56b793fc94704092",
+ "results": [
+  {
+   "name": "selectedDriftFactor",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - 1 / (2 * Ne) + s_correction)^t at s_correction = 0",
+   "note": "",
+   "regime": "forward Wright-Fisher over 3000 replicate populations of 400 independent biallelic loci, mutation rate ZERO, heterozygosity averaged over ALL loci including fixed ones; the observable is the realised H_t/H_0, which IS the drift factor. Ne in 50, 100, 200 and t in 30, 40, 80, 120 swept independently, with (Ne, t) = (100, 40) and (200, 80) reaching nearly the same factor by different routes so a body depending on them separately would separate there. s_correction is held at ZERO: it has no operational definition, so no simulation can set it without inventing one",
+   "span": 0.3305204110867948,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=80",
+    "lean": 0.8185257542796961,
+    "truth": 0.8180051931393654,
+    "sem": 0.0003676106182012285,
+    "sems_off": 1.416066660092416,
+    "rel_err": 0.0006363787720379824
+   },
+   "cells": [
+    {
+     "design": "Ne=50 t=30",
+     "lean": 0.7397003733882802,
+     "truth": 0.739600114524755,
+     "sem": 0.0004107900952384599,
+     "sems_off": 0.24406348811054135,
+     "rel_err": 0.00013555820443535675
+    },
+    {
+     "design": "Ne=100 t=40",
+     "lean": 0.8183201210226743,
+     "truth": 0.8184511893043788,
+     "sem": 0.0003647484288427543,
+     "sems_off": 0.35933885204207283,
+     "rel_err": 0.00016014184280910274
+    },
+    {
+     "design": "Ne=200 t=80",
+     "lean": 0.8185257542796961,
+     "truth": 0.8180051931393654,
+     "sem": 0.0003676106182012285,
+     "sems_off": 1.416066660092416,
+     "rel_err": 0.0006363787720379824
+    },
+    {
+     "design": "Ne=100 t=120",
+     "lean": 0.5479862854900421,
+     "truth": 0.5475661344186907,
+     "sem": 0.0004664949573356559,
+     "sems_off": 0.9006551190843726,
+     "rel_err": 0.0007673065314702979
+    }
+   ]
+  },
+  {
+   "name": "selectedDriftFactor [haploid slip (1 - 1/Ne)^t, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - 1 / Ne)^t",
+   "note": "positive control 'Ne=100 t=120 [E[p_t]/p_0, martingale]' passed at 0.47 sems",
+   "regime": "forward Wright-Fisher over 3000 replicate populations of 400 independent biallelic loci, mutation rate ZERO, heterozygosity averaged over ALL loci including fixed ones; the observable is the realised H_t/H_0, which IS the drift factor. Ne in 50, 100, 200 and t in 30, 40, 80, 120 swept independently, with (Ne, t) = (100, 40) and (200, 80) reaching nearly the same factor by different routes so a body depending on them separately would separate there. s_correction is held at ZERO: it has no operational definition, so no simulation can set it without inventing one",
+   "span": 0.5529285959566694,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=100 t=120",
+    "lean": 0.2993803913123313,
+    "truth": 0.5475661344186907,
+    "sem": 0.0004664949573356559,
+    "sems_off": 532.0223492314901,
+    "rel_err": 0.45325254340252313
+   },
+   "cells": [
+    {
+     "design": "Ne=50 t=30",
+     "lean": 0.5454843193824369,
+     "truth": 0.739600114524755,
+     "sem": 0.0004107900952384599,
+     "sems_off": 472.5425403201012,
+     "rel_err": 0.26246047199039596
+    },
+    {
+     "design": "Ne=100 t=40",
+     "lean": 0.6689717585696803,
+     "truth": 0.8184511893043788,
+     "sem": 0.0003647484288427543,
+     "sems_off": 409.81514631592876,
+     "rel_err": 0.1826369521947236
+    },
+    {
+     "design": "Ne=200 t=80",
+     "lean": 0.6696478204705641,
+     "truth": 0.8180051931393654,
+     "sem": 0.0003676106182012285,
+     "sems_off": 403.57205511292125,
+     "rel_err": 0.18136482984836655
+    },
+    {
+     "design": "Ne=100 t=120",
+     "lean": 0.2993803913123313,
+     "truth": 0.5475661344186907,
+     "sem": 0.0004664949573356559,
+     "sems_off": 532.0223492314901,
+     "rel_err": 0.45325254340252313
+    }
+   ]
+  },
+  {
+   "name": "fstFromDriftFactor",
+   "file": "PhenomeWidePortability.lean",
+   "source": "1 - driftFactor",
+   "note": "",
+   "regime": "forward Wright-Fisher over 3000 replicate populations of 400 independent biallelic loci, mutation rate ZERO, heterozygosity averaged over ALL loci including fixed ones; the observable is the realised H_t/H_0, which IS the drift factor. Ne in 50, 100, 200 and t in 30, 40, 80, 120 swept independently, with (Ne, t) = (100, 40) and (200, 80) reaching nearly the same factor by different routes so a body depending on them separately would separate there. s_correction is held at ZERO: it has no operational definition, so no simulation can set it without inventing one; read as the LOSS 1 - H_t/H_0, which is the PER-BRANCH drift coefficient and not a pairwise F_ST",
+   "span": 0.5985204875541315,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=80",
+    "lean": 0.1814742457203039,
+    "truth": 0.18199480686063463,
+    "sem": 0.0003676106182012285,
+    "sems_off": 1.416066660092416,
+    "rel_err": 0.002860307661027657
+   },
+   "cells": [
+    {
+     "design": "Ne=50 t=30",
+     "lean": 0.2602996266117198,
+     "truth": 0.26039988547524495,
+     "sem": 0.0004107900952384599,
+     "sems_off": 0.24406348811054135,
+     "rel_err": 0.0003850188464644742
+    },
+    {
+     "design": "Ne=100 t=40",
+     "lean": 0.18167987897732574,
+     "truth": 0.18154881069562123,
+     "sem": 0.0003647484288427543,
+     "sems_off": 0.35933885204207283,
+     "rel_err": 0.0007219451408263411
+    },
+    {
+     "design": "Ne=200 t=80",
+     "lean": 0.1814742457203039,
+     "truth": 0.18199480686063463,
+     "sem": 0.0003676106182012285,
+     "sems_off": 1.416066660092416,
+     "rel_err": 0.002860307661027657
+    },
+    {
+     "design": "Ne=100 t=120",
+     "lean": 0.45201371450995786,
+     "truth": 0.45243386558130927,
+     "sem": 0.0004664949573356559,
+     "sems_off": 0.9006551190843726,
+     "rel_err": 0.0009286463797566828
+    }
+   ]
+  },
+  {
+   "name": "fstFromDriftFactor [haploid drift factor, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "1 - (1 - 1 / Ne)^t",
+   "note": "positive control 'Ne=100 t=120 [E[p_t]/p_0, martingale]' passed at 0.47 sems",
+   "regime": "forward Wright-Fisher over 3000 replicate populations of 400 independent biallelic loci, mutation rate ZERO, heterozygosity averaged over ALL loci including fixed ones; the observable is the realised H_t/H_0, which IS the drift factor. Ne in 50, 100, 200 and t in 30, 40, 80, 120 swept independently, with (Ne, t) = (100, 40) and (200, 80) reaching nearly the same factor by different routes so a body depending on them separately would separate there. s_correction is held at ZERO: it has no operational definition, so no simulation can set it without inventing one; read as the LOSS",
+   "span": 0.5284856783437465,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=100 t=120",
+    "lean": 0.7006196086876687,
+    "truth": 0.45243386558130927,
+    "sem": 0.0004664949573356559,
+    "sems_off": 532.0223492314901,
+    "rel_err": 0.5485569538157321
+   },
+   "cells": [
+    {
+     "design": "Ne=50 t=30",
+     "lean": 0.4545156806175631,
+     "truth": 0.26039988547524495,
+     "sem": 0.0004107900952384599,
+     "sems_off": 472.5425403201012,
+     "rel_err": 0.7454526901501723
+    },
+    {
+     "design": "Ne=100 t=40",
+     "lean": 0.3310282414303197,
+     "truth": 0.18154881069562123,
+     "sem": 0.0003647484288427543,
+     "sems_off": 409.81514631592876,
+     "rel_err": 0.8233567059015925
+    },
+    {
+     "design": "Ne=200 t=80",
+     "lean": 0.33035217952943585,
+     "truth": 0.18199480686063463,
+     "sem": 0.0003676106182012285,
+     "sems_off": 403.57205511292125,
+     "rel_err": 0.8151736592264867
+    },
+    {
+     "design": "Ne=100 t=120",
+     "lean": 0.7006196086876687,
+     "truth": 0.45243386558130927,
+     "sem": 0.0004664949573356559,
+     "sems_off": 532.0223492314901,
+     "rel_err": 0.5485569538157321
+    }
+   ]
+  },
+  {
+   "name": "prevalenceDGP_trueExpectation",
+   "file": "DGP.lean",
+   "source": "prevalence c + pgs_effect * p",
+   "note": "",
+   "regime": "3e6 binary outcomes per cell in 30 independent blocks of 1e5, drawn at the stated conditional rate; the observable is the realised mean. p is swept AWAY from zero, where the additive and multiplicative readings coincide, and one cell gives beta a NEGATIVE sign where the two move the prevalence in different directions",
+   "span": 0.7500000000000001,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prev=0.10 beta=+0.20 p=0.8",
+    "lean": 0.26,
+    "truth": 0.26020566666666667,
+    "sem": 0.00024172782420765857,
+    "sems_off": 0.8508191696210349,
+    "rel_err": 0.0007904004140314375
+   },
+   "cells": [
+    {
+     "design": "prev=0.10 beta=+0.20 p=0.8",
+     "lean": 0.26,
+     "truth": 0.26020566666666667,
+     "sem": 0.00024172782420765857,
+     "sems_off": 0.8508191696210349,
+     "rel_err": 0.0007904004140314375
+    },
+    {
+     "design": "prev=0.30 beta=+0.15 p=1.5",
+     "lean": 0.5249999999999999,
+     "truth": 0.5251326666666667,
+     "sem": 0.00036597843455508206,
+     "sems_off": 0.3624985904649354,
+     "rel_err": 0.0002526345723432063
+    },
+    {
+     "design": "prev=0.50 beta=-0.25 p=1.2",
+     "lean": 0.2,
+     "truth": 0.20004800000000003,
+     "sem": 0.00022764481307409649,
+     "sems_off": 0.21085479327129078,
+     "rel_err": 0.0002399424138207842
+    },
+    {
+     "design": "prev=0.20 beta=+0.30 p=2.0",
+     "lean": 0.8,
+     "truth": 0.7999196666666667,
+     "sem": 0.00020717113994486128,
+     "sems_off": 0.3877631476794001,
+     "rel_err": 0.00010042675118628443
+    }
+   ]
+  },
+  {
+   "name": "prevalenceDGP_trueExpectation [multiplicative shift, competing]",
+   "file": "DGP.lean",
+   "source": "prevalence c * (1 + pgs_effect * p)",
+   "note": "positive control 'p=0 [realised rate recovers prevalence]' passed at 0.27 sems",
+   "regime": "3e6 binary outcomes per cell in 30 independent blocks of 1e5, drawn at the stated conditional rate; the observable is the realised mean. p is swept AWAY from zero, where the additive and multiplicative readings coincide, and one cell gives beta a NEGATIVE sign where the two move the prevalence in different directions",
+   "span": 0.6843537414965986,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prev=0.20 beta=+0.30 p=2.0",
+    "lean": 0.32000000000000006,
+    "truth": 0.7999196666666667,
+    "sem": 0.00020717113994486128,
+    "sems_off": 2316.5372686292,
+    "rel_err": 0.5999598292995254
+   },
+   "cells": [
+    {
+     "design": "prev=0.10 beta=+0.20 p=0.8",
+     "lean": 0.11600000000000002,
+     "truth": 0.26020566666666667,
+     "sem": 0.00024172782420765857,
+     "sems_off": 596.5621340420679,
+     "rel_err": 0.5541987940308755
+    },
+    {
+     "design": "prev=0.30 beta=+0.15 p=1.5",
+     "lean": 0.3675,
+     "truth": 0.5251326666666667,
+     "sem": 0.00036597843455508206,
+     "sems_off": 430.7157247073857,
+     "rel_err": 0.3001768442006401
+    },
+    {
+     "design": "prev=0.50 beta=-0.25 p=1.2",
+     "lean": 0.35,
+     "truth": 0.20004800000000003,
+     "sem": 0.00022764481307409649,
+     "sems_off": 658.7103741792343,
+     "rel_err": 0.7495801007758134
+    },
+    {
+     "design": "prev=0.20 beta=+0.30 p=2.0",
+     "lean": 0.32000000000000006,
+     "truth": 0.7999196666666667,
+     "sem": 0.00020717113994486128,
+     "sems_off": 2316.5372686292,
+     "rel_err": 0.5999598292995254
+    }
+   ]
+  }
+ ]
+}

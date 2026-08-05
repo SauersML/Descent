@@ -135,5 +135,159 @@
     "the harness's own rule the disagreement was never a finding."
    ]
   }
+ },
+ "hetMutationFloor": {
+  "authoritative": "ia02",
+  "reason": [
+   "Both designs simulate the infinite-alleles equilibrium and they disagree",
+   "because they estimate HETEROZYGOSITY differently, not because they disagree",
+   "about the body. `battery_ia02` computes `1 - sum p_i^2` over the WHOLE",
+   "sample with the unbiased n/(n-1) correction and never conditions on",
+   "polymorphism, sweeps theta a hundredfold -- over which the three candidate",
+   "readings separate by up to a factor of two -- and carries a positive control",
+   "that is independent of every body under test (Ewens' E(K)), which passes at",
+   "0.33 sems. The body matches at worst 0.68 sems.",
+   "",
+   "`battery_pgs`'s `test_het_mutation_floor` does neither. It takes",
+   "`1 - sum f^2` from the raw sample frequencies, so the estimate is biased",
+   "low by (n-1)/n; and it averages per SITE over the sites a replicate happens",
+   "to carry, so sites with no mutation contribute nothing and the average is",
+   "conditioned on polymorphism -- which inflates heterozygosity exactly where",
+   "theta is small and the two readings separate. It declares no control. Its",
+   "11.6 sems is the size of those two estimator faults, not of an error in",
+   "`4*Ne*mu/(1 + 4*Ne*mu)`.",
+   "",
+   "`bulk20`'s VOID and `bulk20b`'s UNINFORMATIVE are not in conflict with",
+   "either: neither asserts anything."
+  ],
+  "superseded": {
+   "pgs": [
+    "Heterozygosity estimated as `1 - sum f^2` with no n/(n-1) correction, and",
+    "averaged over the sites a replicate happens to carry rather than over the",
+    "whole sequence, so the estimator is both biased low and conditioned on",
+    "polymorphism. No positive control declared."
+   ]
+  }
+ },
+ "sharedLDRetention": {
+  "authoritative": "sld03",
+  "reason": [
+   "The two records are about DIFFERENT FORMULAS, which is why they can both be",
+   "right. `battery_transfer` falsified `exp(-2 * recomb * t_div)` at 13.09 sems",
+   "and +10.8% relative, with the error growing in `recomb` exactly as the gap",
+   "between an exponential and `(1-r)^(2t)` requires. That falsification is what",
+   "MOVED the body: DGP.lean now reads `(1 - recomb)^(2 * t_div)`.",
+   "",
+   "`battery_sld03` put the corrected body back to the identical design -- same",
+   "three (r, t) cells, same 400000 replicates, same oracle, an ancestral",
+   "haplotype surviving t meioses without recombination as an exact Bernoulli",
+   "count -- and it matches. It also re-rejects the superseded exponential and",
+   "the ploidy-dropped `(1-r)^t` on the same cells, so the exponent's factor of",
+   "two is measured rather than named.",
+   "",
+   "The ledger files `transfer`'s row as a corpus row because it was bare-named",
+   "when it ran, and at that moment it WAS the corpus body. The record stays,",
+   "with this note, because a superseded verdict about a superseded body is",
+   "history and not an error."
+  ],
+  "superseded": {
+   "transfer": [
+    "Transcribes `exp(-2 * recomb * t_div)`, which is not the body in DGP.lean.",
+    "Its falsification is correct and is the reason the body changed."
+   ]
+  }
+ },
+ "calibratedBrierFromVariances": {
+  "authoritative": "falsrepair",
+  "reason": [
+   "The two runs are in DIFFERENT REGIMES and both are correct about the one",
+   "they are in. The body is `pi*(1-pi)*(1 - r2)`, which is the Brier score of a",
+   "calibrated probability on the OBSERVED scale: p has mean pi and variance",
+   "r2*pi*(1-pi), the outcome is Bernoulli(p), and the realised mean squared",
+   "error is exactly that expression. `battery_falsrepair` group D simulates",
+   "that regime directly and matches at 1.18 sems, with the liability-scale form",
+   "refuted at 107 sems and the squared-factor reading at 118 on the same cells.",
+   "",
+   "`battery_bulk33` thresholds a latent signal to prevalence pi and scores the",
+   "CALIBRATED conditional probability given the signal. That is the liability",
+   "threshold model, in which `vSignal` and `vResidual` are liability variances",
+   "and the Brier score is `pi - Phi_2(z, z; r2)` -- a different function, which",
+   "battery_falsrepair carries as the competitor and which is the one bulk33's",
+   "design actually measures. Its 299 sems is the gap between two regimes, not",
+   "an error in either formula.",
+   "",
+   "What this costs the reader is stated rather than hidden: the body has no",
+   "argument that says which scale its variances are on, so a consumer who feeds",
+   "it liability variances gets bulk33's answer and not this one."
+  ],
+  "superseded": {
+   "bulk33": [
+    "Measures the liability-threshold regime, where the calibrated Brier score is",
+    "`pi - Phi_2(z, z; r2)` and not `pi*(1-pi)*(1-r2)`. The verdict is about a",
+    "different quantity, and battery_falsrepair carries that quantity explicitly."
+   ]
+  }
+ },
+ "fstEquilibrium": {
+  "authoritative": "falsrepair",
+  "reason": [
+   "The two verdicts are about two different formulas, and the falsification is",
+   "the reason the body changed. `battery_bulk38` transcribed",
+   "`1/(1 + theta + bigM)` and rejected it at 3.30 sems and 57% relative on a",
+   "two-deme island model under infinite alleles. DGP.lean now reads",
+   "`1/(1 + theta + 2*bigM)`: the migration term carries the deme-count",
+   "correction `islandDemeCorrection`, which at d = 2 is a factor of two, and",
+   "which the corpus had already measured and installed under that name.",
+   "",
+   "Two independent runs put the CORRECTED body back on designs the old one",
+   "failed. `battery_bulk38b` re-runs bulk38's own cells -- same estimator, same",
+   "Ne, both forces at order one -- and matches at 1.03 sems while rejecting the",
+   "superseded body at 3.30, the multiplicative composition at 3.01, and the two",
+   "one-force readings at 7.97 and 28.00. `battery_falsrepair` group A repeats it",
+   "at new seeds with two extra migration cells and a per-replicate F_ST, and",
+   "matches at 1.10 sems.",
+   "",
+   "`battery_transfer`'s row is UNINFORMATIVE and asserts nothing either way."
+  ],
+  "superseded": {
+   "bulk38": [
+    "Transcribes `1/(1 + theta + bigM)`, which is not the body in DGP.lean.",
+    "Its falsification is correct and is what moved the body to carry the",
+    "deme correction on the migration term."
+   ]
+  }
+ },
+ "fstMigrationMutationEquilibriumManyDemes": {
+  "authoritative": "falsrepair_c2",
+  "reason": [
+   "Same body, same twenty demes, same estimator, and the two runs differ in ONE",
+   "thing: `falsrepair` group C uses `simlib.island_fst`, which sets",
+   "`recombination_rate = 0`, so each replicate is a single genealogy;",
+   "`falsrepair_c2` simulates 2 Mb at 1e-8 so each replicate averages over many.",
+   "That is a difference in POWER and not in regime. c2's error bars are roughly",
+   "half the size at twice the replicate count, and the sweep is filled in from",
+   "three cells to five.",
+   "",
+   "At those bars the many-deme body `1/(1 + 4*Ne*m + 4*Ne*mu)` misses by 3.92",
+   "sems and 13% relative, while the FINITE-deme form carrying the d/(d-1)",
+   "correction -- `1/(1 + 4*Ne*m*(20/19) + 4*Ne*mu)` -- matches at 2.47 on the",
+   "same cells, and the two-deme form is rejected at 17.11. group C's MATCH at",
+   "1.57 sems is the same measurement through an error bar too wide to separate",
+   "the two, which is what a one-genealogy design buys.",
+   "",
+   "So the finding is that the deme correction is visible at d = 20 and the",
+   "many-deme LIMIT is not the right body at that deme count. The corpus already",
+   "carries the corrected form under `fstIslandEquilibriumFiniteDemes`; what this",
+   "entry records is that the limit's own marker cannot claim a validation off",
+   "the weaker design."
+  ],
+  "superseded": {
+   "falsrepair": [
+    "group C runs at recombination_rate = 0, so one genealogy per replicate and",
+    "an error bar roughly twice c2's at half the replicates. Its MATCH is a",
+    "failure to separate the many-deme limit from the finite-deme form, not a",
+    "measurement that they agree."
+   ]
+  }
  }
 }

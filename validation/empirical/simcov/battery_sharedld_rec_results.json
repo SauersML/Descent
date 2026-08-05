@@ -1,0 +1,580 @@
+{
+ "_battery_sha": "5ca0f35173ab6caf",
+ "results": [
+  {
+   "name": "sharedLD_from_equilibrium",
+   "file": "PortabilityDrift.lean",
+   "source": "m / (m + c)",
+   "note": "positive control 'panmictic split in two [ratio is 1 at every distance]' passed at 1.90 sems",
+   "regime": "two-deme island model over 6 Mb at recombination 1e-8 and mu = 1e-8, 6 replicates per cell; the observable is sigma_B/sigma_W, a ratio of disequilibrium SECOND MOMENTS with every product taken between DISJOINT sample halves so no sampling noise enters either the numerator or the denominator. Ne is varied FOURFOLD at fixed m, where an Ne-free body must not move, and c/m is swept across two orders of magnitude at fixed F_ST, where an F_ST-only body cannot move. c is the REALISED mean separation of the pairs actually drawn, times the recombination rate",
+   "span": 0.6083710127032612,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.3873724646774822,
+    "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+    "truth": 0.6945616864555652,
+    "sem": 0.09101973181114795,
+    "sems_off": 3.3749739278012125,
+    "rel_err": 0.44227781026291246
+   },
+   "cells": [
+    {
+     "lean": 0.9891312370704792,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.01",
+     "truth": 0.9756365406492545,
+     "sem": 0.029204945319469804,
+     "sems_off": 0.4620688816091809,
+     "rel_err": 0.013831684094411234
+    },
+    {
+     "lean": 0.9242832875515175,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.08",
+     "truth": 0.8982933557574452,
+     "sem": 0.04881239835834673,
+     "sems_off": 0.5324452939860125,
+     "rel_err": 0.02893256599026878
+    },
+    {
+     "lean": 0.7238963285546658,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.38",
+     "truth": 0.6867210327120737,
+     "sem": 0.1134663534883283,
+     "sems_off": 0.32763277129916824,
+     "rel_err": 0.05413449431681932
+    },
+    {
+     "lean": 0.9420357672925156,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+     "truth": 0.9712503377177083,
+     "sem": 0.034886434657751667,
+     "sems_off": 0.8374192063992218,
+     "rel_err": 0.030079341330107066
+    },
+    {
+     "lean": 0.729505419136072,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.37",
+     "truth": 0.8438592401294626,
+     "sem": 0.05273789992237027,
+     "sems_off": 2.1683423337242926,
+     "rel_err": 0.13551290968366558
+    },
+    {
+     "lean": 0.3873724646774822,
+     "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+     "truth": 0.6945616864555652,
+     "sem": 0.09101973181114795,
+     "sems_off": 3.3749739278012125,
+     "rel_err": 0.44227781026291246
+    },
+    {
+     "lean": 0.9579141738169861,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+     "truth": 0.901109167468762,
+     "sem": 0.033176714972771464,
+     "sems_off": 1.7121950257837346,
+     "rel_err": 0.06303898395328807
+    },
+    {
+     "lean": 0.7498618379563565,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.33",
+     "truth": 0.8422448482507943,
+     "sem": 0.043462414310034996,
+     "sems_off": 2.1255839502019453,
+     "rel_err": 0.10968664336303421
+    },
+    {
+     "lean": 0.3937681594800423,
+     "design": "Ne=2000 m=1.0e-03 c/m=1.54",
+     "truth": 0.6041849362927393,
+     "sem": 0.08937035321793671,
+     "sems_off": 2.354435998474561,
+     "rel_err": 0.3482655130460684
+    },
+    {
+     "lean": 0.9688625995797316,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+     "truth": 0.9735141115060452,
+     "sem": 0.021703560342678938,
+     "sems_off": 0.21432022455627078,
+     "rel_err": 0.004778063174777758
+    },
+    {
+     "lean": 0.7609150570019436,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.31",
+     "truth": 0.9027573151630479,
+     "sem": 0.07342824843959016,
+     "sems_off": 1.9317124019075402,
+     "rel_err": 0.15712113962265264
+    },
+    {
+     "lean": 0.3978299701229692,
+     "design": "Ne=4000 m=1.0e-03 c/m=1.51",
+     "truth": 0.48573633479180406,
+     "sem": 0.12152322054079043,
+     "sems_off": 0.7233709267878415,
+     "rel_err": 0.1809754765546069
+    }
+   ]
+  },
+  {
+   "name": "sharedLD_from_equilibrium [1 - fstMigrationDriftEquilibrium, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - 1/(1 + 4*Ne*m)",
+   "note": "positive control 'panmictic split in two [ratio is 1 at every distance]' passed at 1.90 sems",
+   "regime": "two-deme island model over 6 Mb at recombination 1e-8 and mu = 1e-8, 6 replicates per cell; the observable is sigma_B/sigma_W, a ratio of disequilibrium SECOND MOMENTS with every product taken between DISJOINT sample halves so no sampling noise enters either the numerator or the denominator. Ne is varied FOURFOLD at fixed m, where an Ne-free body must not move, and c/m is swept across two orders of magnitude at fixed F_ST, where an F_ST-only body cannot move. c is the REALISED mean separation of the pairs actually drawn, times the recombination rate",
+   "span": 0.175,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.8,
+    "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+    "truth": 0.9712503377177083,
+    "sem": 0.034886434657751667,
+    "sems_off": 4.9087944754955615,
+    "rel_err": 0.1763194627248426
+   },
+   "cells": [
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.01",
+     "truth": 0.9756365406492545,
+     "sem": 0.029204945319469804,
+     "sems_off": 0.2033755203891832,
+     "rel_err": 0.006087893088067632
+    },
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.08",
+     "truth": 0.8982933557574452,
+     "sem": 0.04881239835834673,
+     "sems_off": 1.4628171600036697,
+     "rel_err": 0.07948807979250462
+    },
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.38",
+     "truth": 0.6867210327120737,
+     "sem": 0.1134663534883283,
+     "sems_off": 2.4939193715607004,
+     "rel_err": 0.41206825407303527
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+     "truth": 0.9712503377177083,
+     "sem": 0.034886434657751667,
+     "sems_off": 4.9087944754955615,
+     "rel_err": 0.1763194627248426
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.37",
+     "truth": 0.8438592401294626,
+     "sem": 0.05273789992237027,
+     "sems_off": 0.8316455564977547,
+     "rel_err": 0.05197459249570314
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+     "truth": 0.6945616864555652,
+     "sem": 0.09101973181114795,
+     "sems_off": 1.1584116042354784,
+     "rel_err": 0.15180554240257585
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+     "truth": 0.901109167468762,
+     "sem": 0.033176714972771464,
+     "sems_off": 0.3683390169853317,
+     "rel_err": 0.013561374160913537
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.33",
+     "truth": 0.8422448482507943,
+     "sem": 0.043462414310034996,
+     "sems_off": 1.0732040863023335,
+     "rel_err": 0.05538061851606058
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=1.54",
+     "truth": 0.6041849362927393,
+     "sem": 0.08937035321793671,
+     "sems_off": 3.1856643992653395,
+     "rel_err": 0.4712198790375088
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+     "truth": 0.9735141115060452,
+     "sem": 0.021703560342678938,
+     "sems_off": 1.489969406273844,
+     "rel_err": 0.03321743417543576
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.31",
+     "truth": 0.9027573151630479,
+     "sem": 0.07342824843959016,
+     "sems_off": 0.5232203714731808,
+     "rel_err": 0.04255756755429719
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=1.51",
+     "truth": 0.48573633479180406,
+     "sem": 0.12152322054079043,
+     "sems_off": 3.7477622282365237,
+     "rel_err": 0.9376283040296782
+    }
+   ]
+  },
+  {
+   "name": "sharedLD_from_equilibrium [M/(1+M), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "bigM / (1 + bigM)",
+   "note": "positive control 'panmictic split in two [ratio is 1 at every distance]' passed at 1.90 sems",
+   "regime": "two-deme island model over 6 Mb at recombination 1e-8 and mu = 1e-8, 6 replicates per cell; the observable is sigma_B/sigma_W, a ratio of disequilibrium SECOND MOMENTS with every product taken between DISJOINT sample halves so no sampling noise enters either the numerator or the denominator. Ne is varied FOURFOLD at fixed m, where an Ne-free body must not move, and c/m is swept across two orders of magnitude at fixed F_ST, where an F_ST-only body cannot move. c is the REALISED mean separation of the pairs actually drawn, times the recombination rate",
+   "span": 0.175,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.8,
+    "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+    "truth": 0.9712503377177083,
+    "sem": 0.034886434657751667,
+    "sems_off": 4.9087944754955615,
+    "rel_err": 0.1763194627248426
+   },
+   "cells": [
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.01",
+     "truth": 0.9756365406492545,
+     "sem": 0.029204945319469804,
+     "sems_off": 0.2033755203891832,
+     "rel_err": 0.006087893088067632
+    },
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.08",
+     "truth": 0.8982933557574452,
+     "sem": 0.04881239835834673,
+     "sems_off": 1.4628171600036697,
+     "rel_err": 0.07948807979250462
+    },
+    {
+     "lean": 0.9696969696969697,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.38",
+     "truth": 0.6867210327120737,
+     "sem": 0.1134663534883283,
+     "sems_off": 2.4939193715607004,
+     "rel_err": 0.41206825407303527
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+     "truth": 0.9712503377177083,
+     "sem": 0.034886434657751667,
+     "sems_off": 4.9087944754955615,
+     "rel_err": 0.1763194627248426
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.37",
+     "truth": 0.8438592401294626,
+     "sem": 0.05273789992237027,
+     "sems_off": 0.8316455564977547,
+     "rel_err": 0.05197459249570314
+    },
+    {
+     "lean": 0.8,
+     "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+     "truth": 0.6945616864555652,
+     "sem": 0.09101973181114795,
+     "sems_off": 1.1584116042354784,
+     "rel_err": 0.15180554240257585
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+     "truth": 0.901109167468762,
+     "sem": 0.033176714972771464,
+     "sems_off": 0.3683390169853317,
+     "rel_err": 0.013561374160913537
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.33",
+     "truth": 0.8422448482507943,
+     "sem": 0.043462414310034996,
+     "sems_off": 1.0732040863023335,
+     "rel_err": 0.05538061851606058
+    },
+    {
+     "lean": 0.8888888888888888,
+     "design": "Ne=2000 m=1.0e-03 c/m=1.54",
+     "truth": 0.6041849362927393,
+     "sem": 0.08937035321793671,
+     "sems_off": 3.1856643992653395,
+     "rel_err": 0.4712198790375088
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+     "truth": 0.9735141115060452,
+     "sem": 0.021703560342678938,
+     "sems_off": 1.489969406273844,
+     "rel_err": 0.03321743417543576
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.31",
+     "truth": 0.9027573151630479,
+     "sem": 0.07342824843959016,
+     "sems_off": 0.5232203714731808,
+     "rel_err": 0.04255756755429719
+    },
+    {
+     "lean": 0.9411764705882353,
+     "design": "Ne=4000 m=1.0e-03 c/m=1.51",
+     "truth": 0.48573633479180406,
+     "sem": 0.12152322054079043,
+     "sems_off": 3.7477622282365237,
+     "rel_err": 0.9376283040296782
+    }
+   ]
+  },
+  {
+   "name": "sharedLD_from_equilibrium [within-deme Sved 1/(1+4*Ne*c), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 / (1 + 4*Ne*c)",
+   "note": "positive control 'panmictic split in two [ratio is 1 at every distance]' passed at 1.90 sems",
+   "regime": "two-deme island model over 6 Mb at recombination 1e-8 and mu = 1e-8, 6 replicates per cell; the observable is sigma_B/sigma_W, a ratio of disequilibrium SECOND MOMENTS with every product taken between DISJOINT sample halves so no sampling noise enters either the numerator or the denominator. Ne is varied FOURFOLD at fixed m, where an Ne-free body must not move, and c/m is swept across two orders of magnitude at fixed F_ST, where an F_ST-only body cannot move. c is the REALISED mean separation of the pairs actually drawn, times the recombination rate",
+   "span": 0.9505863250895473,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "lean": 0.6604105728504039,
+    "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+    "truth": 0.9735141115060452,
+    "sem": 0.021703560342678938,
+    "sems_off": 14.426367550393987,
+    "rel_err": 0.3216219826246422
+   },
+   "cells": [
+    {
+     "lean": 0.7398517616569195,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.01",
+     "truth": 0.9756365406492545,
+     "sem": 0.029204945319469804,
+     "sems_off": 8.073453876153861,
+     "rel_err": 0.24167276354309972
+    },
+    {
+     "lean": 0.2761347673891344,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.08",
+     "truth": 0.8982933557574452,
+     "sem": 0.04881239835834673,
+     "sems_off": 12.745913114140684,
+     "rel_err": 0.6926006792555018
+    },
+    {
+     "lean": 0.07572760088632931,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.38",
+     "truth": 0.6867210327120737,
+     "sem": 0.1134663534883283,
+     "sems_off": 5.384798339259172,
+     "rel_err": 0.8897258169197795
+    },
+    {
+     "lean": 0.8024888209963532,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+     "truth": 0.9712503377177083,
+     "sem": 0.034886434657751667,
+     "sems_off": 4.837453823440704,
+     "rel_err": 0.17375697095552026
+    },
+    {
+     "lean": 0.4027115463329143,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.37",
+     "truth": 0.8438592401294626,
+     "sem": 0.05273789992237027,
+     "sems_off": 8.364908243330012,
+     "rel_err": 0.5227740277263168
+    },
+    {
+     "lean": 0.13650052467389173,
+     "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+     "truth": 0.6945616864555652,
+     "sem": 0.09101973181114795,
+     "sems_off": 6.131210789980849,
+     "rel_err": 0.80347242392469
+    },
+    {
+     "lean": 0.7399301670351245,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+     "truth": 0.901109167468762,
+     "sem": 0.033176714972771464,
+     "sems_off": 4.858196496124439,
+     "rel_err": 0.1788673406646093
+    },
+    {
+     "lean": 0.2725811692205705,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.33",
+     "truth": 0.8422448482507943,
+     "sem": 0.043462414310034996,
+     "sems_off": 13.107041752595292,
+     "rel_err": 0.6763635066611837
+    },
+    {
+     "lean": 0.07509467561227819,
+     "design": "Ne=2000 m=1.0e-03 c/m=1.54",
+     "truth": 0.6041849362927393,
+     "sem": 0.08937035321793671,
+     "sems_off": 5.920198831375685,
+     "rel_err": 0.875709122983011
+    },
+    {
+     "lean": 0.6604105728504039,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+     "truth": 0.9735141115060452,
+     "sem": 0.021703560342678938,
+     "sems_off": 14.426367550393987,
+     "rel_err": 0.3216219826246422
+    },
+    {
+     "lean": 0.16591137663158168,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.31",
+     "truth": 0.9027573151630479,
+     "sem": 0.07342824843959016,
+     "sems_off": 10.034911007548732,
+     "rel_err": 0.8162170786712305
+    },
+    {
+     "lean": 0.03965392171998622,
+     "design": "Ne=4000 m=1.0e-03 c/m=1.51",
+     "truth": 0.48573633479180406,
+     "sem": 0.12152322054079043,
+     "sems_off": 3.6707586507887684,
+     "rel_err": 0.9183632788414261
+    }
+   ]
+  },
+  {
+   "name": "sharedLD_from_equilibrium [2*m/(2*m + c), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "2*m / (2*m + c)",
+   "note": "",
+   "regime": "two-deme island model over 6 Mb at recombination 1e-8 and mu = 1e-8, 6 replicates per cell; the observable is sigma_B/sigma_W, a ratio of disequilibrium SECOND MOMENTS with every product taken between DISJOINT sample halves so no sampling noise enters either the numerator or the denominator. Ne is varied FOURFOLD at fixed m, where an Ne-free body must not move, and c/m is swept across two orders of magnitude at fixed F_ST, where an F_ST-only body cannot move. c is the REALISED mean separation of the pairs actually drawn, times the recombination rate",
+   "span": 0.43850590104128023,
+   "verdict": "MATCH",
+   "worst": {
+    "lean": 0.9785047645367585,
+    "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+    "truth": 0.901109167468762,
+    "sem": 0.033176714972771464,
+    "sems_off": 2.3328288268297808,
+    "rel_err": 0.08588925721996885
+   },
+   "cells": [
+    {
+     "lean": 0.9945359246655198,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.01",
+     "truth": 0.9756365406492545,
+     "sem": 0.029204945319469804,
+     "sems_off": 0.6471295806079028,
+     "rel_err": 0.019371336792785868
+    },
+    {
+     "lean": 0.960651992906499,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.08",
+     "truth": 0.8982933557574452,
+     "sem": 0.04881239835834673,
+     "sems_off": 1.27751635335064,
+     "rel_err": 0.06941901189558813
+    },
+    {
+     "lean": 0.8398374270703257,
+     "design": "Ne=2000 m=4.0e-03 c/m=0.38",
+     "truth": 0.6867210327120737,
+     "sem": 0.1134663534883283,
+     "sems_off": 1.3494431578256567,
+     "rel_err": 0.22296738714052194
+    },
+    {
+     "lean": 0.9701528500742831,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.06",
+     "truth": 0.9712503377177083,
+     "sem": 0.034886434657751667,
+     "sems_off": 0.03145886514893122,
+     "rel_err": 0.0011299740147366541
+    },
+    {
+     "lean": 0.8436000385595518,
+     "design": "Ne=1000 m=1.0e-03 c/m=0.37",
+     "truth": 0.8438592401294626,
+     "sem": 0.05273789992237027,
+     "sems_off": 0.004914901243551874,
+     "rel_err": 0.0003071620924255163
+    },
+    {
+     "lean": 0.5584260529021432,
+     "design": "Ne=1000 m=1.0e-03 c/m=1.58",
+     "truth": 0.6945616864555652,
+     "sem": 0.09101973181114795,
+     "sems_off": 1.4956716620071198,
+     "rel_err": 0.19600222155664684
+    },
+    {
+     "lean": 0.9785047645367585,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.04",
+     "truth": 0.901109167468762,
+     "sem": 0.033176714972771464,
+     "sems_off": 2.3328288268297808,
+     "rel_err": 0.08588925721996885
+    },
+    {
+     "lean": 0.8570526217453962,
+     "design": "Ne=2000 m=1.0e-03 c/m=0.33",
+     "truth": 0.8422448482507943,
+     "sem": 0.043462414310034996,
+     "sems_off": 0.34070296668224864,
+     "rel_err": 0.017581316793276063
+    },
+    {
+     "lean": 0.5650411179244345,
+     "design": "Ne=2000 m=1.0e-03 c/m=1.54",
+     "truth": 0.6041849362927393,
+     "sem": 0.08937035321793671,
+     "sems_off": 0.4379955651831152,
+     "rel_err": 0.06478780919049411
+    },
+    {
+     "lean": 0.9841850820738254,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.03",
+     "truth": 0.9735141115060452,
+     "sem": 0.021703560342678938,
+     "sems_off": 0.4916691270600565,
+     "rel_err": 0.010961290074441772
+    },
+    {
+     "lean": 0.8642268733818926,
+     "design": "Ne=4000 m=1.0e-03 c/m=0.31",
+     "truth": 0.9027573151630479,
+     "sem": 0.07342824843959016,
+     "sems_off": 0.5247359510809316,
+     "rel_err": 0.042680841388913315
+    },
+    {
+     "lean": 0.5692108176618527,
+     "design": "Ne=4000 m=1.0e-03 c/m=1.51",
+     "truth": 0.48573633479180406,
+     "sem": 0.12152322054079043,
+     "sems_off": 0.6869015032565698,
+     "rel_err": 0.17185142821532462
+    }
+   ]
+  }
+ ]
+}

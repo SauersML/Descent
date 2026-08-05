@@ -69,25 +69,50 @@ def ia_single_homozygosity(Ne, mu, gens, reps, seed):
             _, state[r] = np.unique(state[r], return_inverse=True)
         nxt[:] = state.max(axis=1) + 1
     vals = np.empty(reps)
+    ks = np.empty(reps)
     for r in range(reps):
         c = np.bincount(state[r]).astype(float)
+        c = c[c > 0]
         vals[r] = (c * (c - 1)).sum() / (two_n * (two_n - 1))
-    return float(vals.mean()), float(vals.std(ddof=1) / math.sqrt(reps))
+        ks[r] = c.size
+    return (float(vals.mean()), float(vals.std(ddof=1) / math.sqrt(reps)),
+            float(ks.mean()), float(ks.std(ddof=1) / math.sqrt(reps)))
 
 
 def test_scaled_mutation_rate():
     cells = []
+    control_cell = [None]
     # theta varied 4x; Ne varied 4x INDEPENDENTLY, so pairs share theta at
     # different Ne and share Ne at different theta
     for Ne, mu in ((100, 2.5e-3), (400, 6.25e-4), (100, 1.0e-2), (400, 2.5e-3)):
         theta = 4 * Ne * mu
-        F, sem = ia_single_homozygosity(Ne, mu, gens=10 * Ne, reps=180,
-                                        seed=29000 + Ne + int(1e6 * mu))
+        F, sem, kbar, ksem = ia_single_homozygosity(
+            Ne, mu, gens=10 * Ne, reps=180, seed=29000 + Ne + int(1e6 * mu))
+        if control_cell[0] is None:
+            control_cell[0] = (Ne, theta, kbar, ksem)
         print("  Ne=%4d mu=%.2e theta=%.1f: F=%.5f ± %.5f  vs 1/(1+theta)=%.5f"
               % (Ne, mu, theta, F, sem, 1 / (1 + theta)))
         cells.append(dict(design="Ne=%d mu=%.2e (theta=%.1f)" % (Ne, mu, theta),
                           lean=1 / (1 + theta), truth=F, sem=sem))
-    MODEL = dict(realised_inputs=True)
+    # POSITIVE CONTROL: EWENS' EXPECTED NUMBER OF ALLELES on the same samples,
+    # E[K] = sum_{i=0}^{2N-1} theta/(theta + i). It is a different statistic of
+    # the same simulation, known in closed form, and independent of every body
+    # under test -- a homozygosity convention cannot move an allele COUNT.
+    #
+    # NOT the mu = 0 fixation cell, which was tried first: it returns
+    # F = 1.00000 +/- 0.00000 against a predicted 1, and `verdict.classify`
+    # calls a control whose predicted and measured values are the same number
+    # DEGENERATE, correctly -- it cannot fail. Without a control that can, every
+    # competitor rejection here came back LEAD (no control), and a downgraded
+    # rejection leaves the corpus row looking uncompeted.
+    Nec, thc, kbar, ksem = control_cell[0]
+    ewens = sum(thc / (thc + i) for i in range(2 * Nec))
+    print("  CONTROL Ewens E[K] at theta=%.1f, Ne=%d: measured %.4f +/- %.4f "
+          "(known %.4f)" % (thc, Nec, kbar, ksem, ewens))
+    control = dict(design="Ewens E[K] at theta=%.1f [independent of every body "
+                          "under test]" % thc,
+                   lean=ewens, truth=kbar, sem=max(ksem, 1e-9))
+    MODEL = dict(realised_inputs=True, control=control)
     # The factor under test is the 4 in `4*Ne*mu`. Halving and doubling it are
     # the two readings a reader could plausibly hold (2*Ne*mu is the haploid
     # convention; 8*Ne*mu is the ploidy applied twice), on the same cells.
@@ -157,7 +182,31 @@ def test_scaled_migration_rate_and_tau():
                                      % (Ne, t_div, tau),
                               lean=tau / (1 + tau), truth=s["mean"],
                               sem=s["sem"]))
-    MODEL = dict(realised_inputs=True)
+    # POSITIVE CONTROL: a pure split at t_div = 0 is one population, so the
+    # F_ST read off coalescence times must be exactly 0, whatever the scaling
+    # conventions are. Same estimator, same code path, and it fails on any
+    # sample-labelling or divergence-indexing slip.
+    dem0 = msprime.Demography()
+    dem0.add_population(name="A", initial_size=1000)
+    dem0.add_population(name="B", initial_size=1000)
+    dem0.add_population(name="ANC", initial_size=1000)
+    dem0.add_population_split(time=0, derived=["A", "B"], ancestral="ANC")
+    v0 = []
+    for r in range(22):
+        ts = msprime.sim_ancestry(samples={"A": 25, "B": 25}, demography=dem0,
+                                  sequence_length=4e6, recombination_rate=1e-8,
+                                  random_seed=29881 + r)
+        A, B = ts.samples(population=0), ts.samples(population=1)
+        da = ts.diversity([A], mode="branch")[0]
+        db = ts.diversity([B], mode="branch")[0]
+        dab = ts.divergence([A, B], indexes=[(0, 1)], mode="branch")[0]
+        v0.append(1.0 - ((da + db) / 2.0) / dab)
+    s0 = simlib.summarize(v0)
+    print("  CONTROL t_div=0 (one population): F_ST=%.5f ± %.5f  (known 0)"
+          % (s0["mean"], s0["sem"]))
+    control = dict(design="t_div=0 [one population: F_ST is 0]", lean=0.0,
+                   truth=s0["mean"], sem=max(s0["sem"], 1e-9))
+    MODEL = dict(realised_inputs=True, control=control)
     # Same idea: the rivals differ from the body only in the numeric factor on
     # the scaled rate, read off the same measured F_ST cells.
     cm_half = [dict(c, lean=1 / (1 + 0.5 * (1 / c["lean"] - 1))) for c in cells_m]
@@ -193,7 +242,15 @@ def test_fst_equilibrium_additivity():
     import msprime
     cells = []
     Ne = 400
-    combos = [(1.0, 0.0), (0.5, 0.5), (0.0, 1.0),
+    # NO bigM = 0 CELL, and it is not a design choice -- it is a
+    # non-terminating simulation. An `island_model` with `migration_rate = 0`
+    # and no ancestral merge has two demes that can never share an ancestor, so
+    # `sim_ancestry` has no coalescent to finish and the run hangs rather than
+    # failing. The (theta = 1, bigM = 0) cell this list used to open with is
+    # what left this battery running for over an hour with no output and no
+    # results file, since `dump_results` is at the end. It is replaced by a
+    # cell that keeps the same span in theta.
+    combos = [(4.0, 0.5), (0.5, 0.5), (0.0, 1.0),
               (3.0, 1.0), (2.0, 2.0), (1.0, 3.0)]
     for theta, bigM in combos:
         mu = theta / (4 * Ne)
@@ -227,9 +284,30 @@ def test_fst_equilibrium_additivity():
     # `1 / (1 + theta + 2*bigM)`, so this row transcribes a SUPERSEDED formula
     # and is a competitor to it, not the corpus row. battery_falsrepair
     # group A carries the bare row on the corrected body.
+    # POSITIVE CONTROL: at overwhelming migration the two demes are one
+    # population, so ANY F_ST estimator must read zero. That is a limit
+    # statement about the demography rather than about the formula under test,
+    # so the control is not the cell it is gating.
+    demc = msprime.Demography.island_model([Ne] * 2, migration_rate=400.0 / (4 * Ne))
+    vc = []
+    for r in range(12):
+        ts = msprime.sim_ancestry(samples={"pop_0": 20, "pop_1": 20},
+                                  demography=demc, sequence_length=2e6,
+                                  recombination_rate=1e-8,
+                                  random_seed=29551 + r)
+        A, B = ts.samples(population=0), ts.samples(population=1)
+        da = ts.diversity([A], mode="branch")[0]
+        db = ts.diversity([B], mode="branch")[0]
+        dab = ts.divergence([A, B], indexes=[(0, 1)], mode="branch")[0]
+        vc.append(1.0 - ((da + db) / 2.0) / dab)
+    sc = simlib.summarize(vc)
+    print("  CONTROL bigM=400 (one population): F_ST=%.5f +/- %.5f (known 0)"
+          % (sc["mean"], sc["sem"]))
+    control = dict(design="bigM=400 [one population: F_ST is 0]", lean=0.0,
+                   truth=sc["mean"], sem=max(sc["sem"], 1e-9))
     record("fstEquilibrium [additivity of theta and bigM, superseded body]",
            "DGP.lean", "1 / (1 + theta + bigM)", cells,
-           realised_inputs=True,
+           realised_inputs=True, control=control,
            regime="two-deme island model with both forces on, at three "
                   "combinations holding theta+bigM = 1 and three holding it at "
                   "4, so a formula weighting the two forces differently would "

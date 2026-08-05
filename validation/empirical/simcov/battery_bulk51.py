@@ -87,19 +87,37 @@ def ld_corr_and_fst(bigM, reps, seed, n_dip=30, panmictic=False):
         idx = np.flatnonzero(keep)[:600]
         if idx.size < 40:
             continue
-        ra, rb = [], []
+        # SPLIT-HALF, because the naive correlation of r between demes is
+        # ATTENUATED and the control caught it: one panmictic population split
+        # in two gave 0.9914 +/- 0.0007 where the answer is 1, twelve sems out.
+        # Nothing was wrong with the simulation -- r estimated from a finite
+        # sample carries noise, and a correlation between two noisy estimates
+        # is pulled toward zero by exactly the noise-to-signal ratio.
+        #
+        # The repair is to build every product from DISJOINT halves, so no
+        # E[noise^2] term survives: the numerator pairs deme A's first half
+        # with deme B's first half (independent samples of independent demes),
+        # and each denominator pairs a deme's two halves with each other.
+        a1, a2 = ga[:, :len(A) // 2], ga[:, len(A) // 2:]
+        b1, b2 = gb[:, :len(B) // 2], gb[:, len(B) // 2:]
+        ra1, ra2, rb1, rb2 = [], [], [], []
         for k in range(0, idx.size - 1, 2):
             i, j = idx[k], idx[k + 1]
-            ca = np.corrcoef(ga[i], ga[j])[0, 1]
-            cb = np.corrcoef(gb[i], gb[j])[0, 1]
-            if np.isfinite(ca) and np.isfinite(cb):
-                ra.append(ca)
-                rb.append(cb)
-        if len(ra) < 20:
+            vals = [np.corrcoef(h[i], h[j])[0, 1] for h in (a1, a2, b1, b2)]
+            if all(np.isfinite(v) for v in vals):
+                ra1.append(vals[0]); ra2.append(vals[1])
+                rb1.append(vals[2]); rb2.append(vals[3])
+        if len(ra1) < 20:
             continue
-        c = np.corrcoef(ra, rb)[0, 1]
-        if np.isfinite(c):
-            corrs.append(float(c))
+        ra1 = np.asarray(ra1); ra2 = np.asarray(ra2)
+        rb1 = np.asarray(rb1); rb2 = np.asarray(rb2)
+        num = float(np.mean(ra1 * rb1))
+        da = float(np.mean(ra1 * ra2))
+        db = float(np.mean(rb1 * rb2))
+        if da > 0 and db > 0:
+            c = num / math.sqrt(da * db)
+            if np.isfinite(c):
+                corrs.append(float(c))
         ac1 = ga.sum(axis=1).astype(float)
         ac2 = gb.sum(axis=1).astype(float)
         fsts.append(simlib.hudson_fst(ac1, len(A), ac2, len(B)))

@@ -1,0 +1,107 @@
+{
+ "_battery_sha": "cd8081932a011b81",
+ "results": [
+  {
+   "name": "ldCorrelationMigrationAnsatz",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "M^2 / (1 + M)^2",
+   "note": "positive control 'panmictic split into halves [LD correlation is 1]' passed at 1.31 sems",
+   "regime": "two-deme island model at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, 12 replicates; the observable is the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes -- the quantity this body names -- with 4*Ne*m swept a hundredfold. The control runs one panmictic population through the same estimator and the same filters",
+   "span": 0.9142346938775511,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "4Nem=2.0",
+    "lean": 0.4444444444444444,
+    "truth": 0.9362790181223843,
+    "sem": 0.004833666120738429,
+    "sems_off": 101.75187143517546,
+    "rel_err": 0.5253076958450547
+   },
+   "cells": [
+    {
+     "design": "4Nem=0.4",
+     "lean": 0.08163265306122451,
+     "truth": 0.9059148145726942,
+     "sem": 0.010152722074656416,
+     "sems_off": 81.18829171627499,
+     "rel_err": 0.9098892613874194
+    },
+    {
+     "design": "4Nem=2.0",
+     "lean": 0.4444444444444444,
+     "truth": 0.9362790181223843,
+     "sem": 0.004833666120738429,
+     "sems_off": 101.75187143517546,
+     "rel_err": 0.5253076958450547
+    },
+    {
+     "design": "4Nem=8.0",
+     "lean": 0.7901234567901234,
+     "truth": 0.9808258775942066,
+     "sem": 0.0031385775514322744,
+     "sems_off": 60.76078021938858,
+     "rel_err": 0.19443045413100507
+    },
+    {
+     "design": "4Nem=40.0",
+     "lean": 0.9518143961927424,
+     "truth": 0.9947457165635168,
+     "sem": 0.0021563526608630143,
+     "sems_off": 19.909229668208564,
+     "rel_err": 0.043158085182901255
+    }
+   ]
+  },
+  {
+   "name": "ldCorrelationMigrationAnsatz [unsquared M/(1+M), competing]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "M / (1 + M)",
+   "note": "positive control 'panmictic split into halves [LD correlation is 1]' passed at 1.31 sems",
+   "regime": "two-deme island model at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, 12 replicates; the observable is the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes -- the quantity this body names -- with 4*Ne*m swept a hundredfold. The control runs one panmictic population through the same estimator and the same filters",
+   "span": 0.7071428571428571,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "4Nem=0.4",
+    "lean": 0.28571428571428575,
+    "truth": 0.9059148145726942,
+    "sem": 0.010152722074656416,
+    "sems_off": 61.08711775008349,
+    "rel_err": 0.6846124148559678
+   },
+   "cells": [
+    {
+     "design": "4Nem=0.4",
+     "lean": 0.28571428571428575,
+     "truth": 0.9059148145726942,
+     "sem": 0.010152722074656416,
+     "sems_off": 61.08711775008349,
+     "rel_err": 0.6846124148559678
+    },
+    {
+     "design": "4Nem=2.0",
+     "lean": 0.6666666666666666,
+     "truth": 0.9362790181223843,
+     "sem": 0.004833666120738429,
+     "sems_off": 55.77802535822015,
+     "rel_err": 0.28796154376758204
+    },
+    {
+     "design": "4Nem=8.0",
+     "lean": 0.8888888888888888,
+     "truth": 0.9808258775942066,
+     "sem": 0.0031385775514322744,
+     "sems_off": 29.292565564729397,
+     "rel_err": 0.0937342608973807
+    },
+    {
+     "design": "4Nem=40.0",
+     "lean": 0.975609756097561,
+     "truth": 0.9947457165635168,
+     "sem": 0.0021563526608630143,
+     "sems_off": 8.874225822735928,
+     "rel_err": 0.019237037312473834
+    }
+   ]
+  }
+ ]
+}

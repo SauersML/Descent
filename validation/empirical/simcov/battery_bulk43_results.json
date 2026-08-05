@@ -1,0 +1,327 @@
+{
+ "_battery_sha": "96ceffa625575e05",
+ "results": [
+  {
+   "name": "liabilityThreshold",
+   "file": "PortabilityDrift.lean",
+   "source": "Function.invFun Phi (1 - K)",
+   "note": "",
+   "regime": "4e6 standard-normal liabilities in 20 independent blocks of 2e5; the observable is the empirical (1-K) quantile, which needs no model. K is swept from the far tail to above the median so the threshold CHANGES SIGN across the design",
+   "span": 1.3617778935662908,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "K=0.01",
+    "lean": 2.3263478740408408,
+    "truth": 2.3279925580554224,
+    "sem": 0.0018167458451786268,
+    "sems_off": 0.9052911935625821,
+    "rel_err": 0.000706481646124947
+   },
+   "cells": [
+    {
+     "design": "K=0.01",
+     "lean": 2.3263478740408408,
+     "truth": 2.3279925580554224,
+     "sem": 0.0018167458451786268,
+     "sems_off": 0.9052911935625821,
+     "rel_err": 0.000706481646124947
+    },
+    {
+     "design": "K=0.05",
+     "lean": 1.6448536269514722,
+     "truth": 1.6441163326950998,
+     "sem": 0.0009701024345138413,
+     "sems_off": 0.7600169117623709,
+     "rel_err": 0.00044844409225213745
+    },
+    {
+     "design": "K=0.20",
+     "lean": 0.8416212335729143,
+     "truth": 0.8417099352775177,
+     "sem": 0.000745228876964071,
+     "sems_off": 0.1190261238463475,
+     "rel_err": 0.00010538274634260366
+    },
+    {
+     "design": "K=0.50",
+     "lean": 0.0,
+     "truth": -0.00018391571429366712,
+     "sem": 0.0006805145180845979,
+     "sems_off": 0.2702597952080777,
+     "rel_err": 1.0
+    },
+    {
+     "design": "K=0.80",
+     "lean": -0.8416212335729143,
+     "truth": -0.8420686823231314,
+     "sem": 0.0007389059424153895,
+     "sems_off": 0.6055557609327367,
+     "rel_err": 0.0005313684733917824
+    }
+   ]
+  },
+  {
+   "name": "liabilityThreshold [sign slip Phi^-1(K), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "Function.invFun Phi K",
+   "note": "positive control 'median of the same draws [known to be 0]' passed at 0.27 sems",
+   "regime": "4e6 standard-normal liabilities in 20 independent blocks of 2e5; the observable is the empirical (1-K) quantile, which needs no model. K is swept from the far tail to above the median so the threshold CHANGES SIGN across the design",
+   "span": 3.7641268794572262,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "K=0.05",
+    "lean": -1.6448536269514729,
+    "truth": 1.6441163326950998,
+    "sem": 0.0009701024345138413,
+    "sems_off": 3390.332652133599,
+    "rel_err": 2.0004484440922528
+   },
+   "cells": [
+    {
+     "design": "K=0.01",
+     "lean": -2.3263478740408408,
+     "truth": 2.3279925580554224,
+     "sem": 0.0018167458451786268,
+     "sems_off": 2561.9105966022657,
+     "rel_err": 1.9992935183538751
+    },
+    {
+     "design": "K=0.05",
+     "lean": -1.6448536269514729,
+     "truth": 1.6441163326950998,
+     "sem": 0.0009701024345138413,
+     "sems_off": 3390.332652133599,
+     "rel_err": 2.0004484440922528
+    },
+    {
+     "design": "K=0.20",
+     "lean": -0.8416212335729142,
+     "truth": 0.8417099352775177,
+     "sem": 0.000745228876964071,
+     "sems_off": 2258.81097859227,
+     "rel_err": 1.9998946172536571
+    },
+    {
+     "design": "K=0.50",
+     "lean": 0.0,
+     "truth": -0.00018391571429366712,
+     "sem": 0.0006805145180845979,
+     "sems_off": 0.2702597952080777,
+     "rel_err": 1.0
+    },
+    {
+     "design": "K=0.80",
+     "lean": 0.8416212335729143,
+     "truth": -0.8420686823231314,
+     "sem": 0.0007389059424153895,
+     "sems_off": 2278.625491077088,
+     "rel_err": 1.9994686315266081
+    }
+   ]
+  },
+  {
+   "name": "globalAncestryAveragedEffect",
+   "file": "HaplotypeTheory.lean",
+   "source": "alpha * beta1 + (1 - alpha) * beta2",
+   "note": "",
+   "regime": "2e6 individuals in 20 independent blocks of 1e5, standardised dosage, a fraction alpha carrying the first ancestry's effect and the rest the second; the observable is the realised MARGINAL OLS slope over the whole admixed sample -- what a GWAS ignoring local ancestry estimates. alpha is swept across 1/2, where the swapped reading coincides with the body, and one cell gives the two ancestries effects of OPPOSITE SIGN",
+   "span": 1.0,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+    "lean": 0.0,
+    "truth": -0.0022358859647680605,
+    "sem": 0.0015145119356294455,
+    "sems_off": 1.4763079195138895,
+    "rel_err": 1.0
+   },
+   "cells": [
+    {
+     "design": "alpha=0.2 b1=+1.0 b2=+0.4",
+     "lean": 0.52,
+     "truth": 0.5207482406776914,
+     "sem": 0.0010457944594743761,
+     "sems_off": 0.7154758479668034,
+     "rel_err": 0.0014368568518208886
+    },
+    {
+     "design": "alpha=0.3 b1=+0.8 b2=+0.2",
+     "lean": 0.38,
+     "truth": 0.3793468694413828,
+     "sem": 0.0009037993552952129,
+     "sems_off": 0.722649949671489,
+     "rel_err": 0.0017217238660200212
+    },
+    {
+     "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+     "lean": 0.0,
+     "truth": -0.0022358859647680605,
+     "sem": 0.0015145119356294455,
+     "sems_off": 1.4763079195138895,
+     "rel_err": 1.0
+    },
+    {
+     "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+     "lean": 0.34,
+     "truth": 0.34040292647280224,
+     "sem": 0.0008579292851961164,
+     "sems_off": 0.46964998136193226,
+     "rel_err": 0.001183675114010529
+    }
+   ]
+  },
+  {
+   "name": "globalAncestryAveragedEffect [weights swapped, competing]",
+   "file": "HaplotypeTheory.lean",
+   "source": "(1 - alpha) * beta1 + alpha * beta2",
+   "note": "positive control 'alpha=0.2 b1=+1.0 b2=+0.4 [realised ancestry-1 fraction]' passed at 0.61 sems",
+   "regime": "2e6 individuals in 20 independent blocks of 1e5, standardised dosage, a fraction alpha carrying the first ancestry's effect and the rest the second; the observable is the realised MARGINAL OLS slope over the whole admixed sample -- what a GWAS ignoring local ancestry estimates. alpha is swept across 1/2, where the swapped reading coincides with the body, and one cell gives the two ancestries effects of OPPOSITE SIGN",
+   "span": 1.159090909090909,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+    "lean": -0.14,
+    "truth": 0.34040292647280224,
+    "sem": 0.0008579292851961164,
+    "sems_off": 559.9563212986553,
+    "rel_err": 1.411277310247172
+   },
+   "cells": [
+    {
+     "design": "alpha=0.2 b1=+1.0 b2=+0.4",
+     "lean": 0.8800000000000001,
+     "truth": 0.5207482406776914,
+     "sem": 0.0010457944594743761,
+     "sems_off": 343.520427047272,
+     "rel_err": 0.689876088404611
+    },
+    {
+     "design": "alpha=0.3 b1=+0.8 b2=+0.2",
+     "lean": 0.6199999999999999,
+     "truth": 0.3793468694413828,
+     "sem": 0.0009037993552952129,
+     "sems_off": 266.26831403305357,
+     "rel_err": 0.6343880757814008
+    },
+    {
+     "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+     "lean": 0.0,
+     "truth": -0.0022358859647680605,
+     "sem": 0.0015145119356294455,
+     "sems_off": 1.4763079195138895,
+     "rel_err": 1.0
+    },
+    {
+     "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+     "lean": -0.14,
+     "truth": 0.34040292647280224,
+     "sem": 0.0008579292851961164,
+     "sems_off": 559.9563212986553,
+     "rel_err": 1.411277310247172
+    }
+   ]
+  },
+  {
+   "name": "ancestrySpecificEffect",
+   "file": "HaplotypeTheory.lean",
+   "source": "alpha * beta_pop1 + (1 - alpha) * beta_pop2",
+   "note": "",
+   "regime": "2e6 individuals in 20 independent blocks of 1e5, standardised dosage, a fraction alpha carrying the first ancestry's effect and the rest the second; the observable is the realised MARGINAL OLS slope over the whole admixed sample -- what a GWAS ignoring local ancestry estimates. alpha is swept across 1/2, where the swapped reading coincides with the body, and one cell gives the two ancestries effects of OPPOSITE SIGN",
+   "span": 1.0,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+    "lean": 0.0,
+    "truth": -0.0022358859647680605,
+    "sem": 0.0015145119356294455,
+    "sems_off": 1.4763079195138895,
+    "rel_err": 1.0
+   },
+   "cells": [
+    {
+     "design": "alpha=0.2 b1=+1.0 b2=+0.4",
+     "lean": 0.52,
+     "truth": 0.5207482406776914,
+     "sem": 0.0010457944594743761,
+     "sems_off": 0.7154758479668034,
+     "rel_err": 0.0014368568518208886
+    },
+    {
+     "design": "alpha=0.3 b1=+0.8 b2=+0.2",
+     "lean": 0.38,
+     "truth": 0.3793468694413828,
+     "sem": 0.0009037993552952129,
+     "sems_off": 0.722649949671489,
+     "rel_err": 0.0017217238660200212
+    },
+    {
+     "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+     "lean": 0.0,
+     "truth": -0.0022358859647680605,
+     "sem": 0.0015145119356294455,
+     "sems_off": 1.4763079195138895,
+     "rel_err": 1.0
+    },
+    {
+     "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+     "lean": 0.34,
+     "truth": 0.34040292647280224,
+     "sem": 0.0008579292851961164,
+     "sems_off": 0.46964998136193226,
+     "rel_err": 0.001183675114010529
+    }
+   ]
+  },
+  {
+   "name": "ancestrySpecificEffect [weights swapped, competing]",
+   "file": "HaplotypeTheory.lean",
+   "source": "(1 - alpha) * beta_pop1 + alpha * beta_pop2",
+   "note": "positive control 'alpha=0.2 b1=+1.0 b2=+0.4 [realised ancestry-1 fraction]' passed at 0.61 sems",
+   "regime": "2e6 individuals in 20 independent blocks of 1e5, standardised dosage, a fraction alpha carrying the first ancestry's effect and the rest the second; the observable is the realised MARGINAL OLS slope over the whole admixed sample -- what a GWAS ignoring local ancestry estimates. alpha is swept across 1/2, where the swapped reading coincides with the body, and one cell gives the two ancestries effects of OPPOSITE SIGN",
+   "span": 1.159090909090909,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+    "lean": -0.14,
+    "truth": 0.34040292647280224,
+    "sem": 0.0008579292851961164,
+    "sems_off": 559.9563212986553,
+    "rel_err": 1.411277310247172
+   },
+   "cells": [
+    {
+     "design": "alpha=0.2 b1=+1.0 b2=+0.4",
+     "lean": 0.8800000000000001,
+     "truth": 0.5207482406776914,
+     "sem": 0.0010457944594743761,
+     "sems_off": 343.520427047272,
+     "rel_err": 0.689876088404611
+    },
+    {
+     "design": "alpha=0.3 b1=+0.8 b2=+0.2",
+     "lean": 0.6199999999999999,
+     "truth": 0.3793468694413828,
+     "sem": 0.0009037993552952129,
+     "sems_off": 266.26831403305357,
+     "rel_err": 0.6343880757814008
+    },
+    {
+     "design": "alpha=0.5 b1=+1.0 b2=-1.0",
+     "lean": 0.0,
+     "truth": -0.0022358859647680605,
+     "sem": 0.0015145119356294455,
+     "sems_off": 1.4763079195138895,
+     "rel_err": 1.0
+    },
+    {
+     "design": "alpha=0.8 b1=+0.5 b2=-0.3",
+     "lean": -0.14,
+     "truth": 0.34040292647280224,
+     "sem": 0.0008579292851961164,
+     "sems_off": 559.9563212986553,
+     "rel_err": 1.411277310247172
+    }
+   ]
+  }
+ ]
+}

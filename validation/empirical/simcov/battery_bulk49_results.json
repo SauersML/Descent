@@ -1,0 +1,134 @@
+{
+ "_battery_sha": "70081997c573326e",
+ "results": [
+  {
+   "name": "neutralDriftR2Ratio",
+   "file": "HumanDemography.lean",
+   "source": "presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0",
+   "note": "",
+   "regime": "3000 variants and 400000 individuals per population (10 blocks of 40000); a fraction fst of the signal stops being shared and THE SCORE TRACKS THE ATTENUATED SIGNAL, which is the regime this body declares. The observable is the RATIO of realised R-squared values, so no heritability convention enters. V_A and V_E are held comparable, which is where this body and the naive signal-variance ratio separate",
+   "span": 0.2500000000000001,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "V_A=1.0 V_E=1.0 fst=0.2",
+    "lean": 0.888888888888889,
+    "truth": 0.8949681585957782,
+    "sem": 0.003760561422515934,
+    "sems_off": 1.6165856700252987,
+    "rel_err": 0.006792721784010395
+   },
+   "cells": [
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.2",
+     "lean": 0.888888888888889,
+     "truth": 0.8949681585957782,
+     "sem": 0.003760561422515934,
+     "sems_off": 1.6165856700252987,
+     "rel_err": 0.006792721784010395
+    },
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.5",
+     "lean": 0.6666666666666666,
+     "truth": 0.6673819537496805,
+     "sem": 0.006519177924728574,
+     "sems_off": 0.10972044194415938,
+     "rel_err": 0.0010717806782083211
+    },
+    {
+     "design": "V_A=2.0 V_E=1.0 fst=0.3",
+     "lean": 0.8750000000000001,
+     "truth": 0.8764381714659365,
+     "sem": 0.0029219336821272868,
+     "sems_off": 0.49219853097053906,
+     "rel_err": 0.0016409274638630735
+    }
+   ]
+  },
+  {
+   "name": "neutralDriftR2Ratio [naive 1 - fst, competing]",
+   "file": "HumanDemography.lean",
+   "source": "1 - fst",
+   "note": "positive control 'fst=0 [same construction: ratio is 1]' passed at 1.17 sems",
+   "regime": "3000 variants and 400000 individuals per population (10 blocks of 40000); a fraction fst of the signal stops being shared and THE SCORE TRACKS THE ATTENUATED SIGNAL, which is the regime this body declares. The observable is the RATIO of realised R-squared values, so no heritability convention enters. V_A and V_E are held comparable, which is where this body and the naive signal-variance ratio separate",
+   "span": 0.37500000000000006,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "V_A=2.0 V_E=1.0 fst=0.3",
+    "lean": 0.7,
+    "truth": 0.8764381714659365,
+    "sem": 0.0029219336821272868,
+    "sems_off": 60.38404380809983,
+    "rel_err": 0.20131274197109061
+   },
+   "cells": [
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.2",
+     "lean": 0.8,
+     "truth": 0.8949681585957782,
+     "sem": 0.003760561422515934,
+     "sems_off": 25.25371824195373,
+     "rel_err": 0.10611344960560937
+    },
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.5",
+     "lean": 0.5,
+     "truth": 0.6673819537496805,
+     "sem": 0.006519177924728574,
+     "sems_off": 25.67531607240945,
+     "rel_err": 0.2508038355086562
+    },
+    {
+     "design": "V_A=2.0 V_E=1.0 fst=0.3",
+     "lean": 0.7,
+     "truth": 0.8764381714659365,
+     "sem": 0.0029219336821272868,
+     "sems_off": 60.38404380809983,
+     "rel_err": 0.20131274197109061
+    }
+   ]
+  },
+  {
+   "name": "neutralDriftR2Ratio [scored with the FULL source weights, competing construction]",
+   "file": "HumanDemography.lean",
+   "source": "presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0, against a score that keeps the unshared weights",
+   "note": "positive control 'fst=0 [same construction: ratio is 1]' passed at 1.17 sems",
+   "regime": "3000 variants and 400000 individuals per population (10 blocks of 40000); a fraction fst of the signal stops being shared and THE SCORE TRACKS THE ATTENUATED SIGNAL, which is the regime this body declares. The observable is the RATIO of realised R-squared values, so no heritability convention enters. V_A and V_E are held comparable, which is where this body and the naive signal-variance ratio separate",
+   "span": 0.2500000000000001,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "V_A=2.0 V_E=1.0 fst=0.3",
+    "lean": 0.8750000000000001,
+    "truth": 0.6149068683055476,
+    "sem": 0.0029219336821272868,
+    "sems_off": 89.01404343478941,
+    "rel_err": 0.4229797146536539
+   },
+   "cells": [
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.2",
+     "lean": 0.888888888888889,
+     "truth": 0.7204638258203973,
+     "sem": 0.003760561422515934,
+     "sems_off": 44.78721237208513,
+     "rel_err": 0.23377310148320757
+    },
+    {
+     "design": "V_A=1.0 V_E=1.0 fst=0.5",
+     "lean": 0.6666666666666666,
+     "truth": 0.33476001675947276,
+     "sem": 0.006519177924728574,
+     "sems_off": 50.91234719153839,
+     "rel_err": 0.9914763809612035
+    },
+    {
+     "design": "V_A=2.0 V_E=1.0 fst=0.3",
+     "lean": 0.8750000000000001,
+     "truth": 0.6149068683055476,
+     "sem": 0.0029219336821272868,
+     "sems_off": 89.01404343478941,
+     "rel_err": 0.4229797146536539
+    }
+   ]
+  }
+ ]
+}

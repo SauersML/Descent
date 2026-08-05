@@ -1,0 +1,276 @@
+{
+ "_battery_sha": "52c94e9ef76c1893",
+ "results": [
+  {
+   "name": "neutralPortabilityRatioLD",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - fst_additional) * ld_factor",
+   "note": "",
+   "regime": "2000 variants and 400000 individuals per population (10 blocks of 40000), standardised genotypes; the target differs from the source in TWO independent ways -- a fraction fst_additional of variants stop carrying signal, and the score's tagging is scaled by ld_factor -- and the observable is the realised ratio of score-phenotype covariance. The two penalties are swept INDEPENDENTLY, because the product and the sum separate only when both bite",
+   "span": 0.65,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "fst_add=0.0 ld=1.0",
+    "lean": 1.0,
+    "truth": 0.9965447021342883,
+    "sem": 0.0024527539833888536,
+    "sems_off": 1.4087421278744505,
+    "rel_err": 0.0034672783451776693
+   },
+   "cells": [
+    {
+     "design": "fst_add=0.0 ld=1.0",
+     "lean": 1.0,
+     "truth": 0.9965447021342883,
+     "sem": 0.0024527539833888536,
+     "sems_off": 1.4087421278744505,
+     "rel_err": 0.0034672783451776693
+    },
+    {
+     "design": "fst_add=0.2 ld=1.0",
+     "lean": 0.8,
+     "truth": 0.7961181042424796,
+     "sem": 0.006346482710888703,
+     "sems_off": 0.6116609678712603,
+     "rel_err": 0.004876029997099608
+    },
+    {
+     "design": "fst_add=0.0 ld=0.6",
+     "lean": 0.6,
+     "truth": 0.6008795555285078,
+     "sem": 0.002142242731386296,
+     "sems_off": 0.41057696946351346,
+     "rel_err": 0.0014637800877319012
+    },
+    {
+     "design": "fst_add=0.3 ld=0.5",
+     "lean": 0.35,
+     "truth": 0.35226273051580737,
+     "sem": 0.0036937583802844703,
+     "sems_off": 0.6125821677684088,
+     "rel_err": 0.006423417295647886
+    },
+    {
+     "design": "fst_add=0.1 ld=0.8",
+     "lean": 0.7200000000000001,
+     "truth": 0.7185515563844124,
+     "sem": 0.0022132762558181515,
+     "sems_off": 0.6544341727699451,
+     "rel_err": 0.00201578244834087
+    }
+   ]
+  },
+  {
+   "name": "neutralPortabilityRatioLD [penalties added, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - fst_additional) + ld_factor - 1",
+   "note": "positive control 'fst_add=0 ld=1 [no penalty: ratio is 1]' passed at 1.41 sems",
+   "regime": "2000 variants and 400000 individuals per population (10 blocks of 40000), standardised genotypes; the target differs from the source in TWO independent ways -- a fraction fst_additional of variants stop carrying signal, and the score's tagging is scaled by ld_factor -- and the observable is the realised ratio of score-phenotype covariance. The two penalties are swept INDEPENDENTLY, because the product and the sum separate only when both bite",
+   "span": 0.8,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "fst_add=0.3 ld=0.5",
+    "lean": 0.19999999999999996,
+    "truth": 0.35226273051580737,
+    "sem": 0.0036937583802844703,
+    "sems_off": 41.22162709085511,
+    "rel_err": 0.4322419527403703
+   },
+   "cells": [
+    {
+     "design": "fst_add=0.0 ld=1.0",
+     "lean": 1.0,
+     "truth": 0.9965447021342883,
+     "sem": 0.0024527539833888536,
+     "sems_off": 1.4087421278744505,
+     "rel_err": 0.0034672783451776693
+    },
+    {
+     "design": "fst_add=0.2 ld=1.0",
+     "lean": 0.8,
+     "truth": 0.7961181042424796,
+     "sem": 0.006346482710888703,
+     "sems_off": 0.6116609678712603,
+     "rel_err": 0.004876029997099608
+    },
+    {
+     "design": "fst_add=0.0 ld=0.6",
+     "lean": 0.6000000000000001,
+     "truth": 0.6008795555285078,
+     "sem": 0.002142242731386296,
+     "sems_off": 0.4105769694634616,
+     "rel_err": 0.0014637800877317165
+    },
+    {
+     "design": "fst_add=0.3 ld=0.5",
+     "lean": 0.19999999999999996,
+     "truth": 0.35226273051580737,
+     "sem": 0.0036937583802844703,
+     "sems_off": 41.22162709085511,
+     "rel_err": 0.4322419527403703
+    },
+    {
+     "design": "fst_add=0.1 ld=0.8",
+     "lean": 0.7000000000000002,
+     "truth": 0.7185515563844124,
+     "sem": 0.0022132762558181515,
+     "sems_off": 8.381943435955984,
+     "rel_err": 0.025817989286335132
+    }
+   ]
+  },
+  {
+   "name": "rareHeritabilityShare",
+   "file": "RareVariantPortability.lean",
+   "source": "rareCount * rareVariance / (rareCount * rareVariance + commonCount * commonVariance), at the realised masses",
+   "note": "",
+   "regime": "500000 individuals per cell (10 blocks of 50000) with standardised independent genotypes in a rare and a common class; the observable is the realised share of genetic variance carried by the rare class. Counts and per-variant variances move in OPPOSITE directions across the design, which is the only regime where the counts are visible; at equal class sizes the body and the bare variance ratio coincide exactly. The prediction is evaluated at the REALISED sums of squares",
+   "span": 0.13655920836759639,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
+    "lean": 0.49553890855888855,
+    "truth": 0.4940778874752696,
+    "sem": 0.004007622124319812,
+    "sems_off": 0.36456058937116526,
+    "rel_err": 0.002957066326292697
+   },
+   "cells": [
+    {
+     "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+     "lean": 0.48628191115525377,
+     "truth": 0.4850543639864431,
+     "sem": 0.009104769393869174,
+     "sems_off": 0.13482463044448656,
+     "rel_err": 0.00253074141777022
+    },
+    {
+     "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
+     "lean": 0.4959211982945133,
+     "truth": 0.4965420171152239,
+     "sem": 0.010221789719804248,
+     "sems_off": 0.06073484563156001,
+     "rel_err": 0.0012502845666865598
+    },
+    {
+     "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
+     "lean": 0.49553890855888855,
+     "truth": 0.4940778874752696,
+     "sem": 0.004007622124319812,
+     "sems_off": 0.36456058937116526,
+     "rel_err": 0.002957066326292697
+    },
+    {
+     "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
+     "lean": 0.5631908011154987,
+     "truth": 0.5627625338493031,
+     "sem": 0.003034284422815699,
+     "sems_off": 0.1411427560894861,
+     "rel_err": 0.0007610088455360551
+    }
+   ]
+  },
+  {
+   "name": "rareHeritabilityShare [bare variance ratio, counts dropped, competing]",
+   "file": "RareVariantPortability.lean",
+   "source": "rareVariance / (rareVariance + commonVariance)",
+   "note": "the positive control 'total genetic variance = realised sum of squares' missed by 11459312973.4 sems on the same code path, so this design cannot support any verdict",
+   "regime": "500000 individuals per cell (10 blocks of 50000) with standardised independent genotypes in a rare and a common class; the observable is the realised share of genetic variance carried by the rare class. Counts and per-variant variances move in OPPOSITE directions across the design, which is the only regime where the counts are visible; at equal class sizes the body and the bare variance ratio coincide exactly. The prediction is evaluated at the REALISED sums of squares",
+   "span": 0.9,
+   "verdict": "VOID (control failed)",
+   "worst": {
+    "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
+    "lean": 0.8,
+    "truth": 0.5627625338493031,
+    "sem": 0.003034284422815699,
+    "sems_off": 78.18563888303844,
+    "rel_err": 0.42155874259785847
+   },
+   "cells": [
+    {
+     "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+     "lean": 0.09090909090909091,
+     "truth": 0.4850543639864431,
+     "sem": 0.009104769393869174,
+     "sems_off": 43.28997869432646,
+     "rel_err": 0.8125795835296685
+    },
+    {
+     "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
+     "lean": 0.9090909090909092,
+     "truth": 0.4965420171152239,
+     "sem": 0.010221789719804248,
+     "sems_off": 40.35975140208478,
+     "rel_err": 0.8308438717280843
+    },
+    {
+     "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
+     "lean": 0.5,
+     "truth": 0.4940778874752696,
+     "sem": 0.004007622124319812,
+     "sems_off": 1.4777123044592253,
+     "rel_err": 0.011986192207451965
+    },
+    {
+     "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
+     "lean": 0.8,
+     "truth": 0.5627625338493031,
+     "sem": 0.003034284422815699,
+     "sems_off": 78.18563888303844,
+     "rel_err": 0.42155874259785847
+    }
+   ]
+  },
+  {
+   "name": "rareHeritabilityShare [nominal masses, competing]",
+   "file": "RareVariantPortability.lean",
+   "source": "the same body at NOMINAL count*variance",
+   "note": "",
+   "regime": "500000 individuals per cell (10 blocks of 50000) with standardised independent genotypes in a rare and a common class; the observable is the realised share of genetic variance carried by the rare class. Counts and per-variant variances move in OPPOSITE directions across the design, which is the only regime where the counts are visible; at equal class sizes the body and the bare variance ratio coincide exactly. The prediction is evaluated at the REALISED sums of squares",
+   "span": 0.12499999999999994,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
+    "lean": 0.5714285714285714,
+    "truth": 0.5627625338493031,
+    "sem": 0.003034284422815699,
+    "sems_off": 2.8560399658337126,
+    "rel_err": 0.015399101855613068
+   },
+   "cells": [
+    {
+     "design": "rc=2000 rv=0.001 cc=200 cv=0.010",
+     "lean": 0.5,
+     "truth": 0.4850543639864431,
+     "sem": 0.009104769393869174,
+     "sems_off": 1.6415172495879768,
+     "rel_err": 0.03081229058682304
+    },
+    {
+     "design": "rc=200 rv=0.010 cc=2000 cv=0.001",
+     "lean": 0.5,
+     "truth": 0.4965420171152239,
+     "sem": 0.010221789719804248,
+     "sems_off": 0.3382952476586785,
+     "rel_err": 0.0069641294504462405
+    },
+    {
+     "design": "rc=1000 rv=0.002 cc=1000 cv=0.002",
+     "lean": 0.5,
+     "truth": 0.4940778874752696,
+     "sem": 0.004007622124319812,
+     "sems_off": 1.4777123044592253,
+     "rel_err": 0.011986192207451965
+    },
+    {
+     "design": "rc=500 rv=0.004 cc=1500 cv=0.001",
+     "lean": 0.5714285714285714,
+     "truth": 0.5627625338493031,
+     "sem": 0.003034284422815699,
+     "sems_off": 2.8560399658337126,
+     "rel_err": 0.015399101855613068
+    }
+   ]
+  }
+ ]
+}

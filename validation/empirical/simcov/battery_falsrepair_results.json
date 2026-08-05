@@ -1,0 +1,942 @@
+{
+ "_battery_sha": "1112922e36ea01e7",
+ "results": [
+  {
+   "name": "EvolutionaryParameters.fstEquilibrium",
+   "file": "DGP.lean",
+   "source": "corrected [1/(1+theta+2*bigM)], islandDemeCorrection 2 on migration",
+   "note": "",
+   "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model, sequence_length = 1; the observable is the per-replicate F_ST = (F_within - F_between)/(1 - F_between) from identity by state, 60 replicates.  This is battery_bulk38's design at new seeds with two extra migration cells",
+   "span": 0.7037037037037037,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "theta=0.5 bigM=2.0",
+    "lean": 0.18181818181818182,
+    "truth": 0.16118829478948654,
+    "sem": 0.018833042030065295,
+    "sems_off": 1.0954091747770478,
+    "rel_err": 0.12798626014152029
+   },
+   "cells": [
+    {
+     "design": "theta=1.0 bigM=1.0",
+     "lean": 0.25,
+     "truth": 0.2414004352374367,
+     "sem": 0.017540915103843254,
+     "sems_off": 0.4902574758302724,
+     "rel_err": 0.03562365061233188
+    },
+    {
+     "design": "theta=2.0 bigM=0.5",
+     "lean": 0.25,
+     "truth": 0.2567668663272768,
+     "sem": 0.013374911617377024,
+     "sems_off": 0.5059372742684232,
+     "rel_err": 0.02635412592001534
+    },
+    {
+     "design": "theta=0.5 bigM=2.0",
+     "lean": 0.18181818181818182,
+     "truth": 0.16118829478948654,
+     "sem": 0.018833042030065295,
+     "sems_off": 1.0954091747770478,
+     "rel_err": 0.12798626014152029
+    },
+    {
+     "design": "theta=3.0 bigM=3.0",
+     "lean": 0.1,
+     "truth": 0.09587959862449634,
+     "sem": 0.006213351846748989,
+     "sems_off": 0.66315275186928,
+     "rel_err": 0.04297474577090002
+    },
+    {
+     "design": "theta=1.0 bigM=4.0",
+     "lean": 0.1,
+     "truth": 0.09438895566593357,
+     "sem": 0.009565596474608666,
+     "sems_off": 0.5865859331365939,
+     "rel_err": 0.05944598384926881
+    },
+    {
+     "design": "theta=0.5 bigM=6.0",
+     "lean": 0.07407407407407407,
+     "truth": 0.06504141512082967,
+     "sem": 0.009010031174755033,
+     "sems_off": 1.0025113984680503,
+     "rel_err": 0.13887549857985282
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.fstEquilibrium [superseded body [1/(1+theta+bigM)]]",
+   "file": "DGP.lean",
+   "source": "superseded body [1/(1+theta+bigM)]",
+   "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.94 sems",
+   "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model, sequence_length = 1; the observable is the per-replicate F_ST = (F_within - F_between)/(1 - F_between) from identity by state, 60 replicates.  This is battery_bulk38's design at new seeds with two extra migration cells",
+   "span": 0.6,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=0.5 bigM=6.0",
+    "lean": 0.13333333333333333,
+    "truth": 0.06504141512082967,
+    "sem": 0.009010031174755033,
+    "sems_off": 7.579542943630314,
+    "rel_err": 1.0499758974437352
+   },
+   "cells": [
+    {
+     "design": "theta=1.0 bigM=1.0",
+     "lean": 0.3333333333333333,
+     "truth": 0.2414004352374367,
+     "sem": 0.017540915103843254,
+     "sems_off": 5.241054845294468,
+     "rel_err": 0.3808315341497758
+    },
+    {
+     "design": "theta=2.0 bigM=0.5",
+     "lean": 0.2857142857142857,
+     "truth": 0.2567668663272768,
+     "sem": 0.013374911617377024,
+     "sems_off": 2.164307340124751,
+     "rel_err": 0.11273814180569669
+    },
+    {
+     "design": "theta=0.5 bigM=2.0",
+     "lean": 0.2857142857142857,
+     "truth": 0.16118829478948654,
+     "sem": 0.018833042030065295,
+     "sems_off": 6.612101790353591,
+     "rel_err": 0.772549837365246
+    },
+    {
+     "design": "theta=3.0 bigM=3.0",
+     "lean": 0.14285714285714285,
+     "truth": 0.09587959862449634,
+     "sem": 0.006213351846748989,
+     "sems_off": 7.56074102856843,
+     "rel_err": 0.489963922529857
+    },
+    {
+     "design": "theta=1.0 bigM=4.0",
+     "lean": 0.16666666666666666,
+     "truth": 0.09438895566593357,
+     "sem": 0.009565596474608666,
+     "sems_off": 7.556006694678182,
+     "rel_err": 0.7657433064154479
+    },
+    {
+     "design": "theta=0.5 bigM=6.0",
+     "lean": 0.13333333333333333,
+     "truth": 0.06504141512082967,
+     "sem": 0.009010031174755033,
+     "sems_off": 7.579542943630314,
+     "rel_err": 1.0499758974437352
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.fstEquilibrium [multiplicative [1/((1+theta)(1+bigM))], competing]",
+   "file": "DGP.lean",
+   "source": "multiplicative [1/((1+theta)(1+bigM))], competing",
+   "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.94 sems",
+   "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model, sequence_length = 1; the observable is the per-replicate F_ST = (F_within - F_between)/(1 - F_between) from identity by state, 60 replicates.  This is battery_bulk38's design at new seeds with two extra migration cells",
+   "span": 0.75,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.0625,
+    "truth": 0.09587959862449634,
+    "sem": 0.006213351846748989,
+    "sems_off": 5.372236990242479,
+    "rel_err": 0.34814078389318753
+   },
+   "cells": [
+    {
+     "design": "theta=1.0 bigM=1.0",
+     "lean": 0.25,
+     "truth": 0.2414004352374367,
+     "sem": 0.017540915103843254,
+     "sems_off": 0.4902574758302724,
+     "rel_err": 0.03562365061233188
+    },
+    {
+     "design": "theta=2.0 bigM=0.5",
+     "lean": 0.2222222222222222,
+     "truth": 0.2567668663272768,
+     "sem": 0.013374911617377024,
+     "sems_off": 2.5827941965742274,
+     "rel_err": 0.13453700081779146
+    },
+    {
+     "design": "theta=0.5 bigM=2.0",
+     "lean": 0.2222222222222222,
+     "truth": 0.16118829478948654,
+     "sem": 0.018833042030065295,
+     "sems_off": 3.240789636390147,
+     "rel_err": 0.37864987350630247
+    },
+    {
+     "design": "theta=3.0 bigM=3.0",
+     "lean": 0.0625,
+     "truth": 0.09587959862449634,
+     "sem": 0.006213351846748989,
+     "sems_off": 5.372236990242479,
+     "rel_err": 0.34814078389318753
+    },
+    {
+     "design": "theta=1.0 bigM=4.0",
+     "lean": 0.1,
+     "truth": 0.09438895566593357,
+     "sem": 0.009565596474608666,
+     "sems_off": 0.5865859331365939,
+     "rel_err": 0.05944598384926881
+    },
+    {
+     "design": "theta=0.5 bigM=6.0",
+     "lean": 0.09523809523809523,
+     "truth": 0.06504141512082967,
+     "sem": 0.009010031174755033,
+     "sems_off": 3.3514512360260014,
+     "rel_err": 0.4642684981740965
+    }
+   ]
+  },
+  {
+   "name": "EvolutionaryParameters.fstEquilibrium [squared correction [1/(1+theta+4*bigM)], competing]",
+   "file": "DGP.lean",
+   "source": "squared correction [1/(1+theta+4*bigM)], competing",
+   "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.94 sems",
+   "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model, sequence_length = 1; the observable is the per-replicate F_ST = (F_within - F_between)/(1 - F_between) from identity by state, 60 replicates.  This is battery_bulk38's design at new seeds with two extra migration cells",
+   "span": 0.803921568627451,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.0625,
+    "truth": 0.09587959862449634,
+    "sem": 0.006213351846748989,
+    "sems_off": 5.372236990242479,
+    "rel_err": 0.34814078389318753
+   },
+   "cells": [
+    {
+     "design": "theta=1.0 bigM=1.0",
+     "lean": 0.16666666666666666,
+     "truth": 0.2414004352374367,
+     "sem": 0.017540915103843254,
+     "sems_off": 4.260539893633925,
+     "rel_err": 0.3095842329251121
+    },
+    {
+     "design": "theta=2.0 bigM=0.5",
+     "lean": 0.2,
+     "truth": 0.2567668663272768,
+     "sem": 0.013374911617377024,
+     "sems_off": 4.244279734418868,
+     "rel_err": 0.22108330073601223
+    },
+    {
+     "design": "theta=0.5 bigM=2.0",
+     "lean": 0.10526315789473684,
+     "truth": 0.16118829478948654,
+     "sem": 0.018833042030065295,
+     "sems_off": 2.9695222261740906,
+     "rel_err": 0.346955323075962
+    },
+    {
+     "design": "theta=3.0 bigM=3.0",
+     "lean": 0.0625,
+     "truth": 0.09587959862449634,
+     "sem": 0.006213351846748989,
+     "sems_off": 5.372236990242479,
+     "rel_err": 0.34814078389318753
+    },
+    {
+     "design": "theta=1.0 bigM=4.0",
+     "lean": 0.05555555555555555,
+     "truth": 0.09438895566593357,
+     "sem": 0.009565596474608666,
+     "sems_off": 4.0596945745578,
+     "rel_err": 0.4114188978615174
+    },
+    {
+     "design": "theta=0.5 bigM=6.0",
+     "lean": 0.0392156862745098,
+     "truth": 0.06504141512082967,
+     "sem": 0.009010031174755033,
+     "sems_off": 2.8663306869215157,
+     "rel_err": 0.3970659125165485
+    }
+   ]
+  },
+  {
+   "name": "DriftRegime.closedPopulation",
+   "file": "DriftRegime.lean",
+   "source": "(1 - 1 / (2 * Ne))^t * H0",
+   "note": "",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.8505024326802558,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.904814789840326,
+    "truth": 0.9070171194791667,
+    "sem": 0.001221587305367231,
+    "sems_off": 1.8028426041793597,
+    "rel_err": 0.0024281015115848546
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.904814789840326,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 1.8028426041793597,
+     "rel_err": 0.0024281015115848546
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.606454822840095,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 0.51025966518165,
+     "rel_err": 0.0028491617326289885
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.13526760995605433,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 0.2790779350358335,
+     "rel_err": 0.006136143011308149
+    }
+   ]
+  },
+  {
+   "name": "DriftRegime.closedPopulation [competing [(1 - 1/(4*Ne))^t]]",
+   "file": "DriftRegime.lean",
+   "source": "competing [(1 - 1/(4*Ne))^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.6133049069700508,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=4000",
+    "lean": 0.36783345145064067,
+    "truth": 0.134442650625,
+    "sem": 0.002956017755213834,
+    "sems_off": 78.95446514622085,
+    "rel_err": 1.7359877965857435
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.9512234783443512,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 36.18763773244615,
+     "rel_err": 0.04873817474423072
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.7787764418703372,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 50.23275998780367,
+     "rel_err": 0.28048710734491694
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.36783345145064067,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 78.95446514622085,
+     "rel_err": 1.7359877965857435
+    }
+   ]
+  },
+  {
+   "name": "DriftRegime.closedPopulation [competing [(1 - 1/Ne)^t]]",
+   "file": "DriftRegime.lean",
+   "source": "competing [(1 - 1/Ne)^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.9776717205604135,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.8186488294786356,
+    "truth": 0.9070171194791667,
+    "sem": 0.001221587305367231,
+    "sems_off": 72.33890661131753,
+    "rel_err": 0.09742736724889445
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.8186488294786356,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 72.33890661131753,
+     "rel_err": 0.09742736724889445
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.36769542477096373,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 70.81700873553852,
+     "rel_err": 0.39542437914766454
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.018279019827489414,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 39.297338655229915,
+     "rel_err": 0.8640385343303372
+    }
+   ]
+  },
+  {
+   "name": "neutralDriftFactor",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - 1 / (2 * Ne))^t",
+   "note": "",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.8505024326802558,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.904814789840326,
+    "truth": 0.9070171194791667,
+    "sem": 0.001221587305367231,
+    "sems_off": 1.8028426041793597,
+    "rel_err": 0.0024281015115848546
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.904814789840326,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 1.8028426041793597,
+     "rel_err": 0.0024281015115848546
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.606454822840095,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 0.51025966518165,
+     "rel_err": 0.0028491617326289885
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.13526760995605433,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 0.2790779350358335,
+     "rel_err": 0.006136143011308149
+    }
+   ]
+  },
+  {
+   "name": "neutralDriftFactor [competing [(1 - 1/(4*Ne))^t]]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "competing [(1 - 1/(4*Ne))^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.6133049069700508,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=4000",
+    "lean": 0.36783345145064067,
+    "truth": 0.134442650625,
+    "sem": 0.002956017755213834,
+    "sems_off": 78.95446514622085,
+    "rel_err": 1.7359877965857435
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.9512234783443512,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 36.18763773244615,
+     "rel_err": 0.04873817474423072
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.7787764418703372,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 50.23275998780367,
+     "rel_err": 0.28048710734491694
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.36783345145064067,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 78.95446514622085,
+     "rel_err": 1.7359877965857435
+    }
+   ]
+  },
+  {
+   "name": "neutralDriftFactor [competing [(1 - 1/Ne)^t]]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "competing [(1 - 1/Ne)^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate",
+   "span": 0.9776717205604135,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.8186488294786356,
+    "truth": 0.9070171194791667,
+    "sem": 0.001221587305367231,
+    "sems_off": 72.33890661131753,
+    "rel_err": 0.09742736724889445
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.8186488294786356,
+     "truth": 0.9070171194791667,
+     "sem": 0.001221587305367231,
+     "sems_off": 72.33890661131753,
+     "rel_err": 0.09742736724889445
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.36769542477096373,
+     "truth": 0.6081876478125,
+     "sem": 0.0033959669765160337,
+     "sems_off": 70.81700873553852,
+     "rel_err": 0.39542437914766454
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.018279019827489414,
+     "truth": 0.134442650625,
+     "sem": 0.002956017755213834,
+     "sems_off": 39.297338655229915,
+     "rel_err": 0.8640385343303372
+    }
+   ]
+  },
+  {
+   "name": "heterozygosityLossDerived",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "1 - (1 - 1 / (2 * Ne))^t",
+   "note": "",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate; read as the LOSS 1 - H_t/H_0",
+   "span": 0.8899252401603268,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.09518521015967396,
+    "truth": 0.09298288052083326,
+    "sem": 0.001221587305367231,
+    "sems_off": 1.8028426041793597,
+    "rel_err": 0.023685323862893914
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.09518521015967396,
+     "truth": 0.09298288052083326,
+     "sem": 0.001221587305367231,
+     "sems_off": 1.8028426041793597,
+     "rel_err": 0.023685323862893914
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.393545177159905,
+     "truth": 0.3918123521875,
+     "sem": 0.0033959669765160337,
+     "sems_off": 0.51025966518165,
+     "rel_err": 0.004422588932509653
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.8647323900439456,
+     "truth": 0.865557349375,
+     "sem": 0.002956017755213834,
+     "sems_off": 0.2790779350358241,
+     "rel_err": 0.0009530960965786891
+    }
+   ]
+  },
+  {
+   "name": "heterozygosityLossDerived [competing [(1 - 1/(4*Ne))^t]]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "1 - competing [(1 - 1/(4*Ne))^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate; read as the LOSS 1 - H_t/H_0",
+   "span": 0.9228422924819781,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=4000",
+    "lean": 0.6321665485493593,
+    "truth": 0.865557349375,
+    "sem": 0.002956017755213834,
+    "sems_off": 78.95446514622085,
+    "rel_err": 0.269642214919863
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.04877652165564883,
+     "truth": 0.09298288052083326,
+     "sem": 0.001221587305367231,
+     "sems_off": 36.18763773244615,
+     "rel_err": 0.4754247084793182
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.22122355812966277,
+     "truth": 0.3918123521875,
+     "sem": 0.0033959669765160337,
+     "sems_off": 50.23275998780367,
+     "rel_err": 0.4353839104495683
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.6321665485493593,
+     "truth": 0.865557349375,
+     "sem": 0.002956017755213834,
+     "sems_off": 78.95446514622085,
+     "rel_err": 0.269642214919863
+    }
+   ]
+  },
+  {
+   "name": "heterozygosityLossDerived [competing [(1 - 1/Ne)^t]]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "1 - competing [(1 - 1/Ne)^t]",
+   "note": "positive control 'Ne=100 t=200 [second population size]' passed at 2.39 sems",
+   "regime": "forward Wright-Fisher, 400 independent biallelic loci at p0 = 0.5, NO mutation and no migration -- the closed-population regime these bodies declare -- 24 replicates, retention H_t/H_0 measured per replicate; read as the LOSS 1 - H_t/H_0",
+   "span": 0.8152721861057742,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=1000 t=200",
+    "lean": 0.1813511705213644,
+    "truth": 0.09298288052083326,
+    "sem": 0.001221587305367231,
+    "sems_off": 72.33890661131753,
+    "rel_err": 0.9503716114788658
+   },
+   "cells": [
+    {
+     "design": "Ne=1000 t=200",
+     "lean": 0.1813511705213644,
+     "truth": 0.09298288052083326,
+     "sem": 0.001221587305367231,
+     "sems_off": 72.33890661131753,
+     "rel_err": 0.9503716114788658
+    },
+    {
+     "design": "Ne=1000 t=1000",
+     "lean": 0.6323045752290363,
+     "truth": 0.3918123521875,
+     "sem": 0.0033959669765160337,
+     "sems_off": 70.81700873553852,
+     "rel_err": 0.6137943883056801
+    },
+    {
+     "design": "Ne=1000 t=4000",
+     "lean": 0.9817209801725106,
+     "truth": 0.865557349375,
+     "sem": 0.002956017755213834,
+     "sems_off": 39.29733865522996,
+     "rel_err": 0.13420674075656558
+    }
+   ]
+  },
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "body [1/(1 + 4*Ne*m + 4*Ne*mu)], the many-deme limit",
+   "note": "",
+   "regime": "msprime symmetric island model, TWENTY demes of Ne = 1000, total emigration rate m spread over the 19 other demes, mu = 1e-8, 1 Mb, Hudson F_ST between demes 0 and 1, 24 replicates.  4*Ne*m is swept sixteenfold so the prediction spans 0.5 to 0.059",
+   "span": 0.8823508650567882,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "d=20 4Nem=4.0",
+    "lean": 0.1999984000127999,
+    "truth": 0.1562683587217377,
+    "sem": 0.02779503166378588,
+    "sems_off": 1.5733042444430105,
+    "rel_err": 0.2798393843051168
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.49999000019999607,
+     "truth": 0.473913755129406,
+     "sem": 0.042042772527182554,
+     "sems_off": 0.6202313383050705,
+     "rel_err": 0.05502318678948189
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.1562683587217377,
+     "sem": 0.02779503166378588,
+     "sems_off": 1.5733042444430105,
+     "rel_err": 0.2798393843051168
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.05737142587617447,
+     "sem": 0.010799899132324152,
+     "sems_off": 0.13444247115842667,
+     "rel_err": 0.025308158293733247
+    }
+   ]
+  },
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes [two-deme form [1/(1 + 2*4*Ne*m + 4*Ne*mu)], competing]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "two-deme form [1/(1 + 2*4*Ne*m + 4*Ne*mu)], competing",
+   "note": "positive control 'd=2 4Nem=4 [two-deme form 1/(1+2*4Ne*m)]' passed at 0.39 sems",
+   "regime": "msprime symmetric island model, TWENTY demes of Ne = 1000, total emigration rate m spread over the 19 other demes, mu = 1e-8, 1 Mb, Hudson F_ST between demes 0 and 1, 24 replicates.  4*Ne*m is swept sixteenfold so the prediction spans 0.5 to 0.059",
+   "span": 0.9090898071638701,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=20 4Nem=1.0",
+    "lean": 0.3333288889481474,
+    "truth": 0.473913755129406,
+    "sem": 0.042042772527182554,
+    "sems_off": 3.343853360060023,
+    "rel_err": 0.2966465198775899
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.473913755129406,
+     "sem": 0.042042772527182554,
+     "sems_off": 3.343853360060023,
+     "rel_err": 0.2966465198775899
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.1562683587217377,
+     "sem": 0.02779503166378588,
+     "sems_off": 1.6246695446088761,
+     "rel_err": 0.2889755917639304
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.030302993572129004,
+     "truth": 0.05737142587617447,
+     "sem": 0.010799899132324152,
+     "sems_off": 2.5063597328450515,
+     "rel_err": 0.4718103461898896
+    }
+   ]
+  },
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes [finite-deme form at d=20 [correction 20/19]]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "finite-deme form at d=20 [correction 20/19]",
+   "note": "",
+   "regime": "msprime symmetric island model, TWENTY demes of Ne = 1000, total emigration rate m spread over the 19 other demes, mu = 1e-8, 1 Mb, Hudson F_ST between demes 0 and 1, 24 replicates.  4*Ne*m is swept sixteenfold so the prediction spans 0.5 to 0.059",
+   "span": 0.8849537682452393,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "d=20 4Nem=4.0",
+    "lean": 0.19191771861145307,
+    "truth": 0.1562683587217377,
+    "sem": 0.02779503166378588,
+    "sems_off": 1.2825802942388043,
+    "rel_err": 0.22812909907881676
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.48716999361038105,
+     "truth": 0.473913755129406,
+     "sem": 0.042042772527182554,
+     "sems_off": 0.31530362257637295,
+     "rel_err": 0.027971837359638034
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.19191771861145307,
+     "truth": 0.1562683587217377,
+     "sem": 0.02779503166378588,
+     "sems_off": 1.2825802942388043,
+     "rel_err": 0.22812909907881676
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05604707198886517,
+     "truth": 0.05737142587617447,
+     "sem": 0.010799899132324152,
+     "sems_off": 0.12262650521850756,
+     "rel_err": 0.023083858681980013
+    }
+   ]
+  },
+  {
+   "name": "calibratedBrierFromVariances",
+   "file": "DGP.lean",
+   "source": "pi*(1-pi)*(1 - vSignal/(vSignal+vResidual))",
+   "note": "",
+   "regime": "calibrated probability drawn Beta(mean pi, variance r2*pi*(1-pi)) on the OBSERVED scale, outcome Bernoulli(p), realised mean squared error over 8e5 draws, sem from 20 blocks of 1e4.  This is the additive-noise regime; the liability-threshold design that falsified the body is a different regime",
+   "span": 0.8351648351648352,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "pi=0.20 r2=0.250",
+    "lean": 0.12000000000000002,
+    "truth": 0.12056579508482515,
+    "sem": 0.00048060606144500605,
+    "sems_off": 1.1772533270262735,
+    "rel_err": 0.004692832527061732
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 r2=0.500",
+     "lean": 0.125,
+     "truth": 0.12534473045111466,
+     "sem": 0.0005335160228360558,
+     "sems_off": 0.6461482623935987,
+     "rel_err": 0.0027502588251933596
+    },
+    {
+     "design": "pi=0.20 r2=0.250",
+     "lean": 0.12000000000000002,
+     "truth": 0.12056579508482515,
+     "sem": 0.00048060606144500605,
+     "sems_off": 1.1772533270262735,
+     "rel_err": 0.004692832527061732
+    },
+    {
+     "design": "pi=0.10 r2=0.667",
+     "lean": 0.030000000000000006,
+     "truth": 0.029858575555422085,
+     "sem": 0.00024352195548312073,
+     "sems_off": 0.580746176653149,
+     "rel_err": 0.004736476605034802
+    },
+    {
+     "design": "pi=0.35 r2=0.200",
+     "lean": 0.182,
+     "truth": 0.18221445354998847,
+     "sem": 0.00045104377475467094,
+     "sems_off": 0.47546061378436955,
+     "rel_err": 0.0011769294137231648
+    }
+   ]
+  },
+  {
+   "name": "calibratedBrierFromVariances [liability form, competing]",
+   "file": "DGP.lean",
+   "source": "pi - Phi2(z, z; r2)",
+   "note": "positive control 'r2=0 [Brier = pi*(1-pi)]' passed at 1.39 sems",
+   "regime": "calibrated probability drawn Beta(mean pi, variance r2*pi*(1-pi)) on the OBSERVED scale, outcome Bernoulli(p), realised mean squared error over 8e5 draws, sem from 20 blocks of 1e4.  This is the additive-noise regime; the liability-threshold design that falsified the body is a different regime",
+   "span": 0.7195047718853914,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi=0.10 r2=0.667",
+    "lean": 0.055960988371627995,
+    "truth": 0.029858575555422085,
+    "sem": 0.00024352195548312073,
+    "sems_off": 107.1871025527107,
+    "rel_err": 0.8742015427948275
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 r2=0.500",
+     "lean": 0.16666666666666669,
+     "truth": 0.12534473045111466,
+     "sem": 0.0005335160228360558,
+     "sems_off": 77.45209974368446,
+     "rel_err": 0.329666321566409
+    },
+    {
+     "design": "pi=0.20 r2=0.250",
+     "lean": 0.13860375881915896,
+     "truth": 0.12056579508482515,
+     "sem": 0.00048060606144500605,
+     "sems_off": 37.53170253429653,
+     "rel_err": 0.14961095492832802
+    },
+    {
+     "design": "pi=0.10 r2=0.667",
+     "lean": 0.055960988371627995,
+     "truth": 0.029858575555422085,
+     "sem": 0.00024352195548312073,
+     "sems_off": 107.1871025527107,
+     "rel_err": 0.8742015427948275
+    },
+    {
+     "design": "pi=0.35 r2=0.200",
+     "lean": 0.19950780891275158,
+     "truth": 0.18221445354998847,
+     "sem": 0.00045104377475467094,
+     "sems_off": 38.34074724159358,
+     "rel_err": 0.09490660606689398
+    }
+   ]
+  },
+  {
+   "name": "calibratedBrierFromVariances [squared factor, competing]",
+   "file": "DGP.lean",
+   "source": "pi*(1-pi)*(1 - r2)^2",
+   "note": "positive control 'r2=0 [Brier = pi*(1-pi)]' passed at 1.39 sems",
+   "regime": "calibrated probability drawn Beta(mean pi, variance r2*pi*(1-pi)) on the OBSERVED scale, outcome Bernoulli(p), realised mean squared error over 8e5 draws, sem from 20 blocks of 1e4.  This is the additive-noise regime; the liability-threshold design that falsified the body is a different regime",
+   "span": 0.9313186813186812,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi=0.50 r2=0.500",
+    "lean": 0.0625,
+    "truth": 0.12534473045111466,
+    "sem": 0.0005335160228360558,
+    "sems_off": 117.79352027151062,
+    "rel_err": 0.5013751294125967
+   },
+   "cells": [
+    {
+     "design": "pi=0.50 r2=0.500",
+     "lean": 0.0625,
+     "truth": 0.12534473045111466,
+     "sem": 0.0005335160228360558,
+     "sems_off": 117.79352027151062,
+     "rel_err": 0.5013751294125967
+    },
+    {
+     "design": "pi=0.20 r2=0.250",
+     "lean": 0.09000000000000002,
+     "truth": 0.12056579508482515,
+     "sem": 0.00048060606144500605,
+     "sems_off": 63.59843859006896,
+     "rel_err": 0.25351962439529624
+    },
+    {
+     "design": "pi=0.10 r2=0.667",
+     "lean": 0.010000000000000004,
+     "truth": 0.029858575555422085,
+     "sem": 0.00024352195548312073,
+     "sems_off": 81.54737225243143,
+     "rel_err": 0.665087841131655
+    },
+    {
+     "design": "pi=0.35 r2=0.200",
+     "lean": 0.1456,
+     "truth": 0.18221445354998847,
+     "sem": 0.00045104377475467094,
+     "sems_off": 81.17716195041952,
+     "rel_err": 0.20094154353097848
+    }
+   ]
+  }
+ ]
+}

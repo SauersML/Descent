@@ -1,0 +1,182 @@
+{
+ "_battery_sha": "c3d62d4849dd90ef",
+ "results": [
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "body [1/(1 + 4*Ne*m + 4*Ne*mu)], the many-deme limit",
+   "note": "positive control 'd=2 4Nem=4 [two-deme form 1/(1+2*4Ne*m)]' passed at 0.91 sems",
+   "regime": "msprime symmetric island model, 20 demes of Ne = 1000, total emigration m spread over the 19 other demes, mu = 1e-8, 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates, 4*Ne*m swept sixteenfold",
+   "span": 0.8823508650567882,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=20 4Nem=16.0",
+    "lean": 0.05882339100378588,
+    "truth": 0.052029646107253934,
+    "sem": 0.0017328399544170503,
+    "sems_off": 3.9205841712124228,
+    "rel_err": 0.13057449751872835
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.49999000019999607,
+     "truth": 0.5192554496097063,
+     "sem": 0.013005511952378595,
+     "sems_off": 1.4813295685900867,
+     "rel_err": 0.03710206493584401
+    },
+    {
+     "design": "d=20 4Nem=2.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.3174615684011955,
+     "sem": 0.008624274140365807,
+     "sems_off": 1.8398441757185218,
+     "rel_err": 0.04998186277117926
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.19949868129185214,
+     "sem": 0.005166977723406875,
+     "sems_off": 0.09671392982477652,
+     "rel_err": 0.0025048723014700217
+    },
+    {
+     "design": "d=20 4Nem=8.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.1072692663083993,
+     "sem": 0.002848032150739451,
+     "sems_off": 1.3487737407559628,
+     "rel_err": 0.035810359387582744
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.052029646107253934,
+     "sem": 0.0017328399544170503,
+     "sems_off": 3.9205841712124228,
+     "rel_err": 0.13057449751872835
+    }
+   ]
+  },
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes [finite-deme form at d=20 [correction 20/19]]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "finite-deme form at d=20 [correction 20/19]",
+   "note": "",
+   "regime": "msprime symmetric island model, 20 demes of Ne = 1000, total emigration m spread over the 19 other demes, mu = 1e-8, 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates, 4*Ne*m swept sixteenfold",
+   "span": 0.8849537682452393,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "d=20 4Nem=1.0",
+    "lean": 0.48716999361038105,
+    "truth": 0.5192554496097063,
+    "sem": 0.013005511952378595,
+    "sems_off": 2.4670659730128555,
+    "rel_err": 0.06179127445545726
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.48716999361038105,
+     "truth": 0.5192554496097063,
+     "sem": 0.013005511952378595,
+     "sems_off": 2.4670659730128555,
+     "rel_err": 0.06179127445545726
+    },
+    {
+     "design": "d=20 4Nem=2.0",
+     "lean": 0.32202975012525265,
+     "truth": 0.3174615684011955,
+     "sem": 0.008624274140365807,
+     "sems_off": 0.5296888352233419,
+     "rel_err": 0.0143897157286266
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.19191771861145307,
+     "truth": 0.19949868129185214,
+     "sem": 0.005166977723406875,
+     "sems_off": 1.4671947676601396,
+     "rel_err": 0.038000064117259334
+    },
+    {
+     "design": "d=20 4Nem=8.0",
+     "lean": 0.10614480072598574,
+     "truth": 0.1072692663083993,
+     "sem": 0.002848032150739451,
+     "sems_off": 0.39482194122057274,
+     "rel_err": 0.010482644480672711
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05604707198886517,
+     "truth": 0.052029646107253934,
+     "sem": 0.0017328399544170503,
+     "sems_off": 2.3184056158046906,
+     "rel_err": 0.07721416888613292
+    }
+   ]
+  },
+  {
+   "name": "fstMigrationMutationEquilibriumManyDemes [two-deme form [1/(1 + 2*4*Ne*m)], competing]",
+   "file": "PopulationGeneticsFoundations.lean",
+   "source": "two-deme form [1/(1 + 2*4*Ne*m)], competing",
+   "note": "positive control 'd=2 4Nem=4 [two-deme form 1/(1+2*4Ne*m)]' passed at 0.91 sems",
+   "regime": "msprime symmetric island model, 20 demes of Ne = 1000, total emigration m spread over the 19 other demes, mu = 1e-8, 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates, 4*Ne*m swept sixteenfold",
+   "span": 0.9090898071638701,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=20 4Nem=4.0",
+    "lean": 0.1111106172861454,
+    "truth": 0.19949868129185214,
+    "sem": 0.005166977723406875,
+    "sems_off": 17.106337347904724,
+    "rel_err": 0.44305086847366876
+   },
+   "cells": [
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.5192554496097063,
+     "sem": 0.013005511952378595,
+     "sems_off": 14.295981683947053,
+     "rel_err": 0.3580637638012445
+    },
+    {
+     "design": "d=20 4Nem=2.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.3174615684011955,
+     "sem": 0.008624274140365807,
+     "sems_off": 13.620064306468496,
+     "rel_err": 0.37000752242221097
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.19949868129185214,
+     "sem": 0.005166977723406875,
+     "sems_off": 17.106337347904724,
+     "rel_err": 0.44305086847366876
+    },
+    {
+     "design": "d=20 4Nem=8.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.1072692663083993,
+     "sem": 0.002848032150739451,
+     "sems_off": 17.010297897105946,
+     "rel_err": 0.4516286628206392
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.030302993572129004,
+     "truth": 0.052029646107253934,
+     "sem": 0.0017328399544170503,
+     "sems_off": 12.538176119348574,
+     "rel_err": 0.4175821701792397
+    }
+   ]
+  }
+ ]
+}

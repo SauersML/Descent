@@ -1,0 +1,107 @@
+{
+ "_battery_sha": "e14a392adb3932c4",
+ "results": [
+  {
+   "name": "neutralPortability",
+   "file": "PortabilityBounds.lean",
+   "source": "r2_0 * (1 - fst) / ((1 - fst) * r2_0 + (1 - r2_0))",
+   "note": "",
+   "regime": "3000 variants and 400000 individuals per population (10 blocks of 40000) at V_A = V_E = 1 so r2_0 = 0.5; a fraction fst of the signal stops being shared and THE SCORE TRACKS the attenuated signal. The observable is the realised R-squared in the target. The sweep includes fst = 0.05, as far INSIDE the superseded linear form's claimed fst << 0.5 range as the design goes",
+   "span": 0.2716468590831918,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "fst=0.05 r2_0=0.50",
+    "lean": 0.48717948717948717,
+    "truth": 0.4902493570210482,
+    "sem": 0.0018066920545672114,
+    "sems_off": 1.699166071938267,
+    "rel_err": 0.006261853886387137
+   },
+   "cells": [
+    {
+     "design": "fst=0.05 r2_0=0.50",
+     "lean": 0.48717948717948717,
+     "truth": 0.4902493570210482,
+     "sem": 0.0018066920545672114,
+     "sems_off": 1.699166071938267,
+     "rel_err": 0.006261853886387137
+    },
+    {
+     "design": "fst=0.15 r2_0=0.50",
+     "lean": 0.45945945945945943,
+     "truth": 0.4607255014020565,
+     "sem": 0.0026411649630214665,
+     "sems_off": 0.4793498173429925,
+     "rel_err": 0.0027479311189510824
+    },
+    {
+     "design": "fst=0.30 r2_0=0.50",
+     "lean": 0.4117647058823529,
+     "truth": 0.4091991651636174,
+     "sem": 0.003834764399629966,
+     "sems_off": 0.669021731552298,
+     "rel_err": 0.006269662641441907
+    },
+    {
+     "design": "fst=0.45 r2_0=0.50",
+     "lean": 0.3548387096774194,
+     "truth": 0.3542271665234947,
+     "sem": 0.0030189562427423025,
+     "sems_off": 0.20256774353549306,
+     "rel_err": 0.0017264151700350655
+    }
+   ]
+  },
+  {
+   "name": "neutralPortability [superseded linear r2_0*max 0 (1-2*fst), competing]",
+   "file": "PortabilityBounds.lean",
+   "source": "r2_0 * max 0 (1 - 2 * fst)",
+   "note": "positive control 'fst=0 [R2 must be r2_0 = V_A/(V_A+V_E)]' passed at 0.76 sems",
+   "regime": "3000 variants and 400000 individuals per population (10 blocks of 40000) at V_A = V_E = 1 so r2_0 = 0.5; a fraction fst of the signal stops being shared and THE SCORE TRACKS the attenuated signal. The observable is the realised R-squared in the target. The sweep includes fst = 0.05, as far INSIDE the superseded linear form's claimed fst << 0.5 range as the design goes",
+   "span": 0.888888888888889,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "fst=0.45 r2_0=0.50",
+    "lean": 0.04999999999999999,
+    "truth": 0.3542271665234947,
+    "sem": 0.0030189562427423025,
+    "sems_off": 100.77230077609424,
+    "rel_err": 0.8588476414987678
+   },
+   "cells": [
+    {
+     "design": "fst=0.05 r2_0=0.50",
+     "lean": 0.45,
+     "truth": 0.4902493570210482,
+     "sem": 0.0018066920545672114,
+     "sems_off": 22.277928836461196,
+     "rel_err": 0.08209976503716282
+    },
+    {
+     "design": "fst=0.15 r2_0=0.50",
+     "lean": 0.35,
+     "truth": 0.4607255014020565,
+     "sem": 0.0026411649630214665,
+     "sems_off": 41.922978288863725,
+     "rel_err": 0.2403285710582598
+    },
+    {
+     "design": "fst=0.30 r2_0=0.50",
+     "lean": 0.2,
+     "truth": 0.4091991651636174,
+     "sem": 0.003834764399629966,
+     "sems_off": 54.55332932156248,
+     "rel_err": 0.5112404495741567
+    },
+    {
+     "design": "fst=0.45 r2_0=0.50",
+     "lean": 0.04999999999999999,
+     "truth": 0.3542271665234947,
+     "sem": 0.0030189562427423025,
+     "sems_off": 100.77230077609424,
+     "rel_err": 0.8588476414987678
+    }
+   ]
+  }
+ ]
+}

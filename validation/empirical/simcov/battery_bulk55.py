@@ -87,22 +87,36 @@ def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30):
         # A fixed stride over the kept sites gives pairs spanning the whole
         # sequence at a bounded cost, rather than all O(n^2) of them.
         idx = idx[:400]
-        pairs = [(idx[i], idx[j]) for i in range(0, len(idx) - 1, 2)
-                 for j in (i + 1,) if j < len(idx)]
-        if len(pairs) < 20:
+        # SPLIT-HALF, for the reason battery_bulk51 records at length: the
+        # naive correlation of r between demes is attenuated by the sampling
+        # noise in r itself, and the panmictic control detects it at twelve
+        # sems. Every product below is between DISJOINT halves, so no
+        # E[noise^2] term survives.
+        #
+        # This battery reports a RATIO of two such correlations, and an
+        # attenuation common to both would cancel -- but only if it is the same
+        # size in both arms, and it is not: the noise-to-signal ratio in r
+        # depends on the LD level, which is the very thing migration changes.
+        a1, a2 = ga[:, :len(A) // 2], ga[:, len(A) // 2:]
+        b1, b2 = gb[:, :len(B) // 2], gb[:, len(B) // 2:]
+        ra1, ra2, rb1, rb2 = [], [], [], []
+        for k in range(0, len(idx) - 1, 2):
+            i, j = idx[k], idx[k + 1]
+            vals = [np.corrcoef(h[i], h[j])[0, 1] for h in (a1, a2, b1, b2)]
+            if all(np.isfinite(v) for v in vals):
+                ra1.append(vals[0]); ra2.append(vals[1])
+                rb1.append(vals[2]); rb2.append(vals[3])
+        if len(ra1) < 20:
             continue
-        ra, rb = [], []
-        for i, j in pairs:
-            ca = np.corrcoef(ga[i], ga[j])[0, 1]
-            cb = np.corrcoef(gb[i], gb[j])[0, 1]
-            if np.isfinite(ca) and np.isfinite(cb):
-                ra.append(ca)
-                rb.append(cb)
-        if len(ra) < 20:
-            continue
-        c = np.corrcoef(ra, rb)[0, 1]
-        if np.isfinite(c):
-            out.append(float(c))
+        ra1 = np.asarray(ra1); ra2 = np.asarray(ra2)
+        rb1 = np.asarray(rb1); rb2 = np.asarray(rb2)
+        num = float(np.mean(ra1 * rb1))
+        da = float(np.mean(ra1 * ra2))
+        db = float(np.mean(rb1 * rb2))
+        if da > 0 and db > 0:
+            c = num / math.sqrt(da * db)
+            if np.isfinite(c):
+                out.append(float(c))
     return simlib.summarize(out)
 
 

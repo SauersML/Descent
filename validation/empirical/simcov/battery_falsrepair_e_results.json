@@ -1,0 +1,134 @@
+{
+ "_battery_sha": "08cc28a139bfadc3",
+ "results": [
+  {
+   "name": "serialFounderWithinTime",
+   "file": "SerialFounderChain.lean",
+   "source": "corrected body [2N(1-e^-a) + e^-a * 2 Nanc]",
+   "note": "",
+   "regime": "mean pairwise TMRCA in a two-epoch history under msprime, N = 400 to tAnc then Nanc = 4000, 60000 independent genealogies per cell, tAnc crossing the epoch boundary in both directions -- battery bulk12's design at new seeds with a control that can fail",
+   "span": 0.8487166450440671,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "tAnc=200 (N=400, Nanc=4000)",
+    "lean": 6407.365638114115,
+    "truth": 6391.076993853224,
+    "sem": 31.715374347678615,
+    "sems_off": 0.5135882705443684,
+    "rel_err": 0.00254865404947515
+   },
+   "cells": [
+    {
+     "design": "tAnc=200 (N=400, Nanc=4000)",
+     "lean": 6407.365638114115,
+     "truth": 6391.076993853224,
+     "sem": 31.715374347678615,
+     "sems_off": 0.5135882705443684,
+     "rel_err": 0.00254865404947515
+    },
+    {
+     "design": "tAnc=800 (N=400, Nanc=4000)",
+     "lean": 3448.7319764343847,
+     "truth": 3438.0940455970854,
+     "sem": 25.835609501334428,
+     "sems_off": 0.41175459153575916,
+     "rel_err": 0.003094136081275192
+    },
+    {
+     "design": "tAnc=3000 (N=400, Nanc=4000)",
+     "lean": 969.3277701632655,
+     "truth": 970.810074220736,
+     "sem": 8.382512296882277,
+     "sems_off": 0.17683291177775315,
+     "rel_err": 0.001526873378050132
+    }
+   ]
+  },
+  {
+   "name": "serialFounderWithinTime [superseded body [2N(1-e^-a) + e^-a (tAnc + 2 Nanc)]]",
+   "file": "SerialFounderChain.lean",
+   "source": "superseded body [2N(1-e^-a) + e^-a (tAnc + 2 Nanc)]",
+   "note": "positive control 'Nanc=N [single epoch, mean TMRCA = 2N]' passed at 0.61 sems",
+   "regime": "mean pairwise TMRCA in a two-epoch history under msprime, N = 400 to tAnc then Nanc = 4000, 60000 independent genealogies per cell, tAnc crossing the epoch boundary in both directions -- battery bulk12's design at new seeds with a control that can fail",
+   "span": 0.8415570506714132,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tAnc=800 (N=400, Nanc=4000)",
+    "lean": 3743.0355293715384,
+    "truth": 3438.0940455970854,
+    "sem": 25.835609501334428,
+    "sems_off": 11.803146496648456,
+    "rel_err": 0.08869492216624184
+   },
+   "cells": [
+    {
+     "design": "tAnc=200 (N=400, Nanc=4000)",
+     "lean": 6563.125794728397,
+     "truth": 6391.076993853224,
+     "sem": 31.715374347678615,
+     "sems_off": 5.424775977388571,
+     "rel_err": 0.026920157751290565
+    },
+    {
+     "design": "tAnc=800 (N=400, Nanc=4000)",
+     "lean": 3743.0355293715384,
+     "truth": 3438.0940455970854,
+     "sem": 25.835609501334428,
+     "sems_off": 11.803146496648456,
+     "rel_err": 0.08869492216624184
+    },
+    {
+     "design": "tAnc=3000 (N=400, Nanc=4000)",
+     "lean": 1039.8810077312928,
+     "truth": 970.810074220736,
+     "sem": 8.382512296882277,
+     "sems_off": 8.239884543473492,
+     "rel_err": 0.07114773048271014
+    }
+   ]
+  },
+  {
+   "name": "serialFounderWithinTime [competing [2N(1-e^-a) + e^-a (2 Nanc - tAnc)]]",
+   "file": "SerialFounderChain.lean",
+   "source": "competing [2N(1-e^-a) + e^-a (2 Nanc - tAnc)]",
+   "note": "positive control 'Nanc=N [single epoch, mean TMRCA = 2N]' passed at 0.61 sems",
+   "regime": "mean pairwise TMRCA in a two-epoch history under msprime, N = 400 to tAnc then Nanc = 4000, 60000 independent genealogies per cell, tAnc crossing the epoch boundary in both directions -- battery bulk12's design at new seeds with a control that can fail",
+   "span": 0.8562330052248256,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tAnc=800 (N=400, Nanc=4000)",
+    "lean": 3154.428423497231,
+    "truth": 3438.0940455970854,
+    "sem": 25.835609501334428,
+    "sems_off": 10.979637313576937,
+    "rel_err": 0.08250665000369145
+   },
+   "cells": [
+    {
+     "design": "tAnc=200 (N=400, Nanc=4000)",
+     "lean": 6251.605481499834,
+     "truth": 6391.076993853224,
+     "sem": 31.715374347678615,
+     "sems_off": 4.397599436299834,
+     "rel_err": 0.021822849652340267
+    },
+    {
+     "design": "tAnc=800 (N=400, Nanc=4000)",
+     "lean": 3154.428423497231,
+     "truth": 3438.0940455970854,
+     "sem": 25.835609501334428,
+     "sems_off": 10.979637313576937,
+     "rel_err": 0.08250665000369145
+    },
+    {
+     "design": "tAnc=3000 (N=400, Nanc=4000)",
+     "lean": 898.7745325952383,
+     "truth": 970.810074220736,
+     "sem": 8.382512296882277,
+     "sems_off": 8.593550367028998,
+     "rel_err": 0.0742014772388104
+    }
+   ]
+  }
+ ]
+}

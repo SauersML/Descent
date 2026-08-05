@@ -1,0 +1,260 @@
+{
+ "_battery_sha": "50f92b80662d972f",
+ "results": [
+  {
+   "name": "haplotypePhasePredictionError",
+   "file": "HaplotypeTheory.lean",
+   "source": "freq_cis*((1-se)*(ic-pc)^2 + se*(ic-pt)^2) + (1-freq_cis)*((1-se)*(it-pt)^2 + se*(it-pc)^2)",
+   "note": "",
+   "regime": "4e6 individuals per cell in 20 independent blocks of 2e5: true phase drawn at rate freq_cis, a switch error drawn INDEPENDENTLY at rate switch_err that flips which prediction is APPLIED, and the observable the realised mean squared error. switch_err is swept 0 to 0.25 and one design gives the two interactions OPPOSITE SIGNS, where misreading phase costs most and the on-frequency confusion separates",
+   "span": 1.0,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "fc=0.6 se=0.10 pc=+0.5 pt=+0.2",
+    "lean": 0.009,
+    "truth": 0.009016020000000001,
+    "sem": 1.073682509673588e-05,
+    "sems_off": 1.4920611871448175,
+    "rel_err": 0.0017768372297313007
+   },
+   "cells": [
+    {
+     "design": "fc=0.6 se=0.00 pc=+0.5 pt=+0.2",
+     "lean": 0.0,
+     "truth": 0.0,
+     "sem": 1e-12,
+     "sems_off": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "design": "fc=0.6 se=0.10 pc=+0.5 pt=+0.2",
+     "lean": 0.009,
+     "truth": 0.009016020000000001,
+     "sem": 1.073682509673588e-05,
+     "sems_off": 1.4920611871448175,
+     "rel_err": 0.0017768372297313007
+    },
+    {
+     "design": "fc=0.4 se=0.25 pc=+0.3 pt=+0.1",
+     "lean": 0.21400000000000005,
+     "truth": 0.21397567500000006,
+     "sem": 0.0001047627322057349,
+     "sems_off": 0.23219134789480148,
+     "rel_err": 0.00011368114623305526
+    },
+    {
+     "design": "fc=0.7 se=0.15 pc=+0.4 pt=-0.4",
+     "lean": 0.18399999999999997,
+     "truth": 0.18417952,
+     "sem": 0.00015810705926514883,
+     "sems_off": 1.1354331731575964,
+     "rel_err": 0.0009747012045641343
+    }
+   ]
+  },
+  {
+   "name": "haplotypePhasePredictionError [switch channel dropped, competing]",
+   "file": "HaplotypeTheory.lean",
+   "source": "freq_cis*(ic-pc)^2 + (1-freq_cis)*(it-pt)^2",
+   "note": "positive control 'fc=0.6 se=0.00 pc=+0.5 pt=+0.2 [counted cis fraction]' passed at 1.03 sems",
+   "regime": "4e6 individuals per cell in 20 independent blocks of 2e5: true phase drawn at rate freq_cis, a switch error drawn INDEPENDENTLY at rate switch_err that flips which prediction is APPLIED, and the observable the realised mean squared error. switch_err is swept 0 to 0.25 and one design gives the two interactions OPPOSITE SIGNS, where misreading phase costs most and the on-frequency confusion separates",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "fc=0.7 se=0.15 pc=+0.4 pt=-0.4",
+    "lean": 0.03999999999999998,
+    "truth": 0.18417952,
+    "sem": 0.00015810705926514883,
+    "sems_off": 911.9107057592412,
+    "rel_err": 0.7828205872183835
+   },
+   "cells": [
+    {
+     "design": "fc=0.6 se=0.00 pc=+0.5 pt=+0.2",
+     "lean": 0.0,
+     "truth": 0.0,
+     "sem": 1e-12,
+     "sems_off": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "design": "fc=0.6 se=0.10 pc=+0.5 pt=+0.2",
+     "lean": 0.0,
+     "truth": 0.009016020000000001,
+     "sem": 1.073682509673588e-05,
+     "sems_off": 839.7286831785103,
+     "rel_err": 1.0
+    },
+    {
+     "design": "fc=0.4 se=0.25 pc=+0.3 pt=+0.1",
+     "lean": 0.19800000000000006,
+     "truth": 0.21397567500000006,
+     "sem": 0.0001047627322057349,
+     "sems_off": 152.49387509889186,
+     "rel_err": 0.07466117351890578
+    },
+    {
+     "design": "fc=0.7 se=0.15 pc=+0.4 pt=-0.4",
+     "lean": 0.03999999999999998,
+     "truth": 0.18417952,
+     "sem": 0.00015810705926514883,
+     "sems_off": 911.9107057592412,
+     "rel_err": 0.7828205872183835
+    }
+   ]
+  },
+  {
+   "name": "haplotypePhasePredictionError [switch applied to the FREQUENCY, competing]",
+   "file": "HaplotypeTheory.lean",
+   "source": "q*(ic-pc)^2 + (1-q)*(it-pt)^2 with q = fc(1-se) + (1-fc)se",
+   "note": "positive control 'fc=0.6 se=0.00 pc=+0.5 pt=+0.2 [counted cis fraction]' passed at 1.03 sems",
+   "regime": "4e6 individuals per cell in 20 independent blocks of 2e5: true phase drawn at rate freq_cis, a switch error drawn INDEPENDENTLY at rate switch_err that flips which prediction is APPLIED, and the observable the realised mean squared error. switch_err is swept 0 to 0.25 and one design gives the two interactions OPPOSITE SIGNS, where misreading phase costs most and the on-frequency confusion separates",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "fc=0.7 se=0.15 pc=+0.4 pt=-0.4",
+    "lean": 0.03999999999999998,
+    "truth": 0.18417952,
+    "sem": 0.00015810705926514883,
+    "sems_off": 911.9107057592412,
+    "rel_err": 0.7828205872183835
+   },
+   "cells": [
+    {
+     "design": "fc=0.6 se=0.00 pc=+0.5 pt=+0.2",
+     "lean": 0.0,
+     "truth": 0.0,
+     "sem": 1e-12,
+     "sems_off": 0.0,
+     "rel_err": 0.0
+    },
+    {
+     "design": "fc=0.6 se=0.10 pc=+0.5 pt=+0.2",
+     "lean": 0.0,
+     "truth": 0.009016020000000001,
+     "sem": 1.073682509673588e-05,
+     "sems_off": 839.7286831785103,
+     "rel_err": 1.0
+    },
+    {
+     "design": "fc=0.4 se=0.25 pc=+0.3 pt=+0.1",
+     "lean": 0.21150000000000008,
+     "truth": 0.21397567500000006,
+     "sem": 0.0001047627322057349,
+     "sems_off": 23.631256534415392,
+     "rel_err": 0.01156988989519478
+    },
+    {
+     "design": "fc=0.7 se=0.15 pc=+0.4 pt=-0.4",
+     "lean": 0.03999999999999998,
+     "truth": 0.18417952,
+     "sem": 0.00015810705926514883,
+     "sems_off": 911.9107057592412,
+     "rel_err": 0.7828205872183835
+    }
+   ]
+  },
+  {
+   "name": "driftHorizon",
+   "file": "DirichletTransfer.lean",
+   "source": "(D2 - D1) / (2 * C)",
+   "note": "",
+   "regime": "a walk closing the gap at expected rate 2*C per generation with symmetric multiplicative noise, 4000 replicates, the observable the crossing time with the LAST STEP INTERPOLATED. Gap and C are swept independently. Generations are integers and the last step overshoots, which biases a counted crossing time upward by roughly one step in fifty -- the residual to expect, and the reason a continuous-time design would be the sharper instrument",
+   "span": 0.875,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "gap=1.0 C=0.0040",
+    "lean": 125.0,
+    "truth": 125.08935553432438,
+    "sem": 0.0532064600417077,
+    "sems_off": 1.6794113770083345,
+    "rel_err": 0.0007143336372843027
+   },
+   "cells": [
+    {
+     "design": "gap=1.0 C=0.0010",
+     "lean": 500.0,
+     "truth": 500.14468339296604,
+     "sem": 0.10558865075426291,
+     "sems_off": 1.3702551546261046,
+     "rel_err": 0.00028928307701786733
+    },
+    {
+     "design": "gap=2.0 C=0.0010",
+     "lean": 1000.0,
+     "truth": 1000.1198515336262,
+     "sem": 0.1517770147194354,
+     "sems_off": 0.7896553628209785,
+     "rel_err": 0.00011983717095743607
+    },
+    {
+     "design": "gap=1.0 C=0.0040",
+     "lean": 125.0,
+     "truth": 125.08935553432438,
+     "sem": 0.0532064600417077,
+     "sems_off": 1.6794113770083345,
+     "rel_err": 0.0007143336372843027
+    },
+    {
+     "design": "gap=0.5 C=0.0020",
+     "lean": 125.0,
+     "truth": 125.01882807708331,
+     "sem": 0.05399583924598829,
+     "sems_off": 0.3486949614309772,
+     "rel_err": 0.0001506019323081819
+    }
+   ]
+  },
+  {
+   "name": "driftHorizon [factor two dropped, competing]",
+   "file": "DirichletTransfer.lean",
+   "source": "(D2 - D1) / C",
+   "note": "positive control 'gap doubled at fixed C [crossing time must double]' passed at 1.71 sems",
+   "regime": "a walk closing the gap at expected rate 2*C per generation with symmetric multiplicative noise, 4000 replicates, the observable the crossing time with the LAST STEP INTERPOLATED. Gap and C are swept independently. Generations are integers and the last step overshoots, which biases a counted crossing time upward by roughly one step in fifty -- the residual to expect, and the reason a continuous-time design would be the sharper instrument",
+   "span": 0.875,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "gap=2.0 C=0.0010",
+    "lean": 2000.0,
+    "truth": 1000.1198515336262,
+    "sem": 0.1517770147194354,
+    "sems_off": 6587.823263718054,
+    "rel_err": 0.9997603256580851
+   },
+   "cells": [
+    {
+     "design": "gap=1.0 C=0.0010",
+     "lean": 1000.0,
+     "truth": 500.14468339296604,
+     "sem": 0.10558865075426291,
+     "sems_off": 4733.987157107918,
+     "rel_err": 0.9994214338459643
+    },
+    {
+     "design": "gap=2.0 C=0.0010",
+     "lean": 2000.0,
+     "truth": 1000.1198515336262,
+     "sem": 0.1517770147194354,
+     "sems_off": 6587.823263718054,
+     "rel_err": 0.9997603256580851
+    },
+    {
+     "design": "gap=1.0 C=0.0040",
+     "lean": 250.0,
+     "truth": 125.08935553432438,
+     "sem": 0.0532064600417077,
+     "sems_off": 2347.6593700795006,
+     "rel_err": 0.9985713327254314
+    },
+    {
+     "design": "gap=0.5 C=0.0020",
+     "lean": 250.0,
+     "truth": 125.01882807708331,
+     "sem": 0.05399583924598829,
+     "sems_off": 2314.644492393965,
+     "rel_err": 0.9996987961353836
+    }
+   ]
+  }
+ ]
+}

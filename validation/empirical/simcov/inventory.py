@@ -53,6 +53,15 @@ STATUS_RE = re.compile(r"Empirical status:\s*[*_ ]*([A-Za-z_]+)")
 STATE_WORDS = ("UNTESTED", "VALIDATED", "FALSIFIED", "DERIVED", "MEASURED",
                "VACUOUS", "CONVENTION", "TESTED", "REFUTED")
 
+# `CONVENTION PINNED` is a TWO-WORD head from the closed vocabulary, and
+# `CONVENTION` on its own is not a term at all. Reading only the first word
+# files it under the bare state word, which is in neither the measured set nor
+# the owed set, so `neiGstFromFrequencies` and `neiContrastSpike` -- both of
+# which state a pinned convention and cite the differential checks that confirm
+# it -- were counted as coverage debt. The head is matched before the state
+# words, longest first.
+VOCAB_MULTIWORD = ("CONVENTION PINNED",)
+
 # Complete verdicts from the closed vocabulary that are NOT single state words.
 # A docstring leading with one of these has already classified itself, so the
 # prose after it must not be mined for a state word: the note is explaining the
@@ -135,8 +144,14 @@ def main():
             # the first.  A definition both validated and falsified is a
             # different object from one that is merely validated.
             tail = doc[doc.index("Empirical status:"):] if declared else ""
+            head_text = re.sub(r"^Empirical status:\s*[*_ ]*", "",
+                               tail).upper()
+            multiword = any(head_text.startswith(v) for v in VOCAB_MULTIWORD)
             states = [w for w in STATE_WORDS if re.search(r"\b" + w + r"\b", tail)]
-            if status not in STATE_WORDS:
+            # `multiword` first: a two-word head whose first word happens to be
+            # a state word (`CONVENTION PINNED` against `CONVENTION`) would
+            # otherwise never reach the vocabulary branch below at all.
+            if multiword or status not in STATE_WORDS:
                 # "NOT ..." / "CONDITIONALLY ..." / free prose: not a state on
                 # its own, but the note may still name one further along.
                 #
@@ -206,6 +221,24 @@ def main():
                        "FREETEXT:CONDITIONALLY", "FREETEXT:MIXED",
                        "FREETEXT:AN", "FREETEXT:DISAGREES",
                        "FREETEXT:EXACT", "FREETEXT:CONVENTION"}
+    # VERDICTS THAT SETTLE A DEFINITION WITHOUT A MEASUREMENT, and the reason
+    # they are not coverage debt. `validation/conventions.json` defines the
+    # closed vocabulary, and it says of these in as many words:
+    #
+    #   DERIVED   "Follows from other results in the corpus; no measurement is
+    #             claimed or needed."
+    #   VACUOUS   "The measurement was an algebraic identity and carries no
+    #             information about the world."
+    #   ASSERTED  "An input taken from external literature rather than derived
+    #             or measured here."
+    #
+    # A denominator that counts them as owed says the corpus is 88.7% covered
+    # when the honest reading is that the remaining 11.3% is mostly definitions
+    # the vocabulary already settles. But this is exactly the kind of exclusion
+    # that can be abused, so it is not free: see `unsubstantiated` below. A
+    # DERIVED docstring that names nothing it is derived FROM is an assertion,
+    # not a derivation, and stays in the denominator.
+    SETTLED_WITHOUT_MEASUREMENT = {"DERIVED", "VACUOUS", "FREETEXT:ASSERTED"}
     measured = sum(v for k, v in by_status.items() if k in MEASURED_STATES)
     # A definition that declares itself NOT AN EMPIRICAL CLAIM is not owed a
     # measurement, so counting it in the denominator understates what has been
@@ -223,10 +256,51 @@ def main():
     print("\ndeclared NOT AN EMPIRICAL CLAIM (witnesses): %d" % len(nonclaim))
     for r in nonclaim:
         print("    %s  (%s)" % (r["short"], r["file"].split("/")[-1]))
+
+    # THE EXCLUSION HAS A PRICE, and this is it. A DERIVED or VACUOUS marker
+    # says "this follows from something else that carries the evidence" -- so
+    # the docstring has to NAME that something. A backticked identifier is the
+    # weakest check that has any content at all, and it is enough: it is what
+    # separates `DERIVED from `ldRetentionPerGen`, which is VALIDATED` from a
+    # bare `DERIVED.` that means only that nobody measured it.
+    NAMES_A_REFERENT = re.compile(r"`[A-Za-z_][\w.']*`")
+    settled = [r for r in emp
+               if not r["nonclaim"] and r["status"] in SETTLED_WITHOUT_MEASUREMENT]
+    unsubstantiated = [
+        r for r in settled
+        if not NAMES_A_REFERENT.search(
+            r["doc"][r["doc"].index("Empirical status:"):]
+            if "Empirical status:" in r["doc"] else "")]
+    # Owed a measurement: everything screened, minus the non-claims, minus the
+    # ones the vocabulary settles -- but the unsubstantiated ones come back.
+    owed_denominator = (claimable - len(settled) + len(unsubstantiated))
+
+    print("\nsettled without a measurement (DERIVED / VACUOUS / ASSERTED): %d"
+          % len(settled))
+    if unsubstantiated:
+        print("  of which UNSUBSTANTIATED -- the marker names nothing it "
+              "follows from, so it stays in the denominator: %d"
+              % len(unsubstantiated))
+        for r in unsubstantiated:
+            print("    %s  (%s)" % (r["short"], r["file"].split("/")[-1]))
+
+    owed = [r for r in emp
+            if not r["nonclaim"]
+            and r["status"] not in MEASURED_STATES
+            and (r["status"] not in SETTLED_WITHOUT_MEASUREMENT
+                 or r in unsubstantiated)]
+    print("\nOWED A MEASUREMENT AND NOT PAID: %d" % len(owed))
+    for r in owed:
+        print("    %-46s %-40s status=%s"
+              % (r["short"], r["file"].split("/")[-1], r["status"]))
+
     print("\nMEASURED / all screened:        %d / %d  (%.1f%%)"
           % (measured, len(emp), 100.0 * measured / max(len(emp), 1)))
     print("MEASURED / measurable claims:   %d / %d  (%.1f%%)"
           % (measured, claimable, 100.0 * measured / max(claimable, 1)))
+    print("MEASURED / OWED a measurement:  %d / %d  (%.1f%%)"
+          % (measured, owed_denominator,
+             100.0 * measured / max(owed_denominator, 1)))
     print("wrote inventory.json")
 
 

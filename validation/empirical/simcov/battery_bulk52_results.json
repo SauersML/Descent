@@ -1,0 +1,158 @@
+{
+ "_battery_sha": "a70ee6c7ad2e0c36",
+ "results": [
+  {
+   "name": "alleleFreqMismatchPenalty",
+   "file": "PortabilityDrift.lean",
+   "source": "(2 * pTarget * (1 - pTarget)) / (2 * pSource * (1 - pSource))",
+   "note": "",
+   "regime": "3e6 individuals per population (30 blocks of 1e5) with an UNSTANDARDISED allele count Binomial(2, p) and a FIXED effect; the observable is the ratio of realised score-phenotype covariance in the target to that in the source. Three cells share |dp| = 0.2 at different places in the unit interval, which is the design that refuted the superseded exponential: a body seeing only the gap must return one number for all three. One cell moves a frequency TOWARD 0.5, where retention exceeds one",
+   "span": 0.7142857142857142,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "p_s=0.50 p_t=0.30",
+    "lean": 0.84,
+    "truth": 0.8436971711965499,
+    "sem": 0.0020899654442772184,
+    "sems_off": 1.7690106822931204,
+    "rel_err": 0.004382106901350016
+   },
+   "cells": [
+    {
+     "design": "p_s=0.50 p_t=0.30",
+     "lean": 0.84,
+     "truth": 0.8436971711965499,
+     "sem": 0.0020899654442772184,
+     "sems_off": 1.7690106822931204,
+     "rel_err": 0.004382106901350016
+    },
+    {
+     "design": "p_s=0.30 p_t=0.10",
+     "lean": 0.42857142857142866,
+     "truth": 0.4301068081067544,
+     "sem": 0.0016414437466119366,
+     "sems_off": 0.9353835844176022,
+     "rel_err": 0.0035697633852488186
+    },
+    {
+     "design": "p_s=0.70 p_t=0.50",
+     "lean": 1.1904761904761905,
+     "truth": 1.1877665327320441,
+     "sem": 0.0032085844978624748,
+     "sems_off": 0.8445025356045563,
+     "rel_err": 0.0022813050119485233
+    },
+    {
+     "design": "p_s=0.20 p_t=0.40",
+     "lean": 1.4999999999999996,
+     "truth": 1.4933224197366226,
+     "sem": 0.004955943315425795,
+     "sems_off": 1.347388345341322,
+     "rel_err": 0.004471626605964085
+    }
+   ]
+  },
+  {
+   "name": "alleleFreqMismatchPenalty [superseded exp(-|dp|), competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "exp (-|pTarget - pSource|)",
+   "note": "positive control 'p_s=0.50 p_t=0.30 [counted source allele frequency]' passed at 0.49 sems",
+   "regime": "3e6 individuals per population (30 blocks of 1e5) with an UNSTANDARDISED allele count Binomial(2, p) and a FIXED effect; the observable is the ratio of realised score-phenotype covariance in the target to that in the source. Three cells share |dp| = 0.2 at different places in the unit interval, which is the design that refuted the superseded exponential: a body seeing only the gap must return one number for all three. One cell moves a frequency TOWARD 0.5, where retention exceeds one",
+   "span": 1.3560294644500921e-16,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p_s=0.30 p_t=0.10",
+    "lean": 0.8187307530779818,
+    "truth": 0.4301068081067544,
+    "sem": 0.0016414437466119366,
+    "sems_off": 236.75739468585292,
+    "rel_err": 0.9035521820309556
+   },
+   "cells": [
+    {
+     "design": "p_s=0.50 p_t=0.30",
+     "lean": 0.8187307530779818,
+     "truth": 0.8436971711965499,
+     "sem": 0.0020899654442772184,
+     "sems_off": 11.945852112977054,
+     "rel_err": 0.029591681673129366
+    },
+    {
+     "design": "p_s=0.30 p_t=0.10",
+     "lean": 0.8187307530779818,
+     "truth": 0.4301068081067544,
+     "sem": 0.0016414437466119366,
+     "sems_off": 236.75739468585292,
+     "rel_err": 0.9035521820309556
+    },
+    {
+     "design": "p_s=0.70 p_t=0.50",
+     "lean": 0.8187307530779819,
+     "truth": 1.1877665327320441,
+     "sem": 0.0032085844978624748,
+     "sems_off": 115.01513514757363,
+     "rel_err": 0.3106972367753313
+    },
+    {
+     "design": "p_s=0.20 p_t=0.40",
+     "lean": 0.8187307530779818,
+     "truth": 1.4933224197366226,
+     "sem": 0.004955943315425795,
+     "sems_off": 136.11771235536872,
+     "rel_err": 0.4517387924689556
+    }
+   ]
+  },
+  {
+   "name": "alleleFreqMismatchPenalty [square root -- a standardized score, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "sqrt((2*pTarget*(1-pTarget)) / (2*pSource*(1-pSource)))",
+   "note": "positive control 'p_s=0.50 p_t=0.30 [counted source allele frequency]' passed at 0.49 sems",
+   "regime": "3e6 individuals per population (30 blocks of 1e5) with an UNSTANDARDISED allele count Binomial(2, p) and a FIXED effect; the observable is the ratio of realised score-phenotype covariance in the target to that in the source. Three cells share |dp| = 0.2 at different places in the unit interval, which is the design that refuted the superseded exponential: a body seeing only the gap must return one number for all three. One cell moves a frequency TOWARD 0.5, where retention exceeds one",
+   "span": 0.46547751617515115,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p_s=0.30 p_t=0.10",
+    "lean": 0.6546536707079772,
+    "truth": 0.4301068081067544,
+    "sem": 0.0016414437466119366,
+    "sems_off": 136.79839048076087,
+    "rel_err": 0.5220723280099516
+   },
+   "cells": [
+    {
+     "design": "p_s=0.50 p_t=0.30",
+     "lean": 0.916515138991168,
+     "truth": 0.8436971711965499,
+     "sem": 0.0020899654442772184,
+     "sems_off": 34.8417089832799,
+     "rel_err": 0.08630818056595602
+    },
+    {
+     "design": "p_s=0.30 p_t=0.10",
+     "lean": 0.6546536707079772,
+     "truth": 0.4301068081067544,
+     "sem": 0.0016414437466119366,
+     "sems_off": 136.79839048076087,
+     "rel_err": 0.5220723280099516
+    },
+    {
+     "design": "p_s=0.70 p_t=0.50",
+     "lean": 1.0910894511799618,
+     "truth": 1.1877665327320441,
+     "sem": 0.0032085844978624748,
+     "sems_off": 30.13075754012013,
+     "rel_err": 0.08139401042872482
+    },
+    {
+     "design": "p_s=0.20 p_t=0.40",
+     "lean": 1.224744871391589,
+     "truth": 1.4933224197366226,
+     "sem": 0.004955943315425795,
+     "sems_off": 54.19302265000958,
+     "rel_err": 0.17985235123731866
+    }
+   ]
+  }
+ ]
+}

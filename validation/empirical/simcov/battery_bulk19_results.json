@@ -1,0 +1,225 @@
+{
+ "_battery_sha": "52aab412c34bb00f",
+ "results": [
+  {
+   "name": "scaledMutationRate [haploid 2*Ne*mu, competing]",
+   "file": "DGP.lean",
+   "source": "2 * Ne * mu",
+   "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+   "regime": "same cells, factor halved",
+   "span": 0.5,
+   "verdict": "LEAD (no control)",
+   "worst": {
+    "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.20081155778894477,
+    "sem": 0.006880500250173431,
+    "sems_off": 19.260485535342895,
+    "rel_err": 0.6599310169371349
+   },
+   "cells": [
+    {
+     "design": "Ne=100 mu=2.50e-03 (theta=1.0)",
+     "lean": 0.6666666666666666,
+     "truth": 0.5329726409826911,
+     "sem": 0.01697110069486926,
+     "sems_off": 7.877746298706139,
+     "rel_err": 0.2508459448077323
+    },
+    {
+     "design": "Ne=400 mu=6.25e-04 (theta=1.0)",
+     "lean": 0.6666666666666666,
+     "truth": 0.4685800653594771,
+     "sem": 0.013074771146539297,
+     "sems_off": 15.150292046191584,
+     "rel_err": 0.42273800349407714
+    },
+    {
+     "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.20081155778894477,
+     "sem": 0.006880500250173431,
+     "sems_off": 19.260485535342895,
+     "rel_err": 0.6599310169371349
+    },
+    {
+     "design": "Ne=400 mu=2.50e-03 (theta=4.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.21292786121540813,
+     "sem": 0.008006393762545234,
+     "sems_off": 15.038664808267969,
+     "rel_err": 0.5654754217256575
+    }
+   ]
+  },
+  {
+   "name": "scaledMutationRate [8*Ne*mu, competing]",
+   "file": "DGP.lean",
+   "source": "8 * Ne * mu",
+   "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+   "regime": "same cells, factor doubled",
+   "span": 0.6666666666666666,
+   "verdict": "LEAD (no control)",
+   "worst": {
+    "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.20081155778894477,
+    "sem": 0.006880500250173431,
+    "sems_off": 13.036907698037314,
+    "rel_err": 0.44668966102095503
+   },
+   "cells": [
+    {
+     "design": "Ne=100 mu=2.50e-03 (theta=1.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.5329726409826911,
+     "sem": 0.01697110069486926,
+     "sems_off": 11.763486130850266,
+     "rel_err": 0.3745770275961338
+    },
+    {
+     "design": "Ne=400 mu=6.25e-04 (theta=1.0)",
+     "lean": 0.3333333333333333,
+     "truth": 0.4685800653594771,
+     "sem": 0.013074771146539297,
+     "sems_off": 10.344099373543655,
+     "rel_err": 0.28863099825296146
+    },
+    {
+     "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
+     "lean": 0.1111111111111111,
+     "truth": 0.20081155778894477,
+     "sem": 0.006880500250173431,
+     "sems_off": 13.036907698037314,
+     "rel_err": 0.44668966102095503
+    },
+    {
+     "design": "Ne=400 mu=2.50e-03 (theta=4.0)",
+     "lean": 0.1111111111111111,
+     "truth": 0.21292786121540813,
+     "sem": 0.008006393762545234,
+     "sems_off": 12.716930134089417,
+     "rel_err": 0.47817485942478083
+    }
+   ]
+  },
+  {
+   "name": "scaledMutationRate",
+   "file": "DGP.lean",
+   "source": "4 * Ne * mu",
+   "note": "control 'mu=0 [population fixes: homozygosity is 1]' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+   "regime": "tested through the infinite-alleles equilibrium identity 1/(1+theta), which is independently validated; theta spans a factor of four and Ne spans a factor of four INDEPENDENTLY, so a wrong numeric factor or a wrong Ne-dependence would both show, which a sweep at fixed 4*Ne*mu could not detect",
+   "span": 0.6,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=400 mu=6.25e-04 (theta=1.0)",
+    "lean": 0.5,
+    "truth": 0.4685800653594771,
+    "sem": 0.013074771146539297,
+    "sems_off": 2.4030963363239666,
+    "rel_err": 0.06705350262055791
+   },
+   "cells": [
+    {
+     "design": "Ne=100 mu=2.50e-03 (theta=1.0)",
+     "lean": 0.5,
+     "truth": 0.5329726409826911,
+     "sem": 0.01697110069486926,
+     "sems_off": 1.942869916072062,
+     "rel_err": 0.0618655413942007
+    },
+    {
+     "design": "Ne=400 mu=6.25e-04 (theta=1.0)",
+     "lean": 0.5,
+     "truth": 0.4685800653594771,
+     "sem": 0.013074771146539297,
+     "sems_off": 2.4030963363239666,
+     "rel_err": 0.06705350262055791
+    },
+    {
+     "design": "Ne=100 mu=1.00e-02 (theta=4.0)",
+     "lean": 0.2,
+     "truth": 0.20081155778894477,
+     "sem": 0.006880500250173431,
+     "sems_off": 0.11795040468522691,
+     "rel_err": 0.00404138983771899
+    },
+    {
+     "design": "Ne=400 mu=2.50e-03 (theta=4.0)",
+     "lean": 0.2,
+     "truth": 0.21292786121540813,
+     "sem": 0.008006393762545234,
+     "sems_off": 1.6146921571464594,
+     "rel_err": 0.0607147469646054
+    }
+   ]
+  },
+  {
+   "name": "fstEquilibrium [additivity of theta and bigM, superseded body]",
+   "file": "DGP.lean",
+   "source": "1 / (1 + theta + bigM)",
+   "note": "positive control 'bigM=400 [one population: F_ST is 0]' passed at 0.47 sems",
+   "regime": "two-deme island model with both forces on, at three combinations holding theta+bigM = 1 and three holding it at 4, so a formula weighting the two forces differently would separate WITHIN each group while the design still has span ACROSS groups",
+   "span": 0.6363636363636364,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "theta=4.0 bigM=0.5 (sum=4.5)",
+    "lean": 0.18181818181818182,
+    "truth": 0.4851259683768839,
+    "sem": 0.01830522021555106,
+    "sems_off": 16.569469418402804,
+    "rel_err": 0.6252144934098205
+   },
+   "cells": [
+    {
+     "design": "theta=4.0 bigM=0.5 (sum=4.5)",
+     "lean": 0.18181818181818182,
+     "truth": 0.4851259683768839,
+     "sem": 0.01830522021555106,
+     "sems_off": 16.569469418402804,
+     "rel_err": 0.6252144934098205
+    },
+    {
+     "design": "theta=0.5 bigM=0.5 (sum=1.0)",
+     "lean": 0.5,
+     "truth": 0.4851259683768839,
+     "sem": 0.01830522021555106,
+     "sems_off": 0.812556825209893,
+     "rel_err": 0.030660143122993595
+    },
+    {
+     "design": "theta=0.0 bigM=1.0 (sum=1.0)",
+     "lean": 0.5,
+     "truth": 0.3240229814405089,
+     "sem": 0.02280823179925271,
+     "sems_off": 7.715504652371028,
+     "rel_err": 0.5431004238562034
+    },
+    {
+     "design": "theta=3.0 bigM=1.0 (sum=4.0)",
+     "lean": 0.2,
+     "truth": 0.3240229814405089,
+     "sem": 0.02280823179925271,
+     "sems_off": 5.437641222349046,
+     "rel_err": 0.3827598304575186
+    },
+    {
+     "design": "theta=2.0 bigM=2.0 (sum=4.0)",
+     "lean": 0.2,
+     "truth": 0.2066401104997193,
+     "sem": 0.016763693948590314,
+     "sems_off": 0.3961006756674698,
+     "rel_err": 0.03213369603636714
+    },
+    {
+     "design": "theta=1.0 bigM=3.0 (sum=4.0)",
+     "lean": 0.2,
+     "truth": 0.14104814666030654,
+     "sem": 0.014188025176747575,
+     "sems_off": 4.155042904512764,
+     "rel_err": 0.4179555331674809
+    }
+   ]
+  }
+ ]
+}
