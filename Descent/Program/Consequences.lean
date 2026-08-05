@@ -16,6 +16,7 @@ import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Foundations.CovarianceStructure
 import Descent.Blindness.DecoratedGeometryBlindness
+import Descent.Program.CausalInference
 
 /-!
 # What the separate results say when they are put together
@@ -423,5 +424,39 @@ theorem loss_is_determined_the_labelling_is_not
       divergence (Equiv.swap s t a) (Equiv.swap s t b) = divergence a b :=
   ⟨Descent.Core.ScoreMoments.deployedR2_eq p V_E hE hflow,
    divergence_swap_twin_invariant divergence s t htwin hsymm a b⟩
+
+/-! ### Two loss channels, and only one of them is in the demography -/
+
+/-- **Effect turnover is a SECOND loss channel, additive to drift and invisible to every
+demographic parameter.**
+
+`Core.ScoreMoments.deployedR2_mono_in_migration` proves the first channel: less gene flow,
+lower deployed `R²`, with the whole path from `(Nₑ, m, μ)` a composition of named maps.
+`CausalInference.r2_strictMono_under_effect_turnover` proves the second: at FIXED
+differentiation, a retention `ρ < 1` on the causal effects themselves strictly lowers the
+deployed `R²` again.
+
+The second channel takes no demographic argument. Two populations with identical
+`(Nₑ, m, μ, t)` -- identical `F_ST`, identical moment tuple under drift alone -- can still
+differ in deployed `R²` if their causal effects have turned over, and nothing in the
+demographic chain sees it. So a measured portability gap larger than the drift chain
+predicts is evidence FOR turnover rather than evidence against the chain, and the corpus
+can now say which of the two a number is about.
+
+This is the sharper form of `loss_is_not_in_the_weights` above: that theorem said the loss
+is not in the optimal weights under a SHARED causal map; this one is what happens when the
+causal map is not shared. -/
+theorem drift_and_turnover_are_separate_channels
+    (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig)
+    (V_A fst ρ : ℝ) (hVA : 0 < V_A) (hVE : 0 < V_E) (hfst_lt : fst < 1)
+    (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
+    Descent.Core.ScoreMoments.deployedR2 p V_E
+        < Descent.Core.ScoreMoments.deployedR2 q V_E ∧
+      TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
+        TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
+  ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow,
+   r2_strictMono_under_effect_turnover V_A V_E fst ρ hVA hVE hfst_lt hρ_pos hρ_lt⟩
 
 end Descent
