@@ -183,15 +183,6 @@ Nothing in the corpus referenced it. Use `Integrable.mul_prod` directly. -/
 
 variable {Ω : Type*} [MeasureSpace Ω] {ℙ : Measure Ω} [IsProbabilityMeasure ℙ]
 
-def Phenotype := Ω → ℝ
-/-- Empirical status: NOT AN EMPIRICAL CLAIM. `PGS` is a TYPE ABBREVIATION --
-the type of real-valued random variables on the sample space -- not a formula.
-It says a score is a measurable function of the outcome and asserts nothing a
-simulation could contradict; every claim about what a score is worth is made by
-the definitions that inhabit this type. -/
-def PGS := Ω → ℝ
-def PC (k : ℕ) := Ω → (Fin k → ℝ)
-
 
 /-! ### Discrete Genotypes, Hardy-Weinberg Equilibrium, and Score Approximation
 
@@ -476,6 +467,28 @@ structure HWEScoreModel (m : ℕ) where
   alleleFreq : Fin m → HardyWeinbergModel
   effect : Fin m → ℝ
 
+/-- **The equal-locus panel**: `m` loci sharing one allele frequency and one
+effect size. This is the standard reference architecture -- equal effects at
+equal frequency -- and it is the inhabitant `HWEScoreModel` previously lacked,
+so the Berry-Esseen results stated over the class now have a family they apply
+to rather than a possibly-empty domain.
+
+It is a family rather than a fixed witness on purpose: the frequency and the
+effect stay free, so the theorems below hold across the whole one-parameter
+architecture instead of at one point of it.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a labelling of `m` copies of a
+    supplied one-locus model, with no free parameter of its own and nothing a
+    measurement could disagree with. The one-locus model it repeats carries its
+    own status. -/
+def HWEScoreModel.uniform {m : ℕ} (freq : HardyWeinbergModel) (effect : ℝ) :
+    HWEScoreModel m where
+  alleleFreq := fun _ ↦ freq
+  effect := fun _ ↦ effect
+
+instance HWEScoreModel.instNonempty (m : ℕ) : Nonempty (HWEScoreModel m) :=
+  ⟨HWEScoreModel.uniform HardyWeinbergModel.witness 0⟩
+
 /-- Exact HWE score mean from one-locus expectations. -/
 noncomputable def HWEScoreModel.scoreMean {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) : ℝ :=
@@ -486,10 +499,56 @@ noncomputable def HWEScoreModel.scoreVariance {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) : ℝ :=
   ∑ i : Fin m, (model.effect i) ^ 2 * (model.alleleFreq i).genotypeVariance
 
+/-- **The equal-locus panel's score mean is `m β · 2q`.** Means add across loci
+exactly as variances do, so both moments of the reference architecture are linear
+in the locus count -- which is why the score's standard deviation grows like `√m`
+while its mean grows like `m`, and why a polygenic score has to be standardized
+before populations are compared.
+
+As with `scoreVariance_uniform` the locus count appears as `Fintype.card (Fin m)`
+because this file carries `[Fintype (Fin m)]` as an instance binder. -/
+theorem HWEScoreModel.scoreMean_uniform {m : ℕ} [Fintype (Fin m)]
+    (freq : HardyWeinbergModel) (effect : ℝ) :
+    (HWEScoreModel.uniform (m := m) freq effect).scoreMean =
+      Fintype.card (Fin m) * (effect * freq.expectedAltAlleleCount) := by
+  have hbody : ∀ i : Fin m,
+      (HWEScoreModel.uniform (m := m) freq effect).effect i *
+          ((HWEScoreModel.uniform (m := m) freq effect).alleleFreq i).expectedAltAlleleCount =
+        effect * freq.expectedAltAlleleCount := fun _ ↦ rfl
+  unfold HWEScoreModel.scoreMean
+  rw [Finset.sum_congr rfl (fun i _ ↦ hbody i), Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul]
+
 /-- Berry-Esseen numerator for the weighted HWE score under locus independence. -/
 noncomputable def HWEScoreModel.scoreThirdAbsMomentBound {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) : ℝ :=
   ∑ i : Fin m, |model.effect i| ^ 3 * (model.alleleFreq i).genotypeThirdAbsMoment
+
+/-- **The equal-locus panel's score variance is `m β² · 2q(1-q)`**: variance adds
+across independent loci, so it is linear in the locus count at fixed per-locus
+contribution.
+
+This is what makes `scoreVariance_nonneg` and the Berry-Esseen bound above
+non-vacuous rather than merely well-typed, and it is the exact statement the
+`√m` in a polygenic score's standard deviation comes from.
+
+The locus count appears as `Fintype.card (Fin m)` rather than as `m` on purpose.
+This file carries `[Fintype (Fin m)]` as an instance BINDER, so the instance in
+scope is not syntactically Lean's canonical `Fin.fintype`, and `Fintype.card_fin`
+does not apply to it. Writing the cardinality of the panel's own index type says
+what is meant and needs no appeal to which instance was supplied; it is `m` under
+the standard one. -/
+theorem HWEScoreModel.scoreVariance_uniform {m : ℕ} [Fintype (Fin m)]
+    (freq : HardyWeinbergModel) (effect : ℝ) :
+    (HWEScoreModel.uniform (m := m) freq effect).scoreVariance =
+      Fintype.card (Fin m) * (effect ^ 2 * freq.genotypeVariance) := by
+  have hbody : ∀ i : Fin m,
+      (HWEScoreModel.uniform (m := m) freq effect).effect i ^ 2 *
+          ((HWEScoreModel.uniform (m := m) freq effect).alleleFreq i).genotypeVariance =
+        effect ^ 2 * freq.genotypeVariance := fun _ ↦ rfl
+  unfold HWEScoreModel.scoreVariance
+  rw [Finset.sum_congr rfl (fun i _ ↦ hbody i), Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul]
 
 theorem HWEScoreModel.scoreVariance_nonneg {m : ℕ} [Fintype (Fin m)]
     (model : HWEScoreModel m) :
@@ -647,6 +706,28 @@ for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))
 structure GaussianNoiseAssumption (k : ℕ) where
   sigma2 : (Fin k → ℝ) → NNReal
 
+/-- **The homoscedastic assumption inside the heteroscedastic class**: one noise
+variance at every ancestry coordinate.
+
+`GaussianNoiseAssumption` is stated heteroscedastically -- `σ²` is a function of
+`x` -- which is the generality the portability results need, and which also
+means the class had no exhibited member. This is the member every classical
+model uses, and naming it here says which specialisation the general results
+are a generalisation OF. The variance is left free, so it is the whole
+homoscedastic family and not one point of it.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a constant function. The claim
+    with content is that a real population is homoscedastic in ancestry, which
+    this does not assert and the surrounding results deliberately do not
+    assume. -/
+def GaussianNoiseAssumption.homoscedastic {k : ℕ} (sigma2 : NNReal) :
+    GaussianNoiseAssumption k where
+  sigma2 := fun _ ↦ sigma2
+
+instance GaussianNoiseAssumption.instNonempty (k : ℕ) :
+    Nonempty (GaussianNoiseAssumption k) :=
+  ⟨GaussianNoiseAssumption.homoscedastic 1⟩
+
 /-- Conditional noise law `E | x`. -/
 noncomputable def noiseMeasureGivenX {k : ℕ}
     (hN : GaussianNoiseAssumption k) (x : Fin k → ℝ) : Measure ℝ :=
@@ -657,6 +738,15 @@ instance noiseMeasureGivenX_isProb {k : ℕ}
     IsProbabilityMeasure (noiseMeasureGivenX hN x) := by
   unfold noiseMeasureGivenX
   infer_instance
+
+/-- The homoscedastic member is exactly the one whose noise law does not move
+with ancestry, which is the property the heteroscedastic results are stated so
+as not to assume. -/
+theorem noiseMeasureGivenX_homoscedastic {k : ℕ} (sigma2 : NNReal)
+    (x y : Fin k → ℝ) :
+    noiseMeasureGivenX (GaussianNoiseAssumption.homoscedastic (k := k) sigma2) x =
+      noiseMeasureGivenX (GaussianNoiseAssumption.homoscedastic (k := k) sigma2) y :=
+  rfl
 
 /-- Integrating out Gaussian environmental noise gives a Gaussian CDF at threshold `t`:
 `P(μ + E ≤ t | x) = CDF_{N(μ,σ²(x))}(t)`. -/
