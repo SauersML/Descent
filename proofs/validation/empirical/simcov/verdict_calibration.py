@@ -16,8 +16,11 @@ import verdict
 CASES = []
 
 
-def case(name, expect, cells, **kw):
-    CASES.append((name, expect, cells, kw))
+def case(label, expect, cells, **kw):
+    # The first parameter is `label`, not `name`: `classify` takes a `name=`
+    # kwarg for the oracle-identity gate, and a positional called `name` here
+    # makes `case(..., name="driftVariance")` a duplicate-argument TypeError.
+    CASES.append((label, expect, cells, kw))
 
 
 # ---------------------------------------------------------------------------
@@ -198,11 +201,11 @@ def main():
     print("%-46s %-22s %-22s %s" % ("case", "expected", "gate verdict", "ok"))
     print("-" * 100)
     npass = 0
-    for name, expect, cells, kw in CASES:
+    for label, expect, cells, kw in CASES:
         v, note, worst = verdict.classify([dict(c) for c in cells], **kw)
         ok = v.split(" ")[0] == expect.split(" ")[0]
         npass += ok
-        print("%-46s %-22s %-22s %s" % (name, expect, v, "PASS" if ok else "*** FAIL"))
+        print("%-46s %-22s %-22s %s" % (label, expect, v, "PASS" if ok else "*** FAIL"))
         if not ok:
             print("      note: %s" % note)
     print("-" * 100)
