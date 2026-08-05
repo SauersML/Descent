@@ -75,6 +75,9 @@ DECL = re.compile(
     r"([A-Za-z_][A-Za-z0-9_.'!?₀-₉]*)")
 IMPORT = re.compile(r"^import\s+(\S+)$", re.M)
 IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'₀-₉]*")
+# A Lean BINDER may open with a Greek letter; `IDENT` is used elsewhere to
+# find references and is deliberately left ASCII-initial.
+BINDER = re.compile(r"[^\W\d][\w'₀-₉]*", re.UNICODE)
 
 
 def strip_comments(text: str) -> str:
@@ -281,9 +284,18 @@ def gate_duplicate_bodies(code):
             rhs = " ".join(rhs.split())
             if not rhs:
                 continue
+            # GREEK BINDERS COUNT. `IDENT` opens with `[A-Za-z_]`, so `γ`, `μ`
+            # and `σ_sq` failed it and were left un-normalised -- and a body
+            # keeping `γ` where its twin had `@0` can never collide with it.
+            # `epistaticVariancePairwise (γ p₁ p₂)` and `epistaticVariance
+            # (beta12 p1 p2)` have the same body character for character after
+            # renaming, and this gate read zero. A corpus that writes its
+            # mutation rate `μ` cannot use a binder pattern that stops at ASCII.
+            # (`p₁` always matched: the subscript is in the tail class, and only
+            # the FIRST character was too narrow.)
             binders = []
             for grp in re.findall(r"\(([^()]*?):[^()]*?\)", sig):
-                binders += [b for b in grp.split() if IDENT.fullmatch(b)]
+                binders += [b for b in grp.split() if BINDER.fullmatch(b)]
             norm = rhs
             for k, b in enumerate(binders):
                 norm = re.sub(r"(?<![\w'.])" + re.escape(b) + r"(?![\w'])",
