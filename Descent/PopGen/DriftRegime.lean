@@ -5,7 +5,7 @@ import Descent.Blindness.ObservationalCeiling
 import Mathlib.Tactic.Linarith
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # Regimes, common-mode error, and the power of a validation
@@ -496,4 +496,4 @@ subject to the same law as everything else it proves. A probe that cannot separa
 objects certifies neither, and that is as true of a cross-check as it is of a cumulant.
 -/
 
-end Descent
+end Descent.PopGen

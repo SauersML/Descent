@@ -1002,14 +1002,14 @@ then one Gaussian estimator draw carries information `½‖W‖_F²`.  This defi
 obligations, while the information geometry after whitening is universal. -/
 noncomputable def multivariateGaussianPermeability {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) : ℝ :=
-  (1 / 2 : ℝ) * frobeniusNormSq whitenedCovarianceDerivative
+  (1 / 2 : ℝ) * PopGen.frobeniusNormSq whitenedCovarianceDerivative
 
 /-- Multivariate permeability is nonnegative. -/
 theorem multivariateGaussianPermeability_nonneg {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) :
     0 ≤ multivariateGaussianPermeability whitenedCovarianceDerivative := by
   unfold multivariateGaussianPermeability
-  exact mul_nonneg (by norm_num) (frobeniusNormSq_nonneg _)
+  exact mul_nonneg (by norm_num) (PopGen.frobeniusNormSq_nonneg _)
 
 /-- The correlated Gaussian channel seals exactly when the entire whitened covariance
 response vanishes. -/
@@ -1019,16 +1019,16 @@ theorem multivariateGaussianPermeability_eq_zero_iff {d : ℕ}
       whitenedCovarianceDerivative = 0 := by
   constructor
   · intro hzero
-    ext i j
+    PopGen.ext i j
     by_contra hentry
-    have hpositive : 0 < frobeniusNormSq whitenedCovarianceDerivative :=
-      frobeniusNormSq_pos_of_exists_ne_zero
+    have hpositive : 0 < PopGen.frobeniusNormSq whitenedCovarianceDerivative :=
+      PopGen.frobeniusNormSq_pos_of_exists_ne_zero
         whitenedCovarianceDerivative ⟨i, j, hentry⟩
     unfold multivariateGaussianPermeability at hzero
     nlinarith
   · intro hzero
     subst whitenedCovarianceDerivative
-    simp [multivariateGaussianPermeability, frobeniusNormSq]
+    simp [multivariateGaussianPermeability, PopGen.frobeniusNormSq]
 
 /-- Linear attenuation of the full whitened covariance response attenuates correlated
 Gaussian permeability quadratically. This is the matrix sealing law. -/
@@ -1036,9 +1036,9 @@ theorem multivariateGaussianPermeability_scale {d : ℕ}
     (whitenedCovarianceDerivative : Matrix (Fin d) (Fin d) ℝ) (η : ℝ) :
     multivariateGaussianPermeability (η • whitenedCovarianceDerivative) =
       η ^ 2 * multivariateGaussianPermeability whitenedCovarianceDerivative := by
-  have hfrob : frobeniusNormSq (η • whitenedCovarianceDerivative) =
-      η ^ 2 * frobeniusNormSq whitenedCovarianceDerivative := by
-    unfold frobeniusNormSq
+  have hfrob : PopGen.frobeniusNormSq (η • whitenedCovarianceDerivative) =
+      η ^ 2 * PopGen.frobeniusNormSq whitenedCovarianceDerivative := by
+    unfold PopGen.frobeniusNormSq
     simp only [Matrix.smul_apply, smul_eq_mul, mul_pow]
     calc
       ∑ i, ∑ j, η ^ 2 * whitenedCovarianceDerivative i j ^ 2 =
@@ -1061,7 +1061,7 @@ theorem multivariateGaussianPermeability_diagonal {d : ℕ}
         (Matrix.diagonal fun i ↦ covarianceDerivative i / covariance i) =
       diagonalPermeability covariance covarianceDerivative := by
   classical
-  unfold multivariateGaussianPermeability frobeniusNormSq
+  unfold multivariateGaussianPermeability PopGen.frobeniusNormSq
     diagonalPermeability scalarPermeability
   simp [Matrix.diagonal_apply, Finset.mul_sum]
 
@@ -1106,7 +1106,7 @@ theorem twoChannelWhitenedDerivative_permeability
     multivariateGaussianPermeability
         (twoChannelWhitenedDerivative first second shared) =
       (1 / 2 : ℝ) * (first ^ 2 + second ^ 2) + shared ^ 2 := by
-  simp [multivariateGaussianPermeability, frobeniusNormSq,
+  simp [multivariateGaussianPermeability, PopGen.frobeniusNormSq,
     twoChannelWhitenedDerivative, twoChannelMomentPrecision, Fin.sum_univ_two]
   ring
 

@@ -5,9 +5,9 @@ import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.DriftRegime
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
-open TransportedMetrics (r2FromSignalVariance)
+open PopGen.TransportedMetrics (r2FromSignalVariance)
 
 /-!
 # Phenome-Wide Portability and Trait-Specific Patterns
@@ -195,8 +195,8 @@ identity been stated against that copy it would have died with it; stated
 against `closedPopulation` it survives, and it makes the regime and its
 falsification reachable from this file by a proof rather than by a comment. -/
 theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H₀) (t : ℕ) :
-    (closedPopulation Ne H₀ hH).het t = neutralDriftFactor Ne t * H₀ := by
-  simp [closedPopulation, neutralDriftFactor]
+    (PopGen.closedPopulation Ne H₀ hH).het t = neutralDriftFactor Ne t * H₀ := by
+  simp [PopGen.closedPopulation, neutralDriftFactor]
 
 /-- **Selected drift factor per generation.**
     Under stabilizing selection with correction s_correction, the
@@ -371,8 +371,8 @@ and `DriftRegime` records what substituting one for another cost — but the map
 is written down here, so a convention change in any one of them contradicts this. This
 module is where all three are visible at once. -/
 theorem lossOfRetention_eq_fstFromDriftFactor_eq_covarianceRetentionFactorFromFst (r : ℝ) :
-    lossOfRetention r = fstFromDriftFactor r ∧
-      lossOfRetention r = covarianceRetentionFactorFromFst r :=
+    PopGen.lossOfRetention r = fstFromDriftFactor r ∧
+      PopGen.lossOfRetention r = covarianceRetentionFactorFromFst r :=
   ⟨rfl, rfl⟩
 
 /-- **`F_ST` from an admissible drift factor lies in `[0, 1)`.**
@@ -628,50 +628,50 @@ theorem worse_than_neutral_implies_fluctuating_regime
     (v_mutation s t rho_obs v_selected_obs V_A V_E fstS fstT : ℝ)
     (h_t : 0 < t)
     (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
-    (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs)
+    (h_var_gap : PopGen.stabilizingSelectedArchitectureVariance v_mutation s < v_selected_obs)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1) :
-    let tau_hat := tauFromObservedEffectCorrelation t rho_obs
+    let tau_hat := PopGen.tauFromObservedEffectCorrelation t rho_obs
     let sigma_hat :=
-      sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
+      PopGen.sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
     let observed_ratio :=
-      r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
-        r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
+        PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
     let neutral_ratio :=
-      r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
-        r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
+      PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+        PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E
     (0 < tau_hat ∧
       0 < sigma_hat ∧
-      fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
-      fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
+      PopGen.fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
+      PopGen.fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
         v_selected_obs) ∧
       observed_ratio < neutral_ratio ∧
       ¬ ∃ Ns,
-        effectCorrelationStabilizing Ns = rho_obs ∧
-          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+        PopGen.effectCorrelationStabilizing Ns = rho_obs ∧
+          PopGen.stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
   dsimp
   have h_selection :
-      (0 < tauFromObservedEffectCorrelation t rho_obs ∧
+      (0 < PopGen.tauFromObservedEffectCorrelation t rho_obs ∧
         0 <
-          sigmaThetaFromObservedSelectedVariance
+          PopGen.sigmaThetaFromObservedSelectedVariance
             v_selected_obs v_mutation s t rho_obs ∧
-        fluctuatingEffectCorrelation t
-            (tauFromObservedEffectCorrelation t rho_obs) = rho_obs ∧
-        fluctuatingSelectedArchitectureVariance v_mutation s
-            (sigmaThetaFromObservedSelectedVariance
+        PopGen.fluctuatingEffectCorrelation t
+            (PopGen.tauFromObservedEffectCorrelation t rho_obs) = rho_obs ∧
+        PopGen.fluctuatingSelectedArchitectureVariance v_mutation s
+            (PopGen.sigmaThetaFromObservedSelectedVariance
               v_selected_obs v_mutation s t rho_obs)
-            (tauFromObservedEffectCorrelation t rho_obs) = v_selected_obs) ∧
+            (PopGen.tauFromObservedEffectCorrelation t rho_obs) = v_selected_obs) ∧
       ¬ ∃ Ns,
-        effectCorrelationStabilizing Ns = rho_obs ∧
-          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
-    exact observedSummary_identifies_fluctuating_not_stabilizing
+        PopGen.effectCorrelationStabilizing Ns = rho_obs ∧
+          PopGen.stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+    exact PopGen.observedSummary_identifies_fluctuating_not_stabilizing
       v_mutation s t rho_obs v_selected_obs h_t h_rho h_rho_lt h_var_gap
   rcases h_selection with ⟨h_match, h_not_stab⟩
   have h_port :
-      r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
-          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
-        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
-          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
       mul_comm] using
       portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
@@ -870,4 +870,4 @@ theorem pearson_r2_below_one_under_additive_noise
 
 end PhenomeWideStructure
 
-end Descent
+end Descent.Portability

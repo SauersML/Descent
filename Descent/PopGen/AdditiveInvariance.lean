@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.EpistasisAndNonAdditivity
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # Why effect sizes move: additivity, not ancestry
@@ -130,4 +130,4 @@ theorem differing_weights_refute_shared_additive_map
 
 end AdditiveInvariance
 
-end Descent
+end Descent.PopGen

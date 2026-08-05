@@ -6,7 +6,7 @@ import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.PolygenicAdaptation
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -46,7 +46,7 @@ diverged population pair.
 Empirical status: UNTESTED. This is a first-order approximation and is not a probability outside
 the parameter range where its value lies in `[0,1]`. -/
 noncomputable def rareVariantSharingApproximation (Ne p : ℝ) : ℝ :=
-  pgsDriftVariance_one_pop p Ne
+  PopGen.pgsDriftVariance_one_pop p Ne
 
 /-- **Exact ultra-rare threshold in the sharing approximation.**  At positive effective
 population size, the approximate cross-population sharing probability is below one if and only
@@ -54,7 +54,7 @@ if allele frequency is below `1 / (2 Ne)`. -/
 theorem rareVariantSharingApproximation_lt_one_iff
     (Ne p : ℝ) (h_Ne : 0 < Ne) :
     rareVariantSharingApproximation Ne p < 1 ↔ p < 1 / (2 * Ne) := by
-  unfold rareVariantSharingApproximation pgsDriftVariance_one_pop Var_Delta_Mu
+  unfold rareVariantSharingApproximation PopGen.pgsDriftVariance_one_pop Var_Delta_Mu
   have h2Ne_pos : (0 : ℝ) < 2 * Ne := by positivity
   rw [lt_div_iff₀ h2Ne_pos]
   constructor <;> intro h <;> nlinarith [mul_comm p (2 * Ne)]
@@ -587,11 +587,11 @@ textbook `mu / (h·s)` is not `1 / (1 + θ)` at any `θ`, and it leaves the unit
 weak-constraint regime; the identity below is what a substitution of the one for the other
 would have to contradict. -/
 theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu ≠ 0) :
-    mutationSelectionBalance mu s h = fstMutationDriftEquilibrium (h * s / mu) := by
+    mutationSelectionBalance mu s h = PopGen.fstMutationDriftEquilibrium (h * s / mu) := by
   have hsum : (1 : ℝ) + h * s / mu = (h * s + mu) / mu := by
     field_simp
     ring
-  unfold mutationSelectionBalance fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold mutationSelectionBalance PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [hsum, one_div_div]
 
 /-- **The dominant balance is a fixed point of the dominant map.** This is what
@@ -900,9 +900,9 @@ theorem haploinsufficiency_consistent_direction
     (h_same_direction : 0 < effect_pop1 ∧ 0 < effect_pop2
       ∨ effect_pop1 < 0 ∧ effect_pop2 < 0) :
     effect_pop1 * effect_pop2 > 0 := by
-  rcases h_same_direction with ⟨h1, h2⟩ | ⟨h1, h2⟩
-  · exact mul_pos h1 h2
-  · exact mul_pos_of_neg_of_neg h1 h2
+  rcases h_same_direction with ⟨h1, PopGen.AssortativeMatingModel.h2⟩ | ⟨h1, PopGen.AssortativeMatingModel.h2⟩
+  · exact mul_pos h1 PopGen.AssortativeMatingModel.h2
+  · exact mul_pos_of_neg_of_neg h1 PopGen.AssortativeMatingModel.h2
 
 /-! **Deleted: `gene_lof_maximally_portable_rare`.**
 
@@ -1028,4 +1028,4 @@ theorem hundred_lt_one_div_mul_sq
 
 end EffectSizeDistribution
 
-end Descent
+end Descent.Portability

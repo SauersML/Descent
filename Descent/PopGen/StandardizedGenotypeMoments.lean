@@ -6,7 +6,7 @@ import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Program.Conventions
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # Unification: welding the condensation results onto the existing corpus
@@ -1965,4 +1965,4 @@ mixtures that disagree about which weight goes with which point. -/
 theorem twoMechanismMixture_eq_convexMix (w : ℝ) :
     Conditionals.twoMechanismMixture w = Descent.Core.convexCombination w (2 / 10) (9 / 10) := rfl
 
-end Descent
+end Descent.PopGen

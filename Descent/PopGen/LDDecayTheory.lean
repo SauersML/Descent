@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -427,8 +427,8 @@ applies it with the migration rate in the place of the recombination rate and
 and the same map, so the `1/(2 Nₑ)` inside them has to be the same
 `1/(2 Nₑ)`. -/
 theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
-    driftLDStep Ne c Q = islandFstMultiplicativeStep Ne c Q := by
-  unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep Descent.Core.survivalWeightedMix
+    driftLDStep Ne c Q = Portability.islandFstMultiplicativeStep Ne c Q := by
+  unfold driftLDStep Portability.islandFstMultiplicativeStep Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix
   ring
 
 /-- **`driftLDStep` is the rate-neutral recurrence, stated directly.**
@@ -444,8 +444,8 @@ composed with `islandFstMultiplicativeStep` being `ibdRecurrenceStep` by definit
 stated here anyway, in the direct form. A two-step route is a route a reader has to
 reconstruct, and the guard that looks for these pairs cannot follow it. -/
 theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
-    driftLDStep Ne c Q = ibdRecurrenceStep Ne c Q := by
-  unfold driftLDStep ibdRecurrenceStep Descent.Core.survivalWeightedMix
+    driftLDStep Ne c Q = Portability.ibdRecurrenceStep Ne c Q := by
+  unfold driftLDStep Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix
   ring
 
 /-- **Per-generation retention factor of the two-locus identity measure**,
@@ -627,9 +627,9 @@ two equilibria go with it as one quantity rather than being deduplicated by
 inspection. -/
 theorem driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium (Ne c : ℝ)
     (hNe : Ne ≠ 0) :
-    driftLDEquilibrium Ne c = fstIslandMultiplicativeEquilibrium Ne c := by
-  unfold driftLDEquilibrium driftLDRetention fstIslandMultiplicativeEquilibrium
-    ibdRecurrenceFixedPoint
+    driftLDEquilibrium Ne c = Portability.fstIslandMultiplicativeEquilibrium Ne c := by
+  unfold driftLDEquilibrium driftLDRetention Portability.fstIslandMultiplicativeEquilibrium
+    Portability.ibdRecurrenceFixedPoint
   field_simp [hNe]
   ring
 

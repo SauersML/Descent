@@ -6,7 +6,7 @@ import Descent.Blindness.Condensation
 import Descent.Blindness.JetBarrier
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # PGS Score Distribution Theory

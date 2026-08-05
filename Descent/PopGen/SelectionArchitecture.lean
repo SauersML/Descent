@@ -6,7 +6,7 @@ import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.DemographicHistory
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -874,12 +874,12 @@ section GWASPowerMAF
     This is defined through the canonical `ncp` and `effectiveFisherInformation`
     declarations, so the ancestry-power and selection APIs share one implementation. -/
 noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
-  ncp (effectiveFisherInformation n p 1) β
+  Portability.ncp (Portability.effectiveFisherInformation n p 1) β
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
-  norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
+  norm_num [gwasNCP, Portability.ncp, Portability.effectiveFisherInformation, Portability.fisherInformation, Portability.genotypeVarianceHWE,
       Descent.Core.product,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
@@ -891,8 +891,8 @@ theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
   unfold gwasNCP
   constructor
   · intro h
-    rcases (ncp_eq_zero_iff _ _).1 h with h_information | h_effect
-    · rcases (effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with
+    rcases (Portability.ncp_eq_zero_iff _ _).1 h with h_information | h_effect
+    · rcases (Portability.effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with
         h_n | h_p_zero | h_p_one | h_impossible
       · exact Or.inl h_n
       · exact Or.inr (Or.inr (Or.inl h_p_zero))
@@ -900,30 +900,30 @@ theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
       · norm_num at h_impossible
     · exact Or.inr (Or.inl h_effect)
   · rintro (h_n | h_effect | h_p_zero | h_p_one)
-    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
-        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inl h_n)
-    · exact (ncp_eq_zero_iff _ _).2 (Or.inr h_effect)
-    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
-        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inl h_p_zero))
-    · exact (ncp_eq_zero_iff _ _).2 <| Or.inl <|
-        (effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inr (Or.inl h_p_one)))
+    · exact (Portability.ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inl h_n)
+    · exact (Portability.ncp_eq_zero_iff _ _).2 (Or.inr h_effect)
+    · exact (Portability.ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inl h_p_zero))
+    · exact (Portability.ncp_eq_zero_iff _ _).2 <| Or.inl <|
+        (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inr (Or.inl h_p_one)))
 
 /-- GWAS non-centrality is positive exactly for a nonempty study, nonzero effect,
 and polymorphic locus. -/
 theorem gwasNCP_pos_iff (n : ℕ) (β p : ℝ) :
     0 < gwasNCP n β p ↔ 0 < n ∧ β ≠ 0 ∧ 0 < p ∧ p < 1 := by
-  unfold gwasNCP ncp
+  unfold gwasNCP Portability.ncp
   constructor
   · intro h
     rcases mul_pos_iff.mp h with ⟨h_information, h_effect⟩ | ⟨_, h_effect⟩
-    · rcases (fullyTaggedFisherInformation_pos_iff n p).1 h_information with ⟨h_n, hp0, hp1⟩
+    · rcases (Portability.fullyTaggedFisherInformation_pos_iff n p).1 h_information with ⟨h_n, hp0, hp1⟩
       refine ⟨h_n, ?_, hp0, hp1⟩
       intro h_zero
       rw [h_zero] at h_effect
       norm_num at h_effect
     · nlinarith [sq_nonneg β]
   · rintro ⟨h_n, h_effect, hp0, hp1⟩
-    exact mul_pos ((fullyTaggedFisherInformation_pos_iff n p).2 ⟨h_n, hp0, hp1⟩)
+    exact mul_pos ((Portability.fullyTaggedFisherInformation_pos_iff n p).2 ⟨h_n, hp0, hp1⟩)
       (sq_pos_of_ne_zero h_effect)
 
 /-- **NCP depends on population-specific MAF.**
@@ -935,7 +935,7 @@ theorem ncp_ratio_from_maf
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
-  unfold ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation Portability.genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   simp only [mul_one]
   apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
   apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hn)
@@ -1097,4 +1097,4 @@ theorem cross_trait_portability_bound
 
 end Pleiotropy
 
-end Descent
+end Descent.PopGen

@@ -17,7 +17,7 @@ open MeasureTheory
 -- of unknown type applied to two arguments. That is why one cause produced two error
 -- texts here, `Function expected at` and `Local variable ... has no definition`, across
 -- 35 sites. Do not delete this line to "clean up an unused open".
-open TransportedMetrics (r2FromSignalVariance)
+open PopGen.TransportedMetrics (r2FromSignalVariance)
 
 /-!
 
@@ -160,8 +160,8 @@ theorem r2_strictMono_under_effect_turnover
     -- Immune R² (with effect turnover ρ) is strictly less than
     -- drift-only R² (no effect turnover), showing the selection
     -- pathway causes genuine additional loss beyond LD/drift.
-    r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
-      r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
+    PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fst) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E :=
   -- This proof was written out a second time here, tactic for tactic, as
   -- `effect_retention_lowers_target_r2_at_fixed_fst` in `OpenQuestions`.  That one carried
   -- a source `Fst` and two hypotheses about it that no proof term used; all three are now
@@ -219,8 +219,8 @@ It is stated because the two names invite the opposite reading. A share is large
 numerator is large; a proportional reduction is large when it is small. Writing the
 relation down is what stops the sign being carried by the reader. -/
 theorem r2FromMSE_eq_one_sub_effectShare (mse varY : ℝ) :
-    r2FromMSE mse varY = 1 - effectShare mse varY := by
-  unfold r2FromMSE effectShare Descent.Core.proportionalReduction Descent.Core.ratio; ring
+    PopGen.r2FromMSE mse varY = 1 - effectShare mse varY := by
+  unfold PopGen.r2FromMSE effectShare Descent.Core.proportionalReduction Descent.Core.ratio; ring
 
 /-- `effectShare ie te` lies in [0,1] when `0 ≤ ie`, `0 < te` and `ie ≤ te`. A statement about
     a ratio of reals; "mediated" is not established anywhere. -/
@@ -249,19 +249,19 @@ theorem r2_strictMono_under_ld_noise_reduction
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E)
     (h_ld : 0 < V_ld) (h_α_pos : 0 < α) (h_α_le : α ≤ 1) :
     -- LD correction improves R²: corrected > uncorrected
-    r2FromSignalVariance vSignal (V_E + V_ld) <
-      r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) ∧
+    PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + V_ld) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) ∧
     -- Residual gap remains (corrected < source) when α < 1
-    (α < 1 → r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) <
-      r2FromSignalVariance vSignal V_E) := by
+    (α < 1 → PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + (1 - α) * V_ld) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSignal V_E) := by
   constructor
   · -- Corrected noise = V_E + (1-α)·V_ld < V_E + V_ld = uncorrected noise
     -- since α > 0 implies (1-α) < 1, so (1-α)·V_ld < V_ld.
-    unfold r2FromSignalVariance Descent.Core.share
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · -- If α < 1, then (1-α)·V_ld > 0, so corrected noise > V_E = source noise.
     intro h_α_lt
-    unfold r2FromSignalVariance Descent.Core.share
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact div_lt_div_of_pos_left h_sig (by linarith) (by nlinarith)
 
 /-- **Removing part of the environment noise term strictly raises `R²`.** Monotonicity, not
@@ -280,8 +280,8 @@ theorem r2_strictMono_under_environment_noise_reduction
     (V_genetic V_env : ℝ)
     (h_gen : 0 < V_genetic) (h_env : 0 < V_env) :
     -- Phenotypic R² is strictly less than 1 (perfect genetic prediction)
-    r2FromSignalVariance V_genetic V_env < 1 := by
-  unfold r2FromSignalVariance Descent.Core.share
+    PopGen.TransportedMetrics.r2FromSignalVariance V_genetic V_env < 1 := by
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   rw [div_lt_one (by linarith : 0 < V_genetic + V_env)]
   linarith
 
@@ -308,12 +308,12 @@ theorem r2_lt_of_drift_variance_pos
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst_pos : 0 < fst) (hfst_lt : fst < 1) :
     -- Cross-ancestry R² is strictly below same-ancestry R²
-    r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E <
-      r2FromSignalVariance (presentDayPGSVariance V_A 0) V_E := by
-  apply expectedR2_strictMono_nonneg V_E _ _ hVE
-  · unfold presentDayPGSVariance pgsVarianceFromHet
+    PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A 0) V_E := by
+  apply Portability.expectedR2_strictMono_nonneg V_E _ _ hVE
+  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
     exact le_of_lt (mul_pos hVA (by linarith))
-  · unfold presentDayPGSVariance pgsVarianceFromHet
+  · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
     simp only [sub_zero]
     have : (1 - fst) * V_A < 1 * V_A := by
       exact mul_lt_mul_of_pos_right (by linarith) hVA
@@ -332,8 +332,8 @@ theorem r2_lt_of_drift_variance_pos
 theorem r2_lt_of_added_noise_pos
     (vSignal V_E vNoiseAdded : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_added : 0 < vNoiseAdded) :
-    r2FromSignalVariance vSignal (V_E + vNoiseAdded) < r2FromSignalVariance vSignal V_E := by
-  unfold r2FromSignalVariance Descent.Core.share
+    PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + vNoiseAdded) < PopGen.TransportedMetrics.r2FromSignalVariance vSignal V_E := by
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have h_denom_clean : 0 < vSignal + V_E := by linarith
   have h_denom_noisy : 0 < vSignal + (V_E + vNoiseAdded) := by linarith
   rw [div_lt_div_iff₀ h_denom_noisy h_denom_clean]
@@ -371,15 +371,15 @@ theorem r2_chain_strictMono_of_decreasing_noise
     (h_ld : 0 < V_ld) (h_power : 0 < V_power) (h_cal : 0 < V_cal)
     (h_α_pos : 0 < α) (h_αβ : α < β) (h_β_lt : β < 1) :
     -- Original < recalibrated < LD-corrected < meta-analysis < new GWAS
-    r2FromSignalVariance vSig (V_E + V_ld + V_power + V_cal) <
-      r2FromSignalVariance vSig (V_E + V_ld + V_power) ∧
-    r2FromSignalVariance vSig (V_E + V_ld + V_power) <
-      r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) ∧
-    r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) <
-      r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) ∧
-    r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) <
-      r2FromSignalVariance vSig V_E := by
-  unfold r2FromSignalVariance Descent.Core.share
+    PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + V_ld + V_power + V_cal) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + V_ld + V_power) ∧
+    PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + V_ld + V_power) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) ∧
+    PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + (1 - α) * V_ld + V_power) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) ∧
+    PopGen.TransportedMetrics.r2FromSignalVariance vSig (V_E + (1 - β) * V_ld) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSig V_E := by
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   refine ⟨?_, ?_, ?_, ?_⟩
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
   · exact div_lt_div_of_pos_left h_sig (by nlinarith) (by nlinarith)
@@ -396,9 +396,9 @@ theorem r2_increments_strictAnti_in_signal
     (v Δ V_E : ℝ)
     (hv : 0 ≤ v) (hΔ : 0 < Δ) (hVE : 0 < V_E) :
     -- Second increment gives less R² gain than the first
-    r2FromSignalVariance (v + 2 * Δ) V_E - r2FromSignalVariance (v + Δ) V_E <
-      r2FromSignalVariance (v + Δ) V_E - r2FromSignalVariance v V_E := by
-  unfold r2FromSignalVariance Descent.Core.share
+    PopGen.TransportedMetrics.r2FromSignalVariance (v + 2 * Δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance v V_E := by
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have ha : 0 < v + V_E := by linarith
   have hb : 0 < v + Δ + V_E := by linarith
   have hc : 0 < v + 2 * Δ + V_E := by linarith

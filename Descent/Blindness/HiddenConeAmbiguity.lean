@@ -201,7 +201,7 @@ theorem boundedLogDistortion_eq_iUnion :
     {p : (ℕ → ℝ) × (ℕ → ℝ) | BoundedLogDistortion p.1 p.2} =
       ⋃ C : ℕ, {p : (ℕ → ℝ) × (ℕ → ℝ) |
         ∀ n : ℕ, |Real.log (p.1 n) - Real.log (p.2 n)| ≤ (C : ℝ)} := by
-  ext p
+  PopGen.ext p
   simp only [Set.mem_setOf_eq, Set.mem_iUnion]
   exact boundedLogDistortion_iff_nat p.1 p.2
 

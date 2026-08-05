@@ -5,7 +5,7 @@ import Mathlib.Data.Real.Sqrt
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Portability
 
 open scoped BigOperators
 open Matrix
@@ -647,4 +647,4 @@ theorem transplantExcess_exceeds_cubic (ε : ℝ) (h0 : 0 < ε) (h1 : ε < 1) :
     _ < ε ^ 2 * 1 := mul_lt_mul_of_pos_left h1 (sq_pos_of_pos h0)
     _ = ε ^ 2 := mul_one _
 
-end Descent
+end Descent.Portability

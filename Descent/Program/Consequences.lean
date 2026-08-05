@@ -71,10 +71,10 @@ theorem improvement_has_two_causes
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (h_d₂_closer : d₂ < d₁) (h_d₁_le_one : d₁ ≤ 1) (h_α_pos : 0 < α)
     (h_true : 0 < r2_true) (h_inflated : r2_true < r2_observed) :
-    presentDayR2 V_A V_E ((1 - α) * d₁ + α * d₂) > presentDayR2 V_A V_E d₁ ∧
-      0 < overlapInflation r2_true r2_observed :=
-  ⟨multi_ancestry_reduces_fst V_A V_E d₁ d₂ α hVA hVE h_d₂_closer h_d₁_le_one h_α_pos,
-   overlap_inflation_positive r2_true r2_observed h_true h_inflated⟩
+    Portability.presentDayR2 V_A V_E ((1 - α) * d₁ + α * d₂) > Portability.presentDayR2 V_A V_E d₁ ∧
+      0 < Portability.overlapInflation r2_true r2_observed :=
+  ⟨Portability.multi_ancestry_reduces_fst V_A V_E d₁ d₂ α hVA hVE h_d₂_closer h_d₁_le_one h_α_pos,
+   Portability.overlap_inflation_positive r2_true r2_observed h_true h_inflated⟩
 
 /-- **And the genuine gain is bounded while the artefact is not.**
 
@@ -106,9 +106,9 @@ theorem reduction_pays_most_where_divergence_is_worst
     (V_A V_E fst₁ fst₂ Δ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fst₁ < fst₂) (hfst₂_le_one : fst₂ ≤ 1) (hΔ : 0 < Δ) :
-    presentDayR2 V_A V_E (fst₂ - Δ) - presentDayR2 V_A V_E fst₂ >
-      presentDayR2 V_A V_E (fst₁ - Δ) - presentDayR2 V_A V_E fst₁ :=
-  portability_concave_in_fst_reduction V_A V_E fst₁ fst₂ Δ hVA hVE hfst hfst₂_le_one hΔ
+    Portability.presentDayR2 V_A V_E (fst₂ - Δ) - Portability.presentDayR2 V_A V_E fst₂ >
+      Portability.presentDayR2 V_A V_E (fst₁ - Δ) - Portability.presentDayR2 V_A V_E fst₁ :=
+  Portability.portability_concave_in_fst_reduction V_A V_E fst₁ fst₂ Δ hVA hVE hfst hfst₂_le_one hΔ
 
 /-! ### Two erosions with different shapes, and what follows from the difference -/
 
@@ -128,10 +128,10 @@ theorem imputation_is_recoverable_time_is_not
     (beta_sq het r2_imp r2_initial lambda_total t : ℝ)
     (h_bsq : 0 ≤ beta_sq) (h_het : 0 ≤ het) (h_r2_le : r2_imp ≤ 1)
     (h_init : 0 < r2_initial) :
-    attenuatedVariance beta_sq het r2_imp ≤ beta_sq * het ∧
-      0 < portabilityAtTime r2_initial lambda_total t :=
-  ⟨attenuated_le_true beta_sq het r2_imp h_bsq h_het h_r2_le,
-   (portabilityAtTime_pos_iff r2_initial lambda_total t).mpr h_init⟩
+    Portability.attenuatedVariance beta_sq het r2_imp ≤ beta_sq * het ∧
+      0 < Portability.portabilityAtTime r2_initial lambda_total t :=
+  ⟨Portability.attenuated_le_true beta_sq het r2_imp h_bsq h_het h_r2_le,
+   (Portability.portabilityAtTime_pos_iff r2_initial lambda_total t).mpr h_init⟩
 
 /-- **A score that carries no signal carries none at any time**, so a vanishing
 longitudinal report is not evidence about the decay rate.
@@ -142,9 +142,9 @@ this is the reading rule -- a zero at follow-up says the score never worked, not
 decayed, and the two are routinely confused in a longitudinal report. -/
 theorem zero_at_followup_means_zero_at_baseline
     (r2_initial lambda_total t : ℝ)
-    (h : portabilityAtTime r2_initial lambda_total t = 0) :
+    (h : Portability.portabilityAtTime r2_initial lambda_total t = 0) :
     r2_initial = 0 :=
-  (portabilityAtTime_eq_zero_iff r2_initial lambda_total t).mp h
+  (Portability.portabilityAtTime_eq_zero_iff r2_initial lambda_total t).mp h
 
 /-! ### The demographic chain reaches a clinical benefit gap -/
 
@@ -168,7 +168,7 @@ theorem demography_becomes_a_benefit_gap
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     0 < α * Descent.Core.ScoreMoments.deployedR2 q V_E
           - α * Descent.Core.ScoreMoments.deployedR2 p V_E :=
-  mul_sub_mul_pos_of_lt α (Descent.Core.ScoreMoments.deployedR2 q V_E)
+  Portability.mul_sub_mul_pos_of_lt α (Descent.Core.ScoreMoments.deployedR2 q V_E)
     (Descent.Core.ScoreMoments.deployedR2 p V_E) hα
     (Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow)
 
@@ -210,10 +210,10 @@ theorem gradual_loss_meets_a_noisy_instrument
     (V_A V_E t Ne σ_sq bias_sq : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne)
     (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
-    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) ∧
+    1 - t / (2 * Ne) ≤ PopGen.neutralDriftR2Ratio V_A V_E (Portability.fstFromGenerations t Ne) ∧
       4 * bias_sq * σ_sq + 2 * σ_sq ^ 2 ≥ 2 * σ_sq ^ 2 :=
-  ⟨neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
-   high_cv_inevitable σ_sq bias_sq hσ hb⟩
+  ⟨PopGen.neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
+   Portability.high_cv_inevitable σ_sq bias_sq hσ hb⟩
 
 /-- **And the floor is the same quantity the Core chain bounds from above.**
 
@@ -225,11 +225,11 @@ than leaving the two names to agree by inspection. -/
 theorem the_bounded_quantity_is_one_quantity
     (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
     (hf0 : 0 ≤ fst) (hf : fst < 1) :
-    neutralDriftR2Ratio V_A V_E fst
+    PopGen.neutralDriftR2Ratio V_A V_E fst
       = Descent.Core.ScoreMoments.portabilityRatio V_A V_E fst ∧
-    0 ≤ neutralDriftR2Ratio V_A V_E fst ∧ neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
-  ⟨neutralDriftR2Ratio_eq_core V_A V_E fst,
-   neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
+    0 ≤ PopGen.neutralDriftR2Ratio V_A V_E fst ∧ PopGen.neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
+  ⟨PopGen.neutralDriftR2Ratio_eq_core V_A V_E fst,
+   PopGen.neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
 
 /-! ### What correction cannot reach, and what the convention says the number is -/
 
@@ -254,10 +254,10 @@ convention is why the two results can be composed at all. -/
 theorem unrecoverable_component_is_the_divergence
     (β : Bool → ℝ) (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • Conditionals.dynamicsContrast ∧
-      contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ :=
-  ⟨dynamics_common_contrast_decomposition β,
-   contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
+    β = Portability.dynamicsPooledProjector β + Portability.dynamicsContrastCoefficient β • Conditionals.dynamicsContrast ∧
+      PopGen.contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ :=
+  ⟨Portability.dynamics_common_contrast_decomposition β,
+   PopGen.contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
 
 /-- **At no divergence there is nothing to miss.** The boundary that makes the previous
 theorem a statement about divergence rather than about the projector: two populations at
@@ -265,8 +265,8 @@ the same allele frequency have contrast level exactly zero, so the blind directi
 nothing and pooled correction is complete. Every claim that correction leaves something
 behind is therefore a claim about the demography. -/
 theorem nothing_missed_at_no_divergence (p : ℝ) :
-    contrastSpikeLevel p p = 0 :=
-  contrastSpikeLevel_self p
+    PopGen.contrastSpikeLevel p p = 0 :=
+  PopGen.contrastSpikeLevel_self p
 
 /-! ### Where the loss cannot come from, and what that leaves -/
 
@@ -306,7 +306,7 @@ theorem loss_is_not_in_the_weights
       Foundations.optimalWeightsFromMoments sigmaInvQ EQ XQ (Foundations.causalSignal β XQ) ∧
     Descent.Core.ScoreMoments.deployedR2 p V_E
       < Descent.Core.ScoreMoments.deployedR2 q V_E :=
-  ⟨additive_architecture_weights_agree_across_populations
+  ⟨PopGen.additive_architecture_weights_agree_across_populations
       sigmaInvP sigmaInvQ EP EQ XP XQ β hP hQ,
    Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow⟩
 
@@ -333,15 +333,15 @@ theorem fst_fixes_the_metric_but_not_correctability
     (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
     (hflow : 0 < p.mu + p.mig)
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
-    (hdetect : bbpProxyThreshold n M < F * n) :
+    (hdetect : Portability.bbpProxyThreshold n M < F * n) :
     (0 ≤ Descent.Core.ScoreMoments.deployedR2 p V_E ∧
       Descent.Core.ScoreMoments.deployedR2 p V_E ≤ 1) ∧
     ∃ mBelow mAbove : ℝ,
       0 < mBelow ∧ mBelow < n ∧ 0 < mAbove ∧ mAbove < n ∧
-      demographicSpike n F mBelow < bbpProxyThreshold n M ∧
-      bbpProxyThreshold n M < demographicSpike n F mAbove :=
+      Portability.demographicSpike n F mBelow < Portability.bbpProxyThreshold n M ∧
+      Portability.bbpProxyThreshold n M < Portability.demographicSpike n F mAbove :=
   ⟨Descent.Core.ScoreMoments.deployedR2_mem_unit p V_E hE hflow,
-   fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
+   Portability.fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
 
 /-- **And a correction diagnostic scores its own inapplicability as success.**
 
@@ -355,14 +355,14 @@ does not apply.
 Both are stated in their own modules. That they compound is stated here. -/
 theorem correctability_reporting_has_two_independent_hazards
     (residualSusceptibility n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
-    (hdetect : bbpProxyThreshold n M < F * n) :
-    pcTargetAxisEfficacy 0 residualSusceptibility = 1 ∧
+    (hdetect : Portability.bbpProxyThreshold n M < F * n) :
+    Portability.pcTargetAxisEfficacy 0 residualSusceptibility = 1 ∧
     ∃ mBelow mAbove : ℝ,
       0 < mBelow ∧ mBelow < n ∧ 0 < mAbove ∧ mAbove < n ∧
-      demographicSpike n F mBelow < bbpProxyThreshold n M ∧
-      bbpProxyThreshold n M < demographicSpike n F mAbove :=
-  ⟨pcTargetAxisEfficacy_null_susceptibility_is_junk residualSusceptibility,
-   fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
+      Portability.demographicSpike n F mBelow < Portability.bbpProxyThreshold n M ∧
+      Portability.bbpProxyThreshold n M < Portability.demographicSpike n F mAbove :=
+  ⟨Portability.pcTargetAxisEfficacy_null_susceptibility_is_junk residualSusceptibility,
+   Portability.fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
 
 /-! ### The estimator's null and the metric's ceiling are different kinds of anchor -/
 
@@ -462,8 +462,8 @@ theorem drift_and_turnover_are_separate_channels
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     Descent.Core.ScoreMoments.deployedR2 p V_E
         < Descent.Core.ScoreMoments.deployedR2 q V_E ∧
-      TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fst) V_E <
-        TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E :=
+      PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fst) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E :=
   ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow,
    r2_strictMono_under_effect_turnover V_A V_E fst ρ hVA hVE hfst_lt hρ_pos hρ_lt⟩
 
@@ -495,12 +495,12 @@ theorem calibration_floor_and_spectral_floor_are_different_floors
     (genotypeWeight : Genotype → ℝ)
     (ancestryPosterior : Genotype → Ancestry → ℝ)
     (ancestryRisk : Ancestry → Genotype → ℝ)
-    (h h' : SpectralHistory) (ha : h.amplitude = h'.amplitude) :
-    polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
-        calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk ∧
-      historyDegradation h h' = h.amplitude ^ 2 * historySpectralDistanceSq h h' :=
-  ⟨polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior ancestryRisk,
-   historyDegradation_equal_amplitude h h' ha⟩
+    (h h' : Portability.SpectralHistory) (ha : h.amplitude = h'.amplitude) :
+    Portability.polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
+        Portability.calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk ∧
+      Portability.historyDegradation h h' = h.amplitude ^ 2 * Portability.historySpectralDistanceSq h h' :=
+  ⟨Portability.polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior ancestryRisk,
+   Portability.historyDegradation_equal_amplitude h h' ha⟩
 
 /-! ### Below the edge correction does nothing, and a zero ridge cannot rescue it -/
 
@@ -526,13 +526,13 @@ algebra guard. -/
 theorem subthreshold_correction_fails_and_zero_ridge_does_not_help
     {n : Type*} [Fintype n] [DecidableEq n]
     (markerAxisVariance ancestryVariance nSample markers spike : ℝ)
-    (hsubthreshold : spike ≤ bbpProxyThreshold nSample markers)
+    (hsubthreshold : spike ≤ Portability.bbpProxyThreshold nSample markers)
     (A : Matrix n n ℝ) (x : n → ℝ) (hnull : Spectral.infoQuadraticForm A x = 0) :
-    modeledPCResidualSusceptibility markerAxisVariance ancestryVariance
+    Portability.modeledPCResidualSusceptibility markerAxisVariance ancestryVariance
         nSample markers spike
-      = ancestryGradientSusceptibility markerAxisVariance ancestryVariance ∧
+      = Portability.ancestryGradientSusceptibility markerAxisVariance ancestryVariance ∧
     Spectral.infoQuadraticForm (Spectral.ridgedInfoMatrix A 0) x = 0 :=
-  ⟨modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold
+  ⟨Portability.modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold
       markerAxisVariance ancestryVariance nSample markers spike hsubthreshold,
    Spectral.ridged_infoQuadraticForm_zero_ridge_degenerate A x hnull⟩
 
@@ -560,9 +560,9 @@ theorem design_check_is_sharp_the_moment_certificate_is_not
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
     (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (hp : p ≤ o) :
     ((∃ m : ℝ, 0 < m ∧ m < n ∧
-        bbpProxyThreshold n M < demographicSpike n F m) ↔ 1 / (F ^ 2 * n) < M) ∧
+        Portability.bbpProxyThreshold n M < Portability.demographicSpike n F m) ↔ 1 / (F ^ 2 * n) < M) ∧
       |mu p - nu p| ≤ Blindness.momentDist o mu nu :=
-  ⟨exists_superthreshold_subgroup_iff_marker_requirement n M F hn hM hF,
+  ⟨Portability.exists_superthreshold_subgroup_iff_marker_requirement n M F hn hM hF,
    Blindness.abs_moment_sub_le_momentDist o mu nu hp⟩
 
 /-! ### Two obstructions that need no hypothesis at all -/

@@ -579,7 +579,7 @@ theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
     · exact absurd (NNReal.coe_eq_zero.mp h.symm) hv
   have hs : 0 < Real.sqrt (v : ℝ) := Real.sqrt_pos.mpr hvpos
   have hsq : (⟨Real.sqrt (v : ℝ) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = v := by
-    ext
+    PopGen.ext
     simp [Real.sq_sqrt hvpos.le]
   have hmap : (gaussianReal 0 1).map (fun y ↦ Real.sqrt (v : ℝ) * y) = gaussianReal 0 v := by
     have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal))
@@ -587,7 +587,7 @@ theorem cdf_gaussianReal_zero_mean (v : NNReal) (hv : v ≠ 0) (x : ℝ) :
     rw [mul_zero, hsq] at h
     exact h
   have hpre : (fun y ↦ Real.sqrt (v : ℝ) * y) ⁻¹' Set.Iic x = Set.Iic (x / Real.sqrt (v : ℝ)) := by
-    ext y
+    PopGen.ext y
     simp only [Set.mem_preimage, Set.mem_Iic]
     rw [le_div_iff₀' hs]
   show cdf (gaussianReal 0 v) x = cdf (gaussianReal 0 1) (x / Real.sqrt (v : ℝ))
@@ -617,7 +617,7 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     rw [Measure.prod_apply hSmeas]
     refine lintegral_congr fun z ↦ ?_
     congr 1
-    ext w
+    PopGen.ext w
     simp only [hSdef, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_Iic]
     constructor
     · intro h; linarith
@@ -652,7 +652,7 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
     rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop), hfst]
     have h := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) (-β)
     have hv : (⟨(-β) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = ⟨β ^ 2, sq_nonneg β⟩ := by
-      ext; simp
+      PopGen.ext; simp
     rw [mul_zero, hv] at h
     exact h
   have hindep : IndepFun (fun p : ℝ × ℝ ↦ p.2) (fun p : ℝ × ℝ ↦ -β * p.1)
@@ -669,7 +669,7 @@ theorem gaussianAverage_eq_cdf_sum (α β : ℝ) :
   rw [hfunsum] at hsum
   have hvar : (0 : ℝ) + 0 = 0 := by norm_num
   have hnn : (1 : NNReal) + ⟨β ^ 2, sq_nonneg β⟩ = ⟨1 + β ^ 2, by positivity⟩ := by
-    ext; simp
+    PopGen.ext; simp
   rw [hvar, hnn] at hsum
   -- Put the two readings of the same probability together.
   have hSpre : S = (fun p : ℝ × ℝ ↦ p.2 - β * p.1) ⁻¹' Set.Iic α := rfl
@@ -849,7 +849,7 @@ theorem link_average_strictMono (L : ℝ → ℝ) (hmono : StrictMono L)
     rw [integral_pos_iff_support_of_nonneg (fun z ↦ le_of_lt (hstrict z)) (hiy.sub hix)]
     have hsupp : (Function.support fun z : ℝ ↦
         L (a * (y + σ * z) + b) - L (a * (x + σ * z) + b)) = Set.univ := by
-      ext z
+      PopGen.ext z
       simp only [Function.mem_support, Set.mem_univ, iff_true]
       exact ne_of_gt (hstrict z)
     rw [hsupp, measure_univ]
@@ -945,7 +945,7 @@ theorem link_average_pushforward (a σ b x : ℝ) :
   rw [hfun, ← Measure.map_map (by fun_prop) (by fun_prop)]
   have hscale := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) (a * σ)
   have hv : (⟨(a * σ) ^ 2, sq_nonneg _⟩ : NNReal) * 1 = ⟨(a * σ) ^ 2, sq_nonneg _⟩ := by
-    ext; simp
+    PopGen.ext; simp
   rw [mul_zero, hv] at hscale
   rw [hscale, gaussianReal_map_add_const]
   congr 1
@@ -1048,7 +1048,7 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
     rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop),
       ← Measure.map_map (by fun_prop) (by fun_prop), hfst]
     have hs := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) s
-    have hv : (⟨s ^ 2, sq_nonneg s⟩ : NNReal) * 1 = ⟨s ^ 2, sq_nonneg s⟩ := by ext; simp
+    have hv : (⟨s ^ 2, sq_nonneg s⟩ : NNReal) * 1 = ⟨s ^ 2, sq_nonneg s⟩ := by PopGen.ext; simp
     rw [mul_zero, hv] at hs
     rw [hs, gaussianReal_map_add_const]
     congr 1
@@ -1058,7 +1058,7 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
     have hcomp : (fun p : ℝ × ℝ ↦ t * p.2) = (fun y : ℝ ↦ t * y) ∘ fun p : ℝ × ℝ ↦ p.2 := rfl
     rw [hcomp, ← Measure.map_map (by fun_prop) (by fun_prop), hsnd]
     have ht := gaussianReal_map_const_mul (μ := (0 : ℝ)) (v := (1 : NNReal)) t
-    have hv : (⟨t ^ 2, sq_nonneg t⟩ : NNReal) * 1 = ⟨t ^ 2, sq_nonneg t⟩ := by ext; simp
+    have hv : (⟨t ^ 2, sq_nonneg t⟩ : NNReal) * 1 = ⟨t ^ 2, sq_nonneg t⟩ := by PopGen.ext; simp
     rw [mul_zero, hv] at ht
     exact ht
   have hindep : IndepFun (fun p : ℝ × ℝ ↦ x + s * p.1) (fun p : ℝ × ℝ ↦ t * p.2) (γ.prod γ) :=
@@ -1070,7 +1070,7 @@ theorem gaussian_two_scale_map (x s t : ℝ) :
   rw [hfun] at hsum
   have hm : x + (0 : ℝ) = x := by ring
   have hv : (⟨s ^ 2, sq_nonneg s⟩ : NNReal) + ⟨t ^ 2, sq_nonneg t⟩
-      = ⟨s ^ 2 + t ^ 2, by positivity⟩ := by ext; simp
+      = ⟨s ^ 2 + t ^ 2, by positivity⟩ := by PopGen.ext; simp
   rwa [hm, hv] at hsum
 
 open MeasureTheory ProbabilityTheory in
@@ -1105,7 +1105,7 @@ theorem link_average_two_scale (L : ℝ → ℝ) (hmono : StrictMono L) (x s t :
     have h := link_average_pushforward 1 (Real.sqrt (s ^ 2 + t ^ 2)) 0 x
     have hvar : (⟨(1 * Real.sqrt (s ^ 2 + t ^ 2)) ^ 2, sq_nonneg _⟩ : NNReal)
         = ⟨s ^ 2 + t ^ 2, hnn⟩ := by
-      ext; simp [Real.sq_sqrt hnn]
+      PopGen.ext; simp [Real.sq_sqrt hnn]
     rw [hvar] at h
     simpa using h
   calc
@@ -2163,7 +2163,7 @@ theorem cdf_gaussianReal_eq_Phi (m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) 
     have h := gaussianReal_map_add_const (μ := (0 : ℝ)) (v := v) m
     rwa [zero_add] at h
   have hpre : (fun y : ℝ ↦ y + m) ⁻¹' Set.Iic x = Set.Iic (x - m) := by
-    ext y
+    PopGen.ext y
     simp [Set.mem_Iic, le_sub_iff_add_le]
   have hshift : (gaussianReal m v) (Set.Iic x) = (gaussianReal 0 v) (Set.Iic (x - m)) := by
     rw [← hmap, Measure.map_apply (by fun_prop) measurableSet_Iic, hpre]

@@ -93,7 +93,7 @@ theorem decreaseRate_eq_totalRate_of_binary {lam : ℕ → ℕ → ℝ} {b : ℕ
   refine Finset.sum_congr rfl fun k hk ↦ ?_
   have hk2 : 2 ≤ k := (Finset.mem_Icc.mp hk).1
   rcases eq_or_lt_of_le hk2 with h2 | h3
-  · rw [← h2]
+  · rw [← PopGen.AssortativeMatingModel.h2]
     norm_num
   · rw [hbin k h3, mul_zero, mul_zero]
 

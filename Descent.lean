@@ -214,12 +214,12 @@ namespace Descent
 The arguments have different biological meanings, but the common algebraic map is made explicit
 rather than left as two silently parallel formulas. -/
 theorem pioneerWeightFraction_eq_fstFromTau (w : ℝ) :
-    Blindness.XiFromMarks.pioneerWeightFraction w = fstFromTau w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = Portability.fstFromTau w := rfl
 
 /-- The same saturation coordinate also appears in the migration/LD chart; this identity keeps
 the shared formula explicit without conflating the three scientific arguments. -/
 theorem pioneerWeightFraction_eq_sharedLDFromMigration (w : ℝ) :
-    Blindness.XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = Portability.sharedLDFromMigration w := rfl
 
 /-! ### One formula, several readings
 
@@ -240,11 +240,11 @@ they described is now in the definitions. -/
 /-- The overlap-gap profile of the metric chart is the landscape's population overlap
 profile: one formula, read once as a metric and once as a landscape. -/
 theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
-    ogpOverlapProfile q x = Blindness.populationOverlapProfile q x := rfl
+    Portability.ogpOverlapProfile q x = Blindness.populationOverlapProfile q x := rfl
 
 /-- The epoch sample size of the metric chart is the epoch lineage sample size. -/
 theorem epochSampleSize_eq_epochLineageSampleSize (K : ℕ) :
-    epochSampleSize K = epochLineageSampleSize K := rfl
+    Portability.epochSampleSize K = PopGen.epochLineageSampleSize K := rfl
 
 /-- **The overlap and the squared norm are one inner product, at their own dimensions.**
 
@@ -256,14 +256,14 @@ what the other computes.  No equation between them typechecks: they live at `Fin
 theorem configurationOverlap_and_transplantSqNorm_are_dotProduct
     (configuration : Blindness.TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) :
     Blindness.configurationOverlap configuration configuration = dotProduct configuration configuration ∧
-      transplantSqNorm displacement = dotProduct displacement displacement :=
+      Portability.transplantSqNorm displacement = dotProduct displacement displacement :=
   ⟨rfl, rfl⟩
 
 /-- The two-state kernel that never moves is the one-hot weight on `Fin 2`: one on the
 diagonal, zero off it, whichever way the equality is written. -/
 theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
-    stayKernel i j = Blindness.oneHotWeight (R := ℝ) i j := by
-  unfold stayKernel Blindness.oneHotWeight
+    Portability.stayKernel i j = Blindness.oneHotWeight (R := ℝ) i j := by
+  unfold Portability.stayKernel Blindness.oneHotWeight
   by_cases h : i = j
   · simp [h]
   · simp [h, Ne.symm h]
@@ -462,12 +462,12 @@ theorem twoLocusCoalescent_covariance_gap_lower_bound_dim_two
     (tSource tTarget : ℕ)
     (h_time : tSource ≤ tTarget) :
     2 *
-        (ibdWeight * discreteRecombinationSurvival recombRate tSource *
-          (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
-      frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
-  twoLocusCoalescent_covariance_gap_lower_bound
+        (ibdWeight * PopGen.discreteRecombinationSurvival recombRate tSource *
+          (1 - PopGen.discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤
+      PopGen.frobeniusNormSq
+        (PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+          PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
+  PopGen.twoLocusCoalescent_covariance_gap_lower_bound
     two_le_two ibdWeight recombRate tSource tTarget h_time
 
 /-- Concrete `2 × 2` positivity corollary for the two-locus coalescent witness. -/
@@ -479,10 +479,10 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
     (h_recomb_lt_one : recombRate < 1)
     (h_time : tSource < tTarget) :
     0 <
-      frobeniusNormSq
-        (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
-          twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
-  covariance_mismatch_pos_of_twoLocusCoalescent
+      PopGen.frobeniusNormSq
+        (PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+          PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) :=
+  PopGen.covariance_mismatch_pos_of_twoLocusCoalescent
     two_le_two ibdWeight recombRate tSource tTarget
     h_ibd_pos h_recomb_pos h_recomb_lt_one h_time
 
@@ -506,11 +506,11 @@ def crossS : Fin 2 → ℝ := ![1, 0]
 theorem overlapEnergyTruth_eq_crossS : Blindness.overlapEnergyTruth = crossS := rfl
 
 /-- The positive configuration is the reordering score. -/
-theorem overlapEnergyPositive_eq_reorderScore : Blindness.overlapEnergyPositive = reorderScore := rfl
+theorem overlapEnergyPositive_eq_reorderScore : Blindness.overlapEnergyPositive = Portability.reorderScore := rfl
 
 /-- And it is the two-ancestry conditional, which is the third name for `![0, 1]`. -/
 theorem overlapEnergyPositive_eq_twoAncestryConditional :
-    Blindness.overlapEnergyPositive = twoAncestryConditional := rfl
+    Blindness.overlapEnergyPositive = Portability.twoAncestryConditional := rfl
 
 /-! Target cross-covariances were restated here as `crossT`. The same witness
 vector `![1, 1]` is `DGP.ldWitnessTargetCross`, and the restatement has been
@@ -531,10 +531,10 @@ this development would be one witness. Removing a name does not by itself make t
 it leaves two files whose numbers happen to agree. This is the statement that carries it, so
 a change to either side is a contradiction rather than a divergence nobody notices. -/
 theorem sigmaT_mulVec_crossS_eq_ldWitnessTargetCross :
-    sigmaT.mulVec crossS = ldWitnessTargetCross := by
-  ext i
+    sigmaT.mulVec crossS = PopGen.ldWitnessTargetCross := by
+  PopGen.ext i
   fin_cases i <;>
-    simp [sigmaT, crossS, ldWitnessTargetCross, Matrix.mulVec, dotProduct]
+    simp [sigmaT, crossS, PopGen.ldWitnessTargetCross, Matrix.mulVec, dotProduct]
 
 /-- A concrete proof that the source ERM is LD-specific and does not solve
     the target normal equations under a new correlation structure. The mismatch is
@@ -542,17 +542,17 @@ theorem sigmaT_mulVec_crossS_eq_ldWitnessTargetCross :
 theorem source_erm_solves_source_not_target_normal_equations :
     let wS : Fin 2 → ℝ := ![1, 0]
     sigmaS.mulVec wS = crossS ∧
-    sigmaT2.mulVec wS ≠ ldWitnessTargetCross := by
+    sigmaT2.mulVec wS ≠ PopGen.ldWitnessTargetCross := by
   intro wS
   refine ⟨?_, ?_⟩
-  · ext i
+  · PopGen.ext i
     fin_cases i
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
   · intro heq
-    have h : (sigmaT2.mulVec wS) 1 = ldWitnessTargetCross 1 := congrFun heq 1
+    have h : (sigmaT2.mulVec wS) 1 = PopGen.ldWitnessTargetCross 1 := congrFun heq 1
     revert h
-    simp [wS, sigmaT2, ldWitnessTargetCross, Matrix.mulVec, dotProduct]
+    simp [wS, sigmaT2, PopGen.ldWitnessTargetCross, Matrix.mulVec, dotProduct]
     norm_num
 
 /-- A concrete proof that ERM mismatch occurs under LD shift, without assuming an
@@ -563,14 +563,14 @@ theorem source_target_erm_differ_proved :
     let wS : Fin 2 → ℝ := ![1, 0]
     let wT : Fin 2 → ℝ := ![1/2, 1/2]
     sigmaS.mulVec wS = crossS ∧
-    sigmaT.mulVec wT = ldWitnessTargetCross ∧
+    sigmaT.mulVec wT = PopGen.ldWitnessTargetCross ∧
     wS ≠ wT := by
   intro wS wT
   refine ⟨?_, ?_, ?_⟩
-  · ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-  · ext i
+  · PopGen.ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+  · PopGen.ext i
     fin_cases i <;>
-      simp [wT, sigmaT, ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
+      simp [wT, sigmaT, PopGen.ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
   · intro heq
     have h : wS 0 = wT 0 := congrFun heq 0
     simp [wS, wT] at h
@@ -583,9 +583,9 @@ theorem target_r2_drop_of_twoLocusCoalescent_dim_two
     (tSource tTarget : ℕ)
     (h_mse_gap_lb :
       lam *
-          frobeniusNormSq
-            (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
-              twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤
+          PopGen.frobeniusNormSq
+            (PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource -
+              PopGen.twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤
         mseTarget - mseSource)
     (h_lam_pos : 0 < lam)
     (h_varY_pos : 0 < varY)
@@ -593,8 +593,8 @@ theorem target_r2_drop_of_twoLocusCoalescent_dim_two
     (h_recomb_pos : 0 < recombRate)
     (h_recomb_lt_one : recombRate < 1)
     (h_time : tSource < tTarget) :
-    r2FromMSE mseTarget varY < r2FromMSE mseSource varY :=
-  target_r2_drop_of_twoLocusCoalescent
+    PopGen.r2FromMSE mseTarget varY < PopGen.r2FromMSE mseSource varY :=
+  PopGen.target_r2_drop_of_twoLocusCoalescent
     two_le_two mseSource mseTarget varY lam
     ibdWeight recombRate tSource tTarget
     h_mse_gap_lb h_lam_pos h_varY_pos
@@ -647,7 +647,7 @@ entire time; only the identifier search missed it.
 /-- Rigorous proof that exponential LD decay cannot be fit by a linear slope calibration.
     Non-affineness is derived from three explicit distances rather than assumed. -/
 theorem ld_decay_implies_nonlinear_calibration_of_exp_tagging {k : ℕ} [Fintype (Fin k)]
-    (mech : LDDecayMechanism k)
+    (mech : PopGen.LDDecayMechanism k)
     (lambda : ℝ) (h_lambda_pos : 0 < lambda)
     (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d))
     (c0 c1 c2 : Fin k → ℝ)
@@ -741,7 +741,7 @@ theorem additive_score_subcritical_at_balanced_locus_proved :
   have hc : 0 < Spectral.hweMellinDrift (1 / 2) := by
     rw [Spectral.hweMellinDrift_half]
     exact Real.log_pos (by norm_num)
-  refine additive_score_is_subcritical hc ?_
+  refine PopGen.additive_score_is_subcritical hc ?_
   rw [Spectral.hweMellinDrift_half]
   exact Real.log_lt_log (by norm_num) (by norm_num)
 

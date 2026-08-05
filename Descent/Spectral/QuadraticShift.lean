@@ -79,7 +79,7 @@ omit [DecidableEq ι] in
 theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
     B.mulVec (fun i ↦ x i - y i) =
       fun i ↦ B.mulVec x i - B.mulVec y i := by
-  ext i
+  PopGen.ext i
   simp only [Matrix.mulVec, dotProduct]
   simp_rw [mul_sub]
   rw [Finset.sum_sub_distrib]
@@ -87,7 +87,7 @@ theorem matrix_mulVec_sub (B : Matrix ι ι ℝ) (x y : ι → ℝ) :
 omit [DecidableEq ι] in
 theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
     B.mulVec (c • x) = c • B.mulVec x := by
-  ext i
+  PopGen.ext i
   simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
 
 omit [DecidableEq ι] in
@@ -270,7 +270,7 @@ theorem weightedCovariancePool_mulVec
     (shift : ι → ℝ) :
     (weightedCovariancePool weightLeft weightRight left right).mulVec shift =
       fun i ↦ weightLeft * left.mulVec shift i + weightRight * right.mulVec shift i := by
-  ext i
+  PopGen.ext i
   simp only [weightedCovariancePool, Matrix.mulVec, dotProduct, add_mul]
   rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
   apply congrArg₂ (fun x y : ℝ ↦ x + y) <;>
@@ -328,7 +328,7 @@ theorem weightedCovariancePool_mulVec_eq_zero_iff
     exact ⟨(hleftZero shift).mp hleftEnergy, (hrightZero shift).mp hrightEnergy⟩
   · rintro ⟨hleft, hright⟩
     rw [weightedCovariancePool_mulVec, hleft, hright]
-    ext i
+    PopGen.ext i
     simp
 
 /-- Weighted covariance of an arbitrary finite environment panel. -/
@@ -346,7 +346,7 @@ theorem finiteEnvironmentCovariancePool_mulVec
       fun i ↦ ∑ environment, weight environment *
         (covariance environment).mulVec shift i := by
   classical
-  ext i
+  PopGen.ext i
   simp only [finiteEnvironmentCovariancePool, Matrix.mulVec, dotProduct]
   simp_rw [Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
@@ -526,7 +526,7 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active :
     exact (hpsd.energy_eq_zero_iff environment shift).mp henergyZero
   · intro hkernel
     rw [finiteEnvironmentCovariancePool_mulVec]
-    ext i
+    PopGen.ext i
     apply Finset.sum_eq_zero
     intro environment _
     rcases (hweight environment).eq_or_lt with hweightZero | hweightPos

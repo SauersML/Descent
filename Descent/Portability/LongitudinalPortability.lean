@@ -7,7 +7,7 @@ import Descent.Portability.HorizonCurve
 import Descent.Conditionals.DriftingConditional
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -124,8 +124,8 @@ separate claim, and it is UNTESTED. -/
 
 /-- Drift decay rate is positive for positive Ne. -/
 theorem drift_decay_rate_pos (Ne : ℝ) (h : 0 < Ne) :
-    0 < driftRatePerGen Ne := by
-  unfold driftRatePerGen alleleFreqDivergenceRate
+    0 < PopGen.driftRatePerGen Ne := by
+  unfold PopGen.driftRatePerGen PopGen.alleleFreqDivergenceRate
   positivity
 
 /-! **Larger populations drift slower** is `larger_pop_slower_drift_rate` in
@@ -317,14 +317,14 @@ section CohortEffects
     signal-at-time value; it does not derive that signal from a source `R²`
     plus any transport factor. -/
 noncomputable def temporalMetricProfile
-    (π signalAtTime : ℝ) : TransportedMetrics.Profile :=
-  TransportedMetrics.profileFromSignalVariance π 1 signalAtTime
+    (π signalAtTime : ℝ) : PopGen.TransportedMetrics.Profile :=
+  PopGen.TransportedMetrics.profileFromSignalVariance π 1 signalAtTime
 
 /-- Exact longitudinal `R²` surface induced by an explicit time-indexed signal
     variance. -/
 noncomputable def temporalR2
     (signalAtTime : ℝ) : ℝ :=
-  TransportedMetrics.r2FromSignalVariance signalAtTime 1
+  PopGen.TransportedMetrics.r2FromSignalVariance signalAtTime 1
 
 @[simp] theorem temporalMetricProfile_r2
     (π signalAtTime : ℝ) :
@@ -337,7 +337,7 @@ noncomputable def temporalR2
 theorem temporalR2_eq_signal_coordinate
     (signalAtTime : ℝ) :
     temporalR2 signalAtTime =
-      TransportedMetrics.r2FromSignalVariance signalAtTime 1 := by
+      PopGen.TransportedMetrics.r2FromSignalVariance signalAtTime 1 := by
   unfold temporalR2
   simp
 
@@ -383,7 +383,7 @@ theorem ageDependentSignalVariance_scale (sourceSignalPeak age age_peak width c 
 /-- Canonical age-indexed deployment metrics from the explicit age-indexed
     signal profile. -/
 noncomputable def ageDependentMetricProfile
-    (π sourceSignalPeak age age_peak width : ℝ) : TransportedMetrics.Profile :=
+    (π sourceSignalPeak age age_peak width : ℝ) : PopGen.TransportedMetrics.Profile :=
   temporalMetricProfile π
     (ageDependentSignalVariance sourceSignalPeak age age_peak width)
 
@@ -480,7 +480,7 @@ theorem ageDependentSignalShape_one_width_out (age_peak width : ℝ) (hw : width
 /-- Age-dependent R² peaks at the optimal age. -/
 theorem age_r2_peaks_at_optimal (sourceSignalPeak age_peak width : ℝ) :
     ageDependentR2 sourceSignalPeak age_peak age_peak width =
-      TransportedMetrics.r2FromSignalVariance sourceSignalPeak 1 := by
+      PopGen.TransportedMetrics.r2FromSignalVariance sourceSignalPeak 1 := by
   unfold ageDependentR2
   unfold ageDependentSignalVariance
   rw [ageDependentSignalShape_at_peak]
@@ -786,8 +786,8 @@ theorem twoMode_effectiveRate_nonincreasing
 theorem cohortCrossover_may_be_threefold :
     horizonPolynomial (3 / 10) < 0 ∧ 0 < horizonPolynomial (9 / 20) ∧
       horizonPolynomial (11 / 20) < 0 := by
-  obtain ⟨-, -, -, h1, h2, h3, -⟩ := horizon_three_crossings
-  exact ⟨h1, h2, h3⟩
+  obtain ⟨-, -, -, h1, PopGen.AssortativeMatingModel.h2, h3, -⟩ := horizon_three_crossings
+  exact ⟨h1, PopGen.AssortativeMatingModel.h2, h3⟩
 
 end HorizonShape
 
@@ -870,4 +870,4 @@ theorem interpolatedCohort_error_le_neighbours {n : ℕ}
 
 end CriterionDrift
 
-end Descent
+end Descent.Portability

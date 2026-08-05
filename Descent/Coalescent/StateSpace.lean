@@ -196,7 +196,7 @@ theorem merge_rel {n : ℕ} (ξ : ER n) (a b : Quotient ξ) {x y : Fin n}
 /-- The image of the fold is everything but the class that was folded away. -/
 theorem range_mergeMap {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     Set.range (fun x : Fin n => mergeMap ξ a b (Quotient.mk ξ x)) = {c | c ≠ b} := by
-  ext c
+  PopGen.ext c
   simp only [Set.mem_range, Set.mem_setOf_eq]
   constructor
   · rintro ⟨x, rfl⟩
@@ -226,7 +226,7 @@ theorem blocks_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
     have hfilter : (Finset.univ.filter fun c : Quotient ξ => c ≠ b)
         = Finset.univ.erase b := by
-      ext c
+      PopGen.ext c
       simp [Finset.mem_erase]
     rw [hfilter, Finset.card_erase_of_mem (Finset.mem_univ b), Finset.card_univ]
   have hcard : blocks ξ = Fintype.card (Quotient ξ) := Nat.card_eq_fintype_card

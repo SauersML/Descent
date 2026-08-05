@@ -5,7 +5,7 @@ import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.PopGen.LDDecayTheory
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -53,8 +53,8 @@ this file names the consequence it uses rather than reproving it. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
-    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ :=
-  fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
+    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁ :=
+  Portability.fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
 /-! The island-model `F_ST` has one definition, `fstMigrationDriftEquilibrium`. A second
 spelling in this module would need its own theorem tying it to that one, which is a
@@ -915,7 +915,7 @@ theorem smaller_founder_larger_heterozygosity_loss
 theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
     founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
   unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-    hetDecayFactor hetDecayFromScaled
+    Portability.Core.PopGenParameters.hetDecayFactor hetDecayFromScaled
   simp
 
 end FounderEffects
@@ -1360,4 +1360,4 @@ theorem mul_sq_lt_mul_sq_of_lt_of_nonneg
 
 end DemographicPortability
 
-end Descent
+end Descent.PopGen

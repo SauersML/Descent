@@ -5,7 +5,7 @@ import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.Data.Nat.Choose.Sum
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # Fixed-epoch frequency-spectrum stability
@@ -696,4 +696,4 @@ theorem identifiableUnderLinearObservation_iff_differenceSet_inter_kernel_eq
     rw [heq] at hdifference
     exact hdifference
 
-end Descent
+end Descent.PopGen

@@ -175,7 +175,7 @@ that quadratic form.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite quadratic form. -/
 noncomputable def marginEnergy (weight : Pop → ℝ) (field : Pop → ℝ) : ℝ :=
-  posteriorPairwiseDriftEnergy (fun _ : Unit ↦ weight) (fun p _ ↦ field p) ()
+  Portability.posteriorPairwiseDriftEnergy (fun _ : Unit ↦ weight) (fun p _ ↦ field p) ()
 
 /-- Alignment energy of a decoration field: the same disagreements, each weighted by how far
 apart the two populations are.  This is the decorated Dirichlet energy, and it is the smallest
@@ -190,7 +190,7 @@ noncomputable def alignmentEnergy (weight : Pop → ℝ) (divergence : Pop → P
 theorem marginEnergy_eq (weight : Pop → ℝ) (field : Pop → ℝ) :
     marginEnergy weight field =
       (1 / 2) * ∑ s, weight s * ∑ t, weight t * (field s - field t) ^ 2 := by
-  unfold marginEnergy posteriorPairwiseDriftEnergy
+  unfold marginEnergy Portability.posteriorPairwiseDriftEnergy
   rfl
 
 /-- **A constant decoration has no margin energy, pinned.**  Populations that agree disagree by
@@ -407,16 +407,16 @@ noncomputable def witnessDivergence : Fin 3 → Fin 3 → ℝ :=
 
 /-- The decorated witness uses the ancestry distance array verbatim. -/
 theorem witnessDivergence_eq_threeAncestryDistance :
-    witnessDivergence = threeAncestryDistance := by
+    witnessDivergence = Portability.threeAncestryDistance := by
   funext s t
   fin_cases s <;> fin_cases t <;>
-    norm_num [witnessDivergence, threeAncestryDistance, ancestryPosition]
+    norm_num [witnessDivergence, Portability.threeAncestryDistance, Portability.ancestryPosition]
 
 /-- The tabulated divergence is the gap between the positions, as claimed. -/
 theorem witnessDivergence_eq_position_gap (s t : Fin 3) :
-    witnessDivergence s t = |ancestryPosition s - ancestryPosition t| := by
+    witnessDivergence s t = |Portability.ancestryPosition s - Portability.ancestryPosition t| := by
   fin_cases s <;> fin_cases t <;>
-    norm_num [witnessDivergence, ancestryPosition]
+    norm_num [witnessDivergence, Portability.ancestryPosition]
 
 /-- The witness divergence is symmetric. -/
 theorem witnessDivergence_symm (s t : Fin 3) :
@@ -445,16 +445,16 @@ noncomputable def witnessAlignedField : Fin 3 → ℝ := ![0, 1, 2]
 @[simp] theorem witnessAlignedField_two : witnessAlignedField 2 = 2 := rfl
 
 /-- The aligned decoration is the canonical three-ancestry score. -/
-theorem witnessAlignedField_eq_ancestryScore : witnessAlignedField = ancestryScore := by
+theorem witnessAlignedField_eq_ancestryScore : witnessAlignedField = Portability.ancestryScore := by
   funext i
   fin_cases i <;>
-    norm_num [witnessAlignedField, ancestryScore, threeAncestryConditional,
+    norm_num [witnessAlignedField, Portability.ancestryScore, Portability.threeAncestryConditional,
       Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- Equivalently, the aligned decoration is the canonical three-ancestry conditional itself. -/
 theorem witnessAlignedField_eq_threeAncestryConditional :
-    witnessAlignedField = threeAncestryConditional := by
-  simpa only [ancestryScore] using witnessAlignedField_eq_ancestryScore
+    witnessAlignedField = Portability.threeAncestryConditional := by
+  simpa only [Portability.ancestryScore] using witnessAlignedField_eq_ancestryScore
 
 /-- The transposed assignment: the same three risks, the top two exchanged.
 
@@ -466,10 +466,10 @@ noncomputable def witnessSwappedField : Fin 3 → ℝ := ![0, 2, 1]
 
 /-- The swapped decoration is the canonical permuted ancestry score. -/
 theorem witnessSwappedField_eq_ancestryScoreSwapped :
-    witnessSwappedField = ancestryScoreSwapped := by
+    witnessSwappedField = Portability.ancestryScoreSwapped := by
   funext i
   fin_cases i <;>
-    norm_num [witnessSwappedField, ancestryScoreSwapped, Matrix.cons_val_two, Matrix.tail_cons]
+    norm_num [witnessSwappedField, Portability.ancestryScoreSwapped, Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- The two assignments carry the same three risks: they differ only in which population holds
 which, so every functional of the decoration alone must agree on them. -/

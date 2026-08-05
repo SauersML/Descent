@@ -68,7 +68,7 @@ theorem chargedTuples_one_eq_coverers [TopologicalSpace T] (F : ModulusFamily T 
     (fun t : Fin 1 → T ↦ t 0) ''
         chargedTuples (fun j t ↦ F.curve j t) {u : Fin 1 → T | ∀ l, u l ∈ S} v
       = F.coverers S (v 0) := by
-  ext x
+  PopGen.ext x
   constructor
   · rintro ⟨t, ⟨hmem, hcov⟩, rfl⟩
     exact ⟨hmem 0, hcov 0⟩
@@ -95,7 +95,7 @@ theorem support_eq_product {Sup : Set (Fin k → T)} {S : Fin k → Set T}
     (hsub : ∀ t ∈ Sup, ∀ i, t i ∈ S i)
     (hfull : ∀ t : Fin k → T, (∀ i, t i ∈ S i) → t ∈ Sup) :
     Sup = {t : Fin k → T | ∀ i, t i ∈ S i} := by
-  ext t
+  PopGen.ext t
   constructor
   · intro ht
     exact hsub t ht

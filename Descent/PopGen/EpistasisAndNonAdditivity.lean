@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Spectral.PolygenicSpectroscopy
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -498,4 +498,4 @@ theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18
 
 end CondensationBoundary
 
-end Descent
+end Descent.PopGen

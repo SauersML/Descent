@@ -362,7 +362,7 @@ through `fstFromTau` so that this and the equilibrium route cannot acquire diffe
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedR2FromTau (V_A V_E tau : ℝ) : ℝ :=
-  (momentsUnderDrift V_A V_E (fstFromTau tau)).r2
+  (momentsUnderDrift V_A V_E (Portability.fstFromTau tau)).r2
 
 /-- **A longer split transfers less.** Monotone in the scaled coalescence time, which is
 monotone in the divergence time at fixed effective size -- so the deployed metric decays
@@ -370,21 +370,21 @@ with time since the split. -/
 theorem deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
     (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
     deployedR2FromTau V_A V_E t₂ < deployedR2FromTau V_A V_E t₁ := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
+  have hf1 : Portability.fstFromTau t₁ < Portability.fstFromTau t₂ := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
+  have hlt2 : Portability.fstFromTau t₂ < 1 := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_one (by linarith)]
     linarith
-  exact r2_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE hf1 hlt2
+  exact r2_momentsUnderDrift_anti V_A V_E (Portability.fstFromTau t₁) (Portability.fstFromTau t₂) hV hE hf1 hlt2
 
 /-- **At the moment of the split nothing has been lost.** `τ = 0` gives `F_ST = 0` and
 the deployed metric is the heritability. -/
 theorem deployedR2FromTau_at_zero (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
     deployedR2FromTau V_A V_E 0 = share V_A V_E := by
-  unfold deployedR2FromTau fstFromTau saturation
+  unfold deployedR2FromTau Portability.fstFromTau saturation
   norm_num
   exact r2_momentsUnderDrift_at_source V_A V_E hV hE
 
@@ -423,7 +423,7 @@ split law in coalescent time -- and a reader meeting both has no reason to assum
 moment tuple treats them alike. It does: the tuple sees a differentiation and nothing
 about where it came from. -/
 theorem deployedR2_eq_deployedR2FromTau (p : PopGenParameters) (V_E tau : ℝ)
-    (h : p.fstEquilibrium = fstFromTau tau) :
+    (h : p.fstEquilibrium = Portability.fstFromTau tau) :
     deployedR2 p V_E = deployedR2FromTau p.V_A V_E tau := by
   unfold deployedR2 deployedR2FromTau
   rw [h]
@@ -434,9 +434,9 @@ exactly when the scaled coalescence time is the reciprocal of the total scaled f
 recorded here rather than left for a reader to rediscover. -/
 theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
     (hx : 1 + (p.theta + 2 * p.bigM) ≠ 0) (ht : 1 + tau ≠ 0) :
-    p.fstEquilibrium = fstFromTau tau ↔
+    p.fstEquilibrium = Portability.fstFromTau tau ↔
       1 = tau * (p.theta + 2 * p.bigM) := by
-  unfold PopGenParameters.fstEquilibrium fstFromFlow fstFromTau saturation
+  unfold PopGenParameters.fstEquilibrium fstFromFlow Portability.fstFromTau saturation
   rw [div_eq_div_iff hx ht]
   constructor <;> intro h <;> nlinarith [h]
 
@@ -717,17 +717,17 @@ metric, so a result stated in divergence time and one stated in migration rate r
 same place. -/
 theorem brier_deployedR2FromTau_anti (π V_A V_E t₁ t₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
     (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
-    brier π (momentsUnderDrift V_A V_E (fstFromTau t₁))
-      < brier π (momentsUnderDrift V_A V_E (fstFromTau t₂)) := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
+    brier π (momentsUnderDrift V_A V_E (Portability.fstFromTau t₁))
+      < brier π (momentsUnderDrift V_A V_E (Portability.fstFromTau t₂)) := by
+  have hf1 : Portability.fstFromTau t₁ < Portability.fstFromTau t₂ := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
+  have hlt2 : Portability.fstFromTau t₂ < 1 := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_one (by linarith)]
     linarith
-  exact brier_momentsUnderDrift_mono π V_A V_E (fstFromTau t₁) (fstFromTau t₂) hπ hπ1 hV hE
+  exact brier_momentsUnderDrift_mono π V_A V_E (Portability.fstFromTau t₁) (Portability.fstFromTau t₂) hπ hπ1 hV hE
     hf1 hlt2
 
 
@@ -766,15 +766,15 @@ theorem deployedR2FromIsland_anti_in_demes (Ne m μ d₁ d₂ V_A V_E : ℝ)
     (hV : 0 < V_A) (hE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 ≤ μ)
     (h1 : 1 < d₁) (hlt : d₁ < d₂) :
     deployedR2FromIsland Ne m μ d₂ V_A V_E < deployedR2FromIsland Ne m μ d₁ V_A V_E := by
-  have hc : ∀ d : ℝ, 1 < d → 0 < islandDemeCorrection d := by
+  have hc : ∀ d : ℝ, 1 < d → 0 < PopGen.islandDemeCorrection d := by
     intro d hd
-    unfold islandDemeCorrection ratio
+    unfold PopGen.islandDemeCorrection ratio
     exact div_pos (by linarith) (by linarith)
   have hflowpos : ∀ d : ℝ, 1 < d → 0 < scaledFlow Ne m μ d := by
     intro d hd
     have hcd := hc d hd
     have h4 : (0:ℝ) < 4 * Ne := by linarith
-    have p1 : 0 < 4 * Ne * m * islandDemeCorrection d :=
+    have p1 : 0 < 4 * Ne * m * PopGen.islandDemeCorrection d :=
       mul_pos (mul_pos h4 hm) hcd
     have p2 : 0 ≤ 4 * Ne * μ := by positivity
     unfold scaledFlow
@@ -786,8 +786,8 @@ theorem deployedR2FromIsland_anti_in_demes (Ne m μ d₁ d₂ V_A V_E : ℝ)
     unfold fstIslandEquilibrium fstFromFlow
     rw [div_lt_one (by linarith)]
     linarith
-  have hcorr : islandDemeCorrection d₂ < islandDemeCorrection d₁ := by
-    unfold islandDemeCorrection ratio
+  have hcorr : PopGen.islandDemeCorrection d₂ < PopGen.islandDemeCorrection d₁ := by
+    unfold PopGen.islandDemeCorrection ratio
     rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     nlinarith
   have hf : fstIslandEquilibrium Ne m μ d₁ < fstIslandEquilibrium Ne m μ d₂ := by
@@ -795,7 +795,7 @@ theorem deployedR2FromIsland_anti_in_demes (Ne m μ d₁ d₂ V_A V_E : ℝ)
     have hd2 : (1:ℝ) < d₂ := by linarith
     refine fstFromFlow_lt_of_lt _ _ (le_of_lt (hflowpos d₂ hd2)) ?_
     have h4 : (0:ℝ) < 4 * Ne := by linarith
-    have key : 4 * Ne * m * islandDemeCorrection d₂ < 4 * Ne * m * islandDemeCorrection d₁ :=
+    have key : 4 * Ne * m * PopGen.islandDemeCorrection d₂ < 4 * Ne * m * PopGen.islandDemeCorrection d₁ :=
       by
         have hm4 : 0 < 4 * Ne * m := mul_pos h4 hm
         exact (mul_lt_mul_left hm4).mpr hcorr
@@ -822,50 +822,50 @@ theorem deployedR2FromIsland_mse (Ne m μ nDemes V_A V_E : ℝ) :
 
 /-- **The calibration slope after a clean split is one at every divergence time.** -/
 theorem deployedR2FromTau_slope (V_A V_E tau : ℝ) (hV : 0 < V_A) (h : 0 ≤ tau) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).calibrationSlope = 1 := by
+    (momentsUnderDrift V_A V_E (Portability.fstFromTau tau)).calibrationSlope = 1 := by
   refine calibrationSlope_momentsUnderDrift V_A V_E _ hV ?_
-  unfold fstFromTau saturation
+  unfold Portability.fstFromTau saturation
   rw [div_lt_one (by linarith)]
   linarith
 
 /-- **And the mean squared error is flat along the split too.** Every metric except `R²`
 and the metrics that are functions of `R²` is blind to a clean split. -/
 theorem deployedR2FromTau_mse (V_A V_E tau : ℝ) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).mse = V_E :=
+    (momentsUnderDrift V_A V_E (Portability.fstFromTau tau)).mse = V_E :=
   mse_momentsUnderDrift V_A V_E _
 
 /-- **At the split the deployed metric is the heritability**, so the whole decay is a
 departure from a value the source population fixes. -/
 theorem deployedR2FromTau_bounded (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
     (h : 0 ≤ tau) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).r2 ≤ share V_A V_E := by
-  have hf : fstFromTau tau < 1 := by
-    unfold fstFromTau saturation
+    (momentsUnderDrift V_A V_E (Portability.fstFromTau tau)).r2 ≤ share V_A V_E := by
+  have hf : Portability.fstFromTau tau < 1 := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_one (by linarith)]
     linarith
-  have hf0 : 0 ≤ fstFromTau tau := by
-    unfold fstFromTau saturation
+  have hf0 : 0 ≤ Portability.fstFromTau tau := by
+    unfold Portability.fstFromTau saturation
     positivity
-  have := r2_momentsUnderDrift_le_source V_A V_E (fstFromTau tau) hV hE hf0 hf
+  have := r2_momentsUnderDrift_le_source V_A V_E (Portability.fstFromTau tau) hV hE hf0 hf
   rwa [r2_momentsUnderDrift_at_source V_A V_E hV hE] at this
 
 /-- **The AUC argument decays along the split.** Discrimination falls with divergence
 time, by the same route as `R²`. -/
 theorem aucArgument_deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A)
     (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
-    aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₂))
-      < aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₁)) := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
+    aucArgument (momentsUnderDrift V_A V_E (Portability.fstFromTau t₂))
+      < aucArgument (momentsUnderDrift V_A V_E (Portability.fstFromTau t₁)) := by
+  have hf1 : Portability.fstFromTau t₁ < Portability.fstFromTau t₂ := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_div_iff₀ (by linarith) (by linarith)]
     nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
+  have hlt2 : Portability.fstFromTau t₂ < 1 := by
+    unfold Portability.fstFromTau saturation
     rw [div_lt_one (by linarith)]
     linarith
-  have hf0 : 0 ≤ fstFromTau t₁ := by
-    unfold fstFromTau saturation; positivity
-  exact aucArgument_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE
+  have hf0 : 0 ≤ Portability.fstFromTau t₁ := by
+    unfold Portability.fstFromTau saturation; positivity
+  exact aucArgument_momentsUnderDrift_anti V_A V_E (Portability.fstFromTau t₁) (Portability.fstFromTau t₂) hV hE
     hf1 hlt2 hf0
 
 /-- **The portability ratio along a split.** What a report comparing a target `R²` to a
@@ -876,7 +876,7 @@ source `R²` is measuring, expressed in divergence time.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def portabilityRatioFromTau (V_A V_E tau : ℝ) : ℝ :=
-  portabilityRatio V_A V_E (fstFromTau tau)
+  portabilityRatio V_A V_E (Portability.fstFromTau tau)
 
 /-- **A longer split gives a smaller portability ratio.** -/
 theorem portabilityRatioFromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)

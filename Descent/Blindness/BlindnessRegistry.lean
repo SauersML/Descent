@@ -146,17 +146,17 @@ inductive StructuralGuard
 Every one of these is a statement relating cluster members to each other. None of them
 mentions an observable, and that is precisely the defect. -/
 def StructuralGuard.verdict : StructuralGuard → ℝ → Prop
-  | .overDetermination, r => targetHetOfRetention 1 r = 1 * (1 - lossOfRetention r)
-  | .duplicateBody, r => lossOfRetention r = 1 - r
-  | .conflation, r => targetPgsVarOfRetention 1 r = 1 * r
+  | .overDetermination, r => PopGen.targetHetOfRetention 1 r = 1 * (1 - PopGen.lossOfRetention r)
+  | .duplicateBody, r => PopGen.lossOfRetention r = 1 - r
+  | .conflation, r => PopGen.targetPgsVarOfRetention 1 r = 1 * r
 
 /-- **Every guard passes at every retention value.** The guards are satisfied by the
 algebra alone, so they are satisfied by the wrong number exactly as readily as by the
 right one. -/
 theorem StructuralGuard.verdict_holds (g : StructuralGuard) (r : ℝ) : g.verdict r := by
   cases g <;>
-    · simp only [StructuralGuard.verdict, targetHetOfRetention, lossOfRetention,
-        targetPgsVarOfRetention,
+    · simp only [StructuralGuard.verdict, PopGen.targetHetOfRetention, PopGen.lossOfRetention,
+        PopGen.targetPgsVarOfRetention,
       Descent.Core.complement, Descent.Core.product]
       try ring
 

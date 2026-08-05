@@ -290,8 +290,8 @@ theorem sum_hweProb (q : ℝ) : (∑ g : Genotype, hweProb q g) = 1 := by
 `Core.Fst.hweHeterozygosity q = ploidy · q · (1 - q)` was written as a scalar formula with
 a biological name and no genotype anywhere in its type.  This is the statement that the
 name is earned: it is the probability that a Hardy-Weinberg individual is a heterozygote. -/
-theorem hweProb_het (q : ℝ) : hweProb q Genotype.het = hweHeterozygosity q := by
-  unfold hweProb hweHeterozygosity ploidy
+theorem hweProb_het (q : ℝ) : hweProb q Genotype.het = Portability.hweHeterozygosity q := by
+  unfold hweProb Portability.hweHeterozygosity ploidy
   ring
 
 /-- **The dosage variance under Hardy-Weinberg is also `hweHeterozygosity`.**
@@ -302,9 +302,9 @@ does the dosage vary -- have one answer, and stating it here is what stops the `
 layer's `2 q (1 - q)` and the moment layer's `2 q (1 - q)` from drifting apart. -/
 theorem hwe_dosage_variance (q : ℝ) :
     (∑ g : Genotype, hweProb q g * (Genotype.dosage g - ploidy * q) ^ 2)
-      = hweHeterozygosity q := by
+      = Portability.hweHeterozygosity q := by
   rw [Genotype.sum_univ]
-  unfold hweProb hweHeterozygosity ploidy Genotype.dosage
+  unfold hweProb Portability.hweHeterozygosity ploidy Genotype.dosage
   ring
 
 /-- **The mean dosage is `ploidy · q`**: the coding is unbiased for the allele frequency,

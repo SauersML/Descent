@@ -11,7 +11,7 @@ import Descent.Blindness.ImitationRigidity
 import Descent.Spectral.FoldedSpectrum
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -337,7 +337,7 @@ theorem brier_depends_on_prevalence
     (h_r2_lt : r2 < 1)
     (h_order : π₁ < π₂) (h_half : π₂ ≤ 1/2) :
     brierFromR2 π₁ r2 < brierFromR2 π₂ r2 := by
-  unfold brierFromR2 TransportedMetrics.calibratedBrier
+  unfold brierFromR2 PopGen.TransportedMetrics.calibratedBrier
   have h_factor : 0 < 1 - r2 := by linarith
   -- Need: π₁(1-π₁) < π₂(1-π₂) when 0 < π₁ < π₂ ≤ 1/2
   -- f(x) = x(1-x) is increasing on (0, 1/2)
@@ -391,7 +391,7 @@ theorem brier_worsens_when_r2_drops_and_prevalence_factor_grows
     (h_prev : π_source * (1 - π_source) ≤ π_target * (1 - π_target)) :
     -- Target Brier ≥ source Brier (higher = worse)
     brierFromR2 π_source r2_source ≤ brierFromR2 π_target r2_target := by
-  unfold brierFromR2 TransportedMetrics.calibratedBrier
+  unfold brierFromR2 PopGen.TransportedMetrics.calibratedBrier
   have h1 : 0 < 1 - r2_source := by linarith
   have h2 : 0 < 1 - r2_target := by linarith
   -- (1 - r2_target) ≥ (1 - r2_source) and π_t(1-π_t) ≥ π_s(1-π_s)
@@ -567,7 +567,7 @@ theorem mechanistic_transport_disrupts_slope_and_brier
         targetCalibratedBrierFromSourceWeights cal.metric := by
     rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
       targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart]
-    simpa [brierFromR2, sourceBrierFromR2, TransportedMetrics.calibratedBrier] using
+    simpa [brierFromR2, sourceBrierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
       brierFromR2_strictAnti cal.metric.targetPrevalence
         cal.metric.targetPrevalence_pos cal.metric.targetPrevalence_lt_one h_r2_drop
   exact ⟨hslope_lt, hslope_dev_pos, hslope_dev, hslope_eq, hbrier⟩
@@ -826,7 +826,7 @@ theorem brier_increases_with_portability_loss
     (h_π : 0 < π) (h_π' : π < 1)
     (h_drop : r2_target < r2_source) :
     brierFromR2 π r2_source < brierFromR2 π r2_target := by
-  unfold brierFromR2 TransportedMetrics.calibratedBrier
+  unfold brierFromR2 PopGen.TransportedMetrics.calibratedBrier
   have h_prev : 0 < π * (1 - π) := by nlinarith
   nlinarith
 
@@ -841,7 +841,7 @@ theorem brier_bounded_by_prevalence
     brierFromR2 π r2 < π * (1 - π) := by
   -- The uninformative predictor is `r2 = 0`, where the Brier score IS `π(1-π)`, so this is
   -- the monotonicity above at that endpoint rather than a second run of the same `nlinarith`.
-  simpa [brierFromR2, TransportedMetrics.calibratedBrier] using
+  simpa [brierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
     brier_increases_with_portability_loss π r2 0 h_π h_π' h_r2
 
 /-- Brier worsening caused by mechanistic signal/discrimination loss alone,
@@ -869,7 +869,7 @@ theorem brierDiscriminationLoss_eq
   unfold brierDiscriminationLoss
   rw [targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart,
     sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart]
-  unfold TransportedMetrics.calibratedBrier
+  unfold PopGen.TransportedMetrics.calibratedBrier
   ring_nf
 
 /-- Exact formula for the outcome-scale contribution to Brier worsening when
@@ -884,7 +884,7 @@ theorem brierCalibrationLoss_eq
   unfold brierCalibrationLoss
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
     sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart]
-  unfold TransportedMetrics.calibratedBrier
+  unfold PopGen.TransportedMetrics.calibratedBrier
   ring_nf
 
 /-- Exact decomposition of mechanistic Brier worsening into a source-vs-target
@@ -2878,7 +2878,7 @@ theorem target_metrics_worse_of_r2_drop
       targetMetricProfileFromSourceWeights_brier,
       sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
       targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart]
-    simpa [brierFromR2, sourceBrierFromR2, TransportedMetrics.calibratedBrier] using
+    simpa [brierFromR2, sourceBrierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
       brierFromR2_strictAnti m.targetPrevalence
         m.targetPrevalence_pos m.targetPrevalence_lt_one h_r2_drop
   exact ⟨h_r2_drop, h_auc, h_brier⟩
@@ -2919,7 +2919,7 @@ theorem brier_score_bounded
     (h_π : 0 ≤ π) (h_π' : π ≤ 1)
     (h_r2 : 0 ≤ r2) (h_r2' : r2 ≤ 1) :
     brierFromR2 π r2 ≤ 1/4 := by
-  unfold brierFromR2 TransportedMetrics.calibratedBrier
+  unfold brierFromR2 PopGen.TransportedMetrics.calibratedBrier
   have h1 : π * (1 - π) ≤ 1/4 := by nlinarith [sq_nonneg (π - 1/2)]
   have h_one_minus_pi : 0 ≤ 1 - π := by linarith
   have h2 : 0 ≤ 1 - r2 := by linarith
@@ -3294,16 +3294,16 @@ corpus modules be chained at all. -/
 theorem ldRetentionPerGen_abs_lt_one {recomb Ne : ℝ}
     (hr0 : 0 ≤ recomb) (hr1 : recomb ≤ 1) (hNe : 1 < Ne) :
     |ldRetentionPerGen recomb Ne| < 1 := by
-  have hnn : 0 ≤ ldRetentionPerGen recomb Ne :=
-    ld_retention_nonneg recomb Ne hr1 (le_of_lt hNe)
-  have hlt : ldRetentionPerGen recomb Ne < 1 := by
+  have hnn : 0 ≤ PopGen.ldRetentionPerGen recomb Ne :=
+    PopGen.ld_retention_nonneg recomb Ne hr1 (le_of_lt hNe)
+  have hlt : PopGen.ldRetentionPerGen recomb Ne < 1 := by
     have hfac : 0 < 1 - 1 / (2 * Ne) := by
       rw [sub_pos, div_lt_one (by linarith)]
       linarith
     have hfac1 : 1 - 1 / (2 * Ne) < 1 := by
       have hpos : 0 < 1 / (2 * Ne) := div_pos one_pos (by linarith)
       linarith
-    unfold ldRetentionPerGen
+    unfold PopGen.ldRetentionPerGen
     nlinarith [mul_nonneg hr0 (le_of_lt hfac), hfac1]
   rw [abs_lt]
   exact ⟨by linarith, hlt⟩
@@ -3313,11 +3313,11 @@ needs; it is the step the corpus already performs inside
 `ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone`. -/
 theorem ldRetentionPerGen_strictAnti_recomb {r₁ r₂ Ne : ℝ}
     (hNe : 1 < Ne) (hlt : r₁ < r₂) :
-    ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne := by
+    PopGen.ldRetentionPerGen r₂ Ne < PopGen.ldRetentionPerGen r₁ Ne := by
   have hfac : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]
     linarith
-  unfold ldRetentionPerGen
+  unfold PopGen.ldRetentionPerGen
   nlinarith [hlt, hfac]
 
 /-- **Detection share of a clumped panel**: the fraction of the whitened detection weight — the

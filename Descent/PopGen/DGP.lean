@@ -9,7 +9,7 @@ import Descent.Spectral.SpectralDegradation
 import Descent.Core.Fst
 import Descent.Core.Parameters
 
-namespace Descent
+namespace Descent.PopGen
 
 /-! ### The ploidy-scaled rates, and the identity fraction they feed
 

@@ -782,7 +782,7 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
       Descent.Core.sum] using noise_integrated_cdf hN x s (T x)
   have h_le_set :
       ({e : ℝ | latentLiability s e ≤ T x} : Set ℝ) = Set.Iic (T x - s) := by
-    ext e
+    PopGen.ext e
     constructor
     · intro h
       change e ≤ T x - s
@@ -798,7 +798,7 @@ theorem liability_threshold_probit_raw {k : ℕ} (hN : GaussianNoiseAssumption k
       linarith
   have h_event :
       diseaseEvent T x s = (Set.Iic (T x - s))ᶜ := by
-    ext e
+    PopGen.ext e
     constructor
     · intro h
       change ¬ e ≤ T x - s

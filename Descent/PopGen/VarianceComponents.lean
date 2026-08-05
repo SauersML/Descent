@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -543,4 +543,4 @@ theorem prevalence_confounds_h2_portability
 
 end LiabilityScale
 
-end Descent
+end Descent.PopGen

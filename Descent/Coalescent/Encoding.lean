@@ -72,7 +72,7 @@ scoped instance measurableSpace_EInf : MeasurableSpace EInf :=
 theorem measurable_rel (i j : ℕ) : MeasurableSet {R : EInf | R.r i j} := by
   refine ⟨(fun f : ℕ × ℕ → Bool => f (i, j)) ⁻¹' {true}, ?_, ?_⟩
   · exact (measurable_pi_apply (i, j)) (measurableSet_singleton true)
-  · ext R
+  · PopGen.ext R
     simp [encode]
 
 /-- Its complement, likewise -- stated because the restriction preimages below are built from
@@ -96,7 +96,7 @@ theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
       = ⋂ (p : Fin n × Fin n),
           (if ξ.r p.1 p.2 then {R : EInf | R.r (p.1 : ℕ) (p.2 : ℕ)}
             else {R : EInf | ¬ R.r (p.1 : ℕ) (p.2 : ℕ)}) := by
-    ext R
+    PopGen.ext R
     simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_iInter]
     constructor
     · intro hR p

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Spectral.ReversibleMarkovSpectrum
 import Descent.Blindness.ObservationalCeiling
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # A finite-dimensional Poisson-history law
@@ -215,4 +215,4 @@ theorem no_marginal_only_history_degradation_criterion
         accept (report (historyMarginalAmplitude h)) :=
   marginalAmplitudeHistoryDegradationBlindness.no_criterion_of_factors report
 
-end Descent
+end Descent.Portability

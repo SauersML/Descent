@@ -5,7 +5,7 @@ import Descent.Program.OpenQuestions
 import Descent.Spectral.Permeability
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -800,4 +800,4 @@ theorem shorter_ld_needs_more_samples
 
 end OptimalDesign
 
-end Descent
+end Descent.Portability

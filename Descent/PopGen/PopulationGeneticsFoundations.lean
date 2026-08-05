@@ -5,7 +5,7 @@ import Descent.Program.OpenQuestions
 import Descent.Core.Fst
 import Descent.Core.Heterozygosity
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -362,12 +362,12 @@ function in generation and coalescent units.  Three formulas for this quantity
 existed across three files and two were wrong; this theorem is the relation
 whose absence let them disagree, and it fails to compile if either body moves. -/
 theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    coalFst t Ne = fstFromTau (coalescentTau t Ne) := by
+    coalFst t Ne = Portability.fstFromTau (Portability.coalescentTau t Ne) := by
   have h2 : (2 : ℝ) * Ne ≠ 0 := by positivity
   have hsum : t + 2 * Ne ≠ 0 := by
     have hs : 0 < t + 2 * Ne := by linarith
     exact ne_of_gt hs
-  unfold coalFst fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.oddsLike
+  unfold coalFst Portability.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.oddsLike
   field_simp
   ring
 
@@ -767,7 +767,7 @@ exists so the arithmetic agreement is on the record and cannot drift, and so tha
 repairing one of the two is forced to look at the other. `pairwiseFstFromBranchTaus` is the
 composition PortabilityDrift offers in place of the branch case. -/
 theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
-    wrightFIT a b = pairwiseFstFromBranches a b := rfl
+    wrightFIT a b = Portability.pairwiseFstFromBranches a b := rfl
 
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.
@@ -1419,8 +1419,8 @@ correct in its regime and silent about the regime is still a defect, and this
 is what stops the limit from being read as the general answer. -/
 theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
-    islandFstFiniteDemes Ne m d < fstMigrationDriftEquilibrium Ne m := by
-  unfold islandFstFiniteDemes fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    islandFstFiniteDemes Ne m d < Portability.fstMigrationDriftEquilibrium Ne m := by
+  unfold islandFstFiniteDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hc : 1 < islandDemeCorrection d := one_lt_islandDemeCorrection d hd
   have hNm : 0 < 4 * Ne * m := by positivity
   apply div_lt_div_of_pos_left one_pos (by nlinarith)
@@ -1441,16 +1441,16 @@ theorem islandDemeCorrection_tendsto_one :
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [one_div]
 
 /-- **Island model Fst is strictly decreasing in migration rate.**
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     (ha : 0 ≤ a) (hab : a < b) :
-    fstMigrationDriftEquilibrium Ne b < fstMigrationDriftEquilibrium Ne a := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne b < Portability.fstMigrationDriftEquilibrium Ne a := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
   have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -1459,8 +1459,8 @@ theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     Larger populations have more effective migrants per generation. -/
 theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (ha : 0 ≤ a) (hab : a < b) :
-    fstMigrationDriftEquilibrium b m < fstMigrationDriftEquilibrium a m := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium b m < Portability.fstMigrationDriftEquilibrium a m := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
   have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -1470,8 +1470,8 @@ theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (Nm = 0.25, so 4Nm = 1) is enough to prevent substantial differentiation. -/
 theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
     (h_threshold : 1 < 4 * Ne * m) :
-    fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith : 0 < 1 + 4 * Ne * m) (by norm_num : (0:ℝ) < 2)]
   linarith
 
@@ -1479,8 +1479,8 @@ theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
 theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
-    fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by linarith) (by nlinarith)
 
 /-! ### Relationship between Migration and Mutation Effects on Fst -/
@@ -1491,8 +1491,8 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     Fst_migration = 1/(1+4Nm), Fst_mutation = 1/(1+4Neμ).
     The key parameter is the scaled rate 4N × (rate). -/
 theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
-  unfold fstMigrationDriftEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
+  unfold Portability.fstMigrationDriftEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   ring
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
@@ -1727,8 +1727,8 @@ theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationMutationEquilibriumManyDemes fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationMutationEquilibriumManyDemes Ne m μ < Portability.fstMigrationDriftEquilibrium Ne m := by
+  unfold fstMigrationMutationEquilibriumManyDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- Combined Fst is below mutation-only Fst. -/
@@ -1968,8 +1968,8 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 
 /-- Effective migration equals both rates when migration is symmetric. -/
 theorem effectiveMigration_symmetric (m : ℝ) :
-    effectiveSymmetricMigration m m = m := by
-  unfold effectiveSymmetricMigration Descent.Core.midpoint
+    Portability.effectiveSymmetricMigration m m = m := by
+  unfold Portability.effectiveSymmetricMigration Descent.Core.midpoint
   ring
 
 /-- **Asymmetric migration yields asymmetric Fst.**
@@ -1978,7 +1978,7 @@ theorem effectiveMigration_symmetric (m : ℝ) :
 theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
-    fstMigrationDriftEquilibrium Ne m₁₂ < fstMigrationDriftEquilibrium Ne m₂₁ := by
+    Portability.fstMigrationDriftEquilibrium Ne m₁₂ < Portability.fstMigrationDriftEquilibrium Ne m₂₁ := by
   exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
 
 /-! ### Migration and LD Homogenization -/
@@ -2310,9 +2310,9 @@ noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ �
     This proves H* is indeed a fixed point — the equilibrium heterozygosity. -/
 theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationDriftRecurrence Ne mu (hetMutationFloor Ne mu) 1 =
-      hetMutationFloor Ne mu := by
-  simp [hetMutationDriftRecurrence, hetMutationFloor]
+    hetMutationDriftRecurrence Ne mu (Portability.hetMutationFloor Ne mu) 1 =
+      Portability.hetMutationFloor Ne mu := by
+  simp [hetMutationDriftRecurrence, Portability.hetMutationFloor]
   -- We need: (1 - 1/(2Ne)) * (4Neμ/(1+4Neμ)) + 2μ * (1 - 4Neμ/(1+4Neμ))
   --        = 4Neμ/(1+4Neμ)
   have hθ : 0 < 4 * Ne * mu := by positivity
@@ -2327,8 +2327,8 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
 theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu)
     (h_fixed : (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H) = H) :
-    H = hetMutationFloor Ne mu := by
-  unfold hetMutationFloor
+    H = Portability.hetMutationFloor Ne mu := by
+  unfold Portability.hetMutationFloor
   -- From the fixed-point equation:
   -- H - (1 - 1/(2Ne))H - 2μ(1-H) = 0
   -- H × [1 - (1 - 1/(2Ne)) + 2μ] = 2μ
@@ -2358,8 +2358,8 @@ theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     This is Wright's classical result, but *derived* from the recurrence
     rather than postulated. -/
 theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetMutationFloor Ne mu = 1 / (1 + 4 * Ne * mu) := by
-  unfold hetMutationFloor
+    1 - Portability.hetMutationFloor Ne mu = 1 / (1 + 4 * Ne * mu) := by
+  unfold Portability.hetMutationFloor
   have hθ : 0 < 4 * Ne * mu := by positivity
   have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
   field_simp
@@ -2369,30 +2369,30 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
     `fstMutationDriftEquilibrium`.** -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
+    1 - Portability.hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
 theorem hetEquilibrium_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < hetMutationFloor Ne mu := by
-  unfold hetMutationFloor
+    0 < Portability.hetMutationFloor Ne mu := by
+  unfold Portability.hetMutationFloor
   positivity
 
 theorem hetEquilibrium_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationFloor Ne mu < 1 := by
-  unfold hetMutationFloor
+    Portability.hetMutationFloor Ne mu < 1 := by
+  unfold Portability.hetMutationFloor
   rw [div_lt_one (by positivity)]
   linarith
 
 /-- **Equilibrium Fst is in (0, 1) for positive parameters.** -/
 theorem fstEquilibrium_derived_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < 1 - hetMutationFloor Ne mu := by
+    0 < 1 - Portability.hetMutationFloor Ne mu := by
   linarith [hetEquilibrium_lt_one Ne mu hNe hmu]
 
 theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - hetMutationFloor Ne mu < 1 := by
+    1 - Portability.hetMutationFloor Ne mu < 1 := by
   linarith [hetEquilibrium_pos Ne mu hNe hmu]
 
 /-- **Larger θ → lower equilibrium Fst** (derived version).
@@ -2400,10 +2400,10 @@ theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu
 theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
     (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hmu : 0 < mu)
     (h_lt : Ne₁ < Ne₂) :
-    1 - hetMutationFloor Ne₂ mu < 1 - hetMutationFloor Ne₁ mu := by
+    1 - Portability.hetMutationFloor Ne₂ mu < 1 - Portability.hetMutationFloor Ne₁ mu := by
   -- Equivalent to hetMutationFloor Ne₁ mu < hetMutationFloor Ne₂ mu
   -- i.e., 4Ne₁μ/(1+4Ne₁μ) < 4Ne₂μ/(1+4Ne₂μ)
-  unfold hetMutationFloor
+  unfold Portability.hetMutationFloor
   have h₁ : 0 < 1 + 4 * Ne₁ * mu := by positivity
   have h₂ : 0 < 1 + 4 * Ne₂ * mu := by positivity
   rw [sub_lt_sub_iff_left]
@@ -2581,7 +2581,7 @@ statement back as a hit that asserts an equality the named function does not sat
 is the exact convention where `neiFst`'s docstring records paying a factor of two to four,
 so the abbreviation is not available here. -/
 theorem fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE (a b : ℝ) :
-    fstFromHetRatio a b = hudsonFstFromCoalescenceTimes a b ∧
+    fstFromHetRatio a b = Portability.hudsonFstFromCoalescenceTimes a b ∧
       fstFromHetRatio a b = r2FromMSE a b := by
   constructor <;> rfl
 
@@ -2748,4 +2748,4 @@ theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
 
 end TransientFstDerivation
 
-end Descent
+end Descent.PopGen

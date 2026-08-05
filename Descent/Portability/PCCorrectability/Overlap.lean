@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PCCorrectability.Threshold
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Johnstone--Paul overlap curve
@@ -232,4 +232,4 @@ theorem samplePCResidualAxisFraction_le_fitted
   · simp only [hrank, if_false, sub_zero]
     linarith
 
-end Descent
+end Descent.Portability

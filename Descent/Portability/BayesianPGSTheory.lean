@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -949,4 +949,4 @@ theorem diminishing_returns_from_majority
 
 end MultiAncestryBayesian
 
-end Descent
+end Descent.Portability

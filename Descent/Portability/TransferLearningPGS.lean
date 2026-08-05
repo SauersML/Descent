@@ -6,7 +6,7 @@ import Descent.Program.OpenQuestions
 import Descent.Portability.TransplantationStability
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory Finset
 
@@ -130,7 +130,7 @@ theorem pgsR2_scale_invariant (cov_pgs_y var_pgs var_y c : ℝ) (hc : c ≠ 0) :
 same squared-correlation coordinate. -/
 theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ) :
     pgsR2 cov_pgs_y var_pgs var_y =
-      explainedR2FromTransportMoments cov_pgs_y var_pgs var_y := rfl
+      PopGen.explainedR2FromTransportMoments cov_pgs_y var_pgs var_y := rfl
 
 /-- Source-population `R²` of the score that uses the source's own effects as
     weights under a shared LD kernel.

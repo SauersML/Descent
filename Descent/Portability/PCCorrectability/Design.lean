@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PCCorrectability.Geometry
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Sharp design criteria
@@ -92,4 +92,4 @@ theorem pcCorrectabilityMargin_le_balanced
       rw [effectiveSubgroupSize_balanced n hn]
       ring
 
-end Descent
+end Descent.Portability

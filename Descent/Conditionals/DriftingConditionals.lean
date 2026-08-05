@@ -389,9 +389,9 @@ theorem stateOneResponse_eq_targetAnnotation :
 /-- The uniform two-state population remains positive under the kernel that
 never moves. -/
 theorem transportMass_stayKernel_uniformTwo_pos (y : Fin 2) :
-    0 < transportMass stayKernel uniformTwo y := by
+    0 < transportMass Portability.stayKernel Portability.uniformTwo y := by
   fin_cases y <;>
-    norm_num [transportMass, stayKernel, uniformTwo, Fin.sum_univ_two]
+    norm_num [transportMass, Portability.stayKernel, Portability.uniformTwo, Fin.sum_univ_two]
 
 /-- **A stationary marginal carries no information about the conditional.**
 
@@ -401,18 +401,18 @@ theorem transportMass_stayKernel_uniformTwo_pos (y : Fin 2) :
     `0`. This is a concrete, non-vacuous counterexample to unconditional
     reconstruction of a conditional from a stationary marginal path. -/
 theorem stationaryMarginal_does_not_identify_conditional :
-    (∀ y, transportMass stayKernel uniformTwo y = uniformTwo y) ∧
-      transportedResponse stayKernel uniformTwo stateZeroResponse
+    (∀ y, transportMass Portability.stayKernel Portability.uniformTwo y = Portability.uniformTwo y) ∧
+      transportedResponse Portability.stayKernel Portability.uniformTwo stateZeroResponse
           transportMass_stayKernel_uniformTwo_pos 0 = 1 ∧
-      transportedResponse stayKernel uniformTwo stateOneResponse
+      transportedResponse Portability.stayKernel Portability.uniformTwo stateOneResponse
           transportMass_stayKernel_uniformTwo_pos 0 = 0 := by
   constructor
   · intro y
     fin_cases y <;>
-      norm_num [transportMass, stayKernel, uniformTwo, Fin.sum_univ_two]
+      norm_num [transportMass, Portability.stayKernel, Portability.uniformTwo, Fin.sum_univ_two]
   · constructor <;>
-      norm_num [transportedResponse, transportMass, markedMass, uniformTwo,
-        stayKernel, stateZeroResponse, stateOneResponse, Fin.sum_univ_two,
+      norm_num [transportedResponse, transportMass, markedMass, Portability.uniformTwo,
+        Portability.stayKernel, stateZeroResponse, stateOneResponse, Fin.sum_univ_two,
       Descent.Core.kronecker]
 
 /-! ## Two-state local-ancestry switching -/
@@ -438,10 +438,10 @@ theorem symmetricTwoStateKernel_mass_preserving (switch : ℝ) :
 
 /-- The uniform two-state population is stationary under symmetric switching. -/
 theorem uniformTwo_stationary_symmetricTwoStateKernel (switch : ℝ) :
-    IsStationaryKernel uniformTwo (symmetricTwoStateKernel switch) := by
+    Portability.IsStationaryKernel Portability.uniformTwo (symmetricTwoStateKernel switch) := by
   intro j
   fin_cases j <;>
-    norm_num [uniformTwo, symmetricTwoStateKernel, Fin.sum_univ_two] <;>
+    norm_num [Portability.uniformTwo, symmetricTwoStateKernel, Fin.sum_univ_two] <;>
     ring
 
 /-- The centered ancestry contrast. -/

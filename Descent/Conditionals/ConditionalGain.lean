@@ -659,8 +659,8 @@ theorem gainLandscape_strictly_ordered (β : ℝ) (hβ0 : 0 < β) (hβ1 : β < 1
       gainBounded n < gainLog n ∧ gainLog n < gainPolynomialRow β n ∧
         gainPolynomialRow β n < gainLinear n := by
   filter_upwards [gainBounded_lt_gainLog, gainLog_lt_gainPower β hβ0,
-    gainPower_lt_gainLinear β hβ0 hβ1] with n h1 h2 h3
-  exact ⟨h1, h2, h3⟩
+    gainPower_lt_gainLinear β hβ0 hβ1] with n h1 PopGen.AssortativeMatingModel.h2 h3
+  exact ⟨h1, PopGen.AssortativeMatingModel.h2, h3⟩
 
 end GainLandscape
 

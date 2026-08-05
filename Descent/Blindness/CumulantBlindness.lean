@@ -495,15 +495,15 @@ linkage equilibrium, and the influence shares are not the true shares when `D �
 /-- The abstract score variance at Hardy--Weinberg genotype variances IS the corpus's
 `additiveVariance`. -/
 theorem scoreVariance_eq_additiveVariance {m : ℕ} (p α : Fin m → ℝ) :
-    scoreVariance α (fun j ↦ 2 * p j * (1 - p j)) = additiveVariance p α := by
-  unfold scoreVariance locusVarianceShare additiveVariance
+    scoreVariance α (fun j ↦ 2 * p j * (1 - p j)) = PopGen.additiveVariance p α := by
+  unfold scoreVariance locusVarianceShare PopGen.additiveVariance
   exact Finset.sum_congr rfl fun j _ ↦ by ring
 
 /-- A locus's influence, written in allele frequency and effect size against the
 corpus's additive variance. -/
 theorem locusInfluence_eq_hwe_share {m : ℕ} (p α : Fin m → ℝ) (j : Fin m) :
     locusInfluence α (fun i ↦ 2 * p i * (1 - p i)) j =
-      2 * p j * (1 - p j) * α j ^ 2 / additiveVariance p α := by
+      2 * p j * (1 - p j) * α j ^ 2 / PopGen.additiveVariance p α := by
   unfold locusInfluence locusVarianceShare
   rw [scoreVariance_eq_additiveVariance]
   ring_nf

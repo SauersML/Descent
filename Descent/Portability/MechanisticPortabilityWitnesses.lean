@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PortabilityDrift
 import Descent.Core.Parameters
 
-namespace Descent
+namespace Descent.Portability
 
 open Matrix
 open scoped Matrix
@@ -28,14 +28,14 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       targetSourceEffectProjectionAt, targetEffectHeterogeneityProjectionAt,
       r2FromSourceWeights, explainedSignalVarianceFromSourceWeights,
       predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      sigmaTagCausal, sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+      PopGen.sigmaTagCausal, sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
       effectiveOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
       novelUntaggablePhenotypeResidual,
       taggingProjection, directCausalProjection, proxyTaggingProjection,
       Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
       Descent.Core.PopGenParameters.tauAt, Descent.Core.PopGenParameters.hetDecayFactor,
-      Descent.Core.PopGenParameters.fstTransientAt, fstTransientDecayFromScaled,
+      Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
       Descent.Core.PopGenParameters.migrationSharedBoostAt,
       ldCorrelationDecay, Matrix.one_mulVec, Matrix.mulVec, dotProduct,
@@ -165,9 +165,9 @@ theorem identityDirectMetricModel_source_weights {q : ℕ}
     sourceWeightsFromExplicitDrivers
         (identityDirectMetricModel β outcomeVariance targetPrevalence
           h_out h_prev_pos h_prev_lt) = β := by
-  ext i
+  PopGen.ext i
   simp [identityDirectMetricModel, sourceWeightsFromExplicitDrivers, sourceERMWeights,
-    crossCovariance, sigmaTagCausal, Matrix.one_mulVec,
+    crossCovariance, PopGen.sigmaTagCausal, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem identityDirectMetricModel_metrics {q : ℕ}
@@ -196,13 +196,13 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
       identityDirectMetricModel_source_weights β outcomeVariance targetPrevalence
         h_out h_prev_pos h_prev_lt
   have h_source_cross : crossCovariance m Pop.source = β := by
-    ext i
-    simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
+    PopGen.ext i
+    simp [m, identityDirectMetricModel, crossCovariance, PopGen.sigmaTagCausal,
       Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   have h_target_cross : crossCovariance m Pop.target = β := by
-    ext i
-    simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
+    PopGen.ext i
+    simp [m, identityDirectMetricModel, crossCovariance, PopGen.sigmaTagCausal,
       Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   have h_source_score :
@@ -384,13 +384,13 @@ macro "metric_witness_simp" : tactic =>
       explainedSignalVarianceFromSourceWeights,
       predictiveCovarianceFromSourceWeights,
       scoreVarianceFromSourceWeights,
-      sigmaTagCausal,
+      PopGen.sigmaTagCausal,
       taggingProjection, directCausalProjection, proxyTaggingProjection,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
       crossCovariance,
       effectiveOutcomeVariance,
       targetCalibratedBrierFromSourceWeights,
-      TransportedMetrics.calibratedBrier, TransportedMetrics.r2FromSignalVariance,
+      PopGen.TransportedMetrics.calibratedBrier, PopGen.TransportedMetrics.r2FromSignalVariance,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.share, Descent.Core.ratio, Descent.Core.product, Descent.Core.difference,
@@ -510,7 +510,7 @@ variance; no source-`R²` transport summary appears in the definition. -/
 theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (targetMetricProfileFromSourceWeights m).auc =
-      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   simp [targetMetricProfileFromSourceWeights, equalVarianceGaussianAUCFromSourceWeights, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow]
@@ -550,7 +550,7 @@ section GenerationalMechanisticValidation
 -- These primitive population-genetic rates are deliberately kept transparent in
 -- the concrete witnesses below.  Registering them locally prevents exact
 -- generation checks from getting stuck at an otherwise opaque `4 * Nₑ * rate`.
-attribute [local simp] scaledMutationRate scaledMigrationRate hetDecayFromScaled
+attribute [local simp] PopGen.scaledMutationRate PopGen.scaledMigrationRate PopGen.hetDecayFromScaled
   novelDirectCausalTargetAt novelProxyTaggingTargetAt
 
 /-- Simple generation-indexed population-genetic parameters used to validate
@@ -597,8 +597,8 @@ noncomputable def nondegenerateGenerationalPopGen : Descent.Core.PopGenParameter
 /-- The chosen mutation scale makes the differentiation transient's retention
 factor vanish exactly at generation one. -/
 theorem nondegenerateGenerationalPopGen_fstDecay_eq_zero :
-    fstTransientDecayFromScaled 1 2 (1 / 2) = 0 := by
-  norm_num [fstTransientDecayFromScaled, hetDecayFromScaled, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow]
+    PopGen.fstTransientDecayFromScaled 1 2 (1 / 2) = 0 := by
+  norm_num [PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow]
 
 /-- Exact generation-1 popgen coordinates for the nondegenerate witness. -/
 theorem nondegenerateGenerationalPopGen_coordinates_at_one :
@@ -613,7 +613,7 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
   · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.bigM, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow]
   · simp [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.tauAt, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy, Descent.Core.fstFromFlow]
   · simp [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.fstTransientAt,
-      fstTransientDecayFromScaled, hetDecayFromScaled,
+      PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled,
       Descent.Core.PopGenParameters.hetDecayFactor,
       Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
       nondegenerateGenerationalPopGen_fstDecay_eq_zero,
@@ -741,12 +741,12 @@ theorem popgenDrivenProxyGenerationalModel_source_weights (t : ℕ) :
     sourceWeightsFromExplicitDrivers
         (CrossPopulationGenerationalModel.toMetricModelAt
           popgenDrivenProxyGenerationalModel t) = ![1, 1] := by
-  ext i
+  PopGen.ext i
   fin_cases i <;>
     simp [popgenDrivenProxyGenerationalModel,
       CrossPopulationGenerationalModel.toMetricModelAt,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
-      crossCovariance, sigmaTagCausal,
+      crossCovariance, PopGen.sigmaTagCausal,
       Matrix.one_mulVec, Matrix.mulVec, dotProduct,
       Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
@@ -833,18 +833,18 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       ⟨_, _, h_proxy0, h_proxy1⟩
     have h_cross :
         crossCovariance m1 Pop.target = ![popgenDrivenProxyScale, popgenDrivenProxyScale] := by
-      ext i
+      PopGen.ext i
       fin_cases i
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
-          crossCovariance, sigmaTagCausal, directCausalTargetAt,
+          crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
           Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
           using h_proxy0
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
-          crossCovariance, sigmaTagCausal, directCausalTargetAt,
+          crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
           Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
@@ -859,7 +859,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       ⟨h_ld0, h_ld1, _, _⟩
     have h_sigma :
         (m1.sigmaTag Pop.target) = !![popgenDrivenTagScale, 0; 0, popgenDrivenTagScale] := by
-      ext i j
+      PopGen.ext i j
       fin_cases i <;> fin_cases j
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
@@ -1063,14 +1063,14 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       explainedSignalVarianceFromSourceWeights,
       predictiveCovarianceFromSourceWeights,
       scoreVarianceFromSourceWeights,
-      sigmaTagCausal,
+      PopGen.sigmaTagCausal,
       taggingProjection,
       directCausalProjection, proxyTaggingProjection,
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
       crossCovariance,
       effectiveOutcomeVariance, irreducibleTargetResidualBurden,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-      Descent.Core.PopGenParameters.fstTransientAt, fstTransientDecayFromScaled,
+      Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
       Descent.Core.PopGenParameters.migrationSharedBoostAt,
       Descent.Core.PopGenParameters.bigM,
@@ -1155,13 +1155,13 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     r2FromSourceWeights
       (timeVaryingEffectGenerationalModel.toMetricModelAt 1) Pop.target = 1 / 8 := by
   repeat' constructor
-  · ext i j
+  · PopGen.ext i j
     fin_cases i
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
-  · ext i j
+  · PopGen.ext i j
     fin_cases i
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
@@ -1224,4 +1224,4 @@ theorem individual_error_r2_bounded
     rwa [lt_div_iff₀ h_k] at h_small
   linarith
 
-end Descent
+end Descent.Portability

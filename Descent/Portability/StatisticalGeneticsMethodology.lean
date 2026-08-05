@@ -9,7 +9,7 @@ import Descent.Program.OpenQuestions
 import Descent.Conditionals.LocalToGlobalCoherence
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 open Finset
@@ -627,7 +627,7 @@ theorem disjointWindow_limit_variances_eq_segment :
     {v : ℝ | ∃ (w : ℕ) (share : Fin w → ℝ),
         (∀ j, 0 ≤ share j) ∧ (∑ j, share j) ≤ 1 ∧
           disjointWindowLimitVariance share = v} = Set.Icc (0 : ℝ) 1 := by
-  ext v
+  PopGen.ext v
   constructor
   · rintro ⟨w, share, h_nn, h_le, rfl⟩
     exact disjointWindowLimitVariance_mem_segment share h_nn h_le
@@ -751,15 +751,15 @@ theorem same_sourceR2_different_targetR2_two_signal_witness :
     let sourceVariance : ℝ := ∑ l, sourceSignal l
     let stableTargetVariance : ℝ := ∑ l, sourceSignal l * stableTransport l
     let brokenTargetVariance : ℝ := ∑ l, sourceSignal l * brokenTransport l
-    let sourceR2 := TransportedMetrics.r2FromSignalVariance sourceVariance 1
-    let stableTargetR2 := TransportedMetrics.r2FromSignalVariance stableTargetVariance 1
-    let brokenTargetR2 := TransportedMetrics.r2FromSignalVariance brokenTargetVariance 1
+    let sourceR2 := PopGen.TransportedMetrics.r2FromSignalVariance sourceVariance 1
+    let stableTargetR2 := PopGen.TransportedMetrics.r2FromSignalVariance stableTargetVariance 1
+    let brokenTargetR2 := PopGen.TransportedMetrics.r2FromSignalVariance brokenTargetVariance 1
     sourceR2 = stableTargetR2 ∧
     brokenTargetR2 < stableTargetR2 ∧
     brokenTargetR2 / sourceR2 = (3 : ℝ) / 4 := by
-  simp [TransportedMetrics.r2FromSignalVariance, Descent.Core.share]
+  simp [PopGen.TransportedMetrics.r2FromSignalVariance, Descent.Core.share]
   norm_num
 
 end SourceR2Insufficiency
 
-end Descent
+end Descent.Portability

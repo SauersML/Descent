@@ -90,7 +90,7 @@ theorem nearOptimalSet_superposition_eq_levelResolvedUnion
       {config | ∃ level : Index → R,
         AdmissibleLevels active weight target level ∧
           ∀ k ∈ active, config ∈ NearOptimalSet (energy k) (level k)} := by
-  ext config
+  PopGen.ext config
   exact nearOptimal_superposition_iff_exists_levels active weight energy target hweight config
 
 /-- Overlaps achieved by a common pair of configurations above two component-level vectors. -/
@@ -138,7 +138,7 @@ theorem levelResolvedForbiddenCore_eq_compl_envelope
     (overlap : Config → Config → Overlap) (target : R) :
     LevelResolvedForbiddenCore active weight energy overlap target =
       (LevelResolvedAchievableEnvelope active weight energy overlap target)ᶜ := by
-  ext q
+  PopGen.ext q
   constructor
   · intro hcore henvelope
     rcases henvelope with ⟨leftLevel, rightLevel, hleft, hright, hall⟩
@@ -256,7 +256,7 @@ theorem nearOptimalSet_superposition_oneHot
     (hselected : selected ∈ active) (target : R) :
     NearOptimalSet (superposedLandscape active (oneHotWeight selected) energy) target =
       NearOptimalSet (energy selected) target := by
-  ext config
+  PopGen.ext config
   simp only [NearOptimalSet, Set.mem_setOf_eq,
     superposedLandscape_oneHot active energy selected hselected]
 

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Tactic
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
 open scoped BigOperators
 
@@ -233,4 +233,4 @@ theorem horizon_three_crossings :
       0 < horizonPolynomial (4 / 5) := by
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> · unfold horizonPolynomial; norm_num
 
-end Descent
+end Descent.Portability

@@ -5,7 +5,7 @@ import Descent.Blindness.ImitationRigidity
 import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Positivity
 
-namespace Descent
+namespace Descent.Portability
 
 noncomputable section
 
@@ -111,7 +111,7 @@ def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j ↦ v i * v j
 
 theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
     spikeOuter v = Blindness.rankOneCovarianceBump 1 v := by
-  ext i j
+  PopGen.ext i j
   simp [spikeOuter, Blindness.rankOneCovarianceBump]
 
 /-- The score variance a unit spike contributes to a weighting `x` is the
@@ -403,7 +403,7 @@ theorem isNull_convex {S T : Matrix ι ι ℝ} (hS : K.IsNull S) (hT : K.IsNull 
   constructor
   · have hrewrite : w • S + (1 - w) • T - K.base
         = w • (S - K.base) + (1 - w) • (T - K.base) := by
-      ext i j
+      PopGen.ext i j
       simp only [Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
       ring
     rw [hrewrite]
@@ -930,7 +930,7 @@ bump's scale multiplies the effect vector while the level multiplies the
 covariance. -/
 theorem rankOneCovarianceBump_eq_smul_spikeOuter (scale : ℝ) (v : ι → ℝ) :
     Blindness.rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by
-  ext i j
+  PopGen.ext i j
   simp only [Blindness.rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]
   ring
 
@@ -1966,4 +1966,4 @@ end CapacityInvariant
 
 end
 
-end Descent
+end Descent.Portability

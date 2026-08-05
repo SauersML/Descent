@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.TransferLearningPGS
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
-open TransportedMetrics (r2FromSignalVariance)
+open PopGen.TransportedMetrics (r2FromSignalVariance)
 
 /-!
 # Multi-Ancestry GWAS Theory and Equitable PGS
@@ -55,9 +55,9 @@ theorem multi_ancestry_reduces_fst
 signal variance `V_A × (1 - fst)`. -/
 private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
-    presentDayR2 V_A V_E fst = r2FromSignalVariance ((1 - fst) * V_A) V_E := by
+    presentDayR2 V_A V_E fst = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - fst) * V_A) V_E := by
   simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet,
-    r2FromSignalVariance, mul_comm,
+    PopGen.TransportedMetrics.r2FromSignalVariance, mul_comm,
       Descent.Core.share]
 
 /-- Exact gain from adding `δ` units of taggable signal variance to a deployed
@@ -67,9 +67,9 @@ private theorem expectedR2_gain_eq
     (hVE : 0 < V_E)
     (hx : 0 ≤ x)
     (hδ : 0 < δ) :
-    r2FromSignalVariance (x + δ) V_E - r2FromSignalVariance x V_E =
+    PopGen.TransportedMetrics.r2FromSignalVariance (x + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x V_E =
       δ * V_E / ((x + δ + V_E) * (x + V_E)) := by
-  unfold r2FromSignalVariance Descent.Core.share
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have hxE : x + V_E ≠ 0 := by
     linarith
   have hxdE : x + δ + V_E ≠ 0 := by
@@ -86,8 +86,8 @@ private theorem expectedR2_gain_strictAnti_base
     (hx₁ : 0 ≤ x₁)
     (hx_lt : x₁ < x₂)
     (hδ : 0 < δ) :
-    r2FromSignalVariance (x₁ + δ) V_E - r2FromSignalVariance x₁ V_E >
-      r2FromSignalVariance (x₂ + δ) V_E - r2FromSignalVariance x₂ V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (x₁ + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x₁ V_E >
+      PopGen.TransportedMetrics.r2FromSignalVariance (x₂ + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x₂ V_E := by
   have hx₂ : 0 ≤ x₂ := by
     linarith
   rw [expectedR2_gain_eq x₁ δ V_E hVE hx₁ hδ,
@@ -157,7 +157,7 @@ theorem portability_concave_in_fst_reduction
   -- Reducing a shifted Fst to a shifted signal variance is one rewrite, stated once for an
   -- arbitrary Fst rather than copied out at the high and the low value.
   have h_reduce : ∀ f : ℝ,
-      presentDayR2 V_A V_E (f - Δ) = r2FromSignalVariance ((1 - f) * V_A + δ) V_E := by
+      presentDayR2 V_A V_E (f - Δ) = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - f) * V_A + δ) V_E := by
     intro f
     rw [presentDayR2_eq_expectedR2]
     unfold δ
@@ -672,4 +672,4 @@ theorem sq_mul_le_sq_mul_of_abs_le
 
 end VariantCountAndEstimationNoise
 
-end Descent
+end Descent.Portability

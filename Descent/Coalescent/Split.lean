@@ -76,7 +76,7 @@ theorem range_splitMap {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
     Set.range (fun x : Fin n => (Quotient.mk η x, decide (x ∈ S)))
       = {p | p.2 = false} ∪ {(Quotient.mk η a, true)} := by
   classical
-  ext p
+  PopGen.ext p
   constructor
   · rintro ⟨x, rfl⟩
     by_cases hx : x ∈ S

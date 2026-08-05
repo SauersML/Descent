@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PCCorrectability.Phase
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Application-level correctability diagnostic
@@ -353,10 +353,10 @@ theorem more_exact_population_pcs_reduce_modeled_residual
   apply mul_lt_mul_of_pos_left _ h_c
   apply Finset.sum_lt_sum
   · intro i _
-    split_ifs with h1 h2
+    split_ifs with h1 PopGen.AssortativeMatingModel.h2
     · exact le_refl _
     · exfalso
-      exact h2 (lt_trans (Nat.lt_succ_self k) h1)
+      exact PopGen.AssortativeMatingModel.h2 (lt_trans (Nat.lt_succ_self k) h1)
     · exact le_of_lt (h_eig_pos i)
     · exact le_refl _
   · have hk1_bound : k + 1 < p := by
@@ -366,4 +366,4 @@ theorem more_exact_population_pcs_reduce_modeled_residual
                show k < k + 1 from Nat.lt_succ_iff.mpr (le_refl _), ite_true]
     exact h_eig_pos _
 
-end Descent
+end Descent.Portability

@@ -124,7 +124,7 @@ theorem classSize_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β)
   classical
   unfold classSize
   congr 1
-  ext y
+  PopGen.ext y
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
   exact ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
 
@@ -180,7 +180,7 @@ the Chinese restaurant, and it is what makes the normalisation an induction. -/
 theorem image_extendMap_none {n : ℕ} (ξ : ER n) :
     Finset.univ.image (extendMap ξ none) = Finset.univ := by
   classical
-  ext v
+  PopGen.ext v
   simp only [Finset.mem_univ, iff_true]
   match v with
   | none => exact Finset.mem_image.mpr ⟨Fin.last n, Finset.mem_univ _, extendMap_last ξ none⟩
@@ -193,7 +193,7 @@ theorem image_extendMap_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
     Finset.univ.image (extendMap ξ (some c))
       = Finset.univ.image (some : Quotient ξ → Option (Quotient ξ)) := by
   classical
-  ext v
+  PopGen.ext v
   simp only [Finset.mem_image, Finset.mem_univ, true_and]
   constructor
   · rintro ⟨x, -, rfl⟩

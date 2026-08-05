@@ -5,7 +5,7 @@ import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Portability.PCCorrectability.Overlap
 import Descent.Spectral.ProjectionShiftBounds
 
-namespace Descent
+namespace Descent.Portability
 
 noncomputable section
 
@@ -143,4 +143,4 @@ theorem projection_artifact_implies_standardized_bias_bound
 
 end
 
-end Descent
+end Descent.Portability

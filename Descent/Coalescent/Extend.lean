@@ -300,7 +300,7 @@ one and joining a class leaves it alone.  Both come from the image of `extendMap
 theorem blocks_extend_none {n : ℕ} (ξ : ER n) : blocks (extend ξ none) = blocks ξ + 1 := by
   classical
   have hrange : Set.range (extendMap ξ none) = Set.univ := by
-    ext y
+    PopGen.ext y
     simp only [Set.mem_univ, iff_true]
     match y with
     | none => exact ⟨Fin.last n, extendMap_last ξ none⟩
@@ -318,7 +318,7 @@ theorem blocks_extend_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
   classical
   have hrange : Set.range (extendMap ξ (some c))
       = Set.range (some : Quotient ξ → Option (Quotient ξ)) := by
-    ext y
+    PopGen.ext y
     constructor
     · rintro ⟨x, rfl⟩
       rcases lt_or_ge (x : ℕ) n with hx | hx

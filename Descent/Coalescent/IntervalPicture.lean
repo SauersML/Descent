@@ -63,7 +63,7 @@ theorem filter_sdiff_filter (V : Finset ℝ) {u w : ℝ} :
     (V.filter (fun v => v < w)) \ (V.filter (fun v => v < u))
       = V.filter (fun v => u ≤ v ∧ v < w) := by
   classical
-  ext v
+  PopGen.ext v
   simp only [mem_sdiff, mem_filter, not_and, not_lt]
   constructor
   · rintro ⟨⟨hv, hvw⟩, hnot⟩
@@ -145,7 +145,7 @@ theorem blocks_intervalRel {n : ℕ} (V : Finset ℝ) (U : Fin n → ℝ)
     blocks (intervalRel V U) = V.card + 1 := by
   classical
   have hrange : Set.range (fun i : Fin n => cellIndex V (U i)) = {c | c ≤ V.card} := by
-    ext c
+    PopGen.ext c
     constructor
     · rintro ⟨i, rfl⟩
       exact hle i
@@ -156,7 +156,7 @@ theorem blocks_intervalRel {n : ℕ} (V : Finset ℝ) (U : Fin n → ℝ)
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _),
     Nat.card_congr (Equiv.setCongr hrange)]
   have hfin : {c : ℕ | c ≤ V.card} = ↑(Finset.range (V.card + 1)) := by
-    ext c
+    PopGen.ext c
     simp [Nat.lt_succ_iff]
   rw [Nat.card_congr (Equiv.setCongr hfin)]
   simp

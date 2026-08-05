@@ -13,7 +13,7 @@ import Descent.Spectral.FoldedSpectrum
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 

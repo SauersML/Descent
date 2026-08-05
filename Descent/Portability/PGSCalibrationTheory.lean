@@ -4,10 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.OpenQuestions
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
-open TransportedMetrics (equalVarianceGaussianAUCFromSignalVariance)
+open PopGen.TransportedMetrics (equalVarianceGaussianAUCFromSignalVariance)
 
 /-!
 # PGS Calibration Theory
@@ -891,7 +891,7 @@ theorem sourceCalibrationProfile_exact_mechanistic_portability_law
       CrossPopulationMechanisticCalibrationModel.predictedMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
       CrossPopulationMechanisticCalibrationModel.scoreMean,
-      CalibrationMoments.toProfile, Descent.calibrationProfile,
+      CalibrationMoments.toProfile, Descent.Portability.calibrationProfile,
       calibrationSlopeFromSourceWeights, calibrationInTheLarge,
       Descent.Core.difference,
       totalObservedMeanShift, shiftedObservedMean,
@@ -921,7 +921,7 @@ theorem targetCalibrationProfile_exact_mechanistic_portability_law
       CrossPopulationMechanisticCalibrationModel.scoreMean,
       CrossPopulationMechanisticCalibrationModel.deploymentIntercept,
       CalibrationMoments.toProfile,
-      Descent.calibrationProfile, calibrationSlopeFromSourceWeights,
+      Descent.Portability.calibrationProfile, calibrationSlopeFromSourceWeights,
       calibrationInTheLarge, sub_eq_add_neg, add_assoc,
       Descent.Core.difference] <;> ring
 
@@ -971,7 +971,7 @@ wrote the four conjuncts and their `let`-bound profiles out in full.  Named, the
 between them is visible in one argument -- which prevalence the source profile is read at
 -- instead of being buried in nine lines that agree. -/
 def AucDropsAndCitlWorsens (cal : CrossPopulationCalibrationShiftModel)
-    (sourceMetrics targetMetrics : TransportedMetrics.Profile) : Prop :=
+    (sourceMetrics targetMetrics : PopGen.TransportedMetrics.Profile) : Prop :=
   targetMetrics.auc < sourceMetrics.auc ∧
     ((cal.identityCalibrationProfile Pop.target)).citl =
       cal.observedMeanShift - cal.predictedMeanShift ∧
@@ -1103,7 +1103,7 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
       sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
       targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart,
       h_target_mean_eq_prevalence]
-    simpa [brierFromR2, sourceBrierFromR2, TransportedMetrics.calibratedBrier] using
+    simpa [brierFromR2, sourceBrierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
       brierFromR2_strictAnti metric.targetPrevalence
         metric.targetPrevalence_pos metric.targetPrevalence_lt_one h_r2_drop
   exact ⟨⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩, h_brier⟩
@@ -1428,14 +1428,14 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
             (scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromSignalVariance
+          PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
               (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
       , brier :=
-          TransportedMetrics.calibratedBrierFromVariances
+          PopGen.TransportedMetrics.calibratedBrierFromVariances
             (m.metric.targetPrevalenceAt t)
             ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
@@ -2244,7 +2244,7 @@ theorem downReclassificationRate_eq_thresholdBandRate
       {score | classifiedHighRisk threshold score ∧
           ¬ classifiedHighRisk threshold (score - δ)} =
         Set.Ioc threshold (threshold + δ) := by
-    ext score
+    PopGen.ext score
     exact down_reclassified_after_downward_shift_iff_mem_band threshold score δ
   rw [hset]
 
@@ -3687,4 +3687,4 @@ theorem expectedThresholdQalyLoss_eq_expected_thresholdDecisionRegret
 
 end DecisionImplications
 
-end Descent
+end Descent.Portability

@@ -176,21 +176,21 @@ multiplier needed to halve reconstruction error; the second is the independent-g
 multiplier under root-sample spectrum error.  These are algebraic consequences of the sharp
 `1 / (2K - 3)` inverse exponent. -/
 theorem fixedEpochDemography_halving_budget :
-    (spectrumPrecisionMultiplier 2 2 = 2 ∧
-      spectrumPrecisionMultiplier 3 2 = 8 ∧
-      spectrumPrecisionMultiplier 4 2 = 32 ∧
-      spectrumPrecisionMultiplier 5 2 = 128) ∧
-    (independentSampleMultiplier 2 2 = 4 ∧
-      independentSampleMultiplier 3 2 = 64 ∧
-      independentSampleMultiplier 4 2 = 1024 ∧
-      independentSampleMultiplier 5 2 = 16384) :=
-  ⟨spectrumPrecisionMultiplier_halving_table,
-    independentSampleMultiplier_halving_table⟩
+    (PopGen.spectrumPrecisionMultiplier 2 2 = 2 ∧
+      PopGen.spectrumPrecisionMultiplier 3 2 = 8 ∧
+      PopGen.spectrumPrecisionMultiplier 4 2 = 32 ∧
+      PopGen.spectrumPrecisionMultiplier 5 2 = 128) ∧
+    (PopGen.independentSampleMultiplier 2 2 = 4 ∧
+      PopGen.independentSampleMultiplier 3 2 = 64 ∧
+      PopGen.independentSampleMultiplier 4 2 = 1024 ∧
+      PopGen.independentSampleMultiplier 5 2 = 16384) :=
+  ⟨PopGen.spectrumPrecisionMultiplier_halving_table,
+    PopGen.independentSampleMultiplier_halving_table⟩
 
 /-- A five-epoch demographic sieve inherits the slow `sampleSize⁻¹ᐟ¹⁴` stability rate. -/
 theorem fiveEpochDemography_sampleRateExponent :
-    fixedEpochSampleRateExponent 5 = 1 / 14 :=
-  fixedEpochSampleRateExponent_five
+    PopGen.fixedEpochSampleRateExponent 5 = 1 / 14 :=
+  PopGen.fixedEpochSampleRateExponent_five
 
 /-- **Kingman SFS identifiability boundary.**  The complete quadratic rate ladder has a
 summable reciprocal, while every finite observation map has a nonzero direction on a sieve
@@ -215,10 +215,10 @@ theorem demographicTarget_identifiable_iff_nullDirections_annihilated
     [AddCommGroup Z] [Module ℝ Z]
     (spectrumObservation : V →ₗ[ℝ] W) (target : V →ₗ[ℝ] Z)
     (historyClass : Set V) :
-    TargetIdentifiableUnderLinearObservation spectrumObservation target historyClass ↔
-      modelDifferenceSet historyClass ∩ LinearMap.ker spectrumObservation ⊆
+    PopGen.TargetIdentifiableUnderLinearObservation spectrumObservation target historyClass ↔
+      PopGen.modelDifferenceSet historyClass ∩ LinearMap.ker spectrumObservation ⊆
         LinearMap.ker target :=
-  targetIdentifiableUnderLinearObservation_iff_differenceSet_inter_kernel_subset_ker
+  PopGen.targetIdentifiableUnderLinearObservation_iff_differenceSet_inter_kernel_subset_ker
     spectrumObservation target historyClass
 
 /-- At the stationary Cauchy root, the per-dimension inverse-conditioning base is the exact
@@ -1596,7 +1596,7 @@ noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
 
 /-- The biological context law is the canonical balanced calibration weight. -/
 @[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : BinaryBiologicalState) :
-    binaryStateWeight x = balancedBinaryWeight x := by
+    binaryStateWeight x = Portability.balancedBinaryWeight x := by
   rfl
 
 /-- A transition that preserves the context. -/
@@ -1658,15 +1658,15 @@ example but the horizon example under biological names, and a change to either f
 delta contradicts this. -/
 theorem persistentTransition_contextMatchQuality_agreement_eq_stayKernel
     (x y : BinaryBiologicalState) :
-    persistentTransition x y = stayKernel x y ∧
-      contextMatchQuality x y = stayKernel x y ∧
-        agreement x y = stayKernel x y :=
+    persistentTransition x y = Portability.stayKernel x y ∧
+      contextMatchQuality x y = Portability.stayKernel x y ∧
+        Portability.agreement x y = Portability.stayKernel x y :=
   ⟨rfl, rfl, rfl⟩
 
 /-- **Complete context switching is the horizon curve's swap kernel**, the off-diagonal
 counterpart of the identification above. -/
 theorem switchingTransition_eq_swapKernel (x y : BinaryBiologicalState) :
-    switchingTransition x y = swapKernel x y := rfl
+    switchingTransition x y = Portability.swapKernel x y := rfl
 
 theorem binaryStateWeight_stationary_persistent (y : BinaryBiologicalState) :
     ∑ x, binaryStateWeight x * persistentTransition x y = binaryStateWeight y := by
@@ -1981,7 +1981,7 @@ noncomputable def binaryDynamicsPosterior
 /-- The uninformative dynamics posterior is the canonical balanced calibration weight. -/
 @[simp] theorem binaryDynamicsPosterior_eq_balancedBinaryWeight
     (y : BinaryBiologicalState) (persists : Bool) :
-    binaryDynamicsPosterior y persists = balancedBinaryWeight persists := by
+    binaryDynamicsPosterior y persists = Portability.balancedBinaryWeight persists := by
   rfl
 
 /-- Conditional source-adapted quality for one dynamics and one target context, constructed from
@@ -2007,26 +2007,26 @@ theorem binaryDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
 /-- Pooling persistence and switching makes the source-adapted quality look exactly one-half on
 every target context.  This is the posterior-mean predictor of the calibration core. -/
 theorem posteriorMean_binaryConditionalContextMatch_eq_half (y : BinaryBiologicalState) :
-    posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch y = 1 / 2 := by
-  norm_num [posteriorMean, binaryDynamicsPosterior]
+    Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch y = 1 / 2 := by
+  norm_num [Portability.posteriorMean, binaryDynamicsPosterior]
 
 /-- **Biological drift defect.**  Persistence has conditional quality one and switching has
 quality zero, while the pooled posterior mean is one-half.  Averaging across the two target
 contexts leaves an irreducible squared index-wise calibration defect of exactly `1/4`. -/
 theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter :
-    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch = 1 / 4 := by
   have hposterior : binaryDynamicsPosterior =
-      twoIndexPosterior (fun _ : BinaryBiologicalState ↦ 1 / 2) := by
+      Portability.twoIndexPosterior (fun _ : BinaryBiologicalState ↦ 1 / 2) := by
     funext y persists
-    cases persists <;> norm_num [binaryDynamicsPosterior, twoIndexPosterior]
+    cases persists <;> norm_num [binaryDynamicsPosterior, Portability.twoIndexPosterior]
   have hconditional : binaryConditionalContextMatch =
-      twoIndexConditional (fun _ : BinaryBiologicalState ↦ 1)
+      Portability.twoIndexConditional (fun _ : BinaryBiologicalState ↦ 1)
         (fun _ : BinaryBiologicalState ↦ 0) := by
     funext persists y
     rw [binaryConditionalContextMatch_eq_indicator]
-    cases persists <;> norm_num [twoIndexConditional]
-  rw [hposterior, hconditional, twoIndex_calibrationDriftDefectSq_eq]
+    cases persists <;> norm_num [Portability.twoIndexConditional]
+  rw [hposterior, hconditional, Portability.twoIndex_calibrationDriftDefectSq_eq]
   norm_num [binaryStateWeight, Fin.sum_univ_two]
 
 /-- **The biological defect is pairwise disagreement.**  The quarter-unit portability loss is
@@ -2035,9 +2035,9 @@ the biological dynamics, averaged over target contexts.  Thus the binary persist
 calculation is a concrete face of the arbitrary finite-population pairwise drift law rather than
 an isolated two-state formula. -/
 theorem binaryContextMatch_pairwiseCalibrationDriftEnergy_eq_quarter :
-    pairwiseCalibrationDriftEnergy binaryStateWeight binaryDynamicsPosterior
+    Portability.pairwiseCalibrationDriftEnergy binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch = 1 / 4 := by
-  rw [← calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
+  rw [← Portability.calibrationDriftDefectSq_eq_pairwiseCalibrationDriftEnergy
     binaryStateWeight binaryDynamicsPosterior binaryConditionalContextMatch
     binaryDynamicsPosterior_sum_eq_one]
   exact binaryContextMatch_calibrationDriftDefectSq_eq_quarter
@@ -2046,12 +2046,12 @@ theorem binaryContextMatch_pairwiseCalibrationDriftEnergy_eq_quarter :
 contexts does not create the obstruction, it only preserves a pointwise ancestry/dynamics defect. -/
 theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
     (y : BinaryBiologicalState) :
-    posteriorPairwiseDriftEnergy binaryDynamicsPosterior
+    Portability.posteriorPairwiseDriftEnergy binaryDynamicsPosterior
       binaryConditionalContextMatch y = 1 / 4 := by
-  rw [posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
+  rw [Portability.posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy
     binaryDynamicsPosterior binaryConditionalContextMatch y
     (binaryDynamicsPosterior_sum_eq_one y)]
-  norm_num [posteriorDrift, posteriorMean_binaryConditionalContextMatch_eq_half,
+  norm_num [Portability.posteriorDrift, posteriorMean_binaryConditionalContextMatch_eq_half,
     binaryDynamicsPosterior]
 
 /-- A sealed support boundary: the deployed population contains only persistent dynamics and
@@ -2076,9 +2076,9 @@ qualities one and zero, but after switching receives zero posterior mass the cal
 exactly zero.  This is not conditional invariance; it is categorical blindness created by the
 support wall, and it is certified by the general support-aware theorem. -/
 theorem persistentOnly_contextMatch_calibrationDriftDefectSq_eq_zero :
-    calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
       binaryConditionalContextMatch = 0 := by
-  apply (calibrationDriftDefectSq_eq_zero_iff_on_support
+  apply (Portability.calibrationDriftDefectSq_eq_zero_iff_on_support
     binaryStateWeight persistentOnlyDynamicsPosterior binaryConditionalContextMatch
     (fun y ↦ by norm_num [binaryStateWeight])
     persistentOnlyDynamicsPosterior_sum_eq_one
@@ -2114,24 +2114,24 @@ persistence/switching contrast.  Increasing the dictionary order cannot restore 
 pooling removed. -/
 theorem every_uniform_pooled_correction_erases_dynamicsContrast
     (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
-    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k) :
+    (hC : C ∈ Portability.UniformCorrectionFamily dynamicsPoolingObservation k) :
     C dynamicsContrast = 0 := by
-  apply factorsThrough_apply_eq_zero_of_mem_ker dynamicsPoolingObservation C
-  · exact uniformCorrectionFamily_subset_factorsThrough dynamicsPoolingObservation k hC
+  apply Portability.factorsThrough_apply_eq_zero_of_mem_ker dynamicsPoolingObservation C
+  · exact Portability.uniformCorrectionFamily_subset_factorsThrough dynamicsPoolingObservation k hC
   · exact dynamicsContrast_mem_pooling_kernel
 
 /-- Adaptive coefficients do not rescue the contrast either: every vector they can synthesize from
 the pooled contrast is zero. -/
 theorem adaptive_pooled_correctionSet_dynamicsContrast_eq_zero
     (k : ℕ) (T : Fin k → ℝ →ₗ[ℝ] (Bool → ℝ)) :
-    adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0} :=
-  adaptiveCorrectionSet_of_mem_ker dynamicsPoolingObservation T dynamicsContrast
+    Portability.adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0} :=
+  Portability.adaptiveCorrectionSet_of_mem_ker dynamicsPoolingObservation T dynamicsContrast
     dynamicsContrast_mem_pooling_kernel
 
 /-- The pooled correction residual is the entire contrast, not merely a positive lower bound. -/
 theorem uniform_pooled_correction_residual_eq_dynamicsContrast
     (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ))
-    (hC : C ∈ UniformCorrectionFamily dynamicsPoolingObservation k) :
+    (hC : C ∈ Portability.UniformCorrectionFamily dynamicsPoolingObservation k) :
     dynamicsContrast - C dynamicsContrast = dynamicsContrast := by
   rw [every_uniform_pooled_correction_erases_dynamicsContrast k C hC]
   exact sub_zero _
@@ -2142,9 +2142,9 @@ direction rather than merely placing their theorems in one file. -/
 theorem dynamicsContrast_eq_two_mul_contextMatchDrift
     (persists : Bool) (y : BinaryBiologicalState) :
     dynamicsContrast persists =
-      2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y := by
+      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y := by
   cases persists <;>
-    norm_num [dynamicsContrast, posteriorDrift,
+    norm_num [dynamicsContrast, Portability.posteriorDrift,
       posteriorMean_binaryConditionalContextMatch_eq_half]
 
 /-- Broadcast one pooled scalar equally back to the two biological dynamics.  The factor `1/2`
@@ -2176,7 +2176,7 @@ theorem dynamicsBroadcast_pooling_commonMode :
 /-- The common mode is a nonzero eigen-direction of the pooled correction. -/
 theorem dynamicsCommonMode_mem_nonzeroCorrectionEigencone :
     dynamicsCommonMode ∈
-      NonzeroCorrectionEigencone dynamicsPoolingObservation dynamicsBroadcast := by
+      Portability.NonzeroCorrectionEigencone dynamicsPoolingObservation dynamicsBroadcast := by
   exact ⟨1, one_ne_zero, by
     simpa using dynamicsBroadcast_pooling_commonMode⟩
 
@@ -2185,9 +2185,9 @@ produce any part of `dynamicsContrast` recovers `dynamicsCommonMode` exactly.  A
 not generically weak or strong: it is exact on the observable eigencone and absolutely blind on
 the pooled kernel. -/
 theorem dynamicsCommonMode_mem_adaptive_pooled_correctionSet :
-    dynamicsCommonMode ∈ adaptiveCorrectionSet dynamicsPoolingObservation
+    dynamicsCommonMode ∈ Portability.adaptiveCorrectionSet dynamicsPoolingObservation
       (fun _ : Fin 1 ↦ dynamicsBroadcast) dynamicsCommonMode :=
-  mem_adaptiveCorrectionSet_singleton_of_mem_nonzeroEigencone
+  Portability.mem_adaptiveCorrectionSet_singleton_of_mem_nonzeroEigencone
     dynamicsPoolingObservation dynamicsBroadcast dynamicsCommonMode
     dynamicsCommonMode_mem_nonzeroCorrectionEigencone
 
@@ -2206,7 +2206,7 @@ theorem binaryConditionalContextMatch_eq_half_common_add_contrast
 model, rather than merely evaluating the two theories on unrelated witnesses. -/
 theorem binaryContextMatch_calibrationDriftDefectSq_eq_quarter_oscillationSq
     (y : BinaryBiologicalState) :
-    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch =
         (1 / 4) * contextMatchSectionOscillation y ^ 2 := by
   rw [binaryContextMatch_calibrationDriftDefectSq_eq_quarter,
@@ -2218,7 +2218,7 @@ separated in total variation, the same obstruction is one sixteenth of the squar
 diameter. -/
 theorem binaryContextMatch_calibrationDriftDefectSq_eq_sixteenth_tvDiameterSq
     (y : BinaryBiologicalState) :
-    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch =
         (1 / 16) * contextMatchTotalVariationDiameter y ^ 2 := by
   rw [binaryContextMatch_calibrationDriftDefectSq_eq_quarter,
@@ -2227,19 +2227,19 @@ theorem binaryContextMatch_calibrationDriftDefectSq_eq_sixteenth_tvDiameterSq
 
 /-- The pooled predictor is perfectly aggregate-calibrated in the persistence/switching model. -/
 theorem binaryContextMatch_aggregateCalibrationEnergy_eq_zero :
-    aggregateCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
+    Portability.aggregateCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch
-      (posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 0 :=
-  aggregateCalibrationEnergy_posteriorMean _ _ _
+      (Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 0 :=
+  Portability.aggregateCalibrationEnergy_posteriorMean _ _ _
 
 /-- **No aggregate/index-wise trade-off in the biological model.**  The same pooled predictor
 that has zero aggregate error has index-wise energy exactly `1/4`, the drift defect.  This is the
 finite biological realization of the continuum program's central Pythagorean obstruction. -/
 theorem binaryContextMatch_indexWiseCalibrationEnergy_eq_quarter :
-    indexWiseCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
+    Portability.indexWiseCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch
-      (posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 1 / 4 := by
-  rw [indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
+      (Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 1 / 4 := by
+  rw [Portability.indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
     binaryStateWeight binaryDynamicsPosterior binaryConditionalContextMatch
     binaryDynamicsPosterior_sum_eq_one]
   exact binaryContextMatch_calibrationDriftDefectSq_eq_quarter
@@ -2349,7 +2349,7 @@ structure DynamicsObstructions : Prop where
   /-- Five demographic epochs already reduce root-sample spectrum estimation to a
   `sampleSize⁻¹ᐟ¹⁴` history-reconstruction exponent. -/
   fiveEpochDemographyIsSeverelyIllConditioned :
-    fixedEpochSampleRateExponent 5 = 1 / 14
+    PopGen.fixedEpochSampleRateExponent 5 = 1 / 14
   /-- Kingman's complete rate ladder has the convergent reciprocal sum behind the all-sample
   Müntz obstruction, and every finite spectrum has an explicit rank null direction. -/
   kingmanSpectrumHasIdentifiabilityBoundary :
@@ -3203,33 +3203,33 @@ structure DynamicsObstructions : Prop where
   ancestryWeightedAnsatzFails : exampleComponentResidual = -1
   /-- Pooling is aggregate-calibrated but leaves the positive index-wise drift defect. -/
   conditionalDriftSurvivesPooling :
-    calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch = 1 / 4
   /-- Removing a dynamics from posterior support seals the defect without making the two
   conditional fields equal. -/
   zeroSupportSealsConditionalDrift :
-    calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
+    Portability.calibrationDriftDefectSq binaryStateWeight persistentOnlyDynamicsPosterior
       binaryConditionalContextMatch = 0
   /-- Every finite uniform correction through the pooled observation erases the biological
   contrast, independently of dictionary order. -/
   uniformCorrectionCannotRecoverContrast :
     ∀ (k : ℕ) (C : (Bool → ℝ) →ₗ[ℝ] (Bool → ℝ)),
-      C ∈ UniformCorrectionFamily dynamicsPoolingObservation k → C dynamicsContrast = 0
+      C ∈ Portability.UniformCorrectionFamily dynamicsPoolingObservation k → C dynamicsContrast = 0
   /-- Target-dependent coefficients cannot recover a direction already annihilated by the
   observation. -/
   adaptiveCorrectionCannotRecoverContrast :
     ∀ (k : ℕ) (T : Fin k → ℝ →ₗ[ℝ] (Bool → ℝ)),
-      adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0}
+      Portability.adaptiveCorrectionSet dynamicsPoolingObservation T dynamicsContrast = {0}
   /-- The same one-term adaptive dictionary is exact on the observable common mode, exposing the
   thin-class phase change rather than a blanket failure of adaptivity. -/
   observableModeIsAdaptivelyExact :
-    dynamicsCommonMode ∈ adaptiveCorrectionSet dynamicsPoolingObservation
+    dynamicsCommonMode ∈ Portability.adaptiveCorrectionSet dynamicsPoolingObservation
       (fun _ : Fin 1 ↦ dynamicsBroadcast) dynamicsCommonMode
   /-- The correction-null contrast and the calibration drift are the same biological direction,
   with the normalization made explicit. -/
   correctionContrastIsCalibrationDrift :
     ∀ persists y, dynamicsContrast persists =
-      2 * posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y
+      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y
 
 /-- **The finite obstruction theorem.**  Dynamics, dependence, value allocation, and
 local operator geometry each carry information invisible to a tempting scalar reduction.

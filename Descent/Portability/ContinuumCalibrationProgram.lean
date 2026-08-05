@@ -75,7 +75,7 @@ the units of `decisionCurveNetBenefit` and agree with `thresholdDecision`, and t
 moment is identified with `calibrationInTheLarge`.
 -/
 
-namespace Descent
+namespace Descent.Portability
 
 open scoped BigOperators
 
@@ -1714,4 +1714,4 @@ theorem resolution_budget_eq_of_balanced (a b k : ℝ) (hb : 0 < b) (hk : 0 < k)
 
 end Allocation
 
-end Descent
+end Descent.Portability

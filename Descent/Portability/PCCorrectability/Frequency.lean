@@ -5,7 +5,7 @@ import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Frequency-resolved correctability diagnostic
@@ -310,4 +310,4 @@ theorem FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible {cl
   apply div_nonpos_of_nonpos_of_nonneg _ (le_of_lt cohort.sampleSize_pos)
   exact mul_nonpos_of_nonneg_of_nonpos (le_of_lt cohort.subgroupSize_pos) (by linarith)
 
-end Descent
+end Descent.Portability

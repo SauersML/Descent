@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -776,32 +776,32 @@ recursion `islandFstMultiplicativeStep` has a different fixed point.
 
     Power: the prediction spans 0.026 to 0.070 across the design. -/
 noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
-  ibdFlowStep Ne m F
+  Portability.ibdFlowStep Ne m F
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem geneFlowFstStep_at_reference_point :
     geneFlowFstStep (1 / 4) 1 (1 / 2) = 1 / 2 := by
-  norm_num [geneFlowFstStep, ibdFlowStep]
+  norm_num [geneFlowFstStep, Portability.ibdFlowStep]
 
 
 /-- One quantity, one map. -/
 theorem geneFlowFstStep_eq_ibdFlowStep (m Ne F : ℝ) :
-    geneFlowFstStep m Ne F = ibdFlowStep Ne m F := rfl
+    geneFlowFstStep m Ne F = Portability.ibdFlowStep Ne m F := rfl
 
 /-- **`fstMigrationDriftEquilibrium` is the fixed point of gene flow against drift.**
 Migration homogenises at rate `2m` per pair and drift re-creates identity at
 rate `1/(2 Nₑ)`; balancing them forces `F = 1/(1 + 4 Nₑ m)`.  The formula is
 derived here, not stipulated: no other constant satisfies this. -/
 theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    geneFlowFstStep m Ne (fstMigrationDriftEquilibrium Ne m) = fstMigrationDriftEquilibrium Ne m :=
-  ibdFlowStep_fixedPoint Ne m hNe hm
+    geneFlowFstStep m Ne (Portability.fstMigrationDriftEquilibrium Ne m) = Portability.fstMigrationDriftEquilibrium Ne m :=
+  Portability.ibdFlowStep_fixedPoint Ne m hNe hm
 
 /-- Equilibrium FST strictly decreases as a nonnegative migration rate increases. -/
 theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 ≤ m₁)
     (h_m : m₁ < m₂) :
-    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁ := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 
@@ -882,10 +882,10 @@ theorem portabilityFromArchitecture_at_reference_point :
 theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
     (rg fst tagging_ratio : ℝ) :
     portabilityFromArchitecture rg fst tagging_ratio =
-      rg ^ 2 * covarianceRetention (covarianceRetentionFactorFromFst fst)
-        (ldOverlapFromSharedLD tagging_ratio) := by
-  unfold portabilityFromArchitecture covarianceRetention covarianceRetentionFactorFromFst
-    ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
+      rg ^ 2 * Portability.covarianceRetention (Portability.covarianceRetentionFactorFromFst fst)
+        (Portability.ldOverlapFromSharedLD tagging_ratio) := by
+  unfold portabilityFromArchitecture Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst
+    Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
@@ -895,9 +895,9 @@ theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
 theorem portabilityFromArchitecture_from_divergence
     (rg fst tagging_ratio : ℝ) :
     portabilityFromArchitecture rg fst tagging_ratio =
-      rg^2 * (1 - covarianceDivergenceFromRetention fst tagging_ratio) := by
-  unfold portabilityFromArchitecture covarianceDivergenceFromRetention
-    covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
+      rg^2 * (1 - Portability.covarianceDivergenceFromRetention fst tagging_ratio) := by
+  unfold portabilityFromArchitecture Portability.covarianceDivergenceFromRetention
+    Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- Architecture portability is zero exactly when cross-population effect correlation
@@ -935,4 +935,4 @@ theorem portability_bounded_by_rg_sq
 
 end ArchitectureConvergence
 
-end Descent
+end Descent.PopGen

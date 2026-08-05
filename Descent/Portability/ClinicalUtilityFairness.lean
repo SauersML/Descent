@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PGSCalibrationTheory
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -1216,4 +1216,4 @@ theorem minimum_sample_for_clinical_pgs
 
 end Recommendations
 
-end Descent
+end Descent.Portability

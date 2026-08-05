@@ -690,7 +690,7 @@ theorem balancedRankOneCovariance_quadraticForm
   have hdiagonalMulVec :
       Matrix.diagonal (fun _coordinate ↦ baseline) *ᵥ vector =
         baseline • vector := by
-    ext coordinate
+    PopGen.ext coordinate
     simp [Matrix.mulVec]
   have hdiagonal :
       vector ⬝ᵥ
@@ -5226,7 +5226,7 @@ theorem isClosed_boundedLipschitzPressureFamily
       {profile | ∀ x y,
         dist (profile x) (profile y) ≤ (K : ℝ) * dist x y} ∩
       {profile | ∀ x, profile x ∈ Set.Icc (-bound) bound} by
-    ext profile
+    PopGen.ext profile
     simp only [boundedLipschitzPressureFamily, Set.mem_setOf_eq, Set.mem_inter_iff]
     rw [lipschitzWith_iff_dist_le_mul]]
   apply IsClosed.inter

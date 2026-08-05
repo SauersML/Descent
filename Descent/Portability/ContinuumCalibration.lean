@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Portability
 
 open scoped BigOperators
 
@@ -690,4 +690,4 @@ theorem aggregateCalibrationMoment_eq_indexWiseCalibrationMoment
 
 end PosteriorField
 
-end Descent
+end Descent.Portability

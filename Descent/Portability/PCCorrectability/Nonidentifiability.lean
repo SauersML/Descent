@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PCCorrectability.Geometry
 import Descent.Blindness.HiddenConeAmbiguity
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Non-identifiability from aggregate differentiation
@@ -118,4 +118,4 @@ theorem ancestryProfile_rigidity_dichotomy (B : ℕ → ℝ) (a b : ℝ) :
   refine ⟨n, ?_⟩
   rwa [zero_sub, abs_neg, abs_of_nonneg (Nat.cast_nonneg n)]
 
-end Descent
+end Descent.Portability

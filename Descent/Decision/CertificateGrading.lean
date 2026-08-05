@@ -209,7 +209,7 @@ theorem atomCount_pos (P : FinitePrior n) : 0 < P.atomCount := by
   unfold atomCount activeAtoms probability
   have hfilter : Finset.univ.filter
       (fun j : Fin (n + 1) ↦ ((PMF.pure i) j).toReal ≠ 0) = {i} := by
-    ext j
+    PopGen.ext j
     by_cases hji : j = i
     · subst j
       simp [PMF.pure_apply]
@@ -750,7 +750,7 @@ theorem constantObservationExperiment_modulus_eq
       (constantObservationExperiment target moment law).certificateProblem.modulus K h₂ := by
   unfold FiniteMomentCertificateProblem.modulus
   apply congrArg sSup
-  ext d
+  PopGen.ext d
   simp only [Set.mem_insert_iff, FiniteMomentCertificateProblem.admissibleGaps]
   constructor
   · rintro (rfl | ⟨P, Q, hfeasible, rfl⟩)
@@ -1013,7 +1013,7 @@ theorem admissibleGaps_zero_congr {n : ℕ} (E F : FiniteMomentCertificateProble
     E.admissibleGaps 0 h = F.admissibleGaps 0 h := by
   have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
     intro P Q; unfold targetGap; rw [ht]
-  ext d
+  PopGen.ext d
   constructor
   · rintro ⟨P, Q, hf, rfl⟩
     exact ⟨P, Q, ⟨F.momentMatched_zero P Q, by rw [← hd]; exact hf.2⟩, hgap P Q⟩
@@ -1032,7 +1032,7 @@ theorem admissibleAtomGaps_congr {n : ℕ} (E F : FiniteMomentCertificateProblem
     E.admissibleAtomGaps K h = F.admissibleAtomGaps K h := by
   have hgap : ∀ P Q, E.targetGap P Q = F.targetGap P Q := by
     intro P Q; unfold targetGap; rw [ht]
-  ext d
+  PopGen.ext d
   constructor
   · rintro ⟨P, Q, hf, rfl⟩
     exact ⟨P, Q, ⟨hf.1, by rw [← hd]; exact hf.2⟩, hgap P Q⟩
@@ -1159,9 +1159,9 @@ theorem splitCertificate_probability :
 /-- **A grade-three certificate carries the full unit of separation.** -/
 theorem one_le_convexTarget_modulus :
     (1 : ℝ) ≤ convexTargetExperiment.certificateProblem.modulus 0 0 := by
-  obtain ⟨h0, h1, h2⟩ := splitCertificate_probability
+  obtain ⟨h0, h1, PopGen.AssortativeMatingModel.h2⟩ := splitCertificate_probability
   have hpsplit : predictiveOne splitCertificate = 1 / 2 := by
-    unfold predictiveOne; rw [h1, h2]; norm_num
+    unfold predictiveOne; rw [h1, PopGen.AssortativeMatingModel.h2]; norm_num
   have hppure : predictiveOne (PMF.pure (1 : Fin (2 + 1))) = 1 / 2 := by
     rw [predictiveOne_pure]; norm_num
   have hfeas : convexTargetExperiment.certificateProblem.Feasible 0 0
@@ -1176,7 +1176,7 @@ theorem one_le_convexTarget_modulus :
     have h21 : ¬((2 : Fin (2 + 1)) = 1) := by decide
     show |FinitePrior.mean splitCertificate convexTargetExperiment.target -
       FinitePrior.mean (PMF.pure (1 : Fin (2 + 1))) convexTargetExperiment.target| = 1
-    rw [convexTargetExperiment_mean, convexTargetExperiment_mean, h0, h2]
+    rw [convexTargetExperiment_mean, convexTargetExperiment_mean, h0, PopGen.AssortativeMatingModel.h2]
     norm_num [FinitePrior.probability, PMF.pure_apply, h21]
   have := convexTargetExperiment.certificateProblem.le_modulus_of_feasible 0 0
     splitCertificate (PMF.pure 1) hfeas

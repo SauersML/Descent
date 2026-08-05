@@ -6,7 +6,7 @@ import Descent.Blindness.LumpedRateBlindness
 import Descent.Core.Fst
 import Descent.Core.Moments
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # Human demographic parameters and the size of the portability gap
@@ -122,12 +122,12 @@ zero divergence.
     rather than by a note.
     -/
 noncomputable def neutralDriftR2Ratio (V_A V_E fst : ℝ) : ℝ :=
-  presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0
+  Portability.presentDayR2 V_A V_E fst / Portability.presentDayR2 V_A V_E 0
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem neutralDriftR2Ratio_at_zero_denominator_is_junk (V_A V_E fst : ℝ)
-    (hzero : presentDayR2 V_A V_E 0 = 0) :
+    (hzero : Portability.presentDayR2 V_A V_E 0 = 0) :
     neutralDriftR2Ratio V_A V_E fst = 0 := by
   unfold neutralDriftR2Ratio
   rw [hzero, div_zero]
@@ -159,7 +159,7 @@ theorem neutralDriftR2Ratio_eq_core (V_A V_E fst : ℝ) :
       = Descent.Core.ScoreMoments.portabilityRatio V_A V_E fst := by
   unfold neutralDriftR2Ratio Descent.Core.ScoreMoments.portabilityRatio
     Descent.Core.ratio
-  rw [presentDayR2_eq_core, presentDayR2_eq_core]
+  rw [Portability.presentDayR2_eq_core, Portability.presentDayR2_eq_core]
   rfl
 
 /-- **The reported ratio lies in the unit interval**, inherited rather than re-proved. -/
@@ -194,7 +194,7 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
     ne_of_gt (add_pos (mul_pos h1f hVA) hVE)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
-  unfold neutralDriftR2Ratio presentDayR2 presentDayPGSVariance pgsVarianceFromHet
+  unfold neutralDriftR2Ratio Portability.presentDayR2 Portability.presentDayPGSVariance Portability.pgsVarianceFromHet
     TransportedMetrics.r2FromSignalVariance Descent.Core.share
   field_simp [hden, hsum, hVA']
   ring
@@ -220,8 +220,8 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 `t / (2 Ne)`, the coalescent time scale. -/
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold fstFromGenerations fstFromTau coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
+    Portability.fstFromGenerations t Ne ≤ t / (2 * Ne) := by
+  unfold Portability.fstFromGenerations Portability.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
   nlinarith
@@ -235,16 +235,16 @@ divergence, `t ≈ 2.5 × 10^3` and `Ne ≈ 10^4` give a floor of `0.875`. -/
 theorem neutral_drift_ratio_ge_one_sub_coalescentTau
     (V_A V_E t Ne : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) := by
+    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (Portability.fstFromGenerations t Ne) := by
   have hτ : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
-  have hfst0 : 0 ≤ fstFromGenerations t Ne := by
-    unfold fstFromGenerations
-    exact fst_from_tau_nonneg_of_nonneg _ (by unfold coalescentTau; exact hτ)
-  have hfst1 : fstFromGenerations t Ne < 1 := by
-    unfold fstFromGenerations
-    exact fst_from_tau_lt_one _ (by unfold coalescentTau; exact hτ)
+  have hfst0 : 0 ≤ Portability.fstFromGenerations t Ne := by
+    unfold Portability.fstFromGenerations
+    exact Portability.fst_from_tau_nonneg_of_nonneg _ (by unfold Portability.coalescentTau; exact hτ)
+  have hfst1 : Portability.fstFromGenerations t Ne < 1 := by
+    unfold Portability.fstFromGenerations
+    exact Portability.fst_from_tau_lt_one _ (by unfold Portability.coalescentTau; exact hτ)
   have hbound := neutral_drift_ratio_ge_one_sub_fst V_A V_E
-    (fstFromGenerations t Ne) hVA hVE hfst0 hfst1
+    (Portability.fstFromGenerations t Ne) hVA hVE hfst0 hfst1
   have hle := fstFromGenerations_le_coalescentTau t Ne ht hNe
   linarith
 
@@ -491,4 +491,4 @@ theorem hubFlow_carries_no_exchange_information
 
 end UnidentifiableExchange
 
-end Descent
+end Descent.PopGen

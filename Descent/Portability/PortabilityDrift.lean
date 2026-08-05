@@ -8,7 +8,7 @@ import Descent.Core.Fst
 import Descent.Core.Parameters
 import Descent.Core.Moments
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -29,9 +29,9 @@ cannot collide, since this file defines none of these names and the only
 `Profile` and `calibratedBrier` in the corpus are the ones inside this same
 namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
-open TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
-  equalVarianceGaussianAUCFromSignalVariance
-  equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
+open PopGen.TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
+  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
 
 section PortabilityDrift
 
@@ -492,7 +492,7 @@ Wright's diffusion form `1/(1 + 4 Nₑ m)` written through `scaledMigrationRate`
     argument_source: model. -/
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m :
     SplitMigrationModel) : ℝ :=
-  1 / (1 + scaledMigrationRate m.Ne m.mig)
+  1 / (1 + PopGen.scaledMigrationRate m.Ne m.mig)
 
 /-- Hudson's `F_ST` estimator from mean coalescence times: one minus the ratio
 of the within-population time to the total time.
@@ -1629,7 +1629,7 @@ theorem presentDaySignalToNoise_zero_ve_is_junk (V_A fst : ℝ) :
 itself is not restated here: this is `r2FromSignalVariance` applied to the drift-attenuated signal
 variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
-  r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
+  PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
 /-! ### The drift model produces a moment tuple
 
@@ -1686,7 +1686,7 @@ either the drift model or the metric law reaches the other. -/
 theorem presentDayR2_eq_core (V_A V_E fst : ℝ) :
     presentDayR2 V_A V_E fst = (driftMoments V_A V_E fst).r2 := by
   unfold presentDayR2 driftMoments Descent.Core.ScoreMoments.momentsUnderDrift
-    Descent.Core.ScoreMoments.r2 TransportedMetrics.r2FromSignalVariance
+    Descent.Core.ScoreMoments.r2 PopGen.TransportedMetrics.r2FromSignalVariance
     presentDayPGSVariance pgsVarianceFromHet Descent.Core.share
     Descent.Core.retainedFraction
   have e1 : V_A * (1 - fst) = (1 - fst) * V_A := by ring
@@ -1853,7 +1853,7 @@ theorem presentDayR2_eq_statistical_rsquared_of_moments
         presentDayPGSVariance V_A fst)
     (h_vsig_pos : 0 < presentDayPGSVariance V_A fst)
     (h_vtrue_pos : 0 < presentDayPGSVariance V_A fst + V_E) :
-    presentDayR2 V_A V_E fst = rsquared dgp signal dgp.trueExpectation := by
+    presentDayR2 V_A V_E fst = PopGen.rsquared dgp signal dgp.trueExpectation := by
   have h_vsig_ne : presentDayPGSVariance V_A fst ≠ 0 := by linarith
   have h_vtrue_ne : presentDayPGSVariance V_A fst + V_E ≠ 0 := by linarith
   have h_if_not :
@@ -1863,12 +1863,12 @@ theorem presentDayR2_eq_statistical_rsquared_of_moments
     · exact h_vsig_ne h0
     · exact h_vtrue_ne h1
   have h_rs :
-      rsquared dgp signal dgp.trueExpectation = (presentDayPGSVariance V_A fst) ^ 2 /
+      PopGen.rsquared dgp signal dgp.trueExpectation = (presentDayPGSVariance V_A fst) ^ 2 /
           (presentDayPGSVariance V_A fst * (presentDayPGSVariance V_A fst + V_E)) := by
-    unfold rsquared
+    unfold PopGen.rsquared
     simp [h_vf, h_vg, h_cov, h_if_not]
   rw [h_rs]
-  unfold presentDayR2 r2FromSignalVariance Descent.Core.share
+  unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   field_simp [h_vsig_ne, h_vtrue_ne]
 
 
@@ -1888,7 +1888,7 @@ Measured cost of the substitution on 400 simulated binary-trait PGS studies: bia
 `liabilityThresholdAUCFromExplainedR2` (RMSE `0.0121` on the same runs, against a `0.0120`
 seed-noise floor). -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
-  equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
+  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
 /-- Exact present-day **equal-variance Gaussian** AUC formula at positive residual
 variance. -/
@@ -1897,7 +1897,7 @@ theorem presentDayEqualVarianceGaussianAUC_eq
     presentDayEqualVarianceGaussianAUC V_A V_E fst =
       Foundations.Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   rw [presentDayEqualVarianceGaussianAUC,
-    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
   unfold presentDaySignalToNoise
   congr 2
   rw [div_div, mul_comm]
@@ -1924,8 +1924,8 @@ API below, so the denominator argument has a single proof. -/
 private theorem r2FromSignalVariance_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
-  unfold r2FromSignalVariance Descent.Core.share
+    PopGen.TransportedMetrics.r2FromSignalVariance x V_E < PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
+  unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have hxE : 0 < x + V_E := by linarith
   have hyE : 0 < y + V_E := by linarith [hx, hxy]
   have hxyE : x + V_E < y + V_E := by linarith
@@ -1967,7 +1967,7 @@ theorem drift_degrades_R2
 theorem expectedR2_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    r2FromSignalVariance x V_E < r2FromSignalVariance y V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance x V_E < PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
   exact r2FromSignalVariance_strictMono_nonneg V_E x y hVE hx hxy
 
 /-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
@@ -2289,7 +2289,7 @@ noncomputable def witnessW_opt : Pop → Fin 2 → ℝ :=
 private theorem witnessSigmaObs_mulVec_witnessW_opt (P : Pop) :
     (witnessSigmaObs P).mulVec (witnessW_opt P) = witnessCross P := by
   cases P <;>
-    ext i <;>
+    PopGen.ext i <;>
       fin_cases i <;>
         norm_num [witnessW_opt, witnessSigmaObs, witnessCross, Matrix.mulVec,
           Matrix.cons_val', Matrix.cons_val_fin_one, dotProduct, Pop.pair]
@@ -2380,7 +2380,7 @@ effects. -/
 theorem totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     totalEffect m Pop.target = (m.beta Pop.source) + targetEffectHeterogeneity m := by
-  ext j
+  PopGen.ext j
   simp [targetEffectHeterogeneity]
 
 /-- Target tagging projection of the source effect vector through the target
@@ -2505,7 +2505,7 @@ contributions** — in either population, from the one statement. -/
 theorem taggingProjection_eq_direct_plus_proxy {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) :
     taggingProjection m P = directCausalProjection m P + proxyTaggingProjection m P := by
-  ext i
+  PopGen.ext i
   simp [taggingProjection, directCausalProjection, proxyTaggingProjection,
     sigmaTagCausalSourceAt, Matrix.add_mulVec, add_assoc, Pi.add_apply]
 
@@ -2528,7 +2528,7 @@ theorem taggingProjection_target_eq_standing_plus_novelMutationEffect {p q : ℕ
     taggingProjection m Pop.target =
       (sigmaTagCausalSourceAt m Pop.target).mulVec (m.beta Pop.target) +
         targetNovelMutationEffectProjection m := by
-  ext i
+  PopGen.ext i
   simp [taggingProjection, targetNovelMutationEffectProjection,
     totalEffect, Matrix.mulVec_add, Pi.add_apply]
 
@@ -2859,7 +2859,7 @@ cross-population state. This is the exact bridge back to the generic deployed
 metric surface in `DGP.TransportedMetrics`. -/
 noncomputable def targetIrreduciblePenaltyProfile {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
-    TransportedMetrics.IrreducibleTargetPenalty where
+    PopGen.TransportedMetrics.IrreducibleTargetPenalty where
   brokenTagging := brokenTaggingResidual m
   ancestrySpecificLD := ancestrySpecificLDResidual m
   sourceSpecificOverfit := sourceSpecificOverfitResidual m
@@ -2873,7 +2873,7 @@ noncomputable def targetIrreduciblePenaltyProfile {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     (targetIrreduciblePenaltyProfile m).total =
       irreducibleTargetResidualBurden m := by
-  simp [targetIrreduciblePenaltyProfile, TransportedMetrics.IrreducibleTargetPenalty.total,
+  simp [targetIrreduciblePenaltyProfile, PopGen.TransportedMetrics.IrreducibleTargetPenalty.total,
     irreducibleTargetResidualBurden, add_assoc]
 
 /-- Effective target outcome variance after adding an irreducible
@@ -3061,7 +3061,7 @@ the same target-population outcome scale without falling back to a benchmark
     argument_source: model, inherited. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
-  TransportedMetrics.calibratedBrierFromVariances
+  PopGen.TransportedMetrics.calibratedBrierFromVariances
     π
     (explainedSignalVarianceFromSourceWeights m Pop.source)
     (residualVarianceFromSourceWeights m Pop.source)
@@ -3071,7 +3071,7 @@ source explained signal variance and source residual variance. -/
 theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
     sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
-      TransportedMetrics.calibratedBrierFromVariances
+      PopGen.TransportedMetrics.calibratedBrierFromVariances
         π
         (explainedSignalVarianceFromSourceWeights m Pop.source)
         (residualVarianceFromSourceWeights m Pop.source) := by
@@ -3084,17 +3084,17 @@ construction of source Brier. -/
 @[simp] theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart
     {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
     sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
-      TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source) := by
+      PopGen.TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source) := by
   rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
-  rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
+  rw [PopGen.TransportedMetrics.calibratedBrierFromVariances_eq_chart]
   have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
     ne_of_gt (m.outcomeVariance_pos Pop.source)
   have hr2 :
-      TransportedMetrics.r2FromSignalVariance
+      PopGen.TransportedMetrics.r2FromSignalVariance
           (explainedSignalVarianceFromSourceWeights m Pop.source)
           (residualVarianceFromSourceWeights m Pop.source) =
         r2FromSourceWeights m Pop.source := by
-    unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
       r2FromSourceWeights Descent.Core.share
     field_simp [h_source_ne]
     ring
@@ -3145,7 +3145,7 @@ state. Prevalence enters here, so Brier can change even when the score moments
 are held fixed. -/
 noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  TransportedMetrics.calibratedBrierFromVariances
+  PopGen.TransportedMetrics.calibratedBrierFromVariances
     m.targetPrevalence
     (explainedSignalVarianceFromSourceWeights m Pop.target)
     (residualVarianceFromSourceWeights m Pop.target)
@@ -3155,7 +3155,7 @@ target explained signal variance and target residual variance. -/
 theorem targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetCalibratedBrierFromSourceWeights m =
-      TransportedMetrics.calibratedBrierFromVariances
+      PopGen.TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
@@ -3167,7 +3167,7 @@ about a benchmark `R²` chart. -/
 theorem targetCalibratedBrierFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetCalibratedBrierFromSourceWeights m =
-      TransportedMetrics.calibratedBrierFromVariances
+      PopGen.TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
@@ -3183,7 +3183,7 @@ loss budget made explicit in the residual term. -/
 theorem targetCalibratedBrierFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetCalibratedBrierFromSourceWeights m =
-      TransportedMetrics.calibratedBrierFromVariances
+      PopGen.TransportedMetrics.calibratedBrierFromVariances
         m.targetPrevalence
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
@@ -3200,18 +3200,18 @@ construction of transported Brier. -/
 @[simp] theorem targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     targetCalibratedBrierFromSourceWeights m =
-      TransportedMetrics.calibratedBrier
+      PopGen.TransportedMetrics.calibratedBrier
         m.targetPrevalence (r2FromSourceWeights m Pop.target) := by
   rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
-  rw [TransportedMetrics.calibratedBrierFromVariances_eq_chart]
+  rw [PopGen.TransportedMetrics.calibratedBrierFromVariances_eq_chart]
   have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
     ne_of_gt (effectiveTargetOutcomeVariance_pos m)
   have hr2 :
-      TransportedMetrics.r2FromSignalVariance
+      PopGen.TransportedMetrics.r2FromSignalVariance
           (explainedSignalVarianceFromSourceWeights m Pop.target)
           (residualVarianceFromSourceWeights m Pop.target) =
         r2FromSourceWeights m Pop.target := by
-    unfold TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
       r2FromSourceWeights Descent.Core.share
     field_simp [h_eff_ne]
     -- The residual variance is `Y - X`, so the denominator is `X + (Y - X)`.
@@ -3623,7 +3623,7 @@ theorem tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
 noncomputable def hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
-  hetDecayFromScaled g.Ne g.theta
+  PopGen.hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary
@@ -3664,7 +3664,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     superseded base spans 69.31 to 554.52. -/
 noncomputable def fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta + 2 * g.bigM)) *
-    (1 - fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
+    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
 generations.
@@ -3737,7 +3737,7 @@ noncomputable def migrationSharedBoostAt
 
 @[simp] theorem fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
     g.fstTransientAt 0 = 0 := by
-  simp [fstTransientAt, fstTransientDecayFromScaled, hetDecayFromScaled]
+  simp [fstTransientAt, PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled]
 
 @[simp] theorem mutationSharedRetentionAt_zero (g : Descent.Core.PopGenParameters) :
     g.mutationSharedRetentionAt 0 = 1 := by
@@ -3745,7 +3745,7 @@ noncomputable def migrationSharedBoostAt
 
 @[simp] theorem migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
-  simp [migrationSharedBoostAt, tauAt, bigM]
+  simp [migrationSharedBoostAt, tauAt, PopGen.EvolutionaryParameters.bigM]
 
 end Core.PopGenParameters
 
@@ -3754,7 +3754,7 @@ generation-indexed population-genetic parameter block used by the mechanistic
 transport model. This carries only the shared popgen primitives; the
 SNP/LD-aware state still lives in `CrossPopulationGenerationalModel`. -/
 noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
-    (m : PGSEvolutionaryModel) : Descent.Core.PopGenParameters where
+    (m : PopGen.PGSEvolutionaryModel) : Descent.Core.PopGenParameters where
   Ne := m.Ne
   mu := m.mu
   mig := m.mig
@@ -3770,25 +3770,25 @@ noncomputable def PGSEvolutionaryModel.toGenerationalPopGenParameters
   V_A_pos := m.V_A_pos
 
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_theta
-    (m : PGSEvolutionaryModel) :
+    (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).theta = m.theta := by
-  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    Descent.Core.PopGenParameters.theta, EvolutionaryParameters.theta,
-    scaledMutationRate]
+  simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    Descent.Core.PopGenParameters.theta, PopGen.EvolutionaryParameters.theta,
+    PopGen.scaledMutationRate]
 
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
-    (m : PGSEvolutionaryModel) :
+    (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).bigM = m.bigM := by
-  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    Descent.Core.PopGenParameters.bigM, EvolutionaryParameters.bigM,
-    scaledMigrationRate]
+  simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    Descent.Core.PopGenParameters.bigM, PopGen.EvolutionaryParameters.bigM,
+    PopGen.scaledMigrationRate]
 
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
-    (m : PGSEvolutionaryModel) :
+    (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
-  unfold Descent.Core.PopGenParameters.hetDecayFactor PGSEvolutionaryModel.hetDecayFactor
-    hetDecayFromScaled
-  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
+  unfold Descent.Core.PopGenParameters.hetDecayFactor PopGen.PGSEvolutionaryModel.hetDecayFactor
+    PopGen.hetDecayFromScaled
+  rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   rfl
 
 /-- The transient `F_ST` coordinate in the coarse DGP block agrees exactly with
@@ -3797,16 +3797,16 @@ discrete differentiation recursion. Both were corrected together: an identity
 between two coordinates survives a common wrong factor on both sides, so this
 theorem constrained them jointly and could not have caught the decay base. -/
 @[simp] theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
-    (m : PGSEvolutionaryModel) :
+    (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
-  unfold Descent.Core.PopGenParameters.fstTransientAt PGSEvolutionaryModel.fstTransient
-    fstTransientDecayFromScaled hetDecayFromScaled
-  simp [PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
+  unfold Descent.Core.PopGenParameters.fstTransientAt PopGen.PGSEvolutionaryModel.fstTransient
+    PopGen.fstTransientDecayFromScaled PopGen.hetDecayFromScaled
+  simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters, fstEquilibrium,
     Descent.Core.fstFromFlow,
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
-    PGSEvolutionaryModel.toEvo, EvolutionaryParameters.theta,
-    EvolutionaryParameters.bigM, scaledMutationRate, scaledMigrationRate,
+    PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
+    PopGen.EvolutionaryParameters.bigM, PopGen.scaledMutationRate, PopGen.scaledMigrationRate,
     Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   exact Or.inl (by ring)
 
@@ -3814,32 +3814,32 @@ theorem constrained them jointly and could not have caught the decay base. -/
 mutation-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
 theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
-    (m : PGSEvolutionaryModel)
+    (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
-      mutationLDErosion m.toEvo := by
+      PopGen.mutationLDErosion m.toEvo := by
   unfold Descent.Core.PopGenParameters.mutationSharedRetentionAt
-    PGSEvolutionaryModel.toEvo mutationLDErosion
-  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
+    PopGen.PGSEvolutionaryModel.toEvo PopGen.mutationLDErosion
+  rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
   simp only [Descent.Core.PopGenParameters.tauAt,
-    PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    EvolutionaryParameters.theta, EvolutionaryParameters.tau]
+    PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    PopGen.EvolutionaryParameters.theta, PopGen.EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
 
 /-- When divergence time is an integer number of generations, the coarse
 migration-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
 theorem PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
-    (m : PGSEvolutionaryModel)
+    (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
-      migrationLDBoost m.toEvo := by
+      PopGen.migrationLDBoost m.toEvo := by
   unfold Descent.Core.PopGenParameters.migrationSharedBoostAt
-    PGSEvolutionaryModel.toEvo migrationLDBoost
-  rw [PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
+    PopGen.PGSEvolutionaryModel.toEvo PopGen.migrationLDBoost
+  rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
   simp only [Descent.Core.PopGenParameters.tauAt,
-    PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    EvolutionaryParameters.bigM, EvolutionaryParameters.tau]
+    PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
+    PopGen.EvolutionaryParameters.bigM, PopGen.EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
 
 /-- Exact bridge from the DGP coordinate summary to the generational popgen
@@ -3847,7 +3847,7 @@ coordinates for the fields that genuinely match. The LD coordinate is
 deliberately excluded here because the mechanistic model uses a joint
 locus-specific kernel rather than a single global LD scalar. -/
 theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
-    (m : PGSEvolutionaryModel)
+    (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     m.coordinateSummary.alleleFreqCoordinate =
       1 - (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) ∧
@@ -3856,14 +3856,14 @@ theorem PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_fl
     m.coordinateSummary.migrationCoordinate =
       (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) := by
   refine ⟨?_, ?_, ?_⟩
-  · rw [PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate]
+  · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate]
     exact congrArg (fun x ↦ 1 - x)
-      (PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
-  · rw [PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
-    exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+      (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
+  · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
+    exact (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
       m h_disc).symm
-  · rw [PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
-    exact (PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+  · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
+    exact (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
       m h_disc).symm
 
 /-- Allele-frequency mismatch penalty. This penalizes transport when target
@@ -4596,17 +4596,17 @@ theorem portability_ratio_with_target_ld_decay_any_source
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfstS_lt_one : fstS < 1) (hfstT_lt_one : fstT < 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
-    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
-      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
-    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E /
-      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hRhoS_pos : 0 < rhoS := lt_trans hRhoT_pos hRhoT_lt_rhoS
   have hu_pos : 0 < (1 - fstT) * V_A := mul_pos (by linarith) hVA
   -- Numerator: rhoT < rhoS implies R²(rhoT·u) < R²(rhoS·u)
   have h_num_lt :
-      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
-        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E := by
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E := by
     apply expectedR2_strictMono_nonneg V_E _ _ hVE
     · unfold realWorldPGSVariance
       exact le_of_lt (by simpa [mul_assoc] using mul_pos hRhoT_pos hu_pos)
@@ -4616,8 +4616,8 @@ theorem portability_ratio_with_target_ld_decay_any_source
   have hsource_sig_pos : 0 < realWorldPGSVariance V_A fstS rhoS := by
     unfold realWorldPGSVariance
     simpa [mul_assoc] using mul_pos (mul_pos hRhoS_pos (by linarith : 0 < 1 - fstS)) hVA
-  have h_den_pos : 0 < r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
-    unfold r2FromSignalVariance Descent.Core.share
+  have h_den_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact div_pos hsource_sig_pos (by linarith)
   -- Divide both sides by positive denominator
   simpa [div_eq_mul_inv] using
@@ -4630,10 +4630,10 @@ theorem portability_ratio_with_ld_decay
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1) (hRhoS : rhoS = 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS) :
-    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
-      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
-    r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
-      r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
   have hfstS_lt_one : fstS < 1 := lt_trans hfst hfstT_lt_one
   have hTargetPos : 0 < V_A * (1 - fstT) := by
@@ -4649,8 +4649,8 @@ theorem portability_ratio_with_ld_decay
     simpa [realWorldPGSVariance, presentDayPGSVariance, pgsVarianceFromHet,
       mul_assoc, mul_left_comm, mul_comm] using hscaled
   have hR2Target_lt :
-      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
-        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
     apply expectedR2_strictMono_nonneg V_E
     · exact hVE
     · unfold realWorldPGSVariance
@@ -4663,19 +4663,19 @@ theorem portability_ratio_with_ld_decay
     unfold presentDayPGSVariance pgsVarianceFromHet
     have h1s : 0 < 1 - fstS := by linarith
     exact mul_pos hVA h1s
-  have hR2Source_pos : 0 < r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
-    unfold r2FromSignalVariance Descent.Core.share
+  have hR2Source_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
     exact div_pos hSourcePos hden
   have hL :
-      r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
-          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
-        r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
-          r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     have hmul :
-        r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (r2FromSignalVariance
+        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (PopGen.TransportedMetrics.r2FromSignalVariance
             (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
-          r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (r2FromSignalVariance
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (PopGen.TransportedMetrics.r2FromSignalVariance
               (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
       mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
     simpa [div_eq_mul_inv] using hmul
@@ -4694,10 +4694,10 @@ theorem portability_ratio_with_ld_decay_general
     (hfst : fstS < fstT) (hfstT_lt_one : fstT < 1)
     (hRhoS : rhoS = 1)
     (h_rho : 0 < rhoT ∧ rhoT < rhoS ∧ rhoS ≤ 1) :
-    r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
-      r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
-    r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
-      r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E <
+    PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
+      PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
   rcases h_rho with ⟨hRhoT_pos, hRhoT_lt_rhoS, _⟩
   exact portability_ratio_with_ld_decay V_A V_E fstS fstT rhoS rhoT
     hVA hVE hfst hfstT_lt_one hRhoS ⟨hRhoT_pos, hRhoT_lt_rhoS⟩
@@ -4720,7 +4720,7 @@ theorem portability_ratio_lt_one_of_positive_drift
   -- Source positivity is not a hypothesis: `fstS < fstT ≤ 1` already forces
   -- `0 < 1 - fstS`, and the signal variance is `V_A * (1 - fstS)`.
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstS := by
-    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
+    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstS := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstS := by linarith
@@ -4750,7 +4750,7 @@ theorem targetR2FromNeutralAFBenchmark_ratio_lt_one
     (h_fst_bounds : 0 ≤ fstSource ∧ fstTarget < 1) :
     targetR2FromNeutralAFBenchmark V_A V_E fstTarget / presentDayR2 V_A V_E fstSource < 1 := by
   have hsrc_pos : 0 < presentDayR2 V_A V_E fstSource := by
-    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
+    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hv_pos : 0 < presentDayPGSVariance V_A fstSource := by
       unfold presentDayPGSVariance pgsVarianceFromHet
       have h_one_minus : 0 < 1 - fstSource := by linarith [h_fst_bounds.2, h_fst]
@@ -4889,7 +4889,7 @@ so that argues against a wrapper, not for a copy. -/
 /-- Exact calibrated Bernoulli Brier risk written directly in prevalence and
 explained-risk coordinates. -/
 abbrev brierFromR2 (π r2 : ℝ) : ℝ :=
-  TransportedMetrics.calibratedBrier π r2
+  PopGen.TransportedMetrics.calibratedBrier π r2
 
 /-! ### Liability-threshold primitives
 
@@ -5105,21 +5105,21 @@ individual theorems below already take as explicit hypotheses where they need th
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
 noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=
-  TransportedMetrics.calibratedBrier π r2Source
+  PopGen.TransportedMetrics.calibratedBrier π r2Source
 
 /-- The source Brier chart is the canonical source Brier
 specialization. -/
 theorem sourceBrierFromR2_eq_transportedMetrics
     (π r2Source : ℝ) :
     sourceBrierFromR2 π r2Source =
-      TransportedMetrics.calibratedBrier π r2Source := by
+      PopGen.TransportedMetrics.calibratedBrier π r2Source := by
   rfl
 
 /-- Exact target calibrated Brier risk under the Bernoulli-mixing model from
 explicit target state. -/
 noncomputable def targetExactCalibratedBrierRisk
     (π V_A V_E fstTarget : ℝ) : ℝ :=
-  TransportedMetrics.calibratedBrier π
+  PopGen.TransportedMetrics.calibratedBrier π
     (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
 
 /-- Neutral allele-frequency benchmark target Brier map used by the dashboard
@@ -5140,8 +5140,8 @@ treats the trait as binary for one metric and as continuous for another.
 `neutralAFBenchmarkLiabilityMetricProfile` is the dichotomised-trait version, which spends
 the `π` it was already given on both. -/
 noncomputable def neutralAFBenchmarkMetricProfile
-    (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
-  TransportedMetrics.profileFromSignalVariance π V_E (presentDayPGSVariance V_A fstTarget)
+    (π V_A V_E fstTarget : ℝ) : PopGen.TransportedMetrics.Profile :=
+  PopGen.TransportedMetrics.profileFromSignalVariance π V_E (presentDayPGSVariance V_A fstTarget)
 
 /-- The bundled neutral allele-frequency benchmark metrics reproduce the file's public
 `R²`, AUC, and Brier surfaces exactly. -/
@@ -5151,28 +5151,28 @@ theorem neutralAFBenchmarkMetricProfile_eq
       { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
       , auc := presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
       , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget } := by
-  ext
+  PopGen.ext
   · change
-      TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
+      PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
         targetR2FromNeutralAFBenchmark V_A V_E fstTarget
-    unfold targetR2FromNeutralAFBenchmark TransportedMetrics.r2FromSignalVariance presentDayR2
+    unfold targetR2FromNeutralAFBenchmark PopGen.TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
-      TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
           fstTarget) V_E =
         presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
     rfl
   · change
-      TransportedMetrics.calibratedBrier π
-        (TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
+      PopGen.TransportedMetrics.calibratedBrier π
+        (PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E) =
         targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget
     -- `TransportedMetrics.calibratedBrier` was named TWICE in this list. The
     -- first occurrence unfolds it; the second then fails, because by that
     -- point the constant is gone from the goal. `unfold` is not idempotent --
     -- it errors when a name is already absent rather than succeeding vacuously.
     unfold targetBrierFromNeutralAFBenchmark targetExactCalibratedBrierRisk
-      TransportedMetrics.calibratedBrier targetR2FromNeutralAFBenchmark
-      TransportedMetrics.r2FromSignalVariance
+      PopGen.TransportedMetrics.calibratedBrier targetR2FromNeutralAFBenchmark
+      PopGen.TransportedMetrics.r2FromSignalVariance
       presentDayR2
     rfl
 
@@ -5238,8 +5238,8 @@ AUC of a biological process without a separately proved distributional model. -/
 theorem equalVarianceGaussianAUCFromSNR_eq_variance
     (vSignal vEnv : ℝ) (h_env : vEnv ≠ 0) :
     equalVarianceGaussianAUCFromSNR (vSignal / vEnv) =
-      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
-  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+  rw [PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
   unfold equalVarianceGaussianAUCFromSNR
   congr 2
   rw [div_div, mul_comm]
@@ -5254,9 +5254,9 @@ distributional model rather than supplied as a theorem-bearing parameter. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
-    equalVarianceGaussianAUCFromSignalVariance vSignal 1 =
+    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal 1 =
       equalVarianceGaussianAUCFromSNR vSignal := by
-  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
+  rw [PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
   unfold equalVarianceGaussianAUCFromSNR
   ring_nf
 
@@ -5457,7 +5457,7 @@ prevalence.
 
     argument_source: model, inherited. -/
 noncomputable def neutralAFBenchmarkLiabilityMetricProfile
-    (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
+    (π V_A V_E fstTarget : ℝ) : PopGen.TransportedMetrics.Profile :=
   { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
   , auc := targetLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget π
   , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget }
@@ -5485,15 +5485,15 @@ conversion.  No Gaussian-process theorem is accepted as an argument. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
     (vSignal vEnv : ℝ) (h_signal : 0 ≤ vSignal) (h_env : 0 < vEnv) :
     equalVarianceGaussianAUCFromExplainedR2
-        (r2FromSignalVariance vSignal vEnv) =
-      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+        (PopGen.TransportedMetrics.r2FromSignalVariance vSignal vEnv) =
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
   have h_total : 0 < vSignal + vEnv := add_pos_of_nonneg_of_pos h_signal h_env
-  have h_r2_lt : r2FromSignalVariance vSignal vEnv < 1 := by
-    unfold r2FromSignalVariance Descent.Core.share
+  have h_r2_lt : PopGen.TransportedMetrics.r2FromSignalVariance vSignal vEnv < 1 := by
+    unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact (div_lt_one h_total).2 (lt_add_of_pos_right vSignal h_env)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2_lt]
   rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv (ne_of_gt h_env)]
-  unfold equalVarianceGaussianAUCFromSNR r2FromSignalVariance Descent.Core.share
+  unfold equalVarianceGaussianAUCFromSNR PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
   -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
@@ -5551,7 +5551,7 @@ equation.
     Empirical status: UNTESTED. -/
 noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
-  equalVarianceGaussianAUCFromSignalVariance
+  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
     (explainedSignalVarianceFromSourceWeights m P)
     (residualVarianceFromSourceWeights m P)
 
@@ -5560,7 +5560,7 @@ applied to source explained signal and source residual variance. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
-      equalVarianceGaussianAUCFromSignalVariance
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.source)
         (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
@@ -5587,7 +5587,7 @@ theorem equalVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_pos {p
     exact ne_of_gt (sub_pos.mpr h_signal_lt)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
   rw [equalVarianceGaussianAUCFromSourceWeights,
-    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
+    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
   unfold residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
@@ -5611,7 +5611,7 @@ applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromSignalVariance
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
@@ -5622,7 +5622,7 @@ explicit SNP-level transport model. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromSignalVariance
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         (effectiveOutcomeVariance m Pop.target -
@@ -5637,7 +5637,7 @@ biological loss budget made explicit in the residual term. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      equalVarianceGaussianAUCFromSignalVariance
+      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m -
@@ -5689,7 +5689,7 @@ prevalence scale.
 
     argument_source: model, inherited. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
+    (m : CrossPopulationMetricModel p q) (π : ℝ) : PopGen.TransportedMetrics.Profile where
   r2 := r2FromSourceWeights m Pop.source
   auc := equalVarianceGaussianAUCFromSourceWeights m Pop.source
   brier := sourceCalibratedBrierFromSourceWeightsAtPrevalence m π
@@ -5729,7 +5729,7 @@ prevalence scale carried by the mechanistic target state.
 
     argument_source: model, inherited. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile :=
+    (m : CrossPopulationMetricModel p q) : PopGen.TransportedMetrics.Profile :=
   sourceMetricProfileFromSourceWeightsAtPrevalence m m.targetPrevalence
 
 @[simp] theorem sourceMetricProfileFromSourceWeightsAtTargetPrevalence_r2 {p q : ℕ}
@@ -5756,7 +5756,7 @@ source-weights/target-LD/target-tagging system, with AUC bundled from the
 explicit target signal/residual moment pair rather than from a source-side
 transport surrogate. -/
 noncomputable def targetMetricProfileFromSourceWeights {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile where
+    (m : CrossPopulationMetricModel p q) : PopGen.TransportedMetrics.Profile where
   r2 := r2FromSourceWeights m Pop.target
   auc := equalVarianceGaussianAUCFromSourceWeights m Pop.target
   brier := targetCalibratedBrierFromSourceWeights m
@@ -5796,21 +5796,21 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromSignalVariance
+          PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights m Pop.target)
             (effectiveOutcomeVariance m Pop.target -
               (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights m Pop.target)
       , brier :=
-          TransportedMetrics.calibratedBrierFromVariances
+          PopGen.TransportedMetrics.calibratedBrierFromVariances
             m.targetPrevalence
             ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights m Pop.target)
             (effectiveOutcomeVariance m Pop.target -
               (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights m Pop.target) } := by
-  ext
+  PopGen.ext
   · rw [targetMetricProfileFromSourceWeights_r2,
       targetR2FromSourceWeights_exact_metric_portability_law]
   · rw [targetMetricProfileFromSourceWeights_auc,
@@ -5821,7 +5821,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
 /-- Canonical mechanistic deployed metric profile after `t` generations. -/
 noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
-    TransportedMetrics.Profile :=
+    PopGen.TransportedMetrics.Profile :=
   targetMetricProfileFromSourceWeights (m.toMetricModelAt t)
 
 @[simp] theorem targetMetricProfileAtGeneration_eq_slice {p q : ℕ}
@@ -5870,21 +5870,21 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
             (scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)
       , auc :=
-          equalVarianceGaussianAUCFromSignalVariance
+          PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
       , brier :=
-          TransportedMetrics.calibratedBrierFromVariances
+          PopGen.TransportedMetrics.calibratedBrierFromVariances
             (m.targetPrevalenceAt t)
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
-  ext
+  PopGen.ext
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
   · rw [targetMetricProfileAtGeneration_eq_slice,
@@ -5912,12 +5912,12 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
     linarith
   have hve_ne : V_E ≠ 0 := ne_of_gt hVE
   have hr2_lt : presentDayR2 V_A V_E fst < 1 := by
-    unfold presentDayR2 r2FromSignalVariance Descent.Core.share
+    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact (div_lt_one (add_pos hv_pos hVE)).2 (lt_add_of_pos_right _ hVE)
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
-    unfold presentDayR2 r2FromSignalVariance presentDaySignalToNoise Descent.Core.share
+    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance presentDaySignalToNoise Descent.Core.share
     field_simp [hsum_ne, hve_ne]
     ring
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
@@ -5935,7 +5935,7 @@ evaluated at the explicit target `R²` by definition. -/
 @[simp] theorem targetBrierFromNeutralAFBenchmark_eq
     (π V_A V_E fstTarget : ℝ) :
     targetExactCalibratedBrierRisk π V_A V_E fstTarget =
-      TransportedMetrics.calibratedBrier π
+      PopGen.TransportedMetrics.calibratedBrier π
         (targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
   rfl
 
@@ -5951,7 +5951,7 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (hvar_int : Integrable (fun z ↦ (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
-    Program.exactBrierRiskOfCalibrated μ η = TransportedMetrics.calibratedBrier π r2 := by
+    Program.exactBrierRiskOfCalibrated μ η = PopGen.TransportedMetrics.calibratedBrier π r2 := by
   rw [Program.exactBrierRiskOfCalibrated_eq_integral]
   have hdiff_int : Integrable (fun z ↦ η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
@@ -5979,9 +5979,9 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     _ = π * (1 - π) - ∫ z, (η z - π) ^ 2 ∂μ := by
             rw [hlin_zero]
             ring
-    _ = TransportedMetrics.calibratedBrier π r2 := by
+    _ = PopGen.TransportedMetrics.calibratedBrier π r2 := by
             rw [hvar]
-            unfold TransportedMetrics.calibratedBrier
+            unfold PopGen.TransportedMetrics.calibratedBrier
             ring
 
 /-- Full neutral allele-frequency benchmark Brier degradation theorem: if
@@ -6002,7 +6002,7 @@ theorem targetBrier_ge_source_of_neutralAF_benchmark
       hVA hVE h_fst h_fst_bounds
   have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
   unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
-    targetExactCalibratedBrierRisk TransportedMetrics.calibratedBrier
+    targetExactCalibratedBrierRisk PopGen.TransportedMetrics.calibratedBrier
   have hbase :
       1 - presentDayR2 V_A V_E fstSource ≤
         1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget := by
@@ -6291,14 +6291,14 @@ noncomputable def MutationDriftModelAssumptions.witness : MutationDriftModelAssu
 
     Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
-  scaledMutationRate m.Ne m.μ
+  PopGen.scaledMutationRate m.Ne m.μ
 
 /-- **The scaled mutation parameter is linear in the mutation rate with slope four Ne.**
 `theta_pos` below fixes the sign and leaves the slope free. -/
 theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssumptions)
     (h : m.μ ≠ 0) :
     m.theta / m.μ = 4 * m.Ne := by
-  unfold MutationDriftModelAssumptions.theta scaledMutationRate
+  unfold MutationDriftModelAssumptions.theta PopGen.scaledMutationRate
     Descent.Core.scaledMutationRate Descent.Core.ploidy
   field_simp
   ring
@@ -6306,7 +6306,7 @@ theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssump
 /-- θ is positive for any valid mutation-drift model. -/
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
-  unfold MutationDriftModelAssumptions.theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  unfold MutationDriftModelAssumptions.theta PopGen.scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   nlinarith [m.Ne_pos, m.mu_pos]
 
 /-- **One generation of the identity-by-descent balance.**
@@ -6420,7 +6420,7 @@ The closed form takes that value exactly, rather than approaching it. -/
     -- so the two must not be substituted for one another. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
-  fstMutationDriftEquilibrium m.theta
+  PopGen.fstMutationDriftEquilibrium m.theta
 
 /-- **The equilibrium inverts one plus the scaled mutation parameter.** `fstEquilibrium_pos`
 fixes the sign; this fixes the value, and a body carrying any other coefficient on `theta` would
@@ -6428,7 +6428,7 @@ be positive too. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
     (m : MutationDriftModelAssumptions) (h : 1 + m.theta ≠ 0) :
     m.fstEquilibrium * (1 + m.theta) = 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   field_simp
 
 /-- **The mutation-drift equilibrium is the fixed point of the identity
@@ -6438,7 +6438,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
   have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := by
     unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
-      fstMutationDriftEquilibrium scaledMutationRate Descent.Core.fstFromFlow
+      PopGen.fstMutationDriftEquilibrium PopGen.scaledMutationRate Descent.Core.fstFromFlow
       Descent.Core.scaledMutationRate Descent.Core.ploidy
     ring_nf
   rw [hθ]
@@ -6448,7 +6448,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   have hden : 0 < 1 + m.theta := by
     nlinarith [m.theta_pos]
   exact div_pos one_pos hden
@@ -6457,7 +6457,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
 theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     (m : MutationDriftModelAssumptions) :
     m.fstEquilibrium < 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_one (by linarith [m.theta_pos])]
   linarith [m.theta_pos]
 
@@ -7003,7 +7003,7 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
-  unfold presentDayR2MutationDrift presentDayR2 r2FromSignalVariance Descent.Core.share
+  unfold presentDayR2MutationDrift presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst_lt hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld :=
@@ -7553,14 +7553,14 @@ theorem fstIslandMultiplicativeEquilibrium_ne_fstMigrationDriftEquilibrium :
 
 /-- Scaled migration rate is positive when Ne and m are positive. -/
 theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
-    0 < scaledMigrationRate Ne m := by
-  unfold scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    0 < PopGen.scaledMigrationRate Ne m := by
+  unfold PopGen.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   positivity
 
 /-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
 theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
-    fstMigrationDriftEquilibrium Ne m = 1 / (1 + scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    fstMigrationDriftEquilibrium Ne m = 1 / (1 + PopGen.scaledMigrationRate Ne m) := by
+  unfold fstMigrationDriftEquilibrium PopGen.scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
@@ -7685,7 +7685,7 @@ theorem SplitMigrationModel.fstMigDriftEq_eq_limit (s : SplitMigrationModel) :
     s.fstMigDriftEq = s.fstEqLimitLowMutationManyDemes := by
   unfold SplitMigrationModel.fstMigDriftEq fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
     SplitMigrationModel.fstEqLimitLowMutationManyDemes
-    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    PopGen.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   ring
 
 /-- **Increased migration strictly improves equilibrium Fst in the SplitMigration framework.**
@@ -8219,8 +8219,8 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
     Fst = 1/(1+M) and shared_LD = M/(1+M) sum to 1.
     This parallels the mutation-drift complementarity. -/
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (scaledMigrationRate Ne m) = 1 := by
-  unfold fstMigrationDriftEquilibrium sharedLDFromMigration scaledMigrationRate
+    fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (PopGen.scaledMigrationRate Ne m) = 1 := by
+  unfold fstMigrationDriftEquilibrium sharedLDFromMigration PopGen.scaledMigrationRate
     Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
   have hden' : 1 + Ne * m * 4 ≠ 0 := by intro hc; apply hden; linarith
@@ -8358,7 +8358,7 @@ name/quantity mismatch, so the two are separated rather than bounded.
     of every cell. The CONTROL is that the same split gives `F_ST = 0`. -/
 noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
   (1 - fstMigrationDriftEquilibrium Ne m) *
-    sharedLDFromMigration (scaledMigrationRate Ne m)
+    sharedLDFromMigration (PopGen.scaledMigrationRate Ne m)
 
 /-- **Retained signal variance under migration-drift balance.**
     The additive variance that survives: the retention fraction times `V_A`.
@@ -8403,9 +8403,9 @@ theorem retainedSignalVarianceMigrationDrift_eq_retention_mul_VA (V_A Ne m : ℝ
 theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     signalRetentionMigrationDrift Ne m =
-      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 := by
+      (PopGen.scaledMigrationRate Ne m) ^ 2 / (1 + PopGen.scaledMigrationRate Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
-    scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    PopGen.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
   ring
@@ -8416,8 +8416,8 @@ theorem signalRetentionMigrationDrift_lt_one (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) :
     signalRetentionMigrationDrift Ne m < 1 := by
   rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe (le_of_lt hm)]
-  have hM : 0 < scaledMigrationRate Ne m := scaledMigrationRate_pos Ne m hNe hm
-  have h1M : 0 < (1 + scaledMigrationRate Ne m) ^ 2 := by positivity
+  have hM : 0 < PopGen.scaledMigrationRate Ne m := scaledMigrationRate_pos Ne m hNe hm
+  have h1M : 0 < (1 + PopGen.scaledMigrationRate Ne m) ^ 2 := by positivity
   rw [div_lt_one h1M]
   nlinarith
 
@@ -8440,7 +8440,7 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    sharedLDFromMigration PopGen.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
   ring
@@ -8477,7 +8477,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy at h1 h2
+    sharedLDFromMigration PopGen.scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy at h1 h2
   norm_num at h1 h2
   linarith
 
@@ -8485,7 +8485,7 @@ theorem no_calibration_constant_reconciles_retention_laws :
 theorem retainedSignalVarianceMigrationDrift_eq (V_A Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     retainedSignalVarianceMigrationDrift V_A Ne m =
-      (scaledMigrationRate Ne m) ^ 2 / (1 + scaledMigrationRate Ne m) ^ 2 * V_A := by
+      (PopGen.scaledMigrationRate Ne m) ^ 2 / (1 + PopGen.scaledMigrationRate Ne m) ^ 2 * V_A := by
   unfold retainedSignalVarianceMigrationDrift
   rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe hm]
 
@@ -8512,12 +8512,12 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
   apply mul_lt_mul_of_pos_right _ hVA
   -- Need: M₁²/(1+M₁)² < M₂²/(1+M₂)²  i.e. (M₁/(1+M₁))² < (M₂/(1+M₂))²
   -- which follows from M₁/(1+M₁) < M₂/(1+M₂), a monotone function.
-  set M₁ := scaledMigrationRate Ne m₁
-  set M₂ := scaledMigrationRate Ne m₂
+  set M₁ := PopGen.scaledMigrationRate Ne m₁
+  set M₂ := PopGen.scaledMigrationRate Ne m₂
   have hM₁ : 0 < M₁ := scaledMigrationRate_pos Ne m₁ hNe hm₁
   have hM₂ : 0 < M₂ := scaledMigrationRate_pos Ne m₂ hNe hm₂
   have hM_lt : M₁ < M₂ := by
-    simp [M₁, M₂, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    simp [M₁, M₂, PopGen.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
     nlinarith
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith
@@ -8864,7 +8864,7 @@ theorem admixtureLDDecay_ge_finitePopulation (r Ne : ℝ) (t : ℕ)
 same quantity read as survival of two loci to the MRCA rather than as decay of
 admixture LD; both are the probability of no recombination in `n` meioses. -/
 theorem admixtureLDDecay_eq_discreteRecombinationSurvival (r : ℝ) (t : ℕ) :
-    admixtureLDDecay r t = discreteRecombinationSurvival r t := rfl
+    admixtureLDDecay r t = PopGen.discreteRecombinationSurvival r t := rfl
 
 /-- Admixture LD decay is nonneg for recombination rate in [0, 1]. -/
 theorem admixtureLDDecay_nonneg (r : ℝ) (t : ℕ)
@@ -9211,4 +9211,4 @@ theorem transferTime_doubles_at_equal_circulation (dissipation : ℝ) (hd : 0 < 
 
 end NonreversibleFlow
 
-end Descent
+end Descent.Portability

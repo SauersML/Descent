@@ -5,7 +5,7 @@ import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Descent.Program.OpenQuestions
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -1059,4 +1059,4 @@ theorem tract_length_shortens_with_time (g₁ g₂ admixtureFraction : ℝ)
 
 end LocalAncestryHaplotypes
 
-end Descent
+end Descent.PopGen

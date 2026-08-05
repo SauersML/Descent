@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PhenomeWidePortability
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Portability
 
 open MeasureTheory
 
@@ -510,4 +510,4 @@ theorem portability_loss_decomposition
 
 end ArrayAscertainment
 
-end Descent
+end Descent.Portability

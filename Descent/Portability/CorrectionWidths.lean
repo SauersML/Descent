@@ -41,7 +41,7 @@ the analytic extraction of weakly-null depth cascades is intentionally not smugg
 - `finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one`: uniform budget barrier.
 -/
 
-namespace Descent
+namespace Descent.Portability
 
 open scoped BigOperators
 
@@ -56,7 +56,7 @@ def FactorsThroughObservation (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) : Pr
 
 /-- The zero correction factors through every observation. -/
 theorem FactorsThroughObservation.zero (A : H →ₗ[𝕜] Y) : FactorsThroughObservation A 0 := by
-  exact ⟨0, by ext; simp⟩
+  exact ⟨0, by PopGen.ext; simp⟩
 
 /-- Factored corrections are closed under addition. -/
 theorem FactorsThroughObservation.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[𝕜] H)
@@ -64,14 +64,14 @@ theorem FactorsThroughObservation.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[�
     FactorsThroughObservation A (C + D) := by
   rcases hC with ⟨T, rfl⟩
   rcases hD with ⟨S, rfl⟩
-  exact ⟨T + S, by ext; simp⟩
+  exact ⟨T + S, by PopGen.ext; simp⟩
 
 /-- Factored corrections are closed under scalar multiplication. -/
 theorem FactorsThroughObservation.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
     (hC : FactorsThroughObservation A C) (c : 𝕜) :
     FactorsThroughObservation A (c • C) := by
   rcases hC with ⟨T, rfl⟩
-  exact ⟨c • T, by ext; simp⟩
+  exact ⟨c • T, by PopGen.ext; simp⟩
 
 /-- The corrections factoring through a fixed observation form a linear subspace of all
 endomorphisms. -/
@@ -95,7 +95,7 @@ theorem FactorsThroughObservation.postcomp (A : H →ₗ[𝕜] Y) (C R : H →�
     (hC : FactorsThroughObservation A C) :
     FactorsThroughObservation A (R.comp C) := by
   rcases hC with ⟨T, rfl⟩
-  exact ⟨R.comp T, by ext; simp⟩
+  exact ⟨R.comp T, by PopGen.ext; simp⟩
 
 /-- The factor-through submodule is closed under arbitrary output-side postcomposition. -/
 theorem factorsThroughSubmodule_postcomp_mem
@@ -125,7 +125,7 @@ theorem factorsThrough_iff_ker_le
       ((LinearMap.ker A).liftQ C hker).comp A.quotKerEquivRange.symm.toLinearMap
     rcases f.exists_extend with ⟨T, hT⟩
     refine ⟨T, ?_⟩
-    ext β
+    PopGen.ext β
     have hAβ : A β ∈ LinearMap.range A := ⟨β, rfl⟩
     have hTβ := DFunLike.congr_fun hT ⟨A β, hAβ⟩
     simpa [f] using hTβ.symm
@@ -206,7 +206,7 @@ def UniformCorrectionFamily (A : H →ₗ[𝕜] Y) (k : ℕ) : Set (H →ₗ[�
 /-- At order zero the only representable uniform correction is the zero map. -/
 theorem uniformCorrectionFamily_zero (A : H →ₗ[𝕜] Y) :
     UniformCorrectionFamily A 0 = {0} := by
-  ext C
+  PopGen.ext C
   constructor
   · rintro ⟨T, a, rfl⟩
     simp [combinedPostprocessor]
@@ -271,7 +271,7 @@ def adaptiveCorrectionSet {k : ℕ} (A : H →ₗ[𝕜] Y)
 /-- With no adaptive dictionary entries, the only achievable vector is zero. -/
 theorem adaptiveCorrectionSet_zero_order (A : H →ₗ[𝕜] Y) (β : H) :
     adaptiveCorrectionSet A (fun j : Fin 0 ↦ Fin.elim0 j) β = {0} := by
-  ext z
+  PopGen.ext z
   constructor
   · rintro ⟨a, rfl⟩
     simp
@@ -287,7 +287,7 @@ theorem adaptiveCorrectionSet_smul {k : ℕ} (A : H →ₗ[𝕜] Y)
     (T : Fin k → Y →ₗ[𝕜] H) (β : H) (c : 𝕜) (hc : c ≠ 0) :
     adaptiveCorrectionSet A T (c • β) = adaptiveCorrectionSet A T β := by
   classical
-  ext z
+  PopGen.ext z
   constructor
   · rintro ⟨a, rfl⟩
     refine ⟨fun j ↦ a j * c, ?_⟩
@@ -304,7 +304,7 @@ theorem adaptiveCorrectionSet_smul {k : ℕ} (A : H →ₗ[𝕜] Y)
 theorem adaptiveCorrectionSet_of_mem_ker {k : ℕ} (A : H →ₗ[𝕜] Y)
     (T : Fin k → Y →ₗ[𝕜] H) (β : H) (hβ : β ∈ LinearMap.ker A) :
     adaptiveCorrectionSet A T β = {0} := by
-  ext z
+  PopGen.ext z
   constructor
   · rintro ⟨a, rfl⟩
     simp [LinearMap.mem_ker.mp hβ]
@@ -416,7 +416,7 @@ theorem conjugateLinearOperator_comp (U : H ≃ₗ[𝕜] H')
     (T A : H →ₗ[𝕜] H) :
     conjugateLinearOperator U (T.comp A) =
       (conjugateLinearOperator U T).comp (conjugateLinearOperator U A) := by
-  ext x
+  PopGen.ext x
   simp [conjugateLinearOperator]
 
 /-- Conjugation preserves and reflects the factor-through relation. -/
@@ -427,7 +427,7 @@ theorem factorsThrough_conjugate_iff (U : H ≃ₗ[𝕜] H')
   constructor
   · rintro ⟨T', hT'⟩
     refine ⟨conjugateLinearOperator U.symm T', ?_⟩
-    ext x
+    PopGen.ext x
     apply LinearEquiv.injective U
     have hx := LinearMap.congr_fun hT' (U x)
     simpa [conjugateLinearOperator] using hx
@@ -754,4 +754,4 @@ theorem correctionResidual_eq_of_mem_ker
 
 end NormedObstruction
 
-end Descent
+end Descent.Portability

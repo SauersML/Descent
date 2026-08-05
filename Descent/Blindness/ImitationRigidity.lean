@@ -69,7 +69,7 @@ theorem covarianceMatrix_addRankOneSignal
     (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0) :
     Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) =
       Foundations.covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
-  ext i j
+  PopGen.ext i j
   simp only [Foundations.covarianceMatrix, Matrix.of_apply, addRankOneSignal,
     Matrix.add_apply, rankOneCovarianceBump]
   have hi :
@@ -591,7 +591,7 @@ theorem belowCeiling_add_rankOne_iff
   have hrewrite :
       ceiling • (1 : Matrix ι ι ℝ) - (K + rankOneCovarianceBump scale loading) =
         (ceiling • (1 : Matrix ι ι ℝ) - K) - rankOneCovarianceBump scale loading := by
-    ext i j; simp [Matrix.sub_apply, Matrix.add_apply]; ring
+    PopGen.ext i j; simp [Matrix.sub_apply, Matrix.add_apply]; ring
   unfold BelowCeiling
   rw [hrewrite]
   exact varianceNonneg_sub_rankOne_iff hsymm hgap hwitness scale
@@ -828,9 +828,9 @@ theorem ldWhiteningGain_one_is_junk : ldWhiteningGain 1 = 0 := by
   unfold ldWhiteningGain; norm_num
 
 theorem stationaryLDEntry_eq_ldAfterGenerations (r Ne : ℝ) (separation : ℕ) :
-    stationaryLDEntry (ldRetentionPerGen r Ne) separation =
-      ldAfterGenerations 1 r Ne separation := by
-  unfold stationaryLDEntry ldAfterGenerations Descent.Core.power
+    stationaryLDEntry (PopGen.ldRetentionPerGen r Ne) separation =
+      PopGen.ldAfterGenerations 1 r Ne separation := by
+  unfold stationaryLDEntry PopGen.ldAfterGenerations Descent.Core.power
   rw [one_mul]
 
 theorem ldKernelSymbol_denom_pos {decay angle : ℝ} (hd : |decay| < 1) :
@@ -950,28 +950,28 @@ explicit function of the recombination rate and the effective population size:
 less recombination, more gain. -/
 theorem ldWhiteningGain_of_ldRetention_antitone
     {r₁ r₂ Ne : ℝ} (hr₁ : 0 ≤ r₁) (hr₂ : r₂ < 1) (hNe : 1 < Ne) (hlt : r₁ < r₂) :
-    ldWhiteningGain (ldRetentionPerGen r₂ Ne) <
-      ldWhiteningGain (ldRetentionPerGen r₁ Ne) := by
-  have hret₂ : 0 ≤ ldRetentionPerGen r₂ Ne :=
-    ld_retention_nonneg r₂ Ne (le_of_lt hr₂) (le_of_lt hNe)
-  have hlt' : ldRetentionPerGen r₂ Ne < ldRetentionPerGen r₁ Ne := by
-    unfold ldRetentionPerGen
+    ldWhiteningGain (PopGen.ldRetentionPerGen r₂ Ne) <
+      ldWhiteningGain (PopGen.ldRetentionPerGen r₁ Ne) := by
+  have hret₂ : 0 ≤ PopGen.ldRetentionPerGen r₂ Ne :=
+    PopGen.ld_retention_nonneg r₂ Ne (le_of_lt hr₂) (le_of_lt hNe)
+  have hlt' : PopGen.ldRetentionPerGen r₂ Ne < PopGen.ldRetentionPerGen r₁ Ne := by
+    unfold PopGen.ldRetentionPerGen
     have hfac : 0 < 1 - 1 / (2 * Ne) := by
       rw [sub_pos, div_lt_one (by linarith)]; linarith
     nlinarith [hlt, hfac]
-  have hone : ldRetentionPerGen r₁ Ne < 1 := by
+  have hone : PopGen.ldRetentionPerGen r₁ Ne < 1 := by
     rcases eq_or_lt_of_le hr₁ with hzero | hpos
-    · unfold ldRetentionPerGen
+    · unfold PopGen.ldRetentionPerGen
       rw [← hzero]
       have hfac : 1 - 1 / (2 * Ne) < 1 := by
         have : 0 < 1 / (2 * Ne) := by positivity
         linarith
       nlinarith [hfac]
-    · exact ld_retention_lt_one r₁ Ne hpos (by linarith) hNe
-  have habs : |ldRetentionPerGen r₁ Ne| < 1 := by
+    · exact PopGen.ld_retention_lt_one r₁ Ne hpos (by linarith) hNe
+  have habs : |PopGen.ldRetentionPerGen r₁ Ne| < 1 := by
     rw [abs_lt]
     constructor
-    · nlinarith [ld_retention_nonneg r₁ Ne (by linarith) (le_of_lt hNe)]
+    · nlinarith [PopGen.ld_retention_nonneg r₁ Ne (by linarith) (le_of_lt hNe)]
     · exact hone
   exact ldWhiteningGain_strictMono hret₂ habs hlt'
 
@@ -1693,7 +1693,7 @@ theorem rankOneCovarianceBump_conjugate
     (transform : Matrix ι ι ℝ) (scale : ℝ) (loading : ι → ℝ) :
     transform.transpose * rankOneCovarianceBump scale loading * transform =
       rankOneCovarianceBump scale (transform.transpose.mulVec loading) := by
-  ext i j
+  PopGen.ext i j
   have hinner : ∀ a : ι,
       (∑ b, transform b i * (scale ^ 2 * loading b * loading a) * transform a j) =
         (∑ b, transform b i * loading b) *

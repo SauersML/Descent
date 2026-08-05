@@ -555,7 +555,7 @@ theorem inequivalent_of_profileSet_ne
     ¬ ∃ φ : Latent ≃ Latent, ∀ u, profile₁ (φ u) = profile₂ u := by
   rintro ⟨φ, hφ⟩
   apply h
-  ext d
+  PopGen.ext d
   constructor
   · rintro ⟨u, rfl⟩
     exact ⟨φ.symm u, by rw [← hφ (φ.symm u), φ.apply_symm_apply]⟩

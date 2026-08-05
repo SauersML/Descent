@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.Conventions
 
-namespace Descent
+namespace Descent.PopGen
 
 noncomputable section
 
@@ -92,11 +92,11 @@ theorem neiContrastSpike_eq_contrastSpikeLevel_mul_spikeLoad
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       contrastSpikeLevel p₁ p₂ *
-        (traceWindowBudgetClass base budget).spikeLoad a
-          (demographicSpikeDirection N m) := by
+        (Portability.traceWindowBudgetClass base budget).spikeLoad a
+          (Portability.demographicSpikeDirection N m) := by
   rw [contrastSpikeLevel_eq_four_neiGst p₁ p₂ h,
-    traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold Program.neiContrastSpike demographicSpike
+    Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
+  unfold Program.neiContrastSpike Portability.demographicSpike
   ring
 
 /-- **The exact Nei contrast spike written without a free coefficient.**
@@ -112,10 +112,10 @@ theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       ((p₁ - p₂) ^ 2 / (Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂))) *
-        (traceWindowBudgetClass base budget).spikeLoad a
-          (demographicSpikeDirection N m) := by
+        (Portability.traceWindowBudgetClass base budget).spikeLoad a
+          (Portability.demographicSpikeDirection N m) := by
   rw [Program.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
-    traceWindow_spikeLoad_demographic m hmn hN base budget a]
+    Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
 /-- **The empirically calibrated Hudson BBP spike is level times load.** -/
 theorem hudsonBbpSpike_eq_level_mul_spikeLoad
@@ -123,10 +123,10 @@ theorem hudsonBbpSpike_eq_level_mul_spikeLoad
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       (4 * Program.hudsonFst p₁ p₂) *
-        (traceWindowBudgetClass base budget).spikeLoad a
-          (demographicSpikeDirection N m) := by
-  rw [traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold Program.hudsonBbpSpike demographicSpike
+        (Portability.traceWindowBudgetClass base budget).spikeLoad a
+          (Portability.demographicSpikeDirection N m) := by
+  rw [Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
+  unfold Program.hudsonBbpSpike Portability.demographicSpike
   ring
 
 /-- **The Hudson BBP spike on the Nei scale.** This is the exact formula that
@@ -139,11 +139,11 @@ theorem hudsonBbpSpike_eq_nei_conversion_mul_spikeLoad
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       (8 * Program.neiGst p₁ p₂ / (1 + Program.neiGst p₁ p₂)) *
-        (traceWindowBudgetClass base budget).spikeLoad a
-          (demographicSpikeDirection N m) := by
+        (Portability.traceWindowBudgetClass base budget).spikeLoad a
+          (Portability.demographicSpikeDirection N m) := by
   rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
       (N : ℝ) (m : ℝ) p₁ p₂ hpos hbar,
-    traceWindow_spikeLoad_demographic m hmn hN base budget a]
+    Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
 /-- **Exact multiplicative convention gap at certificate level.** The Hudson-calibrated
 stratification spike is `2/(1+G_ST)` times the Nei-calibrated spike. Thus the estimator choice
@@ -156,7 +156,7 @@ theorem hudsonBbpSpike_eq_nei_multiplier_mul_neiContrastSpike
       (2 / (1 + Program.neiGst p₁ p₂)) * Program.neiContrastSpike N m p₁ p₂ := by
   rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
     N m p₁ p₂ hpos hbar]
-  unfold Program.neiContrastSpike demographicSpike
+  unfold Program.neiContrastSpike Portability.demographicSpike
   ring
 
 /-- On the biological range `0 ≤ G_ST ≤ 1`, the Hudson-to-Nei spike multiplier lies between one
@@ -184,12 +184,12 @@ theorem hudsonCalibrated_stratification_imitable_if_within_budget
     (hfst : 0 ≤ Program.hudsonFst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : Blindness.VarianceNonneg (S₀ - base))
-    (hbudget : traceForm S₀ +
+    (hbudget : Portability.traceForm S₀ +
       Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
-    (traceWindowBudgetClass base budget).IsNull
-      ((traceWindowBudgetClass base budget).spiked S₀ (4 * Program.hudsonFst p₁ p₂)
-        (demographicSpikeDirection N m)) :=
-  imitable_within_traceWindowBudget m (Program.hudsonFst p₁ p₂)
+    (Portability.traceWindowBudgetClass base budget).IsNull
+      ((Portability.traceWindowBudgetClass base budget).spiked S₀ (4 * Program.hudsonFst p₁ p₂)
+        (Portability.demographicSpikeDirection N m)) :=
+  Portability.imitable_within_traceWindowBudget m (Program.hudsonFst p₁ p₂)
     hfst hmn hN base S₀ budget hbase hbudget
 
 /-- **The correction to the empirically Hudson-calibrated
@@ -203,17 +203,17 @@ quantity omits. -/
 theorem hudsonCalibrated_rigid_pcCorrectabilityMargin_is_the_criterion
     {N : ℕ} (m : ℕ) (p₁ p₂ markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
-    0 < pcCorrectabilityMargin (N : ℝ) markerCount (Program.hudsonFst p₁ p₂) (m : ℝ) ↔
-      (traceWindowBudgetClass base (traceForm S₀)).bound a +
-          bbpProxyThreshold (N : ℝ) markerCount <
-        (traceWindowBudgetClass base (traceForm S₀)).form a
-          ((traceWindowBudgetClass base (traceForm S₀)).spiked S₀
-            (4 * Program.hudsonFst p₁ p₂) (demographicSpikeDirection N m)) :=
-  rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos m
+    0 < Portability.pcCorrectabilityMargin (N : ℝ) markerCount (Program.hudsonFst p₁ p₂) (m : ℝ) ↔
+      (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).bound a +
+          Portability.bbpProxyThreshold (N : ℝ) markerCount <
+        (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).form a
+          ((Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).spiked S₀
+            (4 * Program.hudsonFst p₁ p₂) (Portability.demographicSpikeDirection N m)) :=
+  Portability.rigid_certificate_exceeds_ceiling_iff_pcCorrectabilityMargin_pos m
     (Program.hudsonFst p₁ p₂) markerCount hmn hN base S₀ a
 
 end DemographicCapacity
 
 end
 
-end Descent
+end Descent.PopGen

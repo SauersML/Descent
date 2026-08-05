@@ -6,7 +6,7 @@ import Mathlib.Algebra.Module.Submodule.Basic
 import Mathlib.Algebra.Module.Pi
 import Mathlib.Data.Real.Basic
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Correctability linear-algebra core
@@ -282,4 +282,4 @@ theorem spectral_correction_residual_bias_lower_bound {p : ℕ}
       (fun i _ ↦ sq_nonneg (retention i * bias i)) (by simp)
   exact hcoordinate_sq.trans hcoordinate
 
-end Descent
+end Descent.Portability

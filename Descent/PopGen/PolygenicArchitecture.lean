@@ -13,7 +13,7 @@ import Descent.Decision.CertificateGrading
 import Descent.Decision.TransportedMinimax
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -1470,4 +1470,4 @@ theorem portability_upper_bound_from_rg_fst
 
 end ArchitecturePredictions
 
-end Descent
+end Descent.PopGen

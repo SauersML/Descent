@@ -14,7 +14,7 @@ calibration, ancestry-wise calibration, worst-ancestry error, and threshold util
 an empirical assumption about any particular biobank.
 -/
 
-namespace Descent
+namespace Descent.Portability
 
 section GeneralAncestryLaw
 
@@ -199,4 +199,4 @@ theorem max_reciprocal_half_eq_two_div
 
 end BinaryDeploymentBoundary
 
-end Descent
+end Descent.Portability

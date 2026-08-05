@@ -72,7 +72,7 @@ theorem range_mergeSetMap {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)} {a : 
     (ha : a ∈ S) :
     Set.range (fun x : Fin n => mergeSetMap ξ S a (Quotient.mk ξ x))
       = {c | c ∉ S} ∪ {a} := by
-  ext c
+  PopGen.ext c
   simp only [Set.mem_range, Set.mem_union, Set.mem_setOf_eq, Set.mem_singleton_iff]
   constructor
   · rintro ⟨x, rfl⟩
@@ -108,7 +108,7 @@ theorem blocks_mergeSet {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)} {a : Qu
       = Fintype.card (Quotient ξ) - S.card := by
     rw [Set.Nat.card_coe_set_eq, Set.ncard_eq_toFinset_card']
     have hset : {c : Quotient ξ | c ∉ S}.toFinset = Sᶜ := by
-      ext c
+      PopGen.ext c
       simp
     rw [hset, Finset.card_compl]
   have hcard : blocks ξ = Fintype.card (Quotient ξ) := Nat.card_eq_fintype_card

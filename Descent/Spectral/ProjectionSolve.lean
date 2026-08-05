@@ -112,14 +112,14 @@ only ever mention its own definitions cannot be contradicted by anything else in
 the corpus, and a wrong definition sheltered there is consistent with everything
 -- so the relation is stated rather than left implicit. -/
 theorem ridged_form_dominates_residualBiasEnergy
-    (m : PCCorrectionModel) (bias : Fin m.p → ℝ)
+    (m : Portability.PCCorrectionModel) (bias : Fin m.p → ℝ)
     (A : Matrix (Fin m.p) (Fin m.p) ℝ) (ridge : ℝ)
     (hA : 0 ≤ infoQuadraticForm A (m.removeTopPCs bias)) :
     ridge * m.residualBiasEnergy bias ≤
       infoQuadraticForm (ridgedInfoMatrix A ridge) (m.removeTopPCs bias) := by
   have hbound :=
     ridged_infoQuadraticForm_lower_bound A ridge (m.removeTopPCs bias) hA
-  unfold PCCorrectionModel.residualBiasEnergy
+  unfold Portability.PCCorrectionModel.residualBiasEnergy
   exact hbound
 
 end Descent.Spectral

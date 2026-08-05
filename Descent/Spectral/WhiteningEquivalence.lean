@@ -36,7 +36,7 @@ theorem rightTransform_add
     (transform : Matrix cols cols ℝ) (x y : Matrix rows cols ℝ) :
     rightTransform transform (x + y) =
       rightTransform transform x + rightTransform transform y := by
-  ext row col
+  PopGen.ext row col
   simp [rightTransform, Matrix.mulVec, dotProduct, Finset.sum_add_distrib,
     mul_add]
 
@@ -52,7 +52,7 @@ theorem right_whitening_removes_coloring
       rightWhiten inverseColor signal + noise := by
   rw [rightWhiten, rightTransform_add]
   congr 1
-  ext row col
+  PopGen.ext row col
   exact congrFun (hremove (noise row)) col
 
 /-- **A row-wise inverse lifts to the matrices it acts on.**
@@ -70,7 +70,7 @@ theorem rightTransform_leftInverse
     Function.LeftInverse (rightTransform outer : Matrix rows cols ℝ → Matrix rows cols ℝ)
       (rightTransform inner) := by
   intro data
-  ext row col
+  PopGen.ext row col
   exact congrFun (h (data row)) col
 
 /-- Recoloring is a left inverse of whitening whenever the corresponding row

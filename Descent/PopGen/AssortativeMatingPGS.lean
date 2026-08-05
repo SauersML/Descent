@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 
@@ -922,4 +922,4 @@ theorem founder_effect_excess_fst
 
 end PopulationStructure
 
-end Descent
+end Descent.PopGen

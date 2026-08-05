@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Foundations.ReferenceEvaluation
 import Mathlib.Data.Real.Sqrt
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Rank-one spectral threshold model
@@ -231,4 +231,4 @@ theorem pcCorrectabilityMargin_old_reference_point_discriminates_nothing :
   unfold pcCorrectabilityMargin bbpProxyThreshold demographicSpike effectiveSubgroupSize
   norm_num
 
-end Descent
+end Descent.Portability

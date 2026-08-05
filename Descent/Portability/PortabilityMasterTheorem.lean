@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Foundations.TransportIdentities
 import Descent.Core.Moments
 
-namespace Descent
+namespace Descent.Portability
 
 noncomputable section
 
@@ -956,7 +956,7 @@ numbers.
 
 theorem twoContrast_kappa (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).kappa = Matrix.of fun _ _ ↦ α := by
-  ext j l
+  PopGen.ext j l
   unfold DeploymentPopulation.kappa Foundations.predictorCausalCovariance
   show Foundations.covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ rad1 ω) = α
   rw [covariance_uniformExp_four]
@@ -1687,4 +1687,4 @@ end StatisticBoundary
 
 end
 
-end Descent
+end Descent.Portability

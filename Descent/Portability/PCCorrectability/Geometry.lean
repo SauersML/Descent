@@ -6,7 +6,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Spectral threshold geometry
@@ -58,4 +58,4 @@ theorem exists_superthreshold_subgroup_iff_balanced
     rw [demographicSpike, effectiveSubgroupSize_balanced n hn]
     convert hbalanced using 1; ring
 
-end Descent
+end Descent.Portability

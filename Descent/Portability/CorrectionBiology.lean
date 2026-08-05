@@ -13,7 +13,7 @@ Thus the correction obstruction and the biological interpretation agree at the l
 not merely at the level of one numerical example.
 -/
 
-namespace Descent
+namespace Descent.Portability
 
 /-- The canonical correction that pools a biological field and broadcasts its mean back to both
 dynamics. -/
@@ -28,7 +28,7 @@ theorem dynamicsPooledProjector_apply (β : Bool → ℝ) (persists : Bool) :
 /-- Pooling and rebroadcasting is an idempotent correction. -/
 theorem dynamicsPooledProjector_idempotent :
     dynamicsPooledProjector.comp dynamicsPooledProjector = dynamicsPooledProjector := by
-  ext β persists
+  PopGen.ext β persists
   simp only [LinearMap.comp_apply, dynamicsPooledProjector_apply]
   ring
 
@@ -257,4 +257,4 @@ theorem biologicalCorrectionNormalForm : BiologicalCorrectionNormalForm where
   represented_at_every_positive_order := dynamicsPooledProjector_mem_uniformCorrectionFamily
   all_uniform_corrections_contrast_blind := uniformDynamicsCorrection_add_contrast
 
-end Descent
+end Descent.Portability

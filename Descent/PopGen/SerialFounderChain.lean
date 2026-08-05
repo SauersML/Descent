@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib
 
-namespace Descent
+namespace Descent.PopGen
 
 /-!
 # The serial founder chain
@@ -360,4 +360,4 @@ theorem separationStep_not_determined_by_closedForm_fields :
 
 end SerialFounderChain
 
-end Descent
+end Descent.PopGen

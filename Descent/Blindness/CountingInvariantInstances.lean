@@ -124,19 +124,19 @@ def momentInvariant (m : ℕ) (lam : ℕ → ℝ) : ℕ → ℝ := fun p ↦ nor
     inverse-trace certificates differ by exactly `n/(n+1)`. Both bounds are theorems in
     `ImitationCapacity`; this packages them into the general structure. -/
 def meffApproxWitness (n o : ℕ) (hn : 0 < n) : ApproxWitness (ℕ → ℝ) (ℕ → ℝ) where
-  count := momentInvariant (meffSize n)
+  count := momentInvariant (Portability.meffSize n)
   dist := momentDist o
-  rate := inverseTraceCertificate (meffSize n)
-  left := meffPerturbed n
-  right := meffFlat n
+  rate := Portability.inverseTraceCertificate (Portability.meffSize n)
+  left := Portability.meffPerturbed n
+  right := Portability.meffFlat n
   countGap := 1 / ((n : ℝ) + 1)
   count_close := by
     refine Finset.sup'_le _ _ ?_
     intro p _
-    simpa [momentInvariant] using meff_moment_gap_le n p hn
+    simpa [momentInvariant] using Portability.meff_moment_gap_le n p hn
   rateGap := (n : ℝ) / ((n : ℝ) + 1)
   rate_sep := by
-    rw [meff_certificate_gap n hn]
+    rw [Portability.meff_certificate_gap n hn]
     exact le_abs_self _
 
 /-- **Every Lipschitz function of the moments misses the certificate.**
@@ -153,15 +153,15 @@ def meffApproxWitness (n o : ℕ) (hn : 0 < n) : ApproxWitness (ℕ → ℝ) (�
     to *approximate* one, by an amount that does not shrink as the panel grows. -/
 theorem meff_lipschitz_predictor_error_ge (n o : ℕ) (hn : 0 < n)
     (f : (ℕ → ℝ) → ℝ) (L : ℝ) (hL : 0 ≤ L)
-    (hf : |f (momentInvariant (meffSize n) (meffPerturbed n)) -
-            f (momentInvariant (meffSize n) (meffFlat n))|
-          ≤ L * momentDist o (momentInvariant (meffSize n) (meffPerturbed n))
-                             (momentInvariant (meffSize n) (meffFlat n))) :
+    (hf : |f (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n)) -
+            f (momentInvariant (Portability.meffSize n) (Portability.meffFlat n))|
+          ≤ L * momentDist o (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n))
+                             (momentInvariant (Portability.meffSize n) (Portability.meffFlat n))) :
     ((n : ℝ) / ((n : ℝ) + 1) - L * (1 / ((n : ℝ) + 1))) / 2
-      ≤ max |f (momentInvariant (meffSize n) (meffPerturbed n)) -
-              inverseTraceCertificate (meffSize n) (meffPerturbed n)|
-            |f (momentInvariant (meffSize n) (meffFlat n)) -
-              inverseTraceCertificate (meffSize n) (meffFlat n)| := by
+      ≤ max |f (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n)) -
+              Portability.inverseTraceCertificate (Portability.meffSize n) (Portability.meffPerturbed n)|
+            |f (momentInvariant (Portability.meffSize n) (Portability.meffFlat n)) -
+              Portability.inverseTraceCertificate (Portability.meffSize n) (Portability.meffFlat n)| := by
   have h := lipschitz_predictor_error_ge (meffApproxWitness n o hn) f L hL hf
   simpa [meffApproxWitness] using h
 

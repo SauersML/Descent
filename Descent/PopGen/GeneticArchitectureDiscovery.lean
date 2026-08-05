@@ -8,7 +8,7 @@ import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.HaplotypeTheory
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.PopGen
 
 open MeasureTheory
 open Matrix
@@ -68,12 +68,12 @@ section GWASDiscovery
     the two frequencies coincide, so a grid at matched frequencies would have
     had no power and this one does. -/
 noncomputable def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
-  n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
+  n * β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf_causal
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem discoveryNCP_at_reference_point :
     discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [discoveryNCP, genotypeVarianceHWE,
+  norm_num [discoveryNCP, Portability.genotypeVarianceHWE,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 
@@ -127,7 +127,7 @@ the other -- and the noncentrality parameter is even in the first and, through
 of the variant, and which allele the assembly happens to call reference is not. -/
 theorem discoveryNCP_allele_swap (n β maf ld : ℝ) :
     discoveryNCP n (-β) (1 - maf) ld = discoveryNCP n β maf ld := by
-  unfold discoveryNCP genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold discoveryNCP Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- **Rescaling every effect size by `c` scales the noncentrality parameter by `c²`.**
@@ -168,7 +168,7 @@ theorem discoveryNCP_increases_with_n
     have h_var : 0 < 2 * p * (1 - p) := by
       nlinarith
     exact mul_pos (mul_pos hβ2 hld2) h_var
-  simpa [genotypeVarianceHWE, mul_assoc,
+  simpa [Portability.genotypeVarianceHWE, mul_assoc,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy] using
     mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) h_factor
 
@@ -178,12 +178,12 @@ theorem genotypeVarianceHWE_strictMono_left_half
     (maf₁ maf₂ : ℝ)
     (h_order : maf₂ < maf₁)
     (h_maf₁_half : maf₁ ≤ 1 / 2) :
-    genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
+    Portability.genotypeVarianceHWE maf₂ < Portability.genotypeVarianceHWE maf₁ := by
   -- The shape fact -- `2 p (1 - p)` rises with `p` below the turning point -- is
   -- `two_mul_one_sub_strictMono_le_half` in `Descent.Foundations.Probability`, where it is about a
   -- real number rather than about a minor allele.  This theorem is that fact read through
   -- the name the genotype variance carries here.
-  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   exact Foundations.two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
@@ -208,24 +208,24 @@ theorem different_populations_different_hits
       gwasDiscovered n β maf₁ ld₁ z ∧ ¬ gwasDiscovered n β maf₂ ld₂ z := by
   rcases h_threshold_between with ⟨h_pop2_below, h_pop1_above⟩
   have h_var :
-      genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
+      Portability.genotypeVarianceHWE maf₂ < Portability.genotypeVarianceHWE maf₁ := by
     exact genotypeVarianceHWE_strictMono_left_half
       maf₁ maf₂ h_maf_order h_maf₁_half
-  have h_var_pos : 0 < genotypeVarianceHWE maf₂ := by
-    unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  have h_var_pos : 0 < Portability.genotypeVarianceHWE maf₂ := by
+    unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
     have h_maf₂_lt_one : maf₂ < 1 := by
       have h_maf₂_lt_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_maf_order h_maf₁_half
       linarith
     nlinarith [mul_pos h_maf₂_pos (sub_pos.mpr h_maf₂_lt_one)]
   have h_ld_sq_nn : 0 ≤ ld₁ ^ 2 := sq_nonneg ld₁
   have h_prod_lt :
-      ld₂ ^ 2 * genotypeVarianceHWE maf₂ <
-        ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
+      ld₂ ^ 2 * Portability.genotypeVarianceHWE maf₂ <
+        ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₁ := by
     calc
-      ld₂ ^ 2 * genotypeVarianceHWE maf₂
-        < ld₁ ^ 2 * genotypeVarianceHWE maf₂ := by
+      ld₂ ^ 2 * Portability.genotypeVarianceHWE maf₂
+        < ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₂ := by
             exact mul_lt_mul_of_pos_right h_ld_sq h_var_pos
-      _ ≤ ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
+      _ ≤ ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₁ := by
             exact mul_le_mul_of_nonneg_left (le_of_lt h_var) h_ld_sq_nn
   have h_prefactor_pos : 0 < n * β ^ 2 := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
@@ -320,23 +320,23 @@ theorem ct_more_variable_than_bayesian
     (h_beta : ∀ i, 0 < βSq i) :
     taggedScoreEstimationRisk targetTagVariance
         (fun i ↦ jamesSteinMSE
-          (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
+          (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
       taggedScoreEstimationRisk targetTagVariance
         (fun i ↦ jamesSteinMSE 1 (σSq i) (βSq i)) := by
   unfold taggedScoreEstimationRisk Descent.Core.innerSum
   refine Finset.sum_lt_sum ?_ ?_
   · intro i _
     have h_mse :
-        jamesSteinMSE (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+        jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
           jamesSteinMSE 1 (σSq i) (βSq i) := by
-      exact bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
+      exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact le_of_lt (mul_lt_mul_of_pos_left h_mse (h_tag i))
   · rcases h_nonempty with ⟨i⟩
     refine ⟨i, Finset.mem_univ i, ?_⟩
     have h_mse :
-        jamesSteinMSE (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+        jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
           jamesSteinMSE 1 (σSq i) (βSq i) := by
-      exact bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
+      exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact mul_lt_mul_of_pos_left h_mse (h_tag i)
 
 
@@ -713,8 +713,8 @@ theorem is what catches them drifting apart. -/
 theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
     (n₁ n₂ rg priorVariance : ℝ) :
     multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance =
-      multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
-  simp only [multiTraitEffectiveSampleSize, multiAncestryEffectiveN]
+      Portability.multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
+  simp only [multiTraitEffectiveSampleSize, Portability.multiAncestryEffectiveN]
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
 
@@ -765,7 +765,7 @@ noncomputable def multiTraitDiscoveryNCP
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem multiTraitDiscoveryNCP_at_reference_point :
     multiTraitDiscoveryNCP 1 1 0 1 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,
+  norm_num [multiTraitDiscoveryNCP, discoveryNCP, Portability.genotypeVarianceHWE,
     multiTraitEffectiveSampleSize,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
@@ -1039,20 +1039,20 @@ theorem multi_trait_increases_effective_n
   have h_n : n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance := by
     unfold multiTraitEffectiveSampleSize
     linarith
-  have h_factor : 0 < β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf := by
+  have h_factor : 0 < β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
     have h_ld_sq : 0 < ld ^ 2 := sq_pos_of_ne_zero h_ld
-    have h_var : 0 < genotypeVarianceHWE maf := by
-      unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    have h_var : 0 < Portability.genotypeVarianceHWE maf := by
+      unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
       nlinarith [mul_pos h_maf (sub_pos.mpr h_maf_lt_one)]
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor
   · exact h_n
   · unfold multiTraitDiscoveryNCP discoveryNCP
     have h_ncp :
-        n₁ * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) <
+        n₁ * (β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf) <
           multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance *
-            (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) :=
+            (β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf) :=
       mul_lt_mul_of_pos_right h_n h_factor
     simpa [mul_assoc, mul_left_comm, mul_comm] using h_ncp
 
@@ -1090,7 +1090,7 @@ section WGSAndRareVariants
 /-- Common-variant-only witness: one shared common causal locus is directly
 scored in both populations, and there is no proxy tagging or target-only
 biology. -/
-noncomputable def commonOnlyPortableModel : CrossPopulationMetricModel 2 2 where
+noncomputable def commonOnlyPortableModel : Portability.CrossPopulationMetricModel 2 2 where
   beta := Pop.pair (![1, 0]) (![1, 0])
   sigmaTag := Pop.pair 1 1
   directCausal := Pop.pair (!![1, 0; 0, 0]) (!![1, 0; 0, 0])
@@ -1114,7 +1114,7 @@ noncomputable def commonOnlyPortableModel : CrossPopulationMetricModel 2 2 where
 locus and one source-specific rare causal locus. The target retains only the
 common locus, so the within-source `R²` rises while the transported target
 signal stays unchanged. -/
-noncomputable def commonAndRarePortableModel : CrossPopulationMetricModel 2 2 :=
+noncomputable def commonAndRarePortableModel : Portability.CrossPopulationMetricModel 2 2 :=
   -- Only the effect vector and the direct-causal covariance differ from the
   -- common-variant-only witness; the other fifteen fields were copied verbatim, so the
   -- two witnesses could drift apart in a field neither of them is about.  Stated as an
@@ -1129,42 +1129,42 @@ The unfolding list is the same for every witness, and it was written out once pe
 four copies here, differing only in which model name led the list.  A copy that drifts is a
 theorem that evaluates a different chain from its neighbour while reading identically. -/
 local macro "source_r2_of " m:term : tactic =>
-  `(tactic| norm_num [$m:term, r2FromSourceWeights,
+  `(tactic| norm_num [$m:term, Portability.r2FromSourceWeights,
       commonOnlyPortableModel,
-      explainedSignalVarianceFromSourceWeights,
-      predictiveCovarianceFromSourceWeights,
-      scoreVarianceFromSourceWeights,
-      sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
+      Portability.explainedSignalVarianceFromSourceWeights,
+      Portability.predictiveCovarianceFromSourceWeights,
+      Portability.scoreVarianceFromSourceWeights,
+      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
       sigmaTagCausal, dotProduct, Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec])
 
 /-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
 terms the source chain has no need of, and is otherwise the same list. -/
 local macro "target_r2_of " m:term : tactic =>
-  `(tactic| norm_num [$m:term, r2FromSourceWeights,
+  `(tactic| norm_num [$m:term, Portability.r2FromSourceWeights,
       commonOnlyPortableModel,
-      explainedSignalVarianceFromSourceWeights,
-      predictiveCovarianceFromSourceWeights,
-      scoreVarianceFromSourceWeights,
-      sourceWeightsFromExplicitDrivers, sourceERMWeights, crossCovariance,
-      effectiveOutcomeVariance, irreducibleTargetResidualBurden,
-      brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
-      novelUntaggablePhenotypeResidual, sigmaTagCausal,
+      Portability.explainedSignalVarianceFromSourceWeights,
+      Portability.predictiveCovarianceFromSourceWeights,
+      Portability.scoreVarianceFromSourceWeights,
+      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
+      Portability.effectiveOutcomeVariance, Portability.irreducibleTargetResidualBurden,
+      Portability.brokenTaggingResidual, Portability.ancestrySpecificLDResidual, Portability.sourceSpecificOverfitResidual,
+      Portability.novelUntaggablePhenotypeResidual, sigmaTagCausal,
       dotProduct, Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec])
 
 theorem commonOnlyPortableModel_sourceR2 :
-    r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by
+    Portability.r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by
   source_r2_of commonOnlyPortableModel
 
 theorem commonOnlyPortableModel_targetR2 :
-    r2FromSourceWeights commonOnlyPortableModel Pop.target = 1 / 4 := by
+    Portability.r2FromSourceWeights commonOnlyPortableModel Pop.target = 1 / 4 := by
   target_r2_of commonOnlyPortableModel
 
 theorem commonAndRarePortableModel_sourceR2 :
-    r2FromSourceWeights commonAndRarePortableModel Pop.source = 1 / 2 := by
+    Portability.r2FromSourceWeights commonAndRarePortableModel Pop.source = 1 / 2 := by
   source_r2_of commonAndRarePortableModel
 
 theorem commonAndRarePortableModel_targetR2 :
-    r2FromSourceWeights commonAndRarePortableModel Pop.target = 1 / 8 := by
+    Portability.r2FromSourceWeights commonAndRarePortableModel Pop.target = 1 / 8 := by
   target_r2_of commonAndRarePortableModel
 
 /-- **WGS discovers causal variants directly (no tagging needed).**
@@ -1176,20 +1176,20 @@ theorem commonAndRarePortableModel_targetR2 :
     effect heterogeneity and context mismatch may still remain. -/
 theorem wgs_eliminates_ld_mismatch
     {p q : ℕ}
-    (m : CrossPopulationMetricModel p q)
+    (m : Portability.CrossPopulationMetricModel p q)
     (h_direct : (m.directCausal Pop.target) = (m.directCausal Pop.source))
     (h_novelDirect : (m.novelDirectCausal Pop.target) = 0)
     (h_proxySource : (m.proxyTagging Pop.source) = 0)
     (h_proxyTarget : (m.proxyTagging Pop.target) = 0)
     (h_novelProxy : (m.novelProxyTagging Pop.target) = 0) :
-    brokenTaggingResidual m = 0 := by
+    Portability.brokenTaggingResidual m = 0 := by
   have h_sigma :
-      sigmaTagCausalSourceAt m Pop.source = sigmaTagCausalSourceAt m Pop.target := by
+      Portability.sigmaTagCausalSourceAt m Pop.source = Portability.sigmaTagCausalSourceAt m Pop.target := by
     ext i j
-    simp [sigmaTagCausalSourceAt, h_direct, m.novelDirectCausal_source,
+    simp [Portability.sigmaTagCausalSourceAt, h_direct, m.novelDirectCausal_source,
       m.novelProxyTagging_source, h_novelDirect, h_proxySource, h_proxyTarget,
       h_novelProxy]
-  unfold brokenTaggingResidual
+  unfold Portability.brokenTaggingResidual
   rw [h_sigma]
   simp
 
@@ -1201,12 +1201,12 @@ theorem wgs_eliminates_ld_mismatch
     discovery population. But in the target population the rare component does
     not contribute, so the portability ratio drops from `1` to `1/4`. -/
 theorem rare_variant_pgs_poor_portability :
-    mechanisticPortabilityRatio commonAndRarePortableModel <
-      mechanisticPortabilityRatio commonOnlyPortableModel := by
-  unfold mechanisticPortabilityRatio
+    Portability.mechanisticPortabilityRatio commonAndRarePortableModel <
+      Portability.mechanisticPortabilityRatio commonOnlyPortableModel := by
+  unfold Portability.mechanisticPortabilityRatio
   rw [commonAndRarePortableModel_sourceR2, commonAndRarePortableModel_targetR2,
     commonOnlyPortableModel_sourceR2, commonOnlyPortableModel_targetR2]
-  norm_num [mechanisticPortabilityRatio]
+  norm_num [Portability.mechanisticPortabilityRatio]
 
 /-- **Optimal PGS strategy combines common and rare variants.**
     In the explicit common-vs-rare witness above, adding the source-specific
@@ -1215,14 +1215,14 @@ theorem rare_variant_pgs_poor_portability :
     the idea that rare variation helps local prediction without improving
     cross-population transport. -/
 theorem combined_strategy_optimal :
-    r2FromSourceWeights commonOnlyPortableModel Pop.source <
-      r2FromSourceWeights commonAndRarePortableModel Pop.source ∧
-    r2FromSourceWeights commonAndRarePortableModel Pop.target <
-      r2FromSourceWeights commonOnlyPortableModel Pop.target := by
+    Portability.r2FromSourceWeights commonOnlyPortableModel Pop.source <
+      Portability.r2FromSourceWeights commonAndRarePortableModel Pop.source ∧
+    Portability.r2FromSourceWeights commonAndRarePortableModel Pop.target <
+      Portability.r2FromSourceWeights commonOnlyPortableModel Pop.target := by
   rw [commonOnlyPortableModel_sourceR2, commonAndRarePortableModel_sourceR2,
     commonAndRarePortableModel_targetR2, commonOnlyPortableModel_targetR2]
   norm_num
 
 end WGSAndRareVariants
 
-end Descent
+end Descent.PopGen

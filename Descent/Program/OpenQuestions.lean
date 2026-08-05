@@ -7,7 +7,7 @@ namespace Descent.Program
 
 open MeasureTheory
 open scoped ProbabilityTheory
-open TransportedMetrics (r2FromSignalVariance)
+open PopGen.TransportedMetrics (r2FromSignalVariance)
 
 /-!
 # Formal Proofs for Open Questions in PGS Portability
@@ -542,18 +542,18 @@ theorem effect_retention_lowers_target_r2_at_fixed_fst
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfstT : fstT < 1)
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
-    r2FromSignalVariance (ρ ^ 2 * presentDayPGSVariance V_A fstT) V_E <
-      r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E := by
-  apply expectedR2_strictMono_nonneg V_E _ _ hVE
+    PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fstT) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fstT) V_E := by
+  apply Portability.expectedR2_strictMono_nonneg V_E _ _ hVE
   · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
-      (by unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)))
-  · have h_pdv_pos : 0 < presentDayPGSVariance V_A fstT := by
-      unfold presentDayPGSVariance pgsVarianceFromHet; exact mul_pos hVA (by linarith)
-    calc ρ ^ 2 * presentDayPGSVariance V_A fstT
-        < 1 * presentDayPGSVariance V_A fstT := by
+      (by unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet; exact mul_pos hVA (by linarith)))
+  · have h_pdv_pos : 0 < Portability.presentDayPGSVariance V_A fstT := by
+      unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet; exact mul_pos hVA (by linarith)
+    calc ρ ^ 2 * Portability.presentDayPGSVariance V_A fstT
+        < 1 * Portability.presentDayPGSVariance V_A fstT := by
           apply mul_lt_mul_of_pos_right _ h_pdv_pos
           nlinarith [sq_abs ρ, sq_nonneg ρ]
-      _ = presentDayPGSVariance V_A fstT := one_mul _
+      _ = Portability.presentDayPGSVariance V_A fstT := one_mul _
 
 end SelectionModel
 

@@ -6,7 +6,7 @@ import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Portability
 
 /-!
 # Spectral phase and residual-overlap bounds
@@ -156,4 +156,4 @@ theorem markerDangerIndex_lt_one_iff_confounding_lt_bbpProxyThreshold
       mul_nonneg (by linarith) hthreshold.le
     nlinarith [hmul, hgap]
 
-end Descent
+end Descent.Portability

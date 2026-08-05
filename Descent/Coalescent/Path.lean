@@ -125,7 +125,7 @@ theorem blockCountAt_zero (n : ℕ) {hold : ℕ → ℝ} (hn : 1 ≤ n)
   classical
   have hset : ((Finset.Icc 1 n).filter fun k => (0 : ℝ) < descentTime n hold k)
       = Finset.Icc 1 (n - 1) := by
-    ext k
+    PopGen.ext k
     rw [mem_filter, mem_Icc, mem_Icc]
     constructor
     · rintro ⟨⟨hk1, hkn⟩, hlt⟩

@@ -528,7 +528,7 @@ def optimalWeightsFromMoments
 omit [DecidableEq J] in
 theorem matrix_mulVec_add (A : Matrix J J ℝ) (x y : J → ℝ) :
     A.mulVec (fun i ↦ x i + y i) = A.mulVec x + A.mulVec y := by
-  ext j
+  PopGen.ext j
   simp [Matrix.mulVec, dotProduct, left_distrib, Finset.sum_add_distrib]
 
 theorem covariance_with_causal_signal
@@ -555,7 +555,7 @@ theorem crossCovVector_decomposition
     (β : L → ℝ) (h : Ω → ℝ) :
     crossCovVector E X (fun ω ↦ causalSignal β C ω + h ω)
       = (predictorCausalCovariance E X C).mulVec β + contextCrossCovVector E X h := by
-  ext j
+  PopGen.ext j
   unfold crossCovVector predictorCausalCovariance contextCrossCovVector
   rw [covariance_add_right]
   rw [covariance_with_causal_signal]
@@ -621,7 +621,7 @@ theorem secondMoment_eq_covariance_of_centered
     (E : ExpFunctional Ω) (X : Ω → J → ℝ)
     (hcentered : ∀ i, E (fun ω ↦ X ω i) = 0) :
     secondMomentMatrix E X = covarianceMatrix E X := by
-  ext i j
+  PopGen.ext i j
   unfold secondMomentMatrix covarianceMatrix
   simp [covariance_eq_expect_mul_sub_means, hcentered]
 
@@ -816,7 +816,7 @@ theorem scalar_summary_factorization_of_kernel_inclusion
     ∃ c : ℝ, A = c • f := by
   by_cases hf : f = 0
   · refine ⟨0, ?_⟩
-    ext θ
+    PopGen.ext θ
     have hAθ : A θ = 0 := by
       apply hker θ
       simp [hf]
@@ -825,11 +825,11 @@ theorem scalar_summary_factorization_of_kernel_inclusion
       by_contra hnone
       push_neg at hnone
       apply hf
-      ext v
+      PopGen.ext v
       exact hnone v
     rcases hnonzero with ⟨v, hv⟩
     refine ⟨A v / f v, ?_⟩
-    ext θ
+    PopGen.ext θ
     let η : V := θ - (f θ / f v) • v
     have hfη : f η = 0 := by
       dsimp [η]
