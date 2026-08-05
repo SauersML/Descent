@@ -238,7 +238,7 @@ theorem referenceTree_is_gauge_for_tajima :
       ∧ (∀ t₁ t₂ : RefTree, tajimaNumerator t₁ subsample - tajimaNumerator t₂ subsample
           = Coalescent.wattersonEstimator (S t₂ subsample : ℝ) 3
               - Coalescent.wattersonEstimator (S t₁ subsample : ℝ) 3) := by
-  refine ⟨fun θ n hn => Coalescent.expectedTajimaNumerator_eq_zero hn θ,
+  refine ⟨fun θ n hn ↦ Coalescent.expectedTajimaNumerator_eq_zero hn θ,
     treeA_spanning, treeG_spanning, tajimaNumerator_subsample_A, ?_, ?_⟩
   · rw [tajimaNumerator_subsample_G]
     norm_num
