@@ -71,8 +71,10 @@ theorem integral_colourIndicator [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : 
   have hind : colourIndicator Z r i = Set.indicator {ω | Z i ω = r} (1 : Ω → ℝ) := by
     funext ω
     unfold colourIndicator
-    rw [Set.indicator_apply]
-    by_cases h : Z i ω = r <;> simp [h]
+    by_cases h : Z i ω = r
+    · rw [if_pos h, Set.indicator_of_mem (show ω ∈ {ω | Z i ω = r} from h)]
+      rfl
+    · rw [if_neg h, Set.indicator_of_not_mem (show ω ∉ {ω | Z i ω = r} from h)]
   rw [hind, integral_indicator_one hmeas]
 
 /-- **K-C (3.8) for the paintbox.**  The frequency of colour `r` among the first `n` balls
@@ -101,8 +103,10 @@ theorem tendsto_colourFrequency [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : M
       (measurable_const.ite (measurable_id (measurableSet_singleton r)) measurable_const)
   have hlaw := ProbabilityTheory.strong_law_ae (X := colourIndicator Z r)
     (integrable_colourIndicator hZ r 0) hindep' hident'
+  have hmean := integral_colourIndicator hZ r 0
   filter_upwards [hlaw] with ω hω
-  rwa [integral_colourIndicator hZ r 0] at hω
+  rw [← hmean]
+  exact hω
 
 end Coalescent
 
