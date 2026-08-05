@@ -101,6 +101,32 @@ theorem qst_in_unit (V_b V_w : ℝ)
   · exact div_nonneg h_b (le_of_lt h_denom)
   · rw [div_le_one h_denom]; linarith
 
+/-- **`Q_ST = F_ST` under drift alone.** This is the NULL the whole `Q_ST`-`F_ST` test is
+read against, and until now this file described the test in prose without stating it.
+
+Under pure drift the two variance components are determined by `F_ST` and the ancestral
+additive variance: the between-population component is `2·F_ST·V_A`, which is the body
+`expectedPGSDiffVariance` carries and which `battery_bulk3.py` measured at 60.79 against
+60.98 ± 1.36, 183.12 against 185.13 ± 4.14 and 372.76 against 366.22 ± 8.19; the
+within-population component is the retained fraction `(1 - F_ST)·V_A`. Feeding those two
+into `Q_ST` returns `F_ST` exactly, for every `F_ST` and every nonzero `V_A`.
+
+That exactness is the point. The test detects selection by `Q_ST` DEPARTING from `F_ST`,
+so a null that held only approximately, or only in a limit, would leave every departure
+ambiguous between selection and the approximation. The `2` in `Q_ST`'s denominator is what
+makes it exact -- it is the same factor of two that
+`expectedPGSDiffVariance`'s docstring records being 50.7 percent low at 22.7 sems without.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is algebra, given the two components.
+    What is measured is the between-population component it is fed, and that measurement is
+    cited above. A departure of a REAL `Q_ST` from a real `F_ST` is evidence about
+    selection; this theorem is what makes "departure" mean something. -/
+theorem qst_eq_fst_under_drift (fst V_A : ℝ) (hV : V_A ≠ 0) :
+    qst (2 * fst * V_A) ((1 - fst) * V_A) = fst := by
+  unfold qst Descent.Core.oddsLike
+  field_simp
+  ring
+
 end QSTFSTTest
 
 
