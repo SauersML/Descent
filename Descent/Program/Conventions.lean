@@ -1440,6 +1440,32 @@ theorem pcTargetAxisEfficacy_eq_proportionalReduction (residual baseline : ℝ) 
       Portability.pcTargetAxisEfficacy baseline residual = PopGen.r2FromMSE residual baseline := by
   refine ⟨rfl, rfl, rfl⟩
 
+/-- **Slatkin's identity**: `1 - H_w/H_b = 1 - E[T_w]/E[T_b]`.
+
+The heterozygosity reading of `F_ST` and the coalescence-time reading are the same number
+whenever the two RATIOS agree -- which is the content, and it is a premise here rather than
+a theorem. Under the infinite-sites limit expected heterozygosity is proportional to
+expected coalescence time, so the constant cancels in the ratio; away from that limit it
+does not, and this statement correctly says nothing.
+
+What the corpus gets from it is a lattice edge. `fstFromHetRatio` and
+`hudsonFstFromCoalescenceTimes` are both `Core.proportionalReduction`, so at EQUAL
+arguments they agree by `rfl` and that is what
+`pcTargetAxisEfficacy_eq_proportionalReduction` above records. This says the harder thing:
+at DIFFERENT arguments -- heterozygosities on one side, coalescence times on the other --
+they still agree, provided the population genetics that relates those arguments holds. Both
+are Hudson-convention readings, so the edge is inside one convention and needs no bridge.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the algebra is `rw [h]`. The premise
+    `H_w/H_b = E[T_w]/E[T_b]` is where all the biology is, and it is supplied by the
+    caller, not established here. -/
+theorem slatkin_hetRatio_eq_coalescenceRatio
+    (Hw Hb ETw ETb : ℝ) (h : Hw / Hb = ETw / ETb) :
+    PopGen.fstFromHetRatio Hw Hb = Portability.hudsonFstFromCoalescenceTimes ETw ETb := by
+  unfold PopGen.fstFromHetRatio Portability.hudsonFstFromCoalescenceTimes
+    Descent.Core.proportionalReduction
+  rw [h]
+
 end EquilibriumAgreements
 
 section InlinedConstants
