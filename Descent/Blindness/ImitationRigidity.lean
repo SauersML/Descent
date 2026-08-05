@@ -82,12 +82,12 @@ theorem covarianceMatrix_addRankOneSignal
     funext ω
     ring
   rw [hi, hj]
-  rw [covariance_add_left, covariance_add_right, covariance_add_right]
+  rw [covariance_add_left_exp, covariance_add_right, covariance_add_right]
   have hscaledLeft :
       covariance E (fun ω ↦ (scale * loading i) * factor ω)
           (fun ω ↦ noise ω j) = 0 := by
     change covariance E ((scale * loading i) • factor) (fun ω ↦ noise ω j) = 0
-    rw [covariance_smul_left, hright j, mul_zero]
+    rw [covariance_smul_left_exp, hright j, mul_zero]
   have hscaledRight :
       covariance E (fun ω ↦ noise ω i)
           (fun ω ↦ (scale * loading j) * factor ω) = 0 := by
@@ -99,7 +99,7 @@ theorem covarianceMatrix_addRankOneSignal
         scale ^ 2 * loading i * loading j := by
     change covariance E ((scale * loading i) • factor)
       ((scale * loading j) • factor) = _
-    rw [covariance_smul_left, covariance_smul_right, hfactor]
+    rw [covariance_smul_left_exp, covariance_smul_right, hfactor]
     ring
   rw [hscaledLeft, hscaledRight, hscaledBoth]
   ring

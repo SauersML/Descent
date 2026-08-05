@@ -285,22 +285,28 @@ theorem covariance_finset_sum_right
 
 /-- Covariance is symmetric.
 
-    Previously duplicated as `covariance_comm_exp` in `Blindness.ImitationRigidity`,
-    which is where the corpus first needed it.  It is a fact about any positive linear
-    functional and belongs with the rest of the covariance algebra; the copy is gone and
-    its seven uses point here. -/
-theorem covariance_comm (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+    Previously duplicated in `Blindness.ImitationRigidity`, which is where the corpus
+    first needed it.  It is a fact about any positive linear functional and belongs with
+    the rest of the covariance algebra; the copy is gone and its seven uses point here.
+
+    The `_exp` suffix is not decoration.  Mathlib has `ProbabilityTheory.covariance_comm`
+    for its measure-theoretic `covariance`, and these four names -- this one,
+    `covariance_add_left_exp`, `covariance_smul_left_exp`, `variance_add_exp` -- would
+    shadow it.  The suffix says which covariance: the one of an `ExpFunctional`, which
+    carries no measure. -/
+theorem covariance_comm_exp (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
     covariance E X Y = covariance E Y X := by
   unfold covariance
   exact congrArg E (funext fun ω ↦ mul_comm _ _)
 
-theorem covariance_add_left (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
+theorem covariance_add_left_exp (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
     covariance E (fun ω ↦ X ω + Y ω) Z = covariance E X Z + covariance E Y Z := by
-  rw [covariance_comm, covariance_add_right, covariance_comm E Z X, covariance_comm E Z Y]
+  rw [covariance_comm_exp, covariance_add_right, covariance_comm_exp E Z X,
+    covariance_comm_exp E Z Y]
 
-theorem covariance_smul_left (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ) :
+theorem covariance_smul_left_exp (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ) :
     covariance E (c • X) Y = c * covariance E X Y := by
-  rw [covariance_comm, covariance_smul_right, covariance_comm E Y X]
+  rw [covariance_comm_exp, covariance_smul_right, covariance_comm_exp E Y X]
 
 /-- Variance is the covariance of an observable with itself. -/
 theorem variance_eq_covariance_self (E : ExpFunctional Ω) (Z : Ω → ℝ) :
@@ -309,13 +315,13 @@ theorem variance_eq_covariance_self (E : ExpFunctional Ω) (Z : Ω → ℝ) :
   exact congrArg E (funext fun ω ↦ pow_two _)
 
 /-- `Var(X + Y) = Var X + 2 Cov(X,Y) + Var Y`, for any positive linear functional. -/
-theorem variance_add (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+theorem variance_add_exp (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
     variance E (fun ω ↦ X ω + Y ω)
       = variance E X + 2 * covariance E X Y + variance E Y := by
-  rw [variance_eq_covariance_self, covariance_add_left,
+  rw [variance_eq_covariance_self, covariance_add_left_exp,
     covariance_add_right, covariance_add_right,
     variance_eq_covariance_self E X, variance_eq_covariance_self E Y,
-    covariance_comm E Y X]
+    covariance_comm_exp E Y X]
   ring
 
 theorem eval_affine (E : ExpFunctional Ω) (a b : ℝ) (Z : Ω → ℝ) :
@@ -730,13 +736,13 @@ omit [Fintype L] [DecidableEq L] in
 theorem covariance_linScore_left
     (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
     covariance E (linScore w X) Z = ∑ j, w j * covariance E (fun ω ↦ X ω j) Z := by
-  rw [covariance_comm]
+  rw [covariance_comm_exp]
   have hsum : linScore w X = (fun ω ↦ ∑ j, ((w j) • (fun ω' ↦ X ω' j)) ω) := by
     funext ω
     simp [linScore, dot, mul_comm]
   rw [hsum, covariance_finset_sum_right]
   refine Finset.sum_congr rfl fun j _ ↦ ?_
-  rw [covariance_smul_right, covariance_comm]
+  rw [covariance_smul_right, covariance_comm_exp]
 
 omit [Fintype L] [DecidableEq L] in
 /-- **The quadratic-form law.**  A covariance between two linear scores on the same
@@ -750,9 +756,9 @@ theorem covariance_linScore_linScore
   simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
   refine Finset.sum_congr rfl fun j _ ↦ ?_
   congr 1
-  rw [covariance_comm, covariance_linScore_left]
+  rw [covariance_comm_exp, covariance_linScore_left]
   refine Finset.sum_congr rfl fun k _ ↦ ?_
-  rw [covariance_comm]
+  rw [covariance_comm_exp]
   ring
 
 omit [Fintype L] [DecidableEq L] in

@@ -246,8 +246,8 @@ section Bilinearity
 
 The metric laws of `§2` are all instances of one fact: `covariance` is bilinear, so a
 covariance between two linear combinations of coordinate families is the quadratic form
-of the coordinate covariance matrix.  The lemmas themselves --- `covariance_comm`,
-`variance_add`, `covariance_linScore_left`, `covariance_linScore_linScore`,
+of the coordinate covariance matrix.  The lemmas themselves --- `covariance_comm_exp`,
+`variance_add_exp`, `covariance_linScore_left`, `covariance_linScore_linScore`,
 `variance_linScore`, `covariance_linScore_eq_dot_crossCov`, `variance_affine`,
 `covariance_affine_right` --- are facts about an arbitrary positive linear functional
 with no portability content, so they live in `Descent.Foundations.TransportIdentities`
@@ -327,7 +327,7 @@ theorem outcomeVariance_eq :
     P.outcomeVariance
       = dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h := by
   unfold outcomeVariance phenotype
-  rw [variance_add]
+  rw [variance_add_exp]
   congr 1
   · congr 1
     · exact variance_linScore P.E P.C P.β
@@ -389,7 +389,7 @@ theorem deployedMse_eq :
   rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
     show variance P.E (P.score w) = P.scoreVariance w from rfl,
     show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-      covariance_comm _ _ _]
+      covariance_comm_exp _ _ _]
   rw [P.outcomeVariance_eq, P.scoreVariance_eq w, P.predictiveCovariance_eq w]
   unfold bias
   ring
@@ -441,7 +441,12 @@ def taggingShift : ℝ :=
 
 /-- **Effect-turnover channel.**  The change in causal effects, read against the
 *target* tagging.  Sign flips, effect-size heterogeneity and variants causal in one
-population only all land here. -/
+population only all land here.
+
+    Empirical status: UNTESTED.  This is one summand of an identity
+    (`predictiveCovariance_transport`), not an independent model of turnover, so what
+    a simulation could check is the identity rather than this term; the identity holds
+    by `ring` once `§2` is in hand. -/
 def effectTurnover : ℝ :=
   dot D.w (D.target.kappa.mulVec (D.target.β - D.source.β))
 
@@ -705,10 +710,17 @@ slope are concerned. -/
 def portabilityStatistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) : ℝ × ℝ × ℝ :=
   (P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance)
 
-/-- `R²` as an explicit function of the statistic. -/
+/-- `R²` as an explicit function of the statistic.
+
+    Empirical status: UNTESTED.  It is the textbook squared-correlation formula written
+    on a triple; `r2_factors_through_statistic` is the statement that it agrees with the
+    generative `R²`, and that is a definitional identity rather than a prediction. -/
 def r2OfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 ^ 2 / (s.1 * s.2.2)
 
-/-- Calibration slope as an explicit function of the statistic. -/
+/-- Calibration slope as an explicit function of the statistic.
+
+    Empirical status: UNTESTED.  As with `r2OfStatistic`, the content is
+    `slope_factors_through_statistic`, which is definitional. -/
 def slopeOfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 / s.1
 
 omit [DecidableEq J] [DecidableEq L] in
@@ -790,8 +802,13 @@ def twoContrastPopulation (α γ δ : ℝ) : DeploymentPopulation (Fin 4) (Fin 1
   β := fun _ ↦ γ
   h := fun ω ↦ δ * rad2 ω
 
-/-- The single scored variant is used with weight one. -/
-def unitWeight : Fin 1 → ℝ := fun _ ↦ 1
+/-- The single scored variant is used with weight one.
+
+    `(1 : Fin 1 → ℝ)`, Mathlib's `Pi.one`, rather than a written `fun _ ↦ 1`: the
+    duplication scan caught the latter as alpha-equivalent to
+    `Conditionals.ConditionalGain.gainBounded`, two definitions with the same body tied
+    by neither a call nor a theorem. -/
+def unitWeight : Fin 1 → ℝ := 1
 
 theorem twoContrast_scoreVariance (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).scoreVariance unitWeight = α ^ 2 := by
@@ -874,6 +891,89 @@ a scalar summary of genetic distance is a function of one thing, and `R²` is a 
 of three, so no scalar can predict it.  `no_score_side_summary_determines_r2` states that
 directly rather than by analogy.
 -/
+
+/-! ### A constructed deployment
+
+Every theorem of `§3` takes a `Deployment`.  Until one is constructed, they are true and
+empty.  The pair below is a real one -- four individuals on each side, explicit
+contrasts -- and the channel computation after it exhibits the `§3` decomposition on
+numbers.
+-/
+
+theorem twoContrast_kappa (α γ δ : ℝ) :
+    (twoContrastPopulation α γ δ).kappa = Matrix.of fun _ _ ↦ α := by
+  ext j l
+  unfold DeploymentPopulation.kappa predictorCausalCovariance
+  show covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ rad1 ω) = α
+  rw [covariance_uniformExp_four]
+  norm_num [rad1, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.tail_cons,
+    Matrix.head_cons]
+  ring
+
+theorem twoContrast_contextX (α γ δ : ℝ) :
+    (twoContrastPopulation α γ δ).contextX = fun _ ↦ 0 := by
+  funext j
+  unfold DeploymentPopulation.contextX contextCrossCovVector
+  show covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ δ * rad2 ω) = 0
+  rw [covariance_uniformExp_four]
+  norm_num [rad1, rad2, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.tail_cons,
+    Matrix.head_cons]
+
+/-- **A constructed deployment.**  Two four-individual populations and one weight
+vector: the inhabitant that makes `§3` a statement about something. -/
+def twoContrastDeployment (αS γS δS αT γT δT : ℝ) :
+    Deployment (Fin 4) (Fin 4) (Fin 1) (Fin 1) where
+  source := twoContrastPopulation αS γS δS
+  target := twoContrastPopulation αT γT δT
+  w := unitWeight
+
+/-- **The three channels of `§3`, computed.**
+
+    Tagging shift `(α_T - α_S)·γ_S`, effect turnover `α_T·(γ_T - γ_S)`, context shift
+    zero -- the last because the residual here rides the contrast orthogonal to the
+    scored variant, which is what "no stratification" means in this model. -/
+theorem twoContrastDeployment_channels (αS γS δS αT γT δT : ℝ) :
+    (twoContrastDeployment αS γS δS αT γT δT).taggingShift = (αT - αS) * γS ∧
+      (twoContrastDeployment αS γS δS αT γT δT).effectTurnover = αT * (γT - γS) ∧
+      (twoContrastDeployment αS γS δS αT γT δT).contextShift = 0 := by
+  refine ⟨?_, ?_, ?_⟩
+  · show dot unitWeight (((twoContrastPopulation αT γT δT).kappa
+        - (twoContrastPopulation αS γS δS).kappa).mulVec
+        (twoContrastPopulation αS γS δS).β) = (αT - αS) * γS
+    rw [twoContrast_kappa, twoContrast_kappa]
+    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Matrix.sub_apply,
+      twoContrastPopulation]
+  · show dot unitWeight ((twoContrastPopulation αT γT δT).kappa.mulVec
+        ((twoContrastPopulation αT γT δT).β - (twoContrastPopulation αS γS δS).β))
+      = αT * (γT - γS)
+    rw [twoContrast_kappa]
+    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Pi.sub_apply, twoContrastPopulation]
+  · show dot unitWeight ((twoContrastPopulation αT γT δT).contextX
+        - (twoContrastPopulation αS γS δS).contextX) = 0
+    rw [twoContrast_contextX, twoContrast_contextX]
+    simp [dot, unitWeight]
+
+/-- **Two loud channels that cancel exactly.**
+
+    Source `(α, γ) = (1, 2)`, target `(2, 1)`.  The tagging shift is `+2`, the effect
+    turnover is `-2`, and the predictive covariance does not move at all.
+
+    This is why `§3`'s decomposition is stated as an identity between a difference and a
+    sum, and never as a bound on the difference by the size of the channels: a
+    deployment can have large tagging change and large effect turnover and be, on this
+    metric, perfectly portable.  A diagnostic that flags either channel alone would flag
+    this deployment; a diagnostic that flags their sum would not. -/
+theorem twoContrastDeployment_channels_cancel :
+    (twoContrastDeployment 1 2 0 2 1 0).taggingShift = 2 ∧
+      (twoContrastDeployment 1 2 0 2 1 0).effectTurnover = -2 ∧
+      (twoContrastDeployment 1 2 0 2 1 0).target.predictiveCovariance unitWeight
+        = (twoContrastDeployment 1 2 0 2 1 0).source.predictiveCovariance unitWeight := by
+  obtain ⟨ht, he, _⟩ := twoContrastDeployment_channels 1 2 0 2 1 0
+  refine ⟨by rw [ht]; norm_num, by rw [he]; norm_num, ?_⟩
+  show (twoContrastPopulation 2 1 0).predictiveCovariance unitWeight
+    = (twoContrastPopulation 1 2 0).predictiveCovariance unitWeight
+  rw [twoContrast_predictiveCovariance, twoContrast_predictiveCovariance]
+  norm_num
 
 /-- **The outcome-variance coordinate is necessary.**  Two populations with the same
     score variance and the same predictive covariance, differing only in residual
@@ -1067,7 +1167,7 @@ theorem recalibrated_mse_eq (a b : ℝ) :
   rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
     show variance P.E (P.score w) = P.scoreVariance w from rfl,
     show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-      covariance_comm _ _ _]
+      covariance_comm_exp _ _ _]
   ring
 
 /-- **The affine correction the population itself prescribes**: slope `Cov/Var S`,
@@ -1143,9 +1243,9 @@ theorem r2_affine_invariant (a b : ℝ) (hb : b ≠ 0) :
         (variance P.E (P.recalibratedScore w a b) * P.outcomeVariance)
       = P.r2 w := by
   unfold recalibratedScore r2
-  rw [covariance_comm, covariance_affine_right, variance_affine]
+  rw [covariance_comm_exp, covariance_affine_right, variance_affine]
   rw [show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-    covariance_comm _ _ _]
+    covariance_comm_exp _ _ _]
   rw [show variance P.E (P.score w) = P.scoreVariance w from rfl]
   rw [mul_pow]
   by_cases hv : P.scoreVariance w = 0
