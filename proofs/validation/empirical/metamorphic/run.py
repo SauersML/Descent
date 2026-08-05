@@ -103,10 +103,12 @@ def resolve_args(rel, argnames):
 
 def _lookup(lookup, name, rel, argnames):
     norm = _normalise(name)
-    if name in lookup:
-        return lookup[name]
-    if norm in lookup:
-        return lookup[norm]
+    for candidate in (name, norm, name + "_", norm + "_"):
+        # The trailing underscore is `translate.pyname`'s escape for a Lean
+        # argument that collides with a Python keyword: `lambda` arrives as
+        # `lambda_`. The table is written in the corpus's spelling.
+        if candidate in lookup:
+            return lookup[candidate]
     raise Violation(
         f"relation {rel['id']} names argument {name!r}, but the definition's "
         f"parameters are {list(argnames)}. An argument was renamed or reordered.")
@@ -172,7 +174,7 @@ def _expected(rel, base, factor, c):
         if rel["rel"] == "complement":
             return 1.0 - base
     if rel["kind"] == "negate":
-        return -base
+        return base if rel.get("rel") == "invariant" else -base
     if rel["kind"] in ("swap", "reciprocal_scale"):
         return base
     if rel["kind"] in ("scale", "joint_scale"):

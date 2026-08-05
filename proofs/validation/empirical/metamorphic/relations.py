@@ -124,6 +124,17 @@ def odd_under_negation(args):
             "id": f"negate/odd/{'+'.join(args)}"}
 
 
+def even_under_negation(args):
+    """f(-args) == f(args).
+
+    Distinct from every scaling relation: a density, a squared deviation or an
+    absolute difference is even in its argument, and a body carrying a stray odd
+    term satisfies every scaling relation it should while failing this one.
+    """
+    return {"kind": "negate", "args": tuple(args), "rel": "invariant",
+            "id": f"negate/even/{'+'.join(args)}"}
+
+
 # ---------------------------------------------------------------------------
 # SWEPT MODULES
 # ---------------------------------------------------------------------------
@@ -136,6 +147,7 @@ SWEPT_MODULES = (
     "Calibrator/BlindnessRegistry.lean",
     "Calibrator/TransferLearningPGS.lean",
     "Calibrator/Permeability.lean",
+    "Calibrator/PortabilityDrift.lean",
 )
 
 # ---------------------------------------------------------------------------
@@ -471,6 +483,163 @@ RELATIONS = {
         scales("covarianceDerivative", 2),
         scales("covariance", -4),
     ],
+
+    # --- PortabilityDrift --------------------------------------------------
+    # The corpus's largest scalar module. Its recurring structure is that
+    # quantities depend on COMPOUND parameters -- 4·Nₑ·m, t/Nₑ, a variance ratio
+    # -- and the relations below are what pin the compound rather than the
+    # factors, which is the one thing a per-argument monotonicity result cannot
+    # do.
+    "Calibrator.coalescentTau": [
+        jointly_scales(["t", "Ne"], 0),
+        scales("t", 1),
+        scales("Ne", -1),
+    ],
+    "Calibrator.fstFromGenerations": [
+        jointly_scales(["t", "Ne"], 0),
+    ],
+    "Calibrator.pairwiseFstFromBranches": [
+        symmetric_in("fstS", "fstT"),
+    ],
+    "Calibrator.pairwiseFstFromBranchTaus": [
+        symmetric_in("tauS", "tauT"),
+    ],
+    "Calibrator.hudsonFstFromCoalescenceTimes": [
+        # A ratio of coalescence times: the unit of time cancels.
+        jointly_scales(["ETss", "ETst"], 0),
+    ],
+    "Calibrator.hetMutationFloor": [
+        # Depends on 4·Nₑ·μ alone.
+        invariant_under_reciprocal_scaling(["Ne"], ["mu"]),
+    ],
+    "Calibrator.pgsVarianceFromHet": [
+        symmetric_in("β_sq_sum", "het"),
+        jointly_scales(["β_sq_sum", "het"], 2),
+        scales("β_sq_sum", 1),
+    ],
+    "Calibrator.targetHetFromFst": [
+        scales("het_source", 1),
+    ],
+    "Calibrator.presentDayPGSVariance": [
+        scales("V_A", 1),
+    ],
+    "Calibrator.Var_Delta_Mu": [
+        scales("V_A", 1),
+        scales("fst", 1),
+        jointly_scales(["V_A", "fst"], 2),
+    ],
+    "Calibrator.Expected_Abs_Shift": [
+        # A standard deviation, so half a power of the variance.
+        scales("V_A", Q(1, 2)),
+        symmetric_in("fstS", "fstT"),
+    ],
+    "Calibrator.presentDaySignalToNoise": [
+        jointly_scales(["V_A", "V_E"], 0),
+        scales("V_A", 1),
+        scales("V_E", -1),
+    ],
+    "Calibrator.presentDayR2": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.presentDayEqualVarianceGaussianAUC": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.realWorldPGSVariance": [
+        scales("V_A", 1),
+        scales("rhoSq", 1),
+        jointly_scales(["V_A", "rhoSq"], 2),
+    ],
+    "Calibrator.ldCorrelationDecay": [
+        # The decay reads only the products lambda·distance and lambda·fstGap.
+        invariant_under_reciprocal_scaling(["distance"], ["lambda"]),
+        invariant_under_reciprocal_scaling(["fstGap"], ["lambda"]),
+    ],
+    "Calibrator.alleleFreqMismatchPenalty": [
+        # An absolute frequency difference: symmetric in the two panels AND
+        # invariant under relabelling which allele is reference, since the
+        # complement subtracts out.
+        symmetric_in("pSource", "pTarget"),
+        invariant_under_allele_swap(["pSource", "pTarget"]),
+    ],
+    "Calibrator.targetR2FromNeutralAFBenchmark": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.targetExactCalibratedBrierRisk": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.targetBrierFromNeutralAFBenchmark": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.standardNormalPdf": [
+        even_under_negation(["x"]),
+    ],
+    "Calibrator.brierRegretPoint": [
+        # The Brier regret is the squared forecast deviation, so it is quadratic
+        # in the pair and EVEN in it -- a body carrying a stray linear term
+        # would still be zero on the diagonal and still monotone away from it.
+        jointly_scales(["η", "q"], 2),
+        even_under_negation(["η", "q"]),
+    ],
+    "Calibrator.brierRegretRatio": [
+        jointly_scales(["η", "qSource", "qTarget"], 0),
+    ],
+    "Calibrator.expectedSqMeanPGSDiff_pureSplit": [
+        scales("V_A", 1),
+        symmetric_in("fstS", "fstT"),
+        jointly_scales(["fstS", "fstT"], 1),
+    ],
+    "Calibrator.expectedSqMeanPGSDiff_IMEquilibrium": [
+        scales("V_A", 1),
+    ],
+    "Calibrator.covarianceRetention": [
+        symmetric_in("freq_corr", "ld_overlap"),
+        jointly_scales(["freq_corr", "ld_overlap"], 2),
+    ],
+    "Calibrator.alleleFreqCorrelation": [
+        # A variance ratio: only the ratio of ancestral variance to F_ST-weighted
+        # heterozygosity matters, so both a common rescaling and a reciprocal
+        # trade between F_ST and the heterozygosity leave it alone.
+        jointly_scales(["varAncestral", "meanHetAncestral"], 0),
+        invariant_under_reciprocal_scaling(["fst"], ["meanHetAncestral"]),
+    ],
+    "Calibrator.ldOverlapFromSharedLD": [
+        scales("shared_ld", 1),
+    ],
+    "Calibrator.presentDayPGSVarianceMutationDrift": [
+        scales("V_A", 1),
+    ],
+    "Calibrator.presentDayR2MutationDrift": [
+        jointly_scales(["V_A", "V_E"], 0),
+    ],
+    "Calibrator.neutralAFSharedLDBenchmarkRatio": [
+        jointly_scales(["shared_ld_source", "shared_ld_target"], 0),
+    ],
+    "Calibrator.fstMigrationDriftEquilibrium": [
+        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
+    ],
+    "Calibrator.sharedLD_from_equilibrium": [
+        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
+    ],
+    "Calibrator.signalRetentionMigrationDrift": [
+        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
+    ],
+    "Calibrator.retainedSignalVarianceMigrationDrift": [
+        scales("V_A", 1),
+        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
+    ],
+    "Calibrator.neutralAFBenchmarkFromRecurrence": [
+        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
+    ],
+    "Calibrator.asymmetricFst": [
+        # Only the SUM of the two directional rates enters, which is the whole
+        # content of the name: asymmetric migration gives a symmetric F_ST.
+        symmetric_in("m₁₂", "m₂₁"),
+        invariant_under_reciprocal_scaling(["Ne"], ["m₁₂", "m₂₁"]),
+    ],
+    "Calibrator.effectiveSymmetricMigration": [
+        symmetric_in("m₁₂", "m₂₁"),
+        jointly_scales(["m₁₂", "m₂₁"], 1),
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -551,6 +720,103 @@ NO_RELATIONS = {
         "As the binary case: a fixed response over 1 - θ², with θ an angle "
         "carrying no unit. The constants are pinned by reference-point "
         "theorems in the module rather than by any invariance.",
+    # --- PortabilityDrift --------------------------------------------------
+    "Calibrator.fstFromTau":
+        "tau/(1+tau) saturates a single already-scaled coalescent time. Scaling "
+        "tau changes the answer -- that is its content -- and there is no "
+        "second argument to trade against it. Its rescaling invariance lives in "
+        "fstFromGenerations, which does take t and Ne separately.",
+    "Calibrator.twoDemeIMFirstStepSame":
+        "One step of a two-deme island recursion, affine in ETst with an "
+        "M-dependent intercept AND an M-dependent slope. It is affine, not "
+        "homogeneous, so no scaling of any argument multiplies the output.",
+    "Calibrator.twoDemeIMFirstStepDiff":
+        "1/M + ETss adds a reciprocal rate to a time. The two summands have "
+        "opposite degrees in any common rescaling, so no single factor acts on "
+        "the sum; that they nonetheless share units is a statement about the "
+        "coalescent scaling and not about this body.",
+    "Calibrator.twoDemeIMEquilibriumETss":
+        "Constant at 2: two lineages in the same deme coalesce in two "
+        "population-size units whatever the migration rate, which is why the "
+        "argument is named `_M` and ignored. A constant satisfies every "
+        "invariance vacuously, which is exactly why it must not be declared "
+        "with one -- the vacuity screen in run.py would fire, and correctly.",
+    "Calibrator.twoDemeIMEquilibriumETst":
+        "(2M+1)/M is a ratio of terms of different degree in M, so it is not "
+        "homogeneous; and M is already the scaled migration rate, so there is "
+        "no unit left to cancel against it.",
+    "Calibrator.twoDemeIMEquilibriumDelta":
+        "1/(2M+1) in the single scaled migration parameter, saturating rather "
+        "than homogeneous. Same reason as fstFromTau one entry up.",
+    "Calibrator.hetStepWithMutation":
+        "Drift and mutation enter through different powers of Ne and mu with an "
+        "additive input term, so no rescaling of Ne against mu holds them "
+        "fixed. The absence is the content: unlike hetMutationFloor below, the "
+        "STEP is not a function of 4·Ne·mu alone -- only its fixed point is.",
+    "Calibrator.brierFromR2":
+        "π(1-π)(1-r2) is affine in r2 and quadratic-with-an-intercept in π, so "
+        "no argument scales the output. Its content is pinned by reference "
+        "evaluations at r2 = 0 and r2 = 1 instead.",
+    "Calibrator.sourceBrierFromR2":
+        "The same body as brierFromR2 read at the source population; same "
+        "reason.",
+    "Calibrator.equalVarianceGaussianAUCFromSNR":
+        "Phi of a square root: a probability, bounded in [0,1], so no scaling "
+        "of the signal-to-noise ratio scales it. Monotone but not homogeneous.",
+    "Calibrator.equalVarianceGaussianAUCFromExplainedR2":
+        "As above, and additionally clipped by an `if 1 ≤ r2` branch, so any "
+        "relation would hold vacuously on the clipped half of the domain and "
+        "fail off it. A relation that holds only off a clip is not a relation.",
+    "Calibrator.logLossRegretPoint":
+        "A difference of logarithms, so scaling the pair scales neither the "
+        "argument of the log nor the answer. The Brier regret one floor up IS "
+        "quadratic and IS declared, which is the honest contrast: the two "
+        "regrets have genuinely different homogeneity.",
+    "Calibrator.logLossRegretRatio":
+        "A ratio of the above; a common rescaling does not cancel because "
+        "neither numerator nor denominator is homogeneous to begin with.",
+    "Calibrator.ibdFlowStep":
+        "F + (1-F)/(2Ne) - 2·rate·F mixes an input term, a drift term and a "
+        "flow term with different degrees in Ne and rate; no common or "
+        "reciprocal rescaling fixes it. Its equilibrium does, and that is "
+        "fstMigrationDriftEquilibrium.",
+    "Calibrator.covarianceRetentionFactorFromFst":
+        "1 - fst is an affine map of a quantity already in [0,1]. Not "
+        "homogeneous, and F_ST carries no unit to rescale.",
+    "Calibrator.covarianceDivergenceFromRetention":
+        "1 - (1-fst)·shared_ld: affine in shared_ld with an fst-dependent slope "
+        "and a constant intercept, so nothing scales it.",
+    "Calibrator.covarianceDivergenceMutationDrift":
+        "fst + (1-fst)(1-shared_ld) is affine in each argument separately with "
+        "a cross term; the intercept blocks every homogeneity.",
+    "Calibrator.finiteIslandCorrection":
+        "d/(d-1) is a pure deme-count correction; d is a cardinality, so there "
+        "is no unit to rescale and no second argument to exchange with it.",
+    "Calibrator.ibdRecurrenceStep":
+        "(1-rate)²·(1/(2Ne) + (1-1/(2Ne))·x) carries Ne in two channels with "
+        "different numerators and an additive input, so no rescaling of Ne "
+        "against rate leaves it fixed.",
+    "Calibrator.ibdRecurrenceFixedPoint":
+        "(1-rate)²/((1-rate)² + 2Ne·rate·(2-rate)) is NOT a function of the "
+        "product Ne·rate alone -- the (2-rate) factor breaks it, which is the "
+        "exact respect in which the multiplicative recurrence differs from the "
+        "diffusion approximation whose fixed point IS 1/(1+4Ne·m). Declaring a "
+        "reciprocal-scaling relation here would assert the approximation.",
+    "Calibrator.islandFstMultiplicativeStep":
+        "A rename of ibdRecurrenceStep into F_ST language; same reason.",
+    "Calibrator.fstIslandMultiplicativeEquilibrium":
+        "A rename of ibdRecurrenceFixedPoint; same reason, and the same "
+        "instructive contrast with fstMigrationDriftEquilibrium, which IS "
+        "declared with the reciprocal-scaling relation because it IS the "
+        "diffusion form.",
+    "Calibrator.sharedLDFromMigration":
+        "M/(1+M) saturates the single scaled migration parameter. The compound "
+        "is already formed, so nothing is left to hold fixed against it.",
+    "Calibrator.fstMigDriftNext":
+        "(1 - 2m - 1/(2Ne))·Fst + 1/(2Ne) is affine in Fst with an additive "
+        "input term, so scaling Fst does not scale the output and Ne appears in "
+        "both the slope and the intercept.",
+
     "Calibrator.selectionMigrationEquilibriumMigrationFirst":
         "The same max-0 clip as the selection-first ordering, and the same "
         "consequence: on the half of the domain where migration overwhelms "
@@ -566,7 +832,40 @@ NO_RELATIONS = {
 # ---------------------------------------------------------------------------
 
 NOT_EXTRACTABLE = {
-    # Empty, and the gate checks that it stays honest in both directions: an
+    # The liability-threshold family in PortabilityDrift. Every one of them
+    # routes through `Phi`, the standard normal CDF, or through
+    # `Function.invFun Phi`, its inverse -- and `extract/api.py` carries `Phi`
+    # only as a NUMERIC STAND-IN (an erf form substituted for Mathlib's
+    # measure-theoretic `cdf (gaussianReal 0 1)`), while `invFun` is a
+    # noncomputable choice function with no numeric form at all. So these six
+    # cannot be executed, and a relation declared for them could never run.
+    #
+    # This is a real coverage hole and it is stated rather than hidden: the
+    # liability-scale AUC chain is the corpus's route from an explained R² to a
+    # clinical discrimination number, and NOTHING in the empirical tier can
+    # evaluate it. The gate's stale-excuse check will report each of these the
+    # moment extraction reaches them.
+    "Calibrator.liabilityThreshold":
+        "`Function.invFun Phi (1 - K)`: a noncomputable inverse of the normal "
+        "CDF. There is no numeric form, so no relation can be evaluated.",
+    "Calibrator.liabilityCaseMean":
+        "Routes through liabilityThreshold, so it inherits the inverse-CDF gap.",
+    "Calibrator.liabilityControlMean":
+        "Routes through liabilityCaseMean; same inverse-CDF gap.",
+    "Calibrator.liabilityCaseVariance":
+        "Routes through liabilityCaseMean and liabilityThreshold; same gap.",
+    "Calibrator.liabilityControlVariance":
+        "Routes through liabilityControlMean and liabilityThreshold; same gap.",
+    "Calibrator.liabilityThresholdAUCFromExplainedR2":
+        "Composes the whole liability family under `Phi`; same gap. This is the "
+        "one a consumer actually calls, which is what makes the hole matter.",
+    "Calibrator.targetLiabilityAUCFromNeutralAFBenchmark":
+        "Composes liabilityThresholdAUCFromExplainedR2 with presentDayR2, so it "
+        "inherits the gap from the liability half while the F_ST half is "
+        "perfectly executable.",
+
+    # Below: empty of stale excuses. The gate checks this stays honest in both
+    # directions -- an
     # entry here whose definition CAN now be executed is reported as a STALE
     # EXCUSE, which is how the four `ploidy` entries that used to live here were
     # retired. An excuse that outlives its cause is indistinguishable from a

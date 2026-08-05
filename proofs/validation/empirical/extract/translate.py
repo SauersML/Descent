@@ -506,7 +506,19 @@ class Parser:
             name = p.text
             if name in ("let",):
                 return self.let_tail()
-            if name in CONSTS:
+            # A BINDER SHADOWS A CONSTANT.  `π` is Real.pi in most bodies, but
+            # `expectedBrierScore (p π : ℝ)` binds it as the PREVALENCE, and
+            # this branch used to rewrite it to 3.14159 anyway -- silently, with
+            # the arity still correct, so every caller got a number and none got
+            # an error.  `expectedBrierScore 0.7 0.3` returned -0.7666 where the
+            # Lean body gives 0.37, which is `math.pi*(1-0.7)^2 +
+            # (1-math.pi)*0.7^2` exactly.  `self.locals` already holds the
+            # definition's own binders (translate_def passes them as `locals_`)
+            # and `let`-bound names, and line 555 below already honours it for
+            # cross-definition calls; the constant table simply got consulted
+            # first.  Found by the metamorphic gate: brierRegretPoint failed the
+            # quadratic scaling relation that its Lean body plainly satisfies.
+            if name in CONSTS and name not in self.locals:
                 return CONSTS[name]
             if name in FUNCS:
                 fn, ar = FUNCS[name]
