@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Lookdown
 import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.StepLaw
+import Descent.Coalescent.NeutralMutation
 import Mathlib.Tactic
 
 namespace Descent
@@ -20,8 +21,8 @@ maps and not a coalescent.
 This file supplies them, from parts the corpus already has.  Three facts, all at the finest
 state `Δ` where the blocks ARE the levels:
 
-* the covers of `Δ` are the pairs of levels, and there are `C(n,2)` of them
-  (`card_covers_Delta`, from `StateSpace.card_covers` and `blocks_bot`);
+* the covers of `Δ` are the pairs of levels, and there are `C(n,2)` of them --
+  `NeutralMutation.card_covers_delta`, which this file uses rather than restates;
 * `C(n,2)` unit-rate clocks all survive to time `t` with probability `e^{-d_n t}`
   (`lookdown_survival`, an instance of `CompetingRates.prod_survival_covers`) -- so the wait
   until SOME pair looks down is exponential with the coalescent's rate;
@@ -44,7 +45,6 @@ not, and pretending otherwise is what a corpus like this exists to prevent.
 
 ## Main results
 
-- `card_covers_Delta`: the covers of `Δ` are the `C(n,2)` pairs of levels.
 - `lookdown_survival`: **`C(n,2)` unit clocks survive with probability `e^{-d_n t}`**.
 - `lookdown_clock_factors`: **the pair and the time are independent**, with the pair uniform.
 - `lookdown_pair_prob`: each pair is chosen with probability `2/(n(n-1))`.
@@ -53,12 +53,6 @@ not, and pretending otherwise is what a corpus like this exists to prevent.
 namespace Coalescent
 
 open scoped Classical
-
-/-- **At `Δ` the blocks are the levels.**  So the covers of the starting state are exactly
-the pairs of levels a lookdown could use, and there are `C(n,2)` of them. -/
-theorem card_covers_Delta (n : ℕ) :
-    Nat.card {η : ER n // Covers (Delta n) η} = n.choose 2 := by
-  rw [card_covers (Delta n), blocks_bot n]
 
 /-- **The clocks.**  One unit-rate clock per pair of levels; all of them survive to time `t`
 with probability `e^{-d_n t}`, so the wait until some pair looks down is exponential at the
@@ -92,7 +86,7 @@ and not merely a set of weights. -/
 theorem lookdown_pair_prob_normalised {n : ℕ} (hn : 2 ≤ n) :
     ((n.choose 2 : ℕ) : ℝ) * jumpProb n = 1 := by
   have h := card_covers_mul_jumpProb (Delta n) (by rw [blocks_bot n]; exact hn)
-  rwa [card_covers_Delta n, blocks_bot n] at h
+  rwa [card_covers_delta n, blocks_bot n] at h
 
 /-- **The clocks, assembled.**  At the starting state of an `n`-level lookdown: the wait is
 exponential at rate `d_n`, the pair is uniform on the `C(n,2)` pairs, and the two are
