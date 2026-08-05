@@ -2,6 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Spectral.PolygenicSpectroscopy
+-- `Blindness.SymmetricCoding`, `GenotypeDesign` and the eight standardized-genotype
+-- moment lemmas are named throughout. They used to arrive through
+-- `Program.Conventions -> Blindness.BlindnessRegistry`, and this file no longer imports
+-- the programme narrative.
+import Descent.Blindness.EpistaticChaos
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Portability.AncestrySpecificPower
 import Descent.Core.Fst
