@@ -475,6 +475,356 @@ theorem deployedR2_le_heritability (p : PopGenParameters) (V_E : ℝ) (hE : 0 �
   nlinarith [mul_nonneg (mul_nonneg hge (le_of_lt hV)) hE]
 
 
+/-! ### The rest of the metric family
+
+`R²` is one coordinate of a deployment report. A calibration slope, a mean squared error,
+a Brier score and an AUC are the others, and they do not move together -- the slope does
+not move at all under drift. Each is a function of the same tuple, so each composes with
+the same demographic chain, and each needs its own statement. -/
+
+/-- **Mean squared error under drift.** A score whose weights were fitted in the source is
+deployed raw in the target: the error is `Var(Y) - 2Cov(S,Y) + Var(S)`, which under drift
+collapses to the environmental variance alone. -/
+theorem mse_momentsUnderDrift (V_A V_E fst : ℝ) :
+    (momentsUnderDrift V_A V_E fst).mse = V_E := by
+  unfold mse momentsUnderDrift
+  ring
+
+/-- **The raw mean squared error does NOT move with differentiation**, and that is a
+finding rather than an accident.
+
+Drift removes signal from the score and the same signal from the outcome, so the residual
+is the environmental variance whatever the differentiation. A deployment audited on mean
+squared error alone sees a perfectly stable number while `R²` collapses -- the same trap
+as the calibration slope, in a second metric. What `R²` reports and MSE does not is how
+much of a SHRINKING outcome variance the score accounts for. -/
+theorem mse_momentsUnderDrift_const (V_A V_E f₁ f₂ : ℝ) :
+    (momentsUnderDrift V_A V_E f₁).mse = (momentsUnderDrift V_A V_E f₂).mse := by
+  rw [mse_momentsUnderDrift, mse_momentsUnderDrift]
+
+/-- **Two metrics, three behaviours.** At a differentiation where `R²` has strictly
+fallen, the slope and the MSE are unchanged. Stated as a single theorem because the
+conjunction is the claim: no one of these numbers is a summary of a deployment. -/
+theorem drift_moves_r2_alone (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (hf0 : 0 < f) (hf : f < 1) :
+    (momentsUnderDrift V_A V_E f).r2 < (momentsUnderDrift V_A V_E 0).r2 ∧
+    (momentsUnderDrift V_A V_E f).calibrationSlope
+      = (momentsUnderDrift V_A V_E 0).calibrationSlope ∧
+    (momentsUnderDrift V_A V_E f).mse = (momentsUnderDrift V_A V_E 0).mse := by
+  refine ⟨r2_momentsUnderDrift_anti V_A V_E 0 f hV hE hf0 hf, ?_, ?_⟩
+  · rw [calibrationSlope_momentsUnderDrift V_A V_E f hV hf,
+      calibrationSlope_momentsUnderDrift V_A V_E 0 hV (by norm_num)]
+  · exact mse_momentsUnderDrift_const V_A V_E f 0
+
+/-- **Calibrated Brier score from a tuple and a prevalence**, `π(1-π)(1 - R²)`.
+
+The binary-outcome coordinate. It is a function of the tuple only through `R²`, which is
+why every `R²` result above transfers to it -- and why a deployment cannot report a Brier
+score that disagrees with its `R²`. -/
+noncomputable def brier (π : ℝ) (m : ScoreMoments) : ℝ :=
+  π * (1 - π) * complement m.r2
+
+/-- **Brier at no information is the prevalence variance.** The baseline a
+prevalence-only predictor scores, and the number every improvement is measured
+against. -/
+theorem brier_at_zero_r2 (π : ℝ) (m : ScoreMoments) (h : m.r2 = 0) :
+    brier π m = π * (1 - π) := by
+  unfold brier complement
+  rw [h]; ring
+
+/-- **Brier is anti-monotone in `R²`.** Lower error where more variance is explained --
+the direction that makes it a loss rather than a score. -/
+theorem brier_anti_in_r2 (π : ℝ) (m n : ScoreMoments) (hπ : 0 < π) (hπ1 : π < 1)
+    (h : m.r2 < n.r2) : brier π n < brier π m := by
+  unfold brier complement
+  have hp : 0 < π * (1 - π) := by nlinarith
+  nlinarith
+
+/-- **More differentiation, worse Brier score.** The chain carried into the binary
+coordinate. -/
+theorem brier_momentsUnderDrift_mono (π V_A V_E f₁ f₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    brier π (momentsUnderDrift V_A V_E f₁) < brier π (momentsUnderDrift V_A V_E f₂) :=
+  brier_anti_in_r2 π (momentsUnderDrift V_A V_E f₂) (momentsUnderDrift V_A V_E f₁) hπ hπ1
+    (r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2)
+
+/-- **The AUC argument**, `R² / (1 - R²)`.
+
+The equal-variance Gaussian AUC is `Φ` of a strictly increasing function of this, and `Φ`
+is strictly increasing -- so every ordering statement about an AUC is an ordering
+statement about this quantity, and can be made without `Φ`, which this corpus has no
+Mathlib form for. Writing the argument rather than a wrong closed form is the same
+discipline `calibratedBrierFromVariances` records for the liability scale. -/
+noncomputable def aucArgument (m : ScoreMoments) : ℝ :=
+  ratio m.r2 (complement m.r2)
+
+/-- **The AUC argument is strictly increasing in `R²`** on the open unit interval, which
+is what carries every `R²` ordering into an AUC ordering. -/
+theorem aucArgument_mono (m n : ScoreMoments) (h0 : 0 ≤ m.r2) (h1 : n.r2 < 1)
+    (h : m.r2 < n.r2) : aucArgument m < aucArgument n := by
+  unfold aucArgument ratio complement
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+  nlinarith
+
+/-- **More differentiation, lower AUC.** The chain carried into the discrimination
+coordinate, by way of the argument rather than by way of a closed form for `Φ`. -/
+theorem aucArgument_momentsUnderDrift_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A)
+    (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) (h0 : 0 ≤ f₁) :
+    aucArgument (momentsUnderDrift V_A V_E f₂)
+      < aucArgument (momentsUnderDrift V_A V_E f₁) := by
+  have hlt := r2_momentsUnderDrift_anti V_A V_E f₁ f₂ hV hE h1 h2
+  have hadm : ∀ f : ℝ, f < 1 → (momentsUnderDrift V_A V_E f).Admissible := by
+    intro f hf
+    refine { scoreVariance_pos := ?_, outcomeVariance_pos := ?_, cauchy_schwarz := ?_ } <;>
+      unfold momentsUnderDrift retainedFraction <;> simp
+    · nlinarith
+    · nlinarith
+    · nlinarith [sq_nonneg ((1 - f) * V_A), mul_nonneg (le_of_lt hV) (le_of_lt hE)]
+  have hn1 : (momentsUnderDrift V_A V_E f₁).r2 < 1 := by
+    rw [r2_momentsUnderDrift V_A V_E f₁ hV (le_of_lt hE) (by linarith)]
+    unfold share retainedFraction
+    rw [div_lt_one (by nlinarith)]
+    linarith
+  exact aucArgument_mono _ _ (r2_mem_unit _ (hadm f₂ h2)).1 hn1 hlt
+
+/-! ### The whole family, composed with a demographic history
+
+Each of the four metrics, evaluated on the tuple a demographic history produces. These
+are the compositions the layer contract promised. -/
+
+/-- **Deployed calibration slope from a demographic history.** One at every history with
+some flow -- which is the sharpest form of the warning: no demographic history produces a
+miscalibrated score under pure drift, so calibration cannot detect this failure mode. -/
+theorem deployedSlope_eq_one (p : PopGenParameters) (V_E : ℝ)
+    (hflow : 0 < p.mu + p.mig) :
+    (momentsUnderDrift p.V_A V_E p.fstEquilibrium).calibrationSlope = 1 :=
+  calibrationSlope_momentsUnderDrift p.V_A V_E p.fstEquilibrium p.V_A_pos
+    (p.fstEquilibrium_lt_one hflow)
+
+/-- **Deployed mean squared error from a demographic history** is the environmental
+variance, whatever the history. The second metric the chain leaves flat. -/
+theorem deployedMse_eq (p : PopGenParameters) (V_E : ℝ) :
+    (momentsUnderDrift p.V_A V_E p.fstEquilibrium).mse = V_E :=
+  mse_momentsUnderDrift p.V_A V_E p.fstEquilibrium
+
+/-- **Deployed Brier score from a demographic history.** -/
+noncomputable def deployedBrier (π : ℝ) (p : PopGenParameters) (V_E : ℝ) : ℝ :=
+  brier π (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
+
+/-- **More migration, better Brier score.** -/
+theorem deployedBrier_mono_in_migration (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedBrier π q V_E < deployedBrier π p V_E := by
+  unfold deployedBrier
+  rw [hV]
+  exact brier_anti_in_r2 π _ _ hπ hπ1
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **More mutation, better Brier score.** -/
+theorem deployedBrier_mono_in_mutation (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    deployedBrier π q V_E < deployedBrier π p V_E := by
+  unfold deployedBrier
+  rw [hV]
+  exact brier_anti_in_r2 π _ _ hπ hπ1
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hlt)
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **Larger effective size, better Brier score.** -/
+theorem deployedBrier_mono_in_Ne (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
+    (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A)
+    (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedBrier π q V_E < deployedBrier π p V_E := by
+  unfold deployedBrier
+  rw [hV]
+  exact brier_anti_in_r2 π _ _ hπ hπ1
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hflow2 hlt)
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **Deployed Brier at the source is the heritability complement**, scaled by the
+prevalence variance: the anchor the deployed value departs from. -/
+theorem deployedBrier_at_no_flow_bound (π V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
+    brier π (momentsUnderDrift V_A V_E 0) = π * (1 - π) * (1 - share V_A V_E) := by
+  unfold brier complement
+  rw [r2_momentsUnderDrift_at_source V_A V_E hV hE]
+
+/-- **A longer split, worse Brier score.** The split-coordinate route into the binary
+metric, so a result stated in divergence time and one stated in migration rate reach the
+same place. -/
+theorem brier_deployedR2FromTau_anti (π V_A V_E t₁ t₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    brier π (momentsUnderDrift V_A V_E (fstFromTau t₁))
+      < brier π (momentsUnderDrift V_A V_E (fstFromTau t₂)) := by
+  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
+    unfold fstFromTau saturation
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    nlinarith
+  have hlt2 : fstFromTau t₂ < 1 := by
+    unfold fstFromTau saturation
+    rw [div_lt_one (by linarith)]
+    linarith
+  exact brier_momentsUnderDrift_mono π V_A V_E (fstFromTau t₁) (fstFromTau t₂) hπ hπ1 hV hE
+    hf1 hlt2
+
+
+/-! ### The deme count reaches the metric
+
+The island lattice is not decoration: the deme correction is a factor of two at the
+two-population split, and a factor of two on the migration term is a factor on the
+deployed metric. These theorems carry `nDemes` all the way through. -/
+
+/-- **Deployed `R²` from raw island parameters.** The composition that takes
+`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric. -/
+noncomputable def deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ) : ℝ :=
+  (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).r2
+
+/-- **The two-deme reading and the record's reading agree.** `PopGenParameters`'
+`1/(1 + θ + 2M)` is the island law at `d = 2`, so the metric it produces is the island
+metric at two demes -- and a reader who took the record for the many-deme law was reading
+the wrong deployment. -/
+theorem deployedR2_eq_island_two_demes (p : PopGenParameters) (V_E : ℝ) :
+    deployedR2 p V_E = deployedR2FromIsland p.Ne p.mig p.mu 2 p.V_A V_E := by
+  unfold deployedR2 deployedR2FromIsland
+  rw [p.fstEquilibrium_eq_island_two_demes]
+
+/-- **More demes, more differentiation between any two of them, less transferable score.**
+
+The deme correction `d/(d-1)` FALLS with `d`, so the effective migration between a given
+pair falls, so `F_ST` rises and the metric drops. Counter-intuitive read as "more
+populations means more mixing" and correct read as "a fixed per-pair migration rate
+spreads a deme's immigration over more sources". -/
+theorem deployedR2FromIsland_anti_in_demes (Ne m μ d₁ d₂ V_A V_E : ℝ)
+    (hV : 0 < V_A) (hE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 ≤ μ)
+    (h1 : 1 < d₁) (hlt : d₁ < d₂) :
+    deployedR2FromIsland Ne m μ d₂ V_A V_E < deployedR2FromIsland Ne m μ d₁ V_A V_E := by
+  have hc : ∀ d : ℝ, 1 < d → 0 < islandDemeCorrection d := by
+    intro d hd
+    unfold islandDemeCorrection ratio
+    exact div_pos (by linarith) (by linarith)
+  have hflowpos : ∀ d : ℝ, 1 < d → 0 < scaledFlow Ne m μ d := by
+    intro d hd
+    have hcd := hc d hd
+    have h4 : (0:ℝ) < 4 * Ne := by linarith
+    have p1 : 0 < 4 * Ne * m * islandDemeCorrection d :=
+      mul_pos (mul_pos h4 hm) hcd
+    have p2 : 0 ≤ 4 * Ne * μ := by positivity
+    unfold scaledFlow
+    rw [scaledMigrationRate_eq, scaledMutationRate_eq]
+    linarith
+  have hlt1 : ∀ d : ℝ, 1 < d → fstIslandEquilibrium Ne m μ d < 1 := by
+    intro d hd
+    have := hflowpos d hd
+    unfold fstIslandEquilibrium fstFromFlow
+    rw [div_lt_one (by linarith)]
+    linarith
+  have hcorr : islandDemeCorrection d₂ < islandDemeCorrection d₁ := by
+    unfold islandDemeCorrection ratio
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    nlinarith
+  have hf : fstIslandEquilibrium Ne m μ d₁ < fstIslandEquilibrium Ne m μ d₂ := by
+    unfold fstIslandEquilibrium
+    have hd2 : (1:ℝ) < d₂ := by linarith
+    refine fstFromFlow_lt_of_lt _ _ (le_of_lt (hflowpos d₂ hd2)) ?_
+    have h4 : (0:ℝ) < 4 * Ne := by linarith
+    have key : 4 * Ne * m * islandDemeCorrection d₂ < 4 * Ne * m * islandDemeCorrection d₁ :=
+      by
+        have hm4 : 0 < 4 * Ne * m := mul_pos h4 hm
+        exact (mul_lt_mul_left hm4).mpr hcorr
+    unfold scaledFlow
+    rw [scaledMigrationRate_eq, scaledMutationRate_eq]
+    linarith
+  exact r2_momentsUnderDrift_anti V_A V_E (fstIslandEquilibrium Ne m μ d₁)
+    (fstIslandEquilibrium Ne m μ d₂) hV hE hf (hlt1 d₂ (by linarith : (1:ℝ) < d₂))
+
+/-- **The calibration slope is one on the island route too.** Third statement of the same
+warning, now with the deme count carried: no island configuration produces a
+miscalibrated score under pure drift. -/
+theorem deployedR2FromIsland_slope (Ne m μ nDemes V_A V_E : ℝ) (hV : 0 < V_A)
+    (hf : fstIslandEquilibrium Ne m μ nDemes < 1) :
+    (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).calibrationSlope = 1 :=
+  calibrationSlope_momentsUnderDrift V_A V_E _ hV hf
+
+/-- **And the mean squared error is the environmental variance on the island route.** -/
+theorem deployedR2FromIsland_mse (Ne m μ nDemes V_A V_E : ℝ) :
+    (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).mse = V_E :=
+  mse_momentsUnderDrift V_A V_E _
+
+/-! ### The split route, for the rest of the family -/
+
+/-- **The calibration slope after a clean split is one at every divergence time.** -/
+theorem deployedR2FromTau_slope (V_A V_E tau : ℝ) (hV : 0 < V_A) (h : 0 ≤ tau) :
+    (momentsUnderDrift V_A V_E (fstFromTau tau)).calibrationSlope = 1 := by
+  refine calibrationSlope_momentsUnderDrift V_A V_E _ hV ?_
+  unfold fstFromTau saturation
+  rw [div_lt_one (by linarith)]
+  linarith
+
+/-- **And the mean squared error is flat along the split too.** Every metric except `R²`
+and the metrics that are functions of `R²` is blind to a clean split. -/
+theorem deployedR2FromTau_mse (V_A V_E tau : ℝ) :
+    (momentsUnderDrift V_A V_E (fstFromTau tau)).mse = V_E :=
+  mse_momentsUnderDrift V_A V_E _
+
+/-- **At the split the deployed metric is the heritability**, so the whole decay is a
+departure from a value the source population fixes. -/
+theorem deployedR2FromTau_bounded (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (h : 0 ≤ tau) :
+    (momentsUnderDrift V_A V_E (fstFromTau tau)).r2 ≤ share V_A V_E := by
+  have hf : fstFromTau tau < 1 := by
+    unfold fstFromTau saturation
+    rw [div_lt_one (by linarith)]
+    linarith
+  have hf0 : 0 ≤ fstFromTau tau := by
+    unfold fstFromTau saturation
+    positivity
+  have := r2_momentsUnderDrift_le_source V_A V_E (fstFromTau tau) hV hE hf0 hf
+  rwa [r2_momentsUnderDrift_at_source V_A V_E hV hE] at this
+
+/-- **The AUC argument decays along the split.** Discrimination falls with divergence
+time, by the same route as `R²`. -/
+theorem aucArgument_deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A)
+    (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₂))
+      < aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₁)) := by
+  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
+    unfold fstFromTau saturation
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    nlinarith
+  have hlt2 : fstFromTau t₂ < 1 := by
+    unfold fstFromTau saturation
+    rw [div_lt_one (by linarith)]
+    linarith
+  have hf0 : 0 ≤ fstFromTau t₁ := by
+    unfold fstFromTau saturation; positivity
+  exact aucArgument_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE
+    hf1 hlt2 hf0
+
+/-- **The portability ratio along a split.** What a report comparing a target `R²` to a
+source `R²` is measuring, expressed in divergence time. -/
+noncomputable def portabilityRatioFromTau (V_A V_E tau : ℝ) : ℝ :=
+  portabilityRatio V_A V_E (fstFromTau tau)
+
+/-- **A longer split gives a smaller portability ratio.** -/
+theorem portabilityRatioFromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    portabilityRatioFromTau V_A V_E t₂ < portabilityRatioFromTau V_A V_E t₁ := by
+  have hsrc : 0 < (momentsUnderDrift V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift_at_source V_A V_E hV (le_of_lt hE)]
+    unfold share; positivity
+  unfold portabilityRatioFromTau portabilityRatio ratio
+  exact div_lt_div_of_pos_right
+    (deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt) hsrc
+
+
 end ScoreMoments
 
 end Descent.Core

@@ -15,15 +15,20 @@ These gates are that rule applied to the architecture itself.  Each measures a
 property the corpus has been repaired to have, and fails the build if it is lost
 again.
 
-RATCHET, NOT THRESHOLD.  Every gate compares against a recorded baseline in
-`architecture_baseline.json` and fails only on REGRESSION.  Absolute targets
-would fail on the day they are written and teach everyone to ignore the gate.
-Improving a number and forgetting to re-record it is also a failure -- reported
-as a stale baseline, so the file cannot silently drift upward.
+ZERO TOLERANCE.  Every defect count must be ZERO.  There is no baseline file and
+no allowance for the state the corpus happens to be in: a duplicate body, an
+orphan definition, an uninhabited structure, a foundation that depends on what it
+reconciles, or a falsification no docstring mentions fails the build.
+
+This replaces an earlier ratchet that compared against a recorded baseline and
+failed only on regression.  A ratchet makes the current state the standard, and
+the current state is the thing being repaired -- so it licenses every defect that
+already exists and asks only that no new ones appear.  The counts below are what
+is left to fix, and the gate says so by failing.
 
     python3 validation/code/architecture.py            # report
-    python3 validation/code/architecture.py --gate     # report and exit nonzero on regression
-    python3 validation/code/architecture.py --record   # rewrite the baseline
+    python3 validation/code/architecture.py --gate     # exit nonzero unless every count is zero
+    python3 validation/code/architecture.py --verbose  # name every offender
 """
 
 from __future__ import annotations
@@ -37,8 +42,6 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LEAN_ROOT = os.path.join(ROOT, "Descent")
-BASELINE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        "architecture_baseline.json")
 
 # A declaration head at column zero.  Continuation lines and `where` fields are
 # deliberately not matched: this counts declarations, not identifiers.
@@ -424,53 +427,48 @@ def measure():
     }
 
 
-# name -> (direction, human description).  "up" means larger is better.
-GATES = {
-    "cross_module_reuse_pct": ("up", "theorems cited from another module"),
-    "composition_theorems": ("up", "theorems joining a demographic quantity to a metric"),
-    "duplicate_body_groups": ("down", "alpha-equivalent definition bodies"),
-    "duplicate_body_extras": ("down", "definitions that re-type a body instead of wrapping"),
-    "foundation_inverted": ("down", "modules claiming to be foundations from above what they reconcile"),
-    "silent_falsifications": ("down", "FALSIFIED ledger rows no docstring mentions"),
-    "orphan_definitions": ("down", "definitions no code refers to"),
-    "witnessless_structures": ("down", "structures with no constructed inhabitant"),
+# Every one of these must be ZERO.  There is no direction and no allowance: a
+# non-zero count is a defect the corpus still carries.
+DEFECTS = {
+    "foundation_inverted":
+        "modules claiming to reconcile subsystems while depending on them",
+    "duplicate_body_groups":
+        "shapes written out under more than one name instead of wrapping a kernel",
+    "duplicate_body_extras":
+        "definitions that re-type a shared body",
+    "orphan_definitions":
+        "definitions no code refers to",
+    "witnessless_structures":
+        "structures with no constructed inhabitant, over which theorems are empty",
+    "silent_falsifications":
+        "FALSIFIED ledger rows no docstring mentions",
 }
+
+# Reported, never gated.  These are properties of the corpus, not defect counts:
+# there is no value of "theorems cited across modules" that is correct, and a
+# threshold on one would be a number someone picked.
+REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theorems",
+            # Correct position, few consumers.  A new foundation starts here and
+            # earns callers as they move over; it is not the inversion above.
+            "foundation_not_yet_load_bearing")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--gate", action="store_true",
-                    help="exit nonzero on regression against the baseline")
-    ap.add_argument("--record", action="store_true",
-                    help="rewrite the baseline from the current tree")
+                    help="exit nonzero unless every defect count is zero")
     ap.add_argument("--verbose", action="store_true",
-                    help="list the offenders behind each number")
+                    help="name every offender behind every count")
     args = ap.parse_args()
 
     now = measure()
-
-    if args.record:
-        keep = {k: v for k, v in now.items() if not k.startswith("_")}
-        with open(BASELINE, "w", encoding="utf-8") as fh:
-            json.dump(keep, fh, indent=1, sort_keys=True)
-            fh.write("\n")
-        print("recorded baseline:", BASELINE)
-        for k in sorted(keep):
-            print(f"  {k:34} {keep[k]}")
-        return 0
-
-    base = {}
-    if os.path.exists(BASELINE):
-        with open(BASELINE, encoding="utf-8") as fh:
-            base = json.load(fh)
 
     print("architecture")
     for k in sorted(now):
         if k.startswith("_"):
             continue
-        b = base.get(k)
-        mark = "" if b is None else ("  (was %s)" % b if b != now[k] else "")
+        mark = "" if k in REPORTED else ("  OK" if now[k] == 0 else "  <- must be 0")
         print(f"  {k:34} {now[k]}{mark}")
 
     if args.verbose:
@@ -494,43 +492,22 @@ def main() -> int:
                 print("  " + n)
         if now["_witnessless"]:
             print(f"\nstructures with no constructed inhabitant ({len(now['_witnessless'])}):")
-            for n in now["_witnessless"][:40]:
+            for n in now["_witnessless"]:
                 print("  " + n)
         print(f"\ncomposition theorems ({len(now['_compositions'])}):")
-        for c in now["_compositions"][:60]:
+        for c in now["_compositions"]:
             print("  " + c)
 
     if not args.gate:
         return 0
-    if not base:
-        print("\nno baseline recorded; run --record first", file=sys.stderr)
-        return 1
 
-    failures, improvements = [], []
-    for key, (direction, what) in GATES.items():
-        if key not in base:
-            continue
-        old, new = base[key], now[key]
-        worse = new < old if direction == "up" else new > old
-        better = new > old if direction == "up" else new < old
-        if worse:
-            failures.append(f"{key}: {old} -> {new}  ({what})")
-        elif better:
-            improvements.append(f"{key}: {old} -> {new}  ({what})")
-
-    for line in failures:
-        print("REGRESSION  " + line, file=sys.stderr)
-    for line in improvements:
-        print("IMPROVED    " + line + "   (re-record with --record)", file=sys.stderr)
-
+    failures = [(k, now[k], what) for k, what in DEFECTS.items() if now[k] != 0]
+    for k, n, what in sorted(failures):
+        print(f"FAIL  {k}: {n}  ({what})", file=sys.stderr)
     if failures:
+        print("\nrun with --verbose to name every offender", file=sys.stderr)
         return 1
-    if improvements:
-        # An unrecorded improvement is not a defect in the corpus, but leaving it
-        # unrecorded lets the number drift back down for free.  Fail, and say so.
-        print("\nbaseline is stale; run --record", file=sys.stderr)
-        return 1
-    print("\nno regression")
+    print("\nevery defect count is zero")
     return 0
 
 
