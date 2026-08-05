@@ -546,7 +546,7 @@ section GenerationalMechanisticValidation
 -- These primitive population-genetic rates are deliberately kept transparent in
 -- the concrete witnesses below.  Registering them locally prevents exact
 -- generation checks from getting stuck at an otherwise opaque `4 * Nₑ * rate`.
-attribute [local simp] PopGen.scaledMutationRate PopGen.scaledMigrationRate PopGen.hetDecayFromScaled
+attribute [local simp] Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate PopGen.hetDecayFromScaled
   novelDirectCausalTargetAt novelProxyTaggingTargetAt
 
 /-- Simple generation-indexed population-genetic parameters used to validate

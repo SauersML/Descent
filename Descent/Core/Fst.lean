@@ -71,19 +71,39 @@ noncomputable def ploidy : ℝ := 2
 
 /-- Scaled mutation rate, `θ = 4 Ne μ`.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`), and the verdict moved
+    here from `PopGen.DGP`, which carried it on a wrapper that forwarded to this body.
+    That placement was the sentence above taken too literally: a shape asserts nothing,
+    but this shape's CONSTANT does, and the constant is here. There is no longer a second
+    name for the measurement to be attached to.
+
+    A scaling cannot be measured on its own, so it is read through the infinite-alleles
+    equilibrium heterozygosity `θ/(1+θ)`, separately validated at
+    `Portability.hetMutationFloor`. The body predicts 0.50000, 0.50000, 0.20000 and
+    0.20000 against measured 0.53297 ± 0.01697, 0.46858 ± 0.01307, 0.20081 ± 0.00688 and
+    0.21293 ± 0.00801 -- worst cell 2.40 sems.
+
+    Power: `Nₑ` and `μ` are swept by a factor of four INDEPENDENTLY, so two cells reach
+    `θ = 1` and two reach `θ = 4` by different routes. A wrong numeric factor and a wrong
+    `Nₑ`-dependence each break one of those pairs, which a sweep holding `4·Nₑ·μ` fixed
+    could not detect at all. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ := 2 * ploidy * Ne * μ
 
 /-- Scaled migration rate, `M = 4 Ne m`, in the same units as `θ`. Being in the same
 units is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`), moved here with the
+    wrapper that used to carry it, for the reason given on `scaledMutationRate` above.
+
+    Read through the two-deme island `F_ST` from coalescence times against `1/(1 + 2·M)`,
+    where the factor two is `islandDemeCorrection` at `n = 2` -- the deme count matters and
+    a deme-blind law would be off by it. The body predicts 0.33333, 0.33333, 0.11111 and
+    0.11111 against measured 0.31967 ± 0.01809, 0.30661 ± 0.01138, 0.10482 ± 0.00611 and
+    0.10891 ± 0.00467, worst cell 2.35 sems.
+
+    Power: as for `scaledMutationRate`, `Nₑ` and `m` are swept by a factor of four
+    INDEPENDENTLY, so `M = 1` and `M = 4` are each reached twice by different routes and
+    the `Nₑ`-dependence is separately on trial. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ := 2 * ploidy * Ne * m
 
 /-- **The scaling constant, stated as a value.** Both scaled rates carry the same four,

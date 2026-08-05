@@ -37,8 +37,8 @@ section MutationDriftBalance
 
 /-- Scaled mutation rate is positive when Ne and μ are positive. -/
 theorem scaledMutationRate_pos (Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) :
-    0 < scaledMutationRate Ne μ := by
-  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+    0 < Descent.Core.scaledMutationRate Ne μ := by
+  unfold Descent.Core.scaledMutationRate Descent.Core.ploidy
   positivity
 
 /-- **One coalescent time unit of the identity balance, in scaled units.**
@@ -124,26 +124,26 @@ is the same move.  Both single-parameter statements below are this fact; stated 
 each carried its own copy of the unfolding. -/
 theorem fstEquilibrium_decreases_with_product (Ne₁ μ₁ Ne₂ μ₂ : ℝ)
     (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) :
-    fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ₂) <
-      fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ₁) := by
+    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ₂) <
+      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ₁) := by
   apply fstMutationDriftEquilibrium_strictAnti <;>
-    unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy <;>
+    unfold Descent.Core.scaledMutationRate Descent.Core.ploidy <;>
     nlinarith
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
     (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
     (h_more : Ne₁ < Ne₂) :
-    fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) <
-      fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ) :=
+    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ) <
+      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ) :=
   fstEquilibrium_decreases_with_product Ne₁ μ Ne₂ μ (by nlinarith) (by nlinarith)
 
 /-- Equilibrium Fst decreases when μ increases (with Ne fixed). -/
 theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
     (h_more : μ₁ < μ₂) :
-    fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) <
-      fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁) :=
+    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₂) <
+      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₁) :=
   fstEquilibrium_decreases_with_product Ne μ₁ Ne μ₂ (by nlinarith) (by nlinarith)
 
 /-- **Complementarity of heterozygosity and Fst under mutation-drift balance.**
@@ -219,9 +219,9 @@ theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
     When θ > 2, mutation acts faster than drift, so 1/μ < 2Ne. -/
 theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
     (hμ : 0 < μ)
-    (hθ_large : 2 < scaledMutationRate Ne μ) :
+    (hθ_large : 2 < Descent.Core.scaledMutationRate Ne μ) :
     1 / μ < 2 * Ne := by
-  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy at hθ_large
+  unfold Descent.Core.scaledMutationRate Descent.Core.ploidy at hθ_large
   rw [div_lt_iff₀ hμ]
   nlinarith
 

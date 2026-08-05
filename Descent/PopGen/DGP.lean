@@ -34,57 +34,32 @@ mathematics and always in sites that *name* a definition without *applying* it �
 cluster" for the two failure shapes and the rule they share, recorded next to
 `fstEquilibrium` where they landed. -/
 
-/-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory.
+/-! **`scaledMutationRate` is deleted here.**  It was
+`Descent.Core.scaledMutationRate` under a second name, and every reference now
+calls the kernel.  Its VALIDATED record moves with it, to `Core/Fst.lean`, because evidence belongs on the body that was measured and not on a name that forwards to it. -/
 
-    Regime: neutral, single panmictic population, infinite alleles.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`). A scaling
-    cannot be measured on its own, so it is read through the infinite-alleles
-    equilibrium heterozygosity `θ/(1+θ)`, which is separately validated at
-    `PortabilityDrift.hetMutationFloor`. The body predicts 0.50000, 0.50000,
-    0.20000 and 0.20000 against measured 0.53297 ± 0.01697, 0.46858 ± 0.01307,
-    0.20081 ± 0.00688 and 0.21293 ± 0.00801 -- worst cell 2.40 sems.
-
-    Power: `Nₑ` and `μ` are swept by a factor of four INDEPENDENTLY, so two
-    cells reach `θ = 1` and two reach `θ = 4` by different routes. A wrong
-    numeric factor and a wrong `Nₑ`-dependence each break one of those pairs,
-    which a sweep holding `4·Nₑ·μ` fixed could not detect at all. -/
-noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
-  Descent.Core.scaledMutationRate Ne μ
 
 /-- **The scaling factor is four times the effective size.** Positivity is shared by every
 positive multiple of this product; dividing by the mutation rate exhibits the factor, which is
 the whole content of the scaling convention. -/
 theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
-    scaledMutationRate Ne μ / μ = 4 * Ne := by
-  unfold scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+    Descent.Core.scaledMutationRate Ne μ / μ = 4 * Ne := by
+  unfold Descent.Core.scaledMutationRate Descent.Core.ploidy
   field_simp
   ring
 
-/-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow.
+/-! **`scaledMigrationRate` is deleted here.**  It was
+`Descent.Core.scaledMigrationRate` under a second name, and every reference now
+calls the kernel.  Its VALIDATED record moves to `Core/Fst.lean` with it, for the same reason. -/
 
-    Regime: two-deme island model, `m` the total emigration rate.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`). Read through
-    the two-deme island `F_ST` from coalescence times against `1/(1 + 2·M)`,
-    where the factor two is `islandDemeCorrection` at `n = 2` -- the deme count
-    matters and a deme-blind law would be off by it. The body predicts 0.33333,
-    0.33333, 0.11111 and 0.11111 against measured 0.31967 ± 0.01809, 0.30661 ±
-    0.01138, 0.10482 ± 0.00611 and 0.10891 ± 0.00467, worst cell 2.35 sems.
-
-    Power: as for `scaledMutationRate`, `Nₑ` and `m` are swept by a factor of
-    four INDEPENDENTLY, so `M = 1` and `M = 4` are each reached twice by
-    different routes and the `Nₑ`-dependence is separately on trial. -/
-noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
-  Descent.Core.scaledMigrationRate Ne m
 
 /-- **The scaling factor is four times the effective size**, the same convention as the scaled
 mutation rate. Dividing by the migration rate exhibits it, which is the whole content of the
 convention and is what a body carrying any other multiple would fail while remaining positive and
 increasing in both arguments. -/
 theorem scaledMigrationRate_div_m (Ne m : ℝ) (h : m ≠ 0) :
-    scaledMigrationRate Ne m / m = 4 * Ne := by
-  unfold scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Ne m / m = 4 * Ne := by
+  unfold Descent.Core.scaledMigrationRate Descent.Core.ploidy
   field_simp
   ring
 
@@ -2558,16 +2533,16 @@ noncomputable def EvolutionaryParameters.tau (p : EvolutionaryParameters) : ℝ 
 
 /-- Scaled mutation parameter: θ = 4Neμ. -/
 noncomputable def EvolutionaryParameters.theta (p : EvolutionaryParameters) : ℝ :=
-  scaledMutationRate p.Ne p.mu
+  Descent.Core.scaledMutationRate p.Ne p.mu
 
 /-- Scaled migration parameter: M = 4Nem. -/
 noncomputable def EvolutionaryParameters.bigM (p : EvolutionaryParameters) : ℝ :=
-  scaledMigrationRate p.Ne p.mig
+  Descent.Core.scaledMigrationRate p.Ne p.mig
 
 /-- θ ≥ 0. -/
 theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.theta := by
-  unfold theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  unfold theta Descent.Core.scaledMutationRate Descent.Core.ploidy
   have := p.Ne_pos
   have := p.mu_nonneg
   positivity
@@ -2575,7 +2550,7 @@ theorem EvolutionaryParameters.theta_nonneg (p : EvolutionaryParameters) :
 /-- M ≥ 0. -/
 theorem EvolutionaryParameters.bigM_nonneg (p : EvolutionaryParameters) :
     0 ≤ p.bigM := by
-  unfold bigM scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  unfold bigM Descent.Core.scaledMigrationRate Descent.Core.ploidy
   have := p.Ne_pos
   have := p.mig_nonneg
   positivity
@@ -2821,8 +2796,8 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
     linarith [p.theta_nonneg, p.bigM_nonneg]
   have hd' : (1 : ℝ) + p.theta + 2 * p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + 2 * p.bigM = 1 + 4 * p.Ne * (2 * p.mig + p.mu) := by
-    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate
-      scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate
+      Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
     ring
   unfold fstDemeCorrectedFlowStep fstEquilibrium Descent.Core.fstFromFlow
   rw [← add_assoc]
@@ -2838,10 +2813,10 @@ theorem fstEquilibrium_of_no_flow (p : EvolutionaryParameters)
     (hmig : p.mig = 0) (hmu : p.mu = 0) :
     fstEquilibrium p = 1 := by
   have hθ : p.theta = 0 := by
-    unfold EvolutionaryParameters.theta scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+    unfold EvolutionaryParameters.theta Descent.Core.scaledMutationRate Descent.Core.ploidy
     rw [hmu]; ring
   have hM : p.bigM = 0 := by
-    unfold EvolutionaryParameters.bigM scaledMigrationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    unfold EvolutionaryParameters.bigM Descent.Core.scaledMigrationRate Descent.Core.ploidy
     rw [hmig]; ring
   unfold fstEquilibrium Descent.Core.fstFromFlow
   rw [hθ, hM]
@@ -3189,8 +3164,8 @@ theorem fstEquilibrium_decreasing_in_theta
       ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
-    scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
+    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
@@ -3209,8 +3184,8 @@ theorem fstEquilibrium_decreasing_in_migration
       ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM scaledMutationRate Descent.Core.fstFromFlow
-    scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
+    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
@@ -4211,17 +4186,17 @@ divergence time. -/
 theorem fstDriftMigrationManyDemes_at_witness :
     fstDriftMigrationManyDemes EvolutionaryParameters.witness = 1 / 5 := by
   norm_num [fstDriftMigrationManyDemes, EvolutionaryParameters.bigM,
-    EvolutionaryParameters.witness, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem migrationLDBoost_at_witness :
     migrationLDBoost EvolutionaryParameters.witness = 7 / 5 := by
   norm_num [migrationLDBoost, EvolutionaryParameters.bigM, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem mutationLDErosion_at_witness :
     mutationLDErosion EvolutionaryParameters.witness = Real.exp (-2) := by
   norm_num [mutationLDErosion, EvolutionaryParameters.theta, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, scaledMutationRate, Descent.Core.scaledMutationRate, Descent.Core.ploidy]
+    EvolutionaryParameters.witness, Descent.Core.scaledMutationRate, Descent.Core.scaledMutationRate, Descent.Core.ploidy]
 
 theorem sharedLDRetention_at_witness :
     sharedLDRetention EvolutionaryParameters.witness

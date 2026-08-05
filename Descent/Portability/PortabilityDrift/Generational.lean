@@ -242,14 +242,14 @@ noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGe
     (m.toGenerationalPopGenParameters).theta = m.theta := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.theta, PopGen.EvolutionaryParameters.theta,
-    PopGen.scaledMutationRate]
+    Descent.Core.scaledMutationRate]
 
 @[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).bigM = m.bigM := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.bigM, PopGen.EvolutionaryParameters.bigM,
-    PopGen.scaledMigrationRate]
+    Descent.Core.scaledMigrationRate]
 
 @[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PopGen.PGSEvolutionaryModel) :
@@ -278,7 +278,7 @@ theorem constrained them jointly and could not have caught the decay base. -/
     Descent.Core.fstFromFlow,
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
-    PopGen.EvolutionaryParameters.bigM, PopGen.scaledMutationRate, PopGen.scaledMigrationRate,
+    PopGen.EvolutionaryParameters.bigM, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
     Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   exact Or.inl (by ring)
 

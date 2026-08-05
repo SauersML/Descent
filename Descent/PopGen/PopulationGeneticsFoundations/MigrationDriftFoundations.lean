@@ -70,83 +70,22 @@ only in the limit.
 The reason this matters here specifically: two-population comparisons are the
 common case in this corpus, and `d = 2` is exactly where the limit is worst. -/
 
-/-- **Finite-island correction factor** `d/(d-1)`, in the number of demes
-`d`. This is the entire difference between the infinite-island limit and the
-finite-island result, isolated so that it can be stated about rather than
-carried implicitly.
+/-! **`islandDemeCorrection` is deleted here.**  It was
+`Descent.Core.islandDemeCorrection` under a second name, and every reference now
+calls the kernel.  The deme correction `d/(d-1)` is one quantity; two names for it is how a factor-of-two disagreement survives unnoticed. -/
 
-    **The exponent was 2 and is measured to be 1.** msprime symmetric island
-    model at equilibrium, `F_ST` read as `1 - E[T_within]/E[T_between]` directly
-    off the genealogies -- no mutations, no estimator, no convention between the
-    definition and the number. `Ne = 1000`, total emigration `m = 1e-3` so
-    `4 Ne m = 4.0` is identical in every row, 40 replicates of 2 Mb:
-
-      demes   d/(d-1)   (d/(d-1))^2   simulated            linear   squared
-        2     0.11111       0.05882   0.09743±0.00432       3.2      8.9
-        3     0.14286       0.10000   0.15925±0.00771       2.1      7.7
-        4     0.15789       0.12329   0.15885±0.00796       0.1      4.5
-        6     0.17241       0.14793   0.16507±0.00702       1.0      2.4
-       10     0.18367       0.16840   0.18338±0.00645       0.0      2.3
-       20     0.19192       0.18409   0.19065±0.00520       0.2      1.3
-       40     0.19598       0.19202   0.19922±0.00710       0.5      1.0
-
-    The squared form is low in all seven cells, which is a bias and not scatter;
-    the linear form is within 2.1 sems in six of seven. Neither the deme-blind
-    limit (23.8 sems at two demes) nor the square survives.
-
-    Empirical status: **VALIDATED** as `d/(d-1)`
-    (`validation/empirical/simcov/battery_max.py`, `test_island_law`),
-    the square **FALSIFIED** on the same runs.
-
-    Power: at fixed `4 Ne m` the two candidates predict 0.11111 against 0.05882
-    at two demes and converge to 0.19598 against 0.19202 at forty, so the design
-    separates them where they differ and not where they do not. 
-    **Validated across five deme counts, and the squared form excluded**
-    (`validation/empirical/simcov/battery_bulk18b.py`). Island model with the TOTAL emigration rate held fixed at `4 Ne m = 2.0` while the deme count
-    runs 2, 3, 5, 10, 25, `F_ST` from coalescence times so no estimator
-    convention enters:
-
-      demes   measured             no correction   d/(d-1)      (d/(d-1))^2
-        2     0.18634 ± 0.00832     0.33333        0.20000      0.11111
-        3     0.22334 ± 0.00972     0.33333        0.25000      0.18182
-        5     0.28418 ± 0.01266     0.33333        0.27778      0.24242
-       10     0.31609 ± 0.00907     0.33333        0.30303      0.28826
-       25     0.32598 ± 0.01121     0.33333        0.32468      0.31544
-
-      worst cell:                  17.66 sems      2.74 sems    9.04 sems
-
-    The linear correction is the one the data supports. The SQUARED correction
-    was carried through the same cells because it is the form originally
-    proposed for this defect, and it is excluded at 9.04 sems -- it overshoots
-    at every deme count and worst where the correction matters most. Recording
-    that is the point of having carried it: the power on this factor is settled
-    by the sweep rather than by whichever form was proposed first.
-
-    Holding the TOTAL rate fixed is what makes the sweep mean anything, and an
-    earlier run of it did not. `msprime`'s `island_model(migration_rate = m)`
-    sets the rate between each ORDERED PAIR, so a deme's total emigration is
-    `m (n - 1)` and climbs with the deme count; a sweep at fixed pairwise rate
-    moves the very quantity the formulas take, and the measured `F_ST` then
-    falls for a reason no candidate is being asked about. That run is superseded
-    by this one.
-
-    The no-correction row is `fstDriftMigrationManyDemes` and the table is also
-    its evidence: 17.66 sems adrift at two demes and 0.65 sems at twenty-five,
-    which is what a many-deme limit should look like.
--/
-noncomputable def islandDemeCorrection (d : ℝ) : ℝ := Descent.Core.islandDemeCorrection d
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem islandDemeCorrection_at_reference_point :
-    islandDemeCorrection (1 / 2) = -1 := by
-  unfold islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
+    Descent.Core.islandDemeCorrection (1 / 2) = -1 := by
+  unfold Descent.Core.islandDemeCorrection Descent.Core.ratio
   norm_num
 
 /-- **The deme correction's junk branch, named.** At a single deme the correction diverges and
 Lean returns `0`. Consumers must require `d ≠ 1`, and `islandFstFiniteDemes_one_deme_is_junk`
 shows what the `0` does downstream. -/
-theorem islandDemeCorrection_one_deme_is_junk : islandDemeCorrection 1 = 0 := by
-  unfold islandDemeCorrection; exact Descent.Core.islandDemeCorrection_one_is_junk
+theorem islandDemeCorrection_one_deme_is_junk : Descent.Core.islandDemeCorrection 1 = 0 := by
+  unfold Descent.Core.islandDemeCorrection; exact Descent.Core.islandDemeCorrection_one_is_junk
 
 /-- **Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
 
@@ -186,7 +125,7 @@ theorem islandDemeCorrection_one_deme_is_junk : islandDemeCorrection 1 = 0 := by
     against which the differential check `islandModelFst-finite-demes` measures
     the corpus's limit form. -/
 noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=
-  1 / (1 + 4 * Ne * m * islandDemeCorrection d)
+  1 / (1 + 4 * Ne * m * Descent.Core.islandDemeCorrection d)
 
 /-- **This is the master island law at zero mutation**, which is where it sits in the
 lattice.
@@ -203,7 +142,7 @@ convention fixes them in a single place. Without this theorem an edit to that co
 would silently stop reaching this definition. -/
 theorem islandFstFiniteDemes_eq_islandEquilibrium_no_mutation (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d = Descent.Core.fstIslandEquilibrium Ne m 0 d := by
-  unfold islandFstFiniteDemes islandDemeCorrection Descent.Core.fstIslandEquilibrium
+  unfold islandFstFiniteDemes Descent.Core.islandDemeCorrection Descent.Core.fstIslandEquilibrium
     Descent.Core.fstFromFlow Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
     Descent.Core.scaledMutationRate Descent.Core.ploidy
   ring_nf
@@ -226,14 +165,14 @@ theorem islandFstFiniteDemes_one_deme_is_junk (Ne m : ℝ) :
 corpus actually uses, and it is where the measurement separates the candidates
 most sharply -- simulated `0.09743 ± 0.00432` against `0.11111` here and
 `0.05882` for the superseded square. -/
-theorem islandDemeCorrection_at_two : islandDemeCorrection 2 = 2 :=
+theorem islandDemeCorrection_at_two : Descent.Core.islandDemeCorrection 2 = 2 :=
   Descent.Core.islandDemeCorrection_two
 
 /-- The correction is strictly above `1` at every finite number of demes, so
 the limit is never exact for a real population. -/
 theorem one_lt_islandDemeCorrection (d : ℝ) (hd : 1 < d) :
-    1 < islandDemeCorrection d := by
-  unfold islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
+    1 < Descent.Core.islandDemeCorrection d := by
+  unfold Descent.Core.islandDemeCorrection Descent.Core.ratio
   have hpos : 0 < d - 1 := by linarith
   rw [lt_div_iff₀ hpos]; linarith
 
@@ -245,7 +184,7 @@ theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
     islandFstFiniteDemes Ne m d < Portability.fstMigrationDriftEquilibrium Ne m := by
   unfold islandFstFiniteDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-  have hc : 1 < islandDemeCorrection d := one_lt_islandDemeCorrection d hd
+  have hc : 1 < Descent.Core.islandDemeCorrection d := one_lt_islandDemeCorrection d hd
   have hNm : 0 < 4 * Ne * m := by positivity
   apply div_lt_div_of_pos_left one_pos (by nlinarith)
   nlinarith
@@ -260,7 +199,7 @@ the limit throws away: the correction exceeds one by exactly `1/(d-1)`, which is
 what a reader deciding whether the many-deme form is usable at a given `d` actually
 needs. -/
 theorem islandDemeCorrection_tendsto_one :
-    Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1) :=
+    Filter.Tendsto Descent.Core.islandDemeCorrection Filter.atTop (nhds 1) :=
   Descent.Core.islandDemeCorrection_tendsto_one
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
@@ -457,7 +396,7 @@ noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ
     deme counts while the limit form is constant at 0.20000, so the design
     separates them by construction. -/
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
-  Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
+  Descent.Core.fstFromFlow (4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ)
 
 /-- **This body and `Core.fstIslandEquilibrium` are the same function.**
 
@@ -478,7 +417,7 @@ of 200 sampled points, from the values alone. -/
 theorem fstIslandEquilibriumFiniteDemes_eq_master (Ne m μ nDemes : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = Descent.Core.fstIslandEquilibrium Ne m μ nDemes := by
-  unfold fstIslandEquilibriumFiniteDemes islandDemeCorrection
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.islandDemeCorrection
     Descent.Core.fstIslandEquilibrium Descent.Core.fstFromFlow Descent.Core.scaledFlow
     Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   ring_nf
@@ -501,15 +440,15 @@ nothing else, so the balance that produced the limit form produces this one at
 stipulated as a closed form, which is the defect `EQUILIBRIUM_BUDGET` names. -/
 theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ)
-    (hcorr : 0 ≤ islandDemeCorrection nDemes) :
-    scaledIdentityStep (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
+    (hcorr : 0 ≤ Descent.Core.islandDemeCorrection nDemes) :
+    scaledIdentityStep (4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ)
         (fstIslandEquilibriumFiniteDemes Ne m μ nDemes) =
       fstIslandEquilibriumFiniteDemes Ne m μ nDemes := by
   have h4 : (0 : ℝ) ≤ 4 * Ne := by linarith
-  have h : (0 : ℝ) ≤ 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ :=
+  have h : (0 : ℝ) ≤ 4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ :=
     add_nonneg (mul_nonneg (mul_nonneg h4 hm) hcorr) (mul_nonneg h4 hμ)
   have hbody : fstIslandEquilibriumFiniteDemes Ne m μ nDemes =
-      1 / (1 + (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)) := by
+      1 / (1 + (4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ)) := by
     unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
     ring
   rw [hbody]
@@ -519,7 +458,7 @@ theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
 the finite-deme equilibrium is exactly `fstMigrationMutationEquilibriumManyDemes`, which is
 the precise sense in which the older definition is a limit rather than a law. -/
 theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
-    (Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) :
+    (Ne m μ nDemes : ℝ) (h : Descent.Core.islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
   unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow

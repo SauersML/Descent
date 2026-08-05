@@ -564,8 +564,8 @@ breaks this identity fails to compile rather than leaving the two quietly
 disagreeing about a shape they both claim. -/
 theorem mutationSelectionBalance_eq_fstFromTau (mu s h : ℝ)
     (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) :
-    mutationSelectionBalance mu s h = fstFromTau (mu / (h * s)) := by
-  unfold mutationSelectionBalance fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
+    mutationSelectionBalance mu s h = Descent.Core.fstFromTau (mu / (h * s)) := by
+  unfold mutationSelectionBalance Descent.Core.fstFromTau Descent.Core.saturation
   have hden : (h * s + mu) / (h * s) = 1 + mu / (h * s) := by
     rw [add_div, div_self hhs]
   rw [← hden, div_eq_div_iff hsum (div_ne_zero hsum hhs)]

@@ -48,25 +48,15 @@ section FstDerivationFromDrift
 
 /-! ### Pure-drift heterozygosity recurrence -/
 
-/-- **Heterozygosity recurrence under pure drift.**
-    Each generation, the probability that two sampled alleles are distinct
-    is reduced by a factor of (1 - 1/(2Ne)).
+/-! **`hetRecurrence` is deleted here.**  It was
+`Descent.Core.hetRecurrence` under a second name, and every reference now
+calls the kernel.  Nothing referenced the wrapper; `Core.hetRecurrence` is the recurrence, and `Coalescent.WrightFisher.hetRecurrence_eq_pairDistinct` is where it stops being a stipulation. -/
 
-    Regime: closed population, no mutation. This is the root of the cluster that
-    `Descent.PopGen.DriftRegime` dissects: every quantity downstream of this
-    recurrence is a function of the single number `(1 - 1/(2Ne))^t`, so every
-    cross-check among them holds at every value of it, correct or not
-    (`crossChecks_blind_to_retention`). At mutation-drift balance the measured
-    retention is `1.02 ± 0.02` against `e^(-2) = 0.135` predicted here, and the
-    resulting `F_ST` is `≈ 0` where the measurable between-population `F_ST` is
-    `0.50`. The recurrence is correct for what it says; it is not a split `F_ST`. -/
-noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ :=
-  Descent.Core.hetRecurrence Ne H₀
 
 /-- **Closed-form solution by induction.**
     hetRecurrence Ne H₀ t = (1 - 1/(2Ne))^t × H₀. -/
 theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
-    hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ :=
+    Descent.Core.hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ :=
   Descent.Core.hetRecurrence_closed_form Ne H₀ t
 
 /-! ### Fst derived from heterozygosity loss -/
@@ -85,7 +75,7 @@ the bodies were identical.
 /-- **Loss matches heterozygosity decay.** When `H₀ ≠ 0`,
 `heterozygosityLossFromDrift t Ne = 1 - hetRecurrence Ne H₀ t / H₀`. -/
 theorem heterozygosityLossFromDrift_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
-    heterozygosityLossFromDrift t Ne = 1 - hetRecurrence Ne H₀ t / H₀ := by
+    heterozygosityLossFromDrift t Ne = 1 - Descent.Core.hetRecurrence Ne H₀ t / H₀ := by
   unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [hetRecurrence_closed_form]
   field_simp

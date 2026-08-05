@@ -500,37 +500,17 @@ well-tagged in the discovery population, creating systematic bias in PGS.
 
 section DiscoveryBias
 
-/-- **Heterozygosity function.** het(p) = 2p(1-p) is the expected fraction of
-    heterozygotes at a biallelic locus in Hardy-Weinberg proportions, and hence
-    the per-variant information content for association testing.
+/-! **`hweHeterozygosity` is deleted here.**  It was
+`Descent.Core.hweHeterozygosity` under a second name, and every reference now
+calls the kernel.  `Core.Genome.hweProb_het` now proves that this body IS the probability of drawing a heterozygote, which is what earns the name -- and it earns it once. -/
 
-    This is the corpus-wide heterozygote frequency. It was written out
-    independently as `StratificationConfounding.heterozygosity`; that definition
-    is gone and its references point here.
-
-    Empirical status: **VALIDATED** on the same runs as
-    `genotypeVarianceHWE` (`battery_ldsc.py`, `test_hwe_fork`), worst 1.72 sems.
-    It is the same body as `genotypeVarianceHWE` in this file and
-    `Conventions.hweGenotypeVariance`: one quantity, three names -- and, since
-    `Conventions.hweHeterozygosity_eq_hwe` and
-    `hweHeterozygosity_eq_genotypeVarianceHWE`, three names joined by theorem
-    rather than by coincidence of formula. This note used to say no theorem
-    related them.
-
-    Denotes: a frequency — the probability that a random individual is a
-    heterozygote. It is a *probability*, not a variance, and it is a different
-    concept from `genotypeVarianceHWE` even though the two coincide as numbers
-    under Hardy-Weinberg. That coincidence is stated as a theorem below rather
-    than left implicit in the shared formula, because conflating the two with the allelic variance `p(1-p)` is what produced the factor-of-four defect
-    this corpus already had to repair. -/
-noncomputable def hweHeterozygosity (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
 genotype variance recorded below is an identity between two bodies and does not fix either of
 them; the value at the interior maximum does, and it is the only point at which a mistaken factor
 of two is visible. -/
-theorem hweHeterozygosity_at_half : hweHeterozygosity (1 / 2) = 1 / 2 := by
-  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
+theorem hweHeterozygosity_at_half : Descent.Core.hweHeterozygosity (1 / 2) = 1 / 2 := by
+  unfold Descent.Core.hweHeterozygosity Descent.Core.ploidy
   norm_num
 
 /-- **The heterozygote frequency and the genotype variance coincide under
@@ -538,8 +518,8 @@ Hardy-Weinberg.** They are different quantities — one is a probability, one is
 a second moment — and this is the only thing that licenses writing either
 formula where the other is meant. -/
 theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
-    hweHeterozygosity p = genotypeVarianceHWE p := by
-  unfold hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+    Descent.Core.hweHeterozygosity p = genotypeVarianceHWE p := by
+  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,
@@ -547,8 +527,8 @@ theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
 theorem het_strict_mono_on_lower_half (p q : ℝ)
     (h_p_lt : p < 1/2) (h_q_lt : q < 1/2)
     (h_pq : p < q) :
-    hweHeterozygosity p < hweHeterozygosity q := by
-  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    Descent.Core.hweHeterozygosity p < Descent.Core.hweHeterozygosity q := by
+  unfold Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sq_nonneg p, sq_nonneg q]
 
 /-- **Discovered variants are biased toward EUR-common.**
@@ -567,8 +547,8 @@ theorem discovered_variants_eur_biased
     (h_afr_lt : p_afr < 1/2)
     (h_drift_down : p_afr < p_eur)
     (h_β_ne : β ≠ 0) :
-    hweHeterozygosity p_afr * β ^ 2 <
-      hweHeterozygosity p_eur * β ^ 2 := by
+    Descent.Core.hweHeterozygosity p_afr * β ^ 2 <
+      Descent.Core.hweHeterozygosity p_eur * β ^ 2 := by
   have h_het_lt :=
     het_strict_mono_on_lower_half p_afr p_eur h_afr_lt h_eur_lt h_drift_down
   have h_β_sq_pos : 0 < β ^ 2 := sq_pos_of_ne_zero h_β_ne

@@ -74,14 +74,14 @@ noncomputable def MutationDriftModelAssumptions.witness : MutationDriftModelAssu
 
     Empirical status: UNTESTED. -/
 noncomputable def MutationDriftModelAssumptions.theta (m : MutationDriftModelAssumptions) : ℝ :=
-  PopGen.scaledMutationRate m.Ne m.μ
+  Descent.Core.scaledMutationRate m.Ne m.μ
 
 /-- **The scaled mutation parameter is linear in the mutation rate with slope four Ne.**
 `theta_pos` below fixes the sign and leaves the slope free. -/
 theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssumptions)
     (h : m.μ ≠ 0) :
     m.theta / m.μ = 4 * m.Ne := by
-  unfold MutationDriftModelAssumptions.theta PopGen.scaledMutationRate
+  unfold MutationDriftModelAssumptions.theta Descent.Core.scaledMutationRate
     Descent.Core.scaledMutationRate Descent.Core.ploidy
   field_simp
   ring
@@ -89,7 +89,7 @@ theorem MutationDriftModelAssumptions.theta_div_mu (m : MutationDriftModelAssump
 /-- θ is positive for any valid mutation-drift model. -/
 theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptions) :
     0 < m.theta := by
-  unfold MutationDriftModelAssumptions.theta PopGen.scaledMutationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
+  unfold MutationDriftModelAssumptions.theta Descent.Core.scaledMutationRate Descent.Core.ploidy
   nlinarith [m.Ne_pos, m.mu_pos]
 
 /-- **One generation of the identity-by-descent balance.**
@@ -221,7 +221,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
   have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := by
     unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
-      PopGen.fstMutationDriftEquilibrium PopGen.scaledMutationRate Descent.Core.fstFromFlow
+      PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
       Descent.Core.scaledMutationRate Descent.Core.ploidy
     ring_nf
   rw [hθ]

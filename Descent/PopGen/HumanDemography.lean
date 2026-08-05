@@ -221,7 +221,7 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
     Portability.fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold Portability.fstFromGenerations Portability.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
+  unfold Portability.fstFromGenerations Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.fstFromTau Descent.Core.saturation
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
   nlinarith

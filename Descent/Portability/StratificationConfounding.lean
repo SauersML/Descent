@@ -824,12 +824,12 @@ noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
     against this exact body. A definition a battery validates against is not dead code, and
     deleting it would silently retire a passing measurement. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
-  m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_X_resid
+  m.n * m.β_inst ^ 2 * Descent.Core.hweHeterozygosity p / m.σ2_X_resid
 
 /-- Heterozygosity is maximized at p = 0.5 and decreasing as p moves away. -/
 theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
-    0 < hweHeterozygosity p := by
-  unfold hweHeterozygosity Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    0 < Descent.Core.hweHeterozygosity p := by
+  unfold Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have : 0 < 1 - p := by linarith
   positivity
 
@@ -837,7 +837,7 @@ theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
     If the target has lower heterozygosity (allele frequency further from 0.5
     or toward fixation), F-stat decreases. Derived from the F-stat formula. -/
 theorem instrument_strength_decreases (m : MRInstrumentModel)
-    (h_het : hweHeterozygosity m.p_target < hweHeterozygosity m.p_source) :
+    (h_het : Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source) :
     m.fStat m.p_target < m.fStat m.p_source := by
   unfold MRInstrumentModel.fStat
   apply div_lt_div_of_pos_right _ m.σ2_X_resid_pos
