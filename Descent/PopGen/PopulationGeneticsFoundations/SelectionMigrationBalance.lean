@@ -281,6 +281,35 @@ theorem selectionMigrationEquilibrium_orderings (s m : ℝ)
   · have h0 : 0 ≤ (s - m - m * s) / s := by rw [hkey]; nlinarith
     rw [max_eq_right h0, max_eq_right h.le, hkey]
 
+/-- **The maintained polymorphism IS a differentiation, and this says which one.**
+
+The section header claims a selection-migration balance "determines the amount of
+differentiation at selected loci", and until now nothing here named a differentiation
+statistic, so the claim could not be contradicted by anything in the corpus: every theorem
+above relates this module's equilibrium only to this module's own step maps.
+
+The continent--island model puts the island at the equilibrium frequency and the continent at
+zero, so the differentiation between them is Nei's `G_ST` at that pair. At the reference cell
+this module already uses for its own validation -- `s = 1/10`, `m = 1/20`, where the island
+rests at `9/20` -- that `G_ST` is `9/31`, about `0.29`. A migration rate of five percent
+against a ten-percent selective advantage leaves less than a third of the differentiation a
+fully isolated pair would show, which is the quantitative form of the statement that migration
+is the more powerful of the two forces at these magnitudes.
+
+    Empirical status: DERIVED.  Both sides are closed forms already in the corpus and this
+    composes them; `selectionMigrationEquilibrium`'s own VALIDATED note carries the
+    measurement that the island rests at `0.45000` in this cell, and no new measurement is
+    claimed here. -/
+theorem selectionMigrationEquilibrium_reference_neiGst :
+    neiGstFromFrequencies (selectionMigrationEquilibrium (1 / 10) (1 / 20)) 0 = 9 / 31 := by
+  have hp : selectionMigrationEquilibrium (1 / 10) (1 / 20) = 9 / 20 := by
+    unfold selectionMigrationEquilibrium
+    rw [show ((1 : ℝ) / 10 - 1 / 20 - 1 / 20 * (1 / 10)) / (1 / 10) = 9 / 20 by norm_num]
+    exact max_eq_right (by norm_num)
+  rw [hp]
+  unfold neiGstFromFrequencies
+  norm_num
+
 /-- **Loci under selection contribute disproportionally to portability loss.**
     Selected loci have higher Fst → larger portability impact
     despite being a small fraction of all loci.
