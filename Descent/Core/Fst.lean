@@ -326,13 +326,12 @@ theorem fstIslandEquilibrium_structure_coords (Ne m μ nDemes θ bigM : ℝ)
     (hd : islandDemeCorrection nDemes = 2)
     (hθ : θ = scaledMutationRate Ne μ) (hM : bigM = scaledMigrationRate Ne m) :
     fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + θ + 2 * bigM) := by
-  have hflow : scaledFlow Ne m μ nDemes = θ + 2 * bigM := by
+  have hflow : 1 + scaledFlow Ne m μ nDemes = 1 + θ + 2 * bigM := by
     unfold scaledFlow
     rw [hd, hθ, hM]
     ring
   unfold fstIslandEquilibrium fstFromFlow
   rw [hflow]
-  ring
 
 /-! ### `F_ST` from a scaled coalescence time
 
