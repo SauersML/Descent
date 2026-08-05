@@ -149,22 +149,47 @@ FQ_OVERRIDES = {
 
 
 def _leanexpr_table():
-    table: dict[str, callable] = {}
-    defs: dict[str, L.LeanDef] = {}
+    """Return (callables by BARE name, LeanDefs by bare name).
+
+    Two tables are built, not one.  The inner table is keyed by the name LEAN
+    gives a declaration -- `Descent.Core.ploidy`, not `ploidy` -- because that
+    is the only key a body's own text can be resolved against: bodies call
+    `Descent.Core.survivalWeightedMix` by its prefix, and every such call used
+    to raise `KeyError` on a short-name table.  Each definition is then compiled
+    against a `Scope` over that table carrying its OWN namespace, so an
+    unqualified call resolves outward from where it was written, exactly as Lean
+    resolves it.
+
+    The outer table stays keyed by bare name because that is what `load()` and
+    the checks speak.  Where two declarations share a bare name the first still
+    wins there -- but it no longer decides what either of their BODIES mean,
+    which is what the collision was actually corrupting.
+    """
+    full: dict[str, callable] = {}
+    full_defs: dict[str, L.LeanDef] = {}
     for mod in _all_modules():
         path = _module_path(mod)
         for d in L.extract_file(path, mod) + L.extract_recursions(path, mod):
-            if d.name in defs:
+            if d.lean_name in full_defs:
                 continue
-            defs[d.name] = d
+            full_defs[d.lean_name] = d
             if d.py_src is None:
                 continue
             try:
-                table[d.name] = (
+                full[d.lean_name] = (
                     L.compile_recursion if d.is_recursion else L.compile_def
-                )(d, table)
+                )(d, L.Scope(full, d.namespace))
             except L.Unsupported:
                 pass
+
+    table: dict[str, callable] = {}
+    defs: dict[str, L.LeanDef] = {}
+    for lean_name, d in full_defs.items():
+        if d.name in defs:
+            continue
+        defs[d.name] = d
+        if lean_name in full:
+            table[d.name] = full[lean_name]
     return table, defs
 
 

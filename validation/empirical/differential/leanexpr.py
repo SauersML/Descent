@@ -302,10 +302,124 @@ class LeanDef:
     error: str | None = None
     base_src: str | None = None
     is_recursion: bool = False
+    namespace: str = ""
 
     @property
     def fqn(self) -> str:
         return f"Descent.{self.module}.{self.name}"
+
+    @property
+    def lean_name(self) -> str:
+        """The name Lean gives this declaration -- namespace, not module path.
+
+        `fqn` above is the MODULE path and is only ever printed.  Resolution
+        must use this one: `Descent.Core.ploidy` lives in `Core/Fst.lean`, so
+        the module path and the Lean name disagree about both the middle
+        component and its meaning.
+        """
+        return f"{self.namespace}.{self.name}" if self.namespace else self.name
+
+
+def _blank_comments(text: str) -> str:
+    """Replace comment characters with spaces, preserving every newline.
+
+    The namespace scan below must agree with the line numbers the definition
+    scan produces, so comments cannot be deleted -- only emptied.  It matters
+    because `end` appears in prose constantly, and one stray `end` read as code
+    pops a namespace and misfiles every declaration after it.
+    """
+    out = list(text)
+
+    def blank(a, b):
+        for k in range(a, min(b, len(out))):
+            if out[k] != "\n":
+                out[k] = " "
+
+    i, n = 0, len(text)
+    while i < n:
+        if text.startswith("/-", i):
+            depth, j = 1, i + 2
+            while j < n and depth:
+                if text.startswith("/-", j):
+                    depth, j = depth + 1, j + 2
+                elif text.startswith("-/", j):
+                    depth, j = depth - 1, j + 2
+                else:
+                    j += 1
+            blank(i, j)
+            i = j
+        elif text.startswith("--", i):
+            j = text.find("\n", i)
+            j = n if j < 0 else j
+            blank(i, j)
+            i = j
+        else:
+            i += 1
+    return "".join(out)
+
+
+_NS_RE = re.compile(r"^namespace\s+([A-Za-z_][A-Za-z0-9_.'₀-₉]*)\s*$")
+_SECTION_RE = re.compile(r"^section\b")
+_END_RE = re.compile(r"^end\b")
+
+
+def namespaces_by_line(text: str) -> list[str]:
+    """The namespace in effect at each 1-based line, as a dotted string.
+
+    `section` and `namespace` share the `end` keyword, so only a stack that
+    carries both can tell which one an `end` closes.
+    """
+    stack: list[str | None] = []
+    out = [""]
+    for line in _blank_comments(text).split("\n"):
+        out.append(".".join(s for s in stack if s))
+        m = _NS_RE.match(line)
+        if m:
+            stack.append(m.group(1))
+        elif _SECTION_RE.match(line):
+            stack.append(None)
+        elif _END_RE.match(line) and stack:
+            stack.pop()
+    return out
+
+
+class Scope:
+    """Resolve a name the way Lean does: relative to the caller's namespace.
+
+    A body in `Descent.Core` that writes `ploidy` means `Descent.Core.ploidy`,
+    and a body anywhere that writes `Descent.Core.ploidy` means the same thing.
+    A table keyed by SHORT name cannot express either: it collapses
+    `Descent.Core.scaledMutationRate` and `Descent.scaledMutationRate` onto one
+    entry, and it has no entry at all for a name written with its prefix.
+
+    That second failure is what put 81,131 rows in the cross-validation report.
+    Every body calling into the `Core` kernel raised `KeyError` on the written
+    name, `leanexpr` produced nothing, and the comparison recorded a
+    disagreement -- 80,939 of them from `ibdRecurrenceStep` alone.  None was a
+    disagreement about a value: not one row had two numbers in it.
+
+    Longest enclosing prefix first, then outward, then the bare name.  That is
+    Lean's rule, so a kernel is preferred to a wrapper over it from inside the
+    kernel's own namespace, and the wrapper is still reachable from outside.
+    """
+
+    def __init__(self, table: dict, namespace: str):
+        self.table, self.namespace = table, namespace
+
+    def __getitem__(self, key: str):
+        parts = self.namespace.split(".") if self.namespace else []
+        for i in range(len(parts), -1, -1):
+            cand = ".".join(parts[:i] + [key])
+            if cand in self.table:
+                return self.table[cand]
+        raise KeyError(key)
+
+    def __contains__(self, key: str) -> bool:
+        try:
+            self[key]
+        except KeyError:
+            return False
+        return True
 
 
 _BINDER_RE = re.compile(r"\(([^:()]+):\s*([^()]+)\)")
@@ -340,6 +454,7 @@ def _body_lines(lines: list[str], start: int) -> list[str]:
 def extract_file(path: str, module: str) -> list[LeanDef]:
     text = open(path, encoding="utf-8").read()
     lines = text.split("\n")
+    nsline = namespaces_by_line(text)
     out: list[LeanDef] = []
     for m in _DEF_RE.finditer(text):
         line_no = text[: m.start()].count("\n") + 1
@@ -362,6 +477,7 @@ def extract_file(path: str, module: str) -> list[LeanDef]:
             sha256=hashlib.sha256(
                 (m.group(0) + "\n" + body_src).encode()
             ).hexdigest()[:16],
+            namespace=nsline[line_no],
         )
         try:
             d.binders = _parse_binders(m.group("binders"))
@@ -395,6 +511,7 @@ def extract_recursions(path: str, module: str) -> list[LeanDef]:
     """
     text = open(path, encoding="utf-8").read()
     lines = text.split("\n")
+    nsline = namespaces_by_line(text)
     out: list[LeanDef] = []
     for m in _REC_DEF_RE.finditer(text):
         line_no = text[: m.start()].count("\n") + 1
@@ -407,6 +524,7 @@ def extract_recursions(path: str, module: str) -> list[LeanDef]:
             name=name, module=module, line=line_no, binders=[],
             body_src=body_src,
             sha256=hashlib.sha256((m.group(0) + "\n" + body_src).encode()).hexdigest()[:16],
+            namespace=nsline[line_no],
         )
         try:
             d.binders = _parse_binders(m.group("binders"))
