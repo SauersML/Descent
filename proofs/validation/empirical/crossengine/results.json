@@ -1,0 +1,921 @@
+{
+ "guard": "XSIM_CE_V1",
+ "reject_sems": 5.0,
+ "engines": {
+  "slim": {
+   "kind": "forward",
+   "version": "SLiM version 4.3, built Aug  4 2026 18:17:01"
+  },
+  "fwdpy11": {
+   "kind": "forward",
+   "version": "0.24.7"
+  }
+ },
+ "claims": {
+  "mutationSelectionBalance": {
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "engines": {
+    "slim": {
+     "kind": "forward",
+     "version": "SLiM version 4.3, built Aug  4 2026 18:17:01"
+    },
+    "fwdpy11": {
+     "kind": "forward",
+     "version": "0.24.7"
+    }
+   },
+   "cells_run": [
+    "4Nhs=200",
+    "4Nhs=50",
+    "4Nhs=10",
+    "4Nhs=2.5",
+    "4Nhs=1"
+   ],
+   "cells_corpus_rejected": [
+    {
+     "cell": "4Nhs=2.5",
+     "engine": "slim",
+     "sems": 14.375986904962758,
+     "measured": 0.6738668571299006,
+     "corpus": 0.00398406374501992,
+     "ratio": 169.14058113960505
+    },
+    {
+     "cell": "4Nhs=2.5",
+     "engine": "fwdpy11",
+     "sems": 7.839897566423292,
+     "measured": 0.8141428020769562,
+     "corpus": 0.00398406374501992,
+     "ratio": 204.349843321316
+    },
+    {
+     "cell": "4Nhs=1",
+     "engine": "slim",
+     "sems": 62.21547935906552,
+     "measured": 0.926997596535383,
+     "corpus": 0.00398406374501992,
+     "ratio": 232.67639673038116
+    },
+    {
+     "cell": "4Nhs=1",
+     "engine": "fwdpy11",
+     "sems": 23.404611047423693,
+     "measured": 0.9104703761648868,
+     "corpus": 0.00398406374501992,
+     "ratio": 228.5280644173866
+    }
+   ],
+   "calibration_ok": true,
+   "match_cells_with_power": [
+    {
+     "cell": "4Nhs=200",
+     "engine": "slim",
+     "planted_sems": -22.927756699916774
+    },
+    {
+     "cell": "4Nhs=200",
+     "engine": "fwdpy11",
+     "planted_sems": -18.80597179105595
+    },
+    {
+     "cell": "4Nhs=50",
+     "engine": "slim",
+     "planted_sems": -12.51813279170023
+    },
+    {
+     "cell": "4Nhs=50",
+     "engine": "fwdpy11",
+     "planted_sems": -14.138637575115734
+    }
+   ],
+   "underpowered_match_cells": [
+    {
+     "cell": "4Nhs=10",
+     "engine": "slim",
+     "planted_sems": -4.399816951977869
+    },
+    {
+     "cell": "4Nhs=10",
+     "engine": "fwdpy11",
+     "planted_sems": -4.874318334134839
+    }
+   ],
+   "engine_agreement": [
+    {
+     "cell": "4Nhs=200",
+     "worst_pairwise_sems": 0.0023416631135972964,
+     "agree": true
+    },
+    {
+     "cell": "4Nhs=50",
+     "worst_pairwise_sems": 0.917065395318817,
+     "agree": true
+    },
+    {
+     "cell": "4Nhs=10",
+     "worst_pairwise_sems": 0.47128209452638536,
+     "agree": true
+    },
+    {
+     "cell": "4Nhs=2.5",
+     "worst_pairwise_sems": 1.2374594647934334,
+     "agree": true
+    },
+    {
+     "cell": "4Nhs=1",
+     "worst_pairwise_sems": 0.3984837765426943,
+     "agree": true
+    }
+   ],
+   "engines_disagree": false,
+   "engine_kinds": [
+    "forward"
+   ],
+   "saw_forward_simulator": true,
+   "single_engine": false,
+   "verdict": "CORPUS-REJECTED-ON-SOME-CELLS"
+  },
+  "mutationSelectionBalance_guard": {
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "engines": {
+    "slim": {
+     "kind": "forward",
+     "version": "SLiM version 4.3, built Aug  4 2026 18:17:01"
+    }
+   },
+   "cells_run": [
+    "mu/hs=0.10",
+    "mu/hs=0.50",
+    "mu/hs=1.00"
+   ],
+   "cells_corpus_rejected": [
+    {
+     "cell": "mu/hs=0.10",
+     "engine": "slim",
+     "sems": 11.582140993980003,
+     "measured": 0.09977783176013326,
+     "corpus": 0.09090909090909091,
+     "ratio": 1.0975561493614658
+    },
+    {
+     "cell": "mu/hs=0.50",
+     "engine": "slim",
+     "sems": 32.446917618757546,
+     "measured": 0.5114752683694245,
+     "corpus": 0.33333333333333337,
+     "ratio": 1.5344258051082733
+    },
+    {
+     "cell": "mu/hs=1.00",
+     "engine": "slim",
+     "sems": 325.4189044191007,
+     "measured": 0.9978148945030538,
+     "corpus": 0.5,
+     "ratio": 1.9956297890061077
+    }
+   ],
+   "calibration_ok": true,
+   "engines_disagree": false,
+   "engine_kinds": [
+    "forward"
+   ],
+   "saw_forward_simulator": true,
+   "single_engine": true,
+   "verdict": "CORPUS-REJECTED-ON-SOME-CELLS"
+  },
+  "mutationSelectionBalanceRecessive": {
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "engines": {
+    "slim": {
+     "kind": "forward",
+     "version": "SLiM version 4.3, built Aug  4 2026 18:17:01"
+    }
+   },
+   "cells_run": [
+    "N=16000",
+    "N=4000",
+    "N=1000",
+    "N=200",
+    "N=50"
+   ],
+   "cells_corpus_rejected": [
+    {
+     "cell": "N=4000",
+     "engine": "slim",
+     "sems": -8.031058687482034,
+     "measured": 0.012438834620626988,
+     "corpus": 0.014042489172702238,
+     "ratio": 0.8857998370265681
+    },
+    {
+     "cell": "N=1000",
+     "engine": "slim",
+     "sems": -24.54711854508761,
+     "measured": 0.009378944196270297,
+     "corpus": 0.014042489172702238,
+     "ratio": 0.6678975558337908
+    },
+    {
+     "cell": "N=200",
+     "engine": "slim",
+     "sems": -59.60487337779882,
+     "measured": 0.00512528777102017,
+     "corpus": 0.014042489172702238,
+     "ratio": 0.3649842779286897
+    },
+    {
+     "cell": "N=50",
+     "engine": "slim",
+     "sems": -61.23495784933774,
+     "measured": 0.0029412775315259595,
+     "corpus": 0.014042489172702238,
+     "ratio": 0.20945556698335419
+    }
+   ],
+   "calibration_ok": true,
+   "match_cells_with_power": [
+    {
+     "cell": "N=16000",
+     "engine": "slim",
+     "planted_sems": -39.853021507757454
+    }
+   ],
+   "engines_disagree": false,
+   "engine_kinds": [
+    "forward"
+   ],
+   "saw_forward_simulator": true,
+   "single_engine": true,
+   "verdict": "CORPUS-REJECTED-ON-SOME-CELLS"
+  }
+ },
+ "rows": [
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=200",
+   "params": {
+    "N": 2000,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 40000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.004039876609925245,
+   "sem": 6.707209315023065e-05,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 0.832132445610624,
+    "classical": 0.5945335541553477,
+    "exact": 0.6004966894369651,
+    "double": -59.042788201118434,
+    "half": 30.41319443179224,
+    "PLANTED": -22.927756699916774
+   },
+   "corpus_rejected": false,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=200",
+   "params": {
+    "N": 2000,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 40000
+   },
+   "engine": "fwdpy11",
+   "engine_kind": "forward",
+   "engine_version": "0.24.7",
+   "nreps": 6,
+   "measured": 0.004039628929118256,
+   "sem": 8.178573971067678e-05,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 0.6793994196898144,
+    "classical": 0.4845457075823548,
+    "exact": 0.48943604624641723,
+    "double": -48.423736031389524,
+    "half": 24.938686577068292,
+    "PLANTED": -18.80597179105595
+   },
+   "corpus_rejected": false,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=50",
+   "params": {
+    "N": 500,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 80000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.004076873133359304,
+   "sem": 0.00011989137155212599,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 0.7741123246640979,
+    "classical": 0.6411898735004533,
+    "exact": 0.6445258930980119,
+    "double": -32.72234536857402,
+    "half": 17.32295749453769,
+    "PLANTED": -12.51813279170023
+   },
+   "corpus_rejected": false,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=50",
+   "params": {
+    "N": 500,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 80000
+   },
+   "engine": "fwdpy11",
+   "engine_kind": "forward",
+   "engine_version": "0.24.7",
+   "nreps": 6,
+   "measured": 0.004217828853395663,
+   "sem": 9.618044047084173e-05,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 2.4304849014141445,
+    "classical": 2.264793676648844,
+    "exact": 2.2689521101423704,
+    "double": -39.323703739441164,
+    "half": 23.059042384693846,
+    "PLANTED": -14.138637575115734
+   },
+   "corpus_rejected": false,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=10",
+   "params": {
+    "N": 100,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.004326519737886311,
+   "sem": 0.0002843685359635548,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 1.2042682278685033,
+    "classical": 1.148227376070039,
+    "exact": 1.1496338606648302,
+    "double": -12.91802642534436,
+    "half": 8.181354276777238,
+    "PLANTED": -4.399816951977869
+   },
+   "corpus_rejected": false,
+   "planted_rejected": false
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=10",
+   "params": {
+    "N": 100,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "fwdpy11",
+   "engine_kind": "forward",
+   "engine_version": "0.24.7",
+   "nreps": 6,
+   "measured": 0.004132938802349047,
+   "sem": 0.00029640051011056414,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 0.5022766569247556,
+    "classical": 0.4485107070141592,
+    "exact": 0.449860097286554,
+    "double": -13.046742720545426,
+    "half": 7.196137420793952,
+    "PLANTED": -4.874318334134839
+   },
+   "corpus_rejected": false,
+   "planted_rejected": false
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=2.5",
+   "params": {
+    "N": 25,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.6738668571299006,
+   "sem": 0.04659734304248909,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 14.375986904962758,
+    "classical": 14.375644905742641,
+    "exact": 14.375653489063899,
+    "double": 14.289803101493144,
+    "half": 14.41856580786739,
+    "PLANTED": 14.341786982951007
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=2.5",
+   "params": {
+    "N": 25,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "fwdpy11",
+   "engine_kind": "forward",
+   "engine_version": "0.24.7",
+   "nreps": 6,
+   "measured": 0.8141428020769562,
+   "sem": 0.10333792392922117,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 7.839897566423292,
+    "classical": 7.839743351451923,
+    "exact": 7.839747221860286,
+    "double": 7.801035393638297,
+    "half": 7.859097330358736,
+    "PLANTED": 7.824476069286389
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=1",
+   "params": {
+    "N": 10,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.926997596535383,
+   "sem": 0.014835753775412635,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 62.21547935906552,
+    "classical": 62.214405180077286,
+    "exact": 62.214432139271345,
+    "double": 61.94478625403194,
+    "half": 62.34921464309996,
+    "PLANTED": 62.108061460242666
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "4Nhs=1",
+   "params": {
+    "N": 10,
+    "MU": 0.0001,
+    "S": 0.05,
+    "H": 0.5,
+    "T0": 3000,
+    "T1": 150000
+   },
+   "engine": "fwdpy11",
+   "engine_kind": "forward",
+   "engine_version": "0.24.7",
+   "nreps": 6,
+   "measured": 0.9104703761648868,
+   "sem": 0.038731099208745456,
+   "predictions": {
+    "corpus": 0.00398406374501992,
+    "classical": 0.004,
+    "exact": 0.003999600040034924,
+    "double": 0.008,
+    "half": 0.002,
+    "PLANTED": 0.005577689243027888
+   },
+   "sems": {
+    "corpus": 23.404611047423693,
+    "classical": 23.4041995885365,
+    "exact": 23.404209915120905,
+    "double": 23.300923407851787,
+    "half": 23.455837678878858,
+    "PLANTED": 23.36346515870468
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance_guard",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "mu/hs=0.10",
+   "params": {
+    "N": 2000,
+    "MU": 0.002,
+    "S": 0.04,
+    "H": 0.5,
+    "T0": 2000,
+    "T1": 20000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.09977783176013326,
+   "sem": 0.0007657255127227352,
+   "predictions": {
+    "corpus": 0.09090909090909091,
+    "classical": 0.1,
+    "exact": 0.09980039920165057,
+    "double": 0.2,
+    "half": 0.05,
+    "PLANTED": 0.1272727272727273
+   },
+   "sems": {
+    "corpus": 11.582140993980003,
+    "classical": -0.2901408352932758,
+    "exact": -0.02947197284450607,
+    "double": -130.8852409572993,
+    "half": 65.00740922570974,
+    "PLANTED": -35.90698632311311
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance_guard",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "mu/hs=0.50",
+   "params": {
+    "N": 2000,
+    "MU": 0.005,
+    "S": 0.02,
+    "H": 0.5,
+    "T0": 2000,
+    "T1": 20000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.5114752683694245,
+   "sem": 0.005490257568660616,
+   "predictions": {
+    "corpus": 0.33333333333333337,
+    "classical": 0.5,
+    "exact": 0.49751243781115895,
+    "double": 1.0,
+    "half": 0.25,
+    "PLANTED": 0.4666666666666666
+   },
+   "sems": {
+    "corpus": 32.446917618757546,
+    "classical": 2.0901147579901136,
+    "exact": 2.5432013678133956,
+    "double": -88.9802938243122,
+    "half": 47.62531904914127,
+    "PLANTED": 8.16147533014361
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalance_guard",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalance",
+   "cell": "mu/hs=1.00",
+   "params": {
+    "N": 2000,
+    "MU": 0.005,
+    "S": 0.01,
+    "H": 0.5,
+    "T0": 2000,
+    "T1": 20000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.9978148945030538,
+   "sem": 0.0015297663649617836,
+   "predictions": {
+    "corpus": 0.5,
+    "classical": 1.0,
+    "exact": 0.9949931104592465,
+    "double": 2.0,
+    "half": 0.5,
+    "PLANTED": 0.7
+   },
+   "sems": {
+    "corpus": 325.4189044191007,
+    "classical": -1.4283916465902684,
+    "exact": 1.844584969599445,
+    "double": -655.1229837779723,
+    "half": 325.4189044191007,
+    "PLANTED": 194.67998599282436
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalanceRecessive",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "cell": "N=16000",
+   "params": {
+    "N": 16000,
+    "MU": 0.0001,
+    "S": 0.5,
+    "H": 0.0,
+    "T0": 2000,
+    "T1": 12000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.013361556618381619,
+   "sem": 0.00015802887673587335,
+   "predictions": {
+    "corpus": 0.014042489172702238,
+    "linear": 0.0002,
+    "sqrt2s": 0.01,
+    "PLANTED": 0.01965948484178313
+   },
+   "sems": {
+    "corpus": -4.308912196210303,
+    "linear": 83.28576960259997,
+    "sqrt2s": 21.271787079775706,
+    "PLANTED": -39.853021507757454
+   },
+   "corpus_rejected": false,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalanceRecessive",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "cell": "N=4000",
+   "params": {
+    "N": 4000,
+    "MU": 0.0001,
+    "S": 0.5,
+    "H": 0.0,
+    "T0": 3000,
+    "T1": 25000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.012438834620626988,
+   "sem": 0.000199681588004687,
+   "predictions": {
+    "corpus": 0.014042489172702238,
+    "linear": 0.0002,
+    "sqrt2s": 0.01,
+    "PLANTED": 0.01965948484178313
+   },
+   "sems": {
+    "corpus": -8.031058687482034,
+    "linear": 61.29175325037837,
+    "sqrt2s": 12.213617915387086,
+    "PLANTED": -36.1608213020955
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalanceRecessive",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "cell": "N=1000",
+   "params": {
+    "N": 1000,
+    "MU": 0.0001,
+    "S": 0.5,
+    "H": 0.0,
+    "T0": 3000,
+    "T1": 50000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.009378944196270297,
+   "sem": 0.00018998339735338155,
+   "predictions": {
+    "corpus": 0.014042489172702238,
+    "linear": 0.0002,
+    "sqrt2s": 0.01,
+    "PLANTED": 0.01965948484178313
+   },
+   "sems": {
+    "corpus": -24.54711854508761,
+    "linear": 48.31445444254721,
+    "sqrt2s": -3.2690004094120853,
+    "PLANTED": -54.11283716750446
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalanceRecessive",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "cell": "N=200",
+   "params": {
+    "N": 200,
+    "MU": 0.0001,
+    "S": 0.5,
+    "H": 0.0,
+    "T0": 3000,
+    "T1": 100000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.00512528777102017,
+   "sem": 0.0001496052402487526,
+   "predictions": {
+    "corpus": 0.014042489172702238,
+    "linear": 0.0002,
+    "sqrt2s": 0.01,
+    "PLANTED": 0.01965948484178313
+   },
+   "sems": {
+    "corpus": -59.60487337779882,
+    "linear": 32.92189339645299,
+    "sqrt2s": -32.583833433070374,
+    "PLANTED": -97.15032071467928
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  },
+  {
+   "claim": "mutationSelectionBalanceRecessive",
+   "lean_file": "proofs/Calibrator/RareVariantPortability.lean",
+   "def_name": "mutationSelectionBalanceRecessive",
+   "cell": "N=50",
+   "params": {
+    "N": 50,
+    "MU": 0.0001,
+    "S": 0.5,
+    "H": 0.0,
+    "T0": 3000,
+    "T1": 100000
+   },
+   "engine": "slim",
+   "engine_kind": "forward",
+   "engine_version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "nreps": 6,
+   "measured": 0.0029412775315259595,
+   "sem": 0.00018128879370652394,
+   "predictions": {
+    "corpus": 0.014042489172702238,
+    "linear": 0.0002,
+    "sqrt2s": 0.01,
+    "PLANTED": 0.01965948484178313
+   },
+   "sems": {
+    "corpus": -61.23495784933774,
+    "linear": 15.1210534058913,
+    "sqrt2s": -38.93634197765652,
+    "PLANTED": -92.21864721170321
+   },
+   "corpus_rejected": true,
+   "planted_rejected": true
+  }
+ ]
+}

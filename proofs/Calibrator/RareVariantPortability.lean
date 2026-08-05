@@ -423,14 +423,14 @@ admissible parameter, including the weak-constraint regime `s < mu` where
     carrier frequency, `mu = 1e-04`, `s = 0.05`, `h = 0.5`, `Nₑ` swept:
 
       4 Nₑ h s   this def   SLiM                  fwdpy11               sems
-      200         0.003984  0.003905 ± 0.000060  0.004006 ± 0.000087   -1.3 / 0.3
-      50          0.003984  0.004299 ± 0.000136  0.004089 ± 0.000117    2.3 / 0.9
-      10          0.003984  0.004431 ± 0.000253  0.004428 ± 0.000378    1.8 / 1.2
-      2.5         0.003984  0.8438   ± 0.0477    0.9136   ± 0.0384      18 / 24
-      1           0.003984  0.9406   ± 0.0251    0.8698   ± 0.0395      37 / 22
+      200         0.003984  0.004040 ± 0.000067  0.004040 ± 0.000082   0.8 / 0.7
+      50          0.003984  0.004077 ± 0.000120  0.004218 ± 0.000096   0.8 / 2.4
+      10          0.003984  0.004327 ± 0.000284  0.004133 ± 0.000296   1.2 / 0.5
+      2.5         0.003984  0.6739   ± 0.0466    0.8141   ± 0.1033      14 / 7.8
+      1           0.003984  0.9270   ± 0.0148    0.9105   ± 0.0387      62 / 23
 
     At `4 Nₑ h s ≥ 10` the body holds on both engines. At `4 Nₑ h s ≤ 2.5` it is
-    low by a factor of 210 to 240: selection no longer holds the allele down,
+    low by a factor of 170 to 230: selection no longer holds the allele down,
     the site drifts to near-fixation for the deleterious allele, and a formula
     with no `Nₑ` in it cannot see that happen. The failure is not a coefficient
     error, so no reparametrisation repairs it -- the deterministic fixed point
@@ -443,19 +443,50 @@ admissible parameter, including the weak-constraint regime `s < mu` where
     distinguishes a corpus error from a harness error.
 
     Power, and the competitor that earns the match: on the same cells the
-    per-diploid form `2 mu / (h s)` is rejected at 9.5 to 68 sems and the halved
-    form `mu / (2 h s)` at 6.4 to 32, so the agreement in the top three rows is
+    per-diploid form `2 mu / (h s)` is rejected at 13 to 59 sems and the halved
+    form `mu / (2 h s)` at 7.2 to 30, so the agreement in the top three rows is
     a measurement rather than a tautology.
 
-    What this table does NOT settle: the `+ mu` guard in the denominator.
-    `mu / (h s + mu)` and the classical `mu / (h s)` differ by 0.4 percent at
-    `mu / (h s) = 0.004`, far inside these error bars. Cells at
-    `mu / (h s) = 0.1` to `1`, where the two are 10 to 50 percent apart, were
-    run and are reported INCONCLUSIVE rather than as a verdict: at those
-    mutation rates a single locus emulated by infinite sites accumulates
-    repeat hits, each carrying its own multiplicative fitness cost, and both
-    engines share that artifact, so their agreement does not rescue it. The
-    `+ mu` term is UNTESTED. -/
+    **The `+ mu` in the denominator is FALSIFIED.** The cells above cannot see
+    it -- `mu / (h s + mu)` and the classical `mu / (h s)` differ by 0.4 percent
+    at `mu / (h s) = 0.004`, far inside those error bars. Cells run at
+    `mu / (h s)` of `1/2` and `1`, on a true biallelic locus at `4 Nₑ h s = 80`
+    and `40` so that drift is not what is being measured:
+
+      mu/(h s)   this def   classical   exact    measured             sems
+      0.1         0.090909   0.1        0.0998   0.099778 ± 0.000766  12 high
+      0.5         0.33333    0.5        0.49751  0.511475 ± 0.005490  32 high
+      1.0         0.5        1.0        0.99499  0.997815 ± 0.001530 325 high
+
+    where `exact` is the fixed point of EXACT viability selection -- genotype
+    fitnesses `1, 1 - h s, 1 - s` renormalised by mean fitness -- followed by
+    mutation. The measurement lands on `exact` (0.0, 2.5 and 1.8 sems) and on
+    the classical form, and rejects this body at 12, 32 and 325 sems.
+
+    So the justification this docstring gave for the `+ mu` term is backwards.
+    It claimed the guard is "what keeps this quantity inside `[0, 1]` for every
+    admissible parameter, including the weak-constraint regime `s < mu` where
+    `mu / s` is not a frequency at all". The guard does return a number in
+    `[0, 1]` there, but it is not the frequency: when the mutation rate reaches
+    the selection load the deleterious allele really does go to near-fixation,
+    and `mu / (h s + mu) = 1/2` understates it twofold. A denominator chosen to
+    keep a formula in range is a range constraint, not a measurement, and this
+    one buys its boundedness by being wrong in the interior.
+
+    This body remains the exact fixed point of `mutationSelectionStepRare` --
+    `mutationSelectionBalance_isFixedPoint` is a theorem and is not in question.
+    What the measurement rejects is the identification of that fixed point with
+    the standing frequency of a real population, at `mu` comparable to `h s`.
+    Where `mu << h s` the two forms agree to `O(mu / (h s))` and the top table
+    applies.
+
+    These cells are SLiM only, and the harness enforces that by capability:
+    at these mutation rates a single locus emulated by infinite sites takes
+    repeat hits and stops being a single locus, so fwdpy11 -- which has no
+    true-biallelic mode here -- is refused rather than averaged in. It returns
+    0.394 and 0.669 on the last two cells, and that disagreement is the artefact,
+    which is why the harness reports it as a broken instrument rather than as a
+    third opinion. -/
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
 
@@ -659,9 +690,14 @@ nonnegative root of `s p² + mu p − mu = 0`, the fixed point of
 qualitatively different scaling from the dominant `mu/(h s)` — and it is bounded
 by `1` for every positive `s`.
 
-    Empirical status: **VALIDATED**
-    (`proofs/validation/empirical/simcov/battery_bulk2.py`,
-    `test_mutation_selection`). Fixed point of
+    Empirical status: **VALIDATED IN THE LARGE-POPULATION LIMIT ONLY**, and
+    FALSIFIED outside it. The regime boundary is `2 Nₑ √(mu s)`, a quantity this
+    definition does not contain; see
+    `recessiveMutationSelectionDriftParameter` below.
+
+    The earlier unrestricted reading came from
+    `proofs/validation/empirical/simcov/battery_bulk2.py`,
+    `test_mutation_selection`: the fixed point of
     `mutationSelectionStepRecessive`, iterated to convergence from `p = 0.5`:
     0.03113, 0.04373 and 0.06825 predicted against the same three limits at
     `(mu, s)` of (1e-05, 0.01), (1e-04, 0.05) and (1e-03, 0.20). The quadratic
@@ -678,15 +714,17 @@ by `1` for every positive `s`.
     0.014042) with `Nₑ` swept:
 
       Nₑ      2 Nₑ √(mu s)   measured             sems    relative
-      16000   226            0.013710 ± 0.000111  -3.0     -2.4%
-      4000     57            0.012633 ± 0.000369  -3.8    -10.0%
-      1000     14            0.009351 ± 0.000319  -14.7   -33.4%
-      200       2.8          0.005162 ± 0.000193  -46.1   -63.2%
-      50        0.7          0.002622 ± 0.000213  -53.6   -81.3%
+      16000   226            0.013362 ± 0.000158   -4.3    -4.8%
+      4000     57            0.012439 ± 0.000200   -8.0   -11.4%
+      1000     14            0.009379 ± 0.000190  -24.5   -33.2%
+      200       2.8          0.005125 ± 0.000150  -59.6   -63.5%
+      50        0.7          0.002941 ± 0.000181  -61.2   -79.1%
 
     The body is approached from below as `Nₑ` grows and is reached only in the
-    large-population limit. Below `2 Nₑ √(mu s) ≈ 50` it overstates the standing
-    frequency of a recessive deleterious allele by a factor rising to five. This
+    large-population limit: even at `2 Nₑ √(mu s) = 226` it is still 4.8 percent
+    high, and at `57` it is rejected outright. Below `2 Nₑ √(mu s) ≈ 14` it
+    overstates the standing frequency of a recessive deleterious allele by a
+    factor rising to five. This
     is the regime real human recessive alleles occupy, which is what makes the
     restriction worth stating rather than noting.
 
@@ -700,9 +738,9 @@ by `1` for every positive `s`.
     do not share a formula either.
 
     Power, and the competitor that earns the match: on the same cells the
-    dominant scaling `mu / s` is rejected at 11 to 122 sems and `√(mu / (2 s))`
-    at 2.0 to 35, and a deliberately planted body 40 percent above this one is
-    rejected at 19 to 80 sems on the two cells that MATCH -- so the agreement at
+    dominant scaling `mu / s` is rejected at 15 to 83 sems and `√(mu / (2 s))`
+    at 3.3 to 39, and a deliberately planted body 40 percent above this one is
+    rejected at 40 sems on the one cell that MATCHES -- so the agreement at
     large `Nₑ` is a measurement and not a tautology. The square-root scaling
     itself survives; only its `Nₑ`-independence does not.
 
@@ -726,8 +764,8 @@ per copy, only through homozygotes -- with the drift rate `1/(2 Nₑ)`. It is th
 argument `mutationSelectionBalanceRecessive` does not take.
 
 This is data, not a packaged claim that the deterministic approximation is
-adequate. Measurement puts that balance within 10 percent at `2 Nₑ √(mu s) ≥ 57`
-and 63 to 81 percent high below `2 Nₑ √(mu s) ≤ 2.8`.
+adequate. Measurement puts that balance within 5 percent at `2 Nₑ √(mu s) = 226`,
+11 percent high at `57`, and 63 to 79 percent high below `2 Nₑ √(mu s) ≤ 2.8`.
 
 Note it is a WEAKER condition on `Nₑ` than the dominant case needs to be safe,
 in the sense that it involves `√(mu s)` rather than `h s`: at `mu = 1e-04` and
@@ -744,18 +782,19 @@ noncomputable def recessiveMutationSelectionDriftParameter (Ne mu s : ℝ) : ℝ
 
 Stated as a `Prop` rather than left in prose so that a consumer can be made to
 carry it. The threshold is the conservative end of the measured bracket: the
-claim holds at `2 Nₑ √(mu s) = 57` and fails at `14`.
+claim is within 5 percent at `2 Nₑ √(mu s) = 226` and is rejected already at
+`57`, so the bound is set at the value that was actually measured to hold.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a hypothesis a consumer
     discharges, not a prediction about data. -/
 def DeterministicRecessiveBalanceRegime (Ne mu s : ℝ) : Prop :=
-  50 ≤ recessiveMutationSelectionDriftParameter Ne mu s
+  200 ≤ recessiveMutationSelectionDriftParameter Ne mu s
 
 /-- **The recessive regime is exactly a lower bound on the compound parameter.**
 It constrains `Nₑ`, `mu` and `s` only jointly, which is why the restriction
 cannot be stated as a bound on the effective size alone. -/
 theorem deterministicRecessiveBalanceRegime_iff (Ne mu s : ℝ) :
-    DeterministicRecessiveBalanceRegime Ne mu s ↔ 50 ≤ 2 * Ne * Real.sqrt (mu * s) := by
+    DeterministicRecessiveBalanceRegime Ne mu s ↔ 200 ≤ 2 * Ne * Real.sqrt (mu * s) := by
   unfold DeterministicRecessiveBalanceRegime recessiveMutationSelectionDriftParameter
   exact Iff.rfl
 

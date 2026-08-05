@@ -126,7 +126,12 @@ CLAIMS = {
         "def_name": "mutationSelectionBalance",
         "observable": "carrier_frequency",
         "args": ("MU", "S", "H"),
-        "needs": {"selection": True, "finite_population": True},
+        # These cells run at mutation rates a tenth to a whole multiple of the
+        # selection load, where a single locus emulated by infinite sites takes
+        # repeat hits and stops being a single locus.  Only an engine that
+        # models a true two-allele locus may answer here.
+        "needs": {"selection": True, "finite_population": True,
+                  "biallelic_locus": True},
         "bodies": {
             "corpus": msb_corpus,
             "classical": msb_classical,

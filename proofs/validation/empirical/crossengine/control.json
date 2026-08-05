@@ -1,0 +1,41 @@
+{
+ "guard": "XSIM_CE_V1",
+ "N": 500,
+ "mu": 2.5e-05,
+ "L": 2000,
+ "theta": 0.05,
+ "tol_sems": 4.0,
+ "ok": true,
+ "rows": [
+  {
+   "engine": "msprime",
+   "kind": "coalescent",
+   "version": "1.4.2",
+   "pi": 0.046810948782115364,
+   "sem": 0.0009732244706146809,
+   "theta": 0.05,
+   "sems_from_theta": -3.276788977439562,
+   "agrees": true
+  },
+  {
+   "engine": "slim",
+   "kind": "forward",
+   "version": "SLiM version 4.3, built Aug  4 2026 18:17:01",
+   "pi": 0.05100063333333333,
+   "sem": 0.0018153711935701867,
+   "theta": 0.05,
+   "sems_from_theta": 0.5512004029134332,
+   "agrees": true
+  },
+  {
+   "engine": "fwdpy11",
+   "kind": "forward",
+   "version": "0.24.7",
+   "pi": 0.04615571821821813,
+   "sem": 0.0010289483358747555,
+   "theta": 0.05,
+   "sems_from_theta": -3.736127119068301,
+   "agrees": true
+  }
+ ]
+}
