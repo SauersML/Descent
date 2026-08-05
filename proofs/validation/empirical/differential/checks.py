@@ -2292,21 +2292,31 @@ check(
 # Wright-Fisher property beyond the martingale `E[p_t] = p0`. Computer algebra
 # gives residual exactly 0; a body that is genuinely a different function of the
 # same inputs does NOT collapse (a planted `p0(1-p0) fst^2` leaves the nonzero
-# residual `Var(p)(-Var(p) - p0^2 + p0)/(p0(p0-1))`), so the design had power it
+# residual `Var(p)(-Var(p) - p0^2 + p0)/(p0(p0-1))`), so THAT design had power it
 # never spent.
 #
-# These checks pin that finding. Each composes the definition with the oracle's
-# estimator and asserts the round trip is the identity. They are recorded as
-# `kind="identity"` so they are counted as duplicate-detection rather than as
-# validations, and their purpose is to stop the MATCH being re-banked: if a body
-# is ever changed so that the composition stops being the identity, the check
-# reports IDENTICAL-BODIES against an expected AGREE and run.py returns 1.
+# WHAT THESE CHECKS DO AND DO NOT SAY, because an earlier version of this note
+# got it wrong. They establish an ALGEBRAIC FACT: composing the definition with a
+# SAMPLE-ESTIMATED F_ST is the identity. They do NOT say the definitions are
+# untestable, and they must not be read that way. `battery_bulk41` group B takes
+# F from the MODEL -- `1-(1-1/(2Ne))^t`, a function of the simulation's
+# parameters and nothing else -- measures the Hudson and Nei readings separately
+# on the same replicates as competitors, and FALSIFIES both while the body
+# matches at under 1 sem. That is a real measurement with real discriminating
+# power, and all three definitions are VALIDATED on it.
 #
-# What is NOT settled by these, and what a non-vacuous design would have to
-# address: WHICH F_ST the caller supplies. Per-branch Wright F, pairwise Hudson
-# and Nei's G_ST differ by a factor of 2 and by an O(1) function respectively,
-# and an oracle that carries the corpus's own convention in its estimator cannot
-# separate them. See the section note in Calibrator.AncestrySpecificArchitecture.
+# So the vacuity is a property of a DESIGN, not of a definition. The same body
+# and the same oracle give opposite verdicts depending only on where F came from,
+# which is exactly why `simcov/verdict.py` keys its gate on a declared
+# `argument_source` rather than on the definition's name -- a name-keyed gate
+# would have discarded battery_bulk41's finding, which is the expensive
+# direction to be wrong in.
+#
+# These checks are recorded as `kind="identity"` so they count as
+# duplicate-detection rather than as validations. Their purpose is to keep the
+# algebraic fact from lapsing: if a body is ever changed so that the composition
+# stops being the identity, the check reports IDENTICAL-BODIES against an
+# expected AGREE and run.py returns 1.
 _DRIFT_IDENTITY = grid(p0=[0.05, 0.2, 0.5, 0.8], Varp=[1e-4, 1e-3, 1e-2])
 
 check(
@@ -2322,10 +2332,12 @@ check(
     kind="identity",
     expected_verdict="AGREE",
     note=(
-        "UNMASKS a banked MATCH. battery_bulk21 scored driftVariance MATCH "
-        "against Wright-Fisher simulation; the verdict carries no information "
-        "because the body and the oracle's estimator are the same expression. "
-        "The def is annotated VACUOUS in the corpus as a result."
+        "Pins an ALGEBRAIC FACT, not a verdict on the definition. With a "
+        "sample-estimated F the body and the oracle's estimator are the same "
+        "expression, which is why battery_bulk21's MATCH carried no "
+        "information. battery_bulk41 group B feeds the MODEL's F instead and "
+        "VALIDATES the body at under 1 sem while falsifying both competing "
+        "F_ST conventions, so the definition itself is well tested."
     ),
     canfail_clause=(
         "no grid can make this fail, and that IS the finding rather than a "
@@ -2350,8 +2362,10 @@ check(
     kind="identity",
     expected_verdict="AGREE",
     note=(
-        "UNMASKS a banked MATCH. The factor of 2 the docstring argues for is "
-        "assumed by the oracle's estimator, not tested by it."
+        "With a sample-estimated F, the factor of 2 the docstring argues for "
+        "is assumed by the oracle's estimator rather than tested by it. Under "
+        "battery_bulk41's model-supplied F it IS tested: dropping the two "
+        "misses by up to 168 sems."
     ),
     canfail_clause=(
         "as driftVariance-is-the-oracle-estimator: identity by construction on "
@@ -2372,11 +2386,11 @@ check(
     kind="identity",
     expected_verdict="AGREE",
     note=(
-        "UNMASKS a banked MATCH. Same body as twoPopDriftVariance with the "
-        "arguments in the other order, so it inherits the same vacuity. Note "
-        "what this means for the convention question: the factor-of-2 and the "
-        "Nei-vs-Hudson readings are precisely what the simulation could NOT "
-        "answer, because its estimator carried the corpus's convention."
+        "Same body as twoPopDriftVariance with the arguments in the other "
+        "order, so it inherits the same algebra. A sample-estimated F cannot "
+        "answer the factor-of-2 or the Nei-vs-Hudson question, because the "
+        "estimator carries the corpus's own convention; a model-supplied F "
+        "answers both, and battery_bulk41 does (Nei refuted at 157 sems)."
     ),
     canfail_clause=(
         "identity by construction on the real body; the mutant sweep supplies "
@@ -2599,5 +2613,50 @@ check(
         "definition that always returns its first argument, so the grid also "
         "carries q=0.7 and q=0.4: a pass-through would return the MEASURED "
         "ratio there, not the true one. That is why the grid is not all-ones."
+    ),
+)
+
+
+# --- the squaring flow's next floor, off the unit-variance slice -----------
+# A ratio whose numerator and divisor were stated at DIFFERENT generality: the
+# numerator is the general E[(X^2-1)^4], the divisor was (m4-1)^2, which is
+# (E[Y^2])^2 only at m2 = 1. Every call site passes m2 = 1, so nothing computed
+# a wrong number -- but the signature took an m2 it then ignored in half the
+# expression. The grid therefore spends most of its cells OFF that slice, which
+# is the only place the two forms separate.
+
+_SQUARING_FLOW = grid(
+    a=[1.5, 2.0, 3.0],
+    p=[0.1, 0.25, 0.4],
+)
+
+check(
+    id="nextFloorFourthMoment-is-the-standardized-fourth-moment-of-Y",
+    fqn="Calibrator.nextFloorFourthMoment",
+    claim=(
+        "The next floor's fourth moment is E[Y^4]/(E[Y^2])^2 for Y = X^2 - 1, "
+        "at every variance and not only at unit variance."
+    ),
+    model_lean="the corpus body, evaluated on the raw moments of an explicit law",
+    model_ref="the same law's Y = X^2 - 1, from realised values",
+    reference="refs.squaring_flow_next_fourth_moment",
+    grid=_SQUARING_FLOW,
+    lean=lambda D, a, p: D["nextFloorFourthMoment"](*refs._three_point_moments(a, p)),
+    ref=lambda a, p: refs.squaring_flow_next_fourth_moment(a, p),
+    tol=1e-9,
+    kind="formula",
+    expected_verdict="AGREE",
+    canfail_clause=(
+        "The historical divisor (m4 - 1)^2 is the can-fail evidence: on the "
+        "two-point law X = +-2, where Y is constant and the true value is "
+        "exactly 1, it returns 9/25. Only the p = 0.25, a = sqrt(2) cell of "
+        "this grid sits at m2 = 1, so the old body disagrees almost everywhere "
+        "on it."
+    ),
+    note=(
+        "Moments come from an explicit finite law rather than being swept as "
+        "four independent axes. Sweeping m2, m4, m6, m8 freely would wander "
+        "outside the moment cone, where neither side means anything and a "
+        "disagreement would not be evidence."
     ),
 )

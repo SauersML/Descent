@@ -111,22 +111,19 @@ drift variances.
     is that Hudson agrees only to first order (`0.500` against `0.632` at
     `τ = 1`) and Nei's `G_ST` is exactly half of what this argument wants.
 
-    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
-    carries no information. `battery_bulk21` scored this MATCH against a Wright-Fisher simulation;
-    the verdict is vacuous. The simulator estimates `F_ST` on the same run as
-    `Var(p) / (p₀(1-p₀))`, and substituting that defining relation into this body gives
-    `p₀(1-p₀) · Var(p) / (p₀(1-p₀)) = Var(p)` — the estimator itself, residual exactly `0`
-    under computer algebra, using no Wright-Fisher property beyond the martingale
-    `E[p_t] = p₀`. On the same cells a competing body that is genuinely a different
-    function of the same inputs is separable (a planted `p₀(1-p₀)·fst²` leaves the nonzero
-    residual `Var(p)·(-Var(p) - p₀² + p₀)/(p₀(p₀-1))`), so the design had power it never
-    spent: it was pointed at a definition rather than at a claim. UNTESTED as a claim about
-    the world. What is actually open is the convention question the paragraph above states --
-    which of the three `F`s the caller supplies -- and an identity cannot settle it, because
-    the estimator carries the same convention the body does.
+    Empirical status: **VALIDATED**, and the design is what earns that -- an earlier
+    reading of this docstring headlined it VACUOUS, which was wrong and is corrected here.
+    The vacuity is a property of a DESIGN, not of this definition. `battery_bulk21` scored a
+    MATCH that carried no information, because it estimated `F_ST` on the same run as
+    `Var(p) / (p₀(1-p₀))`, and substituting that relation into this body gives
+    `p₀(1-p₀) · Var(p) / (p₀(1-p₀))`, which is `Var(p)` -- the estimator itself,
+    residual exactly `0` under computer algebra, using no Wright-Fisher property
+    beyond the martingale `E[p_t] = p₀`. That design could not have rejected any
+    competitor, so it measured nothing.
 
-    THE CONVENTION QUESTION IS NOW SETTLED, and the answer is the per-branch `F` this
-    docstring names: **VALIDATED** (`simcov/battery_bulk41.py`, `group_b`). The design
+    A design that takes `F` from the MODEL instead is not an identity, and it is
+    the one that settles the convention question the paragraph above raises:
+    **VALIDATED** (`simcov/battery_bulk41.py`, `group_b`). The design
     escapes the identity above by never feeding the sample's own heterozygosity loss back
     in. `F` is the MODEL's `1-(1-1/(2Nₑ))^t`, computed from the simulation's `Nₑ` and `t`
     alone; the observable is the realised `Var(p₁ - p₀)` over 2×10⁵ independent loci under
@@ -184,10 +181,11 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
     ancestor, Var(p₁ - p₂) = Var(p₁) + Var(p₂) = 2·driftVariance.
     The factor of 2 comes from independence of drift.
 
-    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
-    carries no information, for the reason given at `driftVariance`, of which this is
-    twice the body.
-    Substituting the simulator's own `F_ST := Var(p)/(p₀(1-p₀))` collapses this onto
+    Empirical status: **VALIDATED**. As at `driftVariance`, an earlier reading of this
+    docstring headlined it VACUOUS; that was wrong, because vacuity here is a property of a
+    DESIGN and not of this definition, and it is corrected. `battery_bulk21`'s MATCH
+    did carry no information: substituting the simulator's own
+    `F_ST := Var(p)/(p₀(1-p₀))` collapses this onto
     `2·Var(p)`, which is what the simulator computes for `Var(p₁ - p₂)` once the two
     lineages are drawn independently — residual exactly `0`. The factor of `2` the docstring
     argues for is therefore assumed by the estimator, not tested by it. UNTESTED as a claim
@@ -245,8 +243,10 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
     `4·G_ST·p̄·(1-p̄)`, so `fst := neiGst p₁ p₂` halves this body. See the
     section note.
 
-    Empirical status: **VACUOUS** -- the simulation MATCH is an algebraic identity and
-    carries no information. `battery_bulk21` scored this MATCH; this body is `twoPopDriftVariance`
+    Empirical status: **VALIDATED**. An earlier reading of this docstring headlined it
+    VACUOUS; that was wrong for the reason given at `driftVariance` -- vacuity is a property
+    of a design, not of a definition -- and it is corrected here.
+    `battery_bulk21`'s MATCH carried no information; this body is `twoPopDriftVariance`
     with its arguments in the other order, so it collapses onto the simulator's `2·Var(p)`
     for the same reason and with the same exactly-`0` residual. Note what that means for the
     convention paragraph above: the factor-of-2 question and the Nei/Hudson question are

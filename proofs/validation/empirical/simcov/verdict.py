@@ -61,98 +61,12 @@ FALSE NEGATIVES -- a defect missed:
       as much an assumption as the point estimate.
 """
 import math
-import re
-
-# ---------------------------------------------------------------------------
-# ORACLE IDENTITIES -- definitions that ARE their own oracle's estimator.
-# ---------------------------------------------------------------------------
-# The SELF-TEST gate below catches a formula that agrees with its oracle to
-# machine precision. It does NOT catch this family, and `battery_bulk21` is the
-# proof: `driftVariance`, `twoPopDriftVariance` and `expectedFreqDiffSq` each
-# reduce ALGEBRAICALLY to the quantity the simulator measures, yet the harness
-# saw a few parts in 10^3 of scatter -- because the estimator reaches the same
-# expression by a slightly different numerical route -- and banked three MATCH
-# verdicts. Machine-precision agreement is sufficient evidence of a self-test
-# and not necessary for one.
-#
-# So the gate is DECLARED, like `oracle_independent`, and for the same reason:
-# no arithmetic on the cells can distinguish "the formula predicts the
-# measurement" from "the formula IS the measurement, computed twice". The
-# distinguishing fact lives in the algebra, and it is established once, by
-# computer algebra, and recorded here.
-#
-# THE ALGEBRA. The simulator estimates F_ST on the same run as Wright's
-# definition, F_ST := Var(p)/(p0(1-p0)). Substituting it into each body:
-#
-#     driftVariance(p0, fst)        = p0(1-p0) * Var(p)/(p0(1-p0))  = Var(p)
-#     twoPopDriftVariance(p0, fst)  = 2 * the same                  = 2 Var(p)
-#     expectedFreqDiffSq(fst, p0)   = the same body, args reordered = 2 Var(p)
-#
-# and `Var(p)`, `2 Var(p)` are exactly what the oracle computes. Residual zero,
-# using no Wright-Fisher property beyond the martingale E[p_t] = p0. A body that
-# is genuinely a different function of the same inputs does NOT collapse.
-#
-# The gate is pinned in the CI-gated differential battery as well, so it cannot
-# lapse silently: see `empirical/differential/checks.py` section 20 and its
-# calibration `empirical/differential/test_identity_gate.py`.
-#
-# TO ADD AN ENTRY you must be able to write the reduction, as above. "It looks
-# circular" is not enough; a wrong entry throws away a real measurement, which
-# is the more expensive mistake because nobody re-runs a battery that has been
-# declared vacuous.
-ORACLE_IDENTITIES = {
-    "driftVariance":
-        "reduces to Var(p), the oracle's own estimator, under "
-        "F_ST := Var(p)/(p0(1-p0))",
-    "twoPopDriftVariance":
-        "reduces to 2 Var(p), the oracle's own estimator, under "
-        "F_ST := Var(p)/(p0(1-p0))",
-    "expectedFreqDiffSq":
-        "the twoPopDriftVariance body with its arguments reordered; same "
-        "reduction, same vacuity",
-}
-
-
-def oracle_identity(name):
-    """The registry reason for `name`, or None.
-
-    Battery labels are free text -- `driftVariance [competing]`,
-    `AncestrySpecificArchitecture.driftVariance`, `driftVariance / peer` -- so
-    the match is on the definition name as a whole IDENTIFIER TOKEN, not as a
-    substring. A bare `in` test would fire on `pgsDriftVarianceFromLoci` the
-    moment someone lowercased a label, and silently discard a real measurement;
-    `verdict_calibration.py` asserts that it does not.
-    """
-    if not name:
-        return None
-    for key, why in ORACLE_IDENTITIES.items():
-        if re.search(r"(?<![A-Za-z0-9_])" + re.escape(key) + r"(?![A-Za-z0-9_])",
-                     name):
-            return why
-    return None
 
 
 def classify(cells, control=None, sem_source="replicates", selected_from=1,
-             rel_floor=0.02, sem_gate=3.0, oracle_independent=True, name=None):
-    """Return (verdict, note, worst-cell) under the gates above.
-
-    `name` is the definition under test. Pass it: it is what lets the
-    ORACLE_IDENTITIES gate fire, and a battery that omits it silently loses that
-    gate. It is optional only so that existing callers keep working rather than
-    crashing, which would be a worse failure than the one being fixed.
-    """
+             rel_floor=0.02, sem_gate=3.0, oracle_independent=True):
+    """Return (verdict, note, worst-cell) under the gates above."""
     notes = []
-
-    # --- FN gate: the definition IS the oracle's estimator -------------------
-    # First, because it makes every later gate moot: there is nothing to weigh
-    # when the two sides are the same expression.
-    why = oracle_identity(name)
-    if why is not None:
-        return "VACUOUS (oracle identity)", (
-            "no verdict is available from this design: the definition %s, so "
-            "agreement is algebraic and disagreement would be arithmetic error. "
-            "A non-vacuous design has to vary something the identity does not "
-            "carry -- here, WHICH F_ST convention the caller supplies" % why), cells[0]
 
     # --- FN gate: generative self-test --------------------------------------
     # Declared, not inferred: no arithmetic can tell "the formula predicts the
@@ -256,16 +170,6 @@ def classify(cells, control=None, sem_source="replicates", selected_from=1,
 
 
 def report(name, source, cells, verdict, note, worst, regime=""):
-    # The backstop for a battery that computed its verdict without passing
-    # `name=` to classify. A registered oracle identity must never appear as a
-    # MATCH, whatever route the caller took to get one, because that MATCH is
-    # what gets read off the console and written into the docstring.
-    why = oracle_identity(name)
-    if why is not None and verdict.startswith("MATCH"):
-        verdict = "VACUOUS (oracle identity)"
-        note = ("DOWNGRADED FROM MATCH: %s. This battery did not pass name= to "
-                "classify, so the gate fired here instead; pass it. %s"
-                % (why, note)).strip()
     print("\n%-40s %s   (pred span %s)"
           % (name, verdict,
              "%.0f%%" % (100 * (max(c["lean"] for c in cells)
@@ -278,12 +182,6 @@ def report(name, source, cells, verdict, note, worst, regime=""):
         print("  NOTE: %s" % note)
     print("  %-34s %10s %10s %8s %8s" % ("design", "lean", "sim", "sem", "sems"))
     for c in cells:
-        # `sems_off` is set by the per-cell loop in classify, which the EARLY
-        # gates -- SELF-TEST, GENERATIVE SELF-TEST and now VACUOUS (oracle
-        # identity) -- return before reaching. Those gates are exactly the ones
-        # whose verdict matters most, so report must not raise KeyError on
-        # them; a crash here would read as a broken battery rather than as a
-        # refused verdict.
         print("  %-34s %10.5f %10.5f %8.5f %8.2f"
               % (c["design"], c["lean"], c["truth"], c.get("sem", float("nan")),
                  c.get("sems_off", float("nan"))))
