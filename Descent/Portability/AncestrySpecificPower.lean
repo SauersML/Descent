@@ -106,9 +106,15 @@ theorem fisherInformation_at_reference_point :
     variance: worst 1.72 sems over a prediction spanning 0.09500 to 0.50000.
 
     This body is `Conventions.hweGenotypeVariance` and `hweHeterozygosity` as
-    well -- one quantity under three names in three files. All three are now
-    measured against the same oracle, so a divergence between them would show
-    up; nothing relates them by theorem, which is the fork the guard reports.
+    well -- one quantity under three names in three files, all three measured
+    against the same oracle, so a divergence between them would show up.
+
+    They ARE now related by theorem, and this note used to say they were not.
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below joins the two in this file,
+    and `Conventions.genotypeVarianceHWE_eq_hwe` and
+    `Conventions.hweHeterozygosity_eq_hwe` tie both back to the third, so the
+    ploidy convention has exactly one place to change. The three names are kept
+    because they denote three different things that coincide -- see below.
 
     Denotes: a variance — the variance of the dosage `G ∈ {0, 1, 2}`. It is
     *not* the allelic variance `p(1-p)`, and it is numerically but not
@@ -505,8 +511,11 @@ section DiscoveryBias
     Empirical status: **VALIDATED** on the same runs as
     `genotypeVarianceHWE` (`battery_ldsc.py`, `test_hwe_fork`), worst 1.72 sems.
     It is the same body as `genotypeVarianceHWE` in this file and
-    `Conventions.hweGenotypeVariance`: one quantity, three names, no theorem
-    relating them.
+    `Conventions.hweGenotypeVariance`: one quantity, three names -- and, since
+    `Conventions.hweHeterozygosity_eq_hwe` and
+    `hweHeterozygosity_eq_genotypeVarianceHWE`, three names joined by theorem
+    rather than by coincidence of formula. This note used to say no theorem
+    related them.
 
     Denotes: a frequency — the probability that a random individual is a
     heterozygote. It is a *probability*, not a variance, and it is a different
