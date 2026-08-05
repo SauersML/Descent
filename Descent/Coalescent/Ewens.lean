@@ -106,6 +106,66 @@ theorem card_seatings {n : ℕ} (ξ : ER n) :
   rw [Nat.card_option]
   rfl
 
+/-! ### Transferring products from classes to fibres
+
+A class of `Setoid.ker f` IS a fibre of `f`, so a product over classes is a product over the
+distinct values of `f`.  That is the transfer `Descent.Coalescent.Program` named as the last
+missing piece of the Ewens item, and with it the class-size facts of
+`Descent.Coalescent.Extend` become facts about the Ewens weight. -/
+
+/-- The size of the class of `x` is the size of the fibre of `f` over `f x`. -/
+theorem classSize_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (x : Fin m) :
+    classSize (Setoid.ker f) (Quotient.mk _ x)
+      = (Finset.univ.filter fun y => f y = f x).card := by
+  classical
+  unfold classSize
+  congr 1
+  ext y
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  exact ⟨fun h => Quotient.exact h, fun h => Quotient.sound h⟩
+
+/-- **A product over classes is a product over the distinct values of the defining map.** -/
+theorem prod_quotient_ker {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (g : ℕ → ℝ) :
+    ∏ d : Quotient (Setoid.ker f), g (classSize (Setoid.ker f) d)
+      = ∏ v ∈ Finset.univ.image f, g ((Finset.univ.filter fun y => f y = v).card) := by
+  classical
+  refine Finset.prod_bij
+    (fun (d : Quotient (Setoid.ker f)) _ => Quotient.liftOn d f fun _ _ h => h) ?_ ?_ ?_ ?_
+  · intro d _
+    induction d using Quotient.inductionOn with
+    | _ x => exact Finset.mem_image.mpr ⟨x, Finset.mem_univ x, rfl⟩
+  · intro d _ d' _ h
+    induction d using Quotient.inductionOn with
+    | _ x =>
+        induction d' using Quotient.inductionOn with
+        | _ y => exact Quotient.sound (show f x = f y from h)
+  · intro v hv
+    obtain ⟨x, _, hx⟩ := Finset.mem_image.mp hv
+    exact ⟨Quotient.mk _ x, Finset.mem_univ _, hx.symm⟩
+  · intro d _
+    induction d using Quotient.inductionOn with
+    | _ x =>
+        show g (classSize (Setoid.ker f) (Quotient.mk _ x)) = _
+        rw [classSize_ker]
+
+/-- Fibre cardinalities, as `Finset` cards rather than `Nat.card` of subtypes, which is what
+the transfer above consumes. -/
+theorem card_filter_eq_card {m : ℕ} {β : Type*} [DecidableEq β] (f : Fin m → β) (v : β) :
+    (Finset.univ.filter fun y => f y = v).card = Nat.card {x : Fin m // f x = v} := by
+  classical
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+
+/-- Every class is nonempty, so `λ_c ≥ 1` and `(λ_c - 1)!` is what it should be. -/
+theorem one_le_classSize {n : ℕ} (ξ : ER n) (c : Quotient ξ) : 1 ≤ classSize ξ c := by
+  classical
+  obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
+  refine Finset.card_pos.mpr ⟨x, ?_⟩
+  exact Finset.mem_filter.mpr ⟨Finset.mem_univ x, hx⟩
+
+/-- The Ewens weight of K-G (3.8), stripped of its normalising denominator. -/
+noncomputable def ewensWeight {n : ℕ} (θ : ℝ) (ξ : ER n) : ℝ :=
+  θ ^ (blocks ξ - 1) * ∏ c : Quotient ξ, (((classSize ξ c - 1)! : ℕ) : ℝ)
+
 end Coalescent
 
 end Descent

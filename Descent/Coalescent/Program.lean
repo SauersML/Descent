@@ -55,10 +55,10 @@ the fibre of restriction over `ξ` is `Option (Quotient ξ)` (`restrict_extend`,
 (`card_fiber_self`, `card_fiber_of_ne`, `card_fiber_none_old`, `card_fiber_none_new`), and
 the sizes sum to `n` (`sum_classSize`), and the fibrewise sum itself is available
 (`Ewens.sum_ER_succ`, whose dependent-transport step is `Ewens.sum_fiber_eq_sum_seatings`).
-What is left is one identity: that seating multiplies the Ewens weight by `θ` or by `λ_o`.
-Its ingredients are all proved; turning them into a statement about the product over
-`Quotient (extend ξ o)` needs a transfer of products along `Quotient (Setoid.ker f) ≃ range f`,
-and that is not written.
+The transfer of products from classes to fibres, which was the named obstacle, is now written
+(`Ewens.prod_quotient_ker`).  What is left is to combine it with the fibre cardinalities into
+the single identity "seating multiplies the weight by `θ` or by `λ_o`", and then to run the
+induction.  Every input to that is proved; the combination is not.
 
 **3. K-C Theorem 2, the paintbox representation.**  Every exchangeable random equivalence
 relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the
