@@ -162,6 +162,7 @@ import Descent.Coalescent.HoldingSecondMoment
 import Descent.Coalescent.PairwiseTimes
 import Descent.Coalescent.TajimaVariance
 import Descent.Coalescent.PolyaCriterion
+import Descent.Coalescent.SemigroupLimit
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`
@@ -196,6 +197,7 @@ import Descent.Blindness.BundleRigidity.Telescope
 import Descent.Blindness.BundleRigidity.TwoAtom
 import Descent.Pangenome.GaugeCounterexample
 import Descent.Pangenome.GaugeInvariance
+import Descent.Program.Consequences
 
 namespace Descent
 
