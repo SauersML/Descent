@@ -2455,14 +2455,38 @@ Note the quantifiers are what give it its strength: it holds for every
 manufacture a gap on its own. That is worth keeping and is not what a reference
 evaluation is for.
 
-NOT YET PINNED: no theorem here fixes the scale. `ppvPortabilityGap_le_add_abs`
-below bounds it by the two predictive values, which rules out multiples ABOVE
-one, and this theorem rules out nothing; a fractional multiple `c < 1` satisfies
-both. A witness at two distinct prevalences would fix it. -/
+The scale is pinned separately, by `ppvPortabilityGap_at_reference_point` below,
+which is what this theorem cannot do. -/
 theorem ppvPortabilityGap_self (sensitivity specificity prevalence : ℝ) :
     ppvPortabilityGap sensitivity specificity prevalence prevalence = 0 := by
   unfold ppvPortabilityGap
   simp
+
+/-- **Reference evaluation at two DISTINCT prevalences**, which is the only place
+this body's scale is visible.
+
+`ppvPortabilityGap_self` states `0` and so rejects no rescaling; `ppvPortabilityGap_le_add_abs`
+bounds the gap by the two predictive values and so rules out multiples ABOVE one.
+Between them a fractional multiple `c < 1` satisfied everything. This fixes it.
+
+At `sensitivity = 1` and `specificity = 1/2` the PPV is
+`prev / (prev + (1-prev)/2)`, giving `1/3` at `prev = 1/5` and `2/3` at
+`prev = 1/2`, so the gap is `1/3`. The two orders are stated together on purpose,
+and between them they reject three different wrong readings rather than only a
+scale factor:
+
+* any multiple `c ≠ 1` of the body gives `c/3`;
+* dropping the absolute value gives `-1/3` on the second conjunct, since there
+  the target PPV is the smaller one -- which is why both orders are needed and
+  one alone would not see it;
+* reading the gap as a RATIO rather than a difference gives `2` and `1/2`, and
+  neither is `1/3`. -/
+theorem ppvPortabilityGap_at_reference_point :
+    ppvPortabilityGap 1 (1 / 2) (1 / 5) (1 / 2) = 1 / 3 ∧
+      ppvPortabilityGap 1 (1 / 2) (1 / 2) (1 / 5) = 1 / 3 := by
+  constructor <;>
+    · unfold ppvPortabilityGap metricPPV
+      norm_num [abs_of_nonneg, abs_of_nonpos]
 
 
 /-- **The gap is bounded by the two predictive values it compares.** Strict positivity under a

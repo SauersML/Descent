@@ -895,15 +895,34 @@ vanish on the diagonal would not be a distance at all. That is real content, and
 it is why this is renamed rather than moved. Moving the point would destroy a
 true result to satisfy a checker.
 
-NOT YET PINNED: no theorem in this file fixes the scale of `frobeniusNormSq`.
-The sum of squares, the sum of absolute entries and the largest entry all vanish
-on the diagonal and all satisfy every theorem here, so nothing distinguishes
-them. A witness would have to evaluate on a matrix with distinct entries. -/
+The norm is pinned separately, by `ldMismatchFrobenius_at_reference_point` below,
+which is what this theorem cannot do. -/
 theorem ldMismatchFrobenius_self {p : ℕ}
     (Sig : Matrix (Fin p) (Fin p) ℝ) :
     ldMismatchFrobenius Sig Sig = 0 := by
   unfold ldMismatchFrobenius
   simp [frobeniusNormSq]
+
+/-- **Reference evaluation on a matrix with four distinct entries**, which is what
+separates the norm from its competitors.
+
+`ldMismatchFrobenius_self` states `0`, and the sum of squares, the sum of absolute
+entries and the largest entry ALL vanish on the diagonal, so it distinguishes none
+of them. The entries `1, 2, 3, 4` are chosen so that the three give three
+different numbers and one evaluation rejects two competitors at once:
+
+    sum of squares    1 + 4 + 9 + 16 = 30      <- this body
+    sum of absolutes  1 + 2 + 3 + 4  = 10
+    largest entry                      4
+
+It also rejects a TRACE-only reading, which would give `1 + 16 = 17`, so the
+off-diagonal entries are shown to count. And it pins the scale: any multiple
+`c ≠ 1` gives `30c`. -/
+theorem ldMismatchFrobenius_at_reference_point :
+    ldMismatchFrobenius (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) 0 = 30 := by
+  unfold ldMismatchFrobenius frobeniusNormSq
+  simp [Fin.sum_univ_succ]
+  norm_num
 
 
 /-- LD mismatch is nonneg. -/
