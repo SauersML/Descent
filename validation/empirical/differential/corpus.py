@@ -124,6 +124,27 @@ FQ_OVERRIDES = {
     # structure methods (DGP's PGSEvolutionaryModel, PortabilityDrift's
     # GenerationalPopGenParameters) carry the same formula on a record.
     "hetDecayFactor": "Descent.hetDecayFactor",
+    # Core/Fst.lean:78, `2 * ploidy * Ne * μ`.  The other bearer of this short
+    # name, `Descent.scaledMutationRate` (DGP.lean:52), is a pure delegation TO
+    # this one -- so the two are extensionally equal and the ambiguity is not a
+    # disagreement about the value, only about which layer owns it.  It is
+    # pinned to the KERNEL rather than the shim on purpose: the shim is one of
+    # the 171 delegations scheduled for deletion, and a pin to a wrapper would
+    # turn that deletion into a battery failure that says nothing about
+    # population genetics.
+    #
+    # Until this entry existed `api.resolve` refused the name as ambiguous,
+    # `load()` dropped it from the callable table, and both
+    # `hetEquilibrium-vs-exact-iam` and `hetDecayFactor-vs-exact-eigenvalue`
+    # raised `KeyError: 'scaledMutationRate'` at every grid point.  The first
+    # declares `expected_verdict="AGREE"`, so it reported as a REGRESSION; the
+    # second declares none, so it went quiet -- which is exactly the asymmetry
+    # the pin on the first was added to expose.
+    "scaledMutationRate": "Descent.Core.scaledMutationRate",
+    # Same shape: Core/Fst.lean:87 is the kernel, DGP.lean:78 delegates to it.
+    # Not currently reached by a check, but it collides identically and pinning
+    # it here keeps the two halves of one convention from drifting apart.
+    "scaledMigrationRate": "Descent.Core.scaledMigrationRate",
 }
 
 
