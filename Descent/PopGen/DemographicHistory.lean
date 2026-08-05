@@ -915,7 +915,7 @@ theorem smaller_founder_larger_heterozygosity_loss
 theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
     founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
   unfold founderHeterozygosityLoss fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-    Portability.Core.PopGenParameters.hetDecayFactor hetDecayFromScaled
+    Descent.Core.PopGenParameters.hetDecayFactor hetDecayFromScaled
   simp
 
 end FounderEffects

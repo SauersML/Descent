@@ -466,7 +466,11 @@ theorem hweThirdCentralMoment_eq (h : Foundations.HardyWeinbergModel) :
   rw [Foundations.sum_over_genotypes]
   simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
     Foundations.HardyWeinbergModel.centeredAltAlleleCount, Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq,
-    Foundations.altAlleleCount]
+    Foundations.altAlleleCount,
+    -- `dosage` is defined by cases, so the definition does not reduce it
+    -- applied to a constructor; these `rfl` lemmas do.
+    Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
+    Descent.Core.Genotype.dosage_homAlt]
   ring
 
 /-- **Dosage coding is sign-symmetric only at frequency one half.** If the

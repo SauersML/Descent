@@ -204,7 +204,7 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
   have h_target_cross : crossCovariance m Pop.target = β := by
     ext i
     simp [m, identityDirectMetricModel, crossCovariance, PopGen.sigmaTagCausal,
-      Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.one_mulVec,
+      totalEffect, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   have h_source_score :
       scoreVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
@@ -304,7 +304,8 @@ noncomputable def targetLDShiftMetricModel : CrossPopulationMetricModel 1 1 :=
 /-- Proxy-tag baseline witness: the scored SNP is not itself causal, but is a
 perfect source and target proxy for the unscored causal variant. -/
 noncomputable def baselineProxyTagMetricModel : CrossPopulationMetricModel 1 1 := {
-  baselineMetricModel with directCausal := Pop.pair !![0] !![0]
+  baselineMetricModel with
+    directCausal := Pop.pair !![0] !![0]
     proxyTagging := Pop.pair !![1] !![1] }
 
 /-- Target tagging-shift witness: only the target proxy-tagging alignment
@@ -341,21 +342,24 @@ noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1
     which is worse than no marker: it inflates the count of things owed a
     measurement with items that can never receive one. -/
 noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with targetPrevalence := 1 / 4
+  { baselineMetricModel with
+      targetPrevalence := 1 / 4
       targetPrevalence_pos := by norm_num
       targetPrevalence_lt_one := by norm_num }
 
 /-- Novel target-only proxy-tagging witness: source fit is unchanged, but
 target portability changes because new post-split tagging links appear. -/
 noncomputable def novelTargetOnlyTaggingMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineProxyTagMetricModel with proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![0]
+  { baselineProxyTagMetricModel with
+      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![0]
       novelProxyTagging := Pop.withTarget baselineProxyTagMetricModel.novelProxyTagging !![1 / 2] }
 
 /-- Target-only novel untaggable phenotype variance witness: transported score
 moments are unchanged, but target `R²` drops because new target-only causal
 variance enters the phenotype and is not captured by the score. -/
 noncomputable def novelUntaggablePhenotypeMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with novelUntaggablePhenotypeVarianceTarget := 1 / 2
+  { baselineMetricModel with
+      novelUntaggablePhenotypeVarianceTarget := 1 / 2
       novelUntaggablePhenotypeVarianceTarget_nonneg := by norm_num }
 
 /-- **Evaluate a witness model's metrics from its explicit state.**
@@ -827,14 +831,14 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
           CrossPopulationGenerationalModel.toMetricModelAt,
           crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
+          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
           using h_proxy0
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
           crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
+          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
           using h_proxy1
     rw [predictiveCovarianceFromSourceWeights]
