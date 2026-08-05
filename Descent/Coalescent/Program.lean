@@ -138,28 +138,23 @@ step" are different states.
   clearing both binomials leaves `Σ_{b≤m} C(a+b,a) = C(a+m+1,a+1)`, the hockey stick, after
   which the factorials cancel to `1/i`.  `SiteFrequencySpectrum`'s `ASSERTED` marker is
   discharged.
-* **Second moments of the spectrum** -- CLOSED on the `S` side, down to the clock.
-  `Coalescent.SpectrumMoments` proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total
-  variance, with `Var(L_n) = 4 b_{n-1}` from the squared segment lengths, and `b` bounded
-  while `a` diverges -- so Watterson's estimator is consistent, at rate `1/log n`.  The
-  per-clock variance those sums are built from is no longer assumed either:
-  `Coalescent.HoldingSecondMoment` integrates K-C (1.7)'s density twice (`Γ(3) = 2!`) and
-  subtracts, giving `d⁻²`.  STILL ABSENT: `Var(π)` and `Cov(π, θ_W)` for general `n`, hence
-  Tajima's exact denominator.  `SpectrumMoments.tajimaVarPairwise` writes Tajima's expression
-  down in order to CHECK it, and `varPairwise_two_eq` verifies it at `n = 2`, the one sample
-  size where the corpus can: a sample of two has one pair, so `π` IS `S`.  For `n ≥ 3` the
-  pairwise differences overlap.  `Coalescent.PairwiseTimes` computes the SHARING case:
-  restriction consistency puts two pairs sharing a lineage inside a three-sample, and there
-  the symmetric sums of the three pairwise times are TOPOLOGY-FREE -- `Σ T_p = 3τ₃ + 2τ₂` and
-  `Σ T_p² = τ₃² + 2(τ₃+τ₂)²` whichever pair merged first -- so no average over tree shapes is
-  needed and the cross-sum is `3τ₃² + 4τ₃τ₂ + τ₂²`.  With the clock moments that
-  `HoldingSecondMoment` proves, `E(T_ij T_ik) = 4/3` and `Cov(T_ij, T_ik) = 1/3`: overlapping
-  readings of one tree, positively correlated by exactly a third, which is why `Var(π)` is not
-  `Var(S)/C(n,2)`.  STILL ABSENT: the DISJOINT case in a four-sample -- where the symmetric
-  sums are NOT topology-free and an average over the second merger is needed -- the
-  combinatorial sum over pair classes, and the `θ · E(shared path length)` term the
-  overlapping mutation counts contribute on top of `θ² Cov(T,T')`.  Nothing in the corpus
-  depends on the asserted expression.
+* **Second moments of the spectrum** -- CLOSED, both sides.  `Coalescent.SpectrumMoments`
+  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with
+  `Var(L_n) = 4 b_{n-1}` from the squared segment lengths and `b` bounded while `a` diverges,
+  so Watterson's estimator is consistent at rate `1/log n`; `Coalescent.HoldingSecondMoment`
+  removes the last quoted constant by integrating K-C (1.7)'s density twice (`Γ(3) = 2!`).
+  `Coalescent.PairwiseTimes` and `Coalescent.TajimaVariance` then close `Var(π)`.  Restriction
+  consistency puts two pairs sharing a lineage in a three-sample and two disjoint pairs in a
+  four-sample; enumerating topologies gives `Cov(T,T') = 1/3` and `E(S) = 1` for the first,
+  `2/9` and `2/3` for the second, and the counts `n(n-1)(n-2)/2` and `n(n-1)(n-2)(n-3)/8`
+  assemble them into Tajima (1989)'s
+  `(n+1)/(3(n-1)) θ + 2(n²+n+3)/(9n(n-1)) θ²` exactly.  The `n²+n+3` that looks arbitrary in
+  the published formula is `9 + 6(n-2) + (n-2)(n-3)`: one term per pair class.
+
+  Worth recording because the corpus caught it: an earlier pass asserted that DISJOINT pairs
+  never share tree, which is true of the pairing that respects the cherries and false of the
+  other two.  It would have made the `θ` coefficient vanish like `2/n` instead of tending to
+  `1/3`.  The enumeration found it.
 * **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
   K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
   exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix

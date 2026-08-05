@@ -245,10 +245,11 @@ theorem exists_varWattersonEstimator_lt {θ : ℝ} (hθ : 0 ≤ θ) {ε : ℝ} (
 /-- Tajima (1989)'s expression for `Var(π)`:
 `(n+1)/(3(n-1)) · θ + 2(n²+n+3)/(9n(n-1)) · θ²`.
 
-Empirical status: ASSERTED, with referent Tajima (1989, Genetics 123, 585-595).  It is
-written here to be CHECKED, not used: `varPairwise_two_eq` is the one sample size at which
-this corpus can verify it, and the general case is recorded as open in
-`Descent.Coalescent.Program`.  Nothing in the corpus depends on this definition. -/
+Empirical status: DERIVED, in `Descent.Coalescent.TajimaVariance`.  It was written here to be
+CHECKED -- `varPairwise_two_eq` verifies it at `n = 2` -- and
+`TajimaVariance.varPairwiseFromTree_eq_tajima` now derives it for every `n ≥ 2` from the
+tree: the per-pair variance, the two coalescence-time covariances, the two shared-path
+lengths, and the counts of the pair classes. -/
 noncomputable def tajimaVarPairwise (θ : ℝ) (n : ℕ) : ℝ :=
   ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ
     + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ ^ 2
