@@ -508,9 +508,21 @@ noncomputable def misspecExcessRisk (π σ_β_sq : ℝ) : ℝ :=
 
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+satisfying it, and a value does not.
+
+The point is `π = 1/4, σ²_β = 2`, and each coordinate of that choice is doing
+work.  The previous point was `π = 1, σ²_β = 1`, where the `(1 - π)` factor
+vanishes and the whole body collapses to `0` -- and a stated value of zero is
+satisfied by every rescaling `c · π(1-π)σ²_β`, so it pinned nothing at all.
+
+`π` is off `1/2` because the body is symmetric under `π ↔ 1 - π`, so a balanced
+point cannot tell `π(1-π)` from a transposed reading of it.  At `1/4` the two
+factors are `1/4` and `3/4`, which also separates the body from `π²` (`1/16`)
+and from `(1-π)²` (`9/16`).  `σ²_β` is off `1` so that the variance scale is
+carried rather than cancelled.  The value `3/8` is then attained only by this
+product. -/
 theorem misspecExcessRisk_at_reference_point :
-    misspecExcessRisk 1 1 = 0 := by
+    misspecExcessRisk (1 / 4) 2 = 3 / 8 := by
   norm_num [misspecExcessRisk]
 
 
