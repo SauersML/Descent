@@ -589,7 +589,7 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
     nondegenerateGenerationalPopGen.theta = 2 ∧
     nondegenerateGenerationalPopGen.bigM = 1 / 2 ∧
     nondegenerateGenerationalPopGen.tauAt 1 = 1 / 2 ∧
-    nondegenerateGenerationalPopGen.fstTransientAt 1 = 2 / 7 ∧
+    nondegenerateGenerationalPopGen.fstTransientAt 1 = 1 / 4 ∧
     nondegenerateGenerationalPopGen.mutationSharedRetentionAt 1 = Real.exp (-(1 : ℝ)) ∧
     nondegenerateGenerationalPopGen.migrationSharedBoostAt 1 = 7 / 6 := by
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -621,12 +621,16 @@ distance: `lambda * √(F_ST gap) * distance` at `lambda = 1/4`, gap `2/7`,
 distance `1`.
 
 It is named rather than inlined because it is the one place the witness
-depends on the FORM of `ldCorrelationDecay`, and it has moved once already.
-While that body read `lambda * F_ST * distance` this was `2/7 * 1/4 = 1/14`,
-a rational the arithmetic steps could close with `norm_num`. The exponent was
-measured to be a SQUARE ROOT, so it is now `√(2/7) * 1/4`, which is a surd and
-does not reduce. Every step below is stated against this name so that the next
-change to the decay law moves one definition rather than nine proof steps.
+depends on the FORM of `ldCorrelationDecay`, and it has moved TWICE. While that
+body read `lambda * F_ST * distance` this was `2/7 * 1/4 = 1/14`; the exponent
+was measured to be a SQUARE ROOT and it became `√(2/7) * 1/4`, a surd that did
+not reduce; and the witness's `F_ST` gap then moved from `2/7` to `1/4` when
+`fstTransientAt` picked up the two-deme correction on its migration term, which
+makes the surd rational again at `1/8`. It is left written as a square root
+rather than as `1/8` because the SHAPE is the empirical content and a rational
+literal would hide the next move of it. Every step below is stated against this
+name so that a change to the decay law moves one definition rather than nine
+proof steps.
 
 Empirical status: NOT AN EMPIRICAL CLAIM. This is `ldCorrelationDecay`'s
 exponent evaluated at three literal fields of the witness beside it, and a
@@ -639,8 +643,9 @@ the recombination rate and that proof stops compiling rather than leaving this
 number silently stale. The empirical content -- that the exponent goes as
 `√fstGap` and not as `fstGap` -- belongs to `PortabilityDrift.ldCorrelationDecay`,
 where it was measured across a ninetyfold span of `F_ST` and is what moved this
-constant from `1/14` to a surd. -/
-noncomputable def popgenDrivenLDDecayExponent : ℝ := Real.sqrt (2 / 7) / 4
+constant from `1/14` to a surd; the `F_ST` gap itself belongs to
+`DGP.fstEquilibrium`, whose two-deme correction moved the gap to `1/4`. -/
+noncomputable def popgenDrivenLDDecayExponent : ℝ := Real.sqrt (1 / 4) / 4
 
 theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
   unfold popgenDrivenLDDecayExponent
@@ -748,12 +753,12 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
       proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0
           = (7 / 6 : ℝ) *
               (Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent)) := by
-              -- `ring_nf` normalises `√(2/7)` to `√2 * (√7)⁻¹` on one side of the
-              -- goal and leaves the other as written, so the two forms have to be
-              -- put in the same shape before it runs. This is the whole reason the
-              -- surd needs a step where the old rational did not.
-              have hsqrt : Real.sqrt (2 / 7 : ℝ) = Real.sqrt 2 / Real.sqrt 7 :=
-                Real.sqrt_div (by norm_num) 7
+              -- The gap is a perfect square again, so the surd reduces; the step is
+              -- kept because the exponent is still WRITTEN as a square root and the
+              -- two sides have to be put in the same shape before `ring_nf` runs.
+              have hsqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+                rw [show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num]
+                exact Real.sqrt_sq (by norm_num)
               unfold popgenDrivenLDDecayExponent
               fin_cases i <;>
                 generational_witness_simp nondegenerateGenerationalPopGen,

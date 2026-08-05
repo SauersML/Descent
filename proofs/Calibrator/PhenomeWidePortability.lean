@@ -157,9 +157,15 @@ used in the portability theorem below.
     below ties the two together, so neither copy can carry an empirical status
     the other lacks.
 
-    Empirical status: FALSIFIED at demographic equilibrium; see
-    `closedPopulation`. It remains correct inside the declared regime, so the
-    theorems below are conditional on that regime holding rather than false. -/
+    Empirical status: CONDITIONALLY VALID -- measured inside the closed
+    population with no mutation that it declares, and known to fail at
+    demographic equilibrium; see `closedPopulation`, which carries both legs of
+    the measurement and whose retention this body is. In-regime: forward
+    Wright-Fisher at `Ne = 1000` gives 0.90445 ± 0.00094, 0.60311 ± 0.00372 and
+    0.13699 ± 0.00272 at `t = 200`, `1000`, `4000` against this formula's
+    0.90481, 0.60645 and 0.13527, worst 0.90 sems, with `(1 - 1/(4 Ne))^t`
+    excluded at 84.90 sems and `(1 - 1/Ne)^t` at 91.51. The theorems below are
+    conditional on that regime holding rather than false. -/
 noncomputable def neutralDriftFactor (Ne : ℝ) (t : ℕ) : ℝ :=
   (1 - 1 / (2 * Ne)) ^ t
 

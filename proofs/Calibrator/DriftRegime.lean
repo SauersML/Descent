@@ -101,9 +101,34 @@ at the drift rate. This is the premise the cluster encodes.
     Regime: closed population, no mutation — stated here as the definition's whole
     content rather than as a hidden assumption.
 
-    Empirical status: FALSIFIED at demographic equilibrium. Simulation measures
-    the retention as `1.025 ± 0.020` at `Ne = 1000`, `t = 4000`, where this
-    trajectory gives `0.135`. -/
+    Empirical status: CONDITIONALLY VALID -- holds in the closed population
+    with no mutation that it declares, and fails at demographic equilibrium.
+    Both halves are measured.
+
+    INSIDE the regime (`simcov/battery_falsrepair.py`, `group_b`): forward
+    Wright-Fisher, 400 independent biallelic loci at `p₀ = 0.5`, no mutation and
+    no migration, 24 replicates, retention `H_t/H₀` measured per replicate at
+    `Ne = 1000`:
+
+      t      this trajectory   measured           sems
+       200        0.90481      0.90445 ± 0.00094   0.39
+      1000        0.60645      0.60311 ± 0.00372   0.90
+      4000        0.13527      0.13699 ± 0.00272   0.63
+
+    Worst 0.90 sems. Two competing retentions ride the same replicates and are
+    excluded: `(1 - 1/(4 Ne))^t`, the halved-drift-rate reading, at 84.90 sems,
+    and `(1 - 1/Ne)^t`, the haploid reading, at 91.51. So the design fixes the
+    `2 Ne` in the denominator rather than merely failing to reject it.
+
+    Power: the prediction spans 0.90481 to 0.13527, a factor of six and a half,
+    and the control moves it independently -- at `Ne = 100`, `t = 200` the same
+    body predicts 0.36700 against a measured 0.37231 ± 0.00368 (1.44 sems),
+    which is a second population size the same formula has to track.
+
+    OUTSIDE it: at demographic equilibrium simulation measures the retention as
+    `1.025 ± 0.020` at `Ne = 1000`, `t = 4000`, where this trajectory gives
+    `0.135`. That is `mutationDriftBalance` below, not a defect in this body --
+    it is the regime this one is not. -/
 noncomputable def closedPopulation (Ne H₀ : ℝ) (hH : 0 < H₀) : HeterozygosityTrajectory where
   het := fun t ↦ (1 - 1 / (2 * Ne)) ^ t * H₀
   het_zero_pos := by simpa using hH

@@ -742,9 +742,11 @@
       "quantity": "h2",
       "convention": "am-inflated",
       "constants": [
+        "1",
         "1"
       ],
-      "source": "Fisher (1918)."
+      "source": "Fisher (1918).",
+      "note": "Two constants because the body is h2 / (1 - r*h2*(1 - h2)); the second `1` is the (1 - h2) factor. The one-constant entry pinned the superseded h2 / (1 - r*h2), which battery_am01 rejects at up to 275 sems and 54% on the cells where the current body is validated at 2.1 sems worst. Re-pinned against the measured body, not merely against the diff."
     },
     "Calibrator/TransferLearningPGS.lean::additiveHeritability": {
       "quantity": "h2",

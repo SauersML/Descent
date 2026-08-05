@@ -204,6 +204,67 @@ theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
     mutationSelectionDriftParameter Ne s h = scaledMutationRate Ne (h * s) := by
   unfold mutationSelectionDriftParameter scaledMutationRate; ring
 
+/-- **The two in the allele-frequency retention ratio is the ploidy, twice, and
+that is why the ratio does not depend on it.**
+
+`PortabilityDrift.tagAlleleFreqRetentionAt` is `2p_t(1 - p_t) / (2p_0(1 - p_0))`,
+and both twos are the same gene-copy count that `hweGenotypeVariance` carries:
+the body is a ratio of Hardy-Weinberg genotype variances at two times. Stating
+it that way is not decoration. A bare `2` in a numerator and a bare `2` in a
+denominator can be two DIFFERENT conventions written the same way -- a
+heterozygosity over a genotype variance, say -- and the ratio would then be off
+by a factor while looking symmetric. Once both are `hweGenotypeVariance` the
+cancellation is forced, and the retention is a pure ratio that a haploid corpus
+would compute identically. -/
+theorem tagAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) :
+    tagAlleleFreqRetentionAt m t i =
+      hweGenotypeVariance (tagAlleleFreqTargetAt m t i) /
+        hweGenotypeVariance (m.tagAlleleFreqSource i) := by
+  unfold tagAlleleFreqRetentionAt hweGenotypeVariance ploidy; ring
+
+/-- **The same two, at the causal variants.** `causalAlleleFreqRetentionAt` is
+the identical ratio on the causal side, and it is tied here separately rather
+than by appeal to the tag version: two definitions with the same shape in one
+file are exactly the pair a single fix leaves half-repaired. -/
+theorem causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio {p q : ℕ}
+    (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) :
+    causalAlleleFreqRetentionAt m t j =
+      hweGenotypeVariance (causalAlleleFreqTargetAt m t j) /
+        hweGenotypeVariance (m.causalAlleleFreqSource j) := by
+  unfold causalAlleleFreqRetentionAt hweGenotypeVariance ploidy; ring
+
+/-- **The three twos in the deme-corrected flow step are three different twos,
+and only one of them is the ploidy.**
+
+`DGP.fstDemeCorrectedFlowStep` is `F + (1 - F)/(2 Nₑ) - 2(2 mig + mu) F`, and
+the constants are:
+
+* `2 Nₑ` -- the GENE-COPY COUNT, `coalescentTimeScale Nₑ = ploidy · Nₑ`. Drift
+  makes a pair identical at rate one over the number of copies, so this two is
+  the ploidy and is stated as such.
+* the inner `2` on `mig` -- the DEME-COUNT correction, `islandDemeCorrection 2`.
+  A pair of lineages switches between the same-deme and different-deme states at
+  emigration plus immigration, which at `d` demes is `m · d/(d - 1)` and at two
+  demes is `2 m`. It would be `3/2 m` at three demes; nothing about ploidy moves
+  when it changes.
+* the outer `2` on the whole flow term -- the PAIR of lineages, either of which
+  can leave the identity class. A pair is two gene copies whatever the ploidy of
+  the organism carrying them, so this one is left inline: tying it to `ploidy`
+  would make a haploid corpus compute a different number for the same event, and
+  it does not.
+
+Distinguishing them is the point. All three are the numeral `2` in one line of
+source, and the guard that counts convention restatements cannot tell them
+apart. -/
+theorem fstDemeCorrectedFlowStep_constants_named (p : EvolutionaryParameters)
+    (F : ℝ) :
+    fstDemeCorrectedFlowStep p F =
+      F + (1 - F) / coalescentTimeScale p.Ne
+        - 2 * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
+  unfold fstDemeCorrectedFlowStep coalescentTimeScale islandDemeCorrection ploidy
+  norm_num
+
 end Ploidy
 
 section Differentiation
@@ -1560,6 +1621,20 @@ theorem fstDriftFlowStep_uses_coalescentTimeScale (p : EvolutionaryParameters) (
     fstDriftFlowStep p F
       = F + (1 - F) / coalescentTimeScale p.Ne - ploidy * (p.mig + p.mu) * F := by
   unfold fstDriftFlowStep ploidy; rw [coalescentTimeScale_eq]
+
+/-- **The deme-corrected flow step restates neither convention.** Its `2 Nₑ` is the same
+`coalescentTimeScale` and its leading `2` on the rate sum is the same `ploidy` "either
+lineage" factor as in `fstDriftFlowStep`. The only new constant is the `2` INSIDE the rate
+sum, multiplying `mig` alone, and that one is not a ploidy convention at all: it is
+`PopulationGeneticsFoundations.islandDemeCorrection` at two demes, the emigration rate plus
+the immigration rate. Mutation carries no such factor, and this theorem is where that
+asymmetry is visible as an asymmetry rather than as an inlined constant. -/
+theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale (p : EvolutionaryParameters) (F : ℝ) :
+    fstDemeCorrectedFlowStep p F
+      = F + (1 - F) / coalescentTimeScale p.Ne
+          - ploidy * (islandDemeCorrection 2 * p.mig + p.mu) * F := by
+  unfold fstDemeCorrectedFlowStep ploidy islandDemeCorrection
+  rw [coalescentTimeScale_eq]; norm_num
 
 /-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
 deviation is weighted by `1 - ploidy · p`, which is `q - p`, and `ploidy · p` is `E[X]` for

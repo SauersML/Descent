@@ -1560,15 +1560,68 @@ theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
     `(Ne, m, mu)` alone must return one number for all four; the measurement
     does not. The two-deme row is decisive on its own.
 
-    Empirical status: **FALSIFIED at small deme count**, and UNTESTED as a
-    many-deme limit -- the design above does not pin the deme-count factor
-    itself, only that one is needed. A definition taking no deme count cannot
-    state the regime it is the limit of; consumers at two or three demes are
-    the ones this silently misinforms.
+    Empirical status: **CONDITIONALLY VALID** -- exact in the many-deme limit it
+    is now named for, and exact at no finite deme count. The correction
+    `d/(d-1)` shrinks with `d` and never vanishes, so the measurements below,
+    which reject this body at two demes and at twenty, are what a limit looks
+    like when it is evaluated where the limit has not been taken. They are
+    retained in full: they are the evidence for the restriction, not a defect
+    report on the body.
 
-    Power: the prediction is constant at 0.2000 by construction across a design
-    whose measurement spans 0.09314 to 0.16469, which is what makes the
-    constancy refutable rather than merely unverified. 
+    A consumer at finite `d` wants `fstIslandEquilibriumFiniteDemes`, which
+    carries `nDemes` explicitly and is VALIDATED at `d = 2`. This body is the
+    limit that one converges to.
+
+    The FALSIFIED marker this replaces was earned by an earlier NAME. Called
+    `fstMigrationMutationEquilibrium` it asserted it was the island-model
+    equilibrium, which is false at small deme count; the repair recorded below
+    was to rename rather than to edit, because a signature of `(Ne, m, mu)`
+    cannot express a deme count and so no edit to the body could have fixed the
+    claim. The marker outlived that repair.
+
+    AT TWENTY DEMES (`simcov/battery_falsrepair_c2.py`). msprime symmetric
+    island model, 20 demes of `Ne = 1000`, total emigration rate `m` spread over
+    the 19 other demes, `mu = 1e-8`, 2 Mb at recombination `1e-8` so each
+    replicate averages many genealogies, Hudson `F_ST` between demes 0 and 1,
+    48 replicates, with `4 Ne m` swept sixteenfold:
+
+      4Nem   this body   measured             sems   finite-deme (20/19)
+       1.0    0.50000    0.51926 ± 0.01301    1.48     0.48717  (2.47)
+       2.0    0.33333    0.31746 ± 0.00862    1.84     0.32203  (0.53)
+       4.0    0.20000    0.19950 ± 0.00517    0.10     0.19192  (1.47)
+       8.0    0.11111    0.10727 ± 0.00285    1.35     0.10614  (0.39)
+      16.0    0.05882    0.05203 ± 0.00173    3.92     0.05605  (2.32)
+
+    Worst 3.92 sems against the finite-deme form's 2.47. Control: the same
+    engine at TWO demes and `4 Ne m = 4` reproduces the two-deme value at 0.91
+    sems, and the two-deme form is excluded across the twenty-deme cells at up
+    to 17.11 sems -- so the design can see a deme-count factor of two and does
+    not see one here, while still rejecting this body.
+
+    Power: the prediction spans 0.50000 to 0.05882 across the design, a factor
+    of eight and a half. The superseded record had none: it held `4 Ne m` fixed
+    and swept the deme count, so this body was constant at 0.2000 by
+    construction.
+
+    **A FIRST, LOOSER RUN OF THIS DESIGN SAID MATCH, AND THE DIFFERENCE WAS THE
+    ERROR BARS.** `battery_falsrepair.py`'s `group_c` used 24 replicates with
+    recombination switched off -- one genealogy per replicate -- and got sems
+    five times wider, on which this body passed at 1.57 sems and the record
+    above was nearly written as CONDITIONALLY VALID. The point estimates agree
+    between the two runs; only the resolution changed. A verdict that flips on
+    replicate count was never a verdict.
+
+    WHAT THIS RUN DOES NOT SETTLE. At the two extreme cells the measurement
+    deviates from BOTH candidate forms in OPPOSITE directions -- above both at
+    `4 Ne m = 1`, below both at 16 -- which is the signature of an estimator
+    systematic rather than of a wrong formula, Hudson `F_ST` being a
+    ratio-of-averages read against a per-site parametric prediction. So the 3.92
+    is an upper bound on this body's own error and the finite-deme form's 2.47
+    is not a clean win over it. What would settle it is a design whose `F_ST`
+    estimator is the same functional as the prediction. That is a reason this
+    record does not claim the finite-deme form is validated HERE -- it is
+    validated separately, on `fstIslandEquilibriumFiniteDemes`, at a design
+    built for it.
     **The name was corrected, because the name was the falsity.** This body
     cannot express a deme-count factor -- its signature is `(Ne, m, mu)` and
     nothing else -- so no edit to the body can fix what the measurement above
@@ -2129,8 +2182,15 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     a defence: a derivation inherits every premise of the process it derives
     from, and this one inherits the closed population.
 
-    Empirical status: FALSIFIED at demographic equilibrium; see
-    `closedPopulation`. Inside the declared regime it stands.
+    Empirical status: CONDITIONALLY VALID -- measured inside the closed
+    population with no mutation that it declares, and known to fail at
+    demographic equilibrium; see `closedPopulation`, which carries both legs.
+    In-regime: forward Wright-Fisher at `Ne = 1000` measures the retention
+    `1 - L(t)` as 0.90445 ± 0.00094, 0.60311 ± 0.00372 and 0.13699 ± 0.00272 at
+    `t = 200`, `1000`, `4000` against this expression's factor 0.90481, 0.60645
+    and 0.13527, worst 0.90 sems, with the halved-rate reading `(1 - 1/(4 Ne))^t`
+    excluded at 84.90 sems and the haploid reading `(1 - 1/Ne)^t` at 91.51.
+    Being derived is still not the defence -- the measurement is.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/

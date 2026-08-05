@@ -660,8 +660,13 @@ safe order `33.22` vs `33.2`); at `m = 1` the genotype and surrogate laws are in
 (KS `0.019`–`0.025` against a split-half null of `0.024`–`0.035`), confirming
 `additive_score_is_subcritical`.
 
-Empirical status: **FALSIFIED on the common-variant column and on the condensation
-direction; VALIDATED on the rare-variant tail** (`proofs/validation/empirical/safe_order/`). Scope:
+Empirical status: **MIXED** -- FALSIFIED on the common-variant column and on the condensation
+direction, VALIDATED on the rare-variant tail (`proofs/validation/empirical/safe_order/`). The
+head was `FALSIFIED` and reported only one of the two verdicts the same measurement returned; the
+tables above are unchanged and are what says which part carries which. Power, for the validated
+part: the convexity gap between `c(q)` and `log(1/V)` spans 0.0035 at `q = 1e-4` to the factor
+2.64 at `q = 0.2764`, so the rare-variant agreement is a place the design could have rejected this
+body and did not. Scope:
 HWE,
 unlinked loci, disjoint monomials as defined — no LD, no real genotypes, no structure. -/
 noncomputable def maxSafeEpistaticOrder (N q : ℝ) : ℝ :=

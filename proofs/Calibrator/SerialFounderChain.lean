@@ -108,15 +108,28 @@ theorem joinTime_pushforward_not_lt
 chain, whose total age is `tAnc`, or survives into the ancestral population and waits a
 further `2·N_anc`.
 
-    Empirical status: **FALSIFIED as written, and the body corrected**
-    (`proofs/validation/empirical/simcov/battery_bulk12.py`,
-    `test_serial_founder_within_time`). Mean pairwise TMRCA in a two-epoch
-    history, 60000 independent genealogies per cell, `N = 400`, `Nanc = 4000`:
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_falsrepair_e.py`), the body
+    having been corrected first and measured second. Mean pairwise TMRCA in a
+    two-epoch history under msprime, 60000 independent genealogies per cell,
+    `N = 400`, `Nanc = 4000`:
 
-      tAnc    as written   corrected   measured           sems(written)  sems(corr)
-       200      6563.13     6407.37    6455.53±31.99          3.36          1.51
-       800      3743.04     3448.73    3481.02±25.99         10.08          1.24
-      3000      1039.88      969.33     982.79± 8.88          6.43          1.52
+      tAnc    this body   superseded   measured           sems(this)  sems(sup.)
+       200      6407.37     6563.13    6391.08±31.72         0.51         5.42
+       800      3448.73     3743.04    3438.09±25.84         0.41        11.80
+      3000       969.33     1039.88     970.81± 8.38         0.18         8.24
+
+    Worst cell 0.51 sems where the superseded body reaches 11.80. A third form
+    with the sign of the `tAnc` term flipped, `2N(1-e^-a) + e^-a (2 Nanc - tAnc)`,
+    rides the same cells and is excluded at 10.98 sems, so the measurement picks
+    the coefficient of `tAnc` as zero rather than merely rejecting one sign of it.
+
+    Control: with `Nanc = N` the history is single-epoch and the mean pairwise
+    TMRCA must be `2N = 800` whatever `tAnc` is. Measured 798.00 ± 3.27, passing
+    at 0.61 sems. **The earlier record had no control that could fail** -- it
+    compared the constant `2·Nanc` against itself and was correctly recorded as
+    a LEAD rather than a verdict, which is why the correction below was carried
+    in prose for a while with a FALSIFIED marker describing the superseded body.
 
     The error is a double-counted `tAnc`. Decomposing on whether the pair
     coalesces before the size change,
@@ -135,11 +148,11 @@ further `2·N_anc`.
     probability of coalescing in the recent epoch and `2 Nanc` by its
     complement, which is the body now.
 
-    Power: the measurement spans 982.79 to 6455.53, a factor of six and a half,
+    Power: the prediction spans 969.33 to 6407.37, a factor of six and a half,
     and `tAnc` crosses the epoch boundary in both directions -- most pairs
-    coalesce after it at `tAnc = 200` and before it at `tAnc = 3000`. The
-    corrected form holds across that whole range at 1.5 sems; the superseded one
-    fails hardest in the middle, where `e^(-a) tAnc` is largest. -/
+    coalesce after it at `tAnc = 200` and before it at `tAnc = 3000`. This form
+    holds across that whole range at 0.51 sems; the superseded one fails hardest
+    in the middle, where `e^(-a) tAnc` is largest. -/
 noncomputable def serialFounderWithinTime (N Nanc tAnc : ℝ) : ℝ :=
   2 * N * (1 - Real.exp (-tAnc / (2 * N)))
     + Real.exp (-tAnc / (2 * N)) * (2 * Nanc)
