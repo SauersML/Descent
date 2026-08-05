@@ -1,0 +1,73 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-AM01-KESTREL-20260804)
+FRESHNESS token literal: SIMCOV-BATTERY-AM01-KESTREL-20260804
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)       body 0.53875  num-only 0.58450  inverted 0.42734  measured 0.53745 ± 0.00354
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)       body 0.57380  num-only 0.66889  inverted 0.37642  measured 0.57508 ± 0.00287
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)       body 0.84193  num-only 1.05094  inverted 0.61102  measured 0.83829 ± 0.00119
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)       body 0.87167  num-only 1.34116  inverted 0.47806  measured 0.86609 ± 0.00171
+  r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)       body 0.30813  num-only 0.35919  inverted 0.20213  measured 0.32607 ± 0.01330
+
+  arm P (mates paired on PHENOTYPE at correlation r, so the transmission coefficient tracks the inflating heritability -- the reading this module's amVarianceStep disowns):
+    r=0.3 h2=0.5 (r^=0.297 h2^=0.495): body 0.53791  num-only 0.58378  measured 0.54558 ± 0.00412
+    r=0.5 h2=0.5 (r^=0.497 h2^=0.502): body 0.57114  num-only 0.66624  measured 0.58297 ± 0.00249
+    r=0.5 h2=0.8 (r^=0.498 h2^=0.793): body 0.87366  num-only 1.32694  measured 0.87237 ± 0.00132
+
+  CONTROL r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies: predicted 0.49782 measured 0.49486 ± 0.00378
+  (mean allele frequency after the control run: 0.50008)
+
+pgsR2AM                                  MATCH   (pred span 65%)
+  lean: R2_rm / (1 - r * h2 * (1 - h2))
+  regime: Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12
+  design                                   lean        sim      sem     sems
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)    0.53875    0.53745  0.00354     0.37
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)    0.57380    0.57508  0.00287     0.45
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)    0.84193    0.83829  0.00119     3.08
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)    0.87167    0.86609  0.00171     3.26
+  r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)    0.30813    0.32607  0.01330     1.35
+
+pgsR2AM [numerator-inflation only, the previous body, competing] FALSIFIED   (pred span 73%)
+  lean: R2_rm / (1 - r * h2)
+  regime: Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12
+  NOTE: positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems
+  design                                   lean        sim      sem     sems
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)    0.58450    0.53745  0.00354    13.29
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)    0.66889    0.57508  0.00287    32.66
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)    1.05094    0.83829  0.00119   179.38
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)    1.34116    0.86609  0.00171   277.84
+  r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)    0.35919    0.32607  0.01330     2.49
+
+pgsR2AM [inverted factor, competing]     FALSIFIED   (pred span 67%)
+  lean: R2_rm * (1 - r * h2)
+  regime: Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12
+  NOTE: positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems
+  design                                   lean        sim      sem     sems
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)    0.42734    0.53745  0.00354    31.11
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)    0.37642    0.57508  0.00287    69.18
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)    0.61102    0.83829  0.00119   191.71
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)    0.47806    0.86609  0.00171   226.94
+  r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)    0.20213    0.32607  0.01330     9.32
+
+observedH2                               MATCH   (pred span 38%)
+  lean: h2 / (1 - r * h2 * (1 - h2))
+  regime: Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12
+  design                                   lean        sim      sem     sems
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)    0.54000    0.53745  0.00354     0.72
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)    0.56900    0.57508  0.00287     2.12
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)    0.83736    0.83829  0.00119     0.78
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)    0.86871    0.86609  0.00171     1.53
+
+observedH2 [numerator-inflation only, the previous body, competing] FALSIFIED   (pred span 56%)
+  lean: h2 / (1 - r * h2)
+  regime: Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12
+  NOTE: positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems
+  design                                   lean        sim      sem     sems
+  r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)    0.58586    0.53745  0.00354    13.68
+  r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)    0.66329    0.57508  0.00287    30.71
+  r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)    1.04523    0.83829  0.00119   174.57
+  r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)    1.33660    0.86609  0.00171   275.18
+
+================ SUMMARY ================
+MATCH                    pgsR2AM                                                    worst      3.26 sems,     0.64% rel
+FALSIFIED                pgsR2AM [numerator-inflation only, the previous body, comp worst    277.84 sems,    54.85% rel
+FALSIFIED                pgsR2AM [inverted factor, competing]                       worst    226.94 sems,    44.80% rel
+MATCH                    observedH2                                                 worst      2.12 sems,     1.06% rel
+FALSIFIED                observedH2 [numerator-inflation only, the previous body, c worst    275.18 sems,    54.33% rel

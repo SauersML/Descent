@@ -1,0 +1,92 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-PGSCAL01-AVOCET-20260804)
+FRESHNESS token literal: SIMCOV-BATTERY-PGSCAL01-AVOCET-20260804
+
+---- test_effect_genetic_correlation ----
+  rho=0.9 mu=0         cosine 0.90778  centred 0.90795  realised corr(G_s,G_t) 0.90783 ± 0.00068
+  rho=0.5 mu=0         cosine 0.48140  centred 0.48171  realised corr(G_s,G_t) 0.48066 ± 0.00178
+  rho=0.2 mu=0         cosine 0.18449  centred 0.18363  realised corr(G_s,G_t) 0.18522 ± 0.00160
+  rho=0.7 mu=0.6       cosine 0.75741  centred 0.69129  realised corr(G_s,G_t) 0.75779 ± 0.00091
+  rho=0.3 mu=0.9       cosine 0.62049  centred 0.26414  realised corr(G_s,G_t) 0.62109 ± 0.00158
+  CONTROL orthogonal effect vectors: realised corr = 0: predicted 0.00000 measured -0.00065 ± 0.00211
+
+effectGeneticCorrelation                 MATCH   (pred span 80%)
+  lean: sum b_s*b_t / sqrt(sum b_s^2 * sum b_t^2)
+  regime: independent standardised genotypes (the diagonal-LD regime the definition names), 200000 individuals, 400 variants; the oracle is the realised Pearson correlation between the two genetic values and the prediction is evaluated at the REALISED effect vectors
+  design                                   lean        sim      sem     sems
+  rho=0.9 mu=0                          0.90778    0.90783  0.00068     0.07
+  rho=0.5 mu=0                          0.48140    0.48066  0.00178     0.42
+  rho=0.2 mu=0                          0.18449    0.18522  0.00160     0.45
+  rho=0.7 mu=0.6                        0.75741    0.75779  0.00091     0.42
+  rho=0.3 mu=0.9                        0.62049    0.62109  0.00158     0.38
+
+effectGeneticCorrelation [centred Pearson, competing] FALSIFIED   (pred span 80%)
+  lean: corr(b_s, b_t) with the means removed
+  regime: independent standardised genotypes (the diagonal-LD regime the definition names), 200000 individuals, 400 variants; the oracle is the realised Pearson correlation between the two genetic values and the prediction is evaluated at the REALISED effect vectors
+  NOTE: positive control 'orthogonal effect vectors: realised corr = 0' passed at 0.31 sems
+  design                                   lean        sim      sem     sems
+  rho=0.9 mu=0                          0.90795    0.90783  0.00068     0.18
+  rho=0.5 mu=0                          0.48171    0.48066  0.00178     0.59
+  rho=0.2 mu=0                          0.18363    0.18522  0.00160     0.99
+  rho=0.7 mu=0.6                        0.69129    0.75779  0.00091    72.77
+  rho=0.3 mu=0.9                        0.26414    0.62109  0.00158   225.21
+
+---- test_reclassified_band ----
+  pi=0.10 band(0.5,1.0]        f_e=0.19146 f_n=0.14988  body 0.12429  prior-free 0.56091  measured 0.12425 ± 0.00042 (n=616537)
+  pi=0.30 band(1.0,1.7]        f_e=0.25804 f_n=0.11409  body 0.49220  prior-free 0.69341  measured 0.49276 ± 0.00063 (n=628804)
+  pi=0.05 band(0.0,0.4]        f_e=0.06886 f_n=0.15542  body 0.02279  prior-free 0.30702  measured 0.02266 ± 0.00019 (n=604340)
+  pi=0.20 band(-0.5,0.1]       f_e=0.14516 f_n=0.23129  body 0.13563  prior-free 0.38561  measured 0.13583 ± 0.00037 (n=857864)
+  CONTROL cohort event rate reproduces the nominal 0.17: predicted 0.17000 measured 0.16995 ± 0.00019
+
+reclassifiedBandEventPrevalence          MATCH   (pred span 95%)
+  lean: pi*f_e / (pi*f_e + (1-pi)*f_n)
+  regime: binary outcome at cohort prevalence pi, event scores N(mu_e,1) and non-event scores N(0,1), band (threshold, threshold+delta]; the band rates and pi are MODEL quantities (exact normal band masses), the oracle is the counted event fraction among band members in an independently simulated cohort of four million
+  design                                   lean        sim      sem     sems
+  pi=0.10 band(0.5,1.0]                 0.12429    0.12425  0.00042     0.10
+  pi=0.30 band(1.0,1.7]                 0.49220    0.49276  0.00063     0.88
+  pi=0.05 band(0.0,0.4]                 0.02279    0.02266  0.00019     0.68
+  pi=0.20 band(-0.5,0.1]                0.13563    0.13583  0.00037     0.55
+
+reclassifiedBandEventPrevalence [prior-free, competing] FALSIFIED   (pred span 56%)
+  lean: f_e / (f_e + f_n)
+  regime: binary outcome at cohort prevalence pi, event scores N(mu_e,1) and non-event scores N(0,1), band (threshold, threshold+delta]; the band rates and pi are MODEL quantities (exact normal band masses), the oracle is the counted event fraction among band members in an independently simulated cohort of four million
+  NOTE: positive control 'cohort event rate reproduces the nominal 0.17' passed at 0.28 sems
+  design                                   lean        sim      sem     sems
+  pi=0.10 band(0.5,1.0]                 0.56091    0.12425  0.00042  1039.37
+  pi=0.30 band(1.0,1.7]                 0.69341    0.49276  0.00063   318.26
+  pi=0.05 band(0.0,0.4]                 0.30702    0.02266  0.00019  1485.59
+  pi=0.20 band(-0.5,0.1]                0.38561    0.13583  0.00037   675.25
+
+---- test_prevalence_citl ----
+  pi~0.10 shift=0.8 sd=1.2     pi_s=0.1462 pi_t=0.2493  logit-shift 0.66237  prob-diff 0.10310  fitted CITL 0.79967 ± 0.00204 (true intercept shift 0.80)
+  pi~0.27 shift=0.6 sd=1.5     pi_s=0.3292 pi_t=0.4298  logit-shift 0.42940  prob-diff 0.10066  fitted CITL 0.60007 ± 0.00181 (true intercept shift 0.60)
+  pi~0.10 shift=1.5 sd=2.0     pi_s=0.2030 pi_t=0.3948  logit-shift 0.94064  prob-diff 0.19182  fitted CITL 1.49676 ± 0.00149 (true intercept shift 1.50)
+  pi~0.40 shift=-0.9 sd=1.0    pi_s=0.4176 pi_t=0.2523  logit-shift -0.75407  prob-diff -0.16537  fitted CITL -0.89961 ± 0.00190 (true intercept shift -0.90)
+  CONTROL zero-variance score: the offset fit returns the intercept shift it was given (0.7): predicted 0.70000 measured 0.69964 ± 0.00139
+
+prevalenceLogisticCalibrationProfile     FALSIFIED   (pred span 180%)
+  lean: prevalenceLogit pi_target - prevalenceLogit pi_source
+  regime: logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset
+  NOTE: positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems
+  design                                   lean        sim      sem     sems
+  pi~0.10 shift=0.8 sd=1.2              0.66237    0.79967  0.00204    67.17
+  pi~0.27 shift=0.6 sd=1.5              0.42940    0.60007  0.00181    94.41
+  pi~0.10 shift=1.5 sd=2.0              0.94064    1.49676  0.00149   374.03
+  pi~0.40 shift=-0.9 sd=1.0            -0.75407   -0.89961  0.00190    76.42
+
+prevalenceLogisticCalibrationProfile [identity-link reading, competing] FALSIFIED   (pred span 186%)
+  lean: pi_target - pi_source
+  regime: logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset
+  NOTE: positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems
+  design                                   lean        sim      sem     sems
+  pi~0.10 shift=0.8 sd=1.2              0.10310    0.79967  0.00204   340.78
+  pi~0.27 shift=0.6 sd=1.5              0.10066    0.60007  0.00181   276.25
+  pi~0.10 shift=1.5 sd=2.0              0.19182    1.49676  0.00149   877.65
+  pi~0.40 shift=-0.9 sd=1.0            -0.16537   -0.89961  0.00190   385.54
+
+================ SUMMARY ================
+MATCH                    effectGeneticCorrelation                                   worst      0.45 sems,     0.39% rel
+FALSIFIED                effectGeneticCorrelation [centred Pearson, competing]      worst    225.21 sems,    57.47% rel
+MATCH                    reclassifiedBandEventPrevalence                            worst      0.88 sems,     0.11% rel
+FALSIFIED                reclassifiedBandEventPrevalence [prior-free, competing]    worst   1485.59 sems,  1255.14% rel
+FALSIFIED                prevalenceLogisticCalibrationProfile                       worst    374.03 sems,    37.16% rel
+FALSIFIED                prevalenceLogisticCalibrationProfile [identity-link readin worst    877.65 sems,    87.18% rel

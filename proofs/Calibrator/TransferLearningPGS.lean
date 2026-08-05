@@ -177,7 +177,33 @@ noncomputable def ldEffectGeneticCorrelation {m : ℕ}
     target effect-size vectors. This is the diagonal-LD specialization of the
     shared-LD correlation above.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED IN THE DECLARED REGIME**
+    (`proofs/validation/empirical/simcov/battery_pgscal01.py`). The regime is
+    `standardizedDiagonalLD` made real: 200000 individuals with INDEPENDENT
+    standardized genotypes, 400 variants. The oracle is the realised Pearson
+    correlation between the two genetic values in those individuals, and the
+    prediction is evaluated at the REALISED effect vectors, never at the nominal
+    `ρ` used to draw them — at `m = 400` those differ by about 5%, which is the
+    size of a spurious falsification.
+
+      design            this body   realised corr(G_s,G_t)   sems
+      ρ=0.9  μ=0          0.90778     0.90783±0.00068        0.07
+      ρ=0.5  μ=0          0.48140     0.48066±0.00178        0.42
+      ρ=0.2  μ=0          0.18449     0.18522±0.00160        0.45
+      ρ=0.7  μ=0.6        0.75741     0.75779±0.00091        0.42
+      ρ=0.3  μ=0.9        0.62049     0.62109±0.00158        0.38
+
+    The identity gate: the CENTRED Pearson correlation between the same two
+    effect vectors — the natural rival, and equal to this body whenever the
+    effects have mean zero — is rejected at 72.8 and 225.2 sems on the two cells
+    where the effect distribution has a nonzero mean. The uncentred cosine is
+    the genetic correlation; the centred one is not. The positive control, two
+    orthogonalised effect vectors whose realised genetic correlation must be
+    zero, passes at 0.31 sems.
+
+    THE REGIME IS A CONDITION. Under real LD the sibling
+    `ldEffectGeneticCorrelation` is the genetic correlation and this body is
+    3.1 sems away from it; that separation is measured at that definition. -/
 noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
@@ -1979,7 +2005,25 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
     bodies, one indexed by `ℕ` and one by `Fin k`; nothing in the deviation depends on
     which, so the index is a parameter rather than a reason for a second definition.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is what "deviation around a
+    center" MEANS. Both arguments are supplied by the caller and the body is
+    their difference; no population can exhibit a `wSource` and a `wShared`
+    whose deviation is something other than `wSource - wShared`, so there is
+    nothing a measurement could agree or disagree with. It has no free
+    parameter and relates no two measurable quantities.
+
+    The empirical content is in what is built ON it and is claimed there:
+    `metaLearnedSourceWeights` asserts that averaging these deviations recovers
+    the mean source effect vector (`metaLearnedSourceWeights_eq_sourcePopulationMeanWeights`),
+    and `weightedMetaTransferGapSq` asserts a transfer gap. Those are the
+    objects a simulation can contradict.
+
+    That this definition was screened at all is an artefact of the word
+    "Effect" in its name: its structurally identical siblings
+    `populationDeviationSum`, `meanPopulationDeviation` and
+    `weightedPopulationDeviation` -- the same subtraction and the same sums --
+    are not screened, and nothing distinguishes them. An UNTESTED marker here
+    would record a debt that can never be paid. -/
 noncomputable def centeredPopulationEffectDeviation {p : ℕ} {ι : Type*}
     (wShared : Fin p → ℝ)
     (wSource : ι → Fin p → ℝ) : ι → Fin p → ℝ :=
@@ -2437,7 +2481,22 @@ noncomputable def uniformMetaWeight (k : ℕ) : Fin k → ℝ :=
     as `weightedPopulationDeviation`, applied to the source effect vectors themselves
     rather than to their deviations around a shared center.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the body is literally
+    `weightedPopulationDeviation wSource weight`, an application of another
+    definition to different arguments, and it introduces no constant, no
+    exponent and no relation of its own. A weighted average of supplied vectors
+    at supplied weights is what the caller asked for; no measured population can
+    make `Σⱼ wⱼ · vⱼ` come out otherwise.
+
+    What is claimed, and could fail, is
+    `weightedMetaSourceWeights_eq_weightedPopulationEffectAverage`: that ANY
+    affine meta-aggregator over centred deviations equals this average, which
+    needs `Σⱼ wⱼ = 1` and is false without it. That is a theorem about the
+    aggregator, proved rather than measured, and it is where the content sits.
+
+    As with `centeredPopulationEffectDeviation`, the screen fired on the word
+    "Effect" in the name: the definition this one calls is not screened, and the
+    two have the same body. -/
 noncomputable def weightedPopulationEffectAverage {p k : ℕ}
     (wSource : Fin k → Fin p → ℝ)
     (weight : Fin k → ℝ) : Fin p → ℝ :=

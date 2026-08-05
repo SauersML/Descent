@@ -134,6 +134,16 @@ def main():
                 "states": states,
                 "declared": declared,
                 "empirical_claim": empirical,
+                # Read off the FULL docstring, not the truncated `doc` below.
+                # The truncation keeps the last 1200 characters for JSON size,
+                # and a status marker sits at the TOP of a docstring, so any
+                # declaration whose evidence paragraph runs past 1200 characters
+                # had its verdict silently cropped out of the record.
+                # `PolygenicArchitecture.spikeAndSlabVariance` was the one that
+                # showed it: declared NOT AN EMPIRICAL CLAIM, counted as a
+                # FALSIFIED measurement, because the only state word left inside
+                # the window came from a retracted battery quoted in its history.
+                "nonclaim": "NOT AN EMPIRICAL CLAIM" in doc,
                 "doc": doc[-1200:],
                 "body": body.strip()[:600],
             })
@@ -159,8 +169,13 @@ def main():
     # status, so the exclusion has to happen here -- and both numbers are
     # printed, because a denominator that moved is a denominator a reader must
     # be able to audit.
-    nonclaim = [r for r in emp
-                if "NOT AN EMPIRICAL CLAIM" in (r.get("doc") or "")]
+    nonclaim = [r for r in emp if r["nonclaim"]]
+    # A declaration cannot be both not-a-claim and measured; the `status` of a
+    # non-claim is whatever state word its prose quotes, which is history and
+    # not a verdict.  Counting one in the numerator credits the corpus with a
+    # measurement nobody made.
+    measured -= sum(1 for r in nonclaim
+                    if r["status"] in {"VALIDATED", "FALSIFIED", "MEASURED", "TESTED"})
     claimable = len(emp) - len(nonclaim)
     print("\ndeclared NOT AN EMPIRICAL CLAIM (witnesses): %d" % len(nonclaim))
     for r in nonclaim:

@@ -1,0 +1,327 @@
+{
+ "_battery_sha": "f7b5da68201d02c8",
+ "results": [
+  {
+   "name": "effectGeneticCorrelation",
+   "file": "TransferLearningPGS.lean",
+   "source": "sum b_s*b_t / sqrt(sum b_s^2 * sum b_t^2)",
+   "note": "",
+   "regime": "independent standardised genotypes (the diagonal-LD regime the definition names), 200000 individuals, 400 variants; the oracle is the realised Pearson correlation between the two genetic values and the prediction is evaluated at the REALISED effect vectors",
+   "span": 0.7967632524031432,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rho=0.2 mu=0",
+    "lean": 0.18449488437875844,
+    "truth": 0.18521849583852754,
+    "sem": 0.0016048602138663292,
+    "sems_off": 0.45088753121109354,
+    "rel_err": 0.0039067991373817074
+   },
+   "cells": [
+    {
+     "design": "rho=0.9 mu=0",
+     "lean": 0.9077830980877775,
+     "truth": 0.9078273543371511,
+     "sem": 0.0006756643768780816,
+     "sems_off": 0.06550034438420428,
+     "rel_err": 4.874963192309486e-05
+    },
+    {
+     "design": "rho=0.5 mu=0",
+     "lean": 0.4814003605660389,
+     "truth": 0.4806562653024996,
+     "sem": 0.001776935004807283,
+     "sems_off": 0.4187520992755739,
+     "rel_err": 0.0015480818981336018
+    },
+    {
+     "design": "rho=0.2 mu=0",
+     "lean": 0.18449488437875844,
+     "truth": 0.18521849583852754,
+     "sem": 0.0016048602138663292,
+     "sems_off": 0.45088753121109354,
+     "rel_err": 0.0039067991373817074
+    },
+    {
+     "design": "rho=0.7 mu=0.6",
+     "lean": 0.7574068385377751,
+     "truth": 0.757787505668722,
+     "sem": 0.0009138889940890757,
+     "sems_off": 0.4165354144857581,
+     "rel_err": 0.0005023402050036965
+    },
+    {
+     "design": "rho=0.3 mu=0.9",
+     "lean": 0.6204892790600839,
+     "truth": 0.6210893381250958,
+     "sem": 0.0015849724824535316,
+     "sems_off": 0.37859273372559576,
+     "rel_err": 0.0009661396971059683
+    }
+   ]
+  },
+  {
+   "name": "effectGeneticCorrelation [centred Pearson, competing]",
+   "file": "TransferLearningPGS.lean",
+   "source": "corr(b_s, b_t) with the means removed",
+   "note": "positive control 'orthogonal effect vectors: realised corr = 0' passed at 0.31 sems",
+   "regime": "independent standardised genotypes (the diagonal-LD regime the definition names), 200000 individuals, 400 variants; the oracle is the realised Pearson correlation between the two genetic values and the prediction is evaluated at the REALISED effect vectors",
+   "span": 0.7977500837608684,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.3 mu=0.9",
+    "lean": 0.2641426369578219,
+    "truth": 0.6210893381250958,
+    "sem": 0.0015849724824535316,
+    "sems_off": 225.20687590406726,
+    "rel_err": 0.5747107207552482
+   },
+   "cells": [
+    {
+     "design": "rho=0.9 mu=0",
+     "lean": 0.9079475856104593,
+     "truth": 0.9078273543371511,
+     "sem": 0.0006756643768780816,
+     "sems_off": 0.17794526013597262,
+     "rel_err": 0.0001324384782346273
+    },
+    {
+     "design": "rho=0.5 mu=0",
+     "lean": 0.48170931859078814,
+     "truth": 0.4806562653024996,
+     "sem": 0.001776935004807283,
+     "sems_off": 0.5926234135967955,
+     "rel_err": 0.0021908656233281267
+    },
+    {
+     "design": "rho=0.2 mu=0",
+     "lean": 0.1836323231392372,
+     "truth": 0.18521849583852754,
+     "sem": 0.0016048602138663292,
+     "sems_off": 0.9883556745849137,
+     "rel_err": 0.008563792142406563
+    },
+    {
+     "design": "rho=0.7 mu=0.6",
+     "lean": 0.6912852076506708,
+     "truth": 0.757787505668722,
+     "sem": 0.0009138889940890757,
+     "sems_off": 72.76846361886408,
+     "rel_err": 0.08775850422522491
+    },
+    {
+     "design": "rho=0.3 mu=0.9",
+     "lean": 0.2641426369578219,
+     "truth": 0.6210893381250958,
+     "sem": 0.0015849724824535316,
+     "sems_off": 225.20687590406726,
+     "rel_err": 0.5747107207552482
+    }
+   ]
+  },
+  {
+   "name": "reclassifiedBandEventPrevalence",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "pi*f_e / (pi*f_e + (1-pi)*f_n)",
+   "note": "",
+   "regime": "binary outcome at cohort prevalence pi, event scores N(mu_e,1) and non-event scores N(0,1), band (threshold, threshold+delta]; the band rates and pi are MODEL quantities (exact normal band masses), the oracle is the counted event fraction among band members in an independently simulated cohort of four million",
+   "span": 0.9537045944865092,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "pi=0.30 band(1.0,1.7]",
+    "lean": 0.4922048359601129,
+    "truth": 0.49275767965852635,
+    "sem": 0.0006304734362613513,
+    "sems_off": 0.8768707238353687,
+    "rel_err": 0.0011219382695295092
+   },
+   "cells": [
+    {
+     "design": "pi=0.10 band(0.5,1.0]",
+     "lean": 0.12429374536284697,
+     "truth": 0.12425369442547649,
+     "sem": 0.00042011118057103694,
+     "sems_off": 0.09533413825370532,
+     "rel_err": 0.0003223319640971151
+    },
+    {
+     "design": "pi=0.30 band(1.0,1.7]",
+     "lean": 0.4922048359601129,
+     "truth": 0.49275767965852635,
+     "sem": 0.0006304734362613513,
+     "sems_off": 0.8768707238353687,
+     "rel_err": 0.0011219382695295092
+    },
+    {
+     "design": "pi=0.05 band(0.0,0.4]",
+     "lean": 0.022786822476474625,
+     "truth": 0.022656120726743223,
+     "sem": 0.00019141492772156542,
+     "sems_off": 0.6828190010421905,
+     "rel_err": 0.0057689377324478324
+    },
+    {
+     "design": "pi=0.20 band(-0.5,0.1]",
+     "lean": 0.13562539806875995,
+     "truth": 0.13583038803353445,
+     "sem": 0.00036990375872331414,
+     "sems_off": 0.5541710781258385,
+     "rel_err": 0.0015091612984562052
+    }
+   ]
+  },
+  {
+   "name": "reclassifiedBandEventPrevalence [prior-free, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "f_e / (f_e + f_n)",
+   "note": "positive control 'cohort event rate reproduces the nominal 0.17' passed at 0.28 sems",
+   "regime": "binary outcome at cohort prevalence pi, event scores N(mu_e,1) and non-event scores N(0,1), band (threshold, threshold+delta]; the band rates and pi are MODEL quantities (exact normal band masses), the oracle is the counted event fraction among band members in an independently simulated cohort of four million",
+   "span": 0.5572307975163701,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi=0.05 band(0.0,0.4]",
+    "lean": 0.3070210231385503,
+    "truth": 0.022656120726743223,
+    "sem": 0.00019141492772156542,
+    "sems_off": 1485.5941790780698,
+    "rel_err": 12.551350067451905
+   },
+   "cells": [
+    {
+     "design": "pi=0.10 band(0.5,1.0]",
+     "lean": 0.5609064251880032,
+     "truth": 0.12425369442547649,
+     "sem": 0.00042011118057103694,
+     "sems_off": 1039.374220340924,
+     "rel_err": 3.514203201615204
+    },
+    {
+     "design": "pi=0.30 band(1.0,1.7]",
+     "lean": 0.6934109721642202,
+     "truth": 0.49275767965852635,
+     "sem": 0.0006304734362613513,
+     "sems_off": 318.2581231265653,
+     "rel_err": 0.40720480022704786
+    },
+    {
+     "design": "pi=0.05 band(0.0,0.4]",
+     "lean": 0.3070210231385503,
+     "truth": 0.022656120726743223,
+     "sem": 0.00019141492772156542,
+     "sems_off": 1485.5941790780698,
+     "rel_err": 12.551350067451905
+    },
+    {
+     "design": "pi=0.20 band(-0.5,0.1]",
+     "lean": 0.38560720162096707,
+     "truth": 0.13583038803353445,
+     "sem": 0.00036990375872331414,
+     "sems_off": 675.2481089933023,
+     "rel_err": 1.838887580338551
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogisticCalibrationProfile",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "prevalenceLogit pi_target - prevalenceLogit pi_source",
+   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
+   "span": 1.801655936802828,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi~0.10 shift=1.5 sd=2.0",
+    "lean": 0.9406355644469429,
+    "truth": 1.4967576980048904,
+    "sem": 0.0014868458983367636,
+    "sems_off": 374.02809139806936,
+    "rel_err": 0.3715512098579703
+   },
+   "cells": [
+    {
+     "design": "pi~0.10 shift=0.8 sd=1.2",
+     "lean": 0.6623749846176985,
+     "truth": 0.7996694964574858,
+     "sem": 0.002044044477043034,
+     "sems_off": 67.16806477635991,
+     "rel_err": 0.17168906960687913
+    },
+    {
+     "design": "pi~0.27 shift=0.6 sd=1.5",
+     "lean": 0.4293982747701269,
+     "truth": 0.6000733984280144,
+     "sem": 0.0018078507788572456,
+     "sems_off": 94.40774960739428,
+     "rel_err": 0.284423745670109
+    },
+    {
+     "design": "pi~0.10 shift=1.5 sd=2.0",
+     "lean": 0.9406355644469429,
+     "truth": 1.4967576980048904,
+     "sem": 0.0014868458983367636,
+     "sems_off": 374.02809139806936,
+     "rel_err": 0.3715512098579703
+    },
+    {
+     "design": "pi~0.40 shift=-0.9 sd=1.0",
+     "lean": -0.7540660846067708,
+     "truth": -0.899610056535256,
+     "sem": 0.0019044355039078702,
+     "sems_off": 76.42368125874118,
+     "rel_err": 0.16178562130466947
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogisticCalibrationProfile [identity-link reading, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "pi_target - pi_source",
+   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
+   "span": 1.8620894588676886,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "pi~0.10 shift=1.5 sd=2.0",
+    "lean": 0.19182,
+    "truth": 1.4967576980048904,
+    "sem": 0.0014868458983367636,
+    "sems_off": 877.6549738373279,
+    "rel_err": 0.8718429841679203
+   },
+   "cells": [
+    {
+     "design": "pi~0.10 shift=0.8 sd=1.2",
+     "lean": 0.10310050000000001,
+     "truth": 0.7996694964574858,
+     "sem": 0.002044044477043034,
+     "sems_off": 340.77976496145516,
+     "rel_err": 0.8710711106816847
+    },
+    {
+     "design": "pi~0.27 shift=0.6 sd=1.5",
+     "lean": 0.10066150000000001,
+     "truth": 0.6000733984280144,
+     "sem": 0.0018078507788572456,
+     "sems_off": 276.24619480137403,
+     "rel_err": 0.8322513541448455
+    },
+    {
+     "design": "pi~0.10 shift=1.5 sd=2.0",
+     "lean": 0.19182,
+     "truth": 1.4967576980048904,
+     "sem": 0.0014868458983367636,
+     "sems_off": 877.6549738373279,
+     "rel_err": 0.8718429841679203
+    },
+    {
+     "design": "pi~0.40 shift=-0.9 sd=1.0",
+     "lean": -0.165366,
+     "truth": -0.899610056535256,
+     "sem": 0.0019044355039078702,
+     "sems_off": 385.54419670742294,
+     "rel_err": 0.8161803563680824
+    }
+   ]
+  }
+ ]
+}

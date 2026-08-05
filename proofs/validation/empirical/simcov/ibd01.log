@@ -1,0 +1,85 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-IBD01-DUNLIN-20260804)
+FRESHNESS token literal: SIMCOV-BATTERY-IBD01-DUNLIN-20260804
+  Ne=200 m=0.05 d=1      density-reading 0.02439  deme-size-with-m 0.33333  Hudson F_ST 0.02003 ± 0.00554
+  Ne=200 m=0.05 d=2      density-reading 0.04762  deme-size-with-m 0.50000  Hudson F_ST 0.04757 ± 0.00481
+  Ne=200 m=0.05 d=4      density-reading 0.09091  deme-size-with-m 0.66667  Hudson F_ST 0.09331 ± 0.00505
+  Ne=200 m=0.05 d=7      density-reading 0.14894  deme-size-with-m 0.77778  Hudson F_ST 0.14527 ± 0.00866
+  Ne=200 m=0.05 d=10     density-reading 0.20000  deme-size-with-m 0.83333  Hudson F_ST 0.17216 ± 0.01188
+  Ne=200 m=0.05 slope of F/(1-F) vs d density 1/(4*N*sigma_sq) 0.02500  deme-size-with-m 0.50000  fitted 0.02256 ± 0.00157
+  CONTROL within-deme pi = 4*N_total*mu (Strobeck), Ne=200 m=0.05: predicted 0.000160 measured 0.000163 ± 0.000004
+  Ne=200 m=0.02 d=1      density-reading 0.05882  deme-size-with-m 0.75758  Hudson F_ST 0.05053 ± 0.00894
+  Ne=200 m=0.02 d=2      density-reading 0.11111  deme-size-with-m 0.86207  Hudson F_ST 0.10811 ± 0.00723
+  Ne=200 m=0.02 d=4      density-reading 0.20000  deme-size-with-m 0.92593  Hudson F_ST 0.19322 ± 0.00855
+  Ne=200 m=0.02 d=7      density-reading 0.30435  deme-size-with-m 0.95628  Hudson F_ST 0.29103 ± 0.01124
+  Ne=200 m=0.02 d=10     density-reading 0.38462  deme-size-with-m 0.96899  Hudson F_ST 0.37708 ± 0.01699
+  Ne=200 m=0.02 slope of F/(1-F) vs d density 1/(4*N*sigma_sq) 0.06250  deme-size-with-m 3.12500  fitted 0.06071 ± 0.00350
+  Ne=400 m=0.05 d=1      density-reading 0.01235  deme-size-with-m 0.20000  Hudson F_ST 0.02033 ± 0.00454
+  Ne=400 m=0.05 d=2      density-reading 0.02439  deme-size-with-m 0.33333  Hudson F_ST 0.02443 ± 0.00150
+  Ne=400 m=0.05 d=4      density-reading 0.04762  deme-size-with-m 0.50000  Hudson F_ST 0.04674 ± 0.00185
+  Ne=400 m=0.05 d=7      density-reading 0.08046  deme-size-with-m 0.63636  Hudson F_ST 0.07738 ± 0.00289
+  Ne=400 m=0.05 d=10     density-reading 0.11111  deme-size-with-m 0.71429  Hudson F_ST 0.11450 ± 0.00508
+  Ne=400 m=0.05 slope of F/(1-F) vs d density 1/(4*N*sigma_sq) 0.01250  deme-size-with-m 0.25000  fitted 0.01266 ± 0.00052
+
+ibdFst                                   MATCH   (pred span 97%)
+  lean: d / (4 * N * sigma_sq + d), N a density
+  regime: 1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations
+  design                                   lean        sim      sem     sems
+  Ne=200 m=0.05 d=1                     0.02439    0.02003  0.00554     0.79
+  Ne=200 m=0.05 d=2                     0.04762    0.04757  0.00481     0.01
+  Ne=200 m=0.05 d=4                     0.09091    0.09331  0.00505     0.48
+  Ne=200 m=0.05 d=7                     0.14894    0.14527  0.00866     0.42
+  Ne=200 m=0.05 d=10                    0.20000    0.17216  0.01188     2.34
+  Ne=200 m=0.02 d=1                     0.05882    0.05053  0.00894     0.93
+  Ne=200 m=0.02 d=2                     0.11111    0.10811  0.00723     0.42
+  Ne=200 m=0.02 d=4                     0.20000    0.19322  0.00855     0.79
+  Ne=200 m=0.02 d=7                     0.30435    0.29103  0.01124     1.18
+  Ne=200 m=0.02 d=10                    0.38462    0.37708  0.01699     0.44
+  Ne=400 m=0.05 d=1                     0.01235    0.02033  0.00454     1.76
+  Ne=400 m=0.05 d=2                     0.02439    0.02443  0.00150     0.03
+  Ne=400 m=0.05 d=4                     0.04762    0.04674  0.00185     0.48
+  Ne=400 m=0.05 d=7                     0.08046    0.07738  0.00289     1.06
+  Ne=400 m=0.05 d=10                    0.11111    0.11450  0.00508     0.67
+
+ibdFst [deme-size reading carrying m, competing] FALSIFIED   (pred span 79%)
+  lean: d / (d + 4*Ne*m*sigma_sq)
+  regime: 1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations
+  NOTE: positive control 'within-deme pi = 4*N_total*mu (Strobeck), Ne=200 m=0.05' passed at 0.85 sems
+  design                                   lean        sim      sem     sems
+  Ne=200 m=0.05 d=1                     0.33333    0.02003  0.00554    56.59
+  Ne=200 m=0.05 d=2                     0.50000    0.04757  0.00481    94.10
+  Ne=200 m=0.05 d=4                     0.66667    0.09331  0.00505   113.55
+  Ne=200 m=0.05 d=7                     0.77778    0.14527  0.00866    73.06
+  Ne=200 m=0.05 d=10                    0.83333    0.17216  0.01188    55.67
+  Ne=200 m=0.02 d=1                     0.75758    0.05053  0.00894    79.10
+  Ne=200 m=0.02 d=2                     0.86207    0.10811  0.00723   104.34
+  Ne=200 m=0.02 d=4                     0.92593    0.19322  0.00855    85.68
+  Ne=200 m=0.02 d=7                     0.95628    0.29103  0.01124    59.16
+  Ne=200 m=0.02 d=10                    0.96899    0.37708  0.01699    34.85
+  Ne=400 m=0.05 d=1                     0.20000    0.02033  0.00454    39.61
+  Ne=400 m=0.05 d=2                     0.33333    0.02443  0.00150   206.09
+  Ne=400 m=0.05 d=4                     0.50000    0.04674  0.00185   245.15
+  Ne=400 m=0.05 d=7                     0.63636    0.07738  0.00289   193.35
+  Ne=400 m=0.05 d=10                    0.71429    0.11450  0.00508   118.00
+
+ibdFst [slope of F/(1-F) against distance] MATCH   (pred span 80%)
+  lean: 1 / (4 * N * sigma_sq)
+  regime: 1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations
+  design                                   lean        sim      sem     sems
+  Ne=200 m=0.05 slope of F/(1-F) vs d    0.02500    0.02256  0.00157     1.56
+  Ne=200 m=0.02 slope of F/(1-F) vs d    0.06250    0.06071  0.00350     0.51
+  Ne=400 m=0.05 slope of F/(1-F) vs d    0.01250    0.01266  0.00052     0.30
+
+ibdFst [slope, deme-size reading carrying m, competing] FALSIFIED   (pred span 92%)
+  lean: 1 / (4*Ne*m*sigma_sq)
+  regime: 1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations
+  NOTE: positive control 'within-deme pi = 4*N_total*mu (Strobeck), Ne=200 m=0.05' passed at 0.85 sems
+  design                                   lean        sim      sem     sems
+  Ne=200 m=0.05 slope of F/(1-F) vs d    0.50000    0.02256  0.00157   304.83
+  Ne=200 m=0.02 slope of F/(1-F) vs d    3.12500    0.06071  0.00350   876.72
+  Ne=400 m=0.05 slope of F/(1-F) vs d    0.25000    0.01266  0.00052   458.95
+
+================ SUMMARY ================
+MATCH                    ibdFst                                                     worst      2.34 sems,    16.17% rel
+FALSIFIED                ibdFst [deme-size reading carrying m, competing]           worst    245.15 sems,   969.78% rel
+MATCH                    ibdFst [slope of F/(1-F) against distance]                 worst      1.56 sems,    10.83% rel
+FALSIFIED                ibdFst [slope, deme-size reading carrying m, competing]    worst    876.72 sems,  5047.76% rel

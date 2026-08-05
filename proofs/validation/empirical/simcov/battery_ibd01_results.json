@@ -1,0 +1,369 @@
+{
+ "_battery_sha": "a4b831513a804085",
+ "results": [
+  {
+   "name": "ibdFst",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "d / (4 * N * sigma_sq + d), N a density",
+   "note": "",
+   "regime": "1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations",
+   "span": 0.9679012345679012,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 m=0.05 d=10",
+    "lean": 0.2,
+    "truth": 0.17215570960925053,
+    "sem": 0.011876574224462016,
+    "sems_off": 2.344471550844938,
+    "rel_err": 0.16173898881395748
+   },
+   "cells": [
+    {
+     "design": "Ne=200 m=0.05 d=1",
+     "lean": 0.024390243902439025,
+     "truth": 0.02003035232951159,
+     "sem": 0.005536371320318706,
+     "sems_off": 0.7874998479466971,
+     "rel_err": 0.21766424779776927
+    },
+    {
+     "design": "Ne=200 m=0.05 d=2",
+     "lean": 0.047619047619047616,
+     "truth": 0.047571338953132494,
+     "sem": 0.004807752065905806,
+     "sems_off": 0.00992327916687891,
+     "rel_err": 0.0010028867583930091
+    },
+    {
+     "design": "Ne=200 m=0.05 d=4",
+     "lean": 0.09090909090909091,
+     "truth": 0.09331261273312844,
+     "sem": 0.00504937097317993,
+     "sems_off": 0.47600420662375387,
+     "rel_err": 0.02575773792672093
+    },
+    {
+     "design": "Ne=200 m=0.05 d=7",
+     "lean": 0.14893617021276595,
+     "truth": 0.14527380570180087,
+     "sem": 0.008657321361321744,
+     "sems_off": 0.4230366828390359,
+     "rel_err": 0.02521008170242818
+    },
+    {
+     "design": "Ne=200 m=0.05 d=10",
+     "lean": 0.2,
+     "truth": 0.17215570960925053,
+     "sem": 0.011876574224462016,
+     "sems_off": 2.344471550844938,
+     "rel_err": 0.16173898881395748
+    },
+    {
+     "design": "Ne=200 m=0.02 d=1",
+     "lean": 0.058823529411764705,
+     "truth": 0.0505252390779519,
+     "sem": 0.008938840366895455,
+     "sems_off": 0.9283408130371255,
+     "rel_err": 0.1642404961411453
+    },
+    {
+     "design": "Ne=200 m=0.02 d=2",
+     "lean": 0.1111111111111111,
+     "truth": 0.10810558445492369,
+     "sem": 0.007226296162512257,
+     "sems_off": 0.4159152335575646,
+     "rel_err": 0.027801770568481775
+    },
+    {
+     "design": "Ne=200 m=0.02 d=4",
+     "lean": 0.2,
+     "truth": 0.19321530193508843,
+     "sem": 0.00855172220044383,
+     "sems_off": 0.7933721308860407,
+     "rel_err": 0.03511470363351932
+    },
+    {
+     "design": "Ne=200 m=0.02 d=7",
+     "lean": 0.30434782608695654,
+     "truth": 0.29102718009161105,
+     "sem": 0.011244628243495591,
+     "sems_off": 1.1846230668453415,
+     "rel_err": 0.04577114065824488
+    },
+    {
+     "design": "Ne=200 m=0.02 d=10",
+     "lean": 0.38461538461538464,
+     "truth": 0.3770846923944726,
+     "sem": 0.0169853373367832,
+     "sems_off": 0.4433643013143847,
+     "rel_err": 0.01997082451979799
+    },
+    {
+     "design": "Ne=400 m=0.05 d=1",
+     "lean": 0.012345679012345678,
+     "truth": 0.02032624106442043,
+     "sem": 0.004536511021857469,
+     "sems_off": 1.7591849801804558,
+     "rel_err": 0.3926236054557146
+    },
+    {
+     "design": "Ne=400 m=0.05 d=2",
+     "lean": 0.024390243902439025,
+     "truth": 0.024429234979547625,
+     "sem": 0.0014988560678137345,
+     "sems_off": 0.026013890156559638,
+     "rel_err": 0.0015960826092688975
+    },
+    {
+     "design": "Ne=400 m=0.05 d=4",
+     "lean": 0.047619047619047616,
+     "truth": 0.04673859599962634,
+     "sem": 0.0018489162765321844,
+     "sems_off": 0.47619874982800464,
+     "rel_err": 0.01883778493107312
+    },
+    {
+     "design": "Ne=400 m=0.05 d=7",
+     "lean": 0.08045977011494253,
+     "truth": 0.07738220140228826,
+     "sem": 0.002890990190088473,
+     "sems_off": 1.0645379300163202,
+     "rel_err": 0.03977101525782214
+    },
+    {
+     "design": "Ne=400 m=0.05 d=10",
+     "lean": 0.1111111111111111,
+     "truth": 0.11450277126321207,
+     "sem": 0.0050830378889966535,
+     "sems_off": 0.6672506139375729,
+     "rel_err": 0.029620769127975233
+    }
+   ]
+  },
+  {
+   "name": "ibdFst [deme-size reading carrying m, competing]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "d / (d + 4*Ne*m*sigma_sq)",
+   "note": "positive control 'within-deme pi = 4*N_total*mu (Strobeck), Ne=200 m=0.05' passed at 0.85 sems",
+   "regime": "1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations",
+   "span": 0.7936000000000001,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=400 m=0.05 d=4",
+    "lean": 0.5,
+    "truth": 0.04673859599962634,
+    "sem": 0.0018489162765321844,
+    "sems_off": 245.14977219547652,
+    "rel_err": 9.69779674177627
+   },
+   "cells": [
+    {
+     "design": "Ne=200 m=0.05 d=1",
+     "lean": 0.3333333333333333,
+     "truth": 0.02003035232951159,
+     "sem": 0.005536371320318706,
+     "sems_off": 56.58995086799673,
+     "rel_err": 15.64141138656951
+    },
+    {
+     "design": "Ne=200 m=0.05 d=2",
+     "lean": 0.5,
+     "truth": 0.047571338953132494,
+     "sem": 0.004807752065905806,
+     "sems_off": 94.10399181257021,
+     "rel_err": 9.510530310963128
+    },
+    {
+     "design": "Ne=200 m=0.05 d=4",
+     "lean": 0.6666666666666666,
+     "truth": 0.09331261273312844,
+     "sem": 0.00504937097317993,
+     "sems_off": 113.54959993610025,
+     "rel_err": 6.144443255204046
+    },
+    {
+     "design": "Ne=200 m=0.05 d=7",
+     "lean": 0.7777777777777778,
+     "truth": 0.14527380570180087,
+     "sem": 0.008657321361321744,
+     "sems_off": 73.06000848043028,
+     "rel_err": 4.353874871112681
+    },
+    {
+     "design": "Ne=200 m=0.05 d=10",
+     "lean": 0.8333333333333334,
+     "truth": 0.17215570960925053,
+     "sem": 0.011876574224462016,
+     "sems_off": 55.67073562023167,
+     "rel_err": 3.8405791200581563
+    },
+    {
+     "design": "Ne=200 m=0.02 d=1",
+     "lean": 0.7575757575757576,
+     "truth": 0.0505252390779519,
+     "sem": 0.008938840366895455,
+     "sems_off": 79.09868500575664,
+     "rel_err": 13.994006389696569
+    },
+    {
+     "design": "Ne=200 m=0.02 d=2",
+     "lean": 0.8620689655172414,
+     "truth": 0.10810558445492369,
+     "sem": 0.007226296162512257,
+     "sems_off": 104.33607537062232,
+     "rel_err": 6.974324081996842
+    },
+    {
+     "design": "Ne=200 m=0.02 d=4",
+     "lean": 0.9259259259259258,
+     "truth": 0.19321530193508843,
+     "sem": 0.00855172220044383,
+     "sems_off": 85.67989076548933,
+     "rel_err": 3.792197702007033
+    },
+    {
+     "design": "Ne=200 m=0.02 d=7",
+     "lean": 0.9562841530054644,
+     "truth": 0.29102718009161105,
+     "sem": 0.011244628243495591,
+     "sems_off": 59.162202476428554,
+     "rel_err": 2.2858929282977636
+    },
+    {
+     "design": "Ne=200 m=0.02 d=10",
+     "lean": 0.9689922480620154,
+     "truth": 0.3770846923944726,
+     "sem": 0.0169853373367832,
+     "sems_off": 34.848148372403315,
+     "rel_err": 1.5696939377436767
+    },
+    {
+     "design": "Ne=400 m=0.05 d=1",
+     "lean": 0.2,
+     "truth": 0.02032624106442043,
+     "sem": 0.004536511021857469,
+     "sems_off": 39.60615505393666,
+     "rel_err": 8.839497591617425
+    },
+    {
+     "design": "Ne=400 m=0.05 d=2",
+     "lean": 0.3333333333333333,
+     "truth": 0.024429234979547625,
+     "sem": 0.0014988560678137345,
+     "sems_off": 206.09323669374086,
+     "rel_err": 12.644853537673324
+    },
+    {
+     "design": "Ne=400 m=0.05 d=4",
+     "lean": 0.5,
+     "truth": 0.04673859599962634,
+     "sem": 0.0018489162765321844,
+     "sems_off": 245.14977219547652,
+     "rel_err": 9.69779674177627
+    },
+    {
+     "design": "Ne=400 m=0.05 d=7",
+     "lean": 0.6363636363636364,
+     "truth": 0.07738220140228826,
+     "sem": 0.002890990190088473,
+     "sems_off": 193.35293384175807,
+     "rel_err": 7.223643484311866
+    },
+    {
+     "design": "Ne=400 m=0.05 d=10",
+     "lean": 0.7142857142857143,
+     "truth": 0.11450277126321207,
+     "sem": 0.0050830378889966535,
+     "sems_off": 117.99694515771041,
+     "rel_err": 5.238152198463017
+    }
+   ]
+  },
+  {
+   "name": "ibdFst [slope of F/(1-F) against distance]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "1 / (4 * N * sigma_sq)",
+   "note": "",
+   "regime": "1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations",
+   "span": 0.8,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 m=0.05 slope of F/(1-F) vs d",
+    "lean": 0.025,
+    "truth": 0.02255617430557321,
+    "sem": 0.001566280989871937,
+    "sems_off": 1.56027284390817,
+    "rel_err": 0.10834397984870009
+   },
+   "cells": [
+    {
+     "design": "Ne=200 m=0.05 slope of F/(1-F) vs d",
+     "lean": 0.025,
+     "truth": 0.02255617430557321,
+     "sem": 0.001566280989871937,
+     "sems_off": 1.56027284390817,
+     "rel_err": 0.10834397984870009
+    },
+    {
+     "design": "Ne=200 m=0.02 slope of F/(1-F) vs d",
+     "lean": 0.0625,
+     "truth": 0.06070599484190374,
+     "sem": 0.0034951920563065244,
+     "sems_off": 0.5132779913650981,
+     "rel_err": 0.02955235578905142
+    },
+    {
+     "design": "Ne=400 m=0.05 slope of F/(1-F) vs d",
+     "lean": 0.0125,
+     "truth": 0.012655908911398391,
+     "sem": 0.000517146705186496,
+     "sems_off": 0.30147907708735355,
+     "rel_err": 0.012319060803129916
+    }
+   ]
+  },
+  {
+   "name": "ibdFst [slope, deme-size reading carrying m, competing]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "1 / (4*Ne*m*sigma_sq)",
+   "note": "positive control 'within-deme pi = 4*N_total*mu (Strobeck), Ne=200 m=0.05' passed at 0.85 sems",
+   "regime": "1D stepping stone, 20 demes with reflecting boundaries, deme spacing 1, migration m/2 to each neighbour so sigma_sq = m; 20 diploids sampled from seven demes, 2 Mb at mu = 1e-8 with recombination, 10 independent replicates. F is Hudson's F_ST as a ratio of averages, averaged over all sampled pairs at the given lattice distance; the error bar is across replicate simulations",
+   "span": 0.92,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=200 m=0.02 slope of F/(1-F) vs d",
+    "lean": 3.125,
+    "truth": 0.06070599484190374,
+    "sem": 0.0034951920563065244,
+    "sems_off": 876.7169173519549,
+    "rel_err": 50.47761778945257
+   },
+   "cells": [
+    {
+     "design": "Ne=200 m=0.05 slope of F/(1-F) vs d",
+     "lean": 0.5,
+     "truth": 0.02255617430557321,
+     "sem": 0.001566280989871937,
+     "sems_off": 304.82641925792876,
+     "rel_err": 21.166879596974
+    },
+    {
+     "design": "Ne=200 m=0.02 slope of F/(1-F) vs d",
+     "lean": 3.125,
+     "truth": 0.06070599484190374,
+     "sem": 0.0034951920563065244,
+     "sems_off": 876.7169173519549,
+     "rel_err": 50.47761778945257
+    },
+    {
+     "design": "Ne=400 m=0.05 slope of F/(1-F) vs d",
+     "lean": 0.25,
+     "truth": 0.012655908911398391,
+     "sem": 0.000517146705186496,
+     "sems_off": 458.9492472991961,
+     "rel_err": 18.7536187839374
+    }
+   ]
+  }
+ ]
+}

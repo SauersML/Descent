@@ -1,0 +1,284 @@
+{
+ "_battery_sha": "2b5e94fd510fe674",
+ "results": [
+  {
+   "name": "pgsR2AM",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "R2_rm / (1 - r * h2 * (1 - h2))",
+   "note": "",
+   "regime": "Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12",
+   "span": 0.646511995175312,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+    "lean": 0.8716729349738853,
+    "truth": 0.8660916506689167,
+    "sem": 0.0017098611840009968,
+    "sems_off": 3.2641739324760133,
+    "rel_err": 0.0064442190392413785
+   },
+   "cells": [
+    {
+     "design": "r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)",
+     "lean": 0.5387494540781436,
+     "truth": 0.5374534091715482,
+     "sem": 0.003539263782837124,
+     "sems_off": 0.3661905373881113,
+     "rel_err": 0.0024114553642764695
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+     "lean": 0.5738027421470082,
+     "truth": 0.5750840555941124,
+     "sem": 0.002871771722090561,
+     "sems_off": 0.4461752434038807,
+     "rel_err": 0.0022280455085481867
+    },
+    {
+     "design": "r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)",
+     "lean": 0.8419339860027238,
+     "truth": 0.8382864073059134,
+     "sem": 0.0011854863426061268,
+     "sems_off": 3.0768626897815907,
+     "rel_err": 0.004351232067012781
+    },
+    {
+     "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+     "lean": 0.8716729349738853,
+     "truth": 0.8660916506689167,
+     "sem": 0.0017098611840009968,
+     "sems_off": 3.2641739324760133,
+     "rel_err": 0.0064442190392413785
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)",
+     "lean": 0.3081259266435987,
+     "truth": 0.3260726620182919,
+     "sem": 0.013303399422300211,
+     "sems_off": 1.3490337924162015,
+     "rel_err": 0.05503906786790482
+    }
+   ]
+  },
+  {
+   "name": "pgsR2AM [numerator-inflation only, the previous body, competing]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "R2_rm / (1 - r * h2)",
+   "note": "positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems",
+   "regime": "Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12",
+   "span": 0.7321821535726875,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+    "lean": 1.341156382060264,
+    "truth": 0.8660916506689167,
+    "sem": 0.0017098611840009968,
+    "sems_off": 277.8381870039986,
+    "rel_err": 0.5485155422344
+   },
+   "cells": [
+    {
+     "design": "r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)",
+     "lean": 0.5844978713889032,
+     "truth": 0.5374534091715482,
+     "sem": 0.003539263782837124,
+     "sems_off": 13.292160489841626,
+     "rel_err": 0.08753216821132685
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+     "lean": 0.6688878552943889,
+     "truth": 0.5750840555941124,
+     "sem": 0.002871771722090561,
+     "sems_off": 32.66408641700471,
+     "rel_err": 0.1631131984756019
+    },
+    {
+     "design": "r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)",
+     "lean": 1.0509415581900627,
+     "truth": 0.8382864073059134,
+     "sem": 0.0011854863426061268,
+     "sems_off": 179.38220225857395,
+     "rel_err": 0.2536783956304157
+    },
+    {
+     "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+     "lean": 1.341156382060264,
+     "truth": 0.8660916506689167,
+     "sem": 0.0017098611840009968,
+     "sems_off": 277.8381870039986,
+     "rel_err": 0.5485155422344
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)",
+     "lean": 0.359185613965626,
+     "truth": 0.3260726620182919,
+     "sem": 0.013303399422300211,
+     "sems_off": 2.4890594423428007,
+     "rel_err": 0.10155083760280567
+    }
+   ]
+  },
+  {
+   "name": "pgsR2AM [inverted factor, competing]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "R2_rm * (1 - r * h2)",
+   "note": "positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems",
+   "regime": "Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12",
+   "span": 0.6691869324659916,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+    "lean": 0.47806170710065987,
+    "truth": 0.8660916506689167,
+    "sem": 0.0017098611840009968,
+    "sems_off": 226.93651812147962,
+    "rel_err": 0.4480241130007038
+   },
+   "cells": [
+    {
+     "design": "r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)",
+     "lean": 0.42733935314872357,
+     "truth": 0.5374534091715482,
+     "sem": 0.003539263782837124,
+     "sems_off": 31.112135963642586,
+     "rel_err": 0.20488111926307945
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+     "lean": 0.37641834175323624,
+     "truth": 0.5750840555941124,
+     "sem": 0.002871771722090561,
+     "sems_off": 69.1787972952995,
+     "rel_err": 0.3454550894053861
+    },
+    {
+     "design": "r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)",
+     "lean": 0.6110176338702474,
+     "truth": 0.8382864073059134,
+     "sem": 0.0011854863426061268,
+     "sems_off": 191.709313947934,
+     "rel_err": 0.2711111279569268
+    },
+    {
+     "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+     "lean": 0.47806170710065987,
+     "truth": 0.8660916506689167,
+     "sem": 0.0017098611840009968,
+     "sems_off": 226.93651812147962,
+     "rel_err": 0.4480241130007038
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=0.5 (r^=0.502 h2^=0.498 R2rm=0.269)",
+     "lean": 0.20213261777798822,
+     "truth": 0.3260726620182919,
+     "sem": 0.013303399422300211,
+     "sems_off": 9.316419082520033,
+     "rel_err": 0.3800994645584576
+    }
+   ]
+  },
+  {
+   "name": "observedH2",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "h2 / (1 - r * h2 * (1 - h2))",
+   "note": "",
+   "regime": "Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12",
+   "span": 0.3783897625645954,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+    "lean": 0.5689993221370727,
+    "truth": 0.5750840555941124,
+    "sem": 0.002871771722090561,
+    "sems_off": 2.1188081943400916,
+    "rel_err": 0.010580598432264955
+   },
+   "cells": [
+    {
+     "design": "r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)",
+     "lean": 0.5400019970764407,
+     "truth": 0.5374534091715482,
+     "sem": 0.003539263782837124,
+     "sems_off": 0.7200898438967317,
+     "rel_err": 0.004741969929674527
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+     "lean": 0.5689993221370727,
+     "truth": 0.5750840555941124,
+     "sem": 0.002871771722090561,
+     "sems_off": 2.1188081943400916,
+     "rel_err": 0.010580598432264955
+    },
+    {
+     "design": "r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)",
+     "lean": 0.8373607268535276,
+     "truth": 0.8382864073059134,
+     "sem": 0.0011854863426061268,
+     "sems_off": 0.7808444678922708,
+     "rel_err": 0.0011042532054895045
+    },
+    {
+     "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+     "lean": 0.8687147742359306,
+     "truth": 0.8660916506689167,
+     "sem": 0.0017098611840009968,
+     "sems_off": 1.5341149279006945,
+     "rel_err": 0.003028690514436831
+    }
+   ]
+  },
+  {
+   "name": "observedH2 [numerator-inflation only, the previous body, competing]",
+   "file": "AssortativeMatingPGS.lean",
+   "source": "h2 / (1 - r * h2)",
+   "note": "positive control 'r=0: realised R2 after 12 generations equals V_A/(V_A+V_E) from the realised frequencies' passed at 0.78 sems",
+   "regime": "Fisher assortative mating in the linearisation this module declares: environmental variance held FIXED, mates paired by Gaussian copula on BREEDING VALUE at the transmission coefficient r*h2 that amVarianceStep holds at its random-mating value; 120 unlinked loci at p=1/2, 8000 individuals, 12 generations, one allele transmitted per parent per locus. h2 is NARROW-SENSE at RANDOM MATING (V_A/V_P in the founding generation); r is the REALISED transmission coefficient over the REALISED h2, never nominal. The oracle is the realised squared score-phenotype correlation in generation 12",
+   "span": 0.5616829241508279,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+    "lean": 1.3366049545767584,
+    "truth": 0.8660916506689167,
+    "sem": 0.0017098611840009968,
+    "sems_off": 275.17631741710295,
+    "rel_err": 0.5432604084619056
+   },
+   "cells": [
+    {
+     "design": "r=0.3 h2=0.5 frac=1.0 (r^=0.289 h2^=0.501 R2rm=0.500)",
+     "lean": 0.5858567752556003,
+     "truth": 0.5374534091715482,
+     "sem": 0.003539263782837124,
+     "sems_off": 13.676111489280217,
+     "rel_err": 0.09006058061602588
+    },
+    {
+     "design": "r=0.5 h2=0.5 frac=1.0 (r^=0.502 h2^=0.498 R2rm=0.502)",
+     "lean": 0.6632884583718472,
+     "truth": 0.5750840555941124,
+     "sem": 0.002871771722090561,
+     "sems_off": 30.71428069969462,
+     "rel_err": 0.153376540211347
+    },
+    {
+     "design": "r=0.3 h2=0.8 frac=1.0 (r^=0.298 h2^=0.797 R2rm=0.801)",
+     "lean": 1.0452330012530968,
+     "truth": 0.8382864073059134,
+     "sem": 0.0011854863426061268,
+     "sems_off": 174.5668309364409,
+     "rel_err": 0.24686860259641905
+    },
+    {
+     "design": "r=0.5 h2=0.8 frac=1.0 (r^=0.505 h2^=0.798 R2rm=0.801)",
+     "lean": 1.3366049545767584,
+     "truth": 0.8660916506689167,
+     "sem": 0.0017098611840009968,
+     "sems_off": 275.17631741710295,
+     "rel_err": 0.5432604084619056
+    }
+   ]
+  }
+ ]
+}

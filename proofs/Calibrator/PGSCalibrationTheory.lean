@@ -1502,7 +1502,38 @@ section PopulationCalibrationDrift
 
 /-- Shared logistic-scale calibration profile induced by a prevalence shift.
 
-    Empirical status: UNTESTED. -/
+    **This profile's `citl` is a difference of MARGINAL prevalence logits, and
+    that is not the intercept correction a deployment needs.** The two coincide
+    only when the score is constant, because `logit E[p]` is not `E[logit p]`.
+
+    Empirical status: **FALSIFIED** as the deployment
+    calibration-in-the-large, and exact for a constant predictor
+    (`proofs/validation/empirical/simcov/battery_pgscal01.py`). Two million
+    individuals per arm, a logistic risk model, and a target differing from the
+    source by a baseline-risk (intercept) shift and nothing else — the one
+    regime the phrase "induced by a prevalence shift" names. The oracle is the
+    intercept correction the target actually needs: the `a` solving
+    `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear predictor held as an
+    offset. Both prevalences are fed at their realised cohort values.
+
+      score sd   true intercept shift   this citl   fitted correction   sems
+      1.2              0.80              0.66237    0.79967±0.00204     67.2
+      1.5              0.60              0.42940    0.60007±0.00181     94.4
+      2.0              1.50              0.94064    1.49676±0.00149    374.0
+      1.0             -0.90             -0.75407   -0.89961±0.00190     76.4
+
+    The failure is one-directional: `|citl|` is 17% to 37% SMALLER than the
+    correction required, so a deployment sized from this number under-corrects.
+    The gap grows with the spread of the score and vanishes with it — the
+    positive control is a zero-variance score, where the fitted correction
+    returns the 0.7 intercept shift it was given at 0.26 sems and this body
+    returns 0.7 as well. The identity-scale reading `π_target - π_source` is
+    rejected on the same cells at up to 878 sems, so the failure is not an
+    artefact of comparing across links.
+
+    Consumers that read this `citl` as the recalibration a target population
+    needs — rather than as the shift in marginal log-odds, which is what it is —
+    are reading an attenuated number. -/
 noncomputable def prevalenceLogisticCalibrationProfile
     (pi_source pi_target slope : ℝ) : CalibrationProfile :=
   logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source) slope
@@ -2184,7 +2215,26 @@ theorem positive_nri_means_improvement
     decision threshold by a downward intercept recalibration, this is the event
     rate in the moved threshold band `(threshold, threshold + δ]`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pgscal01.py`). Four million
+    patients per cell, event scores `N(μ_e, 1)` and non-event scores `N(0, 1)`;
+    the oracle is the COUNTED event fraction among the patients whose score
+    falls in the band. The band masses and `π` are model quantities — exact
+    normal band masses and the nominal prevalence — and are never estimated from
+    the cohort the oracle counts, which would turn this body into a
+    rearrangement of those counts and put nothing on trial.
+
+      design                    this body   counted in band      sems
+      π=0.10 band (0.5, 1.0]     0.12429     0.12425±0.00042     0.10
+      π=0.30 band (1.0, 1.7]     0.49220     0.49276±0.00063     0.88
+      π=0.05 band (0.0, 0.4]     0.02279     0.02266±0.00019     0.68
+      π=0.20 band (-0.5, 0.1]    0.13563     0.13583±0.00037     0.54
+
+    The identity gate: the prior-free `f_e / (f_e + f_n)` — the same ratio with
+    the cohort prevalence dropped, which is the ordinary base-rate mistake — is
+    rejected at up to 1486 sems and a factor of thirteen. The positive control,
+    the simulated cohort reproducing its own nominal event rate, passes at 0.26
+    sems. -/
 noncomputable def reclassifiedBandEventPrevalence
     (π : ℝ)
     (μevent μnonevent : Measure ℝ)
