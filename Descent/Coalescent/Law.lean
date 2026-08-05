@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Path
-import Mathlib.MeasureTheory.Constructions.Prod.Basic
+import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.Tactic
 

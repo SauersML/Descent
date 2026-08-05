@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Rates
 import Mathlib.Data.Setoid.Partition
 import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Combinatorics.Choose.Basic
+import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Tactic
 
 namespace Descent
