@@ -1400,7 +1400,8 @@ section StatisticBoundary
 `§4` proves the three-real statistic sufficient for `R²` and the calibration slope, and
 each of its coordinates necessary.  A completeness claim is only as good as its stated
 scope, so this section fixes the scope from the other side: the statistic is sufficient
-for the *second-moment* metrics and for nothing beyond them.
+for the second-moment metrics and *not* for threshold metrics, and the second half is
+proved the only way a non-determination can be, by exhibiting a pair.
 
 `exceedance` is the simplest metric that is not a second-moment functional -- the
 fraction of a population scoring above a cut-off, which is what a screening programme
@@ -1426,9 +1427,9 @@ def exceedance (P : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1)) (w : Fin 1 →
 
 /-- **The one-contrast population.**  A single scored variant which is also the single
 causal variant, with unit effect and no residual: score and phenotype coincide, so the
-statistic is `(Var v, Var v, Var v)` for whatever contrast `v` is supplied and `R²` is
-exactly `1`.  All that is left free is the *shape* of `v`, which is exactly the
-information the statistic discards. -/
+statistic is `(Var v, Var v, Var v)` for whatever contrast `v` is supplied, and `R²` is
+exactly `1` whenever `v` is non-constant.  All that is left free is the *shape* of `v`,
+which is exactly the information the statistic discards. -/
 def oneContrastPopulation (v : Fin 4 → ℝ) : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1) where
   E := uniformExp (Fin 4)
   X := fun ω _ ↦ v ω
