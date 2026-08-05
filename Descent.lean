@@ -5,6 +5,7 @@ import Descent.Foundations.Probability
 import Descent.PopGen.DGP
 import Descent.Program.Conclusions
 import Descent.Portability.PortabilityDrift
+import Descent.Portability.PortabilityMasterTheorem
 import Descent.PopGen.HumanDemography
 import Descent.PopGen.AdditiveInvariance
 import Descent.Blindness.ImitationRigidity

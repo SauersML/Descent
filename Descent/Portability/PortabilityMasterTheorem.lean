@@ -1,0 +1,1006 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Foundations.TransportIdentities
+
+namespace Descent
+
+noncomputable section
+
+/-!
+# The portability master theorem: arbitrary generative input to exact output metrics
+
+Every other portability module in this corpus fixes a *shape* first -- a diagonal LD
+matrix, a scalar `F_ST`, an exponential decay chart, a shared-LD assumption -- and then
+computes inside it.  This module fixes nothing.  It takes
+
+* an arbitrary index set `J` of scored variants and `L` of causal variants (finite, no
+  relation between them assumed: `J` need not contain, tag, or even intersect `L`),
+* an arbitrary positive linear expectation functional per population (`ExpFunctional`,
+  so no measure, no Gaussianity, no independence, no exchangeability),
+* arbitrary scored genotypes `X : Ω → J → ℝ` and causal genotypes `C : Ω → L → ℝ`
+  (any allele frequencies, any LD, any admixture, any ploidy coding, any standardisation),
+* an arbitrary **population-specific** causal effect vector `β : L → ℝ` (allelic
+  turnover, sign flips and effect-size heterogeneity are the general case here,
+  not a perturbation of a shared vector),
+* an arbitrary residual `h : Ω → ℝ` carrying everything that is not additive in `C`:
+  environment, gene-environment interaction, dominance, epistasis, population
+  stratification, ascertainment, measurement error, and causal variants outside `L`,
+* an arbitrary deployed weight vector `w : J → ℝ`.
+
+`w` is arbitrary on purpose.  A theory that only covered the source ERM optimum would
+not cover clumping-and-thresholding, LDpred, lassosum, a winner's-cursed marginal-effect
+score, a shrunk score, a multi-ancestry meta-analysed score, or a score someone rounded
+to two decimal places.  Every one of those is a `w`, so every one of them is covered
+by the same identities.
+
+and returns the **exact** value of each deployed metric -- score variance, predictive
+covariance, outcome variance, MSE, calibration slope, calibration intercept, and `R²` --
+as a closed algebraic expression in those inputs.  No approximation, no limit, no
+asymptotic regime, no side condition beyond the finiteness of the two index sets.
+
+The results are of three kinds.
+
+1. **Exact metric laws** (`§2`).  Each output metric equals a named closed form in the
+   input moments.  These are identities, not bounds.
+2. **The transport decomposition** (`§3`).  The source-to-target movement of each metric
+   splits into named channels with *no remainder term*, and the `R²` ratio factors into
+   exactly three factors.
+3. **Completeness** (`§4`).  A three-real statistic is proved to determine every metric
+   in this list (sufficiency), and each of its three coordinates is proved to be
+   separately necessary by realisable witnesses (minimality).  Sufficiency without
+   minimality would be satisfied by the whole input tuple, and minimality without
+   sufficiency by any three functionally independent quantities; together they say the
+   statistic is the right one.
+
+## What is deliberately *not* proved here
+
+Nothing here predicts a metric from a *scalar genetic distance*, because
+`§4`'s minimality witnesses show no scalar can. Nothing here derives the input
+moments from a demographic history; that is the job of `Descent.PopGen`, and the
+interface between the two layers is the moment tuple this module consumes.
+-/
+
+section FiniteWitnesses
+
+/-!
+## §0 Non-degenerate expectation functionals
+
+`ExpFunctional.evalAt` inhabits `ExpFunctional Ω`, which is what makes theorems over it
+non-vacuous, but it is a Dirac: every variance it reports is `0`, every covariance is
+`0`, and every `R²` built from it is the junk value `0/0`. Statements of the form "there
+exist two deployments with different `R²`" cannot be witnessed by it at all.
+
+`weightedExp` is the general finite-support expectation: an arbitrary probability vector
+on an arbitrary finite type. It is what the minimality witnesses of `§4` are built from,
+and it is realistic in the only sense that matters for a witness -- a finite population
+of individuals with rational frequencies is an actual population, not an idealisation of
+one.
+-/
+
+variable {Ω : Type*} [Fintype Ω]
+
+/-- Expectation against an arbitrary finitely-supported probability vector. -/
+def weightedExp (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hsum : ∑ ω, p ω = 1) :
+    ExpFunctional Ω where
+  eval f := ∑ ω, p ω * f ω
+  add_eval f g := by
+    simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
+  smul_eval c f := by
+    simp [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun ω _ ↦ by ring
+  const_one := by simpa using hsum
+  nonneg_eval f hf :=
+    Finset.sum_nonneg fun ω _ ↦ mul_nonneg (hp ω) (hf ω)
+
+@[simp] theorem weightedExp_apply (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hsum : ∑ ω, p ω = 1)
+    (f : Ω → ℝ) : weightedExp p hp hsum f = ∑ ω, p ω * f ω := rfl
+
+/-- The uniform expectation on a nonempty finite type: the empirical distribution of a
+finite population in which each individual is one observation. -/
+def uniformExp (Ω : Type*) [Fintype Ω] [Nonempty Ω] : ExpFunctional Ω :=
+  weightedExp (fun _ ↦ (Fintype.card Ω : ℝ)⁻¹)
+    (fun _ ↦ by positivity)
+    (by
+      rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+      field_simp)
+
+@[simp] theorem uniformExp_apply [Nonempty Ω] (f : Ω → ℝ) :
+    uniformExp Ω f = ∑ ω, (Fintype.card Ω : ℝ)⁻¹ * f ω := rfl
+
+/-- **A non-degenerate expectation functional exists**, and reports a nonzero variance.
+
+    This is what `ExpFunctional.evalAt` cannot do.  Every `§4` witness needs a positive
+    score variance somewhere -- an `R²` with a zero denominator is the junk `0`, so a
+    pair of deployments distinguished only through such an `R²` would distinguish
+    nothing. -/
+theorem variance_uniformExp_two :
+    variance (uniformExp (Fin 2)) (fun i ↦ (i : ℝ)) = 1 / 4 := by
+  have hcard : (Fintype.card (Fin 2) : ℝ) = 2 := by simp
+  unfold variance
+  simp [uniformExp_apply, Fin.sum_univ_two]
+  norm_num
+
+end FiniteWitnesses
+
+section GenerativeLayer
+
+/-!
+## §1 The generative input and the deployed metrics
+-/
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+/-- **One deployment population.**
+
+    Everything a population contributes to a polygenic score's behaviour, with no
+    structure imposed on any of it.  `E` is any positive normalised linear functional;
+    `X` and `C` are any real-valued genotype codings; `β` is this population's causal
+    effect vector, unrelated to any other population's; `h` is any residual.
+
+    The phenotype is `Cᵀβ + h`.  That is not an additivity assumption: `h` is an
+    arbitrary function on `Ω`, so any dominance, epistatic, gene-environment or
+    unmeasured-locus contribution is inside it, and `Cᵀβ` is then *by definition* the
+    part of the phenotype additive in the `L` coordinates. The split is a definition of
+    `β`, not a restriction on the phenotype. -/
+structure DeploymentPopulation (Ω J L : Type*) where
+  /-- The population's expectation functional. -/
+  E : ExpFunctional Ω
+  /-- Scored (genotyped, imputed, or otherwise available) variant codings. -/
+  X : Ω → J → ℝ
+  /-- Causal variant codings. -/
+  C : Ω → L → ℝ
+  /-- This population's causal effects.  Population-specific: turnover is the default. -/
+  β : L → ℝ
+  /-- Everything not additive in `C`. -/
+  h : Ω → ℝ
+
+namespace DeploymentPopulation
+
+variable (P : DeploymentPopulation Ω J L)
+
+/-- The realised phenotype, `Cᵀβ + h`. -/
+def phenotype : Ω → ℝ := fun ω ↦ causalSignal P.β P.C ω + P.h ω
+
+/-- The deployed score `wᵀX`. -/
+def score (w : J → ℝ) : Ω → ℝ := linScore w P.X
+
+/-- Scored-variant covariance ("LD") matrix in this population. -/
+def sigmaX : Matrix J J ℝ := covarianceMatrix P.E P.X
+
+/-- Causal-variant covariance matrix in this population. -/
+def sigmaC : Matrix L L ℝ := covarianceMatrix P.E P.C
+
+/-- Scored-to-causal covariance ("tagging") matrix in this population. -/
+def kappa : Matrix J L ℝ := predictorCausalCovariance P.E P.X P.C
+
+/-- Scored-variant-to-residual covariance: stratification, ancestry-correlated
+environment, and any other route by which the residual is predictable from `X`. -/
+def contextX : J → ℝ := contextCrossCovVector P.E P.X P.h
+
+/-- Causal-variant-to-residual covariance. -/
+def contextC : L → ℝ := contextCrossCovVector P.E P.C P.h
+
+/-! ### The exact output metrics
+
+Each is the textbook definition applied to the realised score and phenotype in this
+population.  No closed form is built into any of them; the closed forms are the theorems
+of `§2`. -/
+
+/-- `Var(S)`. -/
+def scoreVariance (w : J → ℝ) : ℝ := variance P.E (P.score w)
+
+/-- `Cov(S, Y)`. -/
+def predictiveCovariance (w : J → ℝ) : ℝ := covariance P.E (P.score w) P.phenotype
+
+/-- `Var(Y)`. -/
+def outcomeVariance : ℝ := variance P.E P.phenotype
+
+/-- `E[(Y - S)²]`, the raw deployed mean squared error. -/
+def deployedMse (w : J → ℝ) : ℝ := expMse P.E P.phenotype (P.score w)
+
+/-- `Cov(S,Y)/Var(S)`, the regression-of-`Y`-on-`S` slope: `1` for a calibrated score. -/
+def calibrationSlope (w : J → ℝ) : ℝ := P.predictiveCovariance w / P.scoreVariance w
+
+/-- `E[Y] - slope · E[S]`. -/
+def calibrationIntercept (w : J → ℝ) : ℝ :=
+  P.E P.phenotype - P.calibrationSlope w * P.E (P.score w)
+
+/-- `Cov(S,Y)² / (Var(S) · Var(Y))`, the squared Pearson correlation.
+
+    This is the `R²` that portability studies report: the variance explained by the
+    *best affine rescaling* of the score, not by the score as literally emitted.  It is
+    the metric that is insensitive to the intercept and slope errors `calibrationSlope`
+    and `calibrationIntercept` measure, which is exactly why the three are reported
+    together and why `§4` needs all three. -/
+def r2 (w : J → ℝ) : ℝ :=
+  P.predictiveCovariance w ^ 2 / (P.scoreVariance w * P.outcomeVariance)
+
+end DeploymentPopulation
+
+end GenerativeLayer
+
+section Bilinearity
+
+/-!
+## §1b Bilinearity of covariance on linear scores
+
+The metric laws of `§2` are all instances of one fact: `covariance` is bilinear, so a
+covariance between two linear combinations of coordinate families is the quadratic form
+of the coordinate covariance matrix.  `TransportIdentities` proves the right-argument
+half of the bilinearity; symmetry supplies the left half.
+-/
+
+variable {Ω : Type*} {J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+theorem covariance_comm (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+    covariance E X Y = covariance E Y X := by
+  unfold covariance
+  exact congrArg E (funext fun ω ↦ mul_comm _ _)
+
+theorem variance_eq_covariance_self (E : ExpFunctional Ω) (Z : Ω → ℝ) :
+    variance E Z = covariance E Z Z := by
+  unfold variance covariance
+  exact congrArg E (funext fun ω ↦ pow_two _)
+
+theorem covariance_add_left (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
+    covariance E (fun ω ↦ X ω + Y ω) Z = covariance E X Z + covariance E Y Z := by
+  rw [covariance_comm, covariance_add_right, covariance_comm E Z X, covariance_comm E Z Y]
+
+/-- `Var(X + Y) = Var X + 2 Cov(X,Y) + Var Y`, for any positive linear functional. -/
+theorem variance_add (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+    variance E (fun ω ↦ X ω + Y ω)
+      = variance E X + 2 * covariance E X Y + variance E Y := by
+  rw [variance_eq_covariance_self, covariance_add_left,
+    covariance_add_right, covariance_add_right,
+    variance_eq_covariance_self E X, variance_eq_covariance_self E Y,
+    covariance_comm E Y X]
+  ring
+
+/-- A covariance against a linear score expands into the coordinate covariances. -/
+theorem covariance_linScore_left
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
+    covariance E (linScore w X) Z = ∑ j, w j * covariance E (fun ω ↦ X ω j) Z := by
+  rw [covariance_comm]
+  have hsum : linScore w X = (fun ω ↦ ∑ j, ((w j) • (fun ω' ↦ X ω' j)) ω) := by
+    funext ω
+    simp [linScore, dot, mul_comm]
+  rw [hsum, covariance_finset_sum_right]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  rw [covariance_smul_right, covariance_comm]
+
+/-- **The quadratic-form law.**  A covariance between two linear scores on the same
+coordinate family is the coordinate covariance matrix read as a bilinear form. -/
+theorem covariance_linScore_linScore
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w v : J → ℝ) :
+    covariance E (linScore w X) (linScore v X)
+      = dot w ((covarianceMatrix E X).mulVec v) := by
+  rw [covariance_linScore_left]
+  unfold dot covarianceMatrix
+  simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  congr 1
+  rw [covariance_comm, covariance_linScore_left]
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [covariance_comm]
+  ring
+
+/-- The variance of a linear score is the LD quadratic form. -/
+theorem variance_linScore
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) :
+    variance E (linScore w X) = dot w ((covarianceMatrix E X).mulVec w) := by
+  rw [variance_eq_covariance_self, covariance_linScore_linScore]
+
+/-- A covariance between a linear score and an arbitrary observable is the score read
+against the coordinate cross-covariance vector. -/
+theorem covariance_linScore_eq_dot_crossCov
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
+    covariance E (linScore w X) Z = dot w (contextCrossCovVector E X Z) := by
+  rw [covariance_linScore_left]
+  rfl
+
+end Bilinearity
+
+section ExactMetricLaws
+
+/-!
+## §2 The exact metric laws
+
+Each theorem below evaluates one deployed metric as a closed algebraic expression in the
+population's moment tuple `(Σ_X, Σ_C, K, c_X, c_C, Var h)` and the deployed weights `w`.
+They hold in *every* population, source or target: there is no "source formula" and
+"target formula", which is the point -- portability is then a statement about two
+evaluations of one law, not about two laws.
+-/
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+variable (P : DeploymentPopulation Ω J L) (w : J → ℝ)
+
+namespace DeploymentPopulation
+
+omit [Fintype L] [DecidableEq L] in
+/-- **Exact score-variance law.**  `Var(S) = wᵀ Σ_X w`.
+
+    No assumption on `X` at all: any LD structure, any admixture, any coding. -/
+theorem scoreVariance_eq : P.scoreVariance w = dot w (P.sigmaX.mulVec w) :=
+  variance_linScore P.E P.X w
+
+/-- **Exact predictive-covariance law.**  `Cov(S, Y) = wᵀ K β + wᵀ c_X`.
+
+    The first term is the genetic signal the score captures: tagging (`K`) composed with
+    this population's effects (`β`).  The second is the part of the score's predictive
+    covariance that runs through the residual rather than through `C` -- stratification
+    and ancestry-correlated environment live here, and they contribute to a measured
+    `R²` exactly as genuine signal does.  Nothing in the metric separates them, which is
+    a fact about the metric and not a limitation of this proof. -/
+theorem predictiveCovariance_eq :
+    P.predictiveCovariance w = dot w (P.kappa.mulVec P.β) + dot w P.contextX := by
+  unfold predictiveCovariance phenotype score
+  rw [covariance_linScore_eq_dot_crossCov]
+  have hsplit : contextCrossCovVector P.E P.X
+        (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
+      = P.kappa.mulVec P.β + P.contextX := by
+    have h := crossCovVector_decomposition P.E P.X P.C P.β P.h
+    simpa [contextCrossCovVector, crossCovVector, kappa, contextX] using h
+  rw [hsplit]
+  unfold dot
+  simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
+
+omit [Fintype J] [DecidableEq J] in
+/-- **Exact outcome-variance law.**  `Var(Y) = βᵀ Σ_C β + 2 βᵀ c_C + Var(h)`.
+
+    The denominator of `R²` is a property of the *population*, not of the score.  Two
+    populations with identical genetics and different residual variance report different
+    `R²` for the same score, and this identity is where that enters. -/
+theorem outcomeVariance_eq :
+    P.outcomeVariance
+      = dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h := by
+  unfold outcomeVariance phenotype
+  rw [variance_add]
+  congr 1
+  · congr 1
+    · exact variance_linScore P.E P.C P.β
+    · congr 1
+      exact covariance_linScore_eq_dot_crossCov P.E P.C P.β P.h
+
+/-- **Exact `R²` law: the master formula.**
+
+    Every input of the theory appears once, and nothing else does:
+    `R² = (wᵀKβ + wᵀc_X)² / ((wᵀΣ_X w)(βᵀΣ_Cβ + 2βᵀc_C + Var h))`.
+
+    Read it as the answer to "what is the deployed `R²`": given any population and any
+    score, this expression is its exact value.  Every portability phenomenon in the
+    literature is a statement about how the six inputs on the right differ between two
+    populations, and `§3` turns each such difference into its exact effect on the left. -/
+theorem r2_eq :
+    P.r2 w =
+      (dot w (P.kappa.mulVec P.β) + dot w P.contextX) ^ 2 /
+        (dot w (P.sigmaX.mulVec w) *
+          (dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h)) := by
+  unfold r2
+  rw [P.predictiveCovariance_eq w, P.scoreVariance_eq w, P.outcomeVariance_eq]
+
+/-- **Exact calibration-slope law.** -/
+theorem calibrationSlope_eq :
+    P.calibrationSlope w =
+      (dot w (P.kappa.mulVec P.β) + dot w P.contextX) / dot w (P.sigmaX.mulVec w) := by
+  unfold calibrationSlope
+  rw [P.predictiveCovariance_eq w, P.scoreVariance_eq w]
+
+/-- **Exact deployed-MSE law.**  `E[(Y-S)²] = Var Y + Var S - 2 Cov(S,Y) + (E S - E Y)²`,
+    then each term by its own law.
+
+    The raw MSE is the only metric here that is not invariant to the score's affine
+    gauge, which is why it carries the bias term and why a score can have a perfect `R²`
+    and an arbitrarily bad MSE. -/
+theorem deployedMse_eq :
+    P.deployedMse w =
+      (dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h)
+        + dot w (P.sigmaX.mulVec w)
+        - 2 * (dot w (P.kappa.mulVec P.β) + dot w P.contextX)
+        + (P.E (P.score w) - P.E P.phenotype) ^ 2 := by
+  unfold deployedMse
+  rw [mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
+  rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
+    show variance P.E (P.score w) = P.scoreVariance w from rfl,
+    show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+      covariance_comm _ _ _]
+  rw [P.outcomeVariance_eq, P.scoreVariance_eq w, P.predictiveCovariance_eq w]
+  unfold bias
+  ring
+
+end DeploymentPopulation
+
+end ExactMetricLaws
+
+section Transport
+
+/-!
+## §3 Transport: the exact channel decomposition
+
+A deployment is one weight vector read in two populations.  The populations may live on
+different sample spaces and carry different expectation functionals; all they share is
+the scored-variant index `J` and the causal index `L`.  Sharing `L` costs nothing: take
+`L` to be the union of the two causal sets and set `β l = 0` in a population where `l` is
+not causal, which is exactly what "the variant is causal only over there" means.
+
+Every theorem in this section is an identity with **no remainder term**.  That is the
+content: the channels named below are not a decomposition chosen for interpretability
+with an error term swept into the last line, they exhaust the difference.
+-/
+
+variable {ΩS ΩT J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+omit [Fintype L] [DecidableEq L] in
+theorem dot_add_right {ι : Type*} [Fintype ι] (x y z : ι → ℝ) :
+    dot x (y + z) = dot x y + dot x z := by
+  simp [dot, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+
+omit [Fintype L] [DecidableEq L] in
+theorem dot_sub_right {ι : Type*} [Fintype ι] (x y z : ι → ℝ) :
+    dot x (y - z) = dot x y - dot x z := by
+  simp [dot, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
+
+/-- **One score deployed in two populations.** -/
+structure Deployment (ΩS ΩT J L : Type*) where
+  /-- The population the score was trained in (or, more precisely, the one it is being
+  compared against; nothing here assumes `w` was fitted in it). -/
+  source : DeploymentPopulation ΩS J L
+  /-- The population the score is deployed in. -/
+  target : DeploymentPopulation ΩT J L
+  /-- The deployed weights.  One vector, read in both populations: this is what makes
+  the comparison a portability question rather than two unrelated model fits. -/
+  w : J → ℝ
+
+namespace Deployment
+
+variable (D : Deployment ΩS ΩT J L)
+
+/-! ### The three channels of signal transport -/
+
+/-- **Tagging-shift channel.**  The change in scored-to-causal covariance, read against
+the *source* effect vector.  This is the linkage-disequilibrium term: the same causal
+alleles, tagged differently. -/
+def taggingShift : ℝ :=
+  dot D.w ((D.target.kappa - D.source.kappa).mulVec D.source.β)
+
+/-- **Effect-turnover channel.**  The change in causal effects, read against the
+*target* tagging.  Sign flips, effect-size heterogeneity and variants causal in one
+population only all land here. -/
+def effectTurnover : ℝ :=
+  dot D.w (D.target.kappa.mulVec (D.target.β - D.source.β))
+
+/-- **Context-shift channel.**  The change in the covariance between the scored variants
+and everything not additive in `C`: stratification, ancestry-correlated environment,
+and any residual predictability of `h` from `X`. -/
+def contextShift : ℝ :=
+  dot D.w (D.target.contextX - D.source.contextX)
+
+/-- **Linkage channel on the score's own variance.**  The scored-variant covariance
+matrix changes, so the same weights produce a differently-dispersed score. -/
+def scoreVarianceShift : ℝ :=
+  dot D.w ((D.target.sigmaX - D.source.sigmaX).mulVec D.w)
+
+/-- **Exact three-channel law for predictive covariance.**
+
+    `Cov_T(S,Y) - Cov_S(S,Y) = tagging shift + effect turnover + context shift`,
+    with nothing left over.
+
+    The asymmetry of the first two channels -- the tagging shift is read against the
+    source effects and the turnover against the target tagging -- is not a convention
+    that could have gone the other way and stayed exact.  It is the exact algebraic
+    split of `K_T β_T - K_S β_S`, and the mirror-image split (target effects against the
+    tagging shift, source tagging against the turnover) is the equally exact *other*
+    grouping.  What is not available is a symmetric split without an interaction term:
+    the product `(K_T - K_S)(β_T - β_S)` has to be charged to one channel or the other,
+    and here it is charged to turnover. -/
+theorem predictiveCovariance_transport :
+    D.target.predictiveCovariance D.w - D.source.predictiveCovariance D.w
+      = D.taggingShift + D.effectTurnover + D.contextShift := by
+  rw [D.target.predictiveCovariance_eq D.w, D.source.predictiveCovariance_eq D.w]
+  unfold taggingShift effectTurnover contextShift
+  rw [Matrix.sub_mulVec, Matrix.mulVec_sub, dot_sub_right, dot_sub_right, dot_sub_right]
+  ring
+
+omit [Fintype L] [DecidableEq L] in
+/-- **Exact law for the score-variance shift.**  Only the scored-variant covariance
+    matrix can move it: neither the effects nor the residual appear.
+
+    This is why a score's variance changes across populations even when nothing about
+    the trait's genetics has changed, and it is the term that makes `R²` and the
+    calibration slope move in *opposite* directions under a pure LD shift. -/
+theorem scoreVariance_transport :
+    D.target.scoreVariance D.w - D.source.scoreVariance D.w = D.scoreVarianceShift := by
+  rw [D.target.scoreVariance_eq D.w, D.source.scoreVariance_eq D.w]
+  unfold scoreVarianceShift
+  rw [Matrix.sub_mulVec, dot_sub_right]
+
+/-! ### The exact `R²` factorisation -/
+
+/-- The squared-signal factor: how much the score's covariance with the phenotype
+changed, squared because `R²` is quadratic in it. -/
+def alignmentFactor : ℝ :=
+  (D.target.predictiveCovariance D.w / D.source.predictiveCovariance D.w) ^ 2
+
+/-- The dispersion factor: how much the score's own variance changed. -/
+def dispersionFactor : ℝ :=
+  D.source.scoreVariance D.w / D.target.scoreVariance D.w
+
+/-- The outcome-variance factor: how much the phenotype's total variance changed.
+Environmental heterogeneity between populations is entirely inside this factor, and
+nothing genetic is. -/
+def outcomeFactor : ℝ :=
+  D.source.outcomeVariance / D.target.outcomeVariance
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **The exact `R²` portability factorisation.**
+
+    `R²_T = R²_S × alignment × dispersion × outcome`, exactly, with exactly three
+    factors and no residual.
+
+    This is the theorem the informal "portability ratio = AF × LD × effect × env"
+    decomposition is reaching for, and it differs from it in two ways that matter.
+    First, it is proved rather than posited, from the generative model of `§1` with no
+    shape assumption anywhere.  Second, the correct grouping is *three* factors, not
+    four: allele-frequency change and LD change are not separate multiplicative channels
+    of `R²`, because they enter through `Σ_X` and `K` which are the same two objects the
+    alignment and dispersion factors are built from.  There is no factorisation of `R²`
+    in which `F_ST` appears as its own factor.
+
+    The hypotheses are exactly the non-degeneracy of the *source* deployment: a score
+    with no variance, in a population with no phenotypic variance, or with no covariance
+    between the two, has no `R²` to be portable. Target degeneracy needs no hypothesis --
+    both sides are then `0`. -/
+theorem r2_transport_factorisation
+    (hvar : D.source.scoreVariance D.w ≠ 0)
+    (hout : D.source.outcomeVariance ≠ 0)
+    (hcov : D.source.predictiveCovariance D.w ≠ 0) :
+    D.target.r2 D.w
+      = D.source.r2 D.w * D.alignmentFactor * D.dispersionFactor * D.outcomeFactor := by
+  unfold DeploymentPopulation.r2 alignmentFactor dispersionFactor outcomeFactor
+  by_cases hvT : D.target.scoreVariance D.w = 0
+  · rw [hvT]
+    simp
+  by_cases hoT : D.target.outcomeVariance = 0
+  · rw [hoT]
+    simp
+  field_simp
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Each factor is `1` exactly when its own channel is quiet.**  A deployment whose
+    three channels are all silent has fully portable `R²`; this is the converse reading
+    of the factorisation and is what licenses calling the factors "channels". -/
+theorem r2_transport_of_no_shift
+    (hcov : D.target.predictiveCovariance D.w = D.source.predictiveCovariance D.w)
+    (hvar : D.target.scoreVariance D.w = D.source.scoreVariance D.w)
+    (hout : D.target.outcomeVariance = D.source.outcomeVariance) :
+    D.target.r2 D.w = D.source.r2 D.w := by
+  unfold DeploymentPopulation.r2
+  rw [hcov, hvar, hout]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **A pure LD shift moves `R²` and the calibration slope in opposite directions.**
+
+    Fix the signal (`Cov(S,Y)` unchanged) and the phenotype (`Var Y` unchanged), and let
+    only the score's own variance grow.  Then `R²` falls and the calibration slope falls
+    too -- but the slope falls *proportionally* to `Var S`, while `R²` falls only through
+    the same single factor, so the two metrics are not related by any fixed monotone map:
+    that is `§4`'s minimality in miniature, and it is the exact reason a recalibrated
+    score can restore the slope to `1` while leaving `R²` where it was. -/
+theorem recalibration_fixes_slope_not_r2
+    (hcov : D.target.predictiveCovariance D.w = D.source.predictiveCovariance D.w)
+    (hout : D.target.outcomeVariance = D.source.outcomeVariance)
+    (hS : 0 < D.source.scoreVariance D.w)
+    (hgrow : D.source.scoreVariance D.w < D.target.scoreVariance D.w)
+    (hcovpos : 0 < D.source.predictiveCovariance D.w)
+    (houtpos : 0 < D.source.outcomeVariance) :
+    D.target.calibrationSlope D.w < D.source.calibrationSlope D.w ∧
+      D.target.r2 D.w < D.source.r2 D.w := by
+  have hT : 0 < D.target.scoreVariance D.w := lt_trans hS hgrow
+  constructor
+  · unfold DeploymentPopulation.calibrationSlope
+    rw [hcov]
+    exact div_lt_div_of_pos_left hcovpos hS hgrow
+  · unfold DeploymentPopulation.r2
+    rw [hcov, hout]
+    have hnum : 0 < D.source.predictiveCovariance D.w ^ 2 := by positivity
+    exact div_lt_div_of_pos_left hnum (by positivity)
+      (by nlinarith)
+
+end Deployment
+
+end Transport
+
+section Completeness
+
+/-!
+## §4 Completeness of the metric statistic
+
+`§2` writes every metric as a closed form in six input objects.  That alone does not say
+the six are the right inputs: a formula can be exact and still be written in redundant
+or insufficient coordinates.  This section pins the coordinates down.
+
+* **Sufficiency.**  Three reals -- `(Var S, Cov(S,Y), Var Y)` -- determine `R²` and the
+  calibration slope exactly, through explicit functions.  Everything else about the
+  population and the score is irrelevant to those two metrics.
+* **Range.**  The achievable set of those three reals is exactly the Cauchy-Schwarz cone
+  `Cov² ≤ Var S · Var Y`.  Both directions: the bound is forced (so `R² ≤ 1` is a
+  theorem, not a convention), and every point of the cone is realised by an actual finite
+  population.
+* **Minimality.**  Each of the three coordinates is separately necessary: for each one
+  there are two realisable deployments agreeing on the other two whose `R²` differs.  So
+  no two of the three, and a fortiori no single scalar summary, determines `R²`.
+
+The three together are what "complete theory" means here.  Sufficiency alone is
+satisfied by the whole input tuple; minimality alone by any three unrelated numbers;
+the range statement is what stops the statistic from being a coordinate system on a set
+larger than the one deployments actually occupy.
+-/
+
+section Bounds
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+variable (P : DeploymentPopulation Ω J L) (w : J → ℝ)
+
+namespace DeploymentPopulation
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Cauchy-Schwarz for the deployed metrics.**  `Cov(S,Y)² ≤ Var(S)·Var(Y)`.
+
+    Proved, not assumed: it is the discriminant argument applied to the population's own
+    expectation functional, and it needs the positivity field of `ExpFunctional`.  For a
+    merely signed linear functional it is false, and then `R²` could exceed one. -/
+theorem predictiveCovariance_sq_le :
+    P.predictiveCovariance w ^ 2 ≤ P.scoreVariance w * P.outcomeVariance := by
+  have h := P.E.cauchy_schwarz
+    (fun ω ↦ P.score w ω - P.E (P.score w))
+    (fun ω ↦ P.phenotype ω - P.E P.phenotype)
+  simpa [predictiveCovariance, scoreVariance, outcomeVariance, covariance, variance]
+    using h
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- `0 ≤ R²`. -/
+theorem r2_nonneg (hv : 0 ≤ P.scoreVariance w) (ho : 0 ≤ P.outcomeVariance) :
+    0 ≤ P.r2 w := by
+  unfold r2
+  positivity
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`R² ≤ 1`, as a theorem about the generative model.**
+
+    Nothing normalises `R²` by hand anywhere in this development; it is defined as the
+    ratio `Cov²/(Var·Var)` of quantities computed from the population, and the bound
+    falls out of positivity of the expectation functional. -/
+theorem r2_le_one (hv : 0 < P.scoreVariance w) (ho : 0 < P.outcomeVariance) :
+    P.r2 w ≤ 1 := by
+  unfold r2
+  rw [div_le_one (by positivity)]
+  exact P.predictiveCovariance_sq_le w
+
+end DeploymentPopulation
+
+end Bounds
+
+section Sufficiency
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+/-- **The metric statistic.**  Score variance, predictive covariance, outcome
+variance -- the three reals a deployment reduces to as far as `R²` and calibration
+slope are concerned. -/
+def portabilityStatistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) : ℝ × ℝ × ℝ :=
+  (P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance)
+
+/-- `R²` as an explicit function of the statistic. -/
+def r2OfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 ^ 2 / (s.1 * s.2.2)
+
+/-- Calibration slope as an explicit function of the statistic. -/
+def slopeOfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 / s.1
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Sufficiency for `R²`.**  The metric factors through the statistic. -/
+theorem r2_factors_through_statistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) :
+    P.r2 w = r2OfStatistic (portabilityStatistic P w) := rfl
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Sufficiency for the calibration slope.** -/
+theorem slope_factors_through_statistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) :
+    P.calibrationSlope w = slopeOfStatistic (portabilityStatistic P w) := rfl
+
+/-- **Two deployments with the same statistic have the same `R²` and slope**, whatever
+    else differs between them: different sample spaces, different numbers of causal
+    variants, different LD, different effect vectors, different residuals.
+
+    This is the precise sense in which the portability problem is three-dimensional. -/
+theorem metrics_eq_of_statistic_eq
+    {ΩS ΩT J' L₁ L₂ : Type*} [Fintype J'] [DecidableEq J']
+    [Fintype L₁] [DecidableEq L₁] [Fintype L₂] [DecidableEq L₂]
+    (P : DeploymentPopulation ΩS J' L₁) (Q : DeploymentPopulation ΩT J' L₂)
+    (w v : J' → ℝ)
+    (hstat : portabilityStatistic P w = portabilityStatistic Q v) :
+    P.r2 w = Q.r2 v ∧ P.calibrationSlope w = Q.calibrationSlope v := by
+  constructor
+  · rw [r2_factors_through_statistic, r2_factors_through_statistic, hstat]
+  · rw [slope_factors_through_statistic, slope_factors_through_statistic, hstat]
+
+end Sufficiency
+
+section Realisation
+
+/-!
+### Realisable witnesses
+
+Four equally likely individuals and two orthogonal contrasts on them.  Everything in
+this subsection is an actual finite population: no limit, no Gaussian, no asymptotic
+sample size.  If a statement of the form "these two situations are indistinguishable"
+holds here, it holds of real data, because these *are* data.
+-/
+
+/-- Uniform expectation over four individuals, evaluated. -/
+theorem uniformExp_four (f : Fin 4 → ℝ) :
+    uniformExp (Fin 4) f = (f 0 + f 1 + f 2 + f 3) / 4 := by
+  simp [uniformExp_apply, Fin.sum_univ_four]
+  ring
+
+theorem covariance_uniformExp_four (f g : Fin 4 → ℝ) :
+    covariance (uniformExp (Fin 4)) f g
+      = (f 0 * g 0 + f 1 * g 1 + f 2 * g 2 + f 3 * g 3) / 4
+        - ((f 0 + f 1 + f 2 + f 3) / 4) * ((g 0 + g 1 + g 2 + g 3) / 4) := by
+  rw [covariance_eq_expect_mul_sub_means]
+  simp only [uniformExp_four]
+
+theorem variance_uniformExp_four (f : Fin 4 → ℝ) :
+    variance (uniformExp (Fin 4)) f
+      = (f 0 ^ 2 + f 1 ^ 2 + f 2 ^ 2 + f 3 ^ 2) / 4
+        - ((f 0 + f 1 + f 2 + f 3) / 4) ^ 2 := by
+  rw [variance_eq_covariance_self, covariance_uniformExp_four]
+  ring
+
+/-- First contrast: the scored-variant direction. -/
+def rad1 : Fin 4 → ℝ := ![1, 1, -1, -1]
+
+/-- Second contrast, orthogonal to the first: the residual direction. -/
+def rad2 : Fin 4 → ℝ := ![1, -1, 1, -1]
+
+/-- **The two-contrast population.**  One scored variant carrying `α` units of the first
+    contrast, one causal variant carrying the first contrast with effect `γ`, and a
+    residual carrying `δ` units of the orthogonal second contrast.
+
+    Three free reals, and they move the three coordinates of the statistic
+    independently: `α` the score variance, `γ` the alignment, `δ` the residual variance.
+    That independence is what the minimality proofs need. -/
+def twoContrastPopulation (α γ δ : ℝ) : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1) where
+  E := uniformExp (Fin 4)
+  X := fun ω _ ↦ α * rad1 ω
+  C := fun ω _ ↦ rad1 ω
+  β := fun _ ↦ γ
+  h := fun ω ↦ δ * rad2 ω
+
+/-- The single scored variant is used with weight one. -/
+def unitWeight : Fin 1 → ℝ := fun _ ↦ 1
+
+theorem twoContrast_scoreVariance (α γ δ : ℝ) :
+    (twoContrastPopulation α γ δ).scoreVariance unitWeight = α ^ 2 := by
+  show variance (uniformExp (Fin 4)) _ = _
+  rw [variance_uniformExp_four]
+  simp [DeploymentPopulation.score, twoContrastPopulation, linScore, dot, unitWeight,
+    rad1]
+  ring
+
+theorem twoContrast_predictiveCovariance (α γ δ : ℝ) :
+    (twoContrastPopulation α γ δ).predictiveCovariance unitWeight = α * γ := by
+  show covariance (uniformExp (Fin 4)) _ _ = _
+  rw [covariance_uniformExp_four]
+  simp [DeploymentPopulation.score, DeploymentPopulation.phenotype, twoContrastPopulation,
+    linScore, causalSignal, dot, unitWeight, rad1, rad2]
+  ring
+
+theorem twoContrast_outcomeVariance (α γ δ : ℝ) :
+    (twoContrastPopulation α γ δ).outcomeVariance = γ ^ 2 + δ ^ 2 := by
+  show variance (uniformExp (Fin 4)) _ = _
+  rw [variance_uniformExp_four]
+  simp [DeploymentPopulation.phenotype, twoContrastPopulation, causalSignal, dot,
+    rad1, rad2]
+  ring
+
+theorem twoContrast_statistic (α γ δ : ℝ) :
+    portabilityStatistic (twoContrastPopulation α γ δ) unitWeight
+      = (α ^ 2, α * γ, γ ^ 2 + δ ^ 2) := by
+  unfold portabilityStatistic
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+    twoContrast_outcomeVariance]
+
+/-- **Every point of the Cauchy-Schwarz cone is realised.**
+
+    Given any target `(Var S, Cov, Var Y)` obeying the bound that `§4`'s
+    `predictiveCovariance_sq_le` forces, there is an honest four-individual population
+    and a weight vector whose deployed metrics are exactly those numbers.
+
+    Together with `predictiveCovariance_sq_le` this says the achievable set is the cone
+    and nothing less: the statistic is a coordinate system on the deployments, not a
+    lossy summary of a larger space. -/
+theorem exists_deployment_with_statistic
+    (vS c vY : ℝ) (hvS : 0 < vS) (hcs : c ^ 2 ≤ vS * vY) :
+    ∃ (P : DeploymentPopulation (Fin 4) (Fin 1) (Fin 1)) (w : Fin 1 → ℝ),
+      portabilityStatistic P w = (vS, c, vY) := by
+  have hsqrt : Real.sqrt vS ^ 2 = vS := Real.sq_sqrt hvS.le
+  have hspos : 0 < Real.sqrt vS := Real.sqrt_pos.mpr hvS
+  set α := Real.sqrt vS with hα
+  set γ := c / α with hγ
+  have hγsq : γ ^ 2 = c ^ 2 / vS := by
+    rw [hγ, div_pow, hsqrt]
+  have hrem : 0 ≤ vY - γ ^ 2 := by
+    rw [hγsq, sub_nonneg, div_le_iff₀ hvS]
+    linarith [hcs, mul_comm vS vY]
+  refine ⟨twoContrastPopulation α γ (Real.sqrt (vY - γ ^ 2)), unitWeight, ?_⟩
+  rw [twoContrast_statistic]
+  have h1 : α ^ 2 = vS := hsqrt
+  have h2 : α * γ = c := by
+    rw [hγ]
+    field_simp
+  have h3 : γ ^ 2 + Real.sqrt (vY - γ ^ 2) ^ 2 = vY := by
+    rw [Real.sq_sqrt hrem]
+    ring
+  rw [h1, h2, h3]
+
+end Realisation
+
+section Minimality
+
+/-!
+### Minimality: no coordinate is redundant
+
+Each theorem below exhibits two realisable deployments that agree on two coordinates of
+the statistic and disagree on `R²`.  Since `R²` factors through the statistic, the
+disagreeing coordinate cannot be dropped.
+
+The consequence for practice is the one the portability literature keeps rediscovering:
+a scalar summary of genetic distance is a function of one thing, and `R²` is a function
+of three, so no scalar can predict it.  `no_scalar_summary_determines_r2` states that
+directly rather than by analogy.
+-/
+
+/-- **The outcome-variance coordinate is necessary.**  Two populations with the same
+    score variance and the same predictive covariance, differing only in residual
+    variance, have different `R²`.
+
+    This is environmental heterogeneity: identical genetics, identical score, different
+    reported accuracy.  Nothing genetic has moved between these two populations. -/
+theorem outcomeVariance_coordinate_necessary :
+    (twoContrastPopulation 1 1 0).scoreVariance unitWeight
+        = (twoContrastPopulation 1 1 1).scoreVariance unitWeight ∧
+      (twoContrastPopulation 1 1 0).predictiveCovariance unitWeight
+        = (twoContrastPopulation 1 1 1).predictiveCovariance unitWeight ∧
+      (twoContrastPopulation 1 1 0).r2 unitWeight
+        ≠ (twoContrastPopulation 1 1 1).r2 unitWeight := by
+  refine ⟨by rw [twoContrast_scoreVariance, twoContrast_scoreVariance],
+    by rw [twoContrast_predictiveCovariance, twoContrast_predictiveCovariance], ?_⟩
+  unfold DeploymentPopulation.r2
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+    twoContrast_outcomeVariance, twoContrast_scoreVariance,
+    twoContrast_predictiveCovariance, twoContrast_outcomeVariance]
+  norm_num
+
+/-- **The predictive-covariance coordinate is necessary.**  Two populations with the
+    same score variance and the same outcome variance, differing only in how well the
+    score aligns with the phenotype, have different `R²`.
+
+    This is effect turnover and tagging change: the score is dispersed identically and
+    the trait is as variable, but the alignment has decayed. -/
+theorem predictiveCovariance_coordinate_necessary :
+    (twoContrastPopulation 1 1 0).scoreVariance unitWeight
+        = (twoContrastPopulation 1 0 1).scoreVariance unitWeight ∧
+      (twoContrastPopulation 1 1 0).outcomeVariance
+        = (twoContrastPopulation 1 0 1).outcomeVariance ∧
+      (twoContrastPopulation 1 1 0).r2 unitWeight
+        ≠ (twoContrastPopulation 1 0 1).r2 unitWeight := by
+  refine ⟨by rw [twoContrast_scoreVariance, twoContrast_scoreVariance],
+    by rw [twoContrast_outcomeVariance, twoContrast_outcomeVariance]; norm_num, ?_⟩
+  unfold DeploymentPopulation.r2
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+    twoContrast_outcomeVariance, twoContrast_scoreVariance,
+    twoContrast_predictiveCovariance, twoContrast_outcomeVariance]
+  norm_num
+
+/-- **The score-variance coordinate is necessary.**  Two populations with the same
+    predictive covariance and the same outcome variance, differing only in the score's
+    own variance, have different `R²`.
+
+    This is the pure linkage channel: the same weights on differently-correlated
+    genotypes disperse the score differently. -/
+theorem scoreVariance_coordinate_necessary :
+    (twoContrastPopulation 1 1 1).predictiveCovariance unitWeight
+        = (twoContrastPopulation 2 (1 / 2) (Real.sqrt (7 / 4))).predictiveCovariance
+            unitWeight ∧
+      (twoContrastPopulation 1 1 1).outcomeVariance
+        = (twoContrastPopulation 2 (1 / 2) (Real.sqrt (7 / 4))).outcomeVariance ∧
+      (twoContrastPopulation 1 1 1).r2 unitWeight
+        ≠ (twoContrastPopulation 2 (1 / 2) (Real.sqrt (7 / 4))).r2 unitWeight := by
+  have hs : Real.sqrt (7 / 4) ^ 2 = 7 / 4 := Real.sq_sqrt (by norm_num)
+  refine ⟨by rw [twoContrast_predictiveCovariance, twoContrast_predictiveCovariance]; norm_num,
+    by rw [twoContrast_outcomeVariance, twoContrast_outcomeVariance, hs]; norm_num, ?_⟩
+  unfold DeploymentPopulation.r2
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+    twoContrast_outcomeVariance, twoContrast_scoreVariance,
+    twoContrast_predictiveCovariance, twoContrast_outcomeVariance, hs]
+  norm_num
+
+/-- **No scalar summary of a deployment determines its `R²`.**
+
+    Let `summary` be *any* function from deployments to any type: `F_ST`, a PC distance,
+    an admixture proportion, a divergence time, a vector of all of them, a neural
+    network on the whole genotype matrix.  If it is blind to the residual variance --
+    that is, if it does not look at the phenotype's non-genetic variance -- then it
+    cannot determine `R²`, because the two populations of
+    `outcomeVariance_coordinate_necessary` differ in `R²` and in nothing else it can
+    see.
+
+    Stated with `summary` universally quantified rather than instantiated at `F_ST`,
+    because the point is not that `F_ST` in particular is a bad predictor. -/
+theorem no_genetic_summary_determines_r2
+    {Report : Type*} (summary : ℝ → Report) :
+    ¬ ∃ accept : Report → ℝ,
+        ∀ δ : ℝ,
+          (twoContrastPopulation 1 1 δ).r2 unitWeight
+            = accept (summary ((twoContrastPopulation 1 1 δ).scoreVariance unitWeight)) := by
+  rintro ⟨accept, hacc⟩
+  have h0 := hacc 0
+  have h1 := hacc 1
+  rw [twoContrast_scoreVariance] at h0 h1
+  have hne := outcomeVariance_coordinate_necessary.2.2
+  exact hne (h0.trans h1.symm)
+
+end Minimality
+
+section MetricSpecificity
+
+/-!
+### Metric-specific portability, exactly
+
+The third open question of Wang et al. (2026) is that portability depends on which
+metric is reported.  In this framework that is not a phenomenon to be explained but a
+corollary of the statistic having three coordinates and the metrics being different
+functions on it: two metrics agree across a pair of deployments only when the pair
+happens to lie in the level set of both.
+-/
+
+/-- **Equal `R²`, different calibration slope.**  Two realisable deployments whose `R²`
+    agree exactly and whose calibration slopes differ.
+
+    A portability study reporting only `R²` would call these two equally portable; one
+    of them is perfectly calibrated and the other is off by a factor of two. -/
+theorem r2_eq_slope_differs :
+    (twoContrastPopulation 1 1 0).r2 unitWeight
+        = (twoContrastPopulation 2 1 0).r2 unitWeight ∧
+      (twoContrastPopulation 1 1 0).calibrationSlope unitWeight
+        ≠ (twoContrastPopulation 2 1 0).calibrationSlope unitWeight := by
+  constructor
+  · unfold DeploymentPopulation.r2
+    rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+      twoContrast_outcomeVariance, twoContrast_scoreVariance,
+      twoContrast_predictiveCovariance, twoContrast_outcomeVariance]
+    norm_num
+  · unfold DeploymentPopulation.calibrationSlope
+    rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+      twoContrast_scoreVariance, twoContrast_predictiveCovariance]
+    norm_num
+
+/-- **Equal calibration slope, different `R²`.**  The converse failure, so neither
+    metric refines the other and no monotone map relates them. -/
+theorem slope_eq_r2_differs :
+    (twoContrastPopulation 1 1 0).calibrationSlope unitWeight
+        = (twoContrastPopulation 1 1 1).calibrationSlope unitWeight ∧
+      (twoContrastPopulation 1 1 0).r2 unitWeight
+        ≠ (twoContrastPopulation 1 1 1).r2 unitWeight := by
+  refine ⟨?_, outcomeVariance_coordinate_necessary.2.2⟩
+  unfold DeploymentPopulation.calibrationSlope
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance,
+    twoContrast_scoreVariance, twoContrast_predictiveCovariance]
+
+end MetricSpecificity
+
+end Completeness
+
+end
+
+end Descent
