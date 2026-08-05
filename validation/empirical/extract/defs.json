@@ -1,6 +1,6 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:8e98146d0713ed586019c28f9480fae9",
+ "source_digest": "sha256:cd5d54d662273cd0e00ad06c4eabab59",
  "source_files": 282,
  "collisions": {},
  "theorems": [
@@ -62060,7 +62060,7 @@
    "name": "Descent.Program.ploidy_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 93,
+   "line": 100,
    "statement": ": Descent.Core.ploidy = 2",
    "mentions": [
     "ploidy"
@@ -62070,7 +62070,7 @@
    "name": "Descent.Program.hweGenotypeVariance_at_half",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 114,
+   "line": 121,
    "statement": ": hweGenotypeVariance (1 / 2) = 1 / 2",
    "mentions": [
     "hweGenotypeVariance"
@@ -62080,7 +62080,7 @@
    "name": "Descent.Program.coalescentTimeScale_eq",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 155,
+   "line": 162,
    "statement": "(Ne : ℝ) : coalescentTimeScale Ne = 2 * Ne",
    "mentions": [
     "coalescentTimeScale"
@@ -62090,7 +62090,7 @@
    "name": "Descent.Program.coalescentTimeScale_eq_meanPairCoalescenceTime",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 173,
+   "line": 180,
    "statement": "{Ne : ℕ} (hNe : 0 < Ne) : coalescentTimeScale (Ne : ℝ) = ∑' s : ℕ, Coalescent.pairDistinct (2 * Ne) s",
    "mentions": [
     "coalescentTimeScale",
@@ -62101,7 +62101,7 @@
    "name": "Descent.Program.scaledMutationRate_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 180,
+   "line": 187,
    "statement": "(Ne mu : ℝ) : Descent.Core.scaledMutationRate Ne mu = 2 * Descent.Core.ploidy * Ne * mu",
    "mentions": [
     "ploidy",
@@ -62112,7 +62112,7 @@
    "name": "Descent.Program.scaledMigrationRate_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 187,
+   "line": 194,
    "statement": "(Ne m : ℝ) : Descent.Core.scaledMigrationRate Ne m = 2 * Descent.Core.ploidy * Ne * m",
    "mentions": [
     "ploidy",
@@ -62123,7 +62123,7 @@
    "name": "Descent.Program.fstFromDrift_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 200,
+   "line": 207,
    "statement": "(t : ℕ) (Ne : ℝ) : PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62134,7 +62134,7 @@
    "name": "Descent.Program.twoDemeIMEquilibriumETss_eq_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 210,
+   "line": 217,
    "statement": "(M : ℝ) : Portability.twoDemeIMEquilibriumETss M = Descent.Core.ploidy",
    "mentions": [
     "ploidy",
@@ -62145,7 +62145,7 @@
    "name": "Descent.Program.recessiveMutationSelectionDriftParameter_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 223,
+   "line": 230,
    "statement": "(Ne mu s : ℝ) : Portability.recessiveMutationSelectionDriftParameter Ne mu s = Descent.Core.ploidy * Ne * Real.sqrt (mu * s)",
    "mentions": [
     "ploidy",
@@ -62156,7 +62156,7 @@
    "name": "Descent.Program.mutationSelectionDriftParameter_eq_scaledMutationRate",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 238,
+   "line": 245,
    "statement": "(Ne s h : ℝ) : Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s)",
    "mentions": [
     "mutationSelectionDriftParameter",
@@ -62167,7 +62167,7 @@
    "name": "Descent.Program.tagAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 254,
+   "line": 261,
    "statement": "{p q : ℕ} (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : Portability.tagAlleleFreqRetentionAt m t i = hweGenotypeVariance (Portability.tagAlleleFreqTargetAt m t i) / hweGenotypeVariance (m.tagAlleleFreqSource i)",
    "mentions": [
     "hweGenotypeVariance",
@@ -62179,7 +62179,7 @@
    "name": "Descent.Program.causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 265,
+   "line": 272,
    "statement": "{p q : ℕ} (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : Portability.causalAlleleFreqRetentionAt m t j = hweGenotypeVariance (Portability.causalAlleleFreqTargetAt m t j) / hweGenotypeVariance (m.causalAlleleFreqSource j)",
    "mentions": [
     "causalAlleleFreqRetentionAt",
@@ -62191,7 +62191,7 @@
    "name": "Descent.Program.fstDemeCorrectedFlowStep_constants_named",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 295,
+   "line": 302,
    "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - 2 * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
@@ -62203,7 +62203,7 @@
    "name": "Descent.Program.meanAlleleFreq_fixed_and_absent",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 335,
+   "line": 342,
    "statement": ": meanAlleleFreq 0 1 = 1 / 2",
    "mentions": [
     "meanAlleleFreq"
@@ -62213,7 +62213,7 @@
    "name": "Descent.Program.effectiveSymmetricMigration_eq_meanAlleleFreq_map",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 340,
+   "line": 347,
    "statement": "(m₁₂ m₂₁ : ℝ) : Portability.effectiveSymmetricMigration m₁₂ m₂₁ = meanAlleleFreq m₁₂ m₂₁",
    "mentions": [
     "effectiveSymmetricMigration",
@@ -62224,7 +62224,7 @@
    "name": "Descent.Program.neiGst_eq_oneMinusRatio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 455,
+   "line": 462,
    "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : neiGst p₁ p₂ = 1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) / (Descent.Core.ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
    "mentions": [
     "meanAlleleFreq",
@@ -62236,7 +62236,7 @@
    "name": "Descent.Program.neiGst_at_zero_mean_heterozygosity",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 477,
+   "line": 484,
    "statement": "(p₁ p₂ : ℝ) (hzero : Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) : neiGst p₁ p₂ = 0",
    "mentions": [
     "meanAlleleFreq",
@@ -62248,7 +62248,7 @@
    "name": "Descent.Program.hudsonFst_at_p0p0_is_junk",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 507,
+   "line": 514,
    "statement": ": hudsonFst 0 0 = 0",
    "mentions": [
     "hudsonFst"
@@ -62258,7 +62258,7 @@
    "name": "Descent.Program.hudsonFst_symm",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 515,
+   "line": 522,
    "statement": "(p₁ p₂ : ℝ) : hudsonFst p₁ p₂ = hudsonFst p₂ p₁",
    "mentions": [
     "hudsonFst"
@@ -62268,7 +62268,7 @@
    "name": "Descent.Program.hudsonFst_eq_fstFromHetRatio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 536,
+   "line": 543,
    "statement": "(p₁ p₂ : ℝ) (h : p₁ * (1 - p₂) + p₂ * (1 - p₁) ≠ 0) : hudsonFst p₁ p₂ = PopGen.fstFromHetRatio (p₁ * (1 - p₁) + p₂ * (1 - p₂)) (p₁ * (1 - p₂) + p₂ * (1 - p₁))",
    "mentions": [
     "fstFromHetRatio",
@@ -62279,7 +62279,7 @@
    "name": "Descent.Program.hudsonFst_self",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 546,
+   "line": 553,
    "statement": "(p : ℝ) : hudsonFst p p = 0",
    "mentions": [
     "hudsonFst"
@@ -62289,7 +62289,7 @@
    "name": "Descent.Program.neiGst_allele_swap",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 562,
+   "line": 569,
    "statement": "(p₁ p₂ : ℝ) : neiGst (1 - p₁) (1 - p₂) = neiGst p₁ p₂",
    "mentions": [
     "neiGst"
@@ -62299,7 +62299,7 @@
    "name": "Descent.Program.hudsonFst_allele_swap",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 574,
+   "line": 581,
    "statement": "(p₁ p₂ : ℝ) : hudsonFst (1 - p₁) (1 - p₂) = hudsonFst p₁ p₂",
    "mentions": [
     "hudsonFst"
@@ -62309,7 +62309,7 @@
    "name": "Descent.Program.hweGenotypeVariance_allele_swap",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 585,
+   "line": 592,
    "statement": "(p : ℝ) : hweGenotypeVariance (1 - p) = hweGenotypeVariance p",
    "mentions": [
     "hweGenotypeVariance"
@@ -62319,7 +62319,7 @@
    "name": "Descent.Program.hudsonFst_eq_of_neiGst",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 624,
+   "line": 631,
    "statement": "(p₁ p₂ : ℝ) (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁)) (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : hudsonFst p₁ p₂ = 2 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂)",
    "mentions": [
     "hudsonFst",
@@ -62331,7 +62331,7 @@
    "name": "Descent.Program.neiGst_ne_hudsonFst",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 663,
+   "line": 670,
    "statement": ": neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5)",
    "mentions": [
     "hudsonFst",
@@ -62342,7 +62342,7 @@
    "name": "Descent.Program.neiGst_ne_hudsonFst_at_mean_half",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 677,
+   "line": 684,
    "statement": ": neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10)",
    "mentions": [
     "hudsonFst",
@@ -62353,7 +62353,7 @@
    "name": "Descent.Program.no_constant_scales_neiGst_to_hudsonFst",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 704,
+   "line": 711,
    "statement": ": ¬ ∃ c : ℝ, ∀ p₁ p₂ : ℝ, 0 < p₁ → p₁ < 1 → 0 < p₂ → p₂ < 1 → hudsonFst p₁ p₂ = c * neiGst p₁ p₂",
    "mentions": [
     "hudsonFst",
@@ -62364,7 +62364,7 @@
    "name": "Descent.Program.betweenSubgroupVariance_extremes",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 722,
+   "line": 729,
    "statement": ": betweenSubgroupVariance 1 0 = 1 / 4",
    "mentions": [
     "betweenSubgroupVariance"
@@ -62374,7 +62374,7 @@
    "name": "Descent.Program.fairTwoPointVariance_eq_betweenSubgroupVariance",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 732,
+   "line": 739,
    "statement": "(a b : ℝ) : Blindness.fairTwoPointVariance a b = betweenSubgroupVariance a b",
    "mentions": [
     "betweenSubgroupVariance",
@@ -62385,7 +62385,7 @@
    "name": "Descent.Program.neiGst_eq_varianceRatio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 738,
+   "line": 745,
    "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : neiGst p₁ p₂ = betweenSubgroupVariance p₁ p₂ / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
    "mentions": [
     "betweenSubgroupVariance",
@@ -62397,7 +62397,7 @@
    "name": "Descent.Program.neiGstFromFrequencies_eq_neiGst",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 755,
+   "line": 762,
    "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : PopGen.neiGstFromFrequencies p₁ p₂ = neiGst p₁ p₂",
    "mentions": [
     "meanAlleleFreq",
@@ -62409,7 +62409,7 @@
    "name": "Descent.Program.four_neiGst_eq_standardizedContrastVariance",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 773,
+   "line": 780,
    "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : 4 * neiGst p₁ p₂ = (p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
    "mentions": [
     "meanAlleleFreq",
@@ -62420,7 +62420,7 @@
    "name": "Descent.Program.neiContrastSpike_eq_contrastVariance_mul_effectiveSize",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 821,
+   "line": 828,
    "statement": "(n m p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : neiContrastSpike n m p₁ p₂ = ((p₁ - p₂) ^ 2 / (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))) * Portability.effectiveSubgroupSize n m",
    "mentions": [
     "effectiveSubgroupSize",
@@ -62432,7 +62432,7 @@
    "name": "Descent.Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 836,
+   "line": 843,
    "statement": "(n m p₁ p₂ : ℝ) (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁)) (hbar : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : hudsonBbpSpike n m p₁ p₂ = (8 * neiGst p₁ p₂ / (1 + neiGst p₁ p₂)) * Portability.effectiveSubgroupSize n m",
    "mentions": [
     "effectiveSubgroupSize",
@@ -62445,7 +62445,7 @@
    "name": "Descent.Program.hudsonBbpSpike_ne_neiContrastSpike_at_mean_half",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 849,
+   "line": 856,
    "statement": ": hudsonBbpSpike 4 2 (9/10) (1/10) ≠ neiContrastSpike 4 2 (9/10) (1/10)",
    "mentions": [
     "hudsonBbpSpike",
@@ -62456,7 +62456,7 @@
    "name": "Descent.Program.amEquilibriumVariance_at_full_heritability",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 880,
+   "line": 887,
    "statement": "(V_A r : ℝ) : PopGen.amEquilibriumVariance V_A r 1 = V_A / (1 - r)",
    "mentions": [
     "amEquilibriumVariance"
@@ -62466,7 +62466,7 @@
    "name": "Descent.Program.amEquilibrium_then_drift",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 893,
+   "line": 900,
    "statement": "(V_A r h2 fst : ℝ) : Portability.presentDayPGSVariance (PopGen.amEquilibriumVariance V_A r h2) fst = (1 - fst) * (V_A / (1 - r * h2))",
    "mentions": [
     "amEquilibriumVariance",
@@ -62478,7 +62478,7 @@
    "name": "Descent.Program.genotypeVarianceHWE_eq_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 915,
+   "line": 922,
    "statement": "(p : ℝ) : Portability.genotypeVarianceHWE p = hweGenotypeVariance p",
    "mentions": [
     "genotypeVarianceHWE",
@@ -62489,7 +62489,7 @@
    "name": "Descent.Program.hweHeterozygosity_eq_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 919,
+   "line": 926,
    "statement": "(p : ℝ) : Descent.Core.hweHeterozygosity p = hweGenotypeVariance p",
    "mentions": [
     "hweGenotypeVariance",
@@ -62500,7 +62500,7 @@
    "name": "Descent.Program.fstMigrationDriftEquilibrium_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 929,
+   "line": 936,
    "statement": "(Ne m : ℝ) : Portability.fstMigrationDriftEquilibrium Ne m = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m)",
    "mentions": [
     "fstMigrationDriftEquilibrium",
@@ -62512,7 +62512,7 @@
    "name": "Descent.Program.driftLDCreationRate_eq_inv_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 941,
+   "line": 948,
    "statement": "(Ne : ℝ) : PopGen.driftLDCreationRate Ne = 1 / coalescentTimeScale Ne",
    "mentions": [
     "coalescentTimeScale",
@@ -62523,7 +62523,7 @@
    "name": "Descent.Program.driftRatePerGen_eq_inv_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 946,
+   "line": 953,
    "statement": "(Ne : ℝ) : PopGen.driftRatePerGen Ne = 1 / coalescentTimeScale Ne",
    "mentions": [
     "coalescentTimeScale",
@@ -62534,7 +62534,7 @@
    "name": "Descent.Program.coalFst_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 955,
+   "line": 962,
    "statement": "(t Ne : ℝ) : PopGen.coalFst t Ne = t / (t + coalescentTimeScale Ne)",
    "mentions": [
     "coalFst",
@@ -62545,7 +62545,7 @@
    "name": "Descent.Program.pairwiseFstFromBranches_eq_wrightFIT",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 977,
+   "line": 984,
    "statement": "(a b : ℝ) : Portability.pairwiseFstFromBranches a b = PopGen.wrightFIT a b",
    "mentions": [
     "pairwiseFstFromBranches",
@@ -62556,7 +62556,7 @@
    "name": "Descent.Program.neutralDriftFactor_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1000,
+   "line": 1007,
    "statement": "(Ne : ℝ) (t : ℕ) : Portability.neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62567,7 +62567,7 @@
    "name": "Descent.Program.ldRetainedFraction_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1008,
+   "line": 1015,
    "statement": "(r Ne : ℝ) (t : ℕ) : PopGen.ldRetainedFraction r Ne t = ((1 - r) * (1 - 1 / coalescentTimeScale Ne)) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62578,7 +62578,7 @@
    "name": "Descent.Program.heterozygosityLossFromDrift_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1013,
+   "line": 1020,
    "statement": "(Ne : ℝ) (t : ℕ) : PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62589,7 +62589,7 @@
    "name": "Descent.Program.wrightFisherDriftRetention_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1017,
+   "line": 1024,
    "statement": "(N : ℕ) (t : ℕ) : Portability.wrightFisherDriftRetention N t = (1 - 1 / coalescentTimeScale (N : ℝ)) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62600,7 +62600,7 @@
    "name": "Descent.Program.coalescentTau_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1026,
+   "line": 1033,
    "statement": "(t Ne : ℝ) : Portability.coalescentTau t Ne = t / coalescentTimeScale Ne",
    "mentions": [
     "coalescentTau",
@@ -62611,7 +62611,7 @@
    "name": "Descent.Program.EvolutionaryParameters_theta_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1040,
+   "line": 1047,
    "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.theta p = 2 * Descent.Core.ploidy * p.Ne * p.mu",
    "mentions": [
     "ploidy",
@@ -62622,7 +62622,7 @@
    "name": "Descent.Program.EvolutionaryParameters_bigM_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1044,
+   "line": 1051,
    "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.bigM p = 2 * Descent.Core.ploidy * p.Ne * p.mig",
    "mentions": [
     "bigM",
@@ -62633,7 +62633,7 @@
    "name": "Descent.Program.Var_Delta_Mu_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1054,
+   "line": 1061,
    "statement": "(V_A fst : ℝ) : Portability.Var_Delta_Mu V_A fst = Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "Var_Delta_Mu",
@@ -62644,7 +62644,7 @@
    "name": "Descent.Program.pgsDriftVariance_one_pop_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1063,
+   "line": 1070,
    "statement": "(V_A fst : ℝ) : PopGen.pgsDriftVariance_one_pop V_A fst = Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "pgsDriftVariance_one_pop",
@@ -62655,7 +62655,7 @@
    "name": "Descent.Program.pgsDriftVariance_one_pop_eq_Var_Delta_Mu",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1069,
+   "line": 1076,
    "statement": "(V_A fst : ℝ) : PopGen.pgsDriftVariance_one_pop V_A fst = Portability.Var_Delta_Mu V_A fst",
    "mentions": [
     "Var_Delta_Mu",
@@ -62666,7 +62666,7 @@
    "name": "Descent.Program.pgsVariance_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1080,
+   "line": 1087,
    "statement": "{m : ℕ} (β p : Fin m → ℝ) : Portability.pgsVariance β p = ∑ i, β i ^ 2 * hweGenotypeVariance (p i)",
    "mentions": [
     "hweGenotypeVariance",
@@ -62677,7 +62677,7 @@
    "name": "Descent.Program.dominanceVariance_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1084,
+   "line": 1091,
    "statement": "{m : ℕ} (p d : Fin m → ℝ) : PopGen.dominanceVariance p d = ∑ i, (hweGenotypeVariance (p i) * d i) ^ 2",
    "mentions": [
     "dominanceVariance",
@@ -62688,7 +62688,7 @@
    "name": "Descent.Program.additiveVariance_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1096,
+   "line": 1103,
    "statement": "{m : ℕ} (p α : Fin m → ℝ) : PopGen.additiveVariance p α = ∑ i, hweGenotypeVariance (p i) * (α i) ^ 2",
    "mentions": [
     "additiveVariance",
@@ -62699,7 +62699,7 @@
    "name": "Descent.Program.noncentralityParam_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1100,
+   "line": 1107,
    "statement": "(n : ℕ) (beta p : ℝ) : Decision.noncentralityParam n beta p = n * beta ^ 2 * hweGenotypeVariance p",
    "mentions": [
     "hweGenotypeVariance",
@@ -62710,7 +62710,7 @@
    "name": "Descent.Program.gwasNCP_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1104,
+   "line": 1111,
    "statement": "(n : ℕ) (β p : ℝ) : PopGen.gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p",
    "mentions": [
     "gwasNCP",
@@ -62721,7 +62721,7 @@
    "name": "Descent.Program.effectiveFisherInformation_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1110,
+   "line": 1117,
    "statement": "(n : ℕ) (p r2_ld : ℝ) : Portability.effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld",
    "mentions": [
     "effectiveFisherInformation",
@@ -62732,7 +62732,7 @@
    "name": "Descent.Program.epistaticVariancePairwise_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1116,
+   "line": 1123,
    "statement": "(γ p₁ p₂ : ℝ) : Portability.epistaticVariancePairwise γ p₁ p₂ = γ ^ 2 * hweGenotypeVariance p₁ * hweGenotypeVariance p₂",
    "mentions": [
     "epistaticVariancePairwise",
@@ -62743,7 +62743,7 @@
    "name": "Descent.Program.expectedPGSDiffVariance_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1123,
+   "line": 1130,
    "statement": "(V_A fst : ℝ) : PopGen.expectedPGSDiffVariance V_A fst = Descent.Core.ploidy * Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "expectedPGSDiffVariance",
@@ -62754,7 +62754,7 @@
    "name": "Descent.Program.ldHalfLife_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1135,
+   "line": 1142,
    "statement": "(r Ne : ℝ) : PopGen.ldHalfLife r Ne = Real.log 2 / (-Real.log ((1 - r) * (1 - 1 / coalescentTimeScale Ne)))",
    "mentions": [
     "coalescentTimeScale",
@@ -62765,7 +62765,7 @@
    "name": "Descent.Program.cumulativeDrift_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1150,
+   "line": 1157,
    "statement": "{T : ℕ} (Ne : Fin T → ℝ) : PopGen.cumulativeDrift Ne = ∑ i, 1 / coalescentTimeScale (Ne i)",
    "mentions": [
     "coalescentTimeScale",
@@ -62776,7 +62776,7 @@
    "name": "Descent.Program.ldRetentionPerGen_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1155,
+   "line": 1162,
    "statement": "(r Ne : ℝ) : PopGen.ldRetentionPerGen r Ne = (1 - r) * (1 - 1 / coalescentTimeScale Ne)",
    "mentions": [
     "coalescentTimeScale",
@@ -62787,7 +62787,7 @@
    "name": "Descent.Program.hetDecayFactor_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1159,
+   "line": 1166,
    "statement": "(Ne θ : ℝ) : PopGen.hetDecayFactor Ne θ = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne)",
    "mentions": [
     "coalescentTimeScale",
@@ -62798,7 +62798,7 @@
    "name": "Descent.Program.fstTransientDecayFromScaled_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1167,
+   "line": 1174,
    "statement": "(Ne θ bigM : ℝ) : PopGen.fstTransientDecayFromScaled Ne θ bigM = PopGen.hetDecayFromScaled Ne θ * (1 - bigM / coalescentTimeScale Ne)",
    "mentions": [
     "bigM",
@@ -62811,7 +62811,7 @@
    "name": "Descent.Program.asymmetricFst_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1172,
+   "line": 1179,
    "statement": "(Ne m₁₂ m₂₁ : ℝ) : Portability.asymmetricFst Ne m₁₂ m₂₁ = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁))",
    "mentions": [
     "asymmetricFst",
@@ -62823,7 +62823,7 @@
    "name": "Descent.Program.fstMigrationMutationEquilibriumManyDemes_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1184,
+   "line": 1191,
    "statement": "(Ne m μ : ℝ) : PopGen.fstMigrationMutationEquilibriumManyDemes Ne m μ = 1 / (1 + Descent.Core.scaledMigrationRate Ne m + Descent.Core.scaledMutationRate Ne μ)",
    "mentions": [
     "fstMigrationMutationEquilibriumManyDemes",
@@ -62835,7 +62835,7 @@
    "name": "Descent.Program.fstIslandEquilibriumFiniteDemes_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1195,
+   "line": 1202,
    "statement": "(Ne m μ nDemes : ℝ) : PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes = 1 / (1 + Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection nDemes + Descent.Core.scaledMutationRate Ne μ)",
    "mentions": [
     "fstIslandEquilibriumFiniteDemes",
@@ -62848,7 +62848,7 @@
    "name": "Descent.Program.expectedFreqDiffSq_uses_hwe",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1208,
+   "line": 1215,
    "statement": "(fst p0 : ℝ) : PopGen.expectedFreqDiffSq fst p0 = fst * hweGenotypeVariance p0",
    "mentions": [
     "expectedFreqDiffSq",
@@ -62859,7 +62859,7 @@
    "name": "Descent.Program.pgsMean_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1212,
+   "line": 1219,
    "statement": "{m : ℕ} (β p : Fin m → ℝ) : Portability.pgsMean β p = ∑ i, β i * (Descent.Core.ploidy * p i)",
    "mentions": [
     "pgsMean",
@@ -62870,7 +62870,7 @@
    "name": "Descent.Program.fisherAverageEffect_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1216,
+   "line": 1223,
    "statement": "(a d p : ℝ) : PopGen.fisherAverageEffect a d p = a + d * (1 - Descent.Core.ploidy * p)",
    "mentions": [
     "fisherAverageEffect",
@@ -62881,7 +62881,7 @@
    "name": "Descent.Program.selectedDriftFactor_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1240,
+   "line": 1247,
    "statement": "(Ne : ℝ) (t : ℕ) (s_correction : ℝ) : Portability.selectedDriftFactor Ne t s_correction = (1 - 1 / coalescentTimeScale Ne + s_correction) ^ t",
    "mentions": [
     "coalescentTimeScale",
@@ -62892,7 +62892,7 @@
    "name": "Descent.Program.SplitMigrationModel_scaledMigration_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1245,
+   "line": 1252,
    "statement": "(m : Portability.SplitMigrationModel) : Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig",
    "mentions": [
     "ploidy",
@@ -62903,7 +62903,7 @@
    "name": "Descent.Program.fstMigDriftNext_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1250,
+   "line": 1257,
    "statement": "(Ne m Fst : ℝ) : Portability.fstMigDriftNext Ne m Fst = (1 - 2 * m - 1 / coalescentTimeScale Ne) * Fst + 1 / coalescentTimeScale Ne",
    "mentions": [
     "coalescentTimeScale",
@@ -62914,7 +62914,7 @@
    "name": "Descent.Program.ibdFst_eq_ploidy_form",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1256,
+   "line": 1263,
    "statement": "(d N sigma_sq : ℝ) : PopGen.ibdFst d N sigma_sq = d / (2 * Descent.Core.ploidy * N * sigma_sq + d)",
    "mentions": [
     "ibdFst",
@@ -62925,7 +62925,7 @@
    "name": "Descent.Program.EvolutionaryParameters_tau_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1260,
+   "line": 1267,
    "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.tau p = p.t_div / coalescentTimeScale p.Ne",
    "mentions": [
     "coalescentTimeScale",
@@ -62936,7 +62936,7 @@
    "name": "Descent.Program.sharedLDRetention_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1270,
+   "line": 1277,
    "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.sharedLDRetention p = (1 - p.recomb) ^ (Descent.Core.ploidy * p.t_div)",
    "mentions": [
     "ploidy",
@@ -62947,7 +62947,7 @@
    "name": "Descent.Program.demoSteppingStoneFst_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1274,
+   "line": 1281,
    "statement": "(d Ne m σ_sq : ℝ) : PopGen.demoSteppingStoneFst d Ne m σ_sq = d / (d + Descent.Core.scaledMigrationRate Ne m * σ_sq)",
    "mentions": [
     "demoSteppingStoneFst",
@@ -62958,7 +62958,7 @@
    "name": "Descent.Program.tauAt_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1285,
+   "line": 1292,
    "statement": "(g : Descent.Core.PopGenParameters) (t : ℕ) : Descent.Core.PopGenParameters.tauAt g t = (t : ℝ) / coalescentTimeScale g.Ne",
    "mentions": [
     "coalescentTimeScale",
@@ -62969,7 +62969,7 @@
    "name": "Descent.Program.alleleFreqDivergenceRate_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1293,
+   "line": 1300,
    "statement": "(Ne mu m_rate : ℝ) : PopGen.alleleFreqDivergenceRate Ne mu m_rate = 1 / coalescentTimeScale Ne",
    "mentions": [
     "alleleFreqDivergenceRate",
@@ -62980,7 +62980,7 @@
    "name": "Descent.Program.fstMutationDriftTransient_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1298,
+   "line": 1305,
    "statement": "(θ t Ne : ℝ) : PopGen.fstMutationDriftTransient θ t Ne = PopGen.fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / coalescentTimeScale Ne))",
    "mentions": [
     "coalescentTimeScale",
@@ -62992,7 +62992,7 @@
    "name": "Descent.Program.MutationDriftModelAssumptions_fstTransient_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1304,
+   "line": 1311,
    "statement": "(m : Portability.MutationDriftModelAssumptions) : Portability.MutationDriftModelAssumptions.fstTransient m = m.fstEquilibrium * (1 - Real.exp (-(1 + m.theta) * m.t / coalescentTimeScale m.Ne))",
    "mentions": [
     "coalescentTimeScale",
@@ -63005,7 +63005,7 @@
    "name": "Descent.Program.hetMutationDriftRecurrence_step_uses_timeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1312,
+   "line": 1319,
    "statement": "(Ne mu H₀ : ℝ) (t : ℕ) : PopGen.hetMutationDriftRecurrence Ne mu H₀ (t + 1) = (1 - 1 / coalescentTimeScale Ne) * PopGen.hetMutationDriftRecurrence Ne mu H₀ t + Descent.Core.ploidy * mu * (1 - PopGen.hetMutationDriftRecurrence Ne mu H₀ t)",
    "mentions": [
     "coalescentTimeScale",
@@ -63017,7 +63017,7 @@
    "name": "Descent.Program.hetMutationFloor_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1327,
+   "line": 1334,
    "statement": "(Ne mu : ℝ) : Portability.hetMutationFloor Ne mu = Descent.Core.scaledMutationRate Ne mu / (1 + Descent.Core.scaledMutationRate Ne mu)",
    "mentions": [
     "hetMutationFloor",
@@ -63028,7 +63028,7 @@
    "name": "Descent.Program.presentDayPGSVariance_eq_retainedFraction",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1348,
+   "line": 1355,
    "statement": "(V_A fst : ℝ) : Portability.presentDayPGSVariance V_A fst = Descent.Core.retainedFraction fst V_A",
    "mentions": [
     "presentDayPGSVariance",
@@ -63039,7 +63039,7 @@
    "name": "Descent.Program.heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1403,
+   "line": 1410,
    "statement": "(t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) : PopGen.heterozygosityLossFromDrift t Ne = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t",
    "mentions": [
     "closedPopulation",
@@ -63051,7 +63051,7 @@
    "name": "Descent.Program.wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1431,
+   "line": 1438,
    "statement": "(N t : ℕ) (H₀ : ℝ) (hH : 0 < H₀) : Portability.wrightFisherHeterozygosityLoss N t = (PopGen.closedPopulation (N : ℝ) H₀ hH).measuredLoss t",
    "mentions": [
     "closedPopulation",
@@ -63063,7 +63063,7 @@
    "name": "Descent.Program.pcTargetAxisEfficacy_eq_proportionalReduction",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1460,
+   "line": 1467,
    "statement": "(residual baseline : ℝ) : Portability.pcTargetAxisEfficacy baseline residual = PopGen.fstFromHetRatio residual baseline ∧ Portability.pcTargetAxisEfficacy baseline residual = Portability.hudsonFstFromCoalescenceTimes residual baseline ∧ Portability.pcTargetAxisEfficacy baseline residual = PopGen.r2FromMSE residual baseline",
    "mentions": [
     "fstFromHetRatio",
@@ -63076,7 +63076,7 @@
    "name": "Descent.Program.slatkin_hetRatio_eq_coalescenceRatio",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1486,
+   "line": 1493,
    "statement": "(Hw Hb ETw ETb : ℝ) (h : Hw / Hb = ETw / ETb) : PopGen.fstFromHetRatio Hw Hb = Portability.hudsonFstFromCoalescenceTimes ETw ETb",
    "mentions": [
     "fstFromHetRatio",
@@ -63087,7 +63087,7 @@
    "name": "Descent.Program.effectiveSampleSizeFromSE_uses_hweGenotypeVariance",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1515,
+   "line": 1522,
    "statement": "(se p : ℝ) : Portability.effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * hweGenotypeVariance p)",
    "mentions": [
     "effectiveSampleSizeFromSE",
@@ -63098,7 +63098,7 @@
    "name": "Descent.Program.hetStepWithMutation_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1523,
+   "line": 1530,
    "statement": "(Ne mu H : ℝ) : Portability.hetStepWithMutation Ne mu H = (1 - 1 / coalescentTimeScale Ne) * H + Descent.Core.ploidy * mu * (1 - H)",
    "mentions": [
     "coalescentTimeScale",
@@ -63110,7 +63110,7 @@
    "name": "Descent.Program.retention_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1529,
+   "line": 1536,
    "statement": "(r : Portability.ClosedPopulationNoMutation) : r.retention = (1 - 1 / coalescentTimeScale r.Ne) ^ r.horizon",
    "mentions": [
     "coalescentTimeScale",
@@ -63121,7 +63121,7 @@
    "name": "Descent.Program.ibdFlowStep_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1538,
+   "line": 1545,
    "statement": "(Ne rate F : ℝ) : Portability.ibdFlowStep Ne rate F = F + (1 - F) / coalescentTimeScale Ne - Descent.Core.ploidy * rate * F",
    "mentions": [
     "coalescentTimeScale",
@@ -63133,7 +63133,7 @@
    "name": "Descent.Program.ibdRecurrenceStep_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1544,
+   "line": 1551,
    "statement": "(Ne rate x : ℝ) : Portability.ibdRecurrenceStep Ne rate x = (1 - rate) ^ 2 * (1 / coalescentTimeScale Ne + (1 - 1 / coalescentTimeScale Ne) * x)",
    "mentions": [
     "coalescentTimeScale",
@@ -63144,7 +63144,7 @@
    "name": "Descent.Program.ibdRecurrenceFixedPoint_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1553,
+   "line": 1560,
    "statement": "(Ne rate : ℝ) : Portability.ibdRecurrenceFixedPoint Ne rate = (1 - rate) ^ 2 / ((1 - rate) ^ 2 + coalescentTimeScale Ne * rate * (Descent.Core.ploidy - rate))",
    "mentions": [
     "coalescentTimeScale",
@@ -63156,7 +63156,7 @@
    "name": "Descent.Program.hetDecayFromScaled_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1561,
+   "line": 1568,
    "statement": "(Ne θ : ℝ) : PopGen.hetDecayFromScaled Ne θ = (1 - 1 / coalescentTimeScale Ne) * (1 - θ / coalescentTimeScale Ne)",
    "mentions": [
     "coalescentTimeScale",
@@ -63167,7 +63167,7 @@
    "name": "Descent.Program.fstDriftFlowStep_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1569,
+   "line": 1576,
    "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDriftFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - Descent.Core.ploidy * (p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
@@ -63179,7 +63179,7 @@
    "name": "Descent.Program.fstDemeCorrectedFlowStep_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1581,
+   "line": 1588,
    "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - Descent.Core.ploidy * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
@@ -63192,7 +63192,7 @@
    "name": "Descent.Program.averageEffect_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1593,
+   "line": 1600,
    "statement": "(m : Blindness.OneLocusArchitecture) : m.averageEffect = m.a + m.d * (1 - Descent.Core.ploidy * m.p)",
    "mentions": [
     "averageEffect",
@@ -63203,7 +63203,7 @@
    "name": "Descent.Program.polygenicAdaptationShift_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1601,
+   "line": 1608,
    "statement": "{m : ℕ} (β Δp : Fin m → ℝ) : PopGen.polygenicAdaptationShift β Δp = ∑ i, β i * Descent.Core.ploidy * Δp i",
    "mentions": [
     "ploidy",
@@ -63214,7 +63214,7 @@
    "name": "Descent.Program.steppingStoneFstQuadratic_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1609,
+   "line": 1616,
    "statement": "(d Ne m σ_sq : ℝ) : PopGen.steppingStoneFstQuadratic d Ne m σ_sq = d / (d + 2 * Descent.Core.ploidy * Ne * σ_sq ^ 2 * m ^ 2)",
    "mentions": [
     "ploidy",
@@ -63225,7 +63225,7 @@
    "name": "Descent.Program.driftLDStep_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1616,
+   "line": 1623,
    "statement": "(Ne c Q : ℝ) : PopGen.driftLDStep Ne c Q = (1 - c) ^ 2 * (1 / coalescentTimeScale Ne + (1 - 1 / coalescentTimeScale Ne) * Q)",
    "mentions": [
     "coalescentTimeScale",
@@ -63236,7 +63236,7 @@
    "name": "Descent.Program.driftLDRetention_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1623,
+   "line": 1630,
    "statement": "(Ne c : ℝ) : PopGen.driftLDRetention Ne c = (1 - c) ^ 2 * (1 - 1 / coalescentTimeScale Ne)",
    "mentions": [
     "coalescentTimeScale",
@@ -63247,7 +63247,7 @@
    "name": "Descent.Program.driftLDEquilibrium_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1629,
+   "line": 1636,
    "statement": "(Ne c : ℝ) : PopGen.driftLDEquilibrium Ne c = (1 - c) ^ 2 * (1 / coalescentTimeScale Ne) / (1 - PopGen.driftLDRetention Ne c)",
    "mentions": [
     "coalescentTimeScale",
@@ -63259,7 +63259,7 @@
    "name": "Descent.Program.ohtaKimuraSigmaDSq_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1639,
+   "line": 1646,
    "statement": "(Ne c : ℝ) : PopGen.ohtaKimuraSigmaDSq Ne c = (10 + 2 * Descent.Core.ploidy * Ne * c) / ((2 + 2 * Descent.Core.ploidy * Ne * c) * (11 + 2 * Descent.Core.ploidy * Ne * c))",
    "mentions": [
     "ohtaKimuraSigmaDSq",
@@ -63270,7 +63270,7 @@
    "name": "Descent.Program.islandFstFiniteDemes_eq_scaled",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1652,
+   "line": 1659,
    "statement": "(Ne m d : ℝ) : PopGen.islandFstFiniteDemes Ne m d = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection d)",
    "mentions": [
     "fstMutationDriftEquilibrium",
@@ -63283,7 +63283,7 @@
    "name": "Descent.Program.steppingStoneCharacteristicLength_uses_ploidy",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1664,
+   "line": 1671,
    "statement": "(m σ_sq μ : ℝ) : PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (Descent.Core.ploidy * μ))",
    "mentions": [
     "ploidy",
@@ -63294,7 +63294,7 @@
    "name": "Descent.Program.serialFounderWithinTime_uses_coalescentTimeScale",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1680,
+   "line": 1687,
    "statement": "(N Nanc tAnc : ℝ) : PopGen.serialFounderWithinTime N Nanc tAnc = coalescentTimeScale N * (1 - Real.exp (-tAnc / coalescentTimeScale N)) + Real.exp (-tAnc / coalescentTimeScale N) * coalescentTimeScale Nanc",
    "mentions": [
     "coalescentTimeScale",
@@ -63305,7 +63305,7 @@
    "name": "Descent.Program.neiGst_at_fold",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1691,
+   "line": 1698,
    "statement": "(p : ℝ) : neiGst p (1 - p) = (1 - Descent.Core.ploidy * p) ^ 2",
    "mentions": [
     "neiGst",
@@ -63316,7 +63316,7 @@
    "name": "Descent.Program.mOne_mul_mTwo_eq_neiGst_at_fold",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1706,
+   "line": 1713,
    "statement": "(p : ℝ) : Blindness.BundleRigidity.mOne p * Blindness.BundleRigidity.mTwo p = neiGst p (1 - p) / (p * (1 - p))",
    "mentions": [
     "mOne",
@@ -63328,7 +63328,7 @@
    "name": "Descent.Program.importanceWeightESS_eq_momentPermeability",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1729,
+   "line": 1736,
    "statement": "(sum_w sum_w_sq : ℝ) : Portability.importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq",
    "mentions": [
     "importanceWeightESS",
@@ -63339,7 +63339,7 @@
    "name": "Descent.Program.driftVariance_uses_hweGenotypeVariance",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1737,
+   "line": 1744,
    "statement": "(p0 fst : ℝ) : PopGen.driftVariance p0 fst = hweGenotypeVariance p0 * fst / Descent.Core.ploidy",
    "mentions": [
     "driftVariance",
@@ -63351,7 +63351,7 @@
    "name": "Descent.Program.realWorldPGSVariance_eq_retainedFraction",
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
-   "line": 1749,
+   "line": 1756,
    "statement": "(V_A fst rhoSq : ℝ) : Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A",
    "mentions": [
     "realWorldPGSVariance",
@@ -202201,7 +202201,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 108,
+   "line": 115,
    "signature": "(p : ℝ) : ℝ",
    "args": [
     {
@@ -202278,7 +202278,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 153,
+   "line": 160,
    "signature": "(Ne : ℝ) : ℝ",
    "args": [
     {
@@ -202394,7 +202394,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 316,
+   "line": 323,
    "signature": "(p₁ p₂ : ℝ) : ℝ",
    "args": [
     {
@@ -202515,7 +202515,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 436,
+   "line": 443,
    "signature": "(p₁ p₂ : ℝ) : ℝ",
    "args": [
     {
@@ -202620,7 +202620,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 499,
+   "line": 506,
    "signature": "(p₁ p₂ : ℝ) : ℝ",
    "args": [
     {
@@ -202700,7 +202700,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 715,
+   "line": 722,
    "signature": "(p₁ p₂ : ℝ) : ℝ",
    "args": [
     {
@@ -202752,7 +202752,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 796,
+   "line": 803,
    "signature": "(n m p₁ p₂ : ℝ) : ℝ",
    "args": [
     {
@@ -202818,7 +202818,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Program/Conventions.lean",
-   "line": 817,
+   "line": 824,
    "signature": "(n m p₁ p₂ : ℝ) : ℝ",
    "args": [
     {

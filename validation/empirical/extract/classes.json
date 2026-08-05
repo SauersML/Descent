@@ -8596,15 +8596,20 @@
   }
  },
  "Descent.Blindness.ridgeBalance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Fintype.card",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/ImitationRigidity.lean",
   "line": 1193,
   "short": "ridgeBalance",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
-  "python": null,
-  "args": [],
+  "python": "ridgeBalance",
+  "args": [
+   "aspect",
+   "eig",
+   "ridge",
+   "u"
+  ],
   "box": {
    "aspect": [
     0.05,
@@ -8619,9 +8624,18 @@
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "eig": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.ridgeBalance_at_zero_variable_is_junk",
    "Descent.Blindness.ridgeBalance_of_zero_aspect",
@@ -8665,15 +8679,20 @@
   }
  },
  "Descent.Blindness.ridgeSelfConsistentStep": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Fintype.card",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/ImitationRigidity.lean",
   "line": 1225,
   "short": "ridgeSelfConsistentStep",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "ridgeSelfConsistentStep",
+  "args": [
+   "aspect",
+   "eig",
+   "ridge",
+   "u"
+  ],
   "box": {
    "aspect": [
     0.05,
@@ -8688,9 +8707,18 @@
     3.0
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "eig": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Blindness.ridgeBalance_root_isFixedPoint",
    "Descent.Blindness.ridgeSelfConsistentStep_at_singularity_is_junk",
@@ -29322,7 +29350,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 3,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29393,7 +29421,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 1,
+   "finite_points": 4,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -79020,19 +79048,30 @@
   }
  },
  "Descent.Portability.effectiveStratumCount": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "qualified name Fintype.card",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/ContinuumCalibrationProgram.lean",
   "line": 1588,
   "short": "effectiveStratumCount",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
-  "python": null,
-  "args": [],
+  "python": "effectiveStratumCount",
+  "args": [
+   "n"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
   "numeric_standins": null,
-  "vector_args": null,
+  "vector_args": {
+   "n": {
+    "dim": "Stratum",
+    "rank": 1
+   }
+  },
   "mentioned_by": [
    "Descent.Portability.effectiveStratumCount_balanced_eq_card",
    "Descent.Portability.effectiveStratumCount_empty_is_junk",
@@ -117632,7 +117671,7 @@
   "class": "WRAPPER",
   "note": "delegates to Descent.Core.hweHeterozygosity",
   "file": "Descent/Program/Conventions.lean",
-  "line": 108,
+  "line": 115,
   "short": "hweGenotypeVariance",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -117708,7 +117747,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for *: 'function' and 'float'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 153,
+  "line": 160,
   "short": "coalescentTimeScale",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -117823,7 +117862,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 316,
+  "line": 323,
   "short": "meanAlleleFreq",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
@@ -117947,7 +117986,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real number, not 'function'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 436,
+  "line": 443,
   "short": "neiGst",
   "ret_type": "ℝ",
   "empirical_status": "CONVENTION PINNED",
@@ -118055,7 +118094,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 499,
+  "line": 506,
   "short": "hudsonFst",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED --",
@@ -118138,7 +118177,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 715,
+  "line": 722,
   "short": "betweenSubgroupVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -118193,7 +118232,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real number, not 'function'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 796,
+  "line": 803,
   "short": "neiContrastSpike",
   "ret_type": "ℝ",
   "empirical_status": "CONVENTION PINNED",
@@ -118266,7 +118305,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 817,
+  "line": 824,
   "short": "hudsonBbpSpike",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",

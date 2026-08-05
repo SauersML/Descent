@@ -589,6 +589,27 @@ class Parser:
             # one that took 23 definitions silently: a plausible number of the
             # right sign and magnitude, no error, every consumer affected.
             # Closed before it is reached rather than after.
+            if name.startswith("Fintype.card"):
+                # READ THE CARDINALITY OFF THE DATA, do not assume it. A
+                # `Fintype.card ι` is the length of anything indexed by `ι`, and
+                # this body is handed such a thing -- `ridgeBalance` divides its
+                # sum over `ι` by exactly this. `_rt.sumdim` is the helper the
+                # unannotated `∑` already uses: it takes every length the index
+                # is seen at and RAISES if they disagree, which is what stops a
+                # guessed dimension from silently producing a plausible number.
+                #
+                # With nothing indexed by the type in scope there is no honest
+                # answer, so it still refuses. A constant here would be exactly
+                # the invented value the `List ι` refusal exists to forbid.
+                q = self.peek()      # the ident itself is consumed above
+                if q is not None and q.kind == "ident":
+                    ty = q.text
+                    idxed = [a for a, (dv, _) in self.vector_args.items() if dv == ty]
+                    if idxed:
+                        self.next()
+                        lens = ", ".join(f"len({pyname(a)})" for a in idxed)
+                        return f"_rt.sumdim({ty!r}, {lens})"
+                raise Untranslatable(f"qualified name {name}")
             if name == "Matrix.of":
                 # `Matrix.of f` wraps a function as a `Matrix`, and a `Matrix`
                 # in this runtime IS the function -- a `VecFn` of `VecFn`s
