@@ -581,6 +581,32 @@ def measure():
     }
 
 
+# WHERE THE CORPUS STARTED, measured before any of the repair below.  This is a
+# RECORD, not a threshold: nothing reads it, no gate compares against it, and
+# changing a number here changes no verdict.  It is here because a defect count
+# of zero says nothing about whether zero was hard to reach, and because the
+# diagnosis that motivated the repair should be checkable against the corpus it
+# diagnosed rather than remembered.
+#
+# It is deliberately NOT a baseline file.  An earlier version of this script
+# ratcheted against `architecture_baseline.json`, failing only on regression --
+# which makes the current state the standard and licenses every defect already
+# present.  That file is deleted and the gate is zero tolerance.  The difference
+# between the two is that a ratchet is consulted and this is not.
+CORPUS_AT_DIAGNOSIS = {
+    "cross_module_reuse_pct": 8.0,      # theorems cited from another module
+    "terminal_theorem_pct": 61.8,       # theorems no other theorem uses
+    "composition_theorems": 2,          # demography joined to a deployed metric
+    "duplicate_body_extras": 132,       # definitions re-typing a shared body
+    "fst_definitions": 24,              # names for one island-model family
+    "foundation_inverted": 3,           # Conventions, CovarianceStructure,
+                                        # CausalInference -- each importing the
+                                        # subsystems it claimed to reconcile
+    "_source": "Structural audit of 167 files, 133,164 lines, 8,045 "
+               "declarations, 5,852 theorems, at commit e6321bd.",
+}
+
+
 # Every one of these must be ZERO.  There is no direction and no allowance: a
 # non-zero count is a defect the corpus still carries.
 DEFECTS = {
@@ -625,6 +651,13 @@ def main() -> int:
     now = measure()
 
     print("architecture")
+    print("  (at diagnosis: %.1f%% reuse, %d compositions, %d duplicate extras, "
+          "%d Fst names, %d inverted foundations)"
+          % (CORPUS_AT_DIAGNOSIS["cross_module_reuse_pct"],
+             CORPUS_AT_DIAGNOSIS["composition_theorems"],
+             CORPUS_AT_DIAGNOSIS["duplicate_body_extras"],
+             CORPUS_AT_DIAGNOSIS["fst_definitions"],
+             CORPUS_AT_DIAGNOSIS["foundation_inverted"]))
     for k in sorted(now):
         if k.startswith("_"):
             continue
