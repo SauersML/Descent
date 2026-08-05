@@ -6091,6 +6091,233 @@ def run_core_empirics() -> int:
 
 
 # ======================================================================================
+# SHAPE
+# ======================================================================================
+
+# WHAT THESE FIVE GUARDS ARE FOR, and why they are a family.
+#
+# Every structural repair this corpus has shipped was found the same way: an audit
+# read the tree, named a defect, a person fixed it by hand, and one release later
+# the same defect was back somewhere else.  `Coalescent` was an island in one
+# release; `Pangenome` is an island in this one.  A directory was split by reading
+# order once and the split was undone; nine directories are split by reading order
+# now.  A metric got a second entry point taking its demography as loose reals, the
+# parameter record was introduced to stop that, and `deployedR2FromIsland` sits
+# beside `deployedR2` today.
+#
+# The recurrence is not carelessness.  It is that the corpus is organised by
+# NARRATIVE -- by the order a person would read it in -- and a narrative order is
+# invisible to a build.  `A` imports `B` because `B` was written first, and Lean is
+# perfectly happy: an unused import compiles.  Nothing anywhere fails, so the only
+# instrument that has ever caught it is a person re-reading the tree, and a person
+# re-reading the tree is exactly the mechanism the corpus's own root rule forbids
+# relying on:
+#
+#     When two places must agree, make one of them call the other; a note
+#     explaining why they must agree is not a mechanism.
+#
+# `validation/code/architecture.py` measures these shapes already and prints them.
+# Printing is what a note does.  These five guards are the same measurements wired
+# to an exit code, which is what makes them a mechanism.
+#
+# THEY IMPORT `architecture.py` RATHER THAN RE-DERIVING ANYTHING.  Three earlier
+# scripts independently re-derived "which files are the corpus" and disagreed, and
+# this file's own header records what that cost.  So the import graph, the
+# declaration index and the comment stripper come from `architecture.py`, and the
+# only thing that lives here is the threshold and the failure.  `architecture.ROOT`
+# is patched to `CORPUS` before use so `DESCENT_CORPUS` still redirects these
+# guards at a fixture; without that patch they would read the real repository no
+# matter what the environment said, and a guard that cannot be pointed at a planted
+# defect has never been shown to fire.
+#
+# CALIBRATION.  All five land nonzero on the corpus as it stands, which is the
+# evidence that each fires: a guard whose clean report has never been contradicted
+# is indistinguishable from a guard that does nothing.  They are DIAGNOSTIC for
+# exactly that reason and no other -- the findings are real and the fixes are in
+# flight.  Each entry in `GUARDS` names what has to land before it flips.
+
+# The depth limit.  Twelve is one rung for each of the corpus's eleven top-level
+# directories, plus one.  That is the depth a tree gets from its own layer contract
+# -- `Core < Foundations < Coalescent < PopGen < Portability < Decision < Program`,
+# with `Blindness`, `Conditionals`, `Pangenome` and `Spectral` hanging off it -- so
+# a corpus whose imports run downward through the layers and no further can meet
+# it.  Anything above 12 is modules stacked on each other INSIDE a layer, which is
+# the shape a reading order makes and a dependency order does not.
+SHAPE_DEPTH_LIMIT = 12
+
+SHAPE_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'₀-₉]*")
+# Where a declaration block ends: the head of the next one.
+SHAPE_DECL_STOP = re.compile(
+    r"^\s*(noncomputable |def |abbrev |theorem |lemma |structure |inductive "
+    r"|instance |class |end |namespace |section |open |variable |@\[)")
+SHAPE_THEOREM = re.compile(
+    r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+([\w.'₀-₉]+)(.*?):=", re.S | re.M)
+
+# The two spine thresholds.  Both are the audit's, and both are far from where the
+# corpus stands; see `run_shape_spine` for how each is counted.
+SHAPE_REUSE_PCT = 20.0
+SHAPE_SPINE_THEOREMS = 80
+
+# A function of four or more BARE reals is a demography spelled out longhand.
+# Three is not: `deployedR2FromTau (V_A V_E tau : ℝ)` is a formula in its own
+# coordinates and takes no population history at all, while
+# `deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ)` takes four fields of
+# `PopGenParameters` as loose arguments and rebuilds the record's job by hand.
+SHAPE_RAW_ARITY = 4
+
+
+@functools.lru_cache(maxsize=1)
+def _shape_corpus():
+    """`(raw, code, graph, decls, architecture)` for the corpus.
+
+    Cached because five guards want the same objects and the walk is the expensive
+    part of all of them.  The module itself is handed back so a guard can reach a
+    measurement `architecture.py` already defines rather than writing a second one.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import architecture as arch
+
+    # See the section header: the module computes its own root from `__file__`,
+    # which would make every guard below blind to `DESCENT_CORPUS`.
+    arch.ROOT = str(CORPUS)
+    arch.LEAN_ROOT = str(CORPUS / "Descent")
+    raw, code = arch.load()
+    return raw, code, arch.import_graph(raw), arch.declarations(code), arch
+
+
+def _shape_is_toc(mod: str, graph, decls) -> bool:
+    """The corpus root, or a module that IS its directory's table of contents.
+
+    A table of contents declares nothing and imports every module under its
+    directory, and its edges therefore carry no dependency: they are what `lake
+    build` needs to reach the tree, not what a proof rests on.  Counting them
+    breaks every measurement below in the same way.  Depth gains rungs no proof
+    rests on.  The weak-component count is pinned at one forever, because a head is
+    adjacent to every module in its directory whether or not anything in that
+    directory is connected to anything else -- `Pangenome`'s two modules are joined
+    to the corpus by `Descent/Pangenome.lean` and by nothing else, and with heads
+    counted that reads as connected.
+
+    THE TEST IS THE `heads` CONTRACT, not the path shape, and the difference is
+    load-bearing.  Eight modules in this corpus have a directory beside them and
+    declare nothing, which is what a head looks like from the outside.  Three of
+    them -- `TrafficInvariantSeparation`, `MetricSpecificPortability`,
+    `PortabilityDrift` -- import their whole directory and are heads.  The other
+    five import ONE module out of five, or one out of eight: they are not tables of
+    contents, they are links in exactly the chains `shape-chains` reports, and
+    excluding them because they resemble a head would hide the defect inside the
+    exclusion.  A module earns the exclusion by satisfying the contract, and the
+    day one of the five starts importing its directory it earns it automatically.
+
+    `Descent.lean` is the one special case: it declares thirty things, so it fails
+    the contract, but it is the build entry point and imports only the eleven heads.
+    Its edges reach nothing but tables of contents, so it can add a rung above them
+    and nothing else.
+    """
+    if mod == "Descent":
+        return True
+    directory = CORPUS.joinpath(*mod.split("."))
+    if not directory.is_dir():
+        return False
+    if decls.get(mod):
+        return False
+    under = {str(p.relative_to(CORPUS))[:-len(".lean")].replace(os.sep, ".")
+             for p in directory.rglob("*.lean")}
+    return bool(under) and under <= graph.get(mod, set())
+
+
+def _shape_graph_without_toc():
+    """The import graph with the tables of contents deleted, not merely skipped."""
+    _raw, _code, graph, decls, _arch = _shape_corpus()
+    toc = {m for m in graph if _shape_is_toc(m, graph, decls)}
+    return {m: {d for d in graph[m] if d not in toc}
+            for m in graph if m not in toc}
+
+
+def _shape_depths(graph):
+    """Longest path from a leaf, per module, iteratively so a cycle cannot hang us."""
+    depth = {}
+
+    def go(mod, seen):
+        if mod in depth:
+            return depth[mod]
+        if mod in seen:
+            return 0
+        d = 0
+        for dep in graph.get(mod, ()):
+            d = max(d, go(dep, seen | {mod}) + 1)
+        depth[mod] = d
+        return d
+
+    for mod in graph:
+        go(mod, frozenset())
+    return depth
+
+
+def run_shape_depth() -> int:
+    """No module may sit more than `SHAPE_DEPTH_LIMIT` imports above a leaf.
+
+    WHAT THIS CAUGHT.  The audit that asked for this guard measured a longest
+    import chain of 38 modules at depth 37, and the top of it was not a deep result
+    resting on deep machinery.  It was a sequence: `PortabilityDrift.Definitions` ->
+    `ClosedPopulationRegime` -> `PresentDayMetrics` -> `Generational` ->
+    `PresentDayMoments` -> `MutationDrift` -> `MigrationDrift` -> ... , each file
+    importing the one written before it.  `Generational` did not use a single
+    declaration of `PresentDayMetrics`; it used twenty-five of `PopGen.DGP`, which
+    it did not import, and reached them through the chain.  The depth was a reading
+    order compiled into the build graph.
+
+    WHY DEPTH AND NOT SOMETHING VAGUER.  "Files should be small" and "directories
+    should be shallow" are not checkable and would fire on the whole corpus.  Depth
+    is checkable, it is exactly the quantity a narrative order inflates and a
+    dependency order does not, and it is the one number that cannot be brought down
+    by moving files or renaming them: the only way down is for a module to import
+    what it uses.
+
+    Measured with the tables of contents removed -- see `_shape_is_toc` for which
+    modules earn that and why resembling a head does not.  The chain the guard
+    prints is the actionable object; the count of modules over the limit is not,
+    because every one of them is over it on account of some chain.
+    """
+    graph = _shape_graph_without_toc()
+    depth = _shape_depths(graph)
+    if not depth:
+        print("shape-depth guard CANNOT RUN: no Lean modules found under "
+              f"{CORPUS / 'Descent'}")
+        return 1
+
+    worst = max(depth.values())
+    over = sorted(((depth[m], m) for m in depth if depth[m] > SHAPE_DEPTH_LIMIT),
+                  reverse=True)
+
+    if worst > SHAPE_DEPTH_LIMIT:
+        # The chain, not the count, is the actionable object: the fix is an edit to
+        # some module ON it, and a bare number names none of them.
+        top = max(sorted(depth), key=lambda m: depth[m])
+        chain, cur = [top], top
+        while graph.get(cur):
+            cur = max(sorted(graph[cur]), key=lambda d: depth[d])
+            chain.append(cur)
+        print(f"deepest import chain: {len(chain)} modules, depth {worst}, "
+              f"limit {SHAPE_DEPTH_LIMIT}")
+        for m in chain:
+            print(f"    {depth[m]:>3}  {m}")
+        print(f"modules above the limit: {len(over)}, budget 0; for each link on "
+              f"the chain, check whether the module below it is actually used -- "
+              f"`--only shape-chains` names the ones that are not -- and import "
+              f"what the module names instead of the file that precedes it")
+        print(f"shape-depth guard FAILS: depth {worst} exceeds {SHAPE_DEPTH_LIMIT}. "
+              f"A chain of {len(chain)} modules is a reading order compiled into "
+              f"the build graph, and every module on it must be rebuilt when the "
+              f"bottom one changes, whether or not it uses anything from it.")
+        return 1
+
+    print(f"shape-depth guard passes: {len(depth)} modules, deepest sits {worst} "
+          f"imports above a leaf, limit {SHAPE_DEPTH_LIMIT}")
+    return 0
+
+
+# ======================================================================================
 # DISPATCHER
 # ======================================================================================
 
@@ -6198,6 +6425,17 @@ GUARDS = {
     # because a budget pinned to their count would be worse than none.
     "core-empirics":   dict(fn=run_core_empirics,   gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
+    # THE SHAPE GUARDS, all five DIAGNOSTIC, and the reason is the one the `ledger`
+    # entry above records: each reports true findings whose fixes are in flight, and
+    # gating them today breaks the build for everyone while the repair lands. The
+    # budgets are the budgets and they do not move. What flips each one is named on
+    # its line; run `--only <name>` to see the outstanding count.
+    #
+    # `shape-depth`: flip when the deepest module sits 12 or fewer imports above a
+    # leaf. The audit measured 37 on a chain of 38; it reads 21 on a chain of 22 as
+    # the chain repairs land, so do not trust the number in this comment -- run
+    # `--only shape-depth` and read the chain it prints.
+    "shape-depth":     dict(fn=run_shape_depth,      gated=False, takes_argv=False),
 }
 
 
