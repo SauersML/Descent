@@ -106,6 +106,30 @@ not have, and `XiRates` provides only the index set it would be a function on.  
 forward resolution of the ASG that decides which parent was real, which is a different
 process rather than a harder case of this one.
 
+## What Mathlib does and does not have, checked
+
+The open items below are open because of missing foundations, and twice this session I
+asserted that without looking.  Both times I was wrong -- once about an algebraic identity
+the compiler then broke, once about `Coalescent.Uniqueness`, which turned out to be
+available.  So the claims are now grepped rather than remembered, against the pinned
+revision:
+
+* **de Finetti / exchangeable measures**: absent.  No `deFinetti`, `DeFinetti` or
+  `Exchangeable` anywhere in Mathlib.  Item 3's converse has no foundation to sit on.
+* **Reverse martingale convergence**: absent.  `Mathlib/Probability/Martingale/` has the
+  forward theory only.  This is what K-C's Theorem 2 proof needs.
+* **Kolmogorov extension, general form**: absent.  `ProjectiveFamilyContent` and
+  `ClosedCompactCylinders` exist and name it as their goal, but the existence theorem for a
+  general consistent family is not there.  `IsProjectiveLimit.unique` IS, which is what
+  `Uniqueness` used.
+* **Ionescu-Tulcea**: PRESENT, in `Probability/Kernel/IonescuTulcea/Traj.lean`.  It builds a
+  measure on infinite trajectories from a sequence of kernels without Kolmogorov's
+  topological hypotheses.  That is a plausible route to Theorem 3's `{ℛ_k}` -- the jump
+  chain is exactly a sequence of kernels -- with one obstacle: Kingman's chain runs from
+  `ℛ_{k}` to `ℛ_{k-1}`, and Ionescu-Tulcea wants the refining direction, whose transition
+  probabilities are K-G section 8's backward combinatorics.  Not attempted; recorded as the
+  most promising unexplored route rather than as blocked.
+
 ## Verification status
 
 Every module in this group compiles against the pinned Mathlib
