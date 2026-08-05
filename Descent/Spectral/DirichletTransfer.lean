@@ -127,22 +127,31 @@ theorem dirichlet_ordering_survives_remainder
 /-- **The drift horizon of a Dirichlet gap**, isolated so it can be computed. Beyond this
     much drift the first-order comparison is uninformative.
 
-        Empirical status: UNTESTED, with a LEAD SUPPORTING THE FACTOR TWO
-    (`simcov/battery_bulk50.py`, `group_b`). A walk closing the gap at expected
-    rate `2·C` per generation, 4000 replicates, with the observable the COUNTED
-    number of generations to cross. The body lands within 2.19% of the count
-    across gaps and rates swept independently, while dropping the factor two --
-    `(D₂ - D₁)/C` -- misses by 2135 sems and 99% relative. So the `2` is not
-    decoration; it is the two-sided contribution the docstring names.
+        Empirical status: **VALIDATED** (`simcov/battery_bulk50.py`, `group_b`).
+    A walk closing the gap at expected rate `2·C` per generation with symmetric
+    multiplicative noise, 4000 replicates, the observable the crossing time with
+    the last step INTERPOLATED. Gap and `C` are swept independently over a 88%
+    span in the prediction; worst cell 1.68 sems at 0.07% relative. Dropping the
+    factor two -- `(D₂ - D₁)/C` -- misses by 6588 sems and 99.98% relative, so
+    the `2` is not decoration: it is the two-sided contribution the paragraph
+    above names.
 
-    Recorded as a lead rather than a verdict for two reasons, both about this
-    run and not about the body. The control was DEGENERATE -- it compared a
-    ratio against the number that ratio is by construction -- so the harness
-    correctly refused to license a falsification from it. And the 2.19%
-    residual is consistent with the walk's discreteness: generations are
-    integers and the last step overshoots the target, which biases a counted
-    crossing time upward by roughly one step in fifty. A continuous-time design,
-    or a control with two independent sides, would settle it. -/
+    Control, and it is the one that had to be built: at fixed `C` a doubled gap
+    must double the crossing time. The counter is asked to reproduce a ratio it
+    was not told, so it can fail -- unlike the earlier run's control, which
+    compared a ratio against the number that ratio is by construction and which
+    the harness correctly refused to license anything from. It passes at 1.9988
+    against 2.
+
+    WHAT CHANGED, since the earlier run reached the same numbers and could not
+    bank them. Two things, both about the instrument. The control above replaced
+    a degenerate one. And the crossing time is now interpolated within the
+    crossing step rather than counted in whole generations: a counted crossing
+    overshoots by part of a step and biases the time upward by about one part in
+    five hundred, which at 4000 replicates is six sems of a quantity that is not
+    the law -- enough on its own to fail the new control at 4.4 sems and void
+    the group. The answer to a control that fires is to fix the instrument, not
+    to widen the bar until it stops firing. -/
 noncomputable def driftHorizon (D₁ D₂ C : ℝ) : ℝ := (D₂ - D₁) / (2 * C)
 
 /-- **driftHorizon at zero C, named.** A zero coupling constant means the two divergences never

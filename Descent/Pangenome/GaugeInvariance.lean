@@ -114,7 +114,18 @@ theorem sum_split {α : Type u} (p : α → Bool) (f : α → Nat) : ∀ l : Lis
 variable {E : Type u}
 
 /-- The genotype a VCF records for walk `w` at edge `e` under reference tree `T`:
-the traversal count on a variant edge, and nothing on a tree edge. -/
+the traversal count on a variant edge, and nothing on a tree edge.
+
+    Empirical status: **NOT AN EMPIRICAL CLAIM**. This is the DEFINITION of what a VCF
+    written against a chosen reference tree records, not a model of anything: it says
+    which number appears in the file, and a measurement disagreeing with it would be a
+    measurement of a different file format. The empirical content of this module is in
+    the gauge statements ABOUT this map -- whether a quantity computed from `geno` is
+    invariant to the choice of `T` -- and those carry their own markers.
+
+    The name is screened as an empirical claim because it begins `geno`, which is the
+    right screen: most `geno`-named definitions in the corpus are genotype models. This
+    one is not, and says so rather than being exempted by the screen. -/
 def geno (T : Tree E) (w : Walk E) (e : E) : Nat :=
   if T e then 0 else w e
 

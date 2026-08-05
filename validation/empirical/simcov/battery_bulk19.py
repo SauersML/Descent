@@ -38,7 +38,7 @@ import math
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, dump_results, record
+from battery_core import RESULTS, dump_results, record, run_groups
 
 # THE SCALED PARAMETERS ARE CONVENTIONS ABOUT A NUMERIC FACTOR, so the only
 # competitor that means anything is the SAME functional form with a different
@@ -190,7 +190,13 @@ def test_scaled_migration_rate_and_tau():
     dem0.add_population(name="A", initial_size=1000)
     dem0.add_population(name="B", initial_size=1000)
     dem0.add_population(name="ANC", initial_size=1000)
-    dem0.add_population_split(time=0, derived=["A", "B"], ancestral="ANC")
+    # time=1, NOT time=0: msprime refuses a split at the sampling time, and the
+    # first run of this control died on that with the whole group's verdicts
+    # lost to the try/except in main(). One generation of separation is
+    # tau = 1/(2*Ne) = 5e-4, so the true F_ST is 5e-4 against an error bar two
+    # orders of magnitude wider -- the control still asks "is this zero?" and
+    # can still fail on a sample-labelling or divergence-indexing slip.
+    dem0.add_population_split(time=1, derived=["A", "B"], ancestral="ANC")
     v0 = []
     for r in range(22):
         ts = msprime.sim_ancestry(samples={"A": 25, "B": 25}, demography=dem0,
@@ -202,9 +208,9 @@ def test_scaled_migration_rate_and_tau():
         dab = ts.divergence([A, B], indexes=[(0, 1)], mode="branch")[0]
         v0.append(1.0 - ((da + db) / 2.0) / dab)
     s0 = simlib.summarize(v0)
-    print("  CONTROL t_div=0 (one population): F_ST=%.5f ± %.5f  (known 0)"
-          % (s0["mean"], s0["sem"]))
-    control = dict(design="t_div=0 [one population: F_ST is 0]", lean=0.0,
+    print("  CONTROL t_div=1 (one population): F_ST=%.5f +/- %.5f  (known 0 to "
+          "5e-4)" % (s0["mean"], s0["sem"]))
+    control = dict(design="t_div=1 [one population: F_ST is 0]", lean=0.0,
                    truth=s0["mean"], sem=max(s0["sem"], 1e-9))
     MODEL = dict(realised_inputs=True, control=control)
     # Same idea: the rivals differ from the body only in the numeric factor on
@@ -316,15 +322,17 @@ def test_fst_equilibrium_additivity():
 
 
 def main():
-    for fn in (test_scaled_mutation_rate, test_scaled_migration_rate_and_tau,
-               test_fst_equilibrium_additivity):
-        try:
-            fn()
-        except Exception:
-            import traceback
-            traceback.print_exc()
+    # `run_groups` rather than a local try/except: a group that raises has to
+    # reach the RESULTS FILE, not just the log, or the ledger reads a partial
+    # run as a complete one. This battery is the reason -- its control asked
+    # msprime for a split at the sampling time, msprime refused, and the file
+    # that landed carried the mutation group alone.
+    failed = run_groups(test_scaled_mutation_rate,
+                        test_scaled_migration_rate_and_tau,
+                        test_fst_equilibrium_additivity)
     dump_results("battery_bulk19_results.json",
-                 battery_source=os.path.abspath(__file__))
+                 battery_source=os.path.abspath(__file__),
+                 failed_groups=failed)
     print("\n\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {})

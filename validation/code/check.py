@@ -5628,7 +5628,14 @@ def run_conventions() -> int:
 #      that cannot be followed is worse than none: it reads as evidence.
 #   2. A docstring that cites a battery whose results are STALE -- the battery's
 #      source is newer than the results file, so the numbers quoted came from a
-#      source that no longer exists.
+#      source that no longer exists.  The same rule covers INCOMPLETE: a battery
+#      whose run had a group raise wrote its results file anyway, carrying
+#      whatever verdicts had already been recorded, and the declarations in the
+#      group that died simply had no row.  That reads as "this battery does not
+#      measure that" rather than as "this battery failed to", which is the
+#      difference between a gap and a silent one.  `battery_core.run_groups`
+#      records the failure into the results file and `ledger.py` puts it in the
+#      freshness field.
 #   3. A ledger record banking agreement with no competitor rejected.
 #   4. A definition whose docstring cites a battery while the ledger holds both
 #      an agreeing and a disagreeing verdict for it, with no adjudication.  A
@@ -5732,7 +5739,8 @@ def run_ledger() -> int:
             if bat not in batteries:
                 dangling.append(f"{name} ({fname}) cites simcov/battery_{bat}.py, "
                                 f"which the ledger has never seen")
-            elif "STALE" in freshness.get(bat, ""):
+            elif "STALE" in freshness.get(bat, "") \
+                    or "INCOMPLETE" in freshness.get(bat, ""):
                 stale_cite.append(f"{name} ({fname}) cites simcov/battery_{bat}.py, "
                                   f"whose results are {freshness[bat]}")
             elif bat in data_only:
@@ -5768,9 +5776,9 @@ def run_ledger() -> int:
     for label, found, advice in (
         ("docstring citations to a battery the ledger has never seen",
          dangling, "re-emit the ledger, or drop the citation"),
-        ("docstring citations to a battery whose results are stale",
-         stale_cite, "re-run that battery so its results are newer than its "
-                     "source, then re-emit the ledger"),
+        ("docstring citations to a battery whose results are stale or incomplete",
+         stale_cite, "re-run that battery so its results match its source and "
+                     "no group raised, then re-emit the ledger"),
         ("ledger rows banking agreement with no competitor rejected",
          uncompeted, "re-emit the ledger with simcov/ledger.py; the gate is "
                      "applied at emit time and cannot be satisfied by editing"),

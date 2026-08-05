@@ -25,7 +25,40 @@ import simlib
 RESULTS = []
 
 
-def dump_results(path, battery_source=None):
+def run_groups(*fns):
+    """Run each group, and RETURN the ones that raised instead of hiding them.
+
+    Every multi-group battery here wraps its groups in `try/except` so one
+    failure does not cost the others their verdicts. That is the right
+    behaviour and it had a hole: the exception was printed to the log and the
+    results file was written anyway, carrying whatever `RESULTS` had reached at
+    that point. A battery that dropped a whole group looked, to the ledger and
+    to every docstring citing it, exactly like one that ran.
+
+    It is not hypothetical. `battery_bulk19`'s positive control asked msprime
+    for a population split at the sampling time, which msprime refuses; the
+    exception took `scaledMigrationRate` and `EvolutionaryParameters.tau` with
+    it, and the results file that landed contained the mutation group alone.
+
+    So the failures come back to the caller and go into the results file, where
+    `ledger.py` can see them.
+    """
+    failed = []
+    for fn in fns:
+        try:
+            fn()
+        except Exception as exc:                       # noqa: BLE001
+            import traceback
+            traceback.print_exc()
+            failed.append({"group": getattr(fn, "__name__", str(fn)),
+                           "error": "%s: %s" % (type(exc).__name__, exc)})
+    if failed:
+        print("\nINCOMPLETE RUN: %d group(s) raised and produced no verdicts: %s"
+              % (len(failed), ", ".join(f["group"] for f in failed)))
+    return failed
+
+
+def dump_results(path, battery_source=None, failed_groups=None):
     """Write `RESULTS` with the SHA of the source that produced it.
 
     Every battery used to end with `json.dump(RESULTS, open(...))`, and the
@@ -48,9 +81,14 @@ def dump_results(path, battery_source=None):
             open(battery_source, "rb").read()).hexdigest()[:16]
     except OSError:
         sha = None
+    payload = {"_battery_sha": sha, "results": RESULTS}
+    if failed_groups:
+        # RECORDED, not just printed. A log is read by whoever ran the battery;
+        # the results file is read by the ledger and, through it, by every
+        # docstring citation.
+        payload["_failed_groups"] = failed_groups
     with open(path, "w") as fh:
-        json.dump({"_battery_sha": sha, "results": RESULTS}, fh, indent=1,
-                  default=str)
+        json.dump(payload, fh, indent=1, default=str)
     return sha
 
 

@@ -156,7 +156,18 @@ def build(directory: str) -> dict:
             records.append(dict(battery=battery, unreadable=str(exc)))
             continue
         recorded = (rows.get("_battery_sha") if isinstance(rows, dict) else None)
+        failed = (rows.get("_failed_groups") if isinstance(rows, dict) else None)
         fresh, sha = freshness_of(directory, battery, recorded)
+        if failed:
+            # A PARTIAL RUN IS NOT A RUN, and it used to be indistinguishable
+            # from one: a battery whose group raised printed the traceback and
+            # wrote its results file anyway, carrying whatever verdicts had
+            # already been recorded. The declarations in the group that died
+            # simply had no row, which reads as "this battery does not measure
+            # that" rather than as "this battery failed to".
+            fresh = ("INCOMPLETE (%d group(s) raised: %s)"
+                     % (len(failed),
+                        ", ".join(f.get("group", "?") for f in failed)))
         if isinstance(rows, dict) and "results" not in rows:
             # A results file that is a dict of raw arrays, not a list of
             # `record()` outputs. `battery_correct.py` is one: it produces real

@@ -35,18 +35,19 @@ group_mixture    ancestryMixtureCorrelation. The docstring is right that the
                  +rho and -rho with mass `mix`, and read the realised
                  correlation of the pooled sample.
 
-group_clinical   liabilitySpecificity, under the liability threshold model it
-                 declares. The observable is the realised specificity of a
-                 PGS-based classifier: the fraction of true controls the rule
-                 correctly leaves below the classification threshold.
+group_clinical   liabilitySpecificity, and the finding is that the definition
+                 is underdetermined by its own signature. `T'` and `mu_control`
+                 are free arguments and nothing says which scale either lives
+                 on; three self-consistent readings of "the specificity of a
+                 PGS-based classifier at T'" give answers from 0.91 to 0.99999
+                 on the same simulated population. All three are recorded.
 
-group_imputation ldExtentImputationQuality, in the restricted sense its own
-                 name carries -- the LD-extent dependence with everything else
-                 held fixed. Realised imputation r-squared is dominated by
-                 panel size and by minor-allele frequency and neither appears
-                 in the signature, so the design holds both fixed and varies
-                 only the LD extent, and the comparison is of the SHAPE in
-                 `c / ld_extent`.
+group_imputation ldExtentImputationQuality against a COALESCENT. The first
+                 version of this group stipulated the decay and was therefore
+                 circular -- see the group's own docstring, which keeps it so
+                 it is not rebuilt. The decay now comes from msprime, the free
+                 `ld_extent` is fitted, and Sved's hyperbolic rides along with
+                 its own free rate so what is on trial is the SHAPE.
 
 group_impgap     expectedSqMeanPGSDiff_IMEquilibrium. Its docstring names the
                  design it owes in as many words: "A two-deme design measuring
@@ -62,7 +63,7 @@ import os
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, dump_results, record
+from battery_core import RESULTS, dump_results, record, run_groups
 
 FRESH_TOKEN = "SIMCOV-BATTERY-GAP01-CURLEW-20260805"
 
@@ -325,8 +326,20 @@ def group_mixture():
         c_mean.append(dict(design=lab, lean=rho * (1 - mix), truth=got,
                            sem=max(sem, 1e-12)))
         if control is None:
-            control = dict(design=lab + " [realised positive-environment mass]",
-                           lean=mix, truth=mmean, sem=max(msem, 1e-12))
+            # NOT the realised environment mass: `n_pos` is `round(mix*N)`
+            # exactly, so predicted and measured are the same number and
+            # `verdict.classify` calls that control DEGENERATE, correctly.
+            # This one asks the same draws a question with a known answer that
+            # no pooling rule can affect: a standard normal marginal has
+            # variance 1. A scale slip in either environment moves it.
+            v = [float(np.var(np.concatenate([
+                rng.standard_normal(int(round(mix * per_block))),
+                rng.standard_normal(per_block
+                                    - int(round(mix * per_block)))])))
+                 for _ in range(n_blocks)]
+            vmean, vsem = blocked(v)
+            control = dict(design="pooled marginal variance [known to be 1]",
+                           lean=1.0, truth=vmean, sem=max(vsem, 1e-12))
 
     reg = ("1e5 pairs per block and 20 blocks per cell, drawn from TWO "
            "environments with correlations +rho and -rho and pooled at mass "
@@ -359,12 +372,29 @@ def group_mixture():
 # group clinical -- liabilitySpecificity
 # ---------------------------------------------------------------------------
 def group_clinical():
+    """liabilitySpecificity: THREE readings, and the finding is that they differ.
+
+    The body is `Phi((T' - R*h*mu_control) / sigma_resid)`. `T'` and
+    `mu_control` are free ARGUMENTS and the signature does not say which scale
+    either lives on -- the liability scale, or the PGS scale, or the
+    standardised PGS. That is not a quibble: the three self-consistent readings
+    of "the specificity of a PGS-based classifier at threshold T'" give answers
+    from 0.91 to 0.99999 on the same simulated population, and the body matches
+    none of them within the error bar.
+
+    So this group records a MEASUREMENT, not a falsification. What it measures
+    is that the definition is underdetermined by its own signature, which is a
+    finding about the declaration and not about the arithmetic. Every reading is
+    recorded, so a consumer who states which one it means gets a determinate
+    answer -- the same shape as `ancestryRecalibratedSlope`, where a third
+    convention had to be written down before either measurement meant anything.
+    """
     print("\n===== GROUP CLINICAL  liabilitySpecificity")
     from scipy.stats import norm
     rng = np.random.default_rng(70004)
     n_blocks, per_block = 20, 200000
 
-    cells, c_nosigma, c_signflip = [], [], []
+    cells_liab, cells_pgs, cells_own = [], [], []
     control = None
     for h_sq, r2, prev in ((0.5, 0.2, 0.05), (0.3, 0.4, 0.10),
                            (0.7, 0.1, 0.02), (0.5, 0.5, 0.20)):
@@ -372,143 +402,207 @@ def group_clinical():
         R = math.sqrt(r2)
         h = math.sqrt(h_sq)
         sig = math.sqrt(h_sq * (1 - r2) + (1 - h_sq))
-        specs, prevs = [], []
-        for _ in range(n_blocks):
-            # The liability threshold model, generated rather than assumed: a
-            # genetic score of variance h_sq*r2, the rest of the genetics and
-            # the environment as independent noise, and disease above T.
-            ghat = rng.standard_normal(per_block) * (R * h)
-            liab = (ghat
-                    + rng.standard_normal(per_block) * sig)
-            case = liab > T
-            ctrl = ~case
-            mu_control = float(liab[ctrl].mean())
-            # SPECIFICITY: the fraction of true controls the classification
-            # rule correctly leaves below the threshold T'.
-            Tp = T * 0.8
-            specs.append(float((ghat[ctrl] + rng.standard_normal(int(ctrl.sum()))
-                                * sig <= Tp).mean()))
-            prevs.append(float(case.mean()))
-        got, sem = blocked(specs)
-        pmean, psem = blocked(prevs)
         Tp = T * 0.8
+        sp_liab, sp_own, sp_pgs, prevs = [], [], [], []
+        for _ in range(n_blocks):
+            ghat = rng.standard_normal(per_block) * (R * h)
+            liab = ghat + rng.standard_normal(per_block) * sig
+            ctrl = liab <= T
+            nc = int(ctrl.sum())
+            # READING A -- the rule re-draws the residual: a NEW individual with
+            # this control's genetic component.
+            sp_liab.append(float(((ghat[ctrl]
+                                   + rng.standard_normal(nc) * sig) <= Tp)
+                                 .mean()))
+            # READING B -- the rule is on the individual's OWN liability.
+            sp_own.append(float((liab[ctrl] <= Tp).mean()))
+            # READING C -- the rule is on the PGS component alone.
+            sp_pgs.append(float((ghat[ctrl] <= Tp).mean()))
+            prevs.append(float((~ctrl).mean()))
+        a, a_sem = blocked(sp_liab)
+        b, b_sem = blocked(sp_own)
+        c, c_sem = blocked(sp_pgs)
+        pmean, psem = blocked(prevs)
+        # The body, at the model's own truncated control mean on the LIABILITY
+        # scale -- the reading its own prose names ("mu_control = E[Y | Y <= T]").
         mu_c = -float(norm.pdf(T)) / (1 - prev)
         lean = float(norm.cdf((Tp - R * h * mu_c) / sig))
-        nosig = float(norm.cdf(Tp - R * h * mu_c))
-        flip = float(norm.cdf((Tp + R * h * mu_c) / sig))
         lab = "h2=%.1f R2=%.1f K=%.2f" % (h_sq, r2, prev)
-        print("  %-22s measured specificity %.5f +/- %.5f   body %.5f   "
-              "no sigma %.5f   sign flip %.5f"
-              % (lab, got, sem, lean, nosig, flip))
-        cells.append(dict(design=lab, lean=lean, truth=got,
-                          sem=max(sem, 1e-12)))
-        c_nosigma.append(dict(design=lab, lean=nosig, truth=got,
-                              sem=max(sem, 1e-12)))
-        c_signflip.append(dict(design=lab, lean=flip, truth=got,
-                               sem=max(sem, 1e-12)))
+        print("  %-22s body %.5f | A re-drawn residual %.5f +/- %.5f | "
+              "B own liability %.5f +/- %.5f | C PGS alone %.5f +/- %.5f"
+              % (lab, lean, a, a_sem, b, b_sem, c, c_sem))
+        cells_liab.append(dict(design=lab, lean=lean, truth=a,
+                               sem=max(a_sem, 1e-12)))
+        cells_own.append(dict(design=lab, lean=lean, truth=b,
+                              sem=max(b_sem, 1e-12)))
+        cells_pgs.append(dict(design=lab, lean=lean, truth=c,
+                              sem=max(c_sem, 1e-12)))
         if control is None:
             control = dict(design=lab + " [realised prevalence recovers K]",
                            lean=prev, truth=pmean, sem=max(psem, 1e-12))
 
     reg = ("4e6 individuals per cell in 20 blocks of 2e5 under the liability "
-           "threshold model the definition declares: a genetic score of "
-           "variance R^2*h^2, independent residual liability of variance "
-           "h^2(1-R^2) + (1-h^2), disease above the prevalence threshold. The "
-           "observable is the realised SPECIFICITY at a classification "
-           "threshold T' = 0.8*T -- the fraction of true controls the rule "
-           "correctly leaves below it. mu_control is the model's own "
-           "truncated mean, not a fitted quantity")
+           "threshold model the definition declares: a PGS-explained component "
+           "of variance R^2*h^2, independent residual liability of variance "
+           "h^2(1-R^2) + (1-h^2), disease above the prevalence threshold. "
+           "THREE readings of 'specificity at T'' are measured on the same "
+           "draws, because the signature does not say which scale T' and "
+           "mu_control live on: the rule applied to a re-drawn residual, to the "
+           "individual's own liability, and to the PGS component alone. "
+           "mu_control is the model's own truncated mean, not a fitted "
+           "quantity. What is recorded is the SPREAD across readings")
     record("liabilitySpecificity", "ClinicalUtilityFairness.lean",
-           "Phi((T' - R * h * mu_control) / sigma_resid)", cells, regime=reg,
-           control=control, **MODEL)
-    record("liabilitySpecificity [residual sd dropped, competing]",
-           "ClinicalUtilityFairness.lean", "Phi(T' - R * h * mu_control)",
-           c_nosigma, regime=reg, control=control, **MODEL)
-    record("liabilitySpecificity [sign of mu_control flipped, competing]",
-           "ClinicalUtilityFairness.lean",
-           "Phi((T' + R * h * mu_control) / sigma_resid)", c_signflip,
-           regime=reg, control=control, **MODEL)
+           "Phi((T' - R * h * mu_control) / sigma_resid), against the "
+           "re-drawn-residual reading", cells_liab, regime=reg,
+           control=control, realised_inputs=True, argument_source="model")
+    record("liabilitySpecificity [rule on the individual's own liability, "
+           "competing reading]", "ClinicalUtilityFairness.lean",
+           "the same body, against P(own liability <= T' | control)",
+           cells_own, regime=reg, control=control, realised_inputs=True,
+           argument_source="model")
+    record("liabilitySpecificity [rule on the PGS component alone, competing "
+           "reading]", "ClinicalUtilityFairness.lean",
+           "the same body, against P(PGS component <= T' | control)",
+           cells_pgs, regime=reg, control=control, realised_inputs=True,
+           argument_source="model")
 
 
 # ---------------------------------------------------------------------------
 # group imputation -- ldExtentImputationQuality
 # ---------------------------------------------------------------------------
 def group_imputation():
+    """ldExtentImputationQuality, against a coalescent rather than a stipulation.
+
+    THE FIRST VERSION OF THIS GROUP WAS CIRCULAR AND IS RECORDED HERE SO IT IS
+    NOT REBUILT. It generated a tag whose CORRELATION with the target fell
+    linearly in `c / ld_extent`, then measured imputation r-squared -- which is
+    that correlation SQUARED -- and reported the body FALSIFIED at 400%. The
+    finding was entirely the modelling choice: had the r-squared been made to
+    fall linearly instead, the body would have matched to machine precision and
+    the design would have been a SELF-TEST. A definition of the form
+    `f(c/ld_extent)` cannot be tested against a simulation that stipulates
+    `f`.
+
+    So the decay comes from a coalescent instead. Imputation r-squared between a
+    tag and a target at physical distance `c` is measured from msprime, and
+    `ld_extent` is FITTED -- it has to be, since nothing in the corpus says what
+    an LD extent is in base pairs, and the body carries it as a free argument.
+    With one free parameter and five distances the SHAPE is still refutable, and
+    the rival is the shape coalescent theory actually gives: Sved's
+    `r^2 = 1/(1 + 4*Ne*c)`, hyperbolic rather than linear-to-zero, fitted with
+    its own free rate so neither candidate is handicapped.
+    """
     print("\n===== GROUP IMPUTATION  ldExtentImputationQuality")
-    rng = np.random.default_rng(70005)
-    n_blocks, per_block = 12, 60000
+    import msprime
+    ne, reps = 2000, 12
+    seq, rho, mu = 4e6, 1e-8, 1e-8
+    edges = np.array([1e4, 4e4, 1.2e5, 4e5, 1.2e6])
 
-    cells, c_squared, c_exp = [], [], []
-    control = None
-    for c, extent in ((0.1, 1.0), (0.4, 1.0), (0.7, 1.0), (0.4, 0.5),
-                      (0.2, 0.8)):
-        r2s = []
-        for _ in range(n_blocks):
-            # A single tag at distance c from the target, with the LD between
-            # them declining linearly in c/ld_extent and vanishing beyond the
-            # extent. THE PANEL SIZE AND THE ALLELE FREQUENCY ARE HELD FIXED,
-            # because the definition's own name says it carries only the
-            # LD-extent dependence and its signature has room for nothing else.
-            rho = max(0.0, 1 - c / extent)
-            tag = rng.standard_normal(per_block)
-            target = (rho * tag
-                      + math.sqrt(max(1 - rho ** 2, 0.0))
-                      * rng.standard_normal(per_block))
-            # Imputation r-squared is the squared correlation between the
-            # imputed dosage (the tag, best-linear) and the truth.
-            r2s.append(float(np.corrcoef(tag, target)[0, 1]) ** 2)
-        got, sem = blocked(r2s)
-        lean = max(0.0, 1 - c / extent)
-        lab = "c=%.1f extent=%.1f" % (c, extent)
-        print("  %-20s measured imputation r2 %.5f +/- %.5f   body %.5f   "
-              "squared %.5f   exponential %.5f"
-              % (lab, got, sem, lean, lean ** 2, math.exp(-c / extent)))
-        cells.append(dict(design=lab, lean=lean, truth=got,
-                          sem=max(sem, 1e-12)))
-        c_squared.append(dict(design=lab, lean=lean ** 2, truth=got,
-                              sem=max(sem, 1e-12)))
-        c_exp.append(dict(design=lab, lean=math.exp(-c / extent), truth=got,
-                          sem=max(sem, 1e-12)))
+    per_rep = {b: [] for b in range(len(edges))}
+    seps = {b: [] for b in range(len(edges))}
+    for r in range(reps):
+        ts = msprime.sim_ancestry(samples=40, population_size=ne,
+                                  sequence_length=seq, recombination_rate=rho,
+                                  random_seed=72000 + r)
+        ts = msprime.sim_mutations(ts, rate=mu, random_seed=72500 + r)
+        if ts.num_sites < 200:
+            continue
+        gm = ts.genotype_matrix()
+        pos = ts.tables.sites.position
+        f = gm.mean(axis=1)
+        idx = np.flatnonzero(np.minimum(f, 1 - f) > 0.05)
+        if idx.size < 60:
+            continue
+        for b, hi in enumerate(edges):
+            lo = 0.0 if b == 0 else edges[b - 1]
+            vals, sp = [], []
+            for k in range(idx.size):
+                i = idx[k]
+                cand = np.flatnonzero((pos[idx] - pos[i] > lo)
+                                      & (pos[idx] - pos[i] <= hi))
+                if cand.size == 0:
+                    continue
+                j = idx[cand[0]]
+                cc = np.corrcoef(gm[i], gm[j])[0, 1]
+                if np.isfinite(cc):
+                    vals.append(cc ** 2)
+                    sp.append(float(pos[j] - pos[i]))
+                if len(vals) >= 150:
+                    break
+            if len(vals) >= 30:
+                per_rep[b].append(float(np.mean(vals)))
+                seps[b].append(float(np.mean(sp)))
 
-    # POSITIVE CONTROL, and NOT the c = 0 cell: there the tag IS the target,
-    # the measured r-squared is 1 to machine precision, and predicted equals
-    # measured -- `verdict.classify` calls that a DEGENERATE control and is
-    # right, because it cannot fail. The control here imposes a correlation
-    # DIRECTLY, bypassing the body entirely, and requires the estimator to
-    # recover its square. A slip in the standardisation or in the noise scale
-    # moves it.
-    rho_known = 0.5
+    xs, ys, sems = [], [], []
+    for b in range(len(edges)):
+        if len(per_rep[b]) < 4:
+            continue
+        m_, s_ = blocked(per_rep[b])
+        xs.append(float(np.mean(seps[b])) * rho)     # c in Morgans
+        ys.append(m_)
+        sems.append(s_)
+    if len(xs) < 4:
+        print("  (too few usable bins)")
+        return
+    xs = np.asarray(xs); ys = np.asarray(ys); sems = np.asarray(sems)
+
+    # Fit each candidate's ONE free parameter by weighted least squares on the
+    # same points, so neither is handicapped.
+    grid = np.exp(np.linspace(math.log(xs.min() / 20), math.log(xs.max() * 40),
+                              4000))
+    def wss(pred):
+        return float((((pred - ys) / sems) ** 2).sum())
+    best_e = min(grid, key=lambda e: wss(np.maximum(0.0, 1 - xs / e)))
+    best_n = min(grid, key=lambda a: wss(1.0 / (1.0 + xs / a)))
+    lin = np.maximum(0.0, 1 - xs / best_e)
+    hyp = 1.0 / (1.0 + xs / best_n)
+    print("  fitted ld_extent = %.4g Morgans (chi2/point %.2f); Sved scale "
+          "1/(4Ne) = %.4g (chi2/point %.2f)"
+          % (best_e, wss(lin) / len(xs), best_n, wss(hyp) / len(xs)))
+
+    cells, c_sved = [], []
+    for k in range(len(xs)):
+        lab = "c=%.2e M" % xs[k]
+        print("  %-14s measured r2 %.5f +/- %.5f   body(fitted extent) %.5f   "
+              "Sved(fitted) %.5f" % (lab, ys[k], sems[k], lin[k], hyp[k]))
+        cells.append(dict(design=lab, lean=float(lin[k]), truth=float(ys[k]),
+                          sem=max(float(sems[k]), 1e-12)))
+        c_sved.append(dict(design=lab, lean=float(hyp[k]),
+                           truth=float(ys[k]), sem=max(float(sems[k]), 1e-12)))
+
+    # POSITIVE CONTROL for the ESTIMATOR, not for either shape: a pair of sites
+    # with an imposed correlation must come back at its square through the same
+    # r-squared code path.
+    rng2 = np.random.default_rng(72999)
     ctl = []
-    for _ in range(n_blocks):
-        t_ = rng.standard_normal(per_block)
-        y_ = (rho_known * t_
-              + math.sqrt(1 - rho_known ** 2) * rng.standard_normal(per_block))
-        ctl.append(float(np.corrcoef(t_, y_)[0, 1]) ** 2)
+    for _ in range(12):
+        a = rng2.standard_normal(20000)
+        bq = 0.6 * a + math.sqrt(1 - 0.36) * rng2.standard_normal(20000)
+        ctl.append(float(np.corrcoef(a, bq)[0, 1]) ** 2)
     cmean, csem = blocked(ctl)
-    control = dict(design="imposed correlation 0.5 [estimator recovers 0.25]",
-                   lean=rho_known ** 2, truth=cmean, sem=max(csem, 1e-12))
-    print("  CONTROL imposed rho=0.5: measured r2 %.6f +/- %.6f (known %.4f)"
-          % (cmean, csem, rho_known ** 2))
+    print("  CONTROL imposed correlation 0.6: measured r2 %.5f +/- %.5f "
+          "(known 0.36)" % (cmean, csem))
+    control = dict(design="imposed correlation 0.6 [r2 must be 0.36]",
+                   lean=0.36, truth=cmean, sem=max(csem, 1e-12))
 
-    reg = ("60000 individuals per block and 12 blocks per cell; a single tag "
-           "at distance c from the target with correlation declining linearly "
-           "in c/ld_extent and vanishing beyond the extent. THE PANEL SIZE AND "
-           "THE ALLELE FREQUENCY ARE HELD FIXED throughout, because realised "
-           "imputation r-squared is dominated by both and neither appears in "
-           "this signature -- what is measured is the SHAPE in c/ld_extent "
-           "with everything else held, which is the restriction the "
-           "definition's own name carries. c/ld_extent is swept from 0.1 to "
-           "0.8 and the extent itself is varied, so the ratio and not either "
-           "argument alone is on trial")
+    reg = ("msprime, one panmictic population of Ne = 2000 over 4 Mb at "
+           "recombination 1e-8 and mu = 1e-8, 12 replicates; the observable is "
+           "the realised imputation r-squared between common site pairs binned "
+           "by physical separation, with c reported in Morgans as the realised "
+           "mean separation times the recombination rate. `ld_extent` is FITTED "
+           "by weighted least squares, because the corpus nowhere says what an "
+           "LD extent is in base pairs and the body carries it as a free "
+           "argument; Sved's hyperbolic rides along with its own free rate, so "
+           "what is on trial is the SHAPE and not the scale. The panel size and "
+           "the frequency filter are held fixed throughout, which is the "
+           "restriction the definition's own name carries")
     record("ldExtentImputationQuality", "ImputationPortability.lean",
-           "max 0 (1 - c / ld_extent)", cells, regime=reg, control=control,
-           **MODEL)
-    record("ldExtentImputationQuality [squared, competing]",
-           "ImputationPortability.lean", "(max 0 (1 - c / ld_extent))^2",
-           c_squared, regime=reg, control=control, **MODEL)
-    record("ldExtentImputationQuality [exponential decay, competing]",
-           "ImputationPortability.lean", "exp(-c / ld_extent)", c_exp,
-           regime=reg, control=control, **MODEL)
+           "max 0 (1 - c / ld_extent), ld_extent fitted", cells, regime=reg,
+           control=control, realised_inputs=True, argument_source="model")
+    record("ldExtentImputationQuality [Sved 1/(1 + 4*Ne*c), competing shape]",
+           "ImputationPortability.lean", "1 / (1 + 4*Ne*c), rate fitted",
+           c_sved, regime=reg, control=control, realised_inputs=True,
+           argument_source="model")
 
 
 # ---------------------------------------------------------------------------
@@ -631,15 +725,11 @@ def group_impgap():
 def main():
     freshness()
     print("FRESHNESS token literal: SIMCOV-BATTERY-GAP01-CURLEW-20260805")
-    for fn in (group_turnover, group_msbalance, group_mixture, group_clinical,
-               group_imputation, group_impgap):
-        try:
-            fn()
-        except Exception:
-            import traceback
-            traceback.print_exc()
+    failed = run_groups(group_turnover, group_msbalance, group_mixture,
+                        group_clinical, group_imputation, group_impgap)
     dump_results("battery_gap01_results.json",
-                 battery_source=os.path.abspath(__file__))
+                 battery_source=os.path.abspath(__file__),
+                 failed_groups=failed)
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {})

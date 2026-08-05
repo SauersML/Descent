@@ -82,7 +82,13 @@ theorem treeG_spanning : IsSpanningTree [Allele.G] := rfl
 
 /-- Genotype of haplotype `h` at edge `e` under reference tree `t`: the number of
 times the walk traverses `e`, where the tree edge is not a variant and so carries no
-genotype. -/
+genotype.
+
+    Empirical status: **NOT AN EMPIRICAL CLAIM**. As with `GaugeInvariance.geno`, this
+    states what a VCF written against a chosen reference records, not a model of a
+    genotype. It is the fixed input the counterexample below varies the REFERENCE around;
+    a measurement could disagree with the counterexample's conclusion, and cannot
+    disagree with the definition of the encoding it is stated over. -/
 def geno (t : RefTree) (h : Hap) (e : Allele) : Nat :=
   if e = t then 0 else if h = e then 1 else 0
 
