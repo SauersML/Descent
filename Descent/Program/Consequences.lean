@@ -21,6 +21,8 @@ import Descent.Portability.PolygenicContinuumCalibration
 import Descent.Portability.GenerativePortabilityLaw
 import Descent.Portability.PCCorrectability.EndToEnd
 import Descent.Spectral.ProjectionSolve
+import Descent.Portability.PCCorrectability.Design
+import Descent.Blindness.CountingInvariantInstances
 
 /-!
 # What the separate results say when they are put together
