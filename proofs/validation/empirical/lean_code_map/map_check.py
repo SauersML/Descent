@@ -7,7 +7,7 @@ other guard in `proofs/validation/`.  The correspondence also rots on every
 commit to either side, which is what makes it a guard rather than a one-off
 audit.
 
-Six checks, all at budget 0, all of which genuinely fail:
+Nine checks, all at budget 0, all of which genuinely fail:
 
   CORPUS-MISSING   a mapped Lean declaration is not in the corpus
   CORPUS-STALE     a mapped Lean body changed since the mapping was verified
@@ -16,6 +16,20 @@ Six checks, all at budget 0, all of which genuinely fail:
   REFPOINT         the transcription disagrees with a value the corpus proves
   EXPECTED-STALE   expected.json is not what lean_bodies.py computes today
   GUARD-SURFACE    a numerical guard appeared in mapped code with no entry
+  DEGENERATE-REFERENCE  a reference evaluation in a mapped module states a value
+                   at a point where its body is zero, so it pins nothing
+  CODE-PATH        an instrument names its subject by path arithmetic and that
+                   path does not resolve
+
+The last two exist because two separate instruments were found today measuring
+nothing while looking healthy: `extract/` counted `..`s to locate the corpus,
+resolved one directory too high, parsed zero definitions and exited 0; and this
+directory's own contract crate reached the implementation through a `#[path]`
+one level short, so the required CI step failed to build and executed nothing.
+Two independent instances make it a category. Anything here that names its
+subject by position rather than by name is checked for resolving at all, and the
+Lean side of the table is derived from resolved declaration names through
+`extract/api.py` rather than from any path this file computes.
 
 STALE is deliberately not the same finding as "wrong".  A changed body means the
 correspondence is unverified, and the repair is to re-read the two sides and
@@ -35,12 +49,14 @@ import argparse
 import json
 import math
 import pathlib
+import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "extract"))
 
+import degenerate  # noqa: E402
 import lean_bodies  # noqa: E402
 import rustsrc  # noqa: E402
 
@@ -59,6 +75,8 @@ BUDGETS = {
     "REFPOINT": 0,
     "EXPECTED-STALE": 0,
     "GUARD-SURFACE": 0,
+    "DEGENERATE-REFERENCE": 0,
+    "CODE-PATH": 0,
 }
 
 
@@ -133,7 +151,66 @@ def load_sources():
         "code_text": code_text,
         "fixtures": json.loads(FIXTURES_PATH.read_text()),
         "expected": json.loads(EXPECTED_PATH.read_text()),
+        "reference_points": degenerate.scan(),
+        "mapped_lean_files": mapped_lean_files(table),
+        "include_paths": include_paths(root),
     }
+
+
+def mapped_lean_files(table):
+    """The corpus files this table takes responsibility for.
+
+    Derived from the mapped declaration NAMES through `extract/api.py`, not from
+    any path this file computes. That is the point: both of today's
+    "instrument silently measured nothing" bugs -- extract/ counting `..`s to
+    find the corpus, and correctability_calculator's `#[path]` counting one too
+    few -- came from an instrument naming the corpus by arithmetic on its own
+    location. Lean has no such failure mode: `import Calibrator` resolves
+    through the module system and an absent corpus is a compile error, not an
+    empty result. Deriving the scope from resolved declaration names inherits
+    that immunity.
+    """
+    import api
+
+    files = set()
+    definitions = api.definition_table()
+    for entry in table["entries"]:
+        lean = entry.get("lean")
+        if lean is None:
+            continue
+        row = definitions.get(lean["name"])
+        if row is not None:
+            files.add(row["file"])
+    return files
+
+
+_RUST_PATH_ATTRIBUTE = re.compile(r'#\[path\s*=\s*"([^"]+)"\]')
+
+
+def include_paths(root):
+    """[(source file, declared path, resolved path, exists)] for every `#[path]`
+    under proofs/validation/, and every `include_str!` in the contract crate.
+
+    A `#[path]` is path arithmetic relative to the file holding it, which is
+    exactly the construct that made the required "Executable correctability
+    contract" step fail to compile -- and therefore execute nothing -- for as
+    long as it had existed. Checking that each one resolves, and resolves to a
+    file the correspondence table actually maps, closes that off.
+    """
+    rows = []
+    for source in sorted((root / "proofs" / "validation").rglob("*.rs")):
+        text = source.read_text()
+        for match in _RUST_PATH_ATTRIBUTE.finditer(text):
+            declared = match.group(1)
+            resolved = (source.parent / declared).resolve()
+            rows.append((str(source.relative_to(root)), declared,
+                         str(resolved), resolved.is_file()))
+        for match in re.finditer(r'include_str!\("([^"]+)"\)', text):
+            declared = match.group(1)
+            resolved = (source.parent / declared).resolve()
+            rows.append((str(source.relative_to(root)), declared,
+                         str(resolved), resolved.is_file()))
+    return rows
 
 
 def findings(sources):
@@ -199,6 +276,41 @@ def findings(sources):
         if not math.isclose(got, expected, rel_tol=1e-12, abs_tol=1e-12):
             out.append(("REFPOINT", theorem,
                         f"transcription gives {got!r} where the corpus proves {expected!r}"))
+
+    # CATEGORY D. A reference evaluation states a VALUE on the reasoning that a
+    # value pins a body where an inequality would not. That holds only where the
+    # value depends on the part of the body under test, and this corpus shipped
+    # two that did not: at `m = n` the spike collapses to zero and every
+    # constant satisfies the theorem. `Calibrator.scale_competitor_ne_iff`
+    # proves the test is exactly whether the body is nonzero there, so this is
+    # mechanical rather than a matter of taste.
+    #
+    # Gated at budget 0 over the modules this table takes responsibility for.
+    # The corpus-wide census is reported alongside it: 25 degenerate reference
+    # evaluations live outside this scope, in modules other lanes own, and
+    # pinning a budget to that count to make the check pass is exactly the move
+    # this project forbids.
+    mapped_files = sources["mapped_lean_files"]
+    readable = 0
+    for theorem, verdict, detail, source_file in sources["reference_points"]:
+        if verdict != "UNREADABLE":
+            readable += 1
+        if verdict == "DEGENERATE" and source_file in mapped_files:
+            out.append(("DEGENERATE-REFERENCE", theorem, detail))
+    if sources["reference_points"] and readable == 0:
+        out.append(("DEGENERATE-REFERENCE", "(the census itself)",
+                    "no reference evaluation anywhere could be read, so this check "
+                    "has no evidence and must not report success"))
+
+    # CATEGORY A. Every `#[path]` and `include_str!` in the validation tier is
+    # path arithmetic relative to its own file, and a wrong one degrades to
+    # "found nothing" or to a build error that reads as infrastructure noise.
+    for source, declared, resolved, exists in sources["include_paths"]:
+        if not exists:
+            out.append(("CODE-PATH", f"{source} -> {declared}",
+                        f"resolves to {resolved}, which does not exist; an instrument "
+                        f"that cannot find what it measures must not be able to look "
+                        f"like a passing check"))
 
     fixtures = sources["fixtures"]
     expected_rows = sources["expected"]
@@ -305,6 +417,26 @@ def main(argv=None):
         print(f"  {kind:<16} {len(rows):>3}, budget {budget}   {status}")
         for subject, detail in rows:
             print(f"      {subject}: {detail}")
+
+    census = {}
+    for _, verdict, _, _ in sources["reference_points"]:
+        census[verdict] = census.get(verdict, 0) + 1
+    outside = [(name, source_file)
+               for name, verdict, _, source_file in sources["reference_points"]
+               if verdict == "DEGENERATE" and source_file not in sources["mapped_lean_files"]]
+    print()
+    print("DIAGNOSTIC (not gated here): corpus-wide reference-evaluation census")
+    print(f"  scanned {len(sources['reference_points'])}  "
+          f"live={census.get('LIVE', 0)}  degenerate={census.get('DEGENERATE', 0)}  "
+          f"unreadable={census.get('UNREADABLE', 0)}")
+    print(f"  {len(outside)} degenerate reference evaluations lie outside the modules")
+    print("  this table owns. Each states a value at a point where its body is zero,")
+    print("  so it rejects no rescaling of that body -- the defect that let a 4 -> 2")
+    print("  spike constant pass every reference point in its own arc. They are")
+    print("  reported, not gated: a budget pinned to their current count would record")
+    print("  how much drift was tolerated rather than forbid it.")
+    for name, source_file in outside:
+        print(f"      {source_file}  {name}")
 
     print()
     if failed:

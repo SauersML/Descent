@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Calibrator.ReferenceEvaluation
 import Mathlib.Data.Real.Sqrt
 
 namespace Calibrator
@@ -89,6 +90,35 @@ theorem demographicSpike_at_reference_point :
     demographicSpike 4 1 1 = 3 := by
   norm_num [demographicSpike, effectiveSubgroupSize]
 
+/-- **The reference point above, carrying the competitor it rejects.**
+
+Moving the evaluation off `m = n` repairs one theorem.  This term is the
+obligation that stops the defect recurring: `ReferenceEvaluation.ofScale`
+cannot be applied unless the body is nonzero at the point, and
+`scale_competitor_ne_iff` proves that nonzeroness is exactly what it takes to
+separate `demographicSpike` from a wrong constant factor.  The competitor
+carried here is the halved constant -- the error that was actually live. -/
+noncomputable def demographicSpike_referenceEvaluation :
+    ReferenceEvaluation (ℝ × ℝ × ℝ) :=
+  ReferenceEvaluation.ofScale
+    (fun p ↦ demographicSpike p.1 p.2.1 p.2.2) (4, 1, 1) 2 (by norm_num)
+    (by norm_num [demographicSpike, effectiveSubgroupSize])
+
+theorem demographicSpike_referenceEvaluation_value :
+    demographicSpike_referenceEvaluation.value = 3 := by
+  show demographicSpike 4 1 1 = 3
+  exact demographicSpike_at_reference_point
+
+/-- **The old reference point pinned nothing, stated as a theorem rather than as
+a warning in a docstring.**  At `n = m = 1` the spike vanishes, so the
+halved-constant competitor agrees with the body exactly and the value `0` that
+the corpus used to state there separates them not at all. -/
+theorem demographicSpike_old_reference_point_discriminates_nothing :
+    2 * demographicSpike 1 1 1 = demographicSpike 1 1 1 :=
+  scale_competitor_eq_of_body_eq_zero
+    (fun p : ℝ × ℝ × ℝ ↦ demographicSpike p.1 p.2.1 p.2.2) (1, 1, 1)
+    (by norm_num [demographicSpike, effectiveSubgroupSize]) 2
+
 
 
 /-- BBP-style proxy threshold for `n` individuals and `M` effectively
@@ -156,6 +186,40 @@ theorem pcCorrectabilityMargin_at_reference_point :
   unfold pcCorrectabilityMargin bbpProxyThreshold demographicSpike effectiveSubgroupSize
   norm_num [hsqrt]
 
+/-- `√4 = 2`, used by both the margin reference point and its competitor. -/
+private theorem sqrt_four : Real.sqrt 4 = 2 := by
+  rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 2)]
 
+/-- **The margin reference point, carrying the competitor it rejects.**
+
+The competitor here is deliberately not a rescaling of the whole margin.  A
+rescaled margin would be rejected by any nonzero value and would therefore say
+nothing about which half of the difference is right.  What is carried instead is
+the margin computed with the *halved spike constant* -- the error class that was
+actually live -- which at this point gives `2 * 3 - 2 = 4` against the body's
+`3 - 2 = 1`.  At the old point `n = M = F = m = 1` the same competitor gives
+`0 - 1 = -1`, exactly the value the corpus stated, so it was rejected by
+nothing. -/
+noncomputable def pcCorrectabilityMargin_referenceEvaluation :
+    ReferenceEvaluation (ℝ × ℝ × ℝ × ℝ) where
+  point := (4, 1, 1, 1)
+  body := fun p ↦ pcCorrectabilityMargin p.1 p.2.1 p.2.2.1 p.2.2.2
+  value := 1
+  competitor := fun p ↦
+    2 * demographicSpike p.1 p.2.2.1 p.2.2.2 - bbpProxyThreshold p.1 p.2.1
+  evaluates := pcCorrectabilityMargin_at_reference_point
+  discriminates := by
+    show 2 * demographicSpike 4 1 1 - bbpProxyThreshold 4 1 ≠ 1
+    unfold bbpProxyThreshold demographicSpike effectiveSubgroupSize
+    norm_num [sqrt_four]
+
+/-- **The old margin reference point pinned nothing about the spike.**  At
+`n = M = F = m = 1` the halved-constant competitor reproduces the stated value
+`-1` exactly, because the spike term it differs in has collapsed to zero. -/
+theorem pcCorrectabilityMargin_old_reference_point_discriminates_nothing :
+    2 * demographicSpike 1 1 1 - bbpProxyThreshold 1 1 =
+      pcCorrectabilityMargin 1 1 1 1 := by
+  unfold pcCorrectabilityMargin bbpProxyThreshold demographicSpike effectiveSubgroupSize
+  norm_num
 
 end Calibrator

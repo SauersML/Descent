@@ -129,7 +129,57 @@ def main():
     finally:
         lean_bodies.demographicSpike = original
 
-    # 7. An empty corpus must be an error, never a silent pass. A check that
+    # 7. DEGENERATE-REFERENCE: a reference evaluation in a mapped module that
+    #    states a value where its body is zero. This is the category the arc
+    #    actually shipped -- `demographicSpike 1 1 1 = 0` at `m = n` -- and the
+    #    planted row reproduces it inside the scope the table owns.
+    mutated = copy.deepcopy(clean)
+    owned = sorted(mutated["mapped_lean_files"])[0]
+    mutated["reference_points"].append(
+        ("Calibrator.plantedBody_at_reference_point", "DEGENERATE",
+         "planted: body is 0 at its own reference point", owned))
+    result = map_check.findings(mutated)
+    expect("DEGENERATE-REFERENCE" in kinds(result),
+           f"a vacuous reference evaluation in a mapped module is "
+           f"DEGENERATE-REFERENCE (got {kinds(result)})")
+
+    #    ... and one OUTSIDE the mapped modules must not be gated here, or this
+    #    lane would start failing on 25 theorems other lanes own.
+    mutated = copy.deepcopy(clean)
+    mutated["reference_points"].append(
+        ("Calibrator.elsewhere_at_reference_point", "DEGENERATE",
+         "planted: outside the mapped modules",
+         "Calibrator/SomeOtherModule.lean"))
+    result = map_check.findings(mutated)
+    expect("DEGENERATE-REFERENCE" not in kinds(result),
+           f"a vacuous reference evaluation outside the mapped modules is "
+           f"reported but not gated here (got {kinds(result)})")
+
+    # 8. CODE-PATH: an instrument naming its subject by path arithmetic, with
+    #    the path one level short. This is the `#[path]` defect verbatim: the
+    #    required contract step could not compile and executed nothing.
+    mutated = copy.deepcopy(clean)
+    mutated["include_paths"].append(
+        ("proofs/validation/empirical/correctability_calculator/lib.rs",
+         "../../../map/correctability.rs",
+         "/nonexistent/proofs/map/correctability.rs", False))
+    result = map_check.findings(mutated)
+    expect("CODE-PATH" in kinds(result),
+           f"a #[path] that does not resolve is CODE-PATH (got {kinds(result)})")
+
+    # 9. A census that read nothing must not pass. Same standard as the empty
+    #    corpus below: the failure mode is looking healthy while measuring
+    #    nothing, and it is the state the extraction tier was actually in.
+    mutated = copy.deepcopy(clean)
+    mutated["reference_points"] = [
+        (name, "UNREADABLE", "planted", source_file)
+        for name, _, _, source_file in mutated["reference_points"]]
+    result = map_check.findings(mutated)
+    expect("DEGENERATE-REFERENCE" in kinds(result),
+           f"a reference-evaluation census that reads nothing is a finding "
+           f"(got {kinds(result)})")
+
+    # 10. An empty corpus must be an error, never a silent pass. A check that
     #    cannot report its own absence reports someone else's answer as its own.
     print()
     print("CALIBRATION: an unreadable corpus must not pass")
