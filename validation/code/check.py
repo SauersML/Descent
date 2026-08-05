@@ -229,7 +229,7 @@ def corpus_capitalized_identifiers() -> frozenset:
 # that reintroduces a copyright holder, still fails.
 STYLE_LICENSE_HEADER = (
     "/-\n"
-    "Released under the GNU Affero General Public License v3.0 as described in the file LICENSE.\n"
+    "Released under AGPL-3.0-or-later as described in the file LICENSE.\n"
     "-/\n"
 )
 

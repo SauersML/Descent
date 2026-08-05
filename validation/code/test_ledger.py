@@ -145,7 +145,7 @@ def test_emitter_gate() -> None:
 # ---------------------------------------------------------------------------
 
 CLEAN_DEF = '''/-
-Released under the GNU Affero General Public License v3.0 as described in the file LICENSE.
+Released under AGPL-3.0-or-later as described in the file LICENSE.
 -/
 namespace Descent
 
