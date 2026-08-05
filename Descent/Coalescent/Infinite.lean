@@ -125,19 +125,9 @@ theorem restrictInf_ofCompatible (ξ : ∀ n, ER n)
   have hy : (y : ℕ) < n := y.isLt
   have h := rel_indep (ξ := ξ) hcomp (i := (x : ℕ)) (j := (y : ℕ))
     (M := max (x : ℕ) (y : ℕ) + 1) (N := n) (by omega) (by omega) hx hy
-  rw [h]
-  constructor
-  · intro hr
-    have : (⟨(x : ℕ), hx⟩ : Fin n) = x := Fin.ext rfl
-    rw [this] at hr
-    have hy' : (⟨(y : ℕ), hy⟩ : Fin n) = y := Fin.ext rfl
-    rw [hy'] at hr
-    exact hr
-  · intro hr
-    have hx' : (⟨(x : ℕ), hx⟩ : Fin n) = x := Fin.ext rfl
-    have hy' : (⟨(y : ℕ), hy⟩ : Fin n) = y := Fin.ext rfl
-    rw [hx', hy']
-    exact hr
+  have hx' : (⟨(x : ℕ), hx⟩ : Fin n) = x := Fin.ext rfl
+  have hy' : (⟨(y : ℕ), hy⟩ : Fin n) = y := Fin.ext rfl
+  rw [h, hx', hy']
 
 /-- **Uniqueness: nothing else restricts to the family.**  Two relations on `ℕ` with the same
 restrictions are equal, because any pair of naturals is inside some initial segment.  With

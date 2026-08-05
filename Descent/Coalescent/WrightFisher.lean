@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Rates
 import Descent.PopGen.PopulationGeneticsFoundations
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+import Mathlib.Probability.Distributions.Uniform
 import Mathlib.Combinatorics.Enumerative.DoubleCounting
 import Mathlib.Tactic
 
@@ -192,7 +193,6 @@ theorem noCoalescenceProb_two {N : ℕ} (hN : 0 < N) :
   rw [hdesc]
   push_cast [hcast]
   field_simp
-  ring
 
 /-- The no-collision probability as a product of per-lineage survival factors: the `i`-th
 lineage to be placed avoids the `i` parents already used with probability `1 - i/N`. -/
@@ -228,33 +228,35 @@ probability is `q_{ξη} N⁻¹ + O(N⁻²)` with `q` the coalescent generator, 
 is here an explicit `(d_k/N)²/2` rather than an asymptotic gesture. -/
 
 /-- Weierstrass's product inequality, the first Bonferroni bound. -/
-theorem one_sub_sum_le_prod {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i) (h1 : ∀ i, a i ≤ 1) :
+theorem one_sub_sum_le_prod {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i) (h1 : ∀ i < k, a i ≤ 1) :
     1 - ∑ i ∈ range k, a i ≤ ∏ i ∈ range k, (1 - a i) := by
   induction k with
   | zero => simp
   | succ m ih =>
+      have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
-      have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m]
+      have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m (by omega)]
       have hmul : (1 - ∑ i ∈ range m, a i) * (1 - a m)
           ≤ (∏ i ∈ range m, (1 - a i)) * (1 - a m) :=
-        mul_le_mul_of_nonneg_right ih hfac
+        mul_le_mul_of_nonneg_right ihm hfac
       rw [sum_range_succ, prod_range_succ]
       nlinarith [h0 m, hnn]
 
 /-- The second Bonferroni bound: the product exceeds its linear approximation by at most the
 square of the total. -/
 theorem prod_le_one_sub_sum_add_sq {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i)
-    (h1 : ∀ i, a i ≤ 1) :
+    (h1 : ∀ i < k, a i ≤ 1) :
     ∏ i ∈ range k, (1 - a i)
       ≤ 1 - ∑ i ∈ range k, a i + (∑ i ∈ range k, a i) ^ 2 / 2 := by
   induction k with
   | zero => simp
   | succ m ih =>
+      have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
-      have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m]
+      have hfac : (0 : ℝ) ≤ 1 - a m := by linarith [h1 m (by omega)]
       have hmul : (∏ i ∈ range m, (1 - a i)) * (1 - a m)
           ≤ (1 - ∑ i ∈ range m, a i + (∑ i ∈ range m, a i) ^ 2 / 2) * (1 - a m) :=
-        mul_le_mul_of_nonneg_right ih hfac
+        mul_le_mul_of_nonneg_right ihm hfac
       rw [sum_range_succ, prod_range_succ]
       nlinarith [h0 m, hnn]
 
@@ -280,13 +282,11 @@ theorem coalescenceProb_le {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     1 - noCoalescenceProb N k ≤ deathRate k / (N : ℝ) := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
   have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i => by positivity
-  have h1 : ∀ i : ℕ, (i : ℝ) / (N : ℝ) ≤ 1 := by
-    intro i
-    rcases le_or_lt (i : ℝ) (N : ℝ) with h | h
-    · rw [div_le_one hN']
-      exact h
-    · rw [div_le_one hN']
-      linarith
+  have h1 : ∀ i < k, (i : ℝ) / (N : ℝ) ≤ 1 := by
+    intro i hi
+    rw [div_le_one hN']
+    have : i ≤ N := le_trans (le_of_lt hi) hkN
+    exact_mod_cast this
   have := one_sub_sum_le_prod (k := k) (fun i => (i : ℝ) / (N : ℝ)) h0 h1
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith
@@ -298,13 +298,11 @@ theorem le_coalescenceProb {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
     deathRate k / (N : ℝ) - (deathRate k / (N : ℝ)) ^ 2 / 2 ≤ 1 - noCoalescenceProb N k := by
   have hN' : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
   have h0 : ∀ i : ℕ, (0 : ℝ) ≤ (i : ℝ) / (N : ℝ) := fun i => by positivity
-  have h1 : ∀ i : ℕ, (i : ℝ) / (N : ℝ) ≤ 1 := by
-    intro i
-    rcases le_or_lt (i : ℝ) (N : ℝ) with h | h
-    · rw [div_le_one hN']
-      exact h
-    · rw [div_le_one hN']
-      linarith
+  have h1 : ∀ i < k, (i : ℝ) / (N : ℝ) ≤ 1 := by
+    intro i hi
+    rw [div_le_one hN']
+    have : i ≤ N := le_trans (le_of_lt hi) hkN
+    exact_mod_cast this
   have := prod_le_one_sub_sum_add_sq (k := k) (fun i => (i : ℝ) / (N : ℝ)) h0 h1
   rw [noCoalescenceProb_eq_prod hN hkN, sum_range_div_eq_deathRate] at *
   linarith

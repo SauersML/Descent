@@ -97,7 +97,7 @@ theorem norm_prodUpTo_sub_le {M : Type*} [NormedRing M] [NormOneClass M] (A B : 
       have hsplit : prodUpTo A (m + 1) - prodUpTo B (m + 1)
           = prodUpTo A m * (A m - B m) + (prodUpTo A m - prodUpTo B m) * B m := by
         rw [prodUpTo_succ, prodUpTo_succ]
-        ring
+        noncomm_ring
       have h1 : ‖prodUpTo A m * (A m - B m)‖ ≤ ‖A m - B m‖ := by
         calc ‖prodUpTo A m * (A m - B m)‖ ≤ ‖prodUpTo A m‖ * ‖A m - B m‖ := norm_mul_le _ _
           _ ≤ 1 * ‖A m - B m‖ := by
