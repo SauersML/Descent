@@ -574,9 +574,29 @@ def ident_result_kind(args: str) -> str:
 
 
 def ident_lean_files():
-    return (glob.glob(os.path.join(IDENT_ROOT, "Descent", "*.lean")) +
-            glob.glob(os.path.join(IDENT_ROOT, "Descent", "*", "*.lean")) +
-            [os.path.join(IDENT_ROOT, "Descent.lean")])
+    """Every corpus file, at any depth, plus the root module.
+
+    THIS USED TO GLOB EXACTLY TWO LEVELS -- `Descent/*.lean` and
+    `Descent/*/*.lean` -- and the corpus has since grown a third. Splitting
+    `PortabilityDrift.lean` into `PortabilityDrift/` and
+    `PopulationGeneticsFoundations.lean` into its own directory moved 54 ledgered
+    declarations to depths this walk could not see, and the guard reported them
+    as "no longer a `def`" in files they had merely moved out of; repointing the
+    ledger at the new paths then produced "module is not in the corpus", because
+    it was not, to this function. `PCCorrectability/Threshold.lean` had been
+    reporting the same thing for far longer, and was written off as a known
+    pre-existing failure rather than read as the depth bug it was.
+
+    The two-level glob was deliberate about one thing and it is preserved: the
+    root `Descent.lean` is a SIBLING of `Descent/`, not a child, so no walk of
+    that directory reaches it and it is still added by name. The warning above
+    against "a single recursive glob" is about that sibling, not about depth.
+    `lean_sources` recurses and drops AppleDouble files, dotfiles and the
+    lakefile, which is what the hand-rolled globs did not do.
+    """
+    root = Path(IDENT_ROOT)
+    return [str(p) for p in lean_sources(root / "Descent")] + \
+           [os.path.join(IDENT_ROOT, "Descent.lean")]
 
 def run_identifications() -> int:
     bad = []
