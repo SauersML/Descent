@@ -212,7 +212,15 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H‚ÇÄ : ‚Ñù) (hH : 0 < H‚Ç
     loci, and `Ne` -- has not been done, and until it is, the results here are
     conditional on the assumption rather than evidence for it.
 
-    Empirical status: UNTESTED, and NOT MEASURABLE in this form. The
+    Empirical status: **MIXED** -- VALIDATED at `s_correction = 0` (the
+    Wright-Fisher measurement recorded at the end of this docstring), and NOT
+    MEASURABLE for general `s_correction`. Both halves are stated below and
+    neither supersedes the other; they are joined here because a reader, and
+    every scanner, takes the FIRST marker in a docstring as the verdict, and
+    either half alone misreports this definition -- `UNTESTED` hides a
+    measurement that exists, `VALIDATED` hides that it covers one slice.
+
+    Why the general form is not measurable. The
     paragraph above is the reason: `s_correction` has no operational definition,
     so a simulation cannot set it without inventing one, and whatever the
     simulation then measures is a property of the invention rather than of this
@@ -237,7 +245,7 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H‚ÇÄ : ‚Ñù) (hH : 0 < H‚Ç
     parameter is unpinned, so the category is one definition rather than the
     class it first appeared to be.
 
-    Empirical status: **VALIDATED at `s_correction = 0`**
+    The validated half, in full. **VALIDATED at `s_correction = 0`**
     (`simcov/battery_bulk47.py`, `group_a`). An explicit Wright-Fisher forward
     simulation over 3000 replicate populations and 400 loci; the observable is
     the realised heterozygosity ratio `H_t/H_0`, which IS the drift factor.
@@ -286,8 +294,6 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ‚Ñï) (s_correction : ‚
     definition's signature or body records that. It is written down here because
     an inheritance of that kind is invisible otherwise: a reader checking this
     definition alone finds nothing wrong with it, which is the whole difficulty.
-
-    Empirical status: UNTESTED.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'factor', 'frequency', 'fst', and the formula alone does not fix which is meant.

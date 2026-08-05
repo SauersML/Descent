@@ -7015,8 +7015,19 @@ theorem splitMigration_more_migration_less_fst
     `demoSteppingStoneFst`, and the coalescent derivation decides against the
     exponential.
 
-    Empirical status: **FALSIFIED** in its distance dependence
-    (`proofs/validation/empirical/simcov/battery_bulk11.py`). The body says
+    Empirical status: **MIXED** -- the saturating body above is the MEASURED
+    form, better than the linear one it replaced on the same runs and with no
+    free parameter (`simcov/battery_bulk17.py`, head-to-head table below); and it
+    is APPROXIMATE, since `K` still drifts 15% across the swept separations, so
+    the true `d`-dependence is not pinned. The falsification recorded next
+    belongs to the SUPERSEDED linear body, not to the one defined above.
+
+    A leading marker describing a body that no longer exists is read as the
+    current verdict by every scanner and by any reader who stops at the first
+    status line, which is why it is stated here rather than left below.
+
+    The superseded body: **FALSIFIED** in its distance dependence
+    (`proofs/validation/empirical/simcov/battery_bulk11.py`). That body said
     `F_ST` grows LINEARLY in the separation `d`, capped at one. Measured on a
     20-deme 1D stepping stone, `Ne = 500`, `m = 0.01`, interior demes only so no
     boundary reflection enters, `F_ST` read from coalescence times so no
