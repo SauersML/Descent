@@ -64,8 +64,24 @@ any set of blocks onto one, and `blocks_mergeSet` says `|S|` blocks become one -
 coalescents as well as Kingman's, and `Descent.Blindness.MultipleMergerBlindness`, which had
 the rates but no state space, has one.
 
-Still absent, and not claimed: `Ξ`-coalescents (Schweinsberg 2000, simultaneous multiple
-mergers), the ancestral recombination graph, and every model with selection.
+`Coalescent.Xi` goes one further, to Schweinsberg's simultaneous multiple mergers
+(Electron. J. Probab. 5, 2000), and finds the general shape of a coalescent move on the way:
+every merger is an IDEMPOTENT MAP on blocks, and the block count afterwards is `|range f|`
+(`blocks_mergeIdem`).  `merge` and `mergeSet` are then literally instances.
+
+`Coalescent.Recombination` adds Hudson's ancestral recombination graph (Theor. Popul. Biol.
+23, 1983) at the level of its competing rates, with the pairwise `1/(1+ρ)`.
+`Coalescent.Structured` adds Notohara's structured coalescent (J. Math. Biol. 29, 1990) and
+Strobeck's invariance: within-deme coalescence time is `2` whatever the migration rate, so
+`F_ST = 1/(1+2M)` has to be built from the DIFFERENCE of the two times.
+
+Kingman's coalescent is now simultaneously the `Λ = δ₀` fibre, the identity-map fibre, and
+the `ρ = 0` fibre -- three generalisations, each recovering the base development exactly.
+
+Still absent, and not claimed: the `Ξ` measure on the infinite simplex and the rates it
+assigns (only the state-space half of Schweinsberg is here); the Beta-coalescent as an
+explicit `Λ`; seed banks; and every model with selection, which is not a neutral genealogy at
+all and which K-G section 4 explicitly excludes.
 
 ## Verification status
 
