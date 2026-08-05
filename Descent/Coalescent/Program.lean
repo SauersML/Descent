@@ -10,6 +10,7 @@ import Descent.Coalescent.Law
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
 import Descent.Coalescent.CompetingRates
+import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -66,7 +67,10 @@ proof is Kingman's restaurant: `Extend` gives the fibre of restriction over `ξ`
 `λ_c` for joining class `c`.  Listed here because it was open, and left listed because the
 record of what a group had to build to close something is worth more than a tick.
 
-**3. K-C Theorem 2, the paintbox representation.**  Every exchangeable random equivalence
+**3. K-C Theorem 2, the paintbox representation.**  One half is settled:
+`Coalescent.PaintboxFrequency.tendsto_colourFrequency` is K-C (3.8) FOR A PAINTBOX -- the
+asymptotic class frequencies exist and are the `x_r` the box was built from, by the strong
+law.  The half that is Theorem 2, and is untouched:  Every exchangeable random equivalence
 relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the
 construction equivariant, which is the direction that needs no probability.  The converse is
 a de Finetti theorem proved through a reversed martingale convergence argument (K-C cites
