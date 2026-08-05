@@ -69,10 +69,9 @@ theorem blocks_quotientRelation {n : ℕ} {ξ η : ER n} (h : ξ ≤ η) :
   classical
   unfold quotientRelation blocks
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _)]
-  refine Nat.card_congr (Equiv.setCongr ?_)
-  ext q
-  simp only [Set.mem_range, Set.mem_univ, iff_true]
-  exact blockMap_surjective h q
+  have hrange : Set.range (blockMap h) = Set.univ :=
+    Set.range_eq_univ.mpr (blockMap_surjective h)
+  rw [Nat.card_congr (Equiv.setCongr hrange), Nat.card_congr (Equiv.Set.univ _)]
 
 /-- **`ξ/ξ` is `Δ`.**  The post-`s` process starts at the discrete relation on the blocks
 present at time `s`, which is K-C (4.10)'s reason for calling it an `n`-coalescent with `n`

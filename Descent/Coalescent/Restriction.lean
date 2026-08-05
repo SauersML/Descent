@@ -52,7 +52,9 @@ theorem restrict_restrict {l m n : ℕ} (h1 : l ≤ m) (h2 : m ≤ n) (ξ : ER n
 
 /-- Restriction preserves coarsening, so it carries a coalescent path to a path. -/
 theorem restrict_mono {m n : ℕ} (h : m ≤ n) {ξ η : ER n} (hle : ξ ≤ η) :
-    restrict h ξ ≤ restrict h η := fun hxy => hle hxy
+    restrict h ξ ≤ restrict h η := by
+  intro x y hxy
+  exact hle hxy
 
 /-- Restricting the starting state gives the starting state. -/
 theorem restrict_bot {m n : ℕ} (h : m ≤ n) : restrict h (Delta n) = Delta m := by
@@ -81,7 +83,9 @@ theorem blocks_restrict_le {m n : ℕ} (h : m ≤ n) (ξ : ER n) :
     | _ x =>
         induction q using Quotient.inductionOn with
         | _ y =>
-            exact Quotient.sound (Quotient.exact hpq)
+            have h1 : Quotient.mk ξ (Fin.castLE h x) = Quotient.mk ξ (Fin.castLE h y) := hpq
+            have h2 : ξ.r (Fin.castLE h x) (Fin.castLE h y) := Quotient.exact h1
+            exact Quotient.sound h2
   unfold blocks
   rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
   exact Fintype.card_le_of_injective _ hinj

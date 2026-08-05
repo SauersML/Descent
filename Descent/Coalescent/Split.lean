@@ -129,7 +129,8 @@ theorem blocks_splitBy {n : ℕ} (η : ER n) (S : Finset (Fin n)) {a : Fin n}
       {(Quotient.mk η a, true)} : Set _)
       = Nat.card ({p : Quotient η × Bool | p.2 = false} : Set _) + 1 := by
     classical
-    rw [Set.union_singleton, Nat.card_insert_of_not_mem hnotmem]
+    rw [Set.union_singleton, Set.Nat.card_coe_set_eq, Set.Nat.card_coe_set_eq,
+      Set.ncard_insert_of_not_mem hnotmem (Set.toFinite _)]
   unfold blocks splitBy
   rw [Nat.card_congr (Setoid.quotientKerEquivRange _), hequiv, hunion, hfalse]
 
@@ -196,24 +197,33 @@ theorem splitBy_compl {n : ℕ} (η : ER n) (S : Finset (Fin n)) (a : Fin n)
     (hSa : ∀ x ∈ S, η.r x a) :
     splitBy η S = splitBy η ((Finset.univ.filter fun z => η.r z a) \ S) := by
   classical
-  refine (splitBy_eq_iff η S _).mpr ?_
-  intro x y hxy
-  by_cases hx : η.r x a
-  · have hy : η.r y a := η.iseqv.trans (η.iseqv.symm hxy) hx
-    have hmx : (x ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ x ∉ S := by
-      simp [Finset.mem_sdiff, hx]
-    have hmy : (y ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ y ∉ S := by
-      simp [Finset.mem_sdiff, hy]
-    rw [hmx, hmy]
-    tauto
-  · have hy : ¬ η.r y a := fun h => hx (η.iseqv.trans hxy h)
-    have hxS : x ∉ S := fun h => hx (hSa x h)
-    have hyS : y ∉ S := fun h => hy (hSa y h)
-    have hmx : x ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
-      simp [Finset.mem_sdiff, hx]
-    have hmy : y ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
-      simp [Finset.mem_sdiff, hy]
-    simp [hxS, hyS, hmx, hmy]
+  have key : ∀ x y : Fin n, η.r x y →
+      ((x ∈ S ↔ y ∈ S) ↔ (x ∈ (Finset.univ.filter fun z => η.r z a) \ S
+        ↔ y ∈ (Finset.univ.filter fun z => η.r z a) \ S)) := by
+    intro x y hxy
+    by_cases hx : η.r x a
+    · have hy : η.r y a := η.iseqv.trans (η.iseqv.symm hxy) hx
+      have hmx : (x ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ x ∉ S := by
+        simp [Finset.mem_sdiff, hx]
+      have hmy : (y ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ y ∉ S := by
+        simp [Finset.mem_sdiff, hy]
+      rw [hmx, hmy]
+      tauto
+    · have hy : ¬ η.r y a := fun h => hx (η.iseqv.trans hxy h)
+      have hxS : x ∉ S := fun h => hx (hSa x h)
+      have hyS : y ∉ S := fun h => hy (hSa y h)
+      have hmx : x ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+        simp [Finset.mem_sdiff, hx]
+      have hmy : y ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+        simp [Finset.mem_sdiff, hy]
+      simp [hxS, hyS, hmx, hmy]
+  refine Setoid.ext fun x y => ?_
+  rw [splitBy_rel_iff, splitBy_rel_iff]
+  constructor
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, (key x y h1).mp h2⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, (key x y h1).mpr h2⟩
 
 /-- A state other than `Δ` relates two distinct elements -- the class that can be cut. -/
 theorem exists_rel_ne_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
@@ -223,9 +233,8 @@ theorem exists_rel_ne_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
   refine h (Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩)
   · by_contra hne
     exact hcon x y hne hxy
-  · show x = y at hxy
-    subst hxy
-    exact ξ.iseqv.refl x
+  · have hxy' : x = y := hxy
+    rw [hxy']
 
 /-- **Every state except `Δ` has something below it.**  If `ξ` is not the starting state then
 some class of it has two elements, and cutting one off gives a state `ξ ≺` covers.
@@ -241,8 +250,7 @@ theorem exists_covers_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
   have hSa : ∀ z ∈ ({x} : Finset (Fin n)), ξ.r z x := by
     intro z hz
     rw [Finset.mem_singleton] at hz
-    subst hz
-    exact ξ.iseqv.refl x
+    rw [hz]
   have hSne : ∃ z, z ∈ ({x} : Finset (Fin n)) := ⟨x, Finset.mem_singleton_self x⟩
   have hSproper : ∃ z, ξ.r z x ∧ z ∉ ({x} : Finset (Fin n)) := by
     refine ⟨y, ξ.iseqv.symm hrel, ?_⟩
