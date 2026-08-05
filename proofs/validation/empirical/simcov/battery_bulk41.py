@@ -47,7 +47,7 @@ import os
 
 import numpy as np
 
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
 
 FRESH_TOKEN = "SIMCOV-BATTERY41-MERLIN-20260804"
 
@@ -479,8 +479,7 @@ def main():
             print("*** %s RAISED %r" % (label, e))
             import traceback
             traceback.print_exc()
-    json.dump(RESULTS, open("battery_bulk41_results.json", "w"), indent=1,
-              default=str)
+    dump_results("battery_bulk41_results.json")
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {}) or {}

@@ -1,0 +1,581 @@
+[
+ {
+  "name": "fstFromGenerations",
+  "file": "PortabilityDrift.lean",
+  "source": "fstFromTau (coalescentTau t Ne) = (t/(2Ne)) / (1 + t/(2Ne))",
+  "note": "",
+  "regime": "clean two-population split, no migration, equal sizes, sequence 8 Mb with recombination 1e-8; F_ST is pairwise Hudson, ratio of averages",
+  "span": 0.861111111111111,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=2000 t=500 (tau=0.12)",
+   "lean": 0.1111111111111111,
+   "truth": 0.11707779033331907,
+   "sem": 0.0026403898863998267,
+   "sems_off": 2.2597720332672284,
+   "rel_err": 0.05096337405430098
+  },
+  "cells": [
+   {
+    "design": "Ne=1000 t=500 (tau=0.25)",
+    "lean": 0.2,
+    "truth": 0.19851373854110568,
+    "sem": 0.005110898932451835,
+    "sems_off": 0.29080235757691425,
+    "rel_err": 0.007486945084088334
+   },
+   {
+    "design": "Ne=1000 t=2000 (tau=1.00)",
+    "lean": 0.5,
+    "truth": 0.5009466313444961,
+    "sem": 0.00769719871660137,
+    "sems_off": 0.12298387755722462,
+    "rel_err": 0.0018896850188521185
+   },
+   {
+    "design": "Ne=2000 t=500 (tau=0.12)",
+    "lean": 0.1111111111111111,
+    "truth": 0.11707779033331907,
+    "sem": 0.0026403898863998267,
+    "sems_off": 2.2597720332672284,
+    "rel_err": 0.05096337405430098
+   },
+   {
+    "design": "Ne=500 t=2000 (tau=2.00)",
+    "lean": 0.6666666666666666,
+    "truth": 0.6660704903715202,
+    "sem": 0.006237522620487183,
+    "sems_off": 0.0955790193350588,
+    "rel_err": 0.0008950648674044641
+   },
+   {
+    "design": "Ne=1000 t=8000 (tau=4.00)",
+    "lean": 0.8,
+    "truth": 0.8006542294083131,
+    "sem": 0.003173172915818158,
+    "sems_off": 0.20617515202267897,
+    "rel_err": 0.0008171185316744465
+   }
+  ]
+ },
+ {
+  "name": "coalescentTau",
+  "file": "PortabilityDrift.lean",
+  "source": "t / (2 * Ne)",
+  "note": "",
+  "regime": "clean two-population split, no migration, equal sizes, sequence 8 Mb with recombination 1e-8; F_ST is pairwise Hudson, ratio of averages; read as F_ST/(1-F_ST), the odds the saturation law inverts to, so the DIVISOR is what is on trial",
+  "span": 0.96875,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=2000 t=500 (tau=0.12)",
+   "lean": 0.125,
+   "truth": 0.13260261102449564,
+   "sem": 0.0033870622425367326,
+   "sems_off": 2.2446032815746775,
+   "rel_err": 0.057333795811088585
+  },
+  "cells": [
+   {
+    "design": "Ne=1000 t=500 (tau=0.25)",
+    "lean": 0.25,
+    "truth": 0.2476820228705652,
+    "sem": 0.007956189675817123,
+    "sems_off": 0.2913426179971925,
+    "rel_err": 0.009358681355110435
+   },
+   {
+    "design": "Ne=1000 t=2000 (tau=1.00)",
+    "lean": 1.0,
+    "truth": 1.0037937078635355,
+    "sem": 0.030905709339371285,
+    "sems_off": 0.1227510367704984,
+    "rel_err": 0.0037793700377042514
+   },
+   {
+    "design": "Ne=2000 t=500 (tau=0.12)",
+    "lean": 0.125,
+    "truth": 0.13260261102449564,
+    "sem": 0.0033870622425367326,
+    "sems_off": 2.2446032815746775,
+    "rel_err": 0.057333795811088585
+   },
+   {
+    "design": "Ne=500 t=2000 (tau=2.00)",
+    "lean": 2.0,
+    "truth": 1.9946439927174175,
+    "sem": 0.055937433219552336,
+    "sems_off": 0.09574996517198643,
+    "rel_err": 0.00268519460221353
+   },
+   {
+    "design": "Ne=1000 t=8000 (tau=4.00)",
+    "lean": 4.0,
+    "truth": 4.0164094128099945,
+    "sem": 0.07985087637494002,
+    "sems_off": 0.20550072278410675,
+    "rel_err": 0.004085592658372453
+   }
+  ]
+ },
+ {
+  "name": "hudsonFstFromCoalescenceTimes",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - ETss / ETst",
+  "note": "prediction is the branch-mode coalescence-time reading; truth is the site-frequency estimator -- two engines, not one",
+  "regime": "clean two-population split, no migration, equal sizes, sequence 8 Mb with recombination 1e-8; F_ST is pairwise Hudson, ratio of averages",
+  "span": 0.855351871784441,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=2000 t=500 (tau=0.12)",
+   "lean": 0.11570745238253966,
+   "truth": 0.11707779033331907,
+   "sem": 0.0037218771477966358,
+   "sems_off": 0.368184627370266,
+   "rel_err": 0.011704508146917337
+  },
+  "cells": [
+   {
+    "design": "Ne=1000 t=500 (tau=0.25)",
+    "lean": 0.19622256989561787,
+    "truth": 0.19851373854110568,
+    "sem": 0.007112392693280145,
+    "sems_off": 0.32213753434235004,
+    "rel_err": 0.011541612496574823
+   },
+   {
+    "design": "Ne=1000 t=2000 (tau=1.00)",
+    "lean": 0.4980910919445569,
+    "truth": 0.5009466313444961,
+    "sem": 0.010569767547411454,
+    "sems_off": 0.27016104064072205,
+    "rel_err": 0.005700286659828808
+   },
+   {
+    "design": "Ne=2000 t=500 (tau=0.12)",
+    "lean": 0.11570745238253966,
+    "truth": 0.11707779033331907,
+    "sem": 0.0037218771477966358,
+    "sems_off": 0.368184627370266,
+    "rel_err": 0.011704508146917337
+   },
+   {
+    "design": "Ne=500 t=2000 (tau=2.00)",
+    "lean": 0.664525147002595,
+    "truth": 0.6660704903715202,
+    "sem": 0.008752574568086794,
+    "sems_off": 0.17655872074026716,
+    "rel_err": 0.002320089827224203
+   },
+   {
+    "design": "Ne=1000 t=8000 (tau=4.00)",
+    "lean": 0.7999236064092649,
+    "truth": 0.8006542294083131,
+    "sem": 0.004473312549494121,
+    "sems_off": 0.1633292981351978,
+    "rel_err": 0.0009125324918200715
+   }
+  ]
+ },
+ {
+  "name": "hetMutationFloor",
+  "file": "PortabilityDrift.lean",
+  "source": "4 * Ne * mu / (1 + 4 * Ne * mu)",
+  "note": "the positive control 'theta=4*Ne*mu=1.0 [Ewens E(K), independent]' missed by inf sems on the same code path, so this design cannot support any verdict",
+  "regime": "single-locus INFINITE-ALLELES mutation at coalescent equilibrium, Ne = 1000, 100 sampled chromosomes; heterozygosity is 1 - sum p_i^2 over the whole sample, not conditioned on polymorphism",
+  "span": 0.8999999999999999,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "theta=4*Ne*mu=10.0",
+   "lean": 0.9090909090909091,
+   "truth": 0.196952861952862,
+   "sem": 0.03403471279609271,
+   "sems_off": 20.923874145922063,
+   "rel_err": 3.6157791264210606
+  },
+  "cells": [
+   {
+    "design": "theta=4*Ne*mu=0.1",
+    "lean": 0.09090909090909091,
+    "truth": 0.10984848484848488,
+    "sem": 0.029874638075942817,
+    "sems_off": 0.6339622890576643,
+    "rel_err": 0.17241379310344845
+   },
+   {
+    "design": "theta=4*Ne*mu=0.5",
+    "lean": 0.3333333333333333,
+    "truth": 0.2028451178451179,
+    "sem": 0.0354678931680569,
+    "sems_off": 3.6790517798710334,
+    "rel_err": 0.6432898995767278
+   },
+   {
+    "design": "theta=4*Ne*mu=1.0",
+    "lean": 0.5,
+    "truth": 0.18426767676767683,
+    "sem": 0.0368869498176206,
+    "sems_off": 8.55945869185151,
+    "rel_err": 1.7134438810470045
+   },
+   {
+    "design": "theta=4*Ne*mu=3.0",
+    "lean": 0.75,
+    "truth": 0.22934343434343438,
+    "sem": 0.03652549464117329,
+    "sems_off": 14.254606837539075,
+    "rel_err": 2.27020480070469
+   },
+   {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 0.9090909090909091,
+    "truth": 0.196952861952862,
+    "sem": 0.03403471279609271,
+    "sems_off": 20.923874145922063,
+    "rel_err": 3.6157791264210606
+   }
+  ]
+ },
+ {
+  "name": "[control] Ewens expected allele count on the same samples",
+  "file": "PortabilityDrift.lean",
+  "source": "sum_i theta/(theta+i-1)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "same infinite-alleles samples; an independent classical result, carried so the engine itself is on trial too",
+  "span": 0.938527647856863,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "theta=4*Ne*mu=0.5",
+   "lean": 3.2843421893016345,
+   "truth": 2.0,
+   "sem": 0.0,
+   "sems_off": Infinity,
+   "rel_err": 0.6421710946508172
+  },
+  "cells": [
+   {
+    "design": "theta=4*Ne*mu=0.1",
+    "lean": 1.5024921305128602,
+    "truth": 1.625,
+    "sem": 0.10094660663590604,
+    "sems_off": 1.2135907641650683,
+    "rel_err": 0.07538945814593216
+   },
+   {
+    "design": "theta=4*Ne*mu=0.5",
+    "lean": 3.2843421893016345,
+    "truth": 2.0,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 0.6421710946508172
+   },
+   {
+    "design": "theta=4*Ne*mu=1.0",
+    "lean": 5.187377517639621,
+    "truth": 2.0,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 1.5936887588198103
+   },
+   {
+    "design": "theta=4*Ne*mu=3.0",
+    "lean": 11.121247287921772,
+    "truth": 2.0,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 4.560623643960886
+   },
+   {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 24.441754351848147,
+    "truth": 2.0,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 11.220877175924073
+   }
+  ]
+ },
+ {
+  "name": "ibdRecurrenceFixedPoint / fstIslandMultiplicativeEquilibrium",
+  "file": "PortabilityDrift.lean",
+  "source": "(1-m)^2 / ((1-m)^2 + 2*Ne*m*(2-m))",
+  "note": "",
+  "regime": "symmetric island model, 40 demes so the many-deme limit the body declares actually holds; m is the TOTAL emigration rate, so each of the 39 sources gets m/39; F_ST between two demes from coalescence times, 8 Mb with recombination",
+  "span": 0.9695870622868975,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 m=0.060 (4Nm=24.0)",
+   "lean": 0.036567398897515264,
+   "truth": 0.040842025543834856,
+   "sem": 0.0028065452061407188,
+   "sems_off": 1.5230920339236695,
+   "rel_err": 0.10466245465058358
+  },
+  "cells": [
+   {
+    "design": "Ne=100 m=0.002 (4Nm=0.8)",
+    "lean": 0.5548138261724016,
+    "truth": 0.5334457342189456,
+    "sem": 0.0236454140645786,
+    "sems_off": 0.9036886347220255,
+    "rel_err": 0.04005673039028515
+   },
+   {
+    "design": "Ne=100 m=0.010 (4Nm=4.0)",
+    "lean": 0.19759682264470474,
+    "truth": 0.2060398829140567,
+    "sem": 0.010773635915308062,
+    "sems_off": 0.783677890706829,
+    "rel_err": 0.040977795900193396
+   },
+   {
+    "design": "Ne=100 m=0.030 (4Nm=12.0)",
+    "lean": 0.07373304390756139,
+    "truth": 0.07509906328411427,
+    "sem": 0.004313712727790503,
+    "sems_off": 0.31666906508458237,
+    "rel_err": 0.0181895661119629
+   },
+   {
+    "design": "Ne=100 m=0.060 (4Nm=24.0)",
+    "lean": 0.036567398897515264,
+    "truth": 0.040842025543834856,
+    "sem": 0.0028065452061407188,
+    "sems_off": 1.5230920339236695,
+    "rel_err": 0.10466245465058358
+   },
+   {
+    "design": "Ne=100 m=0.120 (4Nm=48.0)",
+    "lean": 0.01687351833774927,
+    "truth": 0.019207805196463035,
+    "sem": 0.0018828181144015053,
+    "sems_off": 1.2397835143283442,
+    "rel_err": 0.12152803690156151
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationDriftEquilibrium [diffusion form, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m)",
+  "note": "",
+  "regime": "symmetric island model, 40 demes so the many-deme limit the body declares actually holds; m is the TOTAL emigration rate, so each of the 39 sources gets m/39; F_ST between two demes from coalescence times, 8 Mb with recombination",
+  "span": 0.963265306122449,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 m=0.002 (4Nm=0.8)",
+   "lean": 0.5555555555555556,
+   "truth": 0.5334457342189456,
+   "sem": 0.0236454140645786,
+   "sems_off": 0.9350574820227419,
+   "rel_err": 0.04144717994414651
+  },
+  "cells": [
+   {
+    "design": "Ne=100 m=0.002 (4Nm=0.8)",
+    "lean": 0.5555555555555556,
+    "truth": 0.5334457342189456,
+    "sem": 0.0236454140645786,
+    "sems_off": 0.9350574820227419,
+    "rel_err": 0.04144717994414651
+   },
+   {
+    "design": "Ne=100 m=0.010 (4Nm=4.0)",
+    "lean": 0.2,
+    "truth": 0.2060398829140567,
+    "sem": 0.010773635915308062,
+    "sems_off": 0.5606169506317481,
+    "rel_err": 0.02931414456576857
+   },
+   {
+    "design": "Ne=100 m=0.030 (4Nm=12.0)",
+    "lean": 0.07692307692307693,
+    "truth": 0.07509906328411427,
+    "sem": 0.004313712727790503,
+    "sems_off": 0.42284077639470563,
+    "rel_err": 0.024288101065416273
+   },
+   {
+    "design": "Ne=100 m=0.060 (4Nm=24.0)",
+    "lean": 0.04,
+    "truth": 0.040842025543834856,
+    "sem": 0.0028065452061407188,
+    "sems_off": 0.30002208480109427,
+    "rel_err": 0.020616645051826032
+   },
+   {
+    "design": "Ne=100 m=0.120 (4Nm=48.0)",
+    "lean": 0.02040816326530612,
+    "truth": 0.019207805196463035,
+    "sem": 0.0018828181144015053,
+    "sems_off": 0.6375326749098364,
+    "rel_err": 0.062493244624540575
+   }
+  ]
+ },
+ {
+  "name": "admixtureLDDecay",
+  "file": "PortabilityDrift.lean",
+  "source": "(1 - r) ^ generations_since",
+  "note": "",
+  "regime": "one-pulse 50/50 admixture into a Wright-Fisher population of Ne = 2000, then 40 generations of recombination and drift; the observable is E[D_t]/E[D_0] over 400 replicates",
+  "span": 0.9984204760292524,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.050 t=40",
+   "lean": 0.12851215656510312,
+   "truth": 0.1162955607638889,
+   "sem": 0.006769501613391325,
+   "sems_off": 1.8046521736618737,
+   "rel_err": 0.10504782573788156
+  },
+  "cells": [
+   {
+    "design": "r=0.005 t=10",
+    "lean": 0.9511101304657719,
+    "truth": 0.9579744756944444,
+    "sem": 0.006279980670714204,
+    "sems_off": 1.093051967609298,
+    "rel_err": 0.007165478207231454
+   },
+   {
+    "design": "r=0.005 t=40",
+    "lean": 0.8183201210226743,
+    "truth": 0.8168245347222222,
+    "sem": 0.011796275880918427,
+    "sems_off": 0.12678461537775246,
+    "rel_err": 0.0018309762217912633
+   },
+   {
+    "design": "r=0.020 t=10",
+    "lean": 0.8170728068875467,
+    "truth": 0.8215751753472225,
+    "sem": 0.00569082530150397,
+    "sems_off": 0.7911626558780308,
+    "rel_err": 0.005480166142767081
+   },
+   {
+    "design": "r=0.020 t=40",
+    "lean": 0.44570040395095073,
+    "truth": 0.44985846701388893,
+    "sem": 0.008989137890949591,
+    "sems_off": 0.4625652774916941,
+    "rel_err": 0.009243047242255916
+   },
+   {
+    "design": "r=0.050 t=10",
+    "lean": 0.5987369392383787,
+    "truth": 0.6041457309027778,
+    "sem": 0.005355219708566526,
+    "sems_off": 1.0100036896239555,
+    "rel_err": 0.008952792989725728
+   },
+   {
+    "design": "r=0.050 t=40",
+    "lean": 0.12851215656510312,
+    "truth": 0.1162955607638889,
+    "sem": 0.006769501613391325,
+    "sems_off": 1.8046521736618737,
+    "rel_err": 0.10504782573788156
+   },
+   {
+    "design": "r=0.150 t=10",
+    "lean": 0.1968744043407226,
+    "truth": 0.19273188541666667,
+    "sem": 0.004155287154152473,
+    "sems_off": 0.9969272327945408,
+    "rel_err": 0.02149368753955903
+   },
+   {
+    "design": "r=0.150 t=40",
+    "lean": 0.001502301249891433,
+    "truth": 0.0048219826388888705,
+    "sem": 0.004219068344390362,
+    "sems_off": 0.7868280667724328,
+    "rel_err": 0.6884473955224342
+   }
+  ]
+ },
+ {
+  "name": "admixtureLDBoost",
+  "file": "PortabilityDrift.lean",
+  "source": "admixtureLDDecay r t_since / equilibrium_ld",
+  "note": "",
+  "regime": "one-pulse 50/50 admixture into a Wright-Fisher population of Ne = 2000, then 40 generations of recombination and drift; the observable is E[D_t]/E[D_0] over 400 replicates; equilibrium_ld held at 0.25",
+  "span": 0.9984204760292524,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.050 t=40 eq=0.25",
+   "lean": 0.5140486262604125,
+   "truth": 0.4651822430555556,
+   "sem": 0.0270780064535653,
+   "sems_off": 1.8046521736618737,
+   "rel_err": 0.10504782573788156
+  },
+  "cells": [
+   {
+    "design": "r=0.005 t=10 eq=0.25",
+    "lean": 3.8044405218630875,
+    "truth": 3.8318979027777775,
+    "sem": 0.025119922682856816,
+    "sems_off": 1.093051967609298,
+    "rel_err": 0.007165478207231454
+   },
+   {
+    "design": "r=0.005 t=40 eq=0.25",
+    "lean": 3.273280484090697,
+    "truth": 3.2672981388888886,
+    "sem": 0.04718510352367371,
+    "sems_off": 0.12678461537775246,
+    "rel_err": 0.0018309762217912633
+   },
+   {
+    "design": "r=0.020 t=10 eq=0.25",
+    "lean": 3.2682912275501868,
+    "truth": 3.28630070138889,
+    "sem": 0.02276330120601588,
+    "sems_off": 0.7911626558780308,
+    "rel_err": 0.005480166142767081
+   },
+   {
+    "design": "r=0.020 t=40 eq=0.25",
+    "lean": 1.782801615803803,
+    "truth": 1.7994338680555557,
+    "sem": 0.035956551563798365,
+    "sems_off": 0.4625652774916941,
+    "rel_err": 0.009243047242255916
+   },
+   {
+    "design": "r=0.050 t=10 eq=0.25",
+    "lean": 2.3949477569535147,
+    "truth": 2.416582923611111,
+    "sem": 0.021420878834266105,
+    "sems_off": 1.0100036896239555,
+    "rel_err": 0.008952792989725728
+   },
+   {
+    "design": "r=0.050 t=40 eq=0.25",
+    "lean": 0.5140486262604125,
+    "truth": 0.4651822430555556,
+    "sem": 0.0270780064535653,
+    "sems_off": 1.8046521736618737,
+    "rel_err": 0.10504782573788156
+   },
+   {
+    "design": "r=0.150 t=10 eq=0.25",
+    "lean": 0.7874976173628904,
+    "truth": 0.7709275416666667,
+    "sem": 0.01662114861660989,
+    "sems_off": 0.9969272327945408,
+    "rel_err": 0.02149368753955903
+   },
+   {
+    "design": "r=0.150 t=40 eq=0.25",
+    "lean": 0.006009204999565732,
+    "truth": 0.019287930555555482,
+    "sem": 0.016876273377561448,
+    "sems_off": 0.7868280667724328,
+    "rel_err": 0.6884473955224342
+   }
+  ]
+ }
+]

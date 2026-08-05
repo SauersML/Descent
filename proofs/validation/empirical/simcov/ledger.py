@@ -70,35 +70,44 @@ def split_name(raw: str) -> tuple[str, str]:
     return head.split(".")[-1], raw[len(head):].strip()
 
 
-def freshness_of(directory: str, battery: str) -> tuple[str, str | None]:
+def freshness_of(directory: str, battery: str,
+                 recorded_sha: str | None) -> tuple[str, str | None]:
     """(freshness, source sha256) for one battery.
 
-    Two independent routes, because the self-reported one only exists for
-    batteries written after the requirement and the ledger has to say something
-    true about the other fifty-eight:
+    THE ONLY TRUSTWORTHY SIGNAL IS A RECORDED HASH, and this function used to
+    trust mtime instead. That was wrong, and the way it went wrong is worth
+    keeping: fetching `battery_bulk20.py` a moment after its results file --
+    an ordinary copy, changing nothing -- inverted the two timestamps and the
+    ledger declared twelve batteries STALE that were not. Neither `tar`, nor
+    `git`, nor a file transfer preserves the relative order of two mtimes, and
+    the repository is now the source of truth precisely BECAUSE files move
+    between machines. A freshness test that a copy can flip is not a freshness
+    test.
 
-      SELF-REPORTED. A battery prints `FRESHNESS=OK` only when its own source
-      carries a token that exists nowhere else, so its log is evidence about
-      WHICH source produced the numbers.
+    So the rule is evidentiary rather than heuristic:
 
-      MTIME. If the results file is OLDER than the battery source, the numbers
-      on disk were produced by a source that no longer exists. That is
-      computable for every battery ever written, needs no re-run, and is the
-      condition that actually matters -- a stale result read as a fresh one is
-      how this harness reported someone else's answer as its own.
+      STALE      the results file records the SHA of the source that produced
+                 it and that SHA is not the source's. Proof of staleness.
+      OK         the recorded SHA matches, or the battery's own log carries the
+                 `FRESHNESS=OK` token it prints only when its source contains a
+                 string that exists nowhere else.
+      UNVERIFIED no recorded hash and no token. Absence of evidence, reported
+                 as such and NOT gated on -- most batteries predate the
+                 requirement, and calling them stale on no evidence would be
+                 the same error in the other direction.
 
-    STALE beats OK: a battery whose source has been edited since the run is
-    stale however cheerfully its old log reported otherwise.
+    `battery_core.dump_results` writes the hash. Batteries that dump `RESULTS`
+    by hand do not, which is why UNVERIFIED exists and why it should shrink.
     """
     src = os.path.join(directory, "battery_%s.py" % battery)
-    res = os.path.join(directory, "battery_%s_results.json" % battery)
     sha = None
     if os.path.exists(src):
         import hashlib
         sha = hashlib.sha256(open(src, "rb").read()).hexdigest()[:16]
-        if os.path.exists(res) and os.path.getmtime(res) < os.path.getmtime(src):
-            return "STALE (source newer than results)", sha
-    self_reported = None
+    if recorded_sha and sha and recorded_sha != sha:
+        return "STALE (recorded source hash does not match the source)", sha
+    if recorded_sha and sha and recorded_sha == sha:
+        return "OK (recorded source hash matches)", sha
     for cand in ("%s.log" % battery, "b%s.log" % battery.replace("bulk", "")):
         path = os.path.join(directory, cand)
         if os.path.exists(path):
@@ -106,12 +115,10 @@ def freshness_of(directory: str, battery: str) -> tuple[str, str | None]:
             if "FRESHNESS=STALE" in txt:
                 return "STALE (self-reported)", sha
             if "FRESHNESS=OK" in txt:
-                self_reported = "OK (self-reported token)"
-    if self_reported:
-        return self_reported, sha
+                return "OK (self-reported token)", sha
     if sha is None:
         return "STALE (battery source absent)", None
-    return "OK (results not older than source)", sha
+    return "UNVERIFIED (no recorded source hash)", sha
 
 
 def build(directory: str) -> dict:
@@ -124,7 +131,8 @@ def build(directory: str) -> dict:
         except Exception as exc:                       # noqa: BLE001
             records.append(dict(battery=battery, unreadable=str(exc)))
             continue
-        fresh, sha = freshness_of(directory, battery)
+        recorded = (rows.get("_battery_sha") if isinstance(rows, dict) else None)
+        fresh, sha = freshness_of(directory, battery, recorded)
         if isinstance(rows, dict) and "results" not in rows:
             # A results file that is a dict of raw arrays, not a list of
             # `record()` outputs. `battery_correct.py` is one: it produces real

@@ -25,7 +25,7 @@ import math
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
 
 SEQ = 4e6
 RHO = 1e-8
@@ -99,8 +99,7 @@ def main():
     record("fstMigrationDriftEquilibrium [diffusion form, competing]",
            "PortabilityDrift.lean", "1 / (1 + 4*Ne*m)", cells_diff,
            regime=reg, control=control)
-    json.dump(RESULTS, open("battery_bulk40_results.json", "w"), indent=1,
-              default=str)
+    dump_results("battery_bulk40_results.json")
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {})

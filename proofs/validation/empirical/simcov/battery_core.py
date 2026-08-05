@@ -25,9 +25,39 @@ import simlib
 RESULTS = []
 
 
+def dump_results(path, battery_source=None):
+    """Write `RESULTS` with the SHA of the source that produced it.
+
+    Every battery used to end with `json.dump(RESULTS, open(...))`, and the
+    ledger then had no way to tell whether the numbers on disk came from the
+    battery beside them. It fell back on comparing mtimes, which any file copy
+    inverts: fetching one file a moment after the other flipped twelve
+    batteries to STALE without changing a byte. A hash recorded AT RUN TIME
+    cannot be flipped by moving the files, which is the whole point, because
+    the repository is the source of truth precisely because files move.
+
+    `battery_source` defaults to the calling module's own file.
+    """
+    import hashlib
+    import inspect
+    if battery_source is None:
+        frame = inspect.stack()[1]
+        battery_source = frame.filename
+    try:
+        sha = hashlib.sha256(
+            open(battery_source, "rb").read()).hexdigest()[:16]
+    except OSError:
+        sha = None
+    with open(path, "w") as fh:
+        json.dump({"_battery_sha": sha, "results": RESULTS}, fh, indent=1,
+                  default=str)
+    return sha
+
+
 def record(name, lean_file, source, cells, note="", regime="",
            control=None, sem_source="replicates", selected_from=1,
-           oracle_independent=True, argument_source=None):
+           oracle_independent=True, argument_source=None,
+           realised_inputs=None):
     """Classify through `verdict.classify`, so the gates actually gate.
 
     The gates were written after twelve batteries and calibrated against the
@@ -36,6 +66,22 @@ def record(name, lean_file, source, cells, note="", regime="",
     self-test in `causalPortabilityFromLocalFst` -- where the oracle WAS the
     formula -- was reported as NO POWER rather than as the SELF-TEST it is. A
     guard nothing calls is a guard that does not exist.
+
+    `realised_inputs` is the same idea applied to the trap that has produced the
+    most false FALSIFICATIONS in this harness: evaluating a prediction at the
+    NOMINAL parameter that generated the data rather than at the value the
+    sample actually realised. With `m = 400` effect vectors a nominal genetic
+    correlation is off by O(1/sqrt(m)) ~ 5%, and at `n = 200000` that is
+    hundreds of sems -- exactly the size of a spurious finding.
+    `battery_bulk22` reported `ancestryRecalibratedR2` FALSIFIED at 353 sems on
+    that alone, and the definition is fine.
+
+    So a FALSIFIED verdict now requires the declaration. Undeclared, it is a
+    LEAD: the disagreement is real arithmetic but the design has not said
+    whether it is comparing against what the sample did or against what it was
+    asked to do, and those differ by the size of the finding. MATCH is left
+    alone, because the nominal/realised gap manufactures disagreement and never
+    agreement.
 
     `argument_source` is passed through to the oracle-identity gate, and the
     passthrough is the point: `verdict.classify` grew the parameter and this
@@ -51,6 +97,20 @@ def record(name, lean_file, source, cells, note="", regime="",
         cells, control=control, sem_source=sem_source,
         selected_from=selected_from, oracle_independent=oracle_independent,
         name=name, argument_source=argument_source)
+    if v.startswith("FALSIFIED"):
+        if realised_inputs is None:
+            v = "LEAD (undeclared input provenance)"
+            gate_note = ("; ".join(x for x in (gate_note, (
+                "a falsification requires `realised_inputs=True/False`: the "
+                "nominal parameter that generated the data and the value the "
+                "sample realised differ by O(1/sqrt(m)), which is the size of "
+                "this finding")) if x))
+        elif realised_inputs is False:
+            v = "LEAD (nominal inputs)"
+            gate_note = ("; ".join(x for x in (gate_note, (
+                "declared `realised_inputs=False`: the prediction is evaluated "
+                "at the nominal parameter, so the disagreement may be the "
+                "nominal/realised gap rather than the definition")) if x))
     full_note = "; ".join(x for x in (note, gate_note) if x)
     preds = [c["lean"] for c in cells]
     span = (max(preds) - min(preds)) / max(abs(max(preds)), 1e-12)

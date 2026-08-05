@@ -1,46 +1,15 @@
-[
- {
-  "name": "ancestryRecalibratedR2",
-  "file": "AncestryCalibration.lean",
-  "source": "r2Source * rhoSq  [equal heritability, realised rhoSq]",
-  "note": "",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.639138773452451,
-  "verdict": "MATCH",
-  "worst": {
-   "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
-   "lean": 0.40210308035016573,
-   "truth": 0.40537335196865926,
-   "sem": 0.0013979523804720955,
-   "sems_off": 2.339329768435416,
-   "rel_err": 0.008067307835139497
-  },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
-    "lean": 0.39775238971290244,
-    "truth": 0.39645909291364195,
-    "sem": 0.001377421115880986,
-    "sems_off": 0.9389262182417681,
-    "rel_err": 0.003262119150189855
-   },
-   {
-    "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
-    "lean": 0.2495774464254818,
-    "truth": 0.2505573074128505,
-    "sem": 0.000970043669545953,
-    "sems_off": 1.0101204905829941,
-    "rel_err": 0.003910726043021131
-   },
-   {
-    "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
-    "lean": 0.1451034107737085,
-    "truth": 0.14566325187978366,
-    "sem": 0.0006021151332806714,
-    "sems_off": 0.9297907910482435,
-    "rel_err": 0.0038433928863347957
-   },
-   {
+{
+ "_battery_sha": "ffc2306e818ba845",
+ "results": [
+  {
+   "name": "ancestryRecalibratedR2",
+   "file": "AncestryCalibration.lean",
+   "source": "r2Source * rhoSq  [equal heritability, realised rhoSq]",
+   "note": "",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.639138773452451,
+   "verdict": "MATCH",
+   "worst": {
     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
     "lean": 0.40210308035016573,
     "truth": 0.40537335196865926,
@@ -48,50 +17,58 @@
     "sems_off": 2.339329768435416,
     "rel_err": 0.008067307835139497
    },
-   {
-    "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
-    "lean": 0.2681885393011083,
-    "truth": 0.26650401965781234,
-    "sem": 0.0010207458684748849,
-    "sems_off": 1.6502830874180654,
-    "rel_err": 0.0063208038867814025
-   }
-  ]
- },
- {
-  "name": "ancestryRecalibratedR2 [nominal rho, the battery-22 reading, competing]",
-  "file": "AncestryCalibration.lean",
-  "source": "r2Source * rhoSq  [NOMINAL rhoSq]",
-  "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.6920882100848172,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
-   "lean": 0.12448067908507478,
-   "truth": 0.14566325187978366,
-   "sem": 0.0006021151332806714,
-   "sems_off": 35.18026972564861,
-   "rel_err": 0.14542152891239118
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
+     "lean": 0.39775238971290244,
+     "truth": 0.39645909291364195,
+     "sem": 0.001377421115880986,
+     "sems_off": 0.9389262182417681,
+     "rel_err": 0.003262119150189855
+    },
+    {
+     "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
+     "lean": 0.2495774464254818,
+     "truth": 0.2505573074128505,
+     "sem": 0.000970043669545953,
+     "sems_off": 1.0101204905829941,
+     "rel_err": 0.003910726043021131
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
+     "lean": 0.1451034107737085,
+     "truth": 0.14566325187978366,
+     "sem": 0.0006021151332806714,
+     "sems_off": 0.9297907910482435,
+     "rel_err": 0.0038433928863347957
+    },
+    {
+     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
+     "lean": 0.40210308035016573,
+     "truth": 0.40537335196865926,
+     "sem": 0.0013979523804720955,
+     "sems_off": 2.339329768435416,
+     "rel_err": 0.008067307835139497
+    },
+    {
+     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
+     "lean": 0.2681885393011083,
+     "truth": 0.26650401965781234,
+     "sem": 0.0010207458684748849,
+     "sems_off": 1.6502830874180654,
+     "rel_err": 0.0063208038867814025
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
-    "lean": 0.4042738315391046,
-    "truth": 0.39645909291364195,
-    "sem": 0.001377421115880986,
-    "sems_off": 5.6734563855327815,
-    "rel_err": 0.019711336592209028
-   },
-   {
-    "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
-    "lean": 0.24547787985700295,
-    "truth": 0.2505573074128505,
-    "sem": 0.000970043669545953,
-    "sems_off": 5.23628751499925,
-    "rel_err": 0.02027251812487757
-   },
-   {
+  {
+   "name": "ancestryRecalibratedR2 [nominal rho, the battery-22 reading, competing]",
+   "file": "AncestryCalibration.lean",
+   "source": "r2Source * rhoSq  [NOMINAL rhoSq]",
+   "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.6920882100848172,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
     "lean": 0.12448067908507478,
     "truth": 0.14566325187978366,
@@ -99,101 +76,93 @@
     "sems_off": 35.18026972564861,
     "rel_err": 0.14542152891239118
    },
-   {
-    "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
-    "lean": 0.4032235043347384,
-    "truth": 0.40537335196865926,
-    "sem": 0.0013979523804720955,
-    "sems_off": 1.5378546965919029,
-    "rel_err": 0.0053033768092557165
-   },
-   {
-    "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
-    "lean": 0.245744807864825,
-    "truth": 0.26650401965781234,
-    "sem": 0.0010207458684748849,
-    "sems_off": 20.33729690623589,
-    "rel_err": 0.0778945541596029
-   }
-  ]
- },
- {
-  "name": "ancestryRecalibratedR2 [UNEQUAL heritability, the regime boundary]",
-  "file": "AncestryCalibration.lean",
-  "source": "r2Source * rhoSq",
-  "note": "",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.6938217796337285,
-  "verdict": "MATCH",
-  "worst": {
-   "design": "rho=0.5 alpha=1.0 UNEQUAL h2 (realised rho 0.4871)",
-   "lean": 0.11906125066627662,
-   "truth": 0.11781930643562813,
-   "sem": 0.0004948917729824357,
-   "sems_off": 2.509526927804826,
-   "rel_err": 0.01054109269712129
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
+     "lean": 0.4042738315391046,
+     "truth": 0.39645909291364195,
+     "sem": 0.001377421115880986,
+     "sems_off": 5.6734563855327815,
+     "rel_err": 0.019711336592209028
+    },
+    {
+     "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
+     "lean": 0.24547787985700295,
+     "truth": 0.2505573074128505,
+     "sem": 0.000970043669545953,
+     "sems_off": 5.23628751499925,
+     "rel_err": 0.02027251812487757
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
+     "lean": 0.12448067908507478,
+     "truth": 0.14566325187978366,
+     "sem": 0.0006021151332806714,
+     "sems_off": 35.18026972564861,
+     "rel_err": 0.14542152891239118
+    },
+    {
+     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
+     "lean": 0.4032235043347384,
+     "truth": 0.40537335196865926,
+     "sem": 0.0013979523804720955,
+     "sems_off": 1.5378546965919029,
+     "rel_err": 0.0053033768092557165
+    },
+    {
+     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
+     "lean": 0.245744807864825,
+     "truth": 0.26650401965781234,
+     "sem": 0.0010207458684748849,
+     "sems_off": 20.33729690623589,
+     "rel_err": 0.0778945541596029
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 UNEQUAL h2 (realised rho 0.8817)",
-    "lean": 0.38886257332036017,
-    "truth": 0.38848148666112947,
-    "sem": 0.0013585953682657107,
-    "sems_off": 0.28050048464184707,
-    "rel_err": 0.0009809647880675472
-   },
-   {
+  {
+   "name": "ancestryRecalibratedR2 [UNEQUAL heritability, the regime boundary]",
+   "file": "AncestryCalibration.lean",
+   "source": "r2Source * rhoSq",
+   "note": "",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.6938217796337285,
+   "verdict": "MATCH",
+   "worst": {
     "design": "rho=0.5 alpha=1.0 UNEQUAL h2 (realised rho 0.4871)",
     "lean": 0.11906125066627662,
     "truth": 0.11781930643562813,
     "sem": 0.0004948917729824357,
     "sems_off": 2.509526927804826,
     "rel_err": 0.01054109269712129
-   }
-  ]
- },
- {
-  "name": "effectTurnoverR2Loss",
-  "file": "AncestryCalibration.lean",
-  "source": "r2Source * (1 - rhoSq)  [equal heritability, realised rhoSq]",
-  "note": "",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.7287458094983497,
-  "verdict": "MATCH",
-  "worst": {
-   "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
-   "lean": 0.09570371512481997,
-   "truth": 0.09243344350632643,
-   "sem": 0.0013979523804720955,
-   "sems_off": 2.3393297684354257,
-   "rel_err": 0.035379744543106974
+   },
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 UNEQUAL h2 (realised rho 0.8817)",
+     "lean": 0.38886257332036017,
+     "truth": 0.38848148666112947,
+     "sem": 0.0013585953682657107,
+     "sems_off": 0.28050048464184707,
+     "rel_err": 0.0009809647880675472
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 UNEQUAL h2 (realised rho 0.4871)",
+     "lean": 0.11906125066627662,
+     "truth": 0.11781930643562813,
+     "sem": 0.0004948917729824357,
+     "sems_off": 2.509526927804826,
+     "rel_err": 0.01054109269712129
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
-    "lean": 0.1013511060143872,
-    "truth": 0.10264440281364767,
-    "sem": 0.001377421115880986,
-    "sems_off": 0.938926218241758,
-    "rel_err": 0.012599779080097283
-   },
-   {
-    "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
-    "lean": 0.25139781858881,
-    "truth": 0.2504179576014413,
-    "sem": 0.000970043669545953,
-    "sems_off": 1.0101204905829941,
-    "rel_err": 0.003912902240534232
-   },
-   {
-    "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
-    "lean": 0.35281930556659064,
-    "truth": 0.3522594644605155,
-    "sem": 0.0006021151332806714,
-    "sems_off": 0.9297907910482435,
-    "rel_err": 0.0015892862011033524
-   },
-   {
+  {
+   "name": "effectTurnoverR2Loss",
+   "file": "AncestryCalibration.lean",
+   "source": "r2Source * (1 - rhoSq)  [equal heritability, realised rhoSq]",
+   "note": "",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.7287458094983497,
+   "verdict": "MATCH",
+   "worst": {
     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
     "lean": 0.09570371512481997,
     "truth": 0.09243344350632643,
@@ -201,117 +170,117 @@
     "sems_off": 2.3393297684354257,
     "rel_err": 0.035379744543106974
    },
-   {
-    "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
-    "lean": 0.233331476749555,
-    "truth": 0.23501599639285098,
-    "sem": 0.0010207458684748849,
-    "sems_off": 1.6502830874180654,
-    "rel_err": 0.007167680792587995
-   }
-  ]
- },
- {
-  "name": "ancestryRecalibratedSlope",
-  "file": "AncestryCalibration.lean",
-  "source": "rho * bSource / alpha  [realised rho]",
-  "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.5581974361502771,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
-   "lean": 1.2186160469744425,
-   "truth": 0.7292766492100428,
-   "sem": 0.00230617625587937,
-   "sems_off": 212.18646949333424,
-   "rel_err": 0.6709928232234713
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
+     "lean": 0.1013511060143872,
+     "truth": 0.10264440281364767,
+     "sem": 0.001377421115880986,
+     "sems_off": 0.938926218241758,
+     "rel_err": 0.012599779080097283
+    },
+    {
+     "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
+     "lean": 0.25139781858881,
+     "truth": 0.2504179576014413,
+     "sem": 0.000970043669545953,
+     "sems_off": 1.0101204905829941,
+     "rel_err": 0.003912902240534232
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
+     "lean": 0.35281930556659064,
+     "truth": 0.3522594644605155,
+     "sem": 0.0006021151332806714,
+     "sems_off": 0.9297907910482435,
+     "rel_err": 0.0015892862011033524
+    },
+    {
+     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
+     "lean": 0.09570371512481997,
+     "truth": 0.09243344350632643,
+     "sem": 0.0013979523804720955,
+     "sems_off": 2.3393297684354257,
+     "rel_err": 0.035379744543106974
+    },
+    {
+     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
+     "lean": 0.233331476749555,
+     "truth": 0.23501599639285098,
+     "sem": 0.0010207458684748849,
+     "sems_off": 1.6502830874180654,
+     "rel_err": 0.007167680792587995
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
-    "lean": 0.8905630737519622,
-    "truth": 0.8875757710993253,
-    "sem": 0.0028067620326541194,
-    "sems_off": 1.0643234509667614,
-    "rel_err": 0.0033656874713208188
-   },
-   {
-    "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
-    "lean": 0.7049765951775625,
-    "truth": 0.7085802776173219,
-    "sem": 0.002240728582345165,
-    "sems_off": 1.6082636996524355,
-    "rel_err": 0.005085778638769295
-   },
-   {
-    "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
-    "lean": 0.5383876939017231,
-    "truth": 0.5386154318282863,
-    "sem": 0.0017032525474925343,
-    "sems_off": 0.13370766824827743,
-    "rel_err": 0.0004228210205380252
-   },
-   {
-    "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
-    "lean": 0.559249488998999,
-    "truth": 0.9001941241860022,
-    "sem": 0.0028466647687282343,
-    "sems_off": 119.76985802206785,
-    "rel_err": 0.37874567943364595
-   },
-   {
+  {
+   "name": "ancestryRecalibratedSlope",
+   "file": "AncestryCalibration.lean",
+   "source": "rho * bSource / alpha  [realised rho]",
+   "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.5581974361502771,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
     "lean": 1.2186160469744425,
     "truth": 0.7292766492100428,
     "sem": 0.00230617625587937,
     "sems_off": 212.18646949333424,
     "rel_err": 0.6709928232234713
-   }
-  ]
- },
- {
-  "name": "ancestryRecalibratedSlope [rho*b*alpha reading, competing]",
-  "file": "AncestryCalibration.lean",
-  "source": "rho * bSource * alpha",
-  "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems",
-  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
-  "span": 0.693487682805487,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
-   "lean": 1.434187587439176,
-   "truth": 0.9001941241860022,
-   "sem": 0.0028466647687282343,
-   "sems_off": 187.5856508006522,
-   "rel_err": 0.5931981212786029
+   },
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
+     "lean": 0.8905630737519622,
+     "truth": 0.8875757710993253,
+     "sem": 0.0028067620326541194,
+     "sems_off": 1.0643234509667614,
+     "rel_err": 0.0033656874713208188
+    },
+    {
+     "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
+     "lean": 0.7049765951775625,
+     "truth": 0.7085802776173219,
+     "sem": 0.002240728582345165,
+     "sems_off": 1.6082636996524355,
+     "rel_err": 0.005085778638769295
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
+     "lean": 0.5383876939017231,
+     "truth": 0.5386154318282863,
+     "sem": 0.0017032525474925343,
+     "sems_off": 0.13370766824827743,
+     "rel_err": 0.0004228210205380252
+    },
+    {
+     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
+     "lean": 0.559249488998999,
+     "truth": 0.9001941241860022,
+     "sem": 0.0028466647687282343,
+     "sems_off": 119.76985802206785,
+     "rel_err": 0.37874567943364595
+    },
+    {
+     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
+     "lean": 1.2186160469744425,
+     "truth": 0.7292766492100428,
+     "sem": 0.00230617625587937,
+     "sems_off": 212.18646949333424,
+     "rel_err": 0.6709928232234713
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
-    "lean": 0.8967555697710912,
-    "truth": 0.8875757710993253,
-    "sem": 0.0028067620326541194,
-    "sems_off": 3.2706009861068686,
-    "rel_err": 0.010342552118560033
-   },
-   {
-    "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
-    "lean": 0.7068738770880992,
-    "truth": 0.7085802776173219,
-    "sem": 0.002240728582345165,
-    "sems_off": 0.7615382526324226,
-    "rel_err": 0.0024081964784013177
-   },
-   {
-    "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
-    "lean": 0.5396085473563564,
-    "truth": 0.5386154318282863,
-    "sem": 0.0017032525474925343,
-    "sems_off": 0.5830700382818509,
-    "rel_err": 0.0018438304389071848
-   },
-   {
+  {
+   "name": "ancestryRecalibratedSlope [rho*b*alpha reading, competing]",
+   "file": "AncestryCalibration.lean",
+   "source": "rho * bSource * alpha",
+   "note": "positive control 'rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927) [source-population slope = 1]' passed at 0.33 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population, declared heritability 0.5 held by scaling each population's residual to its own genetic variance -- so no cell clamps a negative residual, which is what made battery 22's alpha = 1.6 cell read a factor of two high. The target effect vector is rho-correlated with the source vector and RESCALED to its norm, so the two populations have equal heritability; the target genotype scale is alpha. Every prediction uses the REALISED correlation between the two drawn effect vectors",
+   "span": 0.693487682805487,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
     "lean": 1.434187587439176,
     "truth": 0.9001941241860022,
@@ -319,50 +288,58 @@
     "sems_off": 187.5856508006522,
     "rel_err": 0.5931981212786029
    },
-   {
-    "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
-    "lean": 0.43959616071759,
-    "truth": 0.7292766492100428,
-    "sem": 0.00230617625587937,
-    "sems_off": 125.61073237743247,
-    "rel_err": 0.39721618511471135
-   }
-  ]
- },
- {
-  "name": "screeningBreakEvenPrevalence",
-  "file": "PGSCalibrationTheory.lean",
-  "source": "(1-spec)*harm / (sens*benefit + (1-spec)*harm)",
-  "note": "",
-  "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
-  "span": 0.40476190476190504,
-  "verdict": "MATCH",
-  "worst": {
-   "design": "sens=0.95 spec=0.70 harm=1.0",
-   "lean": 0.24000000000000005,
-   "truth": 0.2403429376165645,
-   "sem": 0.0005382763911137262,
-   "sems_off": 0.6371032098489313,
-   "rel_err": 0.0014268678745683202
+   "cells": [
+    {
+     "design": "rho=0.9 alpha=1.0 equal h2 (realised rho 0.8927)",
+     "lean": 0.8967555697710912,
+     "truth": 0.8875757710993253,
+     "sem": 0.0028067620326541194,
+     "sems_off": 3.2706009861068686,
+     "rel_err": 0.010342552118560033
+    },
+    {
+     "design": "rho=0.7 alpha=1.0 equal h2 (realised rho 0.7058)",
+     "lean": 0.7068738770880992,
+     "truth": 0.7085802776173219,
+     "sem": 0.002240728582345165,
+     "sems_off": 0.7615382526324226,
+     "rel_err": 0.0024081964784013177
+    },
+    {
+     "design": "rho=0.5 alpha=1.0 equal h2 (realised rho 0.5398)",
+     "lean": 0.5396085473563564,
+     "truth": 0.5386154318282863,
+     "sem": 0.0017032525474925343,
+     "sems_off": 0.5830700382818509,
+     "rel_err": 0.0018438304389071848
+    },
+    {
+     "design": "rho=0.9 alpha=1.6 equal h2 (realised rho 0.8987)",
+     "lean": 1.434187587439176,
+     "truth": 0.9001941241860022,
+     "sem": 0.0028466647687282343,
+     "sems_off": 187.5856508006522,
+     "rel_err": 0.5931981212786029
+    },
+    {
+     "design": "rho=0.7 alpha=0.6 equal h2 (realised rho 0.7313)",
+     "lean": 0.43959616071759,
+     "truth": 0.7292766492100428,
+     "sem": 0.00230617625587937,
+     "sems_off": 125.61073237743247,
+     "rel_err": 0.39721618511471135
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "sens=0.90 spec=0.90 harm=1.5",
-    "lean": 0.14285714285714282,
-    "truth": 0.14281040996878885,
-    "sem": 0.0009956212158541468,
-    "sems_off": 0.04693842157017033,
-    "rel_err": 0.0003272372676766417
-   },
-   {
-    "design": "sens=0.80 spec=0.95 harm=3.0",
-    "lean": 0.15789473684210537,
-    "truth": 0.1579847606050267,
-    "sem": 0.0024125103418169516,
-    "sems_off": 0.03731538943519371,
-    "rel_err": 0.0005698256121449445
-   },
-   {
+  {
+   "name": "screeningBreakEvenPrevalence",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "(1-spec)*harm / (sens*benefit + (1-spec)*harm)",
+   "note": "",
+   "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
+   "span": 0.40476190476190504,
+   "verdict": "MATCH",
+   "worst": {
     "design": "sens=0.95 spec=0.70 harm=1.0",
     "lean": 0.24000000000000005,
     "truth": 0.2403429376165645,
@@ -370,50 +347,50 @@
     "sems_off": 0.6371032098489313,
     "rel_err": 0.0014268678745683202
    },
-   {
-    "design": "sens=0.70 spec=0.99 harm=20.0",
-    "lean": 0.22222222222222238,
-    "truth": 0.22303400362475184,
-    "sem": 0.012205174440088876,
-    "sems_off": 0.06651124951259232,
-    "rel_err": 0.003639720353562159
-   }
-  ]
- },
- {
-  "name": "screeningBreakEvenPrevalence [numerator swapped, competing]",
-  "file": "PGSCalibrationTheory.lean",
-  "source": "sens*benefit / (sens*benefit + (1-spec)*harm)",
-  "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems",
-  "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
-  "span": 0.11333333333333327,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "sens=0.95 spec=0.70 harm=1.0",
-   "lean": 0.76,
-   "truth": 0.2403429376165645,
-   "sem": 0.0005382763911137262,
-   "sems_off": 965.409352820089,
-   "rel_err": 2.1621482517305335
+   "cells": [
+    {
+     "design": "sens=0.90 spec=0.90 harm=1.5",
+     "lean": 0.14285714285714282,
+     "truth": 0.14281040996878885,
+     "sem": 0.0009956212158541468,
+     "sems_off": 0.04693842157017033,
+     "rel_err": 0.0003272372676766417
+    },
+    {
+     "design": "sens=0.80 spec=0.95 harm=3.0",
+     "lean": 0.15789473684210537,
+     "truth": 0.1579847606050267,
+     "sem": 0.0024125103418169516,
+     "sems_off": 0.03731538943519371,
+     "rel_err": 0.0005698256121449445
+    },
+    {
+     "design": "sens=0.95 spec=0.70 harm=1.0",
+     "lean": 0.24000000000000005,
+     "truth": 0.2403429376165645,
+     "sem": 0.0005382763911137262,
+     "sems_off": 0.6371032098489313,
+     "rel_err": 0.0014268678745683202
+    },
+    {
+     "design": "sens=0.70 spec=0.99 harm=20.0",
+     "lean": 0.22222222222222238,
+     "truth": 0.22303400362475184,
+     "sem": 0.012205174440088876,
+     "sems_off": 0.06651124951259232,
+     "rel_err": 0.003639720353562159
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "sens=0.90 spec=0.90 harm=1.5",
-    "lean": 0.8571428571428571,
-    "truth": 0.14281040996878885,
-    "sem": 0.0009956212158541468,
-    "sems_off": 717.4741114382944,
-    "rel_err": 5.00196342360606
-   },
-   {
-    "design": "sens=0.80 spec=0.95 harm=3.0",
-    "lean": 0.8421052631578946,
-    "truth": 0.1579847606050267,
-    "sem": 0.0024125103418169516,
-    "sems_off": 283.572049700575,
-    "rel_err": 4.330294263401889
-   },
-   {
+  {
+   "name": "screeningBreakEvenPrevalence [numerator swapped, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "sens*benefit / (sens*benefit + (1-spec)*harm)",
+   "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
+   "span": 0.11333333333333327,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "sens=0.95 spec=0.70 harm=1.0",
     "lean": 0.76,
     "truth": 0.2403429376165645,
@@ -421,50 +398,50 @@
     "sems_off": 965.409352820089,
     "rel_err": 2.1621482517305335
    },
-   {
-    "design": "sens=0.70 spec=0.99 harm=20.0",
-    "lean": 0.7777777777777776,
-    "truth": 0.22303400362475184,
-    "sem": 0.012205174440088876,
-    "sems_off": 45.451523603867976,
-    "rel_err": 2.487260978762529
-   }
-  ]
- },
- {
-  "name": "screeningBreakEvenPrevalence [odds form, competing]",
-  "file": "PGSCalibrationTheory.lean",
-  "source": "(1-spec)*harm / (sens*benefit)",
-  "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems",
-  "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
-  "span": 0.4722222222222224,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "sens=0.95 spec=0.70 harm=1.0",
-   "lean": 0.31578947368421056,
-   "truth": 0.2403429376165645,
-   "sem": 0.0005382763911137262,
-   "sems_off": 140.16318997670072,
-   "rel_err": 0.3139120159545153
+   "cells": [
+    {
+     "design": "sens=0.90 spec=0.90 harm=1.5",
+     "lean": 0.8571428571428571,
+     "truth": 0.14281040996878885,
+     "sem": 0.0009956212158541468,
+     "sems_off": 717.4741114382944,
+     "rel_err": 5.00196342360606
+    },
+    {
+     "design": "sens=0.80 spec=0.95 harm=3.0",
+     "lean": 0.8421052631578946,
+     "truth": 0.1579847606050267,
+     "sem": 0.0024125103418169516,
+     "sems_off": 283.572049700575,
+     "rel_err": 4.330294263401889
+    },
+    {
+     "design": "sens=0.95 spec=0.70 harm=1.0",
+     "lean": 0.76,
+     "truth": 0.2403429376165645,
+     "sem": 0.0005382763911137262,
+     "sems_off": 965.409352820089,
+     "rel_err": 2.1621482517305335
+    },
+    {
+     "design": "sens=0.70 spec=0.99 harm=20.0",
+     "lean": 0.7777777777777776,
+     "truth": 0.22303400362475184,
+     "sem": 0.012205174440088876,
+     "sems_off": 45.451523603867976,
+     "rel_err": 2.487260978762529
+    }
+   ]
   },
-  "cells": [
-   {
-    "design": "sens=0.90 spec=0.90 harm=1.5",
-    "lean": 0.16666666666666663,
-    "truth": 0.14281040996878885,
-    "sem": 0.0009956212158541468,
-    "sems_off": 23.96117752212764,
-    "rel_err": 0.16704844347895612
-   },
-   {
-    "design": "sens=0.80 spec=0.95 harm=3.0",
-    "lean": 0.18750000000000017,
-    "truth": 0.1579847606050267,
-    "sem": 0.0024125103418169516,
-    "sems_off": 12.234243676959512,
-    "rel_err": 0.18682333208557816
-   },
-   {
+  {
+   "name": "screeningBreakEvenPrevalence [odds form, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "(1-spec)*harm / (sens*benefit)",
+   "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
+   "span": 0.4722222222222224,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "sens=0.95 spec=0.70 harm=1.0",
     "lean": 0.31578947368421056,
     "truth": 0.2403429376165645,
@@ -472,34 +449,50 @@
     "sems_off": 140.16318997670072,
     "rel_err": 0.3139120159545153
    },
-   {
-    "design": "sens=0.70 spec=0.99 harm=20.0",
-    "lean": 0.285714285714286,
-    "truth": 0.22303400362475184,
-    "sem": 0.012205174440088876,
-    "sems_off": 5.1355498765880565,
-    "rel_err": 0.28103464525970606
-   }
-  ]
- },
- {
-  "name": "screeningBreakEvenPrevalence [spec not complemented, competing]",
-  "file": "PGSCalibrationTheory.lean",
-  "source": "spec*harm / (sens*benefit + spec*harm)",
-  "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems",
-  "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
-  "span": 0.5607591062136518,
-  "verdict": "FALSIFIED",
-  "worst": {
-   "design": "sens=0.90 spec=0.90 harm=1.5",
-   "lean": 0.6000000000000001,
-   "truth": 0.14281040996878885,
-   "sem": 0.0009956212158541468,
-   "sems_off": 459.2003291522738,
-   "rel_err": 3.2013743965242436
+   "cells": [
+    {
+     "design": "sens=0.90 spec=0.90 harm=1.5",
+     "lean": 0.16666666666666663,
+     "truth": 0.14281040996878885,
+     "sem": 0.0009956212158541468,
+     "sems_off": 23.96117752212764,
+     "rel_err": 0.16704844347895612
+    },
+    {
+     "design": "sens=0.80 spec=0.95 harm=3.0",
+     "lean": 0.18750000000000017,
+     "truth": 0.1579847606050267,
+     "sem": 0.0024125103418169516,
+     "sems_off": 12.234243676959512,
+     "rel_err": 0.18682333208557816
+    },
+    {
+     "design": "sens=0.95 spec=0.70 harm=1.0",
+     "lean": 0.31578947368421056,
+     "truth": 0.2403429376165645,
+     "sem": 0.0005382763911137262,
+     "sems_off": 140.16318997670072,
+     "rel_err": 0.3139120159545153
+    },
+    {
+     "design": "sens=0.70 spec=0.99 harm=20.0",
+     "lean": 0.285714285714286,
+     "truth": 0.22303400362475184,
+     "sem": 0.012205174440088876,
+     "sems_off": 5.1355498765880565,
+     "rel_err": 0.28103464525970606
+    }
+   ]
   },
-  "cells": [
-   {
+  {
+   "name": "screeningBreakEvenPrevalence [spec not complemented, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "spec*harm / (sens*benefit + spec*harm)",
+   "note": "positive control 'pi=0.30 [net benefit = b*pi*sens - h*(1-pi)*(1-spec)]' passed at 0.11 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "regime": "a simulated screening programme over 2e6 individuals at 69 prevalences from 0.02 to 0.70, test outcomes drawn at the stated sensitivity and specificity, net benefit = benefit per true positive minus harm per false positive; the observable is the prevalence at which the MEASURED net benefit crosses zero, read by interpolation. The harm-to-benefit ratio is chosen so the crossing is interior to the grid, which battery 40's design was not",
+   "span": 0.5607591062136518,
+   "verdict": "LEAD (undeclared input provenance)",
+   "worst": {
     "design": "sens=0.90 spec=0.90 harm=1.5",
     "lean": 0.6000000000000001,
     "truth": 0.14281040996878885,
@@ -507,30 +500,40 @@
     "sems_off": 459.2003291522738,
     "rel_err": 3.2013743965242436
    },
-   {
-    "design": "sens=0.80 spec=0.95 harm=3.0",
-    "lean": 0.7808219178082192,
-    "truth": 0.1579847606050267,
-    "sem": 0.0024125103418169516,
-    "sems_off": 258.1697356514172,
-    "rel_err": 3.9423875747125408
-   },
-   {
-    "design": "sens=0.95 spec=0.70 harm=1.0",
-    "lean": 0.42424242424242425,
-    "truth": 0.2403429376165645,
-    "sem": 0.0005382763911137262,
-    "sems_off": 341.6450910012246,
-    "rel_err": 0.7651545264843487
-   },
-   {
-    "design": "sens=0.70 spec=0.99 harm=20.0",
-    "lean": 0.9658536585365854,
-    "truth": 0.22303400362475184,
-    "sem": 0.012205174440088876,
-    "sems_off": 60.861043695695386,
-    "rel_err": 3.33052199592671
-   }
-  ]
- }
-]
+   "cells": [
+    {
+     "design": "sens=0.90 spec=0.90 harm=1.5",
+     "lean": 0.6000000000000001,
+     "truth": 0.14281040996878885,
+     "sem": 0.0009956212158541468,
+     "sems_off": 459.2003291522738,
+     "rel_err": 3.2013743965242436
+    },
+    {
+     "design": "sens=0.80 spec=0.95 harm=3.0",
+     "lean": 0.7808219178082192,
+     "truth": 0.1579847606050267,
+     "sem": 0.0024125103418169516,
+     "sems_off": 258.1697356514172,
+     "rel_err": 3.9423875747125408
+    },
+    {
+     "design": "sens=0.95 spec=0.70 harm=1.0",
+     "lean": 0.42424242424242425,
+     "truth": 0.2403429376165645,
+     "sem": 0.0005382763911137262,
+     "sems_off": 341.6450910012246,
+     "rel_err": 0.7651545264843487
+    },
+    {
+     "design": "sens=0.70 spec=0.99 harm=20.0",
+     "lean": 0.9658536585365854,
+     "truth": 0.22303400362475184,
+     "sem": 0.012205174440088876,
+     "sems_off": 60.861043695695386,
+     "rel_err": 3.33052199592671
+    }
+   ]
+  }
+ ]
+}
