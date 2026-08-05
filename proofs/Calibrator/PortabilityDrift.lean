@@ -3184,19 +3184,46 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
 /-- Ohta-Kimura-style closed-form LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence.
 
-    Empirical status: **MEASURED** -- the two factors of this body are in
-    different states and the head cannot be either one alone. The DIVERGENCE
-    factor is settled by measurement and the body already carries the corrected
-    form (`simcov/battery_bulk54.py`, tabulated below: the rival `fstGap`
-    exponent is rejected at 4.73 sems on the cells where `Real.sqrt fstGap`
-    matches at 2.42). The SHAPE in distance carries a LEAD AGAINST THE
-    EXPONENTIAL and no verdict
-    (`simcov/battery_bulk31.py`). Recorded as a lead and not a falsification,
-    because the run carried no valid positive control -- the harness's own rule
-    is that a disagreement without one has not shown the design can reproduce a
-    known result.
+    Empirical status: **FALSIFIED as a shape in distance**
+    (`proofs/validation/empirical/popgensel/ldshapecell.py`, cell `I`). The
+    two factors of this body are in different states and both are now settled.
+    The DIVERGENCE factor is right: the body carries `Real.sqrt fstGap`, and
+    the rival `fstGap` exponent is rejected at 4.73 sems on the cells where the
+    square root matches at 2.42 (`simcov/battery_bulk54.py`, tabulated below).
+    The EXPONENTIAL IN DISTANCE is wrong, and what changed is not the design but
+    the control it was missing.
 
-    The lead: coalescent theory gives Sved's `r² ≈ 1/(1 + 4·Nₑ·c)`, which is
+    THE CONTROL THAT CLOSED IT, supplied without altering anything else about
+    the design. Both shapes are fitted to the SAME binned msprime `r²` values
+    with a free amplitude AND a free rate each, so neither is handicapped and
+    the `r²` estimator's upward bias is common to both. Two arms:
+
+      Nₑ      χ²/point exp   χ²/point hyp   worst exp   worst hyp
+      2000       28.49          4.16        8.87 sems   3.91 sems
+      5000       79.66          1.95       12.56 sems   3.46 sems
+
+    Run on a TRUE exponential with the same `x` grid and matched per-point
+    noise, the same fitter prefers the exponential by a sum-of-squares ratio of
+    168 and 197. So the preference on the real arm is the data's and not the
+    fitter's, which is exactly the thing `simcov/battery_bulk31.py` could not
+    establish and the reason its identical conclusion was recorded as a lead.
+
+    WHAT IS NOT SETTLED, and the reason the body is left standing rather than
+    rewritten to Sved's form: the hyperbolic's fitted rate is not `4 Nₑ`. It
+    returns 6572 against a true 20000 at `Nₑ = 5000`. So "hyperbolic, not
+    exponential" is established and "Sved's law with its coefficient" is not,
+    and substituting a closed form whose constant is off by threefold would
+    trade a wrong shape for a wrong shape and a wrong constant. The same
+    evidence carried `OpenQuestions.ldTaggingDecay` to FALSIFIED, which is the
+    same chart under another name.
+
+    CONSUMERS. `jointTagLDKernelAt` multiplies this factor in and inherits the
+    shape fault; its own record already carries a separate, established
+    falsification through `migrationSharedBoostAt`.
+
+    The earlier, control-less run reached the same conclusion by the same
+    reasoning, and is kept because the reasoning is what the control licenses:
+    coalescent theory gives Sved's `r² ≈ 1/(1 + 4·Nₑ·c)`, which is
     HYPERBOLIC in distance, not exponential, and the two differ in shape rather
     than scale. Measured `r²` between common SNP pairs binned over an
     eightyfold distance range (`Nₑ = 1000`, 5 Mb at `1e-8`, 8 replicates), with
@@ -3215,11 +3242,13 @@ correlation decays exponentially with recombination distance and divergence.
     the signature of a wrong shape rather than a wrong constant, so no choice of
     `lambda` repairs it.
 
-    What would settle it: a control this design lacks. The obvious candidate,
-    that the hyperbolic fit recovers the simulated `Nₑ`, does not work as one --
-    it returned `Nₑ_eff = 563` against a true 1000, a known bias of `r²`
-    estimated from 60 sampled chromosomes. A design with an independently known
-    anchor is needed before either shape earns a verdict.
+    The control this run lacked was looked for in the wrong place. The obvious
+    candidate, that the hyperbolic fit recovers the simulated `Nₑ`, does not
+    work as one -- it returned `Nₑ_eff = 563` against a true 1000, a known bias
+    of `r²` estimated from 60 sampled chromosomes, and the same shortfall
+    reappears in the run that did settle this. The control that works asks
+    nothing of the fitted rate: it feeds the fitter a curve of KNOWN shape and
+    requires it to recover that shape.
 
     THE `fstGap` FACTOR WAS FALSIFIED AND IS NOW **CORRECTED**: the body carries
     `Real.sqrt fstGap`, which is what the measurement supports. The superseded
@@ -3250,11 +3279,12 @@ correlation decays exponentially with recombination distance and divergence.
     so the prediction span was zero and the power gate correctly refused a
     verdict. The fix was more cells, not a better estimator.
 
-    The two leads are therefore in different states: the SHAPE in distance --
-    exponential versus Sved's hyperbolic -- remains open for want of an
-    independently anchored control, while the `fstGap` factor is settled here.
-    A body carrying both faults would be wrong twice over, and only one of them
-    is now established. -/
+    Both leads are now closed and they closed in OPPOSITE directions, which is
+    why the head names the shape and not the divergence factor: the `fstGap`
+    dependence was falsified and the body was corrected, so that fault is gone;
+    the exponential shape was falsified and the body still carries it, so that
+    fault is live. A record that averaged the two into one verdict would hide
+    which of them a reader still has to work around. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * Real.sqrt fstGap * distance))
 
@@ -4061,10 +4091,17 @@ them as independent global scalars.
     kernel that is a product of factors inherits the worst of them and cannot
     average them away.
 
-    The remaining lead on `ldCorrelationDecay` -- whether the decay in DISTANCE
-    is exponential at all, or hyperbolic as Sved's relation gives -- is still
-    open for want of an independently anchored control, so this body may carry a
-    second inherited fault. Only the migration one is established. -/
+    THE SECOND INHERITED FAULT IS NO LONGER A LEAD. Whether the decay in
+    DISTANCE is exponential at all, or hyperbolic as Sved's relation gives, was
+    settled against the exponential once the control the earlier run lacked was
+    supplied (`proofs/validation/empirical/popgensel/ldshapecell.py`, cell `I`;
+    χ²/point 28.49 and 79.66 exponential against 4.16 and 1.95 hyperbolic, on a
+    fitter that prefers the exponential by 168-fold and 197-fold when handed a
+    true exponential). So this kernel carries TWO established faults, not one
+    established and one open: the migration overstatement it inherits from
+    `migrationSharedBoostAt`, and the wrong LD shape it inherits from
+    `ldCorrelationDecay`. Being a product, it inherits the worse of them and
+    cannot average them away. -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
   ldCorrelationDecay (m.tagDistance i j)
