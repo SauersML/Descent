@@ -382,7 +382,9 @@ The fourth-cumulant channel separates a coordinate law from the Gaussian exactly
 is `6q² - 6q + 1 = 0`, whose polymorphic roots are `(3 ± √3)/6`. The minor-allele root is
 this constant.
 
-Empirical status: DERIVED. The constant is the polymorphic root of `6q² - 6q + 1`, forced
+The constant is DERIVED rather than fitted, which is a fact about how it was
+obtained and not the verdict on it; the verdict is the VALIDATED marker below.
+It is the polymorphic root of `6q² - 6q + 1`, forced
 by `hweGenotypeVariance` through `standardizedGenotype_fourth_moment`;
 `gaussianKurtosisMaf_genotypeVariance` proves the variance identity and
 `standardizedGenotype_kurtosis_gaussian_at_blind_maf` proves the fourth moment is `3`

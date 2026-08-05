@@ -5205,6 +5205,7 @@ def run_mathlib() -> int:
 # no rule inspects.
 
 CONVENTION_STATUS_BUDGET = 0       # `Empirical status:` heads outside the closed vocabulary
+CONVENTION_MULTISTATUS_BUDGET = 0  # docstrings stating more than one `Empirical status:`
 CONVENTION_UNLEDGERED_BUDGET = 0   # complete-scope declarations with no ledger entry
 CONVENTION_STALE_BUDGET = 0        # ledger entries naming declarations that are gone
 CONVENTION_UNBRIDGED_BUDGET = 0    # incompatible conventions sharing a module, unrelated
@@ -5231,6 +5232,32 @@ CONVENTION_NUMBER = re.compile(r"(?<![A-Za-z_0-9'₀-₉.])([0-9]+(?:\.[0-9]+)?)
 # tables ("against measured 0.53297"), and a whole-text rule produced 99
 # findings of which none was a defect.
 CONVENTION_STATUS = re.compile(r"Empirical status:[ \t]*(.{0,140})", re.S)
+
+
+def convention_docstrings(raw: str):
+    """(offset, text) for every `/-- ... -/` docstring, nesting respected.
+
+    Needed because a status marker means something only relative to the
+    docstring it sits in: two markers in ONE docstring are two verdicts on one
+    declaration, whereas two in a file are two declarations.
+    """
+    out, i, n = [], 0, len(raw)
+    while True:
+        start = raw.find("/--", i)
+        if start < 0:
+            return out
+        depth, j = 1, start + 3
+        while j < n and depth:
+            if raw.startswith("/-", j):
+                depth += 1
+                j += 2
+            elif raw.startswith("-/", j):
+                depth -= 1
+                j += 2
+            else:
+                j += 1
+        out.append((start, raw[start:j]))
+        i = j
 
 
 def convention_status_head(text: str) -> str:
@@ -5359,6 +5386,32 @@ def run_conventions() -> int:
                 if not k.startswith("$")}
 
     stale, unledgered, unbridged, constants, malformed, statuses = [], [], [], [], [], []
+    multistatus = []
+
+    # MULTIPLICITY.  At most ONE `Empirical status:` marker per docstring.
+    #
+    # Every scanner, and every reader who stops at the first status line, takes
+    # the FIRST marker as the verdict.  So a superseded marker sitting above a
+    # current one IS the reported status, and the corpus has been counted wrong
+    # that way: `pairwiseFstFromBranchTaus` carried a FALSIFIED describing a body
+    # it no longer had, above a VALIDATED describing the body it did have, and
+    # was counted among the falsified for it.  The same mechanism let one
+    # out-of-regime measurement be read as three separate defects.
+    #
+    # This is deliberately not a rule about which marker is right. It is a rule
+    # that a declaration states its verdict once, so that the first marker and
+    # the verdict are the same thing.
+    for module in sorted(sources):
+        raw = read_source(Path(IDENT_ROOT) / module)
+        for offset, doc in convention_docstrings(raw):
+            heads = [convention_status_head(m.group(1))
+                     for m in CONVENTION_STATUS.finditer(doc)]
+            if len(heads) > 1:
+                lineno = raw[:offset].count("\n") + 1
+                multistatus.append(
+                    f"{module}:{lineno}: one docstring carries {len(heads)} status "
+                    f"markers {heads}; every scanner reads the first, so the others "
+                    f"are invisible and the first may not be the current verdict")
 
     # STATUS.  A closed vocabulary of `Empirical status:` heads.  A status marker
     # exists to be COUNTED -- the corpus's own coverage denominator is built from
@@ -5512,6 +5565,16 @@ def run_conventions() -> int:
          CONVENTION_STATUS_BUDGET,
          "the vocabulary is `empirical_status_vocabulary` in the ledger; a new "
          "verdict belongs IN it, with what it means, not beside it"),
+        ("docstrings stating more than one `Empirical status:`", multistatus,
+         CONVENTION_MULTISTATUS_BUDGET,
+         "there are THREE repairs and they are not interchangeable. If one marker "
+         "SUPERSEDES the other, delete the superseded one and keep its evidence as "
+         "history. If BOTH are true -- unmeasurable in general, validated on a "
+         "slice -- merge them into one `MIXED` marker, because deleting either "
+         "half misreports it. If the second is a status being DISCUSSED rather "
+         "than asserted, reword it so it is not a bare marker: a scanner cannot "
+         "tell quotation from assertion, and neither can a reader who stops at "
+         "the first line"),
         ("ledger entries that no longer match the corpus", stale,
          CONVENTION_STALE_BUDGET,
          "repoint the entry, or delete it if the declaration is gone for good"),
