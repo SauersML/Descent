@@ -2022,8 +2022,8 @@ noncomputable def metaLearnedSourceWeights {p : ℕ}
     "Effect" in its name: its structurally identical siblings
     `populationDeviationSum`, `meanPopulationDeviation` and
     `weightedPopulationDeviation` -- the same subtraction and the same sums --
-    are not screened, and nothing distinguishes them. An UNTESTED marker here
-    would record a debt that can never be paid. -/
+    are not screened, and nothing distinguishes them. A marker owing a
+    measurement here would record a debt that can never be paid. -/
 noncomputable def centeredPopulationEffectDeviation {p : ℕ} {ι : Type*}
     (wShared : Fin p → ℝ)
     (wSource : ι → Fin p → ℝ) : ι → Fin p → ℝ :=
