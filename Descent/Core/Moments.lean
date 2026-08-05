@@ -825,6 +825,83 @@ theorem portabilityRatioFromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (h
     (deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt) hsrc
 
 
+/-- **The portability ratio a demographic history produces.** What a paper reporting
+"the score transfers at 40% of its source `R²`" is measuring, as a function of
+`(Nₑ, m, μ)` rather than of a differentiation supplied by hand. -/
+noncomputable def deployedPortabilityRatio (p : PopGenParameters) (V_E : ℝ) : ℝ :=
+  portabilityRatio p.V_A V_E p.fstEquilibrium
+
+/-- **The deployed portability ratio lies in the unit interval at every history.** -/
+theorem deployedPortabilityRatio_mem_unit (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) :
+    0 ≤ deployedPortabilityRatio p V_E ∧ deployedPortabilityRatio p V_E ≤ 1 :=
+  portabilityRatio_mem_unit p.V_A V_E p.fstEquilibrium p.V_A_pos hE
+    p.fstEquilibrium_mem_unit.1 (p.fstEquilibrium_lt_one hflow)
+
+/-- **More migration, a higher portability ratio.** The reported quantity, moved by a
+demographic parameter, with every step a named map. -/
+theorem deployedPortabilityRatio_mono_in_migration (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
+  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
+    unfold share
+    have := q.V_A_pos
+    positivity
+  unfold deployedPortabilityRatio portabilityRatio ratio
+  rw [hV]
+  exact div_lt_div_of_pos_right
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (p.fstEquilibrium_lt_one hflow)) hsrc
+
+/-- **A history with no flow transfers nothing.** At zero migration and zero mutation the
+equilibrium is complete differentiation and the deployed `R²` is zero: two populations
+with nothing passing between them share no allele frequencies for a score to use. The
+boundary the monotone laws approach. -/
+theorem deployedR2_at_no_flow (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0)
+    (hmig : p.mig = 0) (hE : 0 < V_E) :
+    deployedR2 p V_E = 0 := by
+  have hf : p.fstEquilibrium = 1 := by
+    unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
+      fstFromFlow
+    rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
+    norm_num
+  unfold deployedR2
+  rw [hf]
+  exact r2_momentsUnderDrift_at_complete p.V_A V_E hE
+
+
+/-- **A history with no flow leaves the Brier score at its uninformative baseline.**
+The binary coordinate's version of the no-flow boundary: with nothing passing between the
+populations, a deployed score does no better than knowing the prevalence. -/
+theorem deployedBrier_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
+    (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) :
+    deployedBrier π p V_E = π * (1 - π) := by
+  have hf : p.fstEquilibrium = 1 := by
+    unfold PopGenParameters.fstEquilibrium PopGenParameters.theta PopGenParameters.bigM
+      fstFromFlow
+    rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
+    norm_num
+  unfold deployedBrier
+  rw [hf]
+  exact brier_at_zero_r2 π _ (r2_momentsUnderDrift_at_complete p.V_A V_E hE)
+
+/-- **The whole deployment report at a no-flow history, in one statement.** `R²` at zero,
+the Brier score at its baseline, and -- the finding -- the calibration slope still exactly
+one and the mean squared error still exactly the environmental variance. Two of the four
+numbers a deployment reports are unchanged at the worst demographic history there is. -/
+theorem deployedReport_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
+    (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) :
+    deployedR2 p V_E = 0 ∧
+    deployedBrier π p V_E = π * (1 - π) ∧
+    (momentsUnderDrift p.V_A V_E p.fstEquilibrium).mse = V_E := by
+  refine ⟨deployedR2_at_no_flow p V_E hmu hmig hE,
+    deployedBrier_at_no_flow π p V_E hmu hmig hE,
+    mse_momentsUnderDrift p.V_A V_E p.fstEquilibrium⟩
+
+
 end ScoreMoments
 
 end Descent.Core

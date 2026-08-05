@@ -112,8 +112,20 @@ At parameter `t` the family puts mass `mass j t` on the value `atom j t`. The fo
 standing identities say the masses are positive, form a probability vector, and
 standardize the atom values to mean zero and variance one. All of them hold *at every
 parameter simultaneously*, which is what ties the atoms into a bundle: no single atom can
-be moved without moving the rest. -/
-structure BundleFamily (T : Type*) [TopologicalSpace T] (d : ℕ) where
+be moved without moving the rest.
+
+**Not `Descent.BundleFamily`, and the name says so.** The corpus carried two structures
+called `BundleFamily`: that one, in `Blindness/BundleRigidity.lean`, is a pair of bare
+functions `Fin k → ℝ → ℝ` with no standing hypotheses at all; this one is
+continuous-map-valued and bundles four -- positivity, normalisation, and standardisation
+to mean zero and unit variance. They live in different namespaces, so both elaborate, and
+a reader grepping `BundleFamily` for what is known about "the" bundle family got results
+about two different objects with no marker separating them.
+
+Which one a theorem is about is a real question: the peeling lemma's lower bound
+`Φ ≥ p_min` is available here and is not available there, because `mass_pos` is a field of
+this structure and not of that one. -/
+structure ContinuousBundleFamily (T : Type*) [TopologicalSpace T] (d : ℕ) where
   /-- The value of atom `j` at parameter `t`, jointly continuous in `t`. -/
   atom : Fin d → C(T, ℝ)
   /-- The mass of atom `j` at parameter `t`, jointly continuous in `t`. -/
@@ -128,12 +140,12 @@ structure BundleFamily (T : Type*) [TopologicalSpace T] (d : ℕ) where
   /-- Standardization: variance one at every parameter. -/
   var_one : ∀ t : T, ∑ j, mass j t * atom j t ^ 2 = 1
 
-namespace BundleFamily
+namespace ContinuousBundleFamily
 
 /-- **The symmetric two-atom family**, and with it the fact that the fifteen
-theorems taking a `BundleFamily` parameter are about something.
+theorems taking a `ContinuousBundleFamily` parameter are about something.
 
-`BundleFamily` bundles four `Prop` fields holding at every parameter
+`ContinuousBundleFamily` bundles four `Prop` fields holding at every parameter
 simultaneously, so a theorem taking one is conditional on a caller producing all
 four at once. Until a closed term of the type exists, none of those theorems is
 known to be non-vacuous — which is the difference between a hypothesis and a
@@ -148,7 +160,7 @@ the atom to `0` and then the variance is `0`.
 Constant in `t` on purpose. What is being discharged is inhabitation, and a
 `t`-dependent witness would suggest the results below turn on the parameter
 space, which they do not. -/
-noncomputable def rademacher (T : Type*) [TopologicalSpace T] : BundleFamily T 2 where
+noncomputable def rademacher (T : Type*) [TopologicalSpace T] : ContinuousBundleFamily T 2 where
   atom := ![ContinuousMap.const T (1 : ℝ), ContinuousMap.const T (-1 : ℝ)]
   mass := ![ContinuousMap.const T (1 / 2 : ℝ), ContinuousMap.const T (1 / 2 : ℝ)]
   -- `<;>` and not `;`: `simp` closes some of these four outright and leaves the
@@ -159,14 +171,14 @@ noncomputable def rademacher (T : Type*) [TopologicalSpace T] : BundleFamily T 2
   mean_zero _ := by simp [Fin.sum_univ_two] <;> norm_num
   var_one _ := by simp [Fin.sum_univ_two] <;> norm_num
 
-instance {T : Type*} [TopologicalSpace T] : Nonempty (BundleFamily T 2) :=
+instance {T : Type*} [TopologicalSpace T] : Nonempty (ContinuousBundleFamily T 2) :=
   ⟨rademacher T⟩
 
-variable (F : BundleFamily T d)
+variable (F : ContinuousBundleFamily T d)
 
 /-- The **modulus curve** of atom `j`: `|atom j t ^ 2 - 1|`, the value taken by `|U|`
 where `U = X ^ 2 - 1` is the centered square of the standardized value. -/
-noncomputable def modulusMap (F : BundleFamily T d) (j : Fin d) : C(T, ℝ) :=
+noncomputable def modulusMap (F : ContinuousBundleFamily T d) (j : Fin d) : C(T, ℝ) :=
   ⟨fun t ↦ |F.atom j t ^ 2 - 1|,
     (((F.atom j).continuous.pow 2).sub continuous_const).abs⟩
 
@@ -184,7 +196,7 @@ theorem modulusMap_nonneg (j : Fin d) (t : T) : 0 ≤ F.modulusMap j t := abs_no
 Equivalently this is the pairing of `f` against the transfer measure
 `TT t = ∑ j, mass j t • δ (modulusMap j t)`. Everything in this file is a statement about
 this one expression. -/
-noncomputable def coTransfer (F : BundleFamily T d) (f : C(ℝ, ℝ)) : C(T, ℝ) :=
+noncomputable def coTransfer (F : ContinuousBundleFamily T d) (f : C(ℝ, ℝ)) : C(T, ℝ) :=
   ⟨fun t ↦ ∑ j, F.mass j t * f (F.modulusMap j t),
     continuous_finset_sum _ fun j _ ↦
       (F.mass j).continuous.mul (f.continuous.comp (F.modulusMap j).continuous)⟩
@@ -193,7 +205,7 @@ noncomputable def coTransfer (F : BundleFamily T d) (f : C(ℝ, ℝ)) : C(T, ℝ
     F.coTransfer f t = ∑ j, F.mass j t * f (F.modulusMap j t) := rfl
 
 /-- `L*` is linear in the test function. -/
-noncomputable def coTransferₗ (F : BundleFamily T d) : C(ℝ, ℝ) →ₗ[ℝ] C(T, ℝ) where
+noncomputable def coTransferₗ (F : ContinuousBundleFamily T d) : C(ℝ, ℝ) →ₗ[ℝ] C(T, ℝ) where
   toFun := F.coTransfer
   map_add' f g := by
     ext t
@@ -222,7 +234,7 @@ noncomputable def coTransferₗ (F : BundleFamily T d) : C(ℝ, ℝ) →ₗ[ℝ]
 functional on `C(T, ℝ)`, is sent to the measure on modulus values obtained by pushing each
 parameter to its transfer measure and integrating: `L κ = ∫ TT t dκ t`, which in the
 Riesz picture is exactly precomposition with `L*`. -/
-noncomputable def transfer (F : BundleFamily T d) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
+noncomputable def transfer (F : ContinuousBundleFamily T d) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
     C(ℝ, ℝ) →ₗ[ℝ] ℝ :=
   κ.comp F.coTransferₗ
 
@@ -264,7 +276,7 @@ def diracAt (t : T) : C(T, ℝ) →ₗ[ℝ] ℝ where
 
 /-- **Two parameters with the same transfer measure**, i.e. `TT t₁ = TT t₂` tested against
 every continuous function. -/
-def SameTransfer (F : BundleFamily T d) (t₁ t₂ : T) : Prop :=
+def SameTransfer (F : ContinuousBundleFamily T d) (t₁ t₂ : T) : Prop :=
   ∀ f : C(ℝ, ℝ), F.coTransfer f t₁ = F.coTransfer f t₂
 
 /-- A parameter has the same transfer as itself.
@@ -275,7 +287,7 @@ def SameTransfer (F : BundleFamily T d) (t₁ t₂ : T) : Prop :=
     `t₁ ≠ t₂` -- which is why the informal statement says "two DISTINCT
     parameters". Nothing here establishes that a distinct such pair exists for
     any particular family; that is what makes non-rigidity a property of `F`. -/
-theorem sameTransfer_refl (F : BundleFamily T d) (t : T) : F.SameTransfer t t :=
+theorem sameTransfer_refl (F : ContinuousBundleFamily T d) (t : T) : F.SameTransfer t t :=
   fun _ ↦ rfl
 
 /-- **Lemma 4.** If two distinct parameters have the same transfer measure then their
@@ -306,7 +318,7 @@ noncomputable def pullback (τ : C(T, T)) : C(T, ℝ) →ₗ[ℝ] C(T, ℝ) wher
 
 /-- **`τ` is a symmetry of the family**: `TT ∘ τ = TT`, tested against every continuous
 function. This is exactly the hypothesis of Theorem B. -/
-def IsSymmetry (F : BundleFamily T d) (τ : C(T, T)) : Prop :=
+def IsSymmetry (F : ContinuousBundleFamily T d) (τ : C(T, T)) : Prop :=
   ∀ (f : C(ℝ, ℝ)) (t : T), F.coTransfer f (τ t) = F.coTransfer f t
 
 /-- **A checkable sufficient condition for `IsSymmetry`**: `τ` permutes the atoms,
@@ -492,7 +504,7 @@ theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ
     _ = κ' (g + h) := (map_add _ _ _).symm
     _ = κ' f := by rw [hsum]
 
-end BundleFamily
+end ContinuousBundleFamily
 
 /-! ## The standing modelling limitation, in prose
 

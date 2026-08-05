@@ -1754,6 +1754,81 @@ theorem presentDayR2_mono_in_migration (p q : Descent.Core.PopGenParameters) (V_
   rw [presentDayR2_at_equilibrium, presentDayR2_at_equilibrium]
   exact Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hV hlt hflow
 
+/-! ### The rest of the deployment report, at an equilibrium
+
+`presentDayR2` is one number a deployment reports. These carry the same demographic
+history into the others, so a report cannot quietly use a different `F_ST` for its
+calibration slope than for its `R²`. -/
+
+/-- **The deployed calibration slope at an equilibrium is one.** Stated in this module
+because this is where a deployment report is assembled, and the warning belongs next to
+the metrics it is about: no demographic history under pure drift produces a miscalibrated
+score, so a deployment audited on calibration finds nothing while `R²` falls. -/
+theorem deployedSlope_at_equilibrium_eq_one (p : Descent.Core.PopGenParameters) (V_E : ℝ)
+    (hflow : 0 < p.mu + p.mig) :
+    (driftMoments p.V_A V_E p.fstEquilibrium).calibrationSlope = 1 :=
+  Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift p.V_A V_E _ p.V_A_pos
+    (p.fstEquilibrium_lt_one hflow)
+
+/-- **The deployed mean squared error at an equilibrium is the environmental variance**,
+whatever the history. The second flat metric. -/
+theorem deployedMse_at_equilibrium (p : Descent.Core.PopGenParameters) (V_E : ℝ) :
+    (driftMoments p.V_A V_E p.fstEquilibrium).mse = V_E :=
+  Descent.Core.ScoreMoments.mse_momentsUnderDrift p.V_A V_E _
+
+/-- **The deployed Brier score at an equilibrium**, as this module's report would carry
+it. -/
+noncomputable def deployedBrierAtEquilibrium (π : ℝ)
+    (p : Descent.Core.PopGenParameters) (V_E : ℝ) : ℝ :=
+  Descent.Core.ScoreMoments.brier π (driftMoments p.V_A V_E p.fstEquilibrium)
+
+/-- **More migration, better deployed Brier score.** -/
+theorem deployedBrierAtEquilibrium_mono_in_migration (π : ℝ)
+    (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedBrierAtEquilibrium π q V_E < deployedBrierAtEquilibrium π p V_E := by
+  unfold deployedBrierAtEquilibrium driftMoments
+  rw [hV]
+  exact Descent.Core.ScoreMoments.brier_anti_in_r2 π _ _ hπ hπ1
+    (Descent.Core.ScoreMoments.r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium
+      p.fstEquilibrium q.V_A_pos hE
+      (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **The deployed AUC argument at an equilibrium falls with differentiation.** Carried by
+the argument rather than a closed form for `Φ`, which this corpus has no Mathlib form
+for -- the same discipline `calibratedBrierFromVariances` records for the liability
+scale. -/
+theorem deployedAucArgument_mono_in_migration (p q : Descent.Core.PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hflowq : 0 < q.mu + q.mig) :
+    Descent.Core.ScoreMoments.aucArgument (driftMoments p.V_A V_E p.fstEquilibrium)
+      < Descent.Core.ScoreMoments.aucArgument (driftMoments q.V_A V_E q.fstEquilibrium) := by
+  unfold driftMoments
+  rw [hV]
+  exact Descent.Core.ScoreMoments.aucArgument_momentsUnderDrift_anti q.V_A V_E
+    q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+    (Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hlt)
+    (p.fstEquilibrium_lt_one hflow) q.fstEquilibrium_mem_unit.1
+
+/-- **The deployed report is bounded by the heritability at every history.** The ceiling
+in this module's vocabulary: no demography makes a score explain more of the target's
+variance than the trait's heritability. -/
+theorem presentDayR2_at_equilibrium_le_heritability (p : Descent.Core.PopGenParameters)
+    (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) :
+    presentDayR2 p.V_A V_E p.fstEquilibrium ≤ Descent.Core.share p.V_A V_E := by
+  rw [presentDayR2_at_equilibrium]
+  exact Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow
+
+/-- **And it is in the unit interval at every history.** -/
+theorem presentDayR2_at_equilibrium_mem_unit (p : Descent.Core.PopGenParameters)
+    (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) :
+    0 ≤ presentDayR2 p.V_A V_E p.fstEquilibrium ∧
+      presentDayR2 p.V_A V_E p.fstEquilibrium ≤ 1 := by
+  rw [presentDayR2_at_equilibrium]
+  exact Descent.Core.ScoreMoments.deployedR2_mem_unit p V_E hE hflow
+
 /-- Exact bridge theorem: the dashboard algebraic `presentDayR2` equals statistical
 `rsquared` when the relevant second-moment identities hold. -/
 theorem presentDayR2_eq_statistical_rsquared_of_moments
