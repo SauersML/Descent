@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+import Descent.Core.Population
 import Descent.Portability.ClinicalUtilityFairness
 import Descent.Spectral.ProjectionShiftBounds
 import Descent.Blindness.ImitationRigidity
