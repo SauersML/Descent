@@ -184,6 +184,31 @@ theorem restrictionFullProb_two_eq_survivalFactor {n : ℕ} (hn : 2 ≤ n) :
     restrictionFullProb n 2 = survivalFactor n := by
   rw [restrictionFullProb_two hn, survivalFactor]
 
+/-- **K-C (3.21): conditioning the paintbox on its block count gives the jump chain.**
+
+`P{ℛ_k = ξ} = P{ρ_n R = ξ | |ρ_n R| = k}`.  Kingman remarks that the normalising constants of
+(2.3) and (3.19) differ "because (3.19) allows `ξ` with fewer than `k` equivalence classes";
+divide by the probability (3.20) that it does not, and the two agree exactly.
+
+This is the identity behind his calling `𝒫_k` the limiting form of the jump chain's law: the
+paintbox restricted to a sample, conditioned on still showing every colour, IS the jump chain
+at `k` blocks.  It is pure factorial arithmetic once both sides are written out -- the class
+sizes cancel, and what is left is the ratio of coefficients. -/
+theorem wattersonProb_div_restrictionFullProb {k n : ℕ} (hkn : k ≤ n) (lam : Multiset ℕ)
+    (hcard : Multiset.card lam = k) :
+    wattersonProb k n lam / restrictionFullProb n k = absoluteProb n k lam := by
+  have hf1 : ((n ! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  have hf2 : (((n - 1)! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  have hf3 : (((n + k - 1)! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  have hf4 : (((n - k)! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  have hf5 : ((k ! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  have hf6 : (((k - 1)! : ℕ) : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
+  unfold wattersonProb restrictionFullProb absoluteProb jumpCoeff
+  rw [hcard, Nat.sub_self, Nat.factorial_zero]
+  push_cast
+  field_simp
+  ring
+
 /-- **K-C: "the right-hand side of (3.20) tends to 1 as `n → ∞`".**  This is Kingman's
 stated ground for calling `𝒫_k` the limiting form of the jump chain's absolute law: a large
 enough sample sees every colour. -/
