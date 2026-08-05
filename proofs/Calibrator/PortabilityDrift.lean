@@ -1283,9 +1283,27 @@ theorem wrightFisherDriftRetention_zero (N : ℕ) : wrightFisherDriftRetention N
     retention is `0.135`, so this quantity is near `0.865` where the measurable
     between-population `F_ST` is `0.50`.
 
-    Empirical status: FALSIFIED as a split `F_ST`; UNTESTED as heterozygosity
-    loss in the regime it names. Use `ClosedPopulationNoMutation` when the
-    regime is meant, and `fstFromTau` when a split `F_ST` is meant. -/
+    Empirical status: UNTESTED, in the regime it names.
+
+    It was FALSIFIED as a split `F_ST`, and that verdict is retained here as
+    history rather than as a live status, because the claim it refuted is one
+    this definition no longer makes. The refutation was of the NAME: under
+    `wrightFisherFst` this body was read as a between-population variance ratio
+    throughout, and against that reading the `1.025 ± 0.020` measured retention
+    at `Ne = 1000, t = 4000` puts it near `0.865` where the measurable split
+    `F_ST` is `0.50`. The repair was the rename, and it has landed -- a
+    heterozygosity ratio inside one population is simply not that quantity, so
+    there is no body here that could be corrected to make the old reading true.
+
+    What remains owed is a measurement in the regime it does name: a
+    Wright-Fisher run at mutation rate zero, heterozygosity over the WHOLE
+    sequence rather than over segregating sites, comparing `1 - H_t/H_0` against
+    `1 - (1 - 1/(2 Nₑ))^t`. The `1.025` figure above cannot serve, since it was
+    taken at demographic equilibrium where mutation replenishes what drift
+    removes, and this body excludes mutation by construction.
+
+    Use `ClosedPopulationNoMutation` when the regime is meant, and `fstFromTau`
+    when a split `F_ST` is meant. -/
 noncomputable def wrightFisherHeterozygosityLoss (N t : ℕ) : ℝ :=
   1 - wrightFisherDriftRetention N t
 
