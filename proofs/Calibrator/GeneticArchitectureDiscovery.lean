@@ -81,7 +81,31 @@ theorem discoveryNCP_at_reference_point :
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
     equivalent to `z^2 ≤ discoveryNCP`.
 
-    Empirical status: UNTESTED.
+    Empirical status: **VALIDATED** as the FIFTY-PERCENT POWER CONTOUR, and that
+    is the only reading of it that survives measurement
+    (`proofs/validation/empirical/simcov/battery_dgpcov.py`, group A;
+    `battery_dgpcov3.py`, group A2). 20000 replicate GWASes per cell, genotypes
+    drawn and OLS actually run, `maf` REMEASURED from the draws:
+
+      n      β     this def's λ   measured λ         sems   power at z²=λ
+      2000   0.02   0.336          0.322±0.013        1.1    0.6221±0.0035
+      2000   0.05   2.100          2.102±0.023        0.1    0.5032±0.0035
+      4000   0.08  10.752         10.794±0.048        0.9    0.5022±0.0035
+      8000   0.12  48.379         48.269±0.099        1.1    0.4981±0.0035
+
+    Two things are measured. First the threshold: `discoveryNCP` is the realized
+    noncentrality across a 144-fold span, and the halved-ploidy competitor
+    `n β² ld² p(1-p)` is refuted at 12 to 244 sems on the same cells. Second, and
+    this is what the predicate itself adds, WHAT CROSSING IT MEANS. The body is
+    deterministic, so it reads as though discovery follows; the measured
+    discovery probability at the boundary is 0.50, matching the exact
+    `ncx2.sf(λ, 1, λ)` at 0.5019, 0.5000 and 0.5000. A locus satisfying this
+    predicate is discovered about half the time, not certainly, and the
+    certainty reading is refuted at more than a hundred sems.
+
+    The exception is small λ: at λ = 0.336 the boundary marks 0.62 power rather
+    than 0.50, because `ncx2.sf(λ, 1, λ)` tends to 0.5 only as λ grows. The
+    contour reading is exact from λ ≈ 2 upward and optimistic below it.
 
     Convention: `maf_causal` is the causal variant's frequency, matching
     `discoveryNCP`, which this predicate thresholds. -/
@@ -383,7 +407,15 @@ section EffectEstimation
 /-- Expected one-locus linear-effect estimate under an additive estimation-error
 decomposition `β̂ = β_true + ε̄`, where `ε̄` is the mean estimation error.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The second argument is DEFINED by
+    this equation and by nothing else in the corpus: no declaration computes a
+    mean estimation error from a design, so `meanEstimationError` is whatever
+    makes the sum come out, and every estimator on every population satisfies
+    the identity at `ε̄ = E[β̂] - β`. There is no assignment of the two arguments
+    that a measurement could reject. The claims a reader might expect here --
+    that OLS is unbiased, or that winner's curse makes `ε̄` positive at
+    discovered loci -- are claims about what `ε̄` IS, and they live at the
+    definitions that produce a value for it, not at this decomposition. -/
 noncomputable def expectedLinearEffectEstimate
     (β_true meanEstimationError : ℝ) : ℝ :=
   β_true + meanEstimationError
@@ -687,11 +719,46 @@ theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
 
-    Empirical status: UNTESTED. It carried no marker of its own while it sat
-    next to `multiTraitEffectiveSampleSize`, whose marker it was reading.
+    Empirical status: **VALIDATED**, and the composition needed a convention to
+    be pinned before it could be
+    (`proofs/validation/empirical/simcov/battery_dgpcov4.py`, group C3). It
+    carried no marker of its own while it sat next to
+    `multiTraitEffectiveSampleSize`, whose marker it was reading; both parts
+    being measured does not measure the composition, because the two are
+    expressed on different scales and only agree on one reading of
+    `priorVariance`.
+
+    The design: 8000 replicate cohort PAIRS per cell, genotypes drawn and OLS
+    run in both, the borrowed estimate formed by inverse-variance combination of
+    `β̂₁` with `β̂₂/rg` -- a rule fixed before any formula is evaluated, since
+    `β̂₂` is an unbiased reading of `rg β₁` with variance `(1-rg²)τ² + v₂`. `β₁`
+    is HELD FIXED so the statistic is a frequentist noncentrality and prior
+    shrinkage is not credited as information. `maf` is swept from 0.5 to 0.1 at
+    FIXED `n·2p(1-p)`, so the realized noncentrality is invariant along the
+    sweep by construction and only a scale error can move with `maf`:
+
+      p     τ²_std   measured λ      this body   sems   dosage-scale reading
+      0.50  2.0e-4   7.6213±0.0631    7.7038      1.3    6.8667  (12.0 sems)
+      0.30  2.0e-4   9.9827±0.0731    9.9102      1.0    8.6216  (18.6 sems)
+      0.10  2.0e-4   6.5632±0.0595    6.4974      1.1    5.3583  (20.3 sems)
+      0.30  2.0e-5  13.0418±0.0813   13.0376      0.1   12.1810  (10.6 sems)
+      0.10  2.0e-5   9.0315±0.0686    8.9967      0.5    7.1705  (27.1 sems)
+
+    Competitors on the same cells: `n₁` alone is refuted at 26 to 74 sems and
+    the small-prior limit `n₁ + rg²n₂` at 10 to 56 sems, so the design has power
+    to reject both the no-borrowing and the naive-borrowing forms.
 
     Convention: `maf_causal` is the causal variant's frequency, as in
-    `discoveryNCP`. -/
+    `discoveryNCP`. `priorVariance` is the prior variance of the STANDARDIZED
+    effect `β √(2p(1-p))`, not of the dosage-scale `β` this definition's own `β`
+    argument is on. That is forced, not chosen: `multiTraitEffectiveSampleSize`
+    reads its `1/n` slots as sampling VARIANCES of an effect estimate, so its
+    output is a precision on whatever scale its prior is; `discoveryNCP` takes a
+    raw sample COUNT and supplies `genotypeVarianceHWE` itself. The two compose
+    exactly when the prior is standardized-scale, and the dosage-scale reading
+    understates the borrowed term by a factor of `2p(1-p)` -- the column above,
+    off by 10 to 27 sems and growing as `maf` falls. Supplying the wrong one is
+    a silent 10 to 30 percent power error, not a type error. -/
 noncomputable def multiTraitDiscoveryNCP
     (n₁ n₂ rg priorVariance β maf ld : ℝ) : ℝ :=
   discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance) β maf ld

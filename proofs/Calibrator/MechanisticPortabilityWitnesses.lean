@@ -102,7 +102,14 @@ theorem mechanisticPortabilityRatio_at_zero_denominator_is_junk {p q : ℕ}
 
 /-- Total additive source squared-effect mass in a direct-causal witness.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is the squared Euclidean
+    norm of its own argument. `β` is supplied by the caller, so the sum is fixed
+    once the vector is, and no population can disagree with `∑ βᵢ²` any more than
+    it can disagree with addition. What IS empirical is whether a sum of squared
+    effects is the additive genetic variance under linkage equilibrium; that
+    claim is `TransferLearningPGS.additiveGeneticVariance`, and it is measured
+    there. Same reasoning, and same wording, as
+    `PolygenicArchitecture.SNPArchitecturePortabilityModel.sourceEffectMass`. -/
 noncomputable def sourceSquaredEffectMass {q : ℕ}
     (β : Fin q → ℝ) : ℝ :=
   ∑ i, β i ^ 2
@@ -619,7 +626,20 @@ While that body read `lambda * F_ST * distance` this was `2/7 * 1/4 = 1/14`,
 a rational the arithmetic steps could close with `norm_num`. The exponent was
 measured to be a SQUARE ROOT, so it is now `√(2/7) * 1/4`, which is a surd and
 does not reduce. Every step below is stated against this name so that the next
-change to the decay law moves one definition rather than nine proof steps. -/
+change to the decay law moves one definition rather than nine proof steps.
+
+Empirical status: NOT AN EMPIRICAL CLAIM. This is `ldCorrelationDecay`'s
+exponent evaluated at three literal fields of the witness beside it, and a
+witness's own coordinates are not measurable quantities. The reason it is not a
+MEMORISED constant -- the failure this file has had twice -- is
+`popgenDrivenProxyGenerationalModel_coordinates` below, which proves the model's
+generation-1 proxy scale equals `(7/6) * exp (-(1 + this))` by unfolding both
+sides through `ldCorrelationDecay` itself: move the decay law, the `F_ST` gap or
+the recombination rate and that proof stops compiling rather than leaving this
+number silently stale. The empirical content -- that the exponent goes as
+`√fstGap` and not as `fstGap` -- belongs to `PortabilityDrift.ldCorrelationDecay`,
+where it was measured across a ninetyfold span of `F_ST` and is what moved this
+constant from `1/14` to a surd. -/
 noncomputable def popgenDrivenLDDecayExponent : ℝ := Real.sqrt (2 / 7) / 4
 
 theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
@@ -965,7 +985,14 @@ noncomputable def timeVaryingAFGenerationalModel :
 stay fixed, but the target effect vector changes over time. This isolates
 population/time-varying effect heterogeneity as the sole portability driver.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness: every field is
+    a literal, and the declaration exhibits one configuration so that the
+    theorems below have something to be about. No measurement can agree or
+    disagree with `-(1/2)` at generation one; what carries empirical content is
+    each theorem stating what this configuration DOES, and the verdict belongs
+    there. Its sibling `timeVaryingAFGenerationalModel` above is the same kind
+    of object and is screened only because this one's name contains a domain
+    word. -/
 noncomputable def timeVaryingEffectGenerationalModel :
     CrossPopulationGenerationalModel 1 1 :=
   singleLocusGenerationalWitness (fun t ↦ ![if t = 0 then (0 : ℝ) else -(1 / 2)]) !![1] !![0]

@@ -88,9 +88,15 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
     (1-π) proportion have effect = 0 (or ~ N(0, σ²_small)).
     π is the polygenicity parameter.
 
-    Empirical status: **NOT EMPIRICALLY TESTABLE BY SIMULATION, and recorded as
-    such rather than left as UNTESTED.** The only simulation that would bear on
-    it draws effects from the very mixture whose variance this states, and then
+    Empirical status: **NOT AN EMPIRICAL CLAIM.** The body is the law of total
+    variance for a two-component zero-mean mixture, which is arithmetic: given
+    components of variance `σ²_large` and `σ²_small` mixed at `π`, the marginal
+    second moment IS `π σ²_large + (1 - π) σ²_small`, and no population can
+    disagree. The marker previously read NOT EMPIRICALLY TESTABLE BY SIMULATION,
+    which says there is observable content no design can reach; the sharper
+    reading is that there is none, and the paragraph below is why the two are
+    easy to confuse here. The only simulation that would bear on it
+    draws effects from the very mixture whose variance this states, and then
     measures their variance -- so the agreement is guaranteed by construction and
     the residual is the random number generator's sampling noise.
     `battery_ldsc.py` ran exactly that and reported FALSIFIED at 10.6 sems at
@@ -645,7 +651,14 @@ section NonsmoothSummaries
     no derivative at any coordinate through zero, and that is what governs how
     hard it is to estimate.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body averages the absolute
+    entries of the vector it is handed. `beta` is the caller's, so the value is
+    fixed once the vector is and nothing observable can disagree with it -- the
+    same reading, for the same reason, as `sourceEffectMass` above. The
+    empirical questions in the neighbourhood are about what a real effect
+    vector's entries ARE, and about the estimation difficulty this docstring
+    describes; the second is a statement about estimators of this functional,
+    not about the functional, and would be measured at an estimator. -/
 noncomputable def meanAbsoluteEffect {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
   (∑ j, |beta j|) / q
 
@@ -1418,7 +1431,18 @@ gets its own upper envelope from a locus-specific effect-correlation bound
 `rgUpper j` and a locus-specific divergence lower bound `fstLower j`, and the
 global portability bound is their source-effect-weighted average.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. `rgUpper` and `fstLower` are free
+    functions supplied by the caller and the weights are fields of the model, so
+    the body averages numbers the caller chose: no assignment of them is
+    refutable. The substantive claim -- that a causal SNP retains at most
+    `rgUpper j ^ 2 * (1 - fstLower j)` of its source squared effect -- is not
+    made here. It is the HYPOTHESIS `h_locuswise_bound` of
+    `portability_upper_bound_from_rg_fst` below, which is where a measurement of
+    the envelope's FORM belongs, and where a design would first have to fix what
+    "retained squared effect" means operationally -- this structure leaves it a
+    declared field. What this definition does fix is how per-locus envelopes are
+    aggregated: a source-squared-effect-weighted average rather than a
+    trait-wide product. -/
 noncomputable def rgFstWeightedUpperBound {q : ℕ}
     (model : SNPArchitecturePortabilityModel q)
     (rgUpper fstLower : Fin q → ℝ) : ℝ :=

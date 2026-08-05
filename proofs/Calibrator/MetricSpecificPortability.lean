@@ -619,7 +619,30 @@ theorem fisherTraceMSELowerBound_zero_neff_is_junk (nParams infoPerSample : ℝ)
     Solving `(d / I) / n_eff ≤ τ` for `n_eff` gives the closed-form threshold
     `(d / I) / τ` in the orthogonal Fisher model.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_dgpcov.py`, group B;
+    `battery_dgpcov2.py`, group B2). The threshold is taken from this body, an
+    estimator is run at exactly that many samples, and the summed squared error
+    is measured over 4000 to 40000 independent replicate estimates. Two
+    exponential families with different Fisher information, so `I` is not a
+    relabelled variance -- Gaussian location at `σ² = 4` (`I = 1/4`) and
+    Bernoulli at `p = 0.3` (`I = 1/(p(1-p)) = 4.76`):
+
+      family      d    τ      n from this body   measured trace MSE   sems
+      gaussian     5   0.10    200               0.09984±0.00031      0.5
+      gaussian    20   0.02   4000               0.01995±0.00007      0.5
+      bernoulli    5   0.10     10 (10.5)        0.10519±0.00032      0.6
+      bernoulli   12   0.05     50               0.05060±0.00033      1.8
+
+    The Bernoulli `d = 5` cell needs `n = 10.5` and 10 samples were run; against
+    `(d/I)/n` at the integer `n` actually used it is 0.6 sems, so the 5.1 sems
+    it shows against `τ` is the rounding and not the body.
+
+    Competitors on the same cells, each run at its own `n`: `(d/I)/τ²` misses
+    `τ` by 878 to 9819 sems, `(d·I)/τ` by 96 to 3320, and `(d²/I)/τ` by 393 to
+    1777. So the design fixes both exponents and the direction of `I`, which a
+    single family could not: inverting `I` is invisible when `I` is 1/4 unless a
+    second family puts it above one. -/
 noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE
@@ -3325,7 +3348,53 @@ relating separation to LD is Sved's, which this corpus carries as
 `LDDecayTheory.ohtaKimuraSigmaDSq`; supplying `decay` from it is a modelling step and belongs at
 the call site, where it can be named.
 
-Empirical status: UNTESTED. -/
+Empirical status: **FALSIFIED**
+(`proofs/validation/empirical/simcov/battery_dgpcov.py`, group D;
+`battery_dgpcov2.py`, group D2). The `kappa` of `ldBandDetectionShare` is a
+fraction of DIRECTIONS -- a contiguous low-frequency band of the AR(1) symbol.
+`ldPanelRetentionFraction` is a fraction of MARKERS. Feeding the second into the
+first is a change of object, not a change of variable, and the two are not
+close.
+
+The instrument is exact linear algebra on the AR(1) kernel `Σᵢⱼ = ρ^|i-j|`, not
+a simulation: the surviving whitened detection weight of a retained panel `S` is
+`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with
+agreement to five digits between panel sizes, so nothing here is a finite-`n`
+artefact.
+
+  ρ    κ      this body   uniform thinning   random panel   contiguous panel
+  0.5  1/2    0.24535     0.34005            0.41790        0.49980
+  0.8  1/2    0.18945     0.26195            0.36031        0.49962
+  0.5  1/3    0.11290     0.20648            0.25299
+  0.8  1/3    0.06448     0.12520            0.19601
+  0.5  1/4    0.06994     0.15120            0.18110
+  0.8  1/4    0.03041     0.07699            0.13229
+
+(the `κ = 1/2` row at `n` = 1024, the others at `n` = 2048; the two panel sizes
+agree to four digits wherever both were run)
+
+Every marker-subset reading exceeds the body, by 38 percent at `κ = 1/2` and by
+a factor of 2.5 at `κ = 1/4`; the shortfall grows as pruning gets more
+aggressive, which is the regime the frontier is about. The thinned column has a
+closed form -- a panel keeping every `s`-th marker of an AR(1) chromosome is
+itself AR(1) at `ρ^s`, so its share is `κ(1+ρ^{2s})(1-ρ²) / ((1-ρ^{2s})(1+ρ²))`
+-- and it reproduces the measured column to four digits, which is the check that
+the numbers are the kernel's and not the inverter's.
+
+POSITIVE CONTROL, and it is what makes this a falsification of the composition
+rather than of `ldBandDetectionShare`: the band operation the closed form is FOR
+-- the normalised mass of the reciprocal symbol on `|t| ≤ πκ`, by quadrature --
+agrees with the body to five decimals in every cell above. The formula is right
+about directions. It is this definition that hands it markers.
+
+There is also no repair by substituting a different `κ`. The three marker
+columns disagree with EACH OTHER at the same `κ` and `ρ` (0.262, 0.356, 0.500 at
+`ρ = 0.8`, `κ = 1/2`), so the retained detection weight of a pruned panel is not
+a function of `(decay, κ)` at all: it depends on WHICH markers are kept. A
+definition of this signature cannot express the quantity its name claims. The
+`retainedMarkers / totalMarkers` reading is charitable at that -- the reading on
+which the retained weight is the retained block of `Σ⁻¹` gives exactly `κ` and a
+deficit of zero. -/
 noncomputable def ldBlockDetectionShare (decay : ℝ)
     (panel : LDPanelRetention) : ℝ :=
   ldBandDetectionShare decay (ldPanelRetentionFraction panel)
@@ -3334,7 +3403,17 @@ noncomputable def ldBlockDetectionShare (decay : ℝ)
 discarded, as a function of the band kernel's decay.  This is the price the frontier puts on the
 pruning convention.
 
-Empirical status: UNTESTED. -/
+Empirical status: **FALSIFIED**, for the reason recorded in full at
+`ldBlockDetectionShare` above and on the same cells
+(`proofs/validation/empirical/simcov/battery_dgpcov.py`, group D): the `kappa`
+of `ldPruningDetectionDeficit` counts DIRECTIONS and `ldPanelRetentionFraction`
+counts MARKERS. At `κ = 1/2` this body prices the loss at 0.25465 (`ρ = 0.5`)
+and 0.31055 (`ρ = 0.8`); the measured deficit of a uniformly thinned panel is
+0.15995 and 0.23805, of a random half-panel 0.08210 and 0.13969, and of a
+contiguous half-panel 0.00020 and 0.00038. The frontier is therefore charging
+between 1.6 and 800 times the price the kernel exacts, and the spread across those three panels
+at one `(decay, κ)` is the same evidence that no function of this signature can
+be the quantity. -/
 noncomputable def ldBlockPruningDeficit (decay : ℝ)
     (panel : LDPanelRetention) : ℝ :=
   ldPruningDetectionDeficit decay (ldPanelRetentionFraction panel)

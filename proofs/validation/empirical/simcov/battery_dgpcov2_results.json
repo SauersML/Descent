@@ -1,0 +1,163 @@
+{
+ "group_d2_kappa_is_markers_not_directions": [
+  {
+   "n": 512,
+   "rho": 0.5,
+   "kappa": 0.5,
+   "body": 0.24535209105296746,
+   "band_control": 0.2453523410530198,
+   "thinned_panel": 0.340109460516028,
+   "thinned_closed_form": 0.33999999999999997,
+   "random_panel": 0.4157464621550291,
+   "ratio_thin_over_body": 1.38620974884051
+  },
+  {
+   "n": 512,
+   "rho": 0.5,
+   "kappa": 0.333984375,
+   "body": 0.11319286161905348,
+   "band_control": 0.11319278644181455,
+   "thinned_panel": 0.20687665214639409,
+   "thinned_closed_form": 0.20675223214285715,
+   "random_panel": 0.24989520448311117,
+   "ratio_thin_over_body": 1.8276475140511073
+  },
+  {
+   "n": 512,
+   "rho": 0.5,
+   "kappa": 0.25,
+   "body": 0.06993673676857878,
+   "band_control": 0.06993673676861584,
+   "thinned_panel": 0.15128547118612887,
+   "thinned_closed_form": 0.15117647058823527,
+   "random_panel": 0.18201419747344058,
+   "ratio_thin_over_body": 2.1631760098663695
+  },
+  {
+   "n": 512,
+   "rho": 0.8,
+   "kappa": 0.5,
+   "body": 0.18945376957678955,
+   "band_control": 0.18945401957685343,
+   "thinned_panel": 0.2618506795754981,
+   "thinned_closed_form": 0.2620464009518144,
+   "random_panel": 0.359735863849296,
+   "ratio_thin_over_body": 1.382134967071028
+  },
+  {
+   "n": 512,
+   "rho": 0.8,
+   "kappa": 0.333984375,
+   "body": 0.06472643185250421,
+   "band_control": 0.06472636761196894,
+   "thinned_panel": 0.12529344768817305,
+   "thinned_closed_form": 0.12540709162763464,
+   "random_panel": 0.19674455319274384,
+   "ratio_thin_over_body": 1.9357385244668877
+  },
+  {
+   "n": 512,
+   "rho": 0.8,
+   "kappa": 0.25,
+   "body": 0.030410654595827785,
+   "band_control": 0.030410654595872964,
+   "thinned_panel": 0.07694866131668138,
+   "thinned_closed_form": 0.07700422225838491,
+   "random_panel": 0.12474771779688384,
+   "ratio_thin_over_body": 2.530319137794502
+  },
+  {
+   "n": 2048,
+   "rho": 0.5,
+   "kappa": 0.5,
+   "body": 0.24535209105296746,
+   "band_control": 0.2453523410530198,
+   "thinned_panel": 0.3400273490916193,
+   "thinned_closed_form": 0.33999999999999997,
+   "random_panel": 0.4120615869169182,
+   "ratio_thin_over_body": 1.385875081122553
+  },
+  {
+   "n": 2048,
+   "rho": 0.5,
+   "kappa": 0.33349609375,
+   "body": 0.11289946024701733,
+   "band_control": 0.11289955405238218,
+   "thinned_panel": 0.20648099052084198,
+   "thinned_closed_form": 0.20644996279761907,
+   "random_panel": 0.25298928755307354,
+   "ratio_thin_over_body": 1.8288926277333284
+  },
+  {
+   "n": 2048,
+   "rho": 0.5,
+   "kappa": 0.25,
+   "body": 0.06993673676857878,
+   "band_control": 0.06993673676861584,
+   "thinned_panel": 0.15120370476770506,
+   "thinned_closed_form": 0.15117647058823527,
+   "random_panel": 0.18110138849827015,
+   "ratio_thin_over_body": 2.162006861544589
+  },
+  {
+   "n": 2048,
+   "rho": 0.8,
+   "kappa": 0.5,
+   "body": 0.18945376957678955,
+   "band_control": 0.18945401957685343,
+   "thinned_panel": 0.261997526570767,
+   "thinned_closed_form": 0.2620464009518144,
+   "random_panel": 0.35585770568662756,
+   "ratio_thin_over_body": 1.3829100743470506
+  },
+  {
+   "n": 2048,
+   "rho": 0.8,
+   "kappa": 0.33349609375,
+   "body": 0.064475808990265,
+   "band_control": 0.06447588908827097,
+   "thinned_panel": 0.12519529953753847,
+   "thinned_closed_form": 0.12522374792642466,
+   "random_panel": 0.19600557236319635,
+   "ratio_thin_over_body": 1.9417406543350437
+  },
+  {
+   "n": 2048,
+   "rho": 0.8,
+   "kappa": 0.25,
+   "body": 0.030410654595827785,
+   "band_control": 0.030410654595872964,
+   "thinned_panel": 0.07699034790961792,
+   "thinned_closed_form": 0.07700422225838491,
+   "random_panel": 0.13229332919163955,
+   "ratio_thin_over_body": 2.5316899268646678
+  }
+ ],
+ "group_b2_integer_n": [
+  {
+   "family": "gaussian",
+   "d": 5,
+   "tau": 0.1,
+   "n_req_exact": 200.0,
+   "n_used": 200,
+   "trace_mse": 0.09983902102742986,
+   "se": 0.000314652045663765,
+   "predicted_at_integer_n": 0.1,
+   "sems_vs_integer_n": 0.5116094898749288,
+   "sems_vs_tau": 0.5116094898749288
+  },
+  {
+   "family": "bernoulli",
+   "d": 5,
+   "tau": 0.1,
+   "n_req_exact": 10.5,
+   "n_used": 10,
+   "trace_mse": 0.10519,
+   "se": 0.0003224169603439123,
+   "predicted_at_integer_n": 0.10500000000000001,
+   "sems_vs_integer_n": 0.5892990238395912,
+   "sems_vs_tau": 16.09716807225025
+  }
+ ],
+ "_guard": "DGPCOV2-2026-08-04-B"
+}
