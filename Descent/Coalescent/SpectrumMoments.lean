@@ -97,7 +97,7 @@ theorem harmonicSumSq_le {m : ℕ} (hm : 1 ≤ m) : harmonicSumSq m ≤ 2 - 1 / 
       have hppos : (0 : ℝ) < (p : ℝ) := by linarith
       have hstep : 1 / ((p : ℝ) + 1) ^ 2 ≤ 1 / (p : ℝ) - 1 / ((p : ℝ) + 1) := by
         rw [div_sub_div _ _ (ne_of_gt hppos) (by linarith : ((p : ℝ) + 1) ≠ 0),
-          div_le_div_iff (by positivity) (mul_pos hppos (by linarith))]
+          div_le_div_iff₀ (by positivity) (mul_pos hppos (by linarith))]
         nlinarith
       have := harmonicSumSq_succ p
       push_cast
@@ -135,9 +135,8 @@ theorem varTotalBranchLength_eq (n : ℕ) :
   unfold varTotalBranchLength harmonicSumSq
   rw [mul_sum]
   refine sum_congr rfl fun j _ ↦ ?_
-  rw [expectedSegmentLength_eq]
-  rw [div_pow]
-  norm_num
+  rw [expectedSegmentLength_eq, div_pow]
+  ring
 
 theorem varTotalBranchLength_nonneg (n : ℕ) : 0 ≤ varTotalBranchLength n := by
   rw [varTotalBranchLength_eq]
@@ -202,11 +201,13 @@ theorem varWattersonEstimator_le {θ : ℝ} (hθ : 0 ≤ θ) {n : ℕ} (hn : 1 �
   have hb0 := harmonicSumSq_nonneg (n - 1)
   have hsq : 0 ≤ θ ^ 2 := sq_nonneg θ
   unfold varWattersonEstimator varSegregatingSites
-  rw [div_le_div_iff (pow_pos ha 2) ha]
+  rw [div_le_div_iff₀ (pow_pos ha 2) ha]
   have h1 : θ ^ 2 * harmonicSumSq (n - 1) ≤ 2 * θ ^ 2 := by nlinarith
   have h2 : (2 : ℝ) * θ ^ 2 * harmonicSum (n - 1)
-      ≤ 2 * θ ^ 2 * harmonicSum (n - 1) ^ 2 := by nlinarith
-  nlinarith [h1, h2]
+      ≤ 2 * θ ^ 2 * harmonicSum (n - 1) ^ 2 := by
+    nlinarith [mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 2) hsq)
+      (mul_nonneg ha.le (by linarith : (0 : ℝ) ≤ harmonicSum (n - 1) - 1))]
+  nlinarith [mul_le_mul_of_nonneg_right h1 ha.le, h2]
 
 /-- **Watterson's estimator is consistent.**  For every tolerance there is a sample size at
 which its variance is below that tolerance.
@@ -231,9 +232,9 @@ theorem exists_varWattersonEstimator_lt {θ : ℝ} (hθ : 0 ≤ θ) {ε : ℝ} (
   have hbound := varWattersonEstimator_le hθ (n := m + 1) (by rw [hidx]; exact hone)
   rw [hidx] at hbound
   have hkey : (θ + 2 * θ ^ 2) / harmonicSum m < ε := by
-    rw [div_lt_iff hpos]
+    rw [div_lt_iff₀ hpos]
     have hmul : (θ + 2 * θ ^ 2 + 1) ≤ ε * harmonicSum m := by
-      rw [div_le_iff hε] at hbig
+      rw [div_le_iff₀ hε] at hbig
       linarith
     linarith
   linarith

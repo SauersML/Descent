@@ -114,7 +114,7 @@ theorem selectedFixation_one {α : ℝ} (hα : α ≠ 0) : selectedFixation α 1
   have hne : 1 - Real.exp (-α) ≠ 0 := by
     intro h
     have hexp : Real.exp (-α) = 1 := by linarith
-    have hz : -α = 0 := Real.exp_eq_one_iff.mp hexp
+    have hz : -α = 0 := (Real.exp_eq_one_iff (-α)).mp hexp
     exact hα (by linarith)
   unfold selectedFixation
   rw [mul_one, div_self hne]
@@ -224,7 +224,7 @@ theorem selectedFixation_half_gt_half {α : ℝ} (hα : 0 < α) :
     rw [hfac, div_eq_div_iff (mul_ne_zero hne (ne_of_gt h1e)) (ne_of_gt h1e)]
     ring
   unfold selectedFixation
-  rw [harg, hsq, hval, div_lt_div_iff (by norm_num) h1e]
+  rw [harg, hsq, hval, div_lt_div_iff₀ (by norm_num) h1e]
   linarith
 
 end Coalescent

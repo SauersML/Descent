@@ -106,6 +106,7 @@ noncomputable def discordanceProb (T : ℝ) : ℝ := (2 / 3) * branchSurvival T
 is in the statement. -/
 theorem discordanceProb_eq (T : ℝ) :
     discordanceProb T = (1 - jumpProb 3) * branchSurvival T := by
+  unfold discordanceProb
   rw [discordanceGivenFailure_eq_two_thirds]
 
 /-- **A zero-length internal branch leaves the topology entirely to chance.**  Two of the

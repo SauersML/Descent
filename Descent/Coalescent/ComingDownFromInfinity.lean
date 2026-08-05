@@ -119,7 +119,7 @@ theorem descentCurve_ode {t : ℝ} (ht : t ≠ 0) :
 
 /-- `n(2/x) = x`: the curve inverted.  Every check below is an instance of this, which is why
 it is stated once. -/
-theorem descentCurve_two_div {x : ℝ} (hx : x ≠ 0) : descentCurve (2 / x) = x := by
+theorem descentCurve_two_div (x : ℝ) : descentCurve (2 / x) = x := by
   unfold descentCurve
   rw [div_div_eq_mul_div, mul_comm, mul_div_assoc, div_self (by norm_num : (2 : ℝ) ≠ 0),
     mul_one]
@@ -139,7 +139,7 @@ theorem descentCurve_at_entranceTime {k : ℕ} (hk : 2 ≤ k) :
   have hk' : (2 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   have hne : ((k : ℝ) - 1) ≠ 0 := ne_of_gt (by linarith)
   rw [tsum_one_div_deathRate_tail hk]
-  exact descentCurve_two_div hne
+  exact descentCurve_two_div _
 
 /-- **`n(2) = 1`.**  The mean transit time of the whole coalescent is `2` -- the bound
 `Rates.meanTransitTime_lt_two` proves uniform in the sample size -- and the descent curve says
@@ -161,14 +161,14 @@ process starts anywhere in particular, but that no finite state is where it star
 theorem descentCurve_unbounded (B : ℝ) : ∃ t : ℝ, 0 < t ∧ B < descentCurve t := by
   have hpos : (0 : ℝ) < |B| + 1 := by positivity
   refine ⟨2 / (|B| + 1), by positivity, ?_⟩
-  rw [descentCurve_two_div (ne_of_gt hpos)]
+  rw [descentCurve_two_div]
   have := le_abs_self B
   linarith
 
 /-- And it is spent almost immediately: halving the time doubles the lineage count, so all
 but a bounded number of a large sample's coalescences happen in an initial window that
 shrinks as the sample grows.  Stated as the scaling identity, which is the whole of it. -/
-theorem descentCurve_halving {t : ℝ} (ht : t ≠ 0) :
+theorem descentCurve_halving (t : ℝ) :
     descentCurve (t / 2) = 2 * descentCurve t := by
   unfold descentCurve
   rw [div_div_eq_mul_div, mul_div_assoc]

@@ -136,12 +136,10 @@ theorem deriv_deriv_pow (m : ℕ) (x : ℝ) :
     deriv (deriv fun y : ℝ ↦ y ^ (m + 2)) x = ((m : ℝ) + 2) * ((m : ℝ) + 1) * x ^ m := by
   have h1 : (deriv fun y : ℝ ↦ y ^ (m + 2)) = fun y : ℝ ↦ ((m : ℝ) + 2) * y ^ (m + 1) := by
     funext y
-    rw [deriv_pow]
-    push_cast
-    rfl
-  rw [h1, deriv_const_mul_field, deriv_pow]
-  simp only [Nat.add_sub_cancel]
-  push_cast
+    simp
+  have h2 : (deriv fun y : ℝ ↦ y ^ (m + 1)) x = ((m : ℝ) + 1) * x ^ m := by
+    simp
+  rw [h1, deriv_const_mul_field, h2]
   ring
 
 /-- **The diffusion generator, as an operator, applied to a monomial.**  `L f = ½x(1-x)f''`
@@ -149,6 +147,7 @@ evaluated at `f = xⁿ` gives `diffusionOnPow`, so the identity above is about t
 and not about a formula chosen to resemble one. -/
 theorem diffusionGenerator_pow (m : ℕ) (x : ℝ) :
     x * (1 - x) / 2 * deriv (deriv fun y : ℝ ↦ y ^ (m + 2)) x = diffusionOnPow m x := by
+  unfold diffusionOnPow
   rw [deriv_deriv_pow]
 
 /-- **Duality, stated with the operator.**  The composite of the two lemmas above: the

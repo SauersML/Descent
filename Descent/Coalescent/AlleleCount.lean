@@ -130,7 +130,7 @@ theorem expectedNumClasses_two_eq {θ : ℝ} (hθ : 0 < θ) :
   have hθ0 : θ ≠ 0 := ne_of_gt hθ
   have h2 : θ + (1 : ℝ) ≠ 0 := by linarith
   have hsum : θ / (θ + 1) + 1 / (θ + 1) = 1 := by
-    rw [div_add_div_same, div_self h2]
+    rw [← add_div, div_self h2]
   have hcomm : (1 : ℝ) + θ = θ + 1 := by ring
   unfold expectedNumClasses
   rw [sum_range_succ, sum_range_one, Nat.cast_zero, Nat.cast_one, add_zero,
@@ -158,7 +158,7 @@ theorem harmonicSum_le_expectedNumClasses {θ : ℝ} (hθ : 1 ≤ θ) (n : ℕ) 
   have hi : (0 : ℝ) ≤ (i : ℝ) := Nat.cast_nonneg i
   have hden1 : (0 : ℝ) < (i : ℝ) + 1 := by linarith
   have hden2 : (0 : ℝ) < θ + (i : ℝ) := by linarith
-  rw [div_le_div_iff hden1 hden2]
+  rw [div_le_div_iff₀ hden1 hden2]
   nlinarith [mul_nonneg hi (sub_nonneg.mpr hθ)]
 
 /-- **The number of alleles diverges.**  For `θ ≥ 1` a large enough sample shows more
