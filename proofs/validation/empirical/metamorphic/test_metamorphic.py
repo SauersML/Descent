@@ -395,6 +395,65 @@ jobs:
            "workflow-path guard extracted a URL as if it were a repo file")
 
 
+def build_flag_scope():
+    """Both directions for the forbidden-flag scan in build_flags.py.
+
+    The scan itself had never been observed to fire, and its scope was four
+    fixed paths at the repository root -- which is not where cargo looks. A
+    `.cargo/config.toml` is honoured from every ancestor of the directory being
+    built, every crate carries its own `Cargo.toml`, and a `build.rs` can emit
+    `cargo:rustc-flags` at compile time. Measured before the fix: `-C
+    llvm-args=-enable-unsafe-fp-math` planted in `calibrate/.cargo/config.toml`
+    and in `shared/build.rs`, plus an `ffast-math` line in
+    `correctability_calculator/Cargo.toml`, produced ZERO findings and the guard
+    printed "no fast-math or reassociation licence anywhere in the build
+    configuration".
+    """
+    import build_flags as B
+    import os
+
+    # POSITIVE: every forbidden flag must be reported, one at a time, so a
+    # flag that stopped matching is caught rather than covered by its
+    # neighbours.
+    for flag, _why in B.FORBIDDEN:
+        planted = f'[build]\nrustflags = ["-C", "{flag}"]\n'
+        expect(B.scan_config_text("planted/.cargo/config.toml", planted),
+               f"the build-flag scan did not report {flag!r}; that entry of "
+               f"FORBIDDEN is decoration")
+
+    # NEGATIVE: an ordinary configuration must be silent, or the guard fires on
+    # every crate in the tree and gets ignored.
+    expect(not B.scan_config_text(
+        "planted/Cargo.toml",
+        '[package]\nname = "x"\n\n[profile.release]\nlto = true\n'
+        'opt-level = 3\ncodegen-units = 1\n'),
+        "the build-flag scan fired on an ordinary release profile")
+
+    # SCOPE: discovery must reach the files the old fixed list missed. Anchored
+    # to the DIRECTORY each one lives in rather than to its full path, so a
+    # rename inside that directory does not break the assertion while a
+    # narrowing of the scan does.
+    found = B.config_files()
+    expect(found, "build-configuration discovery found no files at all; the "
+                  "scan is examining nothing")
+    expect(any(p.endswith("Cargo.toml") and os.path.dirname(p) == "" for p in found),
+           f"discovery missed the root Cargo.toml (found {found[:8]})")
+    for want in ("build.rs", "Cargo.toml"):
+        nested = [p for p in found
+                  if os.path.basename(p) == want and os.path.dirname(p)]
+        expect(nested,
+               f"discovery found no {want} outside the repository root, so a "
+               f"flag set in a subdirectory crate would still be invisible "
+               f"(found {found[:8]})")
+
+    # ... and must NOT sweep in vendored trees, or the guard reports a
+    # dependency's build script as this repository's configuration.
+    expect(not [p for p in found
+                if any(part in B.SKIP_DIRS for part in p.split(os.sep))],
+           f"discovery walked into a vendored or generated tree "
+           f"({[p for p in found if any(x in p for x in B.SKIP_DIRS)][:3]})")
+
+
 def agreements_integrity():
     """The cross-body agreement list must name real theorems and real reasons,
     and must not pair a definition with itself -- which would pass always and
@@ -536,6 +595,7 @@ def main():
     agreements_integrity()
     no_stale_excuses()
     unevaluatable_is_not_agreement()
+    build_flag_scope()
     workflow_path_extraction()
     broken_table_is_not_silent()
     coverage_check_fires()
@@ -554,8 +614,9 @@ def main():
           "undeclared def, empty sweep reported, vacuity screen catches a "
           "collapsed body, a body that raises across the whole grid is "
           "UNEVALUATED rather than satisfied while a single pole is still "
-          "skipped, CALIB-TAIL reaches the end of both the relation table and "
-          "the real prover.yml.")
+          "skipped, every forbidden build flag is reported and the scan reaches "
+          "subdirectory crates, CALIB-TAIL reaches the end of both the relation "
+          "table and the real prover.yml.")
     return 0
 
 

@@ -82,12 +82,30 @@ FORBIDDEN_SOURCE = (
     ("fmul_fast", "LLVM fast-math intrinsic"),
 )
 
-CONFIG_FILES = (
-    ".cargo/config.toml",
-    ".cargo/config",
+# Filenames that can carry a flag into the build, ANYWHERE in the tree. This
+# used to be four fixed paths at the repository root, which is not where cargo
+# looks: `.cargo/config.toml` is honoured from every ancestor of the directory
+# being built, each crate carries its own `Cargo.toml`, and a `build.rs` can
+# emit `cargo:rustc-flags=...` at compile time. Measured: `-C
+# llvm-args=-enable-unsafe-fp-math` planted in `calibrate/.cargo/config.toml`
+# and in `shared/build.rs` produced zero findings and the guard printed "no
+# fast-math or reassociation licence anywhere in the build configuration".
+#
+# Discovered rather than enumerated, for the reason stated all over this
+# directory: a list of paths stops covering things silently, and this one had.
+CONFIG_NAMES = (
+    "config.toml",              # only under a .cargo/ directory; see below
+    "config",                   # ditto, cargo's pre-2020 spelling
     "Cargo.toml",
     "rust-toolchain.toml",
+    "rust-toolchain",
+    "build.rs",
 )
+
+# Vendored and generated trees. A dependency's own Cargo.toml is not this
+# repository's build configuration, and .venv carries megabytes of unrelated
+# text.
+SKIP_DIRS = (".git", "target", ".venv", "node_modules", ".lake", "vendor")
 
 KERNEL = "score/kernel.rs"
 BATCH = "score/batch.rs"
@@ -103,18 +121,56 @@ def read(rel):
         return handle.read()
 
 
+def config_files():
+    """Every file in this repository that can carry a build flag, discovered.
+
+    A `config.toml`/`config` counts only inside a `.cargo/` directory, which is
+    the only place cargo reads one; every `Cargo.toml`, `rust-toolchain*` and
+    `build.rs` counts wherever it is. Sorted, repo-relative.
+    """
+    out = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        rel_dir = os.path.relpath(dirpath, ROOT)
+        for name in filenames:
+            if name not in CONFIG_NAMES:
+                continue
+            if name in ("config.toml", "config") and \
+                    os.path.basename(dirpath) != ".cargo":
+                continue
+            out.append(os.path.normpath(os.path.join(rel_dir, name)))
+    return sorted(out)
+
+
+def scan_config_text(rel, text):
+    """Findings for one build-configuration file.  Injectable, so the
+    calibration can plant a flag without writing to the tree."""
+    out = []
+    for flag, why in FORBIDDEN:
+        if flag in text:
+            out.append(
+                f"{rel}: build flag {flag!r} is present. {why}. The scoring "
+                f"kernel's accumulation order and NaN handling are part of "
+                f"the specification; see this file's header for the "
+                f"assembly-level baseline it would break.")
+    return out
+
+
 def check_configs():
-    for rel in CONFIG_FILES:
+    scanned = config_files()
+    # A guard that scanned nothing must not report a clean build configuration.
+    # The repository has a root Cargo.toml at minimum; zero means ROOT is wrong,
+    # which is the defect that emptied the extraction tier.
+    if not scanned:
+        findings.append(
+            f"NO BUILD CONFIGURATION FOUND under {ROOT}. This guard examined "
+            f"nothing, so its silence is not evidence; the repository root it "
+            f"computed is wrong.")
+    for rel in scanned:
         text = read(rel)
         if text is None:
             continue
-        for flag, why in FORBIDDEN:
-            if flag in text:
-                findings.append(
-                    f"{rel}: build flag {flag!r} is present. {why}. The scoring "
-                    f"kernel's accumulation order and NaN handling are part of "
-                    f"the specification; see this file's header for the "
-                    f"assembly-level baseline it would break.")
+        findings.extend(scan_config_text(rel, text))
     # RUSTFLAGS in the workflow files, where it is equally invisible.
     wf = os.path.join(ROOT, ".github", "workflows")
     if os.path.isdir(wf):
@@ -299,7 +355,10 @@ def main():
     check_kernel_shape()
     check_workflow_paths()
     print("build-configuration guard: "
-          f"{len(CONFIG_FILES)} config files, {len(FORBIDDEN)} forbidden flags, "
+          f"{len(config_files())} build-configuration files discovered "
+          f"({', '.join(config_files()[:6])}"
+          f"{', ...' if len(config_files()) > 6 else ''}), "
+          f"{len(FORBIDDEN)} forbidden flags, "
           f"kernel shape anchored to declarations.")
     if findings:
         print(f"\n{len(findings)} FINDING(S):\n")
