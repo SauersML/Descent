@@ -116,7 +116,7 @@ run_cmd liftTermElabM do
     let vSet := vU.map (·.1)
     -- Binder types come from a proper telescope: the raw `forallE` domains
     -- carry loose bound variables and cannot be pretty-printed.
-    let info ← forallTelescope ci.type fun args _ => args.mapM fun a => do
+    let info ← forallTelescope ci.type fun args _ ↦ args.mapM fun a ↦ do
       let ty ← inferType a
       pure ((← ppExpr ty).pretty, ← isProp ty, ← a.fvarId!.getUserName)
     let mut props := 0
