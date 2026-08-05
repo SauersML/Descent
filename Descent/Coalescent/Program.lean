@@ -181,9 +181,14 @@ step" are different states.
   (`card_two_collisions_le'`, five overlap cases), and a union bound over the `≤ k⁴` quadruples
   gives `twoDropProb_le`: the chance of dropping two or more is at most `k⁴/N²`.  With
   `WrightFisher.coalescenceProb_le` on the diagonal, that is every entry of the row to the
-  order K-G (2.11) asks for.  STILL ABSENT: assembling those entries into a `Matrix` and
-  feeding it to `SemigroupLimit.tendsto_pow_of_expansion` -- bookkeeping in the row-sum norm,
-  with no mathematics left in it; and Möhle's lemma proper, the `A + B/N` form with `A` a
+  order K-G (2.11) asks for.  `Coalescent.BlockMatrixLimit` assembles them: the entries become a `Matrix` in the row-sum
+  norm (K-G (2.12)'s norm, scoped in Mathlib as `Matrix.Norms.Operator`), each row is a
+  probability distribution so the operator is a contraction, and `row_diff_bound` puts the row
+  within `(d_k/N)² + 2k⁴/N²` of `1 + N⁻¹Q` -- the diagonal from `WrightFisher`'s sandwich, the
+  tail from `twoDropProb_le`, and the subdiagonal by subtraction since the row sums to one.
+  That is K-G (2.11) for the block-count chain.  STILL ABSENT: reading that row bound as a
+  norm bound through `linfty_norm_le_of_rows` and applying `tendsto_pow_of_expansion` -- `Fin`
+  index arithmetic matching `k - 1` to the generator's subdiagonal, with no mathematics in it; and Möhle's lemma proper, the `A + B/N` form with `A` a
   projection, for models whose two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut

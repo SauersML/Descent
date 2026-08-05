@@ -29,6 +29,15 @@ the scoped namespace `Matrix.Norms.Operator`, so they are opened here rather tha
 - `blockMatrix`, `blockGenerator`: the one-generation operator and `Q`.
 - `sum_row_blockMatrix`: **each row is a probability distribution**.
 - `norm_blockMatrix_le_one`: hence the operator is a contraction, K-G (2.12).
+- `sum_range_blockTransition`: the mass below the subdiagonal is the two-drop probability.
+- `row_diff_bound`: **the row is within `(d_k/N)² + 2k⁴/N²` of `1 + N⁻¹Q`**, which is
+  K-G (2.11) for the block-count chain.
+
+What is left is to read `row_diff_bound` as a norm bound through `linfty_norm_le_of_rows` --
+the same conversion `norm_blockMatrix_le_one` already makes -- and hand the result to
+`SemigroupLimit.tendsto_pow_of_expansion`.  The `Fin (n+1)` index arithmetic that conversion
+needs, matching `k - 1` against the generator's subdiagonal, is the only thing between here
+and `P_N^N → exp Q` for the whole chain.
 -/
 
 namespace Coalescent
@@ -107,6 +116,84 @@ theorem norm_blockMatrix_le_one {n N : ℕ} (hN : 0 < N) : ‖blockMatrix n N‖
     Real.norm_of_nonneg (blockTransition_nonneg hN)
   simp only [hnorm]
   exact le_of_eq (sum_row_blockMatrix hN k)
+
+/-! ### The row difference
+
+`WrightFisher.coalescenceProb_le` and `.le_coalescenceProb` place the diagonal within
+`(d_k/N)²/2` of `1 - d_k/N`.  `BlockCountMatrix.twoDropProb_le` places everything below the
+subdiagonal within `k⁴/N²` of zero.  The subdiagonal is then whatever the row has left, and
+the row sums to one -- so its deviation is at most the sum of the other two.  Three bounds,
+one subtraction, and the row is within `O(N⁻²)` of `1 + N⁻¹Q`. -/
+
+/-- The mass strictly below the subdiagonal is the two-drop probability. -/
+theorem sum_range_blockTransition {N k : ℕ} (hN : 0 < N) :
+    ∑ j ∈ Finset.range (k - 1), blockTransition N k j
+      = ((Finset.univ.filter fun f : Fin k → Fin N ↦
+          (Finset.univ.image f).card + 2 ≤ k).card : ℝ) / (N : ℝ) ^ k := by
+  classical
+  have hmem : ∀ f ∈ (Finset.univ.filter fun f : Fin k → Fin N ↦
+      (Finset.univ.image f).card + 2 ≤ k), (Finset.univ.image f).card ∈ Finset.range (k - 1) := by
+    intro f hf
+    have := (Finset.mem_filter.mp hf).2
+    exact Finset.mem_range.mpr (by omega)
+  have hpart := Finset.card_eq_sum_card_fiberwise hmem
+  have hfib : ∀ j ∈ Finset.range (k - 1),
+      ((Finset.univ.filter fun f : Fin k → Fin N ↦
+          (Finset.univ.image f).card + 2 ≤ k).filter
+        fun f ↦ (Finset.univ.image f).card = j)
+      = Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card = j := by
+    intro j hj
+    have hjk : j + 2 ≤ k := by
+      have := Finset.mem_range.mp hj
+      omega
+    ext f
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, and_iff_right_iff_imp]
+    intro hcard
+    omega
+  rw [hpart, Finset.sum_congr rfl (fun j hj ↦ congrArg Finset.card (hfib j hj))]
+  unfold blockTransition
+  rw [← Finset.sum_div, ← Nat.cast_sum]
+
+/-- **The row is within `O(N⁻²)` of `1 + N⁻¹Q`.**  The diagonal deviates by at most
+`(d_k/N)²/2`, the tail by at most `k⁴/N²`, and the subdiagonal -- being one minus the other
+two -- by at most their sum. -/
+theorem row_diff_bound {N k : ℕ} (hN : 0 < N) (hk : 2 ≤ k) (hkN : k ≤ N) :
+    |blockTransition N k k - (1 - deathRate k / (N : ℝ))|
+        + |blockTransition N k (k - 1) - deathRate k / (N : ℝ)|
+        + ∑ j ∈ Finset.range (k - 1), blockTransition N k j
+      ≤ (deathRate k / (N : ℝ)) ^ 2 + 2 * ((k : ℝ) ^ 4 / (N : ℝ) ^ 2) := by
+  classical
+  have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+  set T := ∑ j ∈ Finset.range (k - 1), blockTransition N k j with hT
+  have hTnn : 0 ≤ T := Finset.sum_nonneg fun j _ ↦ blockTransition_nonneg hN
+  have hTle : T ≤ (k : ℝ) ^ 4 / (N : ℝ) ^ 2 := by
+    rw [hT, sum_range_blockTransition hN]
+    exact twoDropProb_le hN hk
+  have hdiag : blockTransition N k k = noCoalescenceProb N k := blockTransition_diag hN
+  have hup : 1 - noCoalescenceProb N k ≤ deathRate k / (N : ℝ) := coalescenceProb_le hN hkN
+  have hlow : deathRate k / (N : ℝ) - (deathRate k / (N : ℝ)) ^ 2 / 2
+      ≤ 1 - noCoalescenceProb N k := le_coalescenceProb hN hkN
+  have hA : |blockTransition N k k - (1 - deathRate k / (N : ℝ))|
+      ≤ (deathRate k / (N : ℝ)) ^ 2 / 2 := by
+    rw [hdiag, abs_le]
+    constructor <;> linarith
+  -- the subdiagonal is one minus the diagonal minus the tail
+  have hsub : blockTransition N k (k - 1) = 1 - blockTransition N k k - T := by
+    have hsplit : ∑ j ∈ Finset.range (k + 1), blockTransition N k j
+        = (∑ j ∈ Finset.range (k - 1), blockTransition N k j)
+          + blockTransition N k (k - 1) + blockTransition N k k := by
+      have h1 : k + 1 = (k - 1) + 1 + 1 := by omega
+      rw [h1, Finset.sum_range_succ, Finset.sum_range_succ]
+      congr 2
+      omega
+    have := sum_blockTransition (N := N) (k := k) hN
+    rw [hsplit] at this
+    linarith
+  have hB : |blockTransition N k (k - 1) - deathRate k / (N : ℝ)|
+      ≤ (deathRate k / (N : ℝ)) ^ 2 / 2 + T := by
+    rw [hsub, hdiag, abs_le]
+    constructor <;> linarith
+  linarith
 
 end Coalescent
 
