@@ -1,7 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.OpenQuestions
+-- `driftLDStep` is proved equal to `Portability.ibdRecurrenceStep` and
+-- `Portability.islandFstMultiplicativeStep` by unfolding both, and the Frobenius mismatch
+-- lemmas name `frobeniusNormSq` and `alleleFreqDivergenceRate` from `PopGen.DGP`.  Both
+-- arrive through `PortabilityDrift`, which is the single import
+-- `Descent.Program.OpenQuestions` used to carry here; the programme narrative was never
+-- supplying anything and is no longer in the path.
+import Descent.Portability.PortabilityDrift
 import Descent.Core.Fst
 
 namespace Descent.PopGen
