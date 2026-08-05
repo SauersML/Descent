@@ -322,7 +322,7 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
         altAlleleCount Descent.Core.Genotype.het * (2 * h.refFreq * h.altFreq) +
         altAlleleCount Descent.Core.Genotype.homAlt * h.altFreq ^ 2
         = 2 * (h.refFreq * h.altFreq) + 2 * h.altFreq ^ 2 := by
-          simp [altAlleleCount]
+          simp [altAlleleCount, Descent.Core.Genotype.dosage]
           ring
     _ 
         = 2 * h.altFreq * (h.refFreq + h.altFreq) := by ring
@@ -358,7 +358,10 @@ theorem HardyWeinbergModel.genotypeVariance_eq
     ring
   unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq, sum_over_genotypes]
-  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount, HardyWeinbergModel.refFreq]
+  -- `altAlleleCount` now delegates to `Core.Genotype.dosage`, so unfolding the
+  -- wrapper alone leaves the coding unexpanded and the arithmetic unfinished.
+  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount,
+    Descent.Core.Genotype.dosage, HardyWeinbergModel.refFreq]
   ring_nf
 
 /-- **A polymorphic locus has positive genotype variance.**

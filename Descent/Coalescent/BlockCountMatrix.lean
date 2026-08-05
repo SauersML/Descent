@@ -274,6 +274,72 @@ theorem twoDropProb_le {k N : ℕ} (hN : 0 < N) (hk : 2 ≤ k) :
     _ = (k : ℝ) ^ 4 * ((N : ℝ) ^ (k - 2) * (N : ℝ) ^ 2) := by ring
     _ = (k : ℝ) ^ 4 * (N : ℝ) ^ k := by rw [hpow]
 
+/-! ### The entries themselves -/
+
+/-- The one-generation block-count transition probability: from `k` lineages to `j`, counted
+as the share of parent maps whose image has exactly `j` elements.
+
+Empirical status: DERIVED.  It is a count over `WrightFisher.parentAssignment`'s sample space
+divided by its size, which is that event's probability under the uniform law -- the same
+reading `WrightFisher.noCoalescenceProb_eq_card_ratio` makes of the diagonal. -/
+noncomputable def blockTransition (N k j : ℕ) : ℝ :=
+  ((Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card = j).card : ℝ)
+    / (N : ℝ) ^ k
+
+/-- **The rows are probability distributions.**  Every parent map has an image of some size
+between `0` and `k`, so the fibres of "image size" partition the sample space. -/
+theorem sum_blockTransition {N k : ℕ} (hN : 0 < N) :
+    ∑ j ∈ Finset.range (k + 1), blockTransition N k j = 1 := by
+  classical
+  have hNR : (0 : ℝ) < (N : ℝ) ^ k := by
+    have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    positivity
+  have hmaps : ∀ f : Fin k → Fin N, (Finset.univ.image f).card ∈ Finset.range (k + 1) := by
+    intro f
+    refine Finset.mem_range.mpr ?_
+    have := Finset.card_image_le (s := (Finset.univ : Finset (Fin k))) (f := f)
+    simp only [Finset.card_univ, Fintype.card_fin] at this
+    omega
+  have hpart : (Finset.univ : Finset (Fin k → Fin N)).card
+      = ∑ j ∈ Finset.range (k + 1),
+          (Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card = j).card :=
+    Finset.card_eq_sum_card_fiberwise fun f _ ↦ hmaps f
+  have htotal : ((Finset.univ : Finset (Fin k → Fin N)).card : ℝ) = (N : ℝ) ^ k := by
+    rw [Finset.card_univ, Fintype.card_fun, Fintype.card_fin, Fintype.card_fin]
+  unfold blockTransition
+  rw [← Finset.sum_div, ← Nat.cast_sum, ← hpart, htotal, div_self (ne_of_gt hNR)]
+
+/-- **The diagonal entry is the counted no-coalescence probability.**  An image of size `k`
+is an injective parent map, which is what `WrightFisher.noCoalescenceProb` counts -- so the
+matrix's diagonal is the quantity `coalescenceProb_le` already places within `(d_k/N)²/2` of
+`1 - d_k/N`. -/
+theorem blockTransition_diag {N k : ℕ} (hN : 0 < N) :
+    blockTransition N k k = noCoalescenceProb N k := by
+  classical
+  have hNR : (0 : ℝ) < (N : ℝ) ^ k := by
+    have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    positivity
+  have hfil : (Finset.univ.filter fun f : Fin k → Fin N ↦ (Finset.univ.image f).card = k)
+      = Finset.univ.filter fun f : Fin k → Fin N ↦ Function.Injective f := by
+    ext f
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · intro h
+      have hinj : Set.InjOn f (Finset.univ : Finset (Fin k)) := by
+        refine Finset.injOn_of_card_image_eq ?_
+        rw [h, Finset.card_univ, Fintype.card_fin]
+      intro x y hxy
+      exact hinj (Finset.mem_coe.mpr (Finset.mem_univ x))
+        (Finset.mem_coe.mpr (Finset.mem_univ y)) hxy
+    · intro h
+      rw [Finset.card_image_of_injective _ h, Finset.card_univ, Fintype.card_fin]
+  have hcard : (Finset.univ.filter fun f : Fin k → Fin N ↦ Function.Injective f).card
+      = N.descFactorial k := by
+    have h := card_injective_parentMaps N k
+    rw [← h, Fintype.card_subtype]
+  unfold blockTransition noCoalescenceProb
+  rw [hfil, hcard]
+
 end Coalescent
 
 end Descent
