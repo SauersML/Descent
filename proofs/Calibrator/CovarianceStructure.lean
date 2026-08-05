@@ -422,7 +422,7 @@ noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : �
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem admixtureLDAtGen_at_reference_point :
-    admixtureLDAtGen 1 1 1 1 1 1 1 = 0 := by
+    admixtureLDAtGen (1 / 2) 1 1 0 0 0 1 = 1 / 4 := by
   norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed]
 
 
@@ -449,7 +449,7 @@ noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
 theorem admixtureLDMagnitude_at_reference_point :
-    admixtureLDMagnitude 1 1 1 1 1 = 0 := by
+    admixtureLDMagnitude (1 / 2) 1 0 0 1 = 1 / 4 := by
   norm_num [admixtureLDMagnitude]
 
 
