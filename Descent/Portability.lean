@@ -16,6 +16,13 @@ import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.Portability.MetricSpecificPortability
+import Descent.Portability.MetricSpecificPortability.ARoneFrontier
+import Descent.Portability.MetricSpecificPortability.CalibrationVsDiscrimination
+import Descent.Portability.MetricSpecificPortability.GeneticFrontier
+import Descent.Portability.MetricSpecificPortability.MetricAndClinicalDecisions
+import Descent.Portability.MetricSpecificPortability.PrecisionRecall
+import Descent.Portability.MetricSpecificPortability.R2Decomposition
+import Descent.Portability.MetricSpecificPortability.SharedCorrectionFamily
 import Descent.Portability.MultiAncestryTheory
 import Descent.Portability.PCCorrectability
 import Descent.Portability.PCCorrectability.Core
@@ -30,6 +37,11 @@ import Descent.Portability.PCCorrectability.Overlap
 import Descent.Portability.PCCorrectability.Phase
 import Descent.Portability.PCCorrectability.Threshold
 import Descent.Portability.PGSCalibrationTheory
+import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
+import Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination
+import Descent.Portability.PGSCalibrationTheory.DecisionImplications
+import Descent.Portability.PGSCalibrationTheory.PopulationCalibrationDrift
+import Descent.Portability.PGSCalibrationTheory.RecalibrationMethods
 import Descent.Portability.PhenomeWidePortability
 import Descent.Portability.PolygenicContinuumCalibration
 import Descent.Portability.PortabilityBounds
@@ -50,6 +62,10 @@ import Descent.Portability.ScoreDistribution
 import Descent.Portability.StatisticalGeneticsMethodology
 import Descent.Portability.StratificationConfounding
 import Descent.Portability.TransferLearningPGS
+import Descent.Portability.TransferLearningPGS.FeatureRepresentation
+import Descent.Portability.TransferLearningPGS.FineTuning
+import Descent.Portability.TransferLearningPGS.ImportanceWeighting
+import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransplantationStability
 
 /-!

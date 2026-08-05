@@ -7,6 +7,9 @@ import Descent.Conditionals.DescentGeometry
 import Descent.Conditionals.DriftingConditional
 import Descent.Conditionals.DriftingConditionals
 import Descent.Conditionals.DynamicsContrast
+import Descent.Conditionals.DynamicsContrast.CohortLandscapeSuperposition
+import Descent.Conditionals.DynamicsContrast.StationarityRepair
+import Descent.Conditionals.DynamicsContrast.Tail
 import Descent.Conditionals.FunctionalDescent
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Conditionals.LocalToGlobalCoherence
