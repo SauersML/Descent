@@ -48,6 +48,15 @@ derived.  What is proved is everything downstream of that.
   framework, its `S` values are reproduced, and its hidden edge is exhibited —
   showing the polymorphism hypothesis of `segregatingCount_gauge_invariant` is
   not removable.
+
+## What this file stops short of
+
+`segregating_add_hidden` is a defect formula for a COUNT.  It becomes a defect
+formula for an ESTIMATOR only once the count is divided by Watterson's `a_{n-1}`,
+and that constant lives in `Descent.Coalescent.BranchLength`, which this file does
+not import.  `Descent.Pangenome.CoalescentGauge` does the division and states the
+consequence for `Descent.Coalescent.expectedTajimaNumerator_eq_zero`, whose null
+mentions no reference tree and therefore cannot see any of this.
 -/
 
 namespace Descent.Pangenome

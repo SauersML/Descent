@@ -30,6 +30,15 @@ every spanning tree removes exactly `|V| - 1` traversed edges and `S` is pinned 
 the Betti number.  Subsample, and edges go untraversed, and different spanning
 trees absorb different numbers of them.
 
+## Where this lands
+
+`Descent.Pangenome.GaugeInvariance` generalises the witness to arbitrary graphs and
+computes the defect.  `Descent.Pangenome.CoalescentGauge` then states what the two
+together mean for the coalescent: the statistics moved here are
+`Descent.Coalescent.wattersonEstimator` and the numerator of Tajima's `D`, whose null
+`Descent.Coalescent.expectedTajimaNumerator_eq_zero` establishes, and that null has no
+argument for a reference tree.
+
 ## Scope
 
 This is a witness, not a general theorem.  It shows the dependence is real and
@@ -141,7 +150,14 @@ def piRows6 (t : RefTree) (sample : List Hap) : Nat :=
   2 * sumOver (unorderedPairs sample) (rowDist t)
 
 /-- Six times Watterson's `θ_W = S / a_n`, at `n = 3` where `a_3 = 3/2`, so
-`6 θ_W = 4 S`. -/
+`6 θ_W = 4 S`.
+
+The factor `4` is `6 / a₃` and is NOT computed here.  `a₃` is a value of the general
+harmonic sum, `Descent.Coalescent.harmonicSum 2`, and
+`Descent.Pangenome.thetaW6_eq_watterson` proves this definition equals six times
+`Descent.Coalescent.wattersonEstimator` at `n = 3`.  The literal is written out rather
+than divided because everything in this file must stay in `ℕ` for `decide`; the theorem
+is what keeps it from being an assertion. -/
 def thetaW6 (t : RefTree) (sample : List Hap) : Nat := 4 * S t sample
 
 /-- Six times the numerator of Tajima's `D`, namely `π - θ_W`, with `π` taken at the
