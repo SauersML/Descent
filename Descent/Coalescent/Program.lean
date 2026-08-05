@@ -44,77 +44,49 @@ reads as a covered one.
 * Transit time, entrance boundary, absorption factor: `Rates`.  K-G (5.7)-(5.13), K-C p.239.
 * Ewens (3.8) normalises at `n = 2, 3`: `Mutation.ewensProb_two_total`, `.ewensProb_three_total`.
 
-## Open, and why
+## The five hard items, and where each stands
 
-(Items 1 and 2 below are settled; they are kept in place with their proofs named.)
-
-**1. The split count.**  SETTLED, by `CutCount.card_covers_below`:
+**1. The split count.**  SETTLED, `CutCount.card_covers_below`:
 `#{ξ ; ξ ≺ η} = Σ_c (2^{λ_c - 1} - 1)`.  The route was to stop dividing by two.
 `Split.splitBy_compl` shows each cut is named twice; `CutSets` breaks the tie with each
-class's canonical representative, so that a CUT SET -- a nonempty subset of one class
-omitting its representative -- names each state exactly once
-(`CutSets.splitBy_injective_on_cutSets`, `CutSets.exists_cutSet_of_covers`).  Counting cut
-sets is then counting subsets (`CutCount.isCutSetOf_iff`, `CutCount.card_cutSetsOf`), and
-`sum_choose_interior_eq_two_mul_cutCount` below checks the total against Kingman's
-`Σ_ν ½C(λ,ν)`.
+class's representative so a cut set names each state once; counting cut sets is then
+counting subsets.  `sum_choose_interior_eq_two_mul_cutCount` below checks the total against
+Kingman's `Σ_ν ½C(λ,ν)`.
 
-**2. Ewens normalisation for general `n`.**  SETTLED, by `Ewens.sum_ewensWeight`:
-`Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, which is what makes K-G (3.8) a
-probability distribution and what `Mutation` could previously only check at `n = 2, 3`.  The
-proof is Kingman's restaurant: `Extend` gives the fibre of restriction over `ξ` as
-`Option (Quotient ξ)`, `Ewens.sum_ER_succ` decomposes the sum by seating, and
-`Ewens.sum_seatings_ewensWeight` values the seatings at `θ + n` -- `θ` for a new class,
-`λ_c` for joining class `c`.  Listed here because it was open, and left listed because the
-record of what a group had to build to close something is worth more than a tick.
+**2. Ewens normalisation for general `n`.**  SETTLED, `Ewens.sum_ewensWeight`:
+`Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, by the Chinese restaurant.  `Extend`
+gives the fibre of restriction as `Option (Quotient ξ)`; seating multiplies the weight by
+`θ` or by `λ_c`; `sum_classSize` turns the class sum into `n`.
 
-**3. K-C Theorem 2, the paintbox representation.**  One half is settled:
-`Coalescent.PaintboxFrequency.tendsto_colourFrequency` is K-C (3.8) FOR A PAINTBOX -- the
-asymptotic class frequencies exist and are the `x_r` the box was built from, by the strong
-law.  The half that is Theorem 2, and is untouched:  Every exchangeable random equivalence
-relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the
-construction equivariant, which is the direction that needs no probability.  The converse is
-a de Finetti theorem proved through a reversed martingale convergence argument (K-C cites
-Doob VII.4.25), and nothing in this corpus is close to it.
+**3. K-C Theorem 2, the paintbox representation.**  HALF SETTLED.  That a paintbox HAS
+asymptotic frequencies, and that they are its own parameters, is
+`PaintboxFrequency.tendsto_colourFrequency` -- K-C (3.8) by the strong law.  `Paintbox`
+also proves the construction permutation-equivariant, which is the exchangeability that
+needs no probability.  OPEN: the converse, that every exchangeable random equivalence
+relation is a paintbox mixture.  K-C proves it by reversed martingale convergence (Doob
+VII.4.25) and nothing in this corpus is close to it.
 
-**4. K-C Theorem 1's real content: independence.**  The ONE-STEP case is settled by
-`Coalescent.CompetingRates`: with unit rate on each cover (K-C (1.3)), the clocks' survival
-multiplies to `e^{-d_k t}` (`prod_survival_covers`, using `card_covers_eq_deathRate`), and
-the joint density of "cover `η` at time `t`" factorises as `(1/d_k) · d_k e^{-d_k t}`
-(`jointDensity_factors`) with the same first factor for every cover
-(`jointDensity_indep_of_cover`).  A density that splits is independence.  What is left is
-the induction over steps and the passage from densities to the joint law of the path.  The factorisation `R_t = ℛ_{D_t}` with
-the jump chain independent of the death process is what makes the finite-dimensional
-distributions computable.  `Coalescent.Path` now supplies the object this was blocked on:
-the path of ONE trajectory, `pathState`, with `|R_t| = D(n,t)` (K-G (6.6),
-`Path.blocks_pathState`), `R_0 = Δ`, absorption at the transit time, and monotone coarsening.
-What is still missing is the LAW.  Taking the chain and the holds independent makes
-independence true by construction -- that is Theorem 3's direction -- while Theorem 1's
-direction, that an ARBITRARY `n`-coalescent factorises, needs the general theory of jump
-chains for continuous-time Markov chains, which this corpus does not have.
+**4. K-C Theorem 1, independence of the jump chain and the death process.**  ONE STEP
+SETTLED.  `CompetingRates`: unit rate on each cover makes the survivals multiply to
+`e^{-d_k t}` (`prod_survival_covers`), and the joint density of "cover `η` at time `t`"
+factorises as `(1/d_k) · d_k e^{-d_k t}` (`jointDensity_factors`), the same first factor for
+every cover.  A density that splits is independence.  `Trajectory.chainLaw_head_blocks` adds
+the structural reason it can hold at all: after `k` jumps the block count is `n - k` on every
+trajectory, so the death process learns nothing from it.  OPEN: the induction over steps,
+and the passage from densities to the joint law of the path.
 
-**5. K-G section 6, the temporal coupling, and K-C Theorem 3, the infinite coalescent.**
-The deterministic half of the temporal coupling is now `Coalescent.Path`: K-G (6.1)'s
-`descentTime`, (6.2)'s death process as a step function, (6.5)'s `R_t = ℛ_{D(n,t)}` and
-(6.6).  The estimate that lets the death process start from infinity --
-`Σ_{r≥k} d_r⁻¹ = 2/(k-1)` -- is `Rates.hasSum_one_div_deathRate_tail`.  The discrete half of the measure is now `Coalescent.Trajectory`: `chainLaw` is a law on
-whole TRAJECTORIES, and `Trajectory.chainLaw_support_chain'` is K-C (1.13) -- every
-trajectory in its support is a descending chain of covers (repeating once absorbed, which is
-`Kernel.jumpKernel_absorbing`'s convention).  `Coalescent.Law` then couples the trajectory to a clock: `coalescentLaw` is the product of
-`chainLaw` with `m` independent copies of a holding-time law, and `coalescentLaw_prod` is
-the independence K-G section 6 needs -- ARRANGED, not derived, which is exactly what
-Theorem 3 does and exactly what Theorem 1 does not.  `Coalescent.HoldingTime` then supplies the clock: K-C (1.7)'s density `d_k e^{-d_k t}` is a
-probability measure (`integral_holdDensity`, the one genuine integral in this group), so
-`HoldingTime.coalescentLawExp` is the coupling with no parameter left open.  The mean `E(τ_r) = d_r⁻¹` of K-G (5.6) is proved too
-(`HoldingTime.integral_id_mul_holdDensity`, a second integral against the same density,
-rescaling to `Γ(2) = 1`), so `Rates.meanTransitTime_eq_two_sub` -- `E(T_n) = 2 - 2/n` -- now
-runs from K-C (1.7)'s density rather than from a cited mean.  The set-level half of the passage to `n = ∞` is
-`Coalescent.Infinite`: `𝓔` really is the projective limit of the `𝓔ₙ`
-(`restrictInf_ofCompatible`, `eq_ofCompatible`), so specifying a process by its restrictions
-is well posed.  What remains is the extension of a consistent family of MEASURES, which is
-Theorem 3's Kakutani-Nelson step.
+**5. K-G section 6 and K-C Theorem 3, the constructions.**  FINITE `n` SETTLED.
+`Trajectory.chainLaw` is a law on whole trajectories, with K-C (1.13) as
+`chainLaw_support_chain'` and `chainLaw_head_eq_top`; `Path` turns a trajectory and holds
+into `R_t = ℛ_{D(n,t)}` with `|R_t| = D(n,t)` (K-G (6.6)) and the death process pinned down
+pathwise (`blockCountAt_eq`, K-C (2.6)); `Law` couples them; `HoldingTime` supplies K-C
+(1.7)'s clock and proves both its integrals, so `E(T_n) = 2 - 2/n` runs from the density.
+`Infinite` proves `𝓔` is the projective limit of the `𝓔ₙ` as a set, so specifying a process
+by its restrictions is well posed.  OPEN: the extension of a consistent family of MEASURES
+to `n = ∞`, which is Theorem 3's Kakutani-Nelson step.
 
-None of the five is asserted anywhere in the group.  Where a result depends on one, the
-dependence is a written hypothesis, not a hidden one.
+Nothing above is asserted where it is open.  Where a result depends on an open item, the
+dependence is a written hypothesis.
 
 ## Main results
 
