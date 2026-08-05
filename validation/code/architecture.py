@@ -37,9 +37,17 @@ honest target is not zero:
     writing a restatement, which is the anti-pattern the duplicate gate exists to
     stop.  `terminal_deliberate` and `terminal_unclassified` are the split, and
     only the second is a population a triage could act on.
-  * `externally_silent_modules`, `defs_no_theorem_names`,
-    `imports_naming_nothing_used` -- same shape, each with its reason on the
-    function that computes it.
+  * `defs_no_theorem_names`, `imports_naming_nothing_used` -- same shape, each
+    with its reason on the function that computes it.
+
+Four of the measurements are now GATED WITH A BUDGET rather than left reported:
+`cross_module_reuse_pct`, `composition_theorems`, `externally_silent_modules`
+and `foundation_not_yet_load_bearing`.  A budget is the gate for a quantity
+whose honest target is neither zero nor its present value -- it fails on the
+wrong side of a bound, and the bound is meant to be tightened as the work lands.
+Leaving them merely reported put the corpus in the position this header
+complains about from the other side: the disease was measured, printed, and the
+build stayed green.  See `BUDGETS`.
 
     python3 validation/code/architecture.py            # report
     python3 validation/code/architecture.py --gate     # exit nonzero unless every count is zero
@@ -754,6 +762,54 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             "foundation_not_yet_load_bearing")
 
 
+# --------------------------------------------------------------------------
+# Budgets: gated, but not at zero
+# --------------------------------------------------------------------------
+#
+# WHY THIS IS NOT THE RATCHET THIS FILE REJECTS.  The header argues against a
+# baseline that fails only on regression, and it is right about DEFECTS: a
+# duplicate body, an orphan definition and an inverted foundation each have an
+# honest target of zero, so a baseline there licenses the very thing being
+# repaired.
+#
+# The four measurements below do NOT have an honest target of zero, and each has
+# a paragraph on its own function explaining why -- a conclusion needs no
+# consumer, a new foundation starts with no callers, cross-module reuse of 100%
+# would mean nothing is ever an endpoint.  Leaving them REPORTED because zero is
+# wrong left the corpus in the position the header complains about from the other
+# side: the disease was measured, printed, and the build stayed green.
+#
+# A BUDGET is the gate for a quantity whose target is neither zero nor the
+# present value.  It fails on the wrong side of a bound, and the bound is meant
+# to be tightened as the work lands -- so a rise in reuse or a fall in silent
+# modules is followed by editing the number DOWN, and the entry records what it
+# was when it was last moved.  An untightened budget is visible: it stops
+# matching the reported value.
+BUDGETS = {
+    # floor, must not fall.  8.0% at diagnosis; the namespace work and the
+    # coalescent inversion took it to 9.68.
+    "cross_module_reuse_pct": ("at least", 9.6),
+    # floor.  2 at diagnosis, 61 now.  The plan's target is 500: a demographic
+    # history reaching a deployed metric should be the common shape, not 1%.
+    "composition_theorems": ("at least", 61),
+    # ceiling, must not rise.  56 at diagnosis, 36 now.
+    "externally_silent_modules": ("at most", 36),
+    # ceiling.  A foundation may start with no callers; it may not accumulate.
+    "foundation_not_yet_load_bearing": ("at most", 6),
+}
+
+
+def budget_failures(now):
+    """Budgets on the wrong side of their bound, as (key, value, bound, sense)."""
+    out = []
+    for key, (sense, bound) in sorted(BUDGETS.items()):
+        value = now[key]
+        if (sense == "at least" and value < bound) or \
+           (sense == "at most" and value > bound):
+            out.append((key, value, bound, sense))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -776,7 +832,14 @@ def main() -> int:
     for k in sorted(now):
         if k.startswith("_"):
             continue
-        mark = "" if k in REPORTED else ("  OK" if now[k] == 0 else "  <- must be 0")
+        if k in BUDGETS:
+            sense, bound = BUDGETS[k]
+            ok = (now[k] >= bound) if sense == "at least" else (now[k] <= bound)
+            mark = f"  [budget {sense} {bound}]{'' if ok else '  <- OUTSIDE'}"
+        elif k in REPORTED:
+            mark = ""
+        else:
+            mark = "  OK" if now[k] == 0 else "  <- must be 0"
         print(f"  {k:34} {now[k]}{mark}")
 
     if args.verbose:
@@ -827,10 +890,15 @@ def main() -> int:
     failures = [(k, now[k], what) for k, what in DEFECTS.items() if now[k] != 0]
     for k, n, what in sorted(failures):
         print(f"FAIL  {k}: {n}  ({what})", file=sys.stderr)
-    if failures:
+
+    over = budget_failures(now)
+    for k, value, bound, sense in over:
+        print(f"FAIL  {k}: {value}  (budget: {sense} {bound})", file=sys.stderr)
+
+    if failures or over:
         print("\nrun with --verbose to name every offender", file=sys.stderr)
         return 1
-    print("\nevery defect count is zero")
+    print("\nevery defect count is zero, and every budget holds")
     return 0
 
 
