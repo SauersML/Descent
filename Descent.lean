@@ -321,7 +321,7 @@ that was already there, at the moment of acting.
   * AND THE WORST OF THE FOUR, BECAUSE PROXIMITY DID NOT HELP: in
     `validation/differential/corpus.py`, `_all_modules()` carries a comment
     saying that `Descent.lean` is a SIBLING of `Descent/` and that
-    a dead-code scan with exactly this blind spot deleted `decaySlope` and
+    a dead-code scan with exactly this blind spot deleted `PopGen.decaySlope` and
     `LDDecayMechanism` as unreferenced. Forty lines below, `_leanexpr_table()`
     reconstructed the path as `join(CORPUS, mod + ".lean")` and reintroduced
     the assumption the comment was written to prevent. The documentation of the
@@ -618,19 +618,19 @@ specialisations above do, instantiating `t := 2` -- and these did neither. -/
 
 /-! ### `ld_decay_implies_nonlinear_calibration_of_exp_tagging` -- READ BEFORE TOUCHING ITS INPUTS
 
-This theorem is the consumer of `LDDecayMechanism` and `decaySlope` in
+This theorem is the consumer of `LDDecayMechanism` and `PopGen.decaySlope` in
 `Descent.PopGen.DGP`, and it is the ONLY one. It also lives in `Descent.lean`, the
 corpus root, one directory *above* `Descent/`.
 
 That combination has already destroyed both definitions once. A dead-code scan walking
-only `Descent/` reported `decaySlope` as having "no use anywhere and no theorem
+only `Descent/` reported `PopGen.decaySlope` as having "no use anywhere and no theorem
 about them" and deleted it; a second pass then deleted `LDDecayMechanism` as having "lost
 its only consumer". Both premises were false, and the second inherited the first's error.
 
 **The deletion did not break the build, and that is the dangerous part.** Lean auto-binds
 an undefined bare name as an implicit variable rather than reporting it missing, so this
 theorem kept elaborating -- with `mech` an arbitrary inhabitant of an arbitrary type and
-`decaySlope` an arbitrary function, every hypothesis about them constraining nothing. It
+`PopGen.decaySlope` an arbitrary function, every hypothesis about them constraining nothing. It
 sat here green, among the headline results, as a well-formed claim about nothing, until
 an application finally demanded a function. So for this class of name the build cannot
 detect the breakage: ABSENCE OF A BUILD FAILURE IS NOT EVIDENCE THAT A DELETION WAS SAFE.
@@ -657,12 +657,12 @@ theorem ld_decay_implies_nonlinear_calibration_of_exp_tagging {k : ℕ} [Fintype
     (hd2 : mech.distance c2 = 2) :
     ∀ (beta0 beta1 : ℝ),
       (fun c ↦ beta0 + beta1 * mech.distance c) ≠
-        (fun c ↦ decaySlope mech c) := by
+        (fun c ↦ PopGen.decaySlope mech c) := by
   intro beta0 beta1 h_eq
   have h0 := congr_fun h_eq c0
   have h1 := congr_fun h_eq c1
   have h2 := congr_fun h_eq c2
-  unfold decaySlope at h0 h1 h2
+  unfold PopGen.decaySlope at h0 h1 h2
   rw [h_tagging] at h0 h1 h2
   rw [hd0] at h0
   rw [hd1] at h1

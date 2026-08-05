@@ -186,10 +186,15 @@ step" are different states.
   probability distribution so the operator is a contraction, and `row_diff_bound` puts the row
   within `(d_k/N)² + 2k⁴/N²` of `1 + N⁻¹Q` -- the diagonal from `WrightFisher`'s sandwich, the
   tail from `twoDropProb_le`, and the subdiagonal by subtraction since the row sums to one.
-  That is K-G (2.11) for the block-count chain.  STILL ABSENT: reading that row bound as a
-  norm bound through `linfty_norm_le_of_rows` and applying `tendsto_pow_of_expansion` -- `Fin`
-  index arithmetic matching `k - 1` to the generator's subdiagonal, with no mathematics in it; and Möhle's lemma proper, the `A + B/N` form with `A` a
-  projection, for models whose two time scales separate.
+  That is K-G (2.11) for the block-count chain.  `tendsto_blockOperator_pow` then CLOSES the
+  many-state case outright: `P_N^N -> exp Q`, K-G (2.14) for the whole block-count chain, with
+  every hypothesis a theorem rather than an assumption.  The last one to fall was `‖exp(tQ)‖
+  ≤ 1`, obtained by uniformisation -- `blockGenerator_eq_smul` factors `Q = d_n(S - 1)` through
+  the stochastic `S = 1 + Q/d_n`, and `SemigroupLimit.norm_exp_smul_sub_one_le_one` turns that
+  into a contraction semigroup in any Banach algebra.  That in turn needed `‖exp x‖ ≤ e^{‖x‖}`,
+  which Mathlib does not state; `ExpRemainder.norm_exp_le_exp_norm` is the second gap this
+  group has had to close there.  STILL ABSENT: Möhle's lemma proper, the `A + B/N` form with
+  `A` a projection, for models whose two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
   restriction commutes with looking down, at or above it the operation is invisible.  That is
