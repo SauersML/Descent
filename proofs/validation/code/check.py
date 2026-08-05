@@ -5473,7 +5473,7 @@ def run_conventions() -> int:
                 stale.append(f"{key}: module {module} is not in the corpus")
             else:
                 stale.append(f"{key}: `{name}` is no longer a `def` in {module}")
-    bridge_edges = set()
+    bridge_edges, bridge_records = set(), 0
     for bridge in ledger.get("bridges", []):
         pair = tuple(bridge.get("between", []))
         thm = bridge.get("theorem", "")
@@ -5484,6 +5484,7 @@ def run_conventions() -> int:
             stale.append(f"bridge {pair[0]} <-> {pair[1]}: theorem `{thm}` is not in the corpus")
             continue
         bridge_edges.add(pair)
+        bridge_records += 1
 
     # UNLEDGERED.  Only `complete` quantities can produce this finding; an
     # `unscoped` quantity is recorded so a later pass has somewhere to put the
@@ -5618,7 +5619,8 @@ def run_conventions() -> int:
           f"{', '.join(unscoped) or 'none'}; "
           f"{len(verified)} source-verified constant records outside those "
           f"families; {with_constants} entries pin a constant multiset; "
-          f"{len(bridge_edges)} bridge theorem(s) present; "
+          f"{bridge_records} bridge theorem(s) present over "
+          f"{len(bridge_edges)} distinct convention edge(s); "
           f"{status_seen} `Empirical status:` heads all inside a closed "
           f"vocabulary of {len(vocabulary)} terms")
     return 0

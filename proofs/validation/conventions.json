@@ -84,6 +84,14 @@
     },
     {
       "between": [
+        "nei-gst",
+        "hudson"
+      ],
+      "theorem": "no_constant_scales_neiGst_to_hudsonFst",
+      "says": "The NON-relation, machine-checked: there is no c with Hudson = c * G on the interior of the frequency range. The same edge as the bridge above, recorded separately because it closes a different door -- the bridge says what the conversion IS, this says no CONSTANT conversion exists, which is the belief that a factor-of-two-to-four error is made of. Listed as a bridge so the staleness rule verifies it keeps existing."
+    },
+    {
+      "between": [
         "hudson",
         "per-branch-drift"
       ],

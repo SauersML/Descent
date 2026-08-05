@@ -21,6 +21,7 @@ import Calibrator.AncestryCalibration
 import Calibrator.PortabilityBounds
 import Calibrator.StratificationConfounding
 import Calibrator.TransferLearningPGS
+import Calibrator.RareVariantPortability
 
 namespace Calibrator
 
@@ -174,6 +175,34 @@ which two it is. -/
 theorem twoDemeIMEquilibriumETss_eq_ploidy (M : ℝ) :
     twoDemeIMEquilibriumETss M = ploidy := by
   unfold twoDemeIMEquilibriumETss ploidy; ring
+
+/-- **The two in the recessive drift parameter is the ploidy.**
+
+`RareVariantPortability.recessiveMutationSelectionDriftParameter` is
+`2 Nₑ √(μ s)`, and that two is the number of gene copies per individual: a
+population of `Nₑ` diploids carries `ploidy · Nₑ` gene copies, drift acts at rate
+`1 / (ploidy · Nₑ)`, and the parameter is the selective force `√(μ s)` measured
+against it. Written inline the two was a bare numeral in a quantity whose whole
+job is to say when drift wins, and a haploid reading of the same formula would
+be off by exactly this factor. -/
+theorem recessiveMutationSelectionDriftParameter_uses_ploidy (Ne mu s : ℝ) :
+    recessiveMutationSelectionDriftParameter Ne mu s
+      = ploidy * Ne * Real.sqrt (mu * s) := by
+  unfold recessiveMutationSelectionDriftParameter ploidy; ring
+
+/-- **The four in the dominant drift parameter is the corpus's own rate scaling.**
+
+`RareVariantPortability.mutationSelectionDriftParameter` is `4 Nₑ h s`, and the
+`4 Nₑ` is not an independent convention: it is `scaledMutationRate`, the same
+`4 Nₑ ·` normalisation the corpus already applies to a mutation rate to get `θ`
+and to a migration rate to get `4 Nₑ m`, applied here to the heterozygous
+selection load `h s`. This is deliberately NOT stated as a multiple of `ploidy`.
+Only one of the two factors in `4 = 2 · 2` is a gene-copy count; the other comes
+from the diffusion limit, and tying it to `ploidy` would record a claim about
+genetics that this parameter does not make. -/
+theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
+    mutationSelectionDriftParameter Ne s h = scaledMutationRate Ne (h * s) := by
+  unfold mutationSelectionDriftParameter scaledMutationRate; ring
 
 end Ploidy
 
@@ -524,6 +553,38 @@ theorem neiGst_ne_hudsonFst_at_mean_half :
     neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
   unfold neiGst hudsonFst ploidy meanAlleleFreq
   norm_num
+
+/-- **NO FIXED FACTOR CONVERTS NEI'S `G_ST` INTO HUDSON'S `F_ST`.**
+
+This closes the fork rather than documenting it. The two witnesses above exhibit
+points where the estimators disagree, and `hudsonFst_eq_of_neiGst` gives the exact
+map `Hudson = 2·G/(1 + G)`. Neither shuts the door this theorem shuts: a reader
+who accepts that the two differ can still believe the difference is a calibration
+constant to be divided out, and that belief is what a factor-of-two-to-four error
+looks like from the inside.
+
+There is no such constant, anywhere on the interior of the frequency range, and
+the witnesses say why. The map `Hudson = 2G/(1 + G)` has slope `2` at `G = 0` and
+slope `1` at `G = 1`, so the RATIO moves with the differentiation: at
+`p₁ = 1/5, p₂ = 3/5` it is `12/7`, and at `p₁ = 9/10, p₂ = 1/10` it is `50/41`.
+
+This is the machine-checked form of what `PopulationGeneticsFoundations.neiFst`
+records in prose -- that the measured ratio runs `0.60, 0.60, 0.68, 0.82` across a
+`τ` sweep, so no rescaling reconciles the two. A docstring paragraph can be read
+past; a theorem cannot. After this, substituting one estimator for the other is
+not a judgement call about tolerable error, it is a claim this file refutes.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an arithmetic fact about two
+    definitions, with both witnesses exhibited rather than sampled. -/
+theorem no_constant_scales_neiGst_to_hudsonFst :
+    ¬ ∃ c : ℝ, ∀ p₁ p₂ : ℝ, 0 < p₁ → p₁ < 1 → 0 < p₂ → p₂ < 1 →
+      hudsonFst p₁ p₂ = c * neiGst p₁ p₂ := by
+  rintro ⟨c, hc⟩
+  have h₁ := hc (1/5) (3/5) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  have h₂ := hc (9/10) (1/10) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  unfold neiGst hudsonFst ploidy meanAlleleFreq at h₁ h₂
+  norm_num at h₁ h₂
+  linarith
 
 /-- Between-subgroup allele-frequency variance for an equal-weight split. -/
 noncomputable def betweenSubgroupVariance (p₁ p₂ : ℝ) : ℝ := (p₁ - p₂) ^ 2 / 4
