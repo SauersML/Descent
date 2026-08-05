@@ -590,7 +590,7 @@ At the crossing frequency (numerically `q ≈ 0.140`) drift separation is blind,
 genotype law is distinguished from its Gaussian surrogate only by the jet variance and
 the lattice datum. -/
 theorem condensationConstant_lt_drift_of_rare :
-    condensationConstant < hweMellinDrift (1 / 256) := by
+    Blindness.condensationConstant < hweMellinDrift (1 / 256) := by
   have hlb := rare_variant_drift_lower_bound (q := 1 / 256) (by norm_num) (by norm_num)
   have harg : (1 : ℝ) / (8 * (1 / 256)) = 32 := by norm_num
   rw [harg] at hlb
@@ -599,19 +599,19 @@ theorem condensationConstant_lt_drift_of_rare :
     norm_num
   rw [h32] at hlb
   have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
-  have hcc : condensationConstant < 0.807 := condensationConstant_bounds.2
+  have hcc : Blindness.condensationConstant < 0.807 := Blindness.condensationConstant_bounds.2
   linarith
 
 /-- **The drift-blind frequency band exists.** There are allele frequencies on both
 sides of the Gaussian constant, so the first observable of the trichotomy fails to
 separate somewhere strictly inside the common-variant range. -/
 theorem drift_straddles_condensationConstant :
-    hweMellinDrift ((5 - Real.sqrt 5) / 10) < condensationConstant ∧
-    condensationConstant < hweMellinDrift (1 / 256) := by
+    hweMellinDrift ((5 - Real.sqrt 5) / 10) < Blindness.condensationConstant ∧
+    Blindness.condensationConstant < hweMellinDrift (1 / 256) := by
   refine ⟨?_, condensationConstant_lt_drift_of_rare⟩
   rw [hweMellinDrift_at_sqrt5_point]
   have hl2 : Real.log 2 < (0.6931471808 : ℝ) := Real.log_two_lt_d9
-  have hcc : (0.640 : ℝ) < condensationConstant := condensationConstant_bounds.1
+  have hcc : (0.640 : ℝ) < Blindness.condensationConstant := Blindness.condensationConstant_bounds.1
   linarith
 
 /-!
@@ -695,7 +695,7 @@ theorem maxSafeEpistaticOrder_vanishing_drift_is_junk (N : ℝ) :
   norm_num
 
 theorem maxSafeEpistaticOrder_eq_criticalDegree (N q : ℝ) :
-    maxSafeEpistaticOrder N q = criticalDegree N (hweMellinDrift q) := rfl
+    maxSafeEpistaticOrder N q = Blindness.criticalDegree N (hweMellinDrift q) := rfl
 
 /-- **The Hardy-Weinberg Mellin drift is strictly positive at every polymorphic
 frequency.**
@@ -752,7 +752,7 @@ theorem hweMellinDrift_pos (q : ℝ) (hq0 : 0 < q) (hq1 : q < 1) :
 /-- Subcriticality (the Gaussian surrogate is valid) is exactly `m * c(q) < log N`. -/
 theorem epistatic_order_safe_iff {N q m : ℝ} (hq0 : 0 < q) (hq1 : q < 1) :
     m < maxSafeEpistaticOrder N q ↔ hweMellinDrift q * m < Real.log N :=
-  subcritical_iff (hweMellinDrift_pos q hq0 hq1)
+  Blindness.subcritical_iff (hweMellinDrift_pos q hq0 hq1)
 
 /-- **A drift above the Gaussian constant is a safe order below the Gaussian value.**
 
@@ -763,10 +763,10 @@ frequency-dependence of `c(q)` becomes an actionable statement about a study
 design rather than a fact about a function. -/
 theorem maxSafeEpistaticOrder_lt_gaussian_of_drift_excess
     {N q : ℝ} (hN : 0 < Real.log N)
-    (hlt : condensationConstant < hweMellinDrift q) :
-    maxSafeEpistaticOrder N q < criticalDegree N condensationConstant := by
-  unfold maxSafeEpistaticOrder criticalDegree
-  exact div_lt_div_of_pos_left hN condensationConstant_pos hlt
+    (hlt : Blindness.condensationConstant < hweMellinDrift q) :
+    maxSafeEpistaticOrder N q < Blindness.criticalDegree N Blindness.condensationConstant := by
+  unfold maxSafeEpistaticOrder Blindness.criticalDegree
+  exact div_lt_div_of_pos_left hN Blindness.condensationConstant_pos hlt
 
 /-- **The rare-variant drift is more than seven times the Gaussian constant.**
 
@@ -779,7 +779,7 @@ The crude `rare_variant_drift_lower_bound` cannot reach this: it would only give
 `c(q) ≥ (1/4) log (128) = 1.213`, a factor of `1.5`. Recovering the true factor
 — numerically `8.5` — is what the sharp bound buys. -/
 theorem sevenfold_drift_excess_at_rare_maf :
-    7 * condensationConstant < hweMellinDrift (1 / 1024) := by
+    7 * Blindness.condensationConstant < hweMellinDrift (1 / 1024) := by
   have hlb := rare_variant_drift_sharp_lower_bound (q := 1 / 1024) (by norm_num) (by norm_num)
   have harg : (1 : ℝ) / (2 * (1 / 1024)) = 512 := by norm_num
   rw [harg] at hlb
@@ -788,7 +788,7 @@ theorem sevenfold_drift_excess_at_rare_maf :
     norm_num
   rw [h512] at hlb
   have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
-  have hcc : condensationConstant < 0.807 := condensationConstant_bounds.2
+  have hcc : Blindness.condensationConstant < 0.807 := Blindness.condensationConstant_bounds.2
   linarith
 
 /-- **The safe epistatic order collapses by more than sevenfold at MAF `10 ^ (-3)`.**
@@ -804,14 +804,14 @@ interaction statistics on standardized rare variants therefore sit *at* the
 condensation boundary, not two decades below it, and the Gaussian-surrogate null
 used to calibrate them is converging to a different limit. -/
 theorem maxSafeEpistaticOrder_collapse_at_rare_maf {N : ℝ} (hN : 0 < Real.log N) :
-    7 * maxSafeEpistaticOrder N (1 / 1024) < criticalDegree N condensationConstant := by
-  have hd : 7 * condensationConstant < hweMellinDrift (1 / 1024) :=
+    7 * maxSafeEpistaticOrder N (1 / 1024) < Blindness.criticalDegree N Blindness.condensationConstant := by
+  have hd : 7 * Blindness.condensationConstant < hweMellinDrift (1 / 1024) :=
     sevenfold_drift_excess_at_rare_maf
-  have hgpos : 0 < condensationConstant := condensationConstant_pos
+  have hgpos : 0 < Blindness.condensationConstant := Blindness.condensationConstant_pos
   have hdpos : 0 < hweMellinDrift (1 / 1024) := by linarith
-  have hcross : 7 * Real.log N * condensationConstant
+  have hcross : 7 * Real.log N * Blindness.condensationConstant
       < Real.log N * hweMellinDrift (1 / 1024) := by nlinarith [hN, hd]
-  unfold maxSafeEpistaticOrder criticalDegree
+  unfold maxSafeEpistaticOrder Blindness.criticalDegree
   have hrw : 7 * (Real.log N / hweMellinDrift (1 / 1024))
       = 7 * Real.log N / hweMellinDrift (1 / 1024) := by ring
   rw [hrw]
@@ -1079,11 +1079,11 @@ because the three values of `log x ^ 2` form an exact arithmetic progression the
 (`hardCall_arithmeticProgression_at_critical_maf`) — but note the record *stipulates*
 that constructor rather than deriving it, so the tie to that theorem is by inspection,
 not by proof. Nothing here claims the triple is a complete observable. -/
-noncomputable def hardCallObservables : MellinObservables where
+noncomputable def hardCallObservables : Blindness.MellinObservables where
   drift := hweMellinDrift latticeCriticalMaf
   jetVariance := hweMellinJetVariance latticeCriticalMaf
   latticeDatum :=
-    LatticeDatum.lattice hardCallLatticeSpan
+    Blindness.LatticeDatum.lattice hardCallLatticeSpan
       (Real.log (2 * latticeCriticalMaf / (1 - latticeCriticalMaf)))
 
 /-- The hard-call triple at `q*` is not the Gaussian triple.
@@ -1092,8 +1092,8 @@ The proof is constructor disjointness on the third slot, and both slots are stip
 in the definitions being compared, so what this establishes is that the corpus files a
 hard-called locus at `q*` in the lattice stratum and the Gaussian in the nonlattice one.
 "Observationally distinct" would need the barrier, which is absent. -/
-theorem hardCallObservables_ne_gaussian : hardCallObservables ≠ gaussianObservables :=
-  lattice_observables_ne_gaussian _ _ _ _
+theorem hardCallObservables_ne_gaussian : hardCallObservables ≠ Blindness.gaussianObservables :=
+  Blindness.lattice_observables_ne_gaussian _ _ _ _
 
 /-- Equivalently: a hard-called locus at the lattice frequency is **not** a chameleon.
 The chameleon stratum is nonlattice, so no hard call can hide there — the blind spot of
@@ -1105,8 +1105,8 @@ The surrounding *completeness* reading — "and nothing else is observable" — 
 withdrawn because its analytic barrier was supplied as a structure field.  The licensed
 claim here is only the proved positive one: this observable triple differs from the
 Gaussian triple. -/
-theorem hardCall_not_chameleon : ¬ IsChameleonObservable hardCallObservables := by
-  rw [isChameleonObservable_iff]
+theorem hardCall_not_chameleon : ¬ Blindness.IsChameleonObservable hardCallObservables := by
+  rw [Blindness.isChameleonObservable_iff]
   exact hardCallObservables_ne_gaussian
 
 
@@ -1118,8 +1118,8 @@ compound-Poisson limits differ" is two unproved local limit theorems and
 Gnedenko-Kolmogorov, so this is not a separation of hard calls from dosage
 surrogates. -/
 theorem hardCall_intensity_inflated :
-    1 < latticeInflation hardCallLatticeSpan :=
-  one_lt_latticeInflation hardCallLatticeSpan_pos
+    1 < Blindness.latticeInflation hardCallLatticeSpan :=
+  Blindness.one_lt_latticeInflation hardCallLatticeSpan_pos
 
 /-!
 ## 4a. The lattice frequency is outside the Cramér stratum
@@ -1274,8 +1274,8 @@ proved on the Cramér stratum transfer to imputed dosages and **do not** transfe
 calls at this frequency. -/
 theorem hardCall_not_cramer_at_critical_maf (h : Foundations.HardyWeinbergModel)
     (hq : h.altFreq = latticeCriticalMaf) :
-    ¬ CramerCondition h.genotypeProb (fun g ↦ Real.log (h.standardizedSquare g)) :=
-  hwe_not_cramer_of_lattice h (fun g ↦ Real.log (h.standardizedSquare g))
+    ¬ Blindness.CramerCondition h.genotypeProb (fun g ↦ Real.log (h.standardizedSquare g)) :=
+  Blindness.hwe_not_cramer_of_lattice h (fun g ↦ Real.log (h.standardizedSquare g))
     hardCallLatticeSpan hardCallLatticeSpan_pos
     (hardCall_logSquare_lattice_at_critical_maf h hq)
 
@@ -1390,7 +1390,7 @@ structure CodingInvariants where
   /-- `v`, the size-biased increment variance. -/
   jetVariance : ℝ
   /-- The arithmetic type (lattice datum) of `log x ^ 2`. -/
-  arithmeticType : LatticeDatum
+  arithmeticType : Blindness.LatticeDatum
   /-- Data-valued indicator of sign symmetry; this is not a theorem field. -/
   symmetric : Bool
   /-- The cumulant sequence of `x ^ 2`. -/
@@ -1415,7 +1415,7 @@ genotypes and recomputed numerically by
 `validation/empirical/condensation/check_condensation.py`. The third and fourth components
 are inputs, not claims. No free parameter. -/
 noncomputable def hweCodingInvariants (h : Foundations.HardyWeinbergModel)
-    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where
+    (arithmeticType : Blindness.LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where
   drift := hweMellinDrift h.altFreq
   jetVariance := hweMellinJetVariance h.altFreq
   arithmeticType := arithmeticType
@@ -1431,7 +1431,7 @@ degenerates — it does not, `c(1/2) = log 2` — but that the one invariant whi
 the Gaussian matches it exactly where the jet variance is unusable. -/
 theorem balanced_locus_symmetric_component
     (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)
-    (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) :
+    (arithmeticType : Blindness.LatticeDatum) (squareCumulant : ℕ → ℝ) :
     (hweCodingInvariants h arithmeticType squareCumulant).symmetric = true ∧
       (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧
       (hweCodingInvariants h arithmeticType squareCumulant).jetVariance = 0 := by
@@ -1456,14 +1456,14 @@ straddles `log 2`, so nothing in the development established it. The gap is now 
 `Descent.Condensation.log_two_lt_condensationConstant`, which takes the
 Euler-Mascheroni bound out to `H_16 - log 16` and lands at `c_G > 0.69871`. -/
 theorem hweMellinDrift_half_lt_condensationConstant :
-    hweMellinDrift (1 / 2) < condensationConstant := by
+    hweMellinDrift (1 / 2) < Blindness.condensationConstant := by
   rw [hweMellinDrift_half]
-  exact log_two_lt_condensationConstant
+  exact Blindness.log_two_lt_condensationConstant
 
 /-- The same fact in the form the separation argument uses: the balanced locus is not
 observationally equal to its Gaussian surrogate in the drift. -/
 theorem balanced_locus_drift_separates :
-    hweMellinDrift (1 / 2) ≠ condensationConstant :=
+    hweMellinDrift (1 / 2) ≠ Blindness.condensationConstant :=
   ne_of_lt hweMellinDrift_half_lt_condensationConstant
 
 /-!

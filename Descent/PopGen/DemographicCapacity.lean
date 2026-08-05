@@ -183,7 +183,7 @@ theorem hudsonCalibrated_stratification_imitable_if_within_budget
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (hfst : 0 ≤ Program.hudsonFst p₁ p₂)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
-    (hbase : VarianceNonneg (S₀ - base))
+    (hbase : Blindness.VarianceNonneg (S₀ - base))
     (hbudget : traceForm S₀ +
       Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull

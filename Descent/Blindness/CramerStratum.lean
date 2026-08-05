@@ -5,7 +5,7 @@ import Descent.Foundations.Probability
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Tactic.Linarith
 
-namespace Descent
+namespace Descent.Blindness
 
 noncomputable section
 
@@ -238,4 +238,4 @@ end HardCalls
 
 end
 
-end Descent
+end Descent.Blindness

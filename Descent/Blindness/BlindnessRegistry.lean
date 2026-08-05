@@ -5,7 +5,7 @@ import Descent.PopGen.DriftRegime
 import Descent.Blindness.EpistaticChaos
 import Descent.Blindness.XiFromMarkedBreakouts
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # The registry: ten instances of one law, and what a guard suite can buy
@@ -603,4 +603,4 @@ theorem totalSweepFrequency_blind_to_originMultiplicity (finalFrequency : ℝ)
   XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity
     finalFrequency hfrequency
 
-end Descent
+end Descent.Blindness

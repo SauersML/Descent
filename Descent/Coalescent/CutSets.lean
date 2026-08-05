@@ -101,7 +101,7 @@ theorem splitBy_compl_classFinset {n : ℕ} (η : ER n) (S : Finset (Fin n)) (a 
   splitBy_compl η S a hSa
 
 /-- **Every cover is a proper cut**, with the witnesses the normalisation needs. -/
-theorem exists_properCut_of_covers {n : ℕ} {ξ η : ER n} (hcov : Covers ξ η) :
+theorem exists_properCut_of_covers {n : ℕ} {ξ η : ER n} (hcov : Blindness.Covers ξ η) :
     ∃ S : Finset (Fin n), ξ = splitBy η S ∧ S.Nonempty ∧
       ∃ a, (∀ x ∈ S, η.r x a) ∧ ∃ w, η.r w a ∧ w ∉ S := by
   classical
@@ -121,7 +121,7 @@ theorem exists_properCut_of_covers {n : ℕ} {ξ η : ER n} (hcov : Covers ξ η
 /-- **Every state below `η` is the cut along a cut set.**  `exists_properCut_of_covers` gives
 a cut; if it contains its class's representative, `splitBy_compl` swaps to the other side,
 which does not.  Normalising this way is what makes the naming unique. -/
-theorem exists_cutSet_of_covers {n : ℕ} {η ξ : ER n} (hcov : Covers ξ η) :
+theorem exists_cutSet_of_covers {n : ℕ} {η ξ : ER n} (hcov : Blindness.Covers ξ η) :
     ∃ T : Finset (Fin n), IsCutSet η T ∧ ξ = splitBy η T := by
   classical
   obtain ⟨S, hξS, hSne, a, hSa, w, hwa, hwS⟩ := exists_properCut_of_covers hcov

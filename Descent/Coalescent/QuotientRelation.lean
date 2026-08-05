@@ -92,7 +92,7 @@ theorem quotientRelation_self {n : ℕ} (ξ : ER n) :
 downstairs: the block count drops by one on both sides.  This is the one-step form of the
 self-similarity K-C (2.4) rests on -- the coalescent from a `k`-block state moves like a
 `k`-coalescent from `Δ`. -/
-theorem blocks_quotientRelation_covers {n : ℕ} {ξ η : ER n} (hcov : Covers ξ η) :
+theorem blocks_quotientRelation_covers {n : ℕ} {ξ η : ER n} (hcov : Blindness.Covers ξ η) :
     Nat.card (Quotient (quotientRelation hcov.1)) + 1 = blocks ξ := by
   rw [blocks_quotientRelation]
   exact hcov.2

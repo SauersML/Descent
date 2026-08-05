@@ -114,7 +114,7 @@ image-free region the mechanism needs is empty, and the band has a single return
 so the required composition cannot be formed.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 open Finset
@@ -337,4 +337,4 @@ The contrast between the second item and the other two is the point of this whol
 genuinely used hypothesis appears as a typed argument of the theorem that needs it and
 cannot be forgotten; an unused one in a record is decoration. -/
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

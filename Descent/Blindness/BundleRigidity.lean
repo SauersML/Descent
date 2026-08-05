@@ -7,7 +7,7 @@ import Mathlib.Data.Fintype.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
 
-namespace Descent
+namespace Descent.Blindness
 
 open scoped BigOperators
 
@@ -315,4 +315,4 @@ inference from summary statistics is on firmer ground than usually assumed, and 
 effect-size asymmetry should not be inferred from moment-based summaries at all.
 -/
 
-end Descent
+end Descent.Blindness

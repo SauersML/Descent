@@ -117,7 +117,7 @@ section PencilEnvironment
     Trivial as algebra, and that is the point: it pins `ldWhiteningGain` as the summand of the
     ergodic average rather than an unrelated closed form that happens to look similar. -/
 theorem whiteningGain_ergodic_mean_eq_of_constant (decay : ℝ) (n : ℕ) (hn : 0 < n) :
-    (∑ _i : Fin n, ldWhiteningGain decay) / (n : ℝ) = ldWhiteningGain decay := by
+    (∑ _i : Fin n, Blindness.ldWhiteningGain decay) / (n : ℝ) = Blindness.ldWhiteningGain decay := by
   have hn' : ((n : ℝ)) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff_ne_zero.mp hn)
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   field_simp
@@ -136,8 +136,8 @@ theorem whiteningGain_ergodic_mean_eq_of_constant (decay : ℝ) (n : ℕ) (hn : 
     and its rate is `1/m` with the constant `gain - 1` — which diverges as `ρ → 1`, meaning the
     finite-panel bias is worst exactly where LD is strongest. -/
 theorem whiteningGain_finite_trace (decay : ℝ) (m : ℝ) (hm : m ≠ 0) :
-    (1 + (m - 1) * ldWhiteningGain decay) / m
-      = ldWhiteningGain decay - (ldWhiteningGain decay - 1) / m := by
+    (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m
+      = Blindness.ldWhiteningGain decay - (Blindness.ldWhiteningGain decay - 1) / m := by
   field_simp
   ring
 
@@ -153,7 +153,7 @@ theorem whiteningGain_finite_trace (decay : ℝ) (m : ℝ) (hm : m ≠ 0) :
     to `9.4e-16` over fifteen cases, and at `decay = 0.99, m = 100` it sits `0.985` below
     the gain, so the finite-`m` distinction is not a rounding effect. -/
 noncomputable def perSitePrecisionTrace (decay m : ℝ) : ℝ :=
-  (1 + (m - 1) * ldWhiteningGain decay) / m
+  (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m
 
 /-- **The per-site trace's junk branches, named.** At `m = 0` there are no sites to average over
 and Lean's `x / 0 = 0` reports zero per-site weight rather than an undefined average; at
@@ -177,9 +177,9 @@ sum formula matches `Tr(Σ⁻¹)/m` to `9.4e-16`; a measurement at fifteen cases
 that and not a proof of it, and this is the proof. -/
 theorem ldPrecisionTrace_div_eq_perSitePrecisionTrace (decay : ℝ) (nSites : ℕ)
     (hd : 1 - decay ^ 2 ≠ 0) (hm : (nSites : ℝ) ≠ 0) :
-    ldPrecisionTrace decay nSites / (nSites : ℝ)
+    Blindness.ldPrecisionTrace decay nSites / (nSites : ℝ)
       = perSitePrecisionTrace decay (nSites : ℝ) := by
-  unfold ldPrecisionTrace perSitePrecisionTrace ldWhiteningGain
+  unfold Blindness.ldPrecisionTrace perSitePrecisionTrace Blindness.ldWhiteningGain
   field_simp
   ring
 
@@ -193,7 +193,7 @@ theorem ldPrecisionTrace_div_eq_perSitePrecisionTrace (decay : ℝ) (nSites : �
     without measure theory, and it is the same edge-sensitivity that makes `tr K⁻¹` a legal
     certificate where effective-marker counts are not. -/
 theorem whiteningGain_unbounded (M : ℝ) :
-    ∃ decay : ℝ, 0 < decay ∧ decay < 1 ∧ M < ldWhiteningGain decay := by
+    ∃ decay : ℝ, 0 < decay ∧ decay < 1 ∧ M < Blindness.ldWhiteningGain decay := by
   obtain ⟨N, hN⟩ := exists_nat_gt (max M 2)
   have hN2 : (2 : ℝ) < (N : ℝ) := lt_of_le_of_lt (le_max_right M 2) hN
   have hMN : M < (N : ℝ) := lt_of_le_of_lt (le_max_left M 2) hN
@@ -209,7 +209,7 @@ theorem whiteningGain_unbounded (M : ℝ) :
   · have h1 : Real.sqrt t < Real.sqrt 1 := Real.sqrt_lt_sqrt (le_of_lt ht0) ht1
     rwa [Real.sqrt_one] at h1
   · have hsq : (Real.sqrt t) ^ 2 = t := Real.sq_sqrt (le_of_lt ht0)
-    unfold ldWhiteningGain
+    unfold Blindness.ldWhiteningGain
     rw [hsq, ht]
     have hden : (1 : ℝ) - (1 - 1 / (N : ℝ)) = 1 / (N : ℝ) := by ring
     rw [hden, lt_div_iff₀ hinv0]
@@ -305,16 +305,16 @@ theorem ababFinite_pos (Eα Eβ Eα2 Eβ2 m : ℝ)
 theorem ababFinite_deficit_proportional_to_whiteningGain_deficit_of_length_ne_zero
     (Eα Eβ Eα2 Eβ2 decay m : ℝ) (hm : m ≠ 0) :
     ((2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m)
-        * (ldWhiteningGain decay - 1)
+        * (Blindness.ldWhiteningGain decay - 1)
       = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2)
-        * (ldWhiteningGain decay - (1 + (m - 1) * ldWhiteningGain decay) / m) := by
+        * (Blindness.ldWhiteningGain decay - (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m) := by
   have hnum : (2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m
       = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2) / m := by
     unfold ababFinite
     field_simp
     ring
-  have hden : ldWhiteningGain decay - (1 + (m - 1) * ldWhiteningGain decay) / m
-      = (ldWhiteningGain decay - 1) / m := by
+  have hden : Blindness.ldWhiteningGain decay - (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m
+      = (Blindness.ldWhiteningGain decay - 1) / m := by
     field_simp
     ring
   rw [hnum, hden]

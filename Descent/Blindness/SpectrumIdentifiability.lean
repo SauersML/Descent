@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # What the frequency spectrum cannot determine
@@ -732,4 +732,4 @@ theorem stableSieveDimension_at_zero_exponent_is_junk (L : ℝ) :
 
 end SpectrumIdentifiability
 
-end Descent
+end Descent.Blindness

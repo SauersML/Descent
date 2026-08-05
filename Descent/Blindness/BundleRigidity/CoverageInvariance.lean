@@ -40,7 +40,7 @@ not quantify how stably their frequencies can be recovered. Pairwise `r²` alone
 neither a joint floor nor stable inversion.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -160,4 +160,4 @@ theorem sigmaMin_pos (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (m : ℕ) :
     0 < (η / C) ^ m :=
   pow_pos (div_pos hη hC) m
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

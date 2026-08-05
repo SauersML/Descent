@@ -12,7 +12,7 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Near-optimal geometry under landscape superposition
@@ -1092,4 +1092,4 @@ theorem equal_overlap_different_covariance_energy :
   norm_num [overlapEnergyWitnessCovariance] at henergy ⊢
   exact henergy
 
-end Descent
+end Descent.Blindness

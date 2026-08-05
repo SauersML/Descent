@@ -214,12 +214,12 @@ namespace Descent
 The arguments have different biological meanings, but the common algebraic map is made explicit
 rather than left as two silently parallel formulas. -/
 theorem pioneerWeightFraction_eq_fstFromTau (w : ℝ) :
-    XiFromMarks.pioneerWeightFraction w = fstFromTau w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = fstFromTau w := rfl
 
 /-- The same saturation coordinate also appears in the migration/LD chart; this identity keeps
 the shared formula explicit without conflating the three scientific arguments. -/
 theorem pioneerWeightFraction_eq_sharedLDFromMigration (w : ℝ) :
-    XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w := rfl
 
 /-! ### One formula, several readings
 
@@ -240,7 +240,7 @@ they described is now in the definitions. -/
 /-- The overlap-gap profile of the metric chart is the landscape's population overlap
 profile: one formula, read once as a metric and once as a landscape. -/
 theorem ogpOverlapProfile_eq_populationOverlapProfile (q x : ℝ) :
-    ogpOverlapProfile q x = populationOverlapProfile q x := rfl
+    ogpOverlapProfile q x = Blindness.populationOverlapProfile q x := rfl
 
 /-- The epoch sample size of the metric chart is the epoch lineage sample size. -/
 theorem epochSampleSize_eq_epochLineageSampleSize (K : ℕ) :
@@ -254,24 +254,24 @@ the corpus's same-quantity screen groups them for it -- correctly, since neither
 what the other computes.  No equation between them typechecks: they live at `Fin 2` and
 `Fin 3`.  What can be stated is what each one is, together, and that is this. -/
 theorem configurationOverlap_and_transplantSqNorm_are_dotProduct
-    (configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) :
-    configurationOverlap configuration configuration = dotProduct configuration configuration ∧
+    (configuration : Blindness.TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) :
+    Blindness.configurationOverlap configuration configuration = dotProduct configuration configuration ∧
       transplantSqNorm displacement = dotProduct displacement displacement :=
   ⟨rfl, rfl⟩
 
 /-- The two-state kernel that never moves is the one-hot weight on `Fin 2`: one on the
 diagonal, zero off it, whichever way the equality is written. -/
 theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
-    stayKernel i j = oneHotWeight (R := ℝ) i j := by
-  unfold stayKernel oneHotWeight
+    stayKernel i j = Blindness.oneHotWeight (R := ℝ) i j := by
+  unfold stayKernel Blindness.oneHotWeight
   by_cases h : i = j
   · simp [h]
   · simp [h, Ne.symm h]
 
 /-- The context-preserving transition is that same one-hot weight. -/
 theorem persistentTransition_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
-    Conditionals.persistentTransition x y = oneHotWeight (R := ℝ) x y := by
-  unfold Conditionals.persistentTransition oneHotWeight
+    Conditionals.persistentTransition x y = Blindness.oneHotWeight (R := ℝ) x y := by
+  unfold Conditionals.persistentTransition Blindness.oneHotWeight
   by_cases h : x = y
   · simp [h]
   · simp [h, Ne.symm h]
@@ -282,13 +282,13 @@ theorem contextMatchQuality_eq_persistentTransition (x y : Conditionals.BinaryBi
 
 /-- And it is the one-hot weight, which is the third name for that delta. -/
 theorem contextMatchQuality_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
-    Conditionals.contextMatchQuality x y = oneHotWeight (R := ℝ) x y := by
+    Conditionals.contextMatchQuality x y = Blindness.oneHotWeight (R := ℝ) x y := by
   rw [contextMatchQuality_eq_persistentTransition, persistentTransition_eq_oneHotWeight]
 
 /-- The stable sieve dimension and the condensation critical degree are the same logarithmic
 law, at different arguments: `log L / κ` and `log N / c`. -/
 theorem stableSieveDimension_eq_criticalDegree (kappa L : ℝ) :
-    SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa := rfl
+    Blindness.SpectrumIdentifiability.stableSieveDimension kappa L = Blindness.criticalDegree L kappa := rfl
 
 /-
 THE WARNING WAS ALREADY WRITTEN DOWN. READ THE PROSE NEXT TO WHAT YOU ARE ABOUT
@@ -503,14 +503,14 @@ def sigmaT : Matrix (Fin 2) (Fin 2) ℝ := ![![1, 1], ![1, 1]]
 def crossS : Fin 2 → ℝ := ![1, 0]
 
 /-- The truth configuration of the overlap-energy witness is the cross-population selector. -/
-theorem overlapEnergyTruth_eq_crossS : overlapEnergyTruth = crossS := rfl
+theorem overlapEnergyTruth_eq_crossS : Blindness.overlapEnergyTruth = crossS := rfl
 
 /-- The positive configuration is the reordering score. -/
-theorem overlapEnergyPositive_eq_reorderScore : overlapEnergyPositive = reorderScore := rfl
+theorem overlapEnergyPositive_eq_reorderScore : Blindness.overlapEnergyPositive = reorderScore := rfl
 
 /-- And it is the two-ancestry conditional, which is the third name for `![0, 1]`. -/
 theorem overlapEnergyPositive_eq_twoAncestryConditional :
-    overlapEnergyPositive = twoAncestryConditional := rfl
+    Blindness.overlapEnergyPositive = twoAncestryConditional := rfl
 
 /-! Target cross-covariances were restated here as `crossT`. The same witness
 vector `![1, 1]` is `DGP.ldWitnessTargetCross`, and the restatement has been
@@ -755,7 +755,7 @@ theorem pairwise_epistasis_supercritical_proved :
 /-- The hard-call lattice point produces a strictly inflated exceedance intensity, so
 hard calls and dosage surrogates are not exchangeable at high epistatic order. -/
 theorem hardCall_lattice_inflation_proved :
-    1 < latticeInflation Spectral.hardCallLatticeSpan :=
+    1 < Blindness.latticeInflation Spectral.hardCallLatticeSpan :=
   Spectral.hardCall_intensity_inflated
 
 /-- The expander frustration floor is a genuine constant above `0.127`, so the
@@ -782,10 +782,10 @@ landing on one value. At one slot these are the same condition, so the support-o
 that `CoverageInvariance` proves about charge is a theorem about the coverers that
 `Coverage`'s single window is built from — not a parallel fact about a similar-looking set. -/
 theorem chargedTuples_one_slot_iff {T : Type*} [TopologicalSpace T] {d : ℕ}
-    (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) :
-    t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v)
+    (F : Blindness.BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) :
+    t ∈ Blindness.BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v)
       ↔ t 0 ∈ F.coverers S v := by
-  unfold BundleRigidity.chargedTuples BundleRigidity.ModulusFamily.coverers
+  unfold Blindness.BundleRigidity.chargedTuples Blindness.BundleRigidity.ModulusFamily.coverers
   simp [Fin.forall_fin_one]
 
 /-- **The symmetric lift's two atom magnitudes are the two sides of a single-modulus
@@ -798,10 +798,10 @@ else. So the lift is not choosing a parameterization: the only two magnitudes av
 it are the two the dichotomy already forces, and a change to either file's constant is a
 contradiction here. -/
 theorem singleModulus_atom_sq_eq_realizability_atom_sq {d : ℕ} {v : ℝ}
-    (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) :
-    S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨
-      S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2 := by
-  rw [BundleRigidity.outerAtom_sq hv, BundleRigidity.innerAtom_sq hv1]
+    (S : Blindness.BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) :
+    S.atom j ^ 2 = Blindness.BundleRigidity.outerAtom v ^ 2 ∨
+      S.atom j ^ 2 = Blindness.BundleRigidity.innerAtom v ^ 2 := by
+  rw [Blindness.BundleRigidity.outerAtom_sq hv, Blindness.BundleRigidity.innerAtom_sq hv1]
   exact S.sq_cases j
 
 /-- **The coupling order is a polynomial grade, and the deployment cost is the benchmark
@@ -819,9 +819,9 @@ not a separate phenomenon. Without this the two power laws are two power laws, a
 claim that one specialises the other is prose. -/
 theorem sampleCost_eq_fixedGradeBenchmarkSampleSize (η C : ℝ) (k : ℕ)
     (hη : 0 < η) (hC : 0 < C) :
-    BundleRigidity.sampleCost η C k
+    Blindness.BundleRigidity.sampleCost η C k
       = Decision.fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1 := by
-  unfold BundleRigidity.sampleCost Decision.fixedGradeBenchmarkSampleSize
+  unfold Blindness.BundleRigidity.sampleCost Decision.fixedGradeBenchmarkSampleSize
   rw [div_one, Real.rpow_neg (div_pos hη hC).le, Real.rpow_natCast,
     div_pow, div_pow, inv_div]
 
@@ -841,8 +841,8 @@ files quietly computing different numbers under one name. It adds no dependence 
 already imports both — and it gives `ResonanceSpectrum`'s graded spectrum a stated relation
 to the dichotomy `CramerStratum` decides, should a result ever need the finer invariant. -/
 theorem intensity_eq_charFnSq {n : ℕ} (P : Spectral.PhasePanel n) (s : ℝ) :
-    P.intensity s = charFnSq P.weight P.phase s := by
-  unfold Spectral.PhasePanel.intensity Spectral.PhasePanel.cosPart Spectral.PhasePanel.sinPart charFnSq
+    P.intensity s = Blindness.charFnSq P.weight P.phase s := by
+  unfold Spectral.PhasePanel.intensity Spectral.PhasePanel.cosPart Spectral.PhasePanel.sinPart Blindness.charFnSq
   rw [pow_two, pow_two, Finset.sum_mul_sum, Finset.sum_mul_sum,
     ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun u _ ↦ ?_

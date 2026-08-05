@@ -75,7 +75,7 @@ explicit input. That is strictly better than a single opaque assumed bicondition
 localizes what is still owed.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -254,4 +254,4 @@ point — the two together say exactly which claim is safe to quote. -/
 theorem sampleCost_one (η C : ℝ) : sampleCost η C 1 = (C / η) ^ 2 := by
   rw [sampleCost]
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

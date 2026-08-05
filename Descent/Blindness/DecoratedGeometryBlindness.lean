@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.ContinuumCalibration
 import Descent.Program.Conventions
 
-namespace Descent
+namespace Descent.Blindness
 
 open scoped BigOperators
 
@@ -704,4 +704,4 @@ theorem spectrumBudgetedError_ge_conjugate {Mode : Type*} [Fintype Mode] [Nonemp
 
 end BudgetConjugacy
 
-end Descent
+end Descent.Blindness

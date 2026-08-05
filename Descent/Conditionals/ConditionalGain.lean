@@ -359,18 +359,18 @@ def FullSupport (J : FiberCoupling k d) : Prop :=
 
 /-- A coupled fiber covers a tuple of modulus values when a charged atom tuple realizes
 those values. -/
-def CoversTuple (family : BundleFamily d) (fiber : Fin k → ℝ)
+def CoversTuple (family : Blindness.BundleFamily d) (fiber : Fin k → ℝ)
     (J : FiberCoupling k d) (value : Fin k → ℝ) : Prop :=
   ∃ x : Fin k → Fin d, J.mass x ≠ 0 ∧
     ∀ i, family.modulus (x i) (fiber i) = value i
 
 /-- Coverage determined from the Cartesian product of the one-slot supports. -/
-def ProductCovers (family : BundleFamily d) (fiber : Fin k → ℝ)
+def ProductCovers (family : Blindness.BundleFamily d) (fiber : Fin k → ℝ)
     (value : Fin k → ℝ) : Prop :=
   ∃ x : Fin k → Fin d, ∀ i, family.modulus (x i) (fiber i) = value i
 
 /-- Under full support, coupled coverage is exactly product coverage. -/
-theorem coversTuple_iff_productCovers (family : BundleFamily d) (fiber : Fin k → ℝ)
+theorem coversTuple_iff_productCovers (family : Blindness.BundleFamily d) (fiber : Fin k → ℝ)
     (J : FiberCoupling k d) (hfull : J.FullSupport) (value : Fin k → ℝ) :
     CoversTuple family fiber J value ↔ ProductCovers family fiber value := by
   constructor
@@ -382,7 +382,7 @@ theorem coversTuple_iff_productCovers (family : BundleFamily d) (fiber : Fin k �
 /-- **Coverage invariance, finite and non-perturbative.** Any two full-support couplings
 charge exactly the same modulus cells.  LD may change their weights arbitrarily; it cannot
 change which cells exist until it kills support. -/
-theorem coverage_invariant (family : BundleFamily d) (fiber : Fin k → ℝ)
+theorem coverage_invariant (family : Blindness.BundleFamily d) (fiber : Fin k → ℝ)
     (J J' : FiberCoupling k d) (hJ : J.FullSupport) (hJ' : J'.FullSupport)
     (value : Fin k → ℝ) :
     CoversTuple family fiber J value ↔ CoversTuple family fiber J' value := by
@@ -452,13 +452,13 @@ practical caveat added**. Exact rational sweep and finite-sample arm in
 `validation/empirical/ld_coverage_boundary/`. -/
 
 /-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
-noncomputable def copyWitnessFamily : BundleFamily 2 where
+noncomputable def copyWitnessFamily : Blindness.BundleFamily 2 where
   atomValue := fun j _ ↦ if j = 0 then 1 else 0
   atomMass := fun _ _ ↦ 1 / 2
 
 theorem copyWitnessFamily_modulus (j : Fin 2) (t : ℝ) :
     copyWitnessFamily.modulus j t = if j = 0 then 0 else 1 := by
-  simp only [BundleFamily.modulus, copyWitnessFamily]
+  simp only [Blindness.BundleFamily.modulus, copyWitnessFamily]
   split_ifs <;> norm_num
 
 /-- **The modulus-copy coupling**: locus two copies locus one, so only the diagonal carries
@@ -692,7 +692,7 @@ For genetics this rules out replacing the two-axis diagnostic by a single LD-sup
 number: a panel may preserve all genotype cells while its score anti-concentration changes
 qualitatively under cell reweighting. -/
 theorem same_full_support_coverage_different_gain
-    (family : BundleFamily 2) (fiber : Fin 1 → ℝ) (value : Fin 1 → ℝ) :
+    (family : Blindness.BundleFamily 2) (fiber : Fin 1 → ℝ) (value : Fin 1 → ℝ) :
     (FiberCoupling.CoversTuple family fiber
         balancedBinaryOppositePhaseLaw.toFiberCoupling value ↔
       FiberCoupling.CoversTuple family fiber

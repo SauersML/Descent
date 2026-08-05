@@ -4,9 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.CountingInvariantBlindness
 import Descent.Portability.PCCorrectability.ImitationCapacity
 
-namespace Descent
+namespace Descent.Blindness
 
-open Descent.CountingInvariantBlindness
+open Descent.Blindness.CountingInvariantBlindness
 
 /-!
 # The `m_eff` prohibition as an instance of counting-invariant blindness
@@ -198,4 +198,4 @@ theorem meffApproxWitness_error_floor_pos (n o : ℕ) (L : ℝ) (hn : 0 < n) (hL
 
 end
 
-end Descent
+end Descent.Blindness

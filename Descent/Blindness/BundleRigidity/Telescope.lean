@@ -66,7 +66,7 @@ closed-path and Neumann-series arguments run on, and because both of its small c
 asserted in the source and are worth having as checked lemmas rather than as remarks.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 variable {ι : Type*} {R : Type*} [Ring R]
 
@@ -170,4 +170,4 @@ theorem altSum_pair (P Q : ι → ℝ) (Φ A : ι → R)
     smul_smul, smul_smul, smul_add, smul_smul, smul_smul]
   abel
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

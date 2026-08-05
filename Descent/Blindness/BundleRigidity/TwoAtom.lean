@@ -108,7 +108,7 @@ lightning-bolt argument from the theory of sums of weighted compositions
 known fact in population genetics, reproduced rather than discovered.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -357,4 +357,4 @@ theorem chain_tendsto_half :
   rw [Real.dist_eq, hgap n]
   exact hbound
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

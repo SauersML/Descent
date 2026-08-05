@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.CumulantBlindness
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Lattice arithmetic from the withdrawn Jet Barrier program
@@ -456,4 +456,4 @@ theorem isChameleonObservable_iff (O : MellinObservables) :
   · rintro rfl
     exact ⟨rfl, rfl, rfl⟩
 
-end Descent
+end Descent.Blindness

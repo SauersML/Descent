@@ -1063,7 +1063,7 @@ information-theoretically unavailable without it, and it requires no symmetry
 of the background class. -/
 theorem active_budget_makes_stratification_detectable
     {base A S₀ : Matrix ι ι ℝ}
-    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < Blindness.quadForm A v)
     {v : ι → ℝ} (hvne : v ≠ 0) {t : ℝ} (ht : 0 < t) :
     ¬ (traceWindowClass base A S₀).IsNull
       ((traceWindowClass base A S₀).spiked S₀ t v) :=

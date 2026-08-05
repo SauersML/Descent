@@ -29,7 +29,7 @@ to variance without an additional theorem. A Denjoy--Koksma or digit-factor appl
 must therefore be supplied separately and with its actual coding hypotheses.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -70,4 +70,4 @@ theorem sublinear_rate_of_bounded (Γ : ℕ → ℝ) (B : ℝ)
     (fun n ↦ div_le_div_of_nonneg_right (hbdd n) (Nat.cast_nonneg n))
   simpa using tendsto_const_div_atTop_nhds_zero_nat B
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

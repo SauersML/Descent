@@ -10,7 +10,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Failure of spectral sufficiency for non-Gaussian product priors
@@ -917,4 +917,4 @@ theorem ldOrientationFourthInvariant_eq_sum_ldPowerScore_four
     ldOrientationFourthInvariant ld = ∑ j, ldPowerScore ld 4 j := by
   exact entryFourthSum_eq_sum_ldPowerScore_four ld
 
-end Descent
+end Descent.Blindness

@@ -474,20 +474,20 @@ section UnidentifiableExchange
     resolution of the observable is the empirical question this asks to be answered explicitly
     rather than assumed. -/
 theorem indistinguishableDemes_exchangeRate_unidentifiable
-    (hubRate exchange exchange' : ℝ) (observable : Fin 3 → ℝ) (hlump : Lumped observable)
+    (hubRate exchange exchange' : ℝ) (observable : Fin 3 → ℝ) (hlump : Blindness.Lumped observable)
     (order : ℕ) :
-    generatorIter (demeRate hubRate exchange) observable order =
-      generatorIter (demeRate hubRate exchange') observable order :=
-  lumped_dynamics_blind_to_exchange hubRate exchange exchange' observable hlump order
+    Blindness.generatorIter (Blindness.demeRate hubRate exchange) observable order =
+      Blindness.generatorIter (Blindness.demeRate hubRate exchange') observable order :=
+  Blindness.lumped_dynamics_blind_to_exchange hubRate exchange exchange' observable hlump order
 
 /-- The mechanism, in one identity: gene flow out of the hub never sees the leaf-to-leaf channel.
 
     Empirical status: DERIVED. -/
 theorem hubFlow_carries_no_exchange_information
-    (hubRate exchange : ℝ) (observable : Fin 3 → ℝ) (hlump : Lumped observable) :
-    generatorApply (demeRate hubRate exchange) observable 0
+    (hubRate exchange : ℝ) (observable : Fin 3 → ℝ) (hlump : Blindness.Lumped observable) :
+    Blindness.generatorApply (Blindness.demeRate hubRate exchange) observable 0
       = 2 * hubRate * (observable 1 - observable 0) :=
-  hubDrift_has_no_exchange_rate hubRate exchange observable hlump
+  Blindness.hubDrift_has_no_exchange_rate hubRate exchange observable hlump
 
 end UnidentifiableExchange
 

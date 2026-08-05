@@ -5,7 +5,7 @@ import Descent.Blindness.ObservationalCeiling
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.Linarith
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Hidden-model ambiguity: witness rigidity, the sigma-compact ceiling, and what it
@@ -384,4 +384,4 @@ theorem catalogue_induces_reduction
   exact IsCompleteCatalogue.separates hcatalogue
     (inequivalent_of_unbounded_coding B x y hdiv)
 
-end Descent
+end Descent.Blindness

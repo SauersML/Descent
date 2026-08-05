@@ -8,7 +8,7 @@ import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Blindness
 
 noncomputable section
 
@@ -1765,4 +1765,4 @@ end Unification
 
 end
 
-end Descent
+end Descent.Blindness

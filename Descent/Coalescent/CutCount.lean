@@ -141,12 +141,12 @@ theorem card_cutSets {n : ℕ} [NeZero n] (η : ER n) :
 /-- **Cut sets and states below `η` biject.**  `CutSets` proved both halves; this packages
 them as an equality of cardinalities. -/
 theorem card_covers_eq_card_cutSets {n : ℕ} (η : ER n) :
-    Nat.card {ξ : ER n // Covers ξ η}
+    Nat.card {ξ : ER n // Blindness.Covers ξ η}
       = Nat.card {S : Finset (Fin n) // IsCutSet η S} := by
   classical
   refine (Nat.card_eq_of_bijective
     (fun S : {S : Finset (Fin n) // IsCutSet η S} =>
-      (⟨splitBy η S.1, ?_⟩ : {ξ : ER n // Covers ξ η})) ?_).symm
+      (⟨splitBy η S.1, ?_⟩ : {ξ : ER n // Blindness.Covers ξ η})) ?_).symm
   · obtain ⟨x, hx⟩ := S.2.1
     refine splitBy_covers η S.1 (a := x) (fun y hy => S.2.2.1 y hy x hx) ⟨x, hx⟩ ?_
     refine ⟨(Quotient.mk η x).out, ?_, out_not_mem_cutSet S.2 x⟩
@@ -165,7 +165,7 @@ split of a class of size `λ` into pieces `ν` and `λ - ν` by `½ C(λ, ν)`. 
 those weights carry, arrived at without the halving:
 `Program.sum_choose_interior_eq_two_mul_cutCount` checks that the two agree. -/
 theorem card_covers_below {n : ℕ} [NeZero n] (η : ER n) :
-    Nat.card {ξ : ER n // Covers ξ η} = ∑ c : Quotient η, (2 ^ (classSize η c - 1) - 1) := by
+    Nat.card {ξ : ER n // Blindness.Covers ξ η} = ∑ c : Quotient η, (2 ^ (classSize η c - 1) - 1) := by
   classical
   rw [card_covers_eq_card_cutSets, ← card_cutSets η, Nat.card_eq_fintype_card,
     Fintype.card_subtype]

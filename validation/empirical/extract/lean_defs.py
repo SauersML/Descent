@@ -66,11 +66,11 @@ def mTwo(p):
 def chain(k):
     return _rt.rdiv((k), (((2.0 * (k)) + 1.0)))
 
-def Descent_BundleFamily_modulus(family, j, t):
+def Descent_Blindness_BundleFamily_modulus(family, j, t):
     return _rt.rabs((_rt.lpow(_rt._proj(family, 'atomValue')(j, t), 2.0) - 1.0))
 
 def massAt(family, t, v):
-    return sum(((_rt._proj(family, 'atomMass')(j, t) if (Descent_BundleFamily_modulus(family, j, t) == v) else 0.0)) for j in range(int(_rt.sumdim('j', len(_rt._proj(family, 'atomMass'))))))
+    return sum(((_rt._proj(family, 'atomMass')(j, t) if (Descent_Blindness_BundleFamily_modulus(family, j, t) == v) else 0.0)) for j in range(int(_rt.sumdim('j', len(_rt._proj(family, 'atomMass'))))))
 
 def gaussianJetVariance():
     return (_rt.rdiv(_rt.lpow(_rt.pi, 2.0), 2.0) - 4.0)
@@ -102,11 +102,11 @@ def charFnSq(w, a, t):
 def locusVarianceShare(β, h, j):
     return _rt.mul(_rt.lpow(β[int(j)], 2.0), h[int(j)])
 
-def Descent_scoreVariance(β, h):
+def Descent_Blindness_scoreVariance(β, h):
     return sum((locusVarianceShare(β, h, j)) for j in range(int(len(β))))
 
-def Descent_locusInfluence(β, h, j):
-    return _rt.rdiv(locusVarianceShare(β, h, j), Descent_scoreVariance(β, h))
+def Descent_Blindness_locusInfluence(β, h, j):
+    return _rt.rdiv(locusVarianceShare(β, h, j), Descent_Blindness_scoreVariance(β, h))
 
 def IsProfileTwin(divergence, s, t):
     return all(((divergence[int(s)][int(u)] == divergence[int(t)][int(u)])) for u in range(int(len(divergence))))
@@ -4087,10 +4087,6 @@ def diploidPanelCovarianceMomentPermeability(q, covarianceDerivative, taggingRes
 
 def totalDiploidCovarianceMomentInformation(m, q, covarianceDerivative):
     return (m * diploidCovarianceMomentPermeability(q, covarianceDerivative))
-
-def twoPointModulusLaw(family, site, pathWeight, v, w):
-    m = float(len(pathWeight))
-    return sum((_rt.mul(pathWeight[int(i)], (_rt.mul(_rt._proj(massAt(family), '1')((site(i)), v), _rt._proj(massAt(family), '2')((site(i)), w))))) for i in range(int(len(pathWeight))))
 
 def ofScalar(D):
     return (lambda _band, pair: D[int(pair)])

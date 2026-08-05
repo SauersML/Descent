@@ -61,7 +61,7 @@ The distinction prevents an abstract realization from being reported as a realiz
 genetic panel.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 open Finset
@@ -265,4 +265,4 @@ theorem sin_has_many_zeros (N : ℕ) (hN : 0 < N) :
     rw [this]
     exact Real.sin_nat_mul_pi _
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

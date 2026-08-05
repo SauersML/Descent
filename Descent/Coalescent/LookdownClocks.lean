@@ -59,7 +59,7 @@ with probability `e^{-d_n t}`, so the wait until some pair looks down is exponen
 coalescent's own rate.  Nothing is assumed here beyond K-C (1.3)'s unit rates: the exponent
 is the COUNT of pairs, `card_covers_eq_deathRate`. -/
 theorem lookdown_survival (n : ℕ) (t : ℝ) :
-    ∏ _p : {η : ER n // Covers (Delta n) η}, Real.exp (-t)
+    ∏ _p : {η : ER n // Blindness.Covers (Delta n) η}, Real.exp (-t)
       = Real.exp (-(deathRate n * t)) := by
   have h := prod_survival_covers (Delta n) t
   rwa [blocks_bot n] at h
@@ -93,7 +93,7 @@ exponential at rate `d_n`, the pair is uniform on the `C(n,2)` pairs, and the tw
 independent.  With `Lookdown.lookdown_consistent` this is the Donnelly-Kurtz construction's
 one-step law, at every `n` at once. -/
 theorem lookdown_driven_by_pair_clocks {n : ℕ} (hn : 2 ≤ n) (t : ℝ) :
-    (∏ _p : {η : ER n // Covers (Delta n) η}, Real.exp (-t)
+    (∏ _p : {η : ER n // Blindness.Covers (Delta n) η}, Real.exp (-t)
         = Real.exp (-(deathRate n * t)))
       ∧ (Real.exp (-(deathRate n * t))
         = jumpProb n * (deathRate n * Real.exp (-(deathRate n * t))))

@@ -98,7 +98,7 @@ written. It is carried below as the named field `independentCoordinates` of
 its signature rather than in prose.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -527,4 +527,4 @@ telescope valid for any coupling.
 continuous mixing measures. Nothing in this module is stated for the continuum, and the
 `d = 2` results in `TwoAtom` are the only complete continuum case in this development. -/
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

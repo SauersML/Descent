@@ -8,7 +8,7 @@ import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Condensation: the multiplicative obstruction to Gaussian universality of chaos
@@ -414,4 +414,4 @@ function of allele frequency in `Descent.Spectral.PolygenicSpectroscopy`. It is 
 the Gaussian surrogate fails is allele-frequency dependent, and fails soonest for rare
 variants. -/
 
-end Descent
+end Descent.Blindness

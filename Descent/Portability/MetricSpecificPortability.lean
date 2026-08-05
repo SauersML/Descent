@@ -2987,9 +2987,9 @@ theorem ldKernelSymbol_mono_in_cos {decay angle₁ angle₂ : ℝ}
     (hcos : Real.cos angle₁ ≤ Real.cos angle₂) :
     ldKernelSymbol decay angle₁ ≤ ldKernelSymbol decay angle₂ := by
   have hden₁ : 0 < 1 - 2 * decay * Real.cos angle₁ + decay ^ 2 :=
-    ldKernelSymbol_denom_pos hd
+    Blindness.ldKernelSymbol_denom_pos hd
   have hden₂ : 0 < 1 - 2 * decay * Real.cos angle₂ + decay ^ 2 :=
-    ldKernelSymbol_denom_pos hd
+    Blindness.ldKernelSymbol_denom_pos hd
   have hnum : 0 ≤ 1 - decay ^ 2 := by
     have := sq_abs decay
     nlinarith [abs_nonneg decay, hd]
@@ -3444,11 +3444,11 @@ theorem ldBlockDetectionShare_le_retention {decay : ℝ}
 linkage to exploit. -/
 theorem ldWhiteningGain_one_lt_iff {decay : ℝ}
     (hd0 : 0 ≤ decay) (hd1 : decay < 1) :
-    1 < ldWhiteningGain decay ↔ 0 < decay := by
+    1 < Blindness.ldWhiteningGain decay ↔ 0 < decay := by
   have hden : (0 : ℝ) < 1 - decay ^ 2 := by
     nlinarith [mul_pos (by linarith : (0:ℝ) < 1 - decay)
       (by linarith : (0:ℝ) < 1 + decay)]
-  unfold ldWhiteningGain
+  unfold Blindness.ldWhiteningGain
   rw [one_lt_div hden]
   constructor
   · intro h
@@ -3499,7 +3499,7 @@ theorem pruning_loses_detection_iff_whiteningGain_exceeds_one
     {decay : ℝ} {panel : LDPanelRetention}
     (hd0 : 0 ≤ decay) (hd1 : decay < 1)
     (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
-    1 < ldWhiteningGain decay ↔ 0 < ldBlockPruningDeficit decay panel := by
+    1 < Blindness.ldWhiteningGain decay ↔ 0 < ldBlockPruningDeficit decay panel := by
   obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
   unfold ldBlockPruningDeficit
   rw [ldWhiteningGain_one_lt_iff hd0 hd1,

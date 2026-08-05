@@ -5,7 +5,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Fiber surgery on an effect-size distribution, and what estimators can see
@@ -256,4 +256,4 @@ theorem surgery_invisible_to_even_visible_to_odd (F : Fiber) {shift : ℝ}
   ⟨F.even_summary_blind_to_transfer heven shift,
     F.odd_summary_detects_transfer hodd hshift hnonzero⟩
 
-end Descent
+end Descent.Blindness

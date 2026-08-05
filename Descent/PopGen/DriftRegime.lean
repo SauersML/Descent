@@ -309,7 +309,7 @@ immediately below.
     measurement it explains is recorded in `Descent.Portability.PortabilityDrift`. -/
 noncomputable def crossChecks_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
-    ProbeBlindness clusterCrossCheck (fun r ↦ r = trueRetention) where
+    Blindness.ProbeBlindness clusterCrossCheck (fun r ↦ r = trueRetention) where
   positive := trueRetention
   negative := wrongRetention
   same_data := by
@@ -450,7 +450,7 @@ proposition is `symmetric_design_has_no_power` immediately below.
 
     Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness construction. -/
 noncomputable def symmetricDesignBlindness :
-    ProbeBlindness diagonalDesign (fun g ↦ g = benchmarkRatio) where
+    Blindness.ProbeBlindness diagonalDesign (fun g ↦ g = benchmarkRatio) where
   positive := benchmarkRatio
   negative := benchmarkRatioSquared
   same_data := diagonalDesign_benchmark_eq

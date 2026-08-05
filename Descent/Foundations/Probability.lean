@@ -726,7 +726,7 @@ theorem noise_integrated_cdf {k : ℕ} (hN : GaussianNoiseAssumption k)
           simp [noiseMeasureGivenX, ProbabilityTheory.gaussianReal_map_const_add]
     _ = ENNReal.ofReal (ProbabilityTheory.cdf
           (ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t) := by
-          symm
+          Blindness.BoundedLogDistortion.symm
           simpa using (ProbabilityTheory.ofReal_cdf
             (μ := ProbabilityTheory.gaussianReal μ (hN.sigma2 x)) t)
 

@@ -51,7 +51,7 @@ elsewhere.  They cancel, and the cancellation is `card_covers`: the number of co
 `d_k`.  A generator whose rows sum to zero is what makes `exp(tQ)` stochastic, which is the
 step K-G needs to run the contraction argument at all. -/
 theorem generator_row_sum_zero {n : ℕ} (ξ : ER n) :
-    (Nat.card {η : ER n // Covers ξ η} : ℝ) + (-deathRate (blocks ξ)) = 0 := by
+    (Nat.card {η : ER n // Blindness.Covers ξ η} : ℝ) + (-deathRate (blocks ξ)) = 0 := by
   rw [card_covers_eq_deathRate]
   ring
 

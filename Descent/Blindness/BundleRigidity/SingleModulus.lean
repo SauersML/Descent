@@ -115,7 +115,7 @@ Nothing in this module is deep. It is finite algebra: a two-way case split on
 is recorded because a false universal claim was about to be built on.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 open Finset
@@ -697,4 +697,4 @@ theorem nonempty_singleModulus_four (v : ℝ) (hv0 : 0 < v) (hv1 : v < 1) :
     (Real.sqrt_lt_sqrt (by linarith) (by linarith))
     (by norm_num)⟩
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

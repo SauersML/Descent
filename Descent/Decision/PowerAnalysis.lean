@@ -775,10 +775,10 @@ exponentially in `k`, while the published quadratic formula is this identity at 
 Either definition changing its exponent convention breaks this. -/
 theorem fixedGradeRiskBenchmark_sampleCost (η C : ℝ) (hη : 0 < η) (hC : 0 < C)
     (k : ℕ) (hk : 0 < k) :
-    fixedGradeRiskBenchmark (BundleRigidity.sampleCost η C k) (2 * k) 1 = η / C := by
+    fixedGradeRiskBenchmark (Blindness.BundleRigidity.sampleCost η C k) (2 * k) 1 = η / C := by
   have hpos : (0 : ℝ) < C / η := div_pos hC hη
   have hk0 : ((k : ℝ)) ≠ 0 := Nat.cast_ne_zero.mpr hk.ne'
-  unfold fixedGradeRiskBenchmark BundleRigidity.sampleCost
+  unfold fixedGradeRiskBenchmark Blindness.BundleRigidity.sampleCost
   rw [← Real.rpow_natCast (C / η) (2 * k), ← Real.rpow_mul hpos.le]
   have hexp : ((2 * k : ℕ) : ℝ) * (-(1 / (2 * (k : ℝ)))) = -(1 : ℝ) := by
     push_cast

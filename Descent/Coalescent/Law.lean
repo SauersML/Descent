@@ -118,7 +118,7 @@ which is what K-G (6.5) claims of the coupling. -/
 theorem coalescentLaw_support_chain' (n k m : ℕ) (holdLaw : Measure ℝ)
     [IsProbabilityMeasure holdLaw] {p : List (ER n) × (Fin m → ℝ)}
     (hp : p.1 ∈ (chainLaw n k).support) :
-    List.Chain' (fun y x => Covers x y ∨ y = x) p.1 :=
+    List.Chain' (fun y x => Blindness.Covers x y ∨ y = x) p.1 :=
   chainLaw_support_chain' k hp
 
 end Coalescent

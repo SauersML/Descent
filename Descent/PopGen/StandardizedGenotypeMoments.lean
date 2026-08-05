@@ -103,7 +103,7 @@ degree to which that apparatus may be extrapolated to interaction models. -/
 theorem additive_score_is_subcritical {N q : ℝ}
     (hc : 0 < Spectral.hweMellinDrift q) (hN : Spectral.hweMellinDrift q < Real.log N) :
     1 < Spectral.maxSafeEpistaticOrder N q := by
-  rw [Spectral.maxSafeEpistaticOrder_eq_criticalDegree, subcritical_iff hc]
+  rw [Spectral.maxSafeEpistaticOrder_eq_criticalDegree, Blindness.subcritical_iff hc]
   linarith
 
 /-- The contrapositive form, in the vocabulary of an interaction model: an order-`m`
@@ -111,7 +111,7 @@ epistatic aggregate is past the boundary exactly when `m * c(q) ≥ log N`. Sinc
 grows like `log (1 / q)`, the admissible order collapses for rare variants. -/
 theorem epistatic_order_unsafe_iff {N q m : ℝ} (hc : 0 < Spectral.hweMellinDrift q) :
     ¬ (m < Spectral.maxSafeEpistaticOrder N q) ↔ Real.log N ≤ Spectral.hweMellinDrift q * m := by
-  rw [Spectral.maxSafeEpistaticOrder_eq_criticalDegree, subcritical_iff hc, not_lt]
+  rw [Spectral.maxSafeEpistaticOrder_eq_criticalDegree, Blindness.subcritical_iff hc, not_lt]
 
 /-!
 ## 3. Imputation: a second discrepancy, not a restatement of the first
@@ -131,7 +131,7 @@ need the inflation factor to *be* an intensity ratio, which is the unproved loca
 step of `Descent.Blindness.JetBarrier`. Read it as: rescaling cannot move the quantity the lattice
 mechanism is stated in terms of. -/
 theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0) :
-    1 < latticeInflation Spectral.hardCallLatticeSpan ∧
+    1 < Blindness.latticeInflation Spectral.hardCallLatticeSpan ∧
       ∀ c V : ℝ, V ≠ 0 → (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V :=
   ⟨Spectral.hardCall_intensity_inflated, fun c V _hV ↦ standardizedSquare_scale_invariant c V lam hlam⟩
 
@@ -207,13 +207,13 @@ case remains exactly what `Descent.Blindness.JetBarrier` says it is: the directi
 observable algebra grows beyond the triple, and which is not proved here. -/
 theorem no_signSymmetric_nondegenerate_locus
     (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (∀ coding : SymmetricCoding Foundations.DiploidGenotype,
+    (∀ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) →
         (∀ g, coding.value g = h.centeredAltAlleleCount g) →
         h.altFreq = 1 / 2) ∧
       (h.altFreq = 1 / 2 → Spectral.hweMellinJetVariance h.altFreq = 0) := by
   refine ⟨fun coding hweight hvalue ↦ ?_, fun hhalf ↦ ?_⟩
-  · exact hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
+  · exact Blindness.hwe_symmetricCoding_forces_half h hq0 hq1 coding hweight hvalue
   · rw [hhalf]
     exact Spectral.hweMellinJetVariance_half
 
@@ -294,7 +294,7 @@ theorem hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance (h : HardyWeinber
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
       1 / Program.hweGenotypeVariance h.altFreq := by
-  rw [standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
+  rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
 
 /-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
 coordinate of the tower is an object this development already had. -/
@@ -337,7 +337,7 @@ uncentered object, and inferring the floor-two channel from it is the mistake th
 predicts. -/
 theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ¬ ∃ coding : SymmetricCoding Foundations.DiploidGenotype,
+    ¬ ∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedSquare g) := by
   rintro ⟨coding, hweight, hvalue⟩
@@ -349,7 +349,7 @@ theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
       intro g
       rw [hweight, hvalue]
     simp_rw [hterm]
-    exact symmetricCoding_third_moment_zero coding
+    exact Blindness.symmetricCoding_third_moment_zero coding
   obtain ⟨_, _, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
   have hprob := Spectral.genotypeProb_values h
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
@@ -561,17 +561,17 @@ not a slot awaiting work: it is decided, and decided negatively away from `q = 1
 theorem hweLevelOne_symmetry (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (hweLevelOne h.altFreq).isSignSymmetric = true ↔
-      (∃ coding : SymmetricCoding Foundations.DiploidGenotype,
+      (∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedGenotype g)) := by
   change decide (h.altFreq = 1 / 2) = true ↔ _
   constructor
   · intro hdecide
-    exact (standardizedGenotype_symmetric_iff h hq0 hq1).mpr
+    exact (Blindness.standardizedGenotype_symmetric_iff h hq0 hq1).mpr
       (of_decide_eq_true hdecide)
   · intro hcoding
     exact decide_eq_true
-      ((standardizedGenotype_symmetric_iff h hq0 hq1).mp hcoding)
+      ((Blindness.standardizedGenotype_symmetric_iff h hq0 hq1).mp hcoding)
 
 /-- Where floor one is symmetric its jet variance vanishes: two of its channels collapse
 together, which is `no_signSymmetric_nondegenerate_locus` read off the tower. -/
@@ -590,8 +590,8 @@ the design fixed means.
 parameter.
 
 Empirical status: UNTESTED. A field update on a design; no modelling content and no free -/
-def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : GenotypeDesign n ι)
-    (model : Fin n → HardyWeinbergModel) : GenotypeDesign n ι :=
+def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDesign n ι)
+    (model : Fin n → HardyWeinbergModel) : Blindness.GenotypeDesign n ι :=
   { design with model := model }
 
 /-- **What "holding the design fixed" means**, stated rather than left to the field update:
@@ -599,7 +599,7 @@ re-modelling moves the coordinate law and leaves the combinatorics alone, so the
 interaction order of every tested set is unchanged. Without this, `reModel` is a record
 update no statement distinguishes from an arbitrary design. -/
 @[simp] theorem GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
-    (design : GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) (s : ι) :
+    (design : Blindness.GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) (s : ι) :
     (design.reModel model).interactionOrder s = design.interactionOrder s := rfl
 
 /-! No observable-tower record is exported: accepting the Vertex-Weight Law and the
@@ -692,7 +692,7 @@ theorem fourthMoment_eq (spectrum : MafSpectrum m)
               (spectrum.model j).standardizedGenotype g ^ 4 =
         spectrum.weight j / (spectrum.model j).genotypeVariance := by
     intro j
-    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2, mul_one_div]
+    rw [Blindness.standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2, mul_one_div]
   have hdef : spectrum.moment 4 =
       ∑ j, spectrum.weight j *
         ∑ g : Foundations.DiploidGenotype,
@@ -752,7 +752,7 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
           (10 * (spectrum.weight j * (1 / (spectrum.model j).genotypeVariance)) -
             20 * spectrum.weight j) := by
     intro j
-    rw [standardizedGenotype_sixth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
+    rw [Blindness.standardizedGenotype_sixth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
     ring
   have hfour : ∀ j : Fin m,
       spectrum.weight j * (1 / (spectrum.model j).genotypeVariance) =
@@ -761,7 +761,7 @@ theorem sixthMoment_eq_floorOne_plus_dispersion (spectrum : MafSpectrum m)
             (spectrum.model j).genotypeProb g *
               (spectrum.model j).standardizedGenotype g ^ 4 := by
     intro j
-    rw [standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
+    rw [Blindness.standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2]
   have hdef6 : spectrum.moment 6 =
       ∑ j, spectrum.weight j *
         ∑ g : Foundations.DiploidGenotype,
@@ -1022,7 +1022,7 @@ theorem hweFloorOneScaleSq_eq (h : HardyWeinbergModel)
           (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
       1 - h.genotypeVariance := by
   unfold squaringScaleSq
-  exact standardizedSquare_second_cumulant h hq0 hq1
+  exact Blindness.standardizedSquare_second_cumulant h hq0 hq1
 
 /-- **The genotype's floor-one scale equals the Gaussian's at the blind frequency**
 `gaussianKurtosisMaf = (3 - √3)/6`, where the genotype variance is `1/3` and so
@@ -1260,7 +1260,7 @@ theorem standardizedGenotype_fourth_moment_ge_two (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 ≤ ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
-  rw [standardizedGenotype_fourth_moment h hq0 hq1, le_div_iff₀ hvar]
+  rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, le_div_iff₀ hvar]
   have hle := hweGenotypeVariance_le_half h
   linarith [hle]
 
@@ -1276,7 +1276,7 @@ theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
     rw [h.genotypeVariance_eq]
     unfold HardyWeinbergModel.refFreq
     ring
-  rw [standardizedGenotype_fourth_moment h hq0 hq1, div_eq_iff (ne_of_gt hvar)]
+  rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, div_eq_iff (ne_of_gt hvar)]
   constructor
   · intro heq
     rw [hveq] at heq
@@ -1317,19 +1317,19 @@ rigidity theorem cannot be applied to genotype data. -/
 theorem phase_strict_iff_not_symmetric (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 < (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ↔
-      ¬ (∃ coding : SymmetricCoding Foundations.DiploidGenotype,
+      ¬ (∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
           (∀ g, coding.weight g = h.genotypeProb g) ∧
           (∀ g, coding.value g = h.standardizedGenotype g)) := by
   constructor
   · intro hstrict hsym
-    have hhalf := (standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
+    have hhalf := (Blindness.standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
     have htwo := (standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mpr hhalf
     rw [htwo] at hstrict
     exact absurd hstrict (by norm_num)
   · intro hnosym
     refine hwe_phase_inequality_off_balanced h hq0 hq1 ?_
     intro hhalf
-    exact hnosym ((standardizedGenotype_symmetric_iff h hq0 hq1).mpr hhalf)
+    exact hnosym ((Blindness.standardizedGenotype_symmetric_iff h hq0 hq1).mpr hhalf)
 
 /-- **The rigidity theorem's hypotheses are never jointly satisfiable on genotype data.**
 
@@ -1344,11 +1344,11 @@ theorem applies away from a single point, and it is the honest statement of what
 result does and does not say about genotypes. -/
 theorem hwe_rigidity_hypotheses_unsatisfiable (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
-    (hsym : ∃ coding : SymmetricCoding Foundations.DiploidGenotype,
+    (hsym : ∃ coding : Blindness.SymmetricCoding Foundations.DiploidGenotype,
       (∀ g, coding.weight g = h.genotypeProb g) ∧
       (∀ g, coding.value g = h.standardizedGenotype g)) :
     (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠ 3 := by
-  have hhalf := (standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
+  have hhalf := (Blindness.standardizedGenotype_symmetric_iff h hq0 hq1).mp hsym
   have htwo := (standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mpr hhalf
   rw [htwo]
   norm_num
@@ -1369,7 +1369,7 @@ theorem fourthMoment_reflection_invariant (h : HardyWeinbergModel) :
     (∑ g : Foundations.DiploidGenotype,
         h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ 4) =
       ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
-  have hk := reflect_even_moment h 2
+  have hk := Blindness.reflect_even_moment h 2
   norm_num at hk
   exact hk
 
@@ -1541,9 +1541,9 @@ theorem hweLadderMoments (h : HardyWeinbergModel)
         1 / h.genotypeVariance ∧
       (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) =
         (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20 :=
-  ⟨standardizedGenotype_second_moment_one h hq0 hq1,
-    standardizedGenotype_fourth_moment h hq0 hq1,
-    standardizedGenotype_sixth_moment h hq0 hq1⟩
+  ⟨Blindness.standardizedGenotype_second_moment_one h hq0 hq1,
+    Blindness.standardizedGenotype_fourth_moment h hq0 hq1,
+    Blindness.standardizedGenotype_sixth_moment h hq0 hq1⟩
 
 /-!
 ## 5l. The ladder fiber is empty over genotype panels

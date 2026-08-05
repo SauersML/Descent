@@ -7,7 +7,7 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Which lineage summaries can see a multiple-merger regime?

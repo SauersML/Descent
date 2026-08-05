@@ -750,17 +750,17 @@ units, and `Condensation.two_pow_le_gaussian_panel_requirement`, which is the st
     Empirical status: NOT AN EMPIRICAL CLAIM -- arithmetic about the defined
     `criticalDegree`, carrying no assertion that a transition occurs there. -/
 theorem two_pow_le_panel_of_subcritical {N m : ℝ} (hm : 0 ≤ m) (hN : 0 < N)
-    (hsub : m < criticalDegree N condensationConstant) :
+    (hsub : m < Blindness.criticalDegree N Blindness.condensationConstant) :
     (2 : ℝ) ^ m ≤ N :=
-  le_trans (two_pow_le_gaussian_panel_requirement m hm)
-    ((subcritical_iff_exp_lt condensationConstant_pos hN).1 hsub).le
+  le_trans (Blindness.two_pow_le_gaussian_panel_requirement m hm)
+    ((Blindness.subcritical_iff_exp_lt Blindness.condensationConstant_pos hN).1 hsub).le
 
 /-- **A panel below `2 ^ m` is supercritical.** The contrapositive, in the direction a
 study is actually read: given the panel and the interaction degree, the Gaussian score
 assumption is unavailable, whatever the per-variant influence. -/
 theorem not_subcritical_of_panel_lt_two_pow {N m : ℝ} (hm : 0 ≤ m) (hN : 0 < N)
     (hpanel : N < (2 : ℝ) ^ m) :
-    ¬ m < criticalDegree N condensationConstant := fun hsub ↦
+    ¬ m < Blindness.criticalDegree N Blindness.condensationConstant := fun hsub ↦
   absurd (two_pow_le_panel_of_subcritical hm hN hsub) (not_le.2 hpanel)
 
 end CondensationCost
@@ -796,9 +796,9 @@ Moving the threshold off the lattice can only reduce the bracket, so the aligned
 name: it is what says a percentile cut placed *on* a hard-call value is the adversarial
 choice rather than a neutral one. -/
 theorem latticeBracket_le_latticeInflation {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ : 0 ≤ δ) :
-    latticeBracket h δ ≤ latticeInflation h := by
-  have hmono := latticeBracket_antitone hh hδ
-  rwa [latticeBracket_zero] at hmono
+    Blindness.latticeBracket h δ ≤ Blindness.latticeInflation h := by
+  have hmono := Blindness.latticeBracket_antitone hh hδ
+  rwa [Blindness.latticeBracket_zero] at hmono
 
 /-- **A hard-called score's threshold factor is bounded by a value strictly above one.**
 
@@ -811,8 +811,8 @@ is a strict departure from the continuum, of a size fixed by the spacing alone.
     identification of that factor with an exceedance-intensity ratio is not proved in
     this corpus; see the note above. -/
 theorem hardCall_threshold_factor_bounded {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ : 0 ≤ δ) :
-    latticeBracket h δ ≤ latticeInflation h ∧ 1 < latticeInflation h :=
-  ⟨latticeBracket_le_latticeInflation hh hδ, one_lt_latticeInflation hh⟩
+    Blindness.latticeBracket h δ ≤ Blindness.latticeInflation h ∧ 1 < Blindness.latticeInflation h :=
+  ⟨latticeBracket_le_latticeInflation hh hδ, Blindness.one_lt_latticeInflation hh⟩
 
 end LatticeThreshold
 

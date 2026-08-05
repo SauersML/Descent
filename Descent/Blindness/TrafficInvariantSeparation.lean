@@ -25,7 +25,7 @@ import Mathlib.Topology.Order.LeftRight
 import Mathlib.Tactic
 import Descent.Blindness.ObservationalCeiling
 
-namespace Descent
+namespace Descent.Blindness
 
 namespace TrafficInvariantSeparation
 
@@ -6618,4 +6618,4 @@ end MatchedBayesBoundary
 
 end TrafficInvariantSeparation
 
-end Descent
+end Descent.Blindness

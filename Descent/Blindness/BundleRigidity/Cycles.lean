@@ -63,7 +63,7 @@ This is the classical **closed-path criterion** for sums of weighted composition
 maps in one variable. The transport is the new part; the criterion is not.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 open Finset
@@ -188,4 +188,4 @@ than present in weakened dress.
 The classical closed-path criterion this transports (Diliberto–Straus, Marshall–O'Farrell,
 Ismailov) is cited in the header as background, not claimed as formalized. -/
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

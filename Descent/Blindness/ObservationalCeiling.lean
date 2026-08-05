@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.Probability
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # The observational ceiling: one law, many instances
@@ -696,4 +696,4 @@ it was. -/
 
 end EffectiveSeparation
 
-end Descent
+end Descent.Blindness

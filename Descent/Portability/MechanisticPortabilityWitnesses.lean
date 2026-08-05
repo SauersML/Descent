@@ -203,7 +203,7 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
   have h_target_cross : crossCovariance m Pop.target = β := by
     ext i
     simp [m, identityDirectMetricModel, crossCovariance, sigmaTagCausal,
-      totalEffect, Matrix.one_mulVec,
+      Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.one_mulVec,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
   have h_source_score :
       scoreVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
@@ -839,14 +839,14 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
           CrossPopulationGenerationalModel.toMetricModelAt,
           crossCovariance, sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
+          Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
           using h_proxy0
       · simpa [m1, popgenDrivenProxyGenerationalModel,
           CrossPopulationGenerationalModel.toMetricModelAt,
           crossCovariance, sigmaTagCausal, directCausalTargetAt,
           novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
+          Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
           using h_proxy1
     rw [predictiveCovarianceFromSourceWeights]

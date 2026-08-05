@@ -66,7 +66,7 @@ sums of weighted compositions (Diliberto–Straus, Marshall–O'Farrell, Ismailo
 coinductive repackaging is a convenience, not a result.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -281,4 +281,4 @@ What *is* proved in this module is the topological and order-theoretic skeleton 
 
 end ModulusFamily
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

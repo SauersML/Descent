@@ -1112,7 +1112,7 @@ theorem link_average_two_scale (L : ℝ → ℝ) (hmono : StrictMono L) (x s t :
     ∫ p, L (x + s * p.1 + t * p.2) ∂((gaussianReal 0 1).prod (gaussianReal 0 1)) =
         ∫ y, L y ∂(((gaussianReal 0 1).prod (gaussianReal 0 1)).map
           (fun p : ℝ × ℝ ↦ x + s * p.1 + t * p.2)) := by
-      symm
+      Blindness.BoundedLogDistortion.symm
       exact integral_map (by fun_prop) hmono.monotone.measurable.aestronglyMeasurable
     _ = ∫ y, L y ∂(gaussianReal x ⟨s ^ 2 + t ^ 2, hnn⟩) := by
       rw [gaussian_two_scale_map]

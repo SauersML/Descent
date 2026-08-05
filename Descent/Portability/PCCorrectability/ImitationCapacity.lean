@@ -110,20 +110,20 @@ of second moments.
 def spikeOuter (v : ι → ℝ) : Matrix ι ι ℝ := fun i j ↦ v i * v j
 
 theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
-    spikeOuter v = rankOneCovarianceBump 1 v := by
+    spikeOuter v = Blindness.rankOneCovarianceBump 1 v := by
   ext i j
-  simp [spikeOuter, rankOneCovarianceBump]
+  simp [spikeOuter, Blindness.rankOneCovarianceBump]
 
 /-- The score variance a unit spike contributes to a weighting `x` is the
 squared projection of `x` on the spike direction. -/
 theorem quadForm_spikeOuter (v x : ι → ℝ) :
-    quadForm (spikeOuter v) x = Foundations.dot v x ^ 2 := by
-  rw [spikeOuter_eq_rankOneCovarianceBump, quadForm_rankOneCovarianceBump]
+    Blindness.quadForm (spikeOuter v) x = Foundations.dot v x ^ 2 := by
+  rw [spikeOuter_eq_rankOneCovarianceBump, Blindness.quadForm_rankOneCovarianceBump]
   ring
 
 theorem quadForm_add_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
-    quadForm (A + B) x = quadForm A x + quadForm B x := by
-  unfold quadForm gramForm
+    Blindness.quadForm (A + B) x = Blindness.quadForm A x + Blindness.quadForm B x := by
+  unfold Blindness.quadForm Blindness.gramForm
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [← Finset.sum_add_distrib]
@@ -132,8 +132,8 @@ theorem quadForm_add_matrix (A B : Matrix ι ι ℝ) (x : ι → ℝ) :
   ring
 
 theorem quadForm_smul_matrix (c : ℝ) (A : Matrix ι ι ℝ) (x : ι → ℝ) :
-    quadForm (c • A) x = c * quadForm A x := by
-  unfold quadForm gramForm
+    Blindness.quadForm (c • A) x = c * Blindness.quadForm A x := by
+  unfold Blindness.quadForm Blindness.gramForm
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   rw [Finset.mul_sum]
@@ -142,18 +142,18 @@ theorem quadForm_smul_matrix (c : ℝ) (A : Matrix ι ι ℝ) (x : ι → ℝ) :
   ring
 
 theorem varianceNonneg_add {A B : Matrix ι ι ℝ}
-    (hA : VarianceNonneg A) (hB : VarianceNonneg B) : VarianceNonneg (A + B) := by
+    (hA : Blindness.VarianceNonneg A) (hB : Blindness.VarianceNonneg B) : Blindness.VarianceNonneg (A + B) := by
   intro x
   rw [quadForm_add_matrix]
   exact add_nonneg (hA x) (hB x)
 
 theorem varianceNonneg_smul {c : ℝ} {A : Matrix ι ι ℝ}
-    (hc : 0 ≤ c) (hA : VarianceNonneg A) : VarianceNonneg (c • A) := by
+    (hc : 0 ≤ c) (hA : Blindness.VarianceNonneg A) : Blindness.VarianceNonneg (c • A) := by
   intro x
   rw [quadForm_smul_matrix]
   exact mul_nonneg hc (hA x)
 
-theorem varianceNonneg_spikeOuter (v : ι → ℝ) : VarianceNonneg (spikeOuter v) := by
+theorem varianceNonneg_spikeOuter (v : ι → ℝ) : Blindness.VarianceNonneg (spikeOuter v) := by
   intro x
   rw [quadForm_spikeOuter]
   exact sq_nonneg _
@@ -259,7 +259,7 @@ ceiling.
 
     Empirical status: UNTESTED (a definition of legality, not a measurement). -/
 def IsNull (S : Matrix ι ι ℝ) : Prop :=
-  VarianceNonneg (S - K.base) ∧ ∀ a : cidx, K.form a S ≤ K.bound a
+  Blindness.VarianceNonneg (S - K.base) ∧ ∀ a : cidx, K.form a S ≤ K.bound a
 
 /-- **Spike load of a constraint in a direction**: how fast the constraint's
 value rises per unit of spike.  This is the quantity that decides rigidity.
@@ -552,8 +552,8 @@ matrix in the spike direction.**  This is what makes "positive spike load" a
 checkable condition rather than an abstraction: for a positive-definite `A` it
 holds in every nonzero direction. -/
 theorem frobeniusForm_spikeOuter (A : Matrix ι ι ℝ) (v : ι → ℝ) :
-    frobeniusForm A (spikeOuter v) = quadForm A v := by
-  unfold frobeniusForm quadForm gramForm
+    frobeniusForm A (spikeOuter v) = Blindness.quadForm A v := by
+  unfold frobeniusForm Blindness.quadForm Blindness.gramForm
   refine Finset.sum_congr rfl (fun i _ ↦ ?_)
   refine Finset.sum_congr rfl (fun j _ ↦ ?_)
   simp only [spikeOuter]
@@ -859,11 +859,11 @@ theorem traceWindowClass_active (base A S₀ : Matrix ι ι ℝ) :
     (traceWindowClass base A S₀).Active () S₀ := rfl
 
 theorem traceWindowClass_spikeLoad (base A S₀ : Matrix ι ι ℝ) (v : ι → ℝ) :
-    (traceWindowClass base A S₀).spikeLoad () v = quadForm A v :=
+    (traceWindowClass base A S₀).spikeLoad () v = Blindness.quadForm A v :=
   frobeniusForm_spikeOuter A v
 
 theorem traceWindowClass_isNull_baseline {base A S₀ : Matrix ι ι ℝ}
-    (hbase : VarianceNonneg (S₀ - base)) :
+    (hbase : Blindness.VarianceNonneg (S₀ - base)) :
     (traceWindowClass base A S₀).IsNull S₀ := by
   refine ⟨hbase, ?_⟩
   intro a
@@ -875,8 +875,8 @@ zero: every spike direction points out of the class at `Σ₀`.  No symmetry
 hypothesis appears in the statement or the proof, which refutes the conjecture
 that rigidity requires a transitive group. -/
 theorem traceWindow_rigid {base A S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
-    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
-    (hbase : VarianceNonneg (S₀ - base))
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < Blindness.quadForm A v)
+    (hbase : Blindness.VarianceNonneg (S₀ - base))
     {v : ι → ℝ} (hv : v ∈ support) (hvne : v ≠ 0) :
     (traceWindowClass base A S₀).imitationCapacity S₀ support = 0 := by
   refine (traceWindowClass base A S₀).imitationCapacity_eq_zero_of_active
@@ -890,7 +890,7 @@ linear constraint with positive spike load and detection becomes possible where
 it was information-theoretically impossible: at every positive level the spiked
 covariance leaves the class, so the certificate statistic separates. -/
 theorem traceWindow_every_level_detectable {base A S₀ : Matrix ι ι ℝ}
-    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < quadForm A v)
+    (hpd : ∀ v : ι → ℝ, v ≠ 0 → 0 < Blindness.quadForm A v)
     {v : ι → ℝ} (hvne : v ≠ 0) {t : ℝ} (ht : 0 < t) :
     ¬ (traceWindowClass base A S₀).IsNull
       ((traceWindowClass base A S₀).spiked S₀ t v) := by
@@ -929,16 +929,16 @@ scale `s` is this file's spike at level `s²`; the level is squared because the
 bump's scale multiplies the effect vector while the level multiplies the
 covariance. -/
 theorem rankOneCovarianceBump_eq_smul_spikeOuter (scale : ℝ) (v : ι → ℝ) :
-    rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by
+    Blindness.rankOneCovarianceBump scale v = (scale ^ 2) • spikeOuter v := by
   ext i j
-  simp only [rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]
+  simp only [Blindness.rankOneCovarianceBump, Matrix.smul_apply, spikeOuter, smul_eq_mul]
   ring
 
 /-- The linear program's alternative and `ImitationRigidity`'s bumped
 background are the same matrix. -/
 theorem spiked_eq_add_rankOneCovarianceBump {cidx : Type*}
     (K : BackgroundClass ι cidx) (S₀ : Matrix ι ι ℝ) (scale : ℝ) (v : ι → ℝ) :
-    K.spiked S₀ (scale ^ 2) v = S₀ + rankOneCovarianceBump scale v := by
+    K.spiked S₀ (scale ^ 2) v = S₀ + Blindness.rankOneCovarianceBump scale v := by
   unfold BackgroundClass.spiked
   rw [rankOneCovarianceBump_eq_smul_spikeOuter]
 
@@ -1001,7 +1001,7 @@ Only the one pair is constrained — nothing is assumed about the rest of the
 matrix, so the class is not Toeplitz, not stationary, and has no symmetry. -/
 theorem diagonalGap_imitationCapacity_eq_zero
     {base S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)} {i j : ι}
-    (hbase : VarianceNonneg (S₀ - base))
+    (hbase : Blindness.VarianceNonneg (S₀ - base))
     (hactive : S₀ i i = S₀ j j)
     {v : ι → ℝ} (hv : v ∈ support) (hload : v j ^ 2 < v i ^ 2) :
     (diagonalGapClass base i j 0).imitationCapacity S₀ support = 0 := by
@@ -1030,7 +1030,7 @@ theorem diagonalGap_not_isNull_add_rankOneCovarianceBump
     (hactive : S₀ i i = S₀ j j) {scale : ℝ} (hscale : scale ≠ 0)
     {v : ι → ℝ} (hload : v j ^ 2 < v i ^ 2) :
     ¬ (diagonalGapClass base i j 0).IsNull
-      (S₀ + rankOneCovarianceBump scale v) := by
+      (S₀ + Blindness.rankOneCovarianceBump scale v) := by
   have hgap : diagonalGapForm i j S₀ = 0 := by
     unfold diagonalGapForm
     rw [hactive]
@@ -1072,7 +1072,7 @@ assigns to a unit isotropic spike on `nSites` variants.
     Empirical status: DERIVED from `ldPrecisionTrace`, itself derived from the
     AR(1) precision stencil (`stationaryLD_interior_stencil`). -/
 def traceWindowSpikeLoad (decay : ℝ) (nSites : ℕ) : ℝ :=
-  ldPrecisionTrace decay nSites / (nSites : ℝ)
+  Blindness.ldPrecisionTrace decay nSites / (nSites : ℝ)
 
 /-- **traceWindowSpikeLoad at its junk point, named.** Averaging a trace over no sites is
 undefined. Lean returns `0`: no spike load, which is what a genuinely flat spectrum also gives.
@@ -1089,9 +1089,9 @@ the denominator of the detection threshold. -/
 theorem traceWindowSpikeLoad_tendsto_ldWhiteningGain {decay : ℝ}
     (hd : |decay| < 1) :
     Filter.Tendsto (traceWindowSpikeLoad decay) Filter.atTop
-      (nhds (ldWhiteningGain decay)) := by
+      (nhds (Blindness.ldWhiteningGain decay)) := by
   unfold traceWindowSpikeLoad
-  exact ldPrecisionTrace_div_sites_tendsto hd
+  exact Blindness.ldPrecisionTrace_div_sites_tendsto hd
 
 /-- **The whitened capacity**: the linear program's value when the binding
 constraint is the trace window and the effect prior is isotropic.
@@ -1100,7 +1100,7 @@ constraint is the trace window and the effect prior is isotropic.
     known `ρ`, sweep the spike level, and compare the measured detection
     boundary against `headroom · (1 - ρ²) / (1 + ρ²)`. -/
 def whitenedCapacity (headroom decay : ℝ) : ℝ :=
-  headroom / ldWhiteningGain decay
+  headroom / Blindness.ldWhiteningGain decay
 
 /-- **whitenedCapacity at its junk point, named.** Two junk branches in sequence. At unit decay
 the whitening gain divides by `1 - decay ^ 2` and is junk-zero, so the capacity divides by that
@@ -1109,13 +1109,13 @@ zero and is junk-zero in turn. A channel at perfect retention -- where the gain 
 Consumers must exclude the argument that makes the guard vanish. -/
 theorem whitenedCapacity_perfect_retention_is_junk (headroom : ℝ) :
     whitenedCapacity headroom 1 = 0 := by
-  unfold whitenedCapacity ldWhiteningGain
+  unfold whitenedCapacity Blindness.ldWhiteningGain
   norm_num
 
 theorem whitenedCapacity_closedForm (headroom decay : ℝ) :
     whitenedCapacity headroom decay =
       headroom * (1 - decay ^ 2) / (1 + decay ^ 2) := by
-  unfold whitenedCapacity ldWhiteningGain
+  unfold whitenedCapacity Blindness.ldWhiteningGain
   rw [div_div_eq_mul_div]
 
 /-- **Threshold equals capacity, for the LD certificate.**  When the binding
@@ -1127,7 +1127,7 @@ theorem imitationCapacity_eq_whitenedCapacity
     {ι : Type*} [Fintype ι] [DecidableEq ι] {cidx : Type*}
     {K : BackgroundClass ι cidx} {S₀ : Matrix ι ι ℝ} {support : Set (ι → ℝ)}
     (E : EquiExit K S₀ support) (hnull : K.IsNull S₀) {decay : ℝ}
-    (hload : E.load = ldWhiteningGain decay) :
+    (hload : E.load = Blindness.ldWhiteningGain decay) :
     K.imitationCapacity S₀ support =
       whitenedCapacity (K.headroom E.binding S₀) decay := by
   unfold whitenedCapacity
@@ -1146,12 +1146,12 @@ theorem whitenedCapacity_strictAnti {headroom decay₁ decay₂ : ℝ}
   have hd₁ : |decay₁| < 1 := by
     rw [abs_lt]
     exact ⟨by linarith, by linarith⟩
-  have hg₁ : (0 : ℝ) < ldWhiteningGain decay₁ :=
-    lt_of_lt_of_le zero_lt_one (ldWhiteningGain_ge_one hd₁)
-  have hg₂ : (0 : ℝ) < ldWhiteningGain decay₂ :=
-    lt_of_lt_of_le zero_lt_one (ldWhiteningGain_ge_one h₂)
-  have hmono : ldWhiteningGain decay₁ < ldWhiteningGain decay₂ :=
-    ldWhiteningGain_strictMono h₁ h₂ hlt
+  have hg₁ : (0 : ℝ) < Blindness.ldWhiteningGain decay₁ :=
+    lt_of_lt_of_le zero_lt_one (Blindness.ldWhiteningGain_ge_one hd₁)
+  have hg₂ : (0 : ℝ) < Blindness.ldWhiteningGain decay₂ :=
+    lt_of_lt_of_le zero_lt_one (Blindness.ldWhiteningGain_ge_one h₂)
+  have hmono : Blindness.ldWhiteningGain decay₁ < Blindness.ldWhiteningGain decay₂ :=
+    Blindness.ldWhiteningGain_strictMono h₁ h₂ hlt
   unfold whitenedCapacity
   rw [div_lt_div_iff₀ hg₂ hg₁]
   exact mul_lt_mul_of_pos_left hmono hheadroom
@@ -1353,7 +1353,7 @@ to it weakens the theorem and certifies nothing. -/
 theorem imitable_within_traceWindowBudget
     {N : ℕ} (m : ℕ) (F : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
-    (hbase : VarianceNonneg (S₀ - base))
+    (hbase : Blindness.VarianceNonneg (S₀ - base))
     (hbudget : traceForm S₀ + demographicSpike (N : ℝ) F (m : ℝ) ≤ budget) :
     (traceWindowBudgetClass base budget).IsNull
       ((traceWindowBudgetClass base budget).spiked S₀ (4 * F)
@@ -1550,7 +1550,7 @@ matrix on `m` sites, in the only form the statement needs: its inverse-trace
 agrees with `ldPrecisionTrace`. -/
 theorem inverseTraceCertificate_eq_traceWindowSpikeLoad {decay : ℝ} {m : ℕ}
     (lam : ℕ → ℝ)
-    (hspectrum : ∑ i ∈ Finset.range m, (lam i)⁻¹ = ldPrecisionTrace decay m) :
+    (hspectrum : ∑ i ∈ Finset.range m, (lam i)⁻¹ = Blindness.ldPrecisionTrace decay m) :
     inverseTraceCertificate m lam = traceWindowSpikeLoad decay m := by
   unfold inverseTraceCertificate traceWindowSpikeLoad
   rw [hspectrum]
@@ -1563,9 +1563,9 @@ reproduce. -/
 theorem inverseTraceCertificate_tendsto_ldWhiteningGain {decay : ℝ}
     (hd : |decay| < 1) (lam : ℕ → ℕ → ℝ)
     (hspectrum : ∀ m : ℕ,
-      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m) :
+      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = Blindness.ldPrecisionTrace decay m) :
     Filter.Tendsto (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) Filter.atTop
-      (nhds (ldWhiteningGain decay)) := by
+      (nhds (Blindness.ldWhiteningGain decay)) := by
   have hrewrite : (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) =
       traceWindowSpikeLoad decay := by
     funext m
@@ -1791,10 +1791,10 @@ disqualifies `m_eff` and qualifies `tr K⁻¹`. -/
 theorem meff_prohibition_with_certificate {decay : ℝ} (hd : |decay| < 1)
     (lam : ℕ → ℕ → ℝ)
     (hspectrum : ∀ m : ℕ,
-      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = ldPrecisionTrace decay m)
+      ∑ i ∈ Finset.range m, (lam m i)⁻¹ = Blindness.ldPrecisionTrace decay m)
     (Φ : MomentContinuousFunctional) :
     Filter.Tendsto (fun m : ℕ ↦ inverseTraceCertificate m (lam m)) Filter.atTop
-        (nhds (ldWhiteningGain decay)) ∧
+        (nhds (Blindness.ldWhiteningGain decay)) ∧
       (∀ headroom : ℝ, whitenedCapacity headroom decay =
         headroom * (1 - decay ^ 2) / (1 + decay ^ 2)) ∧
       ¬ (∀ (m : ℕ) (s : ℕ → ℝ), Φ.value m s = inverseTraceCertificate m s) :=

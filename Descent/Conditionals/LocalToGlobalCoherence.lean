@@ -274,7 +274,7 @@ theorem no_bounded_locality_criterion
         ∀ L : System, asymptoticallyRealizable L ↔ decide (localData r L) :=
   ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,
      holds := hbip, fails := hnon } :
-      LeveledBlindness localData asymptoticallyRealizable).no_level_criterion
+      Blindness.LeveledBlindness localData asymptoticallyRealizable).no_level_criterion
 
 /-- The same impossibility for audits that may consult **every** radius at once and
 combine the results arbitrarily: the twin pair is identical on the whole family. -/
@@ -294,7 +294,7 @@ theorem no_bounded_locality_hierarchy
   exact
     ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,
        holds := hbip, fails := hnon } :
-        LeveledBlindness localData asymptoticallyRealizable).no_hierarchy_criterion combine
+        Blindness.LeveledBlindness localData asymptoticallyRealizable).no_hierarchy_criterion combine
       ⟨accept, hdec⟩
 
 /-!

@@ -227,10 +227,10 @@ noncomputable def canonicalGenomeMultiplierForEpochCoordinates
 /-- The canonical multiplier buys exactly the coordinate count it was designed for. -/
 theorem stableSieveDimension_canonicalGenomeMultiplierForEpochCoordinates
     (kappa : ℝ) (K : ℕ) (hkappa : kappa ≠ 0) :
-    SpectrumIdentifiability.stableSieveDimension kappa
+    Blindness.SpectrumIdentifiability.stableSieveDimension kappa
         (canonicalGenomeMultiplierForEpochCoordinates kappa K) =
       epochSpectrumCoordinateCount K := by
-  have hscaled := SpectrumIdentifiability.stableSieveDimension_of_scaled
+  have hscaled := Blindness.SpectrumIdentifiability.stableSieveDimension_of_scaled
     kappa 1 (epochSpectrumCoordinateCount K) hkappa (by norm_num)
   simpa [canonicalGenomeMultiplierForEpochCoordinates] using hscaled
 
@@ -240,10 +240,10 @@ and only if its canonical exponential data budget is available. -/
 theorem epochCoordinates_le_stableSieveDimension_iff
     (kappa L : ℝ) (K : ℕ) (hkappa : 0 < kappa) (hL : 0 < L) :
     (epochSpectrumCoordinateCount K : ℝ) ≤
-        SpectrumIdentifiability.stableSieveDimension kappa L ↔
+        Blindness.SpectrumIdentifiability.stableSieveDimension kappa L ↔
       canonicalGenomeMultiplierForEpochCoordinates kappa K ≤ L := by
   simpa [canonicalGenomeMultiplierForEpochCoordinates] using
-    SpectrumIdentifiability.le_stableSieveDimension_iff
+    Blindness.SpectrumIdentifiability.le_stableSieveDimension_iff
       kappa L (epochSpectrumCoordinateCount K) hkappa hL
 
 /-- **Exact per-epoch price in the canonical Laplace core.** Adding `extra` epochs adds
@@ -267,18 +267,18 @@ multiplier is the fourth power of the stationary per-direction base
 `(1 + θ²) / (1 - θ²)`. -/
 theorem canonicalGenomeMultiplierForEpochCoordinates_succ_at_stationary
     (θ : ℝ) (K : ℕ) (hK : 2 ≤ K) (hθ0 : 0 < θ) (hθ1 : θ < 1)
-    (hstationary : SpectrumIdentifiability.CauchyConditioningStationary θ) :
+    (hstationary : Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ) :
     canonicalGenomeMultiplierForEpochCoordinates
-        (SpectrumIdentifiability.cauchyConditioningProfile θ) (K + 1) =
+        (Blindness.SpectrumIdentifiability.cauchyConditioningProfile θ) (K + 1) =
       canonicalGenomeMultiplierForEpochCoordinates
-          (SpectrumIdentifiability.cauchyConditioningProfile θ) K *
+          (Blindness.SpectrumIdentifiability.cauchyConditioningProfile θ) K *
         ((1 + θ ^ 2) / (1 - θ ^ 2)) ^ 4 := by
   rw [canonicalGenomeMultiplierForEpochCoordinates_add_epochs _ K 1 hK]
   have hbase :=
-    SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
+    Blindness.SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
       θ hθ0 hθ1 hstationary
-  rw [show SpectrumIdentifiability.cauchyConditioningProfile θ * (2 * (1 : ℕ)) =
-    (4 : ℕ) * (SpectrumIdentifiability.cauchyConditioningProfile θ / 2) by
+  rw [show Blindness.SpectrumIdentifiability.cauchyConditioningProfile θ * (2 * (1 : ℕ)) =
+    (4 : ℕ) * (Blindness.SpectrumIdentifiability.cauchyConditioningProfile θ / 2) by
       norm_num
       ring]
   rw [Real.exp_nat_mul, hbase]
@@ -630,7 +630,7 @@ theorem targetIdentifiableUnderLinearObservation_univ_iff
     [AddCommGroup Z] [Module R Z]
     (observation : V →ₗ[R] W) (target : V →ₗ[R] Z) :
     TargetIdentifiableUnderLinearObservation observation target Set.univ ↔
-      SpectrumIdentifiability.LinearTargetDeterminedByObservation observation target := by
+      Blindness.SpectrumIdentifiability.LinearTargetDeterminedByObservation observation target := by
   constructor
   · intro hdetermined left right hequal
     exact hdetermined left (Set.mem_univ left) right (Set.mem_univ right) hequal

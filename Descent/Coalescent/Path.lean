@@ -252,7 +252,7 @@ noncomputable def pathState (n : ℕ) (chain : ℕ → ER n) (hold : ℕ → ℝ
 
 /-- A descending chain of states coarsens as the block count falls. -/
 theorem chain_antitone {n : ℕ} {chain : ℕ → ER n}
-    (hchain : ∀ k, 1 ≤ k → k < n → Covers (chain (k + 1)) (chain k)) {k k' : ℕ}
+    (hchain : ∀ k, 1 ≤ k → k < n → Blindness.Covers (chain (k + 1)) (chain k)) {k k' : ℕ}
     (h1 : 1 ≤ k) (hk : k ≤ k') (hk' : k' ≤ n) : chain k' ≤ chain k := by
   induction k' with
   | zero => omega
@@ -275,7 +275,7 @@ theorem blocks_pathState (n : ℕ) {chain : ℕ → ER n} {hold : ℕ → ℝ} {
 /-- **The path only coarsens.**  K-G (2.6): `R_s ⊆ R_t` for `s ≤ t` -- lineages merge and
 never unmerge.  It follows from the chain descending and the count falling. -/
 theorem pathState_mono (n : ℕ) {chain : ℕ → ER n} {hold : ℕ → ℝ} (hn : 1 ≤ n)
-    (hchain : ∀ k, 1 ≤ k → k < n → Covers (chain (k + 1)) (chain k)) {s t : ℝ}
+    (hchain : ∀ k, 1 ≤ k → k < n → Blindness.Covers (chain (k + 1)) (chain k)) {s t : ℝ}
     (hs : 0 ≤ s) (hst : s ≤ t) :
     pathState n chain hold s ≤ pathState n chain hold t := by
   unfold pathState

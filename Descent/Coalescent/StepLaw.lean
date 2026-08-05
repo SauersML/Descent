@@ -47,7 +47,7 @@ Empirical status: NOT AN EMPIRICAL CLAIM.  Both factors are forced -- the destin
 K-C (1.3)'s unit rates through `card_covers`, the clock by K-C (1.7) -- and their
 independence is arranged, as in K-C Theorem 3. -/
 noncomputable def stepLaw {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
-    Measure ({η : ER n // Covers ξ η} × ℝ) :=
+    Measure ({η : ER n // Blindness.Covers ξ η} × ℝ) :=
   (jumpStep ξ hk).toMeasure.prod (holdMeasure (deathRate (blocks ξ)))
 
 instance stepLaw_isProbabilityMeasure {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
@@ -66,7 +66,7 @@ about the wait, and the wait says nothing about the destination.
 `CompetingRates.jointDensity_factors` is the same fact at the level of densities; this is the
 form that speaks about random objects rather than about functions. -/
 theorem stepLaw_prod {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (A : Set {η : ER n // Covers ξ η}) (B : Set ℝ) :
+    (A : Set {η : ER n // Blindness.Covers ξ η}) (B : Set ℝ) :
     stepLaw ξ hk (A ×ˢ B)
       = (jumpStep ξ hk).toMeasure A * holdMeasure (deathRate (blocks ξ)) B := by
   haveI : IsProbabilityMeasure (holdMeasure (deathRate (blocks ξ))) :=
@@ -79,7 +79,7 @@ theorem stepLaw_prod {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
 /-- The destination marginal is the uniform choice among covers: coupling it to a clock did
 not change where the chain goes. -/
 theorem stepLaw_destination_marginal {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (A : Set {η : ER n // Covers ξ η}) :
+    (A : Set {η : ER n // Blindness.Covers ξ η}) :
     stepLaw ξ hk (A ×ˢ Set.univ) = (jumpStep ξ hk).toMeasure A := by
   haveI : IsProbabilityMeasure (holdMeasure (deathRate (blocks ξ))) :=
     holdMeasure_isProbabilityMeasure (deathRate_pos hk)
@@ -97,7 +97,7 @@ marginal assigns each cover `1/C(k,2)`, which is `jumpProb` -- so conditioning o
 holding time would not change it.  That is the content of independence stated the way K-C
 (2.2) states its conclusion. -/
 theorem stepLaw_destination_uniform {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η : {η : ER n // Covers ξ η}) :
+    (η : {η : ER n // Blindness.Covers ξ η}) :
     ((jumpStep ξ hk) η).toReal = jumpProb (blocks ξ) :=
   jumpStep_apply_eq_jumpProb ξ hk η
 

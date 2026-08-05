@@ -103,7 +103,7 @@ Straus, Marshall and O'Farrell, Ismailov. The correction recorded here is to a c
 made in this development, not to that literature.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -446,4 +446,4 @@ theorem growth_ratio_gt_one {ι : Type*} (P Q : ι → ℝ)
 
 end ForcedMassGrowth
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

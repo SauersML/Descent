@@ -50,7 +50,7 @@ open scoped Classical
 blocks the chain moves to one of its covers, and to nothing else -- which is what makes the
 trajectories below descending chains. -/
 theorem mem_support_jumpLaw {n : ℕ} {ξ η : ER n} (hk : 2 ≤ blocks ξ) :
-    η ∈ (jumpLaw ξ).support ↔ Covers ξ η := by
+    η ∈ (jumpLaw ξ).support ↔ Blindness.Covers ξ η := by
   classical
   rw [jumpLaw, dif_pos hk, PMF.mem_support_map_iff]
   constructor
@@ -138,7 +138,7 @@ covers, and a total kernel cannot terminate, so it repeats.  Before absorption t
 descriptions agree exactly. -/
 theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
     (hl : l ∈ (chainLaw n k).support) :
-    List.Chain' (fun y x => Covers x y ∨ y = x) l := by
+    List.Chain' (fun y x => Blindness.Covers x y ∨ y = x) l := by
   classical
   induction k generalizing l with
   | zero =>
@@ -201,7 +201,7 @@ theorem chainLaw_head_blocks {n : ℕ} :
           rw [List.head?_cons, Option.some_inj] at hx
           have hy : blocks y + m = n := ih (by omega) hl' List.head?_cons
           have hy2 : 2 ≤ blocks y := by omega
-          have hcov : Covers y z := (mem_support_jumpLaw hy2).mp hz
+          have hcov : Blindness.Covers y z := (mem_support_jumpLaw hy2).mp hz
           have hc2 := hcov.2
           rw [← hx]
           omega

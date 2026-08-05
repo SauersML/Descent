@@ -705,8 +705,8 @@ two-point law with equal weights. One is used as a nonconcentration witness for
 a resolvent and the other as the numerator of `F_ST`, and neither file knew the
 other existed. -/
 theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
-    fairTwoPointVariance a b = betweenSubgroupVariance a b := by
-  unfold fairTwoPointVariance betweenSubgroupVariance Descent.Core.halfDiffSq; ring
+    Blindness.fairTwoPointVariance a b = betweenSubgroupVariance a b := by
+  unfold Blindness.fairTwoPointVariance betweenSubgroupVariance Descent.Core.halfDiffSq; ring
 
 /-- **Cross-check: the heterozygosity form and the variance form of `F_ST`
 agree.** The corpus contained both shapes and never related them. -/
@@ -1542,9 +1542,9 @@ theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale (p : EvolutionaryParam
 deviation is weighted by `1 - ploidy · p`, which is `q - p`, and `ploidy · p` is `E[X]` for
 a dosage `X` on `0, 1, …, ploidy` in Hardy-Weinberg proportions. On a haploid scale the
 weight is not this expression, so the constant is forced by the coding and belongs here. -/
-theorem averageEffect_uses_ploidy (m : OneLocusArchitecture) :
+theorem averageEffect_uses_ploidy (m : Blindness.OneLocusArchitecture) :
     m.averageEffect = m.a + m.d * (1 - ploidy * m.p) := by
-  unfold OneLocusArchitecture.averageEffect ploidy Descent.Core.ploidy; ring
+  unfold Blindness.OneLocusArchitecture.averageEffect ploidy Descent.Core.ploidy; ring
 
 /-- **The two in the polygenic-adaptation shift is the ploidy.** The mean score is
 `Σᵢ βᵢ · ploidy · pᵢ`, so its shift carries the same factor; the body writes the `2` as a
@@ -1656,9 +1656,9 @@ the ancestral/derived swap, `neiGst p (1 - p)` is symmetric under it, and the tw
 curves are exchanged by it. `TwoAtom` imports only Mathlib and that is deliberate; the
 statement therefore lives here, where both sides are visible. -/
 theorem mOne_mul_mTwo_eq_neiGst_at_fold (p : ℝ) :
-    BundleRigidity.mOne p * BundleRigidity.mTwo p = neiGst p (1 - p) / (p * (1 - p)) := by
+    Blindness.BundleRigidity.mOne p * Blindness.BundleRigidity.mTwo p = neiGst p (1 - p) / (p * (1 - p)) := by
   rw [neiGst_at_fold]
-  unfold BundleRigidity.mOne BundleRigidity.mTwo ploidy Descent.Core.ploidy
+  unfold Blindness.BundleRigidity.mOne Blindness.BundleRigidity.mTwo ploidy Descent.Core.ploidy
   rw [div_mul_div_comm, ← sq_abs (1 - 2 * p), pow_two]
 
 end InlinedConstants

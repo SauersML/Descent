@@ -52,7 +52,7 @@ nothing here identifies a causal effect from observational data — the effects 
 computed *from the structural equations*, which is the easy direction.
 -/
 
-namespace Descent.BundleRigidity
+namespace Descent.Blindness.BundleRigidity
 
 open scoped BigOperators
 
@@ -274,4 +274,4 @@ theorem totalEffect_pureMediation_eq_indirectEffect (a c x x' nM nY : ℝ) :
 
 end ChainSCM
 
-end Descent.BundleRigidity
+end Descent.Blindness.BundleRigidity

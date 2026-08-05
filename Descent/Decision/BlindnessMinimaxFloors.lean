@@ -58,7 +58,16 @@ namespace Descent.Decision
 
 open Descent.Decision.FiniteMinimax
 
-namespace ProbeBlindness
+-- `ProbeBlindness` is a structure in `Descent.Blindness.ObservationalCeiling`,
+-- and these are methods on it.  A declaration's namespace is relative to the
+-- enclosing one, so writing this from inside `Descent.Decision` would name them
+-- `Descent.Decision.ProbeBlindness.*` -- a namespace dot notation on the
+-- structure never looks in.
+end Descent.Decision
+
+namespace Descent.Blindness.ProbeBlindness
+
+open Descent.Decision
 
 variable {Object Data : Type*} {probe : Object → Data} {P : Object → Prop}
 
@@ -208,7 +217,9 @@ theorem blindReadoutProblem_minimaxRisk (B : ProbeBlindness probe P) :
       = 1 / 2 := by
   rw [B.uninformativeReadoutProblem_eq, Problem.indistinguishableBinaryProblem_minimaxRisk]
 
-end ProbeBlindness
+end Descent.Blindness.ProbeBlindness
+
+namespace Descent.Decision
 
 /-! ## Instance 8: the dominance blind spot costs a coin flip -/
 
@@ -222,8 +233,8 @@ dominant with probability at least one half at one of the two loci. -/
 theorem half_le_averageEffect_minimaxRisk {δ : ℝ} (hδ : δ ≠ 0) (a : ℝ)
     {observationCount : ℕ}
     (readout : ℝ → CertificateGrading.FinitePrior observationCount) :
-    (1 : ℝ) / 2 ≤ ((averageEffect_blind_to_dominance hδ a).readoutProblem readout).minimaxRisk :=
-  (averageEffect_blind_to_dominance hδ a).half_le_readoutProblem_minimaxRisk readout
+    (1 : ℝ) / 2 ≤ ((Blindness.averageEffect_blind_to_dominance hδ a).readoutProblem readout).minimaxRisk :=
+  (Blindness.averageEffect_blind_to_dominance hδ a).half_le_readoutProblem_minimaxRisk readout
 
 /-! ## Instance 9: the coalescent timescale blind spot -/
 
@@ -276,16 +287,16 @@ a single origin. The underlying content is `XiFromMarks`'s own theorem; what is 
 noncomputable def totalFamilyFraction_blind_to_originMultiplicity {finalFrequency : ℝ}
     (hfrequency : 0 < finalFrequency) :
     ProbeBlindness
-      (fun c : (k : ℕ) × (Fin k → ℝ) ↦ XiFromMarks.totalFamilyFraction c.2)
-      (fun c : (k : ℕ) × (Fin k → ℝ) ↦ ¬ XiFromMarks.HasTwoPositiveFamilies c.2) where
+      (fun c : (k : ℕ) × (Fin k → ℝ) ↦ Blindness.XiFromMarks.totalFamilyFraction c.2)
+      (fun c : (k : ℕ) × (Fin k → ℝ) ↦ ¬ Blindness.XiFromMarks.HasTwoPositiveFamilies c.2) where
   positive := ⟨1, ![finalFrequency]⟩
   negative := ⟨2, ![finalFrequency / 2, finalFrequency / 2]⟩
   same_data :=
-    (XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity finalFrequency hfrequency).1
+    (Blindness.XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity finalFrequency hfrequency).1
   holds :=
-    (XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity finalFrequency hfrequency).2.1
+    (Blindness.XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity finalFrequency hfrequency).2.1
   fails := not_not_intro
-    (XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity
+    (Blindness.XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity
       finalFrequency hfrequency).2.2
 
 /-- **No criterion reading the total selected-allele frequency decides origin
@@ -293,8 +304,8 @@ multiplicity.** -/
 theorem no_totalFamilyFraction_criterion_for_originMultiplicity {finalFrequency : ℝ}
     (hfrequency : 0 < finalFrequency) {Verdict : Type*} (combine : ℝ → Verdict) :
     ¬ ∃ accept : Verdict → Prop, ∀ c : (k : ℕ) × (Fin k → ℝ),
-        ¬ XiFromMarks.HasTwoPositiveFamilies c.2 ↔
-          accept (combine (XiFromMarks.totalFamilyFraction c.2)) :=
+        ¬ Blindness.XiFromMarks.HasTwoPositiveFamilies c.2 ↔
+          accept (combine (Blindness.XiFromMarks.totalFamilyFraction c.2)) :=
   (totalFamilyFraction_blind_to_originMultiplicity hfrequency).no_criterion_of_factors combine
 
 /-- **The sweep-origin blind spot costs a coin flip.** Every rule reading any finite readout

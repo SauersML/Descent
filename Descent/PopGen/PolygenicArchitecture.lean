@@ -729,7 +729,7 @@ structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
   /-- Actual catalogue-indexed observation laws.  Prior discrepancies are
   derived as total variation between mixtures of these laws; they are not an
   arbitrary numerical input. -/
-  observation : Fin (n + 1) → Decision.FinitePrior n
+  observation : Fin (n + 1) → Decision.CertificateGrading.FinitePrior n
   logScale : ℝ
 
 namespace MeanAbsoluteEffectCertificateProblem
@@ -802,19 +802,19 @@ theorem architectureMoment_at_zero {q n : ℕ} (P : MeanAbsoluteEffectCertificat
 
 noncomputable def mixtureExperiment {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) :
-    Decision.FiniteMixtureExperiment n n where
+    Decision.CertificateGrading.FiniteMixtureExperiment n n where
   target i := meanAbsoluteEffect (P.architecture i)
   moment := P.architectureMoment
   observation := P.observation
 
 noncomputable def finiteProblem {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) :
-    Decision.FiniteMomentCertificateProblem n :=
+    Decision.CertificateGrading.FiniteMomentCertificateProblem n :=
   P.mixtureExperiment.certificateProblem
 
 noncomputable def momentConstraintCalculus {q n : ℕ}
-    (P : MeanAbsoluteEffectCertificateProblem q n) : Decision.CertificateCalculus :=
-  Decision.explicitCalculus P.finiteProblem.modulus P.logScale
+    (P : MeanAbsoluteEffectCertificateProblem q n) : Decision.CertificateGrading.CertificateCalculus :=
+  Decision.CertificateGrading.explicitCalculus P.finiteProblem.modulus P.logScale
 
 @[simp] theorem finiteProblem_target {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (i : Fin (n + 1)) :
@@ -840,23 +840,23 @@ squared-effect mass across the architecture catalogue.  The nonsmooth target
 they may still separate is mean absolute effect. -/
 theorem momentMatched_order_two_iff {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n)
-    (A B : Decision.FinitePrior n) :
+    (A B : Decision.CertificateGrading.FinitePrior n) :
     P.finiteProblem.MomentMatched 2 A B ↔
-      Decision.FinitePrior.mean A (fun i ↦ ∑ j, P.architecture i j) =
-          Decision.FinitePrior.mean B (fun i ↦ ∑ j, P.architecture i j) ∧
-        Decision.FinitePrior.mean A (fun i ↦ ∑ j, (P.architecture i j) ^ 2) =
-          Decision.FinitePrior.mean B (fun i ↦ ∑ j, (P.architecture i j) ^ 2) := by
+      Decision.CertificateGrading.FinitePrior.mean A (fun i ↦ ∑ j, P.architecture i j) =
+          Decision.CertificateGrading.FinitePrior.mean B (fun i ↦ ∑ j, P.architecture i j) ∧
+        Decision.CertificateGrading.FinitePrior.mean A (fun i ↦ ∑ j, (P.architecture i j) ^ 2) =
+          Decision.CertificateGrading.FinitePrior.mean B (fun i ↦ ∑ j, (P.architecture i j) ^ 2) := by
   constructor
   · intro h
     constructor
-    · simpa only [Decision.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using
         h 0 (by omega)
-    · simpa only [Decision.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using
         h 1 (by omega)
   · rintro ⟨h0, h1⟩ r hr
     interval_cases r
-    · simpa only [Decision.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using h0
-    · simpa only [Decision.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using h1
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using h0
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.architectureRadius
@@ -870,7 +870,7 @@ theorem momentConstraint_complete_iff_insensitive {q n : ℕ}
     (P : MeanAbsoluteEffectCertificateProblem q n) (K : ℕ) (h : ℝ) :
     P.momentConstraintCalculus.IsComplete K h ↔
       P.momentConstraintCalculus.GradeInsensitive K h :=
-  Decision.isComplete_iff_gradeInsensitive P.momentConstraintCalculus K h
+  Decision.CertificateGrading.isComplete_iff_gradeInsensitive P.momentConstraintCalculus K h
 
 /-- Exact modulus-ratio identity for the mean-absolute-effect
 moment-constraint problem. -/
@@ -879,7 +879,7 @@ theorem momentConstraint_deficit_eq_modulusRatio_sq {q n : ℕ}
     P.momentConstraintCalculus.deficit K h =
       (P.momentConstraintCalculus.modulus.Δ 0 h /
         P.momentConstraintCalculus.modulus.Δ K h) ^ 2 :=
-  Decision.deficit_eq_modulus_ratio_sq P.momentConstraintCalculus K h
+  Decision.CertificateGrading.deficit_eq_modulus_ratio_sq P.momentConstraintCalculus K h
 
 /-- Method-complexity gap for mean-absolute-effect lower bounds.  The numerator
 allows arbitrary finite mixing priors on the architecture catalogue; the
@@ -919,7 +919,7 @@ exactly the difference in mean absolute causal effect. -/
     P.finiteProblem.targetGap (PMF.pure i) (PMF.pure j) =
       |meanAbsoluteEffect (P.architecture i) -
         meanAbsoluteEffect (P.architecture j)| := by
-  simp [Decision.FiniteMomentCertificateProblem.targetGap]
+  simp [Decision.CertificateGrading.FiniteMomentCertificateProblem.targetGap]
 
 /-! #### Two architecture moments do not identify mean absolute effect
 
@@ -964,9 +964,9 @@ theorem orderTwoMomentTwin_momentMatched :
       (PMF.pure 0) (PMF.pure 1) := by
   rw [momentMatched_order_two_iff]
   constructor
-  · simpa only [Decision.FinitePrior.mean_pure, architectureMoment_zero] using
+  · simpa only [Decision.CertificateGrading.FinitePrior.mean_pure, architectureMoment_zero] using
       orderTwoMomentTwin_signedEffect
-  · simpa only [Decision.FinitePrior.mean_pure, architectureMoment_one] using
+  · simpa only [Decision.CertificateGrading.FinitePrior.mean_pure, architectureMoment_one] using
       orderTwoMomentTwin_squaredEffect
 
 /-- Their mean absolute causal effects differ by exactly `2/21`. -/
@@ -1012,23 +1012,23 @@ compares them pairwise.
 /-- Unit effect, null, and sign-flip, emitting at rates `0`, `1/2`, `1`. -/
 noncomputable def signPairCatalogue : MeanAbsoluteEffectCertificateProblem 1 2 where
   architecture := ![![1], ![0], ![-1]]
-  observation := Decision.convexTargetObservation
+  observation := Decision.CertificateGrading.convexTargetObservation
   logScale := 0
 
 theorem signPairCatalogue_target :
     signPairCatalogue.finiteProblem.target =
-      Decision.convexTargetExperiment.certificateProblem.target := by
+      Decision.CertificateGrading.convexTargetExperiment.certificateProblem.target := by
   funext i
   fin_cases i <;>
     simp [signPairCatalogue, finiteProblem, mixtureExperiment,
-      Decision.FiniteMixtureExperiment.certificateProblem, meanAbsoluteEffect,
-      Decision.convexTargetExperiment]
+      Decision.CertificateGrading.FiniteMixtureExperiment.certificateProblem, meanAbsoluteEffect,
+      Decision.CertificateGrading.convexTargetExperiment]
 
 theorem signPairCatalogue_discrepancy :
     signPairCatalogue.finiteProblem.pairDiscrepancy =
-      Decision.convexTargetExperiment.certificateProblem.pairDiscrepancy := by
+      Decision.CertificateGrading.convexTargetExperiment.certificateProblem.pairDiscrepancy := by
   funext P Q
-  exact Decision.FiniteMixtureExperiment.totalVariation_congr _ _ rfl P Q
+  exact Decision.CertificateGrading.FiniteMixtureExperiment.totalVariation_congr _ _ rfl P Q
 
 /-- **Comparing architectures pairwise is strictly weaker than mixing them.**
 
@@ -1039,11 +1039,11 @@ lower-bound methods, not a relabelling of one method. -/
 theorem architecture_pairwise_certificates_incomplete :
     signPairCatalogue.finiteProblem.atomModulus 2 0 <
       signPairCatalogue.finiteProblem.modulus 0 0 := by
-  rw [Decision.FiniteMomentCertificateProblem.atomModulus_congr _ _
+  rw [Decision.CertificateGrading.FiniteMomentCertificateProblem.atomModulus_congr _ _
         signPairCatalogue_target signPairCatalogue_discrepancy 2 0,
-    Decision.FiniteMomentCertificateProblem.modulus_zero_congr _ _
+    Decision.CertificateGrading.FiniteMomentCertificateProblem.modulus_zero_congr _ _
         signPairCatalogue_target signPairCatalogue_discrepancy 0]
-  exact Decision.twoAtom_certificates_incomplete
+  exact Decision.CertificateGrading.twoAtom_certificates_incomplete
 
 /-- The ratio form of the biological gap is junk at the catalogue that exhibits
 the gap: `atomCertificationGap` divides by an atom modulus that is zero here, and
@@ -1052,9 +1052,9 @@ loss. `architecture_pairwise_certificates_incomplete` is the statement to read. 
 theorem signPairCatalogue_atomCertificationGap_is_junk :
     signPairCatalogue.atomCertificationGap 2 0 = 0 := by
   unfold atomCertificationGap
-  rw [Decision.FiniteMomentCertificateProblem.atomModulus_congr _ _
+  rw [Decision.CertificateGrading.FiniteMomentCertificateProblem.atomModulus_congr _ _
     signPairCatalogue_target signPairCatalogue_discrepancy 2 0,
-    Decision.convexTarget_atomModulus_two, div_zero]
+    Decision.CertificateGrading.convexTarget_atomModulus_two, div_zero]
 
 end MeanAbsoluteEffectCertificateProblem
 

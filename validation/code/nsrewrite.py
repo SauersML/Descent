@@ -420,9 +420,14 @@ def rewrite_namespace(text: str, directory: str) -> str:
                 old = m.group(1)
                 if old == "Descent":
                     opened_name = f"Descent.{directory}"
-                elif old == f"Descent.{directory}" or \
-                        old.startswith(f"Descent.{directory}."):
-                    opened_name = old          # already moved; run again freely
+                elif old.split(".")[1:2] and old.split(".")[1] in nsmap.DIRECTORIES:
+                    # Already names a directory -- either this one (a second run)
+                    # or another one, which is how a block of METHODS on a
+                    # structure that lives elsewhere is written: the directory
+                    # namespace is closed around it precisely so the methods land
+                    # in the structure's namespace and stay visible to dot
+                    # notation.  Re-prefixing either would be wrong.
+                    opened_name = old
                 elif old.startswith("Descent."):
                     # `namespace Descent.CertificateGrading` -- a module-named
                     # group that never acquired its directory.  Keep the group,
@@ -439,6 +444,75 @@ def rewrite_namespace(text: str, directory: str) -> str:
                 lines[i] = f"end {opened_name}"
                 opened_name = None
     return "\n".join(lines)
+
+
+def known_names(table) -> set[str]:
+    """Every full name the corpus declares, plus every namespace prefix of one.
+
+    A prefix counts because `Decision.CertificateGrading.FinitePrior` is a name a
+    reference may legitimately end at -- it is where the dot notation continues,
+    not where it stops.
+    """
+    out = set()
+    for _mod, decls in table.items():
+        for full, _short, _kind, _line in decls:
+            parts = full.split(".")
+            for i in range(1, len(parts) + 1):
+                out.add(".".join(parts[:i]))
+    return out
+
+
+def repair(table, write: bool) -> int:
+    """Repoint `Dir.name` references that stopped one namespace short.
+
+    The qualifier prefixes a reference to a directory's contents with the
+    DIRECTORY.  That is right for a declaration sitting directly in it and wrong
+    for one inside a group: `FinitePrior` lives in
+    `Descent.Decision.CertificateGrading`, so `Decision.FinitePrior` names
+    nothing.  Lean reports those as unknown identifiers, one per use -- 40 of
+    them from one module -- and the fix is the same every time, so it is done
+    from the declaration table instead of from the error list.
+
+    A reference is only rewritten when the deeper path is UNIQUE.  Two candidates
+    mean the short name is ambiguous inside the directory, which is a decision
+    about which one was meant and not a repair.
+    """
+    known = known_names(table)
+    deeper = collections.defaultdict(set)
+    for name in known:
+        parts = name.split(".")
+        if len(parts) >= 4 and parts[0] == "Descent" and parts[1] in nsmap.DIRECTORIES:
+            deeper[(parts[1], parts[-1])].add(".".join(parts[1:]))
+
+    fixed = 0
+    for path in all_files():
+        with open(path, encoding="utf-8", errors="ignore") as fh:
+            text = fh.read()
+        mask = code_mask(text)
+        out, last, hits = [], 0, 0
+        pattern = re.compile(r"(?<![\w.])(" + "|".join(nsmap.DIRECTORIES) +
+                             r")\.([A-Za-z_][A-Za-z0-9_'₀-₉]*)")
+        for m in pattern.finditer(text):
+            if not mask[m.start()]:
+                continue
+            d, name = m.group(1), m.group(2)
+            if f"Descent.{d}.{name}" in known:
+                continue
+            cands = deeper.get((d, name), set())
+            if len(cands) != 1:
+                continue
+            out.append(text[last:m.start()])
+            out.append(next(iter(cands)))
+            last = m.end()
+            hits += 1
+        out.append(text[last:])
+        if hits:
+            fixed += hits
+            print(f"    {hits:5d}  {nsmap.module_of(path)}")
+            if write:
+                with open(path, "w", encoding="utf-8") as fh:
+                    fh.write("".join(out))
+    return fixed
 
 
 def report(table):
@@ -476,6 +550,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--repair", action="store_true",
+                    help="repoint Dir.name references that stopped one namespace short")
     ap.add_argument("--dir")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--force", action="append", default=[], metavar="Dir.name",
@@ -501,6 +577,11 @@ def main() -> int:
                     if args.write:
                         with open(path, "w", encoding="utf-8") as fh:
                             fh.write(new)
+        return 0
+
+    if args.repair:
+        print(f"{repair(table, args.write)} references repointed"
+              f"{'' if args.write else '   (dry run; pass --write)'}")
         return 0
 
     if args.report:

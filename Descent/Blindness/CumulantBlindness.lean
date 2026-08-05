@@ -6,7 +6,7 @@ import Descent.PopGen.VarianceComponents
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Cumulant blindness: no cumulant criterion decides chaos universality
@@ -552,4 +552,4 @@ Put together with `Descent.Blindness.Condensation`:
 `Descent.Blindness.JetBarrier` computes exactly what *is* observable there.
 -/
 
-end Descent
+end Descent.Blindness

@@ -48,13 +48,13 @@ to time `t` with probability `e^{-t}`; all surviving is `e^{-d_k t}`, because th
 covers is `d_k` (`card_covers_eq_deathRate`).  This is K-C (1.5)-(1.6) in survival form: the
 total rate out of a state is the sum of the rates on its transitions. -/
 theorem prod_survival_covers {n : ℕ} (ξ : ER n) (t : ℝ) :
-    ∏ _η : {η : ER n // Covers ξ η}, Real.exp (-t)
+    ∏ _η : {η : ER n // Blindness.Covers ξ η}, Real.exp (-t)
       = Real.exp (-(deathRate (blocks ξ) * t)) := by
   classical
   rw [Finset.prod_const, Finset.card_univ]
   rw [← Real.exp_nat_mul]
   congr 1
-  have hcard : (Fintype.card {η : ER n // Covers ξ η} : ℝ) = deathRate (blocks ξ) := by
+  have hcard : (Fintype.card {η : ER n // Blindness.Covers ξ η} : ℝ) = deathRate (blocks ξ) := by
     rw [← Nat.card_eq_fintype_card]
     exact card_covers_eq_deathRate ξ
   rw [hcard]
@@ -78,7 +78,7 @@ theorem jointDensity_factors {k : ℕ} (hk : 2 ≤ k) (t : ℝ) :
 you nothing about the destination.  It is also why the jump chain is uniform on covers
 (`Process.jumpStep_apply_eq_jumpProb`) -- the two facts are the same computation. -/
 theorem jointDensity_indep_of_cover {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
-    (η η' : {η : ER n // Covers ξ η}) (t : ℝ) :
+    (η η' : {η : ER n // Blindness.Covers ξ η}) (t : ℝ) :
     (jumpStep ξ hk η).toReal * (deathRate (blocks ξ) * Real.exp (-(deathRate (blocks ξ) * t)))
       = (jumpStep ξ hk η').toReal
         * (deathRate (blocks ξ) * Real.exp (-(deathRate (blocks ξ) * t))) := by
@@ -127,11 +127,11 @@ consistency check that the factorisation is a probability statement and not just
 algebraic identity -- summing the joint density over destinations returns the marginal in
 time. -/
 theorem sum_jointDensity {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) (t : ℝ) :
-    ∑ _η : {η : ER n // Covers ξ η}, Real.exp (-(deathRate (blocks ξ) * t))
+    ∑ _η : {η : ER n // Blindness.Covers ξ η}, Real.exp (-(deathRate (blocks ξ) * t))
       = deathRate (blocks ξ) * Real.exp (-(deathRate (blocks ξ) * t)) := by
   classical
   rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-  have hcard : (Fintype.card {η : ER n // Covers ξ η} : ℝ) = deathRate (blocks ξ) := by
+  have hcard : (Fintype.card {η : ER n // Blindness.Covers ξ η} : ℝ) = deathRate (blocks ξ) := by
     rw [← Nat.card_eq_fintype_card]
     exact card_covers_eq_deathRate ξ
   rw [hcard]

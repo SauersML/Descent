@@ -424,14 +424,14 @@ theorem loss_is_determined_the_labelling_is_not
     (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
     (hflow : 0 < p.mu + p.mig)
     (divergence : Group → Group → ℝ) (s t : Group)
-    (htwin : IsProfileTwin divergence s t)
+    (htwin : Blindness.IsProfileTwin divergence s t)
     (hsymm : ∀ a b, divergence a b = divergence b a) (a b : Group) :
     Descent.Core.ScoreMoments.deployedR2 p V_E
         = Descent.Core.share
             (Descent.Core.retainedFraction p.fstEquilibrium p.V_A) V_E ∧
       divergence (Equiv.swap s t a) (Equiv.swap s t b) = divergence a b :=
   ⟨Descent.Core.ScoreMoments.deployedR2_eq p V_E hE hflow,
-   divergence_swap_twin_invariant divergence s t htwin hsymm a b⟩
+   Blindness.divergence_swap_twin_invariant divergence s t htwin hsymm a b⟩
 
 /-! ### Two loss channels, and only one of them is in the demography -/
 
@@ -561,9 +561,9 @@ theorem design_check_is_sharp_the_moment_certificate_is_not
     (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (hp : p ≤ o) :
     ((∃ m : ℝ, 0 < m ∧ m < n ∧
         bbpProxyThreshold n M < demographicSpike n F m) ↔ 1 / (F ^ 2 * n) < M) ∧
-      |mu p - nu p| ≤ momentDist o mu nu :=
+      |mu p - nu p| ≤ Blindness.momentDist o mu nu :=
   ⟨exists_superthreshold_subgroup_iff_marker_requirement n M F hn hM hF,
-   abs_moment_sub_le_momentDist o mu nu hp⟩
+   Blindness.abs_moment_sub_le_momentDist o mu nu hp⟩
 
 /-! ### Two obstructions that need no hypothesis at all -/
 

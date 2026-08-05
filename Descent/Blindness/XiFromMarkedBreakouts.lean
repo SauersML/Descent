@@ -8,7 +8,7 @@ import Mathlib.Tactic
 import Descent.Blindness.MarkedBreakoutUniversality
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # A sweep trajectory does not determine the genealogy it leaves
@@ -829,4 +829,4 @@ theorem logDisplacement_injOn (gamma : ℝ) (hg : gamma ≠ 0) :
 
 end XiFromMarks
 
-end Descent
+end Descent.Blindness

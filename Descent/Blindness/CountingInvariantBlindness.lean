@@ -54,7 +54,7 @@ Empirical status: UNTESTED. The `m_eff` instance referred to above is separately
 in `validation/empirical/meff_prohibition/`; nothing in this module is a numerical claim.
 -/
 
-namespace Descent.CountingInvariantBlindness
+namespace Descent.Blindness.CountingInvariantBlindness
 
 /-! ## The abstract witness -/
 
@@ -325,4 +325,4 @@ noncomputable def ghostWitnessExample (u : ℝ) : Witness Bool ℝ :=
 noncomputable def ApproxWitness.witness (u : ℝ) : ApproxWitness Bool ℝ :=
   ApproxWitness.ofWitness (ghostWitnessExample u) (fun x y ↦ |x - y|) (fun x ↦ by simp)
 
-end Descent.CountingInvariantBlindness
+end Descent.Blindness.CountingInvariantBlindness

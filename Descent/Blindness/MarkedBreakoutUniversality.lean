@@ -6,7 +6,7 @@ import Mathlib.MeasureTheory.Measure.WithDensity
 import Descent.Blindness.MultipleMergerBlindness
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Blindness
 
 /-!
 # Marked successful families are the branching-front universality object
@@ -521,4 +521,4 @@ theorem genealogicalTimescale_at_two : genealogicalTimescale 2 3 = 8 := by
 
 end MarkedBreakout
 
-end Descent
+end Descent.Blindness

@@ -86,9 +86,9 @@ measure on `ℝ`, as `Descent.Blindness.MultipleMergerBlindness` defines it. -/
 theorem lambdaRate_consistent (Λ : Measure ℝ) {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b)
     (h1 : Integrable (fun x : ℝ => x ^ (k - 2) * (1 - x) ^ (b + 1 - k)) Λ)
     (h2 : Integrable (fun x : ℝ => x ^ (k + 1 - 2) * (1 - x) ^ (b + 1 - (k + 1))) Λ) :
-    lambdaCoalescentMergerRate Λ b k
-      = lambdaCoalescentMergerRate Λ (b + 1) k + lambdaCoalescentMergerRate Λ (b + 1) (k + 1) := by
-  unfold lambdaCoalescentMergerRate
+    Blindness.lambdaCoalescentMergerRate Λ b k
+      = Blindness.lambdaCoalescentMergerRate Λ (b + 1) k + Blindness.lambdaCoalescentMergerRate Λ (b + 1) (k + 1) := by
+  unfold Blindness.lambdaCoalescentMergerRate
   rw [← integral_add h1 h2]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x => lambdaIntegrand_split hk hkb x)
 
@@ -110,8 +110,8 @@ possible merger: `x^{k-2}` vanishes at `x = 0` unless `k = 2`, and then the inte
 `1`.  So the whole of `Descent.Coalescent` -- the state space, the rates, the jump chain,
 the Ewens formula -- is the `δ₀` fibre of Pitman's family. -/
 theorem lambdaRate_dirac_zero {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b) :
-    lambdaCoalescentMergerRate (Measure.dirac 0) b k = kingmanRate b k := by
-  unfold lambdaCoalescentMergerRate kingmanRate
+    Blindness.lambdaCoalescentMergerRate (Measure.dirac 0) b k = kingmanRate b k := by
+  unfold Blindness.lambdaCoalescentMergerRate kingmanRate
   rw [integral_dirac]
   by_cases h : k = 2
   · subst h

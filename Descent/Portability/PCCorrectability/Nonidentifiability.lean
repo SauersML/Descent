@@ -107,12 +107,12 @@ bound on the mixing, with no intermediate regime.
     Empirical status: NOT AN EMPIRICAL CLAIM -- a statement about which hidden models
     share second-order observables, carrying no assertion about any dataset. -/
 theorem ancestryProfile_rigidity_dichotomy (B : ℕ → ℝ) (a b : ℝ) :
-    (∀ t t' : ℕ → ℝ, BoundedBelowAbove t a b → BoundedBelowAbove t' a b →
-        BoundedLogDistortion t t')
+    (∀ t t' : ℕ → ℝ, Blindness.BoundedBelowAbove t a b → Blindness.BoundedBelowAbove t' a b →
+        Blindness.BoundedLogDistortion t t')
       ∧ ∃ x y : ℕ → ℝ,
-          ¬ BoundedLogDistortion (codedDecayProfile B x) (codedDecayProfile B y) := by
+          ¬ Blindness.BoundedLogDistortion (Blindness.codedDecayProfile B x) (Blindness.codedDecayProfile B y) := by
   refine ⟨fun t t' ht ht' ↦ rigidity_of_boundedBelowAbove ht ht', ?_⟩
-  refine ⟨fun _ ↦ 0, fun n ↦ (n : ℝ), inequivalent_of_unbounded_coding B _ _ ?_⟩
+  refine ⟨fun _ ↦ 0, fun n ↦ (n : ℝ), Blindness.inequivalent_of_unbounded_coding B _ _ ?_⟩
   intro C
   obtain ⟨n, hn⟩ := exists_nat_gt C
   refine ⟨n, ?_⟩

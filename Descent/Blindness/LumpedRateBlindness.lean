@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Blindness
 
 open scoped BigOperators
 
@@ -125,4 +125,4 @@ theorem lumped_dynamics_blind_to_exchange (a b b' : ℝ) (f : Fin 3 → ℝ) (hf
       · exact lumped_closed_under_generator a b _ hlump
   exact fun n ↦ (key n).1
 
-end Descent
+end Descent.Blindness

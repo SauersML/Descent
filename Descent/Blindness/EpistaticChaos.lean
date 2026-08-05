@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.ImitationRigidity
 
-namespace Descent
+namespace Descent.Blindness
 
 noncomputable section
 
@@ -596,7 +596,7 @@ Rademacher coordinate, and `x ^ 2` is not identically one.
 Empirical status: DERIVED from `HardyWeinbergModel.centeredAltAlleleCount` and
 `HardyWeinbergModel.genotypeVariance`; it is the standard normalization, with no
 free parameter. -/
-noncomputable def HardyWeinbergModel.standardizedGenotype
+noncomputable def _root_.Descent.Foundations.HardyWeinbergModel.standardizedGenotype
     (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
   h.centeredAltAlleleCount g / Real.sqrt h.genotypeVariance
 
@@ -895,7 +895,7 @@ additive identity is stated as a theorem here rather than left as a remark.
 Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; the
 centering constant is forced by `standardizedGenotype_second_moment_one`, which
 proves `E[x²] = 1`, so there is no free parameter. -/
-noncomputable def HardyWeinbergModel.centeredSquare
+noncomputable def _root_.Descent.Foundations.HardyWeinbergModel.centeredSquare
     (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
   h.standardizedGenotype g ^ 2 - 1
 
@@ -1236,7 +1236,7 @@ coordinate is standardized (`standardizedGenotype_second_moment_one`).
 
 Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; closed form
 `(1 - 2q)²` at or below frequency one half (`hweSignBias_eq`), with no free parameter. -/
-noncomputable def HardyWeinbergModel.signBias (h : Foundations.HardyWeinbergModel) : ℝ :=
+noncomputable def _root_.Descent.Foundations.HardyWeinbergModel.signBias (h : Foundations.HardyWeinbergModel) : ℝ :=
   ∑ g : Foundations.DiploidGenotype,
     h.genotypeProb g * (h.standardizedGenotype g * |h.standardizedGenotype g|)
 
@@ -1328,7 +1328,7 @@ collapses to floor one for a single locus. Panels are where it bites, and that i
 -/
 
 /-- The reflected locus, at allele frequency `1 - q`. -/
-def HardyWeinbergModel.reflect (h : Foundations.HardyWeinbergModel) : Foundations.HardyWeinbergModel where
+def _root_.Descent.Foundations.HardyWeinbergModel.reflect (h : Foundations.HardyWeinbergModel) : Foundations.HardyWeinbergModel where
   altFreq := 1 - h.altFreq
   altFreq_nonneg := by linarith [h.altFreq_le_one]
   altFreq_le_one := by linarith [h.altFreq_nonneg]
@@ -2630,4 +2630,4 @@ end StarVersusCycle
 
 end
 
-end Descent
+end Descent.Blindness
