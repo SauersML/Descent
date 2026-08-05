@@ -111,17 +111,10 @@ theorem demoSteppingStoneFst_at_d0ne0m0sq0_is_junk :
 /-- **The functional form the previous derivation produced**, retained so that the
 indistinguishability recorded in the note above can be stated rather than asserted.
 
-**DO NOT "CORRECT" THIS BODY. Its falsification is the result, not a defect.**
-This is a deliberate foil. Two theorems below depend on it being the wrong law:
-`demoSteppingStoneFst_indistinguishable_from_quadratic` and
-`steppingStoneCoalescenceTime_indistinguishable_through_coalFst`, which together
-state that with `σ_sq` free no amount of `F_ST` data separates this form from
-`demoSteppingStoneFst` -- so a fit constrains the product `m * σ_sq` and nothing
-else. That non-identifiability is the mathematics. Replacing the body with
-`d / (d + 4 * Ne * m * σ_sq)` makes it literally `demoSteppingStoneFst`,
-collapses both theorems to `x = x`, and deletes the result. Every falsification
-recorded below is therefore intentional and load-bearing: the three instruments
-that reject this form are the demonstration, and a fourth would be too.
+**DO NOT "CORRECT" THIS BODY. THE FALSIFICATION IS THE RESULT.** This is a
+deliberate foil; the full statement of why, and of the two theorems that depend
+on it, is at the end of this docstring. A directive to fix every falsified
+definition does not reach this one.
 
     Empirical status: **FALSIFIED**
     (`proofs/validation/empirical/simcov/battery_verify.py`,

@@ -1494,20 +1494,10 @@ section Definitions
 variable (design : GenotypeDesign n ι)
 
 /-- The interaction order of a tested set: the number of loci in it.
-and nothing fitted.
 
-Empirical status: UNTESTED. A cardinality read off the design; no free parameter -/
+Empirical status: UNTESTED. A cardinality read off the design; no free parameter
+and nothing fitted. -/
 def interactionOrder (s : ι) : ℕ := (design.locusSet s).card
-
-/-- The test statistic: `∑_s c_s ∏_{i ∈ S_s} x_i` in the standardized genotypes
-`HardyWeinbergModel.standardizedGenotype` of the panel's own allele frequencies.
-
-Empirical status: UNTESTED. The multilinear statistic the chaos theory is about,
-written in the corpus's standardized coordinate; no free parameter beyond the
-design's own coefficients. -/
-noncomputable def statistic (x : Fin n → DiploidGenotype) : ℝ :=
-  ∑ s : ι, design.coefficient s *
-    ∏ i ∈ design.locusSet s, (design.model i).standardizedGenotype (x i)
 
 /-- **Linkage equilibrium across the tested panel**: the joint genotype law
 factorizes into the per-locus Hardy-Weinberg laws. It is stated as the
@@ -2344,22 +2334,12 @@ theorem overlap_row_sum_eq_recurrence (design : GenotypeDesign nx ιx) (s : ιx)
   simp_rw [hcard, hrec]
   exact Finset.sum_comm
 
-/-- **The tempered regime.** The cycle densities grow at most exponentially in
-the diagram size, so a single truncation level determines the limit law and
-moment matching is a valid calibration strategy.
-
-Empirical status: UNTESTED. A growth condition on the design's own cycle
-densities; checkable on a panel by computing the overlap structure, with no free
-parameter beyond the declared rate. -/
-def Tempered (design : GenotypeDesign nx ιx) (rate : ℝ) : Prop :=
-  ∀ p : ℕ, |design.cycleDensity p| ≤ rate ^ p
-
 /-- **Bounded hub energy**, in its operational form: no variant is tested more
 than `bound` times. This is what fails for a lead variant in a dense sliding
 scan, or for a pleiotropic variant across a phenotype panel.
-checkable by inspection.
 
-Empirical status: UNTESTED. A bound on the design's own recurrence profile; -/
+Empirical status: UNTESTED. A bound on the design's own recurrence profile;
+checkable by inspection. -/
 def BoundedHubRecurrence (design : GenotypeDesign nx ιx) (bound : ℕ) : Prop :=
   ∀ i : Fin nx, design.variantRecurrence i ≤ bound
 

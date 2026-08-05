@@ -664,7 +664,6 @@ theorem turnover_worsens_ld_only_portability
 theorem immune_combined_decay_faster
     (r2_src lam_LD lam_eff_neutral lam_eff_immune d : ℝ)
     (hr2 : 0 < r2_src)
-    (hlamn : 0 < lam_eff_neutral)
     (hlami : lam_eff_neutral < lam_eff_immune)
     (hd : 0 < d) :
     combinedPortability r2_src lam_LD lam_eff_immune d <

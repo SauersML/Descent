@@ -38,12 +38,15 @@ nothing in this file depends on it.
 
 `spectrumModulusLaw` is a *mixture over loci*: it treats a panel as a bag of independent
 one-locus laws. Reading it as "what LD-score regression, variance-component heritability
-or a heterozygosity summary sees" requires the panel to be in **linkage equilibrium**,
-which is stated here as `InLinkageEquilibrium` and carried as an explicit hypothesis of
-the headline theorems rather than mentioned in a remark.
-
-Sections 1–7 are stated under that hypothesis, and it is genuinely restrictive: the
-surrounding theory factors a panel's characteristic function as a product over loci.
+or a heterozygosity summary sees" requires the panel to be in **linkage equilibrium** —
+and that requirement is on the READING, not on the theorems. §§1–7 used to bind an
+`InLinkageEquilibrium` hypothesis to make the restriction visible in the signatures; no
+proof ever consulted it, because `spectrumModulusLaw` and `Separating` are functions of
+the panel's frequencies and weights alone and never see a joint genotype law. The
+hypothesis and the definition are gone. What remains true is the interpretive caveat: the
+modulus law is what a mixture-over-loci summary computes, so quoting these results as
+statements about a linkage-disequilibrium panel is a claim about the interpretation that
+nothing here establishes.
 
 **Section 8 relaxes it, but not as far as the name "linkage disequilibrium" would
 suggest, and the difference is the single most important caveat in this file.** What §8
@@ -55,9 +58,9 @@ what linkage disequilibrium actually is. The two are different objects and the d
 bites for anything haplotype-level. Genotype-level dependence at fixed frequencies remains
 entirely outside this theory, and no theorem here should be quoted as covering it.
 
-Accordingly the independence hypothesis is not dropped, it is **replaced**: theorems in §8
-carry Harris recurrence / regeneration as an explicit hypothesis, in the signature, in
-exactly the way `InLinkageEquilibrium` is carried in §§1–7.
+Accordingly §8's theorems carry Harris recurrence / regeneration as an explicit hypothesis,
+in the signature — and unlike the independence hypothesis §§1–7 used to bind, those are
+consulted by the proofs that bind them.
 
 ## What is new here and what is not
 
@@ -86,20 +89,26 @@ fact then decides identifiability of the folded spectrum itself, and that it doe
 tied weights with moving analytic atoms.
 -/
 
-/-! ## 0. The standing independence hypothesis -/
+/-! ## 0. There is no standing independence hypothesis, and there never was one
 
-/-- **Linkage equilibrium**: the panel's joint genotype law is the product of its
-per-locus Hardy-Weinberg laws.
+This section defined `InLinkageEquilibrium` -- the panel's joint genotype law is the
+product of its per-locus Hardy-Weinberg laws -- and the file described it as carried
+explicitly by the headline theorems below. It was carried, and it was never used: a scan
+of the kernel-accepted proof terms found it occurring in none of the three theorems whose
+signatures bound it, and the reason is structural rather than accidental.
+`spectrumModulusLaw` and `Separating` are functions of the panel's frequencies and weights
+alone, so nothing in §§1-7 can see a joint genotype distribution whether or not it
+factorizes.
 
-This is the hypothesis under which a panel may be read as a mixture over loci, which is
-what `spectrumModulusLaw` computes. It is carried explicitly by the headline theorems
-below. Under linkage disequilibrium the joint law is not of this form, the factorization
-the surrounding theory relies on fails, and none of the statements below are claimed.
+With the dead premises removed the definition had no remaining consumer anywhere in the
+corpus, so it is gone too. Note that `Calibrator.GenotypeDesign.InLinkageEquilibrium` in
+`EpistaticChaos` is a **different** declaration that survives; the two shared a short name
+and nothing else.
 
-    Empirical status: UNTESTED. -/
-def InLinkageEquilibrium {k n : ℕ} (family : BundleFamily k) (panel : Panel n)
-    (joint : (Fin n → Fin k) → ℝ) : Prop :=
-  ∀ g : Fin n → Fin k, joint g = ∏ i : Fin n, family.atomMass (g i) (panel.support i)
+What this costs the file is a claim it should not have been making. The results below are
+not scoped to equilibrium panels. They are scoped to `Separating` ones, which is a
+condition on the frequencies, and no theorem here says anything about linkage
+disequilibrium in either direction. -/
 
 /-! ## 1. The diploid bundle family -/
 
@@ -448,11 +457,6 @@ There are two distinct ways an array can lose spectral information and they comp
 only the value `1`, whatever its weight. An array ascertained for common variants is
 pushed toward both at once — many markers, similar frequencies, all near balance.
 -/
-
-/-- A panel has an **ascertainment tie** when two distinct loci sit at the same
-frequency. -/
-def HasFrequencyTie {k n : ℕ} (_family : BundleFamily k) (panel : Panel n) : Prop :=
-  ∃ i l : Fin n, i ≠ l ∧ panel.support i = panel.support l
 
 /-- **A tie destroys separation, for every bundle family.**
 

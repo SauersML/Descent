@@ -753,6 +753,173 @@ def deliberate (n : Name) : Bool :=
 
 end UnusedHyp
 
+/-! ## LIVENESS: a definition nothing refers to
+
+A definition no other declaration mentions is dead code, and dead code in a
+proof corpus is worse than dead code in a program: it is a quantity the corpus
+names, documents and appears to reason about, while nothing depends on it, so
+nothing can contradict it either.  The bar is that a declaration earns its place
+by being used or by being contradictable.
+
+**This is in `Check.lean`, over the elaborated environment, because it cannot be
+done from source text.**  Four distinct false-positive classes broke four
+successive source-text attempts at this question, and the environment is immune
+to all four by construction:
+
+  * **Greek-initial identifiers.**  An ASCII identifier start class tokenises
+    `β_obs`, `θ_scaled` and `σ_sq` as their suffixes, so every Greek-named
+    definition reads as unreferenced.  One scan reported six dead on this alone.
+  * **Instance witnesses.**  `instance : Inhabited T := ⟨zeroCertificate⟩` is a
+    use, and a scan looking for applications does not see it.
+  * **Uses inside proof terms.**  `RecentFineScaleConfounding.canonical` is the
+    proof term of that structure's `nonempty` theorem and nothing else; deleting
+    it fails the build with `Unknown constant`.
+  * **Inline attributes.**  A declaration regex that skips modifier keywords but
+    not `@[simp]` misses `@[simp] theorem foo : ...` written on one line, and
+    with it every reference that theorem carries.
+
+The environment sees a name in a proof term, an instance value, a structure
+literal and a Greek identifier identically: they are all `Expr.const` nodes.
+
+## What counts as a use
+
+A definition `n` is LIVE when some OTHER **user-written** `Calibrator`
+declaration mentions `n` in its type or its value.
+
+"User-written" is doing the work, and it replaced a prefix rule that was wrong
+in both directions.  Lean generates `n.eq_1`, `n.eq_def`, `n.ctorIdx`, and a
+structure's field projections, every one of which mentions `n` by construction;
+counting them makes every definition trivially live and the scan reports zero
+forever while appearing to work.  But excluding everything under `n` as a prefix
+is far too much: `AssortativeMatingModel.h2_pos` is a hand-written theorem in the
+structure's own namespace, and that is *exactly* how a structure gets used, so
+the prefix rule reported every structure in the corpus dead.  Asking instead
+whether the mentioning declaration was written by a person separates the two
+cleanly -- only a human-written declaration can keep something alive.
+
+## Inhabitation witnesses
+
+A closed term whose type is a corpus structure is live by its role rather than
+by being named.  The corpus writes `Foo.witness : Foo` to discharge exactly the
+obligation that `LAUNDER_CERT` checks -- a theorem quantified over an
+uninhabited structure is true and empty -- and that scan consumes such terms by
+searching the environment for them, never by mentioning them.  Deleting one
+because nothing names it would silently reintroduce the vacuity the witness was
+written to exclude.
+
+Theorems are deliberately NOT scanned.  A theorem with no consumers is a
+conclusion, which is what a proof corpus is for; a definition with no consumers
+is a quantity nothing computes with.
+-/
+namespace Liveness
+
+/-- Every constant a declaration mentions, in its type and in its value. -/
+def mentions (ci : ConstantInfo) : Array Name :=
+  ci.type.getUsedConstants ++ (ci.value?.map Expr.getUsedConstants).getD #[]
+
+/-- Final name components Lean generates for a structure or inductive, which
+`Shared.userWritten` does not currently filter.  `ctorIdx` alone accounted for a
+third of this scan's first run. -/
+def generatedSuffixes : List String :=
+  ["ctorIdx", "toCtorIdx", "noConfusion", "noConfusionType", "casesOn", "recOn",
+   "rec", "brecOn", "below", "ibelow", "binductionOn", "ndrec", "ndrecOn",
+   "injEq", "mk", "sizeOf_spec", "eq_def", "eq_1", "_sunfold", "_unfold",
+   -- `Pop.source.elim`, `DiploidGenotype.het.elim`: one per constructor.
+   "elim", "ctorElim", "ctorElimType",
+   -- the field of a `deriving Repr` instance
+   "repr"]
+
+/-- Is this a declaration a person wrote, for the purpose of this scan?
+
+Anonymous instances are excluded, and not as a convenience.  An instance is
+reached by typeclass synthesis, never by being named, so "no declaration
+mentions it" is the normal state of a correct instance and says nothing at all
+about whether it is dead.  `deriving DecidableEq` alone produces one per
+enumeration, named `instDecidableEqFoo`.
+
+The test is the `inst` name prefix rather than the instance attribute, which
+catches every anonymous and derived instance -- the ones that are generated and
+numerous.  A *named* instance would still be scanned, and if one is ever
+reported dead the right response is to widen this test, not to delete the
+instance. -/
+def authored (env : Environment) (n : Name) : Bool :=
+  Shared.userWritten env n
+    && !(generatedSuffixes.contains n.getString!)
+    -- ANY component, not just the last: `instReprPop.repr` is a field of a
+    -- derived instance and its last component is `repr`.  The guillemets have
+    -- to come off first -- a `syntax`/macro declaration is named
+    -- `«tacticFoo_,,»`, so the prefix test fails on the quote character.
+    && !(n.components.any fun c ↦
+          let s := c.toString.replace "«" "" |>.replace "»" ""
+          "inst".isPrefixOf s || "tactic".isPrefixOf s)
+
+/-- Can a mention by `n` keep something alive?
+
+This is NOT `authored`, and conflating the two was a real defect: `authored`
+decides what goes in the population, and it excludes tactic macros and
+instances because they are generated and numerous.  But a macro that mentions a
+constant is a genuine *use* of it -- `sigmaTagCausal` is referenced only from
+inside `MechanisticPortabilityWitnesses`' witness-simp macros, and excluding
+those as users reported it dead.  Deleting it broke the build with five
+`Unknown identifier` errors, which is how this was found.
+
+Only the satellites that mention their parent by construction are excluded
+here; everything else counts. -/
+def countsAsUser (n : Name) : Bool :=
+  !(generatedSuffixes.contains n.getString!)
+
+/-- Which members of `population` some declaration other than themselves
+mentions.
+
+One pass over the environment with a hash lookup per mentioned name, rather than
+a membership test per (declaration, candidate) pair: the corpus has ~1900
+candidates against a Mathlib-sized environment. -/
+def liveNames (env : Environment) (population : Std.HashSet Name) :
+    Std.HashSet Name := Id.run do
+  let mut live : Std.HashSet Name := {}
+  for (user, ci) in env.constants.toList do
+    unless countsAsUser user do continue
+    for target in mentions ci do
+      if target != user && population.contains target then
+        live := live.insert target
+  return live
+
+/-- The marker a declaration's docstring carries to declare a consumer this scan
+cannot see.
+
+The scan's population is the Lean environment, so a definition consumed only
+from OUTSIDE it is invisible to the reference relation and would be reported
+dead forever.  That is not hypothetical: `GWASObservationModel.isSelected` is a
+`Prop`-valued convention whose consumers are a prose justification for another
+deletion and `validation/differential/cluster/fam_ascertainment.py`, which
+validates against it; and `DGP` and `MetricSpecificPortability` already carried
+this marker before the scan existed.
+
+It is deliberately a docstring marker rather than an allow-list in this file.
+An allow-list is a second place to keep the truth, it drifts, and it puts the
+justification where the reader of the declaration will not see it.  Here the
+reason travels with the code, and `LIVENESS_EXEMPT` reports how many there are
+so the exemption cannot grow silently. -/
+def exemptMarker : String := "DO NOT DELETE AS UNUSED"
+
+/-- Is `n` a term of a corpus structure -- an inhabitation witness?
+
+The leading `∀` binders have to be stripped first.  A witness is frequently
+parameterised (`StratificationModel.witness (p : ℕ) : StratificationModel (p+1)`),
+so the constant's type is a `forallE` whose head is not the structure at all,
+and reading the head without stripping reported every parameterised witness in
+the corpus dead. -/
+partial def isInhabitationWitness (env : Environment) (ci : ConstantInfo) : Bool :=
+  go ci.type
+where
+  go : Expr → Bool
+    | .forallE _ _ b _ => go b
+    | e => match e.getAppFn.constName? with
+        | some h => Check.isOurs h && (getStructureInfo? env h).isSome
+        | none => false
+
+end Liveness
+
 end Check
 
 /-! ## Calibration of the UNUSED scan
@@ -792,6 +959,31 @@ theorem calib_used_tac (n : Nat) (h : 2 < n) : 1 < n := by omega
 every hypothesis in scope into its certificate, so `h` occurs in the term. -/
 theorem calib_unused_tac (n : Nat) (h : 2 < n) : 0 < n + 1 := by omega
 
+/-! ### Calibration of the LIVENESS scan
+
+Three definitions with known answers, exercising the two reference paths a
+source-text scan cannot see. -/
+
+/-- Calibration: referenced by nothing.  The scan MUST report this dead. -/
+def calibDeadDef : Nat := 41
+
+/-- Calibration: referenced ONLY from inside a proof term.  Must be live. -/
+def calibLiveViaProof : Nat := 42
+
+/-- Calibration: referenced ONLY from a type.  Must be live. -/
+def calibLiveViaType : Nat := 43
+
+/-- The only mention of `calibLiveViaProof` is in this proof's term, never in a
+type or a signature.  This is the class that made a source-text scan report
+`PCCorrectability.Core.canonical` dead when it is the proof of that structure's
+`nonempty`. -/
+theorem calib_uses_in_proof : 0 < 42 := by
+  have h : calibLiveViaProof = 42 := rfl
+  omega
+
+/-- The only mention of `calibLiveViaType` is in this statement's type. -/
+theorem calib_uses_in_type : calibLiveViaType = 43 := rfl
+
 end Check.Calib
 
 open Check in
@@ -827,6 +1019,27 @@ run_cmd do
         {wantDelib}, got fatal {gotFatal} deliberate {gotDelib}"
   logInfo m!"UNUSED_CALIB_CASES\t{cases.size}"
   logInfo m!"UNUSED_CALIB_FAILURES\t{failures}"
+
+  -- LIVENESS, over the planted population only.  The three calibration
+  -- definitions are in `Check.Calib`, so `isOurs` keeps them out of the corpus
+  -- scan below and the corpus out of this one.
+  let planted : Std.HashSet Name :=
+    Std.HashSet.emptyWithCapacity 4
+      |>.insert ``Check.Calib.calibDeadDef
+      |>.insert ``Check.Calib.calibLiveViaProof
+      |>.insert ``Check.Calib.calibLiveViaType
+  let live := Liveness.liveNames env planted
+  let mut lFailures := 0
+  for (n, wantLive) in
+      [(``Check.Calib.calibDeadDef, false),
+       (``Check.Calib.calibLiveViaProof, true),
+       (``Check.Calib.calibLiveViaType, true)] do
+    if live.contains n != wantLive then
+      lFailures := lFailures + 1
+      logError m!"LIVENESS_CALIB\t{n}\texpected live={wantLive}, \
+        got live={live.contains n}"
+  logInfo m!"LIVENESS_CALIB_CASES\t3"
+  logInfo m!"LIVENESS_CALIB_FAILURES\t{lFailures}"
 
 /-! ## Driver
 
@@ -1177,8 +1390,54 @@ run_cmd do
   logInfo m!"UNUSED_FATAL\t{uFatal.size}"
 
   ---------------------------------------------------------------------------
+  -- LIVENESS
+  ---------------------------------------------------------------------------
+  -- Definitions only.  A theorem with no consumers is a conclusion; a
+  -- definition with no consumers is a quantity nothing computes with.
+  let mut defPop : Std.HashSet Name := {}
+  let mut witnesses : Std.HashSet Name := {}
+  for (name, ci) in env.constants.toList do
+    unless isOurs name do continue
+    unless Liveness.authored env name do continue
+    if ci.isTheorem then continue
+    match ci with
+    | .defnInfo _ | .axiomInfo _ | .opaqueInfo _ | .inductInfo _ =>
+        defPop := defPop.insert name
+        if Liveness.isInhabitationWitness env ci then
+          witnesses := witnesses.insert name
+    | _ => pure ()
+  let liveSet := Liveness.liveNames env defPop
+  let mut deadDefs : Array (Name × Name × String) := #[]
+  let mut exempt := 0
+  for name in defPop do
+    unless liveSet.contains name || witnesses.contains name do
+      let doc := (← liftCoreM <| findDocString? env name).getD ""
+      if (doc.splitOn Liveness.exemptMarker).length > 1 then
+        exempt := exempt + 1
+      else
+        let mod := (env.getModuleFor? name).getD `«unknown»
+        let loc ← liftCoreM <| whereIs env name
+        deadDefs := deadDefs.push (mod, name, loc)
+  let deadSorted := deadDefs.qsort (fun a b ↦ a.2.1.toString < b.2.1.toString)
+  for (m, n, loc) in deadSorted do
+    logError m!"DEAD\t{m}\t{n}\t[{loc}]\tno other declaration mentions it in a \
+      type or a value; delete it, or wire it into a consumer"
+  logInfo m!"LIVENESS_DEFS_SCANNED\t{defPop.size}"
+  logInfo m!"LIVENESS_WITNESSES\t{witnesses.size}"
+  -- Printed even at zero: an exemption that is not counted is an allow-list.
+  logInfo m!"LIVENESS_EXEMPT\t{exempt}"
+  logInfo m!"LIVENESS_DEAD\t{deadDefs.size}"
+
+  ---------------------------------------------------------------------------
   -- Stored results
   ---------------------------------------------------------------------------
+  Shared.Results.write "proofs/validation/code/results/liveness.json" "LivenessScan"
+    [ ("definitionsScanned", toJson defPop.size),
+      ("deadCount", toJson deadDefs.size),
+      ("dead", Json.arr (deadSorted.map fun (m, n, loc) ↦ Json.mkObj
+        [ ("module", toJson m.toString), ("declaration", toJson n.toString),
+          ("location", toJson loc) ])) ]
+
   Shared.Results.write "proofs/validation/code/results/unused.json" "UnusedHypScan"
     [ ("scanned", toJson uScanned),
       ("propBinders", toJson uProps),

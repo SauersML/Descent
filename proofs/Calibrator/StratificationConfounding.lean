@@ -813,7 +813,14 @@ noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
     low) and as `4p(1-p)` by 46 sems (97% high), so the ploidy factor in `hweHeterozygosity`
     is carried by the data. The positive control -- a NULL instrument, whose `F` must have
     mean 1 -- passes at 0.88 sems, which is what makes the minus-one convention checkable
-    rather than assumed. -/
+    rather than assumed.
+
+    **DO NOT DELETE AS UNUSED.** No Lean declaration mentions this, so the liveness scan in
+    `proofs/validation/code/Check.lean` reports it dead; its consumer is
+    `simcov/battery_bulk40.py`, `group_d`, whose measured noncentralities are tabulated
+    above and whose identity gate rejects two competing genotype-variance conventions
+    against this exact body. A definition a battery validates against is not dead code, and
+    deleting it would silently retire a passing measurement. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_X_resid
 

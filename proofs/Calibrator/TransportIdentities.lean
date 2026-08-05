@@ -174,8 +174,6 @@ section MetricIdentities
 
 variable {Ω : Type*}
 
-def mean (E : ExpFunctional Ω) (Z : Ω → ℝ) : ℝ := E Z
-
 def variance (E : ExpFunctional Ω) (Z : Ω → ℝ) : ℝ :=
   E (fun ω ↦ (Z ω - E Z) ^ 2)
 

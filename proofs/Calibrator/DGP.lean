@@ -3455,9 +3455,7 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     `PortabilityDrift.liabilityThresholdAUCFromExplainedR2`, which takes a
     prevalence; do not substitute this one for it.
 
-    A SECOND and independent measurement of that same verdict
-    (`simcov/battery_bulk33.py`, `group_a`), reported here as evidence rather
-    than as a second status, since a declaration states its verdict once.
+    Empirical status: **VALIDATED** (`simcov/battery_bulk33.py`, `group_a`).
     The AUC is COUNTED, not computed: two Gaussian score distributions with
     equal variance and a mean separation of `√vSignal`, and the observable is
     the fraction of 800000 case/control pairs the score orders correctly.
@@ -3972,11 +3970,9 @@ theorem alleleFreqDivergenceRate_independent_of_mutation_and_migration
     direction and by the same second-order term; use
     `discreteRecombinationSurvival` where `r` is not small.
 
-    Restating the two halves of that one verdict, because the next paragraph
-    measures the first of them: VALIDATED as the RATE at which a sampled pair
-    breaks, and falsified as an exact per-generation probability -- the two
-    readings differ by the `r²` above, and the table there is the falsification
-    of the second.
+    Empirical status: **VALIDATED** as the RATE at which a sampled pair breaks,
+    and FALSIFIED as an exact per-generation probability -- the two readings are
+    the `r²` above, and the table there is the falsification of the second.
 
     The rate reading is the one the `2` is about, and a simulation decides it
     (`simcov/battery_bulk18.py`, `test_ld_breakage`): the survival of a pair in
