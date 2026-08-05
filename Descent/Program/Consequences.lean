@@ -14,6 +14,7 @@ import Descent.Portability.CorrectionBiology
 import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Portability.PCCorrectability.Diagnostic
+import Descent.Foundations.CovarianceStructure
 
 /-!
 # What the separate results say when they are put together
@@ -352,5 +353,34 @@ theorem correctability_reporting_has_two_independent_hazards
       bbpProxyThreshold n M < demographicSpike n F mAbove :=
   ⟨pcTargetAxisEfficacy_null_susceptibility_is_junk residualSusceptibility,
    fst_does_not_determine_pc_correctability n M F hn hM hF hdetect⟩
+
+/-! ### The estimator's null and the metric's ceiling are different kinds of anchor -/
+
+/-- **The chi-squared null is a calibration point; the heritability cap is a bound. Both
+are "the number cannot exceed this", and only one of them is a fact about the world.**
+
+`CovarianceStructure.ldsrExpectedChi2_null` fixes the null of the LD-score statistic used
+to estimate the inputs of the deployed metric: at zero heritability the expected
+chi-squared is exactly `1` -- a one-degree-of-freedom statistic, not a fitted offset. Its
+own docstring records why the constant is load-bearing: the relation to
+`ldsrExpectedBetaSq` multiplies through by `N` and carries the `+ 1` along without
+constraining it, so a body with any other constant satisfies that identity and fails this.
+
+`Core.ScoreMoments.deployedR2_le_heritability` fixes the ceiling of the metric itself: no
+demographic history takes the deployed `R²` above the trait's heritability.
+
+Put together they bracket a reported figure from both ends, and the two brackets have
+different standing. The null is a property of the ESTIMATOR and holds by construction; the
+cap is a property of the MODEL and would be refuted by an observation above it. A reported
+`R²` exceeding the cap is evidence about the world; a chi-squared inflated above `1` is
+evidence about the study. Neither module distinguishes them, because neither knows the
+other exists. -/
+theorem estimator_null_and_model_ceiling_are_different_anchors
+    (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig) (N M ell_j : ℝ) :
+    ldsrExpectedChi2 N 0 M ell_j 0 = 1 ∧
+      Descent.Core.ScoreMoments.deployedR2 p V_E ≤ Descent.Core.share p.V_A V_E :=
+  ⟨ldsrExpectedChi2_null N M ell_j,
+   Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow⟩
 
 end Descent
