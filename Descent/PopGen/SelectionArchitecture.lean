@@ -351,9 +351,7 @@ theorem short_autocorrelation_lower_correlation
 noncomputable def stabilizingSelectedArchitectureVariance (v_mutation s : ℝ) : ℝ :=
   equilibriumEffectVariance v_mutation s
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem stabilizingSelectedArchitectureVariance_at_reference_point :
     stabilizingSelectedArchitectureVariance 1 1 = 1 := by
   norm_num [stabilizingSelectedArchitectureVariance, equilibriumEffectVariance]
@@ -364,10 +362,7 @@ theorem stabilizingSelectedArchitectureVariance_at_reference_point :
 noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
   sigmaTheta ^ 2 * tau / 2
 
-/-- **optimumOUVariance pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem optimumOUVariance_at_reference_point :
     optimumOUVariance (1 / 2) (1 / 2) = 1 / 16 := by
   unfold optimumOUVariance
@@ -393,9 +388,7 @@ noncomputable def fluctuatingSelectedArchitectureVariance
     (v_mutation s sigmaTheta tau : ℝ) : ℝ :=
   equilibriumEffectVariance v_mutation s + optimumOUVariance sigmaTheta tau
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
     fluctuatingSelectedArchitectureVariance 1 1 1 1 = 3 / 2 := by
   norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance]
@@ -864,9 +857,7 @@ section GWASPowerMAF
 noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
   ncp (effectiveFisherInformation n p 1) β
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
   norm_num [gwasNCP, ncp, effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]

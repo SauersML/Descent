@@ -69,10 +69,7 @@ section TraitClassification
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   Descent.Core.retainedFraction fst_additional ld_factor
 
-/-- **neutralPortabilityRatioLD pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem neutralPortabilityRatioLD_at_reference_point :
     neutralPortabilityRatioLD (1 / 2) (1 / 2) = 1 / 4 := by
   unfold neutralPortabilityRatioLD Descent.Core.retainedFraction
@@ -321,10 +318,7 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 
-/-- **fstFromDriftFactor pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fstFromDriftFactor_at_reference_point :
     fstFromDriftFactor (1 / 2) = 1 / 2 := by
   unfold fstFromDriftFactor

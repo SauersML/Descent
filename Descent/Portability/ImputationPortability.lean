@@ -44,8 +44,7 @@ section ImputationQuality
 noncomputable def attenuatedVariance (beta_sq het r2_imp : ℝ) : ℝ :=
   beta_sq * het * r2_imp
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem attenuatedVariance_at_reference_point :
     attenuatedVariance 2 2 2 = 8 := by
   norm_num [attenuatedVariance]
@@ -68,8 +67,7 @@ theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
 noncomputable def imputationErrorVariance (beta_sq het r2_imp : ℝ) : ℝ :=
   beta_sq * het * (1 - r2_imp)
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem imputationErrorVariance_at_reference_point :
     imputationErrorVariance 2 2 2 = -4 := by
   norm_num [imputationErrorVariance]
@@ -346,8 +344,7 @@ noncomputable def apparent_portability_loss
     (r2_source r2_target_array : ℝ) : ℝ :=
   r2_source - r2_target_array
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem apparent_portability_loss_at_reference_point :
     apparent_portability_loss 2 1 = 1 := by
   norm_num [apparent_portability_loss]
@@ -359,8 +356,7 @@ noncomputable def true_portability_loss
     (r2_source r2_target_ideal : ℝ) : ℝ :=
   r2_source - r2_target_ideal
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem true_portability_loss_at_reference_point :
     true_portability_loss 2 1 = 1 := by
   norm_num [true_portability_loss]
@@ -404,10 +400,7 @@ theorem ascertainment_artificial_loss
 noncomputable def ascertainment_loss (coverage v_causal : ℝ) : ℝ :=
   Descent.Core.retainedFraction coverage v_causal
 
-/-- **ascertainment_loss pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ascertainment_loss_at_reference_point :
     ascertainment_loss (1 / 2) (1 / 2) = 1 / 4 := by
   unfold ascertainment_loss Descent.Core.retainedFraction
@@ -448,8 +441,7 @@ theorem multi_ethnic_arrays_reduce_bias
 noncomputable def total_portability_loss (loss_genetic loss_technical : ℝ) : ℝ :=
   loss_genetic + loss_technical
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem total_portability_loss_at_reference_point :
     total_portability_loss 2 2 = 4 := by
   norm_num [total_portability_loss]

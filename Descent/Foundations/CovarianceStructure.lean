@@ -418,9 +418,7 @@ theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
 noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
   (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem admixtureLDAtGen_at_reference_point :
     admixtureLDAtGen (1 / 2) 1 1 0 0 0 1 = 1 / 4 := by
   norm_num [admixtureLDAtGen, admixedAlleleFreq, admixtureLDTwoLocus, haplotypeFreqAdmixed, Descent.Core.convexCombination]
@@ -465,9 +463,7 @@ theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem admixtureLDMagnitude_at_reference_point :
     admixtureLDMagnitude (1 / 2) 1 0 0 1 = 1 / 4 := by
   norm_num [admixtureLDMagnitude]

@@ -146,10 +146,7 @@ drift variances.
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
-/-- **driftVariance pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem driftVariance_at_reference_point :
     driftVariance (1 / 2) (1 / 2) = 1 / 8 := by
   unfold driftVariance
@@ -209,9 +206,7 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem twoPopDriftVariance_at_reference_point :
     twoPopDriftVariance (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [twoPopDriftVariance, driftVariance]
@@ -277,10 +272,7 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
 
-/-- **expectedFreqDiffSq pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem expectedFreqDiffSq_at_reference_point :
     expectedFreqDiffSq (1 / 2) (1 / 2) = 1 / 4 := by
   unfold expectedFreqDiffSq
@@ -533,10 +525,7 @@ theorem taggedEffect_eq_iff
 noncomputable def gwasHeritability (h2_true avg_r2_tag : ℝ) : ℝ :=
   h2_true * avg_r2_tag
 
-/-- **gwasHeritability pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasHeritability_at_reference_point :
     gwasHeritability (1 / 2) (1 / 2) = 1 / 4 := by
   unfold gwasHeritability
@@ -787,8 +776,7 @@ recursion `islandFstMultiplicativeStep` has a different fixed point.
 noncomputable def geneFlowFstStep (m Ne F : ℝ) : ℝ :=
   ibdFlowStep Ne m F
 
-/-- At migration rate `1/4` and effective size `1`, `F = 1/2` is the exact
-migration-drift equilibrium and remains fixed after one step. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem geneFlowFstStep_at_reference_point :
     geneFlowFstStep (1 / 4) 1 (1 / 2) = 1 / 2 := by
   norm_num [geneFlowFstStep, ibdFlowStep]
@@ -878,10 +866,7 @@ noncomputable def portabilityFromArchitecture
     (rg fst tagging_ratio : ℝ) : ℝ :=
   rg^2 * (1 - fst) * tagging_ratio
 
-/-- **portabilityFromArchitecture pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem portabilityFromArchitecture_at_reference_point :
     portabilityFromArchitecture (1 / 2) (1 / 2) (1 / 2) = 1 / 16 := by
   unfold portabilityFromArchitecture

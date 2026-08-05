@@ -658,8 +658,7 @@ abbrev ExposureStratum := Fin 2 × Fin 2
 noncomputable def exposureGivenStratum (g : ExposureStratum) : ℝ :=
   if g.1 = 1 then confoundedConditionalRisk g.2 else 1 - confoundedConditionalRisk g.2
 
-/-- Reference evaluations: both exposure branches, so the conditional is pinned as a
-complementary pair rather than at one stratum. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem exposureGivenStratum_at_reference_point :
     exposureGivenStratum (1, 0) = 1 / 4 ∧ exposureGivenStratum (0, 0) = 3 / 4 := by
   constructor <;> simp [exposureGivenStratum, confoundedConditionalRisk] <;> norm_num

@@ -74,18 +74,7 @@ substituted for one another.
 noncomputable def demographicSpike (n F m : ℝ) : ℝ :=
   4 * F * effectiveSubgroupSize n m
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not.
-
-The evaluation point is `n = 4, F = 1, m = 1`, deliberately **off** the balanced-and-unit
-point `n = m = 1`.  The previous statement was `demographicSpike 1 1 1 = 0`, and at `m = n`
-the effective subgroup size is zero, so *every* constant in front of `F * effectiveSubgroupSize`
-satisfies it: the reference point pinned nothing.  Differential testing against the shipped
-calculator caught this — a body with the constant `2` in place of `4` passes the old reference
-point and every other reference point in this arc, while disagreeing with
-`map/correctability.rs` on 7275 of 30624 compared outputs.  Here
-`effectiveSubgroupSize 4 1 = 3/4` is nonzero, so the value `3` pins the constant. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem demographicSpike_at_reference_point :
     demographicSpike 4 1 1 = 3 := by
   norm_num [demographicSpike, effectiveSubgroupSize]
@@ -190,14 +179,7 @@ value is the detectable side of the phase diagram. -/
 noncomputable def pcCorrectabilityMargin (n M F m : ℝ) : ℝ :=
   demographicSpike n F m - bbpProxyThreshold n M
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not.
-
-As with `demographicSpike_at_reference_point`, the old point `n = M = F = m = 1` was
-degenerate: the spike term vanishes there, so the stated value `-1` was the threshold alone
-and constrained nothing about the spike half of the difference.  At `n = 4, M = 1, F = 1, m = 1`
-the spike is `3` and the threshold is `√4 = 2`, so both halves are live. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pcCorrectabilityMargin_at_reference_point :
     pcCorrectabilityMargin 4 1 1 1 = 1 := by
   have hsqrt : Real.sqrt 4 = 2 := by

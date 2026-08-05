@@ -120,10 +120,7 @@ noncomputable def ancestryGradientSusceptibility
     (markerAxisVariance ancestryVariance : ℝ) : ℝ :=
   markerAxisVariance * ancestryVariance
 
-/-- **ancestryGradientSusceptibility pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ancestryGradientSusceptibility_at_reference_point :
     ancestryGradientSusceptibility (1 / 2) (1 / 2) = 1 / 4 := by
   unfold ancestryGradientSusceptibility

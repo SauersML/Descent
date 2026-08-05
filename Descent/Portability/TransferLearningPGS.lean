@@ -1044,9 +1044,7 @@ def pcaNetTargetError
     (ancestryBias signalBaseline signalRetained lossWeight : ℝ) : ℝ :=
   ancestryBias + pcaSignalLossPenalty signalBaseline signalRetained lossWeight
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pcaNetTargetError_at_reference_point :
     pcaNetTargetError 1 1 1 1 = 1 := by
   norm_num [pcaNetTargetError, pcaSignalLossPenalty]
@@ -1263,9 +1261,7 @@ noncomputable def infoCertifiedBenDavidUpperBound
   gaussianSourceResidualRisk I_phi_Y +
     pinskerAncestryDivergenceCap I_phi_A + lambda_star
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem infoCertifiedBenDavidUpperBound_at_reference_point :
     infoCertifiedBenDavidUpperBound 0 0 0 = 1 := by
   norm_num [infoCertifiedBenDavidUpperBound, gaussianSourceResidualRisk,
@@ -1388,10 +1384,7 @@ def deployedTransferTargetR2
     (transported_r2 adaptation_gain estimation_penalty : ℝ) : ℝ :=
   transported_r2 + adaptation_gain - estimation_penalty
 
-/-- **deployedTransferTargetR2 pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem deployedTransferTargetR2_at_reference_point :
     deployedTransferTargetR2 (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold deployedTransferTargetR2
@@ -3383,9 +3376,7 @@ noncomputable def privateArchitectureTransferCeiling
     (h2_target f_private M : ℝ) : ℝ :=
   h2_target * (1 - f_private) * sharedLDFromMigration M
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem privateArchitectureTransferCeiling_at_reference_point :
     privateArchitectureTransferCeiling 1 (1 / 2) 1 = 1 / 4 := by
   norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration]

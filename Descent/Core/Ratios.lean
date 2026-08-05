@@ -45,6 +45,17 @@ one-sided bias against finite-population retention and a theorem proving that si
 which a bare primitive has nowhere to put. The rule is WRAP, never REPLACE. A wrapper
 keeps the name, the docstring, and the measurement, and gains the dependency.
 
+## Reference evaluations
+
+Many declarations in this corpus carry a `_at_reference_point` theorem: the body evaluated
+at a fixed argument, stated as an equality to a number. They exist because an inequality,
+a monotonicity or an invariance leaves a whole family of bodies satisfying it, and a value
+does not -- a definition that had quietly acquired a wrong coefficient would still satisfy
+every bound written about it. Pinning one value excludes that family.
+
+The explanation lives here rather than being restated on each of the 149 theorems that
+used to carry it verbatim. Those docstrings now point at this paragraph.
+
 ## Junk values
 
 Every kernel with a division inherits Lean's `x / 0 = 0`, so each has an argument at
@@ -74,8 +85,7 @@ Consumers must require `b ≠ 0`. -/
 theorem ratio_zero_denominator_is_junk (a : ℝ) : ratio a 0 = 0 := by
   unfold ratio; simp
 
-/-- Reference evaluation. An inequality or a monotonicity leaves a family of bodies
-satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ratio_at_reference_point : ratio (1 / 2) (1 / 2) = 1 := by
   norm_num [ratio]
 

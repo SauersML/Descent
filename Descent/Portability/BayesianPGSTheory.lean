@@ -229,9 +229,7 @@ theorem shrinkage_increases_with_h (n : ℝ) (h₁ h₂ : ℝ)
 noncomputable def jamesSteinMSE (lam σ_sq β_sq : ℝ) : ℝ :=
   lam ^ 2 * σ_sq + (1 - lam) ^ 2 * β_sq
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem jamesSteinMSE_at_reference_point :
     jamesSteinMSE 1 1 1 = 1 := by
   norm_num [jamesSteinMSE]
@@ -480,9 +478,7 @@ section PriorSpecification
 noncomputable def spikeAndSlabPriorVariance (π σ_slab : ℝ) : ℝ :=
   π * σ_slab ^ 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem spikeAndSlabPriorVariance_at_reference_point :
     spikeAndSlabPriorVariance 1 1 = 1 := by
   norm_num [spikeAndSlabPriorVariance]
@@ -506,21 +502,7 @@ theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
 noncomputable def misspecExcessRisk (π σ_β_sq : ℝ) : ℝ :=
   π * (1 - π) * σ_β_sq
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not.
-
-The point is `π = 1/4, σ²_β = 2`, and each coordinate of that choice is doing
-work.  The previous point was `π = 1, σ²_β = 1`, where the `(1 - π)` factor
-vanishes and the whole body collapses to `0` -- and a stated value of zero is
-satisfied by every rescaling `c · π(1-π)σ²_β`, so it pinned nothing at all.
-
-`π` is off `1/2` because the body is symmetric under `π ↔ 1 - π`, so a balanced
-point cannot tell `π(1-π)` from a transposed reading of it.  At `1/4` the two
-factors are `1/4` and `3/4`, which also separates the body from `π²` (`1/16`)
-and from `(1-π)²` (`9/16`).  `σ²_β` is off `1` so that the variance scale is
-carried rather than cancelled.  The value `3/8` is then attained only by this
-product. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem misspecExcessRisk_at_reference_point :
     misspecExcessRisk (1 / 4) 2 = 3 / 8 := by
   norm_num [misspecExcessRisk]
@@ -630,10 +612,7 @@ noncomputable def posteriorPredictiveVariance
     (residual_var estimation_var : ℝ) : ℝ :=
   residual_var + estimation_var
 
-/-- **posteriorPredictiveVariance pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem posteriorPredictiveVariance_at_reference_point :
     posteriorPredictiveVariance (1 / 2) (1 / 2) = 1 := by
   unfold posteriorPredictiveVariance
@@ -858,10 +837,7 @@ noncomputable def multiAncestryEffectiveN
     (n_target rg n_other priorVariance : ℝ) : ℝ :=
   n_target + rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n_other)
 
-/-- **multiAncestryEffectiveN pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem multiAncestryEffectiveN_at_reference_point :
     multiAncestryEffectiveN (1 / 2) (1 / 2) (1 / 2) 0 = 5 / 8 := by
   unfold multiAncestryEffectiveN

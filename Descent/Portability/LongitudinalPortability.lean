@@ -49,9 +49,7 @@ section GenerationalDecay
 noncomputable def portabilityAtTime (r2_initial lambda_total t : ℝ) : ℝ :=
   r2_initial * Real.exp (-lambda_total * t)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem portabilityAtTime_at_reference_point :
     portabilityAtTime 1 1 1 = Real.exp (-1) := by
   norm_num [portabilityAtTime]
@@ -164,9 +162,7 @@ it. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   Descent.Core.geometricDecay r t
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldDecayPerGeneration_at_reference_point :
     ldDecayPerGeneration (1 / 2) 2 = 1 / 4 := by
   norm_num [ldDecayPerGeneration, Descent.Core.geometricDecay]
@@ -263,10 +259,7 @@ section EnvironmentalEpochs
 noncomputable def secularTrendBias (trend_rate t : ℝ) : ℝ :=
   trend_rate * t
 
-/-- **secularTrendBias pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem secularTrendBias_at_reference_point :
     secularTrendBias (1 / 2) (1 / 2) = 1 / 4 := by
   unfold secularTrendBias
@@ -376,9 +369,7 @@ noncomputable def ageDependentSignalVariance
     (sourceSignalPeak age age_peak width : ℝ) : ℝ :=
   sourceSignalPeak * ageDependentSignalShape age age_peak width
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ageDependentSignalVariance_at_reference_point :
     ageDependentSignalVariance 1 1 1 1 = 1 := by
   norm_num [ageDependentSignalVariance, ageDependentSignalShape]
@@ -554,9 +545,7 @@ prevalence `π_obs` and mean predicted risk `π_pred`. -/
 noncomputable def temporalCalibrationInTheLarge (π_obs π_pred : ℝ) : ℝ :=
   calibrationInTheLarge π_obs π_pred
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem temporalCalibrationInTheLarge_at_reference_point :
     temporalCalibrationInTheLarge 1 (1 / 2) = 1 / 2 := by
   norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge]
@@ -640,9 +629,7 @@ section RetrainingStrategies
 noncomputable def modelStaleness (lambda t : ℝ) : ℝ :=
   1 - Real.exp (-lambda * t)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem modelStaleness_at_reference_point :
     modelStaleness 1 1 = 1 - Real.exp (-1) := by
   norm_num [modelStaleness]

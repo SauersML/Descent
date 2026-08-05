@@ -140,18 +140,7 @@ theorem ld_retention_nonneg (r Ne : ℝ)
 noncomputable def ldAfterGenerations (D₀ r Ne : ℝ) (t : ℕ) : ℝ :=
   D₀ * (ldRetentionPerGen r Ne) ^ t
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not.
-
-**Moved off a collapse point.** This read `ldAfterGenerations 1 1 1 1 = 0`, where
-`r = 1` sends `ldRetentionPerGen 1 1 = (1-1)·(1-1/2)` to zero and the whole body
-with it, so the stated value survived every rescaling of the body and pinned
-nothing. The point is now `D₀ = 1`, `r = 1/2`, `Nₑ = 2`, `t = 2`: the retention
-per generation is `(1-1/2)·(1-1/4) = 3/8`, and two generations give `9/64`. Both
-factors of the retention are live, and the EXPONENT is pinned too -- `t = 2`
-rather than `t = 1` is what makes a linear reading of the decay give `3/8` and
-fail. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldAfterGenerations_at_reference_point :
     ldAfterGenerations 1 (1 / 2) 2 2 = 9 / 64 := by
   norm_num [ldAfterGenerations, ldRetentionPerGen]
@@ -904,21 +893,7 @@ theorem ldMismatchFrobenius_self {p : ℕ}
   unfold ldMismatchFrobenius
   simp [frobeniusNormSq]
 
-/-- **Reference evaluation on a matrix with four distinct entries**, which is what
-separates the norm from its competitors.
-
-`ldMismatchFrobenius_self` states `0`, and the sum of squares, the sum of absolute
-entries and the largest entry ALL vanish on the diagonal, so it distinguishes none
-of them. The entries `1, 2, 3, 4` are chosen so that the three give three
-different numbers and one evaluation rejects two competitors at once:
-
-    sum of squares    1 + 4 + 9 + 16 = 30      <- this body
-    sum of absolutes  1 + 2 + 3 + 4  = 10
-    largest entry                      4
-
-It also rejects a TRACE-only reading, which would give `1 + 16 = 17`, so the
-off-diagonal entries are shown to count. And it pins the scale: any multiple
-`c ≠ 1` gives `30c`. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldMismatchFrobenius_at_reference_point :
     ldMismatchFrobenius (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) 0 = 30 := by
   unfold ldMismatchFrobenius frobeniusNormSq

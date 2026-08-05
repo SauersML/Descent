@@ -343,9 +343,7 @@ theorem prevalenceLogit_reflect (pi : ℝ) :
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem prevalenceCITLShift_at_reference_point :
     prevalenceCITLShift (1 / 2) (2 / 3) = Real.log 2 := by
   unfold prevalenceCITLShift prevalenceLogit

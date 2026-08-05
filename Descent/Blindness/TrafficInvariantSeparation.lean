@@ -490,8 +490,7 @@ noncomputable def balancedRankOneTrafficCoordinate
     (hasOddDegree : Bool) (p vertices edges : ℕ) : ℝ :=
   if hasOddDegree then 0 else balancedRankOneGraphSum p vertices edges
 
-/-- Reference evaluations: an odd-degree term contributes nothing, and an even-degree term
-contributes the balanced graph sum.  Both branches, since pinning one leaves the other free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem balancedRankOneTrafficCoordinate_at_reference_point (p vertices edges : ℕ) :
     balancedRankOneTrafficCoordinate true p vertices edges = 0 ∧
       balancedRankOneTrafficCoordinate false p vertices edges
@@ -925,16 +924,7 @@ noncomputable def cwObjective (tlam m : ℝ) : ℝ :=
 noncomputable def cwPinskerGap (m : ℝ) : ℝ :=
   cwRate m - m ^ 2 / 2
 
-/-- Reference evaluation, at a point where the body is NONZERO.
-
-The previous point was `cwPinskerGap 0 = 0`. Zero magnetisation is where the
-rate function and the quadratic both vanish, so every rescaling `c * body`
-satisfied it and the theorem rejected nothing -- `scale_competitor_ne_iff`.
-
-The endpoint is the one place a transcendental body has an exact rational-plus-
-log value: `cwRate_one` gives `cwRate 1 = log 2`, so the gap is `log 2 - 1/2`,
-about `0.1931`. Being nonzero is the whole point; a body with `m ^ 2` in place of
-`m ^ 2 / 2` gives `log 2 - 1` here instead. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem cwPinskerGap_at_reference_point :
     cwPinskerGap 1 = Real.log 2 - 1 / 2 := by
   unfold cwPinskerGap
@@ -946,18 +936,7 @@ theorem cwPinskerGap_at_reference_point :
 noncomputable def cwPinskerGapDerivative (m : ℝ) : ℝ :=
   (Real.log (1 + m) - Real.log (1 - m)) / 2 - m
 
-/-- Reference evaluation, at a point where the body is NONZERO.
-
-The previous point was `cwPinskerGapDerivative 0 = 0`, the unique zero of this
-function on `[0, 1)` -- `cwPinskerGapDerivative_nonneg` and the strict growth
-above it are what make it unique. So the old point was the ONE place no
-rescaling could be rejected.
-
-`m = 1/2` is chosen rather than the endpoint on purpose: at `m = 1` the body
-evaluates `Real.log 0`, which Mathlib sends to junk-zero, and a reference value
-read off a junk branch certifies nothing. At `m = 1/2` the two logarithms
-combine exactly, `log (3/2) - log (1/2) = log 3`, giving `log 3 / 2 - 1/2`,
-about `0.0493`. Value confirmed against the corpus's own executable form. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem cwPinskerGapDerivative_at_reference_point :
     cwPinskerGapDerivative (1 / 2) = Real.log 3 / 2 - 1 / 2 := by
   have h : Real.log (1 + 1 / 2) - Real.log (1 - 1 / 2) = Real.log 3 := by
@@ -3488,9 +3467,7 @@ whose exceptional fraction is `4⁻ᵏ` and exceptional value is `a + 2`. -/
 noncomputable def diagonalTrafficCorrection (baseline : ℝ) (edges iteration : ℕ) : ℝ :=
   (1 / 4 : ℝ) ^ iteration * ((baseline + 2) ^ edges - baseline ^ edges)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem diagonalTrafficCorrection_at_reference_point :
     diagonalTrafficCorrection 1 1 1 = 1 / 2 := by
   norm_num [diagonalTrafficCorrection]
@@ -4826,9 +4803,7 @@ Convention: `D` is moment degree, not linkage-disequilibrium `D`. -/
 noncomputable def momentUniformWeight (D : ℕ) : ℝ :=
   1 / (D + 2 : ℝ)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem momentUniformWeight_at_reference_point :
     momentUniformWeight 1 = 1 / 3 := by
   norm_num [momentUniformWeight]

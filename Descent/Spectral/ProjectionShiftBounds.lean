@@ -282,10 +282,7 @@ principal-component truncation does.
 Empirical status: UNTESTED. -/
 def reconstructionWeight (s : ℝ) : ℝ := s
 
-/-- **reconstructionWeight pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem reconstructionWeight_at_reference_point :
     reconstructionWeight (1 / 2) = 1 / 2 := by
   unfold reconstructionWeight

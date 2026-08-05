@@ -293,8 +293,7 @@ theorem two_pow_le_gaussian_panel_requirement (m : ℝ) (hm : 0 ≤ m) :
 constant as a strictly positive multiplier rather than a decimal. -/
 noncomputable def gaussianCriticalMultiplier : ℝ := 1 / condensationConstant
 
-/-- Reference evaluation, stated through the reciprocal so the value is a closed form rather
-than another definition. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gaussianCriticalMultiplier_at_reference_point :
     1 / gaussianCriticalMultiplier = 2 - Real.eulerMascheroniConstant - Real.log 2 := by
   unfold gaussianCriticalMultiplier condensationConstant

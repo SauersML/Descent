@@ -1322,9 +1322,7 @@ first.
 def stratificationCertificateMargin (headroom n M F m : ℝ) : ℝ :=
   demographicSpike n F m - (headroom + bbpProxyThreshold n M)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem stratificationCertificateMargin_at_reference_point :
     stratificationCertificateMargin 1 1 1 1 1 = -2 := by
   norm_num [stratificationCertificateMargin, bbpProxyThreshold, demographicSpike,

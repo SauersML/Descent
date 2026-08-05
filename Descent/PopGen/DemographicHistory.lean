@@ -720,9 +720,7 @@ This is `admixedFst α fst_AB`.
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
   Descent.Core.convexCombination α p_A p_B
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem admixedAlleleFreq_at_reference_point :
     admixedAlleleFreq 1 1 1 = 1 := by
   norm_num [admixedAlleleFreq, Descent.Core.convexCombination]
@@ -801,9 +799,7 @@ section ArchaicIntrogression
 noncomputable def introgressionVariants (N₀ introgressionRate t : ℝ) : ℝ :=
   N₀ * (1 - Real.exp (-introgressionRate * t))
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem introgressionVariants_at_reference_point :
     introgressionVariants 1 1 1 = 1 - Real.exp (-1) := by
   norm_num [introgressionVariants]

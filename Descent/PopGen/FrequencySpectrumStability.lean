@@ -411,8 +411,7 @@ theorem alternatingBinomialResponse_one_sub (order : ℕ) (resolution : ℝ) :
 noncomputable def collisionHistoryDistance (scale resolution : ℝ) : ℝ :=
   scale * resolution
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem collisionHistoryDistance_at_reference_point :
     collisionHistoryDistance 2 2 = 4 := by
   norm_num [collisionHistoryDistance]

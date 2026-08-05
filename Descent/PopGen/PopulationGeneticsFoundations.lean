@@ -1181,9 +1181,7 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem expectedNewMutations_at_reference_point :
     expectedNewMutations 1 1 = 1 / 2 := by
   norm_num [expectedNewMutations]
@@ -1331,10 +1329,7 @@ carried implicitly.
 -/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := Descent.Core.islandDemeCorrection d
 
-/-- **islandDemeCorrection pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
-or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem islandDemeCorrection_at_reference_point :
     islandDemeCorrection (1 / 2) = -1 := by
   unfold islandDemeCorrection Descent.Core.islandDemeCorrection Descent.Core.ratio
@@ -2632,9 +2627,7 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
 noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fstMutationDriftTransientDiscrete_at_reference_point :
     fstMutationDriftTransientDiscrete 1 1 1 = 3 / 8 := by
   norm_num [fstMutationDriftTransientDiscrete, fstMutationDriftEquilibrium, hetDecayFactor,

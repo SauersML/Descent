@@ -443,10 +443,17 @@ def taggingShift : ℝ :=
 *target* tagging.  Sign flips, effect-size heterogeneity and variants causal in one
 population only all land here.
 
-    Empirical status: UNTESTED.  This is one summand of an identity
-    (`predictiveCovariance_transport`), not an independent model of turnover, so what
-    a simulation could check is the identity rather than this term; the identity holds
-    by `ring` once `§2` is in hand. -/
+    Empirical status: **NOT AN EMPIRICAL CLAIM**.  This is one summand of an identity
+    (`predictiveCovariance_transport`), not an independent model of turnover: it is
+    DEFINED as the part of the transport that the target tagging assigns to the effect
+    change, so no measurement can disagree with it without disagreeing with the
+    decomposition.  What a simulation could check is the identity, and the identity
+    holds by `ring` once `§2` is in hand.
+
+    The head read `UNTESTED` before, which claims something different and stronger --
+    that a measurement is owed and has not been made.  Nothing is owed here; every
+    scanner that counts coverage was counting a definition that can never receive
+    one. -/
 def effectTurnover : ℝ :=
   dot D.w (D.target.kappa.mulVec (D.target.β - D.source.β))
 
@@ -712,15 +719,23 @@ def portabilityStatistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) : ℝ
 
 /-- `R²` as an explicit function of the statistic.
 
-    Empirical status: UNTESTED.  It is the textbook squared-correlation formula written
-    on a triple; `r2_factors_through_statistic` is the statement that it agrees with the
-    generative `R²`, and that is a definitional identity rather than a prediction. -/
+    Empirical status: **EXACT BY CONSTRUCTION**.  It is the textbook squared-correlation
+    formula written on a triple, and `r2_factors_through_statistic` proves it agrees with
+    the generative `R²` by `rfl` -- the two are the same expression, so no measurement can
+    bear on the agreement.  The empirical content lives in the three components of
+    `portabilityStatistic`, each of which carries its own status.
+
+    The head read `UNTESTED`, which asserts an unpaid debt.  There is none: a definitional
+    identity is not owed a measurement, and saying it is makes the coverage number a
+    report about the vocabulary rather than about the corpus. -/
 def r2OfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 ^ 2 / (s.1 * s.2.2)
 
 /-- Calibration slope as an explicit function of the statistic.
 
-    Empirical status: UNTESTED.  As with `r2OfStatistic`, the content is
-    `slope_factors_through_statistic`, which is definitional. -/
+    Empirical status: **EXACT BY CONSTRUCTION**.  As with `r2OfStatistic`, the content is
+    `slope_factors_through_statistic`, which holds by `rfl`: this expression and the
+    generative slope are the same expression.  The head read `UNTESTED`, which claims a
+    debt that cannot be paid because there is nothing to measure. -/
 def slopeOfStatistic (s : ℝ × ℝ × ℝ) : ℝ := s.2.1 / s.1
 
 omit [DecidableEq J] [DecidableEq L] in

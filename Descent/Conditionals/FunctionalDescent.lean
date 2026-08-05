@@ -442,8 +442,7 @@ noncomputable def componentRepresentationResidual (localValue : ℝ)
 noncomputable def localizationResidual (localValue mixtureValue : ℝ) : ℝ :=
   localValue - mixtureValue
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem localizationResidual_at_reference_point :
     localizationResidual 2 1 = 1 := by
   norm_num [localizationResidual]

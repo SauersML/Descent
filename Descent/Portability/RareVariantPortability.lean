@@ -388,10 +388,7 @@ and is valid only while `h * s` dominates `mu` — see
 noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
   p * (1 - h * s) + mu * (1 - p)
 
-/-- **mutationSelectionStepRare pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem mutationSelectionStepRare_at_reference_point :
     mutationSelectionStepRare (1 / 2) (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
   unfold mutationSelectionStepRare
@@ -531,10 +528,7 @@ theorem deterministicMutationSelectionRegime_iff (Ne s h : ℝ) :
   unfold DeterministicMutationSelectionRegime mutationSelectionDriftParameter
   exact Iff.rfl
 
-/-- **The drift parameter at a reference point.** No theorem evaluated it, so every
-body agreeing with it in sign and monotonicity was indistinguishable from it. At
-`Nₑ = 1000`, `s = 1 / 100` and `h = 1 / 2` it is `20`, which is inside the
-validated regime and fixes the coefficient `4`. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem mutationSelectionDriftParameter_at_reference_point :
     mutationSelectionDriftParameter 1000 (1 / 100) (1 / 2) = 20 := by
   unfold mutationSelectionDriftParameter
@@ -676,10 +670,7 @@ mutation replenishes as before.
 noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
   p - s * p ^ 2 + mu * (1 - p)
 
-/-- **mutationSelectionStepRecessive pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `5 / 8`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem mutationSelectionStepRecessive_at_reference_point :
     mutationSelectionStepRecessive (1 / 2) (1 / 2) (1 / 2) = 5 / 8 := by
   unfold mutationSelectionStepRecessive
@@ -799,11 +790,7 @@ theorem deterministicRecessiveBalanceRegime_iff (Ne mu s : ℝ) :
   unfold DeterministicRecessiveBalanceRegime recessiveMutationSelectionDriftParameter
   exact Iff.rfl
 
-/-- **The recessive drift parameter at a reference point.** No theorem evaluated
-it, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At `Nₑ = 1000` and `mu * s = 1 / 100` it is `200`, which fixes both the
-factor `2` and the square root: a body without the root would return `20` here
-and a body without the `2` would return `100`. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem recessiveMutationSelectionDriftParameter_at_reference_point :
     recessiveMutationSelectionDriftParameter 1000 (1 / 100) 1 = 200 := by
   unfold recessiveMutationSelectionDriftParameter

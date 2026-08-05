@@ -234,9 +234,7 @@ likely.  The product is identically one. -/
 noncomputable def copiedBinaryJointExpectation : ℝ :=
   ((1 : ℝ) * 1 + (-1 : ℝ) * (-1)) / 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem copiedBinaryJointExpectation_at_reference_point :
     copiedBinaryJointExpectation  = 1 := by
   norm_num [copiedBinaryJointExpectation]
@@ -601,10 +599,7 @@ theorem gainPolynomialRow_injective_exponent (n : ℝ) (hn : 1 < n) :
 /-- Row four: linear gain, the fully fresh case. -/
 noncomputable def gainLinear (n : ℝ) : ℝ := n
 
-/-- **gainLinear pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gainLinear_at_reference_point :
     gainLinear (1 / 2) = 1 / 2 := by
   unfold gainLinear

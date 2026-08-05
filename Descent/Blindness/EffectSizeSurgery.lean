@@ -142,14 +142,7 @@ theorem contribution_zero_test_function_eq_zero :
   unfold contribution
   ring
 
-/-- **Reference evaluation: against the identity test function the fiber contributes its
-signed mass times its level.**
-
-`massPos · level + massNeg · (-level) = level · (massPos - massNeg)`, which is
-`F.level * F.imbalance`. This is what the zero test function could not say: the two masses
-enter with OPPOSITE signs and the level enters linearly, so a body that added the two
-masses, or that used `level ^ 2`, satisfies the zero-function identity above and fails
-here. A test function is a probe, and the zero probe reads nothing. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem contribution_at_reference_point :
     F.contribution (fun x ↦ x) = F.level * F.imbalance := by
   unfold contribution imbalance

@@ -4107,10 +4107,7 @@ theorem alleleFreqDivergenceRate_independent_of_mutation_and_migration
 noncomputable def ldBreakageRate (r : ℝ) : ℝ := 2 * r
 
 
-/-- **ldBreakageRate pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
-or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldBreakageRate_at_reference_point :
     ldBreakageRate (1 / 2) = 1 := by
   unfold ldBreakageRate

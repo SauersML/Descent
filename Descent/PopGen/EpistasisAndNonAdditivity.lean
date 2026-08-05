@@ -104,10 +104,7 @@ theorem additive_pgs_ceiling
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
-/-- **fisherAverageEffect pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fisherAverageEffect_at_reference_point :
     fisherAverageEffect (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold fisherAverageEffect
@@ -157,9 +154,7 @@ noncomputable def pairwiseModel
     (beta1 beta2 beta12 g1 g2 : ℝ) : ℝ :=
   beta1 * g1 + beta2 * g2 + beta12 * g1 * g2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pairwiseModel_at_reference_point :
     pairwiseModel 1 1 1 1 1 = 3 := by
   norm_num [pairwiseModel]
@@ -206,10 +201,7 @@ noncomputable def epistaticVariance
     (beta12 p1 p2 : ℝ) : ℝ :=
   beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))
 
-/-- **epistaticVariance pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 16`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem epistaticVariance_at_reference_point :
     epistaticVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 16 := by
   unfold epistaticVariance
@@ -275,8 +267,7 @@ noncomputable def dominanceVariance
     {m : ℕ} (p : Fin m → ℝ) (d : Fin m → ℝ) : ℝ :=
   ∑ i, (2 * p i * (1 - p i) * d i) ^ 2
 
-/-- Reference evaluation on a two-locus index with distinct entries.  Not the empty index:
-`∑ over Fin 0 = 0` holds for every sum body, so it fixes nothing. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem dominanceVariance_at_reference_point :
     dominanceVariance ![1, 3] ![1, 3] = 1296 := by
   norm_num [dominanceVariance, Fin.sum_univ_two]

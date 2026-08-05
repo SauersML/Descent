@@ -422,10 +422,7 @@ noncomputable def netReclassificationImprovement
     (event_nri nonevent_nri : ℝ) : ℝ :=
   event_nri + nonevent_nri
 
-/-- **netReclassificationImprovement pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem netReclassificationImprovement_at_reference_point :
     netReclassificationImprovement (1 / 2) (1 / 2) = 1 := by
   unfold netReclassificationImprovement
@@ -746,10 +743,7 @@ section Fairness
 noncomputable def ppv (prev tpr fpr : ℝ) : ℝ :=
   prev * tpr / (prev * tpr + (1 - prev) * fpr)
 
-/-- **ppv pinned at a reference point.** No theorem in the corpus evaluated this definition, so
-every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
-arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided bound or an
-invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ppv_at_reference_point :
     ppv (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold ppv
@@ -877,10 +871,7 @@ noncomputable def proportionCorrectlyClassified
     (sensitivity specificity prevalence : ℝ) : ℝ :=
   sensitivity * prevalence + specificity * (1 - prevalence)
 
-/-- **proportionCorrectlyClassified pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem proportionCorrectlyClassified_at_reference_point :
     proportionCorrectlyClassified (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold proportionCorrectlyClassified
@@ -1026,8 +1017,7 @@ noncomputable def numberNeededToScreen (sens π : ℝ)
     (_hsens : 0 < sens) (_hπ : 0 < π) : ℝ :=
   1 / (sens * π)
 
-/-- Reference evaluation.  Hypothesis arguments are discharged at the point, and a `Bool`
-argument selects the branch; the theorem still states a number. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem numberNeededToScreen_at_reference_point :
     numberNeededToScreen 1 1 (by norm_num) (by norm_num) = 1 := by
   norm_num [numberNeededToScreen]

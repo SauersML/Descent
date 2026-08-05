@@ -71,9 +71,7 @@ written ones back here, so that drift between them is a compile error rather
 than a silent disagreement. -/
 noncomputable def ploidy : ℝ := 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ploidy_at_reference_point :
     ploidy  = 2 := by
   norm_num [ploidy]

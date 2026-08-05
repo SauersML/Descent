@@ -66,9 +66,7 @@ haplotypes, each equally frequent, and `n` chromosomes are drawn independently.
 noncomputable def uniformOccupancyDistinctHaplotypes (k n : ℕ) : ℝ :=
   (2 : ℝ) ^ k * (1 - (1 - 1 / ((2 : ℝ) ^ k)) ^ n)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem uniformOccupancyDistinctHaplotypes_at_reference_point :
     uniformOccupancyDistinctHaplotypes 1 1 = 1 := by
   norm_num [uniformOccupancyDistinctHaplotypes]
@@ -379,18 +377,7 @@ noncomputable def haplotypePhasePredictionError
       ((1 - switch_err) * (interaction_trans - pred_trans) ^ 2 +
         switch_err * (interaction_trans - pred_cis) ^ 2)
 
-/-- Reference evaluation, at a point where the body is NONZERO.
-
-The previous point was all ones, and every squared difference in the body is a
-prediction minus an interaction: at `pred = interaction` all four vanish, the
-error is `0`, and every rescaling `c * body` satisfies the theorem. It pinned
-nothing -- `scale_competitor_ne_iff` is the general statement, that a reference
-value rejects a wrong constant factor exactly when the body is nonzero there.
-
-This point makes all four squared differences nonzero and DISTINCT, both phase
-weights nonzero, and the cis fraction away from one half so that swapping
-`freq_cis` for `1 - freq_cis` changes the value: `(1/3)(13/4) + (2/3)(21/4)`.
-Value confirmed against the corpus's own executable form. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem haplotypePhasePredictionError_at_reference_point :
     haplotypePhasePredictionError (1 / 3) (1 / 4) 0 1 2 3 = 55 / 12 := by
   norm_num [haplotypePhasePredictionError]
@@ -457,12 +444,7 @@ theorem haplotypeTransportBias_of_matched_predictor
   unfold haplotypeTransportBias
   simp
 
-/-- **Reference evaluation, off the zero.** A predictor that is certain of a cis
-interaction of one where the truth is zero, in a target that carries the two
-phases in equal proportion, is biased by exactly the interaction it invented.
-Both phase weights of `averagePhaseInteraction` enter at one half, so a body
-weighting them differently -- or taking a signed difference where the name says
-bias -- gives a different number here. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem haplotypeTransportBias_at_reference_point :
     haplotypeTransportBias (1 / 2) 1 1 0 0 = 1 := by
   unfold haplotypeTransportBias averagePhaseInteraction Descent.Core.convexCombination
@@ -806,10 +788,7 @@ section PhasingErrors
     Empirical status: UNTESTED. -/
 noncomputable def phaseAttenuation (s : ℝ) : ℝ := (1 - 2 * s)^2
 
-/-- **phaseAttenuation pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1` it is `1`, which fixes the coefficients a one-sided bound or an
-invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem phaseAttenuation_at_reference_point :
     phaseAttenuation 1 = 1 := by
   unfold phaseAttenuation
@@ -949,9 +928,7 @@ noncomputable def globalAncestryAveragedEffect
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   ancestrySpecificEffect beta₁ beta₂ alpha
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem globalAncestryAveragedEffect_at_reference_point :
     globalAncestryAveragedEffect 1 1 1 = 1 := by
   norm_num [globalAncestryAveragedEffect, ancestrySpecificEffect, Descent.Core.convexCombination]

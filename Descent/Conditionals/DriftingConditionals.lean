@@ -368,8 +368,7 @@ theorem stateZeroResponse_at_reference_point :
 /-- A response concentrated in ancestry state one. -/
 def stateOneResponse (i : Fin 2) : ℝ := if i = 1 then 1 else 0
 
-/-- Reference evaluations: the indicator of the second state, so the two responses are
-supported on disjoint states. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem stateOneResponse_at_reference_point :
     stateOneResponse 0 = 0 ∧ stateOneResponse 1 = 1 := by
   constructor <;> simp [stateOneResponse]
@@ -444,8 +443,7 @@ theorem uniformTwo_stationary_symmetricTwoStateKernel (switch : ℝ) :
 /-- The centered ancestry contrast. -/
 def twoStateContrast (i : Fin 2) : ℝ := if i = 0 then 1 else -1
 
-/-- Reference evaluations: the contrast is the sign, not an indicator -- it sums to zero over
-the two states where an indicator would not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem twoStateContrast_at_reference_point :
     twoStateContrast 0 = 1 ∧ twoStateContrast 1 = -1 := by
   constructor <;> simp [twoStateContrast]

@@ -115,10 +115,7 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
 noncomputable def spikeAndSlabVariance (pi sigma_sq_large sigma_sq_small : ℝ) : ℝ :=
   Descent.Core.convexCombination pi sigma_sq_large sigma_sq_small
 
-/-- **spikeAndSlabVariance pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem spikeAndSlabVariance_at_reference_point :
     spikeAndSlabVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold spikeAndSlabVariance Descent.Core.convexCombination
@@ -299,8 +296,7 @@ theorem effective_polygenicity_ge_one
 noncomputable def effectivePolygenicityOfEffects {q : ℕ} (beta : Fin q → ℝ) : ℝ :=
   effectivePolygenicity (∑ j, beta j ^ 2) (∑ j, beta j ^ 4)
 
-/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
-body that swaps two of its arguments does not agree with one that does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectivePolygenicityOfEffects_at_reference_point :
     effectivePolygenicityOfEffects (![1, 3] : Fin 2 → ℝ) = 50 / 41 := by
   norm_num [effectivePolygenicityOfEffects, effectivePolygenicity, Fin.sum_univ_two]

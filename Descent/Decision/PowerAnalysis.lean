@@ -55,17 +55,7 @@ section PowerSampleSize
 noncomputable def noncentralityParam (n : ℕ) (beta p : ℝ) : ℝ :=
   n * beta^2 * (2 * p * (1 - p))
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not.
-
-**Moved off a collapse point.** This read `noncentralityParam 1 1 1 = 0`, and `p = 1`
-sends the genotype variance `2·p·(1-p)` to zero, so the whole body was zero and the
-stated value rejected no rescaling of it whatever: `c · 0 = 0` for every `c`. A
-reference evaluation at a zero of the body pins nothing. The point is now
-`p = 1/2`, where the heterozygosity term is at its maximum and every factor
-contributes: `4 · 3² · (2 · ½ · ½) = 18`, which fixes the sample-size factor, the
-SQUARE on the effect, and the ploidy-2 in the genotype variance simultaneously. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem noncentralityParam_at_reference_point :
     noncentralityParam 4 3 (1 / 2) = 18 := by
   norm_num [noncentralityParam]

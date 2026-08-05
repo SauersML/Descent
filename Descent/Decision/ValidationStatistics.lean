@@ -129,17 +129,7 @@ noncomputable def likelihoodRatioStat
     (logLNull logLAlt : ℝ) : ℝ :=
   -2 * (logLNull - logLAlt)
 
-/-- Reference evaluation, at a point where the body is NONZERO.
-
-The previous point was `likelihoodRatioStat 1 1 = 0`, and it rejected nothing: at
-equal log-likelihoods the difference vanishes, so every rescaling `c * body`
-satisfies the theorem exactly and the `-2` was pinned by nothing. A reference
-value discriminates against a wrong constant factor if and only if the body is
-nonzero there -- `scale_competitor_ne_iff`.
-
-`1` and `3` separate the two arguments, so the point also fixes the ORIENTATION:
-the null minus the alternative, not the reverse. A body carrying `-1` gives `2`
-here and a body carrying `+2` gives `-4`. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem likelihoodRatioStat_at_reference_point :
     likelihoodRatioStat 1 3 = 4 := by
   norm_num [likelihoodRatioStat]

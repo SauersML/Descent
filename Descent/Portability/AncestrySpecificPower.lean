@@ -78,9 +78,7 @@ This is the formula implemented below.
     the Fisher information is n × v (with σ² = 1). -/
 noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ := n * v
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fisherInformation_at_reference_point :
     fisherInformation 1 1 = 1 := by
   norm_num [fisherInformation]
@@ -116,10 +114,7 @@ theorem fisherInformation_at_reference_point :
     `hweHeterozygosity_eq_genotypeVarianceHWE` below. -/
 def genotypeVarianceHWE (p : ℝ) : ℝ := 2 * p * (1 - p)
 
-/-- **genotypeVarianceHWE pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem genotypeVarianceHWE_at_reference_point :
     genotypeVarianceHWE (1 / 2) = 1 / 2 := by
   unfold genotypeVarianceHWE
@@ -201,9 +196,7 @@ theorem genotypeVariance_max (p : ℝ) :
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectiveFisherInformation_at_reference_point :
     effectiveFisherInformation 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE]
@@ -441,9 +434,7 @@ theorem source_higher_effective_information
     Power: the prediction spans 4.20000 to 8.40000. -/
 noncomputable def ncp (n_eff β : ℝ) : ℝ := n_eff * β ^ 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ncp_at_reference_point :
     ncp 1 1 = 1 := by
   norm_num [ncp]

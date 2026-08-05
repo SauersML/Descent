@@ -116,8 +116,7 @@ theorem stayKernel_at_reference_point :
 /-- The kernel that always moves. -/
 def swapKernel (i j : Fin 2) : ℝ := if i = j then 0 else 1
 
-/-- Reference evaluations: the swap kernel is the exchange matrix, so the two kernels are
-complementary rather than proportional. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem swapKernel_at_reference_point :
     swapKernel 0 0 = 0 ∧ swapKernel 0 1 = 1 := by
   constructor <;> simp [swapKernel]

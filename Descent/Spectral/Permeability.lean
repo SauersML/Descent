@@ -278,9 +278,7 @@ noncomputable def totalCovarianceMomentInformation
   m * covarianceMomentPermeability
     covarianceDerivative secondMoment fourthMoment
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem totalCovarianceMomentInformation_at_reference_point :
     totalCovarianceMomentInformation 2 2 2 2 = -4 := by
   norm_num [totalCovarianceMomentInformation, centeredSquareVarianceFromMoments,
@@ -1136,9 +1134,7 @@ noncomputable def covarianceTangentEstimatorVarianceFromMoments
   centeredSquareVarianceFromMoments secondMoment fourthMoment /
     (m * covarianceDerivative ^ 2)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem covarianceTangentEstimatorVarianceFromMoments_at_reference_point :
     covarianceTangentEstimatorVarianceFromMoments 1 1 1 3 = 2 := by
   norm_num [covarianceTangentEstimatorVarianceFromMoments, centeredSquareVarianceFromMoments]

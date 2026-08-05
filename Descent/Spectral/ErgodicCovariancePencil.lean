@@ -264,10 +264,7 @@ anchor, `mean` is the invariant mean, and `source` is the time-zero coordinate. 
 def firstModeConditionalMean (mean r source : ℝ) : ℝ :=
   mean + r * (source - mean)
 
-/-- **firstModeConditionalMean pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem firstModeConditionalMean_at_reference_point :
     firstModeConditionalMean (1 / 2) (1 / 2) (1 / 2) = 1 / 2 := by
   unfold firstModeConditionalMean

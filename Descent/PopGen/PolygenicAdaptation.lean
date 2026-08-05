@@ -50,10 +50,7 @@ section QSTFSTTest
 noncomputable def qst (V_between V_within : ℝ) : ℝ :=
   Descent.Core.oddsLike V_between V_within
 
-/-- **qst pinned at a reference point.** No theorem in the corpus evaluated this definition, so
-every body agreeing with it in sign and monotonicity was indistinguishable from it. At all
-arguments equal to `1 / 2` it is `1 / 3`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem qst_at_reference_point :
     qst (1 / 2) (1 / 2) = 1 / 3 := by
   unfold qst Descent.Core.oddsLike
@@ -161,11 +158,7 @@ section PGSOverdispersion
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
   Var_Delta_Mu V_A fst
 
-/-- **pgsDriftVariance_one_pop pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. It was `1 / 4` while the body was missing
-its ploidy factor, and this line is what pins the correction to a number. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pgsDriftVariance_one_pop_at_reference_point :
     pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 2 := by
   unfold pgsDriftVariance_one_pop Var_Delta_Mu

@@ -62,9 +62,7 @@ lag covariances. -/
 noncomputable def gaussianPairSquareChannel3 (γ₀ γ₁ γ₂ : ℝ) : ℝ :=
   3 * γ₀ ^ 2 + 4 * γ₁ ^ 2 + 2 * γ₂ ^ 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gaussianPairSquareChannel3_at_reference_point :
     gaussianPairSquareChannel3 1 1 1 = 9 := by
   norm_num [gaussianPairSquareChannel3]
@@ -277,8 +275,7 @@ theorem threeCycleFeatureA_at_reference_point :
 /-- Second annotation on a three-state cycle: present only in state `1`. -/
 noncomputable def threeCycleFeatureB (i : Fin 3) : ℝ := if i.val = 1 then 1 else 0
 
-/-- Reference evaluations: the second feature is the indicator of the second position, so the
-two features are supported on disjoint positions. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem threeCycleFeatureB_at_reference_point :
     threeCycleFeatureB 0 = 0 ∧ threeCycleFeatureB 1 = 1 ∧ threeCycleFeatureB 2 = 0 := by
   refine ⟨?_, ?_, ?_⟩ <;> simp [threeCycleFeatureB]
@@ -336,8 +333,7 @@ noncomputable def ensemblePredictorSquaredLoss {ι : Type*} [Fintype ι]
     (target predictor : ι → ℝ) : ℝ :=
   ∑ i, (target i - predictor i) ^ 2
 
-/-- Reference evaluation at two ensemble members with distinct residuals.  Not the empty index:
-`∑ over an empty type = 0` holds for every sum body, so it fixes nothing. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ensemblePredictorSquaredLoss_at_reference_point :
     ensemblePredictorSquaredLoss (![1, 3] : Fin 2 → ℝ) (![2, 7] : Fin 2 → ℝ) = 17 := by
   norm_num [ensemblePredictorSquaredLoss, Fin.sum_univ_two]
@@ -416,8 +412,7 @@ noncomputable def weightedBandPredictorLoss
     (weight : ι → Band → ℝ) (target predictor : ι → Band → ℝ) : ℝ :=
   ∑ i, ∑ b, weight i b * (target i b - predictor i b) ^ 2
 
-/-- Reference evaluation with one band and two members: unit weights and a predictor that
-misses by one and by two. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem weightedBandPredictorLoss_at_reference_point :
     weightedBandPredictorLoss (fun (_ : Fin 2) (_ : Fin 1) ↦ (1 : ℝ))
         (fun (i : Fin 2) (_ : Fin 1) ↦ (![1, 3] : Fin 2 → ℝ) i)

@@ -322,10 +322,7 @@ theorem migratingForbiddenBand_nonempty (mix : ℝ) :
 noncomputable def mixedSphericalCovariance (alpha beta q : ℝ) : ℝ :=
   q ^ 2 + alpha * q ^ 4 + beta * q ^ 6
 
-/-- **mixedSphericalCovariance pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `37 / 128`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem mixedSphericalCovariance_at_reference_point :
     mixedSphericalCovariance (1 / 2) (1 / 2) (1 / 2) = 37 / 128 := by
   unfold mixedSphericalCovariance

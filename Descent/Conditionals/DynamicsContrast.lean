@@ -2139,8 +2139,7 @@ noncomputable def dynamicsBroadcast : ℝ →ₗ[ℝ] (Bool → ℝ) where
 noncomputable def dynamicsCommonMode (persists : Bool) : ℝ :=
   binaryFirstAnnotation persists + binarySecondAnnotation persists
 
-/-- Reference evaluations: the common mode is one in both Boolean states, which is exactly why
-it carries no contrast. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem dynamicsCommonMode_at_reference_point :
     dynamicsCommonMode true = 1 ∧ dynamicsCommonMode false = 1 := by
   constructor <;> norm_num [dynamicsCommonMode, binaryFirstAnnotation, binarySecondAnnotation]

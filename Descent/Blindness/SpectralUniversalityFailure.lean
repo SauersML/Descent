@@ -639,8 +639,7 @@ noncomputable def lowSNRFourthOrientationCoefficient
     (fourthCumulant h4 : ℝ) : ℝ :=
   -(fourthCumulant ^ 2 / 48 * h4)
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem lowSNRFourthOrientationCoefficient_at_reference_point :
     lowSNRFourthOrientationCoefficient 2 2 = -1 / 6 := by
   norm_num [lowSNRFourthOrientationCoefficient]
@@ -653,8 +652,7 @@ noncomputable def gaussianDesignFourthSpectralMoment
   m4 + c * (4 * m1 * m3 + 2 * m2 ^ 2) +
     6 * c ^ 2 * m1 ^ 2 * m2 + c ^ 3 * m1 ^ 4
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gaussianDesignFourthSpectralMoment_at_reference_point :
     gaussianDesignFourthSpectralMoment 2 2 2 2 2 = 370 := by
   norm_num [gaussianDesignFourthSpectralMoment]
@@ -707,8 +705,7 @@ noncomputable def entrySquareSum {Locus : Type*} [Fintype Locus]
     (covariance : Matrix Locus Locus ℝ) : ℝ :=
   ∑ i, ∑ j, covariance i j ^ 2
 
-/-- Reference evaluation on a concrete two-by-two matrix.  The matrix is asymmetric on purpose:
-a body that reads entry `i j` and one that reads `j i` do not agree on it. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem entrySquareSum_at_reference_point :
     entrySquareSum (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 30 := by
   norm_num [entrySquareSum, Fin.sum_univ_two]

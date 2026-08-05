@@ -69,9 +69,7 @@ section GWASDiscovery
 def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
   n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem discoveryNCP_at_reference_point :
     discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [discoveryNCP, genotypeVarianceHWE]
@@ -284,8 +282,7 @@ noncomputable def taggedScoreEstimationRisk {m : ℕ}
     (targetTagVariance estimatorMSE : Fin m → ℝ) : ℝ :=
   ∑ i, targetTagVariance i * estimatorMSE i
 
-/-- Reference evaluation on a two-locus index with distinct entries.  Not the empty index:
-`∑ over Fin 0 = 0` holds for every sum body, so it fixes nothing. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem taggedScoreEstimationRisk_at_reference_point :
     taggedScoreEstimationRisk ![1, 3] ![1, 3] = 10 := by
   norm_num [taggedScoreEstimationRisk, Fin.sum_univ_two]
@@ -664,9 +661,7 @@ noncomputable def multiTraitEffectiveSampleSize
     (n₁ n₂ rg priorVariance : ℝ) : ℝ :=
   n₁ + rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n₂)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem multiTraitEffectiveSampleSize_at_reference_point :
     multiTraitEffectiveSampleSize 1 1 1 0 = 2 := by
   norm_num [multiTraitEffectiveSampleSize]
@@ -763,9 +758,7 @@ noncomputable def multiTraitDiscoveryNCP
     (n₁ n₂ rg priorVariance β maf ld : ℝ) : ℝ :=
   discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance) β maf ld
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem multiTraitDiscoveryNCP_at_reference_point :
     multiTraitDiscoveryNCP 1 1 0 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,

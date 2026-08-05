@@ -166,9 +166,7 @@ theorem driftHorizon_strictMono (D₁ D₂ D₂' C : ℝ) (hC : 0 < C) (h : D₂
     the infinite-volume field, so it does not see the local marker count at all. -/
 noncomputable def localizedTransferVariance (v : ℝ) (_k : ℕ) : ℝ := v
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem localizedTransferVariance_at_reference_point :
     localizedTransferVariance 1 1 = 1 := by
   norm_num [localizedTransferVariance]
@@ -666,9 +664,7 @@ non-stationary environments, and continuum spectral measures. -/
     correct damping factor: `α(2ρ - α)V`. Measured across 32 cells at `|z| < 1.3`. -/
 noncomputable def shrinkagePremium (α ρ V : ℝ) : ℝ := α * (2 * ρ - α) * V
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem shrinkagePremium_at_reference_point :
     shrinkagePremium 1 1 1 = 1 := by
   norm_num [shrinkagePremium]

@@ -808,14 +808,7 @@ theorem frontSpeedTiltFromTripleRate_at_bolthausen_sznitman (γ : ℝ) :
   unfold frontSpeedTiltFromTripleRate speedBiasParameterFromTripleRate
   norm_num
 
-/-- **Reference evaluation, off the Bolthausen--Sznitman point.** At a normalized triple rate
-of one quarter the bias parameter is `4 - 2 = 2`, and a displacement scale of three carries
-it to six.
-
-The rate and the scale are given DIFFERENT values on purpose. The tilt is the product of the
-two, so a body that added them gives five, one that squared the scale gives eighteen, and one
-that read the rate without inverting gives `3 · (1/4 - 2)`; all three agree with the
-zero above and disagree here. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem frontSpeedTiltFromTripleRate_at_reference_point :
     frontSpeedTiltFromTripleRate (1 / 4) 3 = 6 := by
   unfold frontSpeedTiltFromTripleRate speedBiasParameterFromTripleRate

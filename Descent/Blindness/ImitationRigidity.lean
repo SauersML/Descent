@@ -332,8 +332,7 @@ theorem scalarRowResolvent_mul_denom (latent quadraticForm : ℝ)
 /-- Variance of a fair two-point law. -/
 def fairTwoPointVariance (a b : ℝ) : ℝ := (a - b) ^ 2 / 4
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fairTwoPointVariance_at_reference_point :
     fairTwoPointVariance 3 1 = 1 := by
   norm_num [fairTwoPointVariance]
@@ -810,10 +809,7 @@ finite-chromosome trace. A harmonic mean of a declared symbol is arithmetic; wha
 panel could contradict is `stationaryLDEntry`, not this. -/
 def ldWhiteningGain (decay : ℝ) : ℝ := (1 + decay ^ 2) / (1 - decay ^ 2)
 
-/-- **ldWhiteningGain pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `5 / 3`, which fixes
-the coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldWhiteningGain_at_reference_point :
     ldWhiteningGain (1 / 2) = 5 / 3 := by
   unfold ldWhiteningGain
@@ -1378,10 +1374,16 @@ from scaled initial frequency `x`: the absorbed mass of the boundary-degenerate
 diffusion.
 
 Empirical status: DERIVED for the squared-Bessel representative of neutral
-drift with an absorbing boundary; it is the exponential absorption law, and the
-identities below are proved from it rather than fitted. Its use as a model of a
+drift with an absorbing boundary; it is the exponential absorption law, and
+`alleleLossProbability_zero_time_is_junk` and the identities below are proved
+from it rather than fitted. Its use as a model of a
 real allele requires the diffusion approximation, which is standard and is not
-re-derived here. -/
+re-derived here.
+
+The named referent above is not decoration. `DERIVED` means "follows from other
+results in the corpus", and the coverage scan now keeps a `DERIVED` marker in
+the denominator unless the docstring says WHICH results -- because a marker that
+names nothing is an assertion that no measurement is needed, not a derivation. -/
 def alleleLossProbability (initial time : ℝ) : ℝ :=
   Real.exp (-(initial / (2 * time)))
 

@@ -611,10 +611,7 @@ fact a stipulated constant cannot be trusted to carry.
     Empirical status: UNTESTED. -/
 noncomputable def twoDemeIMEquilibriumETss (_M : ℝ) : ℝ := 2
 
-/-- **twoDemeIMEquilibriumETss pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem twoDemeIMEquilibriumETss_at_reference_point :
     twoDemeIMEquilibriumETss (1 / 2) = 2 := by
   unfold twoDemeIMEquilibriumETss
@@ -1172,9 +1169,7 @@ the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   β_sq_sum * het
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pgsVarianceFromHet_at_reference_point :
     pgsVarianceFromHet 1 1 = 1 := by
   norm_num [pgsVarianceFromHet]
@@ -1207,9 +1202,14 @@ not a between-population `F_ST`. Where that recurrence is wanted, construct a
 which carries the assumption in its type;
 `ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst` is the bridge.
 
-    Empirical status: VACUOUS WITH A SAMPLE-ESTIMATED `fst`, and **VALIDATED with the model's**
-    (`simcov/battery_drift05.py`). Both halves are true and the difference is where `fst` came
-    from, which is the distinction `simcov/verdict.py` now makes by declaration.
+    Empirical status: **MIXED** -- VACUOUS with a sample-estimated `fst`, and VALIDATED with
+    the model's (`simcov/battery_drift05.py`). Both halves are true and the difference is where
+    `fst` came from, which is the distinction `simcov/verdict.py` now makes by declaration.
+    The head is `MIXED` because that is the closed-vocabulary term for a definition whose parts
+    carry different verdicts; it read `VACUOUS ...` before, and a scanner takes the first word
+    of a status line as the verdict, so the half of this definition that IS measured -- the
+    table below, with a competitor refuted at 349 sems and a control that passes -- was being
+    counted as unmeasured.
 
     Estimate `fst` from the same replicates the oracle measures and this is an algebraic
     rearrangement of that estimator, so no measurement can bear on it -- that is the original
@@ -1230,10 +1230,7 @@ which carries the assumption in its type;
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
 
-/-- **targetHetFromFst pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem targetHetFromFst_at_reference_point :
     targetHetFromFst (1 / 2) (1 / 2) = 1 / 4 := by
   unfold targetHetFromFst
@@ -1878,10 +1875,7 @@ weighted reading being 74 percent larger.
 noncomputable def realWorldPGSVariance (V_A fst rhoSq : ℝ) : ℝ :=
   rhoSq * (1 - fst) * V_A
 
-/-- **realWorldPGSVariance pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 8`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem realWorldPGSVariance_at_reference_point :
     realWorldPGSVariance (1 / 2) (1 / 2) (1 / 2) = 1 / 8 := by
   unfold realWorldPGSVariance
@@ -3321,9 +3315,7 @@ correlation decays exponentially with recombination distance and divergence.
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * Real.sqrt fstGap * distance))
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldCorrelationDecay_at_reference_point :
     ldCorrelationDecay 0 0 0 = 1 := by
   norm_num [ldCorrelationDecay]
@@ -6463,10 +6455,7 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     meant; `alleleFreqCorrelation` is the correlation. -/
 noncomputable def covarianceRetentionFactorFromFst (fst : ℝ) : ℝ := 1 - fst
 
-/-- **covarianceRetentionFactorFromFst pinned at a reference point.** No theorem in the corpus
-evaluated this definition, so every body agreeing with it in sign and monotonicity was
-indistinguishable from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the
-coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem covarianceRetentionFactorFromFst_at_reference_point :
     covarianceRetentionFactorFromFst (1 / 2) = 1 / 2 := by
   unfold covarianceRetentionFactorFromFst
@@ -6512,10 +6501,7 @@ theorem alleleFreqCorrelation_at_zero_denominator_is_junk (fst varAncestral mean
   rw [hzero, div_zero]
 
 
-/-- **alleleFreqCorrelation pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `2 / 3`, which
-fixes the coefficients a one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem alleleFreqCorrelation_at_reference_point :
     alleleFreqCorrelation (1 / 2) (1 / 2) (1 / 2) = 2 / 3 := by
   unfold alleleFreqCorrelation
@@ -6567,10 +6553,7 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     make claims a simulation can reach. -/
 noncomputable def ldOverlapFromSharedLD (shared_ld : ℝ) : ℝ := shared_ld
 
-/-- **ldOverlapFromSharedLD pinned at a reference point.** No theorem in the corpus evaluated
-this definition, so every body agreeing with it in sign and monotonicity was indistinguishable
-from it. At all arguments equal to `1 / 2` it is `1 / 2`, which fixes the coefficients a
-one-sided bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ldOverlapFromSharedLD_at_reference_point :
     ldOverlapFromSharedLD (1 / 2) = 1 / 2 := by
   unfold ldOverlapFromSharedLD
@@ -7265,9 +7248,7 @@ identical.
 noncomputable def islandFstMultiplicativeStep (Ne m F : ℝ) : ℝ :=
   ibdRecurrenceStep Ne m F
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem islandFstMultiplicativeStep_at_reference_point :
     islandFstMultiplicativeStep 1 (1 / 2) 0 = 1 / 8 := by
   norm_num [islandFstMultiplicativeStep, ibdRecurrenceStep, Descent.Core.survivalWeightedMix]
@@ -7809,9 +7790,7 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
 noncomputable def sharedLD_from_equilibrium (m c : ℝ) : ℝ :=
   m / (m + c)
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem sharedLD_from_equilibrium_at_reference_point :
     sharedLD_from_equilibrium 1 1 = 1 / 2 := by
   norm_num [sharedLD_from_equilibrium]

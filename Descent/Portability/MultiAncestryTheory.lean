@@ -545,15 +545,7 @@ section EquityImplications
 noncomputable def portabilityGap (r2_source r2_target : ℝ) : ℝ :=
   r2_source - r2_target
 
-/-- Reference evaluation: the body is fixed at a point, not merely bounded or shown invariant.
-An inequality or an invariance leaves a family of bodies satisfying it; a value does not.
-
-**Moved off a collapse point.** This read `portabilityGap 2 2 = 0`, evaluated on the
-diagonal where source and target `R²` are equal and every antisymmetric body
-vanishes. `c·(a-b)`, `(a-b)³` and `a-b` all give `0` there, so the stated value
-rejected none of them. The point is now off the diagonal, where the difference is
-the whole content: `3 - 1 = 2` fixes the SIGN (which of the two is subtracted) and
-the unit coefficient at once, neither of which the diagonal could see. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem portabilityGap_at_reference_point :
     portabilityGap 3 1 = 2 := by
   norm_num [portabilityGap]

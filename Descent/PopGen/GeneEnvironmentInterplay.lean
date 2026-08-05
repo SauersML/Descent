@@ -77,9 +77,7 @@ section GxEInteraction
 noncomputable def effectiveGeneticEffect (β_G β_GxE E_mean : ℝ) : ℝ :=
   β_G + β_GxE * E_mean
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectiveGeneticEffect_at_reference_point :
     effectiveGeneticEffect 1 1 1 = 2 := by
   norm_num [effectiveGeneticEffect]

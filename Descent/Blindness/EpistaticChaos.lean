@@ -207,8 +207,7 @@ def configurationWeight (coding : SymmetricCoding V) (x : Fin n → V) : ℝ :=
   ∏ i, coding.weight (x i)
 
 omit [DecidableEq V] in
-/-- Reference evaluation: an empty locus set has unit configuration weight, since the product
-is empty. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem configurationWeight_at_reference_point (coding : SymmetricCoding V) (x : Fin 0 → V) :
     configurationWeight coding x = 1 := by
   unfold configurationWeight
@@ -511,8 +510,12 @@ It is forced. A relabelling that negates centered dosages must send the unique
 genotype whose centered dosage is its own negative — the heterozygote, at
 `q = 1/2` — to itself, and must exchange the other two.
 
-Empirical status: DERIVED. A permutation of a three-element type; no modelling
-content and no free parameter. -/
+Empirical status: **NOT AN EMPIRICAL CLAIM**. A permutation of a three-element type; no
+modelling content and no free parameter, so there is nothing a measurement could disagree
+with. It was marked `DERIVED`, which is the right family and the wrong term: `DERIVED` says
+it follows from other RESULTS in the corpus, and a scanner is entitled to ask which ones.
+This follows from nothing; it is the unique value-negating relabelling, and the paragraph
+above is the argument that it is forced. -/
 def genotypeFlip : DiploidGenotype ≃ DiploidGenotype where
   toFun
     | .homRef => .homAlt

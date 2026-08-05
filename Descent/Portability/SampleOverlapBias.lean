@@ -94,9 +94,7 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
 noncomputable def partialOverlapR2 (r2_true h2 : ℝ) (f : ℝ) (_n_gwas : ℕ) : ℝ :=
   (1 - f) * r2_true + f * h2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem partialOverlapR2_at_reference_point :
     partialOverlapR2 1 1 1 1 = 1 := by
   norm_num [partialOverlapR2]
@@ -215,10 +213,7 @@ section LOOCorrections
 noncomputable def approxLOOPGS (pgs_full leverage residual : ℝ) : ℝ :=
   pgs_full - leverage * residual
 
-/-- **approxLOOPGS pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem approxLOOPGS_at_reference_point :
     approxLOOPGS (1 / 2) (1 / 2) (1 / 2) = 1 / 4 := by
   unfold approxLOOPGS
@@ -263,10 +258,7 @@ section CrypticRelatedness
 noncomputable def kinshipInflation (r2_true K h2_family : ℝ) : ℝ :=
   r2_true + K * h2_family
 
-/-- **kinshipInflation pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `3 / 4`, which fixes the coefficients a one-sided
-bound or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem kinshipInflation_at_reference_point :
     kinshipInflation (1 / 2) (1 / 2) (1 / 2) = 3 / 4 := by
   unfold kinshipInflation

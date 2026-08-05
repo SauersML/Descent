@@ -54,9 +54,7 @@ section IncrementalR2
 noncomputable def incrementalR2 (r2_full r2_covariates : ℝ) : ℝ :=
   r2_full - r2_covariates
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem incrementalR2_at_reference_point :
     incrementalR2 (3 / 4) (1 / 4) = 1 / 2 := by
   norm_num [incrementalR2]

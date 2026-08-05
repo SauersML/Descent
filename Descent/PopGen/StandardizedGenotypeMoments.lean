@@ -1105,9 +1105,7 @@ equation of `squaringStep`; no free parameter. -/
 noncomputable def squaringFixedPoint (scale : ℝ) : ℝ :=
   (scale + Real.sqrt (scale ^ 2 + 4)) / 2
 
-/-- Reference evaluation.  The value is computed through the definitions this body calls, but
-the theorem states a number: an inequality or an invariance leaves a family of bodies
-satisfying it, and a value does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem squaringFixedPoint_at_reference_point :
     squaringFixedPoint 0 = 1 := by
   norm_num [squaringFixedPoint]
@@ -1805,10 +1803,7 @@ Empirical status: DERIVED. The first-moment displacement of moving unit mass bet
 the two preimages of `|u| = s`; no free parameter. -/
 def varianceProfile (s : ℝ) : ℝ := (1 + s) - (1 - s)
 
-/-- **varianceProfile pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `1`, which fixes the coefficients a one-sided bound
-or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem varianceProfile_at_reference_point :
     varianceProfile (1 / 2) = 1 := by
   unfold varianceProfile
@@ -1819,10 +1814,7 @@ theorem varianceProfile_at_reference_point :
 Empirical status: DERIVED. As for `varianceProfile`, one order up; no free parameter. -/
 def fourthMomentProfile (s : ℝ) : ℝ := (1 + s) ^ 2 - (1 - s) ^ 2
 
-/-- **fourthMomentProfile pinned at a reference point.** No theorem in the corpus evaluated this
-definition, so every body agreeing with it in sign and monotonicity was indistinguishable from
-it. At all arguments equal to `1 / 2` it is `2`, which fixes the coefficients a one-sided bound
-or an invariance leaves free. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fourthMomentProfile_at_reference_point :
     fourthMomentProfile (1 / 2) = 2 := by
   unfold fourthMomentProfile

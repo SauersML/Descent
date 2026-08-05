@@ -73,8 +73,7 @@ noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : �
 noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i ^ 2 * (2 * p i * (1 - p i))
 
-/-- Reference evaluation at dimension two.  Each vector argument gets different entries, so a
-body that swaps two of its arguments does not agree with one that does not. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pgsVariance_at_reference_point :
     pgsVariance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = -364 := by
   norm_num [pgsVariance, Fin.sum_univ_two]
@@ -176,8 +175,7 @@ coordinate, but it is still only a benchmark score-distribution quantity. -/
 noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
   1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
 
-/-- Reference evaluation: at the mean the benchmark rate is one half, since the standardized
-coordinate vanishes there. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem benchmarkHighScoreRate_at_reference_point (μ σ : ℝ) :
     benchmarkHighScoreRate μ μ σ = 1 - Phi 0 := by
   unfold benchmarkHighScoreRate
