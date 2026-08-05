@@ -340,3 +340,55 @@ def cumulative_drift_log_exact(nes) -> float:
 def frobenius_norm_sq(a, b) -> float:
     """||A - B||_F^2, computed directly.  MODEL: none -- linear algebra."""
     return sum((x - y) ** 2 for ra, rb in zip(a, b) for x, y in zip(ra, rb))
+
+
+# ===========================================================================
+# Assortative mating: the inflation law, and what inverting it requires
+# ===========================================================================
+# These exist to check DIRECTION.  A correction factor and the artifact it is
+# meant to undo are reciprocals, so a definition that writes one where it means
+# the other is still total, still type-correct, still provable, and wrong.  The
+# corpus carried exactly that defect in `amCorrectedPortability` until an
+# exact-rational round trip caught it.
+#
+# Nothing here is derived from the correction under test.  Everything is
+# derived from the inflation law alone, which is a DIFFERENT definition in the
+# corpus (`AssortativeMatingModel.pgsR2AM`, `R2_obs = R2_rm / (1 - r*h2)`).
+# That independence is the whole value: a reference written by rearranging the
+# formula it checks cannot reject a competing formula.
+
+def am_inflated_r2(r2_random_mating: float, r: float, h2: float) -> float:
+    """PGS R^2 observed in a population mating assortatively at correlation r.
+
+    MODEL: Fisher (1918) assortative mating at equilibrium.  Assortment builds
+    between-locus gametic disequilibrium, inflating the additive variance and
+    with it the score's R^2, by 1/(1 - r*h2).  Requires r*h2 < 1 for the
+    geometric series to converge.
+    """
+    return r2_random_mating / (1.0 - r * h2)
+
+
+def am_measured_portability(true_ratio: float, r_source: float,
+                            r_target: float, h2: float) -> float:
+    """Target/source R^2 ratio an analyst MEASURES, given the true ratio.
+
+    MODEL: both populations obey `am_inflated_r2` with their own assortment
+    correlation; the underlying random-mating architectures stand in the ratio
+    `true_ratio`.  The measured ratio is then the true one distorted by the two
+    inflations:
+
+        measured = (R2rm_t / (1 - r_t*h2)) / (R2rm_s / (1 - r_s*h2))
+                 = true_ratio * (1 - r_s*h2) / (1 - r_t*h2)
+
+    Built by applying the inflation law twice rather than by writing that
+    closed form, so the composition is what is being asserted.
+
+    When the source assorts more strongly than the target this is BELOW the
+    true ratio -- the artifactual portability loss the corpus models as
+    `DifferentialAMModel.apparentPortability`.  Undoing it therefore has to
+    RAISE the estimate, which is the direction fact a reciprocal cannot fake.
+    """
+    r2rm_source = 1.0
+    r2rm_target = true_ratio
+    return (am_inflated_r2(r2rm_target, r_target, h2)
+            / am_inflated_r2(r2rm_source, r_source, h2))

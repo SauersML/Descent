@@ -2269,3 +2269,335 @@ check(
         "covariance profile at all rather than an arbitrary triple."
     ),
 )
+
+
+# ===========================================================================
+# 20. THE IDENTITY GATE, applied to the SIMULATION ORACLE'S ESTIMATOR
+# ===========================================================================
+# A simulation MATCH is evidence only if the oracle could have said no. When
+# the oracle estimates its "truth" with an estimator that the definition under
+# test reduces to under the model's DEFINING relations alone, the two sides are
+# the same expression and the residual is zero for every seed, every design and
+# every parameter. The verdict is then a property of the algebra, not of the
+# population -- and it looks exactly like a triumph.
+#
+# `battery_bulk21` banked MATCH for `driftVariance`, `twoPopDriftVariance` and
+# `expectedFreqDiffSq` against a Wright-Fisher simulation. All three are
+# vacuous. The simulator estimates F_ST on the same run as
+#
+#     F_ST := Var(p) / (p0 (1 - p0))
+#
+# which is Wright's definition, not a measurement of it. Substituting it into
+# each body collapses the body onto `Var(p)` -- the estimator itself -- using no
+# Wright-Fisher property beyond the martingale `E[p_t] = p0`. Computer algebra
+# gives residual exactly 0; a body that is genuinely a different function of the
+# same inputs does NOT collapse (a planted `p0(1-p0) fst^2` leaves the nonzero
+# residual `Var(p)(-Var(p) - p0^2 + p0)/(p0(p0-1))`), so the design had power it
+# never spent.
+#
+# These checks pin that finding. Each composes the definition with the oracle's
+# estimator and asserts the round trip is the identity. They are recorded as
+# `kind="identity"` so they are counted as duplicate-detection rather than as
+# validations, and their purpose is to stop the MATCH being re-banked: if a body
+# is ever changed so that the composition stops being the identity, the check
+# reports IDENTICAL-BODIES against an expected AGREE and run.py returns 1.
+#
+# What is NOT settled by these, and what a non-vacuous design would have to
+# address: WHICH F_ST the caller supplies. Per-branch Wright F, pairwise Hudson
+# and Nei's G_ST differ by a factor of 2 and by an O(1) function respectively,
+# and an oracle that carries the corpus's own convention in its estimator cannot
+# separate them. See the section note in Calibrator.AncestrySpecificArchitecture.
+_DRIFT_IDENTITY = grid(p0=[0.05, 0.2, 0.5, 0.8], Varp=[1e-4, 1e-3, 1e-2])
+
+check(
+    id="driftVariance-is-the-oracle-estimator",
+    fqn="Calibrator.AncestrySpecificArchitecture.driftVariance",
+    claim="driftVariance(p0, Var(p)/(p0(1-p0))) is exactly Var(p), for all inputs",
+    model_lean="Wright F defined as between-population variance over ancestral heterozygosity",
+    model_ref="the estimator battery_bulk21 computes on the same simulated run",
+    reference="the simulation oracle's own F_ST estimator, inverted",
+    grid=_DRIFT_IDENTITY,
+    lean=lambda D, p0, Varp: D["driftVariance"](p0, Varp / (p0 * (1 - p0))),
+    ref=lambda p0, Varp: Varp,
+    kind="identity",
+    expected_verdict="AGREE",
+    note=(
+        "UNMASKS a banked MATCH. battery_bulk21 scored driftVariance MATCH "
+        "against Wright-Fisher simulation; the verdict carries no information "
+        "because the body and the oracle's estimator are the same expression. "
+        "The def is annotated VACUOUS in the corpus as a result."
+    ),
+    canfail_clause=(
+        "no grid can make this fail, and that IS the finding rather than a "
+        "defect of the check: the composition is the identity at every input. "
+        "Power against a WRONG body is supplied instead by the mutant sweep -- "
+        "a 5% rescaling of driftVariance breaks the round trip at every point, "
+        "so the check is reported non-vacuous. Both directions are therefore "
+        "asserted: identity on the real body, separation on a wrong one."
+    ),
+)
+
+check(
+    id="twoPopDriftVariance-is-twice-the-oracle-estimator",
+    fqn="Calibrator.AncestrySpecificArchitecture.twoPopDriftVariance",
+    claim="twoPopDriftVariance(p0, Var(p)/(p0(1-p0))) is exactly 2 Var(p)",
+    model_lean="two lineages drifting independently from a shared ancestor",
+    model_ref="the same estimator, doubled -- which is what the oracle computes for Var(p1-p2)",
+    reference="the simulation oracle's own F_ST estimator, inverted and doubled",
+    grid=_DRIFT_IDENTITY,
+    lean=lambda D, p0, Varp: D["twoPopDriftVariance"](p0, Varp / (p0 * (1 - p0))),
+    ref=lambda p0, Varp: 2.0 * Varp,
+    kind="identity",
+    expected_verdict="AGREE",
+    note=(
+        "UNMASKS a banked MATCH. The factor of 2 the docstring argues for is "
+        "assumed by the oracle's estimator, not tested by it."
+    ),
+    canfail_clause=(
+        "as driftVariance-is-the-oracle-estimator: identity by construction on "
+        "the real body, separated from a rescaled body by the mutant sweep."
+    ),
+)
+
+check(
+    id="expectedFreqDiffSq-is-twice-the-oracle-estimator",
+    fqn="Calibrator.AncestrySpecificArchitecture.expectedFreqDiffSq",
+    claim="expectedFreqDiffSq(Var(p)/(p0(1-p0)), p0) is exactly 2 Var(p)",
+    model_lean="E[(p1-p2)^2] under independent per-branch drift",
+    model_ref="the same estimator, doubled",
+    reference="the simulation oracle's own F_ST estimator, inverted and doubled",
+    grid=_DRIFT_IDENTITY,
+    lean=lambda D, p0, Varp: D["expectedFreqDiffSq"](Varp / (p0 * (1 - p0)), p0),
+    ref=lambda p0, Varp: 2.0 * Varp,
+    kind="identity",
+    expected_verdict="AGREE",
+    note=(
+        "UNMASKS a banked MATCH. Same body as twoPopDriftVariance with the "
+        "arguments in the other order, so it inherits the same vacuity. Note "
+        "what this means for the convention question: the factor-of-2 and the "
+        "Nei-vs-Hudson readings are precisely what the simulation could NOT "
+        "answer, because its estimator carried the corpus's convention."
+    ),
+    canfail_clause=(
+        "identity by construction on the real body; the mutant sweep supplies "
+        "the separation. The argument ORDER is also load-bearing here and the "
+        "transposition mutant exercises it."
+    ),
+)
+
+
+# ===========================================================================
+# 21. COALESCENT SCALING INVARIANCE
+# ===========================================================================
+# Neutral diffusion-scale quantities depend on the population size and the
+# per-generation rates only through the scaled products 4*Ne*m, 4*Ne*mu,
+# 4*Ne*c and the scaled time t/(2*Ne). Such a quantity is therefore EXACTLY
+# invariant under
+#
+#     Ne -> lam*Ne,   m -> m/lam,   mu -> mu/lam,   c -> c/lam,   t -> lam*t.
+#
+# This is a dimensional-homogeneity check in the only form that survives the
+# corpus's conventions. Assigning generations to `Ne` and per-generation to `m`
+# and demanding term-by-term homogeneity flags every discrete per-generation
+# recurrence -- `1 - 1/(2*Ne)` mixes a pure number with a rate -- because those
+# carry an implicit one-generation step. Scaling invariance asks the same
+# question without that false positive, and it needs no parser, no unit table
+# and no symbolic algebra: evaluate the definition twice and compare.
+#
+# It is exact, deterministic, sub-millisecond, and commits to NO F_ST
+# convention, which is what makes it admissible as a gate. It applies only to
+# definitions declared diffusion-scale; discrete recurrences are NOT invariant
+# (their invariance is only asymptotic) and are deliberately absent rather than
+# silently exempted.
+#
+# WHICH DEFINITIONS ARE ADMISSIBLE HERE, AND WHY THE LIST IS SHORT.
+# A scaling-invariance check has power only against mutants that BREAK the
+# scaling. The harness's own mutant sweep rescales the definition (which cancels,
+# since both sides call it) and transposes its first two arguments (which is the
+# mutation that bites). So a definition whose first two arguments carry EQUAL and
+# OPPOSITE powers of lam -- `fstMigrationDriftEquilibrium(Ne, m)`,
+# `hetMutationFloor(Ne, mu)`, `coalFst(t, Ne)` -- is invariant under transposition
+# too, and a scaling check on it cannot fail. Those three were written, found
+# vacuous by the sweep, and REMOVED rather than relabelled `kind="identity"` to
+# get them past the vacuity count. A check that cannot fail is not a weaker
+# check, it is not a check; the honest move is to delete it and say so here.
+# What remains are the definitions whose argument list makes the check bite.
+_LAM = 4.0
+
+
+def _scale_check(cid, fqn, claim, fn, args, expected=None, note="", extra=""):
+    """Assert f(theta) == f(rescaled theta) for a diffusion-scale quantity.
+
+    `args` maps each argument name to (value, exponent), where the exponent is
+    the power of `lam` that argument carries: sizes and times +1, per-generation
+    rates -1, dimensionless arguments 0.
+    """
+    base = {k: v for k, (v, _e) in args.items()}
+    scaled = {k: v * _LAM ** e for k, (v, e) in args.items()}
+    check(
+        id=cid,
+        fqn=fqn,
+        claim=claim,
+        model_lean="diffusion scale: depends on Ne and the rates only through 4*Ne*rate",
+        model_ref="the same definition at Ne, rates rescaled by lam=%g and 1/lam" % _LAM,
+        reference="coalescent scaling invariance of the same definition",
+        grid=[{}],
+        lean=(lambda f, b: lambda D: f(D, **b))(fn, base),
+        ref=(lambda f, s: lambda D: f(D, **s))(fn, scaled),
+        kind="internal",
+        expected_verdict=expected,
+        note=note,
+        canfail_clause=(
+            "lam must be far from 1 (it is %g) and the quantity must not be "
+            "saturated: a formula evaluated where it is pinned at 0 or 1 is "
+            "invariant for the wrong reason. Power against a mutated body comes "
+            "from the harness's transposition mutant, which is the only mutant "
+            "that breaks a scaling relation -- a rescaling of the definition "
+            "cancels, since both sides call it. %s" % (_LAM, extra)
+        ),
+    )
+
+
+_scale_check(
+    "demoSteppingStoneFst-scale-invariant",
+    "Calibrator.DemographicHistory.demoSteppingStoneFst",
+    "d/(d + 4 Ne m sigma_sq) depends on Ne and m only through their product",
+    lambda D, d, Ne, m, s2: D["demoSteppingStoneFst"](d, Ne, m, s2),
+    {"d": (4.0, 0), "Ne": (500.0, 1), "m": (0.008, -1), "s2": (1.0, 0)},
+    note=(
+        "CONTROL for steppingStoneFstQuadratic-scale-VIOLATION below. This is "
+        "the sibling that carries the migration rate to the first power, and it "
+        "is exactly invariant. The pair together is what makes the violation a "
+        "finding rather than a property of the check."
+    ),
+    extra="F_ST at the base point is 0.20, away from both 0 and 1.",
+)
+
+_scale_check(
+    "steppingStoneFstQuadratic-scale-VIOLATION",
+    "Calibrator.DemographicHistory.steppingStoneFstQuadratic",
+    "d/(d + 4 Ne sigma_sq^2 m^2) is NOT a function of the scaled migration rate",
+    lambda D, d, Ne, m, s2: D["steppingStoneFstQuadratic"](d, Ne, m, s2),
+    {"d": (4.0, 0), "Ne": (500.0, 1), "m": (0.008, -1), "s2": (1.0, 0)},
+    expected="INTERNAL-INCONSISTENT",
+    note=(
+        "PINNED FALSIFIED. sigma_sq^2 * m^2 carries one power of m more than "
+        "the diffusion scale admits, so the body changes by a factor of lam "
+        "under a rescaling that must leave it fixed. This is a third, "
+        "convention-free confirmation of the verdict two independent log-log "
+        "slope measurements already reached (battery_core2, battery_bulk17: "
+        "fitted exponent 0.974 +- 0.042 against a predicted 2). It costs no "
+        "simulation and commits to no F_ST convention. Pinned as an EXPECTED "
+        "disagreement: if this ever starts agreeing, either the body was "
+        "corrected -- in which case retire the check and the FALSIFIED note "
+        "with it -- or the check stopped measuring, and both must be noticed."
+    ),
+    extra=(
+        "The sibling control above must stay AGREE on the same base point; a "
+        "check that fired on both would be measuring the harness, not the body."
+    ),
+)
+
+_scale_check(
+    "ibdFst-scale-VIOLATION-under-the-deme-size-reading",
+    "Calibrator.AssortativeMatingPGS.ibdFst",
+    "d/(4 N sigma_sq + d) is not diffusion-scale if N is read as a deme SIZE",
+    lambda D, d, N, s2: D["ibdFst"](d, N, s2),
+    {"d": (4.0, 0), "N": (500.0, 1), "s2": (1.0, 0)},
+    expected="INTERNAL-INCONSISTENT",
+    note=(
+        "CONVENTION, NOT A DEFECT -- and the distinction is the point. Under "
+        "the deme-size reading the body carries a bare N with no rate to pair "
+        "it with, so it is not invariant. That reading is the WRONG one: N here "
+        "is a population DENSITY and the body is Rousset's isolation-by-distance "
+        "law F/(1-F) = d/(4 N sigma^2), in which dispersal enters through "
+        "sigma_sq and abundance through the density, so there is no migration "
+        "rate to scale. The check is pinned as an expected disagreement to "
+        "record exactly that: what fires here is the deme-size misreading, "
+        "which the docstring now rules out. Contrast demoSteppingStoneFst "
+        "above, whose Ne IS a deme size and which therefore must and does carry "
+        "m -- and is invariant. Registered as DIAGNOSTIC in intent: a scaling "
+        "violation is proof of a defect only once the convention is fixed, and "
+        "this is the case where fixing it dissolves the violation."
+    ),
+    extra=(
+        "This one cannot be promoted to a defect by the check alone; it needs "
+        "the docstring's convention statement, which is why the note carries it."
+    ),
+)
+
+
+# ===========================================================================
+# ROUND TRIPS: does a definition that claims to INVERT something invert it?
+# ===========================================================================
+# A whole class of defect survives every proof in the corpus: a definition
+# whose form encodes a direction, an inverse, or a ratio, written the wrong way
+# round.  It is total, it type-checks, its theorems prove, and it computes the
+# reciprocal of what its name says.  Kernel checking cannot see it, because
+# nothing is false -- the statements are all true ABOUT THE WRONG FUNCTION.
+#
+# The shape that catches it is a round trip.  Take a known input, push it
+# through an independently written FORWARD model, push the result through the
+# corpus's inverse, and require the original back.  A reciprocal error returns
+# the input distorted by the square of the artifact, so it separates hard.
+#
+# These are pinned `expected_verdict="AGREE"`: for this family a disagreement
+# is a defect, so it must be reported as a verdict REGRESSION and fail the run
+# rather than being recorded as an interesting number.
+#
+# LIMITATION, stated because the reader needs it: a round trip constrains the
+# COMPOSITION, so it cannot by itself distinguish "the inverse is wrong" from
+# "the forward reference is wrong in the mirrored way".  What breaks the tie is
+# that the reference is built from a different definition in the corpus (the
+# inflation law) than the one under test, and that the two are separately
+# documented.  A round trip whose forward model is a rearrangement of the
+# definition it checks is worthless; see the note in refs.py.
+
+_AM_ROUNDTRIP = grid(
+    # true target/source R^2 ratio: perfect portability and two lossy cases
+    q=[1.0, 0.7, 0.4],
+    # source assorts more strongly than target in every cell (r_t < r_s), which
+    # is the regime the corpus's DifferentialAMModel fixes by hypothesis
+    r_s=[0.2, 0.5, 0.8],
+    r_t=[0.0, 0.1],
+    # r_s*h2 <= 0.72 < 1 everywhere, so the stability condition holds and no
+    # denominator approaches zero
+    h2=[0.3, 0.6, 0.9],
+)
+
+check(
+    id="amCorrectedPortability-inverts-the-AM-artifact",
+    fqn="Calibrator.amCorrectedPortability",
+    claim=(
+        "Correcting a measured portability for differential assortative mating "
+        "returns the true target/source R2 ratio."
+    ),
+    model_lean="the corpus's AM correction, whatever direction it is written in",
+    model_ref=(
+        "Fisher AM inflation applied separately in each population "
+        "(refs.am_inflated_r2), composed to give the measured ratio"
+    ),
+    reference="refs.am_measured_portability, inverted",
+    grid=_AM_ROUNDTRIP,
+    lean=lambda D, q, r_s, r_t, h2: D["amCorrectedPortability"](
+        refs.am_measured_portability(q, r_s, r_t, h2), r_s, r_t, h2),
+    ref=lambda q, r_s, r_t, h2: q,
+    tol=1e-12,
+    kind="formula",
+    expected_verdict="AGREE",
+    canfail_clause=(
+        "The historical defect is the live can-fail evidence. The definition "
+        "multiplied by (1 - r_source*h2)/(1 - r_target*h2), the artifact itself "
+        "rather than its reciprocal, so this round trip returned "
+        "q * ((1-r_s*h2)/(1-r_t*h2))^2 instead of q. At q=1, r_s=1/2, r_t=0, "
+        "h2=1/2 that is 9/16 against 1 -- a 44% disagreement, far outside tol. "
+        "test_roundtrip.py replays that exact planted definition and asserts "
+        "this check reports it."
+    ),
+    note=(
+        "Direction check. The q=1 cells alone would be satisfiable by a "
+        "definition that always returns its first argument, so the grid also "
+        "carries q=0.7 and q=0.4: a pass-through would return the MEASURED "
+        "ratio there, not the true one. That is why the grid is not all-ones."
+    ),
+)
