@@ -121,6 +121,55 @@ theorem lambdaRate_dirac_zero {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b) :
     rw [zero_pow hk3]
     ring
 
+/-! ### Consistency forces Kingman's `1`
+
+`Descent.Coalescent.Rates` takes the per-pair rate to be `1` and calls it a choice of time
+unit.  That is true, but it is not the whole story: once multiple mergers are excluded,
+consistency forces the binary rate to be the SAME at every sample size.  A coalescent whose
+pair rate depended on how many other lineages were present would not restrict to itself. -/
+
+/-- **A binary-merger coalescent has a sample-size-independent pair rate.**  If no three
+blocks ever merge at once, Pitman's condition reads `λ_{b,2} = λ_{b+1,2}`: the extra block
+contributes nothing, because the `(k+1)`-term that would account for it is zero.
+
+So the `1` in K-C (1.3) is not merely a unit convention -- the convention is only free to
+choose one number, and consistency is what makes one number enough. -/
+theorem binaryRate_const_of_consistent {lam : ℕ → ℕ → ℝ} (hcons : IsConsistentRates lam)
+    (hbin : ∀ b k, 3 ≤ k → lam b k = 0) {b : ℕ} (hb : 2 ≤ b) :
+    lam b 2 = lam (b + 1) 2 := by
+  have h := hcons b 2 (le_refl 2) hb
+  rw [hbin (b + 1) 3 (by omega)] at h
+  linarith
+
+/-- **And therefore it is `λ_{2,2}` at every sample size.**  Induction on the sample size:
+the pair rate never changes, so a binary-merger coalescent is determined by one number. -/
+theorem binaryRate_eq_base {lam : ℕ → ℕ → ℝ} (hcons : IsConsistentRates lam)
+    (hbin : ∀ b k, 3 ≤ k → lam b k = 0) : ∀ b : ℕ, 2 ≤ b → lam b 2 = lam 2 2 := by
+  intro b hb
+  induction b with
+  | zero => omega
+  | succ m ih =>
+      rcases Nat.lt_or_ge m 2 with hm | hm
+      · have : m + 1 = 2 := by omega
+        rw [this]
+      · rw [← binaryRate_const_of_consistent hcons hbin hm]
+        exact ih hm
+
+/-- **Kingman's array is the only normalised binary-merger coalescent.**  Consistent, no
+multiple mergers, unit pair rate at the smallest sample: that pins every entry.
+
+This is the sense in which K-C (1.3) is not a modelling choice among many.  Given that
+lineages merge two at a time, the rate array is forced. -/
+theorem eq_kingmanRate {lam : ℕ → ℕ → ℝ} (hcons : IsConsistentRates lam)
+    (hbin : ∀ b k, 3 ≤ k → lam b k = 0) (hnorm : lam 2 2 = 1) {b k : ℕ}
+    (hk : 2 ≤ k) (hkb : k ≤ b) : lam b k = kingmanRate b k := by
+  unfold kingmanRate
+  by_cases h : k = 2
+  · subst h
+    rw [if_pos rfl, binaryRate_eq_base hcons hbin b hkb, hnorm]
+  · rw [if_neg h]
+    exact hbin b k (by omega)
+
 /-- The total rate out of a state with `b` blocks: every `k`-subset that can merge, at its
 own rate.  For Kingman this is `C(b,2)`; in general it is what
 `Descent.Coalescent.StateSpace.card_covers` would count if covers allowed multiple
