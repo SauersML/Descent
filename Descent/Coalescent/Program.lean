@@ -37,6 +37,8 @@ reads as a covered one.
 
 ## Open, and why
 
+(Item 2 below is settled; it is kept in place with its proof named.)
+
 **1. The split count.**  `Split` makes cuts of a class available and shows each is counted
 twice by `ν ↦ (ν, λ-ν)`, which is where Kingman's factor `½ C(λ, ν)` comes from.  The
 arithmetic half is proved below (`sum_choose_interior_add_two`): the cuts of a class of size
@@ -45,20 +47,14 @@ the bijection between cuts of a class and the states `ξ ≺ η` refining `η` t
 combinatorial half.  `JumpChain.absoluteProb_recursion` carries the factor as a written
 weight until that is done.
 
-**2. Ewens normalisation for general `n`.**  `Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`.
-The proof is the Chinese-restaurant recursion: adding an `(n+1)`-th element either starts a
-new class (weight `θ`) or joins a class of size `λ` (weight `λ`), so the total gains a
-factor `θ + n`.  `Descent.Coalescent.Extend` now supplies everything except the assembly:
-the fibre of restriction over `ξ` is `Option (Quotient ξ)` (`restrict_extend`,
-`extend_injective`, `exists_extend`), seating changes the block count as required
-(`blocks_extend_none`, `blocks_extend_some`), it changes exactly one class size and by one
-(`card_fiber_self`, `card_fiber_of_ne`, `card_fiber_none_old`, `card_fiber_none_new`), and
-the sizes sum to `n` (`sum_classSize`), and the fibrewise sum itself is available
-(`Ewens.sum_ER_succ`, whose dependent-transport step is `Ewens.sum_fiber_eq_sum_seatings`).
-The transfer of products from classes to fibres, which was the named obstacle, is now written
-(`Ewens.prod_quotient_ker`).  What is left is to combine it with the fibre cardinalities into
-the single identity "seating multiplies the weight by `θ` or by `λ_o`", and then to run the
-induction.  Every input to that is proved; the combination is not.
+**2. Ewens normalisation for general `n`.**  SETTLED, by `Ewens.sum_ewensWeight`:
+`Σ_{ξ ∈ 𝓔ₙ} θ^{|ξ|-1} ∏(λ_a - 1)! = (θ+1)⋯(θ+n-1)`, which is what makes K-G (3.8) a
+probability distribution and what `Mutation` could previously only check at `n = 2, 3`.  The
+proof is Kingman's restaurant: `Extend` gives the fibre of restriction over `ξ` as
+`Option (Quotient ξ)`, `Ewens.sum_ER_succ` decomposes the sum by seating, and
+`Ewens.sum_seatings_ewensWeight` values the seatings at `θ + n` -- `θ` for a new class,
+`λ_c` for joining class `c`.  Listed here because it was open, and left listed because the
+record of what a group had to build to close something is worth more than a tick.
 
 **3. K-C Theorem 2, the paintbox representation.**  Every exchangeable random equivalence
 relation is a mixture of paintboxes.  `Paintbox` builds the paintbox and proves the
