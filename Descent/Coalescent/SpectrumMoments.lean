@@ -122,7 +122,8 @@ independent, the squared lineage-count weights add.
 Empirical status: DERIVED given independence, which is ASSUMED and named at
 `Descent.Coalescent.TransitVariance`.  The summand is the SQUARE of
 `BranchLength.expectedSegmentLength`, because a phase of mean duration `d_k⁻¹` contributing
-length at rate `k` contributes variance `k² d_k⁻²`. -/
+length at rate `k` contributes variance `k² d_k⁻²` -- and that `d_k⁻²` is computed from the
+density in `Descent.Coalescent.HoldingSecondMoment`, not quoted. -/
 noncomputable def varTotalBranchLength (n : ℕ) : ℝ :=
   ∑ j ∈ range (n - 1), expectedSegmentLength (j + 2) ^ 2
 

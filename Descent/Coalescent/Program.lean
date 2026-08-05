@@ -138,12 +138,15 @@ step" are different states.
   clearing both binomials leaves `Σ_{b≤m} C(a+b,a) = C(a+m+1,a+1)`, the hockey stick, after
   which the factorials cancel to `1/i`.  `SiteFrequencySpectrum`'s `ASSERTED` marker is
   discharged.
-* **Second moments of the spectrum** -- CLOSED on the `S` side.  `Coalescent.SpectrumMoments`
-  proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total variance, with
-  `Var(L_n) = 4 b_{n-1}` from the squared segment lengths, and `b` bounded while `a` diverges
-  -- so Watterson's estimator is consistent, at rate `1/log n`.  STILL ABSENT: `Var(π)` and
-  `Cov(π, θ_W)`, hence Tajima's exact denominator.  Those need the joint law of pairwise
-  differences across pairs, which is not a function of the tree's total length.
+* **Second moments of the spectrum** -- CLOSED on the `S` side, down to the clock.
+  `Coalescent.SpectrumMoments` proves `Var(S_n) = θ a_{n-1} + θ² b_{n-1}` by the law of total
+  variance, with `Var(L_n) = 4 b_{n-1}` from the squared segment lengths, and `b` bounded
+  while `a` diverges -- so Watterson's estimator is consistent, at rate `1/log n`.  The
+  per-clock variance those sums are built from is no longer assumed either:
+  `Coalescent.HoldingSecondMoment` integrates K-C (1.7)'s density twice (`Γ(3) = 2!`) and
+  subtracts, giving `d⁻²`.  STILL ABSENT: `Var(π)` and `Cov(π, θ_W)`, hence Tajima's exact
+  denominator.  Those need `E(T_ij T_kl)` for pairs sharing a lineage and for disjoint pairs
+  -- three- and four-sample joint laws, not a function of the tree's total length.
 * **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
   K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
   exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix

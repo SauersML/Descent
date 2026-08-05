@@ -41,8 +41,11 @@ anything.
   and `Descent.Coalescent.Program` item 4 records it as settled in the constructive direction
   (`Law.coalescentLaw_prod`) and open in the converse.  `varTransitTime` is therefore the
   variance of the CONSTRUCTED coalescent, which is the one the corpus has.
-* DERIVED: everything else.  `d_r⁻² ≤ d_r⁻¹` because `d_r ≥ 1` for `r ≥ 2`, so the variance is
-  bounded by the mean and hence by `2`; and the `k = 2` term bounds it below by `1`.
+* DERIVED: everything else, including the per-clock variance itself --
+  `Descent.Coalescent.HoldingSecondMoment` computes `∫ t² d e^{-dt} = 2/d²` from `Γ(3) = 2!`
+  and subtracts the squared mean to get `d⁻²`.  Then `d_r⁻² ≤ d_r⁻¹` because `d_r ≥ 1` for
+  `r ≥ 2`, so the variance is bounded by the mean and hence by `2`; and the `k = 2` term
+  bounds it below by `1`.
 
 ## Main results
 
@@ -61,8 +64,9 @@ open Finset
 the variances of independent exponentials adding.
 
 Empirical status: DERIVED given independence, which is ASSUMED and named -- see the module
-docstring.  The summand `d_r⁻²` is the variance of an exponential of rate `d_r`, which
-`Descent.Coalescent.HoldingTime` supplies the density for. -/
+docstring.  The summand `d_r⁻²` is the variance of an exponential of rate `d_r`, and that is
+now computed rather than quoted: `Descent.Coalescent.HoldingSecondMoment.variance_holdTime`
+integrates K-C (1.7)'s density twice and subtracts. -/
 noncomputable def varTransitTime (n : ℕ) : ℝ :=
   ∑ k ∈ range (n - 1), (1 / deathRate (k + 2)) ^ 2
 
