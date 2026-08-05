@@ -32,12 +32,24 @@ if the factor is right.
       several totals so the design also has span.
 """
 import json
+import os
 import math
 
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
+
+# THE SCALED PARAMETERS ARE CONVENTIONS ABOUT A NUMERIC FACTOR, so the only
+# competitor that means anything is the SAME functional form with a different
+# factor.  Each bare row below therefore carries two rivals differing from it
+# only in that factor, evaluated on the identical cells.  Without them
+# `ledger.py` records every agreement here as UNINFORMATIVE and is right to:
+# a design that never rejected anything has not shown it could.
+#
+# `realised_inputs=True`: Ne, mu, m and t_div are the exact constants the
+# demography was built from, never estimated off the replicates the oracle
+# measures, so there is no nominal/realised gap of size O(1/sqrt(reps)).
 
 
 def ia_single_homozygosity(Ne, mu, gens, reps, seed):
@@ -75,7 +87,18 @@ def test_scaled_mutation_rate():
               % (Ne, mu, theta, F, sem, 1 / (1 + theta)))
         cells.append(dict(design="Ne=%d mu=%.2e (theta=%.1f)" % (Ne, mu, theta),
                           lean=1 / (1 + theta), truth=F, sem=sem))
-    record("scaledMutationRate", "DGP.lean", "4 * Ne * mu", cells,
+    MODEL = dict(realised_inputs=True)
+    # The factor under test is the 4 in `4*Ne*mu`. Halving and doubling it are
+    # the two readings a reader could plausibly hold (2*Ne*mu is the haploid
+    # convention; 8*Ne*mu is the ploidy applied twice), on the same cells.
+    c_half = [dict(c, lean=1 / (1 + 0.5 * (1 / c["lean"] - 1))) for c in cells]
+    c_double = [dict(c, lean=1 / (1 + 2.0 * (1 / c["lean"] - 1))) for c in cells]
+    record("scaledMutationRate [haploid 2*Ne*mu, competing]", "DGP.lean",
+           "2 * Ne * mu", c_half, regime="same cells, factor halved", **MODEL)
+    record("scaledMutationRate [8*Ne*mu, competing]", "DGP.lean",
+           "8 * Ne * mu", c_double, regime="same cells, factor doubled",
+           **MODEL)
+    record("scaledMutationRate", "DGP.lean", "4 * Ne * mu", cells, **MODEL,
            regime="tested through the infinite-alleles equilibrium identity "
                   "1/(1+theta), which is independently validated; theta spans "
                   "a factor of four and Ne spans a factor of four "
@@ -134,13 +157,31 @@ def test_scaled_migration_rate_and_tau():
                                      % (Ne, t_div, tau),
                               lean=tau / (1 + tau), truth=s["mean"],
                               sem=s["sem"]))
-    record("scaledMigrationRate", "DGP.lean", "4 * Ne * m", cells_m,
+    MODEL = dict(realised_inputs=True)
+    # Same idea: the rivals differ from the body only in the numeric factor on
+    # the scaled rate, read off the same measured F_ST cells.
+    cm_half = [dict(c, lean=1 / (1 + 0.5 * (1 / c["lean"] - 1))) for c in cells_m]
+    cm_double = [dict(c, lean=1 / (1 + 2.0 * (1 / c["lean"] - 1))) for c in cells_m]
+    ct_half = [dict(c, lean=(0.5 * t) / (1 + 0.5 * t))
+               for c, t in ((c, c["lean"] / (1 - c["lean"])) for c in cells_tau)]
+    ct_double = [dict(c, lean=(2.0 * t) / (1 + 2.0 * t))
+                 for c, t in ((c, c["lean"] / (1 - c["lean"])) for c in cells_tau)]
+    record("scaledMigrationRate [2*Ne*m, competing]", "DGP.lean", "2 * Ne * m",
+           cm_half, regime="same cells, factor halved", **MODEL)
+    record("scaledMigrationRate [8*Ne*m, competing]", "DGP.lean", "8 * Ne * m",
+           cm_double, regime="same cells, factor doubled", **MODEL)
+    record("EvolutionaryParameters.tau [t_div / (4 * Ne), competing]",
+           "DGP.lean", "t_div / (4 * Ne)", ct_half,
+           regime="same cells, tau halved", **MODEL)
+    record("EvolutionaryParameters.tau [t_div / Ne, competing]", "DGP.lean",
+           "t_div / Ne", ct_double, regime="same cells, tau doubled", **MODEL)
+    record("scaledMigrationRate", "DGP.lean", "4 * Ne * m", cells_m, **MODEL,
            regime="tested through the two-deme island F_ST read from "
                   "coalescence times against 1/(1 + 2 bigM), the factor 2 "
                   "being islandDemeCorrection at n=2; bigM spans a factor of "
                   "four and Ne spans a factor of four INDEPENDENTLY")
     record("EvolutionaryParameters.tau", "DGP.lean", "t_div / (2 * Ne)",
-           cells_tau,
+           cells_tau, **MODEL,
            regime="tested through the pure-split F_ST = tau/(1+tau) from "
                   "coalescence times; tau spans a factor of four and Ne spans "
                   "a factor of four independently, so the 2 in 2*Ne is under "
@@ -182,8 +223,13 @@ def test_fst_equilibrium_additivity():
         print("  theta=%.1f bigM=%.1f: F=%.5f ± %.5f  vs 1/(1+sum)=%.5f"
               % (theta, bigM, s["mean"], s["sem"],
                  1 / (1 + theta + bigM)))
-    record("fstEquilibrium [additivity of theta and bigM]", "DGP.lean",
-           "1 / (1 + theta + bigM)", cells,
+    # Stays TAGGED, and deliberately: DGP.lean's body is now
+    # `1 / (1 + theta + 2*bigM)`, so this row transcribes a SUPERSEDED formula
+    # and is a competitor to it, not the corpus row. battery_falsrepair
+    # group A carries the bare row on the corrected body.
+    record("fstEquilibrium [additivity of theta and bigM, superseded body]",
+           "DGP.lean", "1 / (1 + theta + bigM)", cells,
+           realised_inputs=True,
            regime="two-deme island model with both forces on, at three "
                   "combinations holding theta+bigM = 1 and three holding it at "
                   "4, so a formula weighting the two forces differently would "
@@ -199,8 +245,8 @@ def main():
         except Exception:
             import traceback
             traceback.print_exc()
-    json.dump(RESULTS, open("battery_bulk19_results.json", "w"), indent=1,
-              default=str)
+    dump_results("battery_bulk19_results.json",
+                 battery_source=os.path.abspath(__file__))
     print("\n\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {})

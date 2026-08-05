@@ -12,11 +12,19 @@ TMRCA must be 2N whatever tAnc is.
 """
 import json
 import math
+import os
 
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
+
+# `realised_inputs=True`: N, Nanc and tAnc are the exact epoch
+# constants msprime was given, not estimates off the same
+# genealogies the oracle averages, so the prediction is already
+# evaluated at what the sample realised. Undeclared, the two
+# rejections this run exists to record are downgraded to LEADs.
+MODEL = dict(realised_inputs=True)
 
 GUARD = "FALSREPAIR_E_GUARD_20260804"
 
@@ -71,11 +79,17 @@ def main():
            "to tAnc then Nanc = 4000, 60000 independent genealogies per cell, "
            "tAnc crossing the epoch boundary in both directions -- battery "
            "bulk12's design at new seeds with a control that can fail")
+    # BARE for the corrected body that SerialFounderChain.lean now contains,
+    # tagged for the superseded one and the rival: a battery in which every row
+    # is tagged contributes no corpus row to the ledger.
+    CORPUS = "corrected body [2N(1-e^-a) + e^-a * 2 Nanc]"
     for k, c in cells.items():
-        record("serialFounderWithinTime -- " + k, "SerialFounderChain.lean", k,
-               c, regime=reg, control=control)
-    json.dump(RESULTS, open("battery_falsrepair_e_results.json", "w"),
-              indent=1, default=str)
+        record("serialFounderWithinTime" if k == CORPUS
+               else "serialFounderWithinTime [%s]" % k,
+               "SerialFounderChain.lean", k, c, regime=reg, control=control,
+               **MODEL)
+    dump_results("battery_falsrepair_e_results.json",
+                 battery_source=os.path.abspath(__file__))
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         print("%-10s %-70s worst %.2f sems"

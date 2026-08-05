@@ -8,14 +8,28 @@ genealogy per replicate makes the error bars honest but wide, and the cell at
 Either that is two draws of the same noise or it is real curvature.  This run
 adds recombination so each replicate averages over many genealogies, doubles the
 replicates, and fills in the sweep, so the cell either moves back or stays.
+
+NAMING.  The row transcribing the body in PopulationGeneticsFoundations.lean is
+recorded BARE; only rivals carry a bracket tag.  `ledger.split_name` reads
+`<decl> -- <candidate>` as a tagged row, so a battery whose every row is tagged
+has no CORPUS row and its corpus verdict never enters the ledger at all.
+
+`realised_inputs=True`: `4*Ne*m` and `4*Ne*mu` are the exact constants the
+demography was built from, not estimates off the same replicates the oracle
+measures, so there is no nominal/realised gap for a finding to be confused with.
+Undeclared, the two-deme rejection this design turns on is downgraded to a LEAD,
+and a downgraded rejection leaves the corpus row looking uncompeted.
 """
 import json
 import math
+import os
 
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
+
+MODEL = dict(realised_inputs=True)
 
 GUARD = "FALSREPAIR_C2_GUARD_20260804"
 NE, MU, D = 1000, 1e-8, 20
@@ -71,12 +85,14 @@ def main():
            "recombination 1e-8 so each replicate averages many genealogies, "
            "Hudson F_ST between demes 0 and 1, 48 replicates, 4*Ne*m swept "
            "sixteenfold")
+    CORPUS = "body [1/(1 + 4*Ne*m + 4*Ne*mu)], the many-deme limit"
     for k, c in cells.items():
-        record("fstMigrationMutationEquilibriumManyDemes -- " + k,
+        record("fstMigrationMutationEquilibriumManyDemes" if k == CORPUS
+               else "fstMigrationMutationEquilibriumManyDemes [%s]" % k,
                "PopulationGeneticsFoundations.lean", k, c, regime=reg,
-               control=control)
-    json.dump(RESULTS, open("battery_falsrepair_c2_results.json", "w"),
-              indent=1, default=str)
+               control=control, **MODEL)
+    dump_results("battery_falsrepair_c2_results.json",
+                 battery_source=os.path.abspath(__file__))
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         print("%-10s %-62s worst %.2f sems, %.1f%% rel"

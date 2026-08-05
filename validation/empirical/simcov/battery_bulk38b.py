@@ -23,12 +23,23 @@ approach the pure migration-drift value, which is the regime the corpus's
 `fstMigrationDriftEquilibrium` is written for.
 """
 import json
+import os
 import math
 
 import numpy as np
 
 import simlib
-from battery_core import RESULTS, record
+from battery_core import RESULTS, dump_results, record
+
+# `realised_inputs=True`: theta and bigM are the exact constants the demography
+# was built from, not estimates off the replicates the oracle measures.  Left
+# undeclared, every rejection below -- which is the entire point of a design
+# that puts both forces at order one -- came back as a LEAD.
+MODEL = dict(realised_inputs=True)
+
+# The (theta, bigM) design, named once so the corrected-body row can be
+# built from the same cells rather than from a second copy of the list.
+GRID = ((1.0, 1.0), (2.0, 0.5), (0.5, 2.0), (3.0, 3.0))
 
 NE = 500
 
@@ -84,7 +95,7 @@ def identities(theta, bigM, reps=40, seed=48001):
 def main():
     cells, c_mult, c_theta, c_m = [], [], [], []
     control = None
-    for theta, bigM in ((1.0, 1.0), (2.0, 0.5), (0.5, 2.0), (3.0, 3.0)):
+    for theta, bigM in GRID:
         sw, sb = identities(theta, bigM)
         # F_ST from identity probabilities
         fst = (sw["mean"] - sb["mean"]) / max(1 - sb["mean"], 1e-9)
@@ -125,17 +136,34 @@ def main():
            "from DIFFERENT demes are identical by state, over all ordered cross "
            "pairs and 40 replicates. theta and bigM are both held at order one "
            "so their composition is on trial rather than one of them vanishing")
+    # THE BARE ROW IS THE BODY DGP.lean ACTUALLY CONTAINS.  When this battery
+    # was written that was `1/(1 + theta + bigM)`; the falsification it recorded
+    # is what moved the body to `1/(1 + theta + 2*bigM)`, and leaving the old
+    # transcription bare would file a superseded formula as the corpus row and
+    # put a permanent FALSIFIED beside battery_falsrepair's MATCH -- a
+    # contradiction that is really two different formulas, not two answers.
+    # The corrected body costs no extra simulation: same measured cells, a
+    # different `lean` column.
+    c_corrected = [dict(c, lean=1.0 / (1 + th + 2 * M))
+                   for c, (th, M) in zip(cells, GRID)]
     record("EvolutionaryParameters.fstEquilibrium", "DGP.lean",
-           "1 / (1 + theta + bigM)", cells, regime=reg, control=control)
+           "1 / (1 + theta + 2 * bigM)", c_corrected, regime=reg,
+           control=control, **MODEL)
+    record("fstEquilibrium [superseded body 1/(1+theta+bigM), competing]",
+           "DGP.lean", "1 / (1 + theta + bigM)", cells, regime=reg,
+           control=control, **MODEL)
     record("fstEquilibrium [multiplicative composition, competing]", "DGP.lean",
            "1 / ((1 + theta) * (1 + bigM))", c_mult, regime=reg,
-           control=control)
+           control=control, **MODEL)
     record("fstEquilibrium [migration ignored, competing]", "DGP.lean",
-           "1 / (1 + theta)", c_theta, regime=reg, control=control)
+           "1 / (1 + theta)", c_theta, regime=reg, control=control, **MODEL)
     record("fstEquilibrium [mutation ignored, competing]", "DGP.lean",
-           "1 / (1 + bigM)", c_m, regime=reg, control=control)
-    json.dump(RESULTS, open("battery_bulk38_results.json", "w"), indent=1,
-              default=str)
+           "1 / (1 + bigM)", c_m, regime=reg, control=control, **MODEL)
+    # NOT `battery_bulk38_results.json`: that is battery_bulk38's own results
+    # file, and writing it here silently replaced one battery's evidence with
+    # another's under the first one's name.
+    dump_results("battery_bulk38b_results.json",
+                 battery_source=os.path.abspath(__file__))
     print("\n================ SUMMARY ================")
     for r in RESULTS:
         w = r.get("worst", {})
