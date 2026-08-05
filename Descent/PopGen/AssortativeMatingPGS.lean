@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
+import Descent.Core.Ratios
 
 namespace Descent.PopGen
 
@@ -866,6 +867,19 @@ section PopulationStructure
     larger than the neighbourhood size, and at 40 demes it did not have one. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
+
+/-- **The isolation-by-distance `F_ST` has the odds-like shape**, `a / (a + 2b)`, at
+`a = d` and `b = 2·N·σ²`.
+
+`Core.oddsLike` is the same map `coalFst` and `qst` are built on -- `t/(t + 2Nₑ)` and
+`V_b/(V_b + 2V_w)` -- so this places neighbourhood-size differentiation beside them rather
+than leaving three quotients that resemble each other. The `4` in the body is `2 · 2`: one
+factor is the kernel's, and the other is the `2Nσ²` neighbourhood size the law is written
+in. -/
+theorem ibdFst_eq_oddsLike (d N sigma_sq : ℝ) :
+    ibdFst d N sigma_sq = Descent.Core.oddsLike d (2 * N * sigma_sq) := by
+  unfold ibdFst Descent.Core.oddsLike
+  ring_nf
 
 /-- **ibdFst where its denominator vanishes, named.** The guard `4 * N * sigma_sq + d` is zero at `d
 = 0`, `N = 0`, `sigma_sq = 0`. Lean returns `0` there rather than the value the modelled

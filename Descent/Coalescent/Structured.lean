@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
+import Descent.Core.Ratios
 import Mathlib.Tactic
 
 namespace Descent
@@ -105,6 +106,38 @@ them: it is the standard ratio-of-times reading of `F_ST` applied to two numbers
 already fixed, so a measurement of it is a measurement of those. -/
 noncomputable def fstFromMigration (M : ℝ) : ℝ :=
   (meanTimeDiff M - meanTimeSame M) / meanTimeDiff M
+
+/-- **This is the Hudson ratio-of-times `F_ST`, on the kernel the corpus states it with.**
+
+The body reads `(T_diff - T_same)/T_diff`, which is `1 - T_same/T_diff`: exactly
+`Core.proportionalReduction` applied to the two mean coalescence times. Saying so places
+this quantity in the `F_ST` lattice rather than leaving it as a ratio that happens to look
+like one -- `Portability.hudsonFstFromCoalescenceTimes` and `PopGen.fstFromHetRatio` are
+the same kernel on the same convention, and `Program.Conventions`'
+`slatkin_hetRatio_eq_coalescenceRatio` is the edge between times and heterozygosities.
+
+It matters WHICH `F_ST` this is. The corpus has measured Nei's estimator failing the split
+law at up to 18.59 sems where Hudson's matches at 0.03, so a structured-coalescent quantity
+that did not say which convention it computes would be a place for that error to enter. -/
+theorem fstFromMigration_eq_proportionalReduction (M : ℝ) (h : meanTimeDiff M ≠ 0) :
+    fstFromMigration M
+      = Descent.Core.proportionalReduction (meanTimeSame M) (meanTimeDiff M) := by
+  unfold fstFromMigration Descent.Core.proportionalReduction
+  rw [sub_div, div_self h]
+
+/-- **And the hypothesis is not decoration: the two disagree at the junk point.**
+
+With `meanTimeDiff M = 0` the body divides by zero and Lean returns `0`, while the kernel
+computes `1 - T_same/0 = 1 - 0 = 1`. Same quantity, same convention, opposite junk values,
+because the zero enters one as a numerator's divisor and the other as a subtrahend's. A
+reader who took the identity above as unconditional would carry `1` where the definition
+gives `0`. -/
+theorem fstFromMigration_ne_proportionalReduction_at_zero (M : ℝ)
+    (h : meanTimeDiff M = 0) :
+    fstFromMigration M = 0 ∧
+      Descent.Core.proportionalReduction (meanTimeSame M) (meanTimeDiff M) = 1 := by
+  unfold fstFromMigration Descent.Core.proportionalReduction
+  rw [h]; simp
 
 /-- **Wright's island formula, in coalescent dress: `F_ST = 1/(1 + 2M)`.**
 
