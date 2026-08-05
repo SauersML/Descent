@@ -459,27 +459,6 @@ IDENT_ROOT = str(CORPUS)
 # Every budget is 0. Nothing is grandfathered: a screen that permits N existing
 # instances of the defect it names is a screen that has agreed to the defect,
 # and "it was already there" is not a standard. A count above 0 fails the build.
-CONVENTION_SITE_BUDGET = 0          # ploidy/coalescent constants restated inline
-ISOLATED_MODULE_BUDGET = 0          # modules no theorem cross-relates to another
-UNDECLARED_BUDGET = 0               # empirical defs with no status marker
-UNRELATED_BUDGET = 0                # same-quantity siblings no theorem relates
-MISSING_ARG_BUDGET = 0              # signatures omitting a dependency of the named quantity
-CONFLATION_BUDGET = 0               # one formula under names from different concept families
-CONVENTION_DECL_BUDGET = 0          # composable quantities with no declared convention
-OVERCLAIM_BUDGET = 0                # untested definitions whose docstring claims exactness
-EQUILIBRIUM_BUDGET = 0              # equilibria stipulated as a closed form, never derived
-DUPLICATE_BODY_BUDGET = 0           # one body under two names, tied by nothing
-REGIME_DECL_BUDGET = 0              # drift regimes baked into a body instead of a hypothesis
-UNDERDELIVERY_BUDGET = 0            # docstring attributes an identity the signature does not prove
-INHERITED_VALIDATION_BUDGET = None  # VALIDATED inherited from a sibling identity; pin on first run
-UNRESOLVED_CANDIDATE_BUDGET = 0     # self-declared alternative never discriminated from its sibling
-UNRESOLVED_FORK_BUDGET = None       # two defs of one observable related only by an inequality
-VACUOUS_VALIDATION_BUDGET = None    # VALIDATED with no recorded power; pin on first run
-LAUNDERED_PROP_BUDGET = 0           # named propositions only ever assumed, never established
-UNWITNESSED_BUNDLE_BUDGET = 0       # assumption bundles no concrete construction satisfies
-INSTANCE_LAUNDERING_BUDGET = 0      # supplied fields turned into silently-binding instances
-UNCONDITIONAL_NAME_BUDGET = 0       # conditional results named as though unconditional
-DOMAIN_NAMED_ARITHMETIC_BUDGET = 0  # genetics in the name, free reals in the goal
 
 # THE RECORD THE ZEROING WOULD OTHERWISE HAVE DESTROYED.
 #
@@ -824,9 +803,9 @@ def run_identifications() -> int:
                 continue
             if "Empirical status:" not in ident_preceding_docstring(raw, i):
                 undeclared.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{short}` has no Empirical status")
-    if len(undeclared) > UNDECLARED_BUDGET:
+    if undeclared:
         bad.append(f"definitions making an empirical claim without an Empirical status marker: "
-                   f"{len(undeclared)}, budget {UNDECLARED_BUDGET}")
+                   f"{len(undeclared)}")
         bad.extend("    " + u for u in undeclared)
 
     # 3c. Unrelated same-quantity definitions. Two definitions are the same
@@ -905,9 +884,9 @@ def run_identifications() -> int:
             if not tied:
                 unrelated.extend(f"{m}:{n}" for m, n in members)
     unrelated = sorted(set(unrelated))
-    if len(unrelated) > UNRELATED_BUDGET:
+    if unrelated:
         bad.append(f"same-quantity definitions never related to a sibling by any theorem: "
-                   f"{len(unrelated)}, budget {UNRELATED_BUDGET}")
+                   f"{len(unrelated)}")
         bad.extend("    " + item for item in unrelated)
 
     # 3d. Missing-argument screen. Six of the eleven falsified definitions failed
@@ -1003,9 +982,9 @@ def run_identifications() -> int:
                     continue   # omission is exact in a regime the docstring names
                 missing.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` takes no "
                                f"{needed[0]}-like argument and declares no regime; {why}")
-    if len(missing) > MISSING_ARG_BUDGET:
+    if missing:
         bad.append(f"definitions omitting an argument the named quantity depends on: "
-                   f"{len(missing)}, budget {MISSING_ARG_BUDGET}")
+                   f"{len(missing)}")
         bad.extend("    " + x for x in missing)
 
     # 3d-ter. UNRESOLVED CANDIDATE. A definition whose own docstring calls it a
@@ -1038,9 +1017,9 @@ def run_identifications() -> int:
                 continue
             unresolved.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` declares itself an "
                               f"alternative but carries no discriminating measurement")
-    if len(unresolved) > UNRESOLVED_CANDIDATE_BUDGET:
+    if unresolved:
         bad.append(f"self-declared alternatives never discriminated from their sibling: "
-                   f"{len(unresolved)}, budget {UNRESOLVED_CANDIDATE_BUDGET}; measure the "
+                   f"{len(unresolved)}measure the "
                    f"two apart or drop one")
         bad.extend("    " + x for x in unresolved)
 
@@ -1098,12 +1077,9 @@ def run_identifications() -> int:
                     continue
                 if sum(1 for n in present if not def_status.get(n)) >= 2:
                     forks.add(tuple(sorted(present)))
-    if UNRESOLVED_FORK_BUDGET is None:
-        for x in sorted(forks)[:10]:
-            print(f"  advisory (unresolved fork): {' vs '.join(x)}")
-    elif len(forks) > UNRESOLVED_FORK_BUDGET:
+    if forks:
         bad.append(f"definitions of one observable related only by an inequality, neither "
-                   f"measured: {len(forks)}, budget {UNRESOLVED_FORK_BUDGET}")
+                   f"measured: {len(forks)}")
         bad.extend("    " + " vs ".join(x) for x in sorted(forks))
 
     # 3d-bis. Overclaiming. Two of the falsified definitions carried the word
@@ -1122,9 +1098,9 @@ def run_identifications() -> int:
             if claim:
                 overclaim.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` is UNTESTED but its "
                                  f"docstring claims \"{claim.group(1)}\"")
-    if len(overclaim) > OVERCLAIM_BUDGET:
+    if overclaim:
         bad.append(f"untested definitions whose docstring claims exactness: "
-                   f"{len(overclaim)}, budget {OVERCLAIM_BUDGET}")
+                   f"{len(overclaim)}")
         bad.extend("    " + x for x in overclaim)
 
     # 3f. Convention declarations on composable quantities. A definition
@@ -1152,9 +1128,9 @@ def run_identifications() -> int:
                         f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` takes an ambiguity-prone "
                         f"argument and declares no Convention; {why}")
                     break
-    if len(undeclared_conv) > CONVENTION_DECL_BUDGET:
+    if undeclared_conv:
         bad.append(f"definitions taking an ambiguity-prone quantity with no declared "
-                   f"convention: {len(undeclared_conv)}, budget {CONVENTION_DECL_BUDGET}")
+                   f"convention: {len(undeclared_conv)}")
         bad.extend("    " + x for x in undeclared_conv)
 
 
@@ -1199,9 +1175,9 @@ def run_identifications() -> int:
             if "Denotes:" not in doc:
                 conflated.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{n}` shares a formula with names "
                                  f"from {sorted(fams)} and declares no Denotes")
-    if len(conflated) > CONFLATION_BUDGET:
+    if conflated:
         bad.append(f"definitions sharing one formula across concept families with no Denotes "
-                   f"declaration: {len(conflated)}, budget {CONFLATION_BUDGET}")
+                   f"declaration: {len(conflated)}")
         bad.extend("    " + x for x in conflated)
 
 
@@ -1310,9 +1286,9 @@ def run_identifications() -> int:
                     break
             if not ok:
                 stipulated.append(f"{rel}:{line}  {short}  (no fixed-point theorem)")
-    if len(stipulated) > EQUILIBRIUM_BUDGET:
+    if stipulated:
         bad.append(f"equilibrium definitions with no theorem deriving them as the fixed point "
-                   f"of a process in the same file: {len(stipulated)}, budget {EQUILIBRIUM_BUDGET}; "
+                   f"of a process in the same file: {len(stipulated)}"
                    f"define the one-step map and prove `<name>_isFixedPoint`")
         bad.extend("    " + x for x in stipulated)
 
@@ -1493,9 +1469,9 @@ def run_identifications() -> int:
                     continue
                 duplicates.append(f"{fa}:{la} {na}  ==  {fb}:{lb} {nb}")
     duplicates.sort()
-    if len(duplicates) > DUPLICATE_BODY_BUDGET:
+    if duplicates:
         bad.append(f"alpha-equivalent definition bodies tied by neither a call nor a theorem: "
-                   f"{len(duplicates)}, budget {DUPLICATE_BODY_BUDGET}; make one call the "
+                   f"{len(duplicates)}make one call the "
                    f"other, or state the identity as a theorem")
         bad.extend("    " + x for x in duplicates)
 
@@ -1561,9 +1537,9 @@ def run_identifications() -> int:
                     regimeless.append(
                         f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` carries the closed-population "
                         f"retention factor in its body and declares no Regime")
-    if len(regimeless) > REGIME_DECL_BUDGET:
+    if regimeless:
         bad.append(f"definitions encoding a drift regime with no declared Regime: "
-                   f"{len(regimeless)}, budget {REGIME_DECL_BUDGET}; name the "
+                   f"{len(regimeless)}name the "
                    f"data-generating assumption, see Descent.DriftRegime")
         bad.extend("    " + x for x in regimeless)
 
@@ -1683,9 +1659,9 @@ def run_identifications() -> int:
                     f"{os.path.relpath(f, IDENT_ROOT)}:{raw[:m.start()].count(chr(10)) + 1}: "
                     f"`{name}` claims an identity its conclusion does not state: "
                     f"\"{claim}\"")
-    if len(underdelivered) > UNDERDELIVERY_BUDGET:
+    if underdelivered:
         bad.append(f"docstrings attributing an identity the statement does not deliver: "
-                   f"{len(underdelivered)}, budget {UNDERDELIVERY_BUDGET}; state the "
+                   f"{len(underdelivered)}state the "
                    f"identity in the conclusion, or stop claiming it in the prose")
         bad.extend("    " + x for x in underdelivered)
 
@@ -1716,12 +1692,9 @@ def run_identifications() -> int:
     #     and failing the build on all of them at once would be noise rather than
     #     signal. Pin INHERITED_VALIDATION_BUDGET to the first reported count and
     #     ratchet it down, exactly as CONVENTION_SITE_BUDGET was.
-    if INHERITED_VALIDATION_BUDGET is None:
-        for x in inherited[:10]:
-            print(f"  advisory (inherited validation): {x}")
-    elif len(inherited) > INHERITED_VALIDATION_BUDGET:
+    if inherited:
         bad.append(f"VALIDATED tags justified by a sibling identity rather than a measurement: "
-                   f"{len(inherited)}, budget {INHERITED_VALIDATION_BUDGET}")
+                   f"{len(inherited)}")
         bad.extend("    " + x for x in inherited)
 
     # 3l. Validation with no power. `neutralAFBenchmarkRatio` was recorded as
@@ -1759,12 +1732,9 @@ def run_identifications() -> int:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause declares a span of "
                                  f"only {max(nums) - min(nums):.4f}; a near-constant prediction "
                                  f"cannot reject a wrong functional form")
-    if VACUOUS_VALIDATION_BUDGET is None:
-        for x in powerless[:12]:
-            print(f"  advisory (validation power unstated): {x}")
-    elif len(powerless) > VACUOUS_VALIDATION_BUDGET:
+    if powerless:
         bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}, "
-                   f"budget {VACUOUS_VALIDATION_BUDGET}; record the spread of the prediction "
+                   f"record the spread of the prediction "
                    f"across the design, see Descent.DriftRegime")
         bad.extend("    " + x for x in powerless)
 
@@ -1863,10 +1833,10 @@ def run_identifications() -> int:
         "%s:%d  `%s` is assumed by %d theorem(s) and established by nothing"
         % (prop_defs[p][0], prop_defs[p][1], p, len(ts))
         for p, ts in assumed_by.items() if p not in produced)
-    if len(laundered) > LAUNDERED_PROP_BUDGET:
-        bad.append("named propositions only ever assumed, never established: %d, budget %d; "
+    if laundered:
+        bad.append("named propositions only ever assumed, never established: %d; "
                    "prove one concrete object satisfies it, or admit it with `sorry` so the "
-                   "debt is enumerable" % (len(laundered), LAUNDERED_PROP_BUDGET))
+                   "debt is enumerable" % len(laundered))
         bad.extend("    " + x for x in laundered)
 
     # 3n. Assumption bundles nothing satisfies (step 3 of the recipe). A
@@ -1894,10 +1864,10 @@ def run_identifications() -> int:
         "%s:%d  `%s` bundles %d hypothesis field(s) and is never constructed"
         % (v[0], v[1], k, v[2])
         for k, v in bundles.items() if k not in produced)
-    if len(unwitnessed) > UNWITNESSED_BUNDLE_BUDGET:
-        bad.append("hypothesis bundles no construction ever satisfies: %d, budget %d; "
+    if unwitnessed:
+        bad.append("hypothesis bundles no construction ever satisfies: %d; "
                    "build one concrete instance, or the theorems over it are vacuous"
-                   % (len(unwitnessed), UNWITNESSED_BUNDLE_BUDGET))
+                   % len(unwitnessed))
         bad.extend("    " + x for x in unwitnessed)
 
     # 3o. Instances synthesised from supplied fields (step 4). The defect is an
@@ -1957,10 +1927,10 @@ def run_identifications() -> int:
             laundered_inst.append("%s:%d: an instance is built by projecting `%s` out of its "
                                   "own parameter" % (rel, src[:m.start()].count("\n") + 1,
                                                      m.group(2)))
-    if len(laundered_inst) > INSTANCE_LAUNDERING_BUDGET:
-        bad.append("supplied hypotheses installed as typeclass instances: %d, budget %d; "
+    if laundered_inst:
+        bad.append("supplied hypotheses installed as typeclass instances: %d; "
                    "pass the fact explicitly so the dependency stays visible in the signature"
-                   % (len(laundered_inst), INSTANCE_LAUNDERING_BUDGET))
+                   % len(laundered_inst))
         bad.extend("    " + x for x in laundered_inst)
 
     # 3p. Unconditional names on conditional results (step 5). The four screens
@@ -1994,10 +1964,10 @@ def run_identifications() -> int:
             continue
         misnamed.append("`%s` rests on %s, which nothing establishes, and neither its name "
                         "nor an `Assumes:` clause says so" % (tname, ", ".join(rests_on[:3])))
-    if len(misnamed) > UNCONDITIONAL_NAME_BUDGET:
-        bad.append("conditional results named as though unconditional: %d, budget %d; "
+    if misnamed:
+        bad.append("conditional results named as though unconditional: %d; "
                    "name the assumption in the theorem or declare `Assumes:` in its docstring"
-                   % (len(misnamed), UNCONDITIONAL_NAME_BUDGET))
+                   % len(misnamed))
         bad.extend("    " + x for x in misnamed)
 
     # 3q. Genetics in the name, arithmetic in the statement. Guard 3p asks
@@ -2197,16 +2167,11 @@ def run_identifications() -> int:
             domain_named_arithmetic.append(
             "`%s` names genetics but its goal mentions no constant this corpus "
             "defines" % tname)
-    if DOMAIN_NAMED_ARITHMETIC_BUDGET is None:
-        print(f"  advisory (genetics-asserting names on domain-free statements): "
-              f"{len(domain_named_arithmetic)}")
-        for x in domain_named_arithmetic[:12]:
-            print(f"    {x}")
-    elif len(domain_named_arithmetic) > DOMAIN_NAMED_ARITHMETIC_BUDGET:
-        bad.append("genetics-asserting names on domain-free statements: %d, budget %d; "
+    if domain_named_arithmetic:
+        bad.append("genetics-asserting names on domain-free statements: %d; "
                    "either state the theorem about a defined quantity or name it for "
                    "the arithmetic it does"
-                   % (len(domain_named_arithmetic), DOMAIN_NAMED_ARITHMETIC_BUDGET))
+                   % len(domain_named_arithmetic))
         bad.extend("    " + x for x in domain_named_arithmetic)
 
     # 3e. Cheap structural integrity, run before the build so that a broken
@@ -2257,18 +2222,18 @@ def run_identifications() -> int:
     defining = {m for m in owner.values()}
     all_mods = {os.path.basename(f)[:-5] for f in ident_lean_files()}
     isolated = sorted(m for m in all_mods & defining if not linked.get(m))
-    if len(isolated) > ISOLATED_MODULE_BUDGET:
-        bad.append(f"semantically isolated modules rose to {len(isolated)}, budget "
-                   f"{ISOLATED_MODULE_BUDGET}: {', '.join(isolated)}; relate the new "
+    if isolated:
+        bad.append(f"semantically isolated modules: {len(isolated)}: "
+                   f"{', '.join(isolated)}; relate the new "
                    f"module's quantities to an existing one so it can be contradicted")
 
-    if sites > CONVENTION_SITE_BUDGET:
+    if sites:
         # NAME the sites. This reported a bare count for a long time, and a
         # count is not actionable: locating the offenders meant re-implementing
         # the screen's own detection by hand -- domain-name test, ploidy regex,
         # tied set -- which someone did, correctly, to answer "is this mine?".
         # A guard that can find a finding can afford to say where it is.
-        bad.append(f"convention restatement sites rose to {sites}, budget {CONVENTION_SITE_BUDGET}; "
+        bad.append(f"convention restatement sites rose to {sites}"
                    f"relate the new constant to `ploidy` in Conventions.lean instead of inlining it"
                    + "".join(f"\n      {s}" for s in sorted(site_names)))
 
@@ -2295,12 +2260,12 @@ def run_identifications() -> int:
         for name, (was, commit, when) in sorted(LAST_PINNED_BEFORE_ZEROING.items()):
             print(f"  {name:32s} was {was:3d}  pinned {commit} {when}")
         return 1
-    print(f"structural guards pass: convention sites {sites}/{CONVENTION_SITE_BUDGET}, "
-          f"undeclared {len(undeclared)}/{UNDECLARED_BUDGET}, conventions {len(undeclared_conv)}/{CONVENTION_DECL_BUDGET}, "
-          f"unrelated {len(unrelated)}/{UNRELATED_BUDGET}, "
-          f"stipulated equilibria {len(stipulated)}/{EQUILIBRIUM_BUDGET}, "
-          f"duplicate bodies {len(duplicates)}/{DUPLICATE_BODY_BUDGET}, "
-          f"isolated modules {len(isolated)}/{ISOLATED_MODULE_BUDGET}, "
+    print(f"structural guards pass: convention sites {sites}, "
+          f"undeclared {len(undeclared)}, conventions {len(undeclared_conv)}, "
+          f"unrelated {len(unrelated)}, "
+          f"stipulated equilibria {len(stipulated)}, "
+          f"duplicate bodies {len(duplicates)}, "
+          f"isolated modules {len(isolated)}, "
           f"admissions {len(admissions)} (reported, not trusted)")
     return 0
 
@@ -4117,9 +4082,6 @@ def run_field_proofs() -> int:
 # build error rather than a silent drift.  That is the outcome these screens
 # exist to produce, so producing it is not a finding.
 
-DUPLICATE_STATEMENT_BUDGET = 0   # one proposition proved twice under two names
-DUPLICATE_PROOF_BUDGET = 0       # one proof script serving two different statements
-CLONE_BLOCK_BUDGET = 0           # a run of source lines repeated verbatim
 
 # A clone is CLONE_WINDOW or more repeated lines carrying at least CLONE_MIN_CHARS
 # of text.  Both thresholds exist to keep the screen off Lean's unavoidable
@@ -4629,29 +4591,29 @@ def run_duplication() -> int:
     clones = dup_clones()
 
     failures = []
-    if len(dup_statements) > DUPLICATE_STATEMENT_BUDGET:
+    if dup_statements:
         failures.append(
             f"theorems stating the same proposition under different names: "
-            f"{len(dup_statements)}, budget {DUPLICATE_STATEMENT_BUDGET}; delete all "
+            f"{len(dup_statements)}delete all "
             f"but one, or -- if both names are wanted -- prove one FROM the other so "
             f"the corpus records that they are the same claim")
         for key, members in dup_statements:
             failures.append(f"    {_clip(key, 92)}")
             for d in members:
                 failures.append(f"        {d.file}:{d.line}  {d.name}")
-    if len(dup_proofs) > DUPLICATE_PROOF_BUDGET:
+    if dup_proofs:
         failures.append(
             f"identical proof scripts under different statements: {len(dup_proofs)}, "
-            f"budget {DUPLICATE_PROOF_BUDGET}; the repeated script is an unnamed lemma "
+            f"the repeated script is an unnamed lemma "
             f"-- name it and apply it")
         for proof, members in dup_proofs:
             failures.append(f"    {_clip(proof, 92)}")
             for d in members:
                 failures.append(f"        {d.file}:{d.line}  {d.name}")
-    if len(clones) > CLONE_BLOCK_BUDGET:
+    if clones:
         failures.append(
             f"verbatim repeated source blocks of {CLONE_WINDOW}+ lines: {len(clones)}, "
-            f"budget {CLONE_BLOCK_BUDGET}; factor the repeated text, or say in the "
+            f"factor the repeated text, or say in the "
             f"corpus what makes the two copies different")
         for length, sites in clones:
             failures.append(f"    {length} lines: " + "  ==  ".join(sites))
@@ -4662,9 +4624,9 @@ def run_duplication() -> int:
             print("  " + line)
         return 1
     print(f"duplication guard passes: duplicate statements "
-          f"{len(dup_statements)}/{DUPLICATE_STATEMENT_BUDGET}, duplicate proofs "
-          f"{len(dup_proofs)}/{DUPLICATE_PROOF_BUDGET}, repeated {CLONE_WINDOW}+-line "
-          f"blocks {len(clones)}/{CLONE_BLOCK_BUDGET} "
+          f"{len(dup_statements)}, duplicate proofs "
+          f"{len(dup_proofs)}, repeated {CLONE_WINDOW}+-line "
+          f"blocks {len(clones)} "
           f"(over {len(theorems)} theorems)")
     return 0
 
@@ -4719,7 +4681,6 @@ def run_duplication() -> int:
 # Every budget here is 0, like every other budget in this file.  Nothing is
 # grandfathered: the four known collisions were removed before the guard
 # landed, not pinned.
-MATHLIB_COLLISION_BUDGET = 0
 
 MATHLIB_DECL = re.compile(
     r"^(?:@\[[^\]]*\][ \t]*)?"
@@ -4868,7 +4829,6 @@ MATHLIB_SHAPE_MIN_OPERATORS = 2
 # separate nothing.
 MATHLIB_SHAPE_OPERATORS = re.compile(
     r"[+\-*/<>=^≤≥≠∑∏∫∈⊆∀∃¬∧∨→↔]|⁻¹|\|\|")
-MATHLIB_SHAPE_BUDGET = 0
 
 MATHLIB_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'!?]*(?:\.[A-Za-z_][A-Za-z0-9_'!?]*)*")
 
@@ -5145,21 +5105,21 @@ def run_mathlib() -> int:
                                      skeleton))
 
     bad = False
-    if len(collisions) > MATHLIB_COLLISION_BUDGET:
+    if collisions:
         bad = True
         print(f"mathlib guard FAILS: corpus declarations whose name Mathlib already "
-              f"uses: {len(collisions)}, budget {MATHLIB_COLLISION_BUDGET}; import the "
+              f"uses: {len(collisions)}import the "
               f"Mathlib declaration and delete the local one, or -- if the two really "
               f"state different things -- rename the local one and record why in "
               f"MATHLIB_EXEMPT")
         for rel, lineno, name, where in sorted(collisions):
             print(f"  {rel}:{lineno}  {name}  <-  {where}")
 
-    if len(restatements) > MATHLIB_SHAPE_BUDGET:
+    if restatements:
         bad = True
         print(f"mathlib guard FAILS: corpus theorems whose CONCLUSION is a Mathlib "
-              f"theorem's, under a different name: {len(restatements)}, budget "
-              f"{MATHLIB_SHAPE_BUDGET}; use the Mathlib lemma. If the corpus one is "
+              f"theorem's, under a different name: {len(restatements)}; "
+              f"use the Mathlib lemma. If the corpus one is "
               f"genuinely different -- a different type, a stronger conclusion the "
               f"normal form cannot see -- say which in MATHLIB_EXEMPT")
         for rel, lineno, name, where, skeleton in sorted(restatements):
@@ -5169,9 +5129,9 @@ def run_mathlib() -> int:
     if bad:
         return 1
 
-    print(f"mathlib guard passes: name collisions {len(collisions)}/"
-          f"{MATHLIB_COLLISION_BUDGET}, restated conclusions {len(restatements)}/"
-          f"{MATHLIB_SHAPE_BUDGET}, over {scanned} corpus declarations against "
+    print(f"mathlib guard passes: name collisions {len(collisions)}, "
+          f"restated conclusions {len(restatements)}, "
+          f"over {scanned} corpus declarations against "
           f"{len(upstream)} Mathlib names and {len(upstream_shapes)} Mathlib "
           f"statement shapes (read from {root})")
     return 0
@@ -5219,12 +5179,6 @@ def run_mathlib() -> int:
 # twice deleted correct work here.  A ledger entry's `source` is free text that
 # no rule inspects.
 
-CONVENTION_STATUS_BUDGET = 0       # `Empirical status:` heads outside the closed vocabulary
-CONVENTION_MULTISTATUS_BUDGET = 0  # docstrings stating more than one `Empirical status:`
-CONVENTION_UNLEDGERED_BUDGET = 0   # complete-scope declarations with no ledger entry
-CONVENTION_STALE_BUDGET = 0        # ledger entries naming declarations that are gone
-CONVENTION_UNBRIDGED_BUDGET = 0    # incompatible conventions sharing a module, unrelated
-CONVENTION_CONSTANT_BUDGET = 0     # ledgered constants the body no longer carries
 
 CONVENTION_LEDGER = "validation/conventions.json"
 
@@ -5576,13 +5530,11 @@ def run_conventions() -> int:
                 + (f"; {entry['note']}" if "note" in entry else ""))
 
     failures = []
-    for label, found, budget, advice in (
+    for label, found, advice in (
         ("`Empirical status:` heads outside the closed vocabulary", statuses,
-         CONVENTION_STATUS_BUDGET,
          "the vocabulary is `empirical_status_vocabulary` in the ledger; a new "
          "verdict belongs IN it, with what it means, not beside it"),
         ("docstrings stating more than one `Empirical status:`", multistatus,
-         CONVENTION_MULTISTATUS_BUDGET,
          "there are THREE repairs and they are not interchangeable. If one marker "
          "SUPERSEDES the other, delete the superseded one and keep its evidence as "
          "history. If BOTH are true -- unmeasurable in general, validated on a "
@@ -5592,26 +5544,22 @@ def run_conventions() -> int:
          "tell quotation from assertion, and neither can a reader who stops at "
          "the first line"),
         ("ledger entries that no longer match the corpus", stale,
-         CONVENTION_STALE_BUDGET,
          "repoint the entry, or delete it if the declaration is gone for good"),
         ("declarations carrying a ledgered quantity with no ledger entry", unledgered,
-         CONVENTION_UNLEDGERED_BUDGET,
          "add an entry naming which convention it uses and where that convention "
          "comes from"),
         ("modules mixing incompatible conventions with nothing relating them", unbridged,
-         CONVENTION_UNBRIDGED_BUDGET,
          "prove a bridge theorem and name it in `bridges`, or move one of the "
          "declarations"),
         ("ledgered constants the body no longer carries", constants,
-         CONVENTION_CONSTANT_BUDGET,
          "if the body is right the ledger is stale and the SOURCE should be "
          "re-read before updating it; that re-reading is the point"),
-        ("malformed ledger entries", malformed, 0,
+        ("malformed ledger entries", malformed,
          "fix the ledger; a name it does not define is a name nobody checked"),
     ):
-        if len(found) > budget:
-            failures.append(f"conventions guard FAILS: {label}: {len(found)}, "
-                            f"budget {budget}; {advice}")
+        if found:
+            failures.append(f"conventions guard FAILS: {label}: {len(found)}; "
+                            f"{advice}")
             failures.extend("    " + x for x in found)
 
     if failures:

@@ -278,7 +278,6 @@ def _evaluate_conjunct(api, conjunct):
 # Budget 0, and it must stay 0.  Pinning it to the current count would record
 # how many the corpus was carrying on the day somebody was in a hurry, which is
 # the opposite of what this guard is for.
-DEGENERATE_REFERENCE_BUDGET = 0
 
 REPAIR_ADVICE = """
   A reference evaluation exists to reject a rescaled competitor: it states a
@@ -325,9 +324,8 @@ def main():
         return 0
 
     degenerate = counts.get("DEGENERATE", 0)
-    print(f"\nvacuous reference evaluations: {degenerate}, "
-          f"budget {DEGENERATE_REFERENCE_BUDGET}")
-    if degenerate > DEGENERATE_REFERENCE_BUDGET:
+    print(f"\nvacuous reference evaluations: {degenerate}")
+    if degenerate:
         print(REPAIR_ADVICE)
         print("FAIL: the corpus states a reference value of zero somewhere, so that "
               "theorem pins nothing.")
