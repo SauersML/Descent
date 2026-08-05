@@ -360,7 +360,7 @@ which are the same body in two records' fields.
 **The `2` is the deme correction, and the deme count is `2`.** Both records define
 `bigM` as `scaledMigrationRate`, which is `4 Nₑ m` -- `PopGenParameters.bigM` by
 definition and `EvolutionaryParameters.bigM` by
-`Program.EvolutionaryParameters_bigM_eq_ploidy_form` -- so `2M` is `8 Nₑ m`, while the
+`PopGen.EvolutionaryParameters_bigM_eq_ploidy_form` -- so `2M` is `8 Nₑ m`, while the
 master carries `4 Nₑ m · d/(d-1)`. Those agree exactly at `d = 2`. So the free-looking
 coefficient on `M` is not a coordinate artefact and not a many-deme reading: it is
 `islandDemeCorrection` evaluated at the two-population split that most of this corpus's
@@ -822,7 +822,7 @@ spellings of one. Without an exhibited point the conflation can be
 reintroduced by anyone who reads the `neiGst` name and believes it. -/
 theorem neiGst_ne_hudsonFst :
     neiGst (1/5) (3/5) ≠ hudsonFst (1/5) (3/5) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint
   norm_num
 
 /-- **A witness ON the `p̄ = 1/2` slice**, where the estimators are sometimes
@@ -836,7 +836,7 @@ from `neiGst_ne_hudsonFst` because that witness sits at `p̄ = 2/5` and
 so cannot exclude the slice that was actually claimed. -/
 theorem neiGst_ne_hudsonFst_at_mean_half :
     neiGst (9/10) (1/10) ≠ hudsonFst (9/10) (1/10) := by
-  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint
   norm_num
 
 /-- **NO FIXED FACTOR CONVERTS NEI'S `G_ST` INTO HUDSON'S `F_ST`.**
@@ -867,7 +867,7 @@ theorem no_constant_scales_neiGst_to_hudsonFst :
   rintro ⟨c, hc⟩
   have h₁ := hc (1/5) (3/5) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
   have h₂ := hc (9/10) (1/10) (by norm_num) (by norm_num) (by norm_num) (by norm_num)
-  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint ploidy at h₁ h₂
+  unfold neiGst hudsonFst ploidy meanAlleleFreq midpoint at h₁ h₂
   norm_num at h₁ h₂
   linarith
 
@@ -893,7 +893,7 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
         (meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
   have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
-  unfold neiGst betweenSubgroupVariance ploidy halfDiffSq ploidy
+  unfold neiGst betweenSubgroupVariance ploidy halfDiffSq
   field_simp
   ring
 
@@ -919,6 +919,6 @@ is `1/2`, and `G_ST` collapses to `(1 - ploidy · p)²`. This is the only place 
 denominator's `ploidy` is visible as a number, and it is what makes the next theorem an
 identity rather than a proportionality. -/
 theorem neiGst_at_fold (p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2 := by
-  unfold neiGst meanAlleleFreq ploidy midpoint ploidy; ring
+  unfold neiGst meanAlleleFreq ploidy midpoint; ring
 
 end Descent.Core
