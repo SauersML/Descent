@@ -734,6 +734,7 @@ def run_identifications() -> int:
             tied.update(re.findall(r"[A-Za-z_][A-Za-z_0-9']*", stmt))
 
     sites = 0
+    site_names = []
     for f in ident_lean_files():
         if f.endswith("Conventions.lean"):
             continue
@@ -753,6 +754,7 @@ def run_identifications() -> int:
                 continue
             if mult.search(body) and short not in tied:
                 sites += 1
+                site_names.append(f"{os.path.relpath(f, IDENT_ROOT)}::{short}")
     # 3b. Undeclared empirical definitions. Every definition whose name carries
     #     domain vocabulary, or whose body contains a modelling constant, is a
     #     claim about an observable. It must declare an Empirical status, even
@@ -2246,8 +2248,14 @@ def run_identifications() -> int:
                    f"module's quantities to an existing one so it can be contradicted")
 
     if sites > CONVENTION_SITE_BUDGET:
+        # NAME the sites. This reported a bare count for a long time, and a
+        # count is not actionable: locating the offenders meant re-implementing
+        # the screen's own detection by hand -- domain-name test, ploidy regex,
+        # tied set -- which someone did, correctly, to answer "is this mine?".
+        # A guard that can find a finding can afford to say where it is.
         bad.append(f"convention restatement sites rose to {sites}, budget {CONVENTION_SITE_BUDGET}; "
-                   f"relate the new constant to `ploidy` in Conventions.lean instead of inlining it")
+                   f"relate the new constant to `ploidy` in Conventions.lean instead of inlining it"
+                   + "".join(f"\n      {s}" for s in sorted(site_names)))
 
     # The ledger prints before the guard verdict, and unconditionally. Printing
     # it after the `return 1` made it dead code on exactly the runs that matter:
