@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
+import Descent.Core.Ratios
 
 namespace Descent.Portability
 
@@ -49,12 +50,12 @@ the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
     carries, where the omission was measured at 72 percent on a recombining
     panel. -/
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
-  β_sq_sum * het
+  Descent.Core.product β_sq_sum het
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pgsVarianceFromHet_at_reference_point :
     pgsVarianceFromHet 1 1 = 1 := by
-  norm_num [pgsVarianceFromHet]
+  norm_num [pgsVarianceFromHet, Descent.Core.product]
 
 
 /-- **Score variance is bilinear in effect scale and heterozygosity.** Rescaling every effect by
@@ -63,7 +64,7 @@ heterozygosity argument. Separating the two orders is what a mutant collapsing t
 theorem pgsVarianceFromHet_bilinear (β_sq_sum het c : ℝ) :
     pgsVarianceFromHet (c * β_sq_sum) het = c * pgsVarianceFromHet β_sq_sum het ∧
       pgsVarianceFromHet β_sq_sum (c * het) = c * pgsVarianceFromHet β_sq_sum het := by
-  constructor <;> unfold pgsVarianceFromHet <;> ring
+  constructor <;> unfold pgsVarianceFromHet Descent.Core.product <;> ring
 
 /-- Target-population heterozygosity from a heterozygosity-loss fraction.
 
@@ -181,7 +182,7 @@ noncomputable def presentDayPGSVariance (V_A fst : ℝ) : ℝ :=
 `pgsVarianceFromHet → targetHetFromFst → presentDayPGSVariance`. -/
 theorem presentDayPGSVariance_eq_one_sub_fst_mul (V_A fst : ℝ) :
     presentDayPGSVariance V_A fst = (1 - fst) * V_A := by
-  unfold presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   ring
 
 /-- The closed-form discrete Wright-Fisher retention factor after `t` generations.
@@ -409,7 +410,7 @@ theorem expected_abs_mean_shift_ratio_eq
     (hfstS_lt_one : fstS < 1) :
     Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
       2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
-  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance pgsVarianceFromHet
+  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have h1 :
       Real.sqrt (2 * (fstS + fstT) * V_A) =
         Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A := by
@@ -529,7 +530,8 @@ theorem presentDayR2_at_island_eq_deployedR2FromIsland
     presentDayR2 V_A V_E (Descent.Core.fstIslandEquilibrium Ne m μ nDemes)
       = Descent.Core.ScoreMoments.deployedR2FromIsland Ne m μ nDemes V_A V_E := by
   unfold presentDayR2 Descent.Core.ScoreMoments.deployedR2FromIsland presentDayPGSVariance
-    pgsVarianceFromHet PopGen.TransportedMetrics.r2FromSignalVariance
+    pgsVarianceFromHet Descent.Core.product
+    PopGen.TransportedMetrics.r2FromSignalVariance
     Descent.Core.ScoreMoments.r2 Descent.Core.ScoreMoments.momentsUnderDrift
     Descent.Core.share Descent.Core.retainedFraction
   -- The two sides write the retained variance in opposite orders, `V_A * (1 - F)` against
@@ -596,7 +598,8 @@ theorem presentDayR2_eq_core (V_A V_E fst : ℝ) :
     presentDayR2 V_A V_E fst = (driftMoments V_A V_E fst).r2 := by
   unfold presentDayR2 driftMoments Descent.Core.ScoreMoments.momentsUnderDrift
     Descent.Core.ScoreMoments.r2 PopGen.TransportedMetrics.r2FromSignalVariance
-    presentDayPGSVariance pgsVarianceFromHet Descent.Core.share
+    presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
+    Descent.Core.share
     Descent.Core.retainedFraction
   have e1 : V_A * (1 - fst) = (1 - fst) * V_A := by ring
   rw [e1]
@@ -817,7 +820,7 @@ theorem drift_degrades_signalToNoise
     (hVA : 0 < V_A) (hVE : 0 < V_E)
     (hfst : fstS < fstT) :
     presentDaySignalToNoise V_A V_E fstT < presentDaySignalToNoise V_A V_E fstS := by
-  unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have hnum : (1 - fstT) * V_A < (1 - fstS) * V_A := by
     nlinarith [mul_lt_mul_of_pos_right hfst hVA]
   have hInv : 0 < V_E⁻¹ := inv_pos.mpr hVE
@@ -863,7 +866,7 @@ theorem drift_degrades_R2
     (hfst : fstS < fstT)
     (hfstT_le_one : fstT ≤ 1) :
     presentDayR2 V_A V_E fstT < presentDayR2 V_A V_E fstS := by
-  unfold presentDayR2 presentDayPGSVariance pgsVarianceFromHet
+  unfold presentDayR2 presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
   have hT_nonneg : 0 ≤ V_A * (1 - fstT) := by
     have : 0 ≤ 1 - fstT := by linarith
     exact mul_nonneg (le_of_lt hVA) this
@@ -899,7 +902,7 @@ theorem drift_degrades_equalVarianceGaussianAUC
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
-      unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet
+      unfold presentDaySignalToNoise presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
       have hnum : 0 ≤ V_A * (1 - fstT) := by
         have h_one_minus : 0 ≤ 1 - fstT := by linarith
         exact mul_nonneg (le_of_lt hVA) h_one_minus

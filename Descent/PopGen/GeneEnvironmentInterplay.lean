@@ -76,12 +76,12 @@ section GxEInteraction
     `G·E` with `E` independent of `G`. The simulation enacts that model, so it establishes
     the marginal slope GIVEN it. -/
 noncomputable def effectiveGeneticEffect (β_G β_GxE E_mean : ℝ) : ℝ :=
-  β_G + β_GxE * E_mean
+  Descent.Core.affineStep β_G β_GxE E_mean
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectiveGeneticEffect_at_reference_point :
     effectiveGeneticEffect 1 1 1 = 2 := by
-  norm_num [effectiveGeneticEffect]
+  norm_num [effectiveGeneticEffect, Descent.Core.affineStep]
 
 
 /-- **GxE creates population-specific genetic effects.**
@@ -92,7 +92,7 @@ theorem gxe_population_specific_effects
     (h_gxe : β_GxE ≠ 0) (h_env_diff : E₁ ≠ E₂) :
     effectiveGeneticEffect β_G β_GxE E₁ ≠
       effectiveGeneticEffect β_G β_GxE E₂ := by
-  unfold effectiveGeneticEffect
+  unfold effectiveGeneticEffect Descent.Core.affineStep
   intro h
   apply h_env_diff
   have : β_GxE * E₁ = β_GxE * E₂ := by linarith
@@ -139,7 +139,7 @@ theorem diet_genetics_bmi_example
     (h_β_GxE : 0 < β_GxE) (h_E_high : E_low < E_high) :
     effectiveGeneticEffect β_G β_GxE E_low <
       effectiveGeneticEffect β_G β_GxE E_high := by
-  unfold effectiveGeneticEffect
+  unfold effectiveGeneticEffect Descent.Core.affineStep
   have : β_GxE * E_low < β_GxE * E_high := mul_lt_mul_of_pos_left h_E_high h_β_GxE
   linarith
 
@@ -403,7 +403,7 @@ theorem equalize_environment_reveals_genetic_portability
     (β_G β_GxE E_s E_t : ℝ) :
     effectiveGeneticEffect β_G β_GxE E_t - effectiveGeneticEffect β_G β_GxE E_s =
       β_GxE * (E_t - E_s) := by
-  unfold effectiveGeneticEffect; ring
+  unfold effectiveGeneticEffect Descent.Core.affineStep; ring
 
 /-! ## Genetic versus environmental attribution: what a cohort calibration cannot see
 

@@ -420,14 +420,14 @@ decomposition `β̂ = β_true + ε̄`, where `ε̄` is the mean estimation error
     definitions that produce a value for it, not at this decomposition. -/
 noncomputable def expectedLinearEffectEstimate
     (β_true meanEstimationError : ℝ) : ℝ :=
-  β_true + meanEstimationError
+  Descent.Core.sum β_true meanEstimationError
 
 /-- **An unbiased estimator recovers the truth.** With zero mean estimation error the expected
 estimate is the true effect, which is what makes the second argument a bias rather than a
 variance. -/
 theorem expectedLinearEffectEstimate_unbiased (β_true : ℝ) :
     expectedLinearEffectEstimate β_true 0 = β_true := by
-  unfold expectedLinearEffectEstimate; ring
+  unfold expectedLinearEffectEstimate Descent.Core.sum; ring
 
 /-- One-locus OLS effect-estimation variance under genotype variance `varX` and
 sample size `n`.
@@ -535,7 +535,7 @@ theorem ols_unbiased
       olsEffectEstimationVariance σ2 varX n₂ <
         olsEffectEstimationVariance σ2 varX n₁ := by
   constructor
-  · simp [expectedLinearEffectEstimate, h_mean_zero]
+  · simp [expectedLinearEffectEstimate, Descent.Core.sum, h_mean_zero]
   · unfold olsEffectEstimationVariance
     exact div_lt_div_of_pos_left h_σ2 (mul_pos h_n₁ h_varX)
       (by nlinarith)

@@ -6,6 +6,7 @@ import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
+import Descent.Core.Ratios
 
 namespace Descent.Blindness
 
@@ -754,20 +755,20 @@ theorem speedTiltBetaMergerRate_speedBiasParameterFromTripleRate (rate : ℝ) :
 
 /-- Speed tilt after a front-displacement scale `γ`: the genealogy sees `θ / γ`. -/
 noncomputable def frontSpeedBiasParameter (θ γ : ℝ) : ℝ :=
-  θ / γ
+  Descent.Core.ratio θ γ
 
 /-- A zero displacement scale divides by zero and Mathlib returns `0`: the genealogy is
 reported as untilted whatever the front tilt actually is. -/
 theorem frontSpeedBiasParameter_at_zero_scale_is_junk (θ : ℝ) :
     frontSpeedBiasParameter θ 0 = 0 := by
-  simp [frontSpeedBiasParameter]
+  simp [frontSpeedBiasParameter, Descent.Core.ratio]
 
 
 /-- Observable three-lineage rate for a front tilt `θ` and displacement scale `γ`. -/
 theorem frontSpeedBias_tripleMergerRate (θ γ : ℝ) :
     speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3 =
       1 / (θ / γ + 2) := by
-  simp [frontSpeedBiasParameter]
+  simp [frontSpeedBiasParameter, Descent.Core.ratio]
 
 /-- **Speed identification at a fixed front scale.** On the admissible microcanonical-tilt
 domain `-γ < θ`, the normalized three-lineage merger rate identifies the front-speed tilt
@@ -779,15 +780,15 @@ theorem frontSpeedBias_tripleMergerRate_injective
         speedTiltBetaMergerRate (frontSpeedBiasParameter θ₂ γ) 3 3) :
     θ₁ = θ₂ := by
   have hβ₁ : -1 < frontSpeedBiasParameter θ₁ γ := by
-    unfold frontSpeedBiasParameter
+    unfold frontSpeedBiasParameter Descent.Core.ratio
     apply (lt_div_iff₀ hγ).2
     simpa using hθ₁
   have hβ₂ : -1 < frontSpeedBiasParameter θ₂ γ := by
-    unfold frontSpeedBiasParameter
+    unfold frontSpeedBiasParameter Descent.Core.ratio
     apply (lt_div_iff₀ hγ).2
     simpa using hθ₂
   have hparameter := speedTiltBetaMergerRate_three_three_injective_on hβ₁ hβ₂ hrate
-  unfold frontSpeedBiasParameter at hparameter
+  unfold frontSpeedBiasParameter Descent.Core.ratio at hparameter
   exact (div_left_inj' hγ.ne').mp hparameter
 
 /-- Front-speed tilt reconstructed from an observed normalized triple-merger rate and a known
@@ -823,7 +824,7 @@ theorem frontSpeedTiltFromTripleRate_recovers
         (speedTiltBetaMergerRate (frontSpeedBiasParameter θ γ) 3 3) γ = θ := by
   unfold frontSpeedTiltFromTripleRate
   rw [speedBiasParameterFromTripleRate_recovers]
-  unfold frontSpeedBiasParameter
+  unfold frontSpeedBiasParameter Descent.Core.ratio
   field_simp
 
 /-- A valid triple-merger probability reconstructs an admissible dimensional speed tilt at

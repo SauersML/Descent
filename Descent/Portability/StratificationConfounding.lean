@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Core.Population
 import Descent.Portability.PCCorrectability
 import Descent.Portability.AncestrySpecificPower
+import Descent.Core.Ratios
 
 namespace Descent.Portability
 
@@ -644,7 +645,7 @@ noncomputable def AttenuationModel.witness : AttenuationModel where
 
     Power: the prediction spans 0.20000 to 0.80000. -/
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
-  r2 / (r2 + σ2_noise)
+  Descent.Core.share r2 σ2_noise
 
 /-- **reliabilityRatio where its denominator vanishes, named.** The guard `r2 + σ2_noise` is zero at
 `r2 = 0`, `σ2_noise = 0`. With no signal and no noise the reliability ratio is undefined, and
@@ -653,14 +654,14 @@ than the value the modelled quantity takes, and no type error marks the point. C
 require `r2 + σ2_noise ≠ 0`. -/
 theorem reliabilityRatio_at_r202noise0_is_junk :
     reliabilityRatio 0 0 = 0 := by
-  unfold reliabilityRatio
+  unfold reliabilityRatio Descent.Core.share
   norm_num
 
 /-- **The reliability ratio recovers the true variance from the total.** This is what fixes the
 ratio; monotonicity in the noise is shared by every rescaling of it. -/
 theorem reliabilityRatio_mul_total (r2 σ2_noise : ℝ) (h : r2 + σ2_noise ≠ 0) :
     reliabilityRatio r2 σ2_noise * (r2 + σ2_noise) = r2 := by
-  unfold reliabilityRatio
+  unfold reliabilityRatio Descent.Core.share
   field_simp
 
 /-- Observed (attenuated) coefficient -/

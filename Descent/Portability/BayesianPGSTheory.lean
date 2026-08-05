@@ -331,14 +331,14 @@ section LDReferenceMismatch
     f(σ) = σ/(σ+τ) maps the LD diagonal entry to the shrinkage factor.
     This is the key quantity affected by LD mismatch. -/
 noncomputable def snpShrinkage (σ τ : ℝ) : ℝ :=
-  σ / (σ + τ)
+  Descent.Core.share σ τ
 
 /-- **snpShrinkage where its denominator vanishes, named.** The guard `σ + τ` is zero at `σ = 0`, `τ
 = 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type
 error marks the point. Consumers must require `σ + τ ≠ 0`. -/
 theorem snpShrinkage_at_00_is_junk :
     snpShrinkage 0 0 = 0 := by
-  unfold snpShrinkage
+  unfold snpShrinkage Descent.Core.share
   norm_num
 
 /-- **LD mismatch bias bound from mean value theorem.**
@@ -354,7 +354,7 @@ theorem ld_mismatch_bias_proportional
     (h_true : 0 < σ_true) (h_ref : 0 < σ_ref) (h_τ : 0 < τ) :
     |snpShrinkage σ_ref τ - snpShrinkage σ_true τ| ≤
       |σ_ref - σ_true| / τ := by
-  unfold snpShrinkage
+  unfold snpShrinkage Descent.Core.share
   -- f(σ₂) - f(σ₁) = σ₂/(σ₂+τ) - σ₁/(σ₁+τ)
   --               = (σ₂(σ₁+τ) - σ₁(σ₂+τ)) / ((σ₂+τ)(σ₁+τ))
   --               = τ(σ₂ - σ₁) / ((σ₂+τ)(σ₁+τ))

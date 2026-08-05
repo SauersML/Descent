@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
+import Descent.Core.Ratios
 
 namespace Descent.PopGen
 
@@ -37,7 +38,7 @@ section CoalescentTheory
 /-- **Expected heterozygosity from mutation-drift balance.**
     H = 4Neμ / (1 + 4Neμ) = θ / (1 + θ) where θ = 4Neμ. -/
 noncomputable def expectedHeterozygosity (θ : ℝ) : ℝ :=
-  θ / (1 + θ)
+  Descent.Core.saturation θ
 
 /-- **expectedHeterozygosity at `θ = -1`, named.** A negative scaled mutation rate is
 inadmissible. The divisor vanishes at `θ = -1` and the expected heterozygosity is `0` -- a
@@ -45,7 +46,7 @@ monomorphic locus, which is a perfectly ordinary answer and therefore invisible.
 exclude it by hypothesis. -/
 theorem expectedHeterozygosity_negative_unit_theta_is_junk :
     expectedHeterozygosity (-1) = 0 := by
-  unfold expectedHeterozygosity
+  unfold expectedHeterozygosity Descent.Core.saturation
   norm_num
 
 /-- **At unit scaled mutation rate the population is half heterozygous.** The membership in
@@ -53,13 +54,13 @@ theorem expectedHeterozygosity_negative_unit_theta_is_junk :
 fixes which one, and it is the calibration point that distinguishes `θ/(1+θ)` from any other
 saturating form. -/
 theorem expectedHeterozygosity_at_one : expectedHeterozygosity 1 = 1 / 2 := by
-  unfold expectedHeterozygosity
+  unfold expectedHeterozygosity Descent.Core.saturation
   norm_num
 
 /-- Expected heterozygosity is in [0, 1). -/
 theorem expected_het_in_unit (θ : ℝ) (h_θ : 0 ≤ θ) :
     0 ≤ expectedHeterozygosity θ ∧ expectedHeterozygosity θ < 1 := by
-  unfold expectedHeterozygosity
+  unfold expectedHeterozygosity Descent.Core.saturation
   constructor
   · exact div_nonneg h_θ (by linarith)
   · rw [div_lt_one (by linarith : 0 < 1 + θ)]
@@ -70,7 +71,7 @@ theorem expected_het_in_unit (θ : ℝ) (h_θ : 0 ≤ θ) :
 theorem het_increases_with_ne
     (θ₁ θ₂ : ℝ) (h₁ : 0 < θ₁) (h_more : θ₁ < θ₂) :
     expectedHeterozygosity θ₁ < expectedHeterozygosity θ₂ := by
-  unfold expectedHeterozygosity
+  unfold expectedHeterozygosity Descent.Core.saturation
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
