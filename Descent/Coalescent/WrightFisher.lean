@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
-import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.Core.Heterozygosity
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 import Mathlib.Probability.Distributions.Uniform
 import Mathlib.Combinatorics.Enumerative.DoubleCounting
@@ -14,7 +14,7 @@ namespace Descent
 # The Wright-Fisher mechanism, and the rates that come out of it
 
 The corpus has, until this file, proved statements of the form *given this formula, these
-consequences follow*.  `hetRecurrence` posits a per-generation factor `1 - 1/(2Nₑ)` and
+consequences follow*.  `Descent.Core.hetRecurrence` posits a per-generation factor `1 - 1/(2Nₑ)` and
 solves the recurrence; `lambdaCoalescentMergerRate` posits a merger-rate integral and works
 out its algebra; `deathRate` in `Descent.Coalescent.Rates` posits the ladder `k(k-1)/2` and
 telescopes it.  None of them says where the number came from.
@@ -39,7 +39,7 @@ What is derived, and what is still assumed, is stated exactly:
   independent multinomial reproduction; it is the one modelling premise the counting
   cannot supply.
 
-The last section closes the loop on the corpus's own scalars: `hetRecurrence`, which
+The last section closes the loop on the corpus's own scalars: `Descent.Core.hetRecurrence`, which
 `Descent.PopGen.PopulationGeneticsFoundations` posits, is proved equal to the
 mechanism-derived `pairDistinct` at `N = 2 Nₑ`.  The recurrence is no longer a stipulation.
 
@@ -401,21 +401,21 @@ theorem hetRecurrence_factor_eq_mechanism {Ne : ℕ} (hNe : 0 < Ne) :
   ring
 
 /-- **The corpus's heterozygosity recurrence is the Wright-Fisher pair-survival
-probability.**  `hetRecurrence Nₑ H₀ t = pairDistinct (2 Nₑ) t · H₀`: the scalar model and
+probability.**  `Descent.Core.hetRecurrence Nₑ H₀ t = pairDistinct (2 Nₑ) t · H₀`: the scalar model and
 the mechanism agree at every generation, and the mechanism is what says why. -/
 theorem hetRecurrence_eq_pairDistinct {Ne : ℕ} (hNe : 0 < Ne) (H₀ : ℝ) (t : ℕ) :
-    hetRecurrence (Ne : ℝ) H₀ t = pairDistinct (2 * Ne) t * H₀ := by
+    Descent.Core.hetRecurrence (Ne : ℝ) H₀ t = pairDistinct (2 * Ne) t * H₀ := by
   have h2 : 0 < 2 * Ne := by omega
-  rw [hetRecurrence_closed_form, pairDistinct_eq_pow h2]
+  rw [Descent.Core.hetRecurrence_closed_form, pairDistinct_eq_pow h2]
   push_cast
   ring
 
 /-- The same statement for the heterozygosity-loss scalar: the loss is the probability that
 two lineages HAVE met within `t` generations, under the mechanism. -/
 theorem heterozygosityLossDerived_eq_pairCoalesced {Ne : ℕ} (hNe : 0 < Ne) (t : ℕ) :
-    heterozygosityLossDerived (Ne : ℝ) t = 1 - pairDistinct (2 * Ne) t := by
+    Descent.Core.heterozygosityLoss (Ne : ℝ) t = 1 - pairDistinct (2 * Ne) t := by
   have h2 : 0 < 2 * Ne := by omega
-  unfold heterozygosityLossDerived
+  unfold Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [pairDistinct_eq_pow h2]
   push_cast
   ring

@@ -182,7 +182,7 @@ pinned separately, by
 `heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` at the end of this file. -/
 theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
     heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold heterozygosityLossFromDrift; rw [coalescentTimeScale_eq]
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [coalescentTimeScale_eq]
 
 /-- **Cross-check: the within-deme coalescence time carries the same two.**
 `PortabilityDrift.twoDemeIMEquilibriumETss` is `2` in units of `Nₑ`
@@ -969,7 +969,7 @@ theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
 
 theorem heterozygosityLossDerived_uses_timeScale (Ne : ℝ) (t : ℕ) :
     heterozygosityLossDerived Ne t = 1 - (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold heterozygosityLossDerived; rw [coalescentTimeScale_eq]
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [coalescentTimeScale_eq]
 
 theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
     wrightFisherDriftRetention N t
@@ -1356,7 +1356,7 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
     (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
     heterozygosityLossFromDrift t Ne = (closedPopulation Ne H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
-  unfold heterozygosityLossFromDrift
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rfl
 
 /-- **The same body, read as a between-population `F_ST`.**
@@ -1379,7 +1379,7 @@ theorem heterozygosityLossDerived_eq_closedPopulation_measuredLoss
     (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
     heterozygosityLossDerived Ne t = (closedPopulation Ne H₀ hH).measuredLoss t := by
   rw [measuredLoss_closedPopulation]
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rfl
 
 /-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.

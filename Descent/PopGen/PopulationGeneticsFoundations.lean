@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Program.OpenQuestions
 import Descent.Core.Fst
+import Descent.Core.Heterozygosity
 
 namespace Descent
 
@@ -801,7 +802,7 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
     `1.025` across all three times. The design therefore has the power to
     separate the two regimes, which is how the falsification was reached. -/
 noncomputable def heterozygosityLossFromDrift (t : ℕ) (Ne : ℝ) : ℝ :=
-  1 - (1 - 1 / (2 * Ne)) ^ t
+  Descent.Core.heterozygosityLoss Ne t
 
 /-- **heterozygosityLossFromDrift at its junk point, named.** An empty population loses all
 heterozygosity in one generation. The per-generation retention is junk-one, so the loss is `0` at
@@ -809,7 +810,7 @@ every generation count -- no drift at all, reported for the strongest drift poss
 must exclude the argument that makes the guard vanish. -/
 theorem heterozygosityLossFromDrift_empty_population_is_junk (t : ℕ) :
     heterozygosityLossFromDrift t 0 = 0 := by
-  unfold heterozygosityLossFromDrift
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   simp
 
 /-- **One generation of drift in a population of one, pinned.** This definition carries no result
@@ -817,13 +818,13 @@ of its own. At `Ne = 1` a single generation loses half the heterozygosity, which
 per-generation rate at `1 / (2 Ne)` against `1 / Ne` and against `1 / (4 Ne)`. -/
 theorem heterozygosityLossFromDrift_one_generation :
     heterozygosityLossFromDrift 1 1 = 1 / 2 := by
-  unfold heterozygosityLossFromDrift
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   norm_num
 
 /-- Fst from drift is nonneg. -/
 theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
     0 ≤ heterozygosityLossFromDrift t Ne := by
-  unfold heterozygosityLossFromDrift
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [sub_nonneg]
   apply pow_le_one₀
   · rw [sub_nonneg, div_le_one (by linarith)]; linarith
@@ -833,7 +834,7 @@ theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
 theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
     (h_time : t₁ < t₂) :
     heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne := by
-  unfold heterozygosityLossFromDrift
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [sub_lt_sub_iff_left]
   have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
@@ -2114,20 +2115,14 @@ section FstDerivationFromDrift
     retention is `1.02 ± 0.02` against `e^(-2) = 0.135` predicted here, and the
     resulting `F_ST` is `≈ 0` where the measurable between-population `F_ST` is
     `0.50`. The recurrence is correct for what it says; it is not a split `F_ST`. -/
-noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
-  | 0 => H₀
-  | t + 1 => (1 - 1 / (2 * Ne)) * hetRecurrence Ne H₀ t
+noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ :=
+  Descent.Core.hetRecurrence Ne H₀
 
 /-- **Closed-form solution by induction.**
     hetRecurrence Ne H₀ t = (1 - 1/(2Ne))^t × H₀. -/
 theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
-    hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
-  induction t with
-  | zero =>
-    simp [hetRecurrence]
-  | succ n ih =>
-    simp only [hetRecurrence, ih]
-    ring
+    hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ :=
+  Descent.Core.hetRecurrence_closed_form Ne H₀ t
 
 /-! ### Fst derived from heterozygosity loss -/
 
@@ -2163,7 +2158,7 @@ theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     Denotes: the reading its name carries. The same formula appears under
     names from 'fst', 'heterozygosity', and the formula alone does not fix which is meant. -/
 noncomputable def heterozygosityLossDerived (Ne : ℝ) (t : ℕ) : ℝ :=
-  1 - (1 - 1 / (2 * Ne)) ^ t
+  Descent.Core.heterozygosityLoss Ne t
 
 /-- **heterozygosityLossDerived at its junk point, named.** The same failure as
 `heterozygosityLossFromDrift_empty_population_is_junk` reached through a second definition of the
@@ -2171,20 +2166,20 @@ same quantity, so an agreement check between the two derivations passes on the w
 Consumers must exclude the argument that makes the guard vanish. -/
 theorem heterozygosityLossDerived_empty_population_is_junk (t : ℕ) :
     heterozygosityLossDerived 0 t = 0 := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   simp
 
 /-- **Fst matches heterozygosity loss.**
     When H₀ > 0, heterozygosityLossDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀. -/
 theorem heterozygosityLossDerived_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
     heterozygosityLossDerived Ne t = 1 - hetRecurrence Ne H₀ t / H₀ := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [hetRecurrence_closed_form]
   field_simp
 
 /-- **Fst(0) = 0**: populations start undifferentiated. -/
 theorem heterozygosityLossDerived_zero (Ne : ℝ) : heterozygosityLossDerived Ne 0 = 0 := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   simp
 
 /-- **Fst is monotonically increasing in t.**
@@ -2192,7 +2187,7 @@ theorem heterozygosityLossDerived_zero (Ne : ℝ) : heterozygosityLossDerived Ne
 theorem heterozygosityLossDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
     (h_lt : t₁ < t₂) :
     heterozygosityLossDerived Ne t₁ < heterozygosityLossDerived Ne t₂ := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
@@ -2202,7 +2197,7 @@ theorem heterozygosityLossDerived_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < N
 /-- **0 ≤ Fst(t) for all t when Ne ≥ 2.** -/
 theorem heterozygosityLossDerived_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
     0 ≤ heterozygosityLossDerived Ne t := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rw [sub_nonneg]
   apply pow_le_one₀
   · rw [sub_nonneg, div_le_one (by linarith)]; linarith
@@ -2211,7 +2206,7 @@ theorem heterozygosityLossDerived_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
 /-- **Fst(t) < 1 for all t when Ne ≥ 2.** -/
 theorem heterozygosityLossDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
     heterozygosityLossDerived Ne t < 1 := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   linarith [pow_pos (show 0 < 1 - 1 / (2 * Ne) by
     rw [sub_pos, div_lt_one (by linarith)]; linarith) t]
 
@@ -2222,7 +2217,7 @@ theorem heterozygosityLossDerived_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
 theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h_lt : Ne₁ < Ne₂) :
     heterozygosityLossDerived Ne₂ t < heterozygosityLossDerived Ne₁ t := by
-  unfold heterozygosityLossDerived
+  unfold heterozygosityLossDerived Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   -- Need (1 - 1/(2Ne₂))^t > (1 - 1/(2Ne₁))^t, i.e. larger base → larger power
   -- which means 1 - (larger)^t < 1 - (smaller)^t
   have h_base₁_pos : 0 < 1 - 1 / (2 * Ne₁) := by
@@ -2240,7 +2235,7 @@ theorem heterozygosityLossDerived_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) 
     The derivation produces the same formula as the direct definition. -/
 theorem heterozygosityLossDerived_eq_fstFromDrift (Ne : ℝ) (t : ℕ) :
     heterozygosityLossDerived Ne t = heterozygosityLossFromDrift t Ne := by
-  unfold heterozygosityLossDerived heterozygosityLossFromDrift
+  unfold heterozygosityLossDerived heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   rfl
 
 /-! ### Mutation-drift recurrence and equilibrium -/
