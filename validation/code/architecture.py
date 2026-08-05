@@ -40,14 +40,15 @@ honest target is not zero:
   * `defs_no_theorem_names`, `imports_naming_nothing_used` -- same shape, each
     with its reason on the function that computes it.
 
-Four of the measurements are now GATED WITH A BUDGET rather than left reported:
-`cross_module_reuse_pct`, `composition_theorems`, `externally_silent_modules`
-and `foundation_not_yet_load_bearing`.  A budget is the gate for a quantity
-whose honest target is neither zero nor its present value -- it fails on the
-wrong side of a bound, and the bound is meant to be tightened as the work lands.
-Leaving them merely reported put the corpus in the position this header
-complains about from the other side: the disease was measured, printed, and the
-build stayed green.  See `BUDGETS`.
+Four measurements that used to be REPORTED are now DEFECTS, gated at zero like
+the rest: `externally_silent_modules`, `foundation_not_yet_load_bearing`,
+`theorems_no_cross_module_consumer` and `subsystems_not_reaching_a_metric`.
+They were reported on the argument that their honest target is not zero -- a
+conclusion needs no consumer, a new foundation starts with no callers.  That
+argument is how the disease got measured, printed, and shipped green, and it is
+the same argument a baseline makes.  There is no budget and no ratchet here: a
+theorem nothing depends on is a theorem nothing can notice going wrong, and the
+count of them is what is left to fix.
 
     python3 validation/code/architecture.py            # report
     python3 validation/code/architecture.py --gate     # exit nonzero unless every count is zero
@@ -371,6 +372,42 @@ def gate_composition_count(code, decls):
     return hits
 
 
+def subsystems_not_reaching_a_metric(code, comps):
+    """Modules that name a demographic quantity and carry it nowhere.
+
+    `gate_composition_count` counts the theorems that join a demographic quantity
+    to a deployed metric.  Counting them says how much of the join exists; it does
+    not say where the join is MISSING, and 38 of the first 52 sat in the one file
+    written to demonstrate the shape.
+
+    This is the complement, per module: a module whose statements mention drift,
+    `F_ST`, effective size or migration and which proves nothing carrying any of
+    them to an R-squared, a slope, a Brier score or an AUC.  Its population
+    genetics stops where the deployment starts, which is the gap the whole
+    development is about.
+    """
+    joined = {mod for _name, mod in comps}
+    out = []
+    for mod, text in code.items():
+        if mod in joined or mod == "Descent":
+            continue
+        if any(d in text for d in DEMOG):
+            out.append(mod)
+    return sorted(out)
+
+
+def theorems_without_cross_module_consumer(code, decls, reused, total):
+    """The complement of `cross_module_reuse_pct`, as a count rather than a rate.
+
+    A percentage cannot be gated at zero -- 100% reuse would mean nothing is ever
+    an endpoint -- but the quantity the percentage is ABOUT can be: a theorem no
+    other module uses is a theorem nothing depends on, so nothing notices when it
+    stops being true.  That is the same defect as an orphan definition, one level
+    up, and it is gated the same way.
+    """
+    return total - reused
+
+
 def gate_falsified_acknowledged(raw):
     """Every FALSIFIED ledger row must be acknowledged in its declaration's docstring.
 
@@ -664,6 +701,7 @@ def measure():
     silent_modules = externally_silent(code, decls)
     unused_imports = unused_direct_imports(raw, code, decls)
     silent_defs = defs_with_no_theorem(code, decls)
+    unjoined = subsystems_not_reaching_a_metric(code, comps)
     total_thms, n_terminal, terminal_kinds = classify_terminal_theorems(code, decls)
 
     return {
@@ -679,6 +717,9 @@ def measure():
         "orphan_definitions": len(orphans),
         "witnessless_structures": len(witnessless),
         "externally_silent_modules": len(silent_modules),
+        "theorems_no_cross_module_consumer":
+            theorems_without_cross_module_consumer(code, decls, reused, total_thms),
+        "subsystems_not_reaching_a_metric": len(unjoined),
         "imports_naming_nothing_used": sum(len(v) for v in unused_imports.values()),
         "defs_no_theorem_names": len(silent_defs),
         "terminal_theorem_pct": round(100.0 * n_terminal / total_thms, 1) if total_thms else 0.0,
@@ -691,6 +732,7 @@ def measure():
         "_orphans": orphans,
         "_witnessless": witnessless,
         "_silent_modules": silent_modules,
+        "_unjoined": unjoined,
         "_unused_imports": unused_imports,
         "_silent_defs": silent_defs,
         "_terminal_kinds": terminal_kinds,
@@ -739,15 +781,21 @@ DEFECTS = {
         "structures with no constructed inhabitant, over which theorems are empty",
     "silent_falsifications":
         "FALSIFIED ledger rows no docstring mentions",
+    "externally_silent_modules":
+        "modules no other module cites a single declaration of",
+    "foundation_not_yet_load_bearing":
+        "modules in Core/ or Foundations/ that nothing has moved over to yet",
+    "theorems_no_cross_module_consumer":
+        "theorems no other module uses, so nothing depends on their being true",
+    "subsystems_not_reaching_a_metric":
+        "modules naming a demographic quantity with no theorem carrying it to a "
+        "deployed metric",
 }
 
 # Reported, never gated.  These are properties of the corpus, not defect counts:
 # there is no value of "theorems cited across modules" that is correct, and a
 # threshold on one would be a number someone picked.
 REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theorems",
-            # See `externally_silent`: gating this would demand a consumer for
-            # every conclusion, and restatements would satisfy it.
-            "externally_silent_modules",
             # See `unused_direct_imports`: transitive imports make a zero
             # impossible, but a RISE means an import landed without its code.
             "imports_naming_nothing_used",
@@ -756,58 +804,7 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             "defs_no_theorem_names",
             # See `classify_terminal_theorems`: a terminal theorem is usually
             # terminal on purpose, and a consumer for one would be a restatement.
-            "terminal_theorem_pct", "terminal_deliberate", "terminal_unclassified",
-            # Correct position, few consumers.  A new foundation starts here and
-            # earns callers as they move over; it is not the inversion above.
-            "foundation_not_yet_load_bearing")
-
-
-# --------------------------------------------------------------------------
-# Budgets: gated, but not at zero
-# --------------------------------------------------------------------------
-#
-# WHY THIS IS NOT THE RATCHET THIS FILE REJECTS.  The header argues against a
-# baseline that fails only on regression, and it is right about DEFECTS: a
-# duplicate body, an orphan definition and an inverted foundation each have an
-# honest target of zero, so a baseline there licenses the very thing being
-# repaired.
-#
-# The four measurements below do NOT have an honest target of zero, and each has
-# a paragraph on its own function explaining why -- a conclusion needs no
-# consumer, a new foundation starts with no callers, cross-module reuse of 100%
-# would mean nothing is ever an endpoint.  Leaving them REPORTED because zero is
-# wrong left the corpus in the position the header complains about from the other
-# side: the disease was measured, printed, and the build stayed green.
-#
-# A BUDGET is the gate for a quantity whose target is neither zero nor the
-# present value.  It fails on the wrong side of a bound, and the bound is meant
-# to be tightened as the work lands -- so a rise in reuse or a fall in silent
-# modules is followed by editing the number DOWN, and the entry records what it
-# was when it was last moved.  An untightened budget is visible: it stops
-# matching the reported value.
-BUDGETS = {
-    # floor, must not fall.  8.0% at diagnosis; the namespace work and the
-    # coalescent inversion took it to 9.68.
-    "cross_module_reuse_pct": ("at least", 9.6),
-    # floor.  2 at diagnosis, 61 now.  The plan's target is 500: a demographic
-    # history reaching a deployed metric should be the common shape, not 1%.
-    "composition_theorems": ("at least", 61),
-    # ceiling, must not rise.  56 at diagnosis, 36 now.
-    "externally_silent_modules": ("at most", 36),
-    # ceiling.  A foundation may start with no callers; it may not accumulate.
-    "foundation_not_yet_load_bearing": ("at most", 6),
-}
-
-
-def budget_failures(now):
-    """Budgets on the wrong side of their bound, as (key, value, bound, sense)."""
-    out = []
-    for key, (sense, bound) in sorted(BUDGETS.items()):
-        value = now[key]
-        if (sense == "at least" and value < bound) or \
-           (sense == "at most" and value > bound):
-            out.append((key, value, bound, sense))
-    return out
+            "terminal_theorem_pct", "terminal_deliberate", "terminal_unclassified")
 
 
 def main() -> int:
@@ -832,14 +829,7 @@ def main() -> int:
     for k in sorted(now):
         if k.startswith("_"):
             continue
-        if k in BUDGETS:
-            sense, bound = BUDGETS[k]
-            ok = (now[k] >= bound) if sense == "at least" else (now[k] <= bound)
-            mark = f"  [budget {sense} {bound}]{'' if ok else '  <- OUTSIDE'}"
-        elif k in REPORTED:
-            mark = ""
-        else:
-            mark = "  OK" if now[k] == 0 else "  <- must be 0"
+        mark = "" if k in REPORTED else ("  OK" if now[k] == 0 else "  <- must be 0")
         print(f"  {k:34} {now[k]}{mark}")
 
     if args.verbose:
@@ -866,6 +856,11 @@ def main() -> int:
                   "-- reported, not gated:")
             for m in now["_silent_modules"]:
                 print("  " + m)
+        if now["_unjoined"]:
+            print(f"\nmodules naming a demographic quantity that reaches no metric "
+                  f"({len(now['_unjoined'])}):")
+            for m in now["_unjoined"]:
+                print("  " + m)
         if now["_terminal_kinds"]:
             print("\nterminal theorems by kind -- reported, not gated:")
             for k, v in now["_terminal_kinds"].most_common():
@@ -891,14 +886,10 @@ def main() -> int:
     for k, n, what in sorted(failures):
         print(f"FAIL  {k}: {n}  ({what})", file=sys.stderr)
 
-    over = budget_failures(now)
-    for k, value, bound, sense in over:
-        print(f"FAIL  {k}: {value}  (budget: {sense} {bound})", file=sys.stderr)
-
-    if failures or over:
+    if failures:
         print("\nrun with --verbose to name every offender", file=sys.stderr)
         return 1
-    print("\nevery defect count is zero, and every budget holds")
+    print("\nevery defect count is zero")
     return 0
 
 

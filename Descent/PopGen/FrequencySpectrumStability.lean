@@ -158,7 +158,10 @@ theorem spectrumPrecisionMultiplier_mul (K left right : ℕ) :
 of the deterministic precision multiplier. -/
 theorem independentSampleMultiplier_eq_precision_sq (K factor : ℕ) :
     independentSampleMultiplier K factor = spectrumPrecisionMultiplier K factor ^ 2 := by
-  simp [independentSampleMultiplier, spectrumPrecisionMultiplier, pow_mul, Nat.mul_comm]
+  -- `factor ^ (2 * c) = (factor ^ c) ^ 2` is `pow_mul` with the factors the other
+  -- way round; reaching it through `Nat.mul_comm` inside the simp set left the
+  -- goal on whichever orientation simp normalised to first.
+  rw [independentSampleMultiplier, spectrumPrecisionMultiplier, Nat.mul_comm, pow_mul]
 
 /-- Adding one epoch costs exactly two further powers of spectrum precision. -/
 theorem spectrumPrecisionMultiplier_succ (K factor : ℕ) (hK : 2 ≤ K) :
