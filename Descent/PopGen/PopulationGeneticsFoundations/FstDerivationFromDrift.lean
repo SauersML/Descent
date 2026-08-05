@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations
+import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 
 namespace Descent.PopGen
 
@@ -12,12 +12,13 @@ open MeasureTheory
 
 Part of the split of `Descent/PopGen/PopulationGeneticsFoundations.lean`, which was 2,740 lines.
 
-The parts are a CHAIN: each imports the one before, in the order the original was written.
-That is the conservative choice, deliberately. A monolith's declarations depend on each
-other in whatever order they happen to appear, and cutting it into modules that import only
-what they use means discovering that order first -- worth doing, and not what this does.
-The chain preserves every resolution the single file had, so the split cannot change what
-any proof sees.
+The parts are a FAN: each imports the parts that declare the symbols it names, and nothing
+else. The split first made them a CHAIN -- each importing the one before, in the order the
+original text ran -- which preserved every resolution the single file had and charged every
+part a dependency on everything written above it, used or not. Recovering the real order is
+the work that chain deferred: each part's identifiers were resolved against its siblings'
+declarations, and the imports above are the answer, so what a part rests on is readable
+from its header instead of inherited from its position in a file that no longer exists.
 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
@@ -86,25 +87,19 @@ theorem heterozygosityLossFromDrift_zero (Ne : ℝ) : heterozygosityLossFromDrif
   unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
   simp
 
-/-- **Loss is monotonically increasing in `t`.** -/
+/-- **Loss is monotonically increasing in `t`.** This is `fst_drift_increases`,
+proved where the definition is, under the name the Fst chapter uses for it; the
+two names are the same claim and this records that they are. -/
 theorem heterozygosityLossFromDrift_mono (Ne : ℝ) (t₁ t₂ : ℕ) (hNe : 2 < Ne)
     (h_lt : t₁ < t₂) :
-    heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
-  have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
-    rw [sub_pos, div_lt_one (by linarith)]; linarith
-  have h_base_lt : 1 - 1 / (2 * Ne) < 1 := by
-    rw [sub_lt_self_iff]; positivity
-  linarith [pow_lt_pow_right_of_lt_one₀ h_base_pos h_base_lt h_lt]
+    heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne :=
+  fst_drift_increases Ne t₁ t₂ hNe h_lt
 
-/-- **`0 ≤ L(t)` for all `t` when `Nₑ ≥ 2`.** -/
+/-- **`0 ≤ L(t)` for all `t` when `Nₑ ≥ 2`.** This is `fst_drift_nonneg` with its
+two arguments in the other order, and nothing else. -/
 theorem heterozygosityLossFromDrift_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
-    0 ≤ heterozygosityLossFromDrift t Ne := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
-  rw [sub_nonneg]
-  apply pow_le_one₀
-  · rw [sub_nonneg, div_le_one (by linarith)]; linarith
-  · rw [sub_le_self_iff]; positivity
+    0 ≤ heterozygosityLossFromDrift t Ne :=
+  fst_drift_nonneg t Ne hNe
 
 /-- **`L(t) < 1` for all `t` when `Nₑ ≥ 2`.** -/
 theorem heterozygosityLossFromDrift_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
