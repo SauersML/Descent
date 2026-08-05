@@ -60,7 +60,28 @@ theorem rareVariantSharingApproximation_lt_one_iff
 
 /-- Fraction of two-component heritability attributable to rare variants.
 
-Empirical status: UNTESTED. The quotient is a declared two-component accounting model. -/
+Regime: the two products are the classes' TOTAL effect masses. Read that way
+`rareCount * rareVariance` is `∑ β²` over the rare class, and the body is the
+share of genetic variance it carries.
+
+Empirical status: **VALIDATED** (`simcov/battery_bulk48.py`, `group_rare`).
+500000 individuals with standardized genotypes in a rare and a common class;
+the observable is the realised share of genetic variance carried by the rare
+class. Worst cell 0.92 sems at 0.26% relative.
+
+Power: the bare variance ratio `rv / (rv + cv)`, which drops the variant
+COUNTS, is FALSIFIED at 293 sems (83% relative). Counts and per-variant
+variances are swept in OPPOSITE directions -- (2000, 0.001) against (200,
+0.01) and back -- which is the only regime where the counts are visible; at
+equal class sizes the two readings coincide exactly.
+
+THE ARGUMENTS MUST BE REALISED MASSES, NOT NOMINAL ONES. An earlier run
+(`battery_bulk46.py`) was VOID because it fed `rareCount * rareVariance` as a
+count times a per-variant parameter, while a finite draw of `rareCount` effects
+realises a sum of squares off by `O(1/√rareCount)` -- 0.529 measured against a
+nominal 0.500 in one cell, which at these error bars is hundreds of sems. The
+quotient is still a declared two-component accounting model; what is now
+measured is that, given the accounting, the body is the right function of it. -/
 noncomputable def rareHeritabilityShare
     (rareCount rareVariance commonCount commonVariance : ℝ) : ℝ :=
   rareCount * rareVariance /
@@ -401,15 +422,15 @@ admissible parameter, including the weak-constraint regime `s < mu` where
     selection and drift at one biallelic site, and measured the time-averaged
     carrier frequency, `mu = 1e-04`, `s = 0.05`, `h = 0.5`, `Nₑ` swept:
 
-      4 Nₑ h s   this def   SLiM                 fwdpy11              sems
-      200         0.003984  0.004032 ± 0.000146  0.003902 ± 0.000041  0.3 / -2.0
-      50          0.003984  0.004200 ± 0.000105  0.003957 ± 0.000210  2.1 / -0.1
-      10          0.003984  0.004330 ± 0.000197  0.003728 ± 0.000210  1.8 / -1.2
-      2.5         0.003984  0.884    ± 0.040     0.660    ± 0.164     22 / 4.0
-      1           0.003984  0.924    ± 0.045     0.804    ± 0.042     20 / 19
+      4 Nₑ h s   this def   SLiM                  fwdpy11               sems
+      200         0.003984  0.003905 ± 0.000060  0.004006 ± 0.000087   -1.3 / 0.3
+      50          0.003984  0.004299 ± 0.000136  0.004089 ± 0.000117    2.3 / 0.9
+      10          0.003984  0.004431 ± 0.000253  0.004428 ± 0.000378    1.8 / 1.2
+      2.5         0.003984  0.8438   ± 0.0477    0.9136   ± 0.0384      18 / 24
+      1           0.003984  0.9406   ± 0.0251    0.8698   ± 0.0395      37 / 22
 
     At `4 Nₑ h s ≥ 10` the body holds on both engines. At `4 Nₑ h s ≤ 2.5` it is
-    low by a factor of 170 to 230: selection no longer holds the allele down,
+    low by a factor of 210 to 240: selection no longer holds the allele down,
     the site drifts to near-fixation for the deleterious allele, and a formula
     with no `Nₑ` in it cannot see that happen. The failure is not a coefficient
     error, so no reparametrisation repairs it -- the deterministic fixed point
@@ -417,15 +438,24 @@ admissible parameter, including the weak-constraint regime `s < mu` where
 
     Both engines are FORWARD simulators. A coalescent simulator cannot produce
     this table at all: msprime, which produced every other empirical verdict in
-    this corpus, has no selection.
+    this corpus, has no selection, so it could not have found this and did not.
+    The two engines agree with EACH OTHER on every cell, which is what
+    distinguishes a corpus error from a harness error.
 
     Power, and the competitor that earns the match: on the same cells the
-    per-diploid form `2 mu / (h s)` is rejected at 19 to 99 sems and the halved
-    form `mu / (2 h s)` at 8 to 46, so the agreement in the top three rows is a
-    measurement rather than a tautology. The `+ mu` guard in the denominator is
-    NOT exercised by these cells -- `mu / (h s + mu)` and the classical
-    `mu / (h s)` differ by 0.4 percent at `mu / (h s) = 0.004`, well inside the
-    error bars, so this table does not distinguish them. -/
+    per-diploid form `2 mu / (h s)` is rejected at 9.5 to 68 sems and the halved
+    form `mu / (2 h s)` at 6.4 to 32, so the agreement in the top three rows is
+    a measurement rather than a tautology.
+
+    What this table does NOT settle: the `+ mu` guard in the denominator.
+    `mu / (h s + mu)` and the classical `mu / (h s)` differ by 0.4 percent at
+    `mu / (h s) = 0.004`, far inside these error bars. Cells at
+    `mu / (h s) = 0.1` to `1`, where the two are 10 to 50 percent apart, were
+    run and are reported INCONCLUSIVE rather than as a verdict: at those
+    mutation rates a single locus emulated by infinite sites accumulates
+    repeat hits, each carrying its own multiplicative fitness cost, and both
+    engines share that artifact, so their agreement does not rescue it. The
+    `+ mu` term is UNTESTED. -/
 noncomputable def mutationSelectionBalance (mu s h : ℝ) : ℝ :=
   mu / (h * s + mu)
 
