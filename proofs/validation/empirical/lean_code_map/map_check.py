@@ -78,7 +78,15 @@ BUDGETS = {
     "GUARD-SURFACE": 0,
     "DEGENERATE-REFERENCE": 0,
     "CODE-PATH": 0,
+    "SCOPE-EMPTY": 0,
 }
+
+# The fixture grid's floor, kept equal to the one the Rust contract asserts in
+# `correctability_calculator/tests/differential.rs`. Both sides consume the same
+# `fixtures.json`; if only the Rust side carries the floor then the Lean half of
+# the comparison depends on the other half to notice, which is exactly the
+# arrangement that let a `#[path]` one directory short disable the whole thing.
+MIN_FIXTURES = 100
 
 
 def repo_root():
@@ -236,6 +244,42 @@ def findings(sources):
     table = sources["table"]
     corpus = sources["corpus"]
     code_text = sources["code_text"]
+
+    # EVERY check below is a loop over one of these collections, so each one is
+    # a route to a clean report over nothing. `corpus_names()` already refuses
+    # an empty definition table and `test_map_check.py` asserts that; the
+    # collections this file owns had no such floor. Measured: with
+    # `table["entries"]` emptied, all nine budget-0 checks produced zero
+    # findings and this module printed "PASS: every mapped declaration still
+    # describes the code it is mapped to" -- while mapping nothing. The fixture
+    # grid emptied, and truncated to a single fixture, were equally silent; only
+    # the Rust half of the same comparison would have caught them.
+    entries = table["entries"]
+    if not entries:
+        out.append(("SCOPE-EMPTY", "correspondence.json",
+                    "the correspondence table has no entries, so CORPUS-MISSING, "
+                    "CORPUS-STALE, CODE-MISSING, CODE-STALE and GUARD-SURFACE "
+                    "each ranged over nothing and reported no findings"))
+    else:
+        if not any(e.get("lean") for e in entries):
+            out.append(("SCOPE-EMPTY", "correspondence.json",
+                        "no entry maps a Lean declaration, so the CORPUS-* "
+                        "checks range over nothing"))
+        if not any(e.get("code") for e in entries):
+            out.append(("SCOPE-EMPTY", "correspondence.json",
+                        "no entry maps a Rust function, so the CODE-* and "
+                        "GUARD-SURFACE checks range over nothing"))
+    if not lean_bodies.REFERENCE_POINTS:
+        out.append(("SCOPE-EMPTY", "lean_bodies.REFERENCE_POINTS",
+                    "no reference point is transcribed, so the REFPOINT check "
+                    "ranges over nothing"))
+    if len(sources["fixtures"]) < MIN_FIXTURES:
+        out.append(("SCOPE-EMPTY", "fixtures.json",
+                    f"{len(sources['fixtures'])} fixtures, floor {MIN_FIXTURES}. "
+                    f"A grid small enough to miss a wrong constant is worse than "
+                    f"no differential, because it reports PASS -- the same floor "
+                    f"the Rust half of this comparison asserts, so neither half "
+                    f"depends on the other to notice"))
 
     bodies_by_file = {path: rustsrc.function_bodies(text)
                       for path, text in code_text.items()}

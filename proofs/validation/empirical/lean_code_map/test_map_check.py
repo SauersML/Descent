@@ -308,6 +308,68 @@ def main():
            f"an empty corpus table produces findings rather than silence "
            f"(got {len(result)})")
 
+    # 12. ... and neither must an empty anything ELSE. The corpus is one of four
+    #     collections every check here loops over, and it was the only one with a
+    #     floor. Measured before that changed: with `table["entries"]` emptied,
+    #     all nine budget-0 checks produced zero findings and this module printed
+    #     "PASS: every mapped declaration still describes the code it is mapped
+    #     to". The fixture grid emptied, and truncated to one fixture, were
+    #     equally silent -- only the Rust half of the same comparison, which
+    #     carries its own `>= 100` floor, would have caught them.
+    print()
+    print("CALIBRATION: an empty SCOPE must not pass either")
+    for label, mutate in (
+        ("the correspondence table has no entries",
+         lambda s: s["table"].__setitem__("entries", [])),
+        ("no entry maps a Lean declaration",
+         lambda s: s["table"].__setitem__(
+             "entries", [{k: v for k, v in e.items() if k != "lean"}
+                         for e in s["table"]["entries"]])),
+        ("no entry maps a Rust function",
+         lambda s: s["table"].__setitem__(
+             "entries", [{k: v for k, v in e.items() if k != "code"}
+                         for e in s["table"]["entries"]])),
+        ("the fixture grid is empty",
+         lambda s: (s.__setitem__("fixtures", []),
+                    s.__setitem__("expected", []))),
+        ("the fixture grid is truncated to one design",
+         lambda s: (s.__setitem__("fixtures", s["fixtures"][:1]),
+                    s.__setitem__("expected", s["expected"][:1]))),
+    ):
+        mutated = copy.deepcopy(clean)
+        mutate(mutated)
+        result = map_check.findings(mutated)
+        expect("SCOPE-EMPTY" in kinds(result),
+               f"{label}: reported as SCOPE-EMPTY rather than as a clean "
+               f"correspondence (got {kinds(result)})")
+
+    #     THE FALSE-POSITIVE DIRECTION. The floors must not fire on the real
+    #     tree, or the whole lane goes red for a reason that is not a defect.
+    expect("SCOPE-EMPTY" not in kinds(baseline),
+           "a floor fired on the real correspondence table; it is placed above "
+           "what the repository actually carries")
+    expect(len(clean["fixtures"]) >= map_check.MIN_FIXTURES,
+           f"the real fixture grid ({len(clean['fixtures'])}) is at or below "
+           f"the floor ({map_check.MIN_FIXTURES}), so that assertion is "
+           f"pinned to the current count rather than under it")
+
+    #     ... and the REFPOINT floor, which cannot be reached by perturbing
+    #     `sources` because the reference points live in a module. Both
+    #     directions on the real list.
+    original_points = lean_bodies.REFERENCE_POINTS
+    try:
+        lean_bodies.REFERENCE_POINTS = []
+        result = map_check.findings(clean)
+        expect("SCOPE-EMPTY" in kinds(result),
+               f"a transcription with no reference points at all is reported "
+               f"rather than passing the REFPOINT check vacuously "
+               f"(got {kinds(result)})")
+    finally:
+        lean_bodies.REFERENCE_POINTS = original_points
+    expect(original_points,
+           "there are reference points to lose, so the assertion above is "
+           "about something")
+
     print()
     if FAILURES:
         print(f"FAIL: {len(FAILURES)} calibration assertion(s) failed")
