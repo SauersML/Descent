@@ -20,6 +20,19 @@ open MeasureTheory
 open TransportedMetrics (r2FromSignalVariance)
 
 /-!
+
+**This module is not a foundation, and used to say it was.**
+
+It lived under `Foundations/`, which is a claim: a foundation is something the rest of
+the development rests on. This file rests on the rest -- it applies
+`Portability.PortabilityDrift`'s `presentDayPGSVariance` and `DGP`'s
+`r2FromSignalVariance`, and `r2_strictMono_under_effect_turnover` below is discharged by
+a theorem from `Program.OpenQuestions`. A module that imports the subsystems it is filed
+above cannot reconcile them; nothing below it can be made to depend on anything it says.
+
+Moving it is the honest repair. The alternative -- leaving it under `Foundations/` and
+weakening the check that noticed -- would have made the directory name mean nothing.
+
 # Arithmetic of the `R²` noise formula, under names that say so
 
 **THIS FILE CONTAINS NO CAUSAL MATHEMATICS. NO NAME IN IT MAY CLAIM OTHERWISE.**

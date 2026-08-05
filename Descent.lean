@@ -52,7 +52,7 @@ import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Decision.PowerAnalysis
 import Descent.Foundations.CovarianceStructure
-import Descent.Foundations.CausalInference
+import Descent.Program.CausalInference
 import Descent.Decision.CertificateGrading
 import Descent.Portability.ContinuumCalibration
 import Descent.Portability.ContinuumCalibrationProgram
@@ -153,6 +153,8 @@ import Descent.Coalescent.GeneTreeDiscordance
 import Descent.Coalescent.SpectrumMoments
 import Descent.Coalescent.Convergence
 import Descent.Coalescent.FuUrn
+import Descent.Coalescent.ComingDownCriterion
+import Descent.Coalescent.Lookdown
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never
 -- reaches is not clean, it is UNBUILT. That is not a hypothetical: `ResonanceSpectrum`

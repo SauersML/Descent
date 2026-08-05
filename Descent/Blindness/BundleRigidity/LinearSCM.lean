@@ -7,7 +7,7 @@ import Mathlib.Tactic
 # A linear structural causal model, with intervention and a derived mediation identity
 
 This module is **self-contained: it imports only Mathlib.** That is deliberate — it is the
-causal content that `Descent.Foundations.CausalInference` was named for and did not contain, and
+causal content that `Descent.Program.CausalInference` was named for and did not contain, and
 building it here keeps it verifiable while that file's dependency (`PortabilityDrift`) is
 red.
 
