@@ -1597,17 +1597,6 @@ noncomputable def binaryStateWeight (_ : BinaryBiologicalState) : ℝ := 1 / 2
     binaryStateWeight x = Portability.balancedBinaryWeight x := by
   rfl
 
-/-- A transition that preserves the context. -/
-noncomputable def persistentTransition
-    (x y : BinaryBiologicalState) : ℝ :=
-  Descent.Core.kronecker x y
-
-/-- Reference evaluations: the persistent kernel is the identity matrix on two states. -/
-theorem persistentTransition_at_reference_point :
-    persistentTransition 0 0 = 1 ∧ persistentTransition 0 1 = 0 := by
-  constructor <;> norm_num [persistentTransition]
-
-
 /-- A transition that swaps the two contexts. -/
 noncomputable def switchingTransition
     (x y : BinaryBiologicalState) : ℝ :=
@@ -1630,12 +1619,15 @@ theorem targetAnnotation_at_reference_point :
       Descent.Core.kronecker]
 
 
-/-- Quality of a source-adapted readout: one exactly when source and target contexts match.
+/-- Quality of a source-adapted readout: one exactly when source and target contexts match,
+and equally the transition that preserves the context -- one function, two readings.
 
-The same function as `persistentTransition`, read as a readout quality rather than as a
-transition.  `Descent.contextMatchQuality_eq_persistentTransition` says so; the body is
-written out here rather than delegating, because the witness proofs below evaluate this
-definition by `simp` and a delegation stops them one unfolding short. -/
+It was written twice, as `contextMatchQuality` and again here, on the argument that one
+was a transition and the other a readout quality. Both bodies were `Core.kronecker x y`,
+both reference evaluations were `0 0 = 1 ∧ 0 1 = 0` proved the same way, and this docstring
+cited a bridging theorem, `contextMatchQuality_eq_contextMatchQuality`, that was never
+declared anywhere in the corpus. A distinction with no theorem behind it and no difference
+in the body is a comment, so it is a comment now. -/
 noncomputable def contextMatchQuality
     (x y : BinaryBiologicalState) : ℝ :=
   Descent.Core.kronecker x y
@@ -1654,12 +1646,11 @@ context it was built for — `HorizonCurve.agreement` is that same delta read as
 efficiency. Four readings, one matrix: the biological witness is not a second two-state
 example but the horizon example under biological names, and a change to either file's
 delta contradicts this. -/
-theorem persistentTransition_contextMatchQuality_agreement_eq_stayKernel
+theorem contextMatchQuality_agreement_eq_stayKernel
     (x y : BinaryBiologicalState) :
-    persistentTransition x y = Portability.stayKernel x y ∧
-      contextMatchQuality x y = Portability.stayKernel x y ∧
-        Portability.agreement x y = Portability.stayKernel x y :=
-  ⟨rfl, rfl, rfl⟩
+    contextMatchQuality x y = Portability.stayKernel x y ∧
+      Portability.agreement x y = Portability.stayKernel x y :=
+  ⟨rfl, rfl⟩
 
 /-- **Complete context switching is the horizon curve's swap kernel**, the off-diagonal
 counterpart of the identification above. -/
@@ -1667,9 +1658,9 @@ theorem switchingTransition_eq_swapKernel (x y : BinaryBiologicalState) :
     switchingTransition x y = Portability.swapKernel x y := rfl
 
 theorem binaryStateWeight_stationary_persistent (y : BinaryBiologicalState) :
-    ∑ x, binaryStateWeight x * persistentTransition x y = binaryStateWeight y := by
+    ∑ x, binaryStateWeight x * contextMatchQuality x y = binaryStateWeight y := by
   fin_cases y <;>
-    norm_num [binaryStateWeight, persistentTransition, Fin.sum_univ_two]
+    norm_num [binaryStateWeight, contextMatchQuality, Fin.sum_univ_two]
 
 theorem binaryStateWeight_stationary_switching (y : BinaryBiologicalState) :
     ∑ x, binaryStateWeight x * switchingTransition x y = binaryStateWeight y := by
@@ -1678,7 +1669,7 @@ theorem binaryStateWeight_stationary_switching (y : BinaryBiologicalState) :
 
 /-- Target-only performance is identical under persistence and complete switching. -/
 theorem targetOnlyPerformance_blind_to_binary_dynamics :
-    targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation =
+    targetOnlyTransportPerformance binaryStateWeight contextMatchQuality targetAnnotation =
       targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation := by
   rw [targetOnlyTransportPerformance_eq_onePoint _ _ _
       binaryStateWeight_stationary_persistent]
@@ -1688,8 +1679,8 @@ theorem targetOnlyPerformance_blind_to_binary_dynamics :
 /-- Cross-state performance detects the dynamics: a source-adapted readout is perfect when
 the context persists. -/
 theorem crossStatePerformance_persistent_eq_one :
-    crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality = 1 := by
-  norm_num [crossStatePerformance, binaryStateWeight, persistentTransition,
+    crossStatePerformance binaryStateWeight contextMatchQuality contextMatchQuality = 1 := by
+  norm_num [crossStatePerformance, binaryStateWeight, contextMatchQuality,
     contextMatchQuality, Fin.sum_univ_two]
 
 /-- The same readout has zero value when the context always switches. -/
@@ -1718,13 +1709,13 @@ noncomputable def jointTransportLaw
 
 /-- Reference evaluation: half the mass of the persistent kernel sits on each diagonal pair. -/
 theorem jointTransportLaw_at_reference_point :
-    jointTransportLaw persistentTransition (0, 0) = 1 / 2 := by
-  norm_num [jointTransportLaw, persistentTransition, binaryStateWeight]
+    jointTransportLaw contextMatchQuality (0, 0) = 1 / 2 := by
+  norm_num [jointTransportLaw, contextMatchQuality, binaryStateWeight]
 
 
 /-- The two-population family: the context persists, or the context switches. -/
 noncomputable def binaryTransportFamily (persists : Bool) : TransportPair → ℝ :=
-  jointTransportLaw (if persists then persistentTransition else switchingTransition)
+  jointTransportLaw (if persists then contextMatchQuality else switchingTransition)
 
 /-- Both members of the persistence/switching family are genuine nonnegative finite laws. -/
 theorem binaryTransportFamily_nonneg (persists : Bool) (g : TransportPair) :
@@ -1732,7 +1723,7 @@ theorem binaryTransportFamily_nonneg (persists : Bool) (g : TransportPair) :
   rcases g with ⟨x, y⟩
   cases persists <;> fin_cases x <;> fin_cases y <;>
     norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight,
-      persistentTransition, switchingTransition]
+      contextMatchQuality, switchingTransition]
 
 /-- Target-only performance is the mean of a target-measurable kernel under the joint law. -/
 theorem targetOnlyTransportPerformance_eq_conditionalSectionMean
@@ -1767,7 +1758,7 @@ theorem labelMass_binaryTransportFamily (persists : Bool) (y : BinaryBiologicalS
     labelMass (fun g : TransportPair ↦ g.2) (binaryTransportFamily persists) y = 1 / 2 := by
   cases persists <;> fin_cases y <;>
     norm_num [labelMass, binaryTransportFamily, jointTransportLaw, binaryStateWeight,
-      persistentTransition, switchingTransition, Fintype.sum_prod_type, Fin.sum_univ_two]
+      contextMatchQuality, switchingTransition, Fintype.sum_prod_type, Fin.sum_univ_two]
 
 /-- Every fiber of either transport family carries mass, so the fiber conditional is
 defined at every state.
@@ -1793,7 +1784,7 @@ theorem contextMatchQuality_value_persistent (y : BinaryBiologicalState) :
       (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily true) y) = 1 := by
   rw [conditionalSectionMean_fiberConditional, labelMass_binaryTransportFamily]
   fin_cases y <;>
-    norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, persistentTransition,
+    norm_num [binaryTransportFamily, jointTransportLaw, binaryStateWeight, contextMatchQuality,
       contextMatchQuality, Fintype.sum_prod_type, Fin.sum_univ_two]
 
 /-- Under complete switching, the same readout is worthless on the same fiber. -/
@@ -1925,7 +1916,7 @@ theorem contextMatch_totalVariationDiameter_eq_two (y : BinaryBiologicalState) :
           (fiberConditional (fun g : TransportPair ↦ g.2) (binaryTransportFamily false) y) = 2 := by
       fin_cases y <;>
         norm_num [totalVariationGap, fiberConditional, labelMass, binaryTransportFamily,
-          jointTransportLaw, binaryStateWeight, persistentTransition, switchingTransition,
+          jointTransportLaw, binaryStateWeight, contextMatchQuality, switchingTransition,
           Fintype.sum_prod_type, Fin.sum_univ_two]
     rwa [hgap] at hlower
 
@@ -2289,11 +2280,11 @@ calibration and finite correction part of the core theorem rather than adjacent 
 structure DynamicsObstructions : Prop where
   /-- Stationary target averaging cannot distinguish persistence from switching. -/
   targetOnlyBlind :
-    targetOnlyTransportPerformance binaryStateWeight persistentTransition targetAnnotation =
+    targetOnlyTransportPerformance binaryStateWeight contextMatchQuality targetAnnotation =
       targetOnlyTransportPerformance binaryStateWeight switchingTransition targetAnnotation
   /-- A source-target criterion does distinguish them. -/
   crossStateSeparates :
-    crossStatePerformance binaryStateWeight persistentTransition contextMatchQuality ≠
+    crossStatePerformance binaryStateWeight contextMatchQuality contextMatchQuality ≠
       crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality
   /-- Coordinate marginals do not determine the joint biological field law. -/
   marginalsLoseDependence :
