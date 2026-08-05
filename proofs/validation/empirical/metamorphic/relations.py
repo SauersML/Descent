@@ -1243,6 +1243,72 @@ RELATIONS = {
         jointly_scales(["α", "ρ"], 2),
     ],
 
+    # --- TARGETED, no verdict: Condensation / ErgodicCovariancePencil ------
+    "Calibrator.criticalDegree": [
+        # `log N / c`: degree -1 in c. N sits inside a logarithm and so falls
+        # under the log-scaling gap named in this file's header -- the relation
+        # it satisfies is f(N^k, c) = k·f(N, c), which no kind here can carry.
+        scales("c", -1),
+    ],
+    "Calibrator.twoSiteCovarianceEnergy": [
+        symmetric_in("x", "y"),
+        jointly_scales(["x", "y"], 2),
+        even_under_negation(["x", "y"]),
+    ],
+    "Calibrator.firstModeConditionalMean": [
+        # `mean + r(source - mean)`: degree 1 in the two location arguments,
+        # and odd in them, which is what says it is an interpolation between
+        # two locations rather than a shift toward one of them.
+        jointly_scales(["mean", "source"], 1),
+        odd_under_negation(["mean", "source"]),
+    ],
+
+    # --- TARGETED, no verdict: DriftRegime ---------------------------------
+    "Calibrator.targetHetOfRetention": [
+        symmetric_in("H₀", "r"),
+        jointly_scales(["H₀", "r"], 2),
+        scales("H₀", 1),
+    ],
+    "Calibrator.targetPgsVarOfRetention": [
+        symmetric_in("V_A", "r"),
+        jointly_scales(["V_A", "r"], 2),
+        scales("V_A", 1),
+    ],
+
+    # --- TARGETED, no verdict: EpistasisAndNonAdditivity -------------------
+    "Calibrator.fisherAverageEffect": [
+        # The same body as BlindnessRegistry.OneLocusArchitecture.averageEffect,
+        # and it carries the same relation: relabelling the alleles sends
+        # p ↦ 1-p and a ↦ -a together, leaving d alone, and the average effect
+        # is ODD under that -- it is the same substitution described from the
+        # other end. Proved in Lean there as averageEffect_allele_swap; executed
+        # here, on the copy that lives in this module. Two bodies stating one
+        # fact is a place they can drift apart, and this is what would notice.
+        negated_under_allele_swap(["p"], effect_args=["a"]),
+        jointly_scales(["a", "d"], 1),
+    ],
+    "Calibrator.pairwiseModel": [
+        jointly_scales(["beta1", "beta2", "beta12"], 1),
+        odd_under_negation(["beta1", "beta2", "beta12"]),
+    ],
+    "Calibrator.epistaticVariance": [
+        scales("beta12", 2),
+        symmetric_in("p1", "p2"),
+        invariant_under_allele_swap(["p1", "p2"]),
+    ],
+
+    # --- TARGETED, no verdict: CausalInference -----------------------------
+    "Calibrator.effectShare": [
+        # Numerator degree 1 over denominator degree 1: net 0, so the effect's
+        # unit cancels and only the share is read.
+        jointly_scales(["indirect_effect", "total_effect"], 0),
+    ],
+    "Calibrator.costEffectiveness": [
+        jointly_scales(["improvement", "cost"], 0),
+        scales("improvement", 1),
+        scales("cost", -1),
+    ],
+
     "Calibrator.recessiveMutationSelectionDriftParameter": [
         scales("Ne", 1),
         symmetric_in("mu", "s"),
@@ -1521,6 +1587,39 @@ NO_RELATIONS = {
         "No relation in this table's vocabulary can carry a scaling whose "
         "exponent is itself an argument -- which is precisely why α is the "
         "parameter the architecture literature argues about.",
+
+    "Calibrator.windowVariance":
+        "Phi(w/sqrt v) needs w scaled by c and v by c² to hold fixed, which is a "
+        "reciprocal trade with UNEQUAL exponents -- the same shape this table "
+        "could not express for ldCorrelationDecay's corrected sqrt(fstGap), and "
+        "recorded there as a pinned violation because a relation already "
+        "existed to pin. Here there is nothing to pin, so it is recorded as an "
+        "absence. Note also that Phi is bounded, so no scaling of the output is "
+        "available even where the argument has one.",
+    "Calibrator.localPencilTraceContribution":
+        "(1 + source² - 2·source·target)/(1 - source²) carries bare `1`s above "
+        "and below. They are ANCHORS -- the unit-variance normalisation of the "
+        "standardized coordinates -- so no rescaling of either argument acts on "
+        "the ratio. A fourth instance of the anchor family in this file.",
+    "Calibrator.lossOfRetention":
+        "`1 - r` is a complement, and the `1` is an anchor: retention and loss "
+        "partition one, which is a statement about the constant rather than a "
+        "scaling of r.",
+    "Calibrator.benchmarkRatio":
+        "(1 - fstT)/(1 - fstS) is a ratio of two complements, so both numerator "
+        "and denominator carry the anchor and no rescaling of either F_ST acts "
+        "on it.",
+    "Calibrator.benchmarkRatioSquared":
+        "The square of benchmarkRatio, inheriting the same anchors. The relation "
+        "it DOES satisfy is `benchmarkRatioSquared = benchmarkRatio²`, an "
+        "identity between two definitions rather than a transformation of one "
+        "input -- so it belongs in AGREEMENTS if it is ever wanted, not here. "
+        "Worth noting the pair is exactly the kind that an exponent error would "
+        "silently swap, and no relation on either alone would catch it.",
+    "Calibrator.eValue":
+        "`rr + sqrt(rr(rr-1))` carries a bare `-1` fixing the null relative risk "
+        "at one. Anchor again: rescaling rr moves it relative to the null "
+        "rather than scaling the E-value.",
 
     "Calibrator.sampleInverseInflation":
         "`n/(n - m - 1)` carries a bare `-1` in the denominator, which is an "
