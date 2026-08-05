@@ -192,30 +192,25 @@ noncomputable def ewensProb (θ : ℝ) (n : ℕ) (lam : Multiset ℕ) : ℝ :=
   θ ^ (Multiset.card lam - 1) / ewensDenominator θ n
     * (((lam.map fun l => (l - 1)!).prod : ℕ) : ℝ)
 
-/-- **K-G (3.8) at `n = 2`, with the normalisation already done.**  The rising factorial is
-`θ + 1` for a sample of two whatever the class sizes are, so both cases below differ only in
-what the numerator computes to; that is the step they were sharing, and it is here. -/
-theorem ewensProb_two (θ : ℝ) (lam : Multiset ℕ) :
-    ewensProb θ 2 lam
-      = θ ^ (Multiset.card lam - 1) * (((lam.map fun l => (l - 1)!).prod : ℕ) : ℝ)
-        / (1 + θ) := by
-  unfold ewensProb
-  rw [ewensDenominator_two]
-  ring
-
 /-- Both sampled individuals carry the same allele: `(1+θ)⁻¹`.  This is the number the
 finite-`N` mechanism converges to in `tendsto_identityByDescent`, so formula and mechanism
 agree at the one point where both are available in closed form. -/
 theorem ewensProb_two_merged {θ : ℝ} (hθ : 0 ≤ θ) :
     ewensProb θ 2 {2} = 1 / (1 + θ) := by
-  rw [ewensProb_two]
-  simp
+  have hne : (θ : ℝ) + 1 ≠ 0 := by linarith
+  unfold ewensProb
+  simp [ewensDenominator_two]
+  field_simp
+  ring
 
 /-- The two sampled individuals carry different alleles: `θ/(1+θ)`. -/
 theorem ewensProb_two_split {θ : ℝ} (hθ : 0 ≤ θ) :
     ewensProb θ 2 {1, 1} = θ / (1 + θ) := by
-  rw [ewensProb_two]
-  simp
+  have hne : (θ : ℝ) + 1 ≠ 0 := by linarith
+  unfold ewensProb
+  simp [ewensDenominator_two]
+  field_simp
+  ring
 
 /-- **The formula normalises at `n = 2`.**  There are exactly two equivalence relations on a
 two-element set, and K-G (3.8) gives them total probability one. -/

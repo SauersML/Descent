@@ -1588,4 +1588,513 @@ theorem deployedReport_at_no_flow (L : OperatingPointLaw) (p : PopGenParameters)
 
 end OperatingPointLaw
 
+/-! ### The split coordinate is strictly monotone
+
+`Core.Fst` proves `fstFromTau` lands in the unit interval and never proves it increases,
+so every consumer that needs the ordering derives it inline -- `Core.Moments` does it four
+times, with the same four lines. Once, here. -/
+
+/-- **A longer scaled coalescence time is a larger differentiation.** -/
+theorem fstFromTau_lt_fstFromTau (τ₁ τ₂ : ℝ) (h0 : 0 ≤ τ₁) (h : τ₁ < τ₂) :
+    fstFromTau τ₁ < fstFromTau τ₂ := by
+  unfold fstFromTau saturation
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+  nlinarith
+
+/-- **A split law never reaches complete differentiation in finite scaled time.** -/
+theorem fstFromTau_lt_one (tau : ℝ) (h : 0 ≤ tau) : fstFromTau tau < 1 := by
+  unfold fstFromTau saturation
+  rw [div_lt_one (by linarith)]
+  linarith
+
+/-! ### The clinical family along a clean split
+
+The second route into the metric that `Core.Moments` already carries: a divergence time
+rather than a migration-mutation balance. The whole clinical family composes with it by
+the same four theorems, because the moment tuple sees a differentiation and nothing about
+where it came from. -/
+
+namespace OperatingPointLaw
+
+/-- **The predictive value after a clean split**, from the scaled coalescence time.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedPPVFromTau (L : OperatingPointLaw)
+    (V_A V_E tau prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).positivePredictiveValue prevalence
+
+/-- **The negative predictive value after a clean split.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNPVFromTau (L : OperatingPointLaw)
+    (V_A V_E tau prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).negativePredictiveValue prevalence
+
+/-- **The net benefit after a clean split.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNetBenefitFromTau (L : OperatingPointLaw)
+    (V_A V_E tau prevalence t : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).netBenefit prevalence t
+
+/-- **The split-route `R²` is non-negative.** -/
+theorem deployedR2FromTau_nonneg (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h : 0 ≤ tau) : 0 ≤ ScoreMoments.deployedR2FromTau V_A V_E tau := by
+  unfold ScoreMoments.deployedR2FromTau
+  exact r2_momentsUnderDrift_nonneg V_A V_E (fstFromTau tau) hV hE (fstFromTau_lt_one tau h)
+
+/-- **And at most one.** -/
+theorem deployedR2FromTau_le_one (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h : 0 ≤ tau) : ScoreMoments.deployedR2FromTau V_A V_E tau ≤ 1 := by
+  unfold ScoreMoments.deployedR2FromTau
+  exact le_of_lt
+    (r2_momentsUnderDrift_lt_one V_A V_E (fstFromTau tau) hV hE (fstFromTau_lt_one tau h))
+
+/-- **A longer split, a lower predictive value.** The divergence-time route into the
+coordinate a patient is told, so a result stated in divergence time and one stated in
+migration rate reach the same place. -/
+theorem deployedPPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ prevalence : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    L.deployedPPVFromTau V_A V_E t₂ prevalence < L.deployedPPVFromTau V_A V_E t₁ prevalence :=
+  L.positivePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (deployedR2FromTau_nonneg V_A V_E t₂ hV hE (by linarith))
+    (ScoreMoments.deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt)
+    (deployedR2FromTau_le_one V_A V_E t₁ hV hE h0)
+
+/-- **A longer split, a lower negative predictive value.** -/
+theorem deployedNPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ prevalence : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    L.deployedNPVFromTau V_A V_E t₂ prevalence < L.deployedNPVFromTau V_A V_E t₁ prevalence :=
+  L.negativePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (deployedR2FromTau_nonneg V_A V_E t₂ hV hE (by linarith))
+    (ScoreMoments.deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt)
+    (deployedR2FromTau_le_one V_A V_E t₁ hV hE h0)
+
+/-- **A longer split, a lower net benefit.** The decision curve of a score deployed
+across a divergence, as a function of the divergence. -/
+theorem deployedNetBenefitFromTau_anti (L : OperatingPointLaw)
+    (V_A V_E t₁ t₂ prevalence t : ℝ)
+    (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    L.deployedNetBenefitFromTau V_A V_E t₂ prevalence t
+      < L.deployedNetBenefitFromTau V_A V_E t₁ prevalence t :=
+  L.netBenefit_lt_of_r2_lt prevalence t _ _ hπ hπ1 ht ht1
+    (deployedR2FromTau_nonneg V_A V_E t₂ hV hE (by linarith))
+    (ScoreMoments.deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt)
+    (deployedR2FromTau_le_one V_A V_E t₁ hV hE h0)
+
+/-- **The whole clinical report is route-agnostic.**
+
+`Core.Moments.deployedR2_eq_deployedR2FromTau` says the equilibrium route and the split
+route give the same `R²` when they give the same `F_ST`. This says the same of every
+clinical metric downstream, and it is the reason the rest of this file never has to be
+proved twice: a metric that read anything about WHERE the differentiation came from would
+fail here. -/
+theorem clinicalReport_route_agnostic (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t tau : ℝ) (h : p.fstEquilibrium = fstFromTau tau) :
+    L.deployedPPV p V_E prevalence = L.deployedPPVFromTau p.V_A V_E tau prevalence ∧
+    L.deployedNPV p V_E prevalence = L.deployedNPVFromTau p.V_A V_E tau prevalence ∧
+    L.deployedNetBenefit p V_E prevalence t
+      = L.deployedNetBenefitFromTau p.V_A V_E tau prevalence t := by
+  have hr2 : ScoreMoments.deployedR2 p V_E = ScoreMoments.deployedR2FromTau p.V_A V_E tau :=
+    ScoreMoments.deployedR2_eq_deployedR2FromTau p V_E tau h
+  refine ⟨?_, ?_, ?_⟩ <;>
+    simp only [deployedPPV, deployedNPV, deployedNetBenefit, deployedPPVFromTau,
+      deployedNPVFromTau, deployedNetBenefitFromTau, hr2]
+
+end OperatingPointLaw
+
+/-! ### The transient route, and what it does and does not establish
+
+`Core.Moments` reaches the metric through two coordinates: `fstEquilibrium`, the LEVEL a
+migration-mutation balance settles at, and `fstFromTau`, the split law read at a scaled
+coalescence time. Neither is indexed by generations, so neither can say when a population
+gets where it is going.
+
+The corpus's approach-to-equilibrium coordinate is
+`Descent.Core.PopGenParameters.fstTransientAt`. Despite living in this record's namespace
+it is NOT in `Core`: it is declared with `_root_.` from
+`Descent/Portability/PortabilityDrift/Generational.lean` at depth thirty, and its body
+calls `PopGen.fstTransientDecayFromScaled`. `Core` cannot import it and cannot redefine
+it, so no theorem in this layer can mention it. That is a real gap in the layering and
+not a gap this file can close: the repair is to move `fstTransientAt` and `tauAt` DOWN,
+which is a thirty-module edit.
+
+What is reachable is the generation-indexed reading of the split law, below. It is a
+different quantity from `fstTransientAt` and the difference is the whole point of this
+section: an isolated split keeps differentiating without bound, while a
+migration-mutation balance plateaus. So the two coordinates CROSS -- they agree at exactly
+one generation, which the record's own parameters determine, and after it the split law
+strictly exceeds the equilibrium level. Both facts are theorems here.
+
+A reader who wanted "the transient approaches the equilibrium from below and converges to
+it" will not find it, because for THIS coordinate it is false, and the coordinate for
+which it is true is out of reach. -/
+
+namespace PopGenParameters
+
+/-- **Differentiation after `t` generations of isolation**, `τ/(1+τ)` at `τ = t/(2Nₑ)`.
+
+The clean-split law in generations rather than in scaled coalescent time. `t/(2Nₑ)` is the
+corpus's scaled time -- the same conversion
+`Descent.Core.PopGenParameters.tauAt` carries in `Portability/PortabilityDrift/
+Generational.lean`, whose docstring records the measurement that pins the two: the
+composition `exp(-θτ)` is checked at six cells where `Nₑ` runs over a factor of eight and
+cancels, and halving or doubling this factor is excluded by hundreds of sems. That
+declaration is above `Core` and cannot be called from here; when it moves down, this body
+should call it rather than repeat it.
+
+**This is a HUDSON `F_ST`, by the corpus's standing rule and not by choice**: it is
+`Core.fstFromTau` of a scaled time, and every `F_ST` written in `τ/(1+τ)` coordinates in
+this corpus is Hudson. Nei's `G_ST` is falsified at up to 18.59 sems against this same
+split law where Hudson's matches at 0.03, and the ratio between them moves with the data,
+so there is no factor converting a value computed here into a Nei one.
+
+**Regime: ISOLATION.** This is the law for two populations exchanging nothing. With
+migration the differentiation plateaus rather than saturating, and using a
+no-migration transient where a migration transient was wanted is an error the corpus has
+already paid for -- `Generational.fstTransientAt`'s docstring records the superseded
+within-deme decay base FALSIFIED at up to 2222 sems in
+`validation/empirical/simcov/battery_dis4.py`, for exactly that substitution.
+`fstEquilibrium_lt_fstAtGeneration_of_late` below is the machine-checked form of the
+warning.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def fstAtGeneration (p : PopGenParameters) (t : ℕ) : ℝ :=
+  fstFromTau ((t : ℝ) / (2 * p.Ne))
+
+/-- **At the split nothing has differentiated.** -/
+@[simp] theorem fstAtGeneration_zero (p : PopGenParameters) : p.fstAtGeneration 0 = 0 := by
+  unfold fstAtGeneration fstFromTau saturation
+  norm_num
+
+/-- **The scaled time is non-negative**, which every bound below rests on. -/
+theorem scaledTime_nonneg (p : PopGenParameters) (t : ℕ) :
+    (0:ℝ) ≤ (t : ℝ) / (2 * p.Ne) := by
+  have hNe := p.Ne_pos
+  exact div_nonneg (Nat.cast_nonneg t) (by linarith)
+
+/-- **Transient differentiation is non-negative.** -/
+theorem fstAtGeneration_nonneg (p : PopGenParameters) (t : ℕ) :
+    0 ≤ p.fstAtGeneration t :=
+  (fstFromTau_mem_unit _ (p.scaledTime_nonneg t)).1
+
+/-- **And strictly below one at every finite generation.** Complete differentiation is a
+limit and not a value the split law takes: two populations separated for any finite time
+still share allele frequencies. -/
+theorem fstAtGeneration_lt_one (p : PopGenParameters) (t : ℕ) :
+    p.fstAtGeneration t < 1 :=
+  fstFromTau_lt_one _ (p.scaledTime_nonneg t)
+
+/-- **Transient differentiation lies in the unit interval.** -/
+theorem fstAtGeneration_mem_unit (p : PopGenParameters) (t : ℕ) :
+    0 ≤ p.fstAtGeneration t ∧ p.fstAtGeneration t ≤ 1 :=
+  ⟨p.fstAtGeneration_nonneg t, le_of_lt (p.fstAtGeneration_lt_one t)⟩
+
+/-- **Longer isolation, more differentiation.** Strictly increasing in the generation
+count, which is what makes this a transient rather than a level. -/
+theorem fstAtGeneration_strictMono (p : PopGenParameters) (t₁ t₂ : ℕ) (h : t₁ < t₂) :
+    p.fstAtGeneration t₁ < p.fstAtGeneration t₂ := by
+  have hNe := p.Ne_pos
+  have hcast : (t₁ : ℝ) < (t₂ : ℝ) := by exact_mod_cast h
+  have hτ : (t₁ : ℝ) / (2 * p.Ne) < (t₂ : ℝ) / (2 * p.Ne) := by
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    exact mul_lt_mul_of_pos_right hcast (by linarith)
+  exact fstFromTau_lt_fstFromTau _ _ (p.scaledTime_nonneg t₁) hτ
+
+/-- **The equilibrium level IS the split law, at scaled time `1/x`.**
+
+`1/(1 + x)` and `τ/(1 + τ)` are the same curve read from the two ends, so the level a
+migration-mutation balance settles at is the differentiation an ISOLATED pair reaches
+after scaled time `1/x`, where `x` is the record's total scaled flow. That is the
+conversion between the corpus's two `F_ST` coordinates, made explicit rather than left for
+a reader to rediscover, and it is what makes the crossing theorems below statements about
+one curve rather than two.
+
+Written through `Core.scaledFlow` at the record's own deme count, so the deme correction
+`d/(d-1)` is carried into the equilibration time as well: a lattice with more demes
+differentiates to a higher level AND takes a different number of generations to get
+there. -/
+theorem fstEquilibrium_eq_fstFromTau_inv (p : PopGenParameters)
+    (h : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes) :
+    p.fstEquilibrium = fstFromTau (1 / scaledFlow p.Ne p.mig p.mu p.nDemes) := by
+  have hinv : (0:ℝ) < 1 / scaledFlow p.Ne p.mig p.mu p.nDemes := div_pos one_pos h
+  have h1 : (1:ℝ) + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+    exact hpos.ne'
+  have h2 : (1:ℝ) + 1 / scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + 1 / scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+    exact hpos.ne'
+  have hx : scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := h.ne'
+  unfold fstEquilibrium fstIslandEquilibrium fstFromFlow fstFromTau saturation
+  rw [div_eq_div_iff h1 h2]
+  field_simp
+
+/-- **The two routes agree at exactly one generation**, and the condition says which.
+
+`Core.Moments.fstEquilibrium_eq_fstFromTau_iff` states this in scaled time; this is the
+same statement with the generation count in it, so a reader can ask "how long until this
+population is as differentiated as its own equilibrium says it will be" and get an
+answer. -/
+theorem fstAtGeneration_eq_fstEquilibrium_iff (p : PopGenParameters) (t : ℕ) :
+    p.fstEquilibrium = p.fstAtGeneration t ↔
+      1 = ((t : ℝ) / (2 * p.Ne)) * scaledFlow p.Ne p.mig p.mu p.nDemes := by
+  have hflow := p.scaledFlow_nonneg
+  have h0 := p.scaledTime_nonneg t
+  have hx : (1:ℝ) + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+    exact hpos.ne'
+  have ht : (1:ℝ) + ((t : ℝ) / (2 * p.Ne)) ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + ((t : ℝ) / (2 * p.Ne)) := by linarith
+    exact hpos.ne'
+  unfold fstAtGeneration
+  exact ScoreMoments.fstEquilibrium_eq_fstFromTau_iff p ((t : ℝ) / (2 * p.Ne)) hx ht
+
+/-- **The equilibration generation, named.** At `t = 2Nₑ/x` the isolated pair has reached
+exactly the differentiation the migration-mutation balance settles at. Before that
+generation the transient is below the level; after it, above -- which is the next theorem
+and is why "the transient converges to the equilibrium" is false for this coordinate. -/
+theorem fstAtGeneration_eq_fstEquilibrium_of_equilibrationTime (p : PopGenParameters)
+    (t : ℕ) (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
+    (h : (t : ℝ) = 2 * p.Ne / scaledFlow p.Ne p.mig p.mu p.nDemes) :
+    p.fstEquilibrium = p.fstAtGeneration t := by
+  have hNe := p.Ne_pos
+  have hx : scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := hflow.ne'
+  have h2 : (2:ℝ) * p.Ne ≠ 0 := by positivity
+  rw [p.fstAtGeneration_eq_fstEquilibrium_iff t, h]
+  field_simp
+
+/-- **Before the equilibration generation the transient is strictly below the level.**
+The direction a reader expects, and it holds -- but only on this side. -/
+theorem fstAtGeneration_lt_fstEquilibrium_of_early (p : PopGenParameters) (t : ℕ)
+    (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
+    (hearly : (t : ℝ) / (2 * p.Ne) < 1 / scaledFlow p.Ne p.mig p.mu p.nDemes) :
+    p.fstAtGeneration t < p.fstEquilibrium := by
+  rw [p.fstEquilibrium_eq_fstFromTau_inv hflow]
+  exact fstFromTau_lt_fstFromTau _ _ (p.scaledTime_nonneg t) hearly
+
+/-- **And after it the transient strictly EXCEEDS the level, without bound.**
+
+This is the theorem that says the generation-indexed split law is not an
+approach-to-equilibrium coordinate, and it is stated because assuming otherwise is a
+known-expensive error. An isolated pair keeps differentiating; a pair exchanging migrants
+plateaus. Substituting the first for the second is what
+`Generational.fstTransientAt`'s docstring records as FALSIFIED at up to 2222 sems, and a
+reader who took `fstAtGeneration` for a transient under migration would be making it
+again.
+
+The corpus's coordinate for the migration case is `fstTransientAt`, which this layer
+cannot reach; see the section header. -/
+theorem fstEquilibrium_lt_fstAtGeneration_of_late (p : PopGenParameters) (t : ℕ)
+    (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
+    (hlate : 1 / scaledFlow p.Ne p.mig p.mu p.nDemes < (t : ℝ) / (2 * p.Ne)) :
+    p.fstEquilibrium < p.fstAtGeneration t := by
+  have hinv : (0:ℝ) ≤ 1 / scaledFlow p.Ne p.mig p.mu p.nDemes :=
+    le_of_lt (div_pos one_pos hflow)
+  rw [p.fstEquilibrium_eq_fstFromTau_inv hflow]
+  exact fstFromTau_lt_fstFromTau _ _ hinv hlate
+
+/-- **A history with no flow is never reached in finite time.**
+
+At zero migration and zero mutation the equilibrium is complete differentiation, and the
+transient is strictly below one at every generation. So the one demographic history whose
+equilibrium the transient can never cross is the isolated one -- which is right, and is
+the boundary case the two coordinates agree about. -/
+theorem fstAtGeneration_lt_fstEquilibrium_at_no_flow (p : PopGenParameters) (t : ℕ)
+    (hmu : p.mu = 0) (hmig : p.mig = 0) :
+    p.fstAtGeneration t < p.fstEquilibrium := by
+  have hz : scaledFlow p.Ne p.mig p.mu p.nDemes = 0 := by
+    rw [p.scaledFlow_eq, hmu, hmig]
+    ring
+  have heq : p.fstEquilibrium = 1 := by
+    unfold fstEquilibrium fstIslandEquilibrium
+    rw [hz]
+    exact fstFromFlow_zero
+  rw [heq]
+  exact p.fstAtGeneration_lt_one t
+
+/-- **The deployed `R²` after `t` generations of isolation.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedR2AtGeneration (p : PopGenParameters) (V_E : ℝ) (t : ℕ) : ℝ :=
+  (ScoreMoments.momentsUnderDrift p.V_A V_E (p.fstAtGeneration t)).r2
+
+/-- **At the split the deployed metric is the source metric.** -/
+theorem deployedR2AtGeneration_at_zero (p : PopGenParameters) (V_E : ℝ) :
+    p.deployedR2AtGeneration V_E 0 = (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 := by
+  unfold deployedR2AtGeneration
+  rw [p.fstAtGeneration_zero]
+
+/-- **Longer isolation, less transferable score.** The transient route's monotone law, in
+generations. -/
+theorem deployedR2AtGeneration_anti (p : PopGenParameters) (V_E : ℝ) (t₁ t₂ : ℕ)
+    (hE : 0 < V_E) (h : t₁ < t₂) :
+    p.deployedR2AtGeneration V_E t₂ < p.deployedR2AtGeneration V_E t₁ :=
+  ScoreMoments.r2_momentsUnderDrift_anti p.V_A V_E (p.fstAtGeneration t₁)
+    (p.fstAtGeneration t₂) p.V_A_pos hE (p.fstAtGeneration_strictMono t₁ t₂ h)
+    (p.fstAtGeneration_lt_one t₂)
+
+/-- **The transient `R²` is non-negative.** -/
+theorem deployedR2AtGeneration_nonneg (p : PopGenParameters) (V_E : ℝ) (t : ℕ)
+    (hE : 0 < V_E) : 0 ≤ p.deployedR2AtGeneration V_E t :=
+  r2_momentsUnderDrift_nonneg p.V_A V_E (p.fstAtGeneration t) p.V_A_pos hE
+    (p.fstAtGeneration_lt_one t)
+
+/-- **And at most one.** -/
+theorem deployedR2AtGeneration_le_one (p : PopGenParameters) (V_E : ℝ) (t : ℕ)
+    (hE : 0 < V_E) : p.deployedR2AtGeneration V_E t ≤ 1 :=
+  le_of_lt (r2_momentsUnderDrift_lt_one p.V_A V_E (p.fstAtGeneration t) p.V_A_pos hE
+    (p.fstAtGeneration_lt_one t))
+
+/-- **The transient route reaches the equilibrium route's metric, at the equilibration
+generation.**
+
+The `R²` half of the agreement. Both routes feed the same `momentsUnderDrift`, so they
+agree exactly when they agree on `F_ST`, and the generation at which they do is the one
+`fstAtGeneration_eq_fstEquilibrium_of_equilibrationTime` names. -/
+theorem deployedR2AtGeneration_eq_deployedR2 (p : PopGenParameters) (V_E : ℝ) (t : ℕ)
+    (h : p.fstEquilibrium = p.fstAtGeneration t) :
+    p.deployedR2AtGeneration V_E t = ScoreMoments.deployedR2 p V_E := by
+  unfold deployedR2AtGeneration ScoreMoments.deployedR2
+  rw [h]
+
+end PopGenParameters
+
+namespace OperatingPointLaw
+
+/-- **The predictive value after `t` generations of isolation.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedPPVAtGeneration (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (t : ℕ) : ℝ :=
+  (L.point (p.deployedR2AtGeneration V_E t)).positivePredictiveValue prevalence
+
+/-- **The negative predictive value after `t` generations of isolation.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNPVAtGeneration (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (t : ℕ) : ℝ :=
+  (L.point (p.deployedR2AtGeneration V_E t)).negativePredictiveValue prevalence
+
+/-- **The net benefit after `t` generations of isolation.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNetBenefitAtGeneration (L : OperatingPointLaw)
+    (p : PopGenParameters) (V_E prevalence t : ℝ) (gen : ℕ) : ℝ :=
+  (L.point (p.deployedR2AtGeneration V_E gen)).netBenefit prevalence t
+
+/-- **The reclassification index of `t` generations of isolation.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
+noncomputable def deployedNRIAtGeneration (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) (t : ℕ) : ℝ :=
+  OperatingPoint.nriFromOperatingPoints
+    (L.point (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2)
+    (L.point (p.deployedR2AtGeneration V_E t))
+
+/-- **Longer isolation, a lower predictive value.** The transient route reaching the
+number a patient is told. -/
+theorem deployedPPVAtGeneration_anti (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (t₁ t₂ : ℕ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hE : 0 < V_E) (h : t₁ < t₂) :
+    L.deployedPPVAtGeneration p V_E prevalence t₂
+      < L.deployedPPVAtGeneration p V_E prevalence t₁ :=
+  L.positivePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (p.deployedR2AtGeneration_nonneg V_E t₂ hE)
+    (p.deployedR2AtGeneration_anti V_E t₁ t₂ hE h)
+    (p.deployedR2AtGeneration_le_one V_E t₁ hE)
+
+/-- **Longer isolation, a lower negative predictive value.** -/
+theorem deployedNPVAtGeneration_anti (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence : ℝ) (t₁ t₂ : ℕ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (hE : 0 < V_E) (h : t₁ < t₂) :
+    L.deployedNPVAtGeneration p V_E prevalence t₂
+      < L.deployedNPVAtGeneration p V_E prevalence t₁ :=
+  L.negativePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
+    (p.deployedR2AtGeneration_nonneg V_E t₂ hE)
+    (p.deployedR2AtGeneration_anti V_E t₁ t₂ hE h)
+    (p.deployedR2AtGeneration_le_one V_E t₁ hE)
+
+/-- **Longer isolation, a lower net benefit.** -/
+theorem deployedNetBenefitAtGeneration_anti (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E prevalence t : ℝ) (g₁ g₂ : ℕ) (hπ : 0 < prevalence) (hπ1 : prevalence < 1)
+    (ht : 0 < t) (ht1 : t < 1) (hE : 0 < V_E) (h : g₁ < g₂) :
+    L.deployedNetBenefitAtGeneration p V_E prevalence t g₂
+      < L.deployedNetBenefitAtGeneration p V_E prevalence t g₁ :=
+  L.netBenefit_lt_of_r2_lt prevalence t _ _ hπ hπ1 ht ht1
+    (p.deployedR2AtGeneration_nonneg V_E g₂ hE)
+    (p.deployedR2AtGeneration_anti V_E g₁ g₂ hE h)
+    (p.deployedR2AtGeneration_le_one V_E g₁ hE)
+
+/-- **Isolation reclassifies patients the wrong way, at every generation past the
+split.** -/
+theorem deployedNRIAtGeneration_neg (L : OperatingPointLaw) (p : PopGenParameters)
+    (V_E : ℝ) (t : ℕ) (hE : 0 < V_E) (ht : 0 < t) :
+    L.deployedNRIAtGeneration p V_E t < 0 := by
+  have h0 : p.deployedR2AtGeneration V_E 0
+      = (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 :=
+    p.deployedR2AtGeneration_at_zero V_E
+  have hlt : p.deployedR2AtGeneration V_E t
+      < (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 := by
+    rw [← h0]
+    exact p.deployedR2AtGeneration_anti V_E 0 t hE ht
+  have hsrc : (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 ≤ 1 := by
+    rw [← h0]
+    exact p.deployedR2AtGeneration_le_one V_E 0 hE
+  exact L.nri_neg_of_r2_lt _ _ (p.deployedR2AtGeneration_nonneg V_E t hE) hlt hsrc
+
+/-- **The transient and the equilibrium routes reach the SAME clinical report, at the
+equilibration generation.**
+
+This is the agreement the two routes have and the whole of it. It is not convergence: by
+`fstEquilibrium_lt_fstAtGeneration_of_late` the transient overshoots afterwards. It is a
+crossing, at the one generation `fstAtGeneration_eq_fstEquilibrium_of_equilibrationTime`
+names, and at that generation every clinical metric agrees because all of them factor
+through `R²` and `R²` factors through `F_ST`. -/
+theorem clinicalReport_transient_eq_equilibrium (L : OperatingPointLaw)
+    (p : PopGenParameters) (V_E prevalence t : ℝ) (gen : ℕ)
+    (h : p.fstEquilibrium = p.fstAtGeneration gen) :
+    L.deployedPPVAtGeneration p V_E prevalence gen = L.deployedPPV p V_E prevalence ∧
+    L.deployedNPVAtGeneration p V_E prevalence gen = L.deployedNPV p V_E prevalence ∧
+    L.deployedNetBenefitAtGeneration p V_E prevalence t gen
+      = L.deployedNetBenefit p V_E prevalence t ∧
+    L.deployedNRIAtGeneration p V_E gen = L.deployedNRI p V_E := by
+  have hr2 : p.deployedR2AtGeneration V_E gen = ScoreMoments.deployedR2 p V_E :=
+    p.deployedR2AtGeneration_eq_deployedR2 V_E gen h
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    simp only [deployedPPVAtGeneration, deployedNPVAtGeneration,
+      deployedNetBenefitAtGeneration, deployedNRIAtGeneration, deployedPPV, deployedNPV,
+      deployedNetBenefit, deployedNRI, hr2]
+
+end OperatingPointLaw
+
 end Descent.Core
