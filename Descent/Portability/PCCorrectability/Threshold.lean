@@ -214,6 +214,14 @@ noncomputable def pcCorrectabilityMargin_referenceEvaluation :
     unfold bbpProxyThreshold demographicSpike effectiveSubgroupSize
     norm_num [sqrt_four]
 
+/-- **The reference evaluation records the value it was built to pin.**
+
+A `ReferenceEvaluation` bundle that nothing states anything about is a record with a
+number in it. This is what makes the bundle a claim: at the recorded point the body takes
+the recorded value, and the competitor it carries does not. -/
+theorem pcCorrectabilityMargin_referenceEvaluation_value :
+    pcCorrectabilityMargin_referenceEvaluation.value = 1 := rfl
+
 /-- **The old margin reference point pinned nothing about the spike.**  At
 `n = M = F = m = 1` the halved-constant competitor reproduces the stated value
 `-1` exactly, because the spike term it differs in has collapsed to zero. -/

@@ -3686,6 +3686,20 @@ def targetCorrectionCurvature (weight : ι → ℝ) (B : ι → Matrix J J ℝ)
     (beta : J → ℝ) : ι → ℝ :=
   fun i ↦ weight i * coefficientEnergy (B i) beta
 
+/-- **The curvature is the energy scaled by the target's weight**, evaluated where the
+family is not degenerate.
+
+Written because the docstring above says an identifier grep is not enough to justify
+removing this definition: what makes it load-bearing is a statement that USES it, and a
+statement that only quantified over abstract arguments would be satisfied by the constant
+zero. At weight one the curvature IS the coefficient energy of that target's operator,
+which is the claim the name makes. -/
+theorem targetCorrectionCurvature_at_unit_weight (B : ι → Matrix J J ℝ) (beta : J → ℝ)
+    (i : ι) :
+    targetCorrectionCurvature (fun _ ↦ 1) B beta i = coefficientEnergy (B i) beta := by
+  unfold targetCorrectionCurvature
+  ring
+
 /-- **The correction each target would choose alone**, as a family indexed by
 deployment target.
 
@@ -3704,6 +3718,14 @@ Empirical status: UNTESTED. -/
 noncomputable def targetCorrectionOptimum (B : ι → Matrix J J ℝ) (beta theta : J → ℝ) :
     ι → ℝ :=
   fun i ↦ sharedCorrectionOptimum (B i) beta theta
+
+/-- **Each target's own optimum is the shared optimum for that target's operator.**
+The definition unfolded, stated so the indexed family is tied to the scalar it indexes
+rather than merely resembling it. -/
+theorem targetCorrectionOptimum_apply (B : ι → Matrix J J ℝ) (beta theta : J → ℝ)
+    (i : ι) :
+    targetCorrectionOptimum B beta theta i = sharedCorrectionOptimum (B i) beta theta :=
+  rfl
 
 /-- The curvature-weighted mean of the per-target optimal corrections: the
 shared correction that a weighted-least-squares compromise selects.

@@ -342,6 +342,20 @@ theorem GWASObservationModel.observation_decomposition (m : GWASObservationModel
 def GWASObservationModel.isSelected (m : GWASObservationModel) (epsilon z_alpha : ℝ) : Prop :=
   z_alpha * m.standardError < |m.true_beta + epsilon|
 
+/-- **Selection is two-sided, and this is the statement that says so.**
+
+The docstring above records that both references to this definition are prose, so a grep
+reaches neither and the build stays green if it is deleted. That is precisely the case
+where a theorem is owed: an effect and its negation are selected on identically, which is
+what "two-sided" means and what distinguishes this event from the one-sided truncation the
+neighbouring note refers to. -/
+theorem GWASObservationModel.isSelected_neg (m : GWASObservationModel)
+    (epsilon z_alpha : ℝ) (hm : m.true_beta = 0) :
+    m.isSelected epsilon z_alpha ↔ m.isSelected (-epsilon) z_alpha := by
+  unfold GWASObservationModel.isSelected
+  rw [hm]
+  simp [abs_neg]
+
 /-! ### Truncation bias under selection
 
 Removed.  This defined `truncationBias se beta z_alpha` as `se · φ(z_α - β/se)`,
