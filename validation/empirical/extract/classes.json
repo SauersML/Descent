@@ -10813,7 +10813,7 @@
  },
  "Descent.generatorIter": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"generatorApply() missing 1 required positional ar)",
+  "note": "self-check: arity/type mismatch (TypeError(\"generatorApply() missing 1 required positional argument: 'i'\"))",
   "file": "Descent/Blindness/LumpedRateBlindness.lean",
   "line": 103,
   "short": "generatorIter",
@@ -13107,7 +13107,7 @@
  },
  "Descent.gramCovariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"can't multiply sequence by non-int of type 'float)",
+  "note": "self-check: arity/type mismatch (TypeError(\"can't multiply sequence by non-int of type 'float'\"))",
   "file": "Descent/Blindness/SpectralUniversalityFailure.lean",
   "line": 283,
   "short": "gramCovariance",
@@ -29239,7 +29239,8 @@
    "Descent.Coalescent.pairDistinct_nonneg",
    "Descent.Coalescent.pairDistinct_one",
    "Descent.Coalescent.tsum_pairDistinct",
-   "Descent.Coalescent.tsum_pairDistinct_diploid"
+   "Descent.Coalescent.tsum_pairDistinct_diploid",
+   "Descent.Program.coalescentTimeScale_eq_meanPairCoalescenceTime"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -29264,7 +29265,8 @@
     ],
     "Descent.Coalescent.tsum_pairDistinct_diploid": [],
     "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
-    "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": []
+    "Descent.Coalescent.heterozygosityLossDerived_eq_pairCoalesced": [],
+    "Descent.Program.coalescentTimeScale_eq_meanPairCoalescenceTime": []
    },
    "range_lo_thm": [
     "Descent.Coalescent.pairDistinct_nonneg",
@@ -31759,7 +31761,7 @@
  },
  "Descent.Conditionals.exampleComponentResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"componentPosterior() missing 2 required positiona)",
+  "note": "self-check: arity/type mismatch (TypeError(\"componentPosterior() missing 2 required positional arguments: 'g' and 'k'\"))",
   "file": "Descent/Conditionals/DescentGeometry.lean",
   "line": 927,
   "short": "exampleComponentResidual",
@@ -34046,7 +34048,7 @@
  },
  "Descent.Conditionals.binaryTransportFamily": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"jointTransportLaw() missing 1 required positional)",
+  "note": "self-check: arity/type mismatch (TypeError(\"jointTransportLaw() missing 1 required positional argument: 'g'\"))",
   "file": "Descent/Conditionals/DynamicsContrast.lean",
   "line": 1728,
   "short": "binaryTransportFamily",
@@ -34220,7 +34222,7 @@
  },
  "Descent.Conditionals.binaryConditionalContextMatch": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"jointTransportLaw() missing 1 required positional)",
+  "note": "self-check: arity/type mismatch (TypeError(\"jointTransportLaw() missing 1 required positional argument: 'g'\"))",
   "file": "Descent/Conditionals/DynamicsContrast.lean",
   "line": 1989,
   "short": "binaryConditionalContextMatch",
@@ -70072,7 +70074,7 @@
  },
  "Descent.hetRecurrence": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"Descent_Core_hetRecurrence() missing 1 required p)",
+  "note": "self-check: arity/type mismatch (TypeError(\"Descent_Core_hetRecurrence() missing 1 required positional argument: 't'\"))",
   "file": "Descent/PopGen/PopulationGeneticsFoundations.lean",
   "line": 2118,
   "short": "hetRecurrence",
@@ -80701,7 +80703,7 @@
  },
  "Descent.mechanisticPortabilityRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/MechanisticPortabilityWitnesses.lean",
   "line": 93,
   "short": "mechanisticPortabilityRatio",
@@ -81951,7 +81953,7 @@
  },
  "Descent.brierDiscriminationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 849,
   "short": "brierDiscriminationLoss",
@@ -82005,7 +82007,7 @@
  },
  "Descent.brierCalibrationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 857,
   "short": "brierCalibrationLoss",
@@ -83918,7 +83920,7 @@
  },
  "Descent.ancestryAlignmentEnergy": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError('threeAncestryDistance() takes 0 positional argume)",
+  "note": "self-check: arity/type mismatch (TypeError('threeAncestryDistance() takes 0 positional arguments but 2 were given'))",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 2359,
   "short": "ancestryAlignmentEnergy",
@@ -90280,7 +90282,7 @@
  },
  "Descent.shiftedObservedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 463,
   "short": "shiftedObservedMean",
@@ -90525,7 +90527,7 @@
  },
  "Descent.CrossPopulationCalibrationShiftModel.observedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 500,
   "short": "observedMean",
@@ -90574,7 +90576,7 @@
  },
  "Descent.CrossPopulationCalibrationShiftModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 505,
   "short": "predictedMean",
@@ -90899,7 +90901,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.deploymentIntercept": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 748,
   "short": "deploymentIntercept",
@@ -91026,7 +91028,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 759,
   "short": "scoreMean",
@@ -91063,7 +91065,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 766,
   "short": "scoreMeanShift",
@@ -91133,7 +91135,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.predictedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 771,
   "short": "predictedMean",
@@ -91178,7 +91180,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.observedMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 776,
   "short": "observedMean",
@@ -91227,7 +91229,7 @@
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 782,
   "short": "calibrationSlope",
@@ -91710,7 +91712,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.deploymentInterceptAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1258,
   "short": "deploymentInterceptAt",
@@ -91884,7 +91886,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.predictedMeanAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1279,
   "short": "predictedMeanAt",
@@ -91925,7 +91927,7 @@
  },
  "Descent.CrossPopulationGenerationalCalibrationModel.observedMeanAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'f)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 1284,
   "short": "observedMeanAt",
@@ -97605,7 +97607,7 @@
  },
  "Descent.sourceERMWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'l)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'list'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2178,
   "short": "sourceERMWeights",
@@ -97976,7 +97978,7 @@
  },
  "Descent.sourceWeightsFromExplicitDrivers": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2333,
   "short": "sourceWeightsFromExplicitDrivers",
@@ -98027,7 +98029,7 @@
  },
  "Descent.sourceWeightedTagScore": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2341,
   "short": "sourceWeightedTagScore",
@@ -98404,7 +98406,7 @@
  },
  "Descent.scoreVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2590,
   "short": "scoreVarianceFromSourceWeights",
@@ -98506,7 +98508,7 @@
  },
  "Descent.predictiveCovarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2613,
   "short": "predictiveCovarianceFromSourceWeights",
@@ -98594,7 +98596,7 @@
  },
  "Descent.calibrationSlopeFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2619,
   "short": "calibrationSlopeFromSourceWeights",
@@ -98719,7 +98721,7 @@
  },
  "Descent.ancestrySpecificLDResidual": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2793,
   "short": "ancestrySpecificLDResidual",
@@ -98869,7 +98871,7 @@
  },
  "Descent.irreducibleTargetResidualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2843,
   "short": "irreducibleTargetResidualBurden",
@@ -98949,7 +98951,7 @@
  },
  "Descent.residualBurden": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2884,
   "short": "residualBurden",
@@ -98985,7 +98987,7 @@
  },
  "Descent.effectiveOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2914,
   "short": "effectiveOutcomeVariance",
@@ -99083,7 +99085,7 @@
  },
  "Descent.explainedSignalVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2987,
   "short": "explainedSignalVarianceFromSourceWeights",
@@ -99164,7 +99166,7 @@
  },
  "Descent.r2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3019,
   "short": "r2FromSourceWeights",
@@ -99332,7 +99334,7 @@
  },
  "Descent.residualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3037,
   "short": "residualVarianceFromSourceWeights",
@@ -99392,7 +99394,7 @@
  },
  "Descent.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3062,
   "short": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
@@ -99451,7 +99453,7 @@
  },
  "Descent.targetCalibratedBrierFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3146,
   "short": "targetCalibratedBrierFromSourceWeights",
@@ -100895,7 +100897,7 @@
  },
  "Descent.sigmaTagCausalTargetAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4465,
   "short": "sigmaTagCausalTargetAt",
@@ -100935,7 +100937,7 @@
  },
  "Descent.targetSourceEffectProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4504,
   "short": "targetSourceEffectProjectionAt",
@@ -100977,7 +100979,7 @@
  },
  "Descent.targetEffectHeterogeneityProjectionAt": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'function' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4539,
   "short": "targetEffectHeterogeneityProjectionAt",
@@ -102144,7 +102146,7 @@
  },
  "Descent.equalVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'V)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 5552,
   "short": "equalVarianceGaussianAUCFromSourceWeights",
@@ -116612,7 +116614,7 @@
   "class": "WRAPPER",
   "note": "delegates to Descent.Core.ploidy",
   "file": "Descent/Program/Conventions.lean",
-  "line": 91,
+  "line": 92,
   "short": "ploidy",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -116906,7 +116908,7 @@
   "class": "WRAPPER",
   "note": "delegates to Descent.Core.hweHeterozygosity",
   "file": "Descent/Program/Conventions.lean",
-  "line": 109,
+  "line": 110,
   "short": "hweGenotypeVariance",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -116980,9 +116982,9 @@
  },
  "Descent.Program.coalescentTimeScale": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for *: 'function' and)",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for *: 'function' and 'float'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 154,
+  "line": 155,
   "short": "coalescentTimeScale",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -117010,6 +117012,7 @@
    "Descent.Program.coalFst_uses_coalescentTimeScale",
    "Descent.Program.coalescentTau_uses_timeScale",
    "Descent.Program.coalescentTimeScale_eq",
+   "Descent.Program.coalescentTimeScale_eq_meanPairCoalescenceTime",
    "Descent.Program.cumulativeDrift_uses_timeScale",
    "Descent.Program.driftLDCreationRate_eq_inv_timeScale",
    "Descent.Program.driftLDEquilibrium_uses_coalescentTimeScale",
@@ -117046,9 +117049,14 @@
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "units": "generations",
-   "hypotheses": [],
+   "hypotheses": [
+    "0 < Ne"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Program.coalescentTimeScale_eq": [],
+    "Descent.Program.coalescentTimeScale_eq_meanPairCoalescenceTime": [
+     "0 < Ne"
+    ],
     "Descent.Program.fstFromDrift_uses_coalescentTimeScale": [],
     "Descent.Program.fstDemeCorrectedFlowStep_constants_named": [],
     "Descent.Program.driftLDCreationRate_eq_inv_timeScale": [],
@@ -117091,7 +117099,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 299,
+  "line": 318,
   "short": "meanAlleleFreq",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM",
@@ -117213,9 +117221,9 @@
  },
  "Descent.Program.neiGst": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real numbe)",
+  "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real number, not 'function'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 419,
+  "line": 438,
   "short": "neiGst",
   "ret_type": "ℝ",
   "empirical_status": "CONVENTION PINNED",
@@ -117323,7 +117331,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 482,
+  "line": 501,
   "short": "hudsonFst",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED --",
@@ -117401,7 +117409,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 671,
+  "line": 690,
   "short": "betweenSubgroupVariance",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -117454,9 +117462,9 @@
  },
  "Descent.Program.neiContrastSpike": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real numbe)",
+  "note": "self-check: arity/type mismatch (TypeError(\"float() argument must be a string or a real number, not 'function'\"))",
   "file": "Descent/Program/Conventions.lean",
-  "line": 752,
+  "line": 771,
   "short": "neiContrastSpike",
   "ret_type": "ℝ",
   "empirical_status": "CONVENTION PINNED",
@@ -117529,7 +117537,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/Conventions.lean",
-  "line": 773,
+  "line": 792,
   "short": "hudsonBbpSpike",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
@@ -123412,7 +123420,7 @@
  },
  "Descent.Spectral.lagObservationDerivative": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'mulVec'\")",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'mulVec'\"))",
   "file": "Descent/Spectral/Permeability.lean",
   "line": 1360,
   "short": "lagObservationDerivative",
@@ -123459,7 +123467,7 @@
  },
  "Descent.Spectral.lagCompletionPermeability": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'mulVec'\")",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'mulVec'\"))",
   "file": "Descent/Spectral/Permeability.lean",
   "line": 1392,
   "short": "lagCompletionPermeability",
@@ -126547,7 +126555,7 @@
  },
  "Descent.Spectral.FiniteSpectralModel.degradation": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"optimalReadout() missing 1 required positional ar)",
+  "note": "self-check: arity/type mismatch (TypeError(\"optimalReadout() missing 1 required positional argument: 'b'\"))",
   "file": "Descent/Spectral/SpectralDegradation.lean",
   "line": 64,
   "short": "degradation",
