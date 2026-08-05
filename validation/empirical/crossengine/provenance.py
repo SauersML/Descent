@@ -38,7 +38,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 
 def find_repo_root(start: pathlib.Path) -> pathlib.Path:
     for p in [start, *start.parents]:
-        if (p / "proofs" / "Descent").is_dir():
+        if (p / "Descent").is_dir() and (p / "lakefile.lean").is_file():
             return p
     raise SystemExit("could not locate the repository root above " + str(start))
 

@@ -44,8 +44,12 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parent.parent.parent
-SIMCOV = REPO / "proofs" / "validation" / "empirical" / "simcov"
+# validation/code/, so two levels up is the repository root. The corpus used to
+# sit under a `proofs/` directory and no longer does; this resolved through that
+# segment and reported the ledger ABSENT rather than failing to find it, which
+# is the quiet way for a test to stop testing anything.
+REPO = HERE.parent.parent
+SIMCOV = REPO / "validation" / "empirical" / "simcov"
 
 FAILURES: list[str] = []
 

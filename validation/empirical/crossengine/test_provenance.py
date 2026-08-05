@@ -69,7 +69,8 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as td:
         clean = pathlib.Path(td) / "clean"
-        (clean / "proofs" / "Descent").mkdir(parents=True)
+        (clean / "Descent").mkdir(parents=True)
+        (clean / "lakefile.lean").write_text("")
         stage(clean, files)
 
         rc, out = run_against(clean)
@@ -87,7 +88,8 @@ def main() -> int:
                 "direction cannot be calibrated at all")
         for key, s in restricted.items():
             dirty = pathlib.Path(td) / ("dirty_" + key)
-            (dirty / "proofs" / "Descent").mkdir(parents=True)
+            (dirty / "Descent").mkdir(parents=True)
+            (dirty / "lakefile.lean").write_text("")
             stage(dirty, files)
             path = dirty / s["lean_file"]
             text = path.read_text()

@@ -61,8 +61,13 @@ def sh(argv, cwd, timeout=1800):
 
 def stage(td: Path) -> Path:
     root = td / "tree"
-    shutil.copytree(REPO / "proofs", root / "proofs", symlinks=True,
-                    ignore=shutil.ignore_patterns("__pycache__"))
+    # The corpus used to live under `proofs/`; it is the repository root now,
+    # so stage the two directories the guards read rather than a subtree that
+    # no longer exists.
+    for name in ("Descent", "validation"):
+        shutil.copytree(REPO / name, root / name, symlinks=True,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copy2(REPO / "Descent.lean", root / "Descent.lean")
     return root
 
 

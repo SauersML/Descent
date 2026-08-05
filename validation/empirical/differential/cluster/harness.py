@@ -150,7 +150,7 @@ def import_simprov(repo_root, explicit):
         cands.append(os.path.abspath(explicit))
     if repo_root:
         cands.append(os.path.join(
-            repo_root, "proofs", "validation", "empirical", "simprov.py"))
+            repo_root, "validation", "empirical", "simprov.py"))
     for path in cands:
         if os.path.isfile(path):
             d = os.path.dirname(path)

@@ -1348,10 +1348,10 @@ the point: it is not that a positive margin fails to help, it is that the margin
 among the quantities the conclusion depends on. What the existing margin omits is the
 headroom, and the omission is not conservative.
 
-The statement used to be named `imitable_despite_positive_pcCorrectabilityMargin` and to
-bind `0 < pcCorrectabilityMargin ...` as a hypothesis its proof never touched. The
-unconditional statement is strictly stronger -- it covers a positive margin as one case --
-and a premise carried only so that a name could allude to it is a decoration. -/
+Binding `0 < pcCorrectabilityMargin ...` as a hypothesis here would be a decoration: no
+step of the proof touches it, and the unconditional statement is strictly stronger, since
+it covers a positive margin as one case. A premise carried only so that a name can allude
+to it weakens the theorem and certifies nothing. -/
 theorem imitable_within_traceWindowBudget
     {N : ℕ} (m : ℕ) (F : ℝ) (hF : 0 ≤ F) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)

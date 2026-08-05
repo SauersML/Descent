@@ -3494,9 +3494,10 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     `DGP.fstEquilibrium`, spelled out here because this record cannot reach an
     `EvolutionaryParameters`, and it moved when that one did: the migration term
     carries `islandDemeCorrection`, which at the two populations this transport
-    layer is about equals 2. `PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor`
-    is what forces the two spellings to agree and is what would have caught it
-    had only one of them moved.
+    layer is about equals 2. The theorem
+    `PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor`
+    forces the two spellings to agree, and is what would have caught it had only
+    one of them moved.
 
     The half-life design that validated the decay base does NOT bear on the
     level: it reads `F(t)` against `F(t)`'s own plateau by interpolation, which
@@ -7772,15 +7773,15 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
     the race between the migration that reunites two lineages and the
     recombination that separates the two loci.
 
-    THIS BODY USED TO BE `1 - fstMigrationDriftEquilibrium Nₑ m`, and the
-    argument list is the finding. `F_ST` is a property of one site, shared LD of
-    a PAIR, and a pair carries a parameter a single site does not. The old body
-    was falsified at 35 sems (`simcov/battery_bulk34.py`, 0.91 measured against
-    0.44 predicted at `F_ST = 0.56`), and `(1 - F)²` at 56 sems and `1 - 2·F` at
-    78 sems went with it: no shape in `F_ST` alone survives, because at FIXED
-    `F_ST` -- one deme pair, one replicate set -- the measured fraction runs from
-    0.97 to 0.06 as the pairs are sorted by separation. `Nₑ` drops out of the
-    new body entirely: it sets how much LD there is, not how much is shared.
+    NO SHAPE IN `F_ST` ALONE IS ADMISSIBLE HERE, and the argument list is the
+    finding. `F_ST` is a property of one site, shared LD of a PAIR, and a pair
+    carries a parameter a single site does not. `1 - fstMigrationDriftEquilibrium
+    Nₑ m` is FALSIFIED at 35 sems (`simcov/battery_bulk34.py`, 0.91 measured
+    against 0.44 predicted at `F_ST = 0.56`), `(1 - F)²` at 56 sems and `1 - 2·F`
+    at 78 sems. The reason none of them can survive: at FIXED `F_ST` -- one deme
+    pair, one replicate set -- the measured fraction runs from 0.97 to 0.06 as the
+    pairs are sorted by separation. `Nₑ` is absent from this body for the same
+    reason: it sets how much LD there is, not how much of it is shared.
 
     Denotes: a fraction of the disequilibrium SECOND MOMENT, `σ_B/σ_W`, not a
     correlation of `r`. The two are different numbers -- normalising by the
