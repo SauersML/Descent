@@ -78,7 +78,36 @@ section NeutralDriftFloor
 neutral drift in allele frequencies. The source is the same model evaluated at
 zero divergence.
 
-    Empirical status: UNTESTED. -/
+    Regime: the score TRACKS the attenuated signal. That is what the chart
+    assumes and it is load-bearing -- a score that keeps weights on variants
+    which have stopped being shared carries them as pure noise, and its `R²`
+    then falls as `(1-fst)²/((1-fst)·V_A + V_E)` instead, faster than this body.
+    See below.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk49.py`, `group_a`).
+    3000 variants and 400000 individuals per population; a fraction `fst` of the
+    signal stops being shared, and the observable is the RATIO of realised `R²`
+    values. Taking a ratio cancels the absolute scale, so no heritability
+    convention enters:
+
+      V_A   V_E   fst    this body   realised ratio
+      1.0   1.0   0.2     0.88889     0.88885 ± 0.00562
+      1.0   1.0   0.5     0.66667     0.67297 ± 0.00426
+      2.0   1.0   0.3     0.87500     0.86274 ± 0.00546
+
+    Worst cell 2.25 sems at 1.42% relative.
+
+    Power: the naive `1 - fst` -- the ratio of the SIGNAL variances rather than
+    of the `R²` values -- is FALSIFIED at 40.64 sems (26% relative). The two
+    differ because `R²` saturates in signal variance, so they agree only as
+    `V_E` dominates; the design holds `V_A` and `V_E` comparable, which is where
+    they separate.
+
+    The regime clause above is not decoration: an earlier run scored with the
+    FULL source weight vector and measured 0.707 where this body predicts
+    0.889. That run reproduced `(1-f)²/((1-f)V_A + V_E)` to three digits, which
+    is what identified it as measuring the wrong construction rather than
+    refuting this one. -/
 noncomputable def neutralDriftR2Ratio (V_A V_E fst : ℝ) : ℝ :=
   presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0
 
