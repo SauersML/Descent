@@ -111,6 +111,18 @@ theorem demoSteppingStoneFst_at_d0ne0m0sq0_is_junk :
 /-- **The functional form the previous derivation produced**, retained so that the
 indistinguishability recorded in the note above can be stated rather than asserted.
 
+**DO NOT "CORRECT" THIS BODY. Its falsification is the result, not a defect.**
+This is a deliberate foil. Two theorems below depend on it being the wrong law:
+`demoSteppingStoneFst_indistinguishable_from_quadratic` and
+`steppingStoneCoalescenceTime_indistinguishable_through_coalFst`, which together
+state that with `σ_sq` free no amount of `F_ST` data separates this form from
+`demoSteppingStoneFst` -- so a fit constrains the product `m * σ_sq` and nothing
+else. That non-identifiability is the mathematics. Replacing the body with
+`d / (d + 4 * Ne * m * σ_sq)` makes it literally `demoSteppingStoneFst`,
+collapses both theorems to `x = x`, and deletes the result. Every falsification
+recorded below is therefore intentional and load-bearing: the three instruments
+that reject this form are the demonstration, and a fourth would be too.
+
     Empirical status: **FALSIFIED**
     (`proofs/validation/empirical/simcov/battery_verify.py`,
     `test_stepping_slope_tight`). Both this form and `demoSteppingStoneFst` have
@@ -188,7 +200,34 @@ indistinguishability recorded in the note above can be stated rather than assert
     is exact, costs nothing, commits to no `F_ST` convention, and reaches the same
     verdict the two log-log slope measurements above reached — which is the point
     of recording it: three instruments that could each have said no, and none of
-    them did. -/
+    them did.
+
+    **DO NOT "CORRECT" THIS BODY. THE FALSIFICATION IS THE RESULT.**
+
+    This definition is a FOIL, not a candidate law that failed. Its role is to be
+    the wrong exponent, held next to the right one, so that a theorem can say what
+    the data cannot distinguish. Two theorems in this file depend on it being
+    exactly what it is:
+
+    * `demoSteppingStoneFst_indistinguishable_from_quadratic` proves
+      `demoSteppingStoneFst d Nₑ m σ² = steppingStoneFstQuadratic d Nₑ m √(σ²/m)`.
+    * `steppingStoneCoalescenceTime_indistinguishable_through_coalFst` carries the
+      same identity through the meeting time.
+
+    Together they are a NON-IDENTIFIABILITY result: with `σ²` free, no amount of
+    `F_ST` data separates the linear form from the quadratic one, so a fit
+    constrains the product `m·σ²` and nothing else. That is the whole content, and
+    it is why the regime note on `demoSteppingStoneFst` demands `σ²` be held at an
+    independently measured dispersal variance.
+
+    Replacing this body with `d / (d + 4·Nₑ·m·σ_sq)` makes it literally
+    `demoSteppingStoneFst`. Both theorems above collapse to `x = x`, and the
+    identifiability result is gone — deleted, not repaired. The three falsifying
+    instruments recorded above are the DEMONSTRATION that this exponent is wrong;
+    they are what the foil is for, not evidence against keeping it.
+
+    A directive to fix every falsified definition does not reach this one. The
+    alternative here is not "fix it"; the alternative is destroying a theorem. -/
 noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
 
