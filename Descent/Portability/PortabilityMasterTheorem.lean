@@ -661,9 +661,8 @@ theorem predictiveCovariance_sq_le :
 omit [DecidableEq J] [DecidableEq L] in
 /-- `0 ≤ R²`. -/
 theorem r2_nonneg (hv : 0 ≤ P.scoreVariance w) (ho : 0 ≤ P.outcomeVariance) :
-    0 ≤ P.r2 w := by
-  unfold r2
-  positivity
+    0 ≤ P.r2 w :=
+  div_nonneg (sq_nonneg _) (mul_nonneg hv ho)
 
 omit [DecidableEq J] [DecidableEq L] in
 /-- **`R² ≤ 1`, as a theorem about the generative model.**
@@ -674,7 +673,7 @@ omit [DecidableEq J] [DecidableEq L] in
 theorem r2_le_one (hv : 0 < P.scoreVariance w) (ho : 0 < P.outcomeVariance) :
     P.r2 w ≤ 1 := by
   unfold r2
-  rw [div_le_one (by positivity)]
+  rw [div_le_one (mul_pos hv ho)]
   exact P.predictiveCovariance_sq_le w
 
 end DeploymentPopulation
@@ -1000,6 +999,270 @@ theorem slope_eq_r2_differs :
 end MetricSpecificity
 
 end Completeness
+
+section Recalibration
+
+/-!
+## §5 Exact recalibration: what an affine correction can and cannot repair
+
+The metrics of `§2` respond very differently to rescaling the score, and the difference
+is the whole content of the recalibration literature.  This section computes the deployed
+MSE of an *arbitrary* affine correction `a + b·S` exactly, minimises it exactly, and
+reads off the two consequences:
+
+* the best affine correction drives the calibration slope to `1` and the intercept to
+  `0` in the target, whatever they were;
+* the MSE it achieves is `Var(Y)·(1 - R²)`, so the `R²` it started with is *exactly* what
+  survives.  Recalibration cannot move `R²` at all.
+
+That pair is the precise version of the informal claim that some portability loss is
+recoverable and some is not.  The recoverable part is the affine gauge; the
+irrecoverable part is `R²`, and there is nothing in between.
+-/
+
+section AffineMse
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+theorem variance_affine (E : ExpFunctional Ω) (a b : ℝ) (Z : Ω → ℝ) :
+    variance E (fun ω ↦ a + b * Z ω) = b ^ 2 * variance E Z := by
+  have hmean : E (fun ω ↦ a + b * Z ω) = a + b * E Z := by
+    have hsplit : (fun ω ↦ a + b * Z ω) = (fun _ ↦ a) + b • Z := by
+      funext ω
+      simp [smul_eq_mul]
+    rw [hsplit, E.add_eval, E.smul_eval, E.eval_const]
+  unfold variance
+  rw [hmean]
+  have hbody : (fun ω ↦ (a + b * Z ω - (a + b * E Z)) ^ 2)
+      = (b ^ 2) • (fun ω ↦ (Z ω - E Z) ^ 2) := by
+    funext ω
+    simp [smul_eq_mul]
+    ring
+  rw [hbody, E.smul_eval]
+
+theorem covariance_affine_right (E : ExpFunctional Ω) (a b : ℝ) (Y Z : Ω → ℝ) :
+    covariance E Y (fun ω ↦ a + b * Z ω) = b * covariance E Y Z := by
+  have hmean : E (fun ω ↦ a + b * Z ω) = a + b * E Z := by
+    have hsplit : (fun ω ↦ a + b * Z ω) = (fun _ ↦ a) + b • Z := by
+      funext ω
+      simp [smul_eq_mul]
+    rw [hsplit, E.add_eval, E.smul_eval, E.eval_const]
+  unfold covariance
+  rw [hmean]
+  have hbody : (fun ω ↦ (Y ω - E Y) * (a + b * Z ω - (a + b * E Z)))
+      = b • (fun ω ↦ (Y ω - E Y) * (Z ω - E Z)) := by
+    funext ω
+    simp [smul_eq_mul]
+    ring
+  rw [hbody, E.smul_eval]
+
+namespace DeploymentPopulation
+
+variable (P : DeploymentPopulation Ω J L) (w : J → ℝ)
+
+/-- The score after an affine correction `a + b·S`. -/
+def recalibratedScore (a b : ℝ) : Ω → ℝ := fun ω ↦ a + b * P.score w ω
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Exact MSE of an arbitrary affine correction.**
+
+    A quadratic in `b` plus a square in `a`, with coefficients that are exactly the three
+    coordinates of the metric statistic and the two means.  Everything about affine
+    recalibration follows from this one identity. -/
+theorem recalibrated_mse_eq (a b : ℝ) :
+    expMse P.E P.phenotype (P.recalibratedScore w a b)
+      = P.outcomeVariance - 2 * b * P.predictiveCovariance w
+          + b ^ 2 * P.scoreVariance w
+          + (a + b * P.E (P.score w) - P.E P.phenotype) ^ 2 := by
+  rw [mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
+  unfold recalibratedScore bias
+  rw [variance_affine, covariance_affine_right]
+  have hmean : P.E (fun ω ↦ a + b * P.score w ω) = a + b * P.E (P.score w) := by
+    have hsplit : (fun ω ↦ a + b * P.score w ω) = (fun _ ↦ a) + b • P.score w := by
+      funext ω
+      simp [smul_eq_mul]
+    rw [hsplit, P.E.add_eval, P.E.smul_eval, P.E.eval_const]
+  rw [hmean]
+  rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
+    show variance P.E (P.score w) = P.scoreVariance w from rfl,
+    show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+      covariance_comm _ _ _]
+  ring
+
+/-- **The affine correction the population itself prescribes**: slope `Cov/Var S`,
+intercept chosen to match the means. -/
+def bestAffineScore : Ω → ℝ :=
+  P.recalibratedScore w (P.calibrationIntercept w) (P.calibrationSlope w)
+
+/-- The algebraic step behind `bestAffine_mse_eq`: rescaling the outcome variance by the
+unexplained fraction is subtracting the explained variance.  Stated for plain reals with
+the Cauchy-Schwarz premise, because it has to hold at `V = 0` too, where the ratio is the
+totalised `0` and the premise forces `c = 0`. -/
+theorem outcomeVariance_mul_one_sub_ratio (V c v : ℝ) (hv : v ≠ 0) (hcs : c ^ 2 ≤ v * V) :
+    V * (1 - c ^ 2 / (v * V)) = V - c ^ 2 / v := by
+  by_cases ho : V = 0
+  · subst ho
+    have hc : c ^ 2 = 0 := le_antisymm (by simpa using hcs) (sq_nonneg c)
+    rw [hc]
+    simp
+  · field_simp
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **What recalibration achieves, exactly: `Var(Y)·(1 - R²)`.**
+
+    The residual variance of the best affine correction is the outcome variance scaled
+    by exactly the fraction `R²` does not explain.  No approximation and no Gaussian
+    assumption: this is an identity about a positive linear functional. -/
+theorem bestAffine_mse_eq (hv : P.scoreVariance w ≠ 0) :
+    expMse P.E P.phenotype (P.bestAffineScore w)
+      = P.outcomeVariance * (1 - P.r2 w) := by
+  have hR : P.outcomeVariance * (1 - P.r2 w)
+      = P.outcomeVariance - P.predictiveCovariance w ^ 2 / P.scoreVariance w :=
+    outcomeVariance_mul_one_sub_ratio P.outcomeVariance (P.predictiveCovariance w)
+      (P.scoreVariance w) hv (P.predictiveCovariance_sq_le w)
+  rw [hR]
+  unfold bestAffineScore
+  rw [recalibrated_mse_eq]
+  unfold calibrationIntercept calibrationSlope
+  field_simp
+  ring
+
+/-- **The prescribed correction is optimal**: no affine rescaling does better.
+
+    So the number in `bestAffine_mse_eq` is not one correction's score, it is the floor
+    over all of them, and `Var(Y)(1 - R²)` is what an ideally recalibrated deployment
+    achieves. -/
+theorem bestAffine_mse_le (hv : 0 < P.scoreVariance w) (a b : ℝ) :
+    expMse P.E P.phenotype (P.bestAffineScore w)
+      ≤ expMse P.E P.phenotype (P.recalibratedScore w a b) := by
+  rw [bestAffine_mse_eq P w hv.ne', recalibrated_mse_eq]
+  unfold r2
+  rw [outcomeVariance_mul_one_sub_ratio P.outcomeVariance (P.predictiveCovariance w)
+    (P.scoreVariance w) hv.ne' (P.predictiveCovariance_sq_le w)]
+  have hquad : 0 ≤ (b - P.predictiveCovariance w / P.scoreVariance w) ^ 2 *
+      P.scoreVariance w := by positivity
+  have hexpand : (b - P.predictiveCovariance w / P.scoreVariance w) ^ 2 *
+      P.scoreVariance w
+      = b ^ 2 * P.scoreVariance w - 2 * b * P.predictiveCovariance w
+        + P.predictiveCovariance w ^ 2 / P.scoreVariance w := by
+    field_simp
+    ring
+  nlinarith [sq_nonneg (a + b * P.E (P.score w) - P.E P.phenotype)]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **Recalibration cannot move `R²`.**
+
+    The recalibrated score is an affine image of the original, and `R²` is invariant
+    under affine reparametrisation of the predictor for any nonzero slope.  Combined
+    with `bestAffine_mse_eq`, this is the exact division of portability loss into a
+    repairable part and an unrepairable one. -/
+theorem r2_affine_invariant (a b : ℝ) (hb : b ≠ 0) :
+    covariance P.E (P.recalibratedScore w a b) P.phenotype ^ 2 /
+        (variance P.E (P.recalibratedScore w a b) * P.outcomeVariance)
+      = P.r2 w := by
+  unfold recalibratedScore r2
+  rw [covariance_comm, covariance_affine_right, variance_affine]
+  rw [show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+    covariance_comm _ _ _]
+  rw [show variance P.E (P.score w) = P.scoreVariance w from rfl]
+  rw [mul_pow]
+  by_cases hv : P.scoreVariance w = 0
+  · rw [hv]
+    simp
+  · by_cases ho : P.outcomeVariance = 0
+    · rw [ho]
+      simp
+    · field_simp
+
+end DeploymentPopulation
+
+end AffineMse
+
+end Recalibration
+
+section JunkBranches
+
+/-!
+## §6 Named junk branches
+
+Mathlib totalises division: `x / 0 = 0`.  Every definition in this file that divides can
+therefore return a number where the modelled quantity has none, and the corpus
+convention is to name that branch rather than leave a reader to infer it from a value
+that is in range and means nothing.  Each theorem below states what is returned and what
+a consumer must require.
+-/
+
+variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`calibrationSlope` where its denominator vanishes, named.**  A score with no
+variance has no regression slope of the phenotype on it; the value returned is `0`,
+which is also the legitimate slope of a score that carries no signal.  Consumers must
+require `scoreVariance w ≠ 0`. -/
+theorem calibrationSlope_at_zero_scoreVariance_is_junk
+    (P : DeploymentPopulation Ω J L) (w : J → ℝ) (hzero : P.scoreVariance w = 0) :
+    P.calibrationSlope w = 0 := by
+  unfold DeploymentPopulation.calibrationSlope
+  rw [hzero, div_zero]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`r2` where its denominator vanishes, named.**  A constant score, or a population
+with no phenotypic variance, has no squared correlation; `0` is returned, and `0` is
+also what a genuinely uninformative score scores.  Consumers must require both variances
+nonzero -- `predictiveCovariance_sq_le` shows the numerator vanishes there too, so the
+returned `0` is not even a limit of nearby values. -/
+theorem r2_at_zero_denominator_is_junk
+    (P : DeploymentPopulation Ω J L) (w : J → ℝ)
+    (hzero : P.scoreVariance w * P.outcomeVariance = 0) :
+    P.r2 w = 0 := by
+  unfold DeploymentPopulation.r2
+  rw [hzero, div_zero]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`r2OfStatistic` at a degenerate statistic, named.** -/
+theorem r2OfStatistic_at_zero_denominator_is_junk (s : ℝ × ℝ × ℝ)
+    (hzero : s.1 * s.2.2 = 0) : r2OfStatistic s = 0 := by
+  unfold r2OfStatistic
+  rw [hzero, div_zero]
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`slopeOfStatistic` at a degenerate statistic, named.** -/
+theorem slopeOfStatistic_at_zero_scoreVariance_is_junk (s : ℝ × ℝ × ℝ)
+    (hzero : s.1 = 0) : slopeOfStatistic s = 0 := by
+  unfold slopeOfStatistic
+  rw [hzero, div_zero]
+
+variable {ΩS ΩT : Type*}
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **`alignmentFactor` where the source carries no signal, named.**  The factorisation
+`r2_transport_factorisation` requires `predictiveCovariance ≠ 0` in the source for
+exactly this reason: with a source that predicts nothing, the ratio of target to source
+alignment is not a number, and `0` is returned. -/
+theorem alignmentFactor_at_zero_source_covariance_is_junk
+    (D : Deployment ΩS ΩT J L) (hzero : D.source.predictiveCovariance D.w = 0) :
+    D.alignmentFactor = 0 := by
+  unfold Deployment.alignmentFactor
+  rw [hzero, div_zero]
+  norm_num
+
+omit [Fintype L] [DecidableEq J] [DecidableEq L] in
+/-- **`dispersionFactor` where the target score is constant, named.** -/
+theorem dispersionFactor_at_zero_target_scoreVariance_is_junk
+    (D : Deployment ΩS ΩT J L) (hzero : D.target.scoreVariance D.w = 0) :
+    D.dispersionFactor = 0 := by
+  unfold Deployment.dispersionFactor
+  rw [hzero, div_zero]
+
+omit [Fintype J] [DecidableEq J] [DecidableEq L] in
+/-- **`outcomeFactor` where the target phenotype is constant, named.** -/
+theorem outcomeFactor_at_zero_target_outcomeVariance_is_junk
+    (D : Deployment ΩS ΩT J L) (hzero : D.target.outcomeVariance = 0) :
+    D.outcomeFactor = 0 := by
+  unfold Deployment.outcomeFactor
+  rw [hzero, div_zero]
+
+end JunkBranches
 
 end
 
