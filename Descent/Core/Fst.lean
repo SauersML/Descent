@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Core.Ratios
+import Descent.Core.Scaling
 import Mathlib.Order.Filter.AtTopBot.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 
@@ -59,15 +60,14 @@ open Filter Topology
 
 The four in `4·Ne·μ` is `2 · ploidy`: two lineages, each diploid. Writing it as a named
 constant rather than a literal is what lets a ploidy change be a one-line edit instead of
-a census. -/
+a census.
 
-/-- Ploidy. Two, because every population in this corpus is diploid.
-
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def ploidy : ℝ := 2
+`ploidy` and `scalingConstant` are defined in `Core/Scaling.lean`, imported above, along
+with the one-field types `Theta`, `BigM`, `Tau` and `Rho` that carry these scalings where
+a `ℝ` used to. They are in the same namespace, so every reference here and downstream
+resolves unchanged. The two named rates below keep their bodies, their empirical status
+and their ledger rows; `Theta.ofRate` and `BigM.ofRate` are the same arithmetic in the
+wrapped types, and `scaledMutationRate_eq_theta` below is the identification. -/
 
 /-- Scaled mutation rate, `θ = 4 Ne μ`.
 
@@ -120,6 +120,24 @@ theorem scaledMutationRate_eq (Ne μ : ℝ) : scaledMutationRate Ne μ = 4 * Ne 
 theorem scaledMigrationRate_eq (Ne m : ℝ) : scaledMigrationRate Ne m = 4 * Ne * m := by
   unfold scaledMigrationRate ploidy; ring
 
+/-! ### The named rates and the wrapped types are the same arithmetic
+
+`Core/Scaling.lean` carries `θ` and `M` as one-field types so that one cannot be passed
+where the other is wanted. These two theorems say the wrapper costs nothing but the type:
+the number inside is the one the named rate computes, and it is the number every ledger
+row below was measured against. A divergence between the two sites -- a factor changed in
+`scalingConstant` and not here, or the reverse -- fails these. -/
+
+/-- **`Theta.ofRate` wraps `scaledMutationRate`.** -/
+@[simp] theorem scaledMutationRate_eq_theta (Ne μ : ℝ) :
+    (Theta.ofRate Ne μ).value = scaledMutationRate Ne μ := by
+  rw [Theta.value_ofRate, scaledMutationRate_eq]
+
+/-- **`BigM.ofRate` wraps `scaledMigrationRate`.** -/
+@[simp] theorem scaledMigrationRate_eq_bigM (Ne m : ℝ) :
+    (BigM.ofRate Ne m).value = scaledMigrationRate Ne m := by
+  rw [BigM.value_ofRate, scaledMigrationRate_eq]
+
 /-! ### The finite-deme correction -/
 
 /-- The island-model deme-count correction, `d / (d - 1)`.
@@ -146,6 +164,38 @@ factor a many-deme formula drops on the two-population split that most of the co
 portability results are stated for. -/
 @[simp] theorem islandDemeCorrection_two : islandDemeCorrection 2 = 2 := by
   unfold islandDemeCorrection ratio; norm_num
+
+/-- **At twenty demes it is `20/19`.** Pinned as a value for the same reason as the
+two-deme case, and because this is the other factor the ledger measured:
+`simcov/battery_falsrepair_c2.py` separates the finite-deme form carrying this correction
+from the many-deme limit that drops it, at `d = 20`, on a design whose error bars are
+half those of the run that could not tell them apart. -/
+@[simp] theorem islandDemeCorrection_twenty : islandDemeCorrection 20 = 20 / 19 := by
+  unfold islandDemeCorrection ratio; norm_num
+
+/-! ### The two factors the ledger measured, on the scaled rate that carries them
+
+`BigM` is `4 Nₑ m` and never `8 Nₑ m`: the deme correction belongs to the deme count, not
+to the migration scaling. These two theorems say what the correction does to a `BigM` at
+the two deme counts the corpus has been measured at, so the factor a formula drops when
+it omits the correction is a named quantity rather than a step in a derivation. -/
+
+/-- **Two demes: the correction doubles the flow.** This is the factor
+`simcov/battery_bulk38.py` measured. `1/(1 + θ + M)` was rejected at 3.30 sems and 57%
+relative; `1/(1 + θ + 2M)` matches at 1.10. The `2` is this. -/
+theorem twoDeme_vs_manyDeme_factor (Ne m : ℝ) :
+    (BigM.ofRate Ne m).value * islandDemeCorrection 2 = 2 * (BigM.ofRate Ne m).value := by
+  rw [islandDemeCorrection_two]; ring
+
+/-- **Twenty demes: the correction is 5.3%, and it is resolvable.** This is the factor
+`simcov/battery_falsrepair_c2.py` measured, where the limit form misses at 3.92 sems and
+13% relative. Small enough to look like an approximation, large enough to falsify a body
+at forty-eight replicates -- which is the case for carrying the deme count rather than
+assuming it away. -/
+theorem twentyDeme_vs_manyDeme_factor (Ne m : ℝ) :
+    (BigM.ofRate Ne m).value * islandDemeCorrection 20
+      = (20 / 19) * (BigM.ofRate Ne m).value := by
+  rw [islandDemeCorrection_twenty]; ring
 
 /-- **The exact distance from one**, which is more than the limit says: at `d` demes the
 correction overshoots `1` by exactly `1/(d-1)`. A reader who needs to know whether the

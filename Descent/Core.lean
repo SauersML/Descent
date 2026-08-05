@@ -8,6 +8,7 @@ import Descent.Core.Moments
 import Descent.Core.Parameters
 import Descent.Core.Population
 import Descent.Core.Ratios
+import Descent.Core.Scaling
 
 /-!
 # `Descent.Core` -- the layer head

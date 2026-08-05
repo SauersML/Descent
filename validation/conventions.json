@@ -239,12 +239,19 @@
       "note": "d/(d-1): a migrant arrives from one of the OTHER d-1 demes. The 1 is that exclusion and not an offset. islandDemeCorrection_two pins it at 2, which is the factor a many-deme formula drops on a two-population split. Measured on battery_falsrepair group_a at 9.04 sems against the squared correction.",
       "source": "Slatkin (1991); the SQUARED form is Crow & Aoki (1984) for Nei's G_ST."
     },
-    "Descent/Core/Fst.lean::ploidy": {
+    "Descent/Core/Scaling.lean::ploidy": {
       "constants": [
         "2"
       ],
-      "note": "Diploid. Every 4 in a scaled rate is 2 * ploidy -- two lineages, each diploid -- and writing it as this constant is what makes a ploidy change one edit rather than a census. scaledMutationRate_eq and scaledMigrationRate_eq are where the 4 is recovered.",
-      "source": "Wright (1931); the convention is stated in Descent/Core/Fst.lean's header."
+      "note": "Diploid. Every 4 in a scaled rate is 2 * ploidy -- two lineages, each diploid -- and writing it as this constant is what makes a ploidy change one edit rather than a census. scaledMutationRate_eq and scaledMigrationRate_eq are where the 4 is recovered. Moved here from Core/Fst.lean when Core/Scaling.lean was split out to carry the scaling conventions as types; same namespace, so every reference to Descent.Core.ploidy resolves unchanged.",
+      "source": "Wright (1931); the convention is stated in Descent/Core/Scaling.lean's header."
+    },
+    "Descent/Core/Scaling.lean::scalingConstant": {
+      "constants": [
+        "2"
+      ],
+      "note": "The four in 4*Ne*mu, as a name: 2 * ploidy. The single arithmetic site for the rate scalings -- Theta.ofRate, BigM.ofRate and Rho.ofRate all multiply by this and none writes a literal. The 2 recorded here is the 2 in `2 * ploidy` (two lineages); the ploidy is the other factor and is recorded on ploidy itself. scalingConstant_eq is where the 4 is recovered.",
+      "source": "Wright (1931); the same convention as ploidy, named separately because a scaled RATE carries two lineages where a coalescent TIMESCALE (Tau.ofGenerations, ploidy * Ne) carries one."
     },
     "Descent/Core/Fst.lean::scaledMigrationRate": {
       "constants": [
