@@ -6937,11 +6937,19 @@ GUARDS = {
     # arrived as an island, which is the recurrence these guards exist to catch,
     # happening while they were being written. Read the guard, not the comment.
     #
-    # `shape-depth`: flip when the deepest module sits 12 or fewer imports above a
-    # leaf. The audit measured 37 on a chain of 38; 14 on a chain of 15, with two
-    # modules over the limit, as the chain repairs land. This is the closest of the
-    # four.
-    "shape-depth":     dict(fn=run_shape_depth,      gated=False, takes_argv=False),
+    # `shape-depth`: GATED, flipped from diagnostic once it reached the limit. The
+    # audit measured 37 on a chain of 38 modules; the chain repairs brought it to
+    # exactly 12.
+    #
+    # THERE IS NO HEADROOM, and that is deliberate rather than an oversight. One
+    # import added to the wrong module fails this, which is the whole reason to gate
+    # it now rather than after it has drifted back: the depth has been repaired
+    # before and lost again, and a limit set above the current value is a licence to
+    # regress to it. If a module legitimately needs a thirteenth rung, the fix is
+    # not to raise `SHAPE_DEPTH_LIMIT` -- it is that some link on the chain the
+    # guard prints is importing a file rather than a dependency, and `shape-chains`
+    # will usually name it.
+    "shape-depth":     dict(fn=run_shape_depth,      gated=True,  takes_argv=False),
     # `shape-chains`: flip when no module's only internal import is a sibling it
     # names nothing from. Measured 38 when the audit asked for this, six of them
     # consecutive files in `PopGen/PopulationGeneticsFoundations`; 28 as the repair
