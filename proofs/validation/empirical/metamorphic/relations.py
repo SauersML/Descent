@@ -148,6 +148,9 @@ SWEPT_MODULES = (
     "Calibrator/TransferLearningPGS.lean",
     "Calibrator/Permeability.lean",
     "Calibrator/PortabilityDrift.lean",
+    "Calibrator/DGP.lean",
+    "Calibrator/MetricSpecificPortability.lean",
+    "Calibrator/RareVariantPortability.lean",
 )
 
 # ---------------------------------------------------------------------------
@@ -550,15 +553,27 @@ RELATIONS = {
         jointly_scales(["V_A", "rhoSq"], 2),
     ],
     "Calibrator.ldCorrelationDecay": [
-        # The decay reads only the products lambda·distance and lambda·fstGap.
+        # The decay reads the product lambda·distance, so those two trade off
+        # exactly. This still holds after the body's correction.
         invariant_under_reciprocal_scaling(["distance"], ["lambda"]),
+        # And this one is PINNED AS A VIOLATION rather than deleted -- see
+        # EXPECTED_VIOLATIONS. It held for the superseded body and must not hold
+        # for the corrected one.
         invariant_under_reciprocal_scaling(["fstGap"], ["lambda"]),
     ],
     "Calibrator.alleleFreqMismatchPenalty": [
-        # An absolute frequency difference: symmetric in the two panels AND
-        # invariant under relabelling which allele is reference, since the
-        # complement subtracts out.
-        symmetric_in("pSource", "pTarget"),
+        # The body was corrected while this table was live -- from the refuted
+        # `exp(-|Δp|)` to the genotype-variance ratio `2p_t(1-p_t)/2p_s(1-p_s)`
+        # -- and this gate is how that surfaced: the old body was SYMMETRIC in
+        # the two panels and the new one is a ratio, so `swap` started failing
+        # on six grid points. The symmetry declaration is removed because the
+        # quantity genuinely changed, not because it became inconvenient.
+        #
+        # Allele-swap invariance survives the correction, and that is worth more
+        # than it looks: `2p(1-p)` is even about one half in the numerator AND
+        # the denominator, so the ratio is invariant for the same reason the old
+        # absolute difference was. A relation that holds across a body
+        # replacement is evidence the replacement kept the right symmetry.
         invariant_under_allele_swap(["pSource", "pTarget"]),
     ],
     "Calibrator.targetR2FromNeutralAFBenchmark": [
@@ -640,6 +655,156 @@ RELATIONS = {
         symmetric_in("m₁₂", "m₂₁"),
         jointly_scales(["m₁₂", "m₂₁"], 1),
     ],
+
+    # --- DGP ---------------------------------------------------------------
+    "Calibrator.scaledMutationRate": [
+        # `4·Nₑ·μ`. The symmetry is the content: the compound is a product, so
+        # the two factors are interchangeable and only their product is read.
+        symmetric_in("Ne", "μ"),
+        jointly_scales(["Ne", "μ"], 2),
+        scales("Ne", 1),
+    ],
+    "Calibrator.scaledMigrationRate": [
+        symmetric_in("Ne", "m"),
+        jointly_scales(["Ne", "m"], 2),
+        scales("Ne", 1),
+    ],
+    "Calibrator.r2FromMSE": [
+        # A variance ratio subtracted from one: the outcome's unit cancels.
+        jointly_scales(["mse", "varY"], 0),
+    ],
+    "Calibrator.explainedR2FromTransportMoments": [
+        scales("scoreOutcomeCov", 2),
+        scales("scoreVariance", -1),
+        scales("outcomeVariance", -1),
+    ],
+    "Calibrator.taggingMismatchScale": [
+        symmetric_in("recombRate", "arraySparsity"),
+        jointly_scales(["recombRate", "arraySparsity"], 2),
+    ],
+    "Calibrator.demographicCovarianceGapLowerBound": [
+        scales("kappa", 1),
+        jointly_scales(["recombRate", "arraySparsity"], 2),
+        jointly_scales(["fstSource", "fstTarget"], 1),
+    ],
+    "Calibrator.optimalSlopeLinearNoise": [
+        # Signal over signal-plus-noise: every variance in the same unit, so a
+        # common rescaling of all three leaves the optimal slope alone.
+        jointly_scales(["sigma_g_sq", "base_error", "slope_error"], 0),
+    ],
+    "Calibrator.TransportedMetrics.r2FromSignalVariance": [
+        jointly_scales(["vSignal", "vNoise"], 0),
+    ],
+    "Calibrator.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance": [
+        jointly_scales(["vSignal", "vNoise"], 0),
+    ],
+    "Calibrator.TransportedMetrics.calibratedBrierFromVariances": [
+        jointly_scales(["vSignal", "vResidual"], 0),
+    ],
+    "Calibrator.alleleFreqDivergenceRate": [
+        scales("Ne", -1),
+    ],
+    "Calibrator.ldBreakageRate": [
+        scales("r", 1),
+    ],
+
+    # --- MetricSpecificPortability -----------------------------------------
+    "Calibrator.adaptationDifficultyIndex": [
+        jointly_scales(["nParams", "infoPerSample"], 0),
+        scales("nParams", 1),
+        scales("infoPerSample", -1),
+    ],
+    "Calibrator.fisherTraceMSELowerBound": [
+        scales("nEff", -1),
+        jointly_scales(["nParams", "infoPerSample"], 0),
+    ],
+    "Calibrator.requiredEffectiveSampleSizeForTraceMSE": [
+        scales("targetTraceMSE", -1),
+        jointly_scales(["nParams", "infoPerSample"], 0),
+    ],
+    "Calibrator.sensitivityPortabilityGap": [
+        # An absolute difference: symmetric, homogeneous of degree one, and EVEN
+        # under negating the pair. A signed difference would satisfy the first
+        # two and fail the third, which is the one that says "gap".
+        symmetric_in("sensSource", "sensTarget"),
+        jointly_scales(["sensSource", "sensTarget"], 1),
+        even_under_negation(["sensSource", "sensTarget"]),
+    ],
+    "Calibrator.mixtureCoupling": [
+        scales("ρ", 1),
+        # `ρ(2π - 1)` is ODD about π = 1/2: complementing the mixing proportion
+        # reverses the coupling. That is the relation which fixes the `2π - 1`
+        # factor rather than any other odd function of the mixture.
+        negated_under_allele_swap(["π"]),
+    ],
+    "Calibrator.twoCellL2EstimationPenalty": [
+        jointly_scales(["n₁", "n₂"], -1),
+    ],
+    "Calibrator.twoCellWorstEstimationPenalty": [
+        symmetric_in("n₁", "n₂"),
+        jointly_scales(["n₁", "n₂"], -1),
+    ],
+    "Calibrator.ppvPortabilityGap": [
+        symmetric_in("prevalenceSource", "prevalenceTarget"),
+    ],
+
+    # --- RareVariantPortability --------------------------------------------
+    "Calibrator.rareHeritabilityShare": [
+        # A share, so scale-free in the variances and in everything together.
+        jointly_scales(["rareCount", "rareVariance",
+                        "commonCount", "commonVariance"], 0),
+        jointly_scales(["rareVariance", "commonVariance"], 0),
+    ],
+    "Calibrator.variantGeneticVarianceContribution": [
+        scales("β", 2),
+        invariant_under_allele_swap(["p"], effect_args=["β"]),
+    ],
+    "Calibrator.rareVariantCountRatio": [
+        jointly_scales(["sourceCount", "targetCount"], 0),
+        scales("sourceCount", 1),
+    ],
+    "Calibrator.burdenSquaredSignal": [
+        symmetric_in("β₁", "β₂"),
+        jointly_scales(["β₁", "β₂"], 2),
+        even_under_negation(["β₁", "β₂"]),
+    ],
+    "Calibrator.varianceComponentSignal": [
+        # DELIBERATELY the same three relations as burdenSquaredSignal above.
+        # `(β₁+β₂)²` and `β₁²+β₂²` are both symmetric, both quadratic and both
+        # even, differing only by the cross term `2β₁β₂` -- so these relations
+        # do NOT separate the burden statistic from the variance-component one.
+        # Recording that they cannot is the point: the pair is what a reference
+        # evaluation has to distinguish, and no symmetry or homogeneity will.
+        symmetric_in("β₁", "β₂"),
+        jointly_scales(["β₁", "β₂"], 2),
+        even_under_negation(["β₁", "β₂"]),
+    ],
+    "Calibrator.portableVariantSignal": [
+        scales("β", 2),
+        scales("sharing", 1),
+        invariant_under_allele_swap(["frequency"], effect_args=["β"]),
+    ],
+    "Calibrator.mutationSelectionBalance": [
+        # `μ/(hs + μ)` reads only the ratio of mutation to selection.
+        jointly_scales(["mu", "s"], 0),
+    ],
+    "Calibrator.mutationSelectionDriftParameter": [
+        symmetric_in("s", "h"),
+        jointly_scales(["Ne", "s", "h"], 3),
+        scales("Ne", 1),
+    ],
+    "Calibrator.mutationSelectionBalanceRecessive": [
+        jointly_scales(["mu", "s"], 0),
+    ],
+    "Calibrator.recessiveMutationSelectionDriftParameter": [
+        scales("Ne", 1),
+        symmetric_in("mu", "s"),
+        # `2·Nₑ·sqrt(μ·s)`: scaling BOTH by c sends the product to c²μs and the
+        # root to c·sqrt(μs), so the joint exponent is 1, not 1/2. Declared as
+        # 1/2 on first writing -- the half belongs to each argument separately,
+        # not to the pair -- and caught here on the first run.
+        jointly_scales(["mu", "s"], 1),
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -647,6 +812,19 @@ RELATIONS = {
 # ---------------------------------------------------------------------------
 
 EXPECTED_VIOLATIONS = {
+    ("Calibrator.ldCorrelationDecay", "reciprocal_scale/fstGap|lambda"):
+        "The superseded body was `exp(-(lambda · fstGap · distance))`, in which "
+        "fstGap and distance entered identically and each traded off exactly "
+        "against lambda. That linear fstGap dependence was refuted at 4.73 sems "
+        "and the body is now `exp(-(lambda · sqrt(fstGap) · distance))`. So the "
+        "trade against lambda survives for DISTANCE and must NOT survive for "
+        "fstGap: scaling fstGap by c now needs lambda scaled by 1/sqrt(c), not "
+        "1/c. Pinned rather than deleted because that asymmetry IS the "
+        "correction -- a body in which the two arguments traded off the same "
+        "way would be the refuted one, and this entry fires if anyone restores "
+        "it. This table's vocabulary has no reciprocal relation with unequal "
+        "exponents, which is why the fact is recorded as a pinned violation "
+        "rather than as a relation of its own.",
     ("Calibrator.multiTraitEffectiveSampleSize", "swap/n₁<->n₂"):
         "The body is deliberately NOT symmetric: n₁ is the target trait's "
         "own sample and enters undiscounted, while the second trait's sample is "
@@ -816,6 +994,86 @@ NO_RELATIONS = {
         "(1 - 2m - 1/(2Ne))·Fst + 1/(2Ne) is affine in Fst with an additive "
         "input term, so scaling Fst does not scale the output and Ne appears in "
         "both the slope and the intercept.",
+
+    # --- DGP ---------------------------------------------------------------
+    "Calibrator.fstMutationDriftEquilibrium":
+        "1/(1+θ) saturates the single already-scaled mutation parameter. θ is "
+        "4·Nₑ·μ, so the compound is formed before this body sees it and there "
+        "is nothing left to hold fixed against it. The trade between Nₑ and μ "
+        "lives in scaledMutationRate, which IS declared with it.",
+    "Calibrator.hetDecayFromScaled":
+        "(1 - 1/(2Nₑ))(1 - θ/(2Nₑ)) carries Nₑ in two channels with different "
+        "numerators, so no rescaling of Nₑ against θ leaves it fixed. The "
+        "absence is the content: drift and mutation do not trade off, which is "
+        "exactly what distinguishes this from the equilibrium above.",
+    "Calibrator.fstTransientDecayFromScaled":
+        "hetDecayFromScaled times a third channel in bigM, inheriting the same "
+        "obstruction and adding one: three rates in three channels, each with "
+        "its own numerator over 2Nₑ.",
+    "Calibrator.TransportedMetrics.calibratedBrier":
+        "π(1-π)(1-r2) is affine in r2 and quadratic-with-an-intercept in π, so "
+        "no argument scales the output. Its content is pinned by reference "
+        "evaluations at r2 = 0 and r2 = 1 instead. The VARIANCE form one entry "
+        "below is scale-free and IS declared, which is the contrast: the "
+        "explained fraction carries no unit, the variances it is built from do.",
+
+    # --- MetricSpecificPortability -----------------------------------------
+    "Calibrator.metricPPV":
+        "Bayes' rule on probabilities. Every argument is a probability with no "
+        "unit to rescale, and the body is a ratio whose numerator and "
+        "denominator share only one of its three terms, so no common factor "
+        "acts on it.",
+    "Calibrator.ogpOverlapProfile":
+        "x(1-qx)/(1-qx(1-x)) is a rational function whose numerator and "
+        "denominator have different degrees in both arguments; no scaling of "
+        "either is a scaling of the output, and q and x are not "
+        "interchangeable.",
+    "Calibrator.ogpTransitionPolynomial":
+        "1 - 3q + q² has three terms of degrees 0, 1 and 2 in the single "
+        "argument, so no rescaling of q multiplies it. The roots are what carry "
+        "its content and a reference evaluation pins those.",
+    "Calibrator.brierScoreMetric":
+        "A rename of brierScore into metric-portability language; the Brier "
+        "score is affine in the outcome and quadratic-with-intercept in the "
+        "forecast, so nothing scales it.",
+    "Calibrator.ldBandReconstructionShare":
+        "2·arctan((1+d)/(1-d) · tan(πκ/2))/π is a bounded share built from a "
+        "tangent of an angle; κ is already a fraction of the band and d a "
+        "correlation, so neither carries a unit, and the arctangent is not "
+        "homogeneous in either.",
+    "Calibrator.ldBandDetectionShare":
+        "κ minus the deficit below. The two summands have different structure "
+        "in κ -- one linear, one a sine -- so no scaling acts on the sum. The "
+        "relation this body DOES satisfy is an exact decomposition, "
+        "`detectionShare + pruningDeficit = κ`, which is an identity between "
+        "two definitions rather than a transformation of one input, and so "
+        "belongs in AGREEMENTS rather than here if it is ever wanted.",
+    "Calibrator.ldPruningDetectionDeficit":
+        "2·d·sin(πκ)/(π(1+d²)) is a sine in κ and a rational function in d of "
+        "different degrees above and below; neither argument scales it. Note it "
+        "is NOT monotone in d -- it peaks at d = 1 -- so even a monotonicity "
+        "claim would need a domain.",
+
+    # --- RareVariantPortability --------------------------------------------
+    "Calibrator.rareVariantSharingApproximation":
+        "A wrapper around pgsDriftVariance_one_pop, and the relations belong to "
+        "that body rather than to this name. Left undeclared here on purpose "
+        "rather than duplicating a neighbour's declaration, which would make "
+        "two entries that must be kept in step by hand.",
+    "Calibrator.mutationSelectionStepRare":
+        "p(1 - hs) + μ(1 - p) is one generation of a recursion: affine in p "
+        "with an additive mutation input, so scaling p does not scale the "
+        "output. Its FIXED POINT is scale-free in μ and s and is declared as "
+        "mutationSelectionBalance.",
+    "Calibrator.mutationSelectionStepRecessive":
+        "p - sp² + μ(1-p) mixes degrees one and two in p with an additive "
+        "input; same obstruction as the additive step, one order up.",
+    "Calibrator.expectedEffectMultiplier":
+        "(p(1-p))^(1+α) has its EXPONENT as an argument, so scaling p changes "
+        "the output by a factor depending on α rather than by a fixed power. "
+        "No relation in this table's vocabulary can carry a scaling whose "
+        "exponent is itself an argument -- which is precisely why α is the "
+        "parameter the architecture literature argues about.",
 
     "Calibrator.selectionMigrationEquilibriumMigrationFirst":
         "The same max-0 clip as the selection-first ordering, and the same "
