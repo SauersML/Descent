@@ -3801,19 +3801,17 @@ theorem constrained them jointly and could not have caught the decay base. -/
   unfold Descent.Core.PopGenParameters.fstTransientAt PopGen.PGSEvolutionaryModel.fstTransient
     PopGen.fstTransientDecayFromScaled PopGen.hetDecayFromScaled
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    Descent.Core.PopGenParameters.fstEquilibrium,
+    -- BOTH bearers of the name: the record's own equilibrium and the
+    -- `EvolutionaryParameters` one `PGSEvolutionaryModel` carries.  The flat
+    -- namespace let one bare `fstEquilibrium` stand for whichever resolved, and
+    -- the theorem needs the evolutionary one unfolded.
+    Descent.Core.PopGenParameters.fstEquilibrium, PopGen.fstEquilibrium,
     Descent.Core.fstFromFlow,
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
     PopGen.EvolutionaryParameters.bigM, PopGen.scaledMutationRate, PopGen.scaledMigrationRate,
     Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
-  -- `simp` leaves either the disjunction `a = b ∨ _` or, when it has already
-  -- discharged the second disjunct, the equation itself.  Which one depends on
-  -- the order the now fully-qualified unfoldings fire in, and both are closed by
-  -- the same `ring`.
-  first
-    | exact Or.inl (by ring)
-    | ring
+  exact Or.inl (by ring)
 
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
