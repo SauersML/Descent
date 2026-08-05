@@ -117,6 +117,7 @@ import Descent.Coalescent.CutCount
 import Descent.Coalescent.Path
 import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
+import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Program
 -- THE BUILD MUST COVER ITS OWN CORPUS. Everything below was outside this root's import
 -- closure, so `lake build Descent` never compiled it -- and a module the build never

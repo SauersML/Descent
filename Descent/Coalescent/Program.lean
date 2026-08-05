@@ -7,6 +7,7 @@ import Descent.Coalescent.CutCount
 import Descent.Coalescent.Path
 import Descent.Coalescent.Trajectory
 import Descent.Coalescent.Law
+import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Ewens
 import Descent.Coalescent.Mutation
@@ -89,10 +90,11 @@ trajectory in its support is a descending chain of covers (repeating once absorb
 `Kernel.jumpKernel_absorbing`'s convention).  `Coalescent.Law` then couples the trajectory to a clock: `coalescentLaw` is the product of
 `chainLaw` with `m` independent copies of a holding-time law, and `coalescentLaw_prod` is
 the independence K-G section 6 needs -- ARRANGED, not derived, which is exactly what
-Theorem 3 does and exactly what Theorem 1 does not.  One parameter is left open: the
-holding-time law is an argument, and instantiating it with K-C (1.7)'s exponential density
-`d_k e^{-d_k t}` needs an integral this corpus has not done.  The passage to `n = ∞` that
-Theorem 3 needs sits on top of that.
+Theorem 3 does and exactly what Theorem 1 does not.  `Coalescent.HoldingTime` then supplies the clock: K-C (1.7)'s density `d_k e^{-d_k t}` is a
+probability measure (`integral_holdDensity`, the one genuine integral in this group), so
+`HoldingTime.coalescentLawExp` is the coupling with no parameter left open.  What is not
+done: the mean `E(τ_r) = d_r⁻¹` of K-G (5.6), which `Rates` takes as given and sums; and the
+passage to `n = ∞` that Theorem 3 needs on top of the finite construction.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.
