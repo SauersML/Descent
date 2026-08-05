@@ -216,33 +216,29 @@ noncomputable def chance : OperatingPoint where
 @[simp] theorem chance_specificity : chance.specificity = 1 / 2 := rfl
 
 /-- **The four named points are admissible**, which is what makes the theorems below
-statements about something rather than vacuous quantifications. -/
-theorem treatAll_admissible : treatAll.Admissible where
-  sensitivity_nonneg := by norm_num
-  sensitivity_le_one := by norm_num
-  specificity_nonneg := by norm_num
-  specificity_le_one := by norm_num
+statements about something rather than vacuous quantifications.
+
+Bundled into one theorem rather than written four times. Each of the four wants the same
+four-line script and four copies of a script is a copied proof: if `Admissible` gains a
+field, three of the four can be repaired and the fourth forgotten. The projections below
+give the individual names back at no cost. -/
+theorem namedPoints_admissible :
+    treatAll.Admissible ∧ treatNone.Admissible ∧ perfect.Admissible ∧ chance.Admissible := by
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    exact { sensitivity_nonneg := by norm_num, sensitivity_le_one := by norm_num,
+            specificity_nonneg := by norm_num, specificity_le_one := by norm_num }
+
+/-- The treat-everyone baseline is an operating point. -/
+theorem treatAll_admissible : treatAll.Admissible := namedPoints_admissible.1
 
 /-- The treat-no-one baseline is an operating point. -/
-theorem treatNone_admissible : treatNone.Admissible where
-  sensitivity_nonneg := by norm_num
-  sensitivity_le_one := by norm_num
-  specificity_nonneg := by norm_num
-  specificity_le_one := by norm_num
+theorem treatNone_admissible : treatNone.Admissible := namedPoints_admissible.2.1
 
 /-- The perfect rule is an operating point. -/
-theorem perfect_admissible : perfect.Admissible where
-  sensitivity_nonneg := by norm_num
-  sensitivity_le_one := by norm_num
-  specificity_nonneg := by norm_num
-  specificity_le_one := by norm_num
+theorem perfect_admissible : perfect.Admissible := namedPoints_admissible.2.2.1
 
 /-- The coin flip is an operating point. -/
-theorem chance_admissible : chance.Admissible where
-  sensitivity_nonneg := by norm_num
-  sensitivity_le_one := by norm_num
-  specificity_nonneg := by norm_num
-  specificity_le_one := by norm_num
+theorem chance_admissible : chance.Admissible := namedPoints_admissible.2.2.2
 
 /-! ### The predictive values
 
@@ -1106,6 +1102,20 @@ theorem r2_momentsUnderDrift_nonneg (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V
     (hf : f < 1) : 0 ≤ (ScoreMoments.momentsUnderDrift V_A V_E f).r2 :=
   (ScoreMoments.r2_mem_unit _ (momentsUnderDrift_admissible V_A V_E f hV hE hf)).1
 
+/-- **Every history is differentiated, strictly.**
+
+`Core.Parameters` proves `0 ≤ fstEquilibrium` and `fstEquilibrium < 1`; the missing end
+is that the lower bound is never attained. `1/(1 + x)` is strictly positive at every
+finite flow, however large, so there is no demographic history at which two populations
+sit at zero differentiation.
+
+That is what makes the deployment results below unconditional rather than conditional on
+"appreciable differentiation": the case they would have had to exclude does not exist. -/
+theorem fstEquilibrium_pos (p : PopGenParameters) : 0 < p.fstEquilibrium := by
+  have hf := p.scaledFlow_nonneg
+  unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow
+  exact div_pos one_pos (by linarith)
+
 namespace OperatingPointLaw
 
 /-- **The predictive value a moment tuple produces**, at a law, a prevalence and the
@@ -1544,29 +1554,41 @@ reaches, and neither half offsets the other.
 
 This is the clinically decisive statement the corpus could not previously make. Every
 existing NRI result in the corpus takes the reclassification counts as free reals; this
-one takes a demographic history. -/
+one takes a demographic history.
+
+**And it holds at EVERY history**, which is a stronger claim than it first reads. The
+hypothesis is only that there is some flow -- there is no hypothesis that the populations
+are appreciably differentiated, because by `fstEquilibrium_pos` there is no history at
+which they are not. `1/(1 + x)` is strictly positive at every finite flow, so a
+non-negative deployed index is not a case this model admits and then rules out; it is a
+case the model has none of. An earlier version of this section stated a
+`deployedNRI_at_source` anchor under the hypothesis `p.fstEquilibrium = 0`, which no
+record satisfies -- a true, vacuous theorem asserting nothing, and it is deleted rather
+than kept for symmetry. -/
 theorem deployedNRI_neg (L : OperatingPointLaw) (p : PopGenParameters) (V_E : ℝ)
-    (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) (hf0 : 0 < p.fstEquilibrium) :
+    (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
     L.deployedNRI p V_E < 0 := by
   have hf1 := p.fstEquilibrium_lt_one hflow
   have hlt : ScoreMoments.deployedR2 p V_E
       < (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 :=
     ScoreMoments.r2_momentsUnderDrift_anti p.V_A V_E 0 p.fstEquilibrium p.V_A_pos hE
-      hf0 hf1
+      (fstEquilibrium_pos p) hf1
   have hsrc1 : (ScoreMoments.momentsUnderDrift p.V_A V_E 0).r2 ≤ 1 :=
     le_of_lt (r2_momentsUnderDrift_lt_one p.V_A V_E 0 p.V_A_pos hE (by norm_num))
   have hdep0 : 0 ≤ ScoreMoments.deployedR2 p V_E :=
     (ScoreMoments.deployedR2_mem_unit p V_E (le_of_lt hE) hflow).1
   exact L.nri_neg_of_r2_lt _ _ hdep0 hlt hsrc1
 
-/-- **At the source there is nothing to reclassify.** The index is exactly zero when the
-deployed differentiation is zero, which is the anchor the negative values above are a
-departure from. -/
-theorem deployedNRI_at_source (L : OperatingPointLaw) (p : PopGenParameters) (V_E : ℝ)
-    (hf : p.fstEquilibrium = 0) : L.deployedNRI p V_E = 0 := by
-  unfold deployedNRI ScoreMoments.deployedR2
-  rw [hf]
-  exact OperatingPoint.nriFromOperatingPoints_self _
+/-- **No demographic history deploys for free.**
+
+The contrapositive form, and the one a reader should take away: there is no setting of the
+effective size, the migration rate, the mutation rate and the deme count at which the
+deployed reclassification index is zero or positive. Deployment across ANY equilibrium
+costs, and the cost is strict. -/
+theorem deployedNRI_ne_zero (L : OperatingPointLaw) (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    L.deployedNRI p V_E ≠ 0 :=
+  ne_of_lt (deployedNRI_neg L p V_E hE hflow)
 
 /-- **A history with no flow tells every patient the prevalence and nothing more.**
 
@@ -1867,7 +1889,16 @@ theorem fstAtGeneration_eq_fstEquilibrium_iff (p : PopGenParameters) (t : ℕ) :
 /-- **The equilibration generation, named.** At `t = 2Nₑ/x` the isolated pair has reached
 exactly the differentiation the migration-mutation balance settles at. Before that
 generation the transient is below the level; after it, above -- which is the next theorem
-and is why "the transient converges to the equilibrium" is false for this coordinate. -/
+and is why "the transient converges to the equilibrium" is false for this coordinate.
+
+The hypothesis asks that `2Nₑ/x` IS a whole number of generations, and for most records it
+is not: generations are discrete and the equilibration time is a real. So this is an exact
+crossing when the arithmetic happens to land on a generation, and otherwise the crossing
+is bracketed rather than attained -- `fstAtGeneration_lt_fstEquilibrium_of_early` at the
+generation below and `fstEquilibrium_lt_fstAtGeneration_of_late` at the one above, which
+between them locate it without needing it to be hit. Stated this way rather than by
+rounding, because a rounded generation is a different number and the theorem would be
+about the rounding. -/
 theorem fstAtGeneration_eq_fstEquilibrium_of_equilibrationTime (p : PopGenParameters)
     (t : ℕ) (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
     (h : (t : ℝ) = 2 * p.Ne / scaledFlow p.Ne p.mig p.mu p.nDemes) :
