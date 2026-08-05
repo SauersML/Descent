@@ -921,6 +921,36 @@ theorem nextFloorFourthMoment_unit_m4_is_junk (m2 : ℝ) (m6 : ℝ) (m8 : ℝ) :
   unfold nextFloorFourthMoment
   simp
 
+/-- **The next floor's fourth moment from the NEXT floor's own moments**: with
+`Y = X² - 1`, it is just `E[Y⁴] / (E[Y²])²`.
+
+This is the same number as `nextFloorFourthMoment` -- `nextFloorFourthMoment_eq_ofY`
+below proves it at unit variance -- and it is the form an implementation must
+evaluate. The stability does NOT come from the algebra here, which is a division
+and nothing more; it comes from WHERE the two arguments are obtained. A consumer
+holding sample data can accumulate `E[Y²]` and `E[Y⁴]` directly from the realised
+`Y = X² - 1`, so the alternating binomial sum over raw moments is never formed and
+its cancellation never happens. Feeding this body arguments that were themselves
+computed as `m₄ - 2m₂ + 1` and `m₈ - 4m₆ + 6m₄ - 4m₂ + 1` recovers the instability
+exactly; the name is a route, not a charm.
+
+Empirical status: DERIVED. `E[Y⁴]/(E[Y²])²` is the standardised fourth moment of
+`Y`, with no free parameter. -/
+noncomputable def nextFloorFourthMomentOfY (secondY fourthY : ℝ) : ℝ :=
+  fourthY / secondY ^ 2
+
+/-- **The two routes agree at unit variance.** With `m₂ = 1` the squaring flow's
+scale is `E[Y²] = m₄ - 1` and its fourth moment is `E[Y⁴] = m₈ - 4m₆ + 6m₄ - 3`,
+so the expanded raw-moment body and the centred body are the same function. Unit
+variance is not a restriction added to make this work: it is the normalisation the
+whole squaring tower is defined under, and `squaringScaleSq` already reads the
+scale as `m₄ - 1`, which is `E[Y²]` only when `m₂ = 1`. -/
+theorem nextFloorFourthMoment_eq_ofY (m4 m6 m8 : ℝ) :
+    nextFloorFourthMoment 1 m4 m6 m8 =
+      nextFloorFourthMomentOfY (m4 - 1) (m8 - 4 * m6 + 6 * m4 - 3) := by
+  unfold nextFloorFourthMoment nextFloorFourthMomentOfY
+  ring_nf
+
 /-- **Floor one of the Gaussian tower has `σ₁² = 2`.** From `E[X⁴] = 3`. -/
 theorem gaussianFloorOneScaleSq : squaringScaleSq 3 = 2 := by
   unfold squaringScaleSq

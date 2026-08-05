@@ -221,6 +221,35 @@ noncomputable def PosteriorPrediction.prob_mode (pred : PosteriorPrediction) : �
 theorem PosteriorPrediction.mode_is_sigmoid_of_mean (pred : PosteriorPrediction) :
     pred.prob_mode = 1 / (1 + Real.exp (-pred.η_mean)) := rfl
 
+/-- **The point-mass posterior**: all posterior mass at one linear predictor, so
+`E[sigmoid(η)]` is `sigmoid(E[η])` and the two predictions coincide.
+
+`PosteriorPrediction` had no exhibited inhabitant, and for a structure whose
+whole purpose is to keep `prob_mean` and `prob_mode` apart, the case where they
+COINCIDE is the informative one to exhibit: it shows the gap the structure
+tracks is a gap about posterior spread, not a typographical distinction between
+two fields. `prob_mean` is a bare field, so nothing forces it to be an
+expectation of anything -- here it is set to the value a degenerate posterior
+would give it, which is the one case that needs no law of iterated expectations
+to justify.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the degenerate point of the
+    parameter space, written down. The Jensen gap at a nondegenerate posterior is
+    where the content is, and this does not bound it. -/
+noncomputable def PosteriorPrediction.pointMass (η : ℝ) : PosteriorPrediction where
+  η_mean := η
+  prob_mean := 1 / (1 + Real.exp (-η))
+
+instance PosteriorPrediction.instNonempty : Nonempty PosteriorPrediction :=
+  ⟨PosteriorPrediction.pointMass 0⟩
+
+/-- **Mean and mode agree exactly at a point-mass posterior.** Together with the
+fact that they are separate fields in general, this says the mean/mode split is
+carried entirely by posterior spread: remove the spread and the split closes. -/
+theorem PosteriorPrediction.pointMass_prob_mean_eq_prob_mode (η : ℝ) :
+    (PosteriorPrediction.pointMass η).prob_mean =
+      (PosteriorPrediction.pointMass η).prob_mode := rfl
+
 /-- **Brier properness, specialised to a predictor whose value is assumed to be the true
 probability. NOT the Bayesian posterior-mean theorem, which this file does not prove.**
 
@@ -520,15 +549,54 @@ to float64 first so input representation cannot be charged to the formula, along
 **34 of 52 cells exceed 1e-6 relative error, worst 2.4·10⁹.**
 
 That region is not exotic -- it is the calibrated regime, where a forecaster is
-nearly right and the divergence is being used as a small penalty. A consumer that
-compares two nearly calibrated forecasters by this body below `|p - q| ≈ 10⁻⁵` is
-ranking rounding noise. Either restrict the domain to `|p - q|` above that, or
-compute the divergence from `δ = p - q` in a form that does the cancellation
-symbolically before evaluating; the raw two-logarithm form cannot be rescued by
-`log1p` alone, because the cancellation is between the two terms and not inside
-either one. -/
+nearly right and the divergence is being used as a small penalty.
+
+**Correction, from measuring rather than reasoning.** An earlier revision of this
+warning said the form "cannot be rescued by `log1p`, because the cancellation is
+between the two terms and not inside either one". The first clause was wrong. The
+reasoning behind it was right as far as it went -- there IS a residual
+cancellation between the summands, and `log1p` does not remove it -- but it does
+remove a much larger one INSIDE each logarithm, and the measured difference is
+enormous. On a widened grid (`q = p ± δ`, `p ∈ {0.001, 0.01, 0.1, 0.5, 0.9}`,
+`δ` from `10⁻²` to `10⁻¹⁴`, 104 cells):
+
+    body as written                    worst 4.0·10¹⁰   70/104 cells over 1e-6
+    log1p form, exactly equal          worst 1.1·10⁻²   21/104 cells over 1e-6
+
+Twelve orders of magnitude in the worst case and a third of the failing region.
+`bernoulliKLReal_eq_logOnePlus` below proves the two forms equal, so this is a
+free substitution and not an approximation. Implementations must use it.
+
+What survives is a genuine domain restriction and not a large one: below
+`|p - q| ≈ 10⁻⁶` even the stable form loses relative accuracy, because the
+divergence is quadratic in a difference whose linear parts cancel between the
+summands and no rewrite in elementary functions removes that. A consumer ranking
+two nearly calibrated forecasters closer together than that is reading noise
+either way; it is the interval that shrank by ten orders of magnitude, not the
+existence of one. -/
 noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
   p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
+
+/-- **The `log1p` form of the Bernoulli KL divergence: the same number, evaluable.**
+
+`p/q = 1 + (p-q)/q` and `(1-p)/(1-q) = 1 - (p-q)/(1-q)`, so each logarithm can be
+taken of `1 + (something small)` rather than of a ratio that rounds to `1` before
+the logarithm ever sees it. A library `log1p` then evaluates each term to full
+relative precision. The hypotheses are exactly the two points at which the
+rewrite is not an identity -- `q = 0` and `q = 1` -- which are also the two
+forecasts `bernoulliKLReal_certain_forecast_is_junk` names as junk, so this
+theorem excludes nothing a consumer was entitled to evaluate anyway.
+
+See the measured comparison in the docstring of `bernoulliKLReal`. -/
+theorem bernoulliKLReal_eq_logOnePlus {p q : ℝ} (hq0 : q ≠ 0) (hq1 : q ≠ 1) :
+    bernoulliKLReal p q =
+      p * Real.log (1 + (p - q) / q)
+        + (1 - p) * Real.log (1 - (p - q) / (1 - q)) := by
+  have hq1' : (1 : ℝ) - q ≠ 0 := sub_ne_zero_of_ne (Ne.symm hq1)
+  have h1 : 1 + (p - q) / q = p / q := by field_simp; ring
+  have h2 : 1 - (p - q) / (1 - q) = (1 - p) / (1 - q) := by field_simp; ring
+  unfold bernoulliKLReal
+  rw [h1, h2]
 
 /-- **The Bernoulli KL divergence against a certain forecast, named.** A forecast of zero
 probability for an outcome that can occur has infinite KL divergence -- that is the whole content
@@ -1118,6 +1186,27 @@ theorem logBernoulliRisk_eq_iff (η q : ℝ)
 structure BinaryPopulation (Z : Type u) [MeasurableSpace Z] where
   μpos : Measure Z
   μneg : Measure Z
+
+/-- **The two-point population**: all case mass at `zpos`, all control mass at
+`zneg`.
+
+`BinaryPopulation` had no exhibited inhabitant, so the AUC invariance result
+below was quantified over a class nothing had been shown to belong to. This is
+the smallest population on which an AUC is a real comparison rather than an
+integral against nothing: exactly one case value and one control value, which is
+the configuration the `>` and `=` terms of `populationAUC` were written to
+separate. -/
+noncomputable def BinaryPopulation.ofPoints {Z : Type u} [MeasurableSpace Z]
+    (zpos zneg : Z) : BinaryPopulation Z where
+  μpos := Measure.dirac zpos
+  μneg := Measure.dirac zneg
+
+/-- Inhabitation without assuming the sample space has a point: the zero
+population. It is degenerate -- every AUC term vanishes on it -- and is recorded
+only so the class is inhabited at every `Z`, including empty ones. -/
+instance BinaryPopulation.instNonempty {Z : Type u} [MeasurableSpace Z] :
+    Nonempty (BinaryPopulation Z) :=
+  ⟨⟨0, 0⟩⟩
 
 /-- Population AUC of a score:
 `P(s(Z⁺) > s(Z⁻)) + 1/2 P(s(Z⁺)=s(Z⁻))`. -/

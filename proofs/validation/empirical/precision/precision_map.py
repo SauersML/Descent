@@ -129,7 +129,28 @@ CANDIDATES = [
     ("Calibrator.bernoulliKLReal",
      lambda p, q: p * math.log(p / q) + (1 - p) * math.log((1 - p) / (1 - q)),
      lambda p, q: p * mp.log(p / q) + (1 - p) * mp.log((1 - p) / (1 - q)),
-     _KL_PAIRS, None),
+     _KL_PAIRS,
+     # Proved equal by Conclusions.bernoulliKLReal_eq_logOnePlus. Carried
+     # because an earlier revision of this file and of the Lean docstring both
+     # asserted that log1p "cannot rescue" this body, reasoning from the
+     # residual cancellation BETWEEN the summands. That reasoning was right and
+     # the conclusion was wrong: log1p removes a far larger cancellation inside
+     # each logarithm, and the competitor column is what showed it. Twelve
+     # orders of magnitude in the worst cell.
+     ("log1p form (proved equal)",
+      lambda p, q: (p * math.log1p((p - q) / q)
+                    + (1 - p) * math.log1p(-(p - q) / (1 - q))))),
+
+    # Carried after counterex inverted the body: the divisor moved from
+    # (1 - r_target*h2) to (1 - r_source*h2), so the earlier clean verdict was
+    # about a different function and had to be re-earned rather than assumed.
+    ("Calibrator.amCorrectedPortability",
+     lambda pm, rs, rt, h: pm * (1 - rt * h) / (1 - rs * h),
+     lambda pm, rs, rt, h: pm * (1 - rt * h) / (1 - rs * h),
+     [(mp.mpf(1), rs, rt, h)
+      for rs in logspace(-6, 0, 7) for rt in logspace(-6, 0, 7)
+      for h in [mp.mpf("0.1"), mp.mpf("0.5"), mp.mpf("0.9"), mp.mpf(1)]],
+     None),
 
     ("Calibrator.myopiaPrice",
      lambda x: (1 - math.exp(-x)) ** 2,
@@ -172,9 +193,14 @@ KNOWN_FAILURES = {
     "Calibrator.ldKernelSymbol": "Poisson divisor rounds to exactly zero near "
                                  "the singularity; ldKernelSymbol_eq_halfAngle "
                                  "is the stable evaluation.",
-    "Calibrator.bernoulliKLReal": "cancellation is BETWEEN the two log terms, "
-                                  "so log1p does not rescue it; recorded as a "
-                                  "domain restriction on the definition.",
+    "Calibrator.bernoulliKLReal": "the body AS WRITTEN loses everything as p -> q. "
+                                  "bernoulliKLReal_eq_logOnePlus gives an exactly "
+                                  "equal form that recovers twelve orders of "
+                                  "magnitude; what remains after it is a genuine "
+                                  "residual cancellation between the two summands "
+                                  "below |p-q| ~ 1e-6, which no elementary rewrite "
+                                  "removes. This entry pins the WRITTEN body, which "
+                                  "is still the one a naive implementation copies.",
     "Calibrator.myopiaPrice": "1 - exp(-lam*tau) at short horizons; expm1 fixes "
                               "it, but Mathlib has no Real.expm1 so the Lean "
                               "body keeps this form and carries the warning.",
