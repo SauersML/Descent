@@ -2179,4 +2179,34 @@ theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAntiOn_M
 
 end PresentDayMetrics
 
+/-- **The two in the allele-frequency retention ratio is the ploidy, twice, and
+that is why the ratio does not depend on it.**
+
+`PortabilityDrift.tagAlleleFreqRetentionAt` is `2p_t(1 - p_t) / (2p_0(1 - p_0))`,
+and both twos are the same gene-copy count that `genotypeVarianceHWE` carries:
+the body is a ratio of Hardy-Weinberg genotype variances at two times. Stating
+it that way is not decoration. A bare `2` in a numerator and a bare `2` in a
+denominator can be two DIFFERENT conventions written the same way -- a
+heterozygosity over a genotype variance, say -- and the ratio would then be off
+by a factor while looking symmetric. Once both are `genotypeVarianceHWE` the
+cancellation is forced, and the retention is a pure ratio that a haploid corpus
+would compute identically. -/
+theorem tagAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
+    (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) :
+    Portability.tagAlleleFreqRetentionAt m t i =
+      genotypeVarianceHWE (Portability.tagAlleleFreqTargetAt m t i) /
+        genotypeVarianceHWE (m.tagAlleleFreqSource i) := by
+  unfold Portability.tagAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+
+/-- **The same two, at the causal variants.** `causalAlleleFreqRetentionAt` is
+the identical ratio on the causal side, and it is tied here separately rather
+than by appeal to the tag version: two definitions with the same shape in one
+file are exactly the pair a single fix leaves half-repaired. -/
+theorem causalAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
+    (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) :
+    Portability.causalAlleleFreqRetentionAt m t j =
+      genotypeVarianceHWE (Portability.causalAlleleFreqTargetAt m t j) /
+        genotypeVarianceHWE (m.causalAlleleFreqSource j) := by
+  unfold Portability.causalAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+
 end Descent.Portability

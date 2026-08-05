@@ -1767,4 +1767,13 @@ end Unification
 
 end
 
+/-- **Cross-check: the fair two-point variance in `ImitationRigidity` is the
+between-subgroup variance.** Both are `(a - b)² / 4`: the variance of a
+two-point law with equal weights. One is used as a nonconcentration witness for
+a resolvent and the other as the numerator of `F_ST`, and neither file knew the
+other existed. -/
+theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
+    Blindness.fairTwoPointVariance a b = Descent.Core.betweenSubgroupVariance a b := by
+  unfold Blindness.fairTwoPointVariance Descent.Core.betweenSubgroupVariance Descent.Core.halfDiffSq; ring
+
 end Descent.Blindness

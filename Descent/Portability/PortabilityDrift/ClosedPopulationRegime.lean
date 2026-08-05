@@ -394,4 +394,27 @@ theorem ClosedPopulationNoMutation.targetHet_eq_trajectory_of_no_mutation
 end ClosedPopulationRegime
 
 
+/-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
+written out with its own four. This is the last inline restatement of the
+ploidy convention in the development. -/
+theorem hetMutationFloor_eq_scaled (Ne mu : ℝ) :
+    Portability.hetMutationFloor Ne mu
+      = Descent.Core.scaledMutationRate Ne mu / (1 + Descent.Core.scaledMutationRate Ne mu) := by
+  unfold Portability.hetMutationFloor
+  rw [Descent.Core.scaledMutationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
+
+/-- **Both twos in the mutation-drift heterozygosity step are the ploidy.** The drift term
+loses a fraction `1 / (ploidy · Nₑ)` per generation — the reciprocal coalescent time scale —
+and the mutation term gains `ploidy · mu` because both copies at the locus are exposed. A
+haploid recursion would carry neither. -/
+theorem hetStepWithMutation_uses_coalescentTimeScale (Ne mu H : ℝ) :
+    Portability.hetStepWithMutation Ne mu H
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * H + Descent.Core.ploidy * mu * (1 - H) := by
+  unfold Portability.hetStepWithMutation Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The closed-population retention is the coalescent retention over the horizon.** -/
+theorem retention_uses_coalescentTimeScale (r : Portability.ClosedPopulationNoMutation) :
+    r.retention = (1 - 1 / Descent.Core.coalescentTimeScale r.Ne) ^ r.horizon := by
+  unfold Portability.ClosedPopulationNoMutation.retention; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.Portability

@@ -870,4 +870,20 @@ theorem pearson_r2_below_one_under_additive_noise
 
 end PhenomeWideStructure
 
+theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
+    Portability.neutralDriftFactor Ne t = (1 - 1 / Descent.Core.coalescentTimeScale Ne) ^ t := by
+  unfold Portability.neutralDriftFactor; rw [Descent.Core.coalescentTimeScale_eq]
+
+theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : ℝ) :
+    Portability.selectedDriftFactor Ne t s_correction
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne + s_correction) ^ t := by
+  unfold Portability.selectedDriftFactor; rw [Descent.Core.coalescentTimeScale_eq]
+
+theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
+    (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
+    PopGen.heterozygosityLossFromDrift t Ne = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t := by
+  rw [PopGen.measuredLoss_closedPopulation]
+  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  rfl
+
 end Descent.Portability

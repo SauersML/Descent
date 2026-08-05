@@ -762,4 +762,13 @@ theorem same_sourceR2_different_targetR2_two_signal_witness :
 
 end SourceR2Insufficiency
 
+/-- **The `2 p (1 - p)` in the effective sample size is the diploid genotype variance.**
+`StatisticalGeneticsMethodology.effectiveSampleSizeFromSE` inverts `SE² · Var(dosage)`, and
+`Var(dosage)` under Hardy-Weinberg proportions is `genotypeVarianceHWE`. Written inline the
+two was free; here it is the ploidy, and an SE reported on a haploid dosage scale would
+have to change this file rather than that definition. -/
+theorem effectiveSampleSizeFromSE_uses_genotypeVarianceHWE (se p : ℝ) :
+    Portability.effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * genotypeVarianceHWE p) := by
+  unfold Portability.effectiveSampleSizeFromSE genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+
 end Descent.Portability

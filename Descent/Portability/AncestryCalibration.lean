@@ -563,4 +563,9 @@ theorem div_lt_one_of_eq_add_pos
 
 end Epistasis
 
+theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
+    Portability.epistaticVariancePairwise γ p₁ p₂ =
+      γ ^ 2 * genotypeVarianceHWE p₁ * genotypeVarianceHWE p₂ := by
+  unfold Portability.epistaticVariancePairwise genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+
 end Descent.Portability

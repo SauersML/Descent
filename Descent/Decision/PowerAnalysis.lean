@@ -854,4 +854,8 @@ theorem fixedGradeBenchmark_lt_logarithmicBenchmark_eventually (K c : ℝ) :
 
 end NonsmoothSampleSize
 
+theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
+    Decision.noncentralityParam n beta p = n * beta ^ 2 * genotypeVarianceHWE p := by
+  unfold Decision.noncentralityParam genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+
 end Descent.Decision

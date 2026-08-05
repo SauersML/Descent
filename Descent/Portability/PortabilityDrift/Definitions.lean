@@ -785,4 +785,23 @@ every cross-check inside the cluster passed.
 
 end PortabilityDrift
 
+/-- **Cross-check: the within-deme coalescence time carries the same two.**
+`PortabilityDrift.twoDemeIMEquilibriumETss` is `2` in units of `Nₑ`
+generations, and that two is the ploidy: `E[T_within] = ploidy · Nₑ`
+generations is `Descent.Core.coalescentTimeScale`, which is `2 Nₑ`. Writing the constant
+without saying so left a bare numeral in an equilibrium; this theorem says
+which two it is. -/
+theorem twoDemeIMEquilibriumETss_eq_ploidy (M : ℝ) :
+    Portability.twoDemeIMEquilibriumETss M = Descent.Core.ploidy := by
+  unfold Portability.twoDemeIMEquilibriumETss Descent.Core.ploidy; ring
+
+theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
+    Portability.coalescentTau t Ne = t / Descent.Core.coalescentTimeScale Ne := by
+  unfold Portability.coalescentTau; rw [Descent.Core.coalescentTimeScale_eq]
+
+theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
+    (m : Portability.SplitMigrationModel) :
+    Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig := by
+  unfold Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
+
 end Descent.Portability

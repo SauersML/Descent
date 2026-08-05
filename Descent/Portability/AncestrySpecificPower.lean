@@ -792,4 +792,10 @@ theorem shorter_ld_needs_more_samples
 
 end OptimalDesign
 
+theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
+    Portability.effectiveFisherInformation n p r2_ld = n * genotypeVarianceHWE p * r2_ld := by
+  unfold Portability.effectiveFisherInformation Portability.fisherInformation genotypeVarianceHWE
+    genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  ring_nf
+
 end Descent.Portability

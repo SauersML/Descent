@@ -1027,4 +1027,38 @@ theorem hundred_lt_one_div_mul_sq
 
 end EffectSizeDistribution
 
+/-- **The two in the recessive drift parameter is the ploidy.**
+
+`RareVariantPortability.recessiveMutationSelectionDriftParameter` is
+`2 Nₑ √(μ s)`, and that two is the number of gene copies per individual: a
+population of `Nₑ` diploids carries `ploidy · Nₑ` gene copies, drift acts at rate
+`1 / (ploidy · Nₑ)`, and the parameter is the selective force `√(μ s)` measured
+against it. Written inline the two was a bare numeral in a quantity whose whole
+job is to say when drift wins, and a haploid reading of the same formula would
+be off by exactly this factor. -/
+theorem recessiveMutationSelectionDriftParameter_uses_ploidy (Ne mu s : ℝ) :
+    Portability.recessiveMutationSelectionDriftParameter Ne mu s
+      = Descent.Core.ploidy * Ne * Real.sqrt (mu * s) := by
+  unfold Portability.recessiveMutationSelectionDriftParameter Descent.Core.ploidy; ring
+
+/-- **The four in the dominant drift parameter is the corpus's own rate scaling.**
+
+`RareVariantPortability.mutationSelectionDriftParameter` is `4 Nₑ h s`, and the
+`4 Nₑ` is not an independent convention: it is `scaledMutationRate`, the same
+`4 Nₑ ·` normalisation the corpus already applies to a mutation rate to get `θ`
+and to a migration rate to get `4 Nₑ m`, applied here to the heterozygous
+selection load `h s`. This is deliberately NOT stated as a multiple of `ploidy`.
+Only one of the two factors in `4 = 2 · 2` is a gene-copy count; the other comes
+from the diffusion limit, and tying it to `ploidy` would record a claim about
+genetics that this parameter does not make. -/
+theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
+    Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s) := by
+  unfold Portability.mutationSelectionDriftParameter Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
+
+/-- The two drift-variance definitions are the same quantity. -/
+theorem pgsDriftVariance_one_pop_eq_Var_Delta_Mu (V_A fst : ℝ) :
+    PopGen.pgsDriftVariance_one_pop V_A fst = Portability.Var_Delta_Mu V_A fst := by
+  rw [Descent.PopGen.pgsDriftVariance_one_pop_eq_ploidy_form,
+    Descent.Portability.Var_Delta_Mu_eq_ploidy_form]
+
 end Descent.Portability

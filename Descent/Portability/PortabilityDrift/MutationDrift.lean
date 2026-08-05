@@ -937,4 +937,22 @@ theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
 
 end MutationDriftPortability
 
+theorem MutationDriftModelAssumptions_fstTransient_uses_timeScale
+    (m : Portability.MutationDriftModelAssumptions) :
+    Portability.MutationDriftModelAssumptions.fstTransient m
+      = m.fstEquilibrium *
+          (1 - Real.exp (-(1 + m.theta) * m.t / Descent.Core.coalescentTimeScale m.Ne)) := by
+  unfold Portability.MutationDriftModelAssumptions.fstTransient
+  rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **Both twos in the identity-flow step are the ploidy.** Identity is created at
+`1 / (ploidy · Nₑ)` per generation, and destroyed at `ploidy · rate` because either of the
+two lineages of a sampled pair can be hit by the homogenising force. That second two is
+what makes the fixed point `1 / (1 + 4 Nₑ · rate)` rather than `1 / (1 + 2 Nₑ · rate)`, so
+it is the one a reader most needs pinned. -/
+theorem ibdFlowStep_uses_coalescentTimeScale (Ne rate F : ℝ) :
+    Portability.ibdFlowStep Ne rate F
+      = F + (1 - F) / Descent.Core.coalescentTimeScale Ne - Descent.Core.ploidy * rate * F := by
+  unfold Portability.ibdFlowStep Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.Portability

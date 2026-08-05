@@ -940,4 +940,12 @@ theorem percentile_invariant_to_standardization
 
 end Standardization
 
+theorem pgsVariance_uses_hwe {m : ℕ} (β p : Fin m → ℝ) :
+    Portability.pgsVariance β p = ∑ i, β i ^ 2 * genotypeVarianceHWE (p i) := by
+  unfold Portability.pgsVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+
+theorem pgsMean_uses_ploidy {m : ℕ} (β p : Fin m → ℝ) :
+    Portability.pgsMean β p = ∑ i, β i * (Descent.Core.ploidy * p i) := by
+  unfold Portability.pgsMean Descent.Core.ploidy; ring_nf
+
 end Descent.Portability

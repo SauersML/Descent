@@ -249,4 +249,10 @@ theorem recurrence_derived_R2_increases_with_m (V_A V_E Ne m₁ m₂ : ℝ)
 
 end MigrationDriftRecurrence
 
+theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
+    Portability.fstMigDriftNext Ne m Fst
+      = (1 - 2 * m - 1 / Descent.Core.coalescentTimeScale Ne) * Fst
+        + 1 / Descent.Core.coalescentTimeScale Ne := by
+  unfold Portability.fstMigDriftNext; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.Portability

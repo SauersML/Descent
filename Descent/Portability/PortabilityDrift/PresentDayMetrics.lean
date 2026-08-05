@@ -2487,4 +2487,37 @@ to the shared record, not a second record.
 -/
 end PresentDayMetrics
 
+theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
+    Portability.wrightFisherDriftRetention N t
+      = (1 - 1 / Descent.Core.coalescentTimeScale (N : ℝ)) ^ t := by
+  unfold Portability.wrightFisherDriftRetention; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The between-population variance of the mean breeding value is
+`ploidy · F_ST · V_A`.**
+
+Two independently drifting populations each contribute `F_ST V_A`, so the
+variance of their difference carries the ploidy factor. Writing `2` here is
+the same convention as everywhere else and is now tied to it. -/
+theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
+    Portability.Var_Delta_Mu V_A fst = Descent.Core.ploidy * fst * V_A := by
+  unfold Portability.Var_Delta_Mu Descent.Core.ploidy; ring
+
+/-- **Present-day PGS variance is a retained fraction of the ancestral variance.**
+`presentDayPGSVariance` is not a wrapper over the kernel -- it routes through
+`pgsVarianceFromHet` -- so this is a real identity and not a restatement of a body. -/
+theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
+    Portability.presentDayPGSVariance V_A fst = Descent.Core.retainedFraction fst V_A := by
+  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.retainedFraction; ring
+
+/-- **The realised target PGS variance is a retained fraction, scaled by transport.**
+`PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
+by the transported correlation. The first factor is `Core.retainedFraction`, the same
+`(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio.
+Those two now CALL the kernel and so need no theorem here; this one does not, because it
+routes through a transported correlation as well, which is why it survives the deletion of
+its four siblings. -/
+theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
+    Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
+  unfold Portability.realWorldPGSVariance Descent.Core.retainedFraction; ring
+
 end Descent.Portability

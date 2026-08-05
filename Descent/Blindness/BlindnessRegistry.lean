@@ -613,4 +613,25 @@ theorem totalSweepFrequency_blind_to_originMultiplicity (finalFrequency : ℝ)
   XiFromMarks.totalFamilyFraction_does_not_determine_multiplicity
     finalFrequency hfrequency
 
+/-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.
+
+Third copy of the body, third reading of it. `DriftRegime` counted five members in the
+cluster; this attaches the one that states the recurrence over `ℕ` generations, so that
+all three now name the same trajectory rather than three formulas that happen to agree. -/
+theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
+    (N t : ℕ) (H₀ : ℝ) (hH : 0 < H₀) :
+    Portability.wrightFisherHeterozygosityLoss N t
+      = (PopGen.closedPopulation (N : ℝ) H₀ hH).measuredLoss t := by
+  rw [PopGen.measuredLoss_closedPopulation]
+  unfold Portability.wrightFisherHeterozygosityLoss Portability.wrightFisherDriftRetention
+  rfl
+
+/-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
+deviation is weighted by `1 - ploidy · p`, which is `q - p`, and `ploidy · p` is `E[X]` for
+a dosage `X` on `0, 1, …, ploidy` in Hardy-Weinberg proportions. On a haploid scale the
+weight is not this expression, so the constant is forced by the coding and belongs here. -/
+theorem averageEffect_uses_ploidy (m : Blindness.OneLocusArchitecture) :
+    m.averageEffect = m.a + m.d * (1 - Descent.Core.ploidy * m.p) := by
+  unfold Blindness.OneLocusArchitecture.averageEffect Descent.Core.ploidy; ring
+
 end Descent.Blindness

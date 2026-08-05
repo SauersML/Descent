@@ -98,75 +98,6 @@ written ones back to the kernel, so that drift between them is a compile error r
 a silent disagreement -- which is exactly what the local copy was in the way of. -/
 
 
-/-- **Cross-check: the within-deme coalescence time carries the same two.**
-`PortabilityDrift.twoDemeIMEquilibriumETss` is `2` in units of `Nₑ`
-generations, and that two is the ploidy: `E[T_within] = ploidy · Nₑ`
-generations is `coalescentTimeScale`, which is `2 Nₑ`. Writing the constant
-without saying so left a bare numeral in an equilibrium; this theorem says
-which two it is. -/
-theorem twoDemeIMEquilibriumETss_eq_ploidy (M : ℝ) :
-    Portability.twoDemeIMEquilibriumETss M = Descent.Core.ploidy := by
-  unfold Portability.twoDemeIMEquilibriumETss Descent.Core.ploidy; ring
-
-/-- **The two in the recessive drift parameter is the ploidy.**
-
-`RareVariantPortability.recessiveMutationSelectionDriftParameter` is
-`2 Nₑ √(μ s)`, and that two is the number of gene copies per individual: a
-population of `Nₑ` diploids carries `ploidy · Nₑ` gene copies, drift acts at rate
-`1 / (ploidy · Nₑ)`, and the parameter is the selective force `√(μ s)` measured
-against it. Written inline the two was a bare numeral in a quantity whose whole
-job is to say when drift wins, and a haploid reading of the same formula would
-be off by exactly this factor. -/
-theorem recessiveMutationSelectionDriftParameter_uses_ploidy (Ne mu s : ℝ) :
-    Portability.recessiveMutationSelectionDriftParameter Ne mu s
-      = Descent.Core.ploidy * Ne * Real.sqrt (mu * s) := by
-  unfold Portability.recessiveMutationSelectionDriftParameter Descent.Core.ploidy; ring
-
-/-- **The four in the dominant drift parameter is the corpus's own rate scaling.**
-
-`RareVariantPortability.mutationSelectionDriftParameter` is `4 Nₑ h s`, and the
-`4 Nₑ` is not an independent convention: it is `scaledMutationRate`, the same
-`4 Nₑ ·` normalisation the corpus already applies to a mutation rate to get `θ`
-and to a migration rate to get `4 Nₑ m`, applied here to the heterozygous
-selection load `h s`. This is deliberately NOT stated as a multiple of `ploidy`.
-Only one of the two factors in `4 = 2 · 2` is a gene-copy count; the other comes
-from the diffusion limit, and tying it to `ploidy` would record a claim about
-genetics that this parameter does not make. -/
-theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
-    Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s) := by
-  unfold Portability.mutationSelectionDriftParameter Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
-
-/-- **The two in the allele-frequency retention ratio is the ploidy, twice, and
-that is why the ratio does not depend on it.**
-
-`PortabilityDrift.tagAlleleFreqRetentionAt` is `2p_t(1 - p_t) / (2p_0(1 - p_0))`,
-and both twos are the same gene-copy count that `genotypeVarianceHWE` carries:
-the body is a ratio of Hardy-Weinberg genotype variances at two times. Stating
-it that way is not decoration. A bare `2` in a numerator and a bare `2` in a
-denominator can be two DIFFERENT conventions written the same way -- a
-heterozygosity over a genotype variance, say -- and the ratio would then be off
-by a factor while looking symmetric. Once both are `genotypeVarianceHWE` the
-cancellation is forced, and the retention is a pure ratio that a haploid corpus
-would compute identically. -/
-theorem tagAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
-    (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) :
-    Portability.tagAlleleFreqRetentionAt m t i =
-      genotypeVarianceHWE (Portability.tagAlleleFreqTargetAt m t i) /
-        genotypeVarianceHWE (m.tagAlleleFreqSource i) := by
-  unfold Portability.tagAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
-
-/-- **The same two, at the causal variants.** `causalAlleleFreqRetentionAt` is
-the identical ratio on the causal side, and it is tied here separately rather
-than by appeal to the tag version: two definitions with the same shape in one
-file are exactly the pair a single fix leaves half-repaired. -/
-theorem causalAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
-    (m : Portability.CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) :
-    Portability.causalAlleleFreqRetentionAt m t j =
-      genotypeVarianceHWE (Portability.causalAlleleFreqTargetAt m t j) /
-        genotypeVarianceHWE (m.causalAlleleFreqSource j) := by
-  unfold Portability.causalAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
-
-
 end Ploidy
 
 section Differentiation
@@ -186,11 +117,6 @@ records the coincidence, which is what a shared convention deserves — as again
 island-model `F_ST`, where four names really did denote one quantity and are now one. -/
 
 
-theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
-    Portability.effectiveSymmetricMigration m₁₂ m₂₁ = Descent.Core.meanAlleleFreq m₁₂ m₂₁ := by
-  unfold Portability.effectiveSymmetricMigration Descent.Core.meanAlleleFreq Descent.Core.midpoint; ring
-
-
 /-! ### Reference/alternate allele swap: a metamorphic relation, not a symmetry of taste
 
 Which allele a variant call file names REFERENCE is a property of the assembly, not
@@ -200,16 +126,6 @@ effect-direction quantity must be negated; a body that is neither is reporting t
 assembly. The corpus proves that its `F_ST` bodies do not care which population is
 called first (`hudsonFst_symm`) but had no statement about which allele is called
 reference, which is the convention that actually varies between panels. -/
-
-
-/-- **Cross-check: the fair two-point variance in `ImitationRigidity` is the
-between-subgroup variance.** Both are `(a - b)² / 4`: the variance of a
-two-point law with equal weights. One is used as a nonconcentration witness for
-a resolvent and the other as the numerator of `F_ST`, and neither file knew the
-other existed. -/
-theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
-    Blindness.fairTwoPointVariance a b = Descent.Core.betweenSubgroupVariance a b := by
-  unfold Blindness.fairTwoPointVariance Descent.Core.betweenSubgroupVariance Descent.Core.halfDiffSq; ring
 
 
 end Differentiation
@@ -261,11 +177,6 @@ One definition, one bridge: the island-model equilibrium is the migration-drift
 equilibrium at the scaled migration rate. A second spelling of `1 / (1 + 4 Nₑ m)` would
 need its own bridge theorem, which is a reason not to add one. -/
 
-theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
-    Portability.fstMigrationDriftEquilibrium Ne m =
-      PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m) := by
-  unfold Portability.fstMigrationDriftEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
 /-! ### Per-generation drift rate, written out in three modules
 
@@ -309,23 +220,11 @@ FALSIFIED status of its own in `PhenomeWidePortability`. Note that
 `ldRetainedFraction_uses_timeScale` below is the one guard in this group that states
 what its formula omits — copy that shape, not the bare ones. -/
 
-theorem neutralDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) :
-    Portability.neutralDriftFactor Ne t = (1 - 1 / coalescentTimeScale Ne) ^ t := by
-  unfold Portability.neutralDriftFactor; rw [coalescentTimeScale_eq]
-
-
-theorem wrightFisherDriftRetention_uses_timeScale (N : ℕ) (t : ℕ) :
-    Portability.wrightFisherDriftRetention N t
-      = (1 - 1 / coalescentTimeScale (N : ℝ)) ^ t := by
-  unfold Portability.wrightFisherDriftRetention; rw [coalescentTimeScale_eq]
 
 /-! ### The coalescent time coordinate, written out twice
 
 `t / (2 Nₑ)` is time in coalescent units, in `PortabilityDrift` and in `DGP`. -/
 
-theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
-    Portability.coalescentTau t Ne = t / coalescentTimeScale Ne := by
-  unfold Portability.coalescentTau; rw [coalescentTimeScale_eq]
 
 /-! ### The scaled rates, written out on three parameter records
 
@@ -338,49 +237,12 @@ rather than restated. What remains below is the `EvolutionaryParameters` pair, w
 still a separate record. -/
 
 
-/-- **The between-population variance of the mean breeding value is
-`ploidy · F_ST · V_A`.**
-
-Two independently drifting populations each contribute `F_ST V_A`, so the
-variance of their difference carries the ploidy factor. Writing `2` here is
-the same convention as everywhere else and is now tied to it. -/
-theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
-    Portability.Var_Delta_Mu V_A fst = Descent.Core.ploidy * fst * V_A := by
-  unfold Portability.Var_Delta_Mu Descent.Core.ploidy; ring
-
-
-/-- The two drift-variance definitions are the same quantity. -/
-theorem pgsDriftVariance_one_pop_eq_Var_Delta_Mu (V_A fst : ℝ) :
-    PopGen.pgsDriftVariance_one_pop V_A fst = Portability.Var_Delta_Mu V_A fst := by
-  rw [pgsDriftVariance_one_pop_eq_ploidy_form, Var_Delta_Mu_eq_ploidy_form]
-
 /-! ### Genotype variance inside sums and products
 
 Eight further definitions carry `2 p (1 - p)` as a factor rather than as their
 whole body: score means and variances, Fisher's average effect, dominance and
 additive variance, two noncentrality parameters, and a pairwise epistatic
 variance. Each is now written against `genotypeVarianceHWE`. -/
-
-theorem pgsVariance_uses_hwe {m : ℕ} (β p : Fin m → ℝ) :
-    Portability.pgsVariance β p = ∑ i, β i ^ 2 * genotypeVarianceHWE (p i) := by
-  unfold Portability.pgsVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
-
-
-theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
-    Decision.noncentralityParam n beta p = n * beta ^ 2 * genotypeVarianceHWE p := by
-  unfold Decision.noncentralityParam genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
-
-
-theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
-    Portability.effectiveFisherInformation n p r2_ld = n * genotypeVarianceHWE p * r2_ld := by
-  unfold Portability.effectiveFisherInformation Portability.fisherInformation genotypeVarianceHWE
-    genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
-  ring_nf
-
-theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
-    Portability.epistaticVariancePairwise γ p₁ p₂ =
-      γ ^ 2 * genotypeVarianceHWE p₁ * genotypeVarianceHWE p₂ := by
-  unfold Portability.epistaticVariancePairwise genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 
 /-! ### The remaining singletons
@@ -400,22 +262,11 @@ replacement, stating what that definition does claim, is
 `PopulationGeneticsFoundations.steppingStoneCharacteristicLength_balances_mutation`. -/
 
 
-theorem asymmetricFst_eq_scaled (Ne m₁₂ m₂₁ : ℝ) :
-    Portability.asymmetricFst Ne m₁₂ m₂₁
-      = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
-  unfold Portability.asymmetricFst PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
-
 /-! The bridge from the migration-drift equilibrium to the scaled mutation-drift form is
 `fstMigrationDriftEquilibrium_eq_scaled` above.  A second copy of it stood here, for the
 second spelling of that equilibrium -- which is what the note above predicted: "A second
 spelling of `1 / (1 + 4 Nₑ m)` would need its own bridge theorem, which is a reason not to
 add one."  The spelling is gone from `PortabilityDrift` and its bridge with it. -/
-
-
-theorem pgsMean_uses_ploidy {m : ℕ} (β p : Fin m → ℝ) :
-    Portability.pgsMean β p = ∑ i, β i * (Descent.Core.ploidy * p i) := by
-  unfold Portability.pgsMean Descent.Core.ploidy; ring_nf
 
 
 /-! `neutralPortability_uses_ploidy` has been DELETED, not restated. It asserted
@@ -438,46 +289,12 @@ measured, at `PortabilityBounds.neutralPortability_pos_beyond_half`. -/
 These carry the convention inside a larger expression. A relation still ties
 them down; no definition needs rewriting. -/
 
-theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : ℝ) :
-    Portability.selectedDriftFactor Ne t s_correction
-      = (1 - 1 / coalescentTimeScale Ne + s_correction) ^ t := by
-  unfold Portability.selectedDriftFactor; rw [coalescentTimeScale_eq]
-
-theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
-    (m : Portability.SplitMigrationModel) :
-    Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig := by
-  unfold Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
-
-theorem fstMigDriftNext_uses_timeScale (Ne m Fst : ℝ) :
-    Portability.fstMigDriftNext Ne m Fst
-      = (1 - 2 * m - 1 / coalescentTimeScale Ne) * Fst
-        + 1 / coalescentTimeScale Ne := by
-  unfold Portability.fstMigDriftNext; rw [coalescentTimeScale_eq]
-
 
 /-! ### The last seven
 
 Each carries the convention in its own shape: inside a `let`, in a recursion
 step, or under two nested decay factors. A relation reaches all of them. -/
 
-
-theorem MutationDriftModelAssumptions_fstTransient_uses_timeScale
-    (m : Portability.MutationDriftModelAssumptions) :
-    Portability.MutationDriftModelAssumptions.fstTransient m
-      = m.fstEquilibrium *
-          (1 - Real.exp (-(1 + m.theta) * m.t / coalescentTimeScale m.Ne)) := by
-  unfold Portability.MutationDriftModelAssumptions.fstTransient
-  rw [coalescentTimeScale_eq]
-
-
-/-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
-written out with its own four. This is the last inline restatement of the
-ploidy convention in the development. -/
-theorem hetMutationFloor_eq_scaled (Ne mu : ℝ) :
-    Portability.hetMutationFloor Ne mu
-      = Descent.Core.scaledMutationRate Ne mu / (1 + Descent.Core.scaledMutationRate Ne mu) := by
-  unfold Portability.hetMutationFloor
-  rw [Descent.Core.scaledMutationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
 /-! ### Shared primitives
 
@@ -491,12 +308,6 @@ constant. -/
 
 Three further groups are one map under several names. -/
 
-/-- **Present-day PGS variance is a retained fraction of the ancestral variance.**
-`presentDayPGSVariance` is not a wrapper over the kernel -- it routes through
-`pgsVarianceFromHet` -- so this is a real identity and not a restatement of a body. -/
-theorem presentDayPGSVariance_eq_retainedFraction (V_A fst : ℝ) :
-    Portability.presentDayPGSVariance V_A fst = Descent.Core.retainedFraction fst V_A := by
-  unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.retainedFraction; ring
 
 /-! `explainedR2FromTransportMoments` and `pgsR2` are the same term; the identity is
 stated once, next to `pgsR2` in `TransferLearningPGS`. -/
@@ -549,12 +360,6 @@ regime `heterozygosityLossFromDrift` assumes can follow a proof instead of trust
 docstring — and anyone who moves it to a population at mutation-drift balance now
 contradicts `regimes_disagree` rather than silently getting a wrong number. -/
 
-theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
-    (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
-    PopGen.heterozygosityLossFromDrift t Ne = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t := by
-  rw [PopGen.measuredLoss_closedPopulation]
-  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
-  rfl
 
 /-! **The argument-order hazard this section documented is gone with the second copy.**
 
@@ -572,18 +377,6 @@ Deleting the second copy removes the hazard the note described. `DriftRegime` st
 the two READINGS, which is where that separation belongs.
 -/
 
-/-- **The Wright-Fisher loss is the same regime again**, at an integer effective size.
-
-Third copy of the body, third reading of it. `DriftRegime` counted five members in the
-cluster; this attaches the one that states the recurrence over `ℕ` generations, so that
-all three now name the same trajectory rather than three formulas that happen to agree. -/
-theorem wrightFisherHeterozygosityLoss_eq_closedPopulation_measuredLoss
-    (N t : ℕ) (H₀ : ℝ) (hH : 0 < H₀) :
-    Portability.wrightFisherHeterozygosityLoss N t
-      = (PopGen.closedPopulation (N : ℝ) H₀ hH).measuredLoss t := by
-  rw [PopGen.measuredLoss_closedPopulation]
-  unfold Portability.wrightFisherHeterozygosityLoss Portability.wrightFisherDriftRetention
-  rfl
 
 /-- **The fourth proportional-reduction body, and the one that could not be reached from
 its siblings.**
@@ -630,64 +423,6 @@ Where the constant is a coalescent scaling the tie goes through `coalescentTimeS
 which is `ploidy · Nₑ`; where it is the diploid genotype variance it goes through
 `genotypeVarianceHWE`; where it is a scaled rate it goes through `scaledMigrationRate`,
 which `scaledMigrationRate_eq_ploidy_form` already forces. -/
-
-/-- **The `2 p (1 - p)` in the effective sample size is the diploid genotype variance.**
-`StatisticalGeneticsMethodology.effectiveSampleSizeFromSE` inverts `SE² · Var(dosage)`, and
-`Var(dosage)` under Hardy-Weinberg proportions is `genotypeVarianceHWE`. Written inline the
-two was free; here it is the ploidy, and an SE reported on a haploid dosage scale would
-have to change this file rather than that definition. -/
-theorem effectiveSampleSizeFromSE_uses_genotypeVarianceHWE (se p : ℝ) :
-    Portability.effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * genotypeVarianceHWE p) := by
-  unfold Portability.effectiveSampleSizeFromSE genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
-
-/-- **Both twos in the mutation-drift heterozygosity step are the ploidy.** The drift term
-loses a fraction `1 / (ploidy · Nₑ)` per generation — the reciprocal coalescent time scale —
-and the mutation term gains `ploidy · mu` because both copies at the locus are exposed. A
-haploid recursion would carry neither. -/
-theorem hetStepWithMutation_uses_coalescentTimeScale (Ne mu H : ℝ) :
-    Portability.hetStepWithMutation Ne mu H
-      = (1 - 1 / coalescentTimeScale Ne) * H + Descent.Core.ploidy * mu * (1 - H) := by
-  unfold Portability.hetStepWithMutation Descent.Core.ploidy; rw [coalescentTimeScale_eq]
-
-/-- **The closed-population retention is the coalescent retention over the horizon.** -/
-theorem retention_uses_coalescentTimeScale (r : Portability.ClosedPopulationNoMutation) :
-    r.retention = (1 - 1 / coalescentTimeScale r.Ne) ^ r.horizon := by
-  unfold Portability.ClosedPopulationNoMutation.retention; rw [coalescentTimeScale_eq]
-
-/-- **Both twos in the identity-flow step are the ploidy.** Identity is created at
-`1 / (ploidy · Nₑ)` per generation, and destroyed at `ploidy · rate` because either of the
-two lineages of a sampled pair can be hit by the homogenising force. That second two is
-what makes the fixed point `1 / (1 + 4 Nₑ · rate)` rather than `1 / (1 + 2 Nₑ · rate)`, so
-it is the one a reader most needs pinned. -/
-theorem ibdFlowStep_uses_coalescentTimeScale (Ne rate F : ℝ) :
-    Portability.ibdFlowStep Ne rate F
-      = F + (1 - F) / coalescentTimeScale Ne - Descent.Core.ploidy * rate * F := by
-  unfold Portability.ibdFlowStep Descent.Core.ploidy; rw [coalescentTimeScale_eq]
-
-/-- **The multiplicative identity recurrence carries the same coalescent scale.** -/
-theorem ibdRecurrenceStep_uses_coalescentTimeScale (Ne rate x : ℝ) :
-    Portability.ibdRecurrenceStep Ne rate x
-      = (1 - rate) ^ 2 * (1 / coalescentTimeScale Ne
-          + (1 - 1 / coalescentTimeScale Ne) * x) := by
-  unfold Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix; rw [coalescentTimeScale_eq]
-
-/-- **The rest point of that recurrence carries it too**, in both of its constants: the
-`2 Nₑ` is the coalescent time scale and the `2 - rate` is `ploidy - rate`, the two lineages
-less the one disrupting event they share. -/
-theorem ibdRecurrenceFixedPoint_uses_coalescentTimeScale (Ne rate : ℝ) :
-    Portability.ibdRecurrenceFixedPoint Ne rate
-      = (1 - rate) ^ 2
-          / ((1 - rate) ^ 2 + coalescentTimeScale Ne * rate * (Descent.Core.ploidy - rate)) := by
-  unfold Portability.ibdRecurrenceFixedPoint Descent.Core.ploidy; rw [coalescentTimeScale_eq]
-
-
-/-- **The `2 p` in Fisher's average effect is the expected diploid dosage.** The dominance
-deviation is weighted by `1 - ploidy · p`, which is `q - p`, and `ploidy · p` is `E[X]` for
-a dosage `X` on `0, 1, …, ploidy` in Hardy-Weinberg proportions. On a haploid scale the
-weight is not this expression, so the constant is forced by the coding and belongs here. -/
-theorem averageEffect_uses_ploidy (m : Blindness.OneLocusArchitecture) :
-    m.averageEffect = m.a + m.d * (1 - Descent.Core.ploidy * m.p) := by
-  unfold Blindness.OneLocusArchitecture.averageEffect Descent.Core.ploidy; ring
 
 
 /-- **All three twos in the serial-founder within-deme time are coalescent time scales.**
@@ -747,17 +482,6 @@ both. -/
 theorem importanceWeightESS_eq_momentPermeability (sum_w sum_w_sq : ℝ) :
     Portability.importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq := rfl
 
-
-/-- **The realised target PGS variance is a retained fraction, scaled by transport.**
-`PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
-by the transported correlation. The first factor is `Core.retainedFraction`, the same
-`(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio.
-Those two now CALL the kernel and so need no theorem here; this one does not, because it
-routes through a transported correlation as well, which is why it survives the deletion of
-its four siblings. -/
-theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
-    Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
-  unfold Portability.realWorldPGSVariance Descent.Core.retainedFraction; ring
 
 end SharedMaps
 

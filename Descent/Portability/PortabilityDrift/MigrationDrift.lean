@@ -1869,4 +1869,36 @@ theorem admixture_portability_above_equilibrium_of_ld_above_equilibrium
 
 end MigrationDriftPortability
 
+theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
+    Portability.effectiveSymmetricMigration m₁₂ m₂₁ = Descent.Core.meanAlleleFreq m₁₂ m₂₁ := by
+  unfold Portability.effectiveSymmetricMigration Descent.Core.meanAlleleFreq Descent.Core.midpoint; ring
+
+theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
+    Portability.fstMigrationDriftEquilibrium Ne m =
+      PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m) := by
+  unfold Portability.fstMigrationDriftEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
+
+theorem asymmetricFst_eq_scaled (Ne m₁₂ m₂₁ : ℝ) :
+    Portability.asymmetricFst Ne m₁₂ m₂₁
+      = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
+  unfold Portability.asymmetricFst PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
+
+/-- **The multiplicative identity recurrence carries the same coalescent scale.** -/
+theorem ibdRecurrenceStep_uses_coalescentTimeScale (Ne rate x : ℝ) :
+    Portability.ibdRecurrenceStep Ne rate x
+      = (1 - rate) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne
+          + (1 - 1 / Descent.Core.coalescentTimeScale Ne) * x) := by
+  unfold Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix; rw [Descent.Core.coalescentTimeScale_eq]
+
+/-- **The rest point of that recurrence carries it too**, in both of its constants: the
+`2 Nₑ` is the coalescent time scale and the `2 - rate` is `ploidy - rate`, the two lineages
+less the one disrupting event they share. -/
+theorem ibdRecurrenceFixedPoint_uses_coalescentTimeScale (Ne rate : ℝ) :
+    Portability.ibdRecurrenceFixedPoint Ne rate
+      = (1 - rate) ^ 2
+          / ((1 - rate) ^ 2 + Descent.Core.coalescentTimeScale Ne * rate * (Descent.Core.ploidy - rate)) := by
+  unfold Portability.ibdRecurrenceFixedPoint Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.Portability
