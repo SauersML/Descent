@@ -192,6 +192,47 @@ def main() -> int:
                 "UNPINNED        steppingStoneFstQuadratic does not pin its expected verdict; "
                 "a falsified body that starts agreeing must be reported as a regression")
 
+    # ---------------- CALIB-TAIL: the degenerate-corpus region -------------
+    # WHY THIS SECTION EXISTS. Everything above runs against STUB corpora, which
+    # is deliberate -- it makes the calibration about the gate's logic rather
+    # than about the corpus. But it also means the calibration occupies only the
+    # region where the corpus loads fine, and that is not the region where this
+    # tier actually failed. `extract/api.py` spent most of one day resolving its
+    # root one directory too high and returning an EMPTY table, and every
+    # consumer went quiet rather than loud. A calibration that never sees an
+    # empty table certifies the instrument on exactly the conditions that were
+    # never at risk.
+    #
+    # So: run every check this file owns against a corpus that has nothing in
+    # it, and require each one to be LOUD. `evaluate` catches the KeyError per
+    # grid point and `classify` returns ERROR; the run fails only if the check
+    # pinned an `expected_verdict` for ERROR to contradict. An unpinned check
+    # goes silent, which is why `demoSteppingStoneFst-scale-invariant` is pinned
+    # AGREE -- it is the control, and a control that can go quiet is not one.
+    EMPTY: dict = {}
+    for cid in sorted(IDENTITY_IDS | SCALING_IDS):
+        chk = _by_id(cid)
+        if chk is None:
+            continue
+        if chk.expected_verdict is None:
+            failures.append(
+                f"UNPINNED-TAIL   {cid} declares no expected_verdict, so if the "
+                f"corpus table is empty or broken it reports ERROR and run.py "
+                f"still returns 0. Silence must not be a pass")
+            continue
+        res = R.evaluate(chk, EMPTY)
+        got = R.classify(chk, res)
+        if got == chk.expected_verdict:
+            failures.append(
+                f"SILENT-ON-EMPTY {cid} produced its expected verdict "
+                f"{got!r} against an EMPTY corpus. A check that cannot tell an "
+                f"empty table from a real one is measuring nothing")
+        if res["n_errors"] != len(chk.grid):
+            failures.append(
+                f"SILENT-ON-EMPTY {cid} evaluated {len(chk.grid) - res['n_errors']} "
+                f"grid points against an empty corpus; it should have raised on "
+                f"every one")
+
     for f in failures:
         print(f"FAIL  {f}")
     if failures:
@@ -207,6 +248,9 @@ def main() -> int:
     print("  scaling invariance: the diffusion-scale control AGREES and is non-vacuous; "
           "steppingStoneFstQuadratic's extra power of m is reported INTERNAL-INCONSISTENT")
     print(f"  {len(DELETED_AS_VACUOUS)} checks deleted for vacuity are asserted absent")
+    print(f"  CALIB-TAIL: all {len(IDENTITY_IDS | SCALING_IDS)} checks pin an "
+          f"expected_verdict and every one contradicts it against an EMPTY "
+          f"corpus, so a broken extraction fails the run instead of going quiet")
     return 0
 
 

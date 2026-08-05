@@ -61,12 +61,110 @@ FALSE NEGATIVES -- a defect missed:
       as much an assumption as the point estimate.
 """
 import math
+import re
+
+# ---------------------------------------------------------------------------
+# ORACLE IDENTITIES -- designs in which the definition IS its own oracle's
+# estimator.  A PROPERTY OF THE DESIGN, NOT OF THE DEFINITION.
+# ---------------------------------------------------------------------------
+# The SELF-TEST gate below catches a formula that agrees with its oracle to
+# machine precision. It does not catch this family: the estimator can reach the
+# same expression by a slightly different numerical route, so the harness sees a
+# few parts in 10^3 of scatter and banks a MATCH.
+#
+# THE ALGEBRA. `driftVariance(p0, fst) = p0(1-p0) fst`, whose `fst` is the
+# per-branch Wright F. If the battery obtains F from the SAMPLE, as
+# `Var(p)/(p0(1-p0))`, then the body is `Var(p)` -- what the oracle computes --
+# using no Wright-Fisher property beyond the martingale, and no competitor could
+# have been rejected. If the battery obtains F from the MODEL PARAMETERS, as
+# `1-(1-1/(2Ne))^t`, agreement is the Wright-Fisher variance recursion and is a
+# real prediction that can fail.
+#
+# THE CORRECTION THIS ENCODES. An earlier version keyed on the definition NAME
+# and refused every MATCH for the three below. That was wrong in the expensive
+# direction: `battery_bulk21` fed the sample's own F and its MATCHes are vacuous,
+# but `battery_bulk41` group B feeds the model's F, MEASURES the Hudson and Nei
+# readings on the same replicates as competitors, and FALSIFIES both (Nei by 157
+# sems and 47% low, Hudson by 7.8 sems) while the body matches under one sem.
+# Same definition, same oracle, opposite verdicts -- so vacuity cannot be a
+# property of the definition, and a name-keyed gate would have discarded a real
+# measurement.
+#
+# Hence `argument_source`: "model" -> a real prediction, "sample" -> VACUOUS, and
+# silence -> LEAD, never a MATCH. Undeclared is unanswered, not innocent.
+#
+# TO ADD AN ENTRY you must be able to write the reduction AND name the argument
+# whose source decides it. "It looks circular" is not enough.
+ORACLE_IDENTITIES = {
+    "driftVariance": (
+        "fst",
+        "with a sample-estimated F it reduces to Var(p), the oracle's own "
+        "estimator; with the model's 1-(1-1/(2Ne))^t it is the Wright-Fisher "
+        "variance recursion"),
+    "twoPopDriftVariance": (
+        "fst",
+        "same reduction as driftVariance, doubled: sample-estimated F gives "
+        "2 Var(p), the oracle's own estimator"),
+    "expectedFreqDiffSq": (
+        "fst",
+        "the twoPopDriftVariance body with its arguments reordered; same "
+        "reduction and the same dependence on where F came from"),
+}
+
+ARGUMENT_SOURCES = ("model", "sample")
+
+
+def oracle_identity(name):
+    """The (argument, reason) registry entry for `name`, or None.
+
+    Battery labels are free text, so the match is on the definition name as a
+    whole IDENTIFIER TOKEN. A bare substring test fires on
+    `pgsDriftVarianceFromLoci` and silently discards a real falsification;
+    `verdict_calibration.py` asserts that it does not.
+    """
+    if not name:
+        return None
+    for key, entry in ORACLE_IDENTITIES.items():
+        if re.search(r"(?<![A-Za-z0-9_])" + re.escape(key) + r"(?![A-Za-z0-9_])",
+                     name):
+            return entry
+    return None
 
 
 def classify(cells, control=None, sem_source="replicates", selected_from=1,
-             rel_floor=0.02, sem_gate=3.0, oracle_independent=True):
-    """Return (verdict, note, worst-cell) under the gates above."""
+             rel_floor=0.02, sem_gate=3.0, oracle_independent=True, name=None,
+             argument_source=None):
+    """Return (verdict, note, worst-cell) under the gates above.
+
+    `name` is the definition under test; pass it, or the ORACLE_IDENTITIES gate
+    cannot fire. `argument_source` is required for a registered definition and
+    ignored otherwise: "model" means the identity-bearing argument came from the
+    simulation's parameters, "sample" means it was estimated from the same
+    replicates the oracle measures.
+    """
     notes = []
+
+    # --- FN gate: is this design's definition its own oracle's estimator? ----
+    entry = oracle_identity(name)
+    if entry is not None:
+        arg, why = entry
+        if argument_source is None:
+            return "LEAD (undeclared argument source)", (
+                "`%s` %s. The verdict depends entirely on where this design "
+                "obtained `%s`, and this battery did not say. Declare "
+                "argument_source='model' or 'sample'" % (name, why, arg)), cells[0]
+        if argument_source not in ARGUMENT_SOURCES:
+            return "LEAD (undeclared argument source)", (
+                "argument_source=%r is not one of %s"
+                % (argument_source, ", ".join(ARGUMENT_SOURCES))), cells[0]
+        if argument_source == "sample":
+            return "VACUOUS (oracle identity)", (
+                "no verdict is available: `%s` was estimated from the same "
+                "replicates the oracle measures, and %s. Feed the model's value "
+                "instead, as battery_bulk41 group B does" % (arg, why)), cells[0]
+        notes.append(
+            "argument_source='model': `%s` comes from the simulation's "
+            "parameters, so agreement is a prediction and not an identity" % arg)
 
     # --- FN gate: generative self-test --------------------------------------
     # Declared, not inferred: no arithmetic can tell "the formula predicts the
@@ -170,6 +268,24 @@ def classify(cells, control=None, sem_source="replicates", selected_from=1,
 
 
 def report(name, source, cells, verdict, note, worst, regime=""):
+    # Backstop for a battery that computed its verdict without passing `name=`.
+    # It downgrades to a LEAD, not to VACUOUS: whether the identity bites depends
+    # on where the design got its identity-bearing argument, and a battery that
+    # never passed `name=` cannot have passed `argument_source=` either, so the
+    # answer is unknown. Claiming VACUOUS here would repeat the mistake this gate
+    # was corrected for -- discarding battery_bulk41's competitor-rejecting MATCH.
+    entry = oracle_identity(name)
+    if entry is not None and verdict.startswith("MATCH"):
+        arg, why = entry
+        verdict = "LEAD (undeclared argument source)"
+        note = ("DOWNGRADED FROM MATCH: `%s` %s, so the verdict turns on where "
+                "`%s` came from. This battery passed neither name= nor "
+                "argument_source= to classify; pass both. %s"
+                % (name, why, arg, note)).strip()
+    return _report(name, source, cells, verdict, note, worst, regime)
+
+
+def _report(name, source, cells, verdict, note, worst, regime=""):
     print("\n%-40s %s   (pred span %s)"
           % (name, verdict,
              "%.0f%%" % (100 * (max(c["lean"] for c in cells)

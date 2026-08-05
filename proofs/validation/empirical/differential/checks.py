@@ -2478,11 +2478,19 @@ _scale_check(
     "d/(d + 4 Ne m sigma_sq) depends on Ne and m only through their product",
     lambda D, d, Ne, m, s2: D["demoSteppingStoneFst"](d, Ne, m, s2),
     {"d": (4.0, 0), "Ne": (500.0, 1), "m": (0.008, -1), "s2": (1.0, 0)},
+    expected="AGREE",
     note=(
         "CONTROL for steppingStoneFstQuadratic-scale-VIOLATION below. This is "
         "the sibling that carries the migration rate to the first power, and it "
         "is exactly invariant. The pair together is what makes the violation a "
-        "finding rather than a property of the check."
+        "finding rather than a property of the check. "
+        "PINNED expected AGREE, and the pin is the point: an unpinned check that "
+        "ERRORs is scored as no problem at all. `run.py` returns 0 on a check "
+        "whose every grid point raised, because `classify` gives it ERROR and "
+        "nothing compares ERROR against an expectation. Four checks in this file "
+        "sit at ERROR on a clean main today and the run is green. A CONTROL that "
+        "can go silent is not a control, so this one declares what it must "
+        "produce and a broken corpus table now fails the run here."
     ),
     extra="F_ST at the base point is 0.20, away from both 0 and 1.",
 )
