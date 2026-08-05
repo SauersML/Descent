@@ -155,19 +155,16 @@ step" are different states.
   never share tree, which is true of the pairing that respects the cherries and false of the
   other two.  It would have made the `θ` coefficient vanish like `2/n` instead of tending to
   `1/3`.  The enumeration found it.
-* **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
-  K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
-  exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix
-  form for models with separated time scales, and Skorokhod convergence of the processes.
-* **Schweinsberg's criterion** -- CLOSED as a criterion, on all three named members.
-  `Coalescent.ComingDownCriterion` defines `Σ γ_b⁻¹ < ∞`, proves Kingman satisfies it and the
-  star coalescent `Λ = δ₁` does not, and computes the Bolthausen-Sznitman rate:
-  each `k`-merger contributes `b/k`, so `γ_b = b(H_b - 1)`.  `Coalescent.BertrandDescent`
-  finishes that case -- `γ_b ≤ b log b` from Mathlib's `H_n ≤ 1 + log n`, and `Σ 1/(b log b)`
-  diverges by Cauchy condensation, the condensed sum collapsing to a multiple of the harmonic
-  series.  So both sides of the criterion are inhabited by named coalescents.  STILL ABSENT:
-  the equivalence itself, which is a theorem about a process this corpus has only at rate
-  level.
+* **Möhle's lemma** -- CLOSED as K-G (2.14), the semigroup limit.
+  `Coalescent.Convergence` proves the entrywise limit `p_N(k)^N → e^{-d_k}` for every `k`;
+  `Coalescent.SemigroupLimit` proves the operator statement in the generality Kingman states
+  it -- for any complete normed algebra, any `Q`, and any contractions `P_N` within `C/N²` of
+  `exp(N⁻¹Q)`, the `N`-th powers converge to `exp Q`.  `Generator`'s contraction estimate does
+  the accumulation and `exp(N⁻¹Q)^N = exp Q` is exact, so there is no continuity argument at
+  all: the whole limit lives at `t = 1`, which is what "`N` generations are one coalescent
+  unit" means.  STILL ABSENT: the instantiation at the coalescent's own transition matrix,
+  because this corpus has the chain as a KERNEL and not as a matrix; and Möhle's lemma proper,
+  the `A + B/N` form with `A` a projection, for models whose two time scales separate.
 * **The lookdown construction** -- CLOSED for what it is for, with its clocks.
   `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
   restriction commutes with looking down, at or above it the operation is invisible.  That is
@@ -181,7 +178,12 @@ step" are different states.
   bijection is the lookdown's path law, and writing it out would be a second name for one
   object -- the failure mode this corpus exists to prevent.  The item is closed by declining
   to duplicate, not by an absence.
-* **Spatial coalescents** -- CLOSED at the mechanism.  `Coalescent.SpatialCoalescent` proves
+* **Spatial coalescents** -- CLOSED at the mechanism, and the walk's criterion counted.
+  `Coalescent.PolyaCriterion` counts the returning paths -- `4^n` step-sets, `C(2n,n)` of them
+  balanced, so `P(S_{2n}=0) = C(2n,n)/4^n` -- and proves the series diverges, which is Pólya's
+  criterion in one dimension.  A return IS a coalescence by `SpatialCoalescent`'s iff, so the
+  dependency is now one implication (the renewal identity turning divergence into almost-sure
+  return) rather than the whole question.  Below, the mechanism.  `Coalescent.SpatialCoalescent` proves
   the voter-model duality `c_t = c₀ ∘ A_t` by induction, presents the dual AS a pedigree so
   that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise coalescence to
   a hitting time via `walk_sub`.  STILL ABSENT: recurrence of the difference walk, hence
