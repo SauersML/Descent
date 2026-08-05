@@ -22,10 +22,9 @@ class of `η` along a set `S`; when `S` is a nonempty proper subset of one class
 class is cut, and the result is a cover.  `covers_iff_exists_splitBy` shows every cover
 arises this way, so the states below `η` are exactly the cuts of its classes.
 
-What remains open after this file, and is stated rather than glossed: the cardinality
-`#{ξ ; ξ ≺ η} = Σ_c (2^{|c|-1} - 1)`, and its refinement by piece size, which is the
-`½ C(λ, ν)` itself.  Both are now expressible -- `splitBy` and `splitBy_eq_iff` are the
-statement and the injectivity it needs -- and neither is proved here.
+The cardinality this was built for, `#{ξ ; ξ ≺ η} = Σ_c (2^{λ_c-1} - 1)`, is proved in
+`Descent.Coalescent.CutCount`, using `splitBy_eq_iff` and `splitBy_compl` from here to see
+that each cut is named twice and `Descent.Coalescent.CutSets` to break the tie.
 
 ## Main results
 
@@ -33,9 +32,12 @@ statement and the injectivity it needs -- and neither is proved here.
 - `splitBy_rel_iff`: what it relates -- same class, same side of the cut.
 - `blocks_splitBy`: cutting one class in two adds exactly one block.
 - `splitBy_covers`: so it is a cover, from above.
-- `covers_iff_exists_splitBy`: and every cover is one.
-- `splitBy_eq_iff`: a cut is determined by its set up to swapping the two pieces -- the
-  source of the `½` in `½ C(λ, ν)`.
+- `eq_splitBy_merge`, `covers_iff_exists_splitBy`: and every cover is one.
+- `splitBy_compl`: cutting along `S` and along the rest of `S`'s class agree -- the
+  double-naming Kingman's `½` corrects.
+- `splitBy_eq_iff`: a cut is determined by its set up to that swap.
+- `exists_covers_of_ne_bot`: every state but `Δ` has something below it, so `Δ` is the only
+  minimal state and every state is reachable from it.
 -/
 
 namespace Coalescent
