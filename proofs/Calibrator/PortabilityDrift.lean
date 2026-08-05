@@ -1034,9 +1034,28 @@ noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutatio
     Regime: closed population, no mutation -- carried by the structure's
     `mutation_negligible` field rather than assumed.
 
-    Empirical status: FALSIFIED outside the regime. At demographic equilibrium
-    with `Ne = 1000`, `t = 4000` this is `0.135` and the measurement is
-    `1.025 ± 0.020`. Inside the regime it is untested. -/
+    Empirical status: NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS.
+
+    The run carrying the FALSIFIED verdict measured at demographic equilibrium
+    with `Ne = 1000`, `t = 4000`, where this body gives `0.135` against a
+    measured `1.025 ± 0.020`. That run is outside the regime this definition
+    states, and the regime is not a docstring caveat: it is the
+    `mutation_negligible` field of `ClosedPopulationNoMutation`, which a caller
+    must discharge to build the structure at all.
+
+    The disagreement is the size of the excluded mechanism. At mutation-drift
+    equilibrium heterozygosity is replenished as fast as drift removes it, so
+    retention sits at one; drift alone takes it to `(1 - 1/(2 Nₑ))^t`. A body
+    that omits mutation, measured where mutation dominates, reports the term it
+    omits rather than an error in the term it keeps.
+
+    So the verdict is overturned as a design fault, not repaired: the body is
+    unchanged and no new measurement is claimed for it. What is OWED is the
+    in-regime test -- a Wright-Fisher run at mutation rate zero, heterozygosity
+    divided by the WHOLE sequence rather than by segregating sites, comparing
+    `H_t / H_0` against `(1 - 1/(2 Nₑ))^t` across several `t`. Until that runs
+    this is untested inside its regime, which is a debt and is not the same
+    thing as a falsification. -/
 noncomputable def ClosedPopulationNoMutation.retention
     (r : ClosedPopulationNoMutation) : ℝ :=
   (1 - 1 / (2 * r.Ne)) ^ r.horizon
@@ -1045,8 +1064,10 @@ noncomputable def ClosedPopulationNoMutation.retention
 
     Regime: closed population, no mutation.
 
-    Empirical status: FALSIFIED outside the regime; see
-    `ClosedPopulationNoMutation.retention`. -/
+    Empirical status: NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS; see
+    `ClosedPopulationNoMutation.retention`, whose verdict this inherits. The
+    falsifying run was outside the regime the structure enforces, and the
+    in-regime test is owed rather than failed. -/
 noncomputable def ClosedPopulationNoMutation.targetHet
     (r : ClosedPopulationNoMutation) : ℝ :=
   r.H₀ * r.retention
