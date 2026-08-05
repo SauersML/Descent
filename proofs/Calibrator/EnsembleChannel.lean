@@ -215,7 +215,7 @@ noncomputable def binaryTransitionArrowStatistic (xs : List Bool) : ℝ :=
 
 /-- Reference evaluations: the statistic reads a two-element list and is zero on every other
 length, which is the whole content of the pattern match. -/
-theorem binaryTransitionArrowStatistic_at_reference_point :
+theorem binaryTransitionArrowStatistic_off_length_two :
     binaryTransitionArrowStatistic [] = 0 ∧ binaryTransitionArrowStatistic [true] = 0 := by
   constructor <;> simp [binaryTransitionArrowStatistic]
 

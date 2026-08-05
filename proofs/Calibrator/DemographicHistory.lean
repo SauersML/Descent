@@ -973,7 +973,7 @@ noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : 
   1 - Real.exp (-(cumulativeDrift Ne))
 
 /-- Reference evaluation: with no cumulative drift no heterozygosity is lost. -/
-theorem heterozygosityLossVariableNe_at_reference_point {T : ℕ} (Ne : Fin T → ℝ)
+theorem heterozygosityLossVariableNe_of_no_cumulative_drift {T : ℕ} (Ne : Fin T → ℝ)
     (hzero : cumulativeDrift Ne = 0) :
     heterozygosityLossVariableNe Ne = 0 := by
   unfold heterozygosityLossVariableNe

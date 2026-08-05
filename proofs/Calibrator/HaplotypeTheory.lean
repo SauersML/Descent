@@ -424,7 +424,7 @@ population has.
 Unlike the dosage bias, this one does not move when only the configuration
 frequency moves. It is not zero by construction either: it vanishes just when the
 fitted cis/trans effects agree with the target's, which is the content of
-`haplotypeTransportBias_at_reference_point`, and it is what fails when
+`haplotypeTransportBias_of_matched_predictor`, and it is what fails when
 the effects themselves do not transport — see
 `haplotype_less_portable_when_effects_shift`.
 
@@ -434,17 +434,35 @@ noncomputable def haplotypeTransportBias
   |averagePhaseInteraction freq_cis_target pred_cis pred_trans -
     averagePhaseInteraction freq_cis_target interaction_cis interaction_trans|
 
-/-- Reference evaluation: a predictor that matches the interaction transports without bias. -/
-theorem haplotypeTransportBias_at_reference_point
+/-- **A predictor that matches the interaction transports without bias.**
+
+This is an identity about the bias, and it was named `_at_reference_point`, which
+it is not: it states zero, so a competitor scaled by any `c` satisfies it too and
+it pins no coefficient. Renamed rather than moved, because the fact is real and
+worth having -- it is the zero of the bias, and the zero is where the definition
+is anchored. What it is not is a reference evaluation, and
+`haplotypeTransportBias_at_reference_point` below now supplies one. -/
+theorem haplotypeTransportBias_of_matched_predictor
     (freq_cis_target interaction_cis interaction_trans : ℝ) :
     haplotypeTransportBias freq_cis_target interaction_cis interaction_trans
       interaction_cis interaction_trans = 0 := by
   unfold haplotypeTransportBias
   simp
 
+/-- **Reference evaluation, off the zero.** A predictor that is certain of a cis
+interaction of one where the truth is zero, in a target that carries the two
+phases in equal proportion, is biased by exactly the interaction it invented.
+Both phase weights of `averagePhaseInteraction` enter at one half, so a body
+weighting them differently -- or taking a signed difference where the name says
+bias -- gives a different number here. -/
+theorem haplotypeTransportBias_at_reference_point :
+    haplotypeTransportBias (1 / 2) 1 1 0 0 = 1 := by
+  unfold haplotypeTransportBias averagePhaseInteraction
+  norm_num
+
 
 -- **Predicting the true interaction leaves no transport bias** is stated once
--- by `haplotypeTransportBias_at_reference_point` above.
+-- by `haplotypeTransportBias_of_matched_predictor` above.
 
 /-- The dosage-only phase-misspecification error has the exact variance form
 `f(1-f)(δ_cis - δ_trans)^2`. -/
@@ -655,7 +673,7 @@ theorem haplotype_pgs_more_portable_for_cis
         interaction_cis interaction_trans <
       dosageTransportBias
         freq_cis_source freq_cis_target interaction_cis interaction_trans := by
-  rw [dosageTransportBias_eq, haplotypeTransportBias_at_reference_point]
+  rw [dosageTransportBias_eq, haplotypeTransportBias_of_matched_predictor]
   exact mul_pos
     (abs_pos.mpr (sub_ne_zero.mpr h_freq_shift.symm))
     (abs_pos.mpr (sub_ne_zero.mpr h_phase_gap))

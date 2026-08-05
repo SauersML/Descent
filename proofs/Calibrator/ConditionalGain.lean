@@ -252,7 +252,7 @@ noncomputable def copiedBinaryConditionalProductExpectation : ℝ :=
 /-- Reference evaluation.  The value is computed through the definitions this body calls, but
 the theorem states a number: an inequality or an invariance leaves a family of bodies
 satisfying it, and a value does not. -/
-theorem copiedBinaryConditionalProductExpectation_at_reference_point :
+theorem copiedBinaryConditionalProductExpectation_eq_zero :
     copiedBinaryConditionalProductExpectation  = 0 := by
   norm_num [copiedBinaryConditionalProductExpectation]
 

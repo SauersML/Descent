@@ -1888,7 +1888,7 @@ noncomputable def measureVariance (μ : Measure Ω) (Z : Ω → ℝ) : ℝ :=
   ∫ ω, (Z ω - measureMean μ Z) ^ 2 ∂μ
 
 /-- Reference evaluation: a point mass has no spread. -/
-theorem measureVariance_at_reference_point [MeasurableSingletonClass Ω] (a : Ω) (Z : Ω → ℝ) :
+theorem measureVariance_dirac [MeasurableSingletonClass Ω] (a : Ω) (Z : Ω → ℝ) :
     measureVariance (Measure.dirac a) Z = 0 := by
   unfold measureVariance
   simp [measureMean]
