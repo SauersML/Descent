@@ -1,8 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.BundleRigidity.DeploymentCeiling
 import Descent.PopGen.PolygenicArchitecture
+import Descent.Blindness.BundleRigidity.DeploymentCeiling
+import Descent.Core.Ratios
 
 namespace Descent.Decision
 
@@ -854,7 +855,7 @@ theorem fixedGradeBenchmark_lt_logarithmicBenchmark_eventually (K c : ℝ) :
 end NonsmoothSampleSize
 
 theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
-    Decision.noncentralityParam n beta p = n * beta ^ 2 * genotypeVarianceHWE p := by
-  unfold Decision.noncentralityParam genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+    Decision.noncentralityParam n beta p = n * beta ^ 2 * Descent.Core.hweHeterozygosity p := by
+  unfold Decision.noncentralityParam Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 end Descent.Decision

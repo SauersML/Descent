@@ -1,10 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Foundations.TransportIdentities
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.Data.Matrix.Basic
-import Descent.Foundations.TransportIdentities
+import Descent.Core.Ratios
 
 namespace Descent.PopGen
 
@@ -554,7 +555,7 @@ effect product, so no constant repairs it: at `p = 1/2`, `D = 1/8`, `α = (1,1)`
 against a true `3/2`, while `α = (1,-1)` gives `1` against a true `1/2`. The
 unconditional reading is FALSIFIED (`VarianceComponents.additiveVariance`). -/
 theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
-    PopGen.additiveVariance p α = ∑ i, genotypeVarianceHWE (p i) * (α i) ^ 2 := by
-  unfold PopGen.additiveVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+    PopGen.additiveVariance p α = ∑ i, Descent.Core.hweHeterozygosity (p i) * (α i) ^ 2 := by
+  unfold PopGen.additiveVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 end Descent.PopGen

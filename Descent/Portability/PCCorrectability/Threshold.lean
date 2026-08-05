@@ -316,7 +316,7 @@ theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
     hudsonBbpSpike 4 2 (9/10) (1/10) ≠
       neiContrastSpike 4 2 (9/10) (1/10) := by
   unfold hudsonBbpSpike neiContrastSpike demographicSpike Descent.Core.hudsonFst Descent.Core.neiGst
-    effectiveSubgroupSize Descent.Core.ploidy Descent.Core.meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy
+    effectiveSubgroupSize Descent.Core.ploidy Descent.Core.meanAlleleFreq Descent.Core.midpoint
   norm_num
 
 end Descent.Portability

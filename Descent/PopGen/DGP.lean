@@ -1,9 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Population
 import Descent.Foundations.TransportIdentities
+-- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
+-- positivity certificate for excess target risk that does not read an F_ST difference.
+-- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
 import Descent.Spectral.SpectralDegradation
+import Descent.Core.Fst
+import Descent.Core.Parameters
 
 namespace Descent.PopGen
 
@@ -2722,7 +2726,6 @@ theorem fstDemeCorrectedFlowStep_uses_coalescentTimeScale
       = F + (1 - F) / Descent.Core.coalescentTimeScale p.Ne
           - Descent.Core.ploidy * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F := by
   unfold PopGen.fstDemeCorrectedFlowStep Descent.Core.ploidy
-    Descent.Core.islandDemeCorrection Descent.Core.ploidy
     Descent.Core.islandDemeCorrection Descent.Core.ratio
   rw [Descent.Core.coalescentTimeScale_eq]; norm_num
 
@@ -2755,8 +2758,7 @@ theorem fstDemeCorrectedFlowStep_constants_named (p : PopGen.EvolutionaryParamet
       F + (1 - F) / Descent.Core.coalescentTimeScale p.Ne
         - 2 * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F := by
   unfold PopGen.fstDemeCorrectedFlowStep Descent.Core.coalescentTimeScale
-    Descent.Core.islandDemeCorrection
-    Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.ploidy Descent.Core.ploidy
+    Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.ploidy
   norm_num
 
 /-- **The two flow steps differ only in the migration channel**, and coincide
@@ -2891,7 +2893,7 @@ theorem fstEquilibrium_isFixedPoint (p : EvolutionaryParameters) :
   have hd' : (1 : ℝ) + p.theta + 2 * p.bigM ≠ 0 := ne_of_gt hd
   have hscaled : 1 + p.theta + 2 * p.bigM = 1 + 4 * p.Ne * (2 * p.mig + p.mu) := by
     unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate
-      Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+      Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
     ring
   unfold fstDemeCorrectedFlowStep fstEquilibrium Descent.Core.fstFromFlow
   rw [← add_assoc]
@@ -3270,7 +3272,7 @@ theorem fstEquilibrium_decreasing_in_theta
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
@@ -3290,7 +3292,7 @@ theorem fstEquilibrium_decreasing_in_migration
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
   unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
   rw [div_lt_div_iff₀
