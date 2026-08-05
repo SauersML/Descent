@@ -6648,6 +6648,17 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     correlation itself is `alleleFreqCorrelation` below, which carries the
     arguments the quantity depends on.
 
+    THE LEDGER STILL CARRIES THE DEAD NAME. `simcov/ledger.json` holds three rows
+    under `freqCorrFromFst` -- FALSIFIED at 235.05 sems (`pgs`), FALSIFIED
+    (`verify`), and CONVENTION (`fix`) -- and no declaration in the corpus bears
+    that name any more. A reader grepping the ledger for the refutation finds
+    rows pointing at nothing; a reader grepping the Lean for `freqCorrFromFst`
+    finds only prose. The rows are not stale in what they measured -- the
+    measurement above IS them -- they are stale in what they name.
+    This paragraph is the bridge, and it is here rather than in the ledger
+    because the ledger is a record of what was run and rewriting a record to
+    match a later rename is how a record stops being one.
+
     Empirical status: **VALIDATED as a covariance-retention factor**
     (`simcov/battery_drift05.py`). Its former justification was the correlation identity, and
     that justification is gone; retention now has a measurement instead.

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PortabilityDrift
 import Descent.Blindness.LumpedRateBlindness
 import Descent.Core.Fst
+import Descent.Core.Moments
 
 namespace Descent
 
@@ -130,6 +131,57 @@ theorem neutralDriftR2Ratio_at_zero_denominator_is_junk (V_A V_E fst : ℝ)
     neutralDriftR2Ratio V_A V_E fst = 0 := by
   unfold neutralDriftR2Ratio
   rw [hzero, div_zero]
+
+/-! ### A human demographic history produces a moment tuple
+
+This module's job is to put human numbers into the drift model. That makes it the natural
+place to close the layer contract from the `PopGen` side: a demographic history here
+produces a `Core.ScoreMoments`, and the Portability layer reads a metric off it without
+either module importing the other's laws.
+
+`neutralDriftR2Ratio` above is what a paper reports -- a target `R²` against a source `R²`
+-- and the theorems below say it is the Core portability ratio, so a number quoted from
+this module and a number proved in `Core` are the same number by construction rather than
+by agreement. -/
+
+/-- **The moment tuple of a human demographic history**, at additive variance `V_A`,
+environmental variance `V_E` and the differentiation the history produces. -/
+noncomputable def humanDriftMoments (V_A V_E fst : ℝ) : Descent.Core.ScoreMoments :=
+  Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E fst
+
+/-- **This module's reported ratio IS the Core portability ratio.**
+
+Both are the deployed `R²` over the source `R²`. What the equality buys is the
+dependency: a change to either the drift model or the metric law reaches the other, so
+the number this module quotes cannot drift from the number `Core` proves things about. -/
+theorem neutralDriftR2Ratio_eq_core (V_A V_E fst : ℝ) :
+    neutralDriftR2Ratio V_A V_E fst
+      = Descent.Core.ScoreMoments.portabilityRatio V_A V_E fst := by
+  unfold neutralDriftR2Ratio Descent.Core.ScoreMoments.portabilityRatio
+    Descent.Core.ratio
+  rw [presentDayR2_eq_core, presentDayR2_eq_core]
+  rfl
+
+/-- **The reported ratio lies in the unit interval**, inherited rather than re-proved. -/
+theorem neutralDriftR2Ratio_mem_unit (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (hf0 : 0 ≤ fst) (hf : fst < 1) :
+    0 ≤ neutralDriftR2Ratio V_A V_E fst ∧ neutralDriftR2Ratio V_A V_E fst ≤ 1 := by
+  rw [neutralDriftR2Ratio_eq_core]
+  exact Descent.Core.ScoreMoments.portabilityRatio_mem_unit V_A V_E fst hV hE hf0 hf
+
+/-- **A human history with more migration reports a higher ratio.** The end-to-end law in
+this module's vocabulary, from `(Nₑ, m, μ)` to the number a paper prints. -/
+theorem neutralDriftR2Ratio_mono_in_migration
+    (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    neutralDriftR2Ratio p.V_A V_E p.fstEquilibrium
+      < neutralDriftR2Ratio q.V_A V_E q.fstEquilibrium := by
+  rw [neutralDriftR2Ratio_eq_core, neutralDriftR2Ratio_eq_core]
+  have := Descent.Core.ScoreMoments.deployedPortabilityRatio_mono_in_migration p q V_E hE
+    hNe hmu hV hlt hflow
+  unfold Descent.Core.ScoreMoments.deployedPortabilityRatio at this
+  exact this
 
 
 /-- Closed form for the neutral drift ratio. -/
