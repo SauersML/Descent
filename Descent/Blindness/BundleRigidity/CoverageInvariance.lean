@@ -148,7 +148,8 @@ theorem sigmaMin_pow_le (η C : ℝ) (hη : 0 < η) (hC : 0 < C) (σ : ℕ → �
     (hbase : 1 ≤ σ 0) (hstep : ∀ n, (η / C) * σ n ≤ σ (n + 1)) (m : ℕ) :
     (η / C) ^ m ≤ σ m := by
   have hr : 0 < η / C := div_pos hη hC
-  induction m with | zero => simpa using hbase
+  induction m with
+  | zero => simpa using hbase
   | succ n ih =>
     calc (η / C) ^ (n + 1) = (η / C) * (η / C) ^ n := by ring
       _ ≤ (η / C) * σ n := mul_le_mul_of_nonneg_left ih (le_of_lt hr)

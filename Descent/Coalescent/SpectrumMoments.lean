@@ -90,7 +90,8 @@ theorem harmonicSumSq_nonneg (m : ℕ) : 0 ≤ harmonicSumSq m := by
 Stated in the sharp form because the induction needs it; `harmonicSumSq_le_two` is the
 consequence anyone uses. -/
 theorem harmonicSumSq_le {m : ℕ} (hm : 1 ≤ m) : harmonicSumSq m ≤ 2 - 1 / (m : ℝ) := by
-  induction m, hm using Nat.le_induction with | base => norm_num [harmonicSumSq]
+  induction m, hm using Nat.le_induction with
+  | base => norm_num [harmonicSumSq]
   | succ p hp ih =>
       have hp' : (1 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp
       have hppos : (0 : ℝ) < (p : ℝ) := by linarith
@@ -105,7 +106,8 @@ theorem harmonicSumSq_le {m : ℕ} (hm : 1 ≤ m) : harmonicSumSq m ≤ 2 - 1 / 
 /-- **`b_m < 2`, for every `m`.**  The bounded constant beside the divergent one: this is why
 Watterson's estimator is consistent at all. -/
 theorem harmonicSumSq_le_two (m : ℕ) : harmonicSumSq m ≤ 2 := by
-  cases m with | zero => norm_num [harmonicSumSq]
+  cases m with
+  | zero => norm_num [harmonicSumSq]
   | succ p =>
       have h := harmonicSumSq_le (by omega : 1 ≤ p + 1)
       have hpos : (0 : ℝ) < 1 / ((p : ℝ) + 1) := by positivity

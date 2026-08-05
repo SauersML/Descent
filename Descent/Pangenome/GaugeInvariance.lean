@@ -173,7 +173,8 @@ theorem hiddenCount_eq_zero (edges : List E) (T : Tree E) (sample : List (Walk E
       = count (fun _ => false) edges :=
     count_congr (fun a ha => by simp [h a ha])
   have hzero : ∀ l : List E, count (fun _ => false) l = 0 := by
-    intro l; induction l with | nil => rfl
+    intro l; induction l with
+    | nil => rfl
     | cons a as ih => simp [count, ih]
   rw [hiddenCount, this, hzero]
 

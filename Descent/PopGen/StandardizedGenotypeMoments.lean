@@ -1682,7 +1682,8 @@ theorem abs_centeredSquare_le_homAlt (h : HardyWeinbergModel)
   obtain ⟨href, hhet, halt⟩ := Spectral.standardizedSquare_values h hq0 hq1
   have haltval : h.centeredSquare Foundations.DiploidGenotype.homAlt =
       (2 - 3 * h.altFreq) / h.altFreq := centeredSquare_homAlt_eq h hq0 hq1
-  cases g with | homRef =>
+  cases g with
+  | homRef =>
       have hval : h.centeredSquare Foundations.DiploidGenotype.homRef =
           (3 * h.altFreq - 1) / (1 - h.altFreq) := by
         rw [centeredSquare_eq_standardizedSquare_sub_one h hq0 hq1, href, div_sub_one (ne_of_gt hp)]

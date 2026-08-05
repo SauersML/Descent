@@ -225,7 +225,8 @@ theorem chi_mul_prodWeight (P Q : ι → ℝ) (w : List ι) (hQ : prodWeight Q w
 
 /-- A product of positive weights along a word is positive. -/
 theorem prodWeight_pos (P : ι → ℝ) (hP : ∀ i, 0 < P i) (w : List ι) : 0 < prodWeight P w := by
-  induction w with | nil => rw [prodWeight_nil]; norm_num
+  induction w with
+  | nil => rw [prodWeight_nil]; norm_num
   | cons i u ih => rw [prodWeight_cons]; exact mul_pos (hP i) ih
 
 /-- **The character is strictly positive**, being a ratio of products of positive
@@ -397,7 +398,8 @@ theorem forcedMass_ge (ρ : ℝ) (U : ℕ → ℝ) (hρ : 0 ≤ ρ)
     (hstep : ∀ n, ρ * U n ≤ U (n + 1)) :
     ∀ n, ρ ^ n * U 0 ≤ U n := by
   intro n
-  induction n with | zero => simp
+  induction n with
+  | zero => simp
   | succ k ih =>
     calc ρ ^ (k + 1) * U 0 = ρ * (ρ ^ k * U 0) := by ring
       _ ≤ ρ * U k := mul_le_mul_of_nonneg_left ih hρ

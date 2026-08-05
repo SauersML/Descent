@@ -76,7 +76,8 @@ If `x (s+1) = -ρ s · x s` at every step, then `x m = (-1)^m (∏_{s<m} ρ s) x
 in Theorem D follows from this one formula. -/
 theorem iterate_eq (ρ x : ℕ → ℝ) (hrec : ∀ s, x (s + 1) = -ρ s * x s) (m : ℕ) :
     x m = (-1 : ℝ) ^ m * (∏ s ∈ range m, ρ s) * x 0 := by
-  induction m with | zero => simp
+  induction m with
+  | zero => simp
   | succ m ih =>
     rw [hrec m, ih, Finset.prod_range_succ, pow_succ]
     ring

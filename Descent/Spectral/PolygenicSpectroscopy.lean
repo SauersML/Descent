@@ -1217,7 +1217,8 @@ theorem hardCall_logSquare_eq_of_latticeCondition (h : Foundations.HardyWeinberg
   obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
   have hspan : Real.log ((1 - h.altFreq) / h.altFreq)
       = Real.log (1 - h.altFreq) - Real.log h.altFreq := Real.log_div hpne hqne
-  cases g with | homRef =>
+  cases g with
+  | homRef =>
     rw [hX0, Real.log_div h2q hpne, Real.log_mul two_ne_zero hqne, hspan]
     simp only [hardCallLatticeIndex]
     push_cast

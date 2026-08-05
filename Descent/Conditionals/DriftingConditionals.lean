@@ -487,7 +487,8 @@ noncomputable def applyKernelIter (P : ι → ι → ℝ) : ℕ → (ι → ℝ)
 theorem applyKernelIter_const (P : ι → ι → ℝ) (hP : IsMassPreservingKernel P) (c : ℝ) :
     ∀ n, applyKernelIter P n (fun _ ↦ c) = fun _ ↦ c := by
   intro n
-  induction n with | zero => rfl
+  induction n with
+  | zero => rfl
   | succ n ih =>
       funext i
       simp only [applyKernelIter, ih, applyKernel]
@@ -527,7 +528,8 @@ theorem applyKernelIter_twoStateCurve (switch baseline amplitude : ℝ) (n : ℕ
     applyKernelIter (symmetricTwoStateKernel switch) n
         (twoStateCurve baseline amplitude) =
       twoStateCurve baseline (Spectral.twoStatePersistence switch switch ^ n * amplitude) := by
-  induction n with | zero => simp [applyKernelIter]
+  induction n with
+  | zero => simp [applyKernelIter]
   | succ n ih =>
       rw [applyKernelIter, ih, applyKernel_twoStateCurve]
       congr 1

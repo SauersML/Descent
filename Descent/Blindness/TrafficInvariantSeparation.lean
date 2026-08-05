@@ -506,7 +506,8 @@ theorem balancedRankOneTrafficCoordinate_tendsto_zero
     Filter.Tendsto
       (fun p : ℕ ↦ balancedRankOneTrafficCoordinate hasOddDegree (p + 1) vertices edges)
       Filter.atTop (nhds 0) := by
-  cases hodd : hasOddDegree with | false =>
+  cases hodd : hasOddDegree with
+  | false =>
       simpa [balancedRankOneTrafficCoordinate, hodd] using
         balancedRankOneGraphSum_tendsto_zero vertices edges (hev hodd)
   | true =>
@@ -1556,7 +1557,8 @@ theorem biasedBinomialTypeWeight_firstMoment
     (∑ upSpins ∈ Finset.range (population + 1),
       biasedBinomialTypeWeight population q r upSpins * upSpins) =
         population * q := by
-  induction population with | zero => simp [biasedBinomialTypeWeight]
+  induction population with
+  | zero => simp [biasedBinomialTypeWeight]
   | succ population ih =>
       have hsplit := Finset.sum_choose_succ_mul (R := ℝ)
         (fun upSpins downSpins ↦
@@ -3538,7 +3540,8 @@ theorem mesoscopicGFOMIterate_succ_apply
     mesoscopicGFOMIterate iteration (runtime + 1) vector coordinate =
       if coordinate.2.val = 0 then
         (2 : ℝ) ^ (runtime + 1) * vector coordinate else 0 := by
-  induction runtime with | zero =>
+  induction runtime with
+  | zero =>
       simp [mesoscopicGFOMIterate, mesoscopicGFOMStep]
   | succ runtime ih =>
       by_cases hexceptional : coordinate.2.val = 0
@@ -3887,7 +3890,8 @@ theorem finiteOutlierDiagonal_hasMaximum
       (baseline + spikeStrength) := by
   constructor
   · intro coordinate
-    cases coordinate with | none => exact le_rfl
+    cases coordinate with
+    | none => exact le_rfl
     | some coordinate =>
         simp only [finiteOutlierDiagonal]
         linarith
@@ -5674,7 +5678,8 @@ noncomputable def finiteRankOneSingularSpectrum
     cases coordinate <;> simp_all
   inactive_zero := by
     intro coordinate hinactive
-    cases coordinate with | none => simp at hinactive
+    cases coordinate with
+    | none => simp at hinactive
     | some coordinate => rfl
   active_card_le_rank := by simp
 

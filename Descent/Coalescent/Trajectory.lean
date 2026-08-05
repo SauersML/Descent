@@ -85,14 +85,16 @@ the uniform choice among covers that K-C (1.3) forces. -/
 noncomputable def chainLaw (n : ℕ) : ℕ → PMF (List (ER n))
   | 0 => PMF.pure [Delta n]
   | k + 1 => (chainLaw n k).bind fun l =>
-      match l with | [] => PMF.pure []
+      match l with
+      | [] => PMF.pure []
       | x :: rest => (jumpLaw x).map fun y => y :: x :: rest
 
 /-- A trajectory after `k` jumps has `k + 1` entries. -/
 theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chainLaw n k).support) :
     l.length = k + 1 := by
   classical
-  induction k generalizing l with | zero =>
+  induction k generalizing l with
+  | zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       rfl
@@ -100,7 +102,8 @@ theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
       rw [chainLaw, PMF.mem_support_bind_iff] at hl
       obtain ⟨l', hl', hmem⟩ := hl
       have hlen := ih hl'
-      match l', hlen with | x :: rest, hlen =>
+      match l', hlen with
+      | x :: rest, hlen =>
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨y, -, rfl⟩ := hmem
           simp only [List.length_cons] at hlen ⊢
@@ -110,7 +113,8 @@ theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
 theorem chainLaw_getLast {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chainLaw n k).support) :
     l.getLast? = some (Delta n) := by
   classical
-  induction k generalizing l with | zero =>
+  induction k generalizing l with
+  | zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       rfl
@@ -119,7 +123,8 @@ theorem chainLaw_getLast {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chai
       obtain ⟨l', hl', hmem⟩ := hl
       have hlast := ih hl'
       have hlen := chainLaw_length m hl'
-      match l' with | x :: rest =>
+      match l' with
+      | x :: rest =>
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨y, -, rfl⟩ := hmem
           rw [List.getLast?_cons_cons]
@@ -135,7 +140,8 @@ theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
     (hl : l ∈ (chainLaw n k).support) :
     List.Chain' (fun y x => Covers x y ∨ y = x) l := by
   classical
-  induction k generalizing l with | zero =>
+  induction k generalizing l with
+  | zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       exact List.chain'_singleton _
@@ -144,7 +150,8 @@ theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
       obtain ⟨l', hl', hmem⟩ := hl
       have hchain := ih hl'
       have hlen := chainLaw_length m hl'
-      match l' with | x :: rest =>
+      match l' with
+      | x :: rest =>
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨y, hy, rfl⟩ := hmem
           refine List.Chain'.cons ?_ hchain
@@ -174,7 +181,8 @@ theorem chainLaw_head_blocks {n : ℕ} :
     ∀ (k : ℕ), k < n → ∀ {l : List (ER n)}, l ∈ (chainLaw n k).support →
       ∀ {x : ER n}, l.head? = some x → blocks x + k = n := by
   intro k
-  induction k with | zero =>
+  induction k with
+  | zero =>
       intro _ l hl x hx
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       subst hl
@@ -186,7 +194,8 @@ theorem chainLaw_head_blocks {n : ℕ} :
       rw [chainLaw, PMF.mem_support_bind_iff] at hl
       obtain ⟨l', hl', hmem⟩ := hl
       have hlen := chainLaw_length m hl'
-      match l' with | y :: rest =>
+      match l' with
+      | y :: rest =>
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨z, hz, rfl⟩ := hmem
           rw [List.head?_cons, Option.some_inj] at hx
@@ -204,7 +213,8 @@ down Kingman's formula for it; `blockLaw` is the law itself, so the two now have
 meet. -/
 noncomputable def blockLaw (n k : ℕ) : PMF (ER n) :=
   (chainLaw n k).bind fun l =>
-    match l with | [] => PMF.pure (Delta n)
+    match l with
+    | [] => PMF.pure (Delta n)
     | x :: _ => PMF.pure x
 
 /-- **`ℛ_k` has exactly `n - k` blocks**, with probability one.  The support of the law is
@@ -217,7 +227,8 @@ theorem blocks_of_mem_support_blockLaw {n : ℕ} {k : ℕ} (hk : k < n) {x : ER 
   rw [blockLaw, PMF.mem_support_bind_iff] at hx
   obtain ⟨l, hl, hmem⟩ := hx
   have hlen := chainLaw_length k hl
-  match l with | y :: rest =>
+  match l with
+  | y :: rest =>
       rw [PMF.mem_support_pure_iff] at hmem
       subst hmem
       exact chainLaw_head_blocks k hk hl List.head?_cons
@@ -232,7 +243,8 @@ theorem chainLaw_blocks_at {n : ℕ} :
     ∀ (k : ℕ), k < n → ∀ {l : List (ER n)}, l ∈ (chainLaw n k).support →
       ∀ i, i < l.length → blocks (l.getD i (Delta n)) = n - k + i := by
   intro k
-  induction k with | zero =>
+  induction k with
+  | zero =>
       intro _ l hl i hi
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       subst hl
@@ -246,10 +258,12 @@ theorem chainLaw_blocks_at {n : ℕ} :
       rw [chainLaw, PMF.mem_support_bind_iff] at hl
       obtain ⟨l', hl', hmem⟩ := hl
       have hlen := chainLaw_length m hl'
-      match l' with | y :: rest =>
+      match l' with
+      | y :: rest =>
           rw [PMF.mem_support_map_iff] at hmem
           obtain ⟨z, hz, rfl⟩ := hmem
-          match i with | 0 =>
+          match i with
+          | 0 =>
               have hhead : blocks z + (m + 1) = n :=
                 chainLaw_head_blocks (m + 1) hmn
                   (by rw [chainLaw, PMF.mem_support_bind_iff]

@@ -2494,7 +2494,8 @@ theorem hetMutationRecurrence_zero (lam Hstar H₀ : ℝ) :
     the fact that the constant term (1-λ)H* absorbs the equilibrium part. -/
 theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     hetMutationRecurrence lam Hstar H₀ t = Hstar + (H₀ - Hstar) * lam ^ t := by
-  induction t with | zero =>
+  induction t with
+  | zero =>
     simp [hetMutationRecurrence]
   | succ n ih =>
     simp only [hetMutationRecurrence, ih]

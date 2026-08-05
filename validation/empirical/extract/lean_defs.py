@@ -1105,6 +1105,9 @@ def Locus(n):
 def altFreq(P, l):
     return _rt.rdiv((sum((_rt._proj((_rt._proj(P, 'call')(i, l)), 'dosage')) for i in range(int(_rt.sumdim('i', len(_rt._proj(P, 'call'))))))), ((Descent_Core_ploidy() * (_rt._proj(P, 'nSamples')))))
 
+def dosageCovariance(P):
+    return (lambda l_1, l_2: _rt.rdiv((sum(((((_rt._proj((_rt._proj(P, 'call')(i, l_1)), 'dosage') - (Descent_Core_ploidy() * altFreq(P, l_1)))) * ((_rt._proj((_rt._proj(P, 'call')(i, l_2)), 'dosage') - (Descent_Core_ploidy() * altFreq(P, l_2)))))) for i in range(int(_rt.sumdim('i', len(_rt._proj(P, 'call'))))))), (_rt._proj(P, 'nSamples'))))
+
 def hweProb(*_a):
     if len(_a) < 2:
         return lambda *_b: hweProb(*(_a + _b))
@@ -1170,11 +1173,11 @@ def Descent_Core_PopGenParameters_fstEquilibrium(p):
     return fstFromFlow(((Descent_Core_PopGenParameters_theta(p) + (2.0 * Descent_Core_PopGenParameters_bigM(p)))))
 
 def pair(*_a):
-    if len(_a) < 4:
+    if len(_a) < 3:
         return lambda *_b: pair(*(_a + _b))
-    s, t, p, _e = _a[:4]
+    s, t, p = _a[:3]
     _t = [s, t]
-    return _t[_rt._ix(_e, 2, 'pair')]
+    return _t[_rt._ix(p, 2, 'pair')]
 
 def withTarget(f, t):
     return pair((f(0)), t)
@@ -1577,10 +1580,10 @@ def amCorrectedPortability(port_measured, r_source, r_target, h2):
 def ibdFst(d, N, sigma_sq):
     return _rt.rdiv(d, ((((4.0 * N) * sigma_sq) + d)))
 
-def Descent_scaledMutationRate(Ne, μ):
+def Descent_PopGen_scaledMutationRate(Ne, μ):
     return Descent_Core_scaledMutationRate(Ne, μ)
 
-def Descent_scaledMigrationRate(Ne, m):
+def Descent_PopGen_scaledMigrationRate(Ne, m):
     return Descent_Core_scaledMigrationRate(Ne, m)
 
 def fstMutationDriftEquilibrium(θ):
@@ -1598,16 +1601,16 @@ def CausalVec(c):
 def TagVec(t):
     return RealVec(t)
 
-def Descent_HWEPolygenicScoreDGP_scoreMean(dgp):
+def Descent_PopGen_HWEPolygenicScoreDGP_scoreMean(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'scoreMean')
 
-def Descent_HWEPolygenicScoreDGP_scoreVariance(dgp):
+def Descent_PopGen_HWEPolygenicScoreDGP_scoreVariance(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'scoreVariance')
 
 def scoreApproximationError(dgp):
     return _rt._proj(_rt._proj(dgp, 'scoreModel'), 'berryEsseenErrorBound')(_rt._proj(dgp, 'berryEsseenConstant'))
 
-def Descent_SourceTaggedMoments_sigmaTagCausal(mom):
+def Descent_PopGen_SourceTaggedMoments_sigmaTagCausal(mom):
     return (_rt._proj(mom, 'directCausalSource') + _rt._proj(mom, 'proxyTaggingSource'))
 
 def sourceBestLinearWeightsFromLD(mom, betaCausal):
@@ -1677,14 +1680,14 @@ def trueExp(hdgp):
 def tau(p):
     return _rt.rdiv(_rt._proj(p, 't_div'), ((2.0 * _rt._proj(p, 'Ne'))))
 
-def Descent_EvolutionaryParameters_theta(p):
-    return Descent_scaledMutationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mu'))
+def Descent_PopGen_EvolutionaryParameters_theta(p):
+    return Descent_PopGen_scaledMutationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mu'))
 
-def Descent_EvolutionaryParameters_bigM(p):
-    return Descent_scaledMigrationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mig'))
+def Descent_PopGen_EvolutionaryParameters_bigM(p):
+    return Descent_PopGen_scaledMigrationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mig'))
 
 def fstDriftMigrationManyDemes(p):
-    return _rt.rdiv(1.0, ((1.0 + Descent_EvolutionaryParameters_bigM(p))))
+    return _rt.rdiv(1.0, ((1.0 + Descent_PopGen_EvolutionaryParameters_bigM(p))))
 
 def fstDriftFlowStep(p, F):
     return ((F + _rt.rdiv(((1.0 - F)), ((2.0 * _rt._proj(p, 'Ne'))))) - ((2.0 * ((_rt._proj(p, 'mig') + _rt._proj(p, 'mu')))) * F))
@@ -1692,17 +1695,17 @@ def fstDriftFlowStep(p, F):
 def fstDemeCorrectedFlowStep(p, F):
     return ((F + _rt.rdiv(((1.0 - F)), ((2.0 * _rt._proj(p, 'Ne'))))) - ((2.0 * (((2.0 * _rt._proj(p, 'mig')) + _rt._proj(p, 'mu')))) * F))
 
-def Descent_fstEquilibrium(p):
-    return fstFromFlow(((Descent_EvolutionaryParameters_theta(p) + (2.0 * Descent_EvolutionaryParameters_bigM(p)))))
+def Descent_PopGen_fstEquilibrium(p):
+    return fstFromFlow(((Descent_PopGen_EvolutionaryParameters_theta(p) + (2.0 * Descent_PopGen_EvolutionaryParameters_bigM(p)))))
 
 def sharedLDRetention(p):
     return _rt.lpow(((1.0 - _rt._proj(p, 'recomb'))), ((2.0 * _rt._proj(p, 't_div'))))
 
 def mutationLDErosion(p):
-    return _rt.rexp((((-Descent_EvolutionaryParameters_theta(p)) * tau(p))))
+    return _rt.rexp((((-Descent_PopGen_EvolutionaryParameters_theta(p)) * tau(p))))
 
 def migrationLDBoost(p):
-    return (1.0 + _rt.rdiv((Descent_EvolutionaryParameters_bigM(p) * tau(p)), ((1.0 + Descent_EvolutionaryParameters_bigM(p)))))
+    return (1.0 + _rt.rdiv((Descent_PopGen_EvolutionaryParameters_bigM(p) * tau(p)), ((1.0 + Descent_PopGen_EvolutionaryParameters_bigM(p)))))
 
 def r2FromSignalVariance(vSignal, vNoise):
     return share(vSignal, vNoise)
@@ -1716,14 +1719,11 @@ def calibratedBrier(π, r2):
 def calibratedBrierFromVariances(π, vSignal, vResidual):
     return ((π * ((1.0 - π))) * ((1.0 - _rt.rdiv(vSignal, ((vSignal + vResidual))))))
 
-def Descent_TransportedMetrics_IrreducibleTargetPenalty_total(penalty):
+def Descent_PopGen_TransportedMetrics_IrreducibleTargetPenalty_total(penalty):
     return (((_rt._proj(penalty, 'brokenTagging') + _rt._proj(penalty, 'ancestrySpecificLD')) + _rt._proj(penalty, 'sourceSpecificOverfit')) + _rt._proj(penalty, 'novelUntaggablePhenotype'))
 
 def profileFromSignalVarianceWithPenalty(π, vNoise, vSignal, penalty):
-    return profileFromSignalVariance(π, ((vNoise + Descent_TransportedMetrics_IrreducibleTargetPenalty_total(penalty))), vSignal)
-
-def metricProfileFromTargetSignalWithPenalty(m, vSignalTarget, penalty):
-    return profileFromSignalVarianceWithPenalty(_rt._proj(m, 'prevalence'), _rt._proj(m, 'V_E'), vSignalTarget, penalty)
+    return profileFromSignalVariance(π, ((vNoise + Descent_PopGen_TransportedMetrics_IrreducibleTargetPenalty_total(penalty))), vSignal)
 
 def alleleFreqDivergenceRate(Ne, _mu, _m_rate):
     return _rt.rdiv(1.0, ((2.0 * Ne)))
@@ -2062,7 +2062,10 @@ def architectureMoment(P, r, i):
 def finiteProblem(P):
     return _rt._proj(_rt._proj(P, 'mixtureExperiment'), 'certificateProblem')
 
-def Descent_MeanAbsoluteEffectCertificateProblem_atomCertificationGap(P, K, h):
+def momentConstraintCalculus(P):
+    return explicitCalculus(_rt._proj(_rt._proj(P, 'finiteProblem'), 'modulus'), _rt._proj(P, 'logScale'))
+
+def Descent_PopGen_MeanAbsoluteEffectCertificateProblem_atomCertificationGap(P, K, h):
     return _rt.rdiv(_rt._proj(_rt._proj(P, 'finiteProblem'), 'modulus')(0.0, h), _rt._proj(_rt._proj(P, 'finiteProblem'), 'atomModulus')(K, h))
 
 def logCoveringAtExponent(t, e):
@@ -2120,17 +2123,17 @@ def fstMutationDriftTransient(θ, t, Ne):
 def expectedNewMutations(θ, t):
     return (_rt.rdiv(θ, 2.0) * t)
 
-def Descent_islandDemeCorrection(d):
+def Descent_PopGen_islandDemeCorrection(d):
     return Descent_Core_islandDemeCorrection(d)
 
 def islandFstFiniteDemes(Ne, m, d):
-    return _rt.rdiv(1.0, ((1.0 + (((4.0 * Ne) * m) * Descent_islandDemeCorrection(d)))))
+    return _rt.rdiv(1.0, ((1.0 + (((4.0 * Ne) * m) * Descent_PopGen_islandDemeCorrection(d)))))
 
 def fstMigrationMutationEquilibriumManyDemes(Ne, m, μ):
     return fstFromFlow(((((4.0 * Ne) * m) + ((4.0 * Ne) * μ))))
 
 def fstIslandEquilibriumFiniteDemes(Ne, m, μ, nDemes):
-    return fstFromFlow((((((4.0 * Ne) * m) * Descent_islandDemeCorrection(nDemes)) + ((4.0 * Ne) * μ))))
+    return fstFromFlow((((((4.0 * Ne) * m) * Descent_PopGen_islandDemeCorrection(nDemes)) + ((4.0 * Ne) * μ))))
 
 def steppingStoneCharacteristicLength(m, σ_sq, μ):
     return _rt.rsqrt((_rt.rdiv((m * σ_sq), ((2.0 * μ)))))
@@ -2141,7 +2144,7 @@ def alleleFreqAfterMigration(p_0, p_c, m, t):
 def ldCorrelationMigrationAnsatz(M):
     return _rt.rdiv(_rt.lpow(M, 2.0), _rt.lpow(((1.0 + M)), 2.0))
 
-def Descent_hetRecurrence(Ne, H_0):
+def Descent_PopGen_hetRecurrence(Ne, H_0):
     return Descent_Core_hetRecurrence(Ne, H_0)
 
 def heterozygosityLossDerived(Ne, t):
@@ -2153,7 +2156,7 @@ def hetMutationDriftRecurrence(Ne, mu, H_0, t):
         _prev = ((((1.0 - _rt.rdiv(1.0, ((2.0 * Ne))))) * _prev) + ((2.0 * mu) * ((1.0 - _prev))))
     return _prev
 
-def Descent_hetDecayFactor(Ne, θ):
+def Descent_PopGen_hetDecayFactor(Ne, θ):
     return hetDecayFromScaled(Ne, θ)
 
 def hetMutationRecurrence(lam, Hstar, H_0, t):
@@ -2166,7 +2169,7 @@ def fstFromHetRatio(H, H_0):
     return proportionalReduction(H, H_0)
 
 def fstMutationDriftTransientDiscrete(θ, Ne, t):
-    return (fstMutationDriftEquilibrium(θ) * ((1.0 - _rt.lpow(Descent_hetDecayFactor(Ne, θ), t))))
+    return (fstMutationDriftEquilibrium(θ) * ((1.0 - _rt.lpow(Descent_PopGen_hetDecayFactor(Ne, θ), t))))
 
 def equilibriumEffectVariance(v_mutation, s):
     return ratio(v_mutation, s)
@@ -2329,7 +2332,7 @@ def standardErrorSq(n, p, r2_ld):
 def ncp(n_eff, β):
     return (n_eff * _rt.lpow(β, 2.0))
 
-def Descent_hweHeterozygosity(p):
+def Descent_Portability_hweHeterozygosity(p):
     return Descent_Core_hweHeterozygosity(p)
 
 def portableFraction(r2_causal, r2_total):
@@ -2344,7 +2347,7 @@ def posteriorPrecision(m):
 def posteriorVariance(m):
     return _rt.rdiv(1.0, posteriorPrecision(m))
 
-def Descent_BayesianLinearModel_posteriorMean(m, y):
+def Descent_Portability_BayesianLinearModel_posteriorMean(m, y):
     return ((posteriorVariance(m) * _rt._proj(m, 'data_precision')) * y)
 
 def shrinkageFactor(m):
@@ -2407,17 +2410,17 @@ def numberNeededToScreen(sens, π, _hsens, _hπ):
 def populationAttributableFraction(p_high, rr):
     return (p_high * ((1.0 - _rt.rdiv(1.0, rr))))
 
-def Descent_posteriorMean(posterior, conditional, x):
+def Descent_Portability_posteriorMean(posterior, conditional, x):
     return sum((_rt.mul(posterior[int(x)][int(t)], conditional[int(t)][int(x)])) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional)))))
 
 def posteriorDrift(posterior, conditional, t, x):
-    return _rt.sub(conditional[int(t)][int(x)], Descent_posteriorMean(posterior, conditional, x))
+    return _rt.sub(conditional[int(t)][int(x)], Descent_Portability_posteriorMean(posterior, conditional, x))
 
 def indexWiseCalibrationEnergy(covariateWeight, posterior, conditional, predictor):
     return sum((_rt.mul(covariateWeight[int(x)], sum((_rt.mul(posterior[int(x)][int(t)], _rt.lpow((_rt.sub(conditional[int(t)][int(x)], predictor[int(x)])), 2.0))) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional))))))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(posterior), len(conditional[0]), len(predictor)))))
 
 def aggregateCalibrationEnergy(covariateWeight, posterior, conditional, predictor):
-    return sum((_rt.mul(covariateWeight[int(x)], _rt.lpow((_rt.sub(Descent_posteriorMean(posterior, conditional, x), predictor[int(x)])), 2.0))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(predictor)))))
+    return sum((_rt.mul(covariateWeight[int(x)], _rt.lpow((_rt.sub(Descent_Portability_posteriorMean(posterior, conditional, x), predictor[int(x)])), 2.0))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(predictor)))))
 
 def pairwiseCalibrationDriftEnergy(covariateWeight, posterior, conditional):
     return sum((_rt.mul(covariateWeight[int(x)], posteriorPairwiseDriftEnergy(posterior, conditional, x))) for x in range(int(_rt.sumdim('x', len(covariateWeight)))))
@@ -2432,7 +2435,7 @@ def thresholdDecision(cutoff, risk):
     return (true if (cutoff <= risk) else false)
 
 def aggregateCalibrationMoment(covariateWeight, posterior, conditional, predictor, kernel):
-    return sum((_rt.mul(_rt.mul(covariateWeight[int(x)], (_rt.sub(Descent_posteriorMean(posterior, conditional, x), predictor[int(x)]))), kernel[int(x)])) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(predictor), len(kernel)))))
+    return sum((_rt.mul(_rt.mul(covariateWeight[int(x)], (_rt.sub(Descent_Portability_posteriorMean(posterior, conditional, x), predictor[int(x)]))), kernel[int(x)])) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(predictor), len(kernel)))))
 
 def indexWiseCalibrationMoment(covariateWeight, posterior, conditional, predictor, kernel):
     return sum((sum((_rt.mul(_rt.mul(_rt.mul(covariateWeight[int(x)], posterior[int(x)][int(t)]), (_rt.sub(conditional[int(t)][int(x)], predictor[int(x)]))), kernel[int(x)])) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(posterior), len(conditional[0]), len(predictor), len(kernel)))))) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional)))))
@@ -2453,7 +2456,7 @@ def stratumGapEnergy(covariateWeight, posterior, stratify, predictor, other):
     return sum((_rt.mul(covariateWeight[int(x)], sum((_rt.mul(posterior[int(x)][int(t)], _rt.lpow((_rt.sub(predictor[int((stratify(t)))][int(x)], other[int((stratify(t)))][int(x)])), 2.0))) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(stratify))))))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(posterior), len(predictor[0]), len(other[0])))))
 
 def stratumResolutionEnergy(covariateWeight, posterior, conditional, stratify, predictor):
-    return sum((_rt.mul(covariateWeight[int(x)], sum((_rt.mul(posterior[int(x)][int(t)], _rt.lpow((_rt.sub(predictor[int((stratify(t)))][int(x)], Descent_posteriorMean(posterior, conditional, x))), 2.0))) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(stratify))))))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(posterior), len(predictor[0])))))
+    return sum((_rt.mul(covariateWeight[int(x)], sum((_rt.mul(posterior[int(x)][int(t)], _rt.lpow((_rt.sub(predictor[int((stratify(t)))][int(x)], Descent_Portability_posteriorMean(posterior, conditional, x))), 2.0))) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(stratify))))))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(posterior), len(predictor[0])))))
 
 def reportResolutionEnergy(covariateWeight, report, profile):
     return sum((_rt.mul(covariateWeight[int(x)], _rt.lpow(profile[int((report(x)))], 2.0))) for x in range(int(_rt.sumdim('x', len(covariateWeight), len(report)))))
@@ -2614,7 +2617,7 @@ def popgenDrivenTagScale():
 def popgenDrivenProxyScale():
     return ((_rt.rdiv(7.0, 6.0)) * _rt.rexp(((-(((1.0) + popgenDrivenLDDecayExponent()))))))
 
-def Descent_R2DecompositionData_r2(d):
+def Descent_Portability_R2DecompositionData_r2(d):
     return _rt.rdiv(_rt._proj(d, 'varCondE'), _rt._proj(d, 'varY'))
 
 def discrimination(d):
@@ -2890,7 +2893,7 @@ def removedAxisFraction(n, M, spike, pcRank, fittedPCs):
 def fittedResidualAxisFraction(n, M, spike, pcRank, fittedPCs):
     return (1.0 - removedAxisFraction(n, M, spike, pcRank, fittedPCs))
 
-def Descent_EmpiricalPCOverlapModel_residualBiasEnergy(m):
+def Descent_Portability_EmpiricalPCOverlapModel_residualBiasEnergy(m):
     return (_rt._proj(m, 'confoundingEnergy') - sum((_rt._proj(m, 'overlapSq')(i)) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'overlapSq')))))))
 
 def markerDangerIndex(confounding, n, markers):
@@ -2915,13 +2918,13 @@ def calibrationSlopeDeviation(slope):
     return _rt.rabs((slope - 1.0))
 
 def toProfile(mom, link):
-    return Descent_calibrationProfile(link, _rt._proj(mom, 'meanObserved'), _rt._proj(mom, 'meanPredicted'), _rt._proj(mom, 'slope'))
+    return Descent_Portability_calibrationProfile(link, _rt._proj(mom, 'meanObserved'), _rt._proj(mom, 'meanPredicted'), _rt._proj(mom, 'slope'))
 
-def Descent_identityCalibrationProfile(mean_observed, mean_predicted, slope):
-    return Descent_calibrationProfile(0, mean_observed, mean_predicted, slope)
+def Descent_Portability_identityCalibrationProfile(mean_observed, mean_predicted, slope):
+    return Descent_Portability_calibrationProfile(0, mean_observed, mean_predicted, slope)
 
 def logisticCalibrationProfile(mean_observed, mean_predicted, slope):
-    return Descent_calibrationProfile(1, mean_observed, mean_predicted, slope)
+    return Descent_Portability_calibrationProfile(1, mean_observed, mean_predicted, slope)
 
 def hosmerLemeshowContrib(observed, expected, n_group):
     return _rt.rdiv((n_group * _rt.lpow(((observed - expected)), 2.0)), ((expected * ((1.0 - expected)))))
@@ -2938,50 +2941,50 @@ def totalObservedMeanShift(prevalence, environmental, genetic):
 def shiftedObservedMean(baseMean, shift, P):
     return (baseMean + pair(0.0, shift, P))
 
-def Descent_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
+def Descent_Portability_CrossPopulationCalibrationShiftModel_observedMeanShift(m):
     return totalObservedMeanShift(_rt._proj(m, 'prevalenceShift'), _rt._proj(m, 'environmentalObservedShift'), _rt._proj(m, 'geneticObservedShift'))
 
 def predictedMeanShift(m):
     return (_rt._proj(m, 'scoreMeanShift') + _rt._proj(m, 'deploymentInterceptShift'))
 
-def Descent_CrossPopulationCalibrationShiftModel_observedMean(m, P):
-    return shiftedObservedMean(_rt._proj(m, 'baseObservedMean'), Descent_CrossPopulationCalibrationShiftModel_observedMeanShift(m), P)
+def Descent_Portability_CrossPopulationCalibrationShiftModel_observedMean(m, P):
+    return shiftedObservedMean(_rt._proj(m, 'baseObservedMean'), Descent_Portability_CrossPopulationCalibrationShiftModel_observedMeanShift(m), P)
 
-def Descent_CrossPopulationCalibrationShiftModel_predictedMean(m, P):
+def Descent_Portability_CrossPopulationCalibrationShiftModel_predictedMean(m, P):
     return (_rt._proj(m, 'basePredictedMean') + pair(0.0, predictedMeanShift(m), P))
 
-def Descent_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, link):
+def Descent_Portability_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, link):
     return _rt._proj((calibrationMoments(m, P)), 'toProfile')(link)
 
-def Descent_CrossPopulationCalibrationShiftModel_identityCalibrationProfile(m, P):
-    return Descent_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, 0)
+def Descent_Portability_CrossPopulationCalibrationShiftModel_identityCalibrationProfile(m, P):
+    return Descent_Portability_CrossPopulationCalibrationShiftModel_calibrationProfile(m, P, 0)
 
 def deploymentIntercept(m, P):
     return (_rt._proj(m, 'baseDeploymentIntercept') + pair(0.0, _rt._proj(m, 'deploymentInterceptShift'), P))
 
-def Descent_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m):
     return totalObservedMeanShift(_rt._proj(m, 'prevalenceShift'), _rt._proj(m, 'environmentalObservedShift'), _rt._proj(m, 'geneticObservedShift'))
 
-def Descent_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P):
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P):
     return sourceWeightedTagScore(_rt._proj(m, 'metric'), (_rt._proj(m, 'tagMean')(P)))
 
 def scoreMeanShift(m):
-    return (Descent_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 1) - Descent_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 0))
+    return (Descent_Portability_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 1) - Descent_Portability_CrossPopulationMechanisticCalibrationModel_scoreMean(m, 0))
 
-def Descent_CrossPopulationMechanisticCalibrationModel_predictedMean(m, P):
-    return (deploymentIntercept(m, P) + Descent_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P))
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_predictedMean(m, P):
+    return (deploymentIntercept(m, P) + Descent_Portability_CrossPopulationMechanisticCalibrationModel_scoreMean(m, P))
 
-def Descent_CrossPopulationMechanisticCalibrationModel_observedMean(m, P):
-    return shiftedObservedMean(_rt._proj(m, 'baseObservedMean'), Descent_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m), P)
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_observedMean(m, P):
+    return shiftedObservedMean(_rt._proj(m, 'baseObservedMean'), Descent_Portability_CrossPopulationMechanisticCalibrationModel_observedMeanShift(m), P)
 
-def Descent_CrossPopulationMechanisticCalibrationModel_calibrationSlope(m, P):
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_calibrationSlope(m, P):
     return calibrationSlopeFromSourceWeights(_rt._proj(m, 'metric'), P)
 
-def Descent_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, link):
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, link):
     return _rt._proj(_rt._proj(m, 'toShiftModel'), 'calibrationProfile')(P, link)
 
-def Descent_CrossPopulationMechanisticCalibrationModel_identityCalibrationProfile(m, P):
-    return Descent_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, 0)
+def Descent_Portability_CrossPopulationMechanisticCalibrationModel_identityCalibrationProfile(m, P):
+    return Descent_Portability_CrossPopulationMechanisticCalibrationModel_calibrationProfile(m, P, 0)
 
 def tagMeanAt(m, P, t):
     return pair(_rt._proj(m, 'baseTagMean'), (_rt._proj(m, 'targetTagMeanAt')(t)), P)
@@ -3118,20 +3121,20 @@ def coalescenceCdfFromHazard(hazard, t):
 def coalescentTau(t, Ne):
     return _rt.rdiv(t, ((2.0 * Ne)))
 
-def Descent_fstFromTau(tau):
+def Descent_Portability_fstFromTau(tau):
     return Descent_Core_fstFromTau(tau)
 
 def fstFromGenerations(t, Ne):
-    return Descent_fstFromTau((coalescentTau(t, Ne)))
+    return Descent_Portability_fstFromTau((coalescentTau(t, Ne)))
 
 def pairwiseFstFromBranches(fstS, fstT):
     return complementaryComposition(fstS, fstT)
 
 def pairwiseFstFromBranchTaus(tauS, tauT):
-    return Descent_fstFromTau((_rt.rdiv(((tauS + tauT)), 2.0)))
+    return Descent_Portability_fstFromTau((_rt.rdiv(((tauS + tauT)), 2.0)))
 
 def fstEqLimitLowMutationManyDemes(m):
-    return _rt.rdiv(1.0, ((1.0 + Descent_scaledMigrationRate(_rt._proj(m, 'Ne'), _rt._proj(m, 'mig')))))
+    return _rt.rdiv(1.0, ((1.0 + Descent_PopGen_scaledMigrationRate(_rt._proj(m, 'Ne'), _rt._proj(m, 'mig')))))
 
 def hudsonFstFromCoalescenceTimes(ETss, ETst):
     return proportionalReduction(ETss, ETst)
@@ -3217,14 +3220,14 @@ def sourceERMWeights(sigmaObsSource, crossSource):
 def sigmaTagCausalSourceAt(m, P):
     return (((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))) + ((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))))
 
-def Descent_totalEffect(m, P):
+def Descent_Portability_totalEffect(m, P):
     return (_rt._proj(m, 'beta')(P) + _rt._proj(m, 'novelCausalEffect')(P))
 
 def targetLinearRisk(sigmaObsTarget, crossTarget, noiseVar, w):
     return _rt.sub(_rt.add(noiseVar, _rt.dotProduct(w, (_rt.mulVec(sigmaObsTarget, w)))), _rt.mul(2.0, _rt.dotProduct(w, crossTarget)))
 
 def crossCovariance(m, P):
-    return (_rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((Descent_totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
+    return (_rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((Descent_Portability_totalEffect(m, P))) + _rt._proj(m, 'contextCross')(P))
 
 def sourceWeightsFromExplicitDrivers(m):
     return sourceERMWeights((_rt._proj(m, 'sigmaTag')(0)), (crossCovariance(m, 0)))
@@ -3233,10 +3236,10 @@ def sourceWeightedTagScore(m, tagState):
     return _rt.dotProduct((sourceWeightsFromExplicitDrivers(m)), tagState)
 
 def taggingProjection(m, P):
-    return _rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((Descent_totalEffect(m, P)))
+    return _rt._proj((sigmaTagCausalSourceAt(m, P)), 'mulVec')((Descent_Portability_totalEffect(m, P)))
 
 def targetEffectHeterogeneity(m):
-    return (Descent_totalEffect(m, 1) - (_rt._proj(m, 'beta')(0)))
+    return (Descent_Portability_totalEffect(m, 1) - (_rt._proj(m, 'beta')(0)))
 
 def targetSourceEffectProjection(m):
     return _rt._proj((sigmaTagCausalSourceAt(m, 1)), 'mulVec')((_rt._proj(m, 'beta')(0)))
@@ -3248,10 +3251,10 @@ def targetNovelMutationEffectProjection(m):
     return _rt._proj((sigmaTagCausalSourceAt(m, 1)), 'mulVec')((_rt._proj(m, 'novelCausalEffect')(1)))
 
 def directCausalProjection(m, P):
-    return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((Descent_totalEffect(m, P)))
+    return _rt._proj(((_rt._proj(m, 'directCausal')(P) + _rt._proj(m, 'novelDirectCausal')(P))), 'mulVec')((Descent_Portability_totalEffect(m, P)))
 
 def proxyTaggingProjection(m, P):
-    return _rt._proj(((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))), 'mulVec')((Descent_totalEffect(m, P)))
+    return _rt._proj(((_rt._proj(m, 'proxyTagging')(P) + _rt._proj(m, 'novelProxyTagging')(P))), 'mulVec')((Descent_Portability_totalEffect(m, P)))
 
 def scoreVarianceFromSourceWeights(m, P):
     wS = sourceWeightsFromExplicitDrivers(m)
@@ -3264,7 +3267,7 @@ def calibrationSlopeFromSourceWeights(m, P):
     return _rt.rdiv(predictiveCovarianceFromSourceWeights(m, P), scoreVarianceFromSourceWeights(m, P))
 
 def brokenTaggingResidual(m):
-    delta = _rt._proj((((sigmaTagCausalSourceAt(m, 0)) - (sigmaTagCausalSourceAt(m, 1)))), 'mulVec')((Descent_totalEffect(m, 1)))
+    delta = _rt._proj((((sigmaTagCausalSourceAt(m, 0)) - (sigmaTagCausalSourceAt(m, 1)))), 'mulVec')((Descent_Portability_totalEffect(m, 1)))
     return _rt.dotProduct(delta, delta)
 
 def ancestrySpecificLDResidual(m):
@@ -3309,7 +3312,7 @@ def ldCorrelationDecay(distance, fstGap, lambda_):
 def tauAt(g, t):
     return _rt.rdiv((t), ((2.0 * _rt._proj(g, 'Ne'))))
 
-def Descent_Core_PopGenParameters_hetDecayFactor(g):
+def Descent_Portability_Core_PopGenParameters_hetDecayFactor(g):
     return hetDecayFromScaled(_rt._proj(g, 'Ne'), Descent_Core_PopGenParameters_theta(g))
 
 def fstTransientAt(g, t):
@@ -3465,11 +3468,11 @@ def expectedSqMeanPGSDiff_IMEquilibrium(V_A, M):
 def ibdFlowStep(Ne, rate, F):
     return ((F + _rt.rdiv(((1.0 - F)), ((2.0 * Ne)))) - ((2.0 * rate) * F))
 
-def Descent_MutationDriftModelAssumptions_fstEquilibrium(m):
-    return fstMutationDriftEquilibrium(Descent_MutationDriftModelAssumptions_theta(m))
+def Descent_Portability_MutationDriftModelAssumptions_fstEquilibrium(m):
+    return fstMutationDriftEquilibrium(Descent_Portability_MutationDriftModelAssumptions_theta(m))
 
-def Descent_MutationDriftModelAssumptions_fstTransient(m):
-    return (Descent_MutationDriftModelAssumptions_fstEquilibrium(m) * ((1.0 - _rt.rexp((_rt.rdiv(((-((1.0 + Descent_MutationDriftModelAssumptions_theta(m)))) * _rt._proj(m, 't')), ((2.0 * _rt._proj(m, 'Ne')))))))))
+def Descent_Portability_MutationDriftModelAssumptions_fstTransient(m):
+    return (Descent_Portability_MutationDriftModelAssumptions_fstEquilibrium(m) * ((1.0 - _rt.rexp((_rt.rdiv(((-((1.0 + Descent_Portability_MutationDriftModelAssumptions_theta(m)))) * _rt._proj(m, 't')), ((2.0 * _rt._proj(m, 'Ne')))))))))
 
 def covarianceRetention(freq_corr, ld_overlap):
     return product(freq_corr, ld_overlap)
@@ -3527,7 +3530,7 @@ def sharedLDFromMigration(M):
     return saturation(M)
 
 def signalRetentionMigrationDrift(Ne, m):
-    return (((1.0 - fstMigrationDriftEquilibrium(Ne, m))) * sharedLDFromMigration((Descent_scaledMigrationRate(Ne, m))))
+    return (((1.0 - fstMigrationDriftEquilibrium(Ne, m))) * sharedLDFromMigration((Descent_PopGen_scaledMigrationRate(Ne, m))))
 
 def retainedSignalVarianceMigrationDrift(V_A, Ne, m):
     return (signalRetentionMigrationDrift(Ne, m) * V_A)
@@ -3661,7 +3664,7 @@ def internallyStandardized(pgs, μ_target, σ_target):
 def incrementalR2(r2_full, r2_covariates):
     return difference(r2_full, r2_covariates)
 
-def Descent_portabilityRatio(dr2_target, dr2_source):
+def Descent_Portability_portabilityRatio(dr2_target, dr2_source):
     return ratio(dr2_target, dr2_source)
 
 def sampleOverlapBias(predictorCount, overlapCount):

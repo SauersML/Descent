@@ -1910,7 +1910,8 @@ theorem norm_charFun_le_geometric (ν : Measure ℝ)
     (u : ℝ) (n : ℕ) :
     ‖charFun ν u‖ ≤ ν.real Set.univ * Real.exp (-(n : ℝ) * (s * u) ^ 2 / 2) := by
   have hα : 0 < α := lt_of_lt_of_le zero_lt_one hα1
-  induction n generalizing u with | zero => simpa using norm_charFun_le (μ := ν) u
+  induction n generalizing u with
+  | zero => simpa using norm_charFun_le (μ := ν) u
   | succ n ih =>
     have hrel := norm_charFun_selfSimilar ν hα heq u
     have hIH := ih (α * u)
@@ -1996,7 +1997,8 @@ theorem charFun_selfSimilar_iterate (ν : Measure ℝ)
         * Complex.exp ((-(s ^ 2 * u ^ 2 / 2)
             * ∑ k ∈ Finset.range n, α ^ (2 * (k + 1)) : ℝ))
         * Complex.exp (((β * u * ∑ k ∈ Finset.range n, α ^ k : ℝ) : ℂ) * Complex.I) := by
-  induction n with | zero => simp
+  induction n with
+  | zero => simp
   | succ n ih =>
     have hpow : α ^ (n + 1) * u = α * (α ^ n * u) := by ring
     have hA : Complex.exp ((-((s * (α * (α ^ n * u))) ^ 2) / 2 : ℝ))

@@ -57,7 +57,8 @@ noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
 /-- **Closed form**, `H(t) = (1 - 1/(2Nₑ))^t · H₀`, by induction on the step law. -/
 theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
-  induction t with | zero => simp [hetRecurrence]
+  induction t with
+  | zero => simp [hetRecurrence]
   | succ n ih =>
     simp only [hetRecurrence, ih]
     ring

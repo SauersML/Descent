@@ -257,6 +257,33 @@ theorem altFreq_le_one (P : Panel) (hP : 0 < P.nSamples) (l : Locus P.nLoci) :
   rw [div_le_one (mul_pos hp hn)]
   exact hsum
 
+/-- **The estimator delivers a frequency**, in the sense of the predicate.
+
+`IsAlleleFreq` exists so that "this vector is a vector of allele frequencies" is a
+statement rather than a convention, and this is the theorem that makes it inhabited by
+something the corpus actually computes rather than by an assumption. -/
+theorem isAlleleFreq (P : Panel) (hP : 0 < P.nSamples) : IsAlleleFreq P.altFreq :=
+  fun l ↦ Set.mem_Icc.mpr ⟨P.altFreq_nonneg l, P.altFreq_le_one hP l⟩
+
+/-- **The panel's dosage covariance**: the unnormalised linkage-disequilibrium matrix.
+
+Linkage disequilibrium enters the corpus as a real matrix with an `LDMatrix`-shaped role
+and no definition connecting it to genotypes.  This is that connection: the entries are
+covariances of the dosage coding across the panel's samples, so an `LDMatrix` is something
+a genotype matrix PRODUCES rather than something a theorem is handed. -/
+noncomputable def dosageCovariance (P : Panel) : LDMatrix P.nLoci :=
+  fun l₁ l₂ ↦
+    (∑ i, ((P.call i l₁).dosage - ploidy * P.altFreq l₁) *
+          ((P.call i l₂).dosage - ploidy * P.altFreq l₂)) / (P.nSamples : ℝ)
+
+/-- **Linkage disequilibrium is symmetric**, because a covariance is.  Stated because the
+`r²` and `D` quantities downstream all assume it and none of them says so. -/
+theorem dosageCovariance_symm (P : Panel) (l₁ l₂ : Locus P.nLoci) :
+    P.dosageCovariance l₁ l₂ = P.dosageCovariance l₂ l₁ := by
+  unfold dosageCovariance
+  congr 1
+  exact Finset.sum_congr rfl fun i _ ↦ by ring
+
 end Panel
 
 /-! ## Hardy-Weinberg: the one-locus genotype law

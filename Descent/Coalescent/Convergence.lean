@@ -75,7 +75,8 @@ theorem tendsto_one_sub_div_pow (c : ℝ) :
 exponent of the limiting survival probability, which is why the two agree without any
 adjustment. -/
 theorem sum_range_neg_cast (k : ℕ) : ∑ i ∈ range k, (-(i : ℝ)) = -deathRate k := by
-  induction k with | zero => simp [deathRate,
+  induction k with
+  | zero => simp [deathRate,
       Descent.Core.pairCount]
   | succ m ih =>
       rw [sum_range_succ, ih]

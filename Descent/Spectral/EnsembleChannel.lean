@@ -207,7 +207,8 @@ theorem binaryTransitionArrow_reverse :
 
 /-- Ordered-pair arrow readout, extended by zero away from two-unit panels. -/
 noncomputable def binaryTransitionArrowStatistic (xs : List Bool) : ℝ :=
-  match xs with | [x₀, x₁] => twoUnitArrow binaryFirstAnnotation binarySecondAnnotation x₀ x₁
+  match xs with
+  | [x₀, x₁] => twoUnitArrow binaryFirstAnnotation binarySecondAnnotation x₀ x₁
   | _ => 0
 
 /-- Reference evaluations: the statistic reads a two-element list and is zero on every other

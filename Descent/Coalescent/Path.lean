@@ -254,7 +254,8 @@ noncomputable def pathState (n : ℕ) (chain : ℕ → ER n) (hold : ℕ → ℝ
 theorem chain_antitone {n : ℕ} {chain : ℕ → ER n}
     (hchain : ∀ k, 1 ≤ k → k < n → Covers (chain (k + 1)) (chain k)) {k k' : ℕ}
     (h1 : 1 ≤ k) (hk : k ≤ k') (hk' : k' ≤ n) : chain k' ≤ chain k := by
-  induction k' with | zero => omega
+  induction k' with
+  | zero => omega
   | succ m ih =>
       rcases Nat.lt_or_ge k (m + 1) with hlt | hge
       · have hm : k ≤ m := by omega

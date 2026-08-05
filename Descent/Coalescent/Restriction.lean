@@ -79,8 +79,10 @@ theorem blocks_restrict_le {m n : ℕ} (h : m ≤ n) (ξ : ER n) :
       (Quotient.lift (fun x : Fin m => Quotient.mk ξ (Fin.castLE h x))
         (fun _ _ hab => Quotient.sound hab) : Quotient (restrict h ξ) → Quotient ξ) := by
     intro p q hpq
-    induction p using Quotient.inductionOn with | _ x =>
-        induction q using Quotient.inductionOn with | _ y =>
+    induction p using Quotient.inductionOn with
+    | _ x =>
+        induction q using Quotient.inductionOn with
+        | _ y =>
             have h1 : Quotient.mk ξ (Fin.castLE h x) = Quotient.mk ξ (Fin.castLE h y) := hpq
             have h2 : ξ.r (Fin.castLE h x) (Fin.castLE h y) := Quotient.exact h1
             exact Quotient.sound h2

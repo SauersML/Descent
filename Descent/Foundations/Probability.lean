@@ -182,7 +182,8 @@ def DiploidGenotype.equivFin3 : DiploidGenotype ≃ Fin 3 where
 
 @[simp] theorem DiploidGenotype.equivFin3_symm_apply (i : Fin 3) :
     DiploidGenotype.equivFin3.symm i =
-      match i with | ⟨0, _⟩ => DiploidGenotype.homRef
+      match i with
+      | ⟨0, _⟩ => DiploidGenotype.homRef
       | ⟨1, _⟩ => DiploidGenotype.het
       | ⟨2, _⟩ => DiploidGenotype.homAlt := by
   fin_cases i <;> rfl
@@ -289,7 +290,8 @@ def HardyWeinbergModel.genotypeProb (h : HardyWeinbergModel) : DiploidGenotype �
 theorem HardyWeinbergModel.genotypeProb_nonneg
     (h : HardyWeinbergModel) (g : DiploidGenotype) :
     0 ≤ h.genotypeProb g := by
-  cases g with | homRef =>
+  cases g with
+  | homRef =>
       simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
   | het =>
       simp [HardyWeinbergModel.genotypeProb]

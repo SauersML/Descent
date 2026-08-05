@@ -162,7 +162,8 @@ theorem cauchy_schwarz (E : ExpFunctional Ω) (f g : Ω → ℝ) :
 @[simp] theorem eval_sum {ι : Type*} [DecidableEq ι]
     (E : ExpFunctional Ω) (s : Finset ι) (f : ι → Ω → ℝ) :
     E (Finset.sum s f) = Finset.sum s (fun i ↦ E (f i)) := by
-  induction s using Finset.induction with | empty =>
+  induction s using Finset.induction with
+  | empty =>
       simp [eval_zero]
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, E.add_eval, hs]
@@ -276,7 +277,8 @@ theorem covariance_finset_sum_right
     (E : ExpFunctional Ω) (X : Ω → ℝ) (s : Finset ι) (Y : ι → Ω → ℝ) :
     covariance E X (fun ω ↦ Finset.sum s (fun i ↦ Y i ω))
       = Finset.sum s (fun i ↦ covariance E X (Y i)) := by
-  induction s using Finset.induction with | empty =>
+  induction s using Finset.induction with
+  | empty =>
       simp [covariance_eq_expect_mul_sub_means]
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, covariance_add_right, hs]

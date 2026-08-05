@@ -381,7 +381,8 @@ noncomputable def Panel.fold {n : ℕ} (panel : Blindness.Panel n) : Blindness.P
 /-- Folding chooses the same canonical representative from both allele-label orientations. -/
 theorem Panel.reflect_fold {n : ℕ} (panel : Blindness.Panel n) :
     panel.reflect.fold = panel.fold := by
-  cases panel with | mk support weight =>
+  cases panel with
+  | mk support weight =>
       simp only [Blindness.Panel.reflect, Blindness.Panel.fold]
       congr 1
       funext i
@@ -425,7 +426,8 @@ moved to minor-allele frequency, folding again changes neither its support nor i
 theorem Panel.fold_idempotent {n : ℕ} (panel : Blindness.Panel n)
     (h0 : ∀ i, 0 ≤ panel.support i) (h1 : ∀ i, panel.support i ≤ 1) :
     panel.fold.fold = panel.fold := by
-  cases panel with | mk support weight =>
+  cases panel with
+  | mk support weight =>
       simp only [Blindness.Panel.fold] at h0 h1 ⊢
       congr 1
       funext i

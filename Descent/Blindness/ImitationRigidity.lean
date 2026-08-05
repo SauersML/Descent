@@ -691,7 +691,8 @@ hard-edge and whitening-gain results that follow. -/
 theorem stationaryLDEntry_isFixedPoint (decay : ℝ) (separation : ℕ) :
     markovLDStep decay (stationaryLDEntry decay) separation =
       stationaryLDEntry decay separation := by
-  cases separation with | zero => simp [markovLDStep, stationaryLDEntry,
+  cases separation with
+  | zero => simp [markovLDStep, stationaryLDEntry,
       Descent.Core.power]
   | succ n =>
       have hne : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
@@ -859,7 +860,8 @@ theorem ldKernelSymbol_pi {decay : ℝ} (hd : |decay| < 1) :
   rw [Real.cos_pi]
   have hne : (1 : ℝ) + decay ≠ 0 := by
     have h2 : -|decay| ≤ decay := neg_abs_le decay
-    have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
+    have : -1 < decay := by cases abs_lt.mp hd with
+    | intro hlo _ => exact hlo
     linarith
   have hden : 1 - 2 * decay * (-1) + decay ^ 2 = (1 + decay) ^ 2 := by ring
   rw [hden]
@@ -876,7 +878,8 @@ theorem ldKernelSymbol_ge_hardEdge {decay angle : ℝ} (hd : |decay| < 1)
   have hden : 0 < 1 - 2 * decay * Real.cos angle + decay ^ 2 :=
     ldKernelSymbol_denom_pos (decay := decay) (angle := angle) hd
   have hplus : 0 < 1 + decay := by
-    have : -1 < decay := by cases abs_lt.mp hd with | intro hlo _ => exact hlo
+    have : -1 < decay := by cases abs_lt.mp hd with
+    | intro hlo _ => exact hlo
     linarith
   have hcos_ge : -1 ≤ Real.cos angle := Real.neg_one_le_cos angle
   have hminus : 0 ≤ 1 - decay := by
@@ -1008,7 +1011,8 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
     stationaryLDEntry decay separation -
         decay * stationaryLDEntry decay (adjacentBoundarySeparation separation) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
-  cases separation with | zero =>
+  cases separation with
+  | zero =>
       simp [adjacentBoundarySeparation, stationaryLDEntry,
       Descent.Core.power]
       ring
@@ -1047,7 +1051,8 @@ theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
         - decay * stationaryLDEntry decay (adjacentBoundarySeparation separation)
         - decay * stationaryLDEntry decay (separation + 1) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
-  cases separation with | zero =>
+  cases separation with
+  | zero =>
       have hif : (if (0 : ℕ) = 0 then 1 - decay ^ 2 else 0) = 1 - decay ^ 2 :=
         if_pos rfl
       rw [hif]

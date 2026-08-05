@@ -58,7 +58,8 @@ inductive Pop where
 fields with this, so a field that genuinely differs between populations still reads as one
 line rather than two. -/
 def Pop.pair {α : Sort*} (s t : α) (p : Pop) : α :=
-  match p with | Pop.source => s
+  match p with
+  | Pop.source => s
   | Pop.target => t
 
 @[simp] theorem Pop.pair_source {α : Sort*} (s t : α) : Pop.pair s t Pop.source = s := rfl
