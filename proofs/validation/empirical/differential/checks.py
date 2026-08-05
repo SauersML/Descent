@@ -336,16 +336,27 @@ _MD = grid(Ne=[100.0, 1000.0, 10000.0], mu=[1e-6, 1e-5, 1e-4, 1e-3])
 
 check(
     id="hetEquilibrium-vs-exact-iam",
-    fqn="Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
+    fqn="Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
     claim="theta/(1+theta) vs the exact infinite-alleles stationary heterozygosity",
     model_lean="theta/(1+theta), theta = 4 Ne mu",
     model_ref="exact IAM recursion F' = (1-mu)^2[1/2Ne + (1-1/2Ne)F]",
     reference="refs.iam_het_equilibrium",
     grid=_MD,
-    lean=lambda D, Ne, mu: D["hetEquilibrium"](Ne, mu),
+    lean=lambda D, Ne, mu: D["expectedHeterozygosity"](
+        D["scaledMutationRate"](Ne, mu)),
     ref=lambda Ne, mu: refs.iam_het_equilibrium(Ne, mu),
     tol=1e-2,
-    note="agreement to O(mu) is the claim; tol reflects that",
+    expected_verdict="AGREE",
+    note=(
+        "REPOINTED. This named `hetEquilibrium`, which no longer exists -- the "
+        "duplicate pair was collapsed onto `expectedHeterozygosity`, whose body "
+        "takes theta rather than (Ne, mu), so the composition with "
+        "`scaledMutationRate` is supplied here. Until it was repointed the check "
+        "raised KeyError at every grid point, `classify` returned ERROR, and "
+        "because it declared no expected_verdict the run stayed GREEN. It is "
+        "pinned now, so the next definition to vanish underneath it fails the "
+        "build instead of going quiet."
+    ),
     canfail_clause="needs mu large enough that (1-mu)^2 != 1-2mu; mu >= 1e-3",
 )
 
@@ -636,12 +647,23 @@ check(
     model_lean="random walk on D demes absorbed at 0 and D",
     model_ref="same, computed independently in refs",
     reference="_ss_lattice_meeting_time",
-    grid=grid(d=[1.0, 8.0, 64.0], D=[256.0], sigma_sq=[1.0, 4.0], m=[1e-2, 0.1]),
-    lean=lambda D_, d, D, sigma_sq, m: D_["steppingStoneMeetingTimeOnLattice"](
-        d, D, sigma_sq, m
+    grid=grid(d=[1.0, 8.0, 64.0], nDemes=[256.0], sigma_sq=[1.0, 4.0],
+              m=[1e-2, 0.1]),
+    lean=lambda D, d, nDemes, sigma_sq, m: D["steppingStoneMeetingTimeOnLattice"](
+        d, nDemes, sigma_sq, m
     ),
-    ref=lambda d, D, sigma_sq, m: _ss_lattice_meeting_time(d, D, sigma_sq, m),
+    ref=lambda d, nDemes, sigma_sq, m: _ss_lattice_meeting_time(
+        d, nDemes, sigma_sq, m),
+    expected_verdict="AGREE",
     note=(
+        "THIS CHECK HAD NEVER RUN. Its grid axis was called `D`, which is the "
+        "name `run.py` reserves for the corpus table, so the author renamed the "
+        "table parameter to `D_` to break the collision -- and `_wants_corpus` "
+        "tests `params[0] == 'D'` literally, so the check was called WITHOUT the "
+        "corpus and raised TypeError at every point. It reported ERROR, declared "
+        "no expected_verdict, and the run stayed green. The lattice axis is "
+        "renamed `nDemes` so the corpus parameter can keep the name the harness "
+        "requires, and the verdict is pinned.\n\n"
         "Added because this definition had NO simulation behind it at all "
         "while carrying a numerical claim: `steppingStoneDiffusionTimescale` "
         "gives 5.0 at d=1, D=256 where the measured meeting time is 1344.2, a "
@@ -1182,25 +1204,14 @@ check(
 # which is a passing check that has stopped meaning anything. When a duplication
 # is repaired by collapsing the names, retire the check that detected it.
 #
-# Kept below: the one pair that is still genuinely two definitions.
-for _dup_id, _a, _b, _args in [
-    ("dup-effectiveMigration-effectiveSymmetricMigration",
-     "effectiveMigration", "effectiveSymmetricMigration",
-     grid(Ne=[0.001, 0.02], m=[0.004, 0.05])),
-]:
-    check(
-        id=_dup_id,
-        fqn=f"Calibrator.*.{_a}",
-        claim=f"DUPLICATE: {_a} and {_b} are the same function",
-        model_lean="-", model_ref="-",
-        reference=f"Calibrator.*.{_b}",
-        grid=_args,
-        lean=(lambda a: lambda D, Ne, m: D[a](Ne, m))(_a),
-        ref=(lambda b: lambda D, Ne, m: D[b](Ne, m))(_b),
-        kind="identity",
-        note=f"peer={_b}",
-        canfail_clause="arguments differ between rows; identical bodies give 0 error by construction",
-    )
+# RETIRED, by that rule: `dup-effectiveMigration-effectiveSymmetricMigration`
+# tested `effectiveMigration` against `effectiveSymmetricMigration`, and
+# `effectiveMigration` no longer exists -- the pair was collapsed onto the
+# surviving name, which is exactly the repair the rule describes. The check
+# raised KeyError at every grid point from that moment on, reported ERROR, and
+# because it declared no expected_verdict the run stayed GREEN. There is now no
+# pair in the corpus that is still genuinely two definitions, so the loop is
+# gone rather than left empty.
 
 
 # --- 10. Additional differential checks ------------------------------------
@@ -1226,19 +1237,12 @@ check(
     ),
 )
 
-check(
-    id="expectedHeterozygosity-equals-hetEquilibrium",
-    fqn="Calibrator.PopulationGeneticsFoundations.expectedHeterozygosity",
-    claim="theta/(1+theta) composed with theta=4Ne mu reproduces hetEquilibrium",
-    model_lean="infinite alleles, mutation-drift balance",
-    model_ref="same file, hetEquilibrium Ne mu",
-    reference="Calibrator.PopulationGeneticsFoundations.hetEquilibrium",
-    grid=_MD,
-    lean=lambda D, Ne, mu: D["expectedHeterozygosity"](D["scaledMutationRate"](Ne, mu)),
-    ref=lambda D, Ne, mu: D["hetEquilibrium"](Ne, mu),
-    kind="identity",
-    canfail_clause="identity by construction; recorded as a duplicate, not a validation",
-)
+# RETIRED: `expectedHeterozygosity-equals-hetEquilibrium` was a duplicate
+# detector for a pair that has since been collapsed -- `hetEquilibrium` is gone
+# and `expectedHeterozygosity` is the survivor -- so by the general rule above it
+# is retired rather than repointed at itself. The surviving definition keeps a
+# real test: `hetEquilibrium-vs-exact-iam` now runs it against the exact
+# infinite-alleles recursion, which is a reference the corpus does not contain.
 
 check(
     id="ldCorrelationMigrationAnsatz-vs-sharedLD-squared",

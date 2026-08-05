@@ -372,7 +372,33 @@ def main() -> int:
             f"FAIL: {n_unresolved} translation disagreements are unresolved. "
             "No verdict below is trustworthy until they are."
         )
-    return 1 if (n_vac or n_unresolved or regressions) else 0
+
+    # A check that ERRORS is not a check that passed.  Until now `classify`
+    # returned ERROR and nothing compared it to anything, so a check whose every
+    # grid point raised -- because the definition it names was deleted upstream,
+    # or because its own lambda never received the corpus table -- was scored as
+    # no problem at all and this function returned 0.  Four checks sat in that
+    # state simultaneously while the gate reported green, one of them the CONTROL
+    # for a whole family and another a check that had never once executed since
+    # the day it was written.  Present, running, and structurally unable to fail
+    # is the same defect as a truncated error list, and it belongs here rather
+    # than in a reviewer's attention.
+    #
+    # An ERROR against a PINNED expectation is already caught as a regression
+    # above; this catches the unpinned ones, which are the ones that hid.
+    errored = [
+        (cid, c["definition"],
+         next((r["error"] for r in c["rows"] if "error" in r), "?"))
+        for cid, c in out["checks"].items() if c["verdict"] == "ERROR"
+    ]
+    if errored:
+        print("FAIL: checks that could not be evaluated at any grid point. An "
+              "ERROR is not a pass -- repoint the check, fix its lambda, or "
+              "retire it:")
+        for cid, fq, err in errored:
+            print(f"    {cid:<52} {fq}\n        {err}")
+
+    return 1 if (n_vac or n_unresolved or regressions or errored) else 0
 
 
 if __name__ == "__main__":
