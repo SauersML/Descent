@@ -416,6 +416,35 @@ def externally_silent(code, decls):
     return sorted(silent)
 
 
+def defs_with_no_theorem(code, decls):
+    """Definitions no theorem statement names.
+
+    REPORTED, NOT GATED. A definition nothing states anything about is a
+    definition nothing can be wrong about -- but the honest target is not zero.
+    A witness vector exhibited so that a theorem about SOMETHING ELSE can be
+    stated is doing its job without needing a theorem of its own, and demanding
+    one would be answered with reference evaluations, which is padding.
+
+    The count is here because it moves for real reasons: a definition added
+    without a claim raises it, and the ninety-three currently in it are a
+    reading list rather than a defect list.
+    """
+    defs = {}
+    for mod, found in decls.items():
+        for kind, name in found:
+            if kind in ("def", "abbrev"):
+                defs.setdefault(name, mod)
+    named = set()
+    thm = re.compile(
+        r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+[\w.'₀-₉]+(.*?):=", re.S | re.M)
+    for mod, text in code.items():
+        for m in thm.finditer(text):
+            for w in IDENT.findall(m.group(1)):
+                if w in defs:
+                    named.add(w)
+    return sorted(n for n in defs if n not in named)
+
+
 def unused_direct_imports(raw, code, decls):
     """Direct imports whose declarations the importing module never names.
 
@@ -555,6 +584,7 @@ def measure():
     orphans, witnessless = gate_orphans(code, decls)
     silent_modules = externally_silent(code, decls)
     unused_imports = unused_direct_imports(raw, code, decls)
+    silent_defs = defs_with_no_theorem(code, decls)
 
     return {
         "modules": len(graph),
@@ -570,6 +600,7 @@ def measure():
         "witnessless_structures": len(witnessless),
         "externally_silent_modules": len(silent_modules),
         "imports_naming_nothing_used": sum(len(v) for v in unused_imports.values()),
+        "defs_no_theorem_names": len(silent_defs),
         "_offenders": inverted,
         "_thin": thin,
         "_silent": silent,
@@ -577,6 +608,7 @@ def measure():
         "_witnessless": witnessless,
         "_silent_modules": silent_modules,
         "_unused_imports": unused_imports,
+        "_silent_defs": silent_defs,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -634,6 +666,9 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             # See `unused_direct_imports`: transitive imports make a zero
             # impossible, but a RISE means an import landed without its code.
             "imports_naming_nothing_used",
+            # See `defs_with_no_theorem`: zero is not the honest target, and
+            # demanding it would be answered with reference evaluations.
+            "defs_no_theorem_names",
             # Correct position, few consumers.  A new foundation starts here and
             # earns callers as they move over; it is not the inversion above.
             "foundation_not_yet_load_bearing")

@@ -89,4 +89,18 @@ Lean's abbreviations are transparent, so this buys no type safety: `CausalVec c`
 convention has one home. -/
 abbrev RealVec (n : ℕ) := Fin n → ℝ
 
+/-- **`CausalVec` and `TagVec` are the same type, and that is the point.**
+
+Both abbreviate this, so the elaborator finds them interchangeable: a theorem about one
+applies to the other and a caller can pass either. The distinction between a causal-effect
+vector and a tag-weight vector is DOCUMENTARY, carried by the names and by the index sets
+their callers use, and nothing in the type system enforces it.
+
+Stating it is what stops the names being read as a guarantee. A corpus that wanted the
+guarantee would need two one-field structures, as `Core.Fst` does for `NeiFst` and
+`HudsonFst` -- and there the guarantee was worth its cost because substituting one for the
+other is a measured factor-of-two-to-four error. Here the index sets differ, so the
+mistake does not typecheck for a different reason, and the abbreviation is enough. -/
+theorem realVec_is_one_type (n : ℕ) : RealVec n = (Fin n → ℝ) := rfl
+
 end Descent
