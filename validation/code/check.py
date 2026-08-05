@@ -6925,27 +6925,35 @@ GUARDS = {
     # because a budget pinned to their count would be worse than none.
     "core-empirics":   dict(fn=run_core_empirics,   gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
-    # THE SHAPE GUARDS, all five DIAGNOSTIC, and the reason is the one the `ledger`
-    # entry above records: each reports true findings whose fixes are in flight, and
-    # gating them today breaks the build for everyone while the repair lands. The
-    # budgets are the budgets and they do not move. What flips each one is named on
-    # its line; run `--only <name>` to see the outstanding count.
+    # THE SHAPE GUARDS. One is gated and four are DIAGNOSTIC, for the reason the
+    # `ledger` entry above records: each of the four reports true findings whose
+    # fixes are in flight, and gating them today breaks the build for everyone while
+    # the repair lands. The budgets are the budgets and they do not move. What flips
+    # each one is named on its line; run `--only <name>` for the outstanding count,
+    # which is also the work list.
+    #
+    # The counts quoted below were true when written and every one of them has moved
+    # since, in both directions -- `shape-components` went UP when a new subsystem
+    # arrived as an island, which is the recurrence these guards exist to catch,
+    # happening while they were being written. Read the guard, not the comment.
     #
     # `shape-depth`: flip when the deepest module sits 12 or fewer imports above a
-    # leaf. The audit measured 37 on a chain of 38; it reads 21 on a chain of 22 as
-    # the chain repairs land, so do not trust the number in this comment -- run
-    # `--only shape-depth` and read the chain it prints.
+    # leaf. The audit measured 37 on a chain of 38; 14 on a chain of 15, with two
+    # modules over the limit, as the chain repairs land. This is the closest of the
+    # four.
     "shape-depth":     dict(fn=run_shape_depth,      gated=False, takes_argv=False),
     # `shape-chains`: flip when no module's only internal import is a sibling it
     # names nothing from. Measured 38 when the audit asked for this, six of them
-    # consecutive files in `PopGen/PopulationGeneticsFoundations`; 32 as the repair
-    # lands. Run `--only shape-chains` for the outstanding list, which is also the
-    # work list -- each line names the module the file should have imported.
+    # consecutive files in `PopGen/PopulationGeneticsFoundations`; 28 as the repair
+    # lands. Each line of the output names the module the file should have imported.
     "shape-chains":    dict(fn=run_shape_chains,     gated=False, takes_argv=False),
     # `shape-components`: flip when every module lies in the corpus's one weak
-    # component. `Pangenome`'s island closed while this was being written; three
-    # singletons remain -- `BundleRigidity/LinearSCM`, `BundleRigidity/Operator`
-    # and `Spectral/ResonanceSpectrum` -- each importing nothing from the corpus and
+    # component. `Pangenome`'s island closed while this was being written, and a new
+    # `Descent/Meta/` arrived as one on the same day -- which is the whole case for
+    # the guard: the previous two islands were each found by an audit and fixed by
+    # hand, and the third was caught within hours by a check. Three singletons also
+    # remain: `BundleRigidity/LinearSCM`, `BundleRigidity/Operator` and
+    # `Spectral/ResonanceSpectrum`, each importing nothing from the corpus and
     # imported by nothing in it.
     "shape-components": dict(fn=run_shape_components, gated=False, takes_argv=False),
     # `shape-spine`: flip when cross-module theorem reuse reaches 20% and the corpus
