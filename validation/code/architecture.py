@@ -372,27 +372,51 @@ def gate_composition_count(code, decls):
     return hits
 
 
-def subsystems_not_reaching_a_metric(code, comps):
-    """Modules that name a demographic quantity and carry it nowhere.
+def subsystems_not_reaching_a_metric(code, graph, comps):
+    """Modules whose demographic quantities reach no deployed metric ANYWHERE.
 
     `gate_composition_count` counts the theorems that join a demographic quantity
     to a deployed metric.  Counting them says how much of the join exists; it does
     not say where the join is MISSING, and 38 of the first 52 sat in the one file
     written to demonstrate the shape.
 
-    This is the complement, per module: a module whose statements mention drift,
-    `F_ST`, effective size or migration and which proves nothing carrying any of
-    them to an R-squared, a slope, a Brier score or an AUC.  Its population
-    genetics stops where the deployment starts, which is the gap the whole
-    development is about.
+    The complement has to be taken over the import closure, not per module.
+    `Core.Fst` defines `fstFromTau` and cannot state a theorem about an R-squared,
+    because `Core.Moments` -- where the R-squared lives -- imports IT.  Demanding
+    the join in the file that defines the quantity would demand a cycle.  What is
+    demandable is that SOMETHING which imports it makes the join: a kernel feeding
+    a composition is connected through it, and a kernel nothing joins is the gap.
     """
     joined = {mod for _name, mod in comps}
+    # `reaches[m]` -- the modules that import m, directly or transitively.
+    importers = collections.defaultdict(set)
+    for mod, deps in graph.items():
+        for dep in deps:
+            importers[dep].add(mod)
+    closure = {}
+
+    def above(mod, seen=None):
+        if mod in closure:
+            return closure[mod]
+        seen = seen or set()
+        if mod in seen:
+            return set()
+        seen.add(mod)
+        out = set(importers[mod])
+        for up in list(importers[mod]):
+            out |= above(up, seen)
+        closure[mod] = out
+        return out
+
     out = []
     for mod, text in code.items():
         if mod in joined or mod == "Descent":
             continue
-        if any(d in text for d in DEMOG):
-            out.append(mod)
+        if not any(d in text for d in DEMOG):
+            continue
+        if joined & above(mod):
+            continue
+        out.append(mod)
     return sorted(out)
 
 
@@ -701,7 +725,7 @@ def measure():
     silent_modules = externally_silent(code, decls)
     unused_imports = unused_direct_imports(raw, code, decls)
     silent_defs = defs_with_no_theorem(code, decls)
-    unjoined = subsystems_not_reaching_a_metric(code, comps)
+    unjoined = subsystems_not_reaching_a_metric(code, graph, comps)
     total_thms, n_terminal, terminal_kinds = classify_terminal_theorems(code, decls)
 
     return {

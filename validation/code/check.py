@@ -34,7 +34,7 @@ THE GUARDS, and what each one catches:
                   history rather than mathematics.
   identifications structural guards over the corpus: admissions (`sorry` is
                   reported, `admit` is forbidden), convention drift, equilibria
-                  with no dynamic, duplicate bodies, and the budget ratchets.
+                  with no dynamic, and duplicate bodies. Every count is zero.
   duplication     the same mathematics written twice: two theorems stating one
                   proposition under two names, one proof script serving two
                   different statements, and verbatim repeated blocks of source.
@@ -436,8 +436,9 @@ def run_style() -> int:
 #    that reads only the proof term. Four screens ask instead whether anything can
 #    ever satisfy the hypothesis: a proposition never concluded (3m), a bundle
 #    never inhabited (3n), a supplied field installed as an instance (3o), and a
-#    result whose name hides what it rests on (3p). Each count is pinned at what
-#    was measured and ratchets down, so the corpus cannot acquire new ones.
+#    result whose name hides what it rests on (3p). Every count must be zero.
+#    Nothing is pinned at what was measured and nothing ratchets: a screen that
+#    permits the defects already present has agreed to them.
 #
 #    Prefer `sorry`. An admission is a debt this corpus can enumerate; a laundered
 #    premise is a debt it cannot, and guard 1 exists to keep the first cheap.
@@ -456,43 +457,17 @@ def run_style() -> int:
 # the point of the merge: three guards used to re-derive this and disagree.
 IDENT_ROOT = str(CORPUS)
 
-# Every budget is 0. Nothing is grandfathered: a screen that permits N existing
-# instances of the defect it names is a screen that has agreed to the defect,
-# and "it was already there" is not a standard. A count above 0 fails the build.
-
-# THE RECORD THE ZEROING WOULD OTHERWISE HAVE DESTROYED.
+# THERE ARE NO BUDGETS. A screen that permits N existing instances of the defect
+# it names is a screen that has agreed to the defect, and "it was already there"
+# is not a standard. Every count above 0 fails the build.
 #
-# Seven of the budgets above were not always 0. They were pinned at a MEASURED
-# count and ratcheted downwards, and the guard's own header still describes that
-# discipline: each count "pinned at what was measured", so "the corpus cannot
-# acquire new ones". Those numbers were the measurement. Setting them all to 0
-# in a single edit enforces the right standard and destroys the record at the
-# same time, and without the record nobody can read a later run: 7 unwitnessed
-# bundles is excellent progress from 38 and a bad regression from 0, and the
-# number alone does not say which.
-#
-# So the standard is 0 and the history is kept here. Each entry is the last value
-# the budget carried before the zeroing, and the commit that set it.
-#
-# Two of the seven have since been genuinely cleared to 0 -- LAUNDERED_PROP from
-# 16, UNCONDITIONAL_NAME from 35. That is only visible because the old numbers
-# are written down.
-LAST_PINNED_BEFORE_ZEROING = {
-    "ISOLATED_MODULE_BUDGET":         (14, "ee0302c8", "2026-08-01"),
-    "UNRELATED_BUDGET":               (20, "c1881cb4", "2026-08-01"),
-    "LAUNDERED_PROP_BUDGET":          (16, "cfcff551", "2026-08-03"),
-    "UNWITNESSED_BUNDLE_BUDGET":      (38, "cfcff551", "2026-08-03"),
-    "INSTANCE_LAUNDERING_BUDGET":     (2,  "cfcff551", "2026-08-03"),
-    "UNCONDITIONAL_NAME_BUDGET":      (35, "cfcff551", "2026-08-03"),
-    "DOMAIN_NAMED_ARITHMETIC_BUDGET": (90, "12e5ce63", "2026-08-03"),
-}
-# CONVENTION_SITE_BUDGET and ISOLATED_MODULE_BUDGET have a longer history worth
-# keeping, because it is the evidence that a 0 here is reachable rather than
-# rhetorical. Convention sites were ratcheted 101, 100, 99, 93, 86, 79, 77, 76,
-# 43, 37, 29, 15, 7, 0 across fourteen commits on 2026-08-01, each decrement made
-# after the count had actually reached it, and the guard passed at 0. Isolated
-# modules went 23, 22, 21, 19, 17, 15, 14 over the same day and passed at 14.
-# Both have since regressed, which is what the screens are for.
+# The last remnant of the old discipline was a table of the values seven screens
+# carried before they were zeroed, printed beside any failure so a reader could
+# tell progress from regression. It is deleted too. A number that no screen
+# enforces is not a standard, and keeping it invited exactly the comparison the
+# zeroing was meant to end -- "7 unwitnessed bundles, down from 38" reads as
+# progress, and the standard says it is seven failures. `git log` still holds
+# the history for anyone who wants it.
 
 def ident_strip_comments(src: str) -> str:
     """Remove Lean block and line comments so prose cannot trip the guards."""
@@ -1055,10 +1030,9 @@ def run_identifications() -> int:
     #     that one lies below the other. Guard 3c screens same-BODY duplicates;
     #     a fork has different bodies by construction and walks straight through.
     #
-    #     Advisory until the count is measured once and pinned, the same
-    #     treatment INHERITED_VALIDATION_BUDGET gets: this is retroactive over a
-    #     large existing surface, and failing the build on all of it at once
-    #     would be noise rather than signal.
+    #     ENFORCED, at zero, like everything else here -- the "advisory until
+    #     the count is measured once and pinned" this used to promise was never
+    #     what the code did, which appends to `bad` below.
     OBSERVABLE_GROUPS = [
         ("F_ST", re.compile(r"fst|gst", re.I)),
         ("heterozygosity", re.compile(r"^het|heterozyg", re.I)),
@@ -1707,11 +1681,14 @@ def run_identifications() -> int:
             if cites_identity and not cites_measurement:
                 inherited.append(f"{os.path.relpath(f, IDENT_ROOT)}: a VALIDATED note cites a sibling "
                                  f"identity but no measurement: \"{note.strip()[:70]}\"")
-    #     Reported, not enforced, until the count is measured once and pinned:
-    #     these two guards are retroactive over twenty existing VALIDATED tags,
-    #     and failing the build on all of them at once would be noise rather than
-    #     signal. Pin INHERITED_VALIDATION_BUDGET to the first reported count and
-    #     ratchet it down, exactly as CONVENTION_SITE_BUDGET was.
+    #     ENFORCED, at zero. This comment used to say "reported, not enforced,
+    #     until the count is measured once and pinned", and proposed ratcheting a
+    #     budget down from that count -- while the code below already appended to
+    #     `bad` and failed the build. The prose described a discipline the corpus
+    #     no longer has and the code no longer followed. A VALIDATED tag resting
+    #     on a sibling identity rather than on a measurement is a defect at one
+    #     occurrence, and being retroactive over twenty of them is a reason to
+    #     fix twenty, not a reason to permit them.
     if inherited:
         bad.append(f"VALIDATED tags justified by a sibling identity rather than a measurement: "
                    f"{len(inherited)}")
@@ -2272,13 +2249,6 @@ def run_identifications() -> int:
         print("STRUCTURAL GUARD FAILURES\n")
         for b in bad:
             print("  " + b)
-        # A count means nothing without the count it is being compared to. Seven
-        # of these screens were pinned at a measured number and then zeroed in one
-        # edit; printing the old numbers next to the failures is what stops a
-        # reader mistaking progress for regression, or the reverse.
-        print("\nPREVIOUSLY PINNED (budgets are gone; nothing is grandfathered)\n")
-        for name, (was, commit, when) in sorted(LAST_PINNED_BEFORE_ZEROING.items()):
-            print(f"  {name:32s} was {was:3d}  pinned {commit} {when}")
         return 1
     print(f"structural guards pass: convention sites {sites}, "
           f"undeclared {len(undeclared)}, conventions {len(undeclared_conv)}, "

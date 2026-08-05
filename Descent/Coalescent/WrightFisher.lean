@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
 import Descent.Core.Heterozygosity
+import Descent.Core.Moments
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 import Mathlib.Probability.Distributions.Uniform
 import Mathlib.Combinatorics.Enumerative.DoubleCounting
@@ -453,6 +454,45 @@ theorem heterozygosityLossDerived_eq_pairCoalesced {Ne : ℕ} (hNe : 0 < Ne) (t 
   rw [pairDistinct_eq_pow h2]
   push_cast
   ring
+
+/-! ### The mechanism reaching the deployed metric
+
+The chain the corpus is about runs: parents are chosen uniformly, so two lineages collide
+with probability `1/N` per generation, so heterozygosity decays, so the between-population
+differentiation an analyst measures is what it is, so the polygenic score's `R²` in the
+target population is what it is.  Every link but the last was stated somewhere; the last
+was not, in this direction, and a chain missing its final link is a chain nothing can be
+pulled with.  `Descent.Core.Moments.momentsUnderDrift` is the deployed metric's home, and
+it is imported here rather than the reverse because the metric layer sits above the
+mechanism -- which is the direction the whole file exists to establish. -/
+
+/-- **The deployed `R²` at the counted differentiation is the deployed `R²` at the corpus's
+scalar one.**
+
+`momentsUnderDrift V_A V_E fst |>.r2` is what a polygenic score achieves in a population
+differentiated by `fst`.  Feeding it the differentiation COUNTED off the Wright-Fisher
+parent choice, rather than the one `Descent.Core.heterozygosityLoss` posits, gives the same
+number -- and that is the statement that the deployed metric depends on the mechanism, not
+merely on a formula that happens to agree with it.
+
+Before this, no module outside `Descent/Coalescent/` used the coalescent for anything, and
+no theorem inside it mentioned a deployed metric: 12,214 lines whose conclusions could not
+reach the quantity the development is named for. -/
+theorem deployedR2_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne) (V_A V_E : ℝ)
+    (t : ℕ) :
+    (Descent.Core.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)).r2
+      = (Descent.Core.momentsUnderDrift V_A V_E
+          (Descent.Core.heterozygosityLoss (Ne : ℝ) t)).r2 := by
+  rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
+
+/-- **The same for the whole moment record**, not only its `R²`: mean, variance and slope
+all read off the counted differentiation. -/
+theorem momentsUnderDrift_at_counted_differentiation {Ne : ℕ} (hNe : 0 < Ne)
+    (V_A V_E : ℝ) (t : ℕ) :
+    Descent.Core.momentsUnderDrift V_A V_E (1 - pairDistinct (2 * Ne) t)
+      = Descent.Core.momentsUnderDrift V_A V_E
+          (Descent.Core.heterozygosityLoss (Ne : ℝ) t) := by
+  rw [heterozygosityLossDerived_eq_pairCoalesced hNe]
 
 end Coalescent
 

@@ -30,8 +30,8 @@ cannot collide, since this file defines none of these names and the only
 namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
 open PopGen.TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
-  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
-  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
+  equalVarianceGaussianAUCFromSignalVariance
+  equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise)
 
 section PortabilityDrift
 
@@ -1886,7 +1886,7 @@ Measured cost of the substitution on 400 simulated binary-trait PGS studies: bia
 `liabilityThresholdAUCFromExplainedR2` (RMSE `0.0121` on the same runs, against a `0.0120`
 seed-noise floor). -/
 noncomputable def presentDayEqualVarianceGaussianAUC (V_A V_E fst : ℝ) : ℝ :=
-  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
+  equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
 /-- Exact present-day **equal-variance Gaussian** AUC formula at positive residual
 variance. -/
@@ -1895,7 +1895,7 @@ theorem presentDayEqualVarianceGaussianAUC_eq
     presentDayEqualVarianceGaussianAUC V_A V_E fst =
       Foundations.Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   rw [presentDayEqualVarianceGaussianAUC,
-    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
   unfold presentDaySignalToNoise
   congr 2
   rw [div_div, mul_comm]
@@ -3562,7 +3562,16 @@ if someone noticed. The accessors below are the generation-indexed laws this mod
 to the shared record, not a second record.
 -/
 
-namespace Core.PopGenParameters
+-- These are METHODS on `Descent.Core.PopGenParameters`. A declaration's
+-- namespace is relative to the enclosing one, so from inside
+-- `Descent.Portability` this block would name them
+-- `Descent.Portability.Core.PopGenParameters.*` and dot notation on the
+-- structure would never find them.
+end Descent.Portability
+
+namespace Descent.Core.PopGenParameters
+
+open Descent.Portability
 
 /-- Coalescent time coordinate at generation `t`.
 
@@ -3742,7 +3751,9 @@ noncomputable def migrationSharedBoostAt
     g.migrationSharedBoostAt 0 = 1 := by
   simp [migrationSharedBoostAt, tauAt, PopGen.EvolutionaryParameters.bigM]
 
-end Core.PopGenParameters
+end Descent.Core.PopGenParameters
+
+namespace Descent.Portability
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
 generation-indexed population-genetic parameter block used by the mechanistic
@@ -5152,7 +5163,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
     unfold targetR2FromNeutralAFBenchmark PopGen.TransportedMetrics.r2FromSignalVariance presentDayR2
     rfl
   · change
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
+      equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
           fstTarget) V_E =
         presentDayEqualVarianceGaussianAUC V_A V_E fstTarget
     rfl
@@ -5232,8 +5243,8 @@ AUC of a biological process without a separately proved distributional model. -/
 theorem equalVarianceGaussianAUCFromSNR_eq_variance
     (vSignal vEnv : ℝ) (h_env : vEnv ≠ 0) :
     equalVarianceGaussianAUCFromSNR (vSignal / vEnv) =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
-  rw [PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
+      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
   unfold equalVarianceGaussianAUCFromSNR
   congr 2
   rw [div_div, mul_comm]
@@ -5248,9 +5259,9 @@ distributional model rather than supplied as a theorem-bearing parameter. -/
 
 /-- With `vEnv = 1`, variance form equals SNR form exactly. -/
 theorem equalVarianceGaussianAUCFromVariances_scaleOne (vSignal : ℝ) :
-    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal 1 =
+    equalVarianceGaussianAUCFromSignalVariance vSignal 1 =
       equalVarianceGaussianAUCFromSNR vSignal := by
-  rw [PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
+  rw [equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ (by norm_num)]
   unfold equalVarianceGaussianAUCFromSNR
   ring_nf
 
@@ -5480,7 +5491,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
     (vSignal vEnv : ℝ) (h_signal : 0 ≤ vSignal) (h_env : 0 < vEnv) :
     equalVarianceGaussianAUCFromExplainedR2
         (PopGen.TransportedMetrics.r2FromSignalVariance vSignal vEnv) =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
+      equalVarianceGaussianAUCFromSignalVariance vSignal vEnv := by
   have h_total : 0 < vSignal + vEnv := add_pos_of_nonneg_of_pos h_signal h_env
   have h_r2_lt : PopGen.TransportedMetrics.r2FromSignalVariance vSignal vEnv < 1 := by
     unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
@@ -5545,7 +5556,7 @@ equation.
     Empirical status: UNTESTED. -/
 noncomputable def equalVarianceGaussianAUCFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
-  PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+  equalVarianceGaussianAUCFromSignalVariance
     (explainedSignalVarianceFromSourceWeights m P)
     (residualVarianceFromSourceWeights m P)
 
@@ -5554,7 +5565,7 @@ applied to source explained signal and source residual variance. -/
 theorem sourceEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_source_variances
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.source =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.source)
         (residualVarianceFromSourceWeights m Pop.source) := by
   rfl
@@ -5581,7 +5592,7 @@ theorem equalVarianceGaussianAUCFromSourceWeights_eq_explainedR2_chart_of_pos {p
     exact ne_of_gt (sub_pos.mpr h_signal_lt)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2]
   rw [equalVarianceGaussianAUCFromSourceWeights,
-    PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
+    equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_residual_ne]
   unfold residualVarianceFromSourceWeights r2FromSourceWeights
   congr 1
   congr 1
@@ -5605,7 +5616,7 @@ applied to target explained signal and target residual variance. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
     (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
   rfl
@@ -5616,7 +5627,7 @@ explicit SNP-level transport model. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         (effectiveOutcomeVariance m Pop.target -
@@ -5631,7 +5642,7 @@ biological loss budget made explicit in the residual term. -/
 theorem targetEqualVarianceGaussianAUCFromSourceWeights_exact_loss_budget_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     equalVarianceGaussianAUCFromSourceWeights m Pop.target =
-      PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+      equalVarianceGaussianAUCFromSignalVariance
         ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
           scoreVarianceFromSourceWeights m Pop.target)
         ((m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m -
@@ -5789,7 +5800,7 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
           (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
             (scoreVarianceFromSourceWeights m Pop.target * effectiveOutcomeVariance m Pop.target)
       , auc :=
-          PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+          equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights m Pop.target)
             (effectiveOutcomeVariance m Pop.target -
@@ -5863,7 +5874,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
             (scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target *
               effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target)
       , auc :=
-          PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
+          equalVarianceGaussianAUCFromSignalVariance
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
