@@ -1,0 +1,123 @@
+{
+ "_battery_sha": "29d0084fd1ef9202",
+ "results": [
+  {
+   "name": "standardizedResidualPGSBias",
+   "file": "Diagnostic.lean",
+   "source": "pgsStratificationRiskCoefficient * confounding, i.e. K * c",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 0.87 sems",
+   "regime": "confounded null: 1500 candidate variants with an ancestry-gradient allele frequency, 8000 GWAS individuals and 8000 target individuals, no variant causal, phenotype c*a + noise on a standardized ancestry axis. Variants are ascertained at a FIXED |z| > 3 threshold and re-selected at every confounding level, which is the regime the corpus's own ascertainmentAmplification factor models. The observable is the regression slope of the polygenic score on the TARGET panel's ancestry axis over sigma_beta. The coefficient is measured on four replicates at c = 0.4 and the prediction compared on eight disjoint replicates across an eightfold range of c",
+   "span": 0.875,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.15 (mean 282 ascertained)",
+    "lean": 246.3342871075112,
+    "truth": 163.10197998200294,
+    "sem": 8.489301450723788,
+    "sems_off": 9.804376438818997,
+    "rel_err": 0.5103083796695312
+   },
+   "cells": [
+    {
+     "design": "c=0.15 (mean 282 ascertained)",
+     "lean": 246.3342871075112,
+     "truth": 163.10197998200294,
+     "sem": 8.489301450723788,
+     "sems_off": 9.804376438818997,
+     "rel_err": 0.5103083796695312
+    },
+    {
+     "design": "c=0.30 (mean 716 ascertained)",
+     "lean": 492.6685742150224,
+     "truth": 479.36961536098437,
+     "sem": 11.076233752608031,
+     "sems_off": 1.2006751709177867,
+     "rel_err": 0.027742598671013724
+    },
+    {
+     "design": "c=0.40 (mean 858 ascertained)",
+     "lean": 656.8914322866966,
+     "truth": 679.6033636894167,
+     "sem": 13.481228881802823,
+     "sems_off": 1.6847077964366457,
+     "rel_err": 0.03341939227525602
+    },
+    {
+     "design": "c=0.80 (mean 1097 ascertained)",
+     "lean": 1313.7828645733932,
+     "truth": 1400.3512940626097,
+     "sem": 16.97557751007603,
+     "sems_off": 5.099586711428985,
+     "rel_err": 0.06181908058089456
+    },
+    {
+     "design": "c=1.20 (mean 1169 ascertained)",
+     "lean": 1970.6742968600895,
+     "truth": 2108.77592361667,
+     "sem": 25.63437467085772,
+     "sems_off": 5.387360859384658,
+     "rel_err": 0.06548900013981962
+    }
+   ]
+  },
+  {
+   "name": "standardizedResidualPGSBias [quadratic in confounding, competing]",
+   "file": "Diagnostic.lean",
+   "source": "K * c_ref * (c / c_ref)^2",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 0.87 sems",
+   "regime": "confounded null: 1500 candidate variants with an ancestry-gradient allele frequency, 8000 GWAS individuals and 8000 target individuals, no variant causal, phenotype c*a + noise on a standardized ancestry axis. Variants are ascertained at a FIXED |z| > 3 threshold and re-selected at every confounding level, which is the regime the corpus's own ascertainmentAmplification factor models. The observable is the regression slope of the polygenic score on the TARGET panel's ancestry axis over sigma_beta. The coefficient is measured on four replicates at c = 0.4 and the prediction compared on eight disjoint replicates across an eightfold range of c",
+   "span": 0.9843749999999999,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=1.20 (mean 1169 ascertained)",
+    "lean": 5912.022890580269,
+    "truth": 2108.77592361667,
+    "sem": 25.63437467085772,
+    "sems_off": 148.36511581799172,
+    "rel_err": 1.8035329995805411
+   },
+   "cells": [
+    {
+     "design": "c=0.15 (mean 282 ascertained)",
+     "lean": 92.3753576653167,
+     "truth": 163.10197998200294,
+     "sem": 8.489301450723788,
+     "sems_off": 8.331265266903223,
+     "rel_err": 0.43363435762392577
+    },
+    {
+     "design": "c=0.30 (mean 716 ascertained)",
+     "lean": 369.5014306612668,
+     "truth": 479.36961536098437,
+     "sem": 11.076233752608031,
+     "sems_off": 9.919272846137597,
+     "rel_err": 0.22919305099673967
+    },
+    {
+     "design": "c=0.40 (mean 858 ascertained)",
+     "lean": 656.8914322866966,
+     "truth": 679.6033636894167,
+     "sem": 13.481228881802823,
+     "sems_off": 1.6847077964366457,
+     "rel_err": 0.03341939227525602
+    },
+    {
+     "design": "c=0.80 (mean 1097 ascertained)",
+     "lean": 2627.5657291467865,
+     "truth": 1400.3512940626097,
+     "sem": 16.97557751007603,
+     "sems_off": 72.29294168965686,
+     "rel_err": 0.8763618388382108
+    },
+    {
+     "design": "c=1.20 (mean 1169 ascertained)",
+     "lean": 5912.022890580269,
+     "truth": 2108.77592361667,
+     "sem": 25.63437467085772,
+     "sems_off": 148.36511581799172,
+     "rel_err": 1.8035329995805411
+    }
+   ]
+  }
+ ]
+}

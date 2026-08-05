@@ -216,7 +216,54 @@ theorem pgsStratificationRiskCoefficient_at_zero_effect_scale_is_junk
 /-- Standardized residual stratification bias is linear in the confounding
 magnitude once the study design and residual target-axis geometry are fixed.
 
-    Empirical status: UNTESTED. -/
+**"Fixed study design" has to mean the ascertained VARIANT SET, not the
+ascertainment threshold.** Those are different conditions and the
+proportionality holds under only one of them.
+
+    Empirical status: **FALSIFIED** when the ascertainment threshold is what is
+    held fixed, and it holds to 1.1 sems when the variant set is
+    (`proofs/validation/empirical/simcov/battery_strat01.py`). A confounded
+    null: 1500 candidate variants carrying an ancestry-frequency gradient, 8000
+    GWAS and 8000 target individuals, no variant causal, phenotype `c·a + noise`
+    on a standardized ancestry axis. The observable is the regression slope of
+    the score on the TARGET panel's ancestry axis over `σβ`. The coefficient is
+    read as `bias(c₀)/c₀` on four replicates at `c₀ = 0.4` and the prediction is
+    compared on eight DISJOINT replicates across an eightfold range of `c`, so
+    no input comes from the replicates the oracle measures.
+
+      c      variants   this body   measured             sems
+      0.15      282      246.33      163.10±8.49         9.80
+      0.30      716      492.67      479.37±11.08        1.20
+      0.40      858      656.89      679.60±13.48        1.68
+      0.80     1097     1313.78     1400.35±16.98        5.10
+      1.20     1169     1970.67     2108.78±25.63        5.39
+
+    The relation is convex, not proportional: 51% high at the bottom of the
+    range and 6% low at the top. The mechanism is in the second column — more
+    confounding puts more variants over the threshold, 282 to 1169 across the
+    sweep, so the summary the coefficient is a function of moves with the very
+    quantity it multiplies. Holding the SELECTED SET fixed instead removes it
+    entirely: the same code path then tracks `K·c` at worst 1.1 sems over the
+    same eightfold range, which is also the check that the design can reproduce
+    proportionality when proportionality is what is there.
+
+    The identity gate: the quadratic `K·c₀·(c/c₀)²`, which agrees with this body
+    exactly at the anchor and diverges either side of it, is rejected at up to
+    148 sems and 180%. So the truth lies between the two shapes and the design
+    discriminates shape rather than merely calibration. The positive control —
+    the same pipeline with the confounder off and real additive effects of known
+    size, whose mean marginal estimate must recover them — passes at 0.87 sems.
+
+    WHAT THIS DOES NOT SETTLE: the functional form of
+    `pgsStratificationRiskCoefficient` itself, which is a separate question and
+    is not on trial here. Whatever that coefficient is, this battery calibrates
+    it from data and tests only the proportionality it is asserted to enter by.
+
+    Consumers are affected in one direction. `criticalConfoundingMagnitude`
+    inverts the proportionality to report how much confounding would be needed
+    to produce an observed signal; under threshold ascertainment it therefore
+    OVERSTATES the confounding required at small signals — 246 where 163 was
+    measured — which is the reassuring direction and the wrong one. -/
 noncomputable def standardizedResidualPGSBias
     (expectedSNPCount Hres effectSD Φ Λ confounding : ℝ) : ℝ :=
   pgsStratificationRiskCoefficient expectedSNPCount Hres effectSD Φ Λ * confounding

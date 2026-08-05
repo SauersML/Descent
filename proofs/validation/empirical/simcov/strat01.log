@@ -1,0 +1,44 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-STRAT01-GODWIT-20260805)
+FRESHNESS token literal: SIMCOV-BATTERY-STRAT01-GODWIT-20260805
+
+  arm A anchor: c=0.40 bias 656.8914 ± 19.6035 over 836 hits -> K = 1642.2286
+  c=0.15 (mean 282 ascertained)  linear K*c 246.3343   quadratic 92.3754   measured 163.1020 ± 8.4893
+  c=0.30 (mean 716 ascertained)  linear K*c 492.6686   quadratic 369.5014   measured 479.3696 ± 11.0762
+  c=0.40 (mean 858 ascertained)  linear K*c 656.8914   quadratic 656.8914   measured 679.6034 ± 13.4812
+  c=0.80 (mean 1097 ascertained) linear K*c 1313.7829   quadratic 2627.5657   measured 1400.3513 ± 16.9756
+  c=1.20 (mean 1169 ascertained) linear K*c 1970.6743   quadratic 5912.0229   measured 2108.7759 ± 25.6344
+
+  arm F (ascertained set held fixed across the sweep -- linearity is algebra here, so this is a design check and is NOT recorded):
+    c=0.15  linear 149.4735  measured 143.9571 ± 5.2416  (1.1 sems)
+    c=0.30  linear 298.9470  measured 302.5161 ± 4.8706  (0.7 sems)
+    c=0.40  linear 398.5960  measured 398.5709 ± 6.3141  (0.0 sems)
+    c=0.80  linear 797.1919  measured 798.0395 ± 9.0599  (0.1 sems)
+    c=1.20  linear 1195.7879  measured 1178.8565 ± 16.1081  (1.1 sems)
+
+  CONTROL no confounder, true additive effects: the mean marginal estimate recovers the effect it was given: predicted 1.0000 measured 0.9866 ± 0.0155
+
+standardizedResidualPGSBias              FALSIFIED   (pred span 88%)
+  lean: pgsStratificationRiskCoefficient * confounding, i.e. K * c
+  regime: confounded null: 1500 candidate variants with an ancestry-gradient allele frequency, 8000 GWAS individuals and 8000 target individuals, no variant causal, phenotype c*a + noise on a standardized ancestry axis. Variants are ascertained at a FIXED |z| > 3 threshold and re-selected at every confounding level, which is the regime the corpus's own ascertainmentAmplification factor models. The observable is the regression slope of the polygenic score on the TARGET panel's ancestry axis over sigma_beta. The coefficient is measured on four replicates at c = 0.4 and the prediction compared on eight disjoint replicates across an eightfold range of c
+  NOTE: positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 0.87 sems
+  design                                   lean        sim      sem     sems
+  c=0.15 (mean 282 ascertained)       246.33429  163.10198  8.48930     9.80
+  c=0.30 (mean 716 ascertained)       492.66857  479.36962 11.07623     1.20
+  c=0.40 (mean 858 ascertained)       656.89143  679.60336 13.48123     1.68
+  c=0.80 (mean 1097 ascertained)     1313.78286 1400.35129 16.97558     5.10
+  c=1.20 (mean 1169 ascertained)     1970.67430 2108.77592 25.63437     5.39
+
+standardizedResidualPGSBias [quadratic in confounding, competing] FALSIFIED   (pred span 98%)
+  lean: K * c_ref * (c / c_ref)^2
+  regime: confounded null: 1500 candidate variants with an ancestry-gradient allele frequency, 8000 GWAS individuals and 8000 target individuals, no variant causal, phenotype c*a + noise on a standardized ancestry axis. Variants are ascertained at a FIXED |z| > 3 threshold and re-selected at every confounding level, which is the regime the corpus's own ascertainmentAmplification factor models. The observable is the regression slope of the polygenic score on the TARGET panel's ancestry axis over sigma_beta. The coefficient is measured on four replicates at c = 0.4 and the prediction compared on eight disjoint replicates across an eightfold range of c
+  NOTE: positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 0.87 sems
+  design                                   lean        sim      sem     sems
+  c=0.15 (mean 282 ascertained)        92.37536  163.10198  8.48930     8.33
+  c=0.30 (mean 716 ascertained)       369.50143  479.36962 11.07623     9.92
+  c=0.40 (mean 858 ascertained)       656.89143  679.60336 13.48123     1.68
+  c=0.80 (mean 1097 ascertained)     2627.56573 1400.35129 16.97558    72.29
+  c=1.20 (mean 1169 ascertained)     5912.02289 2108.77592 25.63437   148.37
+
+================ SUMMARY ================
+FALSIFIED                standardizedResidualPGSBias                                worst      9.80 sems,    51.03% rel
+FALSIFIED                standardizedResidualPGSBias [quadratic in confounding, com worst    148.37 sems,   180.35% rel
