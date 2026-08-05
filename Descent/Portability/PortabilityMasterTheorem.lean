@@ -227,77 +227,13 @@ section Bilinearity
 
 The metric laws of `§2` are all instances of one fact: `covariance` is bilinear, so a
 covariance between two linear combinations of coordinate families is the quadratic form
-of the coordinate covariance matrix.  `TransportIdentities` proves the right-argument
-half of the bilinearity; symmetry supplies the left half.
+of the coordinate covariance matrix.  The lemmas themselves --- `covariance_comm`,
+`variance_add`, `covariance_linScore_left`, `covariance_linScore_linScore`,
+`variance_linScore`, `covariance_linScore_eq_dot_crossCov`, `variance_affine`,
+`covariance_affine_right` --- are facts about an arbitrary positive linear functional
+with no portability content, so they live in `Descent.Foundations.TransportIdentities`
+alongside the rest of the covariance algebra rather than here.
 -/
-
-variable {Ω : Type*} {J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
-
-theorem covariance_comm (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
-    covariance E X Y = covariance E Y X := by
-  unfold covariance
-  exact congrArg E (funext fun ω ↦ mul_comm _ _)
-
-theorem variance_eq_covariance_self (E : ExpFunctional Ω) (Z : Ω → ℝ) :
-    variance E Z = covariance E Z Z := by
-  unfold variance covariance
-  exact congrArg E (funext fun ω ↦ pow_two _)
-
-theorem covariance_add_left (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
-    covariance E (fun ω ↦ X ω + Y ω) Z = covariance E X Z + covariance E Y Z := by
-  rw [covariance_comm, covariance_add_right, covariance_comm E Z X, covariance_comm E Z Y]
-
-/-- `Var(X + Y) = Var X + 2 Cov(X,Y) + Var Y`, for any positive linear functional. -/
-theorem variance_add (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
-    variance E (fun ω ↦ X ω + Y ω)
-      = variance E X + 2 * covariance E X Y + variance E Y := by
-  rw [variance_eq_covariance_self, covariance_add_left,
-    covariance_add_right, covariance_add_right,
-    variance_eq_covariance_self E X, variance_eq_covariance_self E Y,
-    covariance_comm E Y X]
-  ring
-
-/-- A covariance against a linear score expands into the coordinate covariances. -/
-theorem covariance_linScore_left
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
-    covariance E (linScore w X) Z = ∑ j, w j * covariance E (fun ω ↦ X ω j) Z := by
-  rw [covariance_comm]
-  have hsum : linScore w X = (fun ω ↦ ∑ j, ((w j) • (fun ω' ↦ X ω' j)) ω) := by
-    funext ω
-    simp [linScore, dot, mul_comm]
-  rw [hsum, covariance_finset_sum_right]
-  refine Finset.sum_congr rfl fun j _ ↦ ?_
-  rw [covariance_smul_right, covariance_comm]
-
-/-- **The quadratic-form law.**  A covariance between two linear scores on the same
-coordinate family is the coordinate covariance matrix read as a bilinear form. -/
-theorem covariance_linScore_linScore
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w v : J → ℝ) :
-    covariance E (linScore w X) (linScore v X)
-      = dot w ((covarianceMatrix E X).mulVec v) := by
-  rw [covariance_linScore_left]
-  unfold dot covarianceMatrix
-  simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
-  refine Finset.sum_congr rfl fun j _ ↦ ?_
-  congr 1
-  rw [covariance_comm, covariance_linScore_left]
-  refine Finset.sum_congr rfl fun k _ ↦ ?_
-  rw [covariance_comm]
-  ring
-
-/-- The variance of a linear score is the LD quadratic form. -/
-theorem variance_linScore
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) :
-    variance E (linScore w X) = dot w ((covarianceMatrix E X).mulVec w) := by
-  rw [variance_eq_covariance_self, covariance_linScore_linScore]
-
-/-- A covariance between a linear score and an arbitrary observable is the score read
-against the coordinate cross-covariance vector. -/
-theorem covariance_linScore_eq_dot_crossCov
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
-    covariance E (linScore w X) Z = dot w (contextCrossCovVector E X Z) := by
-  rw [covariance_linScore_left]
-  rfl
 
 end Bilinearity
 
@@ -431,16 +367,6 @@ with an error term swept into the last line, they exhaust the difference.
 
 variable {ΩS ΩT J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
 
-omit [Fintype L] [DecidableEq L] in
-theorem dot_add_right {ι : Type*} [Fintype ι] (x y z : ι → ℝ) :
-    dot x (y + z) = dot x y + dot x z := by
-  simp [dot, Pi.add_apply, mul_add, Finset.sum_add_distrib]
-
-omit [Fintype L] [DecidableEq L] in
-theorem dot_sub_right {ι : Type*} [Fintype ι] (x y z : ι → ℝ) :
-    dot x (y - z) = dot x y - dot x z := by
-  simp [dot, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
-
 /-- **One score deployed in two populations.** -/
 structure Deployment (ΩS ΩT J L : Type*) where
   /-- The population the score was trained in (or, more precisely, the one it is being
@@ -499,7 +425,7 @@ theorem predictiveCovariance_transport :
       = D.taggingShift + D.effectTurnover + D.contextShift := by
   rw [D.target.predictiveCovariance_eq D.w, D.source.predictiveCovariance_eq D.w]
   unfold taggingShift effectTurnover contextShift
-  rw [Matrix.sub_mulVec, Matrix.mulVec_sub, dot_sub_right, dot_sub_right, dot_sub_right]
+  rw [Matrix.sub_mulVec, Matrix.mulVec_sub, dot_sub_right', dot_sub_right', dot_sub_right']
   ring
 
 omit [Fintype L] [DecidableEq L] in
@@ -513,7 +439,7 @@ theorem scoreVariance_transport :
     D.target.scoreVariance D.w - D.source.scoreVariance D.w = D.scoreVarianceShift := by
   rw [D.target.scoreVariance_eq D.w, D.source.scoreVariance_eq D.w]
   unfold scoreVarianceShift
-  rw [Matrix.sub_mulVec, dot_sub_right]
+  rw [Matrix.sub_mulVec, dot_sub_right']
 
 /-! ### The exact `R²` factorisation -/
 
@@ -1024,38 +950,6 @@ section AffineMse
 
 variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L]
 
-theorem variance_affine (E : ExpFunctional Ω) (a b : ℝ) (Z : Ω → ℝ) :
-    variance E (fun ω ↦ a + b * Z ω) = b ^ 2 * variance E Z := by
-  have hmean : E (fun ω ↦ a + b * Z ω) = a + b * E Z := by
-    have hsplit : (fun ω ↦ a + b * Z ω) = (fun _ ↦ a) + b • Z := by
-      funext ω
-      simp [smul_eq_mul]
-    rw [hsplit, E.add_eval, E.smul_eval, E.eval_const]
-  unfold variance
-  rw [hmean]
-  have hbody : (fun ω ↦ (a + b * Z ω - (a + b * E Z)) ^ 2)
-      = (b ^ 2) • (fun ω ↦ (Z ω - E Z) ^ 2) := by
-    funext ω
-    simp [smul_eq_mul]
-    ring
-  rw [hbody, E.smul_eval]
-
-theorem covariance_affine_right (E : ExpFunctional Ω) (a b : ℝ) (Y Z : Ω → ℝ) :
-    covariance E Y (fun ω ↦ a + b * Z ω) = b * covariance E Y Z := by
-  have hmean : E (fun ω ↦ a + b * Z ω) = a + b * E Z := by
-    have hsplit : (fun ω ↦ a + b * Z ω) = (fun _ ↦ a) + b • Z := by
-      funext ω
-      simp [smul_eq_mul]
-    rw [hsplit, E.add_eval, E.smul_eval, E.eval_const]
-  unfold covariance
-  rw [hmean]
-  have hbody : (fun ω ↦ (Y ω - E Y) * (a + b * Z ω - (a + b * E Z)))
-      = b • (fun ω ↦ (Y ω - E Y) * (Z ω - E Z)) := by
-    funext ω
-    simp [smul_eq_mul]
-    ring
-  rw [hbody, E.smul_eval]
-
 namespace DeploymentPopulation
 
 variable (P : DeploymentPopulation Ω J L) (w : J → ℝ)
@@ -1077,12 +971,7 @@ theorem recalibrated_mse_eq (a b : ℝ) :
   rw [mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
   unfold recalibratedScore bias
   rw [variance_affine, covariance_affine_right]
-  have hmean : P.E (fun ω ↦ a + b * P.score w ω) = a + b * P.E (P.score w) := by
-    have hsplit : (fun ω ↦ a + b * P.score w ω) = (fun _ ↦ a) + b • P.score w := by
-      funext ω
-      simp [smul_eq_mul]
-    rw [hsplit, P.E.add_eval, P.E.smul_eval, P.E.eval_const]
-  rw [hmean]
+  rw [eval_affine]
   rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
     show variance P.E (P.score w) = P.scoreVariance w from rfl,
     show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from

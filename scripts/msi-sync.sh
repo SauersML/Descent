@@ -12,8 +12,9 @@ cd "$ROOT"
 tar czf "$TAR" Descent Descent.lean lakefile.lean lean-toolchain lake-manifest.json
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"
-# Replace Descent/ wholesale so deletions and renames propagate.
-"$MSI" "cd $REMOTE && rm -rf Descent && tar xzf .src-sync.tar.gz && rm -f .src-sync.tar.gz && echo synced"
+# Overlay, never delete: the remote checkout is shared with other sessions, and a
+# wholesale replacement of Descent/ would destroy work this tarball does not carry.
+"$MSI" "cd $REMOTE && tar xzf .src-sync.tar.gz && rm -f .src-sync.tar.gz && echo synced"
 if [ "${1:-}" = build ]; then
   shift
   "$MSI" "cd $REMOTE && nice -n 5 lake build ${*:-Descent} 2>&1 | tail -60"

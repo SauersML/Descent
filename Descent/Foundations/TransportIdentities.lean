@@ -283,6 +283,72 @@ theorem covariance_finset_sum_right
   | @insert a s ha hs =>
       simp [Finset.sum_insert, ha, covariance_add_right, hs]
 
+/-- Covariance is symmetric.
+
+    Previously duplicated as `covariance_comm_exp` in `Blindness.ImitationRigidity`,
+    which is where the corpus first needed it.  It is a fact about any positive linear
+    functional and belongs with the rest of the covariance algebra; the copy is gone and
+    its seven uses point here. -/
+theorem covariance_comm (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+    covariance E X Y = covariance E Y X := by
+  unfold covariance
+  exact congrArg E (funext fun ω ↦ mul_comm _ _)
+
+theorem covariance_add_left (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
+    covariance E (fun ω ↦ X ω + Y ω) Z = covariance E X Z + covariance E Y Z := by
+  rw [covariance_comm, covariance_add_right, covariance_comm E Z X, covariance_comm E Z Y]
+
+theorem covariance_smul_left (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ) :
+    covariance E (c • X) Y = c * covariance E X Y := by
+  rw [covariance_comm, covariance_smul_right, covariance_comm E Y X]
+
+/-- Variance is the covariance of an observable with itself. -/
+theorem variance_eq_covariance_self (E : ExpFunctional Ω) (Z : Ω → ℝ) :
+    variance E Z = covariance E Z Z := by
+  unfold variance covariance
+  exact congrArg E (funext fun ω ↦ pow_two _)
+
+/-- `Var(X + Y) = Var X + 2 Cov(X,Y) + Var Y`, for any positive linear functional. -/
+theorem variance_add (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
+    variance E (fun ω ↦ X ω + Y ω)
+      = variance E X + 2 * covariance E X Y + variance E Y := by
+  rw [variance_eq_covariance_self, covariance_add_left,
+    covariance_add_right, covariance_add_right,
+    variance_eq_covariance_self E X, variance_eq_covariance_self E Y,
+    covariance_comm E Y X]
+  ring
+
+theorem eval_affine (E : ExpFunctional Ω) (a b : ℝ) (Z : Ω → ℝ) :
+    E (fun ω ↦ a + b * Z ω) = a + b * E Z := by
+  have hsplit : (fun ω ↦ a + b * Z ω) = (fun _ ↦ a) + b • Z := by
+    funext ω
+    simp [smul_eq_mul]
+  rw [hsplit, E.add_eval, E.smul_eval, E.eval_const]
+
+/-- An affine reparametrisation scales variance by the square of its slope and is blind
+to its intercept. -/
+theorem variance_affine (E : ExpFunctional Ω) (a b : ℝ) (Z : Ω → ℝ) :
+    variance E (fun ω ↦ a + b * Z ω) = b ^ 2 * variance E Z := by
+  unfold variance
+  rw [eval_affine]
+  have hbody : (fun ω ↦ (a + b * Z ω - (a + b * E Z)) ^ 2)
+      = (b ^ 2) • (fun ω ↦ (Z ω - E Z) ^ 2) := by
+    funext ω
+    simp [smul_eq_mul]
+    ring
+  rw [hbody, E.smul_eval]
+
+theorem covariance_affine_right (E : ExpFunctional Ω) (a b : ℝ) (Y Z : Ω → ℝ) :
+    covariance E Y (fun ω ↦ a + b * Z ω) = b * covariance E Y Z := by
+  unfold covariance
+  rw [eval_affine]
+  have hbody : (fun ω ↦ (Y ω - E Y) * (a + b * Z ω - (a + b * E Z)))
+      = b • (fun ω ↦ (Y ω - E Y) * (Z ω - E Z)) := by
+    funext ω
+    simp [smul_eq_mul]
+    ring
+  rw [hbody, E.smul_eval]
+
 end MetricIdentities
 
 section LinearAlgebraicPortability
@@ -301,6 +367,26 @@ omit [DecidableEq ι] in
 theorem dot_sub_left (x y z : ι → ℝ) :
     dot (fun i ↦ x i - y i) z = dot x z - dot y z := by
   simp [dot, sub_eq_add_neg, add_mul, Finset.sum_add_distrib]
+
+omit [DecidableEq ι] in
+/-- Previously `dot_add_right_shift` in `Spectral.ProjectionShiftBounds`.  It is a fact
+about `dot`, which is defined here, so it lives here. -/
+theorem dot_add_right (x y z : ι → ℝ) :
+    dot x (y + z) = dot x y + dot x z := by
+  simp [dot, mul_add, Finset.sum_add_distrib]
+
+omit [DecidableEq ι] in
+/-- Previously duplicated in `Spectral.QuadraticShift`. -/
+theorem dot_sub_right (x y z : ι → ℝ) :
+    dot x (fun i ↦ y i - z i) = dot x y - dot x z := by
+  simp [dot, mul_sub, Finset.sum_sub_distrib]
+
+omit [DecidableEq ι] in
+/-- The `Pi.sub` phrasing of `dot_sub_right`, for callers whose subtraction arrives from
+`Matrix.mulVec_sub` rather than from a written lambda. -/
+theorem dot_sub_right' (x y z : ι → ℝ) :
+    dot x (y - z) = dot x y - dot x z := by
+  simp [dot, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
 theorem normal_equations_orthogonality
     (E : ExpFunctional Ω)
@@ -626,6 +712,52 @@ theorem master_transport_identity_closed_form
   apply master_transport_identity E X Y (optimalWeightsFromMoments sigmaInv E X Y) w
   · exact optimalWeightsFromMoments_normal_equations sigmaInv E X Y hcentered hsigmaInv
   · exact hcentered
+
+omit [Fintype L] [DecidableEq L] in
+/-- A covariance against a linear score expands into the coordinate covariances. -/
+theorem covariance_linScore_left
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
+    covariance E (linScore w X) Z = ∑ j, w j * covariance E (fun ω ↦ X ω j) Z := by
+  rw [covariance_comm]
+  have hsum : linScore w X = (fun ω ↦ ∑ j, ((w j) • (fun ω' ↦ X ω' j)) ω) := by
+    funext ω
+    simp [linScore, dot, mul_comm]
+  rw [hsum, covariance_finset_sum_right]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  rw [covariance_smul_right, covariance_comm]
+
+omit [Fintype L] [DecidableEq L] in
+/-- **The quadratic-form law.**  A covariance between two linear scores on the same
+coordinate family is the coordinate covariance matrix read as a bilinear form. -/
+theorem covariance_linScore_linScore
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w v : J → ℝ) :
+    covariance E (linScore w X) (linScore v X)
+      = dot w ((covarianceMatrix E X).mulVec v) := by
+  rw [covariance_linScore_left]
+  unfold dot covarianceMatrix
+  simp only [Matrix.mulVec, dotProduct, Matrix.of_apply]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  congr 1
+  rw [covariance_comm, covariance_linScore_left]
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [covariance_comm]
+  ring
+
+omit [Fintype L] [DecidableEq L] in
+/-- The variance of a linear score is the coordinate-covariance quadratic form. -/
+theorem variance_linScore
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) :
+    variance E (linScore w X) = dot w ((covarianceMatrix E X).mulVec w) := by
+  rw [variance_eq_covariance_self, covariance_linScore_linScore]
+
+omit [Fintype L] [DecidableEq L] in
+/-- A covariance between a linear score and an arbitrary observable is the score read
+against the coordinate cross-covariance vector. -/
+theorem covariance_linScore_eq_dot_crossCov
+    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (w : J → ℝ) (Z : Ω → ℝ) :
+    covariance E (linScore w X) Z = dot w (contextCrossCovVector E X Z) := by
+  rw [covariance_linScore_left]
+  rfl
 
 end MasterTransport
 

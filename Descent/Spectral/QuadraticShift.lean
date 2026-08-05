@@ -89,11 +89,6 @@ theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
   simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_left_comm]
 
 omit [DecidableEq ι] in
-theorem dot_sub_right (x y z : ι → ℝ) :
-    dot x (fun i ↦ y i - z i) = dot x y - dot x z := by
-  simp [dot, mul_sub, Finset.sum_sub_distrib]
-
-omit [DecidableEq ι] in
 theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
     dot (c • x) y = c * dot x y := by
   simp [dot, Finset.mul_sum, mul_assoc]

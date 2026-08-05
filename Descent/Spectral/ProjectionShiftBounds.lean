@@ -101,11 +101,6 @@ theorem weighted_residual_moment_directional_bound
 def coefficientEnergy (B : Matrix ι ι ℝ) (x : ι → ℝ) : ℝ :=
   dot x (B.mulVec x)
 
-omit [DecidableEq ι] in
-theorem dot_add_right_shift (x y z : ι → ℝ) :
-    dot x (y + z) = dot x y + dot x z := by
-  simp [dot, mul_add, Finset.sum_add_distrib]
-
 /-- Sharp discrepancy--curvature product bound for projection artifacts.
 
 `B a = g` is the residual-score equation for the coefficient movement `a`.
@@ -187,7 +182,7 @@ theorem coefficientEnergy_add
         2 * dot x (B.mulVec y) := by
   unfold coefficientEnergy
   rw [matrix_mulVec_add, dot_add_left]
-  rw [dot_add_right_shift, dot_add_right_shift]
+  rw [dot_add_right, dot_add_right]
   rw [hsymmetric y x]
   ring
 

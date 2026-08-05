@@ -35,28 +35,6 @@ section CovarianceAlgebra
 
 variable {Ω ι : Type*}
 
-theorem covariance_comm_exp (E : ExpFunctional Ω) (X Y : Ω → ℝ) :
-    covariance E X Y = covariance E Y X := by
-  rw [covariance_eq_expect_mul_sub_means, covariance_eq_expect_mul_sub_means]
-  have hmul : (fun ω ↦ X ω * Y ω) = fun ω ↦ Y ω * X ω := by
-    funext ω
-    ring
-  rw [hmul]
-  ring
-
-theorem covariance_add_left_exp
-    (E : ExpFunctional Ω) (X Y Z : Ω → ℝ) :
-    covariance E (fun ω ↦ X ω + Y ω) Z =
-      covariance E X Z + covariance E Y Z := by
-  rw [covariance_comm_exp, covariance_add_right]
-  rw [covariance_comm_exp E Z X, covariance_comm_exp E Z Y]
-
-theorem covariance_smul_left_exp
-    (E : ExpFunctional Ω) (X Y : Ω → ℝ) (c : ℝ) :
-    covariance E (c • X) Y = c * covariance E X Y := by
-  rw [covariance_comm_exp, covariance_smul_right]
-  rw [covariance_comm_exp E Y X]
-
 /-- A rank-one random signal added to each coordinate of a noise row. -/
 def addRankOneSignal
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ) (scale : ℝ) (loading : ι → ℝ) :
@@ -104,12 +82,12 @@ theorem covarianceMatrix_addRankOneSignal
     funext ω
     ring
   rw [hi, hj]
-  rw [covariance_add_left_exp, covariance_add_right, covariance_add_right]
+  rw [covariance_add_left, covariance_add_right, covariance_add_right]
   have hscaledLeft :
       covariance E (fun ω ↦ (scale * loading i) * factor ω)
           (fun ω ↦ noise ω j) = 0 := by
     change covariance E ((scale * loading i) • factor) (fun ω ↦ noise ω j) = 0
-    rw [covariance_smul_left_exp, hright j, mul_zero]
+    rw [covariance_smul_left, hright j, mul_zero]
   have hscaledRight :
       covariance E (fun ω ↦ noise ω i)
           (fun ω ↦ (scale * loading j) * factor ω) = 0 := by
@@ -121,7 +99,7 @@ theorem covarianceMatrix_addRankOneSignal
         scale ^ 2 * loading i * loading j := by
     change covariance E ((scale * loading i) • factor)
       ((scale * loading j) • factor) = _
-    rw [covariance_smul_left_exp, covariance_smul_right, hfactor]
+    rw [covariance_smul_left, covariance_smul_right, hfactor]
     ring
   rw [hscaledLeft, hscaledRight, hscaledBoth]
   ring
