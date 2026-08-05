@@ -31,15 +31,53 @@ recalibration (a + b × PGS) for population T?
 section LinearRecalibration
 
 /-- Target-population slope obtained by transporting a source slope through effect correlation
-`rho` and score-variance ratio `alpha`.
+`rho` and score **standard-deviation** ratio `alpha` = sd(PGS_target) / sd(PGS_source).
 
-Empirical status: UNTESTED. -/
+**The convention is load-bearing and this docstring previously stated the wrong one.** The body
+transports the numerator by `alpha` and the denominator by `alpha ^ 2`, which is the optimal slope
+`Cov(y_T, S_T) / Var(S_T)` only when `alpha` is a ratio of standard deviations: a covariance
+scales with one power of the score's scale and a variance with two. Read as the *variance* ratio
+the docstring used to name, the same transport gives `rho * bSource / Real.sqrt alpha`, and
+computer-algebra differencing of the two readings leaves the nonzero residual
+`bSource * rho / alpha - bSource * rho / Real.sqrt alpha`. Nothing in the body distinguishes them,
+so the convention has to be written down; it is written down here.
+
+Empirical status: DERIVED symbolically: under the sd-ratio convention the body agrees exactly
+(residual `0`) with `Cov(y_T, S_T) / Var(S_T)` transported through `rho`; under the
+variance-ratio convention it disagrees by the residual above.
+
+Against simulation: **VALIDATED at `alpha = 1`; the `alpha` dependence is UNRESOLVED and a
+THIRD convention is missing** (`simcov/battery_bulk41b.py`, `group_a`). 400 causal variants,
+200000 individuals per population, target effects `rho`-correlated with the source vector and
+rescaled to its norm; the observable is the realised OLS slope of the target phenotype on the
+source-weighted score, and `rho` is REMEASURED on the two drawn vectors.
+
+  rho (realised)   alpha   this body   realised slope   sems
+    0.8927          1.0     0.89056       0.88758        1.06
+    0.7058          1.0     0.70498       0.70858        1.61
+    0.5398          1.0     0.53839       0.53862        0.13
+    0.8987          1.6     0.55925       0.90019      119.77
+    0.7313          0.6     1.21862       0.72928      212.19
+
+At `alpha = 1` the body is right. Away from it the measured slope is `rho * bSource` with NO
+`alpha` at all -- 0.900 against `rho = 0.8987`, and 0.729 against `rho = 0.7313`. That is not
+a defect in the transport; it is the OUTCOME scale, which neither this docstring nor the
+symbolic derivation fixes. This design scales the target's residual with its own genetic
+variance, so the target phenotype is standardized too; then `Cov` and `Var` both pick up
+`alpha ^ 2` and it cancels exactly. The body's `1/alpha` is correct only when the target
+phenotype stays on the SOURCE's scale while the score is rescaled. Two conventions were
+written down and a third was not, and the third is the one that decides the answer.
+
+Consumers must state whether `y_T` is standardized in the target or carried on the source's
+scale. Until that is stated the `alpha` factor is not settled by anything, and no simulation
+can settle it, because each convention makes a different design correct. -/
 noncomputable def ancestryRecalibratedSlope (bSource rho alpha : ℝ) : ℝ :=
   rho * (bSource * alpha) / alpha ^ 2
 
 /-- **Recalibration slope under drift model.**
-    If effects change by factor ρ and variance changes by factor α,
-    optimal slope = ρ × b_source / α. -/
+    If effects change by factor ρ and the score's *standard deviation* changes by
+    factor α, optimal slope = ρ × b_source / α.  The α here is the same
+    sd ratio `ancestryRecalibratedSlope` documents, not a variance ratio. -/
 theorem ancestryRecalibratedSlope_eq
     (b_source ρ α : ℝ) (h_α : α ≠ 0) :
     ancestryRecalibratedSlope b_source ρ α = ρ * b_source / α := by
@@ -48,13 +86,50 @@ theorem ancestryRecalibratedSlope_eq
 
 /-- Source `R²` retained after linear recalibration at squared effect correlation `rhoSq`.
 
-Empirical status: UNTESTED. -/
+Empirical status: **VALIDATED** (`simcov/battery_bulk41b.py`, `group_a`). 400 causal variants,
+standardized genotypes, 200000 individuals per population; the observable is the realised
+squared correlation between the source-weighted score and the target phenotype, which is the
+`R²` an optimal linear recalibration attains because rescaling cannot change a correlation.
+`rhoSq` is the REALISED squared correlation between the two effect vectors drawn.
+
+  rho (realised)   alpha   this body   realised R²_target   sems
+    0.8927          1.0     0.39775         0.39646         0.94
+    0.7058          1.0     0.24958         0.25056         1.01
+    0.5398          1.0     0.14510         0.14566         0.93
+    0.8987          1.6     0.40210         0.40537         2.34
+    0.7313          0.6     0.26819         0.26650         1.65
+
+THIS OVERTURNS A RECORDED FALSIFICATION. `simcov/battery_bulk22.py` reported this body
+FALSIFIED at 353 sems, and both design faults behind that number are fixed here. First, that
+battery evaluated the prediction at the NOMINAL `rho` while `m = 400` effect vectors have a
+realised correlation off by about 5%, which at `n = 200000` is hundreds of sems -- carried
+here as the competing reading, it misses by 35 sems. Second, it built the target phenotype as
+`gt + N(0, sqrt(max(1 - Var gt, 1e-6)))`, so at `alpha = 1.6` the genetic variance is 1.28,
+the residual clamped to zero and the target `R²` jumped to 0.82 against a prediction of 0.43
+-- a factor of two that was the clamp. Each cell's residual is scaled to its own genetic
+variance here, so no heritability exceeds one.
+
+Cells in which the two populations have UNEQUAL heritability, run on the same code path
+because in general `R²_target = rho² · h²_target` while `r2Source = h²_source`, also match
+(worst 2.51 sems, 1.05%): at `m = 400` the scatter in the two effect vectors' norms is too
+small to separate the readings. That is a limit of this design, not a licence -- at small `m`
+the equal-heritability condition would bind. -/
 noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
   r2Source * rhoSq
 
 /-- Source `R²` lost to non-recoverable effect turnover.
 
-Empirical status: UNTESTED. -/
+Empirical status: MEASURED, but the MATCH is NOT INDEPENDENT and is recorded as such.
+`simcov/battery_bulk41b.py`, `group_a`, ran this body against the realised
+`r2Source - r2Target` on the same cells that validated `ancestryRecalibratedR2`, and it
+agreed to 2.34 sems and 3.5% relative. That is arithmetic: given `r2Target = r2Source · rhoSq`
+the loss is `r2Source(1 - rhoSq)` identically, so this cell measures nothing the other did
+not. No competing form was carried for it, and a MATCH with no rejected competitor is
+worthless.
+
+What this body adds over the subtraction is the word "non-recoverable", and that is the part
+still untested: the claim is that no linear recalibration recovers this component, which the
+design assumes by measuring `R²` as a squared correlation rather than testing. -/
 noncomputable def effectTurnoverR2Loss (r2Source rhoSq : ℝ) : ℝ :=
   r2Source * (1 - rhoSq)
 
@@ -305,14 +380,33 @@ theorem threshold_shift_changes_prevalence
     Regime: a liability-threshold model, liability = genetic value + noise, the
     threshold placed to give prevalence `K`.
 
-    Empirical status: UNTESTED. The observed-scale `R²` of a
-    liability-threshold genetic value is the variance it explains,
-    `h2 · φ(t)²` with `t = Φ⁻¹(1-K)`, divided by the outcome variance
-    `K(1-K)`.
+    Empirical status: **VALIDATED** (`simcov/battery_bulk22.py`, `group_c`).
+    The observed-scale `R²` of a liability-threshold genetic value is the
+    variance it explains, `h2 · φ(t)²` with `t = Φ⁻¹(1-K)`, divided by the
+    outcome variance `K(1-K)`.
 
-    CORRECTED. The previous body multiplied by `K(1-K)`. That factor is the
+    THIS BODY AS COMPOSED, against the realised observed-scale `R²` of the
+    genetic value over 3×10⁶ individuals, `K` swept fiftyfold:
+
+      h2    K      this body   realised R²
+      0.5   0.01   0.03586     0.03578
+      0.5   0.10   0.17111     0.17106
+      0.5   0.50   0.31831     0.31887
+      0.2   0.05   0.04478     0.04494
+
+    Worst cell 0.4% relative. An earlier write-up recorded the two FACTORS
+    separately -- the numerator against the explained variance at 2.46 sems, the
+    ratio against the `R²` -- which left open whether the composition had been
+    checked. The table above is the composed body, so it is.
+
+    CORRECTED. The previous body MULTIPLIED by `K(1-K)`. That factor is the
     denominator of observed-scale `R²`, while the threshold-density square is
-    part of its numerator.
+    part of its numerator, and the same design falsifies the old form under both
+    available readings: by up to 5316 sems read as an explained variance, and by
+    352 sems read as an `R²` -- in the OPPOSITE direction. That two-sided
+    failure is what shows the error was structural rather than a scale factor,
+    so no constant could have repaired it. Control: the realised prevalence
+    recovers `K`, passing at 0.93 sems.
 
     The old docstring already carried the correct relation in prose -- "`f(K) =
     K(1-K)/φ(Φ⁻¹(K))²`" -- and the body simplified it away. -/

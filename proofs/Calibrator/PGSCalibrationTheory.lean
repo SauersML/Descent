@@ -3086,8 +3086,32 @@ theorem screeningQalyGain_neg_iff
 /-- **Break-even prevalence for a screening operating point.**  This is the prevalence at which
 weighted true-positive benefit balances weighted false-positive harm in the declared model.
 
-Empirical status: UNTESTED. The threshold is derived from the declared linear QALY model; its
-clinical adequacy is not established by data in this corpus. -/
+Empirical status: **VALIDATED against a simulated programme** (`simcov/battery_bulk41b.py`,
+`group_g`). 2×10⁶ individuals at each of 69 prevalences, test outcomes DRAWN at the stated
+sensitivity and specificity rather than computed, net benefit accumulated as benefit per true
+positive minus harm per false positive; the observable is the prevalence at which the MEASURED
+net benefit crosses zero, read by interpolation.
+
+  sens   spec   harm    this body   measured crossing   sems
+  0.90   0.90    1.5     0.14286        0.14281         0.05
+  0.80   0.95    3.0     0.15789        0.15798         0.04
+  0.95   0.70    1.0     0.24000        0.24034         0.64
+  0.70   0.99   20.0     0.22222        0.22303         0.07
+
+Three competing forms are carried on the same cells and all three are refuted: swapping the
+numerator misses by 965 sems, the odds form `(1-spec)·harm/(sens·benefit)` by 140, and
+leaving `spec` uncomplemented by 459. The positive control -- the net benefit at a FIXED
+prevalence against `b·π·sens - h·(1-π)(1-spec)`, a different quantity on the same simulator --
+passes at 0.11 sems.
+
+An earlier design (`battery_bulk40.py`, `group_g`) chose harm-to-benefit ratios that put every
+crossing near π = 0.005 on a grid of spacing 0.0068, so the error bar was 35% of the quantity
+and the odds form matched too. The harm-to-benefit ratios here put the crossing between 0.14
+and 0.24, where the grid resolves it and the odds form separates.
+
+What is validated is the ARITHMETIC of the declared linear QALY model. Its clinical adequacy
+-- whether benefit and harm are commensurable on one scale at all -- is not established by
+data in this corpus and is not the kind of thing this simulation could establish. -/
 noncomputable def screeningBreakEvenPrevalence
     (sens spec benefit harm : ℝ) : ℝ :=
   (1 - spec) * harm / (sens * benefit + (1 - spec) * harm)
