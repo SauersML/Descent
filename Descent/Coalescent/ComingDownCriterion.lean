@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Rates
 import Descent.Coalescent.Lambda
+import Descent.Coalescent.Beta
+import Descent.Coalescent.BranchLength
 import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
 
@@ -43,10 +45,18 @@ their rates (`Descent.Coalescent.Lambda`), with no process to have an entrance l
 condition here is therefore a definition plus a dichotomy, not Schweinsberg's theorem, and
 saying which is which is the point of saying it.
 
-The Bolthausen-Sznitman case is the interesting one and is absent for a stated reason.  Its
-`γ_b` is `b(H_b - 1)`, which grows like `b log b`, so `Σ γ_b⁻¹` diverges and it does not come
-down -- but the divergence of `Σ 1/(b log b)` needs Cauchy condensation, which the corpus
-does not have.  `Descent.Coalescent.Beta` carries its rates.
+The Bolthausen-Sznitman case is the interesting one, and its rate is now computed rather
+than quoted.  `bolthausenSznitman_decrease_term` shows each `k`-fold merger contributes
+exactly `b/k` to `γ_b` -- the binomial, the `k-1` blocks lost, and Beta's
+`(k-2)!(b-k)!/(b-1)!` collapse to that -- so
+
+  `γ_b = Σ_{k=2}^{b} b/k = b (H_b - 1)`,
+
+which is `sum_bolthausenSznitman_rate` against `BranchLength.harmonicSum`.  It grows like
+`b log b`, so `Σ γ_b⁻¹` diverges and the Bolthausen-Sznitman coalescent does not come down
+from infinity.  THAT last step is what is still missing: the divergence of `Σ 1/(b log b)`
+needs Cauchy condensation and a logarithmic bound on `H_b`, neither of which the corpus
+has.  The rate is settled; the summability of its reciprocal is not.
 
 ## Main results
 
@@ -54,11 +64,13 @@ does not have.  `Descent.Coalescent.Beta` carries its rates.
 - `kingman_comesDownFromInfinity`: **Kingman's coalescent satisfies it**.
 - `star_not_comesDownFromInfinity`: **the star coalescent does not**.
 - `comesDownFromInfinity_dichotomy`: the two together, so the condition is seen to separate.
+- `bolthausenSznitman_decrease_term`: **each `k`-merger contributes `b/k`**.
+- `sum_bolthausenSznitman_rate`: hence `γ_b = b(H_b - 1)`.
 -/
 
 namespace Coalescent
 
-open Filter
+open Filter Nat
 
 /-- **Schweinsberg's condition.**  The block count comes down from infinity when the
 reciprocal decrease rates are summable: the time to descend through every level is a
@@ -107,6 +119,78 @@ theorem comesDownFromInfinity_dichotomy :
     comesDownFromInfinity deathRate
       ∧ ¬ comesDownFromInfinity (fun b : ℕ ↦ (b : ℝ) - 1) :=
   ⟨kingman_comesDownFromInfinity, star_not_comesDownFromInfinity⟩
+
+/-! ### The Bolthausen-Sznitman decrease rate -/
+
+/-- **Each `k`-fold merger contributes `b/k` to the decrease rate.**  Written at `k = j+2`
+and `b = j+2+r` so no truncated subtraction appears: the `k-1` blocks lost, the `C(b,k)` sets
+that could merge, and `Descent.Coalescent.Beta`'s `(k-2)!(b-k)!/(b-1)!` collapse to a single
+ratio.
+
+Summing over `k` gives `γ_b = b(H_b - 1)`, which is why the Bolthausen-Sznitman coalescent
+sits at the boundary: `b log b` is just fast enough for the reciprocals to diverge. -/
+theorem bolthausenSznitman_decrease_term (j r : ℕ) :
+    ((j : ℝ) + 1) * (((j + 2 + r).choose (j + 2) : ℕ) : ℝ)
+        * betaCoalescentRate 1 (j + 2 + r) (j + 2)
+      = ((j : ℝ) + 2 + (r : ℝ)) / ((j : ℝ) + 2) := by
+  have hk : 2 ≤ j + 2 := by omega
+  have hkb : j + 2 ≤ j + 2 + r := by omega
+  have hsub1 : j + 2 - 2 = j := by omega
+  have hsub2 : j + 2 + r - (j + 2) = r := by omega
+  have hsub3 : j + 2 + r - 1 = j + 1 + r := by omega
+  have hrate := bolthausenSznitmanRate_eq hk hkb
+  rw [hsub1, hsub2, hsub3] at hrate
+  rw [hrate]
+  have hC : (((j + 2 + r).choose (j + 2) : ℕ) : ℝ) * (((j + 2)! : ℕ) : ℝ) * ((r ! : ℕ) : ℝ)
+      = (((j + 2 + r)! : ℕ) : ℝ) := by
+    have h := Nat.choose_mul_factorial_mul_factorial hkb
+    rw [hsub2] at h
+    exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) h
+  have hf2 : (((j + 2)! : ℕ) : ℝ) = ((j : ℝ) + 2) * (((j + 1)! : ℕ) : ℝ) := by
+    rw [show j + 2 = (j + 1) + 1 from rfl, Nat.factorial_succ]
+    push_cast
+    ring
+  have hf1 : (((j + 1)! : ℕ) : ℝ) = ((j : ℝ) + 1) * ((j ! : ℕ) : ℝ) := by
+    rw [Nat.factorial_succ]
+    push_cast
+    ring
+  have hf3 : (((j + 2 + r)! : ℕ) : ℝ)
+      = ((j : ℝ) + 2 + (r : ℝ)) * (((j + 1 + r)! : ℕ) : ℝ) := by
+    rw [show j + 2 + r = (j + 1 + r) + 1 from by omega, Nat.factorial_succ]
+    push_cast
+    ring
+  have hposj : (0 : ℝ) < ((j ! : ℕ) : ℝ) := by exact_mod_cast Nat.factorial_pos j
+  have hposr : (0 : ℝ) < ((r ! : ℕ) : ℝ) := by exact_mod_cast Nat.factorial_pos r
+  have hposN : (0 : ℝ) < (((j + 1 + r)! : ℕ) : ℝ) := by exact_mod_cast Nat.factorial_pos _
+  have hj2 : (0 : ℝ) < (j : ℝ) + 2 := by positivity
+  rw [hf2, hf1, hf3] at hC
+  have hNne : (((j + 1 + r)! : ℕ) : ℝ) ≠ 0 := ne_of_gt hposN
+  have hj2ne : ((j : ℝ) + 2) ≠ 0 := ne_of_gt hj2
+  field_simp
+  linear_combination hC
+
+/-- **`γ_b = b (H_b - 1)`.**  The sum of the per-merger contributions, against
+`Descent.Coalescent.BranchLength.harmonicSum` -- the same harmonic number that measures the
+tree's total length, appearing now as a rate of descent. -/
+theorem sum_bolthausenSznitman_rate (m : ℕ) :
+    ∑ j ∈ Finset.range m, ((m : ℝ) + 1) / ((j : ℝ) + 2)
+      = ((m : ℝ) + 1) * (harmonicSum (m + 1) - 1) := by
+  have hh : harmonicSum (m + 1) = (∑ j ∈ Finset.range m, 1 / ((j : ℝ) + 2)) + 1 := by
+    unfold harmonicSum
+    rw [Finset.sum_range_succ']
+    have hcongr : ∑ j ∈ Finset.range m, (1 : ℝ) / (((j + 1 : ℕ) : ℝ) + 1)
+        = ∑ j ∈ Finset.range m, 1 / ((j : ℝ) + 2) := by
+      refine Finset.sum_congr rfl fun j _ ↦ ?_
+      push_cast
+      ring
+    rw [hcongr]
+    norm_num
+  rw [hh]
+  have hpull : ((m : ℝ) + 1) * ((∑ j ∈ Finset.range m, 1 / ((j : ℝ) + 2)) + 1 - 1)
+      = ((m : ℝ) + 1) * ∑ j ∈ Finset.range m, 1 / ((j : ℝ) + 2) := by ring
+  rw [hpull, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  ring
 
 end Coalescent
 
