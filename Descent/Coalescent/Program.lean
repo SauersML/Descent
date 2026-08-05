@@ -46,6 +46,43 @@ reads as a covered one.
 * Transit time, entrance boundary, absorption factor: `Rates`.  K-G (5.7)-(5.13), K-C p.239.
 * Ewens (3.8) normalises at `n = 2, 3`: `Mutation.ewensProb_two_total`, `.ewensProb_three_total`.
 
+## The mechanism layer, added after the two papers were covered
+
+The group's first pass proved statements of the form *given this formula, these consequences
+follow*.  Six modules now supply the layer under that -- *this formula follows from this
+explicitly defined stochastic mechanism* -- and they are listed together because the point is
+the layer, not the six results.
+
+* `Coalescent.Pedigree` writes down the sentence K-G section 2 defines the subject with: an
+  explicit sequence of parent maps, an explicit sample, and `ℛ_s` as the kernel of "who is
+  your ancestor `s` generations back".  K-G (2.5), (2.6), (2.7) and the restriction
+  consistency of (7.1) then hold PATHWISE, for every pedigree, with no distributional
+  hypothesis -- they were never facts about a law.  Randomness enters at exactly one place,
+  which pedigree, and `WrightFisher.parentAssignment` is one answer to that.
+* `Coalescent.FamilySize` removes the last modelling assumption from the rate.  For an
+  arbitrary pedigree map, `Σ_j ν_j = N` (K-G (2.1)) is a theorem about functions rather than
+  a constraint on a distribution, the sibling count is `Σ_j ν_j(ν_j - 1)`, and dividing by the
+  ordered pairs gives K-G p.35's `Var(ν₁)/(N-1)`.  Its Wright-Fisher instance reproduces the
+  `1/N` that `WrightFisher` counts off the uniform parent law by a route that never mentions
+  uniformity, and `sameParentCount_id` is the sharp form of what the rate measures: a
+  population where every individual has exactly one child has coalescence probability zero at
+  any size.  Drift is fertility variance, not finiteness.
+* `Coalescent.BranchLength` derives the total length of the tree from the same ladder that
+  gives its height, and gets the opposite behaviour: `E(L_n) = 2 a_{n-1}` diverges while
+  `E(T_n) = 2 - 2/n` is capped.  `height_bounded_length_unbounded` states the pair.
+* `Coalescent.SegregatingSites` puts K-G p.34's Poisson mutation on that tree and reads off
+  Watterson's `E(S_n) = θ a_{n-1}`, the unbiasedness of `θ_W`, `E(π) = θ`, and a mean-zero
+  Tajima numerator.  Each is a consequence of the branch-length sum, not a separate posit.
+* `Coalescent.SiteFrequencySpectrum` adds Fu (1995)'s `E(ξ_i) = θ/i`, ASSERTED because its
+  Pólya-urn count is missing, and subjects it to the check the corpus can make: the classes
+  sum to the derived tree length.  Two consequences that are derived: the spectrum's shape
+  carries no information about `θ`, and singletons are a `1/a_{n-1}` share.
+* `Coalescent.Duality` supplies the only forward-time statement in the group, and the reason
+  any of this describes an allele frequency: `½x(1-x)·(xⁿ)'' = d_n(x^{n-1} - xⁿ)`.  The
+  Wright-Fisher diffusion's generator applied to `xⁿ` in `x` IS the coalescent's block-count
+  generator applied in `n`, so the forward and backward descriptions are one calculation, and
+  the moment hierarchy closes because lineages only merge.
+
 ## Beyond Kingman
 
 The two 1982 papers are not the whole of coalescent theory, and the group no longer stops
