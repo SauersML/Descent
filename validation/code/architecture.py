@@ -26,6 +26,21 @@ the current state is the thing being repaired -- so it licenses every defect tha
 already exists and asks only that no new ones appear.  The counts below are what
 is left to fix, and the gate says so by failing.
 
+WHAT IS REPORTED AND WHAT IS GATED.  Six defect counts must be zero.  Everything
+else is a measurement, and several of them are deliberately ungated because their
+honest target is not zero:
+
+  * `terminal_theorem_pct` -- "61.8% of theorems are terminal" was the headline
+    of the original diagnosis, and on its own it misleads.  A junk-value naming,
+    a reference evaluation, an inhabitation witness and a proved failure are all
+    theorems whose JOB is to be an endpoint.  Giving each a consumer would mean
+    writing a restatement, which is the anti-pattern the duplicate gate exists to
+    stop.  `terminal_deliberate` and `terminal_unclassified` are the split, and
+    only the second is a population a triage could act on.
+  * `externally_silent_modules`, `defs_no_theorem_names`,
+    `imports_naming_nothing_used` -- same shape, each with its reason on the
+    function that computes it.
+
     python3 validation/code/architecture.py            # report
     python3 validation/code/architecture.py --gate     # exit nonzero unless every count is zero
     python3 validation/code/architecture.py --verbose  # name every offender
