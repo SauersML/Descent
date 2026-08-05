@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.ComingDownCriterion
 import Mathlib.Analysis.PSeries
 import Mathlib.NumberTheory.Harmonic.Bounds
+import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Tactic
 
 namespace Descent
@@ -135,8 +136,6 @@ theorem condensed_bertrandTerm {k : ℕ} (hk : 1 ≤ k) :
   have hcast : ((2 ^ k : ℕ) : ℝ) = (2 : ℝ) ^ k := by push_cast; ring
   have hlog : Real.log ((2 ^ k : ℕ) : ℝ) = (k : ℝ) * Real.log 2 := by
     rw [hcast, Real.log_pow]
-    push_cast
-    ring
   unfold bertrandTerm
   simp only [hnot, if_false]
   rw [hlog, hcast]
@@ -152,18 +151,27 @@ theorem condensed_bertrandTerm {k : ℕ} (hk : 1 ≤ k) :
 theorem not_summable_bertrandTerm : ¬ Summable bertrandTerm := by
   rw [← summable_condensed_iff_of_nonneg bertrandTerm_nonneg bertrandTerm_antitone]
   intro hsum
-  have hshift : Summable fun k : ℕ ↦ (2 : ℝ) ^ (k + 1) * bertrandTerm (2 ^ (k + 1)) :=
-    (summable_nat_add_iff 1).mpr hsum
+  have h1 : Summable fun k : ℕ ↦ (2 : ℝ) ^ (k + 1) * bertrandTerm (2 ^ (k + 1)) :=
+    (summable_nat_add_iff (f := fun k : ℕ ↦ (2 : ℝ) ^ k * bertrandTerm (2 ^ k)) 1).mpr hsum
   have hharm : Summable fun k : ℕ ↦ 1 / (((k : ℝ) + 1) * Real.log 2) := by
-    refine hshift.congr fun k ↦ ?_
-    rw [condensed_bertrandTerm (by omega)]
+    refine h1.congr fun k ↦ ?_
+    rw [condensed_bertrandTerm (k := k + 1) (by omega)]
     push_cast
     ring
-  have hlogne : Real.log 2 ≠ 0 := ne_of_gt (Real.log_pos (by norm_num))
-  have hfinal : Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1) := by
-    have := hharm.mul_left (Real.log 2)
-    refine this.congr fun k ↦ ?_
-    field_simp
+  have hl : (0 : ℝ) < Real.log 2 := Real.log_pos (by norm_num)
+  have h2e : (2 : ℝ) < Real.exp 1 := by
+    have h := Real.exp_one_gt_d9
+    linarith
+  have hlog2lt : Real.log 2 < 1 := by
+    have h := Real.log_lt_log (by norm_num : (0 : ℝ) < 2) h2e
+    rwa [Real.log_exp] at h
+  have hcmp : ∀ k : ℕ, 1 / ((k : ℝ) + 1) ≤ 1 / (((k : ℝ) + 1) * Real.log 2) := by
+    intro k
+    have hk : (0 : ℝ) < (k : ℝ) + 1 := by positivity
+    have hle : ((k : ℝ) + 1) * Real.log 2 ≤ (k : ℝ) + 1 := by nlinarith
+    exact one_div_le_one_div_of_le (mul_pos hk hl) hle
+  have hfinal : Summable fun k : ℕ ↦ 1 / ((k : ℝ) + 1) :=
+    Summable.of_nonneg_of_le (fun k ↦ by positivity) hcmp hharm
   have hno := mt (summable_nat_add_iff (f := fun n : ℕ ↦ 1 / (n : ℝ)) 1).mp
     Real.not_summable_one_div_natCast
   refine hno ?_

@@ -148,16 +148,25 @@ step" are different states.
   K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
   exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix
   form for models with separated time scales, and Skorokhod convergence of the processes.
-* **Schweinsberg's criterion** -- CLOSED as a criterion.
-  `Coalescent.ComingDownCriterion` defines `Σ γ_b⁻¹ < ∞` and proves it separates the family:
-  Kingman satisfies it, the star coalescent `Λ = δ₁` does not.  STILL ABSENT: the equivalence
-  itself, which is a theorem about a process this corpus has only at rate level, and the
-  Bolthausen-Sznitman case, whose `γ_b = b(H_b-1)` needs Cauchy condensation.
-* **The lookdown construction** -- CLOSED for what it is for.  `Coalescent.Lookdown` proves
-  the level structure's consistency pathwise: below the cut restriction commutes with looking
-  down, at or above it the operation is invisible.  That is why all `n` coalescents fit on one
-  space without a projective limit.  STILL ABSENT: the Poisson clocks that make the resulting
-  partition process a coalescent.
+* **Schweinsberg's criterion** -- CLOSED as a criterion, on all three named members.
+  `Coalescent.ComingDownCriterion` defines `Σ γ_b⁻¹ < ∞`, proves Kingman satisfies it and the
+  star coalescent `Λ = δ₁` does not, and computes the Bolthausen-Sznitman rate:
+  each `k`-merger contributes `b/k`, so `γ_b = b(H_b - 1)`.  `Coalescent.BertrandDescent`
+  finishes that case -- `γ_b ≤ b log b` from Mathlib's `H_n ≤ 1 + log n`, and `Σ 1/(b log b)`
+  diverges by Cauchy condensation, the condensed sum collapsing to a multiple of the harmonic
+  series.  So both sides of the criterion are inhabited by named coalescents.  STILL ABSENT:
+  the equivalence itself, which is a theorem about a process this corpus has only at rate
+  level.
+* **The lookdown construction** -- CLOSED for what it is for, with its clocks.
+  `Coalescent.Lookdown` proves the level structure's consistency pathwise: below the cut
+  restriction commutes with looking down, at or above it the operation is invisible.  That is
+  why all `n` coalescents fit on one space without a projective limit.
+  `Coalescent.LookdownClocks` supplies the driving clocks from `CompetingRates`: the covers of
+  `Δ` are the `C(n,2)` pairs of levels, `C(n,2)` unit-rate clocks survive to `t` with
+  probability `e^{-d_n t}`, and the density of "this pair at this time" factorises with the
+  same first factor for every pair -- minimum exponential at rate `d_n`, argmin uniform.
+  STILL ABSENT: the composition of the path-level law `Law.coalescentLaw` with the level maps,
+  which is bookkeeping over pairs rather than covers and is not the same arithmetic twice.
 * **Spatial coalescents** -- CLOSED at the mechanism.  `Coalescent.SpatialCoalescent` proves
   the voter-model duality `c_t = c₀ ∘ A_t` by induction, presents the dual AS a pedigree so
   that `Pedigree`'s structure theorems transfer unchanged, and reduces pairwise coalescence to
