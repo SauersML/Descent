@@ -201,8 +201,8 @@ theorem kingmanSpectrum_identifiabilityBoundary :
       ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
         ∃ direction : Fin (n + 1) → ℝ,
           direction ≠ 0 ∧ observation direction = 0 :=
-  ⟨SpectrumIdentifiability.summable_one_div_coalescentRate,
-    fun _ observation ↦ SpectrumIdentifiability.exists_invisible_perturbation observation⟩
+  ⟨Blindness.SpectrumIdentifiability.summable_one_div_coalescentRate,
+    fun _ observation ↦ Blindness.SpectrumIdentifiability.exists_invisible_perturbation observation⟩
 
 /-- **The usable positive boundary for demographic inference.** A linear demographic target
 is determined by the SFS on an admissible history class exactly when every admissible history
@@ -224,10 +224,10 @@ theorem demographicTarget_identifiable_iff_nullDirections_annihilated
 ratio `(1 + θ²) / (1 - θ²)`. -/
 theorem demographicSieveConditioning_exactBase
     (θ : ℝ) (hθ0 : 0 < θ) (hθ1 : θ < 1)
-    (hstationary : SpectrumIdentifiability.CauchyConditioningStationary θ) :
-    Real.exp (SpectrumIdentifiability.cauchyConditioningProfile θ / 2) =
+    (hstationary : Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ) :
+    Real.exp (Blindness.SpectrumIdentifiability.cauchyConditioningProfile θ / 2) =
       (1 + θ ^ 2) / (1 - θ ^ 2) :=
-  SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
+  Blindness.SpectrumIdentifiability.exp_half_cauchyConditioningProfile_at_stationary
     θ hθ0 hθ1 hstationary
 
 /-! ## Multiple-merger genealogy: pairwise blindness -/

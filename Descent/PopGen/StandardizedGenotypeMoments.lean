@@ -589,7 +589,7 @@ the design fixed means.
 parameter.
 
 Empirical status: UNTESTED. A field update on a design; no modelling content and no free -/
-def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDesign n ι)
+def _root_.Descent.Blindness.GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDesign n ι)
     (model : Fin n → HardyWeinbergModel) : Blindness.GenotypeDesign n ι :=
   { design with model := model }
 
@@ -597,7 +597,7 @@ def GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDe
 re-modelling moves the coordinate law and leaves the combinatorics alone, so the
 interaction order of every tested set is unchanged. Without this, `reModel` is a record
 update no statement distinguishes from an arbitrary design. -/
-@[simp] theorem GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
+@[simp] theorem _root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
     (design : Blindness.GenotypeDesign n ι) (model : Fin n → HardyWeinbergModel) (s : ι) :
     (design.reModel model).interactionOrder s = design.interactionOrder s := rfl
 

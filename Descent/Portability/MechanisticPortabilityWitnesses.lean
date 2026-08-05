@@ -1141,13 +1141,13 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     r2FromSourceWeights
       (timeVaryingEffectGenerationalModel.toMetricModelAt 1) Pop.target = 1 / 8 := by
   repeat' constructor
-  · PopGen.ext i j
+  · ext i j
     fin_cases i
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
-  · PopGen.ext i j
+  · ext i j
     fin_cases i
     fin_cases j
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,

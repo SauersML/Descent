@@ -309,8 +309,8 @@ on `T / τ`.
 /-- Pullback of test functions along a continuous self-map of the parameter space. -/
 noncomputable def pullback (τ : C(T, T)) : C(T, ℝ) →ₗ[ℝ] C(T, ℝ) where
   toFun f := f.comp τ
-  map_add' _ _ := by PopGen.ext t; rfl
-  map_smul' _ _ := by PopGen.ext t; rfl
+  map_add' _ _ := by ext t; rfl
+  map_smul' _ _ := by ext t; rfl
 
 @[simp] theorem pullback_apply (τ : C(T, T)) (f : C(T, ℝ)) (t : T) :
     pullback τ f t = f (τ t) := rfl
@@ -383,7 +383,7 @@ theorem evenPart_add_oddPart (τ : C(T, T)) (κ : C(T, ℝ) →ₗ[ℝ] ℝ) :
 theorem isTauEven_evenPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauEven τ (evenPart τ κ) := by
   ext f
-  have hff : pullback τ (pullback τ f) = f := by PopGen.ext t; simp [hinv t]
+  have hff : pullback τ (pullback τ f) = f := by ext t; simp [hinv t]
   simp only [evenPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.add_apply, smul_eq_mul]
   rw [hff]
@@ -393,7 +393,7 @@ theorem isTauEven_evenPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
 theorem isTauOdd_oddPart {τ : C(T, T)} (hinv : ∀ t : T, τ (τ t) = t)
     (κ : C(T, ℝ) →ₗ[ℝ] ℝ) : IsTauOdd τ (oddPart τ κ) := by
   ext f
-  have hff : pullback τ (pullback τ f) = f := by PopGen.ext t; simp [hinv t]
+  have hff : pullback τ (pullback τ f) = f := by ext t; simp [hinv t]
   simp only [oddPart, LinearMap.comp_apply, LinearMap.smul_apply,
     LinearMap.sub_apply, LinearMap.neg_apply, smul_eq_mul]
   rw [hff]
@@ -475,7 +475,7 @@ theorem tauEven_eq_of_agree_on_symmetricFns {τ : C(T, T)} (hinv : ∀ t : T, τ
   -- Split `f` into its `τ`-invariant and `τ`-anti-invariant parts.
   set g : C(T, ℝ) := (2 : ℝ)⁻¹ • (f + pullback τ f) with hg
   set h : C(T, ℝ) := (2 : ℝ)⁻¹ • (f - pullback τ f) with hh
-  have hsum : g + h = f := by PopGen.ext t; simp [hg, hh]; ring
+  have hsum : g + h = f := by ext t; simp [hg, hh]; ring
   have hginv : IsInvariantFn τ g := by
     intro t
     simp only [hg, ContinuousMap.smul_apply, ContinuousMap.add_apply, pullback_apply,

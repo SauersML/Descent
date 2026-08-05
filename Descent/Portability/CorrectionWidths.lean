@@ -56,7 +56,7 @@ def FactorsThroughObservation (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H) : Pr
 
 /-- The zero correction factors through every observation. -/
 theorem FactorsThroughObservation.zero (A : H →ₗ[𝕜] Y) : FactorsThroughObservation A 0 := by
-  exact ⟨0, by PopGen.ext; simp⟩
+  exact ⟨0, by ext; simp⟩
 
 /-- Factored corrections are closed under addition. -/
 theorem FactorsThroughObservation.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[𝕜] H)
@@ -64,14 +64,14 @@ theorem FactorsThroughObservation.add (A : H →ₗ[𝕜] Y) (C D : H →ₗ[�
     FactorsThroughObservation A (C + D) := by
   rcases hC with ⟨T, rfl⟩
   rcases hD with ⟨S, rfl⟩
-  exact ⟨T + S, by PopGen.ext; simp⟩
+  exact ⟨T + S, by ext; simp⟩
 
 /-- Factored corrections are closed under scalar multiplication. -/
 theorem FactorsThroughObservation.smul (A : H →ₗ[𝕜] Y) (C : H →ₗ[𝕜] H)
     (hC : FactorsThroughObservation A C) (c : 𝕜) :
     FactorsThroughObservation A (c • C) := by
   rcases hC with ⟨T, rfl⟩
-  exact ⟨c • T, by PopGen.ext; simp⟩
+  exact ⟨c • T, by ext; simp⟩
 
 /-- The corrections factoring through a fixed observation form a linear subspace of all
 endomorphisms. -/
@@ -95,7 +95,7 @@ theorem FactorsThroughObservation.postcomp (A : H →ₗ[𝕜] Y) (C R : H →�
     (hC : FactorsThroughObservation A C) :
     FactorsThroughObservation A (R.comp C) := by
   rcases hC with ⟨T, rfl⟩
-  exact ⟨R.comp T, by PopGen.ext; simp⟩
+  exact ⟨R.comp T, by ext; simp⟩
 
 /-- The factor-through submodule is closed under arbitrary output-side postcomposition. -/
 theorem factorsThroughSubmodule_postcomp_mem

@@ -544,18 +544,8 @@ def main():
                 continue
             head = a["type"].split()[0] if a["type"].split() else ""
             sd = by_struct.get(head.split(".")[-1])
-            # AN ENUMERATION IS AN INDEX, NOT A RECORD.  `Pop` is declared with
-            # constructors and no fields, so it appears in `structures` and used
-            # to be handed to `struct_value`, which returned the empty dict --
-            # every field it could refuse, it refused, because there are none.
-            # That `{}` then arrived where the body indexes a table (`m.beta P`)
-            # and raised "index {} is not a finite-type index", or worse landed
-            # in arithmetic as "unsupported operand type(s)".  `structval` wins
-            # over `argtypes` in `build_args`, so the correct inhabitant --
-            # `type_value`'s `randrange(2)`, an actual population -- was never
-            # reached.  Skipping the enumerations here is what lets it be.
-            if head.split(".")[-1] in admissible.enum_cards(_ALL_STRUCTS):
-                continue
+            # Enumerations are ruled out inside `build_args`, for every
+            # caller at once -- see `admissible._is_index_enum`.
             if sd is not None:
                 for n in a["names"]:
                     structval[pyname(n)] = sd

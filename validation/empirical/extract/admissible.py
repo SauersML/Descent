@@ -650,6 +650,30 @@ def vector_value(spec, lo, hi, rng, dim=VECTOR_DIM):
     return [[rng.uniform(lo, hi) for _ in range(dim)] for _ in range(dim)]
 
 
+def _is_index_enum(sdecl, structs):
+    """Is this declaration an ENUMERATION being used as an index type?
+
+    `Pop` is declared with constructors and no fields, so a caller scanning
+    argument types for "the head names a structure" finds it and files it as a
+    structure argument.  `struct_value` then returns `{}` -- every field it
+    could inhabit, it refused, because there are none -- and that empty dict
+    reaches a body that indexes a table by population.
+
+    THIS BELONGS HERE AND NOT IN THE CALLERS.  `build_args` promises that
+    "`emit.py`'s self-check and a downstream check see the SAME argument values
+    and cannot disagree about whether a definition evaluates".  Fixing it in
+    `emit.py` alone broke exactly that promise: self-check reported the
+    definition fine while `verify.py`, which builds `structval` the same way,
+    still handed it `{}` and reported "int() argument must be ... not 'dict'".
+    Ruling it out here is what makes the two agree again.
+    """
+    cards = enum_cards(structs)
+    for key in (sdecl.get("short"), sdecl.get("name")):
+        if key and (key in cards or key.split(".")[-1] in cards):
+            return True
+    return False
+
+
 def build_args(argnames, pt, structval, vecspec, rng, structs=None,
                argtypes=None):
     """Positional arguments for a generated callable, in signature order.
@@ -671,7 +695,8 @@ def build_args(argnames, pt, structval, vecspec, rng, structs=None,
     for a in argnames:
         if vecspec and a in vecspec:
             out.append(vector_value(vecspec[a], 0.05, 1.0, rng))
-        elif structval and a in structval:
+        elif structval and a in structval and not _is_index_enum(structval[a],
+                                                                 structs):
             out.append(struct_value(structval[a], rng, structs))
         elif a in pt:
             out.append(pt[a])           # a sampled scalar, box-constrained

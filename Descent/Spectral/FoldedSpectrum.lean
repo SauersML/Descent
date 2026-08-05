@@ -335,7 +335,7 @@ theorem diploid_massAt_reflect (q v : ℝ) :
   rw [hmod, hmass]
 
 /-- The panel with every frequency reflected: `q ↦ 1 - q` at every locus. -/
-def Panel.reflect {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
+def _root_.Descent.Blindness.Panel.reflect {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
   { support := fun i ↦ 1 - panel.support i, weight := panel.weight }
 
 /-- **THE ALLELE-LABEL GAUGE THEOREM (the folded spectrum).**
@@ -374,12 +374,12 @@ theorem reflection_odd_in_kernel {n : ℕ} (panel : Blindness.Panel n) (v : ℝ)
 /-! ## 3. Folding to minor allele frequency -/
 
 /-- The folded panel: every locus moved to `min q (1-q)`, its minor allele frequency. -/
-noncomputable def Panel.fold {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
+noncomputable def _root_.Descent.Blindness.Panel.fold {n : ℕ} (panel : Blindness.Panel n) : Blindness.Panel n :=
   { support := fun i ↦ min (panel.support i) (1 - panel.support i),
     weight := panel.weight }
 
 /-- Folding chooses the same canonical representative from both allele-label orientations. -/
-theorem Panel.reflect_fold {n : ℕ} (panel : Blindness.Panel n) :
+theorem _root_.Descent.Blindness.Panel.reflect_fold {n : ℕ} (panel : Blindness.Panel n) :
     panel.reflect.fold = panel.fold := by
   cases panel with
   | mk support weight =>
@@ -423,7 +423,7 @@ theorem fold_support_nonneg {n : ℕ} (panel : Blindness.Panel n) (i : Fin n)
 
 /-- **Folding is a projection on admissible allele-frequency panels.** Once every locus has been
 moved to minor-allele frequency, folding again changes neither its support nor its weights. -/
-theorem Panel.fold_idempotent {n : ℕ} (panel : Blindness.Panel n)
+theorem _root_.Descent.Blindness.Panel.fold_idempotent {n : ℕ} (panel : Blindness.Panel n)
     (h0 : ∀ i, 0 ≤ panel.support i) (h1 : ∀ i, panel.support i ≤ 1) :
     panel.fold.fold = panel.fold := by
   cases panel with

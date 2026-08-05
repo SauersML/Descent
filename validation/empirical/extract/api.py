@@ -191,8 +191,26 @@ def _by_short():
 
 
 def resolve(short: str) -> str:
-    """Bare name -> fully-qualified name.  Raises if absent or ambiguous."""
+    """Bare name -> fully-qualified name.  Raises if absent or ambiguous.
+
+    A NAME RECORDED UNDER AN OLD NAMESPACE STILL NAMES ITS DECLARATION.  The
+    corpus was one flat `Descent` namespace and is being split per subsystem,
+    so `Descent.cumulativeDrift` is now `Descent.PopGen.cumulativeDrift`.  Every
+    fully-qualified name stored in a results file before the split went stale at
+    once -- 56 of the 62 in `differential/results.json` -- and `verify.py` died
+    on the first one it looked up. Those results are measurements that were
+    actually taken; the declaration they were taken against still exists and has
+    only moved.
+
+    So a qualified name that does not resolve is retried on its LAST component.
+    Ambiguity is still an error, which is what keeps this from silently picking
+    the wrong declaration when a split puts the same short name in two
+    namespaces, and a name matching nothing is still an error, which is what
+    keeps a DELETED declaration from being quietly forgiven.
+    """
     cands = _by_short().get(short, [])
+    if not cands and "." in short:
+        cands = _by_short().get(short.split(".")[-1], [])
     if not cands:
         raise KeyError(f"no definition named {short!r}")
     if len(cands) > 1:

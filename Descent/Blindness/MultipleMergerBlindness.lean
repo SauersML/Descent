@@ -982,4 +982,4 @@ theorem pulled_semipushed_reciprocal_dichotomy
   ⟨not_summable_one_div_criticallyPulledLinearRateLadder coefficient hcoefficient,
     summable_one_div_stablePowerRateLadder alpha halpha⟩
 
-end Descent
+end Descent.Blindness

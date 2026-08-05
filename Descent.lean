@@ -546,7 +546,7 @@ theorem source_erm_solves_source_not_target_normal_equations :
     sigmaT2.mulVec wS ≠ PopGen.ldWitnessTargetCross := by
   intro wS
   refine ⟨?_, ?_⟩
-  · PopGen.ext i
+  · ext i
     fin_cases i
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
     · simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
@@ -568,8 +568,8 @@ theorem source_target_erm_differ_proved :
     wS ≠ wT := by
   intro wS wT
   refine ⟨?_, ?_, ?_⟩
-  · PopGen.ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
-  · PopGen.ext i
+  · ext i; fin_cases i <;> simp [wS, sigmaS, crossS, Matrix.mulVec, dotProduct]
+  · ext i
     fin_cases i <;>
       simp [wT, sigmaT, PopGen.ldWitnessTargetCross, Matrix.mulVec, dotProduct] <;> ring
   · intro heq

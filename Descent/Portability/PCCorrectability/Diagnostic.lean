@@ -355,7 +355,7 @@ theorem more_exact_population_pcs_reduce_modeled_residual
     split_ifs with h1 h2
     · exact le_refl _
     · exfalso
-      exact PopGen.AssortativeMatingModel.h2 (lt_trans (Nat.lt_succ_self k) h1)
+      exact h2 (lt_trans (Nat.lt_succ_self k) h1)
     · exact le_of_lt (h_eig_pos i)
     · exact le_refl _
   · have hk1_bound : k + 1 < p := by

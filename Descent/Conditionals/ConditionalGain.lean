@@ -112,11 +112,11 @@ theorem conditionalGainFunctional_ge_of_freshness_decay {m : ℕ}
     (fresh : Equiv.Perm (Fin m) → ℕ → ℝ) (θ γ s : ℝ)
     (hpos : 0 < C.characteristicAmplitude s)
     (hbound : C.characteristicAmplitude s ≤
-      Real.exp (-(θ * γ * BundleRigidity.effDim fresh))) :
-    ((θ * γ * BundleRigidity.effDim fresh : ℝ) : WithTop ℝ) ≤
+      Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh))) :
+    ((θ * γ * Blindness.BundleRigidity.effDim fresh : ℝ) : WithTop ℝ) ≤
       C.conditionalGainFunctional s := by
   have hlog : Real.log (C.characteristicAmplitude s) ≤
-      -(θ * γ * BundleRigidity.effDim fresh) :=
+      -(θ * γ * Blindness.BundleRigidity.effDim fresh) :=
     (Real.log_le_iff_le_exp hpos).mpr hbound
   rw [C.conditionalGainFunctional_eq_coe (ne_of_gt hpos), WithTop.coe_le_coe]
   linarith
@@ -148,7 +148,7 @@ theorem conditionalGainFunctional_ge_linear_of_uniform_factor
     (hbound : C.characteristicAmplitude s ≤ ρ ^ steps) :
     (((steps : ℝ) * Real.log (1 / ρ) : ℝ) : WithTop ℝ) ≤
       C.conditionalGainFunctional s := by
-  have hgain := BundleRigidity.linear_gain_of_uniform_factor ρ
+  have hgain := Blindness.BundleRigidity.linear_gain_of_uniform_factor ρ
     (C.characteristicAmplitude s) steps hpos hbound
   rw [C.conditionalGainFunctional_eq_coe (ne_of_gt hpos), WithTop.coe_le_coe]
   linarith

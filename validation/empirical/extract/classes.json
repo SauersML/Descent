@@ -1248,7 +1248,7 @@
     "∀ σ k, fresh σ k = 1",
     "dimSum fresh σ = effDim fresh",
     "∀ k, θ * fresh σ k * γ ≤ 1",
-    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh"
+    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.BundleRigidity.effDim_attained": [],
@@ -1267,7 +1267,7 @@
      "∀ k, θ * fresh σ k * γ ≤ 1"
     ],
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_of_freshness_decay": [
-     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh"
+     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh"
     ]
    },
    "range_lo_thm": [
@@ -6414,7 +6414,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.singleLocus_tower_collapses",
-   "Descent.Spectral.Panel.reflect_fold",
+   "Descent.Spectral.Core.Panel.reflect_fold",
    "Descent.Spectral.foldedSpectrum_gauge",
    "Descent.Spectral.reflection_odd_in_kernel"
   ],
@@ -6435,7 +6435,7 @@
     ],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Panel.reflect_fold": []
+    "Descent.Spectral.Core.Panel.reflect_fold": []
    }
   }
  },
@@ -6455,7 +6455,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.no_macroscopic_interaction_term_of_tilted_tail",
-   "Descent.PopGen.GenotypeDesign.reModel_interactionOrder"
+   "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder"
   ],
   "constraints": {
    "hypotheses": [
@@ -6469,7 +6469,7 @@
      "∑ s, coefficient s ^ 2 = 1",
      "∀ s, jumpProbability s ≤ tiltConstant * coefficient s ^ 2 / (threshold ^ 2 * Real.sqrt (interactionOrder s"
     ],
-    "Descent.PopGen.GenotypeDesign.reModel_interactionOrder": []
+    "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder": []
    }
   }
  },
@@ -14180,7 +14180,6 @@
     "0 < θ",
     "θ < 1",
     "CauchyConditioningStationary θ",
-    "SpectrumIdentifiability.CauchyConditioningStationary θ",
     "Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ"
    ],
    "hypotheses_by_theorem": {
@@ -14207,7 +14206,7 @@
     "Descent.Conditionals.demographicSieveConditioning_exactBase": [
      "0 < θ",
      "θ < 1",
-     "SpectrumIdentifiability.CauchyConditioningStationary θ"
+     "Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ"
     ],
     "Descent.PopGen.canonicalGenomeMultiplierForEpochCoordinates_succ_at_stationary": [
      "0 < θ",
@@ -14255,7 +14254,6 @@
     "0 < θ",
     "θ < 1",
     "CauchyConditioningStationary θ",
-    "SpectrumIdentifiability.CauchyConditioningStationary θ",
     "Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ"
    ],
    "hypotheses_by_theorem": {
@@ -14274,7 +14272,7 @@
     "Descent.Conditionals.demographicSieveConditioning_exactBase": [
      "0 < θ",
      "θ < 1",
-     "SpectrumIdentifiability.CauchyConditioningStationary θ"
+     "Blindness.SpectrumIdentifiability.CauchyConditioningStationary θ"
     ],
     "Descent.PopGen.canonicalGenomeMultiplierForEpochCoordinates_succ_at_stationary": [
      "0 < θ",
@@ -29647,7 +29645,7 @@
     "C.characteristicAmplitude s = 0",
     "C.characteristicAmplitude s ≠ 0",
     "0 < C.characteristicAmplitude s",
-    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh",
+    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh",
     "C.characteristicAmplitude s ≤ ρ ^ steps"
    ],
    "hypotheses_by_theorem": {
@@ -29661,7 +29659,7 @@
     ],
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_of_freshness_decay": [
      "0 < C.characteristicAmplitude s",
-     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh"
+     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh"
     ],
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_linear_of_uniform_factor": [
      "0 < C.characteristicAmplitude s",
@@ -29706,7 +29704,7 @@
     "C.characteristicAmplitude s = 0",
     "C.characteristicAmplitude s ≠ 0",
     "0 < C.characteristicAmplitude s",
-    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh",
+    "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh",
     "C.characteristicAmplitude s ≤ ρ ^ steps"
    ],
    "hypotheses_by_theorem": {
@@ -29719,7 +29717,7 @@
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_zero": [],
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_of_freshness_decay": [
      "0 < C.characteristicAmplitude s",
-     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * BundleRigidity.effDim fresh"
+     "C.characteristicAmplitude s ≤ Real.exp (-(θ * γ * Blindness.BundleRigidity.effDim fresh"
     ],
     "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_linear_of_uniform_factor": [
      "0 < C.characteristicAmplitude s",
@@ -52654,8 +52652,8 @@
    "Descent.Portability.ldPanelRetentionFraction_mem",
    "Descent.Portability.ldTightLinkage_le_ldBlockDetectionShare",
    "Descent.Portability.pruning_loses_detection_iff_whiteningGain_exceeds_one",
-   "Descent.Spectral.Panel.fold_idempotent",
-   "Descent.Spectral.Panel.reflect_fold",
+   "Descent.Spectral.Core.Panel.fold_idempotent",
+   "Descent.Spectral.Core.Panel.reflect_fold",
    "Descent.Spectral.fold_preserves_modulusLaw",
    "Descent.Spectral.fold_support_le_half",
    "Descent.Spectral.fold_support_nonneg",
@@ -52687,11 +52685,11 @@
     "Descent.Portability.ldTightLinkage_le_ldBlockDetectionShare": [],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Panel.reflect_fold": [],
+    "Descent.Spectral.Core.Panel.reflect_fold": [],
     "Descent.Spectral.fold_preserves_modulusLaw": [],
     "Descent.Spectral.fold_support_le_half": [],
     "Descent.Spectral.fold_support_nonneg": [],
-    "Descent.Spectral.Panel.fold_idempotent": [],
+    "Descent.Spectral.Core.Panel.fold_idempotent": [],
     "Descent.Spectral.not_separating_of_frequencyTie": [],
     "Descent.Spectral.frequencyTie_gives_kernel": [],
     "Descent.Spectral.readsThroughFunctionals_of_linearCombination": [],
@@ -72874,7 +72872,7 @@
    }
   }
  },
- "Descent.PopGen.GenotypeDesign.reModel": {
+ "Descent.PopGen.Blindness.GenotypeDesign.reModel": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/PopGen/StandardizedGenotypeMoments.lean",
@@ -72896,7 +72894,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.PopGen.GenotypeDesign.reModel_interactionOrder"
+   "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder"
   ],
   "constraints": {
    "declared_kind": "frequency",
@@ -72904,7 +72902,7 @@
    "declared_hi": 1.0,
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Descent.PopGen.GenotypeDesign.reModel_interactionOrder": []
+    "Descent.PopGen.Blindness.GenotypeDesign.reModel_interactionOrder": []
    }
   }
  },
@@ -121146,7 +121144,7 @@
    }
   }
  },
- "Descent.Spectral.Panel.reflect": {
+ "Descent.Spectral.Core.Panel.reflect": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/FoldedSpectrum.lean",
@@ -121162,7 +121160,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.singleLocus_tower_collapses",
-   "Descent.Spectral.Panel.reflect_fold",
+   "Descent.Spectral.Core.Panel.reflect_fold",
    "Descent.Spectral.foldedSpectrum_gauge",
    "Descent.Spectral.reflection_odd_in_kernel"
   ],
@@ -121175,11 +121173,11 @@
     "Descent.Blindness.singleLocus_tower_collapses": [],
     "Descent.Spectral.foldedSpectrum_gauge": [],
     "Descent.Spectral.reflection_odd_in_kernel": [],
-    "Descent.Spectral.Panel.reflect_fold": []
+    "Descent.Spectral.Core.Panel.reflect_fold": []
    }
   }
  },
- "Descent.Spectral.Panel.fold": {
+ "Descent.Spectral.Core.Panel.fold": {
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Spectral/FoldedSpectrum.lean",
@@ -121194,8 +121192,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Spectral.Panel.fold_idempotent",
-   "Descent.Spectral.Panel.reflect_fold",
+   "Descent.Spectral.Core.Panel.fold_idempotent",
+   "Descent.Spectral.Core.Panel.reflect_fold",
    "Descent.Spectral.fold_preserves_modulusLaw",
    "Descent.Spectral.fold_support_le_half",
    "Descent.Spectral.fold_support_nonneg"
@@ -121211,14 +121209,14 @@
     "∀ i, panel.support i ≤ 1"
    ],
    "hypotheses_by_theorem": {
-    "Descent.Spectral.Panel.reflect_fold": [],
+    "Descent.Spectral.Core.Panel.reflect_fold": [],
     "Descent.Spectral.fold_preserves_modulusLaw": [],
     "Descent.Spectral.fold_support_le_half": [],
     "Descent.Spectral.fold_support_nonneg": [
      "0 ≤ panel.support i",
      "panel.support i ≤ 1"
     ],
-    "Descent.Spectral.Panel.fold_idempotent": [
+    "Descent.Spectral.Core.Panel.fold_idempotent": [
      "∀ i, 0 ≤ panel.support i",
      "∀ i, panel.support i ≤ 1"
     ]
