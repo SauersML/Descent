@@ -947,6 +947,97 @@ RELATIONS = {
         scales("g", -1),
     ],
 
+    # --- TARGETED: definitions whose verdict is weakest -------------------
+    # Selected by verdict rather than by module. Two populations are worth more
+    # than the next alphabetical sweep: bodies still marked FALSIFIED, where a
+    # relation either survives a correction (evidence the correction kept the
+    # right structure) or fails it (evidence it did not); and bodies with NO
+    # verdict at all, which nothing in the corpus can contradict today.
+
+    # STILL FALSIFIED. `d / (d + 4·Nₑ·σ²·m²)`.
+    "Calibrator.steppingStoneFstQuadratic": [
+        # σ² and m both enter SQUARED, so they are interchangeable. This is a
+        # true relation and a diagnostic one: `symbolic` showed the extra power
+        # of m is what is wrong with this body, and the symmetry is that error's
+        # signature. A stepping-stone F_ST with σ² and m entering at different
+        # powers -- which is what the correction must produce -- will FAIL this
+        # relation, and that failure is the confirmation that the body moved.
+        # When it is corrected, move this entry to EXPECTED_VIOLATIONS rather
+        # than deleting it, exactly as was done for ldCorrelationDecay.
+        symmetric_in("m", "σ_sq"),
+    ],
+    # STILL FALSIFIED. Coalescent time in a serial-founder chain.
+    "Calibrator.serialFounderWithinTime": [
+        # Every argument is a time or a population size, so scaling all three
+        # together is a change of time unit and must scale the answer by exactly
+        # that factor. This holds for the current body and must hold for any
+        # replacement: a coalescent time that did not rescale would be reporting
+        # generations in one place and coalescent units in another. A relation
+        # that constrains the REPAIR as well as the current body is the most
+        # useful thing to declare on a falsified quantity.
+        jointly_scales(["N", "Nanc", "tAnc"], 1),
+    ],
+
+    # NO VERDICT AT ALL: the scoring-rule core of Conclusions.lean. Every one of
+    # these is invariant under relabelling which outcome counts as the event --
+    # `p ↦ 1-p` together with `π ↦ 1-π` -- because a proper scoring rule cannot
+    # depend on which of two complementary outcomes you decided to call success.
+    #
+    # This is the relation that would have caught the `π`-binder extraction bug
+    # directly, and on the definition where it originated. With `π` shadowed by
+    # the constant, `expectedBrierScore(1-p, 1-π)` no longer equals
+    # `expectedBrierScore(p, π)` at any p other than one half, because only one
+    # of the two arguments is really being complemented.
+    "Calibrator.brierScore": [
+        symmetric_in("p", "y"),
+        jointly_scales(["p", "y"], 2),
+        even_under_negation(["p", "y"]),
+    ],
+    "Calibrator.expectedBrierScore": [
+        invariant_under_allele_swap(["p", "π"]),
+    ],
+    "Calibrator.bernoulliLogLoss": [
+        invariant_under_allele_swap(["p", "q"]),
+    ],
+    "Calibrator.bernoulliKLReal": [
+        invariant_under_allele_swap(["p", "q"]),
+    ],
+    "Calibrator.brierBernoulliRisk": [
+        invariant_under_allele_swap(["η", "q"]),
+    ],
+    "Calibrator.logBernoulliRisk": [
+        invariant_under_allele_swap(["η", "q"]),
+    ],
+
+    # NO VERDICT AT ALL: the shrinkage family of BayesianPGSTheory.
+    "Calibrator.gaussianPosteriorShrinkage": [
+        # `nh/(nh+1)` reads only the product, so sample size and heritability
+        # are interchangeable -- twice the sample at half the heritability
+        # shrinks identically.
+        symmetric_in("n", "h"),
+    ],
+    "Calibrator.jamesSteinMSE": [
+        # Both terms are variances in the same unit.
+        jointly_scales(["σ_sq", "β_sq"], 1),
+    ],
+    "Calibrator.optimalShrinkage": [
+        # A weight in [0,1]: scale-free in the two variances.
+        jointly_scales(["σ_sq", "β_sq"], 0),
+    ],
+    "Calibrator.snpShrinkage": [
+        jointly_scales(["σ", "τ"], 0),
+    ],
+    "Calibrator.misspecExcessRisk": [
+        scales("σ_β_sq", 1),
+        # π(1-π) is even about one half, so the excess risk does not care which
+        # outcome is called the event.
+        invariant_under_allele_swap(["π"]),
+    ],
+    "Calibrator.posteriorPredictiveVariance": [
+        symmetric_in("residual_var", "estimation_var"),
+        jointly_scales(["residual_var", "estimation_var"], 1),
+    ],
+
     "Calibrator.recessiveMutationSelectionDriftParameter": [
         scales("Ne", 1),
         symmetric_in("mu", "s"),
@@ -1225,6 +1316,18 @@ NO_RELATIONS = {
         "No relation in this table's vocabulary can carry a scaling whose "
         "exponent is itself an argument -- which is precisely why α is the "
         "parameter the architecture literature argues about.",
+
+    # --- TARGETED, still FALSIFIED, and a second vocabulary gap -------------
+    "Calibrator.maxSafeEpistaticOrder":
+        "log N / hweMellinDrift q. The relation this body DOES satisfy is under "
+        "N ↦ N^c, which multiplies the answer by c -- a scaling of the "
+        "LOGARITHM of an argument, not of the argument. Every kind in this table "
+        "transforms arguments multiplicatively or by complement, so none of them "
+        "can carry it, and declaring a plain `scales('N', k)` would assert "
+        "something false. This is the second vocabulary gap found by targeting "
+        "weak verdicts rather than sweeping modules; the first was "
+        "reflection-about-an-anchor (see calibrationSlopeDeviation below). Both "
+        "are recorded rather than approximated.",
 
     # --- PGSCalibrationTheory ----------------------------------------------
     "Calibrator.calibrationSlopeDeviation":
