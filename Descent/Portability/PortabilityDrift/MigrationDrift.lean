@@ -1,7 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PortabilityDrift.Definitions
 import Descent.Portability.PortabilityDrift.MutationDrift
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 namespace Descent.Portability
 
@@ -18,12 +20,13 @@ Part of the split of `Portability/PortabilityDrift.lean`, which was 9,208 lines 
 declarations -- the largest file in the corpus by both measures, and large enough that
 nothing in it could be read without reading past most of it.
 
-The parts are a CHAIN: each imports the one before, in the order the original was written.
-That is the conservative choice, deliberately. A monolith's declarations depend on each
-other in whatever order they happen to appear, and cutting it into modules that import only
-what they use means discovering that order first -- worth doing, and not what this does.
-The chain preserves every resolution the single file had, so the split cannot change what
-any proof sees.
+The parts are a FAN, not a chain. The head carries the definitions and every import the
+subsystem draws on from outside it; each other part imports the head and whichever siblings
+actually declare the names it uses. The split first laid the parts out as a chain, each
+importing the one before in the order the original was written, which made every part
+transitively downstream of everything written earlier -- so the depth of the corpus was a
+function of the length of a file rather than of what depends on what. The order here was
+recovered by resolving each name a part references back to the sibling that declares it.
 
 Sections are reopened and reclosed by name where a cut falls inside one: the original
 opened `section PortabilityDrift` and closed it 8,000 lines later. A section scopes
