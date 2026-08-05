@@ -565,6 +565,22 @@ def main():
             elif isinstance(v, bool) or (isinstance(v, (int, float))
                                          and math.isfinite(v)):
                 ok += 1
+            elif callable(v) or isinstance(v, (list, tuple)):
+                # A FUNCTION OR VECTOR VALUE IS A LEGITIMATE RESULT, by exactly
+                # the argument made for structure values above.  `momentInvariant
+                # : ℕ → ℝ`, `constantOneVector : Coordinate → ℝ` and
+                # `rankOneCovarianceBump : Matrix ι ι ℝ` all translate correctly
+                # and all evaluated without error -- what came back is a callable
+                # or a sequence rather than a scalar, which is what their return
+                # types say.  Judging that "not a real number" reported 63
+                # definitions the harness CAN evaluate as unevaluable, and took
+                # everything that applies or indexes them down with them.
+                #
+                # This does not claim the value is right.  Neither does the dict
+                # branch: what both record is that an executable form exists and
+                # produced something of the shape its type declares.  A wrong
+                # scalar is caught by a battery, and so is a wrong vector.
+                ok += 1
             else:
                 err = err or f"value is not a real number: {type(v).__name__}"
         selfcheck[d["name"]] = {"finite_points": ok, "total_points": len(pts),

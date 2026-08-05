@@ -406,7 +406,7 @@ def ldOrientationFourthInvariant(ld):
     return entryFourthSum(ld)
 
 def coalescentRate(m):
-    return pairCount(m)
+    return Descent_Core_pairCount(m)
 
 def cauchyConditioningProfile(θ):
     return (2.0 * ((((_rt.rlog(((1.0 + _rt.lpow(θ, 2.0)))) + (((θ - 1.0)) * _rt.rlog(((1.0 - θ))))) - (((1.0 + θ)) * _rt.rlog(((1.0 + θ))))) + ((2.0 * θ) * _rt.arctan((_rt.rdiv(1.0, θ)))))))
@@ -690,6 +690,9 @@ def colourIndicator(Z, r, i):
 def pairTime(c, p, t_3, t_2):
     return (t_3 if (p == c) else (t_3 + t_2))
 
+def pairTime4(s, p, t_4, t_3, t_2):
+    return (t_4 if (p == 0.0) else ((t_4 + t_3) if (((((s == 0.0) and (p == 5.0))) or (((s == 1.0) and (((p == 1.0) or (p == 3.0)))))) or (((s == 2.0) and (((p == 2.0) or (p == 4.0)))))) else ((t_4 + t_3) + t_2)))
+
 def transitTime(n, hold):
     return descentTime(n, hold, 1.0)
 
@@ -697,7 +700,7 @@ def pathState(n, chain, hold, t):
     return chain((blockCountAt(n, hold, t)))
 
 def deathRate(k):
-    return pairCount(k)
+    return Descent_Core_pairCount(k)
 
 def survivalFactor(x):
     return _rt.rdiv((((x) - 1.0)), (((x) + 1.0)))
@@ -785,6 +788,24 @@ def meanTimeDiff(M):
 
 def fstFromMigration(M):
     return _rt.rdiv(((meanTimeDiff(M) - meanTimeSame(M))), meanTimeDiff(M))
+
+def sharedPath3(c, p, q, t_3, t_2):
+    return (t_3 if ((c == p) or (c == q)) else (t_3 + (2.0 * t_2)))
+
+def sharedPath4(s, d, t_3, t_2):
+    return (0.0 if (d == 0.0) else ((t_3 + (2.0 * t_2)) if (s == 0.0) else t_3))
+
+def Descent_Coalescent_pairCount(n):
+    return _rt.rdiv((n * ((n - 1.0))), 2.0)
+
+def sharingCount(n):
+    return _rt.rdiv(((n * ((n - 1.0))) * ((n - 2.0))), 2.0)
+
+def disjointCount(n):
+    return _rt.rdiv((((n * ((n - 1.0))) * ((n - 2.0))) * ((n - 3.0))), 8.0)
+
+def varPairwiseFromTree(θ, n):
+    return ((_rt.rdiv((((Descent_Coalescent_pairCount(n) + sharingCount(n)) + ((_rt.rdiv(2.0, 3.0)) * disjointCount(n)))), _rt.lpow(Descent_Coalescent_pairCount(n), 2.0)) * θ) + (_rt.rdiv(((Descent_Coalescent_pairCount(n) + (2.0 * ((_rt.rdiv(sharingCount(n), 3.0) + ((_rt.rdiv(2.0, 9.0)) * disjointCount(n))))))), _rt.lpow(Descent_Coalescent_pairCount(n), 2.0)) * _rt.lpow(θ, 2.0)))
 
 def relativeSize(β, t):
     return _rt.rexp(((-((β * t)))))
@@ -1242,7 +1263,7 @@ def product3(a, b, c):
 def pairedEpochCount(k):
     return ((2.0 * k) - 2.0)
 
-def pairCount(k):
+def Descent_Core_pairCount(k):
     return _rt.rdiv(((k) * (((k) - 1.0))), 2.0)
 
 def halfLineageRate(k, x):

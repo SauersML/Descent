@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:c7d5259d171b18a0d5877ae673d374ad",
- "source_files": 208,
+ "source_digest": "sha256:873900b4300df2f6584b4457cca7a602",
+ "source_files": 209,
  "collisions": {},
  "theorems": [
   {
@@ -15437,6 +15437,44 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.sum_disjointProducts",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 197,
+   "statement": "(s : Fin 3) (t₄ t₃ t₂ : ℝ) : pairTime4 s 0 t₄ t₃ t₂ * pairTime4 s 5 t₄ t₃ t₂ + pairTime4 s 1 t₄ t₃ t₂ * pairTime4 s 4 t₄ t₃ t₂ + pairTime4 s 2 t₄ t₃ t₂ * pairTime4 s 3 t₄ t₃ t₂ = if s = 0 then t₄ * (t₄ + t₃) + 2 * (t₄ + t₃ + t₂) ^ 2 else t₄ * (t₄ + t₃ + t₂) + 2 * (t₄ + t₃) * (t₄ + t₃ + t₂)",
+   "mentions": [
+    "pairTime4"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_over_second_merger",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 207,
+   "statement": "(t₄ t₃ t₂ : ℝ) : (t₄ * (t₄ + t₃) + 2 * (t₄ + t₃ + t₂) ^ 2) + 2 * (t₄ * (t₄ + t₃ + t₂) + 2 * (t₄ + t₃) * (t₄ + t₃ + t₂)) = 9 * t₄ ^ 2 + 6 * t₃ ^ 2 + 2 * t₂ ^ 2 + 15 * (t₄ * t₃) + 10 * (t₄ * t₂) + 8 * (t₃ * t₂)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.expected_disjoint_pairTime_product",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 222,
+   "statement": "{e4 e4sq e3 e3sq e2 e2sq : ℝ} (h4 : e4 = 1 / 6) (h4sq : e4sq = 1 / 18) (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2) : (9 * e4sq + 6 * e3sq + 2 * e2sq + 15 * (e4 * e3) + 10 * (e4 * e2) + 8 * (e3 * e2)) / 9 = 11 / 9",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.covariance_disjoint_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 233,
+   "statement": "{e4 e4sq e3 e3sq e2 e2sq : ℝ} (h4 : e4 = 1 / 6) (h4sq : e4sq = 1 / 18) (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2) : (9 * e4sq + 6 * e3sq + 2 * e2sq + 15 * (e4 * e3) + 10 * (e4 * e2) + 8 * (e3 * e2)) / 9 - 1 = 2 / 9",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
    "name": "Descent.Coalescent.descentTime_self",
    "kind": "theorem",
    "file": "Descent/Coalescent/Path.lean",
@@ -15833,7 +15871,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 395,
+   "line": 398,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : (∑ nu ∈ Finset.Ico 1 lam, lam.choose nu) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -15841,7 +15879,7 @@
    "name": "Descent.Coalescent.two_mul_cutCount_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 413,
+   "line": 416,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : 2 * (2 ^ (lam - 1) - 1) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -15849,7 +15887,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 427,
+   "line": 430,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : ∑ nu ∈ Finset.Ico 1 lam, lam.choose nu = 2 * (2 ^ (lam - 1) - 1)",
    "mentions": []
   },
@@ -15857,7 +15895,7 @@
    "name": "Descent.Coalescent.cutCount_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 434,
+   "line": 437,
    "statement": ": 2 ^ (2 - 1) - 1 = 1",
    "mentions": []
   },
@@ -15865,7 +15903,7 @@
    "name": "Descent.Coalescent.cutCount_three",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 437,
+   "line": 440,
    "statement": ": 2 ^ (3 - 1) - 1 = 3",
    "mentions": []
   },
@@ -16943,7 +16981,7 @@
    "name": "Descent.Coalescent.varPairwise_two_eq",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 264,
+   "line": 265,
    "statement": "(θ : ℝ) : tajimaVarPairwise θ 2 = varSegregatingSites θ 2",
    "mentions": [
     "tajimaVarPairwise",
@@ -17469,6 +17507,99 @@
    "statement": ": Tendsto (fun M : ℝ => fstFromMigration M) atTop (nhds 0)",
    "mentions": [
     "fstFromMigration"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_sharedPath3",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 85,
+   "statement": "(c : Fin 3) (t₃ t₂ : ℝ) : sharedPath3 c 0 1 t₃ t₂ + sharedPath3 c 0 2 t₃ t₂ + sharedPath3 c 1 2 t₃ t₂ = 3 * t₃ + 2 * t₂",
+   "mentions": [
+    "sharedPath3"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 93,
+   "statement": "(c c' : Fin 3) (t₃ t₂ : ℝ) : sharedPath3 c 0 1 t₃ t₂ + sharedPath3 c 0 2 t₃ t₂ + sharedPath3 c 1 2 t₃ t₂ = ∑ p : Fin 3, pairTime c' p t₃ t₂",
+   "mentions": [
+    "pairTime",
+    "sharedPath3"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.expected_sharedPath3",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 100,
+   "statement": "{e3 e2 : ℝ} (h3 : e3 = 1 / 3) (h2 : e2 = 1) : (3 * e3 + 2 * e2) / 3 = 1",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_sharedPath4",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 121,
+   "statement": "(s : Fin 3) (t₃ t₂ : ℝ) : sharedPath4 s 0 t₃ t₂ + sharedPath4 s 1 t₃ t₂ + sharedPath4 s 2 t₃ t₂ = if s = 0 then 2 * t₃ + 4 * t₂ else 2 * t₃",
+   "mentions": [
+    "sharedPath4"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_over_second_merger_sharedPath4",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 127,
+   "statement": "(t₃ t₂ : ℝ) : (2 * t₃ + 4 * t₂) + 2 * (2 * t₃) = 6 * t₃ + 4 * t₂",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.expected_sharedPath4",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 133,
+   "statement": "{e3 e2 : ℝ} (h3 : e3 = 1 / 3) (h2 : e2 = 1) : (6 * e3 + 4 * e2) / 9 = 2 / 3",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.count_split",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 154,
+   "statement": "(n : ℝ) : sharingCount n + disjointCount n = pairCount n * (pairCount n - 1) / 2",
+   "mentions": [
+    "disjointCount",
+    "pairCount",
+    "sharingCount"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 182,
+   "statement": "{n : ℕ} (hn : 2 ≤ n) (θ : ℝ) : varPairwiseFromTree θ (n : ℝ) = tajimaVarPairwise θ n",
+   "mentions": [
+    "tajimaVarPairwise",
+    "varPairwiseFromTree"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.varPairwiseFromTree_two",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 193,
+   "statement": "(θ : ℝ) : varPairwiseFromTree θ (2 : ℝ) = varSegregatingSites θ 2",
+   "mentions": [
+    "varPairwiseFromTree",
+    "varSegregatingSites"
    ]
   },
   {
@@ -66728,7 +66859,7 @@
    "name": "Descent.pioneerWeightFraction_eq_fstFromTau",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 203,
+   "line": 204,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = fstFromTau w",
    "mentions": [
     "fstFromTau",
@@ -66739,7 +66870,7 @@
    "name": "Descent.pioneerWeightFraction_eq_sharedLDFromMigration",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 208,
+   "line": 209,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w",
    "mentions": [
     "pioneerWeightFraction",
@@ -66750,7 +66881,7 @@
    "name": "Descent.ogpOverlapProfile_eq_populationOverlapProfile",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 229,
+   "line": 230,
    "statement": "(q x : ℝ) : ogpOverlapProfile q x = populationOverlapProfile q x",
    "mentions": [
     "ogpOverlapProfile",
@@ -66761,7 +66892,7 @@
    "name": "Descent.epochSampleSize_eq_epochLineageSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 233,
+   "line": 234,
    "statement": "(K : ℕ) : epochSampleSize K = epochLineageSampleSize K",
    "mentions": [
     "epochLineageSampleSize",
@@ -66772,7 +66903,7 @@
    "name": "Descent.configurationOverlap_and_transplantSqNorm_are_dotProduct",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 243,
+   "line": 244,
    "statement": "(configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) : configurationOverlap configuration configuration = dotProduct configuration configuration ∧ transplantSqNorm displacement = dotProduct displacement displacement",
    "mentions": [
     "TwoCoordinateConfiguration",
@@ -66785,7 +66916,7 @@
    "name": "Descent.stayKernel_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 251,
+   "line": 252,
    "statement": "(i j : Fin 2) : stayKernel i j = oneHotWeight (R := ℝ) i j",
    "mentions": [
     "oneHotWeight",
@@ -66796,7 +66927,7 @@
    "name": "Descent.persistentTransition_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 259,
+   "line": 260,
    "statement": "(x y : BinaryBiologicalState) : persistentTransition x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66808,7 +66939,7 @@
    "name": "Descent.contextMatchQuality_eq_persistentTransition",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 267,
+   "line": 268,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = persistentTransition x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66820,7 +66951,7 @@
    "name": "Descent.contextMatchQuality_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 271,
+   "line": 272,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66832,7 +66963,7 @@
    "name": "Descent.stableSieveDimension_eq_criticalDegree",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 277,
+   "line": 278,
    "statement": "(kappa L : ℝ) : SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa",
    "mentions": [
     "criticalDegree",
@@ -66844,7 +66975,7 @@
    "name": "Descent.two_le_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 429,
+   "line": 430,
    "statement": ": (2 : ℕ) ≤ 2",
    "mentions": []
   },
@@ -66852,7 +66983,7 @@
    "name": "Descent.twoLocusCoalescent_covariance_gap_lower_bound_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 447,
+   "line": 448,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_time : tSource ≤ tTarget) : 2 * (ibdWeight * discreteRecombinationSurvival recombRate tSource * (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤ frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "discreteRecombinationSurvival",
@@ -66865,7 +66996,7 @@
    "name": "Descent.covariance_mismatch_pos_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 461,
+   "line": 462,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : 0 < frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "frobeniusNormSq",
@@ -66877,7 +67008,7 @@
    "name": "Descent.expectedBrierScore_deriv_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 479,
+   "line": 480,
    "statement": "(p π : ℝ) : deriv (fun x ↦ expectedBrierScore x π) p = 2 * (p - π)",
    "mentions": [
     "expectedBrierScore"
@@ -66887,7 +67018,7 @@
    "name": "Descent.overlapEnergyTruth_eq_crossS",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 493,
+   "line": 494,
    "statement": ": overlapEnergyTruth = crossS",
    "mentions": [
     "crossS",
@@ -66898,7 +67029,7 @@
    "name": "Descent.overlapEnergyPositive_eq_reorderScore",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 496,
+   "line": 497,
    "statement": ": overlapEnergyPositive = reorderScore",
    "mentions": [
     "overlapEnergyPositive",
@@ -66909,7 +67040,7 @@
    "name": "Descent.overlapEnergyPositive_eq_twoAncestryConditional",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 499,
+   "line": 500,
    "statement": ": overlapEnergyPositive = twoAncestryConditional",
    "mentions": [
     "overlapEnergyPositive",
@@ -66920,7 +67051,7 @@
    "name": "Descent.sigmaT_mulVec_crossS_eq_ldWitnessTargetCross",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 520,
+   "line": 521,
    "statement": ": sigmaT.mulVec crossS = ldWitnessTargetCross",
    "mentions": [
     "crossS",
@@ -66931,7 +67062,7 @@
    "name": "Descent.source_erm_solves_source_not_target_normal_equations",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 529,
+   "line": 530,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -66939,7 +67070,7 @@
    "name": "Descent.source_target_erm_differ_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 549,
+   "line": 550,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -66947,7 +67078,7 @@
    "name": "Descent.target_r2_drop_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 567,
+   "line": 568,
    "statement": "(mseSource mseTarget varY lam : ℝ) (ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_mse_gap_lb : lam * frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤ mseTarget - mseSource) (h_lam_pos : 0 < lam) (h_varY_pos : 0 < varY) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : r2FromMSE mseTarget varY < r2FromMSE mseSource varY",
    "mentions": [
     "frobeniusNormSq",
@@ -66960,7 +67091,7 @@
    "name": "Descent.ld_decay_implies_nonlinear_calibration_of_exp_tagging",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 636,
+   "line": 637,
    "statement": "{k : ℕ} [Fintype (Fin k)] (mech : LDDecayMechanism k) (lambda : ℝ) (h_lambda_pos : 0 < lambda) (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d)) (c0 c1 c2 : Fin k → ℝ) (hd0 : mech.distance c0 = 0) (hd1 : mech.distance c1 = 1) (hd2 : mech.distance c2 = 2) : ∀ (beta0 beta1 : ℝ), (fun c ↦ beta0 + beta1 * mech.distance c) ≠ (fun c ↦ decaySlope mech c)",
    "mentions": [
     "decaySlope"
@@ -66970,7 +67101,7 @@
    "name": "Descent.additive_score_subcritical_at_balanced_locus_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 726,
+   "line": 727,
    "statement": ": 1 < maxSafeEpistaticOrder 1000000 (1 / 2)",
    "mentions": [
     "maxSafeEpistaticOrder"
@@ -66980,7 +67111,7 @@
    "name": "Descent.pairwise_epistasis_supercritical_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 737,
+   "line": 738,
    "statement": ": ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Real.log 1000000 < 2 * hweMellinDrift q",
    "mentions": [
     "hweMellinDrift"
@@ -66990,7 +67121,7 @@
    "name": "Descent.hardCall_lattice_inflation_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 744,
+   "line": 745,
    "statement": ": 1 < latticeInflation hardCallLatticeSpan",
    "mentions": [
     "hardCallLatticeSpan",
@@ -67001,7 +67132,7 @@
    "name": "Descent.frustration_floor_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 751,
+   "line": 752,
    "statement": ": (0.127 : ℝ) < expanderAgreementFloor",
    "mentions": [
     "expanderAgreementFloor"
@@ -67011,7 +67142,7 @@
    "name": "Descent.chargedTuples_one_slot_iff",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 771,
+   "line": 772,
    "statement": "{T : Type*} [TopologicalSpace T] {d : ℕ} (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) : t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v) ↔ t 0 ∈ F.coverers S v",
    "mentions": [
     "S",
@@ -67023,7 +67154,7 @@
    "name": "Descent.singleModulus_atom_sq_eq_realizability_atom_sq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 787,
+   "line": 788,
    "statement": "{d : ℕ} {v : ℝ} (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) : S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨ S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2",
    "mentions": [
     "S",
@@ -67035,7 +67166,7 @@
    "name": "Descent.sampleCost_eq_fixedGradeBenchmarkSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 807,
+   "line": 808,
    "statement": "(η C : ℝ) (k : ℕ) (hη : 0 < η) (hC : 0 < C) : BundleRigidity.sampleCost η C k = fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1",
    "mentions": [
     "fixedGradeBenchmarkSampleSize",
@@ -67046,7 +67177,7 @@
    "name": "Descent.intensity_eq_charFnSq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 830,
+   "line": 831,
    "statement": "{n : ℕ} (P : PhasePanel n) (s : ℝ) : P.intensity s = charFnSq P.weight P.phase s",
    "mentions": [
     "charFnSq",
@@ -96386,14 +96517,70 @@
      "Descent.Coalescent.sum_pairTime": [],
      "Descent.Coalescent.sum_sq_pairTime": [],
      "Descent.Coalescent.cross_pairTime": [],
-     "Descent.Coalescent.pairTime_symmetric_sums_topology_free": []
+     "Descent.Coalescent.pairTime_symmetric_sums_topology_free": [],
+     "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime": []
     }
    },
    "mentioned_by": [
     "Descent.Coalescent.cross_pairTime",
     "Descent.Coalescent.pairTime_symmetric_sums_topology_free",
     "Descent.Coalescent.sum_pairTime",
+    "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime",
     "Descent.Coalescent.sum_sq_pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.pairTime4",
+   "decl_name": "pairTime4",
+   "short": "pairTime4",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 188,
+   "signature": "(s : Fin 3) (p : Fin 6) (t₄ t₃ t₂ : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "s"
+     ],
+     "type": "Fin 3",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "p"
+     ],
+     "type": "Fin 6",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t₄",
+      "t₃",
+      "t₂"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if p = 0 then t₄\n  else if (s = 0 ∧ p = 5) ∨ (s = 1 ∧ (p = 1 ∨ p = 3)) ∨ (s = 2 ∧ (p = 2 ∨ p = 4)) then\n    t₄ + t₃\n  else t₄ + t₃ + t₂",
+   "docstring": "The pairwise times of a four-sample whose first merger is the pair `01`, indexed by the\nsecond merger `s` (`0` balanced, `1` and `2` the two caterpillars).\n\nEmpirical status: NOT AN EMPIRICAL CLAIM.  As in `pairTime`, it reads the tree off the jump\nchain and the clock.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.sum_disjointProducts": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.sum_disjointProducts"
    ]
   },
   {
@@ -99086,10 +99273,12 @@
       "0 ≤ θ",
       "1 ≤ harmonicSum (n - 1"
      ],
-     "Descent.Coalescent.varPairwise_two_eq": []
+     "Descent.Coalescent.varPairwise_two_eq": [],
+     "Descent.Coalescent.varPairwiseFromTree_two": []
     }
    },
    "mentioned_by": [
+    "Descent.Coalescent.varPairwiseFromTree_two",
     "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varSegregatingSites_eq_totalVariance",
     "Descent.Coalescent.varSegregatingSites_nonneg",
@@ -99160,7 +99349,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 252,
+   "line": 253,
    "signature": "(θ : ℝ) (n : ℕ) : ℝ",
    "args": [
     {
@@ -99182,8 +99371,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ\n    + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ ^ 2",
-   "docstring": "Tajima (1989)'s expression for `Var(π)`:\n`(n+1)/(3(n-1)) · θ + 2(n²+n+3)/(9n(n-1)) · θ²`.\n\nEmpirical status: ASSERTED, with referent Tajima (1989, Genetics 123, 585-595).  It is\nwritten here to be CHECKED, not used: `varPairwise_two_eq` is the one sample size at which\nthis corpus can verify it, and the general case is recorded as open in\n`Descent.Coalescent.Program`.  Nothing in the corpus depends on this definition.",
-   "empirical_status": "ASSERTED",
+   "docstring": "Tajima (1989)'s expression for `Var(π)`:\n`(n+1)/(3(n-1)) · θ + 2(n²+n+3)/(9n(n-1)) · θ²`.\n\nEmpirical status: DERIVED, in `Descent.Coalescent.TajimaVariance`.  It was written here to be\nCHECKED -- `varPairwise_two_eq` verifies it at `n = 2` -- and\n`TajimaVariance.varPairwiseFromTree_eq_tajima` now derives it for every `n ≥ 2` from the\ntree: the per-pair variance, the two coalescence-time covariances, the two shared-path\nlengths, and the counts of the pair classes.",
+   "empirical_status": "DERIVED",
    "namespace": "Descent.Coalescent",
    "fields": [],
    "equations": [],
@@ -99191,12 +99380,18 @@
     "declared_kind": "nonnegative",
     "declared_lo": 0.0,
     "declared_hi": null,
-    "hypotheses": [],
+    "hypotheses": [
+     "2 ≤ n"
+    ],
     "hypotheses_by_theorem": {
-     "Descent.Coalescent.varPairwise_two_eq": []
+     "Descent.Coalescent.varPairwise_two_eq": [],
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+      "2 ≤ n"
+     ]
     }
    },
    "mentioned_by": [
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
     "Descent.Coalescent.varPairwise_two_eq"
    ]
   },
@@ -101012,6 +101207,327 @@
     "Descent.Coalescent.fstFromMigration_antitone",
     "Descent.Coalescent.fstFromMigration_eq",
     "Descent.Coalescent.tendsto_fstFromMigration"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sharedPath3",
+   "decl_name": "sharedPath3",
+   "short": "sharedPath3",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 80,
+   "signature": "(c p q : Fin 3) (t₃ t₂ : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "c",
+      "p",
+      "q"
+     ],
+     "type": "Fin 3",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t₃",
+      "t₂"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if c = p ∨ c = q then t₃ else t₃ + 2 * t₂",
+   "docstring": "The length of the tree shared by the paths of two pairs `p ≠ q` that meet in a lineage,\nin a three-sample whose first merger is the pair `c`.\n\nIf either pair is the one that merges first, the shared part is the single branch below their\ncommon ancestor, of length `τ₃`.  If not -- the two long pairs -- the shared part is the edge\nabove the first cherry and the branch down to the odd leaf, `τ₃ + 2τ₂`.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM.  It reads the tree off the jump chain and the\nclock, as `pairTime` does.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.sum_sharedPath3": [],
+     "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.sum_sharedPath3",
+    "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sharedPath4",
+   "decl_name": "sharedPath4",
+   "short": "sharedPath4",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 116,
+   "signature": "(s d : Fin 3) (t₃ t₂ : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "s",
+      "d"
+     ],
+     "type": "Fin 3",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t₃",
+      "t₂"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if d = 0 then 0 else if s = 0 then t₃ + 2 * t₂ else t₃",
+   "docstring": "The shared length of two DISJOINT pairs in a four-sample whose first merger is `01` and\nwhose second merger is `s`, for the pairing `d` (`0` is `(01,23)`, `1` is `(02,13)`, `2` is\n`(03,12)`).\n\nThe pairing that respects the first cherry shares nothing.  The other two traverse the edge\nabove the first cherry; in the balanced tree they also traverse the edge above the second, so\nthey share `τ₃ + 2τ₂` rather than `τ₃`.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM, for the reason `sharedPath3` carries.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.sum_sharedPath4": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.sum_sharedPath4"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.pairCount",
+   "decl_name": "pairCount",
+   "short": "pairCount",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 141,
+   "signature": "(n : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " n * (n - 1) / 2",
+   "docstring": "`C(n,2)`, the number of pairs.",
+   "empirical_status": "",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "k ≤ n",
+     "2 ≤ n"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.SpectrumIdentifiability.coalescentRate_two": [],
+     "Descent.SpectrumIdentifiability.coalescentRate_three": [],
+     "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
+     "Descent.Coalescent.expectedSegmentLength_eq": [],
+     "Descent.Coalescent.sum_range_neg_cast": [],
+     "Descent.Coalescent.duality_identity": [],
+     "Descent.Coalescent.jumpProb_eq": [],
+     "Descent.Coalescent.jumpCoeff_recursion": [
+      "k ≤ n"
+     ],
+     "Descent.Coalescent.deathRate_eq_coalescentRate": [],
+     "Descent.Coalescent.deathRate_zero": [],
+     "Descent.Coalescent.deathRate_one": [],
+     "Descent.Coalescent.deathRate_two": [],
+     "Descent.Coalescent.deathRate_three": [],
+     "Descent.Coalescent.deathRate_succ_succ": [],
+     "Descent.Coalescent.survivalFactor_partialProd": [],
+     "Descent.Coalescent.branchDeathRatio_eq": [],
+     "Descent.Coalescent.branchRate_lt_deathRate": [],
+     "Descent.Coalescent.card_covers_eq_deathRate": [],
+     "Descent.Coalescent.count_split": [],
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+      "2 ≤ n"
+     ],
+     "Descent.Coalescent.one_le_deathRate_succ_succ": [],
+     "Descent.Coalescent.sum_range_div_eq_deathRate": [],
+     "Descent.Core.pairCount_one": [],
+     "Descent.Core.pairCount_two": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.branchDeathRatio_eq",
+    "Descent.Coalescent.branchRate_lt_deathRate",
+    "Descent.Coalescent.card_covers_eq_deathRate",
+    "Descent.Coalescent.count_split",
+    "Descent.Coalescent.deathRate_eq_coalescentRate",
+    "Descent.Coalescent.deathRate_one",
+    "Descent.Coalescent.deathRate_succ_succ",
+    "Descent.Coalescent.deathRate_three",
+    "Descent.Coalescent.deathRate_two",
+    "Descent.Coalescent.deathRate_zero",
+    "Descent.Coalescent.duality_identity",
+    "Descent.Coalescent.expectedSegmentLength_eq",
+    "Descent.Coalescent.jumpCoeff_recursion",
+    "Descent.Coalescent.jumpProb_eq",
+    "Descent.Coalescent.one_le_deathRate_succ_succ",
+    "Descent.Coalescent.sum_range_div_eq_deathRate",
+    "Descent.Coalescent.sum_range_neg_cast",
+    "Descent.Coalescent.survivalFactor_partialProd",
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
+    "Descent.Core.pairCount_one",
+    "Descent.Core.pairCount_two",
+    "Descent.SpectrumIdentifiability.coalescentRate_add_two",
+    "Descent.SpectrumIdentifiability.coalescentRate_three",
+    "Descent.SpectrumIdentifiability.coalescentRate_two"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sharingCount",
+   "decl_name": "sharingCount",
+   "short": "sharingCount",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 145,
+   "signature": "(n : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " n * (n - 1) * (n - 2) / 2",
+   "docstring": "The number of unordered pairs-of-pairs sharing exactly one lineage: choose the shared\nlineage, then two others.",
+   "empirical_status": "",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "2 ≤ n"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.count_split": [],
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+      "2 ≤ n"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.count_split",
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.disjointCount",
+   "decl_name": "disjointCount",
+   "short": "disjointCount",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 149,
+   "signature": "(n : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " n * (n - 1) * (n - 2) * (n - 3) / 8",
+   "docstring": "The number of unordered pairs-of-pairs that are disjoint: choose four lineages, then one\nof the three ways to split them.",
+   "empirical_status": "",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "2 ≤ n"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.count_split": [],
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+      "2 ≤ n"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.count_split",
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.varPairwiseFromTree",
+   "decl_name": "varPairwiseFromTree",
+   "short": "varPairwiseFromTree",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/TajimaVariance.lean",
+   "line": 169,
+   "signature": "(θ : ℝ) (n : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (pairCount n + sharingCount n + (2 / 3) * disjointCount n) / pairCount n ^ 2 * θ\n    + (pairCount n + 2 * (sharingCount n / 3 + (2 / 9) * disjointCount n))\n        / pairCount n ^ 2 * θ ^ 2",
+   "docstring": "`Var(π)` assembled from the tree: the per-pair variance `θ + θ²`, plus the covariances of\nthe two classes weighted by their counts, all over `C²`.\n\nEmpirical status: DERIVED.  Every constant in it is proved: `E(T) = Var(T) = 1` from the\nexponential clock, `Cov = 1/3` and `E(S) = 1` for sharing pairs, `Cov = 2/9` and `E(S) = 2/3`\nfor disjoint ones.  What is ASSUMED, as everywhere in this group, is that the holding times\nare independent -- `Descent.Coalescent.Program` item 4 -- and that mutation is Poisson at rate\n`θ/2` along the branches, flagged at `SegregatingSites.expectedSegregatingSites`.",
+   "empirical_status": "DERIVED",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "2 ≤ n"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+      "2 ≤ n"
+     ],
+     "Descent.Coalescent.varPairwiseFromTree_two": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
+    "Descent.Coalescent.varPairwiseFromTree_two"
    ]
   },
   {
@@ -115901,6 +116417,8 @@
       "sigma < (k : ℝ"
      ],
      "Descent.Coalescent.card_covers_eq_deathRate": [],
+     "Descent.Coalescent.count_split": [],
+     "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [],
      "Descent.Coalescent.one_le_deathRate_succ_succ": [],
      "Descent.Coalescent.sum_range_div_eq_deathRate": [],
      "Descent.Core.pairCount_one": [],
@@ -115911,6 +116429,7 @@
     "Descent.Coalescent.branchDeathRatio_eq",
     "Descent.Coalescent.branchRate_lt_deathRate",
     "Descent.Coalescent.card_covers_eq_deathRate",
+    "Descent.Coalescent.count_split",
     "Descent.Coalescent.deathRate_eq_coalescentRate",
     "Descent.Coalescent.deathRate_one",
     "Descent.Coalescent.deathRate_succ_succ",
@@ -115925,6 +116444,7 @@
     "Descent.Coalescent.sum_range_div_eq_deathRate",
     "Descent.Coalescent.sum_range_neg_cast",
     "Descent.Coalescent.survivalFactor_partialProd",
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
     "Descent.Core.pairCount_one",
     "Descent.Core.pairCount_two",
     "Descent.SpectrumIdentifiability.coalescentRate_add_two",
@@ -129063,6 +129583,8 @@
      "Descent.Coalescent.expected_pairTime_product": [],
      "Descent.Coalescent.covariance_pairTime": [],
      "Descent.Coalescent.expected_pairTime": [],
+     "Descent.Coalescent.expected_disjoint_pairTime_product": [],
+     "Descent.Coalescent.covariance_disjoint_pairTime": [],
      "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [],
      "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -129081,6 +129603,8 @@
      "Descent.Coalescent.splitBy_rel_iff": [],
      "Descent.Coalescent.card_covers_eq_deathRate": [],
      "Descent.Coalescent.fstFromMigration_eq": [],
+     "Descent.Coalescent.expected_sharedPath3": [],
+     "Descent.Coalescent.expected_sharedPath4": [],
      "Descent.Coalescent.isPiSystem_cylinders": [],
      "Descent.Coalescent.hetRecurrence_factor_eq_mechanism": [],
      "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
@@ -129283,6 +129807,7 @@
     "Descent.Coalescent.blocks_restrict_le",
     "Descent.Coalescent.bsRate_pos",
     "Descent.Coalescent.card_covers_eq_deathRate",
+    "Descent.Coalescent.covariance_disjoint_pairTime",
     "Descent.Coalescent.covariance_pairTime",
     "Descent.Coalescent.deriv_deriv_pow",
     "Descent.Coalescent.discordance_gt_half_iff",
@@ -129291,8 +129816,11 @@
     "Descent.Coalescent.expectedNumClasses_two_eq",
     "Descent.Coalescent.expectedTotalBranchLength_succ_sub",
     "Descent.Coalescent.expected_cross_pairTime",
+    "Descent.Coalescent.expected_disjoint_pairTime_product",
     "Descent.Coalescent.expected_pairTime",
     "Descent.Coalescent.expected_pairTime_product",
+    "Descent.Coalescent.expected_sharedPath3",
+    "Descent.Coalescent.expected_sharedPath4",
     "Descent.Coalescent.fstFromMigration_eq",
     "Descent.Coalescent.fuTerm_eq",
     "Descent.Coalescent.hasDerivAt_descentCurve",
@@ -209846,7 +210374,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 484,
+   "line": 485,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -209875,7 +210403,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 487,
+   "line": 488,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -209904,7 +210432,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 490,
+   "line": 491,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -209940,7 +210468,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 507,
+   "line": 508,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",

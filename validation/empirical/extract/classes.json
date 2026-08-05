@@ -4291,8 +4291,8 @@
   }
  },
  "Descent.momentInvariant": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/CountingInvariantInstances.lean",
   "line": 119,
   "short": "momentInvariant",
@@ -4310,9 +4310,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -5237,8 +5237,8 @@
   }
  },
  "Descent.rareField": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "WRAPPER",
+  "note": "delegates to binarySecondAnnotation",
   "file": "Descent/Blindness/DecoratedGeometryBlindness.lean",
   "line": 556,
   "short": "rareField",
@@ -5248,9 +5248,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -7387,8 +7387,8 @@
   }
  },
  "Descent.codedDecayProfile": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/HiddenConeAmbiguity.lean",
   "line": 259,
   "short": "codedDecayProfile",
@@ -7401,9 +7401,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -7473,8 +7473,8 @@
   }
  },
  "Descent.addRankOneSignal": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/ImitationRigidity.lean",
   "line": 40,
   "short": "addRankOneSignal",
@@ -7494,9 +7494,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -7552,8 +7552,8 @@
   }
  },
  "Descent.rankOneCovarianceBump": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/ImitationRigidity.lean",
   "line": 46,
   "short": "rankOneCovarianceBump",
@@ -7571,9 +7571,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -14473,8 +14473,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.algorithmicRiskSignature": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 199,
   "short": "algorithmicRiskSignature",
@@ -14487,9 +14487,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -15099,8 +15099,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.constantOneVector": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 762,
   "short": "constantOneVector",
@@ -15110,9 +15110,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -15130,8 +15130,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.balancedRankOneOrthogonalSpin": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "WRAPPER",
+  "note": "delegates to constantOneVector",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 770,
   "short": "balancedRankOneOrthogonalSpin",
@@ -15148,9 +15148,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -17231,8 +17231,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.mesoscopicGFOMUnitInput": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "WRAPPER",
+  "note": "delegates to constantOneVector",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 3558,
   "short": "mesoscopicGFOMUnitInput",
@@ -17249,9 +17249,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -17511,8 +17511,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.finiteBulkDiagonal": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 3783,
   "short": "finiteBulkDiagonal",
@@ -17534,9 +17534,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -18564,9 +18564,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -18888,8 +18888,8 @@
   }
  },
  "Descent.TrafficInvariantSeparation.finiteDiagonalTrafficProfile": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/TrafficInvariantSeparation.lean",
   "line": 4938,
   "short": "finiteDiagonalTrafficProfile",
@@ -18907,9 +18907,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -20051,8 +20051,8 @@
   }
  },
  "Descent.XiFromMarks.oneFamilyMassPartition": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Blindness/XiFromMarkedBreakouts.lean",
   "line": 202,
   "short": "oneFamilyMassPartition",
@@ -20069,9 +20069,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -23348,8 +23348,8 @@
   }
  },
  "Descent.Coalescent.lookdownApply": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/Lookdown.lean",
   "line": 70,
   "short": "lookdownApply",
@@ -23363,9 +23363,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -23843,8 +23843,8 @@
   }
  },
  "Descent.Coalescent.colourIndicator": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/PaintboxFrequency.lean",
   "line": 45,
   "short": "colourIndicator",
@@ -23867,9 +23867,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -23941,6 +23941,7 @@
    "Descent.Coalescent.cross_pairTime",
    "Descent.Coalescent.pairTime_symmetric_sums_topology_free",
    "Descent.Coalescent.sum_pairTime",
+   "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime",
    "Descent.Coalescent.sum_sq_pairTime"
   ],
   "constraints": {
@@ -23949,7 +23950,55 @@
     "Descent.Coalescent.sum_pairTime": [],
     "Descent.Coalescent.sum_sq_pairTime": [],
     "Descent.Coalescent.cross_pairTime": [],
-    "Descent.Coalescent.pairTime_symmetric_sums_topology_free": []
+    "Descent.Coalescent.pairTime_symmetric_sums_topology_free": [],
+    "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime": []
+   }
+  }
+ },
+ "Descent.Coalescent.pairTime4": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/PairwiseTimes.lean",
+  "line": 188,
+  "short": "pairTime4",
+  "ret_type": "ℝ",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM",
+  "python": "pairTime4",
+  "args": [
+   "s",
+   "p",
+   "t_4",
+   "t_3",
+   "t_2"
+  ],
+  "box": {
+   "t₄": [
+    0.05,
+    3.0
+   ],
+   "t₃": [
+    0.05,
+    3.0
+   ],
+   "t₂": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.sum_disjointProducts"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.sum_disjointProducts": []
    }
   }
  },
@@ -25843,8 +25892,8 @@
   }
  },
  "Descent.Coalescent.voterStepMap": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/SpatialCoalescent.lean",
   "line": 68,
   "short": "voterStepMap",
@@ -25856,9 +25905,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -25929,8 +25978,8 @@
   }
  },
  "Descent.Coalescent.voterPedigree": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Coalescent/SpatialCoalescent.lean",
   "line": 123,
   "short": "voterPedigree",
@@ -25942,9 +25991,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -26167,6 +26216,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Coalescent.varPairwiseFromTree_two",
    "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varSegregatingSites_eq_totalVariance",
    "Descent.Coalescent.varSegregatingSites_nonneg",
@@ -26189,7 +26239,8 @@
      "0 ≤ θ",
      "1 ≤ harmonicSum (n - 1"
     ],
-    "Descent.Coalescent.varPairwise_two_eq": []
+    "Descent.Coalescent.varPairwise_two_eq": [],
+    "Descent.Coalescent.varPairwiseFromTree_two": []
    }
   }
  },
@@ -26250,10 +26301,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Coalescent/SpectrumMoments.lean",
-  "line": 252,
+  "line": 253,
   "short": "tajimaVarPairwise",
   "ret_type": "ℝ",
-  "empirical_status": "ASSERTED",
+  "empirical_status": "DERIVED",
   "python": "tajimaVarPairwise",
   "args": [
    "θ",
@@ -26265,7 +26316,7 @@
     3.0
    ],
    "n": [
-    1.0,
+    2.0,
     20.0
    ]
   },
@@ -26277,15 +26328,21 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
    "Descent.Coalescent.varPairwise_two_eq"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
    "declared_lo": 0.0,
    "declared_hi": null,
-   "hypotheses": [],
+   "hypotheses": [
+    "2 ≤ n"
+   ],
    "hypotheses_by_theorem": {
-    "Descent.Coalescent.varPairwise_two_eq": []
+    "Descent.Coalescent.varPairwise_two_eq": [],
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+     "2 ≤ n"
+    ]
    }
   }
  },
@@ -27823,6 +27880,312 @@
    }
   }
  },
+ "Descent.Coalescent.sharedPath3": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 80,
+  "short": "sharedPath3",
+  "ret_type": "ℝ",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM",
+  "python": "sharedPath3",
+  "args": [
+   "c",
+   "p",
+   "q",
+   "t_3",
+   "t_2"
+  ],
+  "box": {
+   "t₃": [
+    0.05,
+    3.0
+   ],
+   "t₂": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.sum_sharedPath3",
+   "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.sum_sharedPath3": [],
+    "Descent.Coalescent.sum_sharedPath3_eq_sum_pairTime": []
+   }
+  }
+ },
+ "Descent.Coalescent.sharedPath4": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 116,
+  "short": "sharedPath4",
+  "ret_type": "ℝ",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM",
+  "python": "sharedPath4",
+  "args": [
+   "s",
+   "d",
+   "t_3",
+   "t_2"
+  ],
+  "box": {
+   "t₃": [
+    0.05,
+    3.0
+   ],
+   "t₂": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.sum_sharedPath4"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.sum_sharedPath4": []
+   }
+  }
+ },
+ "Descent.Coalescent.pairCount": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 141,
+  "short": "pairCount",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Coalescent_pairCount",
+  "args": [
+   "n"
+  ],
+  "box": {
+   "n": [
+    2.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.branchDeathRatio_eq",
+   "Descent.Coalescent.branchRate_lt_deathRate",
+   "Descent.Coalescent.card_covers_eq_deathRate",
+   "Descent.Coalescent.count_split",
+   "Descent.Coalescent.deathRate_eq_coalescentRate",
+   "Descent.Coalescent.deathRate_one",
+   "Descent.Coalescent.deathRate_succ_succ",
+   "Descent.Coalescent.deathRate_three",
+   "Descent.Coalescent.deathRate_two",
+   "Descent.Coalescent.deathRate_zero",
+   "Descent.Coalescent.duality_identity",
+   "Descent.Coalescent.expectedSegmentLength_eq",
+   "Descent.Coalescent.jumpCoeff_recursion",
+   "Descent.Coalescent.jumpProb_eq",
+   "Descent.Coalescent.one_le_deathRate_succ_succ",
+   "Descent.Coalescent.sum_range_div_eq_deathRate",
+   "Descent.Coalescent.sum_range_neg_cast",
+   "Descent.Coalescent.survivalFactor_partialProd",
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
+   "Descent.Core.pairCount_one",
+   "Descent.Core.pairCount_two",
+   "Descent.SpectrumIdentifiability.coalescentRate_add_two",
+   "Descent.SpectrumIdentifiability.coalescentRate_three",
+   "Descent.SpectrumIdentifiability.coalescentRate_two"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "k ≤ n",
+    "2 ≤ n"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.SpectrumIdentifiability.coalescentRate_two": [],
+    "Descent.SpectrumIdentifiability.coalescentRate_three": [],
+    "Descent.SpectrumIdentifiability.coalescentRate_add_two": [],
+    "Descent.Coalescent.expectedSegmentLength_eq": [],
+    "Descent.Coalescent.sum_range_neg_cast": [],
+    "Descent.Coalescent.duality_identity": [],
+    "Descent.Coalescent.jumpProb_eq": [],
+    "Descent.Coalescent.jumpCoeff_recursion": [
+     "k ≤ n"
+    ],
+    "Descent.Coalescent.deathRate_eq_coalescentRate": [],
+    "Descent.Coalescent.deathRate_zero": [],
+    "Descent.Coalescent.deathRate_one": [],
+    "Descent.Coalescent.deathRate_two": [],
+    "Descent.Coalescent.deathRate_three": [],
+    "Descent.Coalescent.deathRate_succ_succ": [],
+    "Descent.Coalescent.survivalFactor_partialProd": [],
+    "Descent.Coalescent.branchDeathRatio_eq": [],
+    "Descent.Coalescent.branchRate_lt_deathRate": [],
+    "Descent.Coalescent.card_covers_eq_deathRate": [],
+    "Descent.Coalescent.count_split": [],
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+     "2 ≤ n"
+    ],
+    "Descent.Coalescent.one_le_deathRate_succ_succ": [],
+    "Descent.Coalescent.sum_range_div_eq_deathRate": [],
+    "Descent.Core.pairCount_one": [],
+    "Descent.Core.pairCount_two": []
+   }
+  }
+ },
+ "Descent.Coalescent.sharingCount": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 145,
+  "short": "sharingCount",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "sharingCount",
+  "args": [
+   "n"
+  ],
+  "box": {
+   "n": [
+    2.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.count_split",
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "2 ≤ n"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.count_split": [],
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+     "2 ≤ n"
+    ]
+   }
+  }
+ },
+ "Descent.Coalescent.disjointCount": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 149,
+  "short": "disjointCount",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "disjointCount",
+  "args": [
+   "n"
+  ],
+  "box": {
+   "n": [
+    2.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.count_split",
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "2 ≤ n"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.count_split": [],
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+     "2 ≤ n"
+    ]
+   }
+  }
+ },
+ "Descent.Coalescent.varPairwiseFromTree": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/TajimaVariance.lean",
+  "line": 169,
+  "short": "varPairwiseFromTree",
+  "ret_type": "ℝ",
+  "empirical_status": "DERIVED",
+  "python": "varPairwiseFromTree",
+  "args": [
+   "θ",
+   "n"
+  ],
+  "box": {
+   "θ": [
+    0.05,
+    3.0
+   ],
+   "n": [
+    2.0,
+    1000.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
+   "Descent.Coalescent.varPairwiseFromTree_two"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "2 ≤ n"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [
+     "2 ≤ n"
+    ],
+    "Descent.Coalescent.varPairwiseFromTree_two": []
+   }
+  }
+ },
  "Descent.Coalescent.chainLaw": {
   "class": "NOT-EXTRACTABLE",
   "note": "recursion with 4 branches, expected 2",
@@ -28183,7 +28546,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 4,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29416,9 +29779,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29437,8 +29800,8 @@
   }
  },
  "Descent.FiberCoupling.copyWitnessValue": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/ConditionalGain.lean",
   "line": 477,
   "short": "copyWitnessValue",
@@ -29448,9 +29811,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29469,8 +29832,8 @@
   }
  },
  "Descent.FiberCoupling.gainBounded": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/ConditionalGain.lean",
   "line": 542,
   "short": "gainBounded",
@@ -29480,9 +29843,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29667,9 +30030,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29763,8 +30126,8 @@
   }
  },
  "Descent.observable": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DeclaredInteractionClass.lean",
   "line": 92,
   "short": "observable",
@@ -29778,9 +30141,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -29854,8 +30217,8 @@
   }
  },
  "Descent.actionGap": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DeclaredInteractionClass.lean",
   "line": 103,
   "short": "actionGap",
@@ -29869,9 +30232,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -30117,8 +30480,8 @@
   }
  },
  "Descent.pointLaw": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DescentGeometry.lean",
   "line": 82,
   "short": "pointLaw",
@@ -30130,9 +30493,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -33629,8 +33992,8 @@
   }
  },
  "Descent.dynamicsContrast": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DynamicsContrast.lean",
   "line": 2103,
   "short": "dynamicsContrast",
@@ -33640,9 +34003,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -41332,7 +41695,7 @@
   "short": "pairCount",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
-  "python": "pairCount",
+  "python": "Descent_Core_pairCount",
   "args": [
    "k"
   ],
@@ -41353,6 +41716,7 @@
    "Descent.Coalescent.branchDeathRatio_eq",
    "Descent.Coalescent.branchRate_lt_deathRate",
    "Descent.Coalescent.card_covers_eq_deathRate",
+   "Descent.Coalescent.count_split",
    "Descent.Coalescent.deathRate_eq_coalescentRate",
    "Descent.Coalescent.deathRate_one",
    "Descent.Coalescent.deathRate_succ_succ",
@@ -41367,6 +41731,7 @@
    "Descent.Coalescent.sum_range_div_eq_deathRate",
    "Descent.Coalescent.sum_range_neg_cast",
    "Descent.Coalescent.survivalFactor_partialProd",
+   "Descent.Coalescent.varPairwiseFromTree_eq_tajima",
    "Descent.Core.pairCount_one",
    "Descent.Core.pairCount_two",
    "Descent.SpectrumIdentifiability.coalescentRate_add_two",
@@ -41408,6 +41773,8 @@
      "sigma < (k : ℝ"
     ],
     "Descent.Coalescent.card_covers_eq_deathRate": [],
+    "Descent.Coalescent.count_split": [],
+    "Descent.Coalescent.varPairwiseFromTree_eq_tajima": [],
     "Descent.Coalescent.one_le_deathRate_succ_succ": [],
     "Descent.Coalescent.sum_range_div_eq_deathRate": [],
     "Descent.Core.pairCount_one": [],
@@ -42842,9 +43209,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -44015,8 +44382,8 @@
   }
  },
  "Descent.FiniteMinimax.Problem.fairBinaryRule": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Decision/FiniteMinimax.lean",
   "line": 782,
   "short": "fairBinaryRule",
@@ -44026,9 +44393,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -47937,9 +48304,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -49420,8 +49787,8 @@
   }
  },
  "Descent.crossCovVector": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 505,
   "short": "crossCovVector",
@@ -49435,9 +49802,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -49513,8 +49880,8 @@
   }
  },
  "Descent.contextCrossCovVector": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Foundations/TransportIdentities.lean",
   "line": 514,
   "short": "contextCrossCovVector",
@@ -49528,9 +49895,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -51666,8 +52033,8 @@
   }
  },
  "Descent.Pangenome.Gauge.walkOf": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 303,
   "short": "walkOf",
@@ -51679,9 +52046,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -52525,6 +52892,7 @@
    "Descent.Coalescent.blocks_restrict_le",
    "Descent.Coalescent.bsRate_pos",
    "Descent.Coalescent.card_covers_eq_deathRate",
+   "Descent.Coalescent.covariance_disjoint_pairTime",
    "Descent.Coalescent.covariance_pairTime",
    "Descent.Coalescent.deriv_deriv_pow",
    "Descent.Coalescent.discordance_gt_half_iff",
@@ -52533,8 +52901,11 @@
    "Descent.Coalescent.expectedNumClasses_two_eq",
    "Descent.Coalescent.expectedTotalBranchLength_succ_sub",
    "Descent.Coalescent.expected_cross_pairTime",
+   "Descent.Coalescent.expected_disjoint_pairTime_product",
    "Descent.Coalescent.expected_pairTime",
    "Descent.Coalescent.expected_pairTime_product",
+   "Descent.Coalescent.expected_sharedPath3",
+   "Descent.Coalescent.expected_sharedPath4",
    "Descent.Coalescent.fstFromMigration_eq",
    "Descent.Coalescent.fuTerm_eq",
    "Descent.Coalescent.hasDerivAt_descentCurve",
@@ -52773,6 +53144,8 @@
     "Descent.Coalescent.expected_pairTime_product": [],
     "Descent.Coalescent.covariance_pairTime": [],
     "Descent.Coalescent.expected_pairTime": [],
+    "Descent.Coalescent.expected_disjoint_pairTime_product": [],
+    "Descent.Coalescent.covariance_disjoint_pairTime": [],
     "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [],
     "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -52791,6 +53164,8 @@
     "Descent.Coalescent.splitBy_rel_iff": [],
     "Descent.Coalescent.card_covers_eq_deathRate": [],
     "Descent.Coalescent.fstFromMigration_eq": [],
+    "Descent.Coalescent.expected_sharedPath3": [],
+    "Descent.Coalescent.expected_sharedPath4": [],
     "Descent.Coalescent.isPiSystem_cylinders": [],
     "Descent.Coalescent.hetRecurrence_factor_eq_mechanism": [],
     "Descent.Coalescent.hetRecurrence_eq_pairDistinct": [],
@@ -54894,8 +55269,8 @@
   }
  },
  "Descent.SourceTaggedMoments.sigmaTagCausal": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: list (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DGP.lean",
   "line": 442,
   "short": "sigmaTagCausal",
@@ -54907,9 +55282,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: list"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -57216,8 +57591,8 @@
   }
  },
  "Descent.HeterogeneousEffectDGP.trueExp": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DGP.lean",
   "line": 2390,
   "short": "trueExp",
@@ -57229,9 +57604,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -60922,8 +61297,8 @@
   }
  },
  "Descent.diagonalDesign": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/DriftRegime.lean",
   "line": 415,
   "short": "diagonalDesign",
@@ -60935,9 +61310,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -63185,8 +63560,8 @@
   }
  },
  "Descent.CrossTraitBorrowingModel.traitBSpecificCrossCov": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: VecFn (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/PopGen/GeneticArchitectureDiscovery.lean",
   "line": 844,
   "short": "traitBSpecificCrossCov",
@@ -63198,9 +63573,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: VecFn"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -75697,7 +76072,7 @@
  },
  "Descent.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition false",
+  "note": "self-check: calls untranslated definition true",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -75721,7 +76096,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'false' is not defined\")"
+   "error": "NameError(\"name 'true' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -78408,8 +78783,8 @@
   }
  },
  "Descent.uniformTwo": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/HorizonCurve.lean",
   "line": 106,
   "short": "uniformTwo",
@@ -78419,9 +78794,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81737,8 +82112,8 @@
   }
  },
  "Descent.threeAncestryWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1259,
   "short": "threeAncestryWeights",
@@ -81748,9 +82123,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81851,8 +82226,8 @@
   }
  },
  "Descent.fourAncestryWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1336,
   "short": "fourAncestryWeights",
@@ -81862,9 +82237,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81887,8 +82262,8 @@
   }
  },
  "Descent.coordinateHighVariance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1339,
   "short": "coordinateHighVariance",
@@ -81898,9 +82273,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81922,8 +82297,8 @@
   }
  },
  "Descent.coordinateHighDrift": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1345,
   "short": "coordinateHighDrift",
@@ -81933,9 +82308,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81954,8 +82329,8 @@
   }
  },
  "Descent.scoreAcrossAncestry": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1351,
   "short": "scoreAcrossAncestry",
@@ -81965,9 +82340,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81986,8 +82361,8 @@
   }
  },
  "Descent.driftAcrossAncestry": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1357,
   "short": "driftAcrossAncestry",
@@ -81997,9 +82372,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82293,8 +82668,8 @@
   }
  },
  "Descent.uResolvedConditional": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1598,
   "short": "uResolvedConditional",
@@ -82306,9 +82681,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82325,8 +82700,8 @@
   }
  },
  "Descent.vResolvedConditional": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 1603,
   "short": "vResolvedConditional",
@@ -82338,9 +82713,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82941,8 +83316,8 @@
   }
  },
  "Descent.threeAncestryDistance": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 2343,
   "short": "threeAncestryDistance",
@@ -82952,9 +83327,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -83742,8 +84117,8 @@
   }
  },
  "Descent.targetCorrectionCurvature": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 3686,
   "short": "targetCorrectionCurvature",
@@ -83757,9 +84132,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -83783,8 +84158,8 @@
   }
  },
  "Descent.targetCorrectionOptimum": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 3719,
   "short": "targetCorrectionOptimum",
@@ -83798,9 +84173,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -85591,8 +85966,8 @@
   }
  },
  "Descent.spikeOuter": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 110,
   "short": "spikeOuter",
@@ -85604,9 +85979,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -85649,8 +86024,8 @@
   }
  },
  "Descent.twoBlock": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 180,
   "short": "twoBlock",
@@ -85677,9 +86052,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -86914,8 +87289,8 @@
   }
  },
  "Descent.subgroupContrast": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 1230,
   "short": "subgroupContrast",
@@ -86937,9 +87312,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -87102,8 +87477,8 @@
   }
  },
  "Descent.blockSpectrum": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 1496,
   "short": "blockSpectrum",
@@ -87125,9 +87500,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -87254,8 +87629,8 @@
   }
  },
  "Descent.meffPerturbed": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 1628,
   "short": "meffPerturbed",
@@ -87272,9 +87647,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -87316,8 +87691,8 @@
   }
  },
  "Descent.meffFlat": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PCCorrectability/ImitationCapacity.lean",
   "line": 1633,
   "short": "meffFlat",
@@ -87334,9 +87709,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97223,8 +97598,8 @@
   }
  },
  "Descent.targetSourceEffectProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: VecFn (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2418,
   "short": "targetSourceEffectProjection",
@@ -97236,9 +97611,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: VecFn"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97309,8 +97684,8 @@
   }
  },
  "Descent.targetNovelMutationEffectProjection": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: VecFn (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2488,
   "short": "targetNovelMutationEffectProjection",
@@ -97322,9 +97697,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: VecFn"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99263,8 +99638,8 @@
   }
  },
  "Descent.betaTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: list (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4144,
   "short": "betaTargetAt",
@@ -99282,9 +99657,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: list"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99740,8 +100115,8 @@
   }
  },
  "Descent.sigmaTagTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4420,
   "short": "sigmaTagTargetAt",
@@ -99759,9 +100134,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99785,8 +100160,8 @@
   }
  },
  "Descent.directCausalTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4429,
   "short": "directCausalTargetAt",
@@ -99804,9 +100179,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99826,8 +100201,8 @@
   }
  },
  "Descent.novelDirectCausalTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4438,
   "short": "novelDirectCausalTargetAt",
@@ -99845,9 +100220,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99862,8 +100237,8 @@
   }
  },
  "Descent.proxyTaggingTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4447,
   "short": "proxyTaggingTargetAt",
@@ -99881,9 +100256,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99905,8 +100280,8 @@
   }
  },
  "Descent.novelProxyTaggingTargetAt": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 4455,
   "short": "novelProxyTaggingTargetAt",
@@ -99924,9 +100299,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -110690,8 +111065,8 @@
   }
  },
  "Descent.standardizedDiagonalLD": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 240,
   "short": "standardizedDiagonalLD",
@@ -110701,9 +111076,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -112538,8 +112913,8 @@
   }
  },
  "Descent.meanPopulationDeviation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 1983,
   "short": "meanPopulationDeviation",
@@ -112557,9 +112932,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -112599,8 +112974,8 @@
   }
  },
  "Descent.metaLearnedSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 1989,
   "short": "metaLearnedSourceWeights",
@@ -112619,9 +112994,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -112651,8 +113026,8 @@
   }
  },
  "Descent.centeredPopulationEffectDeviation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 2021,
   "short": "centeredPopulationEffectDeviation",
@@ -112665,9 +113040,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -112833,8 +113208,8 @@
   }
  },
  "Descent.weightedPopulationDeviation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 2450,
   "short": "weightedPopulationDeviation",
@@ -112847,9 +113222,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -112889,8 +113264,8 @@
   }
  },
  "Descent.weightedMetaSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 2457,
   "short": "weightedMetaSourceWeights",
@@ -112904,9 +113279,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -113026,8 +113401,8 @@
   }
  },
  "Descent.uniformMetaWeight": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 2471,
   "short": "uniformMetaWeight",
@@ -113044,9 +113419,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -113071,8 +113446,8 @@
   }
  },
  "Descent.weightedPopulationEffectAverage": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "WRAPPER",
+  "note": "delegates to weightedPopulationDeviation",
   "file": "Descent/Portability/TransferLearningPGS.lean",
   "line": 2494,
   "short": "weightedPopulationEffectAverage",
@@ -113085,9 +113460,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -115647,8 +116022,8 @@
   }
  },
  "Descent.ploidy": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "WRAPPER",
+  "note": "delegates to Descent.Core.ploidy",
   "file": "Descent/Program/Conventions.lean",
   "line": 91,
   "short": "ploidy",
@@ -115658,9 +116033,9 @@
   "args": [],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -119763,9 +120138,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -122398,8 +122773,8 @@
   }
  },
  "Descent.lagSensitivityMatrix": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/Permeability.lean",
   "line": 1354,
   "short": "lagSensitivityMatrix",
@@ -122412,9 +122787,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -123494,8 +123869,8 @@
   }
  },
  "Descent.weightedResidualMoment": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/ProjectionShiftBounds.lean",
   "line": 45,
   "short": "weightedResidualMoment",
@@ -123510,9 +123885,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -125272,8 +125647,8 @@
   }
  },
  "Descent.rawCrossMoment": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: value is not a real number: function (vector- or function-valued)",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Spectral/SecondMomentShift.lean",
   "line": 25,
   "short": "rawCrossMoment",
@@ -125287,9 +125662,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "value is not a real number: function"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -126023,7 +126398,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 484,
+  "line": 485,
   "short": "sigmaS",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -126049,7 +126424,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 487,
+  "line": 488,
   "short": "sigmaT",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -126075,7 +126450,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 490,
+  "line": 491,
   "short": "crossS",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -126108,7 +126483,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 507,
+  "line": 508,
   "short": "sigmaT2",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
