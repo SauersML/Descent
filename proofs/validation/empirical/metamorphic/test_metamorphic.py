@@ -168,6 +168,80 @@ def specificity():
 # table actually declares, or the pin is decoration.
 # ---------------------------------------------------------------------------
 
+def workflow_path_extraction():
+    """Both directions for the workflow-path guard in build_flags.py.
+
+    POSITIVE: a path in a `run:` block must be extracted, including through a
+    `working-directory`, or the guard cannot see the break it exists for.
+    NEGATIVE: a path named only in PROSE must NOT be extracted. prover.yml's
+    "WHAT IS NOT WIRED UP" section lists a dozen scripts it deliberately does not
+    run; a guard that flagged those would fire on the comment explaining why they
+    are excluded, which is the fastest way to get a required check ignored.
+    """
+    import build_flags as B
+
+    sample = """
+jobs:
+  prove:
+    steps:
+      - name: Install
+        run: curl https://example.com/install.sh -sSf | sh -s -- -y
+      - name: Direct
+        run: python3 proofs/validation/code/check.py
+      - name: With a working directory
+        working-directory: proofs/validation/empirical/differential
+        run: python3 run.py
+      - name: Multi-line
+        run: |
+          python3 first.py
+          python3 dir/second.py
+      # PROSE: empirical/invariants/vacuity.py is 60s and stays out, and
+      # extract/xcheck_vector.py needs numpy. Neither is run.
+      - name: Last
+        run: lake env lean proofs/validation/code/Check.lean
+"""
+    found = B.workflow_run_paths(sample)
+    for want in ("proofs/validation/code/check.py",
+                 "proofs/validation/empirical/differential/run.py",
+                 "dir/second.py",
+                 "proofs/validation/code/Check.lean"):
+        expect(want in found,
+               f"workflow-path guard missed {want!r}, which IS executed; it "
+               f"cannot catch a step whose script is untracked")
+    for unwanted in ("empirical/invariants/vacuity.py",
+                     "extract/xcheck_vector.py"):
+        expect(unwanted not in found,
+               f"workflow-path guard extracted {unwanted!r} from a COMMENT; it "
+               f"would fire on the prose explaining why that script is excluded")
+    expect(not any("example.com" in p or p.startswith("//") for p in found),
+           "workflow-path guard extracted a URL as if it were a repo file")
+
+
+def agreements_integrity():
+    """The cross-body agreement list must name real theorems and real reasons,
+    and must not pair a definition with itself -- which would pass always and
+    check nothing."""
+    for left, right, theorem, note in getattr(R, "AGREEMENTS", ()):
+        expect(left != right,
+               f"AGREEMENT pairs {left} with itself; it can never fail")
+        expect("." in theorem and len(theorem) > 8,
+               f"AGREEMENT {left} vs {right} names no Lean theorem "
+               f"({theorem!r}); an executed equality must say which proof it "
+               f"is executing")
+        expect(len(note) > 40,
+               f"AGREEMENT {left} vs {right} has no substantive note")
+
+
+def no_stale_excuses():
+    """NOT_EXTRACTABLE must not be used as a parking space. Every entry needs a
+    reason as substantive as a NO_RELATIONS one, because the two are the same
+    claim -- 'this definition is not covered, and here is why that is not
+    negligence'."""
+    for fqn, reason in R.NOT_EXTRACTABLE.items():
+        expect(len(reason) > 40,
+               f"NOT_EXTRACTABLE[{fqn}] has no substantive reason")
+
+
 def table_integrity():
     declared_ids = {(fqn, rel["id"])
                     for fqn, rels in R.RELATIONS.items() for rel in rels}
@@ -189,13 +263,18 @@ def main():
     positive_direction()
     specificity()
     table_integrity()
+    agreements_integrity()
+    no_stale_excuses()
+    workflow_path_extraction()
     if FAILURES:
         print(f"metamorphic gate calibration FAILED ({len(FAILURES)}):\n")
         for f in FAILURES:
             print("  " + f)
         return 1
     print("metamorphic gate calibration passed: 6 planted defects all caught, "
-          "3 clean bodies all silent, specificity and table integrity hold.")
+          "3 clean bodies all silent, specificity, table integrity, "
+          f"{len(getattr(R, 'AGREEMENTS', ()))} cross-body agreements "
+          "well-formed, no stale excuses.")
     return 0
 
 

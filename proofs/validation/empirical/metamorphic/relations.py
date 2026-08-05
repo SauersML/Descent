@@ -142,6 +142,25 @@ SWEPT_MODULES = (
 
 RELATIONS = {
     # --- Conventions ------------------------------------------------------
+    # Reachable only since the nullary-def extraction fix (0f4de2f7). A bare
+    # mention of `ploidy` translated to the function's NAME rather than a call,
+    # so one factor made the corpus's headline F_ST convention unexecutable and
+    # therefore invisible to every empirical checker: differential, identity and
+    # metamorphic alike. No amount of adding checks closes a hole of that shape.
+    "Calibrator.neiGst": [
+        invariant_under_allele_swap(["p₁", "p₂"]),
+        symmetric_in("p₁", "p₂"),
+    ],
+    "Calibrator.hweGenotypeVariance": [
+        invariant_under_allele_swap(["p"]),
+    ],
+    "Calibrator.coalescentTimeScale": [
+        scales("Ne", 1),
+    ],
+    "Calibrator.neiContrastSpike": [
+        invariant_under_allele_swap(["p₁", "p₂"]),
+        symmetric_in("p₁", "p₂"),
+    ],
     "Calibrator.meanAlleleFreq": [
         complement_under_allele_swap(["p₁", "p₂"]),
         symmetric_in("p₁", "p₂"),
@@ -349,20 +368,31 @@ NO_RELATIONS = {
 # ---------------------------------------------------------------------------
 
 NOT_EXTRACTABLE = {
-    "Calibrator.hweGenotypeVariance":
-        "Body multiplies by `ploidy`, a nullary def; extract/api.py leaves it as "
-        "a function object and the self-check fails with a TypeError. The "
-        "allele-swap invariance it OUGHT to satisfy is proved in Lean instead, "
-        "as Conventions.hweGenotypeVariance_allele_swap.",
-    "Calibrator.coalescentTimeScale":
-        "`ploidy * Ne`; same nullary-def extraction gap.",
-    "Calibrator.neiGst":
-        "Same `ploidy` gap. Its allele-swap invariance is proved in Lean as "
-        "Conventions.neiGst_allele_swap. Note this means the differential "
-        "battery cannot execute neiGst either -- the corpus's headline F_ST "
-        "convention is checked only through neiGstFromFrequencies, which IS "
-        "executable and which neiGstFromFrequencies_eq_neiGst proves equal.",
-    "Calibrator.neiContrastSpike":
-        "Calls neiGst, so it inherits the `ploidy` gap. The Hudson-based "
-        "counterpart hudsonBbpSpike is executable and IS covered above.",
+    # Empty, and the gate checks that it stays honest in both directions: an
+    # entry here whose definition CAN now be executed is reported as a STALE
+    # EXCUSE, which is how the four `ploidy` entries that used to live here were
+    # retired. An excuse that outlives its cause is indistinguishable from a
+    # decision not to look.
 }
+
+# ---------------------------------------------------------------------------
+# CROSS-BODY AGREEMENTS: two definitions the corpus PROVES equal, executed.
+#
+# A proved equality in Lean constrains the two bodies as mathematics. It does
+# not check that the two TRANSCRIPTIONS every empirical checker consumes still
+# agree, and it is exactly the pairs that are proved equal whose divergence
+# nobody would think to look for. Each entry names the Lean theorem, so a reader
+# can see that this is executing a proof rather than inventing a claim.
+# ---------------------------------------------------------------------------
+
+AGREEMENTS = [
+    ("Calibrator.neiGst", "Calibrator.neiGstFromFrequencies",
+     "Conventions.neiGstFromFrequencies_eq_neiGst",
+     "The corpus's two spellings of Nei's G_ST: `1 - H_S/H_T` and "
+     "`(p₁-p₂)²/(4 p̄(1-p̄))`. This pair could not be executed at all until the "
+     "nullary-def extraction fix, and it is the pair whose FLOATING-POINT "
+     "behaviour differs by eleven orders of magnitude as p₁ -> p₂ (see "
+     "precision/precision_map.py). On the benign grid used here they must agree "
+     "to rounding; that they do is what localises the precision finding to the "
+     "cancellation rather than to a disagreement between the bodies."),
+]

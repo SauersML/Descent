@@ -310,11 +310,51 @@ def main(argv):
                     + (f"\n    ... and {len(fails) - 3} more grid points"
                        if len(fails) > 3 else ""))
 
+    # 5. cross-body agreements: execute the equalities the corpus proves.
+    agreed = 0
+    for left, right, theorem, note in getattr(R, "AGREEMENTS", ()):
+        missing = [n for n in (left, right) if n not in table]
+        if missing:
+            findings.append(
+                f"DANGLING AGREEMENT: {theorem} pairs {left} with {right}, but "
+                f"{', '.join(missing)} no longer exists.")
+            continue
+        try:
+            fl, al = api.callable_for(left)
+            fr, ar = api.callable_for(right)
+        except Exception as exc:
+            findings.append(
+                f"AGREEMENT NOT EXECUTABLE: {left} vs {right} "
+                f"({theorem}): {type(exc).__name__}: {exc}")
+            continue
+        if len(al) != len(ar):
+            findings.append(
+                f"AGREEMENT ARITY: {left}{al} and {right}{ar} are paired by "
+                f"{theorem} but take different numbers of arguments.")
+            continue
+        agreed += 1
+        for k in range(len(GRID_POINTS)):
+            point = _assign(al, k)
+            args = [float(point[a]) for a in al]
+            try:
+                gl, gr = fl(*args), fr(*args)
+            except (ZeroDivisionError, ValueError, OverflowError):
+                continue
+            if not _close(gl, gr):
+                findings.append(
+                    f"PROVED EQUAL BUT DISAGREE: {theorem} proves {left} = "
+                    f"{right}, but at "
+                    + ", ".join(f"{a}={v:g}" for a, v in zip(al, args))
+                    + f" they give {gl!r} and {gr!r}. Either a body changed "
+                      f"without its partner, or a transcription is wrong.")
+                break
+
     swept_n = sum(len(scope.get(m, [])) for m in R.SWEPT_MODULES)
     print(f"metamorphic gate: {checked} relations over {len(R.RELATIONS)} "
           f"definitions; {swept_n} in-scope definitions across "
           f"{len(R.SWEPT_MODULES)} swept modules; "
-          f"{len(R.EXPECTED_VIOLATIONS)} pinned violations.")
+          f"{len(R.EXPECTED_VIOLATIONS)} pinned violations; "
+          f"{agreed} proved cross-body equalities executed.")
     if findings:
         print(f"\n{len(findings)} FINDING(S):\n")
         for f in findings:
