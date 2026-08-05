@@ -1143,8 +1143,25 @@ trajectory of that process and its closed form is proved, not asserted.
     reading of this body -- the `LD` in this name is about where the rate is *used*, not
     about what it measures. As a bare drift rate it stands.
 
-    Empirical status: UNTESTED as a drift rate; the LD reading of the shared formula is
-    FALSIFIED at the twin.
+    Empirical status: **VALIDATED as a drift rate**
+    (`proofs/validation/empirical/popgensel/`, cell A); the LD reading of the shared formula
+    remains FALSIFIED at the twin.
+
+    A per-generation drift rate is the per-generation probability that two gene copies
+    coalesce, whose reciprocal is the mean pairwise coalescence time. Measured under
+    msprime's `DiscreteTimeWrightFisher` model -- a different engine and a different code
+    path from the recursion this body was derived from -- with 40000 replicates per cell:
+
+    | `Nₑ` | mean pairwise `T` | rate `1/T` | this body `1/(2Nₑ)` | sems |
+    |---|---|---|---|---|
+    | 10 | 20.024 ± 0.098 | 0.049940 ± 0.000243 | 0.05000 | 0.25 |
+    | 25 | 49.864 ± 0.244 | 0.020054 ± 0.000098 | 0.02000 | -0.55 |
+    | 60 | 119.118 ± 0.591 | 0.008395 ± 0.000042 | 0.008333 | -1.48 |
+
+    The competitors carried on the same cells are rejected: `1/(4Nₑ)` at 102 sems and
+    `1/Nₑ` at 199 to 206 sems, so the measurement fixes the factor of two rather than
+    tolerating any `1/(kNₑ)`. The `PLANTED` control `1.4/(2Nₑ)` is rejected at 79 to 82
+    sems. Ne was scaled down so the whole cell runs in seconds.
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
@@ -1201,12 +1218,42 @@ section DemographicPortability
     take `c`, and `bottleneckExcessLD_eq_closedForm` proves the closed form
     rather than asserting it.
 
-    Empirical status: UNTESTED. The 3.3-fold falsification of the predecessor is
-    not evidence about this body, and neither is anything else: no simulation
-    has been run against the two-equilibrium-gap amplitude this predicts. What
-    is established is structural -- the level is bounded by the gap between two
-    equilibria, each of which is bounded by `1`
-    (`driftLDEquilibrium_le_one`). -/
+    Empirical status: **VALIDATED** (`proofs/validation/empirical/popgensel/`,
+    cell B), and the predecessor it replaced is rejected by the same cells.
+
+    Simulated with a labelled-ancestry individual-based two-locus Wright-Fisher:
+    each gamete carries one id for its INTACT two-locus haplotype and a
+    recombinant offspring gets a fresh id, because its two loci no longer descend
+    together. `Q` is then the probability that two distinct gametes share an id.
+    (Without the fresh id on recombination the ids fix, `Q` goes to `1` and the
+    excess reads a flat `0.000` -- that is the identity-by-descent-with-no-reset
+    trap, and it is what the first run of this cell reported.) 800 replicates per
+    cell, burn-in at `Nₑ_stable`, then `t_b` generations at `Nₑ_b`:
+
+    | `Nₑ_s` | `Nₑ_b` | `c` | `t_b` | measured excess | this def | sems |
+    |---|---|---|---|---|---|---|
+    | 50 | 10 | 0.02 | 8 | 0.18712 ± 0.00605 | 0.18342 | -0.61 |
+    | 50 | 5 | 0.05 | 5 | 0.24194 ± 0.00606 | 0.25598 | 2.32 |
+    | 80 | 20 | 0.01 | 12 | 0.13245 ± 0.00556 | 0.13297 | 0.09 |
+
+    The deleted predecessor `(1-(1-1/(2Nₑ_b))^t_b) - (1-(1-1/(2Nₑ_s))^t_b)` is
+    rejected at 10.3, 19.6 and 10.3 sems on the same rows, and a variant keeping
+    the trajectory but dropping the `(1-c)²` recombination factor at 12.2, 21.9
+    and 13.8 sems. The `PLANTED` control at `1.4x` this body is rejected at 9.7
+    to 19.2 sems.
+
+    The positive control is the pre-bottleneck level against
+    `driftLDEquilibrium`, which the simulation reaches independently: measured
+    `0.19926 ± 0.00312`, `0.08451 ± 0.00115`, `0.23359 ± 0.00372` against
+    `0.19519`, `0.08472`, `0.23537`, worst 1.30 sems.
+
+    Argument source: the simulation is an individual-based realisation of the
+    same Wright-Fisher model the recursion describes, so what it establishes is
+    that the closed form is the right function OF THAT MODEL -- the
+    discrimination that carries information is the rejection of the predecessor
+    and of the no-recombination variant, which are different functions of it. It
+    is not independent evidence that a real bottlenecked population has this much
+    excess. -/
 noncomputable def bottleneckExcessLD (Ne_b Ne_stable c : ℝ) (t_b : ℕ) : ℝ :=
   driftLDTrajectory Ne_b c (driftLDEquilibrium Ne_stable c) t_b -
     driftLDEquilibrium Ne_stable c

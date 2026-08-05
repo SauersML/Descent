@@ -875,7 +875,17 @@ theorem liability_threshold_probit_real {k : ℕ} (hN : GaussianNoiseAssumption 
 
 /-- Conditional disease probability under the liability-threshold model.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is the measure of
+    `diseaseEvent T x s` under the noise law the model already carries, which is
+    the DEFINITION of `P(Y = 1 | X = x)` in that model, not a prediction about
+    it. No population can make the probability of an event a different number
+    than the measure assigns it. The theorem immediately below,
+    `etaLiabilityThreshold_eq_gaussian_threshold`, evaluates it to
+    `1 - Φ((T(x) - s)/σ(x))`, and that evaluation is Gaussian analysis rather
+    than measurement. The empirical content of the liability-threshold model
+    sits in its INPUTS -- that the residual is Gaussian
+    (`GaussianNoiseAssumption`) and that a fixed threshold `T` exists -- and
+    those are hypotheses a consumer supplies, not consequences of this map. -/
 noncomputable def etaLiabilityThreshold {k : ℕ} (hN : GaussianNoiseAssumption k)
     (T : (Fin k → ℝ) → ℝ) (s : ℝ) (x : Fin k → ℝ) : ℝ :=
   (noiseMeasureGivenX hN x (diseaseEvent T x s)).toReal

@@ -53,9 +53,14 @@ open Filter
 `Λ`-coalescent.  Natural-number subtraction makes the definition total; the biological range
 is `2 ≤ k ≤ b`.
 
-Empirical status: UNTESTED. The formula is the definition of a `Λ`-coalescent, so it is a
-modelling frame rather than a claim; which `Λ` a real population has -- and whether one
-exists -- is what this file shows the pairwise spectrum cannot answer. -/
+Empirical status: NOT AN EMPIRICAL CLAIM. The integral IS the definition of a
+`Λ`-coalescent (Pitman 1999, Sagitov 1999): a `Λ`-coalescent is by construction the process
+whose `k`-of-`b` merger rate is `∫ x^(k-2) (1-x)^(b-k) dΛ`, so no population can make this
+formula a different one. It is a modelling frame, and the only empirical questions --
+which `Λ` a real population has, and whether one exists at all -- are claims about the
+INPUT `Λ`, which is exactly what this file shows the pairwise spectrum cannot answer.
+`lambdaCoalescentMergerRate_two_two` is the sharpest form of that: after normalization the
+pair rate is `1` for every `Λ`, so it carries no information about which one. -/
 noncomputable def lambdaCoalescentMergerRate
     (Λ : Measure ℝ) (b k : ℕ) : ℝ :=
   ∫ x, x ^ (k - 2) * (1 - x) ^ (b - k) ∂Λ

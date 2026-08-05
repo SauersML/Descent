@@ -138,7 +138,42 @@ theorem equilibriumEffectVariance_lt_of_selection_lt
     effect sizes are pulled toward the same optimum.
     ρ(effects) ≈ 1 - O(1/2Ns) where Ns is selection × drift balance.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED** on two independent axes
+    (`proofs/validation/empirical/popgensel/`, cell E). Forward, individual-based
+    Wright-Fisher with Gaussian stabilizing selection toward a SHARED optimum --
+    the setting this docstring describes -- two populations split from one
+    ancestor and evolved independently. Cross-population correlation of allele
+    frequencies at the causal loci:
+
+    1. **The body has no divergence time and the quantity does.** At `Ns` held
+       fixed at 4.8 (`N = 60`, `s = 0.08`) the measured correlation is
+       `0.839 ± 0.006` at `t = 5`, `0.550 ± 0.008` at `t = 20` and
+       `0.163 ± 0.013` at `t = 60`, against the single number `0.896` this body
+       returns for all three. That is 57 sems at `t = 60`. No time-free function
+       of `Ns` can be this quantity, whatever constant replaces the `1/2`.
+
+    2. **The `Ns` dependence has the wrong SIGN.** This body is strictly
+       increasing in `Ns` (`effectCorrelationStabilizing_lt_of_Ns_lt`): stronger
+       selection, better-preserved effects. Measured, stronger stabilizing
+       selection makes the two populations LESS alike, because a shared optimum
+       is reachable by different allelic routes. At `N = 60`, `t = 20`, over
+       `s = 0, 0.1, 0.5, 2.0` the correlation falls monotonically
+       `0.548 ± 0.008`, `0.539 ± 0.009`, `0.477 ± 0.011`, `0.373 ± 0.014`, while
+       this body rises `undefined`, `0.917`, `0.983`, `0.996`.
+
+    The positive control is that same sweep: the design moves 12 sems along the
+    selection axis, so the flatness reported at weak selection is the
+    measurement and not the instrument's blindness. The competitor carried on
+    the same cells is the neutral arm `s = 0`, which this body cannot express at
+    all (it returns the junk `1` there, see
+    `effectCorrelationStabilizing_zero_selection_is_junk`).
+
+    What survives is the ORDERING interface: downstream results
+    (`fluctuatingEffectCorrelation_lt_stabilizing`,
+    `stabilizingNsFromObservedCorrelation_leftInverse`) use this only as a
+    parametrisation of an observed correlation `rho_obs` by a single number, and
+    those are algebra. What does not survive is reading `Ns` off an observed
+    correlation and calling it a selection-drift balance. -/
 noncomputable def effectCorrelationStabilizing (Ns : ℝ) : ℝ :=
   1 - 1 / (2 * Ns)
 
@@ -910,11 +945,34 @@ section ArchitecturePredictions
 
 /-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
 
-Empirical status: UNTESTED. The chart is a modelling convention, not an estimated timescale.
+Empirical status: **FALSIFIED by a factor of two as a selection timescale**
+(`proofs/validation/empirical/popgensel/`, cell D), and the "modelling convention" defence
+this docstring used to offer is what the measurement removes.
+
+The deterministic viability-selection recursion `p' = p(1+s)/(1+s p)` has e-folding time
+`1/log(1+s)` generations for a rare allele. Measured against it, over `s = 0.001, 0.005,
+0.02`:
+
+| `s` | e-folding time | this body `1/(2s)` | ratio | competitor `1/s` | ratio |
+|---|---|---|---|---|---|
+| 0.001 | 1000.50 | 500 | 0.4998 | 1000 | 0.9995 |
+| 0.005 | 200.50 | 100 | 0.4988 | 200 | 0.9975 |
+| 0.02 | 50.50 | 25 | 0.4951 | 50 | 0.9901 |
+
+The competitor `1/s` is right to within one percent everywhere; this body is exactly half
+of it. The other carried competitor, `2/s` -- the `h = 1/2` diploid convention, where the
+per-allele coefficient is `s/2` -- is off by a factor of two the other way, so no reading
+of `s` recovers `1/(2s)`. The `PLANTED` control `1.4/(2s)` is rejected at ratio 0.70 on all
+three rows, so the instrument does reject.
+
+The factor of two is inherited from the body: this is `driftLDCreationRate` applied to a
+selection coefficient, and `1/(2 Nₑ)` carries a two that counts GAMETES
+(`driftRatePerGen_unit_population`). A selection coefficient has no gametes to count. That
+is the type pun the "declared rather than inferred" note below records; the measurement
+says the pun costs a factor of two, which is not a convention.
 
 Denotes: a characteristic timescale indexed by selection strength. Its numerical formula
-matches a drift-rate chart, but the biological dimension is declared here rather than inferred
-from that coincidence. -/
+matches a drift-rate chart, and the coincidence is not benign. -/
 noncomputable def selectionPortabilityTimescale (selectionCoefficient : ℝ) : ℝ :=
   driftLDCreationRate selectionCoefficient
 
@@ -924,10 +982,14 @@ theorem selectionPortabilityTimescale_at_reference_point :
   norm_num [selectionPortabilityTimescale, driftLDCreationRate, driftRatePerGen,
     alleleFreqDivergenceRate]
 
-/-- **Selection coefficient determines portability timescale.**
-    The characteristic timescale for portability decay is 1/(2s) generations,
-    where s is the selection coefficient.
-    Smaller `s` gives slower change; larger `s` gives faster change. -/
+/-- **Selection coefficient orders the portability timescale.**
+    Smaller `s` gives slower change; larger `s` gives faster change.
+
+    The MONOTONICITY is all this states, and it is all that survives: the
+    magnitude `1/(2s)` is FALSIFIED at a factor of two against the deterministic
+    selection recursion, whose e-folding time is `1/log(1+s)` (see
+    `selectionPortabilityTimescale`). Any positive multiple of `1/s` orders the
+    same way, so this theorem does not bear on which multiple is right. -/
 theorem selectionPortabilityTimescale_lt_of_selection_lt
     (s₁ s₂ : ℝ) (h₁ : 0 < s₁)
     (h_stronger : s₁ < s₂) :

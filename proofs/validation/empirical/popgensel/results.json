@@ -1,0 +1,601 @@
+{
+ "ABCD": [
+  {
+   "cell": "A",
+   "target": "driftLDCreationRate",
+   "argument_source": "msprime DiscreteTimeWrightFisher pairwise coalescence time",
+   "detail": [
+    {
+     "N": 10,
+     "mean_tmrca": 20.024225,
+     "sem": 0.09757034745788268,
+     "rate_hat": 0.04993951076758276,
+     "rate_sem": 0.00024333603010701904,
+     "sems": {
+      "corpus  1/(2Ne)": 0.24858313169093352,
+      "COMP    1/(4Ne)": -102.49000428179245,
+      "COMP    1/Ne": 205.7257579586577,
+      "PLANTED 1.4/(2Ne)": 82.4394530624776
+     },
+     "pred": {
+      "corpus  1/(2Ne)": 0.05,
+      "COMP    1/(4Ne)": 0.025,
+      "COMP    1/Ne": 0.1,
+      "PLANTED 1.4/(2Ne)": 0.06999999999999999
+     }
+    },
+    {
+     "N": 25,
+     "mean_tmrca": 49.864125,
+     "sem": 0.24449067664613214,
+     "rate_hat": 0.0200544980985829,
+     "rate_sem": 9.832996788615268e-05,
+     "sems": {
+      "corpus  1/(2Ne)": -0.554236920386237,
+      "COMP    1/(4Ne)": -102.25263279068785,
+      "COMP    1/Ne": 202.842554820217,
+      "PLANTED 1.4/(2Ne)": 80.80447977585501
+     },
+     "pred": {
+      "corpus  1/(2Ne)": 0.02,
+      "COMP    1/(4Ne)": 0.01,
+      "COMP    1/Ne": 0.04,
+      "PLANTED 1.4/(2Ne)": 0.027999999999999997
+     }
+    },
+    {
+     "N": 60,
+     "mean_tmrca": 119.117525,
+     "sem": 0.5907703302142348,
+     "rate_hat": 0.00839507033075108,
+     "rate_sem": 4.1635842177459115e-05,
+     "sems": {
+      "corpus  1/(2Ne)": -1.4827848841057039,
+      "COMP    1/(4Ne)": -101.55681842731151,
+      "COMP    1/Ne": 198.66528220230592,
+      "PLANTED 1.4/(2Ne)": 78.57644195045891
+     },
+     "pred": {
+      "corpus  1/(2Ne)": 0.008333333333333333,
+      "COMP    1/(4Ne)": 0.004166666666666667,
+      "COMP    1/Ne": 0.016666666666666666,
+      "PLANTED 1.4/(2Ne)": 0.011666666666666665
+     }
+    }
+   ],
+   "guard": "PGSEL_V1"
+  },
+  {
+   "cell": "B",
+   "target": "bottleneckExcessLD",
+   "argument_source": "labelled-ancestry individual-based two-locus WF; competitor discrimination against the deleted predecessor formula",
+   "detail": [
+    {
+     "Ns": 50,
+     "Nb": 10,
+     "c": 0.02,
+     "tb": 8,
+     "measured": 0.18711565656565657,
+     "sem": 0.0060537205328044874,
+     "pred": {
+      "corpus": 0.18342343412159753,
+      "COMP deleted-predecessor": 0.2593242631388578,
+      "COMP no-recombination-factor": 0.27088348347600033,
+      "PLANTED 1.4x corpus": 0.25679280777023655
+     },
+     "sems": {
+      "corpus": -0.609909628971351,
+      "COMP deleted-predecessor": 11.927971597286371,
+      "COMP no-recombination-factor": 13.837412291567565,
+      "PLANTED 1.4x corpus": 11.509806378904788
+     },
+     "positive_control_preBottleneckQ": {
+      "measured": 0.19925934343434346,
+      "sem": 0.003123020720609344,
+      "driftLDEquilibrium": 0.1951873831395816,
+      "sems": -1.3038531149954624
+     }
+    },
+    {
+     "Ns": 50,
+     "Nb": 5,
+     "c": 0.05,
+     "tb": 5,
+     "measured": 0.2419358585858586,
+     "sem": 0.00605743962108831,
+     "pred": {
+      "corpus": 0.2559758612260614,
+      "COMP deleted-predecessor": 0.36050004989999984,
+      "COMP no-recombination-factor": 0.37481553625909425,
+      "PLANTED 1.4x corpus": 0.358366205716486
+     },
+     "sems": {
+      "corpus": 2.3178114052221184,
+      "COMP deleted-predecessor": 19.57331789183223,
+      "COMP no-recombination-factor": 21.9366078715221,
+      "PLANTED 1.4x corpus": 19.221049554549076
+     },
+     "positive_control_preBottleneckQ": {
+      "measured": 0.08450858585858587,
+      "sem": 0.0011524500451566984,
+      "driftLDEquilibrium": 0.0847218962684815,
+      "sems": 0.18509297716816503
+     }
+    },
+    {
+     "Ns": 80,
+     "Nb": 20,
+     "c": 0.01,
+     "tb": 12,
+     "measured": 0.13245174921383648,
+     "sem": 0.005558116564111741,
+     "pred": {
+      "corpus": 0.1329664418540373,
+      "COMP deleted-predecessor": 0.18952681604758814,
+      "COMP no-recombination-factor": 0.2003345901606455,
+      "PLANTED 1.4x corpus": 0.18615301859565223
+     },
+     "sems": {
+      "corpus": 0.09260198742936486,
+      "COMP deleted-predecessor": 10.268778312833566,
+      "COMP no-recombination-factor": 12.21328127321446,
+      "PLANTED 1.4x corpus": 9.66177458899657
+     },
+     "positive_control_preBottleneckQ": {
+      "measured": 0.2335899174528302,
+      "sem": 0.0037176527528568707,
+      "driftLDEquilibrium": 0.23536898729617398,
+      "sems": 0.4785465350352134
+     }
+    }
+   ],
+   "guard": "PGSEL_V1"
+  },
+  {
+   "cell": "C",
+   "target": "freeRecombinationStep",
+   "argument_source": "deterministic two-locus gamete recursion D' = (1-r) D, independent of the corpus's product-law definition",
+   "deterministic": [
+    {
+     "D0": 0.1,
+     "r": 0.5,
+     "D_after_one_gen": 0.04999999999999999,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.4999999999999999
+    },
+    {
+     "D0": 0.1,
+     "r": 0.25,
+     "D_after_one_gen": 0.07499999999999998,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.7499999999999998
+    },
+    {
+     "D0": 0.2,
+     "r": 0.5,
+     "D_after_one_gen": 0.1,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.5
+    },
+    {
+     "D0": 0.2,
+     "r": 0.25,
+     "D_after_one_gen": 0.15000000000000002,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.7500000000000001
+    },
+    {
+     "D0": -0.15,
+     "r": 0.5,
+     "D_after_one_gen": -0.07500000000000001,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.5000000000000001
+    },
+    {
+     "D0": -0.15,
+     "r": 0.25,
+     "D_after_one_gen": -0.11250000000000002,
+     "corpus_claim_D_after_one_gen": 0.0,
+     "ratio_to_D0": 0.7500000000000001
+    }
+   ],
+   "finite_N": {
+    "N": 4000,
+    "reps": 400,
+    "D0": 0.2,
+    "mean_D_after_one_gen": 0.099896643125,
+    "sem": 0.00012992804479685516,
+    "corpus_claim": 0.0,
+    "expected_half": 0.1
+   },
+   "guard": "PGSEL_V1"
+  },
+  {
+   "cell": "D",
+   "target": "selectionPortabilityTimescale",
+   "argument_source": "deterministic viability-selection recursion e-folding time",
+   "detail": [
+    {
+     "s": 0.001,
+     "efold_gens_measured": 1000.499916708417,
+     "efold_gens_integer": 1001,
+     "pred": {
+      "corpus 1/(2s)": 500.0,
+      "COMP 1/s": 1000.0,
+      "COMP 2/s": 2000.0,
+      "PLANTED 1.4/(2s)": 699.9999999999999
+     },
+     "ratio": {
+      "corpus 1/(2s)": 0.4997501665417116,
+      "COMP 1/s": 0.9995003330834232,
+      "COMP 2/s": 1.9990006661668465,
+      "PLANTED 1.4/(2s)": 0.6996502331583961
+     }
+    },
+    {
+     "s": 0.005,
+     "efold_gens_measured": 200.4995843717173,
+     "efold_gens_integer": 201,
+     "pred": {
+      "corpus 1/(2s)": 100.0,
+      "COMP 1/s": 200.0,
+      "COMP 2/s": 400.0,
+      "PLANTED 1.4/(2s)": 140.0
+     },
+     "ratio": {
+      "corpus 1/(2s)": 0.4987541511038968,
+      "COMP 1/s": 0.9975083022077936,
+      "COMP 2/s": 1.9950166044155873,
+      "PLANTED 1.4/(2s)": 0.6982558115454556
+     }
+    },
+    {
+     "s": 0.02,
+     "efold_gens_measured": 50.4983497918439,
+     "efold_gens_integer": 51,
+     "pred": {
+      "corpus 1/(2s)": 25.0,
+      "COMP 1/s": 50.0,
+      "COMP 2/s": 100.0,
+      "PLANTED 1.4/(2s)": 35.0
+     },
+     "ratio": {
+      "corpus 1/(2s)": 0.4950656824044932,
+      "COMP 1/s": 0.9901313648089864,
+      "COMP 2/s": 1.980262729617973,
+      "PLANTED 1.4/(2s)": 0.6930919553662905
+     }
+    }
+   ],
+   "guard": "PGSEL_V1"
+  }
+ ],
+ "E": {
+  "cell": "E",
+  "target": "effectCorrelationStabilizing",
+  "argument_source": "forward individual-based WF with Gaussian stabilizing selection; two populations split from one ancestor, same optimum",
+  "guard": "PGSEL_E1",
+  "detail": [
+   {
+    "N": 30,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 5,
+    "corr_freq": 0.7118496565145527,
+    "corr_freq_sem": 0.005415803791940029,
+    "corr_varcontrib": 0.903505103722335,
+    "corr_varcontrib_sem": 0.0052766245431072846,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 20,
+    "corr_freq": 0.26489338077365343,
+    "corr_freq_sem": 0.011338778018975608,
+    "corr_varcontrib": 0.8057894636288936,
+    "corr_varcontrib_sem": 0.014032653789615275,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 60,
+    "corr_freq": 0.0021646740314392064,
+    "corr_freq_sem": 0.03171194971832967,
+    "corr_varcontrib": 0.8122390079825254,
+    "corr_varcontrib_sem": 0.017848600865920352,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.02,
+    "Ns": 0.6,
+    "t": 5,
+    "corr_freq": 0.7096538695874874,
+    "corr_freq_sem": 0.005953798702168452,
+    "corr_varcontrib": 0.9031594962568544,
+    "corr_varcontrib_sem": 0.005404890483117912,
+    "corpus_1_minus_half_over_Ns": 0.16666666666666663,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.02,
+    "Ns": 0.6,
+    "t": 20,
+    "corr_freq": 0.2723625525100071,
+    "corr_freq_sem": 0.014717444574170005,
+    "corr_varcontrib": 0.8114678365907773,
+    "corr_varcontrib_sem": 0.013848501204488542,
+    "corpus_1_minus_half_over_Ns": 0.16666666666666663,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.02,
+    "Ns": 0.6,
+    "t": 60,
+    "corr_freq": 0.011076138479739534,
+    "corr_freq_sem": 0.02476672342522399,
+    "corr_varcontrib": 0.7768483275408075,
+    "corr_varcontrib_sem": 0.018614687914412835,
+    "corpus_1_minus_half_over_Ns": 0.16666666666666663,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.08,
+    "Ns": 2.4,
+    "t": 5,
+    "corr_freq": 0.7033910750784145,
+    "corr_freq_sem": 0.007153669704452961,
+    "corr_varcontrib": 0.8992393798703908,
+    "corr_varcontrib_sem": 0.005128585661196494,
+    "corpus_1_minus_half_over_Ns": 0.7916666666666666,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.08,
+    "Ns": 2.4,
+    "t": 20,
+    "corr_freq": 0.25723519322546007,
+    "corr_freq_sem": 0.013568117308154277,
+    "corr_varcontrib": 0.7937358141852189,
+    "corr_varcontrib_sem": 0.013085259965648237,
+    "corpus_1_minus_half_over_Ns": 0.7916666666666666,
+    "reps": 40
+   },
+   {
+    "N": 30,
+    "s": 0.08,
+    "Ns": 2.4,
+    "t": 60,
+    "corr_freq": 0.0069150650414985465,
+    "corr_freq_sem": 0.02656965913101198,
+    "corr_varcontrib": 0.7674024043427927,
+    "corr_varcontrib_sem": 0.021099436333397465,
+    "corpus_1_minus_half_over_Ns": 0.7916666666666666,
+    "reps": 38
+   },
+   {
+    "N": 60,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 5,
+    "corr_freq": 0.8467116164468059,
+    "corr_freq_sem": 0.0030061444811501285,
+    "corr_varcontrib": 0.9437466684597948,
+    "corr_varcontrib_sem": 0.0035277007405141417,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 20,
+    "corr_freq": 0.5556449753469564,
+    "corr_freq_sem": 0.008556749078123396,
+    "corr_varcontrib": 0.8435388401719024,
+    "corr_varcontrib_sem": 0.008833813364828469,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 60,
+    "corr_freq": 0.14989669448075302,
+    "corr_freq_sem": 0.01790627321619148,
+    "corr_varcontrib": 0.7869169435282641,
+    "corr_varcontrib_sem": 0.012985500609831047,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.02,
+    "Ns": 1.2,
+    "t": 5,
+    "corr_freq": 0.8436074242399915,
+    "corr_freq_sem": 0.00263209741292705,
+    "corr_varcontrib": 0.9360254040319755,
+    "corr_varcontrib_sem": 0.003998180939140428,
+    "corpus_1_minus_half_over_Ns": 0.5833333333333333,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.02,
+    "Ns": 1.2,
+    "t": 20,
+    "corr_freq": 0.5556992394550645,
+    "corr_freq_sem": 0.0080938452602796,
+    "corr_varcontrib": 0.8507450694986487,
+    "corr_varcontrib_sem": 0.007647185854227097,
+    "corpus_1_minus_half_over_Ns": 0.5833333333333333,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.02,
+    "Ns": 1.2,
+    "t": 60,
+    "corr_freq": 0.15676769424151651,
+    "corr_freq_sem": 0.01542511048500998,
+    "corr_varcontrib": 0.7854268274503992,
+    "corr_varcontrib_sem": 0.015277284611341833,
+    "corpus_1_minus_half_over_Ns": 0.5833333333333333,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.08,
+    "Ns": 4.8,
+    "t": 5,
+    "corr_freq": 0.8390681491614153,
+    "corr_freq_sem": 0.005611427205323303,
+    "corr_varcontrib": 0.937989465605216,
+    "corr_varcontrib_sem": 0.004115390948627894,
+    "corpus_1_minus_half_over_Ns": 0.8958333333333334,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.08,
+    "Ns": 4.8,
+    "t": 20,
+    "corr_freq": 0.5495458576606199,
+    "corr_freq_sem": 0.00799165242682907,
+    "corr_varcontrib": 0.8512631256452365,
+    "corr_varcontrib_sem": 0.008437067296390951,
+    "corpus_1_minus_half_over_Ns": 0.8958333333333334,
+    "reps": 40
+   },
+   {
+    "N": 60,
+    "s": 0.08,
+    "Ns": 4.8,
+    "t": 60,
+    "corr_freq": 0.16337463014826423,
+    "corr_freq_sem": 0.012894597600290004,
+    "corr_varcontrib": 0.7866825867563353,
+    "corr_varcontrib_sem": 0.013851527323870452,
+    "corpus_1_minus_half_over_Ns": 0.8958333333333334,
+    "reps": 40
+   }
+  ]
+ },
+ "E_power_control": {
+  "cell": "E",
+  "target": "effectCorrelationStabilizing",
+  "argument_source": "forward individual-based WF with Gaussian stabilizing selection; two populations split from one ancestor, same optimum",
+  "guard": "PGSEL_E2",
+  "detail": [
+   {
+    "N": 30,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 20,
+    "corr_freq": 0.2774307021736907,
+    "corr_freq_sem": 0.012341399161282187,
+    "corr_varcontrib": 0.8242424493127415,
+    "corr_varcontrib_sem": 0.009196174326994605,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 150
+   },
+   {
+    "N": 30,
+    "s": 0.1,
+    "Ns": 3.0,
+    "t": 20,
+    "corr_freq": 0.2595607025028186,
+    "corr_freq_sem": 0.01445736566804469,
+    "corr_varcontrib": 0.791154390652475,
+    "corr_varcontrib_sem": 0.011947476251793423,
+    "corpus_1_minus_half_over_Ns": 0.8333333333333334,
+    "reps": 150
+   },
+   {
+    "N": 30,
+    "s": 0.5,
+    "Ns": 15.0,
+    "t": 20,
+    "corr_freq": 0.19504541952901427,
+    "corr_freq_sem": 0.014521516989219836,
+    "corr_varcontrib": 0.8067906821471197,
+    "corr_varcontrib_sem": 0.010532735456277217,
+    "corpus_1_minus_half_over_Ns": 0.9666666666666667,
+    "reps": 145
+   },
+   {
+    "N": 30,
+    "s": 2.0,
+    "Ns": 60.0,
+    "t": 20,
+    "corr_freq": 0.14777128981133453,
+    "corr_freq_sem": 0.01823810826494209,
+    "corr_varcontrib": 0.7824949043891708,
+    "corr_varcontrib_sem": 0.012782614403696754,
+    "corpus_1_minus_half_over_Ns": 0.9916666666666667,
+    "reps": 130
+   },
+   {
+    "N": 60,
+    "s": 0.0,
+    "Ns": 0.0,
+    "t": 20,
+    "corr_freq": 0.5476646629631776,
+    "corr_freq_sem": 0.007832303875903194,
+    "corr_varcontrib": 0.8560246636629555,
+    "corr_varcontrib_sem": 0.007406099493119257,
+    "corpus_1_minus_half_over_Ns": null,
+    "reps": 150
+   },
+   {
+    "N": 60,
+    "s": 0.1,
+    "Ns": 6.0,
+    "t": 20,
+    "corr_freq": 0.538541491988223,
+    "corr_freq_sem": 0.008769576705319889,
+    "corr_varcontrib": 0.843346905123203,
+    "corr_varcontrib_sem": 0.00819137147151556,
+    "corpus_1_minus_half_over_Ns": 0.9166666666666666,
+    "reps": 150
+   },
+   {
+    "N": 60,
+    "s": 0.5,
+    "Ns": 30.0,
+    "t": 20,
+    "corr_freq": 0.4767939149310584,
+    "corr_freq_sem": 0.010760317536072482,
+    "corr_varcontrib": 0.8147250804758972,
+    "corr_varcontrib_sem": 0.00978739280496083,
+    "corpus_1_minus_half_over_Ns": 0.9833333333333333,
+    "reps": 148
+   },
+   {
+    "N": 60,
+    "s": 2.0,
+    "Ns": 120.0,
+    "t": 20,
+    "corr_freq": 0.3726724543313914,
+    "corr_freq_sem": 0.01412080979944567,
+    "corr_varcontrib": 0.7683727322862438,
+    "corr_varcontrib_sem": 0.011640825106772524,
+    "corpus_1_minus_half_over_Ns": 0.9958333333333333,
+    "reps": 141
+   }
+  ]
+ }
+}

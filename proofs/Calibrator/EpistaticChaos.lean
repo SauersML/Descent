@@ -1515,24 +1515,56 @@ equilibrium quantity. There is no one-step map here and nothing for a
 point live in `Calibrator.LDDecayTheory`.
 directly as pairwise LD between panel loci.
 
-Empirical status: UNTESTED. A factorization condition on the joint law; testable -/
+Empirical status: NOT AN EMPIRICAL CLAIM. This is the DEFINITION of linkage equilibrium on
+this design -- the factorization of the joint law into the per-locus marginals the design
+already carries -- so no population can make it a different condition. The empirical
+question is whether a given panel satisfies it, and that is a claim about the INPUT
+`jointGenotypeProb`, not about this predicate. `freeRecombinationStep` below, whose fixed
+point this is, is where the empirical content sits, and it is FALSIFIED as a one-generation
+step. -/
 def InLinkageEquilibrium : Prop :=
   ∀ x : Fin n → DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
-/-- **One generation of free recombination across the tested panel.** The step
-    leaves the per-locus models, the tested sets and the coefficients where they
-    are and replaces the joint genotype law by the product of the panel's own
-    per-locus Hardy-Weinberg laws: with free recombination and an infinite
-    population, next generation's genotypes at distinct panel loci are drawn
-    independently from the marginals this generation already has.
+/-- **Projection of a panel onto linkage equilibrium.** The map leaves the
+    per-locus models, the tested sets and the coefficients where they are and
+    replaces the joint genotype law by the product of the panel's own per-locus
+    Hardy-Weinberg laws.
 
-    This is the map the equilibrium of `InLinkageEquilibrium` is an equilibrium
-    of. The rate at which a finite recombination fraction approaches it lives in
-    `Calibrator.LDDecayTheory`; here the step is taken in one generation.
+    This is the map `InLinkageEquilibrium` is the fixed-point set of. The rate at
+    which a finite recombination fraction approaches it lives in
+    `Calibrator.LDDecayTheory`.
 
-    Empirical status: UNTESTED. The infinite-population free-recombination step,
-    carrying no free parameter beyond the design's own per-locus models. -/
+    **It is NOT one generation of free recombination, which is what this
+    declaration used to claim and be named for.** Empirical status:
+    **FALSIFIED as a one-generation step**
+    (`proofs/validation/empirical/popgensel/`, cell C). The two-locus gamete
+    recursion under random mating is `D' = (1 - r) D`, so free recombination
+    `r = 1/2` HALVES the disequilibrium in one generation rather than removing
+    it. Exactly, at `pA = pB = 1/2`:
+
+    | `D₀` | `r` | `D` after one generation | this map's claim |
+    |---|---|---|---|
+    | 0.10 | 1/2 | 0.050 | 0 |
+    | 0.20 | 1/2 | 0.100 | 0 |
+    | -0.15 | 1/2 | -0.075 | 0 |
+    | 0.20 | 1/4 | 0.150 | 0 |
+
+    The `r = 1/4` row is the competitor that makes the measurement informative:
+    it lands on `0.75 D₀`, so the instrument reads `(1 - r)` and is not merely
+    reporting "not zero". A finite-population check at `N = 4000` over 400
+    replicates gives `0.09990 ± 0.00013` against `D₀ = 0.20`, i.e. `D₀/2` to
+    within one sem and 769 sems away from the claimed `0`, so the deterministic
+    answer is not a large-population artefact.
+
+    The map itself is sound and is kept -- it is the limit the recombination
+    dynamic converges to, and every theorem below is about the fixed point, not
+    about a rate. What is retracted is the reading of it as a single generation.
+    `freeRecombinationStep_jointGenotypeProb_of_inLinkageEquilibrium` is the
+    part that was always true: a panel ALREADY in linkage equilibrium is fixed.
+
+    Denotes: an idempotent projection onto the product law, not a per-generation
+    transition. -/
 def freeRecombinationStep (d : GenotypeDesign n ι) : GenotypeDesign n ι where
   model := d.model
   locusSet := d.locusSet
@@ -1564,19 +1596,25 @@ theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → HardyWeinbergM
   fun _ ↦ rfl
 
 omit [Fintype ι] in
-/-- **The equilibrium design is the fixed point of free recombination.** One
-    generation of `freeRecombinationStep` returns it unchanged, which is what
+/-- **The equilibrium design is the fixed point of the linkage-equilibrium
+    projection.** `freeRecombinationStep` returns it unchanged, which is what
     entitles it to the name: the product law is where the recombination map
-    rests, not a closed form written down and then guarded by value bounds. -/
+    rests, not a closed form written down and then guarded by value bounds.
+
+    "One generation" is deliberately absent here: the projection is the LIMIT of
+    the recombination dynamic and not a single generation of it, which is
+    FALSIFIED at `D' = (1-r) D` -- see `freeRecombinationStep`. -/
 theorem equilibriumDesign_isFixedPoint (model : Fin n → HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
     freeRecombinationStep (equilibriumDesign model locusSet coefficient) =
       equilibriumDesign model locusSet coefficient := rfl
 
 omit [Fintype ι] in
-/-- Being at linkage equilibrium is exactly being at rest under the step, on the
-    field the step moves: the joint law of a design in linkage equilibrium
-    survives a generation of free recombination. -/
+/-- Being at linkage equilibrium is exactly being at rest under the projection,
+    on the field it moves: the joint law of a design already in linkage
+    equilibrium survives it. This is the part of `freeRecombinationStep` that the
+    one-generation falsification leaves standing, because a panel at `D = 0` has
+    `(1-r) D = 0` for every `r`. -/
 theorem freeRecombinationStep_jointGenotypeProb_of_inLinkageEquilibrium
     (d : GenotypeDesign n ι) (h : d.InLinkageEquilibrium) :
     (freeRecombinationStep d).jointGenotypeProb = d.jointGenotypeProb :=
