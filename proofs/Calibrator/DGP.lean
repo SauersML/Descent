@@ -339,21 +339,35 @@ universally quantified over a `TaggedDataGeneratingProcess`, and the structure
 imposes no probability constraint on `jointMeasureCT`, so nothing in the type
 forces a model to exist; this exhibits one.
 
-WHAT THIS DOES NOT ESTABLISH, stated because a witness is easy to overread: the
-zero law is the DEGENERATE point of the parameter space, the one the three
-`_at_zero_law` theorems below are about. Inhabitation is all it gives. A
-nondegenerate witness -- a genuine joint law with a nonzero causal-tag
-cross-covariance, which is what would make `crossCovEntry` a statement about
-tagging rather than about integrating against nothing -- needs a constructed
-probability measure on the product space and is not supplied here. -/
+The joint law is a point mass rather than the ZERO measure, and the difference
+matters more than it looks. The structure imposes no probability constraint, so
+`jointMeasureCT := 0` would also typecheck and would also inhabit the class --
+but every integral against it vanishes for the trivial reason that there is no
+mass, which makes the three `_at_zero_law` theorems below indistinguishable from
+statements about a genuine law. A Dirac measure is a real probability measure
+(`TaggedDataGeneratingProcess.witness_isProbabilityMeasure`), so the class now
+contains an actual data-generating process.
+
+WHAT THIS STILL DOES NOT ESTABLISH: a point mass has no spread, so its
+causal-tag cross-covariance is zero for a second, different reason. A witness
+with NONZERO `crossCovEntry` -- which is what would make the tagging results
+statements about tagging rather than about a degenerate law -- needs a
+constructed non-atomic measure on the product space and is not supplied here. -/
 noncomputable def TaggedDataGeneratingProcess.witness (c t : ℕ) :
     TaggedDataGeneratingProcess c t where
-  trueExpectation := fun _ _ ↦ 0
-  jointMeasureCT := 0
+  trueExpectation := fun _causal _tag ↦ 0
+  jointMeasureCT := Measure.dirac (fun _ ↦ 0, fun _ ↦ 0)
 
 instance TaggedDataGeneratingProcess.instNonempty (c t : ℕ) :
     Nonempty (TaggedDataGeneratingProcess c t) :=
   ⟨TaggedDataGeneratingProcess.witness c t⟩
+
+/-- The witness carries a genuine probability measure, so it is a data-generating
+process and not merely a record of the right shape. -/
+instance TaggedDataGeneratingProcess.witness_isProbabilityMeasure (c t : ℕ) :
+    IsProbabilityMeasure (TaggedDataGeneratingProcess.witness c t).jointMeasureCT := by
+  unfold TaggedDataGeneratingProcess.witness
+  infer_instance
 
 /-- Mean of causal coordinate `i` under the joint tagged law. -/
 noncomputable def causalMean {c t : ℕ}
@@ -1706,6 +1720,29 @@ theorem decaySlope_exponentialTagging_pos {k : ℕ} (distance : (Fin k → ℝ) 
   rw [decaySlope_exponentialTagging]
   exact Real.exp_pos _
 
+/-- **Tagging efficiency really does decrease with genetic distance**, at every
+positive rate.
+
+The `tagging_efficiency` field of `LDDecayMechanism` is documented as "decreases
+with distance", but the structure takes an arbitrary `ℝ → ℝ` there, so nothing in
+the type enforces it and a mechanism whose efficiency INCREASES with distance is
+equally well-typed. That sentence was therefore prose about a field, not a
+property of one. Here it is a theorem, on the family the corpus's own nonlinearity
+result is about.
+
+The positivity of the rate is what carries it: at `rate = 0` the efficiency is
+constant, which is the no-decay regime, and at a negative rate it would increase.
+Biologically the rate is the reciprocal of the LD decay length, so `0 < rate` is
+the statement that tags and causal variants decouple at all. -/
+theorem decaySlope_exponentialTagging_strictAnti {k : ℕ} (distance : (Fin k → ℝ) → ℝ)
+    (rate : ℝ) (hrate : 0 < rate) (c c' : Fin k → ℝ)
+    (hcloser : distance c < distance c') :
+    decaySlope (LDDecayMechanism.exponentialTagging distance rate) c' <
+      decaySlope (LDDecayMechanism.exponentialTagging distance rate) c := by
+  rw [decaySlope_exponentialTagging, decaySlope_exponentialTagging]
+  apply Real.exp_lt_exp.mpr
+  nlinarith
+
 
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
@@ -1748,6 +1785,40 @@ theorem selectedTotalVariance_neutralUnlinked {k : ℕ} (genic : (Fin k → ℝ)
     selectedTotalVariance (GeneticArchitecture.neutralUnlinked genic) c =
       totalVariance (GeneticArchitecture.neutralUnlinked genic) c :=
   selectedTotalVariance_of_no_selection _ c rfl
+
+/-- **The unlinked architecture is the zero-covariance member of a family that
+also contains linked ones.** Carrying both through one definition is what keeps
+`neutralUnlinked` from being a second body for the same quantity: it is this
+family at `V_cov = 0`, proved by `neutralUnlinked_eq_directionalLD` rather than
+asserted.
+
+Convention: `cov` is the structural covariance CONTRIBUTION TO VARIANCE carried
+by the architecture's `V_cov` field -- a dosage-scale quantity in the same units
+as `V_genic` -- not the haplotype disequilibrium coefficient `D`, which differs
+from it by ploidy and by the allele-frequency factors.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a labelling of the architecture's
+    two variance components, with no free parameter of its own. -/
+noncomputable def GeneticArchitecture.directionalLD {k : ℕ}
+    (genic cov : (Fin k → ℝ) → ℝ) : GeneticArchitecture k where
+  V_genic := genic
+  V_cov := cov
+  selection_effect := fun _ ↦ 0
+
+theorem GeneticArchitecture.neutralUnlinked_eq_directionalLD {k : ℕ}
+    (genic : (Fin k → ℝ) → ℝ) :
+    GeneticArchitecture.neutralUnlinked genic =
+      GeneticArchitecture.directionalLD genic (fun _ ↦ 0) := rfl
+
+/-- **With directional LD the slope moves off one by exactly the covariance
+share.** `directionalLD_nonzero_implies_slope_ne_one` says a nonzero `V_cov`
+forces the slope away from one; this says by how much, on a family that exists,
+so the no-go has both a witness and a rate. -/
+theorem optimalSlopeFromVariance_directionalLD {k : ℕ} [Fintype (Fin k)]
+    (genic cov : (Fin k → ℝ) → ℝ) (c : Fin k → ℝ) (hgenic : genic c ≠ 0) :
+    optimalSlopeFromVariance (GeneticArchitecture.directionalLD genic cov) c =
+      1 + cov c / genic c :=
+  optimal_slope_trace_variance _ c hgenic
 
 /-- **The optimal slope is exactly one on the neutral unlinked architecture.**
 
