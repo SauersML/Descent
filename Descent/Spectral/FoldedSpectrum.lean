@@ -2402,4 +2402,4 @@ separates quotient fibres remains the continuation. -/
   stratification actually runs in. Nothing here is proved in the tilted setting.
 -/
 
-end Descent
+end Descent.Spectral

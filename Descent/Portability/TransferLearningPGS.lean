@@ -3554,4 +3554,4 @@ theorem sourcePopulationMeanWeights_at_zero_count_is_junk
 
 end OperatorError
 
-end Descent
+end Descent.Portability

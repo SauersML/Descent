@@ -3930,4 +3930,4 @@ theorem not_hasTaskIndependentSpectralPortabilityScalar (a : ℝ) (ha : a ≠ 0)
   unfold Spectral.HasTaskIndependentSpectralPortabilityScalar
   exact Spectral.twoBand_no_common_monotone_scalar a ha
 
-end Descent
+end Descent.Portability
