@@ -152,10 +152,11 @@ chain `(Nₑ, m, μ) → F_ST → moments → metric`. -/
 
 The score's causal weights were fitted in the source; in the target, allele frequencies
 have drifted apart, and the covariance a score retains is eroded by `1 - F_ST`. Both the
-score variance and the predictive covariance carry that factor -- the score is built from
-the same drifted frequencies it is scored against -- while the outcome variance
-`V_A + V_E` does not, because the trait's variance is a property of the target
-population and not of the score.
+score variance, the predictive covariance AND the additive part of the outcome variance
+all carry that factor: the target's own additive variance is eroded by the same drift,
+so `Var(Y) = V_A(1 - F) + V_E` and not `V_A + V_E`. Getting that wrong inflates the
+denominator and understates the deployed `R²` -- it is the difference between dividing by
+the ancestral additive variance and by the target's.
 
 This is the drift regime and it says so: no selection, no gene-environment interaction,
 no effect turnover, and the same causal variants in both populations. Those are the
@@ -164,18 +165,19 @@ turnover and context terms are what carry the rest. -/
 noncomputable def momentsUnderDrift (V_A V_E fst : ℝ) : ScoreMoments where
   scoreVariance := retainedFraction fst V_A
   predictiveCovariance := retainedFraction fst V_A
-  outcomeVariance := V_A + V_E
+  outcomeVariance := retainedFraction fst V_A + V_E
 
 /-- **The deployed `R²` under drift, from the tuple.** `V_A(1-F)/(V_A + V_E)`: the
 familiar law, but now as a consequence of the moment interface rather than as a formula
 written next to it. -/
 theorem r2_momentsUnderDrift (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
     (hf : fst < 1) :
-    (momentsUnderDrift V_A V_E fst).r2 = retainedFraction fst V_A / (V_A + V_E) := by
+    (momentsUnderDrift V_A V_E fst).r2
+      = share (retainedFraction fst V_A) V_E := by
   have hr : 0 < retainedFraction fst V_A := by
     unfold retainedFraction; nlinarith
-  have hy : 0 < V_A + V_E := by linarith
-  unfold r2 momentsUnderDrift
+  have hy : 0 < retainedFraction fst V_A + V_E := by linarith
+  unfold r2 momentsUnderDrift share
   simp only
   field_simp
 
@@ -205,16 +207,39 @@ theorem calibrationSlope_momentsUnderDrift (V_A V_E fst : ℝ) (hV : 0 < V_A)
   exact div_self hr
 
 /-- **More differentiation, less transferred `R²`.** The monotone law the whole
-demography-to-metric chain exists to state, at the level of the tuple. -/
-theorem r2_momentsUnderDrift_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+demography-to-metric chain exists to state, at the level of the tuple.
+
+`V_E` must be STRICTLY positive, and that is not a technical convenience. At `V_E = 0`
+the trait is purely additive, the score explains all of it, and `R² = 1` at every
+differentiation -- drift erodes the numerator and the denominator by exactly the same
+factor and they cancel. So the monotone law is a statement about traits with
+environmental variance, and a corpus that stated it without the hypothesis would be
+claiming portability loss for a case that has none. -/
+theorem r2_momentsUnderDrift_anti (V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
     (h1 : f₁ < f₂) (h2 : f₂ < 1) :
     (momentsUnderDrift V_A V_E f₂).r2 < (momentsUnderDrift V_A V_E f₁).r2 := by
-  have hy : 0 < V_A + V_E := by linarith
-  rw [r2_momentsUnderDrift V_A V_E f₁ hV hE (by linarith),
-    r2_momentsUnderDrift V_A V_E f₂ hV hE h2]
-  unfold retainedFraction
-  apply div_lt_div_of_pos_right _ hy
+  rw [r2_momentsUnderDrift V_A V_E f₁ hV (le_of_lt hE) (by linarith),
+    r2_momentsUnderDrift V_A V_E f₂ hV (le_of_lt hE) h2]
+  have h1' : 0 < retainedFraction f₂ V_A := by unfold retainedFraction; nlinarith
+  have h2' : retainedFraction f₂ V_A < retainedFraction f₁ V_A := by
+    unfold retainedFraction; nlinarith
+  have hb1 : 0 < retainedFraction f₂ V_A + V_E := by linarith
+  have hb2 : 0 < retainedFraction f₁ V_A + V_E := by linarith
+  unfold share
+  rw [div_lt_div_iff₀ hb1 hb2]
   nlinarith
+
+/-- **A purely additive trait transfers perfectly, whatever the differentiation.** The
+boundary the monotone law excludes, stated rather than left implicit: at `V_E = 0` drift
+erodes numerator and denominator alike and `R²` is `1` at every `F_ST`. -/
+theorem r2_momentsUnderDrift_of_no_environment (V_A fst : ℝ) (hV : 0 < V_A)
+    (hf : fst < 1) :
+    (momentsUnderDrift V_A 0 fst).r2 = 1 := by
+  have hr : 0 < retainedFraction fst V_A := by unfold retainedFraction; nlinarith
+  rw [r2_momentsUnderDrift V_A 0 fst hV le_rfl hf]
+  unfold share
+  field_simp
+  ring
 
 /-! ### The full chain
 
@@ -231,12 +256,12 @@ severing the metric from the population genetics meant to produce it. -/
 noncomputable def deployedR2 (p : PopGenParameters) (V_E : ℝ) : ℝ :=
   (momentsUnderDrift p.V_A V_E p.fstEquilibrium).r2
 
-/-- **The chain, evaluated.** `V_A(1 - F_ST(Nₑ,m,μ)) / (V_A + V_E)` where the `F_ST` is
-the equilibrium the parameters determine, not a number supplied by the caller. -/
+/-- **The chain, evaluated.** `V_A(1-F) / (V_A(1-F) + V_E)` where `F` is the equilibrium
+the parameters determine, not a number supplied by the caller. -/
 theorem deployedR2_eq (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
     (hflow : 0 < p.mu + p.mig) :
     deployedR2 p V_E
-      = retainedFraction p.fstEquilibrium p.V_A / (p.V_A + V_E) :=
+      = share (retainedFraction p.fstEquilibrium p.V_A) V_E :=
   r2_momentsUnderDrift p.V_A V_E p.fstEquilibrium p.V_A_pos hE
     (p.fstEquilibrium_lt_one hflow)
 
@@ -245,7 +270,7 @@ the migration rate in the demographic parameters and the deployed `R²` goes up,
 every step -- equilibrium, moments, metric -- a named map rather than an assumption.
 
 This is the statement the corpus's two layers were built to support and could not make. -/
-theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+theorem deployedR2_mono_in_migration (p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
     (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedR2 p V_E < deployedR2 q V_E := by

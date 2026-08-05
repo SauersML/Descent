@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.TransportIdentities
+import Descent.Core.Moments
 
 namespace Descent
 
@@ -716,6 +717,41 @@ variance -- the three reals a deployment reduces to as far as `R²` and calibrat
 slope are concerned. -/
 def portabilityStatistic (P : DeploymentPopulation Ω J L) (w : J → ℝ) : ℝ × ℝ × ℝ :=
   (P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance)
+
+/-- **The statistic, as the named interface rather than as an anonymous triple.**
+
+This module's header states the layer contract: the interface between `PopGen` and this
+module is the moment tuple this module consumes. `Core.ScoreMoments` IS that tuple, and
+it sits at depth 2 where `PopGen` can reach it -- which is what lets a demographic
+history and a deployed metric be composed rather than merely both exist.
+
+An anonymous `ℝ × ℝ × ℝ` at the top of the import graph could not serve as an interface,
+whatever the header said, because nothing below it could name the type. -/
+def DeploymentPopulation.toScoreMoments (P : DeploymentPopulation Ω J L) (w : J → ℝ) : Descent.Core.ScoreMoments :=
+  ⟨P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance⟩
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **The named tuple and the anonymous triple carry the same three reals.** -/
+theorem toScoreMoments_eq (P : DeploymentPopulation Ω J L) (w : J → ℝ) :
+    (P.toScoreMoments w).scoreVariance = (portabilityStatistic P w).1 ∧
+    (P.toScoreMoments w).predictiveCovariance = (portabilityStatistic P w).2.1 ∧
+    (P.toScoreMoments w).outcomeVariance = (portabilityStatistic P w).2.2 :=
+  ⟨rfl, rfl, rfl⟩
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **This module's `R²` is the Core metric law, on this population's tuple.**
+
+The point of the equality is not the arithmetic -- both sides are the squared covariance
+over the product of variances -- but the dependency: `Core.ScoreMoments.r2` is a map any
+module can call, and this theorem says the master theorem's `R²` is that map. A demography
+that produces a tuple now produces this `R²`. -/
+theorem r2_eq_core (P : DeploymentPopulation Ω J L) (w : J → ℝ) :
+    P.r2 w = (P.toScoreMoments w).r2 := rfl
+
+omit [DecidableEq J] [DecidableEq L] in
+/-- **And the calibration slope likewise.** -/
+theorem calibrationSlope_eq_core (P : DeploymentPopulation Ω J L) (w : J → ℝ) :
+    P.calibrationSlope w = (P.toScoreMoments w).calibrationSlope := rfl
 
 /-- `R²` as an explicit function of the statistic.
 

@@ -193,30 +193,14 @@ function.  The arguments they serve are different -- that is why both names exis
 identity is stated rather than left for a reader to notice, so a correction to either side
 that does not reach the other stops the build. -/
 
-/-- The pooled-environment correlation is a convex combination, and so is the average phase
-interaction: mass on the first argument, the rest on the second. -/
-theorem averagePhaseInteraction_eq_pooledEnvironmentCorrelation
-    (freq_cis interaction_cis interaction_trans : ℝ) :
-    averagePhaseInteraction freq_cis interaction_cis interaction_trans =
-      pooledEnvironmentCorrelation interaction_cis interaction_trans freq_cis := by
-  unfold averagePhaseInteraction pooledEnvironmentCorrelation
-  ring
+/-! **Three root-level identity theorems, deleted rather than repaired.**
 
-/-- The ancestry-specific effect is the same convex combination at the ancestry weight. -/
-theorem ancestrySpecificEffect_eq_pooledEnvironmentCorrelation
-    (beta_pop1 beta_pop2 alpha : ℝ) :
-    ancestrySpecificEffect beta_pop1 beta_pop2 alpha =
-      pooledEnvironmentCorrelation beta_pop1 beta_pop2 alpha := by
-  unfold ancestrySpecificEffect pooledEnvironmentCorrelation
-  ring
-
-/-- The spike-and-slab variance is the same convex combination at the slab probability. -/
-theorem spikeAndSlabVariance_eq_pooledEnvironmentCorrelation
-    (pi sigma_sq_large sigma_sq_small : ℝ) :
-    spikeAndSlabVariance pi sigma_sq_large sigma_sq_small =
-      pooledEnvironmentCorrelation sigma_sq_large sigma_sq_small pi := by
-  unfold spikeAndSlabVariance pooledEnvironmentCorrelation
-  ring
+`averagePhaseInteraction`, `ancestrySpecificEffect`, `spikeAndSlabVariance` and
+`pooledEnvironmentCorrelation` are four names for a convex combination, and this file
+used to carry three theorems saying so -- stated at the root, above everything, where
+nothing could depend on them. All four now call `Core.convexCombination`, so the three
+theorems hold by `rfl` and say nothing a reader of the bodies cannot see. The agreement
+they described is now in the definitions. -/
 
 /-- The overlap-gap profile of the metric chart is the landscape's population overlap
 profile: one formula, read once as a metric and once as a landscape. -/
