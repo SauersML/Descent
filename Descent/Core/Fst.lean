@@ -61,14 +61,29 @@ The four in `4·Ne·μ` is `2 · ploidy`: two lineages, each diploid. Writing it
 constant rather than a literal is what lets a ploidy change be a one-line edit instead of
 a census. -/
 
-/-- Ploidy. Two, because every population in this corpus is diploid. -/
+/-- Ploidy. Two, because every population in this corpus is diploid.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def ploidy : ℝ := 2
 
-/-- Scaled mutation rate, `θ = 4 Ne μ`. -/
+/-- Scaled mutation rate, `θ = 4 Ne μ`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ := 2 * ploidy * Ne * μ
 
 /-- Scaled migration rate, `M = 4 Ne m`, in the same units as `θ`. Being in the same
-units is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term. -/
+units is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ := 2 * ploidy * Ne * m
 
 /-- **The scaling constant, stated as a value.** Both scaled rates carry the same four,
@@ -92,7 +107,12 @@ theorem scaledMigrationRate_eq (Ne m : ℝ) : scaledMigrationRate Ne m = 4 * Ne 
 With `d` demes a migrant arrives from one of the OTHER `d - 1`, so the effective
 migration rate between any two is inflated by this factor. It is `1` only in the limit
 of infinitely many demes, and at `d = 2` it is `2` -- a factor of two, which is the size
-of the error a many-deme formula makes on a two-population split. -/
+of the error a many-deme formula makes on a two-population split.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def islandDemeCorrection (d : ℝ) : ℝ := ratio d (d - 1)
 
 /-- **islandDemeCorrection at one deme, named.** With a single deme there is nowhere to
@@ -142,7 +162,12 @@ theorem islandDemeCorrection_tendsto_one :
 
 Naming it separates the two questions the equilibrium answers: what counts as flow, and
 how flow becomes a differentiation. Every member of the lattice below differs only in
-what it puts here. -/
+what it puts here.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def scaledFlow (Ne m μ nDemes : ℝ) : ℝ :=
   scaledMigrationRate Ne m * islandDemeCorrection nDemes + scaledMutationRate Ne μ
 
@@ -164,7 +189,12 @@ theorem one_div_one_add_eq_complement_saturation (x : ℝ) (h : 1 + x ≠ 0) :
 Every equilibrium `F_ST` in this corpus is this map applied to a different flow. Naming
 the map separates the two questions -- what counts as flow, and how flow becomes a
 differentiation -- and it is what lets the five bodies the corpus had be five flows
-rather than five formulas. -/
+rather than five formulas.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def fstFromFlow (x : ℝ) : ℝ := 1 / (1 + x)
 
 /-- **No flow, no differentiation is lost.** At zero migration and zero mutation the
@@ -185,7 +215,12 @@ carried.**
     F_ST = 1 / (1 + 4 Ne m (d/(d-1)) + 4 Ne μ)
 
 This is the only place the formula is written. Every other `F_ST` equilibrium in the
-corpus is a theorem below placing a named body inside this family. -/
+corpus is a theorem below placing a named body inside this family.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def fstIslandEquilibrium (Ne m μ nDemes : ℝ) : ℝ :=
   fstFromFlow (scaledFlow Ne m μ nDemes)
 
@@ -263,7 +298,12 @@ theorem fstIslandEquilibrium_structure_coords (Ne m μ nDemes θ bigM : ℝ)
 The other coordinate the corpus works in. `τ/(1 + τ)` is `saturation`, and every result
 written in it is a Hudson `F_ST`. -/
 
-/-- `F_ST` from a scaled coalescence time, `τ / (1 + τ)`. -/
+/-- `F_ST` from a scaled coalescence time, `τ / (1 + τ)`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def fstFromTau (tau : ℝ) : ℝ := saturation tau
 
 /-- **The split law and the equilibrium law are complementary readings of one curve.**
@@ -308,13 +348,23 @@ structure NeiFst where
   /-- The estimate. -/
   value : ℝ
 
-/-- A scaled coalescence time reads as a Hudson `F_ST`, and only as a Hudson one. -/
+/-- A scaled coalescence time reads as a Hudson `F_ST`, and only as a Hudson one.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def hudsonFromTau (tau : ℝ) : HudsonFst := ⟨fstFromTau tau⟩
 
 /-- **The exact conversion, and the reason it is not a correction factor.**
 `Hudson = 2G/(1 + G)`. It is a Möbius map and not a constant multiple, so there is no
 number by which a Nei estimate can be scaled to give a Hudson one: the ratio between them
-moves with the value. Measured ratios across one design were 0.62, 0.60, 0.68 and 0.81. -/
+moves with the value. Measured ratios across one design were 0.62, 0.60, 0.68 and 0.81.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def hudsonOfNei (g : NeiFst) : HudsonFst :=
   ⟨2 * g.value / (1 + g.value)⟩
 
@@ -353,7 +403,12 @@ Two names in the corpus carry this body -- `hweHeterozygosity` and
 `genotypeVarianceHWE` -- and they are NOT one quantity: the first is the probability a
 diploid is heterozygous, the second the variance of a `0/1/2` dosage. Under
 Hardy--Weinberg those numbers coincide, and that coincidence is a fact about the
-proportions rather than about the arithmetic. Both call this. -/
+proportions rather than about the arithmetic. Both call this.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def hweHeterozygosity (p : ℝ) : ℝ := ploidy * p * (1 - p)
 
 /-- **The maximum is at `p = 1/2`, where it is `1/2`.** The value that fixes the

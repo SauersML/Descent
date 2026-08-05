@@ -84,7 +84,11 @@ variance `1`.
 A theorem quantified over an uninhabited structure is true and empty. Every value here
 is strictly inside its constraint -- no rate is zero and the recombination fraction is
 well below the free-assortment boundary -- so nothing downstream reads a degenerate
-point. -/
+point.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
 noncomputable def witness : PopGenParameters where
   Ne := 1000
   mu := 1 / 100000
@@ -101,7 +105,11 @@ noncomputable def witness : PopGenParameters where
   V_A_pos := by norm_num
 
 /-- **A history with no divergence.** The predicate a model without a split satisfies,
-named so that `t_div = 0` reads as a claim rather than as an unfilled field. -/
+named so that `t_div = 0` reads as a claim rather than as an unfilled field.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
 def atOrigin (p : PopGenParameters) : Prop := p.t_div = 0
 
 /-- **The witness is not at the origin.** `atOrigin` names the `t_div = 0` reading so a
@@ -111,13 +119,21 @@ theorem witness_not_atOrigin : ¬ witness.atOrigin := by
   unfold atOrigin witness
   norm_num
 
-/-- Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates. -/
+/-- Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
 noncomputable def theta (p : PopGenParameters) : ℝ := scaledMutationRate p.Ne p.mu
 
 /-- Scaled migration rate in this record's coordinates, `M = 4 Nₑ m`.
 
 Both modules that carried a parameter record defined `bigM` this way, so this is the
-corpus's convention and not a choice made here. -/
+corpus's convention and not a choice made here.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
 noncomputable def bigM (p : PopGenParameters) : ℝ := scaledMigrationRate p.Ne p.mig
 
 /-- **`M` is the scaled migration rate, not half of it.** -/
@@ -143,7 +159,11 @@ theorem bigM_nonneg (p : PopGenParameters) : 0 ≤ p.bigM := by
 /-- **Equilibrium `F_ST` in this record's coordinates**, `1/(1 + θ + 2M)`.
 
 This is `Core.fstFromFlow` applied to the total scaled flow, so it is the same law as
-`fstIslandEquilibrium` at a many-deme correction and not a second formula. -/
+`fstIslandEquilibrium` at a many-deme correction and not a second formula.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
 noncomputable def fstEquilibrium (p : PopGenParameters) : ℝ :=
   fstFromFlow (p.theta + 2 * p.bigM)
 

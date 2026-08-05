@@ -88,7 +88,12 @@ stops being a wrapper and has to say so.
 -/
 
 /-- Ratio, `a / b`. The shape behind heritability fractions, portability ratios, cost
-effectiveness, and every other "this per that" in the corpus. -/
+effectiveness, and every other "this per that" in the corpus.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def ratio (a b : ℝ) : ℝ := a / b
 
 /-- **ratio at a zero denominator, named.** Lean returns `0`, which reads as "none of
@@ -102,21 +107,36 @@ theorem ratio_at_reference_point : ratio (1 / 2) (1 / 2) = 1 := by
   norm_num [ratio]
 
 /-- Product, `a * b`. The shape behind tagged effects, attenuations, retentions, and
-every other "scaled by" in the corpus. -/
+every other "scaled by" in the corpus.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def product (a b : ℝ) : ℝ := a * b
 
 /-- Reference evaluation. -/
 theorem product_at_reference_point : product (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [product]
 
-/-- Difference, `a - b`. The shape behind gaps, increments, penalties and biases. -/
+/-- Difference, `a - b`. The shape behind gaps, increments, penalties and biases.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def difference (a b : ℝ) : ℝ := a - b
 
 /-- Reference evaluation. -/
 theorem difference_at_reference_point : difference (1 / 2) (1 / 4) = 1 / 4 := by
   norm_num [difference]
 
-/-- Sum, `a + b`. The shape behind variance decompositions and additive liabilities. -/
+/-- Sum, `a + b`. The shape behind variance decompositions and additive liabilities.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def sum (a b : ℝ) : ℝ := a + b
 
 /-- Reference evaluation. -/
@@ -137,7 +157,12 @@ one -- the first divides a heterozygosity by an ancestral heterozygosity, the se
 expected within-population coalescence time by a between-population one, the third an
 error by an outcome variance, the fourth a corrected ancestry axis by an uncorrected
 one. Nothing lets a value of one be substituted for another. What they share is the
-construction, and sharing it is not a coincidence. -/
+construction, and sharing it is not a coincidence.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def proportionalReduction (a b : ℝ) : ℝ := 1 - a / b
 
 /-- **proportionalReduction at a zero baseline, named.** Lean returns `1`: "the residual
@@ -159,7 +184,12 @@ Distinct from `ratio` and not a special case of it worth eliding: the denominato
 CONTAINS the numerator, so the value is confined to the unit interval whenever both
 parts are non-negative, and `share_mem_unit` below is the statement `ratio` cannot make.
 Instantiated by the signal fraction of a variance, the shared-LD equilibrium, and the
-heritability captured at a sample size. -/
+heritability captured at a sample size.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def share (a b : ℝ) : ℝ := a / (a + b)
 
 /-- **share where both parts vanish, named.** With no whole there is no share. Lean
@@ -189,7 +219,12 @@ This is `share x 1` and is kept separate because the "one" is not a second part 
 the unit the rate is scaled against. Instantiated by `F_ST` from a scaled coalescence
 time `τ/(1+τ)`, by the mutation-drift floor `θ/(1+θ)`, and by shared LD from a scaled
 migration rate. That these are one map is the fact behind the corpus convention that
-every `F_ST` written in `τ/(1+τ)` coordinates is a HUDSON `F_ST`. -/
+every `F_ST` written in `τ/(1+τ)` coordinates is a HUDSON `F_ST`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def saturation (x : ℝ) : ℝ := x / (1 + x)
 
 /-- **saturation at `x = -1`, named.** The denominator vanishes and Lean returns `0`,
@@ -223,7 +258,12 @@ the whole content of the kernel -- `share` with the second part doubled is a dif
 number, and reading one for the other is exactly the Nei/Hudson confusion the corpus has
 already recorded paying two to four fold for. Instantiated by `Q_ST` (between-population
 additive variance against between plus twice within) and by `F_ST` from a coalescence
-time in the same coordinates, which is why the two can be compared at all. -/
+time in the same coordinates, which is why the two can be compared at all.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def oddsLike (a b : ℝ) : ℝ := a / (a + 2 * b)
 
 /-- **oddsLike where the total vanishes, named.** Consumers must require
@@ -244,7 +284,12 @@ theorem oddsLike_at_reference_point : oddsLike 1 1 = 1 / 3 := by
 /-- Convex combination, `α x + (1 - α) y`.
 
 Instantiated by admixed allele frequencies, spike-and-slab effect variances,
-ancestry-specific effects, and average phase interactions. -/
+ancestry-specific effects, and average phase interactions.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def convexCombination (α x y : ℝ) : ℝ := α * x + (1 - α) * y
 
 /-- **The endpoints, which fix the argument order.** `α` weights the FIRST value.
@@ -265,7 +310,12 @@ theorem convexCombination_at_reference_point :
 Instantiated by per-generation LD decay, recombination survival to the MRCA, and
 admixture LD decay. The last of those is MEASURED against finite-population retention
 and carries a proved one-sided bias, which is the standing reason those three names are
-not collapsed into this one. -/
+not collapsed into this one.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def geometricDecay (r : ℝ) (t : ℕ) : ℝ := (1 - r) ^ t
 
 /-- **Decay at time zero is no decay**, whatever the rate. -/
@@ -285,7 +335,12 @@ theorem geometricDecay_at_reference_point : geometricDecay (1 / 2) 2 = 1 / 4 := 
 /-- Retained fraction, `(1 - loss) · total`: what survives a proportional loss.
 
 Instantiated by the ascertainment-loss survivor, the neutral portability ratio, and
-present-day PGS variance. -/
+present-day PGS variance.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def retainedFraction (loss total : ℝ) : ℝ := (1 - loss) * total
 
 /-- Reference evaluation. -/
@@ -296,7 +351,12 @@ theorem retainedFraction_at_reference_point :
 /-- Complement, `1 - x`: the fraction that did not survive, given the fraction that did.
 
 Instantiated by `F_ST` from a drift retention factor, the covariance retention factor
-from `F_ST`, and the loss from a retention. -/
+from `F_ST`, and the loss from a retention.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def complement (x : ℝ) : ℝ := 1 - x
 
 /-- **Complement is an involution.** The property the name claims, stated so that a body
@@ -312,7 +372,12 @@ theorem complement_at_reference_point : complement (1 / 4) = 3 / 4 := by
 
 This is `convexCombination (1/2)`, and the bridge below says so. Instantiated by the
 mean allele frequency across two populations and by the effective symmetric migration
-rate. -/
+rate.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def midpoint (a b : ℝ) : ℝ := (a + b) / 2
 
 /-- **The midpoint is the balanced convex combination.** -/
@@ -330,7 +395,12 @@ in series, read as a single reduction.
 This is Wright's hierarchical composition law when `a` and `b` are `F_ST` values at two
 levels of subdivision, and it is the same map as the composition of branch-wise
 differentiation along a two-branch genealogy. Those two facts being one map is a real
-population-genetic identity and not an arithmetic coincidence. -/
+population-genetic identity and not an arithmetic coincidence.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def complementaryComposition (a b : ℝ) : ℝ := 1 - (1 - a) * (1 - b)
 
 /-- **Composition is symmetric**: the order in which two levels of subdivision are
@@ -358,7 +428,12 @@ theorem complementaryComposition_at_reference_point :
 /-- Scaled squared difference, `(a - b)² / 4`: the between-group variance of two
 equally-sized groups with means `a` and `b`.
 
-The four is `2²` from the half-weighting on each group and is not free. -/
+The four is `2²` from the half-weighting on each group and is not free.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def halfDiffSq (a b : ℝ) : ℝ := (a - b) ^ 2 / 4
 
 /-- **Symmetric, and zero exactly when the groups agree.** -/
@@ -384,7 +459,12 @@ what they carry forward is a convex mix of a freshly generated `1/(2N)` and the 
 identity-by-descent recurrence, which are the same map: LD decay under drift IS the IBD
 recurrence, with `c` reading as recombination in one and as mutation in the other. The
 corpus had the two bodies written out separately in two modules with nothing relating
-them. -/
+them.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def survivalWeightedMix (N c x : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 / (2 * N) + (1 - 1 / (2 * N)) * x)
 
@@ -427,7 +507,12 @@ the same kind of object: a shape several named quantities instantiate. -/
 /-- Kronecker delta, `1` when the arguments agree and `0` otherwise.
 
 Instantiated by a persistence transition, a context-match quality, and a stay kernel --
-three names in two modules for "did the state stay the same". -/
+three names in two modules for "did the state stay the same".
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def kronecker {α : Type*} [DecidableEq α] (x y : α) : ℝ :=
   if x = y then 1 else 0
 
@@ -451,7 +536,12 @@ theorem kronecker_comm {α : Type*} [DecidableEq α] (x y : α) :
   · simp [h, Ne.symm h]
 
 /-- The complementary indicator, `0` on the diagonal and `1` off it: a switching
-transition, a sequence distance, a swap kernel. -/
+transition, a sequence distance, a swap kernel.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def antiKronecker {α : Type*} [DecidableEq α] (x y : α) : ℝ :=
   if x = y then 0 else 1
 
@@ -481,7 +571,12 @@ exactly as an inlined body does, and the objection is answered rather than overr
 
 The overlap-gap order parameter of a superposed landscape, written out under two names in
 two modules that do not import each other. Not an arithmetic shape anyone would arrive at
-twice by accident -- two copies of this body is a copied derivation. -/
+twice by accident -- two copies of this body is a copied derivation.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def overlapProfile (q x : ℝ) : ℝ :=
   x * (1 - q * x) / (1 - q * x * (1 - x))
 
@@ -497,7 +592,12 @@ makes them worth naming is that a second copy of a body is a copied derivation, 
 copied derivation drifts. -/
 
 /-- Scaled square, `a² / b`. A moment permeability and an importance-weight effective
-sample size are the same map: a squared total against a sum of squares. -/
+sample size are the same map: a squared total against a sum of squares.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def scaledSquare (a b : ℝ) : ℝ := a ^ 2 / b
 
 /-- **scaledSquare at a zero divisor, named.** Consumers must require `b ≠ 0`. -/
@@ -505,7 +605,12 @@ theorem scaledSquare_zero_divisor_is_junk (a : ℝ) : scaledSquare a 0 = 0 := by
   unfold scaledSquare; simp
 
 /-- Ratio against a product, `a / (b · c)`. The events required for a recalibration and a
-tag `r²` are the same map. -/
+tag `r²` are the same map.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def ratioOfProduct (a b c : ℝ) : ℝ := a / (b * c)
 
 /-- **ratioOfProduct where either factor vanishes, named.** -/
@@ -515,7 +620,12 @@ theorem ratioOfProduct_zero_factor_is_junk (a c : ℝ) : ratioOfProduct a 0 c = 
 /-- Squared ratio against a product, `a² / (b · c)`. The `R²` shape: a squared covariance
 against a product of variances. Distinct from `scaledSquare` because the denominator is a
 PRODUCT of two quantities that must both be positive, which is what confines the value to
-the unit interval under Cauchy--Schwarz. -/
+the unit interval under Cauchy--Schwarz.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def squaredShare (a b c : ℝ) : ℝ := a ^ 2 / (b * c)
 
 /-- **What `squaredShare` has and `scaledSquare` does not.** Under Cauchy--Schwarz on the
@@ -528,7 +638,12 @@ theorem squaredShare_le_one (a b c : ℝ) (hb : 0 < b) (hc : 0 < c)
   exact h
 
 /-- Affine step, `a + b · c`. A kinship inflation and a linear norm of reaction are the
-same map: a baseline displaced by a scaled increment. -/
+same map: a baseline displaced by a scaled increment.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def affineStep (a b c : ℝ) : ℝ := a + b * c
 
 /-- **At a zero increment the affine step is its baseline**, which is the property that
@@ -552,7 +667,12 @@ identification, and written as a bare `:= x` the claim is invisible: it reads as
 renaming.
 
 Routing them through this makes the claim greppable, and the docstring on each is where
-the justification has to live. Nothing here justifies any of them. -/
+the justification has to live. Nothing here justifies any of them.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def identifiedWith (x : ℝ) : ℝ := x
 
 /-- **An identification is transparent**, which is the whole of its computational
@@ -560,7 +680,12 @@ content, and exactly why the content is in the docstring instead. -/
 @[simp] theorem identifiedWith_eq (x : ℝ) : identifiedWith x = x := rfl
 
 /-- Power, `a ^ n`. A stationary LD entry, a genealogical timescale and a log-covering
-number at an exponent are one map. -/
+number at an exponent are one map.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def power (a : ℝ) (n : ℕ) : ℝ := a ^ n
 
 /-- **The power at zero is one**, whatever the base -- the property that makes the
@@ -573,7 +698,12 @@ theorem power_succ (a : ℝ) (n : ℕ) : power a (n + 1) = a * power a n := by
   unfold power; ring
 
 /-- Inner sum, `∑ i, f i * g i` over a finite index. A dot product and a tagged-score
-estimation risk are one map. -/
+estimation risk are one map.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def innerSum {ι : Type*} [Fintype ι] (f g : ι → ℝ) : ℝ :=
   ∑ i, f i * g i
 
@@ -590,7 +720,12 @@ theorem innerSum_comm {ι : Type*} [Fintype ι] (f g : ι → ℝ) :
 
 /-- Residual against a representation, `x - ∑ k, c k · b k`: what a finite expansion in a
 basis fails to capture. A component-representation residual and a Jensen residual are one
-map. -/
+map.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def residualAgainst {ι : Type*} [Fintype ι] (x : ℝ) (c b : ι → ℝ) : ℝ :=
   x - innerSum c b
 
@@ -600,7 +735,12 @@ noncomputable def residualAgainst {ι : Type*} [Fintype ι] (x : ℝ) (c b : ι 
   unfold residualAgainst; simp
 
 /-- Triple product, `a · b · c`. An attenuated variance and an allelic-heterogeneity
-retained signal are one map: two independent attenuations applied to a variance. -/
+retained signal are one map: two independent attenuations applied to a variance.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def product3 (a b c : ℝ) : ℝ := a * b * c
 
 /-- **A unit factor changes nothing**, which is what makes the other two attenuations. -/
@@ -610,7 +750,12 @@ noncomputable def product3 (a b c : ℝ) : ℝ := a * b * c
 /-- Paired epoch count, `2k - 2`: the sample size of a `k`-epoch comparison, which counts
 PAIRS of boundaries and drops the two endpoints. Two modules wrote it out. Natural
 subtraction truncates at zero, which is the right answer here -- a single epoch has no
-boundary pair -- and `paired_at_one` records it. -/
+boundary pair -- and `paired_at_one` records it.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 def pairedEpochCount (k : ℕ) : ℕ := 2 * k - 2
 
 /-- **One epoch has no pair**, by truncation and not by accident. -/
@@ -618,7 +763,12 @@ def pairedEpochCount (k : ℕ) : ℕ := 2 * k - 2
   unfold pairedEpochCount; norm_num
 
 /-- Unordered pair count, `k(k-1)/2` on a real-valued cast. Kingman's pair-coalescence
-rate and the spectrum-identifiability collision rate are the same count. -/
+rate and the spectrum-identifiability collision rate are the same count.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def pairCount (k : ℕ) : ℝ := (k : ℝ) * ((k : ℝ) - 1) / 2
 
 /-- **A lone lineage has no pair to coalesce**, which is where the rate ladder starts. -/
@@ -635,7 +785,12 @@ The rate at which one of `k` lineages does something at scaled per-lineage rate 
 half is the same time-unit convention that makes the per-pair coalescence rate one -- it
 is not a modelling choice made independently at each use, which is why it is written once
 here rather than in each ancestral graph. Instantiated by the recombination rate of an
-ancestral recombination graph and the branching rate of an ancestral selection graph. -/
+ancestral recombination graph and the branching rate of an ancestral selection graph.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def halfLineageRate (k : ℕ) (x : ℝ) : ℝ := (k : ℝ) * x / 2
 
 /-- **No lineages, no events.** -/
@@ -655,7 +810,12 @@ theorem halfLineageRate_succ (k : ℕ) (x : ℝ) :
 /-- Triple sum, `a + b + c`. Instantiated by the total observed-mean shift across three
 calibration channels and by the Ben-David domain-adaptation bound's three terms. Those
 are unrelated quantities that happen to add three things; naming the shape costs nothing
-and stops a fourth copy. -/
+and stops a fourth copy.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def sum3 (a b c : ℝ) : ℝ := a + b + c
 
 /-- **A vanishing term contributes nothing**, which is what makes the three summands

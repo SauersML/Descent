@@ -687,6 +687,9 @@ def lookdownApply(i, j, c):
 def colourIndicator(Z, r, i):
     return (lambda ω: ((1.0) if (Z(i, ω) == r) else 0.0))
 
+def pairTime(c, p, t_3, t_2):
+    return (t_3 if (p == c) else (t_3 + t_2))
+
 def transitTime(n, hold):
     return descentTime(n, hold, 1.0)
 
@@ -758,6 +761,9 @@ def varSegregatingSites(θ, n):
 
 def varWattersonEstimator(θ, n):
     return _rt.rdiv(varSegregatingSites(θ, n), _rt.lpow(harmonicSum(((n - 1.0))), 2.0))
+
+def tajimaVarPairwise(θ, n):
+    return ((_rt.rdiv((((n) + 1.0)), ((3.0 * (((n) - 1.0))))) * θ) + (_rt.rdiv((2.0 * (((_rt.lpow((n), 2.0) + (n)) + 3.0))), (((9.0 * (n)) * (((n) - 1.0))))) * _rt.lpow(θ, 2.0)))
 
 def ER(n):
     return Setoid((Fin(n)))

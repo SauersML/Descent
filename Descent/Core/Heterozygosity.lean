@@ -41,7 +41,12 @@ namespace Descent.Core
 The factor is the probability that two lineages sampled in the child generation do not
 share a parent. Writing it as a recurrence rather than as its closed form is deliberate:
 the step is what a mechanism can be compared against, and `hetRecurrence_closed_form`
-below derives the power. -/
+below derives the power.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => (1 - 1 / (2 * Ne)) * hetRecurrence Ne H₀ t
@@ -70,7 +75,12 @@ theorem hetRecurrence_eq_geometricDecay (Ne H₀ : ℝ) (t : ℕ) :
 
 This is `proportionalReduction` of the retained heterozygosity against the ancestral
 one, and it is written under two names in `PopGen` -- `heterozygosityLossFromDrift` and
-`heterozygosityLossDerived`, which differ only in argument order. Both call this. -/
+`heterozygosityLossDerived`, which differ only in argument order. Both call this.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def heterozygosityLoss (Ne : ℝ) (t : ℕ) : ℝ :=
   complement (geometricDecay (1 / (2 * Ne)) t)
 

@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:26c257775ebb5ef45555df030ed04dc8",
- "source_files": 206,
+ "source_digest": "sha256:c7d5259d171b18a0d5877ae673d374ad",
+ "source_files": 208,
  "collisions": {},
  "theorems": [
   {
@@ -14244,6 +14244,40 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.integral_sq_mul_exp_neg",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/HoldingSecondMoment.lean",
+   "line": 43,
+   "statement": ": ∫ x in Ioi (0 : ℝ), x ^ 2 * Real.exp (-x) = 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.integral_sq_mul_holdDensity",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/HoldingSecondMoment.lean",
+   "line": 60,
+   "statement": "{d : ℝ} (hd : 0 < d) : ∫ t in Ioi (0 : ℝ), t ^ 2 * (d * Real.exp (-(d * t))) = 2 / d ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.variance_holdTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/HoldingSecondMoment.lean",
+   "line": 85,
+   "statement": "{d : ℝ} (hd : 0 < d) : (∫ t in Ioi (0 : ℝ), t ^ 2 * (d * Real.exp (-(d * t)))) - (∫ t in Ioi (0 : ℝ), t * (d * Real.exp (-(d * t)))) ^ 2 = 1 / d ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.variance_holdTime_deathRate",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/HoldingSecondMoment.lean",
+   "line": 96,
+   "statement": "{k : ℕ} (hk : 2 ≤ k) : (∫ t in Ioi (0 : ℝ), t ^ 2 * (deathRate k * Real.exp (-(deathRate k * t)))) - (∫ t in Ioi (0 : ℝ), t * (deathRate k * Real.exp (-(deathRate k * t)))) ^ 2 = (1 / deathRate k) ^ 2",
+   "mentions": [
+    "deathRate"
+   ]
+  },
+  {
    "name": "Descent.Coalescent.integral_holdDensity",
    "kind": "theorem",
    "file": "Descent/Coalescent/HoldingTime.lean",
@@ -15323,6 +15357,86 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.sum_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 79,
+   "statement": "(c : Fin 3) (t₃ t₂ : ℝ) : ∑ p : Fin 3, pairTime c p t₃ t₂ = 3 * t₃ + 2 * t₂",
+   "mentions": [
+    "pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.sum_sq_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 84,
+   "statement": "(c : Fin 3) (t₃ t₂ : ℝ) : ∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2 = t₃ ^ 2 + 2 * (t₃ + t₂) ^ 2",
+   "mentions": [
+    "pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.cross_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 95,
+   "statement": "(c : Fin 3) (t₃ t₂ : ℝ) : ((∑ p : Fin 3, pairTime c p t₃ t₂) ^ 2 - ∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2) / 2 = 3 * t₃ ^ 2 + 4 * t₃ * t₂ + t₂ ^ 2",
+   "mentions": [
+    "pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.pairTime_symmetric_sums_topology_free",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 104,
+   "statement": "(c c' : Fin 3) (t₃ t₂ : ℝ) : (∑ p : Fin 3, pairTime c p t₃ t₂) = (∑ p : Fin 3, pairTime c' p t₃ t₂) ∧ (∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2) = (∑ p : Fin 3, pairTime c' p t₃ t₂ ^ 2)",
+   "mentions": [
+    "pairTime"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.expected_cross_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 122,
+   "statement": "{e3 e3sq e2 e2sq e32 : ℝ} (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2) (hindep : e32 = e3 * e2) : 3 * e3sq + 4 * e32 + e2sq = 4",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.expected_pairTime_product",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 131,
+   "statement": "{e3 e3sq e2 e2sq e32 : ℝ} (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2) (hindep : e32 = e3 * e2) : (3 * e3sq + 4 * e32 + e2sq) / 3 = 4 / 3",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.covariance_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 143,
+   "statement": "{e3 e3sq e2 e2sq e32 : ℝ} (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2) (hindep : e32 = e3 * e2) : (3 * e3sq + 4 * e32 + e2sq) / 3 - 1 = 1 / 3",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.expected_pairTime",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 153,
+   "statement": "{e3 e2 : ℝ} (h3 : e3 = 1 / 3) (h2 : e2 = 1) : (3 * e3 + 2 * e2) / 3 = 1",
+   "mentions": [
+    "h2"
+   ]
+  },
+  {
    "name": "Descent.Coalescent.descentTime_self",
    "kind": "theorem",
    "file": "Descent/Coalescent/Path.lean",
@@ -15719,7 +15833,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 384,
+   "line": 395,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : (∑ nu ∈ Finset.Ico 1 lam, lam.choose nu) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -15727,7 +15841,7 @@
    "name": "Descent.Coalescent.two_mul_cutCount_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 402,
+   "line": 413,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : 2 * (2 ^ (lam - 1) - 1) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -15735,7 +15849,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 416,
+   "line": 427,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : ∑ nu ∈ Finset.Ico 1 lam, lam.choose nu = 2 * (2 ^ (lam - 1) - 1)",
    "mentions": []
   },
@@ -15743,7 +15857,7 @@
    "name": "Descent.Coalescent.cutCount_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 423,
+   "line": 434,
    "statement": ": 2 ^ (2 - 1) - 1 = 1",
    "mentions": []
   },
@@ -15751,7 +15865,7 @@
    "name": "Descent.Coalescent.cutCount_three",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 426,
+   "line": 437,
    "statement": ": 2 ^ (3 - 1) - 1 = 3",
    "mentions": []
   },
@@ -16755,7 +16869,7 @@
    "name": "Descent.Coalescent.varTotalBranchLength_eq",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 133,
+   "line": 134,
    "statement": "(n : ℕ) : varTotalBranchLength n = 4 * harmonicSumSq (n - 1)",
    "mentions": [
     "harmonicSumSq",
@@ -16766,7 +16880,7 @@
    "name": "Descent.Coalescent.varTotalBranchLength_nonneg",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 141,
+   "line": 142,
    "statement": "(n : ℕ) : 0 ≤ varTotalBranchLength n",
    "mentions": [
     "varTotalBranchLength"
@@ -16776,7 +16890,7 @@
    "name": "Descent.Coalescent.varTotalBranchLength_le_eight",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 149,
+   "line": 150,
    "statement": "(n : ℕ) : varTotalBranchLength n ≤ 8",
    "mentions": [
     "varTotalBranchLength"
@@ -16786,7 +16900,7 @@
    "name": "Descent.Coalescent.varSegregatingSites_eq_totalVariance",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 169,
+   "line": 170,
    "statement": "(θ : ℝ) (n : ℕ) : varSegregatingSites θ n = θ / 2 * expectedTotalBranchLength n + (θ / 2) ^ 2 * varTotalBranchLength n",
    "mentions": [
     "expectedTotalBranchLength",
@@ -16798,7 +16912,7 @@
    "name": "Descent.Coalescent.varSegregatingSites_nonneg",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 176,
+   "line": 177,
    "statement": "{θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) : 0 ≤ varSegregatingSites θ n",
    "mentions": [
     "varSegregatingSites"
@@ -16808,7 +16922,7 @@
    "name": "Descent.Coalescent.varWattersonEstimator_le",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 197,
+   "line": 198,
    "statement": "{θ : ℝ} (hθ : 0 ≤ θ) {n : ℕ} (hn : 1 ≤ harmonicSum (n - 1)) : varWattersonEstimator θ n ≤ (θ + 2 * θ ^ 2) / harmonicSum (n - 1)",
    "mentions": [
     "harmonicSum",
@@ -16819,10 +16933,21 @@
    "name": "Descent.Coalescent.exists_varWattersonEstimator_lt",
    "kind": "theorem",
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 221,
+   "line": 222,
    "statement": "{θ : ℝ} (hθ : 0 ≤ θ) {ε : ℝ} (hε : 0 < ε) : ∃ n : ℕ, varWattersonEstimator θ n < ε",
    "mentions": [
     "varWattersonEstimator"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.varPairwise_two_eq",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/SpectrumMoments.lean",
+   "line": 264,
+   "statement": "(θ : ℝ) : tajimaVarPairwise θ 2 = varSegregatingSites θ 2",
+   "mentions": [
+    "tajimaVarPairwise",
+    "varSegregatingSites"
    ]
   },
   {
@@ -17483,7 +17608,7 @@
    "name": "Descent.Coalescent.varTransitTime_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 69,
+   "line": 73,
    "statement": ": varTransitTime 1 = 0",
    "mentions": [
     "varTransitTime"
@@ -17493,7 +17618,7 @@
    "name": "Descent.Coalescent.varTransitTime_nonneg",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 72,
+   "line": 76,
    "statement": "(n : ℕ) : 0 ≤ varTransitTime n",
    "mentions": [
     "varTransitTime"
@@ -17503,7 +17628,7 @@
    "name": "Descent.Coalescent.one_le_deathRate_succ_succ",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 79,
+   "line": 83,
    "statement": "(k : ℕ) : (1 : ℝ) ≤ deathRate (k + 2)",
    "mentions": [
     "deathRate"
@@ -17513,7 +17638,7 @@
    "name": "Descent.Coalescent.one_div_deathRate_le_one",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 85,
+   "line": 89,
    "statement": "(k : ℕ) : 1 / deathRate (k + 2) ≤ 1",
    "mentions": [
     "deathRate"
@@ -17523,7 +17648,7 @@
    "name": "Descent.Coalescent.varTransitTime_le_meanTransitTime",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 92,
+   "line": 96,
    "statement": "(n : ℕ) : varTransitTime n ≤ meanTransitTime n",
    "mentions": [
     "meanTransitTime",
@@ -17534,7 +17659,7 @@
    "name": "Descent.Coalescent.varTransitTime_lt_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 103,
+   "line": 107,
    "statement": "(n : ℕ) : varTransitTime n < 2",
    "mentions": [
     "varTransitTime"
@@ -17544,7 +17669,7 @@
    "name": "Descent.Coalescent.one_le_varTransitTime",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 110,
+   "line": 114,
    "statement": "{n : ℕ} (hn : 2 ≤ n) : 1 ≤ varTransitTime n",
    "mentions": [
     "varTransitTime"
@@ -17554,7 +17679,7 @@
    "name": "Descent.Coalescent.coefficientOfVariation_gt_half",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 133,
+   "line": 137,
    "statement": "{n : ℕ} (hn : 2 ≤ n) : meanTransitTime n ^ 2 / 4 < varTransitTime n",
    "mentions": [
     "meanTransitTime",
@@ -17565,7 +17690,7 @@
    "name": "Descent.Coalescent.varTransitTime_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 144,
+   "line": 148,
    "statement": ": varTransitTime 2 = 1",
    "mentions": [
     "varTransitTime"
@@ -23003,7 +23128,7 @@
    "name": "Descent.Core.scaledRates_share_constant",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 76,
+   "line": 91,
    "statement": "(Ne x : ℝ) : scaledMutationRate Ne x = scaledMigrationRate Ne x",
    "mentions": [
     "scaledMigrationRate",
@@ -23014,7 +23139,7 @@
    "name": "Descent.Core.scaledMutationRate_eq",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 81,
+   "line": 96,
    "statement": "(Ne μ : ℝ) : scaledMutationRate Ne μ = 4 * Ne * μ",
    "mentions": [
     "scaledMutationRate"
@@ -23024,7 +23149,7 @@
    "name": "Descent.Core.scaledMigrationRate_eq",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 85,
+   "line": 100,
    "statement": "(Ne m : ℝ) : scaledMigrationRate Ne m = 4 * Ne * m",
    "mentions": [
     "scaledMigrationRate"
@@ -23034,7 +23159,7 @@
    "name": "Descent.Core.islandDemeCorrection_one_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 101,
+   "line": 121,
    "statement": ": islandDemeCorrection 1 = 0",
    "mentions": [
     "islandDemeCorrection"
@@ -23044,7 +23169,7 @@
    "name": "Descent.Core.islandDemeCorrection_two",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 107,
+   "line": 127,
    "statement": ": islandDemeCorrection 2 = 2",
    "mentions": [
     "islandDemeCorrection"
@@ -23054,7 +23179,7 @@
    "name": "Descent.Core.islandDemeCorrection_sub_one",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 113,
+   "line": 133,
    "statement": "(d : ℝ) (hd : d ≠ 1) : islandDemeCorrection d - 1 = 1 / (d - 1)",
    "mentions": [
     "islandDemeCorrection"
@@ -23064,7 +23189,7 @@
    "name": "Descent.Core.islandDemeCorrection_tendsto_one",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 123,
+   "line": 143,
    "statement": ": Tendsto islandDemeCorrection atTop (𝓝 1)",
    "mentions": [
     "islandDemeCorrection"
@@ -23074,7 +23199,7 @@
    "name": "Descent.Core.one_div_one_add_eq_complement_saturation",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 156,
+   "line": 181,
    "statement": "(x : ℝ) (h : 1 + x ≠ 0) : 1 / (1 + x) = complement (saturation x)",
    "mentions": [
     "complement",
@@ -23085,7 +23210,7 @@
    "name": "Descent.Core.fstFromFlow_zero",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 172,
+   "line": 202,
    "statement": ": fstFromFlow 0 = 1",
    "mentions": [
     "fstFromFlow"
@@ -23095,7 +23220,7 @@
    "name": "Descent.Core.fstFromFlow_lt_of_lt",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 177,
+   "line": 207,
    "statement": "(x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) : fstFromFlow y < fstFromFlow x",
    "mentions": [
     "fstFromFlow"
@@ -23105,7 +23230,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_eq",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 194,
+   "line": 229,
    "statement": "(Ne m μ nDemes : ℝ) : fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23116,7 +23241,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_eq_complement_saturation",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 205,
+   "line": 240,
    "statement": "(Ne m μ nDemes : ℝ) (h : 1 + scaledFlow Ne m μ nDemes ≠ 0) : fstIslandEquilibrium Ne m μ nDemes = complement (saturation (scaledFlow Ne m μ nDemes))",
    "mentions": [
     "complement",
@@ -23129,7 +23254,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_manyDemes",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 220,
+   "line": 255,
    "statement": "(Ne m μ nDemes : ℝ) (hd : islandDemeCorrection nDemes = 1) : fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + 4 * Ne * m + 4 * Ne * μ)",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23140,7 +23265,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_no_mutation",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 227,
+   "line": 262,
    "statement": "(Ne m nDemes : ℝ) (hd : islandDemeCorrection nDemes = 1) : fstIslandEquilibrium Ne m 0 nDemes = 1 / (1 + 4 * Ne * m)",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23151,7 +23276,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_no_migration",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 235,
+   "line": 270,
    "statement": "(Ne μ nDemes : ℝ) : fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + scaledMutationRate Ne μ)",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23162,7 +23287,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_no_migration_scaled",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 245,
+   "line": 280,
    "statement": "(Ne μ nDemes θ : ℝ) (hθ : θ = scaledMutationRate Ne μ) : fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + θ)",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23173,7 +23298,7 @@
    "name": "Descent.Core.fstIslandEquilibrium_structure_coords",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 255,
+   "line": 290,
    "statement": "(Ne m μ nDemes θ bigM : ℝ) (hd : islandDemeCorrection nDemes = 1) (hθ : θ = 4 * Ne * μ) (hM : bigM = 2 * Ne * m) : fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + θ + 2 * bigM)",
    "mentions": [
     "bigM",
@@ -23185,7 +23310,7 @@
    "name": "Descent.Core.fstFromTau_add_equilibrium",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 274,
+   "line": 314,
    "statement": "(x : ℝ) (h : 1 + x ≠ 0) : fstFromTau x + 1 / (1 + x) = 1",
    "mentions": [
     "fstFromTau"
@@ -23195,7 +23320,7 @@
    "name": "Descent.Core.fstFromFlow_add_fstFromTau",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 283,
+   "line": 323,
    "statement": "(x : ℝ) (h : 1 + x ≠ 0) : fstFromFlow x + fstFromTau x = 1",
    "mentions": [
     "fstFromFlow",
@@ -23206,7 +23331,7 @@
    "name": "Descent.Core.fstFromTau_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 290,
+   "line": 330,
    "statement": "(tau : ℝ) (h : 0 ≤ tau) : 0 ≤ fstFromTau tau ∧ fstFromTau tau ≤ 1",
    "mentions": [
     "fstFromTau",
@@ -23217,7 +23342,7 @@
    "name": "Descent.Core.hudsonOfNei_eq_iff",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 324,
+   "line": 374,
    "statement": "(g : NeiFst) (h : 1 + g.value ≠ 0) : (hudsonOfNei g).value = g.value ↔ g.value = 0 ∨ g.value = 1",
    "mentions": [
     "hudsonOfNei"
@@ -23227,7 +23352,7 @@
    "name": "Descent.Core.hudsonFromTau_value",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 340,
+   "line": 390,
    "statement": "(tau : ℝ) : (hudsonFromTau tau).value = fstFromTau tau",
    "mentions": [
     "fstFromTau",
@@ -23239,7 +23364,7 @@
    "name": "Descent.Core.hudsonOfNei_at_half",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 347,
+   "line": 397,
    "statement": ": (hudsonOfNei ⟨1 / 2⟩).value = 2 / 3",
    "mentions": [
     "hudsonOfNei"
@@ -23249,7 +23374,7 @@
    "name": "Descent.Core.hweHeterozygosity_at_half",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 362,
+   "line": 417,
    "statement": ": hweHeterozygosity (1 / 2) = 1 / 2",
    "mentions": [
     "hweHeterozygosity"
@@ -23259,7 +23384,7 @@
    "name": "Descent.Core.hweHeterozygosity_allele_swap",
    "kind": "theorem",
    "file": "Descent/Core/Fst.lean",
-   "line": 368,
+   "line": 423,
    "statement": "(p : ℝ) : hweHeterozygosity (1 - p) = hweHeterozygosity p",
    "mentions": [
     "hweHeterozygosity"
@@ -23269,7 +23394,7 @@
    "name": "Descent.Core.hetRecurrence_zero",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 50,
+   "line": 55,
    "statement": "(Ne H₀ : ℝ) : hetRecurrence Ne H₀ 0 = H₀",
    "mentions": [
     "hetRecurrence"
@@ -23279,7 +23404,7 @@
    "name": "Descent.Core.hetRecurrence_closed_form",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 53,
+   "line": 58,
    "statement": "(Ne H₀ : ℝ) (t : ℕ) : hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀",
    "mentions": [
     "hetRecurrence"
@@ -23289,7 +23414,7 @@
    "name": "Descent.Core.hetRecurrence_eq_geometricDecay",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 63,
+   "line": 68,
    "statement": "(Ne H₀ : ℝ) (t : ℕ) : hetRecurrence Ne H₀ t = geometricDecay (1 / (2 * Ne)) t * H₀",
    "mentions": [
     "geometricDecay",
@@ -23300,7 +23425,7 @@
    "name": "Descent.Core.heterozygosityLoss_eq_proportionalReduction",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 79,
+   "line": 89,
    "statement": "(Ne H₀ : ℝ) (t : ℕ) (h : H₀ ≠ 0) : heterozygosityLoss Ne t = proportionalReduction (hetRecurrence Ne H₀ t) H₀",
    "mentions": [
     "hetRecurrence",
@@ -23312,7 +23437,7 @@
    "name": "Descent.Core.heterozygosityLoss_zero",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 86,
+   "line": 96,
    "statement": "(Ne : ℝ) : heterozygosityLoss Ne 0 = 0",
    "mentions": [
     "heterozygosityLoss"
@@ -23322,7 +23447,7 @@
    "name": "Descent.Core.heterozygosityLoss_empty_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 93,
+   "line": 103,
    "statement": "(t : ℕ) : heterozygosityLoss 0 t = complement 1",
    "mentions": [
     "complement",
@@ -23333,7 +23458,7 @@
    "name": "Descent.Core.ScoreMoments.witness_admissible",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 84,
+   "line": 89,
    "statement": ": Admissible witness where scoreVariance_pos",
    "mentions": [
     "witness"
@@ -23343,7 +23468,7 @@
    "name": "Descent.Core.ScoreMoments.r2_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 111,
+   "line": 131,
    "statement": "(m : ScoreMoments) (h : m.Admissible) : 0 ≤ m.r2 ∧ m.r2 ≤ 1",
    "mentions": [
     "r2"
@@ -23353,7 +23478,7 @@
    "name": "Descent.Core.ScoreMoments.calibrationSlope_eq_one_iff",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 124,
+   "line": 144,
    "statement": "(m : ScoreMoments) (h : 0 < m.scoreVariance) : m.calibrationSlope = 1 ↔ m.predictiveCovariance = m.scoreVariance",
    "mentions": [
     "calibrationSlope",
@@ -23365,7 +23490,7 @@
    "name": "Descent.Core.ScoreMoments.r2_eq_slope_mul",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 132,
+   "line": 152,
    "statement": "(m : ScoreMoments) (h : 0 < m.scoreVariance) : m.r2 = m.calibrationSlope * (m.predictiveCovariance / m.outcomeVariance)",
    "mentions": [
     "calibrationSlope",
@@ -23379,7 +23504,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 167,
+   "line": 192,
    "statement": "(V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) (hf : fst < 1) : (momentsUnderDrift V_A V_E fst).r2 = share (retainedFraction fst V_A) V_E",
    "mentions": [
     "momentsUnderDrift",
@@ -23392,7 +23517,7 @@
    "name": "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift_at_zero",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 181,
+   "line": 206,
    "statement": "(V_A V_E : ℝ) (hV : 0 < V_A) : (momentsUnderDrift V_A V_E 0).calibrationSlope = 1",
    "mentions": [
     "calibrationSlope",
@@ -23403,7 +23528,7 @@
    "name": "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 194,
+   "line": 219,
    "statement": "(V_A V_E fst : ℝ) (hV : 0 < V_A) (hf : fst < 1) : (momentsUnderDrift V_A V_E fst).calibrationSlope = 1",
    "mentions": [
     "calibrationSlope",
@@ -23414,7 +23539,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 212,
+   "line": 237,
    "statement": "(V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) : (momentsUnderDrift V_A V_E f₂).r2 < (momentsUnderDrift V_A V_E f₁).r2",
    "mentions": [
     "h2",
@@ -23426,7 +23551,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift_of_no_environment",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 229,
+   "line": 254,
    "statement": "(V_A fst : ℝ) (hV : 0 < V_A) (hf : fst < 1) : (momentsUnderDrift V_A 0 fst).r2 = 1",
    "mentions": [
     "momentsUnderDrift",
@@ -23437,7 +23562,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift_at_source",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 249,
+   "line": 274,
    "statement": "(V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) : (momentsUnderDrift V_A V_E 0).r2 = share V_A V_E",
    "mentions": [
     "momentsUnderDrift",
@@ -23449,7 +23574,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift_at_complete",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 258,
+   "line": 283,
    "statement": "(V_A V_E : ℝ) (hE : 0 < V_E) : (momentsUnderDrift V_A V_E 1).r2 = 0",
    "mentions": [
     "momentsUnderDrift",
@@ -23460,7 +23585,7 @@
    "name": "Descent.Core.ScoreMoments.r2_momentsUnderDrift_le_source",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 265,
+   "line": 290,
    "statement": "(V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) (hf0 : 0 ≤ fst) (hf : fst < 1) : (momentsUnderDrift V_A V_E fst).r2 ≤ (momentsUnderDrift V_A V_E 0).r2",
    "mentions": [
     "momentsUnderDrift",
@@ -23471,7 +23596,7 @@
    "name": "Descent.Core.ScoreMoments.portabilityRatio_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 284,
+   "line": 314,
    "statement": "(V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) (hf0 : 0 ≤ fst) (hf : fst < 1) : 0 ≤ portabilityRatio V_A V_E fst ∧ portabilityRatio V_A V_E fst ≤ 1",
    "mentions": [
     "portabilityRatio"
@@ -23481,7 +23606,7 @@
    "name": "Descent.Core.ScoreMoments.portabilityRatio_at_source",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 308,
+   "line": 338,
    "statement": "(V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) : portabilityRatio V_A V_E 0 = 1",
    "mentions": [
     "portabilityRatio"
@@ -23491,7 +23616,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromTau_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 335,
+   "line": 370,
    "statement": "(V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) : deployedR2FromTau V_A V_E t₂ < deployedR2FromTau V_A V_E t₁",
    "mentions": [
     "deployedR2FromTau"
@@ -23501,7 +23626,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromTau_at_zero",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 350,
+   "line": 385,
    "statement": "(V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) : deployedR2FromTau V_A V_E 0 = share V_A V_E",
    "mentions": [
     "deployedR2FromTau",
@@ -23512,7 +23637,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_eq",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 373,
+   "line": 413,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) : deployedR2 p V_E = share (retainedFraction p.fstEquilibrium p.V_A) V_E",
    "mentions": [
     "deployedR2",
@@ -23525,7 +23650,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_eq_deployedR2FromTau",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 385,
+   "line": 425,
    "statement": "(p : PopGenParameters) (V_E tau : ℝ) (h : p.fstEquilibrium = fstFromTau tau) : deployedR2 p V_E = deployedR2FromTau p.V_A V_E tau",
    "mentions": [
     "deployedR2",
@@ -23539,7 +23664,7 @@
    "name": "Descent.Core.ScoreMoments.fstEquilibrium_eq_fstFromTau_iff",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 395,
+   "line": 435,
    "statement": "(p : PopGenParameters) (tau : ℝ) (hx : 1 + (p.theta + 2 * p.bigM) ≠ 0) (ht : 1 + tau ≠ 0) : p.fstEquilibrium = fstFromTau tau ↔ 1 = tau * (p.theta + 2 * p.bigM)",
    "mentions": [
     "bigM",
@@ -23553,7 +23678,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_mono_in_migration",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 408,
+   "line": 448,
    "statement": "(p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) : deployedR2 p V_E < deployedR2 q V_E",
    "mentions": [
     "deployedR2"
@@ -23563,7 +23688,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_mono_in_mutation",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 421,
+   "line": 461,
    "statement": "(p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) : deployedR2 p V_E < deployedR2 q V_E",
    "mentions": [
     "deployedR2"
@@ -23573,7 +23698,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_mono_in_Ne",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 433,
+   "line": 473,
    "statement": "(p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) : deployedR2 p V_E < deployedR2 q V_E",
    "mentions": [
     "deployedR2"
@@ -23583,7 +23708,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 445,
+   "line": 485,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) : 0 ≤ deployedR2 p V_E ∧ deployedR2 p V_E ≤ 1",
    "mentions": [
     "deployedR2"
@@ -23593,7 +23718,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_le_heritability",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 463,
+   "line": 503,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) : deployedR2 p V_E ≤ share p.V_A V_E",
    "mentions": [
     "deployedR2",
@@ -23604,7 +23729,7 @@
    "name": "Descent.Core.ScoreMoments.mse_momentsUnderDrift",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 488,
+   "line": 528,
    "statement": "(V_A V_E fst : ℝ) : (momentsUnderDrift V_A V_E fst).mse = V_E",
    "mentions": [
     "momentsUnderDrift",
@@ -23615,7 +23740,7 @@
    "name": "Descent.Core.ScoreMoments.mse_momentsUnderDrift_const",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 501,
+   "line": 541,
    "statement": "(V_A V_E f₁ f₂ : ℝ) : (momentsUnderDrift V_A V_E f₁).mse = (momentsUnderDrift V_A V_E f₂).mse",
    "mentions": [
     "momentsUnderDrift",
@@ -23626,7 +23751,7 @@
    "name": "Descent.Core.ScoreMoments.drift_moves_r2_alone",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 508,
+   "line": 548,
    "statement": "(V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (hf0 : 0 < f) (hf : f < 1) : (momentsUnderDrift V_A V_E f).r2 < (momentsUnderDrift V_A V_E 0).r2 ∧ (momentsUnderDrift V_A V_E f).calibrationSlope = (momentsUnderDrift V_A V_E 0).calibrationSlope ∧ (momentsUnderDrift V_A V_E f).mse = (momentsUnderDrift V_A V_E 0).mse",
    "mentions": [
     "calibrationSlope",
@@ -23639,7 +23764,7 @@
    "name": "Descent.Core.ScoreMoments.brier_at_zero_r2",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 530,
+   "line": 575,
    "statement": "(π : ℝ) (m : ScoreMoments) (h : m.r2 = 0) : brier π m = π * (1 - π)",
    "mentions": [
     "brier",
@@ -23650,7 +23775,7 @@
    "name": "Descent.Core.ScoreMoments.brier_anti_in_r2",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 537,
+   "line": 582,
    "statement": "(π : ℝ) (m n : ScoreMoments) (hπ : 0 < π) (hπ1 : π < 1) (h : m.r2 < n.r2) : brier π n < brier π m",
    "mentions": [
     "brier",
@@ -23661,7 +23786,7 @@
    "name": "Descent.Core.ScoreMoments.brier_momentsUnderDrift_mono",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 545,
+   "line": 590,
    "statement": "(π V_A V_E f₁ f₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) : brier π (momentsUnderDrift V_A V_E f₁) < brier π (momentsUnderDrift V_A V_E f₂)",
    "mentions": [
     "brier",
@@ -23673,7 +23798,7 @@
    "name": "Descent.Core.ScoreMoments.aucArgument_mono",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 563,
+   "line": 613,
    "statement": "(m n : ScoreMoments) (h0 : 0 ≤ m.r2) (h1 : n.r2 < 1) (h : m.r2 < n.r2) : aucArgument m < aucArgument n",
    "mentions": [
     "aucArgument",
@@ -23684,7 +23809,7 @@
    "name": "Descent.Core.ScoreMoments.aucArgument_momentsUnderDrift_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 571,
+   "line": 621,
    "statement": "(V_A V_E f₁ f₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) (h0 : 0 ≤ f₁) : aucArgument (momentsUnderDrift V_A V_E f₂) < aucArgument (momentsUnderDrift V_A V_E f₁)",
    "mentions": [
     "aucArgument",
@@ -23696,7 +23821,7 @@
    "name": "Descent.Core.ScoreMoments.deployedSlope_eq_one",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 598,
+   "line": 648,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hflow : 0 < p.mu + p.mig) : (momentsUnderDrift p.V_A V_E p.fstEquilibrium).calibrationSlope = 1",
    "mentions": [
     "calibrationSlope",
@@ -23708,7 +23833,7 @@
    "name": "Descent.Core.ScoreMoments.deployedMse_eq",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 606,
+   "line": 656,
    "statement": "(p : PopGenParameters) (V_E : ℝ) : (momentsUnderDrift p.V_A V_E p.fstEquilibrium).mse = V_E",
    "mentions": [
     "fstEquilibrium",
@@ -23720,7 +23845,7 @@
    "name": "Descent.Core.ScoreMoments.deployedBrier_mono_in_migration",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 615,
+   "line": 670,
    "statement": "(π : ℝ) (p q : PopGenParameters) (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) : deployedBrier π q V_E < deployedBrier π p V_E",
    "mentions": [
     "deployedBrier"
@@ -23730,7 +23855,7 @@
    "name": "Descent.Core.ScoreMoments.deployedBrier_mono_in_mutation",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 628,
+   "line": 683,
    "statement": "(π : ℝ) (p q : PopGenParameters) (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) : deployedBrier π q V_E < deployedBrier π p V_E",
    "mentions": [
     "deployedBrier"
@@ -23740,7 +23865,7 @@
    "name": "Descent.Core.ScoreMoments.deployedBrier_mono_in_Ne",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 641,
+   "line": 696,
    "statement": "(π : ℝ) (p q : PopGenParameters) (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow2 : 0 < p.mu + 2 * p.mig) (hflow : 0 < p.mu + p.mig) : deployedBrier π q V_E < deployedBrier π p V_E",
    "mentions": [
     "deployedBrier"
@@ -23750,7 +23875,7 @@
    "name": "Descent.Core.ScoreMoments.deployedBrier_at_no_flow_bound",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 655,
+   "line": 710,
    "statement": "(π V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) : brier π (momentsUnderDrift V_A V_E 0) = π * (1 - π) * (1 - share V_A V_E)",
    "mentions": [
     "brier",
@@ -23762,7 +23887,7 @@
    "name": "Descent.Core.ScoreMoments.brier_deployedR2FromTau_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 663,
+   "line": 718,
    "statement": "(π V_A V_E t₁ t₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) : brier π (momentsUnderDrift V_A V_E (fstFromTau t₁)) < brier π (momentsUnderDrift V_A V_E (fstFromTau t₂))",
    "mentions": [
     "brier",
@@ -23774,7 +23899,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_eq_island_two_demes",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 694,
+   "line": 754,
    "statement": "(p : PopGenParameters) (V_E : ℝ) : deployedR2 p V_E = deployedR2FromIsland p.Ne p.mig p.mu 2 p.V_A V_E",
    "mentions": [
     "deployedR2",
@@ -23785,7 +23910,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromIsland_anti_in_demes",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 705,
+   "line": 765,
    "statement": "(Ne m μ d₁ d₂ V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 ≤ μ) (h1 : 1 < d₁) (hlt : d₁ < d₂) : deployedR2FromIsland Ne m μ d₂ V_A V_E < deployedR2FromIsland Ne m μ d₁ V_A V_E",
    "mentions": [
     "deployedR2FromIsland"
@@ -23795,7 +23920,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromIsland_slope",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 751,
+   "line": 811,
    "statement": "(Ne m μ nDemes V_A V_E : ℝ) (hV : 0 < V_A) (hf : fstIslandEquilibrium Ne m μ nDemes < 1) : (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).calibrationSlope = 1",
    "mentions": [
     "calibrationSlope",
@@ -23807,7 +23932,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromIsland_mse",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 757,
+   "line": 817,
    "statement": "(Ne m μ nDemes V_A V_E : ℝ) : (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).mse = V_E",
    "mentions": [
     "fstIslandEquilibrium",
@@ -23819,7 +23944,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromTau_slope",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 764,
+   "line": 824,
    "statement": "(V_A V_E tau : ℝ) (hV : 0 < V_A) (h : 0 ≤ tau) : (momentsUnderDrift V_A V_E (fstFromTau tau)).calibrationSlope = 1",
    "mentions": [
     "calibrationSlope",
@@ -23832,7 +23957,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromTau_mse",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 773,
+   "line": 833,
    "statement": "(V_A V_E tau : ℝ) : (momentsUnderDrift V_A V_E (fstFromTau tau)).mse = V_E",
    "mentions": [
     "fstFromTau",
@@ -23845,7 +23970,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2FromTau_bounded",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 779,
+   "line": 839,
    "statement": "(V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) (h : 0 ≤ tau) : (momentsUnderDrift V_A V_E (fstFromTau tau)).r2 ≤ share V_A V_E",
    "mentions": [
     "fstFromTau",
@@ -23859,7 +23984,7 @@
    "name": "Descent.Core.ScoreMoments.aucArgument_deployedR2FromTau_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 794,
+   "line": 854,
    "statement": "(V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) : aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₂)) < aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₁))",
    "mentions": [
     "aucArgument",
@@ -23871,7 +23996,7 @@
    "name": "Descent.Core.ScoreMoments.portabilityRatioFromTau_anti",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 817,
+   "line": 882,
    "statement": "(V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) : portabilityRatioFromTau V_A V_E t₂ < portabilityRatioFromTau V_A V_E t₁",
    "mentions": [
     "portabilityRatioFromTau"
@@ -23881,7 +24006,7 @@
    "name": "Descent.Core.ScoreMoments.deployedPortabilityRatio_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 835,
+   "line": 905,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) : 0 ≤ deployedPortabilityRatio p V_E ∧ deployedPortabilityRatio p V_E ≤ 1",
    "mentions": [
     "deployedPortabilityRatio"
@@ -23891,7 +24016,7 @@
    "name": "Descent.Core.ScoreMoments.deployedPortabilityRatio_mono_in_migration",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 843,
+   "line": 913,
    "statement": "(p q : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) : deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E",
    "mentions": [
     "deployedPortabilityRatio"
@@ -23901,7 +24026,7 @@
    "name": "Descent.Core.ScoreMoments.deployedR2_at_no_flow",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 863,
+   "line": 933,
    "statement": "(p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) : deployedR2 p V_E = 0",
    "mentions": [
     "deployedR2"
@@ -23911,7 +24036,7 @@
    "name": "Descent.Core.ScoreMoments.deployedBrier_at_no_flow",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 879,
+   "line": 949,
    "statement": "(π : ℝ) (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) : deployedBrier π p V_E = π * (1 - π)",
    "mentions": [
     "deployedBrier"
@@ -23921,7 +24046,7 @@
    "name": "Descent.Core.ScoreMoments.deployedReport_at_no_flow",
    "kind": "theorem",
    "file": "Descent/Core/Moments.lean",
-   "line": 895,
+   "line": 965,
    "statement": "(π : ℝ) (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0) (hmig : p.mig = 0) (hE : 0 < V_E) : deployedR2 p V_E = 0 ∧ deployedBrier π p V_E = π * (1 - π) ∧ (momentsUnderDrift p.V_A V_E p.fstEquilibrium).mse = V_E",
    "mentions": [
     "deployedBrier",
@@ -23935,7 +24060,7 @@
    "name": "Descent.Core.PopGenParameters.witness_not_atOrigin",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 110,
+   "line": 118,
    "statement": ": ¬ witness.atOrigin",
    "mentions": [
     "atOrigin"
@@ -23945,7 +24070,7 @@
    "name": "Descent.Core.PopGenParameters.bigM_eq_scaledMigrationRate",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 124,
+   "line": 140,
    "statement": "(p : PopGenParameters) : p.bigM = scaledMigrationRate p.Ne p.mig",
    "mentions": [
     "bigM",
@@ -23956,7 +24081,7 @@
    "name": "Descent.Core.PopGenParameters.theta_nonneg",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 128,
+   "line": 144,
    "statement": "(p : PopGenParameters) : 0 ≤ p.theta",
    "mentions": [
     "theta"
@@ -23966,7 +24091,7 @@
    "name": "Descent.Core.PopGenParameters.bigM_nonneg",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 136,
+   "line": 152,
    "statement": "(p : PopGenParameters) : 0 ≤ p.bigM",
    "mentions": [
     "bigM"
@@ -23976,7 +24101,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_eq_island_two_demes",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 163,
+   "line": 183,
    "statement": "(p : PopGenParameters) : p.fstEquilibrium = fstIslandEquilibrium p.Ne p.mig p.mu 2",
    "mentions": [
     "fstEquilibrium",
@@ -23987,7 +24112,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 175,
+   "line": 195,
    "statement": ": PopGenParameters.witness.fstEquilibrium ≠ fstFromFlow (scaledMigrationRate PopGenParameters.witness.Ne PopGenParameters.witness.mig + scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu)",
    "mentions": [
     "fstEquilibrium",
@@ -24000,7 +24125,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 185,
+   "line": 205,
    "statement": "(p : PopGenParameters) : 0 ≤ p.fstEquilibrium ∧ p.fstEquilibrium ≤ 1",
    "mentions": [
     "fstEquilibrium"
@@ -24010,7 +24135,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_lt_one",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 200,
+   "line": 220,
    "statement": "(p : PopGenParameters) (h : 0 < p.mu + p.mig) : p.fstEquilibrium < 1",
    "mentions": [
     "fstEquilibrium"
@@ -24020,7 +24145,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mig_lt",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 216,
+   "line": 236,
    "statement": "(p q : PopGenParameters) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hlt : p.mig < q.mig) : q.fstEquilibrium < p.fstEquilibrium",
    "mentions": [
     "fstEquilibrium"
@@ -24030,7 +24155,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_mu_lt",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 233,
+   "line": 253,
    "statement": "(p q : PopGenParameters) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hlt : p.mu < q.mu) : q.fstEquilibrium < p.fstEquilibrium",
    "mentions": [
     "fstEquilibrium"
@@ -24040,7 +24165,7 @@
    "name": "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_Ne_lt",
    "kind": "theorem",
    "file": "Descent/Core/Parameters.lean",
-   "line": 252,
+   "line": 272,
    "statement": "(p q : PopGenParameters) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hflow : 0 < p.mu + 2 * p.mig) (hlt : p.Ne < q.Ne) : q.fstEquilibrium < p.fstEquilibrium",
    "mentions": [
     "fstEquilibrium"
@@ -24090,7 +24215,7 @@
    "name": "Descent.Core.ratio_zero_denominator_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 97,
+   "line": 102,
    "statement": "(a : ℝ) : ratio a 0 = 0",
    "mentions": [
     "ratio"
@@ -24100,7 +24225,7 @@
    "name": "Descent.Core.ratio_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 101,
+   "line": 106,
    "statement": ": ratio (1 / 2) (1 / 2) = 1",
    "mentions": [
     "ratio"
@@ -24110,7 +24235,7 @@
    "name": "Descent.Core.product_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 109,
+   "line": 119,
    "statement": ": product (1 / 2) (1 / 2) = 1 / 4",
    "mentions": [
     "product"
@@ -24120,7 +24245,7 @@
    "name": "Descent.Core.difference_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 116,
+   "line": 131,
    "statement": ": difference (1 / 2) (1 / 4) = 1 / 4",
    "mentions": [
     "difference"
@@ -24130,7 +24255,7 @@
    "name": "Descent.Core.sum_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 123,
+   "line": 143,
    "statement": ": sum (1 / 2) (1 / 4) = 3 / 4",
    "mentions": [
     "sum"
@@ -24140,7 +24265,7 @@
    "name": "Descent.Core.proportionalReduction_zero_baseline_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 147,
+   "line": 172,
    "statement": "(a : ℝ) : proportionalReduction a 0 = 1",
    "mentions": [
     "proportionalReduction"
@@ -24150,7 +24275,7 @@
    "name": "Descent.Core.proportionalReduction_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 152,
+   "line": 177,
    "statement": ": proportionalReduction (1 / 2) 1 = 1 / 2",
    "mentions": [
     "proportionalReduction"
@@ -24160,7 +24285,7 @@
    "name": "Descent.Core.share_zero_total_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 168,
+   "line": 198,
    "statement": ": share 0 0 = 0",
    "mentions": [
     "share"
@@ -24170,7 +24295,7 @@
    "name": "Descent.Core.share_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 175,
+   "line": 205,
    "statement": "(a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) (hab : 0 < a + b) : 0 ≤ share a b ∧ share a b ≤ 1",
    "mentions": [
     "share"
@@ -24180,7 +24305,7 @@
    "name": "Descent.Core.share_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 183,
+   "line": 213,
    "statement": ": share (1 / 2) (1 / 2) = 1 / 2",
    "mentions": [
     "share"
@@ -24190,7 +24315,7 @@
    "name": "Descent.Core.saturation_at_neg_one_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 199,
+   "line": 234,
    "statement": ": saturation (-1) = 0",
    "mentions": [
     "saturation"
@@ -24200,7 +24325,7 @@
    "name": "Descent.Core.saturation_eq_share",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 204,
+   "line": 239,
    "statement": "(x : ℝ) : saturation x = share x 1",
    "mentions": [
     "saturation",
@@ -24211,7 +24336,7 @@
    "name": "Descent.Core.saturation_mem_unit",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 210,
+   "line": 245,
    "statement": "(x : ℝ) (hx : 0 ≤ x) : 0 ≤ saturation x ∧ saturation x ≤ 1",
    "mentions": [
     "saturation"
@@ -24221,7 +24346,7 @@
    "name": "Descent.Core.saturation_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 216,
+   "line": 251,
    "statement": ": saturation 1 = 1 / 2",
    "mentions": [
     "saturation"
@@ -24231,7 +24356,7 @@
    "name": "Descent.Core.oddsLike_zero_total_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 231,
+   "line": 271,
    "statement": ": oddsLike 0 0 = 0",
    "mentions": [
     "oddsLike"
@@ -24241,7 +24366,7 @@
    "name": "Descent.Core.oddsLike_ne_share",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 237,
+   "line": 277,
    "statement": ": oddsLike 1 1 ≠ share 1 1",
    "mentions": [
     "oddsLike",
@@ -24252,7 +24377,7 @@
    "name": "Descent.Core.oddsLike_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 241,
+   "line": 281,
    "statement": ": oddsLike 1 1 = 1 / 3",
    "mentions": [
     "oddsLike"
@@ -24262,7 +24387,7 @@
    "name": "Descent.Core.convexCombination_at_endpoints",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 254,
+   "line": 299,
    "statement": "(x y : ℝ) : convexCombination 1 x y = x ∧ convexCombination 0 x y = y",
    "mentions": [
     "convexCombination"
@@ -24272,7 +24397,7 @@
    "name": "Descent.Core.convexCombination_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 259,
+   "line": 304,
    "statement": ": convexCombination (1 / 2) 1 0 = 1 / 2",
    "mentions": [
     "convexCombination"
@@ -24282,7 +24407,7 @@
    "name": "Descent.Core.geometricDecay_at_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 272,
+   "line": 322,
    "statement": "(r : ℝ) : geometricDecay r 0 = 1",
    "mentions": [
     "geometricDecay"
@@ -24292,7 +24417,7 @@
    "name": "Descent.Core.geometricDecay_succ",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 277,
+   "line": 327,
    "statement": "(r : ℝ) (t : ℕ) : geometricDecay r (t + 1) = (1 - r) * geometricDecay r t",
    "mentions": [
     "geometricDecay"
@@ -24302,7 +24427,7 @@
    "name": "Descent.Core.geometricDecay_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 282,
+   "line": 332,
    "statement": ": geometricDecay (1 / 2) 2 = 1 / 4",
    "mentions": [
     "geometricDecay"
@@ -24312,7 +24437,7 @@
    "name": "Descent.Core.retainedFraction_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 292,
+   "line": 347,
    "statement": ": retainedFraction (1 / 2) (1 / 2) = 1 / 4",
    "mentions": [
     "retainedFraction"
@@ -24322,7 +24447,7 @@
    "name": "Descent.Core.complement_involutive",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 304,
+   "line": 364,
    "statement": "(x : ℝ) : complement (complement x) = x",
    "mentions": [
     "complement"
@@ -24332,7 +24457,7 @@
    "name": "Descent.Core.complement_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 308,
+   "line": 368,
    "statement": ": complement (1 / 4) = 3 / 4",
    "mentions": [
     "complement"
@@ -24342,7 +24467,7 @@
    "name": "Descent.Core.midpoint_eq_convexCombination",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 319,
+   "line": 384,
    "statement": "(a b : ℝ) : midpoint a b = convexCombination (1 / 2) a b",
    "mentions": [
     "convexCombination",
@@ -24353,7 +24478,7 @@
    "name": "Descent.Core.midpoint_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 324,
+   "line": 389,
    "statement": ": midpoint 1 0 = 1 / 2",
    "mentions": [
     "midpoint"
@@ -24363,7 +24488,7 @@
    "name": "Descent.Core.complementaryComposition_comm",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 338,
+   "line": 408,
    "statement": "(a b : ℝ) : complementaryComposition a b = complementaryComposition b a",
    "mentions": [
     "complementaryComposition"
@@ -24373,7 +24498,7 @@
    "name": "Descent.Core.complementaryComposition_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 343,
+   "line": 413,
    "statement": "(a : ℝ) : complementaryComposition a 0 = a",
    "mentions": [
     "complementaryComposition"
@@ -24383,7 +24508,7 @@
    "name": "Descent.Core.complementaryComposition_ne_sum",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 349,
+   "line": 419,
    "statement": ": complementaryComposition (1 / 2) (1 / 2) ≠ sum (1 / 2) (1 / 2)",
    "mentions": [
     "complementaryComposition",
@@ -24394,7 +24519,7 @@
    "name": "Descent.Core.complementaryComposition_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 354,
+   "line": 424,
    "statement": ": complementaryComposition (1 / 2) (1 / 2) = 3 / 4",
    "mentions": [
     "complementaryComposition"
@@ -24404,7 +24529,7 @@
    "name": "Descent.Core.halfDiffSq_eq_zero_iff",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 365,
+   "line": 440,
    "statement": "(a b : ℝ) : halfDiffSq a b = 0 ↔ a = b",
    "mentions": [
     "halfDiffSq"
@@ -24414,7 +24539,7 @@
    "name": "Descent.Core.halfDiffSq_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 376,
+   "line": 451,
    "statement": ": halfDiffSq 1 0 = 1 / 4",
    "mentions": [
     "halfDiffSq"
@@ -24424,7 +24549,7 @@
    "name": "Descent.Core.survivalWeightedMix_empty_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 395,
+   "line": 475,
    "statement": "(c x : ℝ) : survivalWeightedMix 0 c x = (1 - c) ^ 2 * x",
    "mentions": [
     "survivalWeightedMix"
@@ -24434,7 +24559,7 @@
    "name": "Descent.Core.survivalWeightedMix_full_loss",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 402,
+   "line": 482,
    "statement": "(N x : ℝ) : survivalWeightedMix N 1 x = 0",
    "mentions": [
     "survivalWeightedMix"
@@ -24444,7 +24569,7 @@
    "name": "Descent.Core.survivalWeightedMix_mono",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 408,
+   "line": 488,
    "statement": "(N c x y : ℝ) (hN : 1 / (2 * N) ≤ 1) (hxy : x ≤ y) : survivalWeightedMix N c x ≤ survivalWeightedMix N c y",
    "mentions": [
     "survivalWeightedMix"
@@ -24454,7 +24579,7 @@
    "name": "Descent.Core.survivalWeightedMix_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 417,
+   "line": 497,
    "statement": ": survivalWeightedMix 1 0 0 = 1 / 2",
    "mentions": [
     "survivalWeightedMix"
@@ -24464,7 +24589,7 @@
    "name": "Descent.Core.kronecker_self",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 435,
+   "line": 520,
    "statement": "{α : Type*} [DecidableEq α] (x : α) : kronecker x x = 1",
    "mentions": [
     "kronecker"
@@ -24474,7 +24599,7 @@
    "name": "Descent.Core.kronecker_of_ne",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 440,
+   "line": 525,
    "statement": "{α : Type*} [DecidableEq α] {x y : α} (h : x ≠ y) : kronecker x y = 0",
    "mentions": [
     "kronecker"
@@ -24484,7 +24609,7 @@
    "name": "Descent.Core.kronecker_comm",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 446,
+   "line": 531,
    "statement": "{α : Type*} [DecidableEq α] (x y : α) : kronecker x y = kronecker y x",
    "mentions": [
     "kronecker"
@@ -24494,7 +24619,7 @@
    "name": "Descent.Core.kronecker_add_antiKronecker",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 461,
+   "line": 551,
    "statement": "{α : Type*} [DecidableEq α] (x y : α) : kronecker x y + antiKronecker x y = 1",
    "mentions": [
     "antiKronecker",
@@ -24505,7 +24630,7 @@
    "name": "Descent.Core.kronecker_eq",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 473,
+   "line": 563,
    "statement": "{α : Type*} [DecidableEq α] (x y : α) : kronecker x y = if x = y then 1 else 0",
    "mentions": [
     "kronecker"
@@ -24515,7 +24640,7 @@
    "name": "Descent.Core.antiKronecker_eq",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 477,
+   "line": 567,
    "statement": "{α : Type*} [DecidableEq α] (x y : α) : antiKronecker x y = if x = y then 0 else 1",
    "mentions": [
     "antiKronecker"
@@ -24525,7 +24650,7 @@
    "name": "Descent.Core.overlapProfile_at_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 490,
+   "line": 585,
    "statement": "(x : ℝ) : overlapProfile 0 x = x",
    "mentions": [
     "overlapProfile"
@@ -24535,7 +24660,7 @@
    "name": "Descent.Core.scaledSquare_zero_divisor_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 504,
+   "line": 604,
    "statement": "(a : ℝ) : scaledSquare a 0 = 0",
    "mentions": [
     "scaledSquare"
@@ -24545,7 +24670,7 @@
    "name": "Descent.Core.ratioOfProduct_zero_factor_is_junk",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 512,
+   "line": 617,
    "statement": "(a c : ℝ) : ratioOfProduct a 0 c = 0",
    "mentions": [
     "ratioOfProduct"
@@ -24555,7 +24680,7 @@
    "name": "Descent.Core.squaredShare_le_one",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 524,
+   "line": 634,
    "statement": "(a b c : ℝ) (hb : 0 < b) (hc : 0 < c) (h : a ^ 2 ≤ b * c) : squaredShare a b c ≤ 1",
    "mentions": [
     "squaredShare"
@@ -24565,7 +24690,7 @@
    "name": "Descent.Core.affineStep_at_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 536,
+   "line": 651,
    "statement": "(a b : ℝ) : affineStep a b 0 = a",
    "mentions": [
     "affineStep"
@@ -24575,7 +24700,7 @@
    "name": "Descent.Core.identifiedWith_eq",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 560,
+   "line": 680,
    "statement": "(x : ℝ) : identifiedWith x = x",
    "mentions": [
     "identifiedWith"
@@ -24585,7 +24710,7 @@
    "name": "Descent.Core.power_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 568,
+   "line": 693,
    "statement": "(a : ℝ) : power a 0 = 1",
    "mentions": [
     "power"
@@ -24595,7 +24720,7 @@
    "name": "Descent.Core.power_succ",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 572,
+   "line": 697,
    "statement": "(a : ℝ) (n : ℕ) : power a (n + 1) = a * power a n",
    "mentions": [
     "power"
@@ -24605,7 +24730,7 @@
    "name": "Descent.Core.innerSum_comm",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 581,
+   "line": 711,
    "statement": "{ι : Type*} [Fintype ι] (f g : ι → ℝ) : innerSum f g = innerSum g f",
    "mentions": [
     "innerSum"
@@ -24615,7 +24740,7 @@
    "name": "Descent.Core.innerSum_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 587,
+   "line": 717,
    "statement": "{ι : Type*} [Fintype ι] (g : ι → ℝ) : innerSum (fun _ ↦ 0) g = 0",
    "mentions": [
     "innerSum"
@@ -24625,7 +24750,7 @@
    "name": "Descent.Core.residualAgainst_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 598,
+   "line": 733,
    "statement": "{ι : Type*} [Fintype ι] (x : ℝ) (b : ι → ℝ) : residualAgainst x (fun _ ↦ 0) b = x",
    "mentions": [
     "residualAgainst"
@@ -24635,7 +24760,7 @@
    "name": "Descent.Core.product3_one",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 607,
+   "line": 747,
    "statement": "(a c : ℝ) : product3 a 1 c = a * c",
    "mentions": [
     "product3"
@@ -24645,7 +24770,7 @@
    "name": "Descent.Core.pairedEpochCount_at_one",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 617,
+   "line": 762,
    "statement": ": pairedEpochCount 1 = 0",
    "mentions": [
     "pairedEpochCount"
@@ -24655,7 +24780,7 @@
    "name": "Descent.Core.pairCount_one",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 625,
+   "line": 775,
    "statement": ": pairCount 1 = 0",
    "mentions": [
     "pairCount"
@@ -24665,7 +24790,7 @@
    "name": "Descent.Core.pairCount_two",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 629,
+   "line": 779,
    "statement": ": pairCount 2 = 1",
    "mentions": [
     "pairCount"
@@ -24675,7 +24800,7 @@
    "name": "Descent.Core.halfLineageRate_zero",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 642,
+   "line": 797,
    "statement": "(x : ℝ) : halfLineageRate 0 x = 0",
    "mentions": [
     "halfLineageRate"
@@ -24685,7 +24810,7 @@
    "name": "Descent.Core.halfLineageRate_succ",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 649,
+   "line": 804,
    "statement": "(k : ℕ) (x : ℝ) : halfLineageRate (k + 1) x = halfLineageRate k x + x / 2",
    "mentions": [
     "halfLineageRate"
@@ -24695,7 +24820,7 @@
    "name": "Descent.Core.sum3_zero_middle",
    "kind": "theorem",
    "file": "Descent/Core/Ratios.lean",
-   "line": 663,
+   "line": 823,
    "statement": "(a c : ℝ) : sum3 a 0 c = a + c",
    "mentions": [
     "sum3"
@@ -66603,7 +66728,7 @@
    "name": "Descent.pioneerWeightFraction_eq_fstFromTau",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 201,
+   "line": 203,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = fstFromTau w",
    "mentions": [
     "fstFromTau",
@@ -66614,7 +66739,7 @@
    "name": "Descent.pioneerWeightFraction_eq_sharedLDFromMigration",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 206,
+   "line": 208,
    "statement": "(w : ℝ) : XiFromMarks.pioneerWeightFraction w = sharedLDFromMigration w",
    "mentions": [
     "pioneerWeightFraction",
@@ -66625,7 +66750,7 @@
    "name": "Descent.ogpOverlapProfile_eq_populationOverlapProfile",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 227,
+   "line": 229,
    "statement": "(q x : ℝ) : ogpOverlapProfile q x = populationOverlapProfile q x",
    "mentions": [
     "ogpOverlapProfile",
@@ -66636,7 +66761,7 @@
    "name": "Descent.epochSampleSize_eq_epochLineageSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 231,
+   "line": 233,
    "statement": "(K : ℕ) : epochSampleSize K = epochLineageSampleSize K",
    "mentions": [
     "epochLineageSampleSize",
@@ -66647,7 +66772,7 @@
    "name": "Descent.configurationOverlap_and_transplantSqNorm_are_dotProduct",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 241,
+   "line": 243,
    "statement": "(configuration : TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) : configurationOverlap configuration configuration = dotProduct configuration configuration ∧ transplantSqNorm displacement = dotProduct displacement displacement",
    "mentions": [
     "TwoCoordinateConfiguration",
@@ -66660,7 +66785,7 @@
    "name": "Descent.stayKernel_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 249,
+   "line": 251,
    "statement": "(i j : Fin 2) : stayKernel i j = oneHotWeight (R := ℝ) i j",
    "mentions": [
     "oneHotWeight",
@@ -66671,7 +66796,7 @@
    "name": "Descent.persistentTransition_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 257,
+   "line": 259,
    "statement": "(x y : BinaryBiologicalState) : persistentTransition x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66683,7 +66808,7 @@
    "name": "Descent.contextMatchQuality_eq_persistentTransition",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 265,
+   "line": 267,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = persistentTransition x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66695,7 +66820,7 @@
    "name": "Descent.contextMatchQuality_eq_oneHotWeight",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 269,
+   "line": 271,
    "statement": "(x y : BinaryBiologicalState) : contextMatchQuality x y = oneHotWeight (R := ℝ) x y",
    "mentions": [
     "BinaryBiologicalState",
@@ -66707,7 +66832,7 @@
    "name": "Descent.stableSieveDimension_eq_criticalDegree",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 275,
+   "line": 277,
    "statement": "(kappa L : ℝ) : SpectrumIdentifiability.stableSieveDimension kappa L = criticalDegree L kappa",
    "mentions": [
     "criticalDegree",
@@ -66719,7 +66844,7 @@
    "name": "Descent.two_le_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 427,
+   "line": 429,
    "statement": ": (2 : ℕ) ≤ 2",
    "mentions": []
   },
@@ -66727,7 +66852,7 @@
    "name": "Descent.twoLocusCoalescent_covariance_gap_lower_bound_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 445,
+   "line": 447,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_time : tSource ≤ tTarget) : 2 * (ibdWeight * discreteRecombinationSurvival recombRate tSource * (1 - discreteRecombinationSurvival recombRate (tTarget - tSource))) ^ 2 ≤ frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "discreteRecombinationSurvival",
@@ -66740,7 +66865,7 @@
    "name": "Descent.covariance_mismatch_pos_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 459,
+   "line": 461,
    "statement": "(ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : 0 < frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget)",
    "mentions": [
     "frobeniusNormSq",
@@ -66752,7 +66877,7 @@
    "name": "Descent.expectedBrierScore_deriv_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 477,
+   "line": 479,
    "statement": "(p π : ℝ) : deriv (fun x ↦ expectedBrierScore x π) p = 2 * (p - π)",
    "mentions": [
     "expectedBrierScore"
@@ -66762,7 +66887,7 @@
    "name": "Descent.overlapEnergyTruth_eq_crossS",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 491,
+   "line": 493,
    "statement": ": overlapEnergyTruth = crossS",
    "mentions": [
     "crossS",
@@ -66773,7 +66898,7 @@
    "name": "Descent.overlapEnergyPositive_eq_reorderScore",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 494,
+   "line": 496,
    "statement": ": overlapEnergyPositive = reorderScore",
    "mentions": [
     "overlapEnergyPositive",
@@ -66784,7 +66909,7 @@
    "name": "Descent.overlapEnergyPositive_eq_twoAncestryConditional",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 497,
+   "line": 499,
    "statement": ": overlapEnergyPositive = twoAncestryConditional",
    "mentions": [
     "overlapEnergyPositive",
@@ -66795,7 +66920,7 @@
    "name": "Descent.sigmaT_mulVec_crossS_eq_ldWitnessTargetCross",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 518,
+   "line": 520,
    "statement": ": sigmaT.mulVec crossS = ldWitnessTargetCross",
    "mentions": [
     "crossS",
@@ -66806,7 +66931,7 @@
    "name": "Descent.source_erm_solves_source_not_target_normal_equations",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 527,
+   "line": 529,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -66814,7 +66939,7 @@
    "name": "Descent.source_target_erm_differ_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 547,
+   "line": 549,
    "statement": ": let wS : Fin 2 → ℝ",
    "mentions": []
   },
@@ -66822,7 +66947,7 @@
    "name": "Descent.target_r2_drop_of_twoLocusCoalescent_dim_two",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 565,
+   "line": 567,
    "statement": "(mseSource mseTarget varY lam : ℝ) (ibdWeight recombRate : ℝ) (tSource tTarget : ℕ) (h_mse_gap_lb : lam * frobeniusNormSq (twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tSource - twoLocusCoalescentCovarianceMatrix two_le_two ibdWeight recombRate tTarget) ≤ mseTarget - mseSource) (h_lam_pos : 0 < lam) (h_varY_pos : 0 < varY) (h_ibd_pos : 0 < ibdWeight) (h_recomb_pos : 0 < recombRate) (h_recomb_lt_one : recombRate < 1) (h_time : tSource < tTarget) : r2FromMSE mseTarget varY < r2FromMSE mseSource varY",
    "mentions": [
     "frobeniusNormSq",
@@ -66835,7 +66960,7 @@
    "name": "Descent.ld_decay_implies_nonlinear_calibration_of_exp_tagging",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 634,
+   "line": 636,
    "statement": "{k : ℕ} [Fintype (Fin k)] (mech : LDDecayMechanism k) (lambda : ℝ) (h_lambda_pos : 0 < lambda) (h_tagging : mech.tagging_efficiency = fun d ↦ Real.exp (-lambda * d)) (c0 c1 c2 : Fin k → ℝ) (hd0 : mech.distance c0 = 0) (hd1 : mech.distance c1 = 1) (hd2 : mech.distance c2 = 2) : ∀ (beta0 beta1 : ℝ), (fun c ↦ beta0 + beta1 * mech.distance c) ≠ (fun c ↦ decaySlope mech c)",
    "mentions": [
     "decaySlope"
@@ -66845,7 +66970,7 @@
    "name": "Descent.additive_score_subcritical_at_balanced_locus_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 724,
+   "line": 726,
    "statement": ": 1 < maxSafeEpistaticOrder 1000000 (1 / 2)",
    "mentions": [
     "maxSafeEpistaticOrder"
@@ -66855,7 +66980,7 @@
    "name": "Descent.pairwise_epistasis_supercritical_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 735,
+   "line": 737,
    "statement": ": ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Real.log 1000000 < 2 * hweMellinDrift q",
    "mentions": [
     "hweMellinDrift"
@@ -66865,7 +66990,7 @@
    "name": "Descent.hardCall_lattice_inflation_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 742,
+   "line": 744,
    "statement": ": 1 < latticeInflation hardCallLatticeSpan",
    "mentions": [
     "hardCallLatticeSpan",
@@ -66876,7 +67001,7 @@
    "name": "Descent.frustration_floor_proved",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 749,
+   "line": 751,
    "statement": ": (0.127 : ℝ) < expanderAgreementFloor",
    "mentions": [
     "expanderAgreementFloor"
@@ -66886,7 +67011,7 @@
    "name": "Descent.chargedTuples_one_slot_iff",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 769,
+   "line": 771,
    "statement": "{T : Type*} [TopologicalSpace T] {d : ℕ} (F : BundleRigidity.ModulusFamily T d) (S : Set T) (v : ℝ) (t : Fin 1 → T) : t ∈ BundleRigidity.chargedTuples (fun j x ↦ F.curve j x) {u | u 0 ∈ S} (fun _ ↦ v) ↔ t 0 ∈ F.coverers S v",
    "mentions": [
     "S",
@@ -66898,7 +67023,7 @@
    "name": "Descent.singleModulus_atom_sq_eq_realizability_atom_sq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 785,
+   "line": 787,
    "statement": "{d : ℕ} {v : ℝ} (S : BundleRigidity.SingleModulus d v) (hv : 0 ≤ v) (hv1 : v ≤ 1) (j : Fin d) : S.atom j ^ 2 = BundleRigidity.outerAtom v ^ 2 ∨ S.atom j ^ 2 = BundleRigidity.innerAtom v ^ 2",
    "mentions": [
     "S",
@@ -66910,7 +67035,7 @@
    "name": "Descent.sampleCost_eq_fixedGradeBenchmarkSampleSize",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 805,
+   "line": 807,
    "statement": "(η C : ℝ) (k : ℕ) (hη : 0 < η) (hC : 0 < C) : BundleRigidity.sampleCost η C k = fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1",
    "mentions": [
     "fixedGradeBenchmarkSampleSize",
@@ -66921,7 +67046,7 @@
    "name": "Descent.intensity_eq_charFnSq",
    "kind": "theorem",
    "file": "Descent.lean",
-   "line": 828,
+   "line": 830,
    "statement": "{n : ℕ} (P : PhasePanel n) (s : ℝ) : P.intensity s = charFnSq P.weight P.phase s",
    "mentions": [
     "charFnSq",
@@ -92857,7 +92982,8 @@
      "Descent.Coalescent.sum_spectrumBranchLength": [],
      "Descent.Coalescent.singletonShare_eq": [],
      "Descent.Coalescent.varWattersonEstimator_le": [],
-     "Descent.Coalescent.exists_varWattersonEstimator_lt": []
+     "Descent.Coalescent.exists_varWattersonEstimator_lt": [],
+     "Descent.Coalescent.varPairwise_two_eq": []
     },
     "range_hi_thm": [
      "Descent.Coalescent.harmonicSum_le_one_add_log",
@@ -92891,6 +93017,7 @@
     "Descent.Coalescent.tendsto_expectedSegregatingSites_atTop",
     "Descent.Coalescent.tendsto_expectedTotalBranchLength_atTop",
     "Descent.Coalescent.tendsto_harmonicSum_atTop",
+    "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varWattersonEstimator_le"
    ]
   },
@@ -96218,6 +96345,58 @@
    ]
   },
   {
+   "name": "Descent.Coalescent.pairTime",
+   "decl_name": "pairTime",
+   "short": "pairTime",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Coalescent/PairwiseTimes.lean",
+   "line": 75,
+   "signature": "(c p : Fin 3) (t₃ t₂ : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "c",
+      "p"
+     ],
+     "type": "Fin 3",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "t₃",
+      "t₂"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " if p = c then t₃ else t₃ + t₂",
+   "docstring": "The coalescence time of pair `p` in a three-sample whose first merger is pair `c`, given\nthe two holding times.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM.  It reads the tree off the jump chain and the\nclock: the pair that merges first waits `τ₃`, the other two wait until the root.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.sum_pairTime": [],
+     "Descent.Coalescent.sum_sq_pairTime": [],
+     "Descent.Coalescent.cross_pairTime": [],
+     "Descent.Coalescent.pairTime_symmetric_sums_topology_free": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.cross_pairTime",
+    "Descent.Coalescent.pairTime_symmetric_sums_topology_free",
+    "Descent.Coalescent.sum_pairTime",
+    "Descent.Coalescent.sum_sq_pairTime"
+   ]
+  },
+  {
    "name": "Descent.Coalescent.descentTime",
    "decl_name": "descentTime",
    "short": "descentTime",
@@ -97105,6 +97284,9 @@
      "Descent.Coalescent.moment_closure": [],
      "Descent.Coalescent.duality_deriv": [],
      "Descent.Coalescent.generator_row_sum_zero": [],
+     "Descent.Coalescent.variance_holdTime_deathRate": [
+      "2 ≤ k"
+     ],
      "Descent.Coalescent.integral_id_mul_holdDensity_deathRate": [
       "2 ≤ k"
      ],
@@ -97252,7 +97434,8 @@
     "Descent.Coalescent.tendsto_survivalFactor_partialProd",
     "Descent.Coalescent.totalRate_kingman",
     "Descent.Coalescent.tsum_one_div_deathRate_tail",
-    "Descent.Coalescent.varTransitTime_le_meanTransitTime"
+    "Descent.Coalescent.varTransitTime_le_meanTransitTime",
+    "Descent.Coalescent.variance_holdTime_deathRate"
    ]
   },
   {
@@ -98772,7 +98955,8 @@
      ],
      "Descent.Coalescent.harmonicSumSq_le_two": [],
      "Descent.Coalescent.varTotalBranchLength_eq": [],
-     "Descent.Coalescent.varWattersonEstimator_le": []
+     "Descent.Coalescent.varWattersonEstimator_le": [],
+     "Descent.Coalescent.varPairwise_two_eq": []
     },
     "range_lo_thm": [
      "Descent.Coalescent.harmonicSumSq_nonneg",
@@ -98791,6 +98975,7 @@
     "Descent.Coalescent.harmonicSumSq_nonneg",
     "Descent.Coalescent.harmonicSumSq_succ",
     "Descent.Coalescent.harmonicSumSq_zero",
+    "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varTotalBranchLength_eq",
     "Descent.Coalescent.varWattersonEstimator_le"
    ]
@@ -98802,7 +98987,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 126,
+   "line": 127,
    "signature": "(n : ℕ) : ℝ",
    "args": [
     {
@@ -98816,7 +99001,7 @@
    ],
    "ret_type": "ℝ",
    "body": "  ∑ j ∈ range (n - 1), expectedSegmentLength (j + 2) ^ 2",
-   "docstring": "`Var(L_n)`, the variance of the total branch length: the phase durations being\nindependent, the squared lineage-count weights add.\n\nEmpirical status: DERIVED given independence, which is ASSUMED and named at\n`Descent.Coalescent.TransitVariance`.  The summand is the SQUARE of\n`BranchLength.expectedSegmentLength`, because a phase of mean duration `d_k⁻¹` contributing\nlength at rate `k` contributes variance `k² d_k⁻²`.",
+   "docstring": "`Var(L_n)`, the variance of the total branch length: the phase durations being\nindependent, the squared lineage-count weights add.\n\nEmpirical status: DERIVED given independence, which is ASSUMED and named at\n`Descent.Coalescent.TransitVariance`.  The summand is the SQUARE of\n`BranchLength.expectedSegmentLength`, because a phase of mean duration `d_k⁻¹` contributing\nlength at rate `k` contributes variance `k² d_k⁻²` -- and that `d_k⁻²` is computed from the\ndensity in `Descent.Coalescent.HoldingSecondMoment`, not quoted.",
    "empirical_status": "DERIVED",
    "namespace": "Descent.Coalescent",
    "fields": [],
@@ -98857,7 +99042,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 162,
+   "line": 163,
    "signature": "(θ : ℝ) (n : ℕ) : ℝ",
    "args": [
     {
@@ -98900,10 +99085,12 @@
      "Descent.Coalescent.varWattersonEstimator_le": [
       "0 ≤ θ",
       "1 ≤ harmonicSum (n - 1"
-     ]
+     ],
+     "Descent.Coalescent.varPairwise_two_eq": []
     }
    },
    "mentioned_by": [
+    "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varSegregatingSites_eq_totalVariance",
     "Descent.Coalescent.varSegregatingSites_nonneg",
     "Descent.Coalescent.varWattersonEstimator_le"
@@ -98916,7 +99103,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/SpectrumMoments.lean",
-   "line": 191,
+   "line": 192,
    "signature": "(θ : ℝ) (n : ℕ) : ℝ",
    "args": [
     {
@@ -98964,6 +99151,53 @@
    "mentioned_by": [
     "Descent.Coalescent.exists_varWattersonEstimator_lt",
     "Descent.Coalescent.varWattersonEstimator_le"
+   ]
+  },
+  {
+   "name": "Descent.Coalescent.tajimaVarPairwise",
+   "decl_name": "tajimaVarPairwise",
+   "short": "tajimaVarPairwise",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Coalescent/SpectrumMoments.lean",
+   "line": 252,
+   "signature": "(θ : ℝ) (n : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ\n    + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ ^ 2",
+   "docstring": "Tajima (1989)'s expression for `Var(π)`:\n`(n+1)/(3(n-1)) · θ + 2(n²+n+3)/(9n(n-1)) · θ²`.\n\nEmpirical status: ASSERTED, with referent Tajima (1989, Genetics 123, 585-595).  It is\nwritten here to be CHECKED, not used: `varPairwise_two_eq` is the one sample size at which\nthis corpus can verify it, and the general case is recorded as open in\n`Descent.Coalescent.Program`.  Nothing in the corpus depends on this definition.",
+   "empirical_status": "ASSERTED",
+   "namespace": "Descent.Coalescent",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.varPairwise_two_eq": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.varPairwise_two_eq"
    ]
   },
   {
@@ -100993,7 +101227,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Coalescent/TransitVariance.lean",
-   "line": 66,
+   "line": 70,
    "signature": "(n : ℕ) : ℝ",
    "args": [
     {
@@ -101007,7 +101241,7 @@
    ],
    "ret_type": "ℝ",
    "body": "  ∑ k ∈ range (n - 1), (1 / deathRate (k + 2)) ^ 2",
-   "docstring": "`Var(T_n)`, the variance of the transit time: the sum of `d_r⁻²` over the `n - 1` phases,\nthe variances of independent exponentials adding.\n\nEmpirical status: DERIVED given independence, which is ASSUMED and named -- see the module\ndocstring.  The summand `d_r⁻²` is the variance of an exponential of rate `d_r`, which\n`Descent.Coalescent.HoldingTime` supplies the density for.",
+   "docstring": "`Var(T_n)`, the variance of the transit time: the sum of `d_r⁻²` over the `n - 1` phases,\nthe variances of independent exponentials adding.\n\nEmpirical status: DERIVED given independence, which is ASSUMED and named -- see the module\ndocstring.  The summand `d_r⁻²` is the variance of an exponential of rate `d_r`, and that is\nnow computed rather than quoted: `Descent.Coalescent.HoldingSecondMoment.variance_holdTime`\nintegrates K-C (1.7)'s density twice and subtracts.",
    "empirical_status": "DERIVED",
    "namespace": "Descent.Coalescent",
    "fields": [],
@@ -108955,13 +109189,13 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 65,
+   "line": 70,
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
    "body": " 2",
-   "docstring": "Ploidy. Two, because every population in this corpus is diploid.",
-   "empirical_status": "",
+   "docstring": "Ploidy. Two, because every population in this corpus is diploid.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109248,7 +109482,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 68,
+   "line": 78,
    "signature": "(Ne μ : ℝ) : ℝ",
    "args": [
     {
@@ -109263,8 +109497,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 2 * ploidy * Ne * μ",
-   "docstring": "Scaled mutation rate, `θ = 4 Ne μ`.",
-   "empirical_status": "",
+   "docstring": "Scaled mutation rate, `θ = 4 Ne μ`.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109395,7 +109629,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 72,
+   "line": 87,
    "signature": "(Ne m : ℝ) : ℝ",
    "args": [
     {
@@ -109410,8 +109644,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 2 * ploidy * Ne * m",
-   "docstring": "Scaled migration rate, `M = 4 Ne m`, in the same units as `θ`. Being in the same\nunits is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term.",
-   "empirical_status": "",
+   "docstring": "Scaled migration rate, `M = 4 Ne m`, in the same units as `θ`. Being in the same\nunits is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109563,7 +109797,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 96,
+   "line": 116,
    "signature": "(d : ℝ) : ℝ",
    "args": [
     {
@@ -109577,8 +109811,8 @@
    ],
    "ret_type": "ℝ",
    "body": " ratio d (d - 1)",
-   "docstring": "The island-model deme-count correction, `d / (d - 1)`.\n\nWith `d` demes a migrant arrives from one of the OTHER `d - 1`, so the effective\nmigration rate between any two is inflated by this factor. It is `1` only in the limit\nof infinitely many demes, and at `d = 2` it is `2` -- a factor of two, which is the size\nof the error a many-deme formula makes on a two-population split.",
-   "empirical_status": "",
+   "docstring": "The island-model deme-count correction, `d / (d - 1)`.\n\nWith `d` demes a migrant arrives from one of the OTHER `d - 1`, so the effective\nmigration rate between any two is inflated by this factor. It is `1` only in the limit\nof infinitely many demes, and at `d = 2` it is `2` -- a factor of two, which is the size\nof the error a many-deme formula makes on a two-population split.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109653,7 +109887,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 146,
+   "line": 171,
    "signature": "(Ne m μ nDemes : ℝ) : ℝ",
    "args": [
     {
@@ -109670,8 +109904,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  scaledMigrationRate Ne m * islandDemeCorrection nDemes + scaledMutationRate Ne μ",
-   "docstring": "Total scaled flow into a deme, `4 Ne m (d/(d-1)) + 4 Ne μ`.\n\nNaming it separates the two questions the equilibrium answers: what counts as flow, and\nhow flow becomes a differentiation. Every member of the lattice below differs only in\nwhat it puts here.",
-   "empirical_status": "",
+   "docstring": "Total scaled flow into a deme, `4 Ne m (d/(d-1)) + 4 Ne μ`.\n\nNaming it separates the two questions the equilibrium answers: what counts as flow, and\nhow flow becomes a differentiation. Every member of the lattice below differs only in\nwhat it puts here.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109712,7 +109946,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 168,
+   "line": 198,
    "signature": "(x : ℝ) : ℝ",
    "args": [
     {
@@ -109726,8 +109960,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 1 / (1 + x)",
-   "docstring": "**`F_ST` from a total scaled flow**, `1 / (1 + x)`.\n\nEvery equilibrium `F_ST` in this corpus is this map applied to a different flow. Naming\nthe map separates the two questions -- what counts as flow, and how flow becomes a\ndifferentiation -- and it is what lets the five bodies the corpus had be five flows\nrather than five formulas.",
-   "empirical_status": "",
+   "docstring": "**`F_ST` from a total scaled flow**, `1 / (1 + x)`.\n\nEvery equilibrium `F_ST` in this corpus is this map applied to a different flow. Naming\nthe map separates the two questions -- what counts as flow, and how flow becomes a\ndifferentiation -- and it is what lets the five bodies the corpus had be five flows\nrather than five formulas.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -109946,7 +110180,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 189,
+   "line": 224,
    "signature": "(Ne m μ nDemes : ℝ) : ℝ",
    "args": [
     {
@@ -109963,8 +110197,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  fstFromFlow (scaledFlow Ne m μ nDemes)",
-   "docstring": "**Island-model `F_ST` at migration-mutation-drift equilibrium, with the deme count\ncarried.**\n\n    F_ST = 1 / (1 + 4 Ne m (d/(d-1)) + 4 Ne μ)\n\nThis is the only place the formula is written. Every other `F_ST` equilibrium in the\ncorpus is a theorem below placing a named body inside this family.",
-   "empirical_status": "",
+   "docstring": "**Island-model `F_ST` at migration-mutation-drift equilibrium, with the deme count\ncarried.**\n\n    F_ST = 1 / (1 + 4 Ne m (d/(d-1)) + 4 Ne μ)\n\nThis is the only place the formula is written. Every other `F_ST` equilibrium in the\ncorpus is a theorem below placing a named body inside this family.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110036,7 +110270,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 267,
+   "line": 307,
    "signature": "(tau : ℝ) : ℝ",
    "args": [
     {
@@ -110050,8 +110284,8 @@
    ],
    "ret_type": "ℝ",
    "body": " saturation tau",
-   "docstring": "`F_ST` from a scaled coalescence time, `τ / (1 + τ)`.",
-   "empirical_status": "",
+   "docstring": "`F_ST` from a scaled coalescence time, `τ / (1 + τ)`.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110158,7 +110392,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 312,
+   "line": 357,
    "signature": "(tau : ℝ) : HudsonFst",
    "args": [
     {
@@ -110172,8 +110406,8 @@
    ],
    "ret_type": "HudsonFst",
    "body": " ⟨fstFromTau tau⟩",
-   "docstring": "A scaled coalescence time reads as a Hudson `F_ST`, and only as a Hudson one.",
-   "empirical_status": "",
+   "docstring": "A scaled coalescence time reads as a Hudson `F_ST`, and only as a Hudson one.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110197,7 +110431,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 318,
+   "line": 368,
    "signature": "(g : NeiFst) : HudsonFst",
    "args": [
     {
@@ -110211,8 +110445,8 @@
    ],
    "ret_type": "HudsonFst",
    "body": "  ⟨2 * g.value / (1 + g.value)⟩",
-   "docstring": "**The exact conversion, and the reason it is not a correction factor.**\n`Hudson = 2G/(1 + G)`. It is a Möbius map and not a constant multiple, so there is no\nnumber by which a Nei estimate can be scaled to give a Hudson one: the ratio between them\nmoves with the value. Measured ratios across one design were 0.62, 0.60, 0.68 and 0.81.",
-   "empirical_status": "",
+   "docstring": "**The exact conversion, and the reason it is not a correction factor.**\n`Hudson = 2G/(1 + G)`. It is a Möbius map and not a constant multiple, so there is no\nnumber by which a Nei estimate can be scaled to give a Hudson one: the ratio between them\nmoves with the value. Measured ratios across one design were 0.62, 0.60, 0.68 and 0.81.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110239,7 +110473,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Fst.lean",
-   "line": 357,
+   "line": 412,
    "signature": "(p : ℝ) : ℝ",
    "args": [
     {
@@ -110253,8 +110487,8 @@
    ],
    "ret_type": "ℝ",
    "body": " ploidy * p * (1 - p)",
-   "docstring": "Hardy--Weinberg heterozygosity, `2p(1-p)`.\n\nTwo names in the corpus carry this body -- `hweHeterozygosity` and\n`genotypeVarianceHWE` -- and they are NOT one quantity: the first is the probability a\ndiploid is heterozygous, the second the variance of a `0/1/2` dosage. Under\nHardy--Weinberg those numbers coincide, and that coincidence is a fact about the\nproportions rather than about the arithmetic. Both call this.",
-   "empirical_status": "",
+   "docstring": "Hardy--Weinberg heterozygosity, `2p(1-p)`.\n\nTwo names in the corpus carry this body -- `hweHeterozygosity` and\n`genotypeVarianceHWE` -- and they are NOT one quantity: the first is the probability a\ndiploid is heterozygous, the second the variance of a `0/1/2` dosage. Under\nHardy--Weinberg those numbers coincide, and that coincidence is a fact about the\nproportions rather than about the arithmetic. Both call this.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110400,7 +110634,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 45,
+   "line": 50,
    "signature": "(Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ",
    "args": [
     {
@@ -110422,8 +110656,8 @@
    ],
    "ret_type": "ℕ → ℝ",
    "body": "| 0 => H₀\n  | t + 1 => (1 - 1 / (2 * Ne)) * hetRecurrence Ne H₀ t",
-   "docstring": "**Heterozygosity under drift alone**, `H(t+1) = (1 - 1/(2Nₑ)) · H(t)`.\n\nThe factor is the probability that two lineages sampled in the child generation do not\nshare a parent. Writing it as a recurrence rather than as its closed form is deliberate:\nthe step is what a mechanism can be compared against, and `hetRecurrence_closed_form`\nbelow derives the power.",
-   "empirical_status": "",
+   "docstring": "**Heterozygosity under drift alone**, `H(t+1) = (1 - 1/(2Nₑ)) · H(t)`.\n\nThe factor is the probability that two lineages sampled in the child generation do not\nshare a parent. Writing it as a recurrence rather than as its closed form is deliberate:\nthe step is what a mechanism can be compared against, and `hetRecurrence_closed_form`\nbelow derives the power.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [
@@ -110478,7 +110712,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Heterozygosity.lean",
-   "line": 74,
+   "line": 84,
    "signature": "(Ne : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -110500,8 +110734,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  complement (geometricDecay (1 / (2 * Ne)) t)",
-   "docstring": "**Fraction of ancestral heterozygosity lost by generation `t`**,\n`1 - (1 - 1/(2Nₑ))^t`.\n\nThis is `proportionalReduction` of the retained heterozygosity against the ancestral\none, and it is written under two names in `PopGen` -- `heterozygosityLossFromDrift` and\n`heterozygosityLossDerived`, which differ only in argument order. Both call this.",
-   "empirical_status": "",
+   "docstring": "**Fraction of ancestral heterozygosity lost by generation `t`**,\n`1 - (1 - 1/(2Nₑ))^t`.\n\nThis is `proportionalReduction` of the retained heterozygosity against the ancestral\none, and it is written under two names in `PopGen` -- `heterozygosityLossFromDrift` and\n`heterozygosityLossDerived`, which differ only in argument order. Both call this.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -110583,13 +110817,13 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 78,
+   "line": 83,
    "signature": ": ScoreMoments where scoreVariance",
    "args": [],
    "ret_type": "ScoreMoments where scoreVariance",
    "body": " 1\n  predictiveCovariance := 1 / 2\n  outcomeVariance := 1",
-   "docstring": "**The tuple is inhabited, admissibly.** A theorem quantified over an uninhabited\nstructure is true and empty.",
-   "empirical_status": "",
+   "docstring": "**The tuple is inhabited, admissibly.** A theorem quantified over an uninhabited\nstructure is true and empty.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -110661,7 +110895,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 96,
+   "line": 106,
    "signature": "(m : ScoreMoments) : ℝ",
    "args": [
     {
@@ -110675,8 +110909,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  m.predictiveCovariance ^ 2 / (m.scoreVariance * m.outcomeVariance)",
-   "docstring": "**Deployed `R²`**, `Cov(S,Y)² / (Var(S) · Var(Y))`.",
-   "empirical_status": "",
+   "docstring": "**Deployed `R²`**, `Cov(S,Y)² / (Var(S) · Var(Y))`.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -110889,7 +111123,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 101,
+   "line": 116,
    "signature": "(m : ScoreMoments) : ℝ",
    "args": [
     {
@@ -110903,8 +111137,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  ratio m.predictiveCovariance m.scoreVariance",
-   "docstring": "**Calibration slope**, `Cov(S,Y) / Var(S)`: the coefficient a regression of the\noutcome on the deployed score would fit. One means the score is on the right scale.",
-   "empirical_status": "",
+   "docstring": "**Calibration slope**, `Cov(S,Y) / Var(S)`: the coefficient a regression of the\noutcome on the deployed score would fit. One means the score is on the right scale.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -110974,7 +111208,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 106,
+   "line": 126,
    "signature": "(m : ScoreMoments) : ℝ",
    "args": [
     {
@@ -110988,8 +111222,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  m.outcomeVariance - 2 * m.predictiveCovariance + m.scoreVariance",
-   "docstring": "**Mean squared error of the raw score**, `Var(Y) - 2Cov(S,Y) + Var(S)`, for a score\nalready centred on the outcome's mean.",
-   "empirical_status": "",
+   "docstring": "**Mean squared error of the raw score**, `Var(Y) - 2Cov(S,Y) + Var(S)`, for a score\nalready centred on the outcome's mean.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111039,7 +111273,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 159,
+   "line": 184,
    "signature": "(V_A V_E fst : ℝ) : ScoreMoments where scoreVariance",
    "args": [
     {
@@ -111055,8 +111289,8 @@
    ],
    "ret_type": "ScoreMoments where scoreVariance",
    "body": " retainedFraction fst V_A\n  predictiveCovariance := retainedFraction fst V_A\n  outcomeVariance := retainedFraction fst V_A + V_E",
-   "docstring": "**The moment tuple of a source-trained score deployed at differentiation `F_ST`.**\n\nThe score's causal weights were fitted in the source; in the target, allele frequencies\nhave drifted apart, and the covariance a score retains is eroded by `1 - F_ST`. Both the\nscore variance, the predictive covariance AND the additive part of the outcome variance\nall carry that factor: the target's own additive variance is eroded by the same drift,\nso `Var(Y) = V_A(1 - F) + V_E` and not `V_A + V_E`. Getting that wrong inflates the\ndenominator and understates the deployed `R²` -- it is the difference between dividing by\nthe ancestral additive variance and by the target's.\n\nThis is the drift regime and it says so: no selection, no gene-environment interaction,\nno effect turnover, and the same causal variants in both populations. Those are the\nassumptions under which `1 - F_ST` is the whole story, and the Portability layer's\nturnover and context terms are what carry the rest.",
-   "empirical_status": "",
+   "docstring": "**The moment tuple of a source-trained score deployed at differentiation `F_ST`.**\n\nThe score's causal weights were fitted in the source; in the target, allele frequencies\nhave drifted apart, and the covariance a score retains is eroded by `1 - F_ST`. Both the\nscore variance, the predictive covariance AND the additive part of the outcome variance\nall carry that factor: the target's own additive variance is eroded by the same drift,\nso `Var(Y) = V_A(1 - F) + V_E` and not `V_A + V_E`. Getting that wrong inflates the\ndenominator and understates the deployed `R²` -- it is the difference between dividing by\nthe ancestral additive variance and by the target's.\n\nThis is the drift regime and it says so: no selection, no gene-environment interaction,\nno effect turnover, and the same causal variants in both populations. Those are the\nassumptions under which `1 - F_ST` is the whole story, and the Portability layer's\nturnover and context terms are what carry the rest.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111221,7 +111455,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 279,
+   "line": 309,
    "signature": "(V_A V_E fst : ℝ) : ℝ",
    "args": [
     {
@@ -111237,8 +111471,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  ratio (momentsUnderDrift V_A V_E fst).r2 (momentsUnderDrift V_A V_E 0).r2",
-   "docstring": "**The portability ratio.** Deployed `R²` against source `R²` -- the quantity the\nliterature reports and the one this whole development is about.",
-   "empirical_status": "",
+   "docstring": "**The portability ratio.** Deployed `R²` against source `R²` -- the quantity the\nliterature reports and the one this whole development is about.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111309,7 +111543,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 329,
+   "line": 364,
    "signature": "(V_A V_E tau : ℝ) : ℝ",
    "args": [
     {
@@ -111325,8 +111559,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  (momentsUnderDrift V_A V_E (fstFromTau tau)).r2",
-   "docstring": "**Deployed `R²` after a clean split**, from the scaled coalescence time. Written\nthrough `fstFromTau` so that this and the equilibrium route cannot acquire different\n`F_ST` conventions: both are Hudson.",
-   "empirical_status": "",
+   "docstring": "**Deployed `R²` after a clean split**, from the scaled coalescence time. Written\nthrough `fstFromTau` so that this and the equilibrium route cannot acquire different\n`F_ST` conventions: both are Hudson.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111367,7 +111601,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 368,
+   "line": 408,
    "signature": "(p : PopGenParameters) (V_E : ℝ) : ℝ",
    "args": [
     {
@@ -111389,8 +111623,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  (momentsUnderDrift p.V_A V_E p.fstEquilibrium).r2",
-   "docstring": "**Deployed `R²` from a demographic history.** The composition of\n`PopGenParameters.fstEquilibrium` with `momentsUnderDrift` with `r2`: three named maps,\none function from a demography to a metric.\n\nThis is the object the corpus had no name for. Its `PopGen` layer computed `F_ST` from\n`(Nₑ, m, μ, t)` and its `Portability` layer computed `R²` from moment tuples, and the two\nwere joined by two theorems out of 5,852 -- everything else took `fst` as a free real,\nsevering the metric from the population genetics meant to produce it.",
-   "empirical_status": "",
+   "docstring": "**Deployed `R²` from a demographic history.** The composition of\n`PopGenParameters.fstEquilibrium` with `momentsUnderDrift` with `r2`: three named maps,\none function from a demography to a metric.\n\nThis is the object the corpus had no name for. Its `PopGen` layer computed `F_ST` from\n`(Nₑ, m, μ, t)` and its `Portability` layer computed `R²` from moment tuples, and the two\nwere joined by two theorems out of 5,852 -- everything else took `fst` as a free real,\nsevering the metric from the population genetics meant to produce it.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111500,7 +111734,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 524,
+   "line": 569,
    "signature": "(π : ℝ) (m : ScoreMoments) : ℝ",
    "args": [
     {
@@ -111522,8 +111756,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  π * (1 - π) * complement m.r2",
-   "docstring": "**Calibrated Brier score from a tuple and a prevalence**, `π(1-π)(1 - R²)`.\n\nThe binary-outcome coordinate. It is a function of the tuple only through `R²`, which is\nwhy every `R²` result above transfers to it -- and why a deployment cannot report a Brier\nscore that disagrees with its `R²`.",
-   "empirical_status": "",
+   "docstring": "**Calibrated Brier score from a tuple and a prevalence**, `π(1-π)(1 - R²)`.\n\nThe binary-outcome coordinate. It is a function of the tuple only through `R²`, which is\nwhy every `R²` result above transfers to it -- and why a deployment cannot report a Brier\nscore that disagrees with its `R²`.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111615,7 +111849,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 558,
+   "line": 608,
    "signature": "(m : ScoreMoments) : ℝ",
    "args": [
     {
@@ -111629,8 +111863,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  ratio m.r2 (complement m.r2)",
-   "docstring": "**The AUC argument**, `R² / (1 - R²)`.\n\nThe equal-variance Gaussian AUC is `Φ` of a strictly increasing function of this, and `Φ`\nis strictly increasing -- so every ordering statement about an AUC is an ordering\nstatement about this quantity, and can be made without `Φ`, which this corpus has no\nMathlib form for. Writing the argument rather than a wrong closed form is the same\ndiscipline `calibratedBrierFromVariances` records for the liability scale.",
-   "empirical_status": "",
+   "docstring": "**The AUC argument**, `R² / (1 - R²)`.\n\nThe equal-variance Gaussian AUC is `Φ` of a strictly increasing function of this, and `Φ`\nis strictly increasing -- so every ordering statement about an AUC is an ordering\nstatement about this quantity, and can be made without `Φ`, which this corpus has no\nMathlib form for. Writing the argument rather than a wrong closed form is the same\ndiscipline `calibratedBrierFromVariances` records for the liability scale.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111666,7 +111900,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 611,
+   "line": 666,
    "signature": "(π : ℝ) (p : PopGenParameters) (V_E : ℝ) : ℝ",
    "args": [
     {
@@ -111696,8 +111930,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  brier π (momentsUnderDrift p.V_A V_E p.fstEquilibrium)",
-   "docstring": "**Deployed Brier score from a demographic history.**",
-   "empirical_status": "",
+   "docstring": "**Deployed Brier score from a demographic history.**\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111777,7 +112011,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 687,
+   "line": 747,
    "signature": "(Ne m μ nDemes V_A V_E : ℝ) : ℝ",
    "args": [
     {
@@ -111796,8 +112030,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).r2",
-   "docstring": "**Deployed `R²` from raw island parameters.** The composition that takes\n`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric.",
-   "empirical_status": "",
+   "docstring": "**Deployed `R²` from raw island parameters.** The composition that takes\n`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111835,7 +112069,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 813,
+   "line": 878,
    "signature": "(V_A V_E tau : ℝ) : ℝ",
    "args": [
     {
@@ -111851,8 +112085,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  portabilityRatio V_A V_E (fstFromTau tau)",
-   "docstring": "**The portability ratio along a split.** What a report comparing a target `R²` to a\nsource `R²` is measuring, expressed in divergence time.",
-   "empirical_status": "",
+   "docstring": "**The portability ratio along a split.** What a report comparing a target `R²` to a\nsource `R²` is measuring, expressed in divergence time.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111882,7 +112116,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Moments.lean",
-   "line": 831,
+   "line": 901,
    "signature": "(p : PopGenParameters) (V_E : ℝ) : ℝ",
    "args": [
     {
@@ -111904,8 +112138,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  portabilityRatio p.V_A V_E p.fstEquilibrium",
-   "docstring": "**The portability ratio a demographic history produces.** What a paper reporting\n\"the score transfers at 40% of its source `R²`\" is measuring, as a function of\n`(Nₑ, m, μ)` rather than of a differentiation supplied by hand.",
-   "empirical_status": "",
+   "docstring": "**The portability ratio a demographic history produces.** What a paper reporting\n\"the score transfers at 40% of its source `R²`\" is measuring, as a function of\n`(Nₑ, m, μ)` rather than of a differentiation supplied by hand.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.ScoreMoments",
    "fields": [],
    "equations": [],
@@ -111968,13 +112202,13 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Parameters.lean",
-   "line": 88,
+   "line": 92,
    "signature": ": PopGenParameters where Ne",
    "args": [],
    "ret_type": "PopGenParameters where Ne",
    "body": " 1000\n  mu := 1 / 100000\n  mig := 1 / 1000\n  t_div := 2000\n  recomb := 1 / 100\n  V_A := 1\n  Ne_pos := by norm_num\n  mu_nonneg := by norm_num\n  mig_nonneg := by norm_num\n  t_div_nonneg := by norm_num\n  recomb_nonneg := by norm_num\n  recomb_le_half := by norm_num\n  V_A_pos := by norm_num",
-   "docstring": "**The record is inhabited**, at a standard human-scale setting: `Nₑ = 1000`,\n`μ = 10⁻⁵` per generation, `m = 10⁻³`, `t = 2000` generations, `r = 10⁻²`, additive\nvariance `1`.\n\nA theorem quantified over an uninhabited structure is true and empty. Every value here\nis strictly inside its constraint -- no rate is zero and the recombination fraction is\nwell below the free-assortment boundary -- so nothing downstream reads a degenerate\npoint.",
-   "empirical_status": "",
+   "docstring": "**The record is inhabited**, at a standard human-scale setting: `Nₑ = 1000`,\n`μ = 10⁻⁵` per generation, `m = 10⁻³`, `t = 2000` generations, `r = 10⁻²`, additive\nvariance `1`.\n\nA theorem quantified over an uninhabited structure is true and empty. Every value here\nis strictly inside its constraint -- no rate is zero and the recombination fraction is\nwell below the free-assortment boundary -- so nothing downstream reads a degenerate\npoint.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the\n    laws computed from it. What carries a status is a claim that a population\n    reaches these values, which is asked where the demography is.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.PopGenParameters",
    "fields": [],
    "equations": [],
@@ -112050,7 +112284,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Core/Parameters.lean",
-   "line": 105,
+   "line": 113,
    "signature": "(p : PopGenParameters) : Prop",
    "args": [
     {
@@ -112064,8 +112298,8 @@
    ],
    "ret_type": "Prop",
    "body": " p.t_div = 0",
-   "docstring": "**A history with no divergence.** The predicate a model without a split satisfies,\nnamed so that `t_div = 0` reads as a claim rather than as an unfilled field.",
-   "empirical_status": "",
+   "docstring": "**A history with no divergence.** The predicate a model without a split satisfies,\nnamed so that `t_div = 0` reads as a claim rather than as an unfilled field.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the\n    laws computed from it. What carries a status is a claim that a population\n    reaches these values, which is asked where the demography is.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.PopGenParameters",
    "fields": [],
    "equations": [],
@@ -112086,7 +112320,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Parameters.lean",
-   "line": 115,
+   "line": 127,
    "signature": "(p : PopGenParameters) : ℝ",
    "args": [
     {
@@ -112100,8 +112334,8 @@
    ],
    "ret_type": "ℝ",
    "body": " scaledMutationRate p.Ne p.mu",
-   "docstring": "Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates.",
-   "empirical_status": "",
+   "docstring": "Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the\n    laws computed from it. What carries a status is a claim that a population\n    reaches these values, which is asked where the demography is.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.PopGenParameters",
    "fields": [],
    "equations": [],
@@ -112331,7 +112565,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Parameters.lean",
-   "line": 121,
+   "line": 137,
    "signature": "(p : PopGenParameters) : ℝ",
    "args": [
     {
@@ -112345,8 +112579,8 @@
    ],
    "ret_type": "ℝ",
    "body": " scaledMigrationRate p.Ne p.mig",
-   "docstring": "Scaled migration rate in this record's coordinates, `M = 4 Nₑ m`.\n\nBoth modules that carried a parameter record defined `bigM` this way, so this is the\ncorpus's convention and not a choice made here.",
-   "empirical_status": "",
+   "docstring": "Scaled migration rate in this record's coordinates, `M = 4 Nₑ m`.\n\nBoth modules that carried a parameter record defined `bigM` this way, so this is the\ncorpus's convention and not a choice made here.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the\n    laws computed from it. What carries a status is a claim that a population\n    reaches these values, which is asked where the demography is.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.PopGenParameters",
    "fields": [],
    "equations": [],
@@ -112474,7 +112708,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Parameters.lean",
-   "line": 147,
+   "line": 167,
    "signature": "(p : PopGenParameters) : ℝ",
    "args": [
     {
@@ -112488,8 +112722,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  fstFromFlow (p.theta + 2 * p.bigM)",
-   "docstring": "**Equilibrium `F_ST` in this record's coordinates**, `1/(1 + θ + 2M)`.\n\nThis is `Core.fstFromFlow` applied to the total scaled flow, so it is the same law as\n`fstIslandEquilibrium` at a many-deme correction and not a second formula.",
-   "empirical_status": "",
+   "docstring": "**Equilibrium `F_ST` in this record's coordinates**, `1/(1 + θ + 2M)`.\n\nThis is `Core.fstFromFlow` applied to the total scaled flow, so it is the same law as\n`fstIslandEquilibrium` at a many-deme correction and not a second formula.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the\n    laws computed from it. What carries a status is a claim that a population\n    reaches these values, which is asked where the demography is.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core.PopGenParameters",
    "fields": [],
    "equations": [],
@@ -112908,7 +113142,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 92,
+   "line": 97,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -112923,8 +113157,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a / b",
-   "docstring": "Ratio, `a / b`. The shape behind heritability fractions, portability ratios, cost\neffectiveness, and every other \"this per that\" in the corpus.",
-   "empirical_status": "",
+   "docstring": "Ratio, `a / b`. The shape behind heritability fractions, portability ratios, cost\neffectiveness, and every other \"this per that\" in the corpus.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113104,7 +113338,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 106,
+   "line": 116,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113119,8 +113353,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a * b",
-   "docstring": "Product, `a * b`. The shape behind tagged effects, attenuations, retentions, and\nevery other \"scaled by\" in the corpus.",
-   "empirical_status": "",
+   "docstring": "Product, `a * b`. The shape behind tagged effects, attenuations, retentions, and\nevery other \"scaled by\" in the corpus.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113238,7 +113472,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 113,
+   "line": 128,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113253,8 +113487,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a - b",
-   "docstring": "Difference, `a - b`. The shape behind gaps, increments, penalties and biases.",
-   "empirical_status": "",
+   "docstring": "Difference, `a - b`. The shape behind gaps, increments, penalties and biases.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113369,7 +113603,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 120,
+   "line": 140,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113384,8 +113618,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a + b",
-   "docstring": "Sum, `a + b`. The shape behind variance decompositions and additive liabilities.",
-   "empirical_status": "",
+   "docstring": "Sum, `a + b`. The shape behind variance decompositions and additive liabilities.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113481,7 +113715,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 141,
+   "line": 166,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113496,8 +113730,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 1 - a / b",
-   "docstring": "Proportional reduction, `1 - a / b`: a residual measured against a baseline.\n\nInstantiated by `F_ST` from a heterozygosity ratio, `F_ST` from coalescence times, `R²`\nfrom a mean squared error, and PC-correction efficacy. Those are four quantities and not\none -- the first divides a heterozygosity by an ancestral heterozygosity, the second an\nexpected within-population coalescence time by a between-population one, the third an\nerror by an outcome variance, the fourth a corrected ancestry axis by an uncorrected\none. Nothing lets a value of one be substituted for another. What they share is the\nconstruction, and sharing it is not a coincidence.",
-   "empirical_status": "",
+   "docstring": "Proportional reduction, `1 - a / b`: a residual measured against a baseline.\n\nInstantiated by `F_ST` from a heterozygosity ratio, `F_ST` from coalescence times, `R²`\nfrom a mean squared error, and PC-correction efficacy. Those are four quantities and not\none -- the first divides a heterozygosity by an ancestral heterozygosity, the second an\nexpected within-population coalescence time by a between-population one, the third an\nerror by an outcome variance, the fourth a corrected ancestry axis by an uncorrected\none. Nothing lets a value of one be substituted for another. What they share is the\nconstruction, and sharing it is not a coincidence.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113555,7 +113789,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 163,
+   "line": 193,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113570,8 +113804,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a / (a + b)",
-   "docstring": "Share, `a / (a + b)`: one part against the whole it belongs to.\n\nDistinct from `ratio` and not a special case of it worth eliding: the denominator\nCONTAINS the numerator, so the value is confined to the unit interval whenever both\nparts are non-negative, and `share_mem_unit` below is the statement `ratio` cannot make.\nInstantiated by the signal fraction of a variance, the shared-LD equilibrium, and the\nheritability captured at a sample size.",
-   "empirical_status": "",
+   "docstring": "Share, `a / (a + b)`: one part against the whole it belongs to.\n\nDistinct from `ratio` and not a special case of it worth eliding: the denominator\nCONTAINS the numerator, so the value is confined to the unit interval whenever both\nparts are non-negative, and `share_mem_unit` below is the statement `ratio` cannot make.\nInstantiated by the signal fraction of a variance, the shared-LD equilibrium, and the\nheritability captured at a sample size.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113737,7 +113971,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 193,
+   "line": 228,
    "signature": "(x : ℝ) : ℝ",
    "args": [
     {
@@ -113751,8 +113985,8 @@
    ],
    "ret_type": "ℝ",
    "body": " x / (1 + x)",
-   "docstring": "Saturation, `x / (1 + x)`: a scaled rate read as a fraction.\n\nThis is `share x 1` and is kept separate because the \"one\" is not a second part -- it is\nthe unit the rate is scaled against. Instantiated by `F_ST` from a scaled coalescence\ntime `τ/(1+τ)`, by the mutation-drift floor `θ/(1+θ)`, and by shared LD from a scaled\nmigration rate. That these are one map is the fact behind the corpus convention that\nevery `F_ST` written in `τ/(1+τ)` coordinates is a HUDSON `F_ST`.",
-   "empirical_status": "",
+   "docstring": "Saturation, `x / (1 + x)`: a scaled rate read as a fraction.\n\nThis is `share x 1` and is kept separate because the \"one\" is not a second part -- it is\nthe unit the rate is scaled against. Instantiated by `F_ST` from a scaled coalescence\ntime `τ/(1+τ)`, by the mutation-drift floor `θ/(1+θ)`, and by shared LD from a scaled\nmigration rate. That these are one map is the fact behind the corpus convention that\nevery `F_ST` written in `τ/(1+τ)` coordinates is a HUDSON `F_ST`.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113873,7 +114107,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 227,
+   "line": 267,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -113888,8 +114122,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a / (a + 2 * b)",
-   "docstring": "Odds-like ratio, `a / (a + 2 b)`: a part against itself plus twice a second part.\n\nThe factor of two is a PLOIDY factor wherever this map appears in the corpus, and it is\nthe whole content of the kernel -- `share` with the second part doubled is a different\nnumber, and reading one for the other is exactly the Nei/Hudson confusion the corpus has\nalready recorded paying two to four fold for. Instantiated by `Q_ST` (between-population\nadditive variance against between plus twice within) and by `F_ST` from a coalescence\ntime in the same coordinates, which is why the two can be compared at all.",
-   "empirical_status": "",
+   "docstring": "Odds-like ratio, `a / (a + 2 b)`: a part against itself plus twice a second part.\n\nThe factor of two is a PLOIDY factor wherever this map appears in the corpus, and it is\nthe whole content of the kernel -- `share` with the second part doubled is a different\nnumber, and reading one for the other is exactly the Nei/Hudson confusion the corpus has\nalready recorded paying two to four fold for. Instantiated by `Q_ST` (between-population\nadditive variance against between plus twice within) and by `F_ST` from a coalescence\ntime in the same coordinates, which is why the two can be compared at all.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -113943,7 +114177,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 248,
+   "line": 293,
    "signature": "(α x y : ℝ) : ℝ",
    "args": [
     {
@@ -113959,8 +114193,8 @@
    ],
    "ret_type": "ℝ",
    "body": " α * x + (1 - α) * y",
-   "docstring": "Convex combination, `α x + (1 - α) y`.\n\nInstantiated by admixed allele frequencies, spike-and-slab effect variances,\nancestry-specific effects, and average phase interactions.",
-   "empirical_status": "",
+   "docstring": "Convex combination, `α x + (1 - α) y`.\n\nInstantiated by admixed allele frequencies, spike-and-slab effect variances,\nancestry-specific effects, and average phase interactions.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114040,7 +114274,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 269,
+   "line": 319,
    "signature": "(r : ℝ) (t : ℕ) : ℝ",
    "args": [
     {
@@ -114062,8 +114296,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (1 - r) ^ t",
-   "docstring": "Geometric decay, `(1 - r)^t`.\n\nInstantiated by per-generation LD decay, recombination survival to the MRCA, and\nadmixture LD decay. The last of those is MEASURED against finite-population retention\nand carries a proved one-sided bias, which is the standing reason those three names are\nnot collapsed into this one.",
-   "empirical_status": "",
+   "docstring": "Geometric decay, `(1 - r)^t`.\n\nInstantiated by per-generation LD decay, recombination survival to the MRCA, and\nadmixture LD decay. The last of those is MEASURED against finite-population retention\nand carries a proved one-sided bias, which is the standing reason those three names are\nnot collapsed into this one.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114204,7 +114438,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 289,
+   "line": 344,
    "signature": "(loss total : ℝ) : ℝ",
    "args": [
     {
@@ -114219,8 +114453,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (1 - loss) * total",
-   "docstring": "Retained fraction, `(1 - loss) · total`: what survives a proportional loss.\n\nInstantiated by the ascertainment-loss survivor, the neutral portability ratio, and\npresent-day PGS variance.",
-   "empirical_status": "",
+   "docstring": "Retained fraction, `(1 - loss) · total`: what survives a proportional loss.\n\nInstantiated by the ascertainment-loss survivor, the neutral portability ratio, and\npresent-day PGS variance.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114310,7 +114544,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 300,
+   "line": 360,
    "signature": "(x : ℝ) : ℝ",
    "args": [
     {
@@ -114324,8 +114558,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 1 - x",
-   "docstring": "Complement, `1 - x`: the fraction that did not survive, given the fraction that did.\n\nInstantiated by `F_ST` from a drift retention factor, the covariance retention factor\nfrom `F_ST`, and the loss from a retention.",
-   "empirical_status": "",
+   "docstring": "Complement, `1 - x`: the fraction that did not survive, given the fraction that did.\n\nInstantiated by `F_ST` from a drift retention factor, the covariance retention factor\nfrom `F_ST`, and the loss from a retention.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114433,7 +114667,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 316,
+   "line": 381,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -114448,8 +114682,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (a + b) / 2",
-   "docstring": "Midpoint, `(a + b) / 2`: the unweighted average of two values.\n\nThis is `convexCombination (1/2)`, and the bridge below says so. Instantiated by the\nmean allele frequency across two populations and by the effective symmetric migration\nrate.",
-   "empirical_status": "",
+   "docstring": "Midpoint, `(a + b) / 2`: the unweighted average of two values.\n\nThis is `convexCombination (1/2)`, and the bridge below says so. Instantiated by the\nmean allele frequency across two populations and by the effective symmetric migration\nrate.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114505,7 +114739,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 334,
+   "line": 404,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -114520,8 +114754,8 @@
    ],
    "ret_type": "ℝ",
    "body": " 1 - (1 - a) * (1 - b)",
-   "docstring": "Complementary composition, `1 - (1 - a)(1 - b)`: two proportional reductions applied\nin series, read as a single reduction.\n\nThis is Wright's hierarchical composition law when `a` and `b` are `F_ST` values at two\nlevels of subdivision, and it is the same map as the composition of branch-wise\ndifferentiation along a two-branch genealogy. Those two facts being one map is a real\npopulation-genetic identity and not an arithmetic coincidence.",
-   "empirical_status": "",
+   "docstring": "Complementary composition, `1 - (1 - a)(1 - b)`: two proportional reductions applied\nin series, read as a single reduction.\n\nThis is Wright's hierarchical composition law when `a` and `b` are `F_ST` values at two\nlevels of subdivision, and it is the same map as the composition of branch-wise\ndifferentiation along a two-branch genealogy. Those two facts being one map is a real\npopulation-genetic identity and not an arithmetic coincidence.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114569,7 +114803,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 362,
+   "line": 437,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -114584,8 +114818,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (a - b) ^ 2 / 4",
-   "docstring": "Scaled squared difference, `(a - b)² / 4`: the between-group variance of two\nequally-sized groups with means `a` and `b`.\n\nThe four is `2²` from the half-weighting on each group and is not free.",
-   "empirical_status": "",
+   "docstring": "Scaled squared difference, `(a - b)² / 4`: the between-group variance of two\nequally-sized groups with means `a` and `b`.\n\nThe four is `2²` from the half-weighting on each group and is not free.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114623,7 +114857,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 388,
+   "line": 468,
    "signature": "(N c x : ℝ) : ℝ",
    "args": [
     {
@@ -114639,8 +114873,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  (1 - c) ^ 2 * (1 / (2 * N) + (1 - 1 / (2 * N)) * x)",
-   "docstring": "Survival-weighted mix, `(1 - c)² · (1/(2N) + (1 - 1/(2N)) · x)`.\n\nTwo lineages both escape an event of per-lineage probability `c` -- hence the square -- and\nwhat they carry forward is a convex mix of a freshly generated `1/(2N)` and the retained\n`x`. Instantiated by the drift step for linkage disequilibrium and by the\nidentity-by-descent recurrence, which are the same map: LD decay under drift IS the IBD\nrecurrence, with `c` reading as recombination in one and as mutation in the other. The\ncorpus had the two bodies written out separately in two modules with nothing relating\nthem.",
-   "empirical_status": "",
+   "docstring": "Survival-weighted mix, `(1 - c)² · (1/(2N) + (1 - 1/(2N)) · x)`.\n\nTwo lineages both escape an event of per-lineage probability `c` -- hence the square -- and\nwhat they carry forward is a convex mix of a freshly generated `1/(2N)` and the retained\n`x`. Instantiated by the drift step for linkage disequilibrium and by the\nidentity-by-descent recurrence, which are the same map: LD decay under drift IS the IBD\nrecurrence, with `c` reading as recombination in one and as mutation in the other. The\ncorpus had the two bodies written out separately in two modules with nothing relating\nthem.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114694,7 +114928,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 431,
+   "line": 516,
    "signature": "{α : Type*} [DecidableEq α] (x y : α) : ℝ",
    "args": [
     {
@@ -114726,8 +114960,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  if x = y then 1 else 0",
-   "docstring": "Kronecker delta, `1` when the arguments agree and `0` otherwise.\n\nInstantiated by a persistence transition, a context-match quality, and a stay kernel --\nthree names in two modules for \"did the state stay the same\".",
-   "empirical_status": "",
+   "docstring": "Kronecker delta, `1` when the arguments agree and `0` otherwise.\n\nInstantiated by a persistence transition, a context-match quality, and a stay kernel --\nthree names in two modules for \"did the state stay the same\".\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114766,7 +115000,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 455,
+   "line": 545,
    "signature": "{α : Type*} [DecidableEq α] (x y : α) : ℝ",
    "args": [
     {
@@ -114798,8 +115032,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  if x = y then 0 else 1",
-   "docstring": "The complementary indicator, `0` on the diagonal and `1` off it: a switching\ntransition, a sequence distance, a swap kernel.",
-   "empirical_status": "",
+   "docstring": "The complementary indicator, `0` on the diagonal and `1` off it: a switching\ntransition, a sequence distance, a swap kernel.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114822,7 +115056,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 485,
+   "line": 580,
    "signature": "(q x : ℝ) : ℝ",
    "args": [
     {
@@ -114837,8 +115071,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  x * (1 - q * x) / (1 - q * x * (1 - x))",
-   "docstring": "Overlap profile, `x(1 - qx) / (1 - qx(1 - x))`.\n\nThe overlap-gap order parameter of a superposed landscape, written out under two names in\ntwo modules that do not import each other. Not an arithmetic shape anyone would arrive at\ntwice by accident -- two copies of this body is a copied derivation.",
-   "empirical_status": "",
+   "docstring": "Overlap profile, `x(1 - qx) / (1 - qx(1 - x))`.\n\nThe overlap-gap order parameter of a superposed landscape, written out under two names in\ntwo modules that do not import each other. Not an arithmetic shape anyone would arrive at\ntwice by accident -- two copies of this body is a copied derivation.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114875,7 +115109,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 501,
+   "line": 601,
    "signature": "(a b : ℝ) : ℝ",
    "args": [
     {
@@ -114890,8 +115124,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a ^ 2 / b",
-   "docstring": "Scaled square, `a² / b`. A moment permeability and an importance-weight effective\nsample size are the same map: a squared total against a sum of squares.",
-   "empirical_status": "",
+   "docstring": "Scaled square, `a² / b`. A moment permeability and an importance-weight effective\nsample size are the same map: a squared total against a sum of squares.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114933,7 +115167,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 509,
+   "line": 614,
    "signature": "(a b c : ℝ) : ℝ",
    "args": [
     {
@@ -114949,8 +115183,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a / (b * c)",
-   "docstring": "Ratio against a product, `a / (b · c)`. The events required for a recalibration and a\ntag `r²` are the same map.",
-   "empirical_status": "",
+   "docstring": "Ratio against a product, `a / (b · c)`. The events required for a recalibration and a\ntag `r²` are the same map.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -114992,7 +115226,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 519,
+   "line": 629,
    "signature": "(a b c : ℝ) : ℝ",
    "args": [
     {
@@ -115008,8 +115242,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a ^ 2 / (b * c)",
-   "docstring": "Squared ratio against a product, `a² / (b · c)`. The `R²` shape: a squared covariance\nagainst a product of variances. Distinct from `scaledSquare` because the denominator is a\nPRODUCT of two quantities that must both be positive, which is what confines the value to\nthe unit interval under Cauchy--Schwarz.",
-   "empirical_status": "",
+   "docstring": "Squared ratio against a product, `a² / (b · c)`. The `R²` shape: a squared covariance\nagainst a product of variances. Distinct from `scaledSquare` because the denominator is a\nPRODUCT of two quantities that must both be positive, which is what confines the value to\nthe unit interval under Cauchy--Schwarz.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115071,7 +115305,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 532,
+   "line": 647,
    "signature": "(a b c : ℝ) : ℝ",
    "args": [
     {
@@ -115087,8 +115321,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a + b * c",
-   "docstring": "Affine step, `a + b · c`. A kinship inflation and a linear norm of reaction are the\nsame map: a baseline displaced by a scaled increment.",
-   "empirical_status": "",
+   "docstring": "Affine step, `a + b · c`. A kinship inflation and a linear norm of reaction are the\nsame map: a baseline displaced by a scaled increment.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115119,7 +115353,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 556,
+   "line": 676,
    "signature": "(x : ℝ) : ℝ",
    "args": [
     {
@@ -115133,8 +115367,8 @@
    ],
    "ret_type": "ℝ",
    "body": " x",
-   "docstring": "**An identification**: a named quantity defined to BE another number.\n\nA definition whose body is its own argument is not a computation, it is a CLAIM -- that\nthe quantity this name denotes is the quantity that argument denotes. The corpus has five\nof them (`ldOverlapFromSharedLD`, `gainLinear`, `reconstructionWeight`,\n`localizedTransferVariance`, `neutralFixation`), each asserting a different\nidentification, and written as a bare `:= x` the claim is invisible: it reads as a\nrenaming.\n\nRouting them through this makes the claim greppable, and the docstring on each is where\nthe justification has to live. Nothing here justifies any of them.",
-   "empirical_status": "",
+   "docstring": "**An identification**: a named quantity defined to BE another number.\n\nA definition whose body is its own argument is not a computation, it is a CLAIM -- that\nthe quantity this name denotes is the quantity that argument denotes. The corpus has five\nof them (`ldOverlapFromSharedLD`, `gainLinear`, `reconstructionWeight`,\n`localizedTransferVariance`, `neutralFixation`), each asserting a different\nidentification, and written as a bare `:= x` the claim is invisible: it reads as a\nrenaming.\n\nRouting them through this makes the claim greppable, and the docstring on each is where\nthe justification has to live. Nothing here justifies any of them.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115180,7 +115414,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 564,
+   "line": 689,
    "signature": "(a : ℝ) (n : ℕ) : ℝ",
    "args": [
     {
@@ -115202,8 +115436,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a ^ n",
-   "docstring": "Power, `a ^ n`. A stationary LD entry, a genealogical timescale and a log-covering\nnumber at an exponent are one map.",
-   "empirical_status": "",
+   "docstring": "Power, `a ^ n`. A stationary LD entry, a genealogical timescale and a log-covering\nnumber at an exponent are one map.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115269,7 +115503,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 577,
+   "line": 707,
    "signature": "{ι : Type*} [Fintype ι] (f g : ι → ℝ) : ℝ",
    "args": [
     {
@@ -115301,8 +115535,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  ∑ i, f i * g i",
-   "docstring": "Inner sum, `∑ i, f i * g i` over a finite index. A dot product and a tagged-score\nestimation risk are one map.",
-   "empirical_status": "",
+   "docstring": "Inner sum, `∑ i, f i * g i` over a finite index. A dot product and a tagged-score\nestimation risk are one map.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115441,7 +115675,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 594,
+   "line": 729,
    "signature": "{ι : Type*} [Fintype ι] (x : ℝ) (c b : ι → ℝ) : ℝ",
    "args": [
     {
@@ -115481,8 +115715,8 @@
    ],
    "ret_type": "ℝ",
    "body": "  x - innerSum c b",
-   "docstring": "Residual against a representation, `x - ∑ k, c k · b k`: what a finite expansion in a\nbasis fails to capture. A component-representation residual and a Jensen residual are one\nmap.",
-   "empirical_status": "",
+   "docstring": "Residual against a representation, `x - ∑ k, c k · b k`: what a finite expansion in a\nbasis fails to capture. A component-representation residual and a Jensen residual are one\nmap.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115511,7 +115745,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 604,
+   "line": 744,
    "signature": "(a b c : ℝ) : ℝ",
    "args": [
     {
@@ -115527,8 +115761,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a * b * c",
-   "docstring": "Triple product, `a · b · c`. An attenuated variance and an allelic-heterogeneity\nretained signal are one map: two independent attenuations applied to a variance.",
-   "empirical_status": "",
+   "docstring": "Triple product, `a · b · c`. An attenuated variance and an allelic-heterogeneity\nretained signal are one map: two independent attenuations applied to a variance.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115568,7 +115802,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Core/Ratios.lean",
-   "line": 614,
+   "line": 759,
    "signature": "(k : ℕ) : ℕ",
    "args": [
     {
@@ -115582,8 +115816,8 @@
    ],
    "ret_type": "ℕ",
    "body": " 2 * k - 2",
-   "docstring": "Paired epoch count, `2k - 2`: the sample size of a `k`-epoch comparison, which counts\nPAIRS of boundaries and drops the two endpoints. Two modules wrote it out. Natural\nsubtraction truncates at zero, which is the right answer here -- a single epoch has no\nboundary pair -- and `paired_at_one` records it.",
-   "empirical_status": "",
+   "docstring": "Paired epoch count, `2k - 2`: the sample size of a `k`-epoch comparison, which counts\nPAIRS of boundaries and drops the two endpoints. Two modules wrote it out. Natural\nsubtraction truncates at zero, which is the right answer here -- a single epoch has no\nboundary pair -- and `paired_at_one` records it.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115613,7 +115847,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 622,
+   "line": 772,
    "signature": "(k : ℕ) : ℝ",
    "args": [
     {
@@ -115627,8 +115861,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (k : ℝ) * ((k : ℝ) - 1) / 2",
-   "docstring": "Unordered pair count, `k(k-1)/2` on a real-valued cast. Kingman's pair-coalescence\nrate and the spectrum-identifiability collision rate are the same count.",
-   "empirical_status": "",
+   "docstring": "Unordered pair count, `k(k-1)/2` on a real-valued cast. Kingman's pair-coalescence\nrate and the spectrum-identifiability collision rate are the same count.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115705,7 +115939,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 639,
+   "line": 794,
    "signature": "(k : ℕ) (x : ℝ) : ℝ",
    "args": [
     {
@@ -115727,8 +115961,8 @@
    ],
    "ret_type": "ℝ",
    "body": " (k : ℝ) * x / 2",
-   "docstring": "Per-lineage half rate, `k · x / 2`.\n\nThe rate at which one of `k` lineages does something at scaled per-lineage rate `x`. The\nhalf is the same time-unit convention that makes the per-pair coalescence rate one -- it\nis not a modelling choice made independently at each use, which is why it is written once\nhere rather than in each ancestral graph. Instantiated by the recombination rate of an\nancestral recombination graph and the branching rate of an ancestral selection graph.",
-   "empirical_status": "",
+   "docstring": "Per-lineage half rate, `k · x / 2`.\n\nThe rate at which one of `k` lineages does something at scaled per-lineage rate `x`. The\nhalf is the same time-unit convention that makes the per-pair coalescence rate one -- it\nis not a modelling choice made independently at each use, which is why it is written once\nhere rather than in each ancestral graph. Instantiated by the recombination rate of an\nancestral recombination graph and the branching rate of an ancestral selection graph.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -115779,7 +116013,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Core/Ratios.lean",
-   "line": 659,
+   "line": 819,
    "signature": "(a b c : ℝ) : ℝ",
    "args": [
     {
@@ -115795,8 +116029,8 @@
    ],
    "ret_type": "ℝ",
    "body": " a + b + c",
-   "docstring": "Triple sum, `a + b + c`. Instantiated by the total observed-mean shift across three\ncalibration channels and by the Ben-David domain-adaptation bound's three terms. Those\nare unrelated quantities that happen to add three things; naming the shape costs nothing\nand stops a fourth copy.",
-   "empirical_status": "",
+   "docstring": "Triple sum, `a + b + c`. Instantiated by the total observed-mean shift across three\ncalibration channels and by the Ben-David domain-adaptation bound's three terms. Those\nare unrelated quantities that happen to add three things; naming the shape costs nothing\nand stops a fourth copy.\n\n    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.\n    A kernel asserts nothing about a population, so no measurement can bear on it.\n    What can be measured is a named quantity claiming this shape computes it, and\n    those live in the subsystem modules with their own status lines and ledger rows.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Core",
    "fields": [],
    "equations": [],
@@ -128825,6 +129059,10 @@
      "Descent.Coalescent.tendsto_identityByDescent": [],
      "Descent.Coalescent.ewensProb_three_total": [],
      "Descent.Coalescent.tendsto_restrictionFullProb_two": [],
+     "Descent.Coalescent.expected_cross_pairTime": [],
+     "Descent.Coalescent.expected_pairTime_product": [],
+     "Descent.Coalescent.covariance_pairTime": [],
+     "Descent.Coalescent.expected_pairTime": [],
      "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
      "Descent.Coalescent.sum_one_div_deathRate_tail": [],
      "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -128839,6 +129077,7 @@
      "Descent.Coalescent.meanTimeActive_eq_of_ratio": [],
      "Descent.Coalescent.varSegregatingSites_nonneg": [],
      "Descent.Coalescent.varWattersonEstimator_le": [],
+     "Descent.Coalescent.varPairwise_two_eq": [],
      "Descent.Coalescent.splitBy_rel_iff": [],
      "Descent.Coalescent.card_covers_eq_deathRate": [],
      "Descent.Coalescent.fstFromMigration_eq": [],
@@ -129044,12 +129283,16 @@
     "Descent.Coalescent.blocks_restrict_le",
     "Descent.Coalescent.bsRate_pos",
     "Descent.Coalescent.card_covers_eq_deathRate",
+    "Descent.Coalescent.covariance_pairTime",
     "Descent.Coalescent.deriv_deriv_pow",
     "Descent.Coalescent.discordance_gt_half_iff",
     "Descent.Coalescent.ewensProb_three_total",
     "Descent.Coalescent.exists_extend",
     "Descent.Coalescent.expectedNumClasses_two_eq",
     "Descent.Coalescent.expectedTotalBranchLength_succ_sub",
+    "Descent.Coalescent.expected_cross_pairTime",
+    "Descent.Coalescent.expected_pairTime",
+    "Descent.Coalescent.expected_pairTime_product",
     "Descent.Coalescent.fstFromMigration_eq",
     "Descent.Coalescent.fuTerm_eq",
     "Descent.Coalescent.hasDerivAt_descentCurve",
@@ -129073,6 +129316,7 @@
     "Descent.Coalescent.tendsto_discordanceProb",
     "Descent.Coalescent.tendsto_identityByDescent",
     "Descent.Coalescent.tendsto_restrictionFullProb_two",
+    "Descent.Coalescent.varPairwise_two_eq",
     "Descent.Coalescent.varSegregatingSites_nonneg",
     "Descent.Coalescent.varWattersonEstimator_le",
     "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_Ne_lt",
@@ -209602,7 +209846,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 482,
+   "line": 484,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -209631,7 +209875,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 485,
+   "line": 487,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -209660,7 +209904,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 488,
+   "line": 490,
    "signature": ": Fin 2 → ℝ",
    "args": [],
    "ret_type": "Fin 2 → ℝ",
@@ -209696,7 +209940,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent.lean",
-   "line": 505,
+   "line": 507,
    "signature": ": Matrix (Fin 2) (Fin 2) ℝ",
    "args": [],
    "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
@@ -211391,7 +211635,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Descent/Core/Fst.lean",
-   "line": 301,
+   "line": 341,
    "signature": "where value : ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -211418,7 +211662,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Descent/Core/Fst.lean",
-   "line": 307,
+   "line": 347,
    "signature": "where value : ℝ",
    "args": [],
    "ret_type": "ℝ",
@@ -211434,7 +211678,7 @@
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 5
+    "raw_chunk_lines": 10
    },
    "mentioned_by": []
   },
@@ -211513,7 +211757,7 @@
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 11
+    "raw_chunk_lines": 16
    },
    "mentioned_by": []
   },

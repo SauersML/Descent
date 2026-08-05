@@ -74,7 +74,12 @@ structure Admissible (m : ScoreMoments) : Prop where
   cauchy_schwarz : m.predictiveCovariance ^ 2 ≤ m.scoreVariance * m.outcomeVariance
 
 /-- **The tuple is inhabited, admissibly.** A theorem quantified over an uninhabited
-structure is true and empty. -/
+structure is true and empty.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def witness : ScoreMoments where
   scoreVariance := 1
   predictiveCovariance := 1 / 2
@@ -92,17 +97,32 @@ Each is a closed expression in the three moments. There is no source law and no 
 law: portability is two evaluations of one map, which is the whole reason the tuple is
 the interface. -/
 
-/-- **Deployed `R²`**, `Cov(S,Y)² / (Var(S) · Var(Y))`. -/
+/-- **Deployed `R²`**, `Cov(S,Y)² / (Var(S) · Var(Y))`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def r2 (m : ScoreMoments) : ℝ :=
   m.predictiveCovariance ^ 2 / (m.scoreVariance * m.outcomeVariance)
 
 /-- **Calibration slope**, `Cov(S,Y) / Var(S)`: the coefficient a regression of the
-outcome on the deployed score would fit. One means the score is on the right scale. -/
+outcome on the deployed score would fit. One means the score is on the right scale.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def calibrationSlope (m : ScoreMoments) : ℝ :=
   ratio m.predictiveCovariance m.scoreVariance
 
 /-- **Mean squared error of the raw score**, `Var(Y) - 2Cov(S,Y) + Var(S)`, for a score
-already centred on the outcome's mean. -/
+already centred on the outcome's mean.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def mse (m : ScoreMoments) : ℝ :=
   m.outcomeVariance - 2 * m.predictiveCovariance + m.scoreVariance
 
@@ -155,7 +175,12 @@ the ancestral additive variance and by the target's.
 This is the drift regime and it says so: no selection, no gene-environment interaction,
 no effect turnover, and the same causal variants in both populations. Those are the
 assumptions under which `1 - F_ST` is the whole story, and the Portability layer's
-turnover and context terms are what carry the rest. -/
+turnover and context terms are what carry the rest.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def momentsUnderDrift (V_A V_E fst : ℝ) : ScoreMoments where
   scoreVariance := retainedFraction fst V_A
   predictiveCovariance := retainedFraction fst V_A
@@ -275,7 +300,12 @@ theorem r2_momentsUnderDrift_le_source (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 
   nlinarith
 
 /-- **The portability ratio.** Deployed `R²` against source `R²` -- the quantity the
-literature reports and the one this whole development is about. -/
+literature reports and the one this whole development is about.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def portabilityRatio (V_A V_E fst : ℝ) : ℝ :=
   ratio (momentsUnderDrift V_A V_E fst).r2 (momentsUnderDrift V_A V_E 0).r2
 
@@ -325,7 +355,12 @@ same moment tuple consumes either. -/
 
 /-- **Deployed `R²` after a clean split**, from the scaled coalescence time. Written
 through `fstFromTau` so that this and the equilibrium route cannot acquire different
-`F_ST` conventions: both are Hudson. -/
+`F_ST` conventions: both are Hudson.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedR2FromTau (V_A V_E tau : ℝ) : ℝ :=
   (momentsUnderDrift V_A V_E (fstFromTau tau)).r2
 
@@ -364,7 +399,12 @@ one function from a demography to a metric.
 This is the object the corpus had no name for. Its `PopGen` layer computed `F_ST` from
 `(Nₑ, m, μ, t)` and its `Portability` layer computed `R²` from moment tuples, and the two
 were joined by two theorems out of 5,852 -- everything else took `fst` as a free real,
-severing the metric from the population genetics meant to produce it. -/
+severing the metric from the population genetics meant to produce it.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedR2 (p : PopGenParameters) (V_E : ℝ) : ℝ :=
   (momentsUnderDrift p.V_A V_E p.fstEquilibrium).r2
 
@@ -520,7 +560,12 @@ theorem drift_moves_r2_alone (V_A V_E f : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
 
 The binary-outcome coordinate. It is a function of the tuple only through `R²`, which is
 why every `R²` result above transfers to it -- and why a deployment cannot report a Brier
-score that disagrees with its `R²`. -/
+score that disagrees with its `R²`.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def brier (π : ℝ) (m : ScoreMoments) : ℝ :=
   π * (1 - π) * complement m.r2
 
@@ -554,7 +599,12 @@ The equal-variance Gaussian AUC is `Φ` of a strictly increasing function of thi
 is strictly increasing -- so every ordering statement about an AUC is an ordering
 statement about this quantity, and can be made without `Φ`, which this corpus has no
 Mathlib form for. Writing the argument rather than a wrong closed form is the same
-discipline `calibratedBrierFromVariances` records for the liability scale. -/
+discipline `calibratedBrierFromVariances` records for the liability scale.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def aucArgument (m : ScoreMoments) : ℝ :=
   ratio m.r2 (complement m.r2)
 
@@ -607,7 +657,12 @@ theorem deployedMse_eq (p : PopGenParameters) (V_E : ℝ) :
     (momentsUnderDrift p.V_A V_E p.fstEquilibrium).mse = V_E :=
   mse_momentsUnderDrift p.V_A V_E p.fstEquilibrium
 
-/-- **Deployed Brier score from a demographic history.** -/
+/-- **Deployed Brier score from a demographic history.**
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedBrier (π : ℝ) (p : PopGenParameters) (V_E : ℝ) : ℝ :=
   brier π (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
 
@@ -683,7 +738,12 @@ two-population split, and a factor of two on the migration term is a factor on t
 deployed metric. These theorems carry `nDemes` all the way through. -/
 
 /-- **Deployed `R²` from raw island parameters.** The composition that takes
-`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric. -/
+`(Nₑ, m, μ, d)` -- including the deme count -- to a deployed metric.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedR2FromIsland (Ne m μ nDemes V_A V_E : ℝ) : ℝ :=
   (momentsUnderDrift V_A V_E (fstIslandEquilibrium Ne m μ nDemes)).r2
 
@@ -809,7 +869,12 @@ theorem aucArgument_deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V
     hf1 hlt2 hf0
 
 /-- **The portability ratio along a split.** What a report comparing a target `R²` to a
-source `R²` is measuring, expressed in divergence time. -/
+source `R²` is measuring, expressed in divergence time.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def portabilityRatioFromTau (V_A V_E tau : ℝ) : ℝ :=
   portabilityRatio V_A V_E (fstFromTau tau)
 
@@ -827,7 +892,12 @@ theorem portabilityRatioFromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (h
 
 /-- **The portability ratio a demographic history produces.** What a paper reporting
 "the score transfers at 40% of its source `R²`" is measuring, as a function of
-`(Nₑ, m, μ)` rather than of a differentiation supplied by hand. -/
+`(Nₑ, m, μ)` rather than of a differentiation supplied by hand.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A kernel asserts nothing about a population, so no measurement can bear on it.
+    What can be measured is a named quantity claiming this shape computes it, and
+    those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedPortabilityRatio (p : PopGenParameters) (V_E : ℝ) : ℝ :=
   portabilityRatio p.V_A V_E p.fstEquilibrium
 

@@ -21276,6 +21276,7 @@
    "Descent.Coalescent.tendsto_expectedSegregatingSites_atTop",
    "Descent.Coalescent.tendsto_expectedTotalBranchLength_atTop",
    "Descent.Coalescent.tendsto_harmonicSum_atTop",
+   "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varWattersonEstimator_le"
   ],
   "constraints": {
@@ -21301,7 +21302,8 @@
     "Descent.Coalescent.sum_spectrumBranchLength": [],
     "Descent.Coalescent.singletonShare_eq": [],
     "Descent.Coalescent.varWattersonEstimator_le": [],
-    "Descent.Coalescent.exists_varWattersonEstimator_lt": []
+    "Descent.Coalescent.exists_varWattersonEstimator_lt": [],
+    "Descent.Coalescent.varPairwise_two_eq": []
    },
    "range_hi_thm": [
     "Descent.Coalescent.harmonicSum_le_one_add_log",
@@ -23903,6 +23905,54 @@
    }
   }
  },
+ "Descent.Coalescent.pairTime": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/PairwiseTimes.lean",
+  "line": 75,
+  "short": "pairTime",
+  "ret_type": "ℝ",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM",
+  "python": "pairTime",
+  "args": [
+   "c",
+   "p",
+   "t_3",
+   "t_2"
+  ],
+  "box": {
+   "t₃": [
+    0.05,
+    3.0
+   ],
+   "t₂": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.cross_pairTime",
+   "Descent.Coalescent.pairTime_symmetric_sums_topology_free",
+   "Descent.Coalescent.sum_pairTime",
+   "Descent.Coalescent.sum_sq_pairTime"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.sum_pairTime": [],
+    "Descent.Coalescent.sum_sq_pairTime": [],
+    "Descent.Coalescent.cross_pairTime": [],
+    "Descent.Coalescent.pairTime_symmetric_sums_topology_free": []
+   }
+  }
+ },
  "Descent.Coalescent.descentTime": {
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.Ico ( k + 1 ) ( n + 1 )`, not `Finset.univ`",
@@ -24610,7 +24660,8 @@
    "Descent.Coalescent.tendsto_survivalFactor_partialProd",
    "Descent.Coalescent.totalRate_kingman",
    "Descent.Coalescent.tsum_one_div_deathRate_tail",
-   "Descent.Coalescent.varTransitTime_le_meanTransitTime"
+   "Descent.Coalescent.varTransitTime_le_meanTransitTime",
+   "Descent.Coalescent.variance_holdTime_deathRate"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -24645,6 +24696,9 @@
     "Descent.Coalescent.moment_closure": [],
     "Descent.Coalescent.duality_deriv": [],
     "Descent.Coalescent.generator_row_sum_zero": [],
+    "Descent.Coalescent.variance_holdTime_deathRate": [
+     "2 ≤ k"
+    ],
     "Descent.Coalescent.integral_id_mul_holdDensity_deathRate": [
      "2 ≤ k"
     ],
@@ -26002,6 +26056,7 @@
    "Descent.Coalescent.harmonicSumSq_nonneg",
    "Descent.Coalescent.harmonicSumSq_succ",
    "Descent.Coalescent.harmonicSumSq_zero",
+   "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varTotalBranchLength_eq",
    "Descent.Coalescent.varWattersonEstimator_le"
   ],
@@ -26018,7 +26073,8 @@
     ],
     "Descent.Coalescent.harmonicSumSq_le_two": [],
     "Descent.Coalescent.varTotalBranchLength_eq": [],
-    "Descent.Coalescent.varWattersonEstimator_le": []
+    "Descent.Coalescent.varWattersonEstimator_le": [],
+    "Descent.Coalescent.varPairwise_two_eq": []
    },
    "range_lo_thm": [
     "Descent.Coalescent.harmonicSumSq_nonneg",
@@ -26036,7 +26092,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `range ( n - 1 )`, not `Finset.univ`",
   "file": "Descent/Coalescent/SpectrumMoments.lean",
-  "line": 126,
+  "line": 127,
   "short": "varTotalBranchLength",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -26084,7 +26140,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition harmonicSum",
   "file": "Descent/Coalescent/SpectrumMoments.lean",
-  "line": 162,
+  "line": 163,
   "short": "varSegregatingSites",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -26111,6 +26167,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varSegregatingSites_eq_totalVariance",
    "Descent.Coalescent.varSegregatingSites_nonneg",
    "Descent.Coalescent.varWattersonEstimator_le"
@@ -26131,7 +26188,8 @@
     "Descent.Coalescent.varWattersonEstimator_le": [
      "0 ≤ θ",
      "1 ≤ harmonicSum (n - 1"
-    ]
+    ],
+    "Descent.Coalescent.varPairwise_two_eq": []
    }
   }
  },
@@ -26139,7 +26197,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition harmonicSum",
   "file": "Descent/Coalescent/SpectrumMoments.lean",
-  "line": 191,
+  "line": 192,
   "short": "varWattersonEstimator",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -26185,6 +26243,49 @@
     "Descent.Coalescent.exists_varWattersonEstimator_lt": [
      "0 ≤ θ"
     ]
+   }
+  }
+ },
+ "Descent.Coalescent.tajimaVarPairwise": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Coalescent/SpectrumMoments.lean",
+  "line": 252,
+  "short": "tajimaVarPairwise",
+  "ret_type": "ℝ",
+  "empirical_status": "ASSERTED",
+  "python": "tajimaVarPairwise",
+  "args": [
+   "θ",
+   "n"
+  ],
+  "box": {
+   "θ": [
+    0.05,
+    3.0
+   ],
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.varPairwise_two_eq"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.varPairwise_two_eq": []
    }
   }
  },
@@ -27881,7 +27982,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `range ( n - 1 )`, not `Finset.univ`",
   "file": "Descent/Coalescent/TransitVariance.lean",
-  "line": 66,
+  "line": 70,
   "short": "varTransitTime",
   "ret_type": "ℝ",
   "empirical_status": "DERIVED",
@@ -28082,7 +28183,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 3,
+   "finite_points": 6,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -28153,7 +28254,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 2,
+   "finite_points": 4,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -34705,10 +34806,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 65,
+  "line": 70,
   "short": "ploidy",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_ploidy",
   "args": [],
   "box": {},
@@ -34999,10 +35100,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 68,
+  "line": 78,
   "short": "scaledMutationRate",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_scaledMutationRate",
   "args": [
    "Ne",
@@ -35149,10 +35250,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 72,
+  "line": 87,
   "short": "scaledMigrationRate",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_scaledMigrationRate",
   "args": [
    "Ne",
@@ -35320,10 +35421,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 96,
+  "line": 116,
   "short": "islandDemeCorrection",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_islandDemeCorrection",
   "args": [
    "d"
@@ -35409,10 +35510,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 146,
+  "line": 171,
   "short": "scaledFlow",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "scaledFlow",
   "args": [
    "Ne",
@@ -35475,10 +35576,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 168,
+  "line": 198,
   "short": "fstFromFlow",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "fstFromFlow",
   "args": [
    "x"
@@ -35708,10 +35809,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 189,
+  "line": 224,
   "short": "fstIslandEquilibrium",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "fstIslandEquilibrium",
   "args": [
    "Ne",
@@ -35805,10 +35906,10 @@
   "class": "WRAPPER",
   "note": "delegates to saturation",
   "file": "Descent/Core/Fst.lean",
-  "line": 267,
+  "line": 307,
   "short": "fstFromTau",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_fstFromTau",
   "args": [
    "tau"
@@ -35926,10 +36027,10 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (HudsonFst)",
   "file": "Descent/Core/Fst.lean",
-  "line": 312,
+  "line": 357,
   "short": "hudsonFromTau",
   "ret_type": "HudsonFst",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": null,
   "args": [],
   "box": {
@@ -35958,10 +36059,10 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (HudsonFst)",
   "file": "Descent/Core/Fst.lean",
-  "line": 318,
+  "line": 368,
   "short": "hudsonOfNei",
   "ret_type": "HudsonFst",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": null,
   "args": [],
   "box": {},
@@ -35988,10 +36089,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Fst.lean",
-  "line": 357,
+  "line": 412,
   "short": "hweHeterozygosity",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_hweHeterozygosity",
   "args": [
    "p"
@@ -36148,10 +36249,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Heterozygosity.lean",
-  "line": 45,
+  "line": 50,
   "short": "hetRecurrence",
   "ret_type": "ℕ → ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_hetRecurrence",
   "args": [
    "Ne",
@@ -36214,10 +36315,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Heterozygosity.lean",
-  "line": 74,
+  "line": 84,
   "short": "heterozygosityLoss",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "heterozygosityLoss",
   "args": [
    "Ne",
@@ -36315,10 +36416,10 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Core/Moments.lean",
-  "line": 78,
+  "line": 83,
   "short": "witness",
   "ret_type": "ScoreMoments where scoreVariance",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": null,
   "args": [],
   "box": {},
@@ -36390,10 +36491,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Moments.lean",
-  "line": 96,
+  "line": 106,
   "short": "r2",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_ScoreMoments_r2",
   "args": [
    "m"
@@ -36612,10 +36713,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Moments.lean",
-  "line": 101,
+  "line": 116,
   "short": "calibrationSlope",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_ScoreMoments_calibrationSlope",
   "args": [
    "m"
@@ -36691,10 +36792,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Moments.lean",
-  "line": 106,
+  "line": 126,
   "short": "mse",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_ScoreMoments_mse",
   "args": [
    "m"
@@ -36750,10 +36851,10 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Core/Moments.lean",
-  "line": 159,
+  "line": 184,
   "short": "momentsUnderDrift",
   "ret_type": "ScoreMoments where scoreVariance",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": null,
   "args": [],
   "box": {
@@ -36931,10 +37032,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'r2'\"))",
   "file": "Descent/Core/Moments.lean",
-  "line": 279,
+  "line": 309,
   "short": "portabilityRatio",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_ScoreMoments_portabilityRatio",
   "args": [
    "V_A",
@@ -37026,10 +37127,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition momentsUnderDrift",
   "file": "Descent/Core/Moments.lean",
-  "line": 329,
+  "line": 364,
   "short": "deployedR2FromTau",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "deployedR2FromTau",
   "args": [
    "V_A",
@@ -37091,10 +37192,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition momentsUnderDrift",
   "file": "Descent/Core/Moments.lean",
-  "line": 368,
+  "line": 408,
   "short": "deployedR2",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "deployedR2",
   "args": [
    "p",
@@ -37216,10 +37317,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Moments.lean",
-  "line": 524,
+  "line": 569,
   "short": "brier",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "brier",
   "args": [
    "π",
@@ -37323,10 +37424,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Moments.lean",
-  "line": 558,
+  "line": 608,
   "short": "aucArgument",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "aucArgument",
   "args": [
    "m"
@@ -37368,10 +37469,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition momentsUnderDrift",
   "file": "Descent/Core/Moments.lean",
-  "line": 611,
+  "line": 666,
   "short": "deployedBrier",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "deployedBrier",
   "args": [
    "π",
@@ -37468,10 +37569,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition momentsUnderDrift",
   "file": "Descent/Core/Moments.lean",
-  "line": 687,
+  "line": 747,
   "short": "deployedR2FromIsland",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "deployedR2FromIsland",
   "args": [
    "Ne",
@@ -37541,10 +37642,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'r2'\"))",
   "file": "Descent/Core/Moments.lean",
-  "line": 813,
+  "line": 878,
   "short": "portabilityRatioFromTau",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "portabilityRatioFromTau",
   "args": [
    "V_A",
@@ -37595,10 +37696,10 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'r2'\"))",
   "file": "Descent/Core/Moments.lean",
-  "line": 831,
+  "line": 901,
   "short": "deployedPortabilityRatio",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "deployedPortabilityRatio",
   "args": [
    "p",
@@ -37673,10 +37774,10 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Core/Parameters.lean",
-  "line": 88,
+  "line": 92,
   "short": "witness",
   "ret_type": "PopGenParameters where Ne",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": null,
   "args": [],
   "box": {},
@@ -37752,10 +37853,10 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Descent/Core/Parameters.lean",
-  "line": 105,
+  "line": 113,
   "short": "atOrigin",
   "ret_type": "Prop",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "atOrigin",
   "args": [
    "p"
@@ -37782,10 +37883,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Parameters.lean",
-  "line": 115,
+  "line": 127,
   "short": "theta",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_PopGenParameters_theta",
   "args": [
    "p"
@@ -38021,10 +38122,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Parameters.lean",
-  "line": 121,
+  "line": 137,
   "short": "bigM",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_PopGenParameters_bigM",
   "args": [
    "p"
@@ -38158,10 +38259,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Parameters.lean",
-  "line": 147,
+  "line": 167,
   "short": "fstEquilibrium",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_PopGenParameters_fstEquilibrium",
   "args": [
    "p"
@@ -38529,10 +38630,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 92,
+  "line": 97,
   "short": "ratio",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "ratio",
   "args": [
    "a",
@@ -38728,10 +38829,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 106,
+  "line": 116,
   "short": "product",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "product",
   "args": [
    "a",
@@ -38865,10 +38966,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 113,
+  "line": 128,
   "short": "difference",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "difference",
   "args": [
    "a",
@@ -38999,10 +39100,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 120,
+  "line": 140,
   "short": "sum",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "Descent_Core_sum",
   "args": [
    "a",
@@ -39114,10 +39215,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 141,
+  "line": 166,
   "short": "proportionalReduction",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "proportionalReduction",
   "args": [
    "a",
@@ -39191,10 +39292,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 163,
+  "line": 193,
   "short": "share",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "share",
   "args": [
    "a",
@@ -39376,10 +39477,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 193,
+  "line": 228,
   "short": "saturation",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "saturation",
   "args": [
    "x"
@@ -39511,10 +39612,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 227,
+  "line": 267,
   "short": "oddsLike",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "oddsLike",
   "args": [
    "a",
@@ -39584,10 +39685,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 248,
+  "line": 293,
   "short": "convexCombination",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "convexCombination",
   "args": [
    "α",
@@ -39688,10 +39789,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 269,
+  "line": 319,
   "short": "geometricDecay",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "geometricDecay",
   "args": [
    "r",
@@ -39848,10 +39949,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 289,
+  "line": 344,
   "short": "retainedFraction",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "retainedFraction",
   "args": [
    "loss",
@@ -39957,10 +40058,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 300,
+  "line": 360,
   "short": "complement",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "complement",
   "args": [
    "x"
@@ -40079,10 +40180,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 316,
+  "line": 381,
   "short": "midpoint",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "midpoint",
   "args": [
    "a",
@@ -40154,10 +40255,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 334,
+  "line": 404,
   "short": "complementaryComposition",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "complementaryComposition",
   "args": [
    "a",
@@ -40221,10 +40322,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 362,
+  "line": 437,
   "short": "halfDiffSq",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "halfDiffSq",
   "args": [
    "a",
@@ -40278,10 +40379,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 388,
+  "line": 468,
   "short": "survivalWeightedMix",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "survivalWeightedMix",
   "args": [
    "N",
@@ -40356,10 +40457,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 431,
+  "line": 516,
   "short": "kronecker",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "kronecker",
   "args": [
    "x",
@@ -40405,10 +40506,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 455,
+  "line": 545,
   "short": "antiKronecker",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "antiKronecker",
   "args": [
    "x",
@@ -40438,10 +40539,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 485,
+  "line": 580,
   "short": "overlapProfile",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "overlapProfile",
   "args": [
    "q",
@@ -40494,10 +40595,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 501,
+  "line": 601,
   "short": "scaledSquare",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "scaledSquare",
   "args": [
    "a",
@@ -40555,10 +40656,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 509,
+  "line": 614,
   "short": "ratioOfProduct",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "ratioOfProduct",
   "args": [
    "a",
@@ -40621,10 +40722,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 519,
+  "line": 629,
   "short": "squaredShare",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "squaredShare",
   "args": [
    "a",
@@ -40707,10 +40808,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 532,
+  "line": 647,
   "short": "affineStep",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "affineStep",
   "args": [
    "a",
@@ -40762,10 +40863,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 556,
+  "line": 676,
   "short": "identifiedWith",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "identifiedWith",
   "args": [
    "x"
@@ -40822,10 +40923,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 564,
+  "line": 689,
   "short": "power",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "power",
   "args": [
    "a",
@@ -40907,10 +41008,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 577,
+  "line": 707,
   "short": "innerSum",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "innerSum",
   "args": [
    "f",
@@ -41065,10 +41166,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 594,
+  "line": 729,
   "short": "residualAgainst",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "residualAgainst",
   "args": [
    "x",
@@ -41119,10 +41220,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 604,
+  "line": 744,
   "short": "product3",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "product3",
   "args": [
    "a",
@@ -41183,10 +41284,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 614,
+  "line": 759,
   "short": "pairedEpochCount",
   "ret_type": "ℕ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "pairedEpochCount",
   "args": [
    "k"
@@ -41227,10 +41328,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 622,
+  "line": 772,
   "short": "pairCount",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "pairCount",
   "args": [
    "k"
@@ -41318,10 +41419,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 639,
+  "line": 794,
   "short": "halfLineageRate",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "halfLineageRate",
   "args": [
    "k",
@@ -41388,10 +41489,10 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Core/Ratios.lean",
-  "line": 659,
+  "line": 819,
   "short": "sum3",
   "ret_type": "ℝ",
-  "empirical_status": "",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM --",
   "python": "sum3",
   "args": [
    "a",
@@ -52424,12 +52525,16 @@
    "Descent.Coalescent.blocks_restrict_le",
    "Descent.Coalescent.bsRate_pos",
    "Descent.Coalescent.card_covers_eq_deathRate",
+   "Descent.Coalescent.covariance_pairTime",
    "Descent.Coalescent.deriv_deriv_pow",
    "Descent.Coalescent.discordance_gt_half_iff",
    "Descent.Coalescent.ewensProb_three_total",
    "Descent.Coalescent.exists_extend",
    "Descent.Coalescent.expectedNumClasses_two_eq",
    "Descent.Coalescent.expectedTotalBranchLength_succ_sub",
+   "Descent.Coalescent.expected_cross_pairTime",
+   "Descent.Coalescent.expected_pairTime",
+   "Descent.Coalescent.expected_pairTime_product",
    "Descent.Coalescent.fstFromMigration_eq",
    "Descent.Coalescent.fuTerm_eq",
    "Descent.Coalescent.hasDerivAt_descentCurve",
@@ -52453,6 +52558,7 @@
    "Descent.Coalescent.tendsto_discordanceProb",
    "Descent.Coalescent.tendsto_identityByDescent",
    "Descent.Coalescent.tendsto_restrictionFullProb_two",
+   "Descent.Coalescent.varPairwise_two_eq",
    "Descent.Coalescent.varSegregatingSites_nonneg",
    "Descent.Coalescent.varWattersonEstimator_le",
    "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_Ne_lt",
@@ -52663,6 +52769,10 @@
     "Descent.Coalescent.tendsto_identityByDescent": [],
     "Descent.Coalescent.ewensProb_three_total": [],
     "Descent.Coalescent.tendsto_restrictionFullProb_two": [],
+    "Descent.Coalescent.expected_cross_pairTime": [],
+    "Descent.Coalescent.expected_pairTime_product": [],
+    "Descent.Coalescent.covariance_pairTime": [],
+    "Descent.Coalescent.expected_pairTime": [],
     "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount": [],
     "Descent.Coalescent.sum_one_div_deathRate_tail": [],
     "Descent.Coalescent.survivalFactor_partialProd": [],
@@ -52677,6 +52787,7 @@
     "Descent.Coalescent.meanTimeActive_eq_of_ratio": [],
     "Descent.Coalescent.varSegregatingSites_nonneg": [],
     "Descent.Coalescent.varWattersonEstimator_le": [],
+    "Descent.Coalescent.varPairwise_two_eq": [],
     "Descent.Coalescent.splitBy_rel_iff": [],
     "Descent.Coalescent.card_covers_eq_deathRate": [],
     "Descent.Coalescent.fstFromMigration_eq": [],
@@ -125912,7 +126023,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 482,
+  "line": 484,
   "short": "sigmaS",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -125938,7 +126049,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 485,
+  "line": 487,
   "short": "sigmaT",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
@@ -125964,7 +126075,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 488,
+  "line": 490,
   "short": "crossS",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -125997,7 +126108,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "Matrix/vector literal (![…])",
   "file": "Descent.lean",
-  "line": 505,
+  "line": 507,
   "short": "sigmaT2",
   "ret_type": "Matrix (Fin 2) (Fin 2) ℝ",
   "empirical_status": "",
