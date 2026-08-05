@@ -104,7 +104,7 @@ the marginal `b = 1`, and the claim that these fluctuations are governed by *the
 excursions* that set the extreme eigenvalue — none involved an eigenvalue computation and all
 remain assertions.
 
-Empirical status: `κ` identification **VALIDATED**; path count **VALIDATED**; freeness
+Empirical status: MIXED -- `κ` identification **VALIDATED**; path count **VALIDATED**; freeness
 **REFUTED** at ~1000σ against a control that reproduces the free value when freeness holds;
 trichotomy **scale exponents VALIDATED**, limit laws untested. See
 `proofs/validation/empirical/pencil/`.

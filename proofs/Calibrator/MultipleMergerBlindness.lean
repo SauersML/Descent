@@ -933,7 +933,7 @@ theorem not_summable_one_div_criticallyPulledLinearRateLadder
 /-- Canonical power-law ladder for an `α`-stable semipushed genealogy.  Multiplying this by a
 positive constant, such as `1 / Γ(α+1)`, does not change reciprocal summability.
 
-Empirical status: not an empirical claim; this is the comparison sequence used to formalize
+Empirical status: NOT AN EMPIRICAL CLAIM; this is the comparison sequence used to formalize
 the reciprocal-rate summability boundary. -/
 noncomputable def stablePowerRateLadder (alpha : ℝ) (n : ℕ) : ℝ :=
   ((n : ℝ) + 1) ^ alpha

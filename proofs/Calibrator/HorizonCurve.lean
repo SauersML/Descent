@@ -59,7 +59,7 @@ exists; the interior signs are model geometry. Inverting `τ_c = log 2 / λ` on 
 signal therefore returns a number with no referent. Uniqueness needs one sign change in the
 coefficient sequence ordered by rate, which is a hypothesis about the value signal.
 
-Empirical status: the flatness identity, the two-state separation, the shape law and the
+Empirical status: MIXED -- the flatness identity, the two-state separation, the shape law and the
 three-crossing witness are PROVED as stated. That a cohort decay curve is a positive exponential
 mixture is an ASSERTED input, and the shape law is what makes it testable.
 -/

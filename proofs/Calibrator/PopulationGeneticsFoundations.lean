@@ -1172,7 +1172,7 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
     So the body tracks *arisen* to 1%, while the segregating reading overstates by **118× at
     `t = 1200`, growing linearly in `t`**. Watterson is reproduced to 2–3%.
 
-    Empirical status: body **VALIDATED** as a count of mutations arising; the
+    Empirical status: MIXED -- body **VALIDATED** as a count of mutations arising; the
     segregating-sites reading **FALSIFIED** (`proofs/validation/empirical/coalescent_diff/`). -/
 noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
   θ / 2 * t
@@ -1409,7 +1409,7 @@ theorem islandDemeCorrection_eq_finiteIslandCorrection (d : ℝ) :
     coalescence-time convention. This is the finite-`d`
     statement; `fstMigrationDriftEquilibrium` is its `d → ∞` limit.
 
-    Empirical status: matches `validation/differential/refs.island_fst_finite_demes`,
+    Empirical status: VALIDATED -- matches `validation/differential/refs.island_fst_finite_demes`,
     against which the differential check `islandModelFst-finite-demes` measures
     the corpus's limit form. -/
 noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=

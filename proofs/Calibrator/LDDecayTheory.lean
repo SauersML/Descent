@@ -1200,7 +1200,7 @@ section ExpansionLD
 
     An identical twin carries the same reading at `DemographicHistory.driftLDCreationRate`.
 
-    Empirical status: body **DERIVED** as a drift rate; the fraction-lost reading
+    Empirical status: MIXED -- body **DERIVED** as a drift rate; the fraction-lost reading
     **FALSIFIED** (`proofs/validation/empirical/coalescent_diff/`).
 
     Denotes: a per-generation rate. Other definitions share this formula under names from a

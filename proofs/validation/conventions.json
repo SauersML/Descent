@@ -14,7 +14,6 @@
     "declaration matching a `complete` quantity with no entry FAILS.  Renaming or",
     "moving a ledgered definition is therefore a two-file edit on purpose."
   ],
-
   "purpose": [
     "A convention is not visible to Lean.  Nei's G_ST, Hudson's F_ST and the",
     "per-branch drift F are all reals in [0,1), all named `fst`, and all three",
@@ -25,7 +24,6 @@
     "against a paper.  This file is that reading, written down as data, so the",
     "next occurrence is caught by a script instead."
   ],
-
   "conventions": {
     "hudson": {
       "means": "Hudson's F_ST: the ratio of averages whose denominator is the BETWEEN-subgroup heterozygosity p1(1-p2)+p2(1-p1), equivalently 1 - E[T_within]/E[T_between] on coalescence times.",
@@ -48,7 +46,6 @@
       "means": "The body transforms an F supplied by the caller and asserts no estimator of its own.  Whatever convention the caller used, this body returns.  Never incompatible with anything, because it commits to nothing.",
       "source": "n/a"
     },
-
     "narrow-sense": {
       "means": "h2 = V_A / V_P with V_P = V_A + V_D + V_I + V_E.  The denominator INCLUDES the non-additive components; V_A/(V_A+V_E) is a different and larger number.",
       "source": "Falconer & Mackay, Introduction to Quantitative Genetics, 4th ed."
@@ -68,62 +65,143 @@
     "derived-share": {
       "means": "A ratio, share, enrichment or fraction BUILT FROM heritabilities rather than a heritability.  Its own value is not a heritability and must not be read as one.",
       "source": "n/a"
+    },
+    "undetermined": {
+      "means": "The reading this argument expects has NOT been established. A named, counted state, not an absence: the guard reports how many there are on every run, so the debt is enumerable rather than invisible. A caller must not assume any particular estimator here.",
+      "source": "n/a"
     }
   },
-
   "bridges": [
     {
-      "between": ["nei-gst", "hudson"],
+      "between": [
+        "nei-gst",
+        "hudson"
+      ],
       "theorem": "hudsonFst_eq_of_neiGst",
       "says": "Hudson = 2G/(1+G) everywhere, so the discrepancy is 2x as G -> 0 and cannot be absorbed by any recalibration constant."
     },
     {
-      "between": ["hudson", "per-branch-drift"],
+      "between": [
+        "hudson",
+        "per-branch-drift"
+      ],
       "theorem": "fstFromTau_lt_coalescenceCdf",
       "says": "tau/(1+tau) < 1 - exp(-tau) at every positive tau: the pairwise estimator and the per-branch drift F are different numbers, 0.500 against 0.632 at tau = 1."
     }
   ],
-
   "quantities": {
     "fst": {
-      "words": ["fst", "gst"],
-      "scope": "complete",
-      "conventions": ["hudson", "nei-gst", "identity-probability", "per-branch-drift", "inherited"],
-      "incompatible": [
-        ["nei-gst", "hudson"],
-        ["nei-gst", "per-branch-drift"],
-        ["hudson", "per-branch-drift"]
+      "words": [
+        "fst",
+        "gst"
       ],
-      "why": "The corpus's most expensive recurring bug class.  Nei's G_ST between two demes is half the per-branch drift F and a quarter of the pairwise F_ST written as a variance ratio; three separate repairs have been needed."
+      "scope": "complete",
+      "conventions": [
+        "hudson",
+        "nei-gst",
+        "identity-probability",
+        "per-branch-drift",
+        "inherited"
+      ],
+      "incompatible": [
+        [
+          "nei-gst",
+          "hudson"
+        ],
+        [
+          "nei-gst",
+          "per-branch-drift"
+        ],
+        [
+          "hudson",
+          "per-branch-drift"
+        ]
+      ],
+      "why": "The corpus's most expensive recurring bug class.  Nei's G_ST between two demes is half the per-branch drift F and a quarter of the pairwise F_ST written as a variance ratio; three separate repairs have been needed.",
+      "argument_scope": "complete"
     },
     "h2": {
-      "words": ["h2", "heritability"],
+      "words": [
+        "h2",
+        "heritability"
+      ],
       "scope": "complete",
-      "conventions": ["narrow-sense", "snp", "liability-scale", "am-inflated", "derived-share"],
+      "conventions": [
+        "narrow-sense",
+        "snp",
+        "liability-scale",
+        "am-inflated",
+        "derived-share"
+      ],
       "incompatible": [],
-      "why": "A docstring on `additive_pgs_ceiling` labelled V_A/(V_A+V_E) as narrow-sense heritability, which is larger than the real one by V_P/(V_A+V_E).  No incompatible PAIR is declared yet: the h2 conventions are ordered by inequalities the corpus proves rather than being rival estimators of one number, so the connectivity rule is inactive here and only completeness and constants apply."
+      "why": "A docstring on `additive_pgs_ceiling` labelled V_A/(V_A+V_E) as narrow-sense heritability, which is larger than the real one by V_P/(V_A+V_E).  No incompatible PAIR is declared yet: the h2 conventions are ordered by inequalities the corpus proves rather than being rival estimators of one number, so the connectivity rule is inactive here and only completeness and constants apply.",
+      "argument_scope": "complete"
     },
     "r2": {
-      "words": ["r2"],
+      "words": [
+        "r2"
+      ],
       "scope": "unscoped",
       "conventions": [],
       "incompatible": [],
       "why": "REGISTERED BUT NOT YET LEDGERED.  44 declarations carry it and the r / r-squared / D' distinction is a known hazard (`tagR2` divides by GENOTYPIC 2p(1-p), and reading the variances as allelic p(1-p) scales the result by four).  `scope: unscoped` means the guard checks nothing here; it is recorded so the next pass has a place to put the work, not so it looks covered."
     },
     "alpha": {
-      "words": ["alpha"],
+      "words": [
+        "alpha"
+      ],
       "scope": "unscoped",
       "conventions": [],
       "incompatible": [],
       "why": "REGISTERED BUT NOT YET LEDGERED.  sd-ratio versus variance-ratio alpha is on the fleet's hazard list; no corpus declaration currently carries `alpha` as a camel-case word, so there is nothing to ledger today and the entry exists to catch the first one."
     }
   },
-
   "open_questions": [
     "There is no theorem anywhere in the corpus relating the `identity-probability` family (1/(1+4*Ne*rate)) to the `hudson` family (tau/(1+tau)).  They are believed to agree in the island model at low mutation, which is why they are not declared incompatible, but the belief is not machine-checked.  A bridge theorem would let `identity-probability` join the incompatibility graph and tighten this guard.",
     "`PortabilityDrift.pairwiseFstFromBranches` is ledgered `hudson` on its OUTPUT while its two ARGUMENTS are per-branch drift values.  The ledger has one convention slot per declaration and cannot express that; the mixed reading is recorded in the entry's `note`."
   ],
-
+  "empirical_status_vocabulary": {
+    "$comment": [
+      "THE CLOSED VOCABULARY OF `Empirical status:` HEADS.  A status line's HEAD --",
+      "the text up to the first bracket, dash, comma, full stop or newline, with `**`",
+      "stripped -- must be exactly one of these terms.  Everything after the head is",
+      "free prose and no rule inspects it.",
+      "",
+      "WHY CLOSED.  `NOT AN EMPIRICAL CLAIM` was being written in two cases at once,",
+      "138 times in capitals and 5 in lower case, for one verdict.  Two spellings",
+      "today is four next month, and a status vocabulary that drifts cannot be",
+      "counted -- which is the only thing a status marker is for.",
+      "",
+      "WHY THE LIST IS THIS LONG.  Every term below was adjudicated against the",
+      "corpus rather than harvested from it: each is a verdict the others cannot",
+      "express.  Terms that were merely PROSE where a verdict belonged were fixed in",
+      "the corpus instead of being added here, which is the difference between",
+      "enumerating a vocabulary and pinning a budget to a count.",
+      "",
+      "`MEASURED` is the one term that also appears constantly as ordinary English",
+      "inside the evidence tables ('against measured 0.53297').  That is why this",
+      "rule reads the HEAD only: applied to the whole status text it produced 99",
+      "findings, none of them defects."
+    ],
+    "terms": {
+      "UNTESTED": "No measurement has been made.",
+      "VALIDATED": "Measured against an instrument that could have said no, and it did not.",
+      "MEASURED": "A number was obtained; whether it confirms the body is stated in the prose.",
+      "DERIVED": "Follows from other results in the corpus; no measurement is claimed or needed.",
+      "FALSIFIED": "Measured and rejected.",
+      "VACUOUS": "The measurement was an algebraic identity and carries no information about the world.",
+      "CONDITIONALLY VALID": "Holds inside a stated regime and is known to fail outside it.",
+      "MIXED": "Different parts of one definition carry different verdicts; the prose says which.",
+      "ASSERTED": "An input taken from external literature rather than derived or measured here. Named so it can be enumerated, not so it can be trusted.",
+      "NOT AN EMPIRICAL CLAIM": "A statement about definitions or about what a model says, with no observable content.",
+      "NOT EMPIRICALLY TESTABLE": "Has observable content in principle that no available design can reach.",
+      "NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS": "A measurement exists and is about a different quantity. Distinct from UNTESTED because a reader has already been misled once.",
+      "EXACT BY CONSTRUCTION": "True by how the quantity is built, so no measurement can bear on it.",
+      "AN IDENTITY": "The comparison is algebraically pinned to the body under test, so it could not have failed. Distinct from VACUOUS in naming the design rather than the verdict; the corpus writes it `AN IDENTITY, NOT A MEASUREMENT` and the head rule reads up to the comma.",
+      "DISAGREES WITH AN EXISTING MEASUREMENT": "Two records of one quantity conflict and neither has been retracted.",
+      "CONVENTION PINNED": "The convention this quantity uses has been identified and fixed; see the convention ledger above."
+    }
+  },
   "verified_constants": {
     "$comment": [
       "Constants and exponents READ AGAINST THE PUBLISHED SOURCE and frozen here, so a",
@@ -137,303 +215,853 @@
       "which is the entire point of writing the value down."
     ],
     "Calibrator/LDDecayTheory.lean::ohtaKimuraSigmaDSq": {
-      "constants": ["10", "11", "2", "4"],
+      "constants": [
+        "10",
+        "11",
+        "2",
+        "4"
+      ],
       "source": "Ohta & Kimura (1971): sigma_d^2 = (10 + rho)/((2 + rho)(11 + rho)), rho = 4*Ne*c.  Value 5/11 at rho = 0."
     },
     "Calibrator/DGP.lean::scaledMutationRate": {
-      "constants": ["4"],
+      "constants": [
+        "4"
+      ],
       "source": "theta = 4*Ne*mu, the diploid coalescent scaling."
     },
     "Calibrator/DGP.lean::scaledMigrationRate": {
-      "constants": ["4"],
+      "constants": [
+        "4"
+      ],
       "source": "M = 4*Ne*m, the same scaling applied to gene flow."
     },
-    "Calibrator/CovarianceStructure.lean::ldsrExpectedChi2": {
-      "constants": ["1"],
-      "source": "Bulik-Sullivan et al. (2015), Nature Genetics 47:291-295: E[chi2] = N*h2*l/M + N*a + 1.  The 1 is the null expectation of a 1-df statistic and is what makes the LDSC intercept a confounding diagnostic; the confounding term is NOT divided by M."
-    },
-    "Calibrator/CovarianceStructure.lean::ldsrExpectedBetaSq": {
-      "constants": ["1"],
-      "source": "Same paper, per-SNP form: E[beta_hat^2] = (h2/M)*l + 1/N."
-    },
     "Calibrator/TransferLearningPGS.lean::pinskerAncestryDivergenceCap": {
-      "constants": ["2"],
+      "constants": [
+        "2"
+      ],
       "source": "sqrt(2*KL), the L1-convention Pinsker bound.  Deliberately NOT the tight sqrt(KL/2): the definition's own docstring records that it is loose by exactly a factor of two, measured over 200000 distribution pairs."
     },
     "Calibrator/TransferLearningPGS.lean::gaussianSourceResidualRisk": {
-      "constants": ["2"],
+      "constants": [
+        "2"
+      ],
       "source": "exp(-2*I) is the Gaussian residual-variance fraction; the 2 is fixed by half a nat costing exactly one e-fold."
     },
     "Calibrator/LDDecayTheory.lean::admixtureLD": {
-      "constants": ["1"],
+      "constants": [
+        "1"
+      ],
       "source": "Chakraborty & Weiss (1988) hybrid-isolation model: D = alpha*(1-alpha)*dp1*dp2.  The weight is the VARIANCE alpha(1-alpha), not alpha; simulation excludes the linear form at 1627 sems."
     },
     "Calibrator/LDDecayTheory.lean::driftLDRetention": {
-      "constants": ["1", "1", "1", "2", "2"],
+      "constants": [
+        "1",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
       "source": "(1-c)^2 * (1 - 1/(2*Ne)).  The exponent 2 on (1-c) is the two lineage pairs; the 2*Ne is the diploid coalescent scale."
     },
     "Calibrator/LDDecayTheory.lean::ldRetentionPerGen": {
-      "constants": ["1", "1", "1", "2"],
+      "constants": [
+        "1",
+        "1",
+        "1",
+        "2"
+      ],
       "source": "The elementary two-locus recursion (1-r)*(1 - 1/(2*Ne)).  NOT Ohta-Kimura, which is the sigma_d^2 form above."
     },
     "Calibrator/EpistasisAndNonAdditivity.lean::fisherAverageEffect": {
-      "constants": ["1", "2"],
+      "constants": [
+        "1",
+        "2"
+      ],
       "source": "Falconer & Mackay: alpha = a + d*(1 - 2p).  The dominance term vanishes at p = 1/2 and reverses across it."
     },
     "Calibrator/EpistasisAndNonAdditivity.lean::dominanceVariance": {
-      "constants": ["1", "2", "2"],
+      "constants": [
+        "1",
+        "2",
+        "2"
+      ],
       "source": "Falconer & Mackay: V_D = sum (2pq*d)^2."
     },
     "Calibrator/EpistasisAndNonAdditivity.lean::epistaticVariance": {
-      "constants": ["1", "1", "2", "2", "2"],
+      "constants": [
+        "1",
+        "1",
+        "2",
+        "2",
+        "2"
+      ],
       "source": "V_AA = beta12^2 * 2p1q1 * 2p2q2 under HWE and linkage equilibrium; the two 2s are genotypic variances, not allelic."
     },
     "Calibrator/PowerAnalysis.lean::noncentralityParam": {
-      "constants": ["1", "2", "2"],
+      "constants": [
+        "1",
+        "2",
+        "2"
+      ],
       "source": "NCP = n*beta^2*2p(1-p): beta enters quadratically and p through the GENOTYPE variance 2p(1-p), not the allelic p(1-p)."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::steppingStoneCharacteristicLength": {
-      "constants": ["2"],
+      "constants": [
+        "2"
+      ],
       "source": "Malecot / Kimura-Weiss (1964) 1-D decay scale L = sqrt(m*sigma^2/(2*mu)); the mutation rate is mandatory and the deme size does not enter."
     },
     "Calibrator/PCCorrectability/Threshold.lean::demographicSpike": {
-      "constants": ["4"],
+      "constants": [
+        "4"
+      ],
       "source": "4*F*effectiveSubgroupSize.  The 4 is recovered as 3.9920 +- 0.0045 by inverting the BBP eigenvalue law on simulated genotypes with F measured as genuine Hudson F_ST."
     },
     "Calibrator/PortabilityDrift.lean::hetMutationFloor": {
-      "constants": ["1", "4", "4"],
+      "constants": [
+        "1",
+        "4",
+        "4"
+      ],
       "source": "theta/(1+theta) with theta = 4*Ne*mu: the infinite-alleles equilibrium heterozygosity, complement of Malecot's identity probability."
     },
     "Calibrator/PortabilityDrift.lean::coalescentTau": {
-      "constants": ["2"],
+      "constants": [
+        "2"
+      ],
       "source": "tau = t/(2*Ne).  This is the 2*Ne that is NOT the 4*Ne of a scaled rate; it is a TIME scale, the mean pairwise coalescence time."
-    },
-    "Calibrator/AssortativeMatingPGS.lean::amVarianceStep": {
-      "constants": ["1", "2"],
-      "source": "Fisher (1918) linearisation: mid-parent variance (1/2)V(1 + r*h2) plus segregation (1/2)V0.  The segregation term uses the RANDOM-MATING V0; using V collapses the recursion to one whose only fixed point is 0."
-    },
-    "Calibrator/AssortativeMatingPGS.lean::amEquilibriumVariance": {
-      "constants": ["1"],
-      "source": "V_A/(1 - r*h2), the fixed point of amVarianceStep, with h2 held at its random-mating value."
     }
   },
-
   "declarations": {
     "Calibrator/Conventions.lean::hudsonFst": {
-      "quantity": "fst", "convention": "hudson", "constants": ["1", "1", "2"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1",
+        "1",
+        "2"
+      ],
       "source": "Bhatia, Patterson, Sankararaman & Price (2013), Genome Research 23:1514-1521."
     },
     "Calibrator/Conventions.lean::neiGst": {
-      "quantity": "fst", "convention": "nei-gst",
+      "quantity": "fst",
+      "convention": "nei-gst",
       "source": "Nei (1973), PNAS 70:3321-3323."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::neiFst": {
-      "quantity": "fst", "convention": "nei-gst",
+      "quantity": "fst",
+      "convention": "nei-gst",
       "note": "The heterozygosity form (H_T - H_S)/H_T; same statistic as `neiGst`, different arguments."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::neiGstFromFrequencies": {
-      "quantity": "fst", "convention": "nei-gst", "constants": ["1", "2", "2", "4"],
+      "quantity": "fst",
+      "convention": "nei-gst",
+      "constants": [
+        "1",
+        "2",
+        "2",
+        "4"
+      ],
       "note": "The 4 is the total-pool denominator 4*pbar*(1-pbar).  Changing it to 2 turns this into a different statistic that still type-checks."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::coalFst": {
-      "quantity": "fst", "convention": "hudson", "constants": ["2"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "2"
+      ],
       "note": "t/(t + 2*Ne) is tau/(1+tau) with tau = t/(2*Ne); the 2 is the ploidy in the coalescent time scale."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::fstFromHetRatio": {
-      "quantity": "fst", "convention": "per-branch-drift", "constants": ["1"],
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "constants": [
+        "1"
+      ],
       "note": "1 - H/H0 with H0 the ANCESTRAL heterozygosity.  Its own docstring measures it against the classical (1 - 1/(2Ne))^t decay, which is the per-branch reading and not an estimator."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::islandFstFiniteDemes": {
-      "quantity": "fst", "convention": "hudson", "constants": ["1", "1", "4"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1",
+        "1",
+        "4"
+      ],
       "source": "Slatkin (1991), Genetics Research 58:167-175, via 1 - E[T_within]/E[T_between].",
       "note": "The deme correction enters LINEARLY here.  Crow & Aoki (1984) square it, but that is the correction for Nei's G_ST, a different statistic."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::fstIslandEquilibriumFiniteDemes": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "4", "4"],
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "4",
+        "4"
+      ],
       "note": "Two independent 4s: 4*Ne*m and 4*Ne*mu.  Either one dropping to 2 halves the corresponding scaled rate."
     },
     "Calibrator/PopulationGeneticsFoundations.lean::fstMigrationMutationEquilibriumManyDemes": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "4", "4"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "4",
+        "4"
+      ]
     },
     "Calibrator/PopulationGeneticsFoundations.lean::fstMutationDriftTransient": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "2"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "2"
+      ]
     },
     "Calibrator/PopulationGeneticsFoundations.lean::fstMutationDriftTransientDiscrete": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1"
+      ]
     },
-
     "Calibrator/DGP.lean::fstMutationDriftEquilibrium": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1"],
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1"
+      ],
       "source": "Malecot; Kimura & Crow (1964), Genetics 49:725-738.",
       "note": "NOT the Wright island-model result despite the shared shape; that one is in the migration rate."
     },
     "Calibrator/DGP.lean::fstDriftFlowStep": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "2", "2"],
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "2",
+        "2"
+      ],
       "note": "The leading 2 on (mig + mu) is the two lineages that can independently escape the identity class.  A 1 there halves both homogenising forces."
     },
     "Calibrator/DGP.lean::fstDriftMigrationManyDemes": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1"
+      ]
     },
     "Calibrator/DGP.lean::fstEquilibrium": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1"
+      ]
     },
     "Calibrator/DGP.lean::fstTransientDecayFromScaled": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "2"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "2"
+      ]
     },
     "Calibrator/DGP.lean::PGSEvolutionaryModel.fstTransient": {
-      "quantity": "fst", "convention": "identity-probability"
+      "quantity": "fst",
+      "convention": "identity-probability"
     },
-
     "Calibrator/PortabilityDrift.lean::fstFromTau": {
-      "quantity": "fst", "convention": "hudson", "constants": ["1"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1"
+      ],
       "note": "tau/(1+tau).  The saturation law; `fstFromTau_lt_coalescenceCdf` is what keeps it distinct from 1 - exp(-tau)."
     },
     "Calibrator/PortabilityDrift.lean::fstFromGenerations": {
-      "quantity": "fst", "convention": "hudson"
+      "quantity": "fst",
+      "convention": "hudson"
     },
     "Calibrator/PortabilityDrift.lean::pairwiseFstFromBranchTaus": {
-      "quantity": "fst", "convention": "hudson", "constants": ["2"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "2"
+      ],
       "note": "The 2 is the MEAN of the branch taus.  A sum instead of a mean double-counts the split time and was measured 50 percent high at up to 59 sems."
     },
     "Calibrator/PortabilityDrift.lean::pairwiseFstFromBranches": {
-      "quantity": "fst", "convention": "hudson", "constants": ["1", "1", "1"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1",
+        "1",
+        "1"
+      ],
       "note": "Output is pairwise; the two ARGUMENTS are per-branch drift values.  Recorded in open_questions: the ledger has one slot per declaration and cannot carry both."
     },
     "Calibrator/PortabilityDrift.lean::hudsonFstFromCoalescenceTimes": {
-      "quantity": "fst", "convention": "hudson", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::steppingStoneFst": {
-      "quantity": "fst", "convention": "inherited",
+      "quantity": "fst",
+      "convention": "inherited",
       "note": "Takes `fst_neighbor` and returns a distance-`d` value in whatever convention that was."
     },
     "Calibrator/PortabilityDrift.lean::asymmetricFst": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "4"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "4"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::fstMigrationDriftEquilibrium": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "4"],
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "4"
+      ],
       "source": "Wright (1931).",
       "note": "The infinite-island LIMIT.  `islandFstFiniteDemes` carries the finite-deme correction."
     },
     "Calibrator/PortabilityDrift.lean::fstMigDriftNext": {
-      "quantity": "fst", "convention": "identity-probability",
-      "constants": ["1", "1", "1", "2", "2", "2"],
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "1",
+        "2",
+        "2",
+        "2"
+      ],
       "note": "The linearised step: (1-m)^2 approximated as 1-2m, so the 2 on m is the linearisation and not a ploidy."
     },
     "Calibrator/PortabilityDrift.lean::fstIslandMultiplicativeEquilibrium": {
-      "quantity": "fst", "convention": "identity-probability"
+      "quantity": "fst",
+      "convention": "identity-probability"
     },
     "Calibrator/PortabilityDrift.lean::islandFstMultiplicativeStep": {
-      "quantity": "fst", "convention": "identity-probability"
+      "quantity": "fst",
+      "convention": "identity-probability"
     },
     "Calibrator/PortabilityDrift.lean::MutationDriftModelAssumptions.fstEquilibrium": {
-      "quantity": "fst", "convention": "identity-probability",
+      "quantity": "fst",
+      "convention": "identity-probability",
       "source": "Malecot; Kimura & Crow (1964).",
       "note": "Within-population identity probability despite the `fst` in the name."
     },
     "Calibrator/PortabilityDrift.lean::MutationDriftModelAssumptions.fstTransient": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "2"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "2"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::SplitMigrationModel.fstEqLimitLowMutationManyDemes": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::SplitMigrationModel.fstMigDriftEq": {
-      "quantity": "fst", "convention": "identity-probability"
+      "quantity": "fst",
+      "convention": "identity-probability"
     },
     "Calibrator/PortabilityDrift.lean::fstTransientAt": {
-      "quantity": "fst", "convention": "identity-probability", "constants": ["1", "1", "1"]
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "1"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::covarianceRetentionFactorFromFst": {
-      "quantity": "fst", "convention": "inherited", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "1"
+      ]
     },
     "Calibrator/PortabilityDrift.lean::targetHetFromFst": {
-      "quantity": "fst", "convention": "inherited", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "1"
+      ]
     },
-
     "Calibrator/DemographicHistory.lean::demoSteppingStoneFst": {
-      "quantity": "fst", "convention": "hudson", "constants": ["4"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "4"
+      ],
       "note": "Built on `coalFst`, hence Hudson.  The 4 is the scaled migration rate 4*Ne*m; the superseded quadratic sibling squares both m and sigma."
     },
     "Calibrator/DemographicHistory.lean::steppingStoneFstQuadratic": {
-      "quantity": "fst", "convention": "hudson", "constants": ["2", "2", "4"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "2",
+        "2",
+        "4"
+      ],
       "note": "A superseded candidate kept as a discriminand: quadratic in m and in sigma where the surviving form is linear."
     },
     "Calibrator/DemographicHistory.lean::admixedFst": {
-      "quantity": "fst", "convention": "inherited", "constants": ["1", "2"],
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "1",
+        "2"
+      ],
       "note": "(1-alpha)^2 scaling of a supplied fst_AB.  The exponent 2 is the admixture weight and a 1 there is a different model."
     },
     "Calibrator/DemographicHistory.lean::admixedFstExact": {
-      "quantity": "fst", "convention": "inherited", "constants": ["1", "2"]
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "1",
+        "2"
+      ]
     },
-
     "Calibrator/AssortativeMatingPGS.lean::ibdFst": {
-      "quantity": "fst", "convention": "hudson", "constants": ["4"],
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "4"
+      ],
       "note": "Isolation by distance; its own docstring pins `N` as a DENSITY rather than a deme size by dimensional analysis."
     },
     "Calibrator/AncestrySpecificArchitecture.lean::geneFlowFstStep": {
-      "quantity": "fst", "convention": "identity-probability"
+      "quantity": "fst",
+      "convention": "identity-probability"
     },
     "Calibrator/PhenomeWidePortability.lean::fstFromDriftFactor": {
-      "quantity": "fst", "convention": "per-branch-drift", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "constants": [
+        "1"
+      ]
     },
     "Calibrator/PhenomeWidePortability.lean::causalPortabilityFromLocalFst": {
-      "quantity": "fst", "convention": "inherited", "constants": ["1"]
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "1"
+      ]
     },
     "Calibrator/PolygenicArchitecture.lean::rgFstWeightedUpperBound": {
-      "quantity": "fst", "convention": "inherited", "constants": ["2", "1"]
+      "quantity": "fst",
+      "convention": "inherited",
+      "constants": [
+        "2",
+        "1"
+      ]
     },
     "Calibrator/SerialFounderChain.lean::serialFounderCeilingFst": {
-      "quantity": "fst", "convention": "hudson",
+      "quantity": "fst",
+      "convention": "hudson",
       "note": "tau/(T_within + tau), the coalescence-time ratio for the chain."
     },
     "Calibrator/SerialFounderChain.lean::ceilingFst": {
-      "quantity": "fst", "convention": "hudson"
+      "quantity": "fst",
+      "convention": "hudson"
     },
-
     "Calibrator/VarianceComponents.lean::narrowSenseH2": {
-      "quantity": "h2", "convention": "narrow-sense",
+      "quantity": "h2",
+      "convention": "narrow-sense",
       "source": "Falconer & Mackay, 4th ed.",
       "note": "V_A/(V_A+V_D+V_I+V_E).  V_A/(V_A+V_E) is NOT this quantity and is larger whenever V_D+V_I > 0."
     },
     "Calibrator/VarianceComponents.lean::snpH2": {
-      "quantity": "h2", "convention": "snp",
+      "quantity": "h2",
+      "convention": "snp",
       "source": "Yang et al. (2010), Nature Genetics 42:565-569."
     },
     "Calibrator/VarianceComponents.lean::liabilityScaleH2": {
-      "quantity": "h2", "convention": "liability-scale", "constants": ["1", "2"],
+      "quantity": "h2",
+      "convention": "liability-scale",
+      "constants": [
+        "1",
+        "2"
+      ],
       "source": "Dempster & Lerner (1950); Lee et al. (2011), AJHG 88:294-305.",
       "note": "The exponent 2 is the squared threshold height z^2.  A 1 there is a different scale conversion entirely."
     },
     "Calibrator/AssortativeMatingPGS.lean::AssortativeMatingModel.h2": {
-      "quantity": "h2", "convention": "narrow-sense"
+      "quantity": "h2",
+      "convention": "narrow-sense"
     },
     "Calibrator/AssortativeMatingPGS.lean::AssortativeMatingModel.observedH2": {
-      "quantity": "h2", "convention": "am-inflated", "constants": ["1"],
+      "quantity": "h2",
+      "convention": "am-inflated",
+      "constants": [
+        "1"
+      ],
       "source": "Fisher (1918)."
     },
     "Calibrator/TransferLearningPGS.lean::additiveHeritability": {
-      "quantity": "h2", "convention": "narrow-sense"
+      "quantity": "h2",
+      "convention": "narrow-sense"
     },
     "Calibrator/TransferLearningPGS.lean::sharedLDHeritability": {
-      "quantity": "h2", "convention": "narrow-sense",
+      "quantity": "h2",
+      "convention": "narrow-sense",
       "note": "Additive variance computed through a shared LD kernel, still divided by the phenotypic variance."
     },
     "Calibrator/AncestrySpecificArchitecture.lean::gwasHeritability": {
-      "quantity": "h2", "convention": "snp",
+      "quantity": "h2",
+      "convention": "snp",
       "note": "h2_true * mean tagging r-squared is the tagged share, which is what h2_SNP measures."
     },
     "Calibrator/PolygenicArchitecture.lean::heritabilityEnrichment": {
-      "quantity": "h2", "convention": "derived-share"
+      "quantity": "h2",
+      "convention": "derived-share"
     },
     "Calibrator/PowerAnalysis.lean::heritabilityFractionFromN": {
-      "quantity": "h2", "convention": "derived-share",
+      "quantity": "h2",
+      "convention": "derived-share",
       "note": "n/(n+C) is the FRACTION of heritability recovered at sample size n, not a heritability."
     },
     "Calibrator/RareVariantPortability.lean::rareHeritabilityShare": {
-      "quantity": "h2", "convention": "derived-share"
+      "quantity": "h2",
+      "convention": "derived-share"
     },
     "Calibrator/SelectionArchitecture.lean::equalPerLocusHeritability": {
-      "quantity": "h2", "convention": "derived-share",
+      "quantity": "h2",
+      "convention": "derived-share",
       "note": "Total heritability divided by the locus count: a per-locus share."
+    },
+    "Calibrator/AncestrySpecificArchitecture.lean::driftVariance": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Audited: Wright's F against the ancestor. Exactly twice Nei's G_ST."
+    },
+    "Calibrator/AncestrySpecificArchitecture.lean::expectedFreqDiffSq": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Audited with driftVariance; the 2 counts independently drifting branches."
+    },
+    "Calibrator/AncestrySpecificArchitecture.lean::portabilityFromArchitecture": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/AncestrySpecificArchitecture.lean::twoPopDriftVariance": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Audited with driftVariance."
+    },
+    "Calibrator/DGP.lean::demographicCovarianceGapLowerBound": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/DriftRegime.lean::benchmarkRatio": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/DriftRegime.lean::benchmarkRatioSquared": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/HumanDemography.lean::neutralDriftR2Ratio": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/HumanDemography.lean::taggedDriftR2RatioCorrected": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PhenomeWidePortability.lean::neutralPortabilityRatioLD": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PolygenicAdaptation.lean::expectedPGSDiffVariance": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Docstring is written in branch F."
+    },
+    "Calibrator/PolygenicAdaptation.lean::pgsDiffVariance_two_pop": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PolygenicAdaptation.lean::pgsDriftVarianceFromLoci": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Docstring is written in branch F."
+    },
+    "Calibrator/PolygenicAdaptation.lean::pgsDriftVariance_one_pop": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityBounds.lean::neutralPortability": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::Expected_Abs_Shift": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Composes Var_Delta_Mu on the SUM of two branch values."
+    },
+    "Calibrator/PortabilityDrift.lean::Var_Delta_Mu": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Its own evidence table is indexed by F_branch."
+    },
+    "Calibrator/PortabilityDrift.lean::alleleFreqCorrelation": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::covarianceDivergenceFromRetention": {
+      "quantity": "fst",
+      "convention": "inherited",
+      "role": "consumer",
+      "note": "Routes through covarianceRetentionFactorFromFst, which commits to nothing."
+    },
+    "Calibrator/PortabilityDrift.lean::covarianceDivergenceMutationDrift": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::expectedSqMeanPGSDiff_pureSplit": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Docstring is written in branch F."
+    },
+    "Calibrator/PortabilityDrift.lean::ldCorrelationDecay": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::neutralAFBenchmarkLiabilityMetricProfile": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::neutralAFBenchmarkMetricProfile": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::neutralAFSharedLDBenchmarkRatio": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDayEqualVarianceGaussianAUC": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Composes presentDayPGSVariance."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDayPGSVariance": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Its docstring declares the heterozygosity-retention reading explicitly and says it is NOT the between-population Hudson F_ST."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDayPGSVarianceMutationDrift": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDayR2": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Composes presentDayPGSVariance; inherits its declared heterozygosity-retention reading."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDayR2MutationDrift": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::presentDaySignalToNoise": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Composes presentDayPGSVariance."
+    },
+    "Calibrator/PortabilityDrift.lean::realWorldPGSVariance": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "note": "Same (1 - fst) heterozygosity-retention shape as presentDayPGSVariance."
+    },
+    "Calibrator/PortabilityDrift.lean::targetBrierFromNeutralAFBenchmark": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::targetExactCalibratedBrierRisk": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::targetLiabilityAUCFromNeutralAFBenchmark": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PortabilityDrift.lean::targetR2FromNeutralAFBenchmark": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/AncestryCalibration.lean::prevalenceScaledR2": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/AssortativeMatingPGS.lean::amCorrectedPortability": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/AssortativeMatingPGS.lean::amEquilibriumVariance": {
+      "quantity": "h2",
+      "convention": "narrow-sense",
+      "role": "consumer",
+      "note": "Fisher's h2 = V_A/V_P, held at its RANDOM-MATING value; the docstring states that convention.",
+      "constants": [
+        "1"
+      ],
+      "source": "V_A/(1 - r*h2), the fixed point of amVarianceStep, with h2 held at its random-mating value."
+    },
+    "Calibrator/AssortativeMatingPGS.lean::amInducedLD": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/AssortativeMatingPGS.lean::amVarianceStep": {
+      "quantity": "h2",
+      "convention": "narrow-sense",
+      "role": "consumer",
+      "note": "Same convention as amEquilibriumVariance, of which it is the step.",
+      "constants": [
+        "1",
+        "2"
+      ],
+      "source": "Fisher (1918) linearisation: mid-parent variance (1/2)V(1 + r*h2) plus segregation (1/2)V0.  The segregation term uses the RANDOM-MATING V0; using V collapses the recursion to one whose only fixed point is 0."
+    },
+    "Calibrator/CovarianceStructure.lean::ldsrExpectedBetaSq": {
+      "quantity": "h2",
+      "convention": "snp",
+      "role": "consumer",
+      "note": "Same, per-SNP form.",
+      "constants": [
+        "1"
+      ],
+      "source": "Same paper, per-SNP form: E[beta_hat^2] = (h2/M)*l + 1/N."
+    },
+    "Calibrator/CovarianceStructure.lean::ldsrExpectedChi2": {
+      "quantity": "h2",
+      "convention": "snp",
+      "role": "consumer",
+      "note": "LD-score regression reads the SNP heritability off the slope.",
+      "constants": [
+        "1"
+      ],
+      "source": "Bulik-Sullivan et al. (2015), Nature Genetics 47:291-295: E[chi2] = N*h2*l/M + N*a + 1.  The 1 is the null expectation of a 1-df statistic and is what makes the LDSC intercept a confounding diagnostic; the confounding term is NOT divided by M."
+    },
+    "Calibrator/EquityAndImplementation.lean::expectedR2FromN": {
+      "quantity": "h2",
+      "convention": "snp",
+      "role": "consumer",
+      "note": "Daetwyler-Dudbridge: the h2 a PGS can reach is the tagged one."
+    },
+    "Calibrator/GeneticArchitectureDiscovery.lean::perCausalLocusSignal": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/PolygenicArchitecture.lean::expectedSquaredEffect": {
+      "quantity": "h2",
+      "convention": "snp",
+      "role": "consumer",
+      "note": "Per-SNP variance h2/M over a marker panel."
+    },
+    "Calibrator/SampleOverlapBias.lean::kinshipInflation": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/SampleOverlapBias.lean::partialOverlapR2": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
+    },
+    "Calibrator/TransferLearningPGS.lean::privateArchitectureTransferCeiling": {
+      "quantity": "h2",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees."
     }
   }
 }

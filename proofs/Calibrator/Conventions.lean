@@ -305,7 +305,7 @@ corpus into status reporting before anyone tested the slice it names.
     reference/alternate allele swap `(p₁, p₂) ↦ (1-p₁, 1-p₂)`, invariant
     (`neiGst_allele_swap`); and `p₁ = p₂`, zero.
 
-    Empirical status: CONVENTION IDENTIFIED and NAME CORRECTED (Nei `G_ST`). -/
+    Empirical status: CONVENTION PINNED (Nei's `G_ST`; the name was corrected with it). -/
 noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
   1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
     (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
@@ -333,7 +333,7 @@ is Nei's throughout and changing the arithmetic would silently move every
 downstream number; what was missing was a name for the quantity the corpus kept
 saying it meant.
 
-    Empirical status: matches `validation/differential/refs.fst_hudson`, which
+    Empirical status: VALIDATED -- matches `validation/differential/refs.fst_hudson`, which
     is checked against scikit-allel. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))

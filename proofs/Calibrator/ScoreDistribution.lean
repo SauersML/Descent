@@ -457,7 +457,7 @@ lattice term that dominates KS. Once weights are continuous the lattice term van
 agrees with skewness (`1.31`). A Berry–Esseen bound is not a claim about measured
 distributional distance.
 
-Empirical status: **the block count is VALIDATED, the `√ℓ` constant is FALSIFIED and
+Empirical status: **MIXED** -- the block count is VALIDATED, the `√ℓ` constant is FALSIFIED and
 replaced.** Measurements in `proofs/validation/empirical/block_count/`; positive control (`ℓ = 1`,
 three independent generators) reproduces the analytic independent-panel value to
 `1.001 ± 0.003`. -/

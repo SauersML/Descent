@@ -5188,6 +5188,7 @@ def run_mathlib() -> int:
 # twice deleted correct work here.  A ledger entry's `source` is free text that
 # no rule inspects.
 
+CONVENTION_STATUS_BUDGET = 0       # `Empirical status:` heads outside the closed vocabulary
 CONVENTION_UNLEDGERED_BUDGET = 0   # complete-scope declarations with no ledger entry
 CONVENTION_STALE_BUDGET = 0        # ledger entries naming declarations that are gone
 CONVENTION_UNBRIDGED_BUDGET = 0    # incompatible conventions sharing a module, unrelated
@@ -5207,6 +5208,22 @@ CONVENTION_NEXT_DECL = re.compile(
     r"^(?:@\[|/-|noncomputable\s|def\s|theorem\s|lemma\s|abbrev\s|structure\s|class\s|"
     r"instance\s|inductive\s|section\b|end\b|namespace\b|open\b|variable\b)", re.M)
 CONVENTION_NUMBER = re.compile(r"(?<![A-Za-z_0-9'₀-₉.])([0-9]+(?:\.[0-9]+)?)")
+
+# The head of an `Empirical status:` line: everything up to the first bracket,
+# dash, comma, full stop, semicolon, colon or newline.  Deliberately NOT the
+# whole status text -- `MEASURED` is also ordinary English inside the evidence
+# tables ("against measured 0.53297"), and a whole-text rule produced 99
+# findings of which none was a defect.
+CONVENTION_STATUS = re.compile(r"Empirical status:[ \t]*(.{0,140})", re.S)
+
+
+def convention_status_head(text: str) -> str:
+    """The vocabulary term a status line claims, stripped of emphasis."""
+    head = text.lstrip()
+    while head.startswith("*"):
+        head = head.lstrip("*").lstrip()
+    head = re.split(r"[(\[,.;:\n]|--|—|\*\*", head)[0]
+    return " ".join(head.split()).rstrip("`")
 
 
 def convention_words(name: str) -> set:
@@ -5235,18 +5252,40 @@ def convention_body(src: str, name: str) -> str | None:
     return rest[:nxt.start()] if nxt else rest
 
 
-def convention_corpus() -> tuple[dict, dict, set]:
-    """(defs by `module::name`, module source by module, every theorem short name)."""
-    defs, sources, theorems = {}, {}, set()
+CONVENTION_BINDER = re.compile(r"\(([^()]*?):")
+
+
+def convention_corpus() -> tuple[dict, dict, set, dict]:
+    """(defs by `module::name`, source by module, theorem short names, binder words).
+
+    The binder words are what lets the guard see a definition that CONSUMES an
+    `F_ST` without being named for one.  That is where the convention mismatch
+    actually bites: `presentDayPGSVariance (V_A fst)` reads its argument as a
+    heterozygosity retention and says so, and a caller holding a Hudson value is
+    making a claim the body does not.  Thirty-three such consumers exist and
+    three of them declared their reading.
+    """
+    defs, sources, theorems, binders = {}, {}, set(), {}
     for path in ident_lean_files():
         rel = os.path.relpath(path, IDENT_ROOT)
         src = ident_strip_comments(read_source(Path(path)))
         sources[rel] = src
-        for m in CONVENTION_DEF.finditer(src):
-            defs[f"{rel}::{m.group(1)}"] = m.group(1)
+        starts = list(CONVENTION_DEF.finditer(src))
+        for i, m in enumerate(starts):
+            key = f"{rel}::{m.group(1)}"
+            defs[key] = m.group(1)
+            end = starts[i + 1].start() if i + 1 < len(starts) else len(src)
+            chunk = src[m.end():end]
+            cut = chunk.find(":=")
+            signature = chunk[:cut] if cut >= 0 else chunk[:400]
+            words: set = set()
+            for group in CONVENTION_BINDER.findall(signature):
+                for token in group.split():
+                    words |= convention_words(token)
+            binders[key] = words
         for m in CONVENTION_THM.finditer(src):
             theorems.add(m.group(1).split(".")[-1])
-    return defs, sources, theorems
+    return defs, sources, theorems, binders
 
 
 def convention_connected(present: set, edges: set) -> list:
@@ -5292,7 +5331,7 @@ def run_conventions() -> int:
     quantities = ledger.get("quantities", {})
     entries = ledger.get("declarations", {})
     known_conventions = set(ledger.get("conventions", {}))
-    defs, sources, theorems = convention_corpus()
+    defs, sources, theorems, binders = convention_corpus()
 
     # `verified_constants` records values read against a published source that
     # fall OUTSIDE the ledgered quantity families -- the Ohta-Kimura 10/2/11, the
@@ -5303,7 +5342,40 @@ def run_conventions() -> int:
     verified = {k: v for k, v in ledger.get("verified_constants", {}).items()
                 if not k.startswith("$")}
 
-    stale, unledgered, unbridged, constants, malformed = [], [], [], [], []
+    stale, unledgered, unbridged, constants, malformed, statuses = [], [], [], [], [], []
+
+    # STATUS.  A closed vocabulary of `Empirical status:` heads.  A status marker
+    # exists to be COUNTED -- the corpus's own coverage denominator is built from
+    # these -- and a vocabulary that drifts cannot be counted.  The defect that
+    # motivated this: one verdict written in two cases at once, 138 times in
+    # capitals and 5 in lower case.
+    vocabulary = ledger.get("empirical_status_vocabulary", {}).get("terms", {})
+    status_seen = 0
+    if vocabulary:
+        folded = {term.lower(): term for term in vocabulary}
+        for module, src in sorted(sources.items()):
+            raw = read_source(Path(IDENT_ROOT) / module)
+            for m in CONVENTION_STATUS.finditer(raw):
+                head = convention_status_head(m.group(1))
+                status_seen += 1
+                if head in vocabulary:
+                    continue
+                # Longest canonical term the head STARTS with, so a term may be
+                # followed by its own qualifying words without a finding.
+                if any(head.startswith(t) and (len(head) == len(t) or not head[len(t)].isalpha())
+                       for t in vocabulary):
+                    continue
+                lineno = raw[:m.start()].count("\n") + 1
+                canonical = folded.get(head.lower())
+                if canonical:
+                    statuses.append(
+                        f"{module}:{lineno}: status head {head!r} is {canonical!r} in the "
+                        f"wrong case; one verdict under two spellings cannot be counted")
+                else:
+                    statuses.append(
+                        f"{module}:{lineno}: status head {head!r} is not in the vocabulary; "
+                        f"use an existing term, or adjudicate a new one INTO "
+                        f"`empirical_status_vocabulary` rather than beside it")
 
     for key in sorted(set(verified) & set(entries)):
         malformed.append(f"{key}: appears in both `declarations` and "
@@ -5349,19 +5421,38 @@ def run_conventions() -> int:
     # work, and it is not allowed to look like coverage it does not have.
     complete = {q: set(spec.get("words", []))
                 for q, spec in quantities.items() if spec.get("scope") == "complete"}
-    matched = 0
+    # A quantity may ALSO be scoped over argument names.  A definition that
+    # consumes an `fst` is where a convention mismatch does its damage, and being
+    # unnamed for it is no protection.
+    by_argument = {q: set(spec.get("words", []))
+                   for q, spec in quantities.items()
+                   if spec.get("argument_scope") == "complete"}
+    matched = consumers = 0
     for key, name in sorted(defs.items()):
         words = convention_words(name)
         for quantity, quantity_words in complete.items():
-            if not (words & quantity_words):
+            hit = words & quantity_words
+            if not hit:
                 continue
             matched += 1
             if key not in entries:
                 unledgered.append(
-                    f"{key}: carries the `{quantity}` word "
-                    f"{sorted(words & quantity_words)} and has no ledger entry, so "
-                    f"which {quantity} it is is stated nowhere a machine can read")
+                    f"{key}: carries the `{quantity}` word {sorted(hit)} and has no "
+                    f"ledger entry, so which {quantity} it is is stated nowhere a "
+                    f"machine can read")
             break
+        else:
+            for quantity, quantity_words in by_argument.items():
+                hit = binders.get(key, set()) & quantity_words
+                if not hit:
+                    continue
+                consumers += 1
+                if key not in entries:
+                    unledgered.append(
+                        f"{key}: takes a `{quantity}` ARGUMENT {sorted(hit)} and has "
+                        f"no ledger entry, so which {quantity} a caller must supply "
+                        f"is stated nowhere a machine can read")
+                break
 
     # UNBRIDGED.  `inherited` commits to no convention and is excluded: a body
     # that returns whatever it was handed cannot disagree with anything.
@@ -5369,7 +5460,7 @@ def run_conventions() -> int:
     for key, entry in entries.items():
         module = key.partition("::")[0]
         conv = entry.get("convention")
-        if conv and conv != "inherited":
+        if conv and conv not in ("inherited", "undetermined"):
             by_module.setdefault((module, entry.get("quantity")), set()).add(conv)
     for (module, quantity), present in sorted(by_module.items()):
         spec = quantities.get(quantity, {})
@@ -5401,6 +5492,10 @@ def run_conventions() -> int:
 
     failures = []
     for label, found, budget, advice in (
+        ("`Empirical status:` heads outside the closed vocabulary", statuses,
+         CONVENTION_STATUS_BUDGET,
+         "the vocabulary is `empirical_status_vocabulary` in the ledger; a new "
+         "verdict belongs IN it, with what it means, not beside it"),
         ("ledger entries that no longer match the corpus", stale,
          CONVENTION_STALE_BUDGET,
          "repoint the entry, or delete it if the declaration is gone for good"),
@@ -5429,18 +5524,237 @@ def run_conventions() -> int:
             print(line)
         return 1
 
+    undetermined = sum(1 for e in entries.values()
+                       if e.get("convention") == "undetermined")
     scoped = sorted(q for q, s in quantities.items() if s.get("scope") == "complete")
     unscoped = sorted(q for q, s in quantities.items() if s.get("scope") != "complete")
     with_constants = sum(1 for e in checked.values() if e.get("constants"))
     print(f"conventions guard passes: {len(entries)} ledger entries over "
-          f"{matched} matching declarations in {len(defs)} corpus definitions; "
+          f"{matched} declarations NAMED for a scoped quantity and {consumers} "
+          f"that merely CONSUME one, in {len(defs)} corpus definitions; "
+          f"{undetermined} of those entries carry `undetermined`, which is "
+          f"enumerated debt and not coverage; "
           f"quantities scoped complete: {', '.join(scoped)}; "
           f"registered but unscoped (checked for nothing): "
           f"{', '.join(unscoped) or 'none'}; "
           f"{len(verified)} source-verified constant records outside those "
           f"families; {with_constants} entries pin a constant multiset; "
-          f"{len(bridge_edges)} bridge theorem(s) present")
+          f"{len(bridge_edges)} bridge theorem(s) present; "
+          f"{status_seen} `Empirical status:` heads all inside a closed "
+          f"vocabulary of {len(vocabulary)} terms")
     return 0
+
+# ======================================================================================
+# LEDGER: the simulation-coverage verdict record against the docstrings
+# ======================================================================================
+#
+# WHAT THIS CATCHES, and why it is a guard rather than a habit.
+#
+# Coverage in this corpus is a DOCSTRING property -- a definition counts as
+# measured when its own `Empirical status:` line says so -- while the evidence
+# lives in `proofs/validation/empirical/simcov/`, in sixty-odd battery result
+# files that nothing read.  Two things follow, and both happened:
+#
+#   * batteries ran AHEAD of the docstrings.  Definitions carried a real verdict
+#     and still read UNTESTED, so the coverage number understated what had been
+#     established and nobody could tell which.
+#   * docstrings ran AHEAD of the batteries.  Definitions read VALIDATED off a
+#     MATCH that no competing formula was ever run against, which is not a
+#     validation: an oracle algebraically pinned to the body under test cannot
+#     reject anything, so agreement with it is arithmetic.  `driftVariance`,
+#     `haplotypeHomozygosity` and `multiTraitEffectiveSampleSize` were each
+#     banked that way.
+#
+# `simcov/ledger.json` is the committed record, emitted by `simcov/ledger.py`
+# from the battery results.  THE COMPETITOR GATE IS APPLIED AT EMIT TIME: a
+# corpus row that agrees with its oracle while no competing formula was rejected
+# on the same cells is recorded as UNINFORMATIVE, not MATCH.  That is why rule 3
+# below reads as though it can never fire -- it fires only if someone hand-edits
+# the ledger, which is exactly the hole a generated-and-committed file has.
+#
+# The guard is deterministic, needs no simulator, no numpy and no network, and
+# anchors everything on DECLARATION NAMES.  Nothing here pins a line number:
+# `empirical/extract/test_parser.py` is a standing demonstration of what happens
+# when a check does.
+#
+# THE RULES, all at budget 0:
+#
+#   1. A docstring citing a battery FILE the ledger has never seen.  A renamed
+#      or deleted battery leaves a citation pointing at nothing, and a citation
+#      that cannot be followed is worse than none: it reads as evidence.
+#   2. A docstring that cites a battery whose results are STALE -- the battery's
+#      source is newer than the results file, so the numbers quoted came from a
+#      source that no longer exists.
+#   3. A ledger record banking agreement with no competitor rejected.
+#   4. A definition whose docstring cites a battery while the ledger holds both
+#      an agreeing and a disagreeing verdict for it, with no adjudication.  A
+#      definition cannot be both validated and falsified; one of the two designs
+#      is wrong and the docstring has to say which.
+#
+# REPORTED, NOT GATED, and named as outstanding work rather than given a budget:
+# definitions whose docstring asserts agreement while every ledger record for
+# them disagrees.  These are real findings -- each is either a stale docstring
+# or a stale record -- but a verdict is evidence about the FORMULA a battery
+# transcribed, and when a body is corrected the old record becomes history.
+# Deciding that automatically needs the transcription and the Lean body to be
+# comparable, and they are not: `sum beta_i^2` and `∑ i : Fin m, β i ^ 2` are
+# the same formula and share no text.  Until each is adjudicated by hand the
+# count is printed in full, with names, so it cannot be mistaken for zero.
+
+LEDGER_PATH = PROOFS / "validation" / "empirical" / "simcov" / "ledger.json"
+
+# The verdicts that assert the corpus body agrees with a measurement, and those
+# that assert it disagrees.  Everything else -- UNINFORMATIVE, SELF-TEST, VOID,
+# NO POWER, LEAD -- asserts nothing and is not evidence in either direction.
+LEDGER_AGREES = {"MATCH", "VALIDATED"}
+LEDGER_DISAGREES = {"FALSIFIED", "REFUTED"}
+DOC_ASSERTS_AGREEMENT = {"VALIDATED", "MEASURED", "TESTED"}
+DOC_ASSERTS_DISAGREEMENT = {"FALSIFIED", "REFUTED"}
+
+BATTERY_CITE = re.compile(r"simcov/battery_([A-Za-z0-9_]+)\.py")
+EMPIRICAL_STATUS = re.compile(r"Empirical status:\s*[*_ ]*([A-Za-z_]+)")
+STATUS_WORDS = ("UNTESTED", "VALIDATED", "FALSIFIED", "DERIVED", "MEASURED",
+                "VACUOUS", "CONVENTION", "TESTED", "REFUTED")
+
+
+def _ledger_docstrings():
+    """[(declaration, file, docstring)] for every top-level `def`.
+
+    Anchored at column 0 and on the same file set as `ident_lean_files`, so this
+    guard and the rest of check.py disagree about nothing.  A second, private
+    idea of what counts as a definition is how `empirical/extract` came to parse
+    zero of them and exit 0.
+    """
+    out = []
+    for path in ident_lean_files():
+        try:
+            raw = Path(path).read_text(errors="ignore")
+        except OSError:
+            continue
+        lines = raw.split("\n")
+        for i, line in enumerate(lines):
+            m = re.match(r"^(?:noncomputable\s+)?def\s+([A-Za-z_][\w.']*)", line)
+            if not m:
+                continue
+            j = i - 1
+            while j >= 0 and (not lines[j].strip()
+                              or lines[j].lstrip().startswith("@[")):
+                j -= 1
+            if j < 0 or not lines[j].rstrip().endswith("-/"):
+                continue
+            end = j
+            while j >= 0 and "/--" not in lines[j]:
+                if "/-!" in lines[j] or ("-/" in lines[j] and j != end):
+                    j = -1
+                    break
+                j -= 1
+            if j < 0:
+                continue
+            out.append((m.group(1).split(".")[-1], Path(path).name,
+                        "\n".join(lines[j:end + 1])))
+    return out
+
+
+def run_ledger() -> int:
+    if not LEDGER_PATH.exists():
+        print(f"ledger guard: {LEDGER_PATH} is absent; regenerate it with "
+              f"`python3 proofs/validation/empirical/simcov/ledger.py "
+              f"<results-dir>`")
+        return 1
+    try:
+        led = json.loads(LEDGER_PATH.read_text())
+    except (OSError, ValueError) as exc:
+        print(f"ledger guard: {LEDGER_PATH} is unreadable: {exc}")
+        return 1
+
+    records = led.get("records", [])
+    corpus_rows = [r for r in records if r.get("role") == "corpus"]
+    batteries = {r.get("battery") for r in records}
+    freshness = {r.get("battery"): r.get("freshness", "") for r in records}
+    by_decl = {}
+    for r in corpus_rows:
+        by_decl.setdefault(r["declaration"], []).append(r)
+
+    adjudicated = set(led.get("adjudications", {}))
+
+    dangling, stale_cite, uncompeted, unadjudicated, contradicted = \
+        [], [], [], [], []
+
+    for name, fname, doc in _ledger_docstrings():
+        cited = set(BATTERY_CITE.findall(doc))
+        for bat in sorted(cited):
+            if bat not in batteries:
+                dangling.append(f"{name} ({fname}) cites simcov/battery_{bat}.py, "
+                                f"which the ledger has never seen")
+            elif "STALE" in freshness.get(bat, ""):
+                stale_cite.append(f"{name} ({fname}) cites simcov/battery_{bat}.py, "
+                                  f"whose results are {freshness[bat]}")
+        heads = {r["verdict"] for r in by_decl.get(name, ())}
+        if cited and (heads & LEDGER_AGREES) and (heads & LEDGER_DISAGREES) \
+                and name not in adjudicated:
+            unadjudicated.append(
+                f"{name} ({fname}) has both {sorted(heads & LEDGER_AGREES)} and "
+                f"{sorted(heads & LEDGER_DISAGREES)} in the ledger and cites a "
+                f"battery, with no adjudication saying which design is wrong")
+        tail = doc[doc.index("Empirical status:"):] if "Empirical status:" in doc else ""
+        states = {w for w in STATUS_WORDS if re.search(r"\b" + w + r"\b", tail)}
+        if (states & DOC_ASSERTS_AGREEMENT) and (heads & LEDGER_DISAGREES) \
+                and not (heads & LEDGER_AGREES):
+            contradicted.append(
+                f"{name} ({fname}) docstring asserts "
+                f"{sorted(states & DOC_ASSERTS_AGREEMENT)} while every ledger "
+                f"record for it says {sorted(heads & LEDGER_DISAGREES)}")
+
+    for r in corpus_rows:
+        if r["verdict"] in LEDGER_AGREES and not r.get("competitors_rejected"):
+            uncompeted.append(
+                f"{r['declaration']} [{r['battery']}] banks {r['verdict']} with "
+                f"no competing formula rejected on the same cells; "
+                f"simcov/ledger.py records that as UNINFORMATIVE, so this row "
+                f"was hand-edited")
+
+    bad = []
+    for label, found, advice in (
+        ("docstring citations to a battery the ledger has never seen",
+         dangling, "re-emit the ledger, or drop the citation"),
+        ("docstring citations to a battery whose results are stale",
+         stale_cite, "re-run that battery so its results are newer than its "
+                     "source, then re-emit the ledger"),
+        ("ledger rows banking agreement with no competitor rejected",
+         uncompeted, "re-emit the ledger with simcov/ledger.py; the gate is "
+                     "applied at emit time and cannot be satisfied by editing"),
+        ("definitions with contradictory ledger verdicts and no adjudication",
+         unadjudicated, "add an `adjudications` entry naming the authoritative "
+                        "battery and saying why the other design is wrong"),
+    ):
+        if found:
+            bad.append(f"{label}: {len(found)}, budget 0; {advice}")
+            bad.extend("    " + x for x in sorted(set(found)))
+
+    if bad:
+        for line in bad:
+            print(line)
+        return 1
+
+    verdict_census = {}
+    for r in corpus_rows:
+        verdict_census[r["verdict"]] = verdict_census.get(r["verdict"], 0) + 1
+    print(f"ledger guard passes: {len(records)} records over {len(batteries)} "
+          f"batteries, {len(corpus_rows)} of them about corpus bodies; "
+          f"verdicts after the emit-time competitor gate: "
+          + ", ".join(f"{k}={v}" for k, v in
+                      sorted(verdict_census.items(), key=lambda kv: -kv[1])))
+    if contradicted:
+        print(f"\nREPORTED, NOT GATED -- {len(contradicted)} definitions assert "
+              f"agreement while every ledger record for them disagrees. Each is "
+              f"either a stale docstring or a record against a body that has "
+              f"since been corrected, and telling those apart needs a human "
+              f"because a transcription and a Lean body share no text. This "
+              f"count is printed in full rather than carried as a budget:")
+        for line in sorted(set(contradicted)):
+            print("    " + line)
+    return 0
+
 
 # ======================================================================================
 # DISPATCHER
@@ -5466,6 +5780,7 @@ GUARDS = {
     "closure":         dict(fn=run_closure,         gated=True,  takes_argv=False),
     "wiring":          dict(fn=run_wiring,          gated=True,  takes_argv=True),
     "conventions":     dict(fn=run_conventions,     gated=True,  takes_argv=False),
+    "ledger":          dict(fn=run_ledger,          gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
 }
 

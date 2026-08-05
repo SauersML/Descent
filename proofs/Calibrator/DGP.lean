@@ -34,7 +34,19 @@ cluster" for the two failure shapes and the rule they share, recorded next to
 
 /-- **Scaled mutation rate** `θ = 4 Nₑ μ`, the fundamental parameter of neutral theory.
 
-    Empirical status: UNTESTED. -/
+    Regime: neutral, single panmictic population, infinite alleles.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`). A scaling
+    cannot be measured on its own, so it is read through the infinite-alleles
+    equilibrium heterozygosity `θ/(1+θ)`, which is separately validated at
+    `PortabilityDrift.hetMutationFloor`. The body predicts 0.50000, 0.50000,
+    0.20000 and 0.20000 against measured 0.53297 ± 0.01697, 0.46858 ± 0.01307,
+    0.20081 ± 0.00688 and 0.21293 ± 0.00801 -- worst cell 2.40 sems.
+
+    Power: `Nₑ` and `μ` are swept by a factor of four INDEPENDENTLY, so two
+    cells reach `θ = 1` and two reach `θ = 4` by different routes. A wrong
+    numeric factor and a wrong `Nₑ`-dependence each break one of those pairs,
+    which a sweep holding `4·Nₑ·μ` fixed could not detect at all. -/
 noncomputable def scaledMutationRate (Ne μ : ℝ) : ℝ :=
   4 * Ne * μ
 
@@ -48,7 +60,18 @@ theorem scaledMutationRate_div_mu (Ne μ : ℝ) (h : μ ≠ 0) :
 
 /-- **Scaled migration rate** `M = 4 Nₑ m`, the same scaling applied to gene flow.
 
-    Empirical status: UNTESTED. -/
+    Regime: two-deme island model, `m` the total emigration rate.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`). Read through
+    the two-deme island `F_ST` from coalescence times against `1/(1 + 2·M)`,
+    where the factor two is `islandDemeCorrection` at `n = 2` -- the deme count
+    matters and a deme-blind law would be off by it. The body predicts 0.33333,
+    0.33333, 0.11111 and 0.11111 against measured 0.31967 ± 0.01809, 0.30661 ±
+    0.01138, 0.10482 ± 0.00611 and 0.10891 ± 0.00467, worst cell 2.35 sems.
+
+    Power: as for `scaledMutationRate`, `Nₑ` and `m` are swept by a factor of
+    four INDEPENDENTLY, so `M = 1` and `M = 4` are each reached twice by
+    different routes and the `Nₑ`-dependence is separately on trial. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ :=
   4 * Ne * m
 
@@ -68,7 +91,25 @@ derives it as the rest point of `scaledIdentityStep` at scaled rate `θ`. That t
 in another module, so a guard looking for a fixed-point result beside the definition will
 not find it.
 
-    Empirical status: UNTESTED. -/
+    Regime: infinite alleles, single panmictic population at mutation-drift
+    equilibrium. The quantity is the probability that two alleles drawn at
+    random are IDENTICAL BY STATE -- the complement of heterozygosity, not a
+    between-population differentiation despite the `fst` in the name.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`, and
+    independently `battery_bulk20b.py` on its complement). Measured against
+    `msprime`'s `InfiniteAlleles` model: the body predicts 0.50000, 0.50000,
+    0.20000 and 0.20000 at `θ = 1, 1, 4, 4` against measured 0.53297 ± 0.01697,
+    0.46858 ± 0.01307, 0.20081 ± 0.00688 and 0.21293 ± 0.00801 -- worst cell
+    2.40 sems.
+
+    Power: `Nₑ` and `μ` are swept by a factor of four INDEPENDENTLY, so each
+    `θ` is reached twice by different routes and a wrong `Nₑ`-dependence breaks
+    one of the pair. Corroboration: `PortabilityDrift.hetMutationFloor` is the
+    complement `θ/(1+θ)` and was measured on a separate run over `θ` = 0.1 to
+    10 -- a hundredfold sweep -- at worst 2.17 sems, with an Ewens
+    expected-allele-count control passing at 1.10 sems. Two runs, two
+    complementary observables, one law. -/
 noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
   1 / (1 + θ)
 
@@ -292,6 +333,27 @@ and defines LD as the causal-tag correlation matrix under a joint law on `(X_cau
 structure TaggedDataGeneratingProcess (c t : ℕ) where
   trueExpectation : CausalVec c → TagVec t → ℝ
   jointMeasureCT : Measure (CausalVec c × TagVec t)
+
+/-- **The tagged process class is inhabited.** Every result in this section is
+universally quantified over a `TaggedDataGeneratingProcess`, and the structure
+imposes no probability constraint on `jointMeasureCT`, so nothing in the type
+forces a model to exist; this exhibits one.
+
+WHAT THIS DOES NOT ESTABLISH, stated because a witness is easy to overread: the
+zero law is the DEGENERATE point of the parameter space, the one the three
+`_at_zero_law` theorems below are about. Inhabitation is all it gives. A
+nondegenerate witness -- a genuine joint law with a nonzero causal-tag
+cross-covariance, which is what would make `crossCovEntry` a statement about
+tagging rather than about integrating against nothing -- needs a constructed
+probability measure on the product space and is not supplied here. -/
+noncomputable def TaggedDataGeneratingProcess.witness (c t : ℕ) :
+    TaggedDataGeneratingProcess c t where
+  trueExpectation := fun _ _ ↦ 0
+  jointMeasureCT := 0
+
+instance TaggedDataGeneratingProcess.instNonempty (c t : ℕ) :
+    Nonempty (TaggedDataGeneratingProcess c t) :=
+  ⟨TaggedDataGeneratingProcess.witness c t⟩
 
 /-- Mean of causal coordinate `i` under the joint tagged law. -/
 noncomputable def causalMean {c t : ℕ}
@@ -1274,6 +1336,62 @@ structure GeneticArchitecture (k : ℕ) where
 noncomputable def totalVariance {k : ℕ} (arch : GeneticArchitecture k) (c : Fin k → ℝ) : ℝ :=
   arch.V_genic c + arch.V_cov c
 
+/-- **The genetic variance after selection has acted**, `V_genic + V_cov +
+selection_effect`.
+
+The field `selection_effect` carries a sign convention in its docstring --
+positive divergent, negative stabilizing -- and until this definition existed
+that convention was prose that nothing could contradict: `totalVariance` is the
+sum of the other two fields, so every theorem about an architecture was blind to
+selection and the field was carried without being read. The convention IS this
+displacement, so it is written as one, and the three theorems below are the
+convention restated where a proof can check it.
+
+    Regime: an ancestry-indexed LD environment at fixed allele frequencies, with
+    selection entering as an additive displacement of the between-population
+    variance rather than through a change in the frequencies themselves. That is
+    what makes it a decomposition and not a dynamic: a model in which selection
+    moved the frequencies would move `V_genic` too, and the displacement could
+    not be read off separately.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a definitional decomposition of
+    the architecture's own fields. What could be measured is the modelling claim
+    that a selection regime is summarised by a single additive displacement, and
+    that belongs at whatever supplies the displacement, not here. -/
+noncomputable def selectedTotalVariance {k : ℕ} (arch : GeneticArchitecture k)
+    (c : Fin k → ℝ) : ℝ :=
+  totalVariance arch c + arch.selection_effect c
+
+/-- **Neutrality is the case that `totalVariance` was already about.** With no
+selection effect the two variances agree, so the earlier results are the zero
+section of this one rather than a different model. -/
+theorem selectedTotalVariance_of_no_selection {k : ℕ} (arch : GeneticArchitecture k)
+    (c : Fin k → ℝ) (hneutral : arch.selection_effect c = 0) :
+    selectedTotalVariance arch c = totalVariance arch c := by
+  unfold selectedTotalVariance
+  rw [hneutral, add_zero]
+
+/-- **Divergent selection inflates the between-population variance.** This is
+the positive half of the field's sign convention, and it is now a theorem rather
+than a comment. -/
+theorem totalVariance_lt_selectedTotalVariance_of_divergent {k : ℕ}
+    (arch : GeneticArchitecture k) (c : Fin k → ℝ)
+    (hdivergent : 0 < arch.selection_effect c) :
+    totalVariance arch c < selectedTotalVariance arch c := by
+  unfold selectedTotalVariance
+  linarith
+
+/-- **Stabilizing selection deflates it**, the negative half of the same
+convention. Both directions are stated because a one-sided claim is compatible
+with a field that only ever takes one sign, and the divergent/stabilizing
+distinction is exactly the claim that it takes both. -/
+theorem selectedTotalVariance_lt_totalVariance_of_stabilizing {k : ℕ}
+    (arch : GeneticArchitecture k) (c : Fin k → ℝ)
+    (hstabilizing : arch.selection_effect c < 0) :
+    selectedTotalVariance arch c < totalVariance arch c := by
+  unfold selectedTotalVariance
+  linarith
+
 /-- Reference evaluation: an architecture with no genic and no covariance component has no
 total variance. -/
 theorem totalVariance_at_zero_components {k : ℕ} (arch : GeneticArchitecture k)
@@ -1529,6 +1647,49 @@ theorem decaySlope_at_zero_efficiency {k : ℕ} (mech : LDDecayMechanism k) (c :
   unfold decaySlope
   exact hzero
 
+/-- **The exponential tagging mechanism at a given distance proxy**: tagging
+efficiency `ρ²(d) = e^{-d}`, the law whose non-affineness in the distance is what
+`ld_decay_implies_nonlinear_calibration_of_exp_tagging` in the corpus root turns
+into a nonlinear calibration curve.
+
+`LDDecayMechanism` had no exhibited inhabitant, so that root theorem and
+`decaySlope_at_zero_efficiency` were quantified over a class nothing had been
+shown to belong to. Carrying the distance proxy as a parameter rather than
+fixing it keeps the mechanism's two fields independent: the decay law is the
+modelling claim, the distance is the study's own PC geometry, and a witness that
+fixed both would tie a general statement to one design.
+
+    Regime: tagging efficiency depending on genetic distance alone, with the
+    distance measured in whatever units the proxy supplies. The exponential is
+    the mechanism this corpus's nonlinearity result assumes, not one derived
+    here.
+
+    Empirical status: UNTESTED. An assumed functional form for LD decay with
+    distance; the corpus result it feeds is about the SHAPE being non-affine,
+    which is a property of this body rather than a measurement of it. -/
+noncomputable def LDDecayMechanism.exponentialTagging {k : ℕ}
+    (distance : (Fin k → ℝ) → ℝ) : LDDecayMechanism k where
+  distance := distance
+  tagging_efficiency := fun d ↦ Real.exp (-d)
+
+/-- The decay slope of the exponential mechanism is `e^{-d}` at the realised
+distance -- positive everywhere, so this mechanism never reaches the vanishing
+branch named by `decaySlope_at_zero_efficiency`. The two together say that the
+zero branch is a real possibility for the class and not one the exponential law
+exhibits. -/
+theorem decaySlope_exponentialTagging {k : ℕ} (distance : (Fin k → ℝ) → ℝ)
+    (c : Fin k → ℝ) :
+    decaySlope (LDDecayMechanism.exponentialTagging distance) c =
+      Real.exp (-(distance c)) := rfl
+
+/-- Positivity of the exponential tagging slope, stated so the contrast with the
+zero branch is available as a fact rather than as an observation. -/
+theorem decaySlope_exponentialTagging_pos {k : ℕ} (distance : (Fin k → ℝ) → ℝ)
+    (c : Fin k → ℝ) :
+    0 < decaySlope (LDDecayMechanism.exponentialTagging distance) c := by
+  rw [decaySlope_exponentialTagging]
+  exact Real.exp_pos _
+
 
 theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
     (arch : GeneticArchitecture k) (c : Fin k → ℝ)
@@ -1537,6 +1698,54 @@ theorem optimal_slope_trace_variance {k : ℕ} [Fintype (Fin k)]
       1 + (arch.V_cov c) / (arch.V_genic c) := by
   unfold optimalSlopeFromVariance totalVariance
   rw [add_div, div_self h_genic_pos]
+
+/-- **The neutral unlinked architecture at a given genic variance.** Structural
+covariance vanishes because the loci are unlinked, and the selection displacement
+vanishes because the regime is neutral; the genic component is left free, since
+it is the one thing an architecture must still say.
+
+Every result above is universally quantified over a `GeneticArchitecture`, and
+until this existed the class had no exhibited inhabitant at all -- so those
+results were true in the way a statement about an empty domain is true. It is
+stated as a FAMILY rather than a single witness because a fixed witness would
+also fix the genic variance, and then the theorems below would hold at one value
+rather than at every value. -/
+noncomputable def GeneticArchitecture.neutralUnlinked {k : ℕ}
+    (genic : (Fin k → ℝ) → ℝ) : GeneticArchitecture k where
+  V_genic := genic
+  V_cov := fun _ ↦ 0
+  selection_effect := fun _ ↦ 0
+
+/-- With no structural covariance the total variance is the genic variance: the
+`V_cov` term is what LD contributes and it contributes nothing here. -/
+theorem totalVariance_neutralUnlinked {k : ℕ} (genic : (Fin k → ℝ) → ℝ)
+    (c : Fin k → ℝ) :
+    totalVariance (GeneticArchitecture.neutralUnlinked genic) c = genic c := by
+  unfold totalVariance GeneticArchitecture.neutralUnlinked
+  simp
+
+/-- Neutrality is visible in the selected variance too: with no displacement the
+selected and unselected totals agree, so `selectedTotalVariance_of_no_selection`
+has a family it applies to rather than only a hypothesis. -/
+theorem selectedTotalVariance_neutralUnlinked {k : ℕ} (genic : (Fin k → ℝ) → ℝ)
+    (c : Fin k → ℝ) :
+    selectedTotalVariance (GeneticArchitecture.neutralUnlinked genic) c =
+      totalVariance (GeneticArchitecture.neutralUnlinked genic) c :=
+  selectedTotalVariance_of_no_selection _ c rfl
+
+/-- **The optimal slope is exactly one on the neutral unlinked architecture.**
+
+This is the reference the LD results are stated against.
+`directionalLD_nonzero_implies_slope_ne_one` says a nonzero `V_cov` forces the
+slope away from one; without an architecture that actually attains one, that
+theorem rules out a value nothing was shown to take. Here the value is
+attained, at every positive genic variance. -/
+theorem optimalSlopeFromVariance_neutralUnlinked {k : ℕ} [Fintype (Fin k)]
+    (genic : (Fin k → ℝ) → ℝ) (c : Fin k → ℝ) (hgenic : genic c ≠ 0) :
+    optimalSlopeFromVariance (GeneticArchitecture.neutralUnlinked genic) c = 1 := by
+  rw [optimal_slope_trace_variance _ c (by simpa [GeneticArchitecture.neutralUnlinked]
+    using hgenic)]
+  simp [GeneticArchitecture.neutralUnlinked]
 
 noncomputable def var {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k)
     (f : ℝ → (Fin k → ℝ) → ℝ) : ℝ :=
@@ -2198,7 +2407,21 @@ noncomputable def EvolutionaryParameters.witness : EvolutionaryParameters where
 
 /-- Scaled drift parameter: τ = t/(2Ne).
 
-    Empirical status: UNTESTED. -/
+    Regime: a clean split with no migration; `τ` is read through the saturation
+    law `F_ST = τ/(1+τ)`.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk19.py`, corroborated
+    independently by `battery_bulk20.py` at `PortabilityDrift.coalescentTau`).
+    Predicted 0.20000, 0.20000, 0.50000 and 0.11111 against measured 0.20058 ±
+    0.00703, 0.19905 ± 0.00440, 0.49657 ± 0.00842 and 0.11493 ± 0.00292 --
+    worst cell 1.31 sems.
+
+    Power: `t_div` and `Nₑ` are swept by a factor of four INDEPENDENTLY, so two
+    cells reach `τ = 0.25` from different `(Nₑ, t)` pairs. The `2` in `2·Nₑ` is
+    therefore under test and not merely the ratio -- `t/Nₑ` or `t/(4·Nₑ)` would
+    miss by exactly the factor in the divisor. `battery_bulk20.py` reaches the
+    same conclusion on a different grid by inverting the saturation law to read
+    `F_ST/(1-F_ST)` as `τ` directly, at worst 2.24 sems. -/
 noncomputable def EvolutionaryParameters.tau (p : EvolutionaryParameters) : ℝ :=
   p.t_div / (2 * p.Ne)
 
@@ -2312,7 +2535,55 @@ theorem fstDriftFlowStep_at_one (p : EvolutionaryParameters) :
     `(1 - F)/(2 Nₑ)` against `2(m + μ)F` gives `F (1 + 4 Nₑ (m + μ)) = 1`, and
     `4 Nₑ (m + μ) = θ + M` is why the two scaled rates add.
 
-    Empirical status: UNTESTED. -/
+    Regime: two-deme island model with mutation, at mutation-migration-drift
+    balance.
+
+    Empirical status: **FALSIFIED** (`simcov/battery_bulk38.py`). The
+    derivation above balances two rates that are individually first-order and
+    reads their sum; the simulation says the composition is MULTIPLICATIVE, not
+    additive. Measured under `msprime`'s infinite-alleles model at `Nₑ = 500`,
+    with `F_ST` built from identity-by-state probabilities as
+    `(F_within - F_between)/(1 - F_between)` -- both measured, neither computed
+    from the body:
+
+      θ     M     F_ST measured      1/(1+θ+M)   1/((1+θ)(1+M))
+      1.0   1.0   0.2747 ± 0.0468    0.3333      0.2500
+      2.0   0.5   0.2546 ± 0.0178    0.2857      0.2222
+      0.5   2.0   0.2109 ± 0.0751    0.2857      0.2222
+      3.0   3.0   0.0921 ± 0.0121    0.1429      0.0625
+
+    This body misses by 4.22 sems at 55% relative. Both parameters are held at
+    order one simultaneously, which is the only regime where additivity and
+    multiplicativity separate -- they agree to first order whenever either is
+    small, which is the limit the derivation above is valid in.
+
+    REPLICATED. An independent run at different seeds reproduces every cell
+    within about one sem (0.2125, 0.2348, 0.2124, 0.1139 against 0.2747, 0.2546,
+    0.2109, 0.0921) and falsifies this body again, at 3.30 sems and 57%
+    relative. Its control passes at 0.53 sems. The falsification is therefore
+    not a single-run artefact -- which mattered to check, because
+    `PortabilityDrift.signalRetentionMigrationDrift` had a falsification
+    withdrawn this same session when its replication moved a cell by more than
+    its error bar.
+
+    NO SIMPLE COMPOSITION SURVIVES. `1/((1+θ)(1+M))` matched the first run at
+    2.45 sems and is FALSIFIED by the second at 3.01 sems -- it sits on the gate
+    boundary, so it is not the law either. Dropping either parameter is far
+    worse: `1/(1+θ)` misses by 8 to 13 sems and `1/(1+M)` by 23 to 28. So both
+    rates genuinely contribute and neither the sum nor the product of the two
+    first-order terms captures how. What the correct closed form is, this design
+    does not say.
+
+    Control: at `M = 200` the demes merge into one population of size `2·Nₑ`,
+    so the within-deme identity must be the panmictic infinite-alleles value at
+    the METAPOPULATION scaled rate `2·θ`. Measured 0.3640 ± 0.0290 against
+    0.3333, passing at 1.06 sems. That factor of two is itself the deme-count
+    blindness this corpus records on `fstMigrationDriftEquilibrium`; an earlier
+    version of the control demanded `1/(1+θ)` and failed on exactly it.
+
+    Both runs pass their control and neither depends on a calibration step that
+    could drift, which is what separates this record from the one that had to be
+    withdrawn. -/
 noncomputable def fstEquilibrium (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.theta + p.bigM)
 
@@ -3035,7 +3306,25 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     validation above is against that model, not against a dichotomised trait.
     The binary-trait counterpart is
     `PortabilityDrift.liabilityThresholdAUCFromExplainedR2`, which takes a
-    prevalence; do not substitute this one for it. -/
+    prevalence; do not substitute this one for it.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk33.py`, `group_a`).
+    The AUC is COUNTED, not computed: two Gaussian score distributions with
+    equal variance and a mean separation of `√vSignal`, and the observable is
+    the fraction of 800000 case/control pairs the score orders correctly.
+    Predicted 0.76025, 0.84134, 0.69146 and 0.69146 against counted 0.76058 ±
+    0.00048, 0.84098 ± 0.00041, 0.69207 ± 0.00052 and 0.69200 ± 0.00052 --
+    worst cell 1.17 sems at 0.09% relative.
+
+    Power: the two errors this shape attracts are carried on the same cells and
+    both are FALSIFIED. Dropping the factor of two, `Φ(√(vSignal/vNoise))`,
+    misses by 197 sems; dropping the square root, `Φ(vSignal/(2·vNoise))`,
+    misses by 181 sems. The `√2` is the standard deviation of the DIFFERENCE of
+    two independent equal-variance scores, which is what an AUC compares, and
+    the design pins it: the last two cells hold `vSignal/vNoise` fixed at 0.5
+    while moving both variances, so a body sensitive to their scale rather than
+    their ratio would separate there. Control: with no separation the counted
+    AUC is 1/2. -/
 noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
   if vNoise = 0 then if 0 < vSignal then 1 else Phi 0
   else Phi (Real.sqrt (vSignal / (2 * vNoise)))
@@ -3066,7 +3355,19 @@ equal-variance Gaussian chart as a numerical function only; it does not offer a 
 identifying that chart with a process AUC.  Such an identification must be proved from an
 explicit liability distribution, not supplied as a record field. -/
 
-/-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk fraction. -/
+/-- Calibrated Bernoulli Brier risk from prevalence and explained-risk fraction.
+
+    Empirical status: CONDITIONALLY VALID -- EXACT WHEN `r2` IS THE
+    OBSERVED-SCALE EXPLAINED FRACTION, and the condition is not optional.
+    `Brier = E[p(1-p)] = π(1-π) - Var(p)` for any calibrated `p`,
+    so this body is that identity with `r2 = Var(p)/(π(1-π))`. Supply a LIABILITY-scale `r²`
+    instead and it is wrong by 9% to 47% -- see `calibratedBrierFromVariances` below, which
+    is this map composed with a liability variance ratio and which
+    `simcov/battery_bulk33.py` falsifies at up to 299 sems for exactly that reason.
+
+    This body itself has not been measured: no battery feeds it an observed-scale `r²`
+    obtained independently of the Brier score it predicts, and with `r2` defined as
+    `Var(p)/(π(1-π))` such a design would be the identity above evaluated twice. -/
 def calibratedBrier (π r2 : ℝ) : ℝ :=
   π * (1 - π) * (1 - r2)
 
@@ -3089,6 +3390,44 @@ variance, and residual variance.
 This is the direct moment form of the calibrated Brier coordinate. It is not
 defined by first constructing transported `R²`; any equality to the `R²`
 chart is a derived algebraic identity.
+
+    Empirical status: **FALSIFIED under the liability-threshold model; exact only when
+    `vSignal/(vSignal + vResidual)` is the explained fraction of the OBSERVED-SCALE
+    variance** (`simcov/battery_bulk33.py`, `group_b`). The word "exact" in the summary line
+    above is the defect: it is exact in one regime and the argument names point at the other.
+
+    Where it is exact. If the calibrated probability `p` is itself a random variable with
+    `E[p] = π` and `Var(p) = σ²`, then `Brier = E[p(1-p)] = π(1-π) - σ²` identically, so the
+    body is right when `vSignal/(vSignal+vResidual)` is `σ²/(π(1-π))`. That is the
+    additive-noise regime `r2FromSignalVariance_eq_rsquared` states, on the OBSERVED scale.
+
+    Where it fails. A binary outcome produced by a liability threshold is not in that regime:
+    `vSignal` and `vResidual` are LIABILITY variances, and the explained fraction on the
+    liability scale is not the explained fraction of `π(1-π)`. Measured against the realised
+    mean squared error of the true conditional probability over 8×10⁵ draws:
+
+      π     vSignal  vResidual   this body   realised Brier   sems    off
+      0.50    1.0      1.0        0.12500       0.166658      299    25.0%
+      0.20    1.0      3.0        0.12000       0.138535      121    13.4%
+      0.10    2.0      1.0        0.03000       0.056102      231    46.5%
+      0.35    0.5      2.0        0.18200       0.199573      138     8.8%
+
+    The exact liability-scale value is `π - Φ₂(Φ⁻¹(π), Φ⁻¹(π); r²)` with `r²` the liability
+    explained fraction and `Φ₂` the standard bivariate normal CDF at correlation `r²`; that
+    form reproduces all four cells to between 5×10⁻⁵ and 2.5×10⁻³ relative, which is what
+    shows the disagreement is the scale and not the simulation. It is not written as a body
+    here because `Φ₂` has no Mathlib form this corpus can call, and a wrong closed form is
+    worse than a named regime.
+
+    Why the anchor theorems did not catch it: `calibratedBrier_anchors` and
+    `calibratedBrierFromVariances_no_residual` pin `r² = 0` and `r² = 1`, and BOTH forms agree
+    at both endpoints -- `Φ₂(z,z;0) = π²` and `Φ₂(z,z;1) = π`. The anchors pin a linear
+    dependence on `r²` only if linearity is assumed, and the liability form is not linear
+    in `r²`. Two anchors cannot distinguish a line from a curve through the same two points.
+
+    CONSUMERS. `PortabilityDrift.sourceCalibratedBrierFromSourceWeightsAtPrevalence` feeds
+    this from PGS explained-signal variances at a prevalence, which is the liability-threshold
+    setting, so it inherits the error at the sizes tabulated above.
 
     Denotes: the reading its name carries. The same formula appears under
     names from 'rate', 'variance', and the formula alone does not fix which is meant. -/

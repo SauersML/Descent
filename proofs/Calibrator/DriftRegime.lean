@@ -282,7 +282,7 @@ reported as one.
 `theorem`: the proposition it supports is `no_crossCheck_criterion_for_retention`
 immediately below.
 
-    Empirical status: not an empirical claim. This is a witness construction; the
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness construction; the
     measurement it explains is recorded in `Calibrator.PortabilityDrift`. -/
 noncomputable def crossChecks_blind_to_retention {trueRetention wrongRetention : ℝ}
     (hne : wrongRetention ≠ trueRetention) :
@@ -387,7 +387,7 @@ theorem benchmarkRatioSquared_fixed_source_is_junk (fstT : ℝ) :
 /-- What a **symmetric** design observes: the two branch lengths are equal, so only the
 diagonal of the candidate function is ever evaluated.
 
-    Empirical status: not an empirical claim. This is a description of a test
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a description of a test
     design, not a prediction about a population. -/
 noncomputable def diagonalDesign (g : ℝ → ℝ → ℝ) : ℝ → ℝ := fun x ↦ g x x
 
@@ -425,7 +425,7 @@ design. A prediction that is constant on the design tests nothing about shape.
 As above this is a `def`, since `ProbeBlindness` carries its witnesses as data; the
 proposition is `symmetric_design_has_no_power` immediately below.
 
-    Empirical status: not an empirical claim. This is a witness construction. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness construction. -/
 noncomputable def symmetricDesignBlindness :
     ProbeBlindness diagonalDesign (fun g ↦ g = benchmarkRatio) where
   positive := benchmarkRatio

@@ -57,8 +57,9 @@ frontier kink is a vanishing gap, and a phase transition in the horizon optimize
 gap. Degeneracy of the extremal, vanishing frontier curvature, and loss of second-order
 transplantation stability are one locus.
 
-Empirical status: the gap bound, perturbation bound, and elimination step are PROVED. That a
-fitted design meets a particular `δ` is an empirical input, and `γ` is the quantity this asks
+Empirical status: DERIVED -- the gap bound, perturbation bound, and
+elimination step are PROVED. That a fitted design meets a particular `δ` is
+an empirical input, and `γ` is the quantity this asks
 studies to report.
 -/
 

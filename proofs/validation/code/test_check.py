@@ -407,6 +407,11 @@ noncomputable def retentionFromFst (f : ℝ) : ℝ := 1 - f
 /-- A name that CONTAINS the letters `gSt` and is not an F_ST at all. -/
 noncomputable def steppingStoneMeetingTime (x : ℝ) : ℝ := x
 
+/-- Not named for an F_ST, but it consumes one.
+
+    Empirical status: UNTESTED. -/
+noncomputable def portabilityFromDivergence (v fst : ℝ) : ℝ := v * (1 - fst)
+
 theorem sample_bridge (p : ℝ) : sampleHudsonFst p = p / (1 + p) := rfl
 
 end Calibrator
@@ -417,6 +422,11 @@ def convention_ledger(entries: dict, bridges: list | None = None,
                       verified: dict | None = None) -> str:
     return json.dumps({
         "verified_constants": verified or {},
+        "empirical_status_vocabulary": {"terms": {
+            "UNTESTED": "no measurement has been made",
+            "VALIDATED": "measured and not rejected",
+            "NOT AN EMPIRICAL CLAIM": "no observable content",
+        }},
         "conventions": {
             "hudson": {"means": "between-subgroup denominator", "source": "Hudson (1992)"},
             "nei-gst": {"means": "total-pool denominator", "source": "Nei (1973)"},
@@ -426,6 +436,7 @@ def convention_ledger(entries: dict, bridges: list | None = None,
                      "says": "fixture bridge"}] if bridges is None else bridges,
         "quantities": {
             "fst": {"words": ["fst", "gst"], "scope": "complete",
+                    "argument_scope": "complete",
                     "conventions": ["hudson", "nei-gst", "inherited"],
                     "incompatible": [["nei-gst", "hudson"]],
                     "why": "fixture"},
@@ -441,6 +452,9 @@ CONVENTION_ENTRIES = {
         "quantity": "fst", "convention": "nei-gst"},
     "Calibrator/Sub.lean::retentionFromFst": {
         "quantity": "fst", "convention": "inherited", "constants": ["1"]},
+    "Calibrator/Sub.lean::portabilityFromDivergence": {
+        "quantity": "fst", "convention": "inherited", "role": "consumer",
+        "constants": ["1"]},
 }
 
 
@@ -728,6 +742,26 @@ theorem clean_rate_at_one_second : cleanRate 1 = 1 := by
          verified={"Calibrator/Sub.lean::steppingStoneMeetingTime": {
              "source": "fixture"}}),
      "pins no constants"),
+    # A definition NOT named for the quantity that nevertheless consumes one.
+    # This is where a convention mismatch does its damage -- a caller holding a
+    # Nei value feeds it to a body written for a per-branch F and nothing
+    # type-errors -- and being unnamed is no protection.
+    ("conventions", "a definition that CONSUMES a ledgered quantity with no entry",
+     convention_corpus_files(
+         entries={k: v for k, v in CONVENTION_ENTRIES.items()
+                  if not k.endswith("portabilityFromDivergence")}),
+     "ARGUMENT"),
+    # The status vocabulary, both failure shapes.
+    ("conventions", "an `Empirical status:` head in the wrong case",
+     convention_corpus_files(
+         lean=CONVENTION_LEAN.replace("Empirical status: UNTESTED",
+                                      "Empirical status: untested")),
+     "in the wrong case"),
+    ("conventions", "an `Empirical status:` head outside the vocabulary",
+     convention_corpus_files(
+         lean=CONVENTION_LEAN.replace("Empirical status: UNTESTED",
+                                      "Empirical status: PROBABLY FINE")),
+     "is not in the vocabulary"),
 ]
 
 # Duplication traps: mathematics that LOOKS repeated to a careless screen and is
@@ -977,6 +1011,24 @@ theorem closers_only_second (m : CleanModel) : m.rate + 0 = m.rate := by
     # `inherited` commits to no convention, so it can sit beside anything. A guard
     # that counted it as a third convention would report every module that carries
     # a retention factor.
+    # A status head may carry qualifying words of its own -- `VALIDATED in its
+    # slope`, `UNTESTED as a portability law`.  A rule that demanded an exact
+    # match would report 40 of those, and the corpus would lose the qualifier
+    # rather than the guard losing the rule.
+    ("conventions", "a vocabulary term followed by its own qualifying words",
+     convention_corpus_files(
+         lean=CONVENTION_LEAN.replace("Empirical status: UNTESTED",
+                                      "Empirical status: UNTESTED as a rate")),
+     "status head"),
+    # `MEASURED` is also ordinary English inside every evidence table. A rule
+    # reading the whole status text rather than its head reported 99 of these,
+    # none of them a defect.
+    ("conventions", "a vocabulary word used as ordinary prose in the evidence",
+     convention_corpus_files(
+         lean=CONVENTION_LEAN.replace(
+             "Empirical status: UNTESTED",
+             "Empirical status: VALIDATED against measured 0.53 and derived 0.51")),
+     "status head"),
     ("conventions", "an `inherited` entry beside a committed one",
      convention_corpus_files(
          entries={k: v for k, v in CONVENTION_ENTRIES.items()
@@ -1100,11 +1152,16 @@ def main() -> int:
           f"macro -- each accepted")
     conv_pos = sum(1 for guard, *_ in CASES if guard == "conventions")
     conv_neg = sum(1 for case in NEGATIVE_CASES if case[0] == "conventions")
-    print(f"  conventions: {conv_pos} planted ledger defects reported "
-          f"(omission, staleness, contradiction, drifted constant, malformed "
-          f"ledger, absent ledger), {conv_neg} traps accepted (a bridged "
-          f"module, an `inherited` neighbour, and a name that merely CONTAINS "
-          f"the quantity's letters)")
+    print(f"  conventions: {conv_pos} planted ledger defects reported -- omission "
+          f"by name and by ARGUMENT, staleness in an entry and in a bridge, "
+          f"contradiction, a drifted constant in each table, a convention the "
+          f"ledger never defines, one definition recorded twice, a record "
+          f"pinning nothing, an absent ledger, and a status head both "
+          f"miscased and unknown")
+    print(f"  conventions: {conv_neg} traps accepted -- a bridged module, an "
+          f"`inherited` neighbour, a name that merely CONTAINS the quantity's "
+          f"letters, a status term carrying its own qualifier, and a vocabulary "
+          f"word used as ordinary prose inside an evidence table")
     print("  wiring --json keys asserted by name; --list names all nine guards")
     return 0
 

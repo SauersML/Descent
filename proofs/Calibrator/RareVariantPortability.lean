@@ -89,7 +89,8 @@ theorem rareHeritabilityShare_mem_Ioo
 /-- Additive genetic-variance contribution of a variant with effect `β` and allele frequency
 `p` under Hardy--Weinberg genotype variance `2p(1-p)`.
 
-Empirical status: **VALIDATED** (`simcov/battery_bulk40.py`, `group_b`). One diploid locus in Hardy-Weinberg proportions over
+Empirical status: **VALIDATED** (`simcov/battery_bulk40.py`, `group_b`). One
+diploid locus in Hardy-Weinberg proportions over
 4×10⁶ individuals; the observable is the realised sample variance of `β` times the
 alt-allele dosage, and the prediction is evaluated at the REALISED allele frequency.
 

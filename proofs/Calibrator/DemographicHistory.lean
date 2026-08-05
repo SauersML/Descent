@@ -507,7 +507,7 @@ section AdmixtureModels
     the expression carries a time since admixture, so this is an assumption the
     body cannot even express.
 
-    Empirical status: NUMERATOR VALIDATED (exactly `(1-α)²`), DENOMINATOR
+    Empirical status: MIXED -- NUMERATOR VALIDATED (exactly `(1-α)²`), DENOMINATOR
     OMITTED. Use `admixedFstExact` when the heterozygosity ratio is available. -/
 noncomputable def admixedFst (α fst_AB : ℝ) : ℝ :=
   (1 - α) ^ 2 * fst_AB
@@ -827,7 +827,7 @@ section FounderEffects
     below pins it to the `θ = 0` slice of the general transient, which is what makes
     the no-mutation premise explicit rather than implied.
 
-    Empirical status: correct for what it says; FALSIFIED as an `F_ST`. -/
+    Empirical status: MIXED -- correct for what it says; FALSIFIED as an `F_ST`. -/
 noncomputable def founderHeterozygosityLoss (k : ℕ) (t : ℕ) : ℝ :=
   1 - (1 - 1 / (2 * (k : ℝ))) ^ t
 
@@ -968,7 +968,7 @@ theorem cumulativeDrift_zero_sizes_is_junk {T : ℕ} :
     `validation/popgen_defs/battery2.py` checks this body against
     `truth = 1 - H_t/H_0`, drift-only heterozygosity loss, which is what it computes.
 
-    Empirical status: correct for what it now says; FALSIFIED as an `F_ST`. -/
+    Empirical status: MIXED -- correct for what it now says; FALSIFIED as an `F_ST`. -/
 noncomputable def heterozygosityLossVariableNe {T : ℕ} (Ne : Fin T → ℝ) : ℝ :=
   1 - Real.exp (-(cumulativeDrift Ne))
 

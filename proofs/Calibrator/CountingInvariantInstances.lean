@@ -81,9 +81,9 @@ distance is `0.0293` at order 2 (inside `1/(n+1)`) but `0.0926` at order 4 and `
 order 8 — 3× and 7.6× over the claimed bound. So "uniformly in the order `p`" is an artifact
 of the illegal normalization. Order ≤ 2 is unaffected, which covers the formulas above.
 
-Empirical status: **the abstract bound is VALIDATED and the instantiation is shown VACUOUS at
-native scale** — see `proofs/validation/empirical/meff_error_floor/`. The positive control passes:
-the
+Empirical status: **MIXED** -- the abstract bound is VALIDATED and the
+instantiation is shown VACUOUS at native scale** — see
+`proofs/validation/empirical/meff_error_floor/`. The positive control passes: the
 script re-derives `certificate gap = n/(n+1)` exactly and every order-2 moment gap within
 `1/(n+1)`, so the instrument reproduces the theorems it tests.
 -/

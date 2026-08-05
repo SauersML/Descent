@@ -214,8 +214,9 @@ parameter is not identified at all**, even though its absolute variance is the s
 the table. The prose describes relative precision and is correct; the formula is an absolute
 variance and is correct.
 
-Empirical status: **the `p/(2n)` floor is VALIDATED and its stated mechanism is FALSIFIED**;
-the metric and the variance are each refuted individually. See
+Empirical status: **MIXED** -- the `p/(2n)` floor is VALIDATED and its
+stated mechanism is FALSIFIED**; the metric and the variance are each
+refuted individually. See
 `proofs/validation/empirical/longmemory/`.
 The measurement bounds the Whittle estimator's risk, so the floor is an efficiency statement,
 not a minimax lower bound. -/

@@ -145,7 +145,7 @@ theorem sigmaResid_pos_pos_le (m : LiabilityThresholdModel)
     - The denominator `σ_resid` decreases in R² (less residual variance)
     - Both effects push the z-score upward as R² increases
 
-    Empirical status: TESTED, APPROXIMATE. This evaluates the conditional
+    Empirical status: CONDITIONALLY VALID (tested, approximate). This evaluates the conditional
     exceedance at the mean case liability, whereas sensitivity averages it over
     the case distribution; Phi is nonlinear, so Jensen guarantees a gap.
     Numerical integration cross-checked by Monte Carlo puts the error under one
@@ -557,8 +557,16 @@ theorem nri_decreases_with_portability_loss
       (specFromR2 m r2_source T' μ_control - specFromR2 m r2_base T' μ_control) := by
   -- Both sides subtract the SAME baseline, so this is the previous theorem's positivity
   -- read across a common `r2_base`.  It had its own copy of that theorem's proof.
-  obtain ⟨h_r2_loss, h_r2_target, h_r2_source, hμ_control_neg, h_sens_num_nonneg,
-    h_spec_num_nonneg⟩ := hregime
+  -- Named projections rather than a positional `obtain`: the six fields are all
+  -- Props over the same two `R²` arguments, so a positional pattern binds by
+  -- ORDER alone and would silently survive a reordering of the structure with
+  -- every hypothesis attached to the wrong name.
+  have h_r2_loss := hregime.r2_gap
+  have h_r2_target := hregime.r2_lo_nonneg
+  have h_r2_source := hregime.r2_hi_le_one
+  have hμ_control_neg := hregime.control_neg
+  have h_sens_num_nonneg := hregime.sens_num_nonneg
+  have h_spec_num_nonneg := hregime.spec_num_nonneg
   have h := nri_positive_when_pgs_adds_value m T' μ_control r2_target r2_source
     h_r2_loss h_r2_target h_r2_source hμ_control_neg h_sens_num_nonneg h_spec_num_nonneg
   unfold netReclassificationImprovement at h ⊢
@@ -695,8 +703,12 @@ theorem portability_narrows_useful_range
         ((1 - specFromR2 m r2_target T' μ_control) * (1 - π)) 1 t <
       decisionCurveNetBenefit (sensFromR2 m r2_source T' * π)
         ((1 - specFromR2 m r2_source T' μ_control) * (1 - π)) 1 t := by
-  obtain ⟨h_r2, h_r2_target, h_r2_source, hμ_control_neg, h_sens_num_nonneg,
-    h_spec_num_nonneg⟩ := hregime
+  have h_r2 := hregime.r2_gap
+  have h_r2_target := hregime.r2_lo_nonneg
+  have h_r2_source := hregime.r2_hi_le_one
+  have hμ_control_neg := hregime.control_neg
+  have h_sens_num_nonneg := hregime.sens_num_nonneg
+  have h_spec_num_nonneg := hregime.spec_num_nonneg
   obtain ⟨h_sens, h_spec⟩ :=
     sens_and_spec_strictMono_of_threshold_le m T' μ_control r2_target r2_source
       hμ_control_neg h_r2_target h_r2_source h_r2 h_sens_num_nonneg h_spec_num_nonneg

@@ -72,8 +72,9 @@ The environment contributes `m^{-1/2}` to normalized linear statistics; the samp
 contributes `m^{-1}`. **The environment dominates**, which is the reverse of the standard
 situation and says where to spend effort. `environment_dominates_sampling` is the inequality.
 
-Empirical status: the Dirichlet law and the fluctuation orders are ASSERTED from an external
-analysis and carried as named inputs; the comparative principle, its drift horizon, and the
+Empirical status: ASSERTED -- the Dirichlet law and the fluctuation orders
+are taken from an external analysis and carried as named inputs; the
+comparative principle, its drift horizon, and the
 factorization algebra are PROVED. No numerical claim is made here.
 -/
 
@@ -319,7 +320,7 @@ diagnosable from data: a nontrivial `ker(-L)` — conserved or quasi-conserved s
 environment — means adaptation to the invariant sector is **free**, and long memory (`T = ∞`)
 means vanishing floor at exploding design norm, approached but never attained.
 
-Empirical status: the spectral representation is an ASSERTED input; the harmonic-mean
+Empirical status: ASSERTED -- the spectral representation is an input; the harmonic-mean
 comparison and the Cauchy–Schwarz defect are PROVED. -/
 
 section SharpFloor
