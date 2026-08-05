@@ -161,6 +161,61 @@ theorem blockCountAt_of_transit_le (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j,
   unfold blockCountAt
   rw [hempty, Finset.card_empty]
 
+/-- **Once a level is reached, the count is at most that level.**  Half of the pathwise
+content of K-C (2.6): `D(n,t) ≤ k` exactly when the time to descend to `k` has elapsed. -/
+theorem blockCountAt_le_of_descentTime_le (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j)
+    {t : ℝ} {k : ℕ} (hk1 : 1 ≤ k) (hkn : k ≤ n) (ht : descentTime n hold k ≤ t) :
+    blockCountAt n hold t ≤ k := by
+  classical
+  unfold blockCountAt
+  have hsub : ((Finset.Icc 1 n).filter fun j => t < descentTime n hold j)
+      ⊆ Finset.Icc 1 (k - 1) := by
+    intro j hj
+    rw [mem_filter, mem_Icc] at hj
+    obtain ⟨⟨hj1, hjn⟩, hlt⟩ := hj
+    rw [mem_Icc]
+    refine ⟨hj1, ?_⟩
+    by_contra hcon
+    have hkj : k ≤ j := by omega
+    have := descentTime_antitone n hpos hkj
+    linarith
+  have := Finset.card_le_card hsub
+  rw [Nat.card_Icc] at this
+  omega
+
+/-- **Before a level is reached, the count is above it.**  The other half: `D(n,t) > k` while
+the descent to `k` is still in progress. -/
+theorem lt_blockCountAt_of_lt_descentTime (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j)
+    {t : ℝ} {k : ℕ} (hk1 : 1 ≤ k) (hkn : k ≤ n) (ht : t < descentTime n hold k) :
+    k < blockCountAt n hold t := by
+  classical
+  unfold blockCountAt
+  have hsub : Finset.Icc 1 k ⊆ ((Finset.Icc 1 n).filter fun j => t < descentTime n hold j) := by
+    intro j hj
+    rw [mem_Icc] at hj
+    rw [mem_filter, mem_Icc]
+    refine ⟨⟨hj.1, le_trans hj.2 hkn⟩, ?_⟩
+    exact lt_of_lt_of_le ht (descentTime_antitone n hpos hj.2)
+  have := Finset.card_le_card hsub
+  rw [Nat.card_Icc] at this
+  omega
+
+/-- **The death process, pinned down.**  `D(n,t) = k` exactly when the descent to `k` has
+happened and the descent to `k - 1` has not -- which is K-C (2.6) read pathwise, before any
+distribution is attached to the holding times. -/
+theorem blockCountAt_eq (n : ℕ) {hold : ℕ → ℝ} (hpos : ∀ j, 0 ≤ hold j) {t : ℝ} {k : ℕ}
+    (hk1 : 1 ≤ k) (hkn : k ≤ n) (hle : descentTime n hold k ≤ t)
+    (hlt : ∀ j, 1 ≤ j → j < k → t < descentTime n hold j) :
+    blockCountAt n hold t = k := by
+  refine le_antisymm (blockCountAt_le_of_descentTime_le n hpos hk1 hkn hle) ?_
+  rcases Nat.eq_or_lt_of_le hk1 with hk | hk
+  · rw [← hk]
+    exact one_le_blockCountAt n hold t
+  · have hprev : k - 1 < blockCountAt n hold t :=
+      lt_blockCountAt_of_lt_descentTime n hpos (by omega) (by omega)
+        (hlt (k - 1) (by omega) (by omega))
+    omega
+
 /-! ### The path itself
 
 With the block count in hand, the path is Kingman's `R_t = ℛ_{D(n,t)}` (K-G (6.5)) -- the
