@@ -134,6 +134,41 @@ def _equation_lhs(conjunct):
     return None
 
 
+def _stated_zero(conjunct, subject):
+    """True when this conjunct states that `subject` equals literally `0`.
+
+    This is the argument-independent half of the census, and it is what lets it
+    see the majority of the corpus.  Evaluating a body requires every argument
+    to be a numeric literal, and most reference evaluations here are stated over
+    STRUCTURES -- `E.totalVariation P P = 0`, `brierRegret μ p p = 0`,
+    `autocorrTime ∅ w lam = 0`.  Those arguments cannot be evaluated, and for a
+    long time this census therefore reported them as unreadable, covering about
+    sixty percent of the population and calling the rest a lower bound.
+
+    No evaluation is needed.  If the theorem states the value `0`, then the
+    rescaled competitor `c * body` gives `c * 0 = 0`, which is the stated value
+    for EVERY `c` -- so the reference point rejects no rescaling whatever its
+    arguments are.  That is `Calibrator.scale_competitor_eq_of_body_eq_zero`
+    read off the statement instead of the value.
+
+    The head is required to be the theorem's own subject, so that a compound
+    left-hand side (`a - b = 0`, where "the body" is not well defined) is not
+    swept in.  Name-anchored, no line numbers, no evaluation.
+    """
+    lhs = _equation_lhs(conjunct)
+    if lhs is None:
+        return False
+    remainder = conjunct[len(lhs):].lstrip()
+    if not remainder.startswith("="):
+        return False
+    if remainder[1:].strip() != "0":
+        return False
+    tokens = _split_arguments(" ".join(lhs.split()))
+    if not tokens:
+        return False
+    return tokens[0].split(".")[-1] == subject
+
+
 def scan():
     """[(theorem, verdict, detail, corpus file)] per `*_at_reference_point` theorem.
 
@@ -160,17 +195,38 @@ def scan():
             rows.append((name, "UNREADABLE", "no proposition in the signature", source_file))
             continue
 
-        evaluated, reasons = [], []
-        for conjunct in _conjuncts(proposition):
+        subject = name.split(".")[-1][:-len(SUFFIX)]
+        conjuncts = _conjuncts(proposition)
+        evaluated, reasons, unresolved = [], [], []
+        for conjunct in conjuncts:
             value, reason = _evaluate_conjunct(api, conjunct)
             if value is None:
                 reasons.append(reason)
+                # An unevaluatable conjunct that STATES zero is still fully
+                # determined for the rescaling question, so it is not an
+                # unresolved one.
+                if not _stated_zero(conjunct, subject):
+                    unresolved.append(reason)
             else:
                 evaluated.append((reason, value))
 
-        if not evaluated:
+        if any(value != 0 for _, value in evaluated):
+            live = ", ".join(f"{head}={value!r}" for head, value in evaluated
+                             if value != 0)
+            rows.append((name, "LIVE", live, source_file))
+        elif not unresolved and (evaluated or reasons):
+            # Every conjunct is known to be zero -- some by evaluation, some by
+            # stating it outright -- so no rescaling of the body is rejected.
+            how = ("evaluated" if not reasons
+                   else "stated" if not evaluated else "evaluated and stated")
+            heads = ", ".join(head for head, _ in evaluated) or subject
+            rows.append((name, "DEGENERATE",
+                         f"every evaluation in this theorem is 0 ({heads}, {how}), "
+                         f"so the stated value rejects no rescaling of the body",
+                         source_file))
+        elif not evaluated:
             rows.append((name, "UNREADABLE", "; ".join(reasons[:2]) or "unparsed", source_file))
-        elif reasons:
+        else:
             # PARTIALLY read: some conjuncts evaluated, others did not. Calling
             # this DEGENERATE would be a false positive in the direction that
             # damages the corpus -- it dispatches somebody to "repair" a
@@ -182,15 +238,6 @@ def scan():
                          f"only {len(evaluated)} of {len(evaluated) + len(reasons)} "
                          f"conjuncts could be evaluated ({reasons[0]}); a partial read "
                          f"is not evidence of degeneracy", source_file))
-        elif all(value == 0 for _, value in evaluated):
-            heads = ", ".join(head for head, _ in evaluated)
-            rows.append((name, "DEGENERATE",
-                         f"every readable evaluation in this theorem is 0 ({heads}), "
-                         f"so the stated value rejects no rescaling of the body", source_file))
-        else:
-            live = ", ".join(f"{head}={value!r}" for head, value in evaluated
-                             if value != 0)
-            rows.append((name, "LIVE", live, source_file))
     return rows
 
 

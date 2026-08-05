@@ -201,20 +201,36 @@ def main():
     for name, verdict, _, _ in clean["reference_points"]:
         if verdict != "DEGENERATE":
             continue
+        subject = name.split(".")[-1][:-len(degenerate.SUFFIX)]
         proposition = degenerate._proposition(api.theorems()[name].get("statement", ""))
         conjuncts = degenerate._conjuncts(proposition)
-        values, unread = [], 0
+        # Every conjunct must be KNOWN zero, by one of the two routes: it
+        # evaluated to zero, or it states zero outright. A conjunct that is
+        # neither means the verdict was a guess.
         for conjunct in conjuncts:
             value, _ = degenerate._evaluate_conjunct(api, conjunct)
             if value is None:
-                unread += 1
-            else:
-                values.append(value)
-        if unread or not values or any(value != 0 for value in values):
-            mislabelled.append((name, values, unread))
+                if not degenerate._stated_zero(conjunct, subject):
+                    mislabelled.append((name, "neither evaluated nor stated zero"))
+            elif value != 0:
+                mislabelled.append((name, f"evaluates to {value!r}"))
+        if not conjuncts:
+            mislabelled.append((name, "no conjuncts at all"))
     expect(not mislabelled,
-           f"every DEGENERATE verdict re-evaluates to all-zero with nothing unread "
-           f"(mislabelled: {mislabelled[:3]})")
+           f"every conjunct of every DEGENERATE verdict is known zero, by evaluation "
+           f"or by statement (mislabelled: {mislabelled[:3]})")
+
+    #     The syntactic route must not fire on a nonzero stated value, and must
+    #     not fire when the head is not the theorem's own subject -- a compound
+    #     left-hand side like `a - b = 0` has no well-defined body to rescale.
+    expect(not degenerate._stated_zero("someBody 1 2 = 1", "someBody"),
+           "a nonzero stated value is not read as degenerate")
+    expect(degenerate._stated_zero("someBody 1 2 = 0", "someBody"),
+           "a zero stated value for the subject is read as degenerate")
+    expect(not degenerate._stated_zero("otherBody 1 2 = 0", "someBody"),
+           "a zero stated value for a DIFFERENT head is not attributed to the subject")
+    expect(degenerate._stated_zero("E.someBody P P = 0", "someBody"),
+           "a structure-projected head still resolves to the subject")
 
     unsupported = []
     for name, verdict, _, _ in clean["reference_points"]:
