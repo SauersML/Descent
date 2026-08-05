@@ -452,7 +452,41 @@ noncomputable def SplitMigrationModel.witness : SplitMigrationModel where
   mig_nonneg := by norm_num
   mu_nonneg := by norm_num
 
-/-- Empirical status: UNTESTED. -/
+/-- **The many-deme, low-mutation limit of the split-with-migration `F_ST`**, which is
+Wright's diffusion form `1/(1 + 4 Nₑ m)` written through `scaledMigrationRate`.
+
+    Empirical status: **FALSIFIED** outside the weak-migration limit
+    (`proofs/validation/empirical/simcov/battery_pd1.py`). The name declares a
+    many-deme, low-mutation regime and says nothing about `mig`, so it is read
+    here at face value across a 50-fold sweep in `mig`. Explicit Wright-Fisher
+    island model, 200 demes, identity-probability `F_ST` on distinct pairs, ten
+    independent replicate metapopulations per cell:
+
+      Nₑ    mig       this def   simulated            rel
+      200   0.0100     0.11111    0.10897 ± 0.00005    1.96%
+      50    0.0100     0.33333    0.32714 ± 0.00009    1.89%
+      13    0.1538     0.11111    0.08769 ± 0.00001   26.7%
+      4     0.5000     0.11111    0.03936 ± 0.00001  182%
+      2     0.2500     0.33333    0.23978 ± 0.00001   39.0%
+
+    Positive control: a panmictic pool split into 200 labelled demes reads
+    `F_ST` 0.05 sems from zero.
+
+    WHAT SURVIVES. At `mig ≤ 0.01` the body is within 2%, and that 2% is itself
+    mostly the finite-deme term rather than the linearisation. The error is
+    `O(mig)` and nothing else: the exact fixed point
+    `fstIslandMultiplicativeEquilibrium`, which differs from this body only in
+    dropped terms of order `m²` and `m/Nₑ`, tracks the same simulation to 1.6%
+    at every cell including `mig = 0.5`. So this is the weak-migration
+    approximation behaving exactly as `ibdRecurrenceFixedPoint_lt_linearisation`
+    says it must, measured rather than asserted.
+
+    WHY THE DESIGN COULD SEE IT AND EARLIER ONES COULD NOT. The two forms
+    separate in `mig`, not in `4 Nₑ mig`. `battery_bulk1` and `battery_bulk20`
+    swept the compound parameter and passed both forms; here `mig` is swept
+    50-fold at fixed `4 Nₑ mig` by shrinking `Nₑ`.
+
+    argument_source: model. -/
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m :
     SplitMigrationModel) : ℝ :=
   1 / (1 + scaledMigrationRate m.Ne m.mig)
@@ -2129,7 +2163,18 @@ noncomputable def taggingProjection {p q : ℕ}
 vector. This is the closed-form biological object behind claims that
 `β_source ≠ β_target`; it is not a scalar retention factor.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. The body is the difference of a
+    quantity the corpus already carries a verdict for (`totalEffect`, measured
+    through `crossCovariance` in `simcov/battery_transport.py`) and a bare field
+    of the model (`m.beta Pop.source`). Subtracting the second from the first
+    names a residual; it predicts nothing, because whatever the two are, their
+    difference is this. `totalEffect_target_eq_betaSource_plus_targetEffectHeterogeneity`
+    is the same statement read forwards and is proved by `rfl`.
+
+    What WOULD be an empirical claim, and is made elsewhere, is that the
+    residual is nonzero in real populations -- that `β_source ≠ β_target` at
+    all. That is a claim about `totalEffect` and `m.beta`, and it is where a
+    measurement belongs. -/
 noncomputable def targetEffectHeterogeneity {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : Fin q → ℝ :=
   totalEffect m Pop.target - (m.beta Pop.source)
@@ -2531,7 +2576,25 @@ theorem brokenTaggingResidual_nonneg {p q : ℕ}
 This is the squared source-score covariance distortion induced by the gap
 between the source and target scored-SNP LD matrices.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED as one of four summands and not separated from
+    the other three** (`proofs/validation/empirical/simcov/battery_transport.py`).
+    This term enters the corpus only through
+    `irreducibleTargetResidualBurden`, which is the sum of the four residuals and
+    which reaches a measurement as the burden inside `effectiveOutcomeVariance`,
+    the denominator of `r2FromSourceWeights`. That target `R²` cell lands at 2.50
+    sems on a design whose source and target differ in tag-tag LD by Frobenius
+    distance 2.09, so the SUM is exercised and this term is a live part of it.
+
+    What that does not license: reading the 2.50 sems as a verdict on the
+    quadratic form written here. The design moves all three channels at once --
+    it has to, or a discrepancy could not be assigned to a term -- so a wrong
+    coefficient on this residual and a compensating one on `brokenTaggingResidual`
+    are the same number to that measurement. Separating them needs a design that
+    holds the effect vector and the tag-causal alignment fixed while moving only
+    `m.sigmaTag`, and none has been run.
+
+    argument_source: model. The covariance matrices are SET in the simulation
+    rather than estimated from the sample scored against. -/
 noncomputable def ancestrySpecificLDResidual {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   let wS := sourceWeightsFromExplicitDrivers m
@@ -2634,7 +2697,25 @@ is now a computed consequence of `residualBurden` rather than the reason for wri
 separate definitions. `effectiveOutcomeVariance_source` below is the statement that used
 to be implicit in the fact that only a `target` version existed.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED in composition**
+    (`proofs/validation/empirical/simcov/battery_transport.py`). This body is the
+    denominator of `r2FromSourceWeights`, which is measured against the squared
+    correlation of the transported score with the outcome at 0.06 sems in the
+    source and 2.50 in the target, on one end-to-end transport simulation with
+    400000 individuals per population and second moments SET rather than
+    estimated. The two populations are what makes this a test of THIS body
+    rather than of the numerator alone: `residualBurden` is zero in the source
+    and the whole irreducible burden in the target, so the source cell fixes the
+    numerator and the target cell is the one that can only pass if the burden is
+    added, and added with coefficient one.
+
+    What is NOT established: the internal structure of the burden. The four
+    residuals enter only through their sum, as recorded at
+    `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with
+    the burden is what the target cell tests, at 2.50 sems, which is a pass and
+    not a comfortable one.
+
+    argument_source: model. -/
 noncomputable def effectiveOutcomeVariance {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   (m.outcomeVariance P) + residualBurden m P
@@ -2768,7 +2849,21 @@ coordinate `π`. This lets downstream theory compare source and target Brier on
 the same target-population outcome scale without falling back to a benchmark
 `R²` surrogate.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED under the liability-threshold model,
+    inherited.** The body is `DGP.TransportedMetrics.calibratedBrierFromVariances`
+    at the source population, and that definition is itself recorded FALSIFIED
+    under the liability-threshold reading -- its docstring names THIS declaration
+    as the consumer that inherits the error, and tabulates the sizes. The
+    inheritance is exact and not approximate: this body adds no arithmetic, it
+    only chooses which two variances to supply.
+
+    The regime the parent is exact in transfers too: `calibratedBrierFromVariances`
+    is exact where the outcome is Gaussian on the scale it is scored on, and
+    wrong where cases are a truncated liability tail, which is the setting a
+    prevalence argument `π` announces. So the fault is worst exactly where this
+    definition is meant to be used.
+
+    argument_source: model, inherited. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
   TransportedMetrics.calibratedBrierFromVariances
@@ -3089,7 +3184,13 @@ theorem targetR2FromSourceWeights_exact_effect_heterogeneity_law {p q : ℕ}
 /-- Ohta-Kimura-style closed-form LD-correlation decay law across populations:
 correlation decays exponentially with recombination distance and divergence.
 
-    Empirical status: UNTESTED, with a LEAD AGAINST THE EXPONENTIAL SHAPE
+    Empirical status: **MEASURED** -- the two factors of this body are in
+    different states and the head cannot be either one alone. The DIVERGENCE
+    factor is settled by measurement and the body already carries the corrected
+    form (`simcov/battery_bulk54.py`, tabulated below: the rival `fstGap`
+    exponent is rejected at 4.73 sems on the cells where `Real.sqrt fstGap`
+    matches at 2.42). The SHAPE in distance carries a LEAD AGAINST THE
+    EXPONENTIAL and no verdict
     (`simcov/battery_bulk31.py`). Recorded as a lead and not a falsification,
     because the run carried no valid positive control -- the harness's own rule
     is that a disagreement without one has not shown the design can reproduce a
@@ -3138,10 +3239,11 @@ correlation decays exponentially with recombination distance and divergence.
       rate independent     19.35 sems off, though formally NO POWER since a
                            constant prediction has no span
 
-    So the body is wrong in its `fstGap` dependence and right that there IS
-    one: divergence does slow LD-correlation decay, at half the rate this body
-    claims in the exponent. Replacing `fstGap` by `Real.sqrt fstGap` is what the
-    measurement supports, and `lambda` absorbs the rest.
+    So the SUPERSEDED body was wrong in its `fstGap` dependence and right that
+    there IS one: divergence does slow LD-correlation decay, at half the rate
+    that body claimed in the exponent. Replacing `fstGap` by `Real.sqrt fstGap`
+    is what the measurement supports and is what the body above now reads;
+    `lambda` absorbs the rest.
 
     An earlier run (`battery_bulk53.py`) reached the same conclusion and could
     not report it: it compared ONE fitted-rate ratio against ONE `F_ST` ratio,
@@ -3320,10 +3422,25 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
 
     **The decay base was `hetDecayFactor` and has been corrected to
     `fstTransientDecayFromScaled`, which carries migration as well.** The level
-    this coordinate settles at is `1/(1 + θ + M)` and depends on the migration
-    rate; the rate at which it got there did not, and that is not a possible
-    process. Measured as a half-life, the superseded base overstates the time to
-    half the plateau by a factor of seventeen at `4 Nₑ m = 16`.
+    this coordinate settles at depends on the migration rate; the rate at which
+    it got there did not, and that is not a possible process. Measured as a
+    half-life, the superseded base overstates the time to half the plateau by a
+    factor of seventeen at `4 Nₑ m = 16`.
+
+    **The LEVEL now carries the two-deme correction as well**, and is
+    `1/(1 + θ + 2 M)` rather than `1/(1 + θ + M)`. It is the same quantity as
+    `DGP.fstEquilibrium`, spelled out here because this record cannot reach an
+    `EvolutionaryParameters`, and it moved when that one did: the migration term
+    carries `islandDemeCorrection`, which at the two populations this transport
+    layer is about equals 2. `PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor`
+    is what forces the two spellings to agree and is what would have caught it
+    had only one of them moved.
+
+    The half-life design that validated the decay base does NOT bear on the
+    level: it reads `F(t)` against `F(t)`'s own plateau by interpolation, which
+    is a shape property with the level divided out. So the level correction is
+    carried entirely by `fstEquilibrium`'s measurement and this record does not
+    claim it twice.
 
     Note that `hetDecayFactor` itself is untouched and remains correct for what
     it is: migration does not destroy heterozygosity, it relocates it. The error
@@ -3332,9 +3449,11 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     Empirical status: **VALIDATED after correction; the superseded base
     FALSIFIED at up to 2222 sems**
     (`proofs/validation/empirical/simcov/battery_dis4.py`). The design and the
-    table are recorded on `DGP.fstTransientDecayFromScaled`. -/
+    table are recorded on `DGP.fstTransientDecayFromScaled`. Power: the
+    half-life prediction spans 32.62 to 69.31 across the design where the
+    superseded base spans 69.31 to 554.52. -/
 noncomputable def fstTransientAt (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
-  (1 / (1 + g.theta + g.bigM)) *
+  (1 / (1 + g.theta + 2 * g.bigM)) *
     (1 - fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
@@ -3799,7 +3918,18 @@ noncomputable def betaTargetAt {p q : ℕ}
 /-- Explicit target tag-SNP allele frequency after standing drift and
 mutation-specific shift are combined.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM. Both summands are FREE FIELDS of
+    `CrossPopulationGenerationalModel` -- unconstrained functions
+    `ℕ → Fin p → ℝ`, with no equation anywhere relating either to a population.
+    Any target frequency trajectory whatever satisfies this body, by putting all
+    of it in the standing term and zero in the shift; no observation can
+    disagree with a decomposition whose two parts are both free. The content it
+    carries is a naming convention -- which part of a target frequency is called
+    standing and which is called mutation-specific -- and a convention is settled
+    by the definitions that constrain those fields, not by a simulation.
+
+    Where the observable content of this chain does live: `tagAlleleFreqRetentionAt`
+    below, whose body was moved by a measurement and carries its own verdict. -/
 noncomputable def tagAlleleFreqTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   m.tagAlleleFreqStandingTargetAt t i + m.tagAlleleFreqMutationShiftAt t i
@@ -3813,7 +3943,13 @@ noncomputable def tagAlleleFreqTargetAt {p q : ℕ}
 /-- Explicit target causal-site allele frequency after standing drift and
 mutation-specific shift are combined.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM, for the reason spelled out at
+    `tagAlleleFreqTargetAt`: `causalAlleleFreqStandingTargetAt` and
+    `causalAlleleFreqMutationShiftAt` are both free fields of
+    `CrossPopulationGenerationalModel`, so every causal-site trajectory
+    satisfies this body and none can disagree with it. The split between
+    standing variation and new mutation is a naming convention here, not a
+    prediction. -/
 noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   m.causalAlleleFreqStandingTargetAt t j + m.causalAlleleFreqMutationShiftAt t j
@@ -3907,22 +4043,28 @@ noncomputable def novelVariantInnovationAt (g : GenerationalPopGenParameters) (t
 and tag-SNP allele-frequency drift meet; the mechanistic model does not treat
 them as independent global scalars.
 
-    Empirical status: **FALSIFIED**, inherited. The first factor is
-    `ldCorrelationDecay` at the transient `F_ST`, and that body's `fstGap`
-    dependence is falsified at 4.73 sems: the fitted decay rate tracks
-    `√fstGap`, not `fstGap`, across a ninetyfold span of `F_ST`. So this kernel
-    attenuates LD with divergence at roughly twice the rate the simulation
-    supports, and the error compounds with `t` because `fstTransientAt` grows.
+    Empirical status: **FALSIFIED**, inherited from `migrationSharedBoostAt`,
+    which overstates the migration-driven restoration of shared LD by roughly a
+    factor of three, worst cell 18.17 sems, with the gap widening in both `τ`
+    and `bigM`. This kernel MULTIPLIES that factor in, so the overstatement
+    passes straight through and grows with `t`.
 
-    The composition is where the damage concentrates rather than cancels. This
-    kernel MULTIPLIES the LD-decay factor by the mutation-retention factor, so a
-    kernel whose first factor decays too fast in divergence produces a joint
-    transport estimate that is too pessimistic at every generation and
-    increasingly so.
+    **THE `fstGap` FAULT THIS RECORD USED TO NAME IS FIXED AND THE MARKER WAS
+    STALE.** The first factor is `ldCorrelationDecay` at the transient `F_ST`,
+    and that body's `fstGap` dependence WAS falsified at 4.73 sems -- the fitted
+    decay rate tracks `√fstGap`, not `fstGap`. It now carries
+    `Real.sqrt fstGap`, so the "attenuates at twice the supported rate" reading
+    that stood here describes a superseded body. The status did not change
+    because a second, live fault was underneath it; the reason did.
 
-    The second lead on `ldCorrelationDecay` -- whether the decay in DISTANCE is
-    exponential at all, or hyperbolic as Sved's relation gives -- is still open,
-    so this body may carry two faults. Only one is established. -/
+    The composition is where the damage concentrates rather than cancels: a
+    kernel that is a product of factors inherits the worst of them and cannot
+    average them away.
+
+    The remaining lead on `ldCorrelationDecay` -- whether the decay in DISTANCE
+    is exponential at all, or hyperbolic as Sved's relation gives -- is still
+    open for want of an independently anchored control, so this body may carry a
+    second inherited fault. Only the migration one is established. -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
   ldCorrelationDecay (m.tagDistance i j)
@@ -4992,7 +5134,31 @@ who knows it.
 This is the conversion to use for a binary trait. For a genuinely **continuous** outcome the
 equal-variance chart is correct and `presentDayEqualVarianceGaussianAUC` is the one to call.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED, inherited from both factors, with the
+    composition itself untouched.** The body is a two-stage composition and each
+    stage carries its own measurement. `liabilityThresholdAUCFromExplainedR2` is
+    validated against 400 simulated PGS studies at pooled RMSE 0.0121 with bias
+    -0.0007, against an independently measured 0.0120 seed-to-seed noise floor,
+    and its prevalence axis is swept. `presentDayR2` runs through
+    `presentDayPGSVariance`, validated on the heterozygosity-retention reading of
+    `fst` at worst 0.94 sems over `Nₑ = 500`, 400 unlinked loci and 200 replicate
+    populations.
+
+    WHAT THE INHERITANCE DOES NOT COVER, stated because a composition of two
+    validated parts is exactly where this corpus has hidden an error before. The
+    two batteries are different simulations, and neither one feeds a
+    drift-attenuated `R²` into the liability chart. So the JOIN -- that a drift
+    `F_ST` may be converted to an explained-variance fraction and that fraction
+    handed to the liability-threshold AUC -- rests on `presentDayR2` denoting the
+    same explained-variance fraction the AUC chart's `r2` argument expects. That
+    is a reading, checked here by inspection and not by a measurement.
+
+    It is also where the fault this definition replaces lived: the superseded
+    body carried a `-0.068` AUC bias precisely because a drift `R²` drop was fed
+    to a prevalence-free chart. Naming the prevalence fixes that, and does not
+    by itself test the join.
+
+    argument_source: model, inherited. -/
 noncomputable def targetLiabilityAUCFromNeutralAFBenchmark
     (V_A V_E fstTarget K : ℝ) : ℝ :=
   liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K
@@ -5011,7 +5177,30 @@ it replaces. The old record simply declined to use it for the discrimination met
 is how a `-0.068` AUC bias survived beside a Brier risk computed correctly at the same
 prevalence.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED on the `brier` coordinate, for the very trait
+    this record is built for**; the other two coordinates inherit validations.
+
+      r2     `targetR2FromNeutralAFBenchmark`, which is `presentDayR2`; that runs
+             through `presentDayPGSVariance`, validated at worst 0.94 sems on
+             the heterozygosity-retention reading of `fst`.
+      auc    `targetLiabilityAUCFromNeutralAFBenchmark`, validated through
+             `liabilityThresholdAUCFromExplainedR2` at pooled RMSE 0.0121
+             against a 0.0120 noise floor, with prevalence swept. The whole
+             point of this record is that this field spends the `π` it was given.
+      brier  `targetBrierFromNeutralAFBenchmark`, which is
+             `DGP.TransportedMetrics.calibratedBrier` at the benchmark `R²`.
+             That chart is recorded FALSIFIED under the liability-threshold
+             model and exact only for a Gaussian outcome.
+
+    So the defect this record was written to repair -- one field treating the
+    trait as binary and another as continuous -- has been repaired on the AUC
+    side and NOT on the Brier side. The record is now consistent in taking `π`
+    everywhere and inconsistent in what it does with it: the AUC uses the
+    liability-threshold chart and the Brier still uses the Gaussian one. Naming
+    that here rather than leaving the marker undeclared is the point of writing
+    the status per-field.
+
+    argument_source: model, inherited. -/
 noncomputable def neutralAFBenchmarkLiabilityMetricProfile
     (π V_A V_E fstTarget : ℝ) : TransportedMetrics.Profile :=
   { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
@@ -5221,7 +5410,29 @@ of `targetMetricProfileFromSourceWeights`, and it lets downstream calibration
 theory compare source and target Brier on the same target-population
 prevalence scale.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED on the `brier` coordinate under the
+    liability-threshold reading**; the record carries one verdict per field and
+    they are not the same verdict.
+
+      r2     `r2FromSourceWeights` at the source, validated at 0.06 sems in
+             `simcov/battery_transport.py`.
+      auc    `equalVarianceGaussianAUCFromSourceWeights`, which has no
+             measurement; its own docstring is explicit that it is the
+             EQUAL-VARIANCE Gaussian chart and not the liability-threshold one,
+             so at a prevalence far from one half it is the wrong chart for a
+             dichotomised outcome and it takes no `π` to be right with.
+      brier  `sourceCalibratedBrierFromSourceWeightsAtPrevalence`, which
+             inherits the falsification recorded at
+             `DGP.TransportedMetrics.calibratedBrierFromVariances`.
+
+    THE INTERNAL INCONSISTENCY IS THE FINDING, and it is the same one
+    `neutralAFBenchmarkMetricProfile` is documented for: this record takes a
+    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with
+    a chart that has nowhere to put one. So a profile assembled to compare
+    source and target Brier "on the same prevalence scale" is binary in one
+    field and continuous in another.
+
+    argument_source: model, inherited. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : TransportedMetrics.Profile where
   r2 := r2FromSourceWeights m Pop.source
@@ -5249,7 +5460,19 @@ noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
 /-- The source metric profile evaluated on the target-population observed
 prevalence scale carried by the mechanistic target state.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED on the `brier` coordinate, inherited.** The
+    body supplies `m.targetPrevalence` for the free `π` of
+    `sourceMetricProfileFromSourceWeightsAtPrevalence` and changes nothing else,
+    so the per-field verdicts are that definition's, read there.
+
+    What this body adds is the CHOICE of prevalence, and it is a modelling
+    choice rather than a measurable one: scoring a source-fitted model on the
+    target's observed prevalence is the comparison the calibration theory wants
+    to make, and no simulation can say it is the wrong prevalence to want. The
+    thing a simulation could say -- that the Brier chart is wrong at whatever
+    prevalence is supplied -- it has already said upstream.
+
+    argument_source: model, inherited. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtTargetPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : TransportedMetrics.Profile :=
   sourceMetricProfileFromSourceWeightsAtPrevalence m m.targetPrevalence
@@ -5680,7 +5903,45 @@ This was two theorems, `_closed` and `_eq`, with the same statement and two proo
 /-- The expected squared mean PGS difference under the IM equilibrium model:
 `E[(Δμ)²] = 4δ V_A` where `δ = 1/(2M+1)`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **DERIVED, and low by an exact stated factor.** Both
+    components carry measurements and the join between them is algebra, so no
+    new simulation is owed -- but the algebra does not come out to `2 δ`.
+
+    THE TWO COMPONENTS. `Var_Delta_Mu V_A f = 2 f V_A` is validated with its
+    second slot read as the SUM OF THE PER-BRANCH DRIFT INDICES: its docstring
+    is explicit that a two-branch design fed a pairwise value produced a
+    factor-of-four false falsification, twice. `twoDemeIMEquilibriumDelta M`
+    is validated as HUDSON's `F_ST`, `1 - E[T_within]/E[T_between]`, at 0.10,
+    0.16 and 2.03 sems. Those are two different conventions in the family this
+    corpus has paid for three times, so the substitution `fstS + fstT ↦ 2 δ` is
+    the whole content of this body.
+
+    THE JOIN, DERIVED. Write `δp = p₁ - p₂` and `p̄ = (p₁ + p₂)/2`. The slot
+    `Var_Delta_Mu` wants is `A = E[δp²] / E[p̄(1-p̄)]`, since variances add over
+    independent branches. Hudson's denominator is
+    `p₁(1-p₂) + p₂(1-p₁) = 2 p̄(1-p̄) + δp²/2`, so as a ratio of averages
+
+      δ = E[δp²] / (2 E[p̄(1-p̄)] + E[δp²]/2) = A / (2 + A/2)
+
+    and inverting, `A = 2 δ / (1 - δ/2)`. So the correct argument is `2 δ` only
+    in the limit `δ → 0`, and this body runs LOW by the factor `(1 - δ/2)`:
+    2.4% at `M = 10` where `δ = 0.048`, 5.6% at `M = 4`, and 17% at `M = 1`
+    where `δ = 1/3`. The bias is one-signed and grows with differentiation,
+    which is the direction that matters, because differentiation is the regime
+    a portability law exists for.
+
+    THE BODY IS LEFT AS IT IS AND THE BIAS IS WRITTEN DOWN, rather than the
+    exact form being substituted, because the derivation above holds at the
+    per-locus level and both `δ` and `A` are ratios of averages over loci. The
+    corpus has already recorded, in `conventions.json`, that a pointwise
+    identity between two `F_ST` estimators does not survive aggregation: the
+    Nei-to-Hudson bridge predicts the two high-differentiation cells and runs
+    low at the two small ones, and the gap is Jensen. So `1 - δ/2` is the size
+    and the sign of the correction, not a coefficient to install unmeasured. A
+    two-deme design measuring `A` and `δ` on the same replicates would settle
+    it, and is what this owes.
+
+    argument_source: model, for both components. -/
 noncomputable def expectedSqMeanPGSDiff_IMEquilibrium (V_A M : ℝ) : ℝ :=
   Var_Delta_Mu V_A (2 * twoDemeIMEquilibriumDelta M)
 
@@ -6218,9 +6479,16 @@ theorem alleleFreqCorrelation_eq_retentionFactor_iff
     settled by the derivation chain this body was made explicit for, not by a
     simulation.
 
-    An UNTESTED marker here would read as an unpaid debt and is not one; it
-    inflates the count of things owed a measurement with an item that can never
-    receive one. The bodies downstream of it are where the empirical content
+    A marker claiming an unpaid measurement debt here would be reporting one
+    that does not exist; it inflates the count of things owed a measurement with
+    an item that can never receive one. And the word for that debt must not
+    appear anywhere in this docstring even as prose: `simcov/inventory.py` falls
+    back to scanning the status note for state words when the head is not one of
+    them, so the single word in the sentence this replaces made a declaration
+    that reads NOT AN EMPIRICAL CLAIM count as an open debt in every coverage
+    number the harness prints.
+
+    The bodies downstream of it are where the empirical content
     lives: `covarianceDivergenceMutationDrift` and
     `presentDayPGSVarianceMutationDrift` both consume this fraction and both
     make claims a simulation can reach. -/
@@ -6263,7 +6531,46 @@ theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :
     Total divergence factor = Fst_drift + (1 - Fst_drift) × (1 - shared_LD)
     where shared_LD is the fraction of LD preserved despite new mutations.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED, and the number is not a rejection**
+    (`proofs/validation/empirical/simcov/battery_bulk36.py`). Two-deme island
+    model, `Nₑ = 1000`, 5 Mb with recombination. `F_ST`, cross-deme LD
+    correlation and score-covariance retention are three SEPARATE measurements
+    on the same replicates, and the body is fed the measured `shared_ld` rather
+    than its migration formula, which is what distinguishes it from
+    `signalRetentionMigrationDrift`: this body takes the LD term as an ARGUMENT
+    and so is not committed to the `M/(1+M)` reading that `battery_bulk34`
+    refuted. Stated as retention, `1 - covDiv = (1 - fst) * shared_ld`:
+
+      4Nₑm   measured retention   this body   1-F     shared_ld
+      0.4    0.392 ± 0.074        0.429       0.472   0.909
+      2.0    0.476 ± 0.075        0.751       0.803   0.936
+      8.0    0.614 ± 0.076        0.918       0.944   0.973
+      40     0.736 ± 0.085        0.979       0.988   0.991
+
+    WHY THIS IS NOT WRITTEN AS A FALSIFICATION, though the raw gate says 4.01
+    sems and 50% relative. The retention column is divided by the estimator's
+    panmictic ceiling, and THAT run's ceiling came out 1.0430 -- above one, which
+    attenuation cannot produce, so the calibration is noise-dominated on six
+    replicates. `signalRetentionMigrationDrift` records the same retraction for
+    the same numbers, and a rejection quoted here from a calibration retracted
+    there would be the corpus disagreeing with itself in two docstrings. What
+    the run does establish is the DIRECTION, and it is the same direction in both
+    replications: measured retention runs well below every candidate at weak
+    migration, so if any of the three is right it is not by a wide margin.
+
+    Both competitors are rejected harder than the body on the same cells --
+    `1 - F` alone at 4.37 sems and `shared_ld` alone at 7.02 -- so the product
+    form is the best of the three and not merely the untested one. The positive
+    control, one population split arbitrarily giving `F_ST = 0`, passed at 0.15
+    sems; it is the ceiling and not the control that failed.
+
+    argument_source: sample. `fst_drift` and `shared_ld` are estimated from the
+    same replicates the retention is measured on. That is deliberate here -- a
+    relation among three separately measured observables is the only way to test
+    a body whose LD term is an argument -- but it is also why the verdict is a
+    number and not a validation: what a usable design still owes is a retention
+    estimator needing no ceiling at all, which means fitting the weights on an
+    independent split of the source sample. -/
 noncomputable def covarianceDivergenceMutationDrift
     (fst_drift shared_ld : ℝ) : ℝ :=
   fst_drift + (1 - fst_drift) * (1 - shared_ld)
@@ -6319,7 +6626,17 @@ theorem covarianceDivergence_le_one (fst_drift shared_ld : ℝ)
 /-- **Generalized signal retention under mutation-drift.**
     The retained signal is (1 - total_divergence) × V_A.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED, inherited**
+    (`proofs/validation/empirical/simcov/battery_bulk36.py`). The retention
+    fraction `1 - covarianceDivergenceMutationDrift` is what that battery
+    measures directly, and the table, the reason it is not written as a
+    rejection, and the two competitors are at
+    `covarianceDivergenceMutationDrift`. What this body adds is the factor
+    `V_A`, and NOTHING here measures it: a retention fraction times an additive
+    variance is dimensional bookkeeping, and every cell of that design was run at
+    one `V_A`. A design that swept `V_A` would test the linearity; none has.
+
+    argument_source: sample, inherited. -/
 noncomputable def presentDayPGSVarianceMutationDrift
     (V_A fst_drift shared_ld : ℝ) : ℝ :=
   (1 - covarianceDivergenceMutationDrift fst_drift shared_ld) * V_A
@@ -6363,7 +6680,18 @@ theorem mutationDrift_signal_lt_puredrift (V_A fst_drift shared_ld : ℝ)
 
 /-- **R² under mutation-drift balance.**
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED, inherited**
+    (`proofs/validation/empirical/simcov/battery_bulk36.py`), through
+    `presentDayPGSVarianceMutationDrift`, whose retention fraction is what that
+    battery measures; the table is at `covarianceDivergenceMutationDrift`.
+
+    The `v / (v + V_E)` chart on top of it is NOT tested by that run and is not
+    claimed to be here. It is the same `r2FromSignalVariance` chart the
+    drift-only `presentDayR2` uses, and it inherits whatever that chart carries;
+    what a reader must not take from this marker is that the chart was exercised
+    at more than one `V_E`, because it was not.
+
+    argument_source: sample, inherited. -/
 noncomputable def presentDayR2MutationDrift (V_A V_E fst_drift shared_ld : ℝ) : ℝ :=
   let v := presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld
   v / (v + V_E)
@@ -6406,7 +6734,22 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
 shared-LD retention coordinate. This remains a coarse benchmark, not a
 mechanistic SNP-level transport law.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **MEASURED, inherited**
+    (`proofs/validation/empirical/simcov/battery_bulk36.py`). Numerator and
+    denominator are each the retention form `(1 - fst) * shared_ld` that battery
+    measures directly, one per population, so the table and the reason it is a
+    number rather than a rejection are at `covarianceDivergenceMutationDrift`.
+
+    WHAT THE RATIO ADDS AND WHY IT IS THE WEAKER CLAIM OF THE TWO. Taking the
+    quotient of two retention factors asserts that the source's own retention is
+    the right normaliser -- that the benchmark is scale-free in whatever the two
+    populations share. Nothing measured here reaches that: `battery_bulk36` runs
+    two demes of a symmetric island model, where the source and target retention
+    factors are equal by construction and the ratio is one at every cell. So the
+    ratio's own content is untouched by the run that covers its parts, and a
+    design that moved the two populations asymmetrically is what it owes.
+
+    argument_source: sample, inherited. -/
 noncomputable def neutralAFSharedLDBenchmarkRatio
     (fstSource fstTarget shared_ld_source shared_ld_target : ℝ) : ℝ :=
   ((1 - fstTarget) * shared_ld_target) / ((1 - fstSource) * shared_ld_source)
@@ -6683,7 +7026,53 @@ it is the island-model equilibrium `F_ST`, with `rate = c` it is Sved's `E[r²]`
 
     Denotes: the rest point of the recurrence, under either reading.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED** on the island reading
+    (`proofs/validation/empirical/simcov/battery_pd1.py`), where it is
+    reached through `fstIslandMultiplicativeEquilibrium`. Explicit
+    Wright-Fisher symmetric island model, 200 demes, migration then
+    reproduction with the census read POST-migration -- the composition
+    convention `ibdRecurrenceStep` declares, and the one that matters, because
+    the other ordering has a fixed point differing by `(1 - m)²`, a factor of
+    four at `m = 0.5`. `F_ST` is the identity-probability convention on DISTINCT
+    pairs, as a ratio of averages over loci; ten independent replicate
+    metapopulations per cell.
+
+      Nₑ    m        this def   simulated            rel
+      200   0.0100    0.10963    0.10897 ± 0.00005    0.61%
+      50    0.0100    0.32999    0.32714 ± 0.00009    0.87%
+      13    0.1538    0.08839    0.08769 ± 0.00001    0.80%
+      4     0.5000    0.04000    0.03936 ± 0.00001    1.63%
+      2     0.2500    0.24324    0.23978 ± 0.00001    1.44%
+
+    WHAT MAKES THIS A MEASUREMENT AND NOT THE THIRD UNINFORMATIVE MATCH. The
+    rival closed form `1/(1 + 4 Nₑ m)` is carried on the SAME cells and is
+    rejected there: 1.7%, 1.9%, 26%, 182%, 39%. The two forms differ in `m` and
+    not in `4 Nₑ m`, so the earlier runs (`battery_bulk1`, `battery_bulk20`),
+    which swept the compound parameter, could not tell them apart and passed
+    both. Here `m` is swept 50-fold at fixed `4 Nₑ m` by SHRINKING `Nₑ`, and
+    `4 Nₑ m` is swept 4-fold besides so the rival has a prediction span at all
+    -- a constant prediction scores NO POWER and rejects nothing.
+
+    Positive control: a panmictic pool split into 200 labelled demes reads
+    `F_ST = -0.000000 ± 0.000007`, 0.05 sems from zero. That control is the one
+    that matters here, because the with-replacement reading of the estimator
+    returns `1/(2 Nₑ)` on the same design, which at `Nₑ = 2` is 0.25 against a
+    signal of 0.24.
+
+    The 0.6-1.6% residual is the finite-deme term the body is blind to. Repeating
+    at 500 demes shrinks it in every cell -- 0.39%, 0.74%, 0.48%, 0.83%, 1.09% --
+    by a factor of 1.2 to 2.0 against the 2.5 a pure `1/d` term would give, so a
+    second correction of order `1/(2 Nₑ)` survives at the smallest deme sizes.
+    Two further controls are recorded rather than gated, both agreeing to the
+    percent that the discrete model differs from its diffusion limit: Wright's
+    law with Latter's finite-deme factor at the small-`m` cell (1.1% high), and
+    the Beta`(4Nμ, 4Nμ)` stationary variance in one population (2.0% and 0.7%
+    high). Neither is a code fault; both are the size of the diffusion
+    approximation at `2 Nₑ = 50`.
+
+    argument_source: model. `Nₑ` and `m` are the simulation's own setup
+    parameters, written into the update rule, never estimated from the
+    replicates the oracle measures. -/
 noncomputable def ibdRecurrenceFixedPoint (Ne rate : ℝ) : ℝ :=
   (1 - rate) ^ 2 / ((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate))
 
@@ -6872,7 +7261,21 @@ witnesses at a point.
     the simulated `F_ST` runs 0.117 at two demes to 0.186 at twenty, against
     a deme-blind 0.200. See `fstIslandEquilibriumFiniteDemes`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **VALIDATED**
+    (`proofs/validation/empirical/simcov/battery_pd1.py`). This is the
+    definition the battery actually calls, so the table and the design are the
+    ones written out at `ibdRecurrenceFixedPoint`: explicit Wright-Fisher island
+    model at 200 demes, `m` swept 50-fold at fixed `4 Nₑ m`, agreement within
+    1.6% relative across the sweep while the rival `1/(1 + 4 Nₑ m)` misses by up
+    to 182% on the same cells, panmictic control 0.05 sems from zero.
+
+    The regime declared above is what the design respects and it is not
+    decoration: 200 demes, not two. At two demes this body is wrong by roughly
+    the factor its own regime paragraph records, and `battery_bulk40` measured
+    exactly that -- 0.199 predicted against 0.104 simulated -- on a two-deme
+    design that had no business testing a many-deme law.
+
+    argument_source: model. -/
 noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
   ibdRecurrenceFixedPoint Ne m
 
@@ -7002,7 +7405,23 @@ theorem lt_one_of_le_migrationEquilibrium (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < 
 
 /-- **SplitMigrationModel equilibrium Fst using the structure.**
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **FALSIFIED** outside the weak-migration limit, inherited
+    (`proofs/validation/empirical/simcov/battery_pd1.py`). This body forwards
+    `s.Ne` and `s.mig` to `fstMigrationDriftEquilibrium`, so it carries that
+    definition's verdict without qualification: within 2% at `mig ≤ 0.01`, 182%
+    high at `mig = 0.5`, against an explicit 200-deme Wright-Fisher island model
+    whose panmictic control reads 0.05 sems from zero. The table is at
+    `SplitMigrationModel.fstEqLimitLowMutationManyDemes`, which is the same
+    closed form written through `scaledMigrationRate`.
+
+    What the forwarding adds over the parent, and what is therefore NOT covered
+    by inheriting: that `Ne` and `mig` are passed in that order. Nothing here
+    measures the argument order, because `fstMigrationDriftEquilibrium` is
+    symmetric in its two arguments only through the product `4 * Ne * m`, so a
+    transposition would return the same number and no simulation can see it.
+    `SplitMigrationModel.fstMigDriftEq_mul_denom` is what pins the coefficient.
+
+    argument_source: model. -/
 noncomputable def SplitMigrationModel.fstMigDriftEq (s : SplitMigrationModel) : ℝ :=
   fstMigrationDriftEquilibrium s.Ne s.mig
 
@@ -7429,7 +7848,59 @@ name/quantity mismatch, so the two are separated rather than bounded.
     retention" read as the fraction of a score's covariance with the genetic
     value that survives transfer from the deme its weights came from.
 
-    Empirical status: UNTESTED, with a LEAD against the product form.
+    Empirical status: **FALSIFIED**
+    (`proofs/validation/empirical/simcov/battery_pd2.py`). THE LEAD BELOW IS NOW
+    CLOSED, and it was closed by removing the calibration rather than by
+    estimating it better. Two-deme island model at migration-drift balance,
+    `Nₑ = 1000`, 5 Mb with recombination, 300 diploids per deme, 200 causal
+    sites, 40 independent replicates:
+
+      4Nₑm   measured retention   this body   1-F_ST   shared LD
+      0.4    0.171 ± 0.028        0.082       0.526    0.377
+      2.0    0.353 ± 0.026        0.444       0.802    0.368
+      8.0    0.523 ± 0.029        0.790       0.940    0.477
+      40     0.798 ± 0.038        0.952       0.989    0.669
+
+    The body misses at 3.23, 3.57, 9.21 and 4.10 sems, and it misses on BOTH
+    SIDES: 110% LOW at `4 Nₑ m = 0.4` and 51% HIGH at `4 Nₑ m = 8`. A two-sided
+    miss is the signature of a wrong functional form rather than a wrong
+    constant, so no rescaling of either factor repairs it.
+
+    WHAT FIXED THE DESIGN. The estimator no longer needs a ceiling. Retention was
+    `w'Σ_T β / w'Σ_S β` with `w = Σ_S β` fitted on the SAME source sample the
+    denominator contracts against, so the denominator carried squared estimation
+    noise the numerator did not, and every cell had to be divided by a
+    separately estimated panmictic ceiling -- which came out 0.8905 in one run
+    and 1.0430 in the other, a value above one that attenuation cannot produce.
+    The source sample is now SPLIT: `w = Σ_A β` from half A, and the
+    source-side covariance evaluated on half B. `Σ_A` and `Σ_B` are independent
+    estimates of one matrix, so there is no squared noise and nothing to
+    calibrate. The positive control is what shows it worked: one panmictic
+    population split three ways returns retention `1.030 ± 0.030`, 1.02 sems
+    from one, with `F_ST` measured at 0.00002 on the same replicates.
+
+    BOTH SINGLE FACTORS ARE ALSO REJECTED on the same cells, so this is not a
+    case of the product being wrong because one factor is spurious. `1 - F_ST`
+    alone misses by 12.76, 17.59, 14.37 and 5.08 sems -- it is the worst of the
+    four candidates, which retires the reading the earlier lead favoured. The LD
+    factor alone misses by 7.39 sems at the weak-migration cell.
+
+    THE MIGRATION PARAMETERISATION IS WHERE THE PRODUCT BREAKS. Read with the
+    MEASURED cross-deme LD correlation in place of `sharedLDFromMigration`, the
+    same product form lands at 0.96, 2.28, 2.60 and 3.66 sems -- still rejected,
+    but by a margin that one cell carries, against 9.21 for the body as written.
+    That is consistent with `battery_bulk34`, which refuted `M/(1+M)` directly.
+    The measured-LD reading is NOT quoted as a verdict of its own, because the
+    cross-deme correlation of two separately estimated `r` vectors is attenuated
+    by its own estimation noise, and that attenuation was not calibrated either;
+    it is reported to locate the fault, not to license a replacement body.
+
+    argument_source: model. `F_ST` and the LD factor are both evaluated at the
+    simulation's own `Nₑ` and `m` through the closed forms, never estimated from
+    the replicates the retention is measured on.
+
+    THE SUPERSEDED RECORD, kept because the retraction is part of the story.
+    This read UNTESTED, with a LEAD against the product form,
     DOWNGRADED from a falsification after a replication check: a second run of
     the same design (`simcov/battery_bulk36.py`) returned retention 0.736 at
     `4·Nₑ·m = 40` where the first returned 0.993, and 0.614 against 0.781 at
@@ -7493,14 +7964,30 @@ noncomputable def signalRetentionMigrationDrift (Ne m : ℝ) : ℝ :=
 
     Denotes: a variance, in the units of `V_A`.
 
-    Empirical status: UNTESTED, inherited. This body is
-    `signalRetentionMigrationDrift Ne m * V_A`, and that fraction carries a LEAD
-    against its product form which two runs could not replicate stably -- see
-    there for the tables and for why the calibration, not the biology, is what
-    moved. An earlier version of this docstring recorded the falsification as
-    inherited; that was withdrawn when the replication check came back.
-    `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` is unaffected: it
-    is algebra and holds whatever the fraction turns out to be. -/
+    Empirical status: **FALSIFIED, inherited**
+    (`proofs/validation/empirical/simcov/battery_pd2.py`). This body is
+    `signalRetentionMigrationDrift Ne m * V_A`, and that fraction is now rejected
+    at up to 9.21 sems on a design whose positive control -- one panmictic
+    population split three ways, retention `1.030 ± 0.030` -- passes; the table
+    and the reason the earlier calibration could not support a verdict are
+    recorded there.
+
+    THE HISTORY MATTERS HERE and is why the marker is spelled out rather than
+    just set. An earlier version of this docstring recorded the falsification as
+    inherited; it was WITHDRAWN when a replication check showed the two runs
+    disagreeing by an order of magnitude more than their quoted bars. The
+    withdrawal was right at the time: the instability was in the ceiling the
+    estimator was divided by, not in the biology. What reinstates the verdict is
+    not a third run of the same design but a design with no ceiling in it.
+
+    WHAT IS STILL NOT MEASURED, and is not claimed: the factor `V_A`. Every cell
+    of that battery is run at one additive variance, and a retention fraction
+    times a variance is dimensional bookkeeping the design never exercises. A
+    body that multiplied by `V_A²` would score identically.
+    `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` is unaffected
+    either way: it is algebra and holds whatever the fraction turns out to be.
+
+    argument_source: model, inherited. -/
 noncomputable def retainedSignalVarianceMigrationDrift (V_A Ne m : ℝ) : ℝ :=
   signalRetentionMigrationDrift Ne m * V_A
 

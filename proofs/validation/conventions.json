@@ -466,13 +466,26 @@
         "1"
       ]
     },
+    "Calibrator/DGP.lean::fstDemeCorrectedFlowStep": {
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "2",
+        "2",
+        "2"
+      ],
+      "note": "fstDriftFlowStep with the migration rate at the two-deme exchange rate.  The inner 2 on mig is islandDemeCorrection at d = 2: the homogenising rate is emigration plus immigration, not emigration alone.  The outer 2 is the two lineages, as in fstDriftFlowStep.  Mutation carries no such factor -- it destroys identity wherever the lineage sits."
+    },
     "Calibrator/DGP.lean::fstEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
         "1",
-        "1"
-      ]
+        "1",
+        "2"
+      ],
+      "note": "The 2 multiplies bigM and nothing else: it is islandDemeCorrection at the two demes this body's regime declares, measured on battery_falsrepair group_a, where the uncorrected 1/(1 + theta + bigM) is excluded at 7.58 sems and the squared correction 1/(1 + theta + 4 bigM) at 5.37."
     },
     "Calibrator/DGP.lean::fstTransientDecayFromScaled": {
       "quantity": "fst",
@@ -602,8 +615,10 @@
       "constants": [
         "1",
         "1",
-        "1"
-      ]
+        "1",
+        "2"
+      ],
+      "note": "The 2 on bigM is the same islandDemeCorrection at d = 2 that DGP::fstEquilibrium carries; this body spells the equilibrium level out because it cannot reach an EvolutionaryParameters, and toGenerationalPopGenParameters_fstTransientAt_floor is what forces the two spellings to move together."
     },
     "Calibrator/PortabilityDrift.lean::covarianceRetentionFactorFromFst": {
       "quantity": "fst",
