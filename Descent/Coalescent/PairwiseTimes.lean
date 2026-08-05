@@ -1,0 +1,160 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Coalescent.HoldingSecondMoment
+import Mathlib.Tactic
+
+namespace Descent
+
+/-!
+# Pairwise coalescence times in a three-sample, and why their symmetric sums forget the tree
+
+`Descent.Coalescent.SpectrumMoments` closes the `S`-side second moments and records what
+`Var(π)` still needs: `E(T_ij T_kl)` for two pairs sharing a lineage.  By restriction
+consistency (K-G (7.2), `Restriction.restrict_restrict`) any two such pairs live in a
+three-sample, so that is the object to compute in.
+
+A three-sample's genealogy is two holding times and a choice.  It spends `τ₃` with three
+lineages, then `τ₂` with two; one of the three pairs merges first, and the jump chain picks
+which uniformly (`JumpChain.jumpProb`, `C(3,2) = 3` covers).  Writing `c` for the pair that
+merges first, the pairwise coalescence times are
+
+  `T_c = τ₃`,   `T_p = τ₃ + τ₂` for the other two.
+
+The observation this file is built on is that the SYMMETRIC functions of those three numbers
+do not depend on `c`:
+
+  `Σ_p T_p = 3τ₃ + 2τ₂`,   `Σ_p T_p² = τ₃² + 2(τ₃+τ₂)²`,
+
+and therefore the cross-sum `Σ_{p≠q} T_p T_q`, being the difference of the square of the
+first and the second, does not either.  So the quantities `Var(π)` is built from need no
+average over topologies at all: the choice the jump chain makes is invisible to them.
+
+That is what makes the computation finite.  With the holding-time moments -- `E τ₃ = 1/3`,
+`E τ₃² = 2/9`, `E τ₂ = 1`, `E τ₂² = 2`, all integrals against K-C (1.7)'s density that
+`Descent.Coalescent.HoldingSecondMoment` proves -- the cross-sum has expectation `4`, so the
+average over the three unordered pairs-of-pairs is
+
+  `E(T_ij T_ik) = 4/3`,   hence   `Cov(T_ij, T_ik) = 1/3`.
+
+## What this closes and what it does not
+
+CLOSED: the three-sample half of `Var(π)`'s missing input, and the structural reason it is
+computable -- topology-independence of the symmetric sums.
+
+NOT CLOSED: the four-sample case, `E(T_ij T_kl)` for DISJOINT pairs, and the combinatorial
+sum over pair classes that assembles them into Tajima's expression.  Also not closed: the
+covariance of the mutation counts, which adds `θ · E(shared path length)` to
+`θ² Cov(T,T')` because overlapping paths share mutations.  `Descent.Coalescent.Program`
+records both.
+
+The moment hypotheses are written as hypotheses rather than derived inline because the
+expectation functional itself -- an integral against the product of two hold measures -- is
+not built in this corpus; `HoldingSecondMoment` proves the one-dimensional integrals and the
+independence that turns `E(τ₃τ₂)` into `E τ₃ · E τ₂` is the corpus's standing assumption,
+tracked as `Program` item 4.
+
+## Main results
+
+- `pairTime`: the three pairwise times of a three-sample.
+- `sum_pairTime`, `sum_sq_pairTime`: **their symmetric sums forget which pair merged first**.
+- `cross_pairTime`: hence so does the cross-sum, `3τ₃² + 4τ₃τ₂ + τ₂²`.
+- `expected_cross_pairTime`: with the coalescent's moments it is `4`.
+- `covariance_pairTime`: **`Cov(T_ij, T_ik) = 1/3`**.
+-/
+
+namespace Coalescent
+
+open Finset
+
+/-- The coalescence time of pair `p` in a three-sample whose first merger is pair `c`, given
+the two holding times.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  It reads the tree off the jump chain and the
+clock: the pair that merges first waits `τ₃`, the other two wait until the root. -/
+def pairTime (c p : Fin 3) (t₃ t₂ : ℝ) : ℝ := if p = c then t₃ else t₃ + t₂
+
+/-- **The total of the three pairwise times forgets the topology.**  Whichever pair merged
+first, the three times sum to `3τ₃ + 2τ₂`. -/
+theorem sum_pairTime (c : Fin 3) (t₃ t₂ : ℝ) :
+    ∑ p : Fin 3, pairTime c p t₃ t₂ = 3 * t₃ + 2 * t₂ := by
+  fin_cases c <;> simp [pairTime, Fin.sum_univ_three] <;> ring
+
+/-- **And so does the sum of their squares.**  `τ₃² + 2(τ₃+τ₂)²`, for every topology. -/
+theorem sum_sq_pairTime (c : Fin 3) (t₃ t₂ : ℝ) :
+    ∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2 = t₃ ^ 2 + 2 * (t₃ + t₂) ^ 2 := by
+  fin_cases c <;> simp [pairTime, Fin.sum_univ_three] <;> ring
+
+/-- **The cross-sum, therefore, also forgets it.**  `Σ_{p<q} T_p T_q` is half the difference
+between the square of the total and the total of the squares, and both of those are
+topology-free, so it is `3τ₃² + 4τ₃τ₂ + τ₂²`.
+
+This is the fact that makes `Var(π)` computable without averaging over tree shapes: the jump
+chain's choice, which is where all the combinatorial difficulty of the coalescent lives, does
+not enter. -/
+theorem cross_pairTime (c : Fin 3) (t₃ t₂ : ℝ) :
+    ((∑ p : Fin 3, pairTime c p t₃ t₂) ^ 2 - ∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2) / 2
+      = 3 * t₃ ^ 2 + 4 * t₃ * t₂ + t₂ ^ 2 := by
+  rw [sum_pairTime, sum_sq_pairTime]
+  ring
+
+/-- Topology-independence, stated as such: any two first-merging pairs give the same
+symmetric sums.  A corollary of the two theorems above, recorded because it is the
+statement the computation rests on rather than a step inside it. -/
+theorem pairTime_symmetric_sums_topology_free (c c' : Fin 3) (t₃ t₂ : ℝ) :
+    (∑ p : Fin 3, pairTime c p t₃ t₂) = (∑ p : Fin 3, pairTime c' p t₃ t₂)
+      ∧ (∑ p : Fin 3, pairTime c p t₃ t₂ ^ 2)
+        = (∑ p : Fin 3, pairTime c' p t₃ t₂ ^ 2) := by
+  constructor
+  · rw [sum_pairTime, sum_pairTime]
+  · rw [sum_sq_pairTime, sum_sq_pairTime]
+
+/-! ### With the coalescent's moments -/
+
+/-- **The cross-sum's expectation is `4`.**
+
+The hypotheses are the moments of K-C (1.7)'s clock at the two rates a three-sample passes
+through, `d₃ = 3` and `d₂ = 1`: `HoldingSecondMoment.integral_id_mul_holdDensity` gives
+`E τ = 1/d` and `.integral_sq_mul_holdDensity` gives `E τ² = 2/d²`, so `E τ₃ = 1/3`,
+`E τ₃² = 2/9`, `E τ₂ = 1`, `E τ₂² = 2`.  The remaining hypothesis, `E(τ₃τ₂) = E τ₃ · E τ₂`,
+is independence of the clocks -- the corpus's standing assumption, tracked as `Program`
+item 4 and not proved here. -/
+theorem expected_cross_pairTime {e3 e3sq e2 e2sq e32 : ℝ}
+    (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2)
+    (hindep : e32 = e3 * e2) :
+    3 * e3sq + 4 * e32 + e2sq = 4 := by
+  subst h3 h3sq h2 h2sq hindep
+  norm_num
+
+/-- **`E(T_ij T_ik) = 4/3`.**  The cross-sum counts the three unordered pairs-of-pairs, and
+they are exchangeable, so each has expectation a third of the total. -/
+theorem expected_pairTime_product {e3 e3sq e2 e2sq e32 : ℝ}
+    (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2)
+    (hindep : e32 = e3 * e2) :
+    (3 * e3sq + 4 * e32 + e2sq) / 3 = 4 / 3 := by
+  rw [expected_cross_pairTime h3 h3sq h2 h2sq hindep]
+
+/-- **`Cov(T_ij, T_ik) = 1/3`.**  Two pairwise coalescence times that share a lineage are
+POSITIVELY correlated, and by exactly a third of their common mean.
+
+That positive correlation is the whole reason Tajima's `Var(π)` is not the naive
+`Var(S)/C(n,2)`: the pairwise differences a sample reports are not independent readings of
+the same tree, they are overlapping readings, and the overlap is a third. -/
+theorem covariance_pairTime {e3 e3sq e2 e2sq e32 : ℝ}
+    (h3 : e3 = 1 / 3) (h3sq : e3sq = 2 / 9) (h2 : e2 = 1) (h2sq : e2sq = 2)
+    (hindep : e32 = e3 * e2) :
+    (3 * e3sq + 4 * e32 + e2sq) / 3 - 1 = 1 / 3 := by
+  rw [expected_pairTime_product h3 h3sq h2 h2sq hindep]
+  norm_num
+
+/-- The mean pairwise time is `1` whatever the sample size, which is what makes the
+subtraction above a covariance: `E(T_ij) = E(T_ik) = 1`.  Here it is inside the three-sample,
+from the same two moments. -/
+theorem expected_pairTime {e3 e2 : ℝ} (h3 : e3 = 1 / 3) (h2 : e2 = 1) :
+    (3 * e3 + 2 * e2) / 3 = 1 := by
+  subst h3 h2
+  norm_num
+
+end Coalescent
+
+end Descent

@@ -148,10 +148,18 @@ step" are different states.
   Tajima's exact denominator.  `SpectrumMoments.tajimaVarPairwise` writes Tajima's expression
   down in order to CHECK it, and `varPairwise_two_eq` verifies it at `n = 2`, the one sample
   size where the corpus can: a sample of two has one pair, so `π` IS `S`.  For `n ≥ 3` the
-  pairwise differences overlap, and `Var(π)` needs `E(T_ij T_kl)` for pairs sharing a lineage
-  and for disjoint pairs -- three- and four-sample joint laws over the product measure, which
-  restriction consistency reduces the general case to but does not compute.  Nothing in the
-  corpus depends on the asserted expression.
+  pairwise differences overlap.  `Coalescent.PairwiseTimes` computes the SHARING case:
+  restriction consistency puts two pairs sharing a lineage inside a three-sample, and there
+  the symmetric sums of the three pairwise times are TOPOLOGY-FREE -- `Σ T_p = 3τ₃ + 2τ₂` and
+  `Σ T_p² = τ₃² + 2(τ₃+τ₂)²` whichever pair merged first -- so no average over tree shapes is
+  needed and the cross-sum is `3τ₃² + 4τ₃τ₂ + τ₂²`.  With the clock moments that
+  `HoldingSecondMoment` proves, `E(T_ij T_ik) = 4/3` and `Cov(T_ij, T_ik) = 1/3`: overlapping
+  readings of one tree, positively correlated by exactly a third, which is why `Var(π)` is not
+  `Var(S)/C(n,2)`.  STILL ABSENT: the DISJOINT case in a four-sample -- where the symmetric
+  sums are NOT topology-free and an average over the second merger is needed -- the
+  combinatorial sum over pair classes, and the `θ · E(shared path length)` term the
+  overlapping mutation counts contribute on top of `θ² Cov(T,T')`.  Nothing in the corpus
+  depends on the asserted expression.
 * **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
   K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
   exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix
