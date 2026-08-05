@@ -307,6 +307,50 @@ jobs:
       # it was the only instrument positioned to notice that the extraction tier
       # had gone silent. A red ground-truth gate must be repointed, not left.)
 
+      # BOTH DIRECTIONS FIRST, as with the laundering and identity-gate
+      # calibrations. Nobody had checked that the Lean corpus and the shipped
+      # implementation agree, and a theorem about a model the code does not
+      # implement is worse than no theorem: it is a false assurance that no
+      # other guard in proofs/validation/ can see. So the detector is asserted
+      # in both directions before its verdict is read -- a clean tree is silent,
+      # and seven planted one-place defects (one per finding class, plus an
+      # unreadable corpus) are each reported.
+      #
+      # The empty-corpus case is not decoration. The extraction tier resolved
+      # its corpus root one directory too high, parsed zero definitions and
+      # exited 0; this check would consume the same table, so it asserts that an
+      # empty table is an error rather than a pass.
+      - name: Calibrate the corpus/implementation correspondence guard
+        run: python3 proofs/validation/empirical/lean_code_map/test_map_check.py
+
+      # The correspondence table itself: which Calibrator declaration describes
+      # which shipped function, and whether that has been verified. Anchored to
+      # declaration NAMES plus content hashes, never to line numbers -- the
+      # mistake extract/test_parser.py was excluded for. A mapped Lean body or
+      # Rust body that changed is STALE, not wrong: the repair is to re-read
+      # both sides and re-bless, not to assume the mathematics broke.
+      #
+      # It also carries the unguarded-code inventory: the clamps, epsilons,
+      # fallback branches, divisions and square roots inside the mapped Rust,
+      # recorded so a newly introduced numerical guard with no corresponding
+      # invariant in the corpus shows up as a finding. Every budget is 0.
+      #
+      # After emit.py, which it consumes through extract/api.py.
+      - name: Corpus/implementation correspondence
+        run: python3 proofs/validation/empirical/lean_code_map/map_check.py
+
+      # Now also the numeric differential: every mapped Calibrator definition
+      # evaluated against the REAL map/correctability.rs on the committed
+      # boundary/degenerate fixture grid, ~12800 comparisons in under a tenth of
+      # a second. Deterministic, exact arithmetic on a fixed grid, so the
+      # verdict is reproducible -- the same reason the differential battery
+      # above qualifies as a gate.
+      #
+      # This step could not compile for as long as it had been required: it
+      # reached the implementation through `#[path = "../../../map/..."]`, one
+      # level short of the repository root, so `cargo test` failed to build and
+      # executed nothing. A gate that cannot build is not a weaker gate; it is
+      # no gate at all, wearing the failure mode of infrastructure noise.
       - name: Executable correctability contract
         run: cargo test --manifest-path proofs/validation/empirical/correctability_calculator/Cargo.toml
 

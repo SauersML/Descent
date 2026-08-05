@@ -1,0 +1,154 @@
+"""Calibration for map_check.py, in BOTH directions.
+
+A detector that reports nothing is indistinguishable from a verified
+correspondence, which is the failure mode this whole lane exists to catch: the
+executable correctability contract was a required CI step that could not compile
+for as long as it had existed, and it looked exactly like a passing check.
+
+So this asserts two things:
+
+  * the real tree produces ZERO findings, and
+  * each of seven planted defects -- one per finding class, plus the empty-corpus
+    case -- is reported.
+
+Each planted defect is a minimal, one-place change: a single character in a Lean
+transcription, a single character in a Rust body, one renamed declaration, one
+extra guard call.  If a bigger perturbation were needed to make the check fire,
+the check would not be sensitive enough to catch a real convention error.
+
+Run:  python3 test_map_check.py
+"""
+
+import copy
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+
+import lean_bodies  # noqa: E402
+import map_check  # noqa: E402
+
+FAILURES = []
+
+
+def expect(condition, message):
+    if not condition:
+        FAILURES.append(message)
+    print(f"  {'ok  ' if condition else 'FAIL'}  {message}")
+
+
+def kinds(results):
+    return sorted({kind for kind, _, _ in results})
+
+
+def main():
+    print("CALIBRATION: the clean tree must be silent")
+    clean = map_check.load_sources()
+    baseline = map_check.findings(clean)
+    expect(baseline == [],
+           f"clean tree yields no findings (got {len(baseline)}: {kinds(baseline)})")
+
+    print()
+    print("CALIBRATION: each planted defect must be caught")
+
+    # 1. CODE-STALE: one character of a mapped Rust body.
+    mutated = copy.deepcopy(clean)
+    path = "map/correctability.rs"
+    text = mutated["code_text"][path]
+    needle = "input.subgroup_size * (input.sample_size - input.subgroup_size)"
+    assert needle in text, "the anchor for the CODE-STALE mutation is gone; re-pick it"
+    mutated["code_text"][path] = text.replace(
+        needle, "input.subgroup_size * (input.sample_size + input.subgroup_size)", 1)
+    result = map_check.findings(mutated)
+    expect("CODE-STALE" in kinds(result),
+           f"a one-character change to effective_subgroup_size is CODE-STALE "
+           f"(got {kinds(result)})")
+
+    # 2. CODE-MISSING: a mapped function that no longer exists under that name.
+    mutated = copy.deepcopy(clean)
+    mutated["code_text"][path] = mutated["code_text"][path].replace(
+        "fn require_finite_positive", "fn require_finite_positive_renamed", 1)
+    result = map_check.findings(mutated)
+    expect("CODE-MISSING" in kinds(result),
+           f"a renamed mapped function is CODE-MISSING (got {kinds(result)})")
+
+    # 3. GUARD-SURFACE: a new numerical guard inside a mapped body.
+    mutated = copy.deepcopy(clean)
+    mutated["code_text"][path] = mutated["code_text"][path].replace(
+        "let residual_axis_fraction = 1.0 - removed_axis_fraction;",
+        "let residual_axis_fraction = (1.0 - removed_axis_fraction).clamp(0.0, 1.0);", 1)
+    result = map_check.findings(mutated)
+    expect({"GUARD-SURFACE", "CODE-STALE"} <= set(kinds(result)),
+           f"a newly introduced clamp in mapped code is GUARD-SURFACE "
+           f"(got {kinds(result)})")
+
+    # 4. CORPUS-MISSING: a mapped Lean declaration that is no longer there.
+    mutated = copy.deepcopy(clean)
+    mutated["corpus"].pop("Calibrator.demographicSpike", None)
+    result = map_check.findings(mutated)
+    expect("CORPUS-MISSING" in kinds(result),
+           f"a deleted mapped Lean declaration is CORPUS-MISSING (got {kinds(result)})")
+
+    # 5. CORPUS-STALE: a mapped Lean body that changed.
+    mutated = copy.deepcopy(clean)
+    mutated["corpus"]["Calibrator.samplePCOverlapSq"] = "sha256:" + "0" * 32
+    result = map_check.findings(mutated)
+    expect("CORPUS-STALE" in kinds(result),
+           f"an edited mapped Lean body is CORPUS-STALE (got {kinds(result)})")
+
+    # 6. REFPOINT and EXPECTED-STALE: one character of a Lean transcription.
+    #    This is the mutation that matters most. The corpus's own reference
+    #    points did NOT catch the analogous spike-constant error, because they
+    #    were evaluated where the body collapses; the fixture grid did.
+    original = lean_bodies.effectiveSubgroupSize
+    try:
+        lean_bodies.effectiveSubgroupSize = lambda n, m: lean_bodies.ldiv(m * (n + m), n)
+        result = map_check.findings(clean)
+        expect("REFPOINT" in kinds(result),
+               f"a one-character change to the effectiveSubgroupSize transcription "
+               f"is REFPOINT (got {kinds(result)})")
+        expect("EXPECTED-STALE" in kinds(result),
+               f"the same change moves the committed expected values "
+               f"(got {kinds(result)})")
+    finally:
+        lean_bodies.effectiveSubgroupSize = original
+
+    #    ... and the spike constant, which the corpus's reference points could
+    #    not see until they were moved off `m = n`. The grid catches it
+    #    independently of that repair, which is the point: the grid does not
+    #    depend on anyone having chosen a good evaluation point.
+    original = lean_bodies.demographicSpike
+    try:
+        lean_bodies.demographicSpike = \
+            lambda n, F, m: 2 * F * lean_bodies.effectiveSubgroupSize(n, m)
+        result = map_check.findings(clean)
+        expect("EXPECTED-STALE" in kinds(result),
+               f"a 4 -> 2 spike constant is caught by the fixture grid "
+               f"(got {kinds(result)})")
+    finally:
+        lean_bodies.demographicSpike = original
+
+    # 7. An empty corpus must be an error, never a silent pass. A check that
+    #    cannot report its own absence reports someone else's answer as its own.
+    print()
+    print("CALIBRATION: an unreadable corpus must not pass")
+    empty = copy.deepcopy(clean)
+    empty["corpus"] = {}
+    result = map_check.findings(empty)
+    expect(len(result) > 0,
+           f"an empty corpus table produces findings rather than silence "
+           f"(got {len(result)})")
+
+    print()
+    if FAILURES:
+        print(f"FAIL: {len(FAILURES)} calibration assertion(s) failed")
+        for message in FAILURES:
+            print(f"  {message}")
+        return 1
+    print("PASS: the correspondence guard is calibrated in both directions")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
