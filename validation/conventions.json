@@ -376,13 +376,13 @@
    ],
    "source": "tau = t/(2*Ne).  This is the 2*Ne that is NOT the 4*Ne of a scaled rate; it is a TIME scale, the mean pairwise coalescence time."
   },
-  "Descent/Portability/TransferLearningPGS.lean::gaussianSourceResidualRisk": {
+  "Descent/Portability/TransferLearningPGS/FeatureRepresentation.lean::gaussianSourceResidualRisk": {
    "constants": [
     "2"
    ],
    "source": "exp(-2*I) is the Gaussian residual-variance fraction; the 2 is fixed by half a nat costing exactly one e-fold."
   },
-  "Descent/Portability/TransferLearningPGS.lean::pinskerAncestryDivergenceCap": {
+  "Descent/Portability/TransferLearningPGS/FeatureRepresentation.lean::pinskerAncestryDivergenceCap": {
    "constants": [
     "2"
    ],
@@ -1145,17 +1145,17 @@
    "role": "consumer",
    "note": "No reading is declared on the definition and none is derivable from its callees."
   },
-  "Descent/Portability/TransferLearningPGS.lean::additiveHeritability": {
-   "quantity": "h2",
-   "convention": "narrow-sense"
-  },
-  "Descent/Portability/TransferLearningPGS.lean::privateArchitectureTransferCeiling": {
+  "Descent/Portability/TransferLearningPGS/FineTuning.lean::privateArchitectureTransferCeiling": {
    "quantity": "h2",
    "convention": "undetermined",
    "role": "consumer",
    "note": "No reading is declared on the definition and none is derivable from its callees."
   },
-  "Descent/Portability/TransferLearningPGS.lean::sharedLDHeritability": {
+  "Descent/Portability/TransferLearningPGS/PGSPortabilityDerivation.lean::additiveHeritability": {
+   "quantity": "h2",
+   "convention": "narrow-sense"
+  },
+  "Descent/Portability/TransferLearningPGS/PGSPortabilityDerivation.lean::sharedLDHeritability": {
    "quantity": "h2",
    "convention": "narrow-sense",
    "note": "Additive variance computed through a shared LD kernel, still divided by the phenotypic variance."
