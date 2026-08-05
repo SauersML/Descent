@@ -173,13 +173,13 @@ noncomputable def islandDemeCorrection (d : ℝ) : ℝ := ratio d (d - 1)
 migrate from; the divisor vanishes and Lean returns `0`, reporting no inflation at all
 for a case where the quantity is undefined. Consumers must require `d ≠ 1`. -/
 theorem islandDemeCorrection_one_is_junk : islandDemeCorrection 1 = 0 := by
-  unfold islandDemeCorrection Descent.Core.ratio ratio; norm_num
+  unfold islandDemeCorrection ratio; norm_num
 
 /-- **At two demes the correction is exactly two.** Pinned as a value because this is the
 factor a many-deme formula drops on the two-population split that most of the corpus's
 portability results are stated for. -/
 @[simp] theorem islandDemeCorrection_two : islandDemeCorrection 2 = 2 := by
-  unfold islandDemeCorrection Descent.Core.ratio ratio; norm_num
+  unfold islandDemeCorrection ratio; norm_num
 
 /-- **At twenty demes it is `20/19`.** Pinned as a value for the same reason as the
 two-deme case, and because this is the other factor the ledger measured:
@@ -187,7 +187,7 @@ two-deme case, and because this is the other factor the ledger measured:
 from the many-deme limit that drops it, at `d = 20`, on a design whose error bars are
 half those of the run that could not tell them apart. -/
 @[simp] theorem islandDemeCorrection_twenty : islandDemeCorrection 20 = 20 / 19 := by
-  unfold islandDemeCorrection Descent.Core.ratio ratio; norm_num
+  unfold islandDemeCorrection ratio; norm_num
 
 /-! ### The two factors the ledger measured, on the scaled rate that carries them
 
@@ -218,7 +218,7 @@ correction overshoots `1` by exactly `1/(d-1)`. A reader who needs to know wheth
 many-deme formula is usable at `d = 20` gets `5%` from this and nothing from a limit. -/
 theorem islandDemeCorrection_sub_one (d : ℝ) (hd : d ≠ 1) :
     islandDemeCorrection d - 1 = 1 / (d - 1) := by
-  unfold islandDemeCorrection Descent.Core.ratio ratio
+  unfold islandDemeCorrection ratio
   have h : d - 1 ≠ 0 := sub_ne_zero_of_ne hd
   field_simp
   ring
@@ -231,7 +231,7 @@ theorem islandDemeCorrection_tendsto_one :
   have hEq : islandDemeCorrection =ᶠ[atTop] fun d : ℝ ↦ 1 + 1 / (d - 1) := by
     filter_upwards [eventually_gt_atTop (1 : ℝ)] with d hd
     have h : d - 1 ≠ 0 := by intro hc; rw [sub_eq_zero] at hc; exact absurd hc (by linarith)
-    unfold islandDemeCorrection Descent.Core.ratio ratio
+    unfold islandDemeCorrection ratio
     field_simp
     ring
   rw [tendsto_congr' hEq]

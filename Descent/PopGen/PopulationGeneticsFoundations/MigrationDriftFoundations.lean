@@ -91,7 +91,7 @@ theorem islandDemeCorrection_at_reference_point :
 Lean returns `0`. Consumers must require `d ≠ 1`, and `islandFstFiniteDemes_one_deme_is_junk`
 shows what the `0` does downstream. -/
 theorem islandDemeCorrection_one_deme_is_junk : Descent.Core.islandDemeCorrection 1 = 0 := by
-  unfold Descent.Core.islandDemeCorrection Descent.Core.ratio; exact Descent.Core.islandDemeCorrection_one_is_junk
+  unfold Descent.Core.islandDemeCorrection; exact Descent.Core.islandDemeCorrection_one_is_junk
 
 /-- **Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.
 
@@ -148,7 +148,8 @@ convention fixes them in a single place. Without this theorem an edit to that co
 would silently stop reaching this definition. -/
 theorem islandFstFiniteDemes_eq_islandEquilibrium_no_mutation (Ne m d : ℝ) :
     islandFstFiniteDemes Ne m d = Descent.Core.fstIslandEquilibrium Ne m 0 d := by
-  unfold islandFstFiniteDemes Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.fstIslandEquilibrium
+  unfold islandFstFiniteDemes Descent.Core.islandDemeCorrection Descent.Core.ratio
+    Descent.Core.fstIslandEquilibrium
     Descent.Core.fstFromFlow Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
     Descent.Core.scaledMutationRate Descent.Core.ploidy
   ring_nf
@@ -190,7 +191,7 @@ theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
     islandFstFiniteDemes Ne m d < Portability.fstMigrationDriftEquilibrium Ne m := by
   unfold islandFstFiniteDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-  have hc : 1 < Descent.Core.islandDemeCorrection Descent.Core.ratio d := one_lt_islandDemeCorrection d hd
+  have hc : 1 < Descent.Core.islandDemeCorrection d := one_lt_islandDemeCorrection d hd
   have hNm : 0 < 4 * Ne * m := by positivity
   apply div_lt_div_of_pos_left one_pos (by nlinarith)
   nlinarith
