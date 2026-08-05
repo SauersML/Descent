@@ -6378,6 +6378,23 @@ def run_shape_chains() -> int:
     The fix is never to delete the import -- that breaks the build, because the
     sibling is the conduit.  It is to import the modules named below it directly,
     after which the sibling is either used or genuinely removable.
+
+    A DIRECTORY-HEAD EDGE IS EXEMPT, and the exemption is deliberate rather than a
+    side effect.  A module whose one import is its own directory head -- today
+    `Program/OpenQuestions` and `Portability/PortabilityBounds`, both importing
+    `Portability/PortabilityDrift` -- looks exactly like the defect above and is
+    not one: the head carries the directory's whole external import surface, so
+    that edge is load-bearing until each module under it has been given its own
+    external import list.  Six such edges were knowingly left in `PortabilityDrift`
+    and `MetricSpecificPortability` during the chain repair, on that reasoning.
+
+    Two independent things keep them out, and both are load-bearing because either
+    one alone would be a rule someone could quietly break.  A head sits one level
+    UP from the modules under it, so it is never a sibling and the second condition
+    rejects it.  And `_shape_graph_without_toc` deletes heads outright, so a module
+    whose only import was its head has zero imports in the graph this reads and
+    fails the first condition too.  If the sibling test is ever loosened, the second
+    protection still holds; do not remove both.
     """
     _raw, code, _graph, decls, _arch = _shape_corpus()
     graph = _shape_graph_without_toc()
