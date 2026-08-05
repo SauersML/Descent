@@ -643,23 +643,38 @@ theorem multiTraitEffectiveSampleSize_smallPrior
 
 
 /-- **Cross-check: borrowing across traits and borrowing across ancestries are
-the same arithmetic, in the vanishing-prior limit.**
-`BayesianPGSTheory.multiAncestryEffectiveN` adds `rg² · n_other` to the target
-sample size for a genetically correlated *ancestry*; this adds it for a
+the same arithmetic, unrestrictedly.**
+`BayesianPGSTheory.multiAncestryEffectiveN` contributes precision to the target
+sample size from a genetically correlated *ancestry*; this contributes it from a
 genetically correlated *trait*. They are different claims about different data,
-and they had better not drift apart in the exponent on `rg`, which is what this
-theorem pins.
+and they had better not drift apart in the exponent on `rg` or in the prior
+term, which is what this theorem pins.
 
-Stated at `priorVariance = 0` because that is where it is TRUE. This body
-carries a prior-variance correction and `multiAncestryEffectiveN` does not, so
-the two agree exactly when the correction vanishes and nowhere else; the
-unrestricted equality was stated briefly and does not hold. -/
+**Why unrestricted, and why it briefly was not.** The prior-variance correction
+was derived for the ancestry case and `BayesianPGSTheory` says so in as many
+words: `multiTraitEffectiveSampleSize` "is the SAME formula and inherits this".
+Both bodies now carry it, so the equality holds everywhere and needs no
+hypothesis. It was restated at `priorVariance = 0` during the window in which
+only one of the two had been corrected -- true then, and the honest statement
+then, but a restriction that now hides the very agreement it was written to
+record. Two concurrent repairs of one arity mismatch took opposite routes; this
+is the merge, and (a) is the right one because the correction is a property of
+inverse-variance borrowing and not of what is being borrowed from.
+
+The two bodies are now the same expression up to the name and ORDER of their
+arguments -- ancestry takes `(n_target, rg, n_other, priorVariance)`, trait takes
+`(n₁, n₂, rg, priorVariance)` -- which is why this is proved rather than
+asserted, and why it is worth keeping both names. Identical arithmetic is not
+identical meaning; `hweHeterozygosity` and `genotypeVarianceHWE` are the same
+`2p(1-p)` and are a heterozygosity and a dosage variance. What an equality
+theorem buys over a single shared definition is that the two can be MEASURED
+separately -- and they have been, against different designs -- while this
+theorem is what catches them drifting apart. -/
 theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
-    (n₁ n₂ rg : ℝ) (h_n₂ : n₂ ≠ 0) :
-    multiTraitEffectiveSampleSize n₁ n₂ rg 0 = multiAncestryEffectiveN n₁ rg n₂ := by
-  unfold multiTraitEffectiveSampleSize multiAncestryEffectiveN
-  field_simp
-  ring
+    (n₁ n₂ rg priorVariance : ℝ) :
+    multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance =
+      multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
+  simp only [multiTraitEffectiveSampleSize, multiAncestryEffectiveN]
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
 
