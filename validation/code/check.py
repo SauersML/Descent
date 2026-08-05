@@ -745,17 +745,31 @@ def run_identifications() -> int:
     mult = re.compile(r"(?<![\^A-Za-z_0-9.])[24]\s*\*\s*(?:\([^)]*\)|[A-Za-z_0-9.]*\.)?" + POP + r"\b"
                       r"|/\s*\(\s*[24]\s*\*\s*(?:[A-Za-z_0-9.]*\.)?" + POP + r"\b"
                       r"|\b(?:[A-Za-z_0-9]+\.)?" + POP + r"\s*\*\s*[24]\b")
-    # Definitions that a Conventions theorem relates back to `ploidy` or to a
-    # derived primitive are not loose restatements: their constant is forced.
+    # Definitions that a theorem relates back to `ploidy` or to a derived
+    # primitive are not loose restatements: their constant is forced.
+    #
+    # This used to accept a tie only from a file named `Conventions.lean`,
+    # which located the tie by the file it sits in rather than by what it
+    # says. That reading has the dependency backwards. A tying theorem
+    # constrains a definition only where both are in scope, so the place it
+    # belongs is BESIDE the definition -- and moving it there, which is the
+    # repair, silently untied the definition and tripped this screen. It also
+    # accepted any theorem in that file, including ones naming no convention at
+    # all. The test is now what the statement mentions: a tie counts wherever
+    # it is stated, and only when it actually reaches a convention primitive.
+    PRIMITIVE = re.compile(r"\b(?:ploidy|scalingConstant|coalescentTimeScale|"
+                           r"scaledMutationRate|scaledMigrationRate|"
+                           r"hweHeterozygosity|genotypeVarianceHWE|"
+                           r"islandDemeCorrection)\b")
     tied = set()
     for f in ident_lean_files():
-        if not f.endswith("Conventions.lean"):
-            continue
         conv = ident_strip_comments(open(f).read())
         for b in re.split(r"\n(?=theorem )", conv):
             if not b.startswith("theorem"):
                 continue
             stmt = b.split(":=", 1)[0]
+            if not PRIMITIVE.search(stmt):
+                continue
             tied.update(re.findall(r"[A-Za-z_][A-Za-z_0-9']*", stmt))
 
     sites = 0
@@ -2291,8 +2305,14 @@ def run_identifications() -> int:
         # the screen's own detection by hand -- domain-name test, ploidy regex,
         # tied set -- which someone did, correctly, to answer "is this mine?".
         # A guard that can find a finding can afford to say where it is.
-        bad.append(f"convention restatement sites rose to {sites}"
-                   f"relate the new constant to `ploidy` in Conventions.lean instead of inlining it"
+        # The advice used to say "in Conventions.lean", which is now the one place
+        # the tie should NOT go: a theorem far downstream of the definition it
+        # constrains is a report about it.  It also ran the count into the advice
+        # with no separator, printing `rose to 5relate the new constant`.
+        bad.append(f"convention restatement sites rose to {sites}; "
+                   f"state a theorem BESIDE the definition relating the new "
+                   f"constant to `ploidy` or to a derived primitive, rather than "
+                   f"inlining it"
                    + "".join(f"\n      {s}" for s in sorted(site_names)))
 
     # The ledger prints before the guard verdict, and unconditionally. Printing
@@ -6378,6 +6398,23 @@ def run_shape_chains() -> int:
     The fix is never to delete the import -- that breaks the build, because the
     sibling is the conduit.  It is to import the modules named below it directly,
     after which the sibling is either used or genuinely removable.
+
+    A DIRECTORY-HEAD EDGE IS EXEMPT, and the exemption is deliberate rather than a
+    side effect.  A module whose one import is its own directory head -- today
+    `Program/OpenQuestions` and `Portability/PortabilityBounds`, both importing
+    `Portability/PortabilityDrift` -- looks exactly like the defect above and is
+    not one: the head carries the directory's whole external import surface, so
+    that edge is load-bearing until each module under it has been given its own
+    external import list.  Six such edges were knowingly left in `PortabilityDrift`
+    and `MetricSpecificPortability` during the chain repair, on that reasoning.
+
+    Two independent things keep them out, and both are load-bearing because either
+    one alone would be a rule someone could quietly break.  A head sits one level
+    UP from the modules under it, so it is never a sibling and the second condition
+    rejects it.  And `_shape_graph_without_toc` deletes heads outright, so a module
+    whose only import was its head has zero imports in the graph this reads and
+    fails the first condition too.  If the sibling test is ever loosened, the second
+    protection still holds; do not remove both.
     """
     _raw, code, _graph, decls, _arch = _shape_corpus()
     graph = _shape_graph_without_toc()
