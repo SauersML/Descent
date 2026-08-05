@@ -685,10 +685,6 @@
       "convention": "hudson",
       "note": "tau/(T_within + tau), the coalescence-time ratio for the chain."
     },
-    "Calibrator/SerialFounderChain.lean::ceilingFst": {
-      "quantity": "fst",
-      "convention": "hudson"
-    },
     "Calibrator/VarianceComponents.lean::narrowSenseH2": {
       "quantity": "h2",
       "convention": "narrow-sense",
