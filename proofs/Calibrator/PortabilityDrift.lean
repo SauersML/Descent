@@ -3027,7 +3027,24 @@ correlation decays exponentially with recombination distance and divergence.
     that the hyperbolic fit recovers the simulated `Nₑ`, does not work as one --
     it returned `Nₑ_eff = 563` against a true 1000, a known bias of `r²`
     estimated from 60 sampled chromosomes. A design with an independently known
-    anchor is needed before either shape earns a verdict. -/
+    anchor is needed before either shape earns a verdict.
+
+    A SECOND LEAD, against the `fstGap` factor (`simcov/battery_bulk53.py`).
+    `lambda` is free, so no absolute rate is refutable, but the claim that the
+    rate is PROPORTIONAL to `fstGap` needs no free constant: fit the decay rate
+    at two migration rates and the ratio of fitted rates must equal the ratio of
+    `F_ST` values. Measured on the cross-deme LD correlation with a passing
+    `F_ST = 0` control, the rate ratio is 0.272 ± 0.095 where the `F_ST` ratio
+    is 0.055. So the rate does fall with divergence -- a rate INDEPENDENT of
+    `fstGap` would give 1.0 and sits 7.6 sems away -- but it falls SUB-
+    proportionally, and strict proportionality sits 2.3 sems off in the other
+    direction. Neither reading is comfortable.
+
+    That run earns no verdict either, and for a reason worth naming: it carried
+    one cell per record, so the prediction span is zero and the power gate fires
+    correctly. A design sweeping several migration rates and regressing fitted
+    rate on `F_ST` would decide it, and is the obvious next step for both leads
+    at once, since it produces the distance profile the shape question needs. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * fstGap * distance))
 
