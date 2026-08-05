@@ -72,7 +72,15 @@ NOISE = {"value", "map", "comp", "id", "sum", "product", "ratio", "share", "witn
 # because that enforcement needs a compiler and the ordering can be measured
 # without one -- and because the direct-violation count is the number that says
 # how much work the enforcement is, which is much smaller than it looks.
+# `Meta` is BELOW `Core`, at rank -1, and that is not a courtesy.  Rank -1 says
+# two things at once with one number: everything may import `Meta` (a dep at -1
+# is never above anything), and `Meta` may import nothing (any dep at 0 or above
+# is above it).  That second half is the invariant `Descent/Meta.lean` states in
+# prose -- no module of `Descent/Meta/` may import a proof module, because a
+# proof module able to import its own auditor can be written to satisfy it -- and
+# here it is a number a script checks rather than a sentence a reader keeps.
 LAYERS = {
+    "Meta": -1,
     "Core": 0,
     "Foundations": 1,
     "Coalescent": 2,

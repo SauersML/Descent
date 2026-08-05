@@ -55,7 +55,8 @@ END = re.compile(r"^end\b\s*([A-Za-z_][A-Za-z0-9_.'₀-₉]*)?\s*$")
 # directory and is exempt.
 DIRECTORIES = [
     "Blindness", "Coalescent", "Conditionals", "Core", "Decision",
-    "Foundations", "Pangenome", "PopGen", "Portability", "Program", "Spectral",
+    "Foundations", "Meta", "Pangenome", "PopGen", "Portability", "Program",
+    "Spectral",
 ]
 
 
