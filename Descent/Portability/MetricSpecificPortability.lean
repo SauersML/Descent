@@ -1215,6 +1215,27 @@ noncomputable def driftFieldA : Fin 2 → ℝ := ![1, -1]
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is an algebraic nonidentifiability witness. -/
 noncomputable def driftFieldB : Fin 2 → ℝ := ![-1, 1]
 
+/-! ### The repeated witness vectors are related by theorem, and audited
+
+Seventeen definitions in this file are literal vectors, and two bodies occur more than
+once: `![1/2, 1/2]` under four names and `![4/5, 1/5]` under two. Every one of those six
+is tied to the others in its body-group by an equality theorem, and each group forms a
+SINGLE connected component under those theorems -- not merely pairwise links that leave
+two islands. `ancestryPairWeights_eq_uniformTwoWeights` and
+`genotypeVisibleRisk_eq_binnedRiskByAncestry` are two of them.
+
+The names stay. Each denotes a role in a distinct witness -- mixture weights, ancestry
+weights, a bin-averaged risk, a genotype-visible risk -- and collapsing them would make
+the witnesses share a symbol whose name fits only one of them. The theorem is what stops
+the shared body from being a coincidence nobody checked.
+
+The `Fin 4` sign vectors are NOT in this file and are NOT a cluster: `rad1`, `rad2`,
+`balancedContrast` and `spreadContrast` live in `PortabilityMasterTheorem`, and no two
+share a body. `balancedContrast` is the negation of `rad1`, which is a sign convention
+meeting between an orthogonal-contrast pair and an exceedance witness in an unrelated
+section, not an identity worth asserting.
+-/
+
 /-- Equal mixture weights. -/
 noncomputable def uniformTwoWeights : Fin 2 → ℝ := ![1 / 2, 1 / 2]
 
