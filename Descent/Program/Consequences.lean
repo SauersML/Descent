@@ -536,4 +536,62 @@ theorem subthreshold_correction_fails_and_zero_ridge_does_not_help
       markerAxisVariance ancestryVariance nSample markers spike hsubthreshold,
    ridged_infoQuadraticForm_zero_ridge_degenerate A x hnull⟩
 
+
+/-! ### A design requirement you can compute, and a distance that cannot certify it -/
+
+/-- **Whether ANY subgroup is correctable is a two-number calculator check, and the moment
+distance that would certify a spectrum cannot see past its own order.**
+
+`PCCorrectability.Design.exists_superthreshold_subgroup_iff_marker_requirement` turns the
+existence question into arithmetic: some admissible subgroup sits above the spectral edge
+if and only if the effective marker count exceeds `1/(F²n)`. That is a design requirement
+a study can be checked against before it is run.
+
+`CountingInvariantInstances.abs_moment_sub_le_momentDist` is the counting invariant's
+guarantee: each individual moment disagreement is bounded by the distance -- but only for
+moments up to the order `o` the distance was taken at. Beyond that order the bound says
+nothing, which is what makes the invariant an APPROXIMATE blindness witness rather than a
+certificate.
+
+Together: the design check is sharp and the spectral certificate is not. A study can know
+in advance whether correctability is possible at all, and still not be able to certify
+from a truncated moment sequence that the spectrum it observed is the spectrum it has. -/
+theorem design_check_is_sharp_the_moment_certificate_is_not
+    (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
+    (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (hp : p ≤ o) :
+    ((∃ m : ℝ, 0 < m ∧ m < n ∧
+        bbpProxyThreshold n M < demographicSpike n F m) ↔ 1 / (F ^ 2 * n) < M) ∧
+      |mu p - nu p| ≤ momentDist o mu nu :=
+  ⟨exists_superthreshold_subgroup_iff_marker_requirement n M F hn hM hF,
+   abs_moment_sub_le_momentDist o mu nu hp⟩
+
+/-! ### Two obstructions that need no hypothesis at all -/
+
+/-- **A sign and a commutativity: two blindness obstructions that hold for EVERY choice of
+weights, and so cannot be designed around.**
+
+`BundleRigidity.Cycles.no_odd_cycle_of_pos`: on a cycle of odd length no atomic kernel
+element exists -- not because of any condition on the mass ratios, but because the
+criterion reads `∏ ρ = -1` and a product of positive ratios is positive. Parity alone
+forbids it.
+
+`BundleRigidity.Dichotomy.commutation_defect_eq_one`: the defect between a two-letter word
+and its transposition is exactly `1` for every choice of weights, because both words use
+the same letters and the products are over a commutative field. That is why the commutator
+mechanism never needed a weight hypothesis -- the only one available to it holds
+automatically.
+
+Both are structural in the strongest sense available: no parameter choice escapes either.
+Worth stating together because the two are met separately and read as technical side
+conditions, when what they share is that they are not conditions at all. -/
+theorem parity_and_commutativity_admit_no_escape
+    {ι : Type*} [DecidableEq ι]
+    (ρ : ℕ → ℝ) (hρ : ∀ s, 0 < ρ s) (n : ℕ) (hodd : Odd n)
+    (P Q : ι → ℝ) (i j : ι)
+    (hP : P i ≠ 0) (hP' : P j ≠ 0) (hQ : Q i ≠ 0) (hQ' : Q j ≠ 0) :
+    (¬ ∃ x : ℕ → ℝ, x 0 ≠ 0 ∧ (∀ s, x (s + 1) = -ρ s * x s) ∧ x n = x 0) ∧
+      Descent.BundleRigidity.defect P Q [i, j] [j, i] = 1 :=
+  ⟨Descent.BundleRigidity.no_odd_cycle_of_pos ρ hρ n hodd,
+   Descent.BundleRigidity.commutation_defect_eq_one P Q i j hP hP' hQ hQ'⟩
+
 end Descent.Program
