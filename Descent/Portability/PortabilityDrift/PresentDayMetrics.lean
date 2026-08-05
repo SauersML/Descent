@@ -511,6 +511,35 @@ variance, so the two cannot drift apart. -/
 noncomputable def presentDayR2 (V_A V_E fst : ℝ) : ℝ :=
   PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fst) V_E
 
+/-- **The free `F_ST` here has a derivation, and this is it.**
+
+`presentDayR2` takes `fst` as a parameter, which is right: the metric is a function of
+differentiation however that differentiation arose. But the corpus also DERIVES an `F_ST`
+from raw demography, and nothing in this module said the two compose. Supplying the island
+equilibrium for the parameter gives exactly `Core.ScoreMoments.deployedR2FromIsland`, the composition
+that runs `(Nₑ, m, μ, d)` to a deployed metric.
+
+The parameter is deliberately not replaced. A metric that only accepted a derived `F_ST`
+would be unable to state what happens at a MEASURED one, which is most of what this module
+is for. What was missing was the edge, not the generality: with it, a reader can see which
+`F_ST`s in this file have a demographic origin and follow it, and the ones that do not are
+the ones with no such theorem. -/
+theorem presentDayR2_at_island_eq_deployedR2FromIsland
+    (Ne m μ nDemes V_A V_E : ℝ) :
+    presentDayR2 V_A V_E (Descent.Core.fstIslandEquilibrium Ne m μ nDemes)
+      = Descent.Core.ScoreMoments.deployedR2FromIsland Ne m μ nDemes V_A V_E := by
+  unfold presentDayR2 Descent.Core.ScoreMoments.deployedR2FromIsland presentDayPGSVariance
+    pgsVarianceFromHet PopGen.TransportedMetrics.r2FromSignalVariance
+    Descent.Core.ScoreMoments.r2 Descent.Core.ScoreMoments.momentsUnderDrift
+    Descent.Core.share Descent.Core.retainedFraction
+  -- The two sides write the retained variance in opposite orders, `V_A * (1 - F)` against
+  -- `(1 - F) * V_A`, so the zero case has to be rewritten on both.
+  by_cases h : (1 - Descent.Core.fstIslandEquilibrium Ne m μ nDemes) * V_A = 0
+  · have h' : V_A * (1 - Descent.Core.fstIslandEquilibrium Ne m μ nDemes) = 0 := by
+      rw [mul_comm]; exact h
+    rw [h, h']; simp
+  · field_simp
+
 /-! ### The drift model produces a moment tuple
 
 `PortabilityMasterTheorem` declares that the interface between the population-genetic
