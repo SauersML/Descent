@@ -1172,11 +1172,13 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
     PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = 1 / (1 + PopGen.scaledMigrationRate Ne m * PopGen.islandDemeCorrection nDemes
               + PopGen.scaledMutationRate Ne μ) := by
-  -- Through the bridge, not the chain: the body is now `Core.fstIslandEquilibrium`,
-  -- and unfolding it here would re-derive the normalisation that
-  -- `fstIslandEquilibriumFiniteDemes_eq` already states once.
-  rw [PopGen.fstIslandEquilibriumFiniteDemes_eq,
-    scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
+  -- The bridge this used to go through, `fstIslandEquilibriumFiniteDemes_eq`, was
+  -- deleted when the body was repointed at `Core.fstFromFlow`, which is `1/(1+x)`
+  -- and needs no normalisation lemma of its own. What is left to say is that the
+  -- two `4`s in the flow are the two scaled rates and not a third inlined ploidy
+  -- convention, which is exactly what the two `_eq_ploidy_form` rewrites state.
+  unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+  rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy Descent.Core.ploidy; ring_nf
 
 theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
