@@ -195,6 +195,20 @@ theorem chainLaw_head_blocks {n : ℕ} :
           have := hcov.2
           omega
 
+/-- **K-C (1.13) in full: the chain runs from `Δ` to `Θ` in `n - 1` jumps.**
+
+`Δ = ℛ_n ≺ ℛ_{n-1} ≺ ⋯ ≺ ℛ_1 = Θ`.  The trajectory starts at `Δ`
+(`chainLaw_getLast`), every step is a cover (`chainLaw_support_chain'`), the block count
+after `k` jumps is `n - k` (`chainLaw_head_blocks`), and so after `n - 1` jumps the count is
+`1`, which by `StateSpace.blocks_eq_one_iff` is `Θ`.  The transit time of K-C (1.11) is the
+time this takes. -/
+theorem chainLaw_head_eq_top {n : ℕ} [NeZero n] (hn : 2 ≤ n) {l : List (ER n)}
+    (hl : l ∈ (chainLaw n (n - 1)).support) {x : ER n} (hx : l.head? = some x) :
+    x = Theta n := by
+  have hblocks : blocks x + (n - 1) = n := chainLaw_head_blocks (n - 1) (by omega) hl hx
+  have : blocks x = 1 := by omega
+  exact (blocks_eq_one_iff x).mp this
+
 end Coalescent
 
 end Descent
