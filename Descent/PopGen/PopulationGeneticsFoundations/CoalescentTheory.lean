@@ -173,6 +173,59 @@ variation. It is central to predicting portability.
 
 section EffectivePopulationSize
 
+/-- **The variance effective size**: the Wright-Fisher size that would produce an observed
+one-generation drift variance at allele frequency `p`.
+
+A Wright-Fisher population of size `Nₑ` at frequency `p` moves that frequency by a variance
+of `p(1-p)/(2Nₑ)` in a generation. Reading it backwards is what makes `Nₑ` a MEASURED
+quantity rather than a count of individuals: given a drift variance observed between two
+timepoints, this is the size a Wright-Fisher population would have needed to produce it. A
+real population's census size is almost never this number, and the gap is the content --
+unequal sex ratio, variance in offspring number and fluctuating size all push `Nₑ` below the
+census. That is why every drift prediction in this corpus is written in `Nₑ` and none in `N`,
+and `coalFst` above takes the same `Nₑ` as its second argument.
+
+    Empirical status: THIS IS THE MODEL.  The Wright-Fisher variance `p(1-p)/(2Nₑ)` is what
+    DEFINES the effective size here.  This declaration poses the question of whether a given
+    population drifts like a Wright-Fisher population of some size; it does not answer it.
+    Whether the `Nₑ` recovered this way agrees with the one recovered from heterozygosity
+    decay, or from `coalFst`, is a real measurement and is not made here. -/
+noncomputable def effectiveSize (driftVariance p : ℝ) : ℝ :=
+  Descent.Core.ratioOfProduct (p * (1 - p)) 2 driftVariance
+
+/-- **effectiveSize where its denominator vanishes, named.** An observed drift variance of
+zero is not an infinite population, but Lean returns `0` -- the smallest size rather than the
+largest, which is the opposite regime, and no type error marks the point. Consumers must
+require `driftVariance ≠ 0`. -/
+@[simp] theorem effectiveSize_zero_drift_is_junk (p : ℝ) :
+    effectiveSize 0 p = 0 := by
+  unfold effectiveSize Descent.Core.ratioOfProduct
+  simp
+
+/-- **More drift means a smaller effective size**, at an interior frequency.
+
+This is the direction that makes `Nₑ` an inverse measure of drift, and it is why a population
+carrying more drift is called smaller however many individuals it contains. -/
+theorem effectiveSize_strictAnti (p v₁ v₂ : ℝ) (hp0 : 0 < p) (hp1 : p < 1)
+    (hv : 0 < v₁) (h : v₁ < v₂) :
+    effectiveSize v₂ p < effectiveSize v₁ p := by
+  unfold effectiveSize Descent.Core.ratioOfProduct
+  have hnum : 0 < p * (1 - p) := mul_pos hp0 (by linarith)
+  exact div_lt_div_of_pos_left hnum (by linarith) (by linarith)
+
+/-- **`effectiveSize` inverts the Wright-Fisher drift variance.**
+
+Fed the variance a Wright-Fisher population of size `Nₑ` produces, it returns `Nₑ`. This is
+the sense in which the definition is an ESTIMATOR and not merely a formula: it is a left
+inverse of the forward model, so a population for which it returns something other than its
+own size is one the forward model does not describe. Without this the definition would be a
+rearrangement of symbols that no theorem ties to the drift it claims to measure. -/
+theorem effectiveSize_of_wrightFisher_variance (Ne p : ℝ) (hNe : Ne ≠ 0)
+    (hp0 : p ≠ 0) (hp1 : (1 : ℝ) - p ≠ 0) :
+    effectiveSize (p * (1 - p) / (2 * Ne)) p = Ne := by
+  have hnum : p * (1 - p) ≠ 0 := mul_ne_zero hp0 hp1
+  unfold effectiveSize Descent.Core.ratioOfProduct
+  field_simp
 
 /-- **`V_A · t / (2 Nₑ)` decreases as `Nₑ` grows.**
 
