@@ -76044,7 +76044,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  ∏ i, coding.weight (x i)\n\nomit [DecidableEq V] in",
+   "body": "  ∏ i, coding.weight (x i)",
    "docstring": "Probability of a genotype configuration under independence across loci.",
    "empirical_status": "",
    "namespace": "Descent.Blindness",
@@ -76169,7 +76169,7 @@
     }
    ],
    "ret_type": "(Fin n → V) ≃ (Fin n → V) where toFun x",
-   "body": " Function.update x i (coding.flip (x i))\n  invFun x := Function.update x i (coding.flip.symm (x i))\n  left_inv x := by\n    funext j\n    by_cases hj : j = i\n    · subst hj; simp\n    · simp [Function.update_of_ne hj]\n  right_inv x := by\n    funext j\n    by_cases hj : j = i\n    · subst hj; simp\n    · simp [Function.update_of_ne hj]\n\nomit [Fintype V] [DecidableEq V] in",
+   "body": " Function.update x i (coding.flip (x i))\n  invFun x := Function.update x i (coding.flip.symm (x i))\n  left_inv x := by\n    funext j\n    by_cases hj : j = i\n    · subst hj; simp\n    · simp [Function.update_of_ne hj]\n  right_inv x := by\n    funext j\n    by_cases hj : j = i\n    · subst hj; simp\n    · simp [Function.update_of_ne hj]",
    "docstring": "Flip the coding of one locus, leaving every other locus alone.",
    "empirical_status": "",
    "namespace": "Descent.Blindness",
@@ -76235,7 +76235,7 @@
     }
    ],
    "ret_type": "Fin n → ℝ",
-   "body": "  fun j ↦ |coding.value (x j)|\n\nomit [DecidableEq V] in",
+   "body": "  fun j ↦ |coding.value (x j)|",
    "docstring": "**The magnitude profile of a configuration**: the absolute coded value at each\nlocus. This is the data a truncation is allowed to see if it is to be\nsign-blind.\n\nEmpirical status: DERIVED. Absolute values of the coding's own field; no free\nparameter.",
    "empirical_status": "DERIVED",
    "namespace": "Descent.Blindness",
@@ -76281,7 +76281,7 @@
     }
    ],
    "ret_type": "SymmetricCoding V where weight",
-   "body": " coding.weight\n  value := fun v ↦ a * coding.value v\n  flip := coding.flip\n  weight_flip := coding.weight_flip\n  value_flip v := by\n    show a * coding.value (coding.flip v) = -(a * coding.value v)\n    rw [coding.value_flip]\n    ring\n\nomit [DecidableEq V] in",
+   "body": " coding.weight\n  value := fun v ↦ a * coding.value v\n  flip := coding.flip\n  weight_flip := coding.weight_flip\n  value_flip v := by\n    show a * coding.value (coding.flip v) = -(a * coding.value v)\n    rw [coding.value_flip]\n    ring",
    "docstring": "**Symmetry is scale-invariant.** Rescaling every coded value by a constant\nkeeps the same relabelling working, because negation commutes with scaling.\n\nThis is what lets a symmetry verdict for the centered dosage be transported to\nthe standardized coordinate `x = (dosage - 2q) / sqrt (2 q (1 - q))` without\nrecomputing anything: see `standardizedGenotype_symmetric_iff`.\n\nEmpirical status: DERIVED. Pure algebra on the structure fields; no modelling\ncontent and no free parameter.",
    "empirical_status": "DERIVED",
    "namespace": "Descent.Blindness",
@@ -77094,7 +77094,7 @@
     }
    ],
    "ret_type": "GenotypeDesign n ι where model",
-   "body": " model\n  locusSet := locusSet\n  coefficient := coefficient\n  jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)\n\nomit [Fintype ι] in",
+   "body": " model\n  locusSet := locusSet\n  coefficient := coefficient\n  jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)",
    "docstring": "The design carrying the product law over its own per-locus models.\n\n    The structure's docstring says the joint law is carried alongside the\n    per-locus models so that linkage equilibrium is a checkable relation rather\n    than a silent assumption. Because the joint law is a free field, nothing\n    forces a design to satisfy that relation; this exhibits one that does.\n\n    It is the rest point of `freeRecombinationStep`\n    (`equilibriumDesign_isFixedPoint`), so the name is earned by the dynamic\n    rather than stipulated. A design in linkage DISequilibrium is equally easy\n    to write and is what the disjoint-licence results are about failing on.",
    "empirical_status": "",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -77123,7 +77123,7 @@
    "signature": ": Prop",
    "args": [],
    "ret_type": "Prop",
-   "body": "  ∀ i : Fin n, 0 < (design.model i).altFreq ∧ (design.model i).altFreq < 1\n\nomit [Fintype ι] in",
+   "body": "  ∀ i : Fin n, 0 < (design.model i).altFreq ∧ (design.model i).altFreq < 1",
    "docstring": "Every panel locus is polymorphic, so the standardized coordinate exists and\nhas unit variance.\n\nThe second clause of that sentence is a claim, not a restatement, and it is\ndischarged one theorem below by `polymorphic_standardizedGenotype_second_moment_one`\nrather than left in prose. A monomorphic locus has `genotypeVariance = 0`, and\n`HardyWeinbergModel.standardizedGenotype` divides by its square root; Mathlib\ntotalises that division to zero, so the coordinate at such a locus is the\nconstant `0` and has second moment `0`, not `1`. Nothing in the type system\nrules it out, which is why the panel-level condition has to be carried as a\nhypothesis and named.\n\nEmpirical status: UNTESTED. A range condition on the panel's allele frequencies.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -77331,7 +77331,7 @@
     }
    ],
    "ret_type": "GenotypeDesign n ι where model",
-   "body": " design.model\n  locusSet := design.locusSet\n  coefficient := fun s ↦\n    if locus ∈ design.locusSet s then -design.coefficient s else design.coefficient s\n  jointGenotypeProb := design.jointGenotypeProb\n\nomit [Fintype ι] in",
+   "body": " design.model\n  locusSet := design.locusSet\n  coefficient := fun s ↦\n    if locus ∈ design.locusSet s then -design.coefficient s else design.coefficient s\n  jointGenotypeProb := design.jointGenotypeProb",
    "docstring": "**Flip the orientation of one locus.** Choosing the other allele as reference\nnegates that coordinate, so every tested set containing the locus has its monomial\nnegated; the design absorbing that is the one with those coefficients negated.\n\nEmpirical status: DERIVED. A relabelling of the design's own coefficients, with no\nmodelling content and no free parameter.",
    "empirical_status": "DERIVED",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -77750,7 +77750,7 @@
     }
    ],
    "ret_type": "Matrix ιx ιx ℝ",
-   "body": "  fun s t ↦ ((design.locusSet s ∩ design.locusSet t).card : ℝ)\n\nomit [Fintype ιx] [DecidableEq ιx] in",
+   "body": "  fun s t ↦ ((design.locusSet s ∩ design.locusSet t).card : ℝ)",
    "docstring": "**The overlap structure of a design.** Entry `(s, t)` counts the variants\ntested by both set `s` and set `t`; the diagonal is the interaction order. This\nis the object whose spectrum the limit law is a function of, and whose row sums\nare the recurrence profile.\nand nothing fitted.\n\nEmpirical status: UNTESTED. A count matrix read off the design; no free parameter",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -77797,7 +77797,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Matrix.trace (design.overlapMatrix ^ p)\n\nomit [DecidableEq ιx] in",
+   "body": "  Matrix.trace (design.overlapMatrix ^ p)",
    "docstring": "**The `p`-th cycle density**: `trace (A ^ p)`, the total weight of closed\nwalks of length `p` in the overlap structure. For `p = 2` it is the squared\nFrobenius norm and for `p = 4` the fourth spectral moment.\n\nThese are the invariants the limit law is a function of, in contrast to the star\ndensities of `variantRecurrence`.\nfree parameter and nothing fitted.\n\nEmpirical status: UNTESTED. A trace of a power of the overlap count matrix; no",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -77848,7 +77848,7 @@
     }
    ],
    "ret_type": "Prop",
-   "body": "  ∀ i : Fin nx, design.variantRecurrence i ≤ bound\n\nomit [DecidableEq ιx] in",
+   "body": "  ∀ i : Fin nx, design.variantRecurrence i ≤ bound",
    "docstring": "**Bounded hub energy**, in its operational form: no variant is tested more\nthan `bound` times. This is what fails for a lead variant in a dense sliding\nscan, or for a pleiotropic variant across a phenotype panel.\n\nEmpirical status: UNTESTED. A bound on the design's own recurrence profile;\ncheckable by inspection.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Blindness.GenotypeDesign",
@@ -78823,7 +78823,7 @@
     }
    ],
    "ret_type": "Prop",
-   "body": " ∀ x : ι → ℝ, 0 ≤ quadForm A x\n\nomit [DecidableEq ι] in",
+   "body": " ∀ x : ι → ℝ, 0 ≤ quadForm A x",
    "docstring": "A matrix is variance-nonnegative when no weighting of the variants produces\na negative score variance: positive semidefiniteness, in the form the genetics\nuses it.",
    "empirical_status": "",
    "namespace": "Descent.Blindness",
@@ -79513,7 +79513,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (1 - 1 / u) -\n    aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))\n\nomit [DecidableEq ι] in",
+   "body": "  (1 - 1 / u) -\n    aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ))",
    "docstring": "The self-consistency equation of the ridge deterministic equivalent, in the\nvariable `u = 1 + δ`. The left side is the increasing part, the right side the\nLD-dependent decreasing part, and a solution is exactly a fixed point of the\nusual equation. The evaluation geometry does not appear.\n\n`aspect` is the variants-per-individual ratio of the training sample. It is not\noptional: the fixed point is a functional of the design *and its aspect ratio*,\nand dropping it — the first version of this definition did — misprices the\nresolvent functional by 34 percent at `aspect = 0.3`, as\n`validation/empirical/imitation_rigidity/check_imitation.py` records.\n\nEmpirical status: VALIDATED. Simulated ridge regression on genotype-like\ndesigns matches `tr(B (S + ridge)⁻¹)/k` computed from this fixed point, for\nevaluation geometries that commute with the design and for ones in general\nposition alike.\n\nPower: the check separates this equation from the aspect-free rival by a wide\nmargin at the design it runs on (`k = 120`, `n = 400`, `ridge = 0.35`, so\n`aspect = 0.30`): taking the resolvent functional this fixed point predicts as\n`1.00`, the equation without the aspect term predicts `1.34` there. The two\nevaluation geometries, commuting and general position, are checked against the\nsame fixed point, so the agreement is not an artifact of one alignment.",
    "empirical_status": "VALIDATED",
    "namespace": "Descent.Blindness",
@@ -79598,7 +79598,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  1 / (1 - aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)))\n\nomit [DecidableEq ι] in",
+   "body": "  1 / (1 - aspect * ((∑ i, eig i / (eig i + ridge * u)) / (Fintype.card ι : ℝ)))",
    "docstring": "**The self-consistency equation read as a one-step map.**\n\n`ridgeBalance` is the residual of the equation `1 - 1/u = A(u)`, where\n`A(u) = aspect · mean_i eig_i/(eig_i + ridge·u)` is the resolvent functional of\nthe training spectrum.  Solving that equation for the `u` on the *left* gives\n`u = 1/(1 - A(u))`, which is the map below: from a candidate `u` it recomputes\nthe resolvent functional and returns the `u` that functional implies.  A root\nof `ridgeBalance` and a fixed point of this map are the same thing, which\n`ridgeBalance_root_isFixedPoint` proves.\n\nComposition convention: the resolvent is evaluated at the *current* iterate and\nthe reciprocal is taken afterwards.  The reversed arrangement — solving for the\n`u` inside the resolvent instead — is a different iteration with the same roots\nbut different convergence behaviour, so this is part of the process rather than\nof its presentation.\n\nEmpirical status: UNTESTED as an iteration; the root it characterises is the\nVALIDATED quantity recorded on `ridgeBalance`.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Blindness",
@@ -128964,7 +128964,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Descent.Core.innerSum x y\n\nomit [DecidableEq ι] in",
+   "body": "  Descent.Core.innerSum x y",
    "docstring": "",
    "empirical_status": "",
    "namespace": "Descent.Foundations",
@@ -129766,7 +129766,7 @@
     }
    ],
    "ret_type": "J → ℝ",
-   "body": "  sigmaInv.mulVec (crossCovVector E X Y)\n\nomit [DecidableEq J] in",
+   "body": "  sigmaInv.mulVec (crossCovVector E X Y)",
    "docstring": "Closed-form moment map `Σ^{-1} Σ_xy`.",
    "empirical_status": "",
    "namespace": "Descent.Foundations",
@@ -129912,7 +129912,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (∑ j, w j * K j l) * β l\n\nomit [DecidableEq J] [DecidableEq L] in",
+   "body": "  (∑ j, w j * K j l) * β l",
    "docstring": "",
    "empirical_status": "",
    "namespace": "Descent.Foundations",
@@ -157724,7 +157724,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  ∑ x, covariateWeight x *\n    ∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2\n\nomit [Fintype Covariate] in",
+   "body": "  ∑ x, covariateWeight x *\n    ∑ t, posterior x t * posteriorDrift posterior conditional t x ^ 2",
    "docstring": "Irreducible posterior-drift energy: conditional variance across indices at each covariate.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite weighted sum.",
    "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Portability",
@@ -157845,7 +157845,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (1 / 2) * ∑ s, posterior x s *\n    ∑ t, posterior x t * (conditional s x - conditional t x) ^ 2\n\nomit [Fintype Covariate] in",
+   "body": "  (1 / 2) * ∑ s, posterior x s *\n    ∑ t, posterior x t * (conditional s x - conditional t x) ^ 2",
    "docstring": "Half the posterior-weighted squared disagreement between two independent draws of the\npopulation index at a fixed covariate.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM -- this is an exact finite quadratic form.",
    "empirical_status": "NOT AN EMPIRICAL CLAIM --",
    "namespace": "Descent.Portability",
@@ -158185,7 +158185,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  if t then upper x else lower x\n\nomit [Fintype Covariate] in",
+   "body": "  if t then upper x else lower x",
    "docstring": "Two environment-specific conditional fields.",
    "empirical_status": "",
    "namespace": "Descent.Portability",
@@ -191739,7 +191739,7 @@
    "signature": ": ℝ",
    "args": [],
    "ret_type": "ℝ",
-   "body": "  D.source.outcomeVariance / D.target.outcomeVariance\n\nomit [DecidableEq J] [DecidableEq L] in",
+   "body": "  D.source.outcomeVariance / D.target.outcomeVariance",
    "docstring": "The outcome-variance factor: how much the phenotype's total variance changed.\nEnvironmental heterogeneity between populations is entirely inside this factor, and\nnothing genetic is.",
    "empirical_status": "",
    "namespace": "Descent.Portability.Deployment",
@@ -191853,7 +191853,7 @@
     }
    ],
    "ret_type": "Descent.Core.ScoreMoments",
-   "body": "  ⟨P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance⟩\n\nomit [DecidableEq J] [DecidableEq L] in",
+   "body": "  ⟨P.scoreVariance w, P.predictiveCovariance w, P.outcomeVariance⟩",
    "docstring": "**The statistic, as the named interface rather than as an anonymous triple.**\n\nThis module's header states the layer contract: the interface between `PopGen` and this\nmodule is the moment tuple this module consumes. `Core.ScoreMoments` IS that tuple, and\nit sits at depth 2 where `PopGen` can reach it -- which is what lets a demographic\nhistory and a deployed metric be composed rather than merely both exist.\n\nAn anonymous `ℝ × ℝ × ℝ` at the top of the import graph could not serve as an interface,\nwhatever the header said, because nothing below it could name the type.",
    "empirical_status": "",
    "namespace": "Descent.Portability",
@@ -191938,7 +191938,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": " s.2.1 / s.1\n\nomit [DecidableEq J] [DecidableEq L] in",
+   "body": " s.2.1 / s.1",
    "docstring": "Calibration slope as an explicit function of the statistic.\n\n    Empirical status: **EXACT BY CONSTRUCTION**.  As with `r2OfStatistic`, the content is\n    `slope_factors_through_statistic`, which holds by `rfl`: this expression and the\n    generative slope are the same expression.  The head read `UNTESTED`, which claims a\n    debt that cannot be paid because there is nothing to measure.",
    "empirical_status": "EXACT BY CONSTRUCTION",
    "namespace": "Descent.Portability",
@@ -192222,7 +192222,7 @@
     }
    ],
    "ret_type": "Ω → ℝ",
-   "body": " fun ω ↦ a + b * P.score w ω\n\nomit [DecidableEq J] [DecidableEq L] in",
+   "body": " fun ω ↦ a + b * P.score w ω",
    "docstring": "The score after an affine correction `a + b·S`.",
    "empirical_status": "",
    "namespace": "Descent.Portability.DeploymentPopulation",
@@ -212071,7 +212071,7 @@
     }
    ],
    "ret_type": "Prop",
-   "body": "  ∀ k : ℕ, k ≤ Fintype.card ι →\n    ∃ (S : Finset ι) (t : ℝ), S.card = k ∧\n      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)\n\nomit [DecidableEq ι] in",
+   "body": "  ∀ k : ℕ, k ≤ Fintype.card ι →\n    ∃ (S : Finset ι) (t : ℝ), S.card = k ∧\n      (∀ i ∈ S, t ≤ score i) ∧ (∀ i ∉ S, score i ≤ t)",
    "docstring": "**A score profile admits threshold sets at every rank**: for each `k` there\nis a set of `k` indices, no more and no fewer, separated from its complement by\na cut value.\n\nThis is the one ingredient the frontier packaging needs beyond the analytic\nlemmas above.  It is not an empirical assumption or an external input: it holds\nfor every score on a finite type.  The proof below chooses, among all `k`-sets,\none maximizing total score.  Exchanging a selected minimum with a larger\nunselected value would improve that maximum, so the selected and unselected\nvalues are separated by the minimum selected score.\n\nWhat is proved without it: every threshold set is a scalarised optimum\n(`scalarized_optimum_is_coordinate_split`), so every supporting line of the\nachievable region that is attained at all is attained by a coordinate split, and\nthe region is convex (`isRankAllocation_convex`, `spectralCapture_affine`).\nWhat needs it: that a supporting line exists in every direction, i.e. that the\nfrontier is the concave envelope of the split values rather than merely bounded\nby it.\n\nEmpirical status: UNTESTED — and untestable, being a finite-combinatorial\nstatement rather than a claim about genotypes.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Spectral",
@@ -212186,7 +212186,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  coefficientEnergy B theta -\n    Foundations.dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta\n\nomit [DecidableEq ι] in",
+   "body": "  coefficientEnergy B theta -\n    Foundations.dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta",
    "docstring": "**The part of the degradation no rescaling can remove.**\n\n`theta' B theta - (beta' B theta)^2 / (beta' B beta)`, which is the target\nsignal energy times the squared sine of the `B`-angle between `beta` and\n`theta`.  It vanishes when the transported direction is `B`-parallel to the\ntarget truth and is strictly positive otherwise.\n\nEmpirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Spectral",
@@ -212476,7 +212476,7 @@
     }
    ],
    "ret_type": "Prop",
-   "body": "  ∀ x y : ι → ℝ, Foundations.dot x (B.mulVec y) = Foundations.dot y (B.mulVec x)\n\nomit [DecidableEq ι] in",
+   "body": "  ∀ x y : ι → ℝ, Foundations.dot x (B.mulVec y) = Foundations.dot y (B.mulVec x)",
    "docstring": "Symmetry of the bilinear form represented by a second-moment matrix.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -212665,7 +212665,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Foundations.dot u (B.mulVec v) / Foundations.dot u (B.mulVec u)\n\nomit [DecidableEq ι] in",
+   "body": "  Foundations.dot u (B.mulVec v) / Foundations.dot u (B.mulVec u)",
    "docstring": "Best scalar rescaling of a deployed direction toward a target direction.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -212724,7 +212724,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Foundations.dot v (B.mulVec v) -\n    Foundations.dot u (B.mulVec v) ^ 2 / Foundations.dot u (B.mulVec u)\n\nomit [DecidableEq ι] in",
+   "body": "  Foundations.dot v (B.mulVec v) -\n    Foundations.dot u (B.mulVec v) ^ 2 / Foundations.dot u (B.mulVec u)",
    "docstring": "Irreducible quadratic risk after optimizing over scalar rescalings.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -212786,7 +212786,7 @@
     }
    ],
    "ret_type": "Matrix ι ι ℝ",
-   "body": "  fun i j ↦ weightLeft * left i j + weightRight * right i j\n\nomit [DecidableEq ι] in",
+   "body": "  fun i j ↦ weightLeft * left i j + weightRight * right i j",
    "docstring": "Weighted covariance of two labeled environments.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -212868,7 +212868,7 @@
     }
    ],
    "ret_type": "Matrix ι ι ℝ",
-   "body": "  fun i j ↦ ∑ environment, weight environment * covariance environment i j\n\nomit [DecidableEq ι] in",
+   "body": "  fun i j ↦ ∑ environment, weight environment * covariance environment i j",
    "docstring": "Weighted covariance of an arbitrary finite environment panel.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -212979,7 +212979,7 @@
     }
    ],
    "ret_type": "Prop",
-   "body": "  ∀ shift : ι → ℝ,\n    Foundations.dot shift (target.mulVec shift) ≤\n      constant * Foundations.dot shift (source.mulVec shift)\n\nomit [DecidableEq ι] in",
+   "body": "  ∀ shift : ι → ℝ,\n    Foundations.dot shift (target.mulVec shift) ≤\n      constant * Foundations.dot shift (source.mulVec shift)",
    "docstring": "A uniform coefficient-space portability bound: target excess risk is at most `constant`\ntimes source excess risk in every coefficient direction.  No nonsingularity is assumed.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -213943,7 +213943,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  ∑ b, taskWeight b * degradationProfile source target b\n\nomit [Fintype Band] in",
+   "body": "  ∑ b, taskWeight b * degradationProfile source target b",
    "docstring": "Degradation for an arbitrary task-specific band weighting.",
    "empirical_status": "",
    "namespace": "Descent.Spectral.FiniteSpectralModel",
@@ -213995,7 +213995,7 @@
     }
    ],
    "ret_type": "FiniteSpectralModel Band where featureSpectrum",
-   "body": " fun b ↦ c ^ 2 * P.featureSpectrum b\n  crossSpectrum := fun b ↦ c * P.crossSpectrum b\n  targetPower := P.targetPower\n  featureSpectrum_pos := fun b ↦ mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)\n\nomit [Fintype Band] in",
+   "body": " fun b ↦ c ^ 2 * P.featureSpectrum b\n  crossSpectrum := fun b ↦ c * P.crossSpectrum b\n  targetPower := P.targetPower\n  featureSpectrum_pos := fun b ↦ mul_pos (sq_pos_of_ne_zero hc) (P.featureSpectrum_pos b)",
    "docstring": "",
    "empirical_status": "",
    "namespace": "Descent.Spectral.FiniteSpectralModel",
@@ -221288,7 +221288,7 @@
    "noncomputable": false,
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 378,
-   "signature": "(k : ℝ) (M : ι → ℝ) : Prop where lower : ∀ i, 0 ≤ M i upper : ∀ i, M i ≤ 1 trace : ∑ i, M i = k omit [DecidableEq ι] in",
+   "signature": "(k : ℝ) (M : ι → ℝ) : Prop where lower : ∀ i, 0 ≤ M i upper : ∀ i, M i ≤ 1 trace : ∑ i, M i = k",
    "args": [
     {
      "names": [
@@ -221307,7 +221307,7 @@
      "implicit": false
     }
    ],
-   "ret_type": "Prop where lower : ∀ i, 0 ≤ M i upper : ∀ i, M i ≤ 1 trace : ∑ i, M i = k omit [DecidableEq ι] in",
+   "ret_type": "Prop where lower : ∀ i, 0 ≤ M i upper : ∀ i, M i ≤ 1 trace : ∑ i, M i = k",
    "body": "",
    "docstring": "**A relaxed rank-`k` reduction**, written in the eigenbasis of the\nbackground.  `M i` is the fraction of eigendirection `i` that survives the\nreduction; `0 ≤ M ≤ 1` is the operator constraint `0 ≤ M ≤ I` and the trace\ncondition is the rank budget.  Genuine rank-`k` projections are the `0/1`\npoints of this set; the relaxation is what makes both task efficiencies linear.\n\nThe trace is pinned to `k` rather than bounded by it because the minimisation\nresults below are statements about reductions that actually *use* their budget:\nwith `tr M ≤ k` the detection minimum is attained trivially by `M = 0`.\n\nEmpirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
@@ -221328,7 +221328,7 @@
    ],
    "equations": [],
    "constraints": {
-    "raw_chunk_lines": 9
+    "raw_chunk_lines": 5
    },
    "mentioned_by": []
   },

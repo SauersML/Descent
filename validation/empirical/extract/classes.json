@@ -45200,7 +45200,7 @@
  },
  "Descent.Decision.CertificateGrading.CertificateCalculus.certifiedRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name C.scale",
   "file": "Descent/Decision/CertificateGrading.lean",
   "line": 841,
   "short": "certifiedRisk",
@@ -45247,7 +45247,7 @@
  },
  "Descent.Decision.CertificateGrading.CertificateCalculus.ungradedRisk": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name C.scale",
   "file": "Descent/Decision/CertificateGrading.lean",
   "line": 846,
   "short": "ungradedRisk",
@@ -99919,16 +99919,22 @@
  },
  "Descent.Portability.MutationDriftModelAssumptions.theta": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'μ'\"))",
   "file": "Descent/Portability/PortabilityDrift/MutationDrift.lean",
   "line": 76,
   "short": "theta",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": null,
-  "args": [],
+  "python": "Descent_Portability_MutationDriftModelAssumptions_theta",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "AttributeError(\"'function' object has no attribute 'μ'\")"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -100192,7 +100198,7 @@
  },
  "Descent.Portability.MutationDriftModelAssumptions.fstEquilibrium": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition Descent_Portability_MutationDriftModelAssumptions_theta",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'μ'\"))",
   "file": "Descent/Portability/PortabilityDrift/MutationDrift.lean",
   "line": 204,
   "short": "fstEquilibrium",
@@ -100206,7 +100212,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'Descent_Portability_MutationDriftModelAssumptions_theta' is not defined\")"
+   "error": "AttributeError(\"'function' object has no attribute 'μ'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -100347,7 +100353,7 @@
  },
  "Descent.Portability.MutationDriftModelAssumptions.fstTransient": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition Descent_Portability_MutationDriftModelAssumptions_theta",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'function' object has no attribute 'μ'\"))",
   "file": "Descent/Portability/PortabilityDrift/MutationDrift.lean",
   "line": 291,
   "short": "fstTransient",
@@ -100361,7 +100367,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'Descent_Portability_MutationDriftModelAssumptions_theta' is not defined\")"
+   "error": "AttributeError(\"'function' object has no attribute 'μ'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -106899,7 +106905,7 @@
  },
  "Descent.Portability.DeploymentPopulation.phenotype": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name P.C",
   "file": "Descent/Portability/PortabilityMasterTheorem.lean",
   "line": 183,
   "short": "phenotype",
@@ -107993,7 +107999,7 @@
  },
  "Descent.Portability.Deployment.taggingShift": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name D.w",
   "file": "Descent/Portability/PortabilityMasterTheorem.lean",
   "line": 439,
   "short": "taggingShift",
@@ -108024,7 +108030,7 @@
  },
  "Descent.Portability.Deployment.effectTurnover": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "qualified name D.w",
   "file": "Descent/Portability/PortabilityMasterTheorem.lean",
   "line": 457,
   "short": "effectTurnover",
@@ -111474,16 +111480,22 @@
  },
  "Descent.Portability.StratificationModel.varTrue": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 85,
   "short": "varTrue",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "varTrue",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -111729,16 +111741,22 @@
  },
  "Descent.Portability.ColliderModel.inducedCov": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('σ2_G'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 247,
   "short": "inducedCov",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "inducedCov",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('σ2_G')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -111767,16 +111785,22 @@
  },
  "Descent.Portability.ColliderModel.β_selected": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β_G'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 271,
   "short": "β_selected",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "β_selected",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β_G')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -111875,16 +111899,23 @@
  },
  "Descent.Portability.RGEModel.pred": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β_direct'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 359,
   "short": "pred",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "pred",
+  "args": [
+   "m",
+   "P"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β_direct')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -111984,16 +112015,22 @@
  },
  "Descent.Portability.RGEInflationModel.r2_obs": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β_indirect'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 404,
   "short": "r2_obs",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "r2_obs",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β_indirect')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -112405,21 +112442,28 @@
  },
  "Descent.Portability.AttenuationModel.β_obs": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β_true'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 668,
   "short": "β_obs",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "β_obs",
+  "args": [
+   "m",
+   "r2"
+  ],
   "box": {
    "r2": [
     0.02,
     0.98
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β_true')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -112514,16 +112558,22 @@
  },
  "Descent.Portability.TransportabilityModel.r2_target": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('δ'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 715,
   "short": "r2_target",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "r2_target",
+  "args": [
+   "m"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('δ')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -112664,21 +112714,28 @@
  },
  "Descent.Portability.MRInstrumentModel.fStat": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('β_inst'))",
   "file": "Descent/Portability/StratificationConfounding.lean",
   "line": 826,
   "short": "fStat",
   "ret_type": "ℝ",
   "empirical_status": "VALIDATED",
-  "python": null,
-  "args": [],
+  "python": "fStat",
+  "args": [
+   "m",
+   "p"
+  ],
   "box": {
    "p": [
     0.02,
     0.98
    ]
   },
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('β_inst')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -117010,16 +117067,22 @@
  },
  "Descent.Program.PosteriorPrediction.prob_mode": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "self-check: structure projection unavailable (KeyError('η_mean'))",
   "file": "Descent/Program/Conclusions.lean",
   "line": 218,
   "short": "prob_mode",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": null,
-  "args": [],
+  "python": "prob_mode",
+  "args": [
+   "pred"
+  ],
   "box": {},
-  "selfcheck": null,
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "KeyError('η_mean')"
+  },
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -118130,7 +118193,7 @@
  },
  "Descent.Program.populationAUC": {
   "class": "NOT-EXTRACTABLE",
-  "note": "unrecognised character '.'",
+  "note": "trailing tokens after expression: op:{",
   "file": "Descent/Program/Conclusions.lean",
   "line": 1221,
   "short": "populationAUC",
