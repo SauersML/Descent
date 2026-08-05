@@ -213,6 +213,41 @@ theorem splitBy_compl {n : ℕ} (η : ER n) (S : Finset (Fin n)) (a : Fin n)
       simp [Finset.mem_sdiff, hy]
     simp [hxS, hyS, hmx, hmy]
 
+/-- A state other than `Δ` relates two distinct elements -- the class that can be cut. -/
+theorem exists_rel_ne_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
+    ∃ x y : Fin n, x ≠ y ∧ ξ.r x y := by
+  by_contra hcon
+  push_neg at hcon
+  refine h (Setoid.ext fun x y => ⟨fun hxy => ?_, fun hxy => ?_⟩)
+  · by_contra hne
+    exact hcon x y hne hxy
+  · show x = y at hxy
+    subst hxy
+    exact ξ.iseqv.refl x
+
+/-- **Every state except `Δ` has something below it.**  If `ξ` is not the starting state then
+some class of it has two elements, and cutting one off gives a state `ξ ≺` covers.
+
+With `blocks_bot`, this says the covering order on `𝓔ₙ` has `Δ` as its only minimal element,
+so the sample paths of K-C (1.13) pass through every level and every state is reachable from
+`Δ`.  Without it, "the chain runs from `Δ` to `Θ`" would leave open whether it could get
+stuck somewhere with no predecessor. -/
+theorem exists_covers_of_ne_bot {n : ℕ} {ξ : ER n} (h : ξ ≠ Delta n) :
+    ∃ ξ' : ER n, Covers ξ' ξ := by
+  classical
+  obtain ⟨x, y, hxy, hrel⟩ := exists_rel_ne_of_ne_bot h
+  have hSa : ∀ z ∈ ({x} : Finset (Fin n)), ξ.r z x := by
+    intro z hz
+    rw [Finset.mem_singleton] at hz
+    subst hz
+    exact ξ.iseqv.refl x
+  have hSne : ∃ z, z ∈ ({x} : Finset (Fin n)) := ⟨x, Finset.mem_singleton_self x⟩
+  have hSproper : ∃ z, ξ.r z x ∧ z ∉ ({x} : Finset (Fin n)) := by
+    refine ⟨y, ξ.iseqv.symm hrel, ?_⟩
+    rw [Finset.mem_singleton]
+    exact fun hcontra => hxy hcontra.symm
+  exact ⟨splitBy ξ {x}, splitBy_covers ξ {x} hSa hSne hSproper⟩
+
 /-- **A cut is determined by its set, up to swapping the two pieces.**  Cutting a class
 along `S` and along its complement within that class give the same state -- which is exactly
 why Kingman's sum over `ν = 1, …, λ-1` carries a factor `½`: it counts each cut twice. -/
