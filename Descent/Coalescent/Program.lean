@@ -237,11 +237,20 @@ integral is zero almost everywhere.  A vanishing `e^{-S}` is an infinite `S`.  S
   **the descent time is almost surely finite exactly when `Σ γ_k⁻¹` converges**
   (`ae_descent_dichotomy`),
 
-with Kingman on one side and the star coalescent on the other, both proved.  STILL ABSENT:
-the multiple-merger correction -- for a `Λ`-coalescent that drops several levels at once,
-`γ_b` is an expected DECREASE rate rather than a rate of leaving, so the mean sojourn is not
-`γ_b⁻¹` and the identity becomes an inequality, which is Schweinsberg's theorem proper -- and
-Pólya's renewal identity, which needs a walk on `ℤ` with its strong Markov property.
+with Kingman on one side and the star coalescent on the other, both proved.  `Coalescent.DecreaseRate` then separates the two rates the multiple-merger case confuses.
+`Lambda.totalRate` is the rate of LEAVING a level, `decreaseRate` is Schweinsberg's expected
+rate of DECREASE, and `totalRate_le_decreaseRate` is the correction in one line: every merger
+destroys at least one block, so `λ_b ≤ γ_b`.  Hence
+`comesDownFromInfinity_of_summable_totalRate`: the corpus's level-by-level condition
+`Σ λ_b⁻¹ < ∞` implies Schweinsberg's `Σ γ_b⁻¹ < ∞` and not conversely, so what
+`ThreeSeries` proves is coming down under a STRICTLY STRONGER hypothesis.  The gap is exactly
+the levels a multiple merger skips: a jump from `b` to `b-k+1` pays one sojourn where the
+level sum charges `k-1`.  With only pairwise mergers the two rates coincide
+(`decreaseRate_eq_totalRate_of_binary`), and Kingman is that case (`kingman_rates_eq`), which
+is why everything else in this group is exact rather than approximate.  STILL ABSENT:
+Schweinsberg's theorem proper, that the weaker condition suffices, which is a comparison
+argument on the process rather than a sum over levels; and Pólya's renewal identity, which
+needs a walk on `ℤ` with its strong Markov property.
 
 ## Beyond Kingman
 
