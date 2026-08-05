@@ -287,13 +287,6 @@ theorem weightedHolonomy_gaugeInvariant (edges : List E) (ℓ : E → Nat) :
     GaugeInvariant (E := E) (fun _ s => sum (fun w => sum (fun e => ℓ e * w e) edges) s) :=
   gaugeInvariant_of_treeFree _
 
-/-- The variant count is gauge-invariant across trees of a common size, which for
-spanning trees of a connected graph is automatic.  Unlike the statistics above
-this one does mention the tree, and is invariant anyway. -/
-theorem variantCount_gauge_invariant (edges : List E) (T₁ T₂ : Tree E)
-    (hsize : variantCount edges T₁ = variantCount edges T₂) :
-    variantCount edges T₁ = variantCount edges T₂ := hsize
-
 /-! ### The witness is an instance
 
 The triallelic site of `GaugeCounterexample`, presented in the general framework:
