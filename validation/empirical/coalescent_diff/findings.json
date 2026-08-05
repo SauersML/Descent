@@ -1,0 +1,169 @@
+{
+ "lane": "DemographicHistory + PopulationGeneticsFoundations/LDDecayTheory not covered by validation/differential",
+ "method": "direct Wright-Fisher / coalescent simulation, pure stdlib python3.12 on MSI acn112, 16 cores; every null preceded by a positive control",
+ "scripts": ["coal_sim.py"],
+ "raw_results": "coal_sim_results.json",
+ "logs": "run_logs.txt",
+
+ "positive_controls": {
+  "P1_mutation_drift_identity": "single WF population, infinite alleles: measured Q vs EXACT discrete fixed point (1-mu)^2/(2Ne) / (1-(1-mu)^2(1-1/(2Ne))). theta=0.25 +0.40%, theta=1 +1.82%, theta=4 -0.03%. PASS (640 replicates each)",
+  "P2_pure_drift_recurrence": "Q(t+1)=1/(2Ne)+(1-1/(2Ne))Q(t) with mu=0, Ne=50, 800 replicates: worst |dev| 0.0123 over 200 generations. PASS",
+  "P3a_Strobeck_within_deme_time": "stepping stone D=64 Ne=25: measured T_within 3136.9 vs 2*N_total 3200.0 (-2.0%). PASS",
+  "P3b_lattice_meeting_time": "measured meeting time vs d(D-d)/(2 sigma^2 m) at d=4,8,16: worst 2.7%. PASS",
+  "P4_admixture_LD_null": "sources equal at either locus -> D measured -0.00012 and -0.00020 against exactly 0. PASS"
+ },
+
+ "findings_ranked": [
+  {
+   "rank": 1,
+   "decl": "Descent.PopulationGeneticsFoundations.fstMutationDriftTransient",
+   "site": "Descent/PopulationGeneticsFoundations.lean:719",
+   "lean": "fstMutationDriftEquilibrium theta * (1 - exp(-(1+theta) t / (2 Ne)))",
+   "verdict": "REGIME UNSTATED / DOCSTRING UNDERSPECIFIED; numerically WRONG for the standard split",
+   "simulation": "two isolated WF demes, Ne=100, infinite alleles, 320 replicates, Fst=(Qs-Qb)/(1-Qb)",
+   "result_equilibrium_ancestor": {
+    "theta_0.25": {"worst_rel_err_lean": 0.250, "at_t": 100, "worst_rel_err_derived_form": 0.074},
+    "theta_1.0": {"worst_rel_err_lean": 0.119, "at_t": 160, "worst_rel_err_derived_form": -0.049},
+    "theta_4.0": {"worst_rel_err_lean": 0.106, "at_t": 20, "worst_rel_err_derived_form": 0.060}
+   },
+   "result_zero_identity_ancestor": {
+    "theta_0.25": {"worst_rel_err_lean": -0.020},
+    "theta_1.0": {"worst_rel_err_lean": 0.033},
+    "theta_4.0": {"worst_rel_err_lean": 0.058}
+   },
+   "why": "the Lean rate constant (1+theta)/(2Ne) = 2mu + 1/(2Ne) is the relaxation rate of the WITHIN-deme identity Qs, not of Fst. After an isolating split, lineages in different demes can never coalesce, so Qb has only one clock, mutation, at rate 2mu = theta/(2Ne). The two rates differ by (1+theta)/theta, which diverges as theta -> 0 (=5x at theta=0.25).",
+   "derived_correct_form_for_equilibrium_split": "Fst(t) = Q*(1-x)/(1 - Q* x) with x=(1-mu)^(2t), Q* the mutation-drift identity",
+   "note": "The Lean body IS correct for a split from an ancestor with zero within-population identity, which is a legitimate but non-standard idealisation. The docstring's 'Starting from Fst=0' is true of both initial conditions and does not select one."
+  },
+  {
+   "rank": 2,
+   "decl": "Descent.LDDecayTheory.driftRatePerGen  (and its identical twin Descent.DemographicHistory.driftLDCreationRate)",
+   "site": "Descent/LDDecayTheory.lean:872 ; Descent/DemographicHistory.lean:841",
+   "lean": "1 / (2 Ne)",
+   "docstring_claim": "the fraction of LD that decays per generation is 1/(2Ne)",
+   "verdict": "DOCSTRING NUMERICALLY WRONG (definition body is a bare rate and survives; the reading attached to it does not)",
+   "evidence": "the same file's ldRetentionPerGen r Ne = (1-r)(1-1/(2Ne)) is VALIDATED to 0.7% by fam_ld_decay.py. The fraction of E[D] lost per generation is therefore 1-(1-r)(1-1/(2Ne)) = r + 1/(2Ne) - r/(2Ne), exact rational arithmetic:",
+   "exact": [
+    {"Ne": 10000, "r": "1/100", "true_fraction_lost": 0.0100495, "lean": 5e-05, "ratio": 201.0},
+    {"Ne": 10000, "r": "1/1000", "true_fraction_lost": 0.00104995, "lean": 5e-05, "ratio": 21.0},
+    {"Ne": 1000, "r": "1/100", "true_fraction_lost": 0.010495, "lean": 0.0005, "ratio": 21.0},
+    {"Ne": 10000, "r": "0", "true_fraction_lost": 5e-05, "lean": 5e-05, "ratio": 1.0}
+   ],
+   "note": "same defect class, same file, as the already-REPAIRED ldHalfLife (2110x) and ldRetainedFraction (37000x): the recombination argument is absent, so the r=0 slice is the only place the claim holds. Unbounded in r/(1/(2Ne))."
+  },
+  {
+   "rank": 3,
+   "decl": "Descent.PopulationGeneticsFoundations.sharedLDFractionFromMutation",
+   "site": "Descent/PopulationGeneticsFoundations.lean:825",
+   "lean": "exp(-(expectedNewMutations theta t)) = exp(-theta t/2)",
+   "verdict": "DOCSTRING OVERCLAIMS; the body is not a fraction of anything",
+   "evidence": "the exponent is, by the corpus's own composition, a COUNT of mutations. Simulation (SIM4) measures that count: 599.9 arisen at theta=1,t=1200, so the body evaluates to exp(-600) = 1e-261, and 2423.8 at theta=4, giving exp(-2424). A quantity described as 'the fraction of LD that is shared between populations' is identically 0 to machine precision for any locus older than roughly 60/theta generations.",
+   "note": "no simulation is needed to see the scale problem, but SIM4 supplies the count the exponent actually is. Nothing in the corpus derives an exp(-N_mutations) law; the plausible-looking regime (theta t/2 ~ 1) exists only for per-SITE theta and vanishes for any locus-scale theta."
+  },
+  {
+   "rank": 4,
+   "decl": "Descent.PopulationGeneticsFoundations.expectedNewMutations",
+   "site": "Descent/PopulationGeneticsFoundations.lean:795",
+   "lean": "theta/2 * t",
+   "verdict": "BODY CORRECT as a count of mutations ARISING; DOCSTRING'S SECOND SENTENCE WRONG",
+   "simulation": "infinite-sites WF, Ne=50, 16 replicates, t=1200",
+   "result": [
+    {"theta": 1.0, "arisen_measured": 599.9, "lean": 600.0, "ratio": 1.000, "segregating_measured": 5.1, "segregating_over_lean": 0.0085, "watterson_theta_sum_1_over_i": 5.2},
+    {"theta": 4.0, "arisen_measured": 2423.8, "lean": 2400.0, "ratio": 1.010, "segregating_measured": 21.3, "segregating_over_lean": 0.0089, "watterson_theta_sum_1_over_i": 20.7}
+   ],
+   "why": "the docstring says 'Over t generations, the expected number of new SEGREGATING SITES is ~theta t/2'. Segregating sites saturate at Watterson's theta*sum(1/i), which the simulation reproduces to 2-3%; theta t/2 grows without bound. Overstatement 118x at t=1200 and growing linearly in t."
+  },
+  {
+   "rank": 5,
+   "decl": "Descent.DemographicHistory.steppingStoneDiffusionTimescale",
+   "site": "Descent/DemographicHistory.lean:249",
+   "lean": "d / (2 sigma^2 m)",
+   "verdict": "CONFIRMS the corpus's own recorded defect, independently and at a different lattice size",
+   "simulation": "direct two-lineage Monte Carlo, circle D=64, Ne=25, m=0.2, sigma^2=1, 48000 replicates per d",
+   "result": [
+    {"d": 1, "meeting_time_measured": 183.2, "lean_perDeme": 2.5, "factor": 73.3, "lattice_form_d_D_minus_d_over_2s2m": 157.5},
+    {"d": 8, "meeting_time_measured": 1150.7, "lean_perDeme": 20.0, "factor": 57.5, "lattice_form": 1120.0},
+    {"d": 32, "meeting_time_measured": 2571.5, "lean_perDeme": 80.0, "factor": 32.1, "lattice_form": 2560.0}
+   ],
+   "note": "the corpus records the factor as (D-d) measured at D=256; at D=64 the measured factors are 73/58/32 against (D-d)=63/56/32. Confirmed."
+  },
+  {
+   "rank": 6,
+   "decl": "Descent.DemographicHistory.steppingStoneMeetingTimeOnLattice (d D sigma_sq m)",
+   "site": "Descent/DemographicHistory.lean:257",
+   "verdict": "NUMERICALLY CORRECT (VERIFIED); the case-only d/D collision is a live, uncaught hazard",
+   "simulation_agreement": "measured/predicted = 1.026 at d=4, 1.027 at d=8, 1.006 at d=16, 1.004 at d=32; 1.163 at d=1 (lattice discreteness at one step)",
+   "call_site_audit": "the only consumers in the corpus are steppingStoneMeetingTime_eq_scaled and steppingStoneMeetingTime_eq_perDeme_iff (DemographicHistory.lean:264,276) and differential/checks.py:641. No call site currently swaps them.",
+   "swap_consequence_exact_rational": [
+    {"d": 1, "D": 256, "correct": 1275, "swapped": -326400, "ratio": -256},
+    {"d": 8, "D": 256, "correct": 9920, "swapped": -317440, "ratio": -32},
+    {"d": 64, "D": 256, "correct": 61440, "swapped": -245760, "ratio": -4},
+    {"d": 128, "D": 256, "correct": 81920, "swapped": -163840, "ratio": -2}
+   ],
+   "swap_is_detectable": "a d<->D swap always flips the sign (d < D), so it yields a NEGATIVE expected time. Nothing in the corpus rules this out: there is no nonnegativity or positivity theorem for steppingStoneMeetingTimeOnLattice, unlike its siblings. That theorem is the cheap guard.",
+   "second_and_worse_collision": "sigma_sq and m enter only as the product 2*sigma_sq*m, so a sigma_sq <-> m swap is EXACTLY invisible -- no test, simulation, or theorem can ever detect it. And the two siblings order them oppositely in the same file: demoSteppingStoneFst (d Ne m sigma_sq) vs steppingStoneDiffusionTimescale (d sigma_sq m) vs steppingStoneMeetingTimeOnLattice (d D sigma_sq m). demoSteppingStoneFst is likewise symmetric in m and sigma_sq. This is the higher-risk collision of the two."
+  },
+  {
+   "rank": 7,
+   "decl": "Descent.DemographicHistory.demoSteppingStoneFst",
+   "site": "Descent/DemographicHistory.lean:124",
+   "lean": "d / (d + 4 Ne m sigma_sq)",
+   "verdict": "HYPERBOLIC FORM VERIFIED by direct simulation, independently of the corpus's own solver; the exponential is confirmed beaten; the d << D regime bound is confirmed and quantified",
+   "simulation": "two-lineage stepping-stone coalescent run forward as a process (lineages walk, coalesce with prob 1/(2Ne) when co-located), circle D=64, Ne=25, m=0.2, sigma^2=1; Fst = 1 - T_within/T_between",
+   "rms_relative_error": {
+    "corpus_hyperbolic_d_le_8_stated_regime": 0.0582,
+    "best_fitted_exponential_1_minus_exp_d_over_L_d_le_8": 0.1030,
+    "corpus_hyperbolic_all_d_to_D_over_2": 0.1715,
+    "lattice_exact_hyperbolic_all_d_to_D_over_2": 0.0612
+   },
+   "per_d": [
+    {"d": 1, "measured": 0.0530, "corpus": 0.0476, "rel": -0.102, "lattice_hyperbolic": 0.0469},
+    {"d": 2, "measured": 0.0930, "corpus": 0.0909, "rel": -0.022, "lattice_hyperbolic": 0.0883},
+    {"d": 4, "measured": 0.1689, "corpus": 0.1667, "rel": -0.013, "lattice_hyperbolic": 0.1579},
+    {"d": 8, "measured": 0.2720, "corpus": 0.2857, "rel": 0.050, "lattice_hyperbolic": 0.2593},
+    {"d": 16, "measured": 0.3780, "corpus": 0.4444, "rel": 0.176, "lattice_hyperbolic": 0.3750},
+    {"d": 32, "measured": 0.4514, "corpus": 0.6154, "rel": 0.363, "lattice_hyperbolic": 0.4444}
+   ],
+   "note": "the deletion of continuousSteppingStoneFst is corroborated: the exponential, with L FITTED freely to the measurement, is 1.8x worse than the corpus form in the corpus form's own stated regime. Replacing d by d(D-d)/D -- the same coalescent derivation without the d << D truncation -- removes essentially all of the far-field error (0.1715 -> 0.0612) and is the form the corpus does not carry.",
+   "second_order_finding": "the two compensating omissions the corpus documents are confirmed quantitatively. Measured T_within = 3136.9 = 2*D*Ne, NOT the per-deme 2*Ne = 50 that coalFst is handed -- a factor of 64 (=D). It cancels against the (D-d)~D dropped from the meeting time, which is exactly why demoSteppingStoneFst is right anyway."
+  },
+  {
+   "rank": 8,
+   "decl": "Descent.PopulationGeneticsFoundations.fstMigrationMutationEquilibrium",
+   "site": "Descent/PopulationGeneticsFoundations.lean:1022",
+   "lean": "1 / (1 + 4 Ne m + 4 Ne mu)",
+   "verdict": "VERIFIED CORRECT",
+   "simulation": "n=20 deme island model, Ne=25, infinite-alleles mutation, time-averaged equilibrium Fst=(Qs-Qb)/(1-Qb), 16 independent replicates x 4000 sampled generations after 1500 burn-in",
+   "result": [
+    {"4Nm": 0.0, "theta": 1.0, "measured": 0.4981, "lean": 0.5000, "rel": 0.004},
+    {"4Nm": 0.25, "theta": 0.5, "measured": 0.5718, "lean": 0.5714, "rel": -0.001},
+    {"4Nm": 1.0, "theta": 0.5, "measured": 0.3960, "lean": 0.4000, "rel": 0.010, "rel_after_finite_n_correction": -0.011},
+    {"4Nm": 1.0, "theta": 2.0, "measured": 0.2427, "lean": 0.2500, "rel": 0.030, "rel_after_finite_n_correction": 0.017},
+    {"4Nm": 4.0, "theta": 0.5, "measured": 0.1723, "lean": 0.1818, "rel": 0.055, "rel_after_finite_n_correction": 0.016}
+   ],
+   "note": "the residual is monotone in 4Nm and is fully accounted for by the finite-deme island correction (n/(n-1))^2 at n=20, which the definition legitimately omits as an infinite-island idealisation. Non-vacuous: Fst spans 0.17-0.57 over the grid and the additivity of the two rates is separately exercised by the (4Nm=1, theta=0.5) vs (4Nm=1, theta=2) pair."
+  },
+  {
+   "rank": 9,
+   "decl": "Descent.LDDecayTheory.admixtureLD  and  Descent.DemographicHistory.admixedAlleleFreq",
+   "site": "Descent/LDDecayTheory.lean:169 ; Descent/DemographicHistory.lean:504",
+   "lean": "alpha*(1-alpha)*dp1*dp2  ;  alpha*p_A + (1-alpha)*p_B",
+   "verdict": "VERIFIED CORRECT -- this is the clean finding",
+   "simulation": "3.2 million simulated admixed haplotypes per cell, ancestry drawn per haplotype then alleles drawn independently within source",
+   "result": [
+    {"alpha": 0.5, "D_measured": 0.08992, "D_lean": 0.09000, "abs_err": -0.00008, "p1_measured": 0.50067, "p1_lean": 0.50000},
+    {"alpha": 0.2, "D_measured": 0.05096, "D_lean": 0.05120, "abs_err": -0.00024, "p1_measured": 0.26024, "p1_lean": 0.26000},
+    {"alpha": 0.8, "D_measured": -0.04320, "D_lean": -0.04320, "abs_err": 0.00000, "p1_measured": 0.41999, "p1_lean": 0.42000}
+   ],
+   "note": "grid includes a negative-D cell (alpha=0.8, dp1<0), so a sign or argument-order error separates. Controls P4 (dp1=0 and dp2=0) return -0.00012 and -0.00020 against exactly 0."
+  }
+ ],
+
+ "not_reached": {
+  "Descent.LDDecayTheory.driftLDStep": "UNTESTED, LDDecayTheory.lean:263. Not reached by direct simulation. Reason: the Sved Q is a DEFECTIVE identity (IBD with no intervening recombination on either lineage); a plain forward label simulation measures ordinary two-locus IBD, which goes to 1 with no mutation and is a different quantity, so the naive direct simulation would have tested the wrong thing. A correct direct test needs an ancestral-recombination-graph simulation, which I did not have time to build.",
+  "Descent.LDDecayTheory.driftLDRetention": "UNTESTED, LDDecayTheory.lean:285. Same reason; it is the slope of driftLDStep.",
+  "Descent.LDDecayTheory.excessLDAfterBottleneck": "UNTESTED marker at LDDecayTheory.lean:719 is STALE. validation/differential/cluster/fam_ld_decay.py section C already measures it against two-locus WF sigma_d^2 and it disagrees: measured/corpus amplification 2.66 vs 5.16 (rho=2, t_b=25), 11.70 vs 7.81 (rho=10, t_b=25), 3.68 vs 8.25 (rho=10, t_b=100). Its null arm passes. Not re-run here.",
+  "Descent.DemographicHistory.bottleneckExcessLD": "UNTESTED, DemographicHistory.lean:890. Proved equal to excessLDAfterBottleneck at t_r=0, so it inherits the disagreement above.",
+  "Descent.PopulationGeneticsFoundations.fstFromHetRatio": "UNTESTED, PopulationGeneticsFoundations.lean:1678. Not reached. Body 1 - H/H0 is definitional; the testable content is which H is which, which is an argument-convention question rather than a simulable one."
+ }
+}

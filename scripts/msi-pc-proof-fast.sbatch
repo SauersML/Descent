@@ -16,4 +16,4 @@ export PATH="$HOME/.elan/bin:$PATH"
 # state and turns a leaf check into a project-wide replay.
 # Lake already parallelises over available cores; it has no --jobs flag in this
 # toolchain, and passing one aborts the build immediately.
-lake build "${1:-Calibrator.PCCorrectability}"
+lake build "${1:-Descent.PCCorrectability}"

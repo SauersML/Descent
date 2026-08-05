@@ -3,9 +3,9 @@
 #
 # Run this from the relay, never on this laptop:
 #
-#   /Users/user/msi-node/msi 'bash /projects/standard/hsiehph/sauer354/gnomon/scripts/cluster-lean-build.sh Calibrator.ProjectionShiftBounds Calibrator.MetricSpecificPortability'
+#   /Users/user/msi-node/msi 'bash /projects/standard/hsiehph/sauer354/gnomon/scripts/cluster-lean-build.sh Descent.ProjectionShiftBounds Descent.MetricSpecificPortability'
 #
-# with no arguments it builds the whole Calibrator target.
+# with no arguments it builds the whole Descent target.
 #
 # ---------------------------------------------------------------------------
 # WHY THIS EXISTS
@@ -76,7 +76,7 @@
 #                        were halted for hours, and the errors turned out to be
 #                        REAL. The root cause was a namespace boundary, not a
 #                        broken chain: five declarations in
-#                        `Calibrator.TransportedMetrics` were referenced bare,
+#                        `Descent.TransportedMetrics` were referenced bare,
 #                        and Lean AUTO-BINDS an unresolved bare name as an
 #                        implicit variable rather than reporting it missing,
 #                        which is why one cause produced three different error
@@ -97,7 +97,7 @@
 #
 #                          CausalInference: 35 errors, two texts, one cause.
 #                          `r2FromSignalVariance` moved into
-#                          `Calibrator.TransportedMetrics`, and OPEN DOES NOT
+#                          `Descent.TransportedMetrics`, and OPEN DOES NOT
 #                          TRAVEL THROUGH IMPORT -- the `open` that
 #                          `OpenQuestions` added for itself did nothing for a
 #                          file that imports `OpenQuestions`. That is how a
@@ -144,7 +144,7 @@
 #   LAKE_EXIT=0       -> build succeeded.
 #   otherwise         -> count Lean errors, and ONLY Lean errors:
 #
-#       grep -c '^error: proofs/'      <- correct
+#       grep -c '^error: Descent/'     <- correct
 #       grep -c '^error:'              <- WRONG, matches git and lake messages
 #
 #   READING LEAN ERRORS: THREE SHAPES OF "unfold failed", ALL PRINTING THE SAME
@@ -278,17 +278,17 @@
 
 set -uo pipefail
 
-ROOT=${GNOMON_ROOT:-/projects/standard/hsiehph/sauer354}
+ROOT=${DESCENT_ROOT:-/projects/standard/hsiehph/sauer354}
 # The cluster's default python3 is 3.6.8 and predates `from __future__ import
 # annotations`, so a guard written against a modern Python dies with a
 # SyntaxError and reports a NONZERO exit. A guard that never ran is then
 # indistinguishable from a guard that failed, unless somebody reads the
 # traceback. Pin the interpreter, and fail loudly if it is missing rather than
 # falling back to one that cannot run the guards.
-GUARD_PY=${GNOMON_PY:-/usr/bin/python3.12}
+GUARD_PY=${DESCENT_PY:-/usr/bin/python3.12}
 if ! "$GUARD_PY" -c 'import sys; assert sys.version_info >= (3, 9)' 2>/dev/null; then
   echo "GUARD_PY_UNUSABLE=$GUARD_PY"
-  echo "!!! No usable Python for the guards. Set GNOMON_PY to a 3.9+ interpreter."
+  echo "!!! No usable Python for the guards. Set DESCENT_PY to a 3.9+ interpreter."
   echo "!!! Guard results below would be interpreter failures, not findings."
   exit 4
 fi
@@ -297,11 +297,11 @@ echo "GUARD_PY=$GUARD_PY"
 
 # The shared checkout runs many commits behind and carries dirty files, so a
 # build of it reports the state of that tree rather than the state of the
-# corpus. Point GNOMON_REPO at a clean clone at a named revision when you want
+# corpus. Point DESCENT_REPO at a clean clone at a named revision when you want
 # a number anyone can trust, and record the revision beside the number.
-REPO=${GNOMON_REPO:-$ROOT/gnomon}
+REPO=${DESCENT_REPO:-$ROOT/gnomon}
 TARGETS=("$@")
-if [ ${#TARGETS[@]} -eq 0 ]; then TARGETS=(Calibrator); fi
+if [ ${#TARGETS[@]} -eq 0 ]; then TARGETS=(Descent); fi
 
 export PATH=$ROOT/.elan/bin:$PATH
 export ELAN_HOME=$ROOT/.elan
@@ -366,7 +366,7 @@ if [ ! -f "$MLROOT" ] || [ "$OLEANS" -lt 2900 ]; then
   fi
 fi
 
-"$GUARD_PY" -S proofs/validation/code/check.py --only identifications \
+"$GUARD_PY" -S validation/code/check.py --only identifications \
   > "$ROOT/guard-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "GUARD_EXIT=$?"
 
@@ -374,10 +374,10 @@ echo "GUARD_EXIT=$?"
 # source text and therefore needs no oleans -- a build that dies in the toolchain
 # still gets this answer.  The elaborated-telescope half (the LAUNDERING scan in
 # Check.lean) needs the oleans and runs after the build, below.
-"$GUARD_PY" -S proofs/validation/code/check.py --only laundering \
+"$GUARD_PY" -S validation/code/check.py --only laundering \
   > "$ROOT/launder-${SLURM_JOB_ID:-manual}.txt" 2>&1
 echo "LAUNDER_GUARD_EXIT=$?"
-"$GUARD_PY" -S proofs/validation/code/check.py --only laundering --summary 2>&1 \
+"$GUARD_PY" -S validation/code/check.py --only laundering --summary 2>&1 \
   | sed -n '3,20p' | sed 's/^/LAUNDER_/'
 
 lake build "${TARGETS[@]}"
@@ -385,11 +385,11 @@ _lake_exit=$?
 echo "LAKE_EXIT=$_lake_exit"
 
 # The environment-level laundering scan needs a successful build: it walks the
-# fully elaborated type of every `Calibrator` declaration.  Reporting it as
+# fully elaborated type of every `Descent` declaration.  Reporting it as
 # SKIPPED when the build failed matters -- an absent scan must not read as a
 # clean one, which is the rule the rest of this file was written around.
 if [ "$_lake_exit" -eq 0 ]; then
-  lake env lean proofs/validation/code/Check.lean \
+  lake env lean validation/code/Check.lean \
     > "$ROOT/launder-env-${SLURM_JOB_ID:-manual}.txt" 2>&1
   echo "LAUNDER_ENV_EXIT=$?"
   grep -E '^LAUNDER_(SCANNED|PREMISES|FATAL|TOTAL)' \
@@ -421,10 +421,10 @@ fi
 echo "--- MODULE STATUS ---"
 _compiled=0; _stale=0; _absent=0
 while IFS= read -r src; do
-  rel=${src#proofs/}                 # Calibrator/Foo/Bar.lean
-  mod=${rel%.lean}                   # Calibrator/Foo/Bar
+  rel=$src                           # Descent/Foo/Bar.lean
+  mod=${rel%.lean}                   # Descent/Foo/Bar
   olean=".lake/build/lib/lean/${mod}.olean"
-  name=${mod//\//.}                  # Calibrator.Foo.Bar
+  name=${mod//\//.}                  # Descent.Foo.Bar
   if [ ! -f "$olean" ]; then
     echo "MODULE_STATUS $name ABSENT"; _absent=$((_absent+1))
   elif [ "$olean" -nt "$src" ]; then
@@ -432,13 +432,12 @@ while IFS= read -r src; do
   else
     echo "MODULE_STATUS $name STALE"; _stale=$((_stale+1))
   fi
-done < <(find proofs -name '*.lean' \
-           -not -path 'proofs/validation/*' | sort)
-# proofs/validation is excluded on purpose, and the exclusion is not cosmetic.
+done < <(find Descent Descent.lean -name '*.lean' | sort)
+# validation is excluded on purpose, and the exclusion is not cosmetic.
 # Two of its modules belong to the ValidationShared library, which this script
 # is not asked to build, and three are detector scripts that run under
 # `lake env lean` and by design never produce an olean at all. Counting those
-# five as ABSENT made a fully green Calibrator build report WHOLE_CORPUS
+# five as ABSENT made a fully green Descent build report WHOLE_CORPUS
 # INCOMPLETE and exit 3, so a correct build looked like a failed one. A guard
 # that fires on the healthy case is a guard everyone learns to ignore.
 echo "MODULES_COMPILED=$_compiled"
@@ -449,9 +448,9 @@ echo "MODULES_ABSENT=$_absent"
 # COVERAGE GUARD. THE BUILD MUST COVER ITS OWN CORPUS.
 #
 # On 2026-02 this script reported zero errors on whole-corpus builds, repeatedly,
-# while eight modules were never compiled at all: `Calibrator.ResonanceSpectrum`
-# and seven `Calibrator.BundleRigidity.*` submodules sat outside the import
-# closure of `proofs/Calibrator.lean`, so `lake build Calibrator` never reached
+# while eight modules were never compiled at all: `Descent.ResonanceSpectrum`
+# and seven `Descent.BundleRigidity.*` submodules sat outside the import
+# closure of `Descent.lean`, so `lake build Descent` never reached
 # them. Naming them as explicit targets produced errors immediately -- a missing
 # `Real.log` import that had been red all day. The root module itself was also
 # never elaborated until `CondensationUnification` compiled, and it was carrying
@@ -469,22 +468,22 @@ echo "MODULES_ABSENT=$_absent"
 echo "--- COVERAGE ---"
 _orphans=$(python3 - <<'PYEOF'
 import os, re, sys
-root = "proofs/Calibrator.lean"
+root = "Descent.lean"
 if not os.path.exists(root):
     print("ROOT_MISSING"); sys.exit(0)
 imports = {}
-for d, _, fs in os.walk("proofs/Calibrator"):
+for d, _, fs in os.walk("Descent"):
     for f in fs:
         if f.endswith(".lean"):
             p = os.path.join(d, f)
-            mod = p[len("proofs/"):-5].replace(os.sep, ".")
-            imports[mod] = re.findall(r"^import (Calibrator\.\S+)", open(p, encoding="utf-8").read(), re.M)
+            mod = p[:-5].replace(os.sep, ".")
+            imports[mod] = re.findall(r"^import (Descent\.\S+)", open(p, encoding="utf-8").read(), re.M)
 seen = set()
 def walk(m):
     for i in imports.get(m, []):
         if i not in seen:
             seen.add(i); walk(i)
-for r in re.findall(r"^import (Calibrator\.\S+)", open(root, encoding="utf-8").read(), re.M):
+for r in re.findall(r"^import (Descent\.\S+)", open(root, encoding="utf-8").read(), re.M):
     seen.add(r); walk(r)
 for o in sorted(set(imports) - seen):
     print(o)
@@ -496,7 +495,7 @@ if [ -n "$_orphans" ]; then
   echo "COVERAGE_EXIT=1"
   echo "!!! MODULES ON DISK ARE OUTSIDE THE ROOT IMPORT CLOSURE. They were NOT built,"
   echo "!!! and their silence in this log is ABSENCE OF EVIDENCE. Add them to"
-  echo "!!! proofs/Calibrator.lean -- not to this script's target list."
+  echo "!!! Descent.lean -- not to this script's target list."
   _coverage=1
 else
   echo "ORPHAN_MODULES=0"
@@ -509,7 +508,7 @@ fi
 # build -- otherwise it would cry wolf on every one-module check and be ignored,
 # which is how a guard becomes decoration.
 _whole=0
-if [ ${#TARGETS[@]} -eq 1 ] && [ "${TARGETS[0]}" = "Calibrator" ]; then _whole=1; fi
+if [ ${#TARGETS[@]} -eq 1 ] && [ "${TARGETS[0]}" = "Descent" ]; then _whole=1; fi
 #
 # STALE IS NOT ALWAYS A FAILURE, and getting this wrong makes the guard useless.
 # `git merge` rewrites every file it touches, which bumps source mtimes; lake

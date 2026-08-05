@@ -1,4 +1,4 @@
-name: Lean Prover CI
+name: Descent CI
 
 on:
   schedule:
@@ -6,16 +6,18 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'proofs/**'
-      - 'map/correctability.rs'
+      - 'Descent/**'
+      - 'Descent.lean'
+      - 'validation/**'
       - 'lakefile.lean'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'proofs/**'
-      - 'map/correctability.rs'
+      - 'Descent/**'
+      - 'Descent.lean'
+      - 'validation/**'
       - 'lakefile.lean'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
@@ -98,9 +100,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .lake/build
-          key: ${{ runner.os }}-gnomon-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'proofs/**/*.lean') }}
+          key: ${{ runner.os }}-descent-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'validation/**/*.lean') }}
           restore-keys: |
-            ${{ runner.os }}-gnomon-v1-
+            ${{ runner.os }}-descent-v1-
 
       - name: Fetch precompiled dependencies
         if: steps.lake-deps-cache.outputs.cache-hit != 'true'
@@ -112,10 +114,10 @@ jobs:
       # a single remote run.
       # `ValidationShared` carries the generated-declaration filter and the
       # results writer that the detectors below import.  Naming only
-      # `Calibrator` leaves those oleans unbuilt and every detector step fails
+      # `Descent` leaves those oleans unbuilt and every detector step fails
       # on an unknown module.
       - name: Build project
-        run: lake build Calibrator ValidationShared
+        run: lake build Descent ValidationShared
 
       # CODE VALIDATION, in two steps because there are exactly two instruments.
       #
@@ -126,13 +128,13 @@ jobs:
       # on clean mathematics.  This step also fails if the calibration file is
       # deleted, which has happened once.
       - name: Calibrate the laundering detector
-        run: python3 proofs/validation/code/test_check.py
+        run: python3 validation/code/test_check.py
 
       # Source text: style, structural guards, laundering, regimes, root import
       # closure, wiring.  Was six separate steps in three directories, each with
       # its own idea of where the corpus is; they disagreed.
       - name: Code validation (source text)
-        run: python3 proofs/validation/code/check.py
+        run: python3 validation/code/check.py
 
       # Elaborated environment: transitive axiom closure, laundered premises,
       # theorem-valued structure fields, rfl proofs.  Was four separate `lake env
@@ -142,19 +144,19 @@ jobs:
       # Source text and elaborated type are different objects and each sees what
       # the other cannot; that is why this stays two steps and not one.
       - name: Code validation (elaborated environment)
-        run: lake env lean proofs/validation/code/Check.lean
+        run: lake env lean validation/code/Check.lean
 
       - name: Verify arithmetic runtime semantics
-        working-directory: proofs/validation/empirical/invariants
+        working-directory: validation/empirical/invariants
         run: python3 test_lean_semantics.py
 
       - name: Regenerate the extracted definition table
         # defs.json and lean_defs.py are generated, never committed: they are
-        # derived from proofs/Calibrator/ and a committed snapshot drifts. CI
+        # derived from Descent/ and a committed snapshot drifts. CI
         # must build them from the revision under test, which is also what
         # makes the battery below evidence about THIS commit rather than about
         # whenever someone last refreshed a cache.
-        run: python3 proofs/validation/empirical/extract/emit.py
+        run: python3 validation/empirical/extract/emit.py
 
       # The identity gate's calibration runs BEFORE the battery, for the same
       # reason the laundering calibration runs before check.py. The identity
@@ -169,7 +171,7 @@ jobs:
       # logic and not about the corpus; it must run after emit.py only because
       # importing run.py pulls the extracted table in. Well under a second.
       - name: Calibrate the identity gate
-        working-directory: proofs/validation/empirical/differential
+        working-directory: validation/empirical/differential
         run: python3 test_identity_gate.py
 
       # Both directions, exactly like the laundering calibration above and for
@@ -184,7 +186,7 @@ jobs:
       # After the extraction step because it imports run.py, which loads the
       # definition table at import.
       - name: Calibrate the round-trip direction checks
-        working-directory: proofs/validation/empirical/differential
+        working-directory: validation/empirical/differential
         run: python3 test_roundtrip.py
 
       # Hand-verified ground truth for the parser and translator, and the only
@@ -199,7 +201,7 @@ jobs:
       # an empty table is reported as an extraction failure rather than raising
       # KeyError on the first lookup. Deterministic, dependency-free, ~2s.
       - name: Parser and translator ground truth
-        working-directory: proofs/validation/empirical/extract
+        working-directory: validation/empirical/extract
         run: python3 test_parser.py
 
       # The battery's own GATE, as opposed to its checks. test_identity_gate.py
@@ -213,7 +215,7 @@ jobs:
       # both ends of the victim's grid, because several checks say in their own
       # `canfail_clause` that their discrimination lives at one end of it.
       - name: Calibrate the differential battery gate
-        working-directory: proofs/validation/empirical/differential
+        working-directory: validation/empirical/differential
         run: python3 test_battery_gate.py
 
       - name: Differential battery
@@ -229,7 +231,7 @@ jobs:
         # scaling checks are dimensional homogeneity in the only form that
         # survives this corpus's conventions, since term-by-term homogeneity
         # flags every discrete per-generation recurrence as a false positive.
-        working-directory: proofs/validation/empirical/differential
+        working-directory: validation/empirical/differential
         run: python3 run.py
 
       # The metamorphic calibration runs BEFORE the metamorphic gate, for the
@@ -242,7 +244,7 @@ jobs:
       # that names it and NOT by the others, so the gate can localise rather
       # than merely alarm. Stub bodies only: no Lean, no generated table.
       - name: Calibrate the metamorphic gate
-        run: python3 proofs/validation/empirical/metamorphic/test_metamorphic.py
+        run: python3 validation/empirical/metamorphic/test_metamorphic.py
 
       # Metamorphic relations: transformations of the INPUT whose effect on the
       # OUTPUT is known exactly. This qualifies as a required check on the same
@@ -260,23 +262,25 @@ jobs:
       # violations: a relation pinned as deliberately unsatisfied that starts
       # holding is a regression too.
       - name: Metamorphic relation gate
-        run: python3 proofs/validation/empirical/metamorphic/run.py
+        run: python3 validation/empirical/metamorphic/run.py
 
-      # The scoring kernel's arithmetic is part of the specification: per-column
-      # f32 accumulation in variant order, flushed to an f64 master every 256
-      # variants. That is what makes the score's error independent of the
-      # variant count (measured flat at ~1e-7 cohort SD from 1e4 to 1e6
-      # variants; removing only the flush makes it grow to 1.2e-5 and depend on
-      # variant order). A single build flag dissolves it with no source diff and
-      # no test failure on small inputs, so the flags are guarded directly. The
-      # emitted aarch64 assembly and LLVM IR were read by hand at 0449db90 and
-      # are clean -- no fast-math, no reassociation, no cross-lane reduction --
-      # and that reading is the baseline this step protects.
-      - name: Build-configuration guard (FP semantics)
-        run: python3 proofs/validation/empirical/metamorphic/build_flags.py
+      # Every file a CI step runs must be TRACKED IN GIT. A step and its script
+      # can come apart silently: a "Calibrate the identity gate" step once rode
+      # into main across three commits while test_identity_gate.py was
+      # untracked, and CI would have failed on a missing file the whole time.
+      # The break is invisible to every other checker here, because the corpus
+      # is fine; it is the pipeline that is broken. Anchored to the paths this
+      # file actually names, so it needs no list of its own to go stale.
+      #
+      # This guard used to sit in metamorphic/build_flags.py alongside three
+      # checks on the Rust scoring kernel's fast-math flags. That kernel lives
+      # in gnomon, not here, so those three left with it when the corpus was
+      # split out and this one moved to validation/code/.
+      - name: Workflow-path guard (every run script is tracked)
+        run: python3 validation/code/workflow_paths.py
 
       # WHAT IS NOT WIRED UP, and why. The steps above are all of
-      # proofs/validation/code/ plus the subset of proofs/validation/empirical/
+      # validation/code/ plus the subset of validation/empirical/
       # that is deterministic, dependency-free and about twenty seconds in
       # total. Everything else under empirical/ falls into one of four buckets,
       # none of which belongs in a required check:
@@ -321,37 +325,21 @@ jobs:
       # it was the only instrument positioned to notice that the extraction tier
       # had gone silent. A red ground-truth gate must be repointed, not left.)
 
-      # BOTH DIRECTIONS FIRST, as with the laundering and identity-gate
-      # calibrations. Nobody had checked that the Lean corpus and the shipped
-      # implementation agree, and a theorem about a model the code does not
-      # implement is worse than no theorem: it is a false assurance that no
-      # other guard in proofs/validation/ can see. So the detector is asserted
-      # in both directions before its verdict is read -- a clean tree is silent,
-      # and seven planted one-place defects (one per finding class, plus an
-      # unreadable corpus) are each reported.
+      # WHAT LEFT WITH GNOMON. Three steps stood here: a calibration and a
+      # verdict for the corpus/implementation correspondence table, and a cargo
+      # differential evaluating every mapped definition against the real
+      # scoring code. All three read Rust -- map/correctability.rs and
+      # map/project.rs -- which is gnomon's, not this repository's.
       #
-      # The empty-corpus case is not decoration. The extraction tier resolved
-      # its corpus root one directory too high, parsed zero definitions and
-      # exited 0; this check would consume the same table, so it asserts that an
-      # empty table is an error rather than a pass.
-      - name: Calibrate the corpus/implementation correspondence guard
-        run: python3 proofs/validation/empirical/lean_code_map/test_map_check.py
-
-      # The correspondence table itself: which Calibrator declaration describes
-      # which shipped function, and whether that has been verified. Anchored to
-      # declaration NAMES plus content hashes, never to line numbers -- the
-      # mistake extract/test_parser.py was excluded for. A mapped Lean body or
-      # Rust body that changed is STALE, not wrong: the repair is to re-read
-      # both sides and re-bless, not to assume the mathematics broke.
-      #
-      # It also carries the unguarded-code inventory: the clamps, epsilons,
-      # fallback branches, divisions and square roots inside the mapped Rust,
-      # recorded so a newly introduced numerical guard with no corresponding
-      # invariant in the corpus shows up as a finding. Every budget is 0.
-      #
-      # After emit.py, which it consumes through extract/api.py.
-      - name: Corpus/implementation correspondence
-        run: python3 proofs/validation/empirical/lean_code_map/map_check.py
+      # They are not retired, they are RELOCATED, and until they are running in
+      # gnomon against this corpus as a dependency, nothing checks that the
+      # theorems here describe the code that ships. That is a real hole and it
+      # is stated here rather than left to be discovered: a theorem about a
+      # model the implementation does not implement is worse than no theorem,
+      # because it reads as assurance. Vendoring a frozen copy of the Rust was
+      # the alternative and is worse -- the table is anchored on content
+      # hashes, so a copy that stops tracking gnomon stays green while checking
+      # an implementation nobody ships.
 
       # A reference evaluation states a VALUE so that a body with the wrong
       # constant in front fails it. A stated value of ZERO fails nothing:
@@ -369,22 +357,7 @@ jobs:
       # BOTH repairs, because the wrong one is destructive: moving a metric off
       # its own diagonal does not fix `d P P = 0`, it deletes it.
       - name: Vacuous reference evaluations
-        run: python3 proofs/validation/empirical/lean_code_map/degenerate.py --gate
-
-      # Now also the numeric differential: every mapped Calibrator definition
-      # evaluated against the REAL map/correctability.rs on the committed
-      # boundary/degenerate fixture grid, ~12800 comparisons in under a tenth of
-      # a second. Deterministic, exact arithmetic on a fixed grid, so the
-      # verdict is reproducible -- the same reason the differential battery
-      # above qualifies as a gate.
-      #
-      # This step could not compile for as long as it had been required: it
-      # reached the implementation through `#[path = "../../../map/..."]`, one
-      # level short of the repository root, so `cargo test` failed to build and
-      # executed nothing. A gate that cannot build is not a weaker gate; it is
-      # no gate at all, wearing the failure mode of infrastructure noise.
-      - name: Executable correctability contract
-        run: cargo test --manifest-path proofs/validation/empirical/correctability_calculator/Cargo.toml
+        run: python3 validation/empirical/reference_eval/degenerate.py --gate
 
   auto-close-failed-proof-pr:
     runs-on: ubuntu-latest
@@ -392,7 +365,7 @@ jobs:
     # IMPORTANT: always() ensures this job runs even if prove fails
     if: always() && github.event_name == 'pull_request'
     steps:
-      - name: Close PR if proofs/ or Lean rules violated
+      - name: Close PR if the corpus or Lean rules were violated
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -413,9 +386,10 @@ jobs:
               }
             );
 
-            const touchesProofs = files.some((file) => file.filename.startsWith('proofs/'));
+            const CORPUS = (name) => name.startsWith('Descent/') || name === 'Descent.lean' || name.startsWith('validation/');
+            const touchesProofs = files.some((file) => CORPUS(file.filename));
             const touchesLean = files.some((file) =>
-              file.filename.startsWith('proofs/') ||
+              CORPUS(file.filename) ||
               file.filename === 'lakefile.lean' ||
               file.filename === 'lean-toolchain' ||
               file.filename === '.github/workflows/prover.yml'
@@ -438,7 +412,7 @@ jobs:
             
             // Also detect Jules PRs by branch name pattern
             const branchName = pr.head.ref;
-            const julesApiBranchPattern = /^fix-(calibrator|proofs|build).*-\d+$/;
+            const julesApiBranchPattern = /^fix-(descent|corpus|build).*-\d+$/;
             const julesScriptBranchPattern = /^jules-improvement-\d{8}-\d{6}$/;
             const hasJulesBranch = julesApiBranchPattern.test(branchName) || julesScriptBranchPattern.test(branchName);
             const isJulesPR = hasJulesCommit || hasJulesBranch;
@@ -460,7 +434,7 @@ jobs:
               '## ❌ Lean Prover CI Failed',
               '',
               'This PR was auto-closed due to one or more rules:',
-              `- Touches \`proofs/\` and Lean Prover CI failed: ${touchesProofs && proverFailed ? 'yes' : 'no'}`,
+              `- Touches the corpus and Descent CI failed: ${touchesProofs && proverFailed ? 'yes' : 'no'}`,
               `- Jules PR (detected by branch pattern or commit author) and build failed: ${isJulesPR && proverFailed ? 'yes' : 'no'}`,
               `- Touches Lean-related files and adds new files: ${touchesLean && addsNewFiles ? 'yes' : 'no'}`,
               '',
@@ -484,4 +458,4 @@ jobs:
               state: 'closed',
             });
 
-            core.setFailed('Lean Prover CI failed for PR that modifies proofs/.');
+            core.setFailed('Descent CI failed for a PR that modifies the corpus.');

@@ -1,0 +1,36 @@
+{
+ "commits": 60,
+ "examined": 94,
+ "permuted": 2,
+ "findings": [
+  {
+   "commit": "97b1c3fa5",
+   "removed": "Descent.SplitMigrationModel.scaledMigration",
+   "survivor": "Descent.EvolutionaryParameters.bigM",
+   "removed_args": [
+    "m"
+   ],
+   "survivor_args": [
+    "p"
+   ],
+   "verdict": "UNTESTED",
+   "why": "survivor body not evaluable"
+  },
+  {
+   "commit": "91a114da0",
+   "removed": "Descent.effectiveMigration",
+   "survivor": "Descent.meanAlleleFreq",
+   "removed_args": [
+    "m\u2081\u2082",
+    "m\u2082\u2081"
+   ],
+   "survivor_args": [
+    "p\u2081",
+    "p\u2082"
+   ],
+   "body": "(p\u2081 + p\u2082) / 2",
+   "verdict": "no witness found (probably symmetric)",
+   "witness": null
+  }
+ ]
+}

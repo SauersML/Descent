@@ -1,0 +1,380 @@
+{
+ "_provenance": {
+  "generator": "validation/differential/cluster/fam_serial_founder.py",
+  "note": "ADDED AFTER THE FACT, BY READING GIT, NOT BY THE RUN. This file was written before the script stamped its own output, so nothing below was reported by the process that produced the numbers. Every field here is either derived from git history, and says so, or is null. No value in this block was guessed, and today's revision is deliberately absent: writing it here would claim this file describes a tree it has never been compared against.",
+  "revision": null,
+  "revisionKnown": false,
+  "partsComputed": ["A_serial_founder", "B_brier", "C_prevalence"],
+  "partsSkipped": [],
+  "allPartsComputed": true,
+  "checkThisNotKeyPresence": "Runs on a machine without the study data omit B_brier and C_prevalence. Read allPartsComputed and partsSkipped to tell a part that was not computed from a part that was computed as nothing; an absent key alone cannot distinguish them.",
+  "runAt": null,
+  "seed": null,
+  "seedNote": "The script draws no random numbers anywhere, so a disagreement with a re-run is NEVER explainable as a seed change. The remaining dependencies differ by part: A_serial_founder reads no files at all and is a function of the code alone, which is why it reproduces exactly across machines and numpy versions; B_brier and C_prevalence additionally depend on sims/results_hpc/ancestry_calibration/results/{accuracy_binary.csv,calibration_binary.csv}, which part B loads and part C consumes through part B's return value.",
+  "numpy": null,
+  "numpyConstraint": "numpy 1.x. The run predates commit db344f43 and used the bare np.trapz that numpy 2 removed, so it cannot have executed on numpy 2. A later run on 2.5.1 reproduces the exact-algebra leaves bit-identically and the trapezoid-derived leaves to one ULP; see reproduction.whatTheULPMeans.",
+  "reproduction": {
+   "note": "REPORTED BY A LATER RUN, not by the run that wrote this file. Recorded here because it settles two questions this block would otherwise leave open.",
+   "reportedBy": "cluster run, revision bb0d1f6a, 2026-08-03T18:53:20Z, node cn1136, numpy 2.5.1, python 3.12.13",
+   "A_serial_founder": "REPRODUCED TO ONE UNIT IN THE LAST PLACE, NOT BIT-IDENTICALLY. A structural JSON diff of a fresh run against this file found 4 of 63 numeric row leaves differing, worst relative difference 3.03e-16. The differing leaves are exactly the trapezoid-derived ones: k=9 founder_ceiling, stored 0.18496515431908497 against fresh 0.184965154319085, and cand5_far_rel_err, stored 0.039050081766467827 against fresh 0.039050081766467681. Every leaf computed by the exact 56-state linear algebra is bit-identical, including exact_far_fst 0.192481575584186. The two values the website cites are in the k=9 row, which is rows[8]; both round to the displayed 0.18497 and 0.19248 and the cited 3.9 per cent is unaffected at any precision anyone shows.",
+   "whatTheULPMeans": "NUMPY VERSION IS NOT STRUCK OFF. The one-ULP differences sit in founder_ceiling, which is the tau integration, and that is precisely where np.trapz was replaced by np.trapezoid for numpy 2. So the evidence IDENTIFIES numpy as the cause of a difference of one ULP and leaves it unexcluded as a cause of anything larger; it does not eliminate it. For the exact-algebra leaves, which are bit-identical across numpy 1.x and 2.5.1, the version is excluded. Stated at neither extreme on purpose. The pattern is also weak positive evidence that the re-run genuinely recomputed rather than copying a file: a copy would differ nowhere.",
+   "B_brier": "NOT REPRODUCED, AND NOT CONTRADICTED. Part B reads accuracy_binary.csv and calibration_binary.csv from sims/results_hpc/, which is gitignored: no checkout contains it and no clone ever will. On a machine without that private tree part B cannot run at all. So B_brier here has no reproducible path behind it, and nothing in the later run either confirms or refutes it.",
+   "C_prevalence": "NOT REPRODUCED, same reason as B_brier: it reads the same study data."
+  },
+  "producedBetween": {
+   "after": "c35cecb57b83adec13c3935a6fa651509d8318e1",
+   "afterAt": "2026-08-03T09:28:49-05:00",
+   "afterWhy": "the commit that introduced the np.trapz call this run executed",
+   "before": "9fe80ca5d0e81d324c416fa8c5a7024d3549c84e",
+   "beforeAt": "2026-08-03T09:32:49-05:00",
+   "beforeWhy": "the single commit that added this file; it has never been modified since"
+  },
+  "howToVerifyThisBlock": "git log --format='%H %ad' --date=iso -- validation/differential/cluster/fam_serial_founder_results.json  and  git show c35cecb5:validation/differential/cluster/fam_serial_founder.py | grep -n trapz",
+  "reproducibilityIsNotUniformAcrossTHISFILE": "A_serial_founder is regenerable by anyone with a checkout: it reads no data files. B_brier and C_prevalence are NOT, on any machine that does not have the private study tree mounted. Do not read a provenance block on this file as a claim that the whole of it can be regenerated.",
+  "supersededBy": "Any future run writes a real _provenance block from validation/simprov.py. If this after-the-fact block is still here, this file is still the original run."
+ },
+ "A_serial_founder": {
+  "demography": {
+   "D": 10,
+   "N": 3000,
+   "Nanc": 10000,
+   "m": 0.001,
+   "split_step": 400,
+   "T0": 200,
+   "four_N_m": 12.0
+  },
+  "E_T_00": 17371.47479251754,
+  "E_T_99": 15056.814785577179,
+  "E_T_09": 20078.97813697219,
+  "rows": [
+   {
+    "k": 1,
+    "exact": 0.03927479005057244,
+    "pure_founder": 0.06449301496838222,
+    "island_damped": 0.004961001151414068,
+    "transient_age": 0.07687446375054974,
+    "founder_ceiling": 0.07659465339963727,
+    "stepping_stone": 0.33518620859621606
+   },
+   {
+    "k": 2,
+    "exact": 0.07303810007167633,
+    "pure_founder": 0.12482668095705252,
+    "island_damped": 0.009897390770403858,
+    "transient_age": 0.14777736168425848,
+    "founder_ceiling": 0.12245762974686548,
+    "stepping_stone": 0.5580226227593261
+   },
+   {
+    "k": 3,
+    "exact": 0.10099297613769442,
+    "pure_founder": 0.18126924692201807,
+    "island_damped": 0.014809290954809873,
+    "transient_age": 0.21309848094795836,
+    "founder_ceiling": 0.1499485835814122,
+    "stepping_stone": 0.7061673441219272
+   },
+   {
+    "k": 4,
+    "exact": 0.12376469109634591,
+    "pure_founder": 0.2340716616353512,
+    "island_damped": 0.019696823196745483,
+    "transient_age": 0.27311432816543857,
+    "founder_ceiling": 0.16613499625590766,
+    "stepping_stone": 0.804655998007455
+   },
+   {
+    "k": 5,
+    "exact": 0.14261563425214852,
+    "pure_founder": 0.2834686894262106,
+    "island_damped": 0.024560108385601298,
+    "transient_age": 0.3278967986603665,
+    "founder_ceiling": 0.17536934781681898,
+    "stepping_stone": 0.8701326134073478
+   },
+   {
+    "k": 6,
+    "exact": 0.15885024019317662,
+    "pure_founder": 0.32967995396436056,
+    "island_damped": 0.02939926681103555,
+    "transient_age": 0.37710742710073064,
+    "founder_ceiling": 0.18042325921770525,
+    "stepping_stone": 0.913662370339638
+   },
+   {
+    "k": 7,
+    "exact": 0.17336286647345334,
+    "pure_founder": 0.3729109147269437,
+    "island_damped": 0.03421441816594939,
+    "transient_age": 0.4195331747789074,
+    "founder_ceiling": 0.18305759029060695,
+    "stepping_stone": 0.942601553084679
+   },
+   {
+    "k": 8,
+    "exact": 0.18631084574432555,
+    "pure_founder": 0.41335378048996807,
+    "island_damped": 0.03900568154944717,
+    "transient_age": 0.45201557174404794,
+    "founder_ceiling": 0.1843586042295336,
+    "stepping_stone": 0.9618407208855366
+   },
+   {
+    "k": 9,
+    "exact": 0.192481575584186,
+    "pure_founder": 0.4511883639059734,
+    "island_damped": 0.043773175469782766,
+    "transient_age": 0.46683878907014476,
+    "founder_ceiling": 0.18496515431908497,
+    "stepping_stone": 0.9746311849746784
+   }
+  ],
+  "worst_rel_err": {
+   "(1) pure founder": 1.3440600095702997,
+   "(2) island-damped": 0.8736848460545301,
+   "(3) transient+age": 1.4261366531734234,
+   "(5) founder ceiling + migration": 0.9502243882401322,
+   "(4) stepping stone [CONTROL]": 7.5343857513843195
+  },
+  "best_candidate": "(2) island-damped",
+  "best_worst_rel_err": 0.8736848460545301,
+  "cand5_far_rel_err": 0.03905008176646783,
+  "cand5_near_rel_err": 0.9502243882401322,
+  "closed_form_delivered": false,
+  "exact_far_fst": 0.192481575584186,
+  "agrees_with_study_note": true
+ },
+ "B_brier": {
+  "n_runs": 400,
+  "spread_rows": [
+   {
+    "dem": "grid2d",
+    "pheno": "phenoA",
+    "mean_resid": 0.08934889336888309,
+    "sd_resid_within_run": 0.0003811642232971722,
+    "sd_brier_within_run": 0.0038278601327628994,
+    "ratio": 0.09957631942577087,
+    "cross_term_scale": 0.0012336095195049671,
+    "obs_over_pred": 0.3089828809444733
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoB",
+    "mean_resid": 0.09231224277239117,
+    "sd_resid_within_run": 0.0001982436680118804,
+    "sd_brier_within_run": 0.0024766212185363444,
+    "ratio": 0.08004601855468241,
+    "cross_term_scale": 0.0012454992216694072,
+    "obs_over_pred": 0.15916803845622973
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoC",
+    "mean_resid": 0.09652031555382284,
+    "sd_resid_within_run": 0.0001129628908502137,
+    "sd_brier_within_run": 0.0003758210744250536,
+    "ratio": 0.3005762543333392,
+    "cross_term_scale": 0.0012201032781933199,
+    "obs_over_pred": 0.09258469579516632
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoR",
+    "mean_resid": 0.08445570947561723,
+    "sd_resid_within_run": 0.0003413020416111957,
+    "sd_brier_within_run": 0.0041337057714284755,
+    "ratio": 0.08256563492501613,
+    "cross_term_scale": 0.0013282781349737971,
+    "obs_over_pred": 0.25695073390478457
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoA",
+    "mean_resid": 0.09126760762421533,
+    "sd_resid_within_run": 0.00028933444217463017,
+    "sd_brier_within_run": 0.0017115801291486678,
+    "ratio": 0.1690452215746065,
+    "cross_term_scale": 0.0016775764302612726,
+    "obs_over_pred": 0.17247169008542165
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoB",
+    "mean_resid": 0.09255031785307613,
+    "sd_resid_within_run": 0.0002107426817725373,
+    "sd_brier_within_run": 0.001163109871010753,
+    "ratio": 0.18118897193211853,
+    "cross_term_scale": 0.0016925733584289332,
+    "obs_over_pred": 0.12451022032401075
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoC",
+    "mean_resid": 0.09613576522147144,
+    "sd_resid_within_run": 0.00015694700492599966,
+    "sd_brier_within_run": 0.0002602196139175698,
+    "ratio": 0.6031328790446827,
+    "cross_term_scale": 0.0016987628334313176,
+    "obs_over_pred": 0.09238900324242652
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoR",
+    "mean_resid": 0.09162873519272698,
+    "sd_resid_within_run": 0.0002706086835472275,
+    "sd_brier_within_run": 0.0018196902388270743,
+    "ratio": 0.14871140031044783,
+    "cross_term_scale": 0.0017317179903340145,
+    "obs_over_pred": 0.15626602313869384
+   }
+  ],
+  "worst_sd_ratio": 0.6031328790446827,
+  "loo_r2": 0.9940986040758343,
+  "loo_rmse": 0.00038009792426876843,
+  "loo_sd_brier": 0.00494786819111231,
+  "n_method_runs": 400,
+  "regression_rows": [
+   {
+    "dem": "grid2d",
+    "pheno": "phenoA",
+    "r2_auc": 0.7253311494847045,
+    "r2_auc_mse": 0.8417448814914462,
+    "r2_mse": 0.6360812707752197,
+    "n": 50
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoB",
+    "r2_auc": 0.6547175350629948,
+    "r2_auc_mse": 0.6563204925429079,
+    "r2_mse": 0.5091690121612672,
+    "n": 50
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoC",
+    "r2_auc": 0.013747556132002625,
+    "r2_auc_mse": 0.30557395694621414,
+    "r2_mse": 0.2508353597106949,
+    "n": 50
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoR",
+    "r2_auc": 0.7371978119691387,
+    "r2_auc_mse": 0.7394004935496197,
+    "r2_mse": 0.19105795698742833,
+    "n": 50
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoA",
+    "r2_auc": 0.4228202728637861,
+    "r2_auc_mse": 0.4540180564665759,
+    "r2_mse": 0.06211182610471888,
+    "n": 50
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoB",
+    "r2_auc": 0.48840211887200846,
+    "r2_auc_mse": 0.4996241879507052,
+    "r2_mse": 0.30195343469919167,
+    "n": 50
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoC",
+    "r2_auc": 0.2735479342541923,
+    "r2_auc_mse": 0.2781051866960572,
+    "r2_mse": 0.023421969601641113,
+    "n": 50
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoR",
+    "r2_auc": 0.5833398991908734,
+    "r2_auc_mse": 0.609143974055973,
+    "r2_mse": 0.46987396344659416,
+    "n": 50
+   }
+  ],
+  "mean_r2_auc": 0.4873880347287126,
+  "mean_r2_auc_mse": 0.5479914037124374
+ },
+ "C_prevalence": {
+  "true_K": 0.15,
+  "rows": [
+   {
+    "dem": "grid2d",
+    "pheno": "phenoA",
+    "n": 50,
+    "rmse_true_K": 0.015587650824875048,
+    "rmse_fitted_K": 0.013269988073817905,
+    "best_fit_K": 0.20900000000000002
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoB",
+    "n": 50,
+    "rmse_true_K": 0.010871861129802768,
+    "rmse_fitted_K": 0.009883797253924931,
+    "best_fit_K": 0.18
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoC",
+    "n": 50,
+    "rmse_true_K": 0.010417885502669656,
+    "rmse_fitted_K": 0.009794152983487993,
+    "best_fit_K": 0.18
+   },
+   {
+    "dem": "grid2d",
+    "pheno": "phenoR",
+    "n": 50,
+    "rmse_true_K": 0.015591746098282335,
+    "rmse_fitted_K": 0.012542935628131371,
+    "best_fit_K": 0.21600000000000003
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoA",
+    "n": 50,
+    "rmse_true_K": 0.011253489065733644,
+    "rmse_fitted_K": 0.010988224985879676,
+    "best_fit_K": 0.165
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoB",
+    "n": 50,
+    "rmse_true_K": 0.011584644927915536,
+    "rmse_fitted_K": 0.01154383647505184,
+    "best_fit_K": 0.156
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoC",
+    "n": 50,
+    "rmse_true_K": 0.011405213063085387,
+    "rmse_fitted_K": 0.011198755574635426,
+    "best_fit_K": 0.166
+   },
+   {
+    "dem": "serial1d",
+    "pheno": "phenoR",
+    "n": 50,
+    "rmse_true_K": 0.013960332082852125,
+    "rmse_fitted_K": 0.013819157850704217,
+    "best_fit_K": 0.139
+   }
+  ],
+  "pooled_rmse_true_K": 0.012584102836902061,
+  "pooled_rmse_fitted_K": 0.011630106103204169,
+  "fitted_K_range": [
+   0.139,
+   0.21600000000000003
+  ]
+ }
+}
