@@ -252,8 +252,13 @@ def gate_duplicate_bodies(code):
             for k, b in enumerate(binders):
                 norm = re.sub(r"(?<![\w'.])" + re.escape(b) + r"(?![\w'])",
                               "@%d" % k, norm)
+            # Two bodies of the same SHAPE at different TYPES are not the same map.
+            # `seqDist : Hap → Hap → Nat` and `antiKronecker : α → α → ℝ` both read
+            # `if a = b then 0 else 1`, and collapsing them would be a type error
+            # wearing an arithmetic coincidence. The result type joins the key.
+            result = sig.rsplit(":", 1)[-1].strip() if ":" in sig else ""
             if "@" in norm and "Descent.Core." not in norm:
-                bodies[norm].append((name, mod))
+                bodies[(norm, result)].append((name, mod))
     groups = [v for v in bodies.values() if len(v) > 1]
     return sum(len(v) - 1 for v in groups), len(groups)
 

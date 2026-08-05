@@ -88,14 +88,14 @@ coded `0, 1, …, ploidy`.
     genotypes per cell: worst 0.88 sems over a prediction spanning 0.09500 to
     0.50000. This body also appears as `AncestrySpecificPower.genotypeVarianceHWE`
     and `hweHeterozygosity`; all three are measured against the same oracle. -/
-noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := ploidy * p * (1 - p)
+noncomputable def hweGenotypeVariance (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 
 /-- **The genotype variance peaks at even allele frequency and is exactly one half there.** With
 diploid ploidy the value at `p = 1/2` is `2 · (1/2) · (1/2) = 1/2`. The vanishing at the two
 fixed points is shared by every multiple of `p(1-p)`; the value at the interior maximum fixes the
 ploidy factor, which is the only free constant in the formula. -/
 theorem hweGenotypeVariance_at_half : hweGenotypeVariance (1 / 2) = 1 / 2 := by
-  unfold hweGenotypeVariance ploidy Descent.Core.ploidy
+  unfold hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy
   norm_num
 
 /-- Coalescent time scale: time measured in units of `ploidy · Nₑ`
@@ -221,7 +221,7 @@ theorem tagAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio {p q : ℕ}
     tagAlleleFreqRetentionAt m t i =
       hweGenotypeVariance (tagAlleleFreqTargetAt m t i) /
         hweGenotypeVariance (m.tagAlleleFreqSource i) := by
-  unfold tagAlleleFreqRetentionAt hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold tagAlleleFreqRetentionAt hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-- **The same two, at the causal variants.** `causalAlleleFreqRetentionAt` is
 the identical ratio on the causal side, and it is tied here separately rather
@@ -232,7 +232,7 @@ theorem causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio {p q : ℕ}
     causalAlleleFreqRetentionAt m t j =
       hweGenotypeVariance (causalAlleleFreqTargetAt m t j) /
         hweGenotypeVariance (m.causalAlleleFreqSource j) := by
-  unfold causalAlleleFreqRetentionAt hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold causalAlleleFreqRetentionAt hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-- **The three twos in the deme-corrected flow step are three different twos,
 and only one of them is the ploidy.**
@@ -522,7 +522,7 @@ swap.** Recoding dosage as `ploidy - dosage` is an affine map with slope `-1`, w
 leaves any variance alone; a body carrying an odd power of `p` would not survive it. -/
 theorem hweGenotypeVariance_allele_swap (p : ℝ) :
     hweGenotypeVariance (1 - p) = hweGenotypeVariance p := by
-  unfold hweGenotypeVariance
+  unfold hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- **The exact conversion between the two conventions**, which is what turns
@@ -853,11 +853,11 @@ The two inlinings are `genotypeVarianceHWE` and `hweHeterozygosity`, both in
 
 theorem genotypeVarianceHWE_eq_hwe (p : ℝ) :
     genotypeVarianceHWE p = hweGenotypeVariance p := by
-  unfold genotypeVarianceHWE hweGenotypeVariance ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold genotypeVarianceHWE hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 theorem hweHeterozygosity_eq_hwe (p : ℝ) :
     hweHeterozygosity p = hweGenotypeVariance p := by
-  unfold hweHeterozygosity hweGenotypeVariance ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold hweHeterozygosity hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-! ### Tying the island-model equilibrium back to the scaled rate
 
@@ -1018,11 +1018,11 @@ variance. Each is now written against `hweGenotypeVariance`. -/
 
 theorem pgsVariance_uses_hwe {m : ℕ} (β p : Fin m → ℝ) :
     pgsVariance β p = ∑ i, β i ^ 2 * hweGenotypeVariance (p i) := by
-  unfold pgsVariance hweGenotypeVariance ploidy Descent.Core.ploidy; ring_nf
+  unfold pgsVariance hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem dominanceVariance_uses_hwe {m : ℕ} (p d : Fin m → ℝ) :
     dominanceVariance p d = ∑ i, (hweGenotypeVariance (p i) * d i) ^ 2 := by
-  unfold dominanceVariance hweGenotypeVariance ploidy Descent.Core.ploidy; ring_nf
+  unfold dominanceVariance hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 /-- **`additiveVariance` is a sum over loci and therefore assumes linkage equilibrium**;
 this theorem pins its `2 p (1 - p)` to `ploidy` and says nothing about that assumption.
@@ -1034,28 +1034,28 @@ against a true `3/2`, while `α = (1,-1)` gives `1` against a true `1/2`. The
 unconditional reading is FALSIFIED (`VarianceComponents.additiveVariance`). -/
 theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
     additiveVariance p α = ∑ i, hweGenotypeVariance (p i) * (α i) ^ 2 := by
-  unfold additiveVariance hweGenotypeVariance ploidy Descent.Core.ploidy; ring_nf
+  unfold additiveVariance hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
     noncentralityParam n beta p = n * beta ^ 2 * hweGenotypeVariance p := by
-  unfold noncentralityParam hweGenotypeVariance ploidy Descent.Core.ploidy; ring_nf
+  unfold noncentralityParam hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
   unfold gwasNCP ncp effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    hweGenotypeVariance Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 
 theorem effectiveFisherInformation_uses_hwe (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * hweGenotypeVariance p * r2_ld := by
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE
-    hweGenotypeVariance ploidy Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    hweGenotypeVariance Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 
 theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
     epistaticVariancePairwise γ p₁ p₂ =
       γ ^ 2 * hweGenotypeVariance p₁ * hweGenotypeVariance p₂ := by
-  unfold epistaticVariancePairwise hweGenotypeVariance ploidy Descent.Core.ploidy; ring_nf
+  unfold epistaticVariancePairwise hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 /-- The between-population drift variance of the score, carrying the same
 ploidy factor as `Var_Delta_Mu`. -/
@@ -1141,7 +1141,7 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
 
 theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
     expectedFreqDiffSq fst p0 = fst * hweGenotypeVariance p0 := by
-  unfold expectedFreqDiffSq hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold expectedFreqDiffSq hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 theorem pgsMean_uses_ploidy {m : ℕ} (β p : Fin m → ℝ) :
     pgsMean β p = ∑ i, β i * (ploidy * p i) := by
@@ -1429,7 +1429,7 @@ two was free; here it is the ploidy, and an SE reported on a haploid dosage scal
 have to change this file rather than that definition. -/
 theorem effectiveSampleSizeFromSE_uses_hweGenotypeVariance (se p : ℝ) :
     effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * hweGenotypeVariance p) := by
-  unfold effectiveSampleSizeFromSE hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold effectiveSampleSizeFromSE hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
 
 /-- **Both twos in the mutation-drift heterozygosity step are the ploidy.** The drift term
 loses a fraction `1 / (ploidy · Nₑ)` per generation — the reciprocal coalescent time scale —
@@ -1651,7 +1651,8 @@ heterozygosity that has become between-population variance. Its heterozygosity f
 one `ploidy` apart, and writing it inline left that scale choice free. -/
 theorem driftVariance_uses_hweGenotypeVariance (p0 fst : ℝ) :
     driftVariance p0 fst = hweGenotypeVariance p0 * fst / ploidy := by
-  unfold driftVariance hweGenotypeVariance ploidy Descent.Core.ploidy; ring
+  unfold driftVariance hweGenotypeVariance ploidy Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  ring
 
 /-- **The realised target PGS variance is a retained fraction, scaled by transport.**
 `PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
