@@ -38,13 +38,17 @@ two distinct colliding pairs.
 - `exists_two_collisions`: **an image of size `≤ k - 2` gives two distinct colliding pairs**,
   which is what a union bound needs.
 
-## What the union bound still needs
+- `card_filter_le_of_determined`: **two determined coordinates leave `N^{k-2}` maps**.
+- `card_two_collisions_le`: hence a prescribed pair of pairs has at most `N^{k-2}` witnesses,
+  disjoint or overlapping.
 
-One count: `#{f : Fin k → Fin N | f a = f b ∧ f c = f d} ≤ N^{k-2}` for distinct pairs, which
-is the observation that two coincidences leave `k - 2` free coordinates.  With it, summing
-over the at most `k⁴` quadruples gives the tail bound `O(N⁻²)` and, with the diagonal already
-counted in `WrightFisher`, the row of `P_N` to the order K-G (2.11) asks for.  That count is a
-bijection with `Fin (k-2) → Fin N`, and it is the last piece.
+## What the union bound is
+
+`exists_two_collisions` puts the event "this generation dropped two or more lineages" inside
+the union, over the at most `k⁴` quadruples, of "both pairs collided".  `card_two_collisions_le`
+bounds each of those by `N^{k-2}`, i.e. by `N^{-2}` in probability.  So the tail is `O(N⁻²)`
+with a constant depending only on `k`, which is what K-G (2.11) asks of the row -- the
+diagonal being `WrightFisher.noCoalescenceProb`, already within `(d_k/N)²/2` of `1 - d_k/N`.
 -/
 
 namespace Coalescent
@@ -112,6 +116,57 @@ theorem exists_two_collisions {k N : ℕ} (f : Fin k → Fin N)
     · exact Or.inr ⟨h2.symm, h1.symm⟩
   have hge := card_image_ge_of_unique_collision f hab huniq
   omega
+
+/-! ### Two determined coordinates -/
+
+/-- **A map with two determined coordinates is a map on `k - 2` coordinates.**  If a property
+forces `f y = f u` and `f z = f v` with `u, v` outside `{y, z}`, then `f` is determined by its
+values off `{y, z}`, so there are at most `N^{k-2}` such maps. -/
+theorem card_filter_le_of_determined {k N : ℕ} {y z u v : Fin k} (hyz : y ≠ z)
+    (huy : u ≠ y) (huz : u ≠ z) (hvy : v ≠ y) (hvz : v ≠ z)
+    (p : (Fin k → Fin N) → Prop) [DecidablePred p]
+    (hdet : ∀ f, p f → f y = f u ∧ f z = f v) :
+    (univ.filter p).card ≤ N ^ (k - 2) := by
+  classical
+  have hcard : Fintype.card {x : Fin k // x ≠ y ∧ x ≠ z} = k - 2 := by
+    rw [Fintype.card_subtype]
+    have hfil : (univ.filter fun x : Fin k ↦ x ≠ y ∧ x ≠ z)
+        = ({y, z} : Finset (Fin k))ᶜ := by
+      ext x
+      simp [not_or]
+    rw [hfil, Finset.card_compl, Fintype.card_fin,
+      Finset.card_insert_of_notMem (by simpa using hyz), Finset.card_singleton]
+  have hinj : Set.InjOn (fun f : Fin k → Fin N ↦ fun x : {x : Fin k // x ≠ y ∧ x ≠ z} ↦ f x)
+      ((univ.filter p : Finset (Fin k → Fin N)) : Set (Fin k → Fin N)) := by
+    intro f hf g hg hfg
+    have hpf : p f := (Finset.mem_filter.mp (Finset.mem_coe.mp hf)).2
+    have hpg : p g := (Finset.mem_filter.mp (Finset.mem_coe.mp hg)).2
+    have hagree : ∀ x : Fin k, x ≠ y → x ≠ z → f x = g x := by
+      intro x hxy hxz
+      exact congrFun hfg ⟨x, hxy, hxz⟩
+    funext x
+    by_cases hxy : x = y
+    · subst hxy
+      rw [(hdet f hpf).1, (hdet g hpg).1, hagree u huy huz]
+    · by_cases hxz : x = z
+      · subst hxz
+        rw [(hdet f hpf).2, (hdet g hpg).2, hagree v hvy hvz]
+      · exact hagree x hxy hxz
+  have hle := Finset.card_le_card_of_injOn _ (fun _ _ ↦ Finset.mem_univ _) hinj
+  refine le_trans hle ?_
+  rw [Finset.card_univ, Fintype.card_fun, hcard, Fintype.card_fin]
+
+/-- **A prescribed pair of pairs has at most `N^{k-2}` witnesses**, whether the pairs are
+disjoint or share a lineage.  Disjoint: `b` and `d` are determined by `a` and `c`.  Sharing:
+the two outer lineages are determined by the shared one. -/
+theorem card_two_collisions_le {k N : ℕ} {a b c d : Fin k} (hab : a ≠ b) (hcd : c ≠ d)
+    (hbd : b ≠ d) (hab' : a ≠ d) (hcb : c ≠ b) :
+    (univ.filter fun f : Fin k → Fin N ↦ f a = f b ∧ f c = f d).card ≤ N ^ (k - 2) := by
+  classical
+  refine card_filter_le_of_determined (y := b) (z := d) (u := a) (v := c) hbd
+    hab hab' hcb hcd _ ?_
+  intro f hf
+  exact ⟨hf.1.symm, hf.2.symm⟩
 
 end Coalescent
 
