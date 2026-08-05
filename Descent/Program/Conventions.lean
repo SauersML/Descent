@@ -1172,10 +1172,11 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
     PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = 1 / (1 + PopGen.scaledMigrationRate Ne m * PopGen.islandDemeCorrection nDemes
               + PopGen.scaledMutationRate Ne μ) := by
-  unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstIslandEquilibrium
-    Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
-    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-  rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
+  -- Through the bridge, not the chain: the body is now `Core.fstIslandEquilibrium`,
+  -- and unfolding it here would re-derive the normalisation that
+  -- `fstIslandEquilibriumFiniteDemes_eq` already states once.
+  rw [PopGen.fstIslandEquilibriumFiniteDemes_eq,
+    scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy Descent.Core.ploidy; ring_nf
 
 theorem expectedFreqDiffSq_uses_hwe (fst p0 : ℝ) :
