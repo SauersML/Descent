@@ -95,6 +95,56 @@ instance holdMeasure_isProbabilityMeasure {d : ℝ} (hd : 0 < d) :
   rw [holdMeasure, withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ]
   exact hdens
 
+/-! ### The mean sojourn, `E(τ_r) = d_r⁻¹`
+
+K-G (5.6) states `E(τ_r) = d_r⁻¹`, and `Descent.Coalescent.Rates` sums those means to get
+`E(T_n) = 2 - 2/n`.  Until now the corpus took the mean from the paper.  It is a second
+integral against the same density, and rescaling turns it into `Γ(2) = 1`. -/
+
+/-- `∫_0^∞ x e^{-x} dx = 1`, which is `Γ(2) = 1! = 1`. -/
+theorem integral_id_mul_exp_neg : ∫ x in Ioi (0 : ℝ), x * Real.exp (-x) = 1 := by
+  have hgamma : Real.Gamma 2 = ∫ x in Ioi (0 : ℝ), Real.exp (-x) * x ^ ((2 : ℝ) - 1) :=
+    Real.Gamma_eq_integral (by norm_num)
+  have hone : Real.Gamma 2 = 1 := by
+    have h := Real.Gamma_nat_eq_factorial 1
+    norm_num at h
+    exact h
+  rw [hone] at hgamma
+  rw [← hgamma]
+  refine setIntegral_congr_fun measurableSet_Ioi fun x hx => ?_
+  rw [show (2 : ℝ) - 1 = 1 by norm_num, Real.rpow_one]
+  ring
+
+/-- **K-G (5.6): the mean sojourn in a state with death rate `d` is `d⁻¹`.**
+
+`Descent.Coalescent.Rates.meanTransitTime` sums exactly these, so `E(T_n) = 2 - 2/n` now
+rests on the density K-C (1.7) rather than on K-G's assertion of its mean. -/
+theorem integral_id_mul_holdDensity {d : ℝ} (hd : 0 < d) :
+    ∫ t in Ioi (0 : ℝ), t * (d * Real.exp (-(d * t))) = 1 / d := by
+  have hpt : ∀ t : ℝ, t * (d * Real.exp (-(d * t)))
+      = (fun x : ℝ => x * Real.exp (-x)) (d * t) := by
+    intro t
+    simp only
+    ring
+  have hcomp : ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x * Real.exp (-x)) (d * t)
+      = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x * Real.exp (-x) :=
+    integral_comp_mul_left_Ioi (fun x : ℝ => x * Real.exp (-x)) 0 hd
+  calc ∫ t in Ioi (0 : ℝ), t * (d * Real.exp (-(d * t)))
+      = ∫ t in Ioi (0 : ℝ), (fun x : ℝ => x * Real.exp (-x)) (d * t) := by
+        exact setIntegral_congr_fun measurableSet_Ioi fun t _ => hpt t
+    _ = d⁻¹ • ∫ x in Ioi (d * (0 : ℝ)), x * Real.exp (-x) := hcomp
+    _ = 1 / d := by
+        rw [mul_zero, integral_id_mul_exp_neg, smul_eq_mul, mul_one, one_div]
+
+/-- **The mean sojourn at `k` blocks is the summand of `meanTransitTime`.**  With this, the
+chain `E(T_n) = Σ_r d_r⁻¹ = 2 - 2/n` of `Descent.Coalescent.Rates` runs from K-C (1.7)'s
+density rather than from a cited mean, and `Rates.meanTransitTime_eq_two_sub` becomes a
+statement about the mechanism. -/
+theorem integral_id_mul_holdDensity_deathRate {k : ℕ} (hk : 2 ≤ k) :
+    ∫ t in Ioi (0 : ℝ), t * (deathRate k * Real.exp (-(deathRate k * t)))
+      = 1 / deathRate k :=
+  integral_id_mul_holdDensity (deathRate_pos hk)
+
 /-- **Kingman's clock, at the rate a `k`-block state carries.**  K-C (1.7)'s `d_k` is
 `Descent.Coalescent.Rates.deathRate`, which `Descent.Coalescent.StateSpace.card_covers`
 identifies as the number of covers -- so the clock's rate is the number of pairs of lineages

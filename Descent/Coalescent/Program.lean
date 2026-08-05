@@ -92,9 +92,11 @@ trajectory in its support is a descending chain of covers (repeating once absorb
 the independence K-G section 6 needs -- ARRANGED, not derived, which is exactly what
 Theorem 3 does and exactly what Theorem 1 does not.  `Coalescent.HoldingTime` then supplies the clock: K-C (1.7)'s density `d_k e^{-d_k t}` is a
 probability measure (`integral_holdDensity`, the one genuine integral in this group), so
-`HoldingTime.coalescentLawExp` is the coupling with no parameter left open.  What is not
-done: the mean `E(τ_r) = d_r⁻¹` of K-G (5.6), which `Rates` takes as given and sums; and the
-passage to `n = ∞` that Theorem 3 needs on top of the finite construction.
+`HoldingTime.coalescentLawExp` is the coupling with no parameter left open.  The mean `E(τ_r) = d_r⁻¹` of K-G (5.6) is proved too
+(`HoldingTime.integral_id_mul_holdDensity`, a second integral against the same density,
+rescaling to `Γ(2) = 1`), so `Rates.meanTransitTime_eq_two_sub` -- `E(T_n) = 2 - 2/n` -- now
+runs from K-C (1.7)'s density rather than from a cited mean.  What is not done: the passage
+to `n = ∞` that Theorem 3 needs on top of the finite construction.
 
 None of the five is asserted anywhere in the group.  Where a result depends on one, the
 dependence is a written hypothesis, not a hidden one.
