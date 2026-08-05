@@ -56,6 +56,17 @@ form for the powers, the distance bound, the limit -- is proved.
 - `one_add_smul_pow`: **`(1 + aQ)^N = 1 + (1 - (1-a)^N)Q`**.
 - `dist_le_of_exp`: `|N⁻¹ - (1 - e^{-1/N})| ≤ N⁻²`, the scalar Taylor bound.
 - `tendsto_pairChain_pow`: **K-G (2.14) for the pair chain**, instantiated.
+- `tendsto_levelChain_pow`: and at every level's rate `d_k`, so the instantiation is not
+  special to a pair.
+
+## What the many-state matrix would still need
+
+The lumping "still `k` blocks" against "fewer" is two-state, which is why the algebra above
+reaches every level.  The FULL block-count matrix -- all `n` states at once -- is not this,
+and the obstacle is precise: comparing it to `exp(N⁻¹Q)` needs
+`‖exp x - 1 - x‖ ≤ ‖x‖²e^{‖x‖}` in a Banach algebra, and Mathlib has that bound only for `ℝ`
+and `ℂ` (`Real.abs_exp_sub_one_sub_id_le`), which is what this file uses.  Proving it in
+general is a tsum estimate on the exponential series, not anything about genealogy.
 -/
 
 namespace Coalescent
@@ -146,6 +157,76 @@ theorem tendsto_pairChain_pow {Q : 𝔸} (hQ : Q * Q = -Q)
             rw [Real.norm_eq_abs, ← hsq]
             exact hb
         _ = ‖Q‖ / (N : ℝ) ^ 2 := by ring
+
+/-! ### Every level, not just the pair
+
+The algebra above never used `d_2 = 1`.  A `k`-block state leaves at rate `d_k`, and the
+lumping "still `k` blocks" against "fewer" is the same two-state generator scaled: the
+one-generation operator is `1 + (d_k/N)Q` and the limit carries `1 - e^{-d_k}`, which is the
+chance that a `k`-block state has moved within one coalescent unit.
+
+`Descent.Coalescent.Convergence.tendsto_noCoalescenceProb_pow` proves the same limit for the
+SURVIVAL probability, counted off the parent law; these two are the scalar and the operator
+readings of one fact. -/
+
+/-- The scalar Taylor bound at rate `c`: `|c/N - (1 - e^{-c/N})| ≤ c²/N²`. -/
+theorem dist_le_of_exp_rate {c : ℝ} (hc : 0 ≤ c) {N : ℕ} (hN : 1 ≤ N) (hcN : c ≤ (N : ℝ)) :
+    |c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ))))| ≤ c ^ 2 / (N : ℝ) ^ 2 := by
+  have hNR : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+  have hpos : (0 : ℝ) < (N : ℝ) := by linarith
+  have hx : |(-(c / (N : ℝ)))| ≤ 1 := by
+    rw [abs_neg, abs_of_nonneg (by positivity)]
+    rw [div_le_one hpos]
+    exact hcN
+  have h := Real.abs_exp_sub_one_sub_id_le hx
+  have hsq : (-(c / (N : ℝ))) ^ 2 = c ^ 2 / (N : ℝ) ^ 2 := by
+    rw [neg_pow, div_pow]
+    norm_num
+  rw [hsq] at h
+  have hrw : Real.exp (-(c / (N : ℝ))) - 1 - -(c / (N : ℝ))
+      = c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ)))) := by ring
+  rwa [hrw] at h
+
+/-- **K-G (2.14) at an arbitrary level's rate.**  A state leaving at rate `c` has
+one-generation operator `1 + (c/N)Q`, and `N` generations carry it to `1 + (1 - e^{-c})Q`.
+
+At `c = Rates.deathRate k` this is the `k`-block level of the coalescent, and the
+coefficient `1 - e^{-d_k}` is the chance that level has been left within one unit of
+coalescent time -- the operator reading of
+`Convergence.tendsto_noCoalescenceProb_pow`. -/
+theorem tendsto_levelChain_pow {Q : 𝔸} (hQ : Q * Q = -Q) {c : ℝ} (hc : 0 ≤ c)
+    (hcN : ∀ N : ℕ, 1 ≤ N → c ≤ (N : ℝ))
+    (hP : ∀ N : ℕ, ‖(1 : 𝔸) + (c / (N : ℝ)) • Q‖ ≤ 1)
+    (hB : ∀ N : ℕ, ‖(1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q‖ ≤ 1) :
+    Tendsto (fun N : ℕ ↦ ((1 : 𝔸) + (c / (N : ℝ)) • Q) ^ N) atTop
+      (nhds (1 + (1 - Real.exp (-c)) • Q)) := by
+  refine tendsto_pow_of_close (1 + (1 - Real.exp (-c)) • Q) (c ^ 2 * ‖Q‖)
+    (fun N ↦ (1 : 𝔸) + (c / (N : ℝ)) • Q)
+    (fun N ↦ (1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q) hP hB ?_ ?_
+  · intro N hN
+    have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    rw [one_add_smul_pow hQ]
+    congr 2
+    have hsub : 1 - (1 - Real.exp (-(c / (N : ℝ)))) = Real.exp (-(c / (N : ℝ))) := by ring
+    rw [hsub, ← Real.exp_nat_mul]
+    congr 1
+    field_simp
+  · intro N
+    have hdiff : ((1 : 𝔸) + (c / (N : ℝ)) • Q)
+        - ((1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q)
+        = (c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ))))) • Q := by
+      rw [add_sub_add_left_eq_sub, ← sub_smul]
+    rw [hdiff, norm_smul]
+    rcases Nat.eq_zero_or_pos N with hz | hpos
+    · subst hz
+      simp
+    · have hb := dist_le_of_exp_rate hc hpos (hcN N hpos)
+      calc ‖c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ))))‖ * ‖Q‖
+          ≤ (c ^ 2 / (N : ℝ) ^ 2) * ‖Q‖ := by
+            refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+            rw [Real.norm_eq_abs]
+            exact hb
+        _ = c ^ 2 * ‖Q‖ / (N : ℝ) ^ 2 := by ring
 
 end Coalescent
 
