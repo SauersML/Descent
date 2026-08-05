@@ -161,6 +161,7 @@ import Descent.Blindness.BundleRigidity.SingleModulus
 import Descent.Blindness.BundleRigidity.Telescope
 import Descent.Blindness.BundleRigidity.TwoAtom
 import Descent.Pangenome.GaugeCounterexample
+import Descent.Pangenome.GaugeInvariance
 
 namespace Descent
 
