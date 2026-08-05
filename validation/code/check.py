@@ -5457,13 +5457,33 @@ def run_conventions() -> int:
             malformed.append(f"{key}: convention {entry.get('convention')!r} is not in `conventions`")
 
     # STALE.  Entries first, then bridges.
+    # WHERE IT WENT, not just that it left.  A ledger entry is keyed by FILE PATH,
+    # which is exactly what splitting a monolith changes, so every split invalidates
+    # every key beneath it: `PortabilityDrift`, `PopulationGeneticsFoundations` and
+    # `TransferLearningPGS` each did that, and each time the finding said only that
+    # the declaration was "no longer a `def`" in a file it had merely moved out of.
+    # Locating it again was a search every time. The declaration index already knows
+    # where every name lives, so the finding can say, and the repair becomes one edit.
+    # This does NOT weaken the check: a moved entry still FAILS, because a record
+    # pointing at the wrong file is a record nobody can trust.
+    elsewhere: dict = {}
+    for k, n in defs.items():
+        elsewhere.setdefault(n, []).append(k.partition("::")[0])
     for key in sorted(checked):
         if key not in defs:
             module, _, name = key.partition("::")
-            if module not in sources:
-                stale.append(f"{key}: module {module} is not in the corpus")
+            found = sorted(set(elsewhere.get(name, [])))
+            if len(found) == 1:
+                whither = f"; it is now in {found[0]} -- repoint the key"
+            elif found:
+                whither = (f"; the name is in {len(found)} files ({', '.join(found[:3])}"
+                           f"{', ...' if len(found) > 3 else ''}) -- say which is meant")
             else:
-                stale.append(f"{key}: `{name}` is no longer a `def` in {module}")
+                whither = "; the name is nowhere in the corpus -- delete the entry"
+            if module not in sources:
+                stale.append(f"{key}: module {module} is not in the corpus{whither}")
+            else:
+                stale.append(f"{key}: `{name}` is no longer a `def` in {module}{whither}")
     bridge_edges, bridge_records = set(), 0
     for bridge in ledger.get("bridges", []):
         pair = tuple(bridge.get("between", []))
