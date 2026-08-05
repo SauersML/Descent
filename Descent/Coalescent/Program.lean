@@ -80,9 +80,14 @@ and a product of factorised terms factorises, so the whole path's density splits
 trajectory factor and a clock factor.  For ONE step the passage from a factorised
 density to independent random objects is `StepLaw`: `stepLaw_prod` is independence as a
 statement about measures rather than densities, and the density it corresponds to is the one
-competing clocks produce, so the arranged product is the right one.  OPEN: the same passage
-for the whole path, which needs the continuous-time process, and the converse -- that an
-ARBITRARY `n`-coalescent factorises -- which needs the general theory of jump chains.
+competing clocks produce, so the arranged product is the right one.  For the WHOLE path the same passage is
+`Law.coalescentLaw_prod`, which is independence in measure for the coupled trajectory and
+clock.  So the constructive direction is complete: densities factorise, one step factorises
+in measure, the whole path factorises in measure.  OPEN, and now the only thing open in this
+item: the CONVERSE, that an arbitrary `n`-coalescent -- one given by its rates rather than
+built as a product -- factorises with independent factors.  That is Theorem 1 proper, and it
+needs the general theory of jump chains for continuous-time Markov chains, which Mathlib does
+not have.
 
 **5. K-G section 6 and K-C Theorem 3, the constructions.**  FINITE `n` SETTLED.
 `Trajectory.chainLaw` is a law on whole trajectories, with K-C (1.13) as
