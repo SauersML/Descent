@@ -55,6 +55,31 @@ theorem wright_decomposition (f_IS f_ST : ℝ) :
     wrightFIT f_IS f_ST = f_IS + f_ST - f_IS * f_ST := by
   unfold wrightFIT Descent.Core.complementaryComposition; ring
 
+/-- **Wright's hierarchy, in the form that makes it one**: the RETAINED fractions multiply,
+`1 - F_IT = (1 - F_IS)(1 - F_ST)`.
+
+`wright_decomposition` above gives the additive rearrangement, which is the form the
+identity is usually quoted in and the form in which the compounding is invisible: reading
+`F_IS + F_ST - F_IS·F_ST` it is not obvious why a third nested level would multiply in
+rather than add. In the complement form it is, and that is what
+`wrightHierarchy_three_levels` below states.
+
+The two `1 -`s are not decoration. `F` is a probability of identity by descent, so `1 - F`
+is the probability that two copies are NOT identical at that level, and independence across
+nested levels is what makes those probabilities multiply. -/
+theorem wrightHierarchy (f_IS f_ST : ℝ) :
+    1 - wrightFIT f_IS f_ST = (1 - f_IS) * (1 - f_ST) := by
+  unfold wrightFIT Descent.Core.complementaryComposition; ring
+
+/-- **And it composes.** Three nested levels compound in either association, because the
+retained fractions simply multiply. A hierarchy that failed this would be an identity about
+two levels wearing the name of one about many. -/
+theorem wrightHierarchy_three_levels (a b c : ℝ) :
+    1 - wrightFIT (wrightFIT a b) c = (1 - a) * (1 - b) * (1 - c) ∧
+      wrightFIT (wrightFIT a b) c = wrightFIT a (wrightFIT b c) := by
+  constructor <;>
+    · unfold wrightFIT Descent.Core.complementaryComposition; ring
+
 /-- **The multiplicative-complement composition `1 - (1-a)(1-b)` occurs twice, and the two
 occurrences do not have the same status.**
 
@@ -83,7 +108,7 @@ theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
     quantity is `coalFst t Ne = t / (t + 2 Nₑ)`: that is unbiased across the
     tested grid, while this formula is biased upward in eleven of twelve cells
     by up to 28 percent. The formula is correct for what it now says, and
-    `heterozygosityLossDerived_eq_het_loss` is the theorem that says it; only the name and
+    `heterozygosityLossFromDrift_eq_het_loss` is the theorem that says it; only the name and
     docstring were reassigning it to a different observable.
 
     Regime: closed population, no mutation. See `Descent.PopGen.DriftRegime`.
