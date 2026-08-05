@@ -163,7 +163,7 @@ theorem norm_exp_smul_sub_one_le_one {𝔸 : Type*} [NormedRing 𝔸] [NormOneCl
       ≤ ‖exp ℝ (a • S)‖ * ‖Real.exp (-a) • (1 : 𝔸)‖ := norm_mul_le _ _
     _ ≤ Real.exp ‖a • S‖ * (Real.exp (-a) * 1) := by
         gcongr
-        · exact norm_exp_le_exp_norm _
+        · exact Descent.Coalescent.norm_exp_le_exp_norm _
         · rw [norm_smul, norm_one, Real.norm_of_nonneg (le_of_lt (Real.exp_pos _))]
     _ ≤ Real.exp a * (Real.exp (-a) * 1) := by
         gcongr

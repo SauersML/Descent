@@ -26,16 +26,16 @@ Turn it into a two-point decision problem by choosing any **readout** of the pro
 finite, possibly randomized measurement `Data → FinitePrior n`. The observation kernel is
 `readout ∘ probe` at the two witnesses, the action set is the binary verdict `P` holds /
 `P` fails, and the loss is `0` for the correct verdict and `1` for the wrong one, so risk
-*is* error probability (`risk_readoutProblem`).
+*is* error probability (`Blindness.ProbeBlindness.risk_readoutProblem`).
 
 `same_data` then says the two observation laws are equal on the nose, and
 `half_separation_le_minimaxRisk_of_observation_eq` gives a floor of `1 / 2`: no rule, at
 any sample size, with any randomization, beats a coin flip on the worst of the two
-hypotheses. `blindReadoutProblem_minimaxRisk` shows the floor is exactly attained, so the
+hypotheses. `Blindness.ProbeBlindness.blindReadoutProblem_minimaxRisk` shows the floor is exactly attained, so the
 cost of blindness is a coin flip and not more.
 
 Nothing here restricts the readout. It may be noisy, it may quantize, it may be the whole
-downstream pipeline folded into one map; `half_le_garbled_readoutProblem_minimaxRisk`
+downstream pipeline folded into one map; `Blindness.ProbeBlindness.half_le_garbled_readoutProblem_minimaxRisk`
 adds the further channel-monotonicity statement on top. This is the sense in which the
 ceiling is a ceiling.
 
@@ -102,7 +102,7 @@ theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_observation_eq (B
     {observationCount : ℕ}
     (readout : Data → CertificateGrading.FinitePrior observationCount) :
     (B.readoutProblem readout).observation 0 = (B.readoutProblem readout).observation 1 := by
-  rw [readoutProblem_observation_zero, readoutProblem_observation_one, B.same_data]
+  rw [Blindness.ProbeBlindness.readoutProblem_observation_zero, Blindness.ProbeBlindness.readoutProblem_observation_one, B.same_data]
 
 /-- The zero-one loss separates the two hypotheses by one at every action: whichever verdict
 is returned, it is wrong at one of them. -/
@@ -112,7 +112,7 @@ theorem _root_.Descent.Blindness.ProbeBlindness.readoutProblem_loss_add (B : Bli
     (action : Fin (1 + 1)) :
     (1 : ℝ) ≤ (B.readoutProblem readout).loss 0 action
       + (B.readoutProblem readout).loss 1 action := by
-  fin_cases action <;> simp [readoutProblem]
+  fin_cases action <;> simp [Blindness.ProbeBlindness.readoutProblem]
 
 /-- **Risk is error probability.** With the zero-one verdict loss, the risk of a rule at a
 hypothesis is one minus the chance it returns that hypothesis' own verdict. Stated so that
@@ -133,7 +133,7 @@ theorem _root_.Descent.Blindness.ProbeBlindness.risk_readoutProblem (B : Blindne
           = (rule x).probability action
             - (if θ = action then (rule x).probability action else 0) := by
       intro action
-      by_cases haction : θ = action <;> simp [readoutProblem, haction]
+      by_cases haction : θ = action <;> simp [Blindness.ProbeBlindness.readoutProblem, haction]
     rw [Finset.sum_congr rfl fun action _ ↦ hsplit action, Finset.sum_sub_distrib,
       (CertificateGrading.finitePrior_probability_mem (rule x)).2]
     simp
@@ -236,11 +236,11 @@ the first of the two rates. -/
 noncomputable def normalisedPairwiseSurvival_blind_to_rate
     {rate₁ rate₂ : ℝ} (h₁ : rate₁ ≠ 0) (h₂ : rate₂ ≠ 0) (hne : rate₁ ≠ rate₂) :
     Blindness.ProbeBlindness
-      (fun r : {r : ℝ // r ≠ 0} ↦ fun x : ℝ ↦ pairwiseCoalescentSurvival r.1 (x / r.1))
+      (fun r : {r : ℝ // r ≠ 0} ↦ fun x : ℝ ↦ Blindness.pairwiseCoalescentSurvival r.1 (x / r.1))
       (fun r : {r : ℝ // r ≠ 0} ↦ r.1 = rate₁) where
   positive := ⟨rate₁, h₁⟩
   negative := ⟨rate₂, h₂⟩
-  same_data := funext fun x ↦ normalised_pairwise_blind_to_rate rate₁ rate₂ x h₁ h₂
+  same_data := funext fun x ↦ Blindness.normalised_pairwise_blind_to_rate rate₁ rate₂ x h₁ h₂
   holds := rfl
   fails := hne.symm
 
@@ -250,7 +250,7 @@ theorem no_normalisedPairwiseSurvival_criterion_for_rate
     {rate₁ rate₂ : ℝ} (h₁ : rate₁ ≠ 0) (h₂ : rate₂ ≠ 0) (hne : rate₁ ≠ rate₂)
     {Verdict : Type*} (combine : (ℝ → ℝ) → Verdict) :
     ¬ ∃ accept : Verdict → Prop, ∀ r : {r : ℝ // r ≠ 0},
-        r.1 = rate₁ ↔ accept (combine (fun x ↦ pairwiseCoalescentSurvival r.1 (x / r.1))) :=
+        r.1 = rate₁ ↔ accept (combine (fun x ↦ Blindness.pairwiseCoalescentSurvival r.1 (x / r.1))) :=
   (normalisedPairwiseSurvival_blind_to_rate h₁ h₂ hne).no_criterion_of_factors combine
 
 /-- **The coalescent timescale blind spot costs a coin flip.** Two `Λ`-coalescents whose raw

@@ -107,6 +107,33 @@ theorem norm_exp_sub_one_sub_self_le_sq {x : 𝔸} (hx : ‖x‖ ≤ 1) :
   rw [hrw] at h
   exact h
 
+/-- **`‖exp x‖ ≤ e^{‖x‖}` in any Banach algebra.**  Mathlib proves the exponential series
+summable and dominated termwise, but does not draw this conclusion; the corpus needs it to
+show that a `Q`-matrix generates a contraction semigroup, which is the hypothesis K-G (2.14)
+takes about the limit operator.
+
+Same shape as `norm_exp_sub_one_sub_self_le`: compare the series to the real one termwise,
+using `‖x^n‖ ≤ ‖x‖^n`. -/
+theorem norm_exp_le_exp_norm [NormOneClass 𝔸] (x : 𝔸) : ‖exp ℝ x‖ ≤ Real.exp ‖x‖ := by
+  have hreal : Real.exp ‖x‖ = ∑' n : ℕ, ((n ! : ℝ))⁻¹ * ‖x‖ ^ n := by
+    rw [Real.exp_eq_exp_ℝ, exp_eq_tsum]
+    simp [smul_eq_mul]
+  rw [exp_eq_tsum, hreal]
+  have hsummable : Summable fun n : ℕ ↦ ‖((n ! : ℝ))⁻¹ • x ^ n‖ :=
+    norm_expSeries_summable' (𝕂 := ℝ) x
+  refine le_trans (norm_tsum_le_tsum_norm hsummable) ?_
+  refine tsum_le_tsum (fun n ↦ ?_) hsummable ?_
+  · rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg (by positivity)]
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+    rcases Nat.eq_zero_or_pos n with h | h
+    · simp [h]
+    · exact norm_pow_le' x h
+  · have hs : Summable fun n : ℕ ↦ ‖((n ! : ℝ))⁻¹ • (‖x‖ : ℝ) ^ n‖ :=
+      norm_expSeries_summable' (𝕂 := ℝ) ‖x‖
+    refine hs.congr fun n ↦ ?_
+    rw [norm_smul, Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (by positivity),
+      abs_of_nonneg (by positivity)]
+
 end Coalescent
 
 end Descent
