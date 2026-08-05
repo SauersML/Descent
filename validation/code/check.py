@@ -6499,6 +6499,179 @@ def run_shape_components() -> int:
     return 0
 
 
+def _shape_metric_names(code):
+    """The deployed metrics, read off the source rather than listed here.
+
+    A metric is an `ℝ`-valued definition of `Descent/Core/Moments.lean` -- `r2`,
+    `calibrationSlope`, `brier`, `deployedR2` and the rest, which is what the corpus
+    means by "a number a deployment reports" -- CLOSED UNDER being computed from
+    one.  `sensFromR2` counts because its body names `r2`; `brierFromR2` counts for
+    the same reason.
+
+    THE CLOSURE IS THE POINT, not a convenience.  A hardcoded list of metric names
+    -- `architecture.py` carries one -- counts `presentDayR2` and
+    `portabilityStatistic` as metrics on the strength of their spelling.  Neither
+    is computed from the metric kernel, so a theorem joining `PopGenParameters` to
+    one of them joins the parameter record to a number that has no stated relation
+    to the `R²` the corpus actually deploys.  Reading the set off the bodies means
+    a new metric joins it the moment it calls the kernel, and never before, which
+    is the same rule `duplicate_body_groups` enforces one level down.
+    """
+    kernel = set()
+    for line in code.get("Descent.Core.Moments", "").split("\n"):
+        m = re.match(r"^(?:noncomputable\s+)?def\s+([\w.'₀-₉]+)(.*)", line)
+        if m and re.search(r":\s*ℝ\s*:?=?\s*$", m.group(2)):
+            kernel.add(m.group(1).split(".")[-1])
+
+    # Parse once.  The closure below sweeps the list repeatedly and re-parsing
+    # every module on each sweep is the whole cost of this guard.
+    real_defs = []
+    for _mod, text in code.items():
+        real_defs += _shape_real_defs(text)
+
+    metrics = set(kernel)
+    while True:
+        grew = {name for name, body in real_defs
+                if name not in metrics
+                and any(re.search(r"(?<![\w.'])" + re.escape(k) + r"(?![\w'])", body)
+                        for k in metrics)}
+        if not grew:
+            return kernel, metrics
+        metrics |= grew
+
+
+def _shape_real_defs(text):
+    """`(short name, body)` for every `ℝ`-valued `def` in one module's code."""
+    lines, i, out = text.split("\n"), 0, []
+    while i < len(lines):
+        m = re.match(r"^\s*(?:noncomputable\s+)?(?:def|abbrev)\s+([\w.'₀-₉]+)",
+                     lines[i])
+        if not m:
+            i += 1
+            continue
+        block, j = [lines[i]], i + 1
+        while j < len(lines) and lines[j].strip() and not SHAPE_DECL_STOP.match(lines[j]):
+            block.append(lines[j])
+            j += 1
+        i = j
+        joined = " ".join(" ".join(block).split())
+        sig, _sep, body = joined.partition(":=")
+        if re.search(r":\s*ℝ\s*$", sig.strip()):
+            out.append((m.group(1).split(".")[-1], body))
+    return out
+
+
+def run_shape_spine() -> int:
+    """The corpus must have a spine: theorems joining the parameters to the metrics.
+
+    TWO NUMBERS, one shape.
+
+    CROSS-MODULE REUSE is the fraction of theorems whose name appears in the CODE
+    of some other module.  A corpus of independent monographs and a corpus with a
+    spine are the same size, the same soundness and the same line count; this is
+    the number that tells them apart, and just under 12% this one is much closer to
+    the monographs.  The threshold is 20%: not a comfortable number and not an
+    arbitrary one -- it is one theorem in five load-bearing, which is roughly what
+    it takes for the deepest results to rest on the shallow ones rather than
+    beside them.  `architecture.py` computes this figure and REPORTS it, on the
+    argument that no value of it is correct.  That argument is right about the
+    percentage and wrong about the corpus: 88% of theorems having no consumer
+    outside their own file is not a property with no correct value, it is the
+    island shape measured one level down, and this is where the same number gets
+    an exit code.  The function that computes it is `architecture`'s, called, not
+    a second copy.
+
+    A SPINE THEOREM is a theorem whose STATEMENT binds the parameter record
+    `PopGenParameters` and names a deployed metric.  Both halves are the point:
+
+      * the record and not a demographic quantity generally.  `Ne`, `m` and `μ`
+        passed as three loose reals are what the record exists to replace, and
+        `shape-routes` fails on exactly that pattern -- so counting a theorem over
+        loose reals as a spine theorem would have the two guards pulling against
+        each other.  A theorem is on the spine when it starts where the spine
+        starts.
+      * the metric read off `Core/Moments.lean` and closed under being computed
+        from it -- see `_shape_metric_names`, which explains why a name list would
+        count theorems that reach a number the corpus never connects to the `R²`
+        it deploys.
+
+    So a spine theorem is `PopGenParameters → … → a number a deployment reports`,
+    stated as one claim.  There are nineteen, and every one of them is in
+    `Core/Moments.lean`: the spine exists, it is one file long, and not one of the
+    subsystems has stated a theorem reaching from the record to a metric.  The
+    per-module breakdown is printed for that reason -- the count alone would read
+    as "not many theorems", and the finding is that they are all in one place.
+
+    HOW THIS DIFFERS FROM `architecture.composition_theorems`, which reads 64.
+    That one matches a statement against two hand-written lists of names, and a
+    name on the metric list is a metric by virtue of its spelling.  Three of them
+    -- `momentsUnderDrift`, `ScoreMoments`, `presentDayR2` -- are respectively the
+    intermediate of the chain, the tuple it passes, and a quantity with no stated
+    relation to the `R²` the corpus deploys.  The audit that asked for this guard
+    counted 26 with a similar list.  Nineteen is the same population under a
+    definition that requires the metric to be computed from the metric kernel, and
+    the smaller number is the more useful one: it is the count of theorems that
+    actually carry a demography to a reported number.
+
+    The threshold is 80, the audit's, which is roughly one such theorem per
+    subsystem module that names a demographic quantity.
+    """
+    _raw, code, _graph, decls, arch = _shape_corpus()
+
+    reused, total = arch.gate_cross_module_reuse(code, decls)
+    pct = round(100.0 * reused / total, 2) if total else 0.0
+
+    kernel, metrics = _shape_metric_names(code)
+    spine = []
+    for mod, text in code.items():
+        for m in SHAPE_THEOREM.finditer(text):
+            stmt = m.group(2)
+            if not re.search(r"(?<![\w.'])PopGenParameters(?![\w'])", stmt):
+                continue
+            if any(re.search(r"(?<![\w.'])" + re.escape(k) + r"(?![\w'])", stmt)
+                   for k in metrics):
+                spine.append((m.group(1), mod))
+
+    bad = []
+    if pct < SHAPE_REUSE_PCT:
+        bad.append(f"cross-module theorem reuse: {pct}% ({reused} of {total} "
+                   f"theorems named in another module's code), floor "
+                   f"{SHAPE_REUSE_PCT}%; the gap is "
+                   f"{int(SHAPE_REUSE_PCT * total / 100) - reused} theorems that "
+                   f"need a consumer somewhere other than the file they are in")
+    if len(spine) < SHAPE_SPINE_THEOREMS:
+        bad.append(f"spine theorems: {len(spine)}, floor {SHAPE_SPINE_THEOREMS}; "
+                   f"state the subsystem's result about `(p : PopGenParameters)` "
+                   f"and one of the {len(metrics)} deployed metrics in the same "
+                   f"claim, rather than about a free real someone has to believe "
+                   f"came from a demography")
+        for name, mod in sorted(spine):
+            bad.append(f"    have: {name}  ({mod})")
+        homes = collections.Counter(mod for _n, mod in spine)
+        for mod, n in homes.most_common():
+            bad.append(f"    {n:>3} of {len(spine)} in {mod}")
+
+    print(f"deployed metrics: {len(kernel)} in Core/Moments.lean, {len(metrics)} "
+          f"once closed under being computed from one")
+    print("    " + ", ".join(sorted(metrics)))
+
+    if bad:
+        for line in bad:
+            print(line)
+        print(f"shape-spine guard FAILS. `PopGenParameters → fstEquilibrium → "
+              f"momentsUnderDrift → a deployed metric` is the claim this corpus "
+              f"exists to make, and a theorem that takes `F_ST` as a free real "
+              f"does not make it -- it makes a statement about arithmetic that a "
+              f"reader has to supply the population genetics for.")
+        return 1
+
+    print(f"shape-spine guard passes: {pct}% cross-module reuse (floor "
+          f"{SHAPE_REUSE_PCT}%) and {len(spine)} theorems joining "
+          f"`PopGenParameters` to a deployed metric (floor "
+          f"{SHAPE_SPINE_THEOREMS})")
+    return 0
+
+
 # ======================================================================================
 # DISPATCHER
 # ======================================================================================
@@ -6630,6 +6803,13 @@ GUARDS = {
     # and `Spectral/ResonanceSpectrum` -- each importing nothing from the corpus and
     # imported by nothing in it.
     "shape-components": dict(fn=run_shape_components, gated=False, takes_argv=False),
+    # `shape-spine`: flip when cross-module theorem reuse reaches 20% and the corpus
+    # states 80 theorems joining `PopGenParameters` to a deployed metric. Both are
+    # far off -- just under 12%, and 19 -- and the second is the sharper number:
+    # all nineteen are in `Core/Moments.lean`, so the spine exists and is one file
+    # long. This is the one of the five that no amount of moving imports around
+    # will fix; it needs theorems that do not exist yet.
+    "shape-spine":     dict(fn=run_shape_spine,      gated=False, takes_argv=False),
 }
 
 
