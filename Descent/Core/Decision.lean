@@ -984,8 +984,7 @@ noncomputable def witness : OperatingPointLaw where
     linarith
   point_admissible := by
     intro x hx hx1
-    refine { sensitivity_nonneg := ?_, sensitivity_le_one := ?_,
-      specificity_nonneg := ?_, specificity_le_one := ?_ } <;>
+    constructor <;>
       simp only [chanceCalibratedPoint_sensitivity, chanceCalibratedPoint_specificity] <;>
       unfold midpoint <;> linarith
 
@@ -2121,6 +2120,7 @@ theorem fstEquilibrium_eq_fstFromTau_inv (p : PopGenParameters)
   unfold fstEquilibrium fstIslandEquilibrium fstFromFlow fstFromTau saturation
   rw [div_eq_div_iff h1 h2]
   field_simp
+  ring
 
 /-- **The two routes agree at exactly one generation**, and the condition says which.
 

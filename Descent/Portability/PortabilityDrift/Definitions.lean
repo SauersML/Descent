@@ -801,7 +801,7 @@ theorem coalescentTau_uses_timeScale (t Ne : ℝ) :
 
 theorem SplitMigrationModel_scaledMigration_eq_ploidy_form
     (m : Portability.SplitMigrationModel) :
-    Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig := by
-  unfold Descent.Core.scaledMigrationRate Descent.Core.ploidy Descent.Core.scaledMigrationRate Descent.Core.ploidy; ring
+    Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig :=
+  rfl
 
 end Descent.Portability

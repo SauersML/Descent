@@ -502,8 +502,9 @@ theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18
 end CondensationBoundary
 
 theorem dominanceVariance_uses_hwe {m : ℕ} (p d : Fin m → ℝ) :
-    PopGen.dominanceVariance p d = ∑ i, (genotypeVarianceHWE (p i) * d i) ^ 2 := by
-  unfold PopGen.dominanceVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+    PopGen.dominanceVariance p d
+      = ∑ i, (Descent.Core.hweHeterozygosity (p i) * d i) ^ 2 := by
+  unfold PopGen.dominanceVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem fisherAverageEffect_uses_ploidy (a d p : ℝ) :
     PopGen.fisherAverageEffect a d p = a + d * (1 - Descent.Core.ploidy * p) := by
