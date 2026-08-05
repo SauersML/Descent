@@ -374,6 +374,168 @@ theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1
     rw [hfinal]
     linarith [hbound]
 
+
+/-! ### `Q` factors through a stochastic matrix, and the limit -/
+
+/-- Real-valued form of the row bound, which is the form a `C/N²` estimate arrives in. -/
+theorem linfty_norm_le_of_rows' {m : Type*} [Fintype m] [DecidableEq m]
+    {A : Matrix m m ℝ} {C : ℝ} (hC : 0 ≤ C) (h : ∀ i, ∑ j, |A i j| ≤ C) : ‖A‖ ≤ C := by
+  have h' : ∀ i, ∑ j, ‖A i j‖₊ ≤ C.toNNReal := by
+    intro i
+    rw [← NNReal.coe_le_coe, Real.coe_toNNReal C hC]
+    push_cast
+    simpa [Real.norm_eq_abs] using h i
+  simpa [Real.coe_toNNReal C hC] using linfty_norm_le_of_rows h'
+
+/-- **The rate ladder is increasing**: more lineages, more pairs. -/
+theorem deathRate_mono {k n : ℕ} (h : k ≤ n) : deathRate k ≤ deathRate n := by
+  simp only [deathRate, Descent.Core.pairCount]
+  have hkR : ((k : ℕ) : ℝ) ≤ (n : ℝ) := by exact_mod_cast h
+  have hk0 : (0 : ℝ) ≤ ((k : ℕ) : ℝ) := Nat.cast_nonneg _
+  nlinarith
+
+/-- **The stochastic matrix `Q` factors through**, `S = 1 + Q/d_n`.
+
+Uniformisation: divide the generator by the largest exit rate and add the identity.  Every
+entry is then non-negative -- the diagonal because `d_k ≤ d_n`, the subdiagonal because
+`d_k ≥ 0` -- and each row still sums to one, because `Q`'s rows sum to zero. -/
+noncomputable def blockStochastic (n : ℕ) : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ :=
+  1 + (deathRate n)⁻¹ • blockGenerator n
+
+/-- The entries of `S`, read off. -/
+theorem blockStochastic_apply {n : ℕ} (k j : Fin (n + 1)) :
+    blockStochastic n k j
+      = (if (k : ℕ) = (j : ℕ) then 1 else 0)
+        + (deathRate n)⁻¹ * (if (j : ℕ) = (k : ℕ) then -deathRate (k : ℕ)
+            else if (j : ℕ) + 1 = (k : ℕ) then deathRate (k : ℕ) else 0) := by
+  simp only [blockStochastic, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, blockGenerator]
+  congr 1
+  rw [Matrix.one_apply]
+  by_cases h : k = j
+  · simp [h]
+  · have : (k : ℕ) ≠ (j : ℕ) := fun hc ↦ h (Fin.ext hc)
+    simp [h, this]
+
+/-- **`S` is a contraction**, because its rows are probability distributions. -/
+theorem norm_blockStochastic_le_one {n : ℕ} (hn : 2 ≤ n) : ‖blockStochastic n‖ ≤ 1 := by
+  classical
+  have han : 0 < deathRate n := deathRate_pos hn
+  refine linfty_norm_le_of_rows' zero_le_one fun k ↦ ?_
+  have hkn : (k : ℕ) ≤ n := Nat.lt_succ_iff.mp k.isLt
+  have hdk0 : 0 ≤ deathRate (k : ℕ) := by
+    simp only [deathRate, Descent.Core.pairCount]
+    rcases Nat.eq_zero_or_pos (k : ℕ) with h | h
+    · simp [h]
+    · have : (1 : ℝ) ≤ ((k : ℕ) : ℝ) := by exact_mod_cast h
+      nlinarith
+  have hratio : deathRate (k : ℕ) / deathRate n ≤ 1 :=
+    (div_le_one han).mpr (deathRate_mono hkn)
+  have hratio0 : 0 ≤ deathRate (k : ℕ) / deathRate n := by positivity
+  by_cases hk0 : (k : ℕ) = 0
+  · have hall : ∀ j : Fin (n + 1), |blockStochastic n k j| = if k = j then 1 else 0 := by
+      intro j
+      rw [blockStochastic_apply]
+      by_cases h : (j : ℕ) = (k : ℕ)
+      · have hkj : k = j := Fin.ext h.symm
+        simp [h, hkj, hk0, deathRate, Descent.Core.pairCount]
+      · have hkj : ¬ k = j := fun hc ↦ h (by rw [hc])
+        have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by omega
+        simp [h, h3, hkj, fun hc : (k : ℕ) = (j : ℕ) ↦ h hc.symm]
+    simp only [hall]
+    rw [Finset.sum_ite_eq Finset.univ k (fun _ ↦ (1 : ℝ))]
+    simp
+  · -- the row has a subdiagonal entry
+    have hk1lt : (k : ℕ) - 1 < n + 1 := by omega
+    set k' : Fin (n + 1) := ⟨(k : ℕ) - 1, hk1lt⟩ with hk'
+    have hkk' : k ≠ k' := by
+      intro hc
+      have : (k : ℕ) = (k : ℕ) - 1 := congrArg Fin.val hc
+      omega
+    have hrest : ∀ j ∈ (Finset.univ.erase k).erase k', |blockStochastic n k j| = 0 := by
+      intro j hj
+      have hjk' : j ≠ k' := (Finset.mem_erase.mp hj).1
+      have hjk : j ≠ k := (Finset.mem_erase.mp (Finset.mem_erase.mp hj).2).1
+      have h2 : ¬((j : ℕ) = (k : ℕ)) := fun hc ↦ hjk (Fin.ext hc)
+      have h1 : ¬((k : ℕ) = (j : ℕ)) := fun hc ↦ h2 hc.symm
+      have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by
+        intro hc
+        exact hjk' (Fin.ext (by simp only [hk']; omega))
+      rw [blockStochastic_apply]
+      simp [h1, h2, h3]
+    have hdiag : blockStochastic n k k = 1 - deathRate (k : ℕ) / deathRate n := by
+      rw [blockStochastic_apply]
+      simp only [if_pos rfl]
+      field_simp
+    have hsub : blockStochastic n k k' = deathRate (k : ℕ) / deathRate n := by
+      have h1 : ¬((k : ℕ) = (k' : ℕ)) := by simp only [hk']; omega
+      have h2 : ¬((k' : ℕ) = (k : ℕ)) := fun hc ↦ h1 hc.symm
+      have h3 : (k' : ℕ) + 1 = (k : ℕ) := by simp only [hk']; omega
+      rw [blockStochastic_apply, if_neg h1, if_neg h2, if_pos h3]
+      field_simp
+    rw [← Finset.sum_erase_add _ _ (Finset.mem_univ k),
+      ← Finset.sum_erase_add _ _ (Finset.mem_erase.mpr ⟨Ne.symm hkk', Finset.mem_univ k'⟩),
+      Finset.sum_congr rfl hrest]
+    rw [hdiag, hsub, abs_of_nonneg (by linarith : (0:ℝ) ≤ 1 - deathRate (k:ℕ) / deathRate n),
+      abs_of_nonneg hratio0]
+    simp
+
+/-- **`Q = d_n · (S - 1)`**, the factorisation `norm_exp_smul_sub_one_le_one` wants. -/
+theorem blockGenerator_eq_smul {n : ℕ} (hn : 2 ≤ n) :
+    blockGenerator n = deathRate n • (blockStochastic n - 1) := by
+  have han : deathRate n ≠ 0 := ne_of_gt (deathRate_pos hn)
+  unfold blockStochastic
+  rw [add_sub_cancel_left, smul_smul, mul_inv_cancel₀ han, one_smul]
+
+/-- **The generator generates a contraction semigroup**, `‖exp(tQ)‖ ≤ 1` for `t ≥ 0`. -/
+theorem norm_exp_smul_blockGenerator_le_one {n : ℕ} (hn : 2 ≤ n) {t : ℝ} (ht : 0 ≤ t) :
+    ‖exp ℝ (t • blockGenerator n)‖ ≤ 1 := by
+  rw [blockGenerator_eq_smul hn, smul_smul]
+  exact norm_exp_smul_sub_one_le_one _ (norm_blockStochastic_le_one hn) _
+    (mul_nonneg ht (le_of_lt (deathRate_pos hn)))
+
+/-- **The one-generation operator**, extended by the identity at `N = 0` so that it is a
+contraction for every `N`.  The limit is taken along `N → ∞`, so the value there is inert. -/
+noncomputable def blockOperator (n N : ℕ) : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ :=
+  if N = 0 then 1 else blockMatrix n N
+
+/-- **K-G (2.14) for the block count: `P_N^N → exp Q`.**
+
+This is the theorem the whole file exists for.  A Wright--Fisher population of size `N`,
+watched for `N` generations, has its sample's ancestral lineage count converge in law to
+Kingman's pure-death chain -- the one with rate `d_k = k(k-1)/2` out of level `k`.
+
+Every hypothesis is now a theorem of this corpus rather than an assumption:
+`norm_blockMatrix_le_one` for the contraction, `norm_exp_smul_blockGenerator_le_one` for the
+limit semigroup, and `row_sum_diff_le` for the one-generation expansion `P_N = 1 + N⁻¹Q +
+O(N⁻²)`.  The `O(N⁻²)` is where the biology sits: the error is the probability that two
+distinct pairs of lineages coalesce in the same generation, and it is `O(N⁻²)` because two
+independent coincidences are needed.  That is why the coalescent is binary.
+
+    Empirical status: DERIVED -- from the Wright-Fisher reproduction mechanism, with no
+    coefficient posited.  What is assumed is the mechanism: uniform, independent parent
+    choice in a constant population of size N.  Which populations reproduce that way is
+    an empirical question the mechanism modules record. -/
+theorem tendsto_blockOperator_pow {n : ℕ} (hn : 2 ≤ n) :
+    Filter.Tendsto (fun N : ℕ ↦ blockOperator n N ^ N) Filter.atTop
+      (nhds (exp ℝ (blockGenerator n))) := by
+  refine tendsto_pow_of_expansion (blockGenerator n) (3 * (n : ℝ) ^ 4) (by positivity)
+    (blockOperator n) (fun N ↦ ?_) (fun N ↦ ?_) ?_
+  · -- contraction
+    unfold blockOperator
+    by_cases hN : N = 0
+    · simp [hN]
+    · rw [if_neg hN]
+      exact norm_blockMatrix_le_one (Nat.pos_of_ne_zero hN)
+  · -- the limit semigroup is a contraction
+    exact norm_exp_smul_blockGenerator_le_one hn (by positivity)
+  · -- the one-generation expansion
+    filter_upwards [Filter.eventually_ge_atTop (max 1 n)] with N hN
+    have hN1 : 0 < N := lt_of_lt_of_le Nat.zero_lt_one (le_trans (le_max_left _ _) hN)
+    have hnN : n ≤ N := le_trans (le_max_right _ _) hN
+    have hC : (0 : ℝ) ≤ 3 * (n : ℝ) ^ 4 / (N : ℝ) ^ 2 := by positivity
+    refine linfty_norm_le_of_rows' hC fun k ↦ ?_
+    simpa using row_sum_diff_le hN1 hnN k
+
 end Coalescent
 
 end Descent

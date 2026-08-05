@@ -1172,7 +1172,9 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
     PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = 1 / (1 + PopGen.scaledMigrationRate Ne m * PopGen.islandDemeCorrection nDemes
               + PopGen.scaledMutationRate Ne μ) := by
-  unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+  unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstIslandEquilibrium
+    Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
+    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
   rw [scaledMigrationRate_eq_ploidy_form, scaledMutationRate_eq_ploidy_form]
   unfold ploidy Descent.Core.ploidy; ring_nf
 

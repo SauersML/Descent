@@ -156,8 +156,8 @@ theorem norm_exp_smul_sub_one_le_one {𝔸 : Type*} [NormedRing 𝔸] [NormOneCl
     simp [smul_smul, mul_comm]
   rw [hdecomp, exp_add_of_commute hcomm]
   have hone : exp ℝ ((-a) • (1 : 𝔸)) = Real.exp (-a) • (1 : 𝔸) := by
-    rw [← Algebra.algebraMap_eq_smul_one, ← Algebra.algebraMap_eq_smul_one, exp_algebraMap,
-      Real.exp_eq_exp_ℝ]
+    rw [← Algebra.algebraMap_eq_smul_one, ← Algebra.algebraMap_eq_smul_one,
+      Real.exp_eq_exp_ℝ, algebraMap_exp_comm]
   rw [hone]
   calc ‖exp ℝ (a • S) * Real.exp (-a) • (1 : 𝔸)‖
       ≤ ‖exp ℝ (a • S)‖ * ‖Real.exp (-a) • (1 : 𝔸)‖ := norm_mul_le _ _

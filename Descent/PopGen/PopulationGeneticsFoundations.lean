@@ -1628,7 +1628,7 @@ noncomputable def fstMigrationMutationEquilibriumManyDemes (Ne m μ : ℝ) : ℝ
     deme counts while the limit form is constant at 0.20000, so the design
     separates them by construction. -/
 noncomputable def fstIslandEquilibriumFiniteDemes (Ne m μ nDemes : ℝ) : ℝ :=
-  Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)
+  Descent.Core.fstIslandEquilibrium Ne m μ nDemes
 
 /-- **fstIslandEquilibriumFiniteDemes at a single deme, named.** The finite-deme correction is
 `nDemes / (nDemes - 1)`, whose divisor vanishes at one deme. The migration term is junk-zero
@@ -1637,7 +1637,7 @@ differentiated from itself at the mutation-drift level, where in fact there is n
 differentiate from. Consumers must exclude it by hypothesis. -/
 theorem fstIslandEquilibriumFiniteDemes_single_deme_is_junk (Ne m μ : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ 1 = 1 / (1 + 4 * Ne * μ) := by
-  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstIslandEquilibrium Descent.Core.scaledFlow Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.fstFromFlow Descent.Core.ploidy
   rw [islandDemeCorrection_one_deme_is_junk]
   norm_num
 
@@ -1657,7 +1657,7 @@ theorem fstIslandEquilibriumFiniteDemes_isFixedPoint (Ne m μ nDemes : ℝ)
     add_nonneg (mul_nonneg (mul_nonneg h4 hm) hcorr) (mul_nonneg h4 hμ)
   have hbody : fstIslandEquilibriumFiniteDemes Ne m μ nDemes =
       1 / (1 + (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)) := by
-    unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
+    unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstIslandEquilibrium Descent.Core.scaledFlow Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate Descent.Core.fstFromFlow Descent.Core.ploidy
     ring
   rw [hbody]
   exact scaledIdentityStep_fixedPoint _ h
@@ -1669,7 +1669,7 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
     (Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
-  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
+  unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstIslandEquilibrium Descent.Core.scaledFlow Descent.Core.scaledMigrationRate Descent.Core.scaledMutationRate fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow Descent.Core.ploidy
   rw [h]; ring_nf
 
 /-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**

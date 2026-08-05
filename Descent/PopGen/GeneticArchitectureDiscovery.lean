@@ -1120,7 +1120,8 @@ noncomputable def commonAndRarePortableModel : Portability.CrossPopulationMetric
   -- common-variant-only witness; the other fifteen fields were copied verbatim, so the
   -- two witnesses could drift apart in a field neither of them is about.  Stated as an
   -- override, the comparison the section makes is what the definition says.
-  { commonOnlyPortableModel with beta := Pop.pair (![1, 1]) (![1, 0])
+  { commonOnlyPortableModel with
+    beta := Pop.pair (![1, 1]) (![1, 0])
     directCausal := Pop.pair 1 1 }
 
 /-- Evaluate a witness model's SOURCE `R²` by unfolding the source-weight chain.
@@ -1135,7 +1136,7 @@ local macro "source_r2_of " m:term : tactic =>
       Portability.predictiveCovarianceFromSourceWeights,
       Portability.scoreVarianceFromSourceWeights,
       Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
-      sigmaTagCausal, dotProduct, Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec])
+      sigmaTagCausal, dotProduct, totalEffect, Matrix.mulVec])
 
 /-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
 terms the source chain has no need of, and is otherwise the same list. -/
@@ -1149,7 +1150,7 @@ local macro "target_r2_of " m:term : tactic =>
       Portability.effectiveOutcomeVariance, Portability.irreducibleTargetResidualBurden,
       Portability.brokenTaggingResidual, Portability.ancestrySpecificLDResidual, Portability.sourceSpecificOverfitResidual,
       Portability.novelUntaggablePhenotypeResidual, sigmaTagCausal,
-      dotProduct, Blindness.BundleRigidity.ChainSCM.totalEffect, Matrix.mulVec])
+      dotProduct, totalEffect, Matrix.mulVec])
 
 theorem commonOnlyPortableModel_sourceR2 :
     Portability.r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by

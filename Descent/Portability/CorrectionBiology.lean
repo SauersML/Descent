@@ -77,7 +77,7 @@ coordinates.  Thus pooling loses precisely one biological direction and no other
 theorem dynamicsPoolingObservation_eq_iff_contrast_translation (β γ : Bool → ℝ) :
     Conditionals.dynamicsPoolingObservation β = Conditionals.dynamicsPoolingObservation γ ↔
       γ = β + (dynamicsContrastCoefficient γ - dynamicsContrastCoefficient β) •
-        dynamicsContrast := by
+        Conditionals.dynamicsContrast := by
   constructor
   · intro hpool
     funext persists

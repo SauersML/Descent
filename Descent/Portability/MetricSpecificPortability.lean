@@ -2984,7 +2984,7 @@ threshold hypothesis of `topVariance_minimizes_detection`. -/
 theorem ldKernelSymbol_mono_in_cos {decay angle₁ angle₂ : ℝ}
     (hd : |decay| < 1) (hd0 : 0 ≤ decay)
     (hcos : Real.cos angle₁ ≤ Real.cos angle₂) :
-    ldKernelSymbol decay angle₁ ≤ ldKernelSymbol decay angle₂ := by
+    Blindness.ldKernelSymbol decay angle₁ ≤ Blindness.ldKernelSymbol decay angle₂ := by
   have hden₁ : 0 < 1 - 2 * decay * Real.cos angle₁ + decay ^ 2 :=
     Blindness.ldKernelSymbol_denom_pos hd
   have hden₂ : 0 < 1 - 2 * decay * Real.cos angle₂ + decay ^ 2 :=
@@ -2995,7 +2995,7 @@ theorem ldKernelSymbol_mono_in_cos {decay angle₁ angle₂ : ℝ}
   have hcmp : 1 - 2 * decay * Real.cos angle₂ + decay ^ 2 ≤
       1 - 2 * decay * Real.cos angle₁ + decay ^ 2 := by
     nlinarith [mul_nonneg hd0 (sub_nonneg.mpr hcos)]
-  unfold ldKernelSymbol
+  unfold Blindness.ldKernelSymbol
   exact div_le_div_of_nonneg_left hnum hden₂ hcmp
 
 /-- **Reconstruction share of a pruned (low-frequency) band** on a stationary
@@ -3593,15 +3593,15 @@ theorem clumping_minimizes_detection_on_ld_kernel
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     Spectral.detectionEfficiency
-        (fun i ↦ ldKernelSymbol decay (angle i))
+        (fun i ↦ Blindness.ldKernelSymbol decay (angle i))
         (Spectral.pruneAllocation S) ≤
       Spectral.detectionEfficiency
-        (fun i ↦ ldKernelSymbol decay (angle i)) M := by
+        (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M := by
   have habs : |decay| < 1 := hdabs
   have hp0 : 0 ≤ decay := hd0
   refine Spectral.topVariance_minimizes_detection
-    (fun i ↦ ldKernelSymbol decay (angle i)) M S
-    (ldKernelSymbol decay cutAngle)
+    (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M S
+    (Blindness.ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
     hM ?_ ?_
   · intro i hi
@@ -3622,15 +3622,15 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
     Spectral.reconstructionEfficiency
-        (fun i ↦ ldKernelSymbol decay (angle i)) M ≤
+        (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M ≤
       Spectral.reconstructionEfficiency
-        (fun i ↦ ldKernelSymbol decay (angle i))
+        (fun i ↦ Blindness.ldKernelSymbol decay (angle i))
         (Spectral.pruneAllocation S) := by
   have habs : |decay| < 1 := hdabs
   have hp0 : 0 ≤ decay := hd0
   refine Spectral.topVariance_maximizes_reconstruction
-    (fun i ↦ ldKernelSymbol decay (angle i)) M S
-    (ldKernelSymbol decay cutAngle)
+    (fun i ↦ Blindness.ldKernelSymbol decay (angle i)) M S
+    (Blindness.ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_
   · intro i hi
     exact ldKernelSymbol_mono_in_cos habs hp0 (hin i hi)
