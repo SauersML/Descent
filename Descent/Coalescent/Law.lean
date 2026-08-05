@@ -25,11 +25,10 @@ with independent factors -- and that is a different statement, still open here, 
 general theory of jump chains for continuous-time Markov chains.
 
 `Descent.Coalescent.Program` item 4 asks for Theorem 1 and item 5 for the constructions.
-What lands here is item 5's direction, at finite `n`, with one parameter left open: the
-holding-time law is an argument.  Instantiating it with the exponential of rate `d_k` --
-K-C (1.7)'s density `d_k e^{-d_k t}` -- is the step not taken, because it needs an integral
-this corpus has not done.  Everything else about the coupling is here, and what it rests on
-is visible in the signature rather than hidden in a definition.
+What lands here is item 5's direction, at finite `n`.  The holding-time law is an argument
+rather than a fixed choice, which keeps what the coupling rests on visible in the signature;
+`Descent.Coalescent.HoldingTime` supplies K-C (1.7)'s exponential and its integral, so
+nothing is left open by the parametrisation.
 
 ## Main results
 
@@ -39,6 +38,8 @@ is visible in the signature rather than hidden in a definition.
   rectangle factorises.
 - `coalescentLaw_chain_marginal`: the trajectory marginal is `chainLaw`, so nothing about
   the jump chain was changed by coupling it to the clock.
+- `coalescentLaw_finiteDimensional`: **K-C (2.5)**, the finite-dimensional distribution
+  splits into a death-process factor and a jump-chain factor.
 -/
 
 namespace Coalescent
