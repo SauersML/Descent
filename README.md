@@ -1,6 +1,6 @@
 # Descent
 
-A Lean 4 formalization of genetics.
+A Lean 4 formalization of genetic theory.
 
 ## Building
 
@@ -8,6 +8,10 @@ A Lean 4 formalization of genetics.
 lake exe cache get
 lake build Descent ValidationShared
 ```
+
+## Contributing
+
+All contributions are welcome.
 
 ## License
 
