@@ -44,6 +44,7 @@
 #   GUARD_EXIT=<code>                                 structural guard result
 #   LAUNDER_GUARD_EXIT=<code>                         source-text laundering guard
 #   LAUNDER_ENV_EXIT=<code>|SKIPPED_BUILD_FAILED      elaborated-telescope scan
+#   LAKE_CPUS=<n>                                     cores the allocation held
 #   LAKE_EXIT=<code>                                  lake's own exit status
 #   MODULE_STATUS <mod> COMPILED|STALE|ABSENT         per module, one line each
 #   MODULES_COMPILED / MODULES_STALE / MODULES_ABSENT summary counts
@@ -396,14 +397,25 @@ echo "LAUNDER_GUARD_EXIT=$?"
 # on a shared node, and neither symptom announces itself: the build finishes, so
 # nothing looks wrong.
 #
-# `-j` IS A GLOBAL OPTION AND MUST PRECEDE THE SUBCOMMAND. `lake build -j 32`
-# exits 1 with `error: unknown short option '-j'`, which the reader below counts
-# as one Lean error -- a build that never started, reported as a corpus with one
-# defect in it. That is the failure shape this script's header is about, and it
-# happened here on the very commit that added the flag.
-_jobs=${SLURM_CPUS_PER_TASK:-$CPUS}
-echo "LAKE_JOBS=$_jobs"
-lake -j "$_jobs" build "${TARGETS[@]}"
+# THERE IS NO `-j`. Lake 5.0.0 (Lean 4.24.0) has no jobs option in either
+# position: `lake build -j 32` and `lake -j 32 build` both exit 1 with
+# `error: unknown short option '-j'`, and `lake --help` lists only `-J/--json`.
+# Two commits asserted otherwise on the strength of other Lake versions.
+#
+# The error text is the part worth keeping, because it is this file's own
+# fifth failure mode reappearing on the commit that introduced it. It begins
+# `error:` at the start of a line, so the reader documented above -- count
+# `^error:` lines -- counted it as ONE, and a run in which lake never started
+# read as a corpus with a single defect. The other four failure modes produce an
+# absence; this one produces a plausible number, and both jobs it hit reported
+# `MODULES_COMPILED=137` from the previous run's oleans while attributing them
+# to a build that had exited before it began.
+#
+# Width is therefore bounded by the cgroup and not by a flag: `--cpus-per-task`
+# is a hard CPU limit, so a Lake that counts the node's 128 cores still only
+# gets the cores the allocation holds, and no other user's job is displaced.
+echo "LAKE_CPUS=${SLURM_CPUS_PER_TASK:-$CPUS}"
+lake build "${TARGETS[@]}"
 _lake_exit=$?
 echo "LAKE_EXIT=$_lake_exit"
 
