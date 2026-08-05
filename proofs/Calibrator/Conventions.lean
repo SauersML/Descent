@@ -307,17 +307,54 @@ corpus into status reporting before anyone tested the slice it names.
 
     Empirical status: CONVENTION PINNED (Nei's `G_ST`; the name was corrected with it). -/
 noncomputable def neiGst (p₁ p₂ : ℝ) : ℝ :=
-  1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
-    (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
+  (p₁ - p₂) ^ 2 /
+    (ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))
 
-/-- Where the mean-frequency heterozygosity vanishes the ratio divides by zero and Mathlib
-returns `0`, so the statistic reports complete differentiation for a pair of populations that
-are both monomorphic and identical. -/
-theorem neiGst_at_zero_mean_heterozygosity_is_junk (p₁ p₂ : ℝ)
-    (hzero : ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) :
-    neiGst p₁ p₂ = 1 := by
+/-- **The textbook spelling, kept as a theorem rather than as the body.**
+
+`G_ST = 1 - H_S/H_T` is how the quantity is defined in the literature and it is
+what the name means; it is not how it should be computed, and it used to be the
+body. As `p₁ → p₂` the ratio tends to `1` and `G_ST` is whatever survives the
+subtraction, so its float64 relative error is machine epsilon divided by the
+answer. Measured float64 against a 60-digit reference over `p₂ = p₁ + δ` for
+`p₁ ∈ {0.01, 0.1, 0.3, 0.5}` and `δ` from `10⁻²` to `10⁻¹⁴`, arguments rounded to
+float64 first: **36 of 52 cells over 1e-6 relative error, worst 9.3·10¹¹** for
+this form, against **0 of 52, worst 1.9·10⁻¹⁶** for the body above. Human `G_ST`
+is `O(10⁻³)` genome-wide and smaller per variant, so the failing region was the
+use case.
+
+The hypothesis is the one point at which the two spellings genuinely differ, and
+that difference was the second reason to swap them -- see
+`neiGst_at_zero_mean_heterozygosity`. -/
+theorem neiGst_eq_oneMinusRatio (p₁ p₂ : ℝ)
+    (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
+    neiGst p₁ p₂ =
+      1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) /
+        (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
+  have h1 : meanAlleleFreq p₁ p₂ ≠ 0 := left_ne_zero_of_mul h
+  have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
+  unfold neiGst ploidy
+  field_simp
+  unfold meanAlleleFreq
+  ring
+
+/-- **Two identical monomorphic populations are not differentiated.**
+
+This used to be a junk-value theorem. With the `1 - H_S/H_T` body, a vanishing
+mean-frequency heterozygosity made the ratio divide by zero, Mathlib returned
+`0`, and the statistic reported `1` -- COMPLETE differentiation -- for a pair of
+populations that are both fixed for the same allele and could not be more alike.
+The docstring named it as junk and told consumers to exclude the point.
+
+Rewriting the body into the cancellation-free form removed the defect instead of
+documenting it: the numerator `(p₁ - p₂)²` vanishes there too, so the value is
+now `0`, which is the right answer and not a junk one. The stable spelling and
+the correct boundary turn out to be the same spelling. -/
+theorem neiGst_at_zero_mean_heterozygosity (p₁ p₂ : ℝ)
+    (hzero : ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) :
+    neiGst p₁ p₂ = 0 := by
   unfold neiGst
-  rw [hzero, div_zero, sub_zero]
+  rw [hzero, div_zero]
 
 
 /-- **Hudson's `F_ST` for two subgroups, parametric limit** (Bhatia, Patterson,
@@ -374,10 +411,9 @@ even about `p = 1/2`, so relabelling the alleles cannot move the statistic. -/
 theorem neiGst_allele_swap (p₁ p₂ : ℝ) :
     neiGst (1 - p₁) (1 - p₂) = neiGst p₁ p₂ := by
   unfold neiGst meanAlleleFreq
-  have hnum : (1 - p₁) * (1 - (1 - p₁)) + (1 - p₂) * (1 - (1 - p₂))
-      = p₁ * (1 - p₁) + p₂ * (1 - p₂) := by ring
-  have hden : ploidy * ((1 - p₁ + (1 - p₂)) / 2) * (1 - (1 - p₁ + (1 - p₂)) / 2)
-      = ploidy * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by ring
+  have hnum : ((1 - p₁) - (1 - p₂)) ^ 2 = (p₁ - p₂) ^ 2 := by ring
+  have hden : ploidy ^ 2 * ((1 - p₁ + (1 - p₂)) / 2) * (1 - (1 - p₁ + (1 - p₂)) / 2)
+      = ploidy ^ 2 * ((p₁ + p₂) / 2) * (1 - (p₁ + p₂) / 2) := by ring
   rw [hnum, hden]
 
 /-- **Hudson's `F_ST` is invariant under the reference/alternate allele swap.** The
@@ -457,8 +493,6 @@ theorem hudsonFst_eq_of_neiGst (p₁ p₂ : ℝ)
           (2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂)) := by
     unfold neiGst ploidy
     field_simp [hD]
-    unfold meanAlleleFreq
-    ring
   have hone :
       1 + neiGst p₁ p₂ =
         (p₁ * (1 - p₂) + p₂ * (1 - p₁)) /
@@ -526,7 +560,6 @@ theorem neiGst_eq_varianceRatio (p₁ p₂ : ℝ)
   have h2 : (1 - meanAlleleFreq p₁ p₂) ≠ 0 := right_ne_zero_of_mul h
   unfold neiGst betweenSubgroupVariance ploidy
   field_simp
-  unfold meanAlleleFreq
   ring
 
 /-- **Cross-check: the two spellings of Nei's `G_ST` in this corpus agree.**

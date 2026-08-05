@@ -134,6 +134,8 @@ SWEPT_MODULES = (
     "Calibrator/AncestrySpecificPower.lean",
     "Calibrator/GeneticArchitectureDiscovery.lean",
     "Calibrator/BlindnessRegistry.lean",
+    "Calibrator/TransferLearningPGS.lean",
+    "Calibrator/Permeability.lean",
 )
 
 # ---------------------------------------------------------------------------
@@ -304,6 +306,157 @@ RELATIONS = {
         # Survival depends on the compound lam·t, so time units cancel.
         invariant_under_reciprocal_scaling(["lam"], ["t"]),
     ],
+
+    # --- TransferLearningPGS ----------------------------------------------
+    "Calibrator.pgsR2": [
+        scales("cov_pgs_y", 2),
+        scales("var_pgs", -1),
+        scales("var_y", -1),
+    ],
+    "Calibrator.benDavidUpperBound": [
+        jointly_scales(["err_source", "divergence", "lambda_star"], 1),
+        symmetric_in("err_source", "divergence"),
+    ],
+    "Calibrator.importanceWeightESS": [
+        scales("sum_w", 2),
+        scales("sum_w_sq", -1),
+    ],
+    "Calibrator.pcaSignalLossPenalty": [
+        scales("lossWeight", 1),
+        jointly_scales(["signalBaseline", "signalRetained"], 1),
+    ],
+    "Calibrator.pcaBiasReduction": [
+        jointly_scales(["ancestryBiasWith", "ancestryBiasWithout"], 1),
+        odd_under_negation(["ancestryBiasWith", "ancestryBiasWithout"]),
+    ],
+    "Calibrator.pcaNetTargetError": [
+        jointly_scales(["ancestryBias", "signalBaseline", "signalRetained"], 1),
+    ],
+    "Calibrator.infoBottleneckObjective": [
+        jointly_scales(["I_phi_Y", "I_phi_A"], 1),
+        odd_under_negation(["I_phi_Y", "I_phi_A"]),
+    ],
+    "Calibrator.pinskerAncestryDivergenceCap": [
+        scales("I_phi_A", Q(1, 2)),
+    ],
+    "Calibrator.fineTunedTargetR2": [
+        jointly_scales(["r2_source", "divergence_penalty", "adaptation_gain"], 1),
+        odd_under_negation(["r2_source", "divergence_penalty",
+                            "adaptation_gain"]),
+    ],
+    "Calibrator.scratchTargetR2": [
+        jointly_scales(["oracle_target_r2", "estimation_penalty"], 1),
+        odd_under_negation(["oracle_target_r2", "estimation_penalty"]),
+    ],
+    "Calibrator.deployedTransferTargetR2": [
+        jointly_scales(["transported_r2", "adaptation_gain",
+                        "estimation_penalty"], 1),
+    ],
+    "Calibrator.oracleTransportAdaptationGain": [
+        jointly_scales(["transported_r2", "oracle_target_r2"], 1),
+        odd_under_negation(["transported_r2", "oracle_target_r2"]),
+    ],
+    "Calibrator.transportPenalty": [
+        jointly_scales(["source_r2", "transported_r2"], 1),
+        odd_under_negation(["source_r2", "transported_r2"]),
+    ],
+    "Calibrator.sampleLimitedScratchTargetR2": [
+        # noiseVar and nTarget enter only through their ratio.
+        jointly_scales(["noiseVar", "nTarget"], 0),
+    ],
+    "Calibrator.sourceShrinkageMSE": [
+        jointly_scales(["noiseVar", "nTarget"], 0),
+    ],
+    "Calibrator.optimalSourceShrinkageWeight": [
+        # A weight, so it is scale-free in the risks; and the sample size enters
+        # only through noiseVar/nTarget.
+        jointly_scales(["gapSq", "noiseVar"], 0),
+        jointly_scales(["noiseVar", "nTarget"], 0),
+    ],
+    "Calibrator.optimalFineTuningMSE": [
+        jointly_scales(["gapSq", "noiseVar"], 1),
+        jointly_scales(["noiseVar", "nTarget"], 0),
+    ],
+    "Calibrator.requiredTargetSamplesForOptimalFineTuningMSE": [
+        scales("noiseVar", 1),
+        jointly_scales(["gapSq", "tau"], -1),
+    ],
+    "Calibrator.privateArchitectureTransferCeiling": [
+        scales("h2_target", 1),
+    ],
+    "Calibrator.scratchVsFineTuningCriticalSampleSize": [
+        scales("noiseVar", 1),
+    ],
+
+    # --- Permeability ------------------------------------------------------
+    "Calibrator.scalarPermeability": [
+        # A squared LOG-derivative, so the covariance's unit cancels.
+        jointly_scales(["covariance", "covarianceDerivative"], 0),
+        scales("covarianceDerivative", 2),
+        scales("covariance", -2),
+    ],
+    "Calibrator.momentPermeability": [
+        scales("response", 2),
+        scales("noiseVariance", -1),
+    ],
+    "Calibrator.covarianceMomentPermeability": [
+        scales("covarianceDerivative", 2),
+    ],
+    "Calibrator.replicatesForEqualPermeability": [
+        scales("sourceReplicates", 1),
+        jointly_scales(["sourcePermeability", "targetPermeability"], 0),
+    ],
+    "Calibrator.twoChannelMomentNoiseDet": [
+        jointly_scales(["firstNoise", "secondNoise", "sharedNoise"], 2),
+    ],
+    "Calibrator.twoChannelConditionalMomentNoise": [
+        jointly_scales(["firstNoise", "secondNoise", "sharedNoise"], 1),
+    ],
+    "Calibrator.twoChannelConditionalMomentResponse": [
+        jointly_scales(["firstResponse", "secondResponse"], 1),
+        jointly_scales(["firstNoise", "sharedNoise"], 0),
+        odd_under_negation(["firstResponse", "secondResponse"]),
+    ],
+    "Calibrator.twoChannelMomentInnovationInformation": [
+        jointly_scales(["firstResponse", "secondResponse"], 2),
+    ],
+    "Calibrator.informationPerUnitCost": [
+        jointly_scales(["information", "cost"], 0),
+        scales("information", 1),
+        scales("cost", -1),
+    ],
+    "Calibrator.informationAtBudget": [
+        scales("budget", 1),
+        jointly_scales(["information", "cost"], 0),
+    ],
+    "Calibrator.totalGaussianInformation": [
+        scales("m", 1),
+        jointly_scales(["covariance", "covarianceDerivative"], 0),
+    ],
+    "Calibrator.totalCovarianceMomentInformation": [
+        scales("m", 1),
+        scales("covarianceDerivative", 2),
+    ],
+    "Calibrator.totalBinaryOrientationArrowPermeability": [
+        scales("m", 1),
+    ],
+    "Calibrator.covarianceTangentEstimatorVarianceFromMoments": [
+        scales("m", -1),
+        scales("covarianceDerivative", -2),
+    ],
+    "Calibrator.gaussianCovarianceTangentEstimatorVariance": [
+        scales("m", -1),
+    ],
+    "Calibrator.gaussianCovarianceHalfSquaredRisk": [
+        scales("m", -1),
+    ],
+    "Calibrator.quadraticChannel": [
+        scales("θ", 2),
+    ],
+    "Calibrator.covarianceScoreInformationFromMoments": [
+        scales("covarianceDerivative", 2),
+        scales("covariance", -4),
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -353,6 +506,35 @@ NO_RELATIONS = {
         "in any argument: the clip destroys every scaling relation on the half "
         "of the domain where it binds, and a relation that holds only off the "
         "clip is not a relation.",
+    "Calibrator.gaussianSourceResidualRisk":
+        "exp(-2·I) turns an information into a risk, so no rescaling of I is a "
+        "rescaling of the output: the relation it does satisfy is "
+        "f(a+b) = f(a)·f(b), a functional equation rather than a homogeneity, "
+        "and this table's kinds are all homogeneities and symmetries.",
+    "Calibrator.infoCertifiedBenDavidUpperBound":
+        "A sum of an exponential, a square root and a linear term in three "
+        "different arguments. Each summand has a different degree, so no common "
+        "scaling acts on the whole; the per-argument relations belong to the "
+        "three components, which are declared separately above.",
+    "Calibrator.usableScratchTargetR2":
+        "max 0 of the sample-limited R², so the clip destroys every scaling "
+        "relation on the half of the domain where it binds. A relation that "
+        "holds only off the clip is not a relation, which is why the unclipped "
+        "sampleLimitedScratchTargetR2 carries the declaration instead.",
+    "Calibrator.centeredSquareVarianceFromMoments":
+        "m₄ - m₂² is Var(X²) from RAW moments, and the two arguments scale at "
+        "different rates under the only transformation that matters: scaling "
+        "the underlying variable by s sends m₂ to s²m₂ and m₄ to s⁴m₄. No "
+        "single common factor acts on both, so no scaling relation in this "
+        "table's vocabulary can express the one relation it does have.",
+    "Calibrator.binaryOrientationArrowPermeability":
+        "A one-argument function of an orientation angle through a variance "
+        "that is not homogeneous in it; θ is an angle, so there is no unit to "
+        "rescale and no second argument to hold against it.",
+    "Calibrator.threeCycleOrientationArrowPermeability":
+        "As the binary case: a fixed response over 1 - θ², with θ an angle "
+        "carrying no unit. The constants are pinned by reference-point "
+        "theorems in the module rather than by any invariance.",
     "Calibrator.selectionMigrationEquilibriumMigrationFirst":
         "The same max-0 clip as the selection-first ordering, and the same "
         "consequence: on the half of the domain where migration overwhelms "
