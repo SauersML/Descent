@@ -1504,6 +1504,23 @@ That theorem *does* prove the migration claim, because it derives the `F_ST` ord
 noncomputable def asymmetricFst (Ne m₁₂ m₂₁ : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * (m₁₂ + m₂₁))
 
+/-- **Asymmetric migration enters the island law only through the TOTAL rate.**
+
+The body is `Core.fstFromFlow` applied to `Core.scaledMigrationRate Ne (m₁₂ + m₂₁)`, so two
+demes exchanging migrants at different rates are, for `F_ST`, a single deme pair exchanging
+at the sum. That is the content: the asymmetry does not survive into the equilibrium, and a
+reader who expected a separate law for it gets the reason it is not there.
+
+It also places the `4` where the others are. Written out here it is a fourth inlined ploidy
+convention; through `scaledMigrationRate` it is `2 · ploidy · Ne · m` and moves with the
+convention. -/
+theorem asymmetricFst_eq_fstFromFlow_total (Ne m₁₂ m₂₁ : ℝ) :
+    asymmetricFst Ne m₁₂ m₂₁
+      = Descent.Core.fstFromFlow (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
+  unfold asymmetricFst Descent.Core.fstFromFlow Descent.Core.scaledMigrationRate
+    Descent.Core.ploidy
+  ring_nf
+
 /-- **asymmetricFst at `4 * Ne * (m₁₂ + m₂₁) = -1`, named.** The two-deme twin of
 `fstMigrationDriftEquilibrium_balancing_negative_migration_is_junk`, with the same divisor and
 the same collapse to no differentiation. Consumers must exclude it by hypothesis. -/

@@ -2623,6 +2623,16 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
 noncomputable def fstDriftMigrationManyDemes (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
 
+/-- **The many-deme island law, on the master's saturation kernel.**
+
+`1/(1 + x)` is `Core.fstFromFlow`, and the `x` here is the scaled migration rate alone --
+no deme correction, because at many demes `d/(d-1)` tends to one, and no mutation term.
+So this is `Core.fstIslandEquilibrium` at both of the limits it is built to take, and
+saying so puts it in the lattice rather than leaving a quotient that resembles the master's.
+`Core.fstIslandEquilibrium_manyDemes` is the limit itself. -/
+theorem fstDriftMigrationManyDemes_eq_fstFromFlow (p : EvolutionaryParameters) :
+    fstDriftMigrationManyDemes p = Descent.Core.fstFromFlow p.bigM := rfl
+
 /-- **One generation of the identity-by-descent balance under all three
 forces.**
 
