@@ -190,14 +190,112 @@ def classify(d, struct_names, def_names, translated):
         return "STRUCTURAL", f"builds a structure value ({ret})"
 
     if d["name"] in translated:
-        # wrapper: body is exactly one application of another definition
-        toks = body.split()
-        if toks and toks[0].split(".")[-1] in def_names and "(" not in body \
-                and all(t.isidentifier() or t.replace("₀", "").isidentifier()
-                        for t in toks[1:]):
-            return "WRAPPER", f"delegates to {toks[0]}"
+        head = delegation_head(body, def_names)
+        if head:
+            return "WRAPPER", f"delegates to {head}"
         return "NUMERIC", ""
     return "NOT-EXTRACTABLE", translated_reason(d)
+
+
+def delegation_head(body, def_names):
+    """The definition this body delegates to, or None.
+
+    A delegation is a body that is exactly one application of another corpus
+    definition to bare identifiers -- `neutralFixation x := identifiedWith x`.
+    Anything with a parenthesis or an operator is doing arithmetic of its own and
+    is not delegating.
+
+    Factored out of `classify` because the status resolver below needs the same
+    question answered for definitions that never translated: whether a name is a
+    wrapper is a fact about its source text, not about whether the translator
+    happened to reach it, and when the two tests were written separately they
+    disagreed for exactly the untranslated definitions.
+    """
+    toks = body.split()
+    if not toks or "(" in body:
+        return None
+    if toks[0].split(".")[-1] not in def_names:
+        return None
+    if not all(t.isidentifier() or t.replace("₀", "").isidentifier()
+               for t in toks[1:]):
+        return None
+    return toks[0]
+
+
+# A kernel that describes itself as a SHAPE is disclaiming empirical content, and
+# that disclaimer is the one status that must NOT flow downhill.
+SHAPE_DISCLAIMER = "NOT AN EMPIRICAL CLAIM"
+
+
+def resolve_inherited_status(blob):
+    """Give a wrapper the empirical status of the kernel it delegates to.
+
+    A wrapper states no formula of its own, so where its kernel carries a verdict
+    the wrapper is under that same verdict and repeating it in the docstring is
+    transcription. Following the delegation chain is how that gets recorded
+    without asking 1,449 docstrings to be retyped.
+
+    WHAT DOES NOT PROPAGATE, and why the guard is the point of this function.
+    Nearly every kernel in `Core/` is marked `NOT AN EMPIRICAL CLAIM -- this is a
+    SHAPE, not a quantity`, and those kernels' own docstrings say what that
+    implies: "What can be measured is a named quantity claiming this shape
+    computes it, and those live in the subsystem modules with their own status
+    lines and ledger rows."  The wrapper IS that named quantity.  Letting the
+    disclaimer flow into it would stamp a measurable biological claim as making
+    no claim -- and because `simcov/inventory.py` reads this field to decide what
+    is OWED a measurement, each one so stamped leaves the denominator.  Applied
+    without this guard the rule reclassifies 72 open measurement debts as
+    non-debts and raises the headline coverage number by discarding the
+    evidence, which is the precise failure the corpus is built to prevent.
+
+    So a shape disclaimer terminates the walk and yields nothing: a wrapper over
+    a shape still owes its own status line.  Only a kernel asserting something
+    about a population has a verdict there is any sense in inheriting.
+    """
+    D = blob["definitions"]
+    by_fq = {d["name"]: d for d in D}
+    by_short = collections.defaultdict(list)
+    for d in D:
+        by_short[d["short"]].append(d)
+    def_names = set(by_short)
+
+    def target(d):
+        head = delegation_head((d["body"] or "").strip(), def_names)
+        if not head:
+            return None
+        cands = by_short[head.split(".")[-1]]
+        # An ambiguous short name resolves only if the body wrote it out in full;
+        # guessing between two kernels would attach a verdict from the wrong one.
+        if len(cands) == 1:
+            return cands[0]["name"]
+        return next((c["name"] for c in cands if c["name"] == head), None)
+
+    edges = {}
+    for d in D:
+        t = target(d)
+        if t and t != d["name"]:
+            edges[d["name"]] = t
+
+    inherited = 0
+    for d in D:
+        if (d["empirical_status"] or "").strip():
+            continue
+        seen, cur = {d["name"]}, d["name"]
+        while cur in edges:
+            cur = edges[cur]
+            if cur in seen or cur not in by_fq:
+                break
+            seen.add(cur)
+            st = (by_fq[cur]["empirical_status"] or "").strip()
+            if not st:
+                continue
+            if st.startswith(SHAPE_DISCLAIMER):
+                break
+            d["empirical_status"] = st
+            d["empirical_status_inherited_from"] = cur
+            inherited += 1
+            break
+    return inherited, len(edges)
 
 
 def selfcheck_reason(err):
@@ -479,6 +577,7 @@ def main():
     root = PROOFS / "Descent"
     defs, thms, structs, failures = lean_parse.build(root)
     blob = lean_parse.to_json(defs, structs, failures, thms)
+    inherited, delegations = resolve_inherited_status(blob)
     (HERE / "defs.json").write_text(json.dumps(blob, indent=1, ensure_ascii=False))
 
     ctx = build_context(blob)
@@ -635,8 +734,13 @@ def main():
     (HERE / "classes.json").write_text(json.dumps(classes, indent=1, ensure_ascii=False))
 
     tally = collections.Counter(v["class"] for v in classes.values())
+    unmarked = sum(1 for d in D if not (d["empirical_status"] or "").strip())
     print(f"definitions parsed : {len(D)}")
     print(f"parse failures     : {len(failures)}")
+    print(f"delegating wrappers: {delegations}"
+          f" ({inherited} inherited a kernel's status; the rest delegate to a"
+          f" kernel that declares itself a shape, which does not propagate)")
+    print(f"status still unset : {unmarked}")
     print(f"executable forms   : {len(translated)}")
     for k, v in tally.most_common():
         print(f"  {k:<17}: {v}")
