@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Split
+import Descent.Coalescent.Extend
 import Descent.Coalescent.Mutation
 import Descent.Coalescent.Kernel
 import Mathlib.Tactic
