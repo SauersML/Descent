@@ -216,7 +216,12 @@ def selfcheck_reason(err):
         return f"self-check: arity/type mismatch ({err[:60]})"
     if err.startswith("value is not a real"):
         return f"self-check: {err} (vector- or function-valued)"
-    return f"self-check: never finite ({err[:60]})"
+    # 200, not 60.  At 60 the most common message in this file truncates to
+    # "mulVec: matrix row width 4 does not match vector" -- cutting off the
+    # length that the width failed to match, which is the entire content of the
+    # diagnostic.  A reason line that names the failure but withholds the number
+    # costs more than the characters it saves.
+    return f"self-check: never finite ({err[:200]})"
 
 
 def translated_reason(d):

@@ -1030,9 +1030,13 @@ theorem total_variance_decomposition_subsigma
     (hm : m ≤ mΩ)
     {L : Ω → ℝ}
     (hL : MemLp L 2 μ) :
-    Var[L; μ] = (∫ ω, conditionalVariance μ m L ω ∂μ) + Var[conditionalMean μ m L; μ] := by
-  simpa [add_comm] using
-    (ProbabilityTheory.integral_condVar_add_variance_condExp (μ := μ) (m := m) hm hL).symm
+    Var[L; μ] = (∫ ω, conditionalVariance μ m L ω ∂μ) + Var[conditionalMean μ m L; μ] :=
+  -- `conditionalVariance` and `conditionalMean` ARE `Var[L; μ | m]` and `μ[L|m]`, in that
+  -- order, so Mathlib's decomposition is this statement already.  It was written as
+  -- `simpa [add_comm] using ..`, which commuted the goal's sum and then asked the
+  -- unpermuted term to match it -- a rewrite that had nothing to repair and one that
+  -- `simp` could only undo by unfolding two plain `def`s it has no lemma for.
+  (ProbabilityTheory.integral_condVar_add_variance_condExp (μ := μ) (m := m) hm hL).symm
 
 theorem explainable_fraction_bound_of_conditional_noise_floor
     (hm : m ≤ mΩ)

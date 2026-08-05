@@ -1,7 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Tactic
@@ -39,7 +38,8 @@ is the same `3` that appears as the large-`t` asymptote of the transit-time tail
 
 ## Main results
 
-- `deathRate_eq_coalescentRate`: the ladder is the one the corpus already carries.
+- `one_div_deathRate_add_two` and `sum_one_div_deathRate_range`: the telescoping and its
+  exact partial sums, which every result below is a reading of.
 - `meanTransitTime_eq_two_sub`: K-G (5.7), `E(T_n) = 2 - 2/n`.
 - `meanTransitTime_lt_two`: the bound that is uniform in `n`.
 - `hasSum_one_div_deathRate_tail`: K-C p.239, `Σ_{r ≥ k} d_r⁻¹ = 2/(k-1)`.
@@ -66,13 +66,6 @@ given population's genealogy has ANY such ladder -- multiple-merger regimes do n
 `Descent.Blindness.MultipleMergerBlindness` records which statistics can tell. -/
 noncomputable def deathRate (k : ℕ) : ℝ := Descent.Core.pairCount k
 
-/-- **Cross-check: the ladder is the corpus's existing one.**  `SpectrumIdentifiability`
-already reasons about `k(k-1)/2` under the name `coalescentRate`, and every telescoping
-result proved there is reused below rather than reproved. -/
-theorem deathRate_eq_coalescentRate (k : ℕ) :
-    deathRate k = SpectrumIdentifiability.coalescentRate k := by
-  simp [deathRate, SpectrumIdentifiability.coalescentRate, Descent.Core.pairCount]
-
 @[simp] theorem deathRate_zero : deathRate 0 = 0 := by norm_num [deathRate,
       Descent.Core.pairCount]
 
@@ -97,16 +90,49 @@ theorem deathRate_pos {k : ℕ} (hk : 2 ≤ k) : 0 < deathRate k := by
   rw [show 2 + m = m + 2 from by ring, deathRate_succ_succ]
   positivity
 
+/-- Positivity in the form the reciprocal-sum results need it: indexed from the smallest
+informative sample, so no side condition has to be carried through a `Finset.range`. -/
+theorem deathRate_add_two_pos (k : ℕ) : 0 < deathRate (k + 2) := by
+  rw [deathRate_succ_succ]
+  positivity
+
 theorem deathRate_ne_zero {k : ℕ} (hk : 2 ≤ k) : deathRate k ≠ 0 :=
   ne_of_gt (deathRate_pos hk)
+
+/-- The reciprocal ladder telescopes, indexed from the smallest informative sample.
+
+This identity used to be imported from `Blindness.SpectrumIdentifiability`, which reasons
+about the same `k(k-1)/2` under the name `coalescentRate` -- so the 12,000-line derivation
+of the coalescent depended on an applied module about spectrum identifiability, and
+nothing in the applied layer depended on the coalescent.  The dependency is now the other
+way round, which is the only direction in which the derivation can be load-bearing. -/
+theorem one_div_deathRate_add_two (k : ℕ) :
+    1 / deathRate (k + 2) = 2 * (1 / ((k : ℝ) + 1) - 1 / ((k : ℝ) + 2)) := by
+  have h1 : ((k : ℝ) + 1) ≠ 0 := by positivity
+  have h2 : ((k : ℝ) + 2) ≠ 0 := by positivity
+  rw [deathRate_succ_succ]
+  field_simp
+  ring
+
+/-- Exact partial sums of the reciprocal ladder: `Σ_{r=2}^{n+1} d_r⁻¹ = 2 - 2/(n+1)`. -/
+theorem sum_one_div_deathRate_range (n : ℕ) :
+    ∑ k ∈ Finset.range n, 1 / deathRate (k + 2) = 2 - 2 / ((n : ℝ) + 1) := by
+  induction n with
+  | zero => norm_num
+  | succ n ih =>
+      have h1 : ((n : ℝ) + 1) ≠ 0 := by positivity
+      have h2 : ((n : ℝ) + 2) ≠ 0 := by positivity
+      rw [Finset.sum_range_succ, ih, one_div_deathRate_add_two]
+      push_cast
+      field_simp
+      ring
 
 /-- The reciprocal ladder telescopes.  This single identity is what makes the transit time
 finite, the tail mass summable, and the entrance boundary available. -/
 theorem one_div_deathRate_eq {r : ℕ} (hr : 2 ≤ r) :
     1 / deathRate r = 2 * (1 / ((r : ℝ) - 1) - 1 / (r : ℝ)) := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hr
-  rw [show 2 + k = k + 2 from by ring, deathRate_eq_coalescentRate,
-    SpectrumIdentifiability.one_div_coalescentRate_add_two]
+  rw [show 2 + k = k + 2 from by ring, one_div_deathRate_add_two]
   push_cast
   ring
 
@@ -131,8 +157,8 @@ noncomputable def meanTransitTime (n : ℕ) : ℝ :=
 theorem meanTransitTime_succ (n : ℕ) :
     meanTransitTime (n + 1) = 2 - 2 / ((n : ℝ) + 1) := by
   unfold meanTransitTime
-  simp only [Nat.add_sub_cancel, deathRate_eq_coalescentRate]
-  exact SpectrumIdentifiability.muntzPartialSum n
+  simp only [Nat.add_sub_cancel]
+  exact sum_one_div_deathRate_range n
 
 /-- **K-G (5.7): the mean transit time of the `n`-coalescent is `2 - 2/n`.**
 

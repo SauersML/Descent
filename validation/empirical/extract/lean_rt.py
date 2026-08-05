@@ -307,8 +307,12 @@ def mulVec(M, v):
     v = list(v)
     for r in M:
         if len(r) != len(v):
+            import traceback as _tb
+            _who = [f.name for f in _tb.extract_stack()[:-1]
+                    if f.name not in ("mulVec", "<module>")][-3:]
             raise ValueError(f"mulVec: matrix row width {len(r)} does not "
-                             f"match vector length {len(v)}")
+                             f"match vector length {len(v)} "
+                             f"[shape {len(M)}x{len(r)}, via {'<'.join(reversed(_who))}]")
     return VecFn(sum(a * b for a, b in zip(r, v)) for r in M)
 
 

@@ -198,7 +198,7 @@ with one additional coefficient.  The first fact is the Müntz obstruction's spe
 the second says finite-sample analyticity alone cannot restore identification. -/
 theorem kingmanSpectrum_identifiabilityBoundary :
     Summable (fun k : ℕ ↦
-      1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧
+      1 / Coalescent.deathRate (k + 2)) ∧
       ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
         ∃ direction : Fin (n + 1) → ℝ,
           direction ≠ 0 ∧ observation direction = 0 :=
@@ -2354,7 +2354,7 @@ structure DynamicsObstructions : Prop where
   Müntz obstruction, and every finite spectrum has an explicit rank null direction. -/
   kingmanSpectrumHasIdentifiabilityBoundary :
     Summable (fun k : ℕ ↦
-      1 / SpectrumIdentifiability.coalescentRate (k + 2)) ∧
+      1 / Coalescent.deathRate (k + 2)) ∧
       ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ),
         ∃ direction : Fin (n + 1) → ℝ,
           direction ≠ 0 ∧ observation direction = 0

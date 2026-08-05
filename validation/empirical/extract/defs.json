@@ -1,6 +1,6 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:4ee40ab94ec1818e1d28094c21cbec2b",
+ "source_digest": "sha256:21f4f92dbb1e1183603b99351d9584a8",
  "source_files": 220,
  "collisions": {},
  "theorems": [
@@ -15541,7 +15541,7 @@
    "name": "Descent.Coalescent.one_add_smul_mul",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 69,
+   "line": 80,
    "statement": "{Q : 𝔸} (hQ : Q * Q = -Q) (a b : ℝ) : (1 + a • Q) * (1 + b • Q) = 1 + (a + b - a * b) • Q",
    "mentions": []
   },
@@ -15549,7 +15549,7 @@
    "name": "Descent.Coalescent.one_add_smul_pow",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 81,
+   "line": 92,
    "statement": "{Q : 𝔸} (hQ : Q * Q = -Q) (a : ℝ) (N : ℕ) : (1 + a • Q) ^ N = 1 + (1 - (1 - a) ^ N) • Q",
    "mentions": []
   },
@@ -15557,7 +15557,7 @@
    "name": "Descent.Coalescent.dist_le_of_exp",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 93,
+   "line": 104,
    "statement": "{N : ℕ} (hN : 1 ≤ N) : |1 / (N : ℝ) - (1 - Real.exp (-(1 / (N : ℝ))))| ≤ (1 / (N : ℝ)) ^ 2",
    "mentions": []
   },
@@ -15565,8 +15565,24 @@
    "name": "Descent.Coalescent.tendsto_pairChain_pow",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 114,
+   "line": 125,
    "statement": "{Q : 𝔸} (hQ : Q * Q = -Q) (hP : ∀ N : ℕ, ‖(1 : 𝔸) + (1 / (N : ℝ)) • Q‖ ≤ 1) (hB : ∀ N : ℕ, ‖(1 : 𝔸) + (1 - Real.exp (-(1 / (N : ℝ)))) • Q‖ ≤ 1) : Tendsto (fun N : ℕ ↦ ((1 : 𝔸) + (1 / (N : ℝ)) • Q) ^ N) atTop (nhds (1 + (1 - Real.exp (-1)) • Q))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.dist_le_of_exp_rate",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairChainLimit.lean",
+   "line": 173,
+   "statement": "{c : ℝ} (hc : 0 ≤ c) {N : ℕ} (hN : 1 ≤ N) (hcN : c ≤ (N : ℝ)) : |c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ))))| ≤ c ^ 2 / (N : ℝ) ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Coalescent.tendsto_levelChain_pow",
+   "kind": "theorem",
+   "file": "Descent/Coalescent/PairChainLimit.lean",
+   "line": 197,
+   "statement": "{Q : 𝔸} (hQ : Q * Q = -Q) {c : ℝ} (hc : 0 ≤ c) (hcN : ∀ N : ℕ, 1 ≤ N → c ≤ (N : ℝ)) (hP : ∀ N : ℕ, ‖(1 : 𝔸) + (c / (N : ℝ)) • Q‖ ≤ 1) (hB : ∀ N : ℕ, ‖(1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q‖ ≤ 1) : Tendsto (fun N : ℕ ↦ ((1 : 𝔸) + (c / (N : ℝ)) • Q) ^ N) atTop (nhds (1 + (1 - Real.exp (-c)) • Q))",
    "mentions": []
   },
   {
@@ -16158,7 +16174,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 456,
+   "line": 465,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : (∑ nu ∈ Finset.Ico 1 lam, lam.choose nu) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -16166,7 +16182,7 @@
    "name": "Descent.Coalescent.two_mul_cutCount_add_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 474,
+   "line": 483,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : 2 * (2 ^ (lam - 1) - 1) + 2 = 2 ^ lam",
    "mentions": []
   },
@@ -16174,7 +16190,7 @@
    "name": "Descent.Coalescent.sum_choose_interior_eq_two_mul_cutCount",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 488,
+   "line": 497,
    "statement": "{lam : ℕ} (h : 1 ≤ lam) : ∑ nu ∈ Finset.Ico 1 lam, lam.choose nu = 2 * (2 ^ (lam - 1) - 1)",
    "mentions": []
   },
@@ -16182,7 +16198,7 @@
    "name": "Descent.Coalescent.cutCount_two",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 495,
+   "line": 504,
    "statement": ": 2 ^ (2 - 1) - 1 = 1",
    "mentions": []
   },
@@ -16190,7 +16206,7 @@
    "name": "Descent.Coalescent.cutCount_three",
    "kind": "theorem",
    "file": "Descent/Coalescent/Program.lean",
-   "line": 498,
+   "line": 507,
    "statement": ": 2 ^ (3 - 1) - 1 = 3",
    "mentions": []
   },
@@ -20277,10 +20293,8 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 461,
-   "statement": "{H : Type*} [TopologicalSpace H] (Phi : H → ℝ) (hPhi : Continuous Phi) (flow : ℝ → H) (limit : H) (hinv : ∀ t, Phi (flow t) = Phi (flow 0)) (hconv : Filter.Tendsto flow Filter.atTop (nhds limit)) : Phi (flow 0) = Phi limit",
-   "mentions": [
-    "Phi"
-   ]
+   "statement": "{H : Type*} [TopologicalSpace H] (invariant : H → ℝ) (hPhi : Continuous invariant) (flow : ℝ → H) (limit : H) (hinv : ∀ t, invariant (flow t) = invariant (flow 0)) (hconv : Filter.Tendsto flow Filter.atTop (nhds limit)) : invariant (flow 0) = invariant limit",
+   "mentions": []
   },
   {
    "name": "Descent.Conditionals.errorEnergy_at_reference_point",
@@ -20315,7 +20329,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 574,
-   "statement": "(v : NNReal) (hv : v ≠ 0) (x : ℝ) : cdf (gaussianReal 0 v) x = Phi (x / Real.sqrt (v : ℝ))",
+   "statement": "(v : NNReal) (hv : v ≠ 0) (x : ℝ) : cdf (gaussianReal 0 v) x = Foundations.Phi (x / Real.sqrt (v : ℝ))",
    "mentions": [
     "Phi"
    ]
@@ -20325,7 +20339,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 608,
-   "statement": "(α β : ℝ) : ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α",
+   "statement": "(α β : ℝ) : ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1) = cdf (gaussianReal 0 ⟨1 + β ^ 2, by positivity⟩) α",
    "mentions": [
     "Phi"
    ]
@@ -20335,7 +20349,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 686,
-   "statement": "(α β : ℝ) : ∫ z, Phi (α + β * z) ∂(gaussianReal 0 1) = Phi (α / Real.sqrt (1 + β ^ 2))",
+   "statement": "(α β : ℝ) : ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1) = Foundations.Phi (α / Real.sqrt (1 + β ^ 2))",
    "mentions": [
     "Phi"
    ]
@@ -20345,7 +20359,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 704,
-   "statement": "(lam t a₀ b₀ x sigma : ℝ) : ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1) = Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) / Real.sqrt (1 + a₀ ^ 2 * sigma ^ 2))",
+   "statement": "(lam t a₀ b₀ x sigma : ℝ) : ∫ z, Foundations.Phi (a₀ * (Real.exp (-(lam * t)) * x + sigma * z) + b₀) ∂(gaussianReal 0 1) = Foundations.Phi ((a₀ * Real.exp (-(lam * t)) * x + b₀) / Real.sqrt (1 + a₀ ^ 2 * sigma ^ 2))",
    "mentions": [
     "Phi"
    ]
@@ -20355,7 +20369,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 746,
-   "statement": "(lam t a₀ b₀ σ : ℝ) : ∃ a' b' : ℝ, ∀ x, ∫ z, Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1) = Phi (a' * x + b')",
+   "statement": "(lam t a₀ b₀ σ : ℝ) : ∃ a' b' : ℝ, ∀ x, ∫ z, Foundations.Phi (a₀ * (Real.exp (-(lam * t)) * x + σ * z) + b₀) ∂(gaussianReal 0 1) = Foundations.Phi (a' * x + b')",
    "mentions": [
     "Phi"
    ]
@@ -20365,7 +20379,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 764,
-   "statement": "(p q a₀ b₀ σ : ℝ) : ∃ a' b' : ℝ, ∀ x, ∫ z, (p + q * Phi (a₀ * (x + σ * z) + b₀)) ∂(gaussianReal 0 1) = p + q * Phi (a' * x + b')",
+   "statement": "(p q a₀ b₀ σ : ℝ) : ∃ a' b' : ℝ, ∀ x, ∫ z, (p + q * Foundations.Phi (a₀ * (x + σ * z) + b₀)) ∂(gaussianReal 0 1) = p + q * Foundations.Phi (a' * x + b')",
    "mentions": [
     "Phi"
    ]
@@ -20375,7 +20389,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 793,
-   "statement": "(p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) : StrictMono (fun u ↦ p + q * Phi (α * u + β))",
+   "statement": "(p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) : StrictMono (fun u ↦ p + q * Foundations.Phi (α * u + β))",
    "mentions": [
     "Phi"
    ]
@@ -20385,7 +20399,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 803,
-   "statement": "(p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q) (hpq : p + q ≤ 1) (u : ℝ) : 0 < p + q * Phi (α * u + β) ∧ p + q * Phi (α * u + β) < 1",
+   "statement": "(p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q) (hpq : p + q ≤ 1) (u : ℝ) : 0 < p + q * Foundations.Phi (α * u + β) ∧ p + q * Foundations.Phi (α * u + β) < 1",
    "mentions": [
     "Phi"
    ]
@@ -20641,7 +20655,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1581,
-   "statement": "(p q α β : ℝ) (hα : 0 < α) : Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atBot (𝓝 p)",
+   "statement": "(p q α β : ℝ) (hα : 0 < α) : Filter.Tendsto (fun u ↦ p + q * Foundations.Phi (α * u + β)) Filter.atBot (𝓝 p)",
    "mentions": [
     "Phi"
    ]
@@ -20651,7 +20665,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1597,
-   "statement": "(p q α β : ℝ) (hα : 0 < α) : Filter.Tendsto (fun u ↦ p + q * Phi (α * u + β)) Filter.atTop (𝓝 (p + q))",
+   "statement": "(p q α β : ℝ) (hα : 0 < α) : Filter.Tendsto (fun u ↦ p + q * Foundations.Phi (α * u + β)) Filter.atTop (𝓝 (p + q))",
    "mentions": [
     "Phi"
    ]
@@ -20661,7 +20675,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1613,
-   "statement": "(p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) : p = p'",
+   "statement": "(p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) : p = p'",
    "mentions": [
     "Phi"
    ]
@@ -20671,7 +20685,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1624,
-   "statement": "(p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) : q = q'",
+   "statement": "(p q α β p' q' α' β' : ℝ) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) : q = q'",
    "mentions": [
     "Phi"
    ]
@@ -20681,7 +20695,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1638,
-   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) (u : ℝ) : α * u + β = α' * u + β'",
+   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) (u : ℝ) : α * u + β = α' * u + β'",
    "mentions": [
     "Phi"
    ]
@@ -20691,7 +20705,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1651,
-   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) : α = α'",
+   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) : α = α'",
    "mentions": [
     "Phi"
    ]
@@ -20701,7 +20715,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 1663,
-   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Phi (α * u + β) = p' + q' * Phi (α' * u + β')) : β = β'",
+   "statement": "(p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α') (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) : β = β'",
    "mentions": [
     "Phi"
    ]
@@ -20855,7 +20869,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 2160,
-   "statement": "(m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) : ((gaussianReal m v) (Set.Iic x)).toReal = Phi ((x - m) / Real.sqrt (v : ℝ))",
+   "statement": "(m : ℝ) (v : NNReal) (hv : v ≠ 0) (x : ℝ) : ((gaussianReal m v) (Set.Iic x)).toReal = Foundations.Phi ((x - m) / Real.sqrt (v : ℝ))",
    "mentions": [
     "Phi"
    ]
@@ -20865,7 +20879,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 2194,
-   "statement": "(ν : Measure ℝ) [IsFiniteMeasure ν] (hmass : 0 < (ν Set.univ).toReal) (hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t = charFun ν (t / a) * Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) : ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Phi (α * u + β)",
+   "statement": "(ν : Measure ℝ) [IsFiniteMeasure ν] (hmass : 0 < (ν Set.univ).toReal) (hself : ∀ s : ℝ, 0 < s → ∃ a b : ℝ, 0 < a ∧ ∀ t : ℝ, Complex.exp (-(((s * t) ^ 2 : ℝ) : ℂ) / 2) * charFun ν t = charFun ν (t / a) * Complex.exp (((-(b * t / a) : ℝ) : ℂ) * Complex.I)) : ∃ q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u : ℝ, (ν (Set.Iic u)).toReal = q * Foundations.Phi (α * u + β)",
    "mentions": [
     "Phi"
    ]
@@ -20875,7 +20889,7 @@
    "kind": "theorem",
    "file": "Descent/Conditionals/DriftingConditional.lean",
    "line": 2249,
-   "statement": "(L : ℝ → ℝ) (hmono : StrictMono L) (hbdd : ∀ u, 0 < L u ∧ L u < 1) (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ, ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) : ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Phi (α * u + β)",
+   "statement": "(L : ℝ → ℝ) (hmono : StrictMono L) (hbdd : ∀ u, 0 < L u ∧ L u < 1) (hinv : ∀ a b σ : ℝ, 0 < a → 0 < σ → ∃ a' b' : ℝ, ∀ x, ∫ z, L (a * (x + σ * z) + b) ∂(gaussianReal 0 1) = L (a' * x + b')) : ∃ p q α β : ℝ, 0 < q ∧ 0 < α ∧ ∀ u, L u = p + q * Foundations.Phi (α * u + β)",
    "mentions": [
     "Phi"
    ]
@@ -29060,7 +29074,7 @@
    "name": "Descent.Foundations.explainable_fraction_bound_of_conditional_noise_floor",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1037,
+   "line": 1041,
    "statement": "(hm : m ≤ mΩ) {L noiseFloor : Ω → ℝ} (hL : MemLp L 2 μ) (hVar_pos : 0 < Var[L; μ]) (hNoise_int : Integrable noiseFloor μ) (hNoise_nonneg : 0 ≤ μ[noiseFloor]) (hNoise_le : noiseFloor ≤ᵐ[μ] conditionalVariance μ m L) : explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ]) ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + μ[noiseFloor])",
    "mentions": [
     "conditionalMean",
@@ -29072,7 +29086,7 @@
    "name": "Descent.Foundations.explainable_fraction_bound_of_conditional_gaussian_floor",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1063,
+   "line": 1067,
    "statement": "(hm : m ≤ mΩ) {L sigma4 : Ω → ℝ} (hL : MemLp L 2 μ) (hVar_pos : 0 < Var[L; μ]) (hsigma4_int : Integrable sigma4 μ) (hsigma4_nonneg : 0 ≤ μ[sigma4]) (hGaussianFloor : (fun ω ↦ (2 : ℝ) * sigma4 ω) ≤ᵐ[μ] conditionalVariance μ m L) : explainableFraction (Var[conditionalMean μ m L; μ]) (Var[L; μ]) ≤ Var[conditionalMean μ m L; μ] / (Var[conditionalMean μ m L; μ] + 2 * μ[sigma4])",
    "mentions": [
     "conditionalMean",
@@ -29084,7 +29098,7 @@
    "name": "Descent.Foundations.mse_from_variance_ratio_corr_bias",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1090,
+   "line": 1094,
    "statement": "(E : ExpFunctional Ω) (Y S : Ω → ℝ) (ρ lam : ℝ) (hlam : variance E S = variance E Y * lam) (hρ : covariance E Y S = ρ * variance E Y * Real.sqrt lam) : expMse E Y S = variance E Y * (1 + lam - 2 * ρ * Real.sqrt lam) + (bias E Y S) ^ 2",
    "mentions": [
     "S",
@@ -29098,7 +29112,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.recallRate_at_zero_denominator_is_junk",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1144,
+   "line": 1148,
    "statement": "(c : ConfusionMatrix) (hzero : (c.tp + c.fn) = 0) : recallRate c = 0",
    "mentions": [
     "recallRate"
@@ -29108,7 +29122,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.fpr_at_zero_denominator_is_junk",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1155,
+   "line": 1159,
    "statement": "(c : ConfusionMatrix) (hzero : (c.fp + c.tn) = 0) : fpr c = 0",
    "mentions": [
     "fpr"
@@ -29118,7 +29132,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.precision_at_zero_denominator_is_junk",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1166,
+   "line": 1170,
    "statement": "(c : ConfusionMatrix) (hzero : (c.tp + c.fp) = 0) : precision c = 0",
    "mentions": [
     "precision"
@@ -29128,7 +29142,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.one_sub_prevalence",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1173,
+   "line": 1177,
    "statement": "(c : ConfusionMatrix) : 1 - prevalence c = c.fp + c.tn",
    "mentions": [
     "prevalence"
@@ -29138,7 +29152,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.fpr_mul_actualNegative",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1179,
+   "line": 1183,
    "statement": "(c : ConfusionMatrix) (h : c.fp + c.tn ≠ 0) : fpr c * (c.fp + c.tn) = c.fp",
    "mentions": [
     "fpr"
@@ -29148,7 +29162,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.precision_mul_predictedPositive",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1185,
+   "line": 1189,
    "statement": "(c : ConfusionMatrix) (h : c.tp + c.fp ≠ 0) : precision c * (c.tp + c.fp) = c.tp",
    "mentions": [
     "precision"
@@ -29158,7 +29172,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.prevalence_mul_recall",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1190,
+   "line": 1194,
    "statement": "(c : ConfusionMatrix) : prevalence c * recallRate c = c.tp",
    "mentions": [
     "prevalence",
@@ -29169,7 +29183,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.one_sub_prevalence_mul_fpr",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1199,
+   "line": 1203,
    "statement": "(c : ConfusionMatrix) : (1 - prevalence c) * fpr c = c.fp",
    "mentions": [
     "fpr",
@@ -29180,7 +29194,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.precision_eq_prevalence_recall_fpr",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1209,
+   "line": 1213,
    "statement": "(c : ConfusionMatrix) : precision c = (prevalence c * recallRate c) / (prevalence c * recallRate c + (1 - prevalence c) * fpr c)",
    "mentions": [
     "fpr",
@@ -29193,7 +29207,7 @@
    "name": "Descent.Foundations.ConfusionMatrix.constant_precision_of_fpr_choice",
    "kind": "theorem",
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1217,
+   "line": 1221,
    "statement": "{π p r : ℝ} (hnum : π * r ≠ 0) (hpi : 1 - π ≠ 0) (hp : p ≠ 0) : (let f := π * r * (1 - p) / ((1 - π) * p); (π * r) / (π * r + (1 - π) * f) = p)",
    "mentions": []
   },
@@ -106663,7 +106677,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": " Phi (a * x + b)",
+   "body": " Foundations.Phi (a * x + b)",
    "docstring": "The probit response curve: `Φ (a x + b)` in the covariate `x`.",
    "empirical_status": "",
    "namespace": "Descent.Conditionals",
@@ -125136,7 +125150,6 @@
      "Descent.windowVariance_zero_window": [],
      "Descent.Phi_nonneg": [],
      "Descent.Phi_le_one": [],
-     "Descent.Conditionals.continuousInvariant_eq_at_limit": [],
      "Descent.Conditionals.cdf_gaussianReal_zero_mean": [],
      "Descent.Conditionals.gaussianAverage_eq_cdf_sum": [],
      "Descent.Conditionals.gaussianAverage_probit": [],
@@ -125188,7 +125201,6 @@
     "Descent.Conditionals.affineProbit_strictMono",
     "Descent.Conditionals.cdf_gaussianReal_eq_Phi",
     "Descent.Conditionals.cdf_gaussianReal_zero_mean",
-    "Descent.Conditionals.continuousInvariant_eq_at_limit",
     "Descent.Conditionals.gaussianAverage_eq_cdf_sum",
     "Descent.Conditionals.gaussianAverage_probit",
     "Descent.Conditionals.liability_cdf_eq_affineProbit_of_charFun_selfSimilar",
@@ -127883,7 +127895,7 @@
    "kind": "def",
    "noncomputable": true,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1119,
+   "line": 1123,
    "signature": ": ConfusionMatrix where tp",
    "args": [],
    "ret_type": "ConfusionMatrix where tp",
@@ -127961,7 +127973,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1138,
+   "line": 1142,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -128057,7 +128069,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1140,
+   "line": 1144,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -128103,7 +128115,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1151,
+   "line": 1155,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -128160,7 +128172,7 @@
    "kind": "def",
    "noncomputable": false,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1162,
+   "line": 1166,
    "signature": "(c : ConfusionMatrix) : ℝ",
    "args": [
     {
@@ -214641,7 +214653,7 @@
    "kind": "structure",
    "noncomputable": false,
    "file": "Descent/Foundations/TransportIdentities.lean",
-   "line": 1105,
+   "line": 1109,
    "signature": "where tp : ℝ fp : ℝ tn : ℝ fn : ℝ tp_nonneg : 0 ≤ tp fp_nonneg : 0 ≤ fp tn_nonneg : 0 ≤ tn fn_nonneg : 0 ≤ fn mass_one : tp + fp + tn + fn = 1",
    "args": [],
    "ret_type": "ℝ fp : ℝ tn : ℝ fn : ℝ tp_nonneg : 0 ≤ tp fp_nonneg : 0 ≤ fp tn_nonneg : 0 ≤ tn fn_nonneg : 0 ≤ fn mass_one : tp + fp + tn + fn = 1",

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.MultipleMergerBlindness
+import Descent.Coalescent.Rates
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
@@ -84,18 +85,25 @@ open Filter
 
 /-! ## The Kingman rate ladder and its reciprocal sum -/
 
-/-- Kingman pair-coalescence rate for `m` lineages, `m (m - 1) / 2`.
+/-! The ladder itself -- `d_m = m(m-1)/2`, its telescoping reciprocal and the exact
+partial sums -- is `Descent.Coalescent.Rates`, imported above.  It used to be defined
+HERE, under the name `coalescentRate`, with `Coalescent.Rates` importing this module to
+get it: the 12,000-line derivation of the coalescent depended on a module about spectrum
+identifiability, and nothing in the applied layer depended on the coalescent at all.
+
+The empirical record for the ladder does not move with the arithmetic, because it is a
+statement about THIS module's use of it.
 
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_bulk9.py`,
     `test_coalescent_rate_by_ratio`). Measured as a RATIO of waiting times,
     which no time-unit convention can enter:
 
-      ratio        this def   measured             sems
-      T(2)/T(3)     3.00000   2.96490±0.02614      1.34
-      T(2)/T(4)     6.00000   5.92983±0.04946      1.42
-      T(2)/T(6)    15.00000  14.87823±0.11851      1.03
-      T(2)/T(8)    28.00000  27.78241±0.21343      1.02
+      ratio        the ladder  measured             sems
+      T(2)/T(3)      3.00000   2.96490±0.02614      1.34
+      T(2)/T(4)      6.00000   5.92983±0.04946      1.42
+      T(2)/T(6)     15.00000  14.87823±0.11851      1.03
+      T(2)/T(8)     28.00000  27.78241±0.21343      1.02
 
     30000 independent genealogies per lineage count, first-coalescence time
     only. The absolute value of `T(2)` against `Ne` generations is the positive
@@ -113,78 +121,34 @@ open Filter
     What is validated is the RATE LADDER, against genealogies simulated under the
     Kingman model. Whether a given real population's genealogy is Kingman at all is a
     different question, and it is the one the identifiability results below leave open. -/
-noncomputable def coalescentRate (m : ℕ) : ℝ :=
-  Descent.Core.pairCount m
-
-@[simp] theorem coalescentRate_two : coalescentRate 2 = 1 := by
-  norm_num [coalescentRate,
-      Descent.Core.pairCount]
-
-@[simp] theorem coalescentRate_three : coalescentRate 3 = 3 := by
-  norm_num [coalescentRate,
-      Descent.Core.pairCount]
-
-/-- The rate ladder, indexed from the smallest informative sample. -/
-theorem coalescentRate_add_two (k : ℕ) :
-    coalescentRate (k + 2) = ((k : ℝ) + 2) * ((k : ℝ) + 1) / 2 := by
-  unfold coalescentRate Descent.Core.pairCount
-  push_cast
-  ring
-
-theorem coalescentRate_add_two_pos (k : ℕ) : 0 < coalescentRate (k + 2) := by
-  rw [coalescentRate_add_two]
-  positivity
-
-/-- The reciprocal rate telescopes.  This is the whole obstruction: the Müntz sum for the
-Kingman ladder is a telescoping series, hence finite. -/
-theorem one_div_coalescentRate_add_two (k : ℕ) :
-    1 / coalescentRate (k + 2) = 2 * (1 / ((k : ℝ) + 1) - 1 / ((k : ℝ) + 2)) := by
-  have h1 : ((k : ℝ) + 1) ≠ 0 := by positivity
-  have h2 : ((k : ℝ) + 2) ≠ 0 := by positivity
-  rw [coalescentRate_add_two]
-  field_simp
-  ring
-
-/-- Exact partial sums of the Müntz series for the Kingman ladder. -/
-theorem muntzPartialSum (n : ℕ) :
-    ∑ k ∈ Finset.range n, 1 / coalescentRate (k + 2) = 2 - 2 / ((n : ℝ) + 1) := by
-  induction n with
-  | zero => norm_num
-  | succ n ih =>
-      have h1 : ((n : ℝ) + 1) ≠ 0 := by positivity
-      have h2 : ((n : ℝ) + 2) ≠ 0 := by positivity
-      rw [Finset.sum_range_succ, ih, one_div_coalescentRate_add_two]
-      push_cast
-      field_simp
-      ring
 
 theorem muntzPartialSum_lt_two (n : ℕ) :
-    ∑ k ∈ Finset.range n, 1 / coalescentRate (k + 2) < 2 := by
-  rw [muntzPartialSum]
+    ∑ k ∈ Finset.range n, 1 / Coalescent.deathRate (k + 2) < 2 := by
+  rw [Coalescent.sum_one_div_deathRate_range]
   have : 0 < 2 / ((n : ℝ) + 1) := by positivity
   linarith
 
 /-- **Exact Kingman Müntz mass.**  The reciprocal rate ladder does not merely converge: its
 total mass is exactly two. -/
 theorem hasSum_one_div_coalescentRate :
-    HasSum (fun k : ℕ ↦ 1 / coalescentRate (k + 2)) 2 := by
+    HasSum (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) 2 := by
   rw [hasSum_iff_tendsto_nat_of_nonneg
-    (fun k ↦ one_div_nonneg.mpr (coalescentRate_add_two_pos k).le)]
+    (fun k ↦ one_div_nonneg.mpr (Coalescent.deathRate_add_two_pos k).le)]
   have hzero : Tendsto (fun n : ℕ ↦ 2 / ((n : ℝ) + 1)) atTop (nhds 0) := by
     simpa [div_eq_mul_inv] using
       tendsto_one_div_add_atTop_nhds_zero_nat.const_mul 2
-  simpa only [muntzPartialSum, sub_zero] using tendsto_const_nhds.sub hzero
+  simpa only [Coalescent.sum_one_div_deathRate_range, sub_zero] using tendsto_const_nhds.sub hzero
 
 /-- **The Müntz criterion fails for Kingman rates.**  The reciprocal rate sum converges, so the
 exponential family the spectrum tests is not dense, and a nonzero function orthogonal to all of
 it exists on any interval bounded away from zero. -/
 theorem summable_one_div_coalescentRate :
-    Summable fun k : ℕ ↦ 1 / coalescentRate (k + 2) :=
+    Summable fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2) :=
   hasSum_one_div_coalescentRate.summable
 
 /-- Exact value of the Kingman reciprocal-rate series. -/
 theorem tsum_one_div_coalescentRate :
-    ∑' k : ℕ, 1 / coalescentRate (k + 2) = 2 :=
+    ∑' k : ℕ, 1 / Coalescent.deathRate (k + 2) = 2 :=
   hasSum_one_div_coalescentRate.tsum_eq
 
 /-- The contrast that makes the criterion a criterion rather than an accident of this proof: a
@@ -443,17 +407,17 @@ theorem twoPoint_risk_lower_bound_sq {ι Θ : Type*} [Fintype ι]
 /-- Squared spectral energy an epoch-localised perturbation can still deposit, when it is
 supported after cumulative coalescent time `τ`. -/
 noncomputable def spectrumAttenuation (n : ℕ) (τ : ℝ) : ℝ :=
-  ∑ k ∈ Finset.range n, Real.exp (-(2 * coalescentRate (k + 2) * τ))
+  ∑ k ∈ Finset.range n, Real.exp (-(2 * Coalescent.deathRate (k + 2) * τ))
 
 /-- The Kingman ladder outruns an arithmetic progression of step two. -/
 theorem two_mul_add_one_le_coalescentRate (k : ℕ) :
-    2 * (k : ℝ) + 1 ≤ coalescentRate (k + 2) := by
+    2 * (k : ℝ) + 1 ≤ Coalescent.deathRate (k + 2) := by
   have h : (k : ℝ) ≤ (k : ℝ) ^ 2 := by
     rcases Nat.eq_zero_or_pos k with rfl | hk
     · norm_num
     · have h1 : (1 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
       nlinarith
-  rw [coalescentRate_add_two]
+  rw [Coalescent.deathRate_succ_succ]
   nlinarith
 
 /-- **Ancient perturbations are attenuated at least geometrically.**  Every rung past the first
