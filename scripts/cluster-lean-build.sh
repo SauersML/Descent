@@ -3,7 +3,7 @@
 #
 # Run this from the relay, never on this laptop:
 #
-#   /Users/user/msi-node/msi 'bash /projects/standard/hsiehph/sauer354/gnomon/scripts/cluster-lean-build.sh Descent.ProjectionShiftBounds Descent.MetricSpecificPortability'
+#   /Users/user/msi-node/msi 'bash /projects/standard/hsiehph/sauer354/descent/scripts/cluster-lean-build.sh Descent.ProjectionShiftBounds Descent.MetricSpecificPortability'
 #
 # with no arguments it builds the whole Descent target.
 #
@@ -300,7 +300,7 @@ echo "GUARD_PY=$GUARD_PY"
 # build of it reports the state of that tree rather than the state of the
 # corpus. Point DESCENT_REPO at a clean clone at a named revision when you want
 # a number anyone can trust, and record the revision beside the number.
-REPO=${DESCENT_REPO:-$ROOT/gnomon}
+REPO=${DESCENT_REPO:-$ROOT/descent}
 TARGETS=("$@")
 if [ ${#TARGETS[@]} -eq 0 ]; then TARGETS=(Descent); fi
 
