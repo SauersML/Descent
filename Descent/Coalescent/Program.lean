@@ -116,8 +116,15 @@ revision:
 
 * **de Finetti / exchangeable measures**: absent.  No `deFinetti`, `DeFinetti` or
   `Exchangeable` anywhere in Mathlib.  Item 3's converse has no foundation to sit on.
-* **Reverse martingale convergence**: absent.  `Mathlib/Probability/Martingale/` has the
-  forward theory only.  This is what K-C's Theorem 2 proof needs.
+* **Reverse martingale convergence**: absent, and it is worth naming the missing theorem
+  exactly rather than the missing area.  `Probability/Martingale/Convergence.lean` HAS
+  Lévy's UPWARD theorem -- `Integrable.tendsto_ae_condExp`, `E[g | 𝓕ₙ] → E[g | 𝓕_∞]` along an
+  INCREASING filtration -- together with the upcrossing estimates and
+  `Submartingale.ae_tendsto_limitProcess` behind it.  What is absent is Lévy's DOWNWARD
+  theorem: convergence of `E[g | 𝓖ₙ]` along a DECREASING filtration to `E[g | ⋂ₙ 𝓖ₙ]`.  That
+  is precisely the statement K-C's Theorem 2 uses (he cites Doob VII.4.25), and it is the
+  single Mathlib lemma that would unblock the paintbox representation.  A reader wanting to
+  finish item 3 should start there, not with de Finetti.
 * **Kolmogorov extension, general form**: absent.  `ProjectiveFamilyContent` and
   `ClosedCompactCylinders` exist and name it as their goal, but the existence theorem for a
   general consistent family is not there.  `IsProjectiveLimit.unique` IS, which is what
