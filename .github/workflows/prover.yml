@@ -156,14 +156,110 @@ jobs:
         # whenever someone last refreshed a cache.
         run: python3 proofs/validation/empirical/extract/emit.py
 
+      # The identity gate's calibration runs BEFORE the battery, for the same
+      # reason the laundering calibration runs before check.py. The identity
+      # gate's finding is that a simulation MATCH can be an algebraic
+      # tautology -- the oracle estimating its truth with an estimator the
+      # definition reduces to, so the residual is zero for every seed. A
+      # detector for that is worthless in both directions until both are
+      # asserted: the real bodies must be reported as identities, and a body
+      # that is genuinely a different function of the same inputs (a squared
+      # F_ST, a wrong constant factor) must NOT be. The bodies it tests are
+      # STUBS written in the test file, so the calibration is about the gate's
+      # logic and not about the corpus; it must run after emit.py only because
+      # importing run.py pulls the extracted table in. Well under a second.
+      - name: Calibrate the identity gate
+        working-directory: proofs/validation/empirical/differential
+        run: python3 test_identity_gate.py
+
+      # Both directions, exactly like the laundering calibration above and for
+      # the same reason: the round-trip checks exist to catch a definition
+      # written the wrong way round, and a detector that reports nothing is
+      # indistinguishable from a clean corpus. This asserts that the correct
+      # definition is clean AND that four planted wrong-direction definitions
+      # are each reported as a verdict regression. The corpus carried exactly
+      # that defect -- amCorrectedPortability multiplied by the artifact
+      # instead of its reciprocal -- until cd95052a.
+      #
+      # After the extraction step because it imports run.py, which loads the
+      # definition table at import.
+      - name: Calibrate the round-trip direction checks
+        working-directory: proofs/validation/empirical/differential
+        run: python3 test_roundtrip.py
+
+      # Hand-verified ground truth for the parser and translator, and the only
+      # thing that would have caught the extraction tier going silent: while
+      # `extract/` resolved its corpus root one directory too high, `emit.py`
+      # parsed zero definitions and exited 0, and the battery below compared an
+      # empty table against its independent reference without objecting.
+      #
+      # It was excluded because it pinned absolute LINE NUMBERS ("neiFst line:
+      # got 46, want 42") and so failed for reasons unrelated to what it tests.
+      # It no longer does: line attribution is checked against the source, and
+      # an empty table is reported as an extraction failure rather than raising
+      # KeyError on the first lookup. Deterministic, dependency-free, ~2s.
+      - name: Parser and translator ground truth
+        working-directory: proofs/validation/empirical/extract
+        run: python3 test_parser.py
+
       - name: Differential battery
         # 67 checks comparing each transcribed Lean body against an
         # independently written reference, plus a totality audit over ~160k
         # points. Exact arithmetic on a fixed grid, so the verdict is
         # reproducible. It also gates the EXPECTED disagreements: a check
         # pinned as model-differing that starts agreeing is a regression.
+        #
+        # Now also carries the identity gate and the coalescent scaling
+        # checks. The identity checks pin three definitions whose banked
+        # simulation MATCH was a tautology, so that nobody re-banks them; the
+        # scaling checks are dimensional homogeneity in the only form that
+        # survives this corpus's conventions, since term-by-term homogeneity
+        # flags every discrete per-generation recurrence as a false positive.
         working-directory: proofs/validation/empirical/differential
         run: python3 run.py
+
+      # The metamorphic calibration runs BEFORE the metamorphic gate, for the
+      # third time in this file and for the same reason: a detector's silence
+      # is not evidence until both directions are asserted. Six planted defects
+      # -- an allele-relabelling asymmetry, a wrong scaling exponent, an
+      # argument asymmetry, a broken coalescent rescaling, an order dependence
+      # and a lost normalisation -- must each be caught, three clean bodies
+      # must produce nothing, and each plant must be caught by the relation
+      # that names it and NOT by the others, so the gate can localise rather
+      # than merely alarm. Stub bodies only: no Lean, no generated table.
+      - name: Calibrate the metamorphic gate
+        run: python3 proofs/validation/empirical/metamorphic/test_metamorphic.py
+
+      # Metamorphic relations: transformations of the INPUT whose effect on the
+      # OUTPUT is known exactly. This qualifies as a required check on the same
+      # grounds as the differential battery -- the inputs are literals in the
+      # table, the transformation is exact and the expected relation is an
+      # identity, so re-running cannot change the verdict. There is no sampling
+      # and no oracle, which is the point: a violated metamorphic relation
+      # admits no convention argument. If relabelling which allele is called
+      # reference moved an F_ST, that would be a defect under every convention.
+      #
+      # It also gates COVERAGE. Every extractable scalar definition in a swept
+      # module must declare its relations or declare, with a reason, that none
+      # applies; a new definition landing in a swept module with neither fails
+      # here. And like the differential battery it gates its EXPECTED
+      # violations: a relation pinned as deliberately unsatisfied that starts
+      # holding is a regression too.
+      - name: Metamorphic relation gate
+        run: python3 proofs/validation/empirical/metamorphic/run.py
+
+      # The scoring kernel's arithmetic is part of the specification: per-column
+      # f32 accumulation in variant order, flushed to an f64 master every 256
+      # variants. That is what makes the score's error independent of the
+      # variant count (measured flat at ~1e-7 cohort SD from 1e4 to 1e6
+      # variants; removing only the flush makes it grow to 1.2e-5 and depend on
+      # variant order). A single build flag dissolves it with no source diff and
+      # no test failure on small inputs, so the flags are guarded directly. The
+      # emitted aarch64 assembly and LLVM IR were read by hand at 0449db90 and
+      # are clean -- no fast-math, no reassociation, no cross-lane reduction --
+      # and that reading is the baseline this step protects.
+      - name: Build-configuration guard (FP semantics)
+        run: python3 proofs/validation/empirical/metamorphic/build_flags.py
 
       # WHAT IS NOT WIRED UP, and why. The steps above are all of
       # proofs/validation/code/ plus the subset of proofs/validation/empirical/
@@ -184,6 +280,27 @@ jobs:
       #     empirical/). Installable,
       #     but check_ranges prints its findings and exits 0 whatever it finds,
       #     so as a gate it would catch nothing but its own crashes.
+      #     empirical/smt/ is in this bucket by dependency only, and is
+      #     deliberately built to the opposite standard: run_statements.py
+      #     exits nonzero when a pinned verdict changes, and a z3 `unknown` is
+      #     reported as UNKNOWN and fails, never folded into "no counterexample
+      #     found". Its sweep.py scans the whole corpus for VACUOUS and
+      #     TAUTOLOGICAL statements (0 and 0 as of 2026-08-04, over 1861 and
+      #     1065 checkable theorems) and is a minute rather than the ~20s the
+      #     gated empirical steps get in total. Promoting run_statements.py is
+      #     a matter of accepting the z3 dependency, not of fixing flakiness:
+      #     its verdicts are deterministic and its calibration is in the same
+      #     file as the statements it checks.
+      #     symbolic/cas_differential.py is in this bucket too and stays out
+      #     for a second reason: `sympy.simplify` has no bounded running time,
+      #     and a simplify that does not close is a false NEGATIVE that reads
+      #     as agreement. It carries a per-expression alarm so a slow
+      #     expression reports TIMEOUT rather than hanging, and it records two
+      #     of its own known false negatives in its header. Its two findings
+      #     that reduce to exact arithmetic on a fixed grid were PROMOTED into
+      #     the differential battery above (sections 20 and 21) with a
+      #     two-directional calibration, which is the shape a sympy finding
+      #     has to take before it can gate anything.
       #   * extract/test_parser.py, which pins absolute LINE NUMBERS in the
       #     Lean sources ("neiFst line: got 46, want 42"). Any edit above a
       #     definition breaks it, so it fails for reasons unrelated to what it
