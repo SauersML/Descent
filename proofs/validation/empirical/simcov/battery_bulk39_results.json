@@ -1,0 +1,297 @@
+[
+ {
+  "name": "ancestryRecalibratedR2",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * rhoSq",
+  "note": "positive control 'rho=0.90 alpha=1.00 [source slope = 1]' passed at 0.50 sems",
+  "regime": "800 causal variants, standardized genotypes, 400000 individuals per population, both with STANDARDIZED genotypes so the target heritability is set by its own effects alone; the score-scale ratio is produced by rescaling the WEIGHTS, which moves alpha without touching h2. rho is the REALISED correlation of the drawn effect vectors and alpha the REALISED score sd ratio -- every input measured, none nominal. m = 4000 puts the finite-panel residual near 1.6%",
+  "span": 0.7143438569290432,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.48 alpha=1.00",
+   "lean": 0.11661031009174654,
+   "truth": 0.11350468530173209,
+   "sem": 0.0003379496579564144,
+   "sems_off": 9.189607732684786,
+   "rel_err": 0.027361203475950713
+  },
+  "cells": [
+   {
+    "design": "rho=0.90 alpha=1.00",
+    "lean": 0.4082191576141972,
+    "truth": 0.40066007263359626,
+    "sem": 0.0009808727532966933,
+    "sems_off": 7.7064888949101675,
+    "rel_err": 0.01886657917000308
+   },
+   {
+    "design": "rho=0.71 alpha=1.00",
+    "lean": 0.2465426497290049,
+    "truth": 0.24947380919323414,
+    "sem": 0.000683451788627164,
+    "sems_off": 4.288758202121348,
+    "rel_err": 0.011749367493558717
+   },
+   {
+    "design": "rho=0.48 alpha=1.00",
+    "lean": 0.11661031009174654,
+    "truth": 0.11350468530173209,
+    "sem": 0.0003379496579564144,
+    "sems_off": 9.189607732684786,
+    "rel_err": 0.027361203475950713
+   },
+   {
+    "design": "rho=0.79 alpha=1.50",
+    "lean": 0.3075414241896303,
+    "truth": 0.30625475901000526,
+    "sem": 0.000806645758530861,
+    "sems_off": 1.5950808220555857,
+    "rel_err": 0.004201290402096322
+   },
+   {
+    "design": "rho=0.62 alpha=0.70",
+    "lean": 0.1974609352273101,
+    "truth": 0.19781749190348302,
+    "sem": 0.0005602750526807649,
+    "sems_off": 0.6363957746590779,
+    "rel_err": 0.0018024527191301079
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedR2 [rho unsquared, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * rho",
+  "note": "positive control 'rho=0.90 alpha=1.00 [source slope = 1]' passed at 0.50 sems",
+  "regime": "800 causal variants, standardized genotypes, 400000 individuals per population, both with STANDARDIZED genotypes so the target heritability is set by its own effects alone; the score-scale ratio is produced by rescaling the WEIGHTS, which moves alpha without touching h2. rho is the REALISED correlation of the drawn effect vectors and alpha the REALISED score sd ratio -- every input measured, none nominal. m = 4000 puts the finite-panel residual near 1.6%",
+  "span": 0.46454160135923006,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.48 alpha=1.00",
+   "lean": 0.24379264648271595,
+   "truth": 0.11350468530173209,
+   "sem": 0.0003379496579564144,
+   "sems_off": 385.5247611991582,
+   "rel_err": 1.1478641682027169
+  },
+  "cells": [
+   {
+    "design": "rho=0.90 alpha=1.00",
+    "lean": 0.4552970820918477,
+    "truth": 0.40066007263359626,
+    "sem": 0.0009808727532966933,
+    "sems_off": 55.702443843625566,
+    "rel_err": 0.1363674925208158
+   },
+   {
+    "design": "rho=0.71 alpha=1.00",
+    "lean": 0.3487960981612062,
+    "truth": 0.24947380919323414,
+    "sem": 0.000683451788627164,
+    "sems_off": 145.32449928542698,
+    "rel_err": 0.39812711919206045
+   },
+   {
+    "design": "rho=0.48 alpha=1.00",
+    "lean": 0.24379264648271595,
+    "truth": 0.11350468530173209,
+    "sem": 0.0003379496579564144,
+    "sems_off": 385.5247611991582,
+    "rel_err": 1.1478641682027169
+   },
+   {
+    "design": "rho=0.79 alpha=1.50",
+    "lean": 0.38820082845094606,
+    "truth": 0.30625475901000526,
+    "sem": 0.000806645758530861,
+    "sems_off": 101.58866959170363,
+    "rel_err": 0.2675748442435261
+   },
+   {
+    "design": "rho=0.62 alpha=0.70",
+    "lean": 0.3202809688727515,
+    "truth": 0.19781749190348302,
+    "sem": 0.0005602750526807649,
+    "sems_off": 218.5774226129002,
+    "rel_err": 0.6190730445061932
+   }
+  ]
+ },
+ {
+  "name": "effectTurnoverR2Loss",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * (1 - rhoSq)",
+  "note": "",
+  "regime": "800 causal variants, standardized genotypes, 400000 individuals per population, both with STANDARDIZED genotypes so the target heritability is set by its own effects alone; the score-scale ratio is produced by rescaling the WEIGHTS, which moves alpha without touching h2. rho is the REALISED correlation of the drawn effect vectors and alpha the REALISED score sd ratio -- every input measured, none nominal. m = 4000 puts the finite-panel residual near 1.6%",
+  "span": 0.7466527225965056,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.48 alpha=1.00",
+   "lean": 0.3930775076688307,
+   "truth": 0.3961831324588452,
+   "sem": 0.0003379496579564144,
+   "sems_off": 9.189607732684868,
+   "rel_err": 0.00783886171715571
+  },
+  "cells": [
+   {
+    "design": "rho=0.90 alpha=1.00",
+    "lean": 0.09958511637644948,
+    "truth": 0.10714420135705038,
+    "sem": 0.0009808727532966933,
+    "sems_off": 7.706488894910139,
+    "rel_err": 0.07055057469149255
+   },
+   {
+    "design": "rho=0.71 alpha=1.00",
+    "lean": 0.24691646668029313,
+    "truth": 0.24398530721606387,
+    "sem": 0.000683451788627164,
+    "sems_off": 4.288758202121348,
+    "rel_err": 0.0120136720431019
+   },
+   {
+    "design": "rho=0.48 alpha=1.00",
+    "lean": 0.3930775076688307,
+    "truth": 0.3961831324588452,
+    "sem": 0.0003379496579564144,
+    "sems_off": 9.189607732684868,
+    "rel_err": 0.00783886171715571
+   },
+   {
+    "design": "rho=0.79 alpha=1.50",
+    "lean": 0.18247348553218698,
+    "truth": 0.18376015071181206,
+    "sem": 0.000806645758530861,
+    "sems_off": 1.59508082205562,
+    "rel_err": 0.007001872683718791
+   },
+   {
+    "design": "rho=0.62 alpha=0.70",
+    "lean": 0.3220337126835895,
+    "truth": 0.3216771560074166,
+    "sem": 0.0005602750526807649,
+    "sems_off": 0.6363957746590284,
+    "rel_err": 0.00110843020560864
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedSlope",
+  "file": "AncestryCalibration.lean",
+  "source": "rho * (bSource * alpha) / alpha^2, alpha an sd ratio",
+  "note": "",
+  "regime": "800 causal variants, standardized genotypes, 400000 individuals per population, both with STANDARDIZED genotypes so the target heritability is set by its own effects alone; the score-scale ratio is produced by rescaling the WEIGHTS, which moves alpha without touching h2. rho is the REALISED correlation of the drawn effect vectors and alpha the REALISED score sd ratio -- every input measured, none nominal. m = 4000 puts the finite-panel residual near 1.6%",
+  "span": 0.4652625075075476,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.48 alpha=1.00",
+   "lean": 0.47865735055532005,
+   "truth": 0.4714877153846388,
+   "sem": 0.0010542795821561258,
+   "sems_off": 6.80050651841185,
+   "rel_err": 0.01520640928010665
+  },
+  "cells": [
+   {
+    "design": "rho=0.90 alpha=1.00",
+    "lean": 0.8951258463741929,
+    "truth": 0.8860249507171599,
+    "sem": 0.0019812130195644706,
+    "sems_off": 4.5935977439889975,
+    "rel_err": 0.01027160200135064
+   },
+   {
+    "design": "rho=0.71 alpha=1.00",
+    "lean": 0.7065193660144764,
+    "truth": 0.7106784155440726,
+    "sem": 0.0015891262472983896,
+    "sems_off": 2.6171926470076627,
+    "rel_err": 0.005852224351589728
+   },
+   {
+    "design": "rho=0.48 alpha=1.00",
+    "lean": 0.47865735055532005,
+    "truth": 0.4714877153846388,
+    "sem": 0.0010542795821561258,
+    "sems_off": 6.80050651841185,
+    "rel_err": 0.01520640928010665
+   },
+   {
+    "design": "rho=0.79 alpha=1.50",
+    "lean": 0.527864980726746,
+    "truth": 0.5261947336965171,
+    "sem": 0.0011766081939478116,
+    "sems_off": 1.4195439389426625,
+    "rel_err": 0.0031741994422775878
+   },
+   {
+    "design": "rho=0.62 alpha=0.70",
+    "lean": 0.8803593168085433,
+    "truth": 0.8829326733912312,
+    "sem": 0.0019742984772584127,
+    "sems_off": 1.303428337877934,
+    "rel_err": 0.002914555843543468
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedSlope [variance-ratio reading, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "rho * bSource / sqrt(alpha)",
+  "note": "positive control 'rho=0.90 alpha=1.00 [source slope = 1]' passed at 0.50 sems",
+  "regime": "800 causal variants, standardized genotypes, 400000 individuals per population, both with STANDARDIZED genotypes so the target heritability is set by its own effects alone; the score-scale ratio is produced by rescaling the WEIGHTS, which moves alpha without touching h2. rho is the REALISED correlation of the drawn effect vectors and alpha the REALISED score sd ratio -- every input measured, none nominal. m = 4000 puts the finite-panel residual near 1.6%",
+  "span": 0.4651693725044815,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.79 alpha=1.50",
+   "lean": 0.6470900785003867,
+   "truth": 0.5261947336965171,
+   "sem": 0.0011766081939478116,
+   "sems_off": 102.74902505840602,
+   "rel_err": 0.2297539999204856
+  },
+  "cells": [
+   {
+    "design": "rho=0.90 alpha=1.00",
+    "lean": 0.8953620078470949,
+    "truth": 0.8860249507171599,
+    "sem": 0.0019812130195644706,
+    "sems_off": 4.712798188650858,
+    "rel_err": 0.01053814243309672
+   },
+   {
+    "design": "rho=0.71 alpha=1.00",
+    "lean": 0.7069621800728625,
+    "truth": 0.7106784155440726,
+    "sem": 0.0015891262472983896,
+    "sems_off": 2.338540111289435,
+    "rel_err": 0.005229137947527374
+   },
+   {
+    "design": "rho=0.48 alpha=1.00",
+    "lean": 0.4788670244925091,
+    "truth": 0.4714877153846388,
+    "sem": 0.0010542795821561258,
+    "sems_off": 6.999385393368587,
+    "rel_err": 0.015651116385609957
+   },
+   {
+    "design": "rho=0.79 alpha=1.50",
+    "lean": 0.6470900785003867,
+    "truth": 0.5261947336965171,
+    "sem": 0.0011766081939478116,
+    "sems_off": 102.74902505840602,
+    "rel_err": 0.2297539999204856
+   },
+   {
+    "design": "rho=0.62 alpha=0.70",
+    "lean": 0.7367679186079028,
+    "truth": 0.8829326733912312,
+    "sem": 0.0019742984772584127,
+    "sems_off": 74.03376767341602,
+    "rel_err": 0.16554462099802952
+   }
+  ]
+ }
+]

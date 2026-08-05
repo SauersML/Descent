@@ -1,0 +1,247 @@
+[
+ {
+  "name": "effectivePolygenicityOfEffects",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(sum b^2)^2 / sum b^4",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "M = 5000 variants of which k carry EQUAL-MAGNITUDE effects with random signs and the rest are exactly zero; the oracle is the count of nonzero effects. Equal magnitude is what makes 'effective number of loci' unambiguous -- under Gaussian effects the ratio is k/3, and that value is carried as a competing cell so the dependence on the effect distribution is explicit",
+  "span": 0.99,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "k=20 of M=5000 (equal magnitude)",
+   "lean": 20.0,
+   "truth": 20.0,
+   "sem": 1e-09
+  },
+  "cells": [
+   {
+    "design": "k=20 of M=5000 (equal magnitude)",
+    "lean": 20.0,
+    "truth": 20.0,
+    "sem": 1e-09
+   },
+   {
+    "design": "k=100 of M=5000 (equal magnitude)",
+    "lean": 100.0,
+    "truth": 100.0,
+    "sem": 1e-09
+   },
+   {
+    "design": "k=500 of M=5000 (equal magnitude)",
+    "lean": 500.0,
+    "truth": 500.0,
+    "sem": 1e-09
+   },
+   {
+    "design": "k=2000 of M=5000 (equal magnitude)",
+    "lean": 2000.0,
+    "truth": 2000.0,
+    "sem": 1e-09
+   }
+  ]
+ },
+ {
+  "name": "effectivePolygenicity [k/3, the Gaussian value, competing]",
+  "file": "PolygenicArchitecture.lean",
+  "source": "k / 3",
+  "note": "the positive control 'k=100 Gaussian [participation = k/3]' missed by 4.2 sems on the same code path, so this design cannot support any verdict",
+  "regime": "M = 5000 variants of which k carry EQUAL-MAGNITUDE effects with random signs and the rest are exactly zero; the oracle is the count of nonzero effects. Equal magnitude is what makes 'effective number of loci' unambiguous -- under Gaussian effects the ratio is k/3, and that value is carried as a competing cell so the dependence on the effect distribution is explicit",
+  "span": 0.9900000000000001,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "k=2000 of M=5000 (equal magnitude)",
+   "lean": 666.6666666666666,
+   "truth": 2000.0,
+   "sem": 1e-09,
+   "sems_off": 1333333333333.3335,
+   "rel_err": 0.6666666666666667
+  },
+  "cells": [
+   {
+    "design": "k=20 of M=5000 (equal magnitude)",
+    "lean": 6.666666666666667,
+    "truth": 20.0,
+    "sem": 1e-09,
+    "sems_off": 13333333333.333332,
+    "rel_err": 0.6666666666666666
+   },
+   {
+    "design": "k=100 of M=5000 (equal magnitude)",
+    "lean": 33.333333333333336,
+    "truth": 100.0,
+    "sem": 1e-09,
+    "sems_off": 66666666666.66666,
+    "rel_err": 0.6666666666666665
+   },
+   {
+    "design": "k=500 of M=5000 (equal magnitude)",
+    "lean": 166.66666666666666,
+    "truth": 500.0,
+    "sem": 1e-09,
+    "sems_off": 333333333333.3334,
+    "rel_err": 0.6666666666666667
+   },
+   {
+    "design": "k=2000 of M=5000 (equal magnitude)",
+    "lean": 666.6666666666666,
+    "truth": 2000.0,
+    "sem": 1e-09,
+    "sems_off": 1333333333333.3335,
+    "rel_err": 0.6666666666666667
+   }
+  ]
+ },
+ {
+  "name": "effectivePolygenicity [sum b^2 / sum b^4, competing]",
+  "file": "PolygenicArchitecture.lean",
+  "source": "sum b^2 / sum b^4",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "M = 5000 variants of which k carry EQUAL-MAGNITUDE effects with random signs and the rest are exactly zero; the oracle is the count of nonzero effects. Equal magnitude is what makes 'effective number of loci' unambiguous -- under Gaussian effects the ratio is k/3, and that value is carried as a competing cell so the dependence on the effect distribution is explicit",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "k=2000 of M=5000 (equal magnitude)",
+   "lean": 1.0,
+   "truth": 2000.0,
+   "sem": 1e-09,
+   "sems_off": 1998999999999.9998,
+   "rel_err": 0.9995
+  },
+  "cells": [
+   {
+    "design": "k=20 of M=5000 (equal magnitude)",
+    "lean": 1.0,
+    "truth": 20.0,
+    "sem": 1e-09,
+    "sems_off": 19000000000.0,
+    "rel_err": 0.95
+   },
+   {
+    "design": "k=100 of M=5000 (equal magnitude)",
+    "lean": 1.0,
+    "truth": 100.0,
+    "sem": 1e-09,
+    "sems_off": 99000000000.0,
+    "rel_err": 0.99
+   },
+   {
+    "design": "k=500 of M=5000 (equal magnitude)",
+    "lean": 1.0,
+    "truth": 500.0,
+    "sem": 1e-09,
+    "sems_off": 498999999999.99994,
+    "rel_err": 0.998
+   },
+   {
+    "design": "k=2000 of M=5000 (equal magnitude)",
+    "lean": 1.0,
+    "truth": 2000.0,
+    "sem": 1e-09,
+    "sems_off": 1998999999999.9998,
+    "rel_err": 0.9995
+   }
+  ]
+ },
+ {
+  "name": "gwasHeritability",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r2_tag",
+  "note": "",
+  "regime": "200 independent causal variants each with one tag at correlation r_tag, 300000 individuals; the phenotype is built from the CAUSAL variants and the observable is the variance explained by a score fitted on the TAGS. r_tag is swept so r and r^2 separate threefold",
+  "span": 0.8817494519696186,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r_tag=0.5 (r2=0.25)",
+   "lean": 0.11739332779010274,
+   "truth": 0.11599402815140694,
+   "sem": 0.00039822873872458257,
+   "sems_off": 3.513808780293884,
+   "rel_err": 0.012063548968825295
+  },
+  "cells": [
+   {
+    "design": "r_tag=0.9 (r2=0.81)",
+    "lean": 0.3889444428578001,
+    "truth": 0.386284816579439,
+    "sem": 0.0011049953240683916,
+    "sems_off": 2.4069117944941367,
+    "rel_err": 0.006885143200584829
+   },
+   {
+    "design": "r_tag=0.7 (r2=0.49)",
+    "lean": 0.2486618974336322,
+    "truth": 0.24988324590762107,
+    "sem": 0.0007902617098624366,
+    "sems_off": 1.5454987363635058,
+    "rel_err": 0.004887676520899595
+   },
+   {
+    "design": "r_tag=0.5 (r2=0.25)",
+    "lean": 0.11739332779010274,
+    "truth": 0.11599402815140694,
+    "sem": 0.00039822873872458257,
+    "sems_off": 3.513808780293884,
+    "rel_err": 0.012063548968825295
+   },
+   {
+    "design": "r_tag=0.3 (r2=0.09)",
+    "lean": 0.045992893521306186,
+    "truth": 0.046123002806846475,
+    "sem": 0.00016448758722546915,
+    "sems_off": 0.7909975927967352,
+    "rel_err": 0.0028209196631268714
+   }
+  ]
+ },
+ {
+  "name": "gwasHeritability [h2 * r unsquared, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r_tag",
+  "note": "positive control 'r_tag=0.9 (r2=0.81) [causal variants recover h2]' passed at 1.58 sems",
+  "regime": "200 independent causal variants each with one tag at correlation r_tag, 300000 individuals; the phenotype is built from the CAUSAL variants and the observable is the variance explained by a score fitted on the TAGS. r_tag is swept so r and r^2 separate threefold",
+  "span": 0.6452483559088561,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r_tag=0.3 (r2=0.09)",
+   "lean": 0.15330964507102063,
+   "truth": 0.046123002806846475,
+   "sem": 0.00016448758722546915,
+   "sems_off": 651.6397016466021,
+   "rel_err": 2.3239302677895775
+  },
+  "cells": [
+   {
+    "design": "r_tag=0.9 (r2=0.81)",
+    "lean": 0.4321604920642223,
+    "truth": 0.386284816579439,
+    "sem": 0.0011049953240683916,
+    "sems_off": 41.516624084776566,
+    "rel_err": 0.11876127022287192
+   },
+   {
+    "design": "r_tag=0.7 (r2=0.49)",
+    "lean": 0.35523128204804605,
+    "truth": 0.24988324590762107,
+    "sem": 0.0007902617098624366,
+    "sems_off": 133.30778250506816,
+    "rel_err": 0.4215890335415722
+   },
+   {
+    "design": "r_tag=0.5 (r2=0.25)",
+    "lean": 0.23478665558020548,
+    "truth": 0.11599402815140694,
+    "sem": 0.00039822873872458257,
+    "sems_off": 298.30249772846315,
+    "rel_err": 1.0241270979376507
+   },
+   {
+    "design": "r_tag=0.3 (r2=0.09)",
+    "lean": 0.15330964507102063,
+    "truth": 0.046123002806846475,
+    "sem": 0.00016448758722546915,
+    "sems_off": 651.6397016466021,
+    "rel_err": 2.3239302677895775
+   }
+  ]
+ }
+]

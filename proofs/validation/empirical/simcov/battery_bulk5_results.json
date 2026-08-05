@@ -1,0 +1,268 @@
+[
+ {
+  "name": "fisherAverageEffect",
+  "file": "EpistasisAndNonAdditivity.lean",
+  "source": "a + d * (1 - 2*p)",
+  "note": "",
+  "regime": "least-squares slope of genotypic value on dosage under Hardy-Weinberg, four million individuals",
+  "span": 0.7,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.2 a=0.6 d=-0.4",
+   "lean": 0.36,
+   "truth": 0.3602468240950779,
+   "sem": 0.00012035259210174651,
+   "sems_off": 2.0508415379143505,
+   "rel_err": 0.0006851527302091675
+  },
+  "cells": [
+   {
+    "design": "p=0.3 a=1.0 d=0.5",
+    "lean": 1.2,
+    "truth": 1.1999049962195734,
+    "sem": 0.00040277651990183635,
+    "sems_off": 0.23587219148164026,
+    "rel_err": 7.917608537835413e-05
+   },
+   {
+    "design": "p=0.7 a=1.0 d=0.5",
+    "lean": 0.8,
+    "truth": 0.8002318224468452,
+    "sem": 0.0002798255698188382,
+    "sems_off": 0.8284534075826192,
+    "rel_err": 0.0002896941115592329
+   },
+   {
+    "design": "p=0.5 a=1.0 d=0.8",
+    "lean": 1.0,
+    "truth": 1.000428287707702,
+    "sem": 0.0004064256386674443,
+    "sems_off": 1.0537910676752948,
+    "rel_err": 0.0004281043558687475
+   },
+   {
+    "design": "p=0.2 a=0.6 d=-0.4",
+    "lean": 0.36,
+    "truth": 0.3602468240950779,
+    "sem": 0.00012035259210174651,
+    "sems_off": 2.0508415379143505,
+    "rel_err": 0.0006851527302091675
+   }
+  ]
+ },
+ {
+  "name": "dominanceVariance",
+  "file": "EpistasisAndNonAdditivity.lean",
+  "source": "sum_i (2 p_i (1-p_i) d_i)^2",
+  "note": "",
+  "regime": "variance of the residual left by the additive fit at each locus, summed over independent loci",
+  "span": 0.573137680037169,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "2 loci",
+   "lean": 0.080964,
+   "truth": 0.08099668500369984,
+   "sem": 5.72733052197469e-05,
+   "sems_off": 0.5706847819319015,
+   "rel_err": 0.00040353507922401375
+  },
+  "cells": [
+   {
+    "design": "1 loci",
+    "lean": 0.04409999999999999,
+    "truth": 0.044090189495629026,
+    "sem": 3.117647197615917e-05,
+    "sems_off": 0.314676541286318,
+    "rel_err": 0.00022250991622388405
+   },
+   {
+    "design": "2 loci",
+    "lean": 0.080964,
+    "truth": 0.08099668500369984,
+    "sem": 5.72733052197469e-05,
+    "sems_off": 0.5706847819319015,
+    "rel_err": 0.00040353507922401375
+   },
+   {
+    "design": "3 loci",
+    "lean": 0.103312,
+    "truth": 0.10332103189452552,
+    "sem": 7.305900229181055e-05,
+    "sems_off": 0.12362466283676858,
+    "rel_err": 8.741583741377963e-05
+   }
+  ]
+ },
+ {
+  "name": "epistaticVariance",
+  "file": "EpistasisAndNonAdditivity.lean",
+  "source": "b12^2 * 2p1(1-p1) * 2p2(1-p2)",
+  "note": "",
+  "regime": "variance of the interaction term after both main effects are removed by least squares",
+  "span": 0.4683159722222223,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p1=0.2 p2=0.8 b12=1.5",
+   "lean": 0.23040000000000002,
+   "truth": 0.23081756044600357,
+   "sem": 0.00016321266220830496,
+   "sems_off": 2.5583826668461978,
+   "rel_err": 0.0018090497325970705
+  },
+  "cells": [
+   {
+    "design": "p1=0.3 p2=0.4 b12=1.0",
+    "lean": 0.20159999999999997,
+    "truth": 0.20151168448581244,
+    "sem": 0.000142490278588242,
+    "sems_off": 0.6198002773420009,
+    "rel_err": 0.00043826497908983173
+   },
+   {
+    "design": "p1=0.5 p2=0.5 b12=0.7",
+    "lean": 0.12249999999999998,
+    "truth": 0.12245439915602395,
+    "sem": 8.658833602934877e-05,
+    "sems_off": 0.5266395691052254,
+    "rel_err": 0.00037239041055546626
+   },
+   {
+    "design": "p1=0.2 p2=0.8 b12=1.5",
+    "lean": 0.23040000000000002,
+    "truth": 0.23081756044600357,
+    "sem": 0.00016321266220830496,
+    "sems_off": 2.5583826668461978,
+    "rel_err": 0.0018090497325970705
+   }
+  ]
+ },
+ {
+  "name": "reliabilityRatio",
+  "file": "StratificationConfounding.lean",
+  "source": "r2 / (r2 + sigma2_noise)",
+  "note": "",
+  "regime": "ratio of the slope fitted on a noisy predictor to the slope fitted on the clean one, two million individuals",
+  "span": 0.7500000000000001,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r2=0.2 s2=0.8",
+   "lean": 0.2,
+   "truth": 0.20016479185311847,
+   "sem": 0.00042461364502240166,
+   "sems_off": 0.38809834552012146,
+   "rel_err": 0.0008232809156536729
+  },
+  "cells": [
+   {
+    "design": "r2=0.5 s2=0.5",
+    "lean": 0.5,
+    "truth": 0.49996831130579933,
+    "sem": 0.0010605929499081525,
+    "sems_off": 0.029878281015742518,
+    "rel_err": 6.338140534928647e-05
+   },
+   {
+    "design": "r2=0.2 s2=0.8",
+    "lean": 0.2,
+    "truth": 0.20016479185311847,
+    "sem": 0.00042461364502240166,
+    "sems_off": 0.38809834552012146,
+    "rel_err": 0.0008232809156536729
+   },
+   {
+    "design": "r2=0.8 s2=0.2",
+    "lean": 0.8,
+    "truth": 0.8002764943406846,
+    "sem": 0.0016976428079174873,
+    "sems_off": 0.1628695620745627,
+    "rel_err": 0.0003454985153754199
+   }
+  ]
+ },
+ {
+  "name": "pgsAttenuationFactor",
+  "file": "StratificationConfounding.lean",
+  "source": "sqrt(r2_gwas)",
+  "note": "",
+  "regime": "correlation between score and outcome at a given r-squared",
+  "span": 0.6666666666666666,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r2=0.1",
+   "lean": 0.31622776601683794,
+   "truth": 0.31675129565823634,
+   "sem": 0.0007071067811865475,
+   "sems_off": 0.7403827191699422,
+   "rel_err": 0.001652809786651265
+  },
+  "cells": [
+   {
+    "design": "r2=0.1",
+    "lean": 0.31622776601683794,
+    "truth": 0.31675129565823634,
+    "sem": 0.0007071067811865475,
+    "sems_off": 0.7403827191699422,
+    "rel_err": 0.001652809786651265
+   },
+   {
+    "design": "r2=0.4",
+    "lean": 0.6324555320336759,
+    "truth": 0.6326892500873535,
+    "sem": 0.0007071067811865475,
+    "sems_off": 0.33052724128240013,
+    "rel_err": 0.00036940418008587713
+   },
+   {
+    "design": "r2=0.9",
+    "lean": 0.9486832980505138,
+    "truth": 0.948619359533391,
+    "sem": 0.0007071067811865475,
+    "sems_off": 0.09042271807297378,
+    "rel_err": 6.740165745106589e-05
+   }
+  ]
+ },
+ {
+  "name": "gwasHeritability",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r2_tag",
+  "note": "",
+  "regime": "variance explained by regressing on TAG variants that correlate with the causal ones at r-squared = rho^2",
+  "span": 0.6484375000000001,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "h2=0.5 rho=0.9",
+   "lean": 0.405,
+   "truth": 0.33004793017529027,
+   "sem": 0.0017760192154101062,
+   "sems_off": 42.202285411310896,
+   "rel_err": 0.22709450044089746
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rho=0.9",
+    "lean": 0.405,
+    "truth": 0.33004793017529027,
+    "sem": 0.0017760192154101062,
+    "sems_off": 42.202285411310896,
+    "rel_err": 0.22709450044089746
+   },
+   {
+    "design": "h2=0.5 rho=0.6",
+    "lean": 0.18,
+    "truth": 0.1476930125348123,
+    "sem": 0.0009605032316591375,
+    "sems_off": 33.63548023610687,
+    "rel_err": 0.21874418370044904
+   },
+   {
+    "design": "h2=0.8 rho=0.8",
+    "lean": 0.5120000000000001,
+    "truth": 0.4853739277615941,
+    "sem": 0.0024706581939619937,
+    "sems_off": 10.77691454992726,
+    "rel_err": 0.054856824224568175
+   }
+  ]
+ }
+]

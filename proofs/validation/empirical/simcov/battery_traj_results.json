@@ -1,0 +1,209 @@
+[
+ {
+  "name": "hetMutationDriftRecurrence",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H_{t+1} = (1 - 1/(2Ne)) H_t + 2 mu (1 - H_t), iterated",
+  "note": "",
+  "regime": "run forward from H_0 for the full trajectory, no re-anchoring on the simulation at intermediate generations",
+  "span": 0.32340601991259044,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=100 mu=1e-03 t=200",
+   "lean": 0.3382969900437048,
+   "truth": 0.2680783422559605,
+   "sem": 0.001072313369023842,
+   "sems_off": 65.48332774370458,
+   "rel_err": 0.2619333109748183
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 t=50",
+    "lean": 0.4365331422635582,
+    "truth": 0.39937993961849483,
+    "sem": 0.0015975197584739793,
+    "sems_off": 23.256803208840278,
+    "rel_err": 0.09302721283536111
+   },
+   {
+    "design": "Ne=100 mu=1e-03 t=200",
+    "lean": 0.3382969900437048,
+    "truth": 0.2680783422559605,
+    "sem": 0.001072313369023842,
+    "sems_off": 65.48332774370458,
+    "rel_err": 0.2619333109748183
+   },
+   {
+    "design": "Ne=500 mu=5e-04 t=200",
+    "lean": 0.5,
+    "truth": 0.42494036194563717,
+    "sem": 0.0016997614477825486,
+    "sems_off": 44.158924861063944,
+    "rel_err": 0.17663569944425578
+   }
+  ]
+ },
+ {
+  "name": "hetMutationRecurrence",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H_{t+1} = lam H_t + (1 - lam) Hstar, iterated",
+  "note": "",
+  "regime": "lam and Hstar taken from the drift-mutation process the affine form abstracts; run forward with no re-anchoring",
+  "span": 0.21627237199034854,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=500 mu=5e-04 t=200",
+   "lean": 0.5,
+   "truth": 0.4248367313564557,
+   "sem": 0.001699346925425823,
+   "sems_off": 44.230679162060945,
+   "rel_err": 0.17692271664824377
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 t=100",
+    "lean": 0.39186381400482573,
+    "truth": 0.3352059754547662,
+    "sem": 0.0013408239018190648,
+    "sems_off": 42.255987884160724,
+    "rel_err": 0.1690239515366429
+   },
+   {
+    "design": "Ne=500 mu=5e-04 t=200",
+    "lean": 0.5,
+    "truth": 0.4248367313564557,
+    "sem": 0.001699346925425823,
+    "sems_off": 44.230679162060945,
+    "rel_err": 0.17692271664824377
+   }
+  ]
+ },
+ {
+  "name": "driftLDTrajectory",
+  "file": "LDDecayTheory.lean",
+  "source": "iterate driftLDStep from Q_0",
+  "note": "",
+  "regime": "normalised sigma_d^2 run forward for the full trajectory",
+  "span": 0.7364349896668315,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 c=0.05 t=15",
+   "lean": 0.10710118642831794,
+   "truth": 0.1124923044226349,
+   "sem": 0.002249846088452698,
+   "sems_off": 2.3962163554150644,
+   "rel_err": 0.04792432710830129
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.00 t=15",
+    "lean": 0.40635585995627027,
+    "truth": 0.4118484241339011,
+    "sem": 0.008236968482678022,
+    "sems_off": 0.6668186468336561,
+    "rel_err": 0.013336372936673122
+   },
+   {
+    "design": "Ne=100 c=0.05 t=15",
+    "lean": 0.10710118642831794,
+    "truth": 0.1124923044226349,
+    "sem": 0.002249846088452698,
+    "sems_off": 2.3962163554150644,
+    "rel_err": 0.04792432710830129
+   },
+   {
+    "design": "Ne=500 c=0.01 t=25",
+    "lean": 0.23166427359711983,
+    "truth": 0.23107258243579273,
+    "sem": 0.004621451648715855,
+    "sems_off": 0.12803145121977136,
+    "rel_err": 0.002560629024395427
+   }
+  ]
+ },
+ {
+  "name": "ldRecurrence",
+  "file": "LDDecayTheory.lean",
+  "source": "D_{t+1} = (1 - r) * D_t, iterated",
+  "note": "",
+  "regime": "gametic D from a simulated admixed population, decayed under random mating",
+  "span": 0.7504024528038561,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.05 t=10",
+   "lean": 0.05386759749387769,
+   "truth": 0.05386759749387769,
+   "sem": 0.00016160279248163308,
+   "sems_off": 0.0,
+   "rel_err": 0.0
+  },
+  "cells": [
+   {
+    "design": "r=0.05 t=10",
+    "lean": 0.05386759749387769,
+    "truth": 0.05386759749387769,
+    "sem": 0.00016160279248163308,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "r=0.20 t=8",
+    "lean": 0.015089891479409135,
+    "truth": 0.015089891479409135,
+    "sem": 4.52696744382274e-05,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "r=0.01 t=40",
+    "lean": 0.06045689009736497,
+    "truth": 0.06045689009736497,
+    "sem": 0.00018137067029209492,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "ldBreakageRate",
+  "file": "DGP.lean",
+  "source": "2 * r",
+  "note": "",
+  "regime": "survival of a PAIR of lineages, each recombining at r; a breakage rate of 2r predicts (1 - 2r)^t against the exact (1 - r)^(2t)",
+  "span": 0.691598751354967,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.05 t=15",
+   "lean": 0.20589113209464907,
+   "truth": 0.2144385,
+   "sem": 0.00029021942536445593,
+   "sems_off": 29.451398350118005,
+   "rel_err": 0.03985929721272501
+  },
+  "cells": [
+   {
+    "design": "r=0.01 t=20",
+    "lean": 0.6676079717550942,
+    "truth": 0.668595,
+    "sem": 0.00033284810798245496,
+    "sems_off": 2.9654013985197323,
+    "rel_err": 0.0014762722498759618
+   },
+   {
+    "design": "r=0.02 t=30",
+    "lean": 0.29385764323070546,
+    "truth": 0.2979615,
+    "sem": 0.00032340411602030513,
+    "sems_off": 12.689562581315046,
+    "rel_err": 0.013773110852558246
+   },
+   {
+    "design": "r=0.05 t=15",
+    "lean": 0.20589113209464907,
+    "truth": 0.2144385,
+    "sem": 0.00029021942536445593,
+    "sems_off": 29.451398350118005,
+    "rel_err": 0.03985929721272501
+   }
+  ]
+ }
+]

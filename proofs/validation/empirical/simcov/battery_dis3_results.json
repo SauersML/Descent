@@ -1,0 +1,104 @@
+[
+ {
+  "name": "fstTransientAt [its decay base carries no migration: R = 1]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - hetDecayFactor^t)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "24-deme forward Wright-Fisher island model, NO mutation so no mutation-model convention enters, started identical; the fitted per-generation decay base of F(t)/F(plateau) -- a SHAPE, so invariant to the F_ST convention -- as R = (1 - lam) * 2Ne",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "M=2.0 (exact recursion 2.934)",
+   "lean": 1.0,
+   "truth": 2.9610788869394318,
+   "sem": 0.0468503920455084,
+   "sems_off": 41.85832393962737,
+   "rel_err": 0.6622852554145902
+  },
+  "cells": [
+   {
+    "design": "M=0.0 (exact recursion 0.983)",
+    "lean": 1.0,
+    "truth": 0.9718240034336635,
+    "sem": 0.0059891230484698235,
+    "sems_off": 4.704527914739583,
+    "rel_err": 0.028992900429280044
+   },
+   {
+    "design": "M=2.0 (exact recursion 2.934)",
+    "lean": 1.0,
+    "truth": 2.9610788869394318,
+    "sem": 0.0468503920455084,
+    "sems_off": 41.85832393962737,
+    "rel_err": 0.6622852554145902
+   },
+   {
+    "design": "M=6.0 (exact recursion 6.883)",
+    "lean": 1.0,
+    "truth": 6.843917329201114,
+    "sem": 0.15108462437442455,
+    "sems_off": 38.67976210946828,
+    "rel_err": 0.8538848510438204
+   },
+   {
+    "design": "M=16.0 (exact recursion 16.605)",
+    "lean": 1.0,
+    "truth": 16.809383821176233,
+    "sem": 0.43227316326828075,
+    "sems_off": 36.5726701645008,
+    "rel_err": 0.9405094195814475
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [CANDIDATE: the base carries every force the equilibrium does, R = 1 + bigM - bigM/(d(1+bigM))]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (hetDecayFromScaled Ne theta * (1 - bigM/(2Ne)))^t",
+  "note": "positive control 'M=0: the stochastic run against the exact deterministic recursion, same fitting code' passed at 1.80 sems",
+  "regime": "same runs, same fits; the O(1/d) term is the finite-deme correction the two-moment recursion carries",
+  "span": 0.9410404624277456,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "M=0.0 (exact recursion 0.983)",
+   "lean": 1.0,
+   "truth": 0.9718240034336635,
+   "sem": 0.0059891230484698235,
+   "sems_off": 4.704527914739583,
+   "rel_err": 0.028992900429280044
+  },
+  "cells": [
+   {
+    "design": "M=0.0 (exact recursion 0.983)",
+    "lean": 1.0,
+    "truth": 0.9718240034336635,
+    "sem": 0.0059891230484698235,
+    "sems_off": 4.704527914739583,
+    "rel_err": 0.028992900429280044
+   },
+   {
+    "design": "M=2.0 (exact recursion 2.934)",
+    "lean": 2.9722222222222223,
+    "truth": 2.9610788869394318,
+    "sem": 0.0468503920455084,
+    "sems_off": 0.2378493497336458,
+    "rel_err": 0.0037632686288571952
+   },
+   {
+    "design": "M=6.0 (exact recursion 6.883)",
+    "lean": 6.964285714285714,
+    "truth": 6.843917329201114,
+    "sem": 0.15108462437442455,
+    "sems_off": 0.7966951341540782,
+    "rel_err": 0.017587644516251222
+   },
+   {
+    "design": "M=16.0 (exact recursion 16.605)",
+    "lean": 16.96078431372549,
+    "truth": 16.809383821176233,
+    "sem": 0.43227316326828075,
+    "sems_off": 0.35024263686546225,
+    "rel_err": 0.00900690317741004
+   }
+  ]
+ }
+]

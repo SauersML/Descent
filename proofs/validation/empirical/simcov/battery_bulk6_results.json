@@ -1,0 +1,217 @@
+[
+ {
+  "name": "prevalenceLogit",
+  "file": "PGSCalibrationTheory.lean",
+  "source": "log(pi / (1 - pi))",
+  "note": "",
+  "regime": "fitted intercept of an intercept-only logistic model on four million simulated binary outcomes",
+  "span": 5.286872051498152,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "pi=0.35",
+   "lean": -0.6190392084062235,
+   "truth": -0.6162557538513197,
+   "sem": 0.0010478481738142244,
+   "sems_off": 2.6563529187361965,
+   "rel_err": 0.004516719783155737
+  },
+  "cells": [
+   {
+    "design": "pi=0.02",
+    "lean": -3.8918202981106265,
+    "truth": -3.8858806305457763,
+    "sem": 0.003561262019062396,
+    "sems_off": 1.6678546911339007,
+    "rel_err": 0.001528525482270404
+   },
+   {
+    "design": "pi=0.10",
+    "lean": -2.197224577336219,
+    "truth": -2.1993959068645283,
+    "sem": 0.0016681152021933165,
+    "sems_off": 1.3016664109614628,
+    "rel_err": 0.0009872390512014227
+   },
+   {
+    "design": "pi=0.35",
+    "lean": -0.6190392084062235,
+    "truth": -0.6162557538513197,
+    "sem": 0.0010478481738142244,
+    "sems_off": 2.6563529187361965,
+    "rel_err": 0.004516719783155737
+   }
+  ]
+ },
+ {
+  "name": "prevalenceCITLShift",
+  "file": "PGSCalibrationTheory.lean",
+  "source": "prevalenceLogit pi_target - prevalenceLogit pi_source",
+  "note": "",
+  "regime": "difference of fitted intercepts between two simulated populations; the design includes a sign reversal",
+  "span": 2.931304941693578,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "0.35 -> 0.02",
+   "lean": -3.272781089704403,
+   "truth": -3.2776069569723294,
+   "sem": 0.003730968634549902,
+   "sems_off": 1.2934622991030331,
+   "rel_err": 0.0014723752210924301
+  },
+  "cells": [
+   {
+    "design": "0.02 -> 0.10",
+    "lean": 1.6945957207744073,
+    "truth": 1.6982803414918153,
+    "sem": 0.003943327467855423,
+    "sems_off": 0.9343937949469405,
+    "rel_err": 0.0021696186591733542
+   },
+   {
+    "design": "0.10 -> 0.35",
+    "lean": 1.5781853689299956,
+    "truth": 1.5761815239774721,
+    "sem": 0.001967843190023588,
+    "sems_off": 1.0182950362520815,
+    "rel_err": 0.0012713287917922084
+   },
+   {
+    "design": "0.35 -> 0.02",
+    "lean": -3.272781089704403,
+    "truth": -3.2776069569723294,
+    "sem": 0.003730968634549902,
+    "sems_off": 1.2934622991030331,
+    "rel_err": 0.0014723752210924301
+   }
+  ]
+ },
+ {
+  "name": "effectivePolygenicity / effectivePolygenicityOfEffects",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(sum beta^2)^2 / (sum beta^4)",
+  "note": "",
+  "regime": "inverse probability that two draws from the effect-mass distribution land on the same locus",
+  "span": 0.9971785918760215,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "400 equal",
+   "lean": 400.0,
+   "truth": 407.8303425774877,
+   "sem": 4.112976296990511,
+   "sems_off": 1.9038141754469227,
+   "rel_err": 0.019199999999999908
+  },
+  "cells": [
+   {
+    "design": "400 equal",
+    "lean": 400.0,
+    "truth": 407.8303425774877,
+    "sem": 4.112976296990511,
+    "sems_off": 1.9038141754469227,
+    "rel_err": 0.019199999999999908
+   },
+   {
+    "design": "gaussian, m=400",
+    "lean": 147.46341668570827,
+    "truth": 146.3539570451136,
+    "sem": 0.8822423538648839,
+    "sems_off": 1.2575452036896808,
+    "rel_err": 0.007580660359273293
+   },
+   {
+    "design": "one dominant",
+    "lean": 1.1285632495913933,
+    "truth": 1.1284994061271876,
+    "sem": 0.00020226554055490656,
+    "sems_off": 0.3156418242602549,
+    "rel_err": 5.657376854529049e-05
+   },
+   {
+    "design": "mixture",
+    "lean": 11.250686102412063,
+    "truth": 11.262371010657018,
+    "sem": 0.018039466520553726,
+    "sems_off": 0.6477413415547514,
+    "rel_err": 0.0010375176092049046
+   }
+  ]
+ },
+ {
+  "name": "causalPortabilityFromLocalFst",
+  "file": "PhenomeWidePortability.lean",
+  "source": "sum_i beta_i^2 (1 - fst_i) / sum_i beta_i^2",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "effect-mass-weighted retention across loci with per-locus drift indices",
+  "span": 0.011105779826552118,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "effect uncorrelated with fst",
+   "lean": 0.851218339350898,
+   "truth": 0.851218339350898,
+   "sem": 8.512183393508981e-10
+  },
+  "cells": [
+   {
+    "design": "effect uncorrelated with fst",
+    "lean": 0.851218339350898,
+    "truth": 0.851218339350898,
+    "sem": 8.512183393508981e-10
+   },
+   {
+    "design": "large effects at LOW fst",
+    "lean": 0.8417648958897436,
+    "truth": 0.8417648958897436,
+    "sem": 8.417648958897436e-10
+   },
+   {
+    "design": "large effects at HIGH fst",
+    "lean": 0.844412052735385,
+    "truth": 0.844412052735385,
+    "sem": 8.444120527353851e-10
+   }
+  ]
+ },
+ {
+  "name": "effectiveBlockCount",
+  "file": "ScoreDistribution.lean",
+  "source": "markers / correlationLength",
+  "note": "",
+  "regime": "independent-block count recovered from the variance of a block sum against fully independent markers",
+  "span": 0.8,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=100 L=10",
+   "lean": 10.0,
+   "truth": 10.03794318828787,
+   "sem": 0.022445523323292648,
+   "sems_off": 1.6904568337016193,
+   "rel_err": 0.0037799763931858784
+  },
+  "cells": [
+   {
+    "design": "m=100 L=5",
+    "lean": 20.0,
+    "truth": 20.016396993596533,
+    "sem": 0.044758024342304276,
+    "sems_off": 0.36634757314422567,
+    "rel_err": 0.0008191780769425651
+   },
+   {
+    "design": "m=100 L=10",
+    "lean": 10.0,
+    "truth": 10.03794318828787,
+    "sem": 0.022445523323292648,
+    "sems_off": 1.6904568337016193,
+    "rel_err": 0.0037799763931858784
+   },
+   {
+    "design": "m=200 L=4",
+    "lean": 50.0,
+    "truth": 49.814787801749546,
+    "sem": 0.11138925180943932,
+    "sems_off": 1.662747484535658,
+    "rel_err": 0.003718016404838512
+   }
+  ]
+ }
+]

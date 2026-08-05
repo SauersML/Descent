@@ -1,0 +1,642 @@
+[
+ {
+  "name": "fstMutationDriftTransient",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "(1/(1+theta)) * (1 - exp(-(1+theta) t / (2 Ne)))",
+  "note": "",
+  "regime": "infinite-alleles Wright-Fisher started ALL-DISTINCT, so identity by descent starts at zero as these formulas assume; five time points per parameter set spanning t/Ne from 0.25 to 4",
+  "span": 0.8025705679557957,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 theta=0.80 t=200 (t/Ne=2.00)",
+   "lean": 0.4637228398768964,
+   "truth": 0.43591005025125634,
+   "sem": 0.012435383593723889,
+   "sems_off": 2.236584775694181,
+   "rel_err": 0.06380396508318377
+  },
+  "cells": [
+   {
+    "design": "Ne=50 theta=1.00 t=12 (t/Ne=0.24)",
+    "lean": 0.10668606946672327,
+    "truth": 0.10892424242424242,
+    "sem": 0.0022326946769246985,
+    "sems_off": 1.0024536631233452,
+    "rel_err": 0.020547978188380084
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=25 (t/Ne=0.50)",
+    "lean": 0.1967346701436833,
+    "truth": 0.20155454545454546,
+    "sem": 0.004940424256725289,
+    "sems_off": 0.9755994749440763,
+    "rel_err": 0.02391350341413733
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=50 (t/Ne=1.00)",
+    "lean": 0.31606027941427883,
+    "truth": 0.32678686868686874,
+    "sem": 0.008716335226269831,
+    "sems_off": 1.2306306485621898,
+    "rel_err": 0.032824419523626136
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=100 (t/Ne=2.00)",
+    "lean": 0.43233235838169365,
+    "truth": 0.4341212121212121,
+    "sem": 0.0120874871340161,
+    "sems_off": 0.14799219388489013,
+    "rel_err": 0.004120631956171161
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=200 (t/Ne=4.00)",
+    "lean": 0.4908421805556329,
+    "truth": 0.4813929292929294,
+    "sem": 0.013978223809332588,
+    "sems_off": 0.6759979945659982,
+    "rel_err": 0.0196289780919354
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=25 (t/Ne=0.25)",
+    "lean": 0.11193543402256831,
+    "truth": 0.11093266331658291,
+    "sem": 0.002175963071850255,
+    "sems_off": 0.46083994666909667,
+    "rel_err": 0.00903945398952208
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=50 (t/Ne=0.50)",
+    "lean": 0.20131769354345927,
+    "truth": 0.1960288944723618,
+    "sem": 0.004366633930091277,
+    "sems_off": 1.2111844399530232,
+    "rel_err": 0.02697969136301558
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=100 (t/Ne=1.00)",
+    "lean": 0.32968352236633386,
+    "truth": 0.3196396984924623,
+    "sem": 0.008696016754771841,
+    "sems_off": 1.1549913204065647,
+    "rel_err": 0.03142232933281405
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=200 (t/Ne=2.00)",
+    "lean": 0.4637228398768964,
+    "truth": 0.43591005025125634,
+    "sem": 0.012435383593723889,
+    "sems_off": 2.236584775694181,
+    "rel_err": 0.06380396508318377
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=400 (t/Ne=4.00)",
+    "lean": 0.5403757097515042,
+    "truth": 0.5322678391959799,
+    "sem": 0.01595847854852768,
+    "sems_off": 0.5080603724765691,
+    "rel_err": 0.015232689181017773
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=50 (t/Ne=0.25)",
+    "lean": 0.11193543402256831,
+    "truth": 0.1124124060150376,
+    "sem": 0.0017792556145062944,
+    "sems_off": 0.26807390044495855,
+    "rel_err": 0.004243054742600995
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=100 (t/Ne=0.50)",
+    "lean": 0.20131769354345927,
+    "truth": 0.20438721804511276,
+    "sem": 0.0046768842414838365,
+    "sems_off": 0.6563182544538707,
+    "rel_err": 0.015018182306175208
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=200 (t/Ne=1.00)",
+    "lean": 0.32968352236633386,
+    "truth": 0.33697926065162903,
+    "sem": 0.009198791509927565,
+    "sems_off": 0.7931192132598538,
+    "rel_err": 0.02165040742028794
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=400 (t/Ne=2.00)",
+    "lean": 0.4637228398768964,
+    "truth": 0.4503194862155388,
+    "sem": 0.013414706510130393,
+    "sems_off": 0.9991537012931119,
+    "rel_err": 0.0297640987601906
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=800 (t/Ne=4.00)",
+    "lean": 0.5403757097515042,
+    "truth": 0.5221342731829575,
+    "sem": 0.014306263892607687,
+    "sems_off": 1.2750664118514128,
+    "rel_err": 0.03493629417840352
+   }
+  ]
+ },
+ {
+  "name": "fstMutationDriftTransientDiscrete",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "(1/(1+theta)) * (1 - hetDecayFactor^t)",
+  "note": "",
+  "regime": "the same trajectories; this and the continuous form agree to O(1/Ne) and the design includes Ne=50 where they separate",
+  "span": 0.8017374311921619,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 theta=0.80 t=200 (t/Ne=2.00)",
+   "lean": 0.46409973960544904,
+   "truth": 0.43591005025125634,
+   "sem": 0.012435383593723889,
+   "sems_off": 2.2668934288782188,
+   "rel_err": 0.06466859238034153
+  },
+  "cells": [
+   {
+    "design": "Ne=50 theta=1.00 t=12 (t/Ne=0.24)",
+    "lean": 0.10716092959639067,
+    "truth": 0.10892424242424242,
+    "sem": 0.0022326946769246985,
+    "sems_off": 0.7897689039508644,
+    "rel_err": 0.016188433250551592
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=25 (t/Ne=0.50)",
+    "lean": 0.19749696643123188,
+    "truth": 0.20155454545454546,
+    "sem": 0.004940424256725289,
+    "sems_off": 0.8213017369490256,
+    "rel_err": 0.02013141908639636
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=50 (t/Ne=1.00)",
+    "lean": 0.31698382936338554,
+    "truth": 0.32678686868686874,
+    "sem": 0.008716335226269831,
+    "sems_off": 1.1246744266946263,
+    "rel_err": 0.02999826572859203
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=100 (t/Ne=2.00)",
+    "lean": 0.4330101625710192,
+    "truth": 0.4341212121212121,
+    "sem": 0.0120874871340161,
+    "sems_off": 0.09191733053152108,
+    "rel_err": 0.0025593072146003486
+   },
+   {
+    "design": "Ne=50 theta=1.00 t=200 (t/Ne=4.00)",
+    "lean": 0.49102472336247743,
+    "truth": 0.4813929292929294,
+    "sem": 0.013978223809332588,
+    "sems_off": 0.6890570791345733,
+    "rel_err": 0.020008175200444372
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=25 (t/Ne=0.25)",
+    "lean": 0.11216343187881771,
+    "truth": 0.11093266331658291,
+    "sem": 0.002175963071850255,
+    "sems_off": 0.5656201514432192,
+    "rel_err": 0.011094735539904869
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=50 (t/Ne=0.50)",
+    "lean": 0.20168171994613393,
+    "truth": 0.1960288944723618,
+    "sem": 0.004366633930091277,
+    "sems_off": 1.2945498899776033,
+    "rel_err": 0.028836695166737918
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=100 (t/Ne=1.00)",
+    "lean": 0.3301475108034924,
+    "truth": 0.3196396984924623,
+    "sem": 0.008696016754771841,
+    "sems_off": 1.208347753615361,
+    "rel_err": 0.03287392761471363
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=200 (t/Ne=2.00)",
+    "lean": 0.46409973960544904,
+    "truth": 0.43591005025125634,
+    "sem": 0.012435383593723889,
+    "sems_off": 2.2668934288782188,
+    "rel_err": 0.06466859238034153
+   },
+   {
+    "design": "Ne=100 theta=0.80 t=400 (t/Ne=4.00)",
+    "lean": 0.540500056267576,
+    "truth": 0.5322678391959799,
+    "sem": 0.01595847854852768,
+    "sems_off": 0.5158522503610258,
+    "rel_err": 0.015466305617922324
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=50 (t/Ne=0.25)",
+    "lean": 0.11204927205147042,
+    "truth": 0.1124124060150376,
+    "sem": 0.0017792556145062944,
+    "sems_off": 0.20409319527028608,
+    "rel_err": 0.003230372664727138
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=100 (t/Ne=0.50)",
+    "lean": 0.20149947324186487,
+    "truth": 0.20438721804511276,
+    "sem": 0.0046768842414838365,
+    "sems_off": 0.6174505619860471,
+    "rel_err": 0.014128793526660232
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=200 (t/Ne=1.00)",
+    "lean": 0.32991527859358155,
+    "truth": 0.33697926065162903,
+    "sem": 0.009198791509927565,
+    "sems_off": 0.7679250095432486,
+    "rel_err": 0.02096266115721069
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=400 (t/Ne=2.00)",
+    "lean": 0.46391119329809816,
+    "truth": 0.4503194862155388,
+    "sem": 0.013414706510130393,
+    "sems_off": 1.0131945169501322,
+    "rel_err": 0.030182364962225698
+   },
+   {
+    "design": "Ne=200 theta=0.80 t=800 (t/Ne=4.00)",
+    "lean": 0.5404379151151186,
+    "truth": 0.5221342731829575,
+    "sem": 0.014306263892607687,
+    "sems_off": 1.2794145326523017,
+    "rel_err": 0.03505543089631182
+   }
+  ]
+ },
+ {
+  "name": "alleleFreqAfterMigration",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "p_c + (p0 - p_c) * (1 - m)^t",
+  "note": "control 't=0 must return p0 exactly' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "Wright-Fisher with migration toward a fixed continent, N=40000 so drift stays far below the deterministic signal, 400 replicates, four time points per parameter set",
+  "span": 0.8637673847950912,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=0.050 p0=0.9 pc=0.3 t=5",
+   "lean": 0.7642685624999999,
+   "truth": 0.7640228984374999,
+   "sem": 0.0001261047534609514,
+   "sems_off": 1.9480951808529472,
+   "rel_err": 0.00032154018289548
+  },
+  "cells": [
+   {
+    "design": "m=0.010 p0=0.8 pc=0.2 t=5",
+    "lean": 0.77059402994,
+    "truth": 0.7706760640624999,
+    "sem": 0.00015825507299210078,
+    "sems_off": 0.5183664633862758,
+    "rel_err": 0.00010644436271631687
+   },
+   {
+    "design": "m=0.010 p0=0.8 pc=0.2 t=15",
+    "lean": 0.7160350127847732,
+    "truth": 0.7161848243750001,
+    "sem": 0.00027888616800721356,
+    "sems_off": 0.537178273477486,
+    "rel_err": 0.00020918006794908646
+   },
+   {
+    "design": "m=0.010 p0=0.8 pc=0.2 t=30",
+    "lean": 0.6438202240329682,
+    "truth": 0.643868789375,
+    "sem": 0.0003633040310424291,
+    "sems_off": 0.13367685982575955,
+    "rel_err": 7.542738960671522e-05
+   },
+   {
+    "design": "m=0.010 p0=0.8 pc=0.2 t=60",
+    "lean": 0.5282939854344568,
+    "truth": 0.5275926396875,
+    "sem": 0.0004776196437662497,
+    "sems_off": 1.4684189733620703,
+    "rel_err": 0.001329331939452776
+   },
+   {
+    "design": "m=0.050 p0=0.9 pc=0.3 t=5",
+    "lean": 0.7642685624999999,
+    "truth": 0.7640228984374999,
+    "sem": 0.0001261047534609514,
+    "sems_off": 1.9480951808529472,
+    "rel_err": 0.00032154018289548
+   },
+   {
+    "design": "m=0.050 p0=0.9 pc=0.3 t=15",
+    "lean": 0.5779747380958519,
+    "truth": 0.5778213546875,
+    "sem": 0.00022185996277771408,
+    "sems_off": 0.691352357728432,
+    "rel_err": 0.00026545126293379777
+   },
+   {
+    "design": "m=0.050 p0=0.9 pc=0.3 t=30",
+    "lean": 0.42878325836576237,
+    "truth": 0.42844581875000004,
+    "sem": 0.0002588123626575055,
+    "sems_off": 1.303800221509779,
+    "rel_err": 0.0007875899378521474
+   },
+   {
+    "design": "m=0.050 p0=0.9 pc=0.3 t=60",
+    "lean": 0.32764187939217115,
+    "truth": 0.327425253125,
+    "sem": 0.00025630654354112333,
+    "sems_off": 0.8451843022744162,
+    "rel_err": 0.0006616052522023125
+   },
+   {
+    "design": "m=0.002 p0=0.1 pc=0.6 t=5",
+    "lean": 0.10498003996001598,
+    "truth": 0.10515738731250002,
+    "sem": 0.00011449560668177694,
+    "sems_off": 1.5489446069048416,
+    "rel_err": 0.0016864944728705248
+   },
+   {
+    "design": "m=0.002 p0=0.1 pc=0.6 t=15",
+    "lean": 0.11479180912788822,
+    "truth": 0.11508524181250002,
+    "sem": 0.00021246019397997998,
+    "sems_off": 1.38111840677056,
+    "rel_err": 0.0025496986406811613
+   },
+   {
+    "design": "m=0.002 p0=0.1 pc=0.6 t=30",
+    "lean": 0.12914602302122474,
+    "truth": 0.12917375831250003,
+    "sem": 0.0003197929181152445,
+    "sems_off": 0.08672891019208749,
+    "rel_err": 0.00021471304727532038
+   },
+   {
+    "design": "m=0.002 p0=0.1 pc=0.6 t=60",
+    "lean": 0.156593064726542,
+    "truth": 0.15677837593750002,
+    "sem": 0.0004391017897462752,
+    "sems_off": 0.42202335605395774,
+    "rel_err": 0.0011819947097289555
+   }
+  ]
+ },
+ {
+  "name": "alleleFreqAfterMigration [convention-free log-slope]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "log|p_t - p_c| is linear in t with slope log(1 - m)",
+  "note": "",
+  "regime": "the approach RATE, read as a slope, which no rescaling or recentring of the frequency can change",
+  "span": 24.620991989139362,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=0.050 log-slope of |p_t - p_c|",
+   "lean": -0.05129329438755058,
+   "truth": -0.05140317391844167,
+   "sem": 1.0832842643301175e-05,
+   "sems_off": 10.143185358557998,
+   "rel_err": 0.0021376020684137995
+  },
+  "cells": [
+   {
+    "design": "m=0.010 log-slope of |p_t - p_c|",
+    "lean": -0.01005033585350145,
+    "truth": -0.01006794429989512,
+    "sem": 5.214111571468133e-06,
+    "sems_off": 3.377075107104223,
+    "rel_err": 0.0017489614432861476
+   },
+   {
+    "design": "m=0.050 log-slope of |p_t - p_c|",
+    "lean": -0.05129329438755058,
+    "truth": -0.05140317391844167,
+    "sem": 1.0832842643301175e-05,
+    "sems_off": 10.143185358557998,
+    "rel_err": 0.0021376020684137995
+   },
+   {
+    "design": "m=0.002 log-slope of |p_t - p_c|",
+    "lean": -0.0020020026706730793,
+    "truth": -0.0019989625214485627,
+    "sem": 1.3030038305650485e-06,
+    "sems_off": 2.333185178126623,
+    "rel_err": 0.001520863543911528
+   }
+  ]
+ },
+ {
+  "name": "mutationSharedRetentionAt",
+  "file": "PortabilityDrift.lean",
+  "source": "exp(-theta * tauAt t), theta = 4 Ne mu, tau = t/(2 Ne)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "the probability that NEITHER lineage of a sampled pair has mutated in t generations; Ne cancels out of theta*tau and that cancellation is what is tested, across four (Ne, mu, t) sets chosen to give different Ne at overlapping theta*tau",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+   "lean": 0.36787944117144233,
+   "truth": 0.3669825,
+   "sem": 0.0007620799575729406,
+   "sems_off": 1.1769646511881875,
+   "rel_err": 0.0024440979377554645
+  },
+  "cells": [
+   {
+    "design": "Ne=500 mu=1.0e-03 t=500 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3683025,
+    "sem": 0.0007626528838432167,
+    "sems_off": 0.5547200273153546,
+    "rel_err": 0.0011486721609482507
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=2000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3681375,
+    "sem": 0.0007625816039837147,
+    "sems_off": 0.3384015916586198,
+    "rel_err": 0.0007009848998205082
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669825,
+    "sem": 0.0007620799575729406,
+    "sems_off": 1.1769646511881875,
+    "rel_err": 0.0024440979377554645
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=1000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669925,
+    "sem": 0.0007620843210297499,
+    "sems_off": 1.1638360047138547,
+    "rel_err": 0.002416782826467393
+   }
+  ]
+ },
+ {
+  "name": "mutationSharedRetentionAt [one-lineage reading exp(-mu t), the competing candidate]",
+  "file": "PortabilityDrift.lean",
+  "source": "exp(-theta * tau / 2)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "same measurement; carried so the factor of two is chosen by the data rather than argued",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25) [one-lineage reading]",
+   "lean": 0.6065306597126334,
+   "truth": 0.3669825,
+   "sem": 0.0007620799575729406,
+   "sems_off": 314.3346801502855,
+   "rel_err": 0.6527509069577798
+  },
+  "cells": [
+   {
+    "design": "Ne=500 mu=1.0e-03 t=500 (theta=2.0 tau=0.50) [one-lineage reading]",
+    "lean": 0.6065306597126334,
+    "truth": 0.3683025,
+    "sem": 0.0007626528838432167,
+    "sems_off": 312.36774259888267,
+    "rel_err": 0.6468274304753117
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=2000 (theta=2.0 tau=0.50) [one-lineage reading]",
+    "lean": 0.6065306597126334,
+    "truth": 0.3681375,
+    "sem": 0.0007625816039837147,
+    "sems_off": 312.6133104539516,
+    "rel_err": 0.6475655419853544
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25) [one-lineage reading]",
+    "lean": 0.6065306597126334,
+    "truth": 0.3669825,
+    "sem": 0.0007620799575729406,
+    "sems_off": 314.3346801502855,
+    "rel_err": 0.6527509069577798
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=1000 (theta=2.0 tau=0.50) [one-lineage reading]",
+    "lean": 0.6065306597126334,
+    "truth": 0.3669925,
+    "sem": 0.0007620843210297499,
+    "sems_off": 314.3197584605371,
+    "rel_err": 0.6527058719527876
+   }
+  ]
+ },
+ {
+  "name": "mutationLDErosion",
+  "file": "DGP.lean",
+  "source": "exp(-theta * tau)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "the same composition, stated on the DGP parameter record; identical arithmetic, so this shares the measurement and is recorded as sharing it",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+   "lean": 0.36787944117144233,
+   "truth": 0.3669825,
+   "sem": 0.0007620799575729406,
+   "sems_off": 1.1769646511881875,
+   "rel_err": 0.0024440979377554645
+  },
+  "cells": [
+   {
+    "design": "Ne=500 mu=1.0e-03 t=500 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3683025,
+    "sem": 0.0007626528838432167,
+    "sems_off": 0.5547200273153546,
+    "rel_err": 0.0011486721609482507
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=2000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3681375,
+    "sem": 0.0007625816039837147,
+    "sems_off": 0.3384015916586198,
+    "rel_err": 0.0007009848998205082
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669825,
+    "sem": 0.0007620799575729406,
+    "sems_off": 1.1769646511881875,
+    "rel_err": 0.0024440979377554645
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=1000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669925,
+    "sem": 0.0007620843210297499,
+    "sems_off": 1.1638360047138547,
+    "rel_err": 0.002416782826467393
+   }
+  ]
+ },
+ {
+  "name": "tauAt",
+  "file": "PortabilityDrift.lean",
+  "source": "t / (2 * Ne)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "tested through the composition theta*tau = 2 mu t rather than as an isolated ratio; a time SCALE has no empirical content except in what it scales, and a wrong factor here moves exp(-theta*tau) by the amounts shown",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+   "lean": 0.36787944117144233,
+   "truth": 0.3669825,
+   "sem": 0.0007620799575729406,
+   "sems_off": 1.1769646511881875,
+   "rel_err": 0.0024440979377554645
+  },
+  "cells": [
+   {
+    "design": "Ne=500 mu=1.0e-03 t=500 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3683025,
+    "sem": 0.0007626528838432167,
+    "sems_off": 0.5547200273153546,
+    "rel_err": 0.0011486721609482507
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=2000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3681375,
+    "sem": 0.0007625816039837147,
+    "sems_off": 0.3384015916586198,
+    "rel_err": 0.0007009848998205082
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=250 (theta=4.0 tau=0.25)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669825,
+    "sem": 0.0007620799575729406,
+    "sems_off": 1.1769646511881875,
+    "rel_err": 0.0024440979377554645
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=1000 (theta=2.0 tau=0.50)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3669925,
+    "sem": 0.0007620843210297499,
+    "sems_off": 1.1638360047138547,
+    "rel_err": 0.002416782826467393
+   }
+  ]
+ }
+]

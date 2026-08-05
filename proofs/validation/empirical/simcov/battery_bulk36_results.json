@@ -1,0 +1,155 @@
+[
+ {
+  "name": "covarianceDivergenceMutationDrift [1 - covDiv = (1-fst)*shared_ld]",
+  "file": "PortabilityDrift.lean",
+  "source": "fst + (1 - fst) * (1 - shared_ld)",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.15 sems",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; F_ST, cross-deme LD correlation and score-covariance retention are three SEPARATE measurements on the same replicates, and the body is fed the measured shared LD rather than its migration formula -- which battery_bulk34 refuted. Retention is divided by the estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.561669186581718,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "4Nm=8.0",
+   "lean": 0.9182917098258261,
+   "truth": 0.6136566657398439,
+   "sem": 0.07594204341409762,
+   "sems_off": 4.011414894709441,
+   "rel_err": 0.4964258698611292
+  },
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.429186941891107,
+    "truth": 0.3918166887291448,
+    "sem": 0.07363633429116545,
+    "sems_off": 0.5074974674078215,
+    "rel_err": 0.09537687964025317
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.751094620332984,
+    "truth": 0.47624236168118306,
+    "sem": 0.07477534525537968,
+    "sems_off": 3.6757069822024904,
+    "rel_err": 0.5771268596971195
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.9182917098258261,
+    "truth": 0.6136566657398439,
+    "sem": 0.07594204341409762,
+    "sems_off": 4.011414894709441,
+    "rel_err": 0.4964258698611292
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.9791393366670545,
+    "truth": 0.7359639274212397,
+    "sem": 0.08479652533573355,
+    "sems_off": 2.8677520486012162,
+    "rel_err": 0.3304175655699356
+   }
+  ]
+ },
+ {
+  "name": "[competing] frequency divergence alone",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - fst",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.15 sems",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; F_ST, cross-deme LD correlation and score-covariance retention are three SEPARATE measurements on the same replicates, and the body is fed the measured shared LD rather than its migration formula -- which battery_bulk34 refuted. Retention is divided by the estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.5217936588221797,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "4Nm=2.0",
+   "lean": 0.8028157250459355,
+   "truth": 0.47624236168118306,
+   "sem": 0.07477534525537968,
+   "sems_off": 4.367393587410514,
+   "rel_err": 0.6857293463183658
+  },
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.4723675004957214,
+    "truth": 0.3918166887291448,
+    "sem": 0.07363633429116545,
+    "sems_off": 1.093900348815173,
+    "rel_err": 0.20558290160595935
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.8028157250459355,
+    "truth": 0.47624236168118306,
+    "sem": 0.07477534525537968,
+    "sems_off": 4.367393587410514,
+    "rel_err": 0.6857293463183658
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.9439671379531596,
+    "truth": 0.6136566657398439,
+    "sem": 0.07594204341409762,
+    "sems_off": 4.349507300089294,
+    "rel_err": 0.5382659240164578
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.987790122841705,
+    "truth": 0.7359639274212397,
+    "sem": 0.08479652533573355,
+    "sems_off": 2.969770216685339,
+    "rel_err": 0.3421719272340488
+   }
+  ]
+ },
+ {
+  "name": "[competing] LD sharing alone",
+  "file": "PortabilityDrift.lean",
+  "source": "shared_ld",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.15 sems",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; F_ST, cross-deme LD correlation and score-covariance retention are three SEPARATE measurements on the same replicates, and the body is fed the measured shared LD rather than its migration formula -- which battery_bulk34 refuted. Retention is divided by the estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.08338561061596365,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "4Nm=0.4",
+   "lean": 0.9085869401275511,
+   "truth": 0.3918166887291448,
+   "sem": 0.07363633429116545,
+   "sems_off": 7.017870408310181,
+   "rel_err": 1.3189082197456867
+  },
+  "cells": [
+   {
+    "design": "4Nm=0.4",
+    "lean": 0.9085869401275511,
+    "truth": 0.3918166887291448,
+    "sem": 0.07363633429116545,
+    "sems_off": 7.017870408310181,
+    "rel_err": 1.3189082197456867
+   },
+   {
+    "design": "4Nm=2.0",
+    "lean": 0.9355753716583066,
+    "truth": 0.47624236168118306,
+    "sem": 0.07477534525537968,
+    "sems_off": 6.142840376174352,
+    "rel_err": 0.9644942301134913
+   },
+   {
+    "design": "4Nm=8.0",
+    "lean": 0.9728005064000358,
+    "truth": 0.6136566657398439,
+    "sem": 0.07594204341409762,
+    "sems_off": 4.729183262844908,
+    "rel_err": 0.5852520810267688
+   },
+   {
+    "design": "4Nm=40.0",
+    "lean": 0.9912422831787753,
+    "truth": 0.7359639274212397,
+    "sem": 0.08479652533573355,
+    "sems_off": 3.0104813227525065,
+    "rel_err": 0.34686259237189926
+   }
+  ]
+ }
+]

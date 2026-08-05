@@ -1,0 +1,318 @@
+[
+ {
+  "name": "ldBandReconstructionShare",
+  "file": "MetricSpecificPortability.lean",
+  "source": "(2/pi) * arctan(((1+rho)/(1-rho)) * tan(pi*kappa/2))",
+  "note": "",
+  "regime": "normalised Poisson-kernel mass of the band |t| <= pi*kappa, by adaptive quadrature",
+  "span": 0.8434804250063443,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.8 kappa=0.3",
+   "lean": 0.863313537607311,
+   "truth": 0.86331353760731,
+   "sem": 8.6331353760731e-10,
+   "sems_off": 1.1574018924016236e-06,
+   "rel_err": 1.1574018924016236e-15
+  },
+  "cells": [
+   {
+    "design": "rho=0.2 kappa=0.1",
+    "lean": 0.14849306855258823,
+    "truth": 0.14849306855258823,
+    "sem": 1.4849306855258825e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.2 kappa=0.3",
+    "lean": 0.4154472423931006,
+    "truth": 0.4154472423931006,
+    "sem": 4.154472423931006e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.2 kappa=0.6",
+    "lean": 0.7128470038995859,
+    "truth": 0.7128470038995859,
+    "sem": 7.128470038995859e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.5 kappa=0.1",
+    "lean": 0.2823876129410101,
+    "truth": 0.28238761294101006,
+    "sem": 2.8238761294101006e-10,
+    "sems_off": 1.9657785500263407e-07,
+    "rel_err": 1.9657785500263408e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.3",
+    "lean": 0.6311905323047338,
+    "truth": 0.6311905323047338,
+    "sem": 6.311905323047338e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.5 kappa=0.6",
+    "lean": 0.8487353062132973,
+    "truth": 0.8487353062132973,
+    "sem": 8.487353062132973e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.8 kappa=0.1",
+    "lean": 0.6105474114119038,
+    "truth": 0.6105474114119038,
+    "sem": 6.105474114119039e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.8 kappa=0.3",
+    "lean": 0.863313537607311,
+    "truth": 0.86331353760731,
+    "sem": 8.6331353760731e-10,
+    "sems_off": 1.1574018924016236e-06,
+    "rel_err": 1.1574018924016236e-15
+   },
+   {
+    "design": "rho=0.8 kappa=0.6",
+    "lean": 0.9487188331466354,
+    "truth": 0.9487188331466344,
+    "sem": 9.487188331466345e-10,
+    "sems_off": 1.0532105901688196e-06,
+    "rel_err": 1.0532105901688197e-15
+   }
+  ]
+ },
+ {
+  "name": "ldBandDetectionShare",
+  "file": "MetricSpecificPortability.lean",
+  "source": "kappa - 2*rho*sin(pi*kappa)/(pi*(1 + rho^2))",
+  "note": "",
+  "regime": "normalised reciprocal-symbol mass of the same band, by adaptive quadrature",
+  "span": 0.9916537874542222,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.8 kappa=0.3",
+   "lean": 0.048762822048544374,
+   "truth": 0.04876282204854448,
+   "sem": 4.876282204854448e-11,
+   "sems_off": 2.134482874165713e-06,
+   "rel_err": 2.134482874165713e-15
+  },
+  "cells": [
+   {
+    "design": "rho=0.2 kappa=0.1",
+    "lean": 0.062168013727559014,
+    "truth": 0.06216801372755901,
+    "sem": 6.216801372755901e-11,
+    "sems_off": 1.1161517777157523e-07,
+    "rel_err": 1.1161517777157524e-16
+   },
+   {
+    "design": "rho=0.2 kappa=0.3",
+    "lean": 0.20095457407682998,
+    "truth": 0.20095457407683,
+    "sem": 2.0095457407683001e-10,
+    "sems_off": 1.3811865563715538e-07,
+    "rel_err": 1.3811865563715537e-16
+   },
+   {
+    "design": "rho=0.2 kappa=0.6",
+    "lean": 0.4835651186706681,
+    "truth": 0.4835651186706682,
+    "sem": 4.835651186706682e-10,
+    "sems_off": 2.2959121362541317e-07,
+    "rel_err": 2.2959121362541315e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.1",
+    "lean": 0.021309468553322733,
+    "truth": 0.021309468553322726,
+    "sem": 2.1309468553322727e-11,
+    "sems_off": 3.256249158229366e-07,
+    "rel_err": 3.2562491582293665e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.3",
+    "lean": 0.09398551407980643,
+    "truth": 0.09398551407980646,
+    "sem": 9.398551407980646e-11,
+    "sems_off": 2.95317591092396e-07,
+    "rel_err": 2.95317591092396e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.6",
+    "lean": 0.3578154468349897,
+    "truth": 0.3578154468349897,
+    "sem": 3.5781544683498975e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.8 kappa=0.1",
+    "lean": 0.004035937260149669,
+    "truth": 0.004035937260149664,
+    "sem": 4.035937260149664e-12,
+    "sems_off": 1.2894577126646007e-06,
+    "rel_err": 1.2894577126646008e-15
+   },
+   {
+    "design": "rho=0.8 kappa=0.3",
+    "lean": 0.048762822048544374,
+    "truth": 0.04876282204854448,
+    "sem": 4.876282204854448e-11,
+    "sems_off": 2.134482874165713e-06,
+    "rel_err": 2.134482874165713e-15
+   },
+   {
+    "design": "rho=0.8 kappa=0.6",
+    "lean": 0.3046529839451094,
+    "truth": 0.3046529839451094,
+    "sem": 3.046529839451094e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "ldPruningDetectionDeficit",
+  "file": "MetricSpecificPortability.lean",
+  "source": "2*rho*sin(pi*kappa)/(pi*(1 + rho^2))",
+  "note": "",
+  "regime": "kappa minus the detection share, on the same integrals",
+  "span": 0.8719066582158734,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.2 kappa=0.6",
+   "lean": 0.11643488132933186,
+   "truth": 0.11643488132933177,
+   "sem": 1.1643488132933178e-10,
+   "sems_off": 7.151355839095148e-07,
+   "rel_err": 7.151355839095148e-16
+  },
+  "cells": [
+   {
+    "design": "rho=0.2 kappa=0.1",
+    "lean": 0.03783198627244099,
+    "truth": 0.037831986272441,
+    "sem": 3.7831986272441e-11,
+    "sems_off": 1.8341341778721038e-07,
+    "rel_err": 1.8341341778721036e-16
+   },
+   {
+    "design": "rho=0.2 kappa=0.3",
+    "lean": 0.09904542592316999,
+    "truth": 0.09904542592316998,
+    "sem": 9.904542592316998e-11,
+    "sems_off": 1.4011538320385965e-07,
+    "rel_err": 1.4011538320385965e-16
+   },
+   {
+    "design": "rho=0.2 kappa=0.6",
+    "lean": 0.11643488132933186,
+    "truth": 0.11643488132933177,
+    "sem": 1.1643488132933178e-10,
+    "sems_off": 7.151355839095148e-07,
+    "rel_err": 7.151355839095148e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.1",
+    "lean": 0.07869053144667727,
+    "truth": 0.07869053144667729,
+    "sem": 7.869053144667729e-11,
+    "sems_off": 1.7635905556462532e-07,
+    "rel_err": 1.7635905556462534e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.3",
+    "lean": 0.20601448592019356,
+    "truth": 0.20601448592019353,
+    "sem": 2.0601448592019355e-10,
+    "sems_off": 1.347263300037112e-07,
+    "rel_err": 1.3472633000371124e-16
+   },
+   {
+    "design": "rho=0.5 kappa=0.6",
+    "lean": 0.24218455316501025,
+    "truth": 0.24218455316501025,
+    "sem": 2.4218455316501025e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.8 kappa=0.1",
+    "lean": 0.09596406273985034,
+    "truth": 0.09596406273985034,
+    "sem": 9.596406273985034e-11,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "rho=0.8 kappa=0.3",
+    "lean": 0.2512371779514556,
+    "truth": 0.2512371779514555,
+    "sem": 2.512371779514555e-10,
+    "sems_off": 4.419023624121728e-07,
+    "rel_err": 4.4190236241217287e-16
+   },
+   {
+    "design": "rho=0.8 kappa=0.6",
+    "lean": 0.29534701605489055,
+    "truth": 0.29534701605489055,
+    "sem": 2.9534701605489057e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "LD-band symbols are normalised to unit total mass",
+  "file": "MetricSpecificPortability.lean",
+  "source": "total normalised mass = 1",
+  "note": "",
+  "regime": "the normalisation both closed forms are stated against; if it failed, both would be scaled by a constant and the boundary checks in the module would not detect it",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "rho=0.2, Poisson mass at kappa=0.999",
+   "lean": 1.0,
+   "truth": 0.999333333028716,
+   "sem": 0.001,
+   "sems_off": 0.6666669712840356,
+   "rel_err": 0.0006671117126290021
+  },
+  "cells": [
+   {
+    "design": "rho=0.2, Poisson mass at kappa=0.999",
+    "lean": 1.0,
+    "truth": 0.999333333028716,
+    "sem": 0.001,
+    "sems_off": 0.6666669712840356,
+    "rel_err": 0.0006671117126290021
+   },
+   {
+    "design": "rho=0.5, Poisson mass at kappa=0.999",
+    "lean": 1.0,
+    "truth": 0.9996666664229727,
+    "sem": 0.001,
+    "sems_off": 0.3333335770272505,
+    "rel_err": 0.00033344472535029243
+   },
+   {
+    "design": "rho=0.8, Poisson mass at kappa=0.999",
+    "lean": 1.0,
+    "truth": 0.9998888887986311,
+    "sem": 0.001,
+    "sems_off": 0.1111112013688631,
+    "rel_err": 0.00011112354843983062
+   }
+  ]
+ }
+]

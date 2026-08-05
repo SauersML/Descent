@@ -1,0 +1,257 @@
+[
+ {
+  "name": "sourceSelfR2DiagonalLD",
+  "file": "TransferLearningPGS.lean",
+  "source": "pgsR2 (sum b^2) (sum b^2) var_y",
+  "note": "control 'h2=0.5 rg=1.0 [rg=1: transported = oracle]' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "300 independent standardized variants, 300000 individuals; effects drawn per population at genetic correlation rg. Every comparison target is a REALISED squared correlation between a simulated score and a simulated phenotype -- no body is evaluated to build it",
+  "span": 0.6455962360605577,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.5 rg=1.0",
+   "lean": 0.4322760401929543,
+   "truth": 0.4362903525334872,
+   "sem": 0.001196114380557816,
+   "sems_off": 3.3561274789295634,
+   "rel_err": 0.009201011017599302
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rg=0.9",
+    "lean": 0.5263636575138096,
+    "truth": 0.5237529575517593,
+    "sem": 0.0013198117865917175,
+    "sems_off": 1.978085048620603,
+    "rel_err": 0.004984601851708537
+   },
+   {
+    "design": "h2=0.3 rg=0.6",
+    "lean": 0.2674688259503862,
+    "truth": 0.26801294029184747,
+    "sem": 0.0008372917911033846,
+    "sems_off": 0.6498503236777865,
+    "rel_err": 0.0020301793669693165
+   },
+   {
+    "design": "h2=0.7 rg=0.4",
+    "lean": 0.7547008614617569,
+    "truth": 0.7580534357236937,
+    "sem": 0.0013615353401694344,
+    "sems_off": 2.462348323268345,
+    "rel_err": 0.004422609415042343
+   },
+   {
+    "design": "h2=0.5 rg=1.0",
+    "lean": 0.4322760401929543,
+    "truth": 0.4362903525334872,
+    "sem": 0.001196114380557816,
+    "sems_off": 3.3561274789295634,
+    "rel_err": 0.009201011017599302
+   }
+  ]
+ },
+ {
+  "name": "transportedTargetR2DiagonalLD",
+  "file": "TransferLearningPGS.lean",
+  "source": "pgsR2 (sum bs*bt) (sum bs^2) var_y",
+  "note": "control 'h2=0.5 rg=1.0 [rg=1: transported = oracle]' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "300 independent standardized variants, 300000 individuals; effects drawn per population at genetic correlation rg. Every comparison target is a REALISED squared correlation between a simulated score and a simulated phenotype -- no body is evaluated to build it",
+  "span": 0.7285934768009068,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.7 rg=0.4",
+   "lean": 0.1314247266202295,
+   "truth": 0.1332636296356639,
+   "sem": 0.00045302744877457295,
+   "sems_off": 4.0591425981109746,
+   "rel_err": 0.013798986418589043
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rg=0.9",
+    "lean": 0.4210445292322686,
+    "truth": 0.416660591266795,
+    "sem": 0.0011620169222890623,
+    "sems_off": 3.772697179691373,
+    "rel_err": 0.010521604532228206
+   },
+   {
+    "design": "h2=0.3 rg=0.6",
+    "lean": 0.11816374074166519,
+    "truth": 0.11692984675952957,
+    "sem": 0.00040122903383213676,
+    "sems_off": 3.0752858793659734,
+    "rel_err": 0.010552429651884946
+   },
+   {
+    "design": "h2=0.7 rg=0.4",
+    "lean": 0.1314247266202295,
+    "truth": 0.1332636296356639,
+    "sem": 0.00045302744877457295,
+    "sems_off": 4.0591425981109746,
+    "rel_err": 0.013798986418589043
+   },
+   {
+    "design": "h2=0.5 rg=1.0",
+    "lean": 0.4353754631571066,
+    "truth": 0.43615045008474307,
+    "sem": 0.0011958792002590244,
+    "sems_off": 0.6480478358253785,
+    "rel_err": 0.001776879807153396
+   }
+  ]
+ },
+ {
+  "name": "targetOracleR2DiagonalLD",
+  "file": "TransferLearningPGS.lean",
+  "source": "pgsR2 (sum bt^2) (sum bt^2) var_y",
+  "note": "control 'h2=0.5 rg=1.0 [rg=1: transported = oracle]' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "300 independent standardized variants, 300000 individuals; effects drawn per population at genetic correlation rg. Every comparison target is a REALISED squared correlation between a simulated score and a simulated phenotype -- no body is evaluated to build it",
+  "span": 0.5661769930472633,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.5 rg=0.9",
+   "lean": 0.5201838436505591,
+   "truth": 0.5167316285841084,
+   "sem": 0.001311682123446334,
+   "sems_off": 2.6318991505200713,
+   "rel_err": 0.006680866576544101
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rg=0.9",
+    "lean": 0.5201838436505591,
+    "truth": 0.5167316285841084,
+    "sem": 0.001311682123446334,
+    "sems_off": 2.6318991505200713,
+    "rel_err": 0.006680866576544101
+   },
+   {
+    "design": "h2=0.3 rg=0.6",
+    "lean": 0.32112578798963,
+    "truth": 0.31935065408850194,
+    "sem": 0.0009620527693112248,
+    "sems_off": 1.8451523219448145,
+    "rel_err": 0.005558572930419303
+   },
+   {
+    "design": "h2=0.7 rg=0.4",
+    "lean": 0.7402230468256733,
+    "truth": 0.7396703684913004,
+    "sem": 0.0013780640114981432,
+    "sems_off": 0.40105418163562284,
+    "rel_err": 0.0007471954507251451
+   },
+   {
+    "design": "h2=0.5 rg=1.0",
+    "lean": 0.4353754631571065,
+    "truth": 0.43615045008474307,
+    "sem": 0.0011958792002590244,
+    "sems_off": 0.6480478358254713,
+    "rel_err": 0.0017768798071536506
+   }
+  ]
+ },
+ {
+  "name": "transportedTargetR2 [cov unsquared, competing]",
+  "file": "TransferLearningPGS.lean",
+  "source": "cov / (var_pgs * var_y)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "300 independent standardized variants, 300000 individuals; effects drawn per population at genetic correlation rg. Every comparison target is a REALISED squared correlation between a simulated score and a simulated phenotype -- no body is evaluated to build it",
+  "span": 0.5831123474565294,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "h2=0.3 rg=0.6",
+   "lean": 0.6642152505030732,
+   "truth": 0.11692984675952957,
+   "sem": 0.00040122903383213676,
+   "sems_off": 1364.0224350576605,
+   "rel_err": 4.68045942854142
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rg=0.9",
+    "lean": 0.8946777715638441,
+    "truth": 0.416660591266795,
+    "sem": 0.0011620169222890623,
+    "sems_off": 411.3685189329265,
+    "rel_err": 1.147257960835001
+   },
+   {
+    "design": "h2=0.3 rg=0.6",
+    "lean": 0.6642152505030732,
+    "truth": 0.11692984675952957,
+    "sem": 0.00040122903383213676,
+    "sems_off": 1364.0224350576605,
+    "rel_err": 4.68045942854142
+   },
+   {
+    "design": "h2=0.7 rg=0.4",
+    "lean": 0.4172823201922511,
+    "truth": 0.1332636296356639,
+    "sem": 0.00045302744877457295,
+    "sems_off": 626.9348387715802,
+    "rel_err": 2.1312543514917017
+   },
+   {
+    "design": "h2=0.5 rg=1.0",
+    "lean": 1.0009467002593446,
+    "truth": 0.43615045008474307,
+    "sem": 0.0011958792002590244,
+    "sems_off": 472.2853696696691,
+    "rel_err": 1.294957393864578
+   }
+  ]
+ },
+ {
+  "name": "transportedTargetR2 [var_pgs omitted, competing]",
+  "file": "TransferLearningPGS.lean",
+  "source": "cov^2 / var_y",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "300 independent standardized variants, 300000 individuals; effects drawn per population at genetic correlation rg. Every comparison target is a REALISED squared correlation between a simulated score and a simulated phenotype -- no body is evaluated to build it",
+  "span": 0.8568768945772554,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "h2=0.3 rg=0.6",
+   "lean": 0.031711003396782386,
+   "truth": 0.11692984675952957,
+   "sem": 0.00040122903383213676,
+   "sems_off": 212.39450831566793,
+   "rel_err": 0.7288031732223407
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rg=0.9",
+    "lean": 0.22156452868401064,
+    "truth": 0.416660591266795,
+    "sem": 0.0011620169222890623,
+    "sems_off": 167.89433857681158,
+    "rel_err": 0.4682373775490108
+   },
+   {
+    "design": "h2=0.3 rg=0.6",
+    "lean": 0.031711003396782386,
+    "truth": 0.11692984675952957,
+    "sem": 0.00040122903383213676,
+    "sems_off": 212.39450831566793,
+    "rel_err": 0.7288031732223407
+   },
+   {
+    "design": "h2=0.7 rg=0.4",
+    "lean": 0.09941212260252295,
+    "truth": 0.1332636296356639,
+    "sem": 0.00045302744877457295,
+    "sems_off": 74.72286088780794,
+    "rel_err": 0.2540190982767712
+   },
+   {
+    "design": "h2=0.5 rg=1.0",
+    "lean": 0.18937251491028675,
+    "truth": 0.43615045008474307,
+    "sem": 0.0011958792002590244,
+    "sems_off": 206.35690889264137,
+    "rel_err": 0.5658091952593604
+   }
+  ]
+ }
+]

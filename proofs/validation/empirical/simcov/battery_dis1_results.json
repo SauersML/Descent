@@ -1,0 +1,687 @@
+[
+ {
+  "name": "alleleFreqDivergenceRate",
+  "file": "DGP.lean",
+  "source": "1 / (2*Ne*(1 + theta + bigM))",
+  "note": "positive control 'Ne=200 no mutation no migration vs 1/(2Ne)' passed at 0.36 sems",
+  "regime": "across-replicate variance of the allele frequency after ONE generation from a common start, normalised by p0(1-p0), 20000 replicate populations and 400 loci",
+  "span": 0.9199999999999999,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 theta=4.0 M=4.0",
+   "lean": 0.0002777777777777778,
+   "truth": 0.002509652753886884,
+   "sem": 1.3780306750027825e-06,
+   "sems_off": 1619.611969889277,
+   "rel_err": 0.8893162500877609
+  },
+  "cells": [
+   {
+    "design": "Ne=200 theta=0.0 M=0.0",
+    "lean": 0.0025,
+    "truth": 0.002499552211506451,
+    "sem": 1.2336757325821539e-06,
+    "sems_off": 0.36297098315424103,
+    "rel_err": 0.0001791474854926099
+   },
+   {
+    "design": "Ne=200 theta=0.8 M=0.0",
+    "lean": 0.001388888888888889,
+    "truth": 0.0025030441155630247,
+    "sem": 1.242073577987123e-06,
+    "sems_off": 897.0122595150209,
+    "rel_err": 0.4451200918700237
+   },
+   {
+    "design": "Ne=200 theta=0.0 M=0.8",
+    "lean": 0.001388888888888889,
+    "truth": 0.002499552211506451,
+    "sem": 1.2336757325821539e-06,
+    "sems_off": 900.287890313673,
+    "rel_err": 0.4443449180636152
+   },
+   {
+    "design": "Ne=200 theta=4.0 M=4.0",
+    "lean": 0.0002777777777777778,
+    "truth": 0.002509652753886884,
+    "sem": 1.3780306750027825e-06,
+    "sems_off": 1619.611969889277,
+    "rel_err": 0.8893162500877609
+   },
+   {
+    "design": "Ne=500 theta=0.0 M=4.0",
+    "lean": 0.0002,
+    "truth": 0.0010000496050444042,
+    "sem": 5.282693017544028e-07,
+    "sems_off": 1514.4730204602245,
+    "rel_err": 0.8000099205167732
+   }
+  ]
+ },
+ {
+  "name": "alleleFreqDivergenceRate [CANDIDATE: 1/(2Ne)]",
+  "file": "DGP.lean",
+  "source": "1 / (2*Ne)",
+  "note": "",
+  "regime": "same runs, the drift rate alone",
+  "span": 0.6,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 theta=4.0 M=4.0",
+   "lean": 0.0025,
+   "truth": 0.002509652753886884,
+   "sem": 1.3780306750027825e-06,
+   "sems_off": 7.0047452948495526,
+   "rel_err": 0.003846250789848979
+  },
+  "cells": [
+   {
+    "design": "Ne=200 theta=0.0 M=0.0",
+    "lean": 0.0025,
+    "truth": 0.002499552211506451,
+    "sem": 1.2336757325821539e-06,
+    "sems_off": 0.36297098315424103,
+    "rel_err": 0.0001791474854926099
+   },
+   {
+    "design": "Ne=200 theta=0.8 M=0.0",
+    "lean": 0.0025,
+    "truth": 0.0025030441155630247,
+    "sem": 1.242073577987123e-06,
+    "sems_off": 2.450833523049317,
+    "rel_err": 0.0012161653660426677
+   },
+   {
+    "design": "Ne=200 theta=0.0 M=0.8",
+    "lean": 0.0025,
+    "truth": 0.002499552211506451,
+    "sem": 1.2336757325821539e-06,
+    "sems_off": 0.36297098315424103,
+    "rel_err": 0.0001791474854926099
+   },
+   {
+    "design": "Ne=200 theta=4.0 M=4.0",
+    "lean": 0.0025,
+    "truth": 0.002509652753886884,
+    "sem": 1.3780306750027825e-06,
+    "sems_off": 7.0047452948495526,
+    "rel_err": 0.003846250789848979
+   },
+   {
+    "design": "Ne=500 theta=0.0 M=4.0",
+    "lean": 0.001,
+    "truth": 0.0010000496050444042,
+    "sem": 5.282693017544028e-07,
+    "sems_off": 0.09390105432852255,
+    "rel_err": 4.960258386575563e-05
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [decay base = hetDecayFactor: R = 1 + theta]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - hetDecayFactor^t)",
+  "note": "the positive control 'theta=4 M=0 vs heterozygosity decay 1+theta' missed by 22.8 sems on the same code path, so this design cannot support any verdict",
+  "regime": "24-deme forward Wright-Fisher island model with two-way mutation started identical; the fitted per-generation decay base of F(t)/F(plateau), which is invariant to the F_ST convention, expressed as R = (1 - lam) * 2Ne",
+  "span": 0.8,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "theta=0.0 M=12.0",
+   "lean": 1.0,
+   "truth": 13.020144112653295,
+   "sem": 0.2214938470450652,
+   "sems_off": 54.26852381234623,
+   "rel_err": 0.9231959345958256
+  },
+  "cells": [
+   {
+    "design": "theta=4.0 M=0.0",
+    "lean": 5.0,
+    "truth": 8.340819886037716,
+    "sem": 0.1465089904435552,
+    "sems_off": 22.802831934909943,
+    "rel_err": 0.4005385479705837
+   },
+   {
+    "design": "theta=0.0 M=4.0",
+    "lean": 1.0,
+    "truth": 4.882838212299219,
+    "sem": 0.08833195128424522,
+    "sems_off": 43.95734675671947,
+    "rel_err": 0.7952010784463156
+   },
+   {
+    "design": "theta=2.0 M=2.0",
+    "lean": 3.0,
+    "truth": 6.303855519758507,
+    "sem": 0.13241768074295066,
+    "sems_off": 24.95025967243721,
+    "rel_err": 0.524100768078053
+   },
+   {
+    "design": "theta=0.0 M=12.0",
+    "lean": 1.0,
+    "truth": 13.020144112653295,
+    "sem": 0.2214938470450652,
+    "sems_off": 54.26852381234623,
+    "rel_err": 0.9231959345958256
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [CANDIDATE: R = 1 + theta + bigM]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - (1 - (1+theta+bigM)/(2Ne))^t)",
+  "note": "the positive control 'theta=4 M=0 vs heterozygosity decay 1+theta' missed by 22.8 sems on the same code path, so this design cannot support any verdict",
+  "regime": "same runs, same fits",
+  "span": 0.6153846153846154,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "theta=4.0 M=0.0",
+   "lean": 5.0,
+   "truth": 8.340819886037716,
+   "sem": 0.1465089904435552,
+   "sems_off": 22.802831934909943,
+   "rel_err": 0.4005385479705837
+  },
+  "cells": [
+   {
+    "design": "theta=4.0 M=0.0",
+    "lean": 5.0,
+    "truth": 8.340819886037716,
+    "sem": 0.1465089904435552,
+    "sems_off": 22.802831934909943,
+    "rel_err": 0.4005385479705837
+   },
+   {
+    "design": "theta=0.0 M=4.0",
+    "lean": 5.0,
+    "truth": 4.882838212299219,
+    "sem": 0.08833195128424522,
+    "sems_off": 1.326380613100734,
+    "rel_err": 0.023994607768421737
+   },
+   {
+    "design": "theta=2.0 M=2.0",
+    "lean": 5.0,
+    "truth": 6.303855519758507,
+    "sem": 0.13241768074295066,
+    "sems_off": 9.84653644772372,
+    "rel_err": 0.20683461346342152
+   },
+   {
+    "design": "theta=0.0 M=12.0",
+    "lean": 13.0,
+    "truth": 13.020144112653295,
+    "sem": 0.2214938470450652,
+    "sems_off": 0.09094660155140259,
+    "rel_err": 0.0015471497457327152
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [m_into = the larger rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'symmetric cell vs the validated two-deme island value 1/(1 + 2*4Ne*m)' passed at 1.69 sems",
+  "regime": "two demes with asymmetric migration, Ne=1000, F_ST read as 1 - E[T_within]/E[T_between] from branch lengths so no estimator convention enters, 24 replicates of 4 Mb",
+  "span": 0.39024390243902435,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=1.0e-03 m21=1.0e-03",
+   "lean": 0.2,
+   "truth": 0.10352696271139572,
+   "sem": 0.0044894590923650205,
+   "sems_off": 21.48878858316601,
+   "rel_err": 0.9318638812725937
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.2,
+    "truth": 0.10352696271139572,
+    "sem": 0.0044894590923650205,
+    "sems_off": 21.48878858316601,
+    "rel_err": 0.9318638812725937
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.14285714285714285,
+    "truth": 0.11410293234164592,
+    "sem": 0.009326824255391579,
+    "sems_off": 3.082958328380093,
+    "rel_err": 0.2520023800037087
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.12195121951219513,
+    "truth": 0.11279655615105903,
+    "sem": 0.0050625906656055,
+    "sems_off": 1.808296179924548,
+    "rel_err": 0.0811608410178412
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [m_into = the smaller rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'symmetric cell vs the validated two-deme island value 1/(1 + 2*4Ne*m)' passed at 1.69 sems",
+  "regime": "same runs, the other reading of the single rate argument",
+  "span": 0.64,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=1.8e-03 m21=2.0e-04",
+   "lean": 0.5555555555555556,
+   "truth": 0.11279655615105903,
+   "sem": 0.0050625906656055,
+   "sems_off": 87.45700149382733,
+   "rel_err": 3.925288275747943
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.2,
+    "truth": 0.10352696271139572,
+    "sem": 0.0044894590923650205,
+    "sems_off": 21.48878858316601,
+    "rel_err": 0.9318638812725937
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.3333333333333333,
+    "truth": 0.11410293234164592,
+    "sem": 0.009326824255391579,
+    "sems_off": 23.50536420421521,
+    "rel_err": 1.9213388866753205
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.5555555555555556,
+    "truth": 0.11279655615105903,
+    "sem": 0.0050625906656055,
+    "sems_off": 87.45700149382733,
+    "rel_err": 3.925288275747943
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [CANDIDATE: the SUM of the two rates]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*(m12 + m21))",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "same runs; the reading the symmetric row forces, since there 1/(1 + 4Ne(m+m)) is the two-deme island value",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "m12=1.0e-03 m21=1.0e-03",
+   "lean": 0.1111111111111111,
+   "truth": 0.10352696271139572,
+   "sem": 0.0044894590923650205,
+   "sems_off": 1.6893234226397862,
+   "rel_err": 0.07325771181810746
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.1111111111111111,
+    "truth": 0.10352696271139572,
+    "sem": 0.0044894590923650205,
+    "sems_off": 1.6893234226397862,
+    "rel_err": 0.07325771181810746
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.1111111111111111,
+    "truth": 0.11410293234164592,
+    "sem": 0.009326824255391579,
+    "sems_off": 0.32077598425909337,
+    "rel_err": 0.026220371108226528
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.1111111111111111,
+    "truth": 0.11279655615105903,
+    "sem": 0.0050625906656055,
+    "sems_off": 0.33292145292302505,
+    "rel_err": 0.014942344850411491
+   }
+  ]
+ },
+ {
+  "name": "gwasHeritability [nominal h2, the earlier reading]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r2_tag",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "variance explained by regressing on tag variants at r-squared rho^2, with h2_true read as the NOMINAL per-effect variance times M",
+  "span": 0.6484375000000001,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "h2=0.5 rho=0.6 (realised h2=0.522)",
+   "lean": 0.18,
+   "truth": 0.18793037818063063,
+   "sem": 0.0011885760731752066,
+   "sems_off": 6.672167107861366,
+   "rel_err": 0.042198489980200524
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rho=0.9 (realised h2=0.501)",
+    "lean": 0.405,
+    "truth": 0.4068057128476269,
+    "sem": 0.0025728652355338465,
+    "sems_off": 0.7018295488967587,
+    "rel_err": 0.004438759807444543
+   },
+   {
+    "design": "h2=0.5 rho=0.6 (realised h2=0.522)",
+    "lean": 0.18,
+    "truth": 0.18793037818063063,
+    "sem": 0.0011885760731752066,
+    "sems_off": 6.672167107861366,
+    "rel_err": 0.042198489980200524
+   },
+   {
+    "design": "h2=0.8 rho=0.8 (realised h2=0.802)",
+    "lean": 0.5120000000000001,
+    "truth": 0.5097165808668439,
+    "sem": 0.0032237307133852595,
+    "sems_off": 0.7083157174621402,
+    "rel_err": 0.004479781939353327
+   }
+  ]
+ },
+ {
+  "name": "gwasHeritability [realised h2]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r2_tag",
+  "note": "",
+  "regime": "same runs, h2_true read as the heritability the drawn effects actually produce, and the in-sample R^2 corrected for its m/n optimism",
+  "span": 0.6343714972204856,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.8 rho=0.8 (realised h2=0.802)",
+   "lean": 0.5135529821906744,
+   "truth": 0.5097165808668439,
+   "sem": 0.0032237307133852595,
+   "sems_off": 1.1900501825110024,
+   "rel_err": 0.007526538213267691
+  },
+  "cells": [
+   {
+    "design": "h2=0.5 rho=0.9 (realised h2=0.501)",
+    "lean": 0.40589587682586875,
+    "truth": 0.4068057128476269,
+    "sem": 0.0025728652355338465,
+    "sems_off": 0.3536275469046731,
+    "rel_err": 0.0022365369831935868
+   },
+   {
+    "design": "h2=0.5 rho=0.6 (realised h2=0.522)",
+    "lean": 0.18776960797633094,
+    "truth": 0.18793037818063063,
+    "sem": 0.0011885760731752066,
+    "sems_off": 0.13526286447127045,
+    "rel_err": 0.0008554774691357634
+   },
+   {
+    "design": "h2=0.8 rho=0.8 (realised h2=0.802)",
+    "lean": 0.5135529821906744,
+    "truth": 0.5097165808668439,
+    "sem": 0.0032237307133852595,
+    "sems_off": 1.1900501825110024,
+    "rel_err": 0.007526538213267691
+   }
+  ]
+ },
+ {
+  "name": "driftLDRetention [slope of the E[D^2] recurrence]",
+  "file": "LDDecayTheory.lean",
+  "source": "(1 - c)^2 * (1 - 1/(2*Ne))",
+  "note": "",
+  "regime": "the SLOPE in Q, obtained by differencing two arms that share p and q and differ only in D0, so the drift CREATION term -- which is what makes the raw ratio E[D^2_{t+1}]/E[D^2_t] exceed one at c = 0 -- cancels exactly",
+  "span": 0.09750000000000006,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 c=0.00",
+   "lean": 0.995,
+   "truth": 0.9852232894842186,
+   "sem": 0.0003608240060610501,
+   "sems_off": 27.095510142213918,
+   "rel_err": 0.009923344910877733
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.00",
+    "lean": 0.995,
+    "truth": 0.9852232894842186,
+    "sem": 0.0003608240060610501,
+    "sems_off": 27.095510142213918,
+    "rel_err": 0.009923344910877733
+   },
+   {
+    "design": "Ne=100 c=0.02",
+    "lean": 0.955598,
+    "truth": 0.946341919181719,
+    "sem": 0.0003572904158479157,
+    "sems_off": 25.906322721572646,
+    "rel_err": 0.009780905432451442
+   },
+   {
+    "design": "Ne=100 c=0.05",
+    "lean": 0.8979874999999999,
+    "truth": 0.8893628464974219,
+    "sem": 0.00035111718471047,
+    "sems_off": 24.563461653663794,
+    "rel_err": 0.009697564426650488
+   },
+   {
+    "design": "Ne=500 c=0.02",
+    "lean": 0.9594396,
+    "truth": 0.9574167648539892,
+    "sem": 0.00016003126299711607,
+    "sems_off": 12.640249836978498,
+    "rel_err": 0.00211280522784584
+   }
+  ]
+ },
+ {
+  "name": "pgsDriftVarianceFromLoci [as the docstring's displayed equation reads it: Var(dPGS) = sum fst beta^2]",
+  "file": "PolygenicAdaptation.lean",
+  "source": "sum_i fst * beta_i^2",
+  "note": "positive control 't=30 vs the validated pgsDriftVariance_one_pop = 2 fst V_A' passed at 0.28 sems",
+  "regime": "variance of ONE population's mean score about the ancestral mean, effects on the STANDARDIZED scale the docstring declares, so that sum beta^2 is V_A",
+  "span": 0.8767861182566575,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 t=250 (F=0.465)",
+   "lean": 210.87939617896265,
+   "truth": 427.7914122923692,
+   "sem": 12.102189022508881,
+   "sems_off": 17.923370367953396,
+   "rel_err": 0.5070508894768567
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 25.983268982902175,
+    "truth": 51.551575293807566,
+    "sem": 1.458390446106874,
+    "sems_off": 17.53186629764283,
+    "rel_err": 0.4959752668116174
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 91.79130572302572,
+    "truth": 181.13649699497995,
+    "sem": 5.124338784085176,
+    "sems_off": 17.435457536382348,
+    "rel_err": 0.49324786972351775
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 210.87939617896265,
+    "truth": 427.7914122923692,
+    "sem": 12.102189022508881,
+    "sems_off": 17.923370367953396,
+    "rel_err": 0.5070508894768567
+   }
+  ]
+ },
+ {
+  "name": "pgsDriftVarianceFromLoci [as the file's own theorem reads it: 2 * sum fst beta^2]",
+  "file": "PolygenicAdaptation.lean",
+  "source": "2 * sum_i fst * beta_i^2",
+  "note": "",
+  "regime": "same runs; pgsDriftVarianceFromLoci_eq_closedForm states 2 * this sum = pgsDriftVariance_one_pop",
+  "span": 0.8767861182566575,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 t=250 (F=0.465)",
+   "lean": 421.7587923579253,
+   "truth": 427.7914122923692,
+   "sem": 12.102189022508881,
+   "sems_off": 0.49847345163952034,
+   "rel_err": 0.014101778953713518
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 51.96653796580435,
+    "truth": 51.551575293807566,
+    "sem": 1.458390446106874,
+    "sems_off": 0.28453468898161816,
+    "rel_err": 0.008049466376765183
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 183.58261144605143,
+    "truth": 181.13649699497995,
+    "sem": 5.124338784085176,
+    "sems_off": 0.477352211502576,
+    "rel_err": 0.0135042605529645
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 421.7587923579253,
+    "truth": 427.7914122923692,
+    "sem": 12.102189022508881,
+    "sems_off": 0.49847345163952034,
+    "rel_err": 0.014101778953713518
+   }
+  ]
+ },
+ {
+  "name": "admixedFst",
+  "file": "DemographicHistory.lean",
+  "source": "(1 - alpha)^2 * fst_AB",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "one-pulse admixture with no post-admixture drift, Nei G_ST as a ratio of averages over 40000 loci, het ratio in the orientation the docstring states: pbar_adm(1-pbar_adm) over pbar_AB(1-pbar_AB)",
+  "span": 0.9375000000000001,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "alpha=0.8 (het ratio 0.937)",
+   "lean": 0.003956393063867278,
+   "truth": 0.004223078494803397,
+   "sem": 3.531627196987461e-05,
+   "sems_off": 7.551347185331638,
+   "rel_err": 0.06314953209235451
+  },
+  "cells": [
+   {
+    "design": "alpha=0.2 (het ratio 0.996)",
+    "lean": 0.06330228902187648,
+    "truth": 0.06355129595317617,
+    "sem": 0.00048544969230104044,
+    "sems_off": 0.5129407542095429,
+    "rel_err": 0.003918203831486796
+   },
+   {
+    "design": "alpha=0.5 (het ratio 0.975)",
+    "lean": 0.024727456649170497,
+    "truth": 0.02535192484538475,
+    "sem": 0.00020036794630494097,
+    "sems_off": 3.1166072604441006,
+    "rel_err": 0.024631983568219495
+   },
+   {
+    "design": "alpha=0.8 (het ratio 0.937)",
+    "lean": 0.003956393063867278,
+    "truth": 0.004223078494803397,
+    "sem": 3.531627196987461e-05,
+    "sems_off": 7.551347185331638,
+    "rel_err": 0.06314953209235451
+   }
+  ]
+ },
+ {
+  "name": "admixedFstExact",
+  "file": "DemographicHistory.lean",
+  "source": "(1 - alpha)^2 * fst_AB / hetRatio",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "same runs, with the heterozygosity-ratio divisor",
+  "span": 0.9335485070530283,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "alpha=0.2 (het ratio 0.996)",
+   "lean": 0.06355129595317617,
+   "truth": 0.06355129595317617,
+   "sem": 0.00048544969230104044
+  },
+  "cells": [
+   {
+    "design": "alpha=0.2 (het ratio 0.996)",
+    "lean": 0.06355129595317617,
+    "truth": 0.06355129595317617,
+    "sem": 0.00048544969230104044
+   },
+   {
+    "design": "alpha=0.5 (het ratio 0.975)",
+    "lean": 0.025351924845384746,
+    "truth": 0.02535192484538475,
+    "sem": 0.00020036794630494097
+   },
+   {
+    "design": "alpha=0.8 (het ratio 0.937)",
+    "lean": 0.004223078494803398,
+    "truth": 0.004223078494803397,
+    "sem": 3.531627196987461e-05
+   }
+  ]
+ },
+ {
+  "name": "spikeAndSlabVariance",
+  "file": "PolygenicArchitecture.lean",
+  "source": "pi*sigma_large + (1-pi)*sigma_small",
+  "note": "the simulation was generated from this definition's own parameters, so agreement is guaranteed by construction and the residual is sampling noise",
+  "regime": "the effects are DRAWN from the two-component mixture whose variance is then measured, so agreement is guaranteed by construction; the earlier run also used a Gaussian error bar for a mixture whose kurtosis at pi=0.01 is enormous",
+  "span": 0.91208,
+  "verdict": "GENERATIVE SELF-TEST",
+  "worst": {
+   "design": "pi=0.01",
+   "lean": 0.01099,
+   "truth": 0.011256014633683096,
+   "sem": 2.51692138766478e-05
+  },
+  "cells": [
+   {
+    "design": "pi=0.01",
+    "lean": 0.01099,
+    "truth": 0.011256014633683096,
+    "sem": 2.51692138766478e-05
+   },
+   {
+    "design": "pi=0.10",
+    "lean": 0.059000000000000004,
+    "truth": 0.05892697493307915,
+    "sem": 0.0001317647216587911
+   },
+   {
+    "design": "pi=0.50",
+    "lean": 0.125,
+    "truth": 0.12472704710462272,
+    "sem": 0.0002788981559587547
+   }
+  ]
+ }
+]

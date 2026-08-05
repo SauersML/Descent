@@ -1,0 +1,206 @@
+[
+ {
+  "name": "EvolutionaryParameters.fstEquilibrium",
+  "file": "DGP.lean",
+  "source": "1 / (1 + theta + bigM)",
+  "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.53 sems",
+  "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model; the observable is the probability that two alleles drawn from DIFFERENT demes are identical by state, over all ordered cross pairs and 40 replicates. theta and bigM are both held at order one so their composition is on trial rather than one of them vanishing",
+  "span": 0.5714285714285714,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "theta=1.0 bigM=1.0",
+   "lean": 0.3333333333333333,
+   "truth": 0.21249167618235473,
+   "sem": 0.036591537957982416,
+   "sems_off": 3.3024481586354604,
+   "rel_err": 0.5686888979466446
+  },
+  "cells": [
+   {
+    "design": "theta=1.0 bigM=1.0",
+    "lean": 0.3333333333333333,
+    "truth": 0.21249167618235473,
+    "sem": 0.036591537957982416,
+    "sems_off": 3.3024481586354604,
+    "rel_err": 0.5686888979466446
+   },
+   {
+    "design": "theta=2.0 bigM=0.5",
+    "lean": 0.2857142857142857,
+    "truth": 0.23479108396819923,
+    "sem": 0.015426322634409063,
+    "sems_off": 3.3010590373949604,
+    "rel_err": 0.2168872892676949
+   },
+   {
+    "design": "theta=0.5 bigM=2.0",
+    "lean": 0.2857142857142857,
+    "truth": 0.21242074749792214,
+    "sem": 0.08767374546850172,
+    "sems_off": 0.8359804617072679,
+    "rel_err": 0.34503945155865956
+   },
+   {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.14285714285714285,
+    "truth": 0.11392723222631185,
+    "sem": 0.01707757100989016,
+    "sems_off": 1.694029590863758,
+    "rel_err": 0.2539332349737322
+   }
+  ]
+ },
+ {
+  "name": "fstEquilibrium [multiplicative composition, competing]",
+  "file": "DGP.lean",
+  "source": "1 / ((1 + theta) * (1 + bigM))",
+  "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.53 sems",
+  "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model; the observable is the probability that two alleles drawn from DIFFERENT demes are identical by state, over all ordered cross pairs and 40 replicates. theta and bigM are both held at order one so their composition is on trial rather than one of them vanishing",
+  "span": 0.75,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "theta=3.0 bigM=3.0",
+   "lean": 0.0625,
+   "truth": 0.11392723222631185,
+   "sem": 0.01707757100989016,
+   "sems_off": 3.011390331595091,
+   "rel_err": 0.45140420969899214
+  },
+  "cells": [
+   {
+    "design": "theta=1.0 bigM=1.0",
+    "lean": 0.25,
+    "truth": 0.21249167618235473,
+    "sem": 0.036591537957982416,
+    "sems_off": 1.0250545866838279,
+    "rel_err": 0.1765166734599835
+   },
+   {
+    "design": "theta=2.0 bigM=0.5",
+    "lean": 0.2222222222222222,
+    "truth": 0.23479108396819923,
+    "sem": 0.015426322634409063,
+    "sems_off": 0.8147672030365578,
+    "rel_err": 0.0535321083473484
+   },
+   {
+    "design": "theta=0.5 bigM=2.0",
+    "lean": 0.2222222222222222,
+    "truth": 0.21242074749792214,
+    "sem": 0.08767374546850172,
+    "sems_off": 0.11179486711699131,
+    "rel_err": 0.0461417956567352
+   },
+   {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.0625,
+    "truth": 0.11392723222631185,
+    "sem": 0.01707757100989016,
+    "sems_off": 3.011390331595091,
+    "rel_err": 0.45140420969899214
+   }
+  ]
+ },
+ {
+  "name": "fstEquilibrium [migration ignored, competing]",
+  "file": "DGP.lean",
+  "source": "1 / (1 + theta)",
+  "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.53 sems",
+  "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model; the observable is the probability that two alleles drawn from DIFFERENT demes are identical by state, over all ordered cross pairs and 40 replicates. theta and bigM are both held at order one so their composition is on trial rather than one of them vanishing",
+  "span": 0.625,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "theta=3.0 bigM=3.0",
+   "lean": 0.25,
+   "truth": 0.11392723222631185,
+   "sem": 0.01707757100989016,
+   "sems_off": 7.967922820808891,
+   "rel_err": 1.1943831612040314
+  },
+  "cells": [
+   {
+    "design": "theta=1.0 bigM=1.0",
+    "lean": 0.5,
+    "truth": 0.21249167618235473,
+    "sem": 0.036591537957982416,
+    "sems_off": 7.857235302538726,
+    "rel_err": 1.353033346919967
+   },
+   {
+    "design": "theta=2.0 bigM=0.5",
+    "lean": 0.3333333333333333,
+    "truth": 0.23479108396819923,
+    "sem": 0.015426322634409063,
+    "sems_off": 6.387928717718599,
+    "rel_err": 0.4197018374789774
+   },
+   {
+    "design": "theta=0.5 bigM=2.0",
+    "lean": 0.6666666666666666,
+    "truth": 0.21242074749792214,
+    "sem": 0.08767374546850172,
+    "sems_off": 5.181094029248928,
+    "rel_err": 2.1384253869702055
+   },
+   {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.25,
+    "truth": 0.11392723222631185,
+    "sem": 0.01707757100989016,
+    "sems_off": 7.967922820808891,
+    "rel_err": 1.1943831612040314
+   }
+  ]
+ },
+ {
+  "name": "fstEquilibrium [mutation ignored, competing]",
+  "file": "DGP.lean",
+  "source": "1 / (1 + bigM)",
+  "note": "positive control 'high migration [F_within = 1/(1+2*theta)]' passed at 0.53 sems",
+  "regime": "two-deme island model at Ne = 500 under msprime's INFINITE ALLELES model; the observable is the probability that two alleles drawn from DIFFERENT demes are identical by state, over all ordered cross pairs and 40 replicates. theta and bigM are both held at order one so their composition is on trial rather than one of them vanishing",
+  "span": 0.625,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "theta=2.0 bigM=0.5",
+   "lean": 0.6666666666666666,
+   "truth": 0.23479108396819923,
+   "sem": 0.015426322634409063,
+   "sems_off": 27.996016479984068,
+   "rel_err": 1.8394036749579548
+  },
+  "cells": [
+   {
+    "design": "theta=1.0 bigM=1.0",
+    "lean": 0.5,
+    "truth": 0.21249167618235473,
+    "sem": 0.036591537957982416,
+    "sems_off": 7.857235302538726,
+    "rel_err": 1.353033346919967
+   },
+   {
+    "design": "theta=2.0 bigM=0.5",
+    "lean": 0.6666666666666666,
+    "truth": 0.23479108396819923,
+    "sem": 0.015426322634409063,
+    "sems_off": 27.996016479984068,
+    "rel_err": 1.8394036749579548
+   },
+   {
+    "design": "theta=0.5 bigM=2.0",
+    "lean": 0.3333333333333333,
+    "truth": 0.21242074749792214,
+    "sem": 0.08767374546850172,
+    "sems_off": 1.3791196576499754,
+    "rel_err": 0.5692126934851028
+   },
+   {
+    "design": "theta=3.0 bigM=3.0",
+    "lean": 0.25,
+    "truth": 0.11392723222631185,
+    "sem": 0.01707757100989016,
+    "sems_off": 7.967922820808891,
+    "rel_err": 1.1943831612040314
+   }
+  ]
+ }
+]

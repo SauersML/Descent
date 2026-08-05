@@ -1,0 +1,120 @@
+[
+ {
+  "name": "MutationDriftModelAssumptions.fstTransient [rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "tau = 2*Ne/(1+theta), from fstEquilibrium*(1-exp(-(1+theta)*t/(2*Ne)))",
+  "note": "",
+  "regime": "two demes split from a common ancestor, no migration, mutation at theta = 4*Ne*mu; 1 Mb with recombination, 12 replicates per time point, five time points spanning 0.25 to 3 predicted time constants. The observable is the TIME CONSTANT of a fitted A*(1-exp(-t/tau)); the amplitude A is discarded because it carries the F_ST convention and tau does not. Ne and theta are swept separately so the two scalings are separately on trial",
+  "span": 0.725,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=1000 theta=0.1",
+   "lean": 1818.181818181818,
+   "truth": 1660.630432543403,
+   "sem": 70.83827623301032,
+   "sems_off": 2.2240996536981905,
+   "rel_err": 0.09487444198954675
+  },
+  "cells": [
+   {
+    "design": "Ne=500 theta=0.5",
+    "lean": 666.6666666666666,
+    "truth": 668.1799436504065,
+    "sem": 44.84733114001952,
+    "sems_off": 0.03374285482039465,
+    "rel_err": 0.0022647746286314652
+   },
+   {
+    "design": "Ne=500 theta=0.0",
+    "lean": 980.3921568627451,
+    "truth": 911.7347717140452,
+    "sem": 60.539721130200896,
+    "sems_off": 1.1340882294624475,
+    "rel_err": 0.0753041205389427
+   },
+   {
+    "design": "Ne=1000 theta=0.5",
+    "lean": 1333.3333333333333,
+    "truth": 1333.3226013040628,
+    "sem": 66.95035499424937,
+    "sems_off": 0.00016029831763220598,
+    "rel_err": 8.049086740118721e-06
+   },
+   {
+    "design": "Ne=500 theta=1.0",
+    "lean": 500.0,
+    "truth": 658.4287951212862,
+    "sem": 82.69664997771352,
+    "sems_off": 1.9157825034506502,
+    "rel_err": 0.24061644371446833
+   },
+   {
+    "design": "Ne=1000 theta=0.1",
+    "lean": 1818.181818181818,
+    "truth": 1660.630432543403,
+    "sem": 70.83827623301032,
+    "sems_off": 2.2240996536981905,
+    "rel_err": 0.09487444198954675
+   }
+  ]
+ },
+ {
+  "name": "fstTransient [drift-only tau = 2*Ne, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "tau = 2*Ne",
+  "note": "positive control 'Ne=500 theta=0.02 [drift-only tau = 2Ne]' passed at 0.15 sems",
+  "regime": "two demes split from a common ancestor, no migration, mutation at theta = 4*Ne*mu; 1 Mb with recombination, 12 replicates per time point, five time points spanning 0.25 to 3 predicted time constants. The observable is the TIME CONSTANT of a fitted A*(1-exp(-t/tau)); the amplitude A is discarded because it carries the F_ST convention and tau does not. Ne and theta are swept separately so the two scalings are separately on trial",
+  "span": 0.5,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=1000 theta=0.5",
+   "lean": 2000.0,
+   "truth": 1333.3226013040628,
+   "sem": 66.95035499424937,
+   "sems_off": 9.957787359801166,
+   "rel_err": 0.5000120736301102
+  },
+  "cells": [
+   {
+    "design": "Ne=500 theta=0.5",
+    "lean": 1000.0,
+    "truth": 668.1799436504065,
+    "sem": 44.84733114001952,
+    "sems_off": 7.398880778738111,
+    "rel_err": 0.4966028380570529
+   },
+   {
+    "design": "Ne=500 theta=0.0",
+    "lean": 1000.0,
+    "truth": 911.7347717140452,
+    "sem": 60.539721130200896,
+    "sems_off": 1.457972165020805,
+    "rel_err": 0.09681020294972156
+   },
+   {
+    "design": "Ne=1000 theta=0.5",
+    "lean": 2000.0,
+    "truth": 1333.3226013040628,
+    "sem": 66.95035499424937,
+    "sems_off": 9.957787359801166,
+    "rel_err": 0.5000120736301102
+   },
+   {
+    "design": "Ne=500 theta=1.0",
+    "lean": 1000.0,
+    "truth": 658.4287951212862,
+    "sem": 82.69664997771352,
+    "sems_off": 4.130411630589222,
+    "rel_err": 0.5187671125710633
+   },
+   {
+    "design": "Ne=1000 theta=0.1",
+    "lean": 2000.0,
+    "truth": 1660.630432543403,
+    "sem": 70.83827623301032,
+    "sems_off": 4.790765466120311,
+    "rel_err": 0.20436188618850154
+   }
+  ]
+ }
+]

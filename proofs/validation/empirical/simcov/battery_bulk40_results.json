@@ -1,0 +1,120 @@
+[
+ {
+  "name": "ibdRecurrenceFixedPoint / fstIslandMultiplicativeEquilibrium",
+  "file": "PortabilityDrift.lean",
+  "source": "(1-m)^2 / ((1-m)^2 + 2*Ne*m*(2-m))",
+  "note": "",
+  "regime": "two-deme island model, 4 Mb with recombination, 24 replicates; F_ST is the site-frequency Hudson estimator as a ratio of averages -- the corpus convention, and the one whose control reproduces on this demography. m is swept 120-fold because m, not 4*Ne*m, is what separates the exact fixed point from the diffusion form",
+  "span": 0.8443714644209716,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+   "lean": 0.031032298923369218,
+   "truth": NaN,
+   "sem": NaN,
+   "sems_off": Infinity,
+   "rel_err": NaN
+  },
+  "cells": [
+   {
+    "design": "Ne=400 m=0.0025 (4Nm=4.0)",
+    "lean": 0.19939980035095148,
+    "truth": 0.10432092505669731,
+    "sem": 0.007940137397419366,
+    "sems_off": 11.974462220912685,
+    "rel_err": 0.9114075171647473
+   },
+   {
+    "design": "Ne=100 m=0.0200 (4Nm=8.0)",
+    "lean": 0.10814828160893653,
+    "truth": 0.05359399462680218,
+    "sem": 0.007644202955191239,
+    "sems_off": 7.1366874089974415,
+    "rel_err": 1.0179179096840811
+   },
+   {
+    "design": "Ne=50 m=0.0600 (4Nm=12.0)",
+    "lean": 0.07055479255166246,
+    "truth": 0.03388586359212761,
+    "sem": 0.00560686386831369,
+    "sems_off": 6.540007002267976,
+    "rel_err": 1.0821305722323038
+   },
+   {
+    "design": "Ne=25 m=0.1600 (4Nm=16.0)",
+    "lean": 0.04574214293123119,
+    "truth": 0.025309125041080995,
+    "sem": 0.010867755974104247,
+    "sems_off": 1.8801505976797888,
+    "rel_err": 0.8073379801547445
+   },
+   {
+    "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+    "lean": 0.031032298923369218,
+    "truth": NaN,
+    "sem": NaN,
+    "sems_off": Infinity,
+    "rel_err": NaN
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationDriftEquilibrium [diffusion form, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m)",
+  "note": "",
+  "regime": "two-deme island model, 4 Mb with recombination, 24 replicates; F_ST is the site-frequency Hudson estimator as a ratio of averages -- the corpus convention, and the one whose control reproduces on this demography. m is swept 120-fold because m, not 4*Ne*m, is what separates the exact fixed point from the diffusion form",
+  "span": 0.736842105263158,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+   "lean": 0.05263157894736842,
+   "truth": NaN,
+   "sem": NaN,
+   "sems_off": Infinity,
+   "rel_err": NaN
+  },
+  "cells": [
+   {
+    "design": "Ne=400 m=0.0025 (4Nm=4.0)",
+    "lean": 0.2,
+    "truth": 0.10432092505669731,
+    "sem": 0.007940137397419366,
+    "sems_off": 12.050052808204487,
+    "rel_err": 0.9171609137026167
+   },
+   {
+    "design": "Ne=100 m=0.0200 (4Nm=8.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.05359399462680218,
+    "sem": 0.007644202955191239,
+    "sems_off": 7.524279093773746,
+    "rel_err": 1.0732007734229387
+   },
+   {
+    "design": "Ne=50 m=0.0600 (4Nm=12.0)",
+    "lean": 0.07692307692307693,
+    "truth": 0.03388586359212761,
+    "sem": 0.00560686386831369,
+    "sems_off": 7.675808498609599,
+    "rel_err": 1.2700639372504512
+   },
+   {
+    "design": "Ne=25 m=0.1600 (4Nm=16.0)",
+    "lean": 0.058823529411764705,
+    "truth": 0.025309125041080995,
+    "sem": 0.010867755974104247,
+    "sems_off": 3.08383850820188,
+    "rel_err": 1.3242024098535274
+   },
+   {
+    "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+    "lean": 0.05263157894736842,
+    "truth": NaN,
+    "sem": NaN,
+    "sems_off": Infinity,
+    "rel_err": NaN
+   }
+  ]
+ }
+]

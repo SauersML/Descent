@@ -1,0 +1,88 @@
+[
+ {
+  "name": "fstTransientAt [theta=0.4 M=1.6]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1 + theta + bigM)) * (1 - hetDecayFactor^t)",
+  "note": "the positive control 'plateau vs fstEquilibrium 1/(1+theta+bigM)' missed by 185.5 sems on the same code path, so this design cannot support any verdict",
+  "regime": "24-deme forward Wright-Fisher island model with two-way mutation, started identical; the level is controlled against the separately validated equilibrium",
+  "span": 0.7840167007025701,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "theta=0.4 M=1.6 t=200",
+   "lean": 0.1679250470184539,
+   "truth": 0.23289654320340147,
+   "sem": 0.005533376231395935,
+   "sems_off": 11.741745630146111,
+   "rel_err": 0.278971492196878
+  },
+  "cells": [
+   {
+    "design": "theta=0.4 M=1.6 t=60",
+    "lean": 0.06319743562680542,
+    "truth": 0.11373585580306786,
+    "sem": 0.010314381664481486,
+    "sems_off": 4.899801250354744,
+    "rel_err": 0.44434905614786113
+   },
+   {
+    "design": "theta=0.4 M=1.6 t=200",
+    "lean": 0.1679250470184539,
+    "truth": 0.23289654320340147,
+    "sem": 0.005533376231395935,
+    "sems_off": 11.741745630146111,
+    "rel_err": 0.278971492196878
+   },
+   {
+    "design": "theta=0.4 M=1.6 t=600",
+    "lean": 0.2926033440195598,
+    "truth": 0.2837600419087814,
+    "sem": 0.0030204862999452767,
+    "sems_off": 2.927774282882396,
+    "rel_err": 0.03116471949782551
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [theta=0.2 M=4.0]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1 + theta + bigM)) * (1 - hetDecayFactor^t)",
+  "note": "the positive control 'plateau vs fstEquilibrium 1/(1+theta+bigM)' missed by 46.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "24-deme forward Wright-Fisher island model with two-way mutation, started identical; the level is controlled against the separately validated equilibrium",
+  "span": 0.8025290496670933,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "theta=0.2 M=4.0 t=200",
+   "lean": 0.08683568317511926,
+   "truth": 0.16786360159253877,
+   "sem": 0.0027241170026650607,
+   "sems_off": 29.744654263435894,
+   "rel_err": 0.4827009408156357
+  },
+  "cells": [
+   {
+    "design": "theta=0.2 M=4.0 t=60",
+    "lean": 0.03171017575966646,
+    "truth": 0.09961777308694174,
+    "sem": 0.007546330215787624,
+    "sems_off": 8.998757725338638,
+    "rel_err": 0.6816815435937189
+   },
+   {
+    "design": "theta=0.2 M=4.0 t=200",
+    "lean": 0.08683568317511926,
+    "truth": 0.16786360159253877,
+    "sem": 0.0027241170026650607,
+    "sems_off": 29.744654263435894,
+    "rel_err": 0.4827009408156357
+   },
+   {
+    "design": "theta=0.2 M=4.0 t=600",
+    "lean": 0.16058147138203274,
+    "truth": 0.1810604586596182,
+    "sem": 0.002045500082270279,
+    "sems_off": 10.011726450216539,
+    "rel_err": 0.11310579587166855
+   }
+  ]
+ }
+]

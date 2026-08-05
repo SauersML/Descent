@@ -1,0 +1,308 @@
+[
+ {
+  "name": "haplotypeHomozygosity",
+  "file": "HaplotypeTheory.lean",
+  "source": "sum freq_i ^ 2",
+  "note": "",
+  "regime": "the observable is the probability that two INDEPENDENTLY drawn haplotypes are identical, counted over 4e6 pairs; the sum of squared frequencies is never evaluated to produce the oracle",
+  "span": 0.877420936504045,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "uniform 10",
+   "lean": 0.10000000000000003,
+   "truth": 0.10028375,
+   "sem": 0.00015018898052615036,
+   "sems_off": 1.8892864110663965,
+   "rel_err": 0.0028294713749732288
+  },
+  "cells": [
+   {
+    "design": "uniform 4",
+    "lean": 0.25,
+    "truth": 0.24985575,
+    "sem": 0.00021646469353680837,
+    "sems_off": 0.6663904290492698,
+    "rel_err": 0.0005773331212109885
+   },
+   {
+    "design": "skewed 4",
+    "lean": 0.5357999999999999,
+    "truth": 0.535947,
+    "sem": 0.00024935306955750516,
+    "sems_off": 0.5895255280429081,
+    "rel_err": 0.00027428085239773384
+   },
+   {
+    "design": "uniform 10",
+    "lean": 0.10000000000000003,
+    "truth": 0.10028375,
+    "sem": 0.00015018898052615036,
+    "sems_off": 1.8892864110663965,
+    "rel_err": 0.0028294713749732288
+   },
+   {
+    "design": "dominant 3",
+    "lean": 0.8158000000000001,
+    "truth": 0.81610075,
+    "sem": 0.00019370100403033375,
+    "sems_off": 1.552650702589353,
+    "rel_err": 0.0003685206759091457
+   }
+  ]
+ },
+ {
+  "name": "multiTraitEffectiveSampleSize",
+  "file": "GeneticArchitectureDiscovery.lean",
+  "source": "n1 + rg ^ 2 * n2",
+  "note": "",
+  "regime": "two genetically correlated traits measured on independent samples, one locus, standardized genotypes so a study of size n estimates the effect with variance 1/n; the observable is the realised variance of the optimally combined estimator over 4000 replicates, inverted through Var = 1/N_eff. rg is swept 0.2 to 0.9, over which the three candidate forms separate by more than twofold",
+  "span": 0.7264150943396226,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "n1=4000 n2=4000 rg=0.7",
+   "lean": 5960.0,
+   "truth": 5763.025585592651,
+   "sem": 128.8812808216706,
+   "sems_off": 1.528339981970673,
+   "rel_err": 0.034178993565424726
+  },
+  "cells": [
+   {
+    "design": "n1=2000 n2=8000 rg=0.9",
+    "lean": 8480.0,
+    "truth": 8639.939063367814,
+    "sem": 193.21906456424614,
+    "sems_off": 0.8277602612791535,
+    "rel_err": 0.018511596227100056
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.5",
+    "lean": 4000.0,
+    "truth": 3978.5386664166563,
+    "sem": 88.97395153132734,
+    "sems_off": 0.24120917655081653,
+    "rel_err": 0.005394275482227064
+   },
+   {
+    "design": "n1=4000 n2=4000 rg=0.7",
+    "lean": 5960.0,
+    "truth": 5763.025585592651,
+    "sem": 128.8812808216706,
+    "sems_off": 1.528339981970673,
+    "rel_err": 0.034178993565424726
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.2",
+    "lean": 2320.0,
+    "truth": 2256.634775596213,
+    "sem": 50.46619625507949,
+    "sems_off": 1.25559739203466,
+    "rel_err": 0.028079521369179357
+   }
+  ]
+ },
+ {
+  "name": "multiTraitEffectiveSampleSize [n1 + rg*n2, competing]",
+  "file": "GeneticArchitectureDiscovery.lean",
+  "source": "n1 + rg * n2",
+  "note": "positive control 'n1=2000 n2=8000 rg=0.9 [trait 1 alone, N_eff = n1]' passed at 0.98 sems",
+  "regime": "two genetically correlated traits measured on independent samples, one locus, standardized genotypes so a study of size n estimates the effect with variance 1/n; the observable is the realised variance of the optimally combined estimator over 4000 replicates, inverted through Var = 1/N_eff. rg is swept 0.2 to 0.9, over which the three candidate forms separate by more than twofold",
+  "span": 0.6086956521739131,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=2000 n2=8000 rg=0.2",
+   "lean": 3600.0,
+   "truth": 2256.634775596213,
+   "sem": 50.46619625507949,
+   "sems_off": 26.619109901087022,
+   "rel_err": 0.5952958090211404
+  },
+  "cells": [
+   {
+    "design": "n1=2000 n2=8000 rg=0.9",
+    "lean": 9200.0,
+    "truth": 8639.939063367814,
+    "sem": 193.21906456424614,
+    "sems_off": 2.8985801059292644,
+    "rel_err": 0.06482232484795748
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.5",
+    "lean": 6000.0,
+    "truth": 3978.5386664166563,
+    "sem": 88.97395153132734,
+    "sems_off": 22.719698280137596,
+    "rel_err": 0.5080914132233406
+   },
+   {
+    "design": "n1=4000 n2=4000 rg=0.7",
+    "lean": 6800.0,
+    "truth": 5763.025585592651,
+    "sem": 128.8812808216706,
+    "sems_off": 8.045966084416724,
+    "rel_err": 0.17993576447061882
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.2",
+    "lean": 3600.0,
+    "truth": 2256.634775596213,
+    "sem": 50.46619625507949,
+    "sems_off": 26.619109901087022,
+    "rel_err": 0.5952958090211404
+   }
+  ]
+ },
+ {
+  "name": "multiTraitEffectiveSampleSize [n1 + n2, competing]",
+  "file": "GeneticArchitectureDiscovery.lean",
+  "source": "n1 + n2",
+  "note": "positive control 'n1=2000 n2=8000 rg=0.9 [trait 1 alone, N_eff = n1]' passed at 0.98 sems",
+  "regime": "two genetically correlated traits measured on independent samples, one locus, standardized genotypes so a study of size n estimates the effect with variance 1/n; the observable is the realised variance of the optimally combined estimator over 4000 replicates, inverted through Var = 1/N_eff. rg is swept 0.2 to 0.9, over which the three candidate forms separate by more than twofold",
+  "span": 0.2,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=2000 n2=8000 rg=0.2",
+   "lean": 10000.0,
+   "truth": 2256.634775596213,
+   "sem": 50.46619625507949,
+   "sems_off": 153.43667244634884,
+   "rel_err": 3.431377247280946
+  },
+  "cells": [
+   {
+    "design": "n1=2000 n2=8000 rg=0.9",
+    "lean": 10000.0,
+    "truth": 8639.939063367814,
+    "sem": 193.21906456424614,
+    "sems_off": 7.038958291716396,
+    "rel_err": 0.15741557048691032
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.5",
+    "lean": 10000.0,
+    "truth": 3978.5386664166563,
+    "sem": 88.97395153132734,
+    "sems_off": 67.67667648731116,
+    "rel_err": 1.5134856887055677
+   },
+   {
+    "design": "n1=4000 n2=4000 rg=0.7",
+    "lean": 8000.0,
+    "truth": 5763.025585592651,
+    "sem": 128.8812808216706,
+    "sems_off": 17.356860516482513,
+    "rel_err": 0.3881597229066104
+   },
+   {
+    "design": "n1=2000 n2=8000 rg=0.2",
+    "lean": 10000.0,
+    "truth": 2256.634775596213,
+    "sem": 50.46619625507949,
+    "sems_off": 153.43667244634884,
+    "rel_err": 3.431377247280946
+   }
+  ]
+ },
+ {
+  "name": "coalescentTimeScale",
+  "file": "Conventions.lean",
+  "source": "ploidy * Ne = 2 * Ne",
+  "note": "",
+  "regime": "single panmictic diploid population, sample of two chromosomes, 2 Mb with recombination so each replicate averages many independent genealogies; the observable is the mean pairwise coalescence time in generations, read in branch mode -- no mutation model, so no mutation-rate convention enters",
+  "span": 0.9,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500",
+   "lean": 1000.0,
+   "truth": 915.5841265038143,
+   "sem": 59.464979245929726,
+   "sems_off": 1.419589724349627,
+   "rel_err": 0.09219892640398893
+  },
+  "cells": [
+   {
+    "design": "Ne=500",
+    "lean": 1000.0,
+    "truth": 915.5841265038143,
+    "sem": 59.464979245929726,
+    "sems_off": 1.419589724349627,
+    "rel_err": 0.09219892640398893
+   },
+   {
+    "design": "Ne=1000",
+    "lean": 2000.0,
+    "truth": 1977.0521169198996,
+    "sem": 100.71489998753408,
+    "sems_off": 0.2278499316679135,
+    "rel_err": 0.01160712096747934
+   },
+   {
+    "design": "Ne=2000",
+    "lean": 4000.0,
+    "truth": 3910.432137247774,
+    "sem": 167.09237644552078,
+    "sems_off": 0.5360379968108782,
+    "rel_err": 0.02290485031029472
+   },
+   {
+    "design": "Ne=5000",
+    "lean": 10000.0,
+    "truth": 9832.953677187474,
+    "sem": 269.3978596231625,
+    "sems_off": 0.6200729398748493,
+    "rel_err": 0.016988417549456687
+   }
+  ]
+ },
+ {
+  "name": "coalescentTimeScale [4*Ne reading, competing]",
+  "file": "Conventions.lean",
+  "source": "4 * Ne",
+  "note": "the 4*Ne that appears throughout this corpus is the scaled mutation rate theta = 4*Ne*mu, a different quantity; the positive control 'Ne=1000 [CV of T2 = 1, T2 exponential]' missed by 9.2 sems on the same code path, so this design cannot support any verdict",
+  "regime": "single panmictic diploid population, sample of two chromosomes, 2 Mb with recombination so each replicate averages many independent genealogies; the observable is the mean pairwise coalescence time in generations, read in branch mode -- no mutation model, so no mutation-rate convention enters",
+  "span": 0.9,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=5000",
+   "lean": 20000.0,
+   "truth": 9832.953677187474,
+   "sem": 269.3978596231625,
+   "sems_off": 37.7398927260756,
+   "rel_err": 1.0339768350989134
+  },
+  "cells": [
+   {
+    "design": "Ne=500",
+    "lean": 2000.0,
+    "truth": 915.5841265038143,
+    "sem": 59.464979245929726,
+    "sems_off": 18.236210409009974,
+    "rel_err": 1.184397852807978
+   },
+   {
+    "design": "Ne=1000",
+    "lean": 4000.0,
+    "truth": 1977.0521169198996,
+    "sem": 100.71489998753408,
+    "sems_off": 20.085884842565395,
+    "rel_err": 1.0232142419349586
+   },
+   {
+    "design": "Ne=2000",
+    "lean": 8000.0,
+    "truth": 3910.432137247774,
+    "sem": 167.09237644552078,
+    "sems_off": 24.474891971421563,
+    "rel_err": 1.0458097006205895
+   },
+   {
+    "design": "Ne=5000",
+    "lean": 20000.0,
+    "truth": 9832.953677187474,
+    "sem": 269.3978596231625,
+    "sems_off": 37.7398927260756,
+    "rel_err": 1.0339768350989134
+   }
+  ]
+ }
+]

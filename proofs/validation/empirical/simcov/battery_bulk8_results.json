@@ -1,0 +1,174 @@
+[
+ {
+  "name": "liabilityScaleH2",
+  "file": "VarianceComponents.lean",
+  "source": "h2_observed * K * (1 - K) / z^2",
+  "note": "",
+  "regime": "Dempster-Lerner transform: does it recover the liability heritability the simulation was built with?",
+  "span": 0.40191093603605654,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2_liab=0.5 K=0.05",
+   "lean": 0.5015663487282157,
+   "truth": 0.5,
+   "sem": 0.0008164965809277261,
+   "sems_off": 1.9183775716929228,
+   "rel_err": 0.0031326974564314103
+  },
+  "cells": [
+   {
+    "design": "h2_liab=0.5 K=0.05",
+    "lean": 0.5015663487282157,
+    "truth": 0.5,
+    "sem": 0.0008164965809277261,
+    "sems_off": 1.9183775716929228,
+    "rel_err": 0.0031326974564314103
+   },
+   {
+    "design": "h2_liab=0.5 K=0.20",
+    "lean": 0.49912353399666975,
+    "truth": 0.5,
+    "sem": 0.0008164965809277261,
+    "sems_off": 1.0734472425278012,
+    "rel_err": 0.0017529320066604903
+   },
+   {
+    "design": "h2_liab=0.3 K=0.10",
+    "lean": 0.29998134802667137,
+    "truth": 0.3,
+    "sem": 0.0004898979485566356,
+    "sems_off": 0.03807318112593457,
+    "rel_err": 6.217324442873522e-05
+   }
+  ]
+ },
+ {
+  "name": "coalescentRate",
+  "file": "SpectrumIdentifiability.lean",
+  "source": "m * (m - 1) / 2",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "inverse mean waiting time to the first coalescence among m lineages, in coalescent units of 2Ne generations",
+  "span": 0.9642857142857143,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "m=2 lineages",
+   "lean": 1.0,
+   "truth": 2.005038623855267,
+   "sem": 0.010025193119276334,
+   "sems_off": 100.25129809447654,
+   "rel_err": 0.5012564904723827
+  },
+  "cells": [
+   {
+    "design": "m=2 lineages",
+    "lean": 1.0,
+    "truth": 2.005038623855267,
+    "sem": 0.010025193119276334,
+    "sems_off": 100.25129809447654,
+    "rel_err": 0.5012564904723827
+   },
+   {
+    "design": "m=4 lineages",
+    "lean": 6.0,
+    "truth": 12.008047732840069,
+    "sem": 0.06004023866420034,
+    "sems_off": 100.06701949408529,
+    "rel_err": 0.5003350974704265
+   },
+   {
+    "design": "m=8 lineages",
+    "lean": 28.0,
+    "truth": 55.68775716092224,
+    "sem": 0.2784387858046112,
+    "sems_off": 99.43929715435394,
+    "rel_err": 0.49719648577176967
+   }
+  ]
+ },
+ {
+  "name": "heritabilityFractionFromN",
+  "file": "PowerAnalysis.lean",
+  "source": "n / (n + C)",
+  "note": "control 'the fitted point reproduces itself' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "out-of-sample R-squared as a fraction of heritability, with C fitted at the smallest n and used to predict the others",
+  "span": 0.08856691329294952,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "n=12000 (C from n=2000)",
+   "lean": 0.9527896509286102,
+   "truth": 1.0084368022274084,
+   "sem": 0.030253104066822252,
+   "sems_off": 1.839386503146461,
+   "rel_err": 0.055181595094393826
+  },
+  "cells": [
+   {
+    "design": "n=5000 (C from n=2000)",
+    "lean": 0.8937197040484606,
+    "truth": 0.9004944018852696,
+    "sem": 0.027014832056558087,
+    "sems_off": 0.2507769740202566,
+    "rel_err": 0.007523309220607698
+   },
+   {
+    "design": "n=12000 (C from n=2000)",
+    "lean": 0.9527896509286102,
+    "truth": 1.0084368022274084,
+    "sem": 0.030253104066822252,
+    "sems_off": 1.839386503146461,
+    "rel_err": 0.055181595094393826
+   },
+   {
+    "design": "n=30000 (C from n=2000)",
+    "lean": 0.9805653504169053,
+    "truth": 0.9843738717665864,
+    "sem": 0.029531216152997593,
+    "sems_off": 0.1289659501305211,
+    "rel_err": 0.0038689785039156327
+   }
+  ]
+ },
+ {
+  "name": "mutationSelectionStepRecessive",
+  "file": "RareVariantPortability.lean",
+  "source": "p - s*p^2 + mu*(1 - p)",
+  "note": "control 's=0, mu=0 is the identity map' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "one generation of exact recessive viability selection then two-way mutation; both sides deterministic",
+  "span": 0.51071021407055,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "s=0.20 mu=1e-03 p=0.15",
+   "lean": 0.14634999999999998,
+   "truth": 0.14686539427423403,
+   "sem": 1.4686539427423405e-10,
+   "sems_off": 3509296.9094658596,
+   "rel_err": 0.0035092969094658597
+  },
+  "cells": [
+   {
+    "design": "s=0.05 mu=1e-04 p=0.20",
+    "lean": 0.19808,
+    "truth": 0.19845711422845694,
+    "sem": 1.9845711422845695e-10,
+    "sems_off": 1900230.3340096488,
+    "rel_err": 0.0019002303340096489
+   },
+   {
+    "design": "s=0.20 mu=1e-03 p=0.15",
+    "lean": 0.14634999999999998,
+    "truth": 0.14686539427423403,
+    "sem": 1.4686539427423405e-10,
+    "sems_off": 3509296.9094658596,
+    "rel_err": 0.0035092969094658597
+   },
+   {
+    "design": "s=0.01 mu=1e-05 p=0.30",
+    "lean": 0.29910699999999996,
+    "truth": 0.29937344510059055,
+    "sem": 2.9937344510059055e-10,
+    "sems_off": 890009.1339132264,
+    "rel_err": 0.0008900091339132265
+   }
+  ]
+ }
+]

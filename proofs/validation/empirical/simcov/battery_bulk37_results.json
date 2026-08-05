@@ -1,0 +1,155 @@
+[
+ {
+  "name": "coalescentTimeScale",
+  "file": "Conventions.lean",
+  "source": "ploidy * Ne = 2 * Ne",
+  "note": "",
+  "regime": "single panmictic diploid population; E[T2] read in BRANCH mode over 2 Mb with recombination, so each replicate averages many independent genealogies and no mutation-rate convention enters. Ne is swept tenfold",
+  "span": 0.9,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=5000",
+   "lean": 10000.0,
+   "truth": 9765.626626564068,
+   "sem": 217.94826686588397,
+   "sems_off": 1.0753624096499719,
+   "rel_err": 0.023999829442424
+  },
+  "cells": [
+   {
+    "design": "Ne=500",
+    "lean": 1000.0,
+    "truth": 1006.7744105140154,
+    "sem": 77.40431187195577,
+    "sems_off": 0.08751980800787641,
+    "rel_err": 0.006728826679808675
+   },
+   {
+    "design": "Ne=1000",
+    "lean": 2000.0,
+    "truth": 2106.343285869378,
+    "sem": 128.1818202818912,
+    "sems_off": 0.8296284577291322,
+    "rel_err": 0.05048715780698859
+   },
+   {
+    "design": "Ne=2000",
+    "lean": 4000.0,
+    "truth": 3900.1365514138365,
+    "sem": 150.90258817555488,
+    "sems_off": 0.6617742597627668,
+    "rel_err": 0.02560511594137955
+   },
+   {
+    "design": "Ne=5000",
+    "lean": 10000.0,
+    "truth": 9765.626626564068,
+    "sem": 217.94826686588397,
+    "sems_off": 1.0753624096499719,
+    "rel_err": 0.023999829442424
+   }
+  ]
+ },
+ {
+  "name": "coalescentTimeScale [4*Ne reading, competing]",
+  "file": "Conventions.lean",
+  "source": "4 * Ne",
+  "note": "positive control 'Ne=1000 [Watterson E(S) = theta * H_{n-1}]' passed at 0.38 sems",
+  "regime": "single panmictic diploid population; E[T2] read in BRANCH mode over 2 Mb with recombination, so each replicate averages many independent genealogies and no mutation-rate convention enters. Ne is swept tenfold",
+  "span": 0.9,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=5000",
+   "lean": 20000.0,
+   "truth": 9765.626626564068,
+   "sem": 217.94826686588397,
+   "sems_off": 46.957810312544154,
+   "rel_err": 1.047999658884848
+  },
+  "cells": [
+   {
+    "design": "Ne=500",
+    "lean": 2000.0,
+    "truth": 1006.7744105140154,
+    "sem": 77.40431187195577,
+    "sems_off": 12.83165711916675,
+    "rel_err": 0.9865423466403827
+   },
+   {
+    "design": "Ne=1000",
+    "lean": 4000.0,
+    "truth": 2106.343285869378,
+    "sem": 128.1818202818912,
+    "sems_off": 14.773208166073665,
+    "rel_err": 0.8990256843860228
+   },
+   {
+    "design": "Ne=2000",
+    "lean": 8000.0,
+    "truth": 3900.1365514138365,
+    "sem": 150.90258817555488,
+    "sems_off": 27.168940560625266,
+    "rel_err": 1.0512102318827592
+   },
+   {
+    "design": "Ne=5000",
+    "lean": 20000.0,
+    "truth": 9765.626626564068,
+    "sem": 217.94826686588397,
+    "sems_off": 46.957810312544154,
+    "rel_err": 1.047999658884848
+   }
+  ]
+ },
+ {
+  "name": "[control] Watterson segregating sites on the same trees",
+  "file": "Conventions.lean",
+  "source": "theta * sum_{i<n} 1/i",
+  "note": "",
+  "regime": "single panmictic diploid population; E[T2] read in BRANCH mode over 2 Mb with recombination, so each replicate averages many independent genealogies and no mutation-rate convention enters. Ne is swept tenfold",
+  "span": 0.9,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=2000",
+   "lean": 56.76383451429891,
+   "truth": 61.96666666666667,
+   "sem": 4.082900516587746,
+   "sems_off": 1.2742980465064062,
+   "rel_err": 0.08396178836526781
+  },
+  "cells": [
+   {
+    "design": "Ne=500",
+    "lean": 14.190958628574727,
+    "truth": 15.333333333333334,
+    "sem": 1.4014223754205946,
+    "sems_off": 0.8151537500717855,
+    "rel_err": 0.0745026981364309
+   },
+   {
+    "design": "Ne=1000",
+    "lean": 28.381917257149453,
+    "truth": 29.2,
+    "sem": 2.134231132922494,
+    "sems_off": 0.3833149700755748,
+    "rel_err": 0.02801653228940226
+   },
+   {
+    "design": "Ne=2000",
+    "lean": 56.76383451429891,
+    "truth": 61.96666666666667,
+    "sem": 4.082900516587746,
+    "sems_off": 1.2742980465064062,
+    "rel_err": 0.08396178836526781
+   },
+   {
+    "design": "Ne=5000",
+    "lean": 141.90958628574725,
+    "truth": 151.53333333333333,
+    "sem": 10.537370098007163,
+    "sems_off": 0.9132968623172998,
+    "rel_err": 0.06350910942093761
+   }
+  ]
+ }
+]

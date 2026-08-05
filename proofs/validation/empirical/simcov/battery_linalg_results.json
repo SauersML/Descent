@@ -1,0 +1,481 @@
+[
+ {
+  "name": "pgsMean",
+  "file": "ScoreDistribution.lean",
+  "source": "sum_i beta_i * 2 * p_i",
+  "note": "",
+  "regime": "mean polygenic score over individuals",
+  "span": 1.3962873092556791,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "linkage equilibrium",
+   "lean": -2.680203476947036,
+   "truth": -2.7042820985623304,
+   "sem": 0.07603613826609396,
+   "sems_off": 0.3166733893169232,
+   "rel_err": 0.008903886775752802
+  },
+  "cells": [
+   {
+    "design": "linkage equilibrium",
+    "lean": -2.680203476947036,
+    "truth": -2.7042820985623304,
+    "sem": 0.07603613826609396,
+    "sems_off": 0.3166733893169232,
+    "rel_err": 0.008903886775752802
+   },
+   {
+    "design": "coalescent LD",
+    "lean": 6.763283643831767,
+    "truth": 6.763283643831766,
+    "sem": 0.054419725300645545,
+    "sems_off": 1.632089127229735e-14,
+    "rel_err": 1.3132355028613352e-16
+   }
+  ]
+ },
+ {
+  "name": "pgsVariance [linkage equilibrium]",
+  "file": "ScoreDistribution.lean",
+  "source": "sum_i beta_i^2 * 2 p_i (1 - p_i)",
+  "note": "",
+  "regime": "unlinked loci, the regime the formula is written for",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "linkage equilibrium",
+   "lean": 34.77871958326883,
+   "truth": 34.688965934523345,
+   "sem": 0.633330971295557,
+   "sems_off": 0.14171681603046118,
+   "rel_err": 0.0025873832305897773
+  },
+  "cells": [
+   {
+    "design": "linkage equilibrium",
+    "lean": 34.77871958326883,
+    "truth": 34.688965934523345,
+    "sem": 0.633330971295557,
+    "sems_off": 0.14171681603046118,
+    "rel_err": 0.0025873832305897773
+   }
+  ]
+ },
+ {
+  "name": "pgsVariance [coalescent LD]",
+  "file": "ScoreDistribution.lean",
+  "source": "sum_i beta_i^2 * 2 p_i (1 - p_i)",
+  "note": "",
+  "regime": "same formula on a linked panel: the LD cross terms it drops",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "coalescent LD",
+   "lean": 30.521573943074433,
+   "truth": 17.76903901078633,
+   "sem": 0.3244167830465652,
+   "sems_off": 39.3091097585345,
+   "rel_err": 0.7176828710065265
+  },
+  "cells": [
+   {
+    "design": "coalescent LD",
+    "lean": 30.521573943074433,
+    "truth": 17.76903901078633,
+    "sem": 0.3244167830465652,
+    "sems_off": 39.3091097585345,
+    "rel_err": 0.7176828710065265
+   }
+  ]
+ },
+ {
+  "name": "pgsMeanShift",
+  "file": "ScoreDistribution.lean",
+  "source": "sum_i beta_i * 2 * (p_target_i - p_source_i)",
+  "note": "",
+  "regime": "difference in mean score between two panels",
+  "span": 3.1988090412484325,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "linkage equilibrium",
+   "lean": 1.665719142912653,
+   "truth": 1.7894475409037334,
+   "sem": 0.10279109135270129,
+   "sems_off": 1.203687949635033,
+   "rel_err": 0.06914335020326622
+  },
+  "cells": [
+   {
+    "design": "linkage equilibrium",
+    "lean": 1.665719142912653,
+    "truth": 1.7894475409037334,
+    "sem": 0.10279109135270129,
+    "sems_off": 1.203687949635033,
+    "rel_err": 0.06914335020326622
+   },
+   {
+    "design": "coalescent LD",
+    "lean": -3.6625983116169305,
+    "truth": -3.6625983116169305,
+    "sem": 0.12035486607244986,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "polygenicAdaptationShift",
+  "file": "SelectionArchitecture.lean",
+  "source": "sum_i beta_i * delta_p_i",
+  "note": "",
+  "regime": "same runs; the sibling written without the ploidy factor",
+  "span": 3.1988090412484325,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "coalescent LD",
+   "lean": -1.8312991558084653,
+   "truth": -3.6625983116169305,
+   "sem": 0.12035486607244986,
+   "sems_off": 15.21582978378357,
+   "rel_err": 0.5
+  },
+  "cells": [
+   {
+    "design": "linkage equilibrium",
+    "lean": 0.8328595714563265,
+    "truth": 1.7894475409037334,
+    "sem": 0.10279109135270129,
+    "sems_off": 9.306136911856694,
+    "rel_err": 0.5345716751016331
+   },
+   {
+    "design": "coalescent LD",
+    "lean": -1.8312991558084653,
+    "truth": -3.6625983116169305,
+    "sem": 0.12035486607244986,
+    "sems_off": 15.21582978378357,
+    "rel_err": 0.5
+   }
+  ]
+ },
+ {
+  "name": "expectedAltAlleleCount",
+  "file": "Probability.lean",
+  "source": "sum_g altAlleleCount g * genotypeProb g",
+  "note": "",
+  "regime": "Hardy-Weinberg dosage mean",
+  "span": 0.8,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.3",
+   "lean": 0.6,
+   "truth": 0.5994795,
+   "sem": 0.00045828693472526027,
+   "sems_off": 1.1357513395226069,
+   "rel_err": 0.0008682532096592523
+  },
+  "cells": [
+   {
+    "design": "p=0.1",
+    "lean": 0.2,
+    "truth": 0.1997515,
+    "sem": 0.00029999236510930575,
+    "sems_off": 0.8283544146514152,
+    "rel_err": 0.0012440457268156314
+   },
+   {
+    "design": "p=0.3",
+    "lean": 0.6,
+    "truth": 0.5994795,
+    "sem": 0.00045828693472526027,
+    "sems_off": 1.1357513395226069,
+    "rel_err": 0.0008682532096592523
+   },
+   {
+    "design": "p=0.5",
+    "lean": 1.0,
+    "truth": 1.0000315,
+    "sem": 0.0004998307208484438,
+    "sems_off": 0.06302133639663454,
+    "rel_err": 3.149900778121701e-05
+   }
+  ]
+ },
+ {
+  "name": "genotypeVariance",
+  "file": "Probability.lean",
+  "source": "sum_g genotypeProb g * centered^2",
+  "note": "",
+  "regime": "Hardy-Weinberg dosage variance",
+  "span": 0.6399999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.5",
+   "lean": 0.5,
+   "truth": 0.4996615,
+   "sem": 0.0003535533095713785,
+   "sems_off": 0.9574228011339827,
+   "rel_err": 0.0006774586394989795
+  },
+  "cells": [
+   {
+    "design": "p=0.1",
+    "lean": 0.18000000000000002,
+    "truth": 0.17999090000000004,
+    "sem": 0.0002721943128696759,
+    "sems_off": 0.03343199901586892,
+    "rel_err": 5.055811154888452e-05
+   },
+   {
+    "design": "p=0.3",
+    "lean": 0.42,
+    "truth": 0.42005410000000004,
+    "sem": 0.00034893458203020665,
+    "sems_off": 0.15504338860678915,
+    "rel_err": 0.0001287929340531538
+   },
+   {
+    "design": "p=0.5",
+    "lean": 0.5,
+    "truth": 0.4996615,
+    "sem": 0.0003535533095713785,
+    "sems_off": 0.9574228011339827,
+    "rel_err": 0.0006774586394989795
+   }
+  ]
+ },
+ {
+  "name": "genotypeThirdAbsMoment",
+  "file": "Probability.lean",
+  "source": "sum_g genotypeProb g * |centered|^3",
+  "note": "",
+  "regime": "Hardy-Weinberg third absolute central moment",
+  "span": 0.6860799999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.5",
+   "lean": 0.5,
+   "truth": 0.4996615,
+   "sem": 0.0003535533095713785,
+   "sems_off": 0.9574228011339827,
+   "rel_err": 0.0006774586394989795
+  },
+  "cells": [
+   {
+    "design": "p=0.1",
+    "lean": 0.15696000000000004,
+    "truth": 0.15717187600000004,
+    "sem": 0.0004271627526567835,
+    "sems_off": 0.49600766612307545,
+    "rel_err": 0.0013480528793840933
+   },
+   {
+    "design": "p=0.3",
+    "lean": 0.3796799999999999,
+    "truth": 0.37968831599999997,
+    "sem": 0.0005281617816413281,
+    "sems_off": 0.015745175605513743,
+    "rel_err": 2.1902175151641266e-05
+   },
+   {
+    "design": "p=0.5",
+    "lean": 0.5,
+    "truth": 0.4996615,
+    "sem": 0.0003535533095713785,
+    "sems_off": 0.9574228011339827,
+    "rel_err": 0.0006774586394989795
+   }
+  ]
+ },
+ {
+  "name": "sourceBestLinearWeightsFromLD",
+  "file": "DGP.lean",
+  "source": "sigmaTagSource^-1 * sigmaTagCausal * betaCausal",
+  "note": "",
+  "regime": "least-squares weights from an explicit regression, standardised dosages",
+  "span": 1.784217249847855,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "coalescent LD (worst coord)",
+   "lean": 0.24305041711404218,
+   "truth": 0.13688404954235367,
+   "sem": 0.01314933889225825,
+   "sems_off": 8.07389393805909,
+   "rel_err": 0.7755934159358668
+  },
+  "cells": [
+   {
+    "design": "coalescent LD (worst coord)",
+    "lean": 0.24305041711404218,
+    "truth": 0.13688404954235367,
+    "sem": 0.01314933889225825,
+    "sems_off": 8.07389393805909,
+    "rel_err": 0.7755934159358668
+   },
+   {
+    "design": "linkage equilibrium (worst coord)",
+    "lean": -0.19060432968354818,
+    "truth": -0.17225989633391744,
+    "sem": 0.010373994594655395,
+    "sems_off": 1.7683095149366714,
+    "rel_err": 0.10649276900800486
+   }
+  ]
+ },
+ {
+  "name": "effectivePolygenicityOfEffects",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(sum beta^2)^2 / (sum beta^4)",
+  "note": "",
+  "regime": "participation ratio; equals the locus count at equal effects",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "all equal",
+   "lean": 500.0,
+   "truth": 500.0,
+   "sem": 5.000000000000001e-07,
+   "sems_off": 0.0,
+   "rel_err": 0.0
+  },
+  "cells": [
+   {
+    "design": "all equal",
+    "lean": 500.0,
+    "truth": 500.0,
+    "sem": 5.000000000000001e-07,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "meanAbsoluteEffect",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(sum |beta_j|) / q",
+  "note": "",
+  "regime": "mean absolute effect",
+  "span": 0.8802,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "all equal",
+   "lean": 1.0,
+   "truth": 1.0,
+   "sem": 0.0,
+   "sems_off": Infinity,
+   "rel_err": 0.0
+  },
+  "cells": [
+   {
+    "design": "all equal",
+    "lean": 1.0,
+    "truth": 1.0,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 0.0
+   },
+   {
+    "design": "gaussian",
+    "lean": 0.8509492475375289,
+    "truth": 0.8509492475375289,
+    "sem": 0.02779925881203073,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "one dominant",
+    "lean": 0.11979999999999999,
+    "truth": 0.11979999999999999,
+    "sem": 0.0197801900900876,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "sourceSquaredEffectMass / sourceEffectMass",
+  "file": "SimulationValidation.lean",
+  "source": "sum_i beta_i^2",
+  "note": "",
+  "regime": "total squared effect mass",
+  "span": 0.8109163893834067,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "all equal",
+   "lean": 500.0,
+   "truth": 500.0,
+   "sem": 5e-10,
+   "sems_off": 0.0,
+   "rel_err": 0.0
+  },
+  "cells": [
+   {
+    "design": "all equal",
+    "lean": 500.0,
+    "truth": 500.0,
+    "sem": 5e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "gaussian",
+    "lean": 555.2570085669104,
+    "truth": 555.2570085669104,
+    "sem": 5.552570085669103e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   },
+   {
+    "design": "one dominant",
+    "lean": 104.99000000000007,
+    "truth": 104.99000000000007,
+    "sem": 1.0499000000000007e-10,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "pgsDriftVarianceFromLoci",
+  "file": "PolygenicAdaptation.lean",
+  "source": "sum_i fst * beta_i^2",
+  "note": "",
+  "regime": "variance of the mean-score difference under one branch of drift, the quantity Var_Delta_Mu is validated against",
+  "span": 0.8444749033304074,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "t=30 (F=0.072)",
+   "lean": 35.3680549823146,
+   "truth": 26.744555675714345,
+   "sem": 0.6905414582250581,
+   "sems_off": 12.488025452904408,
+   "rel_err": 0.32243943070742076
+  },
+  "cells": [
+   {
+    "design": "t=30 (F=0.072)",
+    "lean": 35.3680549823146,
+    "truth": 26.744555675714345,
+    "sem": 0.6905414582250581,
+    "sems_off": 12.488025452904408,
+    "rel_err": 0.32243943070742076
+   },
+   {
+    "design": "t=100 (F=0.221)",
+    "lean": 108.26117954561116,
+    "truth": 83.01352160626799,
+    "sem": 2.1433999112740367,
+    "sems_off": 11.779256781034373,
+    "rel_err": 0.30413910229097946
+   },
+   {
+    "design": "t=250 (F=0.465)",
+    "lean": 227.41059635830183,
+    "truth": 174.41941663816712,
+    "sem": 4.503489972632227,
+    "sems_off": 11.766692063746753,
+    "rel_err": 0.30381468268561435
+   }
+  ]
+ }
+]

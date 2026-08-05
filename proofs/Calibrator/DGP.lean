@@ -1668,9 +1668,22 @@ fixed both would tie a general statement to one design.
     distance; the corpus result it feeds is about the SHAPE being non-affine,
     which is a property of this body rather than a measurement of it. -/
 noncomputable def LDDecayMechanism.exponentialTagging {k : ℕ}
-    (distance : (Fin k → ℝ) → ℝ) : LDDecayMechanism k where
+    (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) : LDDecayMechanism k where
   distance := distance
-  tagging_efficiency := fun d ↦ Real.exp (-d)
+  tagging_efficiency := fun d ↦ Real.exp (-rate * d)
+
+/-- The tagging law of this family is in exactly the form
+`Calibrator.ld_decay_implies_nonlinear_calibration_of_exp_tagging` requires of
+its `h_tagging` argument, so that theorem's exponential hypothesis is discharged
+by construction here rather than assumed at each use.
+
+That theorem, in the corpus root, is the ONLY consumer of `LDDecayMechanism` and
+`decaySlope`; carrying the rate as a parameter rather than fixing it at one is
+what lets this family meet it at every decay rate. -/
+theorem LDDecayMechanism.exponentialTagging_tagging_efficiency {k : ℕ}
+    (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) :
+    (LDDecayMechanism.exponentialTagging distance rate).tagging_efficiency =
+      fun d ↦ Real.exp (-rate * d) := rfl
 
 /-- The decay slope of the exponential mechanism is `e^{-d}` at the realised
 distance -- positive everywhere, so this mechanism never reaches the vanishing
@@ -1678,15 +1691,18 @@ branch named by `decaySlope_at_zero_efficiency`. The two together say that the
 zero branch is a real possibility for the class and not one the exponential law
 exhibits. -/
 theorem decaySlope_exponentialTagging {k : ℕ} (distance : (Fin k → ℝ) → ℝ)
-    (c : Fin k → ℝ) :
-    decaySlope (LDDecayMechanism.exponentialTagging distance) c =
-      Real.exp (-(distance c)) := rfl
+    (rate : ℝ) (c : Fin k → ℝ) :
+    decaySlope (LDDecayMechanism.exponentialTagging distance rate) c =
+      Real.exp (-rate * distance c) := rfl
 
 /-- Positivity of the exponential tagging slope, stated so the contrast with the
-zero branch is available as a fact rather than as an observation. -/
+zero branch is available as a fact rather than as an observation. It holds at
+every rate and every distance, including negative rates, because the exponential
+is positive everywhere -- so `decaySlope_at_zero_efficiency`'s vanishing branch is
+a real possibility for the class that this family never reaches. -/
 theorem decaySlope_exponentialTagging_pos {k : ℕ} (distance : (Fin k → ℝ) → ℝ)
-    (c : Fin k → ℝ) :
-    0 < decaySlope (LDDecayMechanism.exponentialTagging distance) c := by
+    (rate : ℝ) (c : Fin k → ℝ) :
+    0 < decaySlope (LDDecayMechanism.exponentialTagging distance rate) c := by
   rw [decaySlope_exponentialTagging]
   exact Real.exp_pos _
 

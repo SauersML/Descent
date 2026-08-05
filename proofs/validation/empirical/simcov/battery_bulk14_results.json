@@ -1,0 +1,295 @@
+[
+ {
+  "name": "ldRecurrence",
+  "file": "LDDecayTheory.lean",
+  "source": "D_{t+1} = (1 - r) * D_t",
+  "note": "control 'r=0 must leave D unchanged under recombination' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "two-locus Wright-Fisher, N=20000 so the drift shrinkage 1/(2N)=2.5e-5 sits far below every r; predicted from the MEASURED D_t at each generation, not from the initial value",
+  "span": 0.09547738693467334,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.020 (worst of 12 generations)",
+   "lean": 0.24010847822908332,
+   "truth": 0.24013775114062497,
+   "sem": 1.7421549172334474e-05,
+   "sems_off": 1.680270293535671,
+   "rel_err": 0.00012190049837063028
+  },
+  "cells": [
+   {
+    "design": "r=0.005 (worst of 12 generations)",
+    "lean": 0.24875,
+    "truth": 0.24874339681249996,
+    "sem": 4.9699877779260856e-06,
+    "sems_off": 1.328612422220607,
+    "rel_err": 2.654618206815998e-05
+   },
+   {
+    "design": "r=0.020 (worst of 12 generations)",
+    "lean": 0.24010847822908332,
+    "truth": 0.24013775114062497,
+    "sem": 1.7421549172334474e-05,
+    "sems_off": 1.680270293535671,
+    "rel_err": 0.00012190049837063028
+   },
+   {
+    "design": "r=0.100 (worst of 12 generations)",
+    "lean": 0.225,
+    "truth": 0.22496860215104164,
+    "sem": 2.1660687923013753e-05,
+    "sems_off": 1.4495314770222618,
+    "rel_err": 0.00013956547117310262
+   }
+  ]
+ },
+ {
+  "name": "ldRecurrence [convention-free log-slope]",
+  "file": "LDDecayTheory.lean",
+  "source": "log D_t is linear in t with slope log(1 - r)",
+  "note": "",
+  "regime": "the decay RATE, read as a slope, which no scaling of D can change; this is the reading that survives a different LD normalisation",
+  "span": 20.019378863422148,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.005 log-slope over 18 gens",
+   "lean": -0.005012541823544286,
+   "truth": -0.005038007442103858,
+   "sem": 4.007614341368871e-06,
+   "sems_off": 6.354308671046696,
+   "rel_err": 0.005054700464860159
+  },
+  "cells": [
+   {
+    "design": "r=0.005 log-slope over 18 gens",
+    "lean": -0.005012541823544286,
+    "truth": -0.005038007442103858,
+    "sem": 4.007614341368871e-06,
+    "sems_off": 6.354308671046696,
+    "rel_err": 0.005054700464860159
+   },
+   {
+    "design": "r=0.020 log-slope over 18 gens",
+    "lean": -0.020202707317519466,
+    "truth": -0.020211980219084186,
+    "sem": 4.558561501856234e-06,
+    "sems_off": 2.034172745271497,
+    "rel_err": 0.00045878243814845835
+   },
+   {
+    "design": "r=0.100 log-slope over 18 gens",
+    "lean": -0.10536051565782628,
+    "truth": -0.10534484179898326,
+    "sem": 2.838905674158551e-05,
+    "sems_off": 0.5521091801566822,
+    "rel_err": 0.00014878620134934394
+   }
+  ]
+ },
+ {
+  "name": "hetMutationDriftRecurrence",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H' = (1 - 1/(2Ne)) H + 2 mu (1 - H), iterated 15 times",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "the map COMPOUNDED, from a measured start well off the plateau; the single step is separately validated as hetStepWithMutation, so what is at stake here is iteration",
+  "span": 0.20832020813722105,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "Ne=100 mu=5e-03 (15 steps, H0=0.3964)",
+   "lean": 0.45122399505726407,
+   "truth": 0.39798387506344995,
+   "sem": 8.426981902032597e-05,
+   "sems_off": 631.7815869638042,
+   "rel_err": 0.1337745655783821
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 (15 steps, H0=0.3652)",
+    "lean": 0.3572249184904264,
+    "truth": 0.3471217191297163,
+    "sem": 0.00011601685128875834,
+    "sems_off": 87.0838955589644,
+    "rel_err": 0.02910563875415315
+   },
+   {
+    "design": "Ne=500 mu=1e-03 (15 steps, H0=0.3939)",
+    "lean": 0.40590547928773424,
+    "truth": 0.39437768009334984,
+    "sem": 7.979082442765342e-05,
+    "sems_off": 144.4752485899766,
+    "rel_err": 0.029230353988734234
+   },
+   {
+    "design": "Ne=100 mu=5e-03 (15 steps, H0=0.3964)",
+    "lean": 0.45122399505726407,
+    "truth": 0.39798387506344995,
+    "sem": 8.426981902032597e-05,
+    "sems_off": 631.7815869638042,
+    "rel_err": 0.1337745655783821
+   }
+  ]
+ },
+ {
+  "name": "hetMutationRecurrence",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H' = lam H + (1 - lam) Hstar with lam = 1 - 1/(2Ne) - 2mu, Hstar = theta/(1+theta)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "the same simulated trajectory, in affine coordinates; compared against the SIMULATION and not against the sibling recurrence, which would be a self-test",
+  "span": 0.2083202081372212,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "Ne=100 mu=5e-03 (15 steps, H0=0.3964)",
+   "lean": 0.45122399505726424,
+   "truth": 0.39798387506344995,
+   "sem": 8.426981902032597e-05,
+   "sems_off": 631.7815869638063,
+   "rel_err": 0.13377456557838252
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 (15 steps, H0=0.3652)",
+    "lean": 0.3572249184904265,
+    "truth": 0.3471217191297163,
+    "sem": 0.00011601685128875834,
+    "sems_off": 87.08389555896488,
+    "rel_err": 0.029105638754153312
+   },
+   {
+    "design": "Ne=500 mu=1e-03 (15 steps, H0=0.3939)",
+    "lean": 0.4059054792877344,
+    "truth": 0.39437768009334984,
+    "sem": 7.979082442765342e-05,
+    "sems_off": 144.47524858997866,
+    "rel_err": 0.029230353988734657
+   },
+   {
+    "design": "Ne=100 mu=5e-03 (15 steps, H0=0.3964)",
+    "lean": 0.45122399505726424,
+    "truth": 0.39798387506344995,
+    "sem": 8.426981902032597e-05,
+    "sems_off": 631.7815869638063,
+    "rel_err": 0.13377456557838252
+   }
+  ]
+ },
+ {
+  "name": "hetMutationRecurrence [vs the drift form: SELF-TEST, reported only to show the reparametrisation is exact]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "lam/Hstar substitution",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "algebraic identity between the two bodies; this carries no empirical weight and is labelled so",
+  "span": 0.2083202081372212,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "Ne=100 mu=1e-03 (15 steps, H0=0.3652) [affine vs drift form]",
+   "lean": 0.3572249184904265,
+   "truth": 0.3572249184904264,
+   "sem": 3.5822491849042643e-10
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 (15 steps, H0=0.3652) [affine vs drift form]",
+    "lean": 0.3572249184904265,
+    "truth": 0.3572249184904264,
+    "sem": 3.5822491849042643e-10
+   },
+   {
+    "design": "Ne=500 mu=1e-03 (15 steps, H0=0.3939) [affine vs drift form]",
+    "lean": 0.4059054792877344,
+    "truth": 0.40590547928773424,
+    "sem": 4.069054792877343e-10
+   },
+   {
+    "design": "Ne=100 mu=5e-03 (15 steps, H0=0.3964) [affine vs drift form]",
+    "lean": 0.45122399505726424,
+    "truth": 0.45122399505726407,
+    "sem": 4.522239950572641e-10
+   }
+  ]
+ },
+ {
+  "name": "islandFstMultiplicativeStep",
+  "file": "PortabilityDrift.lean",
+  "source": "forwards to ibdRecurrenceStep Ne m F",
+  "note": "",
+  "regime": "called at the wrapper's OWN signature (Ne m F) against an island-model one-step map, with Ne and m five orders apart so a swapped forwarding separates by orders of magnitude rather than by percent",
+  "span": 0.7280501896835488,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 m=0.010 (worst of 120 generations)",
+   "lean": 0.10989620917777587,
+   "truth": 0.1096683251531304,
+   "sem": 0.0006590099509187824,
+   "sems_off": 0.34579754725670686,
+   "rel_err": 0.0020779384049795803
+  },
+  "cells": [
+   {
+    "design": "Ne=200 m=0.002 (worst of 120 generations)",
+    "lean": 0.32535795974015164,
+    "truth": 0.32563140144533126,
+    "sem": 0.0019547884086719876,
+    "sems_off": 0.13988301954654453,
+    "rel_err": 0.0008397276920037122
+   },
+   {
+    "design": "Ne=200 m=0.010 (worst of 120 generations)",
+    "lean": 0.10989620917777587,
+    "truth": 0.1096683251531304,
+    "sem": 0.0006590099509187824,
+    "sems_off": 0.34579754725670686,
+    "rel_err": 0.0020779384049795803
+   },
+   {
+    "design": "Ne=500 m=0.005 (worst of 120 generations)",
+    "lean": 0.08848103543628179,
+    "truth": 0.08860442502987505,
+    "sem": 0.0005326265501792503,
+    "sems_off": 0.2316624913867584,
+    "rel_err": 0.0013925895185444262
+   }
+  ]
+ },
+ {
+  "name": "geneFlowFstStep",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "forwards to ibdFlowStep Ne m F from the signature (m Ne F)",
+  "note": "",
+  "regime": "called at the wrapper's OWN signature, which puts the rate FIRST while the delegate puts Ne first; the two arguments differ by five orders of magnitude so the forwarding is tested, not assumed",
+  "span": 0.6307015861009871,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500 rate=0.005",
+   "lean": 0.026018511093463616,
+   "truth": 0.025994490497022293,
+   "sem": 0.00010497796198808917,
+   "sems_off": 0.22881561030922276,
+   "rel_err": 0.0009240649069107396
+  },
+  "cells": [
+   {
+    "design": "Ne=200 rate=0.002",
+    "lean": 0.0704538934212118,
+    "truth": 0.07049603228439316,
+    "sem": 0.00028298412913757266,
+    "sems_off": 0.14890892754226173,
+    "rel_err": 0.0005977480124180805
+   },
+   {
+    "design": "Ne=500 rate=0.005",
+    "lean": 0.026018511093463616,
+    "truth": 0.025994490497022293,
+    "sem": 0.00010497796198808917,
+    "sems_off": 0.22881561030922276,
+    "rel_err": 0.0009240649069107396
+   },
+   {
+    "design": "Ne=200 rate=0.010",
+    "lean": 0.05501722977653462,
+    "truth": 0.054968010416554525,
+    "sem": 0.0002208720416662181,
+    "sems_off": 0.22284106041124832,
+    "rel_err": 0.0008954182552198441
+   }
+  ]
+ }
+]

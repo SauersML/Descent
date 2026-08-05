@@ -1,0 +1,152 @@
+[
+ {
+  "name": "ldCorrelationDecay [exponential in distance]",
+  "file": "PortabilityDrift.lean",
+  "source": "exp(-(lambda * fstGap * distance))",
+  "note": "the positive control 'Sved 1/(1+4*Ne*c) at the true Ne [classical]' missed by 10.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "single panmictic population Ne = 1000, 5 Mb at recombination 1e-8, 8 replicates; r^2 between common SNP pairs binned by physical distance over an eightyfold range. Both candidate laws are fitted to the SAME curve with one free rate and one free amplitude each, so neither is handicapped by a convention",
+  "span": 0.968444648078429,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "d=10kb",
+   "lean": 0.23870990544557386,
+   "truth": 0.5900029151915597,
+   "sem": 0.016202145768650054,
+   "sems_off": 21.681881817512817,
+   "rel_err": 0.5954089390082581
+  },
+  "cells": [
+   {
+    "design": "d=10kb",
+    "lean": 0.23870990544557386,
+    "truth": 0.5900029151915597,
+    "sem": 0.016202145768650054,
+    "sems_off": 21.681881817512817,
+    "rel_err": 0.5954089390082581
+   },
+   {
+    "design": "d=35kb",
+    "lean": 0.2219925303723172,
+    "truth": 0.23889927899274135,
+    "sem": 0.009822757931500895,
+    "sems_off": 1.721181437873512,
+    "rel_err": 0.07076935808139398
+   },
+   {
+    "design": "d=75kb",
+    "lean": 0.19764554731284917,
+    "truth": 0.17209461245670649,
+    "sem": 0.01037020368409091,
+    "sems_off": 2.463879749569506,
+    "rel_err": 0.14847027743283062
+   },
+   {
+    "design": "d=150kb",
+    "lean": 0.15896107715683508,
+    "truth": 0.12463867375032966,
+    "sem": 0.006042598713578094,
+    "sems_off": 5.680073265395044,
+    "rel_err": 0.27537522964387795
+   },
+   {
+    "design": "d=300kb",
+    "lean": 0.10282490608774186,
+    "truth": 0.07809365712776878,
+    "sem": 0.0031330694751319135,
+    "sems_off": 7.893616517690471,
+    "rel_err": 0.31668703796917036
+   },
+   {
+    "design": "d=600kb",
+    "lean": 0.04302425615983759,
+    "truth": 0.04671749560872468,
+    "sem": 0.002381292724596752,
+    "sems_off": 1.55093887061386,
+    "rel_err": 0.07905473957378316
+   },
+   {
+    "design": "d=1200kb",
+    "lean": 0.007532575073500035,
+    "truth": 0.029545794945908966,
+    "sem": 0.001549291166739972,
+    "sems_off": 14.208575085811198,
+    "rel_err": 0.7450542424974411
+   }
+  ]
+ },
+ {
+  "name": "[competing] Sved hyperbolic 1/(1 + 4*Ne*c)",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*c*distance)",
+  "note": "the positive control 'Sved 1/(1+4*Ne*c) at the true Ne [classical]' missed by 10.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "single panmictic population Ne = 1000, 5 Mb at recombination 1e-8, 8 replicates; r^2 between common SNP pairs binned by physical distance over an eightyfold range. Both candidate laws are fitted to the SAME curve with one free rate and one free amplitude each, so neither is handicapped by a convention",
+  "span": 0.956299656757584,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "d=35kb",
+   "lean": 0.32072229160974386,
+   "truth": 0.23889927899274135,
+   "sem": 0.009822757931500895,
+   "sems_off": 8.329942892576213,
+   "rel_err": 0.34250004002518813
+  },
+  "cells": [
+   {
+    "design": "d=10kb",
+    "lean": 0.468167731472503,
+    "truth": 0.5900029151915597,
+    "sem": 0.016202145768650054,
+    "sems_off": 7.519694333006105,
+    "rel_err": 0.20649929107468853
+   },
+   {
+    "design": "d=35kb",
+    "lean": 0.32072229160974386,
+    "truth": 0.23889927899274135,
+    "sem": 0.009822757931500895,
+    "sems_off": 8.329942892576213,
+    "rel_err": 0.34250004002518813
+   },
+   {
+    "design": "d=75kb",
+    "lean": 0.21325948027750447,
+    "truth": 0.17209461245670649,
+    "sem": 0.01037020368409091,
+    "sems_off": 3.9695332005821293,
+    "rel_err": 0.2391990500641253
+   },
+   {
+    "design": "d=150kb",
+    "lean": 0.130974906866566,
+    "truth": 0.12463867375032966,
+    "sem": 0.006042598713578094,
+    "sems_off": 1.0485940597045464,
+    "rel_err": 0.050836814333637466
+   },
+   {
+    "design": "d=300kb",
+    "lean": 0.07392674499598324,
+    "truth": 0.07809365712776878,
+    "sem": 0.0031330694751319135,
+    "sems_off": 1.3299775714708955,
+    "rel_err": 0.05335788186956163
+   },
+   {
+    "design": "d=600kb",
+    "lean": 0.03950911951919588,
+    "truth": 0.04671749560872468,
+    "sem": 0.002381292724596752,
+    "sems_off": 3.0270852529268373,
+    "rel_err": 0.1542971427642753
+   },
+   {
+    "design": "d=1200kb",
+    "lean": 0.020459090560371655,
+    "truth": 0.029545794945908966,
+    "sem": 0.001549291166739972,
+    "sems_off": 5.8650720927155415,
+    "rel_err": 0.30754645126904917
+   }
+  ]
+ }
+]

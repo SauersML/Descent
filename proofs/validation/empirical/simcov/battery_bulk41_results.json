@@ -1,0 +1,1496 @@
+[
+ {
+  "name": "ancestryRecalibratedR2",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * rhoSq  [rhoSq = REALISED squared effect correlation]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.7303721418628054,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 0.24269172979483516,
+   "truth": 0.07816972236773494,
+   "sem": 0.00033564412632948844,
+   "sems_off": 490.1679919927916,
+   "rel_err": 2.1046768805591634
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.39187319355389166,
+    "truth": 0.40350699540911944,
+    "sem": 0.001393698214069049,
+    "sems_off": 8.347432563080973,
+    "rel_err": 0.02883172283898612
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.23708961747370977,
+    "truth": 0.22851240577631712,
+    "sem": 0.0008976132481497145,
+    "sems_off": 9.555576095911228,
+    "rel_err": 0.03753499363963889
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.11525260071081463,
+    "truth": 0.1168846964441642,
+    "sem": 0.0004912260125235932,
+    "sems_off": 3.322494517269049,
+    "rel_err": 0.013963297018350281
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.42745064069815336,
+    "truth": 0.8248101793050949,
+    "sem": 0.0015439152039189758,
+    "sems_off": 257.3713488916422,
+    "rel_err": 0.4817587713838815
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 0.24269172979483516,
+    "truth": 0.07816972236773494,
+    "sem": 0.00033564412632948844,
+    "sems_off": 490.1679919927916,
+    "rel_err": 2.1046768805591634
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedR2 [nominal rho, the battery-22 reading, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * rhoSq  [rhoSq = NOMINAL]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.7297474723445261,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 0.25529638772974156,
+   "truth": 0.07816972236773494,
+   "sem": 0.00033564412632948844,
+   "sems_off": 527.7216297481948,
+   "rel_err": 2.265924196695328
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.39494655885149416,
+    "truth": 0.40350699540911944,
+    "sem": 0.001393698214069049,
+    "sems_off": 6.142245481274017,
+    "rel_err": 0.021215088350440565
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.24236384944186293,
+    "truth": 0.22851240577631712,
+    "sem": 0.0008976132481497145,
+    "sems_off": 15.4314162520421,
+    "rel_err": 0.06061571851422588
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.11338249881454245,
+    "truth": 0.1168846964441642,
+    "sem": 0.0004912260125235932,
+    "sems_off": 7.129503610018105,
+    "rel_err": 0.029962841468256327
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.4195427876222711,
+    "truth": 0.8248101793050949,
+    "sem": 0.0015439152039189758,
+    "sems_off": 262.4932966876153,
+    "rel_err": 0.49134625378200697
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 0.25529638772974156,
+    "truth": 0.07816972236773494,
+    "sem": 0.00033564412632948844,
+    "sems_off": 527.7216297481948,
+    "rel_err": 2.265924196695328
+   }
+  ]
+ },
+ {
+  "name": "effectTurnoverR2Loss",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * (1 - rhoSq)  [rhoSq = REALISED]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.732457978116228,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 0.27832130638831093,
+   "truth": 0.44284331381541114,
+   "sem": 0.00033564412632948844,
+   "sems_off": 490.1679919927916,
+   "rel_err": 0.37151290827815764
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.09571515070721222,
+    "truth": 0.08408134885198443,
+    "sem": 0.001393698214069049,
+    "sems_off": 8.347432563080982,
+    "rel_err": 0.13836364442378019
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.25753048342805135,
+    "truth": 0.26610769512544397,
+    "sem": 0.0008976132481497145,
+    "sems_off": 9.555576095911196,
+    "rel_err": 0.03223210697965458
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.3382773945473551,
+    "truth": 0.33664529881400557,
+    "sem": 0.0004912260125235932,
+    "sems_off": 3.322494517268993,
+    "rel_err": 0.004848116813451391
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.09050341809477384,
+    "truth": -0.3068561205121677,
+    "sem": 0.0015439152039189758,
+    "sems_off": 257.3713488916422,
+    "rel_err": 1.294937633780015
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 0.27832130638831093,
+    "truth": 0.44284331381541114,
+    "sem": 0.00033564412632948844,
+    "sems_off": 490.1679919927916,
+    "rel_err": 0.37151290827815764
+   }
+  ]
+ },
+ {
+  "name": "effectTurnoverR2Loss [nominal rho, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "r2Source * (1 - rhoSq)  [NOMINAL]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.7276423128842189,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 0.26571664845340454,
+   "truth": 0.44284331381541114,
+   "sem": 0.00033564412632948844,
+   "sems_off": 527.7216297481948,
+   "rel_err": 0.39997592790988307
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.09264178540960971,
+    "truth": 0.08408134885198443,
+    "sem": 0.001393698214069049,
+    "sems_off": 6.142245481274017,
+    "rel_err": 0.10181136095586371
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.25225625145989816,
+    "truth": 0.26610769512544397,
+    "sem": 0.0008976132481497145,
+    "sems_off": 15.4314162520421,
+    "rel_err": 0.052052022242409006
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.34014749644362735,
+    "truth": 0.33664529881400557,
+    "sem": 0.0004912260125235932,
+    "sems_off": 7.129503610018161,
+    "rel_err": 0.010403227497784624
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.09841127117065615,
+    "truth": -0.3068561205121677,
+    "sem": 0.0015439152039189758,
+    "sems_off": 262.4932966876154,
+    "rel_err": 1.3207081905565377
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 0.26571664845340454,
+    "truth": 0.44284331381541114,
+    "sem": 0.00033564412632948844,
+    "sems_off": 527.7216297481948,
+    "rel_err": 0.39997592790988307
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedSlope",
+  "file": "AncestryCalibration.lean",
+  "source": "rho * bSource / alpha  [rho = REALISED]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.5561234266696344,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 1.1399716732423253,
+   "truth": 0.6467375969959605,
+   "sem": 0.002045164854971306,
+   "sems_off": 241.17081566673266,
+   "rel_err": 0.7626494555711527
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.8939749401607511,
+    "truth": 0.9084049083244542,
+    "sem": 0.002872629547981726,
+    "sems_off": 5.023261065403104,
+    "rel_err": 0.01588495177807778
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.692949239694192,
+    "truth": 0.6804344964455771,
+    "sem": 0.002151723807317769,
+    "sems_off": 5.816147595734024,
+    "rel_err": 0.01839228215792828
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.5060067200124866,
+    "truth": 0.5088448498760502,
+    "sem": 0.0016091097012547661,
+    "sems_off": 1.7637889208861484,
+    "rel_err": 0.0055775937680314904
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.5687787584681261,
+    "truth": 0.948497953127368,
+    "sem": 0.00299941488789011,
+    "sems_off": 126.59775617982253,
+    "rel_err": 0.40033738966672466
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 1.1399716732423253,
+    "truth": 0.6467375969959605,
+    "sem": 0.002045164854971306,
+    "sems_off": 241.17081566673266,
+    "rel_err": 0.7626494555711527
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedSlope [nominal rho, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "rho * bSource / alpha  [NOMINAL]",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.570745335354225,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+   "lean": 1.169200267939803,
+   "truth": 0.6467375969959605,
+   "sem": 0.002045164854971306,
+   "sems_off": 255.46237491508862,
+   "rel_err": 0.8078433562091271
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.8974737066111241,
+    "truth": 0.9084049083244542,
+    "sem": 0.002872629547981726,
+    "sems_off": 3.805294602295722,
+    "rel_err": 0.012033402300184154
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.7006144261136324,
+    "truth": 0.6804344964455771,
+    "sem": 0.002151723807317769,
+    "sems_off": 9.378494395714599,
+    "rel_err": 0.029657417096679222
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.5018846689182505,
+    "truth": 0.5088448498760502,
+    "sem": 0.0016091097012547661,
+    "sems_off": 4.325485672215038,
+    "rel_err": 0.013678395211222332
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 0.563492983273867,
+    "truth": 0.948497953127368,
+    "sem": 0.00299941488789011,
+    "sems_off": 128.36002495284222,
+    "rel_err": 0.40591017469681456
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 1.169200267939803,
+    "truth": 0.6467375969959605,
+    "sem": 0.002045164854971306,
+    "sems_off": 255.46237491508862,
+    "rel_err": 0.8078433562091271
+   }
+  ]
+ },
+ {
+  "name": "ancestryRecalibratedSlope [rho*b*alpha reading, competing]",
+  "file": "AncestryCalibration.lean",
+  "source": "rho * bSource * alpha",
+  "note": "positive control 'rho=0.9 alpha=1.0 (realised rho 0.8965) [source-population slope = 1]' passed at 0.68 sems",
+  "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; the target effect vector is drawn rho-correlated with the source vector and the target genotype scale is alpha. Every quantity compared against is a realised sample statistic, and -- the change from battery 22 -- every prediction is evaluated at the REALISED correlation between the two effect vectors drawn, which with m = 400 differs from the nominal rho by about 5%",
+  "span": 0.7193924358488765,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+   "lean": 1.4553672911910283,
+   "truth": 0.948497953127368,
+   "sem": 0.00299941488789011,
+   "sems_off": 168.9894052703757,
+   "rel_err": 0.5343915992569316
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 alpha=1.0 (realised rho 0.8965)",
+    "lean": 0.8951371431612668,
+    "truth": 0.9084049083244542,
+    "sem": 0.002872629547981726,
+    "sems_off": 4.618682966799239,
+    "rel_err": 0.014605563049697392
+   },
+   {
+    "design": "rho=0.7 alpha=1.0 (realised rho 0.6923)",
+    "lean": 0.6887909000410227,
+    "truth": 0.6804344964455771,
+    "sem": 0.002151723807317769,
+    "sems_off": 3.8835856010081162,
+    "rel_err": 0.01228098169492795
+   },
+   {
+    "design": "rho=0.5 alpha=1.0 (realised rho 0.5041)",
+    "lean": 0.5070099693023195,
+    "truth": 0.5088448498760502,
+    "sem": 0.0016091097012547661,
+    "sems_off": 1.140307943143897,
+    "rel_err": 0.0036059725752902332
+   },
+   {
+    "design": "rho=0.9 alpha=1.6 (realised rho 0.9084)",
+    "lean": 1.4553672911910283,
+    "truth": 0.948497953127368,
+    "sem": 0.00299941488789011,
+    "sems_off": 168.9894052703757,
+    "rel_err": 0.5343915992569316
+   },
+   {
+    "design": "rho=0.7 alpha=0.6 (realised rho 0.6825)",
+    "lean": 0.40838707052633316,
+    "truth": 0.6467375969959605,
+    "sem": 0.002045164854971306,
+    "sems_off": 116.54342968502233,
+    "rel_err": 0.36854286433438327
+   }
+  ]
+ },
+ {
+  "name": "driftVariance",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "p0 * (1 - p0) * fst   [fst = per-branch Wright F]",
+  "note": "",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6958539631444615,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+   "lean": 0.0657370035553598,
+   "truth": 0.0655619994375,
+   "sem": 0.00018145267847539536,
+   "sems_off": 0.9644614746402213,
+   "rel_err": 0.0026692919581659262
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.024704653469368596,
+    "truth": 0.024641445656249997,
+    "sem": 7.40239947830542e-05,
+    "sems_off": 0.8538827619861055,
+    "rel_err": 0.0025651016584153823
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.0657370035553598,
+    "truth": 0.0655619994375,
+    "sem": 0.00018145267847539536,
+    "sems_off": 0.9644614746402213,
+    "rel_err": 0.0026692919581659262
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.019993649106121125,
+    "truth": 0.019967309665,
+    "sem": 6.044429752802188e-05,
+    "sems_off": 0.4357638718344777,
+    "rel_err": 0.0013191281931834537
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.03815277458523841,
+    "truth": 0.038168582,
+    "sem": 0.00011225962942819594,
+    "sems_off": 0.14081121452216774,
+    "rel_err": 0.00041414728903454556
+   }
+  ]
+ },
+ {
+  "name": "driftVariance [Hudson pairwise F_ST fed in, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "p0*(1-p0)*F_ST_Hudson",
+  "note": "positive control 'Ne=200 t=50 [drift unbiased: E[p_t] = p0]' passed at 0.95 sems",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6971962087269784,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+   "lean": 0.03729508250188916,
+   "truth": 0.038168582,
+   "sem": 0.00011225962942819594,
+   "sems_off": 7.781065219617077,
+   "rel_err": 0.022885301269794017
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.024183232064854735,
+    "truth": 0.024641445656249997,
+    "sem": 7.40239947830542e-05,
+    "sems_off": 6.1900684060374065,
+    "rel_err": 0.018595239816176994
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.06527728748548185,
+    "truth": 0.0655619994375,
+    "sem": 0.00018145267847539536,
+    "sems_off": 1.569069987890855,
+    "rel_err": 0.004342636808835682
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.019766210134622875,
+    "truth": 0.019967309665,
+    "sem": 6.044429752802188e-05,
+    "sems_off": 3.3270223759965853,
+    "rel_err": 0.01007143845370537
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.03729508250188916,
+    "truth": 0.038168582,
+    "sem": 0.00011225962942819594,
+    "sems_off": 7.781065219617077,
+    "rel_err": 0.022885301269794017
+   }
+  ]
+ },
+ {
+  "name": "driftVariance [Nei G_ST fed in, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "p0*(1-p0)*G_ST_Nei",
+  "note": "positive control 'Ne=200 t=50 [drift unbiased: E[p_t] = p0]' passed at 0.95 sems",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.7306858946150779,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+   "lean": 0.01047599232757413,
+   "truth": 0.019967309665,
+   "sem": 6.044429752802188e-05,
+   "sems_off": 157.02585232338436,
+   "rel_err": 0.47534282267695127
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.013092205370774962,
+    "truth": 0.024641445656249997,
+    "sem": 7.40239947830542e-05,
+    "sems_off": 156.02022451399668,
+    "rel_err": 0.46869166876764445
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.038898788136630016,
+    "truth": 0.0655619994375,
+    "sem": 0.00018145267847539536,
+    "sems_off": 146.94305713699052,
+    "rel_err": 0.406686976139096
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.01047599232757413,
+    "truth": 0.019967309665,
+    "sem": 6.044429752802188e-05,
+    "sems_off": 157.02585232338436,
+    "rel_err": 0.47534282267695127
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.02098595814269267,
+    "truth": 0.038168582,
+    "sem": 0.00011225962942819594,
+    "sems_off": 153.06146960246085,
+    "rel_err": 0.4501771602965845
+   }
+  ]
+ },
+ {
+  "name": "twoPopDriftVariance",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "2 * driftVariance p0 fst",
+  "note": "",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6958539631444615,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+   "lean": 0.03998729821224225,
+   "truth": 0.03991185757,
+   "sem": 0.00012326991686444078,
+   "sems_off": 0.6119955635664956,
+   "rel_err": 0.001890181185126145
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.04940930693873719,
+    "truth": 0.04931655240624999,
+    "sem": 0.00015157277842882549,
+    "sems_off": 0.6119471678798555,
+    "rel_err": 0.001880799203543791
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.1314740071107196,
+    "truth": 0.13129473259375,
+    "sem": 0.0003896057777497251,
+    "sems_off": 0.46014337365596103,
+    "rel_err": 0.001365435714198233
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.03998729821224225,
+    "truth": 0.03991185757,
+    "sem": 0.00012326991686444078,
+    "sems_off": 0.6119955635664956,
+    "rel_err": 0.001890181185126145
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.07630554917047681,
+    "truth": 0.076359896625,
+    "sem": 0.00023280336526486592,
+    "sems_off": 0.23344789050347586,
+    "rel_err": 0.0007117277121273619
+   }
+  ]
+ },
+ {
+  "name": "expectedFreqDiffSq",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "2 * fst * p0 * (1 - p0)",
+  "note": "",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6958539631444615,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+   "lean": 0.03998729821224225,
+   "truth": 0.03991185757,
+   "sem": 0.00012326991686444078,
+   "sems_off": 0.6119955635664956,
+   "rel_err": 0.001890181185126145
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.04940930693873719,
+    "truth": 0.04931655240624999,
+    "sem": 0.00015157277842882549,
+    "sems_off": 0.6119471678798555,
+    "rel_err": 0.001880799203543791
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.1314740071107196,
+    "truth": 0.13129473259375,
+    "sem": 0.0003896057777497251,
+    "sems_off": 0.46014337365596103,
+    "rel_err": 0.001365435714198233
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.03998729821224225,
+    "truth": 0.03991185757,
+    "sem": 0.00012326991686444078,
+    "sems_off": 0.6119955635664956,
+    "rel_err": 0.001890181185126145
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.07630554917047681,
+    "truth": 0.076359896625,
+    "sem": 0.00023280336526486592,
+    "sems_off": 0.23344789050347586,
+    "rel_err": 0.0007117277121273619
+   }
+  ]
+ },
+ {
+  "name": "twoPopDriftVariance [factor of two dropped, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "p0 * (1 - p0) * fst",
+  "note": "positive control 'Ne=200 t=50 [drift unbiased: E[p_t] = p0]' passed at 0.95 sems",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6958539631444615,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+   "lean": 0.0657370035553598,
+   "truth": 0.13129473259375,
+   "sem": 0.0003896057777497251,
+   "sems_off": 168.26682965801177,
+   "rel_err": 0.4993172821429009
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.024704653469368596,
+    "truth": 0.04931655240624999,
+    "sem": 0.00015157277842882549,
+    "sems_off": 162.37677498561183,
+    "rel_err": 0.4990596003982281
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.0657370035553598,
+    "truth": 0.13129473259375,
+    "sem": 0.0003896057777497251,
+    "sems_off": 168.26682965801177,
+    "rel_err": 0.4993172821429009
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.019993649106121125,
+    "truth": 0.03991185757,
+    "sem": 0.00012326991686444078,
+    "sems_off": 161.58207103995062,
+    "rel_err": 0.4990549094074369
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.03815277458523841,
+    "truth": 0.076359896625,
+    "sem": 0.00023280336526486592,
+    "sems_off": 164.11756761459375,
+    "rel_err": 0.5003558638560637
+   }
+  ]
+ },
+ {
+  "name": "twoPopDriftVariance [Hudson F_ST fed in, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "2*p0*(1-p0)*F_ST_Hudson",
+  "note": "positive control 'Ne=200 t=50 [drift unbiased: E[p_t] = p0]' passed at 0.95 sems",
+  "regime": "Wright-Fisher binomial sampling, two demes of size Ne started from a common ancestral frequency p0 = 0.3, 200000 independent loci, t generations with no mutation and no migration; the observables are the realised Var(p1 - p0) and the realised E[(p1 - p2)^2] across loci. The per-branch F is the model's 1-(1-1/(2Ne))^t, and the Hudson pairwise F_ST and Nei G_ST measured on the SAME replicates are carried as competitors, which is what the definition's own section note says must be discriminated",
+  "span": 0.6971962087269784,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+   "lean": 0.07459016500377832,
+   "truth": 0.076359896625,
+   "sem": 0.00023280336526486592,
+   "sems_off": 7.601830064647975,
+   "rel_err": 0.023176191946837666
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=50 (F=0.1176, Hudson 0.1152, Nei 0.0623)",
+    "lean": 0.04836646412970947,
+    "truth": 0.04931655240624999,
+    "sem": 0.00015157277842882549,
+    "sems_off": 6.268198593368514,
+    "rel_err": 0.019265099245261003
+   },
+   {
+    "design": "Ne=200 t=150 (F=0.3130, Hudson 0.3108, Nei 0.1852)",
+    "lean": 0.1305545749709637,
+    "truth": 0.13129473259375,
+    "sem": 0.0003896057777497251,
+    "sems_off": 1.8997603861556396,
+    "rel_err": 0.005637374844857407
+   },
+   {
+    "design": "Ne=500 t=100 (F=0.0952, Hudson 0.0941, Nei 0.0499)",
+    "lean": 0.03953242026924575,
+    "truth": 0.03991185757,
+    "sem": 0.00012326991686444078,
+    "sems_off": 3.078101376279147,
+    "rel_err": 0.009506881509806189
+   },
+   {
+    "design": "Ne=100 t=40 (F=0.1817, Hudson 0.1776, Nei 0.0999)",
+    "lean": 0.07459016500377832,
+    "truth": 0.076359896625,
+    "sem": 0.00023280336526486592,
+    "sems_off": 7.601830064647975,
+    "rel_err": 0.023176191946837666
+   }
+  ]
+ },
+ {
+  "name": "haplotypeHomozygosity",
+  "file": "HaplotypeTheory.lean",
+  "source": "sum f_i^2",
+  "note": "",
+  "regime": "a haplotype frequency vector drawn from a Dirichlet, then 8e6 independent PAIRS of haplotypes drawn from it; the observable is the realised fraction of pairs that match, which is an independent route to the homozygosity and does not evaluate the sum of squares",
+  "span": 0.5443358859431205,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "k=6 conc=1.0 (H=0.3001)",
+   "lean": 0.30011226897707305,
+   "truth": 0.299834375,
+   "sem": 0.00016199294836826978,
+   "sems_off": 1.7154695921782164,
+   "rel_err": 0.000926824941513336
+  },
+  "cells": [
+   {
+    "design": "k=4 conc=0.4 (H=0.4945)",
+    "lean": 0.49446068309622476,
+    "truth": 0.494535375,
+    "sem": 0.0001767661371253023,
+    "sems_off": 0.42254645029828813,
+    "rel_err": 0.00015103450137462246
+   },
+   {
+    "design": "k=6 conc=1.0 (H=0.3001)",
+    "lean": 0.30011226897707305,
+    "truth": 0.299834375,
+    "sem": 0.00016199294836826978,
+    "sems_off": 1.7154695921782164,
+    "rel_err": 0.000926824941513336
+   },
+   {
+    "design": "k=10 conc=0.3 (H=0.2253)",
+    "lean": 0.22530798909900066,
+    "truth": 0.225422125,
+    "sem": 0.00014773582443016503,
+    "sems_off": 0.7725675301815379,
+    "rel_err": 0.0005063207571100037
+   },
+   {
+    "design": "k=3 conc=3.0 (H=0.4562)",
+    "lean": 0.45615296556783014,
+    "truth": 0.455899625,
+    "sem": 0.00017608774692069696,
+    "sems_off": 1.4387177544173886,
+    "rel_err": 0.0005556937403275174
+   }
+  ]
+ },
+ {
+  "name": "haplotypeHomozygosity [uniform reading 1/k, competing]",
+  "file": "HaplotypeTheory.lean",
+  "source": "1/k",
+  "note": "positive control 'k=6 uniform [match probability = 1/k]' passed at 1.19 sems",
+  "regime": "a haplotype frequency vector drawn from a Dirichlet, then 8e6 independent PAIRS of haplotypes drawn from it; the observable is the realised fraction of pairs that match, which is an independent route to the homozygosity and does not evaluate the sum of squares",
+  "span": 0.7,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "k=4 conc=0.4 (H=0.4945)",
+   "lean": 0.25,
+   "truth": 0.494535375,
+   "sem": 0.0001767661371253023,
+   "sems_off": 1383.3835992391398,
+   "rel_err": 0.4944749907931258
+  },
+  "cells": [
+   {
+    "design": "k=4 conc=0.4 (H=0.4945)",
+    "lean": 0.25,
+    "truth": 0.494535375,
+    "sem": 0.0001767661371253023,
+    "sems_off": 1383.3835992391398,
+    "rel_err": 0.4944749907931258
+   },
+   {
+    "design": "k=6 conc=1.0 (H=0.3001)",
+    "lean": 0.16666666666666666,
+    "truth": 0.299834375,
+    "sem": 0.00016199294836826978,
+    "sems_off": 822.0586740022409,
+    "rel_err": 0.44413756205682997
+   },
+   {
+    "design": "k=10 conc=0.3 (H=0.2253)",
+    "lean": 0.1,
+    "truth": 0.225422125,
+    "sem": 0.00014773582443016503,
+    "sems_off": 848.9621625883115,
+    "rel_err": 0.5563878212930519
+   },
+   {
+    "design": "k=3 conc=3.0 (H=0.4562)",
+    "lean": 0.3333333333333333,
+    "truth": 0.455899625,
+    "sem": 0.00017608774692069696,
+    "sems_off": 696.0523591790048,
+    "rel_err": 0.26884490564489205
+   }
+  ]
+ },
+ {
+  "name": "haplotypeHomozygosity [complement 1 - sum f^2, competing]",
+  "file": "HaplotypeTheory.lean",
+  "source": "1 - sum f_i^2",
+  "note": "positive control 'k=6 uniform [match probability = 1/k]' passed at 1.19 sems",
+  "regime": "a haplotype frequency vector drawn from a Dirichlet, then 8e6 independent PAIRS of haplotypes drawn from it; the observable is the realised fraction of pairs that match, which is an independent route to the homozygosity and does not evaluate the sum of squares",
+  "span": 0.3474318699688,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "k=10 conc=0.3 (H=0.2253)",
+   "lean": 0.7746920109009994,
+   "truth": 0.225422125,
+   "sem": 0.00014773582443016503,
+   "sems_off": 3717.9193876610484,
+   "rel_err": 2.4366281078265914
+  },
+  "cells": [
+   {
+    "design": "k=4 conc=0.4 (H=0.4945)",
+    "lean": 0.5055393169037752,
+    "truth": 0.494535375,
+    "sem": 0.0001767661371253023,
+    "sems_off": 62.251413549728355,
+    "rel_err": 0.022251071328871434
+   },
+   {
+    "design": "k=6 conc=1.0 (H=0.3001)",
+    "lean": 0.699887731022927,
+    "truth": 0.299834375,
+    "sem": 0.00016199294836826978,
+    "sems_off": 2469.572657653332,
+    "rel_err": 1.334247802717507
+   },
+   {
+    "design": "k=10 conc=0.3 (H=0.2253)",
+    "lean": 0.7746920109009994,
+    "truth": 0.225422125,
+    "sem": 0.00014773582443016503,
+    "sems_off": 3717.9193876610484,
+    "rel_err": 2.4366281078265914
+   },
+   {
+    "design": "k=3 conc=3.0 (H=0.4562)",
+    "lean": 0.5438470344321699,
+    "truth": 0.455899625,
+    "sem": 0.00017608774692069696,
+    "sems_off": 499.4521820520423,
+    "rel_err": 0.19290958932499647
+   }
+  ]
+ },
+ {
+  "name": "haplotypeHomozygosity [divided by k, competing]",
+  "file": "HaplotypeTheory.lean",
+  "source": "(sum f_i^2)/k",
+  "note": "positive control 'k=6 uniform [match probability = 1/k]' passed at 1.19 sems",
+  "regime": "a haplotype frequency vector drawn from a Dirichlet, then 8e6 independent PAIRS of haplotypes drawn from it; the observable is the realised fraction of pairs that match, which is an independent route to the homozygosity and does not evaluate the sum of squares",
+  "span": 0.8518207666466455,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "k=4 conc=0.4 (H=0.4945)",
+   "lean": 0.12361517077405619,
+   "truth": 0.494535375,
+   "sem": 0.0001767661371253023,
+   "sems_off": 2098.3668606335705,
+   "rel_err": 0.7500377586253436
+  },
+  "cells": [
+   {
+    "design": "k=4 conc=0.4 (H=0.4945)",
+    "lean": 0.12361517077405619,
+    "truth": 0.494535375,
+    "sem": 0.0001767661371253023,
+    "sems_off": 2098.3668606335705,
+    "rel_err": 0.7500377586253436
+   },
+   {
+    "design": "k=6 conc=1.0 (H=0.3001)",
+    "lean": 0.05001871149617884,
+    "truth": 0.299834375,
+    "sem": 0.00016199294836826978,
+    "sems_off": 1542.1391240802525,
+    "rel_err": 0.8331788625097478
+   },
+   {
+    "design": "k=10 conc=0.3 (H=0.2253)",
+    "lean": 0.022530798909900066,
+    "truth": 0.225422125,
+    "sem": 0.00014773582443016503,
+    "sems_off": 1373.3387069295911,
+    "rel_err": 0.900050632075711
+   },
+   {
+    "design": "k=3 conc=3.0 (H=0.4562)",
+    "lean": 0.15205098852261004,
+    "truth": 0.455899625,
+    "sem": 0.00017608774692069696,
+    "sems_off": 1725.5524123108432,
+    "rel_err": 0.6664814354198908
+   }
+  ]
+ },
+ {
+  "name": "additiveGeneticVariance",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum beta_i^2",
+  "note": "",
+  "regime": "m standardized causal variants in LINKAGE EQUILIBRIUM, 400000 individuals; the observable is the realised sample variance of the genetic value G beta. One extra cell puts the same variants in exchangeable LD at pairwise correlation 0.5, where sum beta^2 is no longer the variance, so the linkage-equilibrium regime is shown to be a condition rather than decoration",
+  "span": 0.21740515288879042,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=50 LD=0.0",
+   "lean": 0.5300434440048504,
+   "truth": 0.5270914485021504,
+   "sem": 0.001178612309209638,
+   "sems_off": 2.5046365795038636,
+   "rel_err": 0.005600537650703195
+  },
+  "cells": [
+   {
+    "design": "m=50 LD=0.0",
+    "lean": 0.5300434440048504,
+    "truth": 0.5270914485021504,
+    "sem": 0.001178612309209638,
+    "sems_off": 2.5046365795038636,
+    "rel_err": 0.005600537650703195
+   },
+   {
+    "design": "m=200 LD=0.0",
+    "lean": 0.47943118279595354,
+    "truth": 0.47806269958422126,
+    "sem": 0.0010689806937773793,
+    "sems_off": 1.2801757970918677,
+    "rel_err": 0.002862560105447394
+   },
+   {
+    "design": "m=100 LD=0.0",
+    "lean": 0.6126173518336808,
+    "truth": 0.6110634479070162,
+    "sem": 0.00136637940808549,
+    "sems_off": 1.1372419091428771,
+    "rel_err": 0.0025429502157051135
+   }
+  ]
+ },
+ {
+  "name": "additiveGeneticVariance [sum |beta|, competing]",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum |beta_i|",
+  "note": "positive control 'm=1 [single variant: Var = beta^2]' passed at 0.45 sems",
+  "regime": "m standardized causal variants in LINKAGE EQUILIBRIUM, 400000 individuals; the observable is the realised sample variance of the genetic value G beta. One extra cell puts the same variants in exchangeable LD at pairwise correlation 0.5, where sum beta^2 is no longer the variance, so the linkage-equilibrium regime is shown to be a condition rather than decoration",
+  "span": 0.491936346654471,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=200 LD=0.0",
+   "lean": 8.00391033681382,
+   "truth": 0.47806269958422126,
+   "sem": 0.0010689806937773793,
+   "sems_off": 7040.209127291214,
+   "rel_err": 15.742386184437624
+  },
+  "cells": [
+   {
+    "design": "m=50 LD=0.0",
+    "lean": 4.066495926771673,
+    "truth": 0.5270914485021504,
+    "sem": 0.001178612309209638,
+    "sems_off": 3003.0269076716168,
+    "rel_err": 6.71497230381472
+   },
+   {
+    "design": "m=200 LD=0.0",
+    "lean": 8.00391033681382,
+    "truth": 0.47806269958422126,
+    "sem": 0.0010689806937773793,
+    "sems_off": 7040.209127291214,
+    "rel_err": 15.742386184437624
+   },
+   {
+    "design": "m=100 LD=0.0",
+    "lean": 6.242392127324916,
+    "truth": 0.6110634479070162,
+    "sem": 0.00136637940808549,
+    "sems_off": 4121.3506629965,
+    "rel_err": 9.215620241574003
+   }
+  ]
+ },
+ {
+  "name": "additiveGeneticVariance [per-variant mean, competing]",
+  "file": "TransferLearningPGS.lean",
+  "source": "(sum beta_i^2)/m",
+  "note": "positive control 'm=1 [single variant: Var = beta^2]' passed at 0.45 sems",
+  "regime": "m standardized causal variants in LINKAGE EQUILIBRIUM, 400000 individuals; the observable is the realised sample variance of the genetic value G beta. One extra cell puts the same variants in exchangeable LD at pairwise correlation 0.5, where sum beta^2 is no longer the variance, so the linkage-equilibrium regime is shown to be a condition rather than decoration",
+  "span": 0.7738717513542314,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=200 LD=0.0",
+   "lean": 0.0023971559139797675,
+   "truth": 0.47806269958422126,
+   "sem": 0.0010689806937773793,
+   "sems_off": 444.97112664347264,
+   "rel_err": 0.9949856871994728
+  },
+  "cells": [
+   {
+    "design": "m=50 LD=0.0",
+    "lean": 0.010600868880097007,
+    "truth": 0.5270914485021504,
+    "sem": 0.001178612309209638,
+    "sems_off": 438.2192308583687,
+    "rel_err": 0.9798879892469858
+   },
+   {
+    "design": "m=200 LD=0.0",
+    "lean": 0.0023971559139797675,
+    "truth": 0.47806269958422126,
+    "sem": 0.0010689806937773793,
+    "sems_off": 444.97112664347264,
+    "rel_err": 0.9949856871994728
+   },
+   {
+    "design": "m=100 LD=0.0",
+    "lean": 0.006126173518336808,
+    "truth": 0.6110634479070162,
+    "sem": 0.00136637940808549,
+    "sems_off": 442.7300871258669,
+    "rel_err": 0.989974570497843
+   }
+  ]
+ },
+ {
+  "name": "additiveGeneticVariance [same body OUTSIDE linkage equilibrium]",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum beta_i^2",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "m standardized causal variants in LINKAGE EQUILIBRIUM, 400000 individuals; the observable is the realised sample variance of the genetic value G beta. One extra cell puts the same variants in exchangeable LD at pairwise correlation 0.5, where sum beta^2 is no longer the variance, so the linkage-equilibrium regime is shown to be a condition rather than decoration",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "m=100 LD=0.5",
+   "lean": 0.5994557682489359,
+   "truth": 0.5491088583678021,
+   "sem": 0.00122784473435771,
+   "sems_off": 41.00429677492605,
+   "rel_err": 0.09168839495831005
+  },
+  "cells": [
+   {
+    "design": "m=100 LD=0.5",
+    "lean": 0.5994557682489359,
+    "truth": 0.5491088583678021,
+    "sem": 0.00122784473435771,
+    "sems_off": 41.00429677492605,
+    "rel_err": 0.09168839495831005
+   }
+  ]
+ },
+ {
+  "name": "ldDecayPerGeneration",
+  "file": "LongitudinalPortability.lean",
+  "source": "(1 - r)^t",
+  "note": "",
+  "regime": "400000 diploids, two loci at recombination fraction r, random mating with one gamete from each of two random parents and a recombinant gamete with probability r; started in complete disequilibrium and D MEASURED from the haplotype counts each generation. r is swept eightfold so (1-r)^t and exp(-r t) separate",
+  "span": 0.981389296398892,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.40 t=8 (D0=0.2500)",
+   "lean": 0.016796159999999994,
+   "truth": 0.019045128025884484,
+   "sem": 0.0033541019662496844,
+   "sems_off": 0.6705127180134967,
+   "rel_err": 0.11808626452013804
+  },
+  "cells": [
+   {
+    "design": "r=0.05 t=2 (D0=0.2500)",
+    "lean": 0.9025,
+    "truth": 0.9022275001652111,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.08124375392603836,
+    "rel_err": 0.0003020300697317828
+   },
+   {
+    "design": "r=0.05 t=5 (D0=0.2500)",
+    "lean": 0.7737809374999998,
+    "truth": 0.7729830425453831,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.23788631432360222,
+    "rel_err": 0.0010322282775948983
+   },
+   {
+    "design": "r=0.05 t=8 (D0=0.2500)",
+    "lean": 0.6634204312890623,
+    "truth": 0.6639470387703784,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.15700401675771963,
+    "rel_err": 0.000793146818293574
+   },
+   {
+    "design": "r=0.20 t=2 (D0=0.2500)",
+    "lean": 0.6400000000000001,
+    "truth": 0.6392432403962871,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.2256221222037486,
+    "rel_err": 0.001183836692968205
+   },
+   {
+    "design": "r=0.20 t=5 (D0=0.2500)",
+    "lean": 0.3276800000000001,
+    "truth": 0.3276150261962787,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.019371445583701196,
+    "rel_err": 0.00019832363758084845
+   },
+   {
+    "design": "r=0.20 t=8 (D0=0.2500)",
+    "lean": 0.1677721600000001,
+    "truth": 0.16940323158084622,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.48629159079199963,
+    "rel_err": 0.009628338052498828
+   },
+   {
+    "design": "r=0.40 t=2 (D0=0.2500)",
+    "lean": 0.36,
+    "truth": 0.35846119569445567,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.45878280416885986,
+    "rel_err": 0.004292805815600636
+   },
+   {
+    "design": "r=0.40 t=5 (D0=0.2500)",
+    "lean": 0.07775999999999998,
+    "truth": 0.07714363909803461,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.18376331672902127,
+    "rel_err": 0.007989782555916225
+   },
+   {
+    "design": "r=0.40 t=8 (D0=0.2500)",
+    "lean": 0.016796159999999994,
+    "truth": 0.019045128025884484,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.6705127180134967,
+    "rel_err": 0.11808626452013804
+   }
+  ]
+ },
+ {
+  "name": "ldDecayPerGeneration [exponential reading, competing]",
+  "file": "LongitudinalPortability.lean",
+  "source": "exp(-r*t)",
+  "note": "positive control 'r=0 t=8 [no recombination: D_t/D_0 = 1]' passed at 0.00 sems",
+  "regime": "400000 diploids, two loci at recombination fraction r, random mating with one gamete from each of two random parents and a recombinant gamete with probability r; started in complete disequilibrium and D MEASURED from the haplotype counts each generation. r is swept eightfold so (1-r)^t and exp(-r t) separate",
+  "span": 0.9549507976064423,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.40 t=2 (D0=0.2500)",
+   "lean": 0.44932896411722156,
+   "truth": 0.35846119569445567,
+   "sem": 0.0033541019662496844,
+   "sems_off": 27.091534287601785,
+   "rel_err": 0.2534940169652828
+  },
+  "cells": [
+   {
+    "design": "r=0.05 t=2 (D0=0.2500)",
+    "lean": 0.9048374180359595,
+    "truth": 0.9022275001652111,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.7781271699579849,
+    "rel_err": 0.0028927491904984773
+   },
+   {
+    "design": "r=0.05 t=5 (D0=0.2500)",
+    "lean": 0.7788007830714049,
+    "truth": 0.7729830425453831,
+    "sem": 0.0033541019662496844,
+    "sems_off": 1.7345151055520165,
+    "rel_err": 0.007526349487388953
+   },
+   {
+    "design": "r=0.05 t=8 (D0=0.2500)",
+    "lean": 0.6703200460356393,
+    "truth": 0.6639470387703784,
+    "sem": 0.0033541019662496844,
+    "sems_off": 1.900063662163124,
+    "rel_err": 0.009598668106214677
+   },
+   {
+    "design": "r=0.20 t=2 (D0=0.2500)",
+    "lean": 0.6703200460356393,
+    "truth": 0.6392432403962871,
+    "sem": 0.0033541019662496844,
+    "sems_off": 9.265313324418718,
+    "rel_err": 0.048614992972138005
+   },
+   {
+    "design": "r=0.20 t=5 (D0=0.2500)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3276150261962787,
+    "sem": 0.0033541019662496844,
+    "sems_off": 12.004529194496856,
+    "rel_err": 0.12290161242799857
+   },
+   {
+    "design": "r=0.20 t=8 (D0=0.2500)",
+    "lean": 0.20189651799465538,
+    "truth": 0.16940323158084622,
+    "sem": 0.0033541019662496844,
+    "sems_off": 9.687626297819687,
+    "rel_err": 0.1918103102909346
+   },
+   {
+    "design": "r=0.40 t=2 (D0=0.2500)",
+    "lean": 0.44932896411722156,
+    "truth": 0.35846119569445567,
+    "sem": 0.0033541019662496844,
+    "sems_off": 27.091534287601785,
+    "rel_err": 0.2534940169652828
+   },
+   {
+    "design": "r=0.40 t=5 (D0=0.2500)",
+    "lean": 0.1353352832366127,
+    "truth": 0.07714363909803461,
+    "sem": 0.0033541019662496844,
+    "sems_off": 17.34939626884504,
+    "rel_err": 0.7543284815048431
+   },
+   {
+    "design": "r=0.40 t=8 (D0=0.2500)",
+    "lean": 0.04076220397836621,
+    "truth": 0.019045128025884484,
+    "sem": 0.0033541019662496844,
+    "sems_off": 6.474781080303352,
+    "rel_err": 1.1402956138160776
+   }
+  ]
+ },
+ {
+  "name": "ldDecayPerGeneration [(1-r)^(2t), competing]",
+  "file": "LongitudinalPortability.lean",
+  "source": "(1 - r)^(2t)",
+  "note": "positive control 'r=0 t=8 [no recombination: D_t/D_0 = 1]' passed at 0.00 sems",
+  "regime": "400000 diploids, two loci at recombination fraction r, random mating with one gamete from each of two random parents and a recombinant gamete with probability r; started in complete disequilibrium and D MEASURED from the haplotype counts each generation. r is swept eightfold so (1-r)^t and exp(-r t) separate",
+  "span": 0.9996536417114718,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.20 t=2 (D0=0.2500)",
+   "lean": 0.4096000000000001,
+   "truth": 0.6392432403962871,
+   "sem": 0.0033541019662496844,
+   "sems_off": 68.46638614658981,
+   "rel_err": 0.35924234451650033
+  },
+  "cells": [
+   {
+    "design": "r=0.05 t=2 (D0=0.2500)",
+    "lean": 0.8145062499999999,
+    "truth": 0.9022275001652111,
+    "sem": 0.0033541019662496844,
+    "sems_off": 26.153423792090273,
+    "rel_err": 0.09722741786206718
+   },
+   {
+    "design": "r=0.05 t=5 (D0=0.2500)",
+    "lean": 0.5987369392383787,
+    "truth": 0.7729830425453831,
+    "sem": 0.0033541019662496844,
+    "sems_off": 51.95015090785504,
+    "rel_err": 0.22542034393564866
+   },
+   {
+    "design": "r=0.05 t=8 (D0=0.2500)",
+    "lean": 0.44012666865176536,
+    "truth": 0.6639470387703784,
+    "sem": 0.0033541019662496844,
+    "sems_off": 66.7303416445842,
+    "rel_err": 0.33710575851520563
+   },
+   {
+    "design": "r=0.20 t=2 (D0=0.2500)",
+    "lean": 0.4096000000000001,
+    "truth": 0.6392432403962871,
+    "sem": 0.0033541019662496844,
+    "sems_off": 68.46638614658981,
+    "rel_err": 0.35924234451650033
+   },
+   {
+    "design": "r=0.20 t=5 (D0=0.2500)",
+    "lean": 0.10737418240000006,
+    "truth": 0.3276150261962787,
+    "sem": 0.0033541019662496844,
+    "sems_off": 65.66313308671891,
+    "rel_err": 0.6722550133104374
+   },
+   {
+    "design": "r=0.20 t=8 (D0=0.2500)",
+    "lean": 0.028147497671065624,
+    "truth": 0.16940323158084622,
+    "sem": 0.0033541019662496844,
+    "sems_off": 42.114323097852214,
+    "rel_err": 0.8338432070722779
+   },
+   {
+    "design": "r=0.40 t=2 (D0=0.2500)",
+    "lean": 0.1296,
+    "truth": 0.35846119569445567,
+    "sem": 0.0033541019662496844,
+    "sems_off": 68.23322546462468,
+    "rel_err": 0.6384545899063838
+   },
+   {
+    "design": "r=0.40 t=5 (D0=0.2500)",
+    "lean": 0.006046617599999997,
+    "truth": 0.07714363909803461,
+    "sem": 0.0033541019662496844,
+    "sems_off": 21.197036408982576,
+    "rel_err": 0.921618714508452
+   },
+   {
+    "design": "r=0.40 t=8 (D0=0.2500)",
+    "lean": 0.00028211099074559984,
+    "truth": 0.019045128025884484,
+    "sem": 0.0033541019662496844,
+    "sems_off": 5.594050873807615,
+    "rel_err": 0.9851872357926826
+   }
+  ]
+ },
+ {
+  "name": "ldDecayPerGeneration [linear reading, competing]",
+  "file": "LongitudinalPortability.lean",
+  "source": "1 - r*t",
+  "note": "positive control 'r=0 t=8 [no recombination: D_t/D_0 = 1]' passed at 0.00 sems",
+  "regime": "400000 diploids, two loci at recombination fraction r, random mating with one gamete from each of two random parents and a recombinant gamete with probability r; started in complete disequilibrium and D MEASURED from the haplotype counts each generation. r is swept eightfold so (1-r)^t and exp(-r t) separate",
+  "span": 1.0,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.20 t=5 (D0=0.2500)",
+   "lean": 0.0,
+   "truth": 0.3276150261962787,
+   "sem": 0.0033541019662496844,
+   "sems_off": 97.67592920336713,
+   "rel_err": 1.0
+  },
+  "cells": [
+   {
+    "design": "r=0.05 t=2 (D0=0.2500)",
+    "lean": 0.9,
+    "truth": 0.9022275001652111,
+    "sem": 0.0033541019662496844,
+    "sems_off": 0.6641122385738757,
+    "rel_err": 0.002468889681153842
+   },
+   {
+    "design": "r=0.05 t=5 (D0=0.2500)",
+    "lean": 0.75,
+    "truth": 0.7729830425453831,
+    "sem": 0.0033541019662496844,
+    "sems_off": 6.852219394832849,
+    "rel_err": 0.029732919456682272
+   },
+   {
+    "design": "r=0.05 t=8 (D0=0.2500)",
+    "lean": 0.6,
+    "truth": 0.6639470387703784,
+    "sem": 0.0033541019662496844,
+    "sems_off": 19.065323420050767,
+    "rel_err": 0.09631346332805031
+   },
+   {
+    "design": "r=0.20 t=2 (D0=0.2500)",
+    "lean": 0.6,
+    "truth": 0.6392432403962871,
+    "sem": 0.0033541019662496844,
+    "sems_off": 11.700073757795174,
+    "rel_err": 0.06139015310034252
+   },
+   {
+    "design": "r=0.20 t=5 (D0=0.2500)",
+    "lean": 0.0,
+    "truth": 0.3276150261962787,
+    "sem": 0.0033541019662496844,
+    "sems_off": 97.67592920336713,
+    "rel_err": 1.0
+   },
+   {
+    "design": "r=0.20 t=8 (D0=0.2500)",
+    "lean": 0.0,
+    "truth": 0.16940323158084622,
+    "sem": 0.0033541019662496844,
+    "sems_off": 50.50628552305484,
+    "rel_err": 1.0
+   },
+   {
+    "design": "r=0.40 t=2 (D0=0.2500)",
+    "lean": 0.19999999999999996,
+    "truth": 0.35846119569445567,
+    "sem": 0.0033541019662496844,
+    "sems_off": 47.244000715826665,
+    "rel_err": 0.4420595523246664
+   },
+   {
+    "design": "r=0.40 t=5 (D0=0.2500)",
+    "lean": 0.0,
+    "truth": 0.07714363909803461,
+    "sem": 0.0033541019662496844,
+    "sems_off": 22.999789473988795,
+    "rel_err": 1.0
+   },
+   {
+    "design": "r=0.40 t=8 (D0=0.2500)",
+    "lean": 0.0,
+    "truth": 0.019045128025884484,
+    "sem": 0.0033541019662496844,
+    "sems_off": 5.678160120808545,
+    "rel_err": 1.0
+   }
+  ]
+ }
+]

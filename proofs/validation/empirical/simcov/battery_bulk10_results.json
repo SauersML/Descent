@@ -1,0 +1,115 @@
+[
+ {
+  "name": "approxLOOPGS",
+  "file": "SampleOverlapBias.lean",
+  "source": "pgs_full - leverage * residual / (1 - leverage)",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "against the ACTUAL leave-one-out prediction, obtained by refitting the regression without each individual in turn",
+  "span": 3.788274798140319,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "n=300 p=8 (worst of 300)",
+   "lean": -2.3177605899553835,
+   "truth": -2.317760589955368,
+   "sem": 2.3177605899553682e-09
+  },
+  "cells": [
+   {
+    "design": "n=300 p=8 (worst of 300)",
+    "lean": -2.3177605899553835,
+    "truth": -2.317760589955368,
+    "sem": 2.3177605899553682e-09
+   },
+   {
+    "design": "n=500 p=20 (worst of 500)",
+    "lean": 0.831252569331132,
+    "truth": 0.8312525693310973,
+    "sem": 8.312525693310973e-10
+   },
+   {
+    "design": "n=200 p=5 (worst of 200)",
+    "lean": -1.6274543896421794,
+    "truth": -1.6274543896421605,
+    "sem": 1.6274543896421605e-09
+   }
+  ]
+ },
+ {
+  "name": "pinskerAncestryDivergenceCap",
+  "file": "TransferLearningPGS.lean",
+  "source": "sqrt(2 * I_phi_A)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "how closely each candidate cap is approached by the realised total variation; a valid bound that is never approached is looser than its name suggests",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "max attained fraction of the cap",
+   "lean": 1.0,
+   "truth": 0.4999962719782379,
+   "sem": 0.02,
+   "sems_off": 25.000186401088104,
+   "rel_err": 1.0000149121982342
+  },
+  "cells": [
+   {
+    "design": "max attained fraction of the cap",
+    "lean": 1.0,
+    "truth": 0.4999962719782379,
+    "sem": 0.02,
+    "sems_off": 25.000186401088104,
+    "rel_err": 1.0000149121982342
+   },
+   {
+    "design": "max attained fraction of sqrt(KL/2)",
+    "lean": 1.0,
+    "truth": 0.9999925439564759,
+    "sem": 0.02,
+    "sems_off": 0.0003728021762072764,
+    "rel_err": 7.456099117145066e-06
+   }
+  ]
+ },
+ {
+  "name": "effectCorrelationStabilizing",
+  "file": "SelectionArchitecture.lean",
+  "source": "1 - 1/(2*N*s)",
+  "note": "",
+  "regime": "lag-one autocorrelation of a stationary process built with that retention, measured across 40000 replicates",
+  "span": 0.37500000000000006,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "N=1000 s=0.001 (Ns=1.0)",
+   "lean": 0.5,
+   "truth": 0.5048451357062934,
+   "sem": 0.003725656944768471,
+   "sems_off": 1.3004782185050352,
+   "rel_err": 0.009597271249360308
+  },
+  "cells": [
+   {
+    "design": "N=500 s=0.002 (Ns=1.0)",
+    "lean": 0.5,
+    "truth": 0.49582539665491365,
+    "sem": 0.0037707858801599875,
+    "sems_off": 1.1070910621181245,
+    "rel_err": 0.008419502859777477
+   },
+   {
+    "design": "N=1000 s=0.001 (Ns=1.0)",
+    "lean": 0.5,
+    "truth": 0.5048451357062934,
+    "sem": 0.003725656944768471,
+    "sems_off": 1.3004782185050352,
+    "rel_err": 0.009597271249360308
+   },
+   {
+    "design": "N=500 s=0.005 (Ns=2.5)",
+    "lean": 0.8,
+    "truth": 0.7978854268199183,
+    "sem": 0.0018168942283419843,
+    "sems_off": 1.1638394503633023,
+    "rel_err": 0.002650221584456947
+   }
+  ]
+ }
+]

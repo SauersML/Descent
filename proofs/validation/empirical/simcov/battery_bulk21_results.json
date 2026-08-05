@@ -1,0 +1,289 @@
+[
+ {
+  "name": "fstFromHetRatio",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 - H / H_0",
+  "note": "compared against the classical (1 - 1/(2Ne))^t decay, which is derived independently of this body",
+  "regime": "two isolated Wright-Fisher demes started at a common frequency, 20000 replicate pairs; heterozygosity, frequency variance and squared frequency difference are three separate functionals of the same trajectories, and the F_ST fed to the last two is the MEASURED heterozygosity ratio, not the theoretical decay",
+  "span": 0.713112908849732,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 p0=0.5 t=200",
+   "lean": 0.631238795,
+   "truth": 0.6330421782738329,
+   "sem": 0.0018438060249999998,
+   "sems_off": 0.9780764621554443,
+   "rel_err": 0.002848756900765006
+  },
+  "cells": [
+   {
+    "design": "Ne=100 p0=0.5 t=40",
+    "lean": 0.18125472750000005,
+    "truth": 0.18167987897732574,
+    "sem": 0.004093726362499999,
+    "sems_off": 0.10385439564799234,
+    "rel_err": 0.002340113168936841
+   },
+   {
+    "design": "Ne=100 p0=0.2 t=40",
+    "lean": 0.18109426171875032,
+    "truth": 0.18167987897732574,
+    "sem": 0.004094528691406248,
+    "sems_off": 0.14302433874856885,
+    "rel_err": 0.0032233468112806735
+   },
+   {
+    "design": "Ne=200 p0=0.5 t=120",
+    "lean": 0.25735640625,
+    "truth": 0.2594599977759685,
+    "sem": 0.00371321796875,
+    "sems_off": 0.56651442055707,
+    "rel_err": 0.008107575518384376
+   },
+   {
+    "design": "Ne=50 p0=0.5 t=60",
+    "lean": 0.45429206999999994,
+    "truth": 0.4528433576092388,
+    "sem": 0.0027285396500000003,
+    "sems_off": 0.5309478976276427,
+    "rel_err": 0.0031991468273037294
+   },
+   {
+    "design": "Ne=100 p0=0.5 t=200",
+    "lean": 0.631238795,
+    "truth": 0.6330421782738329,
+    "sem": 0.0018438060249999998,
+    "sems_off": 0.9780764621554443,
+    "rel_err": 0.002848756900765006
+   }
+  ]
+ },
+ {
+  "name": "driftVariance",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "p0 * (1 - p0) * fst",
+  "note": "",
+  "regime": "two isolated Wright-Fisher demes started at a common frequency, 20000 replicate pairs; heterozygosity, frequency variance and squared frequency difference are three separate functionals of the same trajectories, and the F_ST fed to the last two is the MEASURED heterozygosity ratio, not the theoretical decay",
+  "span": 0.8163922616638285,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 p0=0.2 t=40",
+   "lean": 0.028975081875000055,
+   "truth": 0.028641362799304355,
+   "sem": 0.0002025275501883223,
+   "sems_off": 1.6477712557397122,
+   "rel_err": 0.011651647934287707
+  },
+  "cells": [
+   {
+    "design": "Ne=100 p0=0.5 t=40",
+    "lean": 0.04531368187500001,
+    "truth": 0.04531363450522201,
+    "sem": 0.00032041978766089095,
+    "sems_off": 0.0001478366187953298,
+    "rel_err": 1.0453758238581522e-06
+   },
+   {
+    "design": "Ne=100 p0=0.2 t=40",
+    "lean": 0.028975081875000055,
+    "truth": 0.028641362799304355,
+    "sem": 0.0002025275501883223,
+    "sems_off": 1.6477712557397122,
+    "rel_err": 0.011651647934287707
+   },
+   {
+    "design": "Ne=200 p0=0.5 t=120",
+    "lean": 0.0643391015625,
+    "truth": 0.06434061667127615,
+    "sem": 0.00045496255060726296,
+    "sems_off": 0.003330183493401947,
+    "rel_err": 2.3548247662735743e-05
+   },
+   {
+    "design": "Ne=50 p0=0.5 t=60",
+    "lean": 0.11357301749999998,
+    "truth": 0.11356455525081878,
+    "sem": 0.0008030327091744855,
+    "sems_off": 0.01053786363186047,
+    "rel_err": 7.451487977489512e-05
+   },
+   {
+    "design": "Ne=100 p0=0.5 t=200",
+    "lean": 0.15780969875,
+    "truth": 0.15781357239924748,
+    "sem": 0.0011159244212102686,
+    "sems_off": 0.0034712469535128046,
+    "rel_err": 2.4545729423555942e-05
+   }
+  ]
+ },
+ {
+  "name": "expectedFreqDiffSq",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "2 * fst * p0 * (1 - p0)",
+  "note": "",
+  "regime": "two isolated Wright-Fisher demes started at a common frequency, 20000 replicate pairs; heterozygosity, frequency variance and squared frequency difference are three separate functionals of the same trajectories, and the F_ST fed to the last two is the MEASURED heterozygosity ratio, not the theoretical decay",
+  "span": 0.8163922616638285,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 p0=0.2 t=40",
+   "lean": 0.05795016375000011,
+   "truth": 0.05732231624999999,
+   "sem": 0.0005732374936164814,
+   "sems_off": 1.0952659360069237,
+   "rel_err": 0.010952933186821784
+  },
+  "cells": [
+   {
+    "design": "Ne=100 p0=0.5 t=40",
+    "lean": 0.09062736375000002,
+    "truth": 0.08991432125,
+    "sem": 0.0008991656919232943,
+    "sems_off": 0.7930045667944062,
+    "rel_err": 0.007930243926520489
+   },
+   {
+    "design": "Ne=100 p0=0.2 t=40",
+    "lean": 0.05795016375000011,
+    "truth": 0.05732231624999999,
+    "sem": 0.0005732374936164814,
+    "sems_off": 1.0952659360069237,
+    "rel_err": 0.010952933186821784
+   },
+   {
+    "design": "Ne=200 p0=0.5 t=120",
+    "lean": 0.128678203125,
+    "truth": 0.13003207375,
+    "sem": 0.001300353246737539,
+    "sems_off": 1.0411560307914285,
+    "rel_err": 0.010411820606683227
+   },
+   {
+    "design": "Ne=50 p0=0.5 t=60",
+    "lean": 0.22714603499999997,
+    "truth": 0.227683475,
+    "sem": 0.0022768916730033714,
+    "sems_off": 0.2360410933784605,
+    "rel_err": 0.0023604699462709267
+   },
+   {
+    "design": "Ne=100 p0=0.5 t=200",
+    "lean": 0.3156193975,
+    "truth": 0.31397579999999997,
+    "sem": 0.003139836496893645,
+    "sems_off": 0.5234659516908313,
+    "rel_err": 0.005234790388303934
+   }
+  ]
+ },
+ {
+  "name": "twoPopDriftVariance",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "2 * driftVariance p0 fst",
+  "note": "",
+  "regime": "two isolated Wright-Fisher demes started at a common frequency, 20000 replicate pairs; heterozygosity, frequency variance and squared frequency difference are three separate functionals of the same trajectories, and the F_ST fed to the last two is the MEASURED heterozygosity ratio, not the theoretical decay",
+  "span": 0.8163922616638285,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 p0=0.2 t=40",
+   "lean": 0.05795016375000011,
+   "truth": 0.05728272559860871,
+   "sem": 0.0004050551003766446,
+   "sems_off": 1.6477712557397122,
+   "rel_err": 0.011651647934287707
+  },
+  "cells": [
+   {
+    "design": "Ne=100 p0=0.5 t=40",
+    "lean": 0.09062736375000002,
+    "truth": 0.09062726901044402,
+    "sem": 0.0006408395753217819,
+    "sems_off": 0.0001478366187953298,
+    "rel_err": 1.0453758238581522e-06
+   },
+   {
+    "design": "Ne=100 p0=0.2 t=40",
+    "lean": 0.05795016375000011,
+    "truth": 0.05728272559860871,
+    "sem": 0.0004050551003766446,
+    "sems_off": 1.6477712557397122,
+    "rel_err": 0.011651647934287707
+   },
+   {
+    "design": "Ne=200 p0=0.5 t=120",
+    "lean": 0.128678203125,
+    "truth": 0.1286812333425523,
+    "sem": 0.0009099251012145259,
+    "sems_off": 0.003330183493401947,
+    "rel_err": 2.3548247662735743e-05
+   },
+   {
+    "design": "Ne=50 p0=0.5 t=60",
+    "lean": 0.22714603499999997,
+    "truth": 0.22712911050163756,
+    "sem": 0.001606065418348971,
+    "sems_off": 0.01053786363186047,
+    "rel_err": 7.451487977489512e-05
+   },
+   {
+    "design": "Ne=100 p0=0.5 t=200",
+    "lean": 0.3156193975,
+    "truth": 0.31562714479849496,
+    "sem": 0.0022318488424205372,
+    "sems_off": 0.0034712469535128046,
+    "rel_err": 2.4545729423555942e-05
+   }
+  ]
+ },
+ {
+  "name": "epistaticVariancePairwise",
+  "file": "AncestryCalibration.lean",
+  "source": "gamma^2 * (2*p1*(1-p1)) * (2*p2*(1-p2))",
+  "note": "",
+  "regime": "two unlinked loci in Hardy-Weinberg, 4e6 individuals; the observable is the realised variance of the product of the two CENTRED dosages times gamma -- the component orthogonal to both additive effects. Uncentred, the product carries the additive terms and this body would not be what is measured",
+  "span": 0.9450415274591099,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "gamma=2.0 p1=0.10 p2=0.30",
+   "lean": 0.3024,
+   "truth": 0.3031317942726985,
+   "sem": 0.000643039722350382,
+   "sems_off": 1.1380234334882036,
+   "rel_err": 0.002414112562670209
+  },
+  "cells": [
+   {
+    "design": "gamma=1.0 p1=0.50 p2=0.50",
+    "lean": 0.25,
+    "truth": 0.2497458119848905,
+    "sem": 0.0005297909379062411,
+    "sems_off": 0.47978928464514015,
+    "rel_err": 0.0010177868973630338
+   },
+   {
+    "design": "gamma=0.5 p1=0.20 p2=0.80",
+    "lean": 0.0256,
+    "truth": 0.02557844385293534,
+    "sem": 5.4260080084340254e-05,
+    "sems_off": 0.3972745162033536,
+    "rel_err": 0.0008427466185433227
+   },
+   {
+    "design": "gamma=2.0 p1=0.10 p2=0.30",
+    "lean": 0.3024,
+    "truth": 0.3031317942726985,
+    "sem": 0.000643039722350382,
+    "sems_off": 1.1380234334882036,
+    "rel_err": 0.002414112562670209
+   },
+   {
+    "design": "gamma=1.5 p1=0.35 p2=0.65",
+    "lean": 0.4658062499999999,
+    "truth": 0.46613207753541686,
+    "sem": 0.000988815582463556,
+    "sems_off": 0.32951294578627105,
+    "rel_err": 0.0006990026027380133
+   }
+  ]
+ }
+]

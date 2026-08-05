@@ -1,0 +1,155 @@
+[
+ {
+  "name": "driftLDCreationRate [via Sved E(r2) = 1/(1+4*Ne*c)]",
+  "file": "DemographicHistory.lean",
+  "source": "1 / (2 * Ne)",
+  "note": "the positive control 'Ne=100 c=0.0025 (4Nc=1.0) [c=0 gives r2 -> 1, drift only]' missed by 35.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "explicit forward Wright-Fisher two-locus simulation, 3000 replicate populations, 2400 generations with the second half used as the plateau; r^2 computed from realised haplotype frequencies. The sem is taken over replicate BLOCKS, not over successive generations, which are autocorrelated and would understate it",
+  "span": 0.6,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=100 c=0.0025 (4Nc=1.0)",
+   "lean": 0.5,
+   "truth": 0.24701203076970052,
+   "sem": 0.0008140911921969516,
+   "sems_off": 310.76121650152254,
+   "rel_err": 1.0241929044588545
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.0025 (4Nc=1.0)",
+    "lean": 0.5,
+    "truth": 0.24701203076970052,
+    "sem": 0.0008140911921969516,
+    "sems_off": 310.76121650152254,
+    "rel_err": 1.0241929044588545
+   },
+   {
+    "design": "Ne=100 c=0.0100 (4Nc=4.0)",
+    "lean": 0.2,
+    "truth": 0.21879146790022927,
+    "sem": 0.0005999122691682797,
+    "sems_off": 31.32369325648534,
+    "rel_err": 0.08588757176215996
+   },
+   {
+    "design": "Ne=200 c=0.0013 (4Nc=1.0)",
+    "lean": 0.5,
+    "truth": 0.24544878883910926,
+    "sem": 0.0017648778438380263,
+    "sems_off": 144.2316316960079,
+    "rel_err": 1.037084812538016
+   },
+   {
+    "design": "Ne=50 c=0.0200 (4Nc=4.0)",
+    "lean": 0.2,
+    "truth": 0.21699376942765047,
+    "sem": 0.0003280985199613542,
+    "sems_off": 51.79471528750605,
+    "rel_err": 0.0783145501019396
+   }
+  ]
+ },
+ {
+  "name": "driftLDCreationRate [1/(4*Ne) reading, competing]",
+  "file": "DemographicHistory.lean",
+  "source": "1 / (4 * Ne)",
+  "note": "the positive control 'Ne=100 c=0.0025 (4Nc=1.0) [c=0 gives r2 -> 1, drift only]' missed by 35.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "explicit forward Wright-Fisher two-locus simulation, 3000 replicate populations, 2400 generations with the second half used as the plateau; r^2 computed from realised haplotype frequencies. The sem is taken over replicate BLOCKS, not over successive generations, which are autocorrelated and would understate it",
+  "span": 0.6666666666666666,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=50 c=0.0200 (4Nc=4.0)",
+   "lean": 0.1111111111111111,
+   "truth": 0.21699376942765047,
+   "sem": 0.0003280985199613542,
+   "sems_off": 322.7160498286033,
+   "rel_err": 0.48795252783441095
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.0025 (4Nc=1.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.24701203076970052,
+    "sem": 0.0008140911921969516,
+    "sems_off": 106.03394729118902,
+    "rel_err": 0.34946193630590283
+   },
+   {
+    "design": "Ne=100 c=0.0100 (4Nc=4.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.21879146790022927,
+    "sem": 0.0005999122691682797,
+    "sems_off": 179.4935065062206,
+    "rel_err": 0.49215976209008894
+   },
+   {
+    "design": "Ne=200 c=0.0013 (4Nc=1.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.24544878883910926,
+    "sem": 0.0017648778438380263,
+    "sems_off": 49.79638947877787,
+    "rel_err": 0.35805654169201073
+   },
+   {
+    "design": "Ne=50 c=0.0200 (4Nc=4.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.21699376942765047,
+    "sem": 0.0003280985199613542,
+    "sems_off": 322.7160498286033,
+    "rel_err": 0.48795252783441095
+   }
+  ]
+ },
+ {
+  "name": "driftLDCreationRate [1/Ne reading, competing]",
+  "file": "DemographicHistory.lean",
+  "source": "1 / Ne",
+  "note": "the positive control 'Ne=100 c=0.0025 (4Nc=1.0) [c=0 gives r2 -> 1, drift only]' missed by 35.4 sems on the same code path, so this design cannot support any verdict",
+  "regime": "explicit forward Wright-Fisher two-locus simulation, 3000 replicate populations, 2400 generations with the second half used as the plateau; r^2 computed from realised haplotype frequencies. The sem is taken over replicate BLOCKS, not over successive generations, which are autocorrelated and would understate it",
+  "span": 0.5,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=100 c=0.0025 (4Nc=1.0)",
+   "lean": 0.6666666666666666,
+   "truth": 0.24701203076970052,
+   "sem": 0.0008140911921969516,
+   "sems_off": 515.488485711856,
+   "rel_err": 1.6989238726118057
+  },
+  "cells": [
+   {
+    "design": "Ne=100 c=0.0025 (4Nc=1.0)",
+    "lean": 0.6666666666666666,
+    "truth": 0.24701203076970052,
+    "sem": 0.0008140911921969516,
+    "sems_off": 515.488485711856,
+    "rel_err": 1.6989238726118057
+   },
+   {
+    "design": "Ne=100 c=0.0100 (4Nc=4.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.21879146790022927,
+    "sem": 0.0005999122691682797,
+    "sems_off": 190.93102661811744,
+    "rel_err": 0.5235207137297332
+   },
+   {
+    "design": "Ne=200 c=0.0013 (4Nc=1.0)",
+    "lean": 0.6666666666666666,
+    "truth": 0.24544878883910926,
+    "sem": 0.0017648778438380263,
+    "sems_off": 238.66687391323788,
+    "rel_err": 1.7161130833840215
+   },
+   {
+    "design": "Ne=50 c=0.0200 (4Nc=4.0)",
+    "lean": 0.3333333333333333,
+    "truth": 0.21699376942765047,
+    "sem": 0.0003280985199613542,
+    "sems_off": 354.5872865241396,
+    "rel_err": 0.5361424164967672
+   }
+  ]
+ }
+]

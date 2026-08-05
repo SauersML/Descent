@@ -1,0 +1,131 @@
+[
+ {
+  "name": "serialFounderWithinTime",
+  "file": "SerialFounderChain.lean",
+  "source": "2N(1 - exp(-tAnc/2N)) + exp(-tAnc/2N)(tAnc + 2 Nanc)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "mean pairwise TMRCA in a two-epoch history, 60000 independent genealogies, with tAnc crossing the boundary in both directions",
+  "span": 0.8415570506714132,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "tAnc=800 (N=400, Nanc=4000)",
+   "lean": 3743.0355293715384,
+   "truth": 3481.0167348623318,
+   "sem": 25.997869735823716,
+   "sems_off": 10.07847170447809,
+   "rel_err": 0.07527076554533398
+  },
+  "cells": [
+   {
+    "design": "tAnc=200 (N=400, Nanc=4000)",
+    "lean": 6563.125794728397,
+    "truth": 6455.528687990608,
+    "sem": 31.990960369053603,
+    "sems_off": 3.3633596958806056,
+    "rel_err": 0.01666743530052843
+   },
+   {
+    "design": "tAnc=800 (N=400, Nanc=4000)",
+    "lean": 3743.0355293715384,
+    "truth": 3481.0167348623318,
+    "sem": 25.997869735823716,
+    "sems_off": 10.07847170447809,
+    "rel_err": 0.07527076554533398
+   },
+   {
+    "design": "tAnc=3000 (N=400, Nanc=4000)",
+    "lean": 1039.8810077312928,
+    "truth": 982.7902877302115,
+    "sem": 8.875957506849014,
+    "sems_off": 6.4320632401662605,
+    "rel_err": 0.05809043975488842
+   }
+  ]
+ },
+ {
+  "name": "twoDemeIMEquilibriumDelta",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (2*M + 1)",
+  "note": "",
+  "regime": "1 - E[T_within]/E[T_between] for two demes, from coalescence times; also an independent check of the deme-count factor 2 at n = 2",
+  "span": 0.8571428571428571,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "M=10.0",
+   "lean": 0.047619047619047616,
+   "truth": 0.04233486522228899,
+   "sem": 0.002604637784613969,
+   "sems_off": 2.0287590189980245,
+   "rel_err": 0.12481868948945045
+  },
+  "cells": [
+   {
+    "design": "M=1.0",
+    "lean": 0.3333333333333333,
+    "truth": 0.3344402691877046,
+    "sem": 0.011239021181704556,
+    "sems_off": 0.09849041446538044,
+    "rel_err": 0.0033098163001118856
+   },
+   {
+    "design": "M=4.0",
+    "lean": 0.1111111111111111,
+    "truth": 0.1102917025608407,
+    "sem": 0.005127191779436179,
+    "sems_off": 0.15981624747426826,
+    "rel_err": 0.007429466870532643
+   },
+   {
+    "design": "M=10.0",
+    "lean": 0.047619047619047616,
+    "truth": 0.04233486522228899,
+    "sem": 0.002604637784613969,
+    "sems_off": 2.0287590189980245,
+    "rel_err": 0.12481868948945045
+   }
+  ]
+ },
+ {
+  "name": "expectedSqMeanPGSDiff_pureSplit",
+  "file": "PortabilityDrift.lean",
+  "source": "Var_Delta_Mu V_A (fstS + fstT) = 2 (fstS + fstT) V_A",
+  "note": "",
+  "regime": "realised variance of the mean-score difference between two independently drifted demes; Var_Delta_Mu is separately validated for ONE branch, so this tests the composition",
+  "span": 0.873852646253377,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "t=250 (F=0.465 each branch)",
+   "lean": 368.9844545306664,
+   "truth": 353.944781033349,
+   "sem": 9.140338466175946,
+   "sems_off": 1.6454175688320658,
+   "rel_err": 0.042491581464794606
+  },
+  "cells": [
+   {
+    "design": "t=30 (F=0.072 each branch)",
+    "lean": 46.546412512684675,
+    "truth": 45.896970640147046,
+    "sem": 1.1852522447097678,
+    "sems_off": 0.5479355769510968,
+    "rel_err": 0.01414999429111665
+   },
+   {
+    "design": "t=100 (F=0.221 each branch)",
+    "lean": 153.50564275154417,
+    "truth": 148.7856069062957,
+    "sem": 3.842268282777172,
+    "sems_off": 1.2284503574114967,
+    "rel_err": 0.031723739569924435
+   },
+   {
+    "design": "t=250 (F=0.465 each branch)",
+    "lean": 368.9844545306664,
+    "truth": 353.944781033349,
+    "sem": 9.140338466175946,
+    "sems_off": 1.6454175688320658,
+    "rel_err": 0.042491581464794606
+   }
+  ]
+ }
+]

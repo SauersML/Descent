@@ -1,0 +1,772 @@
+[
+ {
+  "name": "averageEffect",
+  "file": "BlindnessRegistry.lean",
+  "source": "a + d * (1 - 2 * p)",
+  "note": "",
+  "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
+  "span": 0.7026539853566792,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.85 (realised 0.8500)",
+   "lean": 0.4400453999999999,
+   "truth": 0.44108501185100124,
+   "sem": 0.00020227141201420364,
+   "sems_off": 5.139687515150775,
+   "rel_err": 0.0023569421382935185
+  },
+  "cells": [
+   {
+    "design": "p=0.20 (realised 0.2001)",
+    "lean": 1.4799102,
+    "truth": 1.479962400985366,
+    "sem": 0.00022629034883575027,
+    "sems_off": 0.23068144812467511,
+    "rel_err": 3.5271832129865666e-05
+   },
+   {
+    "design": "p=0.35 (realised 0.3498)",
+    "lean": 1.24038,
+    "truth": 1.24039333143903,
+    "sem": 0.0002697747860565873,
+    "sems_off": 0.04941692003508248,
+    "rel_err": 1.0747751291579037e-05
+   },
+   {
+    "design": "p=0.50 (realised 0.4998)",
+    "lean": 1.00037,
+    "truth": 1.000369774527519,
+    "sem": 0.0002827996464083932,
+    "sems_off": 0.000797286997249243,
+    "rel_err": 2.2538913774617745e-07
+   },
+   {
+    "design": "p=0.70 (realised 0.7001)",
+    "lean": 0.6797891999999999,
+    "truth": 0.6798182769785897,
+    "sem": 0.000259195758203151,
+    "sems_off": 0.11218153719549584,
+    "rel_err": 4.277169292801654e-05
+   },
+   {
+    "design": "p=0.85 (realised 0.8500)",
+    "lean": 0.4400453999999999,
+    "truth": 0.44108501185100124,
+    "sem": 0.00020227141201420364,
+    "sems_off": 5.139687515150775,
+    "rel_err": 0.0023569421382935185
+   }
+  ]
+ },
+ {
+  "name": "averageEffect [dominance factor 1-p, competing]",
+  "file": "BlindnessRegistry.lean",
+  "source": "a + d * (1 - p)",
+  "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
+  "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
+  "span": 0.3170406311733778,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "p=0.85 (realised 0.8500)",
+   "lean": 1.1200227,
+   "truth": 0.44108501185100124,
+   "sem": 0.00020227141201420364,
+   "sems_off": 3356.5676997465334,
+   "rel_err": 1.539244521820987
+  },
+  "cells": [
+   {
+    "design": "p=0.20 (realised 0.2001)",
+    "lean": 1.6399550999999999,
+    "truth": 1.479962400985366,
+    "sem": 0.00022629034883575027,
+    "sems_off": 707.0239620813982,
+    "rel_err": 0.10810592141267235
+   },
+   {
+    "design": "p=0.35 (realised 0.3498)",
+    "lean": 1.52019,
+    "truth": 1.24039333143903,
+    "sem": 0.0002697747860565873,
+    "sems_off": 1037.1490703444776,
+    "rel_err": 0.2255709229235911
+   },
+   {
+    "design": "p=0.50 (realised 0.4998)",
+    "lean": 1.400185,
+    "truth": 1.000369774527519,
+    "sem": 0.0002827996464083932,
+    "sems_off": 1413.7755494046999,
+    "rel_err": 0.39966743863419524
+   },
+   {
+    "design": "p=0.70 (realised 0.7001)",
+    "lean": 1.2398946,
+    "truth": 0.6798182769785897,
+    "sem": 0.000259195758203151,
+    "sems_off": 2160.8236450476043,
+    "rel_err": 0.8238618201185101
+   },
+   {
+    "design": "p=0.85 (realised 0.8500)",
+    "lean": 1.1200227,
+    "truth": 0.44108501185100124,
+    "sem": 0.00020227141201420364,
+    "sems_off": 3356.5676997465334,
+    "rel_err": 1.539244521820987
+   }
+  ]
+ },
+ {
+  "name": "averageEffect [dominance factor p, competing]",
+  "file": "BlindnessRegistry.lean",
+  "source": "a + d * p",
+  "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
+  "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
+  "span": 0.3094877531976177,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "p=0.85 (realised 0.8500)",
+   "lean": 1.6799773,
+   "truth": 0.44108501185100124,
+   "sem": 0.00020227141201420364,
+   "sems_off": 6124.900576963407,
+   "rel_err": 2.8087381227260955
+  },
+  "cells": [
+   {
+    "design": "p=0.20 (realised 0.2001)",
+    "lean": 1.1600449,
+    "truth": 1.479962400985366,
+    "sem": 0.00022629034883575027,
+    "sems_off": 1413.7478802402386,
+    "rel_err": 0.21616596527882295
+   },
+   {
+    "design": "p=0.35 (realised 0.3498)",
+    "lean": 1.27981,
+    "truth": 1.24039333143903,
+    "sem": 0.0002697747860565873,
+    "sems_off": 146.10953505751968,
+    "rel_err": 0.03177755600736821
+   },
+   {
+    "design": "p=0.50 (realised 0.4998)",
+    "lean": 1.399815,
+    "truth": 1.000369774527519,
+    "sem": 0.0002827996464083932,
+    "sems_off": 1412.4672026486162,
+    "rel_err": 0.39929757540019784
+   },
+   {
+    "design": "p=0.70 (realised 0.7001)",
+    "lean": 1.5601054,
+    "truth": 0.6798182769785897,
+    "sem": 0.000259195758203151,
+    "sems_off": 3396.2250351777125,
+    "rel_err": 1.2948859317725203
+   },
+   {
+    "design": "p=0.85 (realised 0.8500)",
+    "lean": 1.6799773,
+    "truth": 0.44108501185100124,
+    "sem": 0.00020227141201420364,
+    "sems_off": 6124.900576963407,
+    "rel_err": 2.8087381227260955
+   }
+  ]
+ },
+ {
+  "name": "averageEffect [dominance factor doubled, competing]",
+  "file": "BlindnessRegistry.lean",
+  "source": "a + 2*d*(1 - 2*p)",
+  "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
+  "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
+  "span": 1.061183769696448,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "p=0.85 (realised 0.8500)",
+   "lean": -0.11990920000000016,
+   "truth": 0.44108501185100124,
+   "sem": 0.00020227141201420364,
+   "sems_off": 2773.4725647320247,
+   "rel_err": 1.2718505430434022
+  },
+  "cells": [
+   {
+    "design": "p=0.20 (realised 0.2001)",
+    "lean": 1.9598204,
+    "truth": 1.479962400985366,
+    "sem": 0.00022629034883575027,
+    "sems_off": 2120.541160873512,
+    "rel_err": 0.32423661485936545
+   },
+   {
+    "design": "p=0.35 (realised 0.3498)",
+    "lean": 1.48076,
+    "truth": 1.24039333143903,
+    "sem": 0.0002697747860565873,
+    "sems_off": 890.9901183669228,
+    "rel_err": 0.1937826191649313
+   },
+   {
+    "design": "p=0.50 (realised 0.4998)",
+    "lean": 1.00074,
+    "truth": 1.000369774527519,
+    "sem": 0.0002827996464083932,
+    "sems_off": 1.309144043080747,
+    "rel_err": 0.00037008862313512957
+   },
+   {
+    "design": "p=0.70 (realised 0.7001)",
+    "lean": 0.35957839999999974,
+    "truth": 0.6798182769785897,
+    "sem": 0.000259195758203151,
+    "sems_off": 1235.5135716673035,
+    "rel_err": 0.47106688334693836
+   },
+   {
+    "design": "p=0.85 (realised 0.8500)",
+    "lean": -0.11990920000000016,
+    "truth": 0.44108501185100124,
+    "sem": 0.00020227141201420364,
+    "sems_off": 2773.4725647320247,
+    "rel_err": 1.2718505430434022
+   }
+  ]
+ },
+ {
+  "name": "effectiveGeneticEffect",
+  "file": "GeneEnvironmentInterplay.lean",
+  "source": "beta_G + beta_GxE * E_mean",
+  "note": "",
+  "regime": "the file's own linear GxE model Y = bG G + bE E + bGxE G E + eps, 2e6 individuals, G standardized and E independent of G with unit variance; the observable is the realised marginal OLS slope of Y on G. E_mean is swept through zero and negative, and both competitors MOVE across the design so a rejection is of a form",
+  "span": 0.9755480673208139,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "E_mean=+2.5 (realised +2.4988)",
+   "lean": 1.0247087014793652,
+   "truth": 1.0256276222619638,
+   "sem": 0.0007593632813719643,
+   "sems_off": 1.210120116603933,
+   "rel_err": 0.0008959594716959347
+  },
+  "cells": [
+   {
+    "design": "E_mean=-1.5 (realised -1.4998)",
+    "lean": 0.025056108184349613,
+    "truth": 0.024971286554329623,
+    "sem": 0.0007601296793677587,
+    "sems_off": 0.11158836751452808,
+    "rel_err": 0.003396766515631656
+   },
+   {
+    "design": "E_mean=-0.5 (realised -0.5003)",
+    "lean": 0.27492959971243736,
+    "truth": 0.2753557698772263,
+    "sem": 0.0007592395381353103,
+    "sems_off": 0.5613118698159953,
+    "rel_err": 0.0015477074076892649
+   },
+   {
+    "design": "E_mean=+0.0 (realised +0.0003)",
+    "lean": 0.40008467824102806,
+    "truth": 0.39956032362048244,
+    "sem": 0.0007587059122384482,
+    "sems_off": 0.6911170877772518,
+    "rel_err": 0.0013123290515793843
+   },
+   {
+    "design": "E_mean=+1.0 (realised +1.0007)",
+    "lean": 0.6501675044258954,
+    "truth": 0.6508523226761984,
+    "sem": 0.0007597578820933733,
+    "sems_off": 0.9013637981827652,
+    "rel_err": 0.0010521868424577725
+   },
+   {
+    "design": "E_mean=+2.5 (realised +2.4988)",
+    "lean": 1.0247087014793652,
+    "truth": 1.0256276222619638,
+    "sem": 0.0007593632813719643,
+    "sems_off": 1.210120116603933,
+    "rel_err": 0.0008959594716959347
+   }
+  ]
+ },
+ {
+  "name": "effectiveGeneticEffect [environment second moment too, competing]",
+  "file": "GeneEnvironmentInterplay.lean",
+  "source": "beta_G + beta_GxE * (E_mean + Var E)",
+  "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems",
+  "regime": "the file's own linear GxE model Y = bG G + bE E + bGxE G E + eps, 2e6 individuals, G standardized and E independent of G with unit variance; the observable is the realised marginal OLS slope of Y on G. E_mean is swept through zero and negative, and both competitors MOVE across the design so a rejection is of a form",
+  "span": 0.7843613615381289,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "E_mean=+0.0 (realised +0.0003)",
+   "lean": 0.6500193141957009,
+   "truth": 0.39956032362048244,
+   "sem": 0.0007587059122384482,
+   "sems_off": 330.1134030131342,
+   "rel_err": 0.6268364894336054
+  },
+  "cells": [
+   {
+    "design": "E_mean=-1.5 (realised -1.4998)",
+    "lean": 0.27484372122741224,
+    "truth": 0.024971286554329623,
+    "sem": 0.0007601296793677587,
+    "sems_off": 328.72342898242727,
+    "rel_err": 10.006390104468155
+   },
+   {
+    "design": "E_mean=-0.5 (realised -0.5003)",
+    "lean": 0.5251632892440643,
+    "truth": 0.2753557698772263,
+    "sem": 0.0007592395381353103,
+    "sems_off": 329.02332771073065,
+    "rel_err": 0.9072173046463504
+   },
+   {
+    "design": "E_mean=+0.0 (realised +0.0003)",
+    "lean": 0.6500193141957009,
+    "truth": 0.39956032362048244,
+    "sem": 0.0007587059122384482,
+    "sems_off": 330.1134030131342,
+    "rel_err": 0.6268364894336054
+   },
+   {
+    "design": "E_mean=+1.0 (realised +1.0007)",
+    "lean": 0.9007136179098313,
+    "truth": 0.6508523226761984,
+    "sem": 0.0007597578820933733,
+    "sems_off": 328.86963218490865,
+    "rel_err": 0.38389859961818074
+   },
+   {
+    "design": "E_mean=+2.5 (realised +2.4988)",
+    "lean": 1.274556930927801,
+    "truth": 1.0256276222619638,
+    "sem": 0.0007593632813719643,
+    "sems_off": 327.81320189210265,
+    "rel_err": 0.24270924774513947
+   }
+  ]
+ },
+ {
+  "name": "effectiveGeneticEffect [half the interaction, competing]",
+  "file": "GeneEnvironmentInterplay.lean",
+  "source": "beta_G + beta_GxE * E_mean / 2",
+  "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems",
+  "regime": "the file's own linear GxE model Y = bG G + bE E + bGxE G E + eps, 2e6 individuals, G standardized and E independent of G with unit variance; the observable is the realised marginal OLS slope of Y on G. E_mean is swept through zero and negative, and both competitors MOVE across the design so a rejection is of a form",
+  "span": 0.7016540239117043,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "E_mean=+2.5 (realised +2.4988)",
+   "lean": 0.7123543507396826,
+   "truth": 1.0256276222619638,
+   "sem": 0.0007593632813719643,
+   "sems_off": 412.5473000963137,
+   "rel_err": 0.3054454313851013
+  },
+  "cells": [
+   {
+    "design": "E_mean=-1.5 (realised -1.4998)",
+    "lean": 0.21252805409217482,
+    "truth": 0.024971286554329623,
+    "sem": 0.0007601296793677587,
+    "sems_off": 246.74311848189691,
+    "rel_err": 7.510897251120041
+   },
+   {
+    "design": "E_mean=-0.5 (realised -0.5003)",
+    "lean": 0.3374647998562187,
+    "truth": 0.2753557698772263,
+    "sem": 0.0007592395381353103,
+    "sems_off": 81.80426184275379,
+    "rel_err": 0.22555921020534672
+   },
+   {
+    "design": "E_mean=+0.0 (realised +0.0003)",
+    "lean": 0.400042339120514,
+    "truth": 0.39956032362048244,
+    "sem": 0.0007587059122384482,
+    "sems_off": 0.6353126979193551,
+    "rel_err": 0.0012063647753209116
+   },
+   {
+    "design": "E_mean=+1.0 (realised +1.0007)",
+    "lean": 0.5250837522129477,
+    "truth": 0.6508523226761984,
+    "sem": 0.0007597578820933733,
+    "sems_off": 165.53769750531384,
+    "rel_err": 0.1932367237257615
+   },
+   {
+    "design": "E_mean=+2.5 (realised +2.4988)",
+    "lean": 0.7123543507396826,
+    "truth": 1.0256276222619638,
+    "sem": 0.0007593632813719643,
+    "sems_off": 412.5473000963137,
+    "rel_err": 0.3054454313851013
+   }
+  ]
+ },
+ {
+  "name": "effectiveFisherInformation",
+  "file": "AncestrySpecificPower.lean",
+  "source": "n * (2*p*(1-p)) * r2_ld",
+  "note": "",
+  "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
+  "span": 0.9375371833427809,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.9 n=2400 (realised r2=0.8099)",
+   "lean": 884.3865439034389,
+   "truth": 854.7708119950457,
+   "sem": 15.607209162516225,
+   "sems_off": 1.8975674382272754,
+   "rel_err": 0.03464757042799541
+  },
+  "cells": [
+   {
+    "design": "r=0.6 n=600 (realised r2=0.3600)",
+    "lean": 98.27841476189283,
+    "truth": 97.0208040174285,
+    "sem": 1.7714970611610887,
+    "sems_off": 0.7099141014888597,
+    "rel_err": 0.012962279144155688
+   },
+   {
+    "design": "r=0.6 n=2400 (realised r2=0.3602)",
+    "lean": 393.28693467041916,
+    "truth": 385.8667635989652,
+    "sem": 7.045518171468818,
+    "sems_off": 1.053176060421267,
+    "rel_err": 0.019229878733908863
+   },
+   {
+    "design": "r=0.6 n=9600 (realised r2=0.3602)",
+    "lean": 1573.3906990013152,
+    "truth": 1558.7031279261348,
+    "sem": 28.460267241732243,
+    "sems_off": 0.5160728446584465,
+    "rel_err": 0.00942294322249951
+   },
+   {
+    "design": "r=0.9 n=2400 (realised r2=0.8099)",
+    "lean": 884.3865439034389,
+    "truth": 854.7708119950457,
+    "sem": 15.607209162516225,
+    "sems_off": 1.8975674382272754,
+    "rel_err": 0.03464757042799541
+   }
+  ]
+ },
+ {
+  "name": "effectiveFisherInformation [r^1 attenuation, competing]",
+  "file": "AncestrySpecificPower.lean",
+  "source": "n * (2*p*(1-p)) * r",
+  "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.67 sems",
+  "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
+  "span": 0.9375185944374153,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.6 n=2400 (realised r2=0.3602)",
+   "lean": 655.339097460313,
+   "truth": 385.8667635989652,
+   "sem": 7.045518171468818,
+   "sems_off": 38.24734069278108,
+   "rel_err": 0.6983559074847215
+  },
+  "cells": [
+   {
+    "design": "r=0.6 n=600 (realised r2=0.3600)",
+    "lean": 163.798678962917,
+    "truth": 97.0208040174285,
+    "sem": 1.7714970611610887,
+    "sems_off": 37.69573001815787,
+    "rel_err": 0.6882840811491598
+   },
+   {
+    "design": "r=0.6 n=2400 (realised r2=0.3602)",
+    "lean": 655.339097460313,
+    "truth": 385.8667635989652,
+    "sem": 7.045518171468818,
+    "sems_off": 38.24734069278108,
+    "rel_err": 0.6983559074847215
+   },
+   {
+    "design": "r=0.6 n=9600 (realised r2=0.3602)",
+    "lean": 2621.5588059850465,
+    "truth": 1558.7031279261348,
+    "sem": 28.460267241732243,
+    "sems_off": 37.34524588372139,
+    "rel_err": 0.6818846122885815
+   },
+   {
+    "design": "r=0.9 n=2400 (realised r2=0.8099)",
+    "lean": 982.7258549272809,
+    "truth": 854.7708119950457,
+    "sem": 15.607209162516225,
+    "sems_off": 8.198457623003113,
+    "rel_err": 0.14969514767775766
+   }
+  ]
+ },
+ {
+  "name": "effectiveFisherInformation [r^4 attenuation, competing]",
+  "file": "AncestrySpecificPower.lean",
+  "source": "n * (2*p*(1-p)) * r2^2",
+  "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.67 sems",
+  "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
+  "span": 0.9506039724163963,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "r=0.6 n=9600 (realised r2=0.3602)",
+   "lean": 566.7486931556426,
+   "truth": 1558.7031279261348,
+   "sem": 28.460267241732243,
+   "sems_off": 34.85400984977247,
+   "rel_err": 0.6363972824576892
+  },
+  "cells": [
+   {
+    "design": "r=0.6 n=600 (realised r2=0.3600)",
+    "lean": 35.37965863776789,
+    "truth": 97.0208040174285,
+    "sem": 1.7714970611610887,
+    "sems_off": 34.79607543873614,
+    "rel_err": 0.6353394615095913
+   },
+   {
+    "design": "r=0.6 n=2400 (realised r2=0.3602)",
+    "lean": 141.64341848210125,
+    "truth": 385.8667635989652,
+    "sem": 7.045518171468818,
+    "sems_off": 34.6636456216746,
+    "rel_err": 0.6329214333958222
+   },
+   {
+    "design": "r=0.6 n=9600 (realised r2=0.3602)",
+    "lean": 566.7486931556426,
+    "truth": 1558.7031279261348,
+    "sem": 28.460267241732243,
+    "sems_off": 34.85400984977247,
+    "rel_err": 0.6363972824576892
+   },
+   {
+    "design": "r=0.9 n=2400 (realised r2=0.8099)",
+    "lean": 716.2450174335798,
+    "truth": 854.7708119950457,
+    "sem": 15.607209162516225,
+    "sems_off": 8.875756909451995,
+    "rel_err": 0.1620619148636404
+   }
+  ]
+ },
+ {
+  "name": "multiAncestryEffectiveN",
+  "file": "BayesianPGSTheory.lean",
+  "source": "n_target + rg^2 * n_other",
+  "note": "positive control 'target data alone [contributed N = n1]' passed at 0.34 sems",
+  "regime": "two ancestries, one locus, effects from a Gaussian prior of variance tau2; the other ancestry's effect is rg times the target's PLUS independent scatter, which is what a genetic correlation below one means. 600000 replicates; N_eff is the posterior precision of the target effect MINUS the prior precision, i.e. the precision the data contributed, which is the reading under which target data alone gives exactly n1 -- checked as the control. n2*tau2 is swept across 1, the boundary at which the scatter term (1-rg^2)tau2 overtakes the sampling term 1/n2",
+  "span": 0.42394469470362506,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+   "lean": 12722.220524206312,
+   "truth": 8774.990850805578,
+   "sem": 22.10669271971234,
+   "sems_off": 178.55360471360896,
+   "rel_err": 0.4498272124167928
+  },
+  "cells": [
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=0.36 (realised rg 0.8999)",
+    "lean": 12718.856672092897,
+    "truth": 12079.45858621192,
+    "sem": 82.91210420552652,
+    "sems_off": 7.711758035907598,
+    "rel_err": 0.05293267751344562
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.6 n2*tau2=0.36 (realised rg 0.6006)",
+    "lean": 7328.702628119474,
+    "truth": 6448.984185425739,
+    "sem": 72.63230284313524,
+    "sems_off": 12.111944799460263,
+    "rel_err": 0.13641193983415836
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+    "lean": 12722.220524206312,
+    "truth": 8774.990850805578,
+    "sem": 22.10669271971234,
+    "sems_off": 178.55360471360896,
+    "rel_err": 0.4498272124167928
+   },
+   {
+    "design": "n1=6000 n2=6000 rg=0.7 n2*tau2=0.18 (realised rg 0.7000)",
+    "lean": 8939.77992553543,
+    "truth": 8734.690452261319,
+    "sem": 76.80541592798681,
+    "sems_off": 2.6702475443450995,
+    "rel_err": 0.023479878811391113
+   }
+  ]
+ },
+ {
+  "name": "multiAncestryEffectiveN [n_t + rg*n_o, competing]",
+  "file": "BayesianPGSTheory.lean",
+  "source": "n_target + rg * n_other",
+  "note": "positive control 'target data alone [contributed N = n1]' passed at 0.34 sems",
+  "regime": "two ancestries, one locus, effects from a Gaussian prior of variance tau2; the other ancestry's effect is rg times the target's PLUS independent scatter, which is what a genetic correlation below one means. 600000 replicates; N_eff is the posterior precision of the target effect MINUS the prior precision, i.e. the precision the data contributed, which is the reading under which target data alone gives exactly n1 -- checked as the control. n2*tau2 is swept across 1, the boundary at which the scatter term (1-rg^2)tau2 overtakes the sampling term 1/n2",
+  "span": 0.2609470189008564,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+   "lean": 13801.233554112037,
+   "truth": 8774.990850805578,
+   "sem": 22.10669271971234,
+   "sems_off": 227.36294239185784,
+   "rel_err": 0.572791788477481
+  },
+  "cells": [
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=0.36 (realised rg 0.8999)",
+    "lean": 13799.364799149753,
+    "truth": 12079.45858621192,
+    "sem": 82.91210420552652,
+    "sems_off": 20.74372890928502,
+    "rel_err": 0.1423827235850634
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.6 n2*tau2=0.36 (realised rg 0.6006)",
+    "lean": 10207.248541394538,
+    "truth": 6448.984185425739,
+    "sem": 72.63230284313524,
+    "sems_off": 51.74370368079286,
+    "rel_err": 0.5827684249036023
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+    "lean": 13801.233554112037,
+    "truth": 8774.990850805578,
+    "sem": 22.10669271971234,
+    "sems_off": 227.36294239185784,
+    "rel_err": 0.572791788477481
+   },
+   {
+    "design": "n1=6000 n2=6000 rg=0.7 n2*tau2=0.18 (realised rg 0.7000)",
+    "lean": 10199.84280101203,
+    "truth": 8734.690452261319,
+    "sem": 76.80541592798681,
+    "sems_off": 19.07615929226197,
+    "rel_err": 0.16773947019168822
+   }
+  ]
+ },
+ {
+  "name": "multiAncestryEffectiveN [n_t + n_o, competing]",
+  "file": "BayesianPGSTheory.lean",
+  "source": "n_target + n_other",
+  "note": "positive control 'target data alone [contributed N = n1]' passed at 0.34 sems",
+  "regime": "two ancestries, one locus, effects from a Gaussian prior of variance tau2; the other ancestry's effect is rg times the target's PLUS independent scatter, which is what a genetic correlation below one means. 600000 replicates; N_eff is the posterior precision of the target effect MINUS the prior precision, i.e. the precision the data contributed, which is the reading under which target data alone gives exactly n1 -- checked as the control. n2*tau2 is swept across 1, the boundary at which the scatter term (1-rg^2)tau2 overtakes the sampling term 1/n2",
+  "span": 0.2,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+   "lean": 15000.0,
+   "truth": 8774.990850805578,
+   "sem": 22.10669271971234,
+   "sems_off": 281.58934618219206,
+   "rel_err": 0.7094034916997027
+  },
+  "cells": [
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=0.36 (realised rg 0.8999)",
+    "lean": 15000.0,
+    "truth": 12079.45858621192,
+    "sem": 82.91210420552652,
+    "sems_off": 35.22454823421802,
+    "rel_err": 0.24177750955839422
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.6 n2*tau2=0.36 (realised rg 0.6006)",
+    "lean": 15000.0,
+    "truth": 6448.984185425739,
+    "sem": 72.63230284313524,
+    "sems_off": 117.7302037778147,
+    "rel_err": 1.3259477103229635
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+    "lean": 15000.0,
+    "truth": 8774.990850805578,
+    "sem": 22.10669271971234,
+    "sems_off": 281.58934618219206,
+    "rel_err": 0.7094034916997027
+   },
+   {
+    "design": "n1=6000 n2=6000 rg=0.7 n2*tau2=0.18 (realised rg 0.7000)",
+    "lean": 12000.0,
+    "truth": 8734.690452261319,
+    "sem": 76.80541592798681,
+    "sems_off": 42.5140533162434,
+    "rel_err": 0.373832314446052
+   }
+  ]
+ },
+ {
+  "name": "multiAncestryEffectiveN [no borrowing, competing]",
+  "file": "BayesianPGSTheory.lean",
+  "source": "n_target",
+  "note": "positive control 'target data alone [contributed N = n1]' passed at 0.34 sems",
+  "regime": "two ancestries, one locus, effects from a Gaussian prior of variance tau2; the other ancestry's effect is rg times the target's PLUS independent scatter, which is what a genetic correlation below one means. 600000 replicates; N_eff is the posterior precision of the target effect MINUS the prior precision, i.e. the precision the data contributed, which is the reading under which target data alone gives exactly n1 -- checked as the control. n2*tau2 is swept across 1, the boundary at which the scatter term (1-rg^2)tau2 overtakes the sampling term 1/n2",
+  "span": 0.5,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+   "lean": 3000.0,
+   "truth": 8774.990850805578,
+   "sem": 22.10669271971234,
+   "sems_off": 261.2326920189229,
+   "rel_err": 0.6581193016600595
+  },
+  "cells": [
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=0.36 (realised rg 0.8999)",
+    "lean": 3000.0,
+    "truth": 12079.45858621192,
+    "sem": 82.91210420552652,
+    "sems_off": 109.50703366188031,
+    "rel_err": 0.7516444980883211
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.6 n2*tau2=0.36 (realised rg 0.6006)",
+    "lean": 3000.0,
+    "truth": 6448.984185425739,
+    "sem": 72.63230284313524,
+    "sems_off": 47.485540873935214,
+    "rel_err": 0.5348104579354073
+   },
+   {
+    "design": "n1=3000 n2=12000 rg=0.9 n2*tau2=3.60 (realised rg 0.9001)",
+    "lean": 3000.0,
+    "truth": 8774.990850805578,
+    "sem": 22.10669271971234,
+    "sems_off": 261.2326920189229,
+    "rel_err": 0.6581193016600595
+   },
+   {
+    "design": "n1=6000 n2=6000 rg=0.7 n2*tau2=0.18 (realised rg 0.7000)",
+    "lean": 6000.0,
+    "truth": 8734.690452261319,
+    "sem": 76.80541592798681,
+    "sems_off": 35.60543770540061,
+    "rel_err": 0.313083842776974
+   }
+  ]
+ }
+]

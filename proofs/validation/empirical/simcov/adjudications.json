@@ -1,0 +1,104 @@
+{
+ "_README": [
+  "Definitions for which the ledger holds BOTH an agreeing and a disagreeing",
+  "verdict. A definition cannot be validated and falsified at once: one of the",
+  "designs is wrong, or the two are measuring different regimes, and the",
+  "`ledger` guard in check.py fails until this file says which and why.",
+  "",
+  "`authoritative` names the battery whose verdict stands. `superseded` lists",
+  "the batteries whose verdicts do not, each with the defect that explains it.",
+  "A superseded verdict is not deleted -- the record stays in ledger.json and",
+  "the reason travels with it, because a design fault that produced a wrong",
+  "verdict once will produce it again unless it is written down."
+ ],
+ "ancestryRecalibratedR2": {
+  "authoritative": "bulk41b",
+  "with": "bulk39",
+  "reason": [
+   "The two surviving designs agree and together they locate a REGIME rather",
+   "than a defect. `r2_target = rho^2 * h2_target` while `r2Source = h2_source`,",
+   "so `r2Source * rhoSq` is exact only when the two populations have equal",
+   "heritability. bulk41b rescales the drawn target effect vector to the source",
+   "vector's norm, which holds the two heritabilities equal, and matches at 2.34",
+   "sems. bulk39 does not rescale, so the two heritabilities differ by the",
+   "sampling scatter in the vector norms -- O(1/sqrt(m)) = 3.5% at m = 800 -- and",
+   "resolves a 1.2 to 2.7 percent residual at 9.19 sems on 400000 individuals.",
+   "bulk41b's own UNEQUAL-heritability cells show the same sign at 1.05 percent",
+   "and 2.51 sems, which its smaller m and n could not resolve. Neither battery",
+   "is wrong; the body needs the equal-heritability condition stated, and it now",
+   "is."
+  ],
+  "superseded": {
+   "bulk22": [
+    "Two design faults, either sufficient to produce the 353-sem falsification.",
+    "It evaluated the prediction at the NOMINAL genetic correlation while m = 400",
+    "effect vectors have a realised correlation about 5% away, which at",
+    "n = 200000 is hundreds of sems. And it built the target phenotype as",
+    "gt + N(0, sqrt(max(1 - Var gt, 1e-6))), so at alpha = 1.6 the genetic",
+    "variance is 1.28, the residual clamped to zero, and the target R-squared",
+    "jumped to 0.82 against a prediction of 0.43."
+   ],
+   "bulk41": [
+    "Fixed the nominal-rho fault and inherited the clamped-residual one, so its",
+    "490-sem falsification is the alpha != 1 cells alone."
+   ]
+  }
+ },
+ "ancestryRecalibratedSlope": {
+  "authoritative": "bulk39",
+  "reason": [
+   "The two designs disagree because they move `alpha` by different means, and",
+   "that difference IS the convention the docstring was missing. bulk39 produces",
+   "the score-scale ratio by rescaling the WEIGHTS, which moves alpha while",
+   "leaving the target phenotype on its own scale; there the `1/alpha` factor is",
+   "real and the body matches at 6.80 sems with the variance-ratio reading",
+   "rejected at 103 sems on the same cells. bulk41b produces it by rescaling the",
+   "GENOTYPES and scales the target residual with the resulting genetic variance,",
+   "so the phenotype is standardized too, covariance and variance both pick up",
+   "alpha squared, and the factor cancels exactly -- the measured slope is",
+   "rho * bSource with no alpha at all, 0.900 against rho = 0.8987.",
+   "",
+   "So bulk41b did not falsify the body; it measured a construction in which",
+   "alpha is not a free parameter. The finding it produced stands and is the",
+   "reason this entry exists: two conventions were written down -- sd ratio",
+   "versus variance ratio -- and a third, what happens to the OUTCOME scale, was",
+   "not, and the third is the one that decides the answer."
+  ],
+  "superseded": {
+   "bulk22": [
+    "Evaluated the prediction at the nominal genetic correlation rather than the",
+    "realised one, which at m = 400 and n = 200000 is worth hundreds of sems on",
+    "its own, and clamped the target residual at alpha != 1."
+   ],
+   "bulk41": [
+    "Fixed the nominal-rho fault and inherited the clamped-residual one."
+   ],
+   "bulk41b": [
+    "Not a defect in the design: it measures the genotype-rescaling convention,",
+    "under which alpha cancels and the body's alpha factor is not on trial. Its",
+    "cells are correct for what they measure and say nothing about bulk39's."
+   ]
+  }
+ },
+ "gwasHeritability": {
+  "authoritative": "bulk29",
+  "reason": [
+   "bulk29 matches at 3.51 sems and 1.21 percent, with the competing reading",
+   "`h2 * r` unsquared rejected at 652 sems on the same cells, so the match is",
+   "gated. The falsifications it displaces are the nominal-versus-realised",
+   "heritability trap, and battery dis1 demonstrates that directly: on one set",
+   "of cells the `nominal h2` reading is a LEAD at 6.67 sems while the",
+   "`realised h2` reading matches at 1.19 sems."
+  ],
+  "superseded": {
+   "bulk5": [
+    "42-sem falsification with NO competing formula carried, so it could not",
+    "show the design was capable of rejecting anything, and it fed nominal h2."
+   ],
+   "bulk7": [
+    "Recorded LEAD, not a falsification: it carried no positive control, so by",
+    "the harness's own rule the disagreement was never a finding."
+   ]
+  }
+ }
+}

@@ -1,0 +1,389 @@
+[
+ {
+  "name": "mutationSelectionBalance",
+  "file": "RareVariantPortability.lean",
+  "source": "mu / (h*s + mu)",
+  "note": "",
+  "regime": "fixed point of mutationSelectionStepRare, iterated to convergence",
+  "span": 0.4995004995004996,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "mu=1e-05 h=0.5 s=0.01",
+   "lean": 0.0019960079840319364,
+   "truth": 0.0019960079840319954,
+   "sem": 1.9960079840319952e-09,
+   "sems_off": 2.954927968978806e-08,
+   "rel_err": 2.9549279689788055e-14
+  },
+  "cells": [
+   {
+    "design": "mu=1e-05 h=0.5 s=0.01",
+    "lean": 0.0019960079840319364,
+    "truth": 0.0019960079840319954,
+    "sem": 1.9960079840319952e-09,
+    "sems_off": 2.954927968978806e-08,
+    "rel_err": 2.9549279689788055e-14
+   },
+   {
+    "design": "mu=1e-05 h=0.2 s=0.05",
+    "lean": 0.000999000999000999,
+    "truth": 0.0009990009990010088,
+    "sem": 9.990009990010087e-10,
+    "sems_off": 9.767577371921815e-09,
+    "rel_err": 9.767577371921815e-15
+   },
+   {
+    "design": "mu=1e-04 h=0.5 s=0.10",
+    "lean": 0.001996007984031936,
+    "truth": 0.001996007984031937,
+    "sem": 1.996007984031937e-09,
+    "sems_off": 4.3454823073219e-10,
+    "rel_err": 4.3454823073219003e-16
+   }
+  ]
+ },
+ {
+  "name": "mutationSelectionBalanceRecessive",
+  "file": "RareVariantPortability.lean",
+  "source": "(sqrt(mu*(mu + 4*s)) - mu) / (2*s)",
+  "note": "",
+  "regime": "fixed point of mutationSelectionStepRecessive, iterated",
+  "span": 0.543963171411399,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "mu=1e-05 s=0.01",
+   "lean": 0.031126729201736942,
+   "truth": 0.03112672920173846,
+   "sem": 3.112672920173846e-08,
+   "sems_off": 4.882034842487757e-08,
+   "rel_err": 4.882034842487757e-14
+  },
+  "cells": [
+   {
+    "design": "mu=1e-05 s=0.01",
+    "lean": 0.031126729201736942,
+    "truth": 0.03112672920173846,
+    "sem": 3.112672920173846e-08,
+    "sems_off": 4.882034842487757e-08,
+    "rel_err": 4.882034842487757e-14
+   },
+   {
+    "design": "mu=1e-04 s=0.05",
+    "lean": 0.04373253849269008,
+    "truth": 0.04373253849269131,
+    "sem": 4.373253849269131e-08,
+    "sems_off": 2.8242657697583768e-08,
+    "rel_err": 2.8242657697583766e-14
+   },
+   {
+    "design": "mu=1e-03 s=0.20",
+    "lean": 0.06825485849042452,
+    "truth": 0.06825485849042492,
+    "sem": 6.825485849042492e-08,
+    "sems_off": 5.8963692157251705e-09,
+    "rel_err": 5.89636921572517e-15
+   }
+  ]
+ },
+ {
+  "name": "mutationSelectionStepRare",
+  "file": "RareVariantPortability.lean",
+  "source": "p*(1 - h*s) + mu*(1 - p)",
+  "note": "",
+  "regime": "one generation of exact viability selection with dominance h, then two-way mutation, starting at p = 0.2",
+  "span": 0.04386317907444671,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "h=0.2 s=0.05 mu=1e-03",
+   "lean": 0.1988,
+   "truth": 0.19803176517893042,
+   "sem": 0.0,
+   "sems_off": Infinity,
+   "rel_err": 0.0038793514786652837
+  },
+  "cells": [
+   {
+    "design": "h=0.5 s=0.02 mu=1e-04",
+    "lean": 0.19807999999999998,
+    "truth": 0.19845389558232937,
+    "sem": 1.1331166295920985e-19,
+    "sems_off": 3299709602390954.0,
+    "rel_err": 0.0018840425441499086
+   },
+   {
+    "design": "h=0.5 s=0.10 mu=1e-04",
+    "lean": 0.19008,
+    "truth": 0.19189836734693874,
+    "sem": 5.665583147960493e-20,
+    "sems_off": 3.209497238767597e+16,
+    "rel_err": 0.00947567909033464
+   },
+   {
+    "design": "h=0.2 s=0.05 mu=1e-03",
+    "lean": 0.1988,
+    "truth": 0.19803176517893042,
+    "sem": 0.0,
+    "sems_off": Infinity,
+    "rel_err": 0.0038793514786652837
+   }
+  ]
+ },
+ {
+  "name": "haplotypeFreqAdmixed",
+  "file": "CovarianceStructure.lean",
+  "source": "alpha*p_A*q_A + (1-alpha)*p_B*q_B",
+  "note": "",
+  "regime": "one-pulse admixture, joint haplotype frequency at generation 0",
+  "span": 0.3933333333333334,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.5",
+   "lean": 0.30000000000000004,
+   "truth": 0.300246,
+   "sem": 0.0003241128965993177,
+   "sems_off": 0.7589947903371592,
+   "rel_err": 0.0008193281509161436
+  },
+  "cells": [
+   {
+    "design": "alpha=0.3",
+    "lean": 0.182,
+    "truth": 0.182137,
+    "sem": 0.0002729130935215458,
+    "sems_off": 0.5019913051155328,
+    "rel_err": 0.0007521810505278897
+   },
+   {
+    "design": "alpha=0.5",
+    "lean": 0.30000000000000004,
+    "truth": 0.300246,
+    "sem": 0.0003241128965993177,
+    "sems_off": 0.7589947903371592,
+    "rel_err": 0.0008193281509161436
+   }
+  ]
+ },
+ {
+  "name": "admixtureLDTwoLocus",
+  "file": "CovarianceStructure.lean",
+  "source": "haplotypeFreqAdmixed - p_bar * q_bar",
+  "note": "",
+  "regime": "gametic D in the admixed population at generation 0",
+  "span": 0.20634920634920564,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.3",
+   "lean": 0.0756,
+   "truth": 0.07565621675949999,
+   "sem": 0.00030262486703799997,
+   "sems_off": 0.18576384700378729,
+   "rel_err": 0.0007430553880151493
+  },
+  "cells": [
+   {
+    "design": "alpha=0.3",
+    "lean": 0.0756,
+    "truth": 0.07565621675949999,
+    "sem": 0.00030262486703799997,
+    "sems_off": 0.18576384700378729,
+    "rel_err": 0.0007430553880151493
+   },
+   {
+    "design": "alpha=0.5",
+    "lean": 0.06000000000000005,
+    "truth": 0.05999368122000004,
+    "sem": 0.00023997472488000016,
+    "sems_off": 0.026331022999084165,
+    "rel_err": 0.00010532409199633667
+   }
+  ]
+ },
+ {
+  "name": "admixtureLDAtGen",
+  "file": "CovarianceStructure.lean",
+  "source": "(1 - r)^g * admixtureLDTwoLocus",
+  "note": "",
+  "regime": "D after g generations of random mating at recombination r",
+  "span": 0.56564648843229,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.3 r=0.20 g=5",
+   "lean": 0.024772608000000005,
+   "truth": 0.024791029107752965,
+   "sem": 9.916411643101186e-05,
+   "sems_off": 0.18576384700382964,
+   "rel_err": 0.0007430553880153185
+  },
+  "cells": [
+   {
+    "design": "alpha=0.3 r=0.05 g=10",
+    "lean": 0.04526451260642143,
+    "truth": 0.045298171656938335,
+    "sem": 0.00018119268662775335,
+    "sems_off": 0.18576384700370635,
+    "rel_err": 0.0007430553880148255
+   },
+   {
+    "design": "alpha=0.3 r=0.20 g=5",
+    "lean": 0.024772608000000005,
+    "truth": 0.024791029107752965,
+    "sem": 9.916411643101186e-05,
+    "sems_off": 0.18576384700382964,
+    "rel_err": 0.0007430553880153185
+   },
+   {
+    "design": "alpha=0.5 r=0.05 g=10",
+    "lean": 0.035924216354302756,
+    "truth": 0.035920433067305815,
+    "sem": 0.00014368173226922325,
+    "sems_off": 0.02633102299916204,
+    "rel_err": 0.00010532409199664816
+   },
+   {
+    "design": "alpha=0.5 r=0.20 g=5",
+    "lean": 0.019660800000000023,
+    "truth": 0.019658729462169622,
+    "sem": 7.863491784867848e-05,
+    "sems_off": 0.026331022999045314,
+    "rel_err": 0.00010532409199618125
+   }
+  ]
+ },
+ {
+  "name": "uniformOccupancyDistinctHaplotypes",
+  "file": "HaplotypeTheory.lean",
+  "source": "2^k * (1 - (1 - 1/2^k)^n)",
+  "note": "",
+  "regime": "expected distinct types among n uniform draws from 2^k",
+  "span": 0.9452513299172758,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "k=4 n=40",
+   "lean": 14.789482593682624,
+   "truth": 14.79735,
+   "sem": 0.0047031451644086,
+   "sems_off": 1.6727968290055237,
+   "rel_err": 0.000531676706800567
+  },
+  "cells": [
+   {
+    "design": "k=4 n=10",
+    "lean": 7.608632399220369,
+    "truth": 7.605125,
+    "sem": 0.005270314825451606,
+    "sems_off": 0.6655008925521153,
+    "rel_err": 0.00046118889832431285
+   },
+   {
+    "design": "k=4 n=40",
+    "lean": 14.789482593682624,
+    "truth": 14.79735,
+    "sem": 0.0047031451644086,
+    "sems_off": 1.6727968290055237,
+    "rel_err": 0.000531676706800567
+   },
+   {
+    "design": "k=6 n=50",
+    "lean": 34.87883483819262,
+    "truth": 34.869075,
+    "sem": 0.01162855713789871,
+    "sems_off": 0.8392991561099501,
+    "rel_err": 0.0002798995440118421
+   },
+   {
+    "design": "k=8 n=200",
+    "lean": 138.9738305555892,
+    "truth": 138.9849,
+    "sem": 0.023252511686912447,
+    "sems_off": 0.4760537080840301,
+    "rel_err": 7.964494280185771e-05
+   }
+  ]
+ },
+ {
+  "name": "effectiveHaplotypeNumber / haplotypeHomozygosity",
+  "file": "HaplotypeTheory.lean",
+  "source": "1 / sum_i freq_i^2",
+  "note": "",
+  "regime": "inverse match probability of two independent draws",
+  "span": 0.8463996067829933,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "skewed",
+   "lean": 2.909090909090909,
+   "truth": 2.9068563293526357,
+   "sem": 0.0020070239642860834,
+   "sems_off": 1.1133796995136114,
+   "rel_err": 0.0007687272727273395
+  },
+  "cells": [
+   {
+    "design": "uniform 8",
+    "lean": 8.0,
+    "truth": 8.003633649676953,
+    "sem": 0.010590559783004268,
+    "sems_off": 0.3431027019727683,
+    "rel_err": 0.00045399999999994533
+   },
+   {
+    "design": "skewed",
+    "lean": 2.909090909090909,
+    "truth": 2.9068563293526357,
+    "sem": 0.0020070239642860834,
+    "sems_off": 1.1133796995136114,
+    "rel_err": 0.0007687272727273395
+   },
+   {
+    "design": "very skewed",
+    "lean": 1.228803145736053,
+    "truth": 1.2286880222884007,
+    "sem": 0.00029378751672367215,
+    "sems_off": 0.39185956209532075,
+    "rel_err": 9.369623986241467e-05
+   }
+  ]
+ },
+ {
+  "name": "ncp",
+  "file": "AncestrySpecificPower.lean",
+  "source": "n_eff * beta^2",
+  "note": "",
+  "regime": "chi-square noncentrality of the GWAS Wald statistic, measured as E[stat] - 1 over 3000 replicate studies",
+  "span": 0.5,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "n=4000 p=0.1 beta=0.08",
+   "lean": 4.6080000000000005,
+   "truth": 4.731640662076971,
+   "sem": 0.0848467321058973,
+   "sems_off": 1.4572236196752288,
+   "rel_err": 0.02613061111506671
+  },
+  "cells": [
+   {
+    "design": "n=4000 p=0.3 beta=0.05",
+    "lean": 4.200000000000001,
+    "truth": 4.20814397677891,
+    "sem": 0.0795614292060729,
+    "sems_off": 0.10236086581369823,
+    "rel_err": 0.0019352894824531694
+   },
+   {
+    "design": "n=8000 p=0.3 beta=0.05",
+    "lean": 8.400000000000002,
+    "truth": 8.483912355874198,
+    "sem": 0.10872588551841222,
+    "sems_off": 0.7717790062053391,
+    "rel_err": 0.009890761756407745
+   },
+   {
+    "design": "n=4000 p=0.1 beta=0.08",
+    "lean": 4.6080000000000005,
+    "truth": 4.731640662076971,
+    "sem": 0.0848467321058973,
+    "sems_off": 1.4572236196752288,
+    "rel_err": 0.02613061111506671
+   }
+  ]
+ }
+]

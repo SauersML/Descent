@@ -1,0 +1,204 @@
+[
+ {
+  "name": "crossCovariance / totalEffect",
+  "file": "PortabilityDrift.lean",
+  "source": "sigmaTagCausal(P) . totalEffect(P) + contextCross(P)",
+  "note": "",
+  "regime": "Cov(tag genotype, outcome) in each population",
+  "span": 1.5638544125844014,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "source (worst of 12 coords)",
+   "lean": -0.17985403785776738,
+   "truth": -0.17539530824197638,
+   "sem": 0.002534967092863603,
+   "sems_off": 1.7588905309039857,
+   "rel_err": 0.025421031272054934
+  },
+  "cells": [
+   {
+    "design": "source (worst of 12 coords)",
+    "lean": -0.17985403785776738,
+    "truth": -0.17539530824197638,
+    "sem": 0.002534967092863603,
+    "sems_off": 1.7588905309039857,
+    "rel_err": 0.025421031272054934
+   },
+   {
+    "design": "target (worst of 12 coords)",
+    "lean": -0.07014986380465807,
+    "truth": -0.06655550550330529,
+    "sem": 0.002514604857100272,
+    "sems_off": 1.4293928889875893,
+    "rel_err": 0.05400542410686489
+   }
+  ]
+ },
+ {
+  "name": "sourceERMWeights / sourceWeightsFromExplicitDrivers",
+  "file": "PortabilityDrift.lean",
+  "source": "sigmaTag(source)^-1 . crossCovariance(source)",
+  "note": "",
+  "regime": "least-squares weights from an explicit source regression; the error bar carries a sqrt(2 log p) factor for the worst-of-p selection, so the comparison is not a multiple-comparisons artefact",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "source OLS (worst of 12 coords)",
+   "lean": 0.13638876933725602,
+   "truth": 0.14071322905794462,
+   "sem": 0.006212581854986669,
+   "sems_off": 0.6960809244255622,
+   "rel_err": 0.030732431837718798
+  },
+  "cells": [
+   {
+    "design": "source OLS (worst of 12 coords)",
+    "lean": 0.13638876933725602,
+    "truth": 0.14071322905794462,
+    "sem": 0.006212581854986669,
+    "sems_off": 0.6960809244255622,
+    "rel_err": 0.030732431837718798
+   }
+  ]
+ },
+ {
+  "name": "scoreVarianceFromSourceWeights",
+  "file": "PortabilityDrift.lean",
+  "source": "w' sigmaTag(P) w",
+  "note": "",
+  "regime": "variance of the transported score in each population",
+  "span": 0.1886225829318087,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "target",
+   "lean": 0.11043128296318806,
+   "truth": 0.11102824879387292,
+   "sem": 0.0002482667117258589,
+   "sems_off": 2.404534327356947,
+   "rel_err": 0.005376702210201865
+  },
+  "cells": [
+   {
+    "design": "source",
+    "lean": 0.13610347125782402,
+    "truth": 0.13566996103835238,
+    "sem": 0.0003033672553865039,
+    "sems_off": 1.42899476385255,
+    "rel_err": 0.0031953294314655614
+   },
+   {
+    "design": "target",
+    "lean": 0.11043128296318806,
+    "truth": 0.11102824879387292,
+    "sem": 0.0002482667117258589,
+    "sems_off": 2.404534327356947,
+    "rel_err": 0.005376702210201865
+   }
+  ]
+ },
+ {
+  "name": "predictiveCovarianceFromSourceWeights",
+  "file": "PortabilityDrift.lean",
+  "source": "w . crossCovariance(P)",
+  "note": "",
+  "regime": "Cov(score, outcome) in each population",
+  "span": 0.8452144411628392,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "source",
+   "lean": 0.13610347125782404,
+   "truth": 0.13586050756871956,
+   "sem": 0.0009529556954007411,
+   "sems_off": 0.2549580114554103,
+   "rel_err": 0.0017883319696975755
+  },
+  "cells": [
+   {
+    "design": "source",
+    "lean": 0.13610347125782404,
+    "truth": 0.13586050756871956,
+    "sem": 0.0009529556954007411,
+    "sems_off": 0.2549580114554103,
+    "rel_err": 0.0017883319696975755
+   },
+   {
+    "design": "target",
+    "lean": 0.02106685185831974,
+    "truth": 0.021125643752167016,
+    "sem": 0.0008328782367075366,
+    "sems_off": 0.07058882229854818,
+    "rel_err": 0.002782963422889574
+   }
+  ]
+ },
+ {
+  "name": "explainedSignalVarianceFromSourceWeights",
+  "file": "PortabilityDrift.lean",
+  "source": "predictiveCovariance^2 / scoreVariance",
+  "note": "",
+  "regime": "explained signal variance in each population",
+  "span": 0.9704717327343132,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "source",
+   "lean": 0.13610347125782407,
+   "truth": 0.13605132171897813,
+   "sem": 0.0004302320553083056,
+   "sems_off": 0.12121258330825886,
+   "rel_err": 0.0003833078443270056
+  },
+  "cells": [
+   {
+    "design": "source",
+    "lean": 0.13610347125782407,
+    "truth": 0.13605132171897813,
+    "sem": 0.0004302320553083056,
+    "sems_off": 0.12121258330825886,
+    "rel_err": 0.0003833078443270056
+   },
+   {
+    "design": "target",
+    "lean": 0.004018899675088746,
+    "truth": 0.0040196331005096595,
+    "sem": 1.2711195955815053e-05,
+    "sems_off": 0.05769916721159568,
+    "rel_err": 0.00018246078748354884
+   }
+  ]
+ },
+ {
+  "name": "r2FromSourceWeights / effectiveOutcomeVariance",
+  "file": "PortabilityDrift.lean",
+  "source": "explainedSignalVariance / effectiveOutcomeVariance",
+  "note": "",
+  "regime": "R^2 of the transported score, source and target",
+  "span": 0.9698483219230242,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "target",
+   "lean": 0.0016182563653481157,
+   "truth": 0.0016055602733399683,
+   "sem": 5.077227384436819e-06,
+   "sems_off": 2.500595511452689,
+   "rel_err": 0.007907577322984163
+  },
+  "cells": [
+   {
+    "design": "source",
+    "lean": 0.053670524115334,
+    "truth": 0.05366014163145064,
+    "sem": 0.0001696882671226076,
+    "sems_off": 0.0611856320971113,
+    "rel_err": 0.00019348595750397644
+   },
+   {
+    "design": "target",
+    "lean": 0.0016182563653481157,
+    "truth": 0.0016055602733399683,
+    "sem": 5.077227384436819e-06,
+    "sems_off": 2.500595511452689,
+    "rel_err": 0.007907577322984163
+   }
+  ]
+ }
+]

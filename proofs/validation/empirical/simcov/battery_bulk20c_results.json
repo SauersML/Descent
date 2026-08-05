@@ -1,0 +1,286 @@
+[
+ {
+  "name": "admixtureLDDecay",
+  "file": "PortabilityDrift.lean",
+  "source": "(1 - r) ^ generations_since",
+  "note": "",
+  "regime": "one-pulse 50/50 admixture into a Wright-Fisher population of Ne = 2000, then 40 generations of recombination and drift; the observable is E[D_t]/E[D_0] over 400 independent replicates",
+  "span": 0.9984204760292524,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.050 t=40",
+   "lean": 0.12851215656510312,
+   "truth": 0.1162955607638889,
+   "sem": 0.006769501613391325,
+   "sems_off": 1.8046521736618737,
+   "rel_err": 0.10504782573788156
+  },
+  "cells": [
+   {
+    "design": "r=0.005 t=10",
+    "lean": 0.9511101304657719,
+    "truth": 0.9579744756944444,
+    "sem": 0.006279980670714204,
+    "sems_off": 1.093051967609298,
+    "rel_err": 0.007165478207231454
+   },
+   {
+    "design": "r=0.005 t=40",
+    "lean": 0.8183201210226743,
+    "truth": 0.8168245347222222,
+    "sem": 0.011796275880918427,
+    "sems_off": 0.12678461537775246,
+    "rel_err": 0.0018309762217912633
+   },
+   {
+    "design": "r=0.020 t=10",
+    "lean": 0.8170728068875467,
+    "truth": 0.8215751753472225,
+    "sem": 0.00569082530150397,
+    "sems_off": 0.7911626558780308,
+    "rel_err": 0.005480166142767081
+   },
+   {
+    "design": "r=0.020 t=40",
+    "lean": 0.44570040395095073,
+    "truth": 0.44985846701388893,
+    "sem": 0.008989137890949591,
+    "sems_off": 0.4625652774916941,
+    "rel_err": 0.009243047242255916
+   },
+   {
+    "design": "r=0.050 t=10",
+    "lean": 0.5987369392383787,
+    "truth": 0.6041457309027778,
+    "sem": 0.005355219708566526,
+    "sems_off": 1.0100036896239555,
+    "rel_err": 0.008952792989725728
+   },
+   {
+    "design": "r=0.050 t=40",
+    "lean": 0.12851215656510312,
+    "truth": 0.1162955607638889,
+    "sem": 0.006769501613391325,
+    "sems_off": 1.8046521736618737,
+    "rel_err": 0.10504782573788156
+   },
+   {
+    "design": "r=0.150 t=10",
+    "lean": 0.1968744043407226,
+    "truth": 0.19273188541666667,
+    "sem": 0.004155287154152473,
+    "sems_off": 0.9969272327945408,
+    "rel_err": 0.02149368753955903
+   },
+   {
+    "design": "r=0.150 t=40",
+    "lean": 0.001502301249891433,
+    "truth": 0.0048219826388888705,
+    "sem": 0.004219068344390362,
+    "sems_off": 0.7868280667724328,
+    "rel_err": 0.6884473955224342
+   }
+  ]
+ },
+ {
+  "name": "admixtureLDBoost",
+  "file": "PortabilityDrift.lean",
+  "source": "admixtureLDDecay r t_since / equilibrium_ld",
+  "note": "",
+  "regime": "one-pulse 50/50 admixture into a Wright-Fisher population of Ne = 2000, then 40 generations of recombination and drift; the observable is E[D_t]/E[D_0] over 400 independent replicates; equilibrium_ld held at 0.25, since it is an input to the body and what is on trial is the ratio",
+  "span": 0.9984204760292524,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.050 t=40 eq=0.25",
+   "lean": 0.5140486262604125,
+   "truth": 0.4651822430555556,
+   "sem": 0.0270780064535653,
+   "sems_off": 1.8046521736618737,
+   "rel_err": 0.10504782573788156
+  },
+  "cells": [
+   {
+    "design": "r=0.005 t=10 eq=0.25",
+    "lean": 3.8044405218630875,
+    "truth": 3.8318979027777775,
+    "sem": 0.025119922682856816,
+    "sems_off": 1.093051967609298,
+    "rel_err": 0.007165478207231454
+   },
+   {
+    "design": "r=0.005 t=40 eq=0.25",
+    "lean": 3.273280484090697,
+    "truth": 3.2672981388888886,
+    "sem": 0.04718510352367371,
+    "sems_off": 0.12678461537775246,
+    "rel_err": 0.0018309762217912633
+   },
+   {
+    "design": "r=0.020 t=10 eq=0.25",
+    "lean": 3.2682912275501868,
+    "truth": 3.28630070138889,
+    "sem": 0.02276330120601588,
+    "sems_off": 0.7911626558780308,
+    "rel_err": 0.005480166142767081
+   },
+   {
+    "design": "r=0.020 t=40 eq=0.25",
+    "lean": 1.782801615803803,
+    "truth": 1.7994338680555557,
+    "sem": 0.035956551563798365,
+    "sems_off": 0.4625652774916941,
+    "rel_err": 0.009243047242255916
+   },
+   {
+    "design": "r=0.050 t=10 eq=0.25",
+    "lean": 2.3949477569535147,
+    "truth": 2.416582923611111,
+    "sem": 0.021420878834266105,
+    "sems_off": 1.0100036896239555,
+    "rel_err": 0.008952792989725728
+   },
+   {
+    "design": "r=0.050 t=40 eq=0.25",
+    "lean": 0.5140486262604125,
+    "truth": 0.4651822430555556,
+    "sem": 0.0270780064535653,
+    "sems_off": 1.8046521736618737,
+    "rel_err": 0.10504782573788156
+   },
+   {
+    "design": "r=0.150 t=10 eq=0.25",
+    "lean": 0.7874976173628904,
+    "truth": 0.7709275416666667,
+    "sem": 0.01662114861660989,
+    "sems_off": 0.9969272327945408,
+    "rel_err": 0.02149368753955903
+   },
+   {
+    "design": "r=0.150 t=40 eq=0.25",
+    "lean": 0.006009204999565732,
+    "truth": 0.019287930555555482,
+    "sem": 0.016876273377561448,
+    "sems_off": 0.7868280667724328,
+    "rel_err": 0.6884473955224342
+   }
+  ]
+ },
+ {
+  "name": "ibdRecurrenceFixedPoint / fstIslandMultiplicativeEquilibrium",
+  "file": "PortabilityDrift.lean",
+  "source": "(1-m)^2 / ((1-m)^2 + 2*Ne*m*(2-m))",
+  "note": "the positive control 'Ne=400 m=0.0025 (4Nm=4.0) [1/(1+4Nm) at small m, already VALIDATED]' missed by 3.1 sems on the same code path, so this design cannot support any verdict",
+  "regime": "symmetric island model, 30 demes so the many-deme limit both forms are written in actually holds; m is the TOTAL emigration rate, so each of the 29 sources gets m/29 -- msprime's migration_rate is per ordered pair and using it directly would rescale the prediction by 29; F_ST between two demes from branch-mode coalescence times over 4 Mb with recombination 1e-8, 32 replicates. 4*Ne*m is swept only mildly; m itself is swept 120-fold, because m is what separates the two candidate forms",
+  "span": 0.8443714644209716,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+   "lean": 0.031032298923369218,
+   "truth": 0.053886637533118925,
+   "sem": 0.0054010988030165855,
+   "sems_off": 4.231423908961868,
+   "rel_err": 0.42411884756593593
+  },
+  "cells": [
+   {
+    "design": "Ne=400 m=0.0025 (4Nm=4.0)",
+    "lean": 0.19939980035095148,
+    "truth": 0.175969526313767,
+    "sem": 0.007704448697898214,
+    "sems_off": 3.0411357069035057,
+    "rel_err": 0.1331496113446741
+   },
+   {
+    "design": "Ne=100 m=0.0200 (4Nm=8.0)",
+    "lean": 0.10814828160893653,
+    "truth": 0.10779236474739345,
+    "sem": 0.005856787826150025,
+    "sems_off": 0.06076997700922925,
+    "rel_err": 0.003301874510102324
+   },
+   {
+    "design": "Ne=50 m=0.0600 (4Nm=12.0)",
+    "lean": 0.07055479255166246,
+    "truth": 0.07064104855094763,
+    "sem": 0.004887674957172301,
+    "sems_off": 0.017647654568068504,
+    "rel_err": 0.0012210464178340498
+   },
+   {
+    "design": "Ne=25 m=0.1600 (4Nm=16.0)",
+    "lean": 0.04574214293123119,
+    "truth": 0.050901312227664225,
+    "sem": 0.0041805974287999785,
+    "sems_off": 1.2340746470568327,
+    "rel_err": 0.1013563122568988
+   },
+   {
+    "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+    "lean": 0.031032298923369218,
+    "truth": 0.053886637533118925,
+    "sem": 0.0054010988030165855,
+    "sems_off": 4.231423908961868,
+    "rel_err": 0.42411884756593593
+   }
+  ]
+ },
+ {
+  "name": "fstMigrationDriftEquilibrium [diffusion form, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m)",
+  "note": "the positive control 'Ne=400 m=0.0025 (4Nm=4.0) [1/(1+4Nm) at small m, already VALIDATED]' missed by 3.1 sems on the same code path, so this design cannot support any verdict",
+  "regime": "symmetric island model, 30 demes so the many-deme limit both forms are written in actually holds; m is the TOTAL emigration rate, so each of the 29 sources gets m/29 -- msprime's migration_rate is per ordered pair and using it directly would rescale the prediction by 29; F_ST between two demes from branch-mode coalescence times over 4 Mb with recombination 1e-8, 32 replicates. 4*Ne*m is swept only mildly; m itself is swept 120-fold, because m is what separates the two candidate forms",
+  "span": 0.736842105263158,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "Ne=400 m=0.0025 (4Nm=4.0)",
+   "lean": 0.2,
+   "truth": 0.175969526313767,
+   "sem": 0.007704448697898214,
+   "sems_off": 3.119038704584867,
+   "rel_err": 0.13656042719229042
+  },
+  "cells": [
+   {
+    "design": "Ne=400 m=0.0025 (4Nm=4.0)",
+    "lean": 0.2,
+    "truth": 0.175969526313767,
+    "sem": 0.007704448697898214,
+    "sems_off": 3.119038704584867,
+    "rel_err": 0.13656042719229042
+   },
+   {
+    "design": "Ne=100 m=0.0200 (4Nm=8.0)",
+    "lean": 0.1111111111111111,
+    "truth": 0.10779236474739345,
+    "sem": 0.005856787826150025,
+    "sems_off": 0.566649580321102,
+    "rel_err": 0.030788325049691444
+   },
+   {
+    "design": "Ne=50 m=0.0600 (4Nm=12.0)",
+    "lean": 0.07692307692307693,
+    "truth": 0.07064104855094763,
+    "sem": 0.004887674957172301,
+    "sems_off": 1.2852794891589268,
+    "rel_err": 0.0889288664451035
+   },
+   {
+    "design": "Ne=25 m=0.1600 (4Nm=16.0)",
+    "lean": 0.058823529411764705,
+    "truth": 0.050901312227664225,
+    "sem": 0.0041805974287999785,
+    "sems_off": 1.8949964255167513,
+    "rel_err": 0.1556387613086889
+   },
+   {
+    "design": "Ne=15 m=0.3000 (4Nm=18.0)",
+    "lean": 0.05263157894736842,
+    "truth": 0.053886637533118925,
+    "sem": 0.0054010988030165855,
+    "sems_off": 0.23237097330075504,
+    "rel_err": 0.023290719985620618
+   }
+  ]
+ }
+]

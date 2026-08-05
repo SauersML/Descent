@@ -1,0 +1,131 @@
+[
+ {
+  "name": "asymmetricFst [m_into read as the LARGER rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'symmetric cell vs the validated two-deme island value' passed at 0.77 sems",
+  "regime": "two demes with asymmetric migration, F_ST from coalescence times",
+  "span": 0.39024390243902435,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=1.0e-03 m21=1.0e-03 [larger]",
+   "lean": 0.2,
+   "truth": 0.11480404840096824,
+   "sem": 0.005886327325529024,
+   "sems_off": 14.473532796848827,
+   "rel_err": 0.7420988439490714
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03 [larger]",
+    "lean": 0.2,
+    "truth": 0.11480404840096824,
+    "sem": 0.005886327325529024,
+    "sems_off": 14.473532796848827,
+    "rel_err": 0.7420988439490714
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04 [larger]",
+    "lean": 0.14285714285714285,
+    "truth": 0.11537998013558778,
+    "sem": 0.006396025768385298,
+    "sems_off": 4.2959743622940065,
+    "rel_err": 0.2381449770511792
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04 [larger]",
+    "lean": 0.12195121951219513,
+    "truth": 0.10918182483632351,
+    "sem": 0.005213890866459517,
+    "sems_off": 2.449110463361628,
+    "rel_err": 0.1169553146323984
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [m_into read as the SMALLER rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'symmetric cell vs the validated two-deme island value' passed at 0.77 sems",
+  "regime": "same runs, the other reading of the single rate argument",
+  "span": 0.64,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=1.8e-03 m21=2.0e-04 [smaller]",
+   "lean": 0.5555555555555556,
+   "truth": 0.10918182483632351,
+   "sem": 0.005213890866459517,
+   "sems_off": 85.61240389412703,
+   "rel_err": 4.088351988880926
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03 [smaller]",
+    "lean": 0.2,
+    "truth": 0.11480404840096824,
+    "sem": 0.005886327325529024,
+    "sems_off": 14.473532796848827,
+    "rel_err": 0.7420988439490714
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04 [smaller]",
+    "lean": 0.3333333333333333,
+    "truth": 0.11537998013558778,
+    "sem": 0.006396025768385298,
+    "sems_off": 34.076371967583356,
+    "rel_err": 1.8890049464527514
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04 [smaller]",
+    "lean": 0.5555555555555556,
+    "truth": 0.10918182483632351,
+    "sem": 0.005213890866459517,
+    "sems_off": 85.61240389412703,
+    "rel_err": 4.088351988880926
+   }
+  ]
+ },
+ {
+  "name": "effectiveSymmetricMigration",
+  "file": "PortabilityDrift.lean",
+  "source": "(m12 + m21) / 2, fed to the symmetric two-deme form",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "the same arithmetic mean under three different asymmetries, so a dependence on more than the mean would separate",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "m12=1.5e-03 m21=5.0e-04 [mean, x2 deme factor]",
+   "lean": 0.1111111111111111,
+   "truth": 0.11537998013558778,
+   "sem": 0.006396025768385298,
+   "sems_off": 0.6674252385875507,
+   "rel_err": 0.03699835118241618
+  },
+  "cells": [
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03 [mean, x2 deme factor]",
+    "lean": 0.1111111111111111,
+    "truth": 0.11480404840096824,
+    "sem": 0.005886327325529024,
+    "sems_off": 0.6273754559724956,
+    "rel_err": 0.03216730891718263
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04 [mean, x2 deme factor]",
+    "lean": 0.1111111111111111,
+    "truth": 0.11537998013558778,
+    "sem": 0.006396025768385298,
+    "sems_off": 0.6674252385875507,
+    "rel_err": 0.03699835118241618
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04 [mean, x2 deme factor]",
+    "lean": 0.1111111111111111,
+    "truth": 0.10918182483632351,
+    "sem": 0.005213890866459517,
+    "sems_off": 0.3700281275924895,
+    "rel_err": 0.01767039777618506
+   }
+  ]
+ }
+]

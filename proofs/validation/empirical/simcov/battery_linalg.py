@@ -188,7 +188,7 @@ def test_effect_summaries():
     record("meanAbsoluteEffect", "PolygenicArchitecture.lean",
            "(sum |beta_j|) / q", cells_abs, regime="mean absolute effect")
     record("sourceSquaredEffectMass / sourceEffectMass",
-           "MechanisticPortabilityWitnesses.lean", "sum_i beta_i^2", cells_mass,
+           "SimulationValidation.lean", "sum_i beta_i^2", cells_mass,
            regime="total squared effect mass")
 
 

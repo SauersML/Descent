@@ -1,0 +1,131 @@
+[
+ {
+  "name": "targetSourceEffectProjection [Sigma . beta as marginal effects]",
+  "file": "PortabilityDrift.lean",
+  "source": "Sigma_tag_causal.mulVec beta",
+  "note": "error bar inflated by sqrt(2 log 40) for worst-of-40 selection",
+  "regime": "40 standardized variants with AR(1) LD (Sigma[i,j] = rho^|i-j|), four causal among them, 400000 individuals; the phenotype is built from the CAUSAL variants and the observable is the vector of univariate marginal slopes, one regression per variant. Reported at the worst-fitting coordinate of each candidate, which is the hardest cell for that candidate rather than an average that would hide a local miss",
+  "span": 1.680852856199847,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "rho=0.7 worst coord j=27",
+   "lean": 0.08955686381555249,
+   "truth": 0.0845634875921622,
+   "sem": 0.0015788452726210663,
+   "sems_off": 1.1643739706708065,
+   "rel_err": 0.059048844431211694
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 worst coord j=0",
+    "lean": -0.06097504652111964,
+    "truth": -0.06263462973895322,
+    "sem": 0.0015779160209395083,
+    "sems_off": 0.38721566554998416,
+    "rel_err": 0.026496256539718353
+   },
+   {
+    "design": "rho=0.7 worst coord j=27",
+    "lean": 0.08955686381555249,
+    "truth": 0.0845634875921622,
+    "sem": 0.0015788452726210663,
+    "sems_off": 1.1643739706708065,
+    "rel_err": 0.059048844431211694
+   },
+   {
+    "design": "rho=0.4 worst coord j=39",
+    "lean": -0.00025845362155851035,
+    "truth": -0.0049474639932749,
+    "sem": 0.0015822800446425526,
+    "sems_off": 1.0910272877444012,
+    "rel_err": 0.9477603835197534
+   }
+  ]
+ },
+ {
+  "name": "[competing] no LD projection: marginal = causal effect",
+  "file": "PortabilityDrift.lean",
+  "source": "beta",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "40 standardized variants with AR(1) LD (Sigma[i,j] = rho^|i-j|), four causal among them, 400000 individuals; the phenotype is built from the CAUSAL variants and the observable is the vector of univariate marginal slopes, one regression per variant. Reported at the worst-fitting coordinate of each candidate, which is the hardest cell for that candidate rather than an average that would hide a local miss",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "rho=0.7 worst coord j=6",
+   "lean": 0.0,
+   "truth": -0.2610104838919501,
+   "sem": 0.0015788452726210663,
+   "sems_off": 60.86339180540139,
+   "rel_err": 1.0
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 worst coord j=30",
+    "lean": 0.0,
+    "truth": -0.20709493035971838,
+    "sem": 0.0015779160209395083,
+    "sems_off": 48.31960243364396,
+    "rel_err": 1.0
+   },
+   {
+    "design": "rho=0.7 worst coord j=6",
+    "lean": 0.0,
+    "truth": -0.2610104838919501,
+    "sem": 0.0015788452726210663,
+    "sems_off": 60.86339180540139,
+    "rel_err": 1.0
+   },
+   {
+    "design": "rho=0.4 worst coord j=22",
+    "lean": 0.0,
+    "truth": 0.169929167747743,
+    "sem": 0.0015822800446425526,
+    "sems_off": 39.538696718348184,
+    "rel_err": 1.0
+   }
+  ]
+ },
+ {
+  "name": "[competing] projection applied twice",
+  "file": "PortabilityDrift.lean",
+  "source": "Sigma . (Sigma . beta)",
+  "note": "error bar inflated by sqrt(2 log 40) for worst-of-40 selection; positive control 'rho=0.9 [realised Var(g) vs beta'.Sigma.beta]' passed at 0.29 sems",
+  "regime": "40 standardized variants with AR(1) LD (Sigma[i,j] = rho^|i-j|), four causal among them, 400000 individuals; the phenotype is built from the CAUSAL variants and the observable is the vector of univariate marginal slopes, one regression per variant. Reported at the worst-fitting coordinate of each candidate, which is the hardest cell for that candidate rather than an average that would hide a local miss",
+  "span": 7.225122392794878,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "rho=0.9 worst coord j=26",
+   "lean": -2.5023832956749184,
+   "truth": -0.1903305580843875,
+   "sem": 0.0015779160209395083,
+   "sems_off": 539.4505258624262,
+   "rel_err": 12.147564536459921
+  },
+  "cells": [
+   {
+    "design": "rho=0.9 worst coord j=26",
+    "lean": -2.5023832956749184,
+    "truth": -0.1903305580843875,
+    "sem": 0.0015779160209395083,
+    "sems_off": 539.4505258624262,
+    "rel_err": 12.147564536459921
+   },
+   {
+    "design": "rho=0.7 worst coord j=6",
+    "lean": -1.0711733873216476,
+    "truth": -0.2610104838919501,
+    "sem": 0.0015788452726210663,
+    "sems_off": 188.91678787146225,
+    "rel_err": 3.103947747037927
+   },
+   {
+    "design": "rho=0.4 worst coord j=22",
+    "lean": 0.40198138089160196,
+    "truth": 0.169929167747743,
+    "sem": 0.0015822800446425526,
+    "sems_off": 53.99333263337537,
+    "rel_err": 1.3655820023101424
+   }
+  ]
+ }
+]

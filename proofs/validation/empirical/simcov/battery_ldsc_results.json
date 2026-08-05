@@ -1,0 +1,279 @@
+[
+ {
+  "name": "ldsrExpectedBetaSq [slope = h2/M]",
+  "file": "CovarianceStructure.lean",
+  "source": "h2/M * ell_j + 1/N",
+  "note": "",
+  "regime": "explicit GWAS on a recombining coalescent panel, marginal effects squared and averaged over 400 replicate studies, then regressed on the measured LD score",
+  "span": 0.5999999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.2 slope",
+   "lean": 0.0016666666666666668,
+   "truth": 0.0015790296650504611,
+   "sem": 3.6633076685638396e-05,
+   "sems_off": 2.3922915994266676,
+   "rel_err": 0.055500541602177586
+  },
+  "cells": [
+   {
+    "design": "h2=0.2 slope",
+    "lean": 0.0016666666666666668,
+    "truth": 0.0015790296650504611,
+    "sem": 3.6633076685638396e-05,
+    "sems_off": 2.3922915994266676,
+    "rel_err": 0.055500541602177586
+   },
+   {
+    "design": "h2=0.5 slope",
+    "lean": 0.004166666666666667,
+    "truth": 0.004112401835347904,
+    "sem": 5.429062199360601e-05,
+    "sems_off": 0.9995249515681357,
+    "rel_err": 0.013195410733536033
+   }
+  ]
+ },
+ {
+  "name": "ldsrExpectedBetaSq [intercept = 1/N]",
+  "file": "CovarianceStructure.lean",
+  "source": "h2/M * ell_j + 1/N",
+  "note": "",
+  "regime": "same regression; the intercept is what LDSC reads as confounding, so it is half the claim",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "h2=0.5 intercept",
+   "lean": 0.0003333333333333333,
+   "truth": -0.00017917659179101468,
+   "sem": 0.00031580015678640795,
+   "sems_off": 1.6228931940365852,
+   "rel_err": 2.860362059582658
+  },
+  "cells": [
+   {
+    "design": "h2=0.2 intercept",
+    "lean": 0.0003333333333333333,
+    "truth": 0.00018544410100750832,
+    "sem": 0.00021308894494256485,
+    "sems_off": 0.6940258321035213,
+    "rel_err": 0.7974868519535018
+   },
+   {
+    "design": "h2=0.5 intercept",
+    "lean": 0.0003333333333333333,
+    "truth": -0.00017917659179101468,
+    "sem": 0.00031580015678640795,
+    "sems_off": 1.6228931940365852,
+    "rel_err": 2.860362059582658
+   }
+  ]
+ },
+ {
+  "name": "spikeAndSlabVariance",
+  "file": "PolygenicArchitecture.lean",
+  "source": "pi*sigma_large + (1-pi)*sigma_small",
+  "note": "",
+  "regime": "variance of a two-component mixture of effect sizes",
+  "span": 0.91208,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "pi=0.01",
+   "lean": 0.01099,
+   "truth": 0.011256014633683096,
+   "sem": 2.51692138766478e-05,
+   "sems_off": 10.569048162839376,
+   "rel_err": 0.023633110149578116
+  },
+  "cells": [
+   {
+    "design": "pi=0.01",
+    "lean": 0.01099,
+    "truth": 0.011256014633683096,
+    "sem": 2.51692138766478e-05,
+    "sems_off": 10.569048162839376,
+    "rel_err": 0.023633110149578116
+   },
+   {
+    "design": "pi=0.10",
+    "lean": 0.059000000000000004,
+    "truth": 0.05892697493307915,
+    "sem": 0.0001317647216587911,
+    "sems_off": 0.5542080308108255,
+    "rel_err": 0.0012392468305693037
+   },
+   {
+    "design": "pi=0.50",
+    "lean": 0.125,
+    "truth": 0.12472704710462272,
+    "sem": 0.0002788981559587547,
+    "sems_off": 0.9786830409077543,
+    "rel_err": 0.002188401807895946
+   }
+  ]
+ },
+ {
+  "name": "expectedSquaredEffect",
+  "file": "PolygenicArchitecture.lean",
+  "source": "h2 / M",
+  "note": "",
+  "regime": "mean squared effect under a per-SNP variance h2/M",
+  "span": 0.8,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2=0.5 M=1000",
+   "lean": 0.0005,
+   "truth": 0.0005023685053119383,
+   "sem": 1.1233301276324584e-06,
+   "sems_off": 2.1084677190401866,
+   "rel_err": 0.004714677148137785
+  },
+  "cells": [
+   {
+    "design": "h2=0.2 M=1000",
+    "lean": 0.0002,
+    "truth": 0.00019987419482627117,
+    "sem": 4.4693228657957914e-07,
+    "sems_off": 0.2814859823434141,
+    "rel_err": 0.0006294217912331795
+   },
+   {
+    "design": "h2=0.5 M=1000",
+    "lean": 0.0005,
+    "truth": 0.0005023685053119383,
+    "sem": 1.1233301276324584e-06,
+    "sems_off": 2.1084677190401866,
+    "rel_err": 0.004714677148137785
+   },
+   {
+    "design": "h2=0.5 M=5000",
+    "lean": 0.0001,
+    "truth": 0.00010004327634920165,
+    "sem": 2.237035666086119e-07,
+    "sems_off": 0.1934539974383228,
+    "rel_err": 0.00043257628879116004
+   }
+  ]
+ },
+ {
+  "name": "heritabilityEnrichment",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(h2_cat/M_cat) / (h2_total/M_total)",
+  "note": "",
+  "regime": "ratio of per-SNP heritability in a category to genome-wide",
+  "span": 0.9333333333333335,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "h2c=0.3 Mc=100",
+   "lean": 5.000000000000001,
+   "truth": 4.980110256041148,
+   "sem": 0.01574849140785435,
+   "sems_off": 1.2629618573454626,
+   "rel_err": 0.00399383606712832
+  },
+  "cells": [
+   {
+    "design": "h2c=0.3 Mc=100",
+    "lean": 5.000000000000001,
+    "truth": 4.980110256041148,
+    "sem": 0.01574849140785435,
+    "sems_off": 1.2629618573454626,
+    "rel_err": 0.00399383606712832
+   },
+   {
+    "design": "h2c=0.1 Mc=500",
+    "lean": 0.33333333333333337,
+    "truth": 0.33330967235129993,
+    "sem": 0.0010540177307945579,
+    "sems_off": 0.02244837192216771,
+    "rel_err": 7.098798503662204e-05
+   }
+  ]
+ },
+ {
+  "name": "genotypeVarianceHWE / hweHeterozygosity",
+  "file": "AncestrySpecificPower.lean",
+  "source": "2 * p * (1 - p)",
+  "note": "",
+  "regime": "the same body as Conventions.hweGenotypeVariance, under three names in three files; measured against the realised dosage variance",
+  "span": 0.81,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "p=0.05",
+   "lean": 0.095,
+   "truth": 0.095163565031,
+   "sem": 9.5163565031e-05,
+   "sems_off": 1.7187778846527715,
+   "rel_err": 0.0017187778846527715
+  },
+  "cells": [
+   {
+    "design": "p=0.05",
+    "lean": 0.095,
+    "truth": 0.095163565031,
+    "sem": 9.5163565031e-05,
+    "sems_off": 1.7187778846527715,
+    "rel_err": 0.0017187778846527715
+   },
+   {
+    "design": "p=0.25",
+    "lean": 0.375,
+    "truth": 0.37552699932399985,
+    "sem": 0.00037552699932399985,
+    "sems_off": 1.4033593455291526,
+    "rel_err": 0.0014033593455291525
+   },
+   {
+    "design": "p=0.50",
+    "lean": 0.5,
+    "truth": 0.4998794969197501,
+    "sem": 0.0004998794969197501,
+    "sems_off": 0.2410642584711916,
+    "rel_err": 0.0002410642584711916
+   }
+  ]
+ },
+ {
+  "name": "expectedEffectMultiplier",
+  "file": "RareVariantPortability.lean",
+  "source": "(p*(1-p))^(1 + alpha)",
+  "note": "",
+  "regime": "ratio of per-SNP variance contribution between a p=0.5 band and a p=0.1 band under the alpha model",
+  "span": 0.6399999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=-0.5",
+   "lean": 1.6666666666666665,
+   "truth": 1.6455797984236158,
+   "sem": 0.02389312510997307,
+   "sems_off": 0.8825496098142891,
+   "rel_err": 0.012814248365986812
+  },
+  "cells": [
+   {
+    "design": "alpha=-1.0",
+    "lean": 1.0,
+    "truth": 0.9987437089380283,
+    "sem": 0.014505319983337745,
+    "sems_off": 0.08660898645564327,
+    "rel_err": 0.0012578713144611386
+   },
+   {
+    "design": "alpha=-0.5",
+    "lean": 1.6666666666666665,
+    "truth": 1.6455797984236158,
+    "sem": 0.02389312510997307,
+    "sems_off": 0.8825496098142891,
+    "rel_err": 0.012814248365986812
+   },
+   {
+    "design": "alpha=0.0",
+    "lean": 2.7777777777777772,
+    "truth": 2.789995545911177,
+    "sem": 0.040334308137434896,
+    "sems_off": 0.3029125500744662,
+    "rel_err": 0.004379135354285854
+   }
+  ]
+ }
+]

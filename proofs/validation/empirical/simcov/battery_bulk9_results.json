@@ -1,0 +1,257 @@
+[
+ {
+  "name": "coalescentRate",
+  "file": "SpectrumIdentifiability.lean",
+  "source": "m * (m - 1) / 2, as the ratio of waiting times",
+  "note": "",
+  "regime": "ratio T(2)/T(m) of mean first-coalescence times, which is invariant to the time-unit convention that broke the previous attempt",
+  "span": 0.8928571428571429,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "T(2)/T(4)",
+   "lean": 6.0,
+   "truth": 6.071219150210748,
+   "sem": 0.050041364213694046,
+   "sems_off": 1.4232056085964686,
+   "rel_err": 0.011730617598983521
+  },
+  "cells": [
+   {
+    "design": "T(2)/T(3)",
+    "lean": 3.0,
+    "truth": 2.994112047272231,
+    "sem": 0.024598774479880355,
+    "sems_off": 0.2393595962508184,
+    "rel_err": 0.0019665104828435805
+   },
+   {
+    "design": "T(2)/T(4)",
+    "lean": 6.0,
+    "truth": 6.071219150210748,
+    "sem": 0.050041364213694046,
+    "sems_off": 1.4232056085964686,
+    "rel_err": 0.011730617598983521
+   },
+   {
+    "design": "T(2)/T(6)",
+    "lean": 15.0,
+    "truth": 15.020604563995422,
+    "sem": 0.12329240392819515,
+    "sems_off": 0.16711949267711199,
+    "rel_err": 0.001371753307773706
+   },
+   {
+    "design": "T(2)/T(8)",
+    "lean": 28.0,
+    "truth": 28.05897218618647,
+    "sem": 0.22993603881438016,
+    "sems_off": 0.2564721323831969,
+    "rel_err": 0.0021017229638761255
+   }
+  ]
+ },
+ {
+  "name": "fluctuatingEffectCorrelation",
+  "file": "SelectionArchitecture.lean",
+  "source": "exp(-t / tau)",
+  "note": "control 'lag 0 correlation is 1 by construction' is DEGENERATE: predicted and measured are the same number, so it cannot fail and gates nothing",
+  "regime": "lag-t autocorrelation of a stationary Ornstein-Uhlenbeck process across 20000 independent replicates",
+  "span": 0.9996036977314001,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "tau=60 t=10",
+   "lean": 0.8464817248906141,
+   "truth": 0.8509658542110079,
+   "sem": 0.00195060436631673,
+   "sems_off": 2.2988410145215776,
+   "rel_err": 0.0052694585783954065
+  },
+  "cells": [
+   {
+    "design": "tau=5 t=10",
+    "lean": 0.1353352832366127,
+    "truth": 0.13220110302366436,
+    "sem": 0.006947485828877373,
+    "sems_off": 0.45112437652208703,
+    "rel_err": 0.02370767067191045
+   },
+   {
+    "design": "tau=5 t=40",
+    "lean": 0.00033546262790251185,
+    "truth": 0.006065362330319027,
+    "sem": 0.007070807677037349,
+    "sems_off": 0.8103599990457283,
+    "rel_err": 0.9446920712014797
+   },
+   {
+    "design": "tau=20 t=10",
+    "lean": 0.6065306597126334,
+    "truth": 0.6051139115338685,
+    "sem": 0.0044819054980959365,
+    "sems_off": 0.31610398286327035,
+    "rel_err": 0.002341291700224973
+   },
+   {
+    "design": "tau=20 t=40",
+    "lean": 0.1353352832366127,
+    "truth": 0.13904104460616454,
+    "sem": 0.006934367015044286,
+    "sems_off": 0.5344051391442206,
+    "rel_err": 0.026652283719878902
+   },
+   {
+    "design": "tau=60 t=10",
+    "lean": 0.8464817248906141,
+    "truth": 0.8509658542110079,
+    "sem": 0.00195060436631673,
+    "sems_off": 2.2988410145215776,
+    "rel_err": 0.0052694585783954065
+   },
+   {
+    "design": "tau=60 t=40",
+    "lean": 0.513417119032592,
+    "truth": 0.5180832011781282,
+    "sem": 0.005173121062630684,
+    "sems_off": 0.9019858783593536,
+    "rel_err": 0.009006433976097808
+   }
+  ]
+ },
+ {
+  "name": "tauFromObservedEffectCorrelation",
+  "file": "SelectionArchitecture.lean",
+  "source": "-t / log(rho)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "the inverse: recover tau from the measured autocorrelation, against the tau the process was built with",
+  "span": 0.9202427585190734,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "tau=5 t=40",
+   "lean": 7.835208335661321,
+   "truth": 5.0,
+   "sem": 0.15,
+   "sems_off": 18.901388904408805,
+   "rel_err": 0.5670416671322641
+  },
+  "cells": [
+   {
+    "design": "tau=5 t=10",
+    "lean": 4.942100798325619,
+    "truth": 5.0,
+    "sem": 0.15,
+    "sems_off": 0.3859946778292075,
+    "rel_err": 0.011579840334876223
+   },
+   {
+    "design": "tau=5 t=40",
+    "lean": 7.835208335661321,
+    "truth": 5.0,
+    "sem": 0.15,
+    "sems_off": 18.901388904408805,
+    "rel_err": 0.5670416671322641
+   },
+   {
+    "design": "tau=20 t=10",
+    "lean": 19.9068932645764,
+    "truth": 20.0,
+    "sem": 0.6,
+    "sems_off": 0.15517789237266655,
+    "rel_err": 0.004655336771179996
+   },
+   {
+    "design": "tau=20 t=40",
+    "lean": 20.27383766601619,
+    "truth": 20.0,
+    "sem": 0.6,
+    "sems_off": 0.45639611002698055,
+    "rel_err": 0.013691883300809416
+   },
+   {
+    "design": "tau=60 t=10",
+    "lean": 61.96428946840509,
+    "truth": 60.0,
+    "sem": 1.7999999999999998,
+    "sems_off": 1.0912719268917177,
+    "rel_err": 0.032738157806751524
+   },
+   {
+    "design": "tau=60 t=40",
+    "lean": 60.82545344683864,
+    "truth": 60.0,
+    "sem": 1.7999999999999998,
+    "sems_off": 0.4585852482436871,
+    "rel_err": 0.013757557447310612
+   }
+  ]
+ },
+ {
+  "name": "effectVarianceRecurrence",
+  "file": "SelectionArchitecture.lean",
+  "source": "(1 - s) * V + v_mut",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "one step of the recurrence from a state fifty iterations in, so the map is exercised away from both its start and its fixed point",
+  "span": 0.9502903671080051,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "s=0.05 v=0.010",
+   "lean": 0.41544593077479675,
+   "truth": 0.41544593077479675,
+   "sem": 4.1544593077479674e-13
+  },
+  "cells": [
+   {
+    "design": "s=0.05 v=0.010",
+    "lean": 0.41544593077479675,
+    "truth": 0.41544593077479675,
+    "sem": 4.1544593077479674e-13
+   },
+   {
+    "design": "s=0.20 v=0.020",
+    "lean": 0.10004139018308851,
+    "truth": 0.10004139018308851,
+    "sem": 1.000413901830885e-13
+   },
+   {
+    "design": "s=0.01 v=0.005",
+    "lean": 2.0125151678438358,
+    "truth": 2.0125151678438358,
+    "sem": 2.0125151678438356e-12
+   }
+  ]
+ },
+ {
+  "name": "sharedLDFromMigration",
+  "file": "PortabilityDrift.lean",
+  "source": "M / (1 + M)",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "algebraic complement of fstMigrationDriftEquilibrium, which is separately measured; this records the identity, not an independent measurement of it",
+  "span": 0.44999999999999996,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "M=1.0",
+   "lean": 0.5,
+   "truth": 0.5,
+   "sem": 5e-13
+  },
+  "cells": [
+   {
+    "design": "M=1.0",
+    "lean": 0.5,
+    "truth": 0.5,
+    "sem": 5e-13
+   },
+   {
+    "design": "M=4.0",
+    "lean": 0.8,
+    "truth": 0.8,
+    "sem": 8e-13
+   },
+   {
+    "design": "M=10.0",
+    "lean": 0.9090909090909091,
+    "truth": 0.9090909090909091,
+    "sem": 9.09090909090909e-13
+   }
+  ]
+ }
+]

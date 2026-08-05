@@ -46,8 +46,11 @@ Empirical status: DERIVED symbolically: under the sd-ratio convention the body a
 (residual `0`) with `Cov(y_T, S_T) / Var(S_T)` transported through `rho`; under the
 variance-ratio convention it disagrees by the residual above.
 
-Against simulation: **VALIDATED at `alpha = 1`; the `alpha` dependence is UNRESOLVED and a
-THIRD convention is missing** (`simcov/battery_bulk41b.py`, `group_a`). 400 causal variants,
+Against simulation: **VALIDATED under the outcome-scale convention stated below, and a THIRD
+convention had to be written down to say that** (`simcov/battery_bulk39.py` for the reading
+that validates it, `simcov/battery_bulk41b.py`, `group_a`, for the one that does not; the
+adjudication is recorded in `simcov/adjudications.json`). Taking the second first, because it
+is what forced the question: 400 causal variants,
 200000 individuals per population, target effects `rho`-correlated with the source vector and
 rescaled to its norm; the observable is the realised OLS slope of the target phenotype on the
 source-weighted score, and `rho` is REMEASURED on the two drawn vectors.
@@ -70,7 +73,24 @@ written down and a third was not, and the third is the one that decides the answ
 
 Consumers must state whether `y_T` is standardized in the target or carried on the source's
 scale. Until that is stated the `alpha` factor is not settled by anything, and no simulation
-can settle it, because each convention makes a different design correct. -/
+can settle it, because each convention makes a different design correct.
+
+**The other convention, measured** (`simcov/battery_bulk39.py`). The paragraph above is
+confirmed by running the complementary design: target genotypes left STANDARDIZED and the
+score-scale ratio produced by rescaling the WEIGHTS, so the target phenotype stays on a
+fixed scale while the score moves -- which is the condition the note above says makes
+`1/alpha` correct. It does. With 4000 causal variants and 400000 individuals per
+population, `rho` and `alpha` both REMEASURED from the realised draws, the body matches the
+realised OLS slope to worst 1.52% relative across `alpha` = 0.7, 1.0, 1.5. On the same
+cells the variance-ratio reading `rho * bSource / Real.sqrt alpha` is FALSIFIED at 102.75
+sems and 23% relative.
+
+So both halves are now measured and they disagree, which is the point: `battery_bulk41b`
+scales the target's residual with its own genetic variance and finds NO `alpha` dependence;
+this one holds the outcome scale fixed and finds exactly the `1/alpha` the body carries.
+The third convention is not a gap in the simulations but a genuine fork, and the two runs
+bracket it. A consumer that states which side it is on gets a determinate answer; one that
+does not is choosing between 0.90 and 0.56 at `alpha = 1.6`. -/
 noncomputable def ancestryRecalibratedSlope (bSource rho alpha : ℝ) : ℝ :=
   rho * (bSource * alpha) / alpha ^ 2
 

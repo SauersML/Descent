@@ -1,0 +1,155 @@
+[
+ {
+  "name": "sharedLD_from_equilibrium / sharedLDFromMigration",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - fstMigrationDriftEquilibrium = M/(1+M)",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.88 sems",
+  "regime": "two-deme island model at Ne = 1000, 5 Mb with recombination 1e-8, 10 replicates; 4*Ne*m swept a hundredfold. F_ST is the site-frequency Hudson estimator (ratio of averages) and sharedLD is the correlation across SNP pairs between the signed LD r measured separately in each deme -- a DIFFERENT observable from F_ST, which is what makes the identity refutable. Pairs are restricted to sites common in BOTH demes so the pair set is not selected by one of them",
+  "span": 0.5546030505194851,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=1e-04 (4Nm=0.4)",
+   "lean": 0.4393577949805205,
+   "truth": 0.9059582377525507,
+   "sem": 0.013242922420764911,
+   "sems_off": 35.23394821375683,
+   "rel_err": 0.515035266889946
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": 0.4393577949805205,
+    "truth": 0.9059582377525507,
+    "sem": 0.013242922420764911,
+    "sems_off": 35.23394821375683,
+    "rel_err": 0.515035266889946
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.7921282821911165,
+    "truth": 0.9341414262090613,
+    "sem": 0.005444165281244958,
+    "sems_off": 26.085384385220124,
+    "rel_err": 0.15202531440476139
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.9290467105814031,
+    "truth": 0.9673654288600261,
+    "sem": 0.002102572274362077,
+    "sems_off": 18.224685422644477,
+    "rel_err": 0.03961141998198031
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.986440961243587,
+    "truth": 0.9889596106782459,
+    "sem": 0.0005358561130446755,
+    "sems_off": 4.700234584146403,
+    "rel_err": 0.0025467667308794483
+   }
+  ]
+ },
+ {
+  "name": "sharedLD [(1-F)^2, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1 - F)^2",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.88 sems",
+  "regime": "two-deme island model at Ne = 1000, 5 Mb with recombination 1e-8, 10 replicates; 4*Ne*m swept a hundredfold. F_ST is the site-frequency Hudson estimator (ratio of averages) and sharedLD is the correlation across SNP pairs between the signed LD r measured separately in each deme -- a DIFFERENT observable from F_ST, which is what makes the identity refutable. Pairs are restricted to sites common in BOTH demes so the pair set is not selected by one of them",
+  "span": 0.8016215573934516,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=5e-04 (4Nm=2.0)",
+   "lean": 0.6274672154470491,
+   "truth": 0.9341414262090613,
+   "sem": 0.005444165281244958,
+   "sems_off": 56.330804617284265,
+   "rel_err": 0.3282952689578916
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": 0.19303527201014511,
+    "truth": 0.9059582377525507,
+    "sem": 0.013242922420764911,
+    "sems_off": 53.83426279267044,
+    "rel_err": 0.78692696421745
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.6274672154470491,
+    "truth": 0.9341414262090613,
+    "sem": 0.005444165281244958,
+    "sems_off": 56.330804617284265,
+    "rel_err": 0.3282952689578916
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.8631277904421254,
+    "truth": 0.9673654288600261,
+    "sem": 0.002102572274362077,
+    "sems_off": 49.576245101741634,
+    "rel_err": 0.10775414885431413
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.973065770019172,
+    "truth": 0.9889596106782459,
+    "sem": 0.0005358561130446755,
+    "sems_off": 29.66065007407826,
+    "rel_err": 0.016071273778484815
+   }
+  ]
+ },
+ {
+  "name": "sharedLD [1 - 2F, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - 2*F",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 0.88 sems",
+  "regime": "two-deme island model at Ne = 1000, 5 Mb with recombination 1e-8, 10 replicates; 4*Ne*m swept a hundredfold. F_ST is the site-frequency Hudson estimator (ratio of averages) and sharedLD is the correlation across SNP pairs between the signed LD r measured separately in each deme -- a DIFFERENT observable from F_ST, which is what makes the identity refutable. Pairs are restricted to sites common in BOTH demes so the pair set is not selected by one of them",
+  "span": 1.1246650875461794,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=1e-04 (4Nm=0.4)",
+   "lean": -0.12128441003895896,
+   "truth": 0.9059582377525507,
+   "sem": 0.013242922420764911,
+   "sems_off": 77.56918111826981,
+   "rel_err": 1.133874173206741
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": -0.12128441003895896,
+    "truth": 0.9059582377525507,
+    "sem": 0.013242922420764911,
+    "sems_off": 77.56918111826981,
+    "rel_err": 1.133874173206741
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.5842565643822331,
+    "truth": 0.9341414262090613,
+    "sem": 0.005444165281244958,
+    "sems_off": 64.26786178446395,
+    "rel_err": 0.3745523450841199
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.8580934211628062,
+    "truth": 0.9673654288600261,
+    "sem": 0.002102572274362077,
+    "sems_off": 51.9706309407952,
+    "rel_err": 0.11295835517503398
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.972881922487174,
+    "truth": 0.9889596106782459,
+    "sem": 0.0005358561130446755,
+    "sems_off": 30.003741302343755,
+    "rel_err": 0.016257173718192144
+   }
+  ]
+ }
+]

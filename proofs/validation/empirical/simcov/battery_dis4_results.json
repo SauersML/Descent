@@ -1,0 +1,104 @@
+[
+ {
+  "name": "fstTransientAt [decay base = hetDecayFactor, which carries no migration]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - hetDecayFactor^t)",
+  "note": "positive control 'Ne=50 M=0: the stochastic run against the exact deterministic recursion, same half-life estimator' passed at 0.88 sems",
+  "regime": "24-deme forward Wright-Fisher island model, NO mutation so no mutation-model convention enters, started identical; the half-life of F(t) against its own plateau, read by interpolation, which is a property of the shape and so carries no F_ST convention",
+  "span": 0.875,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=400 M=16.0 (exact recursion 32.6)",
+   "lean": 554.5177444479563,
+   "truth": 33.01978422169989,
+   "sem": 0.23473439352617975,
+   "sems_off": 2221.651256095516,
+   "rel_err": 15.793499943089854
+  },
+  "cells": [
+   {
+    "design": "Ne=50 M=0.0 (exact recursion 71.1)",
+    "lean": 69.31471805599453,
+    "truth": 70.67337973582497,
+    "sem": 0.49073644941013356,
+    "sems_off": 2.768617822180415,
+    "rel_err": 0.019224518268534364
+   },
+   {
+    "design": "Ne=100 M=2.0 (exact recursion 47.0)",
+    "lean": 138.62943611198907,
+    "truth": 46.878377267047455,
+    "sem": 0.3978098223097266,
+    "sems_off": 230.6405063410076,
+    "rel_err": 1.9572149078939391
+   },
+   {
+    "design": "Ne=200 M=6.0 (exact recursion 39.8)",
+    "lean": 277.25887222397813,
+    "truth": 39.50945509038864,
+    "sem": 0.38643499611837395,
+    "sems_off": 615.2378007212404,
+    "rel_err": 6.017532172733664
+   },
+   {
+    "design": "Ne=400 M=16.0 (exact recursion 32.6)",
+    "lean": 554.5177444479563,
+    "truth": 33.01978422169989,
+    "sem": 0.23473439352617975,
+    "sems_off": 2221.651256095516,
+    "rel_err": 15.793499943089854
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [CANDIDATE: the base carries every force the equilibrium does]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (hetDecayFromScaled Ne theta * (1 - bigM/(2Ne)))^t",
+  "note": "",
+  "regime": "same runs, same estimator",
+  "span": 0.5294117647058824,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=50 M=0.0 (exact recursion 71.1)",
+   "lean": 69.31471805599453,
+   "truth": 70.67337973582497,
+   "sem": 0.49073644941013356,
+   "sems_off": 2.768617822180415,
+   "rel_err": 0.019224518268534364
+  },
+  "cells": [
+   {
+    "design": "Ne=50 M=0.0 (exact recursion 71.1)",
+    "lean": 69.31471805599453,
+    "truth": 70.67337973582497,
+    "sem": 0.49073644941013356,
+    "sems_off": 2.768617822180415,
+    "rel_err": 0.019224518268534364
+   },
+   {
+    "design": "Ne=100 M=2.0 (exact recursion 47.0)",
+    "lean": 46.20981203732969,
+    "truth": 46.878377267047455,
+    "sem": 0.3978098223097266,
+    "sems_off": 1.6806151890267624,
+    "rel_err": 0.014261697368686932
+   },
+   {
+    "design": "Ne=200 M=6.0 (exact recursion 39.8)",
+    "lean": 39.60841031771116,
+    "truth": 39.50945509038864,
+    "sem": 0.38643499611837395,
+    "sems_off": 0.25607211644001254,
+    "rel_err": 0.0025045961048091652
+   },
+   {
+    "design": "Ne=400 M=16.0 (exact recursion 32.6)",
+    "lean": 32.61869084987978,
+    "truth": 33.01978422169989,
+    "sem": 0.23473439352617975,
+    "sems_off": 1.708711560308138,
+    "rel_err": 0.012147062171185032
+   }
+  ]
+ }
+]

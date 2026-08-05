@@ -1,0 +1,308 @@
+[
+ {
+  "name": "equalVarianceGaussianAUCFromSignalVariance",
+  "file": "DGP.lean",
+  "source": "Phi(sqrt(vSignal / (2 * vNoise)))",
+  "note": "",
+  "regime": "two Gaussian score distributions with EQUAL variance and a mean separation of sqrt(vSignal); 800000 pairs, AUC counted as the fraction of case/control pairs ordered correctly",
+  "span": 0.17814609943771986,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "vS=0.5 vN=1.0",
+   "lean": 0.6914624612740131,
+   "truth": 0.69206875,
+   "sem": 0.0005161269166511246,
+   "sems_off": 1.1746892216371507,
+   "rel_err": 0.0008760527418509969
+  },
+  "cells": [
+   {
+    "design": "vS=1.0 vN=1.0",
+    "lean": 0.7602499389065234,
+    "truth": 0.76057875,
+    "sem": 0.0004770989350339685,
+    "sems_off": 0.6891884876104136,
+    "rel_err": 0.0004323169605732474
+   },
+   {
+    "design": "vS=2.0 vN=1.0",
+    "lean": 0.8413447460685429,
+    "truth": 0.840975,
+    "sem": 0.0004088643561362985,
+    "sems_off": 0.9043245345154021,
+    "rel_err": 0.0004396635673389788
+   },
+   {
+    "design": "vS=0.5 vN=1.0",
+    "lean": 0.6914624612740131,
+    "truth": 0.69206875,
+    "sem": 0.0005161269166511246,
+    "sems_off": 1.1746892216371507,
+    "rel_err": 0.0008760527418509969
+   },
+   {
+    "design": "vS=2.0 vN=4.0",
+    "lean": 0.6914624612740131,
+    "truth": 0.6919975,
+    "sem": 0.0005161600526892675,
+    "sems_off": 1.036575231266536,
+    "rel_err": 0.0007731801429729513
+   }
+  ]
+ },
+ {
+  "name": "equalVarianceGaussianAUC [factor 2 dropped, competing]",
+  "file": "DGP.lean",
+  "source": "Phi(sqrt(vSignal / vNoise))",
+  "note": "positive control 'no separation [AUC = 1/2]' passed at 0.45 sems",
+  "regime": "two Gaussian score distributions with EQUAL variance and a mean separation of sqrt(vSignal); 800000 pairs, AUC counted as the fraction of case/control pairs ordered correctly",
+  "span": 0.17485254055863464,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "vS=2.0 vN=1.0",
+   "lean": 0.9213503964748575,
+   "truth": 0.840975,
+   "sem": 0.0004088643561362985,
+   "sems_off": 196.58205776211912,
+   "rel_err": 0.09557406162473019
+  },
+  "cells": [
+   {
+    "design": "vS=1.0 vN=1.0",
+    "lean": 0.8413447460685429,
+    "truth": 0.76057875,
+    "sem": 0.0004770989350339685,
+    "sems_off": 169.28563477676298,
+    "rel_err": 0.10619018223759599
+   },
+   {
+    "design": "vS=2.0 vN=1.0",
+    "lean": 0.9213503964748575,
+    "truth": 0.840975,
+    "sem": 0.0004088643561362985,
+    "sems_off": 196.58205776211912,
+    "rel_err": 0.09557406162473019
+   },
+   {
+    "design": "vS=0.5 vN=1.0",
+    "lean": 0.7602499389065234,
+    "truth": 0.69206875,
+    "sem": 0.0005161269166511246,
+    "sems_off": 132.1015949893006,
+    "rel_err": 0.09851794190464944
+   },
+   {
+    "design": "vS=2.0 vN=4.0",
+    "lean": 0.7602499389065234,
+    "truth": 0.6919975,
+    "sem": 0.0005161600526892675,
+    "sems_off": 132.2311530133306,
+    "rel_err": 0.09863104838749175
+   }
+  ]
+ },
+ {
+  "name": "equalVarianceGaussianAUC [square root dropped, competing]",
+  "file": "DGP.lean",
+  "source": "Phi(vSignal / (2 * vNoise))",
+  "note": "positive control 'no separation [AUC = 1/2]' passed at 0.45 sems",
+  "regime": "two Gaussian score distributions with EQUAL variance and a mean separation of sqrt(vSignal); 800000 pairs, AUC counted as the fraction of case/control pairs ordered correctly",
+  "span": 0.28839357649694275,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "vS=0.5 vN=1.0",
+   "lean": 0.5987063256829237,
+   "truth": 0.69206875,
+   "sem": 0.0005161269166511246,
+   "sems_off": 180.8904385821531,
+   "rel_err": 0.13490339553270728
+  },
+  "cells": [
+   {
+    "design": "vS=1.0 vN=1.0",
+    "lean": 0.6914624612740131,
+    "truth": 0.76057875,
+    "sem": 0.0004770989350339685,
+    "sems_off": 144.86783275059273,
+    "rel_err": 0.09087328396433224
+   },
+   {
+    "design": "vS=2.0 vN=1.0",
+    "lean": 0.8413447460685429,
+    "truth": 0.840975,
+    "sem": 0.0004088643561362985,
+    "sems_off": 0.9043245345154021,
+    "rel_err": 0.0004396635673389788
+   },
+   {
+    "design": "vS=0.5 vN=1.0",
+    "lean": 0.5987063256829237,
+    "truth": 0.69206875,
+    "sem": 0.0005161269166511246,
+    "sems_off": 180.8904385821531,
+    "rel_err": 0.13490339553270728
+   },
+   {
+    "design": "vS=2.0 vN=4.0",
+    "lean": 0.5987063256829237,
+    "truth": 0.6919975,
+    "sem": 0.0005161600526892675,
+    "sems_off": 180.7407873410893,
+    "rel_err": 0.13481432276428215
+   }
+  ]
+ },
+ {
+  "name": "calibratedBrierFromVariances",
+  "file": "DGP.lean",
+  "source": "pi*(1-pi) * (1 - vSignal/(vSignal+vResidual))",
+  "note": "positive control 'constant predictor [Brier = pi(1-pi)]' passed at 0.47 sems",
+  "regime": "latent signal plus residual thresholded to prevalence pi, 2e6 individuals; the predictor is the CALIBRATED conditional probability given the signal, and the Brier score is its realised mean squared error against the binary outcome",
+  "span": 0.8351648351648352,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "pi=0.50 vS=1.0 vR=1.0",
+   "lean": 0.125,
+   "truth": 0.1666580520781384,
+   "sem": 0.0001393748408972404,
+   "sems_off": 298.89219467416257,
+   "rel_err": 0.24996123234781864
+  },
+  "cells": [
+   {
+    "design": "pi=0.50 vS=1.0 vR=1.0",
+    "lean": 0.125,
+    "truth": 0.1666580520781384,
+    "sem": 0.0001393748408972404,
+    "sems_off": 298.89219467416257,
+    "rel_err": 0.24996123234781864
+   },
+   {
+    "design": "pi=0.20 vS=1.0 vR=3.0",
+    "lean": 0.12000000000000002,
+    "truth": 0.13853465068816742,
+    "sem": 0.0001529768501639343,
+    "sems_off": 121.15983999085577,
+    "rel_err": 0.13379072019958171
+   },
+   {
+    "design": "pi=0.10 vS=2.0 vR=1.0",
+    "lean": 0.030000000000000006,
+    "truth": 0.05610177819637448,
+    "sem": 0.00011288083703257084,
+    "sems_off": 231.23303195247408,
+    "rel_err": 0.4652575913905929
+   },
+   {
+    "design": "pi=0.35 vS=0.5 vR=2.0",
+    "lean": 0.182,
+    "truth": 0.19957300122811503,
+    "sem": 0.00012748715791615934,
+    "sems_off": 137.84134429972735,
+    "rel_err": 0.08805299875221509
+   }
+  ]
+ },
+ {
+  "name": "calibratedBrier [variance factor dropped, competing]",
+  "file": "DGP.lean",
+  "source": "1 - vSignal/(vSignal+vResidual)",
+  "note": "positive control 'constant predictor [Brier = pi(1-pi)]' passed at 0.47 sems",
+  "regime": "latent signal plus residual thresholded to prevalence pi, 2e6 individuals; the predictor is the CALIBRATED conditional probability given the signal, and the Brier score is its realised mean squared error against the binary outcome",
+  "span": 0.5833333333333333,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "pi=0.35 vS=0.5 vR=2.0",
+   "lean": 0.8,
+   "truth": 0.19957300122811503,
+   "sem": 0.00012748715791615934,
+   "sems_off": 4709.705734963123,
+   "rel_err": 3.008558247243011
+  },
+  "cells": [
+   {
+    "design": "pi=0.50 vS=1.0 vR=1.0",
+    "lean": 0.5,
+    "truth": 0.1666580520781384,
+    "sem": 0.0001393748408972404,
+    "sems_off": 2391.69383639068,
+    "rel_err": 2.0001550706087254
+   },
+   {
+    "design": "pi=0.20 vS=1.0 vR=3.0",
+    "lean": 0.75,
+    "truth": 0.13853465068816742,
+    "sem": 0.0001529768501639343,
+    "sems_off": 3997.110338306542,
+    "rel_err": 4.413807998752613
+   },
+   {
+    "design": "pi=0.10 vS=2.0 vR=1.0",
+    "lean": 0.33333333333333337,
+    "truth": 0.05610177819637448,
+    "sem": 0.00011288083703257084,
+    "sems_off": 2455.9665079110464,
+    "rel_err": 4.9415823178823
+   },
+   {
+    "design": "pi=0.35 vS=0.5 vR=2.0",
+    "lean": 0.8,
+    "truth": 0.19957300122811503,
+    "sem": 0.00012748715791615934,
+    "sems_off": 4709.705734963123,
+    "rel_err": 3.008558247243011
+   }
+  ]
+ },
+ {
+  "name": "calibratedBrier [fraction not complemented, competing]",
+  "file": "DGP.lean",
+  "source": "pi*(1-pi) * vSignal/(vSignal+vResidual)",
+  "note": "positive control 'constant predictor [Brier = pi(1-pi)]' passed at 0.47 sems",
+  "regime": "latent signal plus residual thresholded to prevalence pi, 2e6 individuals; the predictor is the CALIBRATED conditional probability given the signal, and the Brier score is its realised mean squared error against the binary outcome",
+  "span": 0.6799999999999999,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "pi=0.35 vS=0.5 vR=2.0",
+   "lean": 0.0455,
+   "truth": 0.19957300122811503,
+   "sem": 0.00012748715791615934,
+   "sems_off": 1208.5374224864247,
+   "rel_err": 0.7720132496880537
+  },
+  "cells": [
+   {
+    "design": "pi=0.50 vS=1.0 vR=1.0",
+    "lean": 0.125,
+    "truth": 0.1666580520781384,
+    "sem": 0.0001393748408972404,
+    "sems_off": 298.89219467416257,
+    "rel_err": 0.24996123234781864
+   },
+   {
+    "design": "pi=0.20 vS=1.0 vR=3.0",
+    "lean": 0.04000000000000001,
+    "truth": 0.13853465068816742,
+    "sem": 0.0001529768501639343,
+    "sems_off": 644.1147832667159,
+    "rel_err": 0.7112635733998606
+   },
+   {
+    "design": "pi=0.10 vS=2.0 vR=1.0",
+    "lean": 0.060000000000000005,
+    "truth": 0.05610177819637448,
+    "sem": 0.00011288083703257084,
+    "sems_off": 34.53395550655536,
+    "rel_err": 0.06948481721881404
+   },
+   {
+    "design": "pi=0.35 vS=0.5 vR=2.0",
+    "lean": 0.0455,
+    "truth": 0.19957300122811503,
+    "sem": 0.00012748715791615934,
+    "sems_off": 1208.5374224864247,
+    "rel_err": 0.7720132496880537
+   }
+  ]
+ }
+]

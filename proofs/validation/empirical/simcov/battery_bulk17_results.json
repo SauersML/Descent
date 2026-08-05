@@ -1,0 +1,346 @@
+[
+ {
+  "name": "cumulativeDrift [current body: sum 1/(2 Ne_i)]",
+  "file": "DemographicHistory.lean",
+  "source": "sum 1/(2 Ne_i)",
+  "note": "positive control 'the shallow schedule, where the linearisation is known to be accurate, must reproduce F' passed at 1.73 sems",
+  "regime": "multi-epoch Wright-Fisher, F read as 1 - H/H_ancestral over 6000 loci and 120 replicate histories; schedules span shallow drift where the two candidates agree to deep drift where they cannot",
+  "span": 0.9933333333333333,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "very deep (12 epochs, F=0.262)",
+   "lean": 0.30000000000000004,
+   "truth": 0.2619669685769791,
+   "sem": 0.0004870501577024018,
+   "sems_off": 78.08853117394935,
+   "rel_err": 0.145182545836289
+  },
+  "cells": [
+   {
+    "design": "shallow (8 epochs, F=0.002)",
+    "lean": 0.002,
+    "truth": 0.002076064155174917,
+    "sem": 4.393621741861267e-05,
+    "sems_off": 1.7312404126690706,
+    "rel_err": 0.03663863420854077
+   },
+   {
+    "design": "moderate (5 epochs, F=0.008)",
+    "lean": 0.007791666666666667,
+    "truth": 0.007897762710367129,
+    "sem": 8.026258257562373e-05,
+    "sems_off": 1.32186182273038,
+    "rel_err": 0.013433683384940508
+   },
+   {
+    "design": "deep (7 epochs, F=0.077)",
+    "lean": 0.0791468253968254,
+    "truth": 0.07651382182793687,
+    "sem": 0.00028341238249750554,
+    "sems_off": 9.290361789014998,
+    "rel_err": 0.03441212980851469
+   },
+   {
+    "design": "very deep (12 epochs, F=0.262)",
+    "lean": 0.30000000000000004,
+    "truth": 0.2619669685769791,
+    "sem": 0.0004870501577024018,
+    "sems_off": 78.08853117394935,
+    "rel_err": 0.145182545836289
+   }
+  ]
+ },
+ {
+  "name": "cumulativeDrift [CANDIDATE: 1 - prod (1 - 1/(2 Ne_i))]",
+  "file": "DemographicHistory.lean",
+  "source": "1 - prod (1 - 1/(2 Ne_i))",
+  "note": "",
+  "regime": "multi-epoch Wright-Fisher, F read as 1 - H/H_ancestral over 6000 loci and 120 replicate histories; schedules span shallow drift where the two candidates agree to deep drift where they cannot",
+  "span": 0.992373136417664,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "shallow (8 epochs, F=0.002)",
+   "lean": 0.0019982508747264927,
+   "truth": 0.002076064155174917,
+   "sem": 4.393621741861267e-05,
+   "sems_off": 1.7710509693413072,
+   "rel_err": 0.03748115406475399
+  },
+  "cells": [
+   {
+    "design": "shallow (8 epochs, F=0.002)",
+    "lean": 0.0019982508747264927,
+    "truth": 0.002076064155174917,
+    "sem": 4.393621741861267e-05,
+    "sems_off": 1.7710509693413072,
+    "rel_err": 0.03748115406475399
+   },
+   {
+    "design": "moderate (5 epochs, F=0.008)",
+    "lean": 0.007768553311984228,
+    "truth": 0.007897762710367129,
+    "sem": 8.026258257562373e-05,
+    "sems_off": 1.609833551781861,
+    "rel_err": 0.016360253292149737
+   },
+   {
+    "design": "deep (7 epochs, F=0.077)",
+    "lean": 0.07654770471679684,
+    "truth": 0.07651382182793687,
+    "sem": 0.00028341238249750554,
+    "sems_off": 0.11955331154336182,
+    "rel_err": 0.0004428335698112955
+   },
+   {
+    "design": "very deep (12 epochs, F=0.262)",
+    "lean": 0.2620016541733491,
+    "truth": 0.2619669685769791,
+    "sem": 0.0004870501577024018,
+    "sems_off": 0.07121565576246326,
+    "rel_err": 0.00013240446518277482
+   }
+  ]
+ },
+ {
+  "name": "Var_Delta_Mu [current body: 2 fst V_A]",
+  "file": "PortabilityDrift.lean",
+  "source": "2 * fst * V_A",
+  "note": "positive control 'the shallowest split, where 2 fst V_A is its own first-order limit' passed at 0.97 sems",
+  "regime": "realised variance of the mean-score difference between two demes drifted independently from a common ancestor, 500 loci, 3000 replicate splits; t runs from shallow drift where the two candidates agree to F_branch near 0.75 where they cannot",
+  "span": 0.8814834998904989,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "t=400 (F_branch=0.737, pairwise fst=0.931)",
+   "lean": 337.78922810012114,
+   "truth": 544.9729930684706,
+   "sem": 14.073487952069684,
+   "sems_off": 14.721564808522146,
+   "rel_err": 0.38017253626056075
+  },
+  "cells": [
+   {
+    "design": "t=20 (F_branch=0.065, pairwise fst=0.125)",
+    "lean": 40.033597089116306,
+    "truth": 39.05697064970284,
+    "sem": 1.0086147623353359,
+    "sems_off": 0.9682848951686913,
+    "rel_err": 0.025005176365896564
+   },
+   {
+    "design": "t=80 (F_branch=0.234, pairwise fst=0.414)",
+    "lean": 160.01813235375434,
+    "truth": 176.42646638308094,
+    "sem": 4.556071182699066,
+    "sems_off": 3.6014217889383637,
+    "rel_err": 0.09300381266889181
+   },
+   {
+    "design": "t=200 (F_branch=0.487, pairwise fst=0.737)",
+    "lean": 279.95700208340514,
+    "truth": 381.5537335730613,
+    "sem": 9.853317395185162,
+    "sems_off": 10.310916355876405,
+    "rel_err": 0.26627109775143126
+   },
+   {
+    "design": "t=400 (F_branch=0.737, pairwise fst=0.931)",
+    "lean": 337.78922810012114,
+    "truth": 544.9729930684706,
+    "sem": 14.073487952069684,
+    "sems_off": 14.721564808522146,
+    "rel_err": 0.38017253626056075
+   }
+  ]
+ },
+ {
+  "name": "Var_Delta_Mu [CANDIDATE: 4 (1 - sqrt(1 - fst)) V_A]",
+  "file": "PortabilityDrift.lean",
+  "source": "4 * (1 - sqrt(1 - fst)) * V_A",
+  "note": "",
+  "regime": "realised variance of the mean-score difference between two demes drifted independently from a common ancestor, 500 loci, 3000 replicate splits; t runs from shallow drift where the two candidates agree to F_branch near 0.75 where they cannot",
+  "span": 0.9226581627059857,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "t=20 (F_branch=0.065, pairwise fst=0.125)",
+   "lean": 41.369782867565974,
+   "truth": 39.05697064970284,
+   "sem": 1.0086147623353359,
+   "sems_off": 2.293058067589723,
+   "rel_err": 0.059216374936153164
+  },
+  "cells": [
+   {
+    "design": "t=20 (F_branch=0.065, pairwise fst=0.125)",
+    "lean": 41.369782867565974,
+    "truth": 39.05697064970284,
+    "sem": 1.0086147623353359,
+    "sems_off": 2.293058067589723,
+    "rel_err": 0.059216374936153164
+   },
+   {
+    "design": "t=80 (F_branch=0.234, pairwise fst=0.414)",
+    "lean": 181.26335354339557,
+    "truth": 176.42646638308094,
+    "sem": 4.556071182699066,
+    "sems_off": 1.0616355553622425,
+    "rel_err": 0.027415881865548053
+   },
+   {
+    "design": "t=200 (F_branch=0.487, pairwise fst=0.737)",
+    "lean": 370.10648415031625,
+    "truth": 381.5537335730613,
+    "sem": 9.853317395185162,
+    "sems_off": 1.161766029006514,
+    "rel_err": 0.030001670578734128
+   },
+   {
+    "design": "t=400 (F_branch=0.737, pairwise fst=0.931)",
+    "lean": 534.8952690417617,
+    "truth": 544.9729930684706,
+    "sem": 14.073487952069684,
+    "sems_off": 0.7160786338845614,
+    "rel_err": 0.01849215310646178
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFst [current body: linear in d]",
+  "file": "PortabilityDrift.lean",
+  "source": "min 1 (f * (1 + alpha * (d - 1)))",
+  "note": "positive control 'd=1 reproduces f by construction in both forms' passed at 0.00 sems",
+  "regime": "20-deme lattice, interior demes only so no boundary reflection enters, F_ST from coalescence times; the linear form is given a free alpha fitted at d=2 while the saturating candidate is given nothing but F(1), so the comparison is stacked AGAINST the candidate",
+  "span": 0.618172670272542,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "d=8 (alpha fitted at d=2)",
+   "lean": 0.3632151142354272,
+   "truth": 0.2755540860205579,
+   "sem": 0.008448208737776073,
+   "sems_off": 10.376285782676502,
+   "rel_err": 0.3181263957317231
+  },
+  "cells": [
+   {
+    "design": "d=3 (alpha fitted at d=2)",
+    "lean": 0.13868545718516678,
+    "truth": 0.12319303449609696,
+    "sem": 0.005703802027710378,
+    "sems_off": 2.716157155140392,
+    "rel_err": 0.12575729425319623
+   },
+   {
+    "design": "d=5 (alpha fitted at d=2)",
+    "lean": 0.22849732000527093,
+    "truth": 0.20517973039003137,
+    "sem": 0.005744999303746842,
+    "sems_off": 4.058762827008875,
+    "rel_err": 0.11364470345542688
+   },
+   {
+    "design": "d=8 (alpha fitted at d=2)",
+    "lean": 0.3632151142354272,
+    "truth": 0.2755540860205579,
+    "sem": 0.008448208737776073,
+    "sems_off": 10.376285782676502,
+    "rel_err": 0.3181263957317231
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFst [CANDIDATE: saturating d^a f/(f d^a + (1-f))]",
+  "file": "PortabilityDrift.lean",
+  "source": "d^alpha * f / (f * d^alpha + (1 - f))",
+  "note": "",
+  "regime": "20-deme lattice, interior demes only so no boundary reflection enters, F_ST from coalescence times; the linear form is given a free alpha fitted at d=2 while the saturating candidate is given nothing but F(1), so the comparison is stacked AGAINST the candidate",
+  "span": 0.5415217726127822,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "d=8 (alpha=1, f from d=1)",
+   "lean": 0.29132280627743534,
+   "truth": 0.2755540860205579,
+   "sem": 0.008448208737776073,
+   "sems_off": 1.8665164115048154,
+   "rel_err": 0.05722549966361589
+  },
+  "cells": [
+   {
+    "design": "d=3 (alpha=1, f from d=1)",
+    "lean": 0.1335651638195484,
+    "truth": 0.12319303449609696,
+    "sem": 0.005703802027710378,
+    "sems_off": 1.818458858330153,
+    "rel_err": 0.0841941215741385
+   },
+   {
+    "design": "d=5 (alpha=1, f from d=1)",
+    "lean": 0.2044074622454159,
+    "truth": 0.20517973039003137,
+    "sem": 0.005744999303746842,
+    "sems_off": 0.13442441048022616,
+    "rel_err": 0.0037638617769282312
+   },
+   {
+    "design": "d=8 (alpha=1, f from d=1)",
+    "lean": 0.29132280627743534,
+    "truth": 0.2755540860205579,
+    "sem": 0.008448208737776073,
+    "sems_off": 1.8665164115048154,
+    "rel_err": 0.05722549966361589
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFstQuadratic [current body: m^2]",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4 Ne sigma^2 m^2)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "K = d(1 - F)/F measured at four migration rates spanning a factor of eight, and the exponent read as the log-log slope, which no constant in front of m can change",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "log-log slope of K against m [quadratic predicts -2]",
+   "lean": -2.0,
+   "truth": 0.9740173774051927,
+   "sem": 0.04164190776574696,
+   "sems_off": 71.41885511430641,
+   "rel_err": 3.053351455934032
+  },
+  "cells": [
+   {
+    "design": "log-log slope of K against m [quadratic predicts -2]",
+    "lean": -2.0,
+    "truth": 0.9740173774051927,
+    "sem": 0.04164190776574696,
+    "sems_off": 71.41885511430641,
+    "rel_err": 3.053351455934032
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFstQuadratic [CANDIDATE: m^1, i.e. demoSteppingStoneFst]",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + 4 Ne sigma^2 m)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "K = d(1 - F)/F measured at four migration rates spanning a factor of eight, and the exponent read as the log-log slope, which no constant in front of m can change",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "log-log slope of K against m [linear predicts -1]",
+   "lean": -1.0,
+   "truth": 0.9740173774051927,
+   "sem": 0.04164190776574696,
+   "sems_off": 47.404585508182315,
+   "rel_err": 2.026675727967016
+  },
+  "cells": [
+   {
+    "design": "log-log slope of K against m [linear predicts -1]",
+    "lean": -1.0,
+    "truth": 0.9740173774051927,
+    "sem": 0.04164190776574696,
+    "sems_off": 47.404585508182315,
+    "rel_err": 2.026675727967016
+   }
+  ]
+ }
+]

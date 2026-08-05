@@ -1,0 +1,356 @@
+[
+ {
+  "name": "fstTransientAt [decay base = hetDecayFactor, which carries no migration: R = 1]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - hetDecayFactor^t)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "24-deme forward Wright-Fisher island model, NO mutation, started identical; the fitted per-generation decay base of F(t)/F(plateau) -- a shape, so invariant to the F_ST convention -- expressed as R = (1 - lam) * 2Ne",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "M=16.0",
+   "lean": 1.0,
+   "truth": 16.86703593345273,
+   "sem": 0.1900031108051547,
+   "sems_off": 83.50934816916832,
+   "rel_err": 0.9407127604431861
+  },
+  "cells": [
+   {
+    "design": "M=0.0",
+    "lean": 1.0,
+    "truth": 0.9718240034336635,
+    "sem": 0.0059891230484698235,
+    "sems_off": 4.704527914739583,
+    "rel_err": 0.028992900429280044
+   },
+   {
+    "design": "M=2.0",
+    "lean": 1.0,
+    "truth": 2.96699328383833,
+    "sem": 0.02728160383244348,
+    "sems_off": 72.09962053254243,
+    "rel_err": 0.6629584551312758
+   },
+   {
+    "design": "M=6.0",
+    "lean": 1.0,
+    "truth": 6.814131942766975,
+    "sem": 0.15644146364572487,
+    "sems_off": 37.164903774702445,
+    "rel_err": 0.8532461642364477
+   },
+   {
+    "design": "M=16.0",
+    "lean": 1.0,
+    "truth": 16.86703593345273,
+    "sem": 0.1900031108051547,
+    "sems_off": 83.50934816916832,
+    "rel_err": 0.9407127604431861
+   }
+  ]
+ },
+ {
+  "name": "fstTransientAt [CANDIDATE: the equilibrium's own forces set the rate, R = 1 + bigM*d/(d-1)]",
+  "file": "PortabilityDrift.lean",
+  "source": "(1/(1+theta+bigM)) * (1 - (1 - (1+theta+bigM)/(2Ne))^t)",
+  "note": "the positive control 'M=0 vs the pure-drift rate 1/(2Ne)' missed by 4.7 sems on the same code path, so this design cannot support any verdict",
+  "regime": "same runs, same fits",
+  "span": 0.9434889434889435,
+  "verdict": "VOID (control failed)",
+  "worst": {
+   "design": "M=0.0",
+   "lean": 1.0,
+   "truth": 0.9718240034336635,
+   "sem": 0.0059891230484698235,
+   "sems_off": 4.704527914739583,
+   "rel_err": 0.028992900429280044
+  },
+  "cells": [
+   {
+    "design": "M=0.0",
+    "lean": 1.0,
+    "truth": 0.9718240034336635,
+    "sem": 0.0059891230484698235,
+    "sems_off": 4.704527914739583,
+    "rel_err": 0.028992900429280044
+   },
+   {
+    "design": "M=2.0",
+    "lean": 3.0869565217391304,
+    "truth": 2.96699328383833,
+    "sem": 0.02728160383244348,
+    "sems_off": 4.397220875927355,
+    "rel_err": 0.04043259502954
+   },
+   {
+    "design": "M=6.0",
+    "lean": 7.260869565217392,
+    "truth": 6.814131942766975,
+    "sem": 0.15644146364572487,
+    "sems_off": 2.8556215982617754,
+    "rel_err": 0.0655604596744882
+   },
+   {
+    "design": "M=16.0",
+    "lean": 17.695652173913043,
+    "truth": 16.86703593345273,
+    "sem": 0.1900031108051547,
+    "sems_off": 4.361066705429084,
+    "rel_err": 0.0491263695488371
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [m_into = the larger rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'the symmetric cell vs the two-deme island value 1/(1 + 2*4Ne*m), validated independently in battery_correct.py' passed at 1.93 sems",
+  "regime": "two demes with asymmetric migration, Ne=1000, F_ST read as 1 - E[T_within]/E[T_between] from branch lengths so no estimator convention enters, 24 replicates of 4 Mb; the SUM of the two rates spans a factor of four across the six designs, and three designs share a sum while differing in asymmetry, so a law depending on more than the sum would separate",
+  "span": 0.8,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=2.0e-03 m21=2.0e-03",
+   "lean": 0.1111111111111111,
+   "truth": 0.05748353399634568,
+   "sem": 0.0033148336561684235,
+   "sems_off": 16.17805979946303,
+   "rel_err": 0.9329206711294857
+  },
+  "cells": [
+   {
+    "design": "m12=5.0e-04 m21=5.0e-04",
+    "lean": 0.3333333333333333,
+    "truth": 0.22085589200445685,
+    "sem": 0.010279576121421868,
+    "sems_off": 10.941836511573847,
+    "rel_err": 0.5092797856015844
+   },
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.2,
+    "truth": 0.12225915834717792,
+    "sem": 0.005762134609095182,
+    "sems_off": 13.49167399354275,
+    "rel_err": 0.6358692690494591
+   },
+   {
+    "design": "m12=2.0e-03 m21=2.0e-03",
+    "lean": 0.1111111111111111,
+    "truth": 0.05748353399634568,
+    "sem": 0.0033148336561684235,
+    "sems_off": 16.17805979946303,
+    "rel_err": 0.9329206711294857
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.14285714285714285,
+    "truth": 0.10394974882967896,
+    "sem": 0.005698779838285857,
+    "sems_off": 6.827320081059123,
+    "rel_err": 0.37429040921699025
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.12195121951219513,
+    "truth": 0.10281424597420734,
+    "sem": 0.005666149050776366,
+    "sems_off": 3.3774214844146533,
+    "rel_err": 0.1861315361179483
+   },
+   {
+    "design": "m12=3.5e-03 m21=5.0e-04",
+    "lean": 0.06666666666666667,
+    "truth": 0.0571676402172247,
+    "sem": 0.0038281981201338,
+    "sems_off": 2.4813309424826637,
+    "rel_err": 0.16616089825201305
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [m_into = the smaller rate]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*m_into)",
+  "note": "positive control 'the symmetric cell vs the two-deme island value 1/(1 + 2*4Ne*m), validated independently in battery_correct.py' passed at 1.93 sems",
+  "regime": "same runs, the other reading of the single rate argument",
+  "span": 0.8,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m12=1.8e-03 m21=2.0e-04",
+   "lean": 0.5555555555555556,
+   "truth": 0.10281424597420734,
+   "sem": 0.005666149050776366,
+   "sems_off": 79.90282386223397,
+   "rel_err": 4.403488108981764
+  },
+  "cells": [
+   {
+    "design": "m12=5.0e-04 m21=5.0e-04",
+    "lean": 0.3333333333333333,
+    "truth": 0.22085589200445685,
+    "sem": 0.010279576121421868,
+    "sems_off": 10.941836511573847,
+    "rel_err": 0.5092797856015844
+   },
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.2,
+    "truth": 0.12225915834717792,
+    "sem": 0.005762134609095182,
+    "sems_off": 13.49167399354275,
+    "rel_err": 0.6358692690494591
+   },
+   {
+    "design": "m12=2.0e-03 m21=2.0e-03",
+    "lean": 0.1111111111111111,
+    "truth": 0.05748353399634568,
+    "sem": 0.0033148336561684235,
+    "sems_off": 16.17805979946303,
+    "rel_err": 0.9329206711294857
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.3333333333333333,
+    "truth": 0.10394974882967896,
+    "sem": 0.005698779838285857,
+    "sems_off": 40.25135046674324,
+    "rel_err": 2.206677621506311
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.5555555555555556,
+    "truth": 0.10281424597420734,
+    "sem": 0.005666149050776366,
+    "sems_off": 79.90282386223397,
+    "rel_err": 4.403488108981764
+   },
+   {
+    "design": "m12=3.5e-03 m21=5.0e-04",
+    "lean": 0.3333333333333333,
+    "truth": 0.0571676402172247,
+    "sem": 0.0038281981201338,
+    "sems_off": 72.1398643564603,
+    "rel_err": 4.830804491260065
+   }
+  ]
+ },
+ {
+  "name": "asymmetricFst [CANDIDATE: 1/(1 + 4Ne(m12 + m21))]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 / (1 + 4*Ne*(m12 + m21))",
+  "note": "",
+  "regime": "same runs, the total-exchange reading",
+  "span": 0.7058823529411764,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m12=5.0e-04 m21=5.0e-04",
+   "lean": 0.2,
+   "truth": 0.22085589200445685,
+   "sem": 0.010279576121421868,
+   "sems_off": 2.028866925844804,
+   "rel_err": 0.09443212863904925
+  },
+  "cells": [
+   {
+    "design": "m12=5.0e-04 m21=5.0e-04",
+    "lean": 0.2,
+    "truth": 0.22085589200445685,
+    "sem": 0.010279576121421868,
+    "sems_off": 2.028866925844804,
+    "rel_err": 0.09443212863904925
+   },
+   {
+    "design": "m12=1.0e-03 m21=1.0e-03",
+    "lean": 0.1111111111111111,
+    "truth": 0.12225915834717792,
+    "sem": 0.005762134609095182,
+    "sems_off": 1.9347078803869477,
+    "rel_err": 0.0911837394169673
+   },
+   {
+    "design": "m12=2.0e-03 m21=2.0e-03",
+    "lean": 0.058823529411764705,
+    "truth": 0.05748353399634568,
+    "sem": 0.0033148336561684235,
+    "sems_off": 0.40424212929221515,
+    "rel_err": 0.023310943539139536
+   },
+   {
+    "design": "m12=1.5e-03 m21=5.0e-04",
+    "lean": 0.1111111111111111,
+    "truth": 0.10394974882967896,
+    "sem": 0.005698779838285857,
+    "sems_off": 1.256648350111771,
+    "rel_err": 0.06889254050210353
+   },
+   {
+    "design": "m12=1.8e-03 m21=2.0e-04",
+    "lean": 0.1111111111111111,
+    "truth": 0.10281424597420734,
+    "sem": 0.005666149050776366,
+    "sems_off": 1.4642864249691674,
+    "rel_err": 0.08069762179635274
+   },
+   {
+    "design": "m12=3.5e-03 m21=5.0e-04",
+    "lean": 0.058823529411764705,
+    "truth": 0.0571676402172247,
+    "sem": 0.0038281981201338,
+    "sems_off": 0.43255054795390985,
+    "rel_err": 0.02896549845765858
+   }
+  ]
+ },
+ {
+  "name": "sourceBestLinearWeightsFromLD",
+  "file": "DGP.lean",
+  "source": "sigmaTagSource^-1 * sigmaTagCausal * betaCausal",
+  "note": "error bar inflated by sqrt(2 log 12) for worst-of-12 selection",
+  "regime": "least-squares weights from an explicit regression on standardised dosages with 40 causal and 12 tag variants; the first cell is the WORST of the twelve coordinates, which is why the selection correction applies",
+  "span": 1.258077837957981,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "worst of 12 coordinates",
+   "lean": -0.5190463330279168,
+   "truth": -0.5023748109646451,
+   "sem": 0.03968497170821112,
+   "sems_off": 0.18844262247813534,
+   "rel_err": 0.03318542589995616
+  },
+  "cells": [
+   {
+    "design": "worst of 12 coordinates",
+    "lean": -0.5190463330279168,
+    "truth": -0.5023748109646451,
+    "sem": 0.03968497170821112,
+    "sems_off": 0.18844262247813534,
+    "rel_err": 0.03318542589995616
+   },
+   {
+    "design": "coordinate 0",
+    "lean": 2.0112007181043787,
+    "truth": 2.0081344301491493,
+    "sem": 0.036628290633930444,
+    "sems_off": 0.037551409981993744,
+    "rel_err": 0.0015269336102173752
+   },
+   {
+    "design": "coordinate 1",
+    "lean": -0.5190463330279168,
+    "truth": -0.5023748109646451,
+    "sem": 0.03968497170821112,
+    "sems_off": 0.18844262247813534,
+    "rel_err": 0.03318542589995616
+   },
+   {
+    "design": "coordinate 2",
+    "lean": 0.8370444448633267,
+    "truth": 0.8352832075970448,
+    "sem": 0.03518810736983937,
+    "sems_off": 0.022451839076012056,
+    "rel_err": 0.0021085510282778477
+   }
+  ]
+ }
+]

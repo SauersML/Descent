@@ -1,0 +1,179 @@
+[
+ {
+  "name": "fstDriftMigration [no deme correction]",
+  "file": "DGP.lean",
+  "source": "1 / (1 + bigM)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "island model with the TOTAL emigration rate held fixed at 4*Ne*m = 2.0 -- the pairwise rate is set to m_total/(n-1) because msprime's migration_rate is per ordered pair -- while the deme count runs 2, 3, 5, 10, 25; F_ST from coalescence times",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
+   "lean": 0.3333333333333333,
+   "truth": 0.18633787600464782,
+   "sem": 0.008324415760593716,
+   "sems_off": 17.658351235234488,
+   "rel_err": 0.7888651544199151
+  },
+  "cells": [
+   {
+    "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.18633787600464782,
+    "sem": 0.008324415760593716,
+    "sems_off": 17.658351235234488,
+    "rel_err": 0.7888651544199151
+   },
+   {
+    "design": "3 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.2233426701267794,
+    "sem": 0.009722044965892573,
+    "sems_off": 11.31353162759783,
+    "rel_err": 0.4924749182237242
+   },
+   {
+    "design": "5 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.28418026031582655,
+    "sem": 0.012655791503285146,
+    "sems_off": 3.8838402959425955,
+    "rel_err": 0.17296441689116623
+   },
+   {
+    "design": "10 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.3160879335295555,
+    "sem": 0.009067447010891025,
+    "sems_off": 1.9019024630708234,
+    "rel_err": 0.05455886787960953
+   },
+   {
+    "design": "25 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.3259824929389194,
+    "sem": 0.011207625428806949,
+    "sems_off": 0.6558784856888648,
+    "rel_err": 0.0225498011507976
+   }
+  ]
+ },
+ {
+  "name": "islandDemeCorrection [linear n/(n-1)]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 / (1 + bigM * n/(n-1))",
+  "note": "",
+  "regime": "island model with the TOTAL emigration rate held fixed at 4*Ne*m = 2.0 -- the pairwise rate is set to m_total/(n-1) because msprime's migration_rate is per ordered pair -- while the deme count runs 2, 3, 5, 10, 25; F_ST from coalescence times",
+  "span": 0.38333333333333325,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "3 demes (4 Ne m_total = 2.0 held fixed)",
+   "lean": 0.25,
+   "truth": 0.2233426701267794,
+   "sem": 0.009722044965892573,
+   "sems_off": 2.7419467783518114,
+   "rel_err": 0.11935618866779321
+  },
+  "cells": [
+   {
+    "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.2,
+    "truth": 0.18633787600464782,
+    "sem": 0.008324415760593716,
+    "sems_off": 1.6412111538236978,
+    "rel_err": 0.07331909265194916
+   },
+   {
+    "design": "3 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.25,
+    "truth": 0.2233426701267794,
+    "sem": 0.009722044965892573,
+    "sems_off": 2.7419467783518114,
+    "rel_err": 0.11935618866779321
+   },
+   {
+    "design": "5 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.2857142857142857,
+    "truth": 0.28418026031582655,
+    "sem": 0.012655791503285146,
+    "sems_off": 0.12121133617450572,
+    "rel_err": 0.005398071620999624
+   },
+   {
+    "design": "10 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3103448275862069,
+    "truth": 0.3160879335295555,
+    "sem": 0.009067447010891025,
+    "sems_off": 0.6333762895388829,
+    "rel_err": 0.018169329905191045
+   },
+   {
+    "design": "25 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.3243243243243243,
+    "truth": 0.3259824929389194,
+    "sem": 0.011207625428806949,
+    "sems_off": 0.14795003858115416,
+    "rel_err": 0.0050866799613861775
+   }
+  ]
+ },
+ {
+  "name": "islandDemeCorrection [squared (n/(n-1))^2, competing]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "1 / (1 + bigM * (n/(n-1))^2)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "island model with the TOTAL emigration rate held fixed at 4*Ne*m = 2.0 -- the pairwise rate is set to m_total/(n-1) because msprime's migration_rate is per ordered pair -- while the deme count runs 2, 3, 5, 10, 25; F_ST from coalescence times",
+  "span": 0.6477623456790124,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
+   "lean": 0.1111111111111111,
+   "truth": 0.18633787600464782,
+   "sem": 0.008324415760593716,
+   "sems_off": 9.0368822337835,
+   "rel_err": 0.40371161519336163
+  },
+  "cells": [
+   {
+    "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.1111111111111111,
+    "truth": 0.18633787600464782,
+    "sem": 0.008324415760593716,
+    "sems_off": 9.0368822337835,
+    "rel_err": 0.40371161519336163
+   },
+   {
+    "design": "3 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.18181818181818182,
+    "truth": 0.2233426701267794,
+    "sem": 0.009722044965892573,
+    "sems_off": 4.271168098304024,
+    "rel_err": 0.18592277187796855
+   },
+   {
+    "design": "5 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.24242424242424243,
+    "truth": 0.28418026031582655,
+    "sem": 0.012655791503285146,
+    "sems_off": 3.299360445432847,
+    "rel_err": 0.14693496953369722
+   },
+   {
+    "design": "10 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.2882562277580071,
+    "truth": 0.3160879335295555,
+    "sem": 0.009067447010891025,
+    "sems_off": 3.0694092546798903,
+    "rel_err": 0.0880505163888075
+   },
+   {
+    "design": "25 demes (4 Ne m_total = 2.0 held fixed)",
+    "lean": 0.31544359255202625,
+    "truth": 0.3259824929389194,
+    "sem": 0.011207625428806949,
+    "sems_off": 0.9403330307421786,
+    "rel_err": 0.03232965148489696
+   }
+  ]
+ }
+]

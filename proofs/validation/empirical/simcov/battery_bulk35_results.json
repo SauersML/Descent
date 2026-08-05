@@ -1,0 +1,155 @@
+[
+ {
+  "name": "signalRetentionMigrationDrift",
+  "file": "PortabilityDrift.lean",
+  "source": "(1 - F) * M/(1+M)",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 2.23 sems",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; 80 causal sites drawn from those segregating in BOTH demes, score weights the deme-0 LD PROJECTION, and the observable is the fraction of the deme-0 score/genetic-value covariance that survives in deme 1, divided by the same estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.8636785705519684,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=1e-04 (4Nm=0.4)",
+   "lean": 0.131325020707785,
+   "truth": 0.5069564222067098,
+   "sem": 0.07555260800740267,
+   "sems_off": 4.971786036322138,
+   "rel_err": 0.7409540249314809
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": 0.131325020707785,
+    "truth": 0.5069564222067098,
+    "sem": 0.07555260800740267,
+    "sems_off": 4.971786036322138,
+    "rel_err": 0.7409540249314809
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.542911695638681,
+    "truth": 0.5233130986229166,
+    "sem": 0.0763686570829358,
+    "sems_off": 0.2566314213759246,
+    "rel_err": 0.037450996482483484
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.83443338296325,
+    "truth": 0.7814746052049723,
+    "sem": 0.09861053520861801,
+    "sems_off": 0.5370498968111211,
+    "rel_err": 0.06776775266342433
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.9633483249077037,
+    "truth": 0.9926945334363942,
+    "sem": 0.1172711281747066,
+    "sems_off": 0.25024239968913337,
+    "rel_err": 0.029562174002412643
+   }
+  ]
+ },
+ {
+  "name": "signalRetention [1 - F alone, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "1 - F",
+  "note": "positive control 'one population split arbitrarily [F_ST = 0]' passed at 2.23 sems",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; 80 causal sites drawn from those segregating in BOTH demes, score weights the deme-0 LD PROJECTION, and the observable is the fraction of the deme-0 score/genetic-value covariance that survives in deme 1, divided by the same estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.5345121921286724,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "m=5e-04 (4Nm=2.0)",
+   "lean": 0.8143675434580215,
+   "truth": 0.5233130986229166,
+   "sem": 0.0763686570829358,
+   "sems_off": 3.8111766783985987,
+   "rel_err": 0.5561764947237252
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": 0.45963757247724746,
+    "truth": 0.5069564222067098,
+    "sem": 0.07555260800740267,
+    "sems_off": 0.6263033266148271,
+    "rel_err": 0.09333908726018313
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.8143675434580215,
+    "truth": 0.5233130986229166,
+    "sem": 0.0763686570829358,
+    "sems_off": 3.8111766783985987,
+    "rel_err": 0.5561764947237252
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.9387375558336563,
+    "truth": 0.7814746052049723,
+    "sem": 0.09861053520861801,
+    "sems_off": 1.5947885314280303,
+    "rel_err": 0.2012387217463524
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.9874320330303963,
+    "truth": 0.9926945334363942,
+    "sem": 0.1172711281747066,
+    "sems_off": 0.04487464636784311,
+    "rel_err": 0.005301228352472991
+   }
+  ]
+ },
+ {
+  "name": "signalRetention [M/(1+M) alone, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "M/(1+M)",
+  "note": "",
+  "regime": "two-deme island model, Ne = 1000, 5 Mb with recombination; 80 causal sites drawn from those segregating in BOTH demes, score weights the deme-0 LD PROJECTION, and the observable is the fraction of the deme-0 score/genetic-value covariance that survives in deme 1, divided by the same estimator's panmictic ceiling to remove its attenuation",
+  "span": 0.7071428571428571,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=1e-04 (4Nm=0.4)",
+   "lean": 0.28571428571428575,
+   "truth": 0.5069564222067098,
+   "sem": 0.07555260800740267,
+   "sems_off": 2.928318986298218,
+   "rel_err": 0.43641253330885565
+  },
+  "cells": [
+   {
+    "design": "m=1e-04 (4Nm=0.4)",
+    "lean": 0.28571428571428575,
+    "truth": 0.5069564222067098,
+    "sem": 0.07555260800740267,
+    "sems_off": 2.928318986298218,
+    "rel_err": 0.43641253330885565
+   },
+   {
+    "design": "m=5e-04 (4Nm=2.0)",
+    "lean": 0.6666666666666666,
+    "truth": 0.5233130986229166,
+    "sem": 0.0763686570829358,
+    "sems_off": 1.8771256889861119,
+    "rel_err": 0.27393460706598166
+   },
+   {
+    "design": "m=2e-03 (4Nm=8.0)",
+    "lean": 0.8888888888888888,
+    "truth": 0.7814746052049723,
+    "sem": 0.09861053520861801,
+    "sems_off": 1.0892779707226372,
+    "rel_err": 0.13745076675363366
+   },
+   {
+    "design": "m=1e-02 (4Nm=40.0)",
+    "lean": 0.975609756097561,
+    "truth": 0.9926945334363942,
+    "sem": 0.1172711281747066,
+    "sems_off": 0.14568613438578812,
+    "rel_err": 0.017210508130523494
+   }
+  ]
+ }
+]

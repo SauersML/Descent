@@ -1,0 +1,96 @@
+[
+ {
+  "name": "demoSteppingStoneFst [saturating: K constant in d]",
+  "file": "DemographicHistory.lean",
+  "source": "d / (d + K)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "K = d(1-F)/F fitted at d=1 and compared at every other separation; the saturating form predicts it is constant",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "K at d=5 (vs d=1)",
+   "lean": 18.71296736956375,
+   "truth": 21.62176837961387,
+   "sem": 0.5649677884573188,
+   "sems_off": 5.148613902383337,
+   "rel_err": 0.13453113357706156
+  },
+  "cells": [
+   {
+    "design": "K at d=2 (vs d=1)",
+    "lean": 18.71296736956375,
+    "truth": 18.713848929260266,
+    "sem": 0.9081282755207615,
+    "sems_off": 0.0009707435835657143,
+    "rel_err": 4.710734279456553e-05
+   },
+   {
+    "design": "K at d=3 (vs d=1)",
+    "lean": 18.71296736956375,
+    "truth": 19.269114976399475,
+    "sem": 0.7560822804595889,
+    "sems_off": 0.7355649262110313,
+    "rel_err": 0.0288621250906898
+   },
+   {
+    "design": "K at d=5 (vs d=1)",
+    "lean": 18.71296736956375,
+    "truth": 21.62176837961387,
+    "sem": 0.5649677884573188,
+    "sems_off": 5.148613902383337,
+    "rel_err": 0.13453113357706156
+   },
+   {
+    "design": "K at d=8 (vs d=1)",
+    "lean": 18.71296736956375,
+    "truth": 20.628137086487342,
+    "sem": 0.6193019014991643,
+    "sems_off": 3.0924654232248914,
+    "rel_err": 0.09284259208157693
+   }
+  ]
+ },
+ {
+  "name": "steppingStoneFst [linear in d]",
+  "file": "PortabilityDrift.lean",
+  "source": "min 1 (fst_neighbor * (1 + alpha * (d - 1)))",
+  "note": "positive control 'the fitted point d=2 reproduces itself' passed at 0.00 sems",
+  "regime": "alpha fitted at d=2 and used to predict d=3, 5 and 8; a form fitted to all points would agree with anything monotone",
+  "span": 0.616752704441388,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "d=8 (alpha from d=2)",
+   "lean": 0.37150814064514004,
+   "truth": 0.27944535740595045,
+   "sem": 0.006045138064128684,
+   "sems_off": 15.229227564789962,
+   "rel_err": 0.3294482473918861
+  },
+  "cells": [
+   {
+    "design": "d=3 (alpha from d=2)",
+    "lean": 0.1423794901802584,
+    "truth": 0.1347157263851465,
+    "sem": 0.004573876138634044,
+    "sems_off": 1.675551231127263,
+    "rel_err": 0.056888412368438036
+   },
+   {
+    "design": "d=5 (alpha from d=2)",
+    "lean": 0.23403095036621102,
+    "truth": 0.18781622350184846,
+    "sem": 0.003985840268578878,
+    "sems_off": 11.59472626855669,
+    "rel_err": 0.24606355086203577
+   },
+   {
+    "design": "d=8 (alpha from d=2)",
+    "lean": 0.37150814064514004,
+    "truth": 0.27944535740595045,
+    "sem": 0.006045138064128684,
+    "sems_off": 15.229227564789962,
+    "rel_err": 0.3294482473918861
+   }
+  ]
+ }
+]

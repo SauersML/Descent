@@ -1,0 +1,225 @@
+[
+ {
+  "name": "ancestrySpecificEffect / globalAncestryAveragedEffect",
+  "file": "HaplotypeTheory.lean",
+  "source": "alpha*beta1 + (1-alpha)*beta2",
+  "note": "",
+  "regime": "pooled least-squares slope in a two-ancestry mixture, measured over two million individuals",
+  "span": 0.6,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.3 b1=1.0 b2=0.2",
+   "lean": 0.43999999999999995,
+   "truth": 0.43970306796124226,
+   "sem": 0.0003488777373775518,
+   "sems_off": 0.851106295832097,
+   "rel_err": 0.0006753012666808693
+  },
+  "cells": [
+   {
+    "design": "alpha=0.3 b1=1.0 b2=0.2",
+    "lean": 0.43999999999999995,
+    "truth": 0.43970306796124226,
+    "sem": 0.0003488777373775518,
+    "sems_off": 0.851106295832097,
+    "rel_err": 0.0006753012666808693
+   },
+   {
+    "design": "alpha=0.5 b1=0.8 b2=-0.4",
+    "lean": 0.2,
+    "truth": 0.19969929841419543,
+    "sem": 0.00045949692795001364,
+    "sems_off": 0.6544147904233598,
+    "rel_err": 0.001505771868967221
+   },
+   {
+    "design": "alpha=0.8 b1=0.5 b2=0.5",
+    "lean": 0.5,
+    "truth": 0.5,
+    "sem": 0.00024505162616885443,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "localAncestryMisspecification",
+  "file": "HaplotypeTheory.lean",
+  "source": "alpha*(b1-bbar)^2 + (1-alpha)*(b2-bbar)^2",
+  "note": "",
+  "regime": "mean squared deviation of the true ancestry-specific effect from the single averaged effect, measured directly",
+  "span": 1.0,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.3 b1=1.0 b2=0.2",
+   "lean": 0.1344,
+   "truth": 0.13432473599999994,
+   "sem": 8.293023463566e-05,
+   "sems_off": 0.9075580254982608,
+   "rel_err": 0.0005603137757147507
+  },
+  "cells": [
+   {
+    "design": "alpha=0.3 b1=1.0 b2=0.2",
+    "lean": 0.1344,
+    "truth": 0.13432473599999994,
+    "sem": 8.293023463566e-05,
+    "sems_off": 0.9075580254982608,
+    "rel_err": 0.0005603137757147507
+   },
+   {
+    "design": "alpha=0.5 b1=0.8 b2=-0.4",
+    "lean": 0.3600000000000001,
+    "truth": 0.3600000000000002,
+    "sem": 1.000000078504623e-12,
+    "sems_off": 0.00011102229374675235,
+    "rel_err": 3.083952846180989e-16
+   },
+   {
+    "design": "alpha=0.8 b1=0.5 b2=0.5",
+    "lean": 0.0,
+    "truth": 0.0,
+    "sem": 1e-12,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "ldTightLinkageDetectionShare",
+  "file": "MetricSpecificPortability.lean",
+  "source": "kappa - sin(pi*kappa)/pi",
+  "note": "",
+  "regime": "reciprocal-symbol mass at rho -> 1 by quadrature; the limit is taken on the integral, not on the closed form",
+  "span": 0.9979581331361337,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "kappa=0.1",
+   "lean": 0.0016368356916534182,
+   "truth": 0.0016368356917025816,
+   "sem": 1.6368356917025815e-10,
+   "sems_off": 0.00030035613593354393,
+   "rel_err": 3.003561359335439e-11
+  },
+  "cells": [
+   {
+    "design": "kappa=0.1",
+    "lean": 0.0016368356916534182,
+    "truth": 0.0016368356917025816,
+    "sem": 1.6368356917025815e-10,
+    "sems_off": 0.00030035613593354393,
+    "rel_err": 3.003561359335439e-11
+   },
+   {
+    "design": "kappa=0.3",
+    "lean": 0.04248189259975804,
+    "truth": 0.042481892599886814,
+    "sem": 4.248189259988681e-09,
+    "sems_off": 3.031220719885099e-05,
+    "rel_err": 3.0312207198850985e-12
+   },
+   {
+    "design": "kappa=0.6",
+    "lean": 0.2972693085437372,
+    "truth": 0.2972693085438886,
+    "sem": 2.972693085438886e-08,
+    "sems_off": 5.094182823670601e-06,
+    "rel_err": 5.0941828236706e-13
+   },
+   {
+    "design": "kappa=0.9",
+    "lean": 0.8016368356916534,
+    "truth": 0.8016368356917027,
+    "sem": 8.016368356917026e-08,
+    "sems_off": 6.149156338458808e-07,
+    "rel_err": 6.149156338458807e-14
+   }
+  ]
+ },
+ {
+  "name": "alleleFreqDivergenceRate",
+  "file": "DGP.lean",
+  "source": "1 / (2*Ne*(1 + theta + bigM))",
+  "note": "",
+  "regime": "per-generation across-replicate frequency variance from a common start, normalised by p(1-p)",
+  "span": 0.4444444444444444,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 mu=1e-03 m=0e+00",
+   "lean": 0.001388888888888889,
+   "truth": 0.002496880102872741,
+   "sem": 2.6319427231444642e-06,
+   "sems_off": 420.9784674417612,
+   "rel_err": 0.44375026766766756
+  },
+  "cells": [
+   {
+    "design": "Ne=200 mu=0e+00 m=0e+00",
+    "lean": 0.0025,
+    "truth": 0.002503386947159722,
+    "sem": 2.6388015392534354e-06,
+    "sems_off": 1.2835171987508252,
+    "rel_err": 0.0013529459213505437
+   },
+   {
+    "design": "Ne=200 mu=1e-03 m=0e+00",
+    "lean": 0.001388888888888889,
+    "truth": 0.002496880102872741,
+    "sem": 2.6319427231444642e-06,
+    "sems_off": 420.9784674417612,
+    "rel_err": 0.44375026766766756
+   },
+   {
+    "design": "Ne=200 mu=0e+00 m=1e-03",
+    "lean": 0.001388888888888889,
+    "truth": 0.002494736394241382,
+    "sem": 2.629683055839512e-06,
+    "sems_off": 420.5250145628129,
+    "rel_err": 0.44327228636465515
+   }
+  ]
+ },
+ {
+  "name": "amInducedLD",
+  "file": "AssortativeMatingPGS.lean",
+  "source": "beta_i*beta_j*r*h2/(1 - r*h2)",
+  "note": "",
+  "regime": "mean off-diagonal correlation between unlinked loci after twelve generations of phenotypic assortative mating",
+  "span": 0.47058823529411764,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=0.5 h2=0.5",
+   "lean": 0.008333333333333333,
+   "truth": 0.00885087676439037,
+   "sem": 0.0001904570789331257,
+   "sems_off": 2.7173756625699306,
+   "rel_err": 0.05847369078047303
+  },
+  "cells": [
+   {
+    "design": "r=0.3 h2=0.5",
+    "lean": 0.004411764705882353,
+    "truth": 0.0046661920875008984,
+    "sem": 0.0001962940626345907,
+    "sems_off": 1.2961542402439976,
+    "rel_err": 0.05452569822405465
+   },
+   {
+    "design": "r=0.5 h2=0.5",
+    "lean": 0.008333333333333333,
+    "truth": 0.00885087676439037,
+    "sem": 0.0001904570789331257,
+    "sems_off": 2.7173756625699306,
+    "rel_err": 0.05847369078047303
+   },
+   {
+    "design": "r=0.3 h2=0.8",
+    "lean": 0.007894736842105263,
+    "truth": 0.008094539730064609,
+    "sem": 0.0001954061575555191,
+    "sems_off": 1.0225004700917744,
+    "rel_err": 0.02468366264449119
+   }
+  ]
+ }
+]

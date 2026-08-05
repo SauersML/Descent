@@ -1,0 +1,303 @@
+[
+ {
+  "name": "pgsDriftVariance_one_pop",
+  "file": "PolygenicAdaptation.lean",
+  "source": "fst * V_A",
+  "note": "",
+  "regime": "variance of ONE population's mean score about the ancestral mean, fst read as the per-branch drift index",
+  "span": 0.8369275134844142,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 t=30 (F=0.072)",
+   "lean": 15.19692631959335,
+   "truth": 30.84202838227579,
+   "sem": 0.6897349425245088,
+   "sems_off": 22.682774350128724,
+   "rel_err": 0.5072656658235009
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 15.19692631959335,
+    "truth": 30.84202838227579,
+    "sem": 0.6897349425245088,
+    "sems_off": 22.682774350128724,
+    "rel_err": 0.5072656658235009
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 45.78085537234562,
+    "truth": 90.55080747860362,
+    "sem": 2.0250307540633288,
+    "sems_off": 22.108282561351118,
+    "rel_err": 0.49441803284677227
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 93.19123442777017,
+    "truth": 182.484118072919,
+    "sem": 4.080979082523398,
+    "sems_off": 21.880260064929374,
+    "rel_err": 0.48931865736101043
+   }
+  ]
+ },
+ {
+  "name": "pgsDiffVariance_two_pop",
+  "file": "PolygenicAdaptation.lean",
+  "source": "2 * fst * V_A",
+  "note": "",
+  "regime": "variance of the difference between two independently drifted populations, same runs",
+  "span": 0.8369275134844142,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 t=100 (F=0.221)",
+   "lean": 91.56171074469124,
+   "truth": 185.13415751932294,
+   "sem": 4.1402431744501,
+   "sems_off": 22.60071276780979,
+   "rel_err": 0.5054304836473263
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 30.3938526391867,
+    "truth": 60.98176520408014,
+    "sem": 1.3637642050239132,
+    "sems_off": 22.429033151194265,
+    "rel_err": 0.5015911307671834
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 91.56171074469124,
+    "truth": 185.13415751932294,
+    "sem": 4.1402431744501,
+    "sems_off": 22.60071276780979,
+    "rel_err": 0.5054304836473263
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 186.38246885554034,
+    "truth": 366.2166645623622,
+    "sem": 8.18987736320862,
+    "sems_off": 21.958106053540057,
+    "rel_err": 0.49105956421106095
+   }
+  ]
+ },
+ {
+  "name": "expectedPGSDiffVariance",
+  "file": "PolygenicAdaptation.lean",
+  "source": "V_A * 2 * fst",
+  "note": "",
+  "regime": "same quantity, same runs",
+  "span": 0.8369275134844142,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "Ne=200 t=100 (F=0.221)",
+   "lean": 91.56171074469124,
+   "truth": 185.13415751932294,
+   "sem": 4.1402431744501,
+   "sems_off": 22.60071276780979,
+   "rel_err": 0.5054304836473263
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 30.3938526391867,
+    "truth": 60.98176520408014,
+    "sem": 1.3637642050239132,
+    "sems_off": 22.429033151194265,
+    "rel_err": 0.5015911307671834
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 91.56171074469124,
+    "truth": 185.13415751932294,
+    "sem": 4.1402431744501,
+    "sems_off": 22.60071276780979,
+    "rel_err": 0.5054304836473263
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 186.38246885554034,
+    "truth": 366.2166645623622,
+    "sem": 8.18987736320862,
+    "sems_off": 21.958106053540057,
+    "rel_err": 0.49105956421106095
+   }
+  ]
+ },
+ {
+  "name": "equilibriumEffectVariance",
+  "file": "SelectionArchitecture.lean",
+  "source": "v_mutation / s",
+  "note": "",
+  "regime": "fixed point of effectVarianceRecurrence, iterated from V = 5.0, far above every equilibrium in the design",
+  "span": 0.8,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "v_mut=0.005 s=0.01",
+   "lean": 0.5,
+   "truth": 0.5000000000000027,
+   "sem": 5.000000000000027e-10,
+   "sems_off": 5.329070518200723e-06,
+   "rel_err": 5.329070518200723e-15
+  },
+  "cells": [
+   {
+    "design": "v_mut=0.010 s=0.05",
+    "lean": 0.19999999999999998,
+    "truth": 0.20000000000000026,
+    "sem": 2.0000000000000027e-10,
+    "sems_off": 1.3877787807814438e-06,
+    "rel_err": 1.3877787807814439e-15
+   },
+   {
+    "design": "v_mut=0.020 s=0.20",
+    "lean": 0.09999999999999999,
+    "truth": 0.10000000000000007,
+    "sem": 1.0000000000000008e-10,
+    "sems_off": 8.326672684688668e-07,
+    "rel_err": 8.326672684688668e-16
+   },
+   {
+    "design": "v_mut=0.005 s=0.01",
+    "lean": 0.5,
+    "truth": 0.5000000000000027,
+    "sem": 5.000000000000027e-10,
+    "sems_off": 5.329070518200723e-06,
+    "rel_err": 5.329070518200723e-15
+   }
+  ]
+ },
+ {
+  "name": "olsEffectEstimationVariance",
+  "file": "GeneticArchitectureDiscovery.lean",
+  "source": "sigma2 / (n * varX)",
+  "note": "",
+  "regime": "observed scatter of a single-SNP regression coefficient over 4000 replicate studies",
+  "span": 0.9732142857142857,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "n=2000 s2=1.0 p=0.3",
+   "lean": 0.0011904761904761906,
+   "truth": 0.0011603077621566323,
+   "sem": 2.594851407703662e-05,
+   "sems_off": 1.162626431324488,
+   "rel_err": 0.026000367577895967
+  },
+  "cells": [
+   {
+    "design": "n=2000 s2=1.0 p=0.3",
+    "lean": 0.0011904761904761906,
+    "truth": 0.0011603077621566323,
+    "sem": 2.594851407703662e-05,
+    "sems_off": 1.162626431324488,
+    "rel_err": 0.026000367577895967
+   },
+   {
+    "design": "n=8000 s2=1.0 p=0.3",
+    "lean": 0.00029761904761904765,
+    "truth": 0.0003023729332255191,
+    "sem": 6.762109649024369e-06,
+    "sems_off": 0.7030181190802366,
+    "rel_err": 0.015721928400667516
+   },
+   {
+    "design": "n=2000 s2=4.0 p=0.1",
+    "lean": 0.01111111111111111,
+    "truth": 0.01100534423832519,
+    "sem": 0.00024611774496796396,
+    "sems_off": 0.42974094695889287,
+    "rel_err": 0.009610501088879696
+   }
+  ]
+ },
+ {
+  "name": "gwasNCP",
+  "file": "SelectionArchitecture.lean",
+  "source": "n * beta^2 * 2 p (1 - p)",
+  "note": "",
+  "regime": "chi-square noncentrality of the Wald statistic; the same body as AncestrySpecificPower.ncp under a second name",
+  "span": 0.5,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "n=4000 p=0.1 b=0.08",
+   "lean": 4.6080000000000005,
+   "truth": 4.482444462993931,
+   "sem": 0.08118481234036751,
+   "sems_off": 1.5465397207506915,
+   "rel_err": 0.02801050588415048
+  },
+  "cells": [
+   {
+    "design": "n=4000 p=0.3 b=0.05",
+    "lean": 4.2,
+    "truth": 4.229477751463924,
+    "sem": 0.08037624020652197,
+    "sems_off": 0.36674708083113394,
+    "rel_err": 0.0069695960579816245
+   },
+   {
+    "design": "n=8000 p=0.3 b=0.05",
+    "lean": 8.4,
+    "truth": 8.458145633975434,
+    "sem": 0.11174712708040921,
+    "sems_off": 0.520332249200412,
+    "rel_err": 0.006874513219761673
+   },
+   {
+    "design": "n=4000 p=0.1 b=0.08",
+    "lean": 4.6080000000000005,
+    "truth": 4.482444462993931,
+    "sem": 0.08118481234036751,
+    "sems_off": 1.5465397207506915,
+    "rel_err": 0.02801050588415048
+   }
+  ]
+ },
+ {
+  "name": "fstDriftFlowStep",
+  "file": "DGP.lean",
+  "source": "F + (1 - F)/(2*Ne) - 2*(mig + mu)*F",
+  "note": "",
+  "regime": "one generation of drift with flow from a fixed source pool",
+  "span": 0.6188539762532473,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500 mig=0.004 mu=0.000",
+   "lean": 0.026976128133012964,
+   "truth": 0.02700244015787212,
+   "sem": 0.00010900976063148849,
+   "sems_off": 0.24137310922189553,
+   "rel_err": 0.0009744313738062712
+  },
+  "cells": [
+   {
+    "design": "Ne=200 mig=0.002 mu=0.000",
+    "lean": 0.07016741316745757,
+    "truth": 0.07018804312063476,
+    "sem": 0.00028175217248253907,
+    "sems_off": 0.07322020978724728,
+    "rel_err": 0.00029392403976453274
+   },
+   {
+    "design": "Ne=200 mig=0.001 mu=0.001",
+    "lean": 0.07077635985240367,
+    "truth": 0.07075963197433877,
+    "sem": 0.0002840385278973551,
+    "sems_off": 0.0588929895839753,
+    "rel_err": 0.00023640425477301853
+   },
+   {
+    "design": "Ne=500 mig=0.004 mu=0.000",
+    "lean": 0.026976128133012964,
+    "truth": 0.02700244015787212,
+    "sem": 0.00010900976063148849,
+    "sems_off": 0.24137310922189553,
+    "rel_err": 0.0009744313738062712
+   }
+  ]
+ }
+]

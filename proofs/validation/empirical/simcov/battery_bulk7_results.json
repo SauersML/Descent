@@ -1,0 +1,174 @@
+[
+ {
+  "name": "gwasHeritability",
+  "file": "AncestrySpecificArchitecture.lean",
+  "source": "h2_true * avg_r2_tag",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "out-of-sample variance explained by TAG variants correlated with the causal ones at r-squared = rho^2, compared against the REALISED effect mass on the same draw",
+  "span": 0.6033559117519013,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "h2r=0.730 rho=0.8",
+   "lean": 0.4670180629223017,
+   "truth": 0.4976121615848427,
+   "sem": 0.004062986285620793,
+   "sems_off": 7.529953711834027,
+   "rel_err": 0.061481814602565237
+  },
+  "cells": [
+   {
+    "design": "h2r=0.495 rho=0.9",
+    "lean": 0.40060956441261897,
+    "truth": 0.4012729730055087,
+    "sem": 0.003276380104777016,
+    "sems_off": 0.20248218206503366,
+    "rel_err": 0.0016532600935488533
+   },
+   {
+    "design": "h2r=0.515 rho=0.6",
+    "lean": 0.18523995376320956,
+    "truth": 0.17883746837915585,
+    "sem": 0.0014602018147335109,
+    "sems_off": 4.384657873625628,
+    "rel_err": 0.03580058162353159
+   },
+   {
+    "design": "h2r=0.730 rho=0.8",
+    "lean": 0.4670180629223017,
+    "truth": 0.4976121615848427,
+    "sem": 0.004062986285620793,
+    "sems_off": 7.529953711834027,
+    "rel_err": 0.061481814602565237
+   }
+  ]
+ },
+ {
+  "name": "selectedDriftFactor",
+  "file": "PhenomeWidePortability.lean",
+  "source": "(1 - 1/(2*Ne) + s_correction)^t",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "realised heterozygosity retention under Wright-Fisher drift with a per-generation restoring term",
+  "span": 0.09532119413008251,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "Ne=200 s=0.0010 t=60",
+   "lean": 0.9138694352425587,
+   "truth": 0.8645933865930625,
+   "sem": 0.005187560319558375,
+   "sems_off": 9.498886878233185,
+   "rel_err": 0.05699332126939911
+  },
+  "cells": [
+   {
+    "design": "Ne=200 s=0.0000 t=60",
+    "lean": 0.8605463393821575,
+    "truth": 0.8604208528333334,
+    "sem": 0.005162525117,
+    "sems_off": 0.02430720354481924,
+    "rel_err": 0.00014584322126891545
+   },
+   {
+    "design": "Ne=200 s=0.0010 t=60",
+    "lean": 0.9138694352425587,
+    "truth": 0.8645933865930625,
+    "sem": 0.005187560319558375,
+    "sems_off": 9.498886878233185,
+    "rel_err": 0.05699332126939911
+   },
+   {
+    "design": "Ne=500 s=0.0005 t=100",
+    "lean": 0.9512175302423237,
+    "truth": 0.9069927373014635,
+    "sem": 0.005441956423808781,
+    "sems_off": 8.126634889499476,
+    "rel_err": 0.048759809336996855
+   }
+  ]
+ },
+ {
+  "name": "fstFromDriftFactor",
+  "file": "PhenomeWidePortability.lean",
+  "source": "1 - driftFactor",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "complement of the same measured retention",
+  "span": 0.6501886752807491,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "Ne=500 s=0.0005 t=100",
+   "lean": 0.048782469757676306,
+   "truth": 0.09300726269853654,
+   "sem": 0.0005580435761912192,
+   "sems_off": 79.24971243770068,
+   "rel_err": 0.4754982746262041
+  },
+  "cells": [
+   {
+    "design": "Ne=200 s=0.0000 t=60",
+    "lean": 0.13945366061784248,
+    "truth": 0.13957914716666664,
+    "sem": 0.0008374748829999999,
+    "sems_off": 0.14983917890724466,
+    "rel_err": 0.000899035073443468
+   },
+   {
+    "design": "Ne=200 s=0.0010 t=60",
+    "lean": 0.0861305647574413,
+    "truth": 0.1354066134069375,
+    "sem": 0.000812439680441625,
+    "sems_off": 60.651947259285485,
+    "rel_err": 0.36391168355571296
+   },
+   {
+    "design": "Ne=500 s=0.0005 t=100",
+    "lean": 0.048782469757676306,
+    "truth": 0.09300726269853654,
+    "sem": 0.0005580435761912192,
+    "sems_off": 79.24971243770068,
+    "rel_err": 0.4754982746262041
+   }
+  ]
+ },
+ {
+  "name": "heritabilityEnrichment",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(h2_cat/M_cat) / (h2_total/M_total)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "per-SNP variance explained recovered by regression in each category separately; nothing on this path is generated from the enrichment formula",
+  "span": 0.6666666666666666,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "mc=100 h2c=0.30 h2rest=0.30",
+   "lean": 5.000000000000001,
+   "truth": 5.619490727818227,
+   "sem": 0.03554077998020585,
+   "sems_off": 17.43042015856845,
+   "rel_err": 0.11023965654957917
+  },
+  "cells": [
+   {
+    "design": "mc=100 h2c=0.30 h2rest=0.30",
+    "lean": 5.000000000000001,
+    "truth": 5.619490727818227,
+    "sem": 0.03554077998020585,
+    "sems_off": 17.43042015856845,
+    "rel_err": 0.11023965654957917
+   },
+   {
+    "design": "mc=100 h2c=0.10 h2rest=0.50",
+    "lean": 1.6666666666666667,
+    "truth": 1.698494403067811,
+    "sem": 0.010742221813484732,
+    "sems_off": 2.9628634516921735,
+    "rel_err": 0.01873879380683107
+   },
+   {
+    "design": "mc=200 h2c=0.40 h2rest=0.20",
+    "lean": 3.333333333333333,
+    "truth": 3.4940670900425905,
+    "sem": 0.022098420603942442,
+    "sems_off": 7.273540475584123,
+    "rel_err": 0.046001909112540325
+   }
+  ]
+ }
+]

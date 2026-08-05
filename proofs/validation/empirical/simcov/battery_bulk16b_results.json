@@ -1,0 +1,270 @@
+[
+ {
+  "name": "mutationSharedRetentionAt",
+  "file": "PortabilityDrift.lean",
+  "source": "exp(-theta * tauAt t)",
+  "note": "",
+  "regime": "theta*tau varied over a factor of eight while Ne is varied over a factor of eight, so the functional form and the cancellation of Ne are tested together; 400000 replicate lineage pairs per cell",
+  "span": 0.8262260565495548,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+   "lean": 0.1353352832366127,
+   "truth": 0.1344775,
+   "sem": 0.0005394286375271292,
+   "sems_off": 1.5901700001412373,
+   "rel_err": 0.006378637590769478
+  },
+  "cells": [
+   {
+    "design": "Ne=250 mu=1.0e-03 t=125 (theta*tau=0.25)",
+    "lean": 0.7788007830714049,
+    "truth": 0.7777875,
+    "sem": 0.0006573319268903459,
+    "sems_off": 1.5415089849636139,
+    "rel_err": 0.0013027762356748
+   },
+   {
+    "design": "Ne=500 mu=1.0e-03 t=250 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6072225,
+    "sem": 0.000772177660085019,
+    "sems_off": 0.8959599883923093,
+    "rel_err": 0.0011393521935807289
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=1000 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6061675,
+    "sem": 0.00077254200847551,
+    "sems_off": 0.4700840972390518,
+    "rel_err": 0.0005991078581967098
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=500 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.135245,
+    "sem": 0.0005407258778137958,
+    "sems_off": 0.16696673918718596,
+    "rel_err": 0.0006675532301578484
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=2000 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1359775,
+    "sem": 0.0005419585304563211,
+    "sems_off": 1.1849924436959445,
+    "rel_err": 0.004722963456360786
+   },
+   {
+    "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1344775,
+    "sem": 0.0005394286375271292,
+    "sems_off": 1.5901700001412373,
+    "rel_err": 0.006378637590769478
+   }
+  ]
+ },
+ {
+  "name": "mutationSharedRetentionAt [one-lineage reading, competing]",
+  "file": "PortabilityDrift.lean",
+  "source": "exp(-theta * tau / 2)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "theta*tau varied over a factor of eight while Ne is varied over a factor of eight, so the functional form and the cancellation of Ne are tested together; 400000 replicate lineage pairs per cell",
+  "span": 0.5831379803214916,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00) [one-lineage]",
+   "lean": 0.36787944117144233,
+   "truth": 0.1344775,
+   "sem": 0.0005394286375271292,
+   "sems_off": 432.6836302970733,
+   "rel_err": 1.7356207631123595
+  },
+  "cells": [
+   {
+    "design": "Ne=250 mu=1.0e-03 t=125 (theta*tau=0.25) [one-lineage]",
+    "lean": 0.8824969025845955,
+    "truth": 0.7777875,
+    "sem": 0.0006573319268903459,
+    "sems_off": 159.29456382857666,
+    "rel_err": 0.1346246919429735
+   },
+   {
+    "design": "Ne=500 mu=1.0e-03 t=250 (theta*tau=0.50) [one-lineage]",
+    "lean": 0.7788007830714049,
+    "truth": 0.6072225,
+    "sem": 0.000772177660085019,
+    "sems_off": 222.20052708144084,
+    "rel_err": 0.28256245951262493
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=1000 (theta*tau=0.50) [one-lineage]",
+    "lean": 0.7788007830714049,
+    "truth": 0.6061675,
+    "sem": 0.00077254200847551,
+    "sems_off": 223.46135378718046,
+    "rel_err": 0.28479468640500344
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=500 (theta*tau=2.00) [one-lineage]",
+    "lean": 0.36787944117144233,
+    "truth": 0.135245,
+    "sem": 0.0005407258778137958,
+    "sems_off": 430.22620280724254,
+    "rel_err": 1.7200964262741123
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=2000 (theta*tau=2.00) [one-lineage]",
+    "lean": 0.36787944117144233,
+    "truth": 0.1359775,
+    "sem": 0.0005419585304563211,
+    "sems_off": 427.89609931258826,
+    "rel_err": 1.7054434827191434
+   },
+   {
+    "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00) [one-lineage]",
+    "lean": 0.36787944117144233,
+    "truth": 0.1344775,
+    "sem": 0.0005394286375271292,
+    "sems_off": 432.6836302970733,
+    "rel_err": 1.7356207631123595
+   }
+  ]
+ },
+ {
+  "name": "mutationLDErosion",
+  "file": "DGP.lean",
+  "source": "exp(-theta * tau)",
+  "note": "",
+  "regime": "theta*tau varied over a factor of eight while Ne is varied over a factor of eight, so the functional form and the cancellation of Ne are tested together; 400000 replicate lineage pairs per cell",
+  "span": 0.8262260565495548,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+   "lean": 0.1353352832366127,
+   "truth": 0.1344775,
+   "sem": 0.0005394286375271292,
+   "sems_off": 1.5901700001412373,
+   "rel_err": 0.006378637590769478
+  },
+  "cells": [
+   {
+    "design": "Ne=250 mu=1.0e-03 t=125 (theta*tau=0.25)",
+    "lean": 0.7788007830714049,
+    "truth": 0.7777875,
+    "sem": 0.0006573319268903459,
+    "sems_off": 1.5415089849636139,
+    "rel_err": 0.0013027762356748
+   },
+   {
+    "design": "Ne=500 mu=1.0e-03 t=250 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6072225,
+    "sem": 0.000772177660085019,
+    "sems_off": 0.8959599883923093,
+    "rel_err": 0.0011393521935807289
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=1000 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6061675,
+    "sem": 0.00077254200847551,
+    "sems_off": 0.4700840972390518,
+    "rel_err": 0.0005991078581967098
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=500 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.135245,
+    "sem": 0.0005407258778137958,
+    "sems_off": 0.16696673918718596,
+    "rel_err": 0.0006675532301578484
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=2000 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1359775,
+    "sem": 0.0005419585304563211,
+    "sems_off": 1.1849924436959445,
+    "rel_err": 0.004722963456360786
+   },
+   {
+    "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1344775,
+    "sem": 0.0005394286375271292,
+    "sems_off": 1.5901700001412373,
+    "rel_err": 0.006378637590769478
+   }
+  ]
+ },
+ {
+  "name": "tauAt",
+  "file": "PortabilityDrift.lean",
+  "source": "t / (2 * Ne)",
+  "note": "",
+  "regime": "theta*tau varied over a factor of eight while Ne is varied over a factor of eight, so the functional form and the cancellation of Ne are tested together; 400000 replicate lineage pairs per cell; tauAt is tested through this composition rather than as an isolated ratio",
+  "span": 0.8262260565495548,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+   "lean": 0.1353352832366127,
+   "truth": 0.1344775,
+   "sem": 0.0005394286375271292,
+   "sems_off": 1.5901700001412373,
+   "rel_err": 0.006378637590769478
+  },
+  "cells": [
+   {
+    "design": "Ne=250 mu=1.0e-03 t=125 (theta*tau=0.25)",
+    "lean": 0.7788007830714049,
+    "truth": 0.7777875,
+    "sem": 0.0006573319268903459,
+    "sems_off": 1.5415089849636139,
+    "rel_err": 0.0013027762356748
+   },
+   {
+    "design": "Ne=500 mu=1.0e-03 t=250 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6072225,
+    "sem": 0.000772177660085019,
+    "sems_off": 0.8959599883923093,
+    "rel_err": 0.0011393521935807289
+   },
+   {
+    "design": "Ne=2000 mu=2.5e-04 t=1000 (theta*tau=0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6061675,
+    "sem": 0.00077254200847551,
+    "sems_off": 0.4700840972390518,
+    "rel_err": 0.0005991078581967098
+   },
+   {
+    "design": "Ne=500 mu=2.0e-03 t=500 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.135245,
+    "sem": 0.0005407258778137958,
+    "sems_off": 0.16696673918718596,
+    "rel_err": 0.0006675532301578484
+   },
+   {
+    "design": "Ne=1000 mu=5.0e-04 t=2000 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1359775,
+    "sem": 0.0005419585304563211,
+    "sems_off": 1.1849924436959445,
+    "rel_err": 0.004722963456360786
+   },
+   {
+    "design": "Ne=250 mu=4.0e-03 t=250 (theta*tau=2.00)",
+    "lean": 0.1353352832366127,
+    "truth": 0.1344775,
+    "sem": 0.0005394286375271292,
+    "sems_off": 1.5901700001412373,
+    "rel_err": 0.006378637590769478
+   }
+  ]
+ }
+]

@@ -1,0 +1,120 @@
+[
+ {
+  "name": "[control] Ewens expected allele count on the same samples",
+  "file": "PortabilityDrift.lean",
+  "source": "sum_i theta/(theta+i-1)",
+  "note": "",
+  "regime": "single-locus INFINITE-ALLELES mutation at coalescent equilibrium, Ne = 1000, 100 sampled chromosomes, 40 independent replicates; heterozygosity is the unbiased 1 - sum p_i^2 over the WHOLE sample, never conditioned on the locus being polymorphic; an independent classical result sharing no algebra with the body under test",
+  "span": 0.938527647856863,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "theta=4*Ne*mu=10.0",
+   "lean": 24.441754351848147,
+   "truth": 25.05,
+   "sem": 0.5534854594712979,
+   "sems_off": 1.0989369959833533,
+   "rel_err": 0.024281263399275613
+  },
+  "cells": [
+   {
+    "design": "theta=4*Ne*mu=0.1",
+    "lean": 1.5024921305128602,
+    "truth": 1.525,
+    "sem": 0.10734260988738765,
+    "sems_off": 0.20968252505461266,
+    "rel_err": 0.014759258680091591
+   },
+   {
+    "design": "theta=4*Ne*mu=0.5",
+    "lean": 3.2843421893016345,
+    "truth": 3.45,
+    "sem": 0.20553245423433678,
+    "sems_off": 0.8059934442737292,
+    "rel_err": 0.04801675672416397
+   },
+   {
+    "design": "theta=4*Ne*mu=1.0",
+    "lean": 5.187377517639621,
+    "truth": 5.375,
+    "sem": 0.32162946510000107,
+    "sems_off": 0.5833497944662619,
+    "rel_err": 0.03490650834611709
+   },
+   {
+    "design": "theta=4*Ne*mu=3.0",
+    "lean": 11.121247287921772,
+    "truth": 11.4,
+    "sem": 0.3540969011225817,
+    "sems_off": 0.7872215520511695,
+    "rel_err": 0.02445199228756388
+   },
+   {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 24.441754351848147,
+    "truth": 25.05,
+    "sem": 0.5534854594712979,
+    "sems_off": 1.0989369959833533,
+    "rel_err": 0.024281263399275613
+   }
+  ]
+ },
+ {
+  "name": "hetMutationFloor",
+  "file": "PortabilityDrift.lean",
+  "source": "4 * Ne * mu / (1 + 4 * Ne * mu)",
+  "note": "",
+  "regime": "single-locus INFINITE-ALLELES mutation at coalescent equilibrium, Ne = 1000, 100 sampled chromosomes, 40 independent replicates; heterozygosity is the unbiased 1 - sum p_i^2 over the WHOLE sample, never conditioned on the locus being polymorphic",
+  "span": 0.8999999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "theta=4*Ne*mu=10.0",
+   "lean": 0.9090909090909091,
+   "truth": 0.9182424242424243,
+   "sem": 0.004211435768374095,
+   "sems_off": 2.173015488028768,
+   "rel_err": 0.009966338855521187
+  },
+  "cells": [
+   {
+    "design": "theta=4*Ne*mu=0.1",
+    "lean": 0.09090909090909091,
+    "truth": 0.11942929292929294,
+    "sem": 0.029583991795197755,
+    "sems_off": 0.9640417093690377,
+    "rel_err": 0.23880407662705633
+   },
+   {
+    "design": "theta=4*Ne*mu=0.5",
+    "lean": 0.3333333333333333,
+    "truth": 0.3740303030303031,
+    "sem": 0.03420681339796878,
+    "sems_off": 1.1897328530282332,
+    "rel_err": 0.10880661103459473
+   },
+   {
+    "design": "theta=4*Ne*mu=1.0",
+    "lean": 0.5,
+    "truth": 0.4999444444444445,
+    "sem": 0.033881817743240394,
+    "sems_off": 0.0016396863939379125,
+    "rel_err": 0.0001111234581618577
+   },
+   {
+    "design": "theta=4*Ne*mu=3.0",
+    "lean": 0.75,
+    "truth": 0.7635454545454545,
+    "sem": 0.017816597133033858,
+    "sems_off": 0.7602716974690874,
+    "rel_err": 0.01774020716751992
+   },
+   {
+    "design": "theta=4*Ne*mu=10.0",
+    "lean": 0.9090909090909091,
+    "truth": 0.9182424242424243,
+    "sem": 0.004211435768374095,
+    "sems_off": 2.173015488028768,
+    "rel_err": 0.009966338855521187
+   }
+  ]
+ }
+]

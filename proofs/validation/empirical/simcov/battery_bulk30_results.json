@@ -1,0 +1,257 @@
+[
+ {
+  "name": "admixtureLD",
+  "file": "LDDecayTheory.lean",
+  "source": "alpha*(1-alpha)*dp1*dp2",
+  "note": "",
+  "regime": "one-pulse admixture, generation 0, two UNLINKED loci; ancestry is assigned per individual and alleles drawn independently from that ancestry's frequencies, then D is measured as E[l1*l2] - E[l1]*E[l2] over 6e6 individuals. alpha is swept across 1/2 and one cell carries opposite-sign frequency contrasts",
+  "span": 1.5688888888888886,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+   "lean": 0.02729999999999999,
+   "truth": 0.027400620501166706,
+   "sem": 0.0001387465108715702,
+   "sems_off": 0.7252110379903799,
+   "rel_err": 0.0036721979037821636
+  },
+  "cells": [
+   {
+    "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+    "lean": 0.09000000000000001,
+    "truth": 0.09006947205333332,
+    "sem": 0.00013186860450856367,
+    "sems_off": 0.5268278495265292,
+    "rel_err": 0.0007713163156121767
+   },
+   {
+    "design": "alpha=0.20 dp1=+0.60 dp2=+0.60",
+    "lean": 0.05760000000000001,
+    "truth": 0.0575769145068889,
+    "sem": 0.00011266889738606785,
+    "sems_off": 0.204896769620541,
+    "rel_err": 0.0004009505078350701
+   },
+   {
+    "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+    "lean": -0.05119999999999999,
+    "truth": -0.051196091928888854,
+    "sem": 0.00012587439446212298,
+    "sems_off": 0.03104738757897825,
+    "rel_err": 7.633534052878527e-05
+   },
+   {
+    "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+    "lean": 0.02729999999999999,
+    "truth": 0.027400620501166706,
+    "sem": 0.0001387465108715702,
+    "sems_off": 0.7252110379903799,
+    "rel_err": 0.0036721979037821636
+   }
+  ]
+ },
+ {
+  "name": "admixtureLD [one contrast dropped, competing]",
+  "file": "LDDecayTheory.lean",
+  "source": "alpha*(1-alpha)*dp1",
+  "note": "positive control 'alpha=0.50 [no contrast at locus 2: D = 0]' passed at 0.41 sems",
+  "regime": "one-pulse admixture, generation 0, two UNLINKED loci; ancestry is assigned per individual and alleles drawn independently from that ancestry's frequencies, then D is measured as E[l1*l2] - E[l1]*E[l2] over 6e6 individuals. alpha is swept across 1/2 and one cell carries opposite-sign frequency contrasts",
+  "span": 0.6966666666666668,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+   "lean": 0.12799999999999997,
+   "truth": -0.051196091928888854,
+   "sem": 0.00012587439446212298,
+   "sems_off": 1423.610359315857,
+   "rel_err": 3.500190838351322
+  },
+  "cells": [
+   {
+    "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+    "lean": 0.15000000000000002,
+    "truth": 0.09006947205333332,
+    "sem": 0.00013186860450856367,
+    "sems_off": 454.47154134989546,
+    "rel_err": 0.6653811394739798
+   },
+   {
+    "design": "alpha=0.20 dp1=+0.60 dp2=+0.60",
+    "lean": 0.09600000000000003,
+    "truth": 0.0575769145068889,
+    "sem": 0.00011266889738606785,
+    "sems_off": 341.0265511115436,
+    "rel_err": 0.6673349175130586
+   },
+   {
+    "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+    "lean": 0.12799999999999997,
+    "truth": -0.051196091928888854,
+    "sem": 0.00012587439446212298,
+    "sems_off": 1423.610359315857,
+    "rel_err": 3.500190838351322
+   },
+   {
+    "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+    "lean": 0.045499999999999985,
+    "truth": 0.027400620501166706,
+    "sem": 0.0001387465108715702,
+    "sems_off": 130.44925876072554,
+    "rel_err": 0.6605463368270297
+   }
+  ]
+ },
+ {
+  "name": "admixtureLD [mixing weight linear, competing]",
+  "file": "LDDecayTheory.lean",
+  "source": "alpha*dp1*dp2",
+  "note": "positive control 'alpha=0.50 [no contrast at locus 2: D = 0]' passed at 0.41 sems",
+  "regime": "one-pulse admixture, generation 0, two UNLINKED loci; ancestry is assigned per individual and alleles drawn independently from that ancestry's frequencies, then D is measured as E[l1*l2] - E[l1]*E[l2] over 6e6 individuals. alpha is swept across 1/2 and one cell carries opposite-sign frequency contrasts",
+  "span": 2.422222222222222,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+   "lean": -0.256,
+   "truth": -0.051196091928888854,
+   "sem": 0.00012587439446212298,
+   "sems_off": 1627.049797905792,
+   "rel_err": 4.000381676702645
+  },
+  "cells": [
+   {
+    "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+    "lean": 0.18000000000000002,
+    "truth": 0.09006947205333332,
+    "sem": 0.00013186860450856367,
+    "sems_off": 681.9707259496064,
+    "rel_err": 0.9984573673687757
+   },
+   {
+    "design": "alpha=0.20 dp1=+0.60 dp2=+0.60",
+    "lean": 0.07200000000000001,
+    "truth": 0.0575769145068889,
+    "sem": 0.00011266889738606785,
+    "sems_off": 128.0130171478416,
+    "rel_err": 0.2505011881347937
+   },
+   {
+    "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+    "lean": -0.256,
+    "truth": -0.051196091928888854,
+    "sem": 0.00012587439446212298,
+    "sems_off": 1627.049797905792,
+    "rel_err": 4.000381676702645
+   },
+   {
+    "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+    "lean": 0.04199999999999999,
+    "truth": 0.027400620501166706,
+    "sem": 0.0001387465108715702,
+    "sems_off": 105.22339918404941,
+    "rel_err": 0.5328120032249506
+   }
+  ]
+ },
+ {
+  "name": "admixtureLD [mixing weight squared, competing]",
+  "file": "LDDecayTheory.lean",
+  "source": "(alpha*(1-alpha))^2*dp1*dp2",
+  "note": "positive control 'alpha=0.50 [no contrast at locus 2: D = 0]' passed at 0.41 sems",
+  "regime": "one-pulse admixture, generation 0, two UNLINKED loci; ancestry is assigned per individual and alleles drawn independently from that ancestry's frequencies, then D is measured as E[l1*l2] - E[l1]*E[l2] over 6e6 individuals. alpha is swept across 1/2 and one cell carries opposite-sign frequency contrasts",
+  "span": 1.3640888888888887,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+   "lean": 0.022500000000000003,
+   "truth": 0.09006947205333332,
+   "sem": 0.00013186860450856367,
+   "sems_off": 512.3999931988761,
+   "rel_err": 0.7501928290789031
+  },
+  "cells": [
+   {
+    "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+    "lean": 0.022500000000000003,
+    "truth": 0.09006947205333332,
+    "sem": 0.00013186860450856367,
+    "sems_off": 512.3999931988761,
+    "rel_err": 0.7501928290789031
+   },
+   {
+    "design": "alpha=0.20 dp1=+0.60 dp2=+0.60",
+    "lean": 0.009216000000000005,
+    "truth": 0.0575769145068889,
+    "sem": 0.00011266889738606785,
+    "sems_off": 429.2303877012024,
+    "rel_err": 0.8399358479187464
+   },
+   {
+    "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+    "lean": -0.008191999999999998,
+    "truth": -0.051196091928888854,
+    "sem": 0.00012587439446212298,
+    "sems_off": 341.6428902212457,
+    "rel_err": 0.8399877863455154
+   },
+   {
+    "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+    "lean": 0.0062107499999999975,
+    "truth": 0.027400620501166706,
+    "sem": 0.0001387465108715702,
+    "sems_off": 152.72362791725243,
+    "rel_err": 0.7733354250231105
+   }
+  ]
+ },
+ {
+  "name": "admixedAlleleFreq",
+  "file": "DemographicHistory.lean",
+  "source": "alpha*p_A + (1-alpha)*p_B",
+  "note": "",
+  "regime": "one-pulse admixture, generation 0, two UNLINKED loci; ancestry is assigned per individual and alleles drawn independently from that ancestry's frequencies, then D is measured as E[l1*l2] - E[l1]*E[l2] over 6e6 individuals. alpha is swept across 1/2 and one cell carries opposite-sign frequency contrasts",
+  "span": 0.5675675675675675,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+   "lean": 0.7400000000000001,
+   "truth": 0.7401626666666666,
+   "sem": 0.00017903532870151427,
+   "sems_off": 0.9085730053744273,
+   "rel_err": 0.0002197715096859789
+  },
+  "cells": [
+   {
+    "design": "alpha=0.50 dp1=+0.60 dp2=+0.60",
+    "lean": 0.5,
+    "truth": 0.499953,
+    "sem": 0.00020412414433011104,
+    "sems_off": 0.23025203683896653,
+    "rel_err": 9.400883683070059e-05
+   },
+   {
+    "design": "alpha=0.20 dp1=+0.60 dp2=+0.60",
+    "lean": 0.32000000000000006,
+    "truth": 0.32005283333333334,
+    "sem": 0.00019044641293928277,
+    "sems_off": 0.2774183693873187,
+    "rel_err": 0.00016507691178054386
+   },
+   {
+    "design": "alpha=0.80 dp1=+0.80 dp2=-0.40",
+    "lean": 0.7400000000000001,
+    "truth": 0.7401626666666666,
+    "sem": 0.00017903532870151427,
+    "sems_off": 0.9085730053744273,
+    "rel_err": 0.0002197715096859789
+   },
+   {
+    "design": "alpha=0.35 dp1=+0.20 dp2=+0.60",
+    "lean": 0.47,
+    "truth": 0.4699948333333333,
+    "sem": 0.00020375626369648355,
+    "sems_off": 0.025357093681122378,
+    "rel_err": 1.0993028646769964e-05
+   }
+  ]
+ }
+]

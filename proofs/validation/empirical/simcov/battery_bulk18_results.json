@@ -1,0 +1,569 @@
+[
+ {
+  "name": "fstDriftMigration",
+  "file": "DGP.lean",
+  "source": "1 / (1 + bigM)",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "island model with 4*Ne*m held FIXED at 2.0 while the deme count runs 2, 4, 10, 40; F_ST read as 1 - E[T_within]/E[T_between] from coalescence times, so no estimator convention and no mutation model enters",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "40 demes (4 Ne m = 2.0 held fixed)",
+   "lean": 0.3333333333333333,
+   "truth": 0.01179439010449935,
+   "sem": 0.0006441936175076297,
+   "sems_off": 499.1340095433742,
+   "rel_err": 27.262023757054855
+  },
+  "cells": [
+   {
+    "design": "2 demes (4 Ne m = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.19716421838735534,
+    "sem": 0.009840478708845678,
+    "sems_off": 13.837651497947407,
+    "rel_err": 0.6906380684067919
+   },
+   {
+    "design": "4 demes (4 Ne m = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.11007267642484088,
+    "sem": 0.005264870420795108,
+    "sems_off": 42.40572683928949,
+    "rel_err": 2.0283022468426837
+   },
+   {
+    "design": "10 demes (4 Ne m = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.04873661012591365,
+    "sem": 0.0021697957373058617,
+    "sems_off": 131.16291009069394,
+    "rel_err": 5.839485398597661
+   },
+   {
+    "design": "40 demes (4 Ne m = 2.0 held fixed)",
+    "lean": 0.3333333333333333,
+    "truth": 0.01179439010449935,
+    "sem": 0.0006441936175076297,
+    "sems_off": 499.1340095433742,
+    "rel_err": 27.262023757054855
+   }
+  ]
+ },
+ {
+  "name": "fstDriftMigration [CANDIDATE: with islandDemeCorrection n/(n-1)]",
+  "file": "DGP.lean",
+  "source": "1 / (1 + bigM * n/(n-1))",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "island model with 4*Ne*m held FIXED at 2.0 while the deme count runs 2, 4, 10, 40; F_ST read as 1 - E[T_within]/E[T_between] from coalescence times, so no estimator convention and no mutation model enters",
+  "span": 0.3897435897435897,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "40 demes",
+   "lean": 0.3277310924369748,
+   "truth": 0.01179439010449935,
+   "sem": 0.0006441936175076297,
+   "sems_off": 490.4374923098855,
+   "rel_err": 26.787031761137968
+  },
+  "cells": [
+   {
+    "design": "2 demes",
+    "lean": 0.2,
+    "truth": 0.19716421838735534,
+    "sem": 0.009840478708845678,
+    "sems_off": 0.28817516876445876,
+    "rel_err": 0.01438284104407523
+   },
+   {
+    "design": "4 demes",
+    "lean": 0.27272727272727276,
+    "truth": 0.11007267642484088,
+    "sem": 0.005264870420795108,
+    "sems_off": 30.89432090483769,
+    "rel_err": 1.4777018383258325
+   },
+   {
+    "design": "10 demes",
+    "lean": 0.3103448275862069,
+    "truth": 0.04873661012591365,
+    "sem": 0.0021697957373058617,
+    "sems_off": 120.56813135098169,
+    "rel_err": 5.367796750418513
+   },
+   {
+    "design": "40 demes",
+    "lean": 0.3277310924369748,
+    "truth": 0.01179439010449935,
+    "sem": 0.0006441936175076297,
+    "sems_off": 490.4374923098855,
+    "rel_err": 26.787031761137968
+   }
+  ]
+ },
+ {
+  "name": "ldBreakageRate",
+  "file": "DGP.lean",
+  "source": "2 * r",
+  "note": "",
+  "regime": "probability that NEITHER lineage of a sampled pair has recombined between the two loci in t generations, 400000 replicate pairs per cell; 2 r t is varied over a factor of three",
+  "span": 0.6321205588285578,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "r=2.0e-03 t=250 (2 r t = 1.00)",
+   "lean": 0.36787944117144233,
+   "truth": 0.36648,
+   "sem": 0.0007618602391515127,
+   "sems_off": 1.8368738772887345,
+   "rel_err": 0.0038186017557366343
+  },
+  "cells": [
+   {
+    "design": "r=1.0e-03 t=250 (2 r t = 0.50)",
+    "lean": 0.6065306597126334,
+    "truth": 0.6066,
+    "sem": 0.0007723930993995222,
+    "sems_off": 0.08977331286427946,
+    "rel_err": 0.00011430973848764227
+   },
+   {
+    "design": "r=5.0e-04 t=1000 (2 r t = 1.00)",
+    "lean": 0.36787944117144233,
+    "truth": 0.3673175,
+    "sem": 0.0007622259412302727,
+    "sems_off": 0.7372370068320063,
+    "rel_err": 0.0015298513450688164
+   },
+   {
+    "design": "r=2.0e-03 t=250 (2 r t = 1.00)",
+    "lean": 0.36787944117144233,
+    "truth": 0.36648,
+    "sem": 0.0007618602391515127,
+    "sems_off": 1.8368738772887345,
+    "rel_err": 0.0038186017557366343
+   },
+   {
+    "design": "r=1.0e-03 t=750 (2 r t = 1.50)",
+    "lean": 0.22313016014842982,
+    "truth": 0.22293,
+    "sem": 0.0006580885485631854,
+    "sems_off": 0.30415382377772937,
+    "rel_err": 0.000897860980710666
+   }
+  ]
+ },
+ {
+  "name": "ldBreakageRate [one-lineage reading r, competing]",
+  "file": "DGP.lean",
+  "source": "r",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "probability that NEITHER lineage of a sampled pair has recombined between the two loci in t generations, 400000 replicate pairs per cell; 2 r t is varied over a factor of three",
+  "span": 0.39346934028736663,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "r=1.0e-03 t=750 (2 r t = 1.50) [one-lineage]",
+   "lean": 0.4723665527410147,
+   "truth": 0.22293,
+   "sem": 0.0006580885485631854,
+   "sems_off": 379.03189971260446,
+   "rel_err": 1.118900788323755
+  },
+  "cells": [
+   {
+    "design": "r=1.0e-03 t=250 (2 r t = 0.50) [one-lineage]",
+    "lean": 0.7788007830714049,
+    "truth": 0.6066,
+    "sem": 0.0007723930993995222,
+    "sems_off": 222.94448669372898,
+    "rel_err": 0.28387864007814845
+   },
+   {
+    "design": "r=5.0e-04 t=1000 (2 r t = 1.00) [one-lineage]",
+    "lean": 0.6065306597126334,
+    "truth": 0.3673175,
+    "sem": 0.0007622259412302727,
+    "sems_off": 313.8349756589638,
+    "rel_err": 0.6512435691537523
+   },
+   {
+    "design": "r=2.0e-03 t=250 (2 r t = 1.00) [one-lineage]",
+    "lean": 0.6065306597126334,
+    "truth": 0.36648,
+    "sem": 0.0007618602391515127,
+    "sems_off": 315.08490321004155,
+    "rel_err": 0.655017080639144
+   },
+   {
+    "design": "r=1.0e-03 t=750 (2 r t = 1.50) [one-lineage]",
+    "lean": 0.4723665527410147,
+    "truth": 0.22293,
+    "sem": 0.0006580885485631854,
+    "sems_off": 379.03189971260446,
+    "rel_err": 1.118900788323755
+   }
+  ]
+ },
+ {
+  "name": "spikeAndSlabVariance",
+  "file": "PolygenicArchitecture.lean",
+  "source": "pi * sigma_sq_large + (1 - pi) * sigma_sq_small",
+  "note": "",
+  "regime": "sample variance of 4e6 draws from the two-component mixture this describes; the sem is inflated threefold over the normal formula because a spike-and-slab mixture is heavy-tailed and the normal sem understates it",
+  "span": 0.9523999999999999,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "pi=0.05 large=1.00 small=0.01",
+   "lean": 0.059500000000000004,
+   "truth": 0.05912151618503321,
+   "sem": 0.00012541569070236393,
+   "sems_off": 3.0178346333475194,
+   "rel_err": 0.006401794801443348
+  },
+  "cells": [
+   {
+    "design": "pi=0.05 large=1.00 small=0.01",
+    "lean": 0.059500000000000004,
+    "truth": 0.05912151618503321,
+    "sem": 0.00012541569070236393,
+    "sems_off": 3.0178346333475194,
+    "rel_err": 0.006401794801443348
+   },
+   {
+    "design": "pi=0.20 large=4.00 small=0.05",
+    "lean": 0.8400000000000001,
+    "truth": 0.8400285097106128,
+    "sem": 0.0017819697895654493,
+    "sems_off": 0.015998986503411812,
+    "rel_err": 3.3938979788396364e-05
+   },
+   {
+    "design": "pi=0.50 large=2.00 small=0.50",
+    "lean": 1.25,
+    "truth": 1.249817972608574,
+    "sem": 0.002651264622449135,
+    "sems_off": 0.068656817537048,
+    "rel_err": 0.00014564312197079375
+   }
+  ]
+ },
+ {
+  "name": "effectGeneticCorrelation",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum(bs*bt) / sqrt(sum bs^2 * sum bt^2)",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "against the uncentred correlation computed through an independent code path (numpy norms); this is an algebraic identity, so it is reported as a SELF-TEST and carries no empirical weight beyond catching a transcription error",
+  "span": 0.9923080401706036,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "rho=0.0 (m=20000)",
+   "lean": 0.006920771126280234,
+   "truth": 0.006920771126280237,
+   "sem": 2.1000000000000002e-11
+  },
+  "cells": [
+   {
+    "design": "rho=0.0 (m=20000)",
+    "lean": 0.006920771126280234,
+    "truth": 0.006920771126280237,
+    "sem": 2.1000000000000002e-11
+   },
+   {
+    "design": "rho=0.4 (m=20000)",
+    "lean": 0.3953100230681614,
+    "truth": 0.39531002306816143,
+    "sem": 3.9631002306816146e-10
+   },
+   {
+    "design": "rho=0.9 (m=20000)",
+    "lean": 0.8997409346615468,
+    "truth": 0.8997409346615474,
+    "sem": 9.007409346615474e-10
+   }
+  ]
+ },
+ {
+  "name": "additiveGeneticVariance",
+  "file": "TransferLearningPGS.lean",
+  "source": "sum beta_i^2",
+  "note": "",
+  "regime": "against the realised variance of the genetic value across 40000 individuals with STANDARDIZED genotypes, which is the condition under which sum beta^2 is the additive variance; on a dosage scale it would be off by the allele-frequency factor and this design would show it",
+  "span": 0.7397855704281014,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=2000 h2=0.5",
+   "lean": 0.4843827243200923,
+   "truth": 0.4815573877744507,
+   "sem": 0.0034051675091178353,
+   "sems_off": 0.829720281917511,
+   "rel_err": 0.0058670817172986976
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2",
+    "lean": 0.20067496872052856,
+    "truth": 0.20122143213306673,
+    "sem": 0.0014228681777769866,
+    "sems_off": 0.38405765275595144,
+    "rel_err": 0.00271573165316105
+   },
+   {
+    "design": "m=2000 h2=0.5",
+    "lean": 0.4843827243200923,
+    "truth": 0.4815573877744507,
+    "sem": 0.0034051675091178353,
+    "sems_off": 0.829720281917511,
+    "rel_err": 0.0058670817172986976
+   },
+   {
+    "design": "m=800 h2=0.8",
+    "lean": 0.7711907792764472,
+    "truth": 0.7706016422242201,
+    "sem": 0.00544904458158534,
+    "sems_off": 0.10811749535285879,
+    "rel_err": 0.0007645156977950659
+   }
+  ]
+ },
+ {
+  "name": "additiveHeritability",
+  "file": "TransferLearningPGS.lean",
+  "source": "additiveGeneticVariance beta / var_y",
+  "note": "",
+  "regime": "the same runs, as a realised variance ratio",
+  "span": 0.7405707671927619,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=2000 h2=0.5",
+   "lean": 0.4880827100813385,
+   "truth": 0.48523579203729755,
+   "sem": 0.0034311780802340516,
+   "sems_off": 0.8297202819175074,
+   "rel_err": 0.005867081717298672
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2",
+    "lean": 0.19968378274338716,
+    "truth": 0.2002275470306932,
+    "sem": 0.0014158402609713914,
+    "sems_off": 0.38405765275594855,
+    "rel_err": 0.0027157316531610295
+   },
+   {
+    "design": "m=2000 h2=0.5",
+    "lean": 0.4880827100813385,
+    "truth": 0.48523579203729755,
+    "sem": 0.0034311780802340516,
+    "sems_off": 0.8297202819175074,
+    "rel_err": 0.005867081717298672
+   },
+   {
+    "design": "m=800 h2=0.8",
+    "lean": 0.769704248756565,
+    "truth": 0.7691162473120656,
+    "sem": 0.005438541122140032,
+    "sems_off": 0.1081174953528633,
+    "rel_err": 0.0007645156977950979
+   }
+  ]
+ },
+ {
+  "name": "expectedSquaredEffect",
+  "file": "PolygenicArchitecture.lean",
+  "source": "h2 / M",
+  "note": "",
+  "regime": "mean squared effect over 4000 replicate architectures drawn at the stated heritability and polygenicity",
+  "span": 0.75,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "m=800 h2=0.8",
+   "lean": 0.001,
+   "truth": 0.000998551652615641,
+   "sem": 7.920960512009978e-07,
+   "sems_off": 1.8284996903632023,
+   "rel_err": 0.0014504481371244921
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2",
+    "lean": 0.0004,
+    "truth": 0.00039977774343418675,
+    "sem": 4.0728987864471714e-07,
+    "sems_off": 0.5456962656495274,
+    "rel_err": 0.00055595032355737
+   },
+   {
+    "design": "m=2000 h2=0.5",
+    "lean": 0.00025,
+    "truth": 0.0002499593887441449,
+    "sem": 1.248614655576655e-07,
+    "sems_off": 0.32525051402945443,
+    "rel_err": 0.00016247141609339932
+   },
+   {
+    "design": "m=800 h2=0.8",
+    "lean": 0.001,
+    "truth": 0.000998551652615641,
+    "sem": 7.920960512009978e-07,
+    "sems_off": 1.8284996903632023,
+    "rel_err": 0.0014504481371244921
+   }
+  ]
+ },
+ {
+  "name": "expectedSquaredEffect [h2/M^2 variant, competing]",
+  "file": "PolygenicArchitecture.lean",
+  "source": "h2 / M^2",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "carried so the normalisation is chosen by the data",
+  "span": 0.8999999999999999,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "m=2000 h2=0.5 [h2/m^2 variant]",
+   "lean": 1.25e-07,
+   "truth": 0.0002499593887441449,
+   "sem": 1.248614655576655e-07,
+   "sems_off": 2000.89265033304,
+   "rel_err": 0.9994999187642919
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2 [h2/m^2 variant]",
+    "lean": 8.000000000000001e-07,
+    "truth": 0.00039977774343418675,
+    "sem": 4.0728987864471714e-07,
+    "sems_off": 979.5915988921955,
+    "rel_err": 0.9979988880993529
+   },
+   {
+    "design": "m=2000 h2=0.5 [h2/m^2 variant]",
+    "lean": 1.25e-07,
+    "truth": 0.0002499593887441449,
+    "sem": 1.248614655576655e-07,
+    "sems_off": 2000.89265033304,
+    "rel_err": 0.9994999187642919
+   },
+   {
+    "design": "m=800 h2=0.8 [h2/m^2 variant]",
+    "lean": 1.25e-06,
+    "truth": 0.000998551652615641,
+    "sem": 7.920960512009978e-07,
+    "sems_off": 1259.0665628284662,
+    "rel_err": 0.9987481869398287
+   }
+  ]
+ },
+ {
+  "name": "meanAbsoluteEffect",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(sum |beta_j|) / q",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "against the realised mean absolute effect; the divisor is the variant count and a wrong divisor separates immediately",
+  "span": 0.499532615247697,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "m=500 h2=0.2",
+   "lean": 0.015949645949294256,
+   "truth": 0.015949645949294256,
+   "sem": 8.725871365181638e-06
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2",
+    "lean": 0.015949645949294256,
+    "truth": 0.015949645949294256,
+    "sem": 8.725871365181638e-06
+   },
+   {
+    "design": "m=2000 h2=0.5",
+    "lean": 0.012614105967069265,
+    "truth": 0.012614105967069267,
+    "sem": 3.375518414721103e-06
+   },
+   {
+    "design": "m=800 h2=0.8",
+    "lean": 0.025204651394640596,
+    "truth": 0.025204651394640596,
+    "sem": 1.0742702168059758e-05
+   }
+  ]
+ },
+ {
+  "name": "meanAbsoluteEffect [root-mean-square variant, competing]",
+  "file": "PolygenicArchitecture.lean",
+  "source": "sqrt(h2/M)",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
+  "regime": "the RMS effect, which differs from the mean absolute effect by sqrt(2/pi) for Gaussian effects, so this cell shows the design can tell the two apart",
+  "span": 0.5,
+  "verdict": "LEAD (no control)",
+  "worst": {
+   "design": "m=2000 h2=0.5 [rms variant]",
+   "lean": 0.015811388300841896,
+   "truth": 0.012614105967069267,
+   "sem": 3.375518414721103e-06,
+   "sems_off": 947.1974200551944,
+   "rel_err": 0.25346880247554143
+  },
+  "cells": [
+   {
+    "design": "m=500 h2=0.2 [rms variant]",
+    "lean": 0.02,
+    "truth": 0.015949645949294256,
+    "sem": 8.725871365181638e-06,
+    "sems_off": 464.1776025793422,
+    "rel_err": 0.2539463298171183
+   },
+   {
+    "design": "m=2000 h2=0.5 [rms variant]",
+    "lean": 0.015811388300841896,
+    "truth": 0.012614105967069267,
+    "sem": 3.375518414721103e-06,
+    "sems_off": 947.1974200551944,
+    "rel_err": 0.25346880247554143
+   },
+   {
+    "design": "m=800 h2=0.8 [rms variant]",
+    "lean": 0.03162277660168379,
+    "truth": 0.025204651394640596,
+    "sem": 1.0742702168059758e-05,
+    "sems_off": 597.4404862610442,
+    "rel_err": 0.25464050688707074
+   }
+  ]
+ },
+ {
+  "name": "heritabilityEnrichment",
+  "file": "PolygenicArchitecture.lean",
+  "source": "(h2_cat / M_cat) / (h2_total / M_total)",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
+  "regime": "algebraic rearrangement through an independent expression; a SELF-TEST, recorded as one, and it establishes only that the body is the per-variant heritability ratio it claims",
+  "span": 0.91,
+  "verdict": "SELF-TEST",
+  "worst": {
+   "design": "h2c=0.3 Mc=100 h2t=0.6 Mt=1000",
+   "lean": 5.000000000000001,
+   "truth": 5.0,
+   "sem": 5.000999999999999e-12
+  },
+  "cells": [
+   {
+    "design": "h2c=0.3 Mc=100 h2t=0.6 Mt=1000",
+    "lean": 5.000000000000001,
+    "truth": 5.0,
+    "sem": 5.000999999999999e-12
+   },
+   {
+    "design": "h2c=0.1 Mc=50 h2t=0.9 Mt=5000",
+    "lean": 11.11111111111111,
+    "truth": 11.11111111111111,
+    "sem": 1.1112111111111111e-11
+   },
+   {
+    "design": "h2c=0.5 Mc=500 h2t=0.5 Mt=500",
+    "lean": 1.0,
+    "truth": 1.0,
+    "sem": 1.001e-12
+   }
+  ]
+ }
+]

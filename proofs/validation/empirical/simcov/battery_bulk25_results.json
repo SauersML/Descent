@@ -1,0 +1,155 @@
+[
+ {
+  "name": "neiFst / hudsonFst ratio [agree, ratio = 1]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "neiGst / hudsonFst = 1",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "clean two-population split, no migration, 2 Mb with recombination, 16 replicates; both estimators computed from the SAME genotype matrix through separate code paths, and the observable is their ratio across a thirtyfold divergence sweep",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "t=2000 (tau=1.00)",
+   "lean": 1.0,
+   "truth": 0.683319665410173,
+   "sem": 0.021627494839478973,
+   "sems_off": 14.642488043125395,
+   "rel_err": 0.46344390571539434
+  },
+  "cells": [
+   {
+    "design": "t=200 (tau=0.10)",
+    "lean": 1.0,
+    "truth": 0.6211592862155224,
+    "sem": 0.07701351401873387,
+    "sems_off": 4.919145926678829,
+    "rel_err": 0.6098930213095647
+   },
+   {
+    "design": "t=500 (tau=0.25)",
+    "lean": 1.0,
+    "truth": 0.598690228022236,
+    "sem": 0.03609504892708127,
+    "sems_off": 11.118139022016138,
+    "rel_err": 0.6703128816775323
+   },
+   {
+    "design": "t=2000 (tau=1.00)",
+    "lean": 1.0,
+    "truth": 0.683319665410173,
+    "sem": 0.021627494839478973,
+    "sems_off": 14.642488043125395,
+    "rel_err": 0.46344390571539434
+   },
+   {
+    "design": "t=6000 (tau=3.00)",
+    "lean": 1.0,
+    "truth": 0.8109043571657938,
+    "sem": 0.014195573219312498,
+    "sems_off": 13.320747243721677,
+    "rel_err": 0.23319105534852191
+   }
+  ]
+ },
+ {
+  "name": "neiFst / hudsonFst ratio [Nei = half Hudson, competing]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "neiGst / hudsonFst = 1/2",
+  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "regime": "clean two-population split, no migration, 2 Mb with recombination, 16 replicates; both estimators computed from the SAME genotype matrix through separate code paths, and the observable is their ratio across a thirtyfold divergence sweep",
+  "span": 0.0,
+  "verdict": "NO POWER",
+  "worst": {
+   "design": "t=6000 (tau=3.00)",
+   "lean": 0.5,
+   "truth": 0.8109043571657938,
+   "sem": 0.014195573219312498,
+   "sems_off": 21.901500725791127,
+   "rel_err": 0.38340447232573904
+  },
+  "cells": [
+   {
+    "design": "t=200 (tau=0.10)",
+    "lean": 0.5,
+    "truth": 0.6211592862155224,
+    "sem": 0.07701351401873387,
+    "sems_off": 1.5732211126744573,
+    "rel_err": 0.19505348934521766
+   },
+   {
+    "design": "t=500 (tau=0.25)",
+    "lean": 0.5,
+    "truth": 0.598690228022236,
+    "sem": 0.03609504892708127,
+    "sems_off": 2.7341763193508535,
+    "rel_err": 0.16484355916123383
+   },
+   {
+    "design": "t=2000 (tau=1.00)",
+    "lean": 0.5,
+    "truth": 0.683319665410173,
+    "sem": 0.021627494839478973,
+    "sems_off": 8.47623207268278,
+    "rel_err": 0.2682780471423028
+   },
+   {
+    "design": "t=6000 (tau=3.00)",
+    "lean": 0.5,
+    "truth": 0.8109043571657938,
+    "sem": 0.014195573219312498,
+    "sems_off": 21.901500725791127,
+    "rel_err": 0.38340447232573904
+   }
+  ]
+ },
+ {
+  "name": "neiFst [read against the split law tau/(1+tau)]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "(H_T - H_S) / H_T",
+  "note": "positive control 't=2000 (tau=1.00) [Hudson vs tau/(1+tau), VALIDATED]' passed at 0.03 sems",
+  "regime": "clean two-population split, no migration, 2 Mb with recombination, 16 replicates; both estimators computed from the SAME genotype matrix through separate code paths, and the observable is their ratio across a thirtyfold divergence sweep",
+  "span": 0.8787878787878788,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "t=2000 (tau=1.00)",
+   "lean": 0.5,
+   "truth": 0.341847076420766,
+   "sem": 0.0085061940745303,
+   "sems_off": 18.592677546916537,
+   "rel_err": 0.4626423172464691
+  },
+  "cells": [
+   {
+    "design": "t=200 (tau=0.10)",
+    "lean": 0.09090909090909091,
+    "truth": 0.054945504291565195,
+    "sem": 0.0045285399658540285,
+    "sems_off": 7.941541178547028,
+    "rel_err": 0.6545319236071979
+   },
+   {
+    "design": "t=500 (tau=0.25)",
+    "lean": 0.2,
+    "truth": 0.11904379136821458,
+    "sem": 0.005130828701212947,
+    "sems_off": 15.778388511128249,
+    "rel_err": 0.6800540179485685
+   },
+   {
+    "design": "t=2000 (tau=1.00)",
+    "lean": 0.5,
+    "truth": 0.341847076420766,
+    "sem": 0.0085061940745303,
+    "sems_off": 18.592677546916537,
+    "rel_err": 0.4626423172464691
+   },
+   {
+    "design": "t=6000 (tau=3.00)",
+    "lean": 0.75,
+    "truth": 0.6118183688513259,
+    "sem": 0.009052754920835007,
+    "sems_off": 15.264041980264778,
+    "rel_err": 0.22585400861387464
+   }
+  ]
+ }
+]
