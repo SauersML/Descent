@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Algebra.Order.Chebyshev
-import Descent.Portability.PortabilityDrift
+import Descent.PopGen.DGP
 import Descent.Portability.TransplantationStability
 import Descent.Core.Ratios
 
@@ -15,12 +15,11 @@ open MeasureTheory Finset
 
 Part of the split of `Descent/Portability/TransferLearningPGS.lean`, which was 3,558 lines.
 
-The parts are a CHAIN: each imports the one before, in the order the original was written.
-That is the conservative choice, deliberately. A monolith's declarations depend on each
-other in whatever order they happen to appear, and cutting it into modules that import only
-what they use means discovering that order first -- worth doing, and not what this does.
-The chain preserves every resolution the single file had, so the split cannot change what
-any proof sees.
+This part is the HEAD of the fan. The split first made the parts a CHAIN -- each importing
+the one before, in the order the original text ran -- which preserved every resolution the
+single file had and charged every part a dependency on everything written above it, used or
+not. This part is what the others were resolved against: it declares the definitions they
+name and carries the imports they share, and it names no sibling itself.
 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
