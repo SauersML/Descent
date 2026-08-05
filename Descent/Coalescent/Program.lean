@@ -196,6 +196,25 @@ batch that re-reading had not, of which the instructive ones were `deriv_pow` ha
 hypotheses in `ComingDownFromInfinity` that were never used -- `2/(2/x) = x` holds at `x = 0`
 too, because division by zero is zero.
 
+## The process, finally
+
+`Coalescent.TrajectoryLaw` builds the jump chain as a measure on INFINITE trajectories, via
+Mathlib's Ionescu-Tulcea theorem.  Until it, every "almost surely" in this subject was
+unavailable to the corpus: `Kernel` had one step, `Trajectory` had finite lists, `Law` had a
+finite path coupled to a clock, and none of them could quantify over time.
+
+`Program` had scoped Ionescu-Tulcea before and concluded it "avoids Kolmogorov's topological
+hypotheses and not the missing simplex measure".  That verdict was right about the PAINTBOX,
+whose kernel needs `𝒫_k` on the simplex, and wrong about the JUMP CHAIN at finite `n`, whose
+kernel is `Kernel.jumpKernel` and needs no simplex at all.  The distinction had not been
+drawn; drawing it is what unblocked this.
+
+What it unblocks, in turn, is the shape of the two remaining process-level gaps: Pólya's
+renewal identity and Schweinsberg's almost-sure equivalence are now blocked on specific
+constructions -- a walk on `ℤ` with its strong Markov property, and the continuous-time
+process built by composing `chainTraj` with a clock -- rather than on the absence of any
+process whatsoever.
+
 ## Beyond Kingman
 
 The two 1982 papers are not the whole of coalescent theory, and the group no longer stops
