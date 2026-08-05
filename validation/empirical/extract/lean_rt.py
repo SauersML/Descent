@@ -36,7 +36,56 @@ def rdiv(a, b):
 
 
 def rinv(a):
+    """Lean `a⁻¹`, at whatever type `a` has.
+
+    Scalars: `x⁻¹ = 0` at `x = 0`, which is Mathlib's junk value and not an
+    error.
+
+    A SQUARE NESTED TABLE IS A MATRIX, and `M⁻¹` is `Matrix.nonsing_inv`, not a
+    reciprocal of each entry and not `1.0 / M`. This used to reach the scalar
+    path and raise "unsupported operand type(s) for /: 'float' and 'VecFn'",
+    which took out the whole cone above `sourceERMWeights` -- twenty-one
+    definitions including `r2FromSourceWeights`, both source-weight Brier
+    variants and the Gaussian AUC, none of which has anything wrong with it.
+
+    A singular matrix inverts to ZERO, matching `Matrix.nonsing_inv_apply_not_
+    isUnit`. That is not a defensive fallback: the corpus states the consequence
+    as `sourceERMWeights_at_singular_covariance_is_junk`, "a rank-deficient
+    design reports predict-nothing rather than not-identified", so returning
+    zero here is what makes that theorem checkable rather than merely stated.
+
+    A flat table is a `Pi` type, whose `Inv` instance IS pointwise.
+    """
+    if isinstance(a, (list, tuple)):
+        n = len(a)
+        if n and all(isinstance(r, (list, tuple)) and len(r) == n for r in a):
+            return _matrix_inv(a)
+        return VecFn(rinv(x) for x in a)
     return 0.0 if a == 0 else 1.0 / a
+
+
+def _matrix_inv(M):
+    """Gauss-Jordan inverse of a square table; the zero matrix if singular."""
+    n = len(M)
+    aug = [[float(x) for x in row] + [1.0 if i == j else 0.0 for j in range(n)]
+           for i, row in enumerate(M)]
+    for c in range(n):
+        piv = max(range(c, n), key=lambda r: abs(aug[r][c]))
+        if abs(aug[piv][c]) < 1e-12:
+            # Singular to working precision. Mathlib's inverse here is 0, and
+            # a caller that goes on to `mulVec` it gets the zero vector, which
+            # is the documented "predict nothing" outcome.
+            return VecFn(VecFn(0.0 for _ in range(n)) for _ in range(n))
+        aug[c], aug[piv] = aug[piv], aug[c]
+        d = aug[c][c]
+        aug[c] = [x / d for x in aug[c]]
+        for r in range(n):
+            if r == c:
+                continue
+            f = aug[r][c]
+            if f:
+                aug[r] = [x - f * y for x, y in zip(aug[r], aug[c])]
+    return VecFn(VecFn(row[n:]) for row in aug)
 
 
 def rlog(x):

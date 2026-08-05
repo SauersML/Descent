@@ -360,7 +360,8 @@ def defined_in(directory: str, table):
 
 
 def qualify(text: str, names: set[str], prefix: str,
-            tokens: set[str] = frozenset()) -> tuple[str, int, set[str]]:
+            tokens: set[str] = frozenset(),
+            forced: bool = False) -> tuple[str, int, set[str]]:
     """Prefix bare uses of `names` with `prefix.`; return (text, hits, held).
 
     `tokens` are namespace segments, prefixed only where they are USED as a
@@ -370,7 +371,7 @@ def qualify(text: str, names: set[str], prefix: str,
     `held` is the subset this file binds locally, which is left alone and
     reported so the file can be qualified by hand.
     """
-    local = bound_locally(text) | namespaces_opened_here(text)
+    local = set() if forced else (bound_locally(text) | namespaces_opened_here(text))
     held = (names | tokens) & local
     movable = names - held
     live_tokens = tokens - held
@@ -477,9 +478,30 @@ def main() -> int:
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--dir")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--force", action="append", default=[], metavar="Dir.name",
+                    help="qualify one name everywhere it is used bare, overriding the "
+                         "per-file local hold; for names the binder heuristics "
+                         "misread, which is a handful and always the same handful")
     args = ap.parse_args()
 
     table = nsmap.load()
+
+    if args.force:
+        want = collections.defaultdict(set)
+        for spec in args.force:
+            directory, _, name = spec.rpartition(".")
+            want[directory].add(name)
+        for directory, names in want.items():
+            for path in files_outside(directory):
+                with open(path, encoding="utf-8", errors="ignore") as fh:
+                    text = fh.read()
+                new, hits, _held = qualify(text, names, directory, forced=True)
+                if hits:
+                    print(f"    {hits:5d}  {nsmap.module_of(path)}")
+                    if args.write:
+                        with open(path, "w", encoding="utf-8") as fh:
+                            fh.write(new)
+        return 0
 
     if args.report:
         report(table)

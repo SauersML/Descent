@@ -175,7 +175,17 @@ to either reached half the call sites.
 ## 1. The standardized genotype and its Mellin drift
 -/
 
-namespace HardyWeinbergModel
+-- `HardyWeinbergModel` is a structure in `Descent.Foundations`, and these are
+-- METHODS ON IT.  A declaration's namespace is relative to the enclosing one, so
+-- writing `namespace HardyWeinbergModel` from inside `Descent.Spectral` would
+-- name them `Descent.Spectral.HardyWeinbergModel.*` -- a different namespace,
+-- invisible to dot notation on the structure they are methods of.  The
+-- directory namespace is therefore closed around the block.
+end Descent.Spectral
+
+namespace Descent.Foundations.HardyWeinbergModel
+
+open Descent.Spectral
 
 /-- The squared standardized genotype `x ^ 2 = (dosage - 2q) ^ 2 / (2 q (1 - q))`.
 This is the multiplicative coordinate: a degree-`m` epistatic monomial has squared
@@ -201,7 +211,9 @@ noncomputable def mellinDrift (h : Foundations.HardyWeinbergModel) : ℝ :=
   ∑ g : Foundations.DiploidGenotype,
     h.genotypeProb g * h.standardizedSquare g * Real.log (h.standardizedSquare g)
 
-end HardyWeinbergModel
+end Descent.Foundations.HardyWeinbergModel
+
+namespace Descent.Spectral
 
 /-- Closed form of the Hardy-Weinberg Mellin drift as a function of the
 alternative-allele frequency.
@@ -934,7 +946,17 @@ established. Whether the triple is what a design observes — and whether it is 
 design observes — is the `Descent.Blindness.JetBarrier` conjecture, which is not proved.
 -/
 
-namespace HardyWeinbergModel
+-- `HardyWeinbergModel` is a structure in `Descent.Foundations`, and these are
+-- METHODS ON IT.  A declaration's namespace is relative to the enclosing one, so
+-- writing `namespace HardyWeinbergModel` from inside `Descent.Spectral` would
+-- name them `Descent.Spectral.HardyWeinbergModel.*` -- a different namespace,
+-- invisible to dot notation on the structure they are methods of.  The
+-- directory namespace is therefore closed around the block.
+end Descent.Spectral
+
+namespace Descent.Foundations.HardyWeinbergModel
+
+open Descent.Spectral
 
 /-- The second Mellin observable: `v(q) = Var(log x^2)` under the size-biased law. -/
 noncomputable def mellinJetVariance (h : Foundations.HardyWeinbergModel) : ℝ :=
@@ -942,7 +964,9 @@ noncomputable def mellinJetVariance (h : Foundations.HardyWeinbergModel) : ℝ :
       h.genotypeProb g * h.standardizedSquare g * (Real.log (h.standardizedSquare g)) ^ 2)
     - h.mellinDrift ^ 2
 
-end HardyWeinbergModel
+end Descent.Foundations.HardyWeinbergModel
+
+namespace Descent.Spectral
 
 /-- Closed form of the Hardy-Weinberg jet variance. The coefficient collapse is the
 same one that produces `hweMellinDrift`; only the logarithm is squared. -/

@@ -91,22 +91,17 @@ exponential at all. -/
 theorem tendsto_pow_of_close {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] (L : 𝔸) (C : ℝ)
     (P B : ℕ → 𝔸)
     (hP : ∀ N, ‖P N‖ ≤ 1) (hB : ∀ N, ‖B N‖ ≤ 1)
-    (hpow : ∀ N : ℕ, 1 ≤ N → B N ^ N = L)
-    (hclose : ∀ N, ‖P N - B N‖ ≤ C / (N : ℝ) ^ 2) :
+    (hpow : ∀ N : ℕ, 1 ≤ N → B N ^ N = L) (hC : 0 ≤ C)
+    (hclose : ∀ᶠ N in atTop, ‖P N - B N‖ ≤ C / (N : ℝ) ^ 2) :
     Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds L) := by
-  have hC : 0 ≤ C := by
-    have h := hclose 1
-    have hnn : (0 : ℝ) ≤ ‖P 1 - B 1‖ := norm_nonneg _
-    have h1 : C / ((1 : ℕ) : ℝ) ^ 2 = C := by norm_num
-    linarith [h1 ▸ h]
   rw [tendsto_iff_norm_sub_tendsto_zero]
-  have hbound : ∀ N : ℕ, 1 ≤ N → ‖P N ^ N - L‖ ≤ C / (N : ℝ) := by
-    intro N hN
+  have hbound : ∀ᶠ N in atTop, ‖P N ^ N - L‖ ≤ C / (N : ℝ) := by
+    filter_upwards [hclose, eventually_ge_atTop 1] with N hcl hN
     have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     have hstep := norm_pow_sub_pow_le (P N) (B N) (hP N) (hB N) N
     rw [hpow N hN] at hstep
     have hmul : (N : ℝ) * ‖P N - B N‖ ≤ (N : ℝ) * (C / (N : ℝ) ^ 2) :=
-      mul_le_mul_of_nonneg_left (hclose N) (le_of_lt hNR)
+      mul_le_mul_of_nonneg_left hcl (le_of_lt hNR)
     have hsimp : (N : ℝ) * (C / (N : ℝ) ^ 2) = C / (N : ℝ) := by
       field_simp
     rw [hsimp] at hmul
@@ -114,11 +109,9 @@ theorem tendsto_pow_of_close {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸
   have hg : Tendsto (fun N : ℕ ↦ C / (N : ℝ)) atTop (nhds 0) := by
     have h := tendsto_one_div_atTop_nhds_zero_nat.const_mul C
     simpa [mul_one_div] using h
-  refine squeeze_zero' (g := fun N : ℕ ↦ C / (N : ℝ)) ?_ ?_ hg
+  refine squeeze_zero' (g := fun N : ℕ ↦ C / (N : ℝ)) ?_ hbound hg
   · filter_upwards with N
     exact norm_nonneg _
-  · filter_upwards [eventually_ge_atTop 1] with N hN
-    exact hbound N hN
 
 /-- **K-G (2.14).**  If each generation's operator is a contraction within `C/N²` of
 `exp(N⁻¹Q)`, then `N` generations converge to `exp Q`.
@@ -129,35 +122,16 @@ form of a distance bound.  The conclusion is the coalescent semigroup. -/
 theorem tendsto_pow_self_exp {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] [NormedAlgebra ℝ 𝔸]
     [CompleteSpace 𝔸] (Q : 𝔸) (C : ℝ) (P : ℕ → 𝔸)
     (hP : ∀ N, ‖P N‖ ≤ 1)
-    (hE : ∀ N, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1)
+    (hE : ∀ N : ℕ, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1)
     (hclose : ∀ N, ‖P N - exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) :
     Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds (exp ℝ Q)) := by
   have hC : 0 ≤ C := by
     have h := hclose 1
     have hnn : (0 : ℝ) ≤ ‖P 1 - exp ℝ ((1 / ((1 : ℕ) : ℝ)) • Q)‖ := norm_nonneg _
-    have : C / ((1 : ℕ) : ℝ) ^ 2 = C := by norm_num
-    linarith [this ▸ h]
-  rw [tendsto_iff_norm_sub_tendsto_zero]
-  have hbound : ∀ N : ℕ, 1 ≤ N → ‖P N ^ N - exp ℝ Q‖ ≤ C / (N : ℝ) := by
-    intro N hN
-    have hNpos : 0 < N := hN
-    have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hNpos
-    have hstep := norm_pow_sub_pow_le (P N) (exp ℝ ((1 / (N : ℝ)) • Q)) (hP N) (hE N) N
-    rw [exp_smul_pow_self Q hNpos] at hstep
-    have hmul : (N : ℝ) * ‖P N - exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ (N : ℝ) * (C / (N : ℝ) ^ 2) :=
-      mul_le_mul_of_nonneg_left (hclose N) (le_of_lt hNR)
-    have hsimp : (N : ℝ) * (C / (N : ℝ) ^ 2) = C / (N : ℝ) := by
-      field_simp
-    rw [hsimp] at hmul
-    linarith
-  have hg : Tendsto (fun N : ℕ ↦ C / (N : ℝ)) atTop (nhds 0) := by
-    have h := tendsto_one_div_atTop_nhds_zero_nat.const_mul C
-    simpa [mul_one_div] using h
-  refine squeeze_zero' (g := fun N : ℕ ↦ C / (N : ℝ)) ?_ ?_ hg
-  · filter_upwards with N
-    exact norm_nonneg _
-  · filter_upwards [eventually_ge_atTop 1] with N hN
-    exact hbound N hN
+    have h1 : C / ((1 : ℕ) : ℝ) ^ 2 = C := by norm_num
+    linarith [h1 ▸ h]
+  refine tendsto_pow_of_close (exp ℝ Q) C P (fun N ↦ exp ℝ ((1 / (N : ℝ)) • Q)) hP hE
+    (fun N hN ↦ exp_smul_pow_self Q hN) hC (Filter.Eventually.of_forall hclose)
 
 end Coalescent
 

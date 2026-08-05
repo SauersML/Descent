@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:176a2169ad86d92d6c00d52f349b2dba",
- "source_files": 221,
+ "source_digest": "sha256:658e0d2e7e34286129705709a09da683",
+ "source_files": 222,
  "collisions": {},
  "theorems": [
   {
@@ -61,6 +61,7 @@
    "line": 414,
    "statement": "(m : OneLocusArchitecture) (h : Foundations.HardyWeinbergModel) (hq : h.altFreq = m.p) : m.valueDosageCovariance h = h.genotypeVariance * m.averageEffect",
    "mentions": [
+    "altFreq",
     "averageEffect",
     "genotypeVariance",
     "valueDosageCovariance"
@@ -93,6 +94,7 @@
    "line": 512,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : hweThirdCentralMoment h = 0 ↔ ∀ a d d' : ℝ, (OneLocusArchitecture.mk a d h.altFreq).averageEffect = (OneLocusArchitecture.mk a d' h.altFreq).averageEffect",
    "mentions": [
+    "altFreq",
     "averageEffect",
     "hweThirdCentralMoment"
    ]
@@ -3361,6 +3363,7 @@
    "line": 463,
    "statement": "(h : Foundations.HardyWeinbergModel) : hweThirdCentralMoment h = 2 * h.altFreq * (1 - h.altFreq) * (1 - 2 * h.altFreq)",
    "mentions": [
+    "altFreq",
     "hweThirdCentralMoment"
    ]
   },
@@ -3371,6 +3374,7 @@
    "line": 479,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (coding : SymmetricCoding Foundations.DiploidGenotype) (hweight : ∀ g, coding.weight g = h.genotypeProb g) (hvalue : ∀ g, coding.value g = h.centeredAltAlleleCount g) : h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "genotypeProb"
    ]
@@ -3412,6 +3416,7 @@
    "line": 575,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.centeredAltAlleleCount g)) ↔ h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "genotypeProb"
    ]
@@ -3423,6 +3428,7 @@
    "line": 612,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.standardizedGenotype g)) ↔ h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -3434,6 +3440,7 @@
    "line": 644,
    "statement": "(h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) : h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧ h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧ h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount"
    ]
   },
@@ -3444,6 +3451,7 @@
    "line": 661,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (h.altFreq = 1 / 2 ∧ h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧ h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧ h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1) ∨ hweThirdCentralMoment h ≠ 0",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "hweThirdCentralMoment"
    ]
@@ -3466,6 +3474,7 @@
    "line": 793,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2 = 1",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -3477,6 +3486,7 @@
    "line": 827,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 = 1 / h.genotypeVariance",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "standardizedGenotype"
@@ -3489,6 +3499,7 @@
    "line": 862,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.genotypeVariance * ((∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1) = 1 - h.genotypeVariance",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "standardizedGenotype"
@@ -3501,6 +3512,7 @@
    "line": 903,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g = 0",
    "mentions": [
+    "altFreq",
     "centeredSquare",
     "genotypeProb"
    ]
@@ -3512,6 +3524,7 @@
    "line": 923,
    "statement": "(h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) : h.centeredSquare Foundations.DiploidGenotype.het = -1",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -3554,6 +3567,7 @@
    "line": 1001,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 = (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "standardizedGenotype"
@@ -3566,6 +3580,7 @@
    "line": 1048,
    "statement": "(h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) : h.centeredSquare Foundations.DiploidGenotype.homRef = 1 ∧ h.centeredSquare Foundations.DiploidGenotype.het = -1 ∧ h.centeredSquare Foundations.DiploidGenotype.homAlt = 1",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -3576,6 +3591,7 @@
    "line": 1084,
    "statement": "(h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) : h.genotypeProb Foundations.DiploidGenotype.homRef + h.genotypeProb Foundations.DiploidGenotype.homAlt = 1 / 2 ∧ h.genotypeProb Foundations.DiploidGenotype.het = 1 / 2",
    "mentions": [
+    "altFreq",
     "genotypeProb"
    ]
   },
@@ -3586,6 +3602,7 @@
    "line": 1101,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 = (1 / h.genotypeVariance + 9) * (1 / h.genotypeVariance - 2)",
    "mentions": [
+    "altFreq",
     "centeredSquare",
     "genotypeProb",
     "genotypeVariance"
@@ -3598,6 +3615,7 @@
    "line": 1119,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3) = 0 ↔ 1 / h.genotypeVariance = 2",
    "mentions": [
+    "altFreq",
     "centeredSquare",
     "genotypeProb",
     "genotypeVariance"
@@ -3610,6 +3628,7 @@
    "line": 1144,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) * h.genotypeVariance ^ m = ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m)",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "genotypeProb",
     "genotypeVariance",
@@ -3623,6 +3642,7 @@
    "line": 1176,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) : h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) ≤ (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) * h.genotypeVariance ^ m",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "standardizedGenotype"
@@ -3635,6 +3655,7 @@
    "line": 1255,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = (1 - 2 * h.altFreq) ^ 2",
    "mentions": [
+    "altFreq",
     "signBias"
    ]
   },
@@ -3645,6 +3666,7 @@
    "line": 1303,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = 0 ↔ h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "signBias"
    ]
   },
@@ -3654,7 +3676,9 @@
    "file": "Descent/Blindness/EpistaticChaos.lean",
    "line": 1336,
    "statement": "(h : Foundations.HardyWeinbergModel) : h.reflect.altFreq = 1 - h.altFreq",
-   "mentions": []
+   "mentions": [
+    "altFreq"
+   ]
   },
   {
    "name": "Descent.reflect_genotypeProb",
@@ -3728,6 +3752,7 @@
    "line": 1405,
    "statement": "(h h' : Foundations.HardyWeinbergModel) (hfreq : h.altFreq = h'.altFreq) (k : ℕ) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k = ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ k",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -3739,6 +3764,7 @@
    "line": 1425,
    "statement": "(h h' : Foundations.HardyWeinbergModel) (hvar : h.genotypeVariance = h'.genotypeVariance) : h'.altFreq = h.altFreq ∨ h'.altFreq = 1 - h.altFreq",
    "mentions": [
+    "altFreq",
     "genotypeVariance"
    ]
   },
@@ -3749,6 +3775,7 @@
    "line": 1448,
    "statement": "(h h' : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1) (hfourth : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ 4) (k : ℕ) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) = ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k)",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -7838,6 +7865,7 @@
    "line": 157,
    "statement": "(order : ℕ) (mixing : Matrix Row Locus ℝ) (kappa : ℝ) : cumulantTensorEnergy order (pushedCumulantTensor order mixing kappa) = kappa ^ 2 * entryPowerSum (mixing.transpose * mixing) order",
    "mentions": [
+    "Locus",
     "cumulantTensorEnergy",
     "entryPowerSum",
     "kappa",
@@ -7851,6 +7879,7 @@
    "line": 202,
    "statement": "(order : ℕ) (mixing : Matrix Row Locus ℝ) : cumulantTensorEnergy order (pushedCumulantTensor order mixing 0) = 0",
    "mentions": [
+    "Locus",
     "cumulantTensorEnergy",
     "pushedCumulantTensor"
    ]
@@ -7862,6 +7891,7 @@
    "line": 211,
    "statement": "(order : ℕ) (left right : Matrix Row Locus ℝ) {kappa : ℝ} (hkappa : kappa ≠ 0) : cumulantTensorEnergy order (pushedCumulantTensor order left kappa) = cumulantTensorEnergy order (pushedCumulantTensor order right kappa) ↔ entryPowerSum (left.transpose * left) order = entryPowerSum (right.transpose * right) order",
    "mentions": [
+    "Locus",
     "cumulantTensorEnergy",
     "entryPowerSum",
     "kappa",
@@ -7901,6 +7931,7 @@
    "line": 278,
    "statement": "(covariance : Matrix Locus Locus ℝ) : entryPowerSum covariance 3 = entryCubeSum covariance",
    "mentions": [
+    "Locus",
     "covariance",
     "entryCubeSum",
     "entryPowerSum"
@@ -7913,6 +7944,7 @@
    "line": 290,
    "statement": "(mixing : Matrix Row Locus ℝ) (kappa : ℝ) : thirdTensorEnergy (pushedThirdMomentTensor mixing kappa) = kappa ^ 2 * entryCubeSum (gramCovariance mixing)",
    "mentions": [
+    "Locus",
     "entryCubeSum",
     "gramCovariance",
     "kappa",
@@ -7937,6 +7969,7 @@
    "line": 336,
    "statement": "(covariance : Matrix Locus Locus ℝ) : entryPowerSum covariance 4 = entryFourthSum covariance",
    "mentions": [
+    "Locus",
     "covariance",
     "entryFourthSum",
     "entryPowerSum"
@@ -7949,6 +7982,7 @@
    "line": 343,
    "statement": "(mixing : Matrix Row Locus ℝ) (kappa : ℝ) : fourthTensorEnergy (pushedFourthCumulantTensor mixing kappa) = kappa ^ 2 * entryFourthSum (gramCovariance mixing)",
    "mentions": [
+    "Locus",
     "entryFourthSum",
     "fourthTensorEnergy",
     "gramCovariance",
@@ -7973,6 +8007,7 @@
    "line": 387,
    "statement": "(covariance : Matrix Locus Locus ℝ) : entryFourthSum covariance = ∑ j, ldPowerScore covariance 4 j",
    "mentions": [
+    "Locus",
     "covariance",
     "entryFourthSum",
     "ldPowerScore"
@@ -8260,6 +8295,7 @@
    "line": 715,
    "statement": "{Locus : Type*} [Fintype Locus] (covariance : Matrix Locus Locus ℝ) : entryPowerSum covariance 2 = entrySquareSum covariance",
    "mentions": [
+    "Locus",
     "covariance",
     "entryPowerSum",
     "entrySquareSum"
@@ -8272,6 +8308,7 @@
    "line": 722,
    "statement": "{Locus : Type*} [Fintype Locus] [DecidableEq Locus] (covariance : Matrix Locus Locus ℝ) (hsymmetric : ∀ i j, covariance j i = covariance i j) : entrySquareSum covariance = Matrix.trace (covariance * covariance)",
    "mentions": [
+    "Locus",
     "covariance",
     "entrySquareSum"
    ]
@@ -8369,6 +8406,7 @@
    "line": 840,
    "statement": "{Row Locus : Type*} [Fintype Row] [Fintype Locus] (order : ℕ) (ldSquareRoot : Matrix Row Locus ℝ) (effectCumulant : ℝ) : cumulantTensorEnergy order (pushedCumulantTensor order ldSquareRoot effectCumulant) = effectCumulant ^ 2 * ldOrientationInvariant order (gramCovariance ldSquareRoot)",
    "mentions": [
+    "Locus",
     "cumulantTensorEnergy",
     "gramCovariance",
     "ldOrientationInvariant",
@@ -8392,6 +8430,7 @@
    "line": 866,
    "statement": "{Row Locus : Type*} [Fintype Row] [Fintype Locus] (ldSquareRoot : Matrix Row Locus ℝ) (effectThirdMoment : ℝ) : thirdTensorEnergy (pushedThirdMomentTensor ldSquareRoot effectThirdMoment) = effectThirdMoment ^ 2 * ldOrientationThirdInvariant (gramCovariance ldSquareRoot)",
    "mentions": [
+    "Locus",
     "gramCovariance",
     "ldOrientationThirdInvariant",
     "pushedThirdMomentTensor",
@@ -8405,6 +8444,7 @@
    "line": 877,
    "statement": "{Row Locus : Type*} [Fintype Row] [Fintype Locus] (ldSquareRoot : Matrix Row Locus ℝ) : thirdTensorEnergy (pushedThirdMomentTensor ldSquareRoot 0) = 0",
    "mentions": [
+    "Locus",
     "pushedThirdMomentTensor",
     "thirdTensorEnergy"
    ]
@@ -8426,6 +8466,7 @@
    "line": 904,
    "statement": "{Row Locus : Type*} [Fintype Row] [Fintype Locus] (ldSquareRoot : Matrix Row Locus ℝ) (effectFourthCumulant : ℝ) : fourthTensorEnergy (pushedFourthCumulantTensor ldSquareRoot effectFourthCumulant) = effectFourthCumulant ^ 2 * ldOrientationFourthInvariant (gramCovariance ldSquareRoot)",
    "mentions": [
+    "Locus",
     "fourthTensorEnergy",
     "gramCovariance",
     "ldOrientationFourthInvariant",
@@ -8439,6 +8480,7 @@
    "line": 915,
    "statement": "{Locus : Type*} [Fintype Locus] (ld : Matrix Locus Locus ℝ) : ldOrientationFourthInvariant ld = ∑ j, ldPowerScore ld 4 j",
    "mentions": [
+    "Locus",
     "ldOrientationFourthInvariant",
     "ldPowerScore"
    ]
@@ -15537,7 +15579,7 @@
    "name": "Descent.Coalescent.dist_le_of_exp_rate",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 173,
+   "line": 174,
    "statement": "{c : ℝ} (hc : 0 ≤ c) {N : ℕ} (hN : 1 ≤ N) (hcN : c ≤ (N : ℝ)) : |c / (N : ℝ) - (1 - Real.exp (-(c / (N : ℝ))))| ≤ c ^ 2 / (N : ℝ) ^ 2",
    "mentions": []
   },
@@ -15545,7 +15587,7 @@
    "name": "Descent.Coalescent.tendsto_levelChain_pow",
    "kind": "theorem",
    "file": "Descent/Coalescent/PairChainLimit.lean",
-   "line": 197,
+   "line": 198,
    "statement": "{Q : 𝔸} (hQ : Q * Q = -Q) {c : ℝ} (hc : 0 ≤ c) (hcN : ∀ N : ℕ, 1 ≤ N → c ≤ (N : ℝ)) (hP : ∀ N : ℕ, ‖(1 : 𝔸) + (c / (N : ℝ)) • Q‖ ≤ 1) (hB : ∀ N : ℕ, ‖(1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q‖ ≤ 1) : Tendsto (fun N : ℕ ↦ ((1 : 𝔸) + (c / (N : ℝ)) • Q) ^ N) atTop (nhds (1 + (1 - Real.exp (-c)) • Q))",
    "mentions": []
   },
@@ -16992,15 +17034,15 @@
    "kind": "theorem",
    "file": "Descent/Coalescent/SemigroupLimit.lean",
    "line": 91,
-   "statement": "{𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] (L : 𝔸) (C : ℝ) (P B : ℕ → 𝔸) (hP : ∀ N, ‖P N‖ ≤ 1) (hB : ∀ N, ‖B N‖ ≤ 1) (hpow : ∀ N : ℕ, 1 ≤ N → B N ^ N = L) (hclose : ∀ N, ‖P N - B N‖ ≤ C / (N : ℝ) ^ 2) : Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds L)",
+   "statement": "{𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] (L : 𝔸) (C : ℝ) (P B : ℕ → 𝔸) (hP : ∀ N, ‖P N‖ ≤ 1) (hB : ∀ N, ‖B N‖ ≤ 1) (hpow : ∀ N : ℕ, 1 ≤ N → B N ^ N = L) (hC : 0 ≤ C) (hclose : ∀ᶠ N in atTop, ‖P N - B N‖ ≤ C / (N : ℝ) ^ 2) : Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds L)",
    "mentions": []
   },
   {
    "name": "Descent.Coalescent.tendsto_pow_self_exp",
    "kind": "theorem",
    "file": "Descent/Coalescent/SemigroupLimit.lean",
-   "line": 129,
-   "statement": "{𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] (Q : 𝔸) (C : ℝ) (P : ℕ → 𝔸) (hP : ∀ N, ‖P N‖ ≤ 1) (hE : ∀ N, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1) (hclose : ∀ N, ‖P N - exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) : Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds (exp ℝ Q))",
+   "line": 122,
+   "statement": "{𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] (Q : 𝔸) (C : ℝ) (P : ℕ → 𝔸) (hP : ∀ N, ‖P N‖ ≤ 1) (hE : ∀ N : ℕ, ‖exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ 1) (hclose : ∀ N, ‖P N - exp ℝ ((1 / (N : ℝ)) • Q)‖ ≤ C / (N : ℝ) ^ 2) : Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds (exp ℝ Q))",
    "mentions": []
   },
   {
@@ -19403,6 +19445,7 @@
    "line": 89,
    "statement": "(μ ν : Genome → ℝ) : 0 ≤ totalVariationGap μ ν",
    "mentions": [
+    "Genome",
     "totalVariationGap"
    ]
   },
@@ -19413,6 +19456,7 @@
    "line": 95,
    "statement": "(μ ν : Genome → ℝ) (hμ_nonneg : ∀ g, 0 ≤ μ g) (hν_nonneg : ∀ g, 0 ≤ ν g) (hμ_sum : ∑ g, μ g = 1) (hν_sum : ∑ g, ν g = 1) : totalVariationGap μ ν ≤ 2",
    "mentions": [
+    "Genome",
     "totalVariationGap"
    ]
   },
@@ -19423,6 +19467,7 @@
    "line": 128,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (hp : ∀ g, 0 ≤ p g) (x : Label) : 0 ≤ labelMass π p x",
    "mentions": [
+    "Genome",
     "labelMass"
    ]
   },
@@ -19435,6 +19480,7 @@
    "mentions": [
     "DescendsAlong",
     "FunctionalDescends",
+    "Genome",
     "fiberConditional",
     "labelMass"
    ]
@@ -19446,6 +19492,7 @@
    "line": 155,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (x : Label) (h : labelMass π p x ≠ 0) : labelMass π (fiberConditional π p x) x = 1",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "labelMass"
    ]
@@ -19457,6 +19504,7 @@
    "line": 170,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (x : Label) (h : labelMass π p x ≠ 0) : ∑ g, fiberConditional π p x g = 1",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "labelMass"
    ]
@@ -19468,6 +19516,7 @@
    "line": 181,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (x : Label) (hp : ∀ g, 0 ≤ p g) (h : labelMass π p x ≠ 0) (g : Genome) : 0 ≤ fiberConditional π p x g",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "labelMass"
    ]
@@ -19480,6 +19529,7 @@
    "statement": "(π : Genome → Label) (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) : DescendsAlong π P b ↔ PairwiseConsistent π P b ∧ Nonempty (Label → Value)",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "PairwiseConsistent"
    ]
   },
@@ -19491,6 +19541,7 @@
    "statement": "[Nonempty Value] (π : Genome → Label) (P : Population → Genome → ℝ) (b : (Genome → ℝ) → Value) : DescendsAlong π P b ↔ PairwiseConsistent π P b",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "PairwiseConsistent"
    ]
   },
@@ -19502,6 +19553,7 @@
    "statement": "(π : Genome → Label) (P : Population → Genome → ℝ) (hK : KernelSufficient π P) (b : (Genome → ℝ) → Value) (defaultWitness : Label → Value) : DescendsAlong π P b",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "KernelSufficient"
    ]
   },
@@ -19513,6 +19565,7 @@
    "statement": "(π : Genome → Label) (P : Population → Genome → ℝ) : KernelSufficient π P ↔ DescendsAlong π P (fun μ ↦ μ)",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "KernelSufficient"
    ]
   },
@@ -19523,6 +19576,7 @@
    "line": 234,
    "statement": "(π : Genome → Label) (m : Label → ℝ) (base : Genome → ℝ) (x : Label) : labelMass π (fun g ↦ m (π g) * base g) x = m x * labelMass π base x",
    "mentions": [
+    "Genome",
     "labelMass"
    ]
   },
@@ -19533,6 +19587,7 @@
    "line": 244,
    "statement": "(π : Genome → Label) (m : Label → ℝ) (base : Genome → ℝ) (x : Label) (h : labelMass π (fun g ↦ m (π g) * base g) x ≠ 0) : fiberConditional π (fun g ↦ m (π g) * base g) x = fiberConditional π base x",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "labelMass"
    ]
@@ -19544,6 +19599,7 @@
    "line": 258,
    "statement": "(π : Genome → Label) (base : Genome → ℝ) (tilt : Population → Label → ℝ) (P : Population → Genome → ℝ) (hP : ∀ i, P i = fun g ↦ tilt i (π g) * base g) : KernelSufficient π P",
    "mentions": [
+    "Genome",
     "KernelSufficient"
    ]
   },
@@ -19554,6 +19610,7 @@
    "line": 268,
    "statement": "[DecidableEq Genome] (π : Genome → Label) (p : Genome → ℝ) (g : Genome) (hsep : ∀ g', π g' = π g → g' = g) (hp : p g ≠ 0) : fiberConditional π p (π g) = pointLaw g",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "pointLaw"
    ]
@@ -19565,6 +19622,7 @@
    "line": 299,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (x : Label) (f : Genome → ℝ) : conditionalSectionMean f (fiberConditional π p x) = (∑ g, if π g = x then p g * f g else 0) / labelMass π p x",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "fiberConditional",
     "labelMass"
@@ -19577,6 +19635,7 @@
    "line": 310,
    "statement": "(π : Genome → Label) (p : Genome → ℝ) (x : Label) (u : Label → ℝ) (h : labelMass π p x ≠ 0) : conditionalSectionMean (fun g ↦ u (π g)) (fiberConditional π p x) = u x",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "fiberConditional",
     "labelMass"
@@ -19590,6 +19649,7 @@
    "statement": "(π : Genome → Label) (P : Population → Genome → ℝ) (u : Label → ℝ) : DescendsAlong π P (conditionalSectionMean (fun g ↦ u (π g)))",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "conditionalSectionMean"
    ]
   },
@@ -19600,6 +19660,7 @@
    "line": 330,
    "statement": "[DecidableEq Genome] (π : Genome → Label) (g : Genome) : labelMass π (pointLaw g) (π g) = 1",
    "mentions": [
+    "Genome",
     "labelMass",
     "pointLaw"
    ]
@@ -19611,6 +19672,7 @@
    "line": 342,
    "statement": "[DecidableEq Genome] (f : Genome → ℝ) (g : Genome) : conditionalSectionMean f (pointLaw g) = f g",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "pointLaw"
    ]
@@ -19622,6 +19684,7 @@
    "line": 352,
    "statement": "[DecidableEq Genome] (π : Genome → Label) (g : Genome) : fiberConditional π (pointLaw g) (π g) = pointLaw g",
    "mentions": [
+    "Genome",
     "fiberConditional",
     "pointLaw"
    ]
@@ -19634,6 +19697,7 @@
    "statement": "[DecidableEq Genome] (π : Genome → Label) (f : Genome → ℝ) (h : DescendsAlong π (pointLaw : Genome → Genome → ℝ) (conditionalSectionMean f)) : ∃ u : Label → ℝ, ∀ g, f g = u (π g)",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "conditionalSectionMean",
     "pointLaw"
    ]
@@ -19645,6 +19709,7 @@
    "line": 381,
    "statement": "(f μ ν : Genome → ℝ) (C : ℝ) (hf : ∀ g, |f g| ≤ C) : |conditionalSectionMean f μ - conditionalSectionMean f ν| ≤ C * totalVariationGap μ ν",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "totalVariationGap"
    ]
@@ -19656,6 +19721,7 @@
    "line": 393,
    "statement": "(f μ ν : Genome → ℝ) (a b : ℝ) (hf : ∀ g, a ≤ f g ∧ f g ≤ b) (hμ : ∑ g, μ g = 1) (hν : ∑ g, ν g = 1) : |conditionalSectionMean f μ - conditionalSectionMean f ν| ≤ ((b - a) / 2) * totalVariationGap μ ν",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "totalVariationGap"
    ]
@@ -19667,6 +19733,7 @@
    "line": 428,
    "statement": "(μ ν : Genome → ℝ) : ∃ f : Genome → ℝ, (∀ g, |f g| ≤ 1) ∧ conditionalSectionMean f μ - conditionalSectionMean f ν = totalVariationGap μ ν",
    "mentions": [
+    "Genome",
     "conditionalSectionMean",
     "totalVariationGap"
    ]
@@ -19993,6 +20060,7 @@
    "line": 821,
    "statement": "(q : Component → Genome → ℝ) (w0 w : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g) (hw0 : ∀ k, 0 < w0 k) (g : Genome) : componentMixtureDensity q w g = posteriorTilt q w0 w g * componentMixtureDensity q w0 g",
    "mentions": [
+    "Genome",
     "componentMixtureDensity",
     "posteriorTilt"
    ]
@@ -20004,6 +20072,7 @@
    "line": 844,
    "statement": "[DecidableEq (Component → ℝ)] (q : Component → Genome → ℝ) (w0 : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g) (hw0 : ∀ k, 0 < w0 k) (w : Population → Component → ℝ) : KernelSufficient (componentPosterior q w0) (fun i ↦ componentMixtureDensity q (w i))",
    "mentions": [
+    "Genome",
     "KernelSufficient",
     "componentMixtureDensity",
     "componentPosterior"
@@ -20017,6 +20086,7 @@
    "statement": "[DecidableEq (Component → ℝ)] (q : Component → Genome → ℝ) (w0 : Component → ℝ) (hq : ∀ k g, 0 ≤ q k g) (hw0 : ∀ k, 0 < w0 k) (w : Population → Component → ℝ) (b : (Genome → ℝ) → ℝ) : DescendsAlong (componentPosterior q w0) (fun i ↦ componentMixtureDensity q (w i)) b",
    "mentions": [
     "DescendsAlong",
+    "Genome",
     "componentMixtureDensity",
     "componentPosterior"
    ]
@@ -22264,6 +22334,7 @@
    "line": 1245,
    "statement": "{Slot Locus Graph : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Locus] [Fintype Graph] [DecidableEq Graph] (shape : (Slot → Locus) → Graph) (coefficient value : (Slot → Locus) → ℝ) (hshape : ∀ left right, shape left = shape right → SameEqualityPattern left right) (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial, coefficient (permutation ∘ monomial) = coefficient monomial) : (∑ monomial, coefficient monomial * value monomial) = ∑ graph, graphShapeCoefficient shape coefficient graph * ∑ monomial, if shape monomial = graph then value monomial else 0",
    "mentions": [
+    "Locus",
     "SameEqualityPattern",
     "graphShapeCoefficient"
    ]
@@ -22275,7 +22346,8 @@
    "line": 1262,
    "statement": "{Slot Locus : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Locus] (coefficient value : (Slot → Locus) → ℝ) (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial, coefficient (permutation ∘ monomial) = coefficient monomial) : CanonicalTrafficFactorizationStatement coefficient value",
    "mentions": [
-    "CanonicalTrafficFactorizationStatement"
+    "CanonicalTrafficFactorizationStatement",
+    "Locus"
    ]
   },
   {
@@ -22285,6 +22357,7 @@
    "line": 1273,
    "statement": "{Slot Locus : Type*} [Fintype Slot] [DecidableEq Slot] [Fintype Locus] (coefficient value : (Option Slot → Locus) → ℝ) (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial, coefficient (permutation ∘ monomial) = coefficient monomial) : RootedCanonicalTrafficFactorizationStatement coefficient value",
    "mentions": [
+    "Locus",
     "RootedCanonicalTrafficFactorizationStatement"
    ]
   },
@@ -22295,7 +22368,8 @@
    "line": 1284,
    "statement": "{D : ℕ} {Locus : Type*} [Fintype Locus] (coefficient value : (degree : Fin (D + 1)) → ((Fin (degree : ℕ) × Bool → Locus) → ℝ)) (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial, coefficient degree (permutation ∘ monomial) = coefficient degree monomial) : DegreeAtMostTrafficFactorizationStatement coefficient value",
    "mentions": [
-    "DegreeAtMostTrafficFactorizationStatement"
+    "DegreeAtMostTrafficFactorizationStatement",
+    "Locus"
    ]
   },
   {
@@ -22305,7 +22379,8 @@
    "line": 1296,
    "statement": "{D : ℕ} {Locus : Type*} [Fintype Locus] (coefficient value : (degree : Fin (D + 1)) → ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)) (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial, coefficient degree (permutation ∘ monomial) = coefficient degree monomial) : DegreeAtMostRootedTrafficFactorizationStatement coefficient value",
    "mentions": [
-    "DegreeAtMostRootedTrafficFactorizationStatement"
+    "DegreeAtMostRootedTrafficFactorizationStatement",
+    "Locus"
    ]
   },
   {
@@ -22315,6 +22390,7 @@
    "line": 1308,
    "statement": "{D : ℕ} {Locus : Type*} [Fintype Locus] (coefficient leftValue rightValue : (degree : Fin (D + 1)) → ((Fin (degree : ℕ) × Bool → Locus) → ℝ)) (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial, coefficient degree (permutation ∘ monomial) = coefficient degree monomial) (htraffic : degreeAtMostCanonicalTrafficProfile leftValue = degreeAtMostCanonicalTrafficProfile rightValue) : (∑ degree : Fin (D + 1), ∑ monomial, coefficient degree monomial * leftValue degree monomial) = ∑ degree : Fin (D + 1), ∑ monomial, coefficient degree monomial * rightValue degree monomial",
    "mentions": [
+    "Locus",
     "degreeAtMostCanonicalTrafficProfile"
    ]
   },
@@ -22325,6 +22401,7 @@
    "line": 1325,
    "statement": "{D : ℕ} {Locus : Type*} [Fintype Locus] (coefficient leftValue rightValue : (degree : Fin (D + 1)) → ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)) (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial, coefficient degree (permutation ∘ monomial) = coefficient degree monomial) (htraffic : degreeAtMostRootedCanonicalTrafficProfile leftValue = degreeAtMostRootedCanonicalTrafficProfile rightValue) : (∑ degree : Fin (D + 1), ∑ monomial, coefficient degree monomial * leftValue degree monomial) = ∑ degree : Fin (D + 1), ∑ monomial, coefficient degree monomial * rightValue degree monomial",
    "mentions": [
+    "Locus",
     "degreeAtMostRootedCanonicalTrafficProfile"
    ]
   },
@@ -22335,6 +22412,7 @@
    "line": 1344,
    "statement": "{Algorithm : Type*} {D : ℕ} {Locus : Type*} [Fintype Locus] (coefficient : Algorithm → (degree : Fin (D + 1)) → ((Fin (degree : ℕ) × Bool → Locus) → ℝ)) (leftValue rightValue : (degree : Fin (D + 1)) → ((Fin (degree : ℕ) × Bool → Locus) → ℝ)) (hinvariant : ∀ algorithm degree (permutation : Equiv.Perm Locus) monomial, coefficient algorithm degree (permutation ∘ monomial) = coefficient algorithm degree monomial) (htraffic : degreeAtMostCanonicalTrafficProfile leftValue = degreeAtMostCanonicalTrafficProfile rightValue) (bayesLeft bayesRight : ℝ) (hoptimalRight : ∀ algorithm, bayesRight ≤ ∑ degree : Fin (D + 1), ∑ monomial, coefficient algorithm degree monomial * rightValue degree monomial) (algorithm : Algorithm) : bayesRight - bayesLeft ≤ (∑ degree : Fin (D + 1), ∑ monomial, coefficient algorithm degree monomial * leftValue degree monomial) - bayesLeft",
    "mentions": [
+    "Locus",
     "degreeAtMostCanonicalTrafficProfile"
    ]
   },
@@ -23377,6 +23455,7 @@
    "line": 375,
    "statement": "(q : Component → Genome → ℝ) (w0 : Component → ℝ) (g : Genome) (k : Component) (hzero : componentMixtureDensity q w0 g = 0) : componentPosterior q w0 g k = 0",
    "mentions": [
+    "Genome",
     "componentMixtureDensity",
     "componentPosterior"
    ]
@@ -23388,6 +23467,7 @@
    "line": 389,
    "statement": "(q : Component → Genome → ℝ) (w0 : Component → ℝ) (g : Genome) : posteriorTilt q w0 0 g = 0",
    "mentions": [
+    "Genome",
     "posteriorTilt"
    ]
   },
@@ -23398,6 +23478,7 @@
    "line": 398,
    "statement": "(q : Component → Genome → ℝ) (w0 w : Component → ℝ) (g : Genome) (k : Component) (hzero : w0 k = 0) : componentPosterior q w0 g k * (w k / w0 k) = 0",
    "mentions": [
+    "Genome",
     "componentPosterior"
    ]
   },
@@ -23408,6 +23489,7 @@
    "line": 408,
    "statement": "(q : Component → Genome → ℝ) (w0 w : Component → ℝ) (g : Genome) (hw0 : ∀ k, w0 k ≠ 0) (hZ : componentMixtureDensity q w0 g ≠ 0) : componentMixtureDensity q w g = componentMixtureDensity q w0 g * posteriorTilt q w0 w g",
    "mentions": [
+    "Genome",
     "componentMixtureDensity",
     "posteriorTilt"
    ]
@@ -23419,6 +23501,7 @@
    "line": 421,
    "statement": "(q : Component → Genome → ℝ) (w0 w : Component → ℝ) (g : Genome) (hw0 : ∀ k, w0 k ≠ 0) (hZ : componentMixtureDensity q w0 g ≠ 0) : componentMixtureDensity q w g / componentMixtureDensity q w0 g = posteriorTilt q w0 w g",
    "mentions": [
+    "Genome",
     "componentMixtureDensity",
     "posteriorTilt"
    ]
@@ -24015,6 +24098,164 @@
    "statement": "(p : ℝ) : hweHeterozygosity (1 - p) = hweHeterozygosity p",
    "mentions": [
     "hweHeterozygosity"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.equivFin3_symm_apply_apply",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 105,
+   "statement": "(g : Genotype) : equivFin3.symm (equivFin3 g) = g",
+   "mentions": [
+    "equivFin3"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.sum_univ",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 117,
+   "statement": "{M : Type*} [AddCommMonoid M] (f : Genotype → M) : (∑ g : Genotype, f g) = f Genotype.homRef + f Genotype.het + f Genotype.homAlt",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Core.Genotype.ofAlleles_comm",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 142,
+   "statement": "(a b : Allele) : ofAlleles a b = ofAlleles b a",
+   "mentions": [
+    "ofAlleles"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage_homRef",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 157,
+   "statement": ": dosage .homRef = 0",
+   "mentions": [
+    "dosage"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage_het",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 158,
+   "statement": ": dosage .het = 1",
+   "mentions": [
+    "dosage"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage_homAlt",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 159,
+   "statement": ": dosage .homAlt = 2",
+   "mentions": [
+    "dosage"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage_nonneg",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 161,
+   "statement": "(g : Genotype) : 0 ≤ dosage g",
+   "mentions": [
+    "dosage"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage_le_ploidy",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 167,
+   "statement": "(g : Genotype) : dosage g ≤ ploidy",
+   "mentions": [
+    "dosage",
+    "ploidy"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genome.ofHaplotypes_comm",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 193,
+   "statement": "{n : ℕ} (h₁ h₂ : Haplotype n) : Genome.ofHaplotypes h₁ h₂ = Genome.ofHaplotypes h₂ h₁",
+   "mentions": [
+    "Haplotype",
+    "ofHaplotypes"
+   ]
+  },
+  {
+   "name": "Descent.Core.Panel.altFreq_nonneg",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 236,
+   "statement": "(P : Panel) (l : Locus P.nLoci) : 0 ≤ P.altFreq l",
+   "mentions": [
+    "Locus",
+    "altFreq"
+   ]
+  },
+  {
+   "name": "Descent.Core.Panel.altFreq_le_one",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 246,
+   "statement": "(P : Panel) (hP : 0 < P.nSamples) (l : Locus P.nLoci) : P.altFreq l ≤ 1",
+   "mentions": [
+    "Locus",
+    "altFreq"
+   ]
+  },
+  {
+   "name": "Descent.Core.sum_hweProb",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 283,
+   "statement": "(q : ℝ) : (∑ g : Genotype, hweProb q g) = 1",
+   "mentions": [
+    "hweProb"
+   ]
+  },
+  {
+   "name": "Descent.Core.hweProb_het",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 293,
+   "statement": "(q : ℝ) : hweProb q Genotype.het = hweHeterozygosity q",
+   "mentions": [
+    "hweHeterozygosity",
+    "hweProb"
+   ]
+  },
+  {
+   "name": "Descent.Core.hwe_dosage_variance",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 303,
+   "statement": "(q : ℝ) : (∑ g : Genotype, hweProb q g * (Genotype.dosage g - ploidy * q) ^ 2) = hweHeterozygosity q",
+   "mentions": [
+    "dosage",
+    "hweHeterozygosity",
+    "hweProb",
+    "ploidy"
+   ]
+  },
+  {
+   "name": "Descent.Core.hwe_mean_dosage",
+   "kind": "theorem",
+   "file": "Descent/Core/Genome.lean",
+   "line": 313,
+   "statement": "(q : ℝ) : (∑ g : Genotype, hweProb q g * Genotype.dosage g) = ploidy * q",
+   "mentions": [
+    "dosage",
+    "hweProb",
+    "ploidy"
    ]
   },
   {
@@ -28108,6 +28349,7 @@
    "line": 251,
    "statement": "(h : HardyWeinbergModel) : h.refFreq + h.altFreq = 1",
    "mentions": [
+    "altFreq",
     "refFreq"
    ]
   },
@@ -28158,6 +28400,7 @@
    "line": 331,
    "statement": "(h : HardyWeinbergModel) : h.expectedAltAlleleCount = 2 * h.altFreq",
    "mentions": [
+    "altFreq",
     "expectedAltAlleleCount"
    ]
   },
@@ -28168,6 +28411,7 @@
    "line": 381,
    "statement": "(h : HardyWeinbergModel) : h.genotypeVariance = 2 * h.altFreq * h.refFreq",
    "mentions": [
+    "altFreq",
     "genotypeVariance",
     "refFreq"
    ]
@@ -28179,6 +28423,7 @@
    "line": 397,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : 0 < h.genotypeVariance",
    "mentions": [
+    "altFreq",
     "genotypeVariance"
    ]
   },
@@ -31226,7 +31471,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/DGP.lean",
    "line": 2131,
-   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] (μ : Measure Ω) (X : Ω → ι → ℝ) (Y : Ω → ℝ) (wStar w : ι → ℝ) (hResidualSq_int : Integrable (fun ω ↦ (Y ω - dot wStar (X ω)) ^ 2) μ) (hCross_int : Integrable (fun ω ↦ (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω)) μ) (hDeltaSq_int : Integrable (fun ω ↦ (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ) (horth : ∫ ω, (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) : ∫ ω, (Y ω - dot w (X ω)) ^ 2 ∂μ = ∫ ω, (Y ω - dot wStar (X ω)) ^ 2 ∂μ + ∫ ω, (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ",
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] (μ : Measure Ω) (X : Ω → ι → ℝ) (Y : Ω → ℝ) (wStar w : ι → ℝ) (hResidualSq_int : Integrable (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) ^ 2) μ) (hCross_int : Integrable (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω)) μ) (hDeltaSq_int : Integrable (fun ω ↦ (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ) (horth : ∫ ω, (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) : ∫ ω, (Y ω - Foundations.dot w (X ω)) ^ 2 ∂μ = ∫ ω, (Y ω - Foundations.dot wStar (X ω)) ^ 2 ∂μ + ∫ ω, (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ",
    "mentions": [
     "dot"
    ]
@@ -31284,7 +31529,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/DGP.lean",
    "line": 2284,
-   "statement": "{k : ℕ} [Fintype (Fin k)] {ι : Type*} [Fintype ι] [DecidableEq ι] (cmdgp : Foundations.ConditionalMeanDGP k) (X : ℝ × (Fin k → ℝ) → ι → ℝ) (wStar w : ι → ℝ) (hm_linear : ∀ p c, cmdgp.m p c = dot wStar (X (p, c))) (hResidualSq_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ) (hOrth_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) * dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ) (hDeltaSq_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) : Foundations.predictionRiskY cmdgp (fun p c ↦ dot w (X (p, c))) = irreduciblePredictionRisk cmdgp + ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ",
+   "statement": "{k : ℕ} [Fintype (Fin k)] {ι : Type*} [Fintype ι] [DecidableEq ι] (cmdgp : Foundations.ConditionalMeanDGP k) (X : ℝ × (Fin k → ℝ) → ι → ℝ) (wStar w : ι → ℝ) (hm_linear : ∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c))) (hResidualSq_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ) (hOrth_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) * Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ) (hDeltaSq_int : Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) : Foundations.predictionRiskY cmdgp (fun p c ↦ Foundations.dot w (X (p, c))) = irreduciblePredictionRisk cmdgp + ∫ x, (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ",
    "mentions": [
     "dot",
     "irreduciblePredictionRisk",
@@ -39135,6 +39380,7 @@
    "line": 55,
    "statement": "(h : HardyWeinbergModel) : h.genotypeVariance = Program.hweGenotypeVariance h.altFreq",
    "mentions": [
+    "altFreq",
     "genotypeVariance",
     "hweGenotypeVariance"
    ]
@@ -39146,6 +39392,7 @@
    "line": 64,
    "statement": "(h : HardyWeinbergModel) (g : Foundations.DiploidGenotype) : h.standardizedSquare g = (h.centeredAltAlleleCount g) ^ 2 / Program.hweGenotypeVariance h.altFreq",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "hweGenotypeVariance",
     "standardizedSquare"
@@ -39199,6 +39446,7 @@
    "line": 208,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∀ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) → (∀ g, coding.value g = h.centeredAltAlleleCount g) → h.altFreq = 1 / 2) ∧ (h.altFreq = 1 / 2 → Spectral.hweMellinJetVariance h.altFreq = 0)",
    "mentions": [
+    "altFreq",
     "centeredAltAlleleCount",
     "genotypeProb",
     "hweMellinJetVariance"
@@ -39211,6 +39459,7 @@
    "line": 293,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 = 1 / Program.hweGenotypeVariance h.altFreq",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "hweGenotypeVariance",
     "standardizedGenotype"
@@ -39223,6 +39472,7 @@
    "line": 301,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : Foundations.DiploidGenotype) : h.standardizedGenotype g ^ 2 = h.standardizedSquare g",
    "mentions": [
+    "altFreq",
     "standardizedGenotype",
     "standardizedSquare"
    ]
@@ -39234,6 +39484,7 @@
    "line": 338,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : ¬ ∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.standardizedSquare g)",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedSquare"
    ]
@@ -39320,6 +39571,7 @@
    "line": 486,
    "statement": "(h : HardyWeinbergModel) (hmaf : h.altFreq = gaussianKurtosisMaf) : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 = 3",
    "mentions": [
+    "altFreq",
     "gaussianKurtosisMaf",
     "genotypeProb",
     "standardizedGenotype"
@@ -39345,6 +39597,7 @@
    "line": 561,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (hweLevelOne h.altFreq).isSignSymmetric = true ↔ (∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.standardizedGenotype g))",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "hweLevelOne",
     "standardizedGenotype"
@@ -39378,6 +39631,7 @@
    "line": 684,
    "statement": "(spectrum : MafSpectrum m) (hpoly : ∀ j, 0 < (spectrum.model j).altFreq ∧ (spectrum.model j).altFreq < 1) : spectrum.moment 4 = ∑ j, spectrum.weight j / (spectrum.model j).genotypeVariance",
    "mentions": [
+    "altFreq",
     "genotypeVariance",
     "moment"
    ]
@@ -39389,6 +39643,7 @@
    "line": 741,
    "statement": "(spectrum : MafSpectrum m) (hpoly : ∀ j, 0 < (spectrum.model j).altFreq ∧ (spectrum.model j).altFreq < 1) : spectrum.moment 6 = (spectrum.moment 4) ^ 2 + 10 * spectrum.moment 4 - 20 + spectrum.fourthMomentDispersion",
    "mentions": [
+    "altFreq",
     "fourthMomentDispersion",
     "moment"
    ]
@@ -39473,6 +39728,7 @@
    "line": 1018,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.genotypeVariance * squaringScaleSq (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 1 - h.genotypeVariance",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "squaringScaleSq",
@@ -39486,6 +39742,7 @@
    "line": 1042,
    "statement": "(h : HardyWeinbergModel) (hmaf : h.altFreq = gaussianKurtosisMaf) : squaringScaleSq (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = squaringScaleSq 3",
    "mentions": [
+    "altFreq",
     "gaussianKurtosisMaf",
     "genotypeProb",
     "squaringScaleSq",
@@ -39579,6 +39836,7 @@
    "line": 1259,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : 2 ≤ ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -39590,6 +39848,7 @@
    "line": 1270,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 2 ↔ h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -39601,6 +39860,7 @@
    "line": 1302,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hunbalanced : h.altFreq ≠ 1 / 2) : 2 < ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -39612,6 +39872,7 @@
    "line": 1317,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : 2 < (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ↔ ¬ (∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.standardizedGenotype g))",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -39623,6 +39884,7 @@
    "line": 1345,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hsym : ∃ coding : SymmetricCoding Foundations.DiploidGenotype, (∀ g, coding.weight g = h.genotypeProb g) ∧ (∀ g, coding.value g = h.standardizedGenotype g)) : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠ 3",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "standardizedGenotype"
    ]
@@ -39654,7 +39916,9 @@
    "file": "Descent/PopGen/StandardizedGenotypeMoments.lean",
    "line": 1383,
    "statement": "(h : HardyWeinbergModel) : h.reflect.altFreq = h.altFreq ↔ h.altFreq = 1 / 2",
-   "mentions": []
+   "mentions": [
+    "altFreq"
+   ]
   },
   {
    "name": "Descent.ladderMomentOrder_low_rungs",
@@ -39683,6 +39947,7 @@
    "line": 1537,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) = 1 ∧ (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) = 1 / h.genotypeVariance ∧ (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) = (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20",
    "mentions": [
+    "altFreq",
     "genotypeProb",
     "genotypeVariance",
     "standardizedGenotype"
@@ -39695,6 +39960,7 @@
    "line": 1650,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : Foundations.DiploidGenotype) : h.centeredSquare g = h.standardizedSquare g - 1",
    "mentions": [
+    "altFreq",
     "centeredSquare",
     "standardizedSquare"
    ]
@@ -39706,6 +39972,7 @@
    "line": 1657,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.centeredSquare Foundations.DiploidGenotype.homAlt = (2 - 3 * h.altFreq) / h.altFreq",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -39716,6 +39983,7 @@
    "line": 1668,
    "statement": "(h h' : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1) (hrarer : h.altFreq < h'.altFreq) : h'.centeredSquare Foundations.DiploidGenotype.homAlt < h.centeredSquare Foundations.DiploidGenotype.homAlt",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -39726,6 +39994,7 @@
    "line": 1684,
    "statement": "(h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hhalf : h.altFreq ≤ 1 / 2) (g : Foundations.DiploidGenotype) : |h.centeredSquare g| ≤ h.centeredSquare Foundations.DiploidGenotype.homAlt",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -39736,6 +40005,7 @@
    "line": 1731,
    "statement": "(h h' : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq0' : 0 < h'.altFreq) (hhalf' : h'.altFreq ≤ 1 / 2) (hrarer : h.altFreq < h'.altFreq) (g : Foundations.DiploidGenotype) : |h'.centeredSquare g| < h.centeredSquare Foundations.DiploidGenotype.homAlt",
    "mentions": [
+    "altFreq",
     "centeredSquare"
    ]
   },
@@ -65735,6 +66005,7 @@
    "line": 231,
    "statement": "(h : Foundations.HardyWeinbergModel) : h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq)",
    "mentions": [
+    "altFreq",
     "genotypeVariance"
    ]
   },
@@ -65746,6 +66017,7 @@
    "statement": "(h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : h.centeredAltAlleleCount g = Foundations.altAlleleCount g - 2 * h.altFreq",
    "mentions": [
     "altAlleleCount",
+    "altFreq",
     "centeredAltAlleleCount"
    ]
   },
@@ -65756,6 +66028,7 @@
    "line": 243,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.standardizedSquare Foundations.DiploidGenotype.homRef = 2 * h.altFreq / (1 - h.altFreq) ∧ h.standardizedSquare Foundations.DiploidGenotype.het = (1 - 2 * h.altFreq) ^ 2 / (2 * h.altFreq * (1 - h.altFreq)) ∧ h.standardizedSquare Foundations.DiploidGenotype.homAlt = 2 * (1 - h.altFreq) / h.altFreq",
    "mentions": [
+    "altFreq",
     "standardizedSquare"
    ]
   },
@@ -65766,6 +66039,7 @@
    "line": 272,
    "statement": "(h : Foundations.HardyWeinbergModel) : h.genotypeProb Foundations.DiploidGenotype.homRef = (1 - h.altFreq) ^ 2 ∧ h.genotypeProb Foundations.DiploidGenotype.het = 2 * (1 - h.altFreq) * h.altFreq ∧ h.genotypeProb Foundations.DiploidGenotype.homAlt = h.altFreq ^ 2",
    "mentions": [
+    "altFreq",
     "genotypeProb"
    ]
   },
@@ -65776,6 +66050,7 @@
    "line": 287,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.mellinDrift = hweMellinDrift h.altFreq",
    "mentions": [
+    "altFreq",
     "hweMellinDrift",
     "mellinDrift"
    ]
@@ -66020,6 +66295,7 @@
    "line": 965,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.mellinJetVariance = hweMellinJetVariance h.altFreq",
    "mentions": [
+    "altFreq",
     "hweMellinJetVariance",
     "mellinJetVariance"
    ]
@@ -66094,6 +66370,7 @@
    "line": 1164,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hlat : hweLatticeCondition h.altFreq) : h.standardizedSquare Foundations.DiploidGenotype.het = 2",
    "mentions": [
+    "altFreq",
     "hweLatticeCondition",
     "standardizedSquare"
    ]
@@ -66105,6 +66382,7 @@
    "line": 1183,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hlat : hweLatticeCondition h.altFreq) (g : Foundations.DiploidGenotype) : Real.log (h.standardizedSquare g) = Real.log 2 + Real.log ((1 - h.altFreq) / h.altFreq) * (hardCallLatticeIndex g : ℝ)",
    "mentions": [
+    "altFreq",
     "hardCallLatticeIndex",
     "hweLatticeCondition",
     "standardizedSquare"
@@ -66117,6 +66395,7 @@
    "line": 1223,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq : h.altFreq = latticeCriticalMaf) (u v : Foundations.DiploidGenotype) : ∃ k : ℤ, Real.log (h.standardizedSquare u) - Real.log (h.standardizedSquare v) = hardCallLatticeSpan * k",
    "mentions": [
+    "altFreq",
     "hardCallLatticeSpan",
     "latticeCriticalMaf",
     "standardizedSquare"
@@ -66130,6 +66409,7 @@
    "statement": "(h : Foundations.HardyWeinbergModel) (hq : h.altFreq = latticeCriticalMaf) : ¬ CramerCondition h.genotypeProb (fun g ↦ Real.log (h.standardizedSquare g))",
    "mentions": [
     "CramerCondition",
+    "altFreq",
     "genotypeProb",
     "latticeCriticalMaf",
     "standardizedSquare"
@@ -66142,6 +66422,7 @@
    "line": 1408,
    "statement": "(h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : (hweCodingInvariants h arithmeticType squareCumulant).symmetric = true ∧ (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧ (hweCodingInvariants h arithmeticType squareCumulant).jetVariance = 0",
    "mentions": [
+    "altFreq",
     "hweCodingInvariants"
    ]
   },
@@ -66174,6 +66455,7 @@
    "line": 1475,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.standardizedFourthMoment = 1 / (2 * h.altFreq * (1 - h.altFreq))",
    "mentions": [
+    "altFreq",
     "standardizedFourthMoment"
    ]
   },
@@ -66184,6 +66466,7 @@
    "line": 1490,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : 2 ≤ h.standardizedFourthMoment",
    "mentions": [
+    "altFreq",
     "standardizedFourthMoment"
    ]
   },
@@ -66194,6 +66477,7 @@
    "line": 1505,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) : h.standardizedFourthMoment = 2 ↔ h.altFreq = 1 / 2",
    "mentions": [
+    "altFreq",
     "standardizedFourthMoment"
    ]
   },
@@ -66204,6 +66488,7 @@
    "line": 1540,
    "statement": "(h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hhalf : h.altFreq = 1 / 2) : h.standardizedFourthMoment ≠ 3",
    "mentions": [
+    "altFreq",
     "standardizedFourthMoment"
    ]
   },
@@ -66222,7 +66507,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 52,
-   "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : dot direction (weightedResidualMoment P densityRatio X residual) = P (fun ω ↦ (densityRatio ω - 1) * (dot direction (X ω) * residual ω))",
+   "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : Foundations.dot direction (weightedResidualMoment P densityRatio X residual) = P (fun ω ↦ (densityRatio ω - 1) * (Foundations.dot direction (X ω) * residual ω))",
    "mentions": [
     "dot",
     "weightedResidualMoment"
@@ -66233,7 +66518,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 89,
-   "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : dot direction (weightedResidualMoment P densityRatio X residual) ^ 2 ≤ chiSquareBudget P densityRatio * directionalResidualCurvature P X residual direction",
+   "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : Foundations.dot direction (weightedResidualMoment P densityRatio X residual) ^ 2 ≤ chiSquareBudget P densityRatio * directionalResidualCurvature P X residual direction",
    "mentions": [
     "chiSquareBudget",
     "directionalResidualCurvature",
@@ -66271,7 +66556,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 178,
-   "statement": "(B : Matrix ι ι ℝ) (x y : ι → ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ x i + y i) = coefficientEnergy B x + coefficientEnergy B y + 2 * dot x (B.mulVec y)",
+   "statement": "(B : Matrix ι ι ℝ) (x y : ι → ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ x i + y i) = coefficientEnergy B x + coefficientEnergy B y + 2 * Foundations.dot x (B.mulVec y)",
    "mentions": [
     "IsSymmetricBilinearMatrix",
     "coefficientEnergy",
@@ -66283,7 +66568,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 194,
-   "statement": "(B : Matrix ι ι ℝ) (genuine artifact : ι → ℝ) (genuineBudget artifactBudget : ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) (hgenuine : coefficientEnergy B genuine ≤ genuineBudget ^ 2) (hartifact : coefficientEnergy B artifact ≤ artifactBudget ^ 2) (hcross : dot genuine (B.mulVec artifact) ≤ genuineBudget * artifactBudget) : coefficientEnergy B (fun i ↦ genuine i + artifact i) ≤ (genuineBudget + artifactBudget) ^ 2",
+   "statement": "(B : Matrix ι ι ℝ) (genuine artifact : ι → ℝ) (genuineBudget artifactBudget : ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) (hgenuine : coefficientEnergy B genuine ≤ genuineBudget ^ 2) (hartifact : coefficientEnergy B artifact ≤ artifactBudget ^ 2) (hcross : Foundations.dot genuine (B.mulVec artifact) ≤ genuineBudget * artifactBudget) : coefficientEnergy B (fun i ↦ genuine i + artifact i) ≤ (genuineBudget + artifactBudget) ^ 2",
    "mentions": [
     "IsSymmetricBilinearMatrix",
     "coefficientEnergy",
@@ -66583,7 +66868,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 986,
-   "statement": "(B : Matrix ι ι ℝ) (x y : ι → ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ x i - y i) = coefficientEnergy B x + coefficientEnergy B y - 2 * dot x (B.mulVec y)",
+   "statement": "(B : Matrix ι ι ℝ) (x y : ι → ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ x i - y i) = coefficientEnergy B x + coefficientEnergy B y - 2 * Foundations.dot x (B.mulVec y)",
    "mentions": [
     "IsSymmetricBilinearMatrix",
     "coefficientEnergy",
@@ -66595,7 +66880,7 @@
    "kind": "theorem",
    "file": "Descent/Spectral/ProjectionShiftBounds.lean",
    "line": 1003,
-   "statement": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ a * beta i - theta i) = a ^ 2 * coefficientEnergy B beta - 2 * a * dot beta (B.mulVec theta) + coefficientEnergy B theta",
+   "statement": "(B : Matrix ι ι ℝ) (beta theta : ι → ℝ) (a : ℝ) (hsymmetric : IsSymmetricBilinearMatrix B) : coefficientEnergy B (fun i ↦ a * beta i - theta i) = a ^ 2 * coefficientEnergy B beta - 2 * a * Foundations.dot beta (B.mulVec theta) + coefficientEnergy B theta",
    "mentions": [
     "IsSymmetricBilinearMatrix",
     "coefficientEnergy",
@@ -110995,6 +111280,12 @@
      "Descent.Core.scaledMutationRate_eq": [],
      "Descent.Core.scaledMigrationRate_eq": [],
      "Descent.Core.hweHeterozygosity_at_half": [],
+     "Descent.Core.Genotype.dosage_le_ploidy": [],
+     "Descent.Core.Panel.altFreq_nonneg": [],
+     "Descent.Core.Panel.altFreq_le_one": [],
+     "Descent.Core.hweProb_het": [],
+     "Descent.Core.hwe_dosage_variance": [],
+     "Descent.Core.hwe_mean_dosage": [],
      "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
      "Descent.scaledMutationRate_div_mu": [],
      "Descent.scaledMigrationRate_div_m": [],
@@ -111129,8 +111420,14 @@
     }
    },
    "mentioned_by": [
+    "Descent.Core.Genotype.dosage_le_ploidy",
+    "Descent.Core.Panel.altFreq_le_one",
+    "Descent.Core.Panel.altFreq_nonneg",
     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
     "Descent.Core.hweHeterozygosity_at_half",
+    "Descent.Core.hweProb_het",
+    "Descent.Core.hwe_dosage_variance",
+    "Descent.Core.hwe_mean_dosage",
     "Descent.Core.scaledMigrationRate_eq",
     "Descent.Core.scaledMutationRate_eq",
     "Descent.EvolutionaryParameters.bigM_nonneg",
@@ -112297,6 +112594,8 @@
     "hypotheses_by_theorem": {
      "Descent.Core.hweHeterozygosity_at_half": [],
      "Descent.Core.hweHeterozygosity_allele_swap": [],
+     "Descent.Core.hweProb_het": [],
+     "Descent.Core.hwe_dosage_variance": [],
      "Descent.discoveryNCP_at_reference_point": [],
      "Descent.discoveryNCP_allele_swap": [],
      "Descent.discoveryNCP_increases_with_n": [
@@ -112370,6 +112669,8 @@
    "mentioned_by": [
     "Descent.Core.hweHeterozygosity_allele_swap",
     "Descent.Core.hweHeterozygosity_at_half",
+    "Descent.Core.hweProb_het",
+    "Descent.Core.hwe_dosage_variance",
     "Descent.Program.additiveVariance_uses_hwe",
     "Descent.Program.causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
     "Descent.Program.dominanceVariance_uses_hwe",
@@ -112415,6 +112716,853 @@
     "Descent.multi_trait_increases_effective_n",
     "Descent.ncp_ratio_from_maf",
     "Descent.source_higher_effective_information"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.equivFin3",
+   "decl_name": "equivFin3",
+   "short": "equivFin3",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 91,
+   "signature": ": Genotype ≃ Fin 3 where toFun | .homRef => 0 | .het => 1 | .homAlt => 2 invFun | ⟨0, _⟩ => .homRef | ⟨1, _⟩ => .het | ⟨2, _⟩ => .homAlt left_inv g",
+   "args": [],
+   "ret_type": "Genotype ≃ Fin 3 where toFun | .homRef => 0 | .het => 1 | .homAlt => 2 invFun | ⟨0, _⟩ => .homRef | ⟨1, _⟩ => .het | ⟨2, _⟩ => .homAlt left_inv g",
+   "body": " by\n    cases g <;> rfl\n  right_inv i := by\n    fin_cases i <;> rfl",
+   "docstring": "Concrete enumeration of the three genotypes by `Fin 3`.",
+   "empirical_status": "",
+   "namespace": "Descent.Core.Genotype",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.Genotype.equivFin3_symm_apply_apply": [],
+     "Descent.Core.Genotype.sum_univ": [],
+     "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply": [],
+     "Descent.Foundations.sum_over_genotypes": [],
+     "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
+     "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Core.Genotype.equivFin3_symm_apply_apply",
+    "Descent.Core.Genotype.sum_univ",
+    "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply",
+    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
+    "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
+    "Descent.Foundations.sum_over_genotypes"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.ofAlleles",
+   "decl_name": "ofAlleles",
+   "short": "ofAlleles",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 131,
+   "signature": ": Allele → Allele → Genotype",
+   "args": [],
+   "ret_type": "Allele → Allele → Genotype",
+   "body": "| .ref, .ref => .homRef\n  | .ref, .alt => .het\n  | .alt, .ref => .het\n  | .alt, .alt => .homAlt",
+   "docstring": "**The genotype two gametes make.**\n\nA diploid individual's genotype at a locus is determined by the two alleles it inherits,\nand by nothing else about which parent supplied which.  Making this a function rather than\na remark is what lets `ofAlleles_comm` be a theorem.",
+   "empirical_status": "",
+   "namespace": "Descent.Core.Genotype",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": ".ref, .ref",
+     "rhs": ".homRef"
+    },
+    {
+     "pattern": ".ref, .alt",
+     "rhs": ".het"
+    },
+    {
+     "pattern": ".alt, .ref",
+     "rhs": ".het"
+    },
+    {
+     "pattern": ".alt, .alt",
+     "rhs": ".homAlt"
+    }
+   ],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.Genotype.ofAlleles_comm": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Core.Genotype.ofAlleles_comm"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genotype.dosage",
+   "decl_name": "dosage",
+   "short": "dosage",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 152,
+   "signature": ": Genotype → ℝ",
+   "args": [],
+   "ret_type": "Genotype → ℝ",
+   "body": "| .homRef => 0\n  | .het => 1\n  | .homAlt => 2",
+   "docstring": "**Number of alternative alleles carried**, the corpus's `0/1/2` genotype coding.\n\nEmpirical status: NOT AN EMPIRICAL CLAIM.  This is a CODING, and a coding cannot disagree\nwith a population: it fixes what the symbol `dosage` denotes everywhere downstream.  What\nis empirical is what the coding buys, and that is tested where it is used --\n`BlindnessRegistry.averageEffect` is the least-squares slope of genotypic value on THIS\ndosage, and a different coding would move that slope.",
+   "empirical_status": "NOT AN EMPIRICAL CLAIM",
+   "namespace": "Descent.Core.Genotype",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": ".homRef",
+     "rhs": "0"
+    },
+    {
+     "pattern": ".het",
+     "rhs": "1"
+    },
+    {
+     "pattern": ".homAlt",
+     "rhs": "2"
+    }
+   ],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.Genotype.dosage_homRef": [],
+     "Descent.Core.Genotype.dosage_het": [],
+     "Descent.Core.Genotype.dosage_homAlt": [],
+     "Descent.Core.Genotype.dosage_nonneg": [],
+     "Descent.Core.Genotype.dosage_le_ploidy": [],
+     "Descent.Core.Panel.altFreq_le_one": [],
+     "Descent.Core.hwe_dosage_variance": [],
+     "Descent.Core.hwe_mean_dosage": []
+    },
+    "range_lo_thm": [
+     "Descent.Core.Genotype.dosage_nonneg",
+     0
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Descent.Core.Genotype.dosage_het",
+    "Descent.Core.Genotype.dosage_homAlt",
+    "Descent.Core.Genotype.dosage_homRef",
+    "Descent.Core.Genotype.dosage_le_ploidy",
+    "Descent.Core.Genotype.dosage_nonneg",
+    "Descent.Core.Panel.altFreq_le_one",
+    "Descent.Core.hwe_dosage_variance",
+    "Descent.Core.hwe_mean_dosage"
+   ]
+  },
+  {
+   "name": "Descent.Core.Locus",
+   "decl_name": "Locus",
+   "short": "Locus",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 180,
+   "signature": "(n : ℕ)",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "",
+   "body": " Fin n",
+   "docstring": "**A locus**: an index into a set of `n` sites.\n\nAn abbreviation and not a structure.  There is nothing to know about a locus in this\ndevelopment beyond which one it is -- position, chromosome and reference base never enter\na statement -- and a one-field structure would buy no invariant while costing every\ntheorem a projection.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.cumulantTensorEnergy_pushedCumulantTensor": [],
+     "Descent.cumulantTensorEnergy_pushedCumulantTensor_zero": [],
+     "Descent.cumulantTensorEnergy_eq_iff_entryPowerSum_eq": [],
+     "Descent.entryPowerSum_three": [],
+     "Descent.thirdTensorEnergy_pushedThirdMomentTensor": [],
+     "Descent.entryPowerSum_four": [],
+     "Descent.fourthTensorEnergy_pushedFourthCumulantTensor": [],
+     "Descent.entryFourthSum_eq_sum_ldPowerScore_four": [],
+     "Descent.entryPowerSum_two": [],
+     "Descent.entrySquareSum_eq_trace_sq_of_symmetric": [],
+     "Descent.independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant": [],
+     "Descent.skewedArchitecture_thirdMomentEnergy_eq_ldOrientationInvariant": [],
+     "Descent.symmetricArchitecture_thirdMomentEnergy_eq_zero": [],
+     "Descent.symmetricNonGaussianArchitecture_fourthCumulantEnergy_eq_ldOrientationInvariant": [],
+     "Descent.ldOrientationFourthInvariant_eq_sum_ldPowerScore_four": [],
+     "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughLDGraphs": [],
+     "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs": [],
+     "Descent.Conditionals.permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs": [],
+     "Descent.Conditionals.degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs": [],
+     "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs": [],
+     "Descent.Conditionals.degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq": [],
+     "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq": [],
+     "Descent.Conditionals.degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile": [],
+     "Descent.Core.Panel.altFreq_nonneg": [],
+     "Descent.Core.Panel.altFreq_le_one": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq",
+    "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs",
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq",
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs",
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile",
+    "Descent.Conditionals.permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs",
+    "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs",
+    "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughLDGraphs",
+    "Descent.Core.Panel.altFreq_le_one",
+    "Descent.Core.Panel.altFreq_nonneg",
+    "Descent.cumulantTensorEnergy_eq_iff_entryPowerSum_eq",
+    "Descent.cumulantTensorEnergy_pushedCumulantTensor",
+    "Descent.cumulantTensorEnergy_pushedCumulantTensor_zero",
+    "Descent.entryFourthSum_eq_sum_ldPowerScore_four",
+    "Descent.entryPowerSum_four",
+    "Descent.entryPowerSum_three",
+    "Descent.entryPowerSum_two",
+    "Descent.entrySquareSum_eq_trace_sq_of_symmetric",
+    "Descent.fourthTensorEnergy_pushedFourthCumulantTensor",
+    "Descent.independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant",
+    "Descent.ldOrientationFourthInvariant_eq_sum_ldPowerScore_four",
+    "Descent.skewedArchitecture_thirdMomentEnergy_eq_ldOrientationInvariant",
+    "Descent.symmetricArchitecture_thirdMomentEnergy_eq_zero",
+    "Descent.symmetricNonGaussianArchitecture_fourthCumulantEnergy_eq_ldOrientationInvariant",
+    "Descent.thirdTensorEnergy_pushedThirdMomentTensor"
+   ]
+  },
+  {
+   "name": "Descent.Core.Haplotype",
+   "decl_name": "Haplotype",
+   "short": "Haplotype",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 183,
+   "signature": "(n : ℕ)",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "",
+   "body": " Locus n → Allele",
+   "docstring": "**A haplotype**: one allele at each of `n` loci.  A gamete.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.Genome.ofHaplotypes_comm": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Core.Genome.ofHaplotypes_comm"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genome",
+   "decl_name": "Genome",
+   "short": "Genome",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 186,
+   "signature": "(n : ℕ)",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "",
+   "body": " Locus n → Genotype",
+   "docstring": "**A genome**: one diploid genotype at each of `n` loci.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Conditionals.totalVariationGap_nonneg": [],
+     "Descent.Conditionals.totalVariationGap_le_two_of_probabilityMasses": [],
+     "Descent.Conditionals.labelMass_nonneg": [],
+     "Descent.Conditionals.functionalDescends_iff_descendsAlong": [],
+     "Descent.Conditionals.labelMass_fiberConditional": [],
+     "Descent.Conditionals.sum_fiberConditional": [],
+     "Descent.Conditionals.fiberConditional_nonneg": [],
+     "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent": [],
+     "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent_of_nonempty": [],
+     "Descent.Conditionals.descendsAlong_of_kernelSufficient": [],
+     "Descent.Conditionals.kernelSufficient_iff_identity_descends": [],
+     "Descent.Conditionals.labelMass_labelFactor": [],
+     "Descent.Conditionals.fiberConditional_labelFactor": [],
+     "Descent.Conditionals.kernelSufficient_of_labelTilt": [],
+     "Descent.Conditionals.fiberConditional_of_separating": [],
+     "Descent.Conditionals.conditionalSectionMean_fiberConditional": [],
+     "Descent.Conditionals.conditionalSectionMean_fiberConditional_of_labelFunction": [],
+     "Descent.Conditionals.descendsAlong_sectionMean_of_labelFunction": [],
+     "Descent.Conditionals.labelMass_pointLaw": [],
+     "Descent.Conditionals.conditionalSectionMean_pointLaw": [],
+     "Descent.Conditionals.fiberConditional_pointLaw": [],
+     "Descent.Conditionals.labelFunction_of_descends_pointLaws": [],
+     "Descent.Conditionals.abs_sectionMean_sub_le": [],
+     "Descent.Conditionals.abs_sectionMean_sub_le_half_range": [],
+     "Descent.Conditionals.exists_kernel_attaining_totalVariationGap": [],
+     "Descent.Conditionals.componentMixtureDensity_eq_posteriorTilt_mul": [],
+     "Descent.Conditionals.kernelSufficient_componentPosterior": [],
+     "Descent.Conditionals.descendsAlong_componentPosterior": [],
+     "Descent.Conditionals.componentPosterior_at_zero_denominator_is_junk": [],
+     "Descent.Conditionals.posteriorTilt_at_zero_target": [],
+     "Descent.Conditionals.posteriorTilt_at_zero_base_weight_is_junk": [],
+     "Descent.Conditionals.componentMixtureDensity_factorization": [],
+     "Descent.Conditionals.componentDensityRatio_eq_posteriorTilt": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Conditionals.abs_sectionMean_sub_le",
+    "Descent.Conditionals.abs_sectionMean_sub_le_half_range",
+    "Descent.Conditionals.componentDensityRatio_eq_posteriorTilt",
+    "Descent.Conditionals.componentMixtureDensity_eq_posteriorTilt_mul",
+    "Descent.Conditionals.componentMixtureDensity_factorization",
+    "Descent.Conditionals.componentPosterior_at_zero_denominator_is_junk",
+    "Descent.Conditionals.conditionalSectionMean_fiberConditional",
+    "Descent.Conditionals.conditionalSectionMean_fiberConditional_of_labelFunction",
+    "Descent.Conditionals.conditionalSectionMean_pointLaw",
+    "Descent.Conditionals.descendsAlong_componentPosterior",
+    "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent",
+    "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent_of_nonempty",
+    "Descent.Conditionals.descendsAlong_of_kernelSufficient",
+    "Descent.Conditionals.descendsAlong_sectionMean_of_labelFunction",
+    "Descent.Conditionals.exists_kernel_attaining_totalVariationGap",
+    "Descent.Conditionals.fiberConditional_labelFactor",
+    "Descent.Conditionals.fiberConditional_nonneg",
+    "Descent.Conditionals.fiberConditional_of_separating",
+    "Descent.Conditionals.fiberConditional_pointLaw",
+    "Descent.Conditionals.functionalDescends_iff_descendsAlong",
+    "Descent.Conditionals.kernelSufficient_componentPosterior",
+    "Descent.Conditionals.kernelSufficient_iff_identity_descends",
+    "Descent.Conditionals.kernelSufficient_of_labelTilt",
+    "Descent.Conditionals.labelFunction_of_descends_pointLaws",
+    "Descent.Conditionals.labelMass_fiberConditional",
+    "Descent.Conditionals.labelMass_labelFactor",
+    "Descent.Conditionals.labelMass_nonneg",
+    "Descent.Conditionals.labelMass_pointLaw",
+    "Descent.Conditionals.posteriorTilt_at_zero_base_weight_is_junk",
+    "Descent.Conditionals.posteriorTilt_at_zero_target",
+    "Descent.Conditionals.sum_fiberConditional",
+    "Descent.Conditionals.totalVariationGap_le_two_of_probabilityMasses",
+    "Descent.Conditionals.totalVariationGap_nonneg"
+   ]
+  },
+  {
+   "name": "Descent.Core.Genome.ofHaplotypes",
+   "decl_name": "Genome.ofHaplotypes",
+   "short": "ofHaplotypes",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 189,
+   "signature": "{n : ℕ} (h₁ h₂ : Haplotype n) : Genome n",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "h₁",
+      "h₂"
+     ],
+     "type": "Haplotype n",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Genome n",
+   "body": "  fun l ↦ Genotype.ofAlleles (h₁ l) (h₂ l)",
+   "docstring": "**A diploid genome is what two gametes make**, locus by locus.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.Genome.ofHaplotypes_comm": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Core.Genome.ofHaplotypes_comm"
+   ]
+  },
+  {
+   "name": "Descent.Core.AlleleFreq",
+   "decl_name": "AlleleFreq",
+   "short": "AlleleFreq",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 202,
+   "signature": "(n : ℕ)",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "",
+   "body": " Locus n → ℝ",
+   "docstring": "**An allele-frequency vector**: the alternative-allele frequency at each of `n` loci.\n\nNamed rather than written `Fin n → ℝ` at each use, so that a theorem quantified over\nallele frequencies says so in its statement.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "frequency",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.IsAlleleFreq",
+   "decl_name": "IsAlleleFreq",
+   "short": "IsAlleleFreq",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 207,
+   "signature": "{n : ℕ} (q : AlleleFreq n) : Prop",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "q"
+     ],
+     "type": "AlleleFreq n",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": " ∀ l, q l ∈ Set.Icc (0 : ℝ) 1",
+   "docstring": "The predicate that makes an `AlleleFreq` a frequency.  Carried as a hypothesis where\nit is needed rather than bundled, because most statements about frequencies hold on all\nof `ℝ` and bundling would make them harder to apply, not safer.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "frequency",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.LDMatrix",
+   "decl_name": "LDMatrix",
+   "short": "LDMatrix",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 210,
+   "signature": "(n : ℕ)",
+   "args": [
+    {
+     "names": [
+      "n"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "",
+   "body": " Locus n → Locus n → ℝ",
+   "docstring": "**A linkage-disequilibrium matrix** over `n` loci.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {},
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.Panel.witness",
+   "decl_name": "witness",
+   "short": "witness",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 225,
+   "signature": ": Panel where nSamples",
+   "args": [],
+   "ret_type": "Panel where nSamples",
+   "body": " 1\n  nLoci := 1\n  call := fun _ _ ↦ Genotype.het",
+   "docstring": "**The class is inhabited.**  A theorem quantified over an uninhabited structure is true\nand empty: kernel-checked, clean axiom report, no content.",
+   "empirical_status": "",
+   "namespace": "Descent.Core.Panel",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.BundleRigidity.LinearSCM.isInterventionalSolution_witness": [],
+     "Descent.BundleRigidity.LinearSCM.isSolution_witness": [],
+     "Descent.gramForm_witness": [],
+     "Descent.varianceNonneg_sub_rankOne_iff": [],
+     "Descent.belowCeiling_add_rankOne_iff": [],
+     "Descent.spiked_genotype_covariance_belowCeiling_of_threshold": [],
+     "Descent.pooledEnvironmentCorrelations_gt": [],
+     "Descent.pooledEnvironmentCorrelations_golden_lt": [],
+     "Descent.pooledEnvironmentGapCertificate_neg_of_same_sign": [],
+     "Descent.TrafficInvariantSeparation.diagonalTraceOneSDPOptimum_of_isDiagonalMaximum": [],
+     "Descent.Conditionals.FiniteBoundedDeviation.nonempty": [],
+     "Descent.Conditionals.pairwiseCompatibleOn_of_descendsOn": [],
+     "Descent.Conditionals.descendsOn_of_pairwiseCompatibleOn": [],
+     "Descent.Core.ScoreMoments.witness_admissible": [],
+     "Descent.Core.PopGenParameters.witness_not_atOrigin": [],
+     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
+     "Descent.fstDriftMigrationManyDemes_at_witness": [],
+     "Descent.migrationLDBoost_at_witness": [],
+     "Descent.mutationLDErosion_at_witness": [],
+     "Descent.sharedLDRetention_at_witness": [],
+     "Descent.thresholdRegime_witness": [],
+     "Descent.RecentFineScaleConfounding.not_mem_topPCSpan": [],
+     "Descent.pc_correction_recent_structure_lower_bound": [],
+     "Descent.Spectral.IsRankAllocation.witness": []
+    },
+    "range_hi_thm": [
+     "Descent.varianceNonneg_sub_rankOne_iff",
+     3
+    ],
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Descent.BundleRigidity.LinearSCM.isInterventionalSolution_witness",
+    "Descent.BundleRigidity.LinearSCM.isSolution_witness",
+    "Descent.Conditionals.FiniteBoundedDeviation.nonempty",
+    "Descent.Conditionals.descendsOn_of_pairwiseCompatibleOn",
+    "Descent.Conditionals.pairwiseCompatibleOn_of_descendsOn",
+    "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
+    "Descent.Core.PopGenParameters.witness_not_atOrigin",
+    "Descent.Core.ScoreMoments.witness_admissible",
+    "Descent.RecentFineScaleConfounding.not_mem_topPCSpan",
+    "Descent.Spectral.IsRankAllocation.witness",
+    "Descent.TrafficInvariantSeparation.diagonalTraceOneSDPOptimum_of_isDiagonalMaximum",
+    "Descent.belowCeiling_add_rankOne_iff",
+    "Descent.fstDriftMigrationManyDemes_at_witness",
+    "Descent.gramForm_witness",
+    "Descent.migrationLDBoost_at_witness",
+    "Descent.mutationLDErosion_at_witness",
+    "Descent.pc_correction_recent_structure_lower_bound",
+    "Descent.pooledEnvironmentCorrelations_golden_lt",
+    "Descent.pooledEnvironmentCorrelations_gt",
+    "Descent.pooledEnvironmentGapCertificate_neg_of_same_sign",
+    "Descent.sharedLDRetention_at_witness",
+    "Descent.spiked_genotype_covariance_belowCeiling_of_threshold",
+    "Descent.thresholdRegime_witness",
+    "Descent.varianceNonneg_sub_rankOne_iff"
+   ]
+  },
+  {
+   "name": "Descent.Core.Panel.altFreq",
+   "decl_name": "altFreq",
+   "short": "altFreq",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Core/Genome.lean",
+   "line": 233,
+   "signature": "(P : Panel) (l : Locus P.nLoci) : ℝ",
+   "args": [
+    {
+     "names": [
+      "P"
+     ],
+     "type": "Panel",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "l"
+     ],
+     "type": "Locus P.nLoci",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (∑ i, (P.call i l).dosage) / (ploidy * (P.nSamples : ℝ))",
+   "docstring": "**The empirical alternative-allele frequency at a locus**: total alternative copies\nover total copies, the estimator every `F_ST` and heterozygosity measurement in the\nvalidation tier actually computes.",
+   "empirical_status": "",
+   "namespace": "Descent.Core.Panel",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "F_ST",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < P.nSamples"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.averageEffect_eq_regression_slope": [],
+     "Descent.thirdCentralMoment_zero_iff_dominance_invisible": [],
+     "Descent.hweThirdCentralMoment_eq": [],
+     "Descent.hwe_symmetricCoding_forces_half": [],
+     "Descent.hwe_symmetricCoding_iff_half": [],
+     "Descent.standardizedGenotype_symmetric_iff": [],
+     "Descent.centeredDosageSquare_two_valued_at_half": [],
+     "Descent.hardCall_coding_dichotomy": [],
+     "Descent.standardizedGenotype_second_moment_one": [],
+     "Descent.standardizedGenotype_fourth_moment": [],
+     "Descent.standardizedSquare_second_cumulant": [],
+     "Descent.centeredSquare_expectation_zero": [],
+     "Descent.centeredSquare_negative_at_half": [],
+     "Descent.standardizedGenotype_sixth_moment": [],
+     "Descent.centeredSquare_values_at_half": [],
+     "Descent.centeredSquare_rademacher_at_half": [],
+     "Descent.centeredSquare_third_moment_factored": [],
+     "Descent.centeredSquare_third_moment_zero_iff_balanced": [],
+     "Descent.standardizedGenotype_even_moment_mul": [],
+     "Descent.standardizedGenotype_even_moment_lower_bound": [],
+     "Descent.hweSignBias_eq": [],
+     "Descent.hweSignBias_zero_iff_balanced": [],
+     "Descent.HardyWeinbergModel.reflect_altFreq": [],
+     "Descent.moment_eq_of_altFreq_eq": [],
+     "Descent.genotypeVariance_determines_frequency_pair": [],
+     "Descent.singleLocus_tower_collapses": [],
+     "Descent.Core.Panel.altFreq_nonneg": [],
+     "Descent.Core.Panel.altFreq_le_one": [
+      "0 < P.nSamples"
+     ],
+     "Descent.Foundations.HardyWeinbergModel.refFreq_add_altFreq": [],
+     "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
+     "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq": [],
+     "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq": [],
+     "Descent.Foundations.HardyWeinbergModel.genotypeVariance_pos": [],
+     "Descent.mellinDrift_uses_ploidy": [],
+     "Descent.standardizedSquare_eq_over_hweGenotypeVariance": [],
+     "Descent.no_signSymmetric_nondegenerate_locus": [],
+     "Descent.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance": [],
+     "Descent.standardizedGenotype_sq_eq_standardizedSquare": [],
+     "Descent.standardizedSquare_never_symmetric": [],
+     "Descent.standardizedGenotype_kurtosis_gaussian_at_blind_maf": [],
+     "Descent.hweLevelOne_symmetry": [],
+     "Descent.MafSpectrum.fourthMoment_eq": [],
+     "Descent.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+     "Descent.hweFloorOneScaleSq_eq": [],
+     "Descent.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [],
+     "Descent.hweGenotypeVariance_le_half": [],
+     "Descent.standardizedGenotype_fourth_moment_ge_two": [],
+     "Descent.standardizedGenotype_fourth_moment_eq_two_iff": [],
+     "Descent.hwe_phase_inequality_off_balanced": [],
+     "Descent.phase_strict_iff_not_symmetric": [],
+     "Descent.hwe_rigidity_hypotheses_unsatisfiable": [],
+     "Descent.balanced_locus_is_reflection_fixed_point": [],
+     "Descent.hweLadderMoments": [],
+     "Descent.centeredSquare_eq_standardizedSquare_sub_one": [],
+     "Descent.centeredSquare_homAlt_eq": [],
+     "Descent.centeredSquare_homAlt_strictAnti": [],
+     "Descent.abs_centeredSquare_le_homAlt": [],
+     "Descent.rarest_locus_owns_largest_atom": [],
+     "Descent.Spectral.hwe_variance_eq": [],
+     "Descent.Spectral.hwe_centered": [],
+     "Descent.Spectral.standardizedSquare_values": [],
+     "Descent.Spectral.genotypeProb_values": [],
+     "Descent.Spectral.HardyWeinbergModel.mellinDrift_eq": [],
+     "Descent.Spectral.HardyWeinbergModel.mellinJetVariance_eq": [],
+     "Descent.Spectral.hweLatticeCondition_het_standardizedSquare": [],
+     "Descent.Spectral.hardCall_logSquare_eq_of_latticeCondition": [],
+     "Descent.Spectral.hardCall_logSquare_lattice_at_critical_maf": [],
+     "Descent.Spectral.hardCall_not_cramer_at_critical_maf": [],
+     "Descent.Spectral.balanced_locus_symmetric_component": [],
+     "Descent.Spectral.HardyWeinbergModel.standardizedFourthMoment_eq": [],
+     "Descent.Spectral.standardizedFourthMoment_ge_two": [],
+     "Descent.Spectral.standardizedFourthMoment_eq_two_iff_half": [],
+     "Descent.Spectral.standardizedFourthMoment_ne_gaussian_at_half": []
+    },
+    "range_hi_thm": [
+     "Descent.Core.Panel.altFreq_le_one",
+     1
+    ],
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Descent.Core.Panel.altFreq_le_one",
+    "Descent.Core.Panel.altFreq_nonneg",
+    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
+    "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
+    "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq",
+    "Descent.Foundations.HardyWeinbergModel.genotypeVariance_pos",
+    "Descent.Foundations.HardyWeinbergModel.refFreq_add_altFreq",
+    "Descent.HardyWeinbergModel.reflect_altFreq",
+    "Descent.MafSpectrum.fourthMoment_eq",
+    "Descent.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
+    "Descent.Spectral.HardyWeinbergModel.mellinDrift_eq",
+    "Descent.Spectral.HardyWeinbergModel.mellinJetVariance_eq",
+    "Descent.Spectral.HardyWeinbergModel.standardizedFourthMoment_eq",
+    "Descent.Spectral.balanced_locus_symmetric_component",
+    "Descent.Spectral.genotypeProb_values",
+    "Descent.Spectral.hardCall_logSquare_eq_of_latticeCondition",
+    "Descent.Spectral.hardCall_logSquare_lattice_at_critical_maf",
+    "Descent.Spectral.hardCall_not_cramer_at_critical_maf",
+    "Descent.Spectral.hweLatticeCondition_het_standardizedSquare",
+    "Descent.Spectral.hwe_centered",
+    "Descent.Spectral.hwe_variance_eq",
+    "Descent.Spectral.standardizedFourthMoment_eq_two_iff_half",
+    "Descent.Spectral.standardizedFourthMoment_ge_two",
+    "Descent.Spectral.standardizedFourthMoment_ne_gaussian_at_half",
+    "Descent.Spectral.standardizedSquare_values",
+    "Descent.abs_centeredSquare_le_homAlt",
+    "Descent.averageEffect_eq_regression_slope",
+    "Descent.balanced_locus_is_reflection_fixed_point",
+    "Descent.centeredDosageSquare_two_valued_at_half",
+    "Descent.centeredSquare_eq_standardizedSquare_sub_one",
+    "Descent.centeredSquare_expectation_zero",
+    "Descent.centeredSquare_homAlt_eq",
+    "Descent.centeredSquare_homAlt_strictAnti",
+    "Descent.centeredSquare_negative_at_half",
+    "Descent.centeredSquare_rademacher_at_half",
+    "Descent.centeredSquare_third_moment_factored",
+    "Descent.centeredSquare_third_moment_zero_iff_balanced",
+    "Descent.centeredSquare_values_at_half",
+    "Descent.genotypeVariance_determines_frequency_pair",
+    "Descent.hardCall_coding_dichotomy",
+    "Descent.hweFloorOneScaleSq_eq",
+    "Descent.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
+    "Descent.hweGenotypeVariance_le_half",
+    "Descent.hweLadderMoments",
+    "Descent.hweLevelOne_symmetry",
+    "Descent.hweSignBias_eq",
+    "Descent.hweSignBias_zero_iff_balanced",
+    "Descent.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
+    "Descent.hweThirdCentralMoment_eq",
+    "Descent.hwe_phase_inequality_off_balanced",
+    "Descent.hwe_rigidity_hypotheses_unsatisfiable",
+    "Descent.hwe_symmetricCoding_forces_half",
+    "Descent.hwe_symmetricCoding_iff_half",
+    "Descent.mellinDrift_uses_ploidy",
+    "Descent.moment_eq_of_altFreq_eq",
+    "Descent.no_signSymmetric_nondegenerate_locus",
+    "Descent.phase_strict_iff_not_symmetric",
+    "Descent.rarest_locus_owns_largest_atom",
+    "Descent.singleLocus_tower_collapses",
+    "Descent.standardizedGenotype_even_moment_lower_bound",
+    "Descent.standardizedGenotype_even_moment_mul",
+    "Descent.standardizedGenotype_fourth_moment",
+    "Descent.standardizedGenotype_fourth_moment_eq_two_iff",
+    "Descent.standardizedGenotype_fourth_moment_ge_two",
+    "Descent.standardizedGenotype_kurtosis_gaussian_at_blind_maf",
+    "Descent.standardizedGenotype_second_moment_one",
+    "Descent.standardizedGenotype_sixth_moment",
+    "Descent.standardizedGenotype_sq_eq_standardizedSquare",
+    "Descent.standardizedGenotype_symmetric_iff",
+    "Descent.standardizedSquare_eq_over_hweGenotypeVariance",
+    "Descent.standardizedSquare_never_symmetric",
+    "Descent.standardizedSquare_second_cumulant",
+    "Descent.thirdCentralMoment_zero_iff_dominance_invisible"
+   ]
+  },
+  {
+   "name": "Descent.Core.hweProb",
+   "decl_name": "hweProb",
+   "short": "hweProb",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Core/Genome.lean",
+   "line": 276,
+   "signature": "(q : ℝ) : Genotype → ℝ",
+   "args": [
+    {
+     "names": [
+      "q"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Genotype → ℝ",
+   "body": "| .homRef => (1 - q) ^ 2\n  | .het => 2 * q * (1 - q)\n  | .homAlt => q ^ 2",
+   "docstring": "**The Hardy-Weinberg genotype law** at alternative-allele frequency `q`.\n\nThe `2` in the heterozygote term is the binomial coefficient `C(2,1)`: a heterozygote can\narise in two ways, alt-from-the-first-gamete and alt-from-the-second, and `Genotype`\nidentifies them.  It is not the ploidy convention, although it counts the same two gene\ncopies; `hweProb_het` below is where the two meet.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": ".homRef",
+     "rhs": "(1 - q) ^ 2"
+    },
+    {
+     "pattern": ".het",
+     "rhs": "2 * q * (1 - q)"
+    },
+    {
+     "pattern": ".homAlt",
+     "rhs": "q ^ 2"
+    }
+   ],
+   "constraints": {
+    "declared_kind": "frequency",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Core.sum_hweProb": [],
+     "Descent.Core.hweProb_het": [],
+     "Descent.Core.hwe_dosage_variance": [],
+     "Descent.Core.hwe_mean_dosage": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Core.hweProb_het",
+    "Descent.Core.hwe_dosage_variance",
+    "Descent.Core.hwe_mean_dosage",
+    "Descent.Core.sum_hweProb"
    ]
   },
   {
@@ -123570,6 +124718,8 @@
    "constraints": {
     "hypotheses": [],
     "hypotheses_by_theorem": {
+     "Descent.Core.Genotype.equivFin3_symm_apply_apply": [],
+     "Descent.Core.Genotype.sum_univ": [],
      "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply": [],
      "Descent.Foundations.sum_over_genotypes": [],
      "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
@@ -123577,6 +124727,8 @@
     }
    },
    "mentioned_by": [
+    "Descent.Core.Genotype.equivFin3_symm_apply_apply",
+    "Descent.Core.Genotype.sum_univ",
     "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply",
     "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
     "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
@@ -136173,7 +137325,7 @@
     "hypotheses": [
      "∀ x : ℝ × (Fin k → ℝ",
      "Integrable (fun x : ℝ × (Fin k → ℝ",
-     "∀ p c, cmdgp.m p c = dot wStar (X (p, c"
+     "∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c"
     ],
     "hypotheses_by_theorem": {
      "Descent.irreduciblePredictionRisk_at_noiseless": [
@@ -136183,7 +137335,7 @@
       "Integrable (fun x : ℝ × (Fin k → ℝ"
      ],
      "Descent.ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition": [
-      "∀ p c, cmdgp.m p c = dot wStar (X (p, c",
+      "∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c",
       "Integrable (fun x : ℝ × (Fin k → ℝ"
      ]
     }
@@ -153242,6 +154394,8 @@
     "hypotheses_by_theorem": {
      "Descent.Core.hweHeterozygosity_at_half": [],
      "Descent.Core.hweHeterozygosity_allele_swap": [],
+     "Descent.Core.hweProb_het": [],
+     "Descent.Core.hwe_dosage_variance": [],
      "Descent.discoveryNCP_at_reference_point": [],
      "Descent.discoveryNCP_allele_swap": [],
      "Descent.discoveryNCP_increases_with_n": [
@@ -153315,6 +154469,8 @@
    "mentioned_by": [
     "Descent.Core.hweHeterozygosity_allele_swap",
     "Descent.Core.hweHeterozygosity_at_half",
+    "Descent.Core.hweProb_het",
+    "Descent.Core.hwe_dosage_variance",
     "Descent.Program.additiveVariance_uses_hwe",
     "Descent.Program.causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
     "Descent.Program.dominanceVariance_uses_hwe",
@@ -200555,6 +201711,12 @@
      "Descent.Core.scaledMutationRate_eq": [],
      "Descent.Core.scaledMigrationRate_eq": [],
      "Descent.Core.hweHeterozygosity_at_half": [],
+     "Descent.Core.Genotype.dosage_le_ploidy": [],
+     "Descent.Core.Panel.altFreq_nonneg": [],
+     "Descent.Core.Panel.altFreq_le_one": [],
+     "Descent.Core.hweProb_het": [],
+     "Descent.Core.hwe_dosage_variance": [],
+     "Descent.Core.hwe_mean_dosage": [],
      "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
      "Descent.scaledMutationRate_div_mu": [],
      "Descent.scaledMigrationRate_div_m": [],
@@ -200689,8 +201851,14 @@
     }
    },
    "mentioned_by": [
+    "Descent.Core.Genotype.dosage_le_ploidy",
+    "Descent.Core.Panel.altFreq_le_one",
+    "Descent.Core.Panel.altFreq_nonneg",
     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
     "Descent.Core.hweHeterozygosity_at_half",
+    "Descent.Core.hweProb_het",
+    "Descent.Core.hwe_dosage_variance",
+    "Descent.Core.hwe_mean_dosage",
     "Descent.Core.scaledMigrationRate_eq",
     "Descent.Core.scaledMutationRate_eq",
     "Descent.EvolutionaryParameters.bigM_nonneg",
@@ -208883,7 +210051,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  P (fun ω ↦ (dot direction (X ω) * residual ω) ^ 2)",
+   "body": "  P (fun ω ↦ (Foundations.dot direction (X ω) * residual ω) ^ 2)",
    "docstring": "Residual curvature seen along a coefficient direction.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -209027,7 +210195,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  dot x (B.mulVec x)",
+   "body": "  Foundations.dot x (B.mulVec x)",
    "docstring": "Quadratic energy associated with a second-moment matrix.",
    "empirical_status": "",
    "namespace": "Descent.Spectral",
@@ -209044,7 +210212,7 @@
      "IsSymmetricBilinearMatrix B",
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-     "dot genuine (B.mulVec artifact",
+     "Foundations.dot genuine (B.mulVec artifact",
      "0 < coefficientEnergy B beta",
      "coefficientEnergy B beta = 0"
     ],
@@ -209067,7 +210235,7 @@
       "IsSymmetricBilinearMatrix B",
       "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
       "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-      "dot genuine (B.mulVec artifact"
+      "Foundations.dot genuine (B.mulVec artifact"
      ],
      "Descent.Spectral.coefficientEnergy_smul": [],
      "Descent.Spectral.coefficientEnergy_sub": [
@@ -209648,7 +210816,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  dot beta (B.mulVec theta) / coefficientEnergy B beta",
+   "body": "  Foundations.dot beta (B.mulVec theta) / coefficientEnergy B beta",
    "docstring": "**The optimal recalibration of a transported predictor for one target.**\n\n`a* = (beta' B theta) / (beta' B beta)`, the scalar that best rescales the\ntransported direction `beta` towards the target optimum `theta` in the target\nmetric `B`.  This is the correction a recalibration step finds.\n\nEmpirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Spectral",
@@ -209716,7 +210884,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  coefficientEnergy B theta -\n    dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta\n\nomit [DecidableEq ι] in",
+   "body": "  coefficientEnergy B theta -\n    Foundations.dot beta (B.mulVec theta) ^ 2 / coefficientEnergy B beta\n\nomit [DecidableEq ι] in",
    "docstring": "**The part of the degradation no rescaling can remove.**\n\n`theta' B theta - (beta' B theta)^2 / (beta' B beta)`, which is the target\nsignal energy times the squared sine of the `B`-angle between `beta` and\n`theta`.  It vanishes when the transported direction is `B`-parallel to the\ntarget truth and is strictly positive otherwise.\n\nEmpirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Spectral",
@@ -210017,7 +211185,7 @@
      "IsSymmetricBilinearMatrix B",
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-     "dot genuine (B.mulVec artifact",
+     "Foundations.dot genuine (B.mulVec artifact",
      "0 < coefficientEnergy B beta",
      "Matrix.IsSymm B",
      "B.mulVec v = b",
@@ -210034,7 +211202,7 @@
       "IsSymmetricBilinearMatrix B",
       "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
       "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-      "dot genuine (B.mulVec artifact"
+      "Foundations.dot genuine (B.mulVec artifact"
      ],
      "Descent.Spectral.coefficientEnergy_sub": [
       "IsSymmetricBilinearMatrix B"
@@ -213743,6 +214911,85 @@
    "equations": [],
    "constraints": {
     "raw_chunk_lines": 10
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.Allele",
+   "decl_name": "Allele",
+   "short": "Allele",
+   "kind": "inductive",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 72,
+   "signature": "",
+   "args": [],
+   "ret_type": "",
+   "body": "| ref\n  | alt\n  deriving DecidableEq, Fintype, Repr",
+   "docstring": "**An allele at a biallelic locus**: the reference copy or the alternative copy.\n\nBiallelic because that is what the rest of the corpus assumes -- every `F_ST`,\nheterozygosity and linkage-disequilibrium quantity here is written for two alleles, and a\ntype admitting more would be promising a generality no theorem below delivers.  The\npangenome's three-symbol alphabet is a different object doing a different job (a reference\npath through a graph, not a state at a site) and is not folded into this.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 10
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.Genotype",
+   "decl_name": "Genotype",
+   "short": "Genotype",
+   "kind": "inductive",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 82,
+   "signature": "",
+   "args": [],
+   "ret_type": "",
+   "body": "| homRef\n  | het\n  | homAlt\n  deriving DecidableEq, Fintype, Repr",
+   "docstring": "**A diploid genotype at a biallelic locus.**\n\nThis is the type `Foundations.Probability` introduced as `DiploidGenotype`, moved here.\nIt is an enumeration of three states and not a pair of alleles, because the two gene\ncopies of a diploid are unordered: see `ofAlleles` and `ofAlleles_comm`.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 6
+   },
+   "mentioned_by": []
+  },
+  {
+   "name": "Descent.Core.Panel",
+   "decl_name": "Panel",
+   "short": "Panel",
+   "kind": "structure",
+   "noncomputable": false,
+   "file": "Descent/Core/Genome.lean",
+   "line": 216,
+   "signature": "where nSamples : ℕ nLoci : ℕ call : Fin nSamples → Genome nLoci",
+   "args": [],
+   "ret_type": "ℕ nLoci : ℕ call : Fin nSamples → Genome nLoci",
+   "body": "",
+   "docstring": "**A genotyped panel**: `nSamples` individuals called at `nLoci` sites.\n\nThis is the object every empirical claim in the corpus is ultimately about -- a genotype\nmatrix -- and until now the corpus had no type for it, only real-valued summaries of one.",
+   "empirical_status": "",
+   "namespace": "Descent.Core",
+   "fields": [
+    {
+     "name": "nSamples",
+     "type": "ℕ"
+    },
+    {
+     "name": "nLoci",
+     "type": "ℕ"
+    },
+    {
+     "name": "call",
+     "type": "Fin nSamples → Genome nLoci"
+    }
+   ],
+   "equations": [],
+   "constraints": {
+    "raw_chunk_lines": 5
    },
    "mentioned_by": []
   },

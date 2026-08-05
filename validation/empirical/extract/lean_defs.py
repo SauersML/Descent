@@ -72,18 +72,6 @@ def Descent_BundleFamily_modulus(family, j, t):
 def massAt(family, t, v):
     return sum(((_rt._proj(family, 'atomMass')(j, t) if (Descent_BundleFamily_modulus(family, j, t) == v) else 0.0)) for j in range(int(_rt.sumdim('j', len(_rt._proj(family, 'atomMass'))))))
 
-def spectrumModulusLaw(family, panel, v):
-    return sum(((_rt._proj(panel, 'weight')(i) * massAt(family, (_rt._proj(panel, 'support')(i)), v))) for i in range(int(_rt.sumdim('i', len(_rt._proj(panel, 'weight')), len(_rt._proj(panel, 'support'))))))
-
-def addWeights(panel, other):
-    return {'support': _rt._proj(panel, 'support'), 'weight': (lambda i: (_rt._proj(panel, 'weight')(i) + _rt._proj(other, 'weight')(i)))}
-
-def smulWeights(c, panel):
-    return {'support': _rt._proj(panel, 'support'), 'weight': (lambda i: (c * _rt._proj(panel, 'weight')(i)))}
-
-def Descent_Covers(family, panel, i, v):
-    return (massAt(family, (_rt._proj(panel, 'support')(i)), v) != 0.0)
-
 def gaussianJetVariance():
     return (_rt.rdiv(_rt.lpow(_rt.pi, 2.0), 2.0) - 4.0)
 
@@ -1103,6 +1091,26 @@ def Descent_Core_fstFromTau(tau):
 
 def Descent_Core_hweHeterozygosity(p):
     return ((Descent_Core_ploidy() * p) * ((1.0 - p)))
+
+def dosage(*_a):
+    if len(_a) < 1:
+        return lambda *_b: dosage(*(_a + _b))
+    _e, = _a[:1]
+    _t = [0.0, 1.0, 2.0]
+    return _t[_rt._ix(_e, 3, 'dosage')]
+
+def Locus(n):
+    return Fin(n)
+
+def altFreq(P, l):
+    return _rt.rdiv((sum((_rt._proj((_rt._proj(P, 'call')(i, l)), 'dosage')) for i in range(int(_rt.sumdim('i', len(_rt._proj(P, 'call'))))))), ((Descent_Core_ploidy() * (_rt._proj(P, 'nSamples')))))
+
+def hweProb(*_a):
+    if len(_a) < 2:
+        return lambda *_b: hweProb(*(_a + _b))
+    q, _e = _a[:2]
+    _t = [_rt.lpow(((1.0 - q)), 2.0), ((2.0 * q) * ((1.0 - q))), _rt.lpow(q, 2.0)]
+    return _t[_rt._ix(_e, 3, 'hweProb')]
 
 def Descent_Core_hetRecurrence(Ne, H_0, t):
     _prev = H_0
@@ -4067,12 +4075,6 @@ def diploidAtomMass(j, q):
 
 def diploidFamily():
     return {'atomValue': diploidAtomValue, 'atomMass': diploidAtomMass}
-
-def Descent_Spectral_Panel_reflect(panel):
-    return {'support': (lambda i: (1.0 - _rt._proj(panel, 'support')(i))), 'weight': _rt._proj(panel, 'weight')}
-
-def fold(panel):
-    return {'support': (lambda i: _rt.rmin((_rt._proj(panel, 'support')(i)), ((1.0 - _rt._proj(panel, 'support')(i))))), 'weight': _rt._proj(panel, 'weight')}
 
 def invHeterozygosity(q):
     return _rt.rdiv(1.0, (((2.0 * q) * ((1.0 - q)))))

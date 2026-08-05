@@ -129,7 +129,8 @@ theorem tendsto_pairChain_pow {Q : 𝔸} (hQ : Q * Q = -Q)
       (nhds (1 + (1 - Real.exp (-1)) • Q)) := by
   refine tendsto_pow_of_close (1 + (1 - Real.exp (-1)) • Q) ‖Q‖
     (fun N ↦ (1 : 𝔸) + (1 / (N : ℝ)) • Q)
-    (fun N ↦ (1 : 𝔸) + (1 - Real.exp (-(1 / (N : ℝ)))) • Q) hP hB ?_ ?_
+    (fun N ↦ (1 : 𝔸) + (1 - Real.exp (-(1 / (N : ℝ)))) • Q) hP hB ?_ (norm_nonneg Q)
+    (Filter.Eventually.of_forall ?_)
   · intro N hN
     have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     rw [one_add_smul_pow hQ]
@@ -202,7 +203,8 @@ theorem tendsto_levelChain_pow {Q : 𝔸} (hQ : Q * Q = -Q) {c : ℝ} (hc : 0 �
       (nhds (1 + (1 - Real.exp (-c)) • Q)) := by
   refine tendsto_pow_of_close (1 + (1 - Real.exp (-c)) • Q) (c ^ 2 * ‖Q‖)
     (fun N ↦ (1 : 𝔸) + (c / (N : ℝ)) • Q)
-    (fun N ↦ (1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q) hP hB ?_ ?_
+    (fun N ↦ (1 : 𝔸) + (1 - Real.exp (-(c / (N : ℝ)))) • Q) hP hB ?_ (by positivity)
+    (Filter.Eventually.of_forall ?_)
   · intro N hN
     have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
     rw [one_add_smul_pow hQ]

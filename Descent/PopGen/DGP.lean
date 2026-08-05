@@ -268,7 +268,7 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP m where
   scoreModel :=
-    { alleleFreq := fun _ ↦ HardyWeinbergModel.witness
+    { alleleFreq := fun _ ↦ Foundations.HardyWeinbergModel.witness
       effect := fun _ ↦ 0 }
   berryEsseenConstant := 0
   berryEsseenConstant_nonneg := le_refl 0
@@ -2133,25 +2133,25 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
     (μ : Measure Ω)
     (X : Ω → ι → ℝ) (Y : Ω → ℝ)
     (wStar w : ι → ℝ)
-    (hResidualSq_int : Integrable (fun ω ↦ (Y ω - dot wStar (X ω)) ^ 2) μ)
+    (hResidualSq_int : Integrable (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) ^ 2) μ)
     (hCross_int :
       Integrable
-        (fun ω ↦ (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω)) μ)
+        (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω)) μ)
     (hDeltaSq_int :
-      Integrable (fun ω ↦ (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ)
+      Integrable (fun ω ↦ (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ)
     (horth :
-      ∫ ω, (Y ω - dot wStar (X ω)) * dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) :
-    ∫ ω, (Y ω - dot w (X ω)) ^ 2 ∂μ =
-      ∫ ω, (Y ω - dot wStar (X ω)) ^ 2 ∂μ +
-        ∫ ω, (dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ := by
-  let residual : Ω → ℝ := fun ω ↦ Y ω - dot wStar (X ω)
-  let delta : Ω → ℝ := fun ω ↦ dot (fun i ↦ w i - wStar i) (X ω)
+      ∫ ω, (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) :
+    ∫ ω, (Y ω - Foundations.dot w (X ω)) ^ 2 ∂μ =
+      ∫ ω, (Y ω - Foundations.dot wStar (X ω)) ^ 2 ∂μ +
+        ∫ ω, (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ := by
+  let residual : Ω → ℝ := fun ω ↦ Y ω - Foundations.dot wStar (X ω)
+  let delta : Ω → ℝ := fun ω ↦ Foundations.dot (fun i ↦ w i - wStar i) (X ω)
   have hdot :
-      ∀ ω, dot w (X ω) = dot wStar (X ω) + dot (fun i ↦ w i - wStar i) (X ω) := by
+      ∀ ω, Foundations.dot w (X ω) = Foundations.dot wStar (X ω) + Foundations.dot (fun i ↦ w i - wStar i) (X ω) := by
     intro ω
     calc
-      dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
-        unfold dot Descent.Core.innerSum
+      Foundations.dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
+        unfold Foundations.dot Descent.Core.innerSum
         refine Finset.sum_congr rfl ?_
         intro i hi
         ring
@@ -2159,11 +2159,11 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
         refine Finset.sum_congr rfl ?_
         intro i hi
         ring
-      _ = dot wStar (X ω) + dot (fun i ↦ w i - wStar i) (X ω) := by
-        unfold dot Descent.Core.innerSum
+      _ = Foundations.dot wStar (X ω) + Foundations.dot (fun i ↦ w i - wStar i) (X ω) := by
+        unfold Foundations.dot Descent.Core.innerSum
         rw [Finset.sum_add_distrib]
   have h_expand :
-      (fun ω ↦ (Y ω - dot w (X ω)) ^ 2) =
+      (fun ω ↦ (Y ω - Foundations.dot w (X ω)) ^ 2) =
         (fun ω ↦ residual ω ^ 2) +
           ((-2 : ℝ) • fun ω ↦ residual ω * delta ω) +
           fun ω ↦ delta ω ^ 2 := by
@@ -2287,32 +2287,32 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     (cmdgp : Foundations.ConditionalMeanDGP k)
     (X : ℝ × (Fin k → ℝ) → ι → ℝ)
     (wStar w : ι → ℝ)
-    (hm_linear : ∀ p c, cmdgp.m p c = dot wStar (X (p, c)))
+    (hm_linear : ∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c)))
     (hResidualSq_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
     (hOrth_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - cmdgp.m x.1 x.2.1) *
-          dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ)
+          Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ)
     (hDeltaSq_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
-        (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
-    Foundations.predictionRiskY cmdgp (fun p c ↦ dot w (X (p, c))) =
+        (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
+    Foundations.predictionRiskY cmdgp (fun p c ↦ Foundations.dot w (X (p, c))) =
       irreduciblePredictionRisk cmdgp +
-        ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+        ∫ x, (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
   have horth :
       ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) *
-        dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+        Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
     simpa using
-      cmdgp.m_spec (fun pc ↦ dot (fun i ↦ w i - wStar i) (X pc)) hOrth_int
+      cmdgp.m_spec (fun pc ↦ Foundations.dot (fun i ↦ w i - wStar i) (X pc)) hOrth_int
   have hResidualSq_int_linear :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
-        (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2) cmdgp.μ := by
+        (x.2.2 - Foundations.dot wStar (X (x.1, x.2.1))) ^ 2) cmdgp.μ := by
     refine hResidualSq_int.congr ?_
     filter_upwards with x
     rw [← hm_linear x.1 x.2.1]
   have hbase :
-      ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
+      ∫ x, (x.2.2 - Foundations.dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
         irreduciblePredictionRisk cmdgp := by
     unfold irreduciblePredictionRisk
     refine integral_congr_ae ?_
@@ -2320,27 +2320,27 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     rw [← hm_linear x.1 x.2.1]
   have hOrth_int_linear :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
-        (x.2.2 - dot wStar (X (x.1, x.2.1))) *
-          dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ := by
+        (x.2.2 - Foundations.dot wStar (X (x.1, x.2.1))) *
+          Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) cmdgp.μ := by
     refine hOrth_int.congr ?_
     filter_upwards with x
     rw [← hm_linear x.1 x.2.1]
   have horth_linear :
-      ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) *
-        dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
+      ∫ x, (x.2.2 - Foundations.dot wStar (X (x.1, x.2.1))) *
+        Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
     simpa [hm_linear] using horth
   unfold Foundations.predictionRiskY
   calc
-    ∫ x, (x.2.2 - dot w (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
-        ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ +
-          ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+    ∫ x, (x.2.2 - Foundations.dot w (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
+        ∫ x, (x.2.2 - Foundations.dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ +
+          ∫ x, (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
             exact measureLinearPredictionRisk_transport_decomposition_of_orthogonality
               cmdgp.μ
               (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ X (x.1, x.2.1))
               (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ x.2.2)
               wStar w hResidualSq_int_linear hOrth_int_linear hDeltaSq_int horth_linear
     _ = irreduciblePredictionRisk cmdgp +
-          ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
+          ∫ x, (Foundations.dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
             rw [hbase]
 
 end ExactMeasureMetricIdentities

@@ -3200,30 +3200,22 @@
   }
  },
  "Descent.spectrumModulusLaw": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "dot-notation call Panel.weight: no such definition",
   "file": "Descent/Blindness/BundleRigidity.lean",
   "line": 121,
   "short": "spectrumModulusLaw",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "spectrumModulusLaw",
-  "args": [
-   "family",
-   "panel",
-   "v"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "v": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -3298,17 +3290,10 @@
   "short": "addWeights",
   "ret_type": "Panel n",
   "empirical_status": "",
-  "python": "addWeights",
-  "args": [
-   "panel",
-   "other"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -3333,22 +3318,15 @@
   "short": "smulWeights",
   "ret_type": "Panel n",
   "empirical_status": "",
-  "python": "smulWeights",
-  "args": [
-   "c",
-   "panel"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "c": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -3369,24 +3347,15 @@
   "short": "Covers",
   "ret_type": "Prop",
   "empirical_status": "",
-  "python": "Descent_Covers",
-  "args": [
-   "family",
-   "panel",
-   "i",
-   "v"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "v": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -28912,7 +28881,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 5,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -28983,7 +28952,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 7,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -35564,8 +35533,14 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Core.Genotype.dosage_le_ploidy",
+   "Descent.Core.Panel.altFreq_le_one",
+   "Descent.Core.Panel.altFreq_nonneg",
    "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
    "Descent.Core.hweHeterozygosity_at_half",
+   "Descent.Core.hweProb_het",
+   "Descent.Core.hwe_dosage_variance",
+   "Descent.Core.hwe_mean_dosage",
    "Descent.Core.scaledMigrationRate_eq",
    "Descent.Core.scaledMutationRate_eq",
    "Descent.EvolutionaryParameters.bigM_nonneg",
@@ -35705,6 +35680,12 @@
     "Descent.Core.scaledMutationRate_eq": [],
     "Descent.Core.scaledMigrationRate_eq": [],
     "Descent.Core.hweHeterozygosity_at_half": [],
+    "Descent.Core.Genotype.dosage_le_ploidy": [],
+    "Descent.Core.Panel.altFreq_nonneg": [],
+    "Descent.Core.Panel.altFreq_le_one": [],
+    "Descent.Core.hweProb_het": [],
+    "Descent.Core.hwe_dosage_variance": [],
+    "Descent.Core.hwe_mean_dosage": [],
     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
     "Descent.scaledMutationRate_div_mu": [],
     "Descent.scaledMigrationRate_div_m": [],
@@ -36856,6 +36837,8 @@
   "mentioned_by": [
    "Descent.Core.hweHeterozygosity_allele_swap",
    "Descent.Core.hweHeterozygosity_at_half",
+   "Descent.Core.hweProb_het",
+   "Descent.Core.hwe_dosage_variance",
    "Descent.Program.additiveVariance_uses_hwe",
    "Descent.Program.causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
    "Descent.Program.dominanceVariance_uses_hwe",
@@ -36917,6 +36900,8 @@
    "hypotheses_by_theorem": {
     "Descent.Core.hweHeterozygosity_at_half": [],
     "Descent.Core.hweHeterozygosity_allele_swap": [],
+    "Descent.Core.hweProb_het": [],
+    "Descent.Core.hwe_dosage_variance": [],
     "Descent.discoveryNCP_at_reference_point": [],
     "Descent.discoveryNCP_allele_swap": [],
     "Descent.discoveryNCP_increases_with_n": [
@@ -36986,6 +36971,721 @@
     2
    ],
    "range_lo": 0
+  }
+ },
+ "Descent.Core.Genotype.equivFin3": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (Genotype ≃ Fin 3 where toFun | .homRef => 0 | .het => 1 | .homAlt => 2 invFun | ⟨0, _⟩ => .homRef | ⟨1, _⟩ => .het | ⟨2, _⟩ => .homAlt left_inv g)",
+  "file": "Descent/Core/Genome.lean",
+  "line": 91,
+  "short": "equivFin3",
+  "ret_type": "Genotype ≃ Fin 3 where toFun | .homRef => 0 | .het => 1 | .homAlt => 2 invFun | ⟨0, _⟩ => .homRef | ⟨1, _⟩ => .het | ⟨2, _⟩ => .homAlt left_inv g",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Genotype.equivFin3_symm_apply_apply",
+   "Descent.Core.Genotype.sum_univ",
+   "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply",
+   "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
+   "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
+   "Descent.Foundations.sum_over_genotypes"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.Genotype.equivFin3_symm_apply_apply": [],
+    "Descent.Core.Genotype.sum_univ": [],
+    "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply": [],
+    "Descent.Foundations.sum_over_genotypes": [],
+    "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
+    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq": []
+   }
+  }
+ },
+ "Descent.Core.Genotype.ofAlleles": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion with 4 branches, expected 2",
+  "file": "Descent/Core/Genome.lean",
+  "line": 131,
+  "short": "ofAlleles",
+  "ret_type": "Allele → Allele → Genotype",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Genotype.ofAlleles_comm"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.Genotype.ofAlleles_comm": []
+   }
+  }
+ },
+ "Descent.Core.Genotype.dosage": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Core/Genome.lean",
+  "line": 152,
+  "short": "dosage",
+  "ret_type": "Genotype → ℝ",
+  "empirical_status": "NOT AN EMPIRICAL CLAIM",
+  "python": "dosage",
+  "args": [
+   "_e"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Genotype.dosage_het",
+   "Descent.Core.Genotype.dosage_homAlt",
+   "Descent.Core.Genotype.dosage_homRef",
+   "Descent.Core.Genotype.dosage_le_ploidy",
+   "Descent.Core.Genotype.dosage_nonneg",
+   "Descent.Core.Panel.altFreq_le_one",
+   "Descent.Core.hwe_dosage_variance",
+   "Descent.Core.hwe_mean_dosage"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.Genotype.dosage_homRef": [],
+    "Descent.Core.Genotype.dosage_het": [],
+    "Descent.Core.Genotype.dosage_homAlt": [],
+    "Descent.Core.Genotype.dosage_nonneg": [],
+    "Descent.Core.Genotype.dosage_le_ploidy": [],
+    "Descent.Core.Panel.altFreq_le_one": [],
+    "Descent.Core.hwe_dosage_variance": [],
+    "Descent.Core.hwe_mean_dosage": []
+   },
+   "range_lo_thm": [
+    "Descent.Core.Genotype.dosage_nonneg",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Core.Locus": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition Fin",
+  "file": "Descent/Core/Genome.lean",
+  "line": 180,
+  "short": "Locus",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": "Locus",
+  "args": [
+   "n"
+  ],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'Fin' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq",
+   "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs",
+   "Descent.Conditionals.degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq",
+   "Descent.Conditionals.degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs",
+   "Descent.Conditionals.degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile",
+   "Descent.Conditionals.permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs",
+   "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs",
+   "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughLDGraphs",
+   "Descent.Core.Panel.altFreq_le_one",
+   "Descent.Core.Panel.altFreq_nonneg",
+   "Descent.cumulantTensorEnergy_eq_iff_entryPowerSum_eq",
+   "Descent.cumulantTensorEnergy_pushedCumulantTensor",
+   "Descent.cumulantTensorEnergy_pushedCumulantTensor_zero",
+   "Descent.entryFourthSum_eq_sum_ldPowerScore_four",
+   "Descent.entryPowerSum_four",
+   "Descent.entryPowerSum_three",
+   "Descent.entryPowerSum_two",
+   "Descent.entrySquareSum_eq_trace_sq_of_symmetric",
+   "Descent.fourthTensorEnergy_pushedFourthCumulantTensor",
+   "Descent.independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant",
+   "Descent.ldOrientationFourthInvariant_eq_sum_ldPowerScore_four",
+   "Descent.skewedArchitecture_thirdMomentEnergy_eq_ldOrientationInvariant",
+   "Descent.symmetricArchitecture_thirdMomentEnergy_eq_zero",
+   "Descent.symmetricNonGaussianArchitecture_fourthCumulantEnergy_eq_ldOrientationInvariant",
+   "Descent.thirdTensorEnergy_pushedThirdMomentTensor"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.cumulantTensorEnergy_pushedCumulantTensor": [],
+    "Descent.cumulantTensorEnergy_pushedCumulantTensor_zero": [],
+    "Descent.cumulantTensorEnergy_eq_iff_entryPowerSum_eq": [],
+    "Descent.entryPowerSum_three": [],
+    "Descent.thirdTensorEnergy_pushedThirdMomentTensor": [],
+    "Descent.entryPowerSum_four": [],
+    "Descent.fourthTensorEnergy_pushedFourthCumulantTensor": [],
+    "Descent.entryFourthSum_eq_sum_ldPowerScore_four": [],
+    "Descent.entryPowerSum_two": [],
+    "Descent.entrySquareSum_eq_trace_sq_of_symmetric": [],
+    "Descent.independentArchitecture_cumulantEnergy_eq_ldOrientationInvariant": [],
+    "Descent.skewedArchitecture_thirdMomentEnergy_eq_ldOrientationInvariant": [],
+    "Descent.symmetricArchitecture_thirdMomentEnergy_eq_zero": [],
+    "Descent.symmetricNonGaussianArchitecture_fourthCumulantEnergy_eq_ldOrientationInvariant": [],
+    "Descent.ldOrientationFourthInvariant_eq_sum_ldPowerScore_four": [],
+    "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughLDGraphs": [],
+    "Descent.Conditionals.permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs": [],
+    "Descent.Conditionals.permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs": [],
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs": [],
+    "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs": [],
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq": [],
+    "Descent.Conditionals.degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq": [],
+    "Descent.Conditionals.degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile": [],
+    "Descent.Core.Panel.altFreq_nonneg": [],
+    "Descent.Core.Panel.altFreq_le_one": []
+   }
+  }
+ },
+ "Descent.Core.Haplotype": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Core/Genome.lean",
+  "line": 183,
+  "short": "Haplotype",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Genome.ofHaplotypes_comm"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.Genome.ofHaplotypes_comm": []
+   }
+  }
+ },
+ "Descent.Core.Genome": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Core/Genome.lean",
+  "line": 186,
+  "short": "Genome",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Conditionals.abs_sectionMean_sub_le",
+   "Descent.Conditionals.abs_sectionMean_sub_le_half_range",
+   "Descent.Conditionals.componentDensityRatio_eq_posteriorTilt",
+   "Descent.Conditionals.componentMixtureDensity_eq_posteriorTilt_mul",
+   "Descent.Conditionals.componentMixtureDensity_factorization",
+   "Descent.Conditionals.componentPosterior_at_zero_denominator_is_junk",
+   "Descent.Conditionals.conditionalSectionMean_fiberConditional",
+   "Descent.Conditionals.conditionalSectionMean_fiberConditional_of_labelFunction",
+   "Descent.Conditionals.conditionalSectionMean_pointLaw",
+   "Descent.Conditionals.descendsAlong_componentPosterior",
+   "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent",
+   "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent_of_nonempty",
+   "Descent.Conditionals.descendsAlong_of_kernelSufficient",
+   "Descent.Conditionals.descendsAlong_sectionMean_of_labelFunction",
+   "Descent.Conditionals.exists_kernel_attaining_totalVariationGap",
+   "Descent.Conditionals.fiberConditional_labelFactor",
+   "Descent.Conditionals.fiberConditional_nonneg",
+   "Descent.Conditionals.fiberConditional_of_separating",
+   "Descent.Conditionals.fiberConditional_pointLaw",
+   "Descent.Conditionals.functionalDescends_iff_descendsAlong",
+   "Descent.Conditionals.kernelSufficient_componentPosterior",
+   "Descent.Conditionals.kernelSufficient_iff_identity_descends",
+   "Descent.Conditionals.kernelSufficient_of_labelTilt",
+   "Descent.Conditionals.labelFunction_of_descends_pointLaws",
+   "Descent.Conditionals.labelMass_fiberConditional",
+   "Descent.Conditionals.labelMass_labelFactor",
+   "Descent.Conditionals.labelMass_nonneg",
+   "Descent.Conditionals.labelMass_pointLaw",
+   "Descent.Conditionals.posteriorTilt_at_zero_base_weight_is_junk",
+   "Descent.Conditionals.posteriorTilt_at_zero_target",
+   "Descent.Conditionals.sum_fiberConditional",
+   "Descent.Conditionals.totalVariationGap_le_two_of_probabilityMasses",
+   "Descent.Conditionals.totalVariationGap_nonneg"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Conditionals.totalVariationGap_nonneg": [],
+    "Descent.Conditionals.totalVariationGap_le_two_of_probabilityMasses": [],
+    "Descent.Conditionals.labelMass_nonneg": [],
+    "Descent.Conditionals.functionalDescends_iff_descendsAlong": [],
+    "Descent.Conditionals.labelMass_fiberConditional": [],
+    "Descent.Conditionals.sum_fiberConditional": [],
+    "Descent.Conditionals.fiberConditional_nonneg": [],
+    "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent": [],
+    "Descent.Conditionals.descendsAlong_iff_pairwiseConsistent_of_nonempty": [],
+    "Descent.Conditionals.descendsAlong_of_kernelSufficient": [],
+    "Descent.Conditionals.kernelSufficient_iff_identity_descends": [],
+    "Descent.Conditionals.labelMass_labelFactor": [],
+    "Descent.Conditionals.fiberConditional_labelFactor": [],
+    "Descent.Conditionals.kernelSufficient_of_labelTilt": [],
+    "Descent.Conditionals.fiberConditional_of_separating": [],
+    "Descent.Conditionals.conditionalSectionMean_fiberConditional": [],
+    "Descent.Conditionals.conditionalSectionMean_fiberConditional_of_labelFunction": [],
+    "Descent.Conditionals.descendsAlong_sectionMean_of_labelFunction": [],
+    "Descent.Conditionals.labelMass_pointLaw": [],
+    "Descent.Conditionals.conditionalSectionMean_pointLaw": [],
+    "Descent.Conditionals.fiberConditional_pointLaw": [],
+    "Descent.Conditionals.labelFunction_of_descends_pointLaws": [],
+    "Descent.Conditionals.abs_sectionMean_sub_le": [],
+    "Descent.Conditionals.abs_sectionMean_sub_le_half_range": [],
+    "Descent.Conditionals.exists_kernel_attaining_totalVariationGap": [],
+    "Descent.Conditionals.componentMixtureDensity_eq_posteriorTilt_mul": [],
+    "Descent.Conditionals.kernelSufficient_componentPosterior": [],
+    "Descent.Conditionals.descendsAlong_componentPosterior": [],
+    "Descent.Conditionals.componentPosterior_at_zero_denominator_is_junk": [],
+    "Descent.Conditionals.posteriorTilt_at_zero_target": [],
+    "Descent.Conditionals.posteriorTilt_at_zero_base_weight_is_junk": [],
+    "Descent.Conditionals.componentMixtureDensity_factorization": [],
+    "Descent.Conditionals.componentDensityRatio_eq_posteriorTilt": []
+   }
+  }
+ },
+ "Descent.Core.Genome.ofHaplotypes": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Genotype.ofAlleles",
+  "file": "Descent/Core/Genome.lean",
+  "line": 189,
+  "short": "ofHaplotypes",
+  "ret_type": "Genome n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Genome.ofHaplotypes_comm"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.Genome.ofHaplotypes_comm": []
+   }
+  }
+ },
+ "Descent.Core.AlleleFreq": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Core/Genome.lean",
+  "line": 202,
+  "short": "AlleleFreq",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {
+   "declared_kind": "frequency",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0
+  }
+ },
+ "Descent.Core.IsAlleleFreq": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Core/Genome.lean",
+  "line": 207,
+  "short": "IsAlleleFreq",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {
+   "declared_kind": "frequency",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0
+  }
+ },
+ "Descent.Core.LDMatrix": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Core/Genome.lean",
+  "line": 210,
+  "short": "LDMatrix",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Core.Panel.witness": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Core/Genome.lean",
+  "line": 225,
+  "short": "witness",
+  "ret_type": "Panel where nSamples",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.BundleRigidity.LinearSCM.isInterventionalSolution_witness",
+   "Descent.BundleRigidity.LinearSCM.isSolution_witness",
+   "Descent.Conditionals.FiniteBoundedDeviation.nonempty",
+   "Descent.Conditionals.descendsOn_of_pairwiseCompatibleOn",
+   "Descent.Conditionals.pairwiseCompatibleOn_of_descendsOn",
+   "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
+   "Descent.Core.PopGenParameters.witness_not_atOrigin",
+   "Descent.Core.ScoreMoments.witness_admissible",
+   "Descent.RecentFineScaleConfounding.not_mem_topPCSpan",
+   "Descent.Spectral.IsRankAllocation.witness",
+   "Descent.TrafficInvariantSeparation.diagonalTraceOneSDPOptimum_of_isDiagonalMaximum",
+   "Descent.belowCeiling_add_rankOne_iff",
+   "Descent.fstDriftMigrationManyDemes_at_witness",
+   "Descent.gramForm_witness",
+   "Descent.migrationLDBoost_at_witness",
+   "Descent.mutationLDErosion_at_witness",
+   "Descent.pc_correction_recent_structure_lower_bound",
+   "Descent.pooledEnvironmentCorrelations_golden_lt",
+   "Descent.pooledEnvironmentCorrelations_gt",
+   "Descent.pooledEnvironmentGapCertificate_neg_of_same_sign",
+   "Descent.sharedLDRetention_at_witness",
+   "Descent.spiked_genotype_covariance_belowCeiling_of_threshold",
+   "Descent.thresholdRegime_witness",
+   "Descent.varianceNonneg_sub_rankOne_iff"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.BundleRigidity.LinearSCM.isInterventionalSolution_witness": [],
+    "Descent.BundleRigidity.LinearSCM.isSolution_witness": [],
+    "Descent.gramForm_witness": [],
+    "Descent.varianceNonneg_sub_rankOne_iff": [],
+    "Descent.belowCeiling_add_rankOne_iff": [],
+    "Descent.spiked_genotype_covariance_belowCeiling_of_threshold": [],
+    "Descent.pooledEnvironmentCorrelations_gt": [],
+    "Descent.pooledEnvironmentCorrelations_golden_lt": [],
+    "Descent.pooledEnvironmentGapCertificate_neg_of_same_sign": [],
+    "Descent.TrafficInvariantSeparation.diagonalTraceOneSDPOptimum_of_isDiagonalMaximum": [],
+    "Descent.Conditionals.FiniteBoundedDeviation.nonempty": [],
+    "Descent.Conditionals.pairwiseCompatibleOn_of_descendsOn": [],
+    "Descent.Conditionals.descendsOn_of_pairwiseCompatibleOn": [],
+    "Descent.Core.ScoreMoments.witness_admissible": [],
+    "Descent.Core.PopGenParameters.witness_not_atOrigin": [],
+    "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
+    "Descent.fstDriftMigrationManyDemes_at_witness": [],
+    "Descent.migrationLDBoost_at_witness": [],
+    "Descent.mutationLDErosion_at_witness": [],
+    "Descent.sharedLDRetention_at_witness": [],
+    "Descent.thresholdRegime_witness": [],
+    "Descent.RecentFineScaleConfounding.not_mem_topPCSpan": [],
+    "Descent.pc_correction_recent_structure_lower_bound": [],
+    "Descent.Spectral.IsRankAllocation.witness": []
+   },
+   "range_hi_thm": [
+    "Descent.varianceNonneg_sub_rankOne_iff",
+    3
+   ],
+   "range_hi": 1
+  }
+ },
+ "Descent.Core.Panel.altFreq": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Locus P.nLoci'\")",
+  "file": "Descent/Core/Genome.lean",
+  "line": 233,
+  "short": "altFreq",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "altFreq",
+  "args": [
+   "P",
+   "l"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Locus P.nLoci'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.Panel.altFreq_le_one",
+   "Descent.Core.Panel.altFreq_nonneg",
+   "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
+   "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
+   "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq",
+   "Descent.Foundations.HardyWeinbergModel.genotypeVariance_pos",
+   "Descent.Foundations.HardyWeinbergModel.refFreq_add_altFreq",
+   "Descent.HardyWeinbergModel.reflect_altFreq",
+   "Descent.MafSpectrum.fourthMoment_eq",
+   "Descent.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
+   "Descent.Spectral.HardyWeinbergModel.mellinDrift_eq",
+   "Descent.Spectral.HardyWeinbergModel.mellinJetVariance_eq",
+   "Descent.Spectral.HardyWeinbergModel.standardizedFourthMoment_eq",
+   "Descent.Spectral.balanced_locus_symmetric_component",
+   "Descent.Spectral.genotypeProb_values",
+   "Descent.Spectral.hardCall_logSquare_eq_of_latticeCondition",
+   "Descent.Spectral.hardCall_logSquare_lattice_at_critical_maf",
+   "Descent.Spectral.hardCall_not_cramer_at_critical_maf",
+   "Descent.Spectral.hweLatticeCondition_het_standardizedSquare",
+   "Descent.Spectral.hwe_centered",
+   "Descent.Spectral.hwe_variance_eq",
+   "Descent.Spectral.standardizedFourthMoment_eq_two_iff_half",
+   "Descent.Spectral.standardizedFourthMoment_ge_two",
+   "Descent.Spectral.standardizedFourthMoment_ne_gaussian_at_half",
+   "Descent.Spectral.standardizedSquare_values",
+   "Descent.abs_centeredSquare_le_homAlt",
+   "Descent.averageEffect_eq_regression_slope",
+   "Descent.balanced_locus_is_reflection_fixed_point",
+   "Descent.centeredDosageSquare_two_valued_at_half",
+   "Descent.centeredSquare_eq_standardizedSquare_sub_one",
+   "Descent.centeredSquare_expectation_zero",
+   "Descent.centeredSquare_homAlt_eq",
+   "Descent.centeredSquare_homAlt_strictAnti",
+   "Descent.centeredSquare_negative_at_half",
+   "Descent.centeredSquare_rademacher_at_half",
+   "Descent.centeredSquare_third_moment_factored",
+   "Descent.centeredSquare_third_moment_zero_iff_balanced",
+   "Descent.centeredSquare_values_at_half",
+   "Descent.genotypeVariance_determines_frequency_pair",
+   "Descent.hardCall_coding_dichotomy",
+   "Descent.hweFloorOneScaleSq_eq",
+   "Descent.hweFloorOneScaleSq_eq_gaussian_at_blind_maf",
+   "Descent.hweGenotypeVariance_le_half",
+   "Descent.hweLadderMoments",
+   "Descent.hweLevelOne_symmetry",
+   "Descent.hweSignBias_eq",
+   "Descent.hweSignBias_zero_iff_balanced",
+   "Descent.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance",
+   "Descent.hweThirdCentralMoment_eq",
+   "Descent.hwe_phase_inequality_off_balanced",
+   "Descent.hwe_rigidity_hypotheses_unsatisfiable",
+   "Descent.hwe_symmetricCoding_forces_half",
+   "Descent.hwe_symmetricCoding_iff_half",
+   "Descent.mellinDrift_uses_ploidy",
+   "Descent.moment_eq_of_altFreq_eq",
+   "Descent.no_signSymmetric_nondegenerate_locus",
+   "Descent.phase_strict_iff_not_symmetric",
+   "Descent.rarest_locus_owns_largest_atom",
+   "Descent.singleLocus_tower_collapses",
+   "Descent.standardizedGenotype_even_moment_lower_bound",
+   "Descent.standardizedGenotype_even_moment_mul",
+   "Descent.standardizedGenotype_fourth_moment",
+   "Descent.standardizedGenotype_fourth_moment_eq_two_iff",
+   "Descent.standardizedGenotype_fourth_moment_ge_two",
+   "Descent.standardizedGenotype_kurtosis_gaussian_at_blind_maf",
+   "Descent.standardizedGenotype_second_moment_one",
+   "Descent.standardizedGenotype_sixth_moment",
+   "Descent.standardizedGenotype_sq_eq_standardizedSquare",
+   "Descent.standardizedGenotype_symmetric_iff",
+   "Descent.standardizedSquare_eq_over_hweGenotypeVariance",
+   "Descent.standardizedSquare_never_symmetric",
+   "Descent.standardizedSquare_second_cumulant",
+   "Descent.thirdCentralMoment_zero_iff_dominance_invisible"
+  ],
+  "constraints": {
+   "declared_kind": "F_ST",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < P.nSamples"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.averageEffect_eq_regression_slope": [],
+    "Descent.thirdCentralMoment_zero_iff_dominance_invisible": [],
+    "Descent.hweThirdCentralMoment_eq": [],
+    "Descent.hwe_symmetricCoding_forces_half": [],
+    "Descent.hwe_symmetricCoding_iff_half": [],
+    "Descent.standardizedGenotype_symmetric_iff": [],
+    "Descent.centeredDosageSquare_two_valued_at_half": [],
+    "Descent.hardCall_coding_dichotomy": [],
+    "Descent.standardizedGenotype_second_moment_one": [],
+    "Descent.standardizedGenotype_fourth_moment": [],
+    "Descent.standardizedSquare_second_cumulant": [],
+    "Descent.centeredSquare_expectation_zero": [],
+    "Descent.centeredSquare_negative_at_half": [],
+    "Descent.standardizedGenotype_sixth_moment": [],
+    "Descent.centeredSquare_values_at_half": [],
+    "Descent.centeredSquare_rademacher_at_half": [],
+    "Descent.centeredSquare_third_moment_factored": [],
+    "Descent.centeredSquare_third_moment_zero_iff_balanced": [],
+    "Descent.standardizedGenotype_even_moment_mul": [],
+    "Descent.standardizedGenotype_even_moment_lower_bound": [],
+    "Descent.hweSignBias_eq": [],
+    "Descent.hweSignBias_zero_iff_balanced": [],
+    "Descent.HardyWeinbergModel.reflect_altFreq": [],
+    "Descent.moment_eq_of_altFreq_eq": [],
+    "Descent.genotypeVariance_determines_frequency_pair": [],
+    "Descent.singleLocus_tower_collapses": [],
+    "Descent.Core.Panel.altFreq_nonneg": [],
+    "Descent.Core.Panel.altFreq_le_one": [
+     "0 < P.nSamples"
+    ],
+    "Descent.Foundations.HardyWeinbergModel.refFreq_add_altFreq": [],
+    "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
+    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq": [],
+    "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq": [],
+    "Descent.Foundations.HardyWeinbergModel.genotypeVariance_pos": [],
+    "Descent.mellinDrift_uses_ploidy": [],
+    "Descent.standardizedSquare_eq_over_hweGenotypeVariance": [],
+    "Descent.no_signSymmetric_nondegenerate_locus": [],
+    "Descent.hweStandardizedFourthMoment_eq_inv_hweGenotypeVariance": [],
+    "Descent.standardizedGenotype_sq_eq_standardizedSquare": [],
+    "Descent.standardizedSquare_never_symmetric": [],
+    "Descent.standardizedGenotype_kurtosis_gaussian_at_blind_maf": [],
+    "Descent.hweLevelOne_symmetry": [],
+    "Descent.MafSpectrum.fourthMoment_eq": [],
+    "Descent.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+    "Descent.hweFloorOneScaleSq_eq": [],
+    "Descent.hweFloorOneScaleSq_eq_gaussian_at_blind_maf": [],
+    "Descent.hweGenotypeVariance_le_half": [],
+    "Descent.standardizedGenotype_fourth_moment_ge_two": [],
+    "Descent.standardizedGenotype_fourth_moment_eq_two_iff": [],
+    "Descent.hwe_phase_inequality_off_balanced": [],
+    "Descent.phase_strict_iff_not_symmetric": [],
+    "Descent.hwe_rigidity_hypotheses_unsatisfiable": [],
+    "Descent.balanced_locus_is_reflection_fixed_point": [],
+    "Descent.hweLadderMoments": [],
+    "Descent.centeredSquare_eq_standardizedSquare_sub_one": [],
+    "Descent.centeredSquare_homAlt_eq": [],
+    "Descent.centeredSquare_homAlt_strictAnti": [],
+    "Descent.abs_centeredSquare_le_homAlt": [],
+    "Descent.rarest_locus_owns_largest_atom": [],
+    "Descent.Spectral.hwe_variance_eq": [],
+    "Descent.Spectral.hwe_centered": [],
+    "Descent.Spectral.standardizedSquare_values": [],
+    "Descent.Spectral.genotypeProb_values": [],
+    "Descent.Spectral.HardyWeinbergModel.mellinDrift_eq": [],
+    "Descent.Spectral.HardyWeinbergModel.mellinJetVariance_eq": [],
+    "Descent.Spectral.hweLatticeCondition_het_standardizedSquare": [],
+    "Descent.Spectral.hardCall_logSquare_eq_of_latticeCondition": [],
+    "Descent.Spectral.hardCall_logSquare_lattice_at_critical_maf": [],
+    "Descent.Spectral.hardCall_not_cramer_at_critical_maf": [],
+    "Descent.Spectral.balanced_locus_symmetric_component": [],
+    "Descent.Spectral.HardyWeinbergModel.standardizedFourthMoment_eq": [],
+    "Descent.Spectral.standardizedFourthMoment_ge_two": [],
+    "Descent.Spectral.standardizedFourthMoment_eq_two_iff_half": [],
+    "Descent.Spectral.standardizedFourthMoment_ne_gaussian_at_half": []
+   },
+   "range_hi_thm": [
+    "Descent.Core.Panel.altFreq_le_one",
+    1
+   ],
+   "range_hi": 1
+  }
+ },
+ "Descent.Core.hweProb": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Core/Genome.lean",
+  "line": 276,
+  "short": "hweProb",
+  "ret_type": "Genotype → ℝ",
+  "empirical_status": "",
+  "python": "hweProb",
+  "args": [
+   "q",
+   "_e"
+  ],
+  "box": {
+   "q": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.hweProb_het",
+   "Descent.Core.hwe_dosage_variance",
+   "Descent.Core.hwe_mean_dosage",
+   "Descent.Core.sum_hweProb"
+  ],
+  "constraints": {
+   "declared_kind": "frequency",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Core.sum_hweProb": [],
+    "Descent.Core.hweProb_het": [],
+    "Descent.Core.hwe_dosage_variance": [],
+    "Descent.Core.hwe_mean_dosage": []
+   }
   }
  },
  "Descent.Core.hetRecurrence": {
@@ -47335,6 +48035,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Core.Genotype.equivFin3_symm_apply_apply",
+   "Descent.Core.Genotype.sum_univ",
    "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply",
    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
    "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum",
@@ -47343,6 +48045,8 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Core.Genotype.equivFin3_symm_apply_apply": [],
+    "Descent.Core.Genotype.sum_univ": [],
     "Descent.Foundations.DiploidGenotype.equivFin3_symm_apply_apply": [],
     "Descent.Foundations.sum_over_genotypes": [],
     "Descent.Foundations.HardyWeinbergModel.genotypeProb_sum": [],
@@ -57848,7 +58552,7 @@
    "hypotheses": [
     "∀ x : ℝ × (Fin k → ℝ",
     "Integrable (fun x : ℝ × (Fin k → ℝ",
-    "∀ p c, cmdgp.m p c = dot wStar (X (p, c"
+    "∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c"
    ],
    "hypotheses_by_theorem": {
     "Descent.irreduciblePredictionRisk_at_noiseless": [
@@ -57858,7 +58562,7 @@
      "Integrable (fun x : ℝ × (Fin k → ℝ"
     ],
     "Descent.ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition": [
-     "∀ p c, cmdgp.m p c = dot wStar (X (p, c",
+     "∀ p c, cmdgp.m p c = Foundations.dot wStar (X (p, c",
      "Integrable (fun x : ℝ × (Fin k → ℝ"
     ]
    }
@@ -74104,6 +74808,8 @@
   "mentioned_by": [
    "Descent.Core.hweHeterozygosity_allele_swap",
    "Descent.Core.hweHeterozygosity_at_half",
+   "Descent.Core.hweProb_het",
+   "Descent.Core.hwe_dosage_variance",
    "Descent.Program.additiveVariance_uses_hwe",
    "Descent.Program.causalAlleleFreqRetentionAt_eq_hweGenotypeVariance_ratio",
    "Descent.Program.dominanceVariance_uses_hwe",
@@ -74165,6 +74871,8 @@
    "hypotheses_by_theorem": {
     "Descent.Core.hweHeterozygosity_at_half": [],
     "Descent.Core.hweHeterozygosity_allele_swap": [],
+    "Descent.Core.hweProb_het": [],
+    "Descent.Core.hwe_dosage_variance": [],
     "Descent.discoveryNCP_at_reference_point": [],
     "Descent.discoveryNCP_allele_swap": [],
     "Descent.discoveryNCP_increases_with_n": [
@@ -80703,7 +81411,7 @@
  },
  "Descent.mechanisticPortabilityRatio": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/MechanisticPortabilityWitnesses.lean",
   "line": 93,
   "short": "mechanisticPortabilityRatio",
@@ -80717,7 +81425,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -81953,7 +82661,7 @@
  },
  "Descent.brierDiscriminationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 849,
   "short": "brierDiscriminationLoss",
@@ -81967,7 +82675,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -82007,7 +82715,7 @@
  },
  "Descent.brierCalibrationLoss": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/MetricSpecificPortability.lean",
   "line": 857,
   "short": "brierCalibrationLoss",
@@ -82027,7 +82735,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91027,8 +91735,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMean": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 759,
   "short": "scoreMean",
@@ -91041,9 +91749,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91064,8 +91772,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.scoreMeanShift": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 766,
   "short": "scoreMeanShift",
@@ -91077,9 +91785,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -91228,8 +91936,8 @@
   }
  },
  "Descent.CrossPopulationMechanisticCalibrationModel.calibrationSlope": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PGSCalibrationTheory.lean",
   "line": 782,
   "short": "calibrationSlope",
@@ -91242,9 +91950,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -97606,8 +98314,8 @@
   }
  },
  "Descent.sourceERMWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'list'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2178,
   "short": "sourceERMWeights",
@@ -97620,9 +98328,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'list'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -97977,8 +98685,8 @@
   }
  },
  "Descent.sourceWeightsFromExplicitDrivers": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2333,
   "short": "sourceWeightsFromExplicitDrivers",
@@ -97990,9 +98698,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98028,8 +98736,8 @@
   }
  },
  "Descent.sourceWeightedTagScore": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2341,
   "short": "sourceWeightedTagScore",
@@ -98042,9 +98750,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": {
@@ -98405,8 +99113,8 @@
   }
  },
  "Descent.scoreVarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2590,
   "short": "scoreVarianceFromSourceWeights",
@@ -98419,9 +99127,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98507,8 +99215,8 @@
   }
  },
  "Descent.predictiveCovarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2613,
   "short": "predictiveCovarianceFromSourceWeights",
@@ -98521,9 +99229,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98595,8 +99303,8 @@
   }
  },
  "Descent.calibrationSlopeFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2619,
   "short": "calibrationSlopeFromSourceWeights",
@@ -98609,9 +99317,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98720,8 +99428,8 @@
   }
  },
  "Descent.ancestrySpecificLDResidual": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2793,
   "short": "ancestrySpecificLDResidual",
@@ -98733,9 +99441,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98870,8 +99578,8 @@
   }
  },
  "Descent.irreducibleTargetResidualBurden": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2843,
   "short": "irreducibleTargetResidualBurden",
@@ -98883,9 +99591,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98950,8 +99658,8 @@
   }
  },
  "Descent.residualBurden": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2884,
   "short": "residualBurden",
@@ -98964,9 +99672,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -98987,7 +99695,7 @@
  },
  "Descent.effectiveOutcomeVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2914,
   "short": "effectiveOutcomeVariance",
@@ -99002,7 +99710,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99084,8 +99792,8 @@
   }
  },
  "Descent.explainedSignalVarianceFromSourceWeights": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 2987,
   "short": "explainedSignalVarianceFromSourceWeights",
@@ -99098,9 +99806,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99166,7 +99874,7 @@
  },
  "Descent.r2FromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3019,
   "short": "r2FromSourceWeights",
@@ -99181,7 +99889,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99334,7 +100042,7 @@
  },
  "Descent.residualVarianceFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3037,
   "short": "residualVarianceFromSourceWeights",
@@ -99349,7 +100057,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99394,7 +100102,7 @@
  },
  "Descent.sourceCalibratedBrierFromSourceWeightsAtPrevalence": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3062,
   "short": "sourceCalibratedBrierFromSourceWeightsAtPrevalence",
@@ -99414,7 +100122,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -99453,7 +100161,7 @@
  },
  "Descent.targetCalibratedBrierFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 3146,
   "short": "targetCalibratedBrierFromSourceWeights",
@@ -99467,7 +100175,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -102146,7 +102854,7 @@
  },
  "Descent.equalVarianceGaussianAUCFromSourceWeights": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\"))",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\"))",
   "file": "Descent/Portability/PortabilityDrift.lean",
   "line": 5552,
   "short": "equalVarianceGaussianAUCFromSourceWeights",
@@ -102161,7 +102869,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"unsupported operand type(s) for /: 'float' and 'VecFn'\")"
+   "error": "TypeError(\"unsupported operand type(s) for +: 'float' and 'function'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -116629,8 +117337,14 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Core.Genotype.dosage_le_ploidy",
+   "Descent.Core.Panel.altFreq_le_one",
+   "Descent.Core.Panel.altFreq_nonneg",
    "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
    "Descent.Core.hweHeterozygosity_at_half",
+   "Descent.Core.hweProb_het",
+   "Descent.Core.hwe_dosage_variance",
+   "Descent.Core.hwe_mean_dosage",
    "Descent.Core.scaledMigrationRate_eq",
    "Descent.Core.scaledMutationRate_eq",
    "Descent.EvolutionaryParameters.bigM_nonneg",
@@ -116770,6 +117484,12 @@
     "Descent.Core.scaledMutationRate_eq": [],
     "Descent.Core.scaledMigrationRate_eq": [],
     "Descent.Core.hweHeterozygosity_at_half": [],
+    "Descent.Core.Genotype.dosage_le_ploidy": [],
+    "Descent.Core.Panel.altFreq_nonneg": [],
+    "Descent.Core.Panel.altFreq_le_one": [],
+    "Descent.Core.hweProb_het": [],
+    "Descent.Core.hwe_dosage_variance": [],
+    "Descent.Core.hwe_mean_dosage": [],
     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
     "Descent.scaledMutationRate_div_mu": [],
     "Descent.scaledMigrationRate_div_m": [],
@@ -120285,16 +121005,10 @@
   "short": "reflect",
   "ret_type": "Panel n",
   "empirical_status": "",
-  "python": "Descent_Spectral_Panel_reflect",
-  "args": [
-   "panel"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -120324,16 +121038,10 @@
   "short": "fold",
   "ret_type": "Panel n",
   "empirical_status": "",
-  "python": "fold",
-  "args": [
-   "panel"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -124569,7 +125277,7 @@
     "IsSymmetricBilinearMatrix B",
     "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
     "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-    "dot genuine (B.mulVec artifact",
+    "Foundations.dot genuine (B.mulVec artifact",
     "0 < coefficientEnergy B beta",
     "coefficientEnergy B beta = 0"
    ],
@@ -124592,7 +125300,7 @@
      "IsSymmetricBilinearMatrix B",
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-     "dot genuine (B.mulVec artifact"
+     "Foundations.dot genuine (B.mulVec artifact"
     ],
     "Descent.Spectral.coefficientEnergy_smul": [],
     "Descent.Spectral.coefficientEnergy_sub": [
@@ -125458,7 +126166,7 @@
     "IsSymmetricBilinearMatrix B",
     "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
     "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-    "dot genuine (B.mulVec artifact",
+    "Foundations.dot genuine (B.mulVec artifact",
     "0 < coefficientEnergy B beta",
     "Matrix.IsSymm B",
     "B.mulVec v = b",
@@ -125475,7 +126183,7 @@
      "IsSymmetricBilinearMatrix B",
      "coefficientEnergy B genuine ≤ genuineBudget ^ 2",
      "coefficientEnergy B artifact ≤ artifactBudget ^ 2",
-     "dot genuine (B.mulVec artifact"
+     "Foundations.dot genuine (B.mulVec artifact"
     ],
     "Descent.Spectral.coefficientEnergy_sub": [
      "IsSymmetricBilinearMatrix B"
