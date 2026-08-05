@@ -35,6 +35,37 @@ WHAT IS DECLARED HERE
                   rather than skipped, because a silently unevaluated definition
                   is the failure mode this whole directory exists to prevent.
 
+HOW TO CHOOSE WHAT TO DECLARE NEXT, which matters more than it sounds.
+
+Sweeping modules alphabetically and targeting weak verdicts are not two orders of
+the same work.  Measured over six batches here: four alphabetical module sweeps
+found ZERO gaps in this table's vocabulary; two batches targeted at definitions
+whose verdict was FALSIFIED or absent found TWO.  The reason is structural rather
+than lucky --
+
+    a sweep finds definitions that fit the existing kinds, because "declarable"
+    is defined by the kinds.  An instrument swept over the cases it can already
+    express measures its own vocabulary, not the corpus.
+
+So order by the weakness of the verdict: bodies still marked FALSIFIED first
+(a relation there either survives a correction, which is evidence the correction
+kept the right structure, or fails it, which is evidence it did not), then bodies
+carrying no verdict at all, which nothing in the corpus can contradict today.
+
+THE TWO KNOWN VOCABULARY GAPS, which are a specification for anyone extending
+the kinds rather than a list of shortfalls:
+
+  * REFLECTION ABOUT AN ANCHOR.  `|slope - 1|` is even about `slope = 1`; the
+    negation kinds here reflect about zero.  A real family: calibration slope,
+    `Ns` from an observed correlation, and most "distance from ideal" quantities.
+    See `calibrationSlopeDeviation`.
+  * SCALING OF THE LOGARITHM OF AN ARGUMENT.  `maxSafeEpistaticOrder` satisfies
+    `f(N^c, q) = c · f(N, q)`; every kind here transforms arguments
+    multiplicatively or by complement.
+
+Neither is approximated with a nearby kind.  Declaring a plain `scales` for
+either would assert something false, which is worse than declaring nothing.
+
 UNSWEPT MODULES ARE VISIBLE DEBT, NOT ZERO.  `run.py --coverage` prints how many
 extractable scalar definitions live outside SWEPT_MODULES.  Extending the sweep
 is additive and never weakens an existing gate.  Do not add a module to
@@ -1038,6 +1069,101 @@ RELATIONS = {
         jointly_scales(["residual_var", "estimation_var"], 1),
     ],
 
+    # --- TARGETED, no verdict: CirculationDefect ---------------------------
+    "Calibrator.driftGeneratorForm": [
+        # `s(x² + y²) + circulationQuadraticForm a x y`, and the second term is
+        # identically zero. So the form is INVARIANT UNDER SCALING `a` -- the
+        # circulation parameter is invisible to the Dirichlet form at every
+        # value, which is the whole content of this module and is stated here
+        # as a relation that can fail rather than as prose. A body in which any
+        # part of the circulation survived would move when `a` moves.
+        scales("a", 0),
+        scales("s", 1),
+        symmetric_in("x", "y"),
+        jointly_scales(["x", "y"], 2),
+        even_under_negation(["x", "y"]),
+    ],
+    "Calibrator.frontierTime": [
+        scales("s", -1),
+    ],
+    "Calibrator.apparentMixingTime": [
+        jointly_scales(["s", "a"], -1),
+        even_under_negation(["a"]),
+    ],
+    "Calibrator.circulationDefect": [
+        # `a²/(s(s² + a²))`: numerator degree 2 over denominator degree 3, so
+        # the joint exponent is -1. Declared as -2 on first writing -- the third
+        # time in this table I have composed a joint exponent from the
+        # per-argument ones instead of computing the net degree, and the third
+        # time the gate caught it on the first run.
+        jointly_scales(["s", "a"], -1),
+        even_under_negation(["a"]),
+    ],
+    "Calibrator.transferTimeInflation": [
+        # Reads only the ratio a/s, so the rate unit cancels.
+        jointly_scales(["s", "a"], 0),
+        even_under_negation(["a"]),
+    ],
+
+    # --- TARGETED, no verdict: ClinicalUtilityFairness ---------------------
+    "Calibrator.netReclassificationImprovement": [
+        symmetric_in("event_nri", "nonevent_nri"),
+        jointly_scales(["event_nri", "nonevent_nri"], 1),
+        odd_under_negation(["event_nri", "nonevent_nri"]),
+    ],
+    "Calibrator.ppv": [
+        # A posterior probability: scale-free in the two rates.
+        jointly_scales(["tpr", "fpr"], 0),
+    ],
+    "Calibrator.proportionCorrectlyClassified": [
+        jointly_scales(["sensitivity", "specificity"], 1),
+    ],
+    "Calibrator.populationAttributableFraction": [
+        scales("p_high", 1),
+    ],
+
+    # --- TARGETED, no verdict: AncestryCalibration -------------------------
+    "Calibrator.ancestryRecalibratedSlope": [
+        scales("bSource", 1),
+        scales("rho", 1),
+        scales("alpha", -1),
+    ],
+    "Calibrator.ancestryRecalibratedR2": [
+        symmetric_in("r2Source", "rhoSq"),
+        jointly_scales(["r2Source", "rhoSq"], 2),
+    ],
+    "Calibrator.effectTurnoverR2Loss": [
+        scales("r2Source", 1),
+    ],
+    "Calibrator.cubicSplineApproximationScale": [
+        # The fourth power is the whole claim: a cubic spline's approximation
+        # error is O(h⁴), and a body carrying h³ or h⁵ is monotone and positive
+        # exactly as this one is.
+        scales("h", 4),
+        even_under_negation(["h"]),
+    ],
+    "Calibrator.splineCalibrationMSE": [
+        # bias² + variance: even in the bias alone, which is what says the
+        # decomposition squares the bias rather than carrying it signed.
+        even_under_negation(["bias"]),
+    ],
+    "Calibrator.explainedVarianceFraction": [
+        jointly_scales(["varSignal", "varNoise"], 0),
+    ],
+    "Calibrator.transferredEstimatorMSE": [
+        jointly_scales(["σ_sq", "bias_sq"], 1),
+    ],
+    "Calibrator.targetOnlyEstimatorMSE": [
+        symmetric_in("σ_sq", "σ_extra_sq"),
+        jointly_scales(["σ_sq", "σ_extra_sq"], 1),
+        scales("nTarget", -1),
+    ],
+    "Calibrator.epistaticVariancePairwise": [
+        scales("γ", 2),
+        symmetric_in("p₁", "p₂"),
+        invariant_under_allele_swap(["p₁", "p₂"]),
+    ],
+
     "Calibrator.recessiveMutationSelectionDriftParameter": [
         scales("Ne", 1),
         symmetric_in("mu", "s"),
@@ -1316,6 +1442,17 @@ NO_RELATIONS = {
         "No relation in this table's vocabulary can carry a scaling whose "
         "exponent is itself an argument -- which is precisely why α is the "
         "parameter the architecture literature argues about.",
+
+    "Calibrator.circulationQuadraticForm":
+        "`x(ay) + y(-(ax))` is IDENTICALLY ZERO -- the quadratic form of an "
+        "antisymmetric operator vanishes, which is `circulationQuadraticForm_eq_zero` "
+        "and the reason this definition exists. A constant satisfies every "
+        "invariance vacuously, so declaring one would be worse than declaring "
+        "nothing, and the vacuity screen in run.py would correctly fire. What "
+        "the vanishing DOES buy is declared next door instead, on "
+        "driftGeneratorForm, as invariance under scaling `a`: the circulation "
+        "parameter is invisible to the Dirichlet form. That is the same fact "
+        "attached to a body where it can fail.",
 
     # --- TARGETED, still FALSIFIED, and a second vocabulary gap -------------
     "Calibrator.maxSafeEpistaticOrder":
