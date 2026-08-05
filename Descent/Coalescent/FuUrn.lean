@@ -74,7 +74,7 @@ open Finset Nat
 theorem sum_range_choose_add (a m : ℕ) :
     ∑ b ∈ range (m + 1), (a + b).choose a = (a + m + 1).choose (a + 1) := by
   induction m with
-  | Conditionals.zero => simp
+  | zero => simp
   | succ p ih =>
       rw [sum_range_succ, ih, show a + (p + 1) = a + p + 1 from by omega]
       conv_rhs => rw [Nat.choose_succ_succ]

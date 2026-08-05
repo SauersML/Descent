@@ -149,7 +149,7 @@ theorem one_div_coalescentRate_add_two (k : ℕ) :
 theorem muntzPartialSum (n : ℕ) :
     ∑ k ∈ Finset.range n, 1 / coalescentRate (k + 2) = 2 - 2 / ((n : ℝ) + 1) := by
   induction n with
-  | Conditionals.zero => norm_num
+  | zero => norm_num
   | succ n ih =>
       have h1 : ((n : ℝ) + 1) ≠ 0 := by positivity
       have h2 : ((n : ℝ) + 2) ≠ 0 := by positivity

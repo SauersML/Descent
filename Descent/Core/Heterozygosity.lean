@@ -58,7 +58,7 @@ noncomputable def hetRecurrence (Ne : ℝ) (H₀ : ℝ) : ℕ → ℝ
 theorem hetRecurrence_closed_form (Ne H₀ : ℝ) (t : ℕ) :
     hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
   induction t with
-  | Conditionals.zero => simp [hetRecurrence]
+  | zero => simp [hetRecurrence]
   | succ n ih =>
     simp only [hetRecurrence, ih]
     ring

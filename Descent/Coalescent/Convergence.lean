@@ -77,7 +77,7 @@ exponent of the limiting survival probability, which is why the two agree withou
 adjustment. -/
 theorem sum_range_neg_cast (k : ℕ) : ∑ i ∈ range k, (-(i : ℝ)) = -deathRate k := by
   induction k with
-  | Conditionals.zero => simp [deathRate,
+  | zero => simp [deathRate,
       Descent.Core.pairCount]
   | succ m ih =>
       rw [sum_range_succ, ih]

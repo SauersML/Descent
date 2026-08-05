@@ -107,7 +107,7 @@ theorem harmonicSumSq_le {m : ℕ} (hm : 1 ≤ m) : harmonicSumSq m ≤ 2 - 1 / 
 Watterson's estimator is consistent at all. -/
 theorem harmonicSumSq_le_two (m : ℕ) : harmonicSumSq m ≤ 2 := by
   cases m with
-  | Conditionals.zero => norm_num [harmonicSumSq]
+  | zero => norm_num [harmonicSumSq]
   | succ p =>
       have h := harmonicSumSq_le (by omega : 1 ≤ p + 1)
       have hpos : (0 : ℝ) < 1 / ((p : ℝ) + 1) := by positivity

@@ -77,7 +77,7 @@ in Theorem D follows from this one formula. -/
 theorem iterate_eq (ρ x : ℕ → ℝ) (hrec : ∀ s, x (s + 1) = -ρ s * x s) (m : ℕ) :
     x m = (-1 : ℝ) ^ m * (∏ s ∈ range m, ρ s) * x 0 := by
   induction m with
-  | Conditionals.zero => simp
+  | zero => simp
   | succ m ih =>
     rw [hrec m, ih, Finset.prod_range_succ, pow_succ]
     ring

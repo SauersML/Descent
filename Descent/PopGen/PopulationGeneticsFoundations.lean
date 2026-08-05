@@ -2506,7 +2506,7 @@ theorem hetMutationRecurrence_zero (lam Hstar H₀ : ℝ) :
 theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     hetMutationRecurrence lam Hstar H₀ t = Hstar + (H₀ - Hstar) * lam ^ t := by
   induction t with
-  | Conditionals.zero =>
+  | zero =>
     simp [hetMutationRecurrence]
   | succ n ih =>
     simp only [hetMutationRecurrence, ih]

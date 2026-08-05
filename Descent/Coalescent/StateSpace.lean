@@ -445,14 +445,14 @@ theorem card_covers {n : ℕ} (ξ : ER n) :
 /-- `2 C(k,2) = k(k-1)`, the integer form of the halving. -/
 theorem two_mul_choose_two (k : ℕ) : 2 * k.choose 2 = k * (k - 1) := by
   induction k with
-  | Conditionals.zero => simp
+  | zero => simp
   | succ m ih =>
       have hsplit : (m + 1).choose 2 = m + m.choose 2 := by
         rw [Nat.choose_succ_succ, Nat.choose_one_right]
       rw [hsplit, Nat.add_sub_cancel, Nat.mul_add]
       rw [ih]
       cases m with
-      | Conditionals.zero => simp
+      | zero => simp
       | succ p =>
           simp only [Nat.add_sub_cancel]
           ring
