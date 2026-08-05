@@ -240,6 +240,36 @@ theorem exists_varWattersonEstimator_lt {θ : ℝ} (hθ : 0 ≤ θ) {ε : ℝ} (
     linarith
   linarith
 
+/-! ### Tajima's variance, where the corpus can check it -/
+
+/-- Tajima (1989)'s expression for `Var(π)`:
+`(n+1)/(3(n-1)) · θ + 2(n²+n+3)/(9n(n-1)) · θ²`.
+
+Empirical status: ASSERTED, with referent Tajima (1989, Genetics 123, 585-595).  It is
+written here to be CHECKED, not used: `varPairwise_two_eq` is the one sample size at which
+this corpus can verify it, and the general case is recorded as open in
+`Descent.Coalescent.Program`.  Nothing in the corpus depends on this definition. -/
+noncomputable def tajimaVarPairwise (θ : ℝ) (n : ℕ) : ℝ :=
+  ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ
+    + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ ^ 2
+
+/-- **At `n = 2` Tajima's formula is this corpus's `Var(S₂)`.**  A sample of two has one pair,
+so `π` IS `S`, and the two developments must agree: Tajima's expression collapses to
+`θ + θ²`, which is `varSegregatingSites θ 2` with `a_1 = b_1 = 1`.
+
+This is the only sample size at which the check is available, because for `n ≥ 3` the pairwise
+differences overlap and `Var(π)` stops being a function of the tree's total length.  That it
+passes is evidence the two conventions match; it is not the general formula, and
+`Descent.Coalescent.Program` says so. -/
+theorem varPairwise_two_eq (θ : ℝ) :
+    tajimaVarPairwise θ 2 = varSegregatingSites θ 2 := by
+  have h1 : harmonicSum (2 - 1) = 1 := by norm_num
+  have h2 : harmonicSumSq (2 - 1) = 1 := by
+    norm_num [harmonicSumSq]
+  unfold tajimaVarPairwise varSegregatingSites
+  rw [h1, h2]
+  norm_num
+
 end Coalescent
 
 end Descent

@@ -144,9 +144,14 @@ step" are different states.
   while `a` diverges -- so Watterson's estimator is consistent, at rate `1/log n`.  The
   per-clock variance those sums are built from is no longer assumed either:
   `Coalescent.HoldingSecondMoment` integrates K-C (1.7)'s density twice (`Γ(3) = 2!`) and
-  subtracts, giving `d⁻²`.  STILL ABSENT: `Var(π)` and `Cov(π, θ_W)`, hence Tajima's exact
-  denominator.  Those need `E(T_ij T_kl)` for pairs sharing a lineage and for disjoint pairs
-  -- three- and four-sample joint laws, not a function of the tree's total length.
+  subtracts, giving `d⁻²`.  STILL ABSENT: `Var(π)` and `Cov(π, θ_W)` for general `n`, hence
+  Tajima's exact denominator.  `SpectrumMoments.tajimaVarPairwise` writes Tajima's expression
+  down in order to CHECK it, and `varPairwise_two_eq` verifies it at `n = 2`, the one sample
+  size where the corpus can: a sample of two has one pair, so `π` IS `S`.  For `n ≥ 3` the
+  pairwise differences overlap, and `Var(π)` needs `E(T_ij T_kl)` for pairs sharing a lineage
+  and for disjoint pairs -- three- and four-sample joint laws over the product measure, which
+  restriction consistency reduces the general case to but does not compute.  Nothing in the
+  corpus depends on the asserted expression.
 * **Möhle's lemma** -- CLOSED for the survival probabilities.  `Coalescent.Convergence` proves
   K-G (2.14) at every `k`: the falling factorial factorises, so `p_N(k)^N → e^{-d_k}`, and the
   exponential holding law K-C (1.7) posits is a limit of counting.  STILL ABSENT: the matrix
