@@ -510,9 +510,13 @@ theorem r2_transport_factorisation
   field_simp
 
 omit [DecidableEq J] [DecidableEq L] in
-/-- **Each factor is `1` exactly when its own channel is quiet.**  A deployment whose
-    three channels are all silent has fully portable `R²`; this is the converse reading
-    of the factorisation and is what licenses calling the factors "channels". -/
+/-- **Three quiet channels give a portable `R²`.**
+
+    Only the one direction is proved, and only the one direction is true: `R²` is a
+    ratio, so channels can cancel.  A deployment whose alignment and dispersion both
+    halve reports the same `R²` as one where neither moved, and
+    `r2_eq_slope_differs` exhibits exactly that.  The name says "of no shift" rather
+    than "iff" for that reason. -/
 theorem r2_transport_of_no_shift
     (hcov : D.target.predictiveCovariance D.w = D.source.predictiveCovariance D.w)
     (hvar : D.target.scoreVariance D.w = D.source.scoreVariance D.w)
@@ -522,15 +526,18 @@ theorem r2_transport_of_no_shift
   rw [hcov, hvar, hout]
 
 omit [DecidableEq J] [DecidableEq L] in
-/-- **A pure LD shift moves `R²` and the calibration slope in opposite directions.**
+/-- **A pure dispersion shift lowers both the calibration slope and `R²`.**
 
     Fix the signal (`Cov(S,Y)` unchanged) and the phenotype (`Var Y` unchanged), and let
-    only the score's own variance grow.  Then `R²` falls and the calibration slope falls
-    too -- but the slope falls *proportionally* to `Var S`, while `R²` falls only through
-    the same single factor, so the two metrics are not related by any fixed monotone map:
-    that is `§4`'s minimality in miniature, and it is the exact reason a recalibrated
-    score can restore the slope to `1` while leaving `R²` where it was. -/
-theorem recalibration_fixes_slope_not_r2
+    only the score's own variance grow.  Both metrics fall, which is what the conclusion
+    says and all it says.
+
+    Read narrowly.  This is not the claim that the two metrics move together in general
+    -- `r2_eq_slope_differs` in `§4` is a pair with equal `R²` and unequal slope, so they
+    do not -- and it is not a statement about what recalibration repairs, which is
+    `§5`'s `bestAffine_mse_eq` and `r2_affine_invariant`.  It is the single channel on
+    which the two happen to agree, isolated. -/
+theorem dispersion_shift_lowers_slope_and_r2
     (hcov : D.target.predictiveCovariance D.w = D.source.predictiveCovariance D.w)
     (hout : D.target.outcomeVariance = D.source.outcomeVariance)
     (hS : 0 < D.source.scoreVariance D.w)
@@ -754,8 +761,9 @@ theorem twoContrast_statistic (α γ δ : ℝ) :
 
 /-- **Every point of the Cauchy-Schwarz cone is realised.**
 
-    Given any target `(Var S, Cov, Var Y)` obeying the bound that `§4`'s
-    `predictiveCovariance_sq_le` forces, there is an honest four-individual population
+    Given any target `(Var S, Cov, Var Y)` with positive score variance and obeying the
+    bound that `§4`'s `predictiveCovariance_sq_le` forces, there is a four-individual
+    population
     and a weight vector whose deployed metrics are exactly those numbers.
 
     Together with `predictiveCovariance_sq_le` this says the achievable set is the cone
@@ -798,7 +806,7 @@ disagreeing coordinate cannot be dropped.
 
 The consequence for practice is the one the portability literature keeps rediscovering:
 a scalar summary of genetic distance is a function of one thing, and `R²` is a function
-of three, so no scalar can predict it.  `no_scalar_summary_determines_r2` states that
+of three, so no scalar can predict it.  `no_score_side_summary_determines_r2` states that
 directly rather than by analogy.
 -/
 
@@ -867,28 +875,30 @@ theorem scoreVariance_coordinate_necessary :
     twoContrast_predictiveCovariance, twoContrast_outcomeVariance, hs]
   norm_num
 
-/-- **No scalar summary of a deployment determines its `R²`.**
+/-- **No summary of the score's own behaviour determines its `R²`.**
 
-    Let `summary` be *any* function from deployments to any type: `F_ST`, a PC distance,
-    an admixture proportion, a divergence time, a vector of all of them, a neural
-    network on the whole genotype matrix.  If it is blind to the residual variance --
-    that is, if it does not look at the phenotype's non-genetic variance -- then it
-    cannot determine `R²`, because the two populations of
-    `outcomeVariance_coordinate_necessary` differ in `R²` and in nothing else it can
-    see.
+    Let `summary` be *any* function of the pair `(Var S, Cov(S,Y))` into any type: an
+    `F_ST`, a PC distance, an admixture proportion, a divergence time, the full LD
+    matrix, a neural network on the entire genotype matrix -- anything at all that can be
+    computed without looking at the phenotype's non-genetic variance.  No such summary
+    determines `R²`, because the two populations of
+    `outcomeVariance_coordinate_necessary` agree on both coordinates it can see and
+    differ in `R²`.
 
-    Stated with `summary` universally quantified rather than instantiated at `F_ST`,
-    because the point is not that `F_ST` in particular is a bad predictor. -/
-theorem no_genetic_summary_determines_r2
-    {Report : Type*} (summary : ℝ → Report) :
+    `summary` is universally quantified rather than instantiated at `F_ST` because the
+    point is not that `F_ST` in particular is a poor predictor.  It is that the
+    predictand has a third coordinate, and no refinement of the first two reaches it. -/
+theorem no_score_side_summary_determines_r2
+    {Report : Type*} (summary : ℝ × ℝ → Report) :
     ¬ ∃ accept : Report → ℝ,
         ∀ δ : ℝ,
           (twoContrastPopulation 1 1 δ).r2 unitWeight
-            = accept (summary ((twoContrastPopulation 1 1 δ).scoreVariance unitWeight)) := by
+            = accept (summary ((twoContrastPopulation 1 1 δ).scoreVariance unitWeight,
+                (twoContrastPopulation 1 1 δ).predictiveCovariance unitWeight)) := by
   rintro ⟨accept, hacc⟩
   have h0 := hacc 0
   have h1 := hacc 1
-  rw [twoContrast_scoreVariance] at h0 h1
+  rw [twoContrast_scoreVariance, twoContrast_predictiveCovariance] at h0 h1
   have hne := outcomeVariance_coordinate_necessary.2.2
   exact hne (h0.trans h1.symm)
 
