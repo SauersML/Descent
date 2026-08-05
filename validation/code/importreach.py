@@ -3,6 +3,7 @@
 
     python3 validation/code/importreach.py drop Descent.Program.OpenQuestions
     python3 validation/code/importreach.py unused
+    python3 validation/code/importreach.py layers
 
 WHY THIS EXISTS, AND WHAT IT DELIBERATELY WILL NOT DO
 
@@ -55,6 +56,40 @@ DECL_RE = re.compile(
 # A false ATTRIBUTION makes a cut look unsafe, which is the safe direction, so
 # this list is short on purpose.
 NOISE = {"value", "map", "comp", "id", "sum", "product", "ratio", "share", "witness"}
+
+# The layer order the corpus is adopting.  A module may import its own layer and
+# any layer below it, and nothing above.
+#
+# The four directories at rank 4 are SIBLINGS, not a sub-order: `Portability`,
+# `Spectral`, `Blindness` and `Conditionals` are four subsystems over the same
+# population-genetic base, and none is built on another.  Giving them one rank
+# says an import between them is not a layer violation -- it may still be a
+# coupling worth removing, but it is a different finding and this file does not
+# make it.  `Pangenome` sits with them because it is a fifth such subsystem.
+#
+# Enforcement belongs in `assert_not_exists` at the head of each file, where a
+# violation is a build error at the file that commits it.  This mode exists
+# because that enforcement needs a compiler and the ordering can be measured
+# without one -- and because the direct-violation count is the number that says
+# how much work the enforcement is, which is much smaller than it looks.
+LAYERS = {
+    "Core": 0,
+    "Foundations": 1,
+    "Coalescent": 2,
+    "PopGen": 3,
+    "Portability": 4,
+    "Spectral": 4,
+    "Blindness": 4,
+    "Conditionals": 4,
+    "Pangenome": 4,
+    "Decision": 5,
+    "Program": 6,
+}
+
+
+def layer_of(mod: str) -> int | None:
+    parts = mod.split(".")
+    return LAYERS.get(parts[1]) if len(parts) > 1 else None
 
 
 def modules() -> dict[str, str]:
@@ -112,13 +147,61 @@ def uses(src: str, names: set[str]) -> set[str]:
 
 
 def main() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in ("drop", "unused"):
+    if len(sys.argv) < 2 or sys.argv[1] not in ("drop", "unused", "layers"):
         print(__doc__)
         return 2
 
     src = modules()
     edges = {m: imports_of(s) for m, s in src.items()}
     decl = {m: declares(s) for m, s in src.items()}
+
+    if sys.argv[1] == "layers":
+        direct: list[tuple[str, str]] = []
+        for m in sorted(edges):
+            lm = layer_of(m)
+            if lm is None:
+                continue
+            for dep in edges[m]:
+                ld = layer_of(dep)
+                if ld is not None and ld > lm:
+                    direct.append((m, dep))
+        # Transitive, for the size of the shadow each direct violation casts.
+        trans = 0
+        for m in edges:
+            lm = layer_of(m)
+            if lm is None:
+                continue
+            for dep in reachable(m, edges):
+                ld = layer_of(dep)
+                if ld is not None and ld > lm:
+                    trans += 1
+        depth: dict[str, int] = {}
+
+        def d(mod: str, stack: tuple[str, ...] = ()) -> int:
+            if mod in depth:
+                return depth[mod]
+            if mod in stack:
+                return 0
+            depth[mod] = 0
+            depth[mod] = max([d(i, stack + (mod,)) + 1 for i in edges.get(mod, [])] + [0])
+            return depth[mod]
+
+        for mod in edges:
+            d(mod)
+        chains = [m for m, deps in edges.items() if len(deps) == 1]
+        print(f"DAG depth {max(depth.values())}; {len(chains)} of {len(edges)} modules "
+              f"import exactly one Descent module")
+        print(f"{len(direct)} DIRECT layer-order violation(s), casting {trans} transitive one(s).")
+        print("These are the import lines that have to change; the transitive count is")
+        print("what they cost, and it is why the direct list is the one to work from.\n")
+        by_pair: dict[tuple[str, str], list[str]] = {}
+        for m, dep in direct:
+            by_pair.setdefault((m.split(".")[1], dep.split(".")[1]), []).append(f"{m} -> {dep}")
+        for (a, b), rows in sorted(by_pair.items(), key=lambda kv: -len(kv[1])):
+            print(f"  {a} (rank {LAYERS[a]}) imports {b} (rank {LAYERS[b]}) -- {len(rows)}")
+            for r in sorted(rows):
+                print(f"      {r}")
+        return 1 if direct else 0
 
     if sys.argv[1] == "drop":
         if len(sys.argv) < 3:
