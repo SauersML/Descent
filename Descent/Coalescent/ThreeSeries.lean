@@ -58,7 +58,7 @@ multiplied. -/
 theorem prod_le_exp_neg_sum (a : ℕ → ℝ) (h0 : ∀ k, 0 ≤ a k) (h1 : ∀ k, a k ≤ 1) (m : ℕ) :
     ∏ k ∈ range m, (1 - a k) ≤ Real.exp (-∑ k ∈ range m, a k) := by
   induction m with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ p ih =>
       have hstep : 1 - a p ≤ Real.exp (-a p) := by
         have h := Real.add_one_le_exp (-a p)

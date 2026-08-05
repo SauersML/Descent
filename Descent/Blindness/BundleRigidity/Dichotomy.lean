@@ -399,7 +399,7 @@ theorem forcedMass_ge (ρ : ℝ) (U : ℕ → ℝ) (hρ : 0 ≤ ρ)
     ∀ n, ρ ^ n * U 0 ≤ U n := by
   intro n
   induction n with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ k ih =>
     calc ρ ^ (k + 1) * U 0 = ρ * (ρ ^ k * U 0) := by ring
       _ ≤ ρ * U k := mul_le_mul_of_nonneg_left ih hρ

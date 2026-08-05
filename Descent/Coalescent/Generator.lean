@@ -76,7 +76,7 @@ theorem prodUpTo_succ {M : Type*} [Monoid M] (A : ℕ → M) (r : ℕ) :
 theorem norm_prodUpTo_le_one {M : Type*} [NormedRing M] [NormOneClass M] (A : ℕ → M)
     (hA : ∀ s, ‖A s‖ ≤ 1) (r : ℕ) : ‖prodUpTo A r‖ ≤ 1 := by
   induction r with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ m ih =>
       rw [prodUpTo_succ]
       calc ‖prodUpTo A m * A m‖ ≤ ‖prodUpTo A m‖ * ‖A m‖ := norm_mul_le _ _
@@ -92,7 +92,7 @@ theorem norm_prodUpTo_sub_le {M : Type*} [NormedRing M] [NormOneClass M] (A B : 
     (hA : ∀ s, ‖A s‖ ≤ 1) (hB : ∀ s, ‖B s‖ ≤ 1) (r : ℕ) :
     ‖prodUpTo A r - prodUpTo B r‖ ≤ ∑ s ∈ range r, ‖A s - B s‖ := by
   induction r with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ m ih =>
       have hsplit : prodUpTo A (m + 1) - prodUpTo B (m + 1)
           = prodUpTo A m * (A m - B m) + (prodUpTo A m - prodUpTo B m) * B m := by
@@ -133,7 +133,7 @@ about `A^r`. -/
 theorem prodUpTo_const {M : Type*} [Monoid M] (A : M) (r : ℕ) :
     prodUpTo (fun _ => A) r = A ^ r := by
   induction r with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ m ih =>
       rw [prodUpTo_succ, ih, pow_succ]
 

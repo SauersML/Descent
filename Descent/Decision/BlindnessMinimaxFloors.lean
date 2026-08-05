@@ -56,7 +56,7 @@ time -- previously they existed only as bare equations:
 
 namespace Descent.Decision
 
-open Descent.FiniteMinimax
+open Descent.Decision.FiniteMinimax
 
 namespace ProbeBlindness
 

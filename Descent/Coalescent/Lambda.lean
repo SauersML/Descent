@@ -147,7 +147,7 @@ theorem binaryRate_eq_base {lam : ℕ → ℕ → ℝ} (hcons : IsConsistentRate
     (hbin : ∀ b k, 3 ≤ k → lam b k = 0) : ∀ b : ℕ, 2 ≤ b → lam b 2 = lam 2 2 := by
   intro b hb
   induction b with
-  | zero => omega
+  | Conditionals.zero => omega
   | succ m ih =>
       rcases Nat.lt_or_ge m 2 with hm | hm
       · have : m + 1 = 2 := by omega

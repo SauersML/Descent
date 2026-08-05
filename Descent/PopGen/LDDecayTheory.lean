@@ -839,7 +839,7 @@ theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
       driftLDEquilibrium Ne c +
         (Q₀ - driftLDEquilibrium Ne c) * driftLDRetention Ne c ^ t := by
   induction t with
-  | zero =>
+  | Conditionals.zero =>
       rw [driftLDTrajectory_zero, pow_zero, mul_one]
       ring
   | succ n ih =>
@@ -1560,7 +1560,7 @@ theorem ldRecurrence_succ (r D₀ : ℝ) (t : ℕ) :
 theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
     ldRecurrence r D₀ t = (1 - r) ^ t * D₀ := by
   induction t with
-  | zero =>
+  | Conditionals.zero =>
     simp
   | succ n ih =>
     simp [ih, pow_succ, mul_left_comm, mul_comm]

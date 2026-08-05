@@ -114,7 +114,7 @@ theorem lumped_dynamics_blind_to_exchange (a b b' : ℝ) (f : Fin 3 → ℝ) (hf
       Lumped (generatorIter (demeRate a b) f n) := by
     intro n
     induction n with
-    | zero => exact ⟨rfl, hf⟩
+    | Conditionals.zero => exact ⟨rfl, hf⟩
     | succ n ih =>
       obtain ⟨heq, hlump⟩ := ih
       refine ⟨?_, ?_⟩

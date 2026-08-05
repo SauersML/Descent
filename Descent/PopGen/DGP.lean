@@ -268,7 +268,7 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP m where
   scoreModel :=
-    { alleleFreq := fun _ ↦ Spectral.HardyWeinbergModel.witness
+    { alleleFreq := fun _ ↦ HardyWeinbergModel.witness
       effect := fun _ ↦ 0 }
   berryEsseenConstant := 0
   berryEsseenConstant_nonneg := le_refl 0
@@ -321,9 +321,9 @@ theorem HWEPolygenicScoreDGP.mem_scoreApproximationInterval_of_abs_sub_le
     (exactValue gaussianCenter : ℝ)
     (h : |exactValue - gaussianCenter| ≤ dgp.scoreApproximationError) :
     exactValue ∈
-      Descent.approximationInterval gaussianCenter dgp.scoreApproximationError := by
-  simpa [Descent.approximationInterval] using
-    (Descent.mem_approximationInterval_of_abs_sub_le
+      Descent.Foundations.approximationInterval gaussianCenter dgp.scoreApproximationError := by
+  simpa [Descent.Foundations.approximationInterval] using
+    (Descent.Foundations.mem_approximationInterval_of_abs_sub_le
     exactValue gaussianCenter dgp.scoreApproximationError h)
 
 /-! ### Tagged DGP (Causal vs Observable Architecture)

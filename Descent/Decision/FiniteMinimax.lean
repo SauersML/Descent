@@ -39,7 +39,7 @@ biological nonidentifiability witnesses.
 namespace Descent.Decision.FiniteMinimax
 
 open scoped BigOperators
-open Descent.CertificateGrading
+open Descent.Decision.CertificateGrading
 
 /-- A finite statistical decision problem.  All three index types are
 nonempty (`Fin (n + 1)`), and every observation law is Mathlib's `PMF`. -/

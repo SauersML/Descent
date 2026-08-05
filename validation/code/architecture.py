@@ -416,6 +416,62 @@ def externally_silent(code, decls):
     return sorted(silent)
 
 
+# The kinds of terminal theorem the corpus states ON PURPOSE.  Each is a claim
+# whose whole job is to be an endpoint: naming the value at a junk argument,
+# pinning a body to a number, exhibiting an inhabitant, or recording a proved
+# failure.  A consumer for any of them would be a restatement.
+TERMINAL_KINDS = (
+    ("junk-value naming", lambda n: "_is_junk" in n),
+    ("reference evaluation", lambda n: n.endswith("_at_reference_point")),
+    ("inhabitation witness",
+     lambda n: "witness" in n.lower() or n.endswith(("_inhabited", "_nonempty"))),
+    ("proved failure or separation",
+     lambda n: n.startswith("no_") or any(k in n for k in
+                                          ("_ne_", "_not_", "_cannot_", "_fails"))),
+    ("primed restatement", lambda n: n.endswith("'")),
+)
+
+
+def classify_terminal_theorems(code, decls):
+    """Theorems no other PROOF uses, split by whether being terminal is the point.
+
+    REPORTED, NOT GATED. `61.8% terminal` was the headline of the original
+    diagnosis and it is a misleading number on its own: a junk-value naming, a
+    reference evaluation, an inhabitation witness and a proved failure are all
+    theorems whose job IS to be an endpoint, and giving each a consumer would
+    mean writing a restatement -- the anti-pattern the duplicate gate exists to
+    stop.
+
+    The split is the useful form. What remains after the deliberate kinds are
+    removed is the population worth reading, and it is the only part of the
+    original 3,617 that a triage could act on.
+    """
+    owner = {}
+    for mod, found in decls.items():
+        for kind, name in found:
+            if kind in ("theorem", "lemma"):
+                owner.setdefault(name, mod)
+    used = set()
+    body = re.compile(
+        r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+[\w.'₀-₉]+.*?:=(.*?)(?=\n\S|\Z)",
+        re.S | re.M)
+    for mod, text in code.items():
+        for m in body.finditer(text):
+            for w in IDENT.findall(m.group(1)):
+                if w in owner:
+                    used.add(w)
+    terminal = [n for n in owner if n not in used]
+    counts = collections.Counter()
+    for n in terminal:
+        for label, pred in TERMINAL_KINDS:
+            if pred(n):
+                counts[label] += 1
+                break
+        else:
+            counts["unclassified leaf"] += 1
+    return len(owner), len(terminal), counts
+
+
 def defs_with_no_theorem(code, decls):
     """Definitions no theorem statement names.
 
@@ -585,6 +641,7 @@ def measure():
     silent_modules = externally_silent(code, decls)
     unused_imports = unused_direct_imports(raw, code, decls)
     silent_defs = defs_with_no_theorem(code, decls)
+    total_thms, n_terminal, terminal_kinds = classify_terminal_theorems(code, decls)
 
     return {
         "modules": len(graph),
@@ -601,6 +658,10 @@ def measure():
         "externally_silent_modules": len(silent_modules),
         "imports_naming_nothing_used": sum(len(v) for v in unused_imports.values()),
         "defs_no_theorem_names": len(silent_defs),
+        "terminal_theorem_pct": round(100.0 * n_terminal / total_thms, 1) if total_thms else 0.0,
+        "terminal_deliberate": sum(v for k, v in terminal_kinds.items()
+                                   if k != "unclassified leaf"),
+        "terminal_unclassified": terminal_kinds.get("unclassified leaf", 0),
         "_offenders": inverted,
         "_thin": thin,
         "_silent": silent,
@@ -609,6 +670,7 @@ def measure():
         "_silent_modules": silent_modules,
         "_unused_imports": unused_imports,
         "_silent_defs": silent_defs,
+        "_terminal_kinds": terminal_kinds,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -669,6 +731,9 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             # See `defs_with_no_theorem`: zero is not the honest target, and
             # demanding it would be answered with reference evaluations.
             "defs_no_theorem_names",
+            # See `classify_terminal_theorems`: a terminal theorem is usually
+            # terminal on purpose, and a consumer for one would be a restatement.
+            "terminal_theorem_pct", "terminal_deliberate", "terminal_unclassified",
             # Correct position, few consumers.  A new foundation starts here and
             # earns callers as they move over; it is not the inversion above.
             "foundation_not_yet_load_bearing")
@@ -723,6 +788,10 @@ def main() -> int:
                   "-- reported, not gated:")
             for m in now["_silent_modules"]:
                 print("  " + m)
+        if now["_terminal_kinds"]:
+            print("\nterminal theorems by kind -- reported, not gated:")
+            for k, v in now["_terminal_kinds"].most_common():
+                print(f"  {v:5}  {k}")
         if now["_unused_imports"]:
             print("\nimports whose declarations the importer never names "
                   "-- reported, not gated:")

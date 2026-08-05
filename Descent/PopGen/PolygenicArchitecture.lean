@@ -719,7 +719,7 @@ theorem boundedEffectCarrier_convex (q : ℕ) (B : ℝ) :
     Convex ℝ (boundedEffectCarrier q B) :=
   convex_closedBall 0 |B|
 
-open Descent.CertificateGrading in
+open Descent.Decision.CertificateGrading in
 /-- A finite catalogue of additive architectures and a numerical discrepancy
 between mixture experiments.  No field has type `Prop`; both the
 moment-constrained modulus and the atom-complexity modulus are derived below
@@ -734,7 +734,7 @@ structure MeanAbsoluteEffectCertificateProblem (q n : ℕ) where
 
 namespace MeanAbsoluteEffectCertificateProblem
 
-open Descent.CertificateGrading
+open Descent.Decision.CertificateGrading
 
 /-- A data-derived radius containing the whole finite architecture catalogue.
 Using the sum of absolute coordinates is deliberately conservative but total:

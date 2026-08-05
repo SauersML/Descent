@@ -179,7 +179,7 @@ theorem speedTiltFullMergerRate_strictAnti_beta
       speedTiltFullMergerRate β₁ (extra + 1) := by
   have hβ₂ : -1 < β₂ := hβ₁.trans hβ
   induction extra with
-  | zero =>
+  | Conditionals.zero =>
       simp only [Nat.zero_add, speedTiltFullMergerRate_one]
       exact one_div_lt_one_div_of_lt (by linarith) (by linarith)
   | succ extra ih =>
@@ -232,7 +232,7 @@ theorem speedTiltFullMergerRate_le_one
     {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
     speedTiltFullMergerRate β extra ≤ 1 := by
   induction extra with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ extra ih =>
       exact (speedTiltFullMergerRate_strictAnti_extra hβ extra).le.trans ih
 
@@ -248,7 +248,7 @@ coordinate equals one there. -/
 @[simp] theorem speedTiltFullMergerRate_neg_one (extra : ℕ) :
     speedTiltFullMergerRate (-1) extra = 1 := by
   induction extra with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ extra ih =>
       rw [speedTiltFullMergerRate_succ, ih, one_mul]
       have hne : (extra : ℝ) + 1 ≠ 0 := by positivity
@@ -261,7 +261,7 @@ for all `extra + 2` lineages to merge simultaneously is `1 / (extra + 1)`. Equiv
 theorem speedTiltFullMergerRate_zero_beta (extra : ℕ) :
     speedTiltFullMergerRate 0 extra = 1 / ((extra : ℝ) + 1) := by
   induction extra with
-  | zero => norm_num
+  | Conditionals.zero => norm_num
   | succ extra ih =>
       rw [speedTiltFullMergerRate_succ, ih]
       have hleft : (extra : ℝ) + 1 ≠ 0 := by positivity
@@ -277,7 +277,7 @@ theorem speedTiltFullMergerRate_succ_le_threeLineage
     {β : ℝ} (hβ : -1 < β) (extra : ℕ) :
     speedTiltFullMergerRate β (extra + 1) ≤ 1 / (β + 2) := by
   induction extra with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ extra ih =>
       exact (speedTiltFullMergerRate_strictAnti_extra hβ (extra + 1)).le.trans ih
 
@@ -356,7 +356,7 @@ theorem speedTiltNonMergerFactor_le_one
     {β : ℝ} (hβ : -1 < β) {k : ℕ} (hk : 2 ≤ k) (extra : ℕ) :
     speedTiltNonMergerFactor β k extra ≤ 1 := by
   induction extra with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ extra ih =>
       exact (speedTiltNonMergerFactor_strictAnti_extra hβ hk extra).le.trans ih
 
@@ -365,7 +365,7 @@ the first outside-lineage factor is exactly zero. -/
 @[simp] theorem speedTiltNonMergerFactor_neg_one_succ (k extra : ℕ) :
     speedTiltNonMergerFactor (-1) k (extra + 1) = 0 := by
   induction extra with
-  | zero => simp [speedTiltNonMergerFactor_succ]
+  | Conditionals.zero => simp [speedTiltNonMergerFactor_succ]
   | succ extra ih =>
       rw [speedTiltNonMergerFactor_succ, ih, zero_mul]
 
@@ -376,7 +376,7 @@ theorem speedTiltNonMergerFactor_two_eq
     speedTiltNonMergerFactor β 2 extra =
       (β + 1) / (β + (extra : ℝ) + 1) := by
   induction extra with
-  | zero =>
+  | Conditionals.zero =>
       rw [speedTiltNonMergerFactor_zero]
       have hne : β + 1 ≠ 0 := by linarith
       norm_num
@@ -897,7 +897,7 @@ theorem reciprocalDifference_sum (n : ℕ) :
       (1 / ((j : ℝ) + 1) - 1 / ((j : ℝ) + 2)) =
         1 - 1 / ((n : ℝ) + 1) := by
   induction n with
-  | zero => norm_num
+  | Conditionals.zero => norm_num
   | succ n ih =>
       rw [Finset.sum_range_succ, ih]
       push_cast

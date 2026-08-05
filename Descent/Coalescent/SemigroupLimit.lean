@@ -49,6 +49,7 @@ for models whose time scales separate -- which is a different theorem with a dif
 
 - `norm_pow_sub_pow_le`: `‖A^r - B^r‖ ≤ r‖A - B‖`, `Generator`'s estimate on powers.
 - `exp_smul_pow_self`: `exp(N⁻¹Q)^N = exp Q`, exactly.
+- `tendsto_pow_of_close`: the limit with the comparison family left open.
 - `tendsto_pow_self_exp`: **K-G (2.14)**.
 -/
 
@@ -77,6 +78,47 @@ theorem exp_smul_pow_self {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ �
   have hsmul : (N : ℕ) • ((1 / (N : ℝ)) • Q) = Q := by
     rw [← Nat.cast_smul_eq_nsmul ℝ N ((1 / (N : ℝ)) • Q), smul_smul, hcoef, one_smul]
   rw [← exp_nsmul (𝕂 := ℝ) N ((1 / (N : ℝ)) • Q), hsmul]
+
+/-- **The limit, with the comparison family left open.**  If `P_N` is a contraction within
+`C/N²` of a contraction `B_N` whose `N`-th power is a FIXED `L`, then `P_N^N → L`.
+
+This is the whole of K-G's argument: the `N` copies of a one-generation error of size `C/N²`
+accumulate to `C/N` and vanish, and the comparison family contributes nothing because its
+`N`-th power does not move.  Taking `B_N = exp(N⁻¹Q)` gives `tendsto_pow_self_exp`; taking a
+family that satisfies a semigroup law directly -- which for a two-state generator is
+elementary algebra, `Descent.Coalescent.PairChainLimit` -- avoids computing a matrix
+exponential at all. -/
+theorem tendsto_pow_of_close {𝔸 : Type*} [NormedRing 𝔸] [NormOneClass 𝔸] (L : 𝔸) (C : ℝ)
+    (P B : ℕ → 𝔸)
+    (hP : ∀ N, ‖P N‖ ≤ 1) (hB : ∀ N, ‖B N‖ ≤ 1)
+    (hpow : ∀ N : ℕ, 1 ≤ N → B N ^ N = L)
+    (hclose : ∀ N, ‖P N - B N‖ ≤ C / (N : ℝ) ^ 2) :
+    Tendsto (fun N : ℕ ↦ P N ^ N) atTop (nhds L) := by
+  have hC : 0 ≤ C := by
+    have h := hclose 1
+    have hnn : (0 : ℝ) ≤ ‖P 1 - B 1‖ := norm_nonneg _
+    have h1 : C / ((1 : ℕ) : ℝ) ^ 2 = C := by norm_num
+    linarith [h1 ▸ h]
+  rw [tendsto_iff_norm_sub_tendsto_zero]
+  have hbound : ∀ N : ℕ, 1 ≤ N → ‖P N ^ N - L‖ ≤ C / (N : ℝ) := by
+    intro N hN
+    have hNR : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    have hstep := norm_pow_sub_pow_le (P N) (B N) (hP N) (hB N) N
+    rw [hpow N hN] at hstep
+    have hmul : (N : ℝ) * ‖P N - B N‖ ≤ (N : ℝ) * (C / (N : ℝ) ^ 2) :=
+      mul_le_mul_of_nonneg_left (hclose N) (le_of_lt hNR)
+    have hsimp : (N : ℝ) * (C / (N : ℝ) ^ 2) = C / (N : ℝ) := by
+      field_simp
+    rw [hsimp] at hmul
+    linarith
+  have hg : Tendsto (fun N : ℕ ↦ C / (N : ℝ)) atTop (nhds 0) := by
+    have h := tendsto_one_div_atTop_nhds_zero_nat.const_mul C
+    simpa [mul_one_div] using h
+  refine squeeze_zero' (g := fun N : ℕ ↦ C / (N : ℝ)) ?_ ?_ hg
+  · filter_upwards with N
+    exact norm_nonneg _
+  · filter_upwards [eventually_ge_atTop 1] with N hN
+    exact hbound N hN
 
 /-- **K-G (2.14).**  If each generation's operator is a contraction within `C/N²` of
 `exp(N⁻¹Q)`, then `N` generations converge to `exp Q`.

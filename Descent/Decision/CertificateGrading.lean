@@ -877,7 +877,7 @@ def IsComplete (K : ℕ) (h : ℝ) : Prop :=
 
 end CertificateCalculus
 
-open CertificateCalculus
+open Decision.CertificateCalculus
 
 /-! ## Unconditional calculus laws -/
 

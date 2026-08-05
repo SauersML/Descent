@@ -94,7 +94,7 @@ theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
     l.length = k + 1 := by
   classical
   induction k generalizing l with
-  | zero =>
+  | Conditionals.zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       rfl
@@ -114,7 +114,7 @@ theorem chainLaw_getLast {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chai
     l.getLast? = some (Delta n) := by
   classical
   induction k generalizing l with
-  | zero =>
+  | Conditionals.zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       rfl
@@ -141,7 +141,7 @@ theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
     List.Chain' (fun y x => Covers x y ∨ y = x) l := by
   classical
   induction k generalizing l with
-  | zero =>
+  | Conditionals.zero =>
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       rw [hl]
       exact List.chain'_singleton _
@@ -182,7 +182,7 @@ theorem chainLaw_head_blocks {n : ℕ} :
       ∀ {x : ER n}, l.head? = some x → blocks x + k = n := by
   intro k
   induction k with
-  | zero =>
+  | Conditionals.zero =>
       intro _ l hl x hx
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       subst hl
@@ -244,7 +244,7 @@ theorem chainLaw_blocks_at {n : ℕ} :
       ∀ i, i < l.length → blocks (l.getD i (Delta n)) = n - k + i := by
   intro k
   induction k with
-  | zero =>
+  | Conditionals.zero =>
       intro _ l hl i hi
       rw [chainLaw, PMF.mem_support_pure_iff] at hl
       subst hl

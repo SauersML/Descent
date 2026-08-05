@@ -248,7 +248,7 @@ is here an explicit `(d_k/N)²/2` rather than an asymptotic gesture. -/
 theorem one_sub_sum_le_prod {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 ≤ a i) (h1 : ∀ i < k, a i ≤ 1) :
     1 - ∑ i ∈ range k, a i ≤ ∏ i ∈ range k, (1 - a i) := by
   induction k with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ m ih =>
       have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
@@ -266,7 +266,7 @@ theorem prod_le_one_sub_sum_add_sq {k : ℕ} (a : ℕ → ℝ) (h0 : ∀ i, 0 �
     ∏ i ∈ range k, (1 - a i)
       ≤ 1 - ∑ i ∈ range k, a i + (∑ i ∈ range k, a i) ^ 2 / 2 := by
   induction k with
-  | zero => simp
+  | Conditionals.zero => simp
   | succ m ih =>
       have ihm := ih fun i hi => h1 i (by omega)
       have hnn : 0 ≤ ∑ i ∈ range m, a i := sum_nonneg fun i _ => h0 i
@@ -283,7 +283,7 @@ theorem sum_range_div_eq_deathRate (N k : ℕ) :
     ∑ i ∈ range k, (i : ℝ) / (N : ℝ) = deathRate k / (N : ℝ) := by
   have hsum : ∑ i ∈ range k, (i : ℝ) = (k : ℝ) * ((k : ℝ) - 1) / 2 := by
     induction k with
-    | zero => norm_num
+    | Conditionals.zero => norm_num
     | succ m ih =>
         rw [sum_range_succ, ih]
         push_cast
@@ -359,7 +359,7 @@ noncomputable def pairDistinct (N : ℕ) : ℕ → ℝ
 theorem pairDistinct_eq_pow {N : ℕ} (hN : 0 < N) (s : ℕ) :
     pairDistinct N s = (1 - 1 / (N : ℝ)) ^ s := by
   induction s with
-  | zero => simp [pairDistinct]
+  | Conditionals.zero => simp [pairDistinct]
   | succ m ih =>
       rw [pairDistinct, ih, noCoalescenceProb_two hN]
       ring

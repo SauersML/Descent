@@ -951,7 +951,7 @@ value of the mutation rate. -/
 theorem hetTrajectory_of_no_mutation (Ne H₀ : ℝ) (t : ℕ) :
     hetTrajectory Ne 0 H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀ := by
   induction t with
-  | zero => simp [hetTrajectory]
+  | Conditionals.zero => simp [hetTrajectory]
   | succ n ih =>
       simp only [hetTrajectory, hetStepWithMutation, ih]
       ring
@@ -988,7 +988,7 @@ theorem hetTrajectory_ge_hetMutationFloor_of_init_ge_floor (Ne mu H₀ : ℝ)
     (hH₀ : hetMutationFloor Ne mu ≤ H₀) (t : ℕ) :
     hetMutationFloor Ne mu ≤ hetTrajectory Ne mu H₀ t := by
   induction t with
-  | zero => simpa [hetTrajectory] using hH₀
+  | Conditionals.zero => simpa [hetTrajectory] using hH₀
   | succ n ih =>
       simp only [hetTrajectory]
       exact hetStepWithMutation_ge_hetMutationFloor_of_ge_floor Ne mu _ hNe hmu hcontract ih

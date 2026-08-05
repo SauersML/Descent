@@ -232,7 +232,13 @@ def namespace_tokens(directory: str) -> set[str]:
                 name = m.group(1)
                 if not stack:
                     # `namespace Descent.CertificateGrading`: the tail is ours.
-                    if name.startswith("Descent.") and name != f"Descent.{directory}":
+                    # After a move it reads `Descent.Decision.CertificateGrading`,
+                    # and the tail is still ours -- so strip the directory first
+                    # or a second run silently stops seeing its own tokens.
+                    head = f"Descent.{directory}."
+                    if name.startswith(head):
+                        tokens.add(name[len(head):].split(".")[0])
+                    elif name.startswith("Descent.") and name != f"Descent.{directory}":
                         tokens.add(name[len("Descent."):].split(".")[0])
                 else:
                     tokens.add(name.split(".")[0])
@@ -242,6 +248,75 @@ def namespace_tokens(directory: str) -> set[str]:
             elif nsmap.END.match(line) and stack:
                 stack.pop()
     return tokens - {directory, "Descent"}
+
+
+def namespaces_opened_here(text: str) -> set[str]:
+    """Namespace segments this file declares itself.
+
+    A file that says `namespace ProbeBlindness` owns that segment locally, and a
+    prefix in front of it would send its own contents somewhere else.
+    """
+    out = set()
+    for line in nsmap.strip_comments(text).split("\n"):
+        m = nsmap.NAMESPACE.match(line)
+        if m:
+            out.update(m.group(1).split("."))
+    return out
+
+
+def rewrite_opens(text: str, directory: str, tokens: set[str]) -> str:
+    """Repoint `open`/`export` of a namespace that has just moved.
+
+    `Decision/FiniteMinimax.lean` opens `Descent.CertificateGrading`, which no
+    longer exists once that group acquires its directory.  The qualifier skips
+    `open` lines by design -- they carry namespaces, not references -- so they
+    need this pass, and without it the sibling module loses every unqualified
+    name it was importing and reports forty unknown identifiers that are all one
+    missing directory.
+    """
+    out = []
+    for line in text.split("\n"):
+        m = re.match(r"^(open|export)(\s+scoped)?\s+(.*)$", line)
+        if m:
+            head = f"{m.group(1)}{m.group(2) or ''} "
+            parts = []
+            for word in m.group(3).split():
+                if word.split(".")[0] in tokens:
+                    parts.append(f"{directory}.{word}")
+                elif word.startswith("Descent.") and \
+                        word[len("Descent."):].split(".")[0] in tokens:
+                    parts.append(f"Descent.{directory}.{word[len('Descent.'):]}")
+                else:
+                    parts.append(word)
+            line = head + " ".join(parts)
+        out.append(line)
+    return "\n".join(out)
+
+
+def rewrite_absolute(text: str, directory: str, names: set[str]) -> tuple[str, int]:
+    """Repoint fully-qualified `Descent.foo` at a name that has just moved.
+
+    The qualifier deliberately skips anything preceded by a dot, because that is
+    how it avoids rewriting field projections -- which means it also skips the
+    one place a flat name is written out in full.  Those are rare and load-
+    bearing: `Foundations/Probability` writes `Descent.berryEsseenErrorBound`
+    precisely to say "the top-level one, not the `HWEScoreModel` method I am
+    defining on the next line", and that disambiguation is exactly what breaks
+    when the top-level one acquires a directory.
+    """
+    hits = 0
+    mask = code_mask(text)
+
+    def sub(m):
+        nonlocal hits
+        if not mask[m.start()]:
+            return m.group(0)
+        hits += 1
+        return f"Descent.{directory}.{m.group(1)}"
+
+    pattern = re.compile(r"(?<![\w.])Descent\.(" + "|".join(
+        sorted((re.escape(n) for n in names), key=len, reverse=True)) + r")(?![\w.'])")
+    return pattern.sub(sub, text), hits
 
 
 def ambiguous_tokens() -> set[str]:
@@ -279,8 +354,10 @@ def qualify(text: str, names: set[str], prefix: str,
     `held` is the subset this file binds locally, which is left alone and
     reported so the file can be qualified by hand.
     """
-    held = names & bound_locally(text)
+    local = bound_locally(text) | namespaces_opened_here(text)
+    held = (names | tokens) & local
     movable = names - held
+    live_tokens = tokens - held
     mask = code_mask(text)
     out, last, hits = [], 0, 0
     for m in IDENT.finditer(text):
@@ -288,7 +365,11 @@ def qualify(text: str, names: set[str], prefix: str,
         if not mask[a]:
             continue
         if m.group(0) not in movable:
-            if not (m.group(0) in tokens and b < len(text) and text[b] == "."):
+            # A namespace segment is prefixed only where it is USED as one.
+            # It must obey the same local hold as a declaration name: this file
+            # defines its own `HardyWeinbergModel`, and `Spectral.` in front of
+            # that one names a structure in a different directory.
+            if not (m.group(0) in live_tokens and b < len(text) and text[b] == "."):
                 continue
         if a and (text[a - 1] in "._" or text[a - 1].isalnum()):
             continue                            # already qualified, or mid-name
@@ -322,7 +403,10 @@ def rewrite_namespace(text: str, directory: str) -> str:
                 old = m.group(1)
                 if old == "Descent":
                     opened_name = f"Descent.{directory}"
-                elif old.startswith("Descent.") and old != f"Descent.{directory}":
+                elif old == f"Descent.{directory}" or \
+                        old.startswith(f"Descent.{directory}."):
+                    opened_name = old          # already moved; run again freely
+                elif old.startswith("Descent."):
                     # `namespace Descent.CertificateGrading` -- a module-named
                     # group that never acquired its directory.  Keep the group,
                     # put the directory above it.
@@ -419,10 +503,18 @@ def main() -> int:
         mods = sorted(all_held[n])
         print(f"    hold  {d}.{n}  bound locally in {len(mods)} module(s): "
               f"{', '.join(mods[:3])}{' ...' if len(mods) > 3 else ''}")
+    for path in outside:
+        with open(path, encoding="utf-8", errors="ignore") as fh:
+            text = fh.read()
+        new, _abs = rewrite_absolute(rewrite_opens(text, d, tokens), d, names)
+        if new != text and args.write:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(new)
     for path in files_of(d):
         with open(path, encoding="utf-8", errors="ignore") as fh:
             text = fh.read()
-        new = rewrite_namespace(text, d)
+        new, _abs = rewrite_absolute(
+            rewrite_opens(rewrite_namespace(text, d), d, tokens), d, names)
         if new != text and args.write:
             with open(path, "w", encoding="utf-8") as fh:
                 fh.write(new)

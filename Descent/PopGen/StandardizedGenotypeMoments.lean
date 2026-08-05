@@ -55,7 +55,7 @@ constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : HardyWeinbergModel) :
     h.genotypeVariance = Program.hweGenotypeVariance h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold Program.hweGenotypeVariance Spectral.HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Program.hweGenotypeVariance HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
@@ -65,7 +65,7 @@ theorem standardizedSquare_eq_over_hweGenotypeVariance
     (h : HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.standardizedSquare g =
       (h.centeredAltAlleleCount g) ^ 2 / Program.hweGenotypeVariance h.altFreq := by
-  unfold Spectral.HardyWeinbergModel.standardizedSquare
+  unfold HardyWeinbergModel.standardizedSquare
   rw [mellinDrift_uses_ploidy]
 
 /-- **Scale invariance of the multiplicative coordinate.** Rescaling the dosage by any
@@ -304,7 +304,7 @@ theorem standardizedGenotype_sq_eq_standardizedSquare (h : HardyWeinbergModel)
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
-  unfold Spectral.HardyWeinbergModel.standardizedGenotype Spectral.HardyWeinbergModel.standardizedSquare
+  unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.standardizedSquare
   rw [div_pow, hsq]
 
 /-- **The level-two coordinate is never symmetric.** `x²` takes the three values
@@ -355,7 +355,7 @@ theorem standardizedSquare_never_symmetric (h : HardyWeinbergModel)
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
   have hvar : 0 < h.genotypeVariance := by
     rw [h.genotypeVariance_eq]
-    unfold Spectral.HardyWeinbergModel.refFreq
+    unfold HardyWeinbergModel.refFreq
     nlinarith [hq0, hcomp]
   have hnonneg : ∀ g : Foundations.DiploidGenotype,
       0 ≤ h.genotypeProb g * h.standardizedSquare g ^ 3 := by
@@ -656,7 +656,7 @@ structure MafSpectrum (m : ℕ) where
 true and empty: kernel-checked, clean axiom report, no content.  This is the witness that
 makes the theorems below statements about something. -/
 noncomputable def MafSpectrum.witness (m : ℕ) : MafSpectrum (m + 1) where
-  model := fun _ ↦ Spectral.HardyWeinbergModel.witness
+  model := fun _ ↦ HardyWeinbergModel.witness
   weight := fun j ↦ if j = 0 then 1 else 0
   weight_nonneg := fun j ↦ by split <;> norm_num
   weight_sum := by simp
@@ -1251,7 +1251,7 @@ is open upstream, so nothing here should be read as "a design can measure the fo
 theorem hweGenotypeVariance_le_half (h : HardyWeinbergModel) :
     h.genotypeVariance ≤ 1 / 2 := by
   rw [h.genotypeVariance_eq]
-  unfold Spectral.HardyWeinbergModel.refFreq
+  unfold HardyWeinbergModel.refFreq
   nlinarith [sq_nonneg (h.altFreq - 1 / 2)]
 
 /-- **Every polymorphic genotype coordinate has `E[x⁴] ≥ 2`**, so it lies inside or on the
@@ -1274,7 +1274,7 @@ theorem standardizedGenotype_fourth_moment_eq_two_iff (h : HardyWeinbergModel)
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hveq : h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq) := by
     rw [h.genotypeVariance_eq]
-    unfold Spectral.HardyWeinbergModel.refFreq
+    unfold HardyWeinbergModel.refFreq
     ring
   rw [standardizedGenotype_fourth_moment h hq0 hq1, div_eq_iff (ne_of_gt hvar)]
   constructor
@@ -1382,7 +1382,7 @@ extremum there — that is the kurtosis boundary. Two different statements, one 
 `Binomial(2, q)`. -/
 theorem balanced_locus_is_reflection_fixed_point (h : HardyWeinbergModel) :
     h.reflect.altFreq = h.altFreq ↔ h.altFreq = 1 / 2 := by
-  rw [Spectral.HardyWeinbergModel.reflect_altFreq]
+  rw [HardyWeinbergModel.reflect_altFreq]
   constructor
   · intro hfix
     linarith [hfix]
@@ -1650,7 +1650,7 @@ is now exact and rejects duplicate frequencies rather than merging them.
 theorem centeredSquare_eq_standardizedSquare_sub_one (h : HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (g : Foundations.DiploidGenotype) :
     h.centeredSquare g = h.standardizedSquare g - 1 := by
-  unfold Spectral.HardyWeinbergModel.centeredSquare
+  unfold HardyWeinbergModel.centeredSquare
   rw [standardizedGenotype_sq_eq_standardizedSquare h hq0 hq1]
 
 /-- The rare-homozygote atom in closed form: `u_alt = (2 - 3q)/q`. -/

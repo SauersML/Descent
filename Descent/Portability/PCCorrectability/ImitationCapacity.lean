@@ -183,7 +183,7 @@ theorem sum_twoBlock (a b : ℝ) (k j : ℕ) :
     ∑ i ∈ Finset.range (k + j), (if i < k then a else b) =
       (k : ℝ) * a + (j : ℝ) * b := by
   induction j with
-  | zero =>
+  | Conditionals.zero =>
       have hcongr : ∀ i ∈ Finset.range (k + 0), (if i < k then a else b) = a := by
         intro i hi
         have hi' : i < k := by

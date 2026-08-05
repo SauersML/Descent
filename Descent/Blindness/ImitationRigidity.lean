@@ -692,7 +692,7 @@ theorem stationaryLDEntry_isFixedPoint (decay : ℝ) (separation : ℕ) :
     markovLDStep decay (stationaryLDEntry decay) separation =
       stationaryLDEntry decay separation := by
   cases separation with
-  | zero => simp [markovLDStep, stationaryLDEntry,
+  | Conditionals.zero => simp [markovLDStep, stationaryLDEntry,
       Descent.Core.power]
   | succ n =>
       have hne : (n + 1 : ℕ) ≠ 0 := Nat.succ_ne_zero n
@@ -1010,7 +1010,7 @@ theorem stationaryLD_boundary_stencil (decay : ℝ) (separation : ℕ) :
         decay * stationaryLDEntry decay (adjacentBoundarySeparation separation) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
   cases separation with
-  | zero =>
+  | Conditionals.zero =>
       simp [adjacentBoundarySeparation, stationaryLDEntry,
       Descent.Core.power]
       ring
@@ -1050,7 +1050,7 @@ theorem stationaryLD_interior_stencil (decay : ℝ) (separation : ℕ) :
         - decay * stationaryLDEntry decay (separation + 1) =
       if separation = 0 then 1 - decay ^ 2 else 0 := by
   cases separation with
-  | zero =>
+  | Conditionals.zero =>
       have hif : (if (0 : ℕ) = 0 then 1 - decay ^ 2 else 0) = 1 - decay ^ 2 :=
         if_pos rfl
       rw [hif]
