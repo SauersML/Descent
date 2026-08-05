@@ -95,10 +95,16 @@ rates `(k-2)!(b-k)!/(b-1)!`, which `Descent.Blindness.MultipleMergerBlindness` a
 studies through its own chart -- that file asks which statistics can see `Λ`, and this one
 says why the family it is looking at is a family.
 
-Still absent, and not claimed: the `Ξ` measure on the infinite simplex and the rates it
-assigns (only the state-space half of Schweinsberg 2000 is here), and the forward resolution
-of the ASG that decides which parent was real -- a different process rather than a harder
-case of this one.
+`Coalescent.XiRates` supplies the language Schweinsberg's rates are indexed by: a merger's
+SHAPE, the multiset of merging group sizes.  The block count a shape costs is `Σ(kᵢ - 1)`,
+and the three families are nested by a condition on shapes rather than by three definitions
+-- Kingman's shapes are `{2}`, `Λ`'s are the singletons `{k}`, `Ξ`'s are the rest.
+
+Still absent, and not claimed: the measure `Ξ` on the infinite simplex and the integral
+assigning a rate to each shape -- that needs an infinite-dimensional measure the corpus does
+not have, and `XiRates` provides only the index set it would be a function on.  Likewise the
+forward resolution of the ASG that decides which parent was real, which is a different
+process rather than a harder case of this one.
 
 ## Verification status
 
