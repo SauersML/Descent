@@ -150,7 +150,7 @@ Kingman draws -- the bound `2` uniform in `n`, and the convergence that lets `T`
 
 Empirical status: NOT AN EMPIRICAL CLAIM given the ladder; it is `Σ_{r=2}^n d_r⁻¹`
 rewritten.  In generations, this is `2 N_e (2 - 2/n)` -- see
-`Descent.Program.Conventions.coalescentTimeScale` for the factor that converts. -/
+`Descent.Core.coalescentTimeScale` for the factor that converts. -/
 noncomputable def meanTransitTime (n : ℕ) : ℝ :=
   ∑ k ∈ Finset.range (n - 1), 1 / deathRate (k + 2)
 

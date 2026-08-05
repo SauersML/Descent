@@ -389,9 +389,9 @@ gives `(1 - (1 - N⁻¹))⁻¹ = N`.
 This sentence was already in the corpus, as prose attached to `pairDistinct_one`: "the mean
 number of generations back to the common ancestor of two lineages is `N`".  Nothing stated
 it, so nothing could depend on it, and the `2·Nₑ` that converts coalescent time to
-generations was chosen independently in `Program.Conventions` under the name
-`coalescentTimeScale`.  Stated, it is what that convention now reads off -- see
-`Descent.Program.Conventions.coalescentTimeScale_eq_meanPairCoalescenceTime`. -/
+generations was chosen independently, under the name `Descent.Core.coalescentTimeScale`.
+Stated, it is what that convention now reads off -- see
+`coalescentTimeScale_eq_meanPairCoalescenceTime` just below. -/
 theorem tsum_pairDistinct {N : ℕ} (hN : 0 < N) :
     ∑' s : ℕ, pairDistinct N s = (N : ℝ) := by
   have hpos : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
@@ -410,7 +410,7 @@ theorem tsum_pairDistinct {N : ℕ} (hN : 0 < N) :
 /-- **In a diploid population of `Nₑ` individuals the mean is `2·Nₑ` generations.**
 
 The `2` is the ploidy: `Nₑ` individuals carry `2·Nₑ` gene copies, and it is gene copies
-that choose parents.  This is the `2·Nₑ` of `Program.Conventions.coalescentTimeScale`, and
+that choose parents.  This is the `2·Nₑ` of `Descent.Core.coalescentTimeScale`, and
 it is NOT the `4·Nₑ` of `θ = 4·Nₑ·μ` -- that one scales a RATE and picks up a further
 factor of two from the two lineages that can mutate. -/
 theorem tsum_pairDistinct_diploid {Ne : ℕ} (hNe : 0 < Ne) :
@@ -419,6 +419,23 @@ theorem tsum_pairDistinct_diploid {Ne : ℕ} (hNe : 0 < Ne) :
   rw [tsum_pairDistinct h2]
   push_cast
   ring
+
+/-- **The convention is the coalescent's own mean, not a second choice of `2`.**
+
+`Descent.Core.coalescentTimeScale` says that one coalescent time unit is `2·Nₑ`
+generations.  Until this theorem existed that was a NUMBER SOMEONE WROTE DOWN,
+agreeing with the coalescent because both had been got right, with nothing forcing
+them to move together.  What it converts is the mean number of generations back to
+the common ancestor of two lineages, and the mechanism supplies that mean:
+`tsum_pairDistinct_diploid`, the sum of the Wright-Fisher pair-survival
+probabilities over all generations, which the geometric series evaluates to `2·Nₑ`.
+
+It is stated HERE, beside the mean it reads off, rather than in an audit module above the
+whole corpus: an identity between the convention and the mechanism constrains them only
+where both are in scope, and this is the lowest module that sees both. -/
+theorem coalescentTimeScale_eq_meanPairCoalescenceTime {Ne : ℕ} (hNe : 0 < Ne) :
+    Descent.Core.coalescentTimeScale (Ne : ℝ) = ∑' s : ℕ, pairDistinct (2 * Ne) s := by
+  rw [tsum_pairDistinct_diploid hNe, Descent.Core.coalescentTimeScale_eq]
 
 /-! ### The corpus's drift recurrence, derived
 
