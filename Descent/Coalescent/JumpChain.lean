@@ -34,11 +34,16 @@ The split is deliberate and is stated rather than hidden:
   of size `λ` in every way contributes `(λ-1)` copies of `½ λ!` (`inner_split_sum`, via
   `Nat.choose_mul_factorial_mul_factorial`).  Both are here, and they combine exactly as
   K-C's `Σ_l (λ_l - 1) = n - (k-1)`.
-* NOT derived here, and NOT claimed: that the number of states `ξ ≺ η` whose class-size
-  multiset arises by splitting `η`'s `l`-th class into parts `ν` and `λ_l - ν` is
-  `½ C(λ_l, ν)`.  That is a count of set partitions, not of sizes, and the identity below
-  carries the factor as written rather than deriving it.  It is the one gap between this
-  file and a complete proof of (2.3).
+* NOT derived here, and NOT claimed: that the weight `½ C(λ_l, ν)` counts the states
+  `ξ ≺ η` obtained by splitting `η`'s `l`-th class into parts `ν` and `λ_l - ν`.  The
+  identity below carries it as written.  Note what the `½` is and is not:
+  `Descent.Coalescent.Split.splitBy_compl` shows a cut is named twice by Kingman's sum, once
+  as `ν` and once as `λ_l - ν`, so the `½` corrects THE SUM.  It is not the count attached
+  to a single `ν` -- for `2ν ≠ λ_l` there are `C(λ_l, ν)` such states, not half that, and
+  only the balanced case `2ν = λ_l` has `C(λ_l, ν)/2`.  Both readings total
+  `2^{λ_l - 1} - 1`, which is `Descent.Coalescent.Program`.  The gap between this file and a
+  complete proof of (2.3) is the bijection between cuts of a class and the states refining
+  `η` there.
 
 ## Main results
 

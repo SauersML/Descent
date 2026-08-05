@@ -175,6 +175,37 @@ theorem covers_iff_exists_splitBy {n : ℕ} (ξ η : ER n) :
   · rintro ⟨S, rfl, hcov⟩
     exact hcov
 
+/-- **Cutting along `S` and along the rest of `S`'s class give the same state.**
+
+This is the double-naming that Kingman's factor `½` corrects.  His sum runs over piece sizes
+`ν = 1, …, λ-1`, and the cut into pieces `{ν, λ-ν}` is reached twice -- once as `ν` and once
+as `λ - ν`.  The `½` is therefore a convention about that SUM, not the number of states
+attached to any single `ν`: for `2ν ≠ λ` there are `C(λ, ν)` cuts of type `{ν, λ-ν}`, and
+only in the balanced case `2ν = λ` is the count `C(λ, ν)/2`.  Both readings give the same
+total, `Σ_ν ½C(λ,ν) = 2^{λ-1} - 1`, which is `Coalescent.Program`. -/
+theorem splitBy_compl {n : ℕ} (η : ER n) (S : Finset (Fin n)) (a : Fin n)
+    (hSa : ∀ x ∈ S, η.r x a) :
+    splitBy η S = splitBy η ((Finset.univ.filter fun z => η.r z a) \ S) := by
+  classical
+  refine (splitBy_eq_iff η S _).mpr ?_
+  intro x y hxy
+  by_cases hx : η.r x a
+  · have hy : η.r y a := η.iseqv.trans (η.iseqv.symm hxy) hx
+    have hmx : (x ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ x ∉ S := by
+      simp [Finset.mem_sdiff, hx]
+    have hmy : (y ∈ (Finset.univ.filter fun z => η.r z a) \ S) ↔ y ∉ S := by
+      simp [Finset.mem_sdiff, hy]
+    rw [hmx, hmy]
+    tauto
+  · have hy : ¬ η.r y a := fun h => hx (η.iseqv.trans hxy h)
+    have hxS : x ∉ S := fun h => hx (hSa x h)
+    have hyS : y ∉ S := fun h => hy (hSa y h)
+    have hmx : x ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+      simp [Finset.mem_sdiff, hx]
+    have hmy : y ∉ (Finset.univ.filter fun z => η.r z a) \ S := by
+      simp [Finset.mem_sdiff, hy]
+    simp [hxS, hyS, hmx, hmy]
+
 /-- **A cut is determined by its set, up to swapping the two pieces.**  Cutting a class
 along `S` and along its complement within that class give the same state -- which is exactly
 why Kingman's sum over `ν = 1, …, λ-1` carries a factor `½`: it counts each cut twice. -/
