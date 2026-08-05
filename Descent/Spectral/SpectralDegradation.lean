@@ -1,7 +1,18 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.GenerativePortabilityLaw
+-- This file imported `Descent.Portability.GenerativePortabilityLaw` and used no name from
+-- it.  The import was carrying Mathlib: `GenerativePortabilityLaw` reaches `Mathlib.Tactic`,
+-- `Mathlib.Data.Real.Basic` and `Mathlib.Data.Fintype.BigOperators` through
+-- `Descent.Blindness.ObservationalCeiling`, and this file was living off that closure.  The
+-- cost was a cycle in the layers: `PopGen.DGP` imports this file for
+-- `degradation_eq_zero_iff`, so the layer that generates the moments was reaching the layer
+-- that consumes them.  The Mathlib closure is now named directly and the edge is gone.
+import Mathlib.Tactic
+import Mathlib.Data.Real.Basic
+import Mathlib.Data.Matrix.Basic
+import Mathlib.Data.Fintype.BigOperators
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 
 namespace Descent.Spectral
 
