@@ -46,6 +46,32 @@ reads as a covered one.
 * Transit time, entrance boundary, absorption factor: `Rates`.  K-G (5.7)-(5.13), K-C p.239.
 * Ewens (3.8) normalises at `n = 2, 3`: `Mutation.ewensProb_two_total`, `.ewensProb_three_total`.
 
+## Verification status
+
+Every module in this group compiles against the pinned Mathlib
+(`lake build Descent.Coalescent.*`, 3211 jobs, clean).  That is worth recording because
+it was not true for most of this group's life, and because of what the first build found.
+
+Six defects had been caught by re-reading, over many passes.  The first ten minutes of
+compilation found more than that, including the only one that was mathematically wrong
+rather than syntactically wrong:
+
+* **A factor of two in `JumpChain.jumpCoeff_recursion`.**  The claim was
+  `jumpCoeff n k · (n-k+1) / d_k = jumpCoeff n (k-1)`; the left side is TWICE the right.
+  It had been checked by hand twice and described in its own docstring as "the arithmetic
+  half of Kingman's displayed calculation".  The corrected form is multiplicative and
+  avoids dividing by `d_k` at all.
+* `WrightFisher`'s Bonferroni lemmas assumed `a_i ≤ 1` for every `i`, which is false for
+  `i/N` once `i > N`.  The bound is only needed on `range k`, and that is now what they ask.
+* Three `import`s that do not exist, written from memory.
+* A missing `MeasurableSpace` instance underneath every measure in `Law`.
+* `subst` eliminating the wrong variable, in three different files.
+* `ring` on a normed ring, which is not commutative.
+
+The lesson the group records is not that the mathematics was wrong -- almost all of it was
+right -- but that the one place it was wrong was invisible to every amount of careful
+reading, and visible to the kernel immediately.
+
 ## The five hard items, and where each stands
 
 **1. The split count.**  SETTLED, `CutCount.card_covers_below`:
