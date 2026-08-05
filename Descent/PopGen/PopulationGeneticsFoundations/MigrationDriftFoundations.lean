@@ -188,6 +188,26 @@ theorem islandDemeCorrection_one_deme_is_junk : islandDemeCorrection 1 = 0 := by
 noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m * islandDemeCorrection d)
 
+/-- **This is the master island law at zero mutation**, which is where it sits in the
+lattice.
+
+`Core.fstIslandEquilibrium Ne m mu d` is `1/(1 + 4·Ne·m·correction(d) + 4·Ne·mu)`. Setting
+`mu = 0` leaves exactly this body, so the finite-deme migration-drift equilibrium is not a
+separate law that happens to resemble the island one -- it is the island one with the
+mutation channel switched off, which is one of the specialisations the master exists to
+support.
+
+Stating it here rather than trusting the shapes to match is the point: the two `4`s in this
+body are inlined, and the master's come from `scaledMigrationRate`, where the ploidy
+convention fixes them in a single place. Without this theorem an edit to that convention
+would silently stop reaching this definition. -/
+theorem islandFstFiniteDemes_eq_islandEquilibrium_no_mutation (Ne m d : ℝ) :
+    islandFstFiniteDemes Ne m d = Descent.Core.fstIslandEquilibrium Ne m 0 d := by
+  unfold islandFstFiniteDemes islandDemeCorrection Descent.Core.fstIslandEquilibrium
+    Descent.Core.fstFromFlow Descent.Core.scaledFlow Descent.Core.scaledMigrationRate
+    Descent.Core.scaledMutationRate Descent.Core.ploidy
+  ring_nf
+
 /-- **The junk value here is not merely wrong, it is inverted.**
 
     At a single deme the correction is Lean's `0` rather than divergent, so the whole
