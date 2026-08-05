@@ -65,7 +65,16 @@ section TraitClassification
     `m = 2000`, and the shared-variant fraction is itself a finite draw. It is
     recorded as a residual rather than a falsification because its size tracks
     the panel, not the parameters; a larger panel is the test that would settle
-    it. -/
+    it.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk48.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_ratio).
+    MATCH at worst 1.41 sems; the ADDITIVE reading is FALSIFIED at 41 sems, so the
+    product is what the design establishes.
+    -/
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   Descent.Core.retainedFraction fst_additional ld_factor
 
@@ -266,7 +275,17 @@ theorem closedPopulation_het_eq_neutralDriftFactor (Ne H₀ : ℝ) (hH : 0 < H�
 
     The `s_correction` parameter is NOT pinned by this run: it was held at zero
     throughout, which is exactly the gap the paragraph above already records.
-    What is established is the drift half of the law. -/
+    What is established is the drift half of the law.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk47.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    MATCH at worst 1.42 sems (0.06% relative) at s_correction = 0; the haploid slip is
+    FALSIFIED at 532 sems. `s_correction` is still held at zero and is still
+    unmeasurable for the reason the paragraphs above give.
+    -/
 noncomputable def selectedDriftFactor (Ne : ℝ) (t : ℕ) (s_correction : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne) + s_correction) ^ t
 
@@ -314,7 +333,16 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
     `PortabilityDrift.fstFromTau`, which is `τ/(1+τ)` and which this corpus
     proves is strictly smaller at every positive `τ`. The simulation measures a
     single population losing heterozygosity, so it measures the per-branch
-    reading and nothing else. -/
+    reading and nothing else.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk47.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    MATCH at worst 1.42 sems (0.29% relative) read as the LOSS on the same runs; the
+    haploid drift factor is FALSIFIED at 532 sems.
+    -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   1 - driftFactor
 

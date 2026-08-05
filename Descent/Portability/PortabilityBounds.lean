@@ -208,7 +208,17 @@ section EvolutionaryModels
     finite-panel scale for `m = 3000`, and agrees at 0.36 sems at `fst = 0.30`.
 
     `neutralDriftR2Ratio` is the same chart as a bare ratio and is separately
-    validated at 2.25 sems. -/
+    validated at 2.25 sems.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk56.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it.
+    MATCH at worst 1.70 sems (0.63% relative); the superseded linear form is FALSIFIED
+    at 101 sems, including at fst = 0.05, as far INSIDE the range its own note claimed
+    as the design goes.
+    -/
 noncomputable def neutralPortability (r2_0 fst : ℝ) : ℝ :=
   r2_0 * (1 - fst) / ((1 - fst) * r2_0 + (1 - r2_0))
 

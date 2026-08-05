@@ -108,7 +108,18 @@ zero divergence.
     FULL source weight vector and measured 0.707 where this body predicts
     0.889. That run reproduced `(1-f)²/((1-f)V_A + V_E)` to three digits, which
     is what identified it as measuring the wrong construction rather than
-    refuting this one. -/
+    refuting this one.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk49.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    MATCH at worst 1.62 sems; the naive `1 - fst` is FALSIFIED at 60 sems and the
+    FULL-source-weight construction -- the one an earlier run measured by mistake -- at
+    89 sems on the same cells, so the regime clause is now carried by a rejected rival
+    rather than by a note.
+    -/
 noncomputable def neutralDriftR2Ratio (V_A V_E fst : ℝ) : ℝ :=
   presentDayR2 V_A V_E fst / presentDayR2 V_A V_E 0
 

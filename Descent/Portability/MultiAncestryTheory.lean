@@ -278,7 +278,19 @@ section InformationTheoreticLimits
     a floor, not a value, and the gap is not small: it is 53% at `ρ = 0.5` for a mixture
     mild enough that nothing about the marginals looks unusual. It is also why this check can
     FAIL rather than merely pass -- had the body matched the non-Gaussian cells, it would
-    have been refuted as a claim about mutual information at all. -/
+    have been refuted as a claim about mutual information at all.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk44.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_b).
+    MATCH at worst 3.04 sems (0.97% relative) over m = 1, 4, 10 and rho = 0.3, 0.5, 0.7,
+    0.9 swept independently; dropping the factor 1/2 is FALSIFIED at 1800 sems and
+    leaving rho unsquared inside the log at 898. This measures the body WITHIN the
+    Gaussian model and nothing beyond it -- `battery_mi01.py` is the model-free
+    measurement and the paragraphs above it stand unchanged.
+    -/
 noncomputable def effectMutualInformation (m : ℕ) (ρ : ℝ) : ℝ :=
   -(m : ℝ) / 2 * Real.log (1 - ρ ^ 2)
 

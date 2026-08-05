@@ -474,7 +474,17 @@ section PriorSpecification
     because a spike-and-slab is heavy-tailed at small `π` and the normal sem
     understates its own scatter. That correction matters here: it is what turned
     an earlier reading of the sibling `spikeAndSlabVariance` from a spurious
-    10.6-sem falsification into the noise it actually was. -/
+    10.6-sem falsification into the noise it actually was.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk44.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    MATCH at worst 0.78 sems (0.22% relative); the unsquared slab sd is FALSIFIED at 495
+    sems and the dropped mixture weight at 3818 sems (4904% relative). The across-block
+    error bar is inflated threefold, as before.
+    -/
 noncomputable def spikeAndSlabPriorVariance (π σ_slab : ℝ) : ℝ :=
   π * σ_slab ^ 2
 

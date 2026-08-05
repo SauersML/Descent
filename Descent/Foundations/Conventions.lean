@@ -1658,9 +1658,11 @@ theorem driftVariance_uses_hweGenotypeVariance (p0 fst : ℝ) :
 
 /-- **The realised target PGS variance is a retained fraction, scaled by transport.**
 `PortabilityDrift.realWorldPGSVariance` erodes the additive variance by `1 - F_ST` and then
-by the transported correlation. The first factor is `retainedFraction`, the same
-`(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio,
-so drift between the drift erosion and its siblings fails here. -/
+by the transported correlation. The first factor is `Core.retainedFraction`, the same
+`(1 - loss) · total` map as the ascertainment survivor and the neutral portability ratio.
+Those two now CALL the kernel and so need no theorem here; this one does not, because it
+routes through a transported correlation as well, which is why it survives the deletion of
+its four siblings. -/
 theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
     realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
   unfold realWorldPGSVariance Descent.Core.retainedFraction; ring

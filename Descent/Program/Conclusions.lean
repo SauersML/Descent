@@ -391,7 +391,7 @@ lemma sigmoid_strictConcaveOn_Ici : StrictConcaveOn ℝ (Set.Ici 0) sigmoid := b
     · simp only [average_eq_integral] at h_lt
       rw [h_mean] at h_lt
       exact h_lt
-    
+
 end BrierScore
 
 section OracleAndRegret

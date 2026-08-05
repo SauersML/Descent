@@ -367,7 +367,16 @@ The switch error acts on the READ, not on the truth: an individual in cis whose
 phase is misread still HAS the cis interaction, and merely receives the trans
 prediction. That is why the body pairs `interaction_cis` with `pred_trans` in
 its switched branch rather than swapping both. Control: with no switch error
-the counted cis fraction recovers `freq_cis`. -/
+the counted cis fraction recovers `freq_cis`.
+
+REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+battery this cites had never been committed: the verdict was real when it
+was produced and no reader could check it, which is the same standing as no
+verdict. `simcov/battery_bulk50.py` is now in the repository, was run against
+the design described above, and its results are committed beside it (group_a).
+MATCH at worst 1.49 sems (0.18% relative); dropping the switch channel and applying the
+switch rate to the phase FREQUENCY are both FALSIFIED at 912 sems.
+-/
 noncomputable def haplotypePhasePredictionError
     (freq_cis switch_err pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
   freq_cis *
@@ -923,7 +932,17 @@ according to the admixture proportion `alpha`.
     fraction recovers `alpha` on the same draws.
 
     This measures `ancestrySpecificEffect` too, since this body is that
-    function applied to the same three arguments. -/
+    function applied to the same three arguments.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk43.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_b).
+    MATCH at worst 1.48 sems; the swapped weights are FALSIFIED at 560 sems. The same
+    cells measure `ancestrySpecificEffect`, which is now recorded under its own name
+    rather than left implicit.
+    -/
 noncomputable def globalAncestryAveragedEffect
     (beta₁ beta₂ alpha : ℝ) : ℝ :=
   ancestrySpecificEffect beta₁ beta₂ alpha

@@ -2020,7 +2020,20 @@ theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
 
     Control: one panmictic population split into two arbitrary halves, through
     the same estimators and filters, gives `F_ST` indistinguishable from zero
-    (0.41 sems). -/
+    (0.41 sems).
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk51.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    FALSIFIED at worst 102 sems (53% relative), and the unsquared `M/(1+M)` with it at
+    61 sems -- so this is not a matter of one power too many. The measured cross-deme LD
+    correlation does not fall with migration the way either form requires. The estimator
+    is SPLIT-HALF: the naive correlation of r between demes is attenuated by the
+    sampling noise in r itself, and the panmictic control detected that at twelve sems
+    before the repair. It now passes at 1.0047 against a known 1.
+    -/
 noncomputable def ldCorrelationMigrationAnsatz (M : ℝ) : ℝ :=
   M ^ 2 / (1 + M) ^ 2
 

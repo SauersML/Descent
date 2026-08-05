@@ -1565,7 +1565,16 @@ noncomputable def PrevalenceDGP.witness (k : ℕ) : PrevalenceDGP k where
     That the shift is ADDITIVE in the score is what makes this an
     observed-scale statement: a multiplicative shift would keep the outcome
     positive automatically, while this body can leave the admissible range and
-    the caller must keep it in. -/
+    the caller must keep it in.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk47.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_b).
+    MATCH at worst 0.85 sems (0.08% relative); the multiplicative shift is FALSIFIED at
+    2317 sems.
+    -/
 noncomputable def prevalenceDGP_trueExpectation {k : ℕ} (pdgp : PrevalenceDGP k)
     (p : ℝ) (c : Fin k → ℝ) : ℝ :=
   pdgp.prevalence c + pdgp.pgs_effect * p
@@ -3044,7 +3053,17 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
     left for migration to restore than a model starting from zero would expect.
 
     `PortabilityDrift.migrationSharedBoostAt` is the same expression at
-    generation `t` and is falsified by the same run. -/
+    generation `t` and is falsified by the same run.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk55.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it.
+    FALSIFIED at worst 15.6 sems (62% relative); no restoration at all is also rejected,
+    at 8.3 sems, so the direction survives and the magnitude does not. Split-half
+    estimator, panmictic control passing at 1.0044 against 1.
+    -/
 noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
   1 + p.bigM * p.tau / (1 + p.bigM)
 

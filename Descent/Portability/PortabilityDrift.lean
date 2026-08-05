@@ -3563,7 +3563,16 @@ noncomputable def mutationSharedRetentionAt
     measured value does rise with `t` and saturate in `bigM` as written. See
     `DGP.migrationLDBoost` for the table and for why the overstatement is
     expected: most LD sharing is inherited from before the split, so there is
-    less for migration to restore than a model starting from zero assumes. -/
+    less for migration to restore than a model starting from zero assumes.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk55.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it.
+    FALSIFIED at worst 15.6 sems (62% relative) on the same run that falsifies
+    `DGP.migrationLDBoost`, of which this is the generation-t reading.
+    -/
 noncomputable def migrationSharedBoostAt
     (g : GenerationalPopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM * g.tauAt t / (1 + g.bigM)
@@ -3743,7 +3752,17 @@ score itself is unchanged.
     frequency recovers `pSource`, at 1.13 sems.
 
     Consequence: `tagAlleleFreqRetentionAt` and `causalAlleleFreqRetentionAt`
-    are this body applied to their own frequencies and inherit the failure. -/
+    are this body applied to their own frequencies and inherit the failure.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk52.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it.
+    MATCH at worst 1.77 sems (0.44% relative) on the three cells that share |dp| = 0.2;
+    the superseded exponential is FALSIFIED at 237 sems and the square root -- what a
+    STANDARDIZED score would give -- at 137 sems.
+    -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
   (2 * pTarget * (1 - pTarget)) / (2 * pSource * (1 - pSource))
 
@@ -4760,7 +4779,19 @@ theorem standardNormalPdf_zero :
     The competing form is recorded as a lead rather than a falsification
     because this run's control was DEGENERATE: it counted the tail mass above
     the MEASURED quantile, which is `K` by construction of a quantile and so
-    cannot fail. The harness detected that. The MATCH above needs no control. -/
+    cannot fail. The harness detected that. The MATCH above needs no control.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_bulk43.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it (group_a).
+    MATCH at worst 0.91 sems (0.07% relative) over K = 0.01, 0.05, 0.2, 0.5, 0.8; the
+    sign slip Phi^-1(K) is FALSIFIED at 3390 sems (200% relative). Control: the MEDIAN
+    of the same draws, known to be 0 and independent of K -- the earlier run's control
+    counted the tail mass above the MEASURED quantile, which is K by construction and
+    could not fail.
+    -/
 noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
 
 /-- Mean liability among cases, `i = φ(T)/K`.
@@ -7786,7 +7817,19 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
     fail for a reason other than bias.
 
     argument_source: model, with `c` realized from the separations of the pairs
-    actually drawn. -/
+    actually drawn.
+
+    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+    battery this cites had never been committed: the verdict was real when it
+    was produced and no reader could check it, which is the same standing as no
+    verdict. `simcov/battery_sharedld_rec.py` is now in the repository, was run against
+    the design described above, and its results are committed beside it.
+    FALSIFIED at worst 3.4 sems (44% relative) over the c/m range the design reaches,
+    with `1 - F_ST`, `M/(1+M)` and the within-deme Sved shape all rejected at 4.9, 4.9
+    and 14.4 sems -- and `2m/(2m + c)` MATCHING at 2.3 sems, which is the same picture
+    the table above records. The estimator is the split-half second-moment ratio and the
+    panmictic control passes at 0.956 against 1.
+    -/
 noncomputable def sharedLD_from_equilibrium (m c : ℝ) : ℝ :=
   m / (m + c)
 

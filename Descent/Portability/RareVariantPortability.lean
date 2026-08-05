@@ -82,7 +82,16 @@ count times a per-variant parameter, while a finite draw of `rareCount` effects
 realises a sum of squares off by `O(1/√rareCount)` -- 0.529 measured against a
 nominal 0.500 in one cell, which at these error bars is hundreds of sems. The
 quotient is still a declared two-component accounting model; what is now
-measured is that, given the accounting, the body is the right function of it. -/
+measured is that, given the accounting, the body is the right function of it.
+
+REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+battery this cites had never been committed: the verdict was real when it
+was produced and no reader could check it, which is the same standing as no
+verdict. `simcov/battery_bulk48.py` is now in the repository, was run against
+the design described above, and its results are committed beside it (group_rare).
+the body is evaluated at the REALISED sums of squares and the nominal reading rides
+along, so the size of that gap is in the record rather than asserted.
+-/
 noncomputable def rareHeritabilityShare
     (rareCount rareVariance commonCount commonVariance : ℝ) : ℝ :=
   rareCount * rareVariance /

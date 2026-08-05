@@ -170,18 +170,14 @@ theorem ldDecayPerGeneration_at_reference_point :
 /-! **Cross-check: geometric LD decay, recombination survival along a genealogy, and
 admixture-LD decay are one map.** `ldDecayPerGeneration_eq_discreteRecombinationSurvival`
 and `ldDecayPerGeneration_eq_admixtureLDDecay` are absent here as redundant, not as wrong.
-`Conventions.lean` proves all four spellings equal to the shared primitive
-`geometricDecay`, and these two are that hub's transitive consequences. Six pairwise
-theorems for one function is five more than the corpus needs, and a divergence between any
-two spellings still fails a proof: it fails one of the three hub theorems.
-
-Neither carries a hypothesis and nothing references either. What is NOT yet done is the
-part worth doing: `(1 - r)^t` is written out under four names in four files
-(`geometricDecay`, `ldDecayPerGeneration`, `DGP.discreteRecombinationSurvival`,
-`PortabilityDrift.admixtureLDDecay`) and should be one. That collapse is ~86 references
-across Lean, Python and JSON string tables and is blocked on `PortabilityDrift.lean`,
-which cannot currently be edited from this session without reverting another session's
-in-flight work. -/
+All four spellings CALL the shared kernel
+`Core.geometricDecay`, and these two are its consequences. The hub used to be a
+definition in `Foundations.Conventions` at depth 12, related to its four spellings by
+three identity theorems; it is now a kernel at depth 0 and the spellings CALL it, so a
+divergence is not a failed proof but a body that no longer says what it says. The four
+names are kept -- `admixtureLDDecay` carries a measured one-sided bias against
+finite-population retention that a bare primitive has nowhere to put.
+-/
 
 /-- LD retention is nonnegative for a recombination fraction in `[0,1]`. -/
 theorem ldDecayPerGeneration_nonneg (r : ℝ) (t : ℕ)
@@ -410,7 +406,17 @@ effect recovers the raw genetic effect.
 
 So the arithmetic is pinned and the modelling assumption is not. A cohort study
 showing effects that combine additively would contradict the declaration, not
-this body. -/
+this body.
+
+REBUILT AND RE-RUN, and the numbers above are superseded by these. The
+battery this cites had never been committed: the verdict was real when it
+was produced and no reader could check it, which is the same standing as no
+verdict. `simcov/battery_bulk46.py` is now in the repository, was run against
+the design described above, and its results are committed beside it (group_cohort).
+MATCH at worst 1.05 sems (0.17% relative); the SUM reading is FALSIFIED at 4334 sems.
+Multiplication remains a DECLARED interaction model -- that caveat is the important one
+and is unchanged.
+-/
 noncomputable def cohortObservedEffect (geneticEffect environmentModifier : ℝ) : ℝ :=
   geneticEffect * environmentModifier
 
