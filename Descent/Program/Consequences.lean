@@ -15,6 +15,7 @@ import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Foundations.CovarianceStructure
+import Descent.Blindness.DecoratedGeometryBlindness
 
 /-!
 # What the separate results say when they are put together
@@ -382,5 +383,45 @@ theorem estimator_null_and_model_ceiling_are_different_anchors
       Descent.Core.ScoreMoments.deployedR2 p V_E ≤ Descent.Core.share p.V_A V_E :=
   ⟨ldsrExpectedChi2_null N M ell_j,
    Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow⟩
+
+/-! ### The differentiation matrix determines the metric and cannot name the populations -/
+
+/-- **`F_ST` fixes what a score loses, and a divergence matrix cannot tell two profile twins
+apart. So the loss is determined and the labelling that explains it is not.**
+
+`Core.ScoreMoments.deployedR2_eq` makes the deployed metric an explicit function of a
+differentiation. `DecoratedGeometryBlindness.divergence_swap_twin_invariant` proves that
+transposing a pair of profile twins leaves EVERY entry of a divergence matrix exactly as
+it was -- so no statistic of pairwise divergences, no `F_ST` matrix, no principal-coordinate
+embedding computed from one, no clustering of it, distinguishes the two labellings.
+
+The conjunction is a caution about attribution rather than about magnitude. Given the
+matrix, the deployed loss is pinned. Which population is which, when two are twins, is not
+recoverable from that same matrix -- so a portability gap attributed to a named group is
+carrying an identification the geometry does not supply. The size is a fact; the label is
+a choice.
+
+Neither module can say this: one computes a metric from a number, the other proves an
+invariance of the matrix that number came from.
+
+A naming hazard, recorded because it caught this composition. `DecoratedGeometryBlindness`
+binds `Pop` as a SECTION VARIABLE -- an arbitrary finite type of populations -- which
+shadows `Descent.Pop`, the concrete two-element source/target index the rest of the corpus
+means by that name. Writing this theorem with the concrete `Pop` fails to synthesise
+`Fintype`, which is the only reason the shadowing surfaced at all. The index type here is
+called `Group` to keep the two apart. -/
+theorem loss_is_determined_the_labelling_is_not
+    {Group : Type*} [Fintype Group] [DecidableEq Group]
+    (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig)
+    (divergence : Group → Group → ℝ) (s t : Group)
+    (htwin : IsProfileTwin divergence s t)
+    (hsymm : ∀ a b, divergence a b = divergence b a) (a b : Group) :
+    Descent.Core.ScoreMoments.deployedR2 p V_E
+        = Descent.Core.share
+            (Descent.Core.retainedFraction p.fstEquilibrium p.V_A) V_E ∧
+      divergence (Equiv.swap s t a) (Equiv.swap s t b) = divergence a b :=
+  ⟨Descent.Core.ScoreMoments.deployedR2_eq p V_E hE hflow,
+   divergence_swap_twin_invariant divergence s t htwin hsymm a b⟩
 
 end Descent
