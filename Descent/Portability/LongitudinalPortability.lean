@@ -826,11 +826,11 @@ theorem invariantAverage_recovers_additive_constant {n : ℕ}
     (stratumWeight : Fin n → ℝ) (populationGenerator : Fin n → Fin n → ℝ)
     (linkedCurve linkedVelocity : Fin n → ℝ) (criterionVelocity : ℝ)
     (hmass : ∑ i, stratumWeight i = 1)
-    (hinv : IsInvariantWeight stratumWeight populationGenerator)
+    (hinv : Conditionals.IsInvariantWeight stratumWeight populationGenerator)
     (hdyn : ∀ i, linkedVelocity i =
       (∑ j, populationGenerator i j * linkedCurve j) - criterionVelocity) :
     ∑ i, stratumWeight i * linkedVelocity i = -criterionVelocity :=
-  invariantAverage_eq_neg_of_affine_evolution stratumWeight populationGenerator
+  Conditionals.invariantAverage_eq_neg_of_affine_evolution stratumWeight populationGenerator
     linkedCurve linkedVelocity criterionVelocity hmass hinv hdyn
 
 /-- **A population model with uniform forcing destroys the separation.**
@@ -845,11 +845,11 @@ theorem uniformSecularShift_conflated_with_criterion {n : ℕ}
     (stratumWeight : Fin n → ℝ) (populationGenerator : Fin n → Fin n → ℝ)
     (linkedCurve linkedVelocity : Fin n → ℝ) (criterionVelocity uniformShift : ℝ)
     (hmass : ∑ i, stratumWeight i = 1)
-    (hinv : IsInvariantWeight stratumWeight populationGenerator)
+    (hinv : Conditionals.IsInvariantWeight stratumWeight populationGenerator)
     (hdyn : ∀ i, linkedVelocity i =
       (∑ j, populationGenerator i j * linkedCurve j) + uniformShift - criterionVelocity) :
     ∑ i, stratumWeight i * linkedVelocity i = uniformShift - criterionVelocity :=
-  constantForcing_conflates_threshold stratumWeight populationGenerator linkedCurve
+  Conditionals.constantForcing_conflates_threshold stratumWeight populationGenerator linkedCurve
     linkedVelocity criterionVelocity uniformShift hmass hinv hdyn
 
 /-- **An interpolated cohort inherits the geometric mean of its neighbours' errors.**
@@ -863,10 +863,10 @@ theorem uniformSecularShift_conflated_with_criterion {n : ℕ}
 theorem interpolatedCohort_error_le_neighbours {n : ℕ}
     (modeWeight relaxationRate : Fin n → ℝ) (earlier later : ℝ)
     (hw : ∀ k, 0 ≤ modeWeight k) :
-    errorEnergy modeWeight relaxationRate ((earlier + later) / 2) ^ 2
-      ≤ errorEnergy modeWeight relaxationRate earlier *
-        errorEnergy modeWeight relaxationRate later :=
-  interiorError_sq_le_mul_endpoints modeWeight relaxationRate earlier later hw
+    Conditionals.errorEnergy modeWeight relaxationRate ((earlier + later) / 2) ^ 2
+      ≤ Conditionals.errorEnergy modeWeight relaxationRate earlier *
+        Conditionals.errorEnergy modeWeight relaxationRate later :=
+  Conditionals.interiorError_sq_le_mul_endpoints modeWeight relaxationRate earlier later hw
 
 end CriterionDrift
 

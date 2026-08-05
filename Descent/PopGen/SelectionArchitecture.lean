@@ -704,7 +704,7 @@ theorem two_mul_one_sub_lt_of_lt_of_lt_half
     (h_balanced : hi < p_balanced) (h_balanced_lt : p_balanced < 1/2)
     (h_lo_le_hi : lo ≤ hi) :
     2 * p_neutral * (1 - p_neutral) < 2 * p_balanced * (1 - p_balanced) :=
-  two_mul_one_sub_strictMono_le_half p_neutral p_balanced
+  Foundations.two_mul_one_sub_strictMono_le_half p_neutral p_balanced
     (by linarith) (le_of_lt h_balanced_lt)
 
 end DiversifyingSelection

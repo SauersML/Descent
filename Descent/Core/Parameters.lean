@@ -198,7 +198,7 @@ theorem fstEquilibrium_ne_island_manyDemes :
           PopGenParameters.witness.mig
         + scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu) := by
   unfold fstEquilibrium theta bigM witness
-  norm_num [fstFromFlow, scaledMutationRate, scaledMigrationRate, ploidy]
+  norm_num [fstFromFlow, scaledMutationRate, scaledMigrationRate, Program.ploidy]
 
 /-- **Equilibrium differentiation lies in the unit interval.** Immediate from the flow
 being non-negative, and stated because every consumer of `fstEquilibrium` needs it. -/

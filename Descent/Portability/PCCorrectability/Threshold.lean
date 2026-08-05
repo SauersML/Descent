@@ -94,8 +94,8 @@ carried here is the halved constant -- the error that was actually live.
     inversion recovering `3.9920 ± 0.0045`.  Nothing here is measurable
     separately from that. -/
 noncomputable def demographicSpike_referenceEvaluation :
-    ReferenceEvaluation (ℝ × ℝ × ℝ) :=
-  ReferenceEvaluation.ofScale
+    Foundations.ReferenceEvaluation (ℝ × ℝ × ℝ) :=
+  Foundations.ReferenceEvaluation.ofScale
     (fun p ↦ demographicSpike p.1 p.2.1 p.2.2) (4, 1, 1) 2 (by norm_num)
     (by norm_num [demographicSpike, effectiveSubgroupSize])
 
@@ -113,7 +113,7 @@ whole corpus -- the same shelter that let two falsified identifications survive
 review.  A machine that forbids vacuous reference points is not much use sitting
 somewhere nothing can contradict. -/
 theorem exists_discriminating_referenceEvaluation_for_demographicSpike :
-    ∃ r : ReferenceEvaluation (ℝ × ℝ × ℝ),
+    ∃ r : Foundations.ReferenceEvaluation (ℝ × ℝ × ℝ),
       r.body = (fun p ↦ demographicSpike p.1 p.2.1 p.2.2) ∧ r.value = 3 :=
   ⟨demographicSpike_referenceEvaluation, rfl, demographicSpike_referenceEvaluation_value⟩
 
@@ -123,7 +123,7 @@ halved-constant competitor agrees with the body exactly and the value `0` that
 the corpus used to state there separates them not at all. -/
 theorem demographicSpike_old_reference_point_discriminates_nothing :
     2 * demographicSpike 1 1 1 = demographicSpike 1 1 1 :=
-  scale_competitor_eq_of_body_eq_zero
+  Foundations.scale_competitor_eq_of_body_eq_zero
     (fun p : ℝ × ℝ × ℝ ↦ demographicSpike p.1 p.2.1 p.2.2) (1, 1, 1)
     (by norm_num [demographicSpike, effectiveSubgroupSize]) 2
 
@@ -202,7 +202,7 @@ actually live -- which at this point gives `2 * 3 - 2 = 4` against the body's
 `0 - 1 = -1`, exactly the value the corpus stated, so it was rejected by
 nothing. -/
 noncomputable def pcCorrectabilityMargin_referenceEvaluation :
-    ReferenceEvaluation (ℝ × ℝ × ℝ × ℝ) where
+    Foundations.ReferenceEvaluation (ℝ × ℝ × ℝ × ℝ) where
   point := (4, 1, 1, 1)
   body := fun p ↦ pcCorrectabilityMargin p.1 p.2.1 p.2.2.1 p.2.2.2
   value := 1

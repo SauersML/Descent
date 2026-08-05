@@ -40,7 +40,7 @@ The positive four-step path expression is formalized once, in
 `tridiagonalABAB_pathExpression_pos`.
 -/
 
-namespace Descent
+namespace Descent.Spectral
 
 open MeasureTheory
 
@@ -283,4 +283,4 @@ theorem localPencilTraceContribution_firstMode (source mean r : ℝ)
   field_simp
   ring
 
-end Descent
+end Descent.Spectral

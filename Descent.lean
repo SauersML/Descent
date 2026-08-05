@@ -266,20 +266,20 @@ theorem stayKernel_eq_oneHotWeight (i j : Fin 2) :
   · simp [h, Ne.symm h]
 
 /-- The context-preserving transition is that same one-hot weight. -/
-theorem persistentTransition_eq_oneHotWeight (x y : BinaryBiologicalState) :
-    persistentTransition x y = oneHotWeight (R := ℝ) x y := by
-  unfold persistentTransition oneHotWeight
+theorem persistentTransition_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
+    Conditionals.persistentTransition x y = oneHotWeight (R := ℝ) x y := by
+  unfold Conditionals.persistentTransition oneHotWeight
   by_cases h : x = y
   · simp [h]
   · simp [h, Ne.symm h]
 
 /-- The readout quality and the context-preserving transition are one Kronecker delta. -/
-theorem contextMatchQuality_eq_persistentTransition (x y : BinaryBiologicalState) :
-    contextMatchQuality x y = persistentTransition x y := rfl
+theorem contextMatchQuality_eq_persistentTransition (x y : Conditionals.BinaryBiologicalState) :
+    Conditionals.contextMatchQuality x y = Conditionals.persistentTransition x y := rfl
 
 /-- And it is the one-hot weight, which is the third name for that delta. -/
-theorem contextMatchQuality_eq_oneHotWeight (x y : BinaryBiologicalState) :
-    contextMatchQuality x y = oneHotWeight (R := ℝ) x y := by
+theorem contextMatchQuality_eq_oneHotWeight (x y : Conditionals.BinaryBiologicalState) :
+    Conditionals.contextMatchQuality x y = oneHotWeight (R := ℝ) x y := by
   rw [contextMatchQuality_eq_persistentTransition, persistentTransition_eq_oneHotWeight]
 
 /-- The stable sieve dimension and the condensation critical degree are the same logarithmic
@@ -734,32 +734,32 @@ theorem at genuine numbers, not restatements.
 `Descent.Portability.ScoreDistribution` applies with enormous margin, and this is the concrete
 witness that the condensation theory does not disturb it. -/
 theorem additive_score_subcritical_at_balanced_locus_proved :
-    1 < maxSafeEpistaticOrder 1000000 (1 / 2) := by
-  have hc : 0 < hweMellinDrift (1 / 2) := by
-    rw [hweMellinDrift_half]
+    1 < Spectral.maxSafeEpistaticOrder 1000000 (1 / 2) := by
+  have hc : 0 < Spectral.hweMellinDrift (1 / 2) := by
+    rw [Spectral.hweMellinDrift_half]
     exact Real.log_pos (by norm_num)
   refine additive_score_is_subcritical hc ?_
-  rw [hweMellinDrift_half]
+  rw [Spectral.hweMellinDrift_half]
   exact Real.log_lt_log (by norm_num) (by norm_num)
 
 /-- Pairwise epistasis at a sufficiently rare variant is supercritical for a
 million-term aggregate: the Gaussian surrogate converges to a different limit. -/
 theorem pairwise_epistasis_supercritical_proved :
     ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧
-      Real.log 1000000 < 2 * hweMellinDrift q :=
-  exists_maf_supercritical (by norm_num) (by norm_num)
+      Real.log 1000000 < 2 * Spectral.hweMellinDrift q :=
+  Spectral.exists_maf_supercritical (by norm_num) (by norm_num)
 
 /-- The hard-call lattice point produces a strictly inflated exceedance intensity, so
 hard calls and dosage surrogates are not exchangeable at high epistatic order. -/
 theorem hardCall_lattice_inflation_proved :
-    1 < latticeInflation hardCallLatticeSpan :=
-  hardCall_intensity_inflated
+    1 < latticeInflation Spectral.hardCallLatticeSpan :=
+  Spectral.hardCall_intensity_inflated
 
 /-- The expander frustration floor is a genuine constant above `0.127`, so the
 non-bipartite twin sits a constant total-variation distance from every globally
 realizable system. -/
-theorem frustration_floor_proved : (0.127 : ℝ) < expanderAgreementFloor :=
-  expanderAgreementFloor_gt
+theorem frustration_floor_proved : (0.127 : ℝ) < Conditionals.expanderAgreementFloor :=
+  Conditionals.expanderAgreementFloor_gt
 
 /-!
 ### The bundle-rigidity modules are one development
@@ -817,8 +817,8 @@ claim that one specialises the other is prose. -/
 theorem sampleCost_eq_fixedGradeBenchmarkSampleSize (η C : ℝ) (k : ℕ)
     (hη : 0 < η) (hC : 0 < C) :
     BundleRigidity.sampleCost η C k
-      = fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1 := by
-  unfold BundleRigidity.sampleCost fixedGradeBenchmarkSampleSize
+      = Decision.fixedGradeBenchmarkSampleSize (η / C) ((2 * k : ℕ) : ℝ) 1 := by
+  unfold BundleRigidity.sampleCost Decision.fixedGradeBenchmarkSampleSize
   rw [div_one, Real.rpow_neg (div_pos hη hC).le, Real.rpow_natCast,
     div_pow, div_pow, inv_div]
 
@@ -837,9 +837,9 @@ checkable, and it is what makes a divergence between them a failure here rather 
 files quietly computing different numbers under one name. It adds no dependence — the root
 already imports both — and it gives `ResonanceSpectrum`'s graded spectrum a stated relation
 to the dichotomy `CramerStratum` decides, should a result ever need the finer invariant. -/
-theorem intensity_eq_charFnSq {n : ℕ} (P : PhasePanel n) (s : ℝ) :
+theorem intensity_eq_charFnSq {n : ℕ} (P : Spectral.PhasePanel n) (s : ℝ) :
     P.intensity s = charFnSq P.weight P.phase s := by
-  unfold PhasePanel.intensity PhasePanel.cosPart PhasePanel.sinPart charFnSq
+  unfold Spectral.PhasePanel.intensity Spectral.PhasePanel.cosPart Spectral.PhasePanel.sinPart charFnSq
   rw [pow_two, pow_two, Finset.sum_mul_sum, Finset.sum_mul_sum,
     ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun u _ ↦ ?_

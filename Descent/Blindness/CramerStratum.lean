@@ -228,9 +228,9 @@ cycle. Do not add an import of `PolygenicSpectroscopy` here.
 The general statement — that a hard call is outside the stratum at *every* polymorphic
 frequency, not only where the values happen to be equally spaced — remains unformalized
 until the required simultaneous-approximation theorem is proved from Mathlib primitives. -/
-theorem hwe_not_cramer_of_lattice (hwe : HardyWeinbergModel)
-    (a : DiploidGenotype → ℝ)
-    (h : ℝ) (hh : 0 < h) (hlat : ∀ u v : DiploidGenotype, ∃ k : ℤ, a u - a v = h * k) :
+theorem hwe_not_cramer_of_lattice (hwe : Foundations.HardyWeinbergModel)
+    (a : Foundations.DiploidGenotype → ℝ)
+    (h : ℝ) (hh : 0 < h) (hlat : ∀ u v : Foundations.DiploidGenotype, ∃ k : ℤ, a u - a v = h * k) :
     ¬ CramerCondition hwe.genotypeProb a :=
   not_cramer_of_lattice _ a hwe.genotypeProb_sum h hh hlat
 

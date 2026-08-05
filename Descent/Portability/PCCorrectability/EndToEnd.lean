@@ -106,32 +106,32 @@ distribution-shift budget times a residual-curvature budget bounds coefficient
 movement; after scaling by marker-axis variance, monotonicity propagates that
 bound to standardized downstream bias. -/
 theorem projection_artifact_implies_standardized_bias_bound
-    (P : ExpFunctional Ω) (densityRatio : Ω → ℝ)
+    (P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ)
     (X : Ω → ι → ℝ) (residual : Ω → ℝ)
     (B : Matrix ι ι ℝ) (artifact : ι → ℝ) (curvatureBound : ℝ)
     (markerAxisVariance expectedSNPCount effectSD directionalAmplification
       countInflation confounding : ℝ)
     (hmoment : B.mulVec artifact =
-      weightedResidualMoment P densityRatio X residual)
+      Spectral.weightedResidualMoment P densityRatio X residual)
 
-    (henergy : 0 ≤ coefficientEnergy B artifact)
-    (hchiSquare : 0 ≤ chiSquareBudget P densityRatio)
+    (henergy : 0 ≤ Spectral.coefficientEnergy B artifact)
+    (hchiSquare : 0 ≤ Spectral.chiSquareBudget P densityRatio)
     (hcurvatureBound : 0 ≤ curvatureBound)
-    (hcurvature : directionalResidualCurvature P X residual artifact ≤
-      curvatureBound * coefficientEnergy B artifact)
+    (hcurvature : Spectral.directionalResidualCurvature P X residual artifact ≤
+      curvatureBound * Spectral.coefficientEnergy B artifact)
     (hmarkerAxis : 0 ≤ markerAxisVariance)
     (heffectSD : 0 < effectSD)
     (hdirectional : 0 ≤ directionalAmplification)
     (hcount : 0 ≤ countInflation)
     (hconfounding : 0 ≤ confounding) :
     standardizedResidualPGSBias expectedSNPCount
-        (markerAxisVariance * coefficientEnergy B artifact) effectSD
+        (markerAxisVariance * Spectral.coefficientEnergy B artifact) effectSD
         directionalAmplification countInflation confounding ≤
       standardizedResidualPGSBias expectedSNPCount
         (markerAxisVariance *
-          (chiSquareBudget P densityRatio * curvatureBound)) effectSD
+          (Spectral.chiSquareBudget P densityRatio * curvatureBound)) effectSD
         directionalAmplification countInflation confounding := by
-  have hartifact := projection_artifact_energy_le_chiSquare_mul_curvature
+  have hartifact := Spectral.projection_artifact_energy_le_chiSquare_mul_curvature
     P densityRatio X residual B artifact curvatureBound hmoment
     henergy hchiSquare hcurvatureBound hcurvature
   apply standardizedResidualPGSBias_mono_susceptibility

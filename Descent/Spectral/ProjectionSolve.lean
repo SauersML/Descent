@@ -7,7 +7,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # The ridge that keeps the projection solve factorizable
@@ -122,4 +122,4 @@ theorem ridged_form_dominates_residualBiasEnergy
   unfold PCCorrectionModel.residualBiasEnergy
   exact hbound
 
-end Descent
+end Descent.Spectral

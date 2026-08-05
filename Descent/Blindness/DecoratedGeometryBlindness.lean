@@ -553,17 +553,17 @@ theorem rareWeight_at_reference_point :
 /-- The rare population carries risk one, the common population risk zero.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite decoration. -/
-noncomputable def rareField : Bool → ℝ := binarySecondAnnotation
+noncomputable def rareField : Bool → ℝ := Spectral.binarySecondAnnotation
 
 /-- The rare-population mark is the shared binary indicator. -/
-theorem rareField_eq_binarySecondAnnotation : rareField = binarySecondAnnotation := rfl
+theorem rareField_eq_binarySecondAnnotation : rareField = Spectral.binarySecondAnnotation := rfl
 
 /-- **The rare population's margin energy is exactly `ε(1 - ε)`.**  Its contribution to a
 variance-type functional is first order in its frequency, not second. -/
 theorem marginEnergy_rare_eq (rare : ℝ) :
     marginEnergy (rareWeight rare) rareField = rare * (1 - rare) := by
   rw [marginEnergy_eq]
-  norm_num [rareWeight, rareField, binarySecondAnnotation]
+  norm_num [rareWeight, rareField, Spectral.binarySecondAnnotation]
   ring
 
 /-- **The energy at an absent subpopulation, pinned.**  A group of frequency zero contributes

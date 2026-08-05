@@ -466,12 +466,12 @@ theorem netReclassificationImprovement_sub_event (event_nri nonevent_nri : ℝ) 
 /-- Exact operating-point sensitivity under the liability-threshold model. -/
 noncomputable def sensFromR2
     (m : LiabilityThresholdModel) (r2 T' : ℝ) : ℝ :=
-  liabilitySensitivity Phi m r2 T'
+  liabilitySensitivity Foundations.Phi m r2 T'
 
 /-- Exact operating-point specificity under the liability-threshold model. -/
 noncomputable def specFromR2
     (m : LiabilityThresholdModel) (r2 T' μ_control : ℝ) : ℝ :=
-  liabilitySpecificity Phi m r2 T' μ_control
+  liabilitySpecificity Foundations.Phi m r2 T' μ_control
 
 /-- Exact liability-threshold sensitivity is strictly increasing in `R²`
     on `[0,1]` under the clinically relevant threshold regime. -/
@@ -482,7 +482,7 @@ theorem sensFromR2_strictMono_of_threshold_le
     (h_num_nonneg : 0 ≤ Real.sqrt R2₁ * Real.sqrt m.h_sq * m.case_mean - T') :
     sensFromR2 m R2₁ T' < sensFromR2 m R2₂ T' := by
   unfold sensFromR2
-  exact liabilitySensitivity_monotone_in_R2_of_threshold_le Phi m T' strictMono_Phi
+  exact liabilitySensitivity_monotone_in_R2_of_threshold_le Foundations.Phi m T' Foundations.strictMono_Phi
     R2₁ R2₂ hR2₁ hR2₂ hR2 h_num_nonneg
 
 /-- Exact liability-threshold specificity is strictly increasing in `R²`
@@ -495,7 +495,7 @@ theorem specFromR2_strictMono_of_threshold_le
     (h_num_nonneg : 0 ≤ T' - Real.sqrt R2₁ * Real.sqrt m.h_sq * μ_control) :
     specFromR2 m R2₁ T' μ_control < specFromR2 m R2₂ T' μ_control := by
   unfold specFromR2
-  exact liabilitySpecificity_monotone_in_R2_of_threshold_le Phi m T' μ_control strictMono_Phi
+  exact liabilitySpecificity_monotone_in_R2_of_threshold_le Foundations.Phi m T' μ_control Foundations.strictMono_Phi
     hμ_control_neg R2₁ R2₂ hR2₁ hR2₂ hR2 h_num_nonneg
 
 /-- **The clinically relevant threshold regime, named once.**

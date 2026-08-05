@@ -2943,7 +2943,7 @@ theorem dotProduct_mulVec_swap_of_isSymm
     (hA : A.IsSymm)
     (u v : Fin p → ℝ) :
     dotProduct u (A.mulVec v) = dotProduct v (A.mulVec u) := by
-  have h := sum_mulVec_mul_eq_sum_mul_transpose_mulVec A v u
+  have h := Foundations.sum_mulVec_mul_eq_sum_mul_transpose_mulVec A v u
   simpa [dotProduct, hA.eq, mul_comm] using h
 
 /-- Exact excess-risk decomposition for target quadratic risk.
@@ -2968,7 +2968,7 @@ theorem targetLinearExcessRisk_eq_quadratic_gap
   have hmul :
       sigmaObsTarget.mulVec (fun i ↦ wStar i + u i) =
         sigmaObsTarget.mulVec wStar + sigmaObsTarget.mulVec u := by
-    simpa [u] using matrix_mulVec_add sigmaObsTarget wStar u
+    simpa [u] using Foundations.matrix_mulVec_add sigmaObsTarget wStar u
   have hswap :
       dotProduct wStar (sigmaObsTarget.mulVec u) =
         dotProduct u crossTarget := by

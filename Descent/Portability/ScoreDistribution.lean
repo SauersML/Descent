@@ -174,11 +174,11 @@ theorem thresholdStandardizedCoordinate_at_mean (μ σ : ℝ) :
 deployment-relevant tail-rate object associated with the standardized
 coordinate, but it is still only a benchmark score-distribution quantity. -/
 noncomputable def benchmarkHighScoreRate (threshold μ σ : ℝ) : ℝ :=
-  1 - Phi (thresholdStandardizedCoordinate threshold μ σ)
+  1 - Foundations.Phi (thresholdStandardizedCoordinate threshold μ σ)
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem benchmarkHighScoreRate_at_reference_point (μ σ : ℝ) :
-    benchmarkHighScoreRate μ μ σ = 1 - Phi 0 := by
+    benchmarkHighScoreRate μ μ σ = 1 - Foundations.Phi 0 := by
   unfold benchmarkHighScoreRate
   rw [thresholdStandardizedCoordinate_at_mean]
 
@@ -249,8 +249,8 @@ theorem mean_shift_changes_benchmark_high_score_rate
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ_T) / σ < (threshold - μ_S) / σ := by
     exact mean_shift_increases_tail threshold μ_S μ_T σ h_σ h_shift
-  have hphi : Phi ((threshold - μ_T) / σ) < Phi ((threshold - μ_S) / σ) := by
-    exact strictMono_Phi hz
+  have hphi : Foundations.Phi ((threshold - μ_T) / σ) < Foundations.Phi ((threshold - μ_S) / σ) := by
+    exact Foundations.strictMono_Phi hz
   linarith
 
 /-- **Variance change changes the benchmark high-score rate.**
@@ -267,8 +267,8 @@ theorem variance_change_changes_benchmark_high_score_rate
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
     exact div_lt_div_of_pos_left h_thr h_σS h_larger
-  have hphi : Phi ((threshold - μ) / σ_T) < Phi ((threshold - μ) / σ_S) := by
-    exact strictMono_Phi hz
+  have hphi : Foundations.Phi ((threshold - μ) / σ_T) < Foundations.Phi ((threshold - μ) / σ_S) := by
+    exact Foundations.strictMono_Phi hz
   linarith
 
 end TailProbabilities
@@ -480,7 +480,7 @@ corpus, not a claim against an experiment. -/
     `Descent.Probability.berryEsseenErrorBound` rather than beside it, so the two files
     share one body. `berryEsseenBound_eq` states the closed form as a theorem. -/
 noncomputable def berryEsseenBound (C ρ σ_sq m : ℝ) : ℝ :=
-  berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
+  Foundations.berryEsseenErrorBound C σ_sq ρ / Real.sqrt m
 
 /-- **berryEsseenBound at its junk point, named.** With no markers there is no sum for the
 central limit theorem to approximate and the Berry-Esseen bound does not apply. The square root
@@ -499,14 +499,14 @@ other power of `m` satisfies that. The closed form recorded below expands the nu
 the exponent alone, so it is compatible with `m`, `m²`, or `m^(1/3)` in the denominator; this is
 what says the decay is root-`m` and not merely decreasing. -/
 theorem berryEsseenBound_mul_sqrt (C ρ σ_sq m : ℝ) (h : Real.sqrt m ≠ 0) :
-    berryEsseenBound C ρ σ_sq m * Real.sqrt m = berryEsseenErrorBound C σ_sq ρ := by
+    berryEsseenBound C ρ σ_sq m * Real.sqrt m = Foundations.berryEsseenErrorBound C σ_sq ρ := by
   unfold berryEsseenBound
   field_simp
 
 /-- The closed form, as a theorem rather than a second definition. -/
 theorem berryEsseenBound_eq (C ρ σ_sq m : ℝ) :
     berryEsseenBound C ρ σ_sq m = C * ρ / (σ_sq * Real.sqrt σ_sq * Real.sqrt m) := by
-  unfold berryEsseenBound berryEsseenErrorBound
+  unfold berryEsseenBound Foundations.berryEsseenErrorBound
   rw [div_div]
 
 /-- The bound decreases in the summand count. -/

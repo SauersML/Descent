@@ -6,7 +6,7 @@ import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Spectral
 
 noncomputable section
 
@@ -40,11 +40,11 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
     Empirical status: UNTESTED. -/
 def quadraticRisk (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
     (b w : ι → ℝ) : ℝ :=
-  outcomeSecondMoment - 2 * dot w b + dot w (B.mulVec w)
+  outcomeSecondMoment - 2 * Foundations.dot w b + Foundations.dot w (B.mulVec w)
 
 /-- Symmetry of the bilinear form represented by a second-moment matrix. -/
 def IsSymmetricBilinearMatrix (B : Matrix ι ι ℝ) : Prop :=
-  ∀ x y : ι → ℝ, dot x (B.mulVec y) = dot y (B.mulVec x)
+  ∀ x y : ι → ℝ, Foundations.dot x (B.mulVec y) = Foundations.dot y (B.mulVec x)
 
 omit [DecidableEq ι] in
 /-- Every symmetric matrix represents a symmetric bilinear form.
@@ -60,7 +60,7 @@ theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ}
     (hB : Matrix.IsSymm B) :
     IsSymmetricBilinearMatrix B := by
   intro x y
-  simp only [dot, Matrix.mulVec, dotProduct, Finset.mul_sum,
+  simp only [Foundations.dot, Matrix.mulVec, dotProduct, Finset.mul_sum,
       Descent.Core.innerSum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun i _ ↦ ?_
@@ -72,7 +72,7 @@ theorem isSymmetricBilinearMatrix_of_isSymm {B : Matrix ι ι ℝ}
 theorem isSymmetricBilinearMatrix_one :
     IsSymmetricBilinearMatrix (1 : Matrix ι ι ℝ) := by
   intro x y
-  simp [dot, Matrix.one_mulVec, mul_comm,
+  simp [Foundations.dot, Matrix.one_mulVec, mul_comm,
       Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
@@ -92,14 +92,14 @@ theorem matrix_mulVec_smul (B : Matrix ι ι ℝ) (c : ℝ) (x : ι → ℝ) :
 
 omit [DecidableEq ι] in
 theorem dot_smul_left (c : ℝ) (x y : ι → ℝ) :
-    dot (c • x) y = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_assoc,
+    Foundations.dot (c • x) y = c * Foundations.dot x y := by
+  simp [Foundations.dot, Finset.mul_sum, mul_assoc,
       Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
 theorem dot_smul_right (c : ℝ) (x y : ι → ℝ) :
-    dot x (c • y) = c * dot x y := by
-  simp [dot, Finset.mul_sum, mul_left_comm,
+    Foundations.dot x (c • y) = c * Foundations.dot x y := by
+  simp [Foundations.dot, Finset.mul_sum, mul_left_comm,
       Descent.Core.innerSum]
 
 omit [DecidableEq ι] in
@@ -112,13 +112,13 @@ theorem singular_quadratic_excess_risk_identity
     (hnormal : B.mulVec v = b) :
     quadraticRisk outcomeSecondMoment B b w -
         quadraticRisk outcomeSecondMoment B b v =
-      dot (fun i ↦ w i - v i)
+      Foundations.dot (fun i ↦ w i - v i)
         (B.mulVec (fun i ↦ w i - v i)) := by
-  have hnormalDotW : dot w b = dot w (B.mulVec v) := by rw [← hnormal]
-  have hnormalDotV : dot v b = dot v (B.mulVec v) := by rw [← hnormal]
-  have hcross : dot v (B.mulVec w) = dot w (B.mulVec v) := hsymmetric v w
+  have hnormalDotW : Foundations.dot w b = Foundations.dot w (B.mulVec v) := by rw [← hnormal]
+  have hnormalDotV : Foundations.dot v b = Foundations.dot v (B.mulVec v) := by rw [← hnormal]
+  have hcross : Foundations.dot v (B.mulVec w) = Foundations.dot w (B.mulVec v) := hsymmetric v w
   rw [quadraticRisk, quadraticRisk, hnormalDotW, hnormalDotV,
-    matrix_mulVec_sub, dot_sub_left, dot_sub_right, dot_sub_right, hcross]
+    matrix_mulVec_sub, Foundations.dot_sub_left, Foundations.dot_sub_right, Foundations.dot_sub_right, hcross]
   ring
 
 omit [DecidableEq ι] in
@@ -128,7 +128,7 @@ theorem normal_solution_minimizes_singular_quadratic_risk
     (outcomeSecondMoment : ℝ) (B : Matrix ι ι ℝ)
     (b v : ι → ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
-    (hpsd : ∀ z : ι → ℝ, 0 ≤ dot z (B.mulVec z))
+    (hpsd : ∀ z : ι → ℝ, 0 ≤ Foundations.dot z (B.mulVec z))
     (hnormal : B.mulVec v = b) :
     ∀ w, quadraticRisk outcomeSecondMoment B b v ≤
       quadraticRisk outcomeSecondMoment B b w := by
@@ -150,31 +150,31 @@ theorem singular_minimizer_kernel_invariance
       quadraticRisk outcomeSecondMoment B b (fun i ↦ v i + k i) =
         quadraticRisk outcomeSecondMoment B b v := by
   have hnormalShift : B.mulVec (fun i ↦ v i + k i) = b := by
-    rw [matrix_mulVec_add, hnormal, hkernel]
+    rw [Foundations.matrix_mulVec_add, hnormal, hkernel]
     simp
   refine ⟨hnormalShift, ?_⟩
   have hid := singular_quadratic_excess_risk_identity
     outcomeSecondMoment B b (fun i ↦ v i + k i) v hsymmetric hnormal
   have hzero :
-      dot (fun i ↦ (v i + k i) - v i)
+      Foundations.dot (fun i ↦ (v i + k i) - v i)
         (B.mulVec (fun i ↦ (v i + k i) - v i)) = 0 := by
     have hdiff : (fun i ↦ (v i + k i) - v i) = k := by
       funext i
       ring
     rw [hdiff, hkernel]
-    simp [dot,
+    simp [Foundations.dot,
       Descent.Core.innerSum]
   linarith
 
 /-- Quadratic-form distance between two coefficient vectors. -/
 def quadraticCoefficientDistance (B : Matrix ι ι ℝ)
     (w v : ι → ℝ) : ℝ :=
-  dot (fun i ↦ w i - v i) (B.mulVec (fun i ↦ w i - v i))
+  Foundations.dot (fun i ↦ w i - v i) (B.mulVec (fun i ↦ w i - v i))
 
 /-- Best scalar rescaling of a deployed direction toward a target direction. -/
 def bestScalarCorrection (B : Matrix ι ι ℝ)
     (u v : ι → ℝ) : ℝ :=
-  dot u (B.mulVec v) / dot u (B.mulVec u)
+  Foundations.dot u (B.mulVec v) / Foundations.dot u (B.mulVec u)
 
 omit [DecidableEq ι] in
 /-- **bestScalarCorrection at a null correction direction, named.** With the correction direction
@@ -183,22 +183,22 @@ no direction to scale. Lean returns `0`, which reads as the correct answer being
 all, rather than as an ill-posed problem. Consumers must exclude it by hypothesis. -/
 theorem bestScalarCorrection_null_direction_is_junk (B : Matrix ι ι ℝ) (v : ι → ℝ) :
     bestScalarCorrection B (fun _ ↦ 0) v = 0 := by
-  unfold bestScalarCorrection dot Descent.Core.innerSum
+  unfold bestScalarCorrection Foundations.dot Descent.Core.innerSum
   simp
 
 /-- Irreducible quadratic risk after optimizing over scalar rescalings. -/
 def scalarCorrectionFloor (B : Matrix ι ι ℝ)
     (u v : ι → ℝ) : ℝ :=
-  dot v (B.mulVec v) -
-    dot u (B.mulVec v) ^ 2 / dot u (B.mulVec u)
+  Foundations.dot v (B.mulVec v) -
+    Foundations.dot u (B.mulVec v) ^ 2 / Foundations.dot u (B.mulVec u)
 
 omit [DecidableEq ι] in
 /-- A correction direction with no energy sends the subtracted quotient to junk `0`, so the
 floor collapses to the whole target energy: no correction is credited, because the term that
 would credit it is undefined. -/
 theorem scalarCorrectionFloor_at_zero_energy_is_junk
-    (B : Matrix ι ι ℝ) (u v : ι → ℝ) (hzero : dot u (B.mulVec u) = 0) :
-    scalarCorrectionFloor B u v = dot v (B.mulVec v) := by
+    (B : Matrix ι ι ℝ) (u v : ι → ℝ) (hzero : Foundations.dot u (B.mulVec u) = 0) :
+    scalarCorrectionFloor B u v = Foundations.dot v (B.mulVec v) := by
   unfold scalarCorrectionFloor
   rw [hzero, div_zero, sub_zero]
 
@@ -209,30 +209,30 @@ the exact optimum and the exact geometric floor. -/
 theorem quadraticCoefficientDistance_eq_floor_add_sq
     (B : Matrix ι ι ℝ) (u v : ι → ℝ) (c : ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
-    (hu : dot u (B.mulVec u) ≠ 0) :
+    (hu : Foundations.dot u (B.mulVec u) ≠ 0) :
     quadraticCoefficientDistance B (fun i ↦ c * u i) v =
       scalarCorrectionFloor B u v +
-        dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
-  have hcross : dot v (B.mulVec u) = dot u (B.mulVec v) := hsymmetric v u
+        Foundations.dot u (B.mulVec u) * (c - bestScalarCorrection B u v) ^ 2 := by
+  have hcross : Foundations.dot v (B.mulVec u) = Foundations.dot u (B.mulVec v) := hsymmetric v u
   have hscaled : (fun i ↦ c * u i) = c • u := by
     funext i
     simp
-  have hleftScaled : dot (c • u) (B.mulVec v) = c * dot u (B.mulVec v) :=
+  have hleftScaled : Foundations.dot (c • u) (B.mulVec v) = c * Foundations.dot u (B.mulVec v) :=
     dot_smul_left c u (B.mulVec v)
-  have hrightScaled : dot v (c • B.mulVec u) = c * dot v (B.mulVec u) :=
+  have hrightScaled : Foundations.dot v (c • B.mulVec u) = c * Foundations.dot v (B.mulVec u) :=
     dot_smul_right c v (B.mulVec u)
   have hbothScaled :
-      dot (c • u) (c • B.mulVec u) = c ^ 2 * dot u (B.mulVec u) := by
+      Foundations.dot (c • u) (c • B.mulVec u) = c ^ 2 * Foundations.dot u (B.mulVec u) := by
     calc
-      dot (c • u) (c • B.mulVec u)
-          = c * dot u (c • B.mulVec u) := dot_smul_left c u _
-      _ = c * (c * dot u (B.mulVec u)) := by
+      Foundations.dot (c • u) (c • B.mulVec u)
+          = c * Foundations.dot u (c • B.mulVec u) := dot_smul_left c u _
+      _ = c * (c * Foundations.dot u (B.mulVec u)) := by
         rw [dot_smul_right]
-      _ = c ^ 2 * dot u (B.mulVec u) := by ring
+      _ = c ^ 2 * Foundations.dot u (B.mulVec u) := by ring
   unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
   rw [hscaled]
-  rw [matrix_mulVec_sub, matrix_mulVec_smul, dot_sub_left,
-    dot_sub_right, dot_sub_right, hleftScaled, hrightScaled, hbothScaled, hcross]
+  rw [matrix_mulVec_sub, matrix_mulVec_smul, Foundations.dot_sub_left,
+    Foundations.dot_sub_right, Foundations.dot_sub_right, hleftScaled, hrightScaled, hbothScaled, hcross]
   field_simp [hu]
   ring
 
@@ -242,7 +242,7 @@ by the reported scalar and no scalar correction can do better. -/
 theorem best_scalar_correction_attains_floor
     (B : Matrix ι ι ℝ) (u v : ι → ℝ)
     (hsymmetric : IsSymmetricBilinearMatrix B)
-    (hu : 0 < dot u (B.mulVec u)) :
+    (hu : 0 < Foundations.dot u (B.mulVec u)) :
       quadraticCoefficientDistance B
         (fun i ↦ bestScalarCorrection B u v * u i) v =
         scalarCorrectionFloor B u v ∧
@@ -283,11 +283,11 @@ omit [DecidableEq ι] in
 theorem weightedCovariancePool_energy
     (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
     (shift : ι → ℝ) :
-    dot shift ((weightedCovariancePool weightLeft weightRight left right).mulVec shift) =
-      weightLeft * dot shift (left.mulVec shift) +
-        weightRight * dot shift (right.mulVec shift) := by
+    Foundations.dot shift ((weightedCovariancePool weightLeft weightRight left right).mulVec shift) =
+      weightLeft * Foundations.dot shift (left.mulVec shift) +
+        weightRight * Foundations.dot shift (right.mulVec shift) := by
   rw [weightedCovariancePool_mulVec]
-  simp only [dot, mul_add,
+  simp only [Foundations.dot, mul_add,
       Descent.Core.innerSum]
   rw [Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
   apply congrArg₂ (fun x y : ℝ ↦ x + y) <;>
@@ -305,25 +305,25 @@ so the theorem is reusable for any covariance representation satisfying it. -/
 theorem weightedCovariancePool_mulVec_eq_zero_iff
     (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
     (hweightLeft : 0 < weightLeft) (hweightRight : 0 < weightRight)
-    (hleftNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (left.mulVec shift))
-    (hrightNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (right.mulVec shift))
+    (hleftNonneg : ∀ shift : ι → ℝ, 0 ≤ Foundations.dot shift (left.mulVec shift))
+    (hrightNonneg : ∀ shift : ι → ℝ, 0 ≤ Foundations.dot shift (right.mulVec shift))
     (hleftZero : ∀ shift : ι → ℝ,
-      dot shift (left.mulVec shift) = 0 ↔ left.mulVec shift = 0)
+      Foundations.dot shift (left.mulVec shift) = 0 ↔ left.mulVec shift = 0)
     (hrightZero : ∀ shift : ι → ℝ,
-      dot shift (right.mulVec shift) = 0 ↔ right.mulVec shift = 0)
+      Foundations.dot shift (right.mulVec shift) = 0 ↔ right.mulVec shift = 0)
     (shift : ι → ℝ) :
     (weightedCovariancePool weightLeft weightRight left right).mulVec shift = 0 ↔
       left.mulVec shift = 0 ∧ right.mulVec shift = 0 := by
   constructor
   · intro hpool
-    have henergy : weightLeft * dot shift (left.mulVec shift) +
-        weightRight * dot shift (right.mulVec shift) = 0 := by
+    have henergy : weightLeft * Foundations.dot shift (left.mulVec shift) +
+        weightRight * Foundations.dot shift (right.mulVec shift) = 0 := by
       rw [← weightedCovariancePool_energy weightLeft weightRight left right shift, hpool]
-      simp [dot,
+      simp [Foundations.dot,
       Descent.Core.innerSum]
-    have hleftEnergy : dot shift (left.mulVec shift) = 0 := by
+    have hleftEnergy : Foundations.dot shift (left.mulVec shift) = 0 := by
       nlinarith [hleftNonneg shift, hrightNonneg shift]
-    have hrightEnergy : dot shift (right.mulVec shift) = 0 := by
+    have hrightEnergy : Foundations.dot shift (right.mulVec shift) = 0 := by
       nlinarith [hleftNonneg shift, hrightNonneg shift]
     exact ⟨(hleftZero shift).mp hleftEnergy, (hrightZero shift).mp hrightEnergy⟩
   · rintro ⟨hleft, hright⟩
@@ -361,12 +361,12 @@ omit [DecidableEq ι] in
 theorem finiteEnvironmentCovariancePool_energy
     {κ : Type*} [Fintype κ]
     (weight : κ → ℝ) (covariance : κ → Matrix ι ι ℝ) (shift : ι → ℝ) :
-    dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) =
+    Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) =
       ∑ environment, weight environment *
-        dot shift ((covariance environment).mulVec shift) := by
+        Foundations.dot shift ((covariance environment).mulVec shift) := by
   classical
   rw [finiteEnvironmentCovariancePool_mulVec]
-  simp only [dot,
+  simp only [Foundations.dot,
       Descent.Core.innerSum]
   simp_rw [Finset.mul_sum]
   rw [Finset.sum_comm]
@@ -386,10 +386,10 @@ structure PositiveSemidefiniteFamily {κ : Type*}
     (covariance : κ → Matrix ι ι ℝ) : Prop where
   /-- Every environment's quadratic form is nonnegative. -/
   energy_nonneg : ∀ environment shift,
-    0 ≤ dot shift ((covariance environment).mulVec shift)
+    0 ≤ Foundations.dot shift ((covariance environment).mulVec shift)
   /-- ... and vanishes exactly on that environment's kernel. -/
   energy_eq_zero_iff : ∀ environment shift,
-    dot shift ((covariance environment).mulVec shift) = 0 ↔
+    Foundations.dot shift ((covariance environment).mulVec shift) = 0 ↔
       (covariance environment).mulVec shift = 0
 
 /-- **The family is inhabited.**  Theorems conditioned on a bundle nothing satisfies are
@@ -399,12 +399,12 @@ theorem positiveSemidefiniteFamily_one {κ : Type*} :
     PositiveSemidefiniteFamily (fun _ : κ ↦ (1 : Matrix ι ι ℝ)) where
   energy_nonneg := by
     intro _ shift
-    simp only [Matrix.one_mulVec, dot,
+    simp only [Matrix.one_mulVec, Foundations.dot,
       Descent.Core.innerSum]
     exact Finset.sum_nonneg fun i _ ↦ mul_self_nonneg (shift i)
   energy_eq_zero_iff := by
     intro _ shift
-    simp only [Matrix.one_mulVec, dot,
+    simp only [Matrix.one_mulVec, Foundations.dot,
       Descent.Core.innerSum]
     constructor
     · intro h
@@ -433,29 +433,29 @@ include hweight hpsd in
 strictly positive energy to a shift exactly when at least one active environment does. This is
 the risk-valued counterpart of the active-kernel intersection theorem below. -/
 theorem finiteEnvironmentCovariancePool_energy_pos_iff_exists_active :
-    0 < dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) ↔
+    0 < Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) ↔
       ∃ environment, 0 < weight environment ∧
-        0 < dot shift ((covariance environment).mulVec shift) := by
+        0 < Foundations.dot shift ((covariance environment).mulVec shift) := by
   rw [finiteEnvironmentCovariancePool_energy]
   constructor
   · intro hsum
     by_contra hnone
     have htermZero : ∀ environment,
-        weight environment * dot shift ((covariance environment).mulVec shift) = 0 := by
+        weight environment * Foundations.dot shift ((covariance environment).mulVec shift) = 0 := by
       intro environment
       rcases (hweight environment).eq_or_lt with hweightZero | hweightPos
       · rw [← hweightZero]
         simp
       · have henergyNotPos :
-            ¬ 0 < dot shift ((covariance environment).mulVec shift) := by
+            ¬ 0 < Foundations.dot shift ((covariance environment).mulVec shift) := by
           intro henergyPos
           exact hnone ⟨environment, hweightPos, henergyPos⟩
-        have henergyZero : dot shift ((covariance environment).mulVec shift) = 0 :=
+        have henergyZero : Foundations.dot shift ((covariance environment).mulVec shift) = 0 :=
           le_antisymm (not_lt.mp henergyNotPos) (hpsd.energy_nonneg environment shift)
         rw [henergyZero, mul_zero]
     have hzero :
         ∑ environment, weight environment *
-          dot shift ((covariance environment).mulVec shift) = 0 := by
+          Foundations.dot shift ((covariance environment).mulVec shift) = 0 := by
       exact Finset.sum_eq_zero fun environment _ ↦ htermZero environment
     linarith
   · rintro ⟨environment, hweightPos, henergyPos⟩
@@ -469,7 +469,7 @@ include hweight hpsd in
 /-- A nonnegatively weighted pool of positive-semidefinite covariance energies remains
 nonnegative. -/
 theorem finiteEnvironmentCovariancePool_energy_nonneg :
-    0 ≤ dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
+    0 ≤ Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
   rw [finiteEnvironmentCovariancePool_energy]
   exact Finset.sum_nonneg fun environment _ ↦
     mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
@@ -480,9 +480,9 @@ include hweight hpsd in
 every positively weighted environment assigns zero risk to the same shift. Zero-weight cohorts
 are absent from the statistical experiment and impose no condition. -/
 theorem finiteEnvironmentCovariancePool_energy_eq_zero_iff_active :
-    dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 ↔
+    Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 ↔
       ∀ environment, 0 < weight environment →
-        dot shift ((covariance environment).mulVec shift) = 0 := by
+        Foundations.dot shift ((covariance environment).mulVec shift) = 0 := by
   constructor
   · intro hpool environment hactive
     apply le_antisymm
@@ -516,9 +516,9 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active :
   constructor
   · intro hpool environment hactive
     have hpoolEnergy :
-        dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 := by
+        Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 := by
       rw [hpool]
-      simp [dot,
+      simp [Foundations.dot,
       Descent.Core.innerSum]
     have henergyZero :=
       (finiteEnvironmentCovariancePool_energy_eq_zero_iff_active
@@ -654,8 +654,8 @@ times source excess risk in every coefficient direction.  No nonsingularity is a
 def UniformQuadraticPortabilityBound
     (source target : Matrix ι ι ℝ) (constant : ℝ) : Prop :=
   ∀ shift : ι → ℝ,
-    dot shift (target.mulVec shift) ≤
-      constant * dot shift (source.mulVec shift)
+    Foundations.dot shift (target.mulVec shift) ≤
+      constant * Foundations.dot shift (source.mulVec shift)
 
 omit [DecidableEq ι] in
 /-- **A uniform portability bound cannot create target risk on a source-null direction.**
@@ -663,13 +663,13 @@ Positive semidefiniteness of the target closes the inequality to an equality. -/
 theorem target_energy_eq_zero_of_uniformPortability_of_source_kernel
     (source target : Matrix ι ι ℝ) (constant : ℝ)
     (hbound : UniformQuadraticPortabilityBound source target constant)
-    (htarget : ∀ shift : ι → ℝ, 0 ≤ dot shift (target.mulVec shift))
+    (htarget : ∀ shift : ι → ℝ, 0 ≤ Foundations.dot shift (target.mulVec shift))
     (shift : ι → ℝ) (hsourceKernel : source.mulVec shift = 0) :
-    dot shift (target.mulVec shift) = 0 := by
+    Foundations.dot shift (target.mulVec shift) = 0 := by
   apply le_antisymm
   · have h := hbound shift
     rw [hsourceKernel] at h
-    simpa [dot,
+    simpa [Foundations.dot,
       Descent.Core.innerSum] using h
   · exact htarget shift
 
@@ -680,9 +680,9 @@ bound forces the source kernel into the target kernel.  This is the coefficient-
 theorem target_kernel_of_uniformPortability_of_source_kernel
     (source target : Matrix ι ι ℝ) (constant : ℝ)
     (hbound : UniformQuadraticPortabilityBound source target constant)
-    (htargetNonneg : ∀ shift : ι → ℝ, 0 ≤ dot shift (target.mulVec shift))
+    (htargetNonneg : ∀ shift : ι → ℝ, 0 ≤ Foundations.dot shift (target.mulVec shift))
     (htargetZero : ∀ shift : ι → ℝ,
-      dot shift (target.mulVec shift) = 0 ↔ target.mulVec shift = 0)
+      Foundations.dot shift (target.mulVec shift) = 0 ↔ target.mulVec shift = 0)
     (shift : ι → ℝ) (hsourceKernel : source.mulVec shift = 0) :
     target.mulVec shift = 0 := by
   apply (htargetZero shift).mp
@@ -696,14 +696,14 @@ exists.  This is the sharp algebraic obstruction behind nonportable singular fit
 theorem no_uniformQuadraticPortabilityBound_of_source_kernel_target_pos
     (source target : Matrix ι ι ℝ) (shift : ι → ℝ)
     (hsourceKernel : source.mulVec shift = 0)
-    (htargetPos : 0 < dot shift (target.mulVec shift)) :
+    (htargetPos : 0 < Foundations.dot shift (target.mulVec shift)) :
     ¬ ∃ constant : ℝ, UniformQuadraticPortabilityBound source target constant := by
   rintro ⟨constant, hbound⟩
   have h := hbound shift
   rw [hsourceKernel] at h
-  simp [dot,
+  simp [Foundations.dot,
       Descent.Core.innerSum] at h
-  unfold dot Descent.Core.innerSum at htargetPos
+  unfold Foundations.dot Descent.Core.innerSum at htargetPos
   exact (not_lt_of_ge h) htargetPos
 
 omit [DecidableEq ι] in
@@ -725,20 +725,20 @@ theorem no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool
   classical
   obtain ⟨detector, hdetectorWeight, hdetector⟩ := hdetected
   have hdetectorEnergyNe :
-      dot shift ((covariance detector).mulVec shift) ≠ 0 := by
+      Foundations.dot shift ((covariance detector).mulVec shift) ≠ 0 := by
     intro henergy
     exact hdetector ((hpsd.energy_eq_zero_iff detector shift).mp henergy)
-  have hdetectorEnergyPos : 0 < dot shift ((covariance detector).mulVec shift) :=
+  have hdetectorEnergyPos : 0 < Foundations.dot shift ((covariance detector).mulVec shift) :=
     lt_of_le_of_ne (hpsd.energy_nonneg detector shift) (Ne.symm hdetectorEnergyNe)
   have htermNonneg : ∀ environment ∈ (Finset.univ : Finset κ),
-      0 ≤ weight environment * dot shift ((covariance environment).mulVec shift) := by
+      0 ≤ weight environment * Foundations.dot shift ((covariance environment).mulVec shift) := by
     intro environment _
     exact mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
-  have hdetectorLe : weight detector * dot shift ((covariance detector).mulVec shift) ≤
+  have hdetectorLe : weight detector * Foundations.dot shift ((covariance detector).mulVec shift) ≤
       ∑ environment, weight environment *
-        dot shift ((covariance environment).mulVec shift) :=
+        Foundations.dot shift ((covariance environment).mulVec shift) :=
     Finset.single_le_sum htermNonneg (Finset.mem_univ detector)
-  have hpoolEnergyPos : 0 < dot shift
+  have hpoolEnergyPos : 0 < Foundations.dot shift
       ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
     rw [finiteEnvironmentCovariancePool_energy]
     exact (mul_pos hdetectorWeight hdetectorEnergyPos).trans_le hdetectorLe
@@ -765,6 +765,6 @@ theorem no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool
     weight covariance reference (fun environment ↦ (hweight environment).le) hpsd shift
       hreference ⟨environment, hweight environment, hdetect⟩
 
-end
+end Descent.Spectral
 
 end Descent

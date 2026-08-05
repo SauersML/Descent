@@ -6,7 +6,7 @@ import Descent.Blindness.JetBarrier
 import Descent.Conditionals.LocalToGlobalCoherence
 import Descent.Blindness.HiddenConeAmbiguity
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # Polygenic spectroscopy: the Mellin drift of a genotype, and what it costs
@@ -180,7 +180,7 @@ namespace HardyWeinbergModel
 /-- The squared standardized genotype `x ^ 2 = (dosage - 2q) ^ 2 / (2 q (1 - q))`.
 This is the multiplicative coordinate: a degree-`m` epistatic monomial has squared
 value equal to the product of `m` independent copies of this variable. -/
-noncomputable def standardizedSquare (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
+noncomputable def standardizedSquare (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
   (h.centeredAltAlleleCount g) ^ 2 / h.genotypeVariance
 
 /-- The **Mellin drift** `c(q) = E[x ^ 2 log x ^ 2]` of a Hardy-Weinberg locus: the
@@ -197,8 +197,8 @@ genotypes; no free parameter and nothing fitted. Recomputed independently by
 `validation/empirical/condensation/check_condensation.py`, which evaluates this sum
 numerically and checks it against `hweMellinDrift` across the frequency
 spectrum. -/
-noncomputable def mellinDrift (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype,
+noncomputable def mellinDrift (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype,
     h.genotypeProb g * h.standardizedSquare g * Real.log (h.standardizedSquare g)
 
 end HardyWeinbergModel
@@ -226,26 +226,26 @@ theorem hweMellinDrift_balanced_frequency_is_junk :
 
 section ClosedForm
 
-variable {h : HardyWeinbergModel}
+variable {h : Foundations.HardyWeinbergModel}
 
-private theorem hwe_variance_eq (h : HardyWeinbergModel) :
+private theorem hwe_variance_eq (h : Foundations.HardyWeinbergModel) :
     h.genotypeVariance = 2 * h.altFreq * (1 - h.altFreq) := by
   rw [h.genotypeVariance_eq]
-  unfold HardyWeinbergModel.refFreq
+  unfold Foundations.HardyWeinbergModel.refFreq
   ring
 
-private theorem hwe_centered (h : HardyWeinbergModel) (g : DiploidGenotype) :
-    h.centeredAltAlleleCount g = altAlleleCount g - 2 * h.altFreq := by
-  unfold HardyWeinbergModel.centeredAltAlleleCount
+private theorem hwe_centered (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
+    h.centeredAltAlleleCount g = Foundations.altAlleleCount g - 2 * h.altFreq := by
+  unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq]
 
 /-- The three squared standardized genotype values. -/
-theorem standardizedSquare_values (h : HardyWeinbergModel)
+theorem standardizedSquare_values (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    h.standardizedSquare DiploidGenotype.homRef = 2 * h.altFreq / (1 - h.altFreq) ∧
-    h.standardizedSquare DiploidGenotype.het =
+    h.standardizedSquare Foundations.DiploidGenotype.homRef = 2 * h.altFreq / (1 - h.altFreq) ∧
+    h.standardizedSquare Foundations.DiploidGenotype.het =
       (1 - 2 * h.altFreq) ^ 2 / (2 * h.altFreq * (1 - h.altFreq)) ∧
-    h.standardizedSquare DiploidGenotype.homAlt = 2 * (1 - h.altFreq) / h.altFreq := by
+    h.standardizedSquare Foundations.DiploidGenotype.homAlt = 2 * (1 - h.altFreq) / h.altFreq := by
   have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
   have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; apply absurd hq1; linarith [hc]
   -- The three cases need different endgames, so they are split rather than run
@@ -253,28 +253,28 @@ theorem standardizedSquare_values (h : HardyWeinbergModel)
   -- `field_simp` chained after it would run on an empty goal list.
   refine ⟨?_, ?_, ?_⟩
   · -- homRef: `(0 - 2q)² / (2q(1-q)) = 2q / (1-q)`
-    unfold HardyWeinbergModel.standardizedSquare
+    unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [altAlleleCount]
+    simp only [Foundations.altAlleleCount]
     field_simp
     ring
   · -- het: `(1 - 2q)² / (2q(1-q))` is already the target, up to `altAlleleCount het = 1`
-    unfold HardyWeinbergModel.standardizedSquare
+    unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [altAlleleCount]
+    simp only [Foundations.altAlleleCount]
   · -- homAlt: `(2 - 2q)² / (2q(1-q)) = 2(1-q) / q`
-    unfold HardyWeinbergModel.standardizedSquare
+    unfold Foundations.HardyWeinbergModel.standardizedSquare
     rw [hwe_centered, hwe_variance_eq]
-    simp only [altAlleleCount]
+    simp only [Foundations.altAlleleCount]
     field_simp
 
 /-- The three Hardy-Weinberg genotype probabilities in terms of `q`. -/
-theorem genotypeProb_values (h : HardyWeinbergModel) :
-    h.genotypeProb DiploidGenotype.homRef = (1 - h.altFreq) ^ 2 ∧
-    h.genotypeProb DiploidGenotype.het = 2 * (1 - h.altFreq) * h.altFreq ∧
-    h.genotypeProb DiploidGenotype.homAlt = h.altFreq ^ 2 := by
+theorem genotypeProb_values (h : Foundations.HardyWeinbergModel) :
+    h.genotypeProb Foundations.DiploidGenotype.homRef = (1 - h.altFreq) ^ 2 ∧
+    h.genotypeProb Foundations.DiploidGenotype.het = 2 * (1 - h.altFreq) * h.altFreq ∧
+    h.genotypeProb Foundations.DiploidGenotype.homAlt = h.altFreq ^ 2 := by
   refine ⟨?_, ?_, ?_⟩ <;>
-    · unfold HardyWeinbergModel.genotypeProb HardyWeinbergModel.refFreq
+    · unfold Foundations.HardyWeinbergModel.genotypeProb Foundations.HardyWeinbergModel.refFreq
       ring
 
 /-- **The closed form of the Hardy-Weinberg Mellin drift.**
@@ -284,7 +284,7 @@ theorem genotypeProb_values (h : HardyWeinbergModel) :
 The proof is a three-term expansion plus the identity
 `log (2q / (1-q)) + log (2(1-q) / q) = log 4`, which is what collapses the two
 homozygote contributions into a single frequency-weighted `log 2`. -/
-theorem HardyWeinbergModel.mellinDrift_eq (h : HardyWeinbergModel)
+theorem HardyWeinbergModel.mellinDrift_eq (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.mellinDrift = hweMellinDrift h.altFreq := by
   set q := h.altFreq with hq
@@ -315,8 +315,8 @@ theorem HardyWeinbergModel.mellinDrift_eq (h : HardyWeinbergModel)
     field_simp
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
     field_simp
-  unfold HardyWeinbergModel.mellinDrift hweMellinDrift
-  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
+  unfold Foundations.HardyWeinbergModel.mellinDrift hweMellinDrift
+  rw [Foundations.sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC]
   linear_combination (2 * q * (1 - q)) * hL
 
 end ClosedForm
@@ -937,8 +937,8 @@ design observes — is the `Descent.Blindness.JetBarrier` conjecture, which is n
 namespace HardyWeinbergModel
 
 /-- The second Mellin observable: `v(q) = Var(log x^2)` under the size-biased law. -/
-noncomputable def mellinJetVariance (h : HardyWeinbergModel) : ℝ :=
-  (∑ g : DiploidGenotype,
+noncomputable def mellinJetVariance (h : Foundations.HardyWeinbergModel) : ℝ :=
+  (∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedSquare g * (Real.log (h.standardizedSquare g)) ^ 2)
     - h.mellinDrift ^ 2
 
@@ -962,7 +962,7 @@ theorem hweMellinJetVariance_at_fixation_is_junk :
 
 
 /-- **The jet variance of a Hardy-Weinberg locus in closed form.** -/
-theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
+theorem HardyWeinbergModel.mellinJetVariance_eq (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.mellinJetVariance = hweMellinJetVariance h.altFreq := by
   set q := h.altFreq with hq
@@ -977,8 +977,8 @@ theorem HardyWeinbergModel.mellinJetVariance_eq (h : HardyWeinbergModel)
   have hC : q ^ 2 * (2 * (1 - q) / q) = 2 * q * (1 - q) := by
     field_simp
   have hdrift : h.mellinDrift = hweMellinDrift q := h.mellinDrift_eq hq0 hq1
-  unfold HardyWeinbergModel.mellinJetVariance hweMellinJetVariance
-  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
+  unfold Foundations.HardyWeinbergModel.mellinJetVariance hweMellinJetVariance
+  rw [Foundations.sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2, hA, hB, hC, hdrift]
 
 /-- The lattice span at `q*` is `h = log ((1 - q*) / q*) = log (3 + 2 sqrt 2)`, which
 is strictly positive; hence the inflation factor `h / (1 - exp (-h))` is strictly
@@ -1138,10 +1138,10 @@ argument is formalized.
 `log x ^ 2` forms at a lattice frequency. The heterozygote sits at the centre, because
 the lattice condition says exactly that its squared standardized value is the geometric
 mean of the two homozygotes'. -/
-def hardCallLatticeIndex : DiploidGenotype → ℤ
-  | DiploidGenotype.homRef => -1
-  | DiploidGenotype.het => 0
-  | DiploidGenotype.homAlt => 1
+def hardCallLatticeIndex : Foundations.DiploidGenotype → ℤ
+  | Foundations.DiploidGenotype.homRef => -1
+  | Foundations.DiploidGenotype.het => 0
+  | Foundations.DiploidGenotype.homAlt => 1
 
 /-- **The heterozygote's squared standardized value is exactly `2` at a lattice frequency.**
 
@@ -1161,10 +1161,10 @@ guarded at exactly one place, which is where it should be.
 What this lemma buys is the other half: if the heterozygote's standardized square ever
 stops being `2` -- a different genotype coding, a polyploid generalisation -- this breaks
 here, loudly, instead of the arithmetic progression quietly ceasing to be one. -/
-theorem hweLatticeCondition_het_standardizedSquare (h : HardyWeinbergModel)
+theorem hweLatticeCondition_het_standardizedSquare (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hlat : hweLatticeCondition h.altFreq) :
-    h.standardizedSquare DiploidGenotype.het = 2 := by
+    h.standardizedSquare Foundations.DiploidGenotype.het = 2 := by
   have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
   have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; exact absurd hq1 (by linarith)
   have hlat' : (1 - 2 * h.altFreq) ^ 2 = 4 * h.altFreq * (1 - h.altFreq) := hlat
@@ -1180,9 +1180,9 @@ holds. Stated for a general `q` satisfying the condition rather than only at `q*
 because the proof uses the condition and nothing else about `q*`; the `q*` instance is
 below and is obtained by discharging the hypothesis with
 `hardCall_arithmeticProgression_at_critical_maf`. -/
-theorem hardCall_logSquare_eq_of_latticeCondition (h : HardyWeinbergModel)
+theorem hardCall_logSquare_eq_of_latticeCondition (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
-    (hlat : hweLatticeCondition h.altFreq) (g : DiploidGenotype) :
+    (hlat : hweLatticeCondition h.altFreq) (g : Foundations.DiploidGenotype) :
     Real.log (h.standardizedSquare g)
       = Real.log 2 + Real.log ((1 - h.altFreq) / h.altFreq)
           * (hardCallLatticeIndex g : ℝ) := by
@@ -1220,8 +1220,8 @@ Every difference of two log-squared-standardized values is an integer multiple o
 `hardCallLatticeSpan`. This is the hypothesis that `hwe_not_cramer_of_lattice` carries
 abstractly; supplying it here is what turns that theorem from a conditional into a
 statement about genotypes. -/
-theorem hardCall_logSquare_lattice_at_critical_maf (h : HardyWeinbergModel)
-    (hq : h.altFreq = latticeCriticalMaf) (u v : DiploidGenotype) :
+theorem hardCall_logSquare_lattice_at_critical_maf (h : Foundations.HardyWeinbergModel)
+    (hq : h.altFreq = latticeCriticalMaf) (u v : Foundations.DiploidGenotype) :
     ∃ k : ℤ, Real.log (h.standardizedSquare u) - Real.log (h.standardizedSquare v)
       = hardCallLatticeSpan * k := by
   have hq0 : 0 < h.altFreq := by rw [hq]; exact latticeCriticalMaf_pos
@@ -1248,7 +1248,7 @@ genotype input — the three logarithms and their common span.
 Scope consequence, stated plainly because it constrains the rest of the corpus: results
 proved on the Cramér stratum transfer to imputed dosages and **do not** transfer to hard
 calls at this frequency. -/
-theorem hardCall_not_cramer_at_critical_maf (h : HardyWeinbergModel)
+theorem hardCall_not_cramer_at_critical_maf (h : Foundations.HardyWeinbergModel)
     (hq : h.altFreq = latticeCriticalMaf) :
     ¬ CramerCondition h.genotypeProb (fun g ↦ Real.log (h.standardizedSquare g)) :=
   hwe_not_cramer_of_lattice h (fun g ↦ Real.log (h.standardizedSquare g))
@@ -1390,7 +1390,7 @@ Empirical status: DERIVED in its first two components, from `hweMellinDrift` and
 genotypes and recomputed numerically by
 `validation/empirical/condensation/check_condensation.py`. The third and fourth components
 are inputs, not claims. No free parameter. -/
-noncomputable def hweCodingInvariants (h : HardyWeinbergModel)
+noncomputable def hweCodingInvariants (h : Foundations.HardyWeinbergModel)
     (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) : CodingInvariants where
   drift := hweMellinDrift h.altFreq
   jetVariance := hweMellinJetVariance h.altFreq
@@ -1406,7 +1406,7 @@ with the Gaussian's. This is the precise form of the "coincidence": not that the
 degenerates — it does not, `c(1/2) = log 2` — but that the one invariant which does match
 the Gaussian matches it exactly where the jet variance is unusable. -/
 theorem balanced_locus_symmetric_component
-    (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)
+    (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2)
     (arithmeticType : LatticeDatum) (squareCumulant : ℕ → ℝ) :
     (hweCodingInvariants h arithmeticType squareCumulant).symmetric = true ∧
       (hweCodingInvariants h arithmeticType squareCumulant).drift = Real.log 2 ∧
@@ -1463,8 +1463,8 @@ since `E[x ^ 2] = 1`.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.standardizedSquare` by direct summation over the three genotypes;
 closed form in `standardizedFourthMoment_eq`. No free parameter. -/
-noncomputable def HardyWeinbergModel.standardizedFourthMoment (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedSquare g ^ 2
+noncomputable def HardyWeinbergModel.standardizedFourthMoment (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedSquare g ^ 2
 
 /-- **The fourth moment in closed form: `E[x ^ 4] = 1 / (2q(1-q))`.**
 
@@ -1472,22 +1472,22 @@ The three contributions are `4q²`, `(1-2q)⁴ / (2q(1-q))` and `4(1-q)²`, and 
 by the polynomial identity `2q(1-q)(4q² + 4(1-q)²) + (1-2q)⁴ = 1`. Note this is the
 reciprocal of the genotype variance `2q(1-q)`, which is a coincidence of the biallelic
 three-point law and not a general fact. -/
-theorem HardyWeinbergModel.standardizedFourthMoment_eq (h : HardyWeinbergModel)
+theorem HardyWeinbergModel.standardizedFourthMoment_eq (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.standardizedFourthMoment = 1 / (2 * h.altFreq * (1 - h.altFreq)) := by
   have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
   have hpne : (1 : ℝ) - h.altFreq ≠ 0 := by intro hc; apply absurd hq1; linarith [hc]
   obtain ⟨hX0, hX1, hX2⟩ := standardizedSquare_values h hq0 hq1
   obtain ⟨hP0, hP1, hP2⟩ := genotypeProb_values h
-  unfold HardyWeinbergModel.standardizedFourthMoment
-  rw [sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2]
+  unfold Foundations.HardyWeinbergModel.standardizedFourthMoment
+  rw [Foundations.sum_over_genotypes, hX0, hX1, hX2, hP0, hP1, hP2]
   field_simp
   ring
 
 /-- **Every polymorphic locus has `E[x ^ 4] ≥ 2`,** because `4q(1-q) ≤ 1`. The bound is
 the standardized restatement of the fact that a three-point law cannot be less
 leptokurtic than the balanced one. -/
-theorem standardizedFourthMoment_ge_two (h : HardyWeinbergModel)
+theorem standardizedFourthMoment_ge_two (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     2 ≤ h.standardizedFourthMoment := by
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
@@ -1502,7 +1502,7 @@ This is the *second* independent reason `q = 1/2` is distinguished, the first be
 symmetry (`Descent.EpistaticChaos.standardizedGenotype_symmetric_iff`). The two are not
 a coincidence: both descend from `Binomial(2, q)` being a symmetric law exactly at
 `q = 1/2`, so the right framing is common cause. -/
-theorem standardizedFourthMoment_eq_two_iff_half (h : HardyWeinbergModel)
+theorem standardizedFourthMoment_eq_two_iff_half (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.standardizedFourthMoment = 2 ↔ h.altFreq = 1 / 2 := by
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
@@ -1537,7 +1537,7 @@ Rigidity makes the computed Mellin invariants redundant *at the Gaussian fiber*,
 four data already pin the law down completely. A genotype is never at that fiber, so for
 the objects this file is about, `hweMellinDrift` and `hweMellinJetVariance` are **not**
 redundant: nothing in the rigidity data determines them off the fiber. -/
-theorem standardizedFourthMoment_ne_gaussian_at_half (h : HardyWeinbergModel)
+theorem standardizedFourthMoment_ne_gaussian_at_half (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hhalf : h.altFreq = 1 / 2) :
     h.standardizedFourthMoment ≠ 3 := by
   rw [h.standardizedFourthMoment_eq hq0 hq1, hhalf]
@@ -1598,4 +1598,4 @@ valid at their displayed allele frequencies.  Extension to overlapping LD design
 still open.
 -/
 
-end Descent
+end Descent.Spectral

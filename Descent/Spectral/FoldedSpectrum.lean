@@ -5,7 +5,7 @@ import Descent.Conditionals.ConditionalGain
 import Descent.Spectral.Permeability
 import Descent.Blindness.EffectSizeSurgery
 
-namespace Descent
+namespace Descent.Spectral
 
 open scoped BigOperators
 
@@ -1241,13 +1241,13 @@ If each atom tuple retains positive mass in both, they cover exactly the same tu
 `|X²-1|` values. This is the finite, proved content of coverage invariance. It does not
 assert the unproved transfinite peeling step or a singular-value constant. -/
 theorem diploid_coverage_invariant_of_joint_floor {k : ℕ} (fiber value : Fin k → ℝ)
-    (J J' : FiberCoupling k 3) (η η' : ℝ) (hη : 0 < η) (hη' : 0 < η')
+    (J J' : Conditionals.FiberCoupling k 3) (η η' : ℝ) (hη : 0 < η) (hη' : 0 < η')
     (hfloor : ∀ x, η ≤ J.mass x) (hfloor' : ∀ x, η' ≤ J'.mass x) :
-    FiberCoupling.CoversTuple diploidFamily fiber J value ↔
-      FiberCoupling.CoversTuple diploidFamily fiber J' value :=
-  FiberCoupling.coverage_invariant diploidFamily fiber J J'
-    (FiberCoupling.fullSupport_of_uniform_floor J η hη hfloor)
-    (FiberCoupling.fullSupport_of_uniform_floor J' η' hη' hfloor') value
+    Conditionals.FiberCoupling.CoversTuple diploidFamily fiber J value ↔
+      Conditionals.FiberCoupling.CoversTuple diploidFamily fiber J' value :=
+  Conditionals.FiberCoupling.coverage_invariant diploidFamily fiber J J'
+    (Conditionals.FiberCoupling.fullSupport_of_uniform_floor J η hη hfloor)
+    (Conditionals.FiberCoupling.fullSupport_of_uniform_floor J' η' hη' hfloor') value
 
 /-! ## 10. Task-relative spectral portability
 

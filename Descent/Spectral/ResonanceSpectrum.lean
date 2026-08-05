@@ -9,7 +9,7 @@ import Mathlib.Tactic.Linarith
 -- build that does not reach this file, which is why the `Descent` root lists this
 -- module: being compiled is what makes the import list answerable to the proofs below.
 
-namespace Descent
+namespace Descent.Spectral
 
 open scoped BigOperators
 
@@ -237,4 +237,4 @@ remains outside it. An invariant can become richer without becoming more reveali
 the thing it was hoped would separate.
 -/
 
-end Descent
+end Descent.Spectral

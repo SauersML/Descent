@@ -1055,8 +1055,8 @@ theorem additiveVariance_uses_hwe {m : ℕ} (p α : Fin m → ℝ) :
   unfold additiveVariance hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem noncentralityParam_uses_hwe (n : ℕ) (beta p : ℝ) :
-    noncentralityParam n beta p = n * beta ^ 2 * hweGenotypeVariance p := by
-  unfold noncentralityParam hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+    Decision.noncentralityParam n beta p = n * beta ^ 2 * hweGenotypeVariance p := by
+  unfold Decision.noncentralityParam hweGenotypeVariance Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
     gwasNCP n β p = n * β ^ 2 * hweGenotypeVariance p := by
@@ -1660,7 +1660,7 @@ variance with which averaging independent copies of a summary estimates its tang
 information; the arithmetic is one map, so a change of convention in either is a change in
 both. -/
 theorem importanceWeightESS_eq_momentPermeability (sum_w sum_w_sq : ℝ) :
-    importanceWeightESS sum_w sum_w_sq = momentPermeability sum_w sum_w_sq := rfl
+    importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq := rfl
 
 /-- **The `p (1 - p)` in the drift variance is half the diploid genotype variance.**
 `AncestrySpecificArchitecture.driftVariance` is `p₀ (1 - p₀) · F_ST`, the ancestral

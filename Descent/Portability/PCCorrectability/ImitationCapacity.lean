@@ -117,7 +117,7 @@ theorem spikeOuter_eq_rankOneCovarianceBump (v : ι → ℝ) :
 /-- The score variance a unit spike contributes to a weighting `x` is the
 squared projection of `x` on the spike direction. -/
 theorem quadForm_spikeOuter (v x : ι → ℝ) :
-    quadForm (spikeOuter v) x = dot v x ^ 2 := by
+    quadForm (spikeOuter v) x = Foundations.dot v x ^ 2 := by
   rw [spikeOuter_eq_rankOneCovarianceBump, quadForm_rankOneCovarianceBump]
   ring
 
@@ -616,8 +616,8 @@ theorem traceForm_smul (c : ℝ) (M : Matrix ι ι ℝ) :
 vector.**  Everything downstream — `effectiveSubgroupSize`, `demographicSpike`,
 the AR(1) whitening gain — is a computation of this one quantity in a
 particular basis. -/
-theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = dot v v := by
-  unfold traceForm dot Descent.Core.innerSum
+theorem traceForm_spikeOuter (v : ι → ℝ) : traceForm (spikeOuter v) = Foundations.dot v v := by
+  unfold traceForm Foundations.dot Descent.Core.innerSum
   exact Finset.sum_congr rfl (fun i _ ↦ by simp only [spikeOuter])
 
 /-- **The trace-window background class**: every legal background carries total
@@ -635,7 +635,7 @@ def traceWindowBudgetClass (base : Matrix ι ι ℝ) (budget : ℝ) :
 
 theorem traceWindowBudgetClass_spikeLoad (base : Matrix ι ι ℝ) (budget : ℝ)
     (v : ι → ℝ) :
-    (traceWindowBudgetClass base budget).spikeLoad () v = dot v v :=
+    (traceWindowBudgetClass base budget).spikeLoad () v = Foundations.dot v v :=
   traceForm_spikeOuter v
 
 theorem traceWindowBudgetClass_headroom (base : Matrix ι ι ℝ) (budget : ℝ)
@@ -1249,7 +1249,7 @@ This is the theorem that stops `m(n-m)/n` from being a formula nothing can
 contradict: it is the trace-window spike load of an explicitly constructed
 direction, and any other centering would give a different number. -/
 theorem dot_demographicSpikeDirection (n m : ℕ) (hmn : m ≤ n) (hn : 0 < n) :
-    dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
+    Foundations.dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
       effectiveSubgroupSize (n : ℝ) (m : ℝ) := by
   have hn' : (0 : ℝ) < (n : ℝ) := by exact_mod_cast hn
   have hne : ((n : ℝ)) ≠ 0 := ne_of_gt hn'
@@ -1259,9 +1259,9 @@ theorem dot_demographicSpikeDirection (n m : ℕ) (hmn : m ≤ n) (hn : 0 < n) :
     intro i
     unfold demographicSpikeDirection
     ring
-  have hsq : dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
+  have hsq : Foundations.dot (demographicSpikeDirection n m) (demographicSpikeDirection n m) =
       ∑ i ∈ Finset.range n, (subgroupContrast n m i) ^ 2 := by
-    unfold dot Descent.Core.innerSum
+    unfold Foundations.dot Descent.Core.innerSum
     rw [Finset.sum_congr rfl (fun i _ ↦ hpoint i)]
     exact Fin.sum_univ_eq_sum_range (fun i ↦ (subgroupContrast n m i) ^ 2) n
   have hsplit : m + (n - m) = n := by omega

@@ -66,16 +66,16 @@ variable {Ω : Type*} {J : Type*} [Fintype J] [DecidableEq J]
 predictors with the trait is the predictor covariance applied to the causal
 effect vector. -/
 theorem crossCovVector_causalSignal_self
-    (E : ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ) :
-    crossCovVector E X (causalSignal β X) = (covarianceMatrix E X).mulVec β := by
+    (E : Foundations.ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ) :
+    Foundations.crossCovVector E X (Foundations.causalSignal β X) = (Foundations.covarianceMatrix E X).mulVec β := by
   funext i
-  unfold crossCovVector causalSignal dot covarianceMatrix Matrix.mulVec Descent.Core.innerSum
-  rw [covariance_finset_sum_right]
+  unfold Foundations.crossCovVector Foundations.causalSignal Foundations.dot Foundations.covarianceMatrix Matrix.mulVec Descent.Core.innerSum
+  rw [Foundations.covariance_finset_sum_right]
   simp only [Matrix.of_apply, dotProduct]
   refine Finset.sum_congr rfl ?_
   intro j _
   rw [show (fun ω ↦ β j * X ω j) = β j • (fun ω ↦ X ω j) from rfl,
-    covariance_smul_right]
+    Foundations.covariance_smul_right]
   ring
 
 /-- **An exactly additive architecture has population-invariant optimal
@@ -86,10 +86,10 @@ minimise squared error are `β` under every genotype distribution whose
 predictor covariance is invertible. No allele-frequency divergence, however
 large, moves them. -/
 theorem additive_architecture_weights_are_transport_invariant
-    (sigmaInv : Matrix J J ℝ) (E : ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ)
-    (hsigmaInv : covarianceMatrix E X * sigmaInv = 1) :
-    optimalWeightsFromMoments sigmaInv E X (causalSignal β X) = β := by
-  unfold optimalWeightsFromMoments
+    (sigmaInv : Matrix J J ℝ) (E : Foundations.ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ)
+    (hsigmaInv : Foundations.covarianceMatrix E X * sigmaInv = 1) :
+    Foundations.optimalWeightsFromMoments sigmaInv E X (Foundations.causalSignal β X) = β := by
+  unfold Foundations.optimalWeightsFromMoments
   rw [crossCovVector_causalSignal_self, Matrix.mulVec_mulVec,
     Matrix.mul_eq_one_comm.mp hsigmaInv, Matrix.one_mulVec]
 
@@ -101,11 +101,11 @@ predictor laws, to make explicit that nothing is assumed to be common between
 the populations except the causal effect vector. -/
 theorem additive_architecture_weights_agree_across_populations
     (sigmaInvP sigmaInvQ : Matrix J J ℝ)
-    (EP EQ : ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
-    (hP : covarianceMatrix EP XP * sigmaInvP = 1)
-    (hQ : covarianceMatrix EQ XQ * sigmaInvQ = 1) :
-    optimalWeightsFromMoments sigmaInvP EP XP (causalSignal β XP) =
-      optimalWeightsFromMoments sigmaInvQ EQ XQ (causalSignal β XQ) := by
+    (EP EQ : Foundations.ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
+    (hP : Foundations.covarianceMatrix EP XP * sigmaInvP = 1)
+    (hQ : Foundations.covarianceMatrix EQ XQ * sigmaInvQ = 1) :
+    Foundations.optimalWeightsFromMoments sigmaInvP EP XP (Foundations.causalSignal β XP) =
+      Foundations.optimalWeightsFromMoments sigmaInvQ EQ XQ (Foundations.causalSignal β XQ) := by
   rw [additive_architecture_weights_are_transport_invariant sigmaInvP EP XP β hP,
     additive_architecture_weights_are_transport_invariant sigmaInvQ EQ XQ β hQ]
 
@@ -118,12 +118,12 @@ the predictors. Something in the trichotomy of the file docstring must give:
 non-additivity, a changed causal map, or predictors that tag rather than cause. -/
 theorem differing_weights_refute_shared_additive_map
     (sigmaInvP sigmaInvQ : Matrix J J ℝ)
-    (EP EQ : ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
-    (hP : covarianceMatrix EP XP * sigmaInvP = 1)
-    (hQ : covarianceMatrix EQ XQ * sigmaInvQ = 1)
+    (EP EQ : Foundations.ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
+    (hP : Foundations.covarianceMatrix EP XP * sigmaInvP = 1)
+    (hQ : Foundations.covarianceMatrix EQ XQ * sigmaInvQ = 1)
     (hdiff :
-      optimalWeightsFromMoments sigmaInvP EP XP (causalSignal β XP) ≠
-        optimalWeightsFromMoments sigmaInvQ EQ XQ (causalSignal β XQ)) :
+      Foundations.optimalWeightsFromMoments sigmaInvP EP XP (Foundations.causalSignal β XP) ≠
+        Foundations.optimalWeightsFromMoments sigmaInvQ EQ XQ (Foundations.causalSignal β XQ)) :
     False :=
   hdiff (additive_architecture_weights_agree_across_populations
     sigmaInvP sigmaInvQ EP EQ XP XQ β hP hQ)

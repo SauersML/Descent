@@ -122,9 +122,9 @@ same binary direction, despite reversing their argument roles. -/
 theorem gaugeAlignedPredictor_eq_persistentOnlyDynamicsPosterior
     (persists : Bool) (x : Unit) :
     gaugeAlignedPredictor persists x =
-      persistentOnlyDynamicsPosterior (0 : BinaryBiologicalState) persists := by
+      Conditionals.persistentOnlyDynamicsPosterior (0 : Conditionals.BinaryBiologicalState) persists := by
   cases persists <;>
-    norm_num [gaugeAlignedPredictor, persistentOnlyDynamicsPosterior, binarySecondAnnotation]
+    norm_num [gaugeAlignedPredictor, Conditionals.persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
 /-- A binary-ancestry PGS deployment has two simultaneous boundaries: unequal representation
 separates pooled calibration from worst-ancestry performance, while a clinical threshold crossed

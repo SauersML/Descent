@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.ImitationRigidity
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # The LD whitening gain as an ergodic average, and why the pencil pair is not free
@@ -322,4 +322,4 @@ theorem ababFinite_deficit_proportional_to_whiteningGain_deficit_of_length_ne_ze
 
 end PencilEnvironment
 
-end Descent
+end Descent.Spectral

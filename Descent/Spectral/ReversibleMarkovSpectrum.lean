@@ -6,7 +6,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # Reversible Markov spectral kernels
@@ -108,4 +108,4 @@ theorem persistent_alternating_mirror (lam x : ℝ) :
     markovPoissonKernel (-lam) x = markovPoissonKernel lam (-x) :=
   markovPoissonKernel_neg lam x
 
-end Descent
+end Descent.Spectral

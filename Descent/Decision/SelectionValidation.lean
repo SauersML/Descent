@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.SelectionArchitecture
 import Descent.Decision.ValidationStatistics
 
-namespace Descent
+namespace Descent.Decision
 
 /-!
 # Selection Validation
@@ -336,4 +336,4 @@ theorem selectionModelLRT_lt_iff_missedSelectedVariance_lt_of_matchedEffectCorre
 
 end SelectionValidation
 
-end Descent
+end Descent.Decision

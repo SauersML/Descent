@@ -43,7 +43,7 @@ theorem scalar_summary_insufficient_for_accuracy
     (distance accuracy : V →ₗ[ℝ] ℝ)
     (hnot : ¬ ∃ c : ℝ, accuracy = c • distance) :
     ∀ θ : V, ∃ θ' : V, distance θ' = distance θ ∧ accuracy θ' ≠ accuracy θ :=
-  scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
+  Foundations.scalar_summary_insufficient_of_not_scalar_factorization distance accuracy hnot
 
 /-! The conditional-noise-floor and Gaussian-floor bounds on the explainable fraction answer
 this question, and they are `explainable_fraction_bound_of_conditional_noise_floor` and
@@ -222,12 +222,12 @@ section Question3
 
 variable {Ω : Type*}
 
-theorem binary_precision_formula_exact (c : ConfusionMatrix) :
-    ConfusionMatrix.precision c =
-      (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c) /
-        (ConfusionMatrix.prevalence c * ConfusionMatrix.recallRate c +
-          (1 - ConfusionMatrix.prevalence c) * ConfusionMatrix.fpr c) :=
-  ConfusionMatrix.precision_eq_prevalence_recall_fpr c
+theorem binary_precision_formula_exact (c : Foundations.ConfusionMatrix) :
+    Foundations.ConfusionMatrix.precision c =
+      (Foundations.ConfusionMatrix.prevalence c * Foundations.ConfusionMatrix.recallRate c) /
+        (Foundations.ConfusionMatrix.prevalence c * Foundations.ConfusionMatrix.recallRate c +
+          (1 - Foundations.ConfusionMatrix.prevalence c) * Foundations.ConfusionMatrix.fpr c) :=
+  Foundations.ConfusionMatrix.precision_eq_prevalence_recall_fpr c
 
 /-- **Precision-recall divergence is consistent.**
     There exist parameter configurations with fixed prevalence and fixed target
@@ -265,10 +265,10 @@ theorem precision_recall_divergence_exists :
   · rfl
   constructor
   · simpa using
-      (ConfusionMatrix.constant_precision_of_fpr_choice
+      (Foundations.ConfusionMatrix.constant_precision_of_fpr_choice
         (π := 1 / 2) (p := 1 / 2) (r := 1 / 4) (by norm_num) (by norm_num) (by norm_num))
   · simpa using
-      (ConfusionMatrix.constant_precision_of_fpr_choice
+      (Foundations.ConfusionMatrix.constant_precision_of_fpr_choice
         (π := 1 / 2) (p := 1 / 2) (r := 1 / 3) (by norm_num) (by norm_num) (by norm_num))
 
 end Question3

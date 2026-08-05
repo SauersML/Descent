@@ -6,7 +6,7 @@ import Mathlib.Data.Real.Sqrt
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Conditionals
 
 /-!
 # Local-to-global coherence: bounded-radius audits cannot certify a single population
@@ -145,8 +145,8 @@ The Gaussian tail is bounded here by Chebyshev's inequality. The resulting
 `Phi (-10) ≤ 1/100` bound is intentionally coarse, but is already far below
 the graph-theoretic agreement floor. -/
 theorem prescribedAgreement_lt_expanderAgreementFloor :
-    2 * Phi (-10) < expanderAgreementFloor := by
-  have hPhi : Phi (-10) ≤ (1 / 100 : ℝ) := by
+    2 * Foundations.Phi (-10) < expanderAgreementFloor := by
+  have hPhi : Foundations.Phi (-10) ≤ (1 / 100 : ℝ) := by
     let μ := ProbabilityTheory.gaussianReal 0 1
     have hsubset : Set.Iic (-10 : ℝ) ⊆
         {x : ℝ | 10 ≤ |id x - ∫ y, id y ∂μ|} := by
@@ -170,8 +170,8 @@ theorem prescribedAgreement_lt_expanderAgreementFloor :
           all_goals
             norm_num [μ, ProbabilityTheory.integral_id_gaussianReal,
               ProbabilityTheory.variance_id_gaussianReal]
-    have hof : ENNReal.ofReal (Phi (-10)) ≤ ENNReal.ofReal (1 / 100 : ℝ) := by
-      rw [Phi, ProbabilityTheory.ofReal_cdf]
+    have hof : ENNReal.ofReal (Foundations.Phi (-10)) ≤ ENNReal.ofReal (1 / 100 : ℝ) := by
+      rw [Foundations.Phi, ProbabilityTheory.ofReal_cdf]
       exact hmeasure
     exact (ENNReal.ofReal_le_ofReal_iff (by norm_num)).mp hof
   linarith [expanderAgreementFloor_gt]
@@ -329,4 +329,4 @@ theorem summary_statistic_coherence_not_locally_certifiable
   no_bounded_locality_criterion audit onePopulationRealizable coherentSet incoherentSet
     hidenticalAudits hcoherent hincoherent
 
-end Descent
+end Descent.Conditionals

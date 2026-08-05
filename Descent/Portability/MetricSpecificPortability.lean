@@ -719,11 +719,11 @@ theorem deployment_meets_both_budgets
   · rintro ⟨hfisher, hrel⟩
     exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
         h_nEff h_target).1 hfisher,
-      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).1 hrel⟩
+      (Spectral.RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).1 hrel⟩
   · rintro ⟨hsample, hpanels⟩
     exact ⟨(fisherTraceMSELowerBound_le_target_iff nEff nParams infoPerSample targetTraceMSE
         h_nEff h_target).2 hsample,
-      (RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).2 hpanels⟩
+      (Spectral.RecoveryAttenuation.panels_suffice_iff p c tau B hp hc htau1 hB).2 hpanels⟩
 
 /-- **The panel budget is unbounded in the reliability target; the Fisher budget is not.**
 
@@ -2667,7 +2667,7 @@ this file's own `metricPPV` facts. -/
 plus the prevalence, which is outcome-side and which the collapse does not contain. -/
 structure ScreeningDeployment where
   /-- The readout-side coordinates: correlation drop and variance ratio. -/
-  readout : LevelSetCoordinates
+  readout : Spectral.LevelSetCoordinates
   /-- Outcome-side base rate. Deliberately **not** part of `readout`. -/
   prevalence : ℝ
 
@@ -2683,17 +2683,17 @@ through and the prevalence is what they do not.
     Empirical status: NOT AN EMPIRICAL CLAIM -- a pair of deployment records. The
     claim with content is that real source and target deployments differ this
     way, which this does not assert. -/
-def ScreeningDeployment.atPrevalence (readout : LevelSetCoordinates)
+def ScreeningDeployment.atPrevalence (readout : Spectral.LevelSetCoordinates)
     (prevalence : ℝ) : ScreeningDeployment where
   readout := readout
   prevalence := prevalence
 
 instance ScreeningDeployment.instNonempty : Nonempty ScreeningDeployment :=
-  ⟨ScreeningDeployment.atPrevalence LevelSetCoordinates.undegraded 0⟩
+  ⟨ScreeningDeployment.atPrevalence Spectral.LevelSetCoordinates.undegraded 0⟩
 
 /-- The constructed pair does share its readout, so the shared-readout hypothesis
 of the split result is discharged rather than assumed for this family. -/
-theorem ScreeningDeployment.atPrevalence_readout_eq (readout : LevelSetCoordinates)
+theorem ScreeningDeployment.atPrevalence_readout_eq (readout : Spectral.LevelSetCoordinates)
     (prevalence prevalence' : ℝ) :
     (ScreeningDeployment.atPrevalence readout prevalence).readout =
       (ScreeningDeployment.atPrevalence readout prevalence').readout := rfl
@@ -2738,8 +2738,8 @@ invisible to both coordinates. A monotone recalibration moves a proper scoring r
 leaving every quantity in this theorem's conclusion fixed. -/
 theorem metric_split_is_prevalence_not_metric_choice
     (sens spec : ScreeningDeployment → ℝ)
-    (hsens : IsLevelSetFunctional sens ScreeningDeployment.readout)
-    (hspec : IsLevelSetFunctional spec ScreeningDeployment.readout)
+    (hsens : Spectral.IsLevelSetFunctional sens ScreeningDeployment.readout)
+    (hspec : Spectral.IsLevelSetFunctional spec ScreeningDeployment.readout)
     (d₁ d₂ : ScreeningDeployment)
     (hreadout : d₁.readout = d₂.readout) :
     sens d₁ = sens d₂ ∧
@@ -2754,9 +2754,9 @@ theorem metric_split_is_prevalence_not_metric_choice
         metricPPV (sens d₂) (spec d₂) d₂.prevalence) := by
   -- The two agreements are the collapse, instantiated at this deployment type.
   have hs : sens d₁ = sens d₂ :=
-    levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout sens hsens d₁ d₂ hreadout
+    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout sens hsens d₁ d₂ hreadout
   have hp : spec d₁ = spec d₂ :=
-    levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout spec hspec d₁ d₂ hreadout
+    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout spec hspec d₁ d₂ hreadout
   refine ⟨hs, hp, ?_, ?_⟩
   · intro hK
     rw [hs, hp, hK]
@@ -2777,9 +2777,9 @@ discrimination metrics, and it is false for proper scoring rules, which carry a
 reliability term neither readout coordinate sees. -/
 theorem ScreeningDeployment.metric_split_atPrevalence
     (sens spec : ScreeningDeployment → ℝ)
-    (hsens : IsLevelSetFunctional sens ScreeningDeployment.readout)
-    (hspec : IsLevelSetFunctional spec ScreeningDeployment.readout)
-    (readout : LevelSetCoordinates) (prevalence prevalence' : ℝ) :
+    (hsens : Spectral.IsLevelSetFunctional sens ScreeningDeployment.readout)
+    (hspec : Spectral.IsLevelSetFunctional spec ScreeningDeployment.readout)
+    (readout : Spectral.LevelSetCoordinates) (prevalence prevalence' : ℝ) :
     sens (ScreeningDeployment.atPrevalence readout prevalence) =
         sens (ScreeningDeployment.atPrevalence readout prevalence') ∧
       spec (ScreeningDeployment.atPrevalence readout prevalence) =
@@ -3143,7 +3143,7 @@ theorem ldPruningDetectionDeficit_le_half_retention {decay kappa : ℝ}
       (by linarith [Real.sin_le_one (Real.pi * kappa)] :
         (0:ℝ) ≤ 1 - Real.sin (Real.pi * kappa))]
   unfold ldPruningDetectionDeficit
-  exact captureRatio_le_of_le hnum hden
+  exact Spectral.captureRatio_le_of_le hnum hden
 
 /-- At half retention the deficit is exactly `2ρ / (π(1 + ρ²))`, so the bound of
 `ldPruningDetectionDeficit_le_half_retention` is attained and the frontier is
@@ -3591,17 +3591,17 @@ theorem clumping_minimizes_detection_on_ld_kernel
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (angle : ι → ℝ) (decay cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
     (hd0 : 0 ≤ decay) (hdabs : |decay| < 1)
-    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hM : Spectral.IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
-    detectionEfficiency
+    Spectral.detectionEfficiency
         (fun i ↦ ldKernelSymbol decay (angle i))
-        (pruneAllocation S) ≤
-      detectionEfficiency
+        (Spectral.pruneAllocation S) ≤
+      Spectral.detectionEfficiency
         (fun i ↦ ldKernelSymbol decay (angle i)) M := by
   have habs : |decay| < 1 := hdabs
   have hp0 : 0 ≤ decay := hd0
-  refine topVariance_minimizes_detection
+  refine Spectral.topVariance_minimizes_detection
     (fun i ↦ ldKernelSymbol decay (angle i)) M S
     (ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) (ldKernelSymbol_pos habs)
@@ -3620,17 +3620,17 @@ theorem clumping_maximizes_reconstruction_on_ld_kernel
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (angle : ι → ℝ) (decay cutAngle : ℝ) (S : Finset ι) (M : ι → ℝ)
     (hd0 : 0 ≤ decay) (hdabs : |decay| < 1)
-    (hM : IsRankAllocation (S.card : ℝ) M)
+    (hM : Spectral.IsRankAllocation (S.card : ℝ) M)
     (hin : ∀ i ∈ S, Real.cos cutAngle ≤ Real.cos (angle i))
     (hout : ∀ i ∉ S, Real.cos (angle i) ≤ Real.cos cutAngle) :
-    reconstructionEfficiency
+    Spectral.reconstructionEfficiency
         (fun i ↦ ldKernelSymbol decay (angle i)) M ≤
-      reconstructionEfficiency
+      Spectral.reconstructionEfficiency
         (fun i ↦ ldKernelSymbol decay (angle i))
-        (pruneAllocation S) := by
+        (Spectral.pruneAllocation S) := by
   have habs : |decay| < 1 := hdabs
   have hp0 : 0 ≤ decay := hd0
-  refine topVariance_maximizes_reconstruction
+  refine Spectral.topVariance_maximizes_reconstruction
     (fun i ↦ ldKernelSymbol decay (angle i)) M S
     (ldKernelSymbol decay cutAngle)
     (fun i ↦ ldKernelSymbol_pos habs) hM ?_ ?_
@@ -3929,8 +3929,8 @@ order when the deployment task changes bands.
 nonzero shift the low-band and high-band tasks rank the same two population shifts in
 opposite orders. -/
 theorem not_hasTaskIndependentSpectralPortabilityScalar (a : ℝ) (ha : a ≠ 0) :
-    ¬ HasTaskIndependentSpectralPortabilityScalar a := by
-  unfold HasTaskIndependentSpectralPortabilityScalar
-  exact twoBand_no_common_monotone_scalar a ha
+    ¬ Spectral.HasTaskIndependentSpectralPortabilityScalar a := by
+  unfold Spectral.HasTaskIndependentSpectralPortabilityScalar
+  exact Spectral.twoBand_no_common_monotone_scalar a ha
 
 end Descent

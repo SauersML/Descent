@@ -30,7 +30,7 @@ developments and are deliberately absent rather than represented by theorem
 parameters.
 -/
 
-namespace Descent
+namespace Descent.Conditionals
 
 open scoped BigOperators
 
@@ -457,9 +457,9 @@ theorem twoStateContrast_at_reference_point :
 same persistence eigenvalue used by the reversible Markov spectral kernel. -/
 theorem symmetricTwoStateKernel_contrast (switch : ℝ) (i : Fin 2) :
     ∑ j, symmetricTwoStateKernel switch i j * twoStateContrast j =
-      twoStatePersistence switch switch * twoStateContrast i := by
+      Spectral.twoStatePersistence switch switch * twoStateContrast i := by
   fin_cases i <;>
-    norm_num [symmetricTwoStateKernel, twoStateContrast, twoStatePersistence,
+    norm_num [symmetricTwoStateKernel, twoStateContrast, Spectral.twoStatePersistence,
       Fin.sum_univ_two] <;>
     ring
 
@@ -505,11 +505,11 @@ noncomputable def twoStateCurve (baseline amplitude : ℝ) (i : Fin 2) : ℝ :=
     alone. -/
 theorem applyKernel_twoStateCurve (switch baseline amplitude : ℝ) :
     applyKernel (symmetricTwoStateKernel switch) (twoStateCurve baseline amplitude) =
-      twoStateCurve baseline (twoStatePersistence switch switch * amplitude) := by
+      twoStateCurve baseline (Spectral.twoStatePersistence switch switch * amplitude) := by
   funext i
   simp only [applyKernel, twoStateCurve]
   fin_cases i <;>
-    simp only [symmetricTwoStateKernel, twoStateContrast, twoStatePersistence,
+    simp only [symmetricTwoStateKernel, twoStateContrast, Spectral.twoStatePersistence,
       Fin.sum_univ_two] <;>
     norm_num <;>
     ring
@@ -528,7 +528,7 @@ theorem applyKernel_twoStateCurve (switch baseline amplitude : ℝ) :
 theorem applyKernelIter_twoStateCurve (switch baseline amplitude : ℝ) (n : ℕ) :
     applyKernelIter (symmetricTwoStateKernel switch) n
         (twoStateCurve baseline amplitude) =
-      twoStateCurve baseline (twoStatePersistence switch switch ^ n * amplitude) := by
+      twoStateCurve baseline (Spectral.twoStatePersistence switch switch ^ n * amplitude) := by
   induction n with
   | zero => simp [applyKernelIter]
   | succ n ih =>
@@ -750,4 +750,4 @@ theorem probit_scale_linearization (lam a da : ℝ) (ha : a ≠ 0)
   field_simp
   ring
 
-end Descent
+end Descent.Conditionals

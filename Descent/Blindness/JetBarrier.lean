@@ -162,7 +162,7 @@ def LatticeDatum.Describes : LatticeDatum → MeasureTheory.Measure ℝ → Prop
 
 /-- The law of the increment `log g²` for a standard Gaussian `g`. -/
 noncomputable def logSqGaussianLaw : MeasureTheory.Measure ℝ :=
-  stdGaussianMeasure.map (fun x ↦ Real.log (x ^ 2))
+  Foundations.stdGaussianMeasure.map (fun x ↦ Real.log (x ^ 2))
 
 /-- The pushforward map sends `0` to Mathlib's junk `Real.log 0 = 0`.  The law is unaffected:
 the standard Gaussian gives `{0}` measure zero, so the junk point carries no mass and no
@@ -209,11 +209,11 @@ theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
   have hpreimageCountable : (logSquare ⁻¹' progression).Countable :=
     ((Set.countable_singleton 0).union (Set.countable_range positiveRoot) |>.union
       (Set.countable_range fun k ↦ -positiveRoot k)).mono hpreimage
-  letI : MeasureTheory.NoAtoms stdGaussianMeasure := by
-    unfold stdGaussianMeasure
+  letI : MeasureTheory.NoAtoms Foundations.stdGaussianMeasure := by
+    unfold Foundations.stdGaussianMeasure
     exact ProbabilityTheory.noAtoms_gaussianReal (by norm_num)
-  have hpreimageZero : stdGaussianMeasure (logSquare ⁻¹' progression) = 0 :=
-    hpreimageCountable.measure_zero stdGaussianMeasure
+  have hpreimageZero : Foundations.stdGaussianMeasure (logSquare ⁻¹' progression) = 0 :=
+    hpreimageCountable.measure_zero Foundations.stdGaussianMeasure
   have hprogressionZero : logSqGaussianLaw progression = 0 := by
     unfold logSqGaussianLaw
     rw [MeasureTheory.Measure.map_apply (by fun_prop) hprogressionMeasurable]
@@ -238,7 +238,7 @@ theorem logSqGaussian_nonlattice : IsNonlatticeLaw logSqGaussianLaw := by
     have huniv : logSqGaussianLaw Set.univ = 1 := by
       unfold logSqGaussianLaw
       rw [MeasureTheory.Measure.map_apply (by fun_prop) MeasurableSet.univ]
-      simp [stdGaussianMeasure]
+      simp [Foundations.stdGaussianMeasure]
     rw [MeasureTheory.measure_compl hprogressionMeasurable hfinite, huniv,
       hprogressionZero]
     simp

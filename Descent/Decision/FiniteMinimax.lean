@@ -36,7 +36,7 @@ biological nonidentifiability witnesses.
 - `finite_minimax_duality`: equality of primal minimax and least-favourable-prior values.
 -/
 
-namespace Descent.FiniteMinimax
+namespace Descent.Decision.FiniteMinimax
 
 open scoped BigOperators
 open Descent.CertificateGrading
@@ -1360,4 +1360,4 @@ theorem ungraded_certificate_calculus_complete :
 
 end Problem
 
-end Descent.FiniteMinimax
+end Descent.Decision.FiniteMinimax

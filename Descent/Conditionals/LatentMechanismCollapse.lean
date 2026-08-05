@@ -6,7 +6,7 @@ import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
 
-namespace Descent
+namespace Descent.Conditionals
 
 /-!
 # Latent-mechanism collapse: "how many mechanisms?" is not a question about the data
@@ -606,4 +606,4 @@ theorem boundary_factorization_dim_one_unique_iff
     push_neg at h
     exact ⟨le_antisymm h1 h.1, le_antisymm h.2 h2⟩
 
-end Descent
+end Descent.Conditionals

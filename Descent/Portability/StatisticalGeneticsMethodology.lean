@@ -691,15 +691,15 @@ theorem window_audit_cannot_certify_coherence
     (hcoherent : onePopulationRealizable coherentSet)
     (hincoherent : ¬ onePopulationRealizable incoherentSet)
     (E : Finset ι) (hE : E.Nonempty) (agree tv : ι → ℝ) (β : ℝ)
-    (hβ : β < expanderAgreementFloor)
+    (hβ : β < Conditionals.expanderAgreementFloor)
     (htv : ∀ e ∈ E, agree e - β ≤ tv e)
-    (hagree : expanderAgreementFloor * E.card ≤ ∑ e ∈ E, agree e) :
+    (hagree : Conditionals.expanderAgreementFloor * E.card ≤ ∑ e ∈ E, agree e) :
     (∀ r : ℕ, ¬ ∃ certify : AuditOutput → Prop,
         ∀ S : SummaryStatSet, onePopulationRealizable S ↔ certify (audit r S))
       ∧ 0 < (∑ e ∈ E, tv e) / E.card :=
-  ⟨summary_statistic_coherence_not_locally_certifiable audit onePopulationRealizable
+  ⟨Conditionals.summary_statistic_coherence_not_locally_certifiable audit onePopulationRealizable
       coherentSet incoherentSet hidenticalAudits hcoherent hincoherent,
-    nonbipartite_twin_tv_gap E hE agree tv β hβ htv hagree⟩
+    Conditionals.nonbipartite_twin_tv_gap E hE agree tv β hβ htv hagree⟩
 
 /-- **No hierarchy of window audits certifies coherence either.** The same twin pair is
 identical on the whole radius family, so folding every radius into one verdict by any rule
@@ -717,7 +717,7 @@ theorem window_audit_hierarchy_cannot_certify_coherence
     (hincoherent : ¬ onePopulationRealizable incoherentSet) :
     ¬ ∀ S : SummaryStatSet,
         onePopulationRealizable S ↔ accept (combine (fun r ↦ audit r S)) :=
-  no_bounded_locality_hierarchy audit onePopulationRealizable combine accept
+  Conditionals.no_bounded_locality_hierarchy audit onePopulationRealizable combine accept
     coherentSet incoherentSet hidenticalAudits hcoherent hincoherent
 
 end WindowAuditCeiling

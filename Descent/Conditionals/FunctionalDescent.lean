@@ -5,7 +5,7 @@ import Descent.Foundations.Probability
 import Mathlib.Tactic
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Conditionals
 
 open scoped BigOperators
 
@@ -484,4 +484,4 @@ theorem componentRepresentationResidual_decomposition (localValue mixtureValue :
 
 end Residual
 
-end Descent
+end Descent.Conditionals

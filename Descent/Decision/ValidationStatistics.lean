@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.Probability
 
-namespace Descent
+namespace Descent.Decision
 
 /-!
 # Validation Statistics
@@ -174,4 +174,4 @@ theorem likelihoodRatioStat_lt_iff_of_fixed_alt
 
 end GoodnessOfFit
 
-end Descent
+end Descent.Decision

@@ -776,14 +776,14 @@ deleting `FoldedSpectrum` removes it. -/
 theorem no_threshold_metric_separates_collinear_split {n : ℕ}
     (G : CohortGradients n) (c : ℝ)
     (hcol : ∀ i, G.environmentalGradient i = c * G.geneticGradient i)
-    (coords : GxEDeployment n → LevelSetCoordinates)
+    (coords : GxEDeployment n → Spectral.LevelSetCoordinates)
     (hfactor : ∀ D D' : GxEDeployment n,
       (∀ i, D.shift i = D'.shift i) → coords D = coords D')
     (metric : GxEDeployment n → ℝ)
-    (hmetric : IsLevelSetFunctional metric coords)
+    (hmetric : Spectral.IsLevelSetFunctional metric coords)
     (gamma eta t : ℝ) :
     metric ⟨G, gamma + c * t, eta - t⟩ = metric ⟨G, gamma, eta⟩ := by
-  refine levelSet_metrics_agree_of_coords_eq coords metric hmetric _ _ ?_
+  refine Spectral.levelSet_metrics_agree_of_coords_eq coords metric hmetric _ _ ?_
   refine hfactor _ _ (fun i ↦ ?_)
   exact shift_blind_to_split_of_collinear G c hcol gamma eta t i
 
@@ -831,8 +831,8 @@ theorem normOfReaction_mechanismCount_not_identified {ι : Type*} (a b E : ι �
     (hrange : ∀ i, 2 / 10 ≤ linearNormOfReaction (a i) (b i) (E i) ∧
       linearNormOfReaction (a i) (b i) (E i) ≤ 9 / 10) :
     ∃ w : ι → ℝ, (∀ i, 0 ≤ w i ∧ w i ≤ 1) ∧
-      ∀ i, twoMechanismMixture (w i) = linearNormOfReaction (a i) (b i) (E i) :=
-  mechanismCount_not_identified_of_range _ hrange
+      ∀ i, Conditionals.twoMechanismMixture (w i) = linearNormOfReaction (a i) (b i) (E i) :=
+  Conditionals.mechanismCount_not_identified_of_range _ hrange
 
 /-- **A three-context GxE design with two mechanism counts and zero residual.**
 
@@ -852,13 +852,13 @@ theorem gxe_threeContext_mechanismCount_not_identified
     (h₀ : linearNormOfReaction (a 0) (b 0) (E 0) = 35 / 100)
     (h₁ : linearNormOfReaction (a 1) (b 1) (E 1) = 50 / 100)
     (h₂ : linearNormOfReaction (a 2) (b 2) (E 2) = 70 / 100) :
-    (threeMechanismMixture (7 / 10) (3 / 20) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
-        threeMechanismMixture (2 / 5) (3 / 10) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
-        threeMechanismMixture (1 / 5) (3 / 20) = linearNormOfReaction (a 2) (b 2) (E 2)) ∧
-      (twoMechanismMixture (11 / 14) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
-        twoMechanismMixture (4 / 7) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
-        twoMechanismMixture (2 / 7) = linearNormOfReaction (a 2) (b 2) (E 2)) := by
-  obtain ⟨⟨t₀, t₁, t₂⟩, ⟨s₀, s₁, s₂⟩⟩ := mechanismCount_not_identified
+    (Conditionals.threeMechanismMixture (7 / 10) (3 / 20) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
+        Conditionals.threeMechanismMixture (2 / 5) (3 / 10) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
+        Conditionals.threeMechanismMixture (1 / 5) (3 / 20) = linearNormOfReaction (a 2) (b 2) (E 2)) ∧
+      (Conditionals.twoMechanismMixture (11 / 14) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
+        Conditionals.twoMechanismMixture (4 / 7) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
+        Conditionals.twoMechanismMixture (2 / 7) = linearNormOfReaction (a 2) (b 2) (E 2)) := by
+  obtain ⟨⟨t₀, t₁, t₂⟩, ⟨s₀, s₁, s₂⟩⟩ := Conditionals.mechanismCount_not_identified
   exact ⟨⟨by rw [h₀]; exact t₀, by rw [h₁]; exact t₁, by rw [h₂]; exact t₂⟩,
     ⟨by rw [h₀]; exact s₀, by rw [h₁]; exact s₁, by rw [h₂]; exact s₂⟩⟩
 

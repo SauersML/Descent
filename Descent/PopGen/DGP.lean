@@ -259,7 +259,7 @@ exposed only as approximation centers, together with an explicit Berry-Esseen er
 
 /-- Discrete genotype-based score DGP under locuswise HWE and an external liability/AUC link. -/
 structure HWEPolygenicScoreDGP (m : ℕ) where
-  scoreModel : HWEScoreModel m
+  scoreModel : Foundations.HWEScoreModel m
   berryEsseenConstant : ℝ
   berryEsseenConstant_nonneg : 0 ≤ berryEsseenConstant
 
@@ -268,7 +268,7 @@ true and empty: kernel-checked, clean axiom report, no content.  This is the wit
 makes the theorems below statements about something. -/
 noncomputable def HWEPolygenicScoreDGP.witness (m : ℕ) : HWEPolygenicScoreDGP m where
   scoreModel :=
-    { alleleFreq := fun _ ↦ HardyWeinbergModel.witness
+    { alleleFreq := fun _ ↦ Spectral.HardyWeinbergModel.witness
       effect := fun _ ↦ 0 }
   berryEsseenConstant := 0
   berryEsseenConstant_nonneg := le_refl 0
@@ -1114,13 +1114,13 @@ It is not provable in this file: its content is
 `degradation = sum_b (readout gap)^2 * targetSpectrum`, and nothing in the demographic
 machinery here produces it. -/
 theorem excess_target_risk_pos_of_bandwise_readout_mismatch
-    {Band : Type*} [Fintype Band] (source target : FiniteSpectralModel Band) (b : Band)
-    (hb : FiniteSpectralModel.optimalReadout source b ≠
-      FiniteSpectralModel.optimalReadout target b) :
-    0 < FiniteSpectralModel.degradation source target := by
-  rcases lt_or_eq_of_le (FiniteSpectralModel.degradation_nonneg source target) with hlt | heq
+    {Band : Type*} [Fintype Band] (source target : Spectral.FiniteSpectralModel Band) (b : Band)
+    (hb : Spectral.FiniteSpectralModel.optimalReadout source b ≠
+      Spectral.FiniteSpectralModel.optimalReadout target b) :
+    0 < Spectral.FiniteSpectralModel.degradation source target := by
+  rcases lt_or_eq_of_le (Spectral.FiniteSpectralModel.degradation_nonneg source target) with hlt | heq
   · exact hlt
-  · exact absurd ((FiniteSpectralModel.degradation_eq_zero_iff source target).mp heq.symm b) hb
+  · exact absurd ((Spectral.FiniteSpectralModel.degradation_eq_zero_iff source target).mp heq.symm b) hb
 
 /-- **End-to-end `R²` drop from a single band of readout mismatch.**
 
@@ -1134,30 +1134,30 @@ Deleting `Descent.Spectral.SpectralDegradation` breaks this theorem:
 is its only source of strict positivity, and that in turn is
 `degradation_eq_zero_iff`. -/
 theorem target_r2_drop_of_bandwise_readout_mismatch
-    {Band : Type*} [Fintype Band] (source target : FiniteSpectralModel Band) (b : Band)
+    {Band : Type*} [Fintype Band] (source target : Spectral.FiniteSpectralModel Band) (b : Band)
     (varY : ℝ)
-    (hb : FiniteSpectralModel.optimalReadout source b ≠
-      FiniteSpectralModel.optimalReadout target b)
+    (hb : Spectral.FiniteSpectralModel.optimalReadout source b ≠
+      Spectral.FiniteSpectralModel.optimalReadout target b)
     (h_varY_pos : 0 < varY) :
     r2FromMSE
-        (FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source)) varY <
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source)) varY <
       r2FromMSE
-        (FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target)) varY := by
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target)) varY := by
   have hpos := excess_target_risk_pos_of_bandwise_readout_mismatch source target b hb
-  unfold FiniteSpectralModel.degradation at hpos
+  unfold Spectral.FiniteSpectralModel.degradation at hpos
   have hlt :
-      FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) <
-        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) := by
+      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) <
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) := by
     linarith
   unfold r2FromMSE Descent.Core.proportionalReduction
   have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
   have hdiv :
-      FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) / varY <
-        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) / varY := by
+      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) / varY <
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) / varY := by
     have hmul :
-        FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout target) *
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) *
             (1 / varY) <
-          FiniteSpectralModel.risk target (FiniteSpectralModel.optimalReadout source) *
+          Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) *
             (1 / varY) :=
       mul_lt_mul_of_pos_right hlt h_inv_pos
     simpa [div_eq_mul_inv] using hmul
@@ -1171,9 +1171,9 @@ from simulation studies. For general proofs, use `dgpAdditiveBias` with arbitrar
 /-- General interaction-bias DGP:
     phenotype = P * (1 + β_int * Σ C). -/
 noncomputable def dgpInteractiveBias (k : ℕ) [Fintype (Fin k)] (β_int :
-    ℝ) : DataGeneratingProcess k := {
+    ℝ) : Foundations.DataGeneratingProcess k := {
   trueExpectation := fun p pc ↦ p * (1 + β_int * (∑ l, pc l)),
-  jointMeasure := stdNormalProdMeasure k
+  jointMeasure := Foundations.stdNormalProdMeasure k
 }
 
 /-! ### Generalized DGP and L² Projection Framework
@@ -1188,10 +1188,10 @@ The following definitions support a cleaner, more general proof approach:
 
     The key insight: the raw model (span{1, P}) cannot capture the β_env * C term,
     so the projection leaves a residual of exactly β_env * C. -/
-noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : DataGeneratingProcess k :=
+noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : Foundations.DataGeneratingProcess k :=
   {
   trueExpectation := fun p pc ↦ p + β_env * (∑ l, pc l),
-  jointMeasure := stdNormalProdMeasure k
+  jointMeasure := Foundations.stdNormalProdMeasure k
 }
 
 def hasInteraction {k : ℕ} [Fintype (Fin k)] (f : ℝ → (Fin k → ℝ) → ℝ) : Prop :=
@@ -1241,7 +1241,7 @@ theorem scenarios_are_distinct (k : ℕ) (hk_pos : 0 < k) :
       contradiction
 
 theorem necessity_of_phenotype_data :
-  ∃ (dgp_A dgp_B : DataGeneratingProcess 1),
+  ∃ (dgp_A dgp_B : Foundations.DataGeneratingProcess 1),
     dgp_A.jointMeasure = dgp_B.jointMeasure ∧ hasInteraction dgp_A.trueExpectation ∧
       ¬ hasInteraction dgp_B.trueExpectation := by
   use dgpInteractiveBias 1 0.1, dgpAdditiveBias 1 (-0.8)
@@ -1591,7 +1591,7 @@ noncomputable def prevalenceDGP_trueExpectation {k : ℕ} (pdgp : PrevalenceDGP 
 
 /-- Convert a PrevalenceDGP to a standard DataGeneratingProcess. -/
 noncomputable def PrevalenceDGP.toDGP {k : ℕ} (pdgp : PrevalenceDGP
-    k) : DataGeneratingProcess k where
+    k) : Foundations.DataGeneratingProcess k where
   trueExpectation := prevalenceDGP_trueExpectation pdgp
   jointMeasure := pdgp.jointMeasure
   is_prob := pdgp.is_prob
@@ -1639,9 +1639,9 @@ theorem normalization_prevalence_bias {k : ℕ} [Fintype (Fin k)]
 theorem normalization_prevalence_mse {k : ℕ} [Fintype (Fin k)]
     (pdgp : PrevalenceDGP k)
     (pi_bar : ℝ) :
-    mseRisk pdgp.toDGP (fun p _ ↦ pi_bar + pdgp.pgs_effect * p) =
+    Foundations.mseRisk pdgp.toDGP (fun p _ ↦ pi_bar + pdgp.pgs_effect * p) =
       ∫ pc, (pdgp.prevalence pc.2 - pi_bar)^2 ∂pdgp.jointMeasure := by
-  unfold mseRisk PrevalenceDGP.toDGP
+  unfold Foundations.mseRisk PrevalenceDGP.toDGP
   simp only
   congr 1; ext pc
   rw [normalization_prevalence_bias pdgp pi_bar pc.1 pc.2]
@@ -1881,13 +1881,13 @@ theorem optimalSlopeFromVariance_neutralUnlinked {k : ℕ} [Fintype (Fin k)]
     using hgenic)]
   simp [GeneticArchitecture.neutralUnlinked]
 
-noncomputable def var {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k)
+noncomputable def var {k : ℕ} [Fintype (Fin k)] (dgp : Foundations.DataGeneratingProcess k)
     (f : ℝ → (Fin k → ℝ) → ℝ) : ℝ :=
   let μ := dgp.jointMeasure
   let m : ℝ := ∫ pc, f pc.1 pc.2 ∂μ
   ∫ pc, (f pc.1 pc.2 - m) ^ 2 ∂μ
 
-noncomputable def rsquared {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k)
+noncomputable def rsquared {k : ℕ} [Fintype (Fin k)] (dgp : Foundations.DataGeneratingProcess k)
     (f g : ℝ → (Fin k → ℝ) → ℝ) : ℝ :=
   let μ := dgp.jointMeasure
   let mf : ℝ := ∫ pc, f pc.1 pc.2 ∂μ
@@ -1969,17 +1969,17 @@ section MomentReadings
 
 /-- Variance of a predictor under a concrete DGP. -/
 noncomputable def signalVariance {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k) : ℝ :=
+    (dgp : Foundations.DataGeneratingProcess k) (signal : Foundations.Predictor k) : ℝ :=
   var dgp signal
 
 /-- Variance of the DGP's conditional-mean outcome. -/
 noncomputable def outcomeMeanVariance {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) : ℝ :=
+    (dgp : Foundations.DataGeneratingProcess k) : ℝ :=
   var dgp dgp.trueExpectation
 
 /-- Covariance of a predictor with the DGP's conditional-mean outcome. -/
 noncomputable def signalOutcomeCovariance {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k) : ℝ :=
+    (dgp : Foundations.DataGeneratingProcess k) (signal : Foundations.Predictor k) : ℝ :=
   measureCovariance dgp.jointMeasure
     (fun pc ↦ signal pc.1 pc.2) (fun pc ↦ dgp.trueExpectation pc.1 pc.2)
 
@@ -1998,7 +1998,7 @@ so it is `0` too — division by zero in Lean is `0`, and here that convention m
 sides agree rather than papering over a gap. The identity is therefore unconditional, and
 the degenerate case is not an exception to it but an instance of it. -/
 theorem rsquared_eq_process_moments {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k) (signal : Predictor k) :
+    (dgp : Foundations.DataGeneratingProcess k) (signal : Foundations.Predictor k) :
     rsquared dgp signal dgp.trueExpectation =
       signalOutcomeCovariance dgp signal ^ 2 /
         (signalVariance dgp signal * outcomeMeanVariance dgp) := by
@@ -2192,13 +2192,13 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
 
 /-- Irreducible risk in a conditional-mean DGP: exact Bayes risk under the joint law. -/
 noncomputable def irreduciblePredictionRisk {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k) : ℝ :=
+    (cmdgp : Foundations.ConditionalMeanDGP k) : ℝ :=
   ∫ x, (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2 ∂cmdgp.μ
 
 /-- Reference evaluation: a noiseless process, where the outcome equals its conditional mean at
 every point, carries no irreducible risk. -/
 theorem irreduciblePredictionRisk_at_noiseless {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k)
+    (cmdgp : Foundations.ConditionalMeanDGP k)
     (hexact : ∀ x : ℝ × (Fin k → ℝ) × ℝ, x.2.2 = cmdgp.m x.1 x.2.1) :
     irreduciblePredictionRisk cmdgp = 0 := by
   unfold irreduciblePredictionRisk
@@ -2207,14 +2207,14 @@ theorem irreduciblePredictionRisk_at_noiseless {k : ℕ} [Fintype (Fin k)]
 
 /-- Approximation risk of a deployed predictor relative to the exact conditional mean. -/
 noncomputable def conditionalMeanApproximationRisk {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k) : ℝ :=
+    (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k) : ℝ :=
   ∫ x, (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1) ^ 2 ∂cmdgp.μ
 
 /-- Reference evaluation: a predictor equal to the conditional mean has no approximation risk.
 That is the point the definition exists to locate, and it holds pointwise rather than only
 almost everywhere. -/
 theorem conditionalMeanApproximationRisk_at_conditional_mean {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k) :
+    (cmdgp : Foundations.ConditionalMeanDGP k) :
     conditionalMeanApproximationRisk cmdgp cmdgp.m = 0 := by
   unfold conditionalMeanApproximationRisk
   simp
@@ -2222,7 +2222,7 @@ theorem conditionalMeanApproximationRisk_at_conditional_mean {k : ℕ} [Fintype 
 
 theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
     {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
+    (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hResidualSq_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦ (x.2.2 - cmdgp.m x.1 x.2.1) ^ 2) cmdgp.μ)
     (hGapSq_int :
@@ -2231,7 +2231,7 @@ theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanAp
     (hOrth_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (x.2.2 - cmdgp.m x.1 x.2.1) * (cmdgp.m x.1 x.2.1 - pred x.1 x.2.1)) cmdgp.μ) :
-    predictionRiskY cmdgp pred =
+    Foundations.predictionRiskY cmdgp pred =
       irreduciblePredictionRisk cmdgp + conditionalMeanApproximationRisk cmdgp pred := by
   let residual : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x ↦ x.2.2 - cmdgp.m x.1 x.2.1
   let gap : ℝ × (Fin k → ℝ) × ℝ → ℝ := fun x ↦ cmdgp.m x.1 x.2.1 - pred x.1 x.2.1
@@ -2245,7 +2245,7 @@ theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanAp
     funext x
     simp [residual, gap, smul_eq_mul]
     ring
-  unfold predictionRiskY irreduciblePredictionRisk conditionalMeanApproximationRisk
+  unfold Foundations.predictionRiskY irreduciblePredictionRisk conditionalMeanApproximationRisk
   rw [h_expand]
   rw [show ∫ x,
         (((fun x ↦ residual x ^ 2) + (2 : ℝ) • fun x ↦ residual x * gap x) +
@@ -2267,13 +2267,13 @@ theorem ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanAp
 
 theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
     {k : ℕ} [Fintype (Fin k)]
-    (cmdgp : ConditionalMeanDGP k) (pred : Predictor k)
+    (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hGapSq_meas :
       AEStronglyMeasurable
         (fun pc : ℝ × (Fin k → ℝ) ↦ (cmdgp.m pc.1 pc.2 - pred pc.1 pc.2) ^ 2)
         cmdgp.toDGP.jointMeasure) :
-    conditionalMeanApproximationRisk cmdgp pred = mseRisk cmdgp.toDGP pred := by
-  unfold conditionalMeanApproximationRisk mseRisk ConditionalMeanDGP.toDGP
+    conditionalMeanApproximationRisk cmdgp pred = Foundations.mseRisk cmdgp.toDGP pred := by
+  unfold conditionalMeanApproximationRisk Foundations.mseRisk Foundations.ConditionalMeanDGP.toDGP
   simpa using
     (MeasureTheory.integral_map
       (μ := cmdgp.μ)
@@ -2284,7 +2284,7 @@ theorem ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
 theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     {k : ℕ} [Fintype (Fin k)]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (cmdgp : ConditionalMeanDGP k)
+    (cmdgp : Foundations.ConditionalMeanDGP k)
     (X : ℝ × (Fin k → ℝ) → ι → ℝ)
     (wStar w : ι → ℝ)
     (hm_linear : ∀ p c, cmdgp.m p c = dot wStar (X (p, c)))
@@ -2297,7 +2297,7 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
     (hDeltaSq_int :
       Integrable (fun x : ℝ × (Fin k → ℝ) × ℝ ↦
         (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2) cmdgp.μ) :
-    predictionRiskY cmdgp (fun p c ↦ dot w (X (p, c))) =
+    Foundations.predictionRiskY cmdgp (fun p c ↦ dot w (X (p, c))) =
       irreduciblePredictionRisk cmdgp +
         ∫ x, (dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ := by
   have horth :
@@ -2329,7 +2329,7 @@ theorem ConditionalMeanDGP.predictionRiskY_linear_transport_decomposition
       ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) *
         dot (fun i ↦ w i - wStar i) (X (x.1, x.2.1)) ∂cmdgp.μ = 0 := by
     simpa [hm_linear] using horth
-  unfold predictionRiskY
+  unfold Foundations.predictionRiskY
   calc
     ∫ x, (x.2.2 - dot w (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ =
         ∫ x, (x.2.2 - dot wStar (X (x.1, x.2.1))) ^ 2 ∂cmdgp.μ +
@@ -2356,7 +2356,7 @@ improves both R² and discrimination.
 -/
 
 /-- Mean squared error for a predictor. -/
-noncomputable def mse {k : ℕ} [Fintype (Fin k)] (dgp : DataGeneratingProcess k)
+noncomputable def mse {k : ℕ} [Fintype (Fin k)] (dgp : Foundations.DataGeneratingProcess k)
     (pred : ℝ → (Fin k → ℝ) → ℝ) : ℝ :=
   ∫ pc, (dgp.trueExpectation pc.1 pc.2 - pred pc.1 pc.2)^2 ∂dgp.jointMeasure
 
@@ -2392,7 +2392,7 @@ def HeterogeneousEffectDGP.trueExp {k : ℕ} (hdgp : HeterogeneousEffectDGP k) :
 
 /-- Convert to standard DGP. -/
 noncomputable def HeterogeneousEffectDGP.toDGP {k : ℕ} (hdgp : HeterogeneousEffectDGP k) :
-    DataGeneratingProcess k :=
+    Foundations.DataGeneratingProcess k :=
   { trueExpectation := hdgp.trueExp
     jointMeasure := hdgp.jointMeasure
     is_prob := hdgp.is_prob }
@@ -3519,7 +3519,7 @@ the statement "this quotient is the `R²` of the process" was not something the 
 could express, let alone check: the quotient was a definition, and a definition cannot be
 wrong. -/
 theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    {dgp : Foundations.DataGeneratingProcess k} {signal : Foundations.Predictor k}
     (V_signal V_E : ℝ)
     (h_signal : signalVariance dgp signal = V_signal)
     (h_additive : signalOutcomeCovariance dgp signal = V_signal)
@@ -3586,14 +3586,14 @@ theorem r2FromSignalVariance_eq_rsquared {k : ℕ} [Fintype (Fin k)]
     their ratio would separate there. Control: with no separation the counted
     AUC is 1/2. -/
 noncomputable def equalVarianceGaussianAUCFromSignalVariance (vSignal vNoise : ℝ) : ℝ :=
-  if vNoise = 0 then if 0 < vSignal then 1 else Phi 0
-  else Phi (Real.sqrt (vSignal / (2 * vNoise)))
+  if vNoise = 0 then if 0 < vSignal then 1 else Foundations.Phi 0
+  else Foundations.Phi (Real.sqrt (vSignal / (2 * vNoise)))
 
 /-- Away from zero residual variance, the AUC chart is its Gaussian closed form. -/
 theorem equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise
     (vSignal vNoise : ℝ) (h_noise : vNoise ≠ 0) :
     equalVarianceGaussianAUCFromSignalVariance vSignal vNoise =
-      Phi (Real.sqrt (vSignal / (2 * vNoise))) := by
+      Foundations.Phi (Real.sqrt (vSignal / (2 * vNoise))) := by
   simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
 
 /-- Positive signal with no residual noise gives perfect discrimination. -/
@@ -3605,7 +3605,7 @@ theorem equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise
 /-- With no signal, the equal-variance chart gives chance discrimination. -/
 @[simp] theorem equalVarianceGaussianAUCFromSignalVariance_zero_signal
     (vNoise : ℝ) :
-    equalVarianceGaussianAUCFromSignalVariance 0 vNoise = Phi 0 := by
+    equalVarianceGaussianAUCFromSignalVariance 0 vNoise = Foundations.Phi 0 := by
   by_cases h_noise : vNoise = 0
   · simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
   · simp [equalVarianceGaussianAUCFromSignalVariance, h_noise]
@@ -3764,7 +3764,7 @@ separately - `calibratedBrierFromVariances` was already the calibrated Brier eva
 The prevalence `π` is untouched by any of it, which is the honest reading: Brier moves
 with prevalence for reasons that have nothing to do with how well the score predicts. -/
 theorem calibratedBrierFromVariances_eq_rsquared_form {k : ℕ} [Fintype (Fin k)]
-    {dgp : DataGeneratingProcess k} {signal : Predictor k}
+    {dgp : Foundations.DataGeneratingProcess k} {signal : Foundations.Predictor k}
     (V_signal π V_E : ℝ)
     (h_signal : signalVariance dgp signal = V_signal)
     (h_additive : signalOutcomeCovariance dgp signal = V_signal)

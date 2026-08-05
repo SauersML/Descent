@@ -184,7 +184,7 @@ theorem genotypeVarianceHWE_strictMono_left_half
   -- real number rather than about a minor allele.  This theorem is that fact read through
   -- the name the genotype variance carries here.
   unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
-  exact two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
+  exact Foundations.two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
     This theorem now proves the biologically relevant part explicitly:

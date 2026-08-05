@@ -390,20 +390,20 @@ midpoint.
     The `∓a` / `d` parameterisation IS the definition of `a` and `d`, so no
     measurement can agree or disagree with it; what a measurement bears on is a
     quantity computed FROM this contrast, and those carry their own statuses. -/
-def OneLocusArchitecture.genotypicValue (m : OneLocusArchitecture) : DiploidGenotype → ℝ
+def OneLocusArchitecture.genotypicValue (m : OneLocusArchitecture) : Foundations.DiploidGenotype → ℝ
   | .homRef => -m.a
   | .het => m.d
   | .homAlt => m.a
 
 /-- Mean genotypic value under Hardy-Weinberg proportions. -/
 noncomputable def OneLocusArchitecture.meanValue
-    (m : OneLocusArchitecture) (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype, h.genotypeProb g * m.genotypicValue g
+    (m : OneLocusArchitecture) (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * m.genotypicValue g
 
 /-- Covariance of genotypic value with allele dosage under Hardy-Weinberg. -/
 noncomputable def OneLocusArchitecture.valueDosageCovariance
-    (m : OneLocusArchitecture) (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype,
+    (m : OneLocusArchitecture) (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype,
     h.genotypeProb g * (m.genotypicValue g - m.meanValue h) * h.centeredAltAlleleCount g
 
 /-- **Fisher's theorem, one locus: the average effect is the dosage-regression slope.**
@@ -412,16 +412,16 @@ noncomputable def OneLocusArchitecture.valueDosageCovariance
 fixation, the least-squares slope is exactly `α = a + d(1 - 2q)`, which is what makes the
 average effect the observable rather than a definition. -/
 theorem averageEffect_eq_regression_slope
-    (m : OneLocusArchitecture) (h : HardyWeinbergModel) (hq : h.altFreq = m.p) :
+    (m : OneLocusArchitecture) (h : Foundations.HardyWeinbergModel) (hq : h.altFreq = m.p) :
     m.valueDosageCovariance h = h.genotypeVariance * m.averageEffect := by
   have hsum : h.refFreq + h.altFreq = 1 := by
-    unfold HardyWeinbergModel.refFreq; ring
+    unfold Foundations.HardyWeinbergModel.refFreq; ring
   unfold OneLocusArchitecture.valueDosageCovariance OneLocusArchitecture.meanValue
-    HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
+    Foundations.HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
   rw [h.expectedAltAlleleCount_eq, h.genotypeVariance_eq]
-  rw [sum_over_genotypes, sum_over_genotypes]
-  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount,
-    OneLocusArchitecture.genotypicValue, HardyWeinbergModel.refFreq]
+  rw [Foundations.sum_over_genotypes, Foundations.sum_over_genotypes]
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.altAlleleCount,
+    OneLocusArchitecture.genotypicValue, Foundations.HardyWeinbergModel.refFreq]
   rw [← hq]
   ring_nf
 
@@ -510,7 +510,7 @@ that hypothesis buys — precisely the visibility of dominance to a dosage regre
 
 /-- **The third central moment vanishes exactly when dominance is invisible.** -/
 theorem thirdCentralMoment_zero_iff_dominance_invisible
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     hweThirdCentralMoment h = 0 ↔
       ∀ a d d' : ℝ,
         (OneLocusArchitecture.mk a d h.altFreq).averageEffect =

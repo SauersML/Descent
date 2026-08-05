@@ -61,16 +61,16 @@ theorem rankOneCovarianceBump_sampleNormalized
 uncorrelated with the noise changes the covariance by precisely the rank-one
 bump `scale² vvᵀ`. No distributional or asymptotic assumption is used. -/
 theorem covarianceMatrix_addRankOneSignal
-    (E : ExpFunctional Ω)
+    (E : Foundations.ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
     (scale : ℝ) (loading : ι → ℝ)
-    (hfactor : covariance E factor factor = 1)
-    (hleft : ∀ i, covariance E (fun ω ↦ noise ω i) factor = 0)
-    (hright : ∀ i, covariance E factor (fun ω ↦ noise ω i) = 0) :
-    covarianceMatrix E (addRankOneSignal noise factor scale loading) =
-      covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
+    (hfactor : Foundations.covariance E factor factor = 1)
+    (hleft : ∀ i, Foundations.covariance E (fun ω ↦ noise ω i) factor = 0)
+    (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0) :
+    Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) =
+      Foundations.covarianceMatrix E noise + rankOneCovarianceBump scale loading := by
   ext i j
-  simp only [covarianceMatrix, Matrix.of_apply, addRankOneSignal,
+  simp only [Foundations.covarianceMatrix, Matrix.of_apply, addRankOneSignal,
     Matrix.add_apply, rankOneCovarianceBump]
   have hi :
       (fun ω ↦ noise ω i + scale * factor ω * loading i) =
@@ -83,24 +83,24 @@ theorem covarianceMatrix_addRankOneSignal
     funext ω
     ring
   rw [hi, hj]
-  rw [covariance_add_left_exp, covariance_add_right, covariance_add_right]
+  rw [Foundations.covariance_add_left_exp, Foundations.covariance_add_right, Foundations.covariance_add_right]
   have hscaledLeft :
-      covariance E (fun ω ↦ (scale * loading i) * factor ω)
+      Foundations.covariance E (fun ω ↦ (scale * loading i) * factor ω)
           (fun ω ↦ noise ω j) = 0 := by
-    change covariance E ((scale * loading i) • factor) (fun ω ↦ noise ω j) = 0
-    rw [covariance_smul_left_exp, hright j, mul_zero]
+    change Foundations.covariance E ((scale * loading i) • factor) (fun ω ↦ noise ω j) = 0
+    rw [Foundations.covariance_smul_left_exp, hright j, mul_zero]
   have hscaledRight :
-      covariance E (fun ω ↦ noise ω i)
+      Foundations.covariance E (fun ω ↦ noise ω i)
           (fun ω ↦ (scale * loading j) * factor ω) = 0 := by
-    change covariance E (fun ω ↦ noise ω i) ((scale * loading j) • factor) = 0
-    rw [covariance_smul_right, hleft i, mul_zero]
+    change Foundations.covariance E (fun ω ↦ noise ω i) ((scale * loading j) • factor) = 0
+    rw [Foundations.covariance_smul_right, hleft i, mul_zero]
   have hscaledBoth :
-      covariance E (fun ω ↦ (scale * loading i) * factor ω)
+      Foundations.covariance E (fun ω ↦ (scale * loading i) * factor ω)
           (fun ω ↦ (scale * loading j) * factor ω) =
         scale ^ 2 * loading i * loading j := by
-    change covariance E ((scale * loading i) • factor)
+    change Foundations.covariance E ((scale * loading i) • factor)
       ((scale * loading j) • factor) = _
-    rw [covariance_smul_left_exp, covariance_smul_right, hfactor]
+    rw [Foundations.covariance_smul_left_exp, Foundations.covariance_smul_right, hfactor]
     ring
   rw [hscaledLeft, hscaledRight, hscaledBoth]
   ring
@@ -109,16 +109,16 @@ theorem covarianceMatrix_addRankOneSignal
 closed under the corresponding covariance bump. -/
 theorem covariance_imitation_of_rankOne_closed
     (nuisanceClass : Set (Matrix ι ι ℝ))
-    (E : ExpFunctional Ω)
+    (E : Foundations.ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
     (scale : ℝ) (loading : ι → ℝ)
-    (hnoise : covarianceMatrix E noise ∈ nuisanceClass)
+    (hnoise : Foundations.covarianceMatrix E noise ∈ nuisanceClass)
     (hclosed : ∀ A ∈ nuisanceClass,
       A + rankOneCovarianceBump scale loading ∈ nuisanceClass)
-    (hfactor : covariance E factor factor = 1)
-    (hleft : ∀ i, covariance E (fun ω ↦ noise ω i) factor = 0)
-    (hright : ∀ i, covariance E factor (fun ω ↦ noise ω i) = 0) :
-    covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ nuisanceClass := by
+    (hfactor : Foundations.covariance E factor factor = 1)
+    (hleft : ∀ i, Foundations.covariance E (fun ω ↦ noise ω i) factor = 0)
+    (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0) :
+    Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ nuisanceClass := by
   rw [covarianceMatrix_addRankOneSignal E noise factor scale loading
     hfactor hleft hright]
   exact hclosed _ hnoise
@@ -501,8 +501,8 @@ omit [DecidableEq ι] in
 projection of the weights on the signal direction. -/
 theorem quadForm_rankOneCovarianceBump (scale : ℝ) (loading x : ι → ℝ) :
     quadForm (rankOneCovarianceBump scale loading) x =
-      scale ^ 2 * dot loading x ^ 2 := by
-  unfold quadForm gramForm rankOneCovarianceBump dot Descent.Core.innerSum
+      scale ^ 2 * Foundations.dot loading x ^ 2 := by
+  unfold quadForm gramForm rankOneCovarianceBump Foundations.dot Descent.Core.innerSum
   have hrow : ∀ i : ι,
       (∑ j, x i * (scale ^ 2 * loading i * loading j) * x j) =
         (scale ^ 2 * (x i * loading i)) * ∑ j, loading j * x j := by
@@ -522,7 +522,7 @@ of `A w = v`, written without ever forming an inverse — reproduces the signal
 functional. -/
 theorem gramForm_witness {A : Matrix ι ι ℝ} (hA : A.IsSymm)
     {loading witness : ι → ℝ} (hwitness : A.mulVec witness = loading) (x : ι → ℝ) :
-    gramForm A witness x = dot loading x := by
+    gramForm A witness x = Foundations.dot loading x := by
   have hexpand : gramForm A witness x = ∑ j, (A.mulVec witness) j * x j := by
     unfold gramForm
     rw [Finset.sum_comm]
@@ -547,9 +547,9 @@ theorem varianceNonneg_sub_rankOne_iff
     (scale : ℝ) :
     VarianceNonneg (A - rankOneCovarianceBump scale loading) ↔
       scale ^ 2 * quadForm A witness ≤ 1 := by
-  have hproj : ∀ x, dot loading x = gramForm A witness x := fun x ↦
+  have hproj : ∀ x, Foundations.dot loading x = gramForm A witness x := fun x ↦
     (gramForm_witness hA hwitness x).symm
-  have hself : quadForm A witness = dot loading witness :=
+  have hself : quadForm A witness = Foundations.dot loading witness :=
     (gramForm_witness hA hwitness witness).symm ▸ rfl
   constructor
   · intro hclass
@@ -606,21 +606,21 @@ The threshold is in the name because it is not a technicality: above it the
 conclusion is false, and `belowCeiling_add_rankOne_iff` is the equivalence that
 says so. -/
 theorem spiked_genotype_covariance_belowCeiling_of_threshold
-    {Ω : Type*} (E : ExpFunctional Ω)
+    {Ω : Type*} (E : Foundations.ExpFunctional Ω)
     (noise : Ω → ι → ℝ) (factor : Ω → ℝ)
     (scale : ℝ) (loading witness : ι → ℝ) (ceiling : ℝ)
-    (hsymm : (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise).IsSymm)
-    (hgap : VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise))
+    (hsymm : (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise).IsSymm)
+    (hgap : VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise))
     (hwitness :
-      (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise).mulVec witness = loading)
-    (hfactor : covariance E factor factor = 1)
-    (hleft : ∀ i, covariance E (fun ω ↦ noise ω i) factor = 0)
-    (hright : ∀ i, covariance E factor (fun ω ↦ noise ω i) = 0)
+      (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise).mulVec witness = loading)
+    (hfactor : Foundations.covariance E factor factor = 1)
+    (hleft : ∀ i, Foundations.covariance E (fun ω ↦ noise ω i) factor = 0)
+    (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0)
     (hthreshold :
       scale ^ 2 *
-        quadForm (ceiling • (1 : Matrix ι ι ℝ) - covarianceMatrix E noise) witness ≤ 1) :
+        quadForm (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise) witness ≤ 1) :
     BelowCeiling ceiling
-      (covarianceMatrix E (addRankOneSignal noise factor scale loading)) := by
+      (Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading)) := by
   rw [covarianceMatrix_addRankOneSignal E noise factor scale loading hfactor hleft hright]
   exact (belowCeiling_add_rankOne_iff hsymm hgap hwitness scale).mpr hthreshold
 
@@ -1644,10 +1644,10 @@ projection of the weights on the signal direction. -/
 theorem mulVec_add_rankOneCovarianceBump
     (K : Matrix ι ι ℝ) (scale : ℝ) (loading weights : ι → ℝ) :
     (K + rankOneCovarianceBump scale loading).mulVec weights =
-      K.mulVec weights + (scale ^ 2 * dot loading weights) • loading := by
+      K.mulVec weights + (scale ^ 2 * Foundations.dot loading weights) • loading := by
   funext i
   simp only [Matrix.mulVec, dotProduct, Matrix.add_apply, Pi.add_apply,
-    rankOneCovarianceBump, Pi.smul_apply, smul_eq_mul, dot, add_mul,
+    rankOneCovarianceBump, Pi.smul_apply, smul_eq_mul, Foundations.dot, add_mul,
       Descent.Core.innerSum]
   rw [Finset.sum_add_distrib]
   congr 1
@@ -1666,20 +1666,20 @@ moves by a rank-one term, so a deployed polygenic score uncorrelated with the
 signal direction sees no change at all: the two experiments agree exactly on
 everything that score can measure. -/
 theorem secondMoment_imitation_shift
-    {Ω : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    {Ω : Type*} (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ)
     (scale : ℝ) (loading weights : ι → ℝ) :
-    (secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
-      (secondMomentMatrix E X).mulVec weights +
-        (scale ^ 2 * dot loading weights) • loading :=
-  mulVec_add_rankOneCovarianceBump (secondMomentMatrix E X) scale loading weights
+    (Foundations.secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
+      (Foundations.secondMomentMatrix E X).mulVec weights +
+        (scale ^ 2 * Foundations.dot loading weights) • loading :=
+  mulVec_add_rankOneCovarianceBump (Foundations.secondMomentMatrix E X) scale loading weights
 
 omit [DecidableEq ι] in
 theorem secondMoment_imitation_invisible_to_orthogonal_score
-    {Ω : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
+    {Ω : Type*} (E : Foundations.ExpFunctional Ω) (X : Ω → ι → ℝ)
     (scale : ℝ) (loading weights : ι → ℝ)
-    (horth : dot loading weights = 0) :
-    (secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
-      (secondMomentMatrix E X).mulVec weights := by
+    (horth : Foundations.dot loading weights = 0) :
+    (Foundations.secondMomentMatrix E X + rankOneCovarianceBump scale loading).mulVec weights =
+      (Foundations.secondMomentMatrix E X).mulVec weights := by
   rw [secondMoment_imitation_shift, horth]
   simp
 
@@ -1733,11 +1733,11 @@ the problem, not a reduction of it. -/
 theorem rightTransform_addRankOneSignal {rows : Type*}
     (transform : Matrix ι ι ℝ) (noise : Matrix rows ι ℝ) (factor : rows → ℝ)
     (scale : ℝ) (loading : ι → ℝ) :
-    rightTransform transform (addRankOneSignal noise factor scale loading) =
-      addRankOneSignal (rightTransform transform noise) factor scale
+    Spectral.rightTransform transform (addRankOneSignal noise factor scale loading) =
+      addRankOneSignal (Spectral.rightTransform transform noise) factor scale
         (transform.transpose.mulVec loading) := by
   funext r i
-  simp only [rightTransform, addRankOneSignal, Matrix.mulVec, dotProduct]
+  simp only [Spectral.rightTransform, addRankOneSignal, Matrix.mulVec, dotProduct]
   rw [Finset.mul_sum, ← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl (fun j _ ↦ by ring)
 
@@ -1752,12 +1752,12 @@ genetics at all. -/
 theorem dropout_floor_caps_explainable_fraction
     (between quadraticForm : ℝ)
     (hbetween : 0 ≤ between) (hquadratic : 0 < quadraticForm) :
-    explainableFraction between
+    Foundations.explainableFraction between
         (between +
           fairTwoPointVariance (scalarRowResolvent 0 quadraticForm)
             (scalarRowResolvent (Real.sqrt 2) quadraticForm)) < 1 := by
   have hfloor := deadSensor_resolvent_variance_pos quadraticForm hquadratic
-  unfold explainableFraction Descent.Core.ratio
+  unfold Foundations.explainableFraction Descent.Core.ratio
   rw [div_lt_one (by linarith)]
   linarith
 

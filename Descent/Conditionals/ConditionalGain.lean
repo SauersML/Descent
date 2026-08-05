@@ -7,7 +7,7 @@ import Descent.Blindness.BundleRigidity.EntropySplit
 import Descent.Blindness.BundleRigidity.Freshness
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Conditionals
 
 open scoped BigOperators
 
@@ -707,4 +707,4 @@ theorem same_full_support_coverage_different_gain
 
 end FiniteCoupledPhaseLaw
 
-end Descent
+end Descent.Conditionals

@@ -1080,7 +1080,7 @@ theorem calibrationDriftDefectSq_gaugeCrossed :
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- this is a fixed finite recalibration. -/
 noncomputable def gaugeAlignedPredictor (s : Bool) (_x : Unit) : ℝ :=
-  binarySecondAnnotation s
+  Spectral.binarySecondAnnotation s
 
 /-- The stratum-level recalibration for the relabelled field: both strata get one half.
 
@@ -1091,7 +1091,7 @@ noncomputable def gaugeCrossedPredictor (_s : Bool) (x : Unit) : ℝ :=
 /-- The aligned predictor is exactly the indicator of the persistent stratum. -/
 @[simp] theorem gaugeAlignedPredictor_apply (s : Bool) (x : Unit) :
     gaugeAlignedPredictor s x = if s then 1 else 0 := by
-  cases s <;> norm_num [gaugeAlignedPredictor, binarySecondAnnotation]
+  cases s <;> norm_num [gaugeAlignedPredictor, Spectral.binarySecondAnnotation]
 
 /-- The crossed predictor is the pooled one-half report in every stratum. -/
 @[simp] theorem gaugeCrossedPredictor_apply (s : Bool) (x : Unit) :
@@ -1105,7 +1105,7 @@ theorem isStratumCalibrated_gaugeAligned :
   intro x s
   cases s <;>
     norm_num [gaugePosterior, gaugeAlignedConditional, gaugeStratify, gaugeAlignedPredictor,
-      binarySecondAnnotation, Fintype.sum_prod_type]
+      Spectral.binarySecondAnnotation, Fintype.sum_prod_type]
 
 /-- The one-half recalibration is stratum-calibrated for the relabelled field. -/
 theorem isStratumCalibrated_gaugeCrossed :
@@ -1121,7 +1121,7 @@ theorem stratifiedCalibrationEnergy_gaugeAligned_eq_zero :
     stratifiedCalibrationEnergy (fun _ : Unit ↦ (1 : ℝ)) gaugePosterior
       gaugeAlignedConditional gaugeStratify gaugeAlignedPredictor = 0 := by
   norm_num [stratifiedCalibrationEnergy, gaugePosterior, gaugeAlignedConditional, gaugeStratify,
-    gaugeAlignedPredictor, binarySecondAnnotation, Fintype.sum_prod_type]
+    gaugeAlignedPredictor, Spectral.binarySecondAnnotation, Fintype.sum_prod_type]
 
 /-- Stratifying the relabelled field removes none of it. -/
 theorem stratifiedCalibrationEnergy_gaugeCrossed_eq_quarter :

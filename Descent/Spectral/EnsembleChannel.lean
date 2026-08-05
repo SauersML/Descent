@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # The ensemble channel for order-erased target panels
@@ -472,4 +472,4 @@ theorem weightedBandPredictorLoss_le_source
   exact Finset.sum_nonneg fun i _ ↦
     Finset.sum_nonneg fun b _ ↦ mul_nonneg (hweight i b) (sq_nonneg _)
 
-end Descent
+end Descent.Spectral

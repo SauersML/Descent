@@ -455,19 +455,19 @@ and repeated on each symmetry-carrying theorem.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.centeredAltAlleleCount`; the closed form is
 `hweThirdCentralMoment_eq`. -/
-def hweThirdCentralMoment (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 3
+def hweThirdCentralMoment (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 3
 
 /-- **The skewness of dosage.** `E[(g - 2q)³] = 2q(1-q)(1-2q)`: zero exactly at
 the monomorphic points and at frequency one half. -/
-theorem hweThirdCentralMoment_eq (h : HardyWeinbergModel) :
+theorem hweThirdCentralMoment_eq (h : Foundations.HardyWeinbergModel) :
     hweThirdCentralMoment h =
       2 * h.altFreq * (1 - h.altFreq) * (1 - 2 * h.altFreq) := by
   unfold hweThirdCentralMoment
-  rw [sum_over_genotypes]
-  simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-    HardyWeinbergModel.centeredAltAlleleCount, HardyWeinbergModel.expectedAltAlleleCount_eq,
-    altAlleleCount]
+  rw [Foundations.sum_over_genotypes]
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+    Foundations.HardyWeinbergModel.centeredAltAlleleCount, Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq,
+    Foundations.altAlleleCount]
   ring
 
 /-- **Dosage coding is sign-symmetric only at frequency one half.** If the
@@ -477,14 +477,14 @@ frequency the Sign-Erasure Lemma does not apply, overlapping interaction terms
 do not decouple, and the truncated sign couplings that survive are exactly the
 skewness of the dosage. -/
 theorem hwe_symmetricCoding_forces_half
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
-    (coding : SymmetricCoding DiploidGenotype)
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
+    (coding : SymmetricCoding Foundations.DiploidGenotype)
     (hweight : ∀ g, coding.weight g = h.genotypeProb g)
     (hvalue : ∀ g, coding.value g = h.centeredAltAlleleCount g) :
     h.altFreq = 1 / 2 := by
   have hzero : hweThirdCentralMoment h = 0 := by
     unfold hweThirdCentralMoment
-    have hrewrite : ∀ g : DiploidGenotype,
+    have hrewrite : ∀ g : Foundations.DiploidGenotype,
         h.genotypeProb g * h.centeredAltAlleleCount g ^ 3 =
           coding.weight g * coding.value g ^ 3 := by
       intro g; rw [hweight, hvalue]
@@ -516,7 +516,7 @@ with. It was marked `DERIVED`, which is the right family and the wrong term: `DE
 it follows from other RESULTS in the corpus, and a scanner is entitled to ask which ones.
 This follows from nothing; it is the unique value-negating relabelling, and the paragraph
 above is the argument that it is forced. -/
-def genotypeFlip : DiploidGenotype ≃ DiploidGenotype where
+def genotypeFlip : Foundations.DiploidGenotype ≃ Foundations.DiploidGenotype where
   toFun
     | .homRef => .homAlt
     | .het => .het
@@ -529,13 +529,13 @@ def genotypeFlip : DiploidGenotype ≃ DiploidGenotype where
   right_inv g := by cases g <;> rfl
 
 @[simp] theorem genotypeFlip_homRef :
-    genotypeFlip DiploidGenotype.homRef = DiploidGenotype.homAlt := rfl
+    genotypeFlip Foundations.DiploidGenotype.homRef = Foundations.DiploidGenotype.homAlt := rfl
 
 @[simp] theorem genotypeFlip_het :
-    genotypeFlip DiploidGenotype.het = DiploidGenotype.het := rfl
+    genotypeFlip Foundations.DiploidGenotype.het = Foundations.DiploidGenotype.het := rfl
 
 @[simp] theorem genotypeFlip_homAlt :
-    genotypeFlip DiploidGenotype.homAlt = DiploidGenotype.homRef := rfl
+    genotypeFlip Foundations.DiploidGenotype.homAlt = Foundations.DiploidGenotype.homRef := rfl
 
 /-- **The balanced locus really is sign-symmetric: the converse direction.**
 
@@ -548,21 +548,21 @@ holds at `q = 1/2` and nowhere else in the polymorphic range.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.centeredAltAlleleCount` evaluated at `q = 1/2`; no free
 parameter and nothing fitted. -/
-def equalFrequencyGenotypeCoding (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
-    SymmetricCoding DiploidGenotype where
+def equalFrequencyGenotypeCoding (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
+    SymmetricCoding Foundations.DiploidGenotype where
   weight := h.genotypeProb
   value := h.centeredAltAlleleCount
   flip := genotypeFlip
   weight_flip g := by
     cases g <;>
       simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
-          HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq, hhalf] <;>
+          Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq, hhalf] <;>
       norm_num
   value_flip g := by
     cases g <;>
       simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
-          HardyWeinbergModel.centeredAltAlleleCount,
-          HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount, hhalf] <;>
+          Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+          Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount, hhalf] <;>
       norm_num
 
 /-- **The symmetry characterization for hard-called dosage.** A polymorphic
@@ -573,8 +573,8 @@ This is the applicability record for every sign-symmetry result in this file and
 for any future symmetric-law completeness theorem. The current corpus exports no such
 `ChaosSpectroscopy` result. -/
 theorem hwe_symmetricCoding_iff_half
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (∃ coding : SymmetricCoding DiploidGenotype,
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∃ coding : SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.centeredAltAlleleCount g)) ↔ h.altFreq = 1 / 2 := by
   constructor
@@ -597,7 +597,7 @@ Empirical status: DERIVED from `HardyWeinbergModel.centeredAltAlleleCount` and
 `HardyWeinbergModel.genotypeVariance`; it is the standard normalization, with no
 free parameter. -/
 noncomputable def HardyWeinbergModel.standardizedGenotype
-    (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
+    (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
   h.centeredAltAlleleCount g / Real.sqrt h.genotypeVariance
 
 /-- **The symmetry characterization for the standardized coordinate.**
@@ -610,8 +610,8 @@ Stating it in the standardized coordinate matters because that is the coordinate
 the proposed abstract theory would quantify over symmetric unit-variance laws, so this is
 the form in which that hypothesis would be discharged, or (at `q ≠ 1/2`) refuted. -/
 theorem standardizedGenotype_symmetric_iff
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (∃ coding : SymmetricCoding DiploidGenotype,
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (∃ coding : SymmetricCoding Foundations.DiploidGenotype,
         (∀ g, coding.weight g = h.genotypeProb g) ∧
         (∀ g, coding.value g = h.standardizedGenotype g)) ↔ h.altFreq = 1 / 2 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
@@ -624,7 +624,7 @@ theorem standardizedGenotype_symmetric_iff
     intro g
     show Real.sqrt h.genotypeVariance * coding.value g = h.centeredAltAlleleCount g
     rw [hvalue g]
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     field_simp
   · intro hhalf
     refine ⟨(equalFrequencyGenotypeCoding h hhalf).scale (1 / Real.sqrt h.genotypeVariance),
@@ -632,7 +632,7 @@ theorem standardizedGenotype_symmetric_iff
     intro g
     show (1 / Real.sqrt h.genotypeVariance) * h.centeredAltAlleleCount g =
       h.standardizedGenotype g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     ring
 
 /-- **At frequency one half the squared dosage takes only two values.** The
@@ -642,13 +642,13 @@ deterministic variance rescaling that produces the standardized square of
 lies inside every lattice. The one frequency at which dosage coding is
 sign-symmetric is the frequency at which it is maximally lattice. -/
 theorem centeredDosageSquare_two_valued_at_half
-    (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
-    h.centeredAltAlleleCount DiploidGenotype.homRef ^ 2 = 1 ∧
-      h.centeredAltAlleleCount DiploidGenotype.het ^ 2 = 0 ∧
-      h.centeredAltAlleleCount DiploidGenotype.homAlt ^ 2 = 1 := by
+    (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
+    h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧
+      h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧
+      h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1 := by
   refine ⟨?_, ?_, ?_⟩ <;>
-    · simp only [HardyWeinbergModel.centeredAltAlleleCount,
-        HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount, hhalf]
+    · simp only [Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+        Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount, hhalf]
       norm_num
 
 /-- **The dichotomy for hard-called genotypes.** At a polymorphic locus, either
@@ -659,11 +659,11 @@ allele frequency at which a hard-called diploid locus is both sign-symmetric
 and spread out in `log x²`, so the universality stratum that would justify a
 Gaussian surrogate by symmetry alone contains no genotype coding. -/
 theorem hardCall_coding_dichotomy
-    (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
+    (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     (h.altFreq = 1 / 2 ∧
-        h.centeredAltAlleleCount DiploidGenotype.homRef ^ 2 = 1 ∧
-        h.centeredAltAlleleCount DiploidGenotype.het ^ 2 = 0 ∧
-        h.centeredAltAlleleCount DiploidGenotype.homAlt ^ 2 = 1) ∨
+        h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef ^ 2 = 1 ∧
+        h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ 2 = 0 ∧
+        h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt ^ 2 = 1) ∨
       hweThirdCentralMoment h ≠ 0 := by
   by_cases hhalf : h.altFreq = 1 / 2
   · exact Or.inl ⟨hhalf, centeredDosageSquare_two_valued_at_half h hhalf⟩
@@ -763,20 +763,20 @@ no symmetry hypothesis: `E[(g - 2q) / sqrt (2q(1-q))] = 0`.
 
 This is the first of the two coordinate-level inputs the disjoint licence needs,
 and it is the reason that licence is not frequency-gated. -/
-theorem standardizedGenotype_expectation_zero (h : HardyWeinbergModel) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g = 0 := by
-  have hfactor : ∀ g : DiploidGenotype,
+theorem standardizedGenotype_expectation_zero (h : Foundations.HardyWeinbergModel) :
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g = 0 := by
+  have hfactor : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedGenotype g =
         h.genotypeProb g * h.centeredAltAlleleCount g / Real.sqrt h.genotypeVariance := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     ring
-  have hnum : ∑ g : DiploidGenotype,
+  have hnum : ∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredAltAlleleCount g = 0 := by
-    rw [sum_over_genotypes]
-    simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-      HardyWeinbergModel.centeredAltAlleleCount,
-      HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount]
+    rw [Foundations.sum_over_genotypes]
+    simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+      Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+      Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount]
     ring
   simp_rw [hfactor]
   rw [← Finset.sum_div, hnum, zero_div]
@@ -790,20 +790,20 @@ This is the second coordinate-level input of the disjoint licence. Together with
 `standardizedGenotype_expectation_zero` it says the genotype coordinate meets the
 hypotheses of the chaos theory at every frequency in `(0, 1)` — which is why
 Theorem D, unlike everything in §`SignErasure`, is not restricted to `q = 1/2`. -/
-theorem standardizedGenotype_second_moment_one (h : HardyWeinbergModel)
+theorem standardizedGenotype_second_moment_one (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2 = 1 := by
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2 = 1 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
-  have hfactor : ∀ g : DiploidGenotype,
+  have hfactor : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedGenotype g ^ 2 =
         h.genotypeProb g * h.centeredAltAlleleCount g ^ 2 / h.genotypeVariance := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [div_pow, hsq]
     ring
-  have hnum : ∑ g : DiploidGenotype,
+  have hnum : ∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredAltAlleleCount g ^ 2 = h.genotypeVariance := rfl
   simp_rw [hfactor]
   rw [← Finset.sum_div, hnum]
@@ -824,9 +824,9 @@ jet variance it is a rational function of a quantity the corpus already owns:
 states it against `hweGenotypeVariance` itself. It diverges as the allele
 frequency goes to zero, so rare variants have heavy-tailed standardized
 coordinates in the precise sense that the fourth channel is large. -/
-theorem standardizedGenotype_fourth_moment (h : HardyWeinbergModel)
+theorem standardizedGenotype_fourth_moment (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
       1 / h.genotypeVariance := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
@@ -835,19 +835,19 @@ theorem standardizedGenotype_fourth_moment (h : HardyWeinbergModel)
     have hrewrite : Real.sqrt h.genotypeVariance ^ 4 =
         (Real.sqrt h.genotypeVariance ^ 2) ^ 2 := by ring
     rw [hrewrite, hsq]
-  have hfactor : ∀ g : DiploidGenotype,
+  have hfactor : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedGenotype g ^ 4 =
         h.genotypeProb g * h.centeredAltAlleleCount g ^ 4 / h.genotypeVariance ^ 2 := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [div_pow, hquart]
     ring
-  have hnum : ∑ g : DiploidGenotype,
+  have hnum : ∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredAltAlleleCount g ^ 4 = h.genotypeVariance := by
-    rw [h.genotypeVariance_eq, sum_over_genotypes]
-    simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-      HardyWeinbergModel.centeredAltAlleleCount,
-      HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount]
+    rw [h.genotypeVariance_eq, Foundations.sum_over_genotypes]
+    simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+      Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+      Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount]
     ring
   simp_rw [hfactor]
   rw [← Finset.sum_div, hnum, pow_two, ← div_div, div_self (ne_of_gt hvar)]
@@ -859,10 +859,10 @@ This is the variance of the level-two coordinate, which is why it is the one
 square-cumulant that a design can expose: it is a *variance*, and variances are
 what the second floor of the observable tower reads. It diverges as the allele
 frequency goes to zero. -/
-theorem standardizedSquare_second_cumulant (h : HardyWeinbergModel)
+theorem standardizedSquare_second_cumulant (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.genotypeVariance *
-        ((∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1) =
+        ((∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) - 1) =
       1 - h.genotypeVariance := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   rw [standardizedGenotype_fourth_moment h hq0 hq1, mul_sub, mul_one_div,
@@ -896,18 +896,18 @@ Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; the
 centering constant is forced by `standardizedGenotype_second_moment_one`, which
 proves `E[x²] = 1`, so there is no free parameter. -/
 noncomputable def HardyWeinbergModel.centeredSquare
-    (h : HardyWeinbergModel) (g : DiploidGenotype) : ℝ :=
+    (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
   h.standardizedGenotype g ^ 2 - 1
 
 /-- Floor two's coordinate is centered: `E[u] = 0`, because `E[x²] = 1`. -/
-theorem centeredSquare_expectation_zero (h : HardyWeinbergModel)
+theorem centeredSquare_expectation_zero (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g = 0 := by
-  have hterm : ∀ g : DiploidGenotype,
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g = 0 := by
+  have hterm : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredSquare g =
         h.genotypeProb g * h.standardizedGenotype g ^ 2 - h.genotypeProb g := by
     intro g
-    unfold HardyWeinbergModel.centeredSquare
+    unfold Foundations.HardyWeinbergModel.centeredSquare
     ring
   simp_rw [hterm]
   rw [Finset.sum_sub_distrib, standardizedGenotype_second_moment_one h hq0 hq1,
@@ -920,20 +920,20 @@ and the heterozygote sits strictly below zero.
 This is what makes floor two a genuinely new floor: `log u²` is not a sum of
 level-one increments, because `u` is not a product of squares. Contrast
 `uncentered_square_log_additive`. -/
-theorem centeredSquare_negative_at_half (h : HardyWeinbergModel)
+theorem centeredSquare_negative_at_half (h : Foundations.HardyWeinbergModel)
     (hhalf : h.altFreq = 1 / 2) :
-    h.centeredSquare DiploidGenotype.het = -1 := by
+    h.centeredSquare Foundations.DiploidGenotype.het = -1 := by
   have hvar : h.genotypeVariance = 1 / 2 := by
     rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     rw [hhalf]
     norm_num
-  have hcentered : h.centeredAltAlleleCount DiploidGenotype.het = 0 := by
-    unfold HardyWeinbergModel.centeredAltAlleleCount
+  have hcentered : h.centeredAltAlleleCount Foundations.DiploidGenotype.het = 0 := by
+    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq, hhalf]
-    simp only [altAlleleCount]
+    simp only [Foundations.altAlleleCount]
     norm_num
-  unfold HardyWeinbergModel.centeredSquare HardyWeinbergModel.standardizedGenotype
+  unfold Foundations.HardyWeinbergModel.centeredSquare Foundations.HardyWeinbergModel.standardizedGenotype
   rw [hcentered, hvar]
   norm_num
 
@@ -955,19 +955,19 @@ theorem uncentered_square_log_additive (x y : ℝ) (hx : x ≠ 0) (hy : y ≠ 0)
 
 This is the first floor-two datum that floor one does not already fix, and the
 one a panel-level construction should target. -/
-theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
-      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) -
-        3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) +
-        (3 * (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) -
-          ∑ g : DiploidGenotype, h.genotypeProb g) := by
-  have hterm : ∀ g : DiploidGenotype,
+theorem centeredSquare_third_moment_eq (h : Foundations.HardyWeinbergModel) :
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
+      (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) -
+        3 * (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) +
+        (3 * (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2) -
+          ∑ g : Foundations.DiploidGenotype, h.genotypeProb g) := by
+  have hterm : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredSquare g ^ 3 =
         h.genotypeProb g * h.standardizedGenotype g ^ 6 -
           3 * (h.genotypeProb g * h.standardizedGenotype g ^ 4) +
           (3 * (h.genotypeProb g * h.standardizedGenotype g ^ 2) - h.genotypeProb g) := by
     intro g
-    unfold HardyWeinbergModel.centeredSquare
+    unfold Foundations.HardyWeinbergModel.centeredSquare
     ring
   simp_rw [hterm]
   rw [Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_sub_distrib,
@@ -978,13 +978,13 @@ theorem centeredSquare_third_moment_eq (h : HardyWeinbergModel) :
 
 A three-term computation like the fourth, and the input to the sixth standardized
 moment below. -/
-theorem hweCenteredSixthMoment_eq (h : HardyWeinbergModel) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 =
+theorem hweCenteredSixthMoment_eq (h : Foundations.HardyWeinbergModel) :
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 =
       h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
-  rw [h.genotypeVariance_eq, sum_over_genotypes]
-  simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-    HardyWeinbergModel.centeredAltAlleleCount,
-    HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount]
+  rw [h.genotypeVariance_eq, Foundations.sum_over_genotypes]
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+    Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+    Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount]
   ring
 
 /-- **The sixth moment of the standardized genotype is a quadratic in the fourth.**
@@ -998,9 +998,9 @@ the mixture average of a quadratic is not the quadratic of the mixture average,
 and the gap is exactly the across-locus dispersion of `E[x⁴]`. That gap is the
 panel's floor-two datum, and it is what
 `Descent.StandardizedGenotypeMoments.MafSpectrum.fourthMomentDispersion` names. -/
-theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
+theorem standardizedGenotype_sixth_moment (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
       (1 / h.genotypeVariance) ^ 2 + 10 * (1 / h.genotypeVariance) - 20 := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hne : h.genotypeVariance ≠ 0 := ne_of_gt hvar
@@ -1010,21 +1010,21 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
     have hrewrite : Real.sqrt h.genotypeVariance ^ 6 =
         (Real.sqrt h.genotypeVariance ^ 2) ^ 3 := by ring
     rw [hrewrite, hsq]
-  have hfactor : ∀ g : DiploidGenotype,
+  have hfactor : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedGenotype g ^ 6 =
         h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 / h.genotypeVariance ^ 3 := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [div_pow, hsix]
     ring
-  have hsum : ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
+  have hsum : ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6 =
       (h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3) /
         h.genotypeVariance ^ 3 := by
     simp_rw [hfactor]
     rw [← Finset.sum_div, hweCenteredSixthMoment_eq]
   have hinv : (1 / h.genotypeVariance) * h.genotypeVariance = 1 := by
     rw [one_div, inv_mul_cancel₀ hne]
-  have hcancel : (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) *
+  have hcancel : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 6) *
       h.genotypeVariance ^ 3 =
         h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
     rw [hsum, div_mul_cancel₀ _ (pow_ne_zero 3 hne)]
@@ -1045,23 +1045,23 @@ theorem standardizedGenotype_sixth_moment (h : HardyWeinbergModel)
 At `q = 1/2` the standardized coordinate takes `-√2, 0, √2`, so `x²` takes `2, 0, 2` and
 `u = x² - 1` takes `1, -1, 1`. Note `σ₁² = E[x⁴] - 1 = 1` there, so the unnormalized and
 normalized floor-two coordinates coincide at this frequency. -/
-theorem centeredSquare_values_at_half (h : HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
-    h.centeredSquare DiploidGenotype.homRef = 1 ∧
-      h.centeredSquare DiploidGenotype.het = -1 ∧
-      h.centeredSquare DiploidGenotype.homAlt = 1 := by
+theorem centeredSquare_values_at_half (h : Foundations.HardyWeinbergModel) (hhalf : h.altFreq = 1 / 2) :
+    h.centeredSquare Foundations.DiploidGenotype.homRef = 1 ∧
+      h.centeredSquare Foundations.DiploidGenotype.het = -1 ∧
+      h.centeredSquare Foundations.DiploidGenotype.homAlt = 1 := by
   have hvar : h.genotypeVariance = 1 / 2 := by
     rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     rw [hhalf]
     norm_num
   have hsqrt : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt (by rw [hvar]; norm_num)
   refine ⟨?_, centeredSquare_negative_at_half h hhalf, ?_⟩ <;>
-    · unfold HardyWeinbergModel.centeredSquare HardyWeinbergModel.standardizedGenotype
+    · unfold Foundations.HardyWeinbergModel.centeredSquare Foundations.HardyWeinbergModel.standardizedGenotype
       rw [div_pow, hsqrt, hvar]
-      unfold HardyWeinbergModel.centeredAltAlleleCount
+      unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
       rw [h.expectedAltAlleleCount_eq, hhalf]
-      simp only [altAlleleCount]
+      simp only [Foundations.altAlleleCount]
       norm_num
 
 /-- **The floor-two coordinate is Rademacher at the balanced locus, hence symmetric.**
@@ -1081,12 +1081,12 @@ and the `+1` mass is split between two atoms of weight `1/4`. So `SymmetricCodin
 strictly stronger than symmetry of the law, and the coding-level detector used by
 `sign_erasure` cannot settle floor-two questions. The moment detector below is what
 settles them. -/
-theorem centeredSquare_rademacher_at_half (h : HardyWeinbergModel)
+theorem centeredSquare_rademacher_at_half (h : Foundations.HardyWeinbergModel)
     (hhalf : h.altFreq = 1 / 2) :
-    h.genotypeProb DiploidGenotype.homRef + h.genotypeProb DiploidGenotype.homAlt = 1 / 2 ∧
-      h.genotypeProb DiploidGenotype.het = 1 / 2 := by
+    h.genotypeProb Foundations.DiploidGenotype.homRef + h.genotypeProb Foundations.DiploidGenotype.homAlt = 1 / 2 ∧
+      h.genotypeProb Foundations.DiploidGenotype.het = 1 / 2 := by
   constructor <;>
-    · simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq, hhalf]
+    · simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq, hhalf]
       norm_num
 
 /-- **The floor-two odd part in closed form**: `E[u³] = (E[x⁴] + 9)(E[x⁴] - 2)`.
@@ -1098,9 +1098,9 @@ factors.
 The factorization is the content: the floor-two odd part vanishes exactly when
 `E[x⁴] = 2`, which is the kurtosis phase boundary, which is the balanced locus. One
 quantity, three descriptions. -/
-theorem centeredSquare_third_moment_factored (h : HardyWeinbergModel)
+theorem centeredSquare_third_moment_factored (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3 =
       (1 / h.genotypeVariance + 9) * (1 / h.genotypeVariance - 2) := by
   rw [centeredSquare_third_moment_eq h,
     standardizedGenotype_sixth_moment h hq0 hq1,
@@ -1116,9 +1116,9 @@ and grows without bound as the variant gets rarer, since `E[x⁴] = 1/(2q(1-q))`
 
 This is the level-two symmetry verdict, and it matches the level-one one: *both* floors are
 symmetric at `q = 1/2` and at no other polymorphic frequency. -/
-theorem centeredSquare_third_moment_zero_iff_balanced (h : HardyWeinbergModel)
+theorem centeredSquare_third_moment_zero_iff_balanced (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
-    (∑ g : DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3) = 0 ↔
+    (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredSquare g ^ 3) = 0 ↔
       1 / h.genotypeVariance = 2 := by
   rw [centeredSquare_third_moment_factored h hq0 hq1]
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
@@ -1141,20 +1141,20 @@ the three computed orders are instances of, and it needs no case analysis.
 Verified symbolically for `m = 1..5` against the three-point law by
 `validation/empirical/coupling/ladder_moments.py`, which reproduces the corpus's closed
 forms at `m = 1, 2, 3` as its positive control. -/
-theorem standardizedGenotype_even_moment_mul (h : HardyWeinbergModel)
+theorem standardizedGenotype_even_moment_mul (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) :
-    (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
+    (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
         h.genotypeVariance ^ m =
-      ∑ g : DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) := by
+      ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) := by
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hpow : Real.sqrt h.genotypeVariance ^ (2 * m) = h.genotypeVariance ^ m := by
     rw [pow_mul, Real.sq_sqrt hvar.le]
-  have hterm : ∀ g : DiploidGenotype,
+  have hterm : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.standardizedGenotype g ^ (2 * m) =
         h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) /
           h.genotypeVariance ^ m := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [div_pow, hpow]
     ring
   simp_rw [hterm]
@@ -1173,32 +1173,32 @@ lower bound rather than the full asymptotic law — the symbolic check finds
 exactly, so that quantity is a polynomial in `q` taking the value `1` at `q = 0` — but
 the bound is what the divergence needs, and it holds at every `m` by proof rather than
 by inspection of finitely many orders. -/
-theorem standardizedGenotype_even_moment_lower_bound (h : HardyWeinbergModel)
+theorem standardizedGenotype_even_moment_lower_bound (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (m : ℕ) :
     h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) ≤
-      (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
+      (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * m)) *
         h.genotypeVariance ^ m := by
   rw [standardizedGenotype_even_moment_mul h hq0 hq1 m]
-  have hpow_nonneg : ∀ g : DiploidGenotype,
+  have hpow_nonneg : ∀ g : Foundations.DiploidGenotype,
       0 ≤ h.centeredAltAlleleCount g ^ (2 * m) := by
     intro g
     rw [pow_mul]
     exact pow_nonneg (sq_nonneg _) m
-  have hhet : h.genotypeProb DiploidGenotype.het *
-      h.centeredAltAlleleCount DiploidGenotype.het ^ (2 * m) =
+  have hhet : h.genotypeProb Foundations.DiploidGenotype.het *
+      h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ (2 * m) =
         h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) := by
-    have hcentered : h.centeredAltAlleleCount DiploidGenotype.het =
+    have hcentered : h.centeredAltAlleleCount Foundations.DiploidGenotype.het =
         1 - 2 * h.altFreq := by
-      unfold HardyWeinbergModel.centeredAltAlleleCount
+      unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
       rw [h.expectedAltAlleleCount_eq]
-      simp only [altAlleleCount]
+      simp only [Foundations.altAlleleCount]
     rw [hcentered, h.genotypeVariance_eq]
-    simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq]
+    simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq]
     ring
   calc h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m)
-      = h.genotypeProb DiploidGenotype.het *
-          h.centeredAltAlleleCount DiploidGenotype.het ^ (2 * m) := hhet.symm
-    _ ≤ ∑ g : DiploidGenotype,
+      = h.genotypeProb Foundations.DiploidGenotype.het *
+          h.centeredAltAlleleCount Foundations.DiploidGenotype.het ^ (2 * m) := hhet.symm
+    _ ≤ ∑ g : Foundations.DiploidGenotype,
           h.genotypeProb g * h.centeredAltAlleleCount g ^ (2 * m) :=
         Finset.single_le_sum
           (fun g _ ↦ mul_nonneg (h.genotypeProb_nonneg g) (hpow_nonneg g))
@@ -1236,8 +1236,8 @@ coordinate is standardized (`standardizedGenotype_second_moment_one`).
 
 Empirical status: DERIVED from `HardyWeinbergModel.standardizedGenotype`; closed form
 `(1 - 2q)²` at or below frequency one half (`hweSignBias_eq`), with no free parameter. -/
-noncomputable def HardyWeinbergModel.signBias (h : HardyWeinbergModel) : ℝ :=
-  ∑ g : DiploidGenotype,
+noncomputable def HardyWeinbergModel.signBias (h : Foundations.HardyWeinbergModel) : ℝ :=
+  ∑ g : Foundations.DiploidGenotype,
     h.genotypeProb g * (h.standardizedGenotype g * |h.standardizedGenotype g|)
 
 /-- **The sign bias in closed form: `b = (1 - 2q)²`.**
@@ -1252,46 +1252,46 @@ becomes rare.
 
 This is arithmetic about the genotype law and stands on its own; it does not depend on
 any claim about what a design can see. -/
-theorem hweSignBias_eq (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
+theorem hweSignBias_eq (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = (1 - 2 * h.altFreq) ^ 2 := by
   have hq1 : h.altFreq < 1 := by linarith
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
   have hvar : 0 < h.genotypeVariance := by
     rw [h.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     nlinarith [hq0, hcomp]
   have hs : 0 < Real.sqrt h.genotypeVariance := Real.sqrt_pos.mpr hvar
   have hss : Real.sqrt h.genotypeVariance * Real.sqrt h.genotypeVariance =
       h.genotypeVariance := Real.mul_self_sqrt hvar.le
-  have hsigned : ∀ g : DiploidGenotype,
+  have hsigned : ∀ g : Foundations.DiploidGenotype,
       h.genotypeProb g * (h.standardizedGenotype g * |h.standardizedGenotype g|) =
         h.genotypeProb g *
           (h.centeredAltAlleleCount g * |h.centeredAltAlleleCount g|) / h.genotypeVariance := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype
     rw [abs_div, abs_of_pos hs, div_mul_div_comm, hss]
     ring
-  have hcref : h.centeredAltAlleleCount DiploidGenotype.homRef = -(2 * h.altFreq) := by
-    unfold HardyWeinbergModel.centeredAltAlleleCount
+  have hcref : h.centeredAltAlleleCount Foundations.DiploidGenotype.homRef = -(2 * h.altFreq) := by
+    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
-    simp only [altAlleleCount]
+    simp only [Foundations.altAlleleCount]
     ring
-  have hchet : h.centeredAltAlleleCount DiploidGenotype.het = 1 - 2 * h.altFreq := by
-    unfold HardyWeinbergModel.centeredAltAlleleCount
+  have hchet : h.centeredAltAlleleCount Foundations.DiploidGenotype.het = 1 - 2 * h.altFreq := by
+    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
-    simp only [altAlleleCount]
-  have hcalt : h.centeredAltAlleleCount DiploidGenotype.homAlt = 2 - 2 * h.altFreq := by
-    unfold HardyWeinbergModel.centeredAltAlleleCount
+    simp only [Foundations.altAlleleCount]
+  have hcalt : h.centeredAltAlleleCount Foundations.DiploidGenotype.homAlt = 2 - 2 * h.altFreq := by
+    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq]
-    simp only [altAlleleCount]
-  unfold HardyWeinbergModel.signBias
+    simp only [Foundations.altAlleleCount]
+  unfold Foundations.HardyWeinbergModel.signBias
   simp_rw [hsigned]
-  rw [← Finset.sum_div, sum_over_genotypes, hcref, hchet, hcalt,
+  rw [← Finset.sum_div, Foundations.sum_over_genotypes, hcref, hchet, hcalt,
     abs_of_nonpos (by linarith : -(2 * h.altFreq) ≤ 0),
     abs_of_nonneg (by linarith : (0 : ℝ) ≤ 1 - 2 * h.altFreq),
     abs_of_nonneg (by linarith : (0 : ℝ) ≤ 2 - 2 * h.altFreq),
     div_eq_iff (ne_of_gt hvar), h.genotypeVariance_eq]
-  simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq]
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq]
   ring
 
 /-- **The sign bias vanishes exactly at the balanced locus**, where the coding is
@@ -1300,7 +1300,7 @@ independent phenomenon.
 
 This is the whole of what `b` is currently known to do for genotypes. Whether any
 admissible design exposes `b` is open, and no mechanism for it is supplied here. -/
-theorem hweSignBias_zero_iff_balanced (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq)
+theorem hweSignBias_zero_iff_balanced (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq)
     (hhalf : h.altFreq ≤ 1 / 2) : h.signBias = 0 ↔ h.altFreq = 1 / 2 := by
   rw [hweSignBias_eq h hq0 hhalf]
   constructor
@@ -1328,56 +1328,56 @@ collapses to floor one for a single locus. Panels are where it bites, and that i
 -/
 
 /-- The reflected locus, at allele frequency `1 - q`. -/
-def HardyWeinbergModel.reflect (h : HardyWeinbergModel) : HardyWeinbergModel where
+def HardyWeinbergModel.reflect (h : Foundations.HardyWeinbergModel) : Foundations.HardyWeinbergModel where
   altFreq := 1 - h.altFreq
   altFreq_nonneg := by linarith [h.altFreq_le_one]
   altFreq_le_one := by linarith [h.altFreq_nonneg]
 
-@[simp] theorem HardyWeinbergModel.reflect_altFreq (h : HardyWeinbergModel) :
+@[simp] theorem HardyWeinbergModel.reflect_altFreq (h : Foundations.HardyWeinbergModel) :
     h.reflect.altFreq = 1 - h.altFreq := rfl
 
 /-- Reflection swaps the two homozygote probabilities and fixes the heterozygote:
 it is `genotypeFlip` on the probabilities. -/
-theorem reflect_genotypeProb (h : HardyWeinbergModel) (g : DiploidGenotype) :
+theorem reflect_genotypeProb (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.reflect.genotypeProb g = h.genotypeProb (genotypeFlip g) := by
   cases g <;>
     simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
-      HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq,
-      HardyWeinbergModel.reflect_altFreq] <;> ring
+      Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+      Foundations.HardyWeinbergModel.reflect_altFreq] <;> ring
 
 /-- Reflection preserves the genotype variance: `2(1-q)q = 2q(1-q)`. -/
-theorem reflect_genotypeVariance (h : HardyWeinbergModel) :
+theorem reflect_genotypeVariance (h : Foundations.HardyWeinbergModel) :
     h.reflect.genotypeVariance = h.genotypeVariance := by
   rw [h.reflect.genotypeVariance_eq, h.genotypeVariance_eq]
-  unfold HardyWeinbergModel.refFreq
-  rw [HardyWeinbergModel.reflect_altFreq]
+  unfold Foundations.HardyWeinbergModel.refFreq
+  rw [Foundations.HardyWeinbergModel.reflect_altFreq]
   ring
 
 /-- Reflection negates the centered dosage, after the homozygote swap. -/
-theorem reflect_centeredAltAlleleCount (h : HardyWeinbergModel) (g : DiploidGenotype) :
+theorem reflect_centeredAltAlleleCount (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.reflect.centeredAltAlleleCount g = -h.centeredAltAlleleCount (genotypeFlip g) := by
   cases g <;>
     · simp only [genotypeFlip_homRef, genotypeFlip_het, genotypeFlip_homAlt,
-        HardyWeinbergModel.centeredAltAlleleCount,
-        HardyWeinbergModel.expectedAltAlleleCount_eq, altAlleleCount,
-        HardyWeinbergModel.reflect_altFreq]
+        Foundations.HardyWeinbergModel.centeredAltAlleleCount,
+        Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount,
+        Foundations.HardyWeinbergModel.reflect_altFreq]
       ring
 
 /-- **The reflected coordinate is the negative of the original.** This is the
 whole content of the single-locus collapse: `q` and `1-q` give the same law up to
 a sign. -/
-theorem reflect_standardizedGenotype (h : HardyWeinbergModel) (g : DiploidGenotype) :
+theorem reflect_standardizedGenotype (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.reflect.standardizedGenotype g = -h.standardizedGenotype (genotypeFlip g) := by
-  unfold HardyWeinbergModel.standardizedGenotype
+  unfold Foundations.HardyWeinbergModel.standardizedGenotype
   rw [reflect_centeredAltAlleleCount, reflect_genotypeVariance]
   ring
 
 /-- Every moment of the reflected locus is the original's, up to the sign of the
 order. -/
-theorem reflect_moment (h : HardyWeinbergModel) (k : ℕ) :
-    ∑ g : DiploidGenotype, h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ k =
-      (-1) ^ k * ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k := by
-  have hterm : ∀ g : DiploidGenotype,
+theorem reflect_moment (h : Foundations.HardyWeinbergModel) (k : ℕ) :
+    ∑ g : Foundations.DiploidGenotype, h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ k =
+      (-1) ^ k * ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k := by
+  have hterm : ∀ g : Foundations.DiploidGenotype,
       h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ k =
         (-1) ^ k * (h.genotypeProb (genotypeFlip g) *
           h.standardizedGenotype (genotypeFlip g) ^ k) := by
@@ -1393,40 +1393,40 @@ theorem reflect_moment (h : HardyWeinbergModel) (k : ℕ) :
 
 /-- **Even moments are reflection-invariant.** Floor two is built from the law of
 `x²`, which is even data, so it cannot separate `q` from `1-q`. -/
-theorem reflect_even_moment (h : HardyWeinbergModel) (k : ℕ) :
-    ∑ g : DiploidGenotype,
+theorem reflect_even_moment (h : Foundations.HardyWeinbergModel) (k : ℕ) :
+    ∑ g : Foundations.DiploidGenotype,
         h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ (2 * k) =
-      ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) := by
+      ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) := by
   rw [reflect_moment, pow_mul]
   norm_num
 
 /-- Two loci with the same allele frequency have the same moments: everything in
 sight is a function of `q`. -/
-theorem moment_eq_of_altFreq_eq (h h' : HardyWeinbergModel)
+theorem moment_eq_of_altFreq_eq (h h' : Foundations.HardyWeinbergModel)
     (hfreq : h.altFreq = h'.altFreq) (k : ℕ) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k =
-      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ k := by
-  have hprob : ∀ g : DiploidGenotype, h.genotypeProb g = h'.genotypeProb g := by
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ k =
+      ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ k := by
+  have hprob : ∀ g : Foundations.DiploidGenotype, h.genotypeProb g = h'.genotypeProb g := by
     intro g
     cases g <;>
-      simp only [HardyWeinbergModel.genotypeProb, HardyWeinbergModel.refFreq, hfreq]
-  have hstd : ∀ g : DiploidGenotype,
+      simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq, hfreq]
+  have hstd : ∀ g : Foundations.DiploidGenotype,
       h.standardizedGenotype g = h'.standardizedGenotype g := by
     intro g
-    unfold HardyWeinbergModel.standardizedGenotype HardyWeinbergModel.centeredAltAlleleCount
+    unfold Foundations.HardyWeinbergModel.standardizedGenotype Foundations.HardyWeinbergModel.centeredAltAlleleCount
     rw [h.expectedAltAlleleCount_eq, h'.expectedAltAlleleCount_eq,
       h.genotypeVariance_eq, h'.genotypeVariance_eq]
-    unfold HardyWeinbergModel.refFreq
+    unfold Foundations.HardyWeinbergModel.refFreq
     rw [hfreq]
   simp_rw [hprob, hstd]
 
 /-- **The genotype variance determines the frequency pair.** `2q(1-q) = 2q'(1-q')`
 forces `q' = q` or `q' = 1 - q`, which is the algebraic half of the collapse. -/
-theorem genotypeVariance_determines_frequency_pair (h h' : HardyWeinbergModel)
+theorem genotypeVariance_determines_frequency_pair (h h' : Foundations.HardyWeinbergModel)
     (hvar : h.genotypeVariance = h'.genotypeVariance) :
     h'.altFreq = h.altFreq ∨ h'.altFreq = 1 - h.altFreq := by
   rw [h.genotypeVariance_eq, h'.genotypeVariance_eq] at hvar
-  unfold HardyWeinbergModel.refFreq at hvar
+  unfold Foundations.HardyWeinbergModel.refFreq at hvar
   have hfactor : (h'.altFreq - h.altFreq) * (h'.altFreq - (1 - h.altFreq)) = 0 := by
     linarith [hvar]
   rcases mul_eq_zero.mp hfactor with hleft | hright
@@ -1445,14 +1445,14 @@ So the tower is not a refinement of single-locus genotype theory. Where it bites
 is panels, whose effective coordinate law is a *mixture* over allele frequencies,
 and mixtures are not determined by their low-order data. See
 `Descent.PopGen.StandardizedGenotypeMoments`. -/
-theorem singleLocus_tower_collapses (h h' : HardyWeinbergModel)
+theorem singleLocus_tower_collapses (h h' : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1)
     (hq0' : 0 < h'.altFreq) (hq1' : h'.altFreq < 1)
-    (hfourth : (∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
-      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ 4)
+    (hfourth : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) =
+      ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ 4)
     (k : ℕ) :
-    ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) =
-      ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) := by
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k) =
+      ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) := by
   rw [standardizedGenotype_fourth_moment h hq0 hq1,
     standardizedGenotype_fourth_moment h' hq0' hq1'] at hfourth
   have hvar : h.genotypeVariance = h'.genotypeVariance := by
@@ -1462,11 +1462,11 @@ theorem singleLocus_tower_collapses (h h' : HardyWeinbergModel)
   rcases genotypeVariance_determines_frequency_pair h h' hvar with hsame | hrefl
   · exact moment_eq_of_altFreq_eq h h' hsame.symm (2 * k)
   · have hreflected : h.reflect.altFreq = h'.altFreq := hrefl.symm
-    calc ∑ g : DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k)
-        = ∑ g : DiploidGenotype,
+    calc ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ (2 * k)
+        = ∑ g : Foundations.DiploidGenotype,
             h.reflect.genotypeProb g * h.reflect.standardizedGenotype g ^ (2 * k) :=
           (reflect_even_moment h k).symm
-      _ = ∑ g : DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) :=
+      _ = ∑ g : Foundations.DiploidGenotype, h'.genotypeProb g * h'.standardizedGenotype g ^ (2 * k) :=
           moment_eq_of_altFreq_eq h.reflect h' hreflected (2 * k)
 
 /-! ### The design: locus-sets over a Hardy-Weinberg panel -/
@@ -1482,13 +1482,13 @@ disjoint licence needs it, and a design whose tested sets sit inside one LD bloc
 does not have it. -/
 structure GenotypeDesign (n : ℕ) (ι : Type*) where
   /-- The Hardy-Weinberg model of each locus on the panel. -/
-  model : Fin n → HardyWeinbergModel
+  model : Fin n → Foundations.HardyWeinbergModel
   /-- The loci entering tested set `s`; its cardinality is the interaction order. -/
   locusSet : ι → Finset (Fin n)
   /-- The coefficient of the corresponding interaction monomial. -/
   coefficient : ι → ℝ
   /-- The population's joint genotype law over the panel. -/
-  jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ
+  jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ
 
 namespace GenotypeDesign
 
@@ -1526,7 +1526,7 @@ question is whether a given panel satisfies it, and that is a claim about the IN
 point this is, is where the empirical content sits, and it is FALSIFIED as a one-generation
 step. -/
 def InLinkageEquilibrium : Prop :=
-  ∀ x : Fin n → DiploidGenotype,
+  ∀ x : Fin n → Foundations.DiploidGenotype,
     design.jointGenotypeProb x = ∏ i, (design.model i).genotypeProb (x i)
 
 /-- **Projection of a panel onto linkage equilibrium.** The map leaves the
@@ -1585,7 +1585,7 @@ def freeRecombinationStep (d : GenotypeDesign n ι) : GenotypeDesign n ι where
     (`equilibriumDesign_isFixedPoint`), so the name is earned by the dynamic
     rather than stipulated. A design in linkage DISequilibrium is equally easy
     to write and is what the disjoint-licence results are about failing on. -/
-def equilibriumDesign (model : Fin n → HardyWeinbergModel)
+def equilibriumDesign (model : Fin n → Foundations.HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) : GenotypeDesign n ι where
   model := model
   locusSet := locusSet
@@ -1593,7 +1593,7 @@ def equilibriumDesign (model : Fin n → HardyWeinbergModel)
   jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)
 
 omit [Fintype ι] in
-theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → HardyWeinbergModel)
+theorem inLinkageEquilibrium_equilibriumDesign (model : Fin n → Foundations.HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
     (equilibriumDesign model locusSet coefficient).InLinkageEquilibrium :=
   fun _ ↦ rfl
@@ -1607,7 +1607,7 @@ omit [Fintype ι] in
     "One generation" is deliberately absent here: the projection is the LIMIT of
     the recombination dynamic and not a single generation of it, which is
     FALSIFIED at `D' = (1-r) D` -- see `freeRecombinationStep`. -/
-theorem equilibriumDesign_isFixedPoint (model : Fin n → HardyWeinbergModel)
+theorem equilibriumDesign_isFixedPoint (model : Fin n → Foundations.HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) :
     freeRecombinationStep (equilibriumDesign model locusSet coefficient) =
       equilibriumDesign model locusSet coefficient := rfl
@@ -1659,7 +1659,7 @@ carrying it as `Polymorphic` rather than as a pair of inequalities per locus is
 what lets a licence state its frequency requirement once. -/
 theorem polymorphic_standardizedGenotype_second_moment_one
     (h : design.Polymorphic) (i : Fin n) :
-    ∑ g : DiploidGenotype,
+    ∑ g : Foundations.DiploidGenotype,
       (design.model i).genotypeProb g *
         (design.model i).standardizedGenotype g ^ 2 = 1 :=
   standardizedGenotype_second_moment_one (design.model i) (h i).1 (h i).2
@@ -1671,7 +1671,7 @@ inputs of the disjoint licence are not symmetric in what they cost: only the
 variance normalization is frequency-gated. Recording that asymmetry here is what
 keeps `Polymorphic` from being attached to results that do not need it. -/
 theorem standardizedGenotype_expectation_zero_of_design (i : Fin n) :
-    ∑ g : DiploidGenotype,
+    ∑ g : Foundations.DiploidGenotype,
       (design.model i).genotypeProb g *
         (design.model i).standardizedGenotype g = 0 :=
   standardizedGenotype_expectation_zero (design.model i)
@@ -1768,13 +1768,13 @@ def IsTwoPoolInteraction (poolOne poolTwo : Finset (Fin n)) : Prop :=
     bookkeeping rather than content.
 
     Empirical status: UNTESTED. -/
-def twoPoolDesign (model : Fin 2 → HardyWeinbergModel) : GenotypeDesign 2 Unit where
+def twoPoolDesign (model : Fin 2 → Foundations.HardyWeinbergModel) : GenotypeDesign 2 Unit where
   model := model
   locusSet := fun _ ↦ {0, 1}
   coefficient := fun _ ↦ 1
   jointGenotypeProb := fun x ↦ ∏ i, (model i).genotypeProb (x i)
 
-theorem isTwoPoolInteraction_twoPoolDesign (model : Fin 2 → HardyWeinbergModel) :
+theorem isTwoPoolInteraction_twoPoolDesign (model : Fin 2 → Foundations.HardyWeinbergModel) :
     (twoPoolDesign model).IsTwoPoolInteraction {0} {1} := by
   refine ⟨by decide, ⟨0, Finset.mem_singleton_self 0⟩, ⟨1, Finset.mem_singleton_self 1⟩,
     fun _ ↦ ⟨0, Finset.mem_singleton_self 0, 1, Finset.mem_singleton_self 1, rfl⟩,
@@ -1947,9 +1947,9 @@ it.
 formal shape of a gene-based burden or kernel scan over non-overlapping genes.
 
 Empirical status: UNTESTED. A study design, not a claim about data; it is the -/
-def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinbergModel)
+def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → Foundations.HardyWeinbergModel)
     (geneOf : Fin n → γ) (coeff : γ → ℝ)
-    (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) : GenotypeDesign n γ where
+    (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ) : GenotypeDesign n γ where
   model := model
   locusSet := fun g ↦ Finset.univ.filter (fun i ↦ geneOf i = g)
   coefficient := coeff
@@ -1959,8 +1959,8 @@ def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → HardyWeinb
 variant has one gene. This is the hypothesis of the licence, discharged for the
 first of the two classes. -/
 theorem geneBurdenDesign_variantDisjoint {γ : Type*} [DecidableEq γ]
-    (model : Fin n → HardyWeinbergModel) (geneOf : Fin n → γ) (coeff : γ → ℝ)
-    (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) :
+    (model : Fin n → Foundations.HardyWeinbergModel) (geneOf : Fin n → γ) (coeff : γ → ℝ)
+    (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ) :
     (geneBurdenDesign model geneOf coeff jointGenotypeProb).VariantDisjoint := by
   intro g g' hne
   rw [Finset.disjoint_left]
@@ -1974,8 +1974,8 @@ theorem geneBurdenDesign_variantDisjoint {γ : Type*} [DecidableEq γ]
 formal shape of a sliding-window interaction or kernel scan.
 
 Empirical status: UNTESTED. A study design, not a claim about data; it is the -/
-def slidingWindowDesign (model : Fin n → HardyWeinbergModel) (width : ℕ)
-    (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ) :
+def slidingWindowDesign (model : Fin n → Foundations.HardyWeinbergModel) (width : ℕ)
+    (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ) :
     GenotypeDesign n (Fin n) where
   model := model
   locusSet := fun k ↦
@@ -1988,8 +1988,8 @@ locus: consecutive windows share the variant at the later start position. The
 licence below therefore does not apply to any sliding-window scan, and by
 Theorem S its achievable nulls are the whole moment body. -/
 theorem slidingWindowDesign_not_variantDisjoint
-    (model : Fin n → HardyWeinbergModel) (width : ℕ)
-    (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → DiploidGenotype) → ℝ)
+    (model : Fin n → Foundations.HardyWeinbergModel) (width : ℕ)
+    (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ)
     (hwidth : 2 ≤ width) (k k' j : Fin n)
     (hstep : (k : ℕ) + 1 = (k' : ℕ)) (hj : (j : ℕ) = (k' : ℕ)) :
     ¬ (slidingWindowDesign model width coeff jointGenotypeProb).VariantDisjoint := by

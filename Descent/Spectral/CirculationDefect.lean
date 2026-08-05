@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # Nonreversible gene flow: the mixing time is not the transfer time
@@ -205,4 +205,4 @@ theorem transferTimeInflation_eq_one_iff (s a : ℝ) (hs : 0 < s) :
     rw [h]
     simp
 
-end Descent
+end Descent.Spectral

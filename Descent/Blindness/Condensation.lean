@@ -345,30 +345,30 @@ and interpolates `0 -> 1`.
 
 /-- Retained variance fraction at window position `w` for a law with jet variance `v`:
 the limit law at the condensation window is `N(0, windowVariance w v)`. -/
-noncomputable def windowVariance (w v : ℝ) : ℝ := Phi (w / Real.sqrt v)
+noncomputable def windowVariance (w v : ℝ) : ℝ := Foundations.Phi (w / Real.sqrt v)
 
 /-- **windowVariance at its junk point, named.** With no spread the standardised coordinate divides
 by zero and is junk-zero, so the window probability collapses to `Phi 0` for EVERY half-width.
 The dependence on the half-width -- the whole content of the quantity -- disappears silently.
 Consumers must exclude the argument that makes the guard vanish. -/
 theorem windowVariance_zero_spread_is_junk (w : ℝ) :
-    windowVariance w 0 = Phi 0 := by
+    windowVariance w 0 = Foundations.Phi 0 := by
   unfold windowVariance
   simp
 
 /-- **A window at the centre carries half the mass.** Monotonicity in the window width is shared
 by every increasing function of `w / sqrt v`; the value at zero is not, and it is what identifies
 the standard normal cdf rather than some other sigmoid. -/
-theorem windowVariance_zero_window (v : ℝ) : windowVariance 0 v = Phi 0 := by
+theorem windowVariance_zero_window (v : ℝ) : windowVariance 0 v = Foundations.Phi 0 := by
   unfold windowVariance
   norm_num
 
-theorem Phi_nonneg (x : ℝ) : 0 ≤ Phi x := by
-  unfold Phi
+theorem Phi_nonneg (x : ℝ) : 0 ≤ Foundations.Phi x := by
+  unfold Foundations.Phi
   exact ProbabilityTheory.cdf_nonneg _ _
 
-theorem Phi_le_one (x : ℝ) : Phi x ≤ 1 := by
-  unfold Phi
+theorem Phi_le_one (x : ℝ) : Foundations.Phi x ≤ 1 := by
+  unfold Foundations.Phi
   exact ProbabilityTheory.cdf_le_one _ _
 
 /-- The retained fraction is a genuine variance fraction. -/
@@ -386,7 +386,7 @@ theorem windowVariance_mono {v : ℝ} (hv : 0 < v) :
   intro a b hab
   have hs : 0 < Real.sqrt v := Real.sqrt_pos.mpr hv
   have : a / Real.sqrt v ≤ b / Real.sqrt v := by gcongr
-  exact Phi_monotone this
+  exact Foundations.Phi_monotone this
 
 /-!
 ## 5. What the condensation theorems say about a polygenic score

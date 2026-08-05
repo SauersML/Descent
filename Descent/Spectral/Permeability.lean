@@ -5,7 +5,7 @@ import Descent.PopGen.DGP
 import Descent.Spectral.EnsembleChannel
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # Permeability of a completed portability experiment
@@ -1484,4 +1484,4 @@ theorem quadraticChannel_visible_away_from_zero {θ : ℝ} (hθ : θ ≠ 0) :
     quadraticChannel θ ≠ quadraticChannel 0 := by
   simp [quadraticChannel, pow_ne_zero _ hθ]
 
-end Descent
+end Descent.Spectral

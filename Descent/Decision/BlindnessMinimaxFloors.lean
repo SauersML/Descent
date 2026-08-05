@@ -54,7 +54,7 @@ time -- previously they existed only as bare equations:
   multiplicity, from the total selected-allele frequency.
 -/
 
-namespace Descent
+namespace Descent.Decision
 
 open Descent.FiniteMinimax
 
@@ -313,4 +313,4 @@ theorem half_le_totalFamilyFraction_minimaxRisk {finalFrequency : ℝ}
   (totalFamilyFraction_blind_to_originMultiplicity hfrequency).half_le_readoutProblem_minimaxRisk
     readout
 
-end Descent
+end Descent.Decision

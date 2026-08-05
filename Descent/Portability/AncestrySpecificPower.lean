@@ -249,11 +249,11 @@ retention. -/
 theorem ld_r2_matches_covariance_response_retention
     (n : ℕ) (p covariance covarianceDerivative η : ℝ) :
     effectiveFisherInformation n p (η ^ 2) *
-        scalarPermeability covariance covarianceDerivative =
+        Spectral.scalarPermeability covariance covarianceDerivative =
       fisherInformation n (genotypeVarianceHWE p) *
-        scalarPermeability covariance (η * covarianceDerivative) := by
+        Spectral.scalarPermeability covariance (η * covarianceDerivative) := by
   unfold effectiveFisherInformation
-  rw [scalarPermeability_derivative_scale]
+  rw [Spectral.scalarPermeability_derivative_scale]
   ring
 
 /-- Information loss from imperfect tagging: effective info ≤ full info. -/

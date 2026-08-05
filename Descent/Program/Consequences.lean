@@ -254,7 +254,7 @@ convention is why the two results can be composed at all. -/
 theorem unrecoverable_component_is_the_divergence
     (β : Bool → ℝ) (p₁ p₂ : ℝ)
     (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) :
-    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • dynamicsContrast ∧
+    β = dynamicsPooledProjector β + dynamicsContrastCoefficient β • Conditionals.dynamicsContrast ∧
       contrastSpikeLevel p₁ p₂ = 4 * neiGst p₁ p₂ :=
   ⟨dynamics_common_contrast_decomposition β,
    contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
@@ -296,14 +296,14 @@ about the demography. -/
 theorem loss_is_not_in_the_weights
     {Ω J : Type*} [Fintype J] [DecidableEq J]
     (sigmaInvP sigmaInvQ : Matrix J J ℝ)
-    (EP EQ : ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
-    (hP : covarianceMatrix EP XP * sigmaInvP = 1)
-    (hQ : covarianceMatrix EQ XQ * sigmaInvQ = 1)
+    (EP EQ : Foundations.ExpFunctional Ω) (XP XQ : Ω → J → ℝ) (β : J → ℝ)
+    (hP : Foundations.covarianceMatrix EP XP * sigmaInvP = 1)
+    (hQ : Foundations.covarianceMatrix EQ XQ * sigmaInvQ = 1)
     (p q : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
     (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hV : p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
-    optimalWeightsFromMoments sigmaInvP EP XP (causalSignal β XP) =
-      optimalWeightsFromMoments sigmaInvQ EQ XQ (causalSignal β XQ) ∧
+    Foundations.optimalWeightsFromMoments sigmaInvP EP XP (Foundations.causalSignal β XP) =
+      Foundations.optimalWeightsFromMoments sigmaInvQ EQ XQ (Foundations.causalSignal β XQ) ∧
     Descent.Core.ScoreMoments.deployedR2 p V_E
       < Descent.Core.ScoreMoments.deployedR2 q V_E :=
   ⟨additive_architecture_weights_agree_across_populations
@@ -388,9 +388,9 @@ other exists. -/
 theorem estimator_null_and_model_ceiling_are_different_anchors
     (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
     (hflow : 0 < p.mu + p.mig) (N M ell_j : ℝ) :
-    ldsrExpectedChi2 N 0 M ell_j 0 = 1 ∧
+    Foundations.ldsrExpectedChi2 N 0 M ell_j 0 = 1 ∧
       Descent.Core.ScoreMoments.deployedR2 p V_E ≤ Descent.Core.share p.V_A V_E :=
-  ⟨ldsrExpectedChi2_null N M ell_j,
+  ⟨Foundations.ldsrExpectedChi2_null N M ell_j,
    Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow⟩
 
 /-! ### The differentiation matrix determines the metric and cannot name the populations -/
@@ -527,14 +527,14 @@ theorem subthreshold_correction_fails_and_zero_ridge_does_not_help
     {n : Type*} [Fintype n] [DecidableEq n]
     (markerAxisVariance ancestryVariance nSample markers spike : ℝ)
     (hsubthreshold : spike ≤ bbpProxyThreshold nSample markers)
-    (A : Matrix n n ℝ) (x : n → ℝ) (hnull : infoQuadraticForm A x = 0) :
+    (A : Matrix n n ℝ) (x : n → ℝ) (hnull : Spectral.infoQuadraticForm A x = 0) :
     modeledPCResidualSusceptibility markerAxisVariance ancestryVariance
         nSample markers spike
       = ancestryGradientSusceptibility markerAxisVariance ancestryVariance ∧
-    infoQuadraticForm (ridgedInfoMatrix A 0) x = 0 :=
+    Spectral.infoQuadraticForm (Spectral.ridgedInfoMatrix A 0) x = 0 :=
   ⟨modeledPCResidualSusceptibility_eq_uncorrected_of_subthreshold
       markerAxisVariance ancestryVariance nSample markers spike hsubthreshold,
-   ridged_infoQuadraticForm_zero_ridge_degenerate A x hnull⟩
+   Spectral.ridged_infoQuadraticForm_zero_ridge_degenerate A x hnull⟩
 
 
 /-! ### A design requirement you can compute, and a distance that cannot certify it -/

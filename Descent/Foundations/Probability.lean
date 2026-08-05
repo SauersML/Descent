@@ -19,7 +19,7 @@ open InnerProductSpace
 open MeasureTheory
 open scoped ENNReal
 
-namespace Descent
+namespace Descent.Foundations
 
 /-- Unit interval as a subtype, used for Bernoulli probabilities. -/
 abbrev UnitProb := Set.Icc (0 : ℝ) 1
@@ -250,17 +250,17 @@ def HardyWeinbergModel.refFreq (h : HardyWeinbergModel) : ℝ :=
 below by zero; this is the identity that makes it the complementary frequency. -/
 theorem HardyWeinbergModel.refFreq_add_altFreq (h : HardyWeinbergModel) :
     h.refFreq + h.altFreq = 1 := by
-  unfold HardyWeinbergModel.refFreq
+  unfold Spectral.HardyWeinbergModel.refFreq
   ring
 
 theorem HardyWeinbergModel.refFreq_nonneg (h : HardyWeinbergModel) :
     0 ≤ h.refFreq := by
-  unfold HardyWeinbergModel.refFreq
+  unfold Spectral.HardyWeinbergModel.refFreq
   linarith [h.altFreq_le_one]
 
 theorem HardyWeinbergModel.refFreq_le_one (h : HardyWeinbergModel) :
     h.refFreq ≤ 1 := by
-  unfold HardyWeinbergModel.refFreq
+  unfold Spectral.HardyWeinbergModel.refFreq
   linarith [h.altFreq_nonneg]
 
 /-- Hardy-Weinberg genotype probabilities:
@@ -292,18 +292,18 @@ theorem HardyWeinbergModel.genotypeProb_nonneg
     0 ≤ h.genotypeProb g := by
   cases g with
   | homRef =>
-      simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
+      simp [Spectral.HardyWeinbergModel.genotypeProb, sq_nonneg]
   | het =>
-      simp [HardyWeinbergModel.genotypeProb]
+      simp [Spectral.HardyWeinbergModel.genotypeProb]
       nlinarith [h.refFreq_nonneg, h.altFreq_nonneg]
   | homAlt =>
-      simp [HardyWeinbergModel.genotypeProb, sq_nonneg]
+      simp [Spectral.HardyWeinbergModel.genotypeProb, sq_nonneg]
 
 /-- Hardy-Weinberg genotype probabilities sum to `1`. -/
 theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
     (∑ g : DiploidGenotype, h.genotypeProb g) = 1 := by
   have hsum : h.refFreq + h.altFreq = 1 := by
-    unfold HardyWeinbergModel.refFreq
+    unfold Spectral.HardyWeinbergModel.refFreq
     ring
   have hrewrite :
       (∑ g : DiploidGenotype, h.genotypeProb g) =
@@ -313,7 +313,7 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
       rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
+  simp [DiploidGenotype.equivFin3, Spectral.HardyWeinbergModel.genotypeProb]
   calc
     h.refFreq ^ 2 + 2 * h.refFreq * h.altFreq + h.altFreq ^ 2
         = (h.refFreq + h.altFreq) ^ 2 := by ring
@@ -332,9 +332,9 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
     (h : HardyWeinbergModel) :
     h.expectedAltAlleleCount = 2 * h.altFreq := by
   have hsum : h.refFreq + h.altFreq = 1 := by
-    unfold HardyWeinbergModel.refFreq
+    unfold Spectral.HardyWeinbergModel.refFreq
     ring
-  unfold HardyWeinbergModel.expectedAltAlleleCount
+  unfold Spectral.HardyWeinbergModel.expectedAltAlleleCount
   have hrewrite :
       (∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g) =
         ∑ i : Fin 3, altAlleleCount (DiploidGenotype.equivFin3.symm i) *
@@ -344,7 +344,7 @@ theorem HardyWeinbergModel.expectedAltAlleleCount_eq
       rw [DiploidGenotype.equivFin3_symm_apply_apply])
   rw [hrewrite]
   rw [Fin.sum_univ_three]
-  simp [DiploidGenotype.equivFin3, HardyWeinbergModel.genotypeProb]
+  simp [DiploidGenotype.equivFin3, Spectral.HardyWeinbergModel.genotypeProb]
   calc
     altAlleleCount DiploidGenotype.homRef * h.refFreq ^ 2 +
         altAlleleCount DiploidGenotype.het * (2 * h.refFreq * h.altFreq) +
@@ -382,11 +382,11 @@ theorem HardyWeinbergModel.genotypeVariance_eq
     (h : HardyWeinbergModel) :
     h.genotypeVariance = 2 * h.altFreq * h.refFreq := by
   have hsum : h.refFreq + h.altFreq = 1 := by
-    unfold HardyWeinbergModel.refFreq
+    unfold Spectral.HardyWeinbergModel.refFreq
     ring
-  unfold HardyWeinbergModel.genotypeVariance HardyWeinbergModel.centeredAltAlleleCount
+  unfold Spectral.HardyWeinbergModel.genotypeVariance Spectral.HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq, sum_over_genotypes]
-  simp only [HardyWeinbergModel.genotypeProb, altAlleleCount, HardyWeinbergModel.refFreq]
+  simp only [Spectral.HardyWeinbergModel.genotypeProb, altAlleleCount, Spectral.HardyWeinbergModel.refFreq]
   ring_nf
 
 /-- **A polymorphic locus has positive genotype variance.**
@@ -398,7 +398,7 @@ theorem HardyWeinbergModel.genotypeVariance_pos
     (h : HardyWeinbergModel) (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     0 < h.genotypeVariance := by
   rw [h.genotypeVariance_eq]
-  unfold HardyWeinbergModel.refFreq
+  unfold Spectral.HardyWeinbergModel.refFreq
   have hcomp : (0 : ℝ) < 1 - h.altFreq := by linarith
   nlinarith [hq0, hcomp]
 
@@ -419,7 +419,7 @@ noncomputable def HardyWeinbergModel.genotypeThirdAbsMoment
 theorem HardyWeinbergModel.genotypeThirdAbsMoment_nonneg
     (h : HardyWeinbergModel) :
     0 ≤ h.genotypeThirdAbsMoment := by
-  unfold HardyWeinbergModel.genotypeThirdAbsMoment
+  unfold Spectral.HardyWeinbergModel.genotypeThirdAbsMoment
   refine Finset.sum_nonneg ?_
   intro g _
   exact mul_nonneg (h.genotypeProb_nonneg g) (by positivity)
@@ -450,7 +450,7 @@ def HWEScoreModel.uniform {m : ℕ} (freq : HardyWeinbergModel) (effect : ℝ) :
   effect := fun _ ↦ effect
 
 instance HWEScoreModel.instNonempty (m : ℕ) : Nonempty (HWEScoreModel m) :=
-  ⟨HWEScoreModel.uniform HardyWeinbergModel.witness 0⟩
+  ⟨HWEScoreModel.uniform Spectral.HardyWeinbergModel.witness 0⟩
 
 /-- Exact HWE score mean from one-locus expectations. -/
 noncomputable def HWEScoreModel.scoreMean {m : ℕ} [Fintype (Fin m)]
@@ -1073,4 +1073,4 @@ theorem two_mul_one_sub_strictMono_le_half (p q : ℝ)
     2 * p * (1 - p) < 2 * q * (1 - q) := by
   nlinarith [sq_nonneg (q - 1 / 2), sq_nonneg (p - 1 / 2)]
 
-end Descent
+end Descent.Foundations

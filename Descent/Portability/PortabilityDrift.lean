@@ -210,10 +210,10 @@ instead of leaving the two quietly disagreeing about a shape they both use. No
 hypothesis is needed, because `1 + (a/s)^2` is positive for every `s` and `a`,
 including `s = 0`. -/
 theorem one_div_transferTimeInflation_eq_one_sub_fstFromTau (s a : ℝ) :
-    1 / transferTimeInflation s a = 1 - fstFromTau ((a / s) ^ 2) := by
+    1 / Spectral.transferTimeInflation s a = 1 - fstFromTau ((a / s) ^ 2) := by
   have hpos : (0 : ℝ) < 1 + (a / s) ^ 2 := by positivity
   have hne : (1 : ℝ) + (a / s) ^ 2 ≠ 0 := ne_of_gt hpos
-  unfold transferTimeInflation fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
+  unfold Spectral.transferTimeInflation fstFromTau Descent.Core.fstFromTau Descent.Core.saturation
   field_simp
   ring
 
@@ -1833,8 +1833,8 @@ theorem presentDayR2_at_equilibrium_mem_unit (p : Descent.Core.PopGenParameters)
 `rsquared` when the relevant second-moment identities hold. -/
 theorem presentDayR2_eq_statistical_rsquared_of_moments
     {k : ℕ} [Fintype (Fin k)]
-    (dgp : DataGeneratingProcess k)
-    (signal : Predictor k)
+    (dgp : Foundations.DataGeneratingProcess k)
+    (signal : Foundations.Predictor k)
     (V_A V_E fst : ℝ)
     (h_vf :
       (let μ := dgp.jointMeasure
@@ -1895,7 +1895,7 @@ variance. -/
 theorem presentDayEqualVarianceGaussianAUC_eq
     (V_A V_E fst : ℝ) (h_env : V_E ≠ 0) :
     presentDayEqualVarianceGaussianAUC V_A V_E fst =
-      Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
+      Foundations.Phi (Real.sqrt (presentDaySignalToNoise V_A V_E fst / 2)) := by
   rw [presentDayEqualVarianceGaussianAUC,
     equalVarianceGaussianAUCFromSignalVariance_eq_formula_of_ne_noise _ _ h_env]
   unfold presentDaySignalToNoise
@@ -1986,7 +1986,7 @@ theorem drift_degrades_equalVarianceGaussianAUC
       presentDayEqualVarianceGaussianAUC V_A V_E fstS := by
   rw [presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE),
     presentDayEqualVarianceGaussianAUC_eq _ _ _ (ne_of_gt hVE)]
-  apply strictMono_Phi
+  apply Foundations.strictMono_Phi
   have hsnr := drift_degrades_signalToNoise V_A V_E fstS fstT hVA hVE hfst
   have hhalf_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT / 2 := by
     have hsnr_nonneg : 0 ≤ presentDaySignalToNoise V_A V_E fstT := by
@@ -4951,7 +4951,7 @@ theorem standardNormalPdf_zero :
     counted the tail mass above the MEASURED quantile, which is K by construction and
     could not fail.
     -/
-noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Phi (1 - K)
+noncomputable def liabilityThreshold (K : ℝ) : ℝ := Function.invFun Foundations.Phi (1 - K)
 
 /-- Mean liability among cases, `i = φ(T)/K`.
 
@@ -5064,14 +5064,14 @@ predicts runs from `0.753` at prevalence `0.5` to `0.921` at prevalence
 The span is more than a sixth of the discriminable interval above chance, so a
 chart missing the prevalence dependence cannot fit it. -/
 noncomputable def liabilityThresholdAUCFromExplainedR2 (r2 K : ℝ) : ℝ :=
-  Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
+  Foundations.Phi ((liabilityCaseMean K - liabilityControlMean K) * Real.sqrt r2 /
     Real.sqrt (liabilityCaseVariance r2 K + liabilityControlVariance r2 K))
 
 /-- A nonpositive total liability variance sends the square root to Mathlib's junk `0`, so the
 whole argument of `Phi` divides by zero and the discrimination reads as `Phi 0`, chance. -/
 theorem liabilityThresholdAUCFromExplainedR2_at_nonpositive_variance_is_junk (r2 K : ℝ)
     (hnonpos : liabilityCaseVariance r2 K + liabilityControlVariance r2 K ≤ 0) :
-    liabilityThresholdAUCFromExplainedR2 r2 K = Phi 0 := by
+    liabilityThresholdAUCFromExplainedR2 r2 K = Foundations.Phi 0 := by
   unfold liabilityThresholdAUCFromExplainedR2
   rw [Real.sqrt_eq_zero_of_nonpos hnonpos, div_zero]
 
@@ -5220,7 +5220,7 @@ theorem targetAUC_lt_source_of_neutralAF_benchmark
     the measurement is of this function rather than of a sibling formula. The
     prediction covers chance-to-perfect discrimination across that design. -/
 noncomputable def equalVarianceGaussianAUCFromSNR (snr : ℝ) : ℝ :=
-  Phi (Real.sqrt (snr / 2))
+  Foundations.Phi (Real.sqrt (snr / 2))
 
 /-- **equalVarianceGaussianAUCFromSNR at its junk point, named.** A negative signal-to-noise
 ratio is inadmissible. `Real.sqrt` is junk-zero, so the AUC collapses to `Phi 0` -- chance
@@ -5228,7 +5228,7 @@ discrimination -- and a sign error upstream is reported as an uninformative but 
 classifier rather than as a domain violation. Consumers must exclude the argument that makes the
 guard vanish. -/
 theorem equalVarianceGaussianAUCFromSNR_negative_snr_is_junk :
-    equalVarianceGaussianAUCFromSNR (-1) = Phi 0 := by
+    equalVarianceGaussianAUCFromSNR (-1) = Foundations.Phi 0 := by
   unfold equalVarianceGaussianAUCFromSNR
   rw [show (-1 : ℝ) / 2 = -(1 / 2) by ring, Real.sqrt_eq_zero_of_nonpos (by norm_num)]
 
@@ -5265,7 +5265,7 @@ theorem equalVarianceGaussianAUCFromSNR_strictMonoOn_nonneg :
     StrictMonoOn equalVarianceGaussianAUCFromSNR (Set.Ici 0) := by
   intro x hx y hy hxy
   unfold equalVarianceGaussianAUCFromSNR
-  apply strictMono_Phi
+  apply Foundations.strictMono_Phi
   have hx2 : 0 ≤ x / 2 :=
     div_nonneg hx (by positivity)
   have hxy2 : x / 2 < y / 2 := by nlinarith
@@ -5289,13 +5289,13 @@ This is not a liability-threshold AUC: that chart also requires prevalence.
     the liability-threshold AUC runs from `0.753` to `0.921` as prevalence moves
     from `0.5` to `0.001`, and this chart answers `0.6783` for all of it. -/
 noncomputable def equalVarianceGaussianAUCFromExplainedR2 (r2 : ℝ) : ℝ :=
-  if 1 ≤ r2 then 1 else Phi (Real.sqrt (r2 / (2 * (1 - r2))))
+  if 1 ≤ r2 then 1 else Foundations.Phi (Real.sqrt (r2 / (2 * (1 - r2))))
 
 /-- Below the perfect-prediction boundary, the total chart is the Gaussian closed form. -/
 theorem equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one
     (r2 : ℝ) (h : r2 < 1) :
     equalVarianceGaussianAUCFromExplainedR2 r2 =
-      Phi (Real.sqrt (r2 / (2 * (1 - r2)))) := by
+      Foundations.Phi (Real.sqrt (r2 / (2 * (1 - r2)))) := by
   simp [equalVarianceGaussianAUCFromExplainedR2, not_le.mpr h]
 
 /-- Perfect prediction gives perfect discrimination. -/
@@ -5525,7 +5525,7 @@ theorem equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval :
   intro x hx y hy hxy
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one x hx.2,
     equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one y hy.2]
-  apply strictMono_Phi
+  apply Foundations.strictMono_Phi
   have hx_one_sub : 0 < 1 - x := by linarith [hx.2]
   have hy_one_sub : 0 < 1 - y := by linarith [hy.2]
   have hx_den : 0 < 2 * (1 - x) :=
@@ -9192,20 +9192,20 @@ section NonreversibleFlow
     unmeasured input this asks for. -/
 theorem geneFlowMixingTime_understates_transferTime
     (dissipation circulation : ℝ) (hd : 0 < dissipation) (hc : circulation ≠ 0) :
-    apparentMixingTime dissipation circulation < frontierTime dissipation :=
-  apparentMixingTime_lt_frontierTime dissipation circulation hd hc
+    Spectral.apparentMixingTime dissipation circulation < Spectral.frontierTime dissipation :=
+  Spectral.apparentMixingTime_lt_frontierTime dissipation circulation hd hc
 
 /-- The overstatement is a factor of two at equal circulation and dissipation, and grows
     quadratically in the ratio beyond that.
 
     Empirical status: DERIVED. -/
 theorem transferTime_doubles_at_equal_circulation (dissipation : ℝ) (hd : 0 < dissipation) :
-    frontierTime dissipation
-        = transferTimeInflation dissipation dissipation *
-            apparentMixingTime dissipation dissipation ∧
-      transferTimeInflation dissipation dissipation = 2 := by
-  refine ⟨frontierTime_eq_inflation_mul_apparent dissipation dissipation hd, ?_⟩
-  unfold transferTimeInflation
+    Spectral.frontierTime dissipation
+        = Spectral.transferTimeInflation dissipation dissipation *
+            Spectral.apparentMixingTime dissipation dissipation ∧
+      Spectral.transferTimeInflation dissipation dissipation = 2 := by
+  refine ⟨Spectral.frontierTime_eq_inflation_mul_apparent dissipation dissipation hd, ?_⟩
+  unfold Spectral.transferTimeInflation
   rw [div_self (ne_of_gt hd)]
   norm_num
 

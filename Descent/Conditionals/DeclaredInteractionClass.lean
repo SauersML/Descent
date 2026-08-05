@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 
-namespace Descent
+namespace Descent.Conditionals
 
 /-!
 # Identification exists only relative to a declared interaction class
@@ -192,4 +192,4 @@ theorem identifiability_depends_on_declaration
 
 end DeclaredInteractionClass
 
-end Descent
+end Descent.Conditionals

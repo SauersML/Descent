@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Foundations
 
 open MeasureTheory
 
@@ -559,4 +559,4 @@ theorem admixture_ld_confounds_pgs
 
 end AdmixtureLD
 
-end Descent
+end Descent.Foundations

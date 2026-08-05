@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
 
-namespace Descent
+namespace Descent.Foundations
 
 /-!
 # Discriminating reference evaluations
@@ -130,4 +130,4 @@ noncomputable def ReferenceEvaluation.witness : ReferenceEvaluation ℝ :=
 theorem ReferenceEvaluation.nonempty : Nonempty (ReferenceEvaluation ℝ) :=
   ⟨ReferenceEvaluation.witness⟩
 
-end Descent
+end Descent.Foundations

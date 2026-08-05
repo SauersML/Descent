@@ -455,13 +455,13 @@ reads, and the inequality on drifts is not.
     Empirical status: VALIDATED in the regime used -- the rare-variant tail of the
     `maxSafeEpistaticOrder` table, whose convexity gap falls to `0.0035` at `q = 1e-4`. -/
 theorem exists_maf_pairwise_beyond_safe_order {N : ℝ} (hN : 1 ≤ N) :
-    ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ maxSafeEpistaticOrder N q ≤ 2 := by
-  obtain ⟨q, hq0, hq8, hsuper⟩ := exists_maf_supercritical (N := N) (m := 2) (by norm_num) hN
+    ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Spectral.maxSafeEpistaticOrder N q ≤ 2 := by
+  obtain ⟨q, hq0, hq8, hsuper⟩ := Spectral.exists_maf_supercritical (N := N) (m := 2) (by norm_num) hN
   refine ⟨q, hq0, hq8, ?_⟩
   by_contra hcon
   push_neg at hcon
   have hq1 : q < 1 := by linarith
-  have hsafe := (epistatic_order_safe_iff (N := N) (q := q) (m := 2) hq0 hq1).1 hcon
+  have hsafe := (Spectral.epistatic_order_safe_iff (N := N) (q := q) (m := 2) hq0 hq1).1 hcon
   linarith
 
 /-- **Three-way interaction is past the boundary at MAF `10 ^ (-3)` for any realistic
@@ -481,8 +481,8 @@ the admissible interaction order by a factor of six at rare variants, and
 
     Empirical status: VALIDATED in the regime used -- see the note above. -/
 theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18) :
-    maxSafeEpistaticOrder N (1 / 1024) < 3 := by
-  have hlb := rare_variant_drift_sharp_lower_bound
+    Spectral.maxSafeEpistaticOrder N (1 / 1024) < 3 := by
+  have hlb := Spectral.rare_variant_drift_sharp_lower_bound
     (q := 1 / 1024) (by norm_num) (by norm_num)
   have harg : (1 : ℝ) / (2 * (1 / 1024)) = 512 := by norm_num
   rw [harg] at hlb
@@ -491,8 +491,8 @@ theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18
     norm_num
   rw [h512] at hlb
   have hl2 : (0.6931471803 : ℝ) < Real.log 2 := Real.log_two_gt_d9
-  have hdrift : (6 : ℝ) < hweMellinDrift (1 / 1024) := by linarith
-  unfold maxSafeEpistaticOrder
+  have hdrift : (6 : ℝ) < Spectral.hweMellinDrift (1 / 1024) := by linarith
+  unfold Spectral.maxSafeEpistaticOrder
   rw [div_lt_iff₀ (by linarith)]
   linarith
 

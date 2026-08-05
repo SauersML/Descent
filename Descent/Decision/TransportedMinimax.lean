@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib
 
-namespace Descent
+namespace Descent.Decision
 
 /-!
 # Transport-aware spectral regularization
@@ -380,4 +380,4 @@ theorem momentBody_entropy_exponent_lt (α : ℝ) (hα : 1 / 2 < α) :
 
 end LongMemoryGeometry
 
-end Descent
+end Descent.Decision

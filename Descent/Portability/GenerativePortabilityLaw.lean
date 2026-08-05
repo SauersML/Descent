@@ -28,7 +28,7 @@ structure SpectralHistory where
 
 /-- Closed Poisson cross-kernel for two history modes. -/
 noncomputable def historyKernel (h h' : SpectralHistory) : ℝ :=
-  markovPoissonKernel (h.memory * h'.memory) (Real.cos (h.phase - h'.phase))
+  Spectral.markovPoissonKernel (h.memory * h'.memory) (Real.cos (h.phase - h'.phase))
 
 /-- Self-energy of one history mode. -/
 noncomputable def historySelfEnergy (h : SpectralHistory) : ℝ :=
@@ -117,7 +117,7 @@ own conventions: it is the Markov kernel of the reversible chain, evaluated wher
 frequency coordinate is extreme. `historySelfEnergy_closed` below is this identity composed
 with that endpoint evaluation, and either module changing its body contradicts this. -/
 theorem historySelfEnergy_eq_markovPoissonKernel_at_one (h : SpectralHistory) :
-    historySelfEnergy h = markovPoissonKernel (h.memory ^ 2) 1 := by
+    historySelfEnergy h = Spectral.markovPoissonKernel (h.memory ^ 2) 1 := by
   unfold historySelfEnergy historyKernel
   rw [pow_two, sub_self, Real.cos_zero]
 
@@ -126,7 +126,7 @@ theorem historySelfEnergy_closed (h : SpectralHistory) (hmemory : h.memory ^ 2 �
     historySelfEnergy h = (1 + h.memory ^ 2) / (1 - h.memory ^ 2) := by
   unfold historySelfEnergy historyKernel
   rw [sub_self, Real.cos_zero]
-  simpa [pow_two] using markovPoissonKernel_at_one (h.memory ^ 2) hmemory
+  simpa [pow_two] using Spectral.markovPoissonKernel_at_one (h.memory ^ 2) hmemory
 
 /-! ## Marginal blindness to dependence -/
 
@@ -167,7 +167,7 @@ theorem same_marginal_different_memory_degradation :
         historyMarginalAmplitude (persistentHalfHistory 1) ∧
       historyDegradation (independentHistory 1) (persistentHalfHistory 1) = 2 / 3 := by
   norm_num [historyMarginalAmplitude, independentHistory, persistentHalfHistory,
-    historyDegradation, historySelfEnergy, historyKernel, markovPoissonKernel]
+    historyDegradation, historySelfEnergy, historyKernel, Spectral.markovPoissonKernel]
 
 /-- The assertion that marginal amplitude alone determines all history degradation. -/
 def MarginalAmplitudeDeterminesHistoryDegradation : Prop :=
@@ -199,7 +199,7 @@ noncomputable def marginalAmplitudeHistoryDegradationBlindness :
   same_data := same_marginal_different_memory_degradation.1
   holds := by
     norm_num [historyDegradation, historySelfEnergy, historyKernel,
-      markovPoissonKernel, independentHistory]
+      Spectral.markovPoissonKernel, independentHistory]
   fails := by
     rw [same_marginal_different_memory_degradation.2]
     norm_num

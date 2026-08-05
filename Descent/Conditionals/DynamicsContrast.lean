@@ -21,7 +21,7 @@ import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
 import Descent.Core.Fst
 
-namespace Descent
+namespace Descent.Conditionals
 
 open MarkedBreakout
 open XiFromMarks
@@ -2058,18 +2058,18 @@ theorem binaryContextMatch_posteriorPairwiseDriftEnergy_eq_quarter
 assigns zero posterior mass to switching dynamics.  The conditional field is unchanged; only its
 represented support changes. -/
 noncomputable def persistentOnlyDynamicsPosterior
-    (_ : BinaryBiologicalState) (persists : Bool) : ℝ := binarySecondAnnotation persists
+    (_ : BinaryBiologicalState) (persists : Bool) : ℝ := Spectral.binarySecondAnnotation persists
 
 /-- The support-sealed biological posterior remains normalized. -/
 theorem persistentOnlyDynamicsPosterior_sum_eq_one (y : BinaryBiologicalState) :
     ∑ persists, persistentOnlyDynamicsPosterior y persists = 1 := by
-  norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation]
+  norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
 /-- Its posterior masses are nonnegative. -/
 theorem persistentOnlyDynamicsPosterior_nonnegative
     (y : BinaryBiologicalState) (persists : Bool) :
     0 ≤ persistentOnlyDynamicsPosterior y persists := by
-  cases persists <;> norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation]
+  cases persists <;> norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
 /-- **Biological sealing law at zero support.**  Persistence and switching still have conditional
 qualities one and zero, but after switching receives zero posterior mass the calibration defect is
@@ -2085,9 +2085,9 @@ theorem persistentOnly_contextMatch_calibrationDriftDefectSq_eq_zero :
     persistentOnlyDynamicsPosterior_nonnegative).mpr
   intro y _ s t hs ht
   cases s
-  · norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation] at hs
+  · norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation] at hs
   · cases t
-    · norm_num [persistentOnlyDynamicsPosterior, binarySecondAnnotation] at ht
+    · norm_num [persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation] at ht
     · rfl
 
 /-! ## Finite correction cannot recover a pooled biological contrast -/
@@ -2156,12 +2156,12 @@ noncomputable def dynamicsBroadcast : ℝ →ₗ[ℝ] (Bool → ℝ) where
 
 /-- The shared biological mode, invariant between persistence and switching. -/
 noncomputable def dynamicsCommonMode (persists : Bool) : ℝ :=
-  binaryFirstAnnotation persists + binarySecondAnnotation persists
+  Spectral.binaryFirstAnnotation persists + Spectral.binarySecondAnnotation persists
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem dynamicsCommonMode_at_reference_point :
     dynamicsCommonMode true = 1 ∧ dynamicsCommonMode false = 1 := by
-  constructor <;> norm_num [dynamicsCommonMode, binaryFirstAnnotation, binarySecondAnnotation]
+  constructor <;> norm_num [dynamicsCommonMode, Spectral.binaryFirstAnnotation, Spectral.binarySecondAnnotation]
 
 
 /-- Pooling followed by broadcasting recovers the common mode exactly. -/
@@ -2171,7 +2171,7 @@ theorem dynamicsBroadcast_pooling_commonMode :
   funext persists
   cases persists <;>
     norm_num [dynamicsBroadcast, dynamicsPoolingObservation, dynamicsCommonMode,
-      binaryFirstAnnotation, binarySecondAnnotation]
+      Spectral.binaryFirstAnnotation, Spectral.binarySecondAnnotation]
 
 /-- The common mode is a nonzero eigen-direction of the pooled correction. -/
 theorem dynamicsCommonMode_mem_nonzeroCorrectionEigencone :
@@ -2199,7 +2199,7 @@ theorem binaryConditionalContextMatch_eq_half_common_add_contrast
       (1 / 2) * dynamicsCommonMode persists + (1 / 2) * dynamicsContrast persists := by
   cases persists <;>
     norm_num [binaryConditionalContextMatch_eq_indicator, dynamicsCommonMode, dynamicsContrast,
-      binaryFirstAnnotation, binarySecondAnnotation]
+      Spectral.binaryFirstAnnotation, Spectral.binarySecondAnnotation]
 
 /-- **The calibration price is one quarter of squared section oscillation.**  This identifies the
 `L²` posterior-field obstruction with the sharp functional-descent geometry in the same biological
@@ -2260,8 +2260,8 @@ The link matters because `CirculationDefect` proves that a mixing diagnostic *un
 identity that understatement is an understatement of the adaptation time too, rather than a
 fact about a separate quantity that happens to be written the same way. -/
 theorem autocorrTime_singleton_eq_frontierTime {ι : Type*} (i : ι) (lam : ι → ℝ) :
-    autocorrTime {i} (fun _ ↦ (1 : ℝ)) lam = frontierTime (lam i) := by
-  unfold autocorrTime frontierTime
+    Spectral.autocorrTime {i} (fun _ ↦ (1 : ℝ)) lam = Spectral.frontierTime (lam i) := by
+  unfold Spectral.autocorrTime Spectral.frontierTime
   simp
 
 /-! ## Geometry and effect recovery are separate gates -/
@@ -2280,7 +2280,7 @@ theorem geometry_and_effect_recovery_gates
       (Identifiable M ↔
         ∀ theta theta' h h', h ∈ M.nuisance → h' ∈ M.nuisance →
           actionGap M theta theta' = (fun x p ↦ h' x p - h x p) → theta = theta') := by
-  exact ⟨covariancePencil_det_zero_iff_precisionPencil_det_zero A B lambda hA hB,
+  exact ⟨Spectral.covariancePencil_det_zero_iff_precisionPencil_det_zero A B lambda hA hB,
     identifiable_iff_transversal M⟩
 
 /-! ## The obstruction bundle -/
@@ -2299,9 +2299,9 @@ structure DynamicsObstructions : Prop where
       crossStatePerformance binaryStateWeight switchingTransition contextMatchQuality
   /-- Coordinate marginals do not determine the joint biological field law. -/
   marginalsLoseDependence :
-    (∀ omega : Bool, coupledBinarySource omega 0 = coupledBinarySource omega 1) ∧
-      (∀ omega : Bool, coordinatewiseMarginalPreserver omega 0 ≠
-        coordinatewiseMarginalPreserver omega 1)
+    (∀ omega : Bool, Spectral.coupledBinarySource omega 0 = Spectral.coupledBinarySource omega 1) ∧
+      (∀ omega : Bool, Spectral.coordinatewiseMarginalPreserver omega 0 ≠
+        Spectral.coordinatewiseMarginalPreserver omega 1)
   /-- At rank two, value allocation can conflict maximally even in a common eigenbasis. -/
   commutingAllocationConflict : (2 : ℝ) < 3 ∧ (3 : ℝ) / 10 < 2 / 1
   /-- Shared local genomic geometry leaves a positive mixed fourth path moment. -/
@@ -3238,9 +3238,9 @@ theorem dynamicsContrast_obstructions : DynamicsObstructions := by
   refine
     { targetOnlyBlind := targetOnlyPerformance_blind_to_binary_dynamics
       crossStateSeparates := ?_
-      marginalsLoseDependence := coordinateMarginalsDoNotDetermineJointLaw
-      commutingAllocationConflict := commutingConflict_myopic_ne_transport
-      sharedGeometryNotFree := tridiagonalABAB_pathExpression_pos 0 0 1 1 (by norm_num)
+      marginalsLoseDependence := Spectral.coordinateMarginalsDoNotDetermineJointLaw
+      commutingAllocationConflict := Spectral.commutingConflict_myopic_ne_transport
+      sharedGeometryNotFree := Spectral.tridiagonalABAB_pathExpression_pos 0 0 1 1 (by norm_num)
         (by norm_num)
       isospectralLDLosesOrientation :=
         ⟨localizedCovarianceBlock_isospectral_rotatedCovarianceBlock (3 / 2), by
@@ -3598,4 +3598,4 @@ theorem conditionalDescent_biological_boundary :
     exact admissible_confounding_meet_obstruction.2.2
       ((descendsAlong_iff_pairwiseConsistent_of_nonempty _ _ _).mpr hpair)
 
-end Descent
+end Descent.Conditionals

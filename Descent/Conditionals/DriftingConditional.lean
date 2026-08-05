@@ -7,7 +7,7 @@ import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic
 import Mathlib.Topology.Order.Monotone
 
-namespace Descent
+namespace Descent.Conditionals
 
 open scoped BigOperators
 
@@ -130,8 +130,8 @@ theorem probitCurve_params_eq_of_two_points {a b a' b' x y : ℝ} (hxy : x ≠ y
     (hx : probitCurve a b x = probitCurve a' b' x)
     (hy : probitCurve a b y = probitCurve a' b' y) :
     a = a' ∧ b = b' := by
-  have hlx : a * x + b = a' * x + b' := strictMono_Phi.injective hx
-  have hly : a * y + b = a' * y + b' := strictMono_Phi.injective hy
+  have hlx : a * x + b = a' * x + b' := Foundations.strictMono_Phi.injective hx
+  have hly : a * y + b = a' * y + b' := Foundations.strictMono_Phi.injective hy
   have hsub : (a - a') * (x - y) = 0 := by nlinarith [hlx, hly]
   have hxy' : x - y ≠ 0 := sub_ne_zero.mpr hxy
   have ha : a = a' := by
@@ -768,7 +768,7 @@ theorem affineProbit_link_invariant (p q a₀ b₀ σ : ℝ) :
   refine ⟨a₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2),
     b₀ / Real.sqrt (1 + a₀ ^ 2 * σ ^ 2), fun x ↦ ?_⟩
   have hPhiMeas : Measurable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀)) :=
-    strictMono_Phi.monotone.measurable.comp (by fun_prop)
+    Foundations.strictMono_Phi.monotone.measurable.comp (by fun_prop)
   have hPhiInt : Integrable (fun z : ℝ ↦ Phi (a₀ * (x + σ * z) + b₀))
       (gaussianReal 0 1) := by
     refine Integrable.mono' (integrable_const (1 : ℝ)) hPhiMeas.aestronglyMeasurable ?_
@@ -795,7 +795,7 @@ theorem affineProbit_strictMono (p q α β : ℝ) (hq : 0 < q) (hα : 0 < α) :
   intro u v huv
   apply add_lt_add_left
   apply mul_lt_mul_of_pos_left _ hq
-  apply strictMono_Phi
+  apply Foundations.strictMono_Phi
   nlinarith
 
 /-- The natural floor/ceiling constraints put every affine-probit risk strictly between zero and
@@ -805,10 +805,10 @@ theorem affineProbit_mem_Ioo (p q α β : ℝ) (hp : 0 ≤ p) (hq : 0 < q)
     0 < p + q * Phi (α * u + β) ∧ p + q * Phi (α * u + β) < 1 := by
   have hPhiPos : 0 < Phi (α * u + β) := by
     have hnonneg : 0 ≤ Phi (α * u + β - 1) := ProbabilityTheory.cdf_nonneg _ _
-    exact lt_of_le_of_lt hnonneg (strictMono_Phi (by linarith))
+    exact lt_of_le_of_lt hnonneg (Foundations.strictMono_Phi (by linarith))
   have hPhiLtOne : Phi (α * u + β) < 1 := by
     have hle : Phi (α * u + β + 1) ≤ 1 := ProbabilityTheory.cdf_le_one _ _
-    exact lt_of_lt_of_le (strictMono_Phi (by linarith)) hle
+    exact lt_of_lt_of_le (Foundations.strictMono_Phi (by linarith)) hle
   constructor <;> nlinarith
 
 open MeasureTheory ProbabilityTheory in
@@ -1645,7 +1645,7 @@ theorem affineProbit_arg_eq (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 
   have : Phi (α * u + β) = Phi (α' * u + β') := by
     have hcancel : q * Phi (α * u + β) = q * Phi (α' * u + β') := by linarith
     exact mul_left_cancel₀ (ne_of_gt hq) hcancel
-  exact strictMono_Phi.injective this
+  exact Foundations.strictMono_Phi.injective this
 
 /-- **The slope is identified.** -/
 theorem affineProbit_slope_unique (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α)
@@ -2371,4 +2371,4 @@ theorem stationaryDrift_collapses_to_generator (aPrime aTimesScore b : ℝ)
     aPrime + aTimesScore - b = b := by
   rw [hrev]; ring
 
-end Descent
+end Descent.Conditionals

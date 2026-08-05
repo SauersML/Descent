@@ -102,7 +102,7 @@ variable {Ω : Type*} [Fintype Ω]
 
 /-- Expectation against an arbitrary finitely-supported probability vector. -/
 def weightedExp (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hsum : ∑ ω, p ω = 1) :
-    ExpFunctional Ω where
+    Foundations.ExpFunctional Ω where
   eval f := ∑ ω, p ω * f ω
   add_eval f g := by
     simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
@@ -118,7 +118,7 @@ def weightedExp (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hsum : ∑ ω, p ω 
 
 /-- The uniform expectation on a nonempty finite type: the empirical distribution of a
 finite population in which each individual is one observation. -/
-def uniformExp (Ω : Type*) [Fintype Ω] [Nonempty Ω] : ExpFunctional Ω :=
+def uniformExp (Ω : Type*) [Fintype Ω] [Nonempty Ω] : Foundations.ExpFunctional Ω :=
   weightedExp (fun _ ↦ (Fintype.card Ω : ℝ)⁻¹)
     (fun _ ↦ by positivity)
     (by
@@ -135,9 +135,9 @@ def uniformExp (Ω : Type*) [Fintype Ω] [Nonempty Ω] : ExpFunctional Ω :=
     pair of deployments distinguished only through such an `R²` would distinguish
     nothing. -/
 theorem variance_uniformExp_two :
-    variance (uniformExp (Fin 2)) (fun i ↦ (i : ℝ)) = 1 / 4 := by
+    Foundations.variance (uniformExp (Fin 2)) (fun i ↦ (i : ℝ)) = 1 / 4 := by
   have hcard : (Fintype.card (Fin 2) : ℝ) = 2 := by simp
-  unfold variance
+  unfold Foundations.variance
   simp [uniformExp_apply, Fin.sum_univ_two]
   norm_num
 
@@ -165,7 +165,7 @@ variable {Ω J L : Type*} [Fintype J] [DecidableEq J] [Fintype L] [DecidableEq L
     `β`, not a restriction on the phenotype. -/
 structure DeploymentPopulation (Ω J L : Type*) where
   /-- The population's expectation functional. -/
-  E : ExpFunctional Ω
+  E : Foundations.ExpFunctional Ω
   /-- Scored (genotyped, imputed, or otherwise available) variant codings. -/
   X : Ω → J → ℝ
   /-- Causal variant codings. -/
@@ -183,23 +183,23 @@ variable (P : DeploymentPopulation Ω J L)
 def phenotype : Ω → ℝ := fun ω ↦ causalSignal P.β P.C ω + P.h ω
 
 /-- The deployed score `wᵀX`. -/
-def score (w : J → ℝ) : Ω → ℝ := linScore w P.X
+def score (w : J → ℝ) : Ω → ℝ := Foundations.linScore w P.X
 
 /-- Scored-variant covariance ("LD") matrix in this population. -/
-def sigmaX : Matrix J J ℝ := covarianceMatrix P.E P.X
+def sigmaX : Matrix J J ℝ := Foundations.covarianceMatrix P.E P.X
 
 /-- Causal-variant covariance matrix in this population. -/
-def sigmaC : Matrix L L ℝ := covarianceMatrix P.E P.C
+def sigmaC : Matrix L L ℝ := Foundations.covarianceMatrix P.E P.C
 
 /-- Scored-to-causal covariance ("tagging") matrix in this population. -/
-def kappa : Matrix J L ℝ := predictorCausalCovariance P.E P.X P.C
+def kappa : Matrix J L ℝ := Foundations.predictorCausalCovariance P.E P.X P.C
 
 /-- Scored-variant-to-residual covariance: stratification, ancestry-correlated
 environment, and any other route by which the residual is predictable from `X`. -/
-def contextX : J → ℝ := contextCrossCovVector P.E P.X P.h
+def contextX : J → ℝ := Foundations.contextCrossCovVector P.E P.X P.h
 
 /-- Causal-variant-to-residual covariance. -/
-def contextC : L → ℝ := contextCrossCovVector P.E P.C P.h
+def contextC : L → ℝ := Foundations.contextCrossCovVector P.E P.C P.h
 
 /-! ### The exact output metrics
 
@@ -208,16 +208,16 @@ population.  No closed form is built into any of them; the closed forms are the 
 of `§2`. -/
 
 /-- `Var(S)`. -/
-def scoreVariance (w : J → ℝ) : ℝ := variance P.E (P.score w)
+def scoreVariance (w : J → ℝ) : ℝ := Foundations.variance P.E (P.score w)
 
 /-- `Cov(S, Y)`. -/
-def predictiveCovariance (w : J → ℝ) : ℝ := covariance P.E (P.score w) P.phenotype
+def predictiveCovariance (w : J → ℝ) : ℝ := Foundations.covariance P.E (P.score w) P.phenotype
 
 /-- `Var(Y)`. -/
-def outcomeVariance : ℝ := variance P.E P.phenotype
+def outcomeVariance : ℝ := Foundations.variance P.E P.phenotype
 
 /-- `E[(Y - S)²]`, the raw deployed mean squared error. -/
-def deployedMse (w : J → ℝ) : ℝ := expMse P.E P.phenotype (P.score w)
+def deployedMse (w : J → ℝ) : ℝ := Foundations.expMse P.E P.phenotype (P.score w)
 
 /-- `Cov(S,Y)/Var(S)`, the regression-of-`Y`-on-`S` slope: `1` for a calibrated score. -/
 def calibrationSlope (w : J → ℝ) : ℝ := P.predictiveCovariance w / P.scoreVariance w
@@ -278,8 +278,8 @@ omit [Fintype L] [DecidableEq L] in
 /-- **Exact score-variance law.**  `Var(S) = wᵀ Σ_X w`.
 
     No assumption on `X` at all: any LD structure, any admixture, any coding. -/
-theorem scoreVariance_eq : P.scoreVariance w = dot w (P.sigmaX.mulVec w) :=
-  variance_linScore P.E P.X w
+theorem scoreVariance_eq : P.scoreVariance w = Foundations.dot w (P.sigmaX.mulVec w) :=
+  Foundations.variance_linScore P.E P.X w
 
 /-- **Exact predictive-covariance law.**  `Cov(S, Y) = wᵀ K β + wᵀ c_X`.
 
@@ -290,33 +290,33 @@ theorem scoreVariance_eq : P.scoreVariance w = dot w (P.sigmaX.mulVec w) :=
     `R²` exactly as genuine signal does.  Nothing in the metric separates them, which is
     a fact about the metric and not a limitation of this proof. -/
 theorem predictiveCovariance_eq :
-    P.predictiveCovariance w = dot w (P.kappa.mulVec P.β) + dot w P.contextX := by
+    P.predictiveCovariance w = Foundations.dot w (P.kappa.mulVec P.β) + Foundations.dot w P.contextX := by
   unfold predictiveCovariance phenotype score
-  rw [covariance_linScore_eq_dot_crossCov]
-  have hsplit : contextCrossCovVector P.E P.X
+  rw [Foundations.covariance_linScore_eq_dot_crossCov]
+  have hsplit : Foundations.contextCrossCovVector P.E P.X
         (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
       = P.kappa.mulVec P.β + P.contextX := by
-    have h := crossCovVector_decomposition P.E P.X P.C P.β P.h
-    simpa [contextCrossCovVector, crossCovVector, kappa, contextX] using h
+    have h := Foundations.crossCovVector_decomposition P.E P.X P.C P.β P.h
+    simpa [Foundations.contextCrossCovVector, Foundations.crossCovVector, kappa, contextX] using h
   rw [hsplit]
-  unfold dot Descent.Core.innerSum
+  unfold Foundations.dot Descent.Core.innerSum
   simp [Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
 omit [Fintype L] [DecidableEq L] in
 /-- **Exact score-mean law.**  `E[S] = wᵀ μ_X`. -/
-theorem eval_score_eq : P.E (P.score w) = dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) :=
-  eval_linScore P.E P.X w
+theorem eval_score_eq : P.E (P.score w) = Foundations.dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) :=
+  Foundations.eval_linScore P.E P.X w
 
 omit [Fintype J] [DecidableEq J] in
 /-- **Exact phenotype-mean law.**  `E[Y] = βᵀ μ_C + E[h]`. -/
 theorem eval_phenotype_eq :
-    P.E P.phenotype = dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h := by
+    P.E P.phenotype = Foundations.dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h := by
   unfold phenotype
   have hsplit : (fun ω ↦ causalSignal P.β P.C ω + P.h ω)
       = causalSignal P.β P.C + P.h := rfl
   rw [hsplit, P.E.add_eval]
   congr 1
-  exact eval_linScore P.E P.C P.β
+  exact Foundations.eval_linScore P.E P.C P.β
 
 omit [Fintype J] [DecidableEq J] in
 /-- **Exact outcome-variance law.**  `Var(Y) = βᵀ Σ_C β + 2 βᵀ c_C + Var(h)`.
@@ -326,14 +326,14 @@ omit [Fintype J] [DecidableEq J] in
     `R²` for the same score, and this identity is where that enters. -/
 theorem outcomeVariance_eq :
     P.outcomeVariance
-      = dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h := by
+      = Foundations.dot P.β (P.sigmaC.mulVec P.β) + 2 * Foundations.dot P.β P.contextC + Foundations.variance P.E P.h := by
   unfold outcomeVariance phenotype
-  rw [variance_add_exp]
+  rw [Foundations.variance_add_exp]
   congr 1
   · congr 1
-    · exact variance_linScore P.E P.C P.β
+    · exact Foundations.variance_linScore P.E P.C P.β
     · congr 1
-      exact covariance_linScore_eq_dot_crossCov P.E P.C P.β P.h
+      exact Foundations.covariance_linScore_eq_dot_crossCov P.E P.C P.β P.h
 
 /-- **Exact `R²` law: the master formula.**
 
@@ -346,16 +346,16 @@ theorem outcomeVariance_eq :
     populations, and `§3` turns each such difference into its exact effect on the left. -/
 theorem r2_eq :
     P.r2 w =
-      (dot w (P.kappa.mulVec P.β) + dot w P.contextX) ^ 2 /
-        (dot w (P.sigmaX.mulVec w) *
-          (dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h)) := by
+      (Foundations.dot w (P.kappa.mulVec P.β) + Foundations.dot w P.contextX) ^ 2 /
+        (Foundations.dot w (P.sigmaX.mulVec w) *
+          (Foundations.dot P.β (P.sigmaC.mulVec P.β) + 2 * Foundations.dot P.β P.contextC + Foundations.variance P.E P.h)) := by
   unfold r2
   rw [P.predictiveCovariance_eq w, P.scoreVariance_eq w, P.outcomeVariance_eq]
 
 /-- **Exact calibration-slope law.** -/
 theorem calibrationSlope_eq :
     P.calibrationSlope w =
-      (dot w (P.kappa.mulVec P.β) + dot w P.contextX) / dot w (P.sigmaX.mulVec w) := by
+      (Foundations.dot w (P.kappa.mulVec P.β) + Foundations.dot w P.contextX) / Foundations.dot w (P.sigmaX.mulVec w) := by
   unfold calibrationSlope
   rw [P.predictiveCovariance_eq w, P.scoreVariance_eq w]
 
@@ -367,9 +367,9 @@ theorem calibrationSlope_eq :
     what an allele-frequency shift does and what an `R²` comparison cannot see. -/
 theorem calibrationIntercept_eq :
     P.calibrationIntercept w
-      = (dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h)
-        - ((dot w (P.kappa.mulVec P.β) + dot w P.contextX) / dot w (P.sigmaX.mulVec w))
-          * dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) := by
+      = (Foundations.dot P.β (fun l ↦ P.E (fun ω ↦ P.C ω l)) + P.E P.h)
+        - ((Foundations.dot w (P.kappa.mulVec P.β) + Foundations.dot w P.contextX) / Foundations.dot w (P.sigmaX.mulVec w))
+          * Foundations.dot w (fun j ↦ P.E (fun ω ↦ P.X ω j)) := by
   unfold calibrationIntercept
   rw [P.eval_phenotype_eq, P.calibrationSlope_eq w, P.eval_score_eq w]
 
@@ -381,18 +381,18 @@ theorem calibrationIntercept_eq :
     and an arbitrarily bad MSE. -/
 theorem deployedMse_eq :
     P.deployedMse w =
-      (dot P.β (P.sigmaC.mulVec P.β) + 2 * dot P.β P.contextC + variance P.E P.h)
-        + dot w (P.sigmaX.mulVec w)
-        - 2 * (dot w (P.kappa.mulVec P.β) + dot w P.contextX)
+      (Foundations.dot P.β (P.sigmaC.mulVec P.β) + 2 * Foundations.dot P.β P.contextC + Foundations.variance P.E P.h)
+        + Foundations.dot w (P.sigmaX.mulVec w)
+        - 2 * (Foundations.dot w (P.kappa.mulVec P.β) + Foundations.dot w P.contextX)
         + (P.E (P.score w) - P.E P.phenotype) ^ 2 := by
   unfold deployedMse
-  rw [mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
-  rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
-    show variance P.E (P.score w) = P.scoreVariance w from rfl,
-    show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-      covariance_comm_exp _ _ _]
+  rw [Foundations.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
+  rw [show Foundations.variance P.E P.phenotype = P.outcomeVariance from rfl,
+    show Foundations.variance P.E (P.score w) = P.scoreVariance w from rfl,
+    show Foundations.covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+      Foundations.covariance_comm_exp _ _ _]
   rw [P.outcomeVariance_eq, P.scoreVariance_eq w, P.predictiveCovariance_eq w]
-  unfold bias
+  unfold Foundations.bias
   ring
 
 end DeploymentPopulation
@@ -438,7 +438,7 @@ variable (D : Deployment ΩS ΩT J L)
 the *source* effect vector.  This is the linkage-disequilibrium term: the same causal
 alleles, tagged differently. -/
 def taggingShift : ℝ :=
-  dot D.w ((D.target.kappa - D.source.kappa).mulVec D.source.β)
+  Foundations.dot D.w ((D.target.kappa - D.source.kappa).mulVec D.source.β)
 
 /-- **Effect-turnover channel.**  The change in causal effects, read against the
 *target* tagging.  Sign flips, effect-size heterogeneity and variants causal in one
@@ -456,18 +456,18 @@ population only all land here.
     scanner that counts coverage was counting a definition that can never receive
     one. -/
 def effectTurnover : ℝ :=
-  dot D.w (D.target.kappa.mulVec (D.target.β - D.source.β))
+  Foundations.dot D.w (D.target.kappa.mulVec (D.target.β - D.source.β))
 
 /-- **Context-shift channel.**  The change in the covariance between the scored variants
 and everything not additive in `C`: stratification, ancestry-correlated environment,
 and any residual predictability of `h` from `X`. -/
 def contextShift : ℝ :=
-  dot D.w (D.target.contextX - D.source.contextX)
+  Foundations.dot D.w (D.target.contextX - D.source.contextX)
 
 /-- **Linkage channel on the score's own variance.**  The scored-variant covariance
 matrix changes, so the same weights produce a differently-dispersed score. -/
 def scoreVarianceShift : ℝ :=
-  dot D.w ((D.target.sigmaX - D.source.sigmaX).mulVec D.w)
+  Foundations.dot D.w ((D.target.sigmaX - D.source.sigmaX).mulVec D.w)
 
 /-- **Exact three-channel law for predictive covariance.**
 
@@ -487,7 +487,7 @@ theorem predictiveCovariance_transport :
       = D.taggingShift + D.effectTurnover + D.contextShift := by
   rw [D.target.predictiveCovariance_eq D.w, D.source.predictiveCovariance_eq D.w]
   unfold taggingShift effectTurnover contextShift
-  rw [Matrix.sub_mulVec, Matrix.mulVec_sub, dot_sub_right', dot_sub_right', dot_sub_right']
+  rw [Matrix.sub_mulVec, Matrix.mulVec_sub, Foundations.dot_sub_right', Foundations.dot_sub_right', Foundations.dot_sub_right']
   ring
 
 omit [Fintype L] [DecidableEq L] in
@@ -502,7 +502,7 @@ theorem scoreVariance_transport :
     D.target.scoreVariance D.w - D.source.scoreVariance D.w = D.scoreVarianceShift := by
   rw [D.target.scoreVariance_eq D.w, D.source.scoreVariance_eq D.w]
   unfold scoreVarianceShift
-  rw [Matrix.sub_mulVec, dot_sub_right']
+  rw [Matrix.sub_mulVec, Foundations.dot_sub_right']
 
 /-! ### The exact `R²` factorisation -/
 
@@ -683,7 +683,7 @@ theorem predictiveCovariance_sq_le :
   have h := P.E.cauchy_schwarz
     (fun ω ↦ P.score w ω - P.E (P.score w))
     (fun ω ↦ P.phenotype ω - P.E P.phenotype)
-  simpa [predictiveCovariance, scoreVariance, outcomeVariance, covariance, variance]
+  simpa [predictiveCovariance, scoreVariance, outcomeVariance, Foundations.covariance, Foundations.variance]
     using h
 
 omit [DecidableEq J] [DecidableEq L] in
@@ -820,17 +820,17 @@ theorem uniformExp_four (f : Fin 4 → ℝ) :
   ring
 
 theorem covariance_uniformExp_four (f g : Fin 4 → ℝ) :
-    covariance (uniformExp (Fin 4)) f g
+    Foundations.covariance (uniformExp (Fin 4)) f g
       = (f 0 * g 0 + f 1 * g 1 + f 2 * g 2 + f 3 * g 3) / 4
         - ((f 0 + f 1 + f 2 + f 3) / 4) * ((g 0 + g 1 + g 2 + g 3) / 4) := by
-  rw [covariance_eq_expect_mul_sub_means]
+  rw [Foundations.covariance_eq_expect_mul_sub_means]
   simp only [uniformExp_four]
 
 theorem variance_uniformExp_four (f : Fin 4 → ℝ) :
-    variance (uniformExp (Fin 4)) f
+    Foundations.variance (uniformExp (Fin 4)) f
       = (f 0 ^ 2 + f 1 ^ 2 + f 2 ^ 2 + f 3 ^ 2) / 4
         - ((f 0 + f 1 + f 2 + f 3) / 4) ^ 2 := by
-  rw [variance_eq_covariance_self, covariance_uniformExp_four]
+  rw [Foundations.variance_eq_covariance_self, covariance_uniformExp_four]
   ring
 
 /-- First contrast: the scored-variant direction. -/
@@ -863,27 +863,27 @@ def unitWeight : Fin 1 → ℝ := 1
 
 theorem twoContrast_scoreVariance (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).scoreVariance unitWeight = α ^ 2 := by
-  show variance (uniformExp (Fin 4)) _ = _
+  show Foundations.variance (uniformExp (Fin 4)) _ = _
   rw [variance_uniformExp_four]
-  simp [DeploymentPopulation.score, twoContrastPopulation, linScore, dot, unitWeight,
+  simp [DeploymentPopulation.score, twoContrastPopulation, Foundations.linScore, Foundations.dot, unitWeight,
     rad1,
       Descent.Core.innerSum]
   ring
 
 theorem twoContrast_predictiveCovariance (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).predictiveCovariance unitWeight = α * γ := by
-  show covariance (uniformExp (Fin 4)) _ _ = _
+  show Foundations.covariance (uniformExp (Fin 4)) _ _ = _
   rw [covariance_uniformExp_four]
   simp [DeploymentPopulation.score, DeploymentPopulation.phenotype, twoContrastPopulation,
-    linScore, causalSignal, dot, unitWeight, rad1, rad2,
+    Foundations.linScore, causalSignal, Foundations.dot, unitWeight, rad1, rad2,
       Descent.Core.innerSum]
   ring
 
 theorem twoContrast_outcomeVariance (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).outcomeVariance = γ ^ 2 + δ ^ 2 := by
-  show variance (uniformExp (Fin 4)) _ = _
+  show Foundations.variance (uniformExp (Fin 4)) _ = _
   rw [variance_uniformExp_four]
-  simp [DeploymentPopulation.phenotype, twoContrastPopulation, causalSignal, dot,
+  simp [DeploymentPopulation.phenotype, twoContrastPopulation, causalSignal, Foundations.dot,
     rad1, rad2,
       Descent.Core.innerSum]
   ring
@@ -957,8 +957,8 @@ numbers.
 theorem twoContrast_kappa (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).kappa = Matrix.of fun _ _ ↦ α := by
   ext j l
-  unfold DeploymentPopulation.kappa predictorCausalCovariance
-  show covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ rad1 ω) = α
+  unfold DeploymentPopulation.kappa Foundations.predictorCausalCovariance
+  show Foundations.covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ rad1 ω) = α
   rw [covariance_uniformExp_four]
   norm_num [rad1, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.tail_cons,
     Matrix.head_cons]
@@ -967,8 +967,8 @@ theorem twoContrast_kappa (α γ δ : ℝ) :
 theorem twoContrast_contextX (α γ δ : ℝ) :
     (twoContrastPopulation α γ δ).contextX = fun _ ↦ 0 := by
   funext j
-  unfold DeploymentPopulation.contextX contextCrossCovVector
-  show covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ δ * rad2 ω) = 0
+  unfold DeploymentPopulation.contextX Foundations.contextCrossCovVector
+  show Foundations.covariance (uniformExp (Fin 4)) (fun ω ↦ α * rad1 ω) (fun ω ↦ δ * rad2 ω) = 0
   rw [covariance_uniformExp_four]
   norm_num [rad1, rad2, Matrix.cons_val_two, Matrix.cons_val_three, Matrix.tail_cons,
     Matrix.head_cons]
@@ -991,23 +991,23 @@ theorem twoContrastDeployment_channels (αS γS δS αT γT δT : ℝ) :
       (twoContrastDeployment αS γS δS αT γT δT).effectTurnover = αT * (γT - γS) ∧
       (twoContrastDeployment αS γS δS αT γT δT).contextShift = 0 := by
   refine ⟨?_, ?_, ?_⟩
-  · show dot unitWeight (((twoContrastPopulation αT γT δT).kappa
+  · show Foundations.dot unitWeight (((twoContrastPopulation αT γT δT).kappa
         - (twoContrastPopulation αS γS δS).kappa).mulVec
         (twoContrastPopulation αS γS δS).β) = (αT - αS) * γS
     rw [twoContrast_kappa, twoContrast_kappa]
-    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Matrix.sub_apply,
+    simp [Foundations.dot, unitWeight, Matrix.mulVec, dotProduct, Matrix.sub_apply,
       twoContrastPopulation,
       Descent.Core.innerSum]
-  · show dot unitWeight ((twoContrastPopulation αT γT δT).kappa.mulVec
+  · show Foundations.dot unitWeight ((twoContrastPopulation αT γT δT).kappa.mulVec
         ((twoContrastPopulation αT γT δT).β - (twoContrastPopulation αS γS δS).β))
       = αT * (γT - γS)
     rw [twoContrast_kappa]
-    simp [dot, unitWeight, Matrix.mulVec, dotProduct, Pi.sub_apply, twoContrastPopulation,
+    simp [Foundations.dot, unitWeight, Matrix.mulVec, dotProduct, Pi.sub_apply, twoContrastPopulation,
       Descent.Core.innerSum]
-  · show dot unitWeight ((twoContrastPopulation αT γT δT).contextX
+  · show Foundations.dot unitWeight ((twoContrastPopulation αT γT δT).contextX
         - (twoContrastPopulation αS γS δS).contextX) = 0
     rw [twoContrast_contextX, twoContrast_contextX]
-    simp [dot, unitWeight,
+    simp [Foundations.dot, unitWeight,
       Descent.Core.innerSum]
 
 /-- **Two loud channels that cancel exactly.**
@@ -1213,18 +1213,18 @@ omit [DecidableEq J] [DecidableEq L] in
     coordinates of the metric statistic and the two means.  Everything about affine
     recalibration follows from this one identity. -/
 theorem recalibrated_mse_eq (a b : ℝ) :
-    expMse P.E P.phenotype (P.recalibratedScore w a b)
+    Foundations.expMse P.E P.phenotype (P.recalibratedScore w a b)
       = P.outcomeVariance - 2 * b * P.predictiveCovariance w
           + b ^ 2 * P.scoreVariance w
           + (a + b * P.E (P.score w) - P.E P.phenotype) ^ 2 := by
-  rw [mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
-  unfold recalibratedScore bias
-  rw [variance_affine, covariance_affine_right]
-  rw [eval_affine]
-  rw [show variance P.E P.phenotype = P.outcomeVariance from rfl,
-    show variance P.E (P.score w) = P.scoreVariance w from rfl,
-    show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-      covariance_comm_exp _ _ _]
+  rw [Foundations.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq]
+  unfold recalibratedScore Foundations.bias
+  rw [Foundations.variance_affine, Foundations.covariance_affine_right]
+  rw [Foundations.eval_affine]
+  rw [show Foundations.variance P.E P.phenotype = P.outcomeVariance from rfl,
+    show Foundations.variance P.E (P.score w) = P.scoreVariance w from rfl,
+    show Foundations.covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+      Foundations.covariance_comm_exp _ _ _]
   ring
 
 /-- **The affine correction the population itself prescribes**: slope `Cov/Var S`,
@@ -1252,7 +1252,7 @@ omit [DecidableEq J] [DecidableEq L] in
     by exactly the fraction `R²` does not explain.  No approximation and no Gaussian
     assumption: this is an identity about a positive linear functional. -/
 theorem bestAffine_mse_eq (hv : P.scoreVariance w ≠ 0) :
-    expMse P.E P.phenotype (P.bestAffineScore w)
+    Foundations.expMse P.E P.phenotype (P.bestAffineScore w)
       = P.outcomeVariance * (1 - P.r2 w) := by
   have hR : P.outcomeVariance * (1 - P.r2 w)
       = P.outcomeVariance - P.predictiveCovariance w ^ 2 / P.scoreVariance w :=
@@ -1272,8 +1272,8 @@ omit [DecidableEq J] [DecidableEq L] in
     over all of them, and `Var(Y)(1 - R²)` is what an ideally recalibrated deployment
     achieves. -/
 theorem bestAffine_mse_le (hv : 0 < P.scoreVariance w) (a b : ℝ) :
-    expMse P.E P.phenotype (P.bestAffineScore w)
-      ≤ expMse P.E P.phenotype (P.recalibratedScore w a b) := by
+    Foundations.expMse P.E P.phenotype (P.bestAffineScore w)
+      ≤ Foundations.expMse P.E P.phenotype (P.recalibratedScore w a b) := by
   rw [bestAffine_mse_eq P w hv.ne', recalibrated_mse_eq]
   unfold r2
   rw [outcomeVariance_mul_one_sub_ratio P.outcomeVariance (P.predictiveCovariance w)
@@ -1296,14 +1296,14 @@ omit [DecidableEq J] [DecidableEq L] in
     with `bestAffine_mse_eq`, this is the exact division of portability loss into a
     repairable part and an unrepairable one. -/
 theorem r2_affine_invariant (a b : ℝ) (hb : b ≠ 0) :
-    covariance P.E (P.recalibratedScore w a b) P.phenotype ^ 2 /
-        (variance P.E (P.recalibratedScore w a b) * P.outcomeVariance)
+    Foundations.covariance P.E (P.recalibratedScore w a b) P.phenotype ^ 2 /
+        (Foundations.variance P.E (P.recalibratedScore w a b) * P.outcomeVariance)
       = P.r2 w := by
   unfold recalibratedScore r2
-  rw [covariance_comm_exp, covariance_affine_right, variance_affine]
-  rw [show covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
-    covariance_comm_exp _ _ _]
-  rw [show variance P.E (P.score w) = P.scoreVariance w from rfl]
+  rw [Foundations.covariance_comm_exp, Foundations.covariance_affine_right, Foundations.variance_affine]
+  rw [show Foundations.covariance P.E P.phenotype (P.score w) = P.predictiveCovariance w from
+    Foundations.covariance_comm_exp _ _ _]
+  rw [show Foundations.variance P.E (P.score w) = P.scoreVariance w from rfl]
   rw [mul_pow]
   by_cases hv : P.scoreVariance w = 0
   · rw [hv]
@@ -1433,15 +1433,15 @@ variable (P : DeploymentPopulation Ω J L)
 
 /-- The weights this population's own moments prescribe. -/
 def optimalWeights (sigmaInv : Matrix J J ℝ) : J → ℝ :=
-  optimalWeightsFromMoments sigmaInv P.E P.X P.phenotype
+  Foundations.optimalWeightsFromMoments sigmaInv P.E P.X P.phenotype
 
 /-- The predictive covariance is the weights read against the cross-covariance vector.
     A restatement of `covariance_linScore_eq_dot_crossCov` in this file's names, needed
     because `crossCovVector` and `contextCrossCovVector` are the same function under two
     names, one for each argument's intended role. -/
 theorem predictiveCovariance_eq_dot_crossCov (w : J → ℝ) :
-    P.predictiveCovariance w = dot w (crossCovVector P.E P.X P.phenotype) :=
-  covariance_linScore_eq_dot_crossCov P.E P.X w P.phenotype
+    P.predictiveCovariance w = Foundations.dot w (Foundations.crossCovVector P.E P.X P.phenotype) :=
+  Foundations.covariance_linScore_eq_dot_crossCov P.E P.X w P.phenotype
 
 /-- **The prescribed weights make predictive covariance and score variance coincide.**
 
@@ -1452,9 +1452,9 @@ theorem predictiveCovariance_optimalWeights (sigmaInv : Matrix J J ℝ)
     P.predictiveCovariance (P.optimalWeights sigmaInv)
       = P.scoreVariance (P.optimalWeights sigmaInv) := by
   have hmul : P.sigmaX.mulVec (P.optimalWeights sigmaInv)
-      = crossCovVector P.E P.X P.phenotype := by
-    unfold optimalWeights optimalWeightsFromMoments
-    have h := Matrix.mulVec_mulVec (crossCovVector P.E P.X P.phenotype) P.sigmaX sigmaInv
+      = Foundations.crossCovVector P.E P.X P.phenotype := by
+    unfold optimalWeights Foundations.optimalWeightsFromMoments
+    have h := Matrix.mulVec_mulVec (Foundations.crossCovVector P.E P.X P.phenotype) P.sigmaX sigmaInv
     rw [hsigmaInv, Matrix.one_mulVec] at h
     simpa using h
   rw [predictiveCovariance_eq_dot_crossCov, P.scoreVariance_eq, hmul]
@@ -1494,9 +1494,9 @@ theorem deployedMse_excess (sigmaInv : Matrix J J ℝ) (w : J → ℝ)
     (hsigmaInv : P.sigmaX * sigmaInv = 1) :
     P.deployedMse w
       = P.deployedMse (P.optimalWeights sigmaInv)
-        + dot (fun j ↦ w j - P.optimalWeights sigmaInv j)
+        + Foundations.dot (fun j ↦ w j - P.optimalWeights sigmaInv j)
             (P.sigmaX.mulVec (fun j ↦ w j - P.optimalWeights sigmaInv j)) :=
-  master_transport_identity_closed_form sigmaInv P.E P.X P.phenotype w hcentered hsigmaInv
+  Foundations.master_transport_identity_closed_form sigmaInv P.E P.X P.phenotype w hcentered hsigmaInv
 
 end DeploymentPopulation
 
@@ -1516,7 +1516,7 @@ theorem target_deployedMse_excess (sigmaInvT : Matrix J J ℝ)
     (hsigmaInv : D.target.sigmaX * sigmaInvT = 1) :
     D.target.deployedMse D.w
       = D.target.deployedMse (D.target.optimalWeights sigmaInvT)
-        + dot (fun j ↦ D.w j - D.target.optimalWeights sigmaInvT j)
+        + Foundations.dot (fun j ↦ D.w j - D.target.optimalWeights sigmaInvT j)
             (D.target.sigmaX.mulVec
               (fun j ↦ D.w j - D.target.optimalWeights sigmaInvT j)) :=
   D.target.deployedMse_excess sigmaInvT D.w hcentered hsigmaInv
@@ -1535,13 +1535,13 @@ theorem weightError_eq (sigmaInvS sigmaInvT : Matrix J J ℝ) :
       = sigmaInvT.mulVec (D.target.kappa.mulVec D.target.β + D.target.contextX)
         - sigmaInvS.mulVec (D.source.kappa.mulVec D.source.β + D.source.contextX) := by
   funext j
-  unfold DeploymentPopulation.optimalWeights optimalWeightsFromMoments
-  have hT : crossCovVector D.target.E D.target.X D.target.phenotype
+  unfold DeploymentPopulation.optimalWeights Foundations.optimalWeightsFromMoments
+  have hT : Foundations.crossCovVector D.target.E D.target.X D.target.phenotype
       = D.target.kappa.mulVec D.target.β + D.target.contextX :=
-    crossCovVector_decomposition D.target.E D.target.X D.target.C D.target.β D.target.h
-  have hS : crossCovVector D.source.E D.source.X D.source.phenotype
+    Foundations.crossCovVector_decomposition D.target.E D.target.X D.target.C D.target.β D.target.h
+  have hS : Foundations.crossCovVector D.source.E D.source.X D.source.phenotype
       = D.source.kappa.mulVec D.source.β + D.source.contextX :=
-    crossCovVector_decomposition D.source.E D.source.X D.source.C D.source.β D.source.h
+    Foundations.crossCovVector_decomposition D.source.E D.source.X D.source.C D.source.β D.source.h
   rw [hT, hS]
   rfl
 
@@ -1596,19 +1596,19 @@ def oneContrastPopulation (v : Fin 4 → ℝ) : DeploymentPopulation (Fin 4) (Fi
 
 theorem oneContrast_statistic (v : Fin 4 → ℝ) :
     portabilityStatistic (oneContrastPopulation v) unitWeight
-      = (variance (uniformExp (Fin 4)) v, variance (uniformExp (Fin 4)) v,
-          variance (uniformExp (Fin 4)) v) := by
+      = (Foundations.variance (uniformExp (Fin 4)) v, Foundations.variance (uniformExp (Fin 4)) v,
+          Foundations.variance (uniformExp (Fin 4)) v) := by
   have hscore : (oneContrastPopulation v).score unitWeight = v := by
     funext ω
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+    simp [DeploymentPopulation.score, oneContrastPopulation, Foundations.linScore, Foundations.dot, unitWeight,
       Descent.Core.innerSum]
   have hpheno : (oneContrastPopulation v).phenotype = v := by
     funext ω
-    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, dot,
+    simp [DeploymentPopulation.phenotype, oneContrastPopulation, causalSignal, Foundations.dot,
       Descent.Core.innerSum]
   unfold portabilityStatistic DeploymentPopulation.scoreVariance
     DeploymentPopulation.predictiveCovariance DeploymentPopulation.outcomeVariance
-  rw [hscore, hpheno, ← variance_eq_covariance_self]
+  rw [hscore, hpheno, ← Foundations.variance_eq_covariance_self]
   rfl
 
 /-- The balanced contrast: half the population above zero. -/
@@ -1617,12 +1617,12 @@ def balancedContrast : Fin 4 → ℝ := ![-1, -1, 1, 1]
 /-- The spread contrast: the same variance, a quarter of the population above zero. -/
 def spreadContrast : Fin 4 → ℝ := ![-Real.sqrt 2, 0, 0, Real.sqrt 2]
 
-theorem variance_balancedContrast : variance (uniformExp (Fin 4)) balancedContrast = 1 := by
+theorem variance_balancedContrast : Foundations.variance (uniformExp (Fin 4)) balancedContrast = 1 := by
   rw [variance_uniformExp_four]
   simp [balancedContrast]
   norm_num
 
-theorem variance_spreadContrast : variance (uniformExp (Fin 4)) spreadContrast = 1 := by
+theorem variance_spreadContrast : Foundations.variance (uniformExp (Fin 4)) spreadContrast = 1 := by
   rw [variance_uniformExp_four]
   simp [spreadContrast]
   norm_num
@@ -1632,7 +1632,7 @@ theorem exceedance_balancedContrast :
   unfold exceedance
   have hscore : ∀ ω, (oneContrastPopulation balancedContrast).score unitWeight ω
       = balancedContrast ω := fun ω ↦ by
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+    simp [DeploymentPopulation.score, oneContrastPopulation, Foundations.linScore, Foundations.dot, unitWeight,
       Descent.Core.innerSum]
   simp only [hscore]
   show uniformExp (Fin 4) _ = _
@@ -1646,7 +1646,7 @@ theorem exceedance_spreadContrast :
   unfold exceedance
   have hscore : ∀ ω, (oneContrastPopulation spreadContrast).score unitWeight ω
       = spreadContrast ω := fun ω ↦ by
-    simp [DeploymentPopulation.score, oneContrastPopulation, linScore, dot, unitWeight,
+    simp [DeploymentPopulation.score, oneContrastPopulation, Foundations.linScore, Foundations.dot, unitWeight,
       Descent.Core.innerSum]
   simp only [hscore]
   show uniformExp (Fin 4) _ = _

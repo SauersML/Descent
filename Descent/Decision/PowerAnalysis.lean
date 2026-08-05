@@ -5,7 +5,7 @@ import Descent.PopGen.PolygenicArchitecture
 import Descent.Blindness.BundleRigidity.DeploymentCeiling
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Decision
 
 open MeasureTheory
 
@@ -150,14 +150,14 @@ theorem ncp_increases_with_n (n₁ n₂ : ℕ) (beta p : ℝ)
     of magnitude at every `ncp` — which is exactly what a threshold-free form
     cannot reproduce. -/
 noncomputable def powerAtThreshold (ncp z_alpha : ℝ) : ℝ :=
-  Phi (Real.sqrt ncp - z_alpha)
+  Foundations.Phi (Real.sqrt ncp - z_alpha)
 
 /-- **powerAtThreshold at its junk point, named.** A negative non-centrality parameter is
 inadmissible; `Real.sqrt` is junk-zero there, so the power collapses to the size of the test. A
 caller passing a sign-flipped effect gets the nominal type-one error rate back as if it were
 power. Consumers must exclude the argument that makes the guard vanish. -/
 theorem powerAtThreshold_negative_noncentrality_is_junk (z_alpha : ℝ) :
-    powerAtThreshold (-1) z_alpha = Phi (-z_alpha) := by
+    powerAtThreshold (-1) z_alpha = Foundations.Phi (-z_alpha) := by
   unfold powerAtThreshold
   rw [Real.sqrt_eq_zero_of_nonpos (by norm_num)]
   norm_num
@@ -167,14 +167,14 @@ theorem powerAtThreshold_negative_noncentrality_is_junk (z_alpha : ℝ) :
 theorem powerAtThreshold_mono (ncp₁ ncp₂ z_alpha : ℝ) (h : ncp₁ ≤ ncp₂) :
     powerAtThreshold ncp₁ z_alpha ≤ powerAtThreshold ncp₂ z_alpha := by
   unfold powerAtThreshold
-  exact Phi_monotone (by linarith [Real.sqrt_le_sqrt h])
+  exact Foundations.Phi_monotone (by linarith [Real.sqrt_le_sqrt h])
 
 /-- **A stricter threshold lowers power** at fixed noncentrality.  This is the
     dependence the previous definition could not express. -/
 theorem powerAtThreshold_antitone_in_threshold (ncp z₁ z₂ : ℝ) (h : z₁ ≤ z₂) :
     powerAtThreshold ncp z₂ ≤ powerAtThreshold ncp z₁ := by
   unfold powerAtThreshold
-  exact Phi_monotone (by linarith)
+  exact Foundations.Phi_monotone (by linarith)
 
 
 /-- **Rare variants need larger samples.**
@@ -854,4 +854,4 @@ theorem fixedGradeBenchmark_lt_logarithmicBenchmark_eventually (K c : ℝ) :
 
 end NonsmoothSampleSize
 
-end Descent
+end Descent.Decision

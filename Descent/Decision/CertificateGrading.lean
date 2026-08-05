@@ -59,7 +59,7 @@ particular, `n` below indexes a parameter catalogue, not independent
 observations.
 -/
 
-namespace Descent.CertificateGrading
+namespace Descent.Decision.CertificateGrading
 
 open scoped BigOperators
 
@@ -1228,4 +1228,4 @@ theorem convexTarget_atomCertificationGap_is_junk :
   unfold FiniteMixtureExperiment.atomCertificationGap
   rw [convexTarget_atomModulus_two, div_zero]
 
-end Descent.CertificateGrading
+end Descent.Decision.CertificateGrading

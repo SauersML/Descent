@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.GenerativePortabilityLaw
 
-namespace Descent
+namespace Descent.Spectral
 
 open scoped BigOperators
 
@@ -342,4 +342,4 @@ theorem twoBand_no_common_monotone_scalar (a : ℝ) (ha : a ≠ 0) :
   · rw [(twoBand_reversal_values a).2.2.1, (twoBand_reversal_values a).2.2.2]
     exact sq_pos_of_ne_zero ha
 
-end Descent
+end Descent.Spectral

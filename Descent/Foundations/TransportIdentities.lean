@@ -5,7 +5,7 @@ import Descent.Foundations.Probability
 import Mathlib.Probability.CondVar
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Foundations
 
 noncomputable section
 
@@ -1237,6 +1237,6 @@ end ConfusionMatrix
 
 end BinaryMetrics
 
-end
+end Descent.Foundations
 
 end Descent

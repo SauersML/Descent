@@ -401,7 +401,7 @@ section OracleAndRegret
 /-- A map from a feature space to a probability. Both names below are this type; they
 differ in what the map is CLAIMED to be, and the whole oracle comparison is about the
 gap between the two claims. -/
-abbrev ProbMap (Z : Type u) := Z → UnitProb
+abbrev ProbMap (Z : Type u) := Z → Foundations.UnitProb
 
 /-- True conditional probability on feature space `Z`: the map nature supplies. -/
 abbrev TrueCondProb (Z : Type u) := ProbMap Z
@@ -629,7 +629,7 @@ theorem bernoulliKLReal_self (p : ℝ) : bernoulliKLReal p p = 0 := by
     · rw [div_self hp, div_self hq]; norm_num
 
 /-- Bernoulli KL on `[0,1]` probabilities. -/
-noncomputable def klBernReal (p q : UnitProb) : ℝ :=
+noncomputable def klBernReal (p q : Foundations.UnitProb) : ℝ :=
   bernoulliKLReal p.1 q.1
 
 theorem bernoulliKLReal_nonneg (p q : ℝ) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
@@ -736,7 +736,7 @@ theorem bernoulliKLReal_eq_zero_iff (p q : ℝ)
     simp [bernoulliKLReal]
 
 /-- `UnitProb` form of `bernoulliKLReal_eq_zero_iff`. -/
-theorem klBernReal_eq_zero_iff (p q : UnitProb)
+theorem klBernReal_eq_zero_iff (p q : Foundations.UnitProb)
     (hp : 0 < p.1 ∧ p.1 < 1) (hq : 0 < q.1 ∧ q.1 < 1) :
     klBernReal p q = 0 ↔ q = p := by
   unfold klBernReal

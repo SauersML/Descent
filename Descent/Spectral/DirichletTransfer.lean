@@ -5,7 +5,7 @@ import Mathlib.Tactic
 import Mathlib.Data.Real.Sqrt
 import Descent.Core.Ratios
 
-namespace Descent
+namespace Descent.Spectral
 
 /-!
 # Transfer degradation is a Dirichlet energy, and that is a construction rule
@@ -714,4 +714,4 @@ end ShrinkageRule
 
 end DirichletTransfer
 
-end Descent
+end Descent.Spectral
