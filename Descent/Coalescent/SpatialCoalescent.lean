@@ -125,7 +125,12 @@ def voterPedigree {n : ℕ} (u : ℕ → Fin n × Fin n) : Pedigree n :=
 
 /-- The spatial coalescent's state: which sampled sites share an opinion-ancestor.  It is
 `Pedigree.ancestralRel` of the voter pedigree, so every structural theorem there is a
-theorem here. -/
+theorem here.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  It is `Pedigree.ancestralRel` at a particular
+pedigree, and that definition carries the same verdict for the same reason: it defines
+"common ancestor" rather than asserting one.  What is empirical is which updates a population
+performs, which is `voterPedigree`'s argument. -/
 def voterAncestralRel {m n : ℕ} (u : ℕ → Fin n × Fin n) (sample : Fin m → Fin n) (s : ℕ) :
     ER m :=
   ancestralRel (voterPedigree u) sample s
