@@ -31,8 +31,19 @@ export ELAN_HOME=$ROOT/.elan
 
 # Same compute-node guarantee as cluster-lean-build.sh, and for the same reason:
 # the relay lands on a login node, and the Lean build here is not a small job.
-CPUS=${CPUS:-32}
-MEM=${MEM:-96g}
+#
+# WIDTH IS BOUNDED BY MEMORY, NOT BY CORES. Lake takes its job count from
+# `nproc`, and `nproc` correctly reports the ALLOCATION's cpuset -- 32 inside
+# `--cpus-per-task=32`, against 128 in /proc/cpuinfo -- so the job count follows
+# CPUS with no flag to set (Lake 5.0.0 has no `-j`). Each elaborator on this
+# corpus peaks around 3 GB, so 32-way needs roughly 100 GB and a cold build at
+# `CPUS=32 MEM=96g` was OOM-killed at exit 137 with nothing in the log to say so.
+#
+# 16-way at 120g leaves real headroom and is the neighbourly choice on a node
+# shared with other users: taking 300 GB to run 32-way would fit, and would be
+# most of the free memory on acn112. Raise CPUS only together with MEM.
+CPUS=${CPUS:-16}
+MEM=${MEM:-120g}
 TIMELIMIT=${TIMELIMIT:-1:00:00}
 if [ -z "${SLURM_JOB_ID:-}" ]; then
   exec sbatch --job-name=ci-mirror --partition="${PARTITION:-agsmall}" \
