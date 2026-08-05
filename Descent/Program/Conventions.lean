@@ -1,30 +1,18 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Heterozygosity
-import Descent.PopGen.AncestrySpecificArchitecture
-import Descent.PopGen.AssortativeMatingPGS
-import Descent.Foundations.CovarianceStructure
-import Descent.PopGen.GeneticArchitectureDiscovery
-import Descent.Portability.StatisticalGeneticsMethodology
-import Descent.Blindness.BlindnessRegistry
-import Descent.PopGen.SerialFounderChain
+import Descent.Blindness.BundleRigidity.DeploymentCeiling
 import Descent.Blindness.BundleRigidity.TwoAtom
-import Descent.Portability.LongitudinalPortability
-import Descent.Portability.ImputationPortability
+import Descent.Blindness.XiFromMarkedBreakouts
+import Descent.Conditionals.DriftingConditional
+import Descent.PopGen.AssortativeMatingPGS
+import Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation
+import Descent.PopGen.SerialFounderChain
+import Descent.Portability.AncestrySpecificPower
 import Descent.Portability.MetricSpecificPortability
-import Descent.Portability.ScoreDistribution
-import Descent.PopGen.EpistasisAndNonAdditivity
-import Descent.PopGen.VarianceComponents
-import Descent.Decision.PowerAnalysis
-import Descent.PopGen.PolygenicAdaptation
-import Descent.Portability.AncestryCalibration
-import Descent.Portability.PortabilityBounds
-import Descent.Portability.StratificationConfounding
+import Descent.Portability.PCCorrectability
 import Descent.Portability.TransferLearningPGS
-import Descent.Portability.RareVariantPortability
-import Descent.Core.Fst
-import Descent.Core.Parameters
+import Descent.Spectral.PolygenicSpectroscopy
 
 namespace Descent.Program
 

@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Algebra.Order.Chebyshev
 import Descent.PopGen.DGP
 import Descent.Portability.TransplantationStability
-import Descent.Core.Ratios
 
 namespace Descent.Portability
 

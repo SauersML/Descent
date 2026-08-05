@@ -1,23 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Coalescent.Split
-import Descent.Coalescent.CutSets
-import Descent.Coalescent.CutCount
-import Descent.Coalescent.Path
-import Descent.Coalescent.Trajectory
-import Descent.Coalescent.Law
-import Descent.Coalescent.HoldingTime
-import Descent.Coalescent.Infinite
-import Descent.Coalescent.Encoding
-import Descent.Coalescent.CompetingRates
-import Descent.Coalescent.StepLaw
-import Descent.Coalescent.PaintboxFrequency
-import Descent.Coalescent.Extend
-import Descent.Coalescent.Ewens
-import Descent.Coalescent.Mutation
-import Descent.Coalescent.Kernel
 import Mathlib.Tactic
+import Descent.Coalescent.Encoding
+import Descent.Coalescent.Extend
+import Descent.Coalescent.HoldingTime
+import Descent.Coalescent.PaintboxFrequency
+import Descent.Coalescent.WrightFisher
 
 namespace Descent
 

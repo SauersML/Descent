@@ -1,9 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Population
-import Descent.Portability.ContinuumCalibrationProgram
 import Descent.Conditionals.DynamicsContrast
+import Descent.Portability.ContinuumCalibrationProgram
 
 /-!
 # Polygenic-score calibration over an ancestry continuum

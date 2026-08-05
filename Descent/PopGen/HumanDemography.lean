@@ -1,10 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PortabilityDrift
 import Descent.Blindness.LumpedRateBlindness
-import Descent.Core.Fst
-import Descent.Core.Moments
+import Descent.Portability.PortabilityDrift
 
 namespace Descent.PopGen
 

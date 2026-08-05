@@ -1,9 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.Data.Nat.Choose.Sum
-import Descent.Core.Ratios
+import Descent.Blindness.SpectrumIdentifiability
 
 namespace Descent.PopGen
 

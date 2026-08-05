@@ -1,12 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.Conclusions
 import Descent.PopGen.DGP
+import Descent.Program.Conclusions
 import Descent.Spectral.CirculationDefect
-import Descent.Core.Fst
-import Descent.Core.Parameters
-import Descent.Core.Moments
 
 namespace Descent.Portability
 

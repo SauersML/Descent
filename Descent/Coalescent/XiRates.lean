@@ -1,8 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Coalescent.Xi
 import Mathlib.Tactic
+import Descent.Coalescent.Lambda
 
 namespace Descent
 

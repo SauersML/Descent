@@ -1,10 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Ratios
-import Descent.Core.Scaling
 import Mathlib.Order.Filter.AtTopBot.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
+import Descent.Core.Scaling
 
 /-!
 # Core: one island-model `F_ST`, and the lattice its specialisations form

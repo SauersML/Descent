@@ -1,11 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PGSCalibrationTheory
+import Descent.Conditionals.DriftingConditional
 import Descent.PopGen.LDDecayTheory
 import Descent.Portability.HorizonCurve
-import Descent.Conditionals.DriftingConditional
-import Descent.Core.Fst
+import Descent.Portability.PGSCalibrationTheory
 
 namespace Descent.Portability
 

@@ -1,13 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Population
 import Descent.Foundations.TransportIdentities
--- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
--- positivity certificate for excess target risk that does not read an F_ST difference.
--- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
 import Descent.Spectral.SpectralDegradation
-import Descent.Core.Fst
-import Descent.Core.Parameters
 
 namespace Descent.PopGen
 

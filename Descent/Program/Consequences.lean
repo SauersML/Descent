@@ -1,30 +1,28 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.MultiAncestryTheory
-import Descent.Portability.SampleOverlapBias
-import Descent.Portability.PortabilityBounds
-import Descent.Core.Moments
-import Descent.Portability.ImputationPortability
-import Descent.Portability.LongitudinalPortability
-import Descent.Portability.EquityAndImplementation
-import Descent.PopGen.HumanDemography
-import Descent.PopGen.DemographicCapacity
-import Descent.Portability.CorrectionBiology
-import Descent.PopGen.AdditiveInvariance
-import Descent.Portability.PCCorrectability.Nonidentifiability
-import Descent.Portability.PCCorrectability.Diagnostic
-import Descent.Foundations.CovarianceStructure
-import Descent.Blindness.DecoratedGeometryBlindness
-import Descent.Program.CausalInference
-import Descent.Portability.PolygenicContinuumCalibration
-import Descent.Portability.GenerativePortabilityLaw
-import Descent.Portability.PCCorrectability.EndToEnd
-import Descent.Spectral.ProjectionSolve
-import Descent.Portability.PCCorrectability.Design
-import Descent.Blindness.CountingInvariantInstances
 import Descent.Blindness.BundleRigidity.Cycles
 import Descent.Blindness.BundleRigidity.Dichotomy
+import Descent.Blindness.CountingInvariantInstances
+import Descent.Blindness.DecoratedGeometryBlindness
+import Descent.Foundations.CovarianceStructure
+import Descent.PopGen.AdditiveInvariance
+import Descent.PopGen.DemographicCapacity
+import Descent.PopGen.HumanDemography
+import Descent.Portability.CorrectionBiology
+import Descent.Portability.EquityAndImplementation
+import Descent.Portability.GenerativePortabilityLaw
+import Descent.Portability.ImputationPortability
+import Descent.Portability.LongitudinalPortability
+import Descent.Portability.MultiAncestryTheory
+import Descent.Portability.PCCorrectability.Design
+import Descent.Portability.PCCorrectability.EndToEnd
+import Descent.Portability.PCCorrectability.Nonidentifiability
+import Descent.Portability.PolygenicContinuumCalibration
+import Descent.Portability.PortabilityBounds
+import Descent.Portability.SampleOverlapBias
+import Descent.Program.CausalInference
+import Descent.Spectral.ProjectionSolve
 
 /-!
 # What the separate results say when they are put together

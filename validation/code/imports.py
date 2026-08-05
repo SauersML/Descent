@@ -57,9 +57,18 @@ by effect.
   python3 validation/code/imports.py chains         # necklace detection
   python3 validation/code/imports.py analyze        # per-module minimal set
   python3 validation/code/imports.py analyze --dir Descent/Portability/PortabilityDrift
+  python3 validation/code/imports.py verify         # names with no import providing them
   python3 validation/code/imports.py rewrite --dir ... [--apply]
 
 `rewrite` without `--apply` prints the diff it would make and changes nothing.
+`verify` is the gate: run it before and after, and the count must not rise.
+
+`--keep-head-imports` holds back one class of edit -- see `plan`.  31 modules
+import a directory HEAD to reach one or two declarations, and naming the module
+instead is strictly less build work; but `check.py --only shape-depth` deletes
+tables of contents from the graph before measuring, so those edges are scored as
+free and making them honest reads as a depth regression from 12 to 18.  The flag
+exists so the other 105 edits can land while that is settled.
 
 NOT A COMPILER.  This reads source text.  It cannot see what Lean's elaborator
 sees, and on this corpus it CANNOT be checked against `#min_imports` today
@@ -563,7 +572,7 @@ def ambient_reaches(mods, syms, dropped, exposed):
     return None
 
 
-def plan(mods, syms, verbose=False):
+def plan(mods, syms, verbose=False, keep_head_imports=False):
     """The whole corpus's new import lists, as a fixed point.
 
     WHY THIS IS NOT PER-MODULE.  The first version of this analysis reduced each
@@ -622,6 +631,18 @@ def plan(mods, syms, verbose=False):
         # computed against a reduced head would justify drops that the real
         # tree, with the head unchanged, never supports.
         required[name] = set(mods[name].imports) if is_head(name) else set(forced)
+        if keep_head_imports and not is_head(name):
+            # A module that imports a directory HEAD to reach one declaration is
+            # paying for the whole directory, and replacing that with the module
+            # it names is the right edit -- 31 modules in this corpus do it.
+            # But `check.py --only shape-depth` deletes tables of contents from
+            # the graph before measuring, so a `module -> head` edge is scored
+            # as free and the replacement, which strictly reduces build work,
+            # reads as a depth REGRESSION (12 to 18 when all 31 are done).
+            # This flag holds those 31 back so the rest can land while that
+            # disagreement is settled, and is not a claim that keeping them is
+            # better.
+            required[name] |= {h for h in mods[name].imports if is_head(h)}
         unresolved[name] = sorted(misses)
 
     # -- 2. ambient re-admission, to a fixed point ------------------------
@@ -936,7 +957,8 @@ def selected(mods, args):
 
 def cmd_analyze(mods, args):
     syms = Symbols(mods)
-    table = plan(mods, syms, verbose=args.verbose)
+    table = plan(mods, syms, verbose=args.verbose,
+                 keep_head_imports=args.keep_head_imports)
     lines_changed = kept = lost = orphaned = 0
     for name in selected(mods, args):
         if is_head(name):
@@ -1005,7 +1027,7 @@ def cmd_verify(mods, args):
 
 def cmd_rewrite(mods, args):
     syms = Symbols(mods)
-    table = plan(mods, syms)
+    table = plan(mods, syms, keep_head_imports=args.keep_head_imports)
     changed = 0
     for name in selected(mods, args):
         if is_head(name):
@@ -1047,6 +1069,10 @@ def main(argv=None):
         s.add_argument("--dir", default=None)
         s.add_argument("--module", default=None)
         s.add_argument("--verbose", action="store_true")
+        s.add_argument("--keep-head-imports", action="store_true",
+                       dest="keep_head_imports",
+                       help="do not replace an import of a directory head with the "
+                            "modules under it; see `plan`")
         if nm == "rewrite":
             s.add_argument("--apply", action="store_true")
         s.set_defaults(fn=fn)

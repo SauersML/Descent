@@ -1,26 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Conditionals.DeclaredInteractionClass
-import Descent.Core.Population
-import Descent.Portability.ContinuumCalibration
-import Descent.Portability.CorrectionWidths
-import Descent.Conditionals.DescentGeometry
-import Descent.Spectral.DirichletTransfer
-import Descent.Spectral.ErgodicCovariancePencil
-import Descent.Spectral.EnsembleChannel
-import Descent.PopGen.FrequencySpectrumStability
-import Descent.Portability.HorizonCurve
 import Descent.Blindness.LandscapeSuperposition
-import Descent.Blindness.MarkedBreakoutUniversality
-import Descent.Blindness.XiFromMarkedBreakouts
-import Descent.Blindness.MultipleMergerBlindness
-import Descent.Spectral.PencilEnvironment
-import Descent.Conditionals.FunctionalDescent
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
-import Descent.Core.Fst
+import Descent.Blindness.XiFromMarkedBreakouts
+import Descent.Portability.CorrectionWidths
+import Descent.Spectral.EnsembleChannel
+import Descent.Spectral.ErgodicCovariancePencil
 
 namespace Descent.Conditionals
 
@@ -35,12 +23,13 @@ open scoped BigOperators
 
 Part of the split of `Descent/Conditionals/DynamicsContrast.lean`, which was 3,590 lines.
 
-The parts are a CHAIN: each imports the one before, in the order the original was written.
-That is the conservative choice, deliberately. A monolith's declarations depend on each
-other in whatever order they happen to appear, and cutting it into modules that import only
-what they use means discovering that order first -- worth doing, and not what this does.
-The chain preserves every resolution the single file had, so the split cannot change what
-any proof sees.
+The parts are a FAN: each imports the modules that declare the symbols it names, and nothing
+else. The split first made them a CHAIN -- each importing the one before, in the order the
+original text ran -- which preserved every resolution the single file had and charged every
+part a dependency on everything written above it, used or not. Recovering the real order is
+the work that chain deferred: each part's identifiers were resolved against the corpus's
+declarations, and the imports above are the answer, so what a part rests on is readable from
+its header instead of inherited from its position in a file that no longer exists.
 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.

@@ -1,10 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.AncestrySpecificPower
-import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.DemographicHistory
-import Descent.Core.Ratios
+import Descent.Portability.AncestrySpecificPower
 
 namespace Descent.PopGen
 

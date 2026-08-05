@@ -1,13 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PortabilityDrift
--- For `summary_statistic_coherence_not_locally_certifiable`,
--- `no_bounded_locality_hierarchy`, `nonbipartite_twin_tv_gap` and
--- `expanderAgreementFloor`: the window-audit section below is what the twin
--- construction says about neighbourhood-consistency QC.
 import Descent.Conditionals.LocalToGlobalCoherence
-import Descent.Core.Ratios
+import Descent.Portability.PortabilityDrift
 
 namespace Descent.Portability
 

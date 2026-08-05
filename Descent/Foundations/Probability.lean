@@ -10,8 +10,6 @@ import Mathlib.Probability.CDF
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.InformationTheory.KullbackLeibler.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
-import Descent.Core.Ratios
-import Descent.Core.Population
 import Descent.Core.Genome
 
 open scoped InnerProductSpace

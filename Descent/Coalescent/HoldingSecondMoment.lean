@@ -1,9 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Coalescent.HoldingTime
-import Descent.Coalescent.TransitVariance
 import Mathlib.Tactic
+import Descent.Coalescent.HoldingTime
 
 namespace Descent
 

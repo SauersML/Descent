@@ -1,15 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.MultipleMergerBlindness
-import Descent.Coalescent.Rates
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.LinearAlgebra.Dimension.Constructions
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
-import Descent.Core.Ratios
+import Descent.Blindness.MultipleMergerBlindness
+import Descent.Coalescent.Rates
 
 namespace Descent.Blindness
 
