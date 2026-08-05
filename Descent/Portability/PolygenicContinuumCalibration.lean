@@ -123,7 +123,7 @@ same binary direction, despite reversing their argument roles. -/
 theorem gaugeAlignedPredictor_eq_persistentOnlyDynamicsPosterior
     (persists : Bool) (x : Unit) :
     gaugeAlignedPredictor persists x =
-      Conditionals.persistentOnlyDynamicsPosterior (0 : Descent.Core.BinaryState) persists := by
+      Conditionals.persistentOnlyDynamicsPosterior (0 : Descent.BinaryState) persists := by
   cases persists <;>
     norm_num [gaugeAlignedPredictor, Conditionals.persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
 
