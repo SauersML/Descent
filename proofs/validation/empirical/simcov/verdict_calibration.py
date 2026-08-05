@@ -16,8 +16,11 @@ import verdict
 CASES = []
 
 
-def case(name, expect, cells, **kw):
-    CASES.append((name, expect, cells, kw))
+def case(label, expect, cells, **kw):
+    # The first parameter is `label`, not `name`: `classify` takes a `name=`
+    # kwarg for the oracle-identity gate, and a positional called `name` here
+    # made `case(..., name="driftVariance")` a duplicate-argument TypeError.
+    CASES.append((label, expect, cells, kw))
 
 
 # ---------------------------------------------------------------------------
@@ -102,23 +105,70 @@ case("coalFst (real validation)", "MATCH",
       dict(design="t=2000", lean=0.50000, truth=0.49974, sem=0.00330)])
 
 
+# ---------------------------------------------------------------------------
+# ORACLE IDENTITIES: the gate must refuse a MATCH, and must NOT refuse anything
+# else.  Both directions, because a wrong entry discards a real measurement and
+# nobody re-runs a battery that has been declared vacuous.
+# ---------------------------------------------------------------------------
+# POSITIVE.  The real battery_bulk21 shape: a few parts in 10^3 of scatter, well
+# inside every numerical gate, which is exactly why the MATCH was banked.  The
+# SELF-TEST gate cannot see this -- the agreement is not to machine precision,
+# because the oracle reaches the same expression by a different numerical route.
+case("driftVariance (banked MATCH, algebraically vacuous)", "VACUOUS",
+     [dict(design="t=30", lean=0.01784, truth=0.01786, sem=0.00021),
+      dict(design="t=100", lean=0.05512, truth=0.05498, sem=0.00058),
+      dict(design="t=250", lean=0.11627, truth=0.11640, sem=0.00121)],
+     name="driftVariance")
+
+case("expectedFreqDiffSq [competing] (label decoration must not evade the gate)",
+     "VACUOUS",
+     [dict(design="t=30", lean=0.03568, truth=0.03572, sem=0.00042),
+      dict(design="t=100", lean=0.11024, truth=0.10996, sem=0.00116),
+      dict(design="t=250", lean=0.23254, truth=0.23280, sem=0.00242)],
+     name="AncestrySpecificArchitecture.expectedFreqDiffSq [competing]")
+
+# NEGATIVE.  Substring matching would fire on this name and throw away a real
+# falsification.  The gate matches whole identifier tokens, so it must not.
+case("pgsDriftVarianceFromLoci (NOT registered; substring trap)", "FALSIFIED",
+     [dict(design="t=30", lean=25.98, truth=51.55, sem=1.46),
+      dict(design="t=100", lean=91.79, truth=181.14, sem=5.12),
+      dict(design="t=250", lean=210.88, truth=427.79, sem=12.10)],
+     name="pgsDriftVarianceFromLoci",
+     control=dict(design="pgsDriftVariance_one_pop on the same draws",
+                  lean=51.97, truth=51.55, sem=1.46))
+
+# NEGATIVE.  A real validation carrying a name must still pass; the gate must
+# fire on the registry, not on the presence of a name.
+case("coalFst (real validation, named)", "MATCH",
+     [dict(design="t=500", lean=0.20000, truth=0.19923, sem=0.00227),
+      dict(design="t=1000", lean=0.33333, truth=0.33415, sem=0.00319),
+      dict(design="t=2000", lean=0.50000, truth=0.49974, sem=0.00330)],
+     name="coalFst")
+
+
 def main():
     print("%-46s %-22s %-22s %s" % ("case", "expected", "gate verdict", "ok"))
     print("-" * 100)
     npass = 0
-    for name, expect, cells, kw in CASES:
+    for label, expect, cells, kw in CASES:
         v, note, worst = verdict.classify([dict(c) for c in cells], **kw)
         ok = v.split(" ")[0] == expect.split(" ")[0]
         npass += ok
-        print("%-46s %-22s %-22s %s" % (name, expect, v, "PASS" if ok else "*** FAIL"))
+        print("%-46s %-22s %-22s %s" % (label, expect, v, "PASS" if ok else "*** FAIL"))
         if not ok:
             print("      note: %s" % note)
     print("-" * 100)
     print("%d / %d gate outcomes as specified" % (npass, len(CASES)))
-    print("\nThe two columns are the point: five artefacts the harness actually")
-    print("produced are refused, and four real findings plus two real")
-    print("validations survive unchanged.")
+    print("\nThe two columns are the point: the artefacts the harness actually")
+    print("produced are refused, and the real findings and real validations")
+    print("survive unchanged. The oracle-identity rows add a third pairing --")
+    print("a banked MATCH that is algebraically vacuous is refused, while a")
+    print("name that merely LOOKS like a registered one keeps its FALSIFIED.")
+    # A calibration that cannot fail the run is a calibration nobody notices
+    # has stopped holding. This one exits non-zero, like test_check.py.
+    return 0 if npass == len(CASES) else 1
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())

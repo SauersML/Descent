@@ -174,7 +174,21 @@ indistinguishability recorded in the note above can be stated rather than assert
     harness duly reported both candidates as failing by tens of sems. The
     measured number 0.974 was correct throughout; only the two predictions it
     was compared against carried the wrong sign.
--/
+
+    **A third, convention-free confirmation that needs no simulation at all: the
+    body is not dimensionally homogeneous.** `Ne` enters population genetics only
+    as a number of generations (`2 * Ne` is the coalescent time scale) and `m` is
+    a per-generation rate, so `4 * Ne * m` is dimensionless and `4 * Ne * m * σ_sq`
+    — the sibling `demoSteppingStoneFst`'s denominator term — carries exactly the
+    units of `σ_sq`, which are the units `d` is counted in. Replacing `m * σ_sq`
+    by `σ_sq ^ 2 * m ^ 2` multiplies that term by one extra factor of `m`, leaving
+    a per-generation rate added to a distance. No choice of units for `d` or
+    `σ_sq` can rescue it: whatever convention makes `demoSteppingStoneFst`
+    homogeneous makes this body inhomogeneous by one power of time. That argument
+    is exact, costs nothing, commits to no `F_ST` convention, and reaches the same
+    verdict the two log-log slope measurements above reached — which is the point
+    of recording it: three instruments that could each have said no, and none of
+    them did. -/
 noncomputable def steppingStoneFstQuadratic (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * σ_sq ^ 2 * m ^ 2)
 
@@ -642,7 +656,22 @@ This is `admixedFst α fst_AB`.
 /-- **Allele frequency in the admixed population.**
     p_adm = α · p_A + (1-α) · p_B.
 
-    Empirical status: UNTESTED. -/
+    Regime: generation zero of a single pulse, ancestry assigned per
+    individual. This is the frequency in the MIXTURE, so it needs no assumption
+    about mating or linkage.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bulk30.py`). Measured as
+    the realised allele frequency in a simulated admixed sample of 6×10⁶
+    individuals whose ancestry is drawn at rate `α` and whose alleles are then
+    drawn from the assigned ancestry's frequency. Worst cell 0.91 sems at 0.02%
+    relative, with `α` swept 0.2 to 0.8 and the ancestral frequencies differing
+    by up to 0.8.
+
+    The companion `LDDecayTheory.admixtureLD` is measured on the SAME draws and
+    is where the power lives: three competing forms of the mixing weight are
+    falsified there at up to 1627 sems. That matters here because both bodies
+    read `α` as the same mixing proportion, so a design that fixed the weight
+    for one fixes the reading for the other. -/
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
   α * p_A + (1 - α) * p_B
 
