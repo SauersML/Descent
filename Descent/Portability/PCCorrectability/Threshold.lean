@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Fst
 import Descent.Foundations.ReferenceEvaluation
 import Mathlib.Data.Real.Sqrt
 
@@ -229,6 +230,93 @@ theorem pcCorrectabilityMargin_old_reference_point_discriminates_nothing :
     2 * demographicSpike 1 1 1 - bbpProxyThreshold 1 1 =
       pcCorrectabilityMargin 1 1 1 1 := by
   unfold pcCorrectabilityMargin bbpProxyThreshold demographicSpike effectiveSubgroupSize
+  norm_num
+
+/-! ### The two named specializations, and why they are two
+
+`demographicSpike` takes an `F` and does not know which estimator produced it, which is
+exactly the freedom the BBP measurement had to remove.  The two definitions below fix that
+argument, one to Nei's `G_ST` and one to Hudson's `F_ST`, and they are named apart because
+the calibration belongs to only one of them.
+
+They were in `Program/Conventions.lean` because that is where `neiGst` and `hudsonFst` were.
+Those are `Core.Fst` kernels now, so the specializations sit next to the body they
+specialize, and `PopGen.DemographicCapacity` -- which is their only consumer, and which
+imported the audit layer at depth 22 to reach them -- gets them from here. -/
+
+/-- **The allele-frequency-contrast normalization.**
+
+This is deliberately not called the BBP spike: its input is Nei's `G_ST`, and
+its interpretation is the standardized allele-frequency contrast
+variance times the subgroup load.
+
+    Empirical status: CONVENTION PINNED as Nei's `G_ST`, and no measurement bears on the
+    constant here. The `4` in `demographicSpike` is DERIVED for this input --
+    `four_neiGst_eq_standardizedContrastVariance` proves `4·G_ST` IS the standardized
+    allele-frequency contrast variance, as algebra with no population in it -- so this
+    specialization inherits an identity rather than an empirical calibration. The BBP
+    inversion that recovered `3.9920 ± 0.0045` supplied genuine Hudson `F_ST` and therefore
+    calibrates `hudsonBbpSpike`; because `Hudson = 2G/(1+G)` is nonlinear, that measurement
+    does NOT transfer here, which is the whole reason the two specializations are named
+    apart. -/
+noncomputable def neiContrastSpike (n m p₁ p₂ : ℝ) : ℝ :=
+  demographicSpike n (Descent.Core.neiGst p₁ p₂) m
+
+/-- **The empirically calibrated PC/BBP normalization.**
+
+The `F` supplied to the validation experiment was the ratio-of-averages Hudson
+estimator. This named specialization prevents that empirical law from being
+silently reinterpreted as the different Nei functional.
+
+    Empirical status: **VALIDATED**, and this specialization is the one the measurement was
+    made on. Inverting the BBP eigenvalue law on simulated genotypes recovers the constant
+    as `3.9920 ± 0.0045` against the derived `4`, with `F` measured as genuine Hudson
+    `F_ST` on the same simulated data
+    (`validation/empirical/differential/cluster/fam_im_coalescent_results.json`, which
+    records `3.99240`). That is 1.8 sems from `4` and 442 sems from the `2` the constant
+    might otherwise have been, so the run discriminates the constant rather than tolerating
+    it.
+
+    The competitor on the same cells is `neiContrastSpike`: supplying Nei's `G_ST` to the
+    same body moves the answer by a factor approaching two at weak differentiation, so the
+    measurement identifies the ESTIMATOR as well as the constant. -/
+noncomputable def hudsonBbpSpike (n m p₁ p₂ : ℝ) : ℝ :=
+  demographicSpike n (Descent.Core.hudsonFst p₁ p₂) m
+
+/-- **The Nei-normalized contrast spike has an exact observable form.** -/
+theorem neiContrastSpike_eq_contrastVariance_mul_effectiveSize
+    (n m p₁ p₂ : ℝ)
+    (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
+    neiContrastSpike n m p₁ p₂ =
+      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))) *
+        effectiveSubgroupSize n m := by
+  unfold neiContrastSpike demographicSpike
+  rw [← Descent.Core.four_neiGst_eq_standardizedContrastVariance p₁ p₂ h]
+
+/-- **The Hudson-calibrated spike expressed on the Nei scale.**
+
+The exact conversion is nonlinear:
+`4·Hudson = 8·G_ST/(1+G_ST)`. Thus the two named spike laws cannot be
+reconciled by changing a global constant. In the weak-differentiation regime
+the Hudson-calibrated level approaches twice the Nei contrast level. -/
+theorem hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+    (n m p₁ p₂ : ℝ)
+    (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
+    (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
+    hudsonBbpSpike n m p₁ p₂ =
+      (8 * Descent.Core.neiGst p₁ p₂ / (1 + Descent.Core.neiGst p₁ p₂)) * effectiveSubgroupSize n m := by
+  unfold hudsonBbpSpike demographicSpike
+  rw [Descent.Core.hudsonFst_eq_of_neiGst p₁ p₂ hpos hbar]
+  ring
+
+/-- **A regression witness preventing convention collapse.** At an interior,
+mean-one-half frequency pair, the empirically Hudson-calibrated spike and the
+exact Nei contrast spike are different. -/
+theorem hudsonBbpSpike_ne_neiContrastSpike_at_mean_half :
+    hudsonBbpSpike 4 2 (9/10) (1/10) ≠
+      neiContrastSpike 4 2 (9/10) (1/10) := by
+  unfold hudsonBbpSpike neiContrastSpike demographicSpike Descent.Core.hudsonFst Descent.Core.neiGst
+    effectiveSubgroupSize Descent.Core.ploidy Descent.Core.meanAlleleFreq Descent.Core.midpoint Descent.Core.ploidy
   norm_num
 
 end Descent.Portability

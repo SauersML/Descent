@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.Conventions
+import Descent.Portability.PCCorrectability.ImitationCapacity
 
 namespace Descent.PopGen
 
@@ -90,13 +90,13 @@ theorem neiContrastSpike_eq_contrastSpikeLevel_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+    Portability.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       contrastSpikeLevel p₁ p₂ *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [contrastSpikeLevel_eq_four_neiGst p₁ p₂ h,
     Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold Program.neiContrastSpike Portability.demographicSpike
+  unfold Portability.neiContrastSpike Portability.demographicSpike
   ring
 
 /-- **The exact Nei contrast spike written without a free coefficient.**
@@ -110,23 +110,23 @@ theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    Program.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+    Portability.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
-  rw [Program.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
+  rw [Portability.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
     Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
 /-- **The empirically calibrated Hudson BBP spike is level times load.** -/
 theorem hudsonBbpSpike_eq_level_mul_spikeLoad
     {N : ℕ} (m : ℕ) (p₁ p₂ : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+    Portability.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       (4 * Descent.Core.hudsonFst p₁ p₂) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
-  unfold Program.hudsonBbpSpike Portability.demographicSpike
+  unfold Portability.hudsonBbpSpike Portability.demographicSpike
   ring
 
 /-- **The Hudson BBP spike on the Nei scale.** This is the exact formula that
@@ -137,11 +137,11 @@ theorem hudsonBbpSpike_eq_nei_conversion_mul_spikeLoad
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
-    Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
+    Portability.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ =
       (8 * Descent.Core.neiGst p₁ p₂ / (1 + Descent.Core.neiGst p₁ p₂)) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
-  rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+  rw [Portability.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
       (N : ℝ) (m : ℝ) p₁ p₂ hpos hbar,
     Portability.traceWindow_spikeLoad_demographic m hmn hN base budget a]
 
@@ -152,11 +152,11 @@ theorem hudsonBbpSpike_eq_nei_multiplier_mul_neiContrastSpike
     (N m p₁ p₂ : ℝ)
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
-    Program.hudsonBbpSpike N m p₁ p₂ =
-      (2 / (1 + Descent.Core.neiGst p₁ p₂)) * Program.neiContrastSpike N m p₁ p₂ := by
-  rw [Program.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
+    Portability.hudsonBbpSpike N m p₁ p₂ =
+      (2 / (1 + Descent.Core.neiGst p₁ p₂)) * Portability.neiContrastSpike N m p₁ p₂ := by
+  rw [Portability.hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
     N m p₁ p₂ hpos hbar]
-  unfold Program.neiContrastSpike Portability.demographicSpike
+  unfold Portability.neiContrastSpike Portability.demographicSpike
   ring
 
 /-- On the biological range `0 ≤ G_ST ≤ 1`, the Hudson-to-Nei spike multiplier lies between one
@@ -185,7 +185,7 @@ theorem hudsonCalibrated_stratification_imitable_if_within_budget
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ)
     (hbase : Blindness.VarianceNonneg (S₀ - base))
     (hbudget : Portability.traceForm S₀ +
-      Program.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
+      Portability.hudsonBbpSpike (N : ℝ) (m : ℝ) p₁ p₂ ≤ budget) :
     (Portability.traceWindowBudgetClass base budget).IsNull
       ((Portability.traceWindowBudgetClass base budget).spiked S₀ (4 * Descent.Core.hudsonFst p₁ p₂)
         (Portability.demographicSpikeDirection N m)) :=
