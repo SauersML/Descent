@@ -117,7 +117,6 @@ constant:
   every `n` while `E(T_n) < 2`, so `E(T_n)²/4 < Var(T_n)`: the tree height never concentrates,
   at any sample size.  More individuals resolve one tree better; they do not average anything,
   which is why inference runs across loci.
-
 * `Coalescent.GeneTreeDiscordance` derives the incomplete-lineage-sorting probability
   `(2/3)e^{-T}` (Hudson 1983; Pamilo and Nei 1988) from two things the corpus already has: the
   `d_2` exponential survival through the internal branch, and `1 - jumpProb 3`, which is the
