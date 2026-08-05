@@ -1172,9 +1172,26 @@ not a between-population `F_ST`. Where that recurrence is wanted, construct a
 which carries the assumption in its type;
 `ClosedPopulationNoMutation.targetHet_eq_targetHetFromFst` is the bridge.
 
-    Empirical status: VACUOUS. This is an algebraic rearrangement of the
-    definition of its own second argument, so no measurement can bear on it; the
-    empirical content lives entirely in whatever supplies `fst`. -/
+    Empirical status: VACUOUS WITH A SAMPLE-ESTIMATED `fst`, and **VALIDATED with the model's**
+    (`simcov/battery_drift05.py`). Both halves are true and the difference is where `fst` came
+    from, which is the distinction `simcov/verdict.py` now makes by declaration.
+
+    Estimate `fst` from the same replicates the oracle measures and this is an algebraic
+    rearrangement of that estimator, so no measurement can bear on it -- that is the original
+    reading and it stands. Take `fst` from the MODEL instead, as
+    `1-(1-1/(2·Nₑ))^t` from the simulation's own `Nₑ` and `t`, and the comparison becomes the
+    Wright-Fisher prediction `E[H_t] = H₀·(1-1/(2Nₑ))^t`, which a simulation can refute.
+
+      Nₑ    t     F        this body   realised mean H   sems
+      200    40   0.0953    0.380009      0.379901       0.58
+      200   120   0.2595    0.311073      0.311100       0.13
+      500    80   0.0769    0.387720      0.387694       0.14
+      100    30   0.1396    0.361361      0.361409       0.24
+
+    300000 independent loci per cell, no mutation. The pairwise reading `het·(1-2·fst)` is
+    refuted on the same cells at up to 349 sems and 35% relative, so the factor is `1-fst` and
+    not its pairwise cousin -- which is the substitution the section note above exists to
+    prevent. Control: drift is unbiased, `E[p_t] = p₀`, at 0.74 sems. -/
 noncomputable def targetHetFromFst (het_source fst : ℝ) : ℝ :=
   het_source * (1 - fst)
 
@@ -6090,9 +6107,21 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     correlation itself is `alleleFreqCorrelation` below, which carries the
     arguments the quantity depends on.
 
-    Empirical status: UNTESTED as a covariance-retention factor. Its former
-    justification was the correlation identity, and that justification is gone;
-    retention needs a measurement of its own and has not had one.
+    Empirical status: **VALIDATED as a covariance-retention factor**
+    (`simcov/battery_drift05.py`). Its former justification was the correlation identity, and
+    that justification is gone; retention now has a measurement instead.
+
+    For a score with FIXED effects the genetic variance it carries in a drifted deme is
+    `∑ βᵢ²·2pᵢ(1-pᵢ)`, so the retention is the heterozygosity ratio on the same draws. Against
+    the MODEL's `fst = 1-(1-1/(2Nₑ))^t` -- never one estimated from the replicates the oracle
+    measures -- over 300000 loci and four `(Nₑ, t)` cells, worst 0.58 sems at 0.03% relative,
+    with `(1-fst)²` refuted at up to 259 sems.
+
+    HONEST LIMIT: this shares its oracle with `targetHetFromFst` above, being that measurement
+    rescaled by the ancestral heterozygosity. It is one measurement supporting two
+    definitions, not two independent ones, and what it adds over the heterozygosity statement
+    is the identification of that ratio with a COVARIANCE retention -- which holds because the
+    effects are fixed and is exactly what would fail if they were not.
 
     Denotes: the covariance-retention factor, not the allele-frequency
     correlation. The same body `1 - fst` appears under names from 'correlation',

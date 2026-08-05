@@ -1,0 +1,209 @@
+{
+ "_battery_sha": "6dfe4875275b0a68",
+ "results": [
+  {
+   "name": "targetHetFromFst",
+   "file": "PortabilityDrift.lean",
+   "source": "het_source * (1 - fst)",
+   "note": "",
+   "regime": "Wright-Fisher binomial sampling in one deme from a common ancestor at p0 = 0.3, 300000 independent loci, t generations, no mutation; the observables are the realised mean heterozygosity and the additive-variance retention it implies for a fixed-effect score. fst is the MODEL's 1-(1-1/(2Ne))^t and shared_ld the model's (1-r)^(2t) -- neither is estimated from the replicates the oracle measures, which is what keeps this from being the battery_bulk21 identity. Ne, t and r are swept so the prediction spans a factor of four",
+   "span": 0.1977504817472608,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+    "lean": 0.37998413526743247,
+    "truth": 0.37986649516666665,
+    "sem": 0.00020179256941404964,
+    "sems_off": 0.5829753846110844,
+    "rel_err": 0.0003096880147700309
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+     "lean": 0.37998413526743247,
+     "truth": 0.37986649516666665,
+     "sem": 0.00020179256941404964,
+     "sems_off": 0.5829753846110844,
+     "rel_err": 0.0003096880147700309
+    },
+    {
+     "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+     "lean": 0.31102680093409324,
+     "truth": 0.31102848604166666,
+     "sem": 0.0003120058607181364,
+     "sems_off": 0.0054008843601369835,
+     "rel_err": 5.417856077651733e-06
+    },
+    {
+     "design": "Ne=500 t=80 r=0.05 (F=0.0769, shared=0.0003)",
+     "lean": 0.3876933470916812,
+     "truth": 0.38769070754,
+     "sem": 0.00018167136024918552,
+     "sems_off": 0.014529266900138851,
+     "rel_err": 6.80839553240867e-06
+    },
+    {
+     "design": "Ne=100 t=30 r=0.10 (F=0.1396, shared=0.0018)",
+     "lean": 0.36136136060417234,
+     "truth": 0.36137123583333336,
+     "sem": 0.00024089284607195743,
+     "sems_off": 0.040994281573916797,
+     "rel_err": 2.7327103493014412e-05
+    }
+   ]
+  },
+  {
+   "name": "targetHetFromFst [pairwise reading 1 - 2*fst, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "het_source * (1 - 2*fst)",
+   "note": "positive control 'Ne=200 t=40 [drift unbiased: E[p_t] = p0]' passed at 0.74 sems",
+   "regime": "Wright-Fisher binomial sampling in one deme from a common ancestor at p0 = 0.3, 300000 independent loci, t generations, no mutation; the observables are the realised mean heterozygosity and the additive-variance retention it implies for a fixed-effect score. fst is the MODEL's 1-(1-1/(2Ne))^t and shared_ld the model's (1-r)^(2t) -- neither is estimated from the replicates the oracle measures, which is what keeps this from being the battery_bulk21 identity. Ne, t and r are swept so the prediction spans a factor of four",
+   "span": 0.4314542295048994,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+    "lean": 0.20205360186818644,
+    "truth": 0.31102848604166666,
+    "sem": 0.0003120058607181364,
+    "sems_off": 349.27191406807344,
+    "rel_err": 0.3503694647405431
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+     "lean": 0.3399682705348649,
+     "truth": 0.37986649516666665,
+     "sem": 0.00020179256941404964,
+     "sems_off": 197.7189980169006,
+     "rel_err": 0.10503222879474114
+    },
+    {
+     "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+     "lean": 0.20205360186818644,
+     "truth": 0.31102848604166666,
+     "sem": 0.0003120058607181364,
+     "sems_off": 349.27191406807344,
+     "rel_err": 0.3503694647405431
+    },
+    {
+     "design": "Ne=500 t=80 r=0.05 (F=0.0769, shared=0.0003)",
+     "lean": 0.3553866941833624,
+     "truth": 0.38769070754,
+     "sem": 0.00018167136024918552,
+     "sems_off": 177.8156629219297,
+     "rel_err": 0.0833241878857895
+    },
+    {
+     "design": "Ne=100 t=30 r=0.10 (F=0.1396, shared=0.0018)",
+     "lean": 0.3027227212083447,
+     "truth": 0.36137123583333336,
+     "sem": 0.00024089284607195743,
+     "sems_off": 243.46308153738065,
+     "rel_err": 0.16229436327366606
+    }
+   ]
+  },
+  {
+   "name": "covarianceRetentionFactorFromFst",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - fst",
+   "note": "",
+   "regime": "Wright-Fisher binomial sampling in one deme from a common ancestor at p0 = 0.3, 300000 independent loci, t generations, no mutation; the observables are the realised mean heterozygosity and the additive-variance retention it implies for a fixed-effect score. fst is the MODEL's 1-(1-1/(2Ne))^t and shared_ld the model's (1-r)^(2t) -- neither is estimated from the replicates the oracle measures, which is what keeps this from being the battery_bulk21 identity. Ne, t and r are swept so the prediction spans a factor of four",
+   "span": 0.19775048174726084,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+    "lean": 0.9047241315891249,
+    "truth": 0.9044440361111111,
+    "sem": 0.0004804584986048801,
+    "sems_off": 0.5829753846109414,
+    "rel_err": 0.0003096880147699549
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+     "lean": 0.9047241315891249,
+     "truth": 0.9044440361111111,
+     "sem": 0.0004804584986048801,
+     "sems_off": 0.5829753846109414,
+     "rel_err": 0.0003096880147699549
+    },
+    {
+     "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+     "lean": 0.7405400022240315,
+     "truth": 0.7405440143849207,
+     "sem": 0.0007428710969479438,
+     "sems_off": 0.005400884360250851,
+     "rel_err": 5.4178560777659576e-06
+    },
+    {
+     "design": "Ne=500 t=80 r=0.05 (F=0.0769, shared=0.0003)",
+     "lean": 0.9230793978373362,
+     "truth": 0.9230731131904762,
+     "sem": 0.000432550857736156,
+     "sems_off": 0.014529266900114407,
+     "rel_err": 6.8083955323972155e-06
+    },
+    {
+     "design": "Ne=100 t=30 r=0.10 (F=0.1396, shared=0.0018)",
+     "lean": 0.8603841919146961,
+     "truth": 0.8604077043650794,
+     "sem": 0.0005735543954094224,
+     "sems_off": 0.04099428157387071,
+     "rel_err": 2.732710349298369e-05
+    }
+   ]
+  },
+  {
+   "name": "covarianceRetentionFactorFromFst [retention squared, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "(1 - fst)^2",
+   "note": "positive control 'Ne=200 t=40 [drift unbiased: E[p_t] = p0]' passed at 0.74 sems",
+   "regime": "Wright-Fisher binomial sampling in one deme from a common ancestor at p0 = 0.3, 300000 independent loci, t generations, no mutation; the observables are the realised mean heterozygosity and the additive-variance retention it implies for a fixed-effect score. fst is the MODEL's 1-(1-1/(2Ne))^t and shared_ld the model's (1-r)^(2t) -- neither is estimated from the replicates the oracle measures, which is what keeps this from being the battery_bulk21 identity. Ne, t and r are swept so the prediction spans a factor of four",
+   "span": 0.3563957104632479,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+    "lean": 0.5483994948939686,
+    "truth": 0.7405440143849207,
+    "sem": 0.0007428710969479438,
+    "sems_off": 258.65122533420697,
+    "rel_err": 0.2594640099151204
+   },
+   "cells": [
+    {
+     "design": "Ne=200 t=40 r=0.02 (F=0.0953, shared=0.1986)",
+     "lean": 0.8185257542796962,
+     "truth": 0.9044440361111111,
+     "sem": 0.0004804584986048801,
+     "sems_off": 178.8256052934813,
+     "rel_err": 0.09499568619064877
+    },
+    {
+     "design": "Ne=200 t=120 r=0.02 (F=0.2595, shared=0.0078)",
+     "lean": 0.5483994948939686,
+     "truth": 0.7405440143849207,
+     "sem": 0.0007428710969479438,
+     "sems_off": 258.65122533420697,
+     "rel_err": 0.2594640099151204
+    },
+    {
+     "design": "Ne=500 t=80 r=0.05 (F=0.0769, shared=0.0003)",
+     "lean": 0.8520755747117391,
+     "truth": 0.9230731131904762,
+     "sem": 0.000432550857736156,
+     "sems_off": 164.13685745606278,
+     "rel_err": 0.07691431747301558
+    },
+    {
+     "design": "Ne=100 t=30 r=0.10 (F=0.1396, shared=0.0018)",
+     "lean": 0.7402609576967045,
+     "truth": 0.8604077043650794,
+     "sem": 0.0005735543954094224,
+     "sems_off": 209.47751011934986,
+     "rel_err": 0.13963931989316014
+    }
+   ]
+  }
+ ]
+}
