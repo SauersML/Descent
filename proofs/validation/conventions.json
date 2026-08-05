@@ -78,7 +78,9 @@
         "hudson"
       ],
       "theorem": "hudsonFst_eq_of_neiGst",
-      "says": "Hudson = 2G/(1+G) everywhere, so the discrepancy is 2x as G -> 0 and cannot be absorbed by any recalibration constant."
+      "says": "Hudson = 2G/(1+G) everywhere, so the discrepancy is 2x as G -> 0 and cannot be absorbed by any recalibration constant.",
+      "measured": "Confirmed in shape and NOT usable as a conversion factor. `simcov/battery_bulk25.py` sweeps tau = 0.1, 0.25, 1, 3 on one genotype dataset with both estimators through separate code paths: Hudson tracks the split law tau/(1+tau) to 0.03 sems while Nei measures 0.05495, 0.11904, 0.34185, 0.61182 -- low in every cell, up to 18.59 sems. The observed ratio Nei/Hudson runs about 0.60, 0.60, 0.68, 0.82 across that sweep, so no fixed 1/2 or 1/4 converts between them.",
+      "caution": "The theorem is POINTWISE, G/H = (1+G)/2 per locus. Evaluated at the measured Nei values it predicts 0.527, 0.560, 0.671, 0.806, which matches the two high-differentiation cells and runs low at the two small ones. That gap is Jensen: both estimators are ratios of averages over loci, and an identity between per-locus quantities does not survive aggregation. Do not use the bridge to predict an aggregate sweep, and do not read the shortfall as a failure of the bridge."
     },
     {
       "between": [
