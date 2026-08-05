@@ -298,6 +298,20 @@ different, strictly increasing function of `s` and gives the same ordering.
 Empirical status: UNTESTED. -/
 def wienerWeight (noise s : ℝ) : ℝ := s / (s + noise)
 
+/-- **The Wiener weight is `Core.share`, and it is the Bayesian posterior shrinkage.**
+
+`share a b = a / (a + b)`, so this is `share s noise`. `Portability.optimalShrinkage` is
+`β²/(σ² + β²)`, the same share with its arguments named for a prior rather than a noise
+level; `optimalShrinkage_eq_share` states that side. The two were found agreeing at every
+sampled point by `semantic_duplicates.py` before either was tied, which is the only reason
+a pair split across `Spectral` and `Portability` came to notice at all.
+
+The docstring above says this is "a different, strictly increasing function" -- that is
+about `reconstructionWeight`, the profile it is a robustness check against, and remains
+true. It is not different from `optimalShrinkage`. -/
+theorem wienerWeight_eq_share (noise s : ℝ) :
+    wienerWeight noise s = Descent.Core.share s noise := rfl
+
 /-- **wienerWeight where its denominator vanishes, named.** The guard `s + noise` is zero at `noise
 = 0`, `s = 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no
 type error marks the point. Consumers must require `s + noise ≠ 0`. -/

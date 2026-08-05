@@ -248,6 +248,26 @@ theorem mse_ols_is_no_shrinkage (σ_sq β_sq : ℝ) :
 noncomputable def optimalShrinkage (σ_sq β_sq : ℝ) : ℝ :=
   β_sq / (σ_sq + β_sq)
 
+/-- **The posterior shrinkage is `Core.share`, and it is the Wiener weight.**
+
+`share a b` is `a / (a + b)`, so this is `share β_sq σ_sq`: the signal's share of the total.
+`Spectral.wienerWeight noise s` is `s / (s + noise)`, the same share with the arguments
+named for a denoising problem instead of a Bayesian one. They are one map, found by
+`semantic_duplicates.py` agreeing at every sampled point, and they are one OBJECT -- the
+optimal linear shrinkage and the Wiener filter are the same estimator under two
+literatures' names.
+
+Both names are kept. Which arguments a caller has in hand differs -- a prior variance and a
+noise variance here, a signal and a noise level there -- and a single name would read wrong
+in one of the two places. What is joined is the shape, so an edit to the share convention
+cannot reach one and miss the other. -/
+theorem optimalShrinkage_eq_share (σ_sq β_sq : ℝ) :
+    optimalShrinkage σ_sq β_sq = Descent.Core.share β_sq σ_sq := by
+  -- Not `rfl`: this body's denominator is `σ² + β²` and the kernel's is
+  -- `β² + σ²`. The same number, and not the same term.
+  unfold optimalShrinkage Descent.Core.share
+  ring
+
 /-- **optimalShrinkage where its denominator vanishes, named.** The guard `σ_sq + β_sq` is zero at
 `σ_sq = 0`, `β_sq = 0`. Lean returns `0` there rather than the value the modelled quantity
 takes, and no type error marks the point. Consumers must require `σ_sq + β_sq ≠ 0`. -/

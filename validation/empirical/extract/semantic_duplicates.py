@@ -209,8 +209,8 @@ def main() -> int:
             continue
         interesting.append((arity, sorted(shorts)))
 
-    print(f"of those, groups NOT sharing a kernel or calling one another: "
-          f"{len(interesting)}\n")
+    print(f"of those, groups with no shared kernel, no delegation between them "
+          f"and no relating theorem: {len(interesting)}\n")
     for arity, shorts in sorted(interesting, key=lambda kv: -len(kv[1])):
         print(f"  arity {arity}: {', '.join(shorts)}")
     if collisions:
