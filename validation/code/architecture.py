@@ -416,6 +416,44 @@ def externally_silent(code, decls):
     return sorted(silent)
 
 
+def unused_direct_imports(raw, code, decls):
+    """Direct imports whose declarations the importing module never names.
+
+    REPORTED, NOT GATED, and the caveat is why: Lean imports are transitive, so a
+    module legitimately imports X to reach a name X's own dependency declares.
+    Dropping such an import breaks the build -- that happened once in this
+    corpus, to `Foundations/Conventions`, and the seven "unused" imports removed
+    from it had to be put back.
+
+    What the number IS good for is catching an import added WITHOUT the code that
+    was supposed to use it. That is not hypothetical: two commits in this file's
+    history inserted their imports and, through a stale anchor string, not their
+    theorems. The build stayed green -- unused imports compile -- and the commit
+    messages described results that were not there. This count is what makes that
+    visible, and a composition module with a rising count is the signature.
+    """
+    out = {}
+    for mod in sorted(code):
+        # The root is an import aggregator by construction: it names almost
+        # nothing and exists to pull the corpus together for `lake build`.
+        # Counting its imports here would bury the signal under 130 entries
+        # that are all correct.
+        if mod == "Descent":
+            continue
+        text = code[mod]
+        names = set(IDENT.findall(text))
+        unused = []
+        for imp in IMPORT.findall(raw[mod]):
+            if imp not in decls or imp == mod:
+                continue
+            theirs = {n for _, n in decls[imp]}
+            if theirs and not (theirs & names):
+                unused.append(imp)
+        if unused:
+            out[mod] = unused
+    return out
+
+
 def gate_orphans(code, decls):
     """Definitions and structures nothing in the CODE refers to, and structures with no
     constructed witness.
@@ -516,6 +554,7 @@ def measure():
     silent = gate_falsified_acknowledged(raw)
     orphans, witnessless = gate_orphans(code, decls)
     silent_modules = externally_silent(code, decls)
+    unused_imports = unused_direct_imports(raw, code, decls)
 
     return {
         "modules": len(graph),
@@ -530,12 +569,14 @@ def measure():
         "orphan_definitions": len(orphans),
         "witnessless_structures": len(witnessless),
         "externally_silent_modules": len(silent_modules),
+        "imports_naming_nothing_used": sum(len(v) for v in unused_imports.values()),
         "_offenders": inverted,
         "_thin": thin,
         "_silent": silent,
         "_orphans": orphans,
         "_witnessless": witnessless,
         "_silent_modules": silent_modules,
+        "_unused_imports": unused_imports,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -564,6 +605,9 @@ REPORTED = ("cross_module_reuse_pct", "composition_theorems", "modules", "theore
             # See `externally_silent`: gating this would demand a consumer for
             # every conclusion, and restatements would satisfy it.
             "externally_silent_modules",
+            # See `unused_direct_imports`: transitive imports make a zero
+            # impossible, but a RISE means an import landed without its code.
+            "imports_naming_nothing_used",
             # Correct position, few consumers.  A new foundation starts here and
             # earns callers as they move over; it is not the inversion above.
             "foundation_not_yet_load_bearing")
@@ -611,6 +655,12 @@ def main() -> int:
                   "-- reported, not gated:")
             for m in now["_silent_modules"]:
                 print("  " + m)
+        if now["_unused_imports"]:
+            print("\nimports whose declarations the importer never names "
+                  "-- reported, not gated:")
+            for m in sorted(now["_unused_imports"]):
+                for i in now["_unused_imports"][m]:
+                    print(f"  {m}  <-  {i}")
         if now["_witnessless"]:
             print(f"\nstructures with no constructed inhabitant ({len(now['_witnessless'])}):")
             for n in now["_witnessless"]:
