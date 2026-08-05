@@ -106,12 +106,6 @@ already centred on the outcome's mean. -/
 noncomputable def mse (m : ScoreMoments) : ℝ :=
   m.outcomeVariance - 2 * m.predictiveCovariance + m.scoreVariance
 
-/-- **`R²` is a proportional reduction in error** -- against the best-recalibrated
-score, not the raw one. Written through the kernel so that the corpus's other
-`1 - residual/baseline` quantities and this one cannot drift apart. -/
-noncomputable def r2FromResidual (residual baseline : ℝ) : ℝ :=
-  proportionalReduction residual baseline
-
 /-- **`R²` lands in the unit interval on an admissible tuple.** The bound every consumer
 needs, proved once here rather than re-derived at each metric. -/
 theorem r2_mem_unit (m : ScoreMoments) (h : m.Admissible) :

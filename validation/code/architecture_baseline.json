@@ -6,6 +6,8 @@
  "foundation_inverted": 3,
  "foundation_not_yet_load_bearing": 4,
  "modules": 185,
+ "orphan_definitions": 6,
  "silent_falsifications": 0,
- "theorems": 6042
+ "theorems": 6044,
+ "witnessless_structures": 8
 }

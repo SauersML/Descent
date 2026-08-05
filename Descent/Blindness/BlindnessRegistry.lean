@@ -288,6 +288,19 @@ structure OneLocusArchitecture where
   /-- Allele frequency. -/
   p : ℝ
 
+/-- **The architecture is inhabited**, at a locus with a unit homozygote contrast, a half
+dominance deviation, and an allele at frequency one half.
+
+A theorem quantified over an uninhabited structure is true, kernel-checked, and empty.
+This is deliberately a locus with NON-ZERO dominance: a witness at `d = 0` would satisfy
+every additive theorem below for the wrong reason, because at zero dominance the average
+effect and the homozygote contrast coincide and nothing the dominance term does is
+visible. -/
+noncomputable def OneLocusArchitecture.witness : OneLocusArchitecture where
+  a := 1
+  d := 1 / 2
+  p := 1 / 2
+
 /-- **Fisher's average effect**, the coefficient a dosage regression recovers.
 
     Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_a`). The docstring's

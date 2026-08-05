@@ -104,6 +104,13 @@ noncomputable def witness : PopGenParameters where
 named so that `t_div = 0` reads as a claim rather than as an unfilled field. -/
 def atOrigin (p : PopGenParameters) : Prop := p.t_div = 0
 
+/-- **The witness is not at the origin.** `atOrigin` names the `t_div = 0` reading so a
+model without a divergence time says so rather than leaving a field at its default; this
+pins that the standard-scale witness is a diverged history and not that default. -/
+theorem witness_not_atOrigin : ¬ witness.atOrigin := by
+  unfold atOrigin witness
+  norm_num
+
 /-- Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates. -/
 noncomputable def theta (p : PopGenParameters) : ℝ := scaledMutationRate p.Ne p.mu
 

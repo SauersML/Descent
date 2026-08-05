@@ -346,6 +346,46 @@ def gate_falsified_acknowledged(raw):
     return silent
 
 
+def gate_orphans(code, decls):
+    """Definitions and structures nothing in the CODE refers to, and structures with no
+    constructed witness.
+
+    Both counts are much smaller than a naive census suggests, and the difference is the
+    point. Counting references in the raw source finds every declaration "used", because
+    the prose mentions names constantly; counting in stripped code and matching short
+    names against a declaration index finds the real orphans. The corpus's own note on
+    deleting a definition -- grep the full tree INCLUDING the root and the validation
+    Python, and grep the prose, before removing anything -- is why this reports rather
+    than removes.
+
+    A structure with no constructed witness is the other half: a theorem quantified over
+    an uninhabited structure is true, kernel-checked, and empty.
+    """
+    owner = {}
+    for mod, found in decls.items():
+        for kind, name in found:
+            if kind in ("def", "abbrev", "structure", "inductive", "class"):
+                owner.setdefault(name, (mod, kind))
+    used = collections.Counter()
+    for mod, text in code.items():
+        for w in IDENT.findall(text):
+            if w in owner:
+                used[w] += 1
+    # one occurrence is the declaration itself
+    orphans = sorted(n for n, (m, k) in owner.items() if used[n] <= 1 and n)
+
+    structures = {n for n, (m, k) in owner.items() if k == "structure"}
+    witnessed = set()
+    for mod, text in code.items():
+        for n in structures:
+            # a witness is a `def ... : N ... where` or an anonymous constructor typed at N
+            if re.search(r":\s*" + re.escape(n) + r"\b[^\n]*\bwhere\b", text) or \
+               re.search(r":\s*" + re.escape(n) + r"\b[^\n]*:=\s*[⟨{]", text):
+                witnessed.add(n)
+    witnessless = sorted(structures - witnessed)
+    return orphans, witnessless
+
+
 # --------------------------------------------------------------------------
 
 
@@ -361,6 +401,7 @@ def measure():
     comps = gate_composition_count(code, decls)
     inverted, thin = gate_foundation_position(raw, graph, depth, indeg)
     silent = gate_falsified_acknowledged(raw)
+    orphans, witnessless = gate_orphans(code, decls)
 
     return {
         "modules": len(graph),
@@ -372,9 +413,13 @@ def measure():
         "foundation_inverted": len(inverted),
         "foundation_not_yet_load_bearing": len(thin),
         "silent_falsifications": len(silent),
+        "orphan_definitions": len(orphans),
+        "witnessless_structures": len(witnessless),
         "_offenders": inverted,
         "_thin": thin,
         "_silent": silent,
+        "_orphans": orphans,
+        "_witnessless": witnessless,
         "_compositions": [f"{n}  ({m})" for n, m in sorted(comps)],
     }
 
@@ -387,6 +432,8 @@ GATES = {
     "duplicate_body_extras": ("down", "definitions that re-type a body instead of wrapping"),
     "foundation_inverted": ("down", "modules claiming to be foundations from above what they reconcile"),
     "silent_falsifications": ("down", "FALSIFIED ledger rows no docstring mentions"),
+    "orphan_definitions": ("down", "definitions no code refers to"),
+    "witnessless_structures": ("down", "structures with no constructed inhabitant"),
 }
 
 
@@ -440,6 +487,14 @@ def main() -> int:
         if now["_silent"]:
             print("\nFALSIFIED with no acknowledgement in the declaring file:")
             for n in now["_silent"]:
+                print("  " + n)
+        if now["_orphans"]:
+            print("\ndefinitions no code refers to:")
+            for n in now["_orphans"]:
+                print("  " + n)
+        if now["_witnessless"]:
+            print(f"\nstructures with no constructed inhabitant ({len(now['_witnessless'])}):")
+            for n in now["_witnessless"][:40]:
                 print("  " + n)
         print(f"\ncomposition theorems ({len(now['_compositions'])}):")
         for c in now["_compositions"][:60]:

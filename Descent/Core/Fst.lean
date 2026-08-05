@@ -333,6 +333,13 @@ theorem hudsonOfNei_eq_iff (g : NeiFst) (h : 1 + g.value ≠ 0) :
     · exact Or.inr (by linarith)
   · rintro (h0 | h0) <;> rw [h0] <;> ring
 
+/-- **A scaled coalescence time reads as a Hudson value, and the wrapper preserves it.**
+The point of `hudsonFromTau` is that `τ/(1+τ)` cannot be handed to something expecting a
+Nei estimate; this says the number inside is the one `fstFromTau` computes, so wrapping
+costs nothing but the type. -/
+@[simp] theorem hudsonFromTau_value (tau : ℝ) :
+    (hudsonFromTau tau).value = fstFromTau tau := rfl
+
 /-- **A witness that the gap is real and sizeable.** At a Nei `G_ST` of `1/2` the Hudson
 value is `2/3`: a 33% difference, at a differentiation level ordinary human population
 pairs sit near. Stated as a value because a monotonicity or an inequality would be

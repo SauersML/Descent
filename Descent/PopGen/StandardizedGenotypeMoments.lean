@@ -515,6 +515,16 @@ structure LevelChannels where
   /-- Whether that floor's coordinate admits a value-negating relabelling. -/
   isSignSymmetric : Bool
 
+/-- **The channel record is inhabited.** A lattice-supported, sign-symmetric floor with
+unit drift and unit increment variance: the two Boolean flags are set to opposite values
+here rather than both to `true`, so a theorem that reads only one of them cannot pass by
+reading the other. -/
+noncomputable def LevelChannels.witness : LevelChannels where
+  drift := 1
+  jetVariance := 1
+  isLattice := true
+  isSignSymmetric := false
+
 /-- Floor one of the tower for a Hardy-Weinberg locus, assembled from quantities this
 corpus computes in closed form.
 
