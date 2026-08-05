@@ -151,20 +151,17 @@ theorem mergeMap_eq_iff {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b
     (x y : Quotient ξ) :
     mergeMap ξ a b x = mergeMap ξ a b y ↔ x = y ∨ (x = a ∧ y = b) ∨ (x = b ∧ y = a) := by
   by_cases hx : x = b <;> by_cases hy : y = b
-  · subst hx
-    subst hy
+  · rw [hx, hy]
     simp
-  · subst hx
-    rw [mergeMap_apply_self, mergeMap_apply_of_ne ξ a b y hy]
+  · rw [hx, mergeMap_apply_self, mergeMap_apply_of_ne ξ a b y hy]
     constructor
     · intro h
       exact Or.inr (Or.inr ⟨rfl, h.symm⟩)
     · rintro (h | ⟨h, -⟩ | ⟨-, h⟩)
       · exact absurd h.symm hy
-      · exact absurd h hab
+      · exact absurd h.symm hab
       · exact h.symm
-  · subst hy
-    rw [mergeMap_apply_self, mergeMap_apply_of_ne ξ a b x hx]
+  · rw [hy, mergeMap_apply_self, mergeMap_apply_of_ne ξ a b x hx]
     constructor
     · intro h
       exact Or.inr (Or.inl ⟨h, rfl⟩)
@@ -200,16 +197,21 @@ theorem merge_rel {n : ℕ} (ξ : ER n) (a b : Quotient ξ) {x y : Fin n}
 theorem range_mergeMap {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
     Set.range (fun x : Fin n => mergeMap ξ a b (Quotient.mk ξ x)) = {c | c ≠ b} := by
   ext c
+  simp only [Set.mem_range, Set.mem_setOf_eq]
   constructor
   · rintro ⟨x, rfl⟩
     by_cases hx : Quotient.mk ξ x = b
-    · rw [hx, mergeMap_apply_self]
+    · show mergeMap ξ a b (Quotient.mk ξ x) ≠ b
+      rw [hx, mergeMap_apply_self]
       exact hab
-    · rw [mergeMap_apply_of_ne ξ a b _ hx]
+    · show mergeMap ξ a b (Quotient.mk ξ x) ≠ b
+      rw [mergeMap_apply_of_ne ξ a b _ hx]
       exact hx
   · intro hc
     obtain ⟨x, hx⟩ := quotient_mk_surjective ξ c
-    exact ⟨x, by rw [hx, mergeMap_apply_of_ne ξ a b c hc]⟩
+    refine ⟨x, ?_⟩
+    show mergeMap ξ a b (Quotient.mk ξ x) = c
+    rw [hx, mergeMap_apply_of_ne ξ a b c hc]
 
 /-- **K-C (1.4): merging two distinct classes drops the block count by exactly one.** -/
 theorem blocks_merge {n : ℕ} (ξ : ER n) {a b : Quotient ξ} (hab : a ≠ b) :
@@ -405,7 +407,9 @@ theorem coverOfPair_bijective {n : ℕ} (ξ : ER n) : Function.Bijective (coverO
       (merge_eq_merge_iff ξ (pair_spec hs).1 (pair_spec ht).1).mp hmerge
     have hs' := (pair_spec hs).2
     have ht' := (pair_spec ht).2
-    exact Subtype.ext (by rw [hs', ht', hpair])
+    have hst' : s = t := by
+      rw [hs', ht', hpair]
+    exact Subtype.ext hst'
   · rintro ⟨η, hη⟩
     obtain ⟨a, b, hab, rfl⟩ := (covers_iff_exists_merge ξ η).mp hη
     have hcard : ({a, b} : Finset (Quotient ξ)).card = 2 := Finset.card_pair hab
@@ -425,7 +429,7 @@ theorem card_covers {n : ℕ} (ξ : ER n) :
     Nat.card {η : ER n // Covers ξ η} = (blocks ξ).choose 2 := by
   classical
   letI : Fintype (Quotient ξ) := Fintype.ofFinite _
-  rw [Nat.card_eq_of_bijective _ (coverOfPair_bijective ξ), Nat.card_eq_fintype_card,
+  rw [← Nat.card_eq_of_bijective _ (coverOfPair_bijective ξ), Nat.card_eq_fintype_card,
     Fintype.card_finset_len]
   congr 1
   exact (Nat.card_eq_fintype_card (α := Quotient ξ)).symm ▸ rfl
@@ -452,20 +456,20 @@ theorem card_covers_eq_deathRate {n : ℕ} (ξ : ER n) :
     (Nat.card {η : ER n // Covers ξ η} : ℝ) = deathRate (blocks ξ) := by
   rw [card_covers]
   have hint : 2 * (blocks ξ).choose 2 = blocks ξ * (blocks ξ - 1) := two_mul_choose_two _
-  cases hb : blocks ξ with
-  | zero => simp [deathRate, hb]
-  | succ m =>
-      have hcast : ((blocks ξ * (blocks ξ - 1) : ℕ) : ℝ)
-          = (blocks ξ : ℝ) * ((blocks ξ : ℝ) - 1) := by
-        rw [hb]
-        push_cast [Nat.add_sub_cancel]
-        ring
-      have h2 : (2 : ℝ) * ((blocks ξ).choose 2 : ℕ) = (blocks ξ : ℝ) * ((blocks ξ : ℝ) - 1) := by
-        rw [← hcast, ← hint]
-        push_cast
-        ring
-      unfold deathRate
-      linarith
+  rcases Nat.eq_zero_or_pos (blocks ξ) with hb | hb
+  · rw [hb]
+    norm_num [deathRate]
+  · have hcast : ((blocks ξ * (blocks ξ - 1) : ℕ) : ℝ)
+        = (blocks ξ : ℝ) * ((blocks ξ : ℝ) - 1) := by
+      push_cast [Nat.cast_sub hb]
+      ring
+    have h2 : 2 * (((blocks ξ).choose 2 : ℕ) : ℝ)
+        = (blocks ξ : ℝ) * ((blocks ξ : ℝ) - 1) := by
+      rw [← hcast, ← hint]
+      push_cast
+      ring
+    unfold deathRate
+    linear_combination h2 / 2
 
 end Coalescent
 
