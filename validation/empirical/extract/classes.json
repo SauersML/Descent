@@ -16295,7 +16295,7 @@
  },
  "Descent.Blindness.TrafficInvariantSeparation.exponentialProfileDistance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'BoundedExponentialProfile bound'\")",
+  "note": "self-check: calls untranslated definition dist",
   "file": "Descent/Blindness/TrafficInvariantSeparation/ExponentialProfileCompactness.lean",
   "line": 318,
   "short": "exponentialProfileDistance",
@@ -16310,7 +16310,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'BoundedExponentialProfile bound'\")"
+   "error": "NameError(\"name 'dist' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -27906,7 +27906,7 @@
  },
  "Descent.Coalescent.mergeMap": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ER n'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Setoid (Fin n) n'\")",
   "file": "Descent/Coalescent/StateSpace.lean",
   "line": 128,
   "short": "mergeMap",
@@ -27922,7 +27922,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ER n'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Setoid (Fin n) n'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -28066,7 +28066,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ER n'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Setoid (Fin n) n'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -28327,7 +28327,7 @@
  },
  "Descent.Coalescent.stepLaw": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ER n'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Setoid (Fin n) n'\")",
   "file": "Descent/Coalescent/StepLaw.lean",
   "line": 49,
   "short": "stepLaw",
@@ -28342,7 +28342,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ER n'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Setoid (Fin n) n'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29090,7 +29090,7 @@
  },
  "Descent.Coalescent.chainTrajFrom": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ER n'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Setoid (Fin n) n'\")",
   "file": "Descent/Coalescent/TrajectoryLaw.lean",
   "line": 88,
   "short": "chainTrajFrom",
@@ -29110,7 +29110,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ER n'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Setoid (Fin n) n'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -29322,7 +29322,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 6,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -29393,7 +29393,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 1,
    "total_points": 8,
    "error": "OverflowError('math range error')"
   },
@@ -34030,8 +34030,8 @@
   }
  },
  "Descent.Conditionals.binaryStateWeight": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 35,
   "short": "binaryStateWeight",
@@ -34043,9 +34043,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34105,8 +34105,8 @@
   }
  },
  "Descent.Conditionals.switchingTransition": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "WRAPPER",
+  "note": "delegates to Descent.Core.antiKronecker",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 48,
   "short": "switchingTransition",
@@ -34119,9 +34119,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34152,8 +34152,8 @@
   }
  },
  "Descent.Conditionals.targetAnnotation": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 59,
   "short": "targetAnnotation",
@@ -34165,9 +34165,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34188,8 +34188,8 @@
   }
  },
  "Descent.Conditionals.contextMatchQuality": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "WRAPPER",
+  "note": "delegates to Descent.Core.kronecker",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 78,
   "short": "contextMatchQuality",
@@ -34202,9 +34202,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34394,7 +34394,7 @@
  },
  "Descent.Conditionals.contextMatchSectionOscillation": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "note": "self-check: calls untranslated definition finiteSectionOscillation",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 277,
   "short": "contextMatchSectionOscillation",
@@ -34408,7 +34408,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": "NameError(\"name 'finiteSectionOscillation' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34428,7 +34428,7 @@
  },
  "Descent.Conditionals.contextMatchTotalVariationDiameter": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "note": "self-check: calls untranslated definition finiteSectionDiameter",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 289,
   "short": "contextMatchTotalVariationDiameter",
@@ -34442,7 +34442,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": "NameError(\"name 'finiteSectionDiameter' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34515,7 +34515,7 @@
  },
  "Descent.Conditionals.binaryConditionalContextMatch": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "note": "self-check: arity/type mismatch (TypeError(\"jointTransportLaw() missing 1 required positional argument: 'g'\"))",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 425,
   "short": "binaryConditionalContextMatch",
@@ -34530,7 +34530,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": "TypeError(\"jointTransportLaw() missing 1 required positional argument: 'g'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -34567,8 +34567,8 @@
   }
  },
  "Descent.Conditionals.persistentOnlyDynamicsPosterior": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "WRAPPER",
+  "note": "delegates to Spectral.binarySecondAnnotation",
   "file": "Descent/Conditionals/DynamicsContrast/Tail.lean",
   "line": 496,
   "short": "persistentOnlyDynamicsPosterior",
@@ -34581,9 +34581,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35144,8 +35144,8 @@
   }
  },
  "Descent.Conditionals.interactionRisk": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/FunctionalDescent.lean",
   "line": 303,
   "short": "interactionRisk",
@@ -35164,9 +35164,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -35202,8 +35202,8 @@
   }
  },
  "Descent.Conditionals.confoundedConditionalRisk": {
-  "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Descent.BinaryState'\")",
+  "class": "NUMERIC",
+  "note": "",
   "file": "Descent/Conditionals/FunctionalDescent.lean",
   "line": 330,
   "short": "confoundedConditionalRisk",
@@ -35215,9 +35215,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 0,
+   "finite_points": 8,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Descent.BinaryState'\")"
+   "error": null
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -36204,7 +36204,7 @@
     "μ ≠ 0",
     "0 < Ne",
     "0 < μ",
-    "2 < scaledMutationRate Ne μ",
+    "2 < Descent.Core.scaledMutationRate Ne μ",
     "m.μ ≠ 0"
    ],
    "hypotheses_by_theorem": {
@@ -36243,7 +36243,7 @@
     ],
     "Descent.PopGen.mutation_timescale_exceeds_drift": [
      "0 < μ",
-     "2 < scaledMutationRate Ne μ"
+     "2 < Descent.Core.scaledMutationRate Ne μ"
     ],
     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
     "Descent.Portability.identityDirectMetricModel_source_weights": [],
@@ -37821,7 +37821,7 @@
  },
  "Descent.Core.Panel.altFreq": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Locus P.nLoci'\")",
+  "note": "self-check: structure projection unavailable (KeyError(\"field 'call' was deliberately left uninhabited: cannot tell whether the domain 'Locus n' is finite. This definition reads a field whose Lean type this harness does not model, so there is no )",
   "file": "Descent/Core/Genome.lean",
   "line": 241,
   "short": "altFreq",
@@ -37836,7 +37836,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Locus P.nLoci'\")"
+   "error": "KeyError(\"field 'call' was deliberately left uninhabited: cannot tell whether the domain 'Locus n' is finite. This definition reads a field whose Lean type this harness does not model, so there is no honest value to give it.\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -43972,7 +43972,7 @@
  },
  "Descent.Decision.CertificateGrading.FinitePrior.probability": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'FinitePrior n'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'PMF (Fin (n + 1)) n'\")",
   "file": "Descent/Decision/CertificateGrading.lean",
   "line": 92,
   "short": "probability",
@@ -43987,7 +43987,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'FinitePrior n'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'PMF (Fin (n + 1)) n'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -45702,7 +45702,7 @@
  },
  "Descent.Decision.FiniteMinimax.Problem.liftGarbledRule": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'FinitePrior summaryCount'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'PMF (Fin (n + 1)) summaryCount'\")",
   "file": "Descent/Decision/FiniteMinimax.lean",
   "line": 115,
   "short": "liftGarbledRule",
@@ -45717,7 +45717,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'FinitePrior summaryCount'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'PMF (Fin (n + 1)) summaryCount'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -53611,7 +53611,7 @@
  },
  "Descent.Pangenome.Gauge.geno": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Tree E'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Bool E'\")",
   "file": "Descent/Pangenome/GaugeInvariance.lean",
   "line": 129,
   "short": "geno",
@@ -53627,7 +53627,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Tree E'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Bool E'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -56086,7 +56086,7 @@
     "μ ≠ 0",
     "0 < Ne",
     "0 < μ",
-    "2 < scaledMutationRate Ne μ",
+    "2 < Descent.Core.scaledMutationRate Ne μ",
     "m.μ ≠ 0"
    ],
    "hypotheses_by_theorem": {
@@ -56125,7 +56125,7 @@
     ],
     "Descent.PopGen.mutation_timescale_exceeds_drift": [
      "0 < μ",
-     "2 < scaledMutationRate Ne μ"
+     "2 < Descent.Core.scaledMutationRate Ne μ"
     ],
     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
     "Descent.Portability.identityDirectMetricModel_source_weights": [],
@@ -57241,7 +57241,7 @@
  },
  "Descent.PopGen.sourceBestLinearWeightsFromLD": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'CausalVec c'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℝ c c'\")",
   "file": "Descent/PopGen/DGP.lean",
   "line": 471,
   "short": "sourceBestLinearWeightsFromLD",
@@ -57256,7 +57256,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'CausalVec c'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ℝ c c'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -59161,7 +59161,7 @@
  },
  "Descent.PopGen.signalVariance": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Foundations.Predictor k'\")",
+  "note": "self-check: calls untranslated definition var",
   "file": "Descent/PopGen/DGP.lean",
   "line": 1968,
   "short": "signalVariance",
@@ -59176,7 +59176,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Foundations.Predictor k'\")"
+   "error": "NameError(\"name 'var' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -78030,7 +78030,7 @@
  },
  "Descent.Portability.thresholdDecision": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition false",
+  "note": "self-check: calls untranslated definition true",
   "file": "Descent/Portability/ContinuumCalibration.lean",
   "line": 525,
   "short": "thresholdDecision",
@@ -78054,7 +78054,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'false' is not defined\")"
+   "error": "NameError(\"name 'true' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -117743,7 +117743,7 @@
  },
  "Descent.Program.klBernReal": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Foundations.UnitProb'\")",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Set.Icc (0 : ℝ) 1'\")",
   "file": "Descent/Program/Conclusions.lean",
   "line": 632,
   "short": "klBernReal",
@@ -117758,7 +117758,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Foundations.UnitProb'\")"
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Set.Icc (0 : ℝ) 1'\")"
   },
   "numeric_standins": null,
   "vector_args": null,

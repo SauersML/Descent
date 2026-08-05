@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import math
 import random
+import pathlib
 import re
 
 # Names that carry a unit-interval convention throughout this corpus.  Matched
@@ -408,6 +409,44 @@ def _is_cdf_name(name):
     return bool(name) and bool(_CDF_NAME.match(str(name)))
 
 
+_ALIASES = None
+
+
+def _aliases():
+    """{abbrev name: the type it abbreviates}, short and qualified.
+
+    `abbrev BinaryState := Fin 2` is a NAME for a type this function already
+    inhabits, and looking only at the name refused it: ten definitions taking a
+    `Descent.BinaryState` were reported "no inhabitant modelled for the type",
+    for a type that is `Fin 2`. The same held for `RealVec`, `CausalVec`,
+    `TagVec` and `AlleleFreq` -- every documentary alias the corpus introduced
+    to stop a convention being written twice, which is exactly the practice the
+    `Core` layer encourages.
+
+    Resolving one step at a time rather than transitively closing here: the
+    recursion in `type_value` does the rest, and `CausalVec c` unfolds to
+    `RealVec c` and then to `Fin c → ℝ` on successive calls.
+    """
+    global _ALIASES
+    if _ALIASES is None:
+        _ALIASES = {}
+        try:
+            import json
+            blob = json.loads((pathlib.Path(__file__).resolve().parent
+                               / "defs.json").read_text())
+            for d in blob.get("definitions", []):
+                if d.get("kind") != "abbrev":
+                    continue
+                body = (d.get("body") or "").strip()
+                if not body:
+                    continue
+                _ALIASES[d["name"]] = body
+                _ALIASES[d["name"].rsplit(".", 1)[-1]] = body
+        except Exception:                                        # noqa: BLE001
+            pass
+    return _ALIASES
+
+
 def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0,
                name=""):
     """An inhabitant of the Lean type `ty`, or raise `Uninhabitable`.
@@ -526,6 +565,18 @@ def type_value(ty, rng, structs=None, dim=None, lo=0.05, hi=1.0, _depth=0,
         # `Band` could exceed the length of a `Band → ℝ` table, every read
         # through it would raise.
         return rng.randrange(dim)
+    # A documentary alias is a name for a type, not a new type. Substituting the
+    # ARGUMENTS of the alias is not attempted: `RealVec n` carries `n`, and the
+    # body `Fin n → ℝ` names the same binder, so the head swap suffices for the
+    # shapes this corpus writes. An alias whose body needs real substitution
+    # falls through to the refusal below, as it should.
+    head0 = ty.split()[0] if ty.split() else ""
+    alias = _aliases().get(head0) or _aliases().get(head0.split(".")[-1])
+    if alias and _depth <= 5:
+        rest = ty[len(head0):].strip()
+        expanded = _norm(f"{alias} {rest}".strip())
+        if expanded != ty:
+            return type_value(expanded, rng, structs, dim, lo, hi, _depth + 1, name)
     raise Uninhabitable(f"no inhabitant modelled for the type {ty!r}")
 
 

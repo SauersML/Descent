@@ -1,6 +1,6 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:a8e3695c9db70937ec908988b1773000",
+ "source_digest": "sha256:781b94f014d780458b493e4a8b18e2e5",
  "source_files": 282,
  "collisions": {},
  "theorems": [
@@ -31275,7 +31275,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/DGP.lean",
    "line": 58,
-   "statement": "(Ne μ : ℝ) (h : μ ≠ 0) : scaledMutationRate Ne μ / μ = 4 * Ne",
+   "statement": "(Ne μ : ℝ) (h : μ ≠ 0) : Descent.Core.scaledMutationRate Ne μ / μ = 4 * Ne",
    "mentions": [
     "scaledMutationRate"
    ]
@@ -31285,7 +31285,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/DGP.lean",
    "line": 85,
-   "statement": "(Ne m : ℝ) (h : m ≠ 0) : scaledMigrationRate Ne m / m = 4 * Ne",
+   "statement": "(Ne m : ℝ) (h : m ≠ 0) : Descent.Core.scaledMigrationRate Ne m / m = 4 * Ne",
    "mentions": [
     "scaledMigrationRate"
    ]
@@ -37904,7 +37904,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/CoalescentTheory.lean",
    "line": 128,
-   "statement": "(t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) : coalFst t Ne = Portability.fstFromTau (Portability.coalescentTau t Ne)",
+   "statement": "(t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) : coalFst t Ne = Descent.Core.fstFromTau (Portability.coalescentTau t Ne)",
    "mentions": [
     "coalFst",
     "coalescentTau",
@@ -38116,7 +38116,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/FstDerivationFromDrift.lean",
    "line": 68,
-   "statement": "(Ne H₀ : ℝ) (t : ℕ) : hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀",
+   "statement": "(Ne H₀ : ℝ) (t : ℕ) : Descent.Core.hetRecurrence Ne H₀ t = (1 - 1 / (2 * Ne)) ^ t * H₀",
    "mentions": [
     "hetRecurrence"
    ]
@@ -38126,7 +38126,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/FstDerivationFromDrift.lean",
    "line": 87,
-   "statement": "(Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) : heterozygosityLossFromDrift t Ne = 1 - hetRecurrence Ne H₀ t / H₀",
+   "statement": "(Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) : heterozygosityLossFromDrift t Ne = 1 - Descent.Core.hetRecurrence Ne H₀ t / H₀",
    "mentions": [
     "hetRecurrence",
     "heterozygosityLossFromDrift"
@@ -38279,7 +38279,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 140,
-   "statement": ": islandDemeCorrection (1 / 2) = -1",
+   "statement": ": Descent.Core.islandDemeCorrection (1 / 2) = -1",
    "mentions": [
     "islandDemeCorrection"
    ]
@@ -38289,7 +38289,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 148,
-   "statement": ": islandDemeCorrection 1 = 0",
+   "statement": ": Descent.Core.islandDemeCorrection 1 = 0",
    "mentions": [
     "islandDemeCorrection"
    ]
@@ -38320,7 +38320,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 229,
-   "statement": ": islandDemeCorrection 2 = 2",
+   "statement": ": Descent.Core.islandDemeCorrection 2 = 2",
    "mentions": [
     "islandDemeCorrection"
    ]
@@ -38330,7 +38330,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 234,
-   "statement": "(d : ℝ) (hd : 1 < d) : 1 < islandDemeCorrection d",
+   "statement": "(d : ℝ) (hd : 1 < d) : 1 < Descent.Core.islandDemeCorrection d",
    "mentions": [
     "islandDemeCorrection"
    ]
@@ -38351,7 +38351,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 262,
-   "statement": ": Filter.Tendsto islandDemeCorrection Filter.atTop (nhds 1)",
+   "statement": ": Filter.Tendsto Descent.Core.islandDemeCorrection Filter.atTop (nhds 1)",
    "mentions": [
     "islandDemeCorrection"
    ]
@@ -38443,7 +38443,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 502,
-   "statement": "(Ne m μ nDemes : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ) (hcorr : 0 ≤ islandDemeCorrection nDemes) : scaledIdentityStep (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ) (fstIslandEquilibriumFiniteDemes Ne m μ nDemes) = fstIslandEquilibriumFiniteDemes Ne m μ nDemes",
+   "statement": "(Ne m μ nDemes : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) (hμ : 0 ≤ μ) (hcorr : 0 ≤ Descent.Core.islandDemeCorrection nDemes) : scaledIdentityStep (4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ) (fstIslandEquilibriumFiniteDemes Ne m μ nDemes) = fstIslandEquilibriumFiniteDemes Ne m μ nDemes",
    "mentions": [
     "fstIslandEquilibriumFiniteDemes",
     "islandDemeCorrection",
@@ -38455,7 +38455,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MigrationDriftFoundations.lean",
    "line": 521,
-   "statement": "(Ne m μ nDemes : ℝ) (h : islandDemeCorrection nDemes = 1) : fstIslandEquilibriumFiniteDemes Ne m μ nDemes = fstMigrationMutationEquilibriumManyDemes Ne m μ",
+   "statement": "(Ne m μ nDemes : ℝ) (h : Descent.Core.islandDemeCorrection nDemes = 1) : fstIslandEquilibriumFiniteDemes Ne m μ nDemes = fstMigrationMutationEquilibriumManyDemes Ne m μ",
    "mentions": [
     "fstIslandEquilibriumFiniteDemes",
     "fstMigrationMutationEquilibriumManyDemes",
@@ -38680,7 +38680,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MutationDriftBalance.lean",
    "line": 39,
-   "statement": "(Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) : 0 < scaledMutationRate Ne μ",
+   "statement": "(Ne μ : ℝ) (hNe : 0 < Ne) (hμ : 0 < μ) : 0 < Descent.Core.scaledMutationRate Ne μ",
    "mentions": [
     "scaledMutationRate"
    ]
@@ -38761,7 +38761,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MutationDriftBalance.lean",
    "line": 125,
-   "statement": "(Ne₁ μ₁ Ne₂ μ₂ : ℝ) (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) : fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ₂) < fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ₁)",
+   "statement": "(Ne₁ μ₁ Ne₂ μ₂ : ℝ) (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) : fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ₂) < fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ₁)",
    "mentions": [
     "fstMutationDriftEquilibrium",
     "scaledMutationRate"
@@ -38772,7 +38772,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MutationDriftBalance.lean",
    "line": 134,
-   "statement": "(μ Ne₁ Ne₂ : ℝ) (hμ : 0 < μ) (hNe₁ : 0 < Ne₁) (h_more : Ne₁ < Ne₂) : fstMutationDriftEquilibrium (scaledMutationRate Ne₂ μ) < fstMutationDriftEquilibrium (scaledMutationRate Ne₁ μ)",
+   "statement": "(μ Ne₁ Ne₂ : ℝ) (hμ : 0 < μ) (hNe₁ : 0 < Ne₁) (h_more : Ne₁ < Ne₂) : fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ) < fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ)",
    "mentions": [
     "fstMutationDriftEquilibrium",
     "scaledMutationRate"
@@ -38783,7 +38783,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MutationDriftBalance.lean",
    "line": 142,
-   "statement": "(Ne μ₁ μ₂ : ℝ) (hNe : 0 < Ne) (hμ₁ : 0 < μ₁) (h_more : μ₁ < μ₂) : fstMutationDriftEquilibrium (scaledMutationRate Ne μ₂) < fstMutationDriftEquilibrium (scaledMutationRate Ne μ₁)",
+   "statement": "(Ne μ₁ μ₂ : ℝ) (hNe : 0 < Ne) (hμ₁ : 0 < μ₁) (h_more : μ₁ < μ₂) : fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₂) < fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₁)",
    "mentions": [
     "fstMutationDriftEquilibrium",
     "scaledMutationRate"
@@ -38848,7 +38848,7 @@
    "kind": "theorem",
    "file": "Descent/PopGen/PopulationGeneticsFoundations/MutationDriftBalance.lean",
    "line": 220,
-   "statement": "(Ne μ : ℝ) (hμ : 0 < μ) (hθ_large : 2 < scaledMutationRate Ne μ) : 1 / μ < 2 * Ne",
+   "statement": "(Ne μ : ℝ) (hμ : 0 < μ) (hθ_large : 2 < Descent.Core.scaledMutationRate Ne μ) : 1 / μ < 2 * Ne",
    "mentions": [
     "scaledMutationRate"
    ]
@@ -41391,7 +41391,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/AncestrySpecificPower.lean",
    "line": 532,
-   "statement": ": hweHeterozygosity (1 / 2) = 1 / 2",
+   "statement": ": Descent.Core.hweHeterozygosity (1 / 2) = 1 / 2",
    "mentions": [
     "hweHeterozygosity"
    ]
@@ -41401,7 +41401,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/AncestrySpecificPower.lean",
    "line": 540,
-   "statement": "(p : ℝ) : hweHeterozygosity p = genotypeVarianceHWE p",
+   "statement": "(p : ℝ) : Descent.Core.hweHeterozygosity p = genotypeVarianceHWE p",
    "mentions": [
     "genotypeVarianceHWE",
     "hweHeterozygosity"
@@ -41412,7 +41412,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/AncestrySpecificPower.lean",
    "line": 547,
-   "statement": "(p q : ℝ) (h_p_lt : p < 1/2) (h_q_lt : q < 1/2) (h_pq : p < q) : hweHeterozygosity p < hweHeterozygosity q",
+   "statement": "(p q : ℝ) (h_p_lt : p < 1/2) (h_q_lt : q < 1/2) (h_pq : p < q) : Descent.Core.hweHeterozygosity p < Descent.Core.hweHeterozygosity q",
    "mentions": [
     "hweHeterozygosity"
    ]
@@ -41422,7 +41422,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/AncestrySpecificPower.lean",
    "line": 564,
-   "statement": "(p_eur p_afr β : ℝ) (h_eur_lt : p_eur < 1/2) (h_afr_lt : p_afr < 1/2) (h_drift_down : p_afr < p_eur) (h_β_ne : β ≠ 0) : hweHeterozygosity p_afr * β ^ 2 < hweHeterozygosity p_eur * β ^ 2",
+   "statement": "(p_eur p_afr β : ℝ) (h_eur_lt : p_eur < 1/2) (h_afr_lt : p_afr < 1/2) (h_drift_down : p_afr < p_eur) (h_β_ne : β ≠ 0) : Descent.Core.hweHeterozygosity p_afr * β ^ 2 < Descent.Core.hweHeterozygosity p_eur * β ^ 2",
    "mentions": [
     "hweHeterozygosity"
    ]
@@ -52492,7 +52492,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 193,
-   "statement": ": fstFromTau (-1) = 0",
+   "statement": ": Descent.Core.fstFromTau (-1) = 0",
    "mentions": [
     "fstFromTau"
    ]
@@ -52502,7 +52502,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 233,
-   "statement": "(s a : ℝ) : 1 / Spectral.transferTimeInflation s a = 1 - fstFromTau ((a / s) ^ 2)",
+   "statement": "(s a : ℝ) : 1 / Spectral.transferTimeInflation s a = 1 - Descent.Core.fstFromTau ((a / s) ^ 2)",
    "mentions": [
     "fstFromTau",
     "transferTimeInflation"
@@ -52523,7 +52523,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 348,
-   "statement": "(a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) : pairwiseFstFromBranches (fstFromTau a) (fstFromTau b) = fstFromTau (a + b + a * b)",
+   "statement": "(a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) : pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau b) = Descent.Core.fstFromTau (a + b + a * b)",
    "mentions": [
     "fstFromTau",
     "pairwiseFstFromBranches"
@@ -52534,7 +52534,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 365,
-   "statement": "(a b : ℝ) (ha : 0 < a) (hb : 0 < b) : pairwiseFstFromBranchTaus a b < pairwiseFstFromBranches (fstFromTau a) (fstFromTau b)",
+   "statement": "(a b : ℝ) (ha : 0 < a) (hb : 0 < b) : pairwiseFstFromBranchTaus a b < pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau b)",
    "mentions": [
     "fstFromTau",
     "pairwiseFstFromBranchTaus",
@@ -52546,7 +52546,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 391,
-   "statement": "(a : ℝ) (ha : 0 ≤ a) : pairwiseFstFromBranches (fstFromTau a) (fstFromTau a) - pairwiseFstFromBranchTaus a a = a / (1 + a) ^ 2",
+   "statement": "(a : ℝ) (ha : 0 ≤ a) : pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau a) - pairwiseFstFromBranchTaus a a = a / (1 + a) ^ 2",
    "mentions": [
     "fstFromTau",
     "pairwiseFstFromBranchTaus",
@@ -52579,7 +52579,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 410,
-   "statement": "(tau : ℝ) (htau : 0 ≤ tau) : 0 ≤ fstFromTau tau",
+   "statement": "(tau : ℝ) (htau : 0 ≤ tau) : 0 ≤ Descent.Core.fstFromTau tau",
    "mentions": [
     "fstFromTau",
     "tau"
@@ -52590,7 +52590,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 414,
-   "statement": "(tau : ℝ) (htau : 0 ≤ tau) : fstFromTau tau < 1",
+   "statement": "(tau : ℝ) (htau : 0 ≤ tau) : Descent.Core.fstFromTau tau < 1",
    "mentions": [
     "fstFromTau",
     "tau"
@@ -52601,7 +52601,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 425,
-   "statement": "(tau : ℝ) (htau : 0 < tau) : fstFromTau tau < 1 - Real.exp (-tau)",
+   "statement": "(tau : ℝ) (htau : 0 < tau) : Descent.Core.fstFromTau tau < 1 - Real.exp (-tau)",
    "mentions": [
     "fstFromTau",
     "tau"
@@ -52612,7 +52612,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/Definitions.lean",
    "line": 446,
-   "statement": ": fstFromTau 1 = 1 / 2",
+   "statement": ": Descent.Core.fstFromTau 1 = 1 / 2",
    "mentions": [
     "fstFromTau"
    ]
@@ -53165,7 +53165,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 434,
-   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) : 0 < PopGen.scaledMigrationRate Ne m",
+   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) : 0 < Descent.Core.scaledMigrationRate Ne m",
    "mentions": [
     "scaledMigrationRate"
    ]
@@ -53175,7 +53175,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 440,
-   "statement": "(Ne m : ℝ) : fstMigrationDriftEquilibrium Ne m = 1 / (1 + PopGen.scaledMigrationRate Ne m)",
+   "statement": "(Ne m : ℝ) : fstMigrationDriftEquilibrium Ne m = 1 / (1 + Descent.Core.scaledMigrationRate Ne m)",
    "mentions": [
     "fstMigrationDriftEquilibrium",
     "scaledMigrationRate"
@@ -53455,7 +53455,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 1048,
-   "statement": "(M : ℝ) : sharedLDFromMigration M = fstFromTau M",
+   "statement": "(M : ℝ) : sharedLDFromMigration M = Descent.Core.fstFromTau M",
    "mentions": [
     "fstFromTau",
     "sharedLDFromMigration"
@@ -53507,7 +53507,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 1098,
-   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (PopGen.scaledMigrationRate Ne m) = 1",
+   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (Descent.Core.scaledMigrationRate Ne m) = 1",
    "mentions": [
     "fstMigrationDriftEquilibrium",
     "scaledMigrationRate",
@@ -53530,7 +53530,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 1278,
-   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : signalRetentionMigrationDrift Ne m = (PopGen.scaledMigrationRate Ne m) ^ 2 / (1 + PopGen.scaledMigrationRate Ne m) ^ 2",
+   "statement": "(Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : signalRetentionMigrationDrift Ne m = (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2",
    "mentions": [
     "scaledMigrationRate",
     "signalRetentionMigrationDrift"
@@ -53583,7 +53583,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/PortabilityDrift/MigrationDrift.lean",
    "line": 1360,
-   "statement": "(V_A Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : retainedSignalVarianceMigrationDrift V_A Ne m = (PopGen.scaledMigrationRate Ne m) ^ 2 / (1 + PopGen.scaledMigrationRate Ne m) ^ 2 * V_A",
+   "statement": "(V_A Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) : retainedSignalVarianceMigrationDrift V_A Ne m = (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2 * V_A",
    "mentions": [
     "retainedSignalVarianceMigrationDrift",
     "scaledMigrationRate"
@@ -57602,7 +57602,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/RareVariantPortability.lean",
    "line": 565,
-   "statement": "(mu s h : ℝ) (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) : mutationSelectionBalance mu s h = fstFromTau (mu / (h * s))",
+   "statement": "(mu s h : ℝ) (hhs : h * s ≠ 0) (hsum : h * s + mu ≠ 0) : mutationSelectionBalance mu s h = Descent.Core.fstFromTau (mu / (h * s))",
    "mentions": [
     "fstFromTau",
     "mutationSelectionBalance"
@@ -59013,7 +59013,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/StratificationConfounding.lean",
    "line": 830,
-   "statement": "(p : ℝ) (hp : 0 < p) (hp1 : p < 1) : 0 < hweHeterozygosity p",
+   "statement": "(p : ℝ) (hp : 0 < p) (hp1 : p < 1) : 0 < Descent.Core.hweHeterozygosity p",
    "mentions": [
     "hweHeterozygosity"
    ]
@@ -59023,7 +59023,7 @@
    "kind": "theorem",
    "file": "Descent/Portability/StratificationConfounding.lean",
    "line": 839,
-   "statement": "(m : MRInstrumentModel) (h_het : hweHeterozygosity m.p_target < hweHeterozygosity m.p_source) : m.fStat m.p_target < m.fStat m.p_source",
+   "statement": "(m : MRInstrumentModel) (h_het : Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source) : m.fStat m.p_target < m.fStat m.p_source",
    "mentions": [
     "fStat",
     "hweHeterozygosity"
@@ -62061,7 +62061,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 96,
-   "statement": ": ploidy = 2",
+   "statement": ": Descent.Core.ploidy = 2",
    "mentions": [
     "ploidy"
    ]
@@ -62102,7 +62102,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 183,
-   "statement": "(Ne mu : ℝ) : PopGen.scaledMutationRate Ne mu = 2 * ploidy * Ne * mu",
+   "statement": "(Ne mu : ℝ) : Descent.Core.scaledMutationRate Ne mu = 2 * Descent.Core.ploidy * Ne * mu",
    "mentions": [
     "ploidy",
     "scaledMutationRate"
@@ -62113,7 +62113,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 190,
-   "statement": "(Ne m : ℝ) : PopGen.scaledMigrationRate Ne m = 2 * ploidy * Ne * m",
+   "statement": "(Ne m : ℝ) : Descent.Core.scaledMigrationRate Ne m = 2 * Descent.Core.ploidy * Ne * m",
    "mentions": [
     "ploidy",
     "scaledMigrationRate"
@@ -62135,7 +62135,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 213,
-   "statement": "(M : ℝ) : Portability.twoDemeIMEquilibriumETss M = ploidy",
+   "statement": "(M : ℝ) : Portability.twoDemeIMEquilibriumETss M = Descent.Core.ploidy",
    "mentions": [
     "ploidy",
     "twoDemeIMEquilibriumETss"
@@ -62146,7 +62146,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 226,
-   "statement": "(Ne mu s : ℝ) : Portability.recessiveMutationSelectionDriftParameter Ne mu s = ploidy * Ne * Real.sqrt (mu * s)",
+   "statement": "(Ne mu s : ℝ) : Portability.recessiveMutationSelectionDriftParameter Ne mu s = Descent.Core.ploidy * Ne * Real.sqrt (mu * s)",
    "mentions": [
     "ploidy",
     "recessiveMutationSelectionDriftParameter"
@@ -62157,7 +62157,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 241,
-   "statement": "(Ne s h : ℝ) : Portability.mutationSelectionDriftParameter Ne s h = PopGen.scaledMutationRate Ne (h * s)",
+   "statement": "(Ne s h : ℝ) : Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s)",
    "mentions": [
     "mutationSelectionDriftParameter",
     "scaledMutationRate"
@@ -62192,7 +62192,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 298,
-   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - 2 * (PopGen.islandDemeCorrection 2 * p.mig + p.mu) * F",
+   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - 2 * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
     "fstDemeCorrectedFlowStep",
@@ -62225,7 +62225,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 458,
-   "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : neiGst p₁ p₂ = 1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) / (ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
+   "statement": "(p₁ p₂ : ℝ) (h : meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) ≠ 0) : neiGst p₁ p₂ = 1 - (p₁ * (1 - p₁) + p₂ * (1 - p₂)) / (Descent.Core.ploidy * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
    "mentions": [
     "meanAlleleFreq",
     "neiGst",
@@ -62237,7 +62237,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 480,
-   "statement": "(p₁ p₂ : ℝ) (hzero : ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) : neiGst p₁ p₂ = 0",
+   "statement": "(p₁ p₂ : ℝ) (hzero : Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂) = 0) : neiGst p₁ p₂ = 0",
    "mentions": [
     "meanAlleleFreq",
     "neiGst",
@@ -62490,7 +62490,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 922,
-   "statement": "(p : ℝ) : Portability.hweHeterozygosity p = hweGenotypeVariance p",
+   "statement": "(p : ℝ) : Descent.Core.hweHeterozygosity p = hweGenotypeVariance p",
    "mentions": [
     "hweGenotypeVariance",
     "hweHeterozygosity"
@@ -62501,7 +62501,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 932,
-   "statement": "(Ne m : ℝ) : Portability.fstMigrationDriftEquilibrium Ne m = PopGen.fstMutationDriftEquilibrium (PopGen.scaledMigrationRate Ne m)",
+   "statement": "(Ne m : ℝ) : Portability.fstMigrationDriftEquilibrium Ne m = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m)",
    "mentions": [
     "fstMigrationDriftEquilibrium",
     "fstMutationDriftEquilibrium",
@@ -62612,7 +62612,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1043,
-   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.theta p = 2 * ploidy * p.Ne * p.mu",
+   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.theta p = 2 * Descent.Core.ploidy * p.Ne * p.mu",
    "mentions": [
     "ploidy",
     "theta"
@@ -62623,7 +62623,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1047,
-   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.bigM p = 2 * ploidy * p.Ne * p.mig",
+   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.EvolutionaryParameters.bigM p = 2 * Descent.Core.ploidy * p.Ne * p.mig",
    "mentions": [
     "bigM",
     "ploidy"
@@ -62634,7 +62634,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1057,
-   "statement": "(V_A fst : ℝ) : Portability.Var_Delta_Mu V_A fst = ploidy * fst * V_A",
+   "statement": "(V_A fst : ℝ) : Portability.Var_Delta_Mu V_A fst = Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "Var_Delta_Mu",
     "ploidy"
@@ -62645,7 +62645,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1066,
-   "statement": "(V_A fst : ℝ) : PopGen.pgsDriftVariance_one_pop V_A fst = ploidy * fst * V_A",
+   "statement": "(V_A fst : ℝ) : PopGen.pgsDriftVariance_one_pop V_A fst = Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "pgsDriftVariance_one_pop",
     "ploidy"
@@ -62744,7 +62744,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1126,
-   "statement": "(V_A fst : ℝ) : PopGen.expectedPGSDiffVariance V_A fst = ploidy * ploidy * fst * V_A",
+   "statement": "(V_A fst : ℝ) : PopGen.expectedPGSDiffVariance V_A fst = Descent.Core.ploidy * Descent.Core.ploidy * fst * V_A",
    "mentions": [
     "expectedPGSDiffVariance",
     "ploidy"
@@ -62812,7 +62812,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1175,
-   "statement": "(Ne m₁₂ m₂₁ : ℝ) : Portability.asymmetricFst Ne m₁₂ m₂₁ = PopGen.fstMutationDriftEquilibrium (PopGen.scaledMigrationRate Ne (m₁₂ + m₂₁))",
+   "statement": "(Ne m₁₂ m₂₁ : ℝ) : Portability.asymmetricFst Ne m₁₂ m₂₁ = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁))",
    "mentions": [
     "asymmetricFst",
     "fstMutationDriftEquilibrium",
@@ -62824,7 +62824,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1187,
-   "statement": "(Ne m μ : ℝ) : PopGen.fstMigrationMutationEquilibriumManyDemes Ne m μ = 1 / (1 + PopGen.scaledMigrationRate Ne m + PopGen.scaledMutationRate Ne μ)",
+   "statement": "(Ne m μ : ℝ) : PopGen.fstMigrationMutationEquilibriumManyDemes Ne m μ = 1 / (1 + Descent.Core.scaledMigrationRate Ne m + Descent.Core.scaledMutationRate Ne μ)",
    "mentions": [
     "fstMigrationMutationEquilibriumManyDemes",
     "scaledMigrationRate",
@@ -62836,7 +62836,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1198,
-   "statement": "(Ne m μ nDemes : ℝ) : PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes = 1 / (1 + PopGen.scaledMigrationRate Ne m * PopGen.islandDemeCorrection nDemes + PopGen.scaledMutationRate Ne μ)",
+   "statement": "(Ne m μ nDemes : ℝ) : PopGen.fstIslandEquilibriumFiniteDemes Ne m μ nDemes = 1 / (1 + Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection nDemes + Descent.Core.scaledMutationRate Ne μ)",
    "mentions": [
     "fstIslandEquilibriumFiniteDemes",
     "islandDemeCorrection",
@@ -62860,7 +62860,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1215,
-   "statement": "{m : ℕ} (β p : Fin m → ℝ) : Portability.pgsMean β p = ∑ i, β i * (ploidy * p i)",
+   "statement": "{m : ℕ} (β p : Fin m → ℝ) : Portability.pgsMean β p = ∑ i, β i * (Descent.Core.ploidy * p i)",
    "mentions": [
     "pgsMean",
     "ploidy"
@@ -62871,7 +62871,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1219,
-   "statement": "(a d p : ℝ) : PopGen.fisherAverageEffect a d p = a + d * (1 - ploidy * p)",
+   "statement": "(a d p : ℝ) : PopGen.fisherAverageEffect a d p = a + d * (1 - Descent.Core.ploidy * p)",
    "mentions": [
     "fisherAverageEffect",
     "ploidy"
@@ -62893,7 +62893,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1248,
-   "statement": "(m : Portability.SplitMigrationModel) : PopGen.scaledMigrationRate m.Ne m.mig = 2 * ploidy * m.Ne * m.mig",
+   "statement": "(m : Portability.SplitMigrationModel) : Descent.Core.scaledMigrationRate m.Ne m.mig = 2 * Descent.Core.ploidy * m.Ne * m.mig",
    "mentions": [
     "ploidy",
     "scaledMigrationRate"
@@ -62915,7 +62915,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1259,
-   "statement": "(d N sigma_sq : ℝ) : PopGen.ibdFst d N sigma_sq = d / (2 * ploidy * N * sigma_sq + d)",
+   "statement": "(d N sigma_sq : ℝ) : PopGen.ibdFst d N sigma_sq = d / (2 * Descent.Core.ploidy * N * sigma_sq + d)",
    "mentions": [
     "ibdFst",
     "ploidy"
@@ -62937,7 +62937,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1273,
-   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.sharedLDRetention p = (1 - p.recomb) ^ (ploidy * p.t_div)",
+   "statement": "(p : PopGen.EvolutionaryParameters) : PopGen.sharedLDRetention p = (1 - p.recomb) ^ (Descent.Core.ploidy * p.t_div)",
    "mentions": [
     "ploidy",
     "sharedLDRetention"
@@ -62948,7 +62948,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1277,
-   "statement": "(d Ne m σ_sq : ℝ) : PopGen.demoSteppingStoneFst d Ne m σ_sq = d / (d + PopGen.scaledMigrationRate Ne m * σ_sq)",
+   "statement": "(d Ne m σ_sq : ℝ) : PopGen.demoSteppingStoneFst d Ne m σ_sq = d / (d + Descent.Core.scaledMigrationRate Ne m * σ_sq)",
    "mentions": [
     "demoSteppingStoneFst",
     "scaledMigrationRate"
@@ -63006,7 +63006,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1315,
-   "statement": "(Ne mu H₀ : ℝ) (t : ℕ) : PopGen.hetMutationDriftRecurrence Ne mu H₀ (t + 1) = (1 - 1 / coalescentTimeScale Ne) * PopGen.hetMutationDriftRecurrence Ne mu H₀ t + ploidy * mu * (1 - PopGen.hetMutationDriftRecurrence Ne mu H₀ t)",
+   "statement": "(Ne mu H₀ : ℝ) (t : ℕ) : PopGen.hetMutationDriftRecurrence Ne mu H₀ (t + 1) = (1 - 1 / coalescentTimeScale Ne) * PopGen.hetMutationDriftRecurrence Ne mu H₀ t + Descent.Core.ploidy * mu * (1 - PopGen.hetMutationDriftRecurrence Ne mu H₀ t)",
    "mentions": [
     "coalescentTimeScale",
     "hetMutationDriftRecurrence",
@@ -63018,7 +63018,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1330,
-   "statement": "(Ne mu : ℝ) : Portability.hetMutationFloor Ne mu = PopGen.scaledMutationRate Ne mu / (1 + PopGen.scaledMutationRate Ne mu)",
+   "statement": "(Ne mu : ℝ) : Portability.hetMutationFloor Ne mu = Descent.Core.scaledMutationRate Ne mu / (1 + Descent.Core.scaledMutationRate Ne mu)",
    "mentions": [
     "hetMutationFloor",
     "scaledMutationRate"
@@ -63099,7 +63099,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1526,
-   "statement": "(Ne mu H : ℝ) : Portability.hetStepWithMutation Ne mu H = (1 - 1 / coalescentTimeScale Ne) * H + ploidy * mu * (1 - H)",
+   "statement": "(Ne mu H : ℝ) : Portability.hetStepWithMutation Ne mu H = (1 - 1 / coalescentTimeScale Ne) * H + Descent.Core.ploidy * mu * (1 - H)",
    "mentions": [
     "coalescentTimeScale",
     "hetStepWithMutation",
@@ -63122,7 +63122,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1541,
-   "statement": "(Ne rate F : ℝ) : Portability.ibdFlowStep Ne rate F = F + (1 - F) / coalescentTimeScale Ne - ploidy * rate * F",
+   "statement": "(Ne rate F : ℝ) : Portability.ibdFlowStep Ne rate F = F + (1 - F) / coalescentTimeScale Ne - Descent.Core.ploidy * rate * F",
    "mentions": [
     "coalescentTimeScale",
     "ibdFlowStep",
@@ -63145,7 +63145,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1556,
-   "statement": "(Ne rate : ℝ) : Portability.ibdRecurrenceFixedPoint Ne rate = (1 - rate) ^ 2 / ((1 - rate) ^ 2 + coalescentTimeScale Ne * rate * (ploidy - rate))",
+   "statement": "(Ne rate : ℝ) : Portability.ibdRecurrenceFixedPoint Ne rate = (1 - rate) ^ 2 / ((1 - rate) ^ 2 + coalescentTimeScale Ne * rate * (Descent.Core.ploidy - rate))",
    "mentions": [
     "coalescentTimeScale",
     "ibdRecurrenceFixedPoint",
@@ -63168,7 +63168,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1572,
-   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDriftFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - ploidy * (p.mig + p.mu) * F",
+   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDriftFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - Descent.Core.ploidy * (p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
     "fstDriftFlowStep",
@@ -63180,7 +63180,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1584,
-   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - ploidy * (PopGen.islandDemeCorrection 2 * p.mig + p.mu) * F",
+   "statement": "(p : PopGen.EvolutionaryParameters) (F : ℝ) : PopGen.fstDemeCorrectedFlowStep p F = F + (1 - F) / coalescentTimeScale p.Ne - Descent.Core.ploidy * (Descent.Core.islandDemeCorrection 2 * p.mig + p.mu) * F",
    "mentions": [
     "coalescentTimeScale",
     "fstDemeCorrectedFlowStep",
@@ -63193,7 +63193,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1596,
-   "statement": "(m : Blindness.OneLocusArchitecture) : m.averageEffect = m.a + m.d * (1 - ploidy * m.p)",
+   "statement": "(m : Blindness.OneLocusArchitecture) : m.averageEffect = m.a + m.d * (1 - Descent.Core.ploidy * m.p)",
    "mentions": [
     "averageEffect",
     "ploidy"
@@ -63204,7 +63204,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1604,
-   "statement": "{m : ℕ} (β Δp : Fin m → ℝ) : PopGen.polygenicAdaptationShift β Δp = ∑ i, β i * ploidy * Δp i",
+   "statement": "{m : ℕ} (β Δp : Fin m → ℝ) : PopGen.polygenicAdaptationShift β Δp = ∑ i, β i * Descent.Core.ploidy * Δp i",
    "mentions": [
     "ploidy",
     "polygenicAdaptationShift"
@@ -63215,7 +63215,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1612,
-   "statement": "(d Ne m σ_sq : ℝ) : PopGen.steppingStoneFstQuadratic d Ne m σ_sq = d / (d + 2 * ploidy * Ne * σ_sq ^ 2 * m ^ 2)",
+   "statement": "(d Ne m σ_sq : ℝ) : PopGen.steppingStoneFstQuadratic d Ne m σ_sq = d / (d + 2 * Descent.Core.ploidy * Ne * σ_sq ^ 2 * m ^ 2)",
    "mentions": [
     "ploidy",
     "steppingStoneFstQuadratic"
@@ -63260,7 +63260,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1642,
-   "statement": "(Ne c : ℝ) : PopGen.ohtaKimuraSigmaDSq Ne c = (10 + 2 * ploidy * Ne * c) / ((2 + 2 * ploidy * Ne * c) * (11 + 2 * ploidy * Ne * c))",
+   "statement": "(Ne c : ℝ) : PopGen.ohtaKimuraSigmaDSq Ne c = (10 + 2 * Descent.Core.ploidy * Ne * c) / ((2 + 2 * Descent.Core.ploidy * Ne * c) * (11 + 2 * Descent.Core.ploidy * Ne * c))",
    "mentions": [
     "ohtaKimuraSigmaDSq",
     "ploidy"
@@ -63271,7 +63271,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1655,
-   "statement": "(Ne m d : ℝ) : PopGen.islandFstFiniteDemes Ne m d = PopGen.fstMutationDriftEquilibrium (PopGen.scaledMigrationRate Ne m * PopGen.islandDemeCorrection d)",
+   "statement": "(Ne m d : ℝ) : PopGen.islandFstFiniteDemes Ne m d = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection d)",
    "mentions": [
     "fstMutationDriftEquilibrium",
     "islandDemeCorrection",
@@ -63284,7 +63284,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1667,
-   "statement": "(m σ_sq μ : ℝ) : PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (ploidy * μ))",
+   "statement": "(m σ_sq μ : ℝ) : PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (Descent.Core.ploidy * μ))",
    "mentions": [
     "ploidy",
     "steppingStoneCharacteristicLength"
@@ -63306,7 +63306,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1694,
-   "statement": "(p : ℝ) : neiGst p (1 - p) = (1 - ploidy * p) ^ 2",
+   "statement": "(p : ℝ) : neiGst p (1 - p) = (1 - Descent.Core.ploidy * p) ^ 2",
    "mentions": [
     "neiGst",
     "ploidy"
@@ -63340,7 +63340,7 @@
    "kind": "theorem",
    "file": "Descent/Program/Conventions.lean",
    "line": 1740,
-   "statement": "(p0 fst : ℝ) : PopGen.driftVariance p0 fst = hweGenotypeVariance p0 * fst / ploidy",
+   "statement": "(p0 fst : ℝ) : PopGen.driftVariance p0 fst = hweGenotypeVariance p0 * fst / Descent.Core.ploidy",
    "mentions": [
     "driftVariance",
     "hweGenotypeVariance",
@@ -68622,7 +68622,7 @@
    "kind": "theorem",
    "file": "Descent.lean",
    "line": 40,
-   "statement": "(w : ℝ) : Blindness.XiFromMarks.pioneerWeightFraction w = Portability.fstFromTau w",
+   "statement": "(w : ℝ) : Blindness.XiFromMarks.pioneerWeightFraction w = Descent.Core.fstFromTau w",
    "mentions": [
     "fstFromTau",
     "pioneerWeightFraction"
@@ -112477,7 +112477,7 @@
      "μ ≠ 0",
      "0 < Ne",
      "0 < μ",
-     "2 < scaledMutationRate Ne μ",
+     "2 < Descent.Core.scaledMutationRate Ne μ",
      "m.μ ≠ 0"
     ],
     "hypotheses_by_theorem": {
@@ -112516,7 +112516,7 @@
      ],
      "Descent.PopGen.mutation_timescale_exceeds_drift": [
       "0 < μ",
-      "2 < scaledMutationRate Ne μ"
+      "2 < Descent.Core.scaledMutationRate Ne μ"
      ],
      "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
      "Descent.Portability.identityDirectMetricModel_source_weights": [],
@@ -112822,12 +112822,7 @@
      "Descent.Program.fstIslandEquilibriumFiniteDemes_eq_scaled": [],
      "Descent.Program.fstDemeCorrectedFlowStep_uses_coalescentTimeScale": [],
      "Descent.Program.islandFstFiniteDemes_eq_scaled": []
-    },
-    "range_lo_thm": [
-     "Descent.PopGen.one_lt_islandDemeCorrection",
-     1
-    ],
-    "range_lo": 1
+    }
    },
    "mentioned_by": [
     "Descent.Core.ScoreMoments.deployedR2FromIsland_anti_in_demes",
@@ -113569,12 +113564,7 @@
      "Descent.Program.expectedFreqDiffSq_uses_hwe": [],
      "Descent.Program.effectiveSampleSizeFromSE_uses_hweGenotypeVariance": [],
      "Descent.Program.driftVariance_uses_hweGenotypeVariance": []
-    },
-    "range_lo_thm": [
-     "Descent.Portability.hweHeterozygosity_pos",
-     2
-    ],
-    "range_lo": 0
+    }
    },
    "mentioned_by": [
     "Descent.Core.hweHeterozygosity_allele_swap",
@@ -134559,7 +134549,7 @@
      "μ ≠ 0",
      "0 < Ne",
      "0 < μ",
-     "2 < scaledMutationRate Ne μ",
+     "2 < Descent.Core.scaledMutationRate Ne μ",
      "m.μ ≠ 0"
     ],
     "hypotheses_by_theorem": {
@@ -134598,7 +134588,7 @@
      ],
      "Descent.PopGen.mutation_timescale_exceeds_drift": [
       "0 < μ",
-      "2 < scaledMutationRate Ne μ"
+      "2 < Descent.Core.scaledMutationRate Ne μ"
      ],
      "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
      "Descent.Portability.identityDirectMetricModel_source_weights": [],
@@ -139248,7 +139238,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  scaledMutationRate p.Ne p.mu",
+   "body": "  Descent.Core.scaledMutationRate p.Ne p.mu",
    "docstring": "Scaled mutation parameter: θ = 4Neμ.",
    "empirical_status": "",
    "namespace": "Descent.PopGen",
@@ -139493,7 +139483,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  scaledMigrationRate p.Ne p.mig",
+   "body": "  Descent.Core.scaledMigrationRate p.Ne p.mig",
    "docstring": "Scaled migration parameter: M = 4Nem.",
    "empirical_status": "",
    "namespace": "Descent.PopGen",
@@ -150790,12 +150780,7 @@
      "Descent.Program.fstIslandEquilibriumFiniteDemes_eq_scaled": [],
      "Descent.Program.fstDemeCorrectedFlowStep_uses_coalescentTimeScale": [],
      "Descent.Program.islandFstFiniteDemes_eq_scaled": []
-    },
-    "range_lo_thm": [
-     "Descent.PopGen.one_lt_islandDemeCorrection",
-     1
-    ],
-    "range_lo": 1
+    }
    },
    "mentioned_by": [
     "Descent.Core.ScoreMoments.deployedR2FromIsland_anti_in_demes",
@@ -150845,7 +150830,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  1 / (1 + 4 * Ne * m * islandDemeCorrection d)",
+   "body": "  1 / (1 + 4 * Ne * m * Descent.Core.islandDemeCorrection d)",
    "docstring": "**Finite-island `F_ST` for `d` demes**, `F_ST = 1/(1 + 4·Nₑ·m·d/(d-1))`.\n\n    **Attribution, corrected -- this is not Nei's.** The docstring used to cite\n    \"(Wright; Nei)\". The form with the deme factor SQUARED,\n    `1/(1 + 4·Nₑ·m·(d/(d-1))²)`, is Crow and Aoki (1984) for Nei's `G_ST` and is\n    what Whitlock and McCauley (1999), Heredity 82:117--125, quote; naming Nei on\n    the LINEAR form credits him with the form this corpus measured against his.\n\n    The linear form is the ratio-of-coalescence-times statistic, Slatkin (1991),\n    *Inbreeding coefficients and coalescence times*, Genetics Research\n    58:167--175, which finds `F_ST` in the finite island model by that route. The\n    derivation is short enough to check here: in the symmetric island model\n    `E[T_within] = 2·Nₑ·d` and `E[T_between] = 2·Nₑ·d + (d-1)/(2·m)`, so\n    `1 - E[T_within]/E[T_between] = 1/(1 + 4·Nₑ·m·d/(d-1))`, which is this body.\n\n    **So the two forms are two STATISTICS, not two guesses at one number**, and\n    the FALSIFIED verdict on the square recorded at `islandDemeCorrection` should\n    be read that way: the measurement read `F_ST` as `1 - E[T_w]/E[T_b]` off the\n    genealogies, which is exactly the quantity the linear form computes, so the\n    square was on trial under a convention that is not its own. It is not\n    evidence that Crow and Aoki are wrong about `G_ST`. What the corpus is\n    entitled to say is that under ITS `F_ST` convention -- the Hudson\n    ratio-of-averages one every `F_ST` here is written for -- the correction is\n    linear. (At `d = 2` the two happen to coincide once the corpus's own\n    two-population `Hudson = 2G/(1 + G)` bridge is applied: `G = 1/(1 + 4M)`\n    maps to `1/(1 + 2M)`, which is the linear form there. That coincidence does\n    NOT extend to `d > 2`, where the two-subpopulation bridge does not apply,\n    and no `d > 2` conversion is claimed here.)\n\n    Regime: `d` demes of equal size `Nₑ`, symmetric migration at rate `m`,\n    mutation negligible relative to migration, and `F_ST` in the Hudson\n    coalescence-time convention. This is the finite-`d`\n    statement; `fstMigrationDriftEquilibrium` is its `d → ∞` limit.\n\n    Empirical status: VALIDATED -- matches `validation/differential/refs.island_fst_finite_demes`,\n    against which the differential check `islandModelFst-finite-demes` measures\n    the corpus's limit form.",
    "empirical_status": "VALIDATED --",
    "namespace": "Descent.PopGen",
@@ -150974,7 +150959,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  Descent.Core.fstFromFlow (4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ)",
+   "body": "  Descent.Core.fstFromFlow (4 * Ne * m * Descent.Core.islandDemeCorrection nDemes + 4 * Ne * μ)",
    "docstring": "**The island-model equilibrium with the deme count carried explicitly.**\n\n    `1 / (1 + 4 Ne m n/(n-1) + 4 Ne mu)`. The homogenising force a deme feels is\n    not the emigration rate but the rate at which it receives lineages from the\n    other `n - 1` demes, and at small `n` those differ by a factor that no value\n    of `m` absorbs: at two demes the correction is 2, at forty it is 1.026.\n\n    Empirical status: **VALIDATED**\n    (`validation/empirical/simcov/battery_correct.py`,\n    `correct_island_deme_count`). msprime symmetric island model at equilibrium,\n    `Ne = 1000`, TOTAL emigration rate `m = 1e-3` held fixed so `4 Ne m = 4.0` is\n    identical in every row, `mu = 1e-8`, Hudson `F_ST`, 40 replicates of 20 Mb:\n\n      demes   limit form   this def   simulated          sems (this def)\n        2         0.20000    0.11111  0.11698±0.01017     0.6\n        3         0.20000    0.14286  0.13273±0.01669     0.6\n        4         0.20000    0.15789  0.12658±0.01764     1.7\n        6         0.20000    0.17241  0.17579±0.02036     0.2\n       10         0.20000    0.18367  0.14297±0.01752     2.3\n       20         0.20000    0.19194  0.18580±0.01879     0.3\n       40         0.20000    0.19608  0.17114±0.01809     1.4\n\n    Worst cell 2.3 sems against the limit form's 8.2 at two demes. The squared\n    correction `(n/(n-1))^2` was also tried and is excluded: it gives 0.05882 at\n    two demes, 5.7 sems low, where this form sits at 0.6.\n\n    Power: at fixed `4 Ne m` the prediction spans 0.11111 to 0.19608 across the\n    deme counts while the limit form is constant at 0.20000, so the design\n    separates them by construction.",
    "empirical_status": "VALIDATED",
    "namespace": "Descent.PopGen",
@@ -150988,8 +150973,8 @@
      "0 < Ne",
      "0 ≤ m",
      "0 ≤ μ",
-     "0 ≤ islandDemeCorrection nDemes",
-     "islandDemeCorrection nDemes = 1"
+     "0 ≤ Descent.Core.islandDemeCorrection nDemes",
+     "Descent.Core.islandDemeCorrection nDemes = 1"
     ],
     "hypotheses_by_theorem": {
      "Descent.PopGen.fstIslandEquilibriumFiniteDemes_eq_master": [],
@@ -150998,10 +150983,10 @@
       "0 < Ne",
       "0 ≤ m",
       "0 ≤ μ",
-      "0 ≤ islandDemeCorrection nDemes"
+      "0 ≤ Descent.Core.islandDemeCorrection nDemes"
      ],
      "Descent.PopGen.fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction": [
-      "islandDemeCorrection nDemes = 1"
+      "Descent.Core.islandDemeCorrection nDemes = 1"
      ],
      "Descent.Program.fstIslandEquilibriumFiniteDemes_eq_scaled": []
     }
@@ -155693,12 +155678,7 @@
      "Descent.Program.expectedFreqDiffSq_uses_hwe": [],
      "Descent.Program.effectiveSampleSizeFromSE_uses_hweGenotypeVariance": [],
      "Descent.Program.driftVariance_uses_hweGenotypeVariance": []
-    },
-    "range_lo_thm": [
-     "Descent.Portability.hweHeterozygosity_pos",
-     2
-    ],
-    "range_lo": 0
+    }
    },
    "mentioned_by": [
     "Descent.Core.hweHeterozygosity_allele_swap",
@@ -179607,7 +179587,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  fstFromTau (coalescentTau t Ne)",
+   "body": "  Descent.Core.fstFromTau (coalescentTau t Ne)",
    "docstring": "`F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by\nrescaling to coalescent time and applying `fstFromTau`.\n\n    Regime: a clean two-population split with no migration and equal sizes;\n    `F_ST` is the pairwise Hudson estimator as a ratio of averages, which is the\n    convention every `F_ST` in this corpus is written for.\n\n    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).\n    The composition, not either half alone, is what is measured: `τ` is never\n    read off, only `t` and `Nₑ` go in. Over `τ` = 0.125, 0.25, 1, 2, 4 the body\n    predicts 0.11111, 0.20000, 0.50000, 0.66667 and 0.80000 against measured\n    0.11708 ± 0.00264, 0.19851 ± 0.00511, 0.50095 ± 0.00770, 0.66607 ± 0.00624\n    and 0.80065 ± 0.00317, worst cell 2.26 sems at 5.1% relative. Power: the\n    prediction spans 86% of the unit interval and crosses the whole saturating\n    curve, so a form linear in `τ`, or one saturating at another rate, separates\n    on the grid rather than only at its ends. Simulated with recombination\n    (8 Mb at 1e-8): at zero recombination one genealogy per replicate makes the\n    error bar honest but far too wide to decide anything.",
    "empirical_status": "VALIDATED",
    "namespace": "Descent.Portability",
@@ -179718,7 +179698,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  fstFromTau ((tauS + tauT) / 2)",
+   "body": "  Descent.Core.fstFromTau ((tauS + tauT) / 2)",
    "docstring": "**Pairwise `F_ST` composed in coalescent time instead of in `F_ST`.**\n\n    Under the coalescent, two demes that split from a common ancestor have\n    `E[T_between] = 1 + tau` in units where `E[T_within] = 1`, with `tau` the\n    time to that ancestor. The path is traversed ONCE, so the branch taus enter\n    through their MEAN and not their sum, and Hudson's ratio gives\n    `fstFromTau ((tauS + tauT) / 2)`.\n\n    Empirical status: CONDITIONALLY VALID. Validated for equal branch lengths\n    and falsified for unequal ones, with the boundary measured rather than\n    asserted; both tables are below. The residual on unequal branches is a\n    SIGNATURE limitation and not a repairable constant: with unequal daughter\n    sizes the between-deme coalescence also depends on the ANCESTRAL size, and\n    two branch taus cannot carry it. Use `hudsonFstFromCoalescenceTimes` there.\n\n    History, kept because it is the evidence for the body above. This\n    definition previously read `fstFromTau (tauS + tauT)`, summing both branch\n    taus, and was **FALSIFIED** in that form\n    (`validation/empirical/simcov/battery_fix.py`, `test_fst_composition`).\n    Measured against msprime coalescent simulation of a clean split, recombining\n    at `1e-8` so that each replicate carries many independent genealogies,\n    Hudson's `F_ST` as a ratio of averages, 25 replicates of 20 Mb, 50 diploids\n    per deme:\n\n      Ne     t       this def   `coalFst`   simulated   sems off (this def)\n      1000   500       0.3333      0.2000      0.19923            59.1\n      1000   1000      0.5000      0.3333      0.33415            51.9\n      1000   2000      0.6667      0.5000      0.49974            50.6\n\n    On the SAME runs `coalFst` matches to 0.34, 0.25 and 0.08 sems. Two\n    definitions of one quantity disagree and the simulation says which.\n\n    The premise stated above is where it goes wrong: two demes that split `t`\n    generations ago have `E[T_between] = 1 + tau`, NOT `1 + tauS + tauT`.\n    Coalescence times add along a path, but the path to the common ancestor is\n    traversed ONCE -- reaching the ancestral population takes `t` generations,\n    not `t` from each side. Summing both branch taus double-counts the split\n    time, which is exactly the observed `+50` percent.\n\n    **The body has been corrected to the MEAN of the branch taus**, which is the\n    composition with the split time counted once. On a symmetric split it\n    reduces to `fstFromTau tau`, hence to `coalFst`, which is what makes the two\n    definitions agree instead of differing by fifty percent. Re-measured on the\n    same engine (`battery_correct.py`, `correct_pairwise_tau`, 30 replicates of\n    20 Mb, recombining):\n\n      NeA    NeB    t      old (sum)   this (mean)   simulated          sems\n      1000   1000    500      0.33333       0.20000  0.19682±0.00277   1.2\n      1000   1000   1000      0.50000       0.33333  0.32924±0.00326   1.3\n      1000   1000   2000      0.66667       0.50000  0.49999±0.00302   0.0\n       600    600   1200      0.66667       0.50000  0.49410±0.00385   1.5\n       500   2000   1000      0.55556       0.38462  0.36592±0.00330   5.7\n\n    So: validated for equal branch lengths at worst 1.5 sems over four designs\n    spanning 0.19682 to 0.49999, and wrong for unequal ones -- the last row\n    misses by 5.7 sems. That is the boundary the status at the top records.\n\n    Power: the prediction spans 0.20000 to 0.50000 across the symmetric designs,\n    a factor of two and a half, and the superseded sum form is excluded at 40 to\n    59 sems on every one of them.",
    "empirical_status": "CONDITIONALLY VALID",
    "namespace": "Descent.Portability",
@@ -179841,7 +179821,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  1 / (1 + PopGen.scaledMigrationRate m.Ne m.mig)",
+   "body": "  1 / (1 + Descent.Core.scaledMigrationRate m.Ne m.mig)",
    "docstring": "**The many-deme, low-mutation limit of the split-with-migration `F_ST`**, which is\nWright's diffusion form `1/(1 + 4 Nₑ m)` written through `scaledMigrationRate`.\n\n    Empirical status: **FALSIFIED** outside the weak-migration limit\n    (`validation/empirical/simcov/battery_pd1.py`). The name declares a\n    many-deme, low-mutation regime and says nothing about `mig`, so it is read\n    here at face value across a 50-fold sweep in `mig`. Explicit Wright-Fisher\n    island model, 200 demes, identity-probability `F_ST` on distinct pairs, ten\n    independent replicate metapopulations per cell:\n\n      Nₑ    mig       this def   simulated            rel\n      200   0.0100     0.11111    0.10897 ± 0.00005    1.96%\n      50    0.0100     0.33333    0.32714 ± 0.00009    1.89%\n      13    0.1538     0.11111    0.08769 ± 0.00001   26.7%\n      4     0.5000     0.11111    0.03936 ± 0.00001  182%\n      2     0.2500     0.33333    0.23978 ± 0.00001   39.0%\n\n    Positive control: a panmictic pool split into 200 labelled demes reads\n    `F_ST` 0.05 sems from zero.\n\n    WHAT SURVIVES. At `mig ≤ 0.01` the body is within 2%, and that 2% is itself\n    mostly the finite-deme term rather than the linearisation. The error is\n    `O(mig)` and nothing else: the exact fixed point\n    `fstIslandMultiplicativeEquilibrium`, which differs from this body only in\n    dropped terms of order `m²` and `m/Nₑ`, tracks the same simulation to 1.6%\n    at every cell including `mig = 0.5`. So this is the weak-migration\n    approximation behaving exactly as `ibdRecurrenceFixedPoint_lt_linearisation`\n    says it must, measured rather than asserted.\n\n    WHY THE DESIGN COULD SEE IT AND EARLIER ONES COULD NOT. The two forms\n    separate in `mig`, not in `4 Nₑ mig`. `battery_bulk1` and `battery_bulk20`\n    swept the compound parameter and passed both forms; here `mig` is swept\n    50-fold at fixed `4 Nₑ mig` by shrinking `Nₑ`.\n\n    argument_source: model.",
    "empirical_status": "FALSIFIED",
    "namespace": "Descent.Portability",
@@ -181743,7 +181723,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (1 - fstMigrationDriftEquilibrium Ne m) *\n    sharedLDFromMigration (PopGen.scaledMigrationRate Ne m)",
+   "body": "  (1 - fstMigrationDriftEquilibrium Ne m) *\n    sharedLDFromMigration (Descent.Core.scaledMigrationRate Ne m)",
    "docstring": "**Signal retention under migration-drift balance.**\n\nThe fraction of additive signal that survives, accounting for both allele\nfrequency drift and LD sharing at the migration-drift equilibrium. It is\n`(1 - F_ST) * shared_LD = M²/(1 + M)²` with `M = 4 Nₑ m`, and it lies in\n`[0, 1)`.\n\nThe previous body of this name multiplied by `V_A` and so returned a variance,\nnot a fraction: it was unbounded and grew without limit as the additive variance\ngrew. A retention that scales with an additive variance is not a retention. The\nname now denotes the fraction and `retainedSignalVarianceMigrationDrift` denotes\nthe variance; `retainedSignalVarianceMigrationDrift_eq_retention_mul_VA` relates\nthem. This corpus has already lost a factor of four to just this kind of\nname/quantity mismatch, so the two are separated rather than bounded.\n\n    Denotes: a dimensionless fraction in `[0, 1)`, never a variance.\n\n    Regime: two-deme island model at migration-drift balance; \"signal\n    retention\" read as the fraction of a score's covariance with the genetic\n    value that survives transfer from the deme its weights came from.\n\n    Empirical status: **FALSIFIED**\n    (`validation/empirical/simcov/battery_pd2.py`). THE LEAD BELOW IS NOW\n    CLOSED, and it was closed by removing the calibration rather than by\n    estimating it better. Two-deme island model at migration-drift balance,\n    `Nₑ = 1000`, 5 Mb with recombination, 300 diploids per deme, 200 causal\n    sites, 40 independent replicates:\n\n      4Nₑm   measured retention   this body   1-F_ST   shared LD\n      0.4    0.171 ± 0.028        0.082       0.526    0.377\n      2.0    0.353 ± 0.026        0.444       0.802    0.368\n      8.0    0.523 ± 0.029        0.790       0.940    0.477\n      40     0.798 ± 0.038        0.952       0.989    0.669\n\n    The body misses at 3.23, 3.57, 9.21 and 4.10 sems, and it misses on BOTH\n    SIDES: 110% LOW at `4 Nₑ m = 0.4` and 51% HIGH at `4 Nₑ m = 8`. A two-sided\n    miss is the signature of a wrong functional form rather than a wrong\n    constant, so no rescaling of either factor repairs it.\n\n    WHAT FIXED THE DESIGN. The estimator no longer needs a ceiling. Retention was\n    `w'Σ_T β / w'Σ_S β` with `w = Σ_S β` fitted on the SAME source sample the\n    denominator contracts against, so the denominator carried squared estimation\n    noise the numerator did not, and every cell had to be divided by a\n    separately estimated panmictic ceiling -- which came out 0.8905 in one run\n    and 1.0430 in the other, a value above one that attenuation cannot produce.\n    The source sample is now SPLIT: `w = Σ_A β` from half A, and the\n    source-side covariance evaluated on half B. `Σ_A` and `Σ_B` are independent\n    estimates of one matrix, so there is no squared noise and nothing to\n    calibrate. The positive control is what shows it worked: one panmictic\n    population split three ways returns retention `1.030 ± 0.030`, 1.02 sems\n    from one, with `F_ST` measured at 0.00002 on the same replicates.\n\n    BOTH SINGLE FACTORS ARE ALSO REJECTED on the same cells, so this is not a\n    case of the product being wrong because one factor is spurious. `1 - F_ST`\n    alone misses by 12.76, 17.59, 14.37 and 5.08 sems -- it is the worst of the\n    four candidates, which retires the reading the earlier lead favoured. The LD\n    factor alone misses by 7.39 sems at the weak-migration cell.\n\n    THE MIGRATION PARAMETERISATION IS WHERE THE PRODUCT BREAKS. Read with the\n    MEASURED cross-deme LD correlation in place of `sharedLDFromMigration`, the\n    same product form lands at 0.96, 2.28, 2.60 and 3.66 sems -- still rejected,\n    but by a margin that one cell carries, against 9.21 for the body as written.\n    That is consistent with `battery_bulk34`, which refuted `M/(1+M)` directly.\n    The measured-LD reading is NOT quoted as a verdict of its own, because the\n    cross-deme correlation of two separately estimated `r` vectors is attenuated\n    by its own estimation noise, and that attenuation was not calibrated either;\n    it is reported to locate the fault, not to license a replacement body.\n\n    argument_source: model. `F_ST` and the LD factor are both evaluated at the\n    simulation's own `Nₑ` and `m` through the closed forms, never estimated from\n    the replicates the retention is measured on.\n\n    THE SUPERSEDED RECORD, kept because the retraction is part of the story.\n    This read UNTESTED, with a LEAD against the product form,\n    DOWNGRADED from a falsification after a replication check: a second run of\n    the same design (`simcov/battery_bulk36.py`) returned retention 0.736 at\n    `4·Nₑ·m = 40` where the first returned 0.993, and 0.614 against 0.781 at\n    `4·Nₑ·m = 8`. Those gaps are an order of magnitude larger than the ±0.08\n    error bars either run quotes, so the quoted bars understate the true\n    variability and no verdict here is safe.\n\n    The instability is in the CALIBRATION, not the biology. Retention is divided\n    by the estimator's panmictic ceiling, and that ceiling came out 0.8905 in\n    the first run and 1.0430 in the second -- a 17% swing on six replicates,\n    applied to every cell. A ceiling above one is itself the tell: attenuation\n    can only pull it below one, so the second estimate is noise-dominated. A\n    usable design needs the ceiling pinned to a few percent, which means\n    hundreds of replicates rather than six, or an estimator that needs no\n    calibration at all.\n\n    What both runs agree on qualitatively: measured retention rises with migration but stays well below the product form at weak migration. That is\n    the lead, and it is consistent with `sharedLD_from_equilibrium`, where\n    measured shared LD stayed near 1 rather than falling to `M/(1+M)`.\n\n    The table below is the FIRST run, kept for the record:\n    Measured at `Nₑ = 1000` over 5 Mb with recombination, 80 causal sites segregating in both demes, weights taken as\n    the deme-0 LD projection `Σ_A·β` (itself VALIDATED at\n    `targetSourceEffectProjection`):\n\n      4Nₑm    retention          this body   1-F     M/(1+M)\n      0.4     0.507 ± 0.076      0.131       0.460   0.286\n      2.0     0.523 ± 0.076      0.543       0.814   0.667\n      8.0     0.781 ± 0.099      0.834       0.939   0.889\n      40      0.993 ± 0.117      0.963       0.987   0.976\n\n    The product misses by 4.97 sems (74% relative), low at weak migration where\n    it multiplies two factors that are each already below one. The single\n    factor `1 - F` is ALSO falsified, at 3.81 sems. `M/(1+M)` alone survives at\n    worst 2.93 sems.\n\n    NOT ASSERTED: that `M/(1+M)` is the right law. Its worst cell is off by 44%\n    relative and escapes rejection only by sitting just under the three-sem\n    gate, on error bars of 0.08 to 0.12. What this run establishes is that the\n    PRODUCT is wrong; which single factor replaces it needs tighter bars. The\n    direction is consistent with `sharedLD_from_equilibrium`, where measured\n    shared LD stayed near 1 rather than falling to `M/(1+M)` -- if the LD term\n    does not decay as written, multiplying by it twice over is the error this\n    table shows.\n\n    Calibration, not a control: the estimator attenuates because `w = Σ_A·β`\n    reuses the same finite-sample `Σ_A` the denominator contracts against, so\n    the denominator carries squared estimation noise the numerator does not. The\n    attenuation is measured on one panmictic population split arbitrarily in\n    half -- same sample size, same site count, same pipeline -- and divided out\n    of every cell. The CONTROL is that the same split gives `F_ST = 0`.",
    "empirical_status": "FALSIFIED",
    "namespace": "Descent.Portability",
@@ -182380,7 +182360,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  PopGen.scaledMutationRate m.Ne m.μ",
+   "body": "  Descent.Core.scaledMutationRate m.Ne m.μ",
    "docstring": "The scaled mutation parameter θ = 4Neμ for a mutation-drift model.\n\n    Empirical status: UNTESTED.",
    "empirical_status": "UNTESTED",
    "namespace": "Descent.Portability",
@@ -196469,7 +196449,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  m.n * m.β_inst ^ 2 * hweHeterozygosity p / m.σ2_X_resid",
+   "body": "  m.n * m.β_inst ^ 2 * Descent.Core.hweHeterozygosity p / m.σ2_X_resid",
    "docstring": "**First-stage F-statistic** of a Mendelian-randomisation instrument at a given allele\n    frequency: `n β² Var(G) / σ²_{X|G}`.\n\n    What enters the noncentrality is the genotype *variance*, which\n    `hweHeterozygosity_eq_genotypeVarianceHWE` identifies with `hweHeterozygosity p`.\n\n    The denominator is the exposure residual variance, matching `β_inst`, which is the\n    instrument's effect on the exposure. Both belong to the first-stage regression; an outcome\n    variance here would divide one regression's numerator by another's denominator and the\n    quantity would not be an F-statistic of anything.\n\n    Empirical status: **VALIDATED** (`simcov/battery_bulk40.py`, `group_d`). 4000\n    independent first-stage regressions of 800 individuals each, exposure\n    `X = β_inst · dosage + N(0,1)`; the observable is the realised MEAN first-stage `F`\n    MINUS ONE, because `E[F] = 1 + ncp` under the alternative and this body is the\n    noncentrality rather than the statistic. That subtraction is the convention and is\n    stated rather than absorbed.\n\n      p      H = 2p(1-p)   this body   measured ncp   sems\n      0.05     0.0950        0.4864       0.4664       0.64\n      0.15     0.2550        1.3056       1.2775       0.65\n      0.30     0.4200        2.1504       2.1124       0.75\n      0.50     0.5000        2.5600       2.6051       0.82\n\n    The identity gate: reading the genotype variance as `p(1-p)` misses by 24 sems (51%\n    low) and as `4p(1-p)` by 46 sems (97% high), so the ploidy factor in `hweHeterozygosity`\n    is carried by the data. The positive control -- a NULL instrument, whose `F` must have\n    mean 1 -- passes at 0.88 sems, which is what makes the minus-one convention checkable\n    rather than assumed.\n\n    **DO NOT DELETE AS UNUSED.** No Lean declaration mentions this, so the liveness scan in\n    `validation/code/Check.lean` reports it dead; its consumer is\n    `simcov/battery_bulk40.py`, `group_d`, whose measured noncentralities are tabulated\n    above and whose identity gate rejects two competing genotype-variance conventions\n    against this exact body. A definition a battery validates against is not dead code, and\n    deleting it would silently retire a passing measurement.",
    "empirical_status": "VALIDATED",
    "namespace": "Descent.Portability",
@@ -196480,11 +196460,11 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
-     "hweHeterozygosity m.p_target < hweHeterozygosity m.p_source"
+     "Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source"
     ],
     "hypotheses_by_theorem": {
      "Descent.Portability.instrument_strength_decreases": [
-      "hweHeterozygosity m.p_target < hweHeterozygosity m.p_source"
+      "Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source"
      ]
     }
    },
@@ -203385,7 +203365,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": " ploidy * Ne",
+   "body": " Descent.Core.ploidy * Ne",
    "docstring": "Coalescent time scale: time measured in units of `ploidy · Nₑ`\ngenerations.\n\n    Regime: a single panmictic diploid population; the scale is the MEAN\n    PAIRWISE coalescence time, which is what makes it a time and not a rate.\n\n    Empirical status: **VALIDATED** (`simcov/battery_bulk37.py`). Measured in\n    BRANCH mode -- straight off the genealogies, with no mutation model, so no\n    mutation-rate convention can leak in -- over 2 Mb with recombination so each\n    replicate averages many independent trees. Across `Nₑ` = 500, 1000, 2000,\n    5000 the worst cell is 1.08 sems at 2.4% relative.\n\n    Power: the `4·Nₑ` reading is carried on the same cells and is FALSIFIED at\n    46.96 sems (105% relative). The tenfold `Nₑ` sweep is what provides that\n    separation.\n\n    Control: Watterson's `E[S] = θ·∑_{i<n} 1/i` for the expected number of\n    segregating sites, computed from tree sequences generated by the same\n    demography -- an independent classical result that would break if the\n    demography or the mutation placement were wrong. It passes at worst 1.27\n    sems (15.33 measured against 14.19 predicted at `Nₑ = 500`, rising to 151.5\n    against 141.9 at `Nₑ = 5000`).\n\n    This run replaces `battery_bulk23.py`, which measured the same thing\n    correctly but carried a control asserting that the coefficient of variation\n    of the replicate means is 1. That holds for a single exponential `T₂`, not\n    for a mean over the many genealogies recombination supplies, so that control\n    failed and its `4·Nₑ` rejection was recorded VOID. A run whose control fails\n    is rightly distrusted even where its headline comparison does not depend on\n    it.\n\n    This is the `2·Nₑ` in the corpus that is NOT the other one. The `4·Nₑ` that\n    appears throughout -- in `scaledMutationRate`, `scaledMigrationRate`,\n    `fstMutationDriftEquilibrium` -- is the scaling of a RATE, `θ = 4·Nₑ·μ` and\n    `M = 4·Nₑ·m`, and shares only its shape with this.",
    "empirical_status": "VALIDATED",
    "namespace": "Descent.Program",
@@ -203516,7 +203496,7 @@
      "Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂",
      "0 < p₁ * (1 - p₂",
      "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂",
-     "ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+     "Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
     ],
     "hypotheses_by_theorem": {
      "Descent.PopGen.contrastSpikeLevel_monomorphic_is_junk": [],
@@ -203546,7 +203526,7 @@
       "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
      ],
      "Descent.Program.neiGst_at_zero_mean_heterozygosity": [
-      "ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+      "Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
      ],
      "Descent.Program.neiGst_allele_swap": [],
      "Descent.Program.hudsonFst_eq_of_neiGst": [
@@ -203623,7 +203603,7 @@
     }
    ],
    "ret_type": "ℝ",
-   "body": "  (p₁ - p₂) ^ 2 /\n    (ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
+   "body": "  (p₁ - p₂) ^ 2 /\n    (Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂))",
    "docstring": "**Nei's `G_ST`, explicitly distinguished from Hudson's `F_ST`.** One minus the ratio\nof mean within-subgroup heterozygosity to TOTAL heterozygosity is the\ndefinition of `G_ST`. Hudson's `F_ST`\ndivides by the BETWEEN-subgroup heterozygosity `p₁(1-p₂) + p₂(1-p₁)`, not by\nthe total-pool `2·p̄·(1-p̄)`. The two denominators differ by exactly\n`(p₁-p₂)²/2`, so THE DENOMINATORS agree iff `p₁ = p₂`, and the two ESTIMATORS\nagree iff `G_ST = 0` or `G_ST = 1` -- that is, only where the differentiation\nis degenerate.\n\n**They agree when `p₁ = p₂`, and NOT when `p̄ = 1/2`**; the second is a tempting\ndisjunct and it is false in both readings.\nThe denominators differ by `(p₁-p₂)²/2`, which does not vanish at `p̄ = 1/2`;\nand by the corpus's own `hudsonFst_eq_of_neiGst`, Hudson `= 2G/(1+G)`,\nwhich equals `G` only at `G = 0` or `G = 1`. So there is no interior\n`p̄ = 1/2` slice on which the two coincide. Witness, on `p̄ = 1/2` exactly:\nat `p₁ = 0.9, p₂ = 0.1` the Nei denominator is `1`, `G_ST = 0.64`, and Hudson\nis `0.64/0.82 = 0.7805` -- a ratio of `1.22`. Nearer the middle it is worse:\n`1.995` at `(0.525, 0.475)`, `1.923` at `(0.6, 0.4)`, `1.724` at `(0.7, 0.3)`.\n\nThe error is worth naming because it is cheap to half-check and wrong: at\n`p̄ = 1/2` the Nei denominator `4·p̄·(1-p̄)` is exactly `1`, which feels like it\nshould settle the comparison and does not -- it makes `G_ST = (p₁-p₂)²`, while\nHudson still divides by `1 - 2p₁p₂`. A DENOMINATOR COINCIDENCE IS NOT AN\nESTIMATOR COINCIDENCE, and here there was not even a denominator coincidence.\nThe claim had propagated into three `checks.py` can-fail clauses and out of the\ncorpus into status reporting before anyone tested the slice it names.\n\n    Derivation, since this is decidable without any simulation. With\n    `d = p₁ - p₂` and `p̄ = (p₁+p₂)/2`,\n    `H_T - H_S = 2p̄(1-p̄) - (p₁(1-p₁) + p₂(1-p₂)) = d²/2`, so this body is\n    `d² / (4·p̄·(1-p̄))`, which is Nei's `G_ST` and is also exactly the body of\n    `PopulationGeneticsFoundations.neiGstFromFrequencies` --\n    `neiGstFromFrequencies_eq_neiGst` below proves the two agree, and what\n    it actually proves is that both are Nei.\n    Hudson's is `d² / (p₁ + p₂ - 2p₁p₂)`; `hudsonFst` states it and\n    `hudsonFst_eq_of_neiGst` gives the exact conversion. At `p₁ = 0.2`,\n    `p₂ = 0.6` this body gives `0.1667` where Hudson gives `0.2857`, the\n    +71.4% the differential tier measured against an independent\n    implementation.\n\n    The old `hudsonFst` name on the Nei body was removed rather than retained as\n    a compatibility alias: that alias would preserve the biological category\n    error. The genuine Hudson body now owns `hudsonFst`. Read every `neiGst` in the\n    *contrast-normalization* chain --\n    including `four_neiGst_eq_standardizedContrastVariance` -- as Nei's `G_ST`.\n    The algebra is unaffected: `4·G_ST` is the standardized allele-frequency\n    contrast variance for THIS body. It is not the empirically calibrated BBP\n    spike. That law uses genuine Hudson `F_ST` and is named `hudsonBbpSpike`\n    below. At weak differentiation the latter is almost twice\n    `neiContrastSpike`; silently exchanging them is therefore a biologically\n    material error, not a harmless change of notation.\n\n    **There is no exception at `p̄ = 1/2`. Do not add one.** The factor does not\n    vanish there: measured ratios along that exact slice are `1.995`, `1.923`,\n    `1.724`, `1.220` -- monotone in `|p₁ - p₂|` and never reaching `1`. The\n    identity in this file settles it without any measurement:\n    `hudsonFst_eq_of_neiGst` gives `Hudson = 2G/(1+G)`, which equals `G` only at\n    `G = 0` or `G = 1`. `neiGst_ne_hudsonFst_at_mean_half` certifies it at\n    `(9/10, 1/10)` -- `p̄ = 1/2` exactly, ratio `50/41` -- and exists to stop an\n    \"except at `p̄ = 1/2`\" caveat being reintroduced.\n\n    Note which witness does the work: `neiGst_ne_hudsonFst` sits at `p̄ = 2/5`,\n    OUTSIDE that slice, and cannot refute a claim about it. A witness outside an\n    exception never refutes the exception.\n\n    **Numerical warning -- this body must not be evaluated as written.** It is\n    `1` minus a ratio that tends to `1` as the two populations become similar,\n    so its floating-point relative error is the machine epsilon divided by the\n    answer. Between human populations `G_ST` is `O(10⁻³)` genome-wide and much\n    smaller at an individual variant, which is exactly the regime that has no\n    digits left. Measured float64 against a 60-digit reference over\n    `p₂ = p₁ + δ` for `p₁ ∈ {0.01, 0.1, 0.3, 0.5}` and `δ` from `10⁻²` down to\n    `10⁻¹⁴`, arguments rounded to float64 FIRST so input representation cannot\n    be charged to the formula: **36 of 52 cells exceed 1e-6 relative error,\n    worst 9.3·10¹¹** -- the returned `G_ST` is wrong by eleven orders of\n    magnitude, and at `δ ≲ 10⁻⁸` it is pure rounding noise of either sign.\n\n    `PopulationGeneticsFoundations.neiGstFromFrequencies` is the SAME quantity\n    written as `(p₁-p₂)² / (4 p̄ (1-p̄))`, with the cancellation done by hand;\n    `neiGstFromFrequencies_eq_neiGst` proves they are equal over `ℝ`. On the\n    same 52 cells that body gives **0 over tolerance, worst 1.9·10⁻¹⁶**. The\n    equality theorem is what makes the substitution safe and it is also what\n    made the difference invisible: two provably equal bodies are not two equally\n    usable programs. Evaluate `neiGstFromFrequencies`; read `neiGst` as the\n    definition of what is being computed.\n\n    Metamorphic relations this body satisfies, all exactly:\n    population relabelling `(p₁, p₂) ↦ (p₂, p₁)`, invariant;\n    reference/alternate allele swap `(p₁, p₂) ↦ (1-p₁, 1-p₂)`, invariant\n    (`neiGst_allele_swap`); and `p₁ = p₂`, zero.\n\n    Empirical status: CONVENTION PINNED (Nei's `G_ST`; the name was corrected with it).",
    "empirical_status": "CONVENTION PINNED",
    "namespace": "Descent.Program",
@@ -203637,7 +203617,7 @@
      "Program.meanAlleleFreq p₁ p₂ * (1 - Program.meanAlleleFreq p₁ p₂",
      "0 < p₁ * (1 - p₂",
      "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂",
-     "ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+     "Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
     ],
     "hypotheses_by_theorem": {
      "Descent.PopGen.contrastSpikeLevel_eq_four_neiGst": [
@@ -203658,7 +203638,7 @@
       "meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
      ],
      "Descent.Program.neiGst_at_zero_mean_heterozygosity": [
-      "ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
+      "Descent.Core.ploidy ^ 2 * meanAlleleFreq p₁ p₂ * (1 - meanAlleleFreq p₁ p₂"
      ],
      "Descent.Program.neiGst_allele_swap": [],
      "Descent.Program.hudsonFst_eq_of_neiGst": [
