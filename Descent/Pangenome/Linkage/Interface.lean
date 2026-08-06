@@ -48,6 +48,8 @@ is what lets a chain of interfaces be an ordinary `List`.
 * `identityLoss_eq_width_add_imbalance` — `H(J ∣ S) = log (m/w) + D(q ‖ u)`.
 * `imbalance_nonneg`, and hence `log_card_sub_log_width_le_identityLoss` — an interface of
   occupied width `w` forgets at least `log (m/w)` nats, with equality exactly at balance.
+* `identityLoss_le_comp`, `width_comp_le` — coarsening an interface can only forget more and
+  occupy fewer states, so the bound downstream is monotone in how much a builder merges.
 
 ## Empirical status
 
@@ -347,6 +349,30 @@ theorem imbalance_nonneg [Nonempty ι] (s : ι → ι) : 0 ≤ imbalance s := by
     intro a _
     rw [div_eq_mul_inv, inv_inv]
   rwa [Finset.sum_congr rfl hterm, ← imbalance] at key
+
+/-! ### Merging states only forgets more
+
+An interface is coarsened by composing its state map with anything: `φ ∘ s` cannot tell apart
+two threads that `s` could not.  Both measures move the way they must. -/
+
+theorem fiber_subset_comp (s φ : ι → ι) (h : ι) : fiber s h ⊆ fiber (φ ∘ s) h := by
+  intro g hg
+  simp only [mem_fiber] at hg ⊢
+  simp [hg]
+
+theorem width_comp_le (s φ : ι → ι) : width (φ ∘ s) ≤ width s := by
+  have himg : Finset.univ.image (φ ∘ s) = (Finset.univ.image s).image φ := by
+    rw [Finset.image_image]
+  rw [width, width, himg]
+  exact Finset.card_image_le
+
+/-- **Coarsening an interface cannot reduce the identity it forgets.**  Linkage-entropy
+pressure is monotone under merging graph states, so a construction that merges more can only
+raise the bound of `Descent.Pangenome.Linkage.Barrier`, never lower it. -/
+theorem identityLoss_le_comp (s φ : ι → ι) : identityLoss s ≤ identityLoss (φ ∘ s) := by
+  refine mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun h _ ↦ ?_) (by positivity)
+  refine Real.log_le_log (by exact_mod_cast fiberCard_pos s h) ?_
+  exact_mod_cast Finset.card_le_card (fiber_subset_comp s φ h)
 
 /-- **An interface of occupied width `w` forgets at least `log (m/w)` nats.**  This is the
 width law for one cut; `Descent.Pangenome.Linkage.Barrier` adds it along a chain. -/
