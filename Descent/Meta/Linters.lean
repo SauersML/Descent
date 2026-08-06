@@ -19,11 +19,12 @@ Run them, after a successful build of `Descent`:
 
     lake env lean validation/code/Lint.lean
 
-NONE OF THIS HAS BEEN COMPILED.  It was written against the pinned toolchain's
-sources and the pinned Batteries revision, and every core and Batteries name in
-it was read out of `~/.elan/toolchains/leanprover--lean4---v4.24.0` and the
-pinned `Batteries/Tactic/Lint/*.lean`, but no build has accepted it.  Treat a
-failure here as a defect in this module until a build says otherwise.
+COMPILED AND RUN.  This module builds and `validation/code/Lint.lean` runs it
+over the whole corpus on every commit -- 44 seconds for 10,377 declarations.
+The paragraph that used to sit here said none of it had been compiled, which was
+true when it was written and stopped being true when `Descent.Meta` joined the
+root; nobody noticed, because nothing invoked it. A linter that is never run and
+a linter that finds nothing produce the same output.
 
 ## What an environment linter can see, and what it cannot
 
@@ -191,6 +192,64 @@ to see that they cannot both hold. -/
         return m!"says {head} while citing battery {names}; replace the head \
           with the verdict that run carries, or, if the run is about a \
           different quantity, say which"
+
+/-! ### The scaling convention, read off a signature
+
+`Core/Scaling.lean` carries `Theta`, `BigM`, `Tau` and `Rho` so that one scaled quantity
+cannot be passed where another is wanted. A type does that only where it is USED, and the
+corpus's population-genetic layers still spell these quantities `ℝ`. This linter counts
+that, per declaration, so the debt is a number the build reports rather than a number an
+audit estimates.
+
+It reads BINDER NAMES, which is a weaker instrument than it looks and is the right one
+here. A binder named `θ` in `Coalescent` is `4·Nₑ·μ` -- that is what the layer's Watterson,
+Ewens and site-frequency-spectrum results are about -- so the name IS the claim about which
+quantity the argument carries, and a name making that claim in a signature typed `ℝ` is the
+exact arrangement `Core/Scaling.lean` exists to end.
+
+Scoped to `Coalescent` and `PopGen` and to DEFINITIONS. Not `Spectral`, where `τ` is a
+transfer parameter and `θ` a Dirichlet one and neither is a coalescent scaling; not
+theorems, which inherit their binders from the definitions they are about; and not
+`Core.Scaling` itself, whose whole content is these quantities.
+-/
+
+/-- Binder names that assert their argument is a scaled population-genetic quantity. -/
+def scaledBinderNames : List Name := [`theta, `θ, `bigM, `tau, `τ, `rho, `ρ]
+
+/-- Is `declName` in a layer where these names mean the coalescent scalings? -/
+def onScaledSurface (declName : Name) : MetaM Bool := do
+  let m ← moduleOf declName
+  return (`Descent.Coalescent).isPrefixOf m || (`Descent.PopGen).isPrefixOf m
+
+/-- The `ℝ`-typed binders of `e` whose names claim a scaled quantity. -/
+partial def realScaledBinders : Expr → List Name
+  | .forallE n t b _ =>
+      let rest := realScaledBinders b
+      if scaledBinderNames.contains n && t.getAppFn.constName? == some `Real then
+        n :: rest
+      else rest
+  | _ => []
+
+/-- A definition in `Coalescent` or `PopGen` taking a scaled quantity as a bare real.
+
+`Core/Scaling.lean` records two occasions on which a scaled quantity was passed where a
+differently-scaled one was wanted, and both times every type involved was `ℝ`. The types
+exist; this reports the signatures that have not taken them. -/
+@[env_linter disabled] def scaledQuantityUntyped : Batteries.Tactic.Lint.Linter where
+  noErrorsFound :=
+    "Every scaled quantity in `Coalescent` and `PopGen` is carried by its own type."
+  errorsFound :=
+    "SCALED QUANTITIES CARRIED AS BARE REALS:"
+  test declName := do
+    unless isDefinition (← getEnv) declName do return none
+    unless (← inCorpus declName) do return none
+    unless (← onScaledSurface declName) do return none
+    let bad := realScaledBinders (← getConstInfo declName).type
+    if bad.isEmpty then return none
+    let names := String.intercalate ", " (bad.map toString)
+    return m!"takes {bad.length} scaled quantity/quantities as bare `ℝ`: {names}; \
+      `Core.Theta`, `Core.BigM`, `Core.Tau` and `Core.Rho` are the types for these, and \
+      a real cannot tell one from another"
 
 /-- A status head outside the closed vocabulary.
 

@@ -101,15 +101,30 @@ it and the text immediately after it.
 
 The preceding character is carried because it is the whole discriminator between
 a status marker and a mention of one: the corpus writes the phrase in backticks
-when it is talking ABOUT a status line and bare when it is asserting one. -/
-def occurrencesAfter (pat : List Char) (prev : Option Char) :
-    List Char → List (Option Char × List Char)
-  | [] => []
-  | c :: cs =>
-      let rest := occurrencesAfter pat (some c) cs
+when it is talking ABOUT a status line and bare when it is asserting one.
+
+**Tail recursive, and it has to be.** The obvious spelling computes the tail first and
+conses onto it, which puts one interpreter frame on the stack per CHARACTER of the
+docstring. That is fine at a hundred characters and fatal at a few thousand: `#lint` runs
+these in the interpreter, and this module's linters crashed the runner with `deep recursion
+was detected at 'interpreter'` on a corpus whose longest docstrings run to several thousand
+characters. The failure was in the SCANNER, not in anything it was scanning, and it arrived
+as a stack trace of ten thousand identical frames rather than as a finding -- so a corpus
+where it fires reports no linter results at all rather than reporting the wrong ones.
+
+The accumulator version compiles to a loop and is bounded by the output, not the input. -/
+def occurrencesAfter (pat : List Char) (prev : Option Char) (cs : List Char) :
+    List (Option Char × List Char) :=
+  go prev cs []
+where
+  /-- The loop: `acc` holds the matches found so far, most recent first. -/
+  go : Option Char → List Char → List (Option Char × List Char) →
+      List (Option Char × List Char)
+  | _, [], acc => acc.reverse
+  | prev, c :: cs, acc =>
       match pat.isPrefixOf? (c :: cs) with
-      | some after => (prev, after) :: rest
-      | none => rest
+      | some after => go (some c) cs ((prev, after) :: acc)
+      | none => go (some c) cs acc
 
 /-- The text following each ASSERTED status marker in `doc`, clipped to the same
 140 characters the Python scan reads.

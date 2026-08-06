@@ -5838,7 +5838,21 @@ LEDGER_DISAGREES = {"FALSIFIED", "REFUTED"}
 DOC_ASSERTS_AGREEMENT = {"VALIDATED", "MEASURED", "TESTED"}
 DOC_ASSERTS_DISAGREEMENT = {"FALSIFIED", "REFUTED"}
 
-BATTERY_CITE = re.compile(r"simcov/battery_([A-Za-z0-9_]+)\.py")
+# A CITATION, NOT A DESCRIPTION OF THE CITATION FORMAT. The negative lookahead
+# drops an ALL-CAPS metavariable stem, which is how this corpus writes a
+# placeholder: `Meta/DocConvention.lean` -- the file that DEFINES what a battery
+# citation looks like -- says "the opening of a battery citation,
+# `simcov/battery_NAME.py`", and the ledger guard read both of its explanatory
+# docstrings as citing a battery nobody has run. That is the same mistake the
+# `Empirical status:` scan already carries a discriminator for: a file
+# documenting a convention states the convention, and a scanner that cannot tell
+# a mention from a use reports the documentation as the defect.
+#
+# Every battery in the harness is named in lower case (`bulk41`, `strat02`,
+# `sved01`, `falsrepair_c2`), so requiring one lower-case character costs no real
+# citation and catches any placeholder written the way this corpus writes them.
+BATTERY_CITE = re.compile(r"simcov/battery_(?![A-Z][A-Z0-9_]*\.py)"
+                          r"([A-Za-z0-9_]+)\.py")
 EMPIRICAL_STATUS = re.compile(r"Empirical status:\s*[*_ ]*([A-Za-z_]+)")
 STATUS_WORDS = ("UNTESTED", "VALIDATED", "FALSIFIED", "DERIVED", "MEASURED",
                 "VACUOUS", "CONVENTION", "TESTED", "REFUTED")

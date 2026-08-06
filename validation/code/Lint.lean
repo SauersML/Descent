@@ -47,6 +47,14 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 
 #lint only coreStatusMissing coreStatusDenied in Descent
 
+-- `scaledQuantityUntyped` is `disabled` and named here for the reason the other two
+-- explicitly-named linters are: it holds a rule this corpus states rather than a rule
+-- about Lean, so a `#lint` on an unrelated importing module should not report it. It is
+-- also the one linter here whose findings are DEBT rather than defects -- every one of
+-- them is a signature that predates `Core/Scaling.lean` -- so it is kept separate from
+-- the gate above until the count reaches zero.
+#lint only scaledQuantityUntyped in Descent
+
 -- `empiricalStatusVocabulary` and `empiricalStatusMultiplicity` are in the
 -- default set now, so this line is redundant with a bare `#lint` and is kept
 -- anyway: it states which checks this runner is FOR, and a default set that
