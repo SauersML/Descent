@@ -1,0 +1,401 @@
+{
+ "_battery_sha": "9c523e824dc6f58f",
+ "results": [
+  {
+   "name": "fstEquilibrium",
+   "file": "Parameters.lean",
+   "source": "body [1/(1 + 4*Ne*m*d/(d-1) + 4*Ne*mu)], the deme-corrected island form",
+   "note": "",
+   "regime": "msprime symmetric island model, Ne = 1000 per deme, mu = 1e-8, total emigration m spread over the d-1 other demes so migration_rate = m/(d-1), 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates per cell. d swept 2/3/5/20 at 4*Ne*m = 4, and 4*Ne*m swept sixteenfold at d = 2 and d = 20. REGIME: equilibrium under migration, mutation and drift; this is NOT the clean-split transient, which is fstAtGeneration",
+   "span": 0.937797906337466,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "d=5 4Nem=4.0",
+    "lean": 0.16666555556296292,
+    "truth": 0.15873182695011637,
+    "sem": 0.006114484278798818,
+    "sems_off": 1.2975302987294821,
+    "rel_err": 0.04998196496119102
+   },
+   "cells": [
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.11071956108266516,
+     "sem": 0.005627934546381312,
+     "sems_off": 0.06948485279234055,
+     "rel_err": 0.003531952255376663
+    },
+    {
+     "design": "d=3 4Nem=4.0",
+     "lean": 0.14285632653527694,
+     "truth": 0.14056118520508723,
+     "sem": 0.005062416281250957,
+     "sems_off": 0.4533687477835317,
+     "rel_err": 0.01632841475291319
+    },
+    {
+     "design": "d=5 4Nem=4.0",
+     "lean": 0.16666555556296292,
+     "truth": 0.15873182695011637,
+     "sem": 0.006114484278798818,
+     "sems_off": 1.2975302987294821,
+     "rel_err": 0.04998196496119102
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.19191771861145307,
+     "truth": 0.19560313653794115,
+     "sem": 0.005407335833593443,
+     "sems_off": 0.6815589118012917,
+     "rel_err": 0.018841302811998705
+    },
+    {
+     "design": "d=2 4Nem=1.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.34015218662302327,
+     "sem": 0.010130157896324795,
+     "sems_off": 0.6735628155757932,
+     "rel_err": 0.020059543766619573
+    },
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.10533548617676758,
+     "sem": 0.005249320477201593,
+     "sems_off": 1.1001673710835294,
+     "rel_err": 0.05482607351986151
+    },
+    {
+     "design": "d=2 4Nem=16.0",
+     "lean": 0.030302993572129004,
+     "truth": 0.030687737096458806,
+     "sem": 0.0019500511760856508,
+     "sems_off": 0.1972991935022442,
+     "rel_err": 0.012537370322238551
+    },
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.48716999361038105,
+     "truth": 0.48313964887823735,
+     "sem": 0.011144595955600392,
+     "sems_off": 0.3616411710393472,
+     "rel_err": 0.008341987128362219
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.19191771861145307,
+     "truth": 0.18833862304752683,
+     "sem": 0.006337598049526313,
+     "sems_off": 0.564740069653637,
+     "rel_err": 0.019003513490820557
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05604707198886517,
+     "truth": 0.0564171567416178,
+     "sem": 0.0020406032020937634,
+     "sems_off": 0.18136046849916967,
+     "rel_err": 0.006559790924019159
+    }
+   ]
+  },
+  {
+   "name": "fstEquilibrium [many-deme limit [correction dropped]]",
+   "file": "Parameters.lean",
+   "source": "many-deme limit [correction dropped]",
+   "note": "positive control 'd=2 4Nem=4 [1/(1 + theta + 2M), the VALIDATED member]' passed at 0.55 sems",
+   "regime": "msprime symmetric island model, Ne = 1000 per deme, mu = 1e-8, total emigration m spread over the d-1 other demes so migration_rate = m/(d-1), 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates per cell. d swept 2/3/5/20 at 4*Ne*m = 4, and 4*Ne*m swept sixteenfold at d = 2 and d = 20. REGIME: equilibrium under migration, mutation and drift; this is NOT the clean-split transient, which is fstAtGeneration",
+   "span": 0.8823508650567882,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=2 4Nem=4.0",
+    "lean": 0.1999984000127999,
+    "truth": 0.10533548617676758,
+    "sem": 0.005249320477201593,
+    "sems_off": 18.0333653178853,
+    "rel_err": 0.8986801815028869
+   },
+   "cells": [
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.11071956108266516,
+     "sem": 0.005627934546381312,
+     "sems_off": 15.863517635886483,
+     "rel_err": 0.8063510915065639
+    },
+    {
+     "design": "d=3 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.14056118520508723,
+     "sem": 0.005062416281250957,
+     "sems_off": 11.740878565803232,
+     "rel_err": 0.42285652842916904
+    },
+    {
+     "design": "d=5 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.15873182695011637,
+     "sem": 0.006114484278798818,
+     "sems_off": 6.748986697990216,
+     "rel_err": 0.2599766779957249
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.19560313653794115,
+     "sem": 0.005407335833593443,
+     "sems_off": 0.812833456274876,
+     "rel_err": 0.02247031183984208
+    },
+    {
+     "design": "d=2 4Nem=1.0",
+     "lean": 0.49999000019999607,
+     "truth": 0.34015218662302327,
+     "sem": 0.010130157896324795,
+     "sems_off": 15.778412855239079,
+     "rel_err": 0.4699008851414926
+    },
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.10533548617676758,
+     "sem": 0.005249320477201593,
+     "sems_off": 18.0333653178853,
+     "rel_err": 0.8986801815028869
+    },
+    {
+     "design": "d=2 4Nem=16.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.030687737096458806,
+     "sem": 0.0019500511760856508,
+     "sems_off": 14.428161810503832,
+     "rel_err": 0.9168370355523467
+    },
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.49999000019999607,
+     "truth": 0.48313964887823735,
+     "sem": 0.011144595955600392,
+     "sems_off": 1.5119750764307487,
+     "rel_err": 0.03487677188341337
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.18833862304752683,
+     "sem": 0.006337598049526313,
+     "sems_off": 1.8397785524035477,
+     "rel_err": 0.061908581344628115
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.0564171567416178,
+     "sem": 0.0020406032020937634,
+     "sems_off": 1.1791779311622952,
+     "rel_err": 0.04265075379796743
+    }
+   ]
+  },
+  {
+   "name": "fstEquilibrium [two-deme form [correction frozen at 2]]",
+   "file": "Parameters.lean",
+   "source": "two-deme form [correction frozen at 2]",
+   "note": "positive control 'd=2 4Nem=4 [1/(1 + theta + 2M), the VALIDATED member]' passed at 0.55 sems",
+   "regime": "msprime symmetric island model, Ne = 1000 per deme, mu = 1e-8, total emigration m spread over the d-1 other demes so migration_rate = m/(d-1), 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates per cell. d swept 2/3/5/20 at 4*Ne*m = 4, and 4*Ne*m swept sixteenfold at d = 2 and d = 20. REGIME: equilibrium under migration, mutation and drift; this is NOT the clean-split transient, which is fstAtGeneration",
+   "span": 0.9090898071638701,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=20 4Nem=4.0",
+    "lean": 0.1111106172861454,
+    "truth": 0.19560313653794115,
+    "sem": 0.005407335833593443,
+    "sems_off": 15.625535726277665,
+    "rel_err": 0.4319589181812876
+   },
+   "cells": [
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.11071956108266516,
+     "sem": 0.005627934546381312,
+     "sems_off": 0.06948485279234055,
+     "rel_err": 0.003531952255376663
+    },
+    {
+     "design": "d=3 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.14056118520508723,
+     "sem": 0.005062416281250957,
+     "sems_off": 5.817492336221786,
+     "rel_err": 0.20952134030437838
+    },
+    {
+     "design": "d=5 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.15873182695011637,
+     "sem": 0.006114484278798818,
+     "sems_off": 7.7882626714883125,
+     "rel_err": 0.30001046783728247
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.19560313653794115,
+     "sem": 0.005407335833593443,
+     "sems_off": 15.625535726277665,
+     "rel_err": 0.4319589181812876
+    },
+    {
+     "design": "d=2 4Nem=1.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.34015218662302327,
+     "sem": 0.010130157896324795,
+     "sems_off": 0.6735628155757932,
+     "rel_err": 0.020059543766619573
+    },
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.10533548617676758,
+     "sem": 0.005249320477201593,
+     "sems_off": 1.1001673710835294,
+     "rel_err": 0.05482607351986151
+    },
+    {
+     "design": "d=2 4Nem=16.0",
+     "lean": 0.030302993572129004,
+     "truth": 0.030687737096458806,
+     "sem": 0.0019500511760856508,
+     "sems_off": 0.1972991935022442,
+     "rel_err": 0.012537370322238551
+    },
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.3333288889481474,
+     "truth": 0.48313964887823735,
+     "sem": 0.011144595955600392,
+     "sems_off": 13.442457719142965,
+     "rel_err": 0.3100775526867302
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.1111106172861454,
+     "truth": 0.18833862304752683,
+     "sem": 0.006337598049526313,
+     "sems_off": 12.185690092345576,
+     "rel_err": 0.4100486905539982
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.030302993572129004,
+     "truth": 0.0564171567416178,
+     "sem": 0.0020406032020937634,
+     "sems_off": 12.797276385087667,
+     "rel_err": 0.46287627164707684
+    }
+   ]
+  },
+  {
+   "name": "fstEquilibrium [squared correction [(d/(d-1))^2]]",
+   "file": "Parameters.lean",
+   "source": "squared correction [(d/(d-1))^2]",
+   "note": "positive control 'd=2 4Nem=4 [1/(1 + theta + 2M), the VALIDATED member]' passed at 0.55 sems",
+   "regime": "msprime symmetric island model, Ne = 1000 per deme, mu = 1e-8, total emigration m spread over the d-1 other demes so migration_rate = m/(d-1), 2 Mb at recombination 1e-8 so each replicate averages many genealogies, Hudson F_ST between demes 0 and 1, 48 replicates per cell. d swept 2/3/5/20 at 4*Ne*m = 4, and 4*Ne*m swept sixteenfold at d = 2 and d = 20. REGIME: equilibrium under migration, mutation and drift; this is NOT the clean-split transient, which is fstAtGeneration",
+   "span": 0.9675681239427355,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "d=2 4Nem=1.0",
+    "lean": 0.1999984000127999,
+    "truth": 0.34015218662302327,
+    "sem": 0.010130157896324795,
+    "sems_off": 13.835301289930628,
+    "rel_err": 0.41203259047559815
+   },
+   "cells": [
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.11071956108266516,
+     "sem": 0.005627934546381312,
+     "sems_off": 9.221175131158525,
+     "rel_err": 0.46871726704310807
+    },
+    {
+     "design": "d=3 4Nem=4.0",
+     "lean": 0.09999960000159999,
+     "truth": 0.14056118520508723,
+     "sem": 0.005062416281250957,
+     "sems_off": 8.012297478125248,
+     "rel_err": 0.2885688900837414
+    },
+    {
+     "design": "d=5 4Nem=4.0",
+     "lean": 0.13793027348814627,
+     "truth": 0.15873182695011637,
+     "sem": 0.006114484278798818,
+     "sems_off": 3.4020127476812383,
+     "rel_err": 0.13104840951970692
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.18408839457602363,
+     "truth": 0.19560313653794115,
+     "sem": 0.005407335833593443,
+     "sems_off": 2.129466768159912,
+     "rel_err": 0.05886787996205776
+    },
+    {
+     "design": "d=2 4Nem=1.0",
+     "lean": 0.1999984000127999,
+     "truth": 0.34015218662302327,
+     "sem": 0.010130157896324795,
+     "sems_off": 13.835301289930628,
+     "rel_err": 0.41203259047559815
+    },
+    {
+     "design": "d=2 4Nem=4.0",
+     "lean": 0.05882339100378588,
+     "truth": 0.10533548617676758,
+     "sem": 0.005249320477201593,
+     "sems_off": 8.860593552058617,
+     "rel_err": 0.44156149898931446
+    },
+    {
+     "design": "d=2 4Nem=16.0",
+     "lean": 0.015384605917165589,
+     "truth": 0.030687737096458806,
+     "sem": 0.0019500511760856508,
+     "sems_off": 7.847553626777776,
+     "rel_err": 0.4986725196188908
+    },
+    {
+     "design": "d=20 4Nem=1.0",
+     "lean": 0.474366820161783,
+     "truth": 0.48313964887823735,
+     "sem": 0.011144595955600392,
+     "sems_off": 0.7871823035491763,
+     "rel_err": 0.018157956476607267
+    },
+    {
+     "design": "d=20 4Nem=4.0",
+     "lean": 0.18408839457602363,
+     "truth": 0.18833862304752683,
+     "sem": 0.006337598049526313,
+     "sems_off": 0.6706371149272973,
+     "rel_err": 0.022566950966985973
+    },
+    {
+     "design": "d=20 4Nem=16.0",
+     "lean": 0.05339435423539786,
+     "truth": 0.0564171567416178,
+     "sem": 0.0020406032020937634,
+     "sems_off": 1.4813279245658288,
+     "rel_err": 0.053579490367866744
+    }
+   ]
+  }
+ ]
+}

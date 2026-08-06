@@ -22,14 +22,14 @@ one the deployed metric reads:
 
 and `d` is a field of the record rather than a constant of the law.
 
-WHAT SEPARATES THE CANDIDATES.  `d/(d-1)` is 2.000, 1.250, 1.053 and 1.020 at
-`d` = 2, 5, 20, 50 -- a factor of two across the sweep, most of it between the
+WHAT SEPARATES THE CANDIDATES.  `d/(d-1)` is 2.000, 1.500, 1.250 and 1.053 at
+`d` = 2, 3, 5, 20 -- a factor of two across the sweep, most of it between the
 first two cells.  So:
 
   * the many-deme limit (correction dropped) agrees at large `d` and is wrong by
     a factor of two at `d = 2`;
   * the two-deme form (correction frozen at 2) agrees at `d = 2` and is wrong by
-    the same factor at `d = 50`;
+    nearly the same factor at `d = 20`;
   * the squared correction agrees with the body at large `d` and separates from
     it at small `d`.
 
@@ -77,7 +77,20 @@ NE, MU = 1000, 1e-8
 THETA = 4.0 * NE * MU
 SEQ_LEN, RHO, N_DIP, REPS = 2e6, 1e-8, 50, 48
 
-DEMES = (2, 5, 20, 50)
+# THE DEME SET IS CHOSEN BY A TIMING MEASUREMENT, NOT BY TASTE.  One replicate
+# at this design costs 0.02s at d = 2, 0.06s at d = 5, 3.15s at d = 20 and
+# 84.72s at d = 50 -- with total emigration held fixed and spread over d-1
+# demes the per-pair rate falls as 1/(d-1), so lineages coalesce ever more
+# slowly and the trees get deeper.  A d = 50 cell is 68 minutes on its own and
+# the first version of this battery was killed by its own timeout having
+# produced nothing.
+#
+# What it would have bought: d/(d-1) is 2.000, 1.500, 1.250, 1.053, 1.020 at
+# d = 2, 3, 5, 20, 50.  Going from 20 to 50 adds 3 percent of the range at 27
+# times the cost of every other cell put together.  Going from 5 to 3 adds 25
+# percent for nothing.  So d = 50 is out and d = 3 is in, and the sweep still
+# spans a factor of two in the quantity under test.
+DEMES = (2, 3, 5, 20)
 
 
 def island_fst_rec(Ne, m, n_demes, reps, seed, seq_len=SEQ_LEN, rho=RHO,
@@ -133,7 +146,7 @@ def main():
     # BLOCK 1: sweep the deme count at fixed scaled migration.  This is the
     # block that puts the FORM of the correction on trial: 4*Ne*m is held at 4
     # so nothing about the rate moves, and d/(d-1) runs over a factor of two.
-    print("  block 1: d swept at 4Nem=4.0   (d/(d-1) runs 2.000 -> 1.020)")
+    print("  block 1: d swept at 4Nem=4.0   (d/(d-1) runs 2.000 -> 1.053)")
     M = 4.0
     for d in DEMES:
         s = island_fst_rec(NE, M / (4.0 * NE), d, REPS, 81000 + 100 * d)
@@ -179,7 +192,7 @@ def main():
            "total emigration m spread over the d-1 other demes so "
            "migration_rate = m/(d-1), 2 Mb at recombination 1e-8 so each "
            "replicate averages many genealogies, Hudson F_ST between demes 0 "
-           "and 1, 48 replicates per cell. d swept 2/5/20/50 at 4*Ne*m = 4, "
+           "and 1, 48 replicates per cell. d swept 2/3/5/20 at 4*Ne*m = 4, "
            "and 4*Ne*m swept sixteenfold at d = 2 and d = 20. REGIME: "
            "equilibrium under migration, mutation and drift; this is NOT the "
            "clean-split transient, which is fstAtGeneration")

@@ -328,16 +328,53 @@ the deme count reached the deployed metric only through a second function taking
 reals. `fstEquilibrium_eq_scaled_two_demes` below recovers the old body from this one as
 the `nDemes = 2` member, and that theorem is what carries the measurement across.
 
-    Empirical status: **MIXED**. The `nDemes = 2` member is VALIDATED; the deme
-    dependence of the general body is UNTESTED. Every cell of every battery
-    below was run at two demes, so what has been measured is the two-deme
-    specialisation, and the `d/(d-1)` factor has never been swept against THIS
-    body. That gap is not a formality: `simcov/battery_falsrepair_c2.py`
-    FALSIFIES the many-deme limit `d/(d-1) = 1` at `d = 20` at 3.92 sems, on
-    `PopGen.fstMigrationMutationEquilibriumManyDemes`, where the finite-deme
-    form matches the same cells at 2.47. So the correction is measurable and
-    moves the answer, and the design that would put this body's deme dependence
-    on trial is owed rather than done.
+    Empirical status: **VALIDATED** (`simcov/battery_demesweep.py`), and the
+    deme dependence is the part that run settles. Worst cell 1.30 sems at 5.0%
+    relative over eleven cells.
+
+    THIS MARKER USED TO READ **MIXED**, and the second half of it said the
+    design was owed: "the `nDemes = 2` member is VALIDATED; the deme dependence
+    of the general body is UNTESTED. Every cell of every battery below was run
+    at two demes, so the `d/(d-1)` factor has never been swept against THIS
+    body." `battery_demesweep.py` is that design. It is no longer owed.
+
+    THE SWEEP. msprime symmetric island model, `Nₑ` = 1000 per deme,
+    `μ = 1e-8`, total emigration spread over the `d-1` other demes so the
+    per-pair rate is `m/(d-1)` -- which is the convention `islandDemeCorrection`
+    is written for, and passing `m` itself would have built the correction into
+    the simulation. 2 Mb at recombination 1e-8 so each replicate averages many
+    genealogies, Hudson `F_ST` between demes 0 and 1, 48 replicates per cell.
+    Block one sweeps `d` over 2, 3, 5, 20 at fixed `4 Nₑ m = 4`, where
+    `d/(d-1)` runs 2.000, 1.500, 1.250, 1.053 -- a factor of two, so the FORM of
+    the correction is on trial and not its value at one point. Block two sweeps
+    `4 Nₑ m` sixteenfold at `d = 2` and `d = 20`, so a candidate cannot pass by
+    absorbing the correction into the rate.
+
+    POWER, and it is why a single deme count could never have done this. Three
+    rivals are carried on the same cells and all three are rejected:
+
+      many-deme limit, correction dropped     FALSIFIED at 18.03 sems (89.9%)
+      two-deme form, correction frozen at 2   FALSIFIED at 15.63 sems (43.2%)
+      squared correction, (d/(d-1))^2         FALSIFIED at 13.84 sems (41.2%)
+
+    Each agrees with this body somewhere: the limit at large `d`, the two-deme
+    form at `d = 2`, the squared correction at large `d`. That is exactly why
+    three previous runs at `d = 2` left the deme dependence untested -- at one
+    lattice size the four candidates are two numbers, not four.
+
+    CONTROL, and it ties this run to the ledger that came before it. At `d = 2`
+    the body reduces to `1/(1 + θ + 2M)` by `fstEquilibrium_eq_scaled_two_demes`
+    below, which is the member `battery_falsrepair.py` group_a and
+    `battery_bulk38b.py` measured at 1.10 and 1.03 sems. This design's `d = 2`
+    cell reproduces it at 0.55 sems. A sweep whose two-deme cell disagreed with
+    the runs that already validated that member would be a sweep with a broken
+    design, and would say nothing about the deme dependence.
+
+    `simcov/battery_falsrepair_c2.py` remains the separate finding it was: it
+    FALSIFIES the many-deme limit at `d = 20` at 3.92 sems on
+    `PopGen.fstMigrationMutationEquilibriumManyDemes`, whose signature is
+    `(Ne, m, mu)` and which cannot express a deme count at all. That run says
+    the correction is measurable; this one says which correction.
 
     THE TWO-DEME MEMBER, MEASURED (`simcov/battery_falsrepair.py` `group_a`,
     and `simcov/battery_bulk38b.py`). Those batteries transcribe
