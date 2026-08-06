@@ -147,13 +147,20 @@ the number inside is the one the named rate computes, and it is the number every
 row below was measured against. A divergence between the two sites -- a factor changed in
 `scalingConstant` and not here, or the reverse -- fails these. -/
 
-/-- **`Theta.ofRate` wraps `scaledMutationRate`.** -/
-@[simp] theorem scaledMutationRate_eq_theta (Ne μ : ℝ) :
+/-- **`Theta.ofRate` wraps `scaledMutationRate`.**
+
+NOT `@[simp]`, and `simpNF` is why. `Theta.value_ofRate` is already simp and rewrites this
+lemma's own left-hand side to `4 * Ne * μ`, so as a simp lemma this one could never fire --
+it sat in the simp set contributing nothing except a non-confluence for the first person to
+run the checker. It is the identification between the wrapped type and the named ledgered
+rate, and it is used by name. -/
+theorem scaledMutationRate_eq_theta (Ne μ : ℝ) :
     (Theta.ofRate Ne μ).value = scaledMutationRate Ne μ := by
   rw [Theta.value_ofRate, scaledMutationRate_eq]
 
-/-- **`BigM.ofRate` wraps `scaledMigrationRate`.** -/
-@[simp] theorem scaledMigrationRate_eq_bigM (Ne m : ℝ) :
+/-- **`BigM.ofRate` wraps `scaledMigrationRate`.** Not `@[simp]`, for the reason on
+`scaledMutationRate_eq_theta` directly above. -/
+theorem scaledMigrationRate_eq_bigM (Ne m : ℝ) :
     (BigM.ofRate Ne m).value = scaledMigrationRate Ne m := by
   rw [BigM.value_ofRate, scaledMigrationRate_eq]
 
