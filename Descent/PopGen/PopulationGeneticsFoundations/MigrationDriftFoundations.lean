@@ -147,7 +147,9 @@ body are inlined, and the master's come from `scaledMigrationRate`, where the pl
 convention fixes them in a single place. Without this theorem an edit to that convention
 would silently stop reaching this definition. -/
 theorem islandFstFiniteDemes_eq_islandEquilibrium_no_mutation (Ne m d : ℝ) :
-    islandFstFiniteDemes Ne m d = Descent.Core.fstIslandEquilibrium Ne m 0 d := by
+    islandFstFiniteDemes Ne m d
+      = Descent.Core.fstIslandEquilibrium (Descent.Core.BigM.ofRate Ne m)
+          (Descent.Core.Theta.ofRate Ne 0) d := by
   rw [Descent.Core.fstIslandEquilibrium_eq]
   unfold islandFstFiniteDemes
   ring_nf
@@ -422,7 +424,8 @@ It was rediscovered numerically before it was written down --
 of 200 sampled points, from the values alone. -/
 theorem fstIslandEquilibriumFiniteDemes_eq_master (Ne m μ nDemes : ℝ) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
-      = Descent.Core.fstIslandEquilibrium Ne m μ nDemes := by
+      = Descent.Core.fstIslandEquilibrium (Descent.Core.BigM.ofRate Ne m)
+          (Descent.Core.Theta.ofRate Ne μ) nDemes := by
   rw [Descent.Core.fstIslandEquilibrium_eq]
   unfold fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
   ring_nf

@@ -536,7 +536,7 @@ do not are the ones with no such theorem. -/
 theorem presentDayR2_at_island_eq_deployedR2
     (p : Descent.Core.PopGenParameters) (V_E : ℝ) :
     presentDayR2 p.V_A V_E
-        (Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes)
+        (Descent.Core.fstIslandEquilibrium p.bigM p.theta p.nDemes)
       = Descent.Core.ScoreMoments.deployedR2 p V_E := by
   unfold presentDayR2 Descent.Core.ScoreMoments.deployedR2 presentDayPGSVariance
     pgsVarianceFromHet Descent.Core.product
@@ -547,9 +547,9 @@ theorem presentDayR2_at_island_eq_deployedR2
   -- The two sides write the retained variance in opposite orders, `V_A * (1 - F)` against
   -- `(1 - F) * V_A`, so the zero case has to be rewritten on both.
   by_cases h :
-      (1 - Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes) * p.V_A = 0
+      (1 - Descent.Core.fstIslandEquilibrium p.bigM p.theta p.nDemes) * p.V_A = 0
   · have h' :
-        p.V_A * (1 - Descent.Core.fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes) = 0 := by
+        p.V_A * (1 - Descent.Core.fstIslandEquilibrium p.bigM p.theta p.nDemes) = 0 := by
       rw [mul_comm]; exact h
     rw [h, h']; simp
   · field_simp

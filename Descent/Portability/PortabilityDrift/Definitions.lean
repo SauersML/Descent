@@ -165,8 +165,9 @@ range, which is exactly why it must be excluded by hypothesis rather than left t
 convention: the saturation curve's divisor vanishes there and Lean returns `0`, an ordinary `Fst`
 value that no downstream range check will reject. Consumers must exclude it by hypothesis. -/
 theorem fstFromTau_negative_unit_tau_is_junk :
-    Descent.Core.fstFromTau (-1) = 0 := by
+    Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled (-1)) = 0 := by
   unfold Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   norm_num
 
 /-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
@@ -188,7 +189,7 @@ rescaling to coalescent time and applying `fstFromTau`.
     (8 Mb at 1e-8): at zero recombination one genealogy per replicate makes the
     error bar honest but far too wide to decide anything. -/
 noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
-  Descent.Core.fstFromTau (coalescentTau t Ne)
+  Descent.Core.fstFromTau (Descent.Core.Tau.ofGenerations t Ne)
 
 /-- **Circulation inflates transfer time by the same saturation law that drift
 uses for `F_ST`.**
@@ -204,11 +205,11 @@ in both, so a change to either body that breaks the identity fails to compile
 instead of leaving the two quietly disagreeing about a shape they both use. No
 hypothesis is needed, because `1 + (a/s)^2` is positive for every `s` and `a`,
 including `s = 0`. -/
-theorem one_div_transferTimeInflation_eq_one_sub_fstFromTau (s a : ℝ) :
-    1 / Spectral.transferTimeInflation s a = 1 - Descent.Core.fstFromTau ((a / s) ^ 2) := by
+theorem one_div_transferTimeInflation_eq_one_sub_saturation (s a : ℝ) :
+    1 / Spectral.transferTimeInflation s a = 1 - Descent.Core.saturation ((a / s) ^ 2) := by
   have hpos : (0 : ℝ) < 1 + (a / s) ^ 2 := by positivity
   have hne : (1 : ℝ) + (a / s) ^ 2 ≠ 0 := ne_of_gt hpos
-  unfold Spectral.transferTimeInflation Descent.Core.fstFromTau Descent.Core.saturation
+  unfold Spectral.transferTimeInflation Descent.Core.saturation
   field_simp
   ring
 
@@ -305,7 +306,7 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
     a factor of two and a half, and the superseded sum form is excluded at 40 to
     59 sems on every one of them. -/
 noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
-  Descent.Core.fstFromTau ((tauS + tauT) / 2)
+  Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled ((tauS + tauT) / 2))
 
 @[simp] theorem pairwise_fst_decomposition (fstS fstT : ℝ) :
     pairwiseFstFromBranches fstS fstT = fstS + fstT - fstS * fstT := by
@@ -321,15 +322,18 @@ the derivation behind the regime note on `pairwiseFstFromBranches`, and it needs
 no simulation to state. -/
 theorem pairwiseFstFromBranches_eq_fstFromTau_add_mul (a b : ℝ)
     (ha : 0 ≤ a) (hb : 0 ≤ b) :
-    pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau b) =
-      Descent.Core.fstFromTau (a + b + a * b) := by
+    pairwiseFstFromBranches (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled a))
+        (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled b)) =
+      Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled (a + b + a * b)) := by
   have ha1 : (0 : ℝ) < 1 + a := by linarith
   have hb1 : (0 : ℝ) < 1 + b := by linarith
   have ha1' : (1 : ℝ) + a ≠ 0 := ne_of_gt ha1
   have hb1' : (1 : ℝ) + b ≠ 0 := ne_of_gt hb1
   have hab : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   have hab' : (1 : ℝ) + (a + b + a * b) ≠ 0 := ne_of_gt hab
-  unfold pairwiseFstFromBranches Descent.Core.fstFromTau Descent.Core.saturation Descent.Core.complementaryComposition
+  unfold pairwiseFstFromBranches Descent.Core.fstFromTau Descent.Core.saturation
+    Descent.Core.complementaryComposition
+  simp only [Descent.Core.Tau.value_ofScaled]
   field_simp
   ring
 
@@ -339,9 +343,11 @@ sign the simulation reports. -/
 theorem pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches (a b : ℝ)
     (ha : 0 < a) (hb : 0 < b) :
     pairwiseFstFromBranchTaus a b <
-      pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau b) := by
+      pairwiseFstFromBranches (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled a))
+        (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled b)) := by
   rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a b ha.le hb.le]
   unfold pairwiseFstFromBranchTaus Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   have h1 : (0 : ℝ) < 1 + (a + b) / 2 := by linarith
   have h2 : (0 : ℝ) < 1 + (a + b + a * b) := by nlinarith
   rw [div_lt_div_iff₀ h1 h2]
@@ -363,11 +369,13 @@ theorem pairwiseFstFromBranchTaus_lt_pairwiseFstFromBranches (a b : ℝ)
     `F_ST`: `0.49999 ± 0.00302` against this definition's `0.50000` where
     `pairwiseFstFromBranches` gives `0.75`. -/
 theorem pairwiseFst_composition_gap_eq (a : ℝ) (ha : 0 ≤ a) :
-    pairwiseFstFromBranches (Descent.Core.fstFromTau a) (Descent.Core.fstFromTau a) -
+    pairwiseFstFromBranches (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled a))
+          (Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled a)) -
         pairwiseFstFromBranchTaus a a = a / (1 + a) ^ 2 := by
   have h1 : (1 : ℝ) + a ≠ 0 := by positivity
   rw [pairwiseFstFromBranches_eq_fstFromTau_add_mul a a ha ha]
   unfold pairwiseFstFromBranchTaus Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   have h2 : (1 : ℝ) + (a + a + a * a) ≠ 0 := by nlinarith
   have h3 : (1 : ℝ) + (a + a) / 2 ≠ 0 := by linarith
   field_simp
@@ -382,11 +390,15 @@ theorem pairwiseFst_composition_gap_eq (a : ℝ) (ha : 0 ≤ a) :
     fstFromGenerations t Ne = t / (2 * Ne) / (1 + t / (2 * Ne)) := rfl
 
 theorem fst_from_tau_nonneg_of_nonneg (tau : ℝ) (htau : 0 ≤ tau) :
-    0 ≤ Descent.Core.fstFromTau tau :=
-  div_nonneg htau (by linarith)
-
-theorem fst_from_tau_lt_one (tau : ℝ) (htau : 0 ≤ tau) : Descent.Core.fstFromTau tau < 1 := by
+    0 ≤ Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled tau) := by
   unfold Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
+  exact div_nonneg htau (by linarith)
+
+theorem fst_from_tau_lt_one (tau : ℝ) (htau : 0 ≤ tau) :
+    Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled tau) < 1 := by
+  unfold Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   rw [div_lt_one (by linarith)]
   linarith
 
@@ -397,12 +409,13 @@ separation, which is the direction and the shape of the bias measured against
 simulation (+5% at `tau = 0.1`, rising to +32% at `tau = 1`).  Stating the
 inequality keeps the two from being interchanged again silently. -/
 theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
-    Descent.Core.fstFromTau tau < 1 - Real.exp (-tau) := by
+    Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled tau) < 1 - Real.exp (-tau) := by
   have hE : (0 : ℝ) < Real.exp tau := Real.exp_pos tau
   have hexp : tau + 1 < Real.exp tau := Real.add_one_lt_exp (by linarith)
   have h1t : (0 : ℝ) < 1 + tau := by linarith
   rw [← sub_pos]
   unfold Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   rw [Real.exp_neg]
   have hrw : 1 - (Real.exp tau)⁻¹ - tau / (1 + tau) =
       (Real.exp tau - 1 - tau) / (Real.exp tau * (1 + tau)) := by
@@ -418,8 +431,9 @@ above by the coalescence CDF and is satisfied by any body below that curve, incl
 `tau / (1 + 2 * tau)`. One coalescent time unit of separation gives `Fst = 1/2`: the map reaches
 its half-saturation exactly where the separation reaches the drift timescale. -/
 theorem fstFromTau_at_one_time_unit :
-    Descent.Core.fstFromTau 1 = 1 / 2 := by
+    Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled 1) = 1 / 2 := by
   unfold Descent.Core.fstFromTau Descent.Core.saturation
+  simp only [Descent.Core.Tau.value_ofScaled]
   norm_num
 
 /-- A split with ongoing migration.

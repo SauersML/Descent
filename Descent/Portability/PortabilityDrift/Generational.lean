@@ -79,31 +79,33 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
     check. Halving or doubling this factor moves `exp(-theta * tau)` from 0.135
     to 0.368 or 0.018 in the bottom rows, which the measurement excludes by
     hundreds of sems. -/
-noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  (t : ℝ) / (2 * g.Ne)
+noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.PopGenParameters)
+    (t : ℕ) : Descent.Core.Tau :=
+  Descent.Core.Tau.ofGenerations (t : ℝ) g.Ne
 
 /-- **The `2 Nₑ` in `tauAt` is the coalescent time scale.**  The denominator is
 `ploidy · Nₑ`, the mean pairwise coalescence time, and not an independently chosen two.
 Stated here, beside the definition, rather than in the audit layer at the top of the
 graph. -/
 theorem _root_.Descent.Core.PopGenParameters.tauAt_uses_timeScale (g : Descent.Core.PopGenParameters) (t : ℕ) :
-    Descent.Core.PopGenParameters.tauAt g t
+    (Descent.Core.PopGenParameters.tauAt g t).value
       = (t : ℝ) / Descent.Core.coalescentTimeScale g.Ne := by
-  unfold Descent.Core.PopGenParameters.tauAt; rw [Descent.Core.coalescentTimeScale_eq]
+  unfold Descent.Core.PopGenParameters.tauAt
+  rw [Descent.Core.Tau.value_ofGenerations, Descent.Core.coalescentTimeScale_eq]
 
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
 theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
     (hzero : (2 * g.Ne) = 0) :
-    Descent.Core.PopGenParameters.tauAt g t = 0 := by
+    (Descent.Core.PopGenParameters.tauAt g t).value = 0 := by
   unfold Descent.Core.PopGenParameters.tauAt
-  rw [hzero, div_zero]
+  rw [Descent.Core.Tau.value_ofGenerations, hzero, div_zero]
 
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
-  PopGen.hetDecayFromScaled g.Ne g.theta
+  PopGen.hetDecayFromScaled g.Ne g.theta.value
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary
@@ -144,8 +146,8 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     half-life prediction spans 32.62 to 69.31 across the design where the
     superseded base spans 69.31 to 554.52. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  (1 / (1 + g.theta + 2 * g.bigM)) *
-    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
+  (1 / (1 + g.theta.value + 2 * g.bigM.value)) *
+    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta.value g.bigM.value ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
 generations.
@@ -183,7 +185,7 @@ generations.
     above are from the redone design. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  Real.exp (-g.theta * g.tauAt t)
+  Real.exp (-g.theta.value * (g.tauAt t).value)
 
 /-- Migration-driven restoration of shared variation after `t` generations.
 
@@ -210,10 +212,10 @@ noncomputable def _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt
     -/
 noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  1 + g.bigM * g.tauAt t / (1 + g.bigM)
+  1 + g.bigM.value * (g.tauAt t).value / (1 + g.bigM.value)
 
 @[simp] theorem _root_.Descent.Core.PopGenParameters.tauAt_zero (g : Descent.Core.PopGenParameters) :
-    g.tauAt 0 = 0 := by
+    (g.tauAt 0).value = 0 := by
   simp [Descent.Core.PopGenParameters.tauAt]
 
 @[simp] theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
@@ -226,7 +228,9 @@ noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
 
 @[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
-  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, PopGen.EvolutionaryParameters.bigM]
+  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, Descent.Core.Tau.ofGenerations,
+    Descent.Core.BigM.ofRate, Descent.Core.scalingConstant, Descent.Core.ratio,
+    PopGen.EvolutionaryParameters.bigM]
 
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
@@ -258,17 +262,17 @@ noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGe
 
 @[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta
     (m : PopGen.PGSEvolutionaryModel) :
-    (m.toGenerationalPopGenParameters).theta = m.theta := by
+    (m.toGenerationalPopGenParameters).theta.value = m.theta := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.theta, PopGen.EvolutionaryParameters.theta,
-    Descent.Core.scaledMutationRate]
+    Descent.Core.Theta.ofRate, Descent.Core.scalingConstant, Descent.Core.scaledMutationRate]
 
 @[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM
     (m : PopGen.PGSEvolutionaryModel) :
-    (m.toGenerationalPopGenParameters).bigM = m.bigM := by
+    (m.toGenerationalPopGenParameters).bigM.value = m.bigM := by
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     Descent.Core.PopGenParameters.bigM, PopGen.EvolutionaryParameters.bigM,
-    Descent.Core.scaledMigrationRate]
+    Descent.Core.BigM.ofRate, Descent.Core.scalingConstant, Descent.Core.scaledMigrationRate]
 
 @[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PopGen.PGSEvolutionaryModel) :
@@ -299,7 +303,11 @@ theorem constrained them jointly and could not have caught the decay base. -/
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
     PopGen.EvolutionaryParameters.bigM, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
-    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
+    Descent.Core.scalingConstant, Descent.Core.ratio,
+    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+    Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
+    Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.ploidy]
   exact Or.inl (by ring)
 
 /-- When divergence time is an integer number of generations, the coarse
@@ -313,7 +321,7 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameter
   unfold Descent.Core.PopGenParameters.mutationSharedRetentionAt
     PopGen.PGSEvolutionaryModel.toEvo PopGen.mutationLDErosion
   rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_theta]
-  simp only [Descent.Core.PopGenParameters.tauAt,
+  simp only [Descent.Core.PopGenParameters.tauAt, Descent.Core.Tau.value_ofGenerations,
     PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     PopGen.EvolutionaryParameters.theta, PopGen.EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
@@ -329,7 +337,7 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameter
   unfold Descent.Core.PopGenParameters.migrationSharedBoostAt
     PopGen.PGSEvolutionaryModel.toEvo PopGen.migrationLDBoost
   rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
-  simp only [Descent.Core.PopGenParameters.tauAt,
+  simp only [Descent.Core.PopGenParameters.tauAt, Descent.Core.Tau.value_ofGenerations,
     PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     PopGen.EvolutionaryParameters.bigM, PopGen.EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]

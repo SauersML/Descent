@@ -44,7 +44,7 @@ namespace Descent
 The arguments have different biological meanings, but the common algebraic map is made explicit
 rather than left as two silently parallel formulas. -/
 theorem pioneerWeightFraction_eq_fstFromTau (w : ℝ) :
-    Blindness.XiFromMarks.pioneerWeightFraction w = Descent.Core.fstFromTau w := rfl
+    Blindness.XiFromMarks.pioneerWeightFraction w = Descent.Core.saturation w := rfl
 
 /-- The same saturation coordinate also appears in the migration/LD chart; this identity keeps
 the shared formula explicit without conflating the three scientific arguments. -/

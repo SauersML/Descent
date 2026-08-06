@@ -1045,14 +1045,20 @@ theorem sharedLDFromMigration_negative_unit_migration_is_junk :
   unfold sharedLDFromMigration Descent.Core.saturation
   norm_num
 
-/-- **The migration shared-LD map and the coalescent `F_ST` map are one function.**
+/-- **The migration shared-LD map and the coalescent `F_ST` map are one MAP, and the
+identity is stated at the map rather than at the two quantities.**
 
-`fstFromTau` sends coalescent time `tau` to `tau / (1 + tau)`; `sharedLDFromMigration`
-sends the scaled migration number `M` to `M / (1 + M)`. The arguments are different
+`Core.fstFromTau` sends a coalescent time `τ` to `τ/(1 + τ)`; `sharedLDFromMigration`
+sends the scaled migration number `M` to `M/(1 + M)`. The arguments are different
 quantities and no value of one may be substituted for the other, but the map is the same
-saturating map, and a change of convention in either spelling has to be made in both. -/
-theorem sharedLDFromMigration_eq_fstFromTau (M : ℝ) :
-    sharedLDFromMigration M = Descent.Core.fstFromTau M := rfl
+saturating map, and a change of convention in either spelling has to be made in both.
+
+This used to be stated as `sharedLDFromMigration M = Core.fstFromTau M`, which said the
+right thing in a form that ASSERTED the substitution its own docstring forbade -- the two
+sides took the same real. `Core.fstFromTau` takes a `Tau` now, so that spelling no longer
+elaborates, and the shared content is where it always was: both are `Core.saturation`. -/
+theorem sharedLDFromMigration_eq_saturation (M : ℝ) :
+    sharedLDFromMigration M = Descent.Core.saturation M := rfl
 
 /-- **The derived shared LD fraction is the same saturating map, read at `m/c`.**
     `m/(m + c) = (m/c)/(1 + m/c)`, so the shape `M/(1 + M)` survives the repair

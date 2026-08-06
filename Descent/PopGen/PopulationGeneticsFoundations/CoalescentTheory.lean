@@ -132,12 +132,13 @@ function in generation and coalescent units.  Three formulas for this quantity
 existed across three files and two were wrong; this theorem is the relation
 whose absence let them disagree, and it fails to compile if either body moves. -/
 theorem coalFst_eq_fstFromTau (t Ne : ℝ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    coalFst t Ne = Descent.Core.fstFromTau (Portability.coalescentTau t Ne) := by
+    coalFst t Ne = Descent.Core.fstFromTau (Descent.Core.Tau.ofGenerations t Ne) := by
   have h2 : (2 : ℝ) * Ne ≠ 0 := by positivity
   have hsum : t + 2 * Ne ≠ 0 := by
     have hs : 0 < t + 2 * Ne := by linarith
     exact ne_of_gt hs
-  unfold coalFst Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.saturation Descent.Core.oddsLike
+  unfold coalFst Descent.Core.fstFromTau Descent.Core.Tau.ofGenerations Descent.Core.saturation
+    Descent.Core.oddsLike Descent.Core.ratio Descent.Core.ploidy
   field_simp
   ring
 

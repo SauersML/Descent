@@ -205,6 +205,44 @@ noncomputable def BigM.ofRate (Ne m : ℝ) : BigM := ⟨scalingConstant * Ne * m
 /-- `ρ` from an effective size and a per-generation recombination rate. -/
 noncomputable def Rho.ofRate (Ne r : ℝ) : Rho := ⟨scalingConstant * Ne * r⟩
 
+/-! ### The boundary constructors
+
+`ofRate` and `ofGenerations` are how a quantity in PER-GENERATION units becomes a scaled
+one, and they are the constructors a body inside the corpus should use. The four below are
+for the other case: a number that arrives ALREADY SCALED, from a simulation harness, a
+published table, or a differential-testing extractor that can only pass reals.
+
+They exist so that case has ONE name each rather than an anonymous `⟨x⟩` at each site.
+That is the whole difference, and it is the difference that matters: `Tau.ofScaled` is
+greppable and countable, and a linter can ask whether a use of it is at a boundary or is a
+body helping itself past the type. `⟨x⟩` is neither.
+
+Every one of them is the identity on the underlying real. None of them carries a factor --
+carrying a factor is what `ofRate` is for -- so a caller that reaches for one of these when
+it holds a per-generation rate has skipped the scaling entirely, and `value_ofScaled` below
+is what makes that visible in a proof. -/
+
+/-- `θ` from a number that is already `4 Nₑ μ`. A boundary constructor; see the note above. -/
+def Theta.ofScaled (x : ℝ) : Theta := ⟨x⟩
+
+/-- `M` from a number that is already `4 Nₑ m`. A boundary constructor; see the note above. -/
+def BigM.ofScaled (x : ℝ) : BigM := ⟨x⟩
+
+/-- `τ` from a number that is already `t / (2 Nₑ)`. A boundary constructor; see the note
+above. -/
+def Tau.ofScaled (x : ℝ) : Tau := ⟨x⟩
+
+/-- `ρ` from a number that is already `4 Nₑ r`. A boundary constructor; see the note above. -/
+def Rho.ofScaled (x : ℝ) : Rho := ⟨x⟩
+
+@[simp] theorem Theta.value_ofScaled (x : ℝ) : (Theta.ofScaled x).value = x := rfl
+
+@[simp] theorem BigM.value_ofScaled (x : ℝ) : (BigM.ofScaled x).value = x := rfl
+
+@[simp] theorem Tau.value_ofScaled (x : ℝ) : (Tau.ofScaled x).value = x := rfl
+
+@[simp] theorem Rho.value_ofScaled (x : ℝ) : (Rho.ofScaled x).value = x := rfl
+
 /-- `τ` from a time in generations and an effective size, `t / (2 Nₑ)`.
 
 The two here is `ploidy` and not half of `scalingConstant`, because it is a different

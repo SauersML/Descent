@@ -221,7 +221,8 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
     Portability.fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold Portability.fstFromGenerations Descent.Core.fstFromTau Portability.coalescentTau Descent.Core.saturation
+  unfold Portability.fstFromGenerations Descent.Core.fstFromTau
+    Descent.Core.Tau.ofGenerations Descent.Core.saturation Descent.Core.ratio Descent.Core.ploidy
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
   nlinarith
@@ -239,10 +240,10 @@ theorem neutral_drift_ratio_ge_one_sub_coalescentTau
   have hτ : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   have hfst0 : 0 ≤ Portability.fstFromGenerations t Ne := by
     unfold Portability.fstFromGenerations
-    exact Portability.fst_from_tau_nonneg_of_nonneg _ (by unfold Portability.coalescentTau; exact hτ)
+    exact Portability.fst_from_tau_nonneg_of_nonneg (t / (2 * Ne)) hτ
   have hfst1 : Portability.fstFromGenerations t Ne < 1 := by
     unfold Portability.fstFromGenerations
-    exact Portability.fst_from_tau_lt_one _ (by unfold Portability.coalescentTau; exact hτ)
+    exact Portability.fst_from_tau_lt_one (t / (2 * Ne)) hτ
   have hbound := neutral_drift_ratio_ge_one_sub_fst V_A V_E
     (Portability.fstFromGenerations t Ne) hVA hVE hfst0 hfst1
   have hle := fstFromGenerations_le_coalescentTau t Ne ht hNe
