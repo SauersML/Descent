@@ -75,6 +75,19 @@ below is a reading order, and takes the headline uniform case first.
    discharged by the theorem, so that weakening one stops `lake build Descent` rather than
    passing every guard silently.  It declares nothing and may not be cited.
 
+## The premise the group carries everywhere
+
+Every result that divides by the panel size, or that needs a thread to exist at all, takes
+`[Nonempty ι]`.  `validation/code/check.py --only laundering` records each of those as a
+hidden instance premise at CONDITIONAL severity — around eighty of them — and it is right to:
+an instance binder is a real hypothesis that a theorem's name does not show, and that ledger
+exists so nobody has to rediscover it.
+
+It is nondegeneracy rather than concealment.  On an empty panel `Fintype.card ι` is `0`,
+`width` is `0`, and `Real.log 0` is Lean's junk `0`, so the statements would be about junk
+values rather than false.  The premise is not removable and is named here rather than left in
+the ledger for a reader to find.
+
 ## What of the manuscript is not here
 
 Stated so the group does not read as complete.  Not formalised: the exact variational
