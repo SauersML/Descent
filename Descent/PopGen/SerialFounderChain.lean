@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib
 
 import Descent.Core.Scaling
+import Descent.Layer
+
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.PopGen
 

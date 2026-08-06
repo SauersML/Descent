@@ -4,6 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.ImitationRigidity
 import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Positivity
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Portability
 

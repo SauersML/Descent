@@ -5,6 +5,9 @@ import Descent.Portability.PCCorrectability.Core
 import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
+import Descent.Layer
+
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 

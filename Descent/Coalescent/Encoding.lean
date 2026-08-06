@@ -5,6 +5,9 @@ import Descent.Coalescent.Infinite
 import Descent.Coalescent.Kernel
 import Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.Tactic
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

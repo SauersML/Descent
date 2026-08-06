@@ -9,6 +9,9 @@ import Descent.Blindness.TrafficInvariantSeparation.SpectralSDPSeparation
 import Descent.Blindness.TrafficInvariantSeparation.PolynomialTraffic
 import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
 import Descent.Blindness.TrafficInvariantSeparation.MatchedBayesBoundary
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # `TrafficInvariantSeparation` -- the head of a split file

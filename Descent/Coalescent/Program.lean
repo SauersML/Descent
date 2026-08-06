@@ -19,6 +19,9 @@ import Descent.Coalescent.Mutation
 import Descent.Coalescent.Kernel
 import Descent.Meta.Informal
 import Mathlib.Tactic
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

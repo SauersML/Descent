@@ -8,6 +8,13 @@ import Descent.Portability.MetricSpecificPortability.MetricAndClinicalDecisions
 import Descent.Portability.MetricSpecificPortability.PrecisionRecall
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
 import Descent.Portability.MetricSpecificPortability.SharedCorrectionFamily
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 2 module(s) -- `Descent.Program.Conclusions`, `Descent.Program.OpenQuestions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!
 # `MetricSpecificPortability` -- the head of a split file

@@ -6,6 +6,13 @@ import Mathlib.Analysis.PSeries
 import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Tactic
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
+--   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent
 

@@ -6,6 +6,9 @@ import Descent.Foundations.TransportIdentities
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.Data.Matrix.Basic
 import Descent.Core.Fst
+import Descent.Layer
+
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.PopGen
 

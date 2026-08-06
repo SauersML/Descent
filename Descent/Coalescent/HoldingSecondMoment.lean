@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.TransitVariance
 import Mathlib.Tactic
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

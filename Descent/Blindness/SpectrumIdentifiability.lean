@@ -88,6 +88,9 @@ open Filter
 /-! The ladder itself -- `d_m = m(m-1)/2`, its telescoping reciprocal and the exact
 partial sums -- is `Descent.Coalescent.Rates`, imported above.  The direction of that
 import is the point: this applied module rests on the 12,000-line derivation of the
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 coalescent, and the derivation rests on nothing here.  Naming the ladder locally, as
 `coalescentRate`, would reverse the edge and make the derivation depend on a module about
 spectrum identifiability.

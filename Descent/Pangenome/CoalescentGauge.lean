@@ -3,6 +3,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.SegregatingSites
 import Descent.Pangenome.GaugeInvariance
+import Descent.Layer
+
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # The reference tree is a gauge, and the coalescent's estimators of `θ` are not invariant

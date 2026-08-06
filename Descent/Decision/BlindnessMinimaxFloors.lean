@@ -4,6 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.BlindnessRegistry
 import Descent.Decision.FiniteMinimax
 
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
+
 /-!
 # From blindness witnesses to minimax floors
 

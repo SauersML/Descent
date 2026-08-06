@@ -6,6 +6,9 @@ import Descent.Blindness.ObservationalCeiling
 import Descent.PopGen.VarianceComponents
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Blindness
 

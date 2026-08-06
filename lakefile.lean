@@ -27,7 +27,14 @@ lean_lib Descent where
   -- about the quantity it names. This corpus has already recorded one such
   -- incident: see the header of `Descent/Foundations/CausalInference.lean`,
   -- where 35 unresolved names had silently become implicit parameters.
-  leanOptions := #[⟨`autoImplicit, false⟩]
+  -- `relaxedAutoImplicit` is the second half of the same hazard and was left on.
+  -- With `autoImplicit` off, Lean still auto-binds a SINGLE-LETTER unresolved
+  -- identifier, and single letters are exactly what this corpus's hypotheses are
+  -- named: `h`, `t`, `d`, `m`, `p`. A mistyped `hd` is caught; a mistyped `d` was
+  -- not. Turning it off costs nothing a corpus with `autoImplicit := false`
+  -- already pays and closes the case the incident in
+  -- `Descent/Foundations/CausalInference.lean` is a record of.
+  leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
 
 -- The generated-declaration filter and the results writer that the detectors
 -- under `validation/` share.  A separate library, and deliberately not

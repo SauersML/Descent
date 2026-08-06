@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.PolygenicArchitecture
 import Descent.Blindness.BundleRigidity.DeploymentCeiling
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Program
 
 namespace Descent.Decision
 

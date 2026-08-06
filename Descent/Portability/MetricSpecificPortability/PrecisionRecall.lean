@@ -10,6 +10,13 @@ import Descent.Portability.MetricSpecificPortability.R2Decomposition
 -- to Program edge and the `layers` guard reports it: the repair is to move `f1Score`
 -- down, since an F1 formula is a classifier metric and carries no programme content.
 import Descent.Program.OpenQuestions
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 2 module(s) -- `Descent.Program.Conclusions`, `Descent.Program.OpenQuestions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Portability
 

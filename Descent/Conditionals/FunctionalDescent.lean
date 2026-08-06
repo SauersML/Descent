@@ -5,6 +5,9 @@ import Descent.Core.Population
 import Descent.Foundations.Probability
 import Mathlib.Tactic
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Conditionals
 

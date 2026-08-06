@@ -8,6 +8,15 @@ import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.HaplotypeTheory
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Blindness Descent.Conditionals Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
+--   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.AncestrySpecificPower`, `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses` and 10 more
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
 

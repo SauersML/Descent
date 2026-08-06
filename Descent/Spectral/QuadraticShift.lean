@@ -5,6 +5,9 @@ import Descent.Foundations.TransportIdentities
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
+import Descent.Layer
+
+assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Spectral
 

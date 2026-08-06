@@ -5,6 +5,9 @@ import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.CompetingRates
 import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.Tactic
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

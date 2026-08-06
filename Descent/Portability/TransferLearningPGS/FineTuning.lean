@@ -7,6 +7,13 @@ import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 -- arrive through the head of this directory, which no longer carries that subsystem
 -- because it does not use it.  The module that does use it names it.
 import Descent.Portability.PortabilityDrift
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Portability
 

@@ -5,6 +5,13 @@ import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransferLearningPGS.ImportanceWeighting
 import Descent.Portability.TransferLearningPGS.FeatureRepresentation
 import Descent.Portability.TransferLearningPGS.FineTuning
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!
 # `TransferLearningPGS` -- the head of a split file

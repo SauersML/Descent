@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Blindness
 

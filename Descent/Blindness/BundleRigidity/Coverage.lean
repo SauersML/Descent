@@ -3,6 +3,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 import Mathlib.Topology.ContinuousMap.Algebra
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # Coverage, peeling, the core, and Theorem A

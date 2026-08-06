@@ -4,6 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.MeasureTheory.Measure.Map
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Descent.Spectral.PencilEnvironment
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`, `Descent.Program`:
+--   Blindness: reaches 1 module(s) -- `Descent.Blindness.ImitationRigidity`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!
 # Ergodic covariance pencils: the law-preserving formulation

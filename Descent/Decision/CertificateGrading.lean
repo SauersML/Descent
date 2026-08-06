@@ -3,6 +3,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Tactic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+import Descent.Layer
+
+assert_below Descent.Program
 
 /-!
 # Certificate calculus without theorem-valued inputs

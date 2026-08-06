@@ -5,6 +5,9 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.MeasureTheory.Measure.WithDensity
 import Descent.Blindness.MultipleMergerBlindness
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Blindness
 

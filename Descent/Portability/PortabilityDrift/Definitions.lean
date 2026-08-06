@@ -6,6 +6,9 @@ import Descent.Spectral.CirculationDefect
 import Descent.Core.Fst
 import Descent.Core.Parameters
 import Descent.Core.Moments
+import Descent.Layer
+
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 

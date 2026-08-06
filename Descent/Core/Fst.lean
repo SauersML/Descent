@@ -5,6 +5,9 @@ import Descent.Core.Ratios
 import Descent.Core.Scaling
 import Mathlib.Order.Filter.AtTopBot.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # Core: one island-model `F_ST`, and the lattice its specialisations form

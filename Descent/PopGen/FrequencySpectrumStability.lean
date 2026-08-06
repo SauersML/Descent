@@ -4,6 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.SpectrumIdentifiability
 import Mathlib.Data.Nat.Choose.Sum
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
+--   Blindness: reaches 2 module(s) -- `Descent.Blindness.MultipleMergerBlindness`, `Descent.Blindness.SpectrumIdentifiability`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
 

@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
 import Descent.Core.Ratios
 import Descent.PopGen.AssortativeMatingPGS
+import Descent.Layer
+
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 

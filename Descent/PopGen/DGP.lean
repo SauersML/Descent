@@ -8,6 +8,13 @@ import Descent.Foundations.TransportIdentities
 import Descent.Spectral.SpectralDegradation
 import Descent.Core.Fst
 import Descent.Core.Parameters
+import Descent.Layer
+
+assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`:
+--   Spectral: reaches 1 module(s) -- `Descent.Spectral.SpectralDegradation`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
 

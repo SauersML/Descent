@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Lean.Elab.Command
 import Lean.DocString
 import Descent.Meta.DocConvention
+import Descent.Layer
+
+assert_below Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # A command linter for the status convention

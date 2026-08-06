@@ -6,6 +6,13 @@ import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 -- path to them.  This file reaches `Program.Conclusions` on its own now rather than
 -- through a sibling that happens to be earlier in the chain.
 import Descent.Program.Conclusions
+import Descent.Layer
+
+assert_below Descent.Decision
+
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
+-- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Portability
 

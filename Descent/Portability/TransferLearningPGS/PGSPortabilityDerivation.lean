@@ -5,6 +5,9 @@ import Mathlib.Algebra.Order.Chebyshev
 import Descent.PopGen.DGP
 import Descent.Portability.TransplantationStability
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 

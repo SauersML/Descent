@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Mathlib.Tactic
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # Conditional rate consequences for deterministic-driving candidates

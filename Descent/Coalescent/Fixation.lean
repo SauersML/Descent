@@ -5,6 +5,9 @@ import Descent.Coalescent.Duality
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Tactic
 import Descent.Core.Ratios
+import Descent.Layer
+
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

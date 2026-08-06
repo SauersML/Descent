@@ -6,6 +6,9 @@ import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Linarith
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Blindness
 

@@ -10,6 +10,9 @@ import Mathlib.Topology.ContinuousMap.Algebra
 
 This module is **self-contained: it imports only Mathlib**. It deliberately does not
 import any other `Descent` module, so it can be read, checked and built on its own.
+import Descent.Layer
+
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 *On the import style, since it changed and the reason is not obvious from the diff.* This
 module and its siblings originally began `import Mathlib`, pulling the whole library at
