@@ -176,6 +176,23 @@ jobs:
       - name: Environment linters
         run: lake env lean validation/code/Lint.lean
 
+      # THE DEBT LEDGER, AND IT DOES NOT GATE. `LintDebt.lean` runs the linters whose
+      # findings are enumerated, deliberately-carried debt rather than defects of the
+      # commit under test: `scaledQuantityUntyped` (definitions still taking a scaled
+      # quantity as a bare real) and `simpNF` (a 420-lemma simp set that had never been
+      # checked for confluence).
+      #
+      # It runs on every commit and its counts are in the log. It is `continue-on-error`
+      # because a gate that is red for a reason everyone already knows about stops being
+      # read, and then the defect the gate was built to catch arrives into a red build and
+      # nobody looks. The step above is the one that must be green.
+      #
+      # Each linter leaves this step for that one when its count reaches zero. Nothing
+      # else moves it: not a decision that the remainder is acceptable, and not a budget.
+      - name: Environment linters (debt ledger, non-gating)
+        continue-on-error: true
+        run: lake env lean validation/code/LintDebt.lean
+
       - name: Verify arithmetic runtime semantics
         working-directory: validation/empirical/invariants
         run: python3 test_lean_semantics.py
