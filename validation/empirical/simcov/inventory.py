@@ -14,13 +14,28 @@ ROOT = sys.argv[1] if len(sys.argv) > 1 else "Descent"
 
 
 def lean_files(root):
-    """check.py's `ident_lean_files`: top level plus exactly one subdir level,
-    plus the corpus root `Descent.lean`.  Kept identical on purpose -- a
-    denominator that disagrees with the guard's is a coverage number nobody can
-    check against the build."""
-    import glob as _glob
-    fs = (_glob.glob(os.path.join(root, "*.lean")) +
-          _glob.glob(os.path.join(root, "*", "*.lean")))
+    """check.py's `ident_lean_files`: every corpus file at ANY depth, plus the
+    corpus root `Descent.lean`.  Kept identical on purpose -- a denominator that
+    disagrees with the guard's is a coverage number nobody can check against the
+    build.
+
+    THIS USED TO GLOB EXACTLY TWO LEVELS, and kept doing so after
+    `ident_lean_files` was fixed to recurse.  The two then disagreed in the one
+    direction that is invisible: 68 of the corpus's 291 files sit at depth three
+    or more, every declaration in them dropped out of BOTH the numerator and the
+    denominator, and the metric read 100% over a corpus with a quarter of its
+    files missing.  A denominator can only be trusted when the walk that builds
+    it is the walk the guard uses, so the exclusions are transcribed too:
+    AppleDouble `._*` files and dotfiles (`.lake/` is the vendored Mathlib
+    checkout) are not corpus, and `lakefile.lean` is build configuration.
+    """
+    fs = []
+    for dirpath, subdirs, names in os.walk(root):
+        subdirs[:] = [d for d in subdirs if not d.startswith(".")]
+        for name in names:
+            if name.endswith(".lean") and not name.startswith(".") \
+                    and name != "lakefile.lean":
+                fs.append(os.path.join(dirpath, name))
     extra = root.rstrip("/") + ".lean"
     if os.path.exists(extra):
         fs.append(extra)
