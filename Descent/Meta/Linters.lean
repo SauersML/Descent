@@ -72,13 +72,27 @@ The other two linters are not ledger joins and are therefore FULLY expressible:
     `instance`, which the text scan's `^def ` does not.  It is a widening, so a
     declaration reported here and not there is not a disagreement between them.
 
-## Registration is `disabled` on purpose
+## Which of these are in the default set, and what changed the answer
 
-Every linter below is `@[env_linter disabled]`, so none of them joins the
-default `#lint` set; `validation/code/Lint.lean` names them explicitly.  A
-linter in the default set runs whenever anyone runs `#lint` on a module that
-imports this one, and switching an unproven check on across 150,000 never-linted
-lines is how a corpus learns to read warnings as scenery.
+`empiricalStatusVocabulary` and `empiricalStatusMultiplicity` are registered
+NORMALLY and are in the default `#lint` set.  They were `disabled` on the
+argument that switching an unproven check on across 150,000 never-linted lines
+is how a corpus learns to read warnings as scenery.  That argument was right
+and it has been discharged: both were run over the whole of `Descent` --
+10,376 declarations, 44 seconds -- and reported nothing.  A check that has been
+run once and found clean is no longer unproven, and leaving it out of the
+default set after that is not caution, it is a second place the rule has to be
+remembered.  Neither joins a ledger; both are decidable from the docstring
+alone, which is why these two and not the other pair.
+
+`coreStatusMissing` and `coreStatusDenied` stay `@[env_linter disabled]` and
+are named explicitly by `validation/code/Lint.lean`.  That is deliberate and is
+not the same caution: they scope to Core's surface and read a battery citation,
+so they are about a rule this corpus states and not about Lean hygiene, and a
+`#lint` run on some unrelated module that happens to import this one should not
+report them.  Their first run found one -- `Core.PopGenParameters.fstAtGeneration`
+denying measurement while citing `battery_dis4`, which was a citation about a
+different body sitting on a definition's own docstring.
 -/
 
 open Lean Meta
@@ -179,7 +193,7 @@ to see that they cannot both hold. -/
 
 A status marker exists to be COUNTED -- the corpus's coverage denominator is
 built from these -- and a vocabulary that drifts cannot be counted. -/
-@[env_linter disabled]
+@[env_linter]
 def empiricalStatusVocabulary : Batteries.Tactic.Lint.Linter where
   noErrorsFound :=
     "Every status head is a term of the closed vocabulary."
@@ -205,7 +219,7 @@ def empiricalStatusVocabulary : Batteries.Tactic.Lint.Linter where
 Every scanner, and every reader who stops at the first status line, takes the
 FIRST marker as the verdict.  A superseded marker sitting above a current one IS
 the reported status, and the corpus has been counted wrong that way. -/
-@[env_linter disabled]
+@[env_linter]
 def empiricalStatusMultiplicity : Batteries.Tactic.Lint.Linter where
   noErrorsFound :=
     "Every docstring states its status at most once."

@@ -3,10 +3,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
 import Descent.Core.Ratios
--- `Portability.coalescentTau` is named at :131 and unfolded at :136.  It reached this
--- file through `FstDefinitions -> Program.OpenQuestions -> Portability.PortabilityDrift`,
--- a path the layer-order pass removed; the use is real, so the import is written.
-import Descent.Portability.PortabilityDrift
+-- The import of `Descent.Portability.PortabilityDrift` is GONE, and this comment
+-- records why it was here.  This file used `Portability.coalescentTau`, so a
+-- population-genetics foundation depended on the portability layer for a scaled
+-- time.  `Core.Tau.ofGenerations` is that quantity in the layer it belongs to,
+-- `coalFst_eq_fstFromTau` now names it, and the edge is not needed.
 
 namespace Descent.PopGen
 

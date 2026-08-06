@@ -2041,13 +2041,13 @@ split law where Hudson's matches at 0.03, and the ratio between them moves with 
 so there is no factor converting a value computed here into a Nei one.
 
 **Regime: ISOLATION.** This is the law for two populations exchanging nothing. With
-migration the differentiation plateaus rather than saturating, and using a
-no-migration transient where a migration transient was wanted is an error the corpus has
-already paid for -- `Generational.fstTransientAt`'s docstring records the superseded
-within-deme decay base FALSIFIED at up to 2222 sems in
-`validation/empirical/simcov/battery_dis4.py`, for exactly that substitution.
-`fstEquilibrium_lt_fstAtGeneration_of_late` below is the machine-checked form of the
-warning.
+migration the differentiation plateaus rather than saturating, and substituting one for
+the other is an error the corpus has already paid for.
+`fstEquilibrium_lt_fstAtGeneration_of_late` below is the machine-checked form of that
+warning, and it is where the measurement which bears on the substitution is cited -- not
+here. The run in question falsifies a DIFFERENT body, `Generational.fstTransientAt`'s
+superseded decay base, and a battery named in this docstring would say that a run bore on
+THIS one, which is the reading `Meta.Linters.coreStatusDenied` exists to catch and did.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
     A kernel asserts nothing about a population, so no measurement can bear on it.
@@ -2193,7 +2193,16 @@ theorem fstAtGeneration_lt_fstEquilibrium_of_early (p : PopGenParameters) (t : â
 This is the theorem that says the generation-indexed split law is not an
 approach-to-equilibrium coordinate, and it is stated because assuming otherwise is a
 known-expensive error. An isolated pair keeps differentiating; a pair exchanging migrants
-plateaus. Substituting the first for the second is what
+plateaus.
+
+**This is where the measurement on that substitution is cited, and `fstAtGeneration`'s own
+docstring is where it is not.** A battery named on the DEFINITION would assert that the run
+bore on that body; it did not -- it falsified the superseded within-deme decay base of
+`Generational.fstTransientAt`, which is a different quantity. Naming it on this theorem
+says what is true: a run measured the substitution, and this is the statement that rules it
+out.
+
+Substituting the first for the second is what
 `Generational.fstTransientAt`'s docstring records as FALSIFIED at up to 2222 sems, and a
 reader who took `fstAtGeneration` for a transient under migration would be making it
 again.

@@ -159,6 +159,23 @@ jobs:
       - name: Code validation (elaborated environment)
         run: lake env lean validation/code/Check.lean
 
+      # Environment linters, as Lean rather than as Python. `Descent.Meta.Linters`
+      # carries four Batteries `env_linter`s; `validation/code/Lint.lean` runs them
+      # over every declaration in `Descent`. A failing linter reports through
+      # `logError`, so `lean` exits nonzero and this step fails.
+      #
+      # This step is the difference between a linter that exists and a linter that
+      # is a gate. All four were written, registered `disabled`, and never run;
+      # their first run took 44 seconds over 10,376 declarations and found one real
+      # defect. A check nothing invokes reports nothing, which is the same output a
+      # clean corpus gives.
+      #
+      # It runs BESIDE `Check.lean` and replaces none of it: the `core-empirics`
+      # rules join against `validation/empirical/simcov/ledger.json`, which is not
+      # in the environment and cannot be read from a linter.
+      - name: Environment linters
+        run: lake env lean validation/code/Lint.lean
+
       - name: Verify arithmetic runtime semantics
         working-directory: validation/empirical/invariants
         run: python3 test_lean_semantics.py

@@ -15,10 +15,17 @@ every `Descent` module.  Run, after a successful build of `Descent`:
 A failing linter is reported by `#lint` with `logError`, so the exit status is
 nonzero and the run fails a script that checks it.
 
-NOT COMPILED.  Neither this file nor the linters it names has been through a
-build; every MSI partition was in maintenance when they were written.  A run
-that fails to elaborate this file is a defect in the Lean, not a finding about
-the corpus, and the two must not be confused in a report.
+COMPILED AND RUN.  This file and `Descent.Meta.Linters` build, and this runner
+has been executed over the whole corpus: 10,376 declarations plus 5,387
+generated ones, four linters, 44 seconds.  It is a step in
+`.github/workflows/prover.yml` and runs on every commit.
+
+Its first run found one thing, and it was real:
+`Core.PopGenParameters.fstAtGeneration` said NOT AN EMPIRICAL CLAIM while its
+own docstring cited `battery_dis4.py`.  The run was about a different body --
+the superseded decay base of `Generational.fstTransientAt` -- so the citation
+moved to `fstEquilibrium_lt_fstAtGeneration_of_late`, the theorem that is the
+machine-checked form of the warning, where naming a battery says something true.
 
 ## Why the linters are named one at a time
 
@@ -40,4 +47,8 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 
 #lint only coreStatusMissing coreStatusDenied in Descent
 
+-- `empiricalStatusVocabulary` and `empiricalStatusMultiplicity` are in the
+-- default set now, so this line is redundant with a bare `#lint` and is kept
+-- anyway: it states which checks this runner is FOR, and a default set that
+-- someone later narrows should not silently narrow the gate too.
 #lint only empiricalStatusVocabulary empiricalStatusMultiplicity in Descent
