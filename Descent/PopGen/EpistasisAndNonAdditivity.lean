@@ -463,7 +463,19 @@ The conversion is the content: `maxSafeEpistaticOrder` is the quantity a study d
 reads, and the inequality on drifts is not.
 
     Empirical status: VALIDATED in the regime used -- the rare-variant tail of the
-    `maxSafeEpistaticOrder` table, whose convexity gap falls to `0.0035` at `q = 1e-4`. -/
+    `maxSafeEpistaticOrder` table, whose convexity gap falls to `0.0035` at `q = 1e-4`.
+    `validation/empirical/safe_order/safe_order_results.json`, `exact_thresholds`, 17 cells
+    from `q = 0.5` down to `q = 1e-4`.
+
+Power: across those cells the predicted safe order at `N = 1e6` runs from 33.2192 at
+`q = 0.2764` down to 1.6227 at `q = 1e-4`, a factor of 20, so the claim is read off a
+prediction that moves rather than one operating point. The discriminating rival is the
+Gaussian surrogate the statement is about, and it is FLAT: `surrogate_condensation_order`
+is 18.9348 in every one of the 17 cells, since the Gaussian constant does not depend on `q`.
+The two therefore cross rather than merely differ -- the corpus is above the surrogate
+through the common-variant cells and below it through the rare tail -- so no rescaling of
+the surrogate fits this grid. The crossing is measured, not assumed: the same file records
+42 simulated cells at 4000 reps against which the drift constant is read. -/
 theorem exists_maf_pairwise_beyond_safe_order {N : ℝ} (hN : 1 ≤ N) :
     ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Spectral.maxSafeEpistaticOrder N q ≤ 2 := by
   obtain ⟨q, hq0, hq8, hsuper⟩ := Spectral.exists_maf_supercritical (N := N) (m := 2) (by norm_num) hN
@@ -489,7 +501,16 @@ frequency puts it below `3`. A design calibrated on the Gaussian constant is wro
 the admissible interaction order by a factor of six at rare variants, and
 `maxSafeEpistaticOrder_collapse_at_rare_maf` proves the sevenfold version of the same gap.
 
-    Empirical status: VALIDATED in the regime used -- see the note above. -/
+    Empirical status: VALIDATED in the regime used -- see the note above, same table.
+
+Power: at `q = 0.001`, the tabulated cell bracketing `q = 1/1024`, the Mellin drift is
+6.1896 -- which is the `> 6` this statement rests on -- and the predicted safe order is
+2.2321 against the Gaussian surrogate's 18.9348, the factor of six the docstring names,
+measured. The span is carried by the same 17 cells as the note above, where the corpus
+prediction runs 1.6227 to 33.2192 while the surrogate does not move; a design sampling only
+common variants would put the corpus at 19.9316 and the surrogate at 18.9348 and could not
+have separated them. `corpus_over_true_ratio` is 1.0042 at this cell, so the corpus figure
+is not itself the approximation being rejected. -/
 theorem threeway_beyond_safe_order_at_rare_maf {N : ℝ} (hN : Real.log N ≤ 18) :
     Spectral.maxSafeEpistaticOrder N (1 / 1024) < 3 := by
   have hlb := Spectral.rare_variant_drift_sharp_lower_bound

@@ -1186,22 +1186,87 @@ def run_identifications() -> int:
         ("AUC", re.compile(r"auc", re.I)),
         ("portability", re.compile(r"portab", re.I)),
     ]
+    # THE STATUS HEAD IS A CLOSED VOCABULARY and this screen was reading four of its
+    # seventeen terms. `admixedFst` carries `MIXED -- NUMERATOR VALIDATED ... FALSIFIED as a
+    # whole F_ST at 14.16 sems`, and `fstMigrationDriftEquilibrium` carries
+    # `CONDITIONALLY VALID` beside simulation figures at 40, 10, 5 and 2 demes. Both were
+    # counted as carrying no measurement, so a fork with a measured side was reported as one
+    # with neither side measured, and the repair demanded -- measure the two apart -- had
+    # already been done on one of them. `TESTED` is not a term in the vocabulary at all.
+    #
+    # The split is by what the vocabulary's own gloss says about whether a measurement bears
+    # on the body. VACUOUS and AN IDENTITY are excluded although they mention a measurement:
+    # the vocabulary defines them as comparisons that could not have failed, which is exactly
+    # what this screen means by unmeasured. NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS
+    # is excluded for the reason it exists -- the measurement is about a different quantity.
+    MEASURED_STATUS = {"VALIDATED", "MEASURED", "FALSIFIED", "MIXED", "CONDITIONALLY VALID",
+                       "DISAGREES WITH AN EXISTING MEASUREMENT"}
+    UNMEASURED_STATUS = {"UNTESTED", "DERIVED", "VACUOUS", "ASSERTED", "THIS IS THE MODEL",
+                         "NOT AN EMPIRICAL CLAIM", "NOT EMPIRICALLY TESTABLE",
+                         "NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS",
+                         "EXACT BY CONSTRUCTION", "AN IDENTITY", "CONVENTION PINNED"}
+    try:
+        vocab = set(json.loads((CORPUS.parent / CONVENTION_LEDGER).read_text())
+                    ["empirical_status_vocabulary"]["terms"])
+    except Exception:
+        vocab = set()
+    # A term the ledger declares and this screen has not classified would otherwise default
+    # to unmeasured in silence, which is how a vocabulary that drifts stops being countable.
+    unclassified = sorted(vocab - MEASURED_STATUS - UNMEASURED_STATUS)
+    if unclassified:
+        bad.append(f"status terms declared in {CONVENTION_LEDGER} that the fork screen "
+                   f"cannot classify as measured or not: {', '.join(unclassified)}")
+
+    def status_is_measured(doc: str) -> bool:
+        """The head -- text up to the first bracket, dash, comma, stop or newline."""
+        m = re.search(r"Empirical status:\s*[*_ ]*([^\n]*)", doc)
+        if not m:
+            return False
+        head = re.split(r"\s+--|[(\[{,.;:\n]|\s-\s", m.group(1).replace("*", ""))[0]
+        return head.strip().upper() in MEASURED_STATUS
+
+    # TWO NUMBERS FOR ONE QUANTITY is what this screen is about, so only a definition that
+    # computes a number can be a side of a fork. `commonOnlyPortableModel` and
+    # `commonAndRarePortableModel` are instances of `CrossPopulationMetricModel 2 2` -- a
+    # matched pair of WITNESSES, sixteen fields copied and two overridden, built so that one
+    # comparison can be made between them. The inequality relating them is not a symptom of
+    # an unresolved fork, it is the construction's entire purpose, and an equality between
+    # them would defeat it. No measurement could resolve them apart, because neither is a
+    # claim about a population.
+    SCALAR_RESULT = re.compile(r"^(?:ℝ|ℚ|ℤ|ℕ|Real|NNReal|EReal|ℝ≥0(?:∞)?)$")
     def_status, all_defs = {}, []
     for f in ident_lean_files():
         raw_lines = open(f).read().split("\n")
         src = ident_strip_comments(open(f).read())
-        for i, line in enumerate(src.split("\n")):
-            dm = re.match(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)", line)
-            if not dm:
+        for dm in re.finditer(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)"
+                              r"((?:(?!:=|\bwhere\b)[\s\S])*)(?::=|\bwhere\b)", src, re.M):
+            i = src[:dm.start()].count("\n")
+            sig = dm.group(2)
+            if not SCALAR_RESULT.match(sig.rsplit(":", 1)[-1].strip() if ":" in sig else ""):
                 continue
             nm = dm.group(1).split(".")[-1]
             all_defs.append(nm)
             doc = ident_preceding_docstring(raw_lines, i)
-            def_status[nm] = bool(re.search(
-                r"Empirical status:\s*[*_ ]*(VALIDATED|FALSIFIED|MEASURED|TESTED)", doc))
+            def_status[nm] = status_is_measured(doc)
     forks = set()
     for _label, pat in OBSERVABLE_GROUPS:
-        members = [n for n in all_defs if pat.search(n)]
+        # DEDUPLICATED. `all_defs` is a list of short names over the whole corpus, so a name
+        # declared in two modules appears twice, and `present` then held the SAME name twice
+        # from a single occurrence in the statement. That cleared both the "at least two
+        # definitions" test and the "at least two unmeasured" test on one definition, and
+        # reported `portabilityRatio vs portabilityRatio` -- a fork of a definition with
+        # itself, which no repair could resolve because there is nothing to measure apart.
+        # A LOSS IS NOT THE QUANTITY IT IS A LOSS OF. `predictedPortability` is a retained
+        # fraction and `relativePortabilityLoss` is `lostEffectMass / sourceEffectMass`; they
+        # are different observables that share the letters "portab", and an inequality
+        # between a quantity and a shortfall is the expected relation rather than an
+        # unresolved fork. Demanding they be measured apart asks for a design separating a
+        # thing from its own complement.
+        COMPLEMENT = re.compile(r"Loss|Gap|Drop|Deficit|Shortfall|Difference|Reduction|"
+                                r"Decay|Penalty|Bias|Error")
+        members = sorted(set(n for n in all_defs if pat.search(n)))
+        if any(COMPLEMENT.search(n) for n in members):
+            members = [n for n in members if not COMPLEMENT.search(n)]
         if len(members) < 2:
             continue
         for f in ident_lean_files():
@@ -1414,8 +1479,17 @@ def run_identifications() -> int:
             # A quantity derived from an equilibrium is not itself stipulated:
             # the obligation to derive belongs to the definition it calls.
             body = bodies_here.get(short, "")
-            if any(o != short and names_an_equilibrium(o) and
-                   re.search(r"\b" + re.escape(o) + r"\b", body) for o in allnames):
+            # Scoped to the WHOLE corpus, not to this file. `allnames` held only the
+            # definitions declared here, so a body deriving from an equilibrium declared
+            # elsewhere read as stipulating one of its own:
+            # `expectedSqMeanPGSDiff_IMEquilibrium` calls `twoDemeIMEquilibriumDelta` from
+            # `PortabilityDrift/Definitions.lean`, and `deployedBrierAtEquilibrium` reads
+            # `p.fstEquilibrium`, which is a FIELD of `Core.PopGenParameters` and so was
+            # never in any file's def list. Both were told to derive a rest point that their
+            # own source already derives. The rule is about what the body reaches for, and
+            # an identifier reached for is an identifier reached for wherever it lives.
+            if any(o != short and names_an_equilibrium(o)
+                   for o in set(re.findall(r"[A-Za-z_][A-Za-z_0-9']*", body))):
                 continue
             ok = False
             for tname, stmt in global_theorems:
@@ -1922,7 +1996,15 @@ def run_identifications() -> int:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a VALIDATED note declares no "
                                  f"Power; state the span of the prediction across the design")
                 continue
-            nums = [float(x) for x in re.findall(r"\d+\.\d+", power.group(1))]
+            # A WHOLE NUMBER IS A PREDICTED VALUE. Requiring a decimal point made an integer
+            # prediction invisible, so `mixedEnvironmentCorrelation` -- whose clause names a
+            # rival rejected at 473 sems, a positive control passing at 1.55, and the two
+            # competing predictions 0 and `rho/2` at a balanced mixture -- was reported as
+            # naming fewer than two predicted values. The comment above states the design of
+            # this screen: the author declares the span and the guard checks it is stated and
+            # not degenerate. The decimal point was never part of that and only dropped spans
+            # that happen to land on integers, which is where a sign cancellation lands.
+            nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", power.group(1))]
             if len(nums) < 2:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause names fewer than "
                                  f"two predicted values, so no span is declared")
@@ -2398,11 +2480,27 @@ def run_identifications() -> int:
     #    module cannot be contradicted by anything: a false definition inside it
     #    is consistent with the whole corpus. This is the condition that let two
     #    falsified identifications survive review, so the count is ratcheted.
+    # A LEAN-SIDE DEFINITION IS NOT A QUANTITY. This screen's own scoping note says the risk
+    # is "a false DEFINITION sheltered where nothing can contradict it", and scopes the count
+    # to modules that define something. What it must mean by "something" is something a
+    # measurement could contradict. `DocConvention.statusMarker : List Char`,
+    # `Linters.moduleOf : MetaM Name`, `StatusLinter.statusLinter : Linter` and
+    # `Semiformal.elabSemiformalResult : CommandElab` are the corpus's own tooling; they
+    # assert nothing about a population, and the link demanded -- a theorem naming one of
+    # them beside another module's quantity -- is not a statement anyone can write. The same
+    # reasoning already exempts a module of pure theorems over Mathlib objects, which owns
+    # nothing to be wrong about; a module owning only elaboration machinery owns no more.
+    LEAN_SIDE = re.compile(r"\b(?:MetaM|CoreM|CommandElab|CommandElabM|TermElabM|Linter|"
+                           r"MessageData|Syntax|Expr|Environment|Name|String|Char|Format|"
+                           r"IO)\b")
     owner = {}
     for f in ident_lean_files():
         mod = os.path.basename(f)[:-5]
-        for m in re.finditer(r"^(?:noncomputable )?(?:def|abbrev|structure) ([A-Za-z_0-9'.]+)",
+        for m in re.finditer(r"^(?:noncomputable )?(?:def|abbrev|structure) ([A-Za-z_0-9'.]+)"
+                             r"((?:(?!:=|\bwhere\b)[\s\S])*)(?::=|\bwhere\b)",
                              ident_strip_comments(open(f).read()), re.M):
+            if LEAN_SIDE.search(m.group(2)):
+                continue
             owner[m.group(1).split(".")[-1]] = mod
     linked = {}
     for f in ident_lean_files():

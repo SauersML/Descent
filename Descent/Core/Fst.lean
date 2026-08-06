@@ -800,7 +800,16 @@ downstream number; what was missing was a name for the quantity the corpus kept
 saying it meant.
 
     Empirical status: VALIDATED -- matches `validation/differential/refs.fst_hudson`, which
-    is checked against scikit-allel. -/
+    is checked against scikit-allel. Check `hudsonFst-is-hudson`, 16 cells, verdict AGREE
+    at `max_rel_err` 0.0 against a tolerance of 1e-9.
+
+Power: across those 16 cells the predicted `F_ST` spans 0.0000 to 0.7721, so the design is
+not evaluated at one operating point. The check detects the mutants `scale x1.05` and
+`scale x0.5`, and the discrimination that matters here is against Nei rather than against a
+scaling: `simpleFst-vs-hudson` runs the SAME grid and records `CONVENTION-DIFFERS` at
+`max_rel_err` 0.4967, so a grid on which the two conventions agree would be a grid on which
+this check could not have failed. The separation is largest away from `p₁ = p₂`, where every
+estimator returns 0 and the comparison goes degenerate. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
 

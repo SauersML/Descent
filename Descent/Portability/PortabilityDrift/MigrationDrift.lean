@@ -913,6 +913,33 @@ saturating map as before, read at `m/c` rather than at `4·Nₑ·m`. -/
 noncomputable def sharedLD_from_equilibrium (m c : ℝ) : ℝ :=
   Descent.Core.share m c
 
+/-- **One step of the race the shared fraction is the outcome of.** The derivation above
+reads `m/(m + c)` two ways, and this is the second one stated as a map: two lineages in
+different demes are shared once migration puts them together, lost once recombination pulls
+the two sites apart, and otherwise carry into the next generation unchanged. So a fraction
+`m` becomes shared, a fraction `c` is lost, and the remaining `1 - m - c` keeps whatever it
+had.
+
+The point of writing it is that `sharedLD_from_equilibrium` is then derived rather than
+stipulated: a closed form asserted beside a dynamic can be wrong about it without anything
+failing, and the theorem below is what makes that impossible here.
+
+    Empirical status: THIS IS THE MODEL. The map constitutes the migration-recombination
+    race rather than asserting anything about a population; what a population does is
+    measured on the fraction it fixes, whose status line is on
+    `sharedLD_from_equilibrium`. -/
+noncomputable def sharedLDStep (m c r : ℝ) : ℝ := m + (1 - m - c) * r
+
+/-- **The shared fraction is the rest point of that step**, and not a stipulation placed
+next to it. `m/(m + c)` is exactly the `r` the race leaves unchanged, which is the
+competing-risks reading of the derivation above: migration and recombination run against
+each other and the shared fraction is migration's share of the total hazard. -/
+theorem sharedLD_from_equilibrium_isFixedPoint (m c : ℝ) (h : m + c ≠ 0) :
+    sharedLDStep m c (sharedLD_from_equilibrium m c) = sharedLD_from_equilibrium m c := by
+  unfold sharedLDStep sharedLD_from_equilibrium Descent.Core.share
+  field_simp
+  ring
+
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem sharedLD_from_equilibrium_at_reference_point :
     sharedLD_from_equilibrium 1 1 = 1 / 2 := by

@@ -137,7 +137,17 @@ theorem islandDemeCorrection_one_deme_is_junk : Descent.Core.islandDemeCorrectio
 
     Empirical status: VALIDATED -- matches `validation/differential/refs.island_fst_finite_demes`,
     against which the differential check `islandModelFst-finite-demes` measures
-    the corpus's limit form. -/
+    the corpus's limit form. This body is checked by
+    `islandFstFiniteDemes-is-the-finite-form`, 12 cells, verdict FORMULA.
+
+Power: across those 12 cells the predicted `F_ST` spans 0.0123 to 0.7091, a factor of 57, so
+the correction is exercised over its whole range rather than at one deme count. The check
+detects `scale x1.05`, `scale x0.5` and `transpose first two args`. The discriminating rival
+is the limit form itself: `islandModelFst-finite-demes` evaluates `1/(1 + 4Nm)` on the
+IDENTICAL grid, deliberately shared so the comparison is exact, and is off by up to 0.7454
+relative. `d = 2` carries that separation -- the correction factor is 4 there -- and the
+same grid restricted to large `d` could not have failed, since at `d = 40` the correction is
+5% and at `d → ∞` it vanishes. -/
 noncomputable def islandFstFiniteDemes (Ne m d : ℝ) : ℝ :=
   1 / (1 + 4 * Ne * m * Descent.Core.islandDemeCorrection d)
 
