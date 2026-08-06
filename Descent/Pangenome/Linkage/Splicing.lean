@@ -148,6 +148,19 @@ theorem spell_injOn_of_prefixFree (code : ι → List α) (hpf : PrefixFree code
       have hxy' : x.length = y.length := by simpa using hxy
       rw [ih y hxy' htail]
 
+omit [Fintype ι] [DecidableEq ι] in
+/-- **Lengthening blocks keeps them decodable.**  Extending every block by anything at all
+preserves prefix-freeness, so a builder who subdivides segments — or pads them to a common
+boundary — does not have to re-establish that the result parses. -/
+theorem prefixFree_append (code ext : ι → List α) (hpf : PrefixFree code) :
+    PrefixFree fun h ↦ code h ++ ext h := by
+  intro g h hgh hpre
+  have h1 : code g <+: code h ++ ext h :=
+    (List.prefix_append (code g) (ext g)).trans hpre
+  rcases List.prefix_or_prefix_of_prefix h1 (List.prefix_append (code h) (ext h)) with hc | hc
+  · exact hpf g h hgh hc
+  · exact hpf h g (Ne.symm hgh) hc
+
 variable [DecidableEq α]
 
 /-- The distinct words the compatible language spells. -/

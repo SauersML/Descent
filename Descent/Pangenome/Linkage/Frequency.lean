@@ -25,6 +25,9 @@ and the uniform statement is this one at `p = 1/m`, which `condIdentityLoss_unif
 * `condIdentityLoss p s` — `H_p(J ∣ S)`, the identity the interface forgets when threads are
   weighed by `p`.  At uniform `p` it is `identityLoss`.
 * `panelEntropy p` — `H(p)`, which replaces `log m`.
+* `stateEntropy p s` — `H(S)`, and `condIdentityLoss_add_stateEntropy` proves the chain rule
+  `H(J ∣ S) + H(S) = H(J)` for these definitions, so the name `H(J ∣ S)` the whole group uses
+  is discharged rather than asserted.
 * `freePotential p v` — `∑ p log (v/p)`, the potential the chain carries.  At `v = 1` it is
   `panelEntropy p`, which is why the induction starts where it does.
 
@@ -204,6 +207,51 @@ theorem panelEntropy_add_condLinkagePressure_le {p : ι → ℝ} (hp : ∀ h, 0 
   rw [hsum]
   linarith
 
+/-! ### Definitional fidelity
+
+Every docstring in this group reads `identityLoss` and `condIdentityLoss` as the conditional
+entropy `H(J ∣ S)`.  That reading is a claim about definitions, and a claim about definitions
+left in prose is exactly the kind a formalisation is supposed to stop making.  The two results
+here discharge it: what is defined is what it is named for. -/
+
+/-- `H(S)`: the entropy of the graph state a `p`-random thread occupies. -/
+noncomputable def stateEntropy (p : ι → ℝ) (s : ι → ι) : ℝ :=
+  ∑ a ∈ Finset.univ.image s,
+    (∑ g ∈ stateFiber s a, p g) * Real.log (1 / ∑ g ∈ stateFiber s a, p g)
+
+/-- **What is called `H(J ∣ S)` is `H(J ∣ S)`.**  The textbook chain rule for a state that is a
+function of the thread, `H(J ∣ S) + H(S) = H(J)`, holds for the definitions actually used in
+this group — not for a paraphrase of them. -/
+theorem condIdentityLoss_add_stateEntropy {p : ι → ℝ} (hp : ∀ h, 0 < p h) (s : ι → ι) :
+    condIdentityLoss p s + stateEntropy p s = panelEntropy p := by
+  have hM : ∀ h : ι, 0 < stateMass p s h := stateMass_pos hp s
+  have hterm : ∀ h : ι, p h * Real.log (stateMass p s h / p h)
+      = p h * Real.log (stateMass p s h) + p h * Real.log (1 / p h) := by
+    intro h
+    rw [Real.log_div (ne_of_gt (hM h)) (ne_of_gt (hp h)), one_div, Real.log_inv]
+    ring
+  have hmass : ∑ h : ι, p h * Real.log (stateMass p s h)
+      = ∑ a ∈ Finset.univ.image s,
+          (∑ g ∈ stateFiber s a, p g) * Real.log (∑ g ∈ stateFiber s a, p g) := by
+    rw [← sum_fiberwise s fun h ↦ p h * Real.log (stateMass p s h)]
+    refine Finset.sum_congr rfl fun a _ ↦ ?_
+    have hconst : ∀ h ∈ stateFiber s a, p h * Real.log (stateMass p s h)
+        = p h * Real.log (∑ g ∈ stateFiber s a, p g) := by
+      intro h hh
+      simp only [mem_stateFiber] at hh
+      rw [stateMass, fiber, hh]
+    rw [Finset.sum_congr rfl hconst, ← Finset.sum_mul]
+  have hzero : (∑ a ∈ Finset.univ.image s,
+        (∑ g ∈ stateFiber s a, p g) * Real.log (∑ g ∈ stateFiber s a, p g))
+      + stateEntropy p s = 0 := by
+    rw [stateEntropy, ← Finset.sum_add_distrib]
+    refine Finset.sum_eq_zero fun a _ ↦ ?_
+    rw [one_div, Real.log_inv]
+    ring
+  rw [condIdentityLoss, Finset.sum_congr rfl fun h _ ↦ hterm h, Finset.sum_add_distrib, hmass,
+    panelEntropy]
+  linarith
+
 /-! ### The uniform statement is this one
 
 `Descent.Pangenome.Linkage.Barrier` is the case `p = 1/m`, and these two identities are the
@@ -236,5 +284,15 @@ theorem condIdentityLoss_uniform [Nonempty ι] (s : ι → ι) :
       = (fiberCard s h : ℝ) := by
     field_simp
   rw [hmass, hcancel]
+
+/-- **The uniform reading, discharged.**  `identityLoss s + H(S) = log m` — which is the
+`H(J ∣ S) = H(J) - H(S)` that `Descent.Pangenome.Linkage.Interface` names it for, at the
+uniform panel the rest of the group is stated over. -/
+theorem identityLoss_add_stateEntropy [Nonempty ι] (s : ι → ι) :
+    identityLoss s + stateEntropy (fun _ : ι ↦ (Fintype.card ι : ℝ)⁻¹) s
+      = Real.log (Fintype.card ι : ℝ) := by
+  have hm : (0 : ℝ) < (Fintype.card ι : ℝ) := by exact_mod_cast Fintype.card_pos
+  rw [← condIdentityLoss_uniform s, ← panelEntropy_uniform]
+  exact condIdentityLoss_add_stateEntropy (fun _ ↦ inv_pos.mpr hm) s
 
 end Descent.Pangenome.Linkage
