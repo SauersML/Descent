@@ -22,8 +22,19 @@ import numpy as np
 from battery_core import RESULTS, record
 
 
-def wf_het_mutation(Ne, mu, H0_p, gens, n_loci=4000, reps=300, seed=1):
-    """Heterozygosity trajectory under drift plus two-way allele mutation."""
+def wf_het_mutation(Ne, mu, H0_p, gens, n_loci=4000, reps=300, seed=1,
+                    blocks=6):
+    """Heterozygosity trajectory under drift plus two-way allele mutation.
+
+    Returns `(trajectory, final-generation mean per replicate block)`. The block
+    means are the whole point: this battery used to attach `sem = obs * 0.004`
+    to every cell, under a comment reading "sem across replicate blocks of the
+    final generation", and NOTHING ACROSS BLOCKS WAS EVER COMPUTED. A hardcoded
+    0.4% error bar is not a measurement of anything, and both falsifications this
+    file recorded against the heterozygosity recurrences -- 65 and 44 sems --
+    were that constant divided into a residual. An invented error bar produces a
+    verdict of whatever size it is chosen to produce.
+    """
     rng = np.random.default_rng(seed)
     two_n = int(2 * Ne)
     p = np.full((reps, n_loci), H0_p)
@@ -32,26 +43,83 @@ def wf_het_mutation(Ne, mu, H0_p, gens, n_loci=4000, reps=300, seed=1):
         p = rng.binomial(two_n, p) / two_n
         p = p * (1 - mu) + (1 - p) * mu
         out.append(float((2 * p * (1 - p)).mean()))
-    return np.array(out)
+    het = 2 * p * (1 - p)
+    block = np.array([float(b.mean())
+                      for b in np.array_split(het, blocks, axis=0)])
+    return np.array(out), block
+
+
+def het_decay_control(Ne, gens=40, n_loci=2000, reps=300, blocks=6, seed=99):
+    """With NO mutation, heterozygosity decays by exactly 1 - 1/(2Ne) per
+    generation. Independent of both recurrences under test -- it involves
+    neither the mutation term nor the affine abstraction -- exact rather than
+    asymptotic, and it has real block-to-block variance."""
+    rng = np.random.default_rng(seed)
+    two_n = int(2 * Ne)
+    p = np.full((reps, n_loci), 0.5)
+    h0 = 2 * p * (1 - p)
+    start = np.array([float(b.mean())
+                      for b in np.array_split(h0, blocks, axis=0)])
+    for _ in range(gens):
+        p = rng.binomial(two_n, p) / two_n
+    h = 2 * p * (1 - p)
+    end = np.array([float(b.mean())
+                    for b in np.array_split(h, blocks, axis=0)])
+    ratio = (end / start) ** (1.0 / gens)
+    return dict(design="no mutation: heterozygosity decays by exactly "
+                       "1 - 1/(2Ne) per generation",
+                lean=1.0 - 1.0 / (2 * Ne), truth=float(ratio.mean()),
+                sem=float(ratio.std(ddof=1) / math.sqrt(len(ratio))))
 
 
 def test_het_mutation_drift_trajectory():
     """hetMutationDriftRecurrence run forward from H0, never re-anchored."""
-    cells = []
+    cells, cells_bi = [], []
     for Ne, mu, gens in ((100, 1e-3, 50), (100, 1e-3, 200), (500, 5e-4, 200)):
-        traj = wf_het_mutation(Ne, mu, 0.5, gens, seed=1201)
+        traj, block = wf_het_mutation(Ne, mu, 0.5, gens, seed=1201)
         H = traj[0]
         for _ in range(gens):
             H = (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
         obs = float(traj[-1])
-        # sem across replicate blocks of the final generation
-        sem = obs * 0.004
-        cells.append(dict(design="Ne=%d mu=%.0e t=%d" % (Ne, mu, gens),
-                          lean=float(H), truth=obs, sem=sem))
-    record("hetMutationDriftRecurrence", "PopulationGeneticsFoundations.lean",
+        sem = float(block.std(ddof=1) / math.sqrt(len(block)))
+        # The BIALLELIC input term, which is what `wf_het_mutation` above
+        # actually implements: `p' = p(1-mu) + (1-p)mu` is a two-allele locus,
+        # and back-mutation removes heterozygosity as well as creating it.
+        Hb = traj[0]
+        for _ in range(gens):
+            Hb = (1 - 1 / (2 * Ne)) * Hb + 2 * mu * (1 - 2 * Hb)
+        lab = "Ne=%d mu=%.0e t=%d" % (Ne, mu, gens)
+        cells.append(dict(design=lab, lean=float(H), truth=obs, sem=sem))
+        cells_bi.append(dict(design=lab, lean=float(Hb), truth=obs, sem=sem))
+    # THIS DESIGN IS BIALLELIC AND THE DECLARATION IS NOT. `battery_bulk15`
+    # tests the same body on an INFINITE-ALLELES Wright-Fisher -- "which is the
+    # model the docstring declares" -- and gets 1.01 sems, and it FALSIFIES the
+    # biallelic input term there. This battery simulates a two-allele locus and
+    # falsifies the infinite-alleles term. The two are not in conflict: each
+    # body is right for its own mutation model, and the disagreement was never
+    # about the recursion.
+    #
+    # So the corpus row here is recorded under the term this simulator matches,
+    # and the declaration's own form is the competitor with the model named.
+    # Recording it the other way round put two falsifications into the ledger
+    # against declarations whose docstrings say VALIDATED, and both were the
+    # design testing a body against a model it does not claim.
+    reg_bi = ("BIALLELIC Wright-Fisher with two-way mutation, run forward from "
+              "H_0 for the full trajectory with no re-anchoring at "
+              "intermediate generations; the error bar is the spread of six "
+              "replicate blocks at the final generation, replacing a hardcoded "
+              "0.4 percent. The declaration this name belongs to is written for "
+              "INFINITE ALLELES, which battery_bulk15 simulates and where it "
+              "matches at 1.01 sems")
+    record("hetMutationDriftRecurrence [biallelic input term 2mu(1 - 2H), "
+           "which is the model this design simulates]",
+           "PopulationGeneticsFoundations.lean",
+           "H_{t+1} = (1 - 1/(2Ne)) H_t + 2 mu (1 - 2 H_t), iterated", cells_bi,
+           control=het_decay_control(100), realised_inputs=True, regime=reg_bi)
+    record("hetMutationDriftRecurrence [the infinite-alleles term this design "
+           "cannot test, competing]", "PopulationGeneticsFoundations.lean",
            "H_{t+1} = (1 - 1/(2Ne)) H_t + 2 mu (1 - H_t), iterated", cells,
-           regime="run forward from H_0 for the full trajectory, no "
-                  "re-anchoring on the simulation at intermediate generations")
+           control=het_decay_control(100), realised_inputs=True, regime=reg_bi)
 
 
 def test_het_mutation_recurrence_affine():
@@ -62,21 +130,48 @@ def test_het_mutation_recurrence_affine():
     `lam` and `Hstar`, so this tests that the affine abstraction really is the
     process it is used to summarise.
     """
-    cells = []
+    cells, cells_bi = [], []
     for Ne, mu, gens in ((100, 1e-3, 100), (500, 5e-4, 200)):
-        traj = wf_het_mutation(Ne, mu, 0.5, gens, seed=1301)
+        traj, block = wf_het_mutation(Ne, mu, 0.5, gens, seed=1301)
         lam = (1 - 1 / (2 * Ne)) - 2 * mu
         Hstar = 2 * mu / (1 / (2 * Ne) + 2 * mu)
         H = traj[0]
         for _ in range(gens):
             H = lam * H + (1 - lam) * Hstar
         obs = float(traj[-1])
-        cells.append(dict(design="Ne=%d mu=%.0e t=%d" % (Ne, mu, gens),
-                          lean=float(H), truth=obs, sem=obs * 0.004))
-    record("hetMutationRecurrence", "PopulationGeneticsFoundations.lean",
-           "H_{t+1} = lam H_t + (1 - lam) Hstar, iterated", cells,
-           regime="lam and Hstar taken from the drift-mutation process the "
-                  "affine form abstracts; run forward with no re-anchoring")
+        sem = float(block.std(ddof=1) / math.sqrt(len(block)))
+        # The affine constants of the BIALLELIC recursion, which is what this
+        # simulator runs: `H' = (1 - 1/(2Ne))H + 2mu(1 - 2H)` rearranges to
+        # `lam = (1 - 1/(2Ne)) - 4mu` and `Hstar = 2mu / (1/(2Ne) + 4mu)`.
+        lam_b = (1 - 1 / (2 * Ne)) - 4 * mu
+        Hstar_b = 2 * mu / (1 / (2 * Ne) + 4 * mu)
+        Hb = traj[0]
+        for _ in range(gens):
+            Hb = lam_b * Hb + (1 - lam_b) * Hstar_b
+        lab = "Ne=%d mu=%.0e t=%d" % (Ne, mu, gens)
+        cells.append(dict(design=lab, lean=float(H), truth=obs, sem=sem))
+        cells_bi.append(dict(design=lab, lean=float(Hb), truth=obs, sem=sem))
+    # Same model mismatch as the group above, and the same repair: the affine
+    # abstraction is exact for whichever recursion supplies its `lam` and
+    # `Hstar`, so testing it here means supplying the BIALLELIC ones. The
+    # infinite-alleles constants are the competitor, with the model named.
+    reg_bi = ("BIALLELIC Wright-Fisher with two-way mutation; lam and Hstar are "
+              "the constants of the biallelic recursion this simulator runs, "
+              "and the affine form is run forward with no re-anchoring. The "
+              "error bar is the spread of six replicate blocks at the final "
+              "generation, replacing a hardcoded 0.4 percent. The declaration "
+              "is written over the INFINITE-ALLELES process, which "
+              "battery_bulk15 simulates")
+    record("hetMutationRecurrence [biallelic lam and Hstar, which is the model "
+           "this design simulates]", "PopulationGeneticsFoundations.lean",
+           "H_{t+1} = lam H_t + (1 - lam) Hstar with lam = (1 - 1/(2Ne)) - 4mu",
+           cells_bi, control=het_decay_control(500), realised_inputs=True,
+           regime=reg_bi)
+    record("hetMutationRecurrence [the infinite-alleles constants this design "
+           "cannot test, competing]", "PopulationGeneticsFoundations.lean",
+           "H_{t+1} = lam H_t + (1 - lam) Hstar, infinite-alleles constants",
+           cells, control=het_decay_control(500), realised_inputs=True,
+           regime=reg_bi)
 
 
 def sigma_d2_traj(Ne, c, gens, reps, seed):

@@ -259,7 +259,7 @@ def group_f():
     """
     rng = np.random.default_rng(40106)
     reps = 600000
-    cells, c_lin, c_sum, c_solo = [], [], [], []
+    cells, c_lin, c_sum, c_solo, c_naive = [], [], [], [], []
     control = None
     designs = ((3000, 12000, 0.9, 3e-5), (3000, 12000, 0.6, 3e-5),
                (3000, 12000, 0.9, 3e-4), (6000, 6000, 0.7, 3e-5))
@@ -281,8 +281,17 @@ def group_f():
         print("  %-52s N_eff = %.0f ± %.0f | body %.0f  lin %.0f  sum %.0f  "
               "solo %.0f" % (lab, n_eff, sem, n1 + rg_hat ** 2 * n2,
                              n1 + rg_hat * n2, n1 + n2, n1))
-        cells.append(dict(design=lab, lean=n1 + rg_hat ** 2 * n2, truth=n_eff,
+        # THE BODY, which is the posterior-precision form this battery's own
+        # regime paragraph describes and which the corpus adopted after the
+        # naive `n1 + rg^2 * n2` was rejected here. `BayesianPGSTheory.lean`
+        # reads `n_target + rg^2 / ((1 - rg^2) * priorVariance + 1/n_other)`,
+        # and `v2` two lines up is exactly that denominator -- the battery has
+        # been computing it all along to form the posterior mean, and recording
+        # a different formula as the corpus row.
+        cells.append(dict(design=lab, lean=n1 + rg_hat ** 2 / v2, truth=n_eff,
                           sem=sem))
+        c_naive.append(dict(design=lab, lean=n1 + rg_hat ** 2 * n2,
+                            truth=n_eff, sem=sem))
         c_lin.append(dict(design=lab, lean=n1 + rg_hat * n2, truth=n_eff,
                           sem=sem))
         c_sum.append(dict(design=lab, lean=float(n1 + n2), truth=n_eff,
@@ -308,16 +317,21 @@ def group_f():
            "as the control. n2*tau2 is swept across 1, the boundary at which "
            "the scatter term (1-rg^2)tau2 overtakes the sampling term 1/n2")
     record("multiAncestryEffectiveN", "BayesianPGSTheory.lean",
-           "n_target + rg^2 * n_other", cells, regime=reg, control=control)
+           "n_target + rg^2 / ((1 - rg^2) * priorVariance + 1/n_other)", cells,
+           regime=reg, control=control, realised_inputs=True)
+    record("multiAncestryEffectiveN [the superseded n_t + rg^2 * n_o, "
+           "competing]", "BayesianPGSTheory.lean",
+           "n_target + rg^2 * n_other", c_naive, regime=reg, control=control,
+           realised_inputs=True)
     record("multiAncestryEffectiveN [n_t + rg*n_o, competing]",
            "BayesianPGSTheory.lean", "n_target + rg * n_other", c_lin,
-           regime=reg, control=control)
+           regime=reg, control=control, realised_inputs=True)
     record("multiAncestryEffectiveN [n_t + n_o, competing]",
            "BayesianPGSTheory.lean", "n_target + n_other", c_sum, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("multiAncestryEffectiveN [no borrowing, competing]",
            "BayesianPGSTheory.lean", "n_target", c_solo, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
 
 
 GROUPS = (("A averageEffect (control fixed)", group_a),

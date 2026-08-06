@@ -1,79 +1,157 @@
 [
  {
-  "name": "hetMutationDriftRecurrence",
+  "name": "hetMutationDriftRecurrence [biallelic input term 2mu(1 - 2H), which is the model this design simulates]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H_{t+1} = (1 - 1/(2Ne)) H_t + 2 mu (1 - 2 H_t), iterated",
+  "note": "",
+  "regime": "BIALLELIC Wright-Fisher with two-way mutation, run forward from H_0 for the full trajectory with no re-anchoring at intermediate generations; the error bar is the spread of six replicate blocks at the final generation, replacing a hardcoded 0.4 percent. The declaration this name belongs to is written for INFINITE ALLELES, which battery_bulk15 simulates and where it matches at 1.01 sems",
+  "span": 0.3695464001263573,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=100 mu=1e-03 t=50",
+   "lean": 0.39898068806698844,
+   "truth": 0.3992617381797922,
+   "sem": 7.874166226043998e-05,
+   "sems_off": 3.569268221366614,
+   "rel_err": 0.0007039244834355029
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 t=50",
+    "lean": 0.39898068806698844,
+    "truth": 0.3992617381797922,
+    "sem": 7.874166226043998e-05,
+    "sems_off": 3.569268221366614,
+    "rel_err": 0.0007039244834355029
+   },
+   {
+    "design": "Ne=100 mu=1e-03 t=200",
+    "lean": 0.26776593126264225,
+    "truth": 0.2683405159898629,
+    "sem": 0.00023297289233635335,
+    "sems_off": 2.466315808068812,
+    "rel_err": 0.002141252226116938
+   },
+   {
+    "design": "Ne=500 mu=5e-04 t=200",
+    "lean": 0.4247194897710294,
+    "truth": 0.42478606069665675,
+    "sem": 3.081422502598011e-05,
+    "sems_off": 2.1603959071244936,
+    "rel_err": 0.00015671636097983784
+   }
+  ]
+ },
+ {
+  "name": "hetMutationDriftRecurrence [the infinite-alleles term this design cannot test, competing]",
   "file": "PopulationGeneticsFoundations.lean",
   "source": "H_{t+1} = (1 - 1/(2Ne)) H_t + 2 mu (1 - H_t), iterated",
-  "note": "",
-  "regime": "run forward from H_0 for the full trajectory, no re-anchoring on the simulation at intermediate generations",
+  "note": "positive control 'no mutation: heterozygosity decays by exactly 1 - 1/(2Ne) per generation' passed at 0.29 sems",
+  "regime": "BIALLELIC Wright-Fisher with two-way mutation, run forward from H_0 for the full trajectory with no re-anchoring at intermediate generations; the error bar is the spread of six replicate blocks at the final generation, replacing a hardcoded 0.4 percent. The declaration this name belongs to is written for INFINITE ALLELES, which battery_bulk15 simulates and where it matches at 1.01 sems",
   "span": 0.32340601991259044,
   "verdict": "FALSIFIED",
   "worst": {
-   "design": "Ne=100 mu=1e-03 t=200",
-   "lean": 0.3382969900437048,
-   "truth": 0.2680783422559605,
-   "sem": 0.001072313369023842,
-   "sems_off": 65.48332774370458,
-   "rel_err": 0.2619333109748183
+   "design": "Ne=500 mu=5e-04 t=200",
+   "lean": 0.5,
+   "truth": 0.42478606069665675,
+   "sem": 3.081422502598011e-05,
+   "sems_off": 2440.883690565926,
+   "rel_err": 0.17706310602563333
   },
   "cells": [
    {
     "design": "Ne=100 mu=1e-03 t=50",
     "lean": 0.4365331422635582,
-    "truth": 0.39937993961849483,
-    "sem": 0.0015975197584739793,
-    "sems_off": 23.256803208840278,
-    "rel_err": 0.09302721283536111
+    "truth": 0.3992617381797922,
+    "sem": 7.874166226043998e-05,
+    "sems_off": 473.33778604380893,
+    "rel_err": 0.09335080354477206
    },
    {
     "design": "Ne=100 mu=1e-03 t=200",
     "lean": 0.3382969900437048,
-    "truth": 0.2680783422559605,
-    "sem": 0.001072313369023842,
-    "sems_off": 65.48332774370458,
-    "rel_err": 0.2619333109748183
+    "truth": 0.2683405159898629,
+    "sem": 0.00023297289233635335,
+    "sems_off": 300.2773127477964,
+    "rel_err": 0.2607003783822366
    },
    {
     "design": "Ne=500 mu=5e-04 t=200",
     "lean": 0.5,
-    "truth": 0.42494036194563717,
-    "sem": 0.0016997614477825486,
-    "sems_off": 44.158924861063944,
-    "rel_err": 0.17663569944425578
+    "truth": 0.42478606069665675,
+    "sem": 3.081422502598011e-05,
+    "sems_off": 2440.883690565926,
+    "rel_err": 0.17706310602563333
    }
   ]
  },
  {
-  "name": "hetMutationRecurrence",
+  "name": "hetMutationRecurrence [biallelic lam and Hstar, which is the model this design simulates]",
   "file": "PopulationGeneticsFoundations.lean",
-  "source": "H_{t+1} = lam H_t + (1 - lam) Hstar, iterated",
+  "source": "H_{t+1} = lam H_t + (1 - lam) Hstar with lam = (1 - 1/(2Ne)) - 4mu",
   "note": "",
-  "regime": "lam and Hstar taken from the drift-mutation process the affine form abstracts; run forward with no re-anchoring",
+  "regime": "BIALLELIC Wright-Fisher with two-way mutation; lam and Hstar are the constants of the biallelic recursion this simulator runs, and the affine form is run forward with no re-anchoring. The error bar is the spread of six replicate blocks at the final generation, replacing a hardcoded 0.4 percent. The declaration is written over the INFINITE-ALLELES process, which battery_bulk15 simulates",
+  "span": 0.21195276135144084,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=500 mu=5e-04 t=200",
+   "lean": 0.42471948977103,
+   "truth": 0.4248312472661106,
+   "sem": 8.183287109144556e-05,
+   "sems_off": 1.3656797517918247,
+   "rel_err": 0.0002630632652371115
+  },
+  "cells": [
+   {
+    "design": "Ne=100 mu=1e-03 t=100",
+    "lean": 0.3346990211142852,
+    "truth": 0.3349105949475037,
+    "sem": 0.00015807826869052762,
+    "sems_off": 1.3384118827409235,
+    "rel_err": 0.0006317322784359159
+   },
+   {
+    "design": "Ne=500 mu=5e-04 t=200",
+    "lean": 0.42471948977103,
+    "truth": 0.4248312472661106,
+    "sem": 8.183287109144556e-05,
+    "sems_off": 1.3656797517918247,
+    "rel_err": 0.0002630632652371115
+   }
+  ]
+ },
+ {
+  "name": "hetMutationRecurrence [the infinite-alleles constants this design cannot test, competing]",
+  "file": "PopulationGeneticsFoundations.lean",
+  "source": "H_{t+1} = lam H_t + (1 - lam) Hstar, infinite-alleles constants",
+  "note": "positive control 'no mutation: heterozygosity decays by exactly 1 - 1/(2Ne) per generation' passed at 0.12 sems",
+  "regime": "BIALLELIC Wright-Fisher with two-way mutation; lam and Hstar are the constants of the biallelic recursion this simulator runs, and the affine form is run forward with no re-anchoring. The error bar is the spread of six replicate blocks at the final generation, replacing a hardcoded 0.4 percent. The declaration is written over the INFINITE-ALLELES process, which battery_bulk15 simulates",
   "span": 0.21627237199034854,
   "verdict": "FALSIFIED",
   "worst": {
    "design": "Ne=500 mu=5e-04 t=200",
    "lean": 0.5,
-   "truth": 0.4248367313564557,
-   "sem": 0.001699346925425823,
-   "sems_off": 44.230679162060945,
-   "rel_err": 0.17692271664824377
+   "truth": 0.4248312472661106,
+   "sem": 8.183287109144556e-05,
+   "sems_off": 918.5642851256041,
+   "rel_err": 0.17693790938782886
   },
   "cells": [
    {
     "design": "Ne=100 mu=1e-03 t=100",
     "lean": 0.39186381400482573,
-    "truth": 0.3352059754547662,
-    "sem": 0.0013408239018190648,
-    "sems_off": 42.255987884160724,
-    "rel_err": 0.1690239515366429
+    "truth": 0.3349105949475037,
+    "sem": 0.00015807826869052762,
+    "sems_off": 360.2849368803518,
+    "rel_err": 0.17005499353118195
    },
    {
     "design": "Ne=500 mu=5e-04 t=200",
     "lean": 0.5,
-    "truth": 0.4248367313564557,
-    "sem": 0.001699346925425823,
-    "sems_off": 44.230679162060945,
-    "rel_err": 0.17692271664824377
+    "truth": 0.4248312472661106,
+    "sem": 8.183287109144556e-05,
+    "sems_off": 918.5642851256041,
+    "rel_err": 0.17693790938782886
    }
   ]
  },
@@ -113,10 +191,10 @@
    {
     "design": "Ne=500 c=0.01 t=25",
     "lean": 0.23166427359711983,
-    "truth": 0.23107258243579273,
-    "sem": 0.004621451648715855,
-    "sems_off": 0.12803145121977136,
-    "rel_err": 0.002560629024395427
+    "truth": 0.23061281018332316,
+    "sem": 0.004612256203666463,
+    "sems_off": 0.22797159727614796,
+    "rel_err": 0.0045594319455229595
    }
   ]
  },
@@ -124,42 +202,34 @@
   "name": "ldRecurrence",
   "file": "LDDecayTheory.lean",
   "source": "D_{t+1} = (1 - r) * D_t, iterated",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "gametic D from a simulated admixed population, decayed under random mating",
   "span": 0.7504024528038561,
-  "verdict": "MATCH",
+  "verdict": "SELF-TEST",
   "worst": {
    "design": "r=0.05 t=10",
    "lean": 0.05386759749387769,
    "truth": 0.05386759749387769,
-   "sem": 0.00016160279248163308,
-   "sems_off": 0.0,
-   "rel_err": 0.0
+   "sem": 0.00016160279248163308
   },
   "cells": [
    {
     "design": "r=0.05 t=10",
     "lean": 0.05386759749387769,
     "truth": 0.05386759749387769,
-    "sem": 0.00016160279248163308,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 0.00016160279248163308
    },
    {
     "design": "r=0.20 t=8",
     "lean": 0.015089891479409135,
     "truth": 0.015089891479409135,
-    "sem": 4.52696744382274e-05,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 4.52696744382274e-05
    },
    {
     "design": "r=0.01 t=40",
     "lean": 0.06045689009736497,
     "truth": 0.06045689009736497,
-    "sem": 0.00018137067029209492,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 0.00018137067029209492
    }
   ]
  },
@@ -167,10 +237,10 @@
   "name": "ldBreakageRate",
   "file": "DGP.lean",
   "source": "2 * r",
-  "note": "",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
   "regime": "survival of a PAIR of lineages, each recombining at r; a breakage rate of 2r predicts (1 - 2r)^t against the exact (1 - r)^(2t)",
   "span": 0.691598751354967,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (no control)",
   "worst": {
    "design": "r=0.05 t=15",
    "lean": 0.20589113209464907,
