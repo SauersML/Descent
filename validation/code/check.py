@@ -3044,6 +3044,19 @@ THEOREMISH = re.compile(
 INFLATED = re.compile(
     r"(?i)(_complete|_proved|_holds|_exists$|^explicit_|_established|_settled"
     r"|_construction$|_theorem$|_conjecture$)")
+# A name that QUALIFIES its inflated token is not claiming a closed result.  Two kinds of
+# qualifier, and all four F17 findings were one or the other.
+#
+#   A CONDITION.  `coverers_const_of_exists` matched `_exists$` and was reported for
+#   "claiming a closed result", when `_of_` is this corpus's own convention for saying
+#   exactly the opposite.  This is the vocabulary the `identifications` guard already uses.
+#
+#   A POINT.  `r2_momentsUnderDrift_at_complete` matched `_complete`, but `_at_complete`
+#   names where the statement is evaluated -- `F_ST = 1`, complete differentiation -- and
+#   its sibling is `r2_momentsUnderDrift_at_source`.  `_at_` introduces a location in
+#   parameter space, never a claim about a proof's status.
+QUALIFIED_NAME_TOKEN = re.compile(
+    r"(?:^|_)(?:of|assuming|given|under|conditional|when|if|requires|at)_", re.I)
 STANDARD_PREDICATES = {
     "IsSofic", "IsFinitelyPresented", "HasPropertyT", "IsAmenable", "IsCompact",
     "IsOpen", "IsClosed", "IsIntegral", "Measurable", "Continuous", "Integrable",
@@ -3305,12 +3318,13 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
                 break
 
         # F17 -- name inflation on a conditional statement.
-        if INFLATED.search(d.name) and (hyps or any(
+        if (INFLATED.search(d.name) and not QUALIFIED_NAME_TOKEN.search(d.name)
+                and (hyps or any(
                 b.kind == "instance" and
                 re.match(r"([A-Za-z_][\w.']*)", norm(b.type)) and
                 re.match(r"([A-Za-z_][\w.']*)", norm(b.type)).group(1).split(".")[-1]
                 not in STANDARD_CLASSES
-                for b in d.binders)):
+                for b in d.binders))):
             add("F17", f"name claims a closed result but the signature carries "
                        f"{len(hyps)} premise(s)")
 
