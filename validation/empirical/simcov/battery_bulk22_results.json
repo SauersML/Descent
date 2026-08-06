@@ -2,6 +2,57 @@
  {
   "name": "taggedEffect",
   "file": "AncestrySpecificArchitecture.lean",
+  "source": "causalEffect * tagR",
+  "note": "",
+  "regime": "one causal variant and one tag at correlation r, both standardized, 2e6 individuals; the observable is the tag's realised marginal OLS slope. r is swept so r and r^2 separate by up to threefold",
+  "span": 0.8285714285714285,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "beta_c=0.3 r=0.9 (r2=0.81)",
+   "lean": 0.27,
+   "truth": 0.26958637129939395,
+   "sem": 0.0006809280109232066,
+   "sems_off": 0.6074485025888007,
+   "rel_err": 0.0015343086470298963
+  },
+  "cells": [
+   {
+    "design": "beta_c=0.3 r=0.9 (r2=0.81)",
+    "lean": 0.27,
+    "truth": 0.26958637129939395,
+    "sem": 0.0006809280109232066,
+    "sems_off": 0.6074485025888007,
+    "rel_err": 0.0015343086470298963
+   },
+   {
+    "design": "beta_c=0.3 r=0.5 (r2=0.25)",
+    "lean": 0.15,
+    "truth": 0.15011924274561816,
+    "sem": 0.0006990947751680679,
+    "sems_off": 0.1705673534600556,
+    "rel_err": 0.0007943201913177152
+   },
+   {
+    "design": "beta_c=0.5 r=0.7 (r2=0.49)",
+    "lean": 0.35,
+    "truth": 0.35029322956610404,
+    "sem": 0.0006623055573299903,
+    "sems_off": 0.4427406094645804,
+    "rel_err": 0.0008370974410989093
+   },
+   {
+    "design": "beta_c=0.2 r=0.3 (r2=0.09)",
+    "lean": 0.06,
+    "truth": 0.060220476905575256,
+    "sem": 0.0007058244531953671,
+    "sems_off": 0.31236790476318543,
+    "rel_err": 0.003661161732760139
+   }
+  ]
+ },
+ {
+  "name": "taggedEffect [the superseded causalEffect * tagR2, competing]",
+  "file": "AncestrySpecificArchitecture.lean",
   "source": "causalEffect * tagR2",
   "note": "positive control 'beta_c=0.3 r=0.9 (r2=0.81) [causal slope = beta_c]' passed at 0.02 sems",
   "regime": "one causal variant and one tag at correlation r, both standardized, 2e6 individuals; the observable is the tag's realised marginal OLS slope. r is swept so r and r^2 separate by up to threefold",
@@ -10,94 +61,43 @@
   "worst": {
    "design": "beta_c=0.5 r=0.7 (r2=0.49)",
    "lean": 0.24499999999999997,
-   "truth": 0.35029322956610387,
+   "truth": 0.35029322956610404,
    "sem": 0.0006623055573299903,
-   "sems_off": 158.97983702655554,
-   "rel_err": 0.3005859682087689
+   "sems_off": 158.9798370265558,
+   "rel_err": 0.30058596820876926
   },
   "cells": [
    {
     "design": "beta_c=0.3 r=0.9 (r2=0.81)",
     "lean": 0.243,
-    "truth": 0.2695863712993941,
+    "truth": 0.26958637129939395,
     "sem": 0.0006809280109232066,
-    "sems_off": 39.044320211395245,
-    "rel_err": 0.09861912221767373
+    "sems_off": 39.044320211395004,
+    "rel_err": 0.09861912221767317
    },
    {
     "design": "beta_c=0.3 r=0.5 (r2=0.25)",
     "lean": 0.075,
-    "truth": 0.15011924274561814,
+    "truth": 0.15011924274561816,
     "sem": 0.0006990947751680679,
-    "sems_off": 107.45215872563041,
-    "rel_err": 0.5003971600956587
+    "sems_off": 107.45215872563045,
+    "rel_err": 0.5003971600956588
    },
    {
     "design": "beta_c=0.5 r=0.7 (r2=0.49)",
     "lean": 0.24499999999999997,
-    "truth": 0.35029322956610387,
+    "truth": 0.35029322956610404,
     "sem": 0.0006623055573299903,
-    "sems_off": 158.97983702655554,
-    "rel_err": 0.3005859682087689
+    "sems_off": 158.9798370265558,
+    "rel_err": 0.30058596820876926
    },
    {
     "design": "beta_c=0.2 r=0.3 (r2=0.09)",
     "lean": 0.018,
-    "truth": 0.06022047690557524,
+    "truth": 0.060220476905575256,
     "sem": 0.0007058244531953671,
-    "sems_off": 59.81724877118833,
-    "rel_err": 0.701098348519828
-   }
-  ]
- },
- {
-  "name": "taggedEffect [causalEffect * r, competing]",
-  "file": "AncestrySpecificArchitecture.lean",
-  "source": "causalEffect * r",
-  "note": "",
-  "regime": "one causal variant and one tag at correlation r, both standardized, 2e6 individuals; the observable is the tag's realised marginal OLS slope. r is swept so r and r^2 separate by up to threefold",
-  "span": 0.8285714285714285,
-  "verdict": "MATCH",
-  "worst": {
-   "design": "beta_c=0.3 r=0.9 (r2=0.81)",
-   "lean": 0.27,
-   "truth": 0.2695863712993941,
-   "sem": 0.0006809280109232066,
-   "sems_off": 0.6074485025885561,
-   "rel_err": 0.0015343086470292774
-  },
-  "cells": [
-   {
-    "design": "beta_c=0.3 r=0.9 (r2=0.81)",
-    "lean": 0.27,
-    "truth": 0.2695863712993941,
-    "sem": 0.0006809280109232066,
-    "sems_off": 0.6074485025885561,
-    "rel_err": 0.0015343086470292774
-   },
-   {
-    "design": "beta_c=0.3 r=0.5 (r2=0.25)",
-    "lean": 0.15,
-    "truth": 0.15011924274561814,
-    "sem": 0.0006990947751680679,
-    "sems_off": 0.1705673534600159,
-    "rel_err": 0.0007943201913175304
-   },
-   {
-    "design": "beta_c=0.5 r=0.7 (r2=0.49)",
-    "lean": 0.35,
-    "truth": 0.35029322956610387,
-    "sem": 0.0006623055573299903,
-    "sems_off": 0.4427406094643289,
-    "rel_err": 0.0008370974410984342
-   },
-   {
-    "design": "beta_c=0.2 r=0.3 (r2=0.09)",
-    "lean": 0.06,
-    "truth": 0.06022047690557524,
-    "sem": 0.0007058244531953671,
-    "sems_off": 0.3123679047631658,
-    "rel_err": 0.0036611617327599096
+    "sems_off": 59.81724877118835,
+    "rel_err": 0.7010983485198281
    }
   ]
  },
@@ -105,34 +105,34 @@
   "name": "prevalenceScaledR2 [read as explained VARIANCE]",
   "file": "AncestryCalibration.lean",
   "source": "h2 * (prevalence * (1 - prevalence))",
-  "note": "positive control 'h2=0.5 K=0.10 [realised prevalence = K]' passed at 0.93 sems",
+  "note": "positive control 'h2=0.5 K=0.10 [realised prevalence = K]' passed at 0.93 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "liability-threshold model, 3e6 individuals, liability = genetic value + noise with the genetic value at heritability h2 and the threshold set to give prevalence K; the observables are the variance of the binary outcome explained by the genetic value and the corresponding R^2. K is swept fiftyfold, over which K(1-K) and phi(t)^2 move in opposite directions",
   "span": 0.9604,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "h2=0.5 K=0.01",
    "lean": 0.00495,
-   "truth": 0.0003530374675455051,
-   "sem": 8.647616555708638e-07,
+   "truth": 0.00035303746754550513,
+   "sem": 8.647616555708639e-07,
    "sems_off": 5315.872301738282,
-   "rel_err": 13.021174677053125
+   "rel_err": 13.021174677053123
   },
   "cells": [
    {
     "design": "h2=0.5 K=0.01",
     "lean": 0.00495,
-    "truth": 0.0003530374675455051,
-    "sem": 8.647616555708638e-07,
+    "truth": 0.00035303746754550513,
+    "sem": 8.647616555708639e-07,
     "sems_off": 5315.872301738282,
-    "rel_err": 13.021174677053125
+    "rel_err": 13.021174677053123
    },
    {
     "design": "h2=0.5 K=0.10",
     "lean": 0.045000000000000005,
-    "truth": 0.015373037495907448,
-    "sem": 3.765609766164649e-05,
-    "sems_off": 786.7772908999073,
-    "rel_err": 1.9272029039140597
+    "truth": 0.015373037495907451,
+    "sem": 3.76560976616465e-05,
+    "sems_off": 786.7772908999069,
+    "rel_err": 1.9272029039140588
    },
    {
     "design": "h2=0.5 K=0.50",
@@ -145,10 +145,10 @@
    {
     "design": "h2=0.2 K=0.05",
     "lean": 0.009500000000000001,
-    "truth": 0.0021359767815063166,
-    "sem": 5.232053217122749e-06,
-    "sems_off": 1407.482476361998,
-    "rel_err": 3.4476138889957815
+    "truth": 0.0021359767815063184,
+    "sem": 5.232053217122752e-06,
+    "sems_off": 1407.4824763619968,
+    "rel_err": 3.447613888995778
    }
   ]
  },
@@ -156,32 +156,32 @@
   "name": "prevalenceScaledR2 [read as an R^2]",
   "file": "AncestryCalibration.lean",
   "source": "h2 * (prevalence * (1 - prevalence))",
-  "note": "positive control 'h2=0.5 K=0.10 [realised prevalence = K]' passed at 0.93 sems",
+  "note": "positive control 'h2=0.5 K=0.10 [realised prevalence = K]' passed at 0.93 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "liability-threshold model, 3e6 individuals, liability = genetic value + noise with the genetic value at heritability h2 and the threshold set to give prevalence K; the observables are the variance of the binary outcome explained by the genetic value and the corresponding R^2. K is swept fiftyfold, over which K(1-K) and phi(t)^2 move in opposite directions",
   "span": 0.9604,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "h2=0.5 K=0.01 [as R^2]",
    "lean": 0.00495,
-   "truth": 0.03577603010306884,
-   "sem": 8.763301877496932e-05,
-   "sems_off": 351.7627320613734,
+   "truth": 0.035776030103068845,
+   "sem": 8.763301877496935e-05,
+   "sems_off": 351.76273206137336,
    "rel_err": 0.8616392040777215
   },
   "cells": [
    {
     "design": "h2=0.5 K=0.01 [as R^2]",
     "lean": 0.00495,
-    "truth": 0.03577603010306884,
-    "sem": 8.763301877496932e-05,
-    "sems_off": 351.7627320613734,
+    "truth": 0.035776030103068845,
+    "sem": 8.763301877496935e-05,
+    "sems_off": 351.76273206137336,
     "rel_err": 0.8616392040777215
    },
    {
     "design": "h2=0.5 K=0.10 [as R^2]",
     "lean": 0.045000000000000005,
-    "truth": 0.17105530514053727,
-    "sem": 0.00041899821539039266,
+    "truth": 0.1710553051405373,
+    "sem": 0.00041899821539039277,
     "sems_off": 300.8492650096085,
     "rel_err": 0.736927188764894
    },
@@ -196,10 +196,10 @@
    {
     "design": "h2=0.2 K=0.05 [as R^2]",
     "lean": 0.009500000000000001,
-    "truth": 0.044944073980755686,
-    "sem": 0.00011009004821474938,
-    "sems_off": 321.95529528351176,
-    "rel_err": 0.7886261934316915
+    "truth": 0.04494407398075572,
+    "sem": 0.00011009004821474947,
+    "sems_off": 321.9552952835118,
+    "rel_err": 0.7886261934316916
    }
   ]
  },
@@ -214,27 +214,27 @@
   "worst": {
    "design": "h2=0.5 K=0.01",
    "lean": 0.00035516834201667567,
-   "truth": 0.0003530374675455051,
-   "sem": 8.647616555708638e-07,
-   "sems_off": 2.4641176646111944,
-   "rel_err": 0.00603583094447596
+   "truth": 0.00035303746754550513,
+   "sem": 8.647616555708639e-07,
+   "sems_off": 2.4641176646111314,
+   "rel_err": 0.0060358309444758056
   },
   "cells": [
    {
     "design": "h2=0.5 K=0.01",
     "lean": 0.00035516834201667567,
-    "truth": 0.0003530374675455051,
-    "sem": 8.647616555708638e-07,
-    "sems_off": 2.4641176646111944,
-    "rel_err": 0.00603583094447596
+    "truth": 0.00035303746754550513,
+    "sem": 8.647616555708639e-07,
+    "sems_off": 2.4641176646111314,
+    "rel_err": 0.0060358309444758056
    },
    {
     "design": "h2=0.5 K=0.10",
     "lean": 0.015399832255542666,
-    "truth": 0.015373037495907448,
-    "sem": 3.765609766164649e-05,
-    "sems_off": 0.711564960235078,
-    "rel_err": 0.0017429710714197437
+    "truth": 0.015373037495907451,
+    "sem": 3.76560976616465e-05,
+    "sems_off": 0.7115649602349857,
+    "rel_err": 0.0017429710714195177
    },
    {
     "design": "h2=0.5 K=0.50",
@@ -247,10 +247,10 @@
    {
     "design": "h2=0.2 K=0.05",
     "lean": 0.002127392063127583,
-    "truth": 0.0021359767815063166,
-    "sem": 5.232053217122749e-06,
-    "sems_off": 1.6407933984001968,
-    "rel_err": 0.004019106599407635
+    "truth": 0.0021359767815063184,
+    "sem": 5.232053217122752e-06,
+    "sems_off": 1.6407933984005274,
+    "rel_err": 0.0040191065994084445
    }
   ]
  },
@@ -258,17 +258,17 @@
   "name": "ancestryRecalibratedR2",
   "file": "AncestryCalibration.lean",
   "source": "r2Source * rhoSq",
-  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems",
+  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; target effects are rho-correlated with source effects and the target genotype scale is alpha. Every quantity compared against is a REALISED sample statistic -- squared correlation, OLS slope, score standard deviation -- never a parameter fed in",
   "span": 0.7223611833361101,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "rho=0.7 alpha=0.6",
-   "lean": 0.24502318792554684,
+   "lean": 0.24502318792554695,
    "truth": 0.0979177032404616,
    "sem": 0.00041590993619989057,
-   "sems_off": 353.6955284818798,
-   "rel_err": 1.5023379819666585
+   "sems_off": 353.6955284818801,
+   "rel_err": 1.5023379819666596
   },
   "cells": [
    {
@@ -290,10 +290,10 @@
    {
     "design": "rho=0.5 alpha=1.0",
     "lean": 0.13238227272737882,
-    "truth": 0.1167235058098356,
-    "sem": 0.0004905933506066275,
-    "sems_off": 31.918017026078452,
-    "rel_err": 0.13415264396748217
+    "truth": 0.11672350580983569,
+    "sem": 0.0004905933506066278,
+    "sems_off": 31.918017026078264,
+    "rel_err": 0.13415264396748136
    },
    {
     "design": "rho=0.9 alpha=1.6",
@@ -305,11 +305,11 @@
    },
    {
     "design": "rho=0.7 alpha=0.6",
-    "lean": 0.24502318792554684,
+    "lean": 0.24502318792554695,
     "truth": 0.0979177032404616,
     "sem": 0.00041590993619989057,
-    "sems_off": 353.6955284818798,
-    "rel_err": 1.5023379819666585
+    "sems_off": 353.6955284818801,
+    "rel_err": 1.5023379819666596
    }
   ]
  },
@@ -317,17 +317,17 @@
   "name": "effectTurnoverR2Loss",
   "file": "AncestryCalibration.lean",
   "source": "r2Source * (1 - rhoSq)",
-  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems",
+  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; target effects are rho-correlated with source effects and the target genotype scale is alpha. Every quantity compared against is a REALISED sample statistic -- squared correlation, OLS slope, score standard deviation -- never a parameter fed in",
   "span": 0.7487110519428506,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "rho=0.7 alpha=0.6",
-   "lean": 0.2550241343714876,
-   "truth": 0.4021296190565728,
+   "lean": 0.2550241343714877,
+   "truth": 0.402129619056573,
    "sem": 0.00041590993619989057,
-   "sems_off": 353.6955284818798,
-   "rel_err": 0.3658160894246141
+   "sems_off": 353.6955284818801,
+   "rel_err": 0.36581608942461413
   },
   "cells": [
    {
@@ -349,10 +349,10 @@
    {
     "design": "rho=0.5 alpha=1.0",
     "lean": 0.3971468181821365,
-    "truth": 0.4128055850996797,
-    "sem": 0.0004905933506066275,
-    "sems_off": 31.918017026078424,
-    "rel_err": 0.03793254617367179
+    "truth": 0.4128055850996796,
+    "sem": 0.0004905933506066278,
+    "sems_off": 31.91801702607818,
+    "rel_err": 0.03793254617367153
    },
    {
     "design": "rho=0.9 alpha=1.6",
@@ -364,11 +364,11 @@
    },
    {
     "design": "rho=0.7 alpha=0.6",
-    "lean": 0.2550241343714876,
-    "truth": 0.4021296190565728,
+    "lean": 0.2550241343714877,
+    "truth": 0.402129619056573,
     "sem": 0.00041590993619989057,
-    "sems_off": 353.6955284818798,
-    "rel_err": 0.3658160894246141
+    "sems_off": 353.6955284818801,
+    "rel_err": 0.36581608942461413
    }
   ]
  },
@@ -376,17 +376,17 @@
   "name": "ancestryRecalibratedSlope",
   "file": "AncestryCalibration.lean",
   "source": "rho * (bSource * alpha) / alpha ^ 2  =  rho * bSource / alpha",
-  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems",
+  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; target effects are rho-correlated with source effects and the target genotype scale is alpha. Every quantity compared against is a REALISED sample statistic -- squared correlation, OLS slope, score standard deviation -- never a parameter fed in",
   "span": 0.575233687900809,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "rho=0.7 alpha=0.6",
-   "lean": 1.1700513353649573,
+   "lean": 1.1700513353649569,
    "truth": 0.7381440913128351,
    "sem": 0.002334217569943867,
-   "sems_off": 185.0329847626452,
-   "rel_err": 0.5851259247824477
+   "sems_off": 185.03298476264501,
+   "rel_err": 0.5851259247824472
   },
   "cells": [
    {
@@ -407,11 +407,11 @@
    },
    {
     "design": "rho=0.5 alpha=1.0",
-    "lean": 0.4969983906897066,
-    "truth": 0.4690088681297829,
-    "sem": 0.0014831372661076698,
-    "sems_off": 18.871835533725832,
-    "rel_err": 0.05967802415236746
+    "lean": 0.4969983906897065,
+    "truth": 0.4690088681297828,
+    "sem": 0.0014831372661076696,
+    "sems_off": 18.871835533725836,
+    "rel_err": 0.05967802415236747
    },
    {
     "design": "rho=0.9 alpha=1.6",
@@ -423,11 +423,11 @@
    },
    {
     "design": "rho=0.7 alpha=0.6",
-    "lean": 1.1700513353649573,
+    "lean": 1.1700513353649569,
     "truth": 0.7381440913128351,
     "sem": 0.002334217569943867,
-    "sems_off": 185.0329847626452,
-    "rel_err": 0.5851259247824477
+    "sems_off": 185.03298476264501,
+    "rel_err": 0.5851259247824472
    }
   ]
  },
@@ -435,10 +435,10 @@
   "name": "ancestryRecalibratedSlope [rho*b*alpha reading, competing]",
   "file": "AncestryCalibration.lean",
   "source": "rho * bSource * alpha",
-  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems",
+  "note": "positive control 'rho=0.9 alpha=1.0 [source-population slope = 1]' passed at 0.32 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
   "regime": "400 causal variants, standardized genotypes, 200000 individuals per population; target effects are rho-correlated with source effects and the target genotype scale is alpha. Every quantity compared against is a REALISED sample statistic -- squared correlation, OLS slope, score standard deviation -- never a parameter fed in",
-  "span": 0.7096772027746568,
-  "verdict": "FALSIFIED",
+  "span": 0.7096772027746571,
+  "verdict": "LEAD (undeclared input provenance)",
   "worst": {
    "design": "rho=0.9 alpha=1.6",
    "lean": 1.440535109621797,
@@ -450,11 +450,11 @@
   "cells": [
    {
     "design": "rho=0.9 alpha=1.0",
-    "lean": 0.9013323592127973,
+    "lean": 0.9013323592127969,
     "truth": 0.909125731184508,
     "sem": 0.002874908990009013,
-    "sems_off": 2.7108238900064356,
-    "rel_err": 0.00857238080981016
+    "sems_off": 2.71082389000659,
+    "rel_err": 0.008572380809810647
    },
    {
     "design": "rho=0.7 alpha=1.0",
@@ -466,11 +466,11 @@
    },
    {
     "design": "rho=0.5 alpha=1.0",
-    "lean": 0.4966152573816937,
-    "truth": 0.4690088681297829,
-    "sem": 0.0014831372661076698,
-    "sems_off": 18.613509270359554,
-    "rel_err": 0.05886112422989765
+    "lean": 0.49661525738169354,
+    "truth": 0.4690088681297828,
+    "sem": 0.0014831372661076696,
+    "sems_off": 18.61350927035948,
+    "rel_err": 0.05886112422989742
    },
    {
     "design": "rho=0.9 alpha=1.6",
@@ -482,11 +482,11 @@
    },
    {
     "design": "rho=0.7 alpha=0.6",
-    "lean": 0.4182201825267164,
+    "lean": 0.4182201825267163,
     "truth": 0.7381440913128351,
     "sem": 0.002334217569943867,
-    "sems_off": 137.05830720561846,
-    "rel_err": 0.4334166086964324
+    "sems_off": 137.05830720561852,
+    "rel_err": 0.43341660869643256
    }
   ]
  }

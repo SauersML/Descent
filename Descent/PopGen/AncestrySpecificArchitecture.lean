@@ -448,18 +448,23 @@ causal variant.
     discards it: two tags in equal-magnitude but opposite-sign LD carry
     apparent effects of opposite sign.
 
-    LEDGER, read correctly. `simcov/ledger.json` carries a FALSIFIED record
-    against the NAME `taggedEffect` at 158.98 sems (`bulk22`). It is not a
-    falsification of the body below. Its `source` field reads
-    `causalEffect * tagR2`, which is the squared form this definition was
-    corrected AWAY from, and the same battery's other row -- `causalEffect * tagR`,
-    logged with role `competitor` because it was the challenger at the time --
-    is the MATCH at 0.61 sems and is what is written here now. The record is
-    stale with respect to the body, and marked so: its freshness field is
-    `UNVERIFIED (no recorded source hash)`, so nothing checked it against the
-    Lean when the correction landed. Cited here because a reader who greps the
-    ledger for this name and not for its `source` reaches the opposite
-    conclusion, and the ledger cannot say this about itself. -/
+    Empirical status: **VALIDATED** (`simcov/battery_bulk22.py`, `group_b`).
+    One causal variant and one tag at imposed correlation `r`, both
+    standardized, two million individuals; the observable is the tag's realised
+    marginal OLS slope, and `r` is swept so that `r` and `r²` separate by up to
+    threefold. This body MATCHES, and the squared form it was corrected away
+    from is FALSIFIED on the same cells at 159 sems. The control is the causal
+    variant's own slope recovering `β_c`.
+
+    THIS PARAGRAPH USED TO SAY THE LEDGER COULD NOT SAY THIS ABOUT ITSELF, and
+    that was true of the ledger and not of the harness. `bulk22` recorded
+    `causalEffect * tagR2` as the corpus row and `causalEffect * tagR` as the
+    challenger; the corpus took the challenger and the labels stayed, so the
+    ledger carried a falsification against this NAME whose `source` field was
+    the superseded formula. A reader who greps for the name and not for the
+    source reached the opposite conclusion. The roles in that battery are now
+    the right way round, so the ledger states the verdict directly and this
+    docstring no longer has to translate it. -/
 noncomputable def taggedEffect (causalEffect tagR : ℝ) : ℝ :=
   Descent.Core.product causalEffect tagR
 

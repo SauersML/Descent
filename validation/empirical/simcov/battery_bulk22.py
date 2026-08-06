@@ -134,11 +134,23 @@ def group_b():
     reg = ("one causal variant and one tag at correlation r, both standardized, "
            "2e6 individuals; the observable is the tag's realised marginal OLS "
            "slope. r is swept so r and r^2 separate by up to threefold")
+    # THE CHALLENGER IS THE BODY NOW. `AncestrySpecificArchitecture.lean` reads
+    # `causalEffect * tagR`, and this battery is why: it recorded `* tagR2` as
+    # the corpus row, `* r` as the challenger, and the corpus took the
+    # challenger. The labels stayed, so the ledger has carried a FALSIFIED
+    # corpus row for a formula the corpus corrected away from -- which that
+    # declaration's docstring has to spend a paragraph explaining, ending "the
+    # ledger cannot say this about itself". It can, once the roles are right.
+    # realised_inputs=True: `r` is the correlation the design IMPOSED between
+    # the two standardized variants and `beta_c` the effect it assigned, both
+    # exact rather than estimated off these individuals, so there is no
+    # nominal-versus-realised gap the disagreement could be.
     record("taggedEffect", "AncestrySpecificArchitecture.lean",
-           "causalEffect * tagR2", cells, regime=reg, control=control)
-    record("taggedEffect [causalEffect * r, competing]",
-           "AncestrySpecificArchitecture.lean", "causalEffect * r", cells_alt,
-           regime=reg, control=control)
+           "causalEffect * tagR", cells_alt, regime=reg, control=control,
+           realised_inputs=True)
+    record("taggedEffect [the superseded causalEffect * tagR2, competing]",
+           "AncestrySpecificArchitecture.lean", "causalEffect * tagR2", cells,
+           regime=reg, control=control, realised_inputs=True)
 
 
 def group_c():
