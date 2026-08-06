@@ -1872,14 +1872,14 @@ so every consumer that needs the ordering derives it inline -- `Core.Moments` do
 times, with the same four lines. Once, here. -/
 
 /-- **A longer scaled coalescence time is a larger differentiation.** -/
-theorem fstFromTau_lt_fstFromTau (τ₁ τ₂ : ℝ) (h0 : 0 ≤ τ₁) (h : τ₁ < τ₂) :
+theorem fstFromTau_lt_fstFromTau (τ₁ τ₂ : Tau) (h0 : 0 ≤ τ₁.value) (h : τ₁.value < τ₂.value) :
     fstFromTau τ₁ < fstFromTau τ₂ := by
   unfold fstFromTau saturation
   rw [div_lt_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
 /-- **A split law never reaches complete differentiation in finite scaled time.** -/
-theorem fstFromTau_lt_one (tau : ℝ) (h : 0 ≤ tau) : fstFromTau tau < 1 := by
+theorem fstFromTau_lt_one (τ : Tau) (h : 0 ≤ τ.value) : fstFromTau τ < 1 := by
   unfold fstFromTau saturation
   rw [div_lt_one (by linarith)]
   linarith
@@ -1900,8 +1900,8 @@ namespace OperatingPointLaw
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedPPVFromTau (L : OperatingPointLaw)
-    (V_A V_E tau prevalence : ℝ) : ℝ :=
-  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).positivePredictiveValue prevalence
+    (V_A V_E : ℝ) (τ : Tau) (prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E τ)).positivePredictiveValue prevalence
 
 /-- **The negative predictive value after a clean split.**
 
@@ -1910,8 +1910,8 @@ noncomputable def deployedPPVFromTau (L : OperatingPointLaw)
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedNPVFromTau (L : OperatingPointLaw)
-    (V_A V_E tau prevalence : ℝ) : ℝ :=
-  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).negativePredictiveValue prevalence
+    (V_A V_E : ℝ) (τ : Tau) (prevalence : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E τ)).negativePredictiveValue prevalence
 
 /-- **The net benefit after a clean split.**
 
@@ -1920,28 +1920,29 @@ noncomputable def deployedNPVFromTau (L : OperatingPointLaw)
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def deployedNetBenefitFromTau (L : OperatingPointLaw)
-    (V_A V_E tau prevalence t : ℝ) : ℝ :=
-  (L.point (ScoreMoments.deployedR2FromTau V_A V_E tau)).netBenefit prevalence t
+    (V_A V_E : ℝ) (τ : Tau) (prevalence t : ℝ) : ℝ :=
+  (L.point (ScoreMoments.deployedR2FromTau V_A V_E τ)).netBenefit prevalence t
 
 /-- **The split-route `R²` is non-negative.** -/
-theorem deployedR2FromTau_nonneg (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h : 0 ≤ tau) : 0 ≤ ScoreMoments.deployedR2FromTau V_A V_E tau := by
+theorem deployedR2FromTau_nonneg (V_A V_E : ℝ) (τ : Tau) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h : 0 ≤ τ.value) : 0 ≤ ScoreMoments.deployedR2FromTau V_A V_E τ := by
   unfold ScoreMoments.deployedR2FromTau
-  exact r2_momentsUnderDrift_nonneg V_A V_E (fstFromTau tau) hV hE (fstFromTau_lt_one tau h)
+  exact r2_momentsUnderDrift_nonneg V_A V_E (fstFromTau τ) hV hE (fstFromTau_lt_one τ h)
 
 /-- **And at most one.** -/
-theorem deployedR2FromTau_le_one (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h : 0 ≤ tau) : ScoreMoments.deployedR2FromTau V_A V_E tau ≤ 1 := by
+theorem deployedR2FromTau_le_one (V_A V_E : ℝ) (τ : Tau) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h : 0 ≤ τ.value) : ScoreMoments.deployedR2FromTau V_A V_E τ ≤ 1 := by
   unfold ScoreMoments.deployedR2FromTau
   exact le_of_lt
-    (r2_momentsUnderDrift_lt_one V_A V_E (fstFromTau tau) hV hE (fstFromTau_lt_one tau h))
+    (r2_momentsUnderDrift_lt_one V_A V_E (fstFromTau τ) hV hE (fstFromTau_lt_one τ h))
 
 /-- **A longer split, a lower predictive value.** The divergence-time route into the
 coordinate a patient is told, so a result stated in divergence time and one stated in
 migration rate reach the same place. -/
-theorem deployedPPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ prevalence : ℝ)
+theorem deployedPPVFromTau_anti (L : OperatingPointLaw) (V_A V_E : ℝ) (t₁ t₂ : Tau)
+    (prevalence : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     L.deployedPPVFromTau V_A V_E t₂ prevalence < L.deployedPPVFromTau V_A V_E t₁ prevalence :=
   L.positivePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
     (deployedR2FromTau_nonneg V_A V_E t₂ hV hE (by linarith))
@@ -1949,9 +1950,10 @@ theorem deployedPPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ preva
     (deployedR2FromTau_le_one V_A V_E t₁ hV hE h0)
 
 /-- **A longer split, a lower negative predictive value.** -/
-theorem deployedNPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ prevalence : ℝ)
+theorem deployedNPVFromTau_anti (L : OperatingPointLaw) (V_A V_E : ℝ) (t₁ t₂ : Tau)
+    (prevalence : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     L.deployedNPVFromTau V_A V_E t₂ prevalence < L.deployedNPVFromTau V_A V_E t₁ prevalence :=
   L.negativePredictiveValue_lt_of_r2_lt prevalence _ _ hπ hπ1
     (deployedR2FromTau_nonneg V_A V_E t₂ hV hE (by linarith))
@@ -1961,9 +1963,9 @@ theorem deployedNPVFromTau_anti (L : OperatingPointLaw) (V_A V_E t₁ t₂ preva
 /-- **A longer split, a lower net benefit.** The decision curve of a score deployed
 across a divergence, as a function of the divergence. -/
 theorem deployedNetBenefitFromTau_anti (L : OperatingPointLaw)
-    (V_A V_E t₁ t₂ prevalence t : ℝ)
+    (V_A V_E : ℝ) (t₁ t₂ : Tau) (prevalence t : ℝ)
     (hπ : 0 < prevalence) (hπ1 : prevalence < 1) (ht : 0 < t) (ht1 : t < 1)
-    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     L.deployedNetBenefitFromTau V_A V_E t₂ prevalence t
       < L.deployedNetBenefitFromTau V_A V_E t₁ prevalence t :=
   L.netBenefit_lt_of_r2_lt prevalence t _ _ hπ hπ1 ht ht1
@@ -1979,13 +1981,13 @@ clinical metric downstream, and it is the reason the rest of this file never has
 proved twice: a metric that read anything about WHERE the differentiation came from would
 fail here. -/
 theorem clinicalReport_route_agnostic (L : OperatingPointLaw) (p : PopGenParameters)
-    (V_E prevalence t tau : ℝ) (h : p.fstEquilibrium = fstFromTau tau) :
-    L.deployedPPV p V_E prevalence = L.deployedPPVFromTau p.V_A V_E tau prevalence ∧
-    L.deployedNPV p V_E prevalence = L.deployedNPVFromTau p.V_A V_E tau prevalence ∧
+    (V_E prevalence t : ℝ) (τ : Tau) (h : p.fstEquilibrium = fstFromTau τ) :
+    L.deployedPPV p V_E prevalence = L.deployedPPVFromTau p.V_A V_E τ prevalence ∧
+    L.deployedNPV p V_E prevalence = L.deployedNPVFromTau p.V_A V_E τ prevalence ∧
     L.deployedNetBenefit p V_E prevalence t
-      = L.deployedNetBenefitFromTau p.V_A V_E tau prevalence t := by
-  have hr2 : ScoreMoments.deployedR2 p V_E = ScoreMoments.deployedR2FromTau p.V_A V_E tau :=
-    ScoreMoments.deployedR2_eq_deployedR2FromTau p V_E tau h
+      = L.deployedNetBenefitFromTau p.V_A V_E τ prevalence t := by
+  have hr2 : ScoreMoments.deployedR2 p V_E = ScoreMoments.deployedR2FromTau p.V_A V_E τ :=
+    ScoreMoments.deployedR2_eq_deployedR2FromTau p V_E τ h
   refine ⟨?_, ?_, ?_⟩ <;>
     simp only [deployedPPV, deployedNPV, deployedNetBenefit, deployedPPVFromTau,
       deployedNPVFromTau, deployedNetBenefitFromTau, hr2]
@@ -2052,17 +2054,24 @@ warning.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
 noncomputable def fstAtGeneration (p : PopGenParameters) (t : ℕ) : ℝ :=
-  fstFromTau ((t : ℝ) / (2 * p.Ne))
+  fstFromTau (Tau.ofGenerations (t : ℝ) p.Ne)
 
 /-- **At the split nothing has differentiated.** -/
 @[simp] theorem fstAtGeneration_zero (p : PopGenParameters) : p.fstAtGeneration 0 = 0 := by
   unfold fstAtGeneration fstFromTau saturation
+  rw [Tau.value_ofGenerations]
   norm_num
 
-/-- **The scaled time is non-negative**, which every bound below rests on. -/
+/-- **The scaled time is non-negative**, which every bound below rests on.
+
+Stated on `Tau.ofGenerations`'s own value rather than on `t/(2 Nₑ)` written out, so that
+the `2` in it is `ploidy` and the same `ploidy` every other scaling in the corpus carries.
+It used to be written out here, which is how a corpus ends up with `t/(2 Nₑ)` in one file
+and `t/(4 Nₑ)` in another. -/
 theorem scaledTime_nonneg (p : PopGenParameters) (t : ℕ) :
-    (0:ℝ) ≤ (t : ℝ) / (2 * p.Ne) := by
+    (0:ℝ) ≤ (Tau.ofGenerations (t : ℝ) p.Ne).value := by
   have hNe := p.Ne_pos
+  rw [Tau.value_ofGenerations]
   exact div_nonneg (Nat.cast_nonneg t) (by linarith)
 
 /-- **Transient differentiation is non-negative.** -/
@@ -2088,8 +2097,10 @@ theorem fstAtGeneration_strictMono (p : PopGenParameters) (t₁ t₂ : ℕ) (h :
     p.fstAtGeneration t₁ < p.fstAtGeneration t₂ := by
   have hNe := p.Ne_pos
   have hcast : (t₁ : ℝ) < (t₂ : ℝ) := by exact_mod_cast h
-  have hτ : (t₁ : ℝ) / (2 * p.Ne) < (t₂ : ℝ) / (2 * p.Ne) := by
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+  have hτ : (Tau.ofGenerations (t₁ : ℝ) p.Ne).value
+      < (Tau.ofGenerations (t₂ : ℝ) p.Ne).value := by
+    rw [Tau.value_ofGenerations, Tau.value_ofGenerations,
+      div_lt_div_iff₀ (by linarith) (by linarith)]
     exact mul_lt_mul_of_pos_right hcast (by linarith)
   exact fstFromTau_lt_fstFromTau _ _ (p.scaledTime_nonneg t₁) hτ
 
@@ -2107,17 +2118,18 @@ Written through `Core.scaledFlow` at the record's own deme count, so the deme co
 differentiates to a higher level AND takes a different number of generations to get
 there. -/
 theorem fstEquilibrium_eq_fstFromTau_inv (p : PopGenParameters)
-    (h : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes) :
-    p.fstEquilibrium = fstFromTau (1 / scaledFlow p.Ne p.mig p.mu p.nDemes) := by
-  have hinv : (0:ℝ) < 1 / scaledFlow p.Ne p.mig p.mu p.nDemes := div_pos one_pos h
-  have h1 : (1:ℝ) + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
-    have hpos : (0:ℝ) < 1 + scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+    (h : 0 < scaledFlow p.bigM p.theta p.nDemes) :
+    p.fstEquilibrium = fstFromTau ⟨1 / scaledFlow p.bigM p.theta p.nDemes⟩ := by
+  have hinv : (0:ℝ) < 1 / scaledFlow p.bigM p.theta p.nDemes := div_pos one_pos h
+  have h1 : (1:ℝ) + scaledFlow p.bigM p.theta p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + scaledFlow p.bigM p.theta p.nDemes := by linarith
     exact hpos.ne'
-  have h2 : (1:ℝ) + 1 / scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
-    have hpos : (0:ℝ) < 1 + 1 / scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+  have h2 : (1:ℝ) + 1 / scaledFlow p.bigM p.theta p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + 1 / scaledFlow p.bigM p.theta p.nDemes := by linarith
     exact hpos.ne'
-  have hx : scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := h.ne'
+  have hx : scaledFlow p.bigM p.theta p.nDemes ≠ 0 := h.ne'
   unfold fstEquilibrium fstIslandEquilibrium fstFromFlow fstFromTau saturation
+  dsimp only
   rw [div_eq_div_iff h1 h2]
   field_simp
   ring
@@ -2130,17 +2142,18 @@ population is as differentiated as its own equilibrium says it will be" and get 
 answer. -/
 theorem fstAtGeneration_eq_fstEquilibrium_iff (p : PopGenParameters) (t : ℕ) :
     p.fstEquilibrium = p.fstAtGeneration t ↔
-      1 = ((t : ℝ) / (2 * p.Ne)) * scaledFlow p.Ne p.mig p.mu p.nDemes := by
+      1 = (Tau.ofGenerations (t : ℝ) p.Ne).value
+          * scaledFlow p.bigM p.theta p.nDemes := by
   have hflow := p.scaledFlow_nonneg
   have h0 := p.scaledTime_nonneg t
-  have hx : (1:ℝ) + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := by
-    have hpos : (0:ℝ) < 1 + scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+  have hx : (1:ℝ) + scaledFlow p.bigM p.theta p.nDemes ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + scaledFlow p.bigM p.theta p.nDemes := by linarith
     exact hpos.ne'
-  have ht : (1:ℝ) + ((t : ℝ) / (2 * p.Ne)) ≠ 0 := by
-    have hpos : (0:ℝ) < 1 + ((t : ℝ) / (2 * p.Ne)) := by linarith
+  have ht : (1:ℝ) + (Tau.ofGenerations (t : ℝ) p.Ne).value ≠ 0 := by
+    have hpos : (0:ℝ) < 1 + (Tau.ofGenerations (t : ℝ) p.Ne).value := by linarith
     exact hpos.ne'
   unfold fstAtGeneration
-  exact ScoreMoments.fstEquilibrium_eq_fstFromTau_iff p ((t : ℝ) / (2 * p.Ne)) hx ht
+  exact ScoreMoments.fstEquilibrium_eq_fstFromTau_iff p (Tau.ofGenerations (t : ℝ) p.Ne) hx ht
 
 /-- **The equilibration generation, named.** At `t = 2Nₑ/x` the isolated pair has reached
 exactly the differentiation the migration-mutation balance settles at. Before that
@@ -2156,20 +2169,21 @@ between them locate it without needing it to be hit. Stated this way rather than
 rounding, because a rounded generation is a different number and the theorem would be
 about the rounding. -/
 theorem fstAtGeneration_eq_fstEquilibrium_of_equilibrationTime (p : PopGenParameters)
-    (t : ℕ) (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
-    (h : (t : ℝ) = 2 * p.Ne / scaledFlow p.Ne p.mig p.mu p.nDemes) :
+    (t : ℕ) (hflow : 0 < scaledFlow p.bigM p.theta p.nDemes)
+    (h : (t : ℝ) = 2 * p.Ne / scaledFlow p.bigM p.theta p.nDemes) :
     p.fstEquilibrium = p.fstAtGeneration t := by
   have hNe := p.Ne_pos
-  have hx : scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0 := hflow.ne'
+  have hx : scaledFlow p.bigM p.theta p.nDemes ≠ 0 := hflow.ne'
   have h2 : (2:ℝ) * p.Ne ≠ 0 := by positivity
-  rw [p.fstAtGeneration_eq_fstEquilibrium_iff t, h]
+  rw [p.fstAtGeneration_eq_fstEquilibrium_iff t, Tau.value_ofGenerations, h]
   field_simp
 
 /-- **Before the equilibration generation the transient is strictly below the level.**
 The direction a reader expects, and it holds -- but only on this side. -/
 theorem fstAtGeneration_lt_fstEquilibrium_of_early (p : PopGenParameters) (t : ℕ)
-    (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
-    (hearly : (t : ℝ) / (2 * p.Ne) < 1 / scaledFlow p.Ne p.mig p.mu p.nDemes) :
+    (hflow : 0 < scaledFlow p.bigM p.theta p.nDemes)
+    (hearly : (Tau.ofGenerations (t : ℝ) p.Ne).value
+      < 1 / scaledFlow p.bigM p.theta p.nDemes) :
     p.fstAtGeneration t < p.fstEquilibrium := by
   rw [p.fstEquilibrium_eq_fstFromTau_inv hflow]
   exact fstFromTau_lt_fstFromTau _ _ (p.scaledTime_nonneg t) hearly
@@ -2187,10 +2201,11 @@ again.
 The corpus's coordinate for the migration case is `fstTransientAt`, which this layer
 cannot reach; see the section header. -/
 theorem fstEquilibrium_lt_fstAtGeneration_of_late (p : PopGenParameters) (t : ℕ)
-    (hflow : 0 < scaledFlow p.Ne p.mig p.mu p.nDemes)
-    (hlate : 1 / scaledFlow p.Ne p.mig p.mu p.nDemes < (t : ℝ) / (2 * p.Ne)) :
+    (hflow : 0 < scaledFlow p.bigM p.theta p.nDemes)
+    (hlate : 1 / scaledFlow p.bigM p.theta p.nDemes
+      < (Tau.ofGenerations (t : ℝ) p.Ne).value) :
     p.fstEquilibrium < p.fstAtGeneration t := by
-  have hinv : (0:ℝ) ≤ 1 / scaledFlow p.Ne p.mig p.mu p.nDemes :=
+  have hinv : (0:ℝ) ≤ 1 / scaledFlow p.bigM p.theta p.nDemes :=
     le_of_lt (div_pos one_pos hflow)
   rw [p.fstEquilibrium_eq_fstFromTau_inv hflow]
   exact fstFromTau_lt_fstFromTau _ _ hinv hlate
@@ -2204,7 +2219,7 @@ the boundary case the two coordinates agree about. -/
 theorem fstAtGeneration_lt_fstEquilibrium_at_no_flow (p : PopGenParameters) (t : ℕ)
     (hmu : p.mu = 0) (hmig : p.mig = 0) :
     p.fstAtGeneration t < p.fstEquilibrium := by
-  have hz : scaledFlow p.Ne p.mig p.mu p.nDemes = 0 := by
+  have hz : scaledFlow p.bigM p.theta p.nDemes = 0 := by
     rw [p.scaledFlow_eq, hmu, hmig]
     ring
   have heq : p.fstEquilibrium = 1 := by
