@@ -5835,7 +5835,13 @@ LEDGER_PATH = CORPUS / "validation" / "empirical" / "simcov" / "ledger.json"
 # NO POWER, LEAD -- asserts nothing and is not evidence in either direction.
 LEDGER_AGREES = {"MATCH", "VALIDATED"}
 LEDGER_DISAGREES = {"FALSIFIED", "REFUTED"}
-DOC_ASSERTS_AGREEMENT = {"VALIDATED", "MEASURED", "TESTED"}
+# MEASURED IS NOT IN HERE, BY THE CLOSED VOCABULARY'S OWN DEFINITION OF IT:
+# "A number was obtained; whether it confirms the body is stated in the prose."
+# A declaration whose head is MEASURED has not asserted agreement, so pairing it
+# against a disagreeing ledger row reports a docstring for saying exactly what
+# the term means. `liabilitySpecificity` and `effectTurnoverR2Loss` were both
+# reported that way, and both read "MEASURED, and what was measured is ..."
+DOC_ASSERTS_AGREEMENT = {"VALIDATED", "TESTED"}
 DOC_ASSERTS_DISAGREEMENT = {"FALSIFIED", "REFUTED"}
 
 # A CITATION, NOT A DESCRIPTION OF THE CITATION FORMAT. The negative lookahead
@@ -5942,14 +5948,29 @@ def run_ledger() -> int:
                 f"{name} ({fname}) has both {sorted(heads & LEDGER_AGREES)} and "
                 f"{sorted(heads & LEDGER_DISAGREES)} in the ledger and cites a "
                 f"battery, with no adjudication saying which design is wrong")
-        tail = doc[doc.index("Empirical status:"):] if "Empirical status:" in doc else ""
-        states = {w for w in STATUS_WORDS if re.search(r"\b" + w + r"\b", tail)}
-        if (states & DOC_ASSERTS_AGREEMENT) and (heads & LEDGER_DISAGREES) \
+        # THE HEAD, NOT EVERY CAPITAL WORD IN THE PARAGRAPH. This scanned the
+        # whole text after `Empirical status:` for any member of STATUS_WORDS,
+        # and these paragraphs are mostly PROSE ABOUT COMPETITORS -- a docstring
+        # reading "VALIDATED as a rate, FALSIFIED as an exact form" was reported
+        # as asserting agreement while the ledger disagreed, when it had already
+        # said the same thing the ledger says. `conventions` learned this rule
+        # first and records why: applied to the whole status text it produced 99
+        # findings, none of them defects.
+        #
+        # The first word of the head, so that "VALIDATED after correction" and
+        # "VALIDATED as a rate" are still read as claiming VALIDATED. What
+        # changes is only that a term appearing further down, about a rival or a
+        # superseded form, no longer counts as this declaration's own verdict.
+        k = doc.rfind("Empirical status:")
+        head = (convention_status_head(doc[k + len("Empirical status:"):])
+                if k >= 0 else "")
+        claimed = head.split()[0] if head.split() else ""
+        if claimed in DOC_ASSERTS_AGREEMENT and (heads & LEDGER_DISAGREES) \
                 and not (heads & LEDGER_AGREES):
             contradicted.append(
-                f"{name} ({fname}) docstring asserts "
-                f"{sorted(states & DOC_ASSERTS_AGREEMENT)} while every ledger "
-                f"record for it says {sorted(heads & LEDGER_DISAGREES)}")
+                f"{name} ({fname}) docstring heads its status {claimed!r} while "
+                f"every ledger record for it says "
+                f"{sorted(heads & LEDGER_DISAGREES)}")
 
     for r in corpus_rows:
         if r["verdict"] in LEDGER_AGREES and not r.get("competitors_rejected"):

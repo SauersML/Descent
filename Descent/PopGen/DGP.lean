@@ -4204,8 +4204,12 @@ theorem alleleFreqDivergenceRate_independent_of_mutation_and_migration
     Regime: a RATE, first order in `r`. Two lineages each recombine with probability `r`, and to
     first order the chance that either does is their sum.
 
-    Empirical status: **VALIDATED as a rate, FALSIFIED as an exact
-    per-generation probability** (`validation/empirical/simcov/battery_traj.py`).
+    Empirical status: **MIXED** -- validated as a rate, FALSIFIED as an exact
+    per-generation probability (`validation/empirical/simcov/battery_traj.py`).
+    The head is `MIXED` and not `VALIDATED`, because the vocabulary has a term
+    for a definition whose parts carry different verdicts and this is one: the
+    ledger holds a falsification, and heading the status with the half that
+    passed reads as a contradiction of it rather than as the split it is.
     The exact chance that a pair survives one meiosis intact is `(1-r)²`, so the
     exact breakage probability is `2r - r²` and this body omits the `r²`. Read as
     a survival law, `(1 - 2r)^t` against the exact `(1 - r)^(2t)`, the omission
