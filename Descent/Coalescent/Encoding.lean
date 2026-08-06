@@ -125,6 +125,19 @@ theorem measurable_restrictInf (n : ℕ) : Measurable (restrictInf n) := by
   · rw [if_neg hp]
     exact measurable_not_rel _ _
 
+/-- **The encoding determines every finite marginal.**
+
+`encode_injective` is the sentence K-C leans on, and `measurable_restrictInf` is what the
+projective-limit argument needs, but nothing said the two were about the same object: the
+restrictions could have collapsed information the encoding keeps, and the σ-algebra pulled
+back along `encode` would then be finer than the one the finite-dimensional laws live in.
+This says they agree -- two relations with the same encoding have the same `ρ_n` for every
+`n`, so a finite-dimensional law is a function of the encoding and the setup step really is
+a setup step. -/
+theorem restrictInf_eq_of_encode_eq {R S : EInf} (h : encode R = encode S) (n : ℕ) :
+    restrictInf n R = restrictInf n S := by
+  rw [encode_injective h]
+
 end Coalescent
 
 end Descent

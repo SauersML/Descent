@@ -350,6 +350,33 @@ theorem z_score_strictMono_in_rho
   -- `ρ₂ * β < ρ₁ * β` from `hβ` and `h_more_turnover`, exactly as it did there.
   exact div_lt_div_of_pos_right (by nlinarith) hσ
 
+/-! ### The neutral law against the moment interface -/
+
+/-- **The neutral law IS the deployed `R²` under drift.**
+
+`neutralPortability`'s own docstring says this is "the only neutral law in the development"
+and that its slope "has no derivation in the corpus at all".  The corrected body has one.
+Writing the ancestral `R²` as `V_A/(V_A + V_E)` -- which is what an ancestral `R²` is -- the
+law returns exactly `(momentsUnderDrift V_A V_E fst).r2`, the `R²` read off the moment
+interface after drift has retained `1 - fst` of the additive variance.
+
+So it is not a curve fitted beside the moment tuple, it is that tuple's `R²` in different
+variables, and the two cannot now disagree: a change to either body breaks this equation.
+That also settles what the deleted `max 0` floor was doing -- the moment-interface `R²` has
+no floor because it cannot go negative, being a ratio of positive variances. -/
+theorem neutralPortability_eq_r2_momentsUnderDrift (V_A V_E fst : ℝ)
+    (hV : 0 < V_A) (hE : 0 < V_E) (hf : fst < 1) :
+    neutralPortability (Descent.Core.share V_A V_E) fst
+      = (Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E fst).r2 := by
+  have hsum : (0 : ℝ) < V_A + V_E := by linarith
+  have hret : (0 : ℝ) < (1 - fst) * V_A + V_E := by nlinarith
+  have h1 : V_A + V_E ≠ 0 := ne_of_gt hsum
+  have h2 : (1 - fst) * V_A + V_E ≠ 0 := ne_of_gt hret
+  rw [Descent.Core.ScoreMoments.r2_momentsUnderDrift V_A V_E fst hV (le_of_lt hE) hf]
+  unfold neutralPortability Descent.Core.share Descent.Core.retainedFraction
+  field_simp
+  ring
+
 end ConcreteWitnesses
 
 end Descent.Portability
