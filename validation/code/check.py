@@ -20,7 +20,6 @@ Run everything:
 Run one guard:
 
     python3 validation/code/check.py --only laundering
-    python3 validation/code/check.py --only laundering --strict
     python3 validation/code/check.py --list
 
 Exit is nonzero if any guard that ran fails.  Guard-specific flags go after the
@@ -2466,7 +2465,6 @@ def run_identifications() -> int:
 #
 # USAGE
 #     validation/code/check.py                  # whole corpus, human report
-#     validation/code/check.py --severity fatal # only the fatal families
 #     validation/code/check.py --json out.json  # machine-readable
 #     validation/code/check.py path/to/File.lean ...
 #
@@ -2490,18 +2488,19 @@ SEVERITY_ORDER = {FATAL: 0, CONDITIONAL: 1, FIDELITY: 2}
 # FATAL gates.  Those families are laundering proper: the declaration does not prove
 # what its name says, and no amount of context makes that acceptable.
 #
-# CONDITIONAL does not gate by default, and this is a deliberate line rather than a
-# concession.  A theorem of the form `(hx : 0 < x) : f x < f (x + 1)` has a Prop-valued
-# premise and is ordinary mathematics; so does every theorem quantified over a model
-# class that the corpus proves nonempty.  Gating on those would make the guard
-# permanently red, and a permanently red guard is read as broken and then ignored --
-# which is how the patterns it exists to catch get in.  The CONDITIONAL count is
-# printed as a LEDGER on every run: it is the honest size of what this corpus assumes,
-# it is meant to be read, and it is meant to go down.
+# EVERY SEVERITY GATES.  There is no ledger tier any more.  CONDITIONAL used to be
+# exempt on the argument that a Prop-valued premise is ordinary mathematics and that a
+# permanently red guard is read as broken and then ignored.  Both halves were true and
+# neither is a reason to keep a tolerance: what a ledger measures is how much the corpus
+# assumes, and a number that is allowed to sit there is a number nobody reduces.
 #
-# `--strict` gates on CONDITIONAL as well.  That is the standard the corpus is aiming
-# at, and the flag exists so the aim is checkable rather than aspirational.
-EXIT_ON = {FATAL}
+# The consequence is stated rather than hidden: turning this on makes the guard red until
+# the assumptions it names are discharged or the detector is fixed.  That redness is the
+# corpus's true state, and a build that reports it is worth more than a green one that
+# does not.  The flags that used to narrow the view -- `--severity` and `--strict` --
+# are gone rather than defaulted: an option that can only weaken a gate is a tolerance
+# with a command-line interface.
+EXIT_ON = {FATAL, CONDITIONAL, FIDELITY}
 
 FAMILY_SEVERITY = {
     "F1": FATAL, "F1b": FATAL, "F4": FATAL, "F7": FATAL, "F8": FATAL,
@@ -3588,16 +3587,11 @@ def check_files(c: Corpus) -> list[Finding]:
 def run_laundering(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("paths", nargs="*", help="files to check (default: all of proofs/)")
-    ap.add_argument("--severity", choices=["fatal", "conditional", "all"],
-                    default="all")
     ap.add_argument("--json", metavar="PATH")
     ap.add_argument("--summary", action="store_true",
                     help="counts per family and per file only")
     ap.add_argument("--family", action="append",
                     help="restrict to one family, e.g. --family F1")
-    ap.add_argument("--strict", action="store_true",
-                    help="also fail on CONDITIONAL findings (the target standard: no "
-                         "unresolved premise anywhere in the corpus)")
     args = ap.parse_args(argv)
 
     if args.paths:
@@ -3609,9 +3603,7 @@ def run_laundering(argv: list[str]) -> int:
     corpus = build_corpus(files)
     findings = analyse(corpus)
 
-    keep = {"fatal": {FATAL}, "conditional": {FATAL, CONDITIONAL},
-            "all": {FATAL, CONDITIONAL, FIDELITY}}[args.severity]
-    findings = [f for f in findings if f.severity in keep]
+    # No severity filter.  There is no view of this guard that shows less than all of it.
     if args.family:
         findings = [f for f in findings if f.family in set(args.family)]
 
@@ -3653,15 +3645,12 @@ def run_laundering(argv: list[str]) -> int:
             [dict(family=f.family, severity=f.severity, file=f.file, line=f.line,
                   decl=f.decl, detail=f.detail) for f in findings], indent=1))
 
-    gate = EXIT_ON | ({CONDITIONAL} if args.strict else set())
-    n_gated = sum(1 for f in findings if f.severity in gate)
+    n_gated = sum(1 for f in findings if f.severity in EXIT_ON)
     if n_gated:
-        print(f"\nFAIL: {n_gated} finding(s) at or above the gating severity "
-              f"({'FATAL+CONDITIONAL' if args.strict else 'FATAL'}).")
+        print(f"\nFAIL: {n_gated} finding(s).  Every severity gates and no flag changes "
+              f"that.")
     else:
-        print(f"\nPASS: no findings at the gating severity "
-              f"({'FATAL+CONDITIONAL' if args.strict else 'FATAL'}). "
-              f"The CONDITIONAL ledger above is still debt, not absolution.")
+        print("\nPASS: no findings at any severity.")
     return 1 if n_gated else 0
 
 
@@ -4837,29 +4826,19 @@ MATHLIB_DECL = re.compile(
 # too generic for name equality to be evidence.  Each one is here because it
 # was checked BY HAND and found not to be a duplicate; this list is not a place
 # to silence a finding that has not been read.
-MATHLIB_EXEMPT = {
-    # `Descent.covariance` is the covariance of an abstract `ExpFunctional`,
-    # a linear functional on `Omega -> R`.  Mathlib's `ProbabilityTheory.
-    # covariance` is the covariance of two functions against a MEASURE.  The
-    # corpus one is deliberately measure-free -- that is the point of
-    # `TransportIdentities` -- so neither can be expressed as the other.
-    "covariance",
-    "covariance_add_right",
-    "covariance_smul_right",
-    "variance",
-    "mean",
-    # SHAPE, not name.  Both of these say a compatible donor derivation over a
-    # chain of `r` interfaces is a list of `r + 1` donors, from membership in
-    # `mosaicsFrom` / `mosaics`.  The normal form of that conclusion is
-    # `length = length + 1`, which is also the normal form of
-    # `Quiver.Path.vertices_length` -- a statement about a quiver path, over a
-    # different type, with no hypothesis.  Neither can be used to prove the
-    # other and importing Mathlib's does not discharge the corpus's; what the
-    # shape screen has found here is that "one longer than" is a common thing
-    # for a length to be.  Read against both sources before being listed.
-    "length_of_mem_mosaicsFrom",
-    "length_of_mem_mosaics",
-}
+# NO EXEMPTIONS.  This set is empty and stays empty.
+#
+# It held seven names: five where Mathlib uses the word for a different object
+# (`covariance` against a measure versus against an abstract functional, and so on) and
+# two where the SHAPE screen normalised a corpus conclusion onto an unrelated Mathlib
+# one.  Every entry was read by hand and every entry was correct about the mathematics.
+# That is precisely why they are gone: an exemption that is correct is still a place
+# where the guard has been told to stop looking, and a list of those grows.
+#
+# When the screen now fires on something genuinely different, the repair is to the
+# SCREEN -- make the normal form carry enough to tell the two apart -- not to a list of
+# declarations the screen is asked to skip.
+MATHLIB_EXEMPT: set[str] = set()
 
 
 def mathlib_root() -> Path | None:
@@ -7558,7 +7537,7 @@ def run_layers() -> int:
 # false positives that make its raw count a diagnostic rather than a verdict.
 #
 # The signature column is not decoration.  `laundering` and `wiring` take their
-# own flags, so `--only laundering --strict` has to reach them; the rest take
+# own flags, so `--only laundering --family F1` has to reach them; the rest take
 # nothing and are called with no arguments.
 def run_heads() -> int:
     """Every module under `Descent/X/` must be imported by `Descent/X.lean`.
@@ -7668,7 +7647,7 @@ GUARDS = {
     # hold at zero by hand; `ledger` reads 2164 and reports its sharpest rules
     # because a budget pinned to their count would be worse than none.
     "core-empirics":   dict(fn=run_core_empirics,   gated=True,  takes_argv=False),
-    "field-proofs":    dict(fn=run_field_proofs,    gated=False, takes_argv=False),
+    "field-proofs":    dict(fn=run_field_proofs,    gated=True , takes_argv=False),
     # THE SHAPE GUARDS. One is gated and four are DIAGNOSTIC, for the reason the
     # `ledger` entry above records: each of the four reports true findings whose
     # fixes are in flight, and gating them today breaks the build for everyone while
@@ -7698,7 +7677,7 @@ GUARDS = {
     # names nothing from. Measured 38 when the audit asked for this, six of them
     # consecutive files in `PopGen/PopulationGeneticsFoundations`; 28 as the repair
     # lands. Each line of the output names the module the file should have imported.
-    "shape-chains":    dict(fn=run_shape_chains,     gated=False, takes_argv=False),
+    "shape-chains":    dict(fn=run_shape_chains,     gated=True , takes_argv=False),
     # `shape-components`: flip when every module lies in the corpus's one weak
     # component. `Pangenome`'s island closed while this was being written, and a new
     # `Descent/Meta/` arrived as one on the same day -- which is the whole case for
@@ -7707,14 +7686,14 @@ GUARDS = {
     # remain: `BundleRigidity/LinearSCM`, `BundleRigidity/Operator` and
     # `Spectral/ResonanceSpectrum`, each importing nothing from the corpus and
     # imported by nothing in it.
-    "shape-components": dict(fn=run_shape_components, gated=False, takes_argv=False),
+    "shape-components": dict(fn=run_shape_components, gated=True , takes_argv=False),
     # `shape-spine`: flip when cross-module theorem reuse reaches 20% and the corpus
     # states 80 theorems joining `PopGenParameters` to a deployed metric. Both are
     # far off -- just under 12%, and 19 -- and the second is the sharper number:
     # all nineteen are in `Core/Moments.lean`, so the spine exists and is one file
     # long. This is the one of the five that no amount of moving imports around
     # will fix; it needs theorems that do not exist yet.
-    "shape-spine":     dict(fn=run_shape_spine,      gated=False, takes_argv=False),
+    "shape-spine":     dict(fn=run_shape_spine,      gated=True , takes_argv=False),
     # GATED, alone among the five, because its count is already zero:
     # `deployedR2FromIsland` was deleted while these guards were being written and
     # nothing has taken its place. Calibrated against a fixture carrying that pair,
@@ -7745,7 +7724,7 @@ GUARDS = {
     # than waiting on `LAYER_PENDING`. It is the only rule in this file that has been
     # demonstrated silent on a whole corpus and nonzero on another, and holding a
     # calibrated rule hostage to an uncalibrated one is how a gate never lands.
-    "layers":          dict(fn=run_layers,           gated=False, takes_argv=False),
+    "layers":          dict(fn=run_layers,           gated=True , takes_argv=False),
 }
 
 
@@ -7777,7 +7756,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         if rest:
             # Guard-specific flags are meaningless without --only: there is no
-            # sensible way to route `--strict` when every guard is running and
+            # sensible way to route `--family` when every guard is running and
             # only one understands it.  Silently ignoring them would be worse.
             print(f"unrecognised arguments {rest} -- pass them after --only NAME",
                   file=sys.stderr)

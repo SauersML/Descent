@@ -15,12 +15,15 @@ every `Descent` module.  Run, after a successful build of `Descent`:
 A failing linter is reported by `#lint` with `logError`, so the exit status is
 nonzero and the run fails a script that checks it.
 
-THIS FILE IS THE GATE, AND IT MUST PASS. Its companion
-`validation/code/LintDebt.lean` runs the linters whose findings are DEBT rather than
-defects; that one is expected to report and is not allowed to fail the build until its
-counts reach zero. Splitting them is not bookkeeping: a gate that is red for a known,
-enumerated, deliberately-carried reason stops being read, and then the defect it was built
-to catch arrives into a red build and nobody looks.
+THIS FILE IS THE GATE AND IT RUNS EVERY LINTER. There is no debt tier.
+
+`validation/code/LintDebt.lean` used to hold the linters whose findings were called DEBT
+rather than defects, on the argument that a gate red for an enumerated reason stops being
+read. The argument is not wrong about human behaviour and it is not a reason to keep two
+exit statuses: a finding that is allowed to persist is a finding nobody removes, and
+`simpNF` reporting 23 non-confluent rewrites is a defect in 23 places whatever tier it is
+filed under. The linters that were debt are named below alongside the ones that were not,
+and this file fails on any of them.
 
 COMPILED AND RUN.  This file and `Descent.Meta.Linters` build, and this runner
 has been executed over the whole corpus: 10,376 declarations plus 5,387
@@ -59,3 +62,14 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 -- anyway: it states which checks this runner is FOR, and a default set that
 -- someone later narrows should not silently narrow the gate too.
 #lint only empiricalStatusVocabulary empiricalStatusMultiplicity in Descent
+
+/-! ## The linters that used to be debt
+
+`scaledQuantityUntyped`, and the Batteries set `simpNF`, `simpVarHead`, `dupNamespace` and
+`defLemma`.  They gate here now.  `unusedArguments` is still absent, and for a reason that
+is not a tolerance: it reported 135 and in this corpus an unused binder is frequently a
+regime hypothesis carried on purpose, so it is a detector that has not been calibrated
+rather than a count that is being carried. Calibrate it and add it. -/
+#lint only scaledQuantityUntyped in Descent
+
+#lint only simpNF simpVarHead dupNamespace defLemma in Descent

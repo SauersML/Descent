@@ -1283,8 +1283,9 @@ def main() -> int:
     for extra in sorted(got - POSITIVE_EXPECTED):
         failures.append(f"MISFILED        {extra} reported but not planted")
 
-    # False positives: clean mathematics must never gate the build.
-    for bad in sorted(families(run(NEGATIVE, "--severity", "conditional"))):
+    # False positives: clean mathematics must never gate the build.  No severity flag --
+    # every severity gates now, so the harness checks the whole report the gate sees.
+    for bad in sorted(families(run(NEGATIVE))):
         failures.append(f"FALSE POSITIVE  {bad} reported on clean mathematics")
 
     # The other seven guards, both directions, against fixture corpora.
