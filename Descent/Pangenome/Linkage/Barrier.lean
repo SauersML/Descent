@@ -265,6 +265,15 @@ theorem prod_width_mul_card_mosaics_of_balanced {c : Chain ι} {bs : List ℕ}
       _ = Fintype.card ι * Fintype.card ι ^ (c.length + 1) := by rw [hw, ih]
       _ = Fintype.card ι ^ (c.length + 1 + 1) := by rw [pow_succ]; ring
 
+/-- **The width a path-language cap demands.**  A chain required to admit at most `F`
+derivations must satisfy `m ^ (r+1) ≤ (∏ w_j) · F`.  With `F` close to `m`, the geometric
+mean of the widths is forced close to `m`: near-exactness across many linkage-bearing
+separators permits almost no average merging. -/
+theorem pow_card_le_prod_width_mul_of_card_le [Nonempty ι] (c : Chain ι) (F : ℕ)
+    (hF : (mosaics c).card ≤ F) :
+    Fintype.card ι ^ (c.length + 1) ≤ (c.map width).prod * F :=
+  le_trans (pow_card_le_prod_width_mul_card_mosaics c) (Nat.mul_le_mul_left _ hF)
+
 /-! ### The exactness barrier -/
 
 theorem prod_le_pow_of_le {w : ℕ} (c : Chain ι) (hw : ∀ s ∈ c, width s ≤ w) :

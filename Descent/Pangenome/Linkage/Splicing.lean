@@ -272,6 +272,19 @@ theorem pow_card_le_prod_width_mul_card_spelledWords [Nonempty ι] (code : ι �
   rw [card_spelledWords code L hlen hinj c]
   exact pow_card_le_prod_width_mul_card_mosaics c
 
+/-- **The exactness barrier, in distinct sequences.**  If the topology spells exactly the
+`m` panel words and no more, then with donor-identifying blocks every interface keeps all `m`
+thread identities in distinct states.  This is the barrier of
+`Descent.Pangenome.Linkage.Barrier.width_eq_card_of_card_mosaics_eq` stated where a graph
+builder can check it: on the sequences the graph spells, not on donor histories. -/
+theorem width_eq_card_of_card_spelledWords_eq [Nonempty ι] (code : ι → List α) (L : ℕ)
+    (hlen : ∀ h, (code h).length = L) (hinj : Function.Injective code) {c : Chain ι}
+    (hex : (spelledWords code c).card = Fintype.card ι) :
+    ∀ s ∈ c, width s = Fintype.card ι := by
+  refine width_eq_card_of_card_mosaics_eq ?_
+  rw [← card_spelledWords code L hlen hinj c]
+  exact hex
+
 end Spelling
 
 /-! ### A biallelic single-SNP block system
