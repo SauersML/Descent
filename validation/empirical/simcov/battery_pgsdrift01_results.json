@@ -1,5 +1,5 @@
 {
- "_battery_sha": "048821202949304f",
+ "_battery_sha": "629cdb320967769f",
  "results": [
   {
    "name": "pgsDriftVariance_one_pop",
@@ -266,6 +266,207 @@
      "sem": 8.001120052200067,
      "sems_off": 0.5420450597554191,
      "rel_err": 0.027083237827939578
+    }
+   ]
+  },
+  {
+   "name": "Var_Delta_Mu [fst * V_A, competing]",
+   "file": "PresentDayMetrics.lean",
+   "source": "fst * V_A",
+   "note": "positive control 'realised F_ST vs Wright's 1 - (1 - 1/(2Ne))^t, worst cell' passed at 1.93 sems",
+   "regime": "independent binomial drift of two populations from a common ancestral frequency vector, 400 replicates in each of 6 batches so every reported quantity is a mean over batches and its sem the spread across them. Genotypes standardized, so V_A = sum beta^2 with beta drawn N(0,1); the population mean score is sum_l beta_l * 2*(p_il - p_l)/sqrt(2 p_l q_l). F_ST is REALISED, measured as mean_l mean_reps (p_il - p_l)^2/(p_l q_l) on the same replicates -- dispersion from the ANCESTRAL frequency, which is what Wright's law is about, because the nominal 1-(1-1/(2Ne))^t is off by O(1/sqrt(L)) and that is tens of sems here. Cells run L from 1000 to 2500, Ne from 100 to 400 and t from 10 to 80, so F_ST spans roughly an order of magnitude and V_A spans twofold independently of it",
+   "span": 0.8669083152338399,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "L=800 Ne=100 t=15 (F=0.0723)",
+    "lean": 56.23473001929566,
+    "truth": 111.9623222726515,
+    "sem": 2.4183123762094856,
+    "sems_off": 23.044000767470934,
+    "rel_err": 0.4977352302290371
+   },
+   "cells": [
+    {
+     "design": "L=1000 Ne=50 t=3 (F=0.0297)",
+     "lean": 29.32041176534622,
+     "truth": 56.64476345019897,
+     "sem": 1.5367982813184466,
+     "sems_off": 17.78005091299992,
+     "rel_err": 0.48238089490612523
+    },
+    {
+     "design": "L=1000 Ne=50 t=10 (F=0.0956)",
+     "lean": 91.53039117954,
+     "truth": 175.3739002919919,
+     "sem": 9.282103169628883,
+     "sems_off": 9.03281374708143,
+     "rel_err": 0.4780843042941689
+    },
+    {
+     "design": "L=1200 Ne=25 t=10 (F=0.1829)",
+     "lean": 220.30235635578364,
+     "truth": 463.0851213932172,
+     "sem": 11.69418568358881,
+     "sems_off": 20.760980850350784,
+     "rel_err": 0.5242724367973822
+    },
+    {
+     "design": "L=800 Ne=100 t=15 (F=0.0723)",
+     "lean": 56.23473001929566,
+     "truth": 111.9623222726515,
+     "sem": 2.4183123762094856,
+     "sems_off": 23.044000767470934,
+     "rel_err": 0.4977352302290371
+    },
+    {
+     "design": "L=1200 Ne=30 t=8 (F=0.1257)",
+     "lean": 161.29817031287922,
+     "truth": 326.2712041281268,
+     "sem": 8.520960669003422,
+     "sems_off": 19.360849113570918,
+     "rel_err": 0.5056316086983349
+    },
+    {
+     "design": "L=600 Ne=20 t=6 (F=0.1407)",
+     "lean": 77.89889264229338,
+     "truth": 160.13475288139182,
+     "sem": 8.001120052200067,
+     "sems_off": 10.278043536727843,
+     "rel_err": 0.5135416189139698
+    }
+   ]
+  },
+  {
+   "name": "Var_Delta_Mu [4 * fst * V_A, the two-population factor, competing]",
+   "file": "PresentDayMetrics.lean",
+   "source": "4 * fst * V_A",
+   "note": "positive control 'realised F_ST vs Wright's 1 - (1 - 1/(2Ne))^t, worst cell' passed at 1.93 sems",
+   "regime": "independent binomial drift of two populations from a common ancestral frequency vector, 400 replicates in each of 6 batches so every reported quantity is a mean over batches and its sem the spread across them. Genotypes standardized, so V_A = sum beta^2 with beta drawn N(0,1); the population mean score is sum_l beta_l * 2*(p_il - p_l)/sqrt(2 p_l q_l). F_ST is REALISED, measured as mean_l mean_reps (p_il - p_l)^2/(p_l q_l) on the same replicates -- dispersion from the ANCESTRAL frequency, which is what Wright's law is about, because the nominal 1-(1-1/(2Ne))^t is off by O(1/sqrt(L)) and that is tens of sems here. Cells run L from 1000 to 2500, Ne from 100 to 400 and t from 10 to 80, so F_ST spans roughly an order of magnitude and V_A spans twofold independently of it",
+   "span": 0.8669083152338399,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "L=800 Ne=100 t=15 (F=0.0723)",
+    "lean": 224.93892007718264,
+    "truth": 111.9623222726515,
+    "sem": 2.4183123762094856,
+    "sems_off": 46.71712344358634,
+    "rel_err": 1.0090590790838516
+   },
+   "cells": [
+    {
+     "design": "L=1000 Ne=50 t=3 (F=0.0297)",
+     "lean": 117.28164706138487,
+     "truth": 56.64476345019897,
+     "sem": 1.5367982813184466,
+     "sems_off": 39.45663158808613,
+     "rel_err": 1.070476420375499
+    },
+    {
+     "design": "L=1000 Ne=50 t=10 (F=0.0956)",
+     "lean": 366.12156471816,
+     "truth": 175.3739002919919,
+     "sem": 9.282103169628883,
+     "sems_off": 20.5500478652614,
+     "rel_err": 1.0876627828233243
+    },
+    {
+     "design": "L=1200 Ne=25 t=10 (F=0.1829)",
+     "lean": 881.2094254231346,
+     "truth": 463.0851213932172,
+     "sem": 11.69418568358881,
+     "sems_off": 35.75488839865931,
+     "rel_err": 0.9029102528104709
+    },
+    {
+     "design": "L=800 Ne=100 t=15 (F=0.0723)",
+     "lean": 224.93892007718264,
+     "truth": 111.9623222726515,
+     "sem": 2.4183123762094856,
+     "sems_off": 46.71712344358634,
+     "rel_err": 1.0090590790838516
+    },
+    {
+     "design": "L=1200 Ne=30 t=8 (F=0.1257)",
+     "lean": 645.1926812515169,
+     "truth": 326.2712041281268,
+     "sem": 8.520960669003422,
+     "sems_off": 37.42787808932463,
+     "rel_err": 0.9774735652066603
+    },
+    {
+     "design": "L=600 Ne=20 t=6 (F=0.1407)",
+     "lean": 311.5955705691735,
+     "truth": 160.13475288139182,
+     "sem": 8.001120052200067,
+     "sems_off": 18.92995189418943,
+     "rel_err": 0.9458335243441208
+    }
+   ]
+  },
+  {
+   "name": "Var_Delta_Mu [the name's reading: variance of the DIFFERENCE at a pairwise F_ST, competing]",
+   "file": "PresentDayMetrics.lean",
+   "source": "2 * fst_pairwise * V_A against Var(mu_1 - mu_2)",
+   "note": "positive control 'realised F_ST vs Wright's 1 - (1 - 1/(2Ne))^t, worst cell' passed at 1.93 sems",
+   "regime": "independent binomial drift of two populations from a common ancestral frequency vector, 400 replicates in each of 6 batches so every reported quantity is a mean over batches and its sem the spread across them. Genotypes standardized, so V_A = sum beta^2 with beta drawn N(0,1); the population mean score is sum_l beta_l * 2*(p_il - p_l)/sqrt(2 p_l q_l). F_ST is REALISED, measured as mean_l mean_reps (p_il - p_l)^2/(p_l q_l) on the same replicates -- dispersion from the ANCESTRAL frequency, which is what Wright's law is about, because the nominal 1-(1-1/(2Ne))^t is off by O(1/sqrt(L)) and that is tens of sems here. Cells run L from 1000 to 2500, Ne from 100 to 400 and t from 10 to 80, so F_ST spans roughly an order of magnitude and V_A spans twofold independently of it",
+   "span": 0.8773489069072594,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "L=1200 Ne=25 t=10 (F=0.1829)",
+    "lean": 242.63311729583543,
+    "truth": 893.8391396230635,
+    "sem": 29.490219887559075,
+    "sems_off": 22.082101280023004,
+    "rel_err": 0.7285494598075499
+   },
+   "cells": [
+    {
+     "design": "L=1000 Ne=50 t=3 (F=0.0297)",
+     "lean": 29.759217056833357,
+     "truth": 117.45746803571114,
+     "sem": 5.582369349749221,
+     "sems_off": 15.709861796016327,
+     "rel_err": 0.7466383572325471
+    },
+    {
+     "design": "L=1000 Ne=50 t=10 (F=0.0956)",
+     "lean": 96.03383449280997,
+     "truth": 349.3617033036454,
+     "sem": 11.614307771656415,
+     "sems_off": 21.81170619819955,
+     "rel_err": 0.7251163090152936
+    },
+    {
+     "design": "L=1200 Ne=25 t=10 (F=0.1829)",
+     "lean": 242.63311729583543,
+     "truth": 893.8391396230635,
+     "sem": 29.490219887559075,
+     "sems_off": 22.082101280023004,
+     "rel_err": 0.7285494598075499
+    },
+    {
+     "design": "L=800 Ne=100 t=15 (F=0.0723)",
+     "lean": 58.33811898897601,
+     "truth": 225.32136822633868,
+     "sem": 13.081526265181981,
+     "sems_off": 12.764813971425351,
+     "rel_err": 0.7410892741855957
+    },
+    {
+     "design": "L=1200 Ne=30 t=8 (F=0.1257)",
+     "lean": 172.26743937692396,
+     "truth": 647.7671454951065,
+     "sem": 31.76399230145799,
+     "sems_off": 14.969771482294334,
+     "rel_err": 0.7340596222346919
+    },
+    {
+     "design": "L=600 Ne=20 t=6 (F=0.1407)",
+     "lean": 83.8296842522231,
+     "truth": 312.1798059256087,
+     "sem": 13.571312855234773,
+     "sems_off": 16.82594190475136,
+     "rel_err": 0.731469868771078
     }
    ]
   },

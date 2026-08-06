@@ -289,5 +289,142 @@
     "measurement that they agree."
    ]
   }
+ },
+ "pgsDriftVariance_one_pop": {
+  "authoritative": "pgsdrift01",
+  "reason": [
+   "The falsified rows are against a SUPERSEDED BODY, and the transcription each",
+   "battery recorded proves it rather than leaving it to be argued: bulk3",
+   "transcribed `fst * V_A` for the one-population variance and `2 * fst * V_A`",
+   "for the two-population one, and the bodies now read `2 * fst * V_A` and",
+   "`4 * fst * V_A`. The corrections were made and never re-measured, so the",
+   "rejection has stood ever since against code nobody can run.",
+   "",
+   "pgsdrift01 measures the bodies that exist. Independent binomial drift of two",
+   "populations from a common ancestral frequency vector, standardized genotypes",
+   "so V_A = sum beta^2, F_ST spanning sixfold and V_A twofold independently, and",
+   "F_ST realised from the replicates rather than nominal. All three bodies match",
+   "at worst 1.92 sems, and the superseded factors are falsified on the same",
+   "cells at 23, 15 and 23 sems -- so this re-runs the rejection that produced",
+   "the correction, which is what makes the match gated rather than uncompeted.",
+   "",
+   "For pgsDriftVarianceFromLoci the two verdicts are about two READINGS, not two",
+   "designs, and its own docstring already says so: the sum is HALF the",
+   "one-branch drift variance, which matches at 1.92 sems, and the reading its",
+   "summary line invites -- that the sum IS that variance -- is falsified at 23",
+   "sems in the same cells. pgsdrift01 records both."
+  ],
+  "superseded": {
+   "bulk3": [
+    "Transcribed a body one factor of two below the one in the corpus; the",
+    "correction landed afterwards and nothing re-measured it. The verdict was",
+    "right about the formula it tested and says nothing about the formula there."
+   ]
+  }
+ },
+ "pgsDiffVariance_two_pop": {
+  "authoritative": "pgsdrift01",
+  "reason": [
+   "The falsified rows are against a SUPERSEDED BODY, and the transcription each",
+   "battery recorded proves it rather than leaving it to be argued: bulk3",
+   "transcribed `fst * V_A` for the one-population variance and `2 * fst * V_A`",
+   "for the two-population one, and the bodies now read `2 * fst * V_A` and",
+   "`4 * fst * V_A`. The corrections were made and never re-measured, so the",
+   "rejection has stood ever since against code nobody can run.",
+   "",
+   "pgsdrift01 measures the bodies that exist. Independent binomial drift of two",
+   "populations from a common ancestral frequency vector, standardized genotypes",
+   "so V_A = sum beta^2, F_ST spanning sixfold and V_A twofold independently, and",
+   "F_ST realised from the replicates rather than nominal. All three bodies match",
+   "at worst 1.92 sems, and the superseded factors are falsified on the same",
+   "cells at 23, 15 and 23 sems -- so this re-runs the rejection that produced",
+   "the correction, which is what makes the match gated rather than uncompeted.",
+   "",
+   "For pgsDriftVarianceFromLoci the two verdicts are about two READINGS, not two",
+   "designs, and its own docstring already says so: the sum is HALF the",
+   "one-branch drift variance, which matches at 1.92 sems, and the reading its",
+   "summary line invites -- that the sum IS that variance -- is falsified at 23",
+   "sems in the same cells. pgsdrift01 records both."
+  ],
+  "superseded": {
+   "bulk3": [
+    "Transcribed a body one factor of two below the one in the corpus; the",
+    "correction landed afterwards and nothing re-measured it. The verdict was",
+    "right about the formula it tested and says nothing about the formula there."
+   ]
+  }
+ },
+ "pgsDriftVarianceFromLoci": {
+  "authoritative": "pgsdrift01",
+  "reason": [
+   "The falsified rows are against a SUPERSEDED BODY, and the transcription each",
+   "battery recorded proves it rather than leaving it to be argued: bulk3",
+   "transcribed `fst * V_A` for the one-population variance and `2 * fst * V_A`",
+   "for the two-population one, and the bodies now read `2 * fst * V_A` and",
+   "`4 * fst * V_A`. The corrections were made and never re-measured, so the",
+   "rejection has stood ever since against code nobody can run.",
+   "",
+   "pgsdrift01 measures the bodies that exist. Independent binomial drift of two",
+   "populations from a common ancestral frequency vector, standardized genotypes",
+   "so V_A = sum beta^2, F_ST spanning sixfold and V_A twofold independently, and",
+   "F_ST realised from the replicates rather than nominal. All three bodies match",
+   "at worst 1.92 sems, and the superseded factors are falsified on the same",
+   "cells at 23, 15 and 23 sems -- so this re-runs the rejection that produced",
+   "the correction, which is what makes the match gated rather than uncompeted.",
+   "",
+   "For pgsDriftVarianceFromLoci the two verdicts are about two READINGS, not two",
+   "designs, and its own docstring already says so: the sum is HALF the",
+   "one-branch drift variance, which matches at 1.92 sems, and the reading its",
+   "summary line invites -- that the sum IS that variance -- is falsified at 23",
+   "sems in the same cells. pgsdrift01 records both."
+  ],
+  "superseded": {
+   "linalg": [
+    "Transcribed a body one factor of two below the one in the corpus; the",
+    "correction landed afterwards and nothing re-measured it. The verdict was",
+    "right about the formula it tested and says nothing about the formula there."
+   ]
+  }
+ },
+ "Var_Delta_Mu": {
+  "authoritative": "pgsdrift01",
+  "reason": [
+   "TWO DESIGNS, TWO SUBSTITUTIONS, AND BOTH ARE FACTORS OF TWO IN THE SAME",
+   "DIRECTION. This body is `2 * fst * V_A`, and battery_pgs transcribed it",
+   "correctly -- so unlike the rest of this family the falsification is not",
+   "against a superseded body. What differs is the pairing of TARGET and",
+   "F_ST CONVENTION each design read it under.",
+   "",
+   "battery_pgs took the target to be the variance of the DIFFERENCE between two",
+   "demes, which is what the name Var Delta Mu says, and evaluated it at a",
+   "PAIRWISE F_ST, `1 - H_S/H_T` over the deme pair. Both readings are off by a",
+   "factor of two from the corpus's: the difference between two independently",
+   "drifting populations has twice the variance of one of them, and for a pure",
+   "split the pairwise F_ST is `(F_b/2)/(1 - F_b/2)`, about HALF the per-branch",
+   "dispersion. pgsdrift01 measures both F_ST conventions in the same cells and",
+   "the halving is there -- 0.1829 branch against 0.1007 pairwise, 0.1407",
+   "against 0.0757.",
+   "",
+   "So pgsdrift01 REPRODUCES battery_pgs's falsification rather than contesting",
+   "it: recorded as a competitor, `2 * fst_pairwise * V_A` against the variance",
+   "of the difference is FALSIFIED at 22.08 sems and 73 percent. On the pairing",
+   "the corpus's own call sites use -- `pgsDriftVariance_one_pop` IS this body,",
+   "against one population's variance at the per-branch F_ST -- the same run",
+   "matches at 1.92 sems with `fst * V_A` and `4 * fst * V_A` rejected at 23 and",
+   "47 sems on those cells.",
+   "",
+   "The body is right and its NAME points at the reading that is false. That is",
+   "recorded on the declaration rather than repaired by renaming, because the",
+   "name is load-bearing at every call site and a rename is not a measurement."
+  ],
+  "superseded": {
+   "pgs": [
+    "Not wrong about what it measured: it measured the variance of the difference",
+    "at a pairwise F_ST, and `2 * fst * V_A` is genuinely false for that pairing.",
+    "It is superseded as evidence about the DECLARATION because the corpus reads",
+    "this body as one population's variance at the per-branch F_ST, which is the",
+    "pairing pgsdrift01 records and which matches."
+   ]
+  }
  }
 }

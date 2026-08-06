@@ -364,6 +364,23 @@ For one branch with drift index `fst`, this is `2 * fst * V_A`.
     So the body is exact rather than first-order, and it is exact at `F_branch`
     up to 0.74 where any first-order law would have visibly failed. What looked
     like a defect was a convention error in the measurement.
+
+    **A third design makes the same convention error measurable rather than
+    argued** (`validation/empirical/simcov/battery_pgsdrift01.py`). That run
+    reports BOTH `F_ST` conventions in every cell, so the gap between them is a
+    number and not a warning: per-branch 0.1829 against pairwise 0.1007, and
+    0.1407 against 0.0757 -- the pairwise value is `(F_b/2)/(1 - F_b/2)`, about
+    half. Fed the per-branch index against one population's score variance this
+    body matches at worst 1.92 sems, with `fst · V_A` rejected at 23 sems and
+    `4 · fst · V_A` at 47 on the same cells. Fed a pairwise `F_ST` against the
+    variance of the DIFFERENCE -- the pairing `battery_pgs` used, and the one
+    this declaration's NAME invites -- it is FALSIFIED at 22.08 sems and 73%.
+
+    That falsification is the one standing in the ledger against this
+    declaration, and `adjudications.json` now records it as a true result about
+    a pairing the corpus does not use rather than as a verdict on the body. The
+    name is left alone: it is load-bearing at every call site, and a rename is
+    not a measurement.
 -/
 noncomputable def Var_Delta_Mu (V_A fst : ℝ) : ℝ :=
   2 * fst * V_A

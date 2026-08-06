@@ -110,7 +110,7 @@ def one_cell(rng, L, ne, gens, reps, batches):
     V_A = float(np.sum(beta ** 2))
     scale = beta * 2.0 / np.sqrt(2.0 * p0 * (1.0 - p0))
 
-    v1, vdiff, fst = [], [], []
+    v1, vdiff, fst, fpair = [], [], [], []
     for _ in range(batches):
         p1 = drift(rng, p0, ne, gens, reps)
         p2 = drift(rng, p0, ne, gens, reps)
@@ -128,6 +128,16 @@ def one_cell(rng, L, ne, gens, reps, batches):
         # the control doing its job on the estimator rather than on the corpus.
         dev = np.concatenate([p1 - p0, p2 - p0], axis=0) ** 2
         fst.append(float(np.mean(dev.mean(axis=0) / (p0 * (1.0 - p0)))))
+        # The PAIRWISE F_ST as well, `1 - H_S/H_T` over the deme pair, because
+        # it is a different number from the per-branch dispersion above and
+        # `battery_pgs` predicted with it. For a pure split the two are related
+        # by `F_pair = (F_b/2)/(1 - F_b/2)`, so the pairwise value is about HALF
+        # the branch value -- which is a factor of two on top of the factor of
+        # two between one population and the difference between two.
+        pbar = 0.5 * (p1 + p2)
+        hs = 0.5 * (2 * p1 * (1 - p1) + 2 * p2 * (1 - p2))
+        ht = 2 * pbar * (1 - pbar)
+        fpair.append(float(1.0 - hs.mean() / ht.mean()))
 
     def ms(a):
         a = np.array(a)
@@ -136,8 +146,10 @@ def one_cell(rng, L, ne, gens, reps, batches):
     m1, s1 = ms(v1)
     md, sd = ms(vdiff)
     mf, sf = ms(fst)
+    mp, sp = ms(fpair)
     return dict(V_A=V_A, var1=m1, var1_sem=s1, vardiff=md, vardiff_sem=sd,
-                fst=mf, fst_sem=sf, ne=ne, gens=gens, L=L)
+                fst=mf, fst_sem=sf, fpair=mp, fpair_sem=sp,
+                ne=ne, gens=gens, L=L)
 
 
 def main():
@@ -162,13 +174,14 @@ def main():
     ]
 
     rows = []
-    print("\n  %-30s %8s %10s %12s %12s"
-          % ("cell", "F_ST", "V_A", "Var(mu_1)", "Var(mu1-mu2)"))
+    print("\n  %-30s %8s %8s %9s %11s %12s"
+          % ("cell", "F_branch", "F_pair", "V_A", "Var(mu_1)", "Var(mu1-mu2)"))
     for L, ne, gens in designs:
         r = one_cell(rng, L, ne, gens, REPS, BATCHES)
         r["label"] = ("L=%d Ne=%d t=%d (F=%.4f)" % (L, ne, gens, r["fst"]))
-        print("  %-30s %8.4f %10.1f %12.2f %12.2f"
-              % (r["label"], r["fst"], r["V_A"], r["var1"], r["vardiff"]))
+        print("  %-30s %8.4f %8.4f %9.1f %11.2f %12.2f"
+              % (r["label"], r["fst"], r["fpair"], r["V_A"], r["var1"],
+                 r["vardiff"]))
         rows.append(r)
 
     def cells(factor, target):
@@ -217,8 +230,32 @@ def main():
            "PolygenicAdaptation.lean", "4 * fst * V_A", cells(4.0, "var1"),
            **MODEL)
 
+    # THE COMPETITORS ARE NOT DECORATION HERE. Recorded without them, this row's
+    # MATCH was downgraded to UNINFORMATIVE by the emit-time gate -- correctly,
+    # since a design that rejected nothing has not shown it could -- and the
+    # declaration stayed on the ledger guard's "asserts agreement while every
+    # record disagrees" list with a match nobody could use.
     record("Var_Delta_Mu", "PresentDayMetrics.lean", "2 * fst * V_A",
            cells(2.0, "var1"), **MODEL)
+    record("Var_Delta_Mu [fst * V_A, competing]", "PresentDayMetrics.lean",
+           "fst * V_A", cells(1.0, "var1"), **MODEL)
+    record("Var_Delta_Mu [4 * fst * V_A, the two-population factor, competing]",
+           "PresentDayMetrics.lean", "4 * fst * V_A", cells(4.0, "var1"),
+           **MODEL)
+    # THE READING THE NAME INVITES, reproduced so the adjudication against
+    # `battery_pgs` is measured rather than argued. That battery took the target
+    # to be the variance of the DIFFERENCE between two demes -- which is what
+    # "Var Delta Mu" says -- and evaluated `2 * fst * V_A` at a PAIRWISE F_ST.
+    # Both substitutions are factors of two in the same direction, so its
+    # falsification is real about that pairing and says nothing about the
+    # pairing the corpus's own call sites use, where
+    # `pgsDriftVariance_one_pop = Var_Delta_Mu`.
+    record("Var_Delta_Mu [the name's reading: variance of the DIFFERENCE at a "
+           "pairwise F_ST, competing]", "PresentDayMetrics.lean",
+           "2 * fst_pairwise * V_A against Var(mu_1 - mu_2)",
+           [dict(design=r["label"], lean=2.0 * r["fpair"] * r["V_A"],
+                 truth=r["vardiff"], sem=r["vardiff_sem"]) for r in rows],
+           **MODEL)
 
     record("pgsDiffVariance_two_pop", "PolygenicAdaptation.lean",
            "2 * pgsDriftVariance_one_pop V_A fst, i.e. 4 * fst * V_A",
