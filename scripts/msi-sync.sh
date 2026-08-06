@@ -9,6 +9,16 @@ REMOTE="/projects/standard/hsiehph/sauer354/descent"
 MSI="${MSI:-$HOME/msi-node/msi}"
 TAR="$(mktemp -t descent-src).tar.gz"
 cd "$ROOT"
+# COPYFILE_DISABLE, or macOS `tar` writes an AppleDouble `._X` beside every file
+# it archives -- the extended attributes, including the `com.apple.provenance`
+# whose "unknown extended header keyword" warning this used to print on every
+# run. Extracted on the node they become 289 files named `._Something.lean`,
+# which are not UTF-8 and are not Lean. Guards that route through
+# `lean_sources` drop them; `run_heads` hand-rolled its walk and reported 271
+# findings asking the heads to import `Descent.Spectral.._CirculationDefect`.
+# Both ends are fixed: the guard no longer sees them and the tar no longer
+# makes them.
+export COPYFILE_DISABLE=1
 tar czf "$TAR" Descent Descent.lean lakefile.lean lean-toolchain lake-manifest.json validation
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"

@@ -7503,12 +7503,20 @@ def run_heads() -> int:
             continue
         text = open(head, encoding="utf-8", errors="ignore").read()
         imported = set(_re.findall(r"(?m)^import\s+(\S+)$", text))
-        on_disk = set()
-        for dirpath, _sub, files in _os.walk(d):
-            for fn in sorted(files):
-                if fn.endswith(".lean"):
-                    rel = _os.path.relpath(_os.path.join(dirpath, fn), root)
-                    on_disk.add(rel[:-len(".lean")].replace(_os.sep, "."))
+        # `lean_sources` AND NOT A FIFTH HAND-ROLLED WALK. The one this replaced
+        # swept up AppleDouble `._X.lean` resource forks -- macOS `tar` writes
+        # one beside every file it archives, and the sync script extracts them
+        # into the shared checkout -- and asked the head to import
+        # `Descent.Spectral.._CirculationDefect`, a module name no file can have.
+        # 271 of this guard's findings were that, i.e. all but one, and the
+        # false ones read exactly like the true one. The comment on
+        # `lean_sources` says one place decides what counts as a corpus file
+        # precisely because a walk that forgets is indistinguishable from a walk
+        # that is right.
+        on_disk = {
+            str(p.relative_to(root)).replace(_os.sep, ".")[:-len(".lean")]
+            for p in lean_sources(Path(d))
+        }
         for m in sorted(on_disk - imported):
             missing.append(f"Descent/{entry}.lean does not import {m}")
         for m in sorted(imported - on_disk):
