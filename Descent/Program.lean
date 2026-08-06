@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Program.CausalInference
 import Descent.Program.Conclusions
 import Descent.Program.Consequences
-import Descent.Program.Conventions
 import Descent.Program.OpenQuestions
 
 /-!

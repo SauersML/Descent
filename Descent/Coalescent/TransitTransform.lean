@@ -7,7 +7,8 @@ import Mathlib.Probability.Independence.InfinitePi
 import Mathlib.Probability.Independence.Integration
 import Mathlib.Tactic
 
-assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`

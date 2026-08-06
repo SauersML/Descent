@@ -7,7 +7,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Nat.Choose.Basic
 import Mathlib.Tactic
 
-assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent
 

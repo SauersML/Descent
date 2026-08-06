@@ -10,7 +10,8 @@ import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
 
-assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # `Linkage` -- what a pangenome graph forgets, and what that forces it to admit

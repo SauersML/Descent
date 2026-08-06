@@ -12,7 +12,8 @@ import Descent.Decision.CertificateGrading
 -- genuinely uses.  Declared here, where the use is.
 import Descent.Decision.TransportedMinimax
 
-assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Program
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Decision`:
 --   Decision: reaches 2 module(s) -- `Descent.Decision.CertificateGrading`, `Descent.Decision.TransportedMinimax`

@@ -5,7 +5,8 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Tactic.Linarith
 import Descent.Layer
 
-assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision
+assert_below Descent.Program
 
 -- `phase_of_abs_neg` uses `Real.log`, which is why `Log.Basic` is imported above: without
 -- it `Real.log` resolves as an unknown constant. A missing import here is invisible to any

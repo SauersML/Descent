@@ -3,7 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.Linkage.Interface
 
-assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # The mosaic language of an interface chain

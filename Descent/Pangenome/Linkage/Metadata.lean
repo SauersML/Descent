@@ -3,7 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.Linkage.Barrier
 
-assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # Where the identity goes when the topology stops carrying it

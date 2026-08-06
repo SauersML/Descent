@@ -5,7 +5,8 @@ import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.Data.Real.Basic
 import Descent.Layer
 
-assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision
+assert_below Descent.Program
 
 namespace Descent.Spectral
 

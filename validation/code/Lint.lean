@@ -63,13 +63,14 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 -- someone later narrows should not silently narrow the gate too.
 #lint only empiricalStatusVocabulary empiricalStatusMultiplicity in Descent
 
-/-! ## The linters that used to be debt
+/-! ## The linters filed as debt elsewhere
 
 `scaledQuantityUntyped`, the Batteries set `simpNF`, `simpVarHead`, `dupNamespace` and
 `defLemma`, and `unusedArguments`.  All of them gate.
 
-`unusedArguments` was held out on the argument that it reported 135 and that an unused
-binder here is frequently a regime hypothesis carried on purpose.  That is a statement
+`unusedArguments` is held out nowhere.  The argument for excluding it is that it
+reports 135, and that an unused binder here is frequently a regime hypothesis
+carried on purpose.  That is a statement
 about intent, not about the finding: the binder IS unused, and a theorem carrying a
 hypothesis its proof never consumes states something weaker than what was proved.  A
 reader cannot tell the deliberate ones from the accidental ones, and neither can this

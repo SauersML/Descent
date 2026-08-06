@@ -3,7 +3,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Core.Ratios
 
-assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Core: the scaling conventions, as types

@@ -6,7 +6,9 @@ import Lean.DocString
 import Descent.Meta.DocConvention
 import Descent.Layer
 
-assert_below Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # A command linter for the status convention

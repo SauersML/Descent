@@ -7,7 +7,8 @@ import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
 
-assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
+assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # The group's statements, pinned

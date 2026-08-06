@@ -5,7 +5,8 @@ import Mathlib
 
 import Descent.Core.Scaling
 
-assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.PopGen
 

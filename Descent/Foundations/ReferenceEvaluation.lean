@@ -5,7 +5,8 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
 import Descent.Layer
 
-assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 namespace Descent.Foundations
 

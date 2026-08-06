@@ -7,7 +7,8 @@ import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Tactic
 import Descent.Layer
 
-assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.PopGen Descent.Spectral Descent.Blindness
+assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # What one pangenome interface forgets
