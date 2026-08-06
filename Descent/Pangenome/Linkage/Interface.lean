@@ -42,8 +42,10 @@ is what lets a chain of interfaces be an ordinary `List`.
 ## The results
 
 * `sum_mul_log_le_log_sum` — weighted Jensen for `Real.log`, from `log x ≤ x - 1` and
-  nothing else.  This is the ONLY analytic input the whole group uses; the chain law, the
-  width law and the imbalance tax are all this inequality applied to different weights.
+  nothing else.  It is the group's only CONVEXITY input: the chain law, the tree law, the
+  width law, the imbalance tax and the frequency-weighted law are all this inequality
+  applied to different weights.  Monotonicity of `log` is used as well, to clear the
+  logarithms out of the width law; nothing else analytic is.
 * `sum_mul_log_div_nonneg` — Gibbs: relative entropy is nonnegative.
 * `identityLoss_eq_width_add_imbalance` — `H(J ∣ S) = log (m/w) + D(q ‖ u)`.
 * `imbalance_nonneg`, and hence `log_card_sub_log_width_le_identityLoss` — an interface of

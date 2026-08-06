@@ -16,15 +16,16 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 
 Seven modules.  The first four read in order, each measuring something the previous one
 defined; the last three each drop a restriction the first four carried.  The group's whole
-analytic content is one inequality, stated in the first module.
+convexity content is one inequality, stated in the first module.
 
 ## The order
 
 1. `Interface` -- one separator.  Its fibers, its occupied `width`, the `identityLoss` it
    commits (which is `H(J ∣ S)` for a uniform panel), and the split
    `H(J ∣ S) = log (m/w) + D(q ‖ u)` into a width term and an imbalance tax.  The only
-   analysis in the group is `sum_mul_log_le_log_sum`, weighted Jensen for `Real.log`, proved
-   from `log x ≤ x - 1`.
+   convexity in the group is `sum_mul_log_le_log_sum`, weighted Jensen for `Real.log`, proved
+   from `log x ≤ x - 1`; monotonicity of `log` is used besides it, to clear logarithms, and
+   nothing else analytic is.
 
 2. `Chain` -- the language.  The derivations a chain of separators admits, the `O(m·r)`
    dynamic program that counts them with a proof that it counts THEM, the exact product
