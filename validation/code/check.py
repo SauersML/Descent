@@ -2882,12 +2882,23 @@ STANDARD_CLASSES = {
 ASSUMPTION_CLASSES = {"Fact", "Nonempty", "Inhabited"}
 
 
-def is_prop_type(ty: str, prop_aliases: set[str], prop_structs: set[str]) -> bool:
+def is_prop_type(ty: str, prop_aliases: set[str], prop_structs: set[str],
+                 type_names: frozenset = frozenset()) -> bool:
     """Whether a binder type is a PROPOSITION (a hypothesis), as opposed to data.
 
     `(f : α → Prop)` is data -- an abstract predicate parameter, reported separately.
     `(h : ∀ x, f x)` is a proposition.  The discriminator is the head, not the presence
     of the token `Prop`.
+
+    A LEADING `∀` DOES NOT MAKE A PROPOSITION.  `∀ x, body` is a dependent function type,
+    and it is a proposition exactly when `body` is one; when `body` is a type family it is
+    ORDINARY DATA.  `(ξ : ∀ n, ER n)` is a family of equivalence relations, one per index,
+    and reading it as an assumed fact reported a data parameter as a laundered premise.
+
+    The recursion uses POSITIVE KNOWLEDGE ONLY: it reclassifies as data when the body's
+    head is a name this corpus defines and does not define as a proposition.  A head that
+    is a bound predicate -- the documented `∀ x, f x` -- is not a corpus name, so it stays
+    a proposition, and no case the caller could not verify is decided here.
     """
     t = norm(ty)
     if not t:
@@ -2895,6 +2906,14 @@ def is_prop_type(ty: str, prop_aliases: set[str], prop_structs: set[str]) -> boo
     if re.search(r"(→|->)\s*Prop$", t) or t == "Prop":
         return False          # predicate-valued data, not an assumption
     if any(t.startswith(k + " ") or t == k for k in LOGIC) or t.startswith("¬"):
+        if t.startswith("∀") and "," in t:
+            body = t.split(",", 1)[1].strip()
+            bhead = re.match(r"([A-Za-z_][\w.']*)", body)
+            if bhead:
+                bbase = bhead.group(1).split(".")[-1]
+                if (bbase in type_names and bbase not in prop_aliases
+                        and bbase not in prop_structs):
+                    return False
         return True
     d = depths(t)
     for op in REL + LOGIC:
@@ -3084,7 +3103,7 @@ def analyse(corpus: Corpus) -> list[Finding]:
 
 
 def hypotheses(d: Decl, c: Corpus) -> list[Binder]:
-    return [b for b in d.binders if is_prop_type(b.type, c.prop_aliases, c.prop_structs)]
+    return [b for b in d.binders if is_prop_type(b.type, c.prop_aliases, c.prop_structs, frozenset(c.corpus_names))]
 
 
 def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
@@ -3130,7 +3149,7 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
                 # premise to a theorem the corpus proves, is ordinary mathematics.  Its
                 # conditionality is real and F16 is where that is reported.
                 if not fld and not m.group(3).strip() and \
-                        is_prop_type(b.type, c.prop_aliases, c.prop_structs):
+                        is_prop_type(b.type, c.prop_aliases, c.prop_structs, frozenset(c.corpus_names)):
                     add("F1b", f"proof is the bare premise `{root}`: the theorem "
                                f"restates its own hypothesis")
                 elif owners:
@@ -3153,7 +3172,7 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             base = head.group(1).split(".")[-1]
             if base in c.prop_structs:
                 carrying = [x.name for x in c.struct_fields.get(base, [])
-                            if is_prop_type(x.type, c.prop_aliases, c.prop_structs)]
+                            if is_prop_type(x.type, c.prop_aliases, c.prop_structs, frozenset(c.corpus_names))]
                 if base not in c.inhabited:
                     add("F4", f"parameter `{b.name} : {base}` is a certificate "
                               f"(Prop fields: {', '.join(carrying[:4])}) and no "
@@ -3172,7 +3191,7 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
                     # equals a Prop field's statement.
                     bare = norm(concl.replace(f"{b.name}.", "")) if b.name else ""
                     for fld in c.struct_fields.get(base, []):
-                        if not is_prop_type(fld.type, c.prop_aliases, c.prop_structs):
+                        if not is_prop_type(fld.type, c.prop_aliases, c.prop_structs, frozenset(c.corpus_names)):
                             continue
                         if bare and bare == norm(fld.type):
                             add("F22", f"parameter `{b.name} : {base}` has field "
@@ -3310,7 +3329,7 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             # theorem whose hypotheses do pin the denominator down.
             guarded = any(re.search(rf"(?<![.\w']){re.escape(den)}(?![\w'])", b.type)
                           for b in d.binders
-                          if is_prop_type(b.type, c.prop_aliases, c.prop_structs))
+                          if is_prop_type(b.type, c.prop_aliases, c.prop_structs, frozenset(c.corpus_names)))
             if not guarded:
                 add("F21", f"conclusion divides by `{den}`, which no premise shows is "
                            f"nonzero; `x / 0 = 0` in Lean, so the claim is silently true "
