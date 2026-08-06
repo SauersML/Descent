@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.SegregatingSites
+import Descent.Core.Scaling
 import Mathlib.Tactic
 import Descent.Layer
 
@@ -90,9 +91,10 @@ Empirical status: MIXED.  The `1/i` shape is DERIVED, in `Descent.Coalescent.FuU
 factor `θ/2` converting branch length to mutations is the Poisson mutation premise flagged at
 `Descent.Coalescent.SegregatingSites.expectedSegregatingSites`, i.e. ASSUMED.  The head is
 `MIXED` because those are two different verdicts and this definition depends on both. -/
-noncomputable def expectedSpectrum (θ : ℝ) (i : ℕ) : ℝ := θ / 2 * spectrumBranchLength i
+noncomputable def expectedSpectrum (θ : Descent.Core.Theta) (i : ℕ) : ℝ :=
+  θ.value / 2 * spectrumBranchLength i
 
-theorem expectedSpectrum_eq (θ : ℝ) (i : ℕ) : expectedSpectrum θ i = θ / (i : ℝ) := by
+theorem expectedSpectrum_eq (θ : Descent.Core.Theta) (i : ℕ) : expectedSpectrum θ i = θ.value / (i : ℝ) := by
   unfold expectedSpectrum spectrumBranchLength
   ring
 
@@ -116,7 +118,7 @@ theorem sum_spectrumBranchLength (n : ℕ) :
 
 /-- **And therefore the spectrum totals Watterson's `E(S_n)`.**  A spectrum whose classes sum
 to something else would contradict the tree, not merely disagree with a convention. -/
-theorem sum_expectedSpectrum (θ : ℝ) (n : ℕ) :
+theorem sum_expectedSpectrum (θ : Descent.Core.Theta) (n : ℕ) :
     ∑ j ∈ range (n - 1), expectedSpectrum θ (j + 1) = expectedSegregatingSites θ n := by
   unfold expectedSpectrum expectedSegregatingSites
   rw [← mul_sum, sum_spectrumBranchLength]
@@ -130,8 +132,8 @@ and only its height moves.
 The practical reading: a spectrum's SHAPE is a statement about the genealogy alone.  Fitting
 demography to a spectrum and then reading a mutation rate off the same fit is reading one
 number twice. -/
-theorem spectrum_shape_independent_of_theta (θ : ℝ) (j : ℕ) :
-    expectedSpectrum θ (j + 1) * ((j : ℝ) + 1) = θ := by
+theorem spectrum_shape_independent_of_theta (θ : Descent.Core.Theta) (j : ℕ) :
+    expectedSpectrum θ (j + 1) * ((j : ℝ) + 1) = θ.value := by
   rw [expectedSpectrum_eq]
   have hne : ((j : ℝ) + 1) ≠ 0 := by positivity
   push_cast
@@ -139,7 +141,7 @@ theorem spectrum_shape_independent_of_theta (θ : ℝ) (j : ℕ) :
 
 /-- The classes fall off exactly like `1/i` relative to the singleton class, for every `θ`
 including `θ = 0` where both sides vanish. -/
-theorem spectrum_ratio (θ : ℝ) (j : ℕ) :
+theorem spectrum_ratio (θ : Descent.Core.Theta) (j : ℕ) :
     expectedSpectrum θ (j + 1) * ((j : ℝ) + 1) = expectedSpectrum θ 1 := by
   rw [spectrum_shape_independent_of_theta, expectedSpectrum_eq]
   norm_num
@@ -151,7 +153,7 @@ of sample size, decaying like `1/log n`.
 Every sample is dominated by singletons, and every larger sample is dominated by them
 slightly less.  A design that expects rare-variant burden to stabilise with sample size is
 expecting the harmonic series to converge. -/
-theorem singletonShare_eq {θ : ℝ} (hθ : θ ≠ 0) {n : ℕ} (hn : 2 ≤ n) :
+theorem singletonShare_eq {θ : Descent.Core.Theta} (hθ : θ.value ≠ 0) {n : ℕ} (hn : 2 ≤ n) :
     expectedSpectrum θ 1 / expectedSegregatingSites θ n = 1 / harmonicSum (n - 1) := by
   have hpos := harmonicSum_pos_of_two_le hn
   have h1 : ((1 : ℕ) : ℝ) = 1 := by norm_num

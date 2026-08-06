@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.PairwiseTimes
+import Descent.Core.Scaling
 import Descent.Coalescent.SpectrumMoments
 import Mathlib.Tactic
 import Descent.Layer
@@ -170,10 +171,10 @@ exponential clock, `Cov = 1/3` and `E(S) = 1` for sharing pairs, `Cov = 2/9` and
 for disjoint ones.  What is ASSUMED, as everywhere in this group, is that the holding times
 are independent -- `Descent.Coalescent.Program` item 4 -- and that mutation is Poisson at rate
 `θ/2` along the branches, flagged at `SegregatingSites.expectedSegregatingSites`. -/
-noncomputable def varPairwiseFromTree (θ : ℝ) (n : ℝ) : ℝ :=
-  (pairCount n + sharingCount n + (2 / 3) * disjointCount n) / pairCount n ^ 2 * θ
+noncomputable def varPairwiseFromTree (θ : Descent.Core.Theta) (n : ℝ) : ℝ :=
+  (pairCount n + sharingCount n + (2 / 3) * disjointCount n) / pairCount n ^ 2 * θ.value
     + (pairCount n + 2 * (sharingCount n / 3 + (2 / 9) * disjointCount n))
-        / pairCount n ^ 2 * θ ^ 2
+        / pairCount n ^ 2 * θ.value ^ 2
 
 /-- **The assembly is Tajima's formula.**
 
@@ -183,7 +184,7 @@ The `θ` coefficient's numerator collapses to `n(n-1)·n(n+1)/12` and the `θ²`
 `n(n-1)(n²+n+3)/18`; dividing by `C² = n²(n-1)²/4` gives Tajima's two fractions.  The
 `n² + n + 3` that looks arbitrary in the published formula is `9 + 6(n-2) + (n-2)(n-3)`: one
 term for the pair itself, one for the sharing class, one for the disjoint class. -/
-theorem varPairwiseFromTree_eq_tajima {n : ℕ} (hn : 2 ≤ n) (θ : ℝ) :
+theorem varPairwiseFromTree_eq_tajima {n : ℕ} (hn : 2 ≤ n) (θ : Descent.Core.Theta) :
     varPairwiseFromTree θ (n : ℝ) = tajimaVarPairwise θ n := by
   have hn2 : (2 : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
   have hn0 : (n : ℝ) ≠ 0 := by linarith
@@ -194,7 +195,7 @@ theorem varPairwiseFromTree_eq_tajima {n : ℕ} (hn : 2 ≤ n) (θ : ℝ) :
 
 /-- The `n = 2` case, against the check `SpectrumMoments.varPairwise_two_eq` already made:
 with one pair there are no covariances, and `Var(π) = Var(S) = θ + θ²`. -/
-theorem varPairwiseFromTree_two (θ : ℝ) :
+theorem varPairwiseFromTree_two (θ : Descent.Core.Theta) :
     varPairwiseFromTree θ (2 : ℝ) = varSegregatingSites θ 2 := by
   rw [show ((2 : ℝ)) = ((2 : ℕ) : ℝ) by norm_num, varPairwiseFromTree_eq_tajima (by norm_num)]
   exact varPairwise_two_eq θ

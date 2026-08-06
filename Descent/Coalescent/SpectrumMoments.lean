@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.SegregatingSites
+import Descent.Core.Scaling
 import Mathlib.Tactic
 import Descent.Layer
 
@@ -163,26 +164,26 @@ Empirical status: DERIVED.  It is the law of total variance applied to the Poiss
 premise of `SegregatingSites.expectedSegregatingSites`, whose two verdicts it inherits: the
 tree factors are derived from the rate ladder, the Poisson-with-mean-`½θL` conditional law is
 assumed.  `varSegregatingSites_eq_totalVariance` is the decomposition made explicit. -/
-noncomputable def varSegregatingSites (θ : ℝ) (n : ℕ) : ℝ :=
-  θ * harmonicSum (n - 1) + θ ^ 2 * harmonicSumSq (n - 1)
+noncomputable def varSegregatingSites (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
+  θ.value * harmonicSum (n - 1) + θ.value ^ 2 * harmonicSumSq (n - 1)
 
 /-- **The law of total variance, as an identity.**  `Var(S) = ½θ E(L) + (½θ)² Var(L)`: the
 first term is the Poisson noise given the tree, the second is the tree's own variability
 transmitted through the mutation rate.  Writing it this way shows there is no third term, and
 that the two contributions are the mean and the variance of the SAME `L`. -/
-theorem varSegregatingSites_eq_totalVariance (θ : ℝ) (n : ℕ) :
+theorem varSegregatingSites_eq_totalVariance (θ : Descent.Core.Theta) (n : ℕ) :
     varSegregatingSites θ n
-      = θ / 2 * expectedTotalBranchLength n + (θ / 2) ^ 2 * varTotalBranchLength n := by
+      = θ.value / 2 * expectedTotalBranchLength n + (θ.value / 2) ^ 2 * varTotalBranchLength n := by
   rw [expectedTotalBranchLength_eq_harmonic, varTotalBranchLength_eq]
   unfold varSegregatingSites
   ring
 
-theorem varSegregatingSites_nonneg {θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) :
+theorem varSegregatingSites_nonneg {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) (n : ℕ) :
     0 ≤ varSegregatingSites θ n := by
   unfold varSegregatingSites
   have h1 := harmonicSum_nonneg (n - 1)
   have h2 := harmonicSumSq_nonneg (n - 1)
-  have : 0 ≤ θ ^ 2 := sq_nonneg θ
+  have : 0 ≤ θ.value ^ 2 := sq_nonneg θ.value
   nlinarith
 
 /-! ### And of the estimator -/
@@ -192,23 +193,23 @@ variance divides by the square.
 
 Empirical status: DERIVED from `varSegregatingSites` and
 `SegregatingSites.wattersonEstimator`. -/
-noncomputable def varWattersonEstimator (θ : ℝ) (n : ℕ) : ℝ :=
+noncomputable def varWattersonEstimator (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
   varSegregatingSites θ n / harmonicSum (n - 1) ^ 2
 
 /-- **A bound falling like `1/a_{n-1}`.**  Both terms of the variance carry at least one
 factor of `a_{n-1}` in the denominator, and `b` is bounded, so the whole thing is at most
 `(θ + 2θ²)/a_{n-1}` once `a_{n-1} ≥ 1` -- which holds from `n = 2` on. -/
-theorem varWattersonEstimator_le {θ : ℝ} (hθ : 0 ≤ θ) {n : ℕ} (hn : 1 ≤ harmonicSum (n - 1)) :
-    varWattersonEstimator θ n ≤ (θ + 2 * θ ^ 2) / harmonicSum (n - 1) := by
+theorem varWattersonEstimator_le {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {n : ℕ} (hn : 1 ≤ harmonicSum (n - 1)) :
+    varWattersonEstimator θ n ≤ (θ.value + 2 * θ.value ^ 2) / harmonicSum (n - 1) := by
   have ha : (0 : ℝ) < harmonicSum (n - 1) := by linarith
   have hb := harmonicSumSq_le_two (n - 1)
   have hb0 := harmonicSumSq_nonneg (n - 1)
-  have hsq : 0 ≤ θ ^ 2 := sq_nonneg θ
+  have hsq : 0 ≤ θ.value ^ 2 := sq_nonneg θ.value
   unfold varWattersonEstimator varSegregatingSites
   rw [div_le_div_iff₀ (pow_pos ha 2) ha]
-  have h1 : θ ^ 2 * harmonicSumSq (n - 1) ≤ 2 * θ ^ 2 := by nlinarith
-  have h2 : (2 : ℝ) * θ ^ 2 * harmonicSum (n - 1)
-      ≤ 2 * θ ^ 2 * harmonicSum (n - 1) ^ 2 := by
+  have h1 : θ.value ^ 2 * harmonicSumSq (n - 1) ≤ 2 * θ.value ^ 2 := by nlinarith
+  have h2 : (2 : ℝ) * θ.value ^ 2 * harmonicSum (n - 1)
+      ≤ 2 * θ.value ^ 2 * harmonicSum (n - 1) ^ 2 := by
     nlinarith [mul_nonneg (mul_nonneg (by norm_num : (0 : ℝ) ≤ 2) hsq)
       (mul_nonneg ha.le (by linarith : (0 : ℝ) ≤ harmonicSum (n - 1) - 1))]
   nlinarith [mul_le_mul_of_nonneg_right h1 ha.le, h2]
@@ -222,22 +223,22 @@ precision.  A study that doubles its cohort improves this estimator by the diffe
 two logarithms.  `Descent.Coalescent.BranchLength.tendsto_expectedTotalBranchLength_atTop` is
 the same `log n` seen as growth; here it is seen as a rate of convergence, and the two are
 the same statement about the same sum. -/
-theorem exists_varWattersonEstimator_lt {θ : ℝ} (hθ : 0 ≤ θ) {ε : ℝ} (hε : 0 < ε) :
+theorem exists_varWattersonEstimator_lt {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {ε : ℝ} (hε : 0 < ε) :
     ∃ n : ℕ, varWattersonEstimator θ n < ε := by
   obtain ⟨m, hm⟩ := (tendsto_harmonicSum_atTop.eventually_ge_atTop
-    (max 1 ((θ + 2 * θ ^ 2 + 1) / ε))).exists
-  have hmax1 : (1 : ℝ) ≤ max 1 ((θ + 2 * θ ^ 2 + 1) / ε) := le_max_left _ _
-  have hmax2 : (θ + 2 * θ ^ 2 + 1) / ε ≤ max 1 ((θ + 2 * θ ^ 2 + 1) / ε) := le_max_right _ _
+    (max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε))).exists
+  have hmax1 : (1 : ℝ) ≤ max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε) := le_max_left _ _
+  have hmax2 : (θ.value + 2 * θ.value ^ 2 + 1) / ε ≤ max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε) := le_max_right _ _
   have hone : (1 : ℝ) ≤ harmonicSum m := le_trans hmax1 hm
-  have hbig : (θ + 2 * θ ^ 2 + 1) / ε ≤ harmonicSum m := le_trans hmax2 hm
+  have hbig : (θ.value + 2 * θ.value ^ 2 + 1) / ε ≤ harmonicSum m := le_trans hmax2 hm
   have hpos : (0 : ℝ) < harmonicSum m := by linarith
   refine ⟨m + 1, ?_⟩
   have hidx : m + 1 - 1 = m := rfl
   have hbound := varWattersonEstimator_le hθ (n := m + 1) (by rw [hidx]; exact hone)
   rw [hidx] at hbound
-  have hkey : (θ + 2 * θ ^ 2) / harmonicSum m < ε := by
+  have hkey : (θ.value + 2 * θ.value ^ 2) / harmonicSum m < ε := by
     rw [div_lt_iff₀ hpos]
-    have hmul : (θ + 2 * θ ^ 2 + 1) ≤ ε * harmonicSum m := by
+    have hmul : (θ.value + 2 * θ.value ^ 2 + 1) ≤ ε * harmonicSum m := by
       rw [div_le_iff₀ hε] at hbig
       linarith
     linarith
@@ -253,9 +254,9 @@ CHECKED -- `varPairwise_two_eq` verifies it at `n = 2` -- and
 `TajimaVariance.varPairwiseFromTree_eq_tajima` now derives it for every `n ≥ 2` from the
 tree: the per-pair variance, the two coalescence-time covariances, the two shared-path
 lengths, and the counts of the pair classes. -/
-noncomputable def tajimaVarPairwise (θ : ℝ) (n : ℕ) : ℝ :=
-  ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ
-    + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ ^ 2
+noncomputable def tajimaVarPairwise (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
+  ((n : ℝ) + 1) / (3 * ((n : ℝ) - 1)) * θ.value
+    + 2 * ((n : ℝ) ^ 2 + (n : ℝ) + 3) / (9 * (n : ℝ) * ((n : ℝ) - 1)) * θ.value ^ 2
 
 /-- **At `n = 2` Tajima's formula is this corpus's `Var(S₂)`.**  A sample of two has one pair,
 so `π` IS `S`, and the two developments must agree: Tajima's expression collapses to
@@ -265,7 +266,7 @@ This is the only sample size at which the check is available, because for `n ≥
 differences overlap and `Var(π)` stops being a function of the tree's total length.  That it
 passes is evidence the two conventions match; it is not the general formula, and
 `Descent.Coalescent.Program` says so. -/
-theorem varPairwise_two_eq (θ : ℝ) :
+theorem varPairwise_two_eq (θ : Descent.Core.Theta) :
     tajimaVarPairwise θ 2 = varSegregatingSites θ 2 := by
   have h1 : harmonicSum (2 - 1) = 1 := by norm_num
   have h2 : harmonicSumSq (2 - 1) = 1 := by

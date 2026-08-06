@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Extend
+import Descent.Core.Scaling
 import Mathlib.Tactic
 import Descent.Layer
 
@@ -171,8 +172,8 @@ theorem one_le_classSize {n : ℕ} (ξ : ER n) (c : Quotient ξ) : 1 ≤ classSi
   exact Finset.mem_filter.mpr ⟨Finset.mem_univ x, hx⟩
 
 /-- The Ewens weight of K-G (3.8), stripped of its normalising denominator. -/
-noncomputable def ewensWeight {n : ℕ} (θ : ℝ) (ξ : ER n) : ℝ :=
-  θ ^ (blocks ξ - 1) * ∏ c : Quotient ξ, (((classSize ξ c - 1)! : ℕ) : ℝ)
+noncomputable def ewensWeight {n : ℕ} (θ : Descent.Core.Theta) (ξ : ER n) : ℝ :=
+  θ.value ^ (blocks ξ - 1) * ∏ c : Quotient ξ, (((classSize ξ c - 1)! : ℕ) : ℝ)
 
 /-! ### The weight of a seating
 
@@ -210,8 +211,8 @@ theorem image_extendMap_some {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
 
 /-- **Starting a new class multiplies the weight by `θ`.**  The new class is a singleton, so
 `(λ - 1)! = 0! = 1` and the factorial product is untouched; only `θ^{|ξ|-1}` moves. -/
-theorem ewensWeight_extend_none {n : ℕ} (θ : ℝ) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
-    ewensWeight θ (extend ξ none) = θ * ewensWeight θ ξ := by
+theorem ewensWeight_extend_none {n : ℕ} (θ : Descent.Core.Theta) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
+    ewensWeight θ (extend ξ none) = θ.value * ewensWeight θ ξ := by
   classical
   have hprod : ∏ d : Quotient (extend ξ none), (((classSize (extend ξ none) d - 1)! : ℕ) : ℝ)
       = ∏ c : Quotient ξ, (((classSize ξ c - 1)! : ℕ) : ℝ) := by
@@ -233,7 +234,7 @@ theorem ewensWeight_extend_none {n : ℕ} (θ : ℝ) (ξ : ER n) (hb : 1 ≤ blo
   have hblocks : blocks (extend ξ none) = blocks ξ + 1 := blocks_extend_none ξ
   unfold ewensWeight
   rw [hprod, hblocks]
-  have hpow : θ ^ (blocks ξ + 1 - 1) = θ * θ ^ (blocks ξ - 1) := by
+  have hpow : θ.value ^ (blocks ξ + 1 - 1) = θ.value * θ.value ^ (blocks ξ - 1) := by
     have : blocks ξ + 1 - 1 = (blocks ξ - 1) + 1 := by omega
     rw [this, pow_succ]
     ring
@@ -242,7 +243,7 @@ theorem ewensWeight_extend_none {n : ℕ} (θ : ℝ) (ξ : ER n) (hb : 1 ≤ blo
 
 /-- **Joining a class of size `λ` multiplies the weight by `λ`.**  The block count is
 unchanged, so `θ^{|ξ|-1}` stands still; the class grows by one, and `λ!/(λ-1)! = λ`. -/
-theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient ξ) :
+theorem ewensWeight_extend_some {n : ℕ} (θ : Descent.Core.Theta) (ξ : ER n) (c : Quotient ξ) :
     ewensWeight θ (extend ξ (some c)) = (classSize ξ c : ℝ) * ewensWeight θ ξ := by
   classical
   have hfib : ∀ d : Quotient ξ,
@@ -294,9 +295,9 @@ theorem ewensWeight_extend_some {n : ℕ} (θ : ℝ) (ξ : ER n) (c : Quotient �
 /-- **The seatings of one state contribute `θ + n`.**  This is the Chinese-restaurant
 recursion: one seat per element, weighted by which class the element is in, plus the new
 class weighted `θ`.  `sum_classSize` is what turns the class sum into `n`. -/
-theorem sum_seatings_ewensWeight {n : ℕ} (θ : ℝ) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
+theorem sum_seatings_ewensWeight {n : ℕ} (θ : Descent.Core.Theta) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
     ∑ o : Option (Quotient ξ), ewensWeight θ (extend ξ o)
-      = (θ + (n : ℝ)) * ewensWeight θ ξ := by
+      = (θ.value + (n : ℝ)) * ewensWeight θ ξ := by
   classical
   rw [Fintype.sum_option, ewensWeight_extend_none θ ξ hb]
   have hsome : ∀ c : Quotient ξ,
@@ -324,8 +325,8 @@ This is what makes K-G (3.8) a probability distribution, and it is the general-`
 that `Descent.Coalescent.Mutation` could only check at `n = 2` and `n = 3`.  The proof is
 Kingman's restaurant, run as an induction on the sample size: `sum_ER_succ` decomposes the
 sum by seating, and `sum_seatings_ewensWeight` values each seating at `θ + n`. -/
-theorem sum_ewensWeight {n : ℕ} (θ : ℝ) (hn : 1 ≤ n) :
-    ∑ ξ : ER n, ewensWeight θ ξ = ∏ i ∈ Finset.Ico 1 n, (θ + (i : ℝ)) := by
+theorem sum_ewensWeight {n : ℕ} (θ : Descent.Core.Theta) (hn : 1 ≤ n) :
+    ∑ ξ : ER n, ewensWeight θ ξ = ∏ i ∈ Finset.Ico 1 n, (θ.value + (i : ℝ)) := by
   classical
   induction n, hn using Nat.le_induction with
   | base =>
@@ -343,7 +344,7 @@ theorem sum_ewensWeight {n : ℕ} (θ : ℝ) (hn : 1 ≤ n) :
       rw [sum_ER_succ]
       have hterm : ∀ ξ : ER m,
           ∑ o : Option (Quotient ξ), ewensWeight θ (extend ξ o)
-            = (θ + (m : ℝ)) * ewensWeight θ ξ :=
+            = (θ.value + (m : ℝ)) * ewensWeight θ ξ :=
         fun ξ ↦ sum_seatings_ewensWeight θ ξ (blocks_pos ξ)
       simp only [hterm]
       rw [← Finset.mul_sum, ih, Finset.prod_Ico_succ_top hm]

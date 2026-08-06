@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StateSpace
+import Descent.Core.Scaling
 import Descent.Coalescent.Mutation
 import Mathlib.Tactic
 import Descent.Layer
@@ -64,8 +65,8 @@ theorem ohtaKimura_rate_balance (n : ℕ) :
 /-- The mutation side's recursion: each additional sampled individual contributes one factor
 to the Ewens denominator of (3.8), matching the one extra lineage the genealogy side gains.
 `Mutation.ewensDenominator` is `(θ+1)⋯(θ+n-1)`. -/
-theorem ewensDenominator_succ (θ : ℝ) (n : ℕ) (hn : 1 ≤ n) :
-    ewensDenominator θ (n + 1) = ewensDenominator θ n * (θ + (n : ℝ)) := by
+theorem ewensDenominator_succ (θ : Descent.Core.Theta) (n : ℕ) (hn : 1 ≤ n) :
+    ewensDenominator θ (n + 1) = ewensDenominator θ n * (θ.value + (n : ℝ)) := by
   unfold ewensDenominator
   rw [show n + 1 - 1 = (n - 1) + 1 from by omega, Finset.prod_range_succ]
   congr 2

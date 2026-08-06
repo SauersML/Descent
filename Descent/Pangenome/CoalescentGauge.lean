@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.SegregatingSites
+import Descent.Core.Scaling
 import Descent.Pangenome.GaugeInvariance
 import Descent.Layer
 
@@ -234,7 +235,7 @@ and `n`; there is no argument of it for the reference tree, so no amount of care
 null constrains the choice.  The test compares a model quantity that has no gauge against
 a data quantity that has one. -/
 theorem referenceTree_is_gauge_for_tajima :
-    (∀ (θ : ℝ) (n : ℕ), 2 ≤ n → Coalescent.expectedTajimaNumerator θ n = 0)
+    (∀ (θ : Descent.Core.Theta) (n : ℕ), 2 ≤ n → Coalescent.expectedTajimaNumerator θ n = 0)
       ∧ IsSpanningTree [Allele.A] ∧ IsSpanningTree [Allele.G]
       ∧ tajimaNumerator Allele.A subsample = 0
       ∧ tajimaNumerator Allele.G subsample < 0

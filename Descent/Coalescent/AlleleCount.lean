@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Ewens
+import Descent.Core.Scaling
 import Descent.Coalescent.BranchLength
 import Mathlib.Tactic
 import Descent.Layer
@@ -71,7 +72,7 @@ open scoped Classical
 
 /-- The Ewens weight is positive for a positive `θ`: a power of `θ` times a product of
 factorials.  This is what lets the seating weights be divided into probabilities. -/
-theorem ewensWeight_pos {n : ℕ} {θ : ℝ} (hθ : 0 < θ) (ξ : ER n) : 0 < ewensWeight θ ξ := by
+theorem ewensWeight_pos {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) : 0 < ewensWeight θ ξ := by
   unfold ewensWeight
   refine mul_pos (pow_pos hθ _) ?_
   refine Finset.prod_pos fun c _ ↦ ?_
@@ -83,12 +84,12 @@ Derived, not posited: the numerator is `Ewens.ewensWeight_extend_none` and the d
 `Ewens.sum_seatings_ewensWeight`, and the state `ξ` cancels between them.  That cancellation
 is the content -- the chance of seeing a new allele depends on how many individuals have been
 examined and not at all on what was seen in them. -/
-theorem seating_new_class_prob {n : ℕ} {θ : ℝ} (hθ : 0 < θ) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
+theorem seating_new_class_prob {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
     ewensWeight θ (extend ξ none) / (∑ o : Option (Quotient ξ), ewensWeight θ (extend ξ o))
-      = θ / (θ + (n : ℝ)) := by
+      = θ.value / (θ.value + (n : ℝ)) := by
   have hw : 0 < ewensWeight θ ξ := ewensWeight_pos hθ ξ
   have hn0 : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-  have hden : (0 : ℝ) < θ + (n : ℝ) := by linarith
+  have hden : (0 : ℝ) < θ.value + (n : ℝ) := by linarith
   rw [ewensWeight_extend_none θ ξ hb, sum_seatings_ewensWeight θ ξ hb,
     div_eq_div_iff (ne_of_gt (mul_pos hden hw)) (ne_of_gt hden)]
   ring
@@ -103,19 +104,19 @@ starts a new class", whose means `seating_new_class_prob` computes off the Ewens
 expectation is linear.  What is ASSUMED is the infinite-alleles convention itself -- every
 mutation produces an allele never seen before -- which is K-G's model on p.33 and is a
 statement about the marker, not the population. -/
-noncomputable def expectedNumClasses (θ : ℝ) (n : ℕ) : ℝ :=
-  ∑ i ∈ range n, θ / (θ + (i : ℝ))
+noncomputable def expectedNumClasses (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
+  ∑ i ∈ range n, θ.value / (θ.value + (i : ℝ))
 
-@[simp] theorem expectedNumClasses_zero (θ : ℝ) : expectedNumClasses θ 0 = 0 := by
+@[simp] theorem expectedNumClasses_zero (θ : Descent.Core.Theta) : expectedNumClasses θ 0 = 0 := by
   simp [expectedNumClasses]
 
-theorem expectedNumClasses_succ (θ : ℝ) (n : ℕ) :
-    expectedNumClasses θ (n + 1) = expectedNumClasses θ n + θ / (θ + (n : ℝ)) := by
+theorem expectedNumClasses_succ (θ : Descent.Core.Theta) (n : ℕ) :
+    expectedNumClasses θ (n + 1) = expectedNumClasses θ n + θ.value / (θ.value + (n : ℝ)) := by
   unfold expectedNumClasses
   rw [sum_range_succ]
 
 /-- A sample of one shows one allele, whatever `θ`: the first draw always starts a class. -/
-theorem expectedNumClasses_one {θ : ℝ} (hθ : 0 < θ) : expectedNumClasses θ 1 = 1 := by
+theorem expectedNumClasses_one {θ : Descent.Core.Theta} (hθ : 0 < θ.value) : expectedNumClasses θ 1 = 1 := by
   unfold expectedNumClasses
   rw [sum_range_one, Nat.cast_zero, add_zero]
   exact div_self (ne_of_gt hθ)
@@ -128,13 +129,13 @@ their common ancestor, which K-G computes on p.34 as `(1+θ)⁻¹` and
 The two developments reach the same number from opposite directions -- one by a geometric sum
 over coalescence times, the other by a Chinese restaurant -- and their agreement at `n = 2` is
 the only place both have a closed form to compare. -/
-theorem expectedNumClasses_two_eq {θ : ℝ} (hθ : 0 < θ) :
-    expectedNumClasses θ 2 = 2 - 1 / (1 + θ) := by
-  have hθ0 : θ ≠ 0 := ne_of_gt hθ
-  have h2 : θ + (1 : ℝ) ≠ 0 := by linarith
-  have hsum : θ / (θ + 1) + 1 / (θ + 1) = 1 := by
+theorem expectedNumClasses_two_eq {θ : Descent.Core.Theta} (hθ : 0 < θ.value) :
+    expectedNumClasses θ 2 = 2 - 1 / (1 + θ.value) := by
+  have hθ0 : θ.value ≠ 0 := ne_of_gt hθ
+  have h2 : θ.value + (1 : ℝ) ≠ 0 := by linarith
+  have hsum : θ.value / (θ.value + 1) + 1 / (θ.value + 1) = 1 := by
     rw [← add_div, div_self h2]
-  have hcomm : (1 : ℝ) + θ = θ + 1 := by ring
+  have hcomm : (1 : ℝ) + θ.value = θ.value + 1 := by ring
   unfold expectedNumClasses
   rw [sum_range_succ, sum_range_one, Nat.cast_zero, Nat.cast_one, add_zero,
     div_self hθ0, hcomm]
@@ -147,20 +148,20 @@ theorem expectedNumClasses_two_eq {θ : ℝ} (hθ : 0 < θ) :
 length, arrived at from the mutation side.  A corpus in which these were two constants would
 have two places to be wrong; they are one. -/
 theorem expectedNumClasses_one_eq_harmonicSum (n : ℕ) :
-    expectedNumClasses 1 n = harmonicSum n := by
+    expectedNumClasses ⟨1⟩ n = harmonicSum n := by
   unfold expectedNumClasses harmonicSum
   refine sum_congr rfl fun i _ ↦ ?_
   ring
 
 /-- For `θ ≥ 1` each class-opening probability dominates the harmonic term, because
 `θ/(θ+i) ≥ 1/(1+i)` reduces to `i ≤ θi`. -/
-theorem harmonicSum_le_expectedNumClasses {θ : ℝ} (hθ : 1 ≤ θ) (n : ℕ) :
+theorem harmonicSum_le_expectedNumClasses {θ : Descent.Core.Theta} (hθ : 1 ≤ θ.value) (n : ℕ) :
     harmonicSum n ≤ expectedNumClasses θ n := by
   unfold harmonicSum expectedNumClasses
   refine sum_le_sum fun i _ ↦ ?_
   have hi : (0 : ℝ) ≤ (i : ℝ) := Nat.cast_nonneg i
   have hden1 : (0 : ℝ) < (i : ℝ) + 1 := by linarith
-  have hden2 : (0 : ℝ) < θ + (i : ℝ) := by linarith
+  have hden2 : (0 : ℝ) < θ.value + (i : ℝ) := by linarith
   rw [div_le_div_iff₀ hden1 hden2]
   nlinarith [mul_nonneg hi (sub_nonneg.mpr hθ)]
 
@@ -168,32 +169,32 @@ theorem harmonicSum_le_expectedNumClasses {θ : ℝ} (hθ : 1 ≤ θ) (n : ℕ) 
 distinct alleles than any bound -- growth like `θ log n`, the same harmonic growth as the
 tree length, and for the same reason: new alleles arrive on terminal branches, whose total
 length is what `BranchLength.tendsto_expectedTotalBranchLength_atTop` sends to infinity. -/
-theorem tendsto_expectedNumClasses_atTop {θ : ℝ} (hθ : 1 ≤ θ) :
+theorem tendsto_expectedNumClasses_atTop {θ : Descent.Core.Theta} (hθ : 1 ≤ θ.value) :
     Tendsto (fun n : ℕ ↦ expectedNumClasses θ n) atTop atTop :=
   tendsto_atTop_mono (harmonicSum_le_expectedNumClasses hθ) tendsto_harmonicSum_atTop
 
 /-- And it never exceeds the sample size: each seating opens at most one class.  The check
 that the summands are probabilities and not an expression that happens to sum. -/
-theorem expectedNumClasses_le {θ : ℝ} (hθ : 0 < θ) (n : ℕ) :
+theorem expectedNumClasses_le {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (n : ℕ) :
     expectedNumClasses θ n ≤ (n : ℝ) := by
   unfold expectedNumClasses
-  have hterm : ∀ i ∈ range n, θ / (θ + (i : ℝ)) ≤ 1 := by
+  have hterm : ∀ i ∈ range n, θ.value / (θ.value + (i : ℝ)) ≤ 1 := by
     intro i _
     have hi : (0 : ℝ) ≤ (i : ℝ) := Nat.cast_nonneg i
-    have hden : (0 : ℝ) < θ + (i : ℝ) := by linarith
+    have hden : (0 : ℝ) < θ.value + (i : ℝ) := by linarith
     rw [div_le_one hden]
     linarith
-  calc ∑ i ∈ range n, θ / (θ + (i : ℝ)) ≤ ∑ _i ∈ range n, (1 : ℝ) := sum_le_sum hterm
+  calc ∑ i ∈ range n, θ.value / (θ.value + (i : ℝ)) ≤ ∑ _i ∈ range n, (1 : ℝ) := sum_le_sum hterm
     _ = (n : ℝ) := by simp
 
 /-- The count is monotone in the sample size: examining another individual cannot reduce the
 number of alleles seen. -/
-theorem expectedNumClasses_monotone {θ : ℝ} (hθ : 0 < θ) :
+theorem expectedNumClasses_monotone {θ : Descent.Core.Theta} (hθ : 0 < θ.value) :
     Monotone fun n : ℕ ↦ expectedNumClasses θ n := by
   refine monotone_nat_of_le_succ fun n ↦ ?_
   rw [expectedNumClasses_succ]
   have hi : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
-  have hpos : 0 < θ / (θ + (n : ℝ)) := div_pos hθ (by linarith)
+  have hpos : 0 < θ.value / (θ.value + (n : ℝ)) := div_pos hθ (by linarith)
   linarith
 
 end Coalescent

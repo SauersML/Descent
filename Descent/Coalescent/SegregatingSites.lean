@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.BranchLength
+import Descent.Core.Scaling
 import Mathlib.Tactic
 import Descent.Layer
 
@@ -79,28 +80,28 @@ independent of the genealogy (K-G p.34), and every mutation visible at a fresh s
 (infinite sites).  The head is `MIXED` because the two halves carry different verdicts, and
 the sentences above are the two verdicts the term promises.  Recurrent mutation breaks the
 second half and is exactly what K-G (3.7) objects to in the Ohta-Kimura model. -/
-noncomputable def expectedSegregatingSites (θ : ℝ) (n : ℕ) : ℝ :=
-  θ / 2 * expectedTotalBranchLength n
+noncomputable def expectedSegregatingSites (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
+  θ.value / 2 * expectedTotalBranchLength n
 
 /-- **Watterson (1975): `E(S_n) = θ a_{n-1}`.**  The harmonic number is not a fitted constant
 and not a convention; it is the total length of the coalescent tree divided by two, and the
 two cancels against the `½θ` of the Poisson rate. -/
-theorem expectedSegregatingSites_eq (θ : ℝ) (n : ℕ) :
-    expectedSegregatingSites θ n = θ * harmonicSum (n - 1) := by
+theorem expectedSegregatingSites_eq (θ : Descent.Core.Theta) (n : ℕ) :
+    expectedSegregatingSites θ n = θ.value * harmonicSum (n - 1) := by
   unfold expectedSegregatingSites
   rw [expectedTotalBranchLength_eq_harmonic]
   ring
 
-@[simp] theorem expectedSegregatingSites_one (θ : ℝ) : expectedSegregatingSites θ 1 = 0 := by
+@[simp] theorem expectedSegregatingSites_one (θ : Descent.Core.Theta) : expectedSegregatingSites θ 1 = 0 := by
   rw [expectedSegregatingSites_eq]
   simp
 
 /-- A sample of two segregates at `θ` sites in expectation: `a_1 = 1`. -/
-theorem expectedSegregatingSites_two (θ : ℝ) : expectedSegregatingSites θ 2 = θ := by
+theorem expectedSegregatingSites_two (θ : Descent.Core.Theta) : expectedSegregatingSites θ 2 = θ.value := by
   rw [expectedSegregatingSites_eq]
   norm_num
 
-theorem expectedSegregatingSites_nonneg {θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) :
+theorem expectedSegregatingSites_nonneg {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) (n : ℕ) :
     0 ≤ expectedSegregatingSites θ n := by
   rw [expectedSegregatingSites_eq]
   exact mul_nonneg hθ (harmonicSum_nonneg _)
@@ -127,8 +128,8 @@ theorem harmonicSum_pos_of_two_le {n : ℕ} (hn : 2 ≤ n) : 0 < harmonicSum (n 
 
 /-- **Watterson's estimator is unbiased.**  Substituting the derived expectation returns
 `θ` exactly. -/
-theorem wattersonEstimator_unbiased {n : ℕ} (hn : 2 ≤ n) (θ : ℝ) :
-    wattersonEstimator (expectedSegregatingSites θ n) n = θ := by
+theorem wattersonEstimator_unbiased {n : ℕ} (hn : 2 ≤ n) (θ : Descent.Core.Theta) :
+    wattersonEstimator (expectedSegregatingSites θ n) n = θ.value := by
   have hpos := harmonicSum_pos_of_two_le hn
   unfold wattersonEstimator
   rw [expectedSegregatingSites_eq, mul_div_assoc, div_self hpos.ne', mul_one]
@@ -143,11 +144,11 @@ derivations of `θ` has two places to be wrong. -/
 /-- `E(π)`, the expected number of pairwise differences: the two-sample case of `E(S)`.
 
 Empirical status: DERIVED -- it is `expectedSegregatingSites θ 2`, definitionally. -/
-noncomputable def expectedPairwiseDifferences (θ : ℝ) : ℝ := expectedSegregatingSites θ 2
+noncomputable def expectedPairwiseDifferences (θ : Descent.Core.Theta) : ℝ := expectedSegregatingSites θ 2
 
 /-- **`E(π) = θ`.**  Tajima's estimator is unbiased too, and for the simplest possible
 reason: a pair of sequences has a tree of two branches, each of expected length `1`. -/
-theorem expectedPairwiseDifferences_eq (θ : ℝ) : expectedPairwiseDifferences θ = θ :=
+theorem expectedPairwiseDifferences_eq (θ : Descent.Core.Theta) : expectedPairwiseDifferences θ = θ.value :=
   expectedSegregatingSites_two θ
 
 /-! ### Tajima's `D`
@@ -162,7 +163,7 @@ premise is a separate question the statistic cannot answer, and
 
 Empirical status: DERIVED.  Both terms are computed above from the same tree; this
 subtracts them. -/
-noncomputable def expectedTajimaNumerator (θ : ℝ) (n : ℕ) : ℝ :=
+noncomputable def expectedTajimaNumerator (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
   expectedPairwiseDifferences θ - wattersonEstimator (expectedSegregatingSites θ n) n
 
 /-- **Tajima's `D` has mean-zero numerator under the coalescent null.**  This is what makes
@@ -172,7 +173,7 @@ any systematic departure is a fact about the population rather than about the es
 The theorem is stated at the expectations rather than the sampling distribution.  The
 variance of `D`, and hence its calibration, is NOT here: it requires the second moments of
 the tree, which need the joint law of the holding times and not merely their means. -/
-theorem expectedTajimaNumerator_eq_zero {n : ℕ} (hn : 2 ≤ n) (θ : ℝ) :
+theorem expectedTajimaNumerator_eq_zero {n : ℕ} (hn : 2 ≤ n) (θ : Descent.Core.Theta) :
     expectedTajimaNumerator θ n = 0 := by
   unfold expectedTajimaNumerator
   rw [expectedPairwiseDifferences_eq, wattersonEstimator_unbiased hn]
@@ -187,17 +188,17 @@ and does keep finding new variants. -/
 /-- **Segregating sites accumulate without bound.**  For any positive mutation rate, the
 expected number of segregating sites in a sample of `n` exceeds any bound for `n` large --
 this is `E(L_n) → ∞` with a positive factor. -/
-theorem tendsto_expectedSegregatingSites_atTop {θ : ℝ} (hθ : 0 < θ) :
+theorem tendsto_expectedSegregatingSites_atTop {θ : Descent.Core.Theta} (hθ : 0 < θ.value) :
     Tendsto (fun n : ℕ ↦ expectedSegregatingSites θ (n + 1)) atTop atTop := by
   have hcomp : (fun n : ℕ ↦ expectedSegregatingSites θ (n + 1))
-      = fun n : ℕ ↦ θ * harmonicSum n := by
+      = fun n : ℕ ↦ θ.value * harmonicSum n := by
     funext n
     rw [expectedSegregatingSites_eq, show n + 1 - 1 = n from rfl]
   rw [hcomp]
   refine tendsto_atTop.2 fun b ↦ ?_
-  filter_upwards [tendsto_harmonicSum_atTop.eventually_ge_atTop (b / θ)] with n hn
-  have hmul : θ * (b / θ) ≤ θ * harmonicSum n := mul_le_mul_of_nonneg_left hn hθ.le
-  have hbe : θ * (b / θ) = b := by field_simp
+  filter_upwards [tendsto_harmonicSum_atTop.eventually_ge_atTop (b / θ.value)] with n hn
+  have hmul : θ.value * (b / θ.value) ≤ θ.value * harmonicSum n := mul_le_mul_of_nonneg_left hn hθ.le
+  have hbe : θ.value * (b / θ.value) = b := by field_simp
   rw [hbe] at hmul
   exact hmul
 
@@ -208,7 +209,7 @@ A study that stops enrolling because "the tree is already deep enough" has confu
 This is the coalescent's own version of the corpus's recurring theme: a bounded summary and
 an unbounded one, computed from the same process, and a design that reads the first as
 speaking for the second. -/
-theorem variantDiscovery_unbounded {θ : ℝ} (hθ : 0 < θ) (B : ℝ) :
+theorem variantDiscovery_unbounded {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (B : ℝ) :
     (∀ n : ℕ, meanTransitTime n < 2) ∧ ∃ n : ℕ, B < expectedSegregatingSites θ n := by
   refine ⟨meanTransitTime_lt_two, ?_⟩
   obtain ⟨n, hn⟩ :=
