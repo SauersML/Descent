@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Pangenome.Linkage.Chain
+import Descent.Pangenome.Linkage.Frequency
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
@@ -17,16 +17,15 @@ The potential carried along the chain is the mean logarithm of the dynamic progr
 `meanLog`.  Two facts about it suffice:
 
 * `meanLog_step` — crossing one interface raises the potential by at least that interface's
-  `identityLoss`.  Inside a fiber this is the arithmetic–geometric mean inequality; the
-  bookkeeping that turns per-thread fiber means into a per-panel statement is
-  `sum_inv_fiberCard_mul_sum_fiber`, the same fiberwise regrouping the width identity uses.
-* `meanLog_le_log_sum` — the potential is at most the logarithm of the total, again by
-  arithmetic–geometric mean.
+  `identityLoss`.  This is NOT proved here: `freePotential_uniform` shows `meanLog` is the
+  weighted potential of `Descent.Pangenome.Linkage.Frequency` shifted by `log m`, so the step
+  is that file's `freePotential_step` at the uniform law and nothing is argued twice.
+* `meanLog_le_log_sum` — the potential is at most the logarithm of the total, by the
+  arithmetic–geometric mean inequality of `Interface`.
 
 Chaining the first and then applying the second gives
 `log m + ∑ H(J ∣ S_j) ≤ log |Ω|`.  No entropy machinery is developed to state it: the
-conditional entropies are `identityLoss`, which is a mean of logarithms, and the whole
-argument is `sum_mul_log_le_log_sum` applied first inside fibers and then across the panel.
+conditional entropies are `identityLoss`, which is a mean of logarithms.
 
 ## The results
 
@@ -70,55 +69,37 @@ mean.  This is the quantity the chain carries. -/
 noncomputable def meanLog (v : ι → ℝ) : ℝ :=
   (Fintype.card ι : ℝ)⁻¹ * ∑ h : ι, Real.log (v h)
 
-/-- **Fiber means, counted per thread, are panel sums.**  Weighting each thread's fiber sum
-by the reciprocal fiber size counts every thread exactly once. -/
-theorem sum_inv_fiberCard_mul_sum_fiber (s : ι → ι) (f : ι → ℝ) :
-    ∑ h : ι, ((fiberCard s h : ℝ))⁻¹ * ∑ g ∈ fiber s h, f g = ∑ g : ι, f g := by
-  rw [← sum_fiberwise s fun h ↦ ((fiberCard s h : ℝ))⁻¹ * ∑ g ∈ fiber s h, f g,
-    ← sum_fiberwise s f]
-  refine Finset.sum_congr rfl fun a ha ↦ ?_
-  have hne : ((stateFiber s a).card : ℝ) ≠ 0 := by
-    exact_mod_cast Nat.pos_iff_ne_zero.mp (card_stateFiber_pos ha)
-  have hconst : ∀ h ∈ stateFiber s a,
-      ((fiberCard s h : ℝ))⁻¹ * ∑ g ∈ fiber s h, f g
-        = (((stateFiber s a).card : ℝ))⁻¹ * ∑ g ∈ stateFiber s a, f g := by
-    intro h hh
-    simp only [mem_stateFiber] at hh
-    simp [fiberCard, fiber, hh]
-  rw [Finset.sum_congr rfl hconst, Finset.sum_const, nsmul_eq_mul, ← mul_assoc,
-    mul_inv_cancel₀ hne, one_mul]
+omit [DecidableEq ι] in
+/-- The uniform law's potential is `meanLog` shifted by `log m`, which is what makes the
+uniform step below an instance of the weighted one rather than a second proof of it. -/
+theorem freePotential_uniform [Nonempty ι] (v : ι → ℝ) (hv : ∀ h, 0 < v h) :
+    freePotential (fun _ : ι ↦ (Fintype.card ι : ℝ)⁻¹) v
+      = meanLog v + Real.log (Fintype.card ι : ℝ) := by
+  have hm : (0 : ℝ) < (Fintype.card ι : ℝ) := by exact_mod_cast Fintype.card_pos
+  have hterm : ∀ h : ι, (Fintype.card ι : ℝ)⁻¹ * Real.log (v h / (Fintype.card ι : ℝ)⁻¹)
+      = (Fintype.card ι : ℝ)⁻¹ * Real.log (v h)
+        + (Fintype.card ι : ℝ)⁻¹ * Real.log (Fintype.card ι : ℝ) := by
+    intro h
+    rw [Real.log_div (ne_of_gt (hv h)) (by positivity), Real.log_inv]
+    ring
+  rw [freePotential, Finset.sum_congr rfl fun h _ ↦ hterm h, Finset.sum_add_distrib,
+    Finset.sum_const, Finset.card_univ, nsmul_eq_mul, ← mul_assoc,
+    mul_inv_cancel₀ (ne_of_gt hm), one_mul, meanLog, Finset.mul_sum]
 
-/-- **Crossing an interface pays its identity loss into the potential.** -/
+/-- **Crossing an interface pays its identity loss into the potential.**
+
+This is `Descent.Pangenome.Linkage.Frequency.freePotential_step` at the uniform law, not a
+second argument: the geometric mean the chain carries is the weighted potential shifted by
+`log m`, and the identity an interface forgets is the weighted one at `p = 1/m`. -/
 theorem meanLog_step [Nonempty ι] (s : ι → ι) (v : ι → ℝ) (hv : ∀ h, 0 < v h) :
     meanLog v + identityLoss s ≤ meanLog fun h ↦ ∑ g ∈ fiber s h, v g := by
-  have hlocal : ∀ h : ι,
-      ((fiberCard s h : ℝ))⁻¹ * ∑ g ∈ fiber s h, Real.log (v g)
-          + Real.log (fiberCard s h : ℝ)
-        ≤ Real.log (∑ g ∈ fiber s h, v g) := by
-    intro h
-    have hn : (0 : ℝ) < (fiberCard s h : ℝ) := by exact_mod_cast fiberCard_pos s h
-    have hsumpos : 0 < ∑ g ∈ fiber s h, v g :=
-      Finset.sum_pos (fun g _ ↦ hv g) ⟨h, self_mem_fiber s h⟩
-    have hw1 : ∑ _g ∈ fiber s h, ((fiberCard s h : ℝ))⁻¹ = 1 := by
-      rw [Finset.sum_const, nsmul_eq_mul]
-      show ((fiberCard s h : ℝ)) * ((fiberCard s h : ℝ))⁻¹ = 1
-      exact mul_inv_cancel₀ (ne_of_gt hn)
-    have hJ := sum_mul_log_le_log_sum (fiber s h) (fun _ ↦ ((fiberCard s h : ℝ))⁻¹) v
-      (fun _ _ ↦ by positivity) hw1 (fun g _ ↦ hv g)
-    rw [← Finset.mul_sum, ← Finset.mul_sum,
-      Real.log_mul (by positivity) (ne_of_gt hsumpos), Real.log_inv] at hJ
-    linarith
-  have hLHS : ∑ h : ι, (((fiberCard s h : ℝ))⁻¹ * ∑ g ∈ fiber s h, Real.log (v g)
-      + Real.log (fiberCard s h : ℝ))
-      = (∑ g : ι, Real.log (v g)) + ∑ h : ι, Real.log (fiberCard s h : ℝ) := by
-    rw [Finset.sum_add_distrib, sum_inv_fiberCard_mul_sum_fiber]
-  have hmono : (Fintype.card ι : ℝ)⁻¹ * ((∑ g : ι, Real.log (v g))
-      + ∑ h : ι, Real.log (fiberCard s h : ℝ))
-      ≤ (Fintype.card ι : ℝ)⁻¹ * ∑ h : ι, Real.log (∑ g ∈ fiber s h, v g) := by
-    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-    rw [← hLHS]
-    exact Finset.sum_le_sum fun h _ ↦ hlocal h
-  simpa [meanLog, identityLoss, mul_add] using hmono
+  have hm : (0 : ℝ) < (Fintype.card ι : ℝ) := by exact_mod_cast Fintype.card_pos
+  have hu : ∀ _h : ι, (0 : ℝ) < (Fintype.card ι : ℝ)⁻¹ := fun _ ↦ by positivity
+  have hA : ∀ h : ι, 0 < ∑ g ∈ fiber s h, v g := fun h ↦
+    Finset.sum_pos (fun g _ ↦ hv g) ⟨h, self_mem_fiber s h⟩
+  have hstep := freePotential_step hu hv s
+  rw [freePotential_uniform v hv, freePotential_uniform _ hA, condIdentityLoss_uniform] at hstep
+  linarith
 
 omit [DecidableEq ι] in
 /-- **The potential is at most the logarithm of the total.** -/

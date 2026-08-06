@@ -22,6 +22,9 @@ state whose futures differ must carry different auxiliary values.
 
 ## The results
 
+* `resolves_id` — the hypothesis is satisfiable: a controller carrying thread identity
+  outright resolves everything, so the bound below constrains a real family of controllers
+  rather than an empty one.
 * `card_le_card_aux_of_resolves` — the local form.  Any set of threads sharing a graph state
   and pairwise-distinguishable futures injects into `A`.
 * `card_le_width_mul_card_aux` — the global form, `m ≤ w · |A|`, when the legal future
@@ -74,6 +77,15 @@ identify their thread, `ρ` is injective and resolving it means recovering the d
 def Resolves (s : ι → ι) (aux : ι → A) (ρ : ι → R) : Prop :=
   ∀ g h : ι, s g = s h → aux g = aux h → ρ g = ρ h
 
+omit [Fintype ι] [DecidableEq ι] [Fintype A] [DecidableEq A] in
+/-- **The hypothesis is satisfiable, and by the obvious controller.**  Auxiliary state that
+carries the thread identity outright resolves every residual class, whatever the topology has
+merged: the full haplotype index is always a legal answer.  It is also the most expensive one,
+since it needs `|A| = m`, which is the extreme `card_le_width_mul_card_aux` permits at `w = 1`
+and the reason that bound is a trade rather than an obstruction. -/
+theorem resolves_id (s : ι → ι) (ρ : ι → R) : Resolves s (id : ι → ι) ρ :=
+  fun _ _ _ haux ↦ congrArg ρ haux
+
 /-- **The local form.**  Threads sharing a graph state but needing different futures must
 carry different auxiliary values, so any such set injects into the auxiliary alphabet. -/
 theorem card_le_card_aux_of_resolves {s : ι → ι} {aux : ι → A} {ρ : ι → R}
@@ -92,7 +104,10 @@ theorem card_le_card_aux_of_resolves {s : ι → ι} {aux : ι → A} {ρ : ι �
 /-- **The global form: `m ≤ w · |A|`.**  When the legal future identifies the donor -- `ρ`
 separating any two threads that share a graph state -- an exact controller needs an auxiliary
 alphabet large enough that state and metadata together separate every thread the panel
-distinguishes. -/
+distinguishes.
+
+Assumes: `Resolves s aux ρ`, which is the exactness of the controller and not a fact about
+any graph; `resolves_id` establishes it for the controller that carries thread identity. -/
 theorem card_le_width_mul_card_aux (s : ι → ι) (aux : ι → A) (ρ : ι → R)
     (hres : Resolves s aux ρ) (hρ : ∀ g h : ι, s g = s h → ρ g = ρ h → g = h) :
     Fintype.card ι ≤ width s * Fintype.card A := by
