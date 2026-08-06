@@ -22,6 +22,12 @@ distinct derivations spell distinct words and every count of
 `Descent.Pangenome.Linkage.Chain` transfers verbatim to distinct sequences:
 `card_spelledWords`, and with it `pow_card_le_prod_width_mul_card_spelledWords`.
 
+When blocks do NOT identify their donor the correction is bounded rather than fatal:
+`card_mosaics_le_pow_mul_card_spelledWords` says at most `μ` donors per block leaves at most
+`μ ^ (r+1)` derivations behind any one word, so segment ambiguity divides the derivation
+count instead of destroying it, and exponential inflation in distinct sequences survives
+whenever the forgotten linkage outruns the ambiguity.
+
 `snpCode` shows the hypothesis is not a strong one.  Over two DNA letters, with each donor's
 block the all-`A` reference carrying a single `C` at that donor's own coordinate — a
 biallelic SNP and nothing else — the blocks are distinct and equally long.  So the width law
@@ -149,6 +155,115 @@ theorem card_phantomWords (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code
     Finset.inter_eq_left.mpr (panelWords_subset code c)
   rw [phantomWords, Finset.card_sdiff, hin, card_spelledWords code L hlen hinj c,
     card_panelWords code L hlen hinj c]
+
+/-! ### When blocks do not identify their donor
+
+Injectivity is the clean case.  When a block is contributed by several donors, distinct
+derivations can spell one word and the derivation count overstates the sequence count.  The
+correction is bounded rather than unbounded: at most `μ` donors per block means at most `μ`
+choices per module, so a word has at most `μ ^ (r+1)` derivations behind it. -/
+
+/-- With every block of one length and at most `μ` donors carrying any one block, the
+derivations spelling a given word number at most `μ ^ (r+1)`, whatever set of first donors
+they are drawn from. -/
+theorem sum_ite_spell_le (code : ι → List α) (L μ : ℕ) (hlen : ∀ h, (code h).length = L)
+    (hμ : ∀ b : List α, (Finset.univ.filter fun g ↦ code g = b).card ≤ μ) :
+    ∀ (c : Chain ι) (y : List α) (S : Finset ι),
+      ∑ h ∈ S, ∑ x ∈ mosaicsFrom c h, (if spell code x = y then 1 else 0)
+        ≤ μ ^ (c.length + 1) := by
+  intro c
+  induction c with
+  | nil =>
+    intro y S
+    have hone : ∀ h : ι,
+        ∑ x ∈ mosaicsFrom ([] : Chain ι) h, (if spell code x = y then 1 else 0)
+          = if code h = y then 1 else 0 := by
+      intro h
+      have hsp : spell code [h] = code h := by simp [spell]
+      rw [show mosaicsFrom ([] : Chain ι) h = {[h]} from rfl, Finset.sum_singleton, hsp]
+    rw [Finset.sum_congr rfl fun h _ ↦ hone h, ← Finset.card_filter]
+    calc (S.filter fun h ↦ code h = y).card
+        ≤ (Finset.univ.filter fun h ↦ code h = y).card :=
+          Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_univ S))
+      _ ≤ μ := hμ y
+      _ = μ ^ (([] : Chain ι).length + 1) := by simp
+  | cons s c ih =>
+    intro y S
+    have htake : ∀ u v : List α, (u ++ v).take u.length = u := by
+      intro u v
+      induction u with
+      | nil => rfl
+      | cons a u ihu => simp [ihu]
+    have hrw : ∀ h : ι,
+        ∑ x ∈ mosaicsFrom (s :: c) h, (if spell code x = y then 1 else 0)
+          = ∑ g ∈ fiber s h, ∑ z ∈ mosaicsFrom c g,
+              (if code h ++ spell code z = y then 1 else 0) := by
+      intro h
+      rw [sum_mosaicsFrom]
+      exact Finset.sum_congr rfl fun g _ ↦ Finset.sum_congr rfl fun z _ ↦ by rw [spell_cons]
+    rw [Finset.sum_congr rfl fun h _ ↦ hrw h]
+    have hvanish : ∀ h ∈ S, h ∉ S.filter (fun h ↦ code h = y.take L) →
+        ∑ g ∈ fiber s h, ∑ z ∈ mosaicsFrom c g,
+          (if code h ++ spell code z = y then 1 else 0) = 0 := by
+      intro h hS hnot
+      refine Finset.sum_eq_zero fun g _ ↦ Finset.sum_eq_zero fun z _ ↦ ?_
+      by_cases hy : code h ++ spell code z = y
+      · exact absurd (Finset.mem_filter.mpr ⟨hS, by rw [← hy, ← hlen h, htake]⟩) hnot
+      · simp [hy]
+    rw [← Finset.sum_subset (Finset.filter_subset _ S) hvanish]
+    have hbound : ∀ h ∈ S.filter (fun h ↦ code h = y.take L),
+        ∑ g ∈ fiber s h, ∑ z ∈ mosaicsFrom c g,
+          (if code h ++ spell code z = y then 1 else 0) ≤ μ ^ (c.length + 1) := by
+      intro h _
+      by_cases hpre : ∃ y' : List α, y = code h ++ y'
+      · obtain ⟨y', rfl⟩ := hpre
+        have hcancel : ∀ g ∈ fiber s h, ∑ z ∈ mosaicsFrom c g,
+            (if code h ++ spell code z = code h ++ y' then 1 else 0)
+            = ∑ z ∈ mosaicsFrom c g, (if spell code z = y' then 1 else 0) := by
+          intro g _
+          refine Finset.sum_congr rfl fun z _ ↦ ?_
+          by_cases hz : spell code z = y'
+          · simp [hz]
+          · have hne : ¬(code h ++ spell code z = code h ++ y') := fun hc ↦
+              hz (List.append_cancel_left hc)
+            simp [hne, hz]
+        rw [Finset.sum_congr rfl hcancel]
+        exact ih y' (fiber s h)
+      · push_neg at hpre
+        refine le_of_eq_of_le
+          (Finset.sum_eq_zero fun g _ ↦ Finset.sum_eq_zero fun z _ ↦ ?_) (Nat.zero_le _)
+        have hne : ¬(code h ++ spell code z = y) := fun hc ↦ hpre (spell code z) hc.symm
+        simp [hne]
+    calc ∑ h ∈ S.filter (fun h ↦ code h = y.take L),
+          ∑ g ∈ fiber s h, ∑ z ∈ mosaicsFrom c g,
+            (if code h ++ spell code z = y then 1 else 0)
+        ≤ ∑ _h ∈ S.filter (fun h ↦ code h = y.take L), μ ^ (c.length + 1) :=
+          Finset.sum_le_sum hbound
+      _ = (S.filter (fun h ↦ code h = y.take L)).card * μ ^ (c.length + 1) := by
+          rw [Finset.sum_const, smul_eq_mul]
+      _ ≤ μ * μ ^ (c.length + 1) :=
+          Nat.mul_le_mul_right _ (le_trans (Finset.card_le_card
+            (Finset.filter_subset_filter _ (Finset.subset_univ S))) (hμ _))
+      _ = μ ^ ((s :: c).length + 1) := by rw [List.length_cons]; ring
+
+/-- A spelled word has at most `μ ^ (r+1)` derivations behind it. -/
+theorem card_filter_spell_le (code : ι → List α) (L μ : ℕ) (hlen : ∀ h, (code h).length = L)
+    (hμ : ∀ b : List α, (Finset.univ.filter fun g ↦ code g = b).card ≤ μ) (c : Chain ι)
+    (y : List α) :
+    ((mosaics c).filter fun x ↦ spell code x = y).card ≤ μ ^ (c.length + 1) := by
+  rw [Finset.card_filter, sum_mosaics]
+  exact sum_ite_spell_le code L μ hlen hμ c y Finset.univ
+
+/-- **The collision-corrected count.**  Segment ambiguity divides the derivation count rather
+than destroying it: with at most `μ` donors per block, the distinct-word count is at least
+`|Ω| / μ ^ (r+1)`, stated without division.  Exponential inflation in distinct sequences is
+therefore guaranteed whenever the linkage the interfaces forget outruns the ambiguity the
+blocks introduce. -/
+theorem card_mosaics_le_pow_mul_card_spelledWords (code : ι → List α) (L μ : ℕ)
+    (hlen : ∀ h, (code h).length = L)
+    (hμ : ∀ b : List α, (Finset.univ.filter fun g ↦ code g = b).card ≤ μ) (c : Chain ι) :
+    (mosaics c).card ≤ μ ^ (c.length + 1) * (spelledWords code c).card :=
+  Finset.card_le_mul_card_image _ _ fun y _ ↦ card_filter_spell_le code L μ hlen hμ c y
 
 /-- **The width law, counted in distinct sequences.** -/
 theorem pow_card_le_prod_width_mul_card_spelledWords [Nonempty ι] (code : ι → List α) (L : ℕ)
