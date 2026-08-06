@@ -3542,10 +3542,32 @@ def check_files(c: Corpus) -> list[Finding]:
             # so it moves nothing into the trusted base.  `elab` and `macro_rules`
             # run code at elaboration time and a term macro rewrites the statement
             # a reader reads; those stay reported.
-            (r"^\s*macro\b(?![^\n]*:\s*tactic\s*=>)", "F24",
+            # `syntax` IS NOT HERE, and the two additions below are why.
+            #
+            # A `syntax` declaration declares GRAMMAR.  It has no elaboration behaviour at
+            # all: parsing is not elaboration, and a parse rule on its own cannot put
+            # anything into the trusted base.  Flagging it reported six findings in
+            # `Meta/Informal.lean` and `Meta/InformalLint.lean` that were parse rules.
+            #
+            # What those files actually declare is `@[command_elab todoCmd] def elabTODO`,
+            # and the attribute form was INVISIBLE here -- including one in
+            # `Meta/Semiformal.lean` that no exemption ever covered and that this guard
+            # never reported.  A screen that reports the grammar and misses the elaborator
+            # is wrong in both directions at once.
+            #
+            # The carve-out is the one already written for `tactic`, extended to `command`
+            # for the same reason: a command elaborator introduces a top-level command and
+            # cannot change what any theorem SAYS, which is the risk `F24` names.  What it
+            # puts in the environment is visible to `validation/code/Check.lean`, which
+            # walks the real axiom closure -- the division of labour this file's own header
+            # states.  A `term` elaborator rewrites the statement a reader reads and stays
+            # reported, in both its bare and its attribute spelling.
+            (r"^\s*macro\b(?![^\n]*:\s*(?:tactic|command)\s*=>)", "F24",
              "custom syntax or elaborator"),
-            (r"^\s*(elab|syntax|macro_rules|elab_rules)\b", "F24",
-             "custom syntax or elaborator"),
+            (r"^\s*(elab|macro_rules|elab_rules)\b(?![^\n]*:\s*(?:tactic|command)\s*=>)",
+             "F24", "custom syntax or elaborator"),
+            (r"@\[(?:builtin_)?(?:term_elab|app_unexpander)\b", "F24",
+             "term elaborator attached by attribute"),
             (r"@\[implemented_by", "F24", "compiled implementation substituted for the "
                                           "definition"),
             (r"#print axioms", "F24_INFO", "handled by the F18 pass below"),
