@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Rates
 import Mathlib.Tactic
 import Descent.Core.Ratios
+import Descent.Core.Scaling
 import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -55,24 +56,28 @@ open Filter
 Empirical status: THIS IS THE MODEL.  `ρ = 4 N_e r` is the scaled rate, and the `1/2` is the
 same time-unit convention that makes the per-pair coalescence rate `1`; see
 `Descent.Program.Conventions`. -/
-noncomputable def recombRate (k : ℕ) (rho : ℝ) : ℝ := Descent.Core.halfLineageRate k rho
+noncomputable def recombRate (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
+  Descent.Core.halfLineageRate k rho.value
 
 /-- The total rate of the next event in the ancestral recombination graph: a coalescence or
 a recombination, whichever comes first. -/
-noncomputable def argEventRate (k : ℕ) (rho : ℝ) : ℝ := deathRate k + recombRate k rho
+noncomputable def argEventRate (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
+  deathRate k + recombRate k rho
 
 /-- **Kingman is the `ρ = 0` fibre.**  With no recombination the graph is a tree and the
 event rate is `deathRate` exactly, so `Descent.Coalescent`'s whole development is the
 zero-recombination case of the ARG. -/
-@[simp] theorem argEventRate_zero_recomb (k : ℕ) : argEventRate k 0 = deathRate k := by
+@[simp] theorem argEventRate_zero_recomb (k : ℕ) : argEventRate k ⟨0⟩ = deathRate k := by
   unfold argEventRate recombRate Descent.Core.halfLineageRate
   ring
 
-theorem recombRate_nonneg {k : ℕ} {rho : ℝ} (h : 0 ≤ rho) : 0 ≤ recombRate k rho := by
+theorem recombRate_nonneg {k : ℕ} {rho : Descent.Core.Rho} (h : 0 ≤ rho.value) :
+    0 ≤ recombRate k rho := by
   unfold recombRate Descent.Core.halfLineageRate
   positivity
 
-theorem argEventRate_pos {k : ℕ} (hk : 2 ≤ k) {rho : ℝ} (hrho : 0 ≤ rho) :
+theorem argEventRate_pos {k : ℕ} (hk : 2 ≤ k) {rho : Descent.Core.Rho}
+    (hrho : 0 ≤ rho.value) :
     0 < argEventRate k rho := by
   have hd := deathRate_pos hk
   have hr := recombRate_nonneg (k := k) hrho
@@ -86,19 +91,19 @@ Empirical status: DERIVED from `recombRate` and `argEventRate`.  For competing e
 the probability that one fires first is its rate over the total, which is a fact about
 exponentials and not about a genome; the empirical content is in `recombRate`, whose own
 marker carries it. -/
-noncomputable def recombFirstProb (k : ℕ) (rho : ℝ) : ℝ :=
+noncomputable def recombFirstProb (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
   recombRate k rho / argEventRate k rho
 
 /-- The complementary chance, that the next event is a coalescence.
 
 Empirical status: DERIVED from `deathRate` and `argEventRate`, by the same competing-
 exponential argument as `recombFirstProb`, of which this is the complement. -/
-noncomputable def coalesceFirstProb (k : ℕ) (rho : ℝ) : ℝ :=
+noncomputable def coalesceFirstProb (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
   deathRate k / argEventRate k rho
 
 /-- The two exhaust the possibilities: something happens, and it is one or the other. -/
-theorem recombFirstProb_add_coalesceFirstProb {k : ℕ} (hk : 2 ≤ k) {rho : ℝ}
-    (hrho : 0 ≤ rho) : recombFirstProb k rho + coalesceFirstProb k rho = 1 := by
+theorem recombFirstProb_add_coalesceFirstProb {k : ℕ} (hk : 2 ≤ k)
+    {rho : Descent.Core.Rho} (hrho : 0 ≤ rho.value) : recombFirstProb k rho + coalesceFirstProb k rho = 1 := by
   have hpos := argEventRate_pos hk hrho
   have hne : argEventRate k rho ≠ 0 := ne_of_gt hpos
   unfold recombFirstProb coalesceFirstProb
@@ -111,18 +116,19 @@ they reach a common ancestor with no intervening recombination with probability 
 
 This is the backbone of two-locus theory: the probability of joint identity by descent, and
 the shape in which linkage disequilibrium decays with distance. -/
-theorem pairCoalesceFirstProb_eq {rho : ℝ} (hrho : 0 ≤ rho) :
-    coalesceFirstProb 2 rho = 1 / (1 + rho) := by
-  have hne : (1 : ℝ) + rho ≠ 0 := by linarith
+theorem pairCoalesceFirstProb_eq {rho : Descent.Core.Rho} (hrho : 0 ≤ rho.value) :
+    coalesceFirstProb 2 rho = 1 / (1 + rho.value) := by
+  have hne : (1 : ℝ) + rho.value ≠ 0 := by linarith
   unfold coalesceFirstProb argEventRate recombRate Descent.Core.halfLineageRate
   rw [deathRate_two]
   push_cast
   field_simp
 
 /-- More recombination, less joint identity: the pairwise probability falls in `ρ`. -/
-theorem pairCoalesceFirstProb_antitone {rho rho' : ℝ} (h0 : 0 ≤ rho) (h : rho ≤ rho') :
+theorem pairCoalesceFirstProb_antitone {rho rho' : Descent.Core.Rho}
+    (h0 : 0 ≤ rho.value) (h : rho.value ≤ rho'.value) :
     coalesceFirstProb 2 rho' ≤ coalesceFirstProb 2 rho := by
-  have h0' : 0 ≤ rho' := le_trans h0 h
+  have h0' : 0 ≤ rho'.value := le_trans h0 h
   rw [pairCoalesceFirstProb_eq h0, pairCoalesceFirstProb_eq h0']
   gcongr
 
@@ -130,10 +136,12 @@ theorem pairCoalesceFirstProb_antitone {rho rho' : ℝ} (h0 : 0 ≤ rho) (h : rh
 recombination vanishes: the two sides of the breakpoint have independent genealogies, which
 is the limit in which two-locus statistics carry no linkage information at all. -/
 theorem tendsto_pairCoalesceFirstProb :
-    Tendsto (fun rho : ℝ ↦ coalesceFirstProb 2 rho) atTop (nhds 0) := by
-  have hcongr : ∀ᶠ rho : ℝ in atTop, coalesceFirstProb 2 rho = 1 / (1 + rho) := by
+    Tendsto (fun x : ℝ ↦ coalesceFirstProb 2 (Descent.Core.Rho.ofScaled x)) atTop
+      (nhds 0) := by
+  have hcongr : ∀ᶠ x : ℝ in atTop,
+      coalesceFirstProb 2 (Descent.Core.Rho.ofScaled x) = 1 / (1 + x) := by
     filter_upwards [eventually_ge_atTop (0 : ℝ)] with rho hrho
-    exact pairCoalesceFirstProb_eq hrho
+    exact pairCoalesceFirstProb_eq (rho := Descent.Core.Rho.ofScaled rho) hrho
   have hlim : Tendsto (fun rho : ℝ ↦ 1 / (1 + rho)) atTop (nhds 0) := by
     have h : Tendsto (fun rho : ℝ ↦ 1 + rho) atTop atTop :=
       tendsto_atTop_add_const_left _ 1 tendsto_id
@@ -142,7 +150,7 @@ theorem tendsto_pairCoalesceFirstProb :
 
 /-- At zero recombination the pair coalesces first with certainty -- there is nothing else
 that can happen, and the ARG is Kingman's tree. -/
-@[simp] theorem pairCoalesceFirstProb_zero : coalesceFirstProb 2 0 = 1 := by
+@[simp] theorem pairCoalesceFirstProb_zero : coalesceFirstProb 2 ⟨0⟩ = 1 := by
   rw [pairCoalesceFirstProb_eq le_rfl]
   norm_num
 
