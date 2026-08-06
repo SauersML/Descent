@@ -1,0 +1,413 @@
+{
+ "_battery_sha": "96714e9efff46098",
+ "results": [
+  {
+   "name": "positivePredictiveValue",
+   "file": "Decision.lean",
+   "source": "body [sens*pi / (sens*pi + (1-spec)*(1-pi))]",
+   "note": "",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 0.9452486457550201,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prevalence=0.05",
+    "lean": 0.19669075009824008,
+    "truth": 0.1977317743904418,
+    "sem": 0.000663428694653031,
+    "sems_off": 1.569157771727311,
+    "rel_err": 0.005264830578752097
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.04509606616848146,
+     "truth": 0.04527307555693687,
+     "sem": 0.0003632632794712244,
+     "sems_off": 0.48727575413916063,
+     "rel_err": 0.003909815851427917
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.19669075009824008,
+     "truth": 0.1977317743904418,
+     "sem": 0.000663428694653031,
+     "sems_off": 1.569157771727311,
+     "rel_err": 0.005264830578752097
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.5386291880802856,
+     "truth": 0.5380840736474614,
+     "sem": 0.0006399781729857846,
+     "sems_off": 0.8517703506684163,
+     "rel_err": 0.0010130655403515602
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.8236520683434296,
+     "truth": 0.8229858694738595,
+     "sem": 0.0004519560062438944,
+     "sems_off": 1.4740347741071518,
+     "rel_err": 0.0008094900462823193
+    }
+   ]
+  },
+  {
+   "name": "positivePredictiveValue [prevalence-free [sens / (sens + (1-spec))], competing]",
+   "file": "Decision.lean",
+   "source": "prevalence-free [sens / (sens + (1-spec))], competing",
+   "note": "positive control 'total positive rate, all prevalences pooled [sens*pi + (1-spec)*(1-pi)]' passed at 0.08 sems",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 0.0008567562344272178,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prevalence=0.01",
+    "lean": 0.8242153145365639,
+    "truth": 0.04477163440413177,
+    "sem": 0.0004968426386771617,
+    "sems_off": 1568.7938583687037,
+    "rel_err": 17.409319326982196
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.8242153145365639,
+     "truth": 0.04477163440413177,
+     "sem": 0.0004968426386771617,
+     "sems_off": 1568.7938583687037,
+     "rel_err": 17.409319326982196
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.8235362953975797,
+     "truth": 0.1976850378025264,
+     "sem": 0.0005502372803783469,
+     "sems_off": 1137.420672704535,
+     "rel_err": 3.165900993580683
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.8236787528762506,
+     "truth": 0.5375470626916796,
+     "sem": 0.00050896613395386,
+     "sems_off": 562.1821789237358,
+     "rel_err": 0.5322914216139755
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.8235091629273243,
+     "truth": 0.8235918630776762,
+     "sem": 0.0003714079190645251,
+     "sems_off": 0.22266663177277493,
+     "rel_err": 0.00010041399637290179
+    }
+   ]
+  },
+  {
+   "name": "negativePredictiveValue",
+   "file": "Decision.lean",
+   "source": "body [spec*(1-pi) / (spec*(1-pi) + (1-sens)*pi)]",
+   "note": "",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 0.2588353393120338,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prevalence=0.50",
+    "lean": 0.7385016060308229,
+    "truth": 0.739285894530339,
+    "sem": 0.00041475157495696164,
+    "sems_off": 1.8909837764870365,
+    "rel_err": 0.0010608730740281637
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.9964069324963883,
+     "truth": 0.9964368298385159,
+     "sem": 5.379958472101371e-05,
+     "sems_off": 0.555716968496818,
+     "rel_err": 3.0004252384363066e-05
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.981674249321118,
+     "truth": 0.9817764948843688,
+     "sem": 0.00011395588911985592,
+     "sems_off": 0.8972380808089774,
+     "rel_err": 0.00010414342142385715
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.9191353969487782,
+     "truth": 0.9190172535891608,
+     "sem": 0.000177267640902737,
+     "sems_off": 0.6664688434720282,
+     "rel_err": 0.00012855401697417637
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.7385016060308229,
+     "truth": 0.739285894530339,
+     "sem": 0.00041475157495696164,
+     "sems_off": 1.8909837764870365,
+     "rel_err": 0.0010608730740281637
+    }
+   ]
+  },
+  {
+   "name": "negativePredictiveValue [prevalence-free [spec / (spec + (1-sens))], competing]",
+   "file": "Decision.lean",
+   "source": "prevalence-free [spec / (spec + (1-sens))], competing",
+   "note": "positive control 'total positive rate, all prevalences pooled [sens*pi + (1-spec)*(1-pi)]' passed at 0.08 sems",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 0.0021136750261015773,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prevalence=0.20",
+    "lean": 0.7390414564628035,
+    "truth": 0.9189613453628954,
+    "sem": 0.0003575503836728884,
+    "sems_off": 503.20149863045583,
+    "rel_err": 0.1957861337780666
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.7406068586841638,
+     "truth": 0.9964040639585761,
+     "sem": 0.0014265599175855603,
+     "sems_off": 179.31052325327263,
+     "rel_err": 0.2567203552524317
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.739570290943722,
+     "truth": 0.9817764486352241,
+     "sem": 0.0006804578496924686,
+     "sems_off": 355.9458646864999,
+     "rel_err": 0.24670194322566505
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.7390414564628035,
+     "truth": 0.9189613453628954,
+     "sem": 0.0003575503836728884,
+     "sems_off": 503.20149863045583,
+     "rel_err": 0.1957861337780666
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.7390697462216691,
+     "truth": 0.7392399816094091,
+     "sem": 0.00037234713296600337,
+     "sems_off": 0.4571953767548223,
+     "rel_err": 0.00023028433522947193
+    }
+   ]
+  },
+  {
+   "name": "netBenefit",
+   "file": "Decision.lean",
+   "source": "body [pi*sens - (1-pi)*(1-spec)*t/(1-t)]",
+   "note": "",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 1.027829003413382,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prevalence=0.50",
+    "lean": 0.3419873333333333,
+    "truth": 0.3415563611111111,
+    "sem": 0.00033330839219962693,
+    "sems_off": 1.2930134143279963,
+    "rel_err": 0.0012617894769115887
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": -0.009517166666666667,
+     "truth": -0.009511416666666666,
+     "sem": 6.245244962299428e-05,
+     "sems_off": 0.09207004744748175,
+     "rel_err": 0.0006045366533201903
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.019217194444444443,
+     "truth": 0.019208999999999997,
+     "sem": 0.00011589901215505892,
+     "sems_off": 0.07070331568903199,
+     "rel_err": 0.0004265940155367842
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.12678808333333333,
+     "truth": 0.12682033333333334,
+     "sem": 0.00026060888381876276,
+     "sems_off": 0.12374865939888412,
+     "rel_err": 0.0002542967610347297
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.3419873333333333,
+     "truth": 0.3415563611111111,
+     "sem": 0.00033330839219962693,
+     "sems_off": 1.2930134143279963,
+     "rel_err": 0.0012617894769115887
+    }
+   ]
+  },
+  {
+   "name": "netBenefit [inverted threshold odds [(1-t)/t], competing]",
+   "file": "Decision.lean",
+   "source": "inverted threshold odds [(1-t)/t], competing",
+   "note": "positive control 'total positive rate, all prevalences pooled [sens*pi + (1-spec)*(1-pi)]' passed at 0.08 sems",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here",
+   "span": 3.093547639559654,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prevalence=0.01",
+    "lean": -1.329266,
+    "truth": -0.009455361111111112,
+    "sem": 0.0017650623038609075,
+    "sems_off": 747.7416723488614,
+    "rel_err": 139.58331399294346
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": -1.329266,
+     "truth": -0.009455361111111112,
+     "sem": 0.0017650623038609075,
+     "sems_off": 747.7416723488614,
+     "rel_err": 139.58331399294346
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": -1.2476344999999998,
+     "truth": 0.019271444444444442,
+     "sem": 0.001900955956739108,
+     "sems_off": 666.457284269589,
+     "rel_err": 65.74006157642567
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": -0.939846,
+     "truth": 0.12657527777777777,
+     "sem": 0.0014722965124243836,
+     "sems_off": 724.3250722789093,
+     "rel_err": 8.42519405448229
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": -0.32472225000000005,
+     "truth": 0.3413323888888889,
+     "sem": 0.0010984686194110388,
+     "sems_off": 606.3483536252538,
+     "rel_err": 1.9513373490779518
+    }
+   ]
+  },
+  {
+   "name": "nriFromOperatingPoints",
+   "file": "Decision.lean",
+   "source": "body [(sens_new - sens_old) + (spec_new - spec_old)]",
+   "note": "",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here; the two rules differ in BOTH coordinates (sens 0.55 -> 0.75, spec 0.90 -> 0.80) so the event and non-event components both carry signal and have opposite signs; the oracle is a reclassification COUNT on held-out individuals classified by both rules",
+   "span": 0.0759579046454691,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prevalence=0.01",
+    "lean": 0.1057963248909708,
+    "truth": 0.09539466402650755,
+    "sem": 0.003559063140120919,
+    "sems_off": 2.922583965203227,
+    "rel_err": 0.10903818332619641
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.1057963248909708,
+     "truth": 0.09539466402650755,
+     "sem": 0.003559063140120919,
+     "sems_off": 2.922583965203227,
+     "rel_err": 0.10903818332619641
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.09776025773306136,
+     "truth": 0.09982492690812972,
+     "sem": 0.0021483365642336574,
+     "sems_off": 0.9610548037219908,
+     "rel_err": 0.020682901946609968
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.09836157937267752,
+     "truth": 0.10067668166222443,
+     "sem": 0.0011506798691138665,
+     "sems_off": 2.011942984046261,
+     "rel_err": 0.022995417124634716
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.10007161361976133,
+     "truth": 0.09959709158598051,
+     "sem": 0.0008931079418886026,
+     "sems_off": 0.5313154340307095,
+     "rel_err": 0.004764416573059962
+    }
+   ]
+  },
+  {
+   "name": "nriFromOperatingPoints [wrong-sign non-event component], competing",
+   "file": "Decision.lean",
+   "source": "wrong sign [(sens_new - sens_old) - (spec_new - spec_old)]",
+   "note": "positive control 'total positive rate, all prevalences pooled [sens*pi + (1-spec)*(1-pi)]' passed at 0.08 sems",
+   "regime": "A rule with a fixed operating point applied to a drawn population: n = 200000 per replicate, 40 replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50, nominal sensitivity 0.70 and specificity 0.85. Sensitivity, specificity and prevalence are REALISED -- counted off the same replicate the predictive value is counted from. REGIME: the operating point is given; which operating point a score with a given R^2 reaches is `OperatingPointLaw.point`, a function field, and is NOT under test here; the two rules differ in BOTH coordinates (sens 0.55 -> 0.75, spec 0.90 -> 0.80) so the event and non-event components both carry signal and have opposite signs; the oracle is a reclassification COUNT on held-out individuals classified by both rules",
+   "span": 0.027940222834208512,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prevalence=0.50",
+    "lean": 0.299256924401324,
+    "truth": 0.09959709158598051,
+    "sem": 0.0009158177683500718,
+    "sems_off": 218.01262185057698,
+    "rel_err": 2.0046753337468743
+   },
+   "cells": [
+    {
+     "design": "prevalence=0.01",
+     "lean": 0.3053502814056885,
+     "truth": 0.09539466402650755,
+     "sem": 0.0036283134163452527,
+     "sems_off": 57.86589891417544,
+     "rel_err": 2.2009157380211546
+    },
+    {
+     "design": "prevalence=0.05",
+     "lean": 0.29681872650072527,
+     "truth": 0.09982492690812972,
+     "sem": 0.0020265981899674,
+     "sems_off": 97.20417227638224,
+     "rel_err": 1.9733928758484514
+    },
+    {
+     "design": "prevalence=0.20",
+     "lean": 0.2982525163464683,
+     "truth": 0.10067668166222443,
+     "sem": 0.001134045271232054,
+     "sems_off": 174.222175865689,
+     "rel_err": 1.962478613936852
+    },
+    {
+     "design": "prevalence=0.50",
+     "lean": 0.299256924401324,
+     "truth": 0.09959709158598051,
+     "sem": 0.0009158177683500718,
+     "sems_off": 218.01262185057698,
+     "rel_err": 2.0046753337468743
+    }
+   ]
+  }
+ ]
+}

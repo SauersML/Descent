@@ -258,10 +258,37 @@ argument here and not a field of the operating point.
 `Portability.ClinicalUtilityFairness.ppv` are this body written out with the sensitivity
 and specificity as free reals, in that order and in the reverse order respectively.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_clinical.py`). Worst cell
+    1.57 sems at 0.5 percent relative across the prevalence sweep.
+
+    Power, and it is the point of the design: the prevalence-free reading
+    `sens / (sens + (1 - spec))` -- the number a balanced test set gives, and the
+    commonest error in this family -- is carried as a named competitor on the
+    same cells and is FALSIFIED at 1568.79 sems and 1741 percent relative. It is
+    exactly right at `pi = 0.5` and wrong by a factor of seventeen at
+    `pi = 0.01`, so a design at one prevalence could not have told the two apart
+    and a design at one half could not have told them apart at all.
+
+    Design, shared by all four rows of that battery. A rule with a fixed
+    operating point applied to a drawn population, 200,000 per replicate and 40
+    replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50 -- a factor of fifty,
+    which is what puts the PREVALENCE DEPENDENCE on trial rather than a value at
+    one point. Each replicate is SPLIT: the operating point and the prevalence
+    are read off half A and the quantity is predicted for half B and counted
+    there, so the two never share an individual.
+
+    That split is not fastidiousness, it is the whole design. Measured on ONE
+    sample these bodies are algebraic identities on four counts -- with
+    `sens = tp/(tp+fn)`, `prev = (tp+fn)/n` and `spec = tn/(tn+fp)` from the same
+    sample, the predictive value IS `tp/(tp+fp)`, for every draw, with no model
+    in between -- and the harness's own gate reported the first version of the
+    run as DEGENERATE ORACLE for exactly that. Out of sample it is a prediction.
+
+    Control: the total positive rate `sens*pi + (1-spec)*(1-pi)`, predicted from
+    half A and counted on half B, pooled over all prevalences. It is the law of
+    total probability on the same counts, the same split and the same rule, and
+    it is none of the candidates -- so it fails when the draw or the split is
+    broken and passes when the only thing left to be wrong is the body. -/
 noncomputable def positivePredictiveValue (o : OperatingPoint) (prevalence : ℝ) : ℝ :=
   share (o.sensitivity * prevalence) ((1 - o.specificity) * (1 - prevalence))
 
@@ -271,10 +298,37 @@ The number a patient who screened negative is told, and the coordinate a screeni
 programme is actually judged on at low prevalence -- where it is near one whatever the
 score does, which is the reason a programme cannot be defended on it.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_clinical.py`), worst cell
+    1.89 sems at 0.1 percent relative, on the design described on
+    `positivePredictiveValue` above and the same control.
+
+    Power: the prevalence-free reading `spec / (spec + (1 - sens))` is carried on
+    the same cells and FALSIFIED at 503.20 sems. The relative miss is 19.6
+    percent rather than the PPV's 1741, and that asymmetry is the substance of
+    this declaration's own docstring: at low prevalence the negative predictive
+    value is near one whatever the score does, so a wrong body is hard to see in
+    the number and easy to see in the sems.
+
+    Design, shared by all four rows of that battery. A rule with a fixed
+    operating point applied to a drawn population, 200,000 per replicate and 40
+    replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50 -- a factor of fifty,
+    which is what puts the PREVALENCE DEPENDENCE on trial rather than a value at
+    one point. Each replicate is SPLIT: the operating point and the prevalence
+    are read off half A and the quantity is predicted for half B and counted
+    there, so the two never share an individual.
+
+    That split is not fastidiousness, it is the whole design. Measured on ONE
+    sample these bodies are algebraic identities on four counts -- with
+    `sens = tp/(tp+fn)`, `prev = (tp+fn)/n` and `spec = tn/(tn+fp)` from the same
+    sample, the predictive value IS `tp/(tp+fp)`, for every draw, with no model
+    in between -- and the harness's own gate reported the first version of the
+    run as DEGENERATE ORACLE for exactly that. Out of sample it is a prediction.
+
+    Control: the total positive rate `sens*pi + (1-spec)*(1-pi)`, predicted from
+    half A and counted on half B, pooled over all prevalences. It is the law of
+    total probability on the same counts, the same split and the same rule, and
+    it is none of the candidates -- so it fails when the draw or the split is
+    broken and passes when the only thing left to be wrong is the body. -/
 noncomputable def negativePredictiveValue (o : OperatingPoint) (prevalence : ℝ) : ℝ :=
   share (o.specificity * (1 - prevalence)) ((1 - o.sensitivity) * prevalence)
 
@@ -642,10 +696,37 @@ Unlike a predictive value it is not confined to the unit interval and is not a
 probability: it is measured in true positives per person, and its whole use is
 COMPARATIVE, against the treat-all and treat-none baselines below.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_clinical.py`), worst cell
+    1.29 sems at 0.1 percent relative, on the design described on
+    `positivePredictiveValue` above and the same control. The threshold
+    probability is 0.10, so the threshold odds are 1/9.
+
+    Power: the inverted threshold odds `(1-t)/t` -- which agrees at `t = 0.5` and
+    is the error a spot check at one threshold cannot catch -- is carried as a
+    named competitor and FALSIFIED at 747.74 sems. The relative miss is 13958
+    percent, which is what an unbounded quantity does when the false-positive
+    penalty is off by a factor of eighty-one.
+
+    Design, shared by all four rows of that battery. A rule with a fixed
+    operating point applied to a drawn population, 200,000 per replicate and 40
+    replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50 -- a factor of fifty,
+    which is what puts the PREVALENCE DEPENDENCE on trial rather than a value at
+    one point. Each replicate is SPLIT: the operating point and the prevalence
+    are read off half A and the quantity is predicted for half B and counted
+    there, so the two never share an individual.
+
+    That split is not fastidiousness, it is the whole design. Measured on ONE
+    sample these bodies are algebraic identities on four counts -- with
+    `sens = tp/(tp+fn)`, `prev = (tp+fn)/n` and `spec = tn/(tn+fp)` from the same
+    sample, the predictive value IS `tp/(tp+fp)`, for every draw, with no model
+    in between -- and the harness's own gate reported the first version of the
+    run as DEGENERATE ORACLE for exactly that. Out of sample it is a prediction.
+
+    Control: the total positive rate `sens*pi + (1-spec)*(1-pi)`, predicted from
+    half A and counted on half B, pooled over all prevalences. It is the law of
+    total probability on the same counts, the same split and the same rule, and
+    it is none of the candidates -- so it fails when the draw or the split is
+    broken and passes when the only thing left to be wrong is the body. -/
 noncomputable def netBenefit (o : OperatingPoint) (prevalence t : ℝ) : ℝ :=
   prevalence * o.sensitivity
     - (1 - prevalence) * (1 - o.specificity) * thresholdOdds t
@@ -809,10 +890,44 @@ net fraction of non-cases moved down is the specificity gain, so the index is th
 two components supplied by hand; this computes them from the rules being compared, which
 is what lets a demographic history reach the index.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
-    A kernel asserts nothing about a population, so no measurement can bear on it.
-    What can be measured is a named quantity claiming this shape computes it, and
-    those live in the subsystem modules with their own status lines and ledger rows. -/
+    Empirical status: **VALIDATED** (`simcov/battery_clinical.py`), worst cell
+    2.92 sems at 10.9 percent relative.
+
+    The oracle here is a RECLASSIFICATION COUNT and not a restatement of this
+    body: the same held-out individuals are classified by both rules, and the
+    index is counted as (moved up among cases minus moved down among cases) plus
+    (moved down among non-cases minus moved up among non-cases), which is the
+    definition the index is named for. The first version of the run computed the
+    truth from the two operating points -- that is this body -- and was reported
+    DEGENERATE ORACLE.
+
+    Power: the wrong-sign non-event component is carried on the same cells and
+    FALSIFIED at 218.01 sems. The two rules differ in BOTH coordinates on purpose
+    (sensitivity 0.55 to 0.75, specificity 0.90 to 0.80, so the two components
+    have opposite signs); at equal specificity the non-event component vanishes
+    and the wrong sign is invisible, which the first run demonstrated by
+    returning DEGENERATE ORACLE on that competitor.
+
+    Design, shared by all four rows of that battery. A rule with a fixed
+    operating point applied to a drawn population, 200,000 per replicate and 40
+    replicates, prevalence swept 0.01 / 0.05 / 0.20 / 0.50 -- a factor of fifty,
+    which is what puts the PREVALENCE DEPENDENCE on trial rather than a value at
+    one point. Each replicate is SPLIT: the operating point and the prevalence
+    are read off half A and the quantity is predicted for half B and counted
+    there, so the two never share an individual.
+
+    That split is not fastidiousness, it is the whole design. Measured on ONE
+    sample these bodies are algebraic identities on four counts -- with
+    `sens = tp/(tp+fn)`, `prev = (tp+fn)/n` and `spec = tn/(tn+fp)` from the same
+    sample, the predictive value IS `tp/(tp+fp)`, for every draw, with no model
+    in between -- and the harness's own gate reported the first version of the
+    run as DEGENERATE ORACLE for exactly that. Out of sample it is a prediction.
+
+    Control: the total positive rate `sens*pi + (1-spec)*(1-pi)`, predicted from
+    half A and counted on half B, pooled over all prevalences. It is the law of
+    total probability on the same counts, the same split and the same rule, and
+    it is none of the candidates -- so it fails when the draw or the split is
+    broken and passes when the only thing left to be wrong is the body. -/
 noncomputable def nriFromOperatingPoints (old new : OperatingPoint) : ℝ :=
   Descent.Core.sum (nriEventComponent old new) (nriNonEventComponent old new)
 
