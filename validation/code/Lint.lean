@@ -65,11 +65,20 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 
 /-! ## The linters that used to be debt
 
-`scaledQuantityUntyped`, and the Batteries set `simpNF`, `simpVarHead`, `dupNamespace` and
-`defLemma`.  They gate here now.  `unusedArguments` is still absent, and for a reason that
-is not a tolerance: it reported 135 and in this corpus an unused binder is frequently a
-regime hypothesis carried on purpose, so it is a detector that has not been calibrated
-rather than a count that is being carried. Calibrate it and add it. -/
+`scaledQuantityUntyped`, the Batteries set `simpNF`, `simpVarHead`, `dupNamespace` and
+`defLemma`, and `unusedArguments`.  All of them gate.
+
+`unusedArguments` was held out on the argument that it reported 135 and that an unused
+binder here is frequently a regime hypothesis carried on purpose.  That is a statement
+about intent, not about the finding: the binder IS unused, and a theorem carrying a
+hypothesis its proof never consumes states something weaker than what was proved.  A
+reader cannot tell the deliberate ones from the accidental ones, and neither can this
+runner, which is the whole reason to make the corpus say which it means.
+
+The repair per finding is one of two, and both are local: delete the binder, which
+strengthens the theorem to what the proof actually establishes; or rename it with a
+leading underscore, which is Lean's own way of saying the binder is carried on purpose and
+which silences the linter because the intent is now written down instead of assumed. -/
 #lint only scaledQuantityUntyped in Descent
 
-#lint only simpNF simpVarHead dupNamespace defLemma in Descent
+#lint only simpNF simpVarHead dupNamespace defLemma unusedArguments in Descent

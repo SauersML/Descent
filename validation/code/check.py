@@ -3503,14 +3503,21 @@ def check_bridges(c: Corpus) -> list[Finding]:
 # `opaque` or `@[implemented_by]`; and it lapses the moment an exempted file
 # acquires any of those, or an `axiom` or a `sorry`. An exemption that cannot
 # expire is indistinguishable from not looking.
-TRUST_BYPASS_EXEMPT = {
-    "Descent/Meta/Informal.lean":
-        "declares the gap vocabulary itself; a gap is an environment-extension "
-        "record and emits no constant, so nothing downstream can cite one",
-    "Descent/Meta/InformalLint.lean":
-        "reports on that vocabulary; it reads the extension and declares no "
-        "constant of its own",
-}
+# NO FILE IS EXEMPT.  This is empty and stays empty.
+#
+# It carried two `Descent/Meta/` files that declare and report the gap vocabulary, on the
+# argument that a gap is an environment-extension record emitting no constant, so their
+# `syntax`/`elab` moves nothing into the trusted base.  That argument is almost certainly
+# right, and it is not a thing this guard can check: "emits no constant" is a fact about
+# the elaborated environment, and this is a source-text scan.  The exemption was an
+# environment-level judgement parked in a text-level tool.
+#
+# An `elab` runs arbitrary code at elaboration time whoever wrote it.  Reporting the two
+# declaration sites costs a reader one glance at a comment; carrying a list that says
+# which elaborators are the safe ones costs the guard its meaning.  If the distinction
+# is worth drawing it belongs in `validation/code/Check.lean`, which can see whether a
+# constant was emitted.
+TRUST_BYPASS_EXEMPT: dict[str, str] = {}
 _EXEMPTION_VOIDED = re.compile(
     r"\bnative_decide\b|^\s*(?:unsafe|opaque)\s+|@\[implemented_by"
     r"|^\s*axiom\s+|\bsorry\b", re.M)
