@@ -56,7 +56,6 @@ the state space's cardinalities like everything else in the group.
 
 ## Main results
 
-- `sum_range_choose_add`: the hockey stick, reindexed to `range (m+1)`.
 - `fuTerm_eq`: each term of Fu's sum in factorials.
 - `fu_sum`: **`Σ_{j≤m} C(m,j)/((j+1) C(a+m+1,j+1)) = 1/(a+1)`**.
 - `expectedSpectrumBranchLength_eq`: **`E(L_i) = 2/i`**, Fu (1995).
@@ -66,19 +65,6 @@ the state space's cardinalities like everything else in the group.
 namespace Coalescent
 
 open Finset Nat
-
-/-! ### The hockey stick -/
-
-/-- `Σ_{b≤m} C(a+b, a) = C(a+m+1, a+1)`.  Mathlib's `Nat.sum_Icc_choose` reindexed from
-`Icc a (a+m)` to `range (m+1)`. -/
-theorem sum_range_choose_add (a m : ℕ) :
-    ∑ b ∈ range (m + 1), (a + b).choose a = (a + m + 1).choose (a + 1) := by
-  induction m with
-  | zero => simp
-  | succ p ih =>
-      rw [sum_range_succ, ih, show a + (p + 1) = a + p + 1 from by omega]
-      conv_rhs => rw [Nat.choose_succ_succ]
-      ring
 
 /-! ### One term -/
 
@@ -157,9 +143,18 @@ theorem fu_sum (a m : ℕ) :
     rw [eq_comm, eq_div_iff (ne_of_gt hposb), ← hR]
     ring
   rw [sum_congr rfl hterm, ← mul_sum]
+  -- The hockey stick is `Nat.sum_range_add_choose`, which summs `(i + k).choose k`;
+  -- this development writes the same term `(a + b).choose a`, so the only work is
+  -- commuting the addition on both sides.  A corpus restatement of it stood here
+  -- until the Mathlib guard found that its conclusion was the library's.
   have hstick : ∑ b ∈ range (m + 1), ((a + b).choose a : ℝ)
       = ((a + m + 1).choose (a + 1) : ℝ) := by
-    exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) (sum_range_choose_add a m)
+    have hcomm : ∑ b ∈ range (m + 1), (a + b).choose a
+        = ∑ b ∈ range (m + 1), (b + a).choose a :=
+      Finset.sum_congr rfl (fun b _ ↦ by rw [Nat.add_comm])
+    have h : ∑ b ∈ range (m + 1), (a + b).choose a = (a + m + 1).choose (a + 1) := by
+      rw [hcomm, Nat.sum_range_add_choose m a, Nat.add_comm m a]
+    exact_mod_cast congrArg (Nat.cast : ℕ → ℝ) h
   rw [hstick]
   have hCfac : ((a + m + 1).choose (a + 1) : ℝ) * ((a + 1)! : ℝ) * (m ! : ℝ)
       = ((a + m + 1)! : ℝ) := by
