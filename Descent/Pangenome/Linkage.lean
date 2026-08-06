@@ -14,9 +14,12 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 /-!
 # `Linkage` -- what a pangenome graph forgets, and what that forces it to admit
 
-Seven modules.  The first four read in order, each measuring something the previous one
-defined; the last three each drop a restriction the first four carried.  The group's whole
-convexity content is one inequality, stated in the first module.
+Seven modules.  The group's whole convexity content is one inequality, stated in the first.
+
+The import order is `Interface`, `Chain`, `Frequency`, `Barrier`, then `Splicing`,
+`Metadata` and `Tree` in any order.  `Frequency` sits where it does because `Barrier`'s
+uniform statement is DERIVED from its weighted one rather than proved beside it; the list
+below is a reading order, and takes the headline uniform case first.
 
 ## The order
 
@@ -33,7 +36,8 @@ convexity content is one inequality, stated in the first module.
    `sum_mosaicsFrom`, evaluates all three.
 
 3. `Barrier` -- the theorem.  A geometric mean carried along the chain gains each
-   interface's `identityLoss`, giving `log m + ∑ H(J ∣ S_j) ≤ log |Ω|` and, with the
+   interface's `identityLoss` — by `Frequency`'s weighted step at the uniform law, not by a
+   second argument — giving `log m + ∑ H(J ∣ S_j) ≤ log |Ω|` and, with the
    logarithms cleared, `m ^ (r+1) ≤ (∏ w_j) · |Ω|` between natural numbers.  The balanced
    count of `Chain` attains it, so it is exact.  Two consequences: an exact topology-only
    representation cannot merge identity at any linkage-bearing separator, and the phantom
@@ -58,11 +62,12 @@ convexity content is one inequality, stated in the first module.
    this is where the result stops being about pangenomes and becomes a counting inequality
    about edge-coloured trees.
 
-7. `Frequency` -- the weighting.  The first six weigh every panel thread equally.  The law
-   holds for any strictly positive frequency law `p`, as `H(p) + ∑_j H_p(J ∣ S_j) ≤ log |Ω|`,
-   and `condIdentityLoss_uniform` and `panelEntropy_uniform` prove that the uniform statement
-   is this one at `p = 1/m` rather than asserting it.  A builder measuring what a graph
-   forgets about a population uses the population's law, not the counting measure on a sample.
+7. `Frequency` -- the weighting, and what the uniform statement rests on.  The law holds for any
+   strictly positive frequency law `p`, as `H(p) + ∑_j H_p(J ∣ S_j) ≤ log |Ω|`.  A builder
+   measuring what a graph forgets about a population uses the population's law, not the
+   counting measure on whichever haplotypes were sampled.  `condIdentityLoss_uniform` and
+   `panelEntropy_uniform` identify the uniform quantities with the weighted ones at
+   `p = 1/m`, which is what lets `Barrier` take its step from here instead of repeating it.
 
 ## What of the manuscript is not here
 
