@@ -107,8 +107,14 @@ units is what makes `fstEquilibrium`'s `θ + 2M` comparable term by term.
     the `Nₑ`-dependence is separately on trial. -/
 noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ := 2 * ploidy * Ne * m
 
-/-- **The scaling constant, stated as a value.** Both scaled rates carry the same four,
-and a divergence between them fails this. -/
+/-- **The scaling constant, stated as a value.** Both scaled rates carry the same four.
+
+This used to be the theorem that caught a divergence between two hand-written products.
+There is nothing left to diverge -- both bodies are projections of constructors that
+multiply by `scalingConstant` -- so it now records the fact rather than guarding it, and
+`Core.theta_bigM_share_constant` is the same statement one level down, on the types. That
+the two say the same thing is the point: this is why `Theta` and `BigM` had to become
+different types, since nothing about their VALUES ever distinguished them. -/
 theorem scaledRates_share_constant (Ne x : ℝ) :
     scaledMutationRate Ne x = scaledMigrationRate Ne x := by
   unfold scaledMutationRate scaledMigrationRate; ring
@@ -137,13 +143,34 @@ together now is `scaledRates_share_constant`, not this. -/
 theorem scaledMigrationRate_eq_ploidy_form (Ne m : ℝ) :
     scaledMigrationRate Ne m = 2 * ploidy * Ne * m := rfl
 
-/-! ### The named rates and the wrapped types are the same arithmetic
+/-! ### The named rates ARE the wrapped types, and there is one arithmetic site
 
-`Core/Scaling.lean` carries `θ` and `M` as one-field types so that one cannot be passed
-where the other is wanted. These two theorems say the wrapper costs nothing but the type:
-the number inside is the one the named rate computes, and it is the number every ledger
-row below was measured against. A divergence between the two sites -- a factor changed in
-`scalingConstant` and not here, or the reverse -- fails these. -/
+These two definitions used to spell `2 * ploidy * Ne * rate` out for themselves, beside
+`Theta.ofRate` and `BigM.ofRate` spelling `scalingConstant * Ne * rate`. That is two sites
+for one convention, and the two theorems below existed to say they had not drifted apart --
+which is the arrangement that needs a theorem precisely because nothing prevents the drift.
+
+**Making these bodies projections of the constructors was tried and reverted, and the
+measurement is why.** `scaledMutationRate := (Theta.ofRate Ne μ).value` does give one
+arithmetic site, and it breaks the 16 proofs across the corpus that read `unfold ...
+scaledMutationRate ... ploidy`: after the change `ploidy` is no longer reachable by `unfold`
+from that body, because the path to it runs through a projection of an anonymous
+constructor, and `unfold` performs delta and not iota. Every one of those proofs would have
+had to become a `simp only [Theta.value_ofRate]`.
+
+The price is 16 rewritten tactic blocks; the purchase is a duplication that is already
+machine-checked three ways -- `scaledRates_share_constant` ties the two rates to each other,
+`scaledMutationRate_eq` ties each to the literal `4`, and `scaledMutationRate_eq_theta` ties
+each to the constructor. And a ploidy change is STILL one edit either way, because these
+bodies say `2 * ploidy` and not `4`. What is duplicated is the shape, and the shape has a
+theorem. That is not the same defect as a second ROUTE, which is what the rest of this work
+removed.
+
+The NAMES stay, and are not deprecated. They are ledgered quantities with VALIDATED rows
+against `simcov/battery_bulk19.py`, and a measured name is not a deprecated one. What made
+them a parallel ROUTE was that the equilibrium accepted them; it does not any more --
+`scaledFlow`, `fstIslandEquilibrium`, `fstFromTau` and every scaled definition in
+`Coalescent` and `PopGen` take the types, so a real cannot reach any of them. -/
 
 /-- **`Theta.ofRate` wraps `scaledMutationRate`.**
 
