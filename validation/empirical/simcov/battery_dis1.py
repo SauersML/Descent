@@ -194,14 +194,29 @@ def test_divergence_rate():
         if theta == 0.0 and bigM == 0.0:
             control = dict(design="Ne=200 no mutation no migration vs 1/(2Ne)",
                            lean=1.0 / (2 * Ne), truth=obs, sem=sem)
+    # THE CANDIDATE IS THE BODY NOW, so it is the corpus row and the form it
+    # replaced is the competitor. This battery proposed the correction, the
+    # corpus took it, and the labels stayed as they were written -- so the
+    # ledger carried a FALSIFIED corpus row for `alleleFreqDivergenceRate`
+    # transcribing `1/(2*Ne*(1 + theta + bigM))` while `DGP.lean` reads
+    # `1 / (2 * Ne)`, and the declaration's own docstring quoted these very
+    # numbers under "VALIDATED after correction". Nothing was re-measured to fix
+    # that; the measurement was always here, filed under the superseded formula.
+    regime = ("across-replicate variance of the allele frequency after ONE "
+              "generation from a common start, normalised by p0(1-p0), "
+              "20000 replicate populations and 400 loci")
+    # realised_inputs=True: Ne, theta and bigM are the simulation's OWN
+    # parameters, exact by construction rather than estimated from the sample,
+    # so there is no nominal-versus-realised gap for the disagreement to be.
     record("alleleFreqDivergenceRate", "DGP.lean",
+           "1 / (2*Ne)", cells_cand, control=control, regime=regime,
+           realised_inputs=True)
+    record("alleleFreqDivergenceRate [the superseded 1/(2Ne(1+theta+bigM)), "
+           "competing]", "DGP.lean",
            "1 / (2*Ne*(1 + theta + bigM))", cells_corpus, control=control,
-           regime="across-replicate variance of the allele frequency after ONE "
-                  "generation from a common start, normalised by p0(1-p0), "
-                  "20000 replicate populations and 400 loci")
-    record("alleleFreqDivergenceRate [CANDIDATE: 1/(2Ne)]", "DGP.lean",
-           "1 / (2*Ne)", cells_cand, control=control,
-           regime="same runs, the drift rate alone")
+           realised_inputs=True,
+           regime=regime + "; the form this battery replaced, which says "
+                  "mutation and migration slow the accumulation of divergence")
 
 
 # ---------------------------------------------------------------------------

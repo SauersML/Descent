@@ -5965,8 +5965,16 @@ def run_ledger() -> int:
         head = (convention_status_head(doc[k + len("Empirical status:"):])
                 if k >= 0 else "")
         claimed = head.split()[0] if head.split() else ""
+        # AN ADJUDICATION IS THE HUMAN THIS FINDING ASKS FOR. The message says
+        # telling a stale docstring from a stale record "needs a human because a
+        # transcription and a Lean body share no text", and `adjudications.json`
+        # is where that human writes the answer down. The sibling check three
+        # lines up already skips adjudicated declarations; this one did not, so
+        # `ancestryRecalibratedR2` -- whose entry says the surviving designs
+        # locate a REGIME rather than a defect, which is what its docstring then
+        # says -- was reported as still needing the decision it carries.
         if claimed in DOC_ASSERTS_AGREEMENT and (heads & LEDGER_DISAGREES) \
-                and not (heads & LEDGER_AGREES):
+                and not (heads & LEDGER_AGREES) and name not in adjudicated:
             contradicted.append(
                 f"{name} ({fname}) docstring heads its status {claimed!r} while "
                 f"every ledger record for it says "

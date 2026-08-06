@@ -89,8 +89,15 @@ def test_tight_linkage_share():
 def test_allele_freq_divergence_rate():
     """alleleFreqDivergenceRate: growth of across-replicate frequency variance."""
     rng = np.random.default_rng(13101)
-    cells = []
-    for Ne, mu, m in ((200, 0.0, 0.0), (200, 1e-3, 0.0), (200, 0.0, 1e-3)):
+    cells, cells_old, unbiased = [], [], []
+    # NE HAS TO MOVE. Every cell here ran at Ne=200, which was fine while the
+    # corpus row transcribed `1/(2*Ne*(1 + theta + bigM))` -- theta and bigM
+    # moved, so the prediction did. The corrected body is `1/(2*Ne)` and at
+    # fixed Ne its prediction is one number across the whole design, so the
+    # harness voided the group as a DEGENERATE ORACLE, which is right. Two cells
+    # at other sizes give the corrected body a fivefold span of its own.
+    for Ne, mu, m in ((200, 0.0, 0.0), (200, 1e-3, 0.0), (200, 0.0, 1e-3),
+                      (500, 0.0, 1e-3), (1000, 1e-3, 0.0)):
         n_loci, reps = 3000, 600
         p0 = 0.5
         two_n = int(2 * Ne)
@@ -103,16 +110,43 @@ def test_allele_freq_divergence_rate():
             p1 = (1 - rate) * p1 + rate * p0
         var1 = float(p1.var())
         theta, bigM = 4 * Ne * mu, 4 * Ne * m
-        lean = 1 / (2 * Ne * (1 + theta + bigM))
         # the definition is a RATE per unit p(1-p); normalise the measurement
         truth = var1 / (p0 * (1 - p0))
         sem = truth * math.sqrt(2.0 / (reps * n_loci))
-        cells.append(dict(design="Ne=%d mu=%.0e m=%.0e" % (Ne, mu, m),
-                          lean=lean, truth=truth, sem=sem))
-    record("alleleFreqDivergenceRate", "DGP.lean",
-           "1 / (2*Ne*(1 + theta + bigM))", cells,
-           regime="per-generation across-replicate frequency variance from a "
-                  "common start, normalised by p(1-p)")
+        design = "Ne=%d mu=%.0e m=%.0e" % (Ne, mu, m)
+        # For the control: drift is UNBIASED, so the across-replicate mean
+        # frequency after one generation is still p0. At p0 = 0.5 with symmetric
+        # mutation and migration toward 0.5 that is exact, it involves neither
+        # body under test, and it has real replicate variance -- which the
+        # obvious alternative does not, since "the drift variance is
+        # p(1-p)/(2Ne)" IS the corrected body and would compare it to itself.
+        unbiased.append(float(p1.mean()))
+        cells.append(dict(design=design, lean=1 / (2 * Ne),
+                          truth=truth, sem=sem))
+        cells_old.append(dict(design=design,
+                              lean=1 / (2 * Ne * (1 + theta + bigM)),
+                              truth=truth, sem=sem))
+    # The corpus row transcribes `DGP.lean` AS IT READS, which is `1 / (2 * Ne)`.
+    # It used to transcribe `1/(2*Ne*(1 + theta + bigM))`, the form battery_dis1
+    # replaced; keeping that as the corpus row after the correction landed left
+    # the ledger holding a falsification of a body nobody can run, against a
+    # docstring that says VALIDATED and quotes these runs.
+    regime = ("per-generation across-replicate frequency variance from a "
+              "common start, normalised by p(1-p)")
+    control = dict(design="drift is unbiased: the across-replicate mean "
+                          "frequency after one generation is still p0 = 0.5",
+                   lean=0.5, truth=float(np.mean(unbiased)),
+                   sem=float(np.std(unbiased, ddof=1) / math.sqrt(len(unbiased))))
+    # realised_inputs=True: every argument here is the simulation's OWN
+    # parameter, exact by construction. Ne is the binomial denominator, mu and m
+    # are the rates applied; there is no estimated input and so no nominal
+    # versus realised gap for a disagreement to hide in.
+    record("alleleFreqDivergenceRate", "DGP.lean", "1 / (2*Ne)", cells,
+           control=control, regime=regime, realised_inputs=True)
+    record("alleleFreqDivergenceRate [the superseded "
+           "1/(2Ne(1+theta+bigM)), competing]", "DGP.lean",
+           "1 / (2*Ne*(1 + theta + bigM))", cells_old, control=control,
+           regime=regime, realised_inputs=True)
 
 
 def test_am_induced_ld():
