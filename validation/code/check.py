@@ -3242,8 +3242,31 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             mentions = (plain - own - local) & c.corpus_names
             constrains_own = bool((plain & own) - local)
             substantive = bool(mentions) and not constrains_own
-            if b.kind in ("implicit", "instance", "strict") or b.inherited:
-                add("F19", f"hidden premise `{b.kind}{' (section variable)' if b.inherited else ''}"
+            # WHAT THIS FAMILY ASKS IS *WHERE*, NOT *WHAT*.  F16 below asks whether a
+            # premise assumes something about this corpus's definitions.  This one asks
+            # whether the premise is CONCEALED, and concealment does not depend on what is
+            # concealed: `theorem foo {h : 1 = 1} : True` shows a reader no premise at all,
+            # and nothing resolves `h` for them either.  An implicit or strict binder, and
+            # a section variable, are reported whatever they say.
+            #
+            # AN INSTANCE BINDER OF A FIXED-CONTENT CLASS IS NOT CONCEALED.  `[Nonempty ι]`
+            # stands in the signature where a reader sees it, and typeclass inference is a
+            # documented mechanism rather than a hiding place.  Reporting it made the same
+            # side condition a finding as `[Nonempty ι]` and clean as `(h : Nonempty ι)`,
+            # decided by the brackets.  So an instance premise is reported when its class
+            # carries arbitrary content, or when it assumes something about a definition
+            # this corpus makes -- and `Fact`, which exists to carry an ARBITRARY
+            # proposition through inference, is caught by F3 on exactly that ground.
+            concealed = True
+            if b.kind == "instance" and not substantive:
+                ihead = re.match(r"([A-Za-z_][\w.']*)", norm(b.type))
+                if ihead:
+                    ibase = ihead.group(1).split(".")[-1]
+                    if ibase in STANDARD_CLASSES or ibase in {"Nonempty", "Inhabited"}:
+                        concealed = False
+            if (b.kind in ("implicit", "instance", "strict") or b.inherited) and concealed:
+                add("F19", f"hidden premise `{b.kind}"
+                           f"{' (section variable)' if b.inherited else ''}"
                            f" {b.name} : {_clip(b.type)}`")
             elif substantive:
                 add("F16", f"premise `{b.name} : {_clip(b.type)}` assumes a fact about "
@@ -3266,8 +3289,20 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             if not head:
                 continue
             base = head.group(1).split(".")[-1]
-            if base in ASSUMPTION_CLASSES or (
-                base in c.struct_fields and base not in STANDARD_CLASSES
+            # `Fact` wraps an arbitrary proposition and hands it to instance resolution;
+            # the wrapper IS the laundering, so it is reported on sight.  `Nonempty` and
+            # `Inhabited` have fixed content and smuggle nothing, so they are reported on
+            # the same ground every other premise is: when they assume something about a
+            # definition this corpus makes, rather than about a type the theorem is
+            # quantified over.  Measured before the change: fifty findings, every one
+            # `Nonempty`, not one `Fact`.
+            assumes_corpus_object = bool(
+                (set(re.findall(rf"(?<![.\w'])({IDENT})", b.type)) - {base})
+                & c.corpus_names)
+            if base == "Fact" or (
+                (base in ASSUMPTION_CLASSES
+                 or (base in c.struct_fields and base not in STANDARD_CLASSES))
+                and assumes_corpus_object
             ):
                 add("F3", f"instance premise `[{_clip(b.type)}]`")
 
