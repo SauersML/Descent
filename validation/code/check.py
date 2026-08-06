@@ -5035,7 +5035,16 @@ def mathlib_statement_key(header: str) -> tuple[str, int]:
         token = match.group(0)
         if token in bound or token in MATHLIB_SHAPE_NOISE:
             return "_"
-        short = token.rsplit(".", 1)[-1]
+        if "." in token and token.split(".", 1)[0] in bound:
+            # A PROJECTION OFF A BOUND VARIABLE.  The receiver is anonymous, but the
+            # projection PATH is not, and taking only its last component threw away the
+            # type: `p.vertices.length` reaches a length through a field that `x.length`
+            # does not have, and collapsing both to `length` reported
+            # `Quiver.Path.vertices_length` as a restatement of a fact about the length
+            # of a list.  Keeping the path is what tells a list from a quiver path.
+            short = token.split(".", 1)[1]
+        else:
+            short = token.rsplit(".", 1)[-1]
         if short in MATHLIB_SHAPE_NOISE:
             return "_"
         constants.add(short)
@@ -5092,6 +5101,14 @@ MATHLIB_SHAPE_CONTROL_DIFFERENT = (
     "(a b : ℝ) : Real.exp (a + b) = Real.exp a * Real.exp b",
     "(a b : ℝ) : Real.log (a * b) = Real.log a + Real.log b",
 )
+# A pair the screen used to identify and must not: one length is a list's, the other is
+# reached through a quiver path's vertex list.  Same operators, same literal, different
+# projection depth -- which is the only thing in the text that says they are about
+# different objects.
+MATHLIB_SHAPE_CONTROL_PROJECTION = (
+    "{c : List σ} {x : List ι} (hx : x ∈ derivations c) : x.length = c.length + 1",
+    "(p : Quiver.Path a b) : p.vertices.length = p.length + 1",
+)
 
 
 def mathlib_shape_is_significant(skeleton: str, constants: int) -> bool:
@@ -5131,6 +5148,13 @@ def mathlib_shape_selftest() -> list:
         problems.append(
             "the shape normal form identifies two DIFFERENT statements:\n"
             f"      {first}\n      {second}")
+    shallow, deep = MATHLIB_SHAPE_CONTROL_PROJECTION
+    if mathlib_statement_key(shallow)[0] == mathlib_statement_key(deep)[0]:
+        problems.append(
+            "the shape normal form identifies a list length with a length reached "
+            "through a projection, which is the false positive that emptied "
+            "MATHLIB_EXEMPT:\n"
+            f"      {shallow}\n      {deep}")
     return problems
 
 
