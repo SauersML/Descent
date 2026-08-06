@@ -264,7 +264,19 @@ def IsNull (S : Matrix ι ι ℝ) : Prop :=
 /-- **Spike load of a constraint in a direction**: how fast the constraint's
 value rises per unit of spike.  This is the quantity that decides rigidity.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM.  The composition of a
+    `BackgroundClass`'s OWN linear functional with the rank-one spike, so its
+    value is fixed by whichever class is supplied and there is no population
+    that could return a different one.  UNTESTED stood here and was the wrong
+    verdict rather than a missing one: it says a measurement is owed, and no
+    design can measure a composition.
+
+    What IS empirical is whether a given class's spike load predicts what the
+    class was built to predict, and that question is asked one level down, at
+    the instance.  `traceWindow_spikeLoad_demographic` evaluates this
+    composition for the trace-window class in the demographic direction and
+    gets `effectiveSubgroupSize`; that number is a claim about a panel, and it
+    is where a simulation would bite. -/
 def spikeLoad (a : cidx) (v : ι → ℝ) : ℝ := K.form a (spikeOuter v)
 
 /-- **Headroom of a constraint at the baseline**: how much of its budget the
@@ -1240,7 +1252,12 @@ theorem subgroupContrast_at_empty_panel_is_junk (m : ℕ) :
 
 /-- The subgroup contrast as a vector on the panel's individuals.
 
-    Empirical status: DERIVED. -/
+    Empirical status: DERIVED, from `dot_demographicSpikeDirection`, which computes its
+    squared length as `effectiveSubgroupSize`, and from
+    `traceWindow_spikeLoad_demographic`, which is that length read as the trace-window
+    class's spike load.  The bare word stood here alone, naming nothing it follows from,
+    which is a claim of derivation rather than a derivation -- and the two theorems it
+    should have named are the next two declarations in this file. -/
 def demographicSpikeDirection (n m : ℕ) : Fin n → ℝ :=
   fun i ↦ subgroupContrast n m i.val
 

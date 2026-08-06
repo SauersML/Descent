@@ -135,7 +135,16 @@ theorem sum_univ {M : Type*} [AddCommMonoid M] (f : Genotype → M) :
 
 A diploid individual's genotype at a locus is determined by the two alleles it inherits,
 and by nothing else about which parent supplied which.  Making this a function rather than
-a remark is what lets `ofAlleles_comm` be a theorem. -/
+a remark is what lets `ofAlleles_comm` be a theorem.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  This is a CODING, in the same sense as
+`dosage` below: it fixes which of the three states of `Genotype` a pair of gametes
+denotes, and a coding cannot disagree with a population.  What DOES have observable
+content is the commitment the coding makes by having a three-state codomain at all --
+that parent of origin does not enter, which is `ofAlleles_comm`, and which is false of
+an imprinted locus.  That commitment is not tested here because nothing here can test
+it; it is exercised wherever a moment is computed from `dosage`, and `dosage` says
+where. -/
 def ofAlleles : Allele → Allele → Genotype
   | .ref, .ref => .homRef
   | .ref, .alt => .het
@@ -193,7 +202,14 @@ abbrev Haplotype (n : ℕ) := Locus n → Allele
 /-- **A genome**: one diploid genotype at each of `n` loci. -/
 abbrev Genome (n : ℕ) := Locus n → Genotype
 
-/-- **A diploid genome is what two gametes make**, locus by locus. -/
+/-- **A diploid genome is what two gametes make**, locus by locus.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The pointwise lift of `Genotype.ofAlleles`,
+and it inherits that coding's content and no more.  What the lift ADDS is the assumption
+that loci combine independently of one another -- there is no term here in which locus
+`l` sees locus `l'` -- and that is not a claim about a population either, because it is
+how `Genome` is defined.  Where it becomes a claim is `LDMatrix`, which is the corpus's
+name for the fact that the loci of a real gamete are not independent. -/
 def Genome.ofHaplotypes {n : ℕ} (h₁ h₂ : Haplotype n) : Genome n :=
   fun l ↦ Genotype.ofAlleles (h₁ l) (h₂ l)
 
@@ -211,7 +227,12 @@ abbrev AlleleFreq (n : ℕ) := Locus n → ℝ
 
 /-- The predicate that makes an `AlleleFreq` a frequency.  Carried as a hypothesis where
 it is needed rather than bundled, because most statements about frequencies hold on all
-of `ℝ` and bundling would make them harder to apply, not safer. -/
+of `ℝ` and bundling would make them harder to apply, not safer.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A predicate naming the range a proportion
+lives in.  No population can fail to satisfy it and no simulation can measure it; what a
+simulation CAN do is fail to establish it for an estimator, and an estimator of a
+frequency is a different object from a frequency. -/
 def IsAlleleFreq {n : ℕ} (q : AlleleFreq n) : Prop := ∀ l, q l ∈ Set.Icc (0 : ℝ) 1
 
 /-- **A linkage-disequilibrium matrix** over `n` loci. -/

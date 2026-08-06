@@ -566,7 +566,16 @@ Before this, `presentDayR2` and the master theorem's `r2` were two expressions w
 same shape in two modules with nothing relating them, and the layer contract was a
 sentence in a docstring. -/
 
-/-- **The drift model's moment tuple.** What this module hands the metric layer. -/
+/-- **The drift model's moment tuple.** What this module hands the metric layer.
+
+Empirical status: DERIVED, and the derivation is the three theorems immediately below.
+`driftMoments_scoreVariance`, `driftMoments_predictiveCovariance` and
+`driftMoments_outcomeVariance` each identify one field of the tuple with a quantity this
+module already computes -- `presentDayPGSVariance`, and that quantity plus `V_E` -- so
+the tuple is a repackaging and not a fourth model with its own content.  It carries no
+measurement of its own for the same reason: what a simulation could reject is
+`presentDayPGSVariance`, and `presentDayR2_eq_deployedR2` is the theorem that makes a
+rejection there a rejection here. -/
 noncomputable def driftMoments (V_A V_E fst : ℝ) : Descent.Core.ScoreMoments :=
   Descent.Core.ScoreMoments.momentsUnderDrift V_A V_E fst
 
