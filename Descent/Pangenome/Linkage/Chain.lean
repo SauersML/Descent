@@ -97,6 +97,13 @@ theorem length_of_mem_mosaicsFrom {c : Chain ι} {h : ι} {x : List ι}
     obtain ⟨g, -, y, hy, rfl⟩ := hx
     simp [ih hy]
 
+/-- Every derivation over `c` has one donor per module, which is what makes the spelled
+sequences of `Descent.Pangenome.Linkage.Splicing` uniquely decodable. -/
+theorem length_of_mem_mosaics {c : Chain ι} {x : List ι} (hx : x ∈ mosaics c) :
+    x.length = c.length + 1 := by
+  obtain ⟨h, -, hh⟩ := Finset.mem_biUnion.mp hx
+  exact length_of_mem_mosaicsFrom hh
+
 theorem mosaicsFrom_nonempty (c : Chain ι) (h : ι) : (mosaicsFrom c h).Nonempty := by
   induction c generalizing h with
   | nil => exact ⟨[h], by simp [mosaicsFrom]⟩
