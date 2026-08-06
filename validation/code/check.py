@@ -3024,6 +3024,12 @@ def build_corpus(files: list[Path]) -> Corpus:
         m = re.match(r"Nonempty\s+\(?([A-Za-z_][\w.']*)", c_)
         if m:
             inhabited.add(m.group(1).split(".")[-1])
+        # A SUBTYPE IS NAMED BY ITS PREDICATE.  `Nonempty {η : ER n // Covers ξ η}` began
+        # with `{`, which the pattern above cannot match, so proving a subtype inhabited
+        # recorded nothing and F12 could not be cleared by any amount of correct work.
+        ms = re.match(r"Nonempty\s*\{[^/]*//\s*([A-Za-z_][\w.']*)", c_)
+        if ms:
+            inhabited.add(ms.group(1).split(".")[-1])
         # Theorems count too.  A Prop-valued structure (`IsRankAllocation k M : Prop`)
         # is inhabited by a THEOREM proving it holds of some `k` and `M`, and a data
         # structure by a theorem concluding `Nonempty S`, matched above.
@@ -3439,11 +3445,20 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             # matched a real subtype -- only the rarer `{n // p n}` spelling.
             sm = re.match(r"\{[^/]*//\s*(.+)\}$", t)
             if sm:
-                base = _head_ident(t)
-                add("F12", f"domain is the subtype `{_clip(t)}`; "
-                           f"no `Nonempty` for it is proved in-corpus"
-                    if base not in c.inhabited else
-                    f"domain is the subtype `{_clip(t)}`")
+                # THE PREDICATE, NOT THE BOUND VARIABLE.  `_head_ident` on
+                # `{η : ER n // Covers ξ η}` returns `η` -- the binder's own name -- and
+                # that was compared against the set of types shown inhabited.  A bound
+                # variable is never in that set, so the finding was unconditional, and
+                # together with the extractor above it made this family unsatisfiable: no
+                # theorem anyone could write would clear it.  What identifies the subtype
+                # is the predicate cutting it out.
+                base = _head_ident(sm.group(1))
+                # AND AN INHABITED SUBTYPE IS NOT LAUNDERING.  This reported the domain
+                # either way, differing only in the wording, so proving inhabitation
+                # changed the message and not the count.
+                if base not in c.inhabited:
+                    add("F12", f"domain is the subtype `{_clip(t)}`; "
+                               f"no `Nonempty` for it is proved in-corpus")
 
     if d.kind in ("def", "abbrev"):
         # F8 -- definitional weakening.

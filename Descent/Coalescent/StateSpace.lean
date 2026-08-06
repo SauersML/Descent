@@ -483,6 +483,25 @@ theorem card_covers_eq_deathRate {n : ℕ} (ξ : ER n) :
     unfold deathRate Descent.Core.pairCount
     linear_combination h2 / 2
 
+/-- **A state with two or more blocks has a cover.**  The number of covers of `ξ` is its
+death rate, and that is positive as soon as two blocks are there to merge, so the subtype
+`{η // Covers ξ η}` -- the domain the jump kernel and the competing-clock densities are
+indexed by -- is inhabited exactly where the chain can move.
+
+Without this the subtype is a domain nothing shows is occupied, and a theorem stated over it
+says nothing at all in the one-block case rather than saying something about no covers.
+
+    Empirical status: **NOT AN EMPIRICAL CLAIM**.  This counts the one-step mergers
+    available to a partition; a measurement disagreeing with it would be an arithmetic
+    error about `deathRate`, whose own convention is ledgered at `Descent.Coalescent.Rates`. -/
+theorem nonempty_covers {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
+    Nonempty {η : ER n // Covers ξ η} := by
+  have hpos : (0 : ℝ) < (Nat.card {η : ER n // Covers ξ η} : ℝ) := by
+    rw [card_covers_eq_deathRate ξ]
+    exact deathRate_pos hk
+  have hcard : 0 < Nat.card {η : ER n // Covers ξ η} := by exact_mod_cast hpos
+  exact (Nat.card_pos_iff.mp hcard).1
+
 end Coalescent
 
 end Descent
