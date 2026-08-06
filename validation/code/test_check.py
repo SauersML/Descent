@@ -42,6 +42,7 @@ that would let a careless matcher demand an F_ST estimator from a meeting time.
 Run:  python3 validation/code/test_check.py
 """
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -1265,6 +1266,46 @@ def calibrate_others() -> list:
         if guard not in r.stdout:
             failures.append(f"DISPATCH        --list does not name the {guard!r} guard")
 
+    # `field-proofs` reads the corpus from `origin/main` rather than from a tree,
+    # so DESCENT_CORPUS cannot reach it and not one planted defect above tests it.
+    # Its only available control is this one -- that it looked at something -- and
+    # it is not a formality: the guard filtered its file list on a `proofs/` prefix,
+    # `5762501 Put the corpus at the root` deleted that directory, and from that
+    # commit until the filter was repaired it scanned ZERO files and printed
+    # `THEOREMS WHOSE WHOLE PROOF IS A FIELD PROJECTION: 0` on every run.  Every
+    # other assertion in this file passed throughout: `--list` still named it, it
+    # still exited 0, and its output still looked like a clean report.  A count of
+    # files scanned is the one number that distinguishes a clean corpus from a
+    # screen pointed at nothing.
+    repo = CHECK.resolve().parents[2]
+    r = subprocess.run([sys.executable, str(CHECK), "--only", "field-proofs"],
+                       capture_output=True, text=True, cwd=repo)
+    m = re.search(r"scanned (\d+) \.lean files", r.stdout)
+    if not m:
+        failures.append(
+            "CONTRACT        field-proofs did not report how many files it scanned; "
+            "that line is the guard's only evidence that it could see the corpus")
+    elif int(m.group(1)) == 0:
+        failures.append(
+            "BLIND SPOT      field-proofs scanned 0 files and still reported a count; "
+            "its path filter no longer matches where the corpus lives")
+
+    # The other direction: pointed somewhere with no such ref, it must FAIL rather
+    # than report zero findings.  This is `mathlib`'s rule -- a screen that cannot
+    # look is not a screen that found nothing -- and it is what the repair added.
+    with tempfile.TemporaryDirectory() as td:
+        subprocess.run(["git", "init", "-q"], cwd=td, capture_output=True)
+        r = subprocess.run([sys.executable, str(CHECK), "--only", "field-proofs"],
+                           capture_output=True, text=True, cwd=td)
+        if r.returncode == 0:
+            failures.append(
+                "FALSE NEGATIVE  field-proofs passed in a repository with no "
+                "`origin/main`, where it can have read nothing at all")
+        elif "CANNOT RUN" not in r.stdout:
+            failures.append(
+                "MISREPORTED     field-proofs failed with no `origin/main`, but did "
+                "not say it CANNOT RUN, which is what tells a reader it is not a finding")
+
     return failures
 
 
@@ -1326,6 +1367,9 @@ def main() -> int:
     print("  wiring --json keys asserted by name; --list names all nine guards")
     print("  mathlib: a planted name collision reported and named, a corpus "
           "declaring only its own names accepted, and an absent Mathlib "
+          "reported as CANNOT RUN rather than as a clean zero")
+    print("  field-proofs: it reported the number of files it read and that "
+          "number is not zero, and a repository with no `origin/main` is "
           "reported as CANNOT RUN rather than as a clean zero")
     return 0
 

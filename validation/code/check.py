@@ -4420,8 +4420,22 @@ def run_wiring(argv: list[str]) -> int:
 # Was `validation/code/check.py`.  Its full header, including the calibration
 # record and the known false-positive modes, is reproduced immediately below.
 #
-# DIAGNOSTIC, NOT A GATE.  It returns 0 whatever it finds, and it is not in the
-# default set: it shells out to git and reads `origin/main`.
+# DIAGNOSTIC ON ITS FINDINGS.  It returns 0 whatever it finds, because the
+# false-positive modes below are real and a hit is a thing to read, not a thing
+# to fail a build on.
+#
+# IT IS IN THE DEFAULT SET, and the sentence that used to sit here saying it was
+# not is what let the next paragraph go unnoticed for every commit since the root
+# move.  It shells out to git and reads `origin/main`, which is a cost -- roughly
+# one `git show` per corpus file -- not a reason to hold it out.
+#
+# IT GATES ON BEING ABLE TO LOOK.  Its file list was `startswith("proofs/")`, and
+# `5762501 Put the corpus at the root` deleted that prefix.  From that commit until
+# this one it scanned ZERO files and printed `THEOREMS WHOSE WHOLE PROOF IS A FIELD
+# PROJECTION: 0` -- a screen reporting a clean corpus while looking at nothing,
+# which is the exact failure the header below spends forty lines telling the reader
+# to distrust.  An empty file list is now a FAILURE, on `mathlib`'s rule: a screen
+# that cannot look is not a screen that found nothing.
 # ======================================================================================
 
 # Find theorems whose ENTIRE proof is a structure-field projection, on origin/main.
@@ -4472,8 +4486,24 @@ def run_wiring(argv: list[str]) -> int:
 def run_field_proofs() -> int:
     def sh(*a): return subprocess.run(a, capture_output=True, text=True).stdout
     REF = "origin/main"
+    # The same population `lean_sources` and `ident_lean_files` scan, named
+    # against a git ref instead of the worktree: everything under `Descent/`,
+    # plus the root module `Descent.lean`, which is that directory's SIBLING and
+    # is reached by no walk of it.  `lakefile.lean` is outside `Descent/` and so
+    # is excluded by construction here, where `lean_sources` has to name it.
     files = [f for f in sh("git","ls-tree","-r","--name-only",REF).splitlines()
-             if f.endswith(".lean") and f.startswith("proofs/")]
+             if f.endswith(".lean")
+             and (f.startswith("Descent/") or f == "Descent.lean")
+             and not any(part.startswith(".") for part in f.split("/"))]
+    if not files:
+        print(f"field-proofs guard CANNOT RUN: no corpus .lean files at {REF}")
+        print("  It reads the corpus from git rather than from the worktree, on purpose "
+              "-- a worktree grep and an origin grep answer different questions, and only "
+              "the second answers `is this in the corpus`.  So an empty list means the ref "
+              "is missing (`git fetch`) or the corpus has moved again and the path filter "
+              "above has to move with it.  This is reported as a failure rather than a "
+              "pass because a screen that cannot look is not a screen that found nothing.")
+        return 1
     srcs = {f: sh("git","show",f"{REF}:{f}") for f in files}
 
     # --- structure fields declared in the corpus ---
