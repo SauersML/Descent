@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -- `witnessDivergence_eq_threeAncestryDistance` and the two decoration lemmas name
 -- `Portability.threeAncestryDistance`, `ancestryPosition`, `ancestryScore`,
 -- `ancestryScoreSwapped` and `threeAncestryConditional`, and `Spectral.binarySecondAnnotation`.
--- All six used to arrive through `Descent.Program.Conventions`, which this file no longer
--- imports; the modules that DEFINE them are named instead.
+-- All six are reached through the modules that DEFINE them, named individually above.
 import Descent.Portability.MetricSpecificPortability.PrecisionRecall
 import Descent.Portability.ContinuumCalibration
 

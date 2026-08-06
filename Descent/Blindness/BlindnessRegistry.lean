@@ -151,7 +151,7 @@ written. Each is faithful to what the guard actually examines: a relation *among
 cluster's members. -/
 inductive StructuralGuard
   /-- Over-determination: relate independently written formulas so drift between them
-  fails to compile (`Descent.Program.Conventions`). -/
+  fails to compile (`validation/conventions.json`). -/
   | overDetermination
   /-- Duplicate bodies: one body under two names in two files, tied by nothing. -/
   | duplicateBody

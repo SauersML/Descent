@@ -24,6 +24,6 @@ importing the one before, and a head that named only the last one reached the wh
 through that chain. The parts are now a fan: `R2Decomposition` carries the definitions and
 the outside imports, and the others import it and whatever siblings they actually name. A
 fan has no last part, so a head that named one part would silently stop delivering the
-rest, and `Program.Conventions` -- which imports this module and nothing under it -- would
-lose declarations without anything saying so.
+rest, and any importer naming this module and nothing under it would lose declarations
+without anything saying so.
 -/

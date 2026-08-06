@@ -122,7 +122,7 @@ positive mixing densities. So:
   modelling choice, not an estimate;
 * reported "numbers of latent GxE components", "numbers of tissue-shared mechanisms",
   and non-negative-matrix-factorization ranks over context panels are conventions in
-  the sense of `Descent.Program.Conventions`;
+  the sense of `validation/conventions.json`;
 * stability of such a rank under perturbation is vacuous, because the minimum is
   always attained at `1`.
 

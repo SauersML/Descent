@@ -54,7 +54,7 @@ open Filter
 
 Empirical status: THIS IS THE MODEL.  `ρ = 4 N_e r` is the scaled rate, and the `1/2` is the
 same time-unit convention that makes the per-pair coalescence rate `1`; see
-`Descent.Program.Conventions`. -/
+`Descent.Core.Scaling`. -/
 noncomputable def recombRate (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
   Descent.Core.halfLineageRate k rho.value
 

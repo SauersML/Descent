@@ -68,7 +68,7 @@ section TransientFstDerivation
     **This is `Descent.hetDecayFromScaled` applied, not a second copy of its body.
     Do not inline the product `(1 - 1/(2Ne)) * (1 - θ/(2Ne))` here.** Every call site
     unfolds the PAIR `hetDecayFactor hetDecayFromScaled` — including
-    `Descent.Program.Conventions` and `Descent.PopGen.DemographicHistory` — and an inlined body
+    `Descent.PopGen.DemographicHistory` — and an inlined body
     leaves no `hetDecayFromScaled` in the goal for the second unfold to find. The
     two-name unfold is the contract: inlining breaks five proofs in three files.
 
@@ -197,7 +197,7 @@ module imports both it and any of the three below, so **no file can currently st
 identity at all.** Closing that one needs an import, not a theorem.
 
 The name spells `hudsonFstFromCoalescenceTimes` out in full, and must keep doing so.  A
-DIFFERENT definition owns the short name `hudsonFst` — `Program.Conventions.hudsonFst`,
+DIFFERENT definition owns the short name `hudsonFst` — `Core.Fst.hudsonFst`,
 the allele-frequency form `d² / (p₁ + p₂ - 2p₁p₂)` — and this theorem is false of it:
 `hudsonFst` is not `1 - a/b`.  An earlier name for this theorem abbreviated to
 `_eq_hudsonFst_`, so anyone grepping `hudsonFst` for what is known about it got this

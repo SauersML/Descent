@@ -423,7 +423,7 @@ diploid convention is the `4` written out here twice. Expanding the master gives
 character for character.
 
 The wrapper was tried and reverted when this module was split out of the monolith, and
-`Program.Conventions` has since been written against the inlined form, so the bodies stay
+the convention edges have since been written against the inlined form, so the bodies stay
 as they are and the identity is stated instead. That is enough for the purpose: an edit to
 `Core.ploidy` that this body failed to follow would now break THIS theorem, which is the
 protection the wrapper would have given.

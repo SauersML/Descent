@@ -558,7 +558,7 @@ Each of the five results supplies a witness pair; this file supplies everything 
 The recurring moral is not that the probes are weak. It is that the quantity being
 probed is **not a function of the observables at all**, so the honest replacement is a
 convention plus a theorem about what the convention buys — which is the programme
-`Descent.Program.Conventions` already states for constants, extended here to structural
+`validation/conventions.json` already states for constants, extended here to structural
 quantities.
 -/
 

@@ -3,9 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Spectral.PolygenicSpectroscopy
 -- `Blindness.SymmetricCoding`, `GenotypeDesign` and the eight standardized-genotype
--- moment lemmas are named throughout. They used to arrive through
--- `Program.Conventions -> Blindness.BlindnessRegistry`, and this file no longer imports
--- the programme narrative.
+-- moment lemmas are named throughout, each through the module that defines it.
 import Descent.Blindness.EpistaticChaos
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Portability.AncestrySpecificPower
@@ -26,7 +24,7 @@ namespace Descent.PopGen
 # Unification: welding the condensation results onto the existing corpus
 
 The condensation modules introduce new named population-genetic quantities, and
-`Descent.Program.Conventions` states the standing policy for exactly that situation:
+`validation/conventions.json` states the standing policy for exactly that situation:
 
 > Against a wrong constant: over-determination. Derive the quantity from a primitive
 > so the constant is forced, and relate independently written formulas so that drift
@@ -164,7 +162,7 @@ The genetics readings are what this corpus believes, and they are stated here as
 rather than as theorems. If a complete scree-type invariant of a
 loading-decay profile existed it would have to separate profiles with identical complete
 second-order observables, so the number of principal components to retain is a convention
-in the sense of `Descent.Program.Conventions`; `Descent.Portability.PCCorrectability` answers the
+in the sense of `validation/conventions.json`; `Descent.Portability.PCCorrectability` answers the
 different question of what correction achieves *given* one. Where the ancestry loadings
 are bounded below the latent coordinates are recoverable and the convention is forced.
 And if every non-constant family of context-specific kernels admits a dimension-one
@@ -1967,7 +1965,7 @@ the lattice arithmetic is proved | `EpistasisAndNonAdditivity` |
 The shared shape is worth naming, because it is the same shape each time: a quantity
 that is routinely *estimated* turns out not to be a function of the observables at all,
 and the honest replacement is a convention plus a theorem about what the convention
-buys. That is the programme `Descent.Program.Conventions` already states, and the three
+buys. That is the programme `validation/conventions.json` already states, and the three
 proved rows extend it from constants to structural quantities. The first two rows are
 where the programme is aimed, not where it has landed.
 -/

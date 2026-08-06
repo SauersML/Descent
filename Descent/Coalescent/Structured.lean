@@ -35,8 +35,8 @@ invisible to within-deme coalescence times, and shows up only in the between-dem
 `E[T_d] = 2 + 1/M` and hence in `F_ST`.
 
 `fstFromMigration` records the consequence `F_ST = 1/(1 + 2M)`, which is Wright's island
-formula in coalescent dress: the corpus's `Descent.Program.Conventions` carries the same
-shape as a scalar, and this is where it comes from.
+formula in coalescent dress: the corpus's `Descent.Core.Fst` carries the same shape as a
+scalar, and this is where it comes from.
 
 ## Main results
 
@@ -115,7 +115,7 @@ The body reads `(T_diff - T_same)/T_diff`, which is `1 - T_same/T_diff`: exactly
 `Core.proportionalReduction` applied to the two mean coalescence times. Saying so places
 this quantity in the `F_ST` lattice rather than leaving it as a ratio that happens to look
 like one -- `Portability.hudsonFstFromCoalescenceTimes` and `PopGen.fstFromHetRatio` are
-the same kernel on the same convention, and `Program.Conventions`'
+the same kernel on the same convention, and `PopGen.DemographicHistory`'s
 `slatkin_hetRatio_eq_coalescenceRatio` is the edge between times and heterozygosities.
 
 It matters WHICH `F_ST` this is. The corpus has measured Nei's estimator failing the split
@@ -143,7 +143,7 @@ theorem fstFromMigration_ne_proportionalReduction_at_zero (M : ℝ)
 
 /-- **Wright's island formula, in coalescent dress: `F_ST = 1/(1 + 2M)`.**
 
-The corpus carries this shape as a scalar in `Descent.Program.Conventions`; here is
+The corpus carries this shape as a scalar in `Descent.Core.Fst`; here is
 where it comes from -- the ratio of two mean coalescence times, each of which came from the
 structured coalescent's competing rates. -/
 theorem fstFromMigration_eq {M : ℝ} (hM : 0 < M) :

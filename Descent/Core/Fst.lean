@@ -621,8 +621,8 @@ relate them at that level.  What follows is the same pair written on the argumen
 data actually supplies -- a pair of subgroup allele frequencies -- together with the
 witnesses that they are two functions and not two spellings of one.
 
-These arrived here from `Program.Conventions`, which is where the corpus put statements it
-could only make after importing everything.  None of them needed that.  `neiGst`,
+These are stated here, at the lowest module that can state them, rather than wherever
+everything happens to be in scope at once.  None of them needed more than this file.  `neiGst`,
 `hudsonFst`, `meanAlleleFreq` and `betweenSubgroupVariance` are built from `ploidy`,
 `midpoint` and `halfDiffSq` and from nothing else, so their home is here, below the
 subsystems that consume them, and a module wanting Hudson's `F_ST` no longer has to import
