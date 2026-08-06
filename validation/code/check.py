@@ -7651,11 +7651,18 @@ GUARDS = {
     # whose results were never committed.  Those are true findings -- six
     # definitions assert an empirical status against evidence that does not
     # exist in the repository -- and the fix is to land the results, which is
-    # running.  Flipping this to gated with the citations outstanding would
-    # break the build for everyone; pinning a budget to seven would be worse.
-    # The budgets are 0 and stay 0.  Flip `gated` when
-    # `battery_bulk19_results.json` and `battery_bulk20_results.json` land.
-    "ledger":          dict(fn=run_ledger,          gated=False, takes_argv=False),
+    # GATED.  The condition this entry set for itself -- flip when
+    # `battery_bulk19_results.json` and `battery_bulk20_results.json` land -- is met:
+    # both files are committed, the seven citations they blocked resolve, and the
+    # guard's gated rules are at zero.  It ran diagnostic for exactly as long as its
+    # stated reason lasted, which is the only thing that separates a ratchet from a
+    # permanent exemption.
+    #
+    # Its `REPORTED, NOT GATED` section still names seven citations that reach a
+    # battery emitting numbers and calling `record()` nowhere.  Those are outstanding
+    # and they do NOT gate: the repair is a `record()` call in three battery scripts
+    # and a rerun, not a change here.  That category is the next thing to flip.
+    "ledger":          dict(fn=run_ledger,          gated=True,  takes_argv=False),
     # GATED, where `ledger` is not, and the difference is the population.  This
     # one reads seven files' worth of declarations at depth 0-1, small enough to
     # hold at zero by hand; `ledger` reads 2164 and reports its sharpest rules
