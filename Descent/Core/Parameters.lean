@@ -211,9 +211,22 @@ and `Ne` were both fields and every consumer that wanted a scaled time divided t
 hand, which is how `t/(2 Nₑ)` and `t/(4 Nₑ)` both appear in the corpus. `Tau.ofGenerations`
 carries the `ploidy` and this names its value on this record.
 
-    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
-    laws computed from it. What carries a status is a claim that a population
-    reaches these values, which is asked where the demography is. -/
+    Empirical status: **MEASURED**, and it agrees
+    (`validation/empirical/simcov/battery_bulk19.py`). The sibling declarations
+    in this record are not empirical claims, and this one is: the OTHER
+    coordinates name a rate the record was handed, while this one asserts a
+    SCALING -- that the coalescent unit of time is `2 Nₑ` generations and not
+    `4 Nₑ` or `Nₑ`. A population can disagree with a scaling.
+
+    It does not. Read through the pure-split law `F_ST = τ/(1 + τ)` on
+    simulated genotype matrices, `t_div / (2 Nₑ)` MATCHES, and the same cells
+    FALSIFY `t_div / (4 Nₑ)` and `t_div / Nₑ`. The battery records the reading
+    against `EvolutionaryParameters.tau` in `PopGen/DGP.lean`, which is this
+    same scaling over the other parameter record; there is one quantity here
+    and two records carrying it, so the measurement bears on both. Reading the
+    ledger row as being about the other declaration alone was tried and
+    reverted -- `Meta.Linters.coreStatusDenied` had it right, and the shared
+    short name is not a collision. -/
 noncomputable def tau (p : PopGenParameters) : Tau := Tau.ofGenerations p.t_div p.Ne
 
 /-- **`M` is the scaled migration rate, not half of it.** -/
