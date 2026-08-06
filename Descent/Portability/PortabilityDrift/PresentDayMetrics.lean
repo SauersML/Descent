@@ -2462,7 +2462,7 @@ correlation decays exponentially with recombination distance and divergence.
     | Sved's `1/(1+ρ)` | 17.6 sems (86% relative) |
 
     The exponential there is FITTED BY LEAST SQUARES TO THE VERY CURVE IT IS
-    TESTED AGAINST, with a free amplitude AND a free rate, while the two
+    BEING JUDGED ON, with a free amplitude AND a free rate, while the two
     hyperbolic forms are given no fitted constant at all. It still loses, which
     is the strongest form the claim can take: the failure cannot be a badly
     chosen `lambda`, because `lambda` was chosen optimally and the shape still
