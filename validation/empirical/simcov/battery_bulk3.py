@@ -53,6 +53,8 @@ def drift_one_branch(Ne, t, n_loci=600, reps=4000, seed=1):
 
 def test_drift_variance_family():
     cells_one, cells_two, cells_exp = [], [], []
+    cells_one_corrected, cells_two_corrected, cells_exp_corrected = [], [], []
+    ctrl_V_A = ctrl_V_A_measured = ctrl_sem = 0.0
     for Ne, t in ((200, 30), (200, 100), (200, 250)):
         r = drift_one_branch(Ne, t, seed=12001 + t)
         s1 = r["one_pop_var"] * math.sqrt(2.0 / (r["reps"] - 1))
@@ -64,16 +66,70 @@ def test_drift_variance_family():
                               truth=r["two_pop_var"], sem=s2))
         cells_exp.append(dict(design=lab, lean=r["V_A"] * 2 * r["F"],
                               truth=r["two_pop_var"], sem=s2))
+        cells_one_corrected.append(dict(design=lab, lean=2 * r["F"] * r["V_A"],
+                                        truth=r["one_pop_var"], sem=s1))
+        cells_two_corrected.append(dict(design=lab, lean=4 * r["F"] * r["V_A"],
+                                        truth=r["two_pop_var"], sem=s2))
+        cells_exp_corrected.append(dict(design=lab, lean=r["V_A"] * 4 * r["F"],
+                                        truth=r["two_pop_var"], sem=s2))
+        # CONTROL: the ancestral additive variance, which is what both bodies
+        # are a multiple of. It is computed from the ancestral frequencies and
+        # measured as the drift variance extrapolated to F = 1 through the
+        # corrected law, so it fails if the drift index or the effect scale is
+        # wrong and passes when the only thing left is the factor.
+        if t == 250:
+            ctrl_V_A = r["V_A"]
+            ctrl_V_A_measured = r["one_pop_var"] / (2 * r["F"])
+            ctrl_sem = s1 / (2 * r["F"])
+    # THE CORPUS ROWS ARE THE CORRECTED BODIES, and the superseded ones are
+    # carried as named competitors.  This block used to transcribe `fst * V_A`
+    # and `2 * fst * V_A` as the corpus rows -- the bodies BEFORE the ploidy
+    # correction -- so the ledger carried three FALSIFIED rows against three
+    # names whose Lean bodies had since doubled, with an empty note, and a
+    # reader who greps for the name and not for the `source` field reached the
+    # opposite conclusion about all three.  That is the same defect `bulk22`
+    # carried on `taggedEffect` and was repaired for: the corpus took the
+    # challenger and the labels stayed.
+    #
+    # `pgsDriftVariance_one_pop`'s own docstring records the measurement that
+    # moved it -- the superseded body 50.7 percent low at 22.7 sems in every
+    # cell -- so the numbers here are not new; what is new is that the ledger
+    # now says the same thing the Lean does.
+    # `realised_inputs=True`: F comes from the drift recurrence
+    # `1 - (1 - 1/(2Ne))^t` and V_A from the ancestral frequencies, both exact
+    # constants of the design rather than estimates taken off the same
+    # replicates the variance is measured on -- so there is no nominal/realised
+    # gap for the 22.7-sem rejection to be confused with. Undeclared, that
+    # rejection is downgraded to a LEAD and the superseded bodies keep looking
+    # uncompeted, which is the state this battery was already in.
+    MODEL = dict(realised_inputs=True)
+    reg_one = ("variance of ONE population's mean score about the ancestral "
+               "mean, fst read as the per-branch drift index")
+    reg_two = ("variance of the difference between two independently drifted "
+               "populations, same runs")
+    control = dict(design="V_A from the ancestral frequencies "
+                          "[sum 2 p (1-p) beta^2]",
+                   lean=ctrl_V_A, truth=ctrl_V_A_measured, sem=ctrl_sem)
     record("pgsDriftVariance_one_pop", "PolygenicAdaptation.lean",
-           "fst * V_A", cells_one,
-           regime="variance of ONE population's mean score about the ancestral "
-                  "mean, fst read as the per-branch drift index")
+           "2 * fst * V_A", cells_one_corrected, regime=reg_one,
+           control=control, **MODEL)
+    record("pgsDriftVariance_one_pop [superseded, missing the ploidy factor "
+           "(fst * V_A)]", "PolygenicAdaptation.lean",
+           "fst * V_A", cells_one, regime=reg_one, control=control, **MODEL)
     record("pgsDiffVariance_two_pop", "PolygenicAdaptation.lean",
-           "2 * fst * V_A", cells_two,
-           regime="variance of the difference between two independently "
-                  "drifted populations, same runs")
+           "4 * fst * V_A", cells_two_corrected, regime=reg_two,
+           control=control, **MODEL)
+    record("pgsDiffVariance_two_pop [superseded, inherited the missing ploidy "
+           "factor (2 * fst * V_A)]", "PolygenicAdaptation.lean",
+           "2 * fst * V_A", cells_two, regime=reg_two, control=control,
+           **MODEL)
     record("expectedPGSDiffVariance", "PolygenicAdaptation.lean",
-           "V_A * 2 * fst", cells_exp, regime="same quantity, same runs")
+           "V_A * 4 * fst", cells_exp_corrected,
+           regime="same quantity, same runs", control=control, **MODEL)
+    record("expectedPGSDiffVariance [superseded, inherited the missing ploidy "
+           "factor (V_A * 2 * fst)]", "PolygenicAdaptation.lean",
+           "V_A * 2 * fst", cells_exp, regime="same quantity, same runs",
+           control=control, **MODEL)
 
 
 def test_effect_variance_recurrence():

@@ -2,129 +2,258 @@
  {
   "name": "pgsDriftVariance_one_pop",
   "file": "PolygenicAdaptation.lean",
-  "source": "fst * V_A",
+  "source": "2 * fst * V_A",
   "note": "",
+  "regime": "variance of ONE population's mean score about the ancestral mean, fst read as the per-branch drift index",
+  "span": 0.8369275134844142,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 t=250 (F=0.465)",
+   "lean": 186.38246885554034,
+   "truth": 180.6248903802546,
+   "sem": 4.039400289784955,
+   "sems_off": 1.4253547710648506,
+   "rel_err": 0.03187588633640011
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 30.3938526391867,
+    "truth": 31.06552345494503,
+    "sem": 0.6947330690806279,
+    "sems_off": 0.9668041520568207,
+    "rel_err": 0.021621100855823888
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 91.56171074469124,
+    "truth": 93.80953402588744,
+    "sem": 2.097907204987211,
+    "sems_off": 1.071459822366122,
+    "rel_err": 0.02396156536259844
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 186.38246885554034,
+    "truth": 180.6248903802546,
+    "sem": 4.039400289784955,
+    "sems_off": 1.4253547710648506,
+    "rel_err": 0.03187588633640011
+   }
+  ]
+ },
+ {
+  "name": "pgsDriftVariance_one_pop [superseded, missing the ploidy factor (fst * V_A)]",
+  "file": "PolygenicAdaptation.lean",
+  "source": "fst * V_A",
+  "note": "positive control 'V_A from the ancestral frequencies [sum 2 p (1-p) beta^2]' passed at 1.43 sems",
   "regime": "variance of ONE population's mean score about the ancestral mean, fst read as the per-branch drift index",
   "span": 0.8369275134844142,
   "verdict": "FALSIFIED",
   "worst": {
-   "design": "Ne=200 t=30 (F=0.072)",
-   "lean": 15.19692631959335,
-   "truth": 30.84202838227579,
-   "sem": 0.6897349425245088,
-   "sems_off": 22.682774350128724,
-   "rel_err": 0.5072656658235009
+   "design": "Ne=200 t=100 (F=0.221)",
+   "lean": 45.78085537234562,
+   "truth": 93.80953402588744,
+   "sem": 2.097907204987211,
+   "sems_off": 22.89361442649443,
+   "rel_err": 0.5119807826812992
   },
   "cells": [
    {
     "design": "Ne=200 t=30 (F=0.072)",
     "lean": 15.19692631959335,
-    "truth": 30.84202838227579,
-    "sem": 0.6897349425245088,
-    "sems_off": 22.682774350128724,
-    "rel_err": 0.5072656658235009
+    "truth": 31.06552345494503,
+    "sem": 0.6947330690806279,
+    "sems_off": 22.84128659133978,
+    "rel_err": 0.5108105504279119
    },
    {
     "design": "Ne=200 t=100 (F=0.221)",
     "lean": 45.78085537234562,
-    "truth": 90.55080747860362,
-    "sem": 2.0250307540633288,
-    "sems_off": 22.108282561351118,
-    "rel_err": 0.49441803284677227
+    "truth": 93.80953402588744,
+    "sem": 2.097907204987211,
+    "sems_off": 22.89361442649443,
+    "rel_err": 0.5119807826812992
    },
    {
     "design": "Ne=200 t=250 (F=0.465)",
     "lean": 93.19123442777017,
-    "truth": 182.484118072919,
-    "sem": 4.080979082523398,
-    "sems_off": 21.880260064929374,
-    "rel_err": 0.48931865736101043
+    "truth": 180.6248903802546,
+    "sem": 4.039400289784955,
+    "sems_off": 21.645207129778946,
+    "rel_err": 0.4840620568317999
    }
   ]
  },
  {
   "name": "pgsDiffVariance_two_pop",
   "file": "PolygenicAdaptation.lean",
-  "source": "2 * fst * V_A",
+  "source": "4 * fst * V_A",
   "note": "",
+  "regime": "variance of the difference between two independently drifted populations, same runs",
+  "span": 0.8369275134844142,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 t=250 (F=0.465)",
+   "lean": 372.7649377110807,
+   "truth": 360.1791594215191,
+   "sem": 8.05485776560965,
+   "sems_off": 1.5625078251905036,
+   "rel_err": 0.03494310528620116
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 60.7877052783734,
+    "truth": 61.681291886982066,
+    "sem": 1.3794080527775516,
+    "sems_off": 0.6478044019022179,
+    "rel_err": 0.014487157795689062
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 183.12342148938248,
+    "truth": 185.81145844869172,
+    "sem": 4.155389977111705,
+    "sems_off": 0.646879588706527,
+    "rel_err": 0.014466475758552285
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 372.7649377110807,
+    "truth": 360.1791594215191,
+    "sem": 8.05485776560965,
+    "sems_off": 1.5625078251905036,
+    "rel_err": 0.03494310528620116
+   }
+  ]
+ },
+ {
+  "name": "pgsDiffVariance_two_pop [superseded, inherited the missing ploidy factor (2 * fst * V_A)]",
+  "file": "PolygenicAdaptation.lean",
+  "source": "2 * fst * V_A",
+  "note": "positive control 'V_A from the ancestral frequencies [sum 2 p (1-p) beta^2]' passed at 1.43 sems",
   "regime": "variance of the difference between two independently drifted populations, same runs",
   "span": 0.8369275134844142,
   "verdict": "FALSIFIED",
   "worst": {
-   "design": "Ne=200 t=100 (F=0.221)",
-   "lean": 91.56171074469124,
-   "truth": 185.13415751932294,
-   "sem": 4.1402431744501,
-   "sems_off": 22.60071276780979,
-   "rel_err": 0.5054304836473263
+   "design": "Ne=200 t=30 (F=0.072)",
+   "lean": 30.3938526391867,
+   "truth": 61.681291886982066,
+   "sem": 1.3794080527775516,
+   "sems_off": 22.68178671626248,
+   "rel_err": 0.5072435788978445
   },
   "cells": [
    {
     "design": "Ne=200 t=30 (F=0.072)",
     "lean": 30.3938526391867,
-    "truth": 60.98176520408014,
-    "sem": 1.3637642050239132,
-    "sems_off": 22.429033151194265,
-    "rel_err": 0.5015911307671834
+    "truth": 61.681291886982066,
+    "sem": 1.3794080527775516,
+    "sems_off": 22.68178671626248,
+    "rel_err": 0.5072435788978445
    },
    {
     "design": "Ne=200 t=100 (F=0.221)",
     "lean": 91.56171074469124,
-    "truth": 185.13415751932294,
-    "sem": 4.1402431744501,
-    "sems_off": 22.60071276780979,
-    "rel_err": 0.5054304836473263
+    "truth": 185.81145844869172,
+    "sem": 4.155389977111705,
+    "sems_off": 22.681324309664635,
+    "rel_err": 0.5072332378792761
    },
    {
     "design": "Ne=200 t=250 (F=0.465)",
     "lean": 186.38246885554034,
-    "truth": 366.2166645623622,
-    "sem": 8.18987736320862,
-    "sems_off": 21.958106053540057,
-    "rel_err": 0.49105956421106095
+    "truth": 360.1791594215191,
+    "sem": 8.05485776560965,
+    "sems_off": 21.57663060271612,
+    "rel_err": 0.4825284473568994
    }
   ]
  },
  {
   "name": "expectedPGSDiffVariance",
   "file": "PolygenicAdaptation.lean",
-  "source": "V_A * 2 * fst",
+  "source": "V_A * 4 * fst",
   "note": "",
+  "regime": "same quantity, same runs",
+  "span": 0.8369275134844142,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "Ne=200 t=250 (F=0.465)",
+   "lean": 372.7649377110807,
+   "truth": 360.1791594215191,
+   "sem": 8.05485776560965,
+   "sems_off": 1.5625078251905036,
+   "rel_err": 0.03494310528620116
+  },
+  "cells": [
+   {
+    "design": "Ne=200 t=30 (F=0.072)",
+    "lean": 60.7877052783734,
+    "truth": 61.681291886982066,
+    "sem": 1.3794080527775516,
+    "sems_off": 0.6478044019022179,
+    "rel_err": 0.014487157795689062
+   },
+   {
+    "design": "Ne=200 t=100 (F=0.221)",
+    "lean": 183.12342148938248,
+    "truth": 185.81145844869172,
+    "sem": 4.155389977111705,
+    "sems_off": 0.646879588706527,
+    "rel_err": 0.014466475758552285
+   },
+   {
+    "design": "Ne=200 t=250 (F=0.465)",
+    "lean": 372.7649377110807,
+    "truth": 360.1791594215191,
+    "sem": 8.05485776560965,
+    "sems_off": 1.5625078251905036,
+    "rel_err": 0.03494310528620116
+   }
+  ]
+ },
+ {
+  "name": "expectedPGSDiffVariance [superseded, inherited the missing ploidy factor (V_A * 2 * fst)]",
+  "file": "PolygenicAdaptation.lean",
+  "source": "V_A * 2 * fst",
+  "note": "positive control 'V_A from the ancestral frequencies [sum 2 p (1-p) beta^2]' passed at 1.43 sems",
   "regime": "same quantity, same runs",
   "span": 0.8369275134844142,
   "verdict": "FALSIFIED",
   "worst": {
-   "design": "Ne=200 t=100 (F=0.221)",
-   "lean": 91.56171074469124,
-   "truth": 185.13415751932294,
-   "sem": 4.1402431744501,
-   "sems_off": 22.60071276780979,
-   "rel_err": 0.5054304836473263
+   "design": "Ne=200 t=30 (F=0.072)",
+   "lean": 30.3938526391867,
+   "truth": 61.681291886982066,
+   "sem": 1.3794080527775516,
+   "sems_off": 22.68178671626248,
+   "rel_err": 0.5072435788978445
   },
   "cells": [
    {
     "design": "Ne=200 t=30 (F=0.072)",
     "lean": 30.3938526391867,
-    "truth": 60.98176520408014,
-    "sem": 1.3637642050239132,
-    "sems_off": 22.429033151194265,
-    "rel_err": 0.5015911307671834
+    "truth": 61.681291886982066,
+    "sem": 1.3794080527775516,
+    "sems_off": 22.68178671626248,
+    "rel_err": 0.5072435788978445
    },
    {
     "design": "Ne=200 t=100 (F=0.221)",
     "lean": 91.56171074469124,
-    "truth": 185.13415751932294,
-    "sem": 4.1402431744501,
-    "sems_off": 22.60071276780979,
-    "rel_err": 0.5054304836473263
+    "truth": 185.81145844869172,
+    "sem": 4.155389977111705,
+    "sems_off": 22.681324309664635,
+    "rel_err": 0.5072332378792761
    },
    {
     "design": "Ne=200 t=250 (F=0.465)",
     "lean": 186.38246885554034,
-    "truth": 366.2166645623622,
-    "sem": 8.18987736320862,
-    "sems_off": 21.958106053540057,
-    "rel_err": 0.49105956421106095
+    "truth": 360.1791594215191,
+    "sem": 8.05485776560965,
+    "sems_off": 21.57663060271612,
+    "rel_err": 0.4825284473568994
    }
   ]
  },
@@ -132,42 +261,34 @@
   "name": "equilibriumEffectVariance",
   "file": "SelectionArchitecture.lean",
   "source": "v_mutation / s",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "fixed point of effectVarianceRecurrence, iterated from V = 5.0, far above every equilibrium in the design",
   "span": 0.8,
-  "verdict": "MATCH",
+  "verdict": "SELF-TEST",
   "worst": {
-   "design": "v_mut=0.005 s=0.01",
-   "lean": 0.5,
-   "truth": 0.5000000000000027,
-   "sem": 5.000000000000027e-10,
-   "sems_off": 5.329070518200723e-06,
-   "rel_err": 5.329070518200723e-15
+   "design": "v_mut=0.010 s=0.05",
+   "lean": 0.19999999999999998,
+   "truth": 0.20000000000000026,
+   "sem": 2.0000000000000027e-10
   },
   "cells": [
    {
     "design": "v_mut=0.010 s=0.05",
     "lean": 0.19999999999999998,
     "truth": 0.20000000000000026,
-    "sem": 2.0000000000000027e-10,
-    "sems_off": 1.3877787807814438e-06,
-    "rel_err": 1.3877787807814439e-15
+    "sem": 2.0000000000000027e-10
    },
    {
     "design": "v_mut=0.020 s=0.20",
     "lean": 0.09999999999999999,
     "truth": 0.10000000000000007,
-    "sem": 1.0000000000000008e-10,
-    "sems_off": 8.326672684688668e-07,
-    "rel_err": 8.326672684688668e-16
+    "sem": 1.0000000000000008e-10
    },
    {
     "design": "v_mut=0.005 s=0.01",
     "lean": 0.5,
     "truth": 0.5000000000000027,
-    "sem": 5.000000000000027e-10,
-    "sems_off": 5.329070518200723e-06,
-    "rel_err": 5.329070518200723e-15
+    "sem": 5.000000000000027e-10
    }
   ]
  },
@@ -263,40 +384,40 @@
   "source": "F + (1 - F)/(2*Ne) - 2*(mig + mu)*F",
   "note": "",
   "regime": "one generation of drift with flow from a fixed source pool",
-  "span": 0.6188539762532473,
+  "span": 0.6193344281794906,
   "verdict": "MATCH",
   "worst": {
    "design": "Ne=500 mig=0.004 mu=0.000",
-   "lean": 0.026976128133012964,
-   "truth": 0.02700244015787212,
-   "sem": 0.00010900976063148849,
-   "sems_off": 0.24137310922189553,
-   "rel_err": 0.0009744313738062712
+   "lean": 0.026806797154963487,
+   "truth": 0.026775962648469376,
+   "sem": 0.0001081038505938775,
+   "sems_off": 0.28523041801674065,
+   "rel_err": 0.0011515741524935831
   },
   "cells": [
    {
     "design": "Ne=200 mig=0.002 mu=0.000",
-    "lean": 0.07016741316745757,
-    "truth": 0.07018804312063476,
-    "sem": 0.00028175217248253907,
-    "sems_off": 0.07322020978724728,
-    "rel_err": 0.00029392403976453274
+    "lean": 0.07019148206041169,
+    "truth": 0.07019443643040169,
+    "sem": 0.0002817777457216068,
+    "sems_off": 0.010484752734572993,
+    "rel_err": 4.20883782281764e-05
    },
    {
     "design": "Ne=200 mig=0.001 mu=0.001",
-    "lean": 0.07077635985240367,
-    "truth": 0.07075963197433877,
-    "sem": 0.0002840385278973551,
-    "sems_off": 0.0588929895839753,
-    "rel_err": 0.00023640425477301853
+    "lean": 0.07042086056472523,
+    "truth": 0.0704283575837259,
+    "sem": 0.00028271343033490365,
+    "sems_off": 0.026518085793767316,
+    "rel_err": 0.00010644886886306709
    },
    {
     "design": "Ne=500 mig=0.004 mu=0.000",
-    "lean": 0.026976128133012964,
-    "truth": 0.02700244015787212,
-    "sem": 0.00010900976063148849,
-    "sems_off": 0.24137310922189553,
-    "rel_err": 0.0009744313738062712
+    "lean": 0.026806797154963487,
+    "truth": 0.026775962648469376,
+    "sem": 0.0001081038505938775,
+    "sems_off": 0.28523041801674065,
+    "rel_err": 0.0011515741524935831
    }
   ]
  }
