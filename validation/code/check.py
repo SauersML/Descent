@@ -957,13 +957,26 @@ def run_identifications() -> int:
                           ident_strip_comments(open(f).read())):
             if re.match(r"(?:@\[simp\]\s*)?(?:private )?theorem ", b) and ":=" in b:
                 all_stmts.append(b.split(":=", 1)[0])
-    # A definition tied to a shared primitive in Conventions is related in the
-    # stronger sense: its whole group is pinned to one object rather than to
-    # each other pairwise. Credit that, or the metric penalises exactly the
-    # refactor it exists to encourage.
+    # A definition tied to a shared primitive is related in the stronger sense: its whole
+    # group is pinned to one object rather than to each other pairwise. Credit that, or the
+    # metric penalises exactly the refactor it exists to encourage.
+    #
+    # The hub is `Descent/Core`, not a file named `Conventions.lean`. This read the filename
+    # for the same reason the ploidy screen above once did, and it has the same defect,
+    # recorded there: it locates the conventions by where they used to sit rather than by
+    # what they are. `Descent/Program/Conventions.lean` DEFINED the shared kernels at depth
+    # 22; the repair moved every one of them down into `Core`, where each is beside the
+    # definitions it pins and where every module already reaches it, and then the emptied
+    # file was deleted. `geometricDecay` -- this credit's own worked example, cited below as
+    # `Conventions.geometricDecay` -- is `Core/Ratios.lean:324`.
+    #
+    # So the set being consulted was empty, and had been since the move. Every group
+    # correctly factored through a shared kernel was reported as pinned to nothing, which
+    # is the penalty the paragraph above exists to prevent, landing on the refactor that
+    # earned the credit.
     primitives = set()
     for f in ident_lean_files():
-        if not f.endswith("Conventions.lean"):
+        if "/Core/" not in f.replace(os.sep, "/"):
             continue
         for m in re.finditer(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)",
                              ident_strip_comments(open(f).read()), re.M):
@@ -1555,6 +1568,26 @@ def run_identifications() -> int:
                 #
                 # Only an entry paired with itself is skipped now.
                 if fa == fb and na == nb and la == lb:
+                    continue
+                shape = norm[3:] if norm.startswith("N::") else norm
+                shape = shape.strip()
+                # A BARE CONSTANT IS NOT A SHARED QUANTITY.  The floor above admits a body
+                # that is nothing but a literal, because a literal is "a constant".  So
+                # `meanTimeSame _M := 2` and `ploidy := 2` were alpha-equivalent, and the
+                # remedy offered -- make one call the other -- would tie a coalescent mean
+                # time to a chromosome count.  Two definitions being the same small number
+                # is the pigeonhole of small numbers, not shared mathematics.
+                if re.fullmatch(r"[0-9]+(\.[0-9]+)?", shape):
+                    continue
+                # ALREADY FACTORED THROUGH A SHARED KERNEL.  Every member of a bucket has
+                # the SAME normalised body, so when that body is one named function applied
+                # to variables, both definitions call that function -- which is the factored
+                # form this screen asks for, reached already.  `neutralFixation`,
+                # `gainLinear` and `localizedTransferVariance` are each
+                # `Core.identifiedWith <arg>`; they do not call each other because they call
+                # the same kernel, and reporting them asks for a fixation probability to be
+                # written in terms of a conditional gain.
+                if re.fullmatch(r"[A-Za-z_][\w.']*(?:\s+V[0-9]+)*", shape):
                     continue
                 # Tied by definition: one is written in terms of the other.
                 if (re.search(r"\b" + re.escape(nb) + r"\b", ba) or

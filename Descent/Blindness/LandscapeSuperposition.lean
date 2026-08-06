@@ -241,6 +241,18 @@ variable {Index Config R : Type*} [Ring R] [DecidableEq Index]
 def oneHotWeight (selected : Index) (k : Index) : R :=
   if k = selected then 1 else 0
 
+/-- **The simplex vertex is the Kronecker delta.** Over `ℝ` this weight is
+`Descent.Core.kronecker` with its arguments in the other order, so the two names denote one
+function and a divergence in either spelling fails this equation.
+
+They are not written in terms of each other because they cannot be: `kronecker` is real-valued,
+while the superposition calculus below needs a weight in an arbitrary `Ring R` and uses it at
+`R` ordered by `LinearOrder R`. Collapsing the definitions would specialise that calculus to
+`ℝ` to remove a duplication the equation already removes. -/
+theorem oneHotWeight_eq_kronecker (selected k : Index) :
+    (oneHotWeight selected k : ℝ) = Descent.Core.kronecker k selected :=
+  rfl
+
 /-- At a simplex vertex the superposition is exactly the selected landscape. -/
 theorem superposedLandscape_oneHot
     (active : Finset Index) (energy : Index → Config → R) (selected : Index)
