@@ -38,10 +38,10 @@
   "name": "pgsVariance [linkage equilibrium]",
   "file": "ScoreDistribution.lean",
   "source": "sum_i beta_i^2 * 2 p_i (1 - p_i)",
-  "note": "",
+  "note": "the simulated truth moves by only 0.0% across the design",
   "regime": "unlinked loci, the regime the formula is written for",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "DEGENERATE ORACLE",
   "worst": {
    "design": "linkage equilibrium",
    "lean": 34.77871958326883,
@@ -65,10 +65,10 @@
   "name": "pgsVariance [coalescent LD]",
   "file": "ScoreDistribution.lean",
   "source": "sum_i beta_i^2 * 2 p_i (1 - p_i)",
-  "note": "",
+  "note": "the simulated truth moves by only 0.0% across the design",
   "regime": "same formula on a linked panel: the LD cross terms it drops",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "DEGENERATE ORACLE",
   "worst": {
    "design": "coalescent LD",
    "lean": 30.521573943074433,
@@ -126,9 +126,44 @@
  {
   "name": "polygenicAdaptationShift",
   "file": "SelectionArchitecture.lean",
-  "source": "sum_i beta_i * delta_p_i",
+  "source": "sum_i beta_i * 2 * delta_p_i",
   "note": "",
-  "regime": "same runs; the sibling written without the ploidy factor",
+  "regime": "the same runs; this declaration and pgsMeanShift are one formula over two names",
+  "span": 3.1988090412484325,
+  "verdict": "MATCH",
+  "worst": {
+   "design": "linkage equilibrium",
+   "lean": 1.665719142912653,
+   "truth": 1.7894475409037334,
+   "sem": 0.10279109135270129,
+   "sems_off": 1.203687949635033,
+   "rel_err": 0.06914335020326622
+  },
+  "cells": [
+   {
+    "design": "linkage equilibrium",
+    "lean": 1.665719142912653,
+    "truth": 1.7894475409037334,
+    "sem": 0.10279109135270129,
+    "sems_off": 1.203687949635033,
+    "rel_err": 0.06914335020326622
+   },
+   {
+    "design": "coalescent LD",
+    "lean": -3.6625983116169305,
+    "truth": -3.6625983116169305,
+    "sem": 0.12035486607244986,
+    "sems_off": 0.0,
+    "rel_err": 0.0
+   }
+  ]
+ },
+ {
+  "name": "polygenicAdaptationShift [the superseded form without the ploidy factor, competing]",
+  "file": "SelectionArchitecture.lean",
+  "source": "sum_i beta_i * delta_p_i",
+  "note": "positive control '0/1/2 dosage coding: a panel's mean dosage at a locus is 2p' passed at 1.00 sems",
+  "regime": "same runs; the form this declaration was corrected away from",
   "span": 3.1988090412484325,
   "verdict": "FALSIFIED",
   "worst": {
@@ -179,8 +214,8 @@
     "design": "p=0.1",
     "lean": 0.2,
     "truth": 0.1997515,
-    "sem": 0.00029999236510930575,
-    "sems_off": 0.8283544146514152,
+    "sem": 0.00029999236510930565,
+    "sems_off": 0.8283544146514155,
     "rel_err": 0.0012440457268156314
    },
    {
@@ -213,33 +248,33 @@
    "design": "p=0.5",
    "lean": 0.5,
    "truth": 0.4996615,
-   "sem": 0.0003535533095713785,
-   "sems_off": 0.9574228011339827,
+   "sem": 0.00035355330957137856,
+   "sems_off": 0.9574228011339825,
    "rel_err": 0.0006774586394989795
   },
   "cells": [
    {
     "design": "p=0.1",
     "lean": 0.18000000000000002,
-    "truth": 0.17999090000000004,
-    "sem": 0.0002721943128696759,
-    "sems_off": 0.03343199901586892,
-    "rel_err": 5.055811154888452e-05
+    "truth": 0.17999090000000023,
+    "sem": 0.0002721943128696758,
+    "sems_off": 0.03343199901515514,
+    "rel_err": 5.055811154780503e-05
    },
    {
     "design": "p=0.3",
     "lean": 0.42,
-    "truth": 0.42005410000000004,
-    "sem": 0.00034893458203020665,
-    "sems_off": 0.15504338860678915,
-    "rel_err": 0.0001287929340531538
+    "truth": 0.42005409999999965,
+    "sem": 0.00034893458203020655,
+    "sems_off": 0.1550433886056756,
+    "rel_err": 0.00012879293405222887
    },
    {
     "design": "p=0.5",
     "lean": 0.5,
     "truth": 0.4996615,
-    "sem": 0.0003535533095713785,
-    "sems_off": 0.9574228011339827,
+    "sem": 0.00035355330957137856,
+    "sems_off": 0.9574228011339825,
     "rel_err": 0.0006774586394989795
    }
   ]
@@ -256,8 +291,8 @@
    "design": "p=0.5",
    "lean": 0.5,
    "truth": 0.4996615,
-   "sem": 0.0003535533095713785,
-   "sems_off": 0.9574228011339827,
+   "sem": 0.00035355330957137856,
+   "sems_off": 0.9574228011339825,
    "rel_err": 0.0006774586394989795
   },
   "cells": [
@@ -265,24 +300,24 @@
     "design": "p=0.1",
     "lean": 0.15696000000000004,
     "truth": 0.15717187600000004,
-    "sem": 0.0004271627526567835,
-    "sems_off": 0.49600766612307545,
+    "sem": 0.00042716275265678333,
+    "sems_off": 0.4960076661230756,
     "rel_err": 0.0013480528793840933
    },
    {
     "design": "p=0.3",
     "lean": 0.3796799999999999,
-    "truth": 0.37968831599999997,
+    "truth": 0.379688316,
     "sem": 0.0005281617816413281,
-    "sems_off": 0.015745175605513743,
-    "rel_err": 2.1902175151641266e-05
+    "sems_off": 0.015745175605618847,
+    "rel_err": 2.1902175151787467e-05
    },
    {
     "design": "p=0.5",
     "lean": 0.5,
     "truth": 0.4996615,
-    "sem": 0.0003535533095713785,
-    "sems_off": 0.9574228011339827,
+    "sem": 0.00035355330957137856,
+    "sems_off": 0.9574228011339825,
     "rel_err": 0.0006774586394989795
    }
   ]
@@ -291,34 +326,34 @@
   "name": "sourceBestLinearWeightsFromLD",
   "file": "DGP.lean",
   "source": "sigmaTagSource^-1 * sigmaTagCausal * betaCausal",
-  "note": "",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
   "regime": "least-squares weights from an explicit regression, standardised dosages",
-  "span": 1.784217249847855,
-  "verdict": "FALSIFIED",
+  "span": 1.7842172498475624,
+  "verdict": "LEAD (no control)",
   "worst": {
    "design": "coalescent LD (worst coord)",
-   "lean": 0.24305041711404218,
-   "truth": 0.13688404954235367,
+   "lean": 0.24305041711413283,
+   "truth": 0.13688404954235475,
    "sem": 0.01314933889225825,
-   "sems_off": 8.07389393805909,
-   "rel_err": 0.7755934159358668
+   "sems_off": 8.073893938065902,
+   "rel_err": 0.7755934159365151
   },
   "cells": [
    {
     "design": "coalescent LD (worst coord)",
-    "lean": 0.24305041711404218,
-    "truth": 0.13688404954235367,
+    "lean": 0.24305041711413283,
+    "truth": 0.13688404954235475,
     "sem": 0.01314933889225825,
-    "sems_off": 8.07389393805909,
-    "rel_err": 0.7755934159358668
+    "sems_off": 8.073893938065902,
+    "rel_err": 0.7755934159365151
    },
    {
     "design": "linkage equilibrium (worst coord)",
     "lean": -0.19060432968354818,
-    "truth": -0.17225989633391744,
+    "truth": -0.17225989633391803,
     "sem": 0.010373994594655395,
-    "sems_off": 1.7683095149366714,
-    "rel_err": 0.10649276900800486
+    "sems_off": 1.7683095149366153,
+    "rel_err": 0.10649276900800111
    }
   ]
  },
@@ -326,26 +361,22 @@
   "name": "effectivePolygenicityOfEffects",
   "file": "PolygenicArchitecture.lean",
   "source": "(sum beta^2)^2 / (sum beta^4)",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "participation ratio; equals the locus count at equal effects",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "SELF-TEST",
   "worst": {
    "design": "all equal",
    "lean": 500.0,
    "truth": 500.0,
-   "sem": 5.000000000000001e-07,
-   "sems_off": 0.0,
-   "rel_err": 0.0
+   "sem": 5.000000000000001e-07
   },
   "cells": [
    {
     "design": "all equal",
     "lean": 500.0,
     "truth": 500.0,
-    "sem": 5.000000000000001e-07,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 5.000000000000001e-07
    }
   ]
  },
@@ -353,42 +384,34 @@
   "name": "meanAbsoluteEffect",
   "file": "PolygenicArchitecture.lean",
   "source": "(sum |beta_j|) / q",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "mean absolute effect",
   "span": 0.8802,
-  "verdict": "MATCH",
+  "verdict": "SELF-TEST",
   "worst": {
    "design": "all equal",
    "lean": 1.0,
    "truth": 1.0,
-   "sem": 0.0,
-   "sems_off": Infinity,
-   "rel_err": 0.0
+   "sem": 0.0
   },
   "cells": [
    {
     "design": "all equal",
     "lean": 1.0,
     "truth": 1.0,
-    "sem": 0.0,
-    "sems_off": Infinity,
-    "rel_err": 0.0
+    "sem": 0.0
    },
    {
     "design": "gaussian",
     "lean": 0.8509492475375289,
     "truth": 0.8509492475375289,
-    "sem": 0.02779925881203073,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 0.02779925881203073
    },
    {
     "design": "one dominant",
     "lean": 0.11979999999999999,
     "truth": 0.11979999999999999,
-    "sem": 0.0197801900900876,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 0.0197801900900876
    }
   ]
  },
@@ -396,42 +419,34 @@
   "name": "sourceSquaredEffectMass / sourceEffectMass",
   "file": "SimulationValidation.lean",
   "source": "sum_i beta_i^2",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "total squared effect mass",
   "span": 0.8109163893834067,
-  "verdict": "MATCH",
+  "verdict": "SELF-TEST",
   "worst": {
    "design": "all equal",
    "lean": 500.0,
    "truth": 500.0,
-   "sem": 5e-10,
-   "sems_off": 0.0,
-   "rel_err": 0.0
+   "sem": 5e-10
   },
   "cells": [
    {
     "design": "all equal",
     "lean": 500.0,
     "truth": 500.0,
-    "sem": 5e-10,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 5e-10
    },
    {
     "design": "gaussian",
     "lean": 555.2570085669104,
     "truth": 555.2570085669104,
-    "sem": 5.552570085669103e-10,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 5.552570085669103e-10
    },
    {
     "design": "one dominant",
     "lean": 104.99000000000007,
     "truth": 104.99000000000007,
-    "sem": 1.0499000000000007e-10,
-    "sems_off": 0.0,
-    "rel_err": 0.0
+    "sem": 1.0499000000000007e-10
    }
   ]
  },
@@ -439,42 +454,42 @@
   "name": "pgsDriftVarianceFromLoci",
   "file": "PolygenicAdaptation.lean",
   "source": "sum_i fst * beta_i^2",
-  "note": "",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
   "regime": "variance of the mean-score difference under one branch of drift, the quantity Var_Delta_Mu is validated against",
   "span": 0.8444749033304074,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (no control)",
   "worst": {
-   "design": "t=30 (F=0.072)",
-   "lean": 35.3680549823146,
-   "truth": 26.744555675714345,
-   "sem": 0.6905414582250581,
-   "sems_off": 12.488025452904408,
-   "rel_err": 0.32243943070742076
+   "design": "t=250 (F=0.465)",
+   "lean": 227.41059635830183,
+   "truth": 173.91333276227155,
+   "sem": 4.49042294314471,
+   "sems_off": 11.913635814127868,
+   "rel_err": 0.30760875400598314
   },
   "cells": [
    {
     "design": "t=30 (F=0.072)",
     "lean": 35.3680549823146,
-    "truth": 26.744555675714345,
-    "sem": 0.6905414582250581,
-    "sems_off": 12.488025452904408,
-    "rel_err": 0.32243943070742076
+    "truth": 27.695174692729065,
+    "sem": 0.7150863357016319,
+    "sems_off": 10.730005464384964,
+    "rel_err": 0.277047549788517
    },
    {
     "design": "t=100 (F=0.221)",
     "lean": 108.26117954561116,
-    "truth": 83.01352160626799,
-    "sem": 2.1433999112740367,
-    "sems_off": 11.779256781034373,
-    "rel_err": 0.30413910229097946
+    "truth": 83.7346136773369,
+    "sem": 2.162018428489584,
+    "sems_off": 11.344290846497946,
+    "rel_err": 0.29290833015346524
    },
    {
     "design": "t=250 (F=0.465)",
     "lean": 227.41059635830183,
-    "truth": 174.41941663816712,
-    "sem": 4.503489972632227,
-    "sems_off": 11.766692063746753,
-    "rel_err": 0.30381468268561435
+    "truth": 173.91333276227155,
+    "sem": 4.49042294314471,
+    "sems_off": 11.913635814127868,
+    "rel_err": 0.30760875400598314
    }
   ]
  }

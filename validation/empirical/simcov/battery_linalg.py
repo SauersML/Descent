@@ -80,7 +80,7 @@ def test_pgs_moments():
 def test_shift_fork():
     """pgsMeanShift against polygenicAdaptationShift: the ploidy factor."""
     rng = np.random.default_rng(7101)
-    cells_2, cells_1 = [], []
+    cells_2, cells_1, dose_ratio = [], [], []
     for tag, unl in (("linkage equilibrium", True), ("coalescent LD", False)):
         dose_s, p_s = panel(seed=21, unlinked=unl)
         dose_t, p_t = panel(seed=22, unlinked=unl)
@@ -95,12 +95,40 @@ def test_shift_fork():
                             truth=obs, sem=sem))
         cells_1.append(dict(design=tag, lean=float((beta * (p_t - p_s)).sum()),
                             truth=obs, sem=sem))
+        # For the control: under a 0/1/2 dosage coding the panel's mean dosage
+        # at a locus is 2p. It involves neither body under test, it fails on any
+        # error in the panel simulation or the frequency bookkeeping, and it has
+        # real variance across loci -- unlike "the shift is the sum of effects
+        # times frequency differences", which IS the body.
+        dose_ratio.append(float(np.mean(dose_t.mean(axis=0) / (2 * p_t))))
+    control = dict(design="0/1/2 dosage coding: a panel's mean dosage at a "
+                          "locus is 2p",
+                   lean=1.0, truth=float(np.mean(dose_ratio)),
+                   sem=float(np.std(dose_ratio, ddof=1)
+                             / math.sqrt(len(dose_ratio))))
+    # BOTH DECLARATIONS CARRY THE SAME CORRECTED FORMULA, which is what this
+    # group established and what `polygenicAdaptationShift`'s docstring records:
+    # "the corrected form is ScoreDistribution.pgsMeanShift, which matched the
+    # same runs to 1.2 sems". The corpus then wrote that factor into
+    # `SelectionArchitecture.lean` too -- it reads `sum_i beta_i * 2 * delta_p_i`
+    # now -- and this battery went on recording the form without the ploidy
+    # factor as its corpus row. So the ledger held a falsification of a body
+    # nobody can run, and the two declarations disagreed in the ledger while
+    # agreeing in the Lean.
     record("pgsMeanShift", "ScoreDistribution.lean",
            "sum_i beta_i * 2 * (p_target_i - p_source_i)", cells_2,
+           control=control, realised_inputs=True,
            regime="difference in mean score between two panels")
     record("polygenicAdaptationShift", "SelectionArchitecture.lean",
+           "sum_i beta_i * 2 * delta_p_i", cells_2,
+           control=control, realised_inputs=True,
+           regime="the same runs; this declaration and pgsMeanShift are one "
+                  "formula over two names")
+    record("polygenicAdaptationShift [the superseded form without the ploidy "
+           "factor, competing]", "SelectionArchitecture.lean",
            "sum_i beta_i * delta_p_i", cells_1,
-           regime="same runs; the sibling written without the ploidy factor")
+           control=control, realised_inputs=True,
+           regime="same runs; the form this declaration was corrected away from")
 
 
 def test_hwe_moments():
