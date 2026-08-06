@@ -16,7 +16,7 @@ So this asserts EXACT SETS, not containment:
             severity decides whether the build stops.
   NEGATIVE  clean mathematics produces NO finding at FATAL or CONDITIONAL severity.
             FIDELITY findings are a ledger rather than an accusation and are allowed --
-            a side condition is correctly reported as F16s and correctly does not gate.
+            a side condition emits nothing at all, because it is not a defect.
 
 Every negative below is a trap this detector actually failed, or would fail under an
 obvious simplification of its rules:
@@ -175,9 +175,10 @@ end Fixture
 # The EXACT set the positive fixture produces at every severity.  Two entries are
 # incidental to the planted patterns and are correct: `famous_conjecture` carries a
 # premise under a name claiming a conjecture (F17), and `ratio_nonneg` has an honest
-# side condition alongside its unguarded denominator (F16s).
+# side condition alongside its unguarded denominator; the side condition itself is
+# not a finding.
 POSITIVE_EXPECTED = {"F1", "F1b", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
-                     "F10", "F11", "F12", "F13", "F15", "F16", "F16s", "F17", "F18",
+                     "F10", "F11", "F12", "F13", "F15", "F16", "F17", "F18",
                      "F19", "F20", "F21", "F22", "F23", "F24"}
 
 # --------------------------------------------------------------------------------------

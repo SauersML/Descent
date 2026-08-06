@@ -2506,7 +2506,7 @@ FAMILY_SEVERITY = {
     "F1": FATAL, "F1b": FATAL, "F4": FATAL, "F7": FATAL, "F8": FATAL,
     "F9": FATAL, "F11": FATAL, "F24": FATAL,
     "F2": CONDITIONAL, "F3": CONDITIONAL, "F16": CONDITIONAL,
-    "F19": CONDITIONAL, "F23": CONDITIONAL, "F22": FIDELITY, "F16s": FIDELITY,
+    "F19": CONDITIONAL, "F23": CONDITIONAL, "F22": FIDELITY,
     "F5": FIDELITY, "F6": FIDELITY, "F10": FIDELITY, "F12": FIDELITY,
     "F13": FIDELITY, "F15": FIDELITY, "F18": FIDELITY, "F14": FIDELITY, "F17": FIDELITY, "F20": FIDELITY,
     "F21": FIDELITY,
@@ -2530,7 +2530,6 @@ FAMILY_TITLE = {
     "F15": "claimed bridge between two definitions with no theorem proving it",
     "F18": "#print axioms on a Prop definition, not on a proof",
     "F16": "assumed fact about a corpus-defined object (laundered premise)",
-    "F16s": "side condition on free variables (not laundering)",
     "F17": "theorem-name inflation",
     "F19": "hidden premise (implicit/instance/section variable)",
     "F20": "semantic shadowing of a standard name",
@@ -3211,15 +3210,21 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             mentions = (plain - own - local) & c.corpus_names
             constrains_own = bool((plain & own) - local)
             substantive = bool(mentions) and not constrains_own
-            fam = "F16" if substantive else "F16s"
             if b.kind in ("implicit", "instance", "strict") or b.inherited:
                 add("F19", f"hidden premise `{b.kind}{' (section variable)' if b.inherited else ''}"
                            f" {b.name} : {_clip(b.type)}`")
             elif substantive:
                 add("F16", f"premise `{b.name} : {_clip(b.type)}` assumes a fact about "
                            f"{', '.join(sorted(mentions)[:3])}")
-            else:
-                add("F16s", f"side condition `{b.name} : {_clip(b.type)}`")
+            # A non-substantive explicit premise -- a side condition constraining only the
+            # theorem's own free variables, `(hx : 0 < x)` -- emits NOTHING.
+            #
+            # It used to emit `F16s`, whose own title ended "(not laundering)" and whose
+            # fixture asserted it "correctly does not gate".  A family documented in two
+            # places as correctly reported on clean mathematics is not a finding; it is an
+            # annotation, and the only thing keeping it out of the exit status was a
+            # severity tier.  With every severity gating there is nowhere to put a
+            # non-defect, so the non-defect goes rather than the gate.
 
         # F3 -- typeclass laundering.
         for b in d.binders:
@@ -4700,9 +4705,25 @@ def run_duplication() -> int:
         # A proof made only of closers is a reflex, however long its lemma lists
         # run; a proof that names a step someone chose is an argument, and two
         # theorems sharing one are sharing that choice.
-        if not any(re.sub(r"[^\w']", "", t) not in DUP_CLOSING_TACTICS and
-                   re.match(r"^[a-z]", re.sub(r"[^\w']", "", t) or "_")
-                   for t in tokens):
+        #
+        # TWO THINGS ARE NOT STEPS, and scanning them left this rule dead for every
+        # tactic proof in the corpus.
+        #
+        #   `by` opens every one of them and chooses nothing.  It is lowercase and it
+        #   is not a closer, so it satisfied the test on its own and no proof ever
+        #   reached the `continue`.
+        #
+        #   A bracketed argument list carries lemma NAMES, not steps -- which is what
+        #   "however long its lemma lists run" above means.  `simp [mul_one, add_zero]`
+        #   is `simp`; scanning inside the brackets made every simp call look like an
+        #   argument someone constructed.
+        #
+        # The fixture `two long proofs made only of closing tactics` is exactly this
+        # pair and was reported for as long as both holes were open.
+        steps = re.sub(r"\[[^\]]*\]", " ", proof)
+        if not any(word not in DUP_CLOSING_TACTICS and word != "by"
+                   and re.match(r"^[a-z]", word)
+                   for word in (re.sub(r"[^\w']", "", t) or "_" for t in steps.split())):
             continue
         # Already factored: a short script naming a corpus theorem is that
         # theorem being applied, and the shared step is the lemma it names.
