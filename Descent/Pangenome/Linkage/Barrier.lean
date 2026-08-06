@@ -431,6 +431,36 @@ theorem card_diagonals (c : Chain ι) : (diagonals c).card = Fintype.card ι := 
 /-- **The panel-phantom derivations**: compatible mosaics the panel does not contain. -/
 def phantoms (c : Chain ι) : Finset (List ι) := mosaics c \ diagonals c
 
+/-- **A derivation is a panel thread exactly when it never switches donor.**  The switch
+grading of `Descent.Pangenome.Linkage.Chain` and the phantom count here are two readings of
+one partition of the compatible language. -/
+theorem mem_diagonals_iff_switches_eq_zero {c : Chain ι} {x : List ι} (hx : x ∈ mosaics c) :
+    x ∈ diagonals c ↔ switches x = 0 := by
+  obtain ⟨h, -, hmem⟩ := Finset.mem_biUnion.mp hx
+  obtain ⟨t, rfl⟩ := mem_mosaicsFrom_head hmem
+  have hlen : (h :: t).length = c.length + 1 := length_of_mem_mosaics hx
+  constructor
+  · intro hd
+    obtain ⟨g, -, hg⟩ := Finset.mem_image.mp hd
+    rw [← hg]
+    exact switches_replicate g c.length
+  · intro hs
+    refine Finset.mem_image.mpr ⟨h, Finset.mem_univ h, ?_⟩
+    have hrep := eq_replicate_of_switches_eq_zero t hs
+    have : t.length + 1 = c.length + 1 := by simpa using hlen
+    rw [← this, ← hrep]
+
+/-- **The phantoms are exactly the recombinant derivations.** -/
+theorem phantoms_eq_filter (c : Chain ι) :
+    phantoms c = (mosaics c).filter fun x ↦ switches x ≠ 0 := by
+  ext x
+  rw [phantoms, Finset.mem_sdiff, Finset.mem_filter]
+  constructor
+  · rintro ⟨hx, hnd⟩
+    exact ⟨hx, fun hz ↦ hnd ((mem_diagonals_iff_switches_eq_zero hx).mpr hz)⟩
+  · rintro ⟨hx, hne⟩
+    exact ⟨hx, fun hd ↦ hne ((mem_diagonals_iff_switches_eq_zero hx).mp hd)⟩
+
 theorem card_phantoms (c : Chain ι) :
     (phantoms c).card = (mosaics c).card - Fintype.card ι := by
   have hin : diagonals c ∩ mosaics c = diagonals c :=

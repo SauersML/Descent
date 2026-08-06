@@ -247,6 +247,37 @@ def switches : List ι → ℕ
   | [_] => 0
   | a :: b :: t => (if a = b then 0 else 1) + switches (b :: t)
 
+omit [Fintype ι] in
+theorem switches_replicate (h : ι) (n : ℕ) : switches (List.replicate (n + 1) h) = 0 := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [List.replicate_succ, List.replicate_succ] at *
+    simp [switches, ih]
+
+omit [Fintype ι] in
+/-- A derivation that never switches is one donor repeated: the two readings of "this is a
+panel thread, not a mosaic" agree. -/
+theorem eq_replicate_of_switches_eq_zero {h : ι} :
+    ∀ t : List ι, switches (h :: t) = 0 → h :: t = List.replicate (t.length + 1) h := by
+  intro t
+  induction t generalizing h with
+  | nil => intro _; rfl
+  | cons b t ih =>
+    intro hs
+    rw [switches] at hs
+    have hhb : h = b := by
+      by_contra hne
+      rw [if_neg hne] at hs
+      omega
+    have hrest : switches (b :: t) = 0 := by
+      rw [if_pos hhb] at hs
+      omega
+    have hrep : b :: t = List.replicate (t.length + 1) b := ih hrest
+    rw [List.length_cons, List.replicate_succ, ← hhb]
+    rw [← hhb] at hrep
+    exact congrArg (h :: ·) hrep
+
 /-- The switch-graded derivation count: the dynamic program with a weight `z` charged at
 every donor change. -/
 noncomputable def switchPolynomial : Chain ι → ι → ℝ → ℝ
