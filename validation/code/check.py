@@ -2788,7 +2788,18 @@ def parse_file(path: Path) -> tuple[list[Decl], list[tuple[int, str]]]:
         # docstring immediately above
         pre = src[max(0, off - 4000) : off]
         doc = ""
-        dm = re.search(r"/--(.*?)-/\s*$", pre, re.S)
+        # THE DOCSTRING IMMEDIATELY ABOVE, AND ONLY THAT ONE.  `/--(.*?)-/\s*$` under
+        # `re.S` searches left to right, so it matched from the FIRST `/--` in four
+        # thousand preceding characters through to the last `-/` -- swallowing every
+        # docstring in between and the code between them.  A declaration then inherited
+        # its neighbours' prose: `equalityPatternRangeEquiv` was reported for calling a
+        # range construction "canonical" when the word belonged to a different definition
+        # six lines above it, and two more F13 findings had no such word within twenty
+        # lines of themselves at all.
+        #
+        # Forbidding `-/` inside the captured content stops the match at the nearest
+        # complete block, which is the one attached to this declaration.
+        dm = re.search(r"/--((?:(?!-/)[\s\S])*)-/\s*$", pre)
         if dm:
             doc = norm(dm.group(1))
         header_m, body_m = split_header_body(raw_m[hdr_off - off :])
@@ -3470,7 +3481,12 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
                                   f"as a conjunct: `{_clip(p)}`")
                         break
         # F13 -- range advertised as canonical.
-        if re.search(r"\.range\b|Set\.image\b", d.body) and re.search(
+        # `Finset.range n` IS NOT AN IMAGE.  It is the interval `{0, …, n-1}`, and
+        # `\.range\b` matched it, so `∏ j ∈ Finset.range extra, …` -- an ordinary finite
+        # product -- counted as a range construction.  What this family is about is
+        # `Set.range f`, the image of a function advertised as the canonical copy of
+        # something.
+        if re.search(r"Set\.range\b|Set\.image\b", d.body) and re.search(
                 r"(?i)(canonical|universal|the standard|concrete copy)", d.doc):
             add("F13", "a range/image construction is described as canonical or "
                        "universal with no isomorphism theorem cited")
