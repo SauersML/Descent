@@ -642,7 +642,7 @@ noncomputable def nondegenerateGenerationalPopGen : Descent.Core.PopGenParameter
 /-- The chosen mutation scale makes the differentiation transient's retention
 factor vanish exactly at generation one. -/
 theorem nondegenerateGenerationalPopGen_fstDecay_eq_zero :
-    PopGen.fstTransientDecayFromScaled 1 2 (1 / 2) = 0 := by
+    PopGen.fstTransientDecayFromScaled 1 ⟨2⟩ ⟨1 / 2⟩ = 0 := by
   norm_num [PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]

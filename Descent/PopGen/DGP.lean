@@ -203,21 +203,24 @@ Denotes: a per-generation retention factor for a BETWEEN-population quantity.
 Other definitions share the shape of this formula under names from the
 heterozygosity family; the formula does not fix which is meant, and the whole
 content of this one is that the two families take different forces. -/
-noncomputable def fstTransientDecayFromScaled (Ne θ bigM : ℝ) : ℝ :=
-  hetDecayFromScaled Ne θ * (1 - bigM / (2 * Ne))
+noncomputable def fstTransientDecayFromScaled (Ne : ℝ) (θ : Descent.Core.Theta)
+    (bigM : Descent.Core.BigM) : ℝ :=
+  hetDecayFromScaled Ne θ.value * (1 - bigM.value / (2 * Ne))
 
 /-- The differentiation transient's decay factor is on the same coalescent clock as the
 heterozygosity one it extends: the migration channel divides by the timescale, not by a
 free constant. -/
-theorem fstTransientDecayFromScaled_uses_timeScale (Ne θ bigM : ℝ) :
+theorem fstTransientDecayFromScaled_uses_timeScale (Ne : ℝ) (θ : Descent.Core.Theta)
+    (bigM : Descent.Core.BigM) :
     PopGen.fstTransientDecayFromScaled Ne θ bigM
-      = PopGen.hetDecayFromScaled Ne θ * (1 - bigM / Descent.Core.coalescentTimeScale Ne) := by
+      = PopGen.hetDecayFromScaled Ne θ.value
+        * (1 - bigM.value / Descent.Core.coalescentTimeScale Ne) := by
   unfold PopGen.fstTransientDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **At zero migration the differentiation transient decays at the heterozygosity rate.**
 This is the boundary at which the superseded body was right, and it is the only one. -/
-theorem fstTransientDecayFromScaled_no_migration (Ne θ : ℝ) :
-    fstTransientDecayFromScaled Ne θ 0 = hetDecayFromScaled Ne θ := by
+theorem fstTransientDecayFromScaled_no_migration (Ne : ℝ) (θ : Descent.Core.Theta) :
+    fstTransientDecayFromScaled Ne θ ⟨0⟩ = hetDecayFromScaled Ne θ.value := by
   unfold fstTransientDecayFromScaled; ring
 
 
@@ -3499,7 +3502,7 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
     `fstTransientDecayFromScaled`. -/
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
   fstEquilibrium m.toEvo *
-    (1 - fstTransientDecayFromScaled m.Ne m.theta m.bigM ^ (Nat.floor m.t_div))
+    (1 - fstTransientDecayFromScaled m.Ne ⟨m.theta⟩ ⟨m.bigM⟩ ^ (Nat.floor m.t_div))
 
 /-! ### Step 2: Primitive evolutionary coordinate summaries
 
@@ -4042,7 +4045,7 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
     m.coordinateSummary =
       { alleleFreqCoordinate :=
           1 - fstEquilibrium m.toEvo *
-            (1 - fstTransientDecayFromScaled m.Ne m.theta m.bigM ^ (Nat.floor m.t_div))
+            (1 - fstTransientDecayFromScaled m.Ne ⟨m.theta⟩ ⟨m.bigM⟩ ^ (Nat.floor m.t_div))
         sharedLDCoordinate := (1 - m.recomb) ^ (2 * m.t_div)
         ancestralVariantCoordinate := Real.exp (-m.theta * m.tau)
         migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by

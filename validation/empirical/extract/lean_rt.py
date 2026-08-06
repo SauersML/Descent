@@ -170,6 +170,31 @@ def _proj(obj, fld):
                     "harness does not model, so there is no honest value to "
                     "give it.")
         return obj[fld]
+    if fld == "value" and isinstance(obj, (int, float)):
+        # THE SCALING WRAPPERS ARE TRANSPARENT HERE, AND ONLY THESE.
+        #
+        # `Core.Theta`, `Core.BigM`, `Core.Tau` and `Core.Rho` are one-field
+        # structures over `ℝ` whose sole field is `value`.  They exist so that a
+        # scaled mutation rate cannot be passed where a scaled migration rate is
+        # wanted -- a guarantee the COMPILER gives and this harness cannot,
+        # because everything crossing the boundary from a battery or a
+        # differential run is a float.
+        #
+        # Without this, typing a definition's argument would DELETE its
+        # empirical coverage: `hetDecayFromScaled` and `fstTransientDecayFromScaled`
+        # are VALIDATED and NUMERIC, and the moment their `θ` becomes a `Theta`
+        # the body reads `θ.value` and this projection raises on the float the
+        # harness passes.  The definition would fall to NOT-EXTRACTABLE, and a
+        # declaration absent from the extract has no coverage debt and no
+        # finding -- which reads exactly like a clean one.  Trading a measured
+        # verdict for a type is not the trade the scaling work is for.
+        #
+        # It is sound because the wrapper is definitionally the real: Lean's
+        # `Theta.value_ofRate` says the number inside is the number the named
+        # rate computes.  Narrow on purpose -- only the field literally named
+        # `value`, and only when the object is already a number, so a genuine
+        # missing-field bug on a structure still raises.
+        return obj
     return getattr(obj, fld)
 
 

@@ -150,7 +150,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     superseded base spans 69.31 to 554.52. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta.value + 2 * g.bigM.value)) *
-    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta.value g.bigM.value ^ t)
+    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
 generations.
