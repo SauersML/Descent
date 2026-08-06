@@ -2915,10 +2915,16 @@ def is_prop_type(ty: str, prop_aliases: set[str], prop_structs: set[str],
                         and bbase not in prop_structs):
                     return False
         return True
-    d = depths(t)
+    # `ℝ≥0` AND `ℝ≥0∞` ARE TYPE NAMES.  The relation scan below looks for `≥` anywhere at
+    # depth zero, and Mathlib spells the non-negative reals with one inside the name -- so
+    # `(C : ℝ≥0)`, an ordinary numeric parameter, read as the proposition `ℝ ≥ 0` and was
+    # reported as a hidden premise.  The scan runs over the type with those two notations
+    # blanked, so a relation has to be a relation and not a letter in a noun.
+    scan = t.replace("ℝ≥0∞", "NNRealInf").replace("ℝ≥0", "NNRealName")
+    d = depths(scan)
     for op in REL + LOGIC:
-        for k in range(len(t) - len(op) + 1):
-            if t[k : k + len(op)] == op and d[k] == 0:
+        for k in range(len(scan) - len(op) + 1):
+            if scan[k : k + len(op)] == op and d[k] == 0:
                 return True
     head = re.match(r"([A-Za-z_][\w.']*)", t)
     if head:
@@ -3264,7 +3270,15 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             # OWNS, so an instance of a class it does not define is infrastructure.
             concealed = True
             if b.kind == "instance" and not substantive:
-                ihead = re.match(r"([A-Za-z_][\w.']*)", norm(b.type))
+                # THE CLASS CAN SIT UNDER BINDERS.  `[∀ k, IsProbabilityMeasure (μ k)]`
+                # names a Mathlib class, but the head regex starts at the first character
+                # and `∀` is not one it matches, so the class went unidentified and the
+                # premise was reported as concealed.  Strip the quantifier prefix and ask
+                # about the class actually being required.
+                itype = norm(b.type)
+                while re.match(r"[∀∃]", itype) and "," in itype:
+                    itype = itype.split(",", 1)[1].strip()
+                ihead = re.match(r"([A-Za-z_][\w.']*)", itype)
                 if ihead:
                     ibase = ihead.group(1).split(".")[-1]
                     corpus_owned = (ibase in c.struct_fields or ibase in c.prop_structs
