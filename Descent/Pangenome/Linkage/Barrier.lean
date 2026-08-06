@@ -357,10 +357,10 @@ and the couplings glue along a tree, which is why the multi-interface term in
 Kullback–Leibler divergence and not an order-2 Rényi one. -/
 
 /-- The interface separating `{0,1}` from `{2}`. -/
-def witnessLeft : Fin 3 → Fin 3 := ![0, 0, 2]
+def witnessLeft : Fin 3 → Fin 3 := fun h ↦ if h = 2 then 2 else 0
 
 /-- The interface separating `{0,2}` from `{1}`, which cuts the panel the other way. -/
-def witnessRight : Fin 3 → Fin 3 := ![0, 1, 0]
+def witnessRight : Fin 3 → Fin 3 := fun h ↦ if h = 1 then 1 else 0
 
 theorem card_mosaics_witnessLeft : (mosaics [witnessLeft]).card = 5 := by
   rw [card_mosaics]; decide
