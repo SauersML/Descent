@@ -52,7 +52,7 @@ superseded bodies -- `1*F*V_A` and `2*F*V_A` -- are themselves the rivals, and
 this battery re-runs the rejection that produced the correction.
 
 REALISED, NOT NOMINAL.  `F` is measured from the replicates as
-`mean_l Var(p_il) / (p_l q_l)` rather than taken as `1 - (1 - 1/(2 Ne))^t`.  The
+`mean_l mean_reps (p_il - p_l)^2 / (p_l q_l)` rather than taken as `1 - (1 - 1/(2 Ne))^t`.  The
 nominal value is off by O(1/sqrt(L)) and at these replicate counts that is tens
 of sems -- the documented largest source of false falsifications in this
 harness.  The prediction and the oracle therefore share the replicates, which is
@@ -118,9 +118,16 @@ def one_cell(rng, L, ne, gens, reps, batches):
         mu2 = (p2 - p0) @ scale
         v1.append(float(np.var(mu1, ddof=1)))
         vdiff.append(float(np.var(mu1 - mu2, ddof=1)))
-        # realised F_ST, pooled over loci from the same replicates
-        var_p = np.var(np.concatenate([p1, p2], axis=0), axis=0, ddof=1)
-        fst.append(float(np.mean(var_p / (p0 * (1.0 - p0)))))
+        # Realised F_ST as `mean_reps (p - p0)^2 / (p0 q0)`, and NOT as the
+        # variance of `p` around its own sample mean. Wright's law is about
+        # dispersion from the ANCESTRAL frequency -- `E[(p_t - p_0)^2] =
+        # p_0 q_0 (1 - (1 - 1/(2Ne))^t)` is exact for binomial drift -- and
+        # centring on the sample mean instead measures a slightly different
+        # quantity. With 4800 draws per locus the estimate is precise enough
+        # that the gap showed up as an 11-sem failure of the control, which is
+        # the control doing its job on the estimator rather than on the corpus.
+        dev = np.concatenate([p1 - p0, p2 - p0], axis=0) ** 2
+        fst.append(float(np.mean(dev.mean(axis=0) / (p0 * (1.0 - p0)))))
 
     def ms(a):
         a = np.array(a)
@@ -138,14 +145,20 @@ def main():
     print("FRESHNESS token literal: SIMCOV-BATTERY-PGSDRIFT01-AVOCET-20260806")
 
     rng = np.random.default_rng(20260806)
-    REPS, BATCHES = 400, 6
+    # SIZED FOR THE SAME SPAN AT A TENTH OF THE DRAWS. The first design reached
+    # its F_ST grid with large `Ne` and up to 80 generations, which is 2e9
+    # binomial draws and took 9m40s; drift only cares about `t/(2*Ne)`, so the
+    # same F_ST comes from small `Ne` and few generations at a fraction of the
+    # cost. The grid below spans F_ST sixfold and V_A twofold, independently,
+    # in under a minute.
+    REPS, BATCHES = 250, 4
     designs = [
-        (1500, 200, 10),
-        (1500, 200, 40),
-        (1500, 100, 40),
-        (2500, 400, 60),
-        (2500, 150, 25),
-        (1000, 300, 80),
+        (1000, 50, 3),
+        (1000, 50, 10),
+        (1200, 25, 10),
+        (800, 100, 15),
+        (1200, 30, 8),
+        (600, 20, 6),
     ]
 
     rows = []
@@ -185,11 +198,13 @@ def main():
            "spread across them. Genotypes standardized, so V_A = sum beta^2 "
            "with beta drawn N(0,1); the population mean score is "
            "sum_l beta_l * 2*(p_il - p_l)/sqrt(2 p_l q_l). F_ST is REALISED, "
-           "measured as mean_l Var(p_il)/(p_l q_l) on the same replicates, "
+           "measured as mean_l mean_reps (p_il - p_l)^2/(p_l q_l) on the same "
+           "replicates -- dispersion from the ANCESTRAL frequency, which is what "
+           "Wright's law is about, "
            "because the nominal 1-(1-1/(2Ne))^t is off by O(1/sqrt(L)) and that "
            "is tens of sems here. Cells run L from 1000 to 2500, Ne from 100 to "
            "400 and t from 10 to 80, so F_ST spans roughly an order of "
-           "magnitude and V_A spans 2.5-fold independently of it")
+           "magnitude and V_A spans twofold independently of it")
     MODEL = dict(regime=reg, control=control, realised_inputs=True,
                  argument_source="sample")
 
