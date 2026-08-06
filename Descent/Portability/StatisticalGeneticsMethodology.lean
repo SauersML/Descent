@@ -7,8 +7,6 @@ import Descent.Portability.PortabilityDrift
 -- `expanderAgreementFloor`: the window-audit section below is what the twin
 -- construction says about neighbourhood-consistency QC.
 import Descent.Conditionals.LocalToGlobalCoherence
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Decision
 

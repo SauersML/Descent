@@ -5,7 +5,6 @@ import Descent.Coalescent.Restriction
 import Descent.Coalescent.Kernel
 import Mathlib.Data.Finite.Card
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

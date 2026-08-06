@@ -1,13 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
-import Descent.Core.Scaling
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 -- `fstMutationDriftEquilibrium` is declared in `PopGen.DGP` and named throughout the
 -- fixed-point results below.  This is a PopGen-internal edge, not a layer inversion.
 import Descent.PopGen.DGP
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

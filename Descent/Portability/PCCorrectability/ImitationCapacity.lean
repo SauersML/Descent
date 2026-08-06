@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.ImitationRigidity
 import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Positivity
-import Descent.Layer
 
 assert_below Descent.Decision
 

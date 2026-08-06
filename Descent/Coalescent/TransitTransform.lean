@@ -6,7 +6,6 @@ import Descent.Coalescent.LaplaceTransform
 import Mathlib.Probability.Independence.InfinitePi
 import Mathlib.Probability.Independence.Integration
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

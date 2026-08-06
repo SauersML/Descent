@@ -1,15 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
-import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 import Descent.PopGen.PopulationGeneticsFoundations.SelectionMigrationBalance
-import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
-import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
 import Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations
 import Descent.PopGen.PopulationGeneticsFoundations.FstDerivationFromDrift
 import Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

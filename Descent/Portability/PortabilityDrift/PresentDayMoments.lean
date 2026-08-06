@@ -9,11 +9,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -- file that really does look like it does not. The edge is still a layer violation and is
 -- still owed a repair; it is now a violation of exactly one file.
 import Descent.Program.Conclusions
-import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
-import Descent.Portability.PortabilityDrift.Definitions
 import Descent.Portability.PortabilityDrift.Generational
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
-import Descent.Layer
 
 assert_below Descent.Decision
 

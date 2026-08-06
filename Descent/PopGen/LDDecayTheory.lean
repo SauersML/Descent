@@ -8,8 +8,6 @@ import Descent.Portability.PortabilityDrift
 -- arrive through `PortabilityDrift`, which is the single import
 -- `Descent.Program.OpenQuestions` used to carry here; the programme narrative was never
 -- supplying anything and is no longer in the path.
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

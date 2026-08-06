@@ -10,8 +10,6 @@ import Descent.Portability.PortabilityDrift
 -- that no longer exists now that the head of this chain imports what it uses.  The
 -- dependency is real, so it is written.  The `layers` guard reports the edge: the repair
 -- is to move the AUC apparatus out of the narrative module it is housed in.
-import Descent.Program.Conclusions
-import Descent.Layer
 
 assert_below Descent.Decision
 

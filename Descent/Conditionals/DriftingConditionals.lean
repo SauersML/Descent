@@ -8,8 +8,6 @@ import Descent.Conditionals.DriftingConditional
 -- defines it is one line.
 import Descent.Spectral.ReversibleMarkovSpectrum
 import Descent.Conditionals.DynamicsContrast
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Decision
 

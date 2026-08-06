@@ -6,7 +6,6 @@ import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Analysis.SpecialFunctions.Sqrt
 import Mathlib.Tactic
 import Mathlib.Topology.Order.Monotone
-import Descent.Layer
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 

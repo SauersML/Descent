@@ -7,7 +7,6 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
 import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

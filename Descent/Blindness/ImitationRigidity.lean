@@ -6,8 +6,6 @@ import Descent.Spectral.WhiteningEquivalence
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Decision
 

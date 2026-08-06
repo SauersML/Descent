@@ -5,7 +5,6 @@ import Descent.Coalescent.SpatialCoalescent
 import Descent.Coalescent.BertrandDescent
 import Mathlib.Data.Nat.Choose.Central
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

@@ -5,7 +5,6 @@ import Descent.Coalescent.WrightFisher
 import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

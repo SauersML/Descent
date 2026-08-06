@@ -2,11 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Lookdown
-import Descent.Coalescent.CompetingRates
 import Descent.Coalescent.StepLaw
 import Descent.Coalescent.NeutralMutation
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

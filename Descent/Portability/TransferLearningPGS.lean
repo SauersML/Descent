@@ -1,11 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransferLearningPGS.ImportanceWeighting
 import Descent.Portability.TransferLearningPGS.FeatureRepresentation
 import Descent.Portability.TransferLearningPGS.FineTuning
-import Descent.Layer
 
 assert_below Descent.Decision
 

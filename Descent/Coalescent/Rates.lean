@@ -5,7 +5,6 @@ import Mathlib.MeasureTheory.Integral.SetIntegral
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Tactic
 import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

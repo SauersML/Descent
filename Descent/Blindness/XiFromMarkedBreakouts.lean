@@ -6,8 +6,6 @@ import Mathlib.MeasureTheory.Measure.WithDensity
 import Mathlib.Topology.Instances.ENNReal.Lemmas
 import Mathlib.Tactic
 import Descent.Blindness.MarkedBreakoutUniversality
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

@@ -6,7 +6,6 @@ import Descent.Portability.PCCorrectability.Frequency
 import Descent.Portability.PCCorrectability.ImitationCapacity
 import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Portability.PCCorrectability.EndToEnd
-import Descent.Layer
 
 assert_below Descent.Decision
 

@@ -2,8 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

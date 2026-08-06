@@ -11,8 +11,6 @@ import Descent.Decision.CertificateGrading
 -- so dropping that unused import removed this file's only path to names it
 -- genuinely uses.  Declared here, where the use is.
 import Descent.Decision.TransportedMinimax
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Program
 

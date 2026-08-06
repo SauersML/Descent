@@ -5,7 +5,6 @@ import Descent.Foundations.Probability
 import Mathlib.LinearAlgebra.Vandermonde
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
-import Descent.Layer
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 

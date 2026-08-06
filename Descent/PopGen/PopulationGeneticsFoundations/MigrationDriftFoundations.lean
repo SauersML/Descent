@@ -2,11 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
-import Descent.Core.Scaling
 -- `Portability.effectiveSymmetricMigration` and `Portability.fstMigrationDriftEquilibrium`
 -- are named below.
 import Descent.Portability.PortabilityDrift
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

@@ -9,8 +9,6 @@ import Descent.Spectral.PolygenicSpectroscopy
 import Descent.Blindness.EpistaticChaos
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Portability.AncestrySpecificPower
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Decision
 

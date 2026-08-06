@@ -24,7 +24,6 @@ import Mathlib.Topology.MetricSpace.UniformConvergence
 import Mathlib.Topology.Order.LeftRight
 import Mathlib.Tactic
 import Descent.Blindness.ObservationalCeiling
-import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

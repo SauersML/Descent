@@ -1,14 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Core.Population
 import Descent.Portability.BayesianPGSTheory
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.HaplotypeTheory
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

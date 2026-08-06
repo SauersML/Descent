@@ -6,7 +6,6 @@ import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 -- path to them.  This file reaches `Program.Conclusions` on its own now rather than
 -- through a sibling that happens to be earlier in the chain.
 import Descent.Program.Conclusions
-import Descent.Layer
 
 assert_below Descent.Decision
 

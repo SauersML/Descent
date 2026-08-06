@@ -10,10 +10,8 @@ import Mathlib.Probability.CDF
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.InformationTheory.KullbackLeibler.Basic
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
-import Descent.Core.Ratios
 import Descent.Core.Population
 import Descent.Core.Genome
-import Descent.Layer
 
 assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

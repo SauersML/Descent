@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
 -- `Portability.pairwiseFstFromBranches` is the right-hand side of `wrightFIT_eq` below.
 import Descent.Portability.PortabilityDrift
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

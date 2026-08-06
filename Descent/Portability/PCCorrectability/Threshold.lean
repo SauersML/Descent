@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Core.Fst
 import Descent.Foundations.ReferenceEvaluation
 import Mathlib.Data.Real.Sqrt
-import Descent.Layer
 
 assert_below Descent.Decision Descent.Program
 

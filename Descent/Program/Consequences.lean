@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.MultiAncestryTheory
 import Descent.Portability.SampleOverlapBias
 import Descent.Portability.PortabilityBounds
-import Descent.Core.Moments
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.EquityAndImplementation
@@ -13,7 +12,6 @@ import Descent.PopGen.DemographicCapacity
 import Descent.Portability.CorrectionBiology
 import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
-import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Foundations.CovarianceStructure
 import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Program.CausalInference

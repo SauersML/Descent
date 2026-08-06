@@ -5,8 +5,6 @@ import Descent.Portability.PGSCalibrationTheory
 import Descent.PopGen.LDDecayTheory
 import Descent.Portability.HorizonCurve
 import Descent.Conditionals.DriftingConditional
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Decision
 

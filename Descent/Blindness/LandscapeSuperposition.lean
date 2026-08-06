@@ -11,7 +11,6 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Ring
 import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

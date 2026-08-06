@@ -6,7 +6,6 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Ring
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision Descent.Program
 

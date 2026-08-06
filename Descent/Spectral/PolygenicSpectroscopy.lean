@@ -5,7 +5,6 @@ import Descent.Blindness.CramerStratum
 import Descent.Blindness.JetBarrier
 import Descent.Conditionals.LocalToGlobalCoherence
 import Descent.Blindness.HiddenConeAmbiguity
-import Descent.Layer
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 

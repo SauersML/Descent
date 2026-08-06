@@ -7,7 +7,6 @@ import Descent.Portability.MetricSpecificPortability.R2Decomposition
 -- the rest of the clinical family. An F1 formula is a classifier metric and carries no
 -- programme content, so this file no longer reaches the audit layer at the top of the graph
 -- to obtain a harmonic mean of two arguments. `f1_le_one` went with the definition.
-import Descent.Layer
 
 assert_below Descent.Decision
 

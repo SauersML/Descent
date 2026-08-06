@@ -3,10 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.DGP
 import Descent.Spectral.CirculationDefect
-import Descent.Core.Fst
-import Descent.Core.Parameters
 import Descent.Core.Moments
-import Descent.Layer
 
 assert_below Descent.Decision Descent.Program
 

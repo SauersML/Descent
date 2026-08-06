@@ -3,8 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.Probability
 import Mathlib.Probability.CondVar
-import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

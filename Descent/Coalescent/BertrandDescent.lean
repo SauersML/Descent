@@ -6,7 +6,6 @@ import Mathlib.Analysis.PSeries
 import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Tactic
-import Descent.Layer
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 

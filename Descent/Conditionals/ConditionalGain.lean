@@ -6,7 +6,6 @@ import Descent.Blindness.BundleRigidity.CoverageInvariance
 import Descent.Blindness.BundleRigidity.EntropySplit
 import Descent.Blindness.BundleRigidity.Freshness
 import Descent.Core.Ratios
-import Descent.Layer
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 

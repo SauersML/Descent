@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Conditionals.DeclaredInteractionClass
-import Descent.Core.Population
 import Descent.Portability.ContinuumCalibration
 import Descent.Portability.CorrectionWidths
 import Descent.Conditionals.DescentGeometry
@@ -12,16 +11,9 @@ import Descent.Spectral.EnsembleChannel
 import Descent.PopGen.FrequencySpectrumStability
 import Descent.Portability.HorizonCurve
 import Descent.Blindness.LandscapeSuperposition
-import Descent.Blindness.MarkedBreakoutUniversality
 import Descent.Blindness.XiFromMarkedBreakouts
-import Descent.Blindness.MultipleMergerBlindness
-import Descent.Spectral.PencilEnvironment
-import Descent.Conditionals.FunctionalDescent
 import Descent.Blindness.SpectralUniversalityFailure
-import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
-import Descent.Core.Fst
-import Descent.Layer
 
 assert_below Descent.Decision
 

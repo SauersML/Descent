@@ -2,11 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
-import Descent.Core.Scaling
 -- `Portability.hetMutationFloor` and `fstMutationDriftEquilibrium` are named below.
-import Descent.PopGen.DGP
-import Descent.Portability.PortabilityDrift
-import Descent.Layer
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

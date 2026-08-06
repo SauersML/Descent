@@ -1,14 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.MetricSpecificPortability.ARoneFrontier
 import Descent.Portability.MetricSpecificPortability.CalibrationVsDiscrimination
 import Descent.Portability.MetricSpecificPortability.GeneticFrontier
 import Descent.Portability.MetricSpecificPortability.MetricAndClinicalDecisions
-import Descent.Portability.MetricSpecificPortability.PrecisionRecall
-import Descent.Portability.MetricSpecificPortability.R2Decomposition
 import Descent.Portability.MetricSpecificPortability.SharedCorrectionFamily
-import Descent.Layer
 
 assert_below Descent.Decision
 
