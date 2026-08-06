@@ -316,8 +316,22 @@ section DiversifyingSelection
     Power: the prediction spans 0.00034 to 0.84648, and the two cells that share
     a predicted 0.13534 at different `(tau, t)` check that only the ratio
     matters. -/
-noncomputable def fluctuatingEffectCorrelation (t τ : ℝ) : ℝ :=
-  Real.exp (-t / τ)
+/-! ### A note on two names this section does NOT use
+
+The relaxation time of the Ornstein--Uhlenbeck optimum is spelled `autocorrTime` and the
+observed effect correlation is spelled `effectCorr`. Both were `tau` and `rho` until
+`Meta.Linters.scaledQuantityUntyped` reported them, and it was right to: `tau` and `rho`
+mean `t/(2 Nₑ)` and `4 Nₑ r` everywhere else in this corpus, and a name carrying one
+meaning in `Coalescent` and another in `PopGen` is the collision `validation/conventions.json`
+exists to catch, arriving in a binder where no ledger looks.
+
+Neither quantity here is a coalescent scaling. `autocorrTime` is in GENERATIONS and is not
+divided by an effective size; `effectCorr` is a correlation in the unit interval. Giving
+them `Core.Tau` and `Core.Rho` would have been wrong, and leaving them under those names
+would have made the linter's report unreadable for the ones that are real. -/
+
+noncomputable def fluctuatingEffectCorrelation (t autocorrTime : ℝ) : ℝ :=
+  Real.exp (-t / autocorrTime)
 
 /-- **fluctuatingEffectCorrelation at its junk point, named.** A zero autocorrelation time means
 effects decorrelate instantly, so the correlation should be zero at any positive separation. The
@@ -336,16 +350,16 @@ direction and leaves both the scale and the starting value free. At zero diverge
 populations have not diverged and the correlation must be exactly one; a body carrying a leading
 factor, or an offset, would still decay and would fail here. It is also the normalisation that
 makes `τ` a time constant rather than an arbitrary rate parameter. -/
-theorem fluctuatingEffectCorrelation_at_zero (τ : ℝ) :
-    fluctuatingEffectCorrelation 0 τ = 1 := by
+theorem fluctuatingEffectCorrelation_at_zero (autocorrTime : ℝ) :
+    fluctuatingEffectCorrelation 0 autocorrTime = 1 := by
   unfold fluctuatingEffectCorrelation
   norm_num
 
 /-- Effect correlation decays with divergence time. -/
 theorem fluctuating_correlation_decays
-    (t₁ t₂ τ : ℝ)
-    (h_τ : 0 < τ) (h_more : t₁ < t₂) :
-    fluctuatingEffectCorrelation t₂ τ < fluctuatingEffectCorrelation t₁ τ := by
+    (t₁ t₂ autocorrTime : ℝ)
+    (h_τ : 0 < autocorrTime) (h_more : t₁ < t₂) :
+    fluctuatingEffectCorrelation t₂ autocorrTime < fluctuatingEffectCorrelation t₁ autocorrTime := by
   unfold fluctuatingEffectCorrelation
   apply Real.exp_lt_exp.mpr
   rw [neg_div, neg_div, neg_lt_neg_iff]
@@ -386,8 +400,8 @@ theorem stabilizingSelectedArchitectureVariance_at_reference_point :
 
 
 /-- Stationary variance of a fluctuating optimum under the OU model. -/
-noncomputable def optimumOUVariance (sigmaTheta tau : ℝ) : ℝ :=
-  sigmaTheta ^ 2 * tau / 2
+noncomputable def optimumOUVariance (sigmaTheta autocorrTime : ℝ) : ℝ :=
+  sigmaTheta ^ 2 * autocorrTime / 2
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem optimumOUVariance_at_reference_point :
@@ -397,23 +411,23 @@ theorem optimumOUVariance_at_reference_point :
 
 /-- **The stationary optimum variance is quadratic in the driving amplitude.**
 Halving the amplitude quarters the variance. -/
-theorem optimumOUVariance_amplitude_scaling (sigmaTheta tau c : ℝ) :
-    optimumOUVariance (c * sigmaTheta) tau = c ^ 2 * optimumOUVariance sigmaTheta tau := by
+theorem optimumOUVariance_amplitude_scaling (sigmaTheta autocorrTime c : ℝ) :
+    optimumOUVariance (c * sigmaTheta) autocorrTime = c ^ 2 * optimumOUVariance sigmaTheta autocorrTime := by
   unfold optimumOUVariance
   ring
 
 /-- **The stationary optimum variance is linear in autocorrelation time.**
 Halving the correlation time halves the variance. -/
-theorem optimumOUVariance_time_scaling (sigmaTheta tau c : ℝ) :
-    optimumOUVariance sigmaTheta (c * tau) = c * optimumOUVariance sigmaTheta tau := by
+theorem optimumOUVariance_time_scaling (sigmaTheta autocorrTime c : ℝ) :
+    optimumOUVariance sigmaTheta (c * autocorrTime) = c * optimumOUVariance sigmaTheta autocorrTime := by
   unfold optimumOUVariance
   ring
 
 /-- Selected-architecture variance under fluctuating selection: the baseline
     mutation-selection variance plus the variance induced by a moving optimum. -/
 noncomputable def fluctuatingSelectedArchitectureVariance
-    (v_mutation s sigmaTheta tau : ℝ) : ℝ :=
-  equilibriumEffectVariance v_mutation s + optimumOUVariance sigmaTheta tau
+    (v_mutation s sigmaTheta autocorrTime : ℝ) : ℝ :=
+  equilibriumEffectVariance v_mutation s + optimumOUVariance sigmaTheta autocorrTime
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
@@ -437,14 +451,14 @@ theorem effectCorrelationStabilizing_lt_one_iff (Ns : ℝ) :
   constructor <;> intro h <;> nlinarith
 
 theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
-    (v_mutation s sigmaTheta tau : ℝ)
-    (h_sigma : 0 < sigmaTheta) (h_tau : 0 < tau) :
+    (v_mutation s sigmaTheta autocorrTime : ℝ)
+    (h_sigma : 0 < sigmaTheta) (h_tau : 0 < autocorrTime) :
     stabilizingSelectedArchitectureVariance v_mutation s <
-      fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta tau := by
+      fluctuatingSelectedArchitectureVariance v_mutation s sigmaTheta autocorrTime := by
   unfold stabilizingSelectedArchitectureVariance
     fluctuatingSelectedArchitectureVariance optimumOUVariance
     equilibriumEffectVariance Descent.Core.ratio
-  have h_extra : 0 < sigmaTheta ^ 2 * tau / 2 := by
+  have h_extra : 0 < sigmaTheta ^ 2 * autocorrTime / 2 := by
     have hsq : 0 < sigmaTheta ^ 2 := sq_pos_of_pos h_sigma
     nlinarith
   linarith
@@ -453,10 +467,10 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     fluctuating autocorrelation time is below the exact threshold obtained by
     matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
 theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
-    (t tau Ns : ℝ)
-    (h_tau : 0 < tau) (hNs : 1 / 2 < Ns)
-    (h_tau_lt : tau < t / (-Real.log (effectCorrelationStabilizing Ns))) :
-    fluctuatingEffectCorrelation t tau < effectCorrelationStabilizing Ns := by
+    (t autocorrTime Ns : ℝ)
+    (h_tau : 0 < autocorrTime) (hNs : 1 / 2 < Ns)
+    (h_tau_lt : autocorrTime < t / (-Real.log (effectCorrelationStabilizing Ns))) :
+    fluctuatingEffectCorrelation t autocorrTime < effectCorrelationStabilizing Ns := by
   have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
     (effectCorrelationStabilizing_pos_iff Ns (by linarith)).2 hNs
   have h_rho_lt_one : effectCorrelationStabilizing Ns < 1 :=
@@ -467,13 +481,13 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
     simpa using h_log_lt
   have h_neglog_pos : 0 < -Real.log (effectCorrelationStabilizing Ns) := by
     linarith
-  have h_mul_lt : tau * (-Real.log (effectCorrelationStabilizing Ns)) < t :=
+  have h_mul_lt : autocorrTime * (-Real.log (effectCorrelationStabilizing Ns)) < t :=
     (lt_div_iff₀ h_neglog_pos).mp h_tau_lt
-  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / tau :=
+  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / autocorrTime :=
     (lt_div_iff₀ h_tau).2 (by simpa [mul_comm] using h_mul_lt)
-  have h_exp_lt_log' : -(t / tau) < Real.log (effectCorrelationStabilizing Ns) := by
+  have h_exp_lt_log' : -(t / autocorrTime) < Real.log (effectCorrelationStabilizing Ns) := by
     linarith
-  have h_exp_lt_log : -t / tau < Real.log (effectCorrelationStabilizing Ns) := by
+  have h_exp_lt_log : -t / autocorrTime < Real.log (effectCorrelationStabilizing Ns) := by
     simpa [neg_div] using h_exp_lt_log'
   unfold fluctuatingEffectCorrelation
   have h_exp_lt := Real.exp_lt_exp.mpr h_exp_lt_log
@@ -483,8 +497,8 @@ theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
     effect correlation.
 
     Empirical status: UNTESTED. -/
-noncomputable def stabilizingNsFromObservedCorrelation (rho : ℝ) : ℝ :=
-  1 / (2 * (1 - rho))
+noncomputable def stabilizingNsFromObservedCorrelation (effectCorr : ℝ) : ℝ :=
+  1 / (2 * (1 - effectCorr))
 
 /-- **The recovered selection strength's junk branch, named.** At a perfectly preserved
 correlation the implied `Ns` diverges and Lean returns `0`, reporting no selection where the
@@ -496,20 +510,20 @@ theorem stabilizingNsFromObservedCorrelation_perfect_is_junk :
 /-- Below perfect correlation, the recovered stabilizing-selection scale lies in the
 positive-correlation regime `Ns > 1/2` exactly when the observation itself is positive. -/
 theorem stabilizingNsFromObservedCorrelation_gt_half_iff
-    (rho : ℝ) (h_rho_lt : rho < 1) :
-    1 / 2 < stabilizingNsFromObservedCorrelation rho ↔ 0 < rho := by
+    (effectCorr : ℝ) (h_rho_lt : effectCorr < 1) :
+    1 / 2 < stabilizingNsFromObservedCorrelation effectCorr ↔ 0 < effectCorr := by
   unfold stabilizingNsFromObservedCorrelation
-  have h_denom : 0 < 2 * (1 - rho) := by linarith
+  have h_denom : 0 < 2 * (1 - effectCorr) := by linarith
   rw [div_lt_div_iff₀ (by norm_num : (0 : ℝ) < 2) h_denom]
   constructor <;> intro h <;> nlinarith
 
 /-- The inverse map for the stabilizing effect-correlation formula is exact on
     the biologically relevant region `ρ < 1`. -/
 theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
-    (rho : ℝ) (h_rho_lt : rho < 1) :
-    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation rho) = rho := by
+    (effectCorr : ℝ) (h_rho_lt : effectCorr < 1) :
+    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation effectCorr) = effectCorr := by
   unfold effectCorrelationStabilizing stabilizingNsFromObservedCorrelation
-  have h_one_minus_ne : 1 - rho ≠ 0 := by linarith
+  have h_one_minus_ne : 1 - effectCorr ≠ 0 := by linarith
   field_simp [h_one_minus_ne]
   ring
 
@@ -538,8 +552,8 @@ theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
     is 5. The inverse is usable only while `rho` is separated from zero by more
     than its own error bar, which the first five rows satisfy and the sixth does
     not. -/
-noncomputable def tauFromObservedEffectCorrelation (t rho : ℝ) : ℝ :=
-  -t / Real.log rho
+noncomputable def tauFromObservedEffectCorrelation (t effectCorr : ℝ) : ℝ :=
+  -t / Real.log effectCorr
 
 /-- **The recovered autocorrelation time's junk branch, named.** At `rho = 1` the logarithm is
 zero and Lean returns `0`, reporting instantaneous decorrelation where a perfectly preserved
@@ -552,11 +566,11 @@ theorem tauFromObservedEffectCorrelation_perfect_is_junk (t : ℝ) :
 /-- The recovered OU autocorrelation time is positive for a genuine observed
     effect correlation in `(0, 1)`. -/
 theorem tauFromObservedEffectCorrelation_pos
-    (t rho : ℝ)
-    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
-    0 < tauFromObservedEffectCorrelation t rho := by
-  have h_log_neg : Real.log rho < 0 := by
-    have h_log_lt : Real.log rho < Real.log 1 :=
+    (t effectCorr : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < effectCorr) (h_rho_lt : effectCorr < 1) :
+    0 < tauFromObservedEffectCorrelation t effectCorr := by
+  have h_log_neg : Real.log effectCorr < 0 := by
+    have h_log_lt : Real.log effectCorr < Real.log 1 :=
       Real.log_lt_log h_rho h_rho_lt
     simpa using h_log_lt
   unfold tauFromObservedEffectCorrelation
@@ -575,17 +589,17 @@ theorem tauFromObservedEffectCorrelation_at_one_efold (t : ℝ) :
 /-- The inverse map for the fluctuating-selection effect-correlation formula is
     exact on the biologically relevant region `ρ ∈ (0, 1)`. -/
 theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
-    (t rho : ℝ)
-    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1) :
-    fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t rho) = rho := by
+    (t effectCorr : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < effectCorr) (h_rho_lt : effectCorr < 1) :
+    fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t effectCorr) = effectCorr := by
   have h_t_ne : t ≠ 0 := ne_of_gt h_t
-  have h_log_neg : Real.log rho < 0 := by
-    have h_log_lt : Real.log rho < Real.log 1 :=
+  have h_log_neg : Real.log effectCorr < 0 := by
+    have h_log_lt : Real.log effectCorr < Real.log 1 :=
       Real.log_lt_log h_rho h_rho_lt
     simpa using h_log_lt
-  have h_log_ne : Real.log rho ≠ 0 := ne_of_lt h_log_neg
+  have h_log_ne : Real.log effectCorr ≠ 0 := ne_of_lt h_log_neg
   unfold fluctuatingEffectCorrelation tauFromObservedEffectCorrelation
-  have h_ratio : -t / (-t / Real.log rho) = Real.log rho := by
+  have h_ratio : -t / (-t / Real.log effectCorr) = Real.log effectCorr := by
     field_simp [h_t_ne, h_log_ne]
   rw [h_ratio, Real.exp_log h_rho]
 
@@ -595,19 +609,19 @@ theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
 
     Empirical status: UNTESTED. -/
 noncomputable def sigmaThetaFromObservedSelectedVariance
-    (v_selected v_mutation s t rho : ℝ) : ℝ :=
+    (v_selected v_mutation s t effectCorr : ℝ) : ℝ :=
   Real.sqrt
     (2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
-      tauFromObservedEffectCorrelation t rho)
+      tauFromObservedEffectCorrelation t effectCorr)
 
 /-- A nonpositive radicand sends `Real.sqrt` to Mathlib's junk `0`, so an observed variance
 below the mutation-selection floor reports zero effect-size scale rather than an inconsistent
 model.  Zero scale is a value the architecture can also take, so it cannot be read as a flag. -/
 theorem sigmaThetaFromObservedSelectedVariance_at_nonpositive_radicand_is_junk
-    (v_selected v_mutation s t rho : ℝ)
+    (v_selected v_mutation s t effectCorr : ℝ)
     (hnonpos : 2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
-      tauFromObservedEffectCorrelation t rho ≤ 0) :
-    sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho = 0 := by
+      tauFromObservedEffectCorrelation t effectCorr ≤ 0) :
+    sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t effectCorr = 0 := by
   unfold sigmaThetaFromObservedSelectedVariance
   exact Real.sqrt_eq_zero_of_nonpos hnonpos
 
@@ -615,12 +629,12 @@ theorem sigmaThetaFromObservedSelectedVariance_at_nonpositive_radicand_is_junk
 /-- The recovered optimum-diffusion scale is positive whenever the observed
     selected-architecture variance strictly exceeds the stabilizing baseline. -/
 theorem sigmaThetaFromObservedSelectedVariance_pos
-    (v_selected v_mutation s t rho : ℝ)
-    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1)
+    (v_selected v_mutation s t effectCorr : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < effectCorr) (h_rho_lt : effectCorr < 1)
     (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected) :
-    0 < sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho := by
-  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho :=
-    tauFromObservedEffectCorrelation_pos t rho h_t h_rho h_rho_lt
+    0 < sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t effectCorr := by
+  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t effectCorr :=
+    tauFromObservedEffectCorrelation_pos t effectCorr h_t h_rho h_rho_lt
   unfold sigmaThetaFromObservedSelectedVariance
   apply Real.sqrt_pos.mpr
   apply div_pos
@@ -631,19 +645,19 @@ theorem sigmaThetaFromObservedSelectedVariance_pos
     once the observed effect correlation and observed selected variance are
     plugged into the recovered OU parameters. -/
 theorem fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaTheta
-    (v_selected v_mutation s t rho : ℝ)
-    (h_t : 0 < t) (h_rho : 0 < rho) (h_rho_lt : rho < 1)
+    (v_selected v_mutation s t effectCorr : ℝ)
+    (h_t : 0 < t) (h_rho : 0 < effectCorr) (h_rho_lt : effectCorr < 1)
     (h_var_gap : stabilizingSelectedArchitectureVariance v_mutation s < v_selected) :
     fluctuatingSelectedArchitectureVariance v_mutation s
-        (sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t rho)
-        (tauFromObservedEffectCorrelation t rho) =
+        (sigmaThetaFromObservedSelectedVariance v_selected v_mutation s t effectCorr)
+        (tauFromObservedEffectCorrelation t effectCorr) =
       v_selected := by
-  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho :=
-    tauFromObservedEffectCorrelation_pos t rho h_t h_rho h_rho_lt
+  have h_tau_pos : 0 < tauFromObservedEffectCorrelation t effectCorr :=
+    tauFromObservedEffectCorrelation_pos t effectCorr h_t h_rho h_rho_lt
   have h_arg_nonneg :
       0 ≤
         2 * (v_selected - stabilizingSelectedArchitectureVariance v_mutation s) /
-          tauFromObservedEffectCorrelation t rho := by
+          tauFromObservedEffectCorrelation t effectCorr := by
     apply div_nonneg
     · nlinarith
     · exact le_of_lt h_tau_pos
