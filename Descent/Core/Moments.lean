@@ -373,14 +373,8 @@ with time since the split. -/
 theorem deployedR2FromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV : 0 < V_A) (hE : 0 < V_E)
     (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     deployedR2FromTau V_A V_E t₂ < deployedR2FromTau V_A V_E t₁ := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-    nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
-    rw [div_lt_one (by linarith)]
-    linarith
+  have hf1 := fstFromTau_lt_fstFromTau t₁ t₂ h0 hlt
+  have hlt2 := fstFromTau_lt_one t₂ (by linarith)
   exact r2_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE hf1 hlt2
 
 /-- **At the moment of the split nothing has been lost.** `τ = 0` gives `F_ST = 0` and
@@ -684,18 +678,32 @@ theorem deployedMse_eq (p : PopGenParameters) (V_E : ℝ) :
 noncomputable def deployedBrier (π : ℝ) (p : PopGenParameters) (V_E : ℝ) : ℝ :=
   brier π (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
 
+/-- **Any change that lowers the equilibrium `F_ST` improves the Brier score.**
+
+The three monotonicity results below -- in migration, in mutation and in effective size
+-- had identical eight-line bodies differing only in which `fstEquilibrium_lt_of_*`
+lemma they cited, and the duplication guard reported the block three times. The
+demography enters ONLY through that inequality, which is the content worth stating: the
+Brier score does not care which parameter moved. -/
+theorem deployedBrier_anti_of_fstEquilibrium_lt (π : ℝ) (p q : PopGenParameters)
+    (V_E : ℝ) (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hV : p.V_A = q.V_A)
+    (hfst : q.fstEquilibrium < p.fstEquilibrium) (hone : p.fstEquilibrium < 1) :
+    deployedBrier π q V_E < deployedBrier π p V_E := by
+  unfold deployedBrier
+  rw [hV]
+  exact brier_anti_in_r2 π _ _ hπ hπ1
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      hfst hone)
+
 /-- **More migration, better Brier score.** -/
 theorem deployedBrier_mono_in_migration (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
     (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E)
     (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
-  unfold deployedBrier
-  rw [hV]
-  exact brier_anti_in_r2 π _ _ hπ hπ1
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
-      (p.fstEquilibrium_lt_one hflow))
+  exact deployedBrier_anti_of_fstEquilibrium_lt π p q V_E hπ hπ1 hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **More mutation, better Brier score.** -/
 theorem deployedBrier_mono_in_mutation (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
@@ -703,12 +711,9 @@ theorem deployedBrier_mono_in_mutation (π : ℝ) (p q : PopGenParameters) (V_E 
     (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
-  unfold deployedBrier
-  rw [hV]
-  exact brier_anti_in_r2 π _ _ hπ hπ1
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
-      (p.fstEquilibrium_lt_one hflow))
+  exact deployedBrier_anti_of_fstEquilibrium_lt π p q V_E hπ hπ1 hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **Larger effective size, better Brier score.** -/
 theorem deployedBrier_mono_in_Ne (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
@@ -716,12 +721,9 @@ theorem deployedBrier_mono_in_Ne (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
     (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
     deployedBrier π q V_E < deployedBrier π p V_E := by
-  unfold deployedBrier
-  rw [hV]
-  exact brier_anti_in_r2 π _ _ hπ hπ1
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
-      (p.fstEquilibrium_lt_one hflow))
+  exact deployedBrier_anti_of_fstEquilibrium_lt π p q V_E hπ hπ1 hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **Deployed Brier at the source is the heritability complement**, scaled by the
 prevalence variance: the anchor the deployed value departs from. -/
@@ -737,14 +739,8 @@ theorem brier_deployedR2FromTau_anti (π V_A V_E : ℝ) (t₁ t₂ : Tau) (hπ :
     (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     brier π (momentsUnderDrift V_A V_E (fstFromTau t₁))
       < brier π (momentsUnderDrift V_A V_E (fstFromTau t₂)) := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-    nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
-    rw [div_lt_one (by linarith)]
-    linarith
+  have hf1 := fstFromTau_lt_fstFromTau t₁ t₂ h0 hlt
+  have hlt2 := fstFromTau_lt_one t₂ (by linarith)
   exact brier_momentsUnderDrift_mono π V_A V_E (fstFromTau t₁) (fstFromTau t₂) hπ hπ1 hV hE
     hf1 hlt2
 
@@ -886,14 +882,8 @@ theorem aucArgument_deployedR2FromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV
     (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₂))
       < aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₁)) := by
-  have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
-    unfold fstFromTau saturation
-    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-    nlinarith
-  have hlt2 : fstFromTau t₂ < 1 := by
-    unfold fstFromTau saturation
-    rw [div_lt_one (by linarith)]
-    linarith
+  have hf1 := fstFromTau_lt_fstFromTau t₁ t₂ h0 hlt
+  have hlt2 := fstFromTau_lt_one t₂ (by linarith)
   have hf0 : 0 ≤ fstFromTau t₁ := by
     unfold fstFromTau saturation; positivity
   exact aucArgument_momentsUnderDrift_anti V_A V_E (fstFromTau t₁) (fstFromTau t₂) hV hE

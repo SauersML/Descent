@@ -5,7 +5,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 import Descent.Layer
 
-assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # Core: the shared arithmetic kernels

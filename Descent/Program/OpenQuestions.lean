@@ -1122,39 +1122,13 @@ For binary traits (asthma, T2D), portability depends on additional factors:
 
 section DiseasePortability
 
-/-- **F1 score definition.**
-
-    Empirical status: UNTESTED. -/
-noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
-  2 * precision * sensitivity / (precision + sensitivity)
-
-/-- **f1Score where its denominator vanishes, named.** The guard `precision + sensitivity` is zero
-at `precision = 0`, `sensitivity = 0`. A classifier with neither precision nor sensitivity has
-no F1 score; the value returned is indistinguishable from a classifier that fires and is always
-wrong. Lean returns `0` there rather than the value the modelled quantity takes, and no type
-error marks the point. Consumers must require `precision + sensitivity ≠ 0`. -/
-theorem f1Score_at_precision0sensitivity0_is_junk :
-    f1Score 0 0 = 0 := by
-  unfold f1Score
-  norm_num
-
-/-- **F1 score is symmetric in precision and recall.** -/
-theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
-  unfold f1Score; ring
-
-/-- **F1 score ≤ arithmetic mean of precision and recall**, the harmonic-arithmetic mean
-    inequality for two positive reals.
-
-    Do not head this "F1 score ≤ max(precision, recall)". Of the chain
-    `harmonic ≤ arithmetic ≤ max`, only the first inequality is proved. The bound by the
-    max is strictly weaker and no theorem here establishes it. The name states exactly
-    what is proved. -/
-theorem f1_le_arithmetic_mean (p r : ℝ)
-    (hp : 0 < p) (hr : 0 < r) :
-    f1Score p r ≤ (p + r) / 2 := by
-  unfold f1Score
-  rw [div_le_div_iff₀ (by linarith) (by norm_num)]
-  nlinarith [sq_nonneg (p - r)]
+/-! **`f1Score` is not here any more.** It, `f1Score_at_precision0sensitivity0_is_junk`,
+`f1_symmetric` and `f1_le_arithmetic_mean` moved to `Core/Decision.lean`, beside
+`positivePredictiveValue`, `netBenefit` and `nriFromOperatingPoints`, which are the family
+it belongs to. An F1 score is the harmonic mean of two reals and carries no programme
+content; keeping it here meant `Portability/MetricSpecificPortability/PrecisionRecall.lean`
+imported this module -- the audit layer, at the top of the graph -- to reach a formula in
+two arguments, which is the `Portability -> Program` edge the layer order forbids. -/
 
 /-
 Two theorems were deleted from this section rather than renamed.

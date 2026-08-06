@@ -2411,4 +2411,65 @@ theorem clinicalReport_transient_eq_equilibrium (L : OperatingPointLaw)
 
 end OperatingPointLaw
 
+/-! ### The F1 score
+
+Moved here from `Program/OpenQuestions.lean`. An F1 score is the harmonic mean of two
+reals; it carries no programme content, and its being in the programme narrative meant that
+`Portability/MetricSpecificPortability/PrecisionRecall.lean` -- which states the one theorem
+about it that the corpus has -- imported the audit layer at the top of the graph to reach a
+formula in two arguments. That file's own header had already written down the repair:
+"the repair is to move `f1Score` down, since an F1 formula is a classifier metric and
+carries no programme content." This is that move.
+
+It belongs in this file rather than anywhere else lower: `positivePredictiveValue`,
+`negativePredictiveValue`, `netBenefit` and `nriFromOperatingPoints` are here, and F1 is a
+member of that family -- the harmonic mean of the precision and the recall that
+`OperatingPoint` already carries. -/
+
+/-- **F1 score**: the harmonic mean of precision and sensitivity.
+
+    Empirical status: UNTESTED. -/
+noncomputable def f1Score (precision sensitivity : ℝ) : ℝ :=
+  2 * precision * sensitivity / (precision + sensitivity)
+
+/-- **f1Score where its denominator vanishes, named.** The guard `precision + sensitivity` is zero
+at `precision = 0`, `sensitivity = 0`. A classifier with neither precision nor sensitivity has
+no F1 score; the value returned is indistinguishable from a classifier that fires and is always
+wrong. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point. Consumers must require `precision + sensitivity ≠ 0`. -/
+theorem f1Score_at_precision0sensitivity0_is_junk :
+    f1Score 0 0 = 0 := by
+  unfold f1Score
+  norm_num
+
+/-- **F1 score is symmetric in precision and recall.** -/
+theorem f1_symmetric (p r : ℝ) : f1Score p r = f1Score r p := by
+  unfold f1Score; ring
+
+/-- **F1 score ≤ arithmetic mean of precision and recall**, the harmonic-arithmetic mean
+    inequality for two positive reals.
+
+    Do not head this "F1 score ≤ max(precision, recall)". Of the chain
+    `harmonic ≤ arithmetic ≤ max`, only the first inequality is proved. The bound by the
+    max is strictly weaker and no theorem here establishes it. The name states exactly
+    what is proved. -/
+theorem f1_le_arithmetic_mean (p r : ℝ)
+    (hp : 0 < p) (hr : 0 < r) :
+    f1Score p r ≤ (p + r) / 2 := by
+  unfold f1Score
+  rw [div_le_div_iff₀ (by linarith) (by norm_num)]
+  nlinarith [sq_nonneg (p - r)]
+
+/-- **F1 is bounded above by one** when both precision and sensitivity lie in `(0, 1]`.
+Moved here with the definition from `Portability/MetricSpecificPortability/PrecisionRecall.lean`,
+which is where it was and which had to import the programme narrative to say it. -/
+theorem f1_le_one (precision sens : ℝ)
+    (h_p : 0 < precision) (h_r : 0 < sens)
+    (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
+    f1Score precision sens ≤ 1 := by
+  unfold f1Score
+  rw [div_le_one (by linarith)]
+  nlinarith [mul_nonneg (le_of_lt h_p) (by linarith : 0 ≤ 1 - sens),
+             mul_nonneg (le_of_lt h_r) (by linarith : 0 ≤ 1 - precision)]
+
 end Descent.Core

@@ -471,6 +471,29 @@ theorem fstFromTau_mem_unit (t : Tau) (h : 0 ≤ t.value) :
     0 ≤ fstFromTau t ∧ fstFromTau t ≤ 1 :=
   saturation_mem_unit t.value h
 
+/-- **A longer split differentiates more.** `τ/(1+τ)` is strictly increasing.
+
+Stated here rather than reproved at each use: `Core.Moments` opened three separate
+proofs with this same four-line `unfold`, `div_lt_div_iff₀`, `nlinarith` argument, and
+the duplication guard reported the block three times over. A tactic script repeated
+verbatim is a lemma that has not been named. -/
+theorem fstFromTau_lt_fstFromTau (t₁ t₂ : Tau) (h0 : 0 ≤ t₁.value)
+    (hlt : t₁.value < t₂.value) : fstFromTau t₁ < fstFromTau t₂ := by
+  unfold fstFromTau saturation
+  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+  nlinarith
+
+/-- **The split law never reaches complete differentiation.**
+
+The STRICT companion to `fstFromTau_mem_unit`, which gives only `≤ 1`. The consumers
+that need this need it strictly -- every monotonicity result below rests on the
+deployed metric being computed at an `F_ST` short of one -- and were each proving it
+inline. -/
+theorem fstFromTau_lt_one (t : Tau) (h0 : 0 ≤ t.value) : fstFromTau t < 1 := by
+  unfold fstFromTau saturation
+  rw [div_lt_one (by linarith)]
+  linarith
+
 /-! ### Nei and Hudson are not interchangeable, and now cannot be
 
 Two one-field types. The wrapper costs a `.value` at each use and buys the property that

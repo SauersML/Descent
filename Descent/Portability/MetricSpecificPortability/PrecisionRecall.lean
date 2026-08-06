@@ -2,20 +2,17 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
--- `f1_le_one` is stated about `Program.f1Score` and the prose above it says "which this
--- file imports".  It did not: the name arrived through
--- `R2Decomposition -> PopGen.LDDecayTheory -> Program.OpenQuestions`, and when
--- `LDDecayTheory` stopped importing the programme narrative the name went with it.  The
--- import is now written where the prose already claimed it was.  This is a Portability
--- to Program edge and the `layers` guard reports it: the repair is to move `f1Score`
--- down, since an F1 formula is a classifier metric and carries no programme content.
-import Descent.Program.OpenQuestions
+-- The `import Descent.Program.OpenQuestions` that used to be here is GONE, and the repair
+-- is the one this comment prescribed: `f1Score` moved DOWN, to `Core/Decision.lean`, beside
+-- the rest of the clinical family. An F1 formula is a classifier metric and carries no
+-- programme content, so this file no longer reaches the audit layer at the top of the graph
+-- to obtain a harmonic mean of two arguments. `f1_le_one` went with the definition.
 import Descent.Layer
 
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 2 module(s) -- `Descent.Program.Conclusions`, `Descent.Program.OpenQuestions`
+--   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Portability
@@ -1654,20 +1651,10 @@ theorem nns_increases_with_ppv_drop
 `F1 = 2 × PPV × sensitivity / (PPV + sensitivity)`, and F1 portability reflects
 both precision and recall portability.
 
-The theorem below is stated about `f1Score` from `Descent.Program.OpenQuestions`, which this
-file imports. Do not restate the formula here; its `Empirical status: UNTESTED` marker
-belongs with that one definition. -/
-
-/-- F1 is bounded above by 1 when both precision and sensitivity lie in `(0,1]`. -/
-theorem f1_le_one
-    (precision sens : ℝ)
-    (h_p : 0 < precision) (h_r : 0 < sens)
-    (h_p1 : precision ≤ 1) (h_r1 : sens ≤ 1) :
-    Program.f1Score precision sens ≤ 1 := by
-  unfold Program.f1Score
-  rw [div_le_one (by linarith)]
-  nlinarith [mul_nonneg (le_of_lt h_p) (by linarith : 0 ≤ 1 - sens),
-             mul_nonneg (le_of_lt h_r) (by linarith : 0 ≤ 1 - precision)]
+`Core.f1Score` is the definition and `Core.f1_le_one` the bound; both moved down with the
+rest of the clinical family. Do not restate the formula here -- its `Empirical status:
+UNTESTED` marker belongs with that one definition, and the reason this file no longer holds
+the theorem is that holding it cost a `Portability -> Program` import. -/
 
 end PrecisionRecall
 
