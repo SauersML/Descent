@@ -8,6 +8,7 @@ import Descent.Pangenome.Linkage
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
 import Descent.Pangenome.Linkage.Interface
+import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Splicing
 
 /-!

@@ -4848,6 +4848,17 @@ MATHLIB_EXEMPT = {
     "covariance_smul_right",
     "variance",
     "mean",
+    # SHAPE, not name.  Both of these say a compatible donor derivation over a
+    # chain of `r` interfaces is a list of `r + 1` donors, from membership in
+    # `mosaicsFrom` / `mosaics`.  The normal form of that conclusion is
+    # `length = length + 1`, which is also the normal form of
+    # `Quiver.Path.vertices_length` -- a statement about a quiver path, over a
+    # different type, with no hypothesis.  Neither can be used to prove the
+    # other and importing Mathlib's does not discharge the corpus's; what the
+    # shape screen has found here is that "one longer than" is a common thing
+    # for a length to be.  Read against both sources before being listed.
+    "length_of_mem_mosaicsFrom",
+    "length_of_mem_mosaics",
 }
 
 

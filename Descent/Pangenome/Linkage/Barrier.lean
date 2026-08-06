@@ -249,6 +249,24 @@ theorem pow_card_le_prod_width_mul_card_mosaics [Nonempty ι] (c : Chain ι) :
 
 /-! ### The exactness barrier -/
 
+theorem prod_le_pow_of_le {w : ℕ} (c : Chain ι) (hw : ∀ s ∈ c, width s ≤ w) :
+    (c.map width).prod ≤ w ^ c.length := by
+  induction c with
+  | nil => simp
+  | cons s c ih =>
+    rw [List.map_cons, List.prod_cons, List.length_cons, pow_succ, mul_comm (w ^ c.length) w]
+    exact Nat.mul_le_mul (hw s (List.mem_cons_self ..))
+      (ih fun t ht ↦ hw t (List.mem_cons_of_mem s ht))
+
+/-- **The width budget.**  A bound on every occupied width bounds the whole product, so a
+constant compression repeated over `r` separators forces a language exponential in `r`:
+`m · (m/w) ^ r` derivations, stated without division. -/
+theorem pow_card_le_pow_width_mul_card_mosaics [Nonempty ι] (c : Chain ι) (w : ℕ)
+    (hw : ∀ s ∈ c, width s ≤ w) :
+    Fintype.card ι ^ (c.length + 1) ≤ w ^ c.length * (mosaics c).card :=
+  le_trans (pow_card_le_prod_width_mul_card_mosaics c)
+    (Nat.mul_le_mul_right _ (prod_le_pow_of_le c hw))
+
 theorem prod_le_pow {m : ℕ} : ∀ (l : List ℕ), (∀ x ∈ l, x ≤ m) → l.prod ≤ m ^ l.length := by
   intro l
   induction l with
