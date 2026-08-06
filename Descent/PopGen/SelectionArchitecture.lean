@@ -284,6 +284,20 @@ in another → allelic turnover → poor portability.
 
 section DiversifyingSelection
 
+/-! ### A note on two names this section does NOT use
+
+The relaxation time of the Ornstein--Uhlenbeck optimum is spelled `autocorrTime` and the
+observed effect correlation is spelled `effectCorr`. Both were `tau` and `rho` until
+`Meta.Linters.scaledQuantityUntyped` reported them, and it was right to: `tau` and `rho`
+mean `t/(2 Nₑ)` and `4 Nₑ r` everywhere else in this corpus, and a name carrying one
+meaning in `Coalescent` and another in `PopGen` is the collision `validation/conventions.json`
+exists to catch, arriving in a binder where no ledger looks.
+
+Neither quantity here is a coalescent scaling. `autocorrTime` is in GENERATIONS and is not
+divided by an effective size; `effectCorr` is a correlation in the unit interval. Giving
+them `Core.Tau` and `Core.Rho` would have been wrong, and leaving them under those names
+would have made the linter's report unreadable for the ones that are real. -/
+
 /-- **Fluctuating selection accelerates effect turnover.**
     Under fluctuating selection with autocorrelation time τ,
     the effect correlation decays as ρ(t) = exp(-t/τ).
@@ -316,20 +330,6 @@ section DiversifyingSelection
     Power: the prediction spans 0.00034 to 0.84648, and the two cells that share
     a predicted 0.13534 at different `(tau, t)` check that only the ratio
     matters. -/
-/-! ### A note on two names this section does NOT use
-
-The relaxation time of the Ornstein--Uhlenbeck optimum is spelled `autocorrTime` and the
-observed effect correlation is spelled `effectCorr`. Both were `tau` and `rho` until
-`Meta.Linters.scaledQuantityUntyped` reported them, and it was right to: `tau` and `rho`
-mean `t/(2 Nₑ)` and `4 Nₑ r` everywhere else in this corpus, and a name carrying one
-meaning in `Coalescent` and another in `PopGen` is the collision `validation/conventions.json`
-exists to catch, arriving in a binder where no ledger looks.
-
-Neither quantity here is a coalescent scaling. `autocorrTime` is in GENERATIONS and is not
-divided by an effective size; `effectCorr` is a correlation in the unit interval. Giving
-them `Core.Tau` and `Core.Rho` would have been wrong, and leaving them under those names
-would have made the linter's report unreadable for the ones that are real. -/
-
 noncomputable def fluctuatingEffectCorrelation (t autocorrTime : ℝ) : ℝ :=
   Real.exp (-t / autocorrTime)
 
