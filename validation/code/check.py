@@ -3478,6 +3478,40 @@ def check_bridges(c: Corpus) -> list[Finding]:
     return out
 
 
+# Files whose custom syntax IS the corpus's mechanism for enumerating unproved
+# statements, rather than a way of smuggling one in.
+#
+# `Meta/Informal.lean` declares `informal_lemma`, `informal_definition`, `TODO`
+# and `withdrawn`; `Meta/InformalLint.lean` reports on them. Their design point,
+# stated at length in `Informal.lean`'s own module docstring, is that a gap
+# pushes a record into an environment extension and ADDS NO CONSTANT -- "not a
+# `sorry`, not an axiom, not an opaque constant" -- precisely so that no proof
+# can rest on one. That is the opposite of a trust bypass, and it is stricter
+# than the PhysLean design it is taken from, which does emit an inert record.
+#
+# These six findings are the only FATAL ones in the guard, so they gate it
+# entirely: `laundering` has been failing on the two files that exist to stop
+# the thing it is looking for, and every real FATAL would have arrived into a
+# guard already red.
+#
+# THE EXEMPTION CHECKS ITS OWN PREMISE. It covers only the two
+# "custom syntax or elaborator" patterns, never `native_decide`, `unsafe`,
+# `opaque` or `@[implemented_by]`; and it lapses the moment an exempted file
+# acquires any of those, or an `axiom` or a `sorry`. An exemption that cannot
+# expire is indistinguishable from not looking.
+TRUST_BYPASS_EXEMPT = {
+    "Descent/Meta/Informal.lean":
+        "declares the gap vocabulary itself; a gap is an environment-extension "
+        "record and emits no constant, so nothing downstream can cite one",
+    "Descent/Meta/InformalLint.lean":
+        "reports on that vocabulary; it reads the extension and declares no "
+        "constant of its own",
+}
+_EXEMPTION_VOIDED = re.compile(
+    r"\bnative_decide\b|^\s*(?:unsafe|opaque)\s+|@\[implemented_by"
+    r"|^\s*axiom\s+|\bsorry\b", re.M)
+
+
 def check_files(c: Corpus) -> list[Finding]:
     """Whole-file syntax that bypasses trust, and dead concrete constructions."""
     out: list[Finding] = []
@@ -3485,6 +3519,8 @@ def check_files(c: Corpus) -> list[Finding]:
     for rel in sorted(seen_files):
         src = (CORPUS_BASE / rel).read_text(encoding="utf-8", errors="replace")  # abs rel is a no-op
         m = mask(src)
+        exempt = (rel in TRUST_BYPASS_EXEMPT
+                  and not _EXEMPTION_VOIDED.search(m))
         for pat, fam, msg in [
             (r"\bnative_decide\b", "F24", "`native_decide` moves the compiler into the "
                                           "trusted base"),
@@ -3505,6 +3541,8 @@ def check_files(c: Corpus) -> list[Finding]:
         ]:
             for mo in re.finditer(pat, m, re.M):
                 if fam == "F24_INFO":
+                    continue
+                if exempt and msg == "custom syntax or elaborator":
                     continue
                 out.append(Finding(fam, rel, m.count("\n", 0, mo.start()) + 1,
                                    "<file>", msg))
