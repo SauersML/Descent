@@ -850,7 +850,24 @@ theorem faster_decay_lower_correlation
     established is that the decay is hyperbolic in genetic distance and not
     exponential in it, which is what this body gets wrong -- and, as the
     paragraph above already says, no choice of `λ_LD` repairs a two-sided
-    failure. -/
+    failure.
+
+    **The successor is `PopGen.LDDecayTheory.ohtaKimuraSigmaDSq`**, and the
+    withdrawal above named none, which leaves a consumer holding a falsified
+    shape with nowhere to go. `simcov/battery_sved01.py` puts the same question
+    to a forward two-locus Wright-Fisher engine rather than to msprime -- a
+    different model class, a different estimator, no binning -- and over
+    `ρ = 4·Nₑ·c` from 0.5 to 20 the Ohta-Kimura form MATCHES at worst 1.85 sems
+    while this body's exponential shape is FALSIFIED at 6.29 sems and 36%
+    relative. The exponential there is fitted to the very curve it is tested
+    against, with a free amplitude AND a free rate, and the hyperbola is given
+    no fitted constant at all; so the failure cannot be a badly chosen `λ_LD`,
+    because it was chosen optimally.
+
+    Sved's `1/(1 + 4·Nₑ·c)` is NOT the successor, and that battery was written
+    to make it one. It is falsified at 17.6 sems in the same place, and `E[r²]`
+    -- the expectation of the ratio, which is what an `r²` curve looks like a
+    curve of -- has no mutation-free equilibrium to measure. -/
 @[withdrawn "OQ-2-ld-decay-ohta-kimura-attribution"
   "this body was attributed to Ohta-Kimura; that result is hyperbolic in the \
    scaled recombination rate, and no published neutral two-locus theory in the \

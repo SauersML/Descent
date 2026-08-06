@@ -2443,7 +2443,40 @@ correlation decays exponentially with recombination distance and divergence.
     dependence was falsified and the body was corrected, so that fault is gone;
     the exponential shape was falsified and the body still carries it, so that
     fault is live. A record that averaged the two into one verdict would hide
-    which of them a reader still has to work around. -/
+    which of them a reader still has to work around.
+
+    **THE SUCCESSOR IS ALREADY IN THE CORPUS, and it is
+    `PopGen.LDDecayTheory.ohtaKimuraSigmaDSq`.** Every previous refutation of
+    the exponential came from ONE simulator and one fitting procedure --
+    binned `r²` off msprime -- so the shape was rejected without a replacement
+    a consumer could move to, which leaves the falsified shape in use.
+    `simcov/battery_sved01.py` puts the question to a forward two-locus
+    Wright-Fisher engine instead, a different model class with a different
+    estimator and no binning, and measures `σ_d² = E[D²]/E[pq p'q']` over
+    `ρ = 4·Nₑ·c` from 0.5 to 20:
+
+    | shape | worst cell |
+    |---|---|
+    | `ohtaKimuraSigmaDSq`, `(10+ρ)/((2+ρ)(11+ρ))` | **1.85 sems** |
+    | this body's shape, `A·exp(-k·ρ)` | 6.29 sems (36% relative) |
+    | Sved's `1/(1+ρ)` | 17.6 sems (86% relative) |
+
+    The exponential there is FITTED BY LEAST SQUARES TO THE VERY CURVE IT IS
+    TESTED AGAINST, with a free amplitude AND a free rate, while the two
+    hyperbolic forms are given no fitted constant at all. It still loses, which
+    is the strongest form the claim can take: the failure cannot be a badly
+    chosen `lambda`, because `lambda` was chosen optimally and the shape still
+    does not fit. The control -- with recombination off, `E[D]` must decay by
+    exactly `1 - 1/(2Nₑ)` per generation -- passed at 0.01 sems.
+
+    What that battery did NOT do is add Sved's `E[r²] = 1/(1+4Nₑc)` as the
+    successor, which is what it was written to do. `E[r²]` has no mutation-free
+    equilibrium to measure: at a mutation rate low enough to leave the
+    drift-recombination equilibrium intact the loci fix and the average is over
+    the remnant nearest to fixation, and at one high enough to keep them
+    polymorphic the measured `σ_d²` falls to 0.143 against Ohta-Kimura's 0.365.
+    The ratio of expectations survives both; the expectation of the ratio does
+    not. -/
 noncomputable def ldCorrelationDecay (distance fstGap lambda : ℝ) : ℝ :=
   Real.exp (-(lambda * Real.sqrt fstGap * distance))
 

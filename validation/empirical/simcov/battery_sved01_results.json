@@ -1,0 +1,206 @@
+{
+ "_battery_sha": "74b55f18dd8196cc",
+ "results": [
+  {
+   "name": "ohtaKimuraSigmaDSq",
+   "file": "LDDecayTheory.lean",
+   "source": "(10 + rho) / ((2 + rho) * (11 + rho)), rho = 4*Ne*c",
+   "note": "",
+   "regime": "neutral two-locus forward Wright-Fisher, Ne=150 diploids, 600 replicates, mutation mu=1e-4 both ways (4*Ne*mu = 0.06, so the equilibrium under test is drift-recombination and not mutation-drift), burn-in of 6*Ne generations then 2000 sampled every 20th. rho = 4*Ne*c runs 0.5 to 20, reaching below the rho=10 where Ohta-Kimura and Sved converge -- above it the grid would validate both and decide nothing. The observable is sigma_d^2 = mean(D^2)/mean(p(1-p)q(1-q)), the ratio of expectations, which is the quantity the Ohta-Kimura closed form is a closed form of. E[r^2], the expectation of the ratio, is printed per cell as a diagnostic and carries no verdict: it has no mutation-free equilibrium to measure here, and the mutation rate that makes it well defined destroys the equilibrium both theories describe. The exponential rival is fitted to this same curve with a free amplitude AND a free rate, so it is asked only to describe the data while the two hyperbolic forms are given no fitted constant at all",
+   "span": 0.8795559279430246,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rho=10.0 (Ne=150)",
+    "lean": 0.07936507936507936,
+    "truth": 0.08791916795452309,
+    "sem": 0.004619699074471358,
+    "sems_off": 1.851654934996517,
+    "rel_err": 0.09729492201141397
+   },
+   "cells": [
+    {
+     "design": "rho=0.5 (Ne=150)",
+     "lean": 0.3652173913043478,
+     "truth": 0.35770593944243356,
+     "sem": 0.017517135662772576,
+     "sems_off": 0.42880594216539664,
+     "rel_err": 0.020998957617596674
+    },
+    {
+     "design": "rho=1.0 (Ne=150)",
+     "lean": 0.3055555555555556,
+     "truth": 0.2944084186471142,
+     "sem": 0.015250277724128194,
+     "sems_off": 0.7309464857026807,
+     "rel_err": 0.037862833405598484
+    },
+    {
+     "design": "rho=2.0 (Ne=150)",
+     "lean": 0.23076923076923078,
+     "truth": 0.2358158083520264,
+     "sem": 0.011878301819986167,
+     "sems_off": 0.4248568237510479,
+     "rel_err": 0.021400505835732907
+    },
+    {
+     "design": "rho=5.0 (Ne=150)",
+     "lean": 0.13392857142857142,
+     "truth": 0.128927463940765,
+     "sem": 0.007391102245292047,
+     "sems_off": 0.6766389263512077,
+     "rel_err": 0.038790086572277116
+    },
+    {
+     "design": "rho=10.0 (Ne=150)",
+     "lean": 0.07936507936507936,
+     "truth": 0.08791916795452309,
+     "sem": 0.004619699074471358,
+     "sems_off": 1.851654934996517,
+     "rel_err": 0.09729492201141397
+    },
+    {
+     "design": "rho=20.0 (Ne=150)",
+     "lean": 0.04398826979472141,
+     "truth": 0.042499284714677885,
+     "sem": 0.0021712488487466153,
+     "sems_off": 0.685773572616084,
+     "rel_err": 0.035035532716372476
+    }
+   ]
+  },
+  {
+   "name": "ohtaKimuraSigmaDSq [Sved's 1/(1+rho) in its place, competing]",
+   "file": "LDDecayTheory.lean",
+   "source": "1 / (1 + rho)",
+   "note": "positive control 'no recombination: E[D_t] must decay by (1 - 1/(2Ne)) per generation' passed at 0.01 sems",
+   "regime": "neutral two-locus forward Wright-Fisher, Ne=150 diploids, 600 replicates, mutation mu=1e-4 both ways (4*Ne*mu = 0.06, so the equilibrium under test is drift-recombination and not mutation-drift), burn-in of 6*Ne generations then 2000 sampled every 20th. rho = 4*Ne*c runs 0.5 to 20, reaching below the rho=10 where Ohta-Kimura and Sved converge -- above it the grid would validate both and decide nothing. The observable is sigma_d^2 = mean(D^2)/mean(p(1-p)q(1-q)), the ratio of expectations, which is the quantity the Ohta-Kimura closed form is a closed form of. E[r^2], the expectation of the ratio, is printed per cell as a diagnostic and carries no verdict: it has no mutation-free equilibrium to measure here, and the mutation rate that makes it well defined destroys the equilibrium both theories describe. The exponential rival is fitted to this same curve with a free amplitude AND a free rate, so it is asked only to describe the data while the two hyperbolic forms are given no fitted constant at all",
+   "span": 0.9285714285714286,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.5 (Ne=150)",
+    "lean": 0.6666666666666666,
+    "truth": 0.35770593944243356,
+    "sem": 0.017517135662772576,
+    "sems_off": 17.637628272802417,
+    "rel_err": 0.8637282559686288
+   },
+   "cells": [
+    {
+     "design": "rho=0.5 (Ne=150)",
+     "lean": 0.6666666666666666,
+     "truth": 0.35770593944243356,
+     "sem": 0.017517135662772576,
+     "sems_off": 17.637628272802417,
+     "rel_err": 0.8637282559686288
+    },
+    {
+     "design": "rho=1.0 (Ne=150)",
+     "lean": 0.5,
+     "truth": 0.2944084186471142,
+     "sem": 0.015250277724128194,
+     "sems_off": 13.481169659461973,
+     "rel_err": 0.6983210001182519
+    },
+    {
+     "design": "rho=2.0 (Ne=150)",
+     "lean": 0.3333333333333333,
+     "truth": 0.2358158083520264,
+     "sem": 0.011878301819986167,
+     "sems_off": 8.209719407636713,
+     "rel_err": 0.413532602681719
+    },
+    {
+     "design": "rho=5.0 (Ne=150)",
+     "lean": 0.16666666666666666,
+     "truth": 0.128927463940765,
+     "sem": 0.007391102245292047,
+     "sems_off": 5.106031749180659,
+     "rel_err": 0.2927165521788337
+    },
+    {
+     "design": "rho=10.0 (Ne=150)",
+     "lean": 0.09090909090909091,
+     "truth": 0.08791916795452309,
+     "sem": 0.004619699074471358,
+     "sems_off": 0.6472116270711774,
+     "rel_err": 0.034007634786925894
+    },
+    {
+     "design": "rho=20.0 (Ne=150)",
+     "lean": 0.047619047619047616,
+     "truth": 0.042499284714677885,
+     "sem": 0.0021712488487466153,
+     "sems_off": 2.357980711112496,
+     "rel_err": 0.12046703700407294
+    }
+   ]
+  },
+  {
+   "name": "ohtaKimuraSigmaDSq [the withdrawn exponential shape, amplitude and rate fitted to this very curve, competing]",
+   "file": "LDDecayTheory.lean",
+   "source": "A * exp(-k * rho), A and k free",
+   "note": "positive control 'no recombination: E[D_t] must decay by (1 - 1/(2Ne)) per generation' passed at 0.01 sems",
+   "regime": "neutral two-locus forward Wright-Fisher, Ne=150 diploids, 600 replicates, mutation mu=1e-4 both ways (4*Ne*mu = 0.06, so the equilibrium under test is drift-recombination and not mutation-drift), burn-in of 6*Ne generations then 2000 sampled every 20th. rho = 4*Ne*c runs 0.5 to 20, reaching below the rho=10 where Ohta-Kimura and Sved converge -- above it the grid would validate both and decide nothing. The observable is sigma_d^2 = mean(D^2)/mean(p(1-p)q(1-q)), the ratio of expectations, which is the quantity the Ohta-Kimura closed form is a closed form of. E[r^2], the expectation of the ratio, is printed per cell as a diagnostic and carries no verdict: it has no mutation-free equilibrium to measure here, and the mutation rate that makes it well defined destroys the equilibrium both theories describe. The exponential rival is fitted to this same curve with a free amplitude AND a free rate, so it is asked only to describe the data while the two hyperbolic forms are given no fitted constant at all",
+   "span": 0.8699292019641621,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=5.0 (Ne=150)",
+    "lean": 0.17538715319013337,
+    "truth": 0.128927463940765,
+    "sem": 0.007391102245292047,
+    "sems_off": 6.28589454014955,
+    "rel_err": 0.36035525581046096
+   },
+   "cells": [
+    {
+     "design": "rho=0.5 (Ne=150)",
+     "lean": 0.2808133974548226,
+     "truth": 0.35770593944243356,
+     "sem": 0.017517135662772576,
+     "sems_off": 4.389561368244869,
+     "rel_err": 0.21496020476334715
+    },
+    {
+     "design": "rho=1.0 (Ne=150)",
+     "lean": 0.2665044625458214,
+     "truth": 0.2944084186471142,
+     "sem": 0.015250277724128194,
+     "sems_off": 1.8297342911430807,
+     "rel_err": 0.09477974926640682
+    },
+    {
+     "design": "rho=2.0 (Ne=150)",
+     "lean": 0.2400367892029421,
+     "truth": 0.2358158083520264,
+     "sem": 0.011878301819986167,
+     "sems_off": 0.35535221405248213,
+     "rel_err": 0.017899482144193752
+    },
+    {
+     "design": "rho=5.0 (Ne=150)",
+     "lean": 0.17538715319013337,
+     "truth": 0.128927463940765,
+     "sem": 0.007391102245292047,
+     "sems_off": 6.28589454014955,
+     "rel_err": 0.36035525581046096
+    },
+    {
+     "design": "rho=10.0 (Ne=150)",
+     "lean": 0.10395955108739599,
+     "truth": 0.08791916795452309,
+     "sem": 0.004619699074471358,
+     "sems_off": 3.4721705622586327,
+     "rel_err": 0.18244466486727806
+    },
+    {
+     "design": "rho=20.0 (Ne=150)",
+     "lean": 0.03652562270610372,
+     "truth": 0.042499284714677885,
+     "sem": 0.0021712488487466153,
+     "sems_off": 2.751256269875537,
+     "rel_err": 0.14055911878702881
+    }
+   ]
+  }
+ ]
+}
