@@ -96,6 +96,18 @@ instance chainTrajFrom_isProbabilityMeasure (n : ℕ) (ξ : ER n) :
   unfold chainTrajFrom
   infer_instance
 
+/-- **The time-indexed family is the one-step kernel, read at the current coordinate.**
+
+The docstrings above say that every modelling commitment is already in
+`Descent.Coalescent.Kernel.jumpKernel` and that the extension adds only measure theory, and
+that was a claim no statement carried: `chainStepKernel` could have been built from a
+different kernel, or from the wrong coordinate of the past, and nothing here would have
+failed.  This says which kernel and which coordinate, so the Markov property the extension
+assumes is checked against the one-step law rather than asserted alongside it. -/
+theorem chainStepKernel_apply (n k : ℕ) (x : Π _i : Iic k, ER n) :
+    chainStepKernel n k x = jumpKernel n (x ⟨k, mem_Iic.mpr le_rfl⟩) := by
+  simp [chainStepKernel, Kernel.comap_apply]
+
 /-- **The process starts where it is told to.**  The trajectory law's restriction to times
 `≤ 0` is the point mass at the starting state -- `Kernel.traj`'s defining property, that the
 entries with index `≤ a` are those of the argument, read at `a = 0`.

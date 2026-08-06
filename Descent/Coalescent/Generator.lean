@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StateSpace
+import Descent.Coalescent.WrightFisher
 import Mathlib.Analysis.Normed.Ring.Basic
 import Mathlib.Tactic
 
@@ -139,6 +140,28 @@ theorem prodUpTo_const {M : Type*} [Monoid M] (A : M) (r : ℕ) :
   | zero => simp
   | succ m ih =>
       rw [prodUpTo_succ, ih, pow_succ]
+
+/-! ### The ordered product against the one K-G (2.11) is counted as -/
+
+/-- An ordered product up to `r` is the product over `range r`, when the factors commute. -/
+theorem prodUpTo_eq_prod_range {M : Type*} [CommMonoid M] (A : ℕ → M) (r : ℕ) :
+    prodUpTo A r = ∏ i ∈ range r, A i := by
+  induction r with
+  | zero => simp
+  | succ r ih =>
+      rw [prodUpTo_succ, ih, Finset.prod_range_succ]
+
+/-- **Wright-Fisher's no-collision probability is one of these products.**
+
+The header describes this file as supplying K-G (2.13), the middle step, with (2.11) counted
+in `Descent.Coalescent.WrightFisher` and (2.14) the two combined -- and the two steps had no
+statement between them, so `prodUpTo` was a contraction estimate about nothing in this
+development. Here the ordered product is the one Wright-Fisher actually forms: the `i`-th
+lineage placed avoids the `i` parents already used with probability `1 - i/N`, and the
+no-collision probability is exactly those factors multiplied in order. -/
+theorem noCoalescenceProb_eq_prodUpTo {N k : ℕ} (hN : 0 < N) (hkN : k ≤ N) :
+    noCoalescenceProb N k = prodUpTo (fun i : ℕ ↦ 1 - (i : ℝ) / (N : ℝ)) k := by
+  rw [noCoalescenceProb_eq_prod hN hkN, prodUpTo_eq_prod_range]
 
 end Coalescent
 

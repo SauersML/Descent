@@ -108,6 +108,34 @@ theorem tendsto_colourFrequency [MeasureSpace Ω] [IsProbabilityMeasure (ℙ : M
   rw [← hmean]
   exact hω
 
+/-! ### The indicator against the relation it is an indicator for -/
+
+/-- **Two balls the indicator picks out for one non-zero colour are one paintbox class.**
+
+The definition above says the indicator is summed to give "the size of the `r`-th class of
+`ρ_n R`", and the theorem above says that "for an i.i.d. colouring the classes of the
+paintbox relation K-C (3.4) are the colour classes" -- both about `paintboxRel`, neither
+stated against it.  So the frequency proved to converge was the frequency of a colour, and
+that it is the frequency of a CLASS was carried by the prose alone; a colouring convention
+that made colour `0` ordinary would have broken the reading and no theorem here would have
+noticed.
+
+`1 ≤ r` is the whole of the condition, and it is not decoration: colour `0` is the special
+one that makes singletons (`paintboxRel_zero`), so the balls it marks are exactly the ones
+whose frequency is not a class frequency. -/
+theorem paintboxRel_of_colourIndicator {Z : ℕ → Ω → ℕ} {r i j : ℕ} (ω : Ω) (hr : 1 ≤ r)
+    (hi : colourIndicator Z r i ω = 1) (hj : colourIndicator Z r j ω = 1) :
+    (paintboxRel (fun s ↦ Z s ω)).r i j := by
+  have hZi : Z i ω = r := by
+    by_contra h
+    simp only [colourIndicator, if_neg h] at hi
+    exact absurd hi (by norm_num)
+  have hZj : Z j ω = r := by
+    by_contra h
+    simp only [colourIndicator, if_neg h] at hj
+    exact absurd hj (by norm_num)
+  exact paintboxRel_of_eq (Z := fun s ↦ Z s ω) (hZi.trans hZj.symm) (by simpa [hZi] using hr)
+
 end Coalescent
 
 end Descent
