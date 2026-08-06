@@ -1061,6 +1061,31 @@ def run_identifications() -> int:
     # a significance threshold is asking a sum of `q`-th powers to declare an
     # alpha level.
     EXPONENT_ARG = re.compile(r"\b(power|order|exponent|degree)\b[^:)]*:\s*ℕ")
+    # That test reads the exponent's NAME, so it sees `ldPowerScore (power : ℕ)` and misses
+    # `power (a : ℝ) (n : ℕ) := a ^ n` -- the corpus's own algebraic power, whose exponent is
+    # called `n` like every exponent in ordinary mathematical writing. The decisive evidence
+    # is not what the binder is called but what the body DOES with it: a definition that
+    # raises something to a natural-number binder is exponentiating, and asking `a ^ n` for a
+    # significance threshold is asking the same of `Nat.pow`.
+    NAT_BINDER = re.compile(r"[({]\s*([^:()}{]+?)\s*:\s*(?:ℕ|Nat)\s*[)}]")
+
+    def exponentiates(args: str, tail: str) -> bool:
+        for b in NAT_BINDER.finditer(args):
+            for v in b.group(1).split():
+                if re.search(r"\^\s*\(?\s*" + re.escape(v) + r"\b", tail):
+                    return True
+        return False
+
+    # A MONOTONE ARGUMENT IS NOT THE OBSERVABLE. `aucArgument` is `R²/(1-R²)`, and its
+    # docstring states the relation exactly: "the equal-variance Gaussian AUC is `Φ` of a
+    # strictly increasing function of this". Naming the argument rather than writing a wrong
+    # closed form is a deliberate discipline here -- the corpus has no Mathlib `Φ` -- and
+    # every ordering statement about the AUC is one about the argument, which is the whole
+    # point of isolating it. Prevalence enters when a liability scale is carried to an
+    # observed one; it does not enter `R²/(1-R²)`, and no binder could be added that the
+    # quantity depends on. So this screen must read the trailing segment: `<X>Argument` is
+    # what X is a function OF, not X.
+    MONOTONE_ARGUMENT = re.compile(r"(?:Argument|Arg)$")
     missing = []
     REQUIRED_ARGS = [(p if hasattr(p, "search") else re.compile(p, re.I), a, w)
                      for p, a, w in REQUIRED_ARGS]
@@ -1076,6 +1101,10 @@ def run_identifications() -> int:
             name, args = m.group(1).split(".")[-1], m.group(2)
             if name in PREVALENCE_FREE or re.search(r"gaussian|interval|approximation", name, re.I):
                 continue   # name declares the model it is exact for, or is a wrapper
+            if MONOTONE_ARGUMENT.search(name):
+                continue   # the argument of the formula, not the formula
+            tail = re.split(r"\n(?=@\[|theorem |def |noncomputable |abbrev |instance |end )",
+                            body_all[m.end():], maxsplit=1)[0]
             doc = ident_preceding_docstring(raw_lines, body_all[:m.start()].count("\n"))
             # A `Prop` RELATING metrics does not compute one, so it cannot have
             # omitted an argument the computation depends on: `AucDropsAndCitlWorsens`
@@ -1088,7 +1117,8 @@ def run_identifications() -> int:
                     continue
                 if any(re.search(a, args, re.I) for a in needed):
                     continue
-                if pat.pattern == r"power" and EXPONENT_ARG.search(args):
+                if pat.pattern == r"power" and (EXPONENT_ARG.search(args) or
+                                                exponentiates(args, tail)):
                     continue
                 if REGIME_DECLARED.search(doc):
                     continue   # omission is exact in a regime the docstring names
@@ -1755,7 +1785,33 @@ def run_identifications() -> int:
             return True
         return re.search(r"(?<![:<>!])=(?!=)", goal) is not None
 
-    def attributed_identity(doc):
+    # A GROUND IS NOT THE CLAIM. `meanTime_le_sum` says the skipped sojourn "is exactly
+    # recovered from the `k - 1` levels it skips, BECAUSE `Σ_k (k-1) p_{b,k} = γ_b/λ_b` by
+    # the definition of the decrease rate". The attribution's complement is a recovery, not
+    # an equation; the equation is the reason offered for it, and it is already in the
+    # signature as `hdrift`. Requiring only that verb and equation share a sentence reads
+    # the ground as the claim, and the repair it then demands -- put the identity in the
+    # conclusion -- would move a hypothesis into the goal.
+    SUBORDINATOR = re.compile(r"\b(?:because|since|provided|whenever|given\s+that|"
+                              r"by\s+the\s+definition\s+of)\b", re.I)
+
+    def equation_tokens(s, at):
+        """Identifiers in the code span carrying the equation, or in the whole sentence."""
+        for span in re.finditer(r"`([^`]*)`", s):
+            if span.start() < at < span.end():
+                return set(re.findall(r"[A-Za-z_][A-Za-z_0-9₀-₉']*", span.group(1)))
+        return set(re.findall(r"[A-Za-z_][A-Za-z_0-9₀-₉']*", s))
+
+    def attributed_identity(doc, header):
+        # AN EQUATION THIS DECLARATION CANNOT BE COMPARED TO IS NOT A CLAIM ABOUT IT.
+        # `covers_nonempty` says a missing next state "is exactly the absorbing case
+        # `k = 1`". No `k` occurs anywhere in that declaration -- it is about `ξ` and
+        # `blocks ξ` -- so the equation names a neighbouring case in the module's informal
+        # notation rather than stating anything this conclusion could deliver. It is in fact
+        # the case the theorem EXCLUDES, since it assumes `2 ≤ blocks ξ`, so the demanded
+        # repair asks the conclusion to state the negation of its own hypothesis. A real
+        # attribution is written in the declaration's own names and still fires.
+        names = set(re.findall(r"[A-Za-z_][A-Za-z_0-9₀-₉']*", header))
         for s in re.split(r"(?<=\.)\s+", doc):
             if STRATEGY.match(s.strip()):
                 continue
@@ -1767,7 +1823,14 @@ def run_identifications() -> int:
             # "We show MSE(l*) < MSE(1) = sigma^2" claims a bound.
             if COMPARATOR.search(s[:eq.start()]):
                 continue
-            if any(re.search(p, s, re.I) for p in ATTRIBUTION):
+            if not (equation_tokens(s, eq.start()) & names):
+                continue
+            for p in ATTRIBUTION:
+                am = re.search(p, s, re.I)
+                if not am:
+                    continue
+                if am.end() <= eq.start() and SUBORDINATOR.search(s[am.end():eq.start()]):
+                    continue
                 return " ".join(s.split())[:120]
         return None
 
@@ -1782,9 +1845,10 @@ def run_identifications() -> int:
             nxt = re.search(r"\n(?=/--|@\[|theorem |noncomputable |def |abbrev |"
                             r"structure |section |end |namespace )", block)
             block = block[:nxt.start()] if nxt else block
-            if delivers_identity(goal_of(header_of(block))):
+            header = header_of(block)
+            if delivers_identity(goal_of(header)):
                 continue
-            claim = attributed_identity(doc)
+            claim = attributed_identity(doc, name + " " + header)
             if claim:
                 underdelivered.append(
                     f"{os.path.relpath(f, IDENT_ROOT)}:{raw[:m.start()].count(chr(10)) + 1}: "

@@ -87,6 +87,17 @@ theorem IsLambdaShape.isShape {s : MergerShape} (h : IsLambdaShape s) : IsShape 
   rw [hj]
   exact hk
 
+/-- **The pairwise merger is a Kingman shape.**  The witness the nesting needs: without one
+concrete shape in the class, `IsKingmanShape` is a hypothesis no object is known to satisfy
+and everything proved under it is vacuous.  This is K-C (1.3)'s own move -- two blocks
+coalesce and no others -- so the class is inhabited by the merger it was written to name. -/
+theorem isKingmanShape_pair : IsKingmanShape ({2} : MergerShape) := rfl
+
+/-- **Every single group of two or more is a `Λ`-shape**, so that family is inhabited at each
+group size rather than only at the Kingman end. -/
+theorem isLambdaShape_singleton {k : ℕ} (hk : 2 ≤ k) : IsLambdaShape ({k} : MergerShape) :=
+  ⟨k, hk, rfl⟩
+
 /-- **A `Λ`-merger of `k` blocks costs `k - 1`**, matching
 `MultiMerge.blocks_mergeSet` exactly: `|S|` blocks become one. -/
 theorem shapeDrop_lambda {s : MergerShape} {k : ℕ} (h : s = {k}) : shapeDrop s = k - 1 := by
@@ -97,6 +108,11 @@ theorem shapeDrop_lambda {s : MergerShape} {k : ℕ} (h : s = {k}) : shapeDrop s
 /-- **A Kingman merger costs one block**, which is K-C (1.4). -/
 theorem shapeDrop_kingman {s : MergerShape} (h : IsKingmanShape s) : shapeDrop s = 1 := by
   rw [shapeDrop_lambda h]
+
+/-- **A pairwise merger costs exactly one block**, the nesting's two ends met on a witness:
+`shapeDrop_kingman` applied to `isKingmanShape_pair` rather than to an assumption. -/
+theorem shapeDrop_pair : shapeDrop ({2} : MergerShape) = 1 :=
+  shapeDrop_kingman isKingmanShape_pair
 
 /-- The drop is additive over groups, which is what makes simultaneous mergers
 simultaneous: `r` groups merging at once cost what they would cost one at a time. -/
