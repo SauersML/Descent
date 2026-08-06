@@ -181,12 +181,36 @@ jobs:
         run: python3 test_lean_semantics.py
 
       - name: Regenerate the extracted definition table
-        # defs.json and lean_defs.py are generated, never committed: they are
-        # derived from Descent/ and a committed snapshot drifts. CI
-        # must build them from the revision under test, which is also what
-        # makes the battery below evidence about THIS commit rather than about
-        # whenever someone last refreshed a cache.
+        # This comment used to say defs.json and lean_defs.py are "generated,
+        # never committed". They are committed, and so is classes.json; the
+        # comment described an intent and the repository did the other thing.
+        # CI rebuilds them from the revision under test, which is what makes
+        # the battery below evidence about THIS commit -- but the COMMITTED
+        # copies are what every local analysis reads, and those had drifted:
+        # classes.json held 2,222 declarations against a corpus of 2,313, so
+        # Core/Decision's 2,387 lines of PPV, net benefit and NRI were invisible
+        # to it while being present in the corpus.
         run: python3 validation/empirical/extract/emit.py
+
+      # STALENESS IS A FAILURE, not a note. The step above regenerates the
+      # tables; this one fails if the regenerated tables differ from what is
+      # committed. That is the whole gate: a committed extract that does not
+      # match the corpus is a table every offline reader trusts and none of
+      # them can tell is wrong, and the failure mode is silent under-reporting
+      # -- a declaration absent from the extract has no coverage debt, no
+      # ledger row and no finding, which reads exactly like a clean one.
+      #
+      # The repair when this fails is to run `emit.py` and commit the result,
+      # in the same commit as the declarations that moved it.
+      - name: The committed extract must match the corpus
+        run: |
+          git diff --exit-code -- \
+            validation/empirical/extract/classes.json \
+            validation/empirical/extract/defs.json \
+            validation/empirical/extract/lean_defs.py \
+          || { echo "::error::The committed extract is stale. Run" \
+                    "python3 validation/empirical/extract/emit.py and commit the result."; \
+               exit 1; }
 
       # The identity gate's calibration runs BEFORE the battery, for the same
       # reason the laundering calibration runs before check.py. The identity

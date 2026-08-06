@@ -78,6 +78,18 @@ def Descent_Blindness_BundleFamily_modulus(family, j, t):
 def massAt(family, t, v):
     return sum(((_rt._proj(family, 'atomMass')(j, t) if (Descent_Blindness_BundleFamily_modulus(family, j, t) == v) else 0.0)) for j in range(int(_rt.sumdim('j', len(_rt._proj(family, 'atomMass'))))))
 
+def spectrumModulusLaw(family, panel, v):
+    return sum(((_rt._proj(panel, 'weight')(i) * massAt(family, (_rt._proj(panel, 'support')(i)), v))) for i in range(int(_rt.sumdim('i', len(_rt._proj(panel, 'weight')), len(_rt._proj(panel, 'support'))))))
+
+def addWeights(panel, other):
+    return {'support': _rt._proj(panel, 'support'), 'weight': (lambda i: (_rt._proj(panel, 'weight')(i) + _rt._proj(other, 'weight')(i)))}
+
+def smulWeights(c, panel):
+    return {'support': _rt._proj(panel, 'support'), 'weight': (lambda i: (c * _rt._proj(panel, 'weight')(i)))}
+
+def Descent_Blindness_Covers(family, panel, i, v):
+    return (massAt(family, (_rt._proj(panel, 'support')(i)), v) != 0.0)
+
 def gaussianJetVariance():
     return (_rt.rdiv(_rt.lpow(_rt.pi, 2.0), 2.0) - 4.0)
 
@@ -1122,8 +1134,59 @@ def threeMechanismMixture(u, v):
 def expanderAgreementFloor():
     return (_rt.rdiv(1.0, 2.0) - _rt.rdiv(_rt.rsqrt(5.0), 6.0))
 
-def ploidy():
-    return 2.0
+def positivePredictiveValue(o, prevalence):
+    return share(((_rt._proj(o, 'sensitivity') * prevalence)), ((((1.0 - _rt._proj(o, 'specificity'))) * ((1.0 - prevalence)))))
+
+def negativePredictiveValue(o, prevalence):
+    return share(((_rt._proj(o, 'specificity') * ((1.0 - prevalence)))), ((((1.0 - _rt._proj(o, 'sensitivity'))) * prevalence)))
+
+def Descent_Core_OperatingPoint_precision(o, prevalence):
+    return identifiedWith((positivePredictiveValue(o, prevalence)))
+
+def Descent_Core_OperatingPoint_recallRate(o):
+    return identifiedWith(_rt._proj(o, 'sensitivity'))
+
+def f1(o, prevalence):
+    return ratio((((2.0 * (Descent_Core_OperatingPoint_precision(o, prevalence))) * (Descent_Core_OperatingPoint_recallRate(o)))), ((Descent_Core_OperatingPoint_precision(o, prevalence) + Descent_Core_OperatingPoint_recallRate(o))))
+
+def thresholdOdds(t):
+    return ratio(t, (complement(t)))
+
+def netBenefit(o, prevalence, t):
+    return ((prevalence * _rt._proj(o, 'sensitivity')) - ((((1.0 - prevalence)) * ((1.0 - _rt._proj(o, 'specificity')))) * thresholdOdds(t)))
+
+def nriEventComponent(old, new):
+    return difference(_rt._proj(new, 'sensitivity'), _rt._proj(old, 'sensitivity'))
+
+def nriNonEventComponent(old, new):
+    return difference(_rt._proj(new, 'specificity'), _rt._proj(old, 'specificity'))
+
+def nriFromOperatingPoints(old, new):
+    return Descent_Core_sum((nriEventComponent(old, new)), (nriNonEventComponent(old, new)))
+
+def momentPPV(L, m, prevalence):
+    return _rt._proj((_rt._proj(L, 'point')(Descent_Core_ScoreMoments_r2(m))), 'positivePredictiveValue')(prevalence)
+
+def momentNPV(L, m, prevalence):
+    return _rt._proj((_rt._proj(L, 'point')(Descent_Core_ScoreMoments_r2(m))), 'negativePredictiveValue')(prevalence)
+
+def momentNetBenefit(L, m, prevalence, t):
+    return _rt._proj((_rt._proj(L, 'point')(Descent_Core_ScoreMoments_r2(m))), 'netBenefit')(prevalence, t)
+
+def momentPrecision(L, m, prevalence):
+    return _rt._proj((_rt._proj(L, 'point')(Descent_Core_ScoreMoments_r2(m))), 'precision')(prevalence)
+
+def momentRecall(L, m):
+    return _rt._proj((_rt._proj(L, 'point')(Descent_Core_ScoreMoments_r2(m))), 'recallRate')
+
+def deployedPPVAtGeneration(L, p, V_E, prevalence, t):
+    return _rt._proj((_rt._proj(L, 'point')((deployedR2AtGeneration(p, V_E, t)))), 'positivePredictiveValue')(prevalence)
+
+def deployedNPVAtGeneration(L, p, V_E, prevalence, t):
+    return _rt._proj((_rt._proj(L, 'point')((deployedR2AtGeneration(p, V_E, t)))), 'negativePredictiveValue')(prevalence)
+
+def deployedNetBenefitAtGeneration(L, p, V_E, prevalence, t, gen):
+    return _rt._proj((_rt._proj(L, 'point')((deployedR2AtGeneration(p, V_E, gen)))), 'netBenefit')(prevalence, t)
 
 def scaledMutationRate(Ne, μ):
     return (((2.0 * ploidy()) * Ne) * μ)
@@ -1134,20 +1197,32 @@ def scaledMigrationRate(Ne, m):
 def islandDemeCorrection(d):
     return ratio(d, ((d - 1.0)))
 
-def scaledFlow(Ne, m, μ, nDemes):
-    return ((scaledMigrationRate(Ne, m) * islandDemeCorrection(nDemes)) + scaledMutationRate(Ne, μ))
+def scaledFlow(bigM, theta, nDemes):
+    return ((_rt._proj(bigM, 'value') * islandDemeCorrection(nDemes)) + _rt._proj(theta, 'value'))
 
 def fstFromFlow(x):
     return _rt.rdiv(1.0, ((1.0 + x)))
 
-def fstIslandEquilibrium(Ne, m, μ, nDemes):
-    return fstFromFlow((scaledFlow(Ne, m, μ, nDemes)))
+def fstIslandEquilibrium(bigM, theta, nDemes):
+    return fstFromFlow((scaledFlow(bigM, theta, nDemes)))
 
-def fstFromTau(tau):
-    return saturation(tau)
+def fstFromTau(t):
+    return saturation(_rt._proj(t, 'value'))
 
 def hweHeterozygosity(p):
     return ((ploidy() * p) * ((1.0 - p)))
+
+def meanAlleleFreq(p_1, p_2):
+    return midpoint(p_1, p_2)
+
+def neiGst(p_1, p_2):
+    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((_rt.lpow(ploidy(), 2.0) * meanAlleleFreq(p_1, p_2)) * ((1.0 - meanAlleleFreq(p_1, p_2))))))
+
+def hudsonFst(p_1, p_2):
+    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((p_1 * ((1.0 - p_2))) + (p_2 * ((1.0 - p_1))))))
+
+def betweenSubgroupVariance(p_1, p_2):
+    return halfDiffSq(p_1, p_2)
 
 def dosage(*_a):
     if len(_a) < 1:
@@ -1193,8 +1268,8 @@ def Descent_Core_ScoreMoments_mse(m):
 def Descent_Core_ScoreMoments_portabilityRatio(V_A, V_E, fst):
     return _rt._proj(_rt._proj(ratio, 'r2'), 'r2')((momentsUnderDrift(V_A, V_E, fst)), (momentsUnderDrift(V_A, V_E, 0.0)))
 
-def deployedR2FromTau(V_A, V_E, tau):
-    return _rt._proj((momentsUnderDrift(V_A, V_E, (fstFromTau(tau)))), 'r2')
+def deployedR2FromTau(V_A, V_E, t):
+    return _rt._proj((momentsUnderDrift(V_A, V_E, (fstFromTau(t)))), 'r2')
 
 def deployedR2(p, V_E):
     return _rt._proj((momentsUnderDrift(_rt._proj(p, 'V_A'), V_E, Descent_Core_PopGenParameters_fstEquilibrium(p))), 'r2')
@@ -1208,11 +1283,8 @@ def aucArgument(m):
 def deployedBrier(π, p, V_E):
     return brier(π, (momentsUnderDrift(_rt._proj(p, 'V_A'), V_E, Descent_Core_PopGenParameters_fstEquilibrium(p))))
 
-def deployedR2FromIsland(Ne, m, μ, nDemes, V_A, V_E):
-    return _rt._proj((momentsUnderDrift(V_A, V_E, (fstIslandEquilibrium(Ne, m, μ, nDemes)))), 'r2')
-
-def portabilityRatioFromTau(V_A, V_E, tau):
-    return Descent_Core_ScoreMoments_portabilityRatio(V_A, V_E, (fstFromTau(tau)))
+def portabilityRatioFromTau(V_A, V_E, t):
+    return Descent_Core_ScoreMoments_portabilityRatio(V_A, V_E, (fstFromTau(t)))
 
 def deployedPortabilityRatio(p, V_E):
     return Descent_Core_ScoreMoments_portabilityRatio(_rt._proj(p, 'V_A'), V_E, Descent_Core_PopGenParameters_fstEquilibrium(p))
@@ -1220,14 +1292,8 @@ def deployedPortabilityRatio(p, V_E):
 def atOrigin(p):
     return (_rt._proj(p, 't_div') == 0.0)
 
-def Descent_Core_PopGenParameters_theta(p):
-    return scaledMutationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mu'))
-
-def Descent_Core_PopGenParameters_bigM(p):
-    return scaledMigrationRate(_rt._proj(p, 'Ne'), _rt._proj(p, 'mig'))
-
 def Descent_Core_PopGenParameters_fstEquilibrium(p):
-    return fstFromFlow(((Descent_Core_PopGenParameters_theta(p) + (2.0 * Descent_Core_PopGenParameters_bigM(p)))))
+    return fstIslandEquilibrium(Descent_Core_PopGenParameters_bigM(p), Descent_Core_PopGenParameters_theta(p), _rt._proj(p, 'nDemes'))
 
 def pair(*_a):
     if len(_a) < 3:
@@ -1337,6 +1403,15 @@ def halfLineageRate(k, x):
 
 def sum3(a, b, c):
     return ((a + b) + c)
+
+def ploidy():
+    return 2.0
+
+def scalingConstant():
+    return (2.0 * ploidy())
+
+def coalescentTimeScale(Ne):
+    return (ploidy() * Ne)
 
 def FinitePrior(n):
     return PMF((Fin(((n + 1.0)))))
@@ -1537,14 +1612,23 @@ def explainableFraction(between, total):
 def prevalence(c):
     return (_rt._proj(c, 'tp') + _rt._proj(c, 'fn'))
 
-def recallRate(c):
+def Descent_Foundations_ConfusionMatrix_recallRate(c):
     return _rt.rdiv(_rt._proj(c, 'tp'), ((_rt._proj(c, 'tp') + _rt._proj(c, 'fn'))))
 
 def fpr(c):
     return _rt.rdiv(_rt._proj(c, 'fp'), ((_rt._proj(c, 'fp') + _rt._proj(c, 'tn'))))
 
-def precision(c):
+def Descent_Foundations_ConfusionMatrix_precision(c):
     return _rt.rdiv(_rt._proj(c, 'tp'), ((_rt._proj(c, 'tp') + _rt._proj(c, 'fp'))))
+
+def statusHead(text):
+    return _rt._proj((dropTrailingTicks((collapseSpaces((upToBreak((dropLeadIn(text)))))))), 'asString')
+
+def statusHeads(doc):
+    return _rt._proj((statusTexts(doc)), 'map')(statusHead)
+
+def tajimaNumerator(t, sample):
+    return (_rt.rdiv((piSeq6(sample)), 6.0) - wattersonEstimator((S(t, sample)), 3.0))
 
 def Hap():
     return Allele
@@ -1751,7 +1835,7 @@ def signalVariance(dgp, signal):
 def trueExp(hdgp):
     return (lambda p, c: ((_rt._proj(hdgp, 'alpha')(c) * p) + _rt._proj(hdgp, 'baseline')(c)))
 
-def tau(p):
+def Descent_PopGen_EvolutionaryParameters_tau(p):
     return _rt.rdiv(_rt._proj(p, 't_div'), ((2.0 * _rt._proj(p, 'Ne'))))
 
 def Descent_PopGen_EvolutionaryParameters_theta(p):
@@ -1776,10 +1860,10 @@ def sharedLDRetention(p):
     return _rt.lpow(((1.0 - _rt._proj(p, 'recomb'))), ((2.0 * _rt._proj(p, 't_div'))))
 
 def mutationLDErosion(p):
-    return _rt.rexp((((-Descent_PopGen_EvolutionaryParameters_theta(p)) * tau(p))))
+    return _rt.rexp((((-Descent_PopGen_EvolutionaryParameters_theta(p)) * Descent_PopGen_EvolutionaryParameters_tau(p))))
 
 def migrationLDBoost(p):
-    return (1.0 + _rt.rdiv((Descent_PopGen_EvolutionaryParameters_bigM(p) * tau(p)), ((1.0 + Descent_PopGen_EvolutionaryParameters_bigM(p)))))
+    return (1.0 + _rt.rdiv((Descent_PopGen_EvolutionaryParameters_bigM(p) * Descent_PopGen_EvolutionaryParameters_tau(p)), ((1.0 + Descent_PopGen_EvolutionaryParameters_bigM(p)))))
 
 def r2FromSignalVariance(vSignal, vNoise):
     return share(vSignal, vNoise)
@@ -2163,6 +2247,9 @@ def expectedHeterozygosity(θ):
 def coalFst(t, Ne):
     return oddsLike(t, Ne)
 
+def effectiveSize(driftVariance, p):
+    return ratioOfProduct(((p * ((1.0 - p)))), 2.0, driftVariance)
+
 def neiGstFromFrequencies(p_1, p_2):
     p_bar = _rt.rdiv(((p_1 + p_2)), 2.0)
     return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((4.0 * p_bar) * ((1.0 - p_bar)))))
@@ -2275,8 +2362,11 @@ def polygenicAdaptationShift(β, Δp):
 def gwasNCP(n, β, p):
     return ncp((effectiveFisherInformation(n, p, 1.0)), β)
 
-def selectionPortabilityTimescale(selectionCoefficient):
-    return driftLDCreationRate(selectionCoefficient)
+def selectionCoefficient(variantFitness, referenceFitness):
+    return proportionalReduction(variantFitness, referenceFitness)
+
+def selectionPortabilityTimescale(s):
+    return driftLDCreationRate(s)
 
 def pleiotropicTargetR2(sourceR2, sharedFraction, turnover):
     return (sourceR2 * ((1.0 - (sharedFraction * turnover))))
@@ -2381,9 +2471,6 @@ def epistaticVariancePairwise(γ, p_1, p_2):
 
 def fisherInformation(n, v):
     return product(n, v)
-
-def genotypeVarianceHWE(p):
-    return hweHeterozygosity(p)
 
 def effectiveFisherInformation(n, p, r2_ld):
     return (fisherInformation(n, (genotypeVarianceHWE(p))) * r2_ld)
@@ -3040,6 +3127,12 @@ def bbpProxyThreshold(n, M):
 def pcCorrectabilityMargin(n, M, F, m):
     return (demographicSpike(n, F, m) - bbpProxyThreshold(n, M))
 
+def neiContrastSpike(n, m, p_1, p_2):
+    return demographicSpike(n, (neiGst(p_1, p_2)), m)
+
+def hudsonBbpSpike(n, m, p_1, p_2):
+    return demographicSpike(n, (hudsonFst(p_1, p_2)), m)
+
 def calibrationInTheLarge(mean_observed, mean_predicted):
     return difference(mean_observed, mean_predicted)
 
@@ -3275,13 +3368,13 @@ def coalescentTau(t, Ne):
     return _rt.rdiv(t, ((2.0 * Ne)))
 
 def fstFromGenerations(t, Ne):
-    return fstFromTau((coalescentTau(t, Ne)))
+    return fstFromTau((ofGenerations(t, Ne)))
 
 def pairwiseFstFromBranches(fstS, fstT):
     return complementaryComposition(fstS, fstT)
 
 def pairwiseFstFromBranchTaus(tauS, tauT):
-    return fstFromTau((_rt.rdiv(((tauS + tauT)), 2.0)))
+    return fstFromTau((Descent_Core_Tau_ofScaled((_rt.rdiv(((tauS + tauT)), 2.0)))))
 
 def fstEqLimitLowMutationManyDemes(m):
     return _rt.rdiv(1.0, ((1.0 + scaledMigrationRate(_rt._proj(m, 'Ne'), _rt._proj(m, 'mig')))))
@@ -3307,20 +3400,23 @@ def twoDemeIMEquilibriumETst(M):
 def twoDemeIMEquilibriumDelta(M):
     return _rt.rdiv(1.0, (((2.0 * M) + 1.0)))
 
+def genotypeVarianceHWE(p):
+    return hweHeterozygosity(p)
+
 def tauAt(g, t):
-    return _rt.rdiv((t), ((2.0 * _rt._proj(g, 'Ne'))))
+    return ofGenerations((t), _rt._proj(g, 'Ne'))
 
 def Descent_Portability__root__Descent_Core_PopGenParameters_hetDecayFactor(g):
-    return hetDecayFromScaled(_rt._proj(g, 'Ne'), Descent_Core_PopGenParameters_theta(g))
+    return hetDecayFromScaled(_rt._proj(g, 'Ne'), _rt._proj(_rt._proj(g, 'theta'), 'value'))
 
 def fstTransientAt(g, t):
-    return ((_rt.rdiv(1.0, (((1.0 + Descent_Core_PopGenParameters_theta(g)) + (2.0 * Descent_Core_PopGenParameters_bigM(g)))))) * ((1.0 - _rt.lpow(fstTransientDecayFromScaled(_rt._proj(g, 'Ne'), Descent_Core_PopGenParameters_theta(g), Descent_Core_PopGenParameters_bigM(g)), t))))
+    return ((_rt.rdiv(1.0, (((1.0 + _rt._proj(_rt._proj(g, 'theta'), 'value')) + (2.0 * _rt._proj(_rt._proj(g, 'bigM'), 'value')))))) * ((1.0 - _rt.lpow(fstTransientDecayFromScaled(_rt._proj(g, 'Ne'), _rt._proj(_rt._proj(g, 'theta'), 'value'), _rt._proj(_rt._proj(g, 'bigM'), 'value')), t))))
 
 def mutationSharedRetentionAt(g, t):
-    return _rt.rexp((((-Descent_Core_PopGenParameters_theta(g)) * tauAt(g, t))))
+    return _rt.rexp((((-_rt._proj(_rt._proj(g, 'theta'), 'value')) * _rt._proj((tauAt(g, t)), 'value'))))
 
 def migrationSharedBoostAt(g, t):
-    return (1.0 + _rt.rdiv((Descent_Core_PopGenParameters_bigM(g) * tauAt(g, t)), ((1.0 + Descent_Core_PopGenParameters_bigM(g)))))
+    return (1.0 + _rt.rdiv((_rt._proj(_rt._proj(g, 'bigM'), 'value') * _rt._proj((tauAt(g, t)), 'value')), ((1.0 + _rt._proj(_rt._proj(g, 'bigM'), 'value')))))
 
 def alleleFreqMismatchPenalty(pSource, pTarget):
     return _rt.rdiv((((2.0 * pTarget) * ((1.0 - pTarget)))), (((2.0 * pSource) * ((1.0 - pSource)))))
@@ -4117,30 +4213,6 @@ def logBayesRisk(μ, η, F):
 
 def brierBayesRisk(μ, η, F):
     return BayesRisk((brierRisk(μ, η)), F)
-
-def hweGenotypeVariance(p):
-    return hweHeterozygosity(p)
-
-def coalescentTimeScale(Ne):
-    return (ploidy * Ne)
-
-def meanAlleleFreq(p_1, p_2):
-    return midpoint(p_1, p_2)
-
-def neiGst(p_1, p_2):
-    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((_rt.lpow(ploidy, 2.0) * meanAlleleFreq(p_1, p_2)) * ((1.0 - meanAlleleFreq(p_1, p_2))))))
-
-def hudsonFst(p_1, p_2):
-    return _rt.rdiv(_rt.lpow(((p_1 - p_2)), 2.0), (((p_1 * ((1.0 - p_2))) + (p_2 * ((1.0 - p_1))))))
-
-def betweenSubgroupVariance(p_1, p_2):
-    return halfDiffSq(p_1, p_2)
-
-def neiContrastSpike(n, m, p_1, p_2):
-    return demographicSpike(n, (neiGst(p_1, p_2)), m)
-
-def hudsonBbpSpike(n, m, p_1, p_2):
-    return demographicSpike(n, (hudsonFst(p_1, p_2)), m)
 
 def ldTaggingDecay(lam_LD, d):
     return _rt.rexp((((-lam_LD) * d)))
