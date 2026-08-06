@@ -165,27 +165,73 @@ def test_hwe_moments():
 def test_best_linear_weights():
     """sourceBestLinearWeightsFromLD against an actual regression."""
     rng = np.random.default_rng(7301)
-    cells = []
+    cells, marg = [], []
+    control = None
+    # THE TAGS MUST NOT BE THE CAUSALS. This group used to set
+    # `sig_tag_causal = sig_tag` with the comment "tags ARE the causals here",
+    # and under that substitution the body collapses:
+    # `Sigma^-1 (Sigma beta) = beta` identically, so the comparison was asking
+    # whether ordinary least squares recovers the effect vector it was given --
+    # a property of the regression, not of this formula. The sites are now split
+    # into a causal half and a tag half, so `sigmaTagCausal` is a genuine cross-
+    # covariance and the body has to do the work of predicting from tags alone.
     for tag, unl in (("coalescent LD", False), ("linkage equilibrium", True)):
         dose, p = panel(n_ind=20000, n_sites=40, seed=31, unlinked=unl)
         z = (dose - dose.mean(0)) / dose.std(0)
         n, m = z.shape
-        beta_causal = rng.normal(0, 1, m) / math.sqrt(m)
-        y = z @ beta_causal + rng.normal(0, 1.0, n)
-        sig_tag = np.corrcoef(z, rowvar=False)          # tag-tag LD
-        sig_tag_causal = sig_tag                        # tags ARE the causals here
+        half = m // 2
+        zc, zt = z[:, :half], z[:, half:]
+        beta_causal = rng.normal(0, 1, half) / math.sqrt(half)
+        y = zc @ beta_causal + rng.normal(0, 1.0, n)
+        sig_tag = np.corrcoef(zt, rowvar=False)
+        sig_tag_causal = (zt - zt.mean(0)).T @ (zc - zc.mean(0)) / (n - 1)
         lean_w = np.linalg.solve(sig_tag, sig_tag_causal @ beta_causal)
-        ols = np.linalg.lstsq(z, y, rcond=None)[0]
-        # compare the whole weight vector by its worst coordinate
+        ols = np.linalg.lstsq(zt, y, rcond=None)[0]
+        # The worst coordinate of the vector, which is a MAXIMUM OVER `half`
+        # comparisons; `selected_from` is declared below so the gate accounts
+        # for it rather than reading a 2.5-sigma order statistic as a finding.
         k = int(np.argmax(np.abs(lean_w - ols)))
         sem = float(np.std(y) / math.sqrt(n))
-        cells.append(dict(design="%s (worst coord)" % tag,
-                          lean=float(lean_w[k]), truth=float(ols[k]),
-                          sem=max(sem, 1e-9)))
+        lab = "%s (worst of %d coords)" % (tag, half)
+        cells.append(dict(design=lab, lean=float(lean_w[k]),
+                          truth=float(ols[k]), sem=max(sem, 1e-9)))
+        # The rival worth carrying: the MARGINAL weights, which drop the
+        # `sigmaTagSource^-1` and so ignore LD among the tags. It is the same
+        # vector under linkage equilibrium, where the inverse is the identity,
+        # and it is what the body exists to correct under real LD -- so a design
+        # with both a linked and an unlinked panel is exactly the one that can
+        # tell them apart.
+        marg.append(dict(design=lab,
+                         lean=float((sig_tag_causal @ beta_causal)[k]),
+                         truth=float(ols[k]), sem=max(sem, 1e-9)))
+        if control is None:
+            # Independent of the body: least squares ON THE CAUSAL SITES must
+            # recover the effect vector it was handed. It uses neither
+            # `sigmaTagSource` nor `sigmaTagCausal`, and it fails on any error
+            # in the panel, the standardisation or the phenotype.
+            ols_c = np.linalg.lstsq(zc, y, rcond=None)[0]
+            ratio = ols_c / beta_causal
+            control = dict(design="least squares on the causal sites recovers "
+                                  "the effect vector it was given",
+                           lean=1.0, truth=float(ratio.mean()),
+                           sem=float(ratio.std(ddof=1) / math.sqrt(len(ratio))))
     record("sourceBestLinearWeightsFromLD", "DGP.lean",
            "sigmaTagSource^-1 * sigmaTagCausal * betaCausal", cells,
-           regime="least-squares weights from an explicit regression, "
-                  "standardised dosages")
+           control=control, realised_inputs=True, selected_from=20,
+           regime="20 causal sites and 20 disjoint tag sites from the same "
+                  "panel, standardised dosages, 20000 individuals; the "
+                  "prediction is the best linear predictor of the causal "
+                  "signal from the tags and the oracle is the explicit "
+                  "least-squares fit of the phenotype on the tags. The "
+                  "reported cell is the worst of the 20 coordinates, declared "
+                  "as such")
+    record("sourceBestLinearWeightsFromLD [marginal weights, ignoring tag-tag "
+           "LD, competing]", "DGP.lean",
+           "sigmaTagCausal * betaCausal, without the sigmaTagSource inverse",
+           marg, control=control, realised_inputs=True, selected_from=20,
+           regime="the same two panels; identical to the body under linkage "
+                  "equilibrium, where the inverse is the identity, and "
+                  "differing from it exactly where there is LD to correct for")
 
 
 def test_effect_summaries():

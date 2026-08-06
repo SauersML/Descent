@@ -326,34 +326,69 @@
   "name": "sourceBestLinearWeightsFromLD",
   "file": "DGP.lean",
   "source": "sigmaTagSource^-1 * sigmaTagCausal * betaCausal",
-  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
-  "regime": "least-squares weights from an explicit regression, standardised dosages",
-  "span": 1.7842172498475624,
-  "verdict": "LEAD (no control)",
+  "note": "error bar inflated by sqrt(2 log 20) for worst-of-20 selection",
+  "regime": "20 causal sites and 20 disjoint tag sites from the same panel, standardised dosages, 20000 individuals; the prediction is the best linear predictor of the causal signal from the tags and the oracle is the explicit least-squares fit of the phenotype on the tags. The reported cell is the worst of the 20 coordinates, declared as such",
+  "span": 50.54109162351706,
+  "verdict": "MATCH",
   "worst": {
-   "design": "coalescent LD (worst coord)",
-   "lean": 0.24305041711413283,
-   "truth": 0.13688404954235475,
-   "sem": 0.01314933889225825,
-   "sems_off": 8.073893938065902,
-   "rel_err": 0.7755934159365151
+   "design": "coalescent LD (worst of 20 coords)",
+   "lean": -0.5725972310181173,
+   "truth": -0.5063448095157262,
+   "sem": 0.015116212637709023,
+   "sems_off": 1.7905739703214987,
+   "rel_err": 0.13084447644630864
   },
   "cells": [
    {
-    "design": "coalescent LD (worst coord)",
-    "lean": 0.24305041711413283,
-    "truth": 0.13688404954235475,
-    "sem": 0.01314933889225825,
-    "sems_off": 8.073893938065902,
-    "rel_err": 0.7755934159365151
+    "design": "coalescent LD (worst of 20 coords)",
+    "lean": -0.5725972310181173,
+    "truth": -0.5063448095157262,
+    "sem": 0.015116212637709023,
+    "sems_off": 1.7905739703214987,
+    "rel_err": 0.13084447644630864
    },
    {
-    "design": "linkage equilibrium (worst coord)",
-    "lean": -0.19060432968354818,
-    "truth": -0.17225989633391803,
-    "sem": 0.010373994594655395,
-    "sems_off": 1.7683095149366153,
-    "rel_err": 0.10649276900800111
+    "design": "linkage equilibrium (worst of 20 coords)",
+    "lean": -0.011109528591296927,
+    "truth": 0.00022646787249657016,
+    "sem": 0.010762448263261481,
+    "sems_off": 0.430310682978368,
+    "rel_err": 50.0556495666518
+   }
+  ]
+ },
+ {
+  "name": "sourceBestLinearWeightsFromLD [marginal weights, ignoring tag-tag LD, competing]",
+  "file": "DGP.lean",
+  "source": "sigmaTagCausal * betaCausal, without the sigmaTagSource inverse",
+  "note": "error bar inflated by sqrt(2 log 20) for worst-of-20 selection; positive control 'least squares on the causal sites recovers the effect vector it was given' passed at 0.88 sems",
+  "regime": "the same two panels; identical to the body under linkage equilibrium, where the inverse is the identity, and differing from it exactly where there is LD to correct for",
+  "span": 24.03580524074212,
+  "verdict": "FALSIFIED",
+  "worst": {
+   "design": "coalescent LD (worst of 20 coords)",
+   "lean": -0.2724411361726561,
+   "truth": -0.5063448095157262,
+   "sem": 0.015116212637709023,
+   "sems_off": 6.32160786810741,
+   "rel_err": 0.4619454351013852
+  },
+  "cells": [
+   {
+    "design": "coalescent LD (worst of 20 coords)",
+    "lean": -0.2724411361726561,
+    "truth": -0.5063448095157262,
+    "sem": 0.015116212637709023,
+    "sems_off": 6.32160786810741,
+    "rel_err": 0.4619454351013852
+   },
+   {
+    "design": "linkage equilibrium (worst of 20 coords)",
+    "lean": -0.010882060055703656,
+    "truth": 0.00022646787249657016,
+    "sem": 0.010762448263261481,
+    "sems_off": 0.4216760524701582,
+    "rel_err": 49.05123100129121
    }
   ]
  },
