@@ -1033,6 +1033,32 @@ theorem snr_portability_signal_only
   unfold snrPortabilityRatio
   field_simp
 
+/-- **The `R²` ratio is the SNR ratio times the outcome-variance ratio**, which is this
+section's claim written as an equation instead of an argument.
+
+`Descent.Core.share v_sig v_noise` is `v_sig / (v_sig + v_noise)` -- the `R²` the corpus
+computes everywhere -- and the section above says a portability quoted as a ratio of `R²`
+values is not comparing signal transport, because `Var(Y)` differs between populations.
+Here is the exact discrepancy: the two ratios agree only when `v_sig_t + v_noise` equals
+`v_sig_s + v_noise`, that is only when the signal itself is unchanged, which is the case
+where there is no portability loss to quote. Everywhere else the `R²` ratio is off by a
+factor that depends on the outcome variances and not on transport at all.
+
+This also ties these definitions to the corpus: `snrPortabilityRatio` lives in the register
+of open questions, and until now nothing outside it constrained the quantity, so a wrong
+body here would have been consistent with everything else. -/
+theorem snrPortabilityRatio_eq_share_ratio_mul (v_sig_s v_sig_t v_noise : ℝ)
+    (hn : 0 < v_noise) (hs : 0 < v_sig_s) (ht : 0 < v_sig_t) :
+    snrPortabilityRatio v_sig_s v_noise v_sig_t v_noise
+      = (Descent.Core.share v_sig_t v_noise / Descent.Core.share v_sig_s v_noise)
+          * ((v_sig_t + v_noise) / (v_sig_s + v_noise)) := by
+  have h1 : v_sig_s ≠ 0 := ne_of_gt hs
+  have h2 : v_noise ≠ 0 := ne_of_gt hn
+  have h3 : v_sig_t + v_noise ≠ 0 := ne_of_gt (by linarith)
+  have h4 : v_sig_s + v_noise ≠ 0 := ne_of_gt (by linarith)
+  unfold snrPortabilityRatio Descent.Core.share
+  field_simp
+
 end R2NonComparability
 
 
