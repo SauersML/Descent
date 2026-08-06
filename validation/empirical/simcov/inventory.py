@@ -130,11 +130,37 @@ def strip_comments(src):
     return "".join(out)
 
 
+def skip_attribute_block(lines, j):
+    """check.py's `skip_attribute_block`, transcribed: walk `j` back past blank
+    lines and whole `@[...]` blocks, which are NOT always one line.
+
+    Skipping only lines that themselves begin with `@[` catches every `@[simp]`
+    and no `@[withdrawn "tag" "a sentence of justification"]`; that form wraps,
+    so the line above the declaration is the tail of a string argument, the
+    docstring above it fails the `-/` test, and a declaration that documents its
+    status in detail is read as declaring none.
+    """
+    while j >= 0:
+        if not lines[j].strip() or lines[j].lstrip().startswith("@["):
+            j -= 1
+            continue
+        if not lines[j].rstrip().endswith("]"):
+            break
+        depth, k = 0, j
+        while k >= 0:
+            depth += lines[k].count("]") - lines[k].count("[")
+            if depth <= 0:
+                break
+            k -= 1
+        if k < 0 or depth != 0 or not lines[k].lstrip().startswith("@["):
+            break
+        j = k - 1
+    return j
+
+
 def preceding_doc(lines, i):
     """The /-- ... -/ docstring immediately above line i, if any."""
-    j = i - 1
-    while j >= 0 and (not lines[j].strip() or lines[j].lstrip().startswith("@[")):
-        j -= 1
+    j = skip_attribute_block(lines, i - 1)
     if j < 0 or not lines[j].rstrip().endswith("-/"):
         return ""
     end = j

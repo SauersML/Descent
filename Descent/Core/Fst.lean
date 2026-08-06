@@ -244,18 +244,26 @@ theorem islandDemeCorrection_tendsto_one :
 
 /-! ### The master equilibrium -/
 
-/-- Total scaled flow into a deme, `4 Ne m (d/(d-1)) + 4 Ne μ`.
+/-- Total scaled flow into a deme, `M·(d/(d-1)) + θ`.
 
 Naming it separates the two questions the equilibrium answers: what counts as flow, and
 how flow becomes a differentiation. Every member of the lattice below differs only in
 what it puts here.
 
+**It takes `BigM` and `Theta`, not four reals.** The two failures `Core/Scaling.lean`
+records were both a scaled quantity passed where a differently-scaled one was wanted, and
+this is the argument position where that happened. A caller now supplies `BigM.ofRate Ne m`
+and `Theta.ofRate Ne μ`, so the two cannot be exchanged and the effective size cannot be
+given twice with different meanings. The raw `(Ne, m, μ, d)` spelling is gone rather than
+kept beside this one: a second route that accepts the confusable arguments is exactly what
+`deployedR2FromIsland` was, and it was deleted for the same reason.
+
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def scaledFlow (Ne m μ nDemes : ℝ) : ℝ :=
-  scaledMigrationRate Ne m * islandDemeCorrection nDemes + scaledMutationRate Ne μ
+noncomputable def scaledFlow (bigM : BigM) (theta : Theta) (nDemes : ℝ) : ℝ :=
+  bigM.value * islandDemeCorrection nDemes + theta.value
 
 /-- **`1/(1 + x)` is the complement of a saturation**, away from the pole.
 
@@ -307,26 +315,29 @@ corpus is a theorem below placing a named body inside this family.
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def fstIslandEquilibrium (Ne m μ nDemes : ℝ) : ℝ :=
-  fstFromFlow (scaledFlow Ne m μ nDemes)
+noncomputable def fstIslandEquilibrium (bigM : BigM) (theta : Theta) (nDemes : ℝ) : ℝ :=
+  fstFromFlow (scaledFlow bigM theta nDemes)
 
 /-- **The master, in the raw coordinates the subsystem modules wrote it in.** This is the
-bridge that lets `fstIslandEquilibriumFiniteDemes` be a wrapper rather than a copy. -/
+bridge that lets `fstIslandEquilibriumFiniteDemes` be a wrapper rather than a copy, and it
+is now also the only way back to `(Ne, m, μ)`: the master itself no longer accepts them, so
+a body written in raw rates reaches this family through `BigM.ofRate` and `Theta.ofRate`
+here and nowhere else. -/
 theorem fstIslandEquilibrium_eq (Ne m μ nDemes : ℝ) :
-    fstIslandEquilibrium Ne m μ nDemes
+    fstIslandEquilibrium (BigM.ofRate Ne m) (Theta.ofRate Ne μ) nDemes
       = 1 / (1 + 4 * Ne * m * islandDemeCorrection nDemes + 4 * Ne * μ) := by
   unfold fstIslandEquilibrium fstFromFlow scaledFlow
-  rw [scaledMigrationRate_eq, scaledMutationRate_eq]
+  rw [BigM.value_ofRate, Theta.value_ofRate]
   ring_nf
 
 /-- **The equilibrium is a saturation of the total scaled flow.** `F_ST = 1/(1 + x)` is
 `1 - saturation x`, so the whole family lives on one curve and the only thing that
 distinguishes its members is what they put into `x`. This is the statement that makes
 the lattice below a lattice rather than a list. -/
-theorem fstIslandEquilibrium_eq_complement_saturation (Ne m μ nDemes : ℝ)
-    (h : 1 + scaledFlow Ne m μ nDemes ≠ 0) :
-    fstIslandEquilibrium Ne m μ nDemes
-      = complement (saturation (scaledFlow Ne m μ nDemes)) := by
+theorem fstIslandEquilibrium_eq_complement_saturation (bigM : BigM) (theta : Theta)
+    (nDemes : ℝ) (h : 1 + scaledFlow bigM theta nDemes ≠ 0) :
+    fstIslandEquilibrium bigM theta nDemes
+      = complement (saturation (scaledFlow bigM theta nDemes)) := by
   unfold fstIslandEquilibrium fstFromFlow
   exact one_div_one_add_eq_complement_saturation _ h
 
@@ -340,22 +351,26 @@ the master at a deme correction of one, which `islandDemeCorrection_tendsto_one`
 the large-`d` limit. -/
 theorem fstIslandEquilibrium_manyDemes (Ne m μ nDemes : ℝ)
     (hd : islandDemeCorrection nDemes = 1) :
-    fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + 4 * Ne * m + 4 * Ne * μ) := by
+    fstIslandEquilibrium (BigM.ofRate Ne m) (Theta.ofRate Ne μ) nDemes
+      = 1 / (1 + 4 * Ne * m + 4 * Ne * μ) := by
   rw [fstIslandEquilibrium_eq, hd]; ring_nf
 
 /-- **No mutation: `μ = 0`.** `fstMigrationDriftEquilibrium` is the many-deme master with the
 mutation term dropped. Migration alone. -/
 theorem fstIslandEquilibrium_no_mutation (Ne m nDemes : ℝ)
     (hd : islandDemeCorrection nDemes = 1) :
-    fstIslandEquilibrium Ne m 0 nDemes = 1 / (1 + 4 * Ne * m) := by
+    fstIslandEquilibrium (BigM.ofRate Ne m) (Theta.ofRate Ne 0) nDemes
+      = 1 / (1 + 4 * Ne * m) := by
   rw [fstIslandEquilibrium_manyDemes Ne m 0 nDemes hd]; ring_nf
 
 /-- **No migration: `m = 0`.** `fstMutationDriftEquilibrium θ` is the master with the
 migration term dropped and `θ = 4 Ne μ` substituted -- the pure mutation-drift balance a
 single isolated population reaches. -/
 theorem fstIslandEquilibrium_no_migration (Ne μ nDemes : ℝ) :
-    fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + scaledMutationRate Ne μ) := by
-  unfold fstIslandEquilibrium fstFromFlow scaledFlow scaledMigrationRate
+    fstIslandEquilibrium (BigM.ofRate Ne 0) (Theta.ofRate Ne μ) nDemes
+      = 1 / (1 + scaledMutationRate Ne μ) := by
+  unfold fstIslandEquilibrium fstFromFlow scaledFlow
+  rw [BigM.value_ofRate, Theta.value_ofRate, scaledMutationRate_eq]
   ring_nf
 
 /-- **The `θ` reparameterisation.** The scaled coordinates are not a different model:
@@ -365,7 +380,7 @@ corpus had `fstMutationDriftEquilibrium` taking a bare `θ` in one module and
 two spellings. -/
 theorem fstIslandEquilibrium_no_migration_scaled (Ne μ nDemes θ : ℝ)
     (hθ : θ = scaledMutationRate Ne μ) :
-    fstIslandEquilibrium Ne 0 μ nDemes = 1 / (1 + θ) := by
+    fstIslandEquilibrium (BigM.ofRate Ne 0) (Theta.ofRate Ne μ) nDemes = 1 / (1 + θ) := by
   rw [fstIslandEquilibrium_no_migration, hθ]
 
 /-- **The structure-field coordinates, `1/(1 + θ + 2M)`.** The bridge to the two
@@ -391,10 +406,13 @@ file whose purpose is to hold the scaling constants. -/
 theorem fstIslandEquilibrium_structure_coords (Ne m μ nDemes θ bigM : ℝ)
     (hd : islandDemeCorrection nDemes = 2)
     (hθ : θ = scaledMutationRate Ne μ) (hM : bigM = scaledMigrationRate Ne m) :
-    fstIslandEquilibrium Ne m μ nDemes = 1 / (1 + θ + 2 * bigM) := by
-  have hflow : 1 + scaledFlow Ne m μ nDemes = 1 + θ + 2 * bigM := by
+    fstIslandEquilibrium (BigM.ofRate Ne m) (Theta.ofRate Ne μ) nDemes
+      = 1 / (1 + θ + 2 * bigM) := by
+  have hflow : 1 + scaledFlow (BigM.ofRate Ne m) (Theta.ofRate Ne μ) nDemes
+      = 1 + θ + 2 * bigM := by
     unfold scaledFlow
-    rw [hd, hθ, hM]
+    rw [hd, hθ, hM, BigM.value_ofRate, Theta.value_ofRate,
+      scaledMutationRate_eq, scaledMigrationRate_eq]
     ring
   unfold fstIslandEquilibrium fstFromFlow
   rw [hflow]
@@ -406,19 +424,25 @@ written in it is a Hudson `F_ST`. -/
 
 /-- `F_ST` from a scaled coalescence time, `τ / (1 + τ)`.
 
+**It takes `Tau`, not a real.** `Core/Scaling.lean` gives the reason as a theorem:
+`fstFromTau` and `fstFromFlow` are `τ/(1+τ)` and `1/(1+x)`, which `fstFromFlow_add_fstFromTau`
+proves are complements, so passing a scaled RATE here where a scaled TIME was wanted does
+not make a small error -- it returns one minus the answer. As reals nothing separated the
+two arguments; `Theta`, `BigM` and `Tau` are the same numbers in the same regimes.
+
     Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def fstFromTau (tau : ℝ) : ℝ := saturation tau
+noncomputable def fstFromTau (t : Tau) : ℝ := saturation t.value
 
 /-- **The split law and the equilibrium law are complementary readings of one curve.**
 `F_ST = τ/(1+τ)` and `F_ST = 1/(1 + x)` are `saturation` and its complement, so a result
 stated in one coordinate transfers to the other by reading `τ = 1/x`. Stated because the
 corpus writes both and a reader meeting them in different files has no reason to expect
 they are the same object. -/
-theorem fstFromTau_add_equilibrium (x : ℝ) (h : 1 + x ≠ 0) :
-    fstFromTau x + 1 / (1 + x) = 1 := by
+theorem fstFromTau_add_equilibrium (t : Tau) (h : 1 + t.value ≠ 0) :
+    fstFromTau t + 1 / (1 + t.value) = 1 := by
   unfold fstFromTau saturation
   field_simp
   ring
@@ -426,16 +450,16 @@ theorem fstFromTau_add_equilibrium (x : ℝ) (h : 1 + x ≠ 0) :
 /-- **The equilibrium law and the split law are complements.** `fstFromFlow x` and
 `fstFromTau x` sum to one away from the pole, so a result in either coordinate transfers
 to the other. -/
-theorem fstFromFlow_add_fstFromTau (x : ℝ) (h : 1 + x ≠ 0) :
-    fstFromFlow x + fstFromTau x = 1 := by
+theorem fstFromFlow_add_fstFromTau (t : Tau) (h : 1 + t.value ≠ 0) :
+    fstFromFlow t.value + fstFromTau t = 1 := by
   unfold fstFromFlow
   rw [add_comm]
-  exact fstFromTau_add_equilibrium x h
+  exact fstFromTau_add_equilibrium t h
 
 /-- **`F_ST` from a scaled time lands in the unit interval.** -/
-theorem fstFromTau_mem_unit (tau : ℝ) (h : 0 ≤ tau) :
-    0 ≤ fstFromTau tau ∧ fstFromTau tau ≤ 1 :=
-  saturation_mem_unit tau h
+theorem fstFromTau_mem_unit (t : Tau) (h : 0 ≤ t.value) :
+    0 ≤ fstFromTau t ∧ fstFromTau t ≤ 1 :=
+  saturation_mem_unit t.value h
 
 /-! ### Nei and Hudson are not interchangeable, and now cannot be
 
@@ -460,7 +484,7 @@ structure NeiFst where
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def hudsonFromTau (tau : ℝ) : HudsonFst := ⟨fstFromTau tau⟩
+noncomputable def hudsonFromTau (t : Tau) : HudsonFst := ⟨fstFromTau t⟩
 
 /-- **The exact conversion, and the reason it is not a correction factor.**
 `Hudson = 2G/(1 + G)`. It is a Möbius map and not a constant multiple, so there is no
@@ -493,8 +517,8 @@ theorem hudsonOfNei_eq_iff (g : NeiFst) (h : 1 + g.value ≠ 0) :
 The point of `hudsonFromTau` is that `τ/(1+τ)` cannot be handed to something expecting a
 Nei estimate; this says the number inside is the one `fstFromTau` computes, so wrapping
 costs nothing but the type. -/
-@[simp] theorem hudsonFromTau_value (tau : ℝ) :
-    (hudsonFromTau tau).value = fstFromTau tau := rfl
+@[simp] theorem hudsonFromTau_value (t : Tau) :
+    (hudsonFromTau t).value = fstFromTau t := rfl
 
 /-- **A witness that the gap is real and sizeable.** At a Nei `G_ST` of `1/2` the Hudson
 value is `2/3`: a 33% difference, at a differentiation level ordinary human population

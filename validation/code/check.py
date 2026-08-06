@@ -575,6 +575,43 @@ def ident_block_structure_errors(src: str):
         errors.append(f"line {n}: `{kind} {name}`".rstrip() + " is never closed")
     return errors
 
+def skip_attribute_block(lines, j):
+    """Walk `j` back past blank lines and whole `@[...]` attribute blocks.
+
+    AN ATTRIBUTE IS NOT ALWAYS ONE LINE. This used to skip only lines that
+    THEMSELVES begin with `@[`, which is every `@[simp]` and no `@[withdrawn
+    "tag" "a sentence of justification"]` -- that form wraps, so the line
+    directly above the declaration is the tail of the attribute's string
+    argument and matches nothing. The docstring above it then failed the
+    `endswith("-/")` test and the declaration was read as carrying NO docstring
+    at all, which for an `Empirical status:` marker is indistinguishable from
+    carrying none: `ldTaggingDecay` documents a two-sided FALSIFICATION with a
+    residual table and was counted as undeclared coverage debt.
+
+    Blocks are matched by bracket balance rather than by a regex, because the
+    justification strings contain prose and the block ends where the brackets
+    close. An unbalanced or non-attribute `]` leaves `j` where it was, which is
+    the old behaviour and the safe direction: a missed skip reports a status as
+    absent, never a neighbour's status as this declaration's.
+    """
+    while j >= 0:
+        if not lines[j].strip() or lines[j].lstrip().startswith("@["):
+            j -= 1
+            continue
+        if not lines[j].rstrip().endswith("]"):
+            break
+        depth, k = 0, j
+        while k >= 0:
+            depth += lines[k].count("]") - lines[k].count("[")
+            if depth <= 0:
+                break
+            k -= 1
+        if k < 0 or depth != 0 or not lines[k].lstrip().startswith("@["):
+            break
+        j = k - 1
+    return j
+
+
 def ident_preceding_docstring(lines, i):
     """The whole `/-- ... -/` block attached to the declaration on line `i`.
 
@@ -582,9 +619,7 @@ def ident_preceding_docstring(lines, i):
     lines, so a fixed lookback window reports a declared status as missing and
     invites a second, contradictory marker next to the first. The block is
     delimited, so read the delimiters."""
-    j = i - 1
-    while j >= 0 and (not lines[j].strip() or lines[j].lstrip().startswith("@[")):
-        j -= 1
+    j = skip_attribute_block(lines, i - 1)
     if j < 0 or not lines[j].rstrip().endswith("-/"):
         return ""
     end = j
