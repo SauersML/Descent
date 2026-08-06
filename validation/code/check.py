@@ -3257,12 +3257,19 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
             # carries arbitrary content, or when it assumes something about a definition
             # this corpus makes -- and `Fact`, which exists to carry an ARBITRARY
             # proposition through inference, is caught by F3 on exactly that ground.
+            # WHOSE CLASS IS IT.  A hand-kept list of "ordinary Mathlib structure" cannot
+            # be right for long -- `IsStrictOrderedRing` was missing from it, and seven
+            # findings in one file were that omission.  The question the list was standing
+            # in for is answerable directly: this corpus can only launder a definition it
+            # OWNS, so an instance of a class it does not define is infrastructure.
             concealed = True
             if b.kind == "instance" and not substantive:
                 ihead = re.match(r"([A-Za-z_][\w.']*)", norm(b.type))
                 if ihead:
                     ibase = ihead.group(1).split(".")[-1]
-                    if ibase in STANDARD_CLASSES or ibase in {"Nonempty", "Inhabited"}:
+                    corpus_owned = (ibase in c.struct_fields or ibase in c.prop_structs
+                                    or ibase in c.prop_aliases)
+                    if not corpus_owned:
                         concealed = False
             if (b.kind in ("implicit", "instance", "strict") or b.inherited) and concealed:
                 add("F19", f"hidden premise `{b.kind}"
@@ -3394,7 +3401,14 @@ def check_decl(d: Decl, c: Corpus, proved_props: set[str]) -> list[Finding]:
         # F10/F12 -- vacuous or self-satisfying domain.
         for b in d.binders:
             t = norm(b.type)
-            if re.match(r"(Empty|PEmpty|Fin 0)\b", t):
+            # THE WHOLE TYPE, NOT ITS FIRST TOKEN.  `re.match` anchors at the start only,
+            # so `Fin 0 → ℝ` was read as "the empty type" -- and `Fin 0 → ℝ` is not empty,
+            # it is a SINGLETON whose one inhabitant is the empty function.  Every one of
+            # the twelve findings this produced was a function out of an empty index,
+            # several of them theorems named `..._empty_panel_is_junk` whose whole purpose
+            # is to record what the quantity does there.  Quantifying over `Fin 0` is
+            # vacuous; quantifying over `Fin 0 → ℝ` is quantifying over one point.
+            if re.fullmatch(r"(Empty|PEmpty|Fin 0)", t):
                 add("F10", f"quantifies over the empty type `{t}`")
             # `{n : ℕ // 0 < n}` ascribes the bound variable, so `\w+\s*//` never
             # matched a real subtype -- only the rarer `{n // p n}` spelling.
@@ -3709,6 +3723,12 @@ def run_laundering(argv: list[str]) -> int:
     if args.family:
         findings = [f for f in findings if f.family in set(args.family)]
 
+    # ONE FINDING PER FACT.  `sharedCorrectionConsensus_no_curvature_is_junk` and
+    # `jointDensity_indep_of_cover` were each reported twice, identically, because the same
+    # binder is reached by two paths.  A count that double-reports is a count nobody can
+    # act on: it says two things are wrong where one is.
+    findings = list({(f.family, f.file, f.line, f.decl, f.detail): f
+                     for f in findings}.values())
     findings.sort(key=lambda f: (SEVERITY_ORDER[f.severity], f.family, f.file, f.line))
 
     by_family = defaultdict(int)
