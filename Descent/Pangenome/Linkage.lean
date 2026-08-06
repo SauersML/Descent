@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
+import Descent.Pangenome.Linkage.Frequency
 import Descent.Pangenome.Linkage.Interface
 import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Splicing
@@ -13,10 +14,9 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 /-!
 # `Linkage` -- what a pangenome graph forgets, and what that forces it to admit
 
-Six modules.  The first four read in order, each measuring something the previous one
-defined; the fifth prices the escape the third leaves open, and the sixth drops the one
-hypothesis the first four never needed.  The group's whole analytic content is one
-inequality, stated in the first module.
+Seven modules.  The first four read in order, each measuring something the previous one
+defined; the last three each drop a restriction the first four carried.  The group's whole
+analytic content is one inequality, stated in the first module.
 
 ## The order
 
@@ -56,6 +56,23 @@ inequality, stated in the first module.
    `chainArbor` embeds a chain and the specialisation theorems say every quantity agrees, so
    this is where the result stops being about pangenomes and becomes a counting inequality
    about edge-coloured trees.
+
+7. `Frequency` -- the weighting.  The first six weigh every panel thread equally.  The law
+   holds for any strictly positive frequency law `p`, as `H(p) + ∑_j H_p(J ∣ S_j) ≤ log |Ω|`,
+   and `condIdentityLoss_uniform` and `panelEntropy_uniform` prove that the uniform statement
+   is this one at `p = 1/m` rather than asserting it.  A builder measuring what a graph
+   forgets about a population uses the population's law, not the counting measure on a sample.
+
+## What of the manuscript is not here
+
+Stated so the group does not read as complete.  Not formalised: the exact variational
+(Bethe) formula and the frequency-aware capacity that maximises the bound, with its unique
+interior optimiser and fixed-point equation; the random-merger expectations over hashed or
+uniformly-drawn surjective state maps; the total-width arithmetic-geometric budget, of which
+the max-width form `pow_card_le_pow_width_mul_card_mosaics` is proved instead; the entropy
+form of the metadata bound and its Fano version, of which the zero-error cardinality form is
+proved instead; the layered DAG whose paths are exactly the compatible splices, of which the
+counting half is proved; and the invariance of the tree count under re-rooting.
 
 ## Why the group is one group
 
