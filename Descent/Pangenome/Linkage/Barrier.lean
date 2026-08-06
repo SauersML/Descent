@@ -350,6 +350,57 @@ theorem width_eq_card_of_card_mosaics_eq [Nonempty ι] {c : Chain ι}
   exact eq_of_pow_le_prod hm (c.map width) hle (by rw [hlen]; exact hstep) (width s)
     (List.mem_map.mpr ⟨s, hs, rfl⟩)
 
+/-! ### Why the law is Shannon, and not one exact factor per interface
+
+`Descent.Pangenome.Linkage.Chain.card_mosaics_singleton` gives ONE interface's count exactly:
+`∑ n_a²`, which is `m²/w` inflated by the fibers' imbalance and is strictly better than the
+width bound.  It is tempting to divide that by `m` and multiply the resulting factor over the
+interfaces of a chain.
+
+That is false, and the two interfaces below show it.  Over three threads, `{0,1} | {2}` and
+`{0,2} | {1}` each admit `5` derivations on their own, so the per-interface factor is `5/3`
+and the product would predict `3 · (5/3)² = 25/3 > 8`.  The true count is `8`.
+
+The Shannon construction survives precisely because conditional entropy obeys a chain rule
+and the couplings glue along a tree, which is why the multi-interface term in
+`Descent.Pangenome.Linkage.Interface.identityLoss_eq_width_add_imbalance` is a
+Kullback–Leibler divergence and not an order-2 Rényi one. -/
+
+/-- The interface separating `{0,1}` from `{2}`. -/
+def witnessLeft : Fin 3 → Fin 3 := ![0, 0, 2]
+
+/-- The interface separating `{0,2}` from `{1}`, which cuts the panel the other way. -/
+def witnessRight : Fin 3 → Fin 3 := ![0, 1, 0]
+
+theorem card_mosaics_witnessLeft : (mosaics [witnessLeft]).card = 5 := by
+  rw [card_mosaics]; decide
+
+theorem card_mosaics_witnessRight : (mosaics [witnessRight]).card = 5 := by
+  rw [card_mosaics]; decide
+
+theorem card_mosaics_witness : (mosaics [witnessLeft, witnessRight]).card = 8 := by
+  rw [card_mosaics]; decide
+
+theorem width_witnessLeft : width witnessLeft = 2 := by decide
+
+theorem width_witnessRight : width witnessRight = 2 := by decide
+
+/-- **The exact per-interface factors do not multiply.**  Their product, cleared of
+denominators, strictly exceeds the true count, so it is not a lower bound on anything. -/
+theorem card_mosaics_witness_lt_renyi_product :
+    (mosaics [witnessLeft, witnessRight]).card * Fintype.card (Fin 3) ^ 2
+      < (mosaics [witnessLeft]).card * (mosaics [witnessRight]).card
+        * Fintype.card (Fin 3) := by
+  rw [card_mosaics_witness, card_mosaics_witnessLeft, card_mosaics_witnessRight]
+  decide
+
+/-- The width law, by contrast, holds on the same witness: `3³ ≤ (2·2)·8`. -/
+theorem width_law_holds_on_witness :
+    Fintype.card (Fin 3) ^ (([witnessLeft, witnessRight] : Chain (Fin 3)).length + 1)
+      ≤ (([witnessLeft, witnessRight] : Chain (Fin 3)).map width).prod
+        * (mosaics [witnessLeft, witnessRight]).card :=
+  pow_card_le_prod_width_mul_card_mosaics _
+
 /-! ### The phantoms the width budget forces -/
 
 /-- The `m` panel threads, as the derivations that never switch donor. -/

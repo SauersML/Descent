@@ -222,6 +222,20 @@ theorem card_mosaics_of_balanced {c : Chain ι} {bs : List ℕ} (hb : Balanced c
   rw [card_mosaics, Finset.sum_congr rfl fun h _ ↦ derivationCount_of_balanced hb h,
     Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
+/-- **One interface counts exactly.**  A single separator admits `∑ n_a²` derivations — one
+ordered pair of donors from each fiber — with no inequality anywhere.  This is the exact
+value the width law estimates from below by `m²/w`, and the gap between them is the
+imbalance of the fibers. -/
+theorem card_mosaics_singleton (s : ι → ι) :
+    (mosaics [s]).card = ∑ a ∈ Finset.univ.image s, (stateFiber s a).card ^ 2 := by
+  rw [card_mosaics, ← sum_fiberwise s fun h ↦ derivationCount [s] h]
+  refine Finset.sum_congr rfl fun a _ ↦ ?_
+  have hconst : ∀ h ∈ stateFiber s a, derivationCount [s] h = (stateFiber s a).card := by
+    intro h hh
+    simp only [mem_stateFiber] at hh
+    simp [derivationCount, fiber, hh]
+  rw [Finset.sum_congr rfl hconst, Finset.sum_const, smul_eq_mul, sq]
+
 /-! ### The switch grading
 
 Counting mosaics hides how recombinant they are.  The same recursion, carrying a formal
