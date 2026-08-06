@@ -196,7 +196,60 @@ theorem ascertainmentAmplification_unit_negative_lambda_is_junk (Φ : ℝ) :
 standardized PGS bias formula.  `expectedSNPCount` corresponds to `L Sbar`,
 `Hres` to residual susceptibility `H'`, and `effectSD` to `σβ`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: **CONDITIONALLY VALID** -- an equality where the two
+    ancestry loading vectors are proportional, an upper bound where they are
+    not, and in the first regime it is right and every rival reading is not
+    (`validation/empirical/simcov/battery_strat02.py`).
+
+    **What was ambiguous, and what pins it.** `battery_strat01` measured
+    `standardizedResidualPGSBias` and deliberately recorded nothing here,
+    because the corpus does not say what the score is standardized by: under a
+    coherent sum over ascertained variants the exponent on `L` is 1, and under
+    a root-mean-square over the loading geometry it is 1/2. The two are
+    different functions of quantities a simulation can measure, so a design in
+    which they disagree decides between them. Writing `r_l` for the ancestry
+    correlation in the GWAS panel and `rho_l` for it in the target, over the
+    ascertained set, the reading measured is `L·Sbar = Σ r_l²` and
+    `H' = Σ rho_l²` -- under which this body is the Cauchy-Schwarz bound on
+    `Σ r_l·rho_l`, which is the slope of the score on the target's ancestry
+    axis.
+
+    A confounded null: 1500 candidate variants carrying an ancestry-frequency
+    gradient, 6000 GWAS and 6000 target individuals, no variant causal. Both
+    susceptibilities are measured on reference panels drawn independently of
+    the panel that ascertains and of the panel the oracle regresses on, so
+    nothing the oracle measures enters the prediction. The positive control --
+    confounder off, a real additive effect of known size, which the mean
+    marginal estimate must recover -- passed at 1.31 sems.
+
+    | reading | worst cell |
+    |---|---|
+    | this body, `sqrt(L·Sbar)·sqrt(H')` | **2.43 sems** |
+    | `(L·Sbar)·sqrt(H')`, the coherent-sum exponent | 402.7 sems |
+    | `sqrt(L·Sbar)·H'` | 508.7 sems |
+    | `(L·Sbar + H')/2`, arithmetic for geometric | 23.7 sems |
+    | `H'` alone | 32.6 sems |
+
+    The last two rivals agree with this body whenever the two susceptibilities
+    coincide, so they are separated only by cells that shrink the target's
+    gradient WITHOUT turning it -- which is what correcting on principal
+    components does, and which keeps the bound tight while breaking
+    `H' = L·Sbar`. The prediction spans 73% across the design.
+
+    **The condition is not decoration.** Turning the target's gradient away
+    from the GWAS panel's, at cosines 0.9 down to 0.5, leaves this body
+    overstating the bias by up to 17.2 sems, monotonically in the misalignment.
+    Read as an equality it is FALSIFIED there; read as a bound it holds. A
+    consumer that treats the coefficient as the bias rather than as its
+    ceiling is wrong by the cosine between two ancestry gradients it has not
+    measured.
+
+    **`ascertainmentAmplification Φ Λ` is NOT tested and is not folded in.**
+    The design holds `Φ = Λ = 0`, where that factor is 1. The corpus defines
+    neither operationally -- there is no rule here for computing them from an
+    ascertainment scheme -- so a simulation that assigned them values would be
+    measuring the assignment. What is measured is the whole of the body that
+    is identified. -/
 noncomputable def pgsStratificationRiskCoefficient
     (expectedSNPCount Hres effectSD Φ Λ : ℝ) : ℝ :=
   Real.sqrt expectedSNPCount * Real.sqrt Hres / effectSD *

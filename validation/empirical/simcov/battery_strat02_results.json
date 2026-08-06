@@ -1,0 +1,391 @@
+{
+ "_battery_sha": "28b8854950cbe3c4",
+ "results": [
+  {
+   "name": "pgsStratificationRiskCoefficient",
+   "file": "Diagnostic.lean",
+   "source": "sqrt(L*Sbar) * sqrt(H') / sigma_beta * ascertainmentAmplification 0 0",
+   "note": "",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.732239154928181,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+    "lean": 1172.1595039275417,
+    "truth": 1119.9518464226435,
+    "sem": 21.505712064576176,
+    "sems_off": 2.4276181764236346,
+    "rel_err": 0.04661598413508596
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+     "lean": 1721.546178224008,
+     "truth": 1697.8859763532519,
+     "sem": 20.82226132192959,
+     "sems_off": 1.1362935804593712,
+     "rel_err": 0.013935094700277716
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>2.5 rho=1.00 k=0.60 (1030 ascertained)",
+     "lean": 1054.2061256083061,
+     "truth": 1052.1100510294307,
+     "sem": 13.985898391057665,
+     "sems_off": 0.14987057107576673,
+     "rel_err": 0.001992257917149036
+    },
+    {
+     "design": "c=0.60 u=0.035 |z|>3.0 rho=1.00 k=1.50 (741 ascertained)",
+     "lean": 1198.827931674495,
+     "truth": 1228.032429751882,
+     "sem": 24.167745843303553,
+     "sems_off": 1.2084080272417788,
+     "rel_err": 0.023781536521220184
+    },
+    {
+     "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+     "lean": 1172.1595039275417,
+     "truth": 1119.9518464226435,
+     "sem": 21.505712064576176,
+     "sems_off": 2.4276181764236346,
+     "rel_err": 0.04661598413508596
+    },
+    {
+     "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+     "lean": 2166.9822103730444,
+     "truth": 2208.393284271383,
+     "sem": 27.15725299836881,
+     "sems_off": 1.5248623968273205,
+     "rel_err": 0.018751675343914746
+    },
+    {
+     "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+     "lean": 580.2329879050844,
+     "truth": 572.5802394925071,
+     "sem": 4.867107797913032,
+     "sems_off": 1.572340028272802,
+     "rel_err": 0.013365372894042212
+    }
+   ]
+  },
+  {
+   "name": "pgsStratificationRiskCoefficient [exponent 1 on the GWAS side, competing]",
+   "file": "Diagnostic.lean",
+   "source": "(L*Sbar) * sqrt(H') / sigma_beta",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 1.31 sems",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.8157462335768026,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+    "lean": 10082.80899425081,
+    "truth": 1697.8859763532519,
+    "sem": 20.82226132192959,
+    "sems_off": 402.6903172647596,
+    "rel_err": 4.938448832651789
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+     "lean": 10082.80899425081,
+     "truth": 1697.8859763532519,
+     "sem": 20.82226132192959,
+     "sems_off": 402.6903172647596,
+     "rel_err": 4.938448832651789
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>2.5 rho=1.00 k=0.60 (1030 ascertained)",
+     "lean": 6169.309304759694,
+     "truth": 1052.1100510294307,
+     "sem": 13.985898391057665,
+     "sems_off": 365.8827706772208,
+     "rel_err": 4.863749042909884
+    },
+    {
+     "design": "c=0.60 u=0.035 |z|>3.0 rho=1.00 k=1.50 (741 ascertained)",
+     "lean": 4851.39146846767,
+     "truth": 1228.032429751882,
+     "sem": 24.167745843303553,
+     "sems_off": 149.92540314717667,
+     "rel_err": 2.950540190089174
+    },
+    {
+     "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+     "lean": 8709.620688477899,
+     "truth": 1119.9518464226435,
+     "sem": 21.505712064576176,
+     "sems_off": 352.91409181269665,
+     "rel_err": 6.776781400288073
+    },
+    {
+     "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+     "lean": 12700.228368603606,
+     "truth": 2208.393284271383,
+     "sem": 27.15725299836881,
+     "sems_off": 386.3363899493962,
+     "rel_err": 4.75089068557542
+    },
+    {
+     "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+     "lean": 2340.0649113499526,
+     "truth": 572.5802394925071,
+     "sem": 4.867107797913032,
+     "sems_off": 363.14886483823625,
+     "rel_err": 3.086876825200977
+    }
+   ]
+  },
+  {
+   "name": "pgsStratificationRiskCoefficient [exponent 1 on the residual side, competing]",
+   "file": "Diagnostic.lean",
+   "source": "sqrt(L*Sbar) * H' / sigma_beta",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 1.31 sems",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.8958102884236965,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+    "lean": 16024.500592245013,
+    "truth": 2208.393284271383,
+    "sem": 27.15725299836881,
+    "sems_off": 508.74465502101737,
+    "rel_err": 6.256180638826743
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+     "lean": 10120.558632860346,
+     "truth": 1697.8859763532519,
+     "sem": 20.82226132192959,
+     "sems_off": 404.5032634201215,
+     "rel_err": 4.9606821505160505
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>2.5 rho=1.00 k=0.60 (1030 ascertained)",
+     "lean": 3798.132028037593,
+     "truth": 1052.1100510294307,
+     "sem": 13.985898391057665,
+     "sems_off": 196.34219413204946,
+     "rel_err": 2.610014013573327
+    },
+    {
+     "design": "c=0.60 u=0.035 |z|>3.0 rho=1.00 k=1.50 (741 ascertained)",
+     "lean": 7102.876030108814,
+     "truth": 1228.032429751882,
+     "sem": 24.167745843303553,
+     "sems_off": 243.08612141354283,
+     "rel_err": 4.783948255783372
+    },
+    {
+     "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+     "lean": 3698.2042529483792,
+     "truth": 1119.9518464226435,
+     "sem": 21.505712064576176,
+     "sems_off": 119.886865349257,
+     "rel_err": 2.3021100547860196
+    },
+    {
+     "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+     "lean": 16024.500592245013,
+     "truth": 2208.393284271383,
+     "sem": 27.15725299836881,
+     "sems_off": 508.74465502101737,
+     "rel_err": 6.256180638826743
+    },
+    {
+     "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+     "lean": 1669.588094860314,
+     "truth": 572.5802394925071,
+     "sem": 4.867107797913032,
+     "sems_off": 225.39214270910392,
+     "rel_err": 1.915902400579024
+    }
+   ]
+  },
+  {
+   "name": "pgsStratificationRiskCoefficient [arithmetic mean in place of geometric, competing]",
+   "file": "Diagnostic.lean",
+   "source": "(L*Sbar + H') / 2 / sigma_beta",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 1.31 sems",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.7243193467861564,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+    "lean": 1629.1293761830768,
+    "truth": 1119.9518464226435,
+    "sem": 21.505712064576176,
+    "sems_off": 23.67638552173966,
+    "rel_err": 0.45464234144249244
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+     "lean": 1721.5581988823117,
+     "truth": 1697.8859763532519,
+     "sem": 20.82226132192959,
+     "sems_off": 1.13687087886697,
+     "rel_err": 0.01394217447976301
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>2.5 rho=1.00 k=0.60 (1030 ascertained)",
+     "lean": 1180.6847072534308,
+     "truth": 1052.1100510294307,
+     "sem": 13.985898391057665,
+     "sems_off": 9.193163901877657,
+     "rel_err": 0.12220647079475863
+    },
+    {
+     "design": "c=0.60 u=0.035 |z|>3.0 rho=1.00 k=1.50 (741 ascertained)",
+     "lean": 1287.0067448501545,
+     "truth": 1228.032429751882,
+     "sem": 24.167745843303553,
+     "sems_off": 2.4402075179308933,
+     "rel_err": 0.048023418331214505
+    },
+    {
+     "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+     "lean": 1629.1293761830768,
+     "truth": 1119.9518464226435,
+     "sem": 21.505712064576176,
+     "sems_off": 23.67638552173966,
+     "rel_err": 0.45464234144249244
+    },
+    {
+     "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+     "lean": 2225.8154113829773,
+     "truth": 2208.393284271383,
+     "sem": 27.15725299836881,
+     "sems_off": 0.6415275916397294,
+     "rel_err": 0.007889050938380507
+    },
+    {
+     "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+     "lean": 613.6142465434991,
+     "truth": 572.5802394925071,
+     "sem": 4.867107797913032,
+     "sems_off": 8.43088108066705,
+     "rel_err": 0.07166507717304664
+    }
+   ]
+  },
+  {
+   "name": "pgsStratificationRiskCoefficient [residual susceptibility alone, competing]",
+   "file": "Diagnostic.lean",
+   "source": "H' / sigma_beta",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 1.31 sems",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.8485896610906521,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+    "lean": 413.9842805867716,
+    "truth": 572.5802394925071,
+    "sem": 4.867107797913032,
+    "sems_off": 32.58525709534106,
+    "rel_err": 0.27698468785144115
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=1.00 k=1.00 (943 ascertained)",
+     "lean": 1727.9915791152312,
+     "truth": 1697.8859763532519,
+     "sem": 20.82226132192959,
+     "sems_off": 1.4458373322916986,
+     "rel_err": 0.01773122764500395
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>2.5 rho=1.00 k=0.60 (1030 ascertained)",
+     "lean": 649.0214466532236,
+     "truth": 1052.1100510294307,
+     "sem": 13.985898391057665,
+     "sems_off": 28.821073420205508,
+     "rel_err": 0.3831239935231181
+    },
+    {
+     "design": "c=0.60 u=0.035 |z|>3.0 rho=1.00 k=1.50 (741 ascertained)",
+     "lean": 1755.1925536129186,
+     "truth": 1228.032429751882,
+     "sem": 24.167745843303553,
+     "sems_off": 21.812548314558803,
+     "rel_err": 0.4292721520127499
+    },
+    {
+     "design": "c=0.60 u=0.065 |z|>3.5 rho=1.00 k=0.40 (1004 ascertained)",
+     "lean": 497.712290535613,
+     "truth": 1119.9518464226435,
+     "sem": 21.505712064576176,
+     "sems_off": 28.933687664867993,
+     "rel_err": 0.5555949194374665
+    },
+    {
+     "design": "c=0.90 u=0.050 |z|>2.5 rho=1.00 k=1.30 (1140 ascertained)",
+     "lean": 2734.1876622747104,
+     "truth": 2208.393284271383,
+     "sem": 27.15725299836881,
+     "sems_off": 19.361103202702758,
+     "rel_err": 0.2380891038512659
+    },
+    {
+     "design": "c=0.90 u=0.035 |z|>3.5 rho=1.00 k=0.70 (810 ascertained)",
+     "lean": 413.9842805867716,
+     "truth": 572.5802394925071,
+     "sem": 4.867107797913032,
+     "sems_off": 32.58525709534106,
+     "rel_err": 0.27698468785144115
+    }
+   ]
+  },
+  {
+   "name": "pgsStratificationRiskCoefficient [read as an equality off the aligned regime]",
+   "file": "Diagnostic.lean",
+   "source": "sqrt(L*Sbar) * sqrt(H') / sigma_beta, at rho < 1",
+   "note": "positive control 'no confounder, true additive effects: the mean marginal estimate recovers the effect it was given' passed at 1.31 sems",
+   "regime": "confounded null: 1500 candidate variants carrying an ancestry frequency gradient, 6000 GWAS individuals, 6000 target individuals and 6000 reference individuals per panel, no variant causal, phenotype c*a + noise on a standardized ancestry axis. The target panel carries the ancestry LOADING vector rho*u + sqrt(1-rho^2)*u_perp against the GWAS panel's u, at the same scale and on the same allele frequencies, so the residual axis differs in direction rather than in magnitude; the axis's own variance is observationally inert for this oracle and misalignment is what separates L*Sbar from H'. L*Sbar is the sum of squared ancestry correlations over the ascertained set and H' the same sum in the target, both measured on reference panels drawn independently of the GWAS panel that ascertains and of the target panel the oracle regresses on. The observable is the regression slope of the score on the target panel's ancestry axis, over sigma_beta and over the confounding magnitude. Phi = Lambda = 0, where ascertainmentAmplification is 1: the corpus defines neither operationally, so that factor is outside this design and is not folded into the verdict",
+   "span": 0.5685248211904387,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "c=0.60 u=0.050 |z|>3.0 rho=0.50 k=1.00 (955 ascertained)",
+    "lean": 1472.5523256297076,
+    "truth": 858.5152942943323,
+    "sem": 35.75384999676612,
+    "sems_off": 17.174011508995928,
+    "rel_err": 0.7152313248421404
+   },
+   "cells": [
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=0.90 k=1.00 (949 ascertained)",
+     "lean": 1677.094769485621,
+     "truth": 1540.3596486439653,
+     "sem": 25.427574279051385,
+     "sems_off": 5.3774347226784265,
+     "rel_err": 0.08876830872713959
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=0.70 k=1.00 (922 ascertained)",
+     "lean": 1494.1860761951602,
+     "truth": 1162.3867342605718,
+     "sem": 20.687690359982717,
+     "sems_off": 16.038491303814432,
+     "rel_err": 0.2854466006493577
+    },
+    {
+     "design": "c=0.60 u=0.050 |z|>3.0 rho=0.50 k=1.00 (955 ascertained)",
+     "lean": 1472.5523256297076,
+     "truth": 858.5152942943323,
+     "sem": 35.75384999676612,
+     "sems_off": 17.174011508995928,
+     "rel_err": 0.7152313248421404
+    },
+    {
+     "design": "c=0.90 u=0.040 |z|>2.5 rho=0.70 k=0.70 (1050 ascertained)",
+     "lean": 723.6247655443883,
+     "truth": 541.2321330497813,
+     "sem": 12.708378012559182,
+     "sems_off": 14.352156688631364,
+     "rel_err": 0.3369952029027644
+    }
+   ]
+  }
+ ]
+}
