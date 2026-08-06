@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
+import Descent.Core.Scaling
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
 -- `Portability.hudsonFstFromCoalescenceTimes`, `hetDecayFromScaled` and `r2FromMSE` are
 -- named below; the first is Portability's, the others `PopGen.DGP`'s.
@@ -76,7 +77,7 @@ section TransientFstDerivation
     two-name unfold is the contract: inlining breaks five proofs in three files.
 
     Empirical status: UNTESTED. -/
-noncomputable def hetDecayFactor (Ne θ : ℝ) : ℝ :=
+noncomputable def hetDecayFactor (Ne : ℝ) (θ : Descent.Core.Theta) : ℝ :=
   hetDecayFromScaled Ne θ
 
 /-- **Heterozygosity recurrence with mutation (affine recurrence).**
@@ -232,7 +233,7 @@ theorem fst_from_closed_form_het (lam Hstar H₀ : ℝ) (t : ℕ) (hH₀ : H₀ 
     1 - H* = 1 - θ/(1+θ) = 1/(1+θ) = Fst_eq.
     This is the correct normalisation: H₀ represents the ancestral
     heterozygosity before the population split, scaled to unit maximum. -/
-theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem het_ratio_prefactor_unit_H₀ (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     1 - expectedHeterozygosity θ / 1 = fstMutationDriftEquilibrium θ := by
   rw [div_one]
   exact (fstEquilibrium_eq_one_minus_het θ hθ).symm
@@ -261,12 +262,12 @@ theorem het_ratio_prefactor_unit_H₀ (θ : ℝ) (hθ : 0 ≤ θ) :
     Separating them needs about a hundredfold increase in replicates at small
     `Ne`, which is worth doing only if something downstream depends on the
     difference; nothing currently does. -/
-noncomputable def fstMutationDriftTransientDiscrete (θ Ne : ℝ) (t : ℕ) : ℝ :=
+noncomputable def fstMutationDriftTransientDiscrete (θ : Descent.Core.Theta) (Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fstMutationDriftTransientDiscrete_at_reference_point :
-    fstMutationDriftTransientDiscrete 1 1 1 = 3 / 8 := by
+    fstMutationDriftTransientDiscrete ⟨1⟩ 1 1 = 3 / 8 := by
   norm_num [fstMutationDriftTransientDiscrete, fstMutationDriftEquilibrium, hetDecayFactor,
     hetDecayFromScaled, Descent.Core.fstFromFlow]
 
@@ -284,8 +285,8 @@ theorem fstMutationDriftTransientDiscrete_at_reference_point :
 
     This theorem shows that the recurrence-based Fst exactly equals
     `fstMutationDriftTransientDiscrete`. -/
-theorem fstTransient_derived_from_recurrence (θ Ne : ℝ) (t : ℕ)
-    (hθ : 0 ≤ θ) :
+theorem fstTransient_derived_from_recurrence (Ne : ℝ) (θ : Descent.Core.Theta) (t : ℕ)
+    (hθ : 0 ≤ θ.value) :
     fstFromHetRatio
       (hetMutationRecurrence (hetDecayFactor Ne θ) (expectedHeterozygosity θ) 1 t) 1 =
     fstMutationDriftTransientDiscrete θ Ne t := by
@@ -294,14 +295,14 @@ theorem fstTransient_derived_from_recurrence (θ Ne : ℝ) (t : ℕ)
   rw [het_ratio_prefactor_unit_H₀ θ hθ]
 
 /-- **At t = 0, the derived transient Fst is 0.** -/
-theorem fstTransientDiscrete_at_zero (θ Ne : ℝ) :
+theorem fstTransientDiscrete_at_zero (Ne : ℝ) (θ : Descent.Core.Theta) :
     fstMutationDriftTransientDiscrete θ Ne 0 = 0 := by
   unfold fstMutationDriftTransientDiscrete
   simp
 
 /-- **The derived transient Fst is nonneg for valid parameters.** -/
-theorem fstTransientDiscrete_nonneg (θ Ne : ℝ) (t : ℕ)
-    (hθ : 0 ≤ θ) (hNe : 2 ≤ Ne) (hθNe : θ ≤ 2 * Ne) :
+theorem fstTransientDiscrete_nonneg (Ne : ℝ) (θ : Descent.Core.Theta) (t : ℕ)
+    (hθ : 0 ≤ θ.value) (hNe : 2 ≤ Ne) (hθNe : θ.value ≤ 2 * Ne) :
     0 ≤ fstMutationDriftTransientDiscrete θ Ne t := by
   unfold fstMutationDriftTransientDiscrete
   apply mul_nonneg
@@ -314,13 +315,13 @@ theorem fstTransientDiscrete_nonneg (θ Ne : ℝ) (t : ℕ)
       · rw [sub_nonneg, div_le_one (by linarith)]; linarith
     · unfold hetDecayFactor hetDecayFromScaled
       have h1 : 1 - 1 / (2 * Ne) < 1 := by rw [sub_lt_self_iff]; positivity
-      have h2 : 1 - θ / (2 * Ne) ≤ 1 := by rw [sub_le_self_iff]; positivity
+      have h2 : 1 - θ.value / (2 * Ne) ≤ 1 := by rw [sub_le_self_iff]; positivity
       nlinarith [mul_le_of_le_one_right
         (show 0 ≤ 1 - 1 / (2 * Ne) by rw [sub_nonneg, div_le_one (by linarith)]; linarith) h2]
 
 /-- **The derived transient Fst is bounded by the equilibrium Fst.** -/
-theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
-    (hθ : 0 ≤ θ) (hNe : 2 ≤ Ne) (hθNe : θ ≤ 2 * Ne) :
+theorem fstTransientDiscrete_le_equilibrium (Ne : ℝ) (θ : Descent.Core.Theta) (t : ℕ)
+    (hθ : 0 ≤ θ.value) (hNe : 2 ≤ Ne) (hθNe : θ.value ≤ 2 * Ne) :
     fstMutationDriftTransientDiscrete θ Ne t ≤ fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftTransientDiscrete
   have hfeq : 0 < fstMutationDriftEquilibrium θ := fstMutationDriftEquilibrium_pos θ hθ
@@ -343,19 +344,19 @@ theorem fstTransientDiscrete_le_equilibrium (θ Ne : ℝ) (t : ℕ)
     so λ^t ≈ exp(-(1+θ)t/(2N)).
     We state the algebraic identity connecting the two:
     (1-1/(2N))(1-θ/(2N)) = 1 - (1+θ)/(2N) + θ/(4N²). -/
-theorem hetDecayFactor_expansion (Ne θ : ℝ) (hNe : Ne ≠ 0) :
-    hetDecayFactor Ne θ = 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) := by
+theorem hetDecayFactor_expansion (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : Ne ≠ 0) :
+    hetDecayFactor Ne θ = 1 - (1 + θ.value) / (2 * Ne) + θ.value / (4 * Ne ^ 2) := by
   unfold hetDecayFactor hetDecayFromScaled
   field_simp
   ring
 
 /-- **The θ/(4N²) correction is negligible for large Ne.**
     |hetDecayFactor - (1 - (1+θ)/(2N))| = θ/(4N²), which vanishes as N → ∞. -/
-theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ) :
-    |hetDecayFactor Ne θ - (1 - (1 + θ) / (2 * Ne))| = θ / (4 * Ne ^ 2) := by
+theorem hetDecayFactor_approx_error (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : 0 < Ne) (hθ : 0 ≤ θ.value) :
+    |hetDecayFactor Ne θ - (1 - (1 + θ.value) / (2 * Ne))| = θ.value / (4 * Ne ^ 2) := by
   rw [hetDecayFactor_expansion Ne θ (ne_of_gt hNe)]
-  have : 1 - (1 + θ) / (2 * Ne) + θ / (4 * Ne ^ 2) - (1 - (1 + θ) / (2 * Ne)) =
-      θ / (4 * Ne ^ 2) := by ring
+  have : 1 - (1 + θ.value) / (2 * Ne) + θ.value / (4 * Ne ^ 2) - (1 - (1 + θ.value) / (2 * Ne)) =
+      θ.value / (4 * Ne ^ 2) := by ring
   rw [this, abs_of_nonneg]
   positivity
 
@@ -366,9 +367,9 @@ theorem hetDecayFactor_approx_error (Ne θ : ℝ) (hNe : 0 < Ne) (hθ : 0 ≤ θ
     (1-1/(2N))(1-θ/(2N)) or the continuous approximation exp(-(1+θ)/(2N)).
     This theorem states the structural agreement: when the decay base is the same,
     the formulas are identical. -/
-theorem fstTransientDiscrete_eq_explicit (θ Ne : ℝ) (t : ℕ) :
+theorem fstTransientDiscrete_eq_explicit (Ne : ℝ) (θ : Descent.Core.Theta) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
-      1 / (1 + θ) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))) ^ t) := by
+      1 / (1 + θ.value) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ.value / (2 * Ne))) ^ t) := by
   unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor Descent.Core.fstFromFlow
     hetDecayFromScaled
   rfl
@@ -402,9 +403,9 @@ theorem hudsonFst_eq_fstFromHetRatio (p₁ p₂ : ℝ)
   field_simp
   ring
 
-theorem hetDecayFactor_uses_timeScale (Ne θ : ℝ) :
+theorem hetDecayFactor_uses_timeScale (Ne : ℝ) (θ : Descent.Core.Theta) :
     PopGen.hetDecayFactor Ne θ
-      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * (1 - θ / Descent.Core.coalescentTimeScale Ne) := by
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * (1 - θ.value / Descent.Core.coalescentTimeScale Ne) := by
   unfold PopGen.hetDecayFactor PopGen.hetDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 end Descent.PopGen

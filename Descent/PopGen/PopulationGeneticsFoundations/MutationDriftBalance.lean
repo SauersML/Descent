@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
+import Descent.Core.Scaling
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 -- `fstMutationDriftEquilibrium` is declared in `PopGen.DGP` and named throughout the
 -- fixed-point results below.  This is a PopGen-internal edge, not a layer inversion.
@@ -93,19 +94,19 @@ theorem scaledIdentityStep_fixedPoint (scaledRate : ℝ) (h : 0 ≤ scaledRate) 
 
 /-- **The mutation-drift equilibrium is the rest point of the scaled identity
 balance** driven by mutation alone. -/
-theorem fstMutationDriftEquilibrium_isFixedPoint (θ : ℝ) (hθ : 0 ≤ θ) :
-    scaledIdentityStep θ (fstMutationDriftEquilibrium θ) =
+theorem fstMutationDriftEquilibrium_isFixedPoint (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
+    scaledIdentityStep θ.value (fstMutationDriftEquilibrium θ) =
       fstMutationDriftEquilibrium θ :=
-  scaledIdentityStep_fixedPoint θ hθ
+  scaledIdentityStep_fixedPoint θ.value hθ
 
 /-- Equilibrium Fst is positive for nonneg θ. -/
-theorem fstMutationDriftEquilibrium_pos (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem fstMutationDriftEquilibrium_pos (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     0 < fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   positivity
 
 /-- Equilibrium Fst is at most 1. -/
-theorem fstMutationDriftEquilibrium_le_one (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem fstMutationDriftEquilibrium_le_one (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     fstMutationDriftEquilibrium θ ≤ 1 := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_le_one (by linarith)]
@@ -114,19 +115,19 @@ theorem fstMutationDriftEquilibrium_le_one (θ : ℝ) (hθ : 0 ≤ θ) :
 /-- Equilibrium Fst is strictly less than 1 when θ > 0. This is the key
     qualitative difference from the pure drift model: mutation prevents
     complete fixation. -/
-theorem fstMutationDriftEquilibrium_lt_one (θ : ℝ) (hθ : 0 < θ) :
+theorem fstMutationDriftEquilibrium_lt_one (θ : Descent.Core.Theta) (hθ : 0 < θ.value) :
     fstMutationDriftEquilibrium θ < 1 := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_one (by linarith)]
   linarith
 
 /-- Equilibrium Fst decreases with θ: more mutation → less differentiation. -/
-theorem fstMutationDriftEquilibrium_strictAnti (a b : ℝ)
-    (ha : 0 ≤ a) (hab : a < b) :
+theorem fstMutationDriftEquilibrium_strictAnti (a b : Descent.Core.Theta)
+    (ha : 0 ≤ a.value) (hab : a.value < b.value) :
     fstMutationDriftEquilibrium b < fstMutationDriftEquilibrium a := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-  have hden : 0 < 1 + a := by linarith
-  have hden_lt : 1 + a < 1 + b := by linarith
+  have hden : 0 < 1 + a.value := by linarith
+  have hden_lt : 1 + a.value < 1 + b.value := by linarith
   simpa using div_lt_div_of_pos_left one_pos hden hden_lt
 
 /-- **Equilibrium Fst decreases when the compound parameter `Ne * μ` increases.**
@@ -136,26 +137,26 @@ is the same move.  Both single-parameter statements below are this fact; stated 
 each carried its own copy of the unfolding. -/
 theorem fstEquilibrium_decreases_with_product (Ne₁ μ₁ Ne₂ μ₂ : ℝ)
     (h_nonneg : 0 ≤ Ne₁ * μ₁) (h_more : Ne₁ * μ₁ < Ne₂ * μ₂) :
-    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ₂) <
-      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ₁) := by
+    fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne₂ μ₂) <
+      fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne₁ μ₁) := by
   apply fstMutationDriftEquilibrium_strictAnti <;>
-    unfold Descent.Core.scaledMutationRate Descent.Core.ploidy <;>
+    simp only [Descent.Core.Theta.value_ofRate] <;>
     nlinarith
 
 /-- Equilibrium Fst decreases when Ne increases (with μ fixed). -/
 theorem fstEquilibrium_decreases_with_Ne (μ Ne₁ Ne₂ : ℝ)
     (hμ : 0 < μ) (hNe₁ : 0 < Ne₁)
     (h_more : Ne₁ < Ne₂) :
-    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₂ μ) <
-      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne₁ μ) :=
+    fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne₂ μ) <
+      fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne₁ μ) :=
   fstEquilibrium_decreases_with_product Ne₁ μ Ne₂ μ (by nlinarith) (by nlinarith)
 
 /-- Equilibrium Fst decreases when μ increases (with Ne fixed). -/
 theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     (hNe : 0 < Ne) (hμ₁ : 0 < μ₁)
     (h_more : μ₁ < μ₂) :
-    fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₂) <
-      fstMutationDriftEquilibrium (Descent.Core.scaledMutationRate Ne μ₁) :=
+    fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne μ₂) <
+      fstMutationDriftEquilibrium (Descent.Core.Theta.ofRate Ne μ₁) :=
   fstEquilibrium_decreases_with_product Ne μ₁ Ne μ₂ (by nlinarith) (by nlinarith)
 
 /-- **Complementarity of heterozygosity and Fst under mutation-drift balance.**
@@ -182,10 +183,10 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     See also `nei_fst_complement` for the general (non-equilibrium)
     version derived directly from Nei's definition, and
     `nei_fst_equilibrium_consistent` which connects the two. -/
-theorem het_plus_fst_eq_one (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem het_plus_fst_eq_one (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     expectedHeterozygosity θ + fstMutationDriftEquilibrium θ = 1 := by
   unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
-  have hden : (1 + θ) ≠ 0 := by linarith
+  have hden : (1 + θ.value) ≠ 0 := by linarith
   field_simp [hden]
   ring
 
@@ -204,23 +205,23 @@ theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
     When H_S = θ/(1+θ) (`expectedHeterozygosity θ`) and H_T = 1 (maximal
     heterozygosity under the infinite-alleles model), Nei's formula gives
     Fst = 1/(1+θ) = `fstMutationDriftEquilibrium θ`. -/
-theorem nei_fst_equilibrium_consistent (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem nei_fst_equilibrium_consistent (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     (neiFst 1 (expectedHeterozygosity θ)).value = fstMutationDriftEquilibrium θ := by
   simp only [neiFst_value]
   unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
-  have hden : (1 + θ) ≠ 0 := by linarith
+  have hden : (1 + θ.value) ≠ 0 := by linarith
   field_simp [hden]
   ring
 
 /-- **At mutation-drift equilibrium, the within-population share equals expectedHeterozygosity.**
     When H_T = 1, we have H_S / H_T = H_S = θ/(1+θ). -/
-theorem within_pop_share_eq_het (θ : ℝ) :
+theorem within_pop_share_eq_het (θ : Descent.Core.Theta) :
     expectedHeterozygosity θ / 1 = expectedHeterozygosity θ := by
   simp
 
 /-- **Heterozygosity determines Fst and vice versa.**
     Fst = 1 - H under mutation-drift balance. -/
-theorem fstEquilibrium_eq_one_minus_het (θ : ℝ) (hθ : 0 ≤ θ) :
+theorem fstEquilibrium_eq_one_minus_het (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     fstMutationDriftEquilibrium θ = 1 - expectedHeterozygosity θ := by
   have h := het_plus_fst_eq_one θ hθ
   linarith
@@ -238,11 +239,11 @@ theorem mutation_timescale_exceeds_drift (Ne μ : ℝ)
   nlinarith
 
 /-- When θ < 1, equilibrium Fst > 1/2. -/
-theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
-    (hθ_pos : 0 < θ) (hθ_small : θ < 1) :
+theorem fstEquilibrium_gt_half_of_small_theta (θ : Descent.Core.Theta)
+    (hθ_pos : 0 < θ.value) (hθ_small : θ.value < 1) :
     1 / 2 < fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
-  rw [lt_div_iff₀ (by linarith : 0 < 1 + θ)]
+  rw [lt_div_iff₀ (by linarith : 0 < 1 + θ.value)]
   linarith
 
 /-- **Fst under mutation-drift with time dependence (approach to equilibrium).**
@@ -276,31 +277,31 @@ theorem fstEquilibrium_gt_half_of_small_theta (θ : ℝ)
 
     Power: the prediction rises from a quarter of the plateau to within 2% of
     it across the time points, so a wrong rate constant would separate. -/
-noncomputable def fstMutationDriftTransient (θ t Ne : ℝ) : ℝ :=
-  fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
+noncomputable def fstMutationDriftTransient (θ : Descent.Core.Theta) (t Ne : ℝ) : ℝ :=
+  fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ.value) * t / (2 * Ne)))
 
 /-- A zero effective size sends the scaled time to Mathlib's junk `0`, hence the exponential to
 one and the transient to zero: the body reports no divergence at all where the true reading is
 immediate saturation at the equilibrium value. -/
-theorem fstMutationDriftTransient_at_zero_size_is_junk (θ t : ℝ) :
+theorem fstMutationDriftTransient_at_zero_size_is_junk (t : ℝ) (θ : Descent.Core.Theta) :
     fstMutationDriftTransient θ t 0 = 0 := by
   unfold fstMutationDriftTransient
   simp
 
 
 /-- Transient mutation-drift Fst is nonneg for nonneg θ, t, and positive Ne. -/
-theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
-    (hθ : 0 ≤ θ) (ht : 0 ≤ t) (hNe : 0 < Ne) :
+theorem fstMutationDriftTransient_nonneg (t Ne : ℝ) (θ : Descent.Core.Theta)
+    (hθ : 0 ≤ θ.value) (ht : 0 ≤ t) (hNe : 0 < Ne) :
     0 ≤ fstMutationDriftTransient θ t Ne := by
   unfold fstMutationDriftTransient
   apply mul_nonneg
   · exact le_of_lt (fstMutationDriftEquilibrium_pos θ hθ)
-  · have harg : 0 ≤ (1 + θ) * t / (2 * Ne) := by positivity
-    have hexp : Real.exp (-(1 + θ) * t / (2 * Ne)) ≤ 1 := by
+  · have harg : 0 ≤ (1 + θ.value) * t / (2 * Ne) := by positivity
+    have hexp : Real.exp (-(1 + θ.value) * t / (2 * Ne)) ≤ 1 := by
       rw [← Real.exp_zero]
-      have h_nonpos : -(Real.exp 0 + θ) * t / (2 * Ne) ≤ 0 := by
-        have hnum_nonpos : -(Real.exp 0 + θ) * t ≤ 0 := by
-          have hneg_nonpos : -(Real.exp 0 + θ) ≤ 0 := by
+      have h_nonpos : -(Real.exp 0 + θ.value) * t / (2 * Ne) ≤ 0 := by
+        have hnum_nonpos : -(Real.exp 0 + θ.value) * t ≤ 0 := by
+          have hneg_nonpos : -(Real.exp 0 + θ.value) ≤ 0 := by
             nlinarith [hθ, Real.exp_pos 0]
           exact mul_nonpos_of_nonpos_of_nonneg hneg_nonpos ht
         exact div_nonpos_of_nonpos_of_nonneg hnum_nonpos (by positivity : 0 ≤ 2 * Ne)
@@ -308,50 +309,50 @@ theorem fstMutationDriftTransient_nonneg (θ t Ne : ℝ)
     exact sub_nonneg.mpr hexp
 
 /-- Transient Fst is bounded above by the equilibrium Fst. -/
-theorem fstMutationDriftTransient_le_equilibrium (θ t Ne : ℝ)
-    (hθ : 0 ≤ θ) :
+theorem fstMutationDriftTransient_le_equilibrium (t Ne : ℝ) (θ : Descent.Core.Theta)
+    (hθ : 0 ≤ θ.value) :
     fstMutationDriftTransient θ t Ne ≤ fstMutationDriftEquilibrium θ := by
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
     fstMutationDriftEquilibrium_pos θ hθ
-  have hexp_pos : 0 < Real.exp (-(1 + θ) * t / (2 * Ne)) :=
+  have hexp_pos : 0 < Real.exp (-(1 + θ.value) * t / (2 * Ne)) :=
     Real.exp_pos _
-  have h_factor_le : 1 - Real.exp (-(1 + θ) * t / (2 * Ne)) ≤ 1 := by linarith
-  calc fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ) * t / (2 * Ne)))
+  have h_factor_le : 1 - Real.exp (-(1 + θ.value) * t / (2 * Ne)) ≤ 1 := by linarith
+  calc fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ.value) * t / (2 * Ne)))
       ≤ fstMutationDriftEquilibrium θ * 1 := by
         exact mul_le_mul_of_nonneg_left h_factor_le (le_of_lt hfeq_pos)
     _ = fstMutationDriftEquilibrium θ := by ring
 
 /-- Transient Fst increases with time toward equilibrium. -/
-theorem fstMutationDriftTransient_increases_with_time (θ Ne t₁ t₂ : ℝ)
-    (hθ : 0 < θ) (hNe : 0 < Ne)
+theorem fstMutationDriftTransient_increases_with_time (Ne t₁ t₂ : ℝ) (θ : Descent.Core.Theta)
+    (hθ : 0 < θ.value) (hNe : 0 < Ne)
     (h_more : t₁ < t₂) :
     fstMutationDriftTransient θ t₁ Ne < fstMutationDriftTransient θ t₂ Ne := by
   unfold fstMutationDriftTransient
   have hfeq_pos : 0 < fstMutationDriftEquilibrium θ :=
     fstMutationDriftEquilibrium_pos θ (le_of_lt hθ)
-  have harg_lt : (1 + θ) * t₁ / (2 * Ne) < (1 + θ) * t₂ / (2 * Ne) := by
+  have harg_lt : (1 + θ.value) * t₁ / (2 * Ne) < (1 + θ.value) * t₂ / (2 * Ne) := by
     exact div_lt_div_of_pos_right (by nlinarith) (by positivity)
-  have hneg_arg_lt : -((1 + θ) * t₂ / (2 * Ne)) < -((1 + θ) * t₁ / (2 * Ne)) := by
+  have hneg_arg_lt : -((1 + θ.value) * t₂ / (2 * Ne)) < -((1 + θ.value) * t₁ / (2 * Ne)) := by
     exact neg_lt_neg harg_lt
-  have hexp_lt : Real.exp (-((1 + θ) * t₂ / (2 * Ne))) <
-      Real.exp (-((1 + θ) * t₁ / (2 * Ne))) := by
+  have hexp_lt : Real.exp (-((1 + θ.value) * t₂ / (2 * Ne))) <
+      Real.exp (-((1 + θ.value) * t₁ / (2 * Ne))) := by
     exact Real.exp_lt_exp.mpr hneg_arg_lt
   have h_factor_lt :
-      1 - Real.exp (-((1 + θ) * t₁ / (2 * Ne))) <
-        1 - Real.exp (-((1 + θ) * t₂ / (2 * Ne))) := by
+      1 - Real.exp (-((1 + θ.value) * t₁ / (2 * Ne))) <
+        1 - Real.exp (-((1 + θ.value) * t₂ / (2 * Ne))) := by
     linarith
   have h_factor_lt' :
-      1 - Real.exp (-(1 + θ) * t₁ / (2 * Ne)) <
-        1 - Real.exp (-(1 + θ) * t₂ / (2 * Ne)) := by
-    have harg₁ : -(1 + θ) * t₁ / (2 * Ne) = -((1 + θ) * t₁ / (2 * Ne)) := by ring
-    have harg₂ : -(1 + θ) * t₂ / (2 * Ne) = -((1 + θ) * t₂ / (2 * Ne)) := by ring
+      1 - Real.exp (-(1 + θ.value) * t₁ / (2 * Ne)) <
+        1 - Real.exp (-(1 + θ.value) * t₂ / (2 * Ne)) := by
+    have harg₁ : -(1 + θ.value) * t₁ / (2 * Ne) = -((1 + θ.value) * t₁ / (2 * Ne)) := by ring
+    have harg₂ : -(1 + θ.value) * t₂ / (2 * Ne) = -((1 + θ.value) * t₂ / (2 * Ne)) := by ring
     rw [harg₁, harg₂]
     exact h_factor_lt
   exact mul_lt_mul_of_pos_left h_factor_lt' hfeq_pos
 
 /-- At t=0, transient Fst is 0 (populations are undifferentiated). -/
-theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
+theorem fstMutationDriftTransient_at_zero (Ne : ℝ) (θ : Descent.Core.Theta) :
     fstMutationDriftTransient θ 0 Ne = 0 := by
   unfold fstMutationDriftTransient
   simp [mul_zero, zero_div, Real.exp_zero, sub_self]
@@ -374,31 +375,31 @@ theorem fstMutationDriftTransient_at_zero (θ Ne : ℝ) :
 
     Empirical status: MIXED -- body **VALIDATED** as a count of mutations arising; the
     segregating-sites reading **FALSIFIED** (`validation/empirical/coalescent_diff/`). -/
-noncomputable def expectedNewMutations (θ t : ℝ) : ℝ :=
-  θ / 2 * t
+noncomputable def expectedNewMutations (θ : Descent.Core.Theta) (t : ℝ) : ℝ :=
+  θ.value / 2 * t
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem expectedNewMutations_at_reference_point :
-    expectedNewMutations 1 1 = 1 / 2 := by
+    expectedNewMutations ⟨1⟩ 1 = 1 / 2 := by
   norm_num [expectedNewMutations]
 
 
 /-- Expected new mutations is nonneg for nonneg θ and t. -/
-theorem expectedNewMutations_nonneg (θ t : ℝ) (hθ : 0 ≤ θ) (ht : 0 ≤ t) :
+theorem expectedNewMutations_nonneg (t : ℝ) (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) (ht : 0 ≤ t) :
     0 ≤ expectedNewMutations θ t := by
   unfold expectedNewMutations
   positivity
 
 /-- More mutations accumulate with larger θ (fixed t). -/
-theorem expectedNewMutations_increases_with_theta (t θ₁ θ₂ : ℝ)
-    (ht : 0 < t) (h_more : θ₁ < θ₂) :
+theorem expectedNewMutations_increases_with_theta (t : ℝ) (θ₁ θ₂ : Descent.Core.Theta)
+    (ht : 0 < t) (h_more : θ₁.value < θ₂.value) :
     expectedNewMutations θ₁ t < expectedNewMutations θ₂ t := by
   unfold expectedNewMutations
   nlinarith
 
 /-- More mutations accumulate over longer time (fixed θ). -/
-theorem expectedNewMutations_increases_with_time (θ t₁ t₂ : ℝ)
-    (hθ : 0 < θ) (h_more : t₁ < t₂) :
+theorem expectedNewMutations_increases_with_time (t₁ t₂ : ℝ) (θ : Descent.Core.Theta)
+    (hθ : 0 < θ.value) (h_more : t₁ < t₂) :
     expectedNewMutations θ t₁ < expectedNewMutations θ t₂ := by
   unfold expectedNewMutations
   nlinarith

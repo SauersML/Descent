@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
+import Descent.Core.Scaling
 -- `Portability.hetMutationFloor` and `fstMutationDriftEquilibrium` are named below.
 import Descent.PopGen.DGP
 import Descent.Portability.PortabilityDrift
@@ -265,9 +266,9 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
 /-- **The equilibrium derived from the recurrence agrees with `fstMutationDriftEquilibrium`.** -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - Portability.hetMutationFloor Ne mu = fstMutationDriftEquilibrium (4 * Ne * mu) := by
+    1 - Portability.hetMutationFloor Ne mu = Descent.Core.fstFromFlow (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
-  unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold Descent.Core.fstFromFlow
   rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/

@@ -108,7 +108,7 @@ theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
-  PopGen.hetDecayFromScaled g.Ne g.theta.value
+  PopGen.hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
 discrete-time drift/mutation/migration coordinate used in the evolutionary

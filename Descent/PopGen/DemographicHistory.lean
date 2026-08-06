@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations
+import Descent.Core.Scaling
 import Descent.PopGen.LDDecayTheory
 import Descent.Core.Fst
 import Descent.Layer
@@ -923,7 +924,7 @@ theorem smaller_founder_larger_heterozygosity_loss
     formula is the pure-drift case of the general heterozygosity recurrence
     derived in `PopulationGeneticsFoundations`. -/
 theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
-    founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete 0 (k : ℝ) t := by
+    founderHeterozygosityLoss k t = fstMutationDriftTransientDiscrete ⟨0⟩ (k : ℝ) t := by
   -- `simp only` rather than `unfold`: two declarations bear the name
   -- `hetDecayFactor` -- this module's `(Ne θ : ℝ)` one and the method on
   -- `Core.PopGenParameters` -- and `unfold` fails outright when the name it is
@@ -1398,10 +1399,10 @@ theorem demoSteppingStoneFst_eq_scaled (d Ne m σ_sq : ℝ) :
   unfold PopGen.demoSteppingStoneFst
   rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
-theorem fstMutationDriftTransient_uses_timeScale (θ t Ne : ℝ) :
+theorem fstMutationDriftTransient_uses_timeScale (t Ne : ℝ) (θ : Descent.Core.Theta) :
     PopGen.fstMutationDriftTransient θ t Ne
       = PopGen.fstMutationDriftEquilibrium θ *
-          (1 - Real.exp (-(1 + θ) * t / Descent.Core.coalescentTimeScale Ne)) := by
+          (1 - Real.exp (-(1 + θ.value) * t / Descent.Core.coalescentTimeScale Ne)) := by
   unfold PopGen.fstMutationDriftTransient; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **Slatkin's identity**: `1 - H_w/H_b = 1 - E[T_w]/E[T_b]`.
@@ -1446,8 +1447,9 @@ consumer of the one bridge, so the finite-`d` form and its `d → ∞` limit can
 different conventions. -/
 theorem islandFstFiniteDemes_eq_scaled (Ne m d : ℝ) :
     PopGen.islandFstFiniteDemes Ne m d
-      = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m * Descent.Core.islandDemeCorrection d) := by
-  unfold PopGen.islandFstFiniteDemes PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow
+      = Descent.Core.fstFromFlow (Descent.Core.scaledMigrationRate Ne m
+          * Descent.Core.islandDemeCorrection d) := by
+  unfold PopGen.islandFstFiniteDemes Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow
     Descent.Core.islandDemeCorrection Descent.Core.ratio Descent.Core.ploidy
   ring
 

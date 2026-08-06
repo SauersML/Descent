@@ -177,7 +177,7 @@ theorem serialFounderWithinTime_at_zero_size_is_junk (Nanc tAnc : ℝ) :
 
 
 /-- **The validated half.** The saturated far-deme `F_ST` is the ratio of the ceiling waiting
-time to the total, `τ / (T_w + τ)`, with `τ` the founder ceiling and `T_w` the within-deme
+time to the total, `c / (T_w + c)`, with `c` the founder ceiling and `T_w` the within-deme
 time. Measured: `0.18497` against an exact `0.19248`, a `3.9%` error with no free parameter.
 
 This is the part a closed form gets right. The approach to it is not, and
@@ -186,9 +186,19 @@ This is the part a closed form gets right. The approach to it is not, and
     Empirical status: MEASURED at one design point -- `0.18497` against the
     analytic `0.19248`, a `3.9%` error with no free parameter. Power is not
     established: a single configuration cannot reject a wrong functional form,
-    so this is not recorded as VALIDATED. -/
-noncomputable def serialFounderCeilingFst (N Nanc tAnc τ : ℝ) : ℝ :=
-  τ / (serialFounderWithinTime N Nanc tAnc + τ)
+    so this is not recorded as VALIDATED.
+
+    **The ceiling argument is a time in GENERATIONS, and it was spelled `τ`.**
+    `Meta.Linters.scaledQuantityUntyped` reported it, and the report was right in
+    a way it was not built for: `τ` means `t/(2 Nₑ)` everywhere else in this
+    corpus, and this argument is not scaled by anything. `serialFounderWithinTime`
+    returns generations -- its own validation table spans 969 to 6407 -- and the
+    chain's `ceiling` field is `2000`, so both sides of this ratio are raw waiting
+    times and the ratio is a time fraction rather than a coalescent `F_ST`
+    coordinate. Giving it `Core.Tau` would have asserted a scaling that is not
+    there; it is `ceilingTime` now. -/
+noncomputable def serialFounderCeilingFst (N Nanc tAnc ceilingTime : ℝ) : ℝ :=
+  ceilingTime / (serialFounderWithinTime N Nanc tAnc + ceilingTime)
 
 /-- **serialFounderCeilingFst at zero between-population coalescent time, named.** With the
 between-population time set to zero the ratio has a vanishing numerator, and the
@@ -202,16 +212,16 @@ theorem serialFounderCeilingFst_no_coalescent_time_is_junk (N Nanc tAnc : ℝ) :
 
 /-- The ceiling `F_ST` is a genuine variance ratio: nonnegative, and below one whenever the
 within-deme time is positive. -/
-theorem serialFounderCeilingFst_lt_one (N Nanc tAnc τ : ℝ)
-    (hτ : 0 ≤ τ) (hw : 0 < serialFounderWithinTime N Nanc tAnc) :
-    serialFounderCeilingFst N Nanc tAnc τ < 1 := by
+theorem serialFounderCeilingFst_lt_one (N Nanc tAnc ceilingTime : ℝ)
+    (hτ : 0 ≤ ceilingTime) (hw : 0 < serialFounderWithinTime N Nanc tAnc) :
+    serialFounderCeilingFst N Nanc tAnc ceilingTime < 1 := by
   unfold serialFounderCeilingFst
   rw [div_lt_one (by linarith)]
   linarith
 
-theorem serialFounderCeilingFst_nonneg (N Nanc tAnc τ : ℝ)
-    (hτ : 0 ≤ τ) (hw : 0 < serialFounderWithinTime N Nanc tAnc) :
-    0 ≤ serialFounderCeilingFst N Nanc tAnc τ := by
+theorem serialFounderCeilingFst_nonneg (N Nanc tAnc ceilingTime : ℝ)
+    (hτ : 0 ≤ ceilingTime) (hw : 0 < serialFounderWithinTime N Nanc tAnc) :
+    0 ≤ serialFounderCeilingFst N Nanc tAnc ceilingTime := by
   unfold serialFounderCeilingFst
   exact div_nonneg hτ (by linarith)
 

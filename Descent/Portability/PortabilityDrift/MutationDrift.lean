@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.Definitions
+import Descent.Core.Scaling
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Layer
 
@@ -208,7 +209,7 @@ The closed form takes that value exactly, rather than approaching it. -/
     -- so the two must not be substituted for one another. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
-  PopGen.fstMutationDriftEquilibrium m.theta
+  PopGen.fstMutationDriftEquilibrium (Descent.Core.Theta.ofScaled m.theta)
 
 /-- **The equilibrium inverts one plus the scaled mutation parameter.** `fstEquilibrium_pos`
 fixes the sign; this fixes the value, and a body carrying any other coefficient on `theta` would
@@ -217,6 +218,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
     (m : MutationDriftModelAssumptions) (h : 1 + m.theta ≠ 0) :
     m.fstEquilibrium * (1 + m.theta) = 1 := by
   unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  simp only [Descent.Core.Theta.value_ofScaled]
   field_simp
 
 /-- **The mutation-drift equilibrium is the fixed point of the identity
@@ -228,6 +230,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
       PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
       Descent.Core.ploidy
+    simp only [Descent.Core.Theta.value_ofScaled]
     ring_nf
   rw [hθ]
   exact ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
@@ -237,6 +240,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
   unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  simp only [Descent.Core.Theta.value_ofScaled]
   have hden : 0 < 1 + m.theta := by
     nlinarith [m.theta_pos]
   exact div_pos one_pos hden
@@ -246,6 +250,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     (m : MutationDriftModelAssumptions) :
     m.fstEquilibrium < 1 := by
   unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  simp only [Descent.Core.Theta.value_ofScaled]
   rw [div_lt_one (by linarith [m.theta_pos])]
   linarith [m.theta_pos]
 
@@ -930,12 +935,12 @@ is no evidence that the admissible ones are the intended domain. -/
 /-- **Pairwise Fst under mutation-drift balance is bounded.**
     Under mutation-drift equilibrium, pairwise Fst between any two populations
     is bounded above by 2 × Fst_eq (since each branch contributes at most Fst_eq). -/
-theorem pairwise_fst_mutationDrift_bound (θ : ℝ) (hθ : 0 < θ) :
-    pairwiseFstFromBranches (1 / (1 + θ)) (1 / (1 + θ)) ≤ 2 / (1 + θ) := by
+theorem pairwise_fst_mutationDrift_bound (θ : Descent.Core.Theta) (hθ : 0 < θ.value) :
+    pairwiseFstFromBranches (1 / (1 + θ.value)) (1 / (1 + θ.value)) ≤ 2 / (1 + θ.value) := by
   simp [pairwiseFstFromBranches, Descent.Core.complementaryComposition]
   ring_nf
-  have h1 : 0 < 1 + θ := by linarith
-  have hsq : 0 ≤ (1 / (1 + θ)) ^ 2 := sq_nonneg (1 / (1 + θ))
+  have h1 : 0 < 1 + θ.value := by linarith
+  have hsq : 0 ≤ (1 / (1 + θ.value)) ^ 2 := sq_nonneg (1 / (1 + θ.value))
   nlinarith
 
 end MutationDriftPortability

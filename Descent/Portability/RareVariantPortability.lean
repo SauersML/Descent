@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift
+import Descent.Core.Scaling
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.PolygenicAdaptation
 import Descent.Core.Fst
@@ -593,11 +594,11 @@ textbook `mu / (h·s)` is not `1 / (1 + θ)` at any `θ`, and it leaves the unit
 weak-constraint regime; the identity below is what a substitution of the one for the other
 would have to contradict. -/
 theorem mutationSelectionBalance_eq_identityFraction (mu s h : ℝ) (hmu : mu ≠ 0) :
-    mutationSelectionBalance mu s h = PopGen.fstMutationDriftEquilibrium (h * s / mu) := by
+    mutationSelectionBalance mu s h = Descent.Core.fstFromFlow (h * s / mu) := by
   have hsum : (1 : ℝ) + h * s / mu = (h * s + mu) / mu := by
     field_simp
     ring
-  unfold mutationSelectionBalance PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold mutationSelectionBalance Descent.Core.fstFromFlow
   rw [hsum, one_div_div]
 
 /-- **The dominant balance is a fixed point of the dominant map.** This is what

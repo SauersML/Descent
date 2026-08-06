@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.Definitions
+import Descent.Core.Scaling
 import Descent.Portability.PortabilityDrift.MutationDrift
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Layer
@@ -1882,16 +1883,30 @@ theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ
     Portability.effectiveSymmetricMigration m₁₂ m₂₁ = Descent.Core.meanAlleleFreq m₁₂ m₂₁ := by
   unfold Portability.effectiveSymmetricMigration Descent.Core.meanAlleleFreq Descent.Core.midpoint; ring
 
+/-- **The migration-drift equilibrium is the flow map at the scaled MIGRATION rate.**
+
+This used to read `= PopGen.fstMutationDriftEquilibrium (scaledMigrationRate Ne m)`, and it
+stopped elaborating the moment `fstMutationDriftEquilibrium` began taking a `Core.Theta`.
+The type was right and the statement was wrong: it fed a scaled MIGRATION rate to the
+MUTATION-drift law, which is the exact substitution `Core/Scaling.lean` was built after --
+`theta_bigM_share_constant` says the two carry the same number at equal rates, so nothing
+about the value objected and nothing ever would have.
+
+What is true, and is what this now says, is that both are `Core.fstFromFlow`: one map,
+`1/(1 + x)`, applied to two different flows. The shared content is the map. -/
 theorem fstMigrationDriftEquilibrium_eq_scaled (Ne m : ℝ) :
     Portability.fstMigrationDriftEquilibrium Ne m =
-      PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne m) := by
-  unfold Portability.fstMigrationDriftEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+      Descent.Core.fstFromFlow (Descent.Core.scaledMigrationRate Ne m) := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
+/-- **And the asymmetric two-deme `F_ST` is the same map at the summed migration rate.**
+Restated through `Core.fstFromFlow` for the reason given on
+`fstMigrationDriftEquilibrium_eq_scaled` directly above. -/
 theorem asymmetricFst_eq_scaled (Ne m₁₂ m₂₁ : ℝ) :
     Portability.asymmetricFst Ne m₁₂ m₂₁
-      = PopGen.fstMutationDriftEquilibrium (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
-  unfold Portability.asymmetricFst PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+      = Descent.Core.fstFromFlow (Descent.Core.scaledMigrationRate Ne (m₁₂ + m₂₁)) := by
+  unfold Portability.asymmetricFst Descent.Core.fstFromFlow
   rw [Descent.Core.scaledMigrationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
 /-- **The multiplicative identity recurrence carries the same coalescent scale.** -/

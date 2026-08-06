@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Foundations.TransportIdentities
+import Descent.Core.Scaling
 -- Step 4b below needs `FiniteSpectralModel.degradation_eq_zero_iff`, which supplies a
 -- positivity certificate for excess target risk that does not read an F_ST difference.
 -- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
@@ -97,8 +98,8 @@ not find it.
     10 -- a hundredfold sweep -- at worst 2.17 sems, with an Ewens
     expected-allele-count control passing at 1.10 sems. Two runs, two
     complementary observables, one law. -/
-noncomputable def fstMutationDriftEquilibrium (θ : ℝ) : ℝ :=
-  Descent.Core.fstFromFlow θ
+noncomputable def fstMutationDriftEquilibrium (θ : Descent.Core.Theta) : ℝ :=
+  Descent.Core.fstFromFlow θ.value
 
 /-- **fstMutationDriftEquilibrium at its junk point, named.** A negative scaled mutation rate is
 inadmissible, and the divisor `1 + θ` vanishes exactly there. Lean returns `0`: no
@@ -106,7 +107,7 @@ differentiation at mutation-drift equilibrium, which is what an infinite mutatio
 gives. The two ends of the parameter range meet at the same reported value. Consumers must
 exclude it by hypothesis. -/
 theorem fstMutationDriftEquilibrium_negative_unit_theta_is_junk :
-    fstMutationDriftEquilibrium (-1) = 0 := by
+    fstMutationDriftEquilibrium ⟨-1⟩ = 0 := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
@@ -114,7 +115,7 @@ theorem fstMutationDriftEquilibrium_negative_unit_theta_is_junk :
 own. At `θ = 1` mutation and drift contribute equally and the equilibrium differentiation is one
 half, which fixes the `1 + θ` denominator against `1 / (1 + 2 * θ)` and `1 / (1 + θ) ^ 2`. -/
 theorem fstMutationDriftEquilibrium_at_unit_theta :
-    fstMutationDriftEquilibrium 1 = 1 / 2 := by
+    fstMutationDriftEquilibrium ⟨1⟩ = 1 / 2 := by
   unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
   norm_num
 
@@ -138,22 +139,22 @@ Two accessors on two structures used to write this product out separately.
     so it is a pure-decay reading and understates the retained heterozygosity
     wherever mutation replenishes it. One and a half percent per generation at
     `theta = 2` compounds over a run. -/
-noncomputable def hetDecayFromScaled (Ne θ : ℝ) : ℝ :=
-  (1 - 1 / (2 * Ne)) * (1 - θ / (2 * Ne))
+noncomputable def hetDecayFromScaled (Ne : ℝ) (θ : Descent.Core.Theta) : ℝ :=
+  (1 - 1 / (2 * Ne)) * (1 - θ.value / (2 * Ne))
 
 /-- **Both denominators in the scaled heterozygosity decay are the coalescent time
 scale**, so `θ / (2 Nₑ)` is `θ` measured in coalescent units and not a second convention. -/
-theorem hetDecayFromScaled_uses_coalescentTimeScale (Ne θ : ℝ) :
+theorem hetDecayFromScaled_uses_coalescentTimeScale (Ne : ℝ) (θ : Descent.Core.Theta) :
     PopGen.hetDecayFromScaled Ne θ
       = (1 - 1 / Descent.Core.coalescentTimeScale Ne)
-          * (1 - θ / Descent.Core.coalescentTimeScale Ne) := by
+          * (1 - θ.value / Descent.Core.coalescentTimeScale Ne) := by
   unfold PopGen.hetDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **The two channels factor.** Heterozygosity decay is drift times mutation, and at zero scaled
 mutation only the drift factor survives. A body that added the two channels instead of
 multiplying them would fail this, and would also predict decay exceeding one for large `θ`. -/
 theorem hetDecayFromScaled_no_mutation (Ne : ℝ) :
-    hetDecayFromScaled Ne 0 = 1 - 1 / (2 * Ne) := by
+    hetDecayFromScaled Ne ⟨0⟩ = 1 - 1 / (2 * Ne) := by
   unfold hetDecayFromScaled; ring
 
 /-- **The per-generation decay factor of a DIFFERENTIATION transient**, as
@@ -205,7 +206,7 @@ heterozygosity family; the formula does not fix which is meant, and the whole
 content of this one is that the two families take different forces. -/
 noncomputable def fstTransientDecayFromScaled (Ne : ℝ) (θ : Descent.Core.Theta)
     (bigM : Descent.Core.BigM) : ℝ :=
-  hetDecayFromScaled Ne θ.value * (1 - bigM.value / (2 * Ne))
+  hetDecayFromScaled Ne θ * (1 - bigM.value / (2 * Ne))
 
 /-- The differentiation transient's decay factor is on the same coalescent clock as the
 heterozygosity one it extends: the migration channel divides by the timescale, not by a
@@ -213,14 +214,14 @@ free constant. -/
 theorem fstTransientDecayFromScaled_uses_timeScale (Ne : ℝ) (θ : Descent.Core.Theta)
     (bigM : Descent.Core.BigM) :
     PopGen.fstTransientDecayFromScaled Ne θ bigM
-      = PopGen.hetDecayFromScaled Ne θ.value
+      = PopGen.hetDecayFromScaled Ne θ
         * (1 - bigM.value / Descent.Core.coalescentTimeScale Ne) := by
   unfold PopGen.fstTransientDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **At zero migration the differentiation transient decays at the heterozygosity rate.**
 This is the boundary at which the superseded body was right, and it is the only one. -/
 theorem fstTransientDecayFromScaled_no_migration (Ne : ℝ) (θ : Descent.Core.Theta) :
-    fstTransientDecayFromScaled Ne θ ⟨0⟩ = hetDecayFromScaled Ne θ.value := by
+    fstTransientDecayFromScaled Ne θ ⟨0⟩ = hetDecayFromScaled Ne θ := by
   unfold fstTransientDecayFromScaled; ring
 
 
@@ -234,7 +235,7 @@ is `1`, reporting a population that loses no heterozygosity at all. An empty pop
 loses everything in one generation, so this is the maximal reversal, and it is produced by two
 independent junk branches in the same expression -- neither of which is visible in the value.
 Consumers must require `Ne ≠ 0`. -/
-theorem hetDecayFromScaled_zero_population_is_junk (θ : ℝ) :
+theorem hetDecayFromScaled_zero_population_is_junk (θ : Descent.Core.Theta) :
     hetDecayFromScaled 0 θ = 1 := by
   unfold hetDecayFromScaled
   simp
@@ -2959,8 +2960,9 @@ theorem fstEquilibrium_lt_one (p : EvolutionaryParameters)
 
 /-- Full equilibrium Fst ≤ drift-mutation Fst (migration only helps). -/
 theorem fstEquilibrium_le_driftMutation (p : EvolutionaryParameters) :
-    fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta := by
+    fstEquilibrium p ≤ fstMutationDriftEquilibrium (Descent.Core.Theta.ofScaled p.theta) := by
   unfold fstEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  simp only [Descent.Core.Theta.value_ofScaled]
   exact one_div_le_one_div_of_le (by linarith [p.theta_nonneg]) (by linarith [p.bigM_nonneg])
 
 /-- Full equilibrium Fst ≤ drift-migration Fst (mutation only helps). -/
@@ -2974,11 +2976,12 @@ theorem fstEquilibrium_le_driftMigration (p : EvolutionaryParameters) :
 /-- **Key ordering**: Fst_full ≤ Fst_mutation_only ≤ Fst_drift_only (at equilibrium).
     Each additional force beyond drift reduces Fst. -/
 theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
-    fstEquilibrium p ≤ fstMutationDriftEquilibrium p.theta ∧
-    fstMutationDriftEquilibrium p.theta < 1 := by
+    fstEquilibrium p ≤ fstMutationDriftEquilibrium (Descent.Core.Theta.ofScaled p.theta) ∧
+    fstMutationDriftEquilibrium (Descent.Core.Theta.ofScaled p.theta) < 1 := by
   constructor
   · exact fstEquilibrium_le_driftMutation p
   · unfold fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    simp only [Descent.Core.Theta.value_ofScaled]
     rw [div_lt_one (by linarith : 0 < 1 + p.theta)]
     linarith
 
@@ -3473,7 +3476,7 @@ At equilibrium (t → ∞), Fst → Fst_eq = 1/(1+θ+M).
 
     Empirical status: UNTESTED. -/
 noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel) : ℝ :=
-  hetDecayFromScaled m.Ne m.theta
+  hetDecayFromScaled m.Ne (Descent.Core.Theta.ofScaled m.theta)
 
 /-- **Transient Fst(t)**: Fst as a function of divergence time.
     Fst(t) = Fst_eq × (1 - λ^t)

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
+import Descent.Core.Scaling
 -- `Portability.effectiveSymmetricMigration` and `Portability.fstMigrationDriftEquilibrium`
 -- are named below.
 import Descent.Portability.PortabilityDrift
@@ -270,8 +271,9 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     Fst_migration = 1/(1+4Nm), Fst_mutation = 1/(1+4Neμ).
     The key parameter is the scaled rate 4N × (rate). -/
 theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
-    Portability.fstMigrationDriftEquilibrium Ne m = fstMutationDriftEquilibrium (4 * Ne * m) := by
-  unfold Portability.fstMigrationDriftEquilibrium fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    Portability.fstMigrationDriftEquilibrium Ne m
+      = Descent.Core.fstFromFlow (4 * Ne * m) := by
+  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   ring
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
@@ -537,8 +539,9 @@ theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
 /-- Combined Fst is below mutation-only Fst. -/
 theorem fstMigrationMutation_lt_mutationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMutationDriftEquilibrium (4 * Ne * μ) := by
-  unfold fstMigrationMutationEquilibriumManyDemes fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationMutationEquilibriumManyDemes Ne m μ
+      < Descent.Core.fstFromFlow (4 * Ne * μ) := by
+  unfold fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-! ### Stepping-Stone Model Foundations -/

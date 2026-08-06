@@ -448,13 +448,10 @@ causal variant.
     discards it: two tags in equal-magnitude but opposite-sign LD carry
     apparent effects of opposite sign.
 
-    Empirical status: **VALIDATED** (`simcov/battery_bulk22.py`, `group_b`).
-    One causal variant and one tag at imposed correlation `r`, both
-    standardized, two million individuals; the observable is the tag's realised
-    marginal OLS slope, and `r` is swept so that `r` and `r²` separate by up to
-    threefold. This body MATCHES, and the squared form it was corrected away
-    from is FALSIFIED on the same cells at 159 sems. The control is the causal
-    variant's own slope recovering `β_c`.
+    WHAT THE LEDGER NOW SAYS, in its own voice. The verdict above is
+    `bulk22` `group_b`, and this paragraph is about that row rather than a
+    second reading of it -- one docstring states its status once, and the
+    marker is the one at the top.
 
     THIS PARAGRAPH USED TO SAY THE LEDGER COULD NOT SAY THIS ABOUT ITSELF, and
     that was true of the ledger and not of the harness. `bulk22` recorded
