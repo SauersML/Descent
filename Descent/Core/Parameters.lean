@@ -176,12 +176,20 @@ theorem witness_not_atOrigin : ¬ witness.atOrigin := by
   unfold atOrigin witness
   norm_num
 
+/-! ### The record's scaled coordinates, in the types that carry the scaling
+
+These three accessors return `Theta`, `BigM` and `Tau` rather than three reals. They used
+to return reals, and the record was therefore the place where the scaling convention was
+lost: `p.theta` and `p.bigM` are the same number at equal rates -- `theta_bigM_share_constant`
+says so -- so a body reading the wrong one off the record typechecked. Every consumer that
+needs the number asks for `.value`, and no consumer can supply one where the other belongs. -/
+
 /-- Scaled mutation rate, `θ = 4 Nₑ μ`, in this record's coordinates.
 
     Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
     laws computed from it. What carries a status is a claim that a population
     reaches these values, which is asked where the demography is. -/
-noncomputable def theta (p : PopGenParameters) : ℝ := scaledMutationRate p.Ne p.mu
+noncomputable def theta (p : PopGenParameters) : Theta := Theta.ofRate p.Ne p.mu
 
 /-- Scaled migration rate in this record's coordinates, `M = 4 Nₑ m`.
 
@@ -191,24 +199,46 @@ corpus's convention and not a choice made here.
     Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
     laws computed from it. What carries a status is a claim that a population
     reaches these values, which is asked where the demography is. -/
-noncomputable def bigM (p : PopGenParameters) : ℝ := scaledMigrationRate p.Ne p.mig
+noncomputable def bigM (p : PopGenParameters) : BigM := BigM.ofRate p.Ne p.mig
+
+/-- The record's divergence time in coalescent units, `τ = t_div / (2 Nₑ)`.
+
+The third scaled coordinate, and the one the record could not previously state: `t_div`
+and `Ne` were both fields and every consumer that wanted a scaled time divided them by
+hand, which is how `t/(2 Nₑ)` and `t/(4 Nₑ)` both appear in the corpus. `Tau.ofGenerations`
+carries the `ploidy` and this names its value on this record.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
+noncomputable def tau (p : PopGenParameters) : Tau := Tau.ofGenerations p.t_div p.Ne
 
 /-- **`M` is the scaled migration rate, not half of it.** -/
 theorem bigM_eq_scaledMigrationRate (p : PopGenParameters) :
-    p.bigM = scaledMigrationRate p.Ne p.mig := rfl
+    p.bigM.value = scaledMigrationRate p.Ne p.mig :=
+  scaledMigrationRate_eq_bigM p.Ne p.mig
+
+/-- **And `θ` is the scaled mutation rate.** The companion, stated so both readings of the
+record's coordinates go through a named theorem rather than through `rfl` at a use site. -/
+theorem theta_eq_scaledMutationRate (p : PopGenParameters) :
+    p.theta.value = scaledMutationRate p.Ne p.mu :=
+  scaledMutationRate_eq_theta p.Ne p.mu
+
+/-- **The record's scaled time is `t_div / (2 Nₑ)`.** -/
+@[simp] theorem tau_value (p : PopGenParameters) :
+    p.tau.value = p.t_div / (2 * p.Ne) :=
+  Tau.value_ofGenerations p.t_div p.Ne
 
 /-- Both scaled rates are non-negative, which every equilibrium below needs. -/
-theorem theta_nonneg (p : PopGenParameters) : 0 ≤ p.theta := by
-  unfold theta
-  rw [scaledMutationRate_eq]
+theorem theta_nonneg (p : PopGenParameters) : 0 ≤ p.theta.value := by
+  rw [p.theta_eq_scaledMutationRate, scaledMutationRate_eq]
   have := p.Ne_pos
   have := p.mu_nonneg
   positivity
 
 /-- Both scaled rates are non-negative, which every equilibrium below needs. -/
-theorem bigM_nonneg (p : PopGenParameters) : 0 ≤ p.bigM := by
-  unfold bigM
-  rw [scaledMigrationRate_eq]
+theorem bigM_nonneg (p : PopGenParameters) : 0 ≤ p.bigM.value := by
+  rw [p.bigM_eq_scaledMigrationRate, scaledMigrationRate_eq]
   have := p.Ne_pos
   have := p.mig_nonneg
   positivity
@@ -238,16 +268,17 @@ theorem demeCorrection_gt_one (p : PopGenParameters) :
 /-- **The record's total scaled flow, in raw coordinates.** Written out once so that
 every bound below reads the same expression rather than re-deriving it. -/
 theorem scaledFlow_eq (p : PopGenParameters) :
-    scaledFlow p.Ne p.mig p.mu p.nDemes
+    scaledFlow p.bigM p.theta p.nDemes
       = 4 * p.Ne * p.mig * islandDemeCorrection p.nDemes + 4 * p.Ne * p.mu := by
   unfold scaledFlow
-  rw [scaledMigrationRate_eq, scaledMutationRate_eq]
+  rw [p.bigM_eq_scaledMigrationRate, p.theta_eq_scaledMutationRate,
+    scaledMigrationRate_eq, scaledMutationRate_eq]
 
 /-- **The flow a record produces is non-negative.** Four fields at once: `Ne_pos`,
 `mig_nonneg`, `mu_nonneg` and -- through `demeCorrection_gt_one` -- `nDemes_ge_two`. Drop
 the deme bound and the correction can be zero or negative, and the flow with it. -/
 theorem scaledFlow_nonneg (p : PopGenParameters) :
-    0 ≤ scaledFlow p.Ne p.mig p.mu p.nDemes := by
+    0 ≤ scaledFlow p.bigM p.theta p.nDemes := by
   have hc := p.demeCorrection_gt_one
   have hNe := p.Ne_pos
   have h1 : 0 ≤ 4 * p.Ne * p.mig * islandDemeCorrection p.nDemes :=
@@ -261,7 +292,7 @@ running, which is exactly the hypothesis `fstEquilibrium_lt_one` carries. The de
 correction cannot rescue a dead history and cannot kill a live one: it multiplies the
 migration term by something above one. -/
 theorem scaledFlow_pos (p : PopGenParameters) (h : 0 < p.mu + p.mig) :
-    0 < scaledFlow p.Ne p.mig p.mu p.nDemes := by
+    0 < scaledFlow p.bigM p.theta p.nDemes := by
   have hc := p.demeCorrection_gt_one
   have hNe := p.Ne_pos
   have hmig : 0 ≤ 4 * p.Ne * p.mig := mul_nonneg (by linarith) p.mig_nonneg
@@ -325,20 +356,20 @@ the `nDemes = 2` member, and that theorem is what carries the measurement across
     `Core.Moments.deployedR2`, and so to every demography-to-metric theorem in
     the corpus. A silent status here is a silent status on the spine. -/
 noncomputable def fstEquilibrium (p : PopGenParameters) : ℝ :=
-  fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes
+  fstIslandEquilibrium p.bigM p.theta p.nDemes
 
 /-- **One route, and this is it.** The record's equilibrium IS the island master at the
 record's own deme count -- definitionally, not up to a lemma. Stated so that a reader who
 knows `fstIslandEquilibrium` can see there is nothing else here, and so that the claim
 survives as a theorem if the body is ever written a different way. -/
 theorem fstEquilibrium_eq_island (p : PopGenParameters) :
-    p.fstEquilibrium = fstIslandEquilibrium p.Ne p.mig p.mu p.nDemes := rfl
+    p.fstEquilibrium = fstIslandEquilibrium p.bigM p.theta p.nDemes := rfl
 
 /-- **At two demes this is the two-deme island member.** The specialisation named, so a
 result stated for the two-population split says which member it is about rather than
 inheriting one by silence. -/
 theorem fstEquilibrium_eq_island_two_demes (p : PopGenParameters) (hd : p.nDemes = 2) :
-    p.fstEquilibrium = fstIslandEquilibrium p.Ne p.mig p.mu 2 := by
+    p.fstEquilibrium = fstIslandEquilibrium p.bigM p.theta 2 := by
   unfold fstEquilibrium
   rw [hd]
 
@@ -357,10 +388,10 @@ specialisation is a hypothesis a caller states rather than an assumption the rec
 for everyone. `fstEquilibrium_ne_island_manyDemes` below is the witness that the two
 readings are far apart. -/
 theorem fstEquilibrium_eq_scaled_two_demes (p : PopGenParameters) (hd : p.nDemes = 2) :
-    p.fstEquilibrium = fstFromFlow (p.theta + 2 * p.bigM) := by
+    p.fstEquilibrium = fstFromFlow (p.theta.value + 2 * p.bigM.value) := by
   unfold fstEquilibrium theta bigM
   rw [hd, fstIslandEquilibrium_eq, islandDemeCorrection_two,
-    scaledMutationRate_eq, scaledMigrationRate_eq]
+    Theta.value_ofRate, BigM.value_ofRate]
   unfold fstFromFlow
   ring_nf
 
@@ -375,7 +406,8 @@ theorem fstEquilibrium_ne_island_manyDemes :
           PopGenParameters.witness.mig
         + scaledMutationRate PopGenParameters.witness.Ne PopGenParameters.witness.mu) := by
   unfold fstEquilibrium witness
-  norm_num [fstIslandEquilibrium, scaledFlow, fstFromFlow, scaledMutationRate,
+  norm_num [fstIslandEquilibrium, scaledFlow, fstFromFlow, theta, bigM,
+    Theta.ofRate, BigM.ofRate, scalingConstant, scaledMutationRate,
     scaledMigrationRate, islandDemeCorrection, ratio, ploidy]
 
 /-- **Equilibrium differentiation lies in the unit interval.** Immediate from the flow
@@ -383,7 +415,7 @@ being non-negative, and stated because every consumer of `fstEquilibrium` needs 
 theorem fstEquilibrium_mem_unit (p : PopGenParameters) :
     0 ≤ p.fstEquilibrium ∧ p.fstEquilibrium ≤ 1 := by
   have hf := p.scaledFlow_nonneg
-  have hpos : (0 : ℝ) < 1 + scaledFlow p.Ne p.mig p.mu p.nDemes := by linarith
+  have hpos : (0 : ℝ) < 1 + scaledFlow p.bigM p.theta p.nDemes := by linarith
   unfold fstEquilibrium fstIslandEquilibrium fstFromFlow
   refine ⟨div_nonneg zero_le_one (le_of_lt hpos), ?_⟩
   rw [div_le_one hpos]
@@ -412,7 +444,7 @@ theorem fstEquilibrium_congr (p q : PopGenParameters)
     (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
     (hd : p.nDemes = q.nDemes) :
     p.fstEquilibrium = q.fstEquilibrium := by
-  unfold fstEquilibrium
+  unfold fstEquilibrium theta bigM
   rw [hNe, hmu, hmig, hd]
 
 /-- **More migration means less differentiation.** The qualitative law the whole
