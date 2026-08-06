@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Core.Moments
-import Descent.Layer
 
 assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
@@ -1870,22 +1869,12 @@ end OperatingPointLaw
 
 /-! ### The split coordinate is strictly monotone
 
-`Core.Fst` proves `fstFromTau` lands in the unit interval and never proves it increases,
-so every consumer that needs the ordering derives it inline -- `Core.Moments` does it four
-times, with the same four lines. Once, here. -/
-
-/-- **A longer scaled coalescence time is a larger differentiation.** -/
-theorem fstFromTau_lt_fstFromTau (τ₁ τ₂ : Tau) (h0 : 0 ≤ τ₁.value) (h : τ₁.value < τ₂.value) :
-    fstFromTau τ₁ < fstFromTau τ₂ := by
-  unfold fstFromTau saturation
-  rw [div_lt_div_iff₀ (by linarith) (by linarith)]
-  nlinarith
-
-/-- **A split law never reaches complete differentiation in finite scaled time.** -/
-theorem fstFromTau_lt_one (τ : Tau) (h : 0 ≤ τ.value) : fstFromTau τ < 1 := by
-  unfold fstFromTau saturation
-  rw [div_lt_one (by linarith)]
-  linarith
+These two lemmas were extracted HERE, with a note reading "`Core.Moments` does it four
+times, with the same four lines. Once, here." The extraction was right and the location
+could not work: this file is DOWNSTREAM of `Core.Moments`, so the consumer the note names
+could not reach them and went on repeating the four lines, which is how the duplication
+guard still found the block three times over. They now sit in `Core.Fst`, beside the
+`fstFromTau` and `saturation` they are about and above everything that needs them. -/
 
 /-! ### The clinical family along a clean split
 
