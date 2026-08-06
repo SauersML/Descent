@@ -62,7 +62,21 @@ rational values appear in each docstring.
 namespace Descent.Pangenome
 
 /-- The three parallel edges of the two-node graph, equivalently the three alleles
-of the triallelic site. -/
+of the triallelic site.
+
+**This is NOT `Core.Allele`, and the two are not going to be merged.** `Core.Allele` is
+`ref | alt`: a biallelic state at a site, which is what every `F_ST`, heterozygosity and
+linkage-disequilibrium quantity in the corpus is written for. This one is `A | C | G`: a
+label on an edge of a graph, which is what a pangenome path takes. `Core/Genome.lean` says
+so at its own definition -- "the pangenome's three-symbol alphabet is a different object
+doing a different job (a reference path through a graph, not a state at a site) and is not
+folded into this" -- and this is the other end of that statement, which was missing.
+
+The shared short name is a collision only for a reader who resolves names without their
+namespace. `Descent.Core.Allele` and `Descent.Pangenome.Allele` are distinct types with no
+coercion between them, so no term of one can be passed where the other is wanted, and a
+rename would buy nothing the namespace does not already give. What was actually missing was
+this paragraph. -/
 inductive Allele
   | A
   | C
