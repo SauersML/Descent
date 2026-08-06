@@ -361,14 +361,14 @@ through `fstFromTau` so that this and the equilibrium route cannot acquire diffe
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def deployedR2FromTau (V_A V_E tau : ℝ) : ℝ :=
-  (momentsUnderDrift V_A V_E (fstFromTau tau)).r2
+noncomputable def deployedR2FromTau (V_A V_E : ℝ) (t : Tau) : ℝ :=
+  (momentsUnderDrift V_A V_E (fstFromTau t)).r2
 
 /-- **A longer split transfers less.** Monotone in the scaled coalescence time, which is
 monotone in the divergence time at fixed effective size -- so the deployed metric decays
 with time since the split. -/
-theorem deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+theorem deployedR2FromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     deployedR2FromTau V_A V_E t₂ < deployedR2FromTau V_A V_E t₁ := by
   have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
     unfold fstFromTau saturation
@@ -383,7 +383,7 @@ theorem deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 
 /-- **At the moment of the split nothing has been lost.** `τ = 0` gives `F_ST = 0` and
 the deployed metric is the heritability. -/
 theorem deployedR2FromTau_at_zero (V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E) :
-    deployedR2FromTau V_A V_E 0 = share V_A V_E := by
+    deployedR2FromTau V_A V_E ⟨0⟩ = share V_A V_E := by
   unfold deployedR2FromTau fstFromTau saturation
   norm_num
   exact r2_momentsUnderDrift_at_source V_A V_E hV hE
@@ -422,9 +422,9 @@ the corpus computes `F_ST` two ways -- an equilibrium under migration and mutati
 split law in coalescent time -- and a reader meeting both has no reason to assume the
 moment tuple treats them alike. It does: the tuple sees a differentiation and nothing
 about where it came from. -/
-theorem deployedR2_eq_deployedR2FromTau (p : PopGenParameters) (V_E tau : ℝ)
-    (h : p.fstEquilibrium = fstFromTau tau) :
-    deployedR2 p V_E = deployedR2FromTau p.V_A V_E tau := by
+theorem deployedR2_eq_deployedR2FromTau (p : PopGenParameters) (V_E : ℝ) (t : Tau)
+    (h : p.fstEquilibrium = fstFromTau t) :
+    deployedR2 p V_E = deployedR2FromTau p.V_A V_E t := by
   unfold deployedR2 deployedR2FromTau
   rw [h]
 
@@ -436,10 +436,10 @@ recorded here rather than left for a reader to rediscover.
 The flow is `scaledFlow`, which carries the deme correction. Written as `θ + 2M` this is
 that flow at two demes and no other lattice size; the conversion is the same map either
 way, and the coordinate it converts is the one the record computes. -/
-theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (tau : ℝ)
-    (hx : 1 + scaledFlow p.Ne p.mig p.mu p.nDemes ≠ 0) (ht : 1 + tau ≠ 0) :
-    p.fstEquilibrium = fstFromTau tau ↔
-      1 = tau * scaledFlow p.Ne p.mig p.mu p.nDemes := by
+theorem fstEquilibrium_eq_fstFromTau_iff (p : PopGenParameters) (t : Tau)
+    (hx : 1 + scaledFlow p.bigM p.theta p.nDemes ≠ 0) (ht : 1 + t.value ≠ 0) :
+    p.fstEquilibrium = fstFromTau t ↔
+      1 = t.value * scaledFlow p.bigM p.theta p.nDemes := by
   unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow fstFromTau
     saturation
   rw [div_eq_div_iff hx ht]
@@ -730,8 +730,8 @@ theorem deployedBrier_at_no_flow_bound (π V_A V_E : ℝ) (hV : 0 < V_A) (hE : 0
 /-- **A longer split, worse Brier score.** The split-coordinate route into the binary
 metric, so a result stated in divergence time and one stated in migration rate reach the
 same place. -/
-theorem brier_deployedR2FromTau_anti (π V_A V_E t₁ t₂ : ℝ) (hπ : 0 < π) (hπ1 : π < 1)
-    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+theorem brier_deployedR2FromTau_anti (π V_A V_E : ℝ) (t₁ t₂ : Tau) (hπ : 0 < π) (hπ1 : π < 1)
+    (hV : 0 < V_A) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     brier π (momentsUnderDrift V_A V_E (fstFromTau t₁))
       < brier π (momentsUnderDrift V_A V_E (fstFromTau t₂)) := by
   have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
@@ -771,7 +771,7 @@ measured the two-deme member, so the deployment they bear on is this one, and a
 deployment at any other lattice size inherits the SHAPE and not the verdict. -/
 theorem deployedR2_at_two_demes (p : PopGenParameters) (V_E : ℝ) (hd : p.nDemes = 2) :
     deployedR2 p V_E
-      = (momentsUnderDrift p.V_A V_E (fstFromFlow (p.theta + 2 * p.bigM))).r2 := by
+      = (momentsUnderDrift p.V_A V_E (fstFromFlow (p.theta.value + 2 * p.bigM.value))).r2 := by
   unfold deployedR2
   rw [p.fstEquilibrium_eq_scaled_two_demes hd]
 
@@ -849,8 +849,8 @@ theorem deployedBrier_anti_in_demes (π : ℝ) (p q : PopGenParameters) (V_E : �
 /-! ### The split route, for the rest of the family -/
 
 /-- **The calibration slope after a clean split is one at every divergence time.** -/
-theorem deployedR2FromTau_slope (V_A V_E tau : ℝ) (hV : 0 < V_A) (h : 0 ≤ tau) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).calibrationSlope = 1 := by
+theorem deployedR2FromTau_slope (V_A V_E : ℝ) (t : Tau) (hV : 0 < V_A) (h : 0 ≤ t.value) :
+    (momentsUnderDrift V_A V_E (fstFromTau t)).calibrationSlope = 1 := by
   refine calibrationSlope_momentsUnderDrift V_A V_E _ hV ?_
   unfold fstFromTau saturation
   rw [div_lt_one (by linarith)]
@@ -858,29 +858,29 @@ theorem deployedR2FromTau_slope (V_A V_E tau : ℝ) (hV : 0 < V_A) (h : 0 ≤ ta
 
 /-- **And the mean squared error is flat along the split too.** Every metric except `R²`
 and the metrics that are functions of `R²` is blind to a clean split. -/
-theorem deployedR2FromTau_mse (V_A V_E tau : ℝ) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).mse = V_E :=
+theorem deployedR2FromTau_mse (V_A V_E : ℝ) (t : Tau) :
+    (momentsUnderDrift V_A V_E (fstFromTau t)).mse = V_E :=
   mse_momentsUnderDrift V_A V_E _
 
 /-- **At the split the deployed metric is the heritability**, so the whole decay is a
 departure from a value the source population fixes. -/
-theorem deployedR2FromTau_bounded (V_A V_E tau : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
-    (h : 0 ≤ tau) :
-    (momentsUnderDrift V_A V_E (fstFromTau tau)).r2 ≤ share V_A V_E := by
-  have hf : fstFromTau tau < 1 := by
+theorem deployedR2FromTau_bounded (V_A V_E : ℝ) (t : Tau) (hV : 0 < V_A) (hE : 0 ≤ V_E)
+    (h : 0 ≤ t.value) :
+    (momentsUnderDrift V_A V_E (fstFromTau t)).r2 ≤ share V_A V_E := by
+  have hf : fstFromTau t < 1 := by
     unfold fstFromTau saturation
     rw [div_lt_one (by linarith)]
     linarith
-  have hf0 : 0 ≤ fstFromTau tau := by
+  have hf0 : 0 ≤ fstFromTau t := by
     unfold fstFromTau saturation
     positivity
-  have := r2_momentsUnderDrift_le_source V_A V_E (fstFromTau tau) hV hE hf0 hf
+  have := r2_momentsUnderDrift_le_source V_A V_E (fstFromTau t) hV hE hf0 hf
   rwa [r2_momentsUnderDrift_at_source V_A V_E hV hE] at this
 
 /-- **The AUC argument decays along the split.** Discrimination falls with divergence
 time, by the same route as `R²`. -/
-theorem aucArgument_deployedR2FromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A)
-    (hE : 0 < V_E) (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+theorem aucArgument_deployedR2FromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV : 0 < V_A)
+    (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₂))
       < aucArgument (momentsUnderDrift V_A V_E (fstFromTau t₁)) := by
   have hf1 : fstFromTau t₁ < fstFromTau t₂ := by
@@ -903,12 +903,12 @@ source `R²` is measuring, expressed in divergence time.
     A kernel asserts nothing about a population, so no measurement can bear on it.
     What can be measured is a named quantity claiming this shape computes it, and
     those live in the subsystem modules with their own status lines and ledger rows. -/
-noncomputable def portabilityRatioFromTau (V_A V_E tau : ℝ) : ℝ :=
-  portabilityRatio V_A V_E (fstFromTau tau)
+noncomputable def portabilityRatioFromTau (V_A V_E : ℝ) (t : Tau) : ℝ :=
+  portabilityRatio V_A V_E (fstFromTau t)
 
 /-- **A longer split gives a smaller portability ratio.** -/
-theorem portabilityRatioFromTau_anti (V_A V_E t₁ t₂ : ℝ) (hV : 0 < V_A) (hE : 0 < V_E)
-    (h0 : 0 ≤ t₁) (hlt : t₁ < t₂) :
+theorem portabilityRatioFromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV : 0 < V_A) (hE : 0 < V_E)
+    (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
     portabilityRatioFromTau V_A V_E t₂ < portabilityRatioFromTau V_A V_E t₁ := by
   have hsrc : 0 < (momentsUnderDrift V_A V_E 0).r2 := by
     rw [r2_momentsUnderDrift_at_source V_A V_E hV (le_of_lt hE)]
@@ -963,7 +963,8 @@ theorem deployedR2_at_no_flow (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0
     deployedR2 p V_E = 0 := by
   have hf : p.fstEquilibrium = 1 := by
     unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow scaledFlow
-    rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
+      PopGenParameters.theta PopGenParameters.bigM
+    rw [hmu, hmig, Theta.value_ofRate, BigM.value_ofRate]
     norm_num
   unfold deployedR2
   rw [hf]
@@ -978,7 +979,8 @@ theorem deployedBrier_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
     deployedBrier π p V_E = π * (1 - π) := by
   have hf : p.fstEquilibrium = 1 := by
     unfold PopGenParameters.fstEquilibrium fstIslandEquilibrium fstFromFlow scaledFlow
-    rw [hmu, hmig, scaledMutationRate_eq, scaledMigrationRate_eq]
+      PopGenParameters.theta PopGenParameters.bigM
+    rw [hmu, hmig, Theta.value_ofRate, BigM.value_ofRate]
     norm_num
   unfold deployedBrier
   rw [hf]
