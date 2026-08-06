@@ -46,6 +46,10 @@ not a claim that the costs at different interfaces add as storage: one persisten
 identifier can carry identity through many separators, and nothing here forbids that.  What
 is forbidden is deciding an exact transition without the distinction being available.
 
+The bound is also the ZERO-ERROR, cardinality form: it counts how many auxiliary values must
+be available, not how many bits a controller must hold on average.  The entropy form of the
+same trade is not formalised here.
+
 ## Empirical status
 
 None.  The results are pigeonhole statements about finite alphabets.  Which index a given
@@ -57,11 +61,11 @@ namespace Descent.Pangenome.Linkage
 
 open Finset
 
-universe u v w
+universe u v z
 
 variable {ι : Type u} [Fintype ι] [DecidableEq ι]
 variable {A : Type v} [Fintype A] [DecidableEq A]
-variable {R : Type w}
+variable {R : Type z}
 
 /-- A controller with auxiliary state `aux` RESOLVES the residual class `ρ` at interface `s`
 when the graph state and the auxiliary state together determine it.  `ρ h` is whatever the
@@ -85,15 +89,17 @@ theorem card_le_card_aux_of_resolves {s : ι → ι} {aux : ι → A} {ρ : ι �
     _ ≤ Fintype.card A := by
         simpa [Finset.card_univ] using Finset.card_le_card (Finset.subset_univ (t.image aux))
 
-/-- **The global form: `m ≤ w · |A|`.**  An exact controller whose graph states have width
-`w` needs an auxiliary alphabet large enough that state and metadata together separate every
-thread the panel distinguishes. -/
-theorem card_le_width_mul_card_aux (s : ι → ι) (aux : ι → A)
-    (hres : ∀ g h : ι, s g = s h → aux g = aux h → g = h) :
+/-- **The global form: `m ≤ w · |A|`.**  When the legal future identifies the donor -- `ρ`
+separating any two threads that share a graph state -- an exact controller needs an auxiliary
+alphabet large enough that state and metadata together separate every thread the panel
+distinguishes. -/
+theorem card_le_width_mul_card_aux (s : ι → ι) (aux : ι → A) (ρ : ι → R)
+    (hres : Resolves s aux ρ) (hρ : ∀ g h : ι, s g = s h → ρ g = ρ h → g = h) :
     Fintype.card ι ≤ width s * Fintype.card A := by
   have hinj : Function.Injective fun h : ι ↦ (s h, aux h) := by
     intro g h hgh
-    exact hres g h (congrArg Prod.fst hgh) (congrArg Prod.snd hgh)
+    have hs : s g = s h := congrArg Prod.fst hgh
+    exact hρ g h hs (hres g h hs (congrArg Prod.snd hgh))
   have hsub : (Finset.univ.image fun h : ι ↦ (s h, aux h))
       ⊆ (Finset.univ.image s) ×ˢ (Finset.univ.image aux) := by
     intro p hp
@@ -113,18 +119,20 @@ theorem card_le_width_mul_card_aux (s : ι → ι) (aux : ι → A)
 /-- **No metadata means no merging.**  A single auxiliary value carries no information, so an
 exact controller with one is a topology that kept every thread identity apart — the same
 conclusion `width_eq_card_of_card_mosaics_eq` reaches from the phantom side. -/
-theorem width_eq_card_of_card_aux_eq_one (s : ι → ι) (aux : ι → A) (hone : Fintype.card A = 1)
-    (hres : ∀ g h : ι, s g = s h → aux g = aux h → g = h) :
+theorem width_eq_card_of_card_aux_eq_one (s : ι → ι) (aux : ι → A) (ρ : ι → R)
+    (hone : Fintype.card A = 1) (hres : Resolves s aux ρ)
+    (hρ : ∀ g h : ι, s g = s h → ρ g = ρ h → g = h) :
     width s = Fintype.card ι :=
-  le_antisymm (width_le_card s) (by simpa [hone] using card_le_width_mul_card_aux s aux hres)
+  le_antisymm (width_le_card s)
+    (by simpa [hone] using card_le_width_mul_card_aux s aux ρ hres hρ)
 
 /-- **What a fixed compression costs in metadata.**  Merging an interface down to width `w`
 obliges an exact controller to carry at least `m / w` auxiliary values — the exponential of
 the identity `identityLoss` says the merge discarded. -/
-theorem card_aux_ge_of_width_le {w : ℕ} (s : ι → ι) (aux : ι → A) (hw : width s ≤ w)
-    (hres : ∀ g h : ι, s g = s h → aux g = aux h → g = h) :
-    Fintype.card ι ≤ w * Fintype.card A :=
-  le_trans (card_le_width_mul_card_aux s aux hres)
-    (Nat.mul_le_mul_right _ hw)
+theorem card_aux_ge_of_width_le {w₀ : ℕ} (s : ι → ι) (aux : ι → A) (ρ : ι → R)
+    (hw : width s ≤ w₀) (hres : Resolves s aux ρ)
+    (hρ : ∀ g h : ι, s g = s h → ρ g = ρ h → g = h) :
+    Fintype.card ι ≤ w₀ * Fintype.card A :=
+  le_trans (card_le_width_mul_card_aux s aux ρ hres hρ) (Nat.mul_le_mul_right _ hw)
 
 end Descent.Pangenome.Linkage
