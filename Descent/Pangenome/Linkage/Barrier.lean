@@ -32,8 +32,9 @@ argument is `sum_mul_log_le_log_sum` applied first inside fibers and then across
 
 * `log_card_add_linkagePressure_le` — the barrier in logarithmic form.
 * `pow_card_le_prod_width_mul_card_mosaics` — the same statement as an inequality between
-  natural numbers, `m ^ (r+1) ≤ (∏ w_j) · |Ω|`, with no logarithms left in it.  This is the
-  form `Descent.Pangenome.Linkage.Chain.card_mosaics_of_balanced` attains with equality.
+  natural numbers, `m ^ (r+1) ≤ (∏ w_j) · |Ω|`, with no logarithms left in it.
+* `prod_width_mul_card_mosaics_of_balanced` — the same statement as an EQUALITY for a
+  balanced chain, so the bound is exact and not merely true.
 * `width_eq_card_of_card_mosaics_eq` — the topology-only exactness barrier: a chain whose
   compatible language is exactly the panel has `w_j = m` at every interface.  Identity can
   leave the topology only by being carried somewhere else.
@@ -246,6 +247,23 @@ theorem pow_card_le_prod_width_mul_card_mosaics [Nonempty ι] (c : Chain ι) :
     push_cast
     linarith
   exact_mod_cast (Real.log_le_log_iff (by positivity) (by positivity)).mp hlog
+
+/-- **The width law is exact.**  A balanced chain turns the previous inequality into an
+equality, so no sharper bound holds — and it does so whatever the partitions at different
+interfaces are, since balance at each interface is the only hypothesis. -/
+theorem prod_width_mul_card_mosaics_of_balanced {c : Chain ι} {bs : List ℕ}
+    (hb : Balanced c bs) :
+    (c.map width).prod * (mosaics c).card = Fintype.card ι ^ (c.length + 1) := by
+  rw [card_mosaics_of_balanced hb]
+  induction hb with
+  | nil => simp
+  | @cons s c b bs hfib _ ih =>
+    have hw := width_mul_of_balanced hfib
+    rw [List.map_cons, List.prod_cons, List.prod_cons, List.length_cons]
+    calc width s * (c.map width).prod * (Fintype.card ι * (b * bs.prod))
+        = width s * b * ((c.map width).prod * (Fintype.card ι * bs.prod)) := by ring
+      _ = Fintype.card ι * Fintype.card ι ^ (c.length + 1) := by rw [hw, ih]
+      _ = Fintype.card ι ^ (c.length + 1 + 1) := by rw [pow_succ]; ring
 
 /-! ### The exactness barrier -/
 
