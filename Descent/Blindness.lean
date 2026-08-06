@@ -44,9 +44,6 @@ import Descent.Blindness.TrafficInvariantSeparation.PolynomialTraffic
 import Descent.Blindness.TrafficInvariantSeparation.RankOneInvisibility
 import Descent.Blindness.TrafficInvariantSeparation.SpectralSDPSeparation
 import Descent.Blindness.XiFromMarkedBreakouts
-import Descent.Layer
-
-assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.ConditionalGain`

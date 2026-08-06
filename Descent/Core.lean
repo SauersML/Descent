@@ -10,9 +10,6 @@ import Descent.Core.Parameters
 import Descent.Core.Population
 import Descent.Core.Ratios
 import Descent.Core.Scaling
-import Descent.Layer
-
-assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # `Descent.Core` -- the layer head

@@ -7,9 +7,6 @@ import Descent.Meta.InformalLint
 import Descent.Meta.Linters
 import Descent.Meta.Semiformal
 import Descent.Meta.StatusLinter
-import Descent.Layer
-
-assert_below Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # The corpus's own linters

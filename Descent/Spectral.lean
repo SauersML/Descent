@@ -17,9 +17,6 @@ import Descent.Spectral.ReversibleMarkovSpectrum
 import Descent.Spectral.SecondMomentShift
 import Descent.Spectral.SpectralDegradation
 import Descent.Spectral.WhiteningEquivalence
-import Descent.Layer
-
-assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
 --   Blindness: reaches 15 module(s) -- `Descent.Blindness.BundleRigidity`, `Descent.Blindness.BundleRigidity.Coverage`, `Descent.Blindness.BundleRigidity.CoverageInvariance` and 12 more

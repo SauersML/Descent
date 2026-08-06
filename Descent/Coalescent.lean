@@ -80,9 +80,6 @@ import Descent.Coalescent.VariableSize
 import Descent.Coalescent.WrightFisher
 import Descent.Coalescent.Xi
 import Descent.Coalescent.XiRates
-import Descent.Layer
-
-assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`

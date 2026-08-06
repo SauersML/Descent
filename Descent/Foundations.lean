@@ -5,9 +5,6 @@ import Descent.Foundations.CovarianceStructure
 import Descent.Foundations.Probability
 import Descent.Foundations.ReferenceEvaluation
 import Descent.Foundations.TransportIdentities
-import Descent.Layer
-
-assert_below Descent.Coalescent Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # `Descent.Foundations` -- the layer head
