@@ -120,6 +120,40 @@ coalescent only through this number. -/
 theorem wrightFisherTimeScale {N : ℕ} (hN : 0 < N) : (N : ℝ) / 1 = (N : ℝ) := by
   ring
 
+/-! ### The contrast, against Wright-Fisher's own counted probability -/
+
+/-- **The Moran variance is twice Wright-Fisher's pair-coalescence probability.**
+
+The two clock theorems above are arithmetic in `N` and name no model: `N / 1 = N` is true of
+any `N` whatever Wright-Fisher does, so the contrast this file exists to draw was carried
+entirely by the prose around them, and the Moran variance could have moved without anything
+failing.  Here it is tied to a number the other module COUNTS -- `noCoalescenceProb N 2` is
+`(N)₂/N²`, the injective parent maps over all of them -- so the `2/N` is checked against the
+mechanism rather than against a remark.
+
+This is K-G's factor of two at its source.  Two lineages find a common parent with
+probability `1/N` per Wright-Fisher generation; the Moran family-size variance is `2/N`,
+exactly twice, and every later factor of two between the two models' conclusions is this
+one. -/
+theorem moranVariance_eq_two_mul_wrightFisherCoalescence {N : ℕ} (hN : 0 < N) :
+    (∑ k ∈ range 3, (k : ℝ) ^ 2 * moranMass N k)
+        - (∑ k ∈ range 3, (k : ℝ) * moranMass N k) ^ 2
+      = 2 * (1 - noCoalescenceProb N 2) := by
+  rw [moranVariance hN, noCoalescenceProb_two hN]
+  ring
+
+/-- **The Moran clock, read off that probability rather than off a constant.**  K-G (4.4)'s
+scale is `N σ⁻²`, and with `σ²` written as twice Wright-Fisher's coalescence probability the
+`N²/2` follows from the counted mechanism. -/
+theorem moranTimeScale_of_wrightFisherCoalescence {N : ℕ} (hN : 0 < N) :
+    (N : ℝ) / (2 * (1 - noCoalescenceProb N 2)) = (N : ℝ) ^ 2 / 2 := by
+  rw [noCoalescenceProb_two hN]
+  have hN' : (N : ℝ) ≠ 0 := by
+    have : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
+    linarith
+  field_simp
+  ring
+
 end Coalescent
 
 end Descent

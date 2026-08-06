@@ -166,6 +166,49 @@ theorem lineages_meet_of_difference_zero (x₀ y₀ : ℤ) (ξ η : ℕ → ℤ)
     walk x₀ ξ t = walk y₀ η t :=
   (meet_iff_difference_walk_zero x₀ y₀ ξ η t).mpr h
 
+/-! ### The count against the walk it is counting -/
+
+/-- The `±1` history a set of up-steps determines: step `s` goes up when `s ∈ up` and down
+otherwise.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is the translation between a step-set and a
+history, which is the object the counting above and the walk below are two readings of. -/
+def upSteps (up : Finset ℕ) : ℕ → ℤ := fun s ↦ if s ∈ up then 1 else -1
+
+/-- **Displacement is twice the up-steps taken, less the steps taken.**  The identity the
+counting rests on, proved against `walk` rather than assumed of it. -/
+theorem walk_upSteps (up : Finset ℕ) (m : ℕ) :
+    walk 0 (upSteps up) m
+      = 2 * (((Finset.range m).filter (fun s ↦ s ∈ up)).card : ℤ) - (m : ℤ) := by
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    have hnot : m ∉ (Finset.range m).filter (fun s ↦ s ∈ up) := by simp
+    rw [walk_succ, ih, Finset.range_add_one, Finset.filter_insert]
+    by_cases h : m ∈ up
+    · rw [if_pos h, Finset.card_insert_of_notMem hnot]
+      simp only [upSteps, if_pos h]
+      push_cast
+      ring
+    · rw [if_neg h]
+      simp only [upSteps, if_neg h]
+      push_cast
+      ring
+
+/-- **A history returns to the origin exactly when half its steps went up.**
+
+This is the bridge the header claims and the file did not have.  `returnProb` counts
+step-sets of size `n` out of `2n`, and `SpatialCoalescent.meet_iff_difference_walk_zero`
+turns a difference walk at zero into two lineages that have met -- but nothing said the
+step-sets being counted are the histories that return, so the combinatorics and the walk were
+two developments about the same picture with no statement between them.  A `returnProb` off
+by an index would have left every theorem here true. -/
+theorem walk_upSteps_eq_zero_iff (n : ℕ) (up : Finset ℕ) :
+    walk 0 (upSteps up) (2 * n) = 0
+      ↔ ((Finset.range (2 * n)).filter (fun s ↦ s ∈ up)).card = n := by
+  rw [walk_upSteps]
+  omega
+
 end Coalescent
 
 end Descent
