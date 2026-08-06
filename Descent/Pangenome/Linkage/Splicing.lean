@@ -16,11 +16,19 @@ under which that cannot happen, and then says what the barrier becomes.
 
 ## Spelling
 
-`spell code x` concatenates the block each donor of `x` contributes.  When the blocks are
-distinct and all of one length, `spell_injOn` makes the concatenation uniquely decodable, so
+`spell code x` concatenates the block each donor of `x` contributes.  What makes that
+concatenation parseable is `PrefixFree`: no donor's block begins another's.  Under it,
+`spell_injOn_of_prefixFree` gives unique decodability with NO hypothesis on lengths, so
 distinct derivations spell distinct words and every count of
 `Descent.Pangenome.Linkage.Chain` transfers verbatim to distinct sequences:
 `card_spelledWords`, and with it `pow_card_le_prod_width_mul_card_spelledWords`.
+
+Prefix-freeness rather than one fixed length is the hypothesis a pangenome can actually
+meet.  Segments between consecutive separators differ in length wherever the panel carries
+an indel, and prefix-free parsing is already the standard preprocessing applied to a
+haplotype collection before an index is built over it.  `prefixFree_of_length` shows fixed
+length is a special case; `combCode` — donor `i` contributing `A^i C` — is prefix-free with
+`i + 1` distinct lengths, so the weakening is strict and not a restatement.
 
 When blocks do NOT identify their donor the correction is bounded rather than fatal:
 `card_mosaics_le_pow_mul_card_spelledWords` says at most `μ` donors per block leaves at most
@@ -56,8 +64,9 @@ graph realises a particular block system.
 ## Empirical status
 
 None.  The results are statements about concatenating lists and adding traversal counts.
-`snpCode` is a construction, not a model of any locus: it exhibits a block system meeting
-the decodability hypothesis, and asserts nothing about how often real panels meet it.
+`snpCode` and `combCode` are constructions, not models of any locus: they exhibit block
+systems meeting the decodability hypothesis — one at fixed length, one not — and assert
+nothing about how often real panels meet it.
 -/
 
 namespace Descent.Pangenome.Linkage
@@ -85,11 +94,32 @@ omit [Fintype ι] [DecidableEq ι] in
 theorem spell_cons (code : ι → List α) (h : ι) (x : List ι) :
     spell code (h :: x) = code h ++ spell code x := rfl
 
+/-! ### Prefix-free blocks are uniquely decodable
+
+Blocks of one fixed length are decodable, and are not what a pangenome has: the segments
+between consecutive separators differ in length whenever the panel carries an indel.  What
+actually makes a concatenation parseable is the classical prefix-code condition — no block
+begins another block — which is also the condition prefix-free parsing imposes on a
+haplotype collection before an index is built over it.  Everything below is stated on that
+hypothesis, and the fixed-length case enters through `prefixFree_of_length`. -/
+
 omit [Fintype ι] [DecidableEq ι] in
-/-- **Fixed-length blocks are uniquely decodable.**  Distinct donors contributing distinct
-blocks of one length means a spelled word determines the derivation that spelled it. -/
-theorem spell_injOn (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).length = L)
-    (hinj : Function.Injective code) :
+/-- A block system is PREFIX-FREE when no donor's block begins another donor's block. -/
+def PrefixFree (code : ι → List α) : Prop := ∀ g h : ι, g ≠ h → ¬ code g <+: code h
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **Distinct blocks of one length are prefix-free.**  So the hypothesis used below is
+weaker than the fixed-length one, and `combCode` shows it is strictly weaker. -/
+theorem prefixFree_of_length (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).length = L)
+    (hinj : Function.Injective code) : PrefixFree code := by
+  intro g h hgh hpre
+  exact hgh (hinj (hpre.sublist.eq_of_length (by rw [hlen, hlen])))
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **Prefix-free blocks are uniquely decodable.**  Two blocks that both begin one word are
+comparable, so prefix-freeness pins the first donor, and the rest follows by induction.  No
+length hypothesis is used, which is the point: variable-length segments are decodable too. -/
+theorem spell_injOn_of_prefixFree (code : ι → List α) (hpf : PrefixFree code) :
     ∀ x y : List ι, x.length = y.length → spell code x = spell code y → x = y := by
   intro x
   induction x with
@@ -104,10 +134,17 @@ theorem spell_injOn (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).le
     | nil => simp at hxy
     | cons b y =>
       rw [spell_cons, spell_cons] at hsp
-      have hL : (code a).length = (code b).length := by rw [hlen, hlen]
-      obtain ⟨hhead, htail⟩ := List.append_inj hsp hL
-      have hab : a = b := hinj hhead
+      have hab : a = b := by
+        by_contra hne
+        have h1 : code a <+: code b ++ spell code y := by
+          rw [← hsp]
+          exact List.prefix_append _ _
+        rcases List.prefix_or_prefix_of_prefix h1
+          (List.prefix_append (code b) (spell code y)) with hc | hc
+        · exact hpf a b hne hc
+        · exact hpf b a (Ne.symm hne) hc
       subst hab
+      have htail : spell code x = spell code y := List.append_cancel_left hsp
       have hxy' : x.length = y.length := by simpa using hxy
       rw [ih y hxy' htail]
 
@@ -127,19 +164,17 @@ def phantomWords (code : ι → List α) (c : Chain ι) : Finset (List α) :=
 
 /-- **Donor-identifying blocks lose nothing.**  With uniquely decodable blocks the number of
 distinct spelled words is the number of derivations. -/
-theorem card_spelledWords (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).length = L)
-    (hinj : Function.Injective code) (c : Chain ι) :
+theorem card_spelledWords (code : ι → List α) (hpf : PrefixFree code) (c : Chain ι) :
     (spelledWords code c).card = (mosaics c).card := by
   refine Finset.card_image_of_injOn fun x hx y hy hxy ↦ ?_
-  exact spell_injOn code L hlen hinj x y
+  exact spell_injOn_of_prefixFree code hpf x y
     (by rw [length_of_mem_mosaics hx, length_of_mem_mosaics hy]) hxy
 
-theorem card_panelWords (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).length = L)
-    (hinj : Function.Injective code) (c : Chain ι) :
+theorem card_panelWords (code : ι → List α) (hpf : PrefixFree code) (c : Chain ι) :
     (panelWords code c).card = Fintype.card ι := by
   rw [panelWords, Finset.card_image_of_injOn, card_diagonals]
   intro x hx y hy hxy
-  exact spell_injOn code L hlen hinj x y
+  exact spell_injOn_of_prefixFree code hpf x y
     (by rw [length_of_mem_mosaics (diagonals_subset c hx),
       length_of_mem_mosaics (diagonals_subset c hy)]) hxy
 
@@ -148,13 +183,12 @@ theorem panelWords_subset (code : ι → List α) (c : Chain ι) :
   Finset.image_subset_image (diagonals_subset c)
 
 /-- **The phantom word count.**  Everything the topology spells beyond the panel. -/
-theorem card_phantomWords (code : ι → List α) (L : ℕ) (hlen : ∀ h, (code h).length = L)
-    (hinj : Function.Injective code) (c : Chain ι) :
+theorem card_phantomWords (code : ι → List α) (hpf : PrefixFree code) (c : Chain ι) :
     (phantomWords code c).card = (mosaics c).card - Fintype.card ι := by
   have hin : panelWords code c ∩ spelledWords code c = panelWords code c :=
     Finset.inter_eq_left.mpr (panelWords_subset code c)
-  rw [phantomWords, Finset.card_sdiff, hin, card_spelledWords code L hlen hinj c,
-    card_panelWords code L hlen hinj c]
+  rw [phantomWords, Finset.card_sdiff, hin, card_spelledWords code hpf c,
+    card_panelWords code hpf c]
 
 /-! ### When blocks do not identify their donor
 
@@ -266,10 +300,10 @@ theorem card_mosaics_le_pow_mul_card_spelledWords (code : ι → List α) (L μ 
   Finset.card_le_mul_card_image _ _ fun y _ ↦ card_filter_spell_le code L μ hlen hμ c y
 
 /-- **The width law, counted in distinct sequences.** -/
-theorem pow_card_le_prod_width_mul_card_spelledWords [Nonempty ι] (code : ι → List α) (L : ℕ)
-    (hlen : ∀ h, (code h).length = L) (hinj : Function.Injective code) (c : Chain ι) :
+theorem pow_card_le_prod_width_mul_card_spelledWords [Nonempty ι] (code : ι → List α)
+    (hpf : PrefixFree code) (c : Chain ι) :
     Fintype.card ι ^ (c.length + 1) ≤ (c.map width).prod * (spelledWords code c).card := by
-  rw [card_spelledWords code L hlen hinj c]
+  rw [card_spelledWords code hpf c]
   exact pow_card_le_prod_width_mul_card_mosaics c
 
 /-- **The exactness barrier, in distinct sequences.**  If the topology spells exactly the
@@ -277,12 +311,12 @@ theorem pow_card_le_prod_width_mul_card_spelledWords [Nonempty ι] (code : ι �
 thread identities in distinct states.  This is the barrier of
 `Descent.Pangenome.Linkage.Barrier.width_eq_card_of_card_mosaics_eq` stated where a graph
 builder can check it: on the sequences the graph spells, not on donor histories. -/
-theorem width_eq_card_of_card_spelledWords_eq [Nonempty ι] (code : ι → List α) (L : ℕ)
-    (hlen : ∀ h, (code h).length = L) (hinj : Function.Injective code) {c : Chain ι}
+theorem width_eq_card_of_card_spelledWords_eq [Nonempty ι] (code : ι → List α)
+    (hpf : PrefixFree code) {c : Chain ι}
     (hex : (spelledWords code c).card = Fintype.card ι) :
     ∀ s ∈ c, width s = Fintype.card ι := by
   refine width_eq_card_of_card_mosaics_eq ?_
-  rw [← card_spelledWords code L hlen hinj c]
+  rw [← card_spelledWords code hpf c]
   exact hex
 
 end Spelling
@@ -322,6 +356,38 @@ theorem snpCode_injective : Function.Injective (snpCode (ι := ι)) := by
   exact eq_of_map_ite_eq (by simp) (Finset.univ : Finset ι).toList
     (Finset.mem_toList.mpr (Finset.mem_univ h₁)) hEq
 
+theorem snpCode_prefixFree : PrefixFree (snpCode (ι := ι)) :=
+  prefixFree_of_length snpCode (Fintype.card ι) length_snpCode snpCode_injective
+
+/-- A block system of VARIABLE length: donor `i` contributes `A^i C`.  This is the unary comb
+code, the smallest witness that prefix-freeness is strictly weaker than fixed length — the
+blocks have `i + 1` distinct lengths, so no fixed-length hypothesis reaches them, and
+`combCode_prefixFree` shows the decodability results here do. -/
+def combCode (n : ℕ) (i : Fin n) : List Allele :=
+  List.replicate i.val Allele.A ++ [Allele.C]
+
+theorem length_combCode (n : ℕ) (i : Fin n) : (combCode n i).length = i.val + 1 := by
+  simp [combCode]
+
+/-- **The comb code is prefix-free.**  A shorter comb word puts its `C` where a longer one
+still has an `A`, so neither begins the other. -/
+theorem combCode_prefixFree (n : ℕ) : PrefixFree (combCode n) := by
+  intro g h hgh hpre
+  obtain ⟨t, ht⟩ := hpre
+  have hle : g.val ≤ h.val := by
+    have hlen := congrArg List.length ht
+    simp [combCode] at hlen
+    omega
+  have hne : g.val ≠ h.val := fun hv ↦ hgh (Fin.ext hv)
+  have hlt : g.val < h.val := lt_of_le_of_ne hle hne
+  obtain ⟨d, hd⟩ : ∃ d, h.val = g.val + (d + 1) := ⟨h.val - g.val - 1, by omega⟩
+  rw [combCode, combCode, hd, List.replicate_add, List.append_assoc,
+    List.append_assoc] at ht
+  have htail := List.append_cancel_left ht
+  rw [List.replicate_succ, List.cons_append] at htail
+  injection htail with hhead _
+  exact Allele.noConfusion hhead
+
 /-- **The width law is attained as a count of distinct DNA words.**  A balanced chain over
 biallelic single-SNP blocks spells exactly `m · ∏ b_j` distinct words, which is the value the
 width bound of `Descent.Pangenome.Linkage.Barrier` gives.  So no sharper bound holds, and the
@@ -329,15 +395,13 @@ extremal example needs nothing richer than one marker per block. -/
 theorem card_spelledWords_snpCode_of_balanced {c : Chain ι} {bs : List ℕ}
     (hb : Balanced c bs) :
     (spelledWords snpCode c).card = Fintype.card ι * bs.prod := by
-  rw [card_spelledWords snpCode (Fintype.card ι) length_snpCode snpCode_injective c,
-    card_mosaics_of_balanced hb]
+  rw [card_spelledWords snpCode snpCode_prefixFree c, card_mosaics_of_balanced hb]
 
 /-- And all but the `m` panel words are words the panel never contained. -/
 theorem card_phantomWords_snpCode_of_balanced {c : Chain ι} {bs : List ℕ}
     (hb : Balanced c bs) :
     (phantomWords snpCode c).card = Fintype.card ι * bs.prod - Fintype.card ι := by
-  rw [card_phantomWords snpCode (Fintype.card ι) length_snpCode snpCode_injective c,
-    card_mosaics_of_balanced hb]
+  rw [card_phantomWords snpCode snpCode_prefixFree c, card_mosaics_of_balanced hb]
 
 /-! ### Splicing donor segments into a walk -/
 
