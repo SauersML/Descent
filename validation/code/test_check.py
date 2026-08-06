@@ -590,8 +590,61 @@ def convention_corpus_files(entries=None, bridges=None, lean=None, ledger=True,
     return files
 
 
+# The `layers` guard had no fixture in either direction, and its REACHABLE rule is
+# the one rule in this file that a repair can silence by accident: it scans the corpus
+# TEXT for qualified names, so anything that narrows what counts as text narrows the
+# rule, and a rule that reports nothing looks exactly like a corpus with nothing to
+# report.  Both cases below are about that rule and about the same name.
+#
+# The trap is not hypothetical.  `Descent.Meta.Linters` builds the message
+# "`Core.Theta`, `Core.BigM` ... are the types for these" and hands it to an author
+# who wrote a bare `ℝ`; REACHABLE read those as references and asked that file to
+# import `Descent.Core.Scaling`, which the guard's own META rule forbids it to import.
+LAYERS_CORE = HEADER + """
+namespace Descent.Core
+
+/-- A scaled quantity, defined here and nowhere else. -/
+def bigM : ℝ := 1
+
+end Descent.Core
+"""
+
+LAYERS_ROOT = HEADER + """
+import Descent.Core.Scale
+import Descent.PopGen.Uses
+"""
+
+
+def layers_corpus(uses: str) -> dict:
+    """A two-layer fixture: `Core` defines `bigM`, `PopGen` does something with it."""
+    return {
+        "Descent.lean": LAYERS_ROOT,
+        "Descent/Core/Scale.lean": LAYERS_CORE,
+        "Descent/PopGen/Uses.lean": HEADER + uses,
+    }
+
+
+LAYERS_REFERENCE = """
+namespace Descent.PopGen
+
+theorem uses_it : Core.bigM = 1 := rfl
+
+end Descent.PopGen
+"""
+
+LAYERS_IN_A_STRING = """
+namespace Descent.PopGen
+
+/-- Advice for an author, which is prose and not a reference. -/
+def advice : String := "Core.bigM is the type for this"
+
+end Descent.PopGen
+"""
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
+    ("layers", "a qualified name from a layer the file cannot reach",
+     layers_corpus(LAYERS_REFERENCE), "names Core.bigM"),
     ("style", "line over 100 characters",
      clean_plus("Descent/Sub.lean",
                 CLEAN_SUB + "\n-- " + "x" * 120 + "\n"),
@@ -892,6 +945,13 @@ theorem clean_rate_at_one_second : cleanRate 1 = 1 := by
 # useless -- Lean proofs repeat short tactics everywhere, and a screen readers
 # learn to skim past has been deleted in effect.
 NEGATIVE_CASES = [
+    # The message form, not the silent form, and for the reason the paragraph above
+    # gives about `identifications`: `LAYER_PENDING` is a table of outstanding edges in
+    # the REAL corpus, so every one of its fifteen entries is stale against a
+    # three-file fixture and the guard exits nonzero no matter what this trap does.
+    # Demanding a clean exit here would assert something about the fixture.
+    ("layers", "a qualified name inside a string literal, which is prose",
+     layers_corpus(LAYERS_IN_A_STRING), "names Core.bigM"),
     ("duplication", "two short idiomatic proofs of different statements",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + """
 theorem model_rate_refl (m : CleanModel) : m.rate = m.rate := rfl

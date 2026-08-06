@@ -7600,9 +7600,33 @@ def run_shape_routes() -> int:
 # clean order over a directory nobody had placed.  Adding a top-level directory now
 # means writing one sentence about where it sits.
 
-LAYER_ORDER = ("Core", "Foundations", "Coalescent", "PopGen", "Portability",
+# `Layer` is FIRST, and it is the one rank that was derived rather than decided.
+# `Descent/Layer.lean` is the module that defines `assert_below` -- the command by
+# which a file states its own position in this order -- and its header pins it: "Depth
+# 0. Imports `Lean` and nothing else -- not Mathlib, not `Core`."  Thirty-six modules
+# import it, five of them from `Core` and `Meta`, and until it was ranked those five
+# were reported as unargued cross-layer edges while the directory itself was reported
+# as placed in neither table.  Both findings were the same omission: the gate had been
+# written and never given a position in the order it enforces.
+#
+# Rank 0 is not a courtesy.  It says the thing that is true of this module and of no
+# other: everything may import it and it may import nothing here, so an edge OUT of
+# `Layer` into the corpus is an order violation by the ordinary rule, with no special
+# case needed.  What rank 0 cannot express is that `Core` and `Meta` may import it too
+# -- those two are governed by rules that ignore rank -- and that is `LAYER_GATE`
+# below.
+LAYER_ORDER = ("Layer", "Core", "Foundations", "Coalescent", "PopGen", "Portability",
                "Decision", "Program")
 LAYER_RANK = {name: i for i, name in enumerate(LAYER_ORDER)}
+
+# The gate module's own top-level name.  Two rules below are absolute rather than
+# ranked -- `Core` imports nothing outside itself, and nothing crosses the `Meta`
+# boundary -- and both must admit this one target, for the same reason
+# `LAYER_META_VOCABULARY` exists: it adds SYNTAX and no constant, so a module that
+# imports it gains a way to STATE where it sits and nothing it could cite.  A file that
+# may not say which layer it is below is a file exempt from the gate, which is the
+# opposite of what either rule is for.
+LAYER_GATE = "Layer"
 
 # Why each of these is unranked, and what ranking it would have to settle.  A guard
 # that skipped them without saying so would report a clean order over half the tree.
@@ -7675,19 +7699,14 @@ LAYER_PENDING = {
         "against its own `driftLDStep`. The identity-by-descent recurrence and the "
         "island-model F_ST step are statements about one population's allele "
         "frequencies over generations; nothing in them is about transport.",
-    # The five `PopulationGeneticsFoundations` files below arrived together and for one
+    # The `PopulationGeneticsFoundations` files below arrived together and for one
     # reason: the chain that used to carry these names ran out of the directory and back
     # in, and cutting it left five files naming declarations they could not reach. The
     # imports are the repair for THAT, and they make a dependency that was always there
-    # visible for the first time.
-    ("Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory",
-     "Descent.Portability.PortabilityDrift"):
-        "`Portability.coalescentTau`: coalescent time for a pair of demes, which is a "
-        "PopGen quantity housed in the drift chapter.",
-    ("Descent.PopGen.PopulationGeneticsFoundations.FstDerivationFromDrift",
-     "Descent.Portability.PortabilityDrift"):
-        "`Portability.hetMutationFloor`: the mutation-drift heterozygosity floor for "
-        "one closed population. Same extraction.",
+    # visible for the first time.  Two of the five -- `CoalescentTheory`, whose entry
+    # named `Portability.coalescentTau`, and `FstDerivationFromDrift`, whose entry named
+    # `Portability.hetMutationFloor` -- no longer carry the edge and their entries are
+    # gone; three remain.
     ("Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations",
      "Descent.Portability.PortabilityDrift"):
         "`Portability.effectiveSymmetricMigration` and "
@@ -7700,8 +7719,8 @@ LAYER_PENDING = {
     ("Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics",
      "Descent.Portability.PortabilityDrift"):
         "`Portability.pairwiseFstFromBranches`: pairwise F_ST off a tree. Same "
-        "extraction as the four above; one move of the drift recurrences down into "
-        "PopGen retires all five edges and `LDDecayTheory`'s as well.",
+        "extraction as the two above; one move of the drift recurrences down into "
+        "PopGen retires all three edges and `LDDecayTheory`'s as well.",
     ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.CertificateGrading"):
         "Reads `FinitePrior.mean` and the atom-modulus lemmas. The certificate "
         "machinery is decision-theoretic and correctly placed; the polygenic INSTANCE "
@@ -7718,30 +7737,25 @@ LAYER_PENDING = {
      "Descent.Portability.AncestrySpecificPower"):
         "`Portability.genotypeVarianceHWE` again, six times. One extraction retires "
         "this edge, and two more above it.",
-    ("Descent.Portability.MetricSpecificPortability.PrecisionRecall",
-     "Descent.Program.OpenQuestions"):
-        "`Program.f1Score`. This import was WRITTEN rather than found: the file named "
-        "`f1Score` and reached it through `R2Decomposition -> PopGen.LDDecayTheory -> "
-        "Program.OpenQuestions` until that chain was cut. An F1 formula is a "
-        "classifier metric with no programme content; move the definition into "
-        "Portability and the edge goes.",
-    ("Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination",
-     "Descent.Program.Conclusions"):
-        "`BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`: "
-        "a measure-theoretic AUC apparatus housed in the narrative module. Also "
-        "written rather than found -- the names arrived along a fifteen-module path "
-        "that no longer exists.",
     ("Descent.Portability.PGSCalibrationTheory.RecalibrationMethods",
      "Descent.Program.Conclusions"):
-        "The same three names and the same repair; this file reaches them on its own "
-        "now rather than through a sibling that happened to be earlier in a chain.",
-    ("Descent.Portability.PortabilityDrift.Definitions", "Descent.Program.Conclusions"):
-        "This file names NOTHING from `Conclusions`. It is a carrier: "
-        "`PortabilityDrift.PresentDayMoments`, further down the same chain, names "
-        "`brierBernoulliRisk`, `bernoulliKLReal` and `exactBrierRiskOfCalibrated` and "
-        "reaches them only through here. Interim repair is to move the import to the "
-        "file that uses the names; the real one is to move the Bernoulli losses out "
-        "of the narrative module.",
+        "`BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`: "
+        "a measure-theoretic AUC apparatus housed in the narrative module. This entry "
+        "used to read `the same three names and the same repair`, deferring to a "
+        "`CalibrationVsDiscrimination` entry that has since been retired with its "
+        "edge; the names are written out here so the argument does not depend on a "
+        "neighbour that can be deleted.",
+    ("Descent.Portability.PortabilityDrift.PresentDayMoments",
+     "Descent.Program.Conclusions"):
+        "`brierBernoulliRisk`, `bernoulliKLReal` and `exactBrierRiskOfCalibrated`. "
+        "This edge is what the retired `PortabilityDrift.Definitions` entry PREDICTED: "
+        "that file named nothing from `Conclusions` and carried the import for this "
+        "one, its entry said the interim repair was to move the import to the file "
+        "that uses the names, and that move is what happened -- so the edge did not go "
+        "away, it arrived where it was always owed. The real repair is unchanged and "
+        "is the one that retires it: move the Bernoulli losses out of the narrative "
+        "module. They are risk functions of a Bernoulli outcome and there is no "
+        "programme content in them.",
 }
 
 # The self-auditing directory.  See META in the header.
@@ -7763,6 +7777,26 @@ LAYER_META_VOCABULARY = {
 }
 
 LAYER_QUALIFIED = re.compile(r"\b([A-Z][A-Za-z0-9]*)\.([A-Za-z_][A-Za-z0-9_'!?]*)")
+
+# What REACHABLE must not read: comments, docstrings, AND string literals.  Lean
+# resolves names in terms and in nothing else, so a qualified name inside a `"..."`
+# is not a reference to anything -- it is text, addressed to a person.
+#
+# The case that put string literals here is the one place in the corpus where the
+# guard's advice could not be taken.  `Descent.Meta.Linters` builds the message
+# "`Core.Theta`, `Core.BigM`, `Core.Tau` and `Core.Rho` are the types for these" and
+# hands it to an author who has written a bare `ℝ`.  REACHABLE read those four as
+# references and asked the file to import `Descent.Core.Scaling`, which the META rule
+# two hundred lines above FORBIDS: nothing under `Descent/Meta/` may import a proof
+# module, ever.  Two rules in this one guard demanding opposite things of one file is
+# not a finding about the corpus; it is one of the rules being wrong, and it is this
+# one, for the reason the comment stripping already gives -- prose is allowed to name
+# a declaration the file does not import, because that is what a cross-reference IS.
+#
+# One alternation, not three passes: `re.sub` takes the LEFTMOST match, so a `--`
+# inside a string is not a comment and a `"` inside a comment does not open a string.
+# Stripping in two passes gets one of those two backwards whichever order it picks.
+LAYER_NONCODE = re.compile(r"/-.*?-/|--[^\n]*|\"(?:[^\"\\]|\\.)*\"", re.S)
 LAYER_DECL = re.compile(
     r"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|noncomputable\s+|nonrec\s+)*"
     r"(?:theorem|lemma|def|abbrev|structure|inductive|class|instance)\s+"
@@ -7832,6 +7866,16 @@ def run_layers() -> int:
                     order.append((mod, dep))
             else:
                 census[(src, dst)] += 1
+            # Importing the gate itself is what every rule here exists to make
+            # possible.  `Core` importing nothing outside itself and `Meta` crossing
+            # no boundary are rules about DEPENDENCE, and `Descent.Layer` is a
+            # dependence on nothing: it declares one command and no constant, and it
+            # imports `Lean` alone.  Exempting it in these two rules and nowhere else
+            # keeps the direction asymmetric -- an edge OUT of `Layer` is still an
+            # order violation by rank, which is what stops the exemption becoming a
+            # hole the gate could be moved into.
+            if dst == LAYER_GATE:
+                continue
             if src == "Core":
                 core.append((mod, dep))
             if dst == "Program":
@@ -7868,7 +7912,7 @@ def run_layers() -> int:
         text = raw.get(mod)
         if src is None or text is None:
             continue
-        body = re.sub(r"--[^\n]*", "", re.sub(r"/-.*?-/", "", text, flags=re.S))
+        body = LAYER_NONCODE.sub("", text)
         closure = None
         for layer, name in sorted(set(LAYER_QUALIFIED.findall(body))):
             if layer == src or (layer not in LAYER_UNRANKED
