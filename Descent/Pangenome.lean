@@ -10,6 +10,7 @@ import Descent.Pangenome.Linkage.Chain
 import Descent.Pangenome.Linkage.Frequency
 import Descent.Pangenome.Linkage.Interface
 import Descent.Pangenome.Linkage.Metadata
+import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
 

@@ -6,6 +6,7 @@ import Descent.Pangenome.Linkage.Chain
 import Descent.Pangenome.Linkage.Frequency
 import Descent.Pangenome.Linkage.Interface
 import Descent.Pangenome.Linkage.Metadata
+import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
 
@@ -14,10 +15,11 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 /-!
 # `Linkage` -- what a pangenome graph forgets, and what that forces it to admit
 
-Seven modules.  The group's whole convexity content is one inequality, stated in the first.
+Seven modules of mathematics and one that checks them.  The group's whole convexity content
+is one inequality, stated in the first.
 
 The import order is `Interface`, `Chain`, `Frequency`, `Barrier`, then `Splicing`,
-`Metadata` and `Tree` in any order.  `Frequency` sits where it does because `Barrier`'s
+`Metadata`, `Tree` and `Pinned` in any order.  `Frequency` sits where it does because `Barrier`'s
 uniform statement is DERIVED from its weighted one rather than proved beside it; the list
 below is a reading order, and takes the headline uniform case first.
 
@@ -68,6 +70,10 @@ below is a reading order, and takes the headline uniform case first.
    counting measure on whichever haplotypes were sampled.  `condIdentityLoss_uniform` and
    `panelEntropy_uniform` identify the uniform quantities with the weighted ones at
    `p = 1/m`, which is what lets `Barrier` take its step from here instead of repeating it.
+
+8. `Pinned` -- the check.  Each load-bearing result above, restated independently and
+   discharged by the theorem, so that weakening one stops `lake build Descent` rather than
+   passing every guard silently.  It declares nothing and may not be cited.
 
 ## What of the manuscript is not here
 
