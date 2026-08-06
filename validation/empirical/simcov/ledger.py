@@ -177,7 +177,7 @@ def build(directory: str) -> dict:
             # a citation that resolves to a data dump is not the same thing as
             # a citation that resolves to nothing.
             records.append(dict(
-                declaration=None, against=None, battery=battery,
+                declaration=None, against=None, lean_file="", battery=battery,
                 results_file="battery_%s_results.json" % stem,
                 battery_sha=sha, role="data", tag="",
                 source=", ".join(sorted(rows)[:6]),
@@ -199,6 +199,16 @@ def build(directory: str) -> dict:
                 continue
             parsed.append(dict(
                 short=short, tag=tag, bare=not tag,
+                # THE LEAN FILE THE BATTERY DECLARED. `split_name` keeps only
+                # the last dotted component, so `EvolutionaryParameters.tau` in
+                # `DGP.lean` and `PopGenParameters.tau` in `Core/Parameters.lean`
+                # both reach the ledger as `tau`. Every consumer that joins a
+                # ledger row to a declaration then has two candidates and no way
+                # to choose: `check.py`'s core-empirics guard reported the Core
+                # `tau` as denying measurability against a MATCH that was
+                # measured on the other one. The batteries have always passed
+                # this and the ledger has always dropped it.
+                lean_file=(row.get("file") or "").strip(),
                 source=(row.get("source") or "").strip(),
                 verdict=str(row.get("verdict", "")),
                 note=(row.get("note") or "")[:400],
@@ -274,6 +284,7 @@ def build(directory: str) -> dict:
                               "reject anything")
             records.append(dict(
                 declaration=p["short"], against=p.get("against"),
+                lean_file=p["lean_file"],
                 battery=battery,
                 # WHICH FILE this row came from, kept separate from the battery
                 # it belongs to: one battery may emit several.

@@ -6079,6 +6079,29 @@ def _core_docstrings():
     return out
 
 
+def _rows_about(rows, fname):
+    """The ledger rows that are about the declaration in `fname`, not merely
+    about something with the same last name.
+
+    THE LEDGER KEEPS SHORT NAMES. `ledger.py`'s `split_name` drops every dotted
+    component but the last, so `EvolutionaryParameters.tau` in `DGP.lean` and
+    `PopGenParameters.tau` in `Core/Parameters.lean` are both `tau`, and a join
+    on that name alone hands this guard two candidates with no way to choose.
+    It chose wrong: the Core `tau` was reported as denying that any measurement
+    can bear on it against a MATCH from `battery_bulk19`, which measured the
+    OTHER one, through the pure-split law in `DGP.lean`. The Core declaration's
+    status was right and the finding was a name collision.
+
+    A row that declares no file is kept. That is the conservative direction --
+    an unattributable measurement still gets to contradict a declaration that
+    denies being measurable -- and it is what keeps this fix from silencing
+    every row emitted before `lean_file` reached the ledger.
+    """
+    return [r for r in rows
+            if not r.get("lean_file")
+            or os.path.basename(r["lean_file"]) == os.path.basename(fname)]
+
+
 def run_core_empirics() -> int:
     if not LEDGER_PATH.exists():
         print(f"core-empirics guard CANNOT RUN: {LEDGER_PATH} is absent. The "
@@ -6105,7 +6128,7 @@ def run_core_empirics() -> int:
 
     for qualified, fname, doc in _core_docstrings():
         short = qualified.split(".")[-1]
-        mine = rows.get(short, [])
+        mine = _rows_about(rows.get(short, []), fname)
         # Only rows that said yes or no.  UNINFORMATIVE, NO POWER, LEAD and
         # SELF-TEST assert nothing, and a declaration is not obliged to answer
         # a run that concluded nothing.
