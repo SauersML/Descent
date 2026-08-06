@@ -134,6 +134,35 @@ theorem shapeDrop_pos {s : MergerShape} (hs : IsShape s) (hne : s ≠ 0) : 0 < s
   rw [shapeDrop_cons]
   omega
 
+/-! ### The shape language against the state space it indexes -/
+
+/-- **A shape's cost is the block count the merger it names actually loses.**
+
+The header says `shapeDrop` "for a single group is `MultiMerge.blocks_mergeSet`'s `|S| - 1`",
+and until this theorem that was a claim about two expressions that had never been put in one
+statement. `MergerShape` is an index set, so nothing about it is forced by the state space
+unless something says so; a `shapeDrop` off by one, or reading `|S|` where it means `|S| - 1`,
+would leave every theorem in this file true and every rate attached to a shape wrong. Here
+the two meet: merging `S` into `a` leaves `blocks ξ - shapeDrop {|S|}` blocks, as naturals,
+with no subtraction to truncate on either side. -/
+theorem blocks_mergeSet_add_shapeDrop {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)}
+    {a : Quotient ξ} (ha : a ∈ S) :
+    blocks (mergeSet ξ S a) + shapeDrop ({S.card} : MergerShape) = blocks ξ := by
+  have hd : shapeDrop ({S.card} : MergerShape) = S.card - 1 := shapeDrop_lambda rfl
+  rw [hd]
+  exact blocks_mergeSet ξ ha
+
+/-- **A legitimate single-group shape costs at least one block of the state it acts on**, so
+the index set contains no shape naming a move that changes nothing.  `shapeDrop_pos` says the
+cost is positive; this says the cost is positive AND is the cost of a merger. -/
+theorem blocks_mergeSet_lt_of_isLambdaShape {n : ℕ} (ξ : ER n) {S : Finset (Quotient ξ)}
+    {a : Quotient ξ} (ha : a ∈ S) (hS : IsLambdaShape ({S.card} : MergerShape)) :
+    blocks (mergeSet ξ S a) < blocks ξ := by
+  have hdrop : 0 < shapeDrop ({S.card} : MergerShape) :=
+    shapeDrop_pos hS.isShape (by simp)
+  have hadd := blocks_mergeSet_add_shapeDrop ξ ha
+  omega
+
 end Coalescent
 
 end Descent

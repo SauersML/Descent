@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Lambda
+import Descent.Coalescent.XiRates
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Mathlib.Tactic
 
@@ -136,6 +137,34 @@ theorem bolthausenSznitmanRate_eq {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b) :
     push_cast
     exact Gamma_nat_eq_factorial (b - 1)
   rw [g1, g2, g3]
+
+/-! ### The rates against the shapes they are indexed by -/
+
+/-- **The shape's cost is the multiplier in this family's decrease rate.**
+
+`betaCoalescentRate alpha b k` is the rate of the single-group merger of `k` out of `b`
+blocks, which is the `Λ`-shape `{k}`, and `Descent.Coalescent.shapeDrop` says that shape
+costs `k - 1` blocks.  The block-count decrease rate that
+`Descent.Coalescent.meanTime_le_sum` takes as its drift hypothesis is
+`Σ_k (k-1) λ_{b,k}`, so this states that weighting those rates by the shape language's own
+cost function gives that same sum, and the two modules cannot drift apart on what a merger
+of `k` blocks costs.
+
+The content is the cast.  `shapeDrop` is `ℕ`-valued and its subtraction TRUNCATES, so the
+equality holds only because `2 ≤ k` on the summation range; at `k = 0` the left side would
+read `0` where the right reads `-1`, and a decrease rate built from a shape sum would be
+silently wrong about the one term a coalescent never takes. -/
+theorem betaCoalescentRate_shapeDrop_weighted (alpha : ℝ) (b : ℕ) :
+    ∑ k ∈ Finset.Icc 2 b, (shapeDrop ({k} : MergerShape) : ℝ) * betaCoalescentRate alpha b k
+      = ∑ k ∈ Finset.Icc 2 b, ((k : ℝ) - 1) * betaCoalescentRate alpha b k := by
+  refine Finset.sum_congr rfl fun k hk ↦ ?_
+  have hk2 : 2 ≤ k := (Finset.mem_Icc.mp hk).1
+  have hs : shapeDrop ({k} : MergerShape) = k - 1 := shapeDrop_lambda rfl
+  have h1 : (1 : ℕ) ≤ k := by omega
+  rw [hs]
+  congr 1
+  push_cast [Nat.cast_sub h1]
+  ring
 
 end Coalescent
 

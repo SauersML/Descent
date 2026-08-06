@@ -115,6 +115,30 @@ theorem meanTimeDormant_sub_meanTimeActive (c r : ℝ) :
   unfold meanTimeDormant
   ring
 
+/-! ### Against migration, which is what this module is for -/
+
+/-- **Dormancy inflates the coalescence time where migration leaves it alone.**
+
+The header states this as the reason the two modules sit side by side, and until now it was
+prose: `Structured.meanTimeSame_eq_two` and `meanTimeActive_gt_one` were two theorems about
+two quantities with no statement between them, so nothing in the corpus would break if one
+of the two answers moved.  Each side is compared to its OWN unstructured baseline, which is
+what makes the comparison mean anything -- the two systems are normalised differently, and a
+bare inequality between `2` and `1 + 2c/r` would be an artefact of that.
+
+Migration's ratio is exactly `1` for every migration rate, however slow, which is Strobeck's
+invariance.  Dormancy's is `1 + 2c/r`, strictly greater for every positive dormancy rate.
+Structure that preserves the opportunity to coalesce is invisible to coalescence times;
+structure that removes it is not. -/
+theorem meanTimeSame_ratio_lt_meanTimeActive_ratio {M c r : ℝ} (hc : 0 < c) (hr : 0 < r) :
+    meanTimeSame M / meanTimeSame 0 < meanTimeActive c r / meanTimeActive 0 r := by
+  have h0 : meanTimeActive 0 r = 1 := meanTimeActive_zero_dormancy r
+  have hs : meanTimeSame M / meanTimeSame 0 = 1 := by
+    unfold meanTimeSame
+    norm_num
+  rw [hs, h0, div_one]
+  exact meanTimeActive_gt_one hc hr
+
 end Coalescent
 
 end Descent
