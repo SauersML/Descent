@@ -6,15 +6,17 @@ import Descent.Pangenome.Linkage.Chain
 import Descent.Pangenome.Linkage.Interface
 import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Splicing
+import Descent.Pangenome.Linkage.Tree
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
 /-!
 # `Linkage` -- what a pangenome graph forgets, and what that forces it to admit
 
-Five modules.  The first four read in order, each measuring something the previous one
-defined; the fifth prices the escape the third leaves open.  The group's whole analytic
-content is one inequality, stated in the first module.
+Six modules.  The first four read in order, each measuring something the previous one
+defined; the fifth prices the escape the third leaves open, and the sixth drops the one
+hypothesis the first four never needed.  The group's whole analytic content is one
+inequality, stated in the first module.
 
 ## The order
 
@@ -47,6 +49,13 @@ content is one inequality, stated in the first module.
    of width `w` needs an auxiliary alphabet of at least `m / w`.  That is the same `m / w`
    the width law charges in derivations, so the two options are one trade rather than an
    escape.
+
+6. `Tree` -- the generality.  Nothing in the argument used the chain.  The same law holds on
+   any tree of modules whose edges carry unrelated equivalence relations on the panel, with
+   `log m + ∑ H(J ∣ S_e) ≤ log |Ω|` summed over every edge, and balance extremal there too.
+   `chainArbor` embeds a chain and the specialisation theorems say every quantity agrees, so
+   this is where the result stops being about pangenomes and becomes a counting inequality
+   about edge-coloured trees.
 
 ## Why the group is one group
 
