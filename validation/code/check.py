@@ -5825,10 +5825,7 @@ def _ledger_docstrings():
             m = re.match(r"^(?:noncomputable\s+)?def\s+([A-Za-z_][\w.']*)", line)
             if not m:
                 continue
-            j = i - 1
-            while j >= 0 and (not lines[j].strip()
-                              or lines[j].lstrip().startswith("@[")):
-                j -= 1
+            j = skip_attribute_block(lines, i - 1)
             if j < 0 or not lines[j].rstrip().endswith("-/"):
                 continue
             end = j
@@ -6059,10 +6056,7 @@ def _core_docstrings():
             qualified = m.group(1)
             if not (in_core_dir or CORE_NAMESPACE in qualified):
                 continue
-            j = i - 1
-            while j >= 0 and (not lines[j].strip()
-                              or lines[j].lstrip().startswith("@[")):
-                j -= 1
+            j = skip_attribute_block(lines, i - 1)
             if j < 0 or not lines[j].rstrip().endswith("-/"):
                 out.append((qualified, Path(path).name, ""))
                 continue
@@ -6079,7 +6073,34 @@ def _core_docstrings():
     return out
 
 
-def _rows_about(rows, fname):
+_DECLARING_FILES = {}
+
+
+def _declaring_files():
+    """short declaration name -> the set of corpus file basenames declaring it.
+
+    Built once. Only used to decide whether a name is AMBIGUOUS, so it wants
+    the same column-0 screen every other guard here uses and nothing finer.
+    """
+    if _DECLARING_FILES:
+        return _DECLARING_FILES
+    pat = re.compile(r"^(?:noncomputable\s+)?(?:def|abbrev|structure)\s+"
+                     r"([A-Za-z_][\w.']*)")
+    for path in ident_lean_files():
+        try:
+            raw = Path(path).read_text(errors="ignore")
+        except OSError:
+            continue
+        base = Path(path).name
+        for line in raw.split("\n"):
+            m = pat.match(line)
+            if m:
+                _DECLARING_FILES.setdefault(m.group(1).split(".")[-1],
+                                            set()).add(base)
+    return _DECLARING_FILES
+
+
+def _rows_about(rows, fname, short):
     """The ledger rows that are about the declaration in `fname`, not merely
     about something with the same last name.
 
@@ -6089,17 +6110,30 @@ def _rows_about(rows, fname):
     on that name alone hands this guard two candidates with no way to choose.
     It chose wrong: the Core `tau` was reported as denying that any measurement
     can bear on it against a MATCH from `battery_bulk19`, which measured the
-    OTHER one, through the pure-split law in `DGP.lean`. The Core declaration's
-    status was right and the finding was a name collision.
+    OTHER one, through the pure-split law in `DGP.lean`.
 
-    A row that declares no file is kept. That is the conservative direction --
-    an unattributable measurement still gets to contradict a declaration that
-    denies being measurable -- and it is what keeps this fix from silencing
-    every row emitted before `lean_file` reached the ledger.
+    THE FILE IS A TIEBREAK AND NOT A FILTER, which is the whole subtlety. A
+    battery names the file where the quantity it measured is USED, and for a
+    Core kernel that is almost never Core: requiring the row's file to equal
+    the declaration's file dropped all five Core rows this guard exists to
+    hold, turning one false positive into five false negatives -- the silent
+    direction, on the layer whose docstring says a silent verdict here is an
+    unstated premise. So the file is consulted only when the short name is
+    declared in more than one corpus file, and even then only against rows
+    whose declared file is itself one of those declaring files. A row naming a
+    consumer's file cannot be attributed either way and is kept.
     """
-    return [r for r in rows
-            if not r.get("lean_file")
-            or os.path.basename(r["lean_file"]) == os.path.basename(fname)]
+    homes = _declaring_files().get(short, set())
+    if len(homes) < 2:
+        return rows
+    here = os.path.basename(fname)
+    out = []
+    for r in rows:
+        cited = os.path.basename(r.get("lean_file") or "")
+        if cited in homes and cited != here:
+            continue
+        out.append(r)
+    return out
 
 
 def run_core_empirics() -> int:
@@ -6128,7 +6162,7 @@ def run_core_empirics() -> int:
 
     for qualified, fname, doc in _core_docstrings():
         short = qualified.split(".")[-1]
-        mine = _rows_about(rows.get(short, []), fname)
+        mine = _rows_about(rows.get(short, []), fname, short)
         # Only rows that said yes or no.  UNINFORMATIVE, NO POWER, LEAD and
         # SELF-TEST assert nothing, and a declaration is not obliged to answer
         # a run that concluded nothing.
