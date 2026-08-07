@@ -127,7 +127,7 @@ coalescences that have already occurred.  This is the whole difficulty in one eq
 /-- Observing an observation says nothing new. -/
 theorem observed_idem {n : ℕ} (s : Fin n → Fin n) (ξ : Coalescent.ER n) :
     observed s (observed s ξ) = observed s ξ := by
-  simp [observed, sup_assoc]
+  simp [observed]
 
 /-- **A faithful interface observes nothing.**  When `s` is injective the graph is a
 relabelling of the panel and the report is the coalescent itself. -/

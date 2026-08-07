@@ -134,7 +134,7 @@ theorem transitDeficit_nonneg {n : ℕ} {s : Fin n → Fin n} (hw : 1 ≤ Linkag
   have h2 : (Linkage.width s : ℝ) ≤ (n : ℝ) := by exact_mod_cast hle
   have h3 : (0 : ℝ) < (n : ℝ) := lt_of_lt_of_le h1 h2
   have hkey : (2 : ℝ) / (n : ℝ) ≤ 2 / (Linkage.width s : ℝ) := by
-    rw [div_le_div_iff h3 h1]
+    rw [div_le_div_iff₀ h3 h1]
     linarith
   rw [transitDeficit_eq hn hw]
   linarith
@@ -149,7 +149,7 @@ theorem transitDeficit_pos {n : ℕ} {s : Fin n → Fin n} (hw : 1 ≤ Linkage.w
   have h2 : (Linkage.width s : ℝ) < (n : ℝ) := by exact_mod_cast hlt
   have h3 : (0 : ℝ) < (n : ℝ) := lt_trans h1 h2
   have hkey : (2 : ℝ) / (n : ℝ) < 2 / (Linkage.width s : ℝ) := by
-    rw [div_lt_div_iff h3 h1]
+    rw [div_lt_div_iff₀ h3 h1]
     linarith
   rw [transitDeficit_eq hn hw]
   linarith
