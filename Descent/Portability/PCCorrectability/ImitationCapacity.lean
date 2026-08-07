@@ -148,7 +148,8 @@ theorem quadForm_smul_matrix (c : ℝ) (A : Matrix ι ι ℝ) (x : ι → ℝ) :
   ring
 
 theorem varianceNonneg_add {A B : Matrix ι ι ℝ}
-    (hA : Blindness.VarianceNonneg A) (hB : Blindness.VarianceNonneg B) : Blindness.VarianceNonneg (A + B) := by
+    (hA : Blindness.VarianceNonneg A) (hB : Blindness.VarianceNonneg B) : Blindness.VarianceNonneg
+      (A + B) := by
   intro x
   rw [quadForm_add_matrix]
   exact add_nonneg (hA x) (hB x)

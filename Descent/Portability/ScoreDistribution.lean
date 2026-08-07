@@ -253,7 +253,8 @@ theorem mean_shift_changes_benchmark_high_score_rate
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ_T) / σ < (threshold - μ_S) / σ := by
     exact mean_shift_increases_tail threshold μ_S μ_T σ h_σ h_shift
-  have hphi : Foundations.Phi ((threshold - μ_T) / σ) < Foundations.Phi ((threshold - μ_S) / σ) := by
+  have hphi : Foundations.Phi ((threshold - μ_T) / σ) < Foundations.Phi ((threshold - μ_S) / σ)
+    := by
     exact Foundations.strictMono_Phi hz
   linarith
 
@@ -271,7 +272,8 @@ theorem variance_change_changes_benchmark_high_score_rate
   unfold benchmarkHighScoreRate thresholdStandardizedCoordinate
   have hz : (threshold - μ) / σ_T < (threshold - μ) / σ_S := by
     exact div_lt_div_of_pos_left h_thr h_σS h_larger
-  have hphi : Foundations.Phi ((threshold - μ) / σ_T) < Foundations.Phi ((threshold - μ) / σ_S) := by
+  have hphi : Foundations.Phi ((threshold - μ) / σ_T) < Foundations.Phi ((threshold - μ) / σ_S)
+    := by
     exact Foundations.strictMono_Phi hz
   linarith
 
@@ -815,7 +817,8 @@ is a strict departure from the continuum, of a size fixed by the spacing alone.
     identification of that factor with an exceedance-intensity ratio is not proved in
     this corpus; see the note above. -/
 theorem hardCall_threshold_factor_bounded {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ : 0 ≤ δ) :
-    Blindness.latticeBracket h δ ≤ Blindness.latticeInflation h ∧ 1 < Blindness.latticeInflation h :=
+    Blindness.latticeBracket h δ ≤ Blindness.latticeInflation h ∧ 1 < Blindness.latticeInflation h
+      :=
   ⟨latticeBracket_le_latticeInflation hh hδ, Blindness.one_lt_latticeInflation hh⟩
 
 end LatticeThreshold
@@ -945,7 +948,8 @@ end Standardization
 
 theorem pgsVariance_uses_hwe {m : ℕ} (β p : Fin m → ℝ) :
     Portability.pgsVariance β p = ∑ i, β i ^ 2 * genotypeVarianceHWE (p i) := by
-  unfold Portability.pgsVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+  unfold Portability.pgsVariance genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring_nf
 
 theorem pgsMean_uses_ploidy {m : ℕ} (β p : Fin m → ℝ) :
     Portability.pgsMean β p = ∑ i, β i * (Descent.Core.ploidy * p i) := by

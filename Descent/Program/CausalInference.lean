@@ -159,8 +159,10 @@ theorem r2_strictMono_under_effect_turnover
     -- Immune R² (with effect turnover ρ) is strictly less than
     -- drift-only R² (no effect turnover), showing the selection
     -- pathway causes genuine additional loss beyond LD/drift.
-    PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fst) V_E <
-      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E :=
+    PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A
+      fst) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E
+        :=
   -- This proof was written out a second time here, tactic for tactic, as
   -- `effect_retention_lowers_target_r2_at_fixed_fst` in `OpenQuestions`.  That one carried
   -- a source `Fst` and two hypotheses about it that no proof term used; all three are now
@@ -308,7 +310,8 @@ theorem r2_lt_of_drift_variance_pos
     (hfst_pos : 0 < fst) (hfst_lt : fst < 1) :
     -- Cross-ancestry R² is strictly below same-ancestry R²
     PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E <
-      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A 0) V_E := by
+      PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A 0) V_E
+        := by
   apply Portability.expectedR2_strictMono_nonneg V_E _ _ hVE
   · unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
     exact le_of_lt (mul_pos hVA (by linarith))
@@ -331,7 +334,8 @@ theorem r2_lt_of_drift_variance_pos
 theorem r2_lt_of_added_noise_pos
     (vSignal V_E vNoiseAdded : ℝ)
     (h_sig : 0 < vSignal) (h_VE : 0 < V_E) (h_added : 0 < vNoiseAdded) :
-    PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + vNoiseAdded) < PopGen.TransportedMetrics.r2FromSignalVariance vSignal V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance vSignal (V_E + vNoiseAdded) <
+      PopGen.TransportedMetrics.r2FromSignalVariance vSignal V_E := by
   unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have h_denom_clean : 0 < vSignal + V_E := by linarith
   have h_denom_noisy : 0 < vSignal + (V_E + vNoiseAdded) := by linarith
@@ -395,8 +399,10 @@ theorem r2_increments_strictAnti_in_signal
     (v Δ V_E : ℝ)
     (hv : 0 ≤ v) (hΔ : 0 < Δ) (hVE : 0 < V_E) :
     -- Second increment gives less R² gain than the first
-    PopGen.TransportedMetrics.r2FromSignalVariance (v + 2 * Δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E <
-      PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance v V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (v + 2 * Δ) V_E -
+      PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance (v + Δ) V_E -
+        PopGen.TransportedMetrics.r2FromSignalVariance v V_E := by
   unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have ha : 0 < v + V_E := by linarith
   have hb : 0 < v + Δ + V_E := by linarith

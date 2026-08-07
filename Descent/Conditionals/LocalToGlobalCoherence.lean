@@ -296,7 +296,8 @@ theorem no_bounded_locality_hierarchy
   exact
     ({ positive := bipartiteTwin, negative := nonBipartiteTwin, same_data := hlocal,
        holds := hbip, fails := hnon } :
-        Blindness.LeveledBlindness localData asymptoticallyRealizable).no_hierarchy_criterion combine
+        Blindness.LeveledBlindness localData asymptoticallyRealizable).no_hierarchy_criterion
+          combine
       ⟨accept, hdec⟩
 
 /-!

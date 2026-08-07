@@ -5,9 +5,13 @@ import Descent.PopGen.PopulationGeneticsFoundations
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -684,7 +688,8 @@ theorem pgsDriftVariance_one_pop_eq_ploidy_form (V_A fst : ℝ) :
 /-- The between-population drift variance of the score, carrying the same
 ploidy factor as `Var_Delta_Mu`. -/
 theorem expectedPGSDiffVariance_eq_ploidy_form (V_A fst : ℝ) :
-    PopGen.expectedPGSDiffVariance V_A fst = Descent.Core.ploidy * Descent.Core.ploidy * fst * V_A := by
+    PopGen.expectedPGSDiffVariance V_A fst = Descent.Core.ploidy * Descent.Core.ploidy * fst * V_A
+      := by
   unfold PopGen.expectedPGSDiffVariance Descent.Core.ploidy; ring
 
 end Descent.PopGen

@@ -98,7 +98,8 @@ theorem neutralPortabilityRatioLD_eq_presentDayPGSVariance
     (fst_additional ld_factor : ℝ) :
     neutralPortabilityRatioLD fst_additional ld_factor =
       presentDayPGSVariance ld_factor fst_additional := by
-  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet Descent.Core.product Descent.Core.retainedFraction; ring
+  unfold neutralPortabilityRatioLD presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
+    Descent.Core.retainedFraction; ring
 
 /-- Neutral ratio is in [0, 1] under valid parameters. -/
 theorem neutral_ratio_in_unit (fst ld : ℝ)
@@ -886,9 +887,11 @@ theorem selectedDriftFactor_uses_timeScale (Ne : ℝ) (t : ℕ) (s_correction : 
 
 theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
     (t : ℕ) (Ne H₀ : ℝ) (hH : 0 < H₀) :
-    PopGen.heterozygosityLossFromDrift t Ne = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t := by
+    PopGen.heterozygosityLossFromDrift t Ne = (PopGen.closedPopulation Ne H₀ hH).measuredLoss t
+      := by
   rw [PopGen.measuredLoss_closedPopulation]
-  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   rfl
 
 end Descent.Portability

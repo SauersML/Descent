@@ -71,7 +71,8 @@ open scoped Classical
 
 /-- The Ewens weight is positive for a positive `θ`: a power of `θ` times a product of
 factorials.  This is what lets the seating weights be divided into probabilities. -/
-theorem ewensWeight_pos {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) : 0 < ewensWeight θ ξ := by
+theorem ewensWeight_pos {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) : 0 <
+  ewensWeight θ ξ := by
   unfold ewensWeight
   refine mul_pos (pow_pos hθ _) ?_
   refine Finset.prod_pos fun c _ ↦ ?_
@@ -83,7 +84,8 @@ Derived, not posited: the numerator is `Ewens.ewensWeight_extend_none` and the d
 `Ewens.sum_seatings_ewensWeight`, and the state `ξ` cancels between them.  That cancellation
 is the content -- the chance of seeing a new allele depends on how many individuals have been
 examined and not at all on what was seen in them. -/
-theorem seating_new_class_prob {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) (hb : 1 ≤ blocks ξ) :
+theorem seating_new_class_prob {n : ℕ} {θ : Descent.Core.Theta} (hθ : 0 < θ.value) (ξ : ER n) (hb :
+  1 ≤ blocks ξ) :
     ewensWeight θ (extend ξ none) / (∑ o : Option (Quotient ξ), ewensWeight θ (extend ξ o))
       = θ.value / (θ.value + (n : ℝ)) := by
   have hw : 0 < ewensWeight θ ξ := ewensWeight_pos hθ ξ
@@ -115,7 +117,8 @@ theorem expectedNumClasses_succ (θ : Descent.Core.Theta) (n : ℕ) :
   rw [sum_range_succ]
 
 /-- A sample of one shows one allele, whatever `θ`: the first draw always starts a class. -/
-theorem expectedNumClasses_one {θ : Descent.Core.Theta} (hθ : 0 < θ.value) : expectedNumClasses θ 1 = 1 := by
+theorem expectedNumClasses_one {θ : Descent.Core.Theta} (hθ : 0 < θ.value) : expectedNumClasses θ 1
+  = 1 := by
   unfold expectedNumClasses
   rw [sum_range_one, Nat.cast_zero, add_zero]
   exact div_self (ne_of_gt hθ)

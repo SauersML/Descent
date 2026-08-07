@@ -6,9 +6,13 @@ import Descent.PopGen.LDDecayTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -61,7 +65,8 @@ this file names the consequence it uses rather than reproving it. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁ :=
+    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁
+      :=
   Portability.fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
 /-! The island-model `F_ST` has one definition, `fstMigrationDriftEquilibrium`. A second
@@ -1383,7 +1388,8 @@ written once for the two branches of a split and once for the two levels of
 the `F`-statistic hierarchy. -/
 theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
     Portability.pairwiseFstFromBranches a b = PopGen.wrightFIT a b := by
-  unfold Portability.pairwiseFstFromBranches PopGen.wrightFIT Descent.Core.complementaryComposition; ring_nf
+  unfold Portability.pairwiseFstFromBranches PopGen.wrightFIT Descent.Core.complementaryComposition;
+    ring_nf
 
 theorem cumulativeDrift_uses_timeScale {T : ℕ} (Ne : Fin T → ℝ) :
     PopGen.cumulativeDrift Ne = ∑ i, 1 / Descent.Core.coalescentTimeScale (Ne i) := by

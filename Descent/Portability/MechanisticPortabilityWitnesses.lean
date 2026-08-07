@@ -128,7 +128,8 @@ noncomputable def sourceSquaredEffectMass {q : ℕ}
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem sourceSquaredEffectMass_at_reference_point :
     sourceSquaredEffectMass (![1, 3] : Fin 2 → ℝ) = 10 := by
-  norm_num [sourceSquaredEffectMass, Fin.sum_univ_two, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  norm_num [sourceSquaredEffectMass, Fin.sum_univ_two, Descent.Core.scaledMutationRate,
+    Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 
@@ -203,7 +204,8 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     identityDirectMetricModel β outcomeVariance targetPrevalence
       h_out h_prev_pos h_prev_lt
   have h_weights : sourceWeightsFromExplicitDrivers m = β := by
-    simpa [m, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simpa [m, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using
       identityDirectMetricModel_source_weights β outcomeVariance targetPrevalence
@@ -238,20 +240,23 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     rw [sourcePredictiveCovarianceFromSourceWeights_eq_score_on_source_crossCov]
     unfold sourceWeightedTagScore
     rw [h_weights, h_source_cross]
-    simpa [sourceSquaredEffectMass, dotProduct, pow_two, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simpa [sourceSquaredEffectMass, dotProduct, pow_two, Descent.Core.scaledMutationRate,
+      Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_source_signal :
       explainedSignalVarianceFromSourceWeights m Pop.source = sourceSquaredEffectMass β := by
     unfold explainedSignalVarianceFromSourceWeights
     rw [h_source_cov, h_source_score]
-    field_simp [ne_of_gt h_mass, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    field_simp [ne_of_gt h_mass, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_source :
       r2FromSourceWeights m Pop.source = sourceSquaredEffectMass β / outcomeVariance := by
     rw [r2FromSourceWeights, h_source_signal]
-    simp [m, identityDirectMetricModel, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simp [m, identityDirectMetricModel, Descent.Core.scaledMutationRate,
+      Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_target_score :
@@ -270,14 +275,16 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
     rw [targetPredictiveCovarianceFromSourceWeights_eq_score_on_target_crossCov]
     unfold sourceWeightedTagScore
     rw [h_weights, h_target_cross]
-    simpa [sourceSquaredEffectMass, dotProduct, pow_two, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simpa [sourceSquaredEffectMass, dotProduct, pow_two, Descent.Core.scaledMutationRate,
+      Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_target_signal :
       explainedSignalVarianceFromSourceWeights m Pop.target = sourceSquaredEffectMass β := by
     unfold explainedSignalVarianceFromSourceWeights
     rw [h_target_cov, h_target_score]
-    field_simp [ne_of_gt h_mass, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    field_simp [ne_of_gt h_mass, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_eff : effectiveOutcomeVariance m Pop.target = outcomeVariance := by
@@ -295,7 +302,8 @@ theorem identityDirectMetricModel_metrics {q : ℕ}
   have h_mass_ne : sourceSquaredEffectMass β ≠ 0 := ne_of_gt h_mass
   have h_ratio_ne : sourceSquaredEffectMass β / outcomeVariance ≠ 0 := by
     exact div_ne_zero h_mass_ne (ne_of_gt h_out)
-  field_simp [h_ratio_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  field_simp [h_ratio_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+    Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 
@@ -546,7 +554,8 @@ theorem target_metric_profile_auc_uses_explicit_target_moments {p q : ℕ}
       PopGen.TransportedMetrics.equalVarianceGaussianAUCFromSignalVariance
         (explainedSignalVarianceFromSourceWeights m Pop.target)
         (residualVarianceFromSourceWeights m Pop.target) := by
-  simp [targetMetricProfileFromSourceWeights, equalVarianceGaussianAUCFromSourceWeights, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  simp [targetMetricProfileFromSourceWeights, equalVarianceGaussianAUCFromSourceWeights,
+    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 
@@ -566,7 +575,8 @@ derived deployed `R²`, change under the mechanistic state. -/
 theorem target_ld_shift_changes_liability_auc :
     equalVarianceGaussianAUCFromSourceWeights targetLDShiftMetricModel Pop.target <
       equalVarianceGaussianAUCFromSourceWeights baselineMetricModel Pop.target := by
-  rcases target_ld_shift_changes_portability_without_changing_source_r2 with ⟨_, _, h_target_shift, h_target_base, _⟩
+  rcases target_ld_shift_changes_portability_without_changing_source_r2 with ⟨_, _, h_target_shift,
+    h_target_base, _⟩
   rw [target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_shift, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using
@@ -588,7 +598,8 @@ section GenerationalMechanisticValidation
 -- These primitive population-genetic rates are deliberately kept transparent in
 -- the concrete witnesses below.  Registering them locally prevents exact
 -- generation checks from getting stuck at an otherwise opaque `4 * Nₑ * rate`.
-attribute [local simp] Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate PopGen.hetDecayFromScaled
+attribute [local simp] Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate
+  PopGen.hetDecayFromScaled
   novelDirectCausalTargetAt novelProxyTaggingTargetAt
 
 /-- Simple generation-indexed population-genetic parameters used to validate
@@ -640,7 +651,8 @@ noncomputable def nondegenerateGenerationalPopGen : Descent.Core.PopGenParameter
 factor vanish exactly at generation one. -/
 theorem nondegenerateGenerationalPopGen_fstDecay_eq_zero :
     PopGen.fstTransientDecayFromScaled 1 ⟨2⟩ ⟨1 / 2⟩ = 0 := by
-  norm_num [PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  norm_num [PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled,
+    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 
@@ -653,13 +665,16 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
     nondegenerateGenerationalPopGen.mutationSharedRetentionAt 1 = Real.exp (-(1 : ℝ)) ∧
     nondegenerateGenerationalPopGen.migrationSharedBoostAt 1 = 7 / 6 := by
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
-  · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.theta, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.theta,
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
-  · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.bigM, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.bigM,
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
-  · simp [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.tauAt, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  · simp [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.tauAt,
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   · simp [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.fstTransientAt,
@@ -735,7 +750,8 @@ theorem popgenDrivenLDDecayExponent_eq_eighth :
   unfold popgenDrivenLDDecayExponent
   rw [h_fst, show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num,
     Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 1 / 2)]
-  norm_num [nondegenerateGenerationalPopGen, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  norm_num [nondegenerateGenerationalPopGen, Descent.Core.scaledMutationRate,
+    Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 
@@ -834,7 +850,8 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
       popgenDrivenProxyScale ∧
     proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 1 0 =
       popgenDrivenProxyScale := by
-  rcases nondegenerateGenerationalPopGen_coordinates_at_one with ⟨h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig⟩
+  rcases nondegenerateGenerationalPopGen_coordinates_at_one with ⟨h_theta, h_bigM, h_tau, h_fst,
+    h_mut, h_mig⟩
   -- Both tags carry the same proxy scale at generation one, and the calculation that shows
   -- it does not depend on which: it was written out once per tag, `calc` step for `calc`
   -- step. Proved for an arbitrary tag, the last two goals are two instances of it.
@@ -885,9 +902,11 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     CrossPopulationGenerationalModel.toMetricModelAt popgenDrivenProxyGenerationalModel 1
   have h_weights :
       sourceWeightsFromExplicitDrivers m1 = ![1, 1] := by
-    simpa [m1, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simpa [m1, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using popgenDrivenProxyGenerationalModel_source_weights 1
+      Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using
+        popgenDrivenProxyGenerationalModel_source_weights 1
   have h_cov :
       predictiveCovarianceFromSourceWeights m1 Pop.target = 2 * popgenDrivenProxyScale := by
     rcases popgenDrivenProxyGenerationalModel_generation_one_scales with ⟨_, _, h_proxy0, h_proxy1⟩
@@ -915,7 +934,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
           using h_proxy1
     rw [predictiveCovarianceFromSourceWeights]
     rw [h_weights, h_cross]
-    simp [dotProduct, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simp [dotProduct, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
     ring
@@ -954,7 +974,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
           using h_ld1
     rw [scoreVarianceFromSourceWeights]
     rw [h_weights, h_sigma]
-    simp [Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simp [Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
     ring
@@ -968,7 +989,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio]
-    simpa [h_target_var, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    simpa [h_target_var, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using this
   have h_tag_pos : 0 < popgenDrivenTagScale := by
@@ -993,7 +1015,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
               ring
       _ < ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * 1 := by
               exact mul_lt_mul_of_pos_left h_ld_gap_lt_one (by positivity)
-      _ = popgenDrivenTagScale := by simp [popgenDrivenTagScale, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      _ = popgenDrivenTagScale := by simp [popgenDrivenTagScale, Descent.Core.scaledMutationRate,
+        Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
   have h_exp_one_ge_two : (2 : ℝ) ≤ Real.exp (1 : ℝ) := by
@@ -1030,7 +1053,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
         unfold popgenDrivenProxyScale
         positivity
       have h_mul_lt := mul_lt_mul_of_pos_left h_proxy_lt_one h_proxy_pos
-      simpa [pow_two, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      simpa [pow_two, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+        Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using h_mul_lt
     exact lt_trans h_proxy_sq_lt_proxy h_proxy_lt_tag
@@ -1045,7 +1069,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     have h_eq :
         (2 * popgenDrivenProxyScale) ^ 2 / (2 * popgenDrivenTagScale) =
           2 * (popgenDrivenProxyScale ^ 2 / popgenDrivenTagScale) := by
-      field_simp [h_tag_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      field_simp [h_tag_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+        Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
     rw [h_eq]
@@ -1221,7 +1246,8 @@ theorem target_r2_changes_along_generation_indexed_af_path :
               (2 + 2 * (1 - (9 / 16 : ℝ)) ^ 2) =
           (9 / 16 : ℝ) /
             (2 + 2 * (1 - (9 / 16 : ℝ)) ^ 2) := by
-      field_simp [h_exp_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      field_simp [h_exp_ne, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+        Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
     simpa using hcalc
@@ -1298,7 +1324,8 @@ theorem target_metric_profile_at_generation_reads_explicit_target_r2
     {p q : ℕ} (m : CrossPopulationGenerationalModel p q) (t : ℕ) :
     (targetMetricProfileAtGeneration m t).r2 =
       r2FromSourceWeights (m.toMetricModelAt t) Pop.target := by
-  simp [r2FromSourceWeights, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  simp [r2FromSourceWeights, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+    Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
 

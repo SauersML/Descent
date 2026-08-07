@@ -467,7 +467,8 @@ theorem continuousInvariant_eq_at_limit {H : Type*} [TopologicalSpace H]
     invariant (flow 0) = invariant limit := by
   have hcomp : Filter.Tendsto (fun t ↦ invariant (flow t)) Filter.atTop (nhds (invariant limit)) :=
     (hPhi.tendsto limit).comp hconv
-  have hconst : Filter.Tendsto (fun t ↦ invariant (flow t)) Filter.atTop (nhds (invariant (flow 0))) := by
+  have hconst : Filter.Tendsto (fun t ↦ invariant (flow t)) Filter.atTop (nhds (invariant (flow 0)))
+    := by
     simp [hinv]
   exact tendsto_nhds_unique hconst hcomp
 
@@ -686,7 +687,8 @@ open MeasureTheory ProbabilityTheory in
     centred Gaussian cdf, and `cdf_gaussianReal_zero_mean` — which IS proved — standardises it.
     So Theorem 3 rests on one measure-theoretic assembly, not on the identity as a whole. -/
 theorem gaussianAverage_probit (α β : ℝ) :
-    ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1) = Foundations.Phi (α / Real.sqrt (1 + β ^ 2)) := by
+    ∫ z, Foundations.Phi (α + β * z) ∂(gaussianReal 0 1) = Foundations.Phi (α / Real.sqrt (1 + β ^
+      2)) := by
   have hne : (⟨1 + β ^ 2, by positivity⟩ : NNReal) ≠ 0 := by
     intro h
     have h' : (1 + β ^ 2 : ℝ) = 0 := by simpa using congrArg NNReal.toReal h
@@ -1639,14 +1641,16 @@ theorem affineProbit_scale_unique (p q α β p' q' α' β' : ℝ) (hα : 0 < α)
 
 /-- With floor and scale pinned, the two probit arguments agree pointwise. -/
 theorem affineProbit_arg_eq (p q α β p' q' α' β' : ℝ) (hq : 0 < q) (hα : 0 < α) (hα' : 0 < α')
-    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) (u : ℝ) :
+    (h : ∀ u, p + q * Foundations.Phi (α * u + β) = p' + q' * Foundations.Phi (α' * u + β')) (u : ℝ)
+      :
     α * u + β = α' * u + β' := by
   have hp : p = p' := affineProbit_floor_unique p q α β p' q' α' β' hα hα' h
   have hqq : q = q' := affineProbit_scale_unique p q α β p' q' α' β' hα hα' h
   have hu := h u
   rw [← hp, ← hqq] at hu
   have : Foundations.Phi (α * u + β) = Foundations.Phi (α' * u + β') := by
-    have hcancel : q * Foundations.Phi (α * u + β) = q * Foundations.Phi (α' * u + β') := by linarith
+    have hcancel : q * Foundations.Phi (α * u + β) = q * Foundations.Phi (α' * u + β') := by
+      linarith
     exact mul_left_cancel₀ (ne_of_gt hq) hcancel
   exact Foundations.strictMono_Phi.injective this
 

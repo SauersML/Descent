@@ -187,7 +187,8 @@ theorem ancestryRecalibratedR2_add_effectTurnoverR2Loss
     (r2_source ρ_sq : ℝ) :
     ancestryRecalibratedR2 r2_source ρ_sq +
       effectTurnoverR2Loss r2_source ρ_sq = r2_source := by
-  unfold ancestryRecalibratedR2 effectTurnoverR2Loss Descent.Core.product Descent.Core.retainedFraction
+  unfold ancestryRecalibratedR2 effectTurnoverR2Loss Descent.Core.product
+    Descent.Core.retainedFraction
   ring
 
 
@@ -571,6 +572,7 @@ end Epistasis
 theorem epistaticVariancePairwise_uses_hwe (γ p₁ p₂ : ℝ) :
     Portability.epistaticVariancePairwise γ p₁ p₂ =
       γ ^ 2 * genotypeVarianceHWE p₁ * genotypeVarianceHWE p₂ := by
-  unfold Portability.epistaticVariancePairwise genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring_nf
+  unfold Portability.epistaticVariancePairwise genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring_nf
 
 end Descent.Portability

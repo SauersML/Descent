@@ -5,9 +5,12 @@ import Descent.Blindness.ImitationRigidity
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`,
+-- `Descent.Program`:
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.ImitationRigidity`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -125,7 +128,8 @@ section PencilEnvironment
     Trivial as algebra, and that is the point: it pins `ldWhiteningGain` as the summand of the
     ergodic average rather than an unrelated closed form that happens to look similar. -/
 theorem whiteningGain_ergodic_mean_eq_of_constant (decay : ℝ) (n : ℕ) (hn : 0 < n) :
-    (∑ _i : Fin n, Blindness.ldWhiteningGain decay) / (n : ℝ) = Blindness.ldWhiteningGain decay := by
+    (∑ _i : Fin n, Blindness.ldWhiteningGain decay) / (n : ℝ) = Blindness.ldWhiteningGain decay
+      := by
   have hn' : ((n : ℝ)) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.pos_iff_ne_zero.mp hn)
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   field_simp
@@ -315,7 +319,8 @@ theorem ababFinite_deficit_proportional_to_whiteningGain_deficit_of_length_ne_ze
     ((2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m)
         * (Blindness.ldWhiteningGain decay - 1)
       = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2)
-        * (Blindness.ldWhiteningGain decay - (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m) := by
+        * (Blindness.ldWhiteningGain decay - (1 + (m - 1) * Blindness.ldWhiteningGain decay) / m)
+          := by
   have hnum : (2 * Eα2 * Eβ2 + 4 * Eα ^ 2 * Eβ ^ 2) - ababFinite Eα Eβ Eα2 Eβ2 m
       = (2 * Eα2 * Eβ2 + 8 * Eα ^ 2 * Eβ ^ 2) / m := by
     unfold ababFinite

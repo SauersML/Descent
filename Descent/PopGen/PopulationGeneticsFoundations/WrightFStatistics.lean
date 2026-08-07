@@ -7,9 +7,13 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -153,7 +157,8 @@ every generation count -- no drift at all, reported for the strongest drift poss
 must exclude the argument that makes the guard vanish. -/
 theorem heterozygosityLossFromDrift_empty_population_is_junk (t : ℕ) :
     heterozygosityLossFromDrift t 0 = 0 := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   simp
 
 /-- **One generation of drift in a population of one, pinned.** This definition carries no result
@@ -161,13 +166,15 @@ of its own. At `Ne = 1` a single generation loses half the heterozygosity, which
 per-generation rate at `1 / (2 Ne)` against `1 / Ne` and against `1 / (4 Ne)`. -/
 theorem heterozygosityLossFromDrift_one_generation :
     heterozygosityLossFromDrift 1 1 = 1 / 2 := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   norm_num
 
 /-- Fst from drift is nonneg. -/
 theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
     0 ≤ heterozygosityLossFromDrift t Ne := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   rw [sub_nonneg]
   apply pow_le_one₀
   · rw [sub_nonneg, div_le_one (by linarith)]; linarith
@@ -177,7 +184,8 @@ theorem fst_drift_nonneg (t : ℕ) (Ne : ℝ) (h_Ne : 2 ≤ Ne) :
 theorem fst_drift_increases (Ne : ℝ) (t₁ t₂ : ℕ) (h_Ne : 2 < Ne)
     (h_time : t₁ < t₂) :
     heterozygosityLossFromDrift t₁ Ne < heterozygosityLossFromDrift t₂ Ne := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   rw [sub_lt_sub_iff_left]
   have h_base_pos : 0 < 1 - 1 / (2 * Ne) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
@@ -197,8 +205,10 @@ let one be substituted for the other. What is pinned here is the constant. The r
 pinned separately, by
 `heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss` at the end of this file. -/
 theorem fstFromDrift_uses_coalescentTimeScale (t : ℕ) (Ne : ℝ) :
-    PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / Descent.Core.coalescentTimeScale Ne) ^ t := by
-  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay; rw [Descent.Core.coalescentTimeScale_eq]
+    PopGen.heterozygosityLossFromDrift t Ne = 1 - (1 - 1 / Descent.Core.coalescentTimeScale Ne) ^ t
+      := by
+  unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-! `heterozygosityLossFromDrift_uses_timeScale` stood beside the theorem above with the
 same statement, the same proof and a different binder order, under a second name.  Both

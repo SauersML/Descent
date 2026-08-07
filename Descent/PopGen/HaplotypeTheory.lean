@@ -988,7 +988,8 @@ theorem localAncestryMisspecification_eq
     (beta₁ beta₂ alpha : ℝ) :
     localAncestryMisspecification beta₁ beta₂ alpha =
       alpha * (1 - alpha) * (beta₁ - beta₂) ^ 2 := by
-  unfold localAncestryMisspecification globalAncestryAveragedEffect ancestrySpecificEffect Descent.Core.convexCombination
+  unfold localAncestryMisspecification globalAncestryAveragedEffect ancestrySpecificEffect
+    Descent.Core.convexCombination
   ring
 
 /-- **Local ancestry deconvolution for haplotypes.**

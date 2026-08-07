@@ -16,10 +16,15 @@ import Descent.Conditionals.LatentMechanismCollapse
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Conditionals`:
---   Spectral: reaches 4 module(s) -- `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.FoldedSpectrum`, `Descent.Spectral.Permeability` and 1 more
---   Blindness: reaches 8 module(s) -- `Descent.Blindness.BundleRigidity`, `Descent.Blindness.BundleRigidity.Coverage`, `Descent.Blindness.BundleRigidity.CoverageInvariance` and 5 more
---   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.ConditionalGain`, `Descent.Conditionals.LatentMechanismCollapse`
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Conditionals`:
+--   Spectral: reaches 4 module(s) -- `Descent.Spectral.EnsembleChannel`,
+--   `Descent.Spectral.FoldedSpectrum`, `Descent.Spectral.Permeability` and 1 more
+--   Blindness: reaches 8 module(s) -- `Descent.Blindness.BundleRigidity`,
+--   `Descent.Blindness.BundleRigidity.Coverage`,
+--   `Descent.Blindness.BundleRigidity.CoverageInvariance` and 5 more
+--   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.ConditionalGain`,
+--   `Descent.Conditionals.LatentMechanismCollapse`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -862,8 +867,10 @@ theorem gxe_threeContext_mechanismCount_not_identified
     (h₁ : linearNormOfReaction (a 1) (b 1) (E 1) = 50 / 100)
     (h₂ : linearNormOfReaction (a 2) (b 2) (E 2) = 70 / 100) :
     (Conditionals.threeMechanismMixture (7 / 10) (3 / 20) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
-        Conditionals.threeMechanismMixture (2 / 5) (3 / 10) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
-        Conditionals.threeMechanismMixture (1 / 5) (3 / 20) = linearNormOfReaction (a 2) (b 2) (E 2)) ∧
+        Conditionals.threeMechanismMixture (2 / 5) (3 / 10) = linearNormOfReaction (a 1) (b 1) (E 1)
+          ∧
+        Conditionals.threeMechanismMixture (1 / 5) (3 / 20) = linearNormOfReaction (a 2) (b 2) (E
+          2)) ∧
       (Conditionals.twoMechanismMixture (11 / 14) = linearNormOfReaction (a 0) (b 0) (E 0) ∧
         Conditionals.twoMechanismMixture (4 / 7) = linearNormOfReaction (a 1) (b 1) (E 1) ∧
         Conditionals.twoMechanismMixture (2 / 7) = linearNormOfReaction (a 2) (b 2) (E 2)) := by

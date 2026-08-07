@@ -18,7 +18,8 @@ import Descent.Blindness.TrafficInvariantSeparation
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`, `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
+--   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -64,7 +65,8 @@ theorem pooledCohort_forbiddenOverlap_of_levelResolved_cover
           ∃ cohort ∈ active,
             q ∉ Blindness.ComponentAchievableOverlaps fitness overlap leftLevel rightLevel cohort) :
     q ∉ Blindness.SuperposedAchievableOverlaps active weight fitness overlap target :=
-  Blindness.forbiddenOverlap_of_levelResolved_cover active weight fitness overlap target hweight q hcover
+  Blindness.forbiddenOverlap_of_levelResolved_cover active weight fitness overlap target hweight q
+    hcover
 
 end CohortLandscapeSuperposition
 

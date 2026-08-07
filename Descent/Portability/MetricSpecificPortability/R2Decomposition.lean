@@ -234,7 +234,8 @@ theorem r2_less_portable_than_auc_from_decomposition
   have h_r2_ratio : target.r2 / source.r2 = target.calibration := by
     rw [h_tgt_r2, h_src_r2_eq, hDiscPreserved]
     field_simp [ne_of_gt source.disc_pos]
-  have h_auc_eq : Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource := by
+  have h_auc_eq : Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource
+    := by
     rw [hScoreTarget]
     simpa [Function.comp] using
       (Program.populationAUC_strictMono_invariant pop scoreSource g hg)

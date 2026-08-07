@@ -150,7 +150,8 @@ theorem tendsto_identityByDescent {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.valu
         linarith
       field_simp
       ring
-    have hlim : Tendsto (fun N : ℕ ↦ 1 + θ.value - θ.value * (1 / (N : ℝ)) - (θ.value ^ 2 / 4) * (1 / (N : ℝ))
+    have hlim : Tendsto (fun N : ℕ ↦ 1 + θ.value - θ.value * (1 / (N : ℝ)) - (θ.value ^ 2 / 4) * (1
+      / (N : ℝ))
         + (θ.value ^ 2 / 4) * (1 / (N : ℝ)) ^ 2) atTop (nhds (1 + θ.value)) := by
       have h1 : Tendsto (fun N : ℕ ↦ θ.value * (1 / (N : ℝ))) atTop (nhds 0) := by
         simpa using hinv.const_mul θ.value
@@ -178,10 +179,12 @@ noncomputable def ewensDenominator (θ : Descent.Core.Theta) (n : ℕ) : ℝ :=
 @[simp] theorem ewensDenominator_one (θ : Descent.Core.Theta) : ewensDenominator θ 1 = 1 := by
   simp [ewensDenominator]
 
-@[simp] theorem ewensDenominator_two (θ : Descent.Core.Theta) : ewensDenominator θ 2 = θ.value + 1 := by
+@[simp] theorem ewensDenominator_two (θ : Descent.Core.Theta) : ewensDenominator θ 2 = θ.value + 1
+  := by
   simp [ewensDenominator]
 
-theorem ewensDenominator_three (θ : Descent.Core.Theta) : ewensDenominator θ 3 = (θ.value + 1) * (θ.value + 2) := by
+theorem ewensDenominator_three (θ : Descent.Core.Theta) : ewensDenominator θ 3 = (θ.value + 1) *
+  (θ.value + 2) := by
   unfold ewensDenominator
   norm_num [Finset.prod_range_succ]
 

@@ -10,11 +10,17 @@ import Descent.Portability.AncestrySpecificPower
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 6 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 3 more
---   Blindness: reaches 8 module(s) -- `Descent.Blindness.Condensation`, `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 5 more
---   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.LatentMechanismCollapse`, `Descent.Conditionals.LocalToGlobalCoherence`
---   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`, `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
+--   Spectral: reaches 6 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 3 more
+--   Blindness: reaches 8 module(s) -- `Descent.Blindness.Condensation`,
+--   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 5 more
+--   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.LatentMechanismCollapse`,
+--   `Descent.Conditionals.LocalToGlobalCoherence`
+--   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`,
+--   `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -67,7 +73,8 @@ constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : Foundations.HardyWeinbergModel) :
     h.genotypeVariance = Portability.genotypeVarianceHWE h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold Portability.genotypeVarianceHWE Foundations.HardyWeinbergModel.refFreq Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.genotypeVarianceHWE Foundations.HardyWeinbergModel.refFreq
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- The same guard expressed on the standardized coordinate itself: the squared
@@ -145,7 +152,8 @@ mechanism is stated in terms of. -/
 theorem imputation_rescaling_cannot_repair_lattice (lam : ℝ) (hlam : lam ≠ 0) :
     1 < Blindness.latticeInflation Spectral.hardCallLatticeSpan ∧
       ∀ c V : ℝ, V ≠ 0 → (lam * c) ^ 2 / (lam ^ 2 * V) = c ^ 2 / V :=
-  ⟨Spectral.hardCall_intensity_inflated, fun c V _hV ↦ standardizedSquare_scale_invariant c V lam hlam⟩
+  ⟨Spectral.hardCall_intensity_inflated, fun c V _hV ↦ standardizedSquare_scale_invariant c V lam
+    hlam⟩
 
 /-!
 ## 4-5. Two abstract results, and why they are not re-exported here
@@ -316,7 +324,8 @@ theorem standardizedGenotype_sq_eq_standardizedSquare (h : Foundations.HardyWein
   have hvar : 0 < h.genotypeVariance := h.genotypeVariance_pos hq0 hq1
   have hsq : Real.sqrt h.genotypeVariance ^ 2 = h.genotypeVariance :=
     Real.sq_sqrt hvar.le
-  unfold Foundations.HardyWeinbergModel.standardizedGenotype Foundations.HardyWeinbergModel.standardizedSquare
+  unfold Foundations.HardyWeinbergModel.standardizedGenotype
+    Foundations.HardyWeinbergModel.standardizedSquare
   rw [div_pow, hsq]
 
 /-- **The level-two coordinate is never symmetric.** `x²` takes the three values
@@ -472,7 +481,8 @@ theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
 /-- At the blind frequency the genotype variance is exactly `1/3`. -/
 theorem gaussianKurtosisMaf_genotypeVariance :
     Portability.genotypeVarianceHWE gaussianKurtosisMaf = 1 / 3 := by
-  unfold Portability.genotypeVarianceHWE gaussianKurtosisMaf Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.genotypeVarianceHWE gaussianKurtosisMaf Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy
   nlinarith [sqrt_three_sq]
 
 /-- **The standardized genotype has exactly Gaussian kurtosis at `MAF = (3 - √3)/6`.**
@@ -602,7 +612,8 @@ the design fixed means.
 parameter.
 
 Empirical status: UNTESTED. A field update on a design; no modelling content and no free -/
-def _root_.Descent.Blindness.GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design : Blindness.GenotypeDesign n ι)
+def _root_.Descent.Blindness.GenotypeDesign.reModel {ι : Type*} {n : ℕ} (design :
+  Blindness.GenotypeDesign n ι)
     (model : Fin n → Foundations.HardyWeinbergModel) : Blindness.GenotypeDesign n ι :=
   { design with model := model }
 
@@ -611,7 +622,8 @@ re-modelling moves the coordinate law and leaves the combinatorics alone, so the
 interaction order of every tested set is unchanged. Without this, `reModel` is a record
 update no statement distinguishes from an arbitrary design. -/
 @[simp] theorem _root_.Descent.Blindness.GenotypeDesign.reModel_interactionOrder {ι : Type*} {n : ℕ}
-    (design : Blindness.GenotypeDesign n ι) (model : Fin n → Foundations.HardyWeinbergModel) (s : ι) :
+    (design : Blindness.GenotypeDesign n ι) (model : Fin n → Foundations.HardyWeinbergModel) (s : ι)
+      :
     (design.reModel model).interactionOrder s = design.interactionOrder s := rfl
 
 /-! No observable-tower record is exported: accepting the Vertex-Weight Law and the
@@ -704,7 +716,8 @@ theorem fourthMoment_eq (spectrum : MafSpectrum m)
               (spectrum.model j).standardizedGenotype g ^ 4 =
         spectrum.weight j / (spectrum.model j).genotypeVariance := by
     intro j
-    rw [Blindness.standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2, mul_one_div]
+    rw [Blindness.standardizedGenotype_fourth_moment (spectrum.model j) (hpoly j).1 (hpoly j).2,
+      mul_one_div]
   have hdef : spectrum.moment 4 =
       ∑ j, spectrum.weight j *
         ∑ g : Foundations.DiploidGenotype,
@@ -1315,7 +1328,8 @@ theorem hwe_phase_inequality_off_balanced (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) (hunbalanced : h.altFreq ≠ 1 / 2) :
     2 < ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 := by
   have hge := standardizedGenotype_fourth_moment_ge_two h hq0 hq1
-  have hne : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠ 2 := by
+  have hne : (∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4) ≠
+    2 := by
     intro heq
     exact hunbalanced ((standardizedGenotype_fourth_moment_eq_two_iff h hq0 hq1).mp heq)
   exact lt_of_le_of_ne hge (Ne.symm hne)
@@ -1721,7 +1735,8 @@ theorem abs_centeredSquare_le_homAlt (h : Foundations.HardyWeinbergModel)
         ring
       have hden : (0 : ℝ) < 2 * h.altFreq * (1 - h.altFreq) := by positivity
       rw [hval, haltval, abs_div, abs_of_pos hden, div_le_div_iff₀ hden hq0]
-      rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq] <;>
+      rcases abs_cases (1 - 6 * h.altFreq + 6 * h.altFreq ^ 2) with ⟨heq, _⟩ | ⟨heq, _⟩ <;> rw [heq]
+        <;>
         nlinarith [hq0, hhalf, hp, sq_nonneg (2 * h.altFreq - 1)]
   | homAlt =>
       have hnonneg : 0 ≤ h.centeredSquare Descent.Core.Genotype.homAlt := by

@@ -12,7 +12,8 @@ import Descent.Conditionals.DynamicsContrast
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`, `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
+--   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -412,7 +413,8 @@ theorem transportMass_stayKernel_uniformTwo_pos (y : Fin 2) :
     `0`. This is a concrete, non-vacuous counterexample to unconditional
     reconstruction of a conditional from a stationary marginal path. -/
 theorem stationaryMarginal_does_not_identify_conditional :
-    (∀ y, transportMass Portability.stayKernel Portability.uniformTwo y = Portability.uniformTwo y) ∧
+    (∀ y, transportMass Portability.stayKernel Portability.uniformTwo y = Portability.uniformTwo y)
+      ∧
       transportedResponse Portability.stayKernel Portability.uniformTwo stateZeroResponse
           transportMass_stayKernel_uniformTwo_pos 0 = 1 ∧
       transportedResponse Portability.stayKernel Portability.uniformTwo stateOneResponse

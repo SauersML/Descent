@@ -841,7 +841,8 @@ theorem hweHeterozygosity_pos (p : ℝ) (hp : 0 < p) (hp1 : p < 1) :
     If the target has lower heterozygosity (allele frequency further from 0.5
     or toward fixation), F-stat decreases. Derived from the F-stat formula. -/
 theorem instrument_strength_decreases (m : MRInstrumentModel)
-    (h_het : Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source) :
+    (h_het : Descent.Core.hweHeterozygosity m.p_target < Descent.Core.hweHeterozygosity m.p_source)
+      :
     m.fStat m.p_target < m.fStat m.p_source := by
   unfold MRInstrumentModel.fStat
   apply div_lt_div_of_pos_right _ m.σ2_X_resid_pos

@@ -8,7 +8,9 @@ import Descent.Blindness.EffectSizeSurgery
 assert_below Descent.Portability Descent.Decision Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`:
---   Blindness: reaches 8 module(s) -- `Descent.Blindness.BundleRigidity`, `Descent.Blindness.BundleRigidity.Coverage`, `Descent.Blindness.BundleRigidity.CoverageInvariance` and 5 more
+--   Blindness: reaches 8 module(s) -- `Descent.Blindness.BundleRigidity`,
+--   `Descent.Blindness.BundleRigidity.Coverage`,
+--   `Descent.Blindness.BundleRigidity.CoverageInvariance` and 5 more
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.ConditionalGain`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -511,7 +513,8 @@ theorem frequencyTie_gives_kernel {n : ℕ} (panel : Blindness.LocusSpectrum n)
 weights `c` and `-c`, produce no modulus signal at any value. A fixed-MAF grid is this
 configuration repeated. -/
 theorem tied_pair_invisible (q c v : ℝ) :
-    Blindness.spectrumModulusLaw diploidFamily { support := ![q, q], weight := ![c, -c] } v = 0 := by
+    Blindness.spectrumModulusLaw diploidFamily { support := ![q, q], weight := ![c, -c] } v = 0
+      := by
   unfold Blindness.spectrumModulusLaw
   simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one]
   ring

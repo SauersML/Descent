@@ -479,7 +479,8 @@ theorem componentRepresentationResidual_decomposition (localValue mixtureValue :
     componentRepresentationResidual localValue a componentValue =
       localizationResidual localValue mixtureValue +
         jensenResidual mixtureValue a componentValue := by
-  unfold componentRepresentationResidual localizationResidual jensenResidual Descent.Core.difference Descent.Core.residualAgainst Descent.Core.innerSum
+  unfold componentRepresentationResidual localizationResidual jensenResidual Descent.Core.difference
+    Descent.Core.residualAgainst Descent.Core.innerSum
   ring
 
 end Residual

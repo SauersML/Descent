@@ -774,6 +774,7 @@ two was free; here it is the ploidy, and an SE reported on a haploid dosage scal
 have to change this file rather than that definition. -/
 theorem effectiveSampleSizeFromSE_uses_genotypeVarianceHWE (se p : ℝ) :
     Portability.effectiveSampleSizeFromSE se p = 1 / (se ^ 2 * genotypeVarianceHWE p) := by
-  unfold Portability.effectiveSampleSizeFromSE genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold Portability.effectiveSampleSizeFromSE genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring
 
 end Descent.Portability

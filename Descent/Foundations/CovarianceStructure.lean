@@ -394,7 +394,8 @@ theorem admixtureLDTwoLocus_eq_haplotype_sub_marginals
     (alpha p_A q_A p_B q_B : ℝ) :
     admixtureLDTwoLocus alpha p_A q_A p_B q_B =
       haplotypeFreqAdmixed alpha p_A q_A p_B q_B
-        - Descent.Core.convexCombination alpha p_A p_B * Descent.Core.convexCombination alpha q_A q_B :=
+        - Descent.Core.convexCombination alpha p_A p_B * Descent.Core.convexCombination alpha q_A
+          q_B :=
   rfl
 
 /-- **Core algebraic identity (Step 4): D_admix = α(1−α)(p_A − p_B)(q_A − q_B).**
@@ -424,7 +425,8 @@ noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : �
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem admixtureLDAtGen_at_reference_point :
     admixtureLDAtGen (1 / 2) 1 1 0 0 0 1 = 1 / 4 := by
-  norm_num [admixtureLDAtGen, Descent.Core.convexCombination, admixtureLDTwoLocus, haplotypeFreqAdmixed, Descent.Core.convexCombination]
+  norm_num [admixtureLDAtGen, Descent.Core.convexCombination, admixtureLDTwoLocus,
+    haplotypeFreqAdmixed, Descent.Core.convexCombination]
 
 
 /-- **Full admixture LD formula at generation g.**

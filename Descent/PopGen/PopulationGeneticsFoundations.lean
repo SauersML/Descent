@@ -8,9 +8,13 @@ import Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 

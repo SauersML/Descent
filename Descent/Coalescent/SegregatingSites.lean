@@ -92,12 +92,14 @@ theorem expectedSegregatingSites_eq (θ : Descent.Core.Theta) (n : ℕ) :
   rw [expectedTotalBranchLength_eq_harmonic]
   ring
 
-@[simp] theorem expectedSegregatingSites_one (θ : Descent.Core.Theta) : expectedSegregatingSites θ 1 = 0 := by
+@[simp] theorem expectedSegregatingSites_one (θ : Descent.Core.Theta) : expectedSegregatingSites θ 1
+  = 0 := by
   rw [expectedSegregatingSites_eq]
   simp
 
 /-- A sample of two segregates at `θ` sites in expectation: `a_1 = 1`. -/
-theorem expectedSegregatingSites_two (θ : Descent.Core.Theta) : expectedSegregatingSites θ 2 = θ.value := by
+theorem expectedSegregatingSites_two (θ : Descent.Core.Theta) : expectedSegregatingSites θ 2 =
+  θ.value := by
   rw [expectedSegregatingSites_eq]
   norm_num
 
@@ -144,11 +146,13 @@ derivations of `θ` has two places to be wrong. -/
 /-- `E(π)`, the expected number of pairwise differences: the two-sample case of `E(S)`.
 
 Empirical status: DERIVED -- it is `expectedSegregatingSites θ 2`, definitionally. -/
-noncomputable def expectedPairwiseDifferences (θ : Descent.Core.Theta) : ℝ := expectedSegregatingSites θ 2
+noncomputable def expectedPairwiseDifferences (θ : Descent.Core.Theta) : ℝ :=
+  expectedSegregatingSites θ 2
 
 /-- **`E(π) = θ`.**  Tajima's estimator is unbiased too, and for the simplest possible
 reason: a pair of sequences has a tree of two branches, each of expected length `1`. -/
-theorem expectedPairwiseDifferences_eq (θ : Descent.Core.Theta) : expectedPairwiseDifferences θ = θ.value :=
+theorem expectedPairwiseDifferences_eq (θ : Descent.Core.Theta) : expectedPairwiseDifferences θ =
+  θ.value :=
   expectedSegregatingSites_two θ
 
 /-! ### Tajima's `D`
@@ -197,7 +201,8 @@ theorem tendsto_expectedSegregatingSites_atTop {θ : Descent.Core.Theta} (hθ : 
   rw [hcomp]
   refine tendsto_atTop.2 fun b ↦ ?_
   filter_upwards [tendsto_harmonicSum_atTop.eventually_ge_atTop (b / θ.value)] with n hn
-  have hmul : θ.value * (b / θ.value) ≤ θ.value * harmonicSum n := mul_le_mul_of_nonneg_left hn hθ.le
+  have hmul : θ.value * (b / θ.value) ≤ θ.value * harmonicSum n := mul_le_mul_of_nonneg_left hn
+    hθ.le
   have hbe : θ.value * (b / θ.value) = b := by field_simp
   rw [hbe] at hmul
   exact hmul

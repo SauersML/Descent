@@ -5,10 +5,14 @@ import Descent.Portability.PCCorrectability.ImitationCapacity
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 3 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`, `Descent.Spectral.WhiteningEquivalence`
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Portability`, `Descent.Program`:
+--   Spectral: reaches 3 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`, `Descent.Spectral.WhiteningEquivalence`
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.ImitationRigidity`
---   Portability: reaches 12 module(s) -- `Descent.Portability.PCCorrectability.ImitationCapacity`, `Descent.Portability.PCCorrectability.Threshold`, `Descent.Portability.PortabilityDrift` and 9 more
+--   Portability: reaches 12 module(s) -- `Descent.Portability.PCCorrectability.ImitationCapacity`,
+--   `Descent.Portability.PCCorrectability.Threshold`, `Descent.Portability.PortabilityDrift` and 9
+--   more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -120,7 +124,8 @@ theorem neiContrastSpike_eq_contrastVariance_mul_spikeLoad
     (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0)
     (base : Matrix (Fin N) (Fin N) ℝ) (budget : ℝ) (a : Unit) :
     Portability.neiContrastSpike (N : ℝ) (m : ℝ) p₁ p₂ =
-      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))) *
+      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁
+        p₂))) *
         (Portability.traceWindowBudgetClass base budget).spikeLoad a
           (Portability.demographicSpikeDirection N m) := by
   rw [Portability.neiContrastSpike_eq_contrastVariance_mul_effectiveSize (N : ℝ) (m : ℝ) p₁ p₂ h,
@@ -212,7 +217,8 @@ quantity omits. -/
 theorem hudsonCalibrated_rigid_pcCorrectabilityMargin_is_the_criterion
     {N : ℕ} (m : ℕ) (p₁ p₂ markerCount : ℝ) (hmn : m ≤ N) (hN : 0 < N)
     (base S₀ : Matrix (Fin N) (Fin N) ℝ) (a : Unit) :
-    0 < Portability.pcCorrectabilityMargin (N : ℝ) markerCount (Descent.Core.hudsonFst p₁ p₂) (m : ℝ) ↔
+    0 < Portability.pcCorrectabilityMargin (N : ℝ) markerCount (Descent.Core.hudsonFst p₁ p₂) (m :
+      ℝ) ↔
       (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).bound a +
           Portability.bbpProxyThreshold (N : ℝ) markerCount <
         (Portability.traceWindowBudgetClass base (Portability.traceForm S₀)).form a

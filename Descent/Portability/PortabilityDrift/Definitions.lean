@@ -729,7 +729,8 @@ theorem twoDemeIMEquilibriumDelta_isFixedPoint (M : ℝ) (hM : 0 < M) :
   have hM' : M ≠ 0 := ne_of_gt hM
   have h2 : (0 : ℝ) < 2 * M + 1 := by linarith
   have h2' : (2 : ℝ) * M + 1 ≠ 0 := ne_of_gt h2
-  unfold hudsonFstFromCoalescenceTimes twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst Descent.Core.proportionalReduction
+  unfold hudsonFstFromCoalescenceTimes twoDemeIMEquilibriumETss twoDemeIMEquilibriumETst
+    Descent.Core.proportionalReduction
     twoDemeIMEquilibriumDelta
   field_simp
   ring

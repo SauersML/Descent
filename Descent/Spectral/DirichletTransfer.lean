@@ -230,7 +230,8 @@ holds for every body that ignores `k`, including a body carrying the wrong varia
 which value it is constant at. -/
 theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
     localizedTransferVariance v k = delocalizedTransferVariance v 1 := by
-  unfold localizedTransferVariance delocalizedTransferVariance Descent.Core.ratio Descent.Core.identifiedWith
+  unfold localizedTransferVariance delocalizedTransferVariance Descent.Core.ratio
+    Descent.Core.identifiedWith
   norm_num
 
 /-! ### The two correction factors -/

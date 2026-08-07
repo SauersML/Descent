@@ -102,7 +102,8 @@ noncomputable def coalesceFirstProb (k : ℕ) (rho : Descent.Core.Rho) : ℝ :=
 
 /-- The two exhaust the possibilities: something happens, and it is one or the other. -/
 theorem recombFirstProb_add_coalesceFirstProb {k : ℕ} (hk : 2 ≤ k)
-    {rho : Descent.Core.Rho} (hrho : 0 ≤ rho.value) : recombFirstProb k rho + coalesceFirstProb k rho = 1 := by
+    {rho : Descent.Core.Rho} (hrho : 0 ≤ rho.value) : recombFirstProb k rho + coalesceFirstProb k
+      rho = 1 := by
   have hpos := argEventRate_pos hk hrho
   have hne : argEventRate k rho ≠ 0 := ne_of_gt hpos
   unfold recombFirstProb coalesceFirstProb

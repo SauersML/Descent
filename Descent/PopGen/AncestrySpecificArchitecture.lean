@@ -5,9 +5,13 @@ import Descent.PopGen.PopulationGeneticsFoundations
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -366,7 +370,8 @@ theorem freq_change_alters_pgs_variance
     beta_sq * (2 * p_source * (1 - p_source)) ≠
       beta_sq * (2 * p_target * (1 - p_target)) := by
   intro h
-  rcases (weighted_heterozygosity_eq_iff beta_sq p_source p_target h_beta).1 h with h_same | h_complement
+  rcases (weighted_heterozygosity_eq_iff beta_sq p_source p_target h_beta).1 h with h_same |
+    h_complement
   · exact h_diff h_same
   · exact h_not_complement h_complement
 
@@ -801,14 +806,16 @@ Migration homogenises at rate `2m` per pair and drift re-creates identity at
 rate `1/(2 Nₑ)`; balancing them forces `F = 1/(1 + 4 Nₑ m)`.  The formula is
 derived here, not stipulated: no other constant satisfies this. -/
 theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    geneFlowFstStep m Ne (Portability.fstMigrationDriftEquilibrium Ne m) = Portability.fstMigrationDriftEquilibrium Ne m :=
+    geneFlowFstStep m Ne (Portability.fstMigrationDriftEquilibrium Ne m) =
+      Portability.fstMigrationDriftEquilibrium Ne m :=
   Portability.ibdFlowStep_fixedPoint Ne m hNe hm
 
 /-- Equilibrium FST strictly decreases as a nonnegative migration rate increases. -/
 theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 ≤ m₁)
     (h_m : m₁ < m₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁ := by
+    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁
+      := by
   unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
@@ -892,8 +899,10 @@ theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
     portabilityFromArchitecture rg fst tagging_ratio =
       rg ^ 2 * Portability.covarianceRetention (Portability.covarianceRetentionFactorFromFst fst)
         (Portability.ldOverlapFromSharedLD tagging_ratio) := by
-  unfold portabilityFromArchitecture Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst
-    Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
+  unfold portabilityFromArchitecture Portability.covarianceRetention
+    Portability.covarianceRetentionFactorFromFst
+    Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+      Descent.Core.identifiedWith
   ring
 
 /-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
@@ -905,7 +914,9 @@ theorem portabilityFromArchitecture_from_divergence
     portabilityFromArchitecture rg fst tagging_ratio =
       rg^2 * (1 - Portability.covarianceDivergenceFromRetention fst tagging_ratio) := by
   unfold portabilityFromArchitecture Portability.covarianceDivergenceFromRetention
-    Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
+    Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst
+      Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+      Descent.Core.identifiedWith
   ring
 
 /-- Architecture portability is zero exactly when cross-population effect correlation

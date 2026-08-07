@@ -290,7 +290,8 @@ theorem neiContrastSpike_eq_contrastVariance_mul_effectiveSize
     (n m p₁ p₂ : ℝ)
     (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
     neiContrastSpike n m p₁ p₂ =
-      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂))) *
+      ((p₁ - p₂) ^ 2 / (Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁
+        p₂))) *
         effectiveSubgroupSize n m := by
   unfold neiContrastSpike demographicSpike
   rw [← Descent.Core.four_neiGst_eq_standardizedContrastVariance p₁ p₂ h]
@@ -306,7 +307,8 @@ theorem hudsonBbpSpike_eq_eight_neiGst_div_one_add_mul_effectiveSize
     (hpos : 0 < p₁ * (1 - p₂) + p₂ * (1 - p₁))
     (hbar : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
     hudsonBbpSpike n m p₁ p₂ =
-      (8 * Descent.Core.neiGst p₁ p₂ / (1 + Descent.Core.neiGst p₁ p₂)) * effectiveSubgroupSize n m := by
+      (8 * Descent.Core.neiGst p₁ p₂ / (1 + Descent.Core.neiGst p₁ p₂)) * effectiveSubgroupSize n m
+        := by
   unfold hudsonBbpSpike demographicSpike
   rw [Descent.Core.hudsonFst_eq_of_neiGst p₁ p₂ hpos hbar]
   ring

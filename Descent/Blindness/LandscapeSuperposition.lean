@@ -197,7 +197,8 @@ theorem forbiddenOverlap_of_levelResolved_cover
     q ∉ SuperposedAchievableOverlaps active weight energy overlap target := by
   intro hq
   rcases superposedAchievableOverlap_subset_levelResolved
-      active weight energy overlap target hweight q hq with ⟨leftLevel, rightLevel, hleft, hright, hall⟩
+      active weight energy overlap target hweight q hq with ⟨leftLevel, rightLevel, hleft, hright,
+        hall⟩
   rcases hcover leftLevel rightLevel hleft hright with ⟨k, hk⟩
   exact hk.2 (hall k hk.1)
 

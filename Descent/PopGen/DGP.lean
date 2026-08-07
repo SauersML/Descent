@@ -1119,9 +1119,11 @@ theorem excess_target_risk_pos_of_bandwise_readout_mismatch
     (hb : Spectral.FiniteSpectralModel.optimalReadout source b ≠
       Spectral.FiniteSpectralModel.optimalReadout target b) :
     0 < Spectral.FiniteSpectralModel.degradation source target := by
-  rcases lt_or_eq_of_le (Spectral.FiniteSpectralModel.degradation_nonneg source target) with hlt | heq
+  rcases lt_or_eq_of_le (Spectral.FiniteSpectralModel.degradation_nonneg source target) with hlt |
+    heq
   · exact hlt
-  · exact absurd ((Spectral.FiniteSpectralModel.degradation_eq_zero_iff source target).mp heq.symm b) hb
+  · exact absurd ((Spectral.FiniteSpectralModel.degradation_eq_zero_iff source target).mp heq.symm
+      b) hb
 
 /-- **End-to-end `R²` drop from a single band of readout mismatch.**
 
@@ -1141,24 +1143,32 @@ theorem target_r2_drop_of_bandwise_readout_mismatch
       Spectral.FiniteSpectralModel.optimalReadout target b)
     (h_varY_pos : 0 < varY) :
     r2FromMSE
-        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source)) varY <
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          source)) varY <
       r2FromMSE
-        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target)) varY := by
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          target)) varY := by
   have hpos := excess_target_risk_pos_of_bandwise_readout_mismatch source target b hb
   unfold Spectral.FiniteSpectralModel.degradation at hpos
   have hlt :
-      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) <
-        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) := by
+      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target)
+        <
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          source) := by
     linarith
   unfold r2FromMSE Descent.Core.proportionalReduction
   have h_inv_pos : 0 < (1 / varY) := one_div_pos.mpr h_varY_pos
   have hdiv :
-      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) / varY <
-        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) / varY := by
+      Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target)
+        / varY <
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          source) / varY := by
     have hmul :
-        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout target) *
+        Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          target) *
             (1 / varY) <
-          Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout source) *
+          Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+            source) *
             (1 / varY) :=
       mul_lt_mul_of_pos_right hlt h_inv_pos
     simpa [div_eq_mul_inv] using hmul
@@ -1189,7 +1199,8 @@ The following definitions support a cleaner, more general proof approach:
 
     The key insight: the raw model (span{1, P}) cannot capture the β_env * C term,
     so the projection leaves a residual of exactly β_env * C. -/
-noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) : Foundations.DataGeneratingProcess k :=
+noncomputable def dgpAdditiveBias (k : ℕ) [Fintype (Fin k)] (β_env : ℝ) :
+  Foundations.DataGeneratingProcess k :=
   {
   trueExpectation := fun p pc ↦ p + β_env * (∑ l, pc l),
   jointMeasure := Foundations.stdNormalProdMeasure k
@@ -2137,18 +2148,21 @@ theorem measureLinearPredictionRisk_transport_decomposition_of_orthogonality
     (hResidualSq_int : Integrable (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) ^ 2) μ)
     (hCross_int :
       Integrable
-        (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω)) μ)
+        (fun ω ↦ (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X
+          ω)) μ)
     (hDeltaSq_int :
       Integrable (fun ω ↦ (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2) μ)
     (horth :
-      ∫ ω, (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω) ∂μ = 0) :
+      ∫ ω, (Y ω - Foundations.dot wStar (X ω)) * Foundations.dot (fun i ↦ w i - wStar i) (X ω) ∂μ =
+        0) :
     ∫ ω, (Y ω - Foundations.dot w (X ω)) ^ 2 ∂μ =
       ∫ ω, (Y ω - Foundations.dot wStar (X ω)) ^ 2 ∂μ +
         ∫ ω, (Foundations.dot (fun i ↦ w i - wStar i) (X ω)) ^ 2 ∂μ := by
   let residual : Ω → ℝ := fun ω ↦ Y ω - Foundations.dot wStar (X ω)
   let delta : Ω → ℝ := fun ω ↦ Foundations.dot (fun i ↦ w i - wStar i) (X ω)
   have hdot :
-      ∀ ω, Foundations.dot w (X ω) = Foundations.dot wStar (X ω) + Foundations.dot (fun i ↦ w i - wStar i) (X ω) := by
+      ∀ ω, Foundations.dot w (X ω) = Foundations.dot wStar (X ω) + Foundations.dot (fun i ↦ w i -
+        wStar i) (X ω) := by
     intro ω
     calc
       Foundations.dot w (X ω) = ∑ i, (wStar i + (w i - wStar i)) * X ω i := by
@@ -2266,7 +2280,8 @@ theorem _root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreduc
   rw [horth]
   ring
 
-theorem _root_.Descent.Foundations.ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
+theorem
+  _root_.Descent.Foundations.ConditionalMeanDGP.conditionalMeanApproximationRisk_eq_mseRisk_toDGP
     {k : ℕ} [Fintype (Fin k)]
     (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hGapSq_meas :
@@ -3282,7 +3297,8 @@ theorem fstEquilibrium_decreasing_in_theta
       ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
     Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
@@ -3302,7 +3318,8 @@ theorem fstEquilibrium_decreasing_in_migration
       ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
+  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
+    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
     Descent.Core.scaledMigrationRate Descent.Core.ploidy
   simp only
   rw [← add_assoc, ← add_assoc]
@@ -4053,7 +4070,8 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
   ext <;>
     simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
       PGSEvolutionaryModel.toEvo,
-      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium, Descent.Core.fstFromFlow]
+      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium,
+        Descent.Core.fstFromFlow]
 
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
 

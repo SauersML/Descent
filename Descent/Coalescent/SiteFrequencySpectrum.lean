@@ -93,7 +93,8 @@ factor `θ/2` converting branch length to mutations is the Poisson mutation prem
 noncomputable def expectedSpectrum (θ : Descent.Core.Theta) (i : ℕ) : ℝ :=
   θ.value / 2 * spectrumBranchLength i
 
-theorem expectedSpectrum_eq (θ : Descent.Core.Theta) (i : ℕ) : expectedSpectrum θ i = θ.value / (i : ℝ) := by
+theorem expectedSpectrum_eq (θ : Descent.Core.Theta) (i : ℕ) : expectedSpectrum θ i = θ.value / (i :
+  ℝ) := by
   unfold expectedSpectrum spectrumBranchLength
   ring
 

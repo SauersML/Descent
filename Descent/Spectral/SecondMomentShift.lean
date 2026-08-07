@@ -123,7 +123,8 @@ theorem residualScoreMoment_eq_cross_sub_secondMoment
     ring
   rw [hexpand, E.eval_sub]
   have hlinear := congrFun (rawCrossMoment_linScore E X w) i
-  simpa [rawCrossMoment, Foundations.linScore] using congrArg (fun z ↦ E (fun ω ↦ X ω i * Y ω) - z) hlinear
+  simpa [rawCrossMoment, Foundations.linScore] using congrArg (fun z ↦ E (fun ω ↦ X ω i * Y ω) - z)
+    hlinear
 
 /-- Exact residual-score identity.  The change from a deployed coefficient
 `w` to any normal-equation solution `v` is identified through the singular-safe

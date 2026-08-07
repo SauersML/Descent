@@ -6,9 +6,13 @@ import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -87,13 +91,15 @@ the bodies were identical.
 `heterozygosityLossFromDrift t Ne = 1 - hetRecurrence Ne H₀ t / H₀`. -/
 theorem heterozygosityLossFromDrift_eq_het_loss (Ne H₀ : ℝ) (t : ℕ) (hH₀ : H₀ ≠ 0) :
     heterozygosityLossFromDrift t Ne = 1 - Descent.Core.hetRecurrence Ne H₀ t / H₀ := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   rw [hetRecurrence_closed_form]
   field_simp
 
 /-- **Nothing is lost at time zero.** -/
 theorem heterozygosityLossFromDrift_zero (Ne : ℝ) : heterozygosityLossFromDrift 0 Ne = 0 := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   simp
 
 /-- **Loss is monotonically increasing in `t`.** This is `fst_drift_increases`,
@@ -113,7 +119,8 @@ theorem heterozygosityLossFromDrift_nonneg (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne)
 /-- **`L(t) < 1` for all `t` when `Nₑ ≥ 2`.** -/
 theorem heterozygosityLossFromDrift_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne) :
     heterozygosityLossFromDrift t Ne < 1 := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   linarith [pow_pos (show 0 < 1 - 1 / (2 * Ne) by
     rw [sub_pos, div_lt_one (by linarith)]; linarith) t]
 
@@ -121,7 +128,8 @@ theorem heterozygosityLossFromDrift_lt_one (Ne : ℝ) (t : ℕ) (hNe : 2 ≤ Ne)
 theorem heterozygosityLossFromDrift_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ) (ht : 1 ≤ t)
     (hNe₁ : 2 < Ne₁) (hNe₂ : 2 < Ne₂) (h_lt : Ne₁ < Ne₂) :
     heterozygosityLossFromDrift t Ne₂ < heterozygosityLossFromDrift t Ne₁ := by
-  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement Descent.Core.geometricDecay
+  unfold heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
+    Descent.Core.geometricDecay
   have h_base₁_pos : 0 < 1 - 1 / (2 * Ne₁) := by
     rw [sub_pos, div_lt_one (by linarith)]; linarith
   have h_base₂_lt_one : 1 - 1 / (2 * Ne₂) < 1 := by

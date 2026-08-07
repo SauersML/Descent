@@ -188,7 +188,8 @@ theorem effectiveFisherInformation_at_reference_point :
 /-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
     effectiveFisherInformation n p r2_ld = n * (2 * p * (1 - p)) * r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
 /-- Effective information vanishes exactly when the study is empty, the locus is
@@ -204,7 +205,8 @@ theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
 at a polymorphic locus. -/
 theorem fullyTaggedFisherInformation_pos_iff (n : ℕ) (p : ℝ) :
     0 < effectiveFisherInformation n p 1 ↔ 0 < n ∧ 0 < p ∧ p < 1 := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   simp only [mul_one]
   constructor
   · intro h
@@ -320,7 +322,8 @@ remains. A bare-stem substitution here would have corrupted both. -/
 theorem effective_information_nonneg (n : ℕ) (p r2_ld : ℝ)
     (h_p : 0 ≤ p) (h_p_le : p ≤ 1) (h_r2 : 0 ≤ r2_ld) :
     0 ≤ effectiveFisherInformation n p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   apply mul_nonneg
   · apply mul_nonneg
     · exact Nat.cast_nonneg n
@@ -335,7 +338,8 @@ theorem effective_information_mono_r2 (n : ℕ) (p r2_a r2_b : ℝ)
     (h_n : 0 < n) (h_p : 0 < p) (h_p_lt : p < 1)
     (h_r2 : r2_a < r2_b) :
     effectiveFisherInformation n p r2_a < effectiveFisherInformation n p r2_b := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_coeff : 0 < ↑n * (2 * p * (1 - p)) := by
     apply mul_pos
@@ -350,7 +354,8 @@ theorem effective_information_mono_n (n_a n_b : ℕ) (p r2_ld : ℝ)
     (h_r2 : 0 < r2_ld)
     (h_n : n_a < n_b) :
     effectiveFisherInformation n_a p r2_ld < effectiveFisherInformation n_b p r2_ld := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+    Descent.Core.hweHeterozygosity Descent.Core.ploidy
   have h_het : 0 < 2 * p * (1 - p) := by nlinarith
   have h_cast : (↑n_a : ℝ) < ↑n_b := Nat.cast_lt.mpr h_n
   have h_suffix : 0 < 2 * p * (1 - p) * r2_ld := mul_pos h_het h_r2
@@ -378,7 +383,8 @@ theorem source_higher_effective_information
   by_cases h_nt : n_target = 0
   · -- When n_target = 0, LHS is 0; RHS is positive since n_source ≥ 1
     have h_ns_pos : 0 < n_source := by omega
-    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
+      Descent.Core.hweHeterozygosity Descent.Core.ploidy
     rw [h_nt]; simp
     have h_het : 0 < 2 * p_target * (1 - p_target) := by nlinarith
     have h_cast : (0 : ℝ) < ↑n_source := Nat.cast_pos.mpr h_ns_pos
@@ -491,7 +497,8 @@ a second moment — and this is the only thing that licenses writing either
 formula where the other is meant. -/
 theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
     Descent.Core.hweHeterozygosity p = genotypeVarianceHWE p := by
-  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,

@@ -323,7 +323,8 @@ theorem portableVariantSignal_eq_zero_iff
     portableVariantSignal β frequency sharing = 0 ↔ sharing = 0 := by
   have h_contribution : variantGeneticVarianceContribution β frequency ≠ 0 := by
     intro h_zero
-    rcases (variantGeneticVarianceContribution_eq_zero_iff β frequency h_effect).1 h_zero with h_zero_freq | h_fixed
+    rcases (variantGeneticVarianceContribution_eq_zero_iff β frequency h_effect).1 h_zero with
+      h_zero_freq | h_fixed
     · linarith
     · linarith
   unfold portableVariantSignal
@@ -1056,8 +1057,10 @@ Only one of the two factors in `4 = 2 · 2` is a gene-copy count; the other come
 from the diffusion limit, and tying it to `ploidy` would record a claim about
 genetics that this parameter does not make. -/
 theorem mutationSelectionDriftParameter_eq_scaledMutationRate (Ne s h : ℝ) :
-    Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s) := by
-  unfold Portability.mutationSelectionDriftParameter Descent.Core.scaledMutationRate Descent.Core.ploidy; ring
+    Portability.mutationSelectionDriftParameter Ne s h = Descent.Core.scaledMutationRate Ne (h * s)
+      := by
+  unfold Portability.mutationSelectionDriftParameter Descent.Core.scaledMutationRate
+    Descent.Core.ploidy; ring
 
 /-- The two drift-variance definitions are the same quantity. -/
 theorem pgsDriftVariance_one_pop_eq_Var_Delta_Mu (V_A fst : ℝ) :

@@ -8,9 +8,13 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -237,7 +241,8 @@ theorem islandModelFst_eq_inv (Ne m : ℝ) :
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     (ha : 0 ≤ a) (hab : a < b) :
-    Portability.fstMigrationDriftEquilibrium Ne b < Portability.fstMigrationDriftEquilibrium Ne a := by
+    Portability.fstMigrationDriftEquilibrium Ne b < Portability.fstMigrationDriftEquilibrium Ne a
+      := by
   unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
   have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
@@ -247,7 +252,8 @@ theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     Larger populations have more effective migrants per generation. -/
 theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (ha : 0 ≤ a) (hab : a < b) :
-    Portability.fstMigrationDriftEquilibrium b m < Portability.fstMigrationDriftEquilibrium a m := by
+    Portability.fstMigrationDriftEquilibrium b m < Portability.fstMigrationDriftEquilibrium a m
+      := by
   unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
   have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
@@ -488,7 +494,8 @@ theorem fstIslandEquilibriumFiniteDemes_eq_limit_of_unit_correction
     (Ne m μ nDemes : ℝ) (h : Descent.Core.islandDemeCorrection nDemes = 1) :
     fstIslandEquilibriumFiniteDemes Ne m μ nDemes
       = fstMigrationMutationEquilibriumManyDemes Ne m μ := by
-  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
+  unfold fstIslandEquilibriumFiniteDemes fstMigrationMutationEquilibriumManyDemes
+    Descent.Core.fstFromFlow
   rw [h]; ring_nf
 
 /-- **`fstMigrationMutationEquilibriumManyDemes` at the denominator, named.**
@@ -540,8 +547,10 @@ theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibriumManyDemes Ne m μ < Portability.fstMigrationDriftEquilibrium Ne m := by
-  unfold fstMigrationMutationEquilibriumManyDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationMutationEquilibriumManyDemes Ne m μ < Portability.fstMigrationDriftEquilibrium Ne m
+      := by
+  unfold fstMigrationMutationEquilibriumManyDemes Portability.fstMigrationDriftEquilibrium
+    Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
 /-- Combined Fst is below mutation-only Fst. -/
@@ -792,7 +801,8 @@ theorem effectiveMigration_symmetric (m : ℝ) :
 theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₁₂ < Portability.fstMigrationDriftEquilibrium Ne m₂₁ := by
+    Portability.fstMigrationDriftEquilibrium Ne m₁₂ < Portability.fstMigrationDriftEquilibrium Ne
+      m₂₁ := by
   exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
 
 /-! ### Migration and LD Homogenization -/
@@ -897,7 +907,8 @@ theorem fstMigrationMutationEquilibriumManyDemes_eq_scaled (Ne m μ : ℝ) :
     PopGen.fstMigrationMutationEquilibriumManyDemes Ne m μ
       = 1 / (1 + Descent.Core.scaledMigrationRate Ne m + Descent.Core.scaledMutationRate Ne μ) := by
   unfold PopGen.fstMigrationMutationEquilibriumManyDemes Descent.Core.fstFromFlow
-  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form, Descent.Core.scaledMutationRate_eq_ploidy_form]
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form,
+    Descent.Core.scaledMutationRate_eq_ploidy_form]
   unfold Descent.Core.ploidy; ring_nf
 
 /-- **The finite-deme island equilibrium carries the same two scaled rates.** Its
@@ -914,7 +925,8 @@ theorem fstIslandEquilibriumFiniteDemes_eq_scaled (Ne m μ nDemes : ℝ) :
   -- two `4`s in the flow are the two scaled rates and not a third inlined ploidy
   -- convention, which is exactly what the two `_eq_ploidy_form` rewrites state.
   unfold PopGen.fstIslandEquilibriumFiniteDemes Descent.Core.fstFromFlow
-  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form, Descent.Core.scaledMutationRate_eq_ploidy_form]
+  rw [Descent.Core.scaledMigrationRate_eq_ploidy_form,
+    Descent.Core.scaledMutationRate_eq_ploidy_form]
   unfold Descent.Core.ploidy; ring_nf
 
 /-- **The `2 μ` in the stepping-stone characteristic length counts the two lineages of a
@@ -923,7 +935,8 @@ sampled pair.** Mutation destroys the identity of a pair at rate `ploidy · μ`,
 is the balance. Written inline the two read as arbitrary; it is the same two that
 `Descent.Core.coalescentTimeScale` puts in front of `Nₑ`. -/
 theorem steppingStoneCharacteristicLength_uses_ploidy (m σ_sq μ : ℝ) :
-    PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (Descent.Core.ploidy * μ)) := by
+    PopGen.steppingStoneCharacteristicLength m σ_sq μ = Real.sqrt (m * σ_sq / (Descent.Core.ploidy *
+      μ)) := by
   unfold PopGen.steppingStoneCharacteristicLength Descent.Core.ploidy; ring
 
 end Descent.PopGen

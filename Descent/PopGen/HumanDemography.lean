@@ -6,10 +6,14 @@ import Descent.Blindness.LumpedRateBlindness
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Portability`, `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.LumpedRateBlindness`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -201,7 +205,8 @@ theorem neutralDriftR2Ratio_eq (V_A V_E fst : ℝ)
     ne_of_gt (add_pos (mul_pos h1f hVA) hVE)
   have hsum : V_A + V_E ≠ 0 := ne_of_gt (add_pos hVA hVE)
   have hVA' : V_A ≠ 0 := ne_of_gt hVA
-  unfold neutralDriftR2Ratio Portability.presentDayR2 Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
+  unfold neutralDriftR2Ratio Portability.presentDayR2 Portability.presentDayPGSVariance
+    Portability.pgsVarianceFromHet Descent.Core.product
     TransportedMetrics.r2FromSignalVariance Descent.Core.share
   field_simp [hden, hsum, hVA']
   ring

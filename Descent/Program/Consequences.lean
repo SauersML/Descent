@@ -254,7 +254,8 @@ convention is why the two results can be composed at all. -/
 theorem unrecoverable_component_is_the_divergence
     (β : Bool → ℝ) (p₁ p₂ : ℝ)
     (h : Descent.Core.meanAlleleFreq p₁ p₂ * (1 - Descent.Core.meanAlleleFreq p₁ p₂) ≠ 0) :
-    β = Portability.dynamicsPooledProjector β + Portability.dynamicsContrastCoefficient β • Conditionals.dynamicsContrast ∧
+    β = Portability.dynamicsPooledProjector β + Portability.dynamicsContrastCoefficient β •
+      Conditionals.dynamicsContrast ∧
       PopGen.contrastSpikeLevel p₁ p₂ = 4 * Descent.Core.neiGst p₁ p₂ :=
   ⟨Portability.dynamics_common_contrast_decomposition β,
    PopGen.contrastSpikeLevel_eq_four_neiGst p₁ p₂ h⟩
@@ -463,8 +464,10 @@ theorem drift_and_turnover_are_separate_channels
     (hρ_pos : 0 < ρ) (hρ_lt : ρ < 1) :
     Descent.Core.ScoreMoments.deployedR2 p V_E
         < Descent.Core.ScoreMoments.deployedR2 q V_E ∧
-      PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A fst) V_E <
-        PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst) V_E :=
+      PopGen.TransportedMetrics.r2FromSignalVariance (ρ ^ 2 * Portability.presentDayPGSVariance V_A
+        fst) V_E <
+        PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fst)
+          V_E :=
   ⟨Descent.Core.ScoreMoments.deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV
       hlt hflow,
    r2_strictMono_under_effect_turnover V_A V_E fst ρ hVA hVE hfst_lt hρ_pos hρ_lt⟩
@@ -500,8 +503,10 @@ theorem calibration_floor_and_spectral_floor_are_different_floors
     (h h' : Portability.SpectralHistory) (ha : h.amplitude = h'.amplitude) :
     Portability.polygenicCalibrationFloor genotypeWeight ancestryPosterior ancestryRisk =
         Portability.calibrationDriftDefectSq genotypeWeight ancestryPosterior ancestryRisk ∧
-      Portability.historyDegradation h h' = h.amplitude ^ 2 * Portability.historySpectralDistanceSq h h' :=
-  ⟨Portability.polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior ancestryRisk,
+      Portability.historyDegradation h h' = h.amplitude ^ 2 * Portability.historySpectralDistanceSq
+        h h' :=
+  ⟨Portability.polygenicCalibrationFloor_eq_driftDefectSq genotypeWeight ancestryPosterior
+    ancestryRisk,
    Portability.historyDegradation_equal_amplitude h h' ha⟩
 
 /-! ### Below the edge correction does nothing, and a zero ridge cannot rescue it -/
@@ -562,7 +567,8 @@ theorem design_check_is_sharp_the_moment_certificate_is_not
     (n M F : ℝ) (hn : 0 < n) (hM : 0 < M) (hF : 0 < F)
     (o : ℕ) (mu nu : ℕ → ℝ) {p : ℕ} (hp : p ≤ o) :
     ((∃ m : ℝ, 0 < m ∧ m < n ∧
-        Portability.bbpProxyThreshold n M < Portability.demographicSpike n F m) ↔ 1 / (F ^ 2 * n) < M) ∧
+        Portability.bbpProxyThreshold n M < Portability.demographicSpike n F m) ↔ 1 / (F ^ 2 * n) <
+          M) ∧
       |mu p - nu p| ≤ Blindness.momentDist o mu nu :=
   ⟨Portability.exists_superthreshold_subgroup_iff_marker_requirement n M F hn hM hF,
    Blindness.abs_moment_sub_le_momentDist o mu nu hp⟩
@@ -637,7 +643,8 @@ the ancestral/derived swap, `neiGst p (1 - p)` is symmetric under it, and the tw
 curves are exchanged by it. `TwoAtom` imports only Mathlib and that is deliberate; the
 statement therefore lives here, where both sides are visible. -/
 theorem mOne_mul_mTwo_eq_neiGst_at_fold (p : ℝ) :
-    Blindness.BundleRigidity.mOne p * Blindness.BundleRigidity.mTwo p = Descent.Core.neiGst p (1 - p) / (p * (1 - p)) := by
+    Blindness.BundleRigidity.mOne p * Blindness.BundleRigidity.mTwo p = Descent.Core.neiGst p (1 -
+      p) / (p * (1 - p)) := by
   rw [Descent.Core.neiGst_at_fold]
   unfold Blindness.BundleRigidity.mOne Blindness.BundleRigidity.mTwo Descent.Core.ploidy
   rw [div_mul_div_comm, ← sq_abs (1 - 2 * p), pow_two]
@@ -649,6 +656,7 @@ variance with which averaging independent copies of a summary estimates its tang
 information; the arithmetic is one map, so a change of convention in either is a change in
 both. -/
 theorem importanceWeightESS_eq_momentPermeability (sum_w sum_w_sq : ℝ) :
-    Portability.importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq := rfl
+    Portability.importanceWeightESS sum_w sum_w_sq = Spectral.momentPermeability sum_w sum_w_sq :=
+      rfl
 
 end Descent.Program

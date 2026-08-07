@@ -6,7 +6,8 @@ import Descent.Conditionals.DynamicsContrast.CohortLandscapeSuperposition
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`, `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
+--   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -87,7 +88,8 @@ theorem ancestryMixture_pure_gapped_balanced_ungapped :
   have hnegative := Blindness.populationGapCertificate_neg_of_golden_lt_abs
     (-(4 / 5)) (by norm_num) (by rw [habsNegative]; exact hthreshold)
   refine ⟨hpositive, hnegative, ?_⟩
-  simp [ancestryMixtureCorrelation, Blindness.mixedEnvironmentCorrelation, Blindness.populationGapCertificate]
+  simp [ancestryMixtureCorrelation, Blindness.mixedEnvironmentCorrelation,
+    Blindness.populationGapCertificate]
 
 /-- **Scope of the explicit diversity mechanism.**  If the two ancestry environments carry
 the same active LD correlation, pooling leaves that correlation unchanged at every mixture
@@ -211,8 +213,10 @@ replacement for treating a coalescent measure alone as the universal branching-f
 theorem markedSuccessfulFamilyMeasure_determinesGenealogy
     (ν : MeasureTheory.Measure Blindness.MarkedBreakout.SuccessfulFamilyMark)
     (b k : ℕ) (hk : 2 ≤ k) :
-    Blindness.MarkedBreakout.speedTiltedGenealogyMeasure 0 ν = Blindness.MarkedBreakout.genealogyMeasure ν ∧
-      Blindness.MarkedBreakout.markedEventMergerRate ν b k = Blindness.MarkedBreakout.markedLambdaMergerRate ν b k :=
+    Blindness.MarkedBreakout.speedTiltedGenealogyMeasure 0 ν =
+      Blindness.MarkedBreakout.genealogyMeasure ν ∧
+      Blindness.MarkedBreakout.markedEventMergerRate ν b k =
+        Blindness.MarkedBreakout.markedLambdaMergerRate ν b k :=
   ⟨Blindness.MarkedBreakout.speedTiltedGenealogyMeasure_zero ν,
     Blindness.MarkedBreakout.markedEventMergerRate_eq_lambda ν b k hk⟩
 
@@ -248,7 +252,8 @@ three-lineage data identifies the tilt parameter only if the displacement law is
 logarithmic one.  The chart is a model assumption about front response, not a fact about
 multiple-merger genealogies. -/
 theorem speedConditionedGenealogy_chart_not_universal :
-    Blindness.MarkedBreakout.linearDisplacementTripleRate 1 ≠ Blindness.speedTiltBetaMergerRate 1 3 3 :=
+    Blindness.MarkedBreakout.linearDisplacementTripleRate 1 ≠ Blindness.speedTiltBetaMergerRate 1 3
+      3 :=
   Blindness.MarkedBreakout.tripleRate_separates_at_unit_tilt
 
 /-- **And what the chart does rest on, exactly.**  The logarithmic displacement law is what
@@ -350,10 +355,13 @@ theorem twoColourPioneerResponse_exact
     conversion * reproductiveWeight /
         (conversion * 1 + conversion * reproductiveWeight) =
           Blindness.XiFromMarks.pioneerWeightFraction reproductiveWeight ∧
-      Real.exp (-(gamma * Blindness.XiFromMarks.pioneerWeightDisplacement gamma reproductiveWeight)) *
+      Real.exp (-(gamma * Blindness.XiFromMarks.pioneerWeightDisplacement gamma reproductiveWeight))
+        *
           (1 + reproductiveWeight) = 1 := by
-  refine ⟨Blindness.XiFromMarks.spectralResponse_pioneerFraction conversion reproductiveWeight hconversion ?_,
-    Blindness.XiFromMarks.spectralResponse_shift_restoresAmplitude gamma reproductiveWeight hgamma hweight⟩
+  refine ⟨Blindness.XiFromMarks.spectralResponse_pioneerFraction conversion reproductiveWeight
+    hconversion ?_,
+    Blindness.XiFromMarks.spectralResponse_shift_restoresAmplitude gamma reproductiveWeight hgamma
+      hweight⟩
   linarith
 
 /-- **The light-tailed BRW boundary transform is an algebraic identity.**  The critical
@@ -422,13 +430,19 @@ theorem uniquePioneer_commonProfile_markedResponse
     (hcount : backgroundCount + pioneerCount ≠ 0)
     (hprofile : Blindness.XiFromMarks.HasCommonProfileRelaxation conversion 1 w
       backgroundCount pioneerCount) :
-    (Blindness.XiFromMarks.totalFamilyFraction ![Blindness.XiFromMarks.pioneerWeightFraction w] = Blindness.XiFromMarks.pioneerWeightFraction w ∧
-      Blindness.XiFromMarks.paintboxWeight ![Blindness.XiFromMarks.pioneerWeightFraction w] = Blindness.XiFromMarks.pioneerWeightFraction w ^ 2 ∧
-        Blindness.XiFromMarks.disjointPairMergeProbability ![Blindness.XiFromMarks.pioneerWeightFraction w] = 0) ∧
-      pioneerCount / (backgroundCount + pioneerCount) = Blindness.XiFromMarks.pioneerWeightFraction w ∧
-        Blindness.XiFromMarks.amplitudeFront gamma (1 + w) - Blindness.XiFromMarks.amplitudeFront gamma 1 =
+    (Blindness.XiFromMarks.totalFamilyFraction ![Blindness.XiFromMarks.pioneerWeightFraction w] =
+      Blindness.XiFromMarks.pioneerWeightFraction w ∧
+      Blindness.XiFromMarks.paintboxWeight ![Blindness.XiFromMarks.pioneerWeightFraction w] =
+        Blindness.XiFromMarks.pioneerWeightFraction w ^ 2 ∧
+        Blindness.XiFromMarks.disjointPairMergeProbability
+          ![Blindness.XiFromMarks.pioneerWeightFraction w] = 0) ∧
+      pioneerCount / (backgroundCount + pioneerCount) = Blindness.XiFromMarks.pioneerWeightFraction
+        w ∧
+        Blindness.XiFromMarks.amplitudeFront gamma (1 + w) - Blindness.XiFromMarks.amplitudeFront
+          gamma 1 =
           Blindness.XiFromMarks.pioneerWeightDisplacement gamma w :=
-  ⟨Blindness.XiFromMarks.oneSuccessfulAncestor_produces_onePaintboxAtom (Blindness.XiFromMarks.pioneerWeightFraction w),
+  ⟨Blindness.XiFromMarks.oneSuccessfulAncestor_produces_onePaintboxAtom
+    (Blindness.XiFromMarks.pioneerWeightFraction w),
     Blindness.XiFromMarks.pioneerCountFraction_eq_of_commonProfile
       conversion w backgroundCount pioneerCount hconversion hcount hprofile,
     Blindness.XiFromMarks.amplitudeFront_pioneerShift gamma w⟩
@@ -457,7 +471,8 @@ shared across all designs. -/
 theorem genomicAlgorithmicRiskSignature_isCoarsestSufficientInvariant
     {Algorithm Design Model Loss : Type*}
     (risk : Algorithm → Design → Model → Loss → ℝ) :
-    Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk (Blindness.TrafficInvariantSeparation.algorithmicRiskSignature risk) ∧
+    Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk
+      (Blindness.TrafficInvariantSeparation.algorithmicRiskSignature risk) ∧
       ∀ (Invariant : Type*) (invariant : Design → Invariant),
         Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk invariant →
           ∀ left right, invariant left = invariant right →
@@ -482,7 +497,8 @@ theorem genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
       ∑ vertex, degree term vertex = 2 * edges term) :
     Filter.Tendsto
       (fun population : ℕ ↦
-        Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+        Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient hasOddDegree
+          vertices edges
           (population + 1))
       Filter.atTop (nhds 0) :=
   Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
@@ -500,9 +516,11 @@ theorem positiveLDBalancedRankOneCovariance_fullWitness
     (baseline spikeStrength temperature : ℝ)
     (hbaseline : 0 ≤ baseline) (hspike : 0 < spikeStrength)
     (hcritical : 1 < temperature * spikeStrength) :
-    Blindness.TrafficInvariantSeparation.ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+    Blindness.TrafficInvariantSeparation.ConcreteBalancedPSDPressureWitness coefficient hasOddDegree
+      vertices edges
       baseline spikeStrength temperature :=
-  Blindness.TrafficInvariantSeparation.concreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+  Blindness.TrafficInvariantSeparation.concreteBalancedPSDPressureWitness coefficient hasOddDegree
+    vertices edges
     hconnected baseline spikeStrength temperature hbaseline hspike hcritical
 
 /-- **A rare LD subspace is invisible to every fixed traffic coordinate but survives a
@@ -522,7 +540,8 @@ theorem rareLDSubspace_limitingTrafficInsufficientForDegreeOne
         (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
         Filter.atTop (nhds 0) ∧
       ∀ iteration,
-        Blindness.TrafficInvariantSeparation.amplifiedDegreeOneTrafficDifference baseline iteration = 2 :=
+        Blindness.TrafficInvariantSeparation.amplifiedDegreeOneTrafficDifference baseline iteration
+          = 2 :=
   Blindness.TrafficInvariantSeparation.limitingTraffic_insufficient_for_unstableDegreeOne baseline
 
 /-- **Bulk LD spectrum does not determine extremal spectral or SDP behavior.**
@@ -531,7 +550,8 @@ average, while changing both the exact spectral maximum and the full
 trace-one positive-semidefinite SDP optimum by its complete strength. -/
 theorem genomicBulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
     (baseline spikeStrength : ℝ) (hspike : 0 < spikeStrength) :
-    Blindness.TrafficInvariantSeparation.BulkSpectralLawExtremalSDPSeparation baseline spikeStrength :=
+    Blindness.TrafficInvariantSeparation.BulkSpectralLawExtremalSDPSeparation baseline spikeStrength
+      :=
   Blindness.TrafficInvariantSeparation.bulkSpectralLaw_invisible_extremalSpectrumAndSDP_visible
     baseline spikeStrength hspike
 
@@ -548,7 +568,8 @@ theorem positiveLDSpike_fixedTrafficInvisible_variationalPressureVisible
     (tlam : ℝ) (hcritical : 1 < tlam) :
     Filter.Tendsto
         (fun population : ℕ ↦
-          Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+          Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient
+            hasOddDegree vertices edges
             (population + 1))
         Filter.atTop (nhds 0) ∧
       0 < Blindness.TrafficInvariantSeparation.cwVariationalPressureGap tlam :=
@@ -567,7 +588,8 @@ theorem positiveLDSpike_fixedTrafficInvisible_finitePressureVisible
     (vertices edges : Term → ℕ)
     (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term)
     (tlam : ℝ) (hcritical : 1 < tlam) :
-    Blindness.TrafficInvariantSeparation.RankOneSpikeInvisibleWithFinitePressure coefficient hasOddDegree vertices edges tlam :=
+    Blindness.TrafficInvariantSeparation.RankOneSpikeInvisibleWithFinitePressure coefficient
+      hasOddDegree vertices edges tlam :=
   Blindness.TrafficInvariantSeparation.finiteRankOneTraffic_invisible_finitePressure_visible
     coefficient hasOddDegree vertices edges hconnected tlam hcritical
 
@@ -578,7 +600,8 @@ counterexample. -/
 theorem genomicFiniteCWPressure_dominatesVariationalObjective
     (population : ℕ) (tlam m : ℝ)
     (hpopulation : 0 < population) (htlam : 0 ≤ tlam) (hm : |m| < 1) :
-    Blindness.TrafficInvariantSeparation.cwObjective tlam m ≤ Blindness.TrafficInvariantSeparation.finiteCWPressureGap population tlam :=
+    Blindness.TrafficInvariantSeparation.cwObjective tlam m ≤
+      Blindness.TrafficInvariantSeparation.finiteCWPressureGap population tlam :=
   Blindness.TrafficInvariantSeparation.finiteCWPressureGap_ge_cwObjective
     population tlam m hpopulation htlam hm
 
@@ -589,7 +612,8 @@ theorem genomicFiniteCWTypeMass_le_one_of_subcritical
     (population upSpins : ℕ) (tlam : ℝ) (hcritical : tlam ≤ 1)
     (hupSpins : upSpins ∈ Finset.range (population + 1)) :
     Blindness.TrafficInvariantSeparation.finiteCWTypeMass population tlam upSpins ≤ 1 :=
-  Blindness.TrafficInvariantSeparation.finiteCWTypeMass_le_one_of_subcritical population upSpins tlam
+  Blindness.TrafficInvariantSeparation.finiteCWTypeMass_le_one_of_subcritical population upSpins
+    tlam
     hcritical hupSpins
 
 /-- **Exact finite genomic pressure phase boundary.**  For nonnegative LD
@@ -599,7 +623,8 @@ interior genotype-frequency witness prevents convergence to zero. -/
 theorem genomicFiniteCWPressure_exactCriticalPoint
     (tlam : ℝ) (htlam : 0 ≤ tlam) :
     Filter.Tendsto
-        (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population + 1) tlam)
+        (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population +
+          1) tlam)
         Filter.atTop (nhds 0) ↔
       tlam ≤ 1 :=
   Blindness.TrafficInvariantSeparation.finiteCWPressureGap_tendsto_zero_iff tlam htlam
@@ -610,7 +635,8 @@ principle assumed beyond the proved finite type-count squeeze. -/
 theorem genomicFiniteCWPressure_convergesToVariational
     (tlam : ℝ) (htlam : 0 ≤ tlam) :
     Filter.Tendsto
-      (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population + 1) tlam)
+      (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population +
+        1) tlam)
       Filter.atTop (nhds (Blindness.TrafficInvariantSeparation.cwVariationalPressureGap tlam)) :=
   Blindness.TrafficInvariantSeparation.finiteCWPressureGap_tendsto_variationalPressure tlam htlam
 
@@ -656,7 +682,8 @@ exactly when the nonnegative effective LD coupling is at most one. -/
 theorem positiveLDSpike_pressureDifference_exactCriticalPoint
     (baseline temperature spikeStrength : ℝ)
     (hcoupling : 0 ≤ temperature * spikeStrength) :
-    Blindness.TrafficInvariantSeparation.FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength :=
+    Blindness.TrafficInvariantSeparation.FiniteRankOnePressureCriticalStatement baseline temperature
+      spikeStrength :=
   Blindness.TrafficInvariantSeparation.finiteRankOneRademacherPressure_difference_tendsto_zero_iff
     baseline temperature spikeStrength hcoupling
 
@@ -674,7 +701,8 @@ theorem positiveLDSpike_pressure_convergesToVariational
 converges uniformly over every nonnegative spike strength. -/
 theorem positiveLDSpike_pressure_convergesUniformlyOnNonnegativeStrength
     (baseline temperature : ℝ) (htemperature : 0 ≤ temperature) :
-    Blindness.TrafficInvariantSeparation.FiniteRankOnePressureUniformLimitStatement baseline temperature :=
+    Blindness.TrafficInvariantSeparation.FiniteRankOnePressureUniformLimitStatement baseline
+      temperature :=
   Blindness.TrafficInvariantSeparation.finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
     baseline temperature htemperature
 
@@ -694,7 +722,8 @@ theorem positiveLDSpike_refutesTrafficAndGroundStateDichotomies
     (horthogonal : alignment orthogonal = 0)
     (haligned : alignment aligned = population)
     (hcritical : 1 < temperature * spikeStrength) :
-    Blindness.TrafficInvariantSeparation.RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges
+    Blindness.TrafficInvariantSeparation.RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree
+      vertices edges
       alignment orthogonal aligned baseline spikeStrength population temperature :=
   Blindness.TrafficInvariantSeparation.rankOneTraffic_groundState_pressure_counterexample
     coefficient hasOddDegree vertices edges hconnected alignment orthogonal aligned
@@ -716,7 +745,8 @@ theorem positiveLDSpike_groundStateDoesNotFixPressure
       0 < Blindness.TrafficInvariantSeparation.cwObjective tlam 1 := by
   refine ⟨Blindness.TrafficInvariantSeparation.rankOne_groundState_certificate
     (fun state : Bool ↦ if state = true then population else 0) false
-    baseline spikeStrength population hspike ?_, Blindness.TrafficInvariantSeparation.curieWeiss_supercritical_witness tlam hlarge⟩
+    baseline spikeStrength population hspike ?_,
+      Blindness.TrafficInvariantSeparation.curieWeiss_supercritical_witness tlam hlarge⟩
   simp
 
 /-- **The positive LD-spike pressure has its exact Curie–Weiss critical point.**  The pressure
@@ -737,7 +767,8 @@ theorem ldVariationalPressureGap_exactCriticalPoint (tlam : ℝ) :
 /-- The limiting LD pressure is globally stable under coupling changes: it is
 `1/2`-Lipschitz, continuous, monotone, and convex. -/
 theorem ldVariationalPressureGap_globalRegularity :
-    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal)
+      Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
       Continuous Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
         Monotone Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
           ConvexOn ℝ Set.univ Blindness.TrafficInvariantSeparation.cwVariationalPressureGap :=
@@ -755,7 +786,8 @@ theorem matchedBayes_randomDesignGap_fromScalarGap_asymmetric
     (hright : |randomRight - scalarRight| ≤ rightError)
     (hgap : scalarRight - scalarLeft = delta) :
     delta - (leftError + rightError) ≤ randomRight - randomLeft :=
-  Blindness.TrafficInvariantSeparation.randomDesign_gap_of_scalarGap_asymmetric scalarLeft scalarRight randomLeft randomRight
+  Blindness.TrafficInvariantSeparation.randomDesign_gap_of_scalarGap_asymmetric scalarLeft
+    scalarRight randomLeft randomRight
     leftError rightError delta hleft hright hgap
 
 /-- The equal-error specialization loses at most `2ε`. -/
@@ -765,7 +797,8 @@ theorem matchedBayes_randomDesignGap_from_scalarGap
     (hright : |randomRight - scalarRight| ≤ epsilon)
     (hgap : scalarRight - scalarLeft = delta) :
     delta - 2 * epsilon ≤ randomRight - randomLeft :=
-  Blindness.TrafficInvariantSeparation.randomDesign_gap_of_scalarGap scalarLeft scalarRight randomLeft randomRight epsilon delta
+  Blindness.TrafficInvariantSeparation.randomDesign_gap_of_scalarGap scalarLeft scalarRight
+    randomLeft randomRight epsilon delta
     hleft hright hgap
 
 /-- A positive genomic scalar-channel gap survives under independently
@@ -780,7 +813,8 @@ theorem matchedBayes_randomDesignEventuallySeparates_fromAsymmetricErrors
     (hleftVanishing : Filter.Tendsto leftError regime (nhds 0))
     (hrightVanishing : Filter.Tendsto rightError regime (nhds 0)) :
     ∀ᶠ index in regime, randomLeft index < randomRight index :=
-  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_asymmetric regime
+  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_asymmetric
+    regime
     scalarLeft scalarRight delta randomLeft randomRight leftError rightError
     hleft hright hgap hpositive hleftVanishing hrightVanishing
 
@@ -830,7 +864,8 @@ theorem matchedBayes_aspectWishartRatioBridge
     (∀ index, constant / Real.sqrt (aspectRatio index) =
       constant * Real.sqrt ((aspectRatio index)⁻¹)) := by
   constructor
-  · exact Blindness.TrafficInvariantSeparation.aspectAtTop_iff_inverseTendstoNhdsGTZero regime aspectRatio
+  · exact Blindness.TrafficInvariantSeparation.aspectAtTop_iff_inverseTendstoNhdsGTZero regime
+      aspectRatio
   · intro index
     exact Blindness.TrafficInvariantSeparation.div_sqrt_eq_mul_sqrt_inv constant (aspectRatio index)
 
@@ -848,7 +883,8 @@ theorem matchedBayes_randomDesignEventuallySeparates_ofAspectAtTop
     (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
     (haspectRatio : Filter.Tendsto aspectRatio regime Filter.atTop) :
     ∀ᶠ index in regime, randomLeft index < randomRight index :=
-  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_of_aspectAtTop regime
+  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_of_aspectAtTop
+    regime
     scalarLeft scalarRight delta constant aspectRatio randomLeft randomRight
     hleft hright hgap hpositive haspectRatio
 
@@ -914,7 +950,8 @@ theorem matchedBayes_certifiedRankOnePerturbation_isAsymptoticallyInvisible
       (certificate population).variance ≤ varianceBound)
     (hnuclear : ∀ population,
       (certificate population).nuclearDistance =
-        (Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum population spikeStrength hspike).normalizedNuclearDistance) :
+        (Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum population spikeStrength
+          hspike).normalizedNuclearDistance) :
     Filter.Tendsto
       (fun population ↦ (certificate population).informationPath 1 -
         (certificate population).informationPath 0)
@@ -988,7 +1025,8 @@ theorem matchedBayes_certifiedSublinearRank_isInvisible_ofVarianceBound
     (hnuclearRank : ∀ index,
       (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
     Blindness.TrafficInvariantSeparation.MatchedInformationPathGapTendsToZero regime certificate :=
-  Blindness.TrafficInvariantSeparation.matchedInformationPath_lowRank_tendsto_zero_of_varianceBound regime certificate
+  Blindness.TrafficInvariantSeparation.matchedInformationPath_lowRank_tendsto_zero_of_varianceBound
+    regime certificate
     varianceBound operatorBound rankFraction hvarianceBound
     hrankVanishing hnuclearRank
 
@@ -1002,7 +1040,8 @@ theorem matchedBayes_certifiedSublinearRank_isInvisible
     (hnuclearRank : ∀ index,
       (certificate index).nuclearDistance ≤ operatorBound * rankFraction index) :
     Blindness.TrafficInvariantSeparation.MatchedInformationPathGapTendsToZero regime certificate :=
-  Blindness.TrafficInvariantSeparation.matchedInformationPath_lowRank_tendsto_zero regime certificate operatorBound
+  Blindness.TrafficInvariantSeparation.matchedInformationPath_lowRank_tendsto_zero regime
+    certificate operatorBound
     rankFraction hvariance hrankVanishing hnuclearRank
 
 /-- **A genomic covariance perturbation occupying a vanishing rank fraction
@@ -1065,7 +1104,8 @@ theorem matchedBayes_certifiedPersistentGap_requiresExtensiveRank
     (∀ᶠ index in regime,
       delta / (varianceBound * operatorBound / 2) ≤ rankFraction index) ∧
       ¬ Filter.Tendsto rankFraction regime (nhds 0) :=
-  Blindness.TrafficInvariantSeparation.matchedInformationPath_persistentGap_requires_extensiveRank regime certificate
+  Blindness.TrafficInvariantSeparation.matchedInformationPath_persistentGap_requires_extensiveRank
+    regime certificate
     varianceBound operatorBound delta rankFraction hvariancePositive hoperator
     hdelta hvarianceBound hnuclearRank hgap
 
@@ -1088,13 +1128,15 @@ theorem matchedBayes_persistentGap_requiresExtensiveRank
 /-- A degree-limited genomic risk functional cannot distinguish designs with the same truncated
 traffic profile, so the complete Bayes gap transfers to every procedure in the class. -/
 theorem degreeLimitedGenomicRisk_fullGapHardness
-    {Algorithm : Type*} {D : ℕ} (risk : Algorithm → Blindness.TrafficInvariantSeparation.TruncatedTrafficRisk D)
+    {Algorithm : Type*} {D : ℕ} (risk : Algorithm →
+      Blindness.TrafficInvariantSeparation.TruncatedTrafficRisk D)
     (left right : Fin (D + 1) → ℝ) (htraffic : left = right)
     (bayesLeft bayesRight : ℝ)
     (hoptimalRight : ∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right)
     (algorithm : Algorithm) :
     bayesRight - bayesLeft ≤ (risk algorithm).evaluate left - bayesLeft :=
-  Blindness.TrafficInvariantSeparation.truncatedTraffic_hardness risk left right htraffic bayesLeft bayesRight hoptimalRight algorithm
+  Blindness.TrafficInvariantSeparation.truncatedTraffic_hardness risk left right htraffic bayesLeft
+    bayesRight hoptimalRight algorithm
 
 /-- **The corrected stable low-degree theorem.**  A degree-`D` genomic graph
 polynomial is quantitatively controlled by the maximum retained LD-traffic
@@ -1182,7 +1224,8 @@ theorem permutationInvariantGenomicPolynomial_factorsThroughLDGraphs
     (∑ monomial, coefficient monomial * value monomial) =
       ∑ graph, Blindness.TrafficInvariantSeparation.graphShapeCoefficient shape coefficient graph *
         ∑ monomial, if shape monomial = graph then value monomial else 0 :=
-  Blindness.TrafficInvariantSeparation.invariantPolynomial_graphSum_factorization shape coefficient value hshape hinvariant
+  Blindness.TrafficInvariantSeparation.invariantPolynomial_graphSum_factorization shape coefficient
+    value hshape hinvariant
 
 /-- **Canonical finite genomic traffic factorization.**  The graph index is
 the quotient of endpoint assignments by equality pattern, so callers need not
@@ -1193,7 +1236,8 @@ theorem permutationInvariantGenomicPolynomial_factorsThroughCanonicalLDGraphs
     (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial,
       coefficient (permutation ∘ monomial) = coefficient monomial) :
     Blindness.TrafficInvariantSeparation.CanonicalTrafficFactorizationStatement coefficient value :=
-  Blindness.TrafficInvariantSeparation.invariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
+  Blindness.TrafficInvariantSeparation.invariantPolynomial_canonicalTraffic_factorization
+    coefficient value hinvariant
 
 /-- **Canonical rooted genomic traffic factorization.**  The distinguished
 `none` slot records the output locus, formally supplying the rooted graph
@@ -1203,8 +1247,10 @@ theorem permutationEquivariantGenomicPolynomial_factorsThroughRootedLDGraphs
     (coefficient value : (Option Slot → Locus) → ℝ)
     (hinvariant : ∀ (permutation : Equiv.Perm Locus) monomial,
       coefficient (permutation ∘ monomial) = coefficient monomial) :
-    Blindness.TrafficInvariantSeparation.RootedCanonicalTrafficFactorizationStatement coefficient value :=
-  Blindness.TrafficInvariantSeparation.rootedInvariantPolynomial_canonicalTraffic_factorization coefficient value hinvariant
+    Blindness.TrafficInvariantSeparation.RootedCanonicalTrafficFactorizationStatement coefficient
+      value :=
+  Blindness.TrafficInvariantSeparation.rootedInvariantPolynomial_canonicalTraffic_factorization
+    coefficient value hinvariant
 
 /-- A genomic polynomial of total degree at most `D`, decomposed into its
 homogeneous degrees, factors exactly through canonical LD traffic graphs with at most `D` ordered
@@ -1215,7 +1261,8 @@ theorem degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
       ((Fin (degree : ℕ) × Bool → Locus) → ℝ))
     (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
       coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
-    Blindness.TrafficInvariantSeparation.DegreeAtMostTrafficFactorizationStatement coefficient value :=
+    Blindness.TrafficInvariantSeparation.DegreeAtMostTrafficFactorizationStatement coefficient value
+      :=
   Blindness.TrafficInvariantSeparation.degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
     coefficient value hinvariant
 
@@ -1227,7 +1274,8 @@ theorem degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs
       ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ))
     (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
       coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
-    Blindness.TrafficInvariantSeparation.DegreeAtMostRootedTrafficFactorizationStatement coefficient value :=
+    Blindness.TrafficInvariantSeparation.DegreeAtMostRootedTrafficFactorizationStatement coefficient
+      value :=
   Blindness.TrafficInvariantSeparation.degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
     coefficient value hinvariant
 
@@ -1256,7 +1304,8 @@ theorem degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq
       ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ))
     (hinvariant : ∀ degree (permutation : Equiv.Perm Locus) monomial,
       coefficient degree (permutation ∘ monomial) = coefficient degree monomial)
-    (htraffic : Blindness.TrafficInvariantSeparation.degreeAtMostRootedCanonicalTrafficProfile leftValue =
+    (htraffic : Blindness.TrafficInvariantSeparation.degreeAtMostRootedCanonicalTrafficProfile
+      leftValue =
       Blindness.TrafficInvariantSeparation.degreeAtMostRootedCanonicalTrafficProfile rightValue) :
     (∑ degree : Fin (D + 1),
       ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
@@ -1348,7 +1397,8 @@ theorem genomicBoundedLipschitzPressureFamily_hasUniformlyConvergentSubsequence
       ∃ subsequence : ℕ → ℕ,
         StrictMono subsequence ∧
           Filter.Tendsto (profiles ∘ subsequence) Filter.atTop (nhds limit) :=
-  Blindness.TrafficInvariantSeparation.boundedLipschitzPressureFamily_tendsto_subseq K bound profiles hprofiles
+  Blindness.TrafficInvariantSeparation.boundedLipschitzPressureFamily_tendsto_subseq K bound
+    profiles hprofiles
 
 /-- **The nonperturbative genomic LD profile has a genuine compact state space.**
 Uniformly bounded countable pressure coordinates admit one common subsequence
@@ -1356,19 +1406,23 @@ on which every prior/replica/tilt coordinate converges.  This is the exact
 diagonal compactness statement needed before any model-specific identification
 of the limiting right-convergence profile. -/
 theorem genomicExponentialProfile_hasCommonCoordinatewiseSubsequence
-    (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound) :
-    ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+    (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound) :
+    ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence :
+      ℕ → ℕ,
       StrictMono subsequence ∧
         ∀ coordinate : ℕ,
           Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
             Filter.atTop (nhds (limit coordinate)) :=
-  Blindness.TrafficInvariantSeparation.boundedExponentialProfile_common_coordinatewise_subsequence bound profiles
+  Blindness.TrafficInvariantSeparation.boundedExponentialProfile_common_coordinatewise_subsequence
+    bound profiles
 
 /-- **The explicit exponential-profile formula is a genuine separating
 distance.**  It is nonnegative, symmetric, triangular, and vanishes exactly on
 identical genomic LD pressure profiles. -/
 theorem genomicExponentialProfileDistance_metricLaws
-    {bound : ℝ} (left middle right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound) :
+    {bound : ℝ} (left middle right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound) :
     0 ≤ exponentialProfileDistance left right ∧
       exponentialProfileDistance left right = exponentialProfileDistance right left ∧
       exponentialProfileDistance left right ≤
@@ -1383,7 +1437,8 @@ theorem genomicExponentialProfileDistance_metricLaws
 The installed metric is exactly the weighted capped-coordinate distance, and
 its complete carrier is compact in the ordinary topological sense. -/
 theorem genomicExponentialProfilePoint_isCompactMetricSpace (bound : ℝ) :
-    IsCompact (Set.univ : Set (Blindness.TrafficInvariantSeparation.ExponentialProfilePoint bound)) :=
+    IsCompact (Set.univ : Set (Blindness.TrafficInvariantSeparation.ExponentialProfilePoint bound))
+      :=
   isCompact_univ
 
 /-- Standard convergence in the bundled genomic right-profile metric is
@@ -1402,7 +1457,8 @@ pressure convergence.**  Thus convergence in the metric is neither weaker nor
 stronger than simultaneous convergence of every enumerated prior/replica/tilt
 coordinate. -/
 theorem genomicExponentialProfileDistance_converges_iff_coordinatewise
-    {bound : ℝ} {profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound}
+    {bound : ℝ} {profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound}
     {limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound} :
     Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
         Filter.atTop (nhds 0) ↔
@@ -1429,13 +1485,16 @@ theorem genomicExponentialProfileDistance_finitePrefixControl
 explicit weighted distance.**  The same subsequence works simultaneously for
 every enumerated prior/replica/tilt coordinate. -/
 theorem genomicExponentialProfile_compactInExplicitDistance
-    (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound) :
-    ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+    (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound) :
+    ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence :
+      ℕ → ℕ,
       StrictMono subsequence ∧
         Filter.Tendsto
           (fun n ↦ exponentialProfileDistance (profiles (subsequence n)) limit)
           Filter.atTop (nhds 0) :=
-  Blindness.TrafficInvariantSeparation.boundedExponentialProfile_compact_subsequence_in_distance bound profiles
+  Blindness.TrafficInvariantSeparation.boundedExponentialProfile_compact_subsequence_in_distance
+    bound profiles
 
 
 /-- **Exact criterion for the Beta curve.**  At conditional-Laplace-transform level the Beta
@@ -1446,7 +1505,8 @@ theorem speedConditionedGenealogy_beta_iff_logResponse
     (gamma : ℝ) (conditionalLaplace : ℝ → ℝ → ℝ) :
     Blindness.MarkedBreakout.HasBetaTiltInvariant gamma conditionalLaplace ↔
       Blindness.MarkedBreakout.HasFractionIndependentCenteredTransform gamma conditionalLaplace :=
-  Blindness.MarkedBreakout.hasBetaTiltInvariant_iff_centeredTransformIndependent gamma conditionalLaplace
+  Blindness.MarkedBreakout.hasBetaTiltInvariant_iff_centeredTransformIndependent gamma
+    conditionalLaplace
 
 /-- **The `log³ N` clock is a front-response statement.**  At susceptibility exponent three the
 genealogical clock is the cube of the front width; the coalescent rate law contributes no cube. -/

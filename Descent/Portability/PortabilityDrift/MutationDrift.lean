@@ -214,7 +214,8 @@ be positive too. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
     (m : MutationDriftModelAssumptions) (h : 1 + m.theta ≠ 0) :
     m.fstEquilibrium * (1 + m.theta) = 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium
+    Descent.Core.fstFromFlow
   simp only [Descent.Core.Theta.value_ofScaled]
   field_simp
 
@@ -236,7 +237,8 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
     (m : MutationDriftModelAssumptions) :
     0 < m.fstEquilibrium := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium
+    Descent.Core.fstFromFlow
   simp only [Descent.Core.Theta.value_ofScaled]
   have hden : 0 < 1 + m.theta := by
     nlinarith [m.theta_pos]
@@ -246,7 +248,8 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_pos
 theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     (m : MutationDriftModelAssumptions) :
     m.fstEquilibrium < 1 := by
-  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold MutationDriftModelAssumptions.fstEquilibrium PopGen.fstMutationDriftEquilibrium
+    Descent.Core.fstFromFlow
   simp only [Descent.Core.Theta.value_ofScaled]
   rw [div_lt_one (by linarith [m.theta_pos])]
   linarith [m.theta_pos]
@@ -581,7 +584,8 @@ theorem ldOverlapFromSharedLD_at_reference_point :
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
     covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld) =
       (1 - fst) * shared_ld := by
-  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
+  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+    Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
 /-- **Covariance divergence derived from retention.**
@@ -793,7 +797,8 @@ theorem mutationDrift_R2_lt_puredrift_R2 (V_A V_E fst_drift shared_ld : ℝ)
     (hld : 0 < shared_ld) (hld_lt : shared_ld < 1) :
     presentDayR2MutationDrift V_A V_E fst_drift shared_ld <
       presentDayR2 V_A V_E fst_drift := by
-  unfold presentDayR2MutationDrift presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
+  unfold presentDayR2MutationDrift presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance
+    Descent.Core.share
   have h_sig_lt := mutationDrift_signal_lt_puredrift V_A fst_drift shared_ld
     hVA hfst_lt hld_lt
   have h_md_nonneg : 0 ≤ presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld :=

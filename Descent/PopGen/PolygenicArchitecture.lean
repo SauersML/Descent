@@ -16,7 +16,8 @@ assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Por
 assert_below Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Decision`:
---   Decision: reaches 2 module(s) -- `Descent.Decision.CertificateGrading`, `Descent.Decision.TransportedMinimax`
+--   Decision: reaches 2 module(s) -- `Descent.Decision.CertificateGrading`,
+--   `Descent.Decision.TransportedMinimax`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -819,7 +820,8 @@ noncomputable def finiteProblem {q n : ℕ}
   P.mixtureExperiment.certificateProblem
 
 noncomputable def momentConstraintCalculus {q n : ℕ}
-    (P : MeanAbsoluteEffectCertificateProblem q n) : Decision.CertificateGrading.CertificateCalculus :=
+    (P : MeanAbsoluteEffectCertificateProblem q n) : Decision.CertificateGrading.CertificateCalculus
+      :=
   Decision.CertificateGrading.explicitCalculus P.finiteProblem.modulus P.logScale
 
 @[simp] theorem finiteProblem_target {q n : ℕ}
@@ -851,18 +853,23 @@ theorem momentMatched_order_two_iff {q n : ℕ}
       Decision.CertificateGrading.FinitePrior.mean A (fun i ↦ ∑ j, P.architecture i j) =
           Decision.CertificateGrading.FinitePrior.mean B (fun i ↦ ∑ j, P.architecture i j) ∧
         Decision.CertificateGrading.FinitePrior.mean A (fun i ↦ ∑ j, (P.architecture i j) ^ 2) =
-          Decision.CertificateGrading.FinitePrior.mean B (fun i ↦ ∑ j, (P.architecture i j) ^ 2) := by
+          Decision.CertificateGrading.FinitePrior.mean B (fun i ↦ ∑ j, (P.architecture i j) ^ 2)
+            := by
   constructor
   · intro h
     constructor
-    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment,
+        architectureMoment_zero] using
         h 0 (by omega)
-    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment,
+        architectureMoment_one] using
         h 1 (by omega)
   · rintro ⟨h0, h1⟩ r hr
     interval_cases r
-    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_zero] using h0
-    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment, architectureMoment_one] using h1
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment,
+        architectureMoment_zero] using h0
+    · simpa only [Decision.CertificateGrading.FinitePrior.mean, finiteProblem_moment,
+        architectureMoment_one] using h1
 
 theorem effects_nonempty {q n : ℕ} (P : MeanAbsoluteEffectCertificateProblem q n) :
     P.effects.Nonempty := boundedEffectCarrier_nonempty q P.architectureRadius

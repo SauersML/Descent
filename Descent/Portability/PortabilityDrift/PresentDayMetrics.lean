@@ -430,7 +430,8 @@ theorem expected_abs_mean_shift_ratio_eq
     (hfstS_lt_one : fstS < 1) :
     Expected_Abs_Shift V_A fstS fstT / Real.sqrt (presentDayPGSVariance V_A fstS) =
       2 * Real.sqrt ((fstS + fstT) / (Real.pi * (1 - fstS))) := by
-  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
+  unfold Expected_Abs_Shift Var_Delta_Mu presentDayPGSVariance pgsVarianceFromHet
+    Descent.Core.product
   have h1 :
       Real.sqrt (2 * (fstS + fstT) * V_A) =
         Real.sqrt (2 * (fstS + fstT)) * Real.sqrt V_A := by
@@ -871,7 +872,8 @@ API below, so the denominator argument has a single proof. -/
 private theorem r2FromSignalVariance_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    PopGen.TransportedMetrics.r2FromSignalVariance x V_E < PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance x V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
   unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have hxE : 0 < x + V_E := by linarith
   have hyE : 0 < y + V_E := by linarith [hx, hxy]
@@ -914,7 +916,8 @@ theorem drift_degrades_R2
 theorem expectedR2_strictMono_nonneg
     (V_E x y : ℝ)
     (hVE : 0 < V_E) (hx : 0 ≤ x) (hxy : x < y) :
-    PopGen.TransportedMetrics.r2FromSignalVariance x V_E < PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance x V_E <
+      PopGen.TransportedMetrics.r2FromSignalVariance y V_E := by
   exact r2FromSignalVariance_strictMono_nonneg V_E x y hVE hx hxy
 
 /-- Drift strictly degrades the exact **equal-variance Gaussian** AUC whenever
@@ -2580,7 +2583,8 @@ Those two now CALL the kernel and so need no theorem here; this one does not, be
 routes through a transported correlation as well, which is why it survives the deletion of
 its four siblings. -/
 theorem realWorldPGSVariance_eq_retainedFraction (V_A fst rhoSq : ℝ) :
-    Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A := by
+    Portability.realWorldPGSVariance V_A fst rhoSq = rhoSq * Descent.Core.retainedFraction fst V_A
+      := by
   unfold Portability.realWorldPGSVariance Descent.Core.retainedFraction; ring
 
 /-- **Cross-check spanning the mating and drift modules: assortative mating and

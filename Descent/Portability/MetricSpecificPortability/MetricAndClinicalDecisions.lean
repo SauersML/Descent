@@ -186,9 +186,11 @@ theorem metric_split_is_prevalence_not_metric_choice
         metricPPV (sens d₂) (spec d₂) d₂.prevalence) := by
   -- The two agreements are the collapse, instantiated at this deployment type.
   have hs : sens d₁ = sens d₂ :=
-    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout sens hsens d₁ d₂ hreadout
+    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout sens hsens d₁ d₂
+      hreadout
   have hp : spec d₁ = spec d₂ :=
-    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout spec hspec d₁ d₂ hreadout
+    Spectral.levelSet_metrics_agree_of_coords_eq ScreeningDeployment.readout spec hspec d₁ d₂
+      hreadout
   refine ⟨hs, hp, ?_, ?_⟩
   · intro hK
     rw [hs, hp, hK]

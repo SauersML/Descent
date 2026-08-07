@@ -198,7 +198,8 @@ noncomputable def varWattersonEstimator (θ : Descent.Core.Theta) (n : ℕ) : �
 /-- **A bound falling like `1/a_{n-1}`.**  Both terms of the variance carry at least one
 factor of `a_{n-1}` in the denominator, and `b` is bounded, so the whole thing is at most
 `(θ + 2θ²)/a_{n-1}` once `a_{n-1} ≥ 1` -- which holds from `n = 2` on. -/
-theorem varWattersonEstimator_le {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {n : ℕ} (hn : 1 ≤ harmonicSum (n - 1)) :
+theorem varWattersonEstimator_le {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {n : ℕ} (hn : 1 ≤
+  harmonicSum (n - 1)) :
     varWattersonEstimator θ n ≤ (θ.value + 2 * θ.value ^ 2) / harmonicSum (n - 1) := by
   have ha : (0 : ℝ) < harmonicSum (n - 1) := by linarith
   have hb := harmonicSumSq_le_two (n - 1)
@@ -222,12 +223,14 @@ precision.  A study that doubles its cohort improves this estimator by the diffe
 two logarithms.  `Descent.Coalescent.BranchLength.tendsto_expectedTotalBranchLength_atTop` is
 the same `log n` seen as growth; here it is seen as a rate of convergence, and the two are
 the same statement about the same sum. -/
-theorem exists_varWattersonEstimator_lt {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {ε : ℝ} (hε : 0 < ε) :
+theorem exists_varWattersonEstimator_lt {θ : Descent.Core.Theta} (hθ : 0 ≤ θ.value) {ε : ℝ} (hε : 0
+  < ε) :
     ∃ n : ℕ, varWattersonEstimator θ n < ε := by
   obtain ⟨m, hm⟩ := (tendsto_harmonicSum_atTop.eventually_ge_atTop
     (max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε))).exists
   have hmax1 : (1 : ℝ) ≤ max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε) := le_max_left _ _
-  have hmax2 : (θ.value + 2 * θ.value ^ 2 + 1) / ε ≤ max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε) := le_max_right _ _
+  have hmax2 : (θ.value + 2 * θ.value ^ 2 + 1) / ε ≤ max 1 ((θ.value + 2 * θ.value ^ 2 + 1) / ε) :=
+    le_max_right _ _
   have hone : (1 : ℝ) ≤ harmonicSum m := le_trans hmax1 hm
   have hbig : (θ.value + 2 * θ.value ^ 2 + 1) / ε ≤ harmonicSum m := le_trans hmax2 hm
   have hpos : (0 : ℝ) < harmonicSum m := by linarith

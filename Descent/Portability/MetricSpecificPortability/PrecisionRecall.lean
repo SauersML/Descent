@@ -995,13 +995,16 @@ theorem spectrumEntries_pairedEpochCount (K : ℕ) (hK : 2 ≤ K) :
   omega
 
 /-- **Two epochs are Lipschitz-stable.** -/
-theorem spectrumEntries_two_epochs : spectrumEntries (Descent.Core.pairedEpochCount 2) = 1 := by decide
+theorem spectrumEntries_two_epochs : spectrumEntries (Descent.Core.pairedEpochCount 2) = 1 := by
+  decide
 
 /-- **Three epochs are cube-root stable.** -/
-theorem spectrumEntries_three_epochs : spectrumEntries (Descent.Core.pairedEpochCount 3) = 3 := by decide
+theorem spectrumEntries_three_epochs : spectrumEntries (Descent.Core.pairedEpochCount 3) = 3 := by
+  decide
 
 /-- **Four epochs are fifth-root stable.** -/
-theorem spectrumEntries_four_epochs : spectrumEntries (Descent.Core.pairedEpochCount 4) = 5 := by decide
+theorem spectrumEntries_four_epochs : spectrumEntries (Descent.Core.pairedEpochCount 4) = 5 := by
+  decide
 
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping

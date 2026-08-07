@@ -11,9 +11,13 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -441,7 +445,8 @@ and the same map, so the `1/(2 Nₑ)` inside them has to be the same
 `1/(2 Nₑ)`. -/
 theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
     driftLDStep Ne c Q = Portability.islandFstMultiplicativeStep Ne c Q := by
-  unfold driftLDStep Portability.islandFstMultiplicativeStep Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix
+  unfold driftLDStep Portability.islandFstMultiplicativeStep Portability.ibdRecurrenceStep
+    Descent.Core.survivalWeightedMix
   ring
 
 /-- **`driftLDStep` is the rate-neutral recurrence, stated directly.**
@@ -1719,7 +1724,8 @@ slice. This theorem pins the `2·Nₑ` convention inside the full expression. -/
 theorem ldRetainedFraction_uses_timeScale (r Ne : ℝ) (t : ℕ) :
     PopGen.ldRetainedFraction r Ne t
       = ((1 - r) * (1 - 1 / Descent.Core.coalescentTimeScale Ne)) ^ t := by
-  unfold PopGen.ldRetainedFraction PopGen.ldRetentionPerGen; rw [Descent.Core.coalescentTimeScale_eq]
+  unfold PopGen.ldRetainedFraction PopGen.ldRetentionPerGen; rw
+    [Descent.Core.coalescentTimeScale_eq]
 
 /-- **Do not simplify this to `Descent.Core.coalescentTimeScale Ne * log 2`.** That is the `r → 0`
 limit and is false at every `r > 0`. The `2·Nₑ` convention appears inside the retention
@@ -1739,7 +1745,8 @@ theorem driftLDStep_uses_coalescentTimeScale (Ne c Q : ℝ) :
     PopGen.driftLDStep Ne c Q
       = (1 - c) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne
           + (1 - 1 / Descent.Core.coalescentTimeScale Ne) * Q) := by
-  unfold PopGen.driftLDStep Descent.Core.survivalWeightedMix; rw [Descent.Core.coalescentTimeScale_eq]
+  unfold PopGen.driftLDStep Descent.Core.survivalWeightedMix; rw
+    [Descent.Core.coalescentTimeScale_eq]
 
 /-- **Its slope in `Q` carries it too.** -/
 theorem driftLDRetention_uses_coalescentTimeScale (Ne c : ℝ) :
@@ -1750,7 +1757,8 @@ theorem driftLDRetention_uses_coalescentTimeScale (Ne c : ℝ) :
 scale rather than an independently chosen constant. -/
 theorem driftLDEquilibrium_uses_coalescentTimeScale (Ne c : ℝ) :
     PopGen.driftLDEquilibrium Ne c
-      = (1 - c) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne) / (1 - PopGen.driftLDRetention Ne c) := by
+      = (1 - c) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne) / (1 - PopGen.driftLDRetention Ne c)
+        := by
   unfold PopGen.driftLDEquilibrium; rw [Descent.Core.coalescentTimeScale_eq]
 
 /-- **The `ρ` of the Ohta-Kimura approximation is the coalescent-scaled recombination

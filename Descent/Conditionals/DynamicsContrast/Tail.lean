@@ -6,7 +6,8 @@ import Descent.Conditionals.DynamicsContrast.StationarityRepair
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`, `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
+--   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -586,7 +587,8 @@ direction rather than merely placing their theorems in one file. -/
 theorem dynamicsContrast_eq_two_mul_contextMatchDrift
     (persists : Bool) (y : Descent.BinaryState) :
     dynamicsContrast persists =
-      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y := by
+      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists
+        y := by
   cases persists <;>
     norm_num [dynamicsContrast, Portability.posteriorDrift,
       posteriorMean_binaryConditionalContextMatch_eq_half]
@@ -605,7 +607,8 @@ noncomputable def dynamicsCommonMode (persists : Bool) : ℝ :=
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem dynamicsCommonMode_at_reference_point :
     dynamicsCommonMode true = 1 ∧ dynamicsCommonMode false = 1 := by
-  constructor <;> norm_num [dynamicsCommonMode, Spectral.binaryFirstAnnotation, Spectral.binarySecondAnnotation]
+  constructor <;> norm_num [dynamicsCommonMode, Spectral.binaryFirstAnnotation,
+    Spectral.binarySecondAnnotation]
 
 
 /-- Pooling followed by broadcasting recovers the common mode exactly. -/
@@ -682,7 +685,8 @@ finite biological realization of the continuum program's central Pythagorean obs
 theorem binaryContextMatch_indexWiseCalibrationEnergy_eq_quarter :
     Portability.indexWiseCalibrationEnergy binaryStateWeight binaryDynamicsPosterior
       binaryConditionalContextMatch
-      (Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 1 / 4 := by
+      (Portability.posteriorMean binaryDynamicsPosterior binaryConditionalContextMatch) = 1 / 4
+        := by
   rw [Portability.indexWiseCalibrationEnergy_posteriorMean_eq_driftDefectSq
     binaryStateWeight binaryDynamicsPosterior binaryConditionalContextMatch
     binaryDynamicsPosterior_sum_eq_one]
@@ -777,8 +781,10 @@ structure DynamicsObstructions : Prop where
   fourth-order low-SNR information coefficient by exactly `49 / 96`. -/
   symmetricLDChangesLowSNRCoefficient :
     ∀ c m1 m2 m3 m4 : ℝ,
-      Blindness.lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 Blindness.rotatedUniformFourthInvariant -
-          Blindness.lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 Blindness.localizedUniformFourthInvariant =
+      Blindness.lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4 Blindness.rotatedUniformFourthInvariant
+        -
+          Blindness.lowSNRFourthCoefficient c 1 (-2) m1 m2 m3 m4
+            Blindness.localizedUniformFourthInvariant =
         49 / 96
   /-- Both signs of a strong sparse-LD direction have a population gap, while a balanced
   environment mixture cancels it. -/
@@ -813,8 +819,10 @@ structure DynamicsObstructions : Prop where
   markedSuccessfulFamilyMeasureDeterminesGenealogy :
     ∀ (ν : MeasureTheory.Measure Blindness.MarkedBreakout.SuccessfulFamilyMark) (b k : ℕ),
       2 ≤ k →
-        Blindness.MarkedBreakout.speedTiltedGenealogyMeasure 0 ν = Blindness.MarkedBreakout.genealogyMeasure ν ∧
-          Blindness.MarkedBreakout.markedEventMergerRate ν b k = Blindness.MarkedBreakout.markedLambdaMergerRate ν b k
+        Blindness.MarkedBreakout.speedTiltedGenealogyMeasure 0 ν =
+          Blindness.MarkedBreakout.genealogyMeasure ν ∧
+          Blindness.MarkedBreakout.markedEventMergerRate ν b k =
+            Blindness.MarkedBreakout.markedLambdaMergerRate ν b k
   /-- General successful events are complete mass partitions.  Their collision-weighted marked
   measure is the `Ξ` genealogy law, and collision integrability controls every fixed sample. -/
   markedMassPartitionMeasureDeterminesXi :
@@ -827,14 +835,16 @@ structure DynamicsObstructions : Prop where
   merger. -/
   frontTrajectoryDoesNotDetermineXi :
     ∀ x : ℝ, x ≠ 0 →
-      Blindness.XiFromMarks.paintboxWeight ![x] ≠ Blindness.XiFromMarks.paintboxWeight ![x / 2, x / 2] ∧
+      Blindness.XiFromMarks.paintboxWeight ![x] ≠ Blindness.XiFromMarks.paintboxWeight ![x / 2, x /
+        2] ∧
         Blindness.XiFromMarks.disjointPairMergeProbability ![x] = 0 ∧
           0 < Blindness.XiFromMarks.disjointPairMergeProbability ![x / 2, x / 2]
   /-- Rank-one two-colour response gives the pioneer fraction and logarithmic amplitude repair
   exactly; the remaining hard-selection obstruction is the uniform probabilistic estimate. -/
   twoColourPioneerResponseIsExact :
     ∀ conversion gamma w : ℝ, conversion ≠ 0 → gamma ≠ 0 → -1 < w →
-      conversion * w / (conversion * 1 + conversion * w) = Blindness.XiFromMarks.pioneerWeightFraction w ∧
+      conversion * w / (conversion * 1 + conversion * w) =
+        Blindness.XiFromMarks.pioneerWeightFraction w ∧
         Real.exp (-(gamma * Blindness.XiFromMarks.pioneerWeightDisplacement gamma w)) * (1 + w) = 1
   /-- The critical log-mgf transform has unit additive mass and zero centered derivative mass. -/
   branchingRandomWalkBoundaryTransformIsCritical :
@@ -872,11 +882,16 @@ structure DynamicsObstructions : Prop where
     ∀ conversion gamma w backgroundCount pioneerCount : ℝ,
       conversion ≠ 0 → backgroundCount + pioneerCount ≠ 0 →
       Blindness.XiFromMarks.HasCommonProfileRelaxation conversion 1 w backgroundCount pioneerCount →
-        (Blindness.XiFromMarks.totalFamilyFraction ![Blindness.XiFromMarks.pioneerWeightFraction w] = Blindness.XiFromMarks.pioneerWeightFraction w ∧
-          Blindness.XiFromMarks.paintboxWeight ![Blindness.XiFromMarks.pioneerWeightFraction w] = Blindness.XiFromMarks.pioneerWeightFraction w ^ 2 ∧
-            Blindness.XiFromMarks.disjointPairMergeProbability ![Blindness.XiFromMarks.pioneerWeightFraction w] = 0) ∧
-          pioneerCount / (backgroundCount + pioneerCount) = Blindness.XiFromMarks.pioneerWeightFraction w ∧
-            Blindness.XiFromMarks.amplitudeFront gamma (1 + w) - Blindness.XiFromMarks.amplitudeFront gamma 1 =
+        (Blindness.XiFromMarks.totalFamilyFraction ![Blindness.XiFromMarks.pioneerWeightFraction w]
+          = Blindness.XiFromMarks.pioneerWeightFraction w ∧
+          Blindness.XiFromMarks.paintboxWeight ![Blindness.XiFromMarks.pioneerWeightFraction w] =
+            Blindness.XiFromMarks.pioneerWeightFraction w ^ 2 ∧
+            Blindness.XiFromMarks.disjointPairMergeProbability
+              ![Blindness.XiFromMarks.pioneerWeightFraction w] = 0) ∧
+          pioneerCount / (backgroundCount + pioneerCount) =
+            Blindness.XiFromMarks.pioneerWeightFraction w ∧
+            Blindness.XiFromMarks.amplitudeFront gamma (1 + w) -
+              Blindness.XiFromMarks.amplitudeFront gamma 1 =
               Blindness.XiFromMarks.pioneerWeightDisplacement gamma w
   /-- Linear pulled clocks and superlinear stable clocks lie on opposite sides of reciprocal
   summability; using this as an identifiability theorem still requires the transform-system
@@ -892,7 +907,8 @@ structure DynamicsObstructions : Prop where
   genomicAlgorithmicRiskSignatureIsCoarsest :
     ∀ (Algorithm Design Model Loss : Type)
       (risk : Algorithm → Design → Model → Loss → ℝ),
-      Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk (Blindness.TrafficInvariantSeparation.algorithmicRiskSignature risk) ∧
+      Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk
+        (Blindness.TrafficInvariantSeparation.algorithmicRiskSignature risk) ∧
         ∀ (Invariant : Type) (invariant : Design → Invariant),
           Blindness.TrafficInvariantSeparation.RiskSignaturesFactorThrough risk invariant →
             ∀ left right, invariant left = invariant right →
@@ -913,7 +929,8 @@ structure DynamicsObstructions : Prop where
         ∑ vertex, degree term vertex = 2 * edges term) →
         Filter.Tendsto
           (fun population : ℕ ↦
-            Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+            Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient
+              hasOddDegree vertices edges
               (population + 1))
           Filter.atTop (nhds 0)
   /-- The same concrete balanced matrices simultaneously certify PSD order,
@@ -927,7 +944,8 @@ structure DynamicsObstructions : Prop where
       ∀ baseline spikeStrength temperature : ℝ,
         0 ≤ baseline → 0 < spikeStrength →
         1 < temperature * spikeStrength →
-          Blindness.TrafficInvariantSeparation.ConcreteBalancedPSDPressureWitness coefficient hasOddDegree vertices edges
+          Blindness.TrafficInvariantSeparation.ConcreteBalancedPSDPressureWitness coefficient
+            hasOddDegree vertices edges
             baseline spikeStrength temperature
   /-- A mesoscopic LD block vanishes from every fixed traffic coordinate but has unit normalized
   energy after a logarithmic number of power iterations. -/
@@ -941,8 +959,10 @@ structure DynamicsObstructions : Prop where
           (fun iteration ↦ diagonalTrafficCorrection baseline 1 iteration)
           Filter.atTop (nhds 0) ∧
         ∀ iteration,
-          Blindness.TrafficInvariantSeparation.amplifiedDegreeOneTrafficDifference baseline iteration = 2
-  /-- The genuine finite diagonal iteration realizes the same separation with ambient dimension `16^k`, exceptional rank `4^k`, fixed-time decay, and
+          Blindness.TrafficInvariantSeparation.amplifiedDegreeOneTrafficDifference baseline
+            iteration = 2
+  /-- The genuine finite diagonal iteration realizes the same separation with ambient dimension
+  `16^k`, exceptional rank `4^k`, fixed-time decay, and
   unit logarithmic-time normalized output. -/
   rareLDSubspaceConcreteGFOMEvadesFixedTrafficAtLogRuntime :
     Blindness.TrafficInvariantSeparation.ConcreteGFOMLogRuntimeSeparation
@@ -951,7 +971,8 @@ structure DynamicsObstructions : Prop where
   optimum at every finite size. -/
   genomicBulkSpectralLawDoesNotDetermineExtremalSpectrumOrSDP :
     ∀ baseline spikeStrength : ℝ, 0 < spikeStrength →
-      Blindness.TrafficInvariantSeparation.BulkSpectralLawExtremalSDPSeparation baseline spikeStrength
+      Blindness.TrafficInvariantSeparation.BulkSpectralLawExtremalSDPSeparation baseline
+        spikeStrength
   /-- Every finite contracted rank-one LD traffic expansion vanishes, while
   the associated variational pressure is positive above `tλ = 1`. -/
   positiveLDSpikeFixedTrafficInvisibleVariationalPressureVisible :
@@ -962,7 +983,8 @@ structure DynamicsObstructions : Prop where
       ∀ tlam : ℝ, 1 < tlam →
         Filter.Tendsto
             (fun population : ℕ ↦
-              Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+              Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection coefficient
+                hasOddDegree vertices edges
                 (population + 1))
             Filter.atTop (nhds 0) ∧
           0 < Blindness.TrafficInvariantSeparation.cwVariationalPressureGap tlam
@@ -982,7 +1004,8 @@ structure DynamicsObstructions : Prop where
   genomicFiniteCWPressureDominatesVariationalObjective :
     ∀ (population : ℕ) (tlam m : ℝ),
       0 < population → 0 ≤ tlam → |m| < 1 →
-        Blindness.TrafficInvariantSeparation.cwObjective tlam m ≤ Blindness.TrafficInvariantSeparation.finiteCWPressureGap population tlam
+        Blindness.TrafficInvariantSeparation.cwObjective tlam m ≤
+          Blindness.TrafficInvariantSeparation.finiteCWPressureGap population tlam
   /-- Every finite genotype-count type has mass at most one at and below the
   critical LD coupling. -/
   genomicFiniteCWTypeMassLeOneOfSubcritical :
@@ -994,7 +1017,8 @@ structure DynamicsObstructions : Prop where
   genomicFiniteCWPressureHasExactCriticalPoint :
     ∀ tlam : ℝ, 0 ≤ tlam →
       (Filter.Tendsto
-          (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population + 1) tlam)
+          (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population
+            + 1) tlam)
           Filter.atTop (nhds 0) ↔
         tlam ≤ 1)
   /-- The actual finite genomic pressure converges to its full variational LD
@@ -1002,7 +1026,8 @@ structure DynamicsObstructions : Prop where
   genomicFiniteCWPressureConvergesToVariational :
     ∀ tlam : ℝ, 0 ≤ tlam →
       Filter.Tendsto
-        (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population + 1) tlam)
+        (fun population : ℕ ↦ Blindness.TrafficInvariantSeparation.finiteCWPressureGap (population +
+          1) tlam)
         Filter.atTop (nhds (Blindness.TrafficInvariantSeparation.cwVariationalPressureGap tlam))
   /-- The full finite genomic pressure limit is uniform over all nonnegative
   LD couplings. -/
@@ -1036,7 +1061,8 @@ structure DynamicsObstructions : Prop where
   positiveLDSpikePressureDifferenceHasExactCriticalPoint :
     ∀ baseline temperature spikeStrength : ℝ,
       0 ≤ temperature * spikeStrength →
-        Blindness.TrafficInvariantSeparation.FiniteRankOnePressureCriticalStatement baseline temperature spikeStrength
+        Blindness.TrafficInvariantSeparation.FiniteRankOnePressureCriticalStatement baseline
+          temperature spikeStrength
   /-- The complete finite LD-spiked pressure converges to baseline plus its
   variational pressure correction. -/
   positiveLDSpikePressureConvergesToVariational :
@@ -1048,7 +1074,8 @@ structure DynamicsObstructions : Prop where
   uniformly over all nonnegative spike strengths. -/
   positiveLDSpikePressureConvergesUniformlyOnNonnegativeStrength :
     ∀ baseline temperature : ℝ, 0 ≤ temperature →
-      Blindness.TrafficInvariantSeparation.FiniteRankOnePressureUniformLimitStatement baseline temperature
+      Blindness.TrafficInvariantSeparation.FiniteRankOnePressureUniformLimitStatement baseline
+        temperature
   /-- One positive LD spike simultaneously defeats fixed traffic sufficiency
   and the lower-ground-state characterization. -/
   positiveLDSpikeRefutesTrafficAndGroundStateDichotomies :
@@ -1061,7 +1088,8 @@ structure DynamicsObstructions : Prop where
         0 < spikeStrength → population ≠ 0 →
         alignment orthogonal = 0 → alignment aligned = population →
         1 < temperature * spikeStrength →
-          Blindness.TrafficInvariantSeparation.RankOneSpikeRefutesBothDichotomies coefficient hasOddDegree vertices edges
+          Blindness.TrafficInvariantSeparation.RankOneSpikeRefutesBothDichotomies coefficient
+            hasOddDegree vertices edges
             alignment orthogonal aligned baseline spikeStrength population temperature
   /-- Positive-cone order and the lower genetic ground state do not determine exponential
   pressure: an orthogonal state preserves the minimum while an aligned state separates. -/
@@ -1069,9 +1097,11 @@ structure DynamicsObstructions : Prop where
     ∀ baseline spikeStrength population tlam : ℝ, 0 ≤ spikeStrength →
       2 * Real.log 2 < tlam →
         ((∀ state : Bool, baseline ≤
-            Blindness.TrafficInvariantSeparation.rankOneEnergyDensity baseline spikeStrength population
+            Blindness.TrafficInvariantSeparation.rankOneEnergyDensity baseline spikeStrength
+              population
               (if state = true then population else 0)) ∧
-          Blindness.TrafficInvariantSeparation.rankOneEnergyDensity baseline spikeStrength population
+          Blindness.TrafficInvariantSeparation.rankOneEnergyDensity baseline spikeStrength
+            population
             (if false = true then population else 0) = baseline) ∧
           0 < Blindness.TrafficInvariantSeparation.cwObjective tlam 1
   /-- The positive-temperature LD-spike pressure separates at exactly `tλ = 1`. -/
@@ -1086,7 +1116,8 @@ structure DynamicsObstructions : Prop where
   /-- The genomic LD pressure profile is globally half-Lipschitz, continuous,
   monotone, and convex in effective coupling. -/
   ldVariationalPressureGapHasGlobalRegularity :
-    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal) Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
+    LipschitzWith (⟨1 / 2, by norm_num⟩ : NNReal)
+      Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
       Continuous Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
         Monotone Blindness.TrafficInvariantSeparation.cwVariationalPressureGap ∧
           ConvexOn ℝ Set.univ Blindness.TrafficInvariantSeparation.cwVariationalPressureGap
@@ -1215,7 +1246,8 @@ structure DynamicsObstructions : Prop where
       (∀ population,
         (certificate population).nuclearDistance =
           Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.normalizedNuclearDistance
-            (Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum population spikeStrength hspike)) →
+            (Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum population
+              spikeStrength hspike)) →
         Filter.Tendsto
           (fun population ↦ (certificate population).informationPath 1 -
             (certificate population).informationPath 0)
@@ -1330,7 +1362,8 @@ structure DynamicsObstructions : Prop where
   /-- Every degree-limited genomic risk that factors through a common truncated traffic profile
   inherits the complete Bayes-risk gap on one shared design. -/
   degreeLimitedGenomicRiskHasFullGapHardness :
-    ∀ (Algorithm : Type) (D : ℕ) (risk : Algorithm → Blindness.TrafficInvariantSeparation.TruncatedTrafficRisk D)
+    ∀ (Algorithm : Type) (D : ℕ) (risk : Algorithm →
+      Blindness.TrafficInvariantSeparation.TruncatedTrafficRisk D)
       (left right : Fin (D + 1) → ℝ), left = right →
       ∀ bayesLeft bayesRight : ℝ,
         (∀ algorithm, bayesRight ≤ (risk algorithm).evaluate right) →
@@ -1392,11 +1425,13 @@ structure DynamicsObstructions : Prop where
       [Fintype Locus] [Fintype Graph] [DecidableEq Graph]
       (shape : (Slot → Locus) → Graph)
       (coefficient value : (Slot → Locus) → ℝ),
-      (∀ left right, shape left = shape right → Blindness.TrafficInvariantSeparation.SameEqualityPattern left right) →
+      (∀ left right, shape left = shape right →
+        Blindness.TrafficInvariantSeparation.SameEqualityPattern left right) →
       (∀ (permutation : Equiv.Perm Locus) monomial,
         coefficient (permutation ∘ monomial) = coefficient monomial) →
         (∑ monomial, coefficient monomial * value monomial) =
-          ∑ graph, Blindness.TrafficInvariantSeparation.graphShapeCoefficient shape coefficient graph *
+          ∑ graph, Blindness.TrafficInvariantSeparation.graphShapeCoefficient shape coefficient
+            graph *
             ∑ monomial, if shape monomial = graph then value monomial else 0
   /-- Canonical unrooted factorization through the quotient by endpoint
   equality pattern requires no caller-supplied graph encoding. -/
@@ -1405,7 +1440,8 @@ structure DynamicsObstructions : Prop where
       (coefficient value : (Slot → Locus) → ℝ),
       (∀ (permutation : Equiv.Perm Locus) monomial,
         coefficient (permutation ∘ monomial) = coefficient monomial) →
-        Blindness.TrafficInvariantSeparation.CanonicalTrafficFactorizationStatement coefficient value
+        Blindness.TrafficInvariantSeparation.CanonicalTrafficFactorizationStatement coefficient
+          value
   /-- Canonical rooted factorization uses `none` as the output locus and
   `some slot` as matrix-entry endpoint slots. -/
   permutationEquivariantGenomicPolynomialFactorsThroughRootedLDGraphs :
@@ -1413,7 +1449,8 @@ structure DynamicsObstructions : Prop where
       (coefficient value : (Option Slot → Locus) → ℝ),
       (∀ (permutation : Equiv.Perm Locus) monomial,
         coefficient (permutation ∘ monomial) = coefficient monomial) →
-        Blindness.TrafficInvariantSeparation.RootedCanonicalTrafficFactorizationStatement coefficient value
+        Blindness.TrafficInvariantSeparation.RootedCanonicalTrafficFactorizationStatement
+          coefficient value
   /-- The homogeneous decomposition proves exact traffic factorization for
   every scalar genomic polynomial of total degree at most `D`. -/
   degreeLimitedGenomicPolynomialFactorsThroughCanonicalLDGraphs :
@@ -1422,7 +1459,8 @@ structure DynamicsObstructions : Prop where
         ((Fin (degree : ℕ) × Bool → Locus) → ℝ)),
       (∀ degree (permutation : Equiv.Perm Locus) monomial,
         coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
-        Blindness.TrafficInvariantSeparation.DegreeAtMostTrafficFactorizationStatement coefficient value
+        Blindness.TrafficInvariantSeparation.DegreeAtMostTrafficFactorizationStatement coefficient
+          value
   /-- The rooted homogeneous decomposition gives the corresponding exact
   degree-`D` statement for equivariant vector-polynomial coordinates. -/
   degreeLimitedGenomicEquivariantPolynomialFactorsThroughRootedLDGraphs :
@@ -1431,7 +1469,8 @@ structure DynamicsObstructions : Prop where
         ((Option (Fin (degree : ℕ) × Bool) → Locus) → ℝ)),
       (∀ degree (permutation : Equiv.Perm Locus) monomial,
         coefficient degree (permutation ∘ monomial) = coefficient degree monomial) →
-        Blindness.TrafficInvariantSeparation.DegreeAtMostRootedTrafficFactorizationStatement coefficient value
+        Blindness.TrafficInvariantSeparation.DegreeAtMostRootedTrafficFactorizationStatement
+          coefficient value
   /-- Equality of canonical profiles implies exact equality of every invariant
   scalar polynomial of degree at most `D`. -/
   degreeLimitedGenomicPolynomialIsDeterminedByCanonicalLDProfile :
@@ -1553,8 +1592,10 @@ structure DynamicsObstructions : Prop where
   /-- Every uniformly bounded countable exponential/LD profile has one common
   coordinatewise-convergent subsequence. -/
   genomicExponentialProfileIsSequentiallyCompact :
-    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound),
-      ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound),
+      ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence
+        : ℕ → ℕ,
         StrictMono subsequence ∧
           ∀ coordinate : ℕ,
             Filter.Tendsto (fun n ↦ profiles (subsequence n) coordinate)
@@ -1562,7 +1603,8 @@ structure DynamicsObstructions : Prop where
   /-- The explicit weighted exponential-profile formula satisfies the metric
   laws on bounded genomic pressure profiles. -/
   genomicExponentialProfileDistanceSatisfiesMetricLaws :
-    ∀ (bound : ℝ) (left middle right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound),
+    ∀ (bound : ℝ) (left middle right :
+      Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound),
       0 ≤ exponentialProfileDistance left right ∧
         exponentialProfileDistance left right = exponentialProfileDistance right left ∧
         exponentialProfileDistance left right ≤
@@ -1572,11 +1614,13 @@ structure DynamicsObstructions : Prop where
   metric and is compact in its standard topology. -/
   genomicExponentialProfilePointIsCompactMetricSpace :
     ∀ bound : ℝ,
-      IsCompact (Set.univ : Set (Blindness.TrafficInvariantSeparation.ExponentialProfilePoint bound))
+      IsCompact (Set.univ : Set (Blindness.TrafficInvariantSeparation.ExponentialProfilePoint
+        bound))
   /-- Metric convergence of bundled genomic profiles is coordinatewise
   convergence of every enumerated pressure. -/
   genomicExponentialProfilePointConvergenceIsCoordinatewise :
-    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.ExponentialProfilePoint bound)
+    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.ExponentialProfilePoint
+      bound)
       (limit : Blindness.TrafficInvariantSeparation.ExponentialProfilePoint bound),
       Filter.Tendsto profiles Filter.atTop (nhds limit) ↔
         ∀ coordinate : ℕ,
@@ -1585,7 +1629,8 @@ structure DynamicsObstructions : Prop where
   /-- Convergence in the explicit genomic right-profile distance is equivalent
   to convergence of every enumerated pressure coordinate. -/
   genomicExponentialProfileDistanceCharacterizesConvergence :
-    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound)
+    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound)
       (limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound),
       Filter.Tendsto (fun n ↦ exponentialProfileDistance (profiles n) limit)
           Filter.atTop (nhds 0) ↔
@@ -1595,7 +1640,8 @@ structure DynamicsObstructions : Prop where
   /-- A finite prefix of genomic pressure coordinates controls the complete
   right-profile distance by the exact remaining geometric tail. -/
   genomicExponentialProfileHasFiniteCoordinateApproximation :
-    ∀ (bound : ℝ) (left right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound)
+    ∀ (bound : ℝ) (left right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound)
       (prefixLength : ℕ),
       (∀ coordinate < prefixLength, left coordinate = right coordinate) →
         exponentialProfileDistance left right ≤ 2 ∧
@@ -1604,8 +1650,10 @@ structure DynamicsObstructions : Prop where
   /-- Every bounded sequence has a subsequence converging in the explicit
   weighted exponential-profile distance. -/
   genomicExponentialProfileIsCompactInExplicitDistance :
-    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound),
-      ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence : ℕ → ℕ,
+    ∀ (bound : ℝ) (profiles : ℕ → Blindness.TrafficInvariantSeparation.BoundedExponentialProfile
+      bound),
+      ∃ limit : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound, ∃ subsequence
+        : ℕ → ℕ,
         StrictMono subsequence ∧
           Filter.Tendsto
             (fun n ↦ exponentialProfileDistance (profiles (subsequence n)) limit)
@@ -1613,7 +1661,8 @@ structure DynamicsObstructions : Prop where
   /-- Equal unconditioned Bolthausen--Sznitman genealogy does not determine the conditioned
   family: the logarithmic and linear response marks already separate at three lineages. -/
   speedConditionedGenealogyRetainsResponseMark :
-    Blindness.MarkedBreakout.linearDisplacementTripleRate 1 ≠ Blindness.speedTiltBetaMergerRate 1 3 3
+    Blindness.MarkedBreakout.linearDisplacementTripleRate 1 ≠ Blindness.speedTiltBetaMergerRate 1 3
+      3
   /-- The cubic genealogical clock belongs to pioneer susceptibility, not coalescent theory. -/
   pioneerSusceptibilitySetsClock :
     ∀ width : ℝ, Blindness.MarkedBreakout.genealogicalTimescale width 3 = width ^ 3
@@ -1672,7 +1721,8 @@ structure DynamicsObstructions : Prop where
   with the normalization made explicit. -/
   correctionContrastIsCalibrationDrift :
     ∀ persists y, dynamicsContrast persists =
-      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists y
+      2 * Portability.posteriorDrift binaryDynamicsPosterior binaryConditionalContextMatch persists
+        y
 
 /-- **The finite obstruction theorem.**  Dynamics, dependence, value allocation, and
 local operator geometry each carry information invisible to a tempting scalar reduction.

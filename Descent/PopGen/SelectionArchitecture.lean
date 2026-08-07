@@ -6,9 +6,13 @@ import Descent.PopGen.DemographicHistory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
---   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`, `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
+--   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`,
+--   `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -356,7 +360,8 @@ theorem fluctuatingEffectCorrelation_at_zero (autocorrTime : ℝ) :
 theorem fluctuating_correlation_decays
     (t₁ t₂ autocorrTime : ℝ)
     (h_τ : 0 < autocorrTime) (h_more : t₁ < t₂) :
-    fluctuatingEffectCorrelation t₂ autocorrTime < fluctuatingEffectCorrelation t₁ autocorrTime := by
+    fluctuatingEffectCorrelation t₂ autocorrTime < fluctuatingEffectCorrelation t₁ autocorrTime
+      := by
   unfold fluctuatingEffectCorrelation
   apply Real.exp_lt_exp.mpr
   rw [neg_div, neg_div, neg_lt_neg_iff]
@@ -409,14 +414,16 @@ theorem optimumOUVariance_at_reference_point :
 /-- **The stationary optimum variance is quadratic in the driving amplitude.**
 Halving the amplitude quarters the variance. -/
 theorem optimumOUVariance_amplitude_scaling (sigmaTheta autocorrTime c : ℝ) :
-    optimumOUVariance (c * sigmaTheta) autocorrTime = c ^ 2 * optimumOUVariance sigmaTheta autocorrTime := by
+    optimumOUVariance (c * sigmaTheta) autocorrTime = c ^ 2 * optimumOUVariance sigmaTheta
+      autocorrTime := by
   unfold optimumOUVariance
   ring
 
 /-- **The stationary optimum variance is linear in autocorrelation time.**
 Halving the correlation time halves the variance. -/
 theorem optimumOUVariance_time_scaling (sigmaTheta autocorrTime c : ℝ) :
-    optimumOUVariance sigmaTheta (c * autocorrTime) = c * optimumOUVariance sigmaTheta autocorrTime := by
+    optimumOUVariance sigmaTheta (c * autocorrTime) = c * optimumOUVariance sigmaTheta autocorrTime
+      := by
   unfold optimumOUVariance
   ring
 
@@ -518,7 +525,8 @@ theorem stabilizingNsFromObservedCorrelation_gt_half_iff
     the biologically relevant region `ρ < 1`. -/
 theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
     (effectCorr : ℝ) (h_rho_lt : effectCorr < 1) :
-    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation effectCorr) = effectCorr := by
+    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation effectCorr) = effectCorr
+      := by
   unfold effectCorrelationStabilizing stabilizingNsFromObservedCorrelation
   have h_one_minus_ne : 1 - effectCorr ≠ 0 := by linarith
   field_simp [h_one_minus_ne]
@@ -588,7 +596,8 @@ theorem tauFromObservedEffectCorrelation_at_one_efold (t : ℝ) :
 theorem fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
     (t effectCorr : ℝ)
     (h_t : 0 < t) (h_rho : 0 < effectCorr) (h_rho_lt : effectCorr < 1) :
-    fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t effectCorr) = effectCorr := by
+    fluctuatingEffectCorrelation t (tauFromObservedEffectCorrelation t effectCorr) = effectCorr
+      := by
   have h_t_ne : t ≠ 0 := ne_of_gt h_t
   have h_log_neg : Real.log effectCorr < 0 := by
     have h_log_lt : Real.log effectCorr < Real.log 1 :=
@@ -902,7 +911,8 @@ noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
-  norm_num [gwasNCP, Portability.ncp, Portability.effectiveFisherInformation, Portability.fisherInformation, Portability.genotypeVarianceHWE,
+  norm_num [gwasNCP, Portability.ncp, Portability.effectiveFisherInformation,
+    Portability.fisherInformation, Portability.genotypeVarianceHWE,
       Descent.Core.product,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
@@ -915,7 +925,8 @@ theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
   constructor
   · intro h
     rcases (Portability.ncp_eq_zero_iff _ _).1 h with h_information | h_effect
-    · rcases (Portability.effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with h_n | h_p_zero | h_p_one | h_impossible
+    · rcases (Portability.effectiveFisherInformation_eq_zero_iff n p 1).1 h_information with h_n |
+        h_p_zero | h_p_one | h_impossible
       · exact Or.inl h_n
       · exact Or.inr (Or.inr (Or.inl h_p_zero))
       · exact Or.inr (Or.inr (Or.inr h_p_one))
@@ -928,7 +939,8 @@ theorem gwasNCP_eq_zero_iff (n : ℕ) (β p : ℝ) :
     · exact (Portability.ncp_eq_zero_iff _ _).2 <| Or.inl <|
         (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inl h_p_zero))
     · exact (Portability.ncp_eq_zero_iff _ _).2 <| Or.inl <|
-        (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inr (Or.inl h_p_one)))
+        (Portability.effectiveFisherInformation_eq_zero_iff n p 1).2 (Or.inr (Or.inr (Or.inl
+          h_p_one)))
 
 /-- GWAS non-centrality is positive exactly for a nonempty study, nonzero effect,
 and polymorphic locus. -/
@@ -938,7 +950,8 @@ theorem gwasNCP_pos_iff (n : ℕ) (β p : ℝ) :
   constructor
   · intro h
     rcases mul_pos_iff.mp h with ⟨h_information, h_effect⟩ | ⟨_, h_effect⟩
-    · rcases (Portability.fullyTaggedFisherInformation_pos_iff n p).1 h_information with ⟨h_n, hp0, hp1⟩
+    · rcases (Portability.fullyTaggedFisherInformation_pos_iff n p).1 h_information with ⟨h_n, hp0,
+        hp1⟩
       refine ⟨h_n, ?_, hp0, hp1⟩
       intro h_zero
       rw [h_zero] at h_effect
@@ -957,7 +970,9 @@ theorem ncp_ratio_from_maf
     (h_maf : p₁ < p₂) (h_half : p₂ ≤ 1/2) :
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
-  unfold Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation Portability.genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation
+    Portability.genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy
   simp only [mul_one]
   apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
   apply mul_lt_mul_of_pos_left _ (Nat.cast_pos.mpr hn)

@@ -61,7 +61,8 @@ theorem sum_ER_one {M : Type*} [AddCommMonoid M] (w : ER 1 → M) :
   classical
   rw [Finset.sum_congr rfl (fun ξ _ ↦ congrArg w (Subsingleton.elim ξ (⊥ : ER 1)))]
   rw [Finset.sum_const, Finset.card_univ]
-  have hcard : Fintype.card (ER 1) = 1 := Fintype.card_eq_one_iff.mpr ⟨⊥, fun ξ ↦ Subsingleton.elim ξ ⊥⟩
+  have hcard : Fintype.card (ER 1) = 1 := Fintype.card_eq_one_iff.mpr ⟨⊥, fun ξ ↦ Subsingleton.elim
+    ξ ⊥⟩
   rw [hcard, one_smul]
 
 /-- **The fibre of restriction sums as a sum over seatings.**

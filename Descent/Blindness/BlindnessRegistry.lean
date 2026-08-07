@@ -8,7 +8,9 @@ import Descent.Blindness.XiFromMarkedBreakouts
 assert_below Descent.Conditionals Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -437,7 +439,8 @@ theorem averageEffect_eq_regression_slope
     Foundations.HardyWeinbergModel.centeredAltAlleleCount OneLocusArchitecture.averageEffect
   rw [h.expectedAltAlleleCount_eq, h.genotypeVariance_eq]
   rw [Foundations.sum_over_genotypes, Foundations.sum_over_genotypes]
-  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.altAlleleCount,
+    Descent.Core.Genotype.dosage,
     OneLocusArchitecture.genotypicValue, Foundations.HardyWeinbergModel.refFreq]
   rw [← hq]
   ring_nf

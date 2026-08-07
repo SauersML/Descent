@@ -412,7 +412,8 @@ haploid recursion would carry neither. -/
 theorem hetStepWithMutation_uses_coalescentTimeScale (Ne mu H : ℝ) :
     Portability.hetStepWithMutation Ne mu H
       = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * H + Descent.Core.ploidy * mu * (1 - H) := by
-  unfold Portability.hetStepWithMutation Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+  unfold Portability.hetStepWithMutation Descent.Core.ploidy; rw
+    [Descent.Core.coalescentTimeScale_eq]
 
 /-- **The closed-population retention is the coalescent retention over the horizon.** -/
 theorem retention_uses_coalescentTimeScale (r : Portability.ClosedPopulationNoMutation) :

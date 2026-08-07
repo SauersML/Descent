@@ -549,7 +549,8 @@ theorem portability_ratio_with_target_ld_decay_any_source
   -- Numerator: rhoT < rhoS implies R²(rhoT·u) < R²(rhoS·u)
   have h_num_lt :
       PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E <
-        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E := by
+        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoS) V_E
+          := by
     apply expectedR2_strictMono_nonneg V_E _ _ hVE
     · unfold realWorldPGSVariance
       exact le_of_lt (by simpa [mul_assoc] using mul_pos hRhoT_pos hu_pos)
@@ -559,7 +560,8 @@ theorem portability_ratio_with_target_ld_decay_any_source
   have hsource_sig_pos : 0 < realWorldPGSVariance V_A fstS rhoS := by
     unfold realWorldPGSVariance
     simpa [mul_assoc] using mul_pos (mul_pos hRhoS_pos (by linarith : 0 < 1 - fstS)) hVA
-  have h_den_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS rhoS) V_E := by
+  have h_den_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstS
+    rhoS) V_E := by
     unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     exact div_pos hsource_sig_pos (by linarith)
   -- Divide both sides by positive denominator
@@ -606,7 +608,8 @@ theorem portability_ratio_with_ld_decay
     unfold presentDayPGSVariance pgsVarianceFromHet Descent.Core.product
     have h1s : 0 < 1 - fstS := by linarith
     exact mul_pos hVA h1s
-  have hR2Source_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
+  have hR2Source_pos : 0 < PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A
+    fstS) V_E := by
     unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
     have hden : 0 < presentDayPGSVariance V_A fstS + V_E := by linarith [hSourcePos, hVE]
     exact div_pos hSourcePos hden
@@ -616,9 +619,11 @@ theorem portability_ratio_with_ld_decay
         PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E /
           PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E := by
     have hmul :
-        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E * (PopGen.TransportedMetrics.r2FromSignalVariance
+        PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rhoT) V_E *
+          (PopGen.TransportedMetrics.r2FromSignalVariance
             (presentDayPGSVariance V_A fstS) V_E)⁻¹ <
-          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E * (PopGen.TransportedMetrics.r2FromSignalVariance
+          PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstT) V_E *
+            (PopGen.TransportedMetrics.r2FromSignalVariance
               (presentDayPGSVariance V_A fstS) V_E)⁻¹ :=
       mul_lt_mul_of_pos_right hR2Target_lt (inv_pos.mpr hR2Source_pos)
     simpa [div_eq_mul_inv] using hmul
@@ -1098,7 +1103,8 @@ theorem neutralAFBenchmarkMetricProfile_eq
   · change
       PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstTarget) V_E =
         targetR2FromNeutralAFBenchmark V_A V_E fstTarget
-    unfold targetR2FromNeutralAFBenchmark PopGen.TransportedMetrics.r2FromSignalVariance presentDayR2
+    unfold targetR2FromNeutralAFBenchmark PopGen.TransportedMetrics.r2FromSignalVariance
+      presentDayR2
     rfl
   · change
       equalVarianceGaussianAUCFromSignalVariance (presentDayPGSVariance V_A
@@ -1436,7 +1442,8 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance
     exact (div_lt_one h_total).2 (lt_add_of_pos_right vSignal h_env)
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ h_r2_lt]
   rw [← equalVarianceGaussianAUCFromSNR_eq_variance vSignal vEnv (ne_of_gt h_env)]
-  unfold equalVarianceGaussianAUCFromSNR PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
+  unfold equalVarianceGaussianAUCFromSNR PopGen.TransportedMetrics.r2FromSignalVariance
+    Descent.Core.share
   congr 2
   -- `field_simp` was called without the two nonzero facts proved directly
   -- above, so it could not cancel `vEnv` and left `X * Y * Y⁻¹ = X` for
@@ -1860,7 +1867,8 @@ theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC
   have hchart :
       presentDayR2 V_A V_E fst / (2 * (1 - presentDayR2 V_A V_E fst)) =
         presentDaySignalToNoise V_A V_E fst / 2 := by
-    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance presentDaySignalToNoise Descent.Core.share
+    unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance presentDaySignalToNoise
+      Descent.Core.share
     field_simp [hsum_ne, hve_ne]
     ring
   rw [equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _ hr2_lt]
@@ -1974,7 +1982,8 @@ theorem brierRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem brierRegretPoint_eq_sq_error (η q : ℝ) :
     brierRegretPoint η q = (q - η) ^ 2 := by
   unfold brierRegretPoint
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Program.brier_regret_pointwise η q
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Program.brier_regret_pointwise η
+    q
 
 /-- Ratio form in present-day units: Brier-regret ratio is a squared-error ratio. -/
 theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
@@ -2208,7 +2217,8 @@ theorem tagAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
     Portability.tagAlleleFreqRetentionAt m t i =
       genotypeVarianceHWE (Portability.tagAlleleFreqTargetAt m t i) /
         genotypeVarianceHWE (m.tagAlleleFreqSource i) := by
-  unfold Portability.tagAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold Portability.tagAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring
 
 /-- **The same two, at the causal variants.** `causalAlleleFreqRetentionAt` is
 the identical ratio on the causal side, and it is tied here separately rather
@@ -2219,6 +2229,7 @@ theorem causalAlleleFreqRetentionAt_eq_genotypeVarianceHWE_ratio {p q : ℕ}
     Portability.causalAlleleFreqRetentionAt m t j =
       genotypeVarianceHWE (Portability.causalAlleleFreqTargetAt m t j) /
         genotypeVarianceHWE (m.causalAlleleFreqSource j) := by
-  unfold Portability.causalAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy; ring
+  unfold Portability.causalAlleleFreqRetentionAt genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy; ring
 
 end Descent.Portability

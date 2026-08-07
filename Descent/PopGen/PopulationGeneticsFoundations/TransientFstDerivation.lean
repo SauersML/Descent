@@ -8,9 +8,13 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.SpectralDegradation`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.SpectralDegradation`
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -348,7 +352,8 @@ theorem hetDecayFactor_expansion (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : Ne 
 
 /-- **The θ/(4N²) correction is negligible for large Ne.**
     |hetDecayFactor - (1 - (1+θ)/(2N))| = θ/(4N²), which vanishes as N → ∞. -/
-theorem hetDecayFactor_approx_error (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : 0 < Ne) (hθ : 0 ≤ θ.value) :
+theorem hetDecayFactor_approx_error (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : 0 < Ne) (hθ : 0 ≤
+  θ.value) :
     |hetDecayFactor Ne θ - (1 - (1 + θ.value) / (2 * Ne))| = θ.value / (4 * Ne ^ 2) := by
   rw [hetDecayFactor_expansion Ne θ (ne_of_gt hNe)]
   have : 1 - (1 + θ.value) / (2 * Ne) + θ.value / (4 * Ne ^ 2) - (1 - (1 + θ.value) / (2 * Ne)) =
@@ -366,7 +371,8 @@ theorem hetDecayFactor_approx_error (Ne : ℝ) (θ : Descent.Core.Theta) (hNe : 
 theorem fstTransientDiscrete_eq_explicit (Ne : ℝ) (θ : Descent.Core.Theta) (t : ℕ) :
     fstMutationDriftTransientDiscrete θ Ne t =
       1 / (1 + θ.value) * (1 - ((1 - 1 / (2 * Ne)) * (1 - θ.value / (2 * Ne))) ^ t) := by
-  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor Descent.Core.fstFromFlow
+  unfold fstMutationDriftTransientDiscrete fstMutationDriftEquilibrium hetDecayFactor
+    Descent.Core.fstFromFlow
     hetDecayFromScaled
   rfl
 
@@ -401,7 +407,8 @@ theorem hudsonFst_eq_fstFromHetRatio (p₁ p₂ : ℝ)
 
 theorem hetDecayFactor_uses_timeScale (Ne : ℝ) (θ : Descent.Core.Theta) :
     PopGen.hetDecayFactor Ne θ
-      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * (1 - θ.value / Descent.Core.coalescentTimeScale Ne) := by
+      = (1 - 1 / Descent.Core.coalescentTimeScale Ne) * (1 - θ.value /
+        Descent.Core.coalescentTimeScale Ne) := by
   unfold PopGen.hetDecayFactor PopGen.hetDecayFromScaled; rw [Descent.Core.coalescentTimeScale_eq]
 
 end Descent.PopGen

@@ -5,9 +5,11 @@ import Descent.PopGen.EpistasisAndNonAdditivity
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Conditionals`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Conditionals`:
 --   Spectral: reaches 1 module(s) -- `Descent.Spectral.PolygenicSpectroscopy`
---   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`, `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
+--   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`,
+--   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.LocalToGlobalCoherence`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -75,9 +77,11 @@ predictors with the trait is the predictor covariance applied to the causal
 effect vector. -/
 theorem crossCovVector_causalSignal_self
     (E : Foundations.ExpFunctional Ω) (X : Ω → J → ℝ) (β : J → ℝ) :
-    Foundations.crossCovVector E X (Foundations.causalSignal β X) = (Foundations.covarianceMatrix E X).mulVec β := by
+    Foundations.crossCovVector E X (Foundations.causalSignal β X) = (Foundations.covarianceMatrix E
+      X).mulVec β := by
   funext i
-  unfold Foundations.crossCovVector Foundations.causalSignal Foundations.dot Foundations.covarianceMatrix Matrix.mulVec Descent.Core.innerSum
+  unfold Foundations.crossCovVector Foundations.causalSignal Foundations.dot
+    Foundations.covarianceMatrix Matrix.mulVec Descent.Core.innerSum
   rw [Foundations.covariance_finset_sum_right]
   simp only [Matrix.of_apply, dotProduct]
   refine Finset.sum_congr rfl ?_

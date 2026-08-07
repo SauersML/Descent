@@ -121,7 +121,8 @@ theorem singular_quadratic_excess_risk_identity
   have hnormalDotV : Foundations.dot v b = Foundations.dot v (B.mulVec v) := by rw [← hnormal]
   have hcross : Foundations.dot v (B.mulVec w) = Foundations.dot w (B.mulVec v) := hsymmetric v w
   rw [quadraticRisk, quadraticRisk, hnormalDotW, hnormalDotV,
-    matrix_mulVec_sub, Foundations.dot_sub_left, Foundations.dot_sub_right, Foundations.dot_sub_right, hcross]
+    matrix_mulVec_sub, Foundations.dot_sub_left, Foundations.dot_sub_right,
+      Foundations.dot_sub_right, hcross]
   ring
 
 omit [DecidableEq ι] in
@@ -235,7 +236,8 @@ theorem quadraticCoefficientDistance_eq_floor_add_sq
   unfold quadraticCoefficientDistance scalarCorrectionFloor bestScalarCorrection
   rw [hscaled]
   rw [matrix_mulVec_sub, matrix_mulVec_smul, Foundations.dot_sub_left,
-    Foundations.dot_sub_right, Foundations.dot_sub_right, hleftScaled, hrightScaled, hbothScaled, hcross]
+    Foundations.dot_sub_right, Foundations.dot_sub_right, hleftScaled, hrightScaled, hbothScaled,
+      hcross]
   field_simp [hu]
   ring
 
@@ -286,7 +288,8 @@ omit [DecidableEq ι] in
 theorem weightedCovariancePool_energy
     (weightLeft weightRight : ℝ) (left right : Matrix ι ι ℝ)
     (shift : ι → ℝ) :
-    Foundations.dot shift ((weightedCovariancePool weightLeft weightRight left right).mulVec shift) =
+    Foundations.dot shift ((weightedCovariancePool weightLeft weightRight left right).mulVec shift)
+      =
       weightLeft * Foundations.dot shift (left.mulVec shift) +
         weightRight * Foundations.dot shift (right.mulVec shift) := by
   rw [weightedCovariancePool_mulVec]
@@ -472,7 +475,8 @@ include hweight hpsd in
 /-- A nonnegatively weighted pool of positive-semidefinite covariance energies remains
 nonnegative. -/
 theorem finiteEnvironmentCovariancePool_energy_nonneg :
-    0 ≤ Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) := by
+    0 ≤ Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift)
+      := by
   rw [finiteEnvironmentCovariancePool_energy]
   exact Finset.sum_nonneg fun environment _ ↦
     mul_nonneg (hweight environment) (hpsd.energy_nonneg environment shift)
@@ -519,7 +523,8 @@ theorem finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active :
   constructor
   · intro hpool environment hactive
     have hpoolEnergy :
-        Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0 := by
+        Foundations.dot shift ((finiteEnvironmentCovariancePool weight covariance).mulVec shift) = 0
+          := by
       rw [hpool]
       simp [Foundations.dot,
       Descent.Core.innerSum]

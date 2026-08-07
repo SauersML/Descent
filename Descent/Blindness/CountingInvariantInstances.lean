@@ -7,7 +7,9 @@ import Descent.Portability.PCCorrectability.ImitationCapacity
 assert_below Descent.Conditionals Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 12 module(s) -- `Descent.Portability.PCCorrectability.ImitationCapacity`, `Descent.Portability.PCCorrectability.Threshold`, `Descent.Portability.PortabilityDrift` and 9 more
+--   Portability: reaches 12 module(s) -- `Descent.Portability.PCCorrectability.ImitationCapacity`,
+--   `Descent.Portability.PCCorrectability.Threshold`, `Descent.Portability.PortabilityDrift` and 9
+--   more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -162,13 +164,16 @@ theorem meff_lipschitz_predictor_error_ge (n o : ℕ) (hn : 0 < n)
     (f : (ℕ → ℝ) → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hf : |f (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n)) -
             f (momentInvariant (Portability.meffSize n) (Portability.meffFlat n))|
-          ≤ L * momentDist o (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n))
+          ≤ L * momentDist o (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed
+            n))
                              (momentInvariant (Portability.meffSize n) (Portability.meffFlat n))) :
     ((n : ℝ) / ((n : ℝ) + 1) - L * (1 / ((n : ℝ) + 1))) / 2
       ≤ max |f (momentInvariant (Portability.meffSize n) (Portability.meffPerturbed n)) -
-              Portability.inverseTraceCertificate (Portability.meffSize n) (Portability.meffPerturbed n)|
+              Portability.inverseTraceCertificate (Portability.meffSize n)
+                (Portability.meffPerturbed n)|
             |f (momentInvariant (Portability.meffSize n) (Portability.meffFlat n)) -
-              Portability.inverseTraceCertificate (Portability.meffSize n) (Portability.meffFlat n)| := by
+              Portability.inverseTraceCertificate (Portability.meffSize n) (Portability.meffFlat n)|
+                := by
   have h := lipschitz_predictor_error_ge (meffApproxWitness n o hn) f L hL hf
   simpa [meffApproxWitness] using h
 

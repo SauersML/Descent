@@ -61,10 +61,12 @@ noncomputable def dynamicsContrastCoefficient (β : Bool → ℝ) : ℝ :=
 
 /-- The residual of canonical pooled correction is exactly the contrast component. -/
 theorem dynamicsPooledProjector_residual (β : Bool → ℝ) :
-    β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • Conditionals.dynamicsContrast := by
+    β - dynamicsPooledProjector β = dynamicsContrastCoefficient β • Conditionals.dynamicsContrast
+      := by
   funext persists
   cases persists <;>
-    simp [dynamicsPooledProjector_apply, dynamicsContrastCoefficient, Conditionals.dynamicsContrast] <;>
+    simp [dynamicsPooledProjector_apply, dynamicsContrastCoefficient, Conditionals.dynamicsContrast]
+      <;>
     ring
 
 /-- **Exact biological correction normal form.**  Every two-dynamics field is the sum of its
@@ -112,7 +114,8 @@ theorem dynamicsPoolingObservation_eq_iff_exists_add_contrast (β γ : Bool → 
 /-- The canonical pooled projector is representable by every positive uniform dictionary order. -/
 theorem dynamicsPooledProjector_mem_uniformCorrectionFamily
     (k : ℕ) (hk : 0 < k) :
-    dynamicsPooledProjector ∈ UniformCorrectionFamily Conditionals.dynamicsPoolingObservation k := by
+    dynamicsPooledProjector ∈ UniformCorrectionFamily Conditionals.dynamicsPoolingObservation k
+      := by
   apply factorsThrough_subset_uniformCorrectionFamily Conditionals.dynamicsPoolingObservation k hk
   exact ⟨Conditionals.dynamicsBroadcast, rfl⟩
 
@@ -181,7 +184,8 @@ theorem uniformDynamicsCorrection_eq_pooledProjector
     (hcommon : ∀ c : ℝ, C (fun _ : Bool ↦ c) = fun _ : Bool ↦ c) :
     C = dynamicsPooledProjector :=
   dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common C
-    (uniformCorrectionFamily_subset_factorsThrough Conditionals.dynamicsPoolingObservation k hC) hcommon
+    (uniformCorrectionFamily_subset_factorsThrough Conditionals.dynamicsPoolingObservation k hC)
+      hcommon
 
 /-- Every finite uniform biological correction is constant along the entire contrast orbit. -/
 theorem uniformDynamicsCorrection_add_contrast
@@ -195,7 +199,8 @@ theorem uniformDynamicsCorrection_add_contrast
 /-- The contrast coefficient of the common mode vanishes. -/
 theorem dynamicsContrastCoefficient_commonMode :
     dynamicsContrastCoefficient Conditionals.dynamicsCommonMode = 0 := by
-  norm_num [dynamicsContrastCoefficient, Conditionals.dynamicsCommonMode, Spectral.binaryFirstAnnotation,
+  norm_num [dynamicsContrastCoefficient, Conditionals.dynamicsCommonMode,
+    Spectral.binaryFirstAnnotation,
     Spectral.binarySecondAnnotation]
 
 /-- The contrast coefficient of the normalized contrast is one. -/

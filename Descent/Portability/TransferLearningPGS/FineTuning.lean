@@ -178,7 +178,8 @@ theorem scratchTargetR2_eq_deployedTransferTargetR2
       deployedTransferTargetR2 transported_r2
         (oracleTransportAdaptationGain transported_r2 oracle_target_r2)
         estimation_penalty := by
-  unfold scratchTargetR2 deployedTransferTargetR2 oracleTransportAdaptationGain Descent.Core.difference
+  unfold scratchTargetR2 deployedTransferTargetR2 oracleTransportAdaptationGain
+    Descent.Core.difference
   ring
 
 /-- The canonical deployed-transfer target `R²` can always be rewritten as the
@@ -308,7 +309,8 @@ theorem sampleLimitedScratchTargetR2_eq_targetHeritability_minus_noise_over_n_di
     (h_beta_nonzero : 0 < additiveGeneticVariance β_target) :
     sampleLimitedScratchTargetR2 (targetOracleR2DiagonalLD β_target var_y) noiseVar nTarget =
       additiveHeritability β_target var_y - noiseVar / nTarget := by
-  unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOracleR2DiagonalLD Descent.Core.difference
+  unfold sampleLimitedScratchTargetR2 scratchTargetR2 targetOracleR2DiagonalLD
+    Descent.Core.difference
   rw [sourceOptimalR2_eq_additiveHeritability β_target var_y h_var_y h_beta_nonzero]
 
 /-- Sample-limited scratch training is the canonical deployed-transfer target

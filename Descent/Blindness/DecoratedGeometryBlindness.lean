@@ -10,9 +10,12 @@ import Descent.Portability.ContinuumCalibration
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Conditionals`,
+-- `Descent.Portability`, `Descent.Program`:
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.ConditionalGain`
---   Portability: reaches 20 module(s) -- `Descent.Portability.ClinicalUtilityFairness`, `Descent.Portability.ContinuumCalibration`, `Descent.Portability.MetricSpecificPortability.PrecisionRecall` and 17 more
+--   Portability: reaches 20 module(s) -- `Descent.Portability.ClinicalUtilityFairness`,
+--   `Descent.Portability.ContinuumCalibration`,
+--   `Descent.Portability.MetricSpecificPortability.PrecisionRecall` and 17 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -461,7 +464,8 @@ directly below. -/
 /-- Equivalently, the aligned decoration is the canonical three-ancestry conditional itself. -/
 theorem ancestryScore_eq_threeAncestryConditional :
     Portability.ancestryScore = Portability.threeAncestryConditional := by
-  simpa only [Portability.ancestryScore, Portability.threeAncestryConditional] using Portability.ancestryScore_eq_ancestryScore
+  simpa only [Portability.ancestryScore, Portability.threeAncestryConditional] using
+    Portability.ancestryScore_eq_ancestryScore
 
 
 /-- The third population's risk under the transposed assignment, pinned. -/
@@ -474,7 +478,8 @@ theorem ancestryScoreSwapped_is_relabelling :
       Portability.ancestryScoreSwapped 1 = Portability.ancestryScore 2 ∧
         Portability.ancestryScoreSwapped 2 = Portability.ancestryScore 1 := by
   refine ⟨?_, ?_, ?_⟩ <;>
-    norm_num [Portability.ancestryScoreSwapped, Portability.ancestryScore, Portability.threeAncestryConditional, Matrix.cons_val_two, Matrix.tail_cons]
+    norm_num [Portability.ancestryScoreSwapped, Portability.ancestryScore,
+      Portability.threeAncestryConditional, Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- Both assignments carry the same margin energy: the two decorations are the same multiset of
 risks under the same weights. -/
@@ -482,21 +487,24 @@ theorem marginEnergy_witness_eq :
     marginEnergy witnessWeight Portability.ancestryScore =
       marginEnergy witnessWeight Portability.ancestryScoreSwapped := by
   rw [marginEnergy_eq, marginEnergy_eq]
-  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional, Portability.ancestryScoreSwapped, Fin.sum_univ_three,
+  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional,
+    Portability.ancestryScoreSwapped, Fin.sum_univ_three,
     Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- The margin energy of the witness, evaluated: two thirds. -/
 theorem marginEnergy_witnessAligned_eq :
     marginEnergy witnessWeight Portability.ancestryScore = 2 / 3 := by
   rw [marginEnergy_eq]
-  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional, Fin.sum_univ_three, Matrix.cons_val_two,
+  norm_num [witnessWeight, Portability.ancestryScore, Portability.threeAncestryConditional,
+    Fin.sum_univ_three, Matrix.cons_val_two,
     Matrix.tail_cons]
 
 /-- The alignment energy of the increasing assignment: ten thirds. -/
 theorem alignmentEnergy_witnessAligned_eq :
     alignmentEnergy witnessWeight witnessDivergence Portability.ancestryScore = 10 / 3 := by
   unfold alignmentEnergy
-  norm_num [witnessWeight, witnessDivergence, Portability.ancestryScore, Portability.threeAncestryConditional, Fin.sum_univ_three,
+  norm_num [witnessWeight, witnessDivergence, Portability.ancestryScore,
+    Portability.threeAncestryConditional, Fin.sum_univ_three,
     Matrix.cons_val_two, Matrix.tail_cons]
 
 /-- The alignment energy of the transposed assignment: two. -/

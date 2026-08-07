@@ -442,7 +442,8 @@ theorem scaledMigrationRate_pos (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 < m) :
 /-- Fst under migration-drift equilibrium equals 1/(1 + M). -/
 theorem fstMigrationDriftEquilibrium_eq_from_M (Ne m : ℝ) :
     fstMigrationDriftEquilibrium Ne m = 1 / (1 + Descent.Core.scaledMigrationRate Ne m) := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow Descent.Core.ploidy
+  unfold fstMigrationDriftEquilibrium Descent.Core.scaledMigrationRate Descent.Core.fstFromFlow
+    Descent.Core.ploidy
   ring
 
 /-- Equilibrium Fst under migration-drift is positive for nonneg migration. -/
@@ -1135,7 +1136,8 @@ theorem sharedLDFromMigration_increases (M₁ M₂ : ℝ)
     Fst = 1/(1+M) and shared_LD = M/(1+M) sum to 1.
     This parallels the mutation-drift complementarity. -/
 theorem fst_plus_sharedLD_eq_one (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (Descent.Core.scaledMigrationRate Ne m) = 1 := by
+    fstMigrationDriftEquilibrium Ne m + sharedLDFromMigration (Descent.Core.scaledMigrationRate Ne
+      m) = 1 := by
   unfold fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.scaledMigrationRate
     Descent.Core.fstFromFlow Descent.Core.saturation Descent.Core.ploidy
   have hden : 1 + 4 * Ne * m ≠ 0 := by nlinarith
@@ -1319,8 +1321,10 @@ theorem retainedSignalVarianceMigrationDrift_eq_retention_mul_VA (V_A Ne m : ℝ
 theorem signalRetentionMigrationDrift_eq_ratio (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     signalRetentionMigrationDrift Ne m =
-      (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2 := by
-  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration Descent.Core.fstFromFlow
+      (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2
+        := by
+  unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium sharedLDFromMigration
+    Descent.Core.fstFromFlow
     Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp [hden]
@@ -1356,7 +1360,8 @@ theorem signalRetentionMigrationDrift_eq_one_sub_fst_sq (Ne m : ℝ)
     signalRetentionMigrationDrift Ne m =
       (1 - fstMigrationDriftEquilibrium Ne m) ^ 2 := by
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy
+    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation
+      Descent.Core.ploidy
   have hden : (1 + 4 * Ne * m) ≠ 0 := by nlinarith
   field_simp
   ring
@@ -1393,7 +1398,8 @@ theorem no_calibration_constant_reconciles_retention_laws :
   have h1 := hc 1 (1 / 4) (by norm_num) (by norm_num)
   have h2 := hc 1 (3 / 4) (by norm_num) (by norm_num)
   unfold signalRetentionMigrationDrift fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation Descent.Core.ploidy at h1 h2
+    sharedLDFromMigration Descent.Core.scaledMigrationRate Descent.Core.saturation
+      Descent.Core.ploidy at h1 h2
   norm_num at h1 h2
   linarith
 
@@ -1401,7 +1407,8 @@ theorem no_calibration_constant_reconciles_retention_laws :
 theorem retainedSignalVarianceMigrationDrift_eq (V_A Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
     retainedSignalVarianceMigrationDrift V_A Ne m =
-      (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2 * V_A := by
+      (Descent.Core.scaledMigrationRate Ne m) ^ 2 / (1 + Descent.Core.scaledMigrationRate Ne m) ^ 2
+        * V_A := by
   unfold retainedSignalVarianceMigrationDrift
   rw [signalRetentionMigrationDrift_eq_ratio Ne m hNe hm]
 
@@ -1433,7 +1440,8 @@ theorem signalRetention_increases_with_migration (V_A Ne m₁ m₂ : ℝ)
   have hM₁ : 0 < M₁ := scaledMigrationRate_pos Ne m₁ hNe hm₁
   have hM₂ : 0 < M₂ := scaledMigrationRate_pos Ne m₂ hNe hm₂
   have hM_lt : M₁ < M₂ := by
-    simp [M₁, M₂, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
+    simp [M₁, M₂, Descent.Core.scaledMigrationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy]
     nlinarith
   have h1M₁ : 0 < 1 + M₁ := by linarith
   have h1M₂ : 0 < 1 + M₂ := by linarith
@@ -1904,7 +1912,8 @@ end MigrationDriftPortability
 
 theorem effectiveSymmetricMigration_eq_meanAlleleFreq_map (m₁₂ m₂₁ : ℝ) :
     Portability.effectiveSymmetricMigration m₁₂ m₂₁ = Descent.Core.meanAlleleFreq m₁₂ m₂₁ := by
-  unfold Portability.effectiveSymmetricMigration Descent.Core.meanAlleleFreq Descent.Core.midpoint; ring
+  unfold Portability.effectiveSymmetricMigration Descent.Core.meanAlleleFreq Descent.Core.midpoint;
+    ring
 
 /-- **The migration-drift equilibrium is the flow map at the scaled MIGRATION rate.**
 
@@ -1937,7 +1946,8 @@ theorem ibdRecurrenceStep_uses_coalescentTimeScale (Ne rate x : ℝ) :
     Portability.ibdRecurrenceStep Ne rate x
       = (1 - rate) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne
           + (1 - 1 / Descent.Core.coalescentTimeScale Ne) * x) := by
-  unfold Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix; rw [Descent.Core.coalescentTimeScale_eq]
+  unfold Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix; rw
+    [Descent.Core.coalescentTimeScale_eq]
 
 /-- **The rest point of that recurrence carries it too**, in both of its constants: the
 `2 Nₑ` is the coalescent time scale and the `2 - rate` is `ploidy - rate`, the two lineages
@@ -1945,7 +1955,9 @@ less the one disrupting event they share. -/
 theorem ibdRecurrenceFixedPoint_uses_coalescentTimeScale (Ne rate : ℝ) :
     Portability.ibdRecurrenceFixedPoint Ne rate
       = (1 - rate) ^ 2
-          / ((1 - rate) ^ 2 + Descent.Core.coalescentTimeScale Ne * rate * (Descent.Core.ploidy - rate)) := by
-  unfold Portability.ibdRecurrenceFixedPoint Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+          / ((1 - rate) ^ 2 + Descent.Core.coalescentTimeScale Ne * rate * (Descent.Core.ploidy -
+            rate)) := by
+  unfold Portability.ibdRecurrenceFixedPoint Descent.Core.ploidy; rw
+    [Descent.Core.coalescentTimeScale_eq]
 
 end Descent.Portability

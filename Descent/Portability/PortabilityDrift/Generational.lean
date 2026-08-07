@@ -89,7 +89,8 @@ noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.P
 `ploidy · Nₑ`, the mean pairwise coalescence time, and not an independently chosen two.
 Stated here, beside the definition, rather than in the audit layer at the top of the
 graph. -/
-theorem _root_.Descent.Core.PopGenParameters.tauAt_uses_timeScale (g : Descent.Core.PopGenParameters) (t : ℕ) :
+theorem _root_.Descent.Core.PopGenParameters.tauAt_uses_timeScale (g :
+  Descent.Core.PopGenParameters) (t : ℕ) :
     (Descent.Core.PopGenParameters.tauAt g t).value
       = (t : ℝ) / Descent.Core.coalescentTimeScale g.Ne := by
   unfold Descent.Core.PopGenParameters.tauAt
@@ -98,7 +99,8 @@ theorem _root_.Descent.Core.PopGenParameters.tauAt_uses_timeScale (g : Descent.C
 
 /-- With a vanishing denominator Mathlib returns `0`, which is a value this quantity can also
 take legitimately, so the branch is named rather than left to be inferred from the result. -/
-theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (g : Descent.Core.PopGenParameters) (t : ℕ)
+theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (g :
+  Descent.Core.PopGenParameters) (t : ℕ)
     (hzero : (2 * g.Ne) = 0) :
     (Descent.Core.PopGenParameters.tauAt g t).value = 0 := by
   unfold Descent.Core.PopGenParameters.tauAt
@@ -106,7 +108,8 @@ theorem _root_.Descent.Core.PopGenParameters.tauAt_at_zero_denominator_is_junk (
 
 
 /-- Per-generation heterozygosity retention factor under drift + mutation. -/
-noncomputable def _root_.Descent.Core.PopGenParameters.hetDecayFactor (g : Descent.Core.PopGenParameters) : ℝ :=
+noncomputable def _root_.Descent.Core.PopGenParameters.hetDecayFactor (g :
+  Descent.Core.PopGenParameters) : ℝ :=
   PopGen.hetDecayFromScaled g.Ne g.theta
 
 /-- Transient differentiation after `t` generations. This is the same
@@ -147,7 +150,8 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     table are recorded on `DGP.fstTransientDecayFromScaled`. Power: the
     half-life prediction spans 32.62 to 69.31 across the design where the
     superseded base spans 69.31 to 554.52. -/
-noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
+noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g :
+  Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   (1 / (1 + g.theta.value + 2 * g.bigM.value)) *
     (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
 
@@ -216,21 +220,28 @@ noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   1 + g.bigM.value * (g.tauAt t).value / (1 + g.bigM.value)
 
-@[simp] theorem _root_.Descent.Core.PopGenParameters.tauAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.tauAt_zero (g : Descent.Core.PopGenParameters)
+  :
     (g.tauAt 0).value = 0 := by
   simp [Descent.Core.PopGenParameters.tauAt]
 
-@[simp] theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_zero (g :
+  Descent.Core.PopGenParameters) :
     g.fstTransientAt 0 = 0 := by
-  simp [Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled, PopGen.hetDecayFromScaled]
+  simp [Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled,
+    PopGen.hetDecayFromScaled]
 
-@[simp] theorem _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt_zero (g :
+  Descent.Core.PopGenParameters) :
     g.mutationSharedRetentionAt 0 = 1 := by
-  simp [Descent.Core.PopGenParameters.mutationSharedRetentionAt, Descent.Core.PopGenParameters.tauAt]
+  simp [Descent.Core.PopGenParameters.mutationSharedRetentionAt,
+    Descent.Core.PopGenParameters.tauAt]
 
-@[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g : Descent.Core.PopGenParameters) :
+@[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g :
+  Descent.Core.PopGenParameters) :
     g.migrationSharedBoostAt 0 = 1 := by
-  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt, Descent.Core.Tau.ofGenerations,
+  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt,
+    Descent.Core.Tau.ofGenerations,
     Descent.Core.BigM.ofRate, Descent.Core.scalingConstant, Descent.Core.ratio,
     PopGen.EvolutionaryParameters.bigM]
 
@@ -276,7 +287,8 @@ noncomputable def _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGe
     Descent.Core.PopGenParameters.bigM, PopGen.EvolutionaryParameters.bigM,
     Descent.Core.BigM.ofRate, Descent.Core.scalingConstant, Descent.Core.scaledMigrationRate]
 
-@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
+@[simp] theorem
+  _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_hetDecayFactor
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).hetDecayFactor = m.hetDecayFactor := by
   unfold Descent.Core.PopGenParameters.hetDecayFactor PopGen.PGSEvolutionaryModel.hetDecayFactor
@@ -289,7 +301,8 @@ generation-indexed popgen bridge at `⌊t_div⌋`, because both use the same
 discrete differentiation recursion. Both were corrected together: an identity
 between two coordinates survives a common wrong factor on both sides, so this
 theorem constrained them jointly and could not have caught the decay base. -/
-@[simp] theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
+@[simp] theorem
+  _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
@@ -304,7 +317,8 @@ theorem constrained them jointly and could not have caught the decay base. -/
     Descent.Core.fstFromFlow,
     Descent.Core.PopGenParameters.theta, Descent.Core.PopGenParameters.bigM,
     PopGen.PGSEvolutionaryModel.toEvo, PopGen.EvolutionaryParameters.theta,
-    PopGen.EvolutionaryParameters.bigM, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+    PopGen.EvolutionaryParameters.bigM, Descent.Core.scaledMutationRate,
+      Descent.Core.scaledMigrationRate,
     Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
     Descent.Core.scalingConstant, Descent.Core.ratio,
     Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
@@ -348,7 +362,8 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameter
 coordinates for the fields that genuinely match. The LD coordinate is
 deliberately excluded here because the mechanistic model uses a joint
 locus-specific kernel rather than a single global LD scalar. -/
-theorem _root_.Descent.PopGen.PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
+theorem
+  _root_.Descent.PopGen.PGSEvolutionaryModel.coordinateSummary_matches_generational_popgen_at_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     m.coordinateSummary.alleleFreqCoordinate =
@@ -362,7 +377,8 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.coordinateSummary_matches_gen
     exact congrArg (fun x ↦ 1 - x)
       (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
-    exact (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+    exact
+      (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
       m h_disc).symm
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
     exact (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor

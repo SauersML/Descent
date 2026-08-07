@@ -9,9 +9,13 @@ import Descent.PopGen.HaplotypeTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`, `Descent.Program`:
---   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
---   Portability: reaches 13 module(s) -- `Descent.Portability.AncestrySpecificPower`, `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses` and 10 more
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
+-- `Descent.Program`:
+--   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
+--   Portability: reaches 13 module(s) -- `Descent.Portability.AncestrySpecificPower`,
+--   `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses`
+--   and 10 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -134,7 +138,8 @@ the other -- and the noncentrality parameter is even in the first and, through
 of the variant, and which allele the assembly happens to call reference is not. -/
 theorem discoveryNCP_allele_swap (n β maf ld : ℝ) :
     discoveryNCP n (-β) (1 - maf) ld = discoveryNCP n β maf ld := by
-  unfold discoveryNCP Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold discoveryNCP Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity
+    Descent.Core.ploidy
   ring
 
 /-- **Rescaling every effect size by `c` scales the noncentrality parameter by `c²`.**
@@ -1141,7 +1146,8 @@ local macro "source_r2_of " m:term : tactic =>
       Portability.explainedSignalVarianceFromSourceWeights,
       Portability.predictiveCovarianceFromSourceWeights,
       Portability.scoreVarianceFromSourceWeights,
-      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
+      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights,
+        Portability.crossCovariance,
       sigmaTagCausal, dotProduct, Portability.totalEffect, Matrix.mulVec])
 
 /-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
@@ -1152,9 +1158,11 @@ local macro "target_r2_of " m:term : tactic =>
       Portability.explainedSignalVarianceFromSourceWeights,
       Portability.predictiveCovarianceFromSourceWeights,
       Portability.scoreVarianceFromSourceWeights,
-      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights, Portability.crossCovariance,
+      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights,
+        Portability.crossCovariance,
       Portability.effectiveOutcomeVariance, Portability.irreducibleTargetResidualBurden,
-      Portability.brokenTaggingResidual, Portability.ancestrySpecificLDResidual, Portability.sourceSpecificOverfitResidual,
+      Portability.brokenTaggingResidual, Portability.ancestrySpecificLDResidual,
+        Portability.sourceSpecificOverfitResidual,
       Portability.novelUntaggablePhenotypeResidual, sigmaTagCausal,
       dotProduct, Portability.totalEffect, Matrix.mulVec])
 
@@ -1191,7 +1199,8 @@ theorem wgs_eliminates_ld_mismatch
     (h_novelProxy : (m.novelProxyTagging Pop.target) = 0) :
     Portability.brokenTaggingResidual m = 0 := by
   have h_sigma :
-      Portability.sigmaTagCausalSourceAt m Pop.source = Portability.sigmaTagCausalSourceAt m Pop.target := by
+      Portability.sigmaTagCausalSourceAt m Pop.source = Portability.sigmaTagCausalSourceAt m
+        Pop.target := by
     ext i j
     simp [Portability.sigmaTagCausalSourceAt, h_direct, m.novelDirectCausal_source,
       m.novelProxyTagging_source, h_novelDirect, h_proxySource, h_proxyTarget,

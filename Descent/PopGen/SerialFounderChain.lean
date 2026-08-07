@@ -376,8 +376,10 @@ theorem separationStep_not_determined_by_closedForm_fields :
 end SerialFounderChain
 
 /-- **All three twos in the serial-founder within-deme time are coalescent time scales.**
-A pair either coalesces inside the chain, on the scale `Descent.Core.coalescentTimeScale N`, or survives
-into the ancestral population and waits a further `Descent.Core.coalescentTimeScale Nanc`. Three literal
+A pair either coalesces inside the chain, on the scale `Descent.Core.coalescentTimeScale N`, or
+survives
+into the ancestral population and waits a further `Descent.Core.coalescentTimeScale Nanc`. Three
+literal
 twos in one body is exactly the shape in which one of them gets changed alone.
 
 There is no `tAnc` term, and that absence is the whole content of the correction this
@@ -389,8 +391,10 @@ and `e^{-a} (tAnc + 2 Nanc)` for the late one counts `tAnc e^{-a}` once too ofte
 is what this body used to do. -/
 theorem serialFounderWithinTime_uses_coalescentTimeScale (N Nanc tAnc : ℝ) :
     PopGen.serialFounderWithinTime N Nanc tAnc
-      = Descent.Core.coalescentTimeScale N * (1 - Real.exp (-tAnc / Descent.Core.coalescentTimeScale N))
-          + Real.exp (-tAnc / Descent.Core.coalescentTimeScale N) * Descent.Core.coalescentTimeScale Nanc := by
+      = Descent.Core.coalescentTimeScale N * (1 - Real.exp (-tAnc / Descent.Core.coalescentTimeScale
+        N))
+          + Real.exp (-tAnc / Descent.Core.coalescentTimeScale N) * Descent.Core.coalescentTimeScale
+            Nanc := by
   unfold PopGen.serialFounderWithinTime Descent.Core.coalescentTimeScale Descent.Core.ploidy; ring
 
 end Descent.PopGen

@@ -130,7 +130,8 @@ theorem gaugeAlignedPredictor_eq_persistentOnlyDynamicsPosterior
     gaugeAlignedPredictor persists x =
       Conditionals.persistentOnlyDynamicsPosterior (0 : Descent.BinaryState) persists := by
   cases persists <;>
-    norm_num [gaugeAlignedPredictor, Conditionals.persistentOnlyDynamicsPosterior, Spectral.binarySecondAnnotation]
+    norm_num [gaugeAlignedPredictor, Conditionals.persistentOnlyDynamicsPosterior,
+      Spectral.binarySecondAnnotation]
 
 /-- A binary-ancestry PGS deployment has two simultaneous boundaries: unequal representation
 separates pooled calibration from worst-ancestry performance, while a clinical threshold crossed

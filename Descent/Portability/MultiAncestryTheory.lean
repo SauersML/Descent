@@ -60,7 +60,8 @@ theorem multi_ancestry_reduces_fst
 signal variance `V_A × (1 - fst)`. -/
 private theorem presentDayR2_eq_expectedR2
     (V_A V_E fst : ℝ) :
-    presentDayR2 V_A V_E fst = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - fst) * V_A) V_E := by
+    presentDayR2 V_A V_E fst = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - fst) * V_A) V_E
+      := by
   simp [presentDayR2, presentDayPGSVariance, pgsVarianceFromHet, Descent.Core.product,
     PopGen.TransportedMetrics.r2FromSignalVariance, mul_comm,
       Descent.Core.share]
@@ -72,7 +73,8 @@ private theorem expectedR2_gain_eq
     (hVE : 0 < V_E)
     (hx : 0 ≤ x)
     (hδ : 0 < δ) :
-    PopGen.TransportedMetrics.r2FromSignalVariance (x + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x V_E =
+    PopGen.TransportedMetrics.r2FromSignalVariance (x + δ) V_E -
+      PopGen.TransportedMetrics.r2FromSignalVariance x V_E =
       δ * V_E / ((x + δ + V_E) * (x + V_E)) := by
   unfold PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
   have hxE : x + V_E ≠ 0 := by
@@ -91,8 +93,10 @@ private theorem expectedR2_gain_strictAnti_base
     (hx₁ : 0 ≤ x₁)
     (hx_lt : x₁ < x₂)
     (hδ : 0 < δ) :
-    PopGen.TransportedMetrics.r2FromSignalVariance (x₁ + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x₁ V_E >
-      PopGen.TransportedMetrics.r2FromSignalVariance (x₂ + δ) V_E - PopGen.TransportedMetrics.r2FromSignalVariance x₂ V_E := by
+    PopGen.TransportedMetrics.r2FromSignalVariance (x₁ + δ) V_E -
+      PopGen.TransportedMetrics.r2FromSignalVariance x₁ V_E >
+      PopGen.TransportedMetrics.r2FromSignalVariance (x₂ + δ) V_E -
+        PopGen.TransportedMetrics.r2FromSignalVariance x₂ V_E := by
   have hx₂ : 0 ≤ x₂ := by
     linarith
   rw [expectedR2_gain_eq x₁ δ V_E hVE hx₁ hδ,
@@ -162,7 +166,8 @@ theorem portability_concave_in_fst_reduction
   -- Reducing a shifted Fst to a shifted signal variance is one rewrite, stated once for an
   -- arbitrary Fst rather than copied out at the high and the low value.
   have h_reduce : ∀ f : ℝ,
-      presentDayR2 V_A V_E (f - Δ) = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - f) * V_A + δ) V_E := by
+      presentDayR2 V_A V_E (f - Δ) = PopGen.TransportedMetrics.r2FromSignalVariance ((1 - f) * V_A +
+        δ) V_E := by
     intro f
     rw [presentDayR2_eq_expectedR2]
     unfold δ
@@ -609,7 +614,8 @@ theorem diversity_reduces_max_gap
     (h_improvement : fst_worst_multi < fst_worst_single) :
     portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_multi) <
       portabilityGap (presentDayR2 V_A V_E fstS) (presentDayR2 V_A V_E fst_worst_single) :=
-  -- Diversification lowers the worst population's effective `Fst`, and "the gap grows with -- distance" read backwards is exactly that. The two were one theorem with the target pair
+  -- Diversification lowers the worst population's effective `Fst`, and "the gap grows with --
+  -- distance" read backwards is exactly that. The two were one theorem with the target pair
   -- renamed, proved twice.
   portability_gap_increases_with_distance V_A V_E fstS fst_worst_multi fst_worst_single
     hVA hVE h_improvement h_single_bound

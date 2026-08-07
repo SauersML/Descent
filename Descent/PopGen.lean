@@ -31,12 +31,20 @@ import Descent.PopGen.SerialFounderChain
 import Descent.PopGen.StandardizedGenotypeMoments
 import Descent.PopGen.VarianceComponents
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`, `Descent.Conditionals`, `Descent.Portability`, `Descent.Decision`, `Descent.Program`:
---   Spectral: reaches 7 module(s) -- `Descent.Spectral.CirculationDefect`, `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.FoldedSpectrum` and 4 more
---   Blindness: reaches 19 module(s) -- `Descent.Blindness.BundleRigidity`, `Descent.Blindness.BundleRigidity.Coverage`, `Descent.Blindness.BundleRigidity.CoverageInvariance` and 16 more
---   Conditionals: reaches 3 module(s) -- `Descent.Conditionals.ConditionalGain`, `Descent.Conditionals.LatentMechanismCollapse`, `Descent.Conditionals.LocalToGlobalCoherence`
---   Portability: reaches 15 module(s) -- `Descent.Portability.AncestrySpecificPower`, `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses` and 12 more
---   Decision: reaches 2 module(s) -- `Descent.Decision.CertificateGrading`, `Descent.Decision.TransportedMinimax`
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
+-- `Descent.Conditionals`, `Descent.Portability`, `Descent.Decision`, `Descent.Program`:
+--   Spectral: reaches 7 module(s) -- `Descent.Spectral.CirculationDefect`,
+--   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.FoldedSpectrum` and 4 more
+--   Blindness: reaches 19 module(s) -- `Descent.Blindness.BundleRigidity`,
+--   `Descent.Blindness.BundleRigidity.Coverage`,
+--   `Descent.Blindness.BundleRigidity.CoverageInvariance` and 16 more
+--   Conditionals: reaches 3 module(s) -- `Descent.Conditionals.ConditionalGain`,
+--   `Descent.Conditionals.LatentMechanismCollapse`, `Descent.Conditionals.LocalToGlobalCoherence`
+--   Portability: reaches 15 module(s) -- `Descent.Portability.AncestrySpecificPower`,
+--   `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses`
+--   and 12 more
+--   Decision: reaches 2 module(s) -- `Descent.Decision.CertificateGrading`,
+--   `Descent.Decision.TransportedMinimax`
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 

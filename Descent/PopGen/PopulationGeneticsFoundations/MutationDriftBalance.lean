@@ -183,7 +183,8 @@ theorem fstEquilibrium_decreases_with_mu (Ne μ₁ μ₂ : ℝ)
     `nei_fst_equilibrium_consistent` which connects the two. -/
 theorem het_plus_fst_eq_one (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     expectedHeterozygosity θ + fstMutationDriftEquilibrium θ = 1 := by
-  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    Descent.Core.saturation
   have hden : (1 + θ.value) ≠ 0 := by linarith
   field_simp [hden]
   ring
@@ -206,7 +207,8 @@ theorem nei_fst_complement (H_S H_T : ℝ) (hHT : H_T ≠ 0) :
 theorem nei_fst_equilibrium_consistent (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) :
     (neiFst 1 (expectedHeterozygosity θ)).value = fstMutationDriftEquilibrium θ := by
   simp only [neiFst_value]
-  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow Descent.Core.saturation
+  unfold expectedHeterozygosity fstMutationDriftEquilibrium Descent.Core.fstFromFlow
+    Descent.Core.saturation
   have hden : (1 + θ.value) ≠ 0 := by linarith
   field_simp [hden]
   ring
@@ -383,7 +385,8 @@ theorem expectedNewMutations_at_reference_point :
 
 
 /-- Expected new mutations is nonneg for nonneg θ and t. -/
-theorem expectedNewMutations_nonneg (t : ℝ) (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) (ht : 0 ≤ t) :
+theorem expectedNewMutations_nonneg (t : ℝ) (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.value) (ht : 0 ≤ t)
+  :
     0 ≤ expectedNewMutations θ t := by
   unfold expectedNewMutations
   positivity

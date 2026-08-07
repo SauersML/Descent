@@ -297,7 +297,8 @@ theorem fisherTraceMSELowerBound_le_target_iff
     (h_target : 0 < targetTraceMSE) :
     fisherTraceMSELowerBound nEff nParams infoPerSample ≤ targetTraceMSE ↔
       requiredEffectiveSampleSizeForTraceMSE nParams infoPerSample targetTraceMSE ≤ nEff := by
-  unfold fisherTraceMSELowerBound requiredEffectiveSampleSizeForTraceMSE adaptationDifficultyIndex Descent.Core.ratio
+  unfold fisherTraceMSELowerBound requiredEffectiveSampleSizeForTraceMSE adaptationDifficultyIndex
+    Descent.Core.ratio
   constructor
   · intro h
     rw [div_le_iff₀ h_target]

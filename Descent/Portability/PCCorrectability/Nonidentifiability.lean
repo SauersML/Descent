@@ -112,7 +112,8 @@ theorem ancestryProfile_rigidity_dichotomy (B : ℕ → ℝ) (a b : ℝ) :
     (∀ t t' : ℕ → ℝ, Blindness.BoundedBelowAbove t a b → Blindness.BoundedBelowAbove t' a b →
         Blindness.BoundedLogDistortion t t')
       ∧ ∃ x y : ℕ → ℝ,
-          ¬ Blindness.BoundedLogDistortion (Blindness.codedDecayProfile B x) (Blindness.codedDecayProfile B y) := by
+          ¬ Blindness.BoundedLogDistortion (Blindness.codedDecayProfile B x)
+            (Blindness.codedDecayProfile B y) := by
   refine ⟨fun t t' ht ht' ↦ Blindness.rigidity_of_boundedBelowAbove ht ht', ?_⟩
   refine ⟨fun _ ↦ 0, fun n ↦ (n : ℝ), Blindness.inequivalent_of_unbounded_coding B _ _ ?_⟩
   intro C

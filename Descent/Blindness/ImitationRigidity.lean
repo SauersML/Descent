@@ -10,7 +10,9 @@ import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 assert_below Descent.Conditionals Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`, `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`, `Descent.Portability.PortabilityDrift.Definitions` and 7 more
+--   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
+--   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
+--   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
 --   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -89,7 +91,8 @@ theorem covarianceMatrix_addRankOneSignal
     funext ω
     ring
   rw [hi, hj]
-  rw [Foundations.covariance_add_left_exp, Foundations.covariance_add_right, Foundations.covariance_add_right]
+  rw [Foundations.covariance_add_left_exp, Foundations.covariance_add_right,
+    Foundations.covariance_add_right]
   have hscaledLeft :
       Foundations.covariance E (fun ω ↦ (scale * loading i) * factor ω)
           (fun ω ↦ noise ω j) = 0 := by
@@ -124,7 +127,8 @@ theorem covariance_imitation_of_rankOne_closed
     (hfactor : Foundations.covariance E factor factor = 1)
     (hleft : ∀ i, Foundations.covariance E (fun ω ↦ noise ω i) factor = 0)
     (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0) :
-    Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ nuisanceClass := by
+    Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading) ∈ nuisanceClass
+      := by
   rw [covarianceMatrix_addRankOneSignal E noise factor scale loading
     hfactor hleft hright]
   exact hclosed _ hnoise
@@ -618,13 +622,15 @@ theorem spiked_genotype_covariance_belowCeiling_of_threshold
     (hsymm : (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise).IsSymm)
     (hgap : VarianceNonneg (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise))
     (hwitness :
-      (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise).mulVec witness = loading)
+      (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise).mulVec witness =
+        loading)
     (hfactor : Foundations.covariance E factor factor = 1)
     (hleft : ∀ i, Foundations.covariance E (fun ω ↦ noise ω i) factor = 0)
     (hright : ∀ i, Foundations.covariance E factor (fun ω ↦ noise ω i) = 0)
     (hthreshold :
       scale ^ 2 *
-        quadForm (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise) witness ≤ 1) :
+        quadForm (ceiling • (1 : Matrix ι ι ℝ) - Foundations.covarianceMatrix E noise) witness ≤ 1)
+          :
     BelowCeiling ceiling
       (Foundations.covarianceMatrix E (addRankOneSignal noise factor scale loading)) := by
   rw [covarianceMatrix_addRankOneSignal E noise factor scale loading hfactor hleft hright]
@@ -1780,6 +1786,7 @@ a resolvent and the other as the numerator of `F_ST`, and neither file knew the
 other existed. -/
 theorem fairTwoPointVariance_eq_betweenSubgroupVariance (a b : ℝ) :
     Blindness.fairTwoPointVariance a b = Descent.Core.betweenSubgroupVariance a b := by
-  unfold Blindness.fairTwoPointVariance Descent.Core.betweenSubgroupVariance Descent.Core.halfDiffSq; ring
+  unfold Blindness.fairTwoPointVariance Descent.Core.betweenSubgroupVariance
+    Descent.Core.halfDiffSq; ring
 
 end Descent.Blindness

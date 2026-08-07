@@ -9,7 +9,8 @@ import Descent.Blindness.HiddenConeAmbiguity
 assert_below Descent.Portability Descent.Decision Descent.Program
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`:
---   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`, `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
+--   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`,
+--   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.LocalToGlobalCoherence`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
@@ -197,7 +198,8 @@ open Descent.Spectral
 /-- The squared standardized genotype `x ^ 2 = (dosage - 2q) ^ 2 / (2 q (1 - q))`.
 This is the multiplicative coordinate: a degree-`m` epistatic monomial has squared
 value equal to the product of `m` independent copies of this variable. -/
-noncomputable def standardizedSquare (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) : ℝ :=
+noncomputable def standardizedSquare (h : Foundations.HardyWeinbergModel) (g :
+  Foundations.DiploidGenotype) : ℝ :=
   (h.centeredAltAlleleCount g) ^ 2 / h.genotypeVariance
 
 /-- The **Mellin drift** `c(q) = E[x ^ 2 log x ^ 2]` of a Hardy-Weinberg locus: the
@@ -253,7 +255,8 @@ private theorem hwe_variance_eq (h : Foundations.HardyWeinbergModel) :
   unfold Foundations.HardyWeinbergModel.refFreq
   ring
 
-private theorem hwe_centered (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
+private theorem hwe_centered (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype)
+  :
     h.centeredAltAlleleCount g = Foundations.altAlleleCount g - 2 * h.altFreq := by
   unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
   rw [h.expectedAltAlleleCount_eq]
@@ -303,7 +306,8 @@ theorem genotypeProb_values (h : Foundations.HardyWeinbergModel) :
 The proof is a three-term expansion plus the identity
 `log (2q / (1-q)) + log (2(1-q) / q) = log 4`, which is what collapses the two
 homozygote contributions into a single frequency-weighted `log 2`. -/
-theorem _root_.Descent.Foundations.HardyWeinbergModel.mellinDrift_eq (h : Foundations.HardyWeinbergModel)
+theorem _root_.Descent.Foundations.HardyWeinbergModel.mellinDrift_eq (h :
+  Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.mellinDrift = hweMellinDrift h.altFreq := by
   set q := h.altFreq with hq
@@ -811,7 +815,8 @@ interaction statistics on standardized rare variants therefore sit *at* the
 condensation boundary, not two decades below it, and the Gaussian-surrogate null
 used to calibrate them is converging to a different limit. -/
 theorem maxSafeEpistaticOrder_collapse_at_rare_maf {N : ℝ} (hN : 0 < Real.log N) :
-    7 * maxSafeEpistaticOrder N (1 / 1024) < Blindness.criticalDegree N Blindness.condensationConstant := by
+    7 * maxSafeEpistaticOrder N (1 / 1024) < Blindness.criticalDegree N
+      Blindness.condensationConstant := by
   have hd : 7 * Blindness.condensationConstant < hweMellinDrift (1 / 1024) :=
     sevenfold_drift_excess_at_rare_maf
   have hgpos : 0 < Blindness.condensationConstant := Blindness.condensationConstant_pos
@@ -993,7 +998,8 @@ theorem hweMellinJetVariance_at_fixation_is_junk :
 
 
 /-- **The jet variance of a Hardy-Weinberg locus in closed form.** -/
-theorem _root_.Descent.Foundations.HardyWeinbergModel.mellinJetVariance_eq (h : Foundations.HardyWeinbergModel)
+theorem _root_.Descent.Foundations.HardyWeinbergModel.mellinJetVariance_eq (h :
+  Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.mellinJetVariance = hweMellinJetVariance h.altFreq := by
   set q := h.altFreq with hq
@@ -1494,7 +1500,8 @@ since `E[x ^ 2] = 1`.
 Empirical status: DERIVED from `HardyWeinbergModel.genotypeProb` and
 `HardyWeinbergModel.standardizedSquare` by direct summation over the three genotypes;
 closed form in `standardizedFourthMoment_eq`. No free parameter. -/
-noncomputable def _root_.Descent.Foundations.HardyWeinbergModel.standardizedFourthMoment (h : Foundations.HardyWeinbergModel) : ℝ :=
+noncomputable def _root_.Descent.Foundations.HardyWeinbergModel.standardizedFourthMoment (h :
+  Foundations.HardyWeinbergModel) : ℝ :=
   ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedSquare g ^ 2
 
 /-- **The fourth moment in closed form: `E[x ^ 4] = 1 / (2q(1-q))`.**
@@ -1503,7 +1510,8 @@ The three contributions are `4q²`, `(1-2q)⁴ / (2q(1-q))` and `4(1-q)²`, and 
 by the polynomial identity `2q(1-q)(4q² + 4(1-q)²) + (1-2q)⁴ = 1`. Note this is the
 reciprocal of the genotype variance `2q(1-q)`, which is a coincidence of the biallelic
 three-point law and not a general fact. -/
-theorem _root_.Descent.Foundations.HardyWeinbergModel.standardizedFourthMoment_eq (h : Foundations.HardyWeinbergModel)
+theorem _root_.Descent.Foundations.HardyWeinbergModel.standardizedFourthMoment_eq (h :
+  Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     h.standardizedFourthMoment = 1 / (2 * h.altFreq * (1 - h.altFreq)) := by
   have hqne : h.altFreq ≠ 0 := ne_of_gt hq0
