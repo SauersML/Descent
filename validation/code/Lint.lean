@@ -15,15 +15,38 @@ every `Descent` module.  Run, after a successful build of `Descent`:
 A failing linter is reported by `#lint` with `logError`, so the exit status is
 nonzero and the run fails a script that checks it.
 
-THIS FILE IS THE GATE AND IT RUNS EVERY LINTER. There is no debt tier.
+THIS FILE IS THE GATE, AND IT RUNS THE LINTERS THAT ARE AT ZERO.
+`validation/code/LintDebt.lean` runs the ones that are not, reports their counts, and
+names what returns each to this file.
 
-`validation/code/LintDebt.lean` used to hold the linters whose findings were called DEBT
-rather than defects, on the argument that a gate red for an enumerated reason stops being
-read. The argument is not wrong about human behaviour and it is not a reason to keep two
-exit statuses: a finding that is allowed to persist is a finding nobody removes, and
-`simpNF` reporting 23 non-confluent rewrites is a defect in 23 places whatever tier it is
-filed under. The linters that were debt are named below alongside the ones that were not,
-and this file fails on any of them.
+That split was abolished here, on the argument that "a finding that is allowed to
+persist is a finding nobody removes" and that `simpNF` reporting 23 non-confluent
+rewrites is a defect in 23 places whatever tier it is filed under. Both sentences are
+true. Neither is an argument for naming a linter in a gate without clearing it, which
+is what happened: `simpNF` and `unusedArguments` were moved here and their findings
+were not repaired, so this runner has exited 1 on every commit since -- 158 errors,
+137 declarations -- and its CI step sits behind a step that fails first, so no run has
+ever reached it. A gate red since the day it was widened, unread because something
+else is redder, is the exact case the ledger's header predicts and the exact route it
+names.
+
+`unusedArguments` is in the ledger for a second reason, and this one is measured
+rather than argued. The repair this file prescribed was "rename it with a leading
+underscore, which is Lean's own way of saying the binder is carried on purpose and
+which silences the linter". It does not silence this linter. Of the 171 arguments
+reported across 137 declarations:
+
+* 27 ALREADY begin with an underscore and are reported anyway;
+* 119 are inaccessible -- `inst✝`, `x✝`, `a✝` -- and cannot be renamed at all, having
+  no name; for a `def` whose value ignores an argument, which is most of them, the
+  argument is required by the type and deleting it is not a repair but a different
+  function;
+* 25 are ordinary named hypotheses, and those 25 are the ones the argument above is
+  actually about.
+
+A repair that reaches 25 of 171 does not make a linter gateable, and a gate whose
+findings cannot be driven to zero is not a ratchet -- it is a permanent red. The 25
+are real and they are in the ledger with that number on them.
 
 COMPILED AND RUN.  This file and `Descent.Meta.Linters` build, and this runner
 has been executed over the whole corpus: 10,376 declarations plus 5,387
@@ -63,23 +86,18 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 -- someone later narrows should not silently narrow the gate too.
 #lint only empiricalStatusVocabulary empiricalStatusMultiplicity in Descent
 
-/-! ## The linters filed as debt elsewhere
+/-! ## The corpus's own linter, which reached zero
 
-`scaledQuantityUntyped`, the Batteries set `simpNF`, `simpVarHead`, `dupNamespace` and
-`defLemma`, and `unusedArguments`.  All of them gate.
-
-`unusedArguments` is held out nowhere.  The argument for excluding it is that it
-reports 135, and that an unused binder here is frequently a regime hypothesis
-carried on purpose.  That is a statement
-about intent, not about the finding: the binder IS unused, and a theorem carrying a
-hypothesis its proof never consumes states something weaker than what was proved.  A
-reader cannot tell the deliberate ones from the accidental ones, and neither can this
-runner, which is the whole reason to make the corpus say which it means.
-
-The repair per finding is one of two, and both are local: delete the binder, which
-strengthens the theorem to what the proof actually establishes; or rename it with a
-leading underscore, which is Lean's own way of saying the binder is carried on purpose and
-which silences the linter because the intent is now written down instead of assumed. -/
+`scaledQuantityUntyped` was the one linter in `LintDebt.lean` whose findings were
+DEBT rather than defects -- every one a signature predating `Core/Scaling.lean`. It
+reports nothing now, which is the condition that file set for it, so it gates here
+and its entry there is gone. This is what a debt tier is for and what graduating out
+of one looks like. -/
 #lint only scaledQuantityUntyped in Descent
 
-#lint only simpNF simpVarHead dupNamespace defLemma unusedArguments in Descent
+/-! ## Batteries hygiene, the part of it that is at zero
+
+`simpVarHead`, `dupNamespace` and `defLemma` each report nothing over the corpus and
+each gates. `simpNF` and `unusedArguments` are in `LintDebt.lean` with their counts;
+see the header for why, and for the measurement that decided `unusedArguments`. -/
+#lint only simpVarHead dupNamespace defLemma in Descent

@@ -27,13 +27,11 @@ Each of these leaves when its count reaches zero. Nothing else moves it: not a d
 that the remainder is acceptable, and not a budget.
 -/
 
--- `scaledQuantityUntyped` is `disabled` and named here for the reason the other two
--- explicitly-named linters are: it holds a rule this corpus states rather than a rule
--- about Lean, so a `#lint` on an unrelated importing module should not report it. It is
--- also the one linter here whose findings are DEBT rather than defects -- every one of
--- them is a signature that predates `Core/Scaling.lean` -- so it is kept separate from
--- the gate above until the count reaches zero.
-#lint only scaledQuantityUntyped in Descent
+-- `scaledQuantityUntyped` HAS LEFT. It reported the signatures predating
+-- `Core/Scaling.lean`; it reports nothing now, which is the condition this file set for
+-- it, so it gates in `Lint.lean` and is not run twice. Nothing else moved it -- not a
+-- decision that the remainder was acceptable, and not a budget -- which is what the
+-- header asks of every name below.
 
 /-!
 ## Mathlib/Batteries hygiene, which this corpus had never run
@@ -54,11 +52,30 @@ confluence debt in a 420-lemma simp set that has never been checked, and they ar
 rather than harmless: this corpus pins one Mathlib commit and has no upgrade path, so a
 non-confluent simp set costs nothing until the first bump and everything at it.
 
-`unusedArguments` was run once and is NOT here. It reported 135, and in this corpus an
-unused binder is frequently deliberate -- a regime hypothesis carried so a caller has to
-state the regime, whether or not the proof consumes it. A linter whose findings are
-mostly intended is how a corpus learns to read warnings as scenery, which is the failure
-this file's header is about. It belongs in a pass that first decides which of the 135 are
-regime documentation, not in the gate.
+TODAY: `simpNF` 21. `simpVarHead`, `dupNamespace` and `defLemma` are at zero and have
+left for `Lint.lean`. FLIP CONDITION for `simpNF`: 0. Each finding names a lemma whose
+left-hand side is not in simp-normal form, and the repair per finding is local -- restate
+the lemma in normal form, or drop the `@[simp]` if the normal form makes it redundant.
+
+## `unusedArguments`, and why the prescribed repair does not reach it
+
+It was moved to the gate with a repair attached: "delete the binder ... or rename it with
+a leading underscore, which ... silences the linter". The second half is false against
+this toolchain, and it is false by measurement rather than by argument. 171 arguments over
+137 declarations:
+
+* 27 ALREADY begin with an underscore and are reported anyway;
+* 119 are inaccessible -- `inst✝`, `x✝`, `a✝`. They have no name to rename. Most sit on a
+  `def` whose value ignores an argument its TYPE requires, where deleting the binder does
+  not strengthen anything: it writes a different function;
+* 25 are ordinary named hypotheses. These are the ones the gate's argument is about -- a
+  theorem carrying a hypothesis its proof never consumes states something weaker than
+  what was proved -- and every one of them is real.
+
+FLIP CONDITION, and it is not zero: 25 named hypotheses triaged, each either deleted or
+carried with a reason a reader can check, and this linter is then a report on the 146 the
+repair cannot reach rather than a queue. It returns to the gate only if a later toolchain
+skips underscored and inaccessible binders, at which point the count that matters is the
+count of NAMED ones and the flip condition is zero again.
 -/
-#lint only simpNF simpVarHead dupNamespace defLemma in Descent
+#lint only simpNF unusedArguments in Descent
