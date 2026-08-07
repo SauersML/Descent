@@ -1,14 +1,15 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Foundations.BernoulliLosses
+import Descent.Portability.PortabilityDrift.Generational
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
+
 -- The Brier and log-loss risk decompositions this file states its present-day moment
 -- results in terms of: `bernoulliLogLoss`, `bernoulliKLReal`, `brierBernoulliRisk`,
 -- `exactBrierRiskOfCalibrated` and the pointwise regret identities. They are losses of one
 -- Bernoulli outcome against one prediction, so they sit below this chapter rather than
 -- above it, and the import runs downward like every other one here.
-import Descent.Foundations.BernoulliLosses
-import Descent.Portability.PortabilityDrift.Generational
-import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Decision Descent.Program
 
@@ -1896,7 +1897,8 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (hvar_int : Integrable (fun z ↦ (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
-    Foundations.exactBrierRiskOfCalibrated μ η = PopGen.TransportedMetrics.calibratedBrier π r2 := by
+    Foundations.exactBrierRiskOfCalibrated μ η = PopGen.TransportedMetrics.calibratedBrier π r2
+      := by
   rw [Foundations.exactBrierRiskOfCalibrated_eq_integral]
   have hdiff_int : Integrable (fun z ↦ η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
@@ -1976,7 +1978,8 @@ theorem brierRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem brierRegretPoint_eq_sq_error (η q : ℝ) :
     brierRegretPoint η q = (q - η) ^ 2 := by
   unfold brierRegretPoint
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Foundations.brier_regret_pointwise η
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using
+    Foundations.brier_regret_pointwise η
     q
 
 /-- Ratio form in present-day units: Brier-regret ratio is a squared-error ratio. -/
