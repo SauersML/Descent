@@ -143,27 +143,35 @@ def main():
     print("FRESHNESS token literal: SIMCOV-BATTERY-BULK51-FULMAR-20260805")
     reps = 20
 
-    # A THOUSANDFOLD SWEEP, AND A SUCCESSOR THAT IS ALLOWED TO WIN.
+    # A THOUSANDFOLD SWEEP, AND TWO REFUTATION INSTRUMENTS.
     #
     # The previous run swept `4*Ne*m` a hundredfold and rejected both the ansatz
-    # and its unsquared form. That is a complete finding about those two bodies
-    # and no finding at all about what the quantity IS, and a withdrawal that
-    # names no replacement leaves every consumer with the refuted number,
-    # because it is the only one written down.
+    # and its unsquared form.
     #
-    # So the sweep widens to a thousandfold and the design carries CANDIDATE
-    # successors, fitted by weighted least squares on these very cells. Fitting
-    # a rival to the curve it is tested against is the strongest form of a shape
-    # claim: the ansatz gets no free parameter, the candidates get one or two,
-    # and if a candidate still fails then no choice of constant rescues that
-    # shape either -- which is the difference between "we have not found the
-    # law" and "this family cannot contain it".
+    # WHAT THE FITTED ROWS BELOW ARE FOR, AND WHAT THEY ARE NOT. A simulation
+    # VALIDATES a formula; it does not produce one. A shape read off these cells
+    # and installed in the corpus would be fitted to the very data meant to test
+    # it, and its agreement would be a property of the fitting rather than of
+    # population genetics -- so nothing here is a proposed body, and no row
+    # below may be promoted into `PopulationGeneticsFoundations.lean`. A
+    # successor has to come from a derivation, and this battery would then be
+    # the thing that tests it.
     #
-    # The candidates are chosen from what the measurements already say. The
-    # correlation is near ONE at the lowest migration and rises slowly, so the
-    # object is a small DEFICIT that decays in M, not a share that grows from
-    # zero: any body of the form f(M) -> 0 as M -> 0 is excluded before it is
-    # fitted, and both refuted forms are of exactly that shape.
+    # A fitted rival is still worth running, for exactly ONE direction of
+    # inference. If a shape given free parameters and fitted to these cells
+    # STILL fails them, no choice of constant rescues that shape, and the whole
+    # family is excluded rather than one member of it. That is a refutation, and
+    # it is sound because fitting can only help the rival. The converse is
+    # worthless: a fitted form that agrees has demonstrated nothing, because it
+    # was chosen to agree. Read these rows in one direction only.
+    #
+    # The two families are the ones the refuted bodies rule out between them.
+    # The correlation is near ONE at the lowest migration and rises slowly, so
+    # whatever the law is, it is a small DEFICIT decaying in M and not a share
+    # growing from zero -- and every body of the form f(M) -> 0 as M -> 0 is
+    # excluded before any fitting, which is what BOTH refuted forms are. Testing
+    # the deficit family here says whether the corpus should be looking for a
+    # power law at all.
     bigMs = (0.1, 0.4, 1.0, 2.0, 8.0, 20.0, 40.0, 100.0)
     obs = []
     for bigM in bigMs:
@@ -222,35 +230,41 @@ def main():
            "THOUSANDFOLD, 0.1 to 100. The control runs one panmictic "
            "population through the "
            "same estimator and the same filters")
-    fitted = ("; this candidate is FITTED by weighted least squares on these "
-              "very cells and the ansatz is not, so the comparison is being "
-              "made on the ansatz's worst terms -- which is what makes a "
-              "candidate's failure a statement about its SHAPE")
+    fitted = ("; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. "
+              "It is FITTED by weighted least squares on the very cells it is "
+              "scored against, so it may be read in one direction only: if it "
+              "FAILS, no choice of constant rescues its shape and the family is "
+              "excluded. If it agrees, that is a property of the fitting and "
+              "not evidence about a population, and it must not be promoted "
+              "into the corpus -- a successor has to come from a derivation, "
+              "which this battery would then test")
     record("ldCorrelationMigrationAnsatz", "PopulationGeneticsFoundations.lean",
            "M^2 / (1 + M)^2", cells, regime=reg, control=control, **MODEL)
     record("ldCorrelationMigrationAnsatz [unsquared M/(1+M), competing]",
            "PopulationGeneticsFoundations.lean", "M / (1 + M)", c_unsquared,
            regime=reg, control=control, **MODEL)
     record("ldCorrelationMigrationAnsatz "
-           "[CANDIDATE: unit minus a free power law, competing]",
+           "[REFUTATION INSTRUMENT: unit minus a free power law, competing]",
            "PopulationGeneticsFoundations.lean",
            "1 - c * M^(-b), both c and b fitted", c_pow,
            regime=reg + fitted,
-           note="the shape the measurements point at rather than the shape the "
-                "ansatz assumed: what migration moves is a DEFICIT that decays "
-                "in M, not a share that grows from zero. Two free parameters "
-                "against eight cells spanning a thousandfold in M",
+           note="two free parameters against eight cells spanning a "
+                "thousandfold in M, asking ONLY whether the deficit family can "
+                "be excluded outright. A failure here says the corpus should "
+                "not be looking for a power law in M; agreement says nothing, "
+                "because the parameters were chosen to produce it",
            **MODEL)
     record("ldCorrelationMigrationAnsatz "
-           "[CANDIDATE: unit minus c/sqrt(M), competing]",
+           "[REFUTATION INSTRUMENT: unit minus c/sqrt(M), competing]",
            "PopulationGeneticsFoundations.lean",
            "1 - c / sqrt(M), c fitted and the exponent PINNED at one half",
            c_sqrt, regime=reg + fitted,
-           note="the same family with the exponent held fixed instead of "
-                "fitted, so it spends ONE parameter where the row above spends "
-                "two. If it survives the same cells, the exponent is not a "
-                "fitted quantity but a half, and the deficit is a diffusive "
-                "one -- which is a claim a mechanism could be asked for",
+           note="the same family with the exponent HELD FIXED rather than "
+                "fitted, so only the amplitude is free. The pinned exponent is "
+                "the informative part: a half is what a diffusive deficit would "
+                "give, so a failure here excludes that mechanism whatever the "
+                "constant, which is a statement no amount of fitting could "
+                "manufacture. Agreement, again, is not evidence",
            **MODEL)
 
     dump_results("battery_bulk51_results.json",

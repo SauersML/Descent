@@ -194,14 +194,16 @@ def main():
 
     tau_basis = lambda t, M: M * t / (1 + M)
     flat_basis = lambda t, M: M / (1 + M)
-    # THE THIRD CANDIDATE IS THE ONE THE MEASUREMENTS POINT AT, and it is not
-    # either of the two hypotheses this design was built to separate. Across
-    # `tau` = 0.25, 0.5, 1.0 at fixed `bigM` the excess rose and then flattened
-    # -- a fourfold change in divergence producing about a twofold change in
-    # excess -- which is neither proportional (the body) nor constant (the
-    # tau-free rival). It is SATURATING, in `tau` exactly as the body already
-    # saturates in `bigM`, so the candidate applies the corpus's own saturation
-    # to both arguments and spends the same single parameter as its rivals.
+    # A THIRD REFUTATION INSTRUMENT, NOT A THIRD PROPOSAL. Across `tau` = 0.25,
+    # 0.5, 1.0 at fixed `bigM` the measured excess rose and then flattened -- a
+    # fourfold change in divergence buying about twofold in excess -- so the
+    # dependence is neither proportional (the body) nor absent (the tau-free
+    # rival), and a design that carried only those two would report both
+    # rejected and leave the reader to guess why. Saturation is the third thing
+    # a bounded increasing dependence can be, so it is carried to be REJECTED
+    # or not; it is not offered as a body. See the fitting note below: none of
+    # these fitted rows may be promoted into the corpus, because a shape read
+    # off these cells has been fitted to the data meant to test it.
     sat_basis = lambda t, M: (M / (1 + M)) * (t / (1 + t))
     a_tau = fit(tau_basis)
     a_flat = fit(flat_basis)
@@ -241,9 +243,13 @@ def main():
            "cross-deme correlation of signed LD r across SNP pairs common in "
            "BOTH demes. A ratio fixes no scale, so no LD normalisation "
            "convention enters" % reps)
-    fitted = ("; this rival is FITTED by weighted least squares on these very "
-              "cells, and the corpus body is not, so it is being given every "
-              "advantage the comparison can give it")
+    fitted = ("; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. "
+              "It is FITTED by weighted least squares on the very cells it is "
+              "scored against, so it may be read in one direction only: if it "
+              "FAILS, no choice of constant rescues its shape. If it agrees, "
+              "that is a property of the fitting and not evidence about a "
+              "population, and it must not be promoted into the corpus -- a "
+              "simulation validates a formula and does not produce one")
     record("migrationLDBoost", "DGP.lean", "1 + bigM * tau / (1 + bigM)",
            cells, regime=reg, control=control, **MODEL)
     record("migrationLDBoost [no restoration at all, competing]", "DGP.lean",
@@ -264,17 +270,17 @@ def main():
                 "sweep then the divergence depth does not enter the boost, and "
                 "the repair deletes the argument rather than rescaling it",
            **MODEL)
-    record("migrationLDBoost "
-           "[CANDIDATE: saturating in tau as well as in bigM, competing]",
+    record("migrationLDBoost [REFUTATION INSTRUMENT: saturating in tau as "
+           "well as in bigM, competing]",
            "DGP.lean",
            "1 + a * (bigM/(1+bigM)) * (tau/(1+tau)), a fitted", c_sat,
            regime=reg + fitted,
-           note="the same one free parameter as the two rows above, spent on "
-                "the shape the cells actually trace: the excess rises with "
-                "divergence and then flattens, which is neither proportional "
-                "nor constant. It is the body's own saturation applied to its "
-                "OTHER argument, so if it survives, the repair to the "
-                "declaration is one kernel and not a new function",
+           note="the third thing a bounded increasing dependence can be, "
+                "carried so that `rejected and rejected` is not the whole "
+                "report: the excess rises with divergence and then flattens, "
+                "which is neither proportional nor constant. Its REJECTION "
+                "would be the finding. Its agreement would not be, and would "
+                "not license writing it into the declaration",
            **MODEL)
     record("migrationSharedBoostAt", "PortabilityDrift.lean",
            "1 + bigM * tauAt t / (1 + bigM)", cells,
