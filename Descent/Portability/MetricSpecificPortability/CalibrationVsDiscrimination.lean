@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
+import Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination
+import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 
 assert_below Descent.Decision Descent.Program
 

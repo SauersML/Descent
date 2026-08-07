@@ -1,11 +1,15 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Conditionals.DynamicsContrast.CohortLandscapeSuperposition
 import Descent.Blindness.TrafficInvariantSeparation.CurieWeissWindow
 import Descent.Blindness.TrafficInvariantSeparation.MatchedBayesBoundary
 import Descent.Blindness.XiFromMarkedBreakouts
 import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
+import Descent.PopGen.FrequencySpectrumStability
+import Descent.Blindness.TrafficInvariantSeparation.PolynomialTraffic
+import Descent.Blindness.TrafficInvariantSeparation.MesoscopicAmplification
+import Descent.Blindness.SpectrumIdentifiability
+import Descent.Blindness.LandscapeSuperposition
 
 assert_below Descent.Decision
 

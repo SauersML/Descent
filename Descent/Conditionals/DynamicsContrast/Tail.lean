@@ -4,6 +4,18 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Conditionals.DynamicsContrast.StationarityRepair
 import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
 import Descent.Spectral.CirculationDefect
+import Descent.Spectral.EnsembleChannel
+import Descent.Portability.HorizonCurve
+import Descent.Portability.CorrectionWidths
+import Descent.Portability.ContinuumCalibration
+import Descent.Conditionals.FunctionalDescent
+import Descent.Conditionals.DescentGeometry
+import Descent.Spectral.ErgodicCovariancePencil
+import Descent.PopGen.SelectionArchitecture
+import Descent.Conditionals.DeclaredInteractionClass
+import Descent.Blindness.SpectralUniversalityFailure
+import Descent.Spectral.PencilEnvironment
+import Descent.Spectral.DirichletTransfer
 
 assert_below Descent.Decision
 

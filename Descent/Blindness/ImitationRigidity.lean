@@ -1,11 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.LDDecayTheory
 import Descent.Spectral.WhiteningEquivalence
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Symmetric
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+import Descent.PopGen.LDDecayTheory
+import Descent.Foundations.TransportIdentities
+import Descent.Core.Ratios
+import Descent.Core.Fst
 
 assert_below Descent.Conditionals Descent.Decision
 

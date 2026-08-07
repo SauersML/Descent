@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Descent.Portability.ClinicalUtilityFairness
 import Descent.Spectral.ProjectionShiftBounds
 import Descent.Blindness.ImitationRigidity
 import Descent.Spectral.FoldedSpectrum
@@ -10,6 +9,8 @@ import Descent.Spectral.FoldedSpectrum
 -- below, so the module declaring them is imported directly rather than reached along a
 -- path that runs through some other chapter's head.
 import Descent.Portability.PopulationAUC
+import Descent.Portability.PortabilityDrift.PresentDayMoments
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Decision Descent.Program
 

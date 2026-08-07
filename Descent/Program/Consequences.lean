@@ -9,13 +9,11 @@ import Descent.Portability.LongitudinalPortability
 import Descent.Portability.EquityAndImplementation
 import Descent.PopGen.HumanDemography
 import Descent.PopGen.DemographicCapacity
-import Descent.Portability.CorrectionBiology
 import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Foundations.CovarianceStructure
 import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Program.CausalInference
-import Descent.Portability.PolygenicContinuumCalibration
 import Descent.Portability.GenerativePortabilityLaw
 import Descent.Portability.PCCorrectability.EndToEnd
 import Descent.Spectral.ProjectionSolve
@@ -25,6 +23,8 @@ import Descent.Blindness.BundleRigidity.Cycles
 import Descent.Blindness.BundleRigidity.Dichotomy
 import Descent.Blindness.BundleRigidity.TwoAtom
 import Descent.PopGen.DriftRecurrences
+import Descent.Portability.CorrectionBiology
+import Descent.Portability.PolygenicContinuumCalibration
 
 /-!
 # What the separate results say when they are put together

@@ -6,7 +6,6 @@ import Descent.Portability.ContinuumCalibration
 import Descent.Portability.CorrectionWidths
 import Descent.Conditionals.DescentGeometry
 import Descent.Spectral.DirichletTransfer
-import Descent.Spectral.ErgodicCovariancePencil
 import Descent.Spectral.EnsembleChannel
 import Descent.PopGen.FrequencySpectrumStability
 import Descent.Portability.HorizonCurve

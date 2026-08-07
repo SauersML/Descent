@@ -6,6 +6,7 @@ import Descent.Portability.MetricSpecificPortability.PrecisionRecall
 -- results against. It is a loss of one outcome against one prediction, so the import runs
 -- downward.
 import Descent.Foundations.BernoulliLosses
+import Descent.Portability.PGSCalibrationTheory.DecisionImplications
 
 assert_below Descent.Decision Descent.Program
 
