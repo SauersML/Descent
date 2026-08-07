@@ -102,6 +102,25 @@ theorem ancestralRel_rel {n N : ℕ} (P : Pedigree N) (sample : Fin n → Fin N)
     (ancestralRel P sample s).r i j
       ↔ ancestor P s (sample i) = ancestor P s (sample j) := Iff.rfl
 
+/-- **`ℛ_s` at any depth is the ONE-generation ancestral partition, applied to the
+`s`-generation ancestor map.**
+
+`Descent.Coalescent.WrightFisher.ancestralPartition` is the object Kingman's `R_1` names:
+who shares a parent, one step back.  This says the whole pedigree theory adds no second
+construction on top of it -- `ancestralRel` at depth `s` is that same partition, taken of
+`ancestor P s ∘ sample` instead of of the parent map.  The depth lives entirely in the map
+being kernelled, and none of it in the kernelling.
+
+That is why every structural fact about `ℛ_s` in this file is proved by `congrArg` and none
+of them by probability: `ancestralPartition` is a `Setoid.ker`, kernels are equivalence
+relations for free, and a coarsening of the map coarsens its kernel.  It is also what lets
+`Descent.Pangenome.GraphCoalescent.Observation.graphKer` be the same object under a
+different reading of the map -- there the map is a graph's interface rather than a
+generation of reproduction, and nothing else changes. -/
+theorem ancestralRel_eq_ancestralPartition {n N : ℕ} (P : Pedigree N)
+    (sample : Fin n → Fin N) (s : ℕ) :
+    ancestralRel P sample s = ancestralPartition fun i ↦ ancestor P s (sample i) := rfl
+
 /-- **K-G (2.5): `ℛ_0 = Δ`.**  At the moment of sampling nobody shares an ancestor with anybody but
 themselves -- provided the `n` individuals sampled are distinct, which is the
 hypothesis, and is what "select `n` particular individuals" means. -/

@@ -3,6 +3,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Interpolation
 import Descent.Coalescent.Lumping
+-- `Coalescent.ancestralPartition`, for `graphKer_eq_ancestralPartition` below: the graph's
+-- merge and one generation of reproduction are the same construction, and saying so is what
+-- stops this group being a second theory of the same object.
+import Descent.Coalescent.WrightFisher
 import Descent.Pangenome.Linkage.Interface
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -67,6 +71,29 @@ each handed back the premise they were given, so neither could be rewritten with
 consumer had to know which of the two names moved in the direction it needed. -/
 theorem graphKer_rel_iff {n : ℕ} {s : Fin n → Fin n} {x y : Fin n} :
     (graphKer s).r x y ↔ s x = s y := Iff.rfl
+
+/-- **The graph's merge and one generation of reproduction are the same object.**
+
+`Descent.Coalescent.WrightFisher.ancestralPartition` is Kingman's `R_1`: the kernel of the
+parent map, two lineages related when they chose the same parent.  `graphKer` is the kernel
+of the interface map, two haplotypes related when they occupy the same graph state.  They
+are one construction, and the whole difference is what the map is READ as -- a generation
+of descent in one case, a builder's decision in the other.
+
+This is the identification the group rests on and it is worth having stated rather than
+noticed.  It says the pangenome development is not a second theory of coarsening that
+happens to resemble the coalescent's: every lattice fact `Descent.Coalescent.Pedigree`
+proves about `ancestralRel` -- reflexivity for free, monotonicity under coarsening of the
+map, `ℛ_0 = Δ` at an injective sample -- is a fact about `graphKer` for the same reason and
+with the same proof.  It also fixes the reading of the width law: `Linkage.width s` counts
+the classes of this partition, so it is a lineage count in exactly the sense the coalescent
+means, and `blocks_graphKer` below is that sentence made into an equation.
+
+What it does NOT say is that a graph's interface arises from descent.  It is one merge map
+compared with another, and which merges a real graph performs is the empirical question
+`Descent.Pangenome.Linkage.Interface` states and this file assumes. -/
+theorem graphKer_eq_ancestralPartition {n : ℕ} (s : Fin n → Fin n) :
+    graphKer s = Coalescent.ancestralPartition s := rfl
 
 /-- **A faithful interface has destroyed nothing.**  If no two panel haplotypes share a
 graph state then `graphKer s` sits below every coalescent state, so joining with it changes
