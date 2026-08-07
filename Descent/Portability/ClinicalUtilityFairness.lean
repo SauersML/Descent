@@ -1229,4 +1229,116 @@ theorem minimum_sample_for_clinical_pgs
 
 end Recommendations
 
+/-! ## The same clinical laws, read at a demography's own deployed `R²`
+
+Everything above states a clinical-utility law about a free `R²`, and a reader has to
+believe that number came from a population. The results below say the same things about
+`(p : Descent.Core.PopGenParameters)` and the `R²` that record itself deploys, so a
+migration rate reaches an operating-point metric inside one claim.
+
+What the record supplies and what it cannot. The three `R²` facts the threshold regime
+needs — the gap between two histories, and that both lie in `[0,1]` — are theorems about
+the parameters, and `thresholdRegime_of_deployedR2_of_mig_lt` discharges all three. The
+other three are about where the operating point sits: a control mean below the threshold
+and the two numerator sign conditions. No demography supplies those, they are properties
+of the threshold model and the cut-off chosen, and they stay as hypotheses here.
+-/
+
+section DeployedClinicalUtility
+
+open Descent.Core.ScoreMoments
+
+/-- **Two histories differing only in migration land in the threshold regime.**
+
+Give two parameter records agreeing on everything but migration; the one with more
+migration deploys the strictly higher `R²`, and both deployed values are `R²`s. That is the
+whole `R²` side of `ThresholdRegime`, so the only hypotheses left are the three about the
+operating point.
+
+This is the bridge every corollary below crosses, and the reason none of them has to assume
+an `R²` gap: the gap is `deployedR2_mono_in_migration`, which is a statement about
+demography rather than a number a reader supplies. -/
+theorem thresholdRegime_of_deployedR2_of_mig_lt
+    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (T' μ_control V_E : ℝ) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
+    (hsens : 0 ≤ Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * m.case_mean - T')
+    (hspec : 0 ≤ T' - Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * μ_control) :
+    ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E) where
+  r2_gap := deployedR2_mono_in_migration p q V_E hE hsame.1 hsame.2.1 hsame.2.2.1
+    hsame.2.2.2 hlt hflow
+  r2_lo_nonneg := (deployedR2_mem_unit p V_E hE.le hflow).1
+  r2_hi_le_one := (deployedR2_mem_unit q V_E hE.le (by have := hsame.2.1; linarith)).2
+  control_neg := hμ_control_neg
+  sens_num_nonneg := hsens
+  spec_num_nonneg := hspec
+
+/-- **More migration between two populations, strictly better operating-point sensitivity.**
+
+The end-to-end claim: a demographic rate on the left, a number a clinic reports on the
+right, and no free `R²` in between. -/
+theorem sensFromR2_mono_in_migration_of_params
+    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (T' μ_control V_E : ℝ) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
+    (hsens : 0 ≤ Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * m.case_mean - T')
+    (hspec : 0 ≤ T' - Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * μ_control) :
+    sensFromR2 m (deployedR2 p V_E) T' < sensFromR2 m (deployedR2 q V_E) T' :=
+  have hregime := thresholdRegime_of_deployedR2_of_mig_lt m p q T' μ_control V_E hE hsame hlt
+    hflow hμ_control_neg hsens hspec
+  sensFromR2_strictMono_of_threshold_le m T' _ _ hregime.r2_lo_nonneg hregime.r2_hi_le_one
+    hregime.r2_gap hregime.sens_num_nonneg
+
+/-- **And strictly better specificity**, from the same demographic contrast. -/
+theorem specFromR2_mono_in_migration_of_params
+    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (T' μ_control V_E : ℝ) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
+    (hsens : 0 ≤ Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * m.case_mean - T')
+    (hspec : 0 ≤ T' - Real.sqrt (deployedR2 p V_E) * Real.sqrt m.h_sq * μ_control) :
+    specFromR2 m (deployedR2 p V_E) T' μ_control <
+      specFromR2 m (deployedR2 q V_E) T' μ_control :=
+  have hregime := thresholdRegime_of_deployedR2_of_mig_lt m p q T' μ_control V_E hE hsame hlt
+    hflow hμ_control_neg hsens hspec
+  specFromR2_strictMono_of_threshold_le m T' μ_control _ _ hregime.control_neg
+    hregime.r2_lo_nonneg hregime.r2_hi_le_one hregime.r2_gap hregime.spec_num_nonneg
+
+/-- **A demography that loses `R²` loses NRI.**
+
+The reclassification improvement a score buys is strictly smaller under the history that
+deploys the lower `R²`, against a common baseline. The regime is the one
+`thresholdRegime_of_deployedR2_of_mig_lt` builds from a migration contrast. -/
+theorem nri_decreases_with_deployedR2_loss_of_params
+    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (T' μ_control r2_base V_E : ℝ)
+    (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E)) :
+    netReclassificationImprovement
+        (sensFromR2 m (deployedR2 p V_E) T' - sensFromR2 m r2_base T')
+        (specFromR2 m (deployedR2 p V_E) T' μ_control - specFromR2 m r2_base T' μ_control) <
+      netReclassificationImprovement
+        (sensFromR2 m (deployedR2 q V_E) T' - sensFromR2 m r2_base T')
+        (specFromR2 m (deployedR2 q V_E) T' μ_control - specFromR2 m r2_base T' μ_control) :=
+  nri_decreases_with_portability_loss m T' μ_control r2_base (deployedR2 q V_E)
+    (deployedR2 p V_E) hregime
+
+/-- **The useful threshold range narrows with the deployed `R²`.**
+
+Net benefit at every treatment threshold is strictly lower under the history that deploys
+less, which is the decision-curve statement with the demography in place of a free `R²`. -/
+theorem portability_narrows_useful_range_of_params
+    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (T' μ_control V_E π t : ℝ) (h_π : 0 < π) (h_π1 : π < 1) (ht : 0 < t) (ht1 : t < 1)
+    (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E)) :
+    decisionCurveNetBenefit (sensFromR2 m (deployedR2 p V_E) T' * π)
+        ((1 - specFromR2 m (deployedR2 p V_E) T' μ_control) * (1 - π)) 1 t <
+      decisionCurveNetBenefit (sensFromR2 m (deployedR2 q V_E) T' * π)
+        ((1 - specFromR2 m (deployedR2 q V_E) T' μ_control) * (1 - π)) 1 t :=
+  portability_narrows_useful_range m T' μ_control (deployedR2 q V_E) (deployedR2 p V_E) π t
+    h_π h_π1 ht ht1 hregime
+
+end DeployedClinicalUtility
+
 end Descent.Portability

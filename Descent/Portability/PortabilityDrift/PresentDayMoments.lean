@@ -2196,6 +2196,161 @@ theorem expectedSqMeanPGSDiff_IMEquilibrium_strictAntiOn_M
   have := twoDemeIMEquilibriumDelta_strictAntiOn ha hb hab
   nlinarith
 
+/-! ## The demography's own deployed metrics
+
+Every law above states itself over loose reals -- a `V_A`, an `F_ST`, a signal variance -- and
+a reader has to believe those came from a population. The corollaries below state the same
+laws about `(p : PopGenParameters)` and the differentiation that record itself predicts, so
+the demography reaches the deployed number inside one claim instead of across a gap the reader
+closes. `Core/Moments.lean` states this pattern for the metrics it owns; these are the chart
+and benchmark laws this module owns.
+
+The record's own fields discharge what the loose form asked the reader to assume: `V_A_pos`
+for the additive variance, `fstEquilibrium_lt_one` for the differentiation, both under the
+flow hypothesis `0 < p.mu + p.mig` that says the demes are connected at all. `V_E` stays an
+argument because environmental variance is not demography and the record does not carry it.
+
+Not every law above admits one. A law reading a prevalence against a literal `R²`, a
+junk-value law about a degenerate variance, and the laws about a `CrossPopulationMetricModel`
+or a `CrossPopulationGenerationalModel` all take nothing this record supplies, and binding
+`p` to them would name a demography the statement never uses. -/
+
+open Descent.Core (PopGenParameters)
+
+/-- **The deployed `R²` under drift is strictly below one** whenever there is environmental
+variance left to explain. The unit-interval bound is not enough for the AUC charts, which
+divide by `1 - R²`: at `R² = 1` the Gaussian argument is undefined, and a positive `V_E` is
+exactly what rules that case out. -/
+theorem presentDayR2_lt_one (V_A V_E fst : ℝ) (hVA : 0 < V_A) (hVE : 0 < V_E)
+    (hfst : fst < 1) :
+    presentDayR2 V_A V_E fst < 1 := by
+  have hv_pos : 0 < presentDayPGSVariance V_A fst := by
+    rw [presentDayPGSVariance_eq_one_sub_fst_mul]
+    exact mul_pos (by linarith) hVA
+  unfold presentDayR2 PopGen.TransportedMetrics.r2FromSignalVariance Descent.Core.share
+  exact (div_lt_one (add_pos hv_pos hVE)).2 (lt_add_of_pos_right _ hVE)
+
+/-- **A demography's benchmark profile, read at its own equilibrium differentiation.**  The
+three deployed coordinates of the neutral-allele-frequency benchmark are what this record's
+additive variance and island equilibrium produce, with no free `F_ST` for a reader to
+supply. -/
+theorem neutralAFBenchmarkMetricProfile_eq_of_params (p : PopGenParameters) (π V_E : ℝ) :
+    neutralAFBenchmarkMetricProfile π p.V_A V_E p.fstEquilibrium =
+      { r2 := targetR2FromNeutralAFBenchmark p.V_A V_E p.fstEquilibrium
+      , auc := presentDayEqualVarianceGaussianAUC p.V_A V_E p.fstEquilibrium
+      , brier := targetBrierFromNeutralAFBenchmark π p.V_A V_E p.fstEquilibrium } :=
+  neutralAFBenchmarkMetricProfile_eq π p.V_A V_E p.fstEquilibrium
+
+/-- **A demography's liability-threshold AUC is the chart at the `R²` it deploys.**  For a
+dichotomised trait at prevalence `K`, the benchmark AUC is the liability chart read at the
+`R²` this record's equilibrium leaves, and nothing else enters. -/
+theorem targetLiabilityAUCFromNeutralAFBenchmark_eq_of_params
+    (p : PopGenParameters) (V_E K : ℝ) :
+    targetLiabilityAUCFromNeutralAFBenchmark p.V_A V_E p.fstEquilibrium K =
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) K :=
+  targetLiabilityAUCFromNeutralAFBenchmark_eq p.V_A V_E p.fstEquilibrium K
+
+/-- **Dichotomising a demography's trait moves the AUC coordinate and nothing else.**  At
+this record's own differentiation the liability profile agrees with the benchmark profile on
+`R²` and on Brier risk, and differs on the discrimination coordinate alone -- which is where
+the misidentification this module records would land. -/
+theorem liabilityProfile_differs_only_in_auc_of_params (p : PopGenParameters) (π V_E : ℝ) :
+    (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).r2 =
+      targetR2FromNeutralAFBenchmark p.V_A V_E p.fstEquilibrium ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).brier =
+      targetBrierFromNeutralAFBenchmark π p.V_A V_E p.fstEquilibrium ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).auc =
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) π :=
+  liabilityProfile_differs_only_in_auc π p.V_A V_E p.fstEquilibrium
+
+/-- **A connected demography's equal-variance AUC is its present-day AUC.**  The chart read
+at the `R²` this record deploys and the closed form in the record's own coordinates are one
+number.  The flow hypothesis is what makes the equilibrium differentiation strictly below
+one; with no migration and no mutation the demes are separate populations and the chart has
+nothing to read. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC_of_params
+    (p : PopGenParameters) (V_E : ℝ) (hVE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) =
+      presentDayEqualVarianceGaussianAUC p.V_A V_E p.fstEquilibrium :=
+  equalVarianceGaussianAUCFromExplainedR2_eq_presentDayAUC p.V_A V_E p.fstEquilibrium
+    p.V_A_pos hVE (p.fstEquilibrium_lt_one hflow)
+
+/-- **The `R²` and variance readings agree on a demography's drifted signal.**  The record's
+additive variance, attenuated by its own equilibrium, is the signal variance the AUC reads,
+so the two ways of entering the chart cannot disagree about this population.  No flow
+hypothesis is needed: at complete differentiation the attenuated signal is zero, which the
+variance form reads as well as the `R²` form does. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_variance_of_params
+    (p : PopGenParameters) (V_E : ℝ) (hVE : 0 < V_E) :
+    equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) =
+      equalVarianceGaussianAUCFromSignalVariance
+        (presentDayPGSVariance p.V_A p.fstEquilibrium) V_E := by
+  have hv : 0 ≤ presentDayPGSVariance p.V_A p.fstEquilibrium := by
+    rw [presentDayPGSVariance_eq_one_sub_fst_mul]
+    exact mul_nonneg (by linarith [p.fstEquilibrium_mem_unit.2]) p.V_A_pos.le
+  exact equalVarianceGaussianAUCFromExplainedR2_eq_variance
+    (presentDayPGSVariance p.V_A p.fstEquilibrium) V_E hv hVE
+
+/-- **The closed form of the chart, at a demography's own `R²`.** -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_params
+    (p : PopGenParameters) (V_E : ℝ) (hVE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) =
+      Foundations.Phi (Real.sqrt (presentDayR2 p.V_A V_E p.fstEquilibrium /
+        (2 * (1 - presentDayR2 p.V_A V_E p.fstEquilibrium)))) :=
+  equalVarianceGaussianAUCFromExplainedR2_eq_formula_of_lt_one _
+    (presentDayR2_lt_one p.V_A V_E p.fstEquilibrium p.V_A_pos hVE
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **And its signal-to-noise reading.**  A deployment quoting an AUC from a signal-to-noise
+ratio and one quoting it from an `R²` are quoting the same number about this population. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR_of_params
+    (p : PopGenParameters) (V_E : ℝ) (hVE : 0 < V_E) (hflow : 0 < p.mu + p.mig) :
+    equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) =
+      equalVarianceGaussianAUCFromSNR (presentDayR2 p.V_A V_E p.fstEquilibrium /
+        (1 - presentDayR2 p.V_A V_E p.fstEquilibrium)) :=
+  equalVarianceGaussianAUCFromExplainedR2_eq_fromSNR _
+    (presentDayR2_lt_one p.V_A V_E p.fstEquilibrium p.V_A_pos hVE
+      (p.fstEquilibrium_lt_one hflow))
+
+/-- **Deeper differentiation discriminates worse, for one demography.**  The additive
+variance is the record's and only the differentiation moves, which is the comparison a
+deployment across two target populations actually makes.  Stated at a free `F_ST` rather than
+at the record's equilibrium because the point is the movement, and a record has one
+equilibrium. -/
+theorem equalVarianceGaussianAUCFromExplainedR2_anti_of_params
+    (p : PopGenParameters) (V_E f₁ f₂ : ℝ) (hVE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E f₂) <
+      equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E f₁) := by
+  have hf1 : f₁ < 1 := lt_trans h1 h2
+  exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
+    ⟨(presentDayR2_mem_unit p.V_A V_E f₂ p.V_A_pos hVE.le h2).1,
+      presentDayR2_lt_one p.V_A V_E f₂ p.V_A_pos hVE h2⟩
+    ⟨(presentDayR2_mem_unit p.V_A V_E f₁ p.V_A_pos hVE.le hf1).1,
+      presentDayR2_lt_one p.V_A V_E f₁ p.V_A_pos hVE hf1⟩
+    (presentDayR2_anti p.V_A V_E f₁ f₂ p.V_A_pos hVE h1 h2)
+
+/-- **And it costs Brier risk, for the same demography.**  The two deployed coordinates move
+together under differentiation because both read the one `R²` this record's additive variance
+leaves after drift. -/
+theorem brierFromR2_anti_of_params
+    (p : PopGenParameters) (π V_E f₁ f₂ : ℝ) (hπ0 : 0 < π) (hπ1 : π < 1) (hVE : 0 < V_E)
+    (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    brierFromR2 π (presentDayR2 p.V_A V_E f₁) < brierFromR2 π (presentDayR2 p.V_A V_E f₂) :=
+  brierFromR2_strictAnti π hπ0 hπ1 (presentDayR2_anti p.V_A V_E f₁ f₂ p.V_A_pos hVE h1 h2)
+
+/-- **Prevalence-dependence at a demography's own `R²` rules out the equal-variance chart.**
+If the liability AUC this record deploys differs between two prevalences, then no prevalence
+makes the liability chart agree with the equal-variance one there -- so the choice of chart is
+a claim about the trait and not a presentational one. -/
+theorem liabilityAUC_ne_equalVarianceAUC_of_params
+    (p : PopGenParameters) (V_E K₁ K₂ : ℝ)
+    (hK : liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) K₁ ≠
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) K₂) :
+    ¬ (∀ K : ℝ,
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) K =
+        equalVarianceGaussianAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium)) :=
+  liabilityAUC_ne_equalVarianceAUC_of_prevalence_dependent hK
+
 end PresentDayMetrics
 
 /-- **The two in the allele-frequency retention ratio is the ploidy, twice, and
