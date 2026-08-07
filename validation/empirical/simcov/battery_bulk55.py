@@ -134,26 +134,65 @@ def main():
     print("FRESHNESS token literal: SIMCOV-BATTERY-BULK55-SKUA-20260805")
     reps = 16
 
-    cells, c_none = [], []
-    control = None
-    for tau in (0.5, 1.0):
+    # THE DESIGN SWEEPS `tau` EIGHTFOLD, and that is the change.
+    #
+    # The previous run held `tau` to 0.5 and 1.0 -- a factor of two -- and
+    # reported the body FALSIFIED on magnitude. Magnitude was the wrong reading
+    # of its own numbers: at each `bigM` the measured EXCESS was the same at
+    # both depths to within a sem, while the body says the excess is
+    # PROPORTIONAL to `tau` and must therefore double. A factor of two in the
+    # swept parameter is not enough to separate "too large by a constant" from
+    # "does not depend on tau at all", and those call for different repairs --
+    # one rescales a constant, the other deletes an argument.
+    #
+    # So `tau` runs 0.25 to 2.0 here. If the excess is still flat across an
+    # eightfold change in divergence depth, no constant repairs the body.
+    taus = (0.25, 0.5, 1.0, 2.0)
+    bigMs = (0.5, 4.0, 16.0)
+    obs = []
+    for tau in taus:
         t_div = int(tau * 2 * NE)
         base = cross_deme_ld_corr(t_div, 0.0, reps, seed=55000 + t_div)
-        for bigM in (0.5, 4.0, 16.0):
+        for bigM in bigMs:
             with_m = cross_deme_ld_corr(t_div, bigM, reps,
                                         seed=55500 + t_div + int(10 * bigM))
             boost = with_m["mean"] / base["mean"]
             # Ratio of two independent means: relative errors add in quadrature.
             sem = boost * math.sqrt((with_m["sem"] / with_m["mean"]) ** 2
                                     + (base["sem"] / base["mean"]) ** 2)
-            lean = 1 + bigM * tau / (1 + bigM)
-            lab = "tau=%.1f bigM=%.1f" % (tau, bigM)
-            print("  %-20s measured boost %.4f +/- %.4f   body %.4f"
-                  % (lab, boost, sem, lean))
-            cells.append(dict(design=lab, lean=lean, truth=boost,
-                              sem=max(sem, 1e-9)))
-            c_none.append(dict(design=lab, lean=1.0, truth=boost,
-                               sem=max(sem, 1e-9)))
+            lab = "tau=%.2f bigM=%.1f" % (tau, bigM)
+            print("  %-22s measured boost %.4f +/- %.4f   body %.4f"
+                  % (lab, boost, sem, 1 + bigM * tau / (1 + bigM)))
+            obs.append((tau, bigM, lab, boost, max(sem, 1e-9)))
+
+    # ONE FREE PARAMETER EACH, and the corpus body gets none.
+    #
+    # The question is no longer whether the body's amplitude is right -- it
+    # plainly is not -- but whether its SHAPE is. So both rivals are fitted, by
+    # weighted least squares on these very cells, and the body is not. A rival
+    # fitted to the curve it is tested against is the strongest form the
+    # comparison can take: if the tau-BEARING shape still loses to the tau-FREE
+    # one with an amplitude chosen in its favour, no choice of constant repairs
+    # the tau factor, and the argument has to go rather than be rescaled.
+    def fit(basis):
+        num = sum(basis(t, M) * (b - 1.0) / s ** 2 for t, M, _, b, s in obs)
+        den = sum(basis(t, M) ** 2 / s ** 2 for t, M, _, b, s in obs)
+        return num / den if den > 0 else 0.0
+
+    tau_basis = lambda t, M: M * t / (1 + M)
+    flat_basis = lambda t, M: M / (1 + M)
+    a_tau = fit(tau_basis)
+    a_flat = fit(flat_basis)
+    print("  fitted amplitudes: tau-bearing a=%.4f, tau-free a=%.4f"
+          % (a_tau, a_flat))
+
+    cells, c_none, c_fit_tau, c_flat = [], [], [], []
+    for tau, bigM, lab, boost, sem in obs:
+        cell = lambda v: dict(design=lab, lean=v, truth=boost, sem=sem)
+        cells.append(cell(1 + bigM * tau / (1 + bigM)))
+        c_none.append(cell(1.0))
+        c_fit_tau.append(cell(1 + a_tau * tau_basis(tau, bigM)))
+        c_flat.append(cell(1 + a_flat * flat_basis(tau, bigM)))
 
     # POSITIVE CONTROL, through the ESTIMATOR UNDER TEST rather than beside it:
     # a split one generation ago, no migration, is one population labelled two
@@ -172,14 +211,35 @@ def main():
 
     reg = ("two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb "
            "with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing "
-           "migration at m = bigM/(4 Ne), 16 replicates each; the observable "
-           "is the RATIO of the cross-deme correlation of signed LD r across "
-           "SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD "
-           "normalisation convention enters")
+           "migration at m = bigM/(4 Ne), %d replicates each; tau sweeps 0.25 "
+           "to 2.0, EIGHTFOLD, which is what separates an amplitude error from "
+           "a dependence that is not there. The observable is the RATIO of the "
+           "cross-deme correlation of signed LD r across SNP pairs common in "
+           "BOTH demes. A ratio fixes no scale, so no LD normalisation "
+           "convention enters" % reps)
+    fitted = ("; this rival is FITTED by weighted least squares on these very "
+              "cells, and the corpus body is not, so it is being given every "
+              "advantage the comparison can give it")
     record("migrationLDBoost", "DGP.lean", "1 + bigM * tau / (1 + bigM)",
            cells, regime=reg, control=control, **MODEL)
     record("migrationLDBoost [no restoration at all, competing]", "DGP.lean",
            "1", c_none, regime=reg, control=control, **MODEL)
+    record("migrationLDBoost [tau-bearing shape, free amplitude, competing]",
+           "DGP.lean", "1 + a * bigM * tau / (1 + bigM), a fitted",
+           c_fit_tau, regime=reg + fitted, control=control,
+           note="the body's own shape with its magnitude repaired: this is the "
+                "best any rescaling of the constant can do, and it is carried "
+                "so that a magnitude reading of this design can be excluded "
+                "rather than assumed away",
+           **MODEL)
+    record("migrationLDBoost [tau-free, free amplitude, competing]",
+           "DGP.lean", "1 + a * bigM / (1 + bigM), a fitted", c_flat,
+           regime=reg + fitted, control=control,
+           note="the same one free parameter, spent on an amplitude instead of "
+                "on a tau. If this beats the row above across an eightfold tau "
+                "sweep then the divergence depth does not enter the boost, and "
+                "the repair deletes the argument rather than rescaling it",
+           **MODEL)
     record("migrationSharedBoostAt", "PortabilityDrift.lean",
            "1 + bigM * tauAt t / (1 + bigM)", cells,
            regime=reg + "; this is migrationLDBoost at generation t, so the "
@@ -187,6 +247,13 @@ def main():
            control=control, **MODEL)
     record("migrationSharedBoostAt [no restoration at all, competing]",
            "PortabilityDrift.lean", "1", c_none, regime=reg, control=control,
+           **MODEL)
+    record("migrationSharedBoostAt [tau-free, free amplitude, competing]",
+           "PortabilityDrift.lean", "1 + a * bigM / (1 + bigM), a fitted",
+           c_flat, regime=reg + fitted, control=control,
+           note="same rival, same cells: whatever the tau sweep says about "
+                "migrationLDBoost it says about this one, because they are the "
+                "same expression read at a generation",
            **MODEL)
 
     dump_results("battery_bulk55_results.json",
