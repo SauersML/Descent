@@ -993,7 +993,26 @@ def run_identifications() -> int:
     #     `a + b` does not. A group spanning two modules with no theorem
     #     mentioning two of its members is a divergence nothing can detect,
     #     which is how amInflationFactor and fstFromDrift survived.
-    bodypat = re.compile(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)(.*?):=\s*\n?\s*(.+?)"
+    # THE SIGNATURE MAY NOT CROSS A DECLARATION BOUNDARY. `(.*?)` under `re.S` runs
+    # until the first `:=` anywhere below, and a PATTERN-MATCHING definition has no `:=`
+    # of its own -- `def walk ... : ℕ → ℤ` followed by `| 0 => x₀` arms -- so the first
+    # one it finds belongs to the NEXT declaration and the body recorded is that
+    # declaration's proof term. `def walk` recorded `rfl`, captured 155 characters later
+    # out of `theorem walk_zero ... := rfl`.
+    #
+    # Seven definitions were grouped that way, and what the guard said they had in common
+    # was the four-character string `rfl`. They are `dosage : Genotype → ℝ`,
+    # `ancestor : ℕ → Fin N → Fin N`, `walk : ℕ → ℤ` and four more: no equation between
+    # them typechecks, so the group asked for a repair nobody could write. That is the
+    # same false-positive shape this screen's own comments already record for
+    # `configurationOverlap` at `Fin 2` versus `Fin 3`.
+    #
+    # A pattern-matching definition now records no body and is not grouped, which is the
+    # honest answer: its body is its arms, and this screen compares bodies.
+    bodypat = re.compile(r"^(?:noncomputable )?def ([A-Za-z_0-9'.]+)"
+                         r"((?:(?!\n(?:@\[|theorem |lemma |noncomputable |def |abbrev "
+                         r"|structure |inductive |class |instance |section |end "
+                         r"|namespace |/-))[\s\S])*?):=\s*\n?\s*(.+?)"
                          r"(?=\n(?:@\[|theorem |noncomputable |def |abbrev |structure |section |end |namespace |/-))",
                          re.S | re.M)
     groups = {}
