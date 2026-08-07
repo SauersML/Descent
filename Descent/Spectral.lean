@@ -19,7 +19,7 @@ import Descent.Spectral.SpectralDegradation
 import Descent.Spectral.WhiteningEquivalence
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`,
--- `Descent.Portability`, `Descent.Program`:
+-- `Descent.Portability`:
 --   Blindness: reaches 15 module(s) -- `Descent.Blindness.BundleRigidity`,
 --   `Descent.Blindness.BundleRigidity.Coverage`,
 --   `Descent.Blindness.BundleRigidity.CoverageInvariance` and 12 more
@@ -28,7 +28,6 @@ import Descent.Spectral.WhiteningEquivalence
 --   Portability: reaches 11 module(s) -- `Descent.Portability.PCCorrectability.Core`,
 --   `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!

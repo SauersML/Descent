@@ -4,9 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Blindness.BlindnessRegistry
 import Descent.Decision.FiniteMinimax
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Program
 
 /-!
 # From blindness witnesses to minimax floors
@@ -223,8 +221,6 @@ theorem _root_.Descent.Blindness.ProbeBlindness.blindReadoutProblem_minimaxRisk 
     (B.readoutProblem (fun _ ↦ (PMF.pure 0 : CertificateGrading.FinitePrior 0))).minimaxRisk
       = 1 / 2 := by
   rw [B.uninformativeReadoutProblem_eq, Problem.indistinguishableBinaryProblem_minimaxRisk]
-
-
 
 /-! ## Instance 8: the dominance blind spot costs a coin flip -/
 

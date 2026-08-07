@@ -6,10 +6,9 @@ import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactnes
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
 --   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Conditionals
@@ -36,9 +35,7 @@ Where a cut falls inside a section, the section is reopened and reclosed by name
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
 
-
 /-! ## An exact two-state biological witness -/
-
 
 /-- Uniform invariant law on two biological contexts. -/
 noncomputable def binaryStateWeight (_ : Descent.BinaryState) : ℝ := 1 / 2
@@ -46,7 +43,6 @@ noncomputable def binaryStateWeight (_ : Descent.BinaryState) : ℝ := 1 / 2
 /-- Reference evaluation: the two states are equally weighted. -/
 @[simp] theorem binaryStateWeight_at_reference_point (x : Descent.BinaryState) :
     binaryStateWeight x = 1 / 2 := rfl
-
 
 /-- The biological context law is the canonical balanced calibration weight. -/
 @[simp] theorem binaryStateWeight_eq_balancedBinaryWeight (x : Descent.BinaryState) :
@@ -63,7 +59,6 @@ theorem switchingTransition_at_reference_point :
     switchingTransition 0 0 = 0 ∧ switchingTransition 0 1 = 1 := by
   constructor <;> norm_num [switchingTransition]
 
-
 /-- A target-only annotation distinguishing state `1`. -/
 noncomputable def targetAnnotation (y : Descent.BinaryState) : ℝ :=
   Descent.Core.kronecker y 1
@@ -73,7 +68,6 @@ theorem targetAnnotation_at_reference_point :
     targetAnnotation 1 = 1 ∧ targetAnnotation 0 = 0 := by
   constructor <;> norm_num [targetAnnotation,
       Descent.Core.kronecker]
-
 
 /-- Quality of a source-adapted readout: one exactly when source and target contexts match,
 and equally the transition that preserves the context -- one function, two readings.
@@ -92,7 +86,6 @@ noncomputable def contextMatchQuality
 theorem contextMatchQuality_at_reference_point :
     contextMatchQuality 0 0 = 1 ∧ contextMatchQuality 0 1 = 0 := by
   constructor <;> norm_num [contextMatchQuality]
-
 
 /-- **The two-context biological witness runs on the horizon-curve kernels.**
 
@@ -168,7 +161,6 @@ noncomputable def jointTransportLaw
 theorem jointTransportLaw_at_reference_point :
     jointTransportLaw contextMatchQuality (0, 0) = 1 / 2 := by
   norm_num [jointTransportLaw, contextMatchQuality, binaryStateWeight]
-
 
 /-- The two-population family: the context persists, or the context switches. -/
 noncomputable def binaryTransportFamily (persists : Bool) : TransportPair → ℝ :=
@@ -610,7 +602,6 @@ theorem dynamicsCommonMode_at_reference_point :
     dynamicsCommonMode true = 1 ∧ dynamicsCommonMode false = 1 := by
   constructor <;> norm_num [dynamicsCommonMode, Spectral.binaryFirstAnnotation,
     Spectral.binarySecondAnnotation]
-
 
 /-- Pooling followed by broadcasting recovers the common mode exactly. -/
 theorem dynamicsBroadcast_pooling_commonMode :
@@ -2091,6 +2082,5 @@ theorem conditionalDescent_biological_boundary :
   · intro hpair
     exact admissible_confounding_meet_obstruction.2.2
       ((descendsAlong_iff_pairwiseConsistent_of_nonempty _ _ _).mpr hpair)
-
 
 end Descent.Conditionals

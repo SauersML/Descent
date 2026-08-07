@@ -9,11 +9,10 @@ import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Blindness
@@ -350,7 +349,6 @@ theorem fairTwoPointVariance_at_reference_point :
   norm_num [fairTwoPointVariance,
       Descent.Core.halfDiffSq]
 
-
 /-- **Exact nonconcentration witness.** If the leave-one-out quadratic form is
 positive, an alive/dead row produces two separated resolvent values and hence
 a strictly positive fair-mixture variance. -/
@@ -408,7 +406,6 @@ theorem gramForm_at_reference_point :
       (![2, 5] : Fin 2 → ℝ) = 90 := by
   simp [gramForm, Fin.sum_univ_succ]
   norm_num
-
 
 /-- Quadratic form `xᵀ A x`. When `A` is a genotype second-moment matrix this
 is the variance of the polygenic score with weights `x`, so every statement in
@@ -1147,7 +1144,6 @@ theorem lossGeometryRisk_at_reference_point :
   simp [lossGeometryRisk, Matrix.trace, Matrix.diag, Matrix.mul_apply, Fin.sum_univ_succ]
   norm_num
 
-
 omit [DecidableEq ι] in
 theorem lossGeometryRisk_add (B₁ B₂ M : Matrix ι ι ℝ) :
     lossGeometryRisk (B₁ + B₂) M = lossGeometryRisk B₁ M + lossGeometryRisk B₂ M := by
@@ -1215,7 +1211,6 @@ theorem ridgeBalance_at_zero_variable_is_junk (aspect : ℝ) (eig : ι → ℝ) 
   unfold ridgeBalance
   norm_num
 
-
 /-- **The self-consistency equation read as a one-step map.**
 
 `ridgeBalance` is the residual of the equation `1 - 1/u = A(u)`, where
@@ -1246,7 +1241,6 @@ theorem ridgeSelfConsistentStep_at_singularity_is_junk
     ridgeSelfConsistentStep aspect eig ridge u = 0 := by
   unfold ridgeSelfConsistentStep
   rw [hzero, div_zero]
-
 
 /-- The scalar content of the ridge balance equation, with the spectral
 functional abstracted to a single real `A`. -/

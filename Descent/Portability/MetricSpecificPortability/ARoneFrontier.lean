@@ -5,11 +5,7 @@ import Descent.Portability.MetricSpecificPortability.R2Decomposition
 import Descent.Blindness.ImitationRigidity
 import Descent.Spectral.ProjectionShiftBounds
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -31,7 +27,6 @@ recovered by resolving each name a part references back to the sibling that decl
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
 
 /-!
 ## Metric-specific portability of the marker panel itself: the AR(1) frontier
@@ -176,7 +171,6 @@ theorem ldPruningDetectionDeficit_at_zero_denominator_is_junk (decay kappa : ℝ
     ldPruningDetectionDeficit decay kappa = 0 := by
   unfold ldPruningDetectionDeficit
   rw [hzero, div_zero]
-
 
 theorem ldBandDetectionShare_eq_sub_deficit (decay kappa : ℝ) :
     ldBandDetectionShare decay kappa =

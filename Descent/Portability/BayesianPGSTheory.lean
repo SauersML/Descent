@@ -6,11 +6,7 @@ import Descent.Core.Ratios
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.DGP
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -36,7 +32,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat Bayesian shrinkage, prior specification or LD reference panels.
 Sources for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## Bayesian Shrinkage Framework
@@ -108,7 +103,6 @@ theorem posteriorVariance_at_zero_denominator_is_junk (m : BayesianLinearModel)
     posteriorVariance m = 0 := by
   unfold posteriorVariance
   rw [hzero, div_zero]
-
 
 /-- Posterior variance is positive. -/
 theorem posteriorVariance_pos (m : BayesianLinearModel) :
@@ -243,7 +237,6 @@ theorem jamesSteinMSE_at_reference_point :
     jamesSteinMSE 1 1 1 = 1 := by
   norm_num [jamesSteinMSE]
 
-
 /-- **OLS MSE is the no-shrinkage case.** MSE(1) = σ² (full weight on data). -/
 theorem mse_ols_is_no_shrinkage (σ_sq β_sq : ℝ) :
     jamesSteinMSE 1 σ_sq β_sq = σ_sq := by
@@ -324,7 +317,6 @@ theorem bayesian_shrinkage_reduces_mse
   nlinarith [h_σ, h_β]
 
 end BayesianShrinkage
-
 
 /-!
 ## LD Reference Panel Mismatch
@@ -468,7 +460,6 @@ theorem long_range_ld_worse_mismatch
 
 end LDReferenceMismatch
 
-
 /-!
 ## Prior Specification and Portability
 
@@ -522,7 +513,6 @@ theorem spikeAndSlabPriorVariance_at_reference_point :
     spikeAndSlabPriorVariance 1 1 = 1 := by
   norm_num [spikeAndSlabPriorVariance]
 
-
 /-- Spike-and-slab variance is nonneg. -/
 theorem spike_slab_variance_nonneg (π σ_slab : ℝ)
     (h_π : 0 ≤ π) :
@@ -545,7 +535,6 @@ noncomputable def misspecExcessRisk (π σ_β_sq : ℝ) : ℝ :=
 theorem misspecExcessRisk_at_reference_point :
     misspecExcessRisk (1 / 4) 2 = 3 / 8 := by
   norm_num [misspecExcessRisk]
-
 
 /-- **Excess risk is nonneg for valid parameters.** -/
 theorem misspec_excess_risk_nonneg (π σ_β_sq : ℝ)
@@ -633,7 +622,6 @@ theorem spikeAndSlabPriorVariance_ne_of_pi_ne
 
 end PriorSpecification
 
-
 /-!
 ## Posterior Predictive Distribution
 
@@ -715,9 +703,7 @@ theorem cross_population_posterior_wider
   unfold posteriorPredictiveVariance Descent.Core.sum
   linarith
 
-
 end PosteriorPredictive
-
 
 /-!
 ## PRS-CS Specific Theory
@@ -780,7 +766,6 @@ theorem ct_r2_le_prs_cs_r2_of_assumed_noise_ordering
     apply mul_le_mul h_pM_ratio h1 (by linarith) (by linarith)
   nlinarith
 
-
 /-- **PRS-CS with mismatched LD can be worse than C+T.**
     If the LD reference panel is from a very different population,
     PRS-CS can actually perform worse than C+T because C+T
@@ -804,7 +789,6 @@ theorem ld_mismatch_can_reverse_advantage
   nlinarith
 
 end PRSCS
-
 
 /-!
 ## Multi-Ancestry Bayesian Methods

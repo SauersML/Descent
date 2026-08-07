@@ -6,11 +6,7 @@ import Descent.PopGen.DGP
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Portability.PortabilityDrift.PresentDayMoments
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -116,7 +112,6 @@ directly from explicit source/target biological state:
 - target prevalence for deployed calibration metrics
 -/
 
-
 section MechanisticValidation
 
 /-- Exact target/source portability ratio from the explicit mechanistic state. -/
@@ -132,7 +127,6 @@ theorem mechanisticPortabilityRatio_at_zero_denominator_is_junk {p q : ℕ}
     mechanisticPortabilityRatio m = 0 := by
   unfold mechanisticPortabilityRatio
   rw [hzero, div_zero]
-
 
 /-- Total additive source squared-effect mass in a direct-causal witness.
 
@@ -155,7 +149,6 @@ theorem sourceSquaredEffectMass_at_reference_point :
     Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
-
 
 /-- Generic `q`-locus direct-causal witness with identical source and target
 states and no proxy, context, or novel-variant channels. Serves as the

@@ -4,11 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.PolygenicAdaptation
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -33,7 +29,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat rare-variant sharing, burden tests or loss-of-function variants.
 Sources for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## Rare Variant Population Specificity
@@ -163,7 +158,6 @@ theorem variantGeneticVarianceContribution_eq_zero_iff
     · exact Or.inl hp
     · exact Or.inr (by linarith)
 
-
 /-- Ratio of rare-variant counts between two populations. -/
 noncomputable def rareVariantCountRatio (sourceCount targetCount : ℝ) : ℝ :=
   Descent.Core.ratio sourceCount targetCount
@@ -204,7 +198,6 @@ theorem rareVariantCountRatio_eq_variance_ratio_of_shared_contribution
   · field_simp
 
 end RareVariantSpecificity
-
 
 /-!
 ## Burden Tests and Gene-Based PGS
@@ -268,7 +261,6 @@ theorem homogeneousGeneBurdenVariance_gt_single
     exact_mod_cast (by omega : 1 < k)
   linarith [mul_lt_mul_of_pos_right h_k_real h_β2]
 
-
 /-- Squared signal of an additive burden statistic. -/
 noncomputable def burdenSquaredSignal (β₁ β₂ : ℝ) : ℝ :=
   (β₁ + β₂) ^ 2
@@ -299,7 +291,6 @@ theorem burdenSquaredSignal_lt_varianceComponentSignal_of_opposite
   positivity
 
 end BurdenTests
-
 
 /-!
 ## WGS-Based PGS
@@ -356,9 +347,7 @@ theorem portableVariantSignal_eq_zero_iff
   rw [mul_eq_zero]
   simp [h_contribution]
 
-
 end WGSBasedPGS
-
 
 /-!
 ## Loss-of-Function Variants
@@ -945,7 +934,6 @@ maximal over, and none was given. -/
 
 end LossOfFunction
 
-
 /-!
 ## Rare Variant Effect Size Distribution
 
@@ -1053,7 +1041,6 @@ theorem hundred_lt_one_div_mul_sq
     _ = maf := mul_one maf
     _ < 1 / 100 := h_maf_small
   nlinarith
-
 
 end EffectSizeDistribution
 

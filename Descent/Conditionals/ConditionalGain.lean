@@ -609,6 +609,22 @@ theorem gainLinear_at_reference_point :
   unfold gainLinear Descent.Core.identifiedWith
   norm_num
 
+/-- **The fully fresh row is the additive one, and that is what "fresh" means.**
+
+Two problems pooled into one of the combined size return the sum of the gains they return
+apart. Nothing is lost to overlap and nothing is gained from scale, which is the whole content
+of calling row four fresh — and it is a property of this row alone. Row two fails it because
+`log (m + n)` is not `log m + log n`, row one because a bounded gain cannot add indefinitely,
+and every polynomial row with exponent other than one because `(m + n)^β` is not `m^β + n^β`.
+
+So the four rows are separated twice over: by growth rate, in `gainLandscape_strictly_ordered`
+below, and by this structural law, which does not need a limit to state. -/
+theorem gainLinear_add (m n : ℝ) :
+    gainLinear (Descent.Core.sum m n) =
+      Descent.Core.sum (gainLinear m) (gainLinear n) := by
+  unfold gainLinear Descent.Core.identifiedWith Descent.Core.sum
+  ring
+
 /-- Row one is eventually below row two. -/
 theorem gainBounded_lt_gainLog :
     ∀ᶠ n : ℝ in Filter.atTop, gainBounded n < gainLog n := by

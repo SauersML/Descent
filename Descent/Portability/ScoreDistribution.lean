@@ -4,11 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PGSCalibrationTheory
 import Descent.Blindness.JetBarrier
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -31,7 +27,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat score distribution theory, tail probabilities or quantile
 thresholds. Sources for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## Score Mean and Variance Under Hardy-Weinberg
@@ -83,7 +78,6 @@ theorem pgsVariance_at_reference_point :
     pgsVariance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = -364 := by
   norm_num [pgsVariance, Fin.sum_univ_two]
 
-
 /-- PGS variance is nonneg. -/
 theorem pgs_variance_nonneg {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ)
     (hp : ∀ i, 0 ≤ p i) (hp1 : ∀ i, p i ≤ 1) :
@@ -131,7 +125,6 @@ theorem variance_ratio_can_be_below_one
 
 end ScoreMeanVariance
 
-
 /-!
 ## Tail Probabilities and Risk Categorization
 
@@ -141,7 +134,6 @@ individuals fall in extreme categories.
 -/
 
 section TailProbabilities
-
 
 /-- Standardized benchmark threshold coordinate for a Gaussian score law with mean `μ` and standard
 deviation `σ`. This is a score-summary object, not by
@@ -185,7 +177,6 @@ theorem benchmarkHighScoreRate_at_reference_point (μ σ : ℝ) :
     benchmarkHighScoreRate μ μ σ = 1 - Foundations.Phi 0 := by
   unfold benchmarkHighScoreRate
   rw [thresholdStandardizedCoordinate_at_mean]
-
 
 /-- **A rightward mean shift lowers the standardized threshold coordinate.**
 
@@ -278,7 +269,6 @@ theorem variance_change_changes_benchmark_high_score_rate
   linarith
 
 end TailProbabilities
-
 
 /-!
 ## Calibration Across Populations
@@ -391,7 +381,6 @@ theorem platt_scaling_shifts_zero
     a + b * 0 ≠ 0 := by simp [h_a_ne]
 
 end Calibration
-
 
 /-!
 ## Gaussian Approximation Error and Berry-Esseen
@@ -838,7 +827,6 @@ theorem hardCall_threshold_factor_bounded {h : ℝ} (hh : 0 < h) {δ : ℝ} (hδ
 end LatticeThreshold
 
 end GaussianApproximation
-
 
 /-!
 ## Score Standardization and Comparability

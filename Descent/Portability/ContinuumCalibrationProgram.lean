@@ -5,11 +5,7 @@ import Descent.Portability.ContinuumCalibration
 import Descent.Spectral.EnsembleChannel
 import Descent.Portability.PGSCalibrationTheory
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Resolving the drifting index: strata, gauge, unqueried populations, and decisions

@@ -8,11 +8,10 @@ import Descent.PopGen.DGP
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Blindness
@@ -223,7 +222,6 @@ theorem configurationWeight_at_reference_point (coding : SymmetricCoding V) (x :
     configurationWeight coding x = 1 := by
   unfold configurationWeight
   simp
-
 
 /-- The interaction monomial `∏_{i ∈ S} x_i` of a configuration. -/
 def interactionMonomial (coding : SymmetricCoding V) (locusSet : Finset (Fin n))
@@ -743,7 +741,6 @@ Theorem S is strictly stronger than the folklore. Folklore puts the effect of
 overlap at a variance-mixture component in the limit. A variance mixture of
 centered Gaussians is symmetric, unimodal and has non-negative fourth cumulant,
 and the moment body contains laws that are none of those.
-
 
 ### Does the licence need sign symmetry? No, and this matters
 

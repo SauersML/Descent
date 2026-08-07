@@ -14,10 +14,9 @@ import Descent.Conditionals.FunctionalDescent
 import Descent.Conditionals.LatentMechanismCollapse
 import Descent.Conditionals.LocalToGlobalCoherence
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
 --   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!

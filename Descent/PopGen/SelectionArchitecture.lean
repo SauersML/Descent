@@ -6,14 +6,12 @@ import Descent.PopGen.DemographicHistory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
 --   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`,
 --   `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -37,7 +35,6 @@ Key results:
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
-
 
 /-!
 ## Stabilizing Selection and Architecture Conservation
@@ -303,7 +300,6 @@ theorem equalPerLocusHeritability_sum (locusCount : ℕ) (totalHeritability : �
 
 end StabilizingSelection
 
-
 /-!
 ## Diversifying and Fluctuating Selection
 
@@ -428,8 +424,6 @@ theorem stabilizingSelectedArchitectureVariance_at_reference_point :
   norm_num [stabilizingSelectedArchitectureVariance, equilibriumEffectVariance,
       Descent.Core.ratio]
 
-
-
 /-- Stationary variance of a fluctuating optimum under the OU model. -/
 noncomputable def optimumOUVariance (sigmaTheta autocorrTime : ℝ) : ℝ :=
   sigmaTheta ^ 2 * autocorrTime / 2
@@ -467,7 +461,6 @@ theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
     fluctuatingSelectedArchitectureVariance 1 1 1 1 = 3 / 2 := by
   norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance,
       Descent.Core.ratio]
-
 
 theorem effectCorrelationStabilizing_pos_iff
     (Ns : ℝ) (hNs : 0 < Ns) :
@@ -660,7 +653,6 @@ theorem sigmaThetaFromObservedSelectedVariance_at_nonpositive_radicand_is_junk
   unfold sigmaThetaFromObservedSelectedVariance
   exact Real.sqrt_eq_zero_of_nonpos hnonpos
 
-
 /-- The recovered optimum-diffusion scale is positive whenever the observed
     selected-architecture variance strictly exceeds the stabilizing baseline. -/
 theorem sigmaThetaFromObservedSelectedVariance_pos
@@ -766,7 +758,6 @@ theorem two_mul_one_sub_lt_of_lt_of_lt_half
     (by linarith) (le_of_lt h_balanced_lt)
 
 end DiversifyingSelection
-
 
 /-!
 ## Polygenic Adaptation
@@ -911,7 +902,6 @@ theorem qst_fst_comparison_stabilizing
 
 end PolygenicAdaptation
 
-
 /-!
 ## GWAS Power and Minor Allele Frequency
 
@@ -944,7 +934,6 @@ theorem gwasNCP_at_reference_point :
     Portability.fisherInformation, Portability.genotypeVarianceHWE,
       Descent.Core.product,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
-
 
 /-- GWAS non-centrality vanishes exactly for an empty study, null effect, or
 monomorphic locus. -/
@@ -1008,9 +997,7 @@ theorem ncp_ratio_from_maf
   -- 2p₁(1-p₁) < 2p₂(1-p₂) when p₁ < p₂ ≤ 1/2
   nlinarith [sq_nonneg (p₂ - p₁), sq_nonneg (1/2 - p₂)]
 
-
 end GWASPowerMAF
-
 
 /-!
 ## Genetic Architecture Parameters and Portability Predictions
@@ -1160,7 +1147,6 @@ theorem polygenic_more_portable_than_oligogenic
     h_oligo h_more_loci h_h2
 
 end ArchitecturePredictions
-
 
 /-!
 ## Pleiotropy and Cross-Trait Portability

@@ -6,11 +6,7 @@ import Descent.Core.Ratios
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -181,7 +177,6 @@ theorem portability_concave_in_fst_reduction
   exact expectedR2_gain_strictAnti_base xHigh xLow δ V_E hVE hxHigh hx_lt hδ
 
 end GWASDiversity
-
 
 /-!
 ## Information-Theoretic and Geometric Limits on Portability
@@ -556,7 +551,6 @@ theorem no_free_lunch_portability
 
 end InformationTheoreticLimits
 
-
 /-!
 ## Equity Implications
 
@@ -592,7 +586,6 @@ theorem portabilityGap_between_targets (r2_source r2_target₁ r2_target₂ : �
       portabilityGap r2_target₁ r2_target₂ := by
   unfold portabilityGap Descent.Core.difference
   ring
-
 
 /-- **Portability gap is always non-negative under drift.** -/
 theorem portability_gap_nonneg
@@ -639,7 +632,6 @@ theorem diversity_reduces_max_gap
     hVA hVE h_improvement h_single_bound
 
 end EquityImplications
-
 
 /-!
 ## Variant Count and Estimation Noise

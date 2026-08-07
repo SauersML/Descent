@@ -6,11 +6,7 @@ import Descent.Core.Ratios
 import Descent.Foundations.TransportIdentities
 import Descent.Portability.PortabilityDrift.PresentDayMoments
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -28,7 +24,6 @@ portability gap, and for the R2/AUC divergence, which the docstrings below cite 
 specific finding. The recalibration algebra and the transfer bounds are derived
 here, not imported from it.
 -/
-
 
 /-!
 ## Optimal Linear Recalibration
@@ -207,9 +202,7 @@ theorem ancestryRecalibratedR2_compose (r2Source rhoSq₁ rhoSq₂ : ℝ) :
   unfold ancestryRecalibratedR2 Descent.Core.product
   ring
 
-
 end LinearRecalibration
-
 
 /-!
 ## Nonlinear Calibration via Splines
@@ -302,7 +295,6 @@ theorem explainedVarianceFraction_noise_eq_complement
 
 end SplineCalibration
 
-
 /-!
 ## Transfer Learning Bounds
 
@@ -381,7 +373,6 @@ theorem meta_analysis_reduces_variance
   linarith [div_pos h₁ h₂]
 
 end TransferLearning
-
 
 /-!
 ## Phenotype Heterogeneity Across Populations
@@ -516,7 +507,6 @@ theorem prevalenceScaledR2_symm_of_threshold_reflection
 
 end PhenotypeHeterogeneity
 
-
 /-!
 ## Epistasis and Portability
 
@@ -550,7 +540,6 @@ noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
 theorem epistaticVariancePairwise_at_reference_point :
     epistaticVariancePairwise 1 (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [epistaticVariancePairwise]
-
 
 /-- Epistatic variance is nonneg. -/
 theorem epistatic_variance_pairwise_nonneg (γ p₁ p₂ : ℝ)

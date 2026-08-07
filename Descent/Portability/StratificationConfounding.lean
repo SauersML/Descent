@@ -4,11 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PCCorrectability
 import Descent.Portability.AncestrySpecificPower
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -34,7 +30,6 @@ References:
   gap cited in one docstring below, not for the stratification results, which the
   three references above cover.
 -/
-
 
 /-!
 ## Stratification Bias in GWAS
@@ -154,7 +149,6 @@ theorem varBiasTarget_lt_varBias {p : ℕ} (m : TwoPopBiasModel p) :
 
 end StratificationBias
 
-
 /-!
 ## Assortative Mating and PGS Variance
 
@@ -196,7 +190,6 @@ theorem am_increases_r2
   nlinarith [mul_pos h_vpgs h_ve]
 
 end AssortativeMating
-
 
 /-!
 ## Collider Bias in Ascertained Samples
@@ -320,7 +313,6 @@ theorem sub_gt_sub_iff_sub_lt_sub
 
 end ColliderBias
 
-
 /-!
 ## Gene-Environment Correlation (rGE) and Portability
 
@@ -426,7 +418,6 @@ theorem rge_inflates_apparent_heritability (m : RGEInflationModel) :
   linarith
 
 end GeneEnvironmentCorrelation
-
 
 /-!
 ## Survivorship Bias in PGS Portability Studies
@@ -551,9 +542,7 @@ theorem survivorship_attenuates_in_older (m : SurvivorshipAttenuationModel) :
       < m.r2_full * 1 := by exact mul_lt_mul_of_pos_left h_ratio_lt_one m.r2_full_pos
     _ = m.r2_full := by ring
 
-
 end SurvivorshipBias
-
 
 /-!
 ## Causal Inference Framework for Portability
@@ -734,7 +723,6 @@ theorem transportability_violation_creates_gap {n : ℕ}
 
 end CausalInference
 
-
 /-!
 ## Mendelian Randomization and Portability
 
@@ -880,7 +868,6 @@ theorem add_left_ne_of_pleiotropy_ne
   intro h; exact h_diff (by linarith)
 
 end MRPortability
-
 
 /-!
 ## Sample Size and Statistical Power for Portability Detection

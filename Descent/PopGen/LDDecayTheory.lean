@@ -12,14 +12,12 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -68,7 +66,6 @@ gap and does not treat the Ohta-Kimura decay model, admixture LD or bottleneck
 amplification. Sources for individual results, where they exist, are cited at those
 results.
 -/
-
 
 /-!
 ## Ohta-Kimura LD Decay Model
@@ -163,7 +160,6 @@ theorem ldAfterGenerations_at_reference_point :
     ldAfterGenerations 1 (1 / 2) 2 2 = 9 / 64 := by
   norm_num [ldAfterGenerations, ldRetentionPerGen]
 
-
 /-- LD decays monotonically with time. -/
 theorem ld_decays_with_time (D₀ r Ne : ℝ) (t₁ t₂ : ℕ)
     (hD₀ : 0 < D₀) (hr : 0 < r) (hr1 : r < 1) (hNe : 1 < Ne)
@@ -184,7 +180,6 @@ theorem ld_decays_with_time (D₀ r Ne : ℝ) (t₁ t₂ : ℕ)
   exact pow_lt_pow_right_of_lt_one₀ h_ret_pos h_ret_lt h_time
 
 end OhtaKimuraDecay
-
 
 /-!
 ## LD-Based Tagging and PGS Accuracy
@@ -263,7 +258,6 @@ theorem div_sum_mul_nonneg
 
 end LDTagging
 
-
 /-!
 ## Admixture and Long-Range LD
 
@@ -338,7 +332,6 @@ theorem admixture_ld_decays_unlinked (D₀ : ℝ) (t : ℕ) (hD₀ : 0 < D₀) :
   · omega
 
 end AdmixtureLD
-
 
 /-!
 ## Population Bottlenecks and LD Amplification
@@ -868,7 +861,6 @@ theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
 
 end BottleneckLD
 
-
 /-!
 ## LD Mismatch Quantification
 
@@ -919,7 +911,6 @@ theorem ldMismatchFrobenius_at_reference_point :
   simp [Fin.sum_univ_succ]
   norm_num
 
-
 /-- LD mismatch is nonneg. -/
 theorem ld_mismatch_nonneg {p : ℕ}
     (Sig_S Sig_T : Matrix (Fin p) (Fin p) ℝ) :
@@ -936,7 +927,6 @@ theorem ld_mismatch_pos_of_ne {p : ℕ}
   exact frobeniusNormSq_pos_of_exists_ne_zero _ h_ne
 
 end LDMismatchQuantification
-
 
 /-!
 ## Harmonic Mean Effective Population Size
@@ -1005,7 +995,6 @@ theorem one_div_lt_one_div_of_lt_of_pos (Ne_b Ne_normal : ℝ)
   exact div_lt_div_of_pos_left one_pos hb h_bottle
 
 end HarmonicMeanNe
-
 
 /-!
 ## Bottleneck Effects on LD
@@ -1195,7 +1184,6 @@ theorem excess_ld_decays_after_recovery (N_b N_r c : ℝ) (t_b : ℕ) (t₁ t₂
   exact pow_lt_pow_right_of_lt_one₀ h_Lr_pos h_Lr_lt h_time
 
 end BottleneckLDExcess
-
 
 /-!
 ## Population Expansion and LD Persistence
@@ -1394,7 +1382,6 @@ theorem expansion_retains_more_ld (Ne_small Ne_large D₀ : ℝ) (t : ℕ)
 
 end ExpansionLD
 
-
 /-!
 ## LD Half-Life Depends on Ne Trajectory
 
@@ -1495,7 +1482,6 @@ theorem different_ne_different_ld_persistence
   exact larger_ne_more_ld_retained r Ne₁ Ne₂ t hr1 hNe₁ h_larger ht
 
 end LDHalfLifeTrajectory
-
 
 /-!
 ## First-Principles Derivation of LD Decay
@@ -1663,7 +1649,6 @@ theorem ld_recurrence_ratio_eq_decay_factor (r D₀ : ℝ) (t : ℕ) (hD₀ : D�
 
 end LDDecayDerivation
 
-
 /-! ## Second-order statistics cannot separate two marker layouts
 
 `sum_ldScore_isoBlock_eq` elsewhere in the corpus shows the LD score is a spectral
@@ -1711,7 +1696,6 @@ one a shift of origin would explain. -/
 theorem markerLayout_not_translate (t : ℕ) (ht : t ≤ 17) :
     markerLayoutA.image (· + t) ≠ markerLayoutB := by
   interval_cases t <;> decide
-
 
 theorem driftRatePerGen_eq_inv_timeScale (Ne : ℝ) :
     PopGen.driftRatePerGen Ne = 1 / Descent.Core.coalescentTimeScale Ne := by

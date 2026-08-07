@@ -7,14 +7,12 @@ import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -37,8 +35,6 @@ from its header instead of inherited from its position in a file that no longer 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
-
 
 /-!
 ## Derivation of Fst from Wright-Fisher Drift Dynamics
@@ -67,7 +63,6 @@ section FstDerivationFromDrift
 `Descent.Core.hetRecurrence` under a second name, and every reference now
 calls the kernel.  Nothing referenced the wrapper; `Core.hetRecurrence` is the recurrence, and
 `Coalescent.WrightFisher.hetRecurrence_eq_pairDistinct` is where it stops being a stipulation. -/
-
 
 /-- **Closed-form solution by induction.**
     hetRecurrence Ne H₀ t = (1 - 1/(2Ne))^t × H₀. -/

@@ -10,8 +10,8 @@ import Descent.Portability.AncestrySpecificPower
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
--- `Descent.Conditionals`, `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`,
+-- `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 6 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 3 more
 --   Blindness: reaches 8 module(s) -- `Descent.Blindness.Condensation`,
@@ -21,7 +21,6 @@ assert_below Descent.Decision
 --   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`,
 --   `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -448,7 +447,6 @@ noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 /-- Reference evaluation in closed surd form. -/
 theorem gaussianKurtosisMaf_at_reference_point :
     gaussianKurtosisMaf = (3 - Real.sqrt 3) / 6 := rfl
-
 
 /-- **The Gaussian kurtosis frequency is below a quarter.** A one-sided bound on a constant built
 from a surd does not exclude the sign-flipped constant, which here is `(3 + √3)/6 > 3/4`. This
@@ -1144,7 +1142,6 @@ noncomputable def squaringFixedPoint (scale : ℝ) : ℝ :=
 theorem squaringFixedPoint_at_reference_point :
     squaringFixedPoint 0 = 1 := by
   norm_num [squaringFixedPoint]
-
 
 /-- The defining identity in cleared form: `x*² - 1 = σ x*`. -/
 theorem squaringFixedPoint_root (scale : ℝ) :
@@ -1890,7 +1887,6 @@ theorem jProfile_at_unit_argument_is_junk (tilt order : ℕ) :
   have hlog : Real.log (1 - (1 : ℝ)) = 0 := by norm_num
   rw [hlog, zero_pow (Nat.succ_ne_zero order)]
   norm_num
-
 
 /-- `J₁⁰` is the variance profile: tilt one, order zero. -/
 theorem jProfile_one_zero (s : ℝ) : jProfile 1 0 s = varianceProfile s := by

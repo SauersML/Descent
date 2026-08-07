@@ -9,14 +9,12 @@ import Descent.PopGen.HaplotypeTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
 --   Portability: reaches 13 module(s) -- `Descent.Portability.AncestrySpecificPower`,
 --   `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses`
 --   and 10 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -43,7 +41,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat the winner's curse, ascertainment bias or shrinkage estimation.
 Sources for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## GWAS Discovery and Population Specificity
@@ -86,7 +83,6 @@ theorem discoveryNCP_at_reference_point :
     discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
   norm_num [discoveryNCP, Portability.genotypeVarianceHWE,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
-
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
     `z`-threshold. In the one-degree-of-freedom Gaussian approximation this is
@@ -279,7 +275,6 @@ theorem winners_curse_worse_near_threshold
 
 end GWASDiscovery
 
-
 /-!
 ## Clumping and Thresholding (C+T) vs Bayesian Methods
 
@@ -302,7 +297,6 @@ theorem taggedScoreEstimationRisk_at_reference_point :
     taggedScoreEstimationRisk ![1, 3] ![1, 3] = 10 := by
   norm_num [taggedScoreEstimationRisk, Fin.sum_univ_two,
       Descent.Core.innerSum]
-
 
 /-- C+T-to-dense-model gap measured as target causal signal mass missed by the
 current discovered set. When discovery at larger sample size recovers more
@@ -350,7 +344,6 @@ theorem ct_more_variable_than_bayesian
           Portability.jamesSteinMSE 1 (σSq i) (βSq i) := by
       exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact mul_lt_mul_of_pos_left h_mse (h_tag i)
-
 
 /-- **Both methods converge with infinite sample size.**
     The large-sample convergence statement is now tied to explicit discovered
@@ -406,7 +399,6 @@ theorem mul_pos_and_mul_neg_of_between
   · exact mul_neg_of_neg_of_pos (by linarith) h_extra
 
 end PGSMethods
-
 
 /-!
 ## Effect Size Estimation and Portability
@@ -632,7 +624,6 @@ theorem estimation_trait_interaction
 
 end EffectEstimation
 
-
 /-!
 ## Multi-Trait Analysis and Genetic Correlation
 
@@ -707,7 +698,6 @@ theorem multiTraitEffectiveSampleSize_smallPrior
   unfold multiTraitEffectiveSampleSize
   field_simp
   ring
-
 
 /-- **Cross-check: borrowing across traits and borrowing across ancestries are
 the same arithmetic, unrestrictedly.**
@@ -795,7 +785,6 @@ theorem multiTraitDiscoveryNCP_at_reference_point :
   norm_num [multiTraitDiscoveryNCP, discoveryNCP, Portability.genotypeVarianceHWE,
     multiTraitEffectiveSampleSize,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
-
 
 /-- Genetic correlation is bounded by [-1, 1] (Cauchy-Schwarz). -/
 theorem genetic_correlation_bounded
@@ -903,7 +892,6 @@ theorem borrowedTraitBProjection_zero_weights {p q : ℕ}
   rw [hzero]
   simp
 
-
 /-- Total trait-B projection captured by the source-trained score. -/
 noncomputable def totalTraitBProjection {p q : ℕ}
     (m : CrossTraitBorrowingModel p q) : ℝ :=
@@ -919,7 +907,6 @@ theorem totalTraitBProjection_zero_weights {p q : ℕ}
   unfold totalTraitBProjection
   rw [hzero]
   simp
-
 
 /-- **A witness chosen so that a wrong functional form gives a wrong number.**
 
@@ -966,7 +953,6 @@ theorem totalTraitBProjection_at_witness :
   norm_num [totalTraitBProjection, totalTraitBCrossCov, borrowedTraitBCrossCov,
     traitBSpecificCrossCov, borrowingWitness, dotProduct, Matrix.mulVec,
     Fin.sum_univ_two]
-
 
 theorem traitBSpecificCrossCov_nonneg {p q : ℕ}
     (m : CrossTraitBorrowingModel p q)
@@ -1103,7 +1089,6 @@ theorem genetic_correlation_population_specific
   exact h
 
 end MultiTraitAnalysis
-
 
 /-!
 ## Future Directions: Whole Genome Sequencing and Rare Variants

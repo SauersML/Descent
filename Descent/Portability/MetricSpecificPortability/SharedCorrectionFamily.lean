@@ -6,11 +6,7 @@ import Descent.PopGen.DGP
 import Descent.Spectral.ProjectionShiftBounds
 import Descent.Spectral.SpectralDegradation
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -32,7 +28,6 @@ recovered by resolving each name a part references back to the sibling that decl
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
 
 /-!
 ## One correction, several deployment targets: the spread law
@@ -326,6 +321,5 @@ theorem not_hasTaskIndependentSpectralPortabilityScalar (a : ℝ) (ha : a ≠ 0)
     ¬ Spectral.HasTaskIndependentSpectralPortabilityScalar a := by
   unfold Spectral.HasTaskIndependentSpectralPortabilityScalar
   exact Spectral.twoBand_no_common_monotone_scalar a ha
-
 
 end Descent.Portability

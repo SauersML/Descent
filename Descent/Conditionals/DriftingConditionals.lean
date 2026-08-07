@@ -11,10 +11,9 @@ import Descent.Conditionals.DynamicsContrast
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
 --   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!
@@ -83,7 +82,6 @@ noncomputable def markedMass (population response : ι → ℝ) (x : ι) : ℝ :
 theorem markedMass_at_reference_point (population response : ι → ℝ) (x : ι) :
     markedMass population response x = population x * response x := rfl
 
-
 /-- Response curve after both population mass and frozen marked mass pass
 through the same kernel. Positivity of every transported population cell is an
 input because a real-valued conditional probability is undefined on an empty
@@ -103,7 +101,6 @@ theorem transportedResponse_at_zero_denominator_is_junk (P : ι → ι → ℝ)
     transportedResponse P population response _hpositive y = 0 := by
   unfold transportedResponse
   rw [hzero, div_zero]
-
 
 /-- Multiplying the reconstructed response by its transported population mass
 recovers the transported frozen-mark mass exactly. -/
@@ -146,7 +143,6 @@ noncomputable def composeKernel (P Q : ι → ι → ℝ) (x z : ι) : ℝ :=
 theorem composeKernel_at_reference_point :
     composeKernel (fun _ _ : Fin 2 ↦ (1 : ℝ)) (fun _ _ : Fin 2 ↦ (1 : ℝ)) 0 0 = 2 := by
   norm_num [composeKernel, Fin.sum_univ_two]
-
 
 /-- Transporting mass through a composed kernel is the same as transporting it
 through the two kernels in sequence. -/
@@ -239,7 +235,6 @@ theorem reverseBridge_at_zero_denominator_is_junk (P : ι → ι → ℝ) (popul
     reverseBridge P population _hpositive y x = 0 := by
   unfold reverseBridge
   rw [hzero, div_zero]
-
 
 /-- Every row of the population-built reverse bridge has mass one. -/
 theorem reverseBridge_mass_preserving
@@ -377,7 +372,6 @@ theorem stateZeroResponse_at_reference_point :
     stateZeroResponse 0 = 1 ∧ stateZeroResponse 1 = 0 := by
   constructor <;> simp [stateZeroResponse]
 
-
 /-- A response concentrated in ancestry state one. -/
 noncomputable def stateOneResponse (i : Fin 2) : ℝ :=
   Descent.Core.kronecker i 1
@@ -387,7 +381,6 @@ theorem stateOneResponse_at_reference_point :
     stateOneResponse 0 = 0 ∧ stateOneResponse 1 = 1 := by
   constructor <;> simp [stateOneResponse,
       Descent.Core.kronecker]
-
 
 /-- The ancestry-state-one response IS `DynamicsContrast.targetAnnotation`.
 
@@ -464,7 +457,6 @@ def twoStateContrast (i : Fin 2) : ℝ := if i = 0 then 1 else -1
 theorem twoStateContrast_at_reference_point :
     twoStateContrast 0 = 1 ∧ twoStateContrast 1 = -1 := by
   constructor <;> simp [twoStateContrast]
-
 
 /-- Symmetric ancestry switching damps the centered ancestry contrast by the
 same persistence eigenvalue used by the reversible Markov spectral kernel. -/
@@ -648,7 +640,6 @@ theorem ouVariance_at_zero_denominator_is_junk (horizon : OUHorizon)
   unfold ouVariance
   rw [hzero, div_zero]
 
-
 /-- A valid OU horizon accumulates nonnegative variance. -/
 theorem ouVariance_nonneg (horizon : OUHorizon) : 0 ≤ ouVariance horizon := by
   unfold ouVariance
@@ -696,7 +687,6 @@ theorem probitSlope_at_zero_denominator_is_junk (a0 : ℝ) (horizon : OUHorizon)
   unfold probitSlope
   rw [hzero, div_zero]
 
-
 /-- Intercept surface of the drifting probit index.
 
     Empirical status: UNTESTED. -/
@@ -710,7 +700,6 @@ theorem probitIntercept_at_zero_denominator_is_junk (a0 b0 : ℝ) (horizon : OUH
     probitIntercept a0 b0 horizon = 0 := by
   unfold probitIntercept
   rw [hzero, div_zero]
-
 
 /-- **The intercept and slope surfaces are not independent.**
 

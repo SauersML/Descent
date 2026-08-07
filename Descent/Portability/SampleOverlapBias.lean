@@ -5,11 +5,7 @@ import Descent.Portability.PortabilityDrift
 import Descent.Core.Ratios
 import Descent.PopGen.AssortativeMatingPGS
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -34,7 +30,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat sample-overlap bias in R-squared estimates. Sources for individual
 results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## Overlap-Induced R² Inflation
@@ -107,8 +102,6 @@ theorem partialOverlapR2_at_reference_point :
     partialOverlapR2 1 1 1 1 = 1 := by
   norm_num [partialOverlapR2]
 
-
-
 /-- Zero overlap gives unbiased estimate. -/
 theorem no_overlap_unbiased (r2_true h2 : ℝ) (n_gwas : ℕ) :
     partialOverlapR2 r2_true h2 0 n_gwas = r2_true := by
@@ -125,7 +118,6 @@ theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
   nlinarith [mul_lt_mul_of_pos_right h_f h_diff]
 
 end OverlapInflation
-
 
 /-!
 ## Cross-Ancestry Evaluation Avoids Overlap
@@ -179,7 +171,6 @@ theorem div_add_lt_div
   linarith
 
 end CrossAncestryNoOverlap
-
 
 /-!
 ## Leave-One-Out Corrections
@@ -248,7 +239,6 @@ theorem gwas_subtraction_estimates_bias
   ring
 
 end LOOCorrections
-
 
 /-!
 ## Relatedness and Cryptic Overlap

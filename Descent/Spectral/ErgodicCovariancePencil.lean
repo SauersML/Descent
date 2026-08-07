@@ -10,13 +10,11 @@ import Descent.PopGen.DGP
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`:
 --   Blindness: reaches 1 module(s) -- `Descent.Blindness.ImitationRigidity`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 /-!

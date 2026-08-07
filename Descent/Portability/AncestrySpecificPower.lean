@@ -4,11 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PortabilityDrift
 import Descent.Spectral.Permeability
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -33,7 +29,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat power curves, Fisher information or multi-population study design.
 Sources for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## Population-Specific Power Curves
@@ -104,9 +99,6 @@ theorem fisherInformation_add_samples (m n : ℕ) (v : ℝ) :
   unfold fisherInformation Descent.Core.product Descent.Core.sum
   push_cast
   ring
-
-
-
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem genotypeVarianceHWE_at_reference_point :
@@ -196,8 +188,6 @@ theorem effectiveFisherInformation_at_reference_point :
   norm_num [effectiveFisherInformation, fisherInformation, genotypeVarianceHWE,
       Descent.Core.product,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
-
-
 
 /-- Effective Fisher information equals n × 2p(1-p) × r²_LD. -/
 theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
@@ -291,7 +281,6 @@ theorem standardErrorSq_at_zero_denominator_is_junk (n : ℕ) (p r2_ld : ℝ)
     standardErrorSq n p r2_ld = 0 := by
   unfold standardErrorSq
   rw [hzero, div_zero]
-
 
 /-- **NCP from the Wald test.**
     NCP = (β / SE)² = β² / SE² = β² × I_eff = β² × n_eff.
@@ -453,7 +442,6 @@ theorem ncp_eq_zero_iff (n_eff β : ℝ) :
     · exact Or.inr (sq_eq_zero_iff.mp h_effect)
   · rintro (rfl | rfl) <;> norm_num
 
-
 /-- NCP is monotone in effective sample size. -/
 theorem ncp_mono_neff (n1 n2 β : ℝ) (h_n : n1 < n2) (h_β : β ≠ 0) :
     ncp n1 β < ncp n2 β := by
@@ -481,7 +469,6 @@ theorem detected_variants_gap
 
 end PopulationPowerCurves
 
-
 /-!
 ## Discovery Bias
 
@@ -495,7 +482,6 @@ section DiscoveryBias
 `Descent.Core.hweHeterozygosity` under a second name, and every reference now
 calls the kernel.  `Core.Genome.hweProb_het` now proves that this body IS the probability of drawing
 a heterozygote, which is what earns the name -- and it earns it once. -/
-
 
 /-- **Heterozygosity peaks at one half, where it equals one half.** The coincidence with the
 genotype variance recorded below is an identity between two bodies and does not fix either of
@@ -615,7 +601,6 @@ theorem portableFraction_residual_eq_complement (r2_causal r2_total : ℝ)
 
 end DiscoveryBias
 
-
 /-!
 ## Power-Portability Tradeoff
 
@@ -624,7 +609,6 @@ one population and maximizing cross-population portability.
 -/
 
 section PowerPortabilityTradeoff
-
 
 /-- **Multi-ancestry tradeoff: splitting budget.**
     With total budget N and two populations, allocate fraction α to pop1
@@ -695,7 +679,6 @@ theorem pareto_no_dominance
 
 end PowerPortabilityTradeoff
 
-
 /-!
 ## Optimal Multi-Population Study Design
 
@@ -729,7 +712,6 @@ theorem proportional_sums_to_total
       proportionalAllocation pop_B n_total (pop_A + pop_B) = n_total := by
   unfold proportionalAllocation
   field_simp
-
 
 /-- **Optimal allocation depends on objective.**
     With two pops and R² ∝ n_pop × c_pop, moving Δ samples from pop1

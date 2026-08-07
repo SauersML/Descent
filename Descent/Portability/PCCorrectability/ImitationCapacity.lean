@@ -5,11 +5,7 @@ import Descent.Blindness.ImitationRigidity
 import Descent.Portability.PCCorrectability.Threshold
 import Mathlib.Tactic.Positivity
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -545,7 +541,6 @@ theorem frobeniusForm_at_reference_point :
   simp [frobeniusForm, Fin.sum_univ_succ]
   norm_num
 
-
 theorem frobeniusForm_add (A M N : Matrix ι ι ℝ) :
     frobeniusForm A (M + N) = frobeniusForm A M + frobeniusForm A N := by
   unfold frobeniusForm
@@ -617,7 +612,6 @@ theorem traceForm_at_reference_point :
     traceForm (!![1, 2; 3, 4] : Matrix (Fin 2) (Fin 2) ℝ) = 5 := by
   simp [traceForm, Fin.sum_univ_succ]
   norm_num
-
 
 theorem traceForm_add (M N : Matrix ι ι ℝ) :
     traceForm (M + N) = traceForm M + traceForm N := by
@@ -786,7 +780,6 @@ theorem margin_at_reference_point (E : EquiExit K S₀ support) :
     E.margin 0 = -K.headroom E.binding S₀ := by
   unfold EquiExit.margin
   ring
-
 
 theorem margin_pos_of_gt_capacity (E : EquiExit K S₀ support)
     (hnull : K.IsNull S₀) {t : ℝ}
@@ -1256,7 +1249,6 @@ theorem subgroupContrast_at_empty_panel_is_junk (m : ℕ) :
   unfold subgroupContrast
   norm_num
 
-
 /-- The subgroup contrast as a vector on the panel's individuals.
 
     Empirical status: DERIVED, from `dot_demographicSpikeDirection`, which computes its
@@ -1351,7 +1343,6 @@ theorem stratificationCertificateMargin_at_reference_point :
     stratificationCertificateMargin 1 1 1 1 1 = -2 := by
   norm_num [stratificationCertificateMargin, bbpProxyThreshold, demographicSpike,
     effectiveSubgroupSize]
-
 
 /-- **The existing margin is this one at zero headroom.**  This is the precise
 sense in which `pcCorrectabilityMargin` is a special case: it assumes the
@@ -1886,7 +1877,6 @@ theorem weightedMean_at_zero_weight (c : tgt → ℝ) : weightedMean 0 c = 0 := 
   unfold weightedMean
   simp
 
-
 /-- **Energy-weighted variance of the per-target optimal corrections.**  The
 degradation calculus's irreducible part: the component of the correction that
 no single shared choice removes.
@@ -1904,7 +1894,6 @@ theorem energyWeightedVariance_at_constant (w : tgt → ℝ) (v : ℝ)
   unfold energyWeightedVariance
   rw [hmean]
   simp
-
 
 theorem weighted_sq_expand (w c : tgt → ℝ) (s : ℝ) :
     ∑ t, w t * (c t - s) ^ 2 =
@@ -1966,8 +1955,6 @@ theorem imitationCapacity_mul_load_eq_headroom
     K.imitationCapacity S₀ support * E.load = K.headroom E.binding S₀ := by
   rw [E.imitationCapacity_eq hnull, div_mul_eq_mul_div, mul_div_assoc,
     div_self (ne_of_gt E.load_pos), mul_one]
-
-
 
 /-! ### The spectral-orientation development lives in `SpectralUniversalityFailure`
 

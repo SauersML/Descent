@@ -6,11 +6,7 @@ import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.DGP
 import Descent.Portability.PGSCalibrationTheory.DecisionImplications
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -35,7 +31,6 @@ gap itself and its clinical-equity motivation, which that paper measures. It doe
 not contain the liability-threshold derivation, the decision-curve results or the
 fairness impossibility statement below; those are derived here.
 -/
-
 
 /-!
 ## Liability Threshold Model — First-Principles Derivation
@@ -427,7 +422,6 @@ theorem liability_model_provides_specificityCurve
 
 end LiabilityThresholdModel
 
-
 /-!
 ## Net Reclassification Improvement
 
@@ -647,7 +641,6 @@ theorem nri_can_be_negative
 
 end NRI
 
-
 /-!
 ## Decision Curve Analysis
 
@@ -780,7 +773,6 @@ theorem portability_narrows_useful_range
 
 end DecisionCurve
 
-
 /-!
 ## Fairness Criteria and Impossibility
 
@@ -907,7 +899,6 @@ theorem fairness_accuracy_tradeoff
 
 end Fairness
 
-
 /-!
 ## Risk Stratification Accuracy
 
@@ -967,7 +958,6 @@ theorem portability_gap_creates_stratification_disparity
     h_sens h_spec h_π h_π1
 
 end RiskStratification
-
 
 /-!
 ## Cost-Effectiveness of PGS-Guided Interventions
@@ -1047,7 +1037,6 @@ theorem screeningQalyGain_neg_at_zero_sensitivity
 
 end CostEffectiveness
 
-
 /-!
 ## Population-Level Impact of Portability Gaps
 
@@ -1074,7 +1063,6 @@ noncomputable def numberNeededToScreen (sens π : ℝ)
 theorem numberNeededToScreen_at_reference_point :
     numberNeededToScreen 1 1 (by norm_num) (by norm_num) = 1 := by
   norm_num [numberNeededToScreen]
-
 
 /-- NNS is higher in the target population. -/
 theorem nns_higher_in_target
@@ -1148,7 +1136,6 @@ theorem equity_gap_in_public_health
   linarith
 
 end PopulationImpact
-
 
 /-!
 ## Recommendations and Remediation

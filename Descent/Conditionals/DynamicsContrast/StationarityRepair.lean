@@ -9,10 +9,9 @@ import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactnes
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
 --   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
 --   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Conditionals
@@ -38,7 +37,6 @@ any proof sees.
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
 
 /-! ## Population overlap geometry under ancestry-environment mixing -/
 
@@ -1500,7 +1498,6 @@ theorem genomicExponentialProfile_compactInExplicitDistance
   Blindness.TrafficInvariantSeparation.boundedExponentialProfile_compact_subsequence_in_distance
     bound profiles
 
-
 /-- **Exact criterion for the Beta curve.**  At conditional-Laplace-transform level the Beta
 power profile is equivalent to an `x`-independent transform after subtracting the logarithmic
 front response.  When the transforms determine the laws, this is the claimed common-noise
@@ -1530,7 +1527,6 @@ noncomputable def onePointPerformance (weight : State → ℝ) (score : State �
 theorem onePointPerformance_at_reference_point :
     onePointPerformance (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) = 17 := by
   norm_num [onePointPerformance, Fin.sum_univ_two]
-
 
 /-- Mean performance obtained by transporting to `y` and then evaluating a score that sees
 only `y`.  Under stationarity this is exactly `onePointPerformance`; it contains no temporal

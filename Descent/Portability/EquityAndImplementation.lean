@@ -3,11 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ClinicalUtilityFairness
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -32,7 +28,6 @@ gap and the equity motivation, which that paper measures and argues. The
 decision-theoretic, allocation and implementation results below are derived here;
 that paper does not contain them.
 -/
-
 
 /-!
 ## Health Disparity from Portability Gaps
@@ -109,7 +104,6 @@ theorem qaly_gap_proportional_to_r2_gap
   mul_sub_mul_pos_of_lt γ r2₁ r2₂ h_γ h_gap
 
 end HealthDisparity
-
 
 /-!
 ## Fairness Impossibility Results
@@ -193,7 +187,6 @@ theorem no_fully_fair_policy
   · exact div_pos (abs_pos.mpr (sub_ne_zero.mpr h_mu_diff)) h_sigma
 
 end FairnessImpossibility
-
 
 /-!
 ## Resource Allocation for Equitable PGS
@@ -333,7 +326,6 @@ theorem diversity_has_higher_marginal_value
   nlinarith [h_base_lt, h_shift_lt, h1, h2', h3, h4]
 
 end ResourceAllocation
-
 
 /-!
 ## Clinical Implementation Guidelines

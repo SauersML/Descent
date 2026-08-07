@@ -8,18 +8,13 @@ import Descent.Portability.PortabilityDrift
 -- construction says about neighbourhood-consistency QC.
 import Descent.Conditionals.LocalToGlobalCoherence
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
 open MeasureTheory
 open Finset
 open scoped BigOperators
-
 
 /-!
 # Statistical Genetics Methodology for Portability Assessment
@@ -45,7 +40,6 @@ R-squared, LD score regression and genetic-correlation estimation are standard, 
 what is proved about them here is derived here; that paper contains none of it.
 -/
 
-
 /-!
 ## Incremental R² and Standard Error
 
@@ -65,7 +59,6 @@ theorem incrementalR2_at_reference_point :
     incrementalR2 (3 / 4) (1 / 4) = 1 / 2 := by
   norm_num [incrementalR2,
       Descent.Core.difference]
-
 
 /-- **Increments telescope.** The gain from covariates to full equals the gain through any
 intermediate model plus the gain from there. A body that failed this would not be an increment. -/
@@ -173,7 +166,6 @@ theorem portabilityRatio_eq_zero_iff
 
 end IncrementalR2
 
-
 /-!
 ## Cross-Validation for Portability Assessment
 
@@ -229,7 +221,6 @@ theorem sampleOverlapBias_scales_inversely_with_overlap
 
 end CrossValidation
 
-
 /-!
 ## Summary Statistic-Based PGS
 
@@ -238,7 +229,6 @@ individual-level data. This introduces specific challenges.
 -/
 
 section SummaryStatPGS
-
 
 /-! **Deleted: `effectiveSampleSizeSE se = 1/se^2`, together with
 `effectiveSampleSizeSE_lt_corrected` and the positivity lemma stated about it.**
@@ -367,7 +357,6 @@ theorem fixed_weights_at_zero_denominator_is_junk (m : MetaAnalysisModel) (i : F
   unfold fixed_weights
   rw [hzero, div_zero]
 
-
 noncomputable def random_weights (m : MetaAnalysisModel) (i : Fin m.k) : ℝ :=
   1 / (m.variances i + m.tau_sq)
 
@@ -378,7 +367,6 @@ theorem random_weights_at_zero_denominator_is_junk (m : MetaAnalysisModel) (i : 
     random_weights m i = 0 := by
   unfold random_weights
   rw [hzero, div_zero]
-
 
 noncomputable def fixed_se_sq (m : MetaAnalysisModel) : ℝ :=
   1 / (∑ i, fixed_weights m i)
@@ -391,7 +379,6 @@ theorem fixed_se_sq_at_zero_denominator_is_junk (m : MetaAnalysisModel)
   unfold fixed_se_sq
   rw [hzero, div_zero]
 
-
 noncomputable def random_se_sq (m : MetaAnalysisModel) : ℝ :=
   1 / (∑ i, random_weights m i)
 
@@ -402,7 +389,6 @@ theorem random_se_sq_at_zero_denominator_is_junk (m : MetaAnalysisModel)
     random_se_sq m = 0 := by
   unfold random_se_sq
   rw [hzero, div_zero]
-
 
 /-- **Fixed vs random effects meta-analysis.**
     Fixed effects: assumes same β across populations (tau² = 0).
@@ -434,7 +420,6 @@ theorem random_effects_captures_heterogeneity (m : MetaAnalysisModel) :
       linarith [m.h_tau_sq]
 
 end SummaryStatPGS
-
 
 /-!
 ## LD Score Regression
@@ -518,7 +503,6 @@ theorem ldsc_se_decreases_with_n
 
 end LDScoreRegression
 
-
 /-!
 ## Genetic Correlation Methods
 
@@ -570,9 +554,7 @@ theorem twoRegionGeneticCorrelation_lt_firstCorrelation
   rw [div_lt_iff₀ (by linarith : (0 : ℝ) < w₁ + w₆)]
   nlinarith
 
-
 end GeneticCorrelationMethods
-
 
 /-!
 ## Disjoint-Window Designs: the variance parameter, not the limit law

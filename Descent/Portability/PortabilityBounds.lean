@@ -6,11 +6,7 @@ import Descent.Core.Moments
 import Descent.Core.Ratios
 import Descent.PopGen.AssortativeMatingPGS
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -44,7 +40,6 @@ the neutral-floor conclusion by a route that survives measurement, and gets `0.9
 than `0.88` for the continental case, because the floor must be computed from the branch
 quantity `1 - H_T/H_S` and not from a pairwise `F_ST`.
 -/
-
 
 /-!
 ## Berry-Esseen Bounds on Score Distribution Approximation
@@ -102,7 +97,6 @@ theorem portability_ratio_approximation_error
 
 end BerryEsseenPortability
 
-
 /-!
 ## Individual-Level Prediction Error Distribution
 
@@ -148,7 +142,6 @@ theorem spline_r2_bounded_by_bias_variation
   exact div_le_of_le_mul₀ (le_of_lt h_total_pos) h_δ_nn h_bias_small
 
 end IndividualErrorDistribution
-
 
 /-!
 ## Evolutionary Models for Trait-Specific Portability
@@ -298,7 +291,6 @@ theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
     le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hr2_le hfst hfst') hr2_le⟩
 
 end EvolutionaryModels
-
 
 /-!
 ## Concrete Witness: Height vs Lymphocyte Count

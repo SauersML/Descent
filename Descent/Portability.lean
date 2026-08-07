@@ -69,9 +69,7 @@ import Descent.Portability.TransferLearningPGS.ImportanceWeighting
 import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransplantationStability
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 2 module(s) -- `Descent.Program.Conclusions`, `Descent.Program.OpenQuestions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Program
 
 /-!
 # `Descent.Portability` -- the layer head

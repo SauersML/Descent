@@ -3,11 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PhenomeWidePortability
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -33,7 +29,6 @@ gap and does not treat genotype imputation quality. Sources for individual resul
 where they exist, are cited at those results.
 -/
 
-
 /-!
 ## Imputation Quality and PGS
 
@@ -54,7 +49,6 @@ theorem attenuatedVariance_at_reference_point :
     attenuatedVariance 2 2 2 = 8 := by
   norm_num [attenuatedVariance,
       Descent.Core.product3]
-
 
 /-- Attenuated ≤ true variance. -/
 theorem attenuated_le_true (beta_sq het r2_imp : ℝ)
@@ -77,7 +71,6 @@ noncomputable def imputationErrorVariance (beta_sq het r2_imp : ℝ) : ℝ :=
 theorem imputationErrorVariance_at_reference_point :
     imputationErrorVariance 2 2 2 = -4 := by
   norm_num [imputationErrorVariance]
-
 
 /-- Imputation error variance is nonneg. -/
 theorem imputation_error_nonneg (beta_sq het r2_imp : ℝ)
@@ -124,7 +117,6 @@ theorem imputationErrorVariance_eq_zero_iff
   constructor <;> intro h <;> linarith
 
 end ImputationQuality
-
 
 /-!
 ## Reference Panel Effects
@@ -330,7 +322,6 @@ theorem shorter_ld_worse_imputation
 
 end ReferencePanel
 
-
 /-!
 ## Rare Variant Imputation
 
@@ -339,7 +330,6 @@ difficulty varies dramatically across populations.
 -/
 
 section RareVariantImputation
-
 
 /-- **Population specificity of rare variant imputation.**
     Rare variants are population-specific → they're only in the
@@ -385,7 +375,6 @@ theorem wgs_vs_array_tradeoff
 
 end RareVariantImputation
 
-
 /-!
 ## Array Ascertainment Bias
 
@@ -407,7 +396,6 @@ theorem apparent_portability_loss_at_reference_point :
   norm_num [apparent_portability_loss,
       Descent.Core.difference]
 
-
 /-- Difference in `R²` corresponding to true biological portability loss,
     as measured with an ideal non-ascertained array or sequencing design. -/
 noncomputable def true_portability_loss
@@ -419,7 +407,6 @@ theorem true_portability_loss_at_reference_point :
     true_portability_loss 2 1 = 1 := by
   norm_num [true_portability_loss,
       Descent.Core.difference]
-
 
 /-- **Ascertainment creates artificial portability loss.**
     Even with identical genetic architecture, the PGS computed
@@ -509,7 +496,6 @@ theorem total_portability_loss_at_reference_point :
   norm_num [total_portability_loss,
       Descent.Core.sum]
 
-
 /-- **The apparent loss is the total of the true loss and the ascertainment gap.**
 
 `ascertainment_artificial_loss` writes that decomposition with a bare `+`. Written through
@@ -550,7 +536,6 @@ theorem portability_loss_decomposition
   · dsimp [total_portability_loss,
       Descent.Core.sum]
     linarith
-
 
 end ArrayAscertainment
 

@@ -8,14 +8,12 @@ import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -43,7 +41,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat the QST-FST test or score overdispersion under selection. Sources
 for individual results, where they exist, are cited at those results.
 -/
-
 
 /-!
 ## QST-FST Comparison
@@ -142,7 +139,6 @@ theorem qst_eq_fst_under_drift (fst V_A : ℝ) (hV : V_A ≠ 0) :
   ring
 
 end QSTFSTTest
-
 
 /-!
 ## Polygenic Score Overdispersion
@@ -359,7 +355,6 @@ theorem expected_pgs_diff_var_nonneg (V_A fst : ℝ)
     0 ≤ expectedPGSDiffVariance V_A fst := by
   unfold expectedPGSDiffVariance; positivity
 
-
 /-- **Population stratification confounds overdispersion tests.**
     Cryptic stratification in the GWAS discovery sample can
     create spurious PGS differences that look like adaptation.
@@ -399,7 +394,6 @@ theorem corrections_reduce_signal
   exact ⟨by linarith, by linarith⟩
 
 end PGSOverdispersion
-
 
 /-!
 ## Directional vs Stabilizing Selection
@@ -653,7 +647,6 @@ theorem selection_strength_determines_portability
 
 end SelectionTypes
 
-
 /-!
 ## Detecting Adaptation from GWAS Summary Statistics
 
@@ -674,7 +667,6 @@ theorem stratification_reduces_adaptation_signal
     -- After removing stratification bias, signal is reduced but not eliminated
     0 < signal_raw - strat_bias ∧ signal_raw - strat_bias < signal_raw := by
   exact ⟨by linarith, by linarith⟩
-
 
 end DetectingAdaptation
 

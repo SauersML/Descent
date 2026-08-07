@@ -12,12 +12,11 @@ import Descent.Portability.ContinuumCalibration
 assert_below Descent.Decision
 
 -- LAYER DEBT. This file cannot yet assert it is below `Descent.Conditionals`,
--- `Descent.Portability`, `Descent.Program`:
+-- `Descent.Portability`:
 --   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.ConditionalGain`
 --   Portability: reaches 20 module(s) -- `Descent.Portability.ClinicalUtilityFairness`,
 --   `Descent.Portability.ContinuumCalibration`,
 --   `Descent.Portability.MetricSpecificPortability.PrecisionRecall` and 17 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.Blindness
@@ -451,7 +450,6 @@ noncomputable def witnessWeight (_p : Fin 3) : ℝ := 1 / 3
 /-- Reference evaluation: the witness is uniform on three points. -/
 @[simp] theorem witnessWeight_at_reference_point (p : Fin 3) : witnessWeight p = 1 / 3 := rfl
 
-
 /-! **The two decorations are `Portability.ancestryScore` and
 `Portability.ancestryScoreSwapped`.** This module names them; it does not redeclare their
 bodies `![0, 1, 2]` and `![0, 2, 1]` under local names. A witness that carries its own copy
@@ -467,7 +465,6 @@ theorem ancestryScore_eq_threeAncestryConditional :
     Portability.ancestryScore = Portability.threeAncestryConditional := by
   simpa only [Portability.ancestryScore, Portability.threeAncestryConditional] using
     Portability.ancestryScore_eq_ancestryScore
-
 
 /-- The third population's risk under the transposed assignment, pinned. -/
 @[simp] theorem ancestryScoreSwapped_two : Portability.ancestryScoreSwapped 2 = 1 := rfl
@@ -553,7 +550,6 @@ noncomputable def rareWeight (rare : ℝ) (p : Bool) : ℝ := if p then rare els
 theorem rareWeight_at_reference_point :
     rareWeight 1 true = 1 := by
   norm_num [rareWeight]
-
 
 /-- The rare population carries risk one, the common population risk zero.
 

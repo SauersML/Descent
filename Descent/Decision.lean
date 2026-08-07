@@ -9,9 +9,7 @@ import Descent.Decision.SelectionValidation
 import Descent.Decision.TransportedMinimax
 import Descent.Decision.ValidationStatistics
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Program
 
 /-!
 # `Descent.Decision` -- the layer head

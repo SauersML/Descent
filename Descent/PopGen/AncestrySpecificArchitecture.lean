@@ -8,14 +8,12 @@ import Descent.Portability.PortabilityDrift.MutationDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -42,7 +40,6 @@ gap and does not treat drift models of allele-frequency divergence, allelic hete
 or LD tagging. Sources for individual results, where they exist, are cited at those
 results.
 -/
-
 
 /-!
 ## Allele Frequency Divergence
@@ -224,7 +221,6 @@ noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
 theorem twoPopDriftVariance_at_reference_point :
     twoPopDriftVariance (1 / 2) (1 / 2) = 1 / 4 := by
   norm_num [twoPopDriftVariance, driftVariance]
-
 
 /-- Two-population drift variance equals the sum of individual drift variances. -/
 theorem twoPopDriftVariance_eq_sum (p0 fst : ℝ) :
@@ -408,7 +404,6 @@ theorem rare_variants_drift_more
 
 end AlleleFrequencyDivergence
 
-
 /-!
 ## Ancestry-Specific LD Tagging
 
@@ -591,9 +586,7 @@ theorem taggedEffect_sq_eq_gwasHeritability (causalEffect tagR : ℝ) :
   unfold taggedEffect gwasHeritability Descent.Core.product
   ring
 
-
 end LDTagging
-
 
 /-!
 ## Allelic Heterogeneity
@@ -782,7 +775,6 @@ theorem afrSignalCount_le_distinctSignalCount
 
 end AllelicHeterogeneity
 
-
 /-!
 ## Architecture Convergence
 
@@ -851,7 +843,6 @@ theorem geneFlowFstStep_at_reference_point :
     geneFlowFstStep (1 / 4) 1 (1 / 2) = 1 / 2 := by
   norm_num [geneFlowFstStep, Portability.ibdFlowStep]
 
-
 /-- One quantity, one map. -/
 theorem geneFlowFstStep_eq_ibdFlowStep (m Ne F : ℝ) :
     geneFlowFstStep m Ne F = Portability.ibdFlowStep Ne m F := rfl
@@ -874,7 +865,6 @@ theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
   unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
-
 
 /-!
 ### Derivation: portabilityFromArchitecture = rg² × (1 - Fst) × tagging_ratio

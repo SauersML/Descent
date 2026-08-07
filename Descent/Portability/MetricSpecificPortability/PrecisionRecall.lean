@@ -12,11 +12,7 @@ import Descent.Portability.PGSCalibrationTheory.RecalibrationMethods
 -- programme content, so nothing in this file reaches the audit layer at the top of the
 -- graph to obtain a harmonic mean of two arguments.
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -38,8 +34,6 @@ recovered by resolving each name a part references back to the sibling that decl
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
-
 
 /-!
 ## Precision vs Recall in PGS Risk Stratification
@@ -314,7 +308,6 @@ theorem driftFields_differ_at_first_ancestry : driftFieldA 0 ≠ driftFieldB 0 :
   unfold driftFieldA driftFieldB
   norm_num
 
-
 /-! #### Resolution: what refining the index buys, and what it cannot
 
 Splitting the ancestry index into cells and calibrating per cell resolves part of the drift and
@@ -387,7 +380,6 @@ theorem excess_is_exactly_quadratic {m : ℕ} (π η : Fin m → ℝ) (hπ : ∑
     indexwiseLoss π η (pooledConditional π η + e) - driftDefect π η = e ^ 2 := by
   rw [indexwiseLoss_eq_defect_add_sq π η hπ]
   ring
-
 
 /-! #### The ancestry coordinate that explains the most variation can explain none of the drift
 
@@ -485,7 +477,6 @@ theorem variance_ordering_opposes_drift_ordering :
     highDrift_captures_no_score, highDrift_captures_drift]
   norm_num
 
-
 /-! #### The atomic within/between split
 
 The witness above shows merging two ancestries loses resolved energy. The identity below is why,
@@ -575,7 +566,6 @@ theorem belowThresholdMass_pos_inside :
   unfold belowThresholdMass uniformTwoWeights twoAncestryConditional
   norm_num [Fin.sum_univ_two]
 
-
 /-! #### The obstruction is drift VISIBLE TO THE SCORE'S BINS, not total effect heterogeneity
 
 The irreducible defect is the variance across ancestry of the BIN-AVERAGED risk, not of the
@@ -647,7 +637,6 @@ theorem refining_reveals_drift :
       < driftDefect ancestryPairWeights fineRiskByAncestry := by
   rw [binnedRisk_driftDefect_zero]
   exact fineRisk_driftDefect_pos
-
 
 /-! #### Resolution does not order the defect
 
@@ -722,7 +711,6 @@ theorem vResolvedConditional_resolution_zero :
   norm_num [Fin.sum_univ_two, bitSign, driftFieldB, twoBitIndexWeights,
     binnedRiskByAncestry, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
-
 /-! #### Superposition of landscapes lives in `LandscapeSuperposition`
 
 Pooling cohorts is a weighted sum of per-cohort landscapes, which is the shape
@@ -744,7 +732,6 @@ excluded by some cohort at every split of the target is excluded by the pooled
 fit; that pooling DISSOLVES a barrier does not follow, and needs configurations
 built at the intermediate overlaps.
 -/
-
 
 /-- **The pooled calibration target decomposes into per-ancestry loss budgets.**
 
@@ -788,7 +775,6 @@ theorem pooledTarget_reject_of_every_budget_rejected {m : ℕ} (π η : Fin m �
   obtain ⟨budget, hsum, hle⟩ := (pooledTarget_iff_exists_budget π η ε v hπ).mp h
   obtain ⟨i, hi⟩ := hreject budget hsum
   exact absurd (hle i) (not_le.mpr hi)
-
 
 /-! #### Heterogeneous cohorts can remove a barrier that each cohort alone has
 
@@ -900,7 +886,6 @@ theorem mixtureCoupling_eq_zero_iff (ρ π : ℝ) (hρ : ρ ≠ 0) :
     rw [h]
     ring
 
-
 /-! #### A direction invisible to the pooled design is invisible to every cohort
 
 The exact-degeneracy counterpart, and it runs the other way from the barrier
@@ -921,8 +906,6 @@ theorem pooledQuadratic_eq_zero_iff {K : ℕ} (π : Fin K → ℝ) (Q : Fin K �
     fun h _ ↦ mul_nonneg (hπ h).le (hQ h)
   have := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hzero g (Finset.mem_univ g)
   exact (mul_eq_zero.mp this).resolve_left (hπ g).ne'
-
-
 
 /-! #### Heterogeneity fattens the lower tail, so barriers close by filling not deleting
 
@@ -1009,7 +992,6 @@ theorem spectrumEntries_three_epochs : spectrumEntries (Descent.Core.pairedEpoch
 /-- **Four epochs are fifth-root stable.** -/
 theorem spectrumEntries_four_epochs : spectrumEntries (Descent.Core.pairedEpochCount 4) = 5 := by
   decide
-
 
 /-! #### Drift invisible to genotype is irreducible by any amount of genotyping
 
@@ -1125,7 +1107,6 @@ noncomputable def absoluteLoss {m : ℕ} (π η : Fin m → ℝ) (v : ℝ) : ℝ
 theorem absoluteLoss_at_reference_point :
     absoluteLoss (![1, 3] : Fin 2 → ℝ) (![2, 5] : Fin 2 → ℝ) 4 = 5 := by
   norm_num [absoluteLoss, Fin.sum_univ_two]
-
 
 /-- **The pooled mean is `3/10`.** -/
 theorem skewedAncestry_pooled_mean :
@@ -1268,7 +1249,6 @@ theorem squareRoot_allocation_beats_proportional (n : ℝ) (hn : 0 < n) :
   field_simp [ne_of_gt hn]
   nlinarith
 
-
 /-! #### Resolution monotonicity in general, not just on a witness
 
 The merge witness shows coarsening loses drift energy in one instance; the atomic split shows
@@ -1344,7 +1324,6 @@ theorem aboveThresholdMass_pos_inside :
     0 < aboveThresholdMass uniformTwoWeights twoAncestryConditional (1 / 2) := by
   unfold aboveThresholdMass uniformTwoWeights twoAncestryConditional
   norm_num [Fin.sum_univ_two]
-
 
 /-! #### Why a threshold inside the drift range admits no single decision
 
@@ -1457,7 +1436,6 @@ theorem ancestryAlignmentEnergy_swapped : ancestryAlignmentEnergy ancestryScoreS
     Matrix.cons_val_two, Matrix.tail_cons]
   norm_num [abs_of_nonneg, abs_of_nonpos]
 
-
 /-! #### A rare ancestry is not proportionately harmless
 
 The drift defect is an `L²` quantity, and the functional built from it moves like the SQUARE ROOT
@@ -1569,7 +1547,6 @@ theorem ppvPortabilityGap_at_reference_point :
   constructor <;>
     · unfold ppvPortabilityGap metricPPV
       norm_num [abs_of_nonneg, abs_of_nonpos]
-
 
 /-- **The gap is bounded by the two predictive values it compares.** Strict positivity under a
 prevalence shift is shared by every positive multiple of this distance; the triangle bound is

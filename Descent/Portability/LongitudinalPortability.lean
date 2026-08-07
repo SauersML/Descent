@@ -6,11 +6,7 @@ import Descent.PopGen.LDDecayTheory
 import Descent.Portability.HorizonCurve
 import Descent.Conditionals.DriftingConditional
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -37,7 +33,6 @@ gap and does not treat temporal decay of portability, epoch effects or retrainin
 schedules. Sources for individual results, where they exist, are cited at those results.
 -/
 
-
 /-!
 ## Portability Decay Over Generations
 
@@ -58,8 +53,6 @@ noncomputable def portabilityAtTime (r2_initial lambda_total t : ℝ) : ℝ :=
 theorem portabilityAtTime_at_reference_point :
     portabilityAtTime 1 1 1 = Real.exp (-1) := by
   norm_num [portabilityAtTime]
-
-
 
 /-- Portability at time 0 equals initial R². -/
 theorem portabilityAtTime_zero_time (r2_initial lambda_total : ℝ) :
@@ -257,7 +250,6 @@ theorem ldDecayPerGeneration_lt_of_recombination_lt (r₁ r₂ : ℝ) (t : ℕ)
 
 end GenerationalDecay
 
-
 /-!
 ## Environmental Epoch Effects
 
@@ -267,7 +259,6 @@ PGS validity even within the same population over time.
 -/
 
 section EnvironmentalEpochs
-
 
 /-- **Secular trends shift PGS distributions.**
     A secular trend (e.g., increasing height) shifts the
@@ -322,7 +313,6 @@ theorem heritability_increases_when_env_equalizes
   nlinarith
 
 end EnvironmentalEpochs
-
 
 /-!
 ## Cohort Effects
@@ -390,7 +380,6 @@ noncomputable def ageDependentSignalVariance
 theorem ageDependentSignalVariance_at_reference_point :
     ageDependentSignalVariance 1 1 1 1 = 1 := by
   norm_num [ageDependentSignalVariance, ageDependentSignalShape]
-
 
 /-- **The peak sets the scale and the shape sets the age dependence, separately.** Doubling the
 peak doubles the variance at every age without moving where the maximum sits. A body that mixed
@@ -576,7 +565,6 @@ theorem survivorship_bias_attenuates_pgs
 
 end CohortEffects
 
-
 /-!
 ## Temporal Calibration Drift
 
@@ -596,7 +584,6 @@ theorem temporalCalibrationInTheLarge_at_reference_point :
     temporalCalibrationInTheLarge 1 (1 / 2) = 1 / 2 := by
   norm_num [temporalCalibrationInTheLarge, calibrationInTheLarge,
       Descent.Core.difference]
-
 
 /-- Exact temporal calibration drift from a prevalence shift with fixed mean
 prediction. The temporal CITL shift equals the prevalence shift exactly. -/
@@ -621,7 +608,6 @@ theorem temporal_calibration_drift_nonzero_of_prevalence_shift
   intro hzero
   rw [hzero, h_src_cal] at h_delta
   exact h_shift (by linarith)
-
 
 /-- Exact temporal Brier risk under a calibrated Bernoulli model with prevalence `π` and explicit
 time-indexed signal variance. This is the `brier`
@@ -660,7 +646,6 @@ theorem brier_calibration_worsens_discrimination_stable
 
 end CalibrationDrift
 
-
 /-!
 ## Retraining and Update Strategies
 
@@ -680,8 +665,6 @@ noncomputable def modelStaleness (lambda t : ℝ) : ℝ :=
 theorem modelStaleness_at_reference_point :
     modelStaleness 1 1 = 1 - Real.exp (-1) := by
   norm_num [modelStaleness]
-
-
 
 /-- Staleness starts at 0. -/
 theorem staleness_at_zero (lambda : ℝ) :
@@ -715,7 +698,6 @@ theorem ensemble_at_least_min (r2_old r2_new : ℝ) :
   · simp [min_eq_left h]; linarith
   · simp [min_eq_right h]; linarith
 
-
 /-- **Transfer learning reduces retraining cost.**
     Using the old PGS as a starting point (warm start) reduces
     the sample size needed for retraining. -/
@@ -728,7 +710,6 @@ theorem transfer_reduces_sample_requirement
   exact h_less
 
 end RetrainingStrategies
-
 
 /-!
 ## Cross-Temporal Validation
@@ -757,7 +738,6 @@ theorem temporal_split_more_conservative
   calc r2_true * Real.exp (-lambda * delta_t)
       ≤ r2_true * 1 := mul_le_mul_of_nonneg_left h_exp_le h_r2
     _ = r2_true := mul_one _
-
 
 end CrossTemporalValidation
 

@@ -4,11 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.DriftRegime
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -28,7 +24,6 @@ Key results:
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/
-
 
 /-!
 ## Trait Classification by Portability Pattern
@@ -684,7 +679,6 @@ theorem worse_than_neutral_implies_fluctuating_regime
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩
   exact ⟨h_match, h_port, h_not_stab⟩
 
-
 /-- **Scalar three-factor portability upper bound.**
     This is only the coarse scalar inequality
     `r2_source × (1 - fst) × ρ² × ld_factor ≤ r2_source`
@@ -706,7 +700,6 @@ theorem scalar_three_factor_portability_upper_bound
 
 end TraitClassification
 
-
 /-!
 ## Immune Trait Portability
 
@@ -717,7 +710,6 @@ neutral expectation, reflecting pathogen-driven divergent selection.
 section ImmuneTraits
 
 end ImmuneTraits
-
 
 /-!
 ## Metabolic Trait Portability
@@ -771,7 +763,6 @@ theorem larger_gxe_variance_lowers_scalar_portability_fraction
   apply div_lt_div_of_pos_left h_beta_pos (by linarith) (by linarith)
 
 end MetabolicTraits
-
 
 /-!
 ## Anthropometric Trait Portability
@@ -848,7 +839,6 @@ theorem lt_of_lt_mul_of_lt_one
     port_selected < port_reference := by nlinarith
 
 end AnthropometricTraits
-
 
 /-!
 ## Phenome-Wide Portability Correlation Structure

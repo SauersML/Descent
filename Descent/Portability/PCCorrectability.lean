@@ -7,11 +7,7 @@ import Descent.Portability.PCCorrectability.ImitationCapacity
 import Descent.Portability.PCCorrectability.Nonidentifiability
 import Descent.Portability.PCCorrectability.EndToEnd
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Population-structure correctability for PC and mixed-model adjustment

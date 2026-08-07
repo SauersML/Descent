@@ -6,14 +6,12 @@ import Descent.PopGen.LDDecayTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -31,7 +29,6 @@ substantiates nothing below. It is an empirical study of the polygenic-score por
 gap and does not treat island, admixture or bottleneck demographic models. Sources for
 individual results, where they exist, are cited at those results.
 -/
-
 
 section IslandModel
 
@@ -79,7 +76,6 @@ a fixed point of that map. Without such a theorem the constant would rate only "
 but probably true". -/
 
 end IslandModel
-
 
 section SteppingStone
 
@@ -492,7 +488,6 @@ theorem steppingStoneFst_from_coalescence_time (d Ne m σ_sq : ℝ)
   field_simp
   ring
 
-
 /-- **The meeting time inherits the indistinguishability of the `F_ST` it produces.**
 
 `steppingStoneDiffusionTimescale` is the only route by which `demoSteppingStoneFst` acquires
@@ -525,7 +520,6 @@ theorem fstFromCoalescenceTime_in_unit (T Ne : ℝ)
   · rw [div_lt_one (by linarith)]; linarith
 
 end SteppingStone
-
 
 section AdmixtureModels
 
@@ -738,7 +732,6 @@ theorem admixedAlleleFreq_at_reference_point :
     admixedAlleleFreq 1 1 1 = 1 := by
   norm_num [admixedAlleleFreq, Descent.Core.convexCombination]
 
-
 /-- **Key algebraic identity**: the difference between admixed and source A
     allele frequencies is (1-α) times the parental difference.
     This is the core of the (1-α)² derivation. -/
@@ -789,7 +782,6 @@ theorem admixed_squared_diff (α p_A p_B : ℝ) :
 
 end AdmixtureModels
 
-
 /-!
 ### Recent expansion and the singleton spectrum
 
@@ -801,7 +793,6 @@ the formula and wrong about the quantity it was named for, which is the failure
 this development is trying to eliminate, so they are deleted rather than
 weakened.
 -/
-
 
 section ArchaicIntrogression
 
@@ -816,8 +807,6 @@ noncomputable def introgressionVariants (N₀ introgressionRate t : ℝ) : ℝ :
 theorem introgressionVariants_at_reference_point :
     introgressionVariants 1 1 1 = 1 - Real.exp (-1) := by
   norm_num [introgressionVariants]
-
-
 
 /-- **Differential introgression creates population-specific variants.**
     When one population has a higher archaic introgression fraction than
@@ -855,7 +844,6 @@ theorem introgression_gap_bounded
   exact (div_le_iff₀ h_total).mpr h_small
 
 end ArchaicIntrogression
-
 
 section FounderEffects
 
@@ -937,7 +925,6 @@ theorem founderHeterozygosityLoss_eq_derived (k : ℕ) (t : ℕ) :
   simp
 
 end FounderEffects
-
 
 /-!
 ## Heterozygosity Loss Under Variable Population Size
@@ -1039,7 +1026,6 @@ theorem heterozygosityLossVariableNe_of_no_cumulative_drift {T : ℕ} (Ne : Fin 
   rw [hzero]
   simp
 
-
 /-- Heterozygosity loss under variable Nₑ is nonneg when all Nₑ are positive. -/
 theorem heterozygosityLossVariableNe_nonneg {T : ℕ}
     (Ne : Fin T → ℝ) (hNe : ∀ i, 0 < Ne i) :
@@ -1102,7 +1088,6 @@ theorem one_div_two_mul_lt_one_div_two_mul_of_lt (x y : ℝ)
   div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 end VariableNeFst
-
 
 /-!
 ## Portability Implications of Demographic History
@@ -1216,7 +1201,6 @@ theorem driftLDCreationRate_eq_driftRatePerGen (Ne : ℝ) :
   unfold driftLDCreationRate driftRatePerGen; ring
 
 end BottleneckExcessLD_Derivation
-
 
 section DemographicPortability
 

@@ -8,14 +8,12 @@ import Descent.Portability.PortabilityDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Portability`,
--- `Descent.Program`:
+-- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
 --   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
 --   `Descent.Spectral.SpectralDegradation`
 --   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
 --   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
 --   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
 -- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent.PopGen
@@ -38,8 +36,6 @@ from its header instead of inherited from its position in a file that no longer 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
-
 
 /-!
 ## Migration-Drift Balance: Population Genetics Foundations
@@ -91,7 +87,6 @@ common case in this corpus, and `d = 2` is exactly where the limit is worst. -/
 `Descent.Core.islandDemeCorrection` under a second name, and every reference now
 calls the kernel.  The deme correction `d/(d-1)` is one quantity; two names for it is how a
 factor-of-two disagreement survives unnoticed. -/
-
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem islandDemeCorrection_at_reference_point :

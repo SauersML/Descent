@@ -311,6 +311,27 @@ theorem linearNormOfReaction_sub (a b E₁ E₂ : ℝ) :
   unfold linearNormOfReaction Descent.Core.affineStep
   ring
 
+/-- **Two environments identify the slope, and identify it exactly.**
+
+`linearNormOfReaction_sub` says the intercept cancels; this says what the cancellation
+leaves.  The two-point slope a reaction-norm experiment computes -- phenotype contrast over
+environment contrast -- returns `b` itself, from ANY pair of distinct environments, so the
+sensitivity is estimable without ever knowing the baseline or choosing a reference.
+
+That the answer does not depend on WHICH two environments were used is the linearity, and it
+is the assumption a reaction-norm study makes when it reports a single slope.  For a norm of
+reaction with any curvature the same estimator returns a chord slope that moves with the
+pair, and two laboratories measuring at different environments would report different
+sensitivities for one genotype without either being wrong. -/
+theorem linearNormOfReaction_slope_identified (a b E₁ E₂ : ℝ) (h : E₁ ≠ E₂) :
+    Descent.Core.ratio
+        (Descent.Core.difference (linearNormOfReaction a b E₁) (linearNormOfReaction a b E₂))
+        (Descent.Core.difference E₁ E₂) = b := by
+  have hne : E₁ - E₂ ≠ 0 := sub_ne_zero_of_ne h
+  unfold linearNormOfReaction Descent.Core.affineStep Descent.Core.ratio
+    Descent.Core.difference
+  field_simp
+
 /-- **Different genotypes have different slopes.**
     If b(G₁) ≠ b(G₂), then the genotype ranking can reverse
     across environments (crossover GxE). Given two genotypes

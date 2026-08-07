@@ -8,11 +8,7 @@ import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 -- because it does not use it.  The module that does use it names it.
 import Descent.Portability.PortabilityDrift
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -34,8 +30,6 @@ from its header instead of inherited from its position in a file that no longer 
 Where a cut falls inside a section, the section is reopened and reclosed by name. A section
 scopes `variable`s and this file declares none at that level, so the reopening is exact.
 -/
-
-
 
 /-!
 ## Fine-Tuning and Few-Shot Adaptation
@@ -2061,7 +2055,6 @@ theorem metaLearned_deployedTransferTargetR2_strictMono
 
 end FineTuning
 
-
 /-!
 ## Theoretical Limits of Transfer
 
@@ -2107,8 +2100,6 @@ theorem privateArchitectureTransferCeiling_at_reference_point :
     privateArchitectureTransferCeiling 1 (1 / 2) 1 = 1 / 4 := by
   norm_num [privateArchitectureTransferCeiling, sharedLDFromMigration,
       Descent.Core.saturation]
-
-
 
 /-- **A positive private causal fraction lowers the transferable `R²` ceiling.**
     In the architecture-aware transfer model above, compare a trait with private causal fraction
