@@ -7753,6 +7753,11 @@ LAYER_PENDING = {
         "capacity theorem in terms of them, so the consumer moves UP rather than the "
         "definitions moving down.",
     ("Descent.PopGen.GeneticArchitectureDiscovery",
+     "Descent.Portability.AncestrySpecificPower"):
+        "Twenty-two uses of `Portability.genotypeVarianceHWE`, which is Hardy-Weinberg "
+        "genotype variance and contains no transport at all. Extract it downward -- "
+        "Core or PopGen -- and this edge and two others go with it.",
+    ("Descent.PopGen.GeneticArchitectureDiscovery",
      "Descent.Portability.BayesianPGSTheory"):
         "`jamesSteinMSE` and `optimalShrinkage`: shrinkage-estimator facts about one "
         "population, in Portability because the Bayesian PGS chapter was written "
@@ -7824,6 +7829,18 @@ LAYER_PENDING = {
         "`fisherInformation`, `ncp` and `effectiveFisherInformation` are study-design "
         "quantities for a single cohort. Same extraction as "
         "`GeneticArchitectureDiscovery`.",
+    ("Descent.PopGen.StandardizedGenotypeMoments",
+     "Descent.Portability.AncestrySpecificPower"):
+        "`Portability.genotypeVarianceHWE` again. One extraction retires this edge and "
+        "ONE more, not two: `GeneticArchitectureDiscovery` names nothing else from "
+        "`AncestrySpecificPower` and goes with it, but `SelectionArchitecture` "
+        "independently names `fisherInformation`, `ncp`, `effectiveFisherInformation` "
+        "and three of their lemmas, all declared there, so its edge survives and needs "
+        "its own extraction. The declaration's body is `Descent.Core.hweHeterozygosity` "
+        "and nothing else, and its home is `PopGen.DGP` rather than `Core/Fst.lean` -- "
+        "beside `hweHeterozygosity` it would be two names for one body in one namespace, "
+        "which is what `duplication` reports, and the ledger keys of two VALIDATED "
+        "battery records move with the name.",
 }
 
 # The self-auditing directory.  See META in the header.
