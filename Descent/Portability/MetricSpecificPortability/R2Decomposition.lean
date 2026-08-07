@@ -11,11 +11,7 @@ import Descent.Spectral.FoldedSpectrum
 -- path that runs through some other chapter's head.
 import Descent.Portability.PopulationAUC
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 

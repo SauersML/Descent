@@ -7841,16 +7841,6 @@ LAYER_PENDING = {
         "beside `hweHeterozygosity` it would be two names for one body in one namespace, "
         "which is what `duplication` reports, and the ledger keys of two VALIDATED "
         "battery records move with the name.",
-    ("Descent.Portability.PortabilityDrift.PresentDayMoments",
-     "Descent.Program.Conclusions"):
-        "`brierBernoulliRisk`, `bernoulliKLReal` and `exactBrierRiskOfCalibrated`. "
-        "This edge is what the retired `PortabilityDrift.Definitions` entry PREDICTED: "
-        "that file named nothing from `Conclusions` and carried the import for this "
-        "one, its entry said the interim repair was to move the import to the file "
-        "that uses the names, and that move is what happened -- so the edge did not go "
-        "away, it arrived where it was always owed. The real repair is unchanged and "
-        "is the one that retires it: move the Bernoulli losses out of the narrative "
-        "module. They are risk functions of a Bernoulli outcome and there is no "
         "programme content in them.",
 }
 

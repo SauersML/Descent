@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Foundations.BernoulliLosses
 import Descent.Foundations.CovarianceStructure
 import Descent.Foundations.Probability
 import Descent.Foundations.ReferenceEvaluation

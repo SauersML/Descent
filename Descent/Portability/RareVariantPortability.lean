@@ -178,6 +178,31 @@ theorem rareVariantCountRatio_gt_iff
   unfold rareVariantCountRatio Descent.Core.ratio
   exact lt_div_iff₀ h_target
 
+/-- **Counting variants is comparing variance, when the per-variant architecture is shared.**
+
+Give the rare variants of both populations the same effect size and the same allele frequency.
+Then the ratio of the additive variance they carry is exactly the ratio of how many there are:
+the common per-variant contribution cancels out of numerator and denominator, and what is left
+is `rareVariantCountRatio`.
+
+This is what a count ratio is doing when it stands in for a portability statement, and it is
+also its limit. The cancellation needs the shared contribution to be nonzero, and it needs the
+architecture to be shared — as soon as the two populations differ in effect size or in
+frequency, the counts no longer report the variance ratio and the substitution is unlicensed.
+`variantGeneticVarianceContribution` is what would have to be equal, and it is stated here so
+that requirement is visible rather than assumed. -/
+theorem rareVariantCountRatio_eq_variance_ratio_of_shared_contribution
+    (β p sourceCount targetCount : ℝ)
+    (h_contribution : variantGeneticVarianceContribution β p ≠ 0) :
+    Descent.Core.ratio
+        (Descent.Core.product (variantGeneticVarianceContribution β p) sourceCount)
+        (Descent.Core.product (variantGeneticVarianceContribution β p) targetCount) =
+      rareVariantCountRatio sourceCount targetCount := by
+  unfold rareVariantCountRatio Descent.Core.ratio Descent.Core.product
+  rcases eq_or_ne targetCount 0 with h_target | h_target
+  · simp [h_target]
+  · field_simp
+
 end RareVariantSpecificity
 
 

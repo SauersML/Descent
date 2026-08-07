@@ -485,6 +485,28 @@ theorem heritabilityFractionFromN_at_n0c0_is_junk :
   unfold heritabilityFractionFromN Descent.Core.share
   norm_num
 
+/-- **Attained against missing is sample size against the constant.**
+
+The odds form of the learning curve: the heritability recovered divided by the heritability
+still missing is exactly `n / C`. So `C` is not a fitted scale with an arbitrary meaning — it
+is the sample size at which the odds are even, and doubling `n` doubles the odds rather than
+doubling the fraction.
+
+This is the statement that separates `n / (n + C)` from the other saturating shapes it is
+easily confused with. An exponential approach to the ceiling, `1 - exp (-n / C)`, is monotone,
+concave and bounded by one just as this is, and its odds are not linear in `n`; the fit
+described above pins the constant at one sample size and then predicts three others, which is
+a test of exactly this linearity. -/
+theorem heritabilityFractionFromN_odds (n C : ℝ) (h_C : 0 < C) (h_n : 0 ≤ n) :
+    Descent.Core.ratio (heritabilityFractionFromN n C)
+        (Descent.Core.complement (heritabilityFractionFromN n C)) =
+      Descent.Core.ratio n C := by
+  have h_sum : n + C ≠ 0 := ne_of_gt (by linarith)
+  have h_ne : C ≠ 0 := ne_of_gt h_C
+  unfold Descent.Core.ratio Descent.Core.complement heritabilityFractionFromN Descent.Core.share
+  field_simp
+  rw [show n + C - n = C from by ring, mul_div_assoc, div_self h_ne, mul_one]
+
 /-- The attained fraction of heritability is increasing in `n`. -/
 theorem r2_scaling_increasing (n₁ n₂ C : ℝ)
     (h_C : 0 < C) (h_n₁ : 0 ≤ n₁) (h_n : n₁ < n₂) :

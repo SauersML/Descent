@@ -278,6 +278,22 @@ theorem kinship_inflates (r2_true K h2_family : ℝ)
     r2_true < kinshipInflation r2_true K h2_family := by
   unfold kinshipInflation Descent.Core.affineStep; linarith [mul_pos h_K h_h2]
 
+/-- **The whole excess over the true `R²` is the kinship-weighted family variance.**
+
+`kinship_inflates` says the inflated figure exceeds the true one; this says by exactly how
+much, and that the excess carries no term the true `R²` contributes to. That is what makes the
+bias removable in principle: it is a product of two quantities a study can bound separately,
+the kinship coefficient by a GRM cutoff and the family-level heritability by design.
+
+The two theorems below both reason about that product — one comparing it at two thresholds,
+one bounding it when kinship is near zero — so it is named here rather than re-derived from
+the affine body at each use. -/
+theorem kinshipInflation_excess (r2_true K h2_family : ℝ) :
+    Descent.Core.difference (kinshipInflation r2_true K h2_family) r2_true =
+      Descent.Core.product K h2_family := by
+  unfold kinshipInflation Descent.Core.affineStep Descent.Core.difference Descent.Core.product
+  ring
+
 /-- **GRM-based exclusion: bias-variance tradeoff.**
     Removing individuals with GRM off-diagonal > threshold reduces
     kinship-based inflation. A stricter threshold (lower cutoff)

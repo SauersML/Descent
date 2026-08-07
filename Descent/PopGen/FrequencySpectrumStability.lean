@@ -429,6 +429,23 @@ theorem collisionHistoryDistance_at_reference_point :
       Descent.Core.product]
 
 
+/-- **"First order in resolution" is the first-order response, exactly.**
+
+The history distance is the scale against the order-one alternating response at
+`1 - resolution`, which `alternatingBinomialResponse_one_sub` evaluates to `resolution` itself.
+So the phrase in the definition above is not a description of a limit but an identity, and it
+is the base case of `collisionSpectrumDiscrepancy_eq_distance_pow`: the whole discrepancy
+hierarchy is powers of this one quantity.
+
+Stating it against the response family is what would catch the distance drifting away from the
+family it indexes — a distance carrying `resolution ^ 2`, or a rescaled response, satisfies the
+reference point above and fails here. -/
+theorem collisionHistoryDistance_eq_first_order_response (scale resolution : ℝ) :
+    collisionHistoryDistance scale resolution =
+      Descent.Core.product scale (alternatingBinomialResponse 1 (1 - resolution)) := by
+  unfold collisionHistoryDistance Descent.Core.product
+  rw [alternatingBinomialResponse_one_sub, pow_one]
+
 /-- Its normalized frequency-spectrum discrepancy is order `order`. -/
 noncomputable def collisionSpectrumDiscrepancy
     (order : ℕ) (scale resolution : ℝ) : ℝ :=

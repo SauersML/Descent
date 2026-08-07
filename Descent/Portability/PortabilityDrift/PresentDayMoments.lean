@@ -1,23 +1,16 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Program.Conclusions
+-- The Brier and log-loss risk decompositions this file states its present-day moment
+-- results in terms of: `bernoulliLogLoss`, `bernoulliKLReal`, `brierBernoulliRisk`,
+-- `exactBrierRiskOfCalibrated` and the pointwise regret identities. They are losses of one
+-- Bernoulli outcome against one prediction, so they sit below this chapter rather than
+-- above it, and the import runs downward like every other one here.
+import Descent.Foundations.BernoulliLosses
 import Descent.Portability.PortabilityDrift.Generational
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
--- The `Program -> Portability` edge, written where the USE is. This file names nine
--- declarations from `Program.Conclusions` -- the Brier and log-loss risk decompositions --
--- and used to reach them through `Definitions.lean`, the head of the fan, which imported
--- `Program.Conclusions` and used nothing from it. A head that carries an import for a
--- sibling makes the whole fan look like it depends on the audit layer, and makes the one
--- file that really does look like it does not. The edge is still a layer violation and is
--- still owed a repair; it is now a violation of exactly one file.
-
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -1903,8 +1896,8 @@ theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     (hvar_int : Integrable (fun z ↦ (η z - π) ^ 2) μ)
     (hmean : ∫ z, η z ∂μ = π)
     (hvar : ∫ z, (η z - π) ^ 2 ∂μ = π * (1 - π) * r2) :
-    Program.exactBrierRiskOfCalibrated μ η = PopGen.TransportedMetrics.calibratedBrier π r2 := by
-  rw [Program.exactBrierRiskOfCalibrated_eq_integral]
+    Foundations.exactBrierRiskOfCalibrated μ η = PopGen.TransportedMetrics.calibratedBrier π r2 := by
+  rw [Foundations.exactBrierRiskOfCalibrated_eq_integral]
   have hdiff_int : Integrable (fun z ↦ η z - π) μ := by
     simpa [sub_eq_add_neg] using hη_int.sub (integrable_const π)
   have hlin_zero : ∫ z, (η z - π) ∂μ = 0 := by
@@ -1963,7 +1956,7 @@ theorem targetBrier_ge_source_of_neutralAF_benchmark
 
 /-- Pointwise Brier regret relative to the true Bernoulli probability. -/
 noncomputable def brierRegretPoint (η q : ℝ) : ℝ :=
-  Program.brierBernoulliRisk η q - Program.brierBernoulliRisk η η
+  Foundations.brierBernoulliRisk η q - Foundations.brierBernoulliRisk η η
 
 /-- Pointwise Brier regret ratio between target and source predictors. -/
 noncomputable def brierRegretRatio (η qSource qTarget : ℝ) : ℝ :=
@@ -1983,7 +1976,7 @@ theorem brierRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem brierRegretPoint_eq_sq_error (η q : ℝ) :
     brierRegretPoint η q = (q - η) ^ 2 := by
   unfold brierRegretPoint
-  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Program.brier_regret_pointwise η
+  simpa [sub_eq_add_neg, add_comm, add_left_comm, add_assoc] using Foundations.brier_regret_pointwise η
     q
 
 /-- Ratio form in present-day units: Brier-regret ratio is a squared-error ratio. -/
@@ -1995,7 +1988,7 @@ theorem brierRegretRatio_eq_sq_error_ratio (η qSource qTarget : ℝ) :
 
 /-- Pointwise log-loss regret relative to truth. -/
 noncomputable def logLossRegretPoint (η q : ℝ) : ℝ :=
-  Program.bernoulliLogLoss η q - Program.bernoulliLogLoss η η
+  Foundations.bernoulliLogLoss η q - Foundations.bernoulliLogLoss η η
 
 /-- **The pointwise regret vanishes exactly on a matching forecast.**
 
@@ -2027,9 +2020,9 @@ theorem logLossRegretRatio_calibrated_source_is_junk (η qTarget : ℝ) :
 theorem logLossRegretPoint_eq_kl (η q : ℝ)
     (hη0 : 0 < η) (hη1 : η < 1)
     (hq0 : 0 < q) (hq1 : q < 1) :
-    logLossRegretPoint η q = Program.bernoulliKLReal η q := by
+    logLossRegretPoint η q = Foundations.bernoulliKLReal η q := by
   unfold logLossRegretPoint
-  simpa using Program.logLoss_regret_eq_kl_pointwise η q hη0 hη1 hq0 hq1
+  simpa using Foundations.logLoss_regret_eq_kl_pointwise η q hη0 hη1 hq0 hq1
 
 /-- Ratio form in present-day units: log-loss regret ratio is a KL ratio. -/
 theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
@@ -2037,7 +2030,7 @@ theorem logLossRegretRatio_eq_kl_ratio (η qSource qTarget : ℝ)
     (hqS0 : 0 < qSource) (hqS1 : qSource < 1)
     (hqT0 : 0 < qTarget) (hqT1 : qTarget < 1) :
     logLossRegretRatio η qSource qTarget =
-      Program.bernoulliKLReal η qTarget / Program.bernoulliKLReal η qSource := by
+      Foundations.bernoulliKLReal η qTarget / Foundations.bernoulliKLReal η qSource := by
   unfold logLossRegretRatio
   rw [logLossRegretPoint_eq_kl η qTarget hη0 hη1 hqT0 hqT1,
     logLossRegretPoint_eq_kl η qSource hη0 hη1 hqS0 hqS1]

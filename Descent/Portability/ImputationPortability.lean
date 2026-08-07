@@ -174,6 +174,24 @@ theorem panelAdjustedImputationQuality_eq_zero_iff
   rw [mul_eq_zero]
   simp [h_ld]
 
+/-- **Panel mismatch scales the variance an imputed variant contributes.**
+
+The variance a variant carries at a panel-adjusted quality is the variance it carries at the
+bare LD ceiling, multiplied by the panel match — the mismatch factor passes straight through
+the attenuation and out the other side. This is what licenses reading `panelMatch` as a
+portability coefficient rather than as one more term inside a quality score: a panel that
+matches half as well leaves half the variance, at every `r²_LD` and every effect size.
+
+It also pins `attenuatedVariance` and `panelAdjustedImputationQuality` to each other. Both are
+products, and a product is exactly the shape under which the two orders of multiplication
+agree; were either body a share, a sum or a clamp, the two sides would part company. -/
+theorem attenuatedVariance_panelAdjusted (beta_sq het r2_LD panelMatch : ℝ) :
+    attenuatedVariance beta_sq het (panelAdjustedImputationQuality r2_LD panelMatch) =
+      Descent.Core.product (attenuatedVariance beta_sq het r2_LD) panelMatch := by
+  unfold attenuatedVariance panelAdjustedImputationQuality Descent.Core.product3
+    Descent.Core.product
+  ring
+
 /-- **Imputation quality as a function of LD extent alone.**
 
     The name carries the restriction because the signature cannot carry the alternative.
@@ -491,6 +509,26 @@ theorem total_portability_loss_at_reference_point :
   norm_num [total_portability_loss,
       Descent.Core.sum]
 
+
+/-- **The apparent loss is the total of the true loss and the ascertainment gap.**
+
+`ascertainment_artificial_loss` writes that decomposition with a bare `+`. Written through
+`total_portability_loss` instead, it says which named quantity that sum is: the technical
+component is the `R²` an ideal design would have recovered and the deployed array did not,
+and the genetic component is `true_portability_loss`. The three loss quantities of this file
+are one identity rather than three unrelated differences.
+
+This is the statement that fails if any of the three drifts apart. `apparent` and `true` are
+both `a - b` and are deliberately kept distinct — see `ascertainment_artificial_loss` — so
+nothing but a theorem naming all three can detect a body changing under one of the names. -/
+theorem apparent_portability_loss_eq_total_of_ideal
+    (r2_source r2_target_array r2_target_ideal : ℝ) :
+    apparent_portability_loss r2_source r2_target_array =
+      total_portability_loss (true_portability_loss r2_source r2_target_ideal)
+        (Descent.Core.difference r2_target_ideal r2_target_array) := by
+  unfold apparent_portability_loss true_portability_loss total_portability_loss
+    Descent.Core.difference Descent.Core.sum
+  ring
 
 /-- **Decomposing portability loss: genetic vs technical.**
     Total portability loss = genetic loss + technical loss.

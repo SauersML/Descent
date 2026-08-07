@@ -234,6 +234,22 @@ theorem localizedTransferVariance_eq_delocalized_one (v : ℝ) (k : ℕ) :
     Descent.Core.identifiedWith
   norm_num
 
+/-- **The two schemes carry one variance budget, split or kept whole.**
+
+Multiplying a delocalized scheme's per-site variance back by its site count returns exactly the
+localized scheme's variance. So the difference between the two is not how much transfer
+variance there is but how it is distributed: `k` blocks each carrying `v/k`, or one block
+carrying `v`. `delocalizedTransferVariance_mul_sites` supplies the arithmetic; what is added
+here is the identification of the total it recovers with `localizedTransferVariance`.
+
+Read together with `delocalizedTransferVariance_strictAnti`, this says where the concentration
+comes from: not from destroying variance, but from dividing a fixed budget further. A localized
+scheme never divides it, which is why adding markers within a region buys nothing. -/
+theorem delocalizedTransferVariance_mul_sites_eq_localized (v : ℝ) (k : ℕ) (hk : k ≠ 0) :
+    Descent.Core.product (delocalizedTransferVariance v k) k = localizedTransferVariance v k := by
+  unfold Descent.Core.product localizedTransferVariance Descent.Core.identifiedWith
+  exact delocalizedTransferVariance_mul_sites v k hk
+
 /-! ### The two correction factors -/
 
 /-- The Gaussian finite-`n` inverse-Wishart inflation, `n/(n - m - 1)`. -/

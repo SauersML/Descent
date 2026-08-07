@@ -471,6 +471,22 @@ theorem netReclassificationImprovement_sub_event (event_nri nonevent_nri : ℝ) 
   unfold netReclassificationImprovement Descent.Core.sum
   ring
 
+/-- **The total is blind to a trade between cases and controls.**
+
+Moving any amount from the non-event component to the event component -- the
+`Descent.Core.sum` of one with it against the `Descent.Core.difference` of the other -- leaves
+the reported NRI exactly where it was. A single total is therefore consistent with an
+arbitrarily large gain among cases paid for by an equal loss among controls, and no bound on
+the total constrains either component. This is the reason the two are reported separately,
+stated as the invariance that makes the omission unrecoverable rather than as an example. -/
+theorem netReclassificationImprovement_component_trade
+    (event_nri nonevent_nri movement : ℝ) :
+    netReclassificationImprovement (Descent.Core.sum event_nri movement)
+        (Descent.Core.difference nonevent_nri movement) =
+      netReclassificationImprovement event_nri nonevent_nri := by
+  unfold netReclassificationImprovement Descent.Core.sum Descent.Core.difference
+  ring
+
 /-- Exact operating-point sensitivity under the liability-threshold model. -/
 noncomputable def sensFromR2
     (m : LiabilityThresholdModel) (r2 T' : ℝ) : ℝ :=

@@ -127,6 +127,25 @@ theorem ancestryGradientSusceptibility_at_reference_point :
   unfold ancestryGradientSusceptibility Descent.Core.product
   norm_num
 
+/-- **Susceptibility is homogeneous of degree one in each variance separately.**
+
+Rescaling the marker axis by `c` rescales the confounding energy by `c` and leaves the
+ancestry variance untouched. This is the property the opposite-direction sweep in the
+docstring above is testing: the sum is not degree one in either argument, and the geometric
+mean is degree one-half in both, so both fail this identity while agreeing with the product at
+the balanced reference point.
+
+It is also what the bound below uses without saying so — a floor on ancestry energy carries
+straight through to a floor on `H'` precisely because the marker-axis factor comes out
+unchanged. -/
+theorem ancestryGradientSusceptibility_smul
+    (markerAxisVariance ancestryVariance c : ℝ) :
+    ancestryGradientSusceptibility (Descent.Core.product c markerAxisVariance) ancestryVariance =
+      Descent.Core.product c
+        (ancestryGradientSusceptibility markerAxisVariance ancestryVariance) := by
+  unfold ancestryGradientSusceptibility Descent.Core.product
+  ring
+
 /-- A lower bound on residual ancestry energy immediately induces a lower
 bound on residual susceptibility `H'`. -/
 theorem residual_susceptibility_lower_bound

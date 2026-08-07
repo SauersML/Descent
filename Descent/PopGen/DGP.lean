@@ -746,6 +746,22 @@ theorem taggingMismatchScale_dense (recombRate : ℝ) :
   unfold taggingMismatchScale Descent.Core.product
   ring
 
+/-- **Thinning an array scales the mismatch by exactly the thinning factor.**
+
+Tag density enters the mismatch scale linearly: an array carrying a fraction `factor` of the
+tags of another carries `factor` times its mismatch, at every recombination rate. With
+`taggingMismatchScale_dense` fixing the value at full density, the two together pin the body —
+a scale that saturated in sparsity, or that carried it quadratically, satisfies the reference
+point and fails this.
+
+That is what licenses reading `arraySparsity` as an inverse tag density rather than as an
+opaque penalty: densities compose by multiplication, and so does this. -/
+theorem taggingMismatchScale_sparsity_smul (recombRate arraySparsity factor : ℝ) :
+    taggingMismatchScale recombRate (Descent.Core.product arraySparsity factor) =
+      Descent.Core.product (taggingMismatchScale recombRate arraySparsity) factor := by
+  unfold taggingMismatchScale Descent.Core.product
+  ring
+
 /-- Demography-to-LD lower bound template used in portability theorems.
 
 **Vacuous in the generic split, and this is measured, not suspected.** The bound is

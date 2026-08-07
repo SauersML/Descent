@@ -184,6 +184,22 @@ names are kept -- `admixtureLDDecay` carries a measured one-sided bias against
 finite-population retention that a bare primitive has nowhere to put.
 -/
 
+/-- **Retention composes across epochs: elapsed generations multiply, they do not add.**
+
+Splitting an interval at any point and multiplying the two retentions gives the retention over
+the whole interval, so a decay measured over one stretch of generations transports to any
+other stretch. This is the memorylessness the geometric law carries and a linear law does not:
+`1 - r·t` fails this identity at every positive `r`, which is the shape the simulation gate in
+the docstring above refuses at 98 sems.
+
+Composition is where the body meets `Core.product`, and it is what makes the decay a rate
+rather than a schedule. -/
+theorem ldDecayPerGeneration_add (r : ℝ) (s t : ℕ) :
+    ldDecayPerGeneration r (s + t) =
+      Descent.Core.product (ldDecayPerGeneration r s) (ldDecayPerGeneration r t) := by
+  unfold ldDecayPerGeneration Descent.Core.geometricDecay Descent.Core.product
+  exact pow_add (1 - r) s t
+
 /-- LD retention is nonnegative for a recombination fraction in `[0,1]`. -/
 theorem ldDecayPerGeneration_nonneg (r : ℝ) (t : ℕ)
     (h_r_le : r ≤ 1) :
@@ -448,6 +464,24 @@ theorem cohortObservedEffect_eq_iff
     · exact Or.inl h_effect
     · exact Or.inr (mul_left_cancel₀ h_effect h)
   · rintro (rfl | rfl) <;> ring
+
+/-- **A drifting environment can be charged to the cohort or to the effect, with one answer.**
+
+Let the environment modifier itself be what the secular trend has accumulated by time `t`.
+Then applying the trend to the environment and reading the observed effect, or reading the
+observed effect at the bare trend rate and letting *it* drift for time `t`, give the same
+number. The elapsed time enters the observed effect once, and it does not matter at which
+stage of the model it is applied.
+
+The two quantities are the same interaction shape wearing two names — a cohort modifier and a
+per-year drift — so this is where a divergence between them would show. It holds because both
+are multiplications; a trend that accumulated additively would break it, and that reading is
+the one `simcov/battery_bulk46.py` falsifies for the cohort effect at 4334 sems. -/
+theorem cohortObservedEffect_secularTrendBias (geneticEffect trend_rate t : ℝ) :
+    cohortObservedEffect geneticEffect (secularTrendBias trend_rate t) =
+      secularTrendBias (cohortObservedEffect geneticEffect trend_rate) t := by
+  unfold cohortObservedEffect secularTrendBias Descent.Core.product
+  ring
 
 /-- **Age-dependent PGS performance.**
     PGS for age-related traits (e.g., CAD, T2D) have different

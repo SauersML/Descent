@@ -358,6 +358,22 @@ theorem wienerWeight_strictMono {noise s₁ s₂ : ℝ}
   rw [div_lt_div_iff₀ d₁ d₂]
   nlinarith [mul_pos hn (sub_pos.mpr h)]
 
+/-- **The two profiles are exact reciprocals**, and that is the source of the ordering below.
+
+A direction's detection weight is one over its reconstruction weight, at every background
+variance and with no side condition — including the junk point, where both are zero. So the
+opposition between the two tasks is not a property of the spectrum a study happens to have:
+reciprocation reverses order on the positives, so no spectrum can order the two profiles the
+same way.
+
+`weight_orders_reversed` states the consequence and discharges its reconstruction conjunct with
+the hypothesis directly, since that profile is the identity. This states the algebra the
+consequence rests on, which is what would fail if either profile were re-specified. -/
+theorem detectionWeight_eq_ratio_reconstructionWeight (s : ℝ) :
+    detectionWeight s = Descent.Core.ratio 1 (reconstructionWeight s) := by
+  unfold detectionWeight Descent.Core.ratio reconstructionWeight Descent.Core.identifiedWith
+  exact (one_div s).symm
+
 /-- **The two weight profiles are inversely ordered.**  On a background with distinct eigenvalues,
 moving to a higher-variance direction strictly increases
 the reconstruction weight and strictly decreases the detection weight.  No

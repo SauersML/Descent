@@ -1070,6 +1070,25 @@ theorem selectionCoefficient_strictAnti (w₁ w₂ wRef : ℝ) (hRef : 0 < wRef)
   have hlt : w₁ / wRef < w₂ / wRef := div_lt_div_of_pos_right h hRef
   linarith
 
+/-- **The variant's fitness is the reference scaled by `1 - s`**, which is the sign
+convention as an equation rather than as a paragraph.
+
+The docstring above commits to `w = w_ref (1 - s)` against the competing `w = w_ref (1 + s)`,
+and prose is not something a proof can consult: a hypothesis taking `s` reads whichever
+convention its author had in mind.  This recovers the fitness the coefficient was computed
+from, so the commitment is checkable at every call site that multiplies a fitness by a
+selection term.  Under the competing convention the same equation returns `w_ref (1 + s)`
+and fails for every non-neutral variant, and the two agree only at `s = 0`, which is the
+`selectionCoefficient_self` case above. -/
+theorem selectionCoefficient_complement_mul_reference
+    (variantFitness referenceFitness : ℝ) (hRef : referenceFitness ≠ 0) :
+    Descent.Core.product referenceFitness
+        (Descent.Core.complement (selectionCoefficient variantFitness referenceFitness))
+      = variantFitness := by
+  unfold selectionCoefficient Descent.Core.proportionalReduction Descent.Core.product
+    Descent.Core.complement
+  field_simp
+
 /-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
 
 Empirical status: **FALSIFIED by a factor of two as a selection timescale**

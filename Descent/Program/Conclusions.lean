@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Descent.Foundations.Probability
+import Descent.Foundations.BernoulliLosses
 
 namespace Descent.Program
 
@@ -11,6 +12,10 @@ universe u
 open scoped InnerProductSpace
 open InnerProductSpace
 open MeasureTheory
+open Descent.Foundations (expectedBrierScore brierScore_at_true_prob
+  exactBrierRiskOfCalibrated exactBrierRiskOfCalibrated_eq_integral bernoulliLogLoss
+  bernoulliKLReal bernoulliKLReal_certain_forecast_is_junk logLoss_regret_eq_kl_pointwise
+  brier_regret_pointwise brierBernoulliRisk)
 
 /-!
 =================================================================
@@ -81,13 +86,6 @@ theorem brierScore_eq_zero_iff (p y : ℝ) : brierScore p y = 0 ↔ p = y := by
   unfold brierScore
   rw [pow_eq_zero_iff two_ne_zero, sub_eq_zero]
   exact eq_comm
-
-/-- Expected Brier Score when Y is Bernoulli(π).
-    E[(Y - p)²] = π(1-p)² + (1-π)p²
-
-    This is the loss we want to minimize by choosing p optimally. -/
-noncomputable def expectedBrierScore (p : ℝ) (π : ℝ) : ℝ :=
-  π * (1 - p) ^ 2 + (1 - π) * p ^ 2
 
 /-- The expected Brier score can be rewritten as:
     E[(Y - p)²] = π - 2πp + p²
@@ -160,13 +158,6 @@ theorem brierScore_minimized_at_true_prob (π : ℝ) :
   have h : π - 2 * π * p + p ^ 2 - (π - 2 * π * π + π ^ 2) = (p - π) ^ 2 := by ring
   linarith [sq_nonneg (p - π)]
 
-/-- The Brier score at the true probability simplifies to π(1-π),
-    which is the irreducible variance of a Bernoulli(π) variable. -/
-theorem brierScore_at_true_prob (π : ℝ) :
-    expectedBrierScore π π = π * (1 - π) := by
-  unfold expectedBrierScore
-  ring
-
 /-- Strict improvement: if p ≠ π, the Brier score is strictly worse. -/
 theorem brierScore_strict_minimum (π p : ℝ) (hp : p ≠ π) :
     expectedBrierScore π π < expectedBrierScore p π := by
@@ -175,21 +166,6 @@ theorem brierScore_strict_minimum (π p : ℝ) (hp : p ≠ π) :
   have hne : p - π ≠ 0 := sub_ne_zero.mpr hp
   have hsq : (p - π) ^ 2 > 0 := sq_pos_of_ne_zero hne
   linarith
-
-/-- Exact population Brier risk of a calibrated predictor (`q = η`). -/
-noncomputable def exactBrierRiskOfCalibrated {Z : Type*} [MeasurableSpace Z]
-    (μ : Measure Z) (η : Z → ℝ) : ℝ :=
-  ∫ z, expectedBrierScore (η z) (η z) ∂μ
-
-/-- Exact calibrated Brier-risk identity: pointwise Bernoulli variance integrated over the
-    population. -/
-theorem exactBrierRiskOfCalibrated_eq_integral {Z : Type*} [MeasurableSpace Z]
-    (μ : Measure Z) (η : Z → ℝ) :
-    exactBrierRiskOfCalibrated μ η = ∫ z, η z * (1 - η z) ∂μ := by
-  unfold exactBrierRiskOfCalibrated
-  refine integral_congr_ae ?_
-  filter_upwards with z
-  simp [brierScore_at_true_prob]
 
 /-! ### Posterior Mean Optimality -/
 
@@ -513,10 +489,6 @@ theorem BayesRisk_mono {α : Type u} (R : α → ℝ) (F G : Set α)
 /-! ### Magnitude Certificates: Log Loss (KL) and Brier (L²) -/
 
 
-/-- Bernoulli log-loss (cross-entropy) at truth `p` and prediction `q`. -/
-noncomputable def bernoulliLogLoss (p q : ℝ) : ℝ :=
-  -(p * Real.log q + (1 - p) * Real.log (1 - q))
-
 /-- **bernoulliLogLoss at its junk point, named.** A forecast of probability zero for an outcome
 that occurs is infinitely costly -- that is the whole point of a log score. `Real.log 0` is
 junk-zero and the loss is `0`: a PERFECT score, awarded to the most confidently wrong forecast
@@ -544,46 +516,6 @@ theorem bernoulliLogLoss_certain_correct : bernoulliLogLoss 1 1 = 0 := by
   unfold bernoulliLogLoss
   norm_num
 
-/-- Real-valued Bernoulli KL divergence formula.
-
-**Numerical warning -- this body must not be evaluated as written near `p = q`.**
-The divergence is second order in `p - q` (`KL ≈ (p-q)² / (2q(1-q))`), but the body
-computes it as a sum of two logarithms each of which is first order in `p - q`, so
-the first-order parts cancel between the summands and the answer is what survives
-the cancellation. Measured float64 against a 60-digit reference, arguments rounded
-to float64 first so input representation cannot be charged to the formula, along
-`q = p + δ` for `p ∈ {0.001, 0.1, 0.5, 0.9}` and `δ` from `10⁻²` down to `10⁻¹⁴`:
-**34 of 52 cells exceed 1e-6 relative error, worst 2.4·10⁹.**
-
-That region is not exotic -- it is the calibrated regime, where a forecaster is
-nearly right and the divergence is being used as a small penalty.
-
-**Correction, from measuring rather than reasoning.** An earlier revision of this
-warning said the form "cannot be rescued by `log1p`, because the cancellation is
-between the two terms and not inside either one". The first clause was wrong. The
-reasoning behind it was right as far as it went -- there IS a residual
-cancellation between the summands, and `log1p` does not remove it -- but it does
-remove a much larger one INSIDE each logarithm, and the measured difference is
-enormous. On a widened grid (`q = p ± δ`, `p ∈ {0.001, 0.01, 0.1, 0.5, 0.9}`,
-`δ` from `10⁻²` to `10⁻¹⁴`, 104 cells):
-
-    body as written                    worst 4.0·10¹⁰   70/104 cells over 1e-6
-    log1p form, exactly equal          worst 1.1·10⁻²   21/104 cells over 1e-6
-
-Twelve orders of magnitude in the worst case and a third of the failing region.
-`bernoulliKLReal_eq_logOnePlus` below proves the two forms equal, so this is a
-free substitution and not an approximation. Implementations must use it.
-
-What survives is a genuine domain restriction and not a large one: below
-`|p - q| ≈ 10⁻⁶` even the stable form loses relative accuracy, because the
-divergence is quadratic in a difference whose linear parts cancel between the
-summands and no rewrite in elementary functions removes that. A consumer ranking
-two nearly calibrated forecasters closer together than that is reading noise
-either way; it is the interval that shrank by ten orders of magnitude, not the
-existence of one. -/
-noncomputable def bernoulliKLReal (p q : ℝ) : ℝ :=
-  p * Real.log (p / q) + (1 - p) * Real.log ((1 - p) / (1 - q))
-
 /-- **The `log1p` form of the Bernoulli KL divergence: the same number, evaluable.**
 
 `p/q = 1 + (p-q)/q` and `(1-p)/(1-q) = 1 - (p-q)/(1-q)`, so each logarithm can be
@@ -604,17 +536,6 @@ theorem bernoulliKLReal_eq_logOnePlus {p q : ℝ} (hq0 : q ≠ 0) (hq1 : q ≠ 1
   have h2 : 1 - (p - q) / (1 - q) = (1 - p) / (1 - q) := by field_simp; ring
   unfold bernoulliKLReal
   rw [h1, h2]
-
-/-- **The Bernoulli KL divergence against a certain forecast, named.** A forecast of zero
-probability for an outcome that can occur has infinite KL divergence -- that is the whole content
-of the divergence as a penalty. The ratio `p / 0` is junk-zero, `Real.log 0` is junk-zero, and
-the first term vanishes, leaving `(1 - p) * log (1 - p)`, which is FINITE AND NEGATIVE for
-`p` in `(0, 1)`. So the certificate that is supposed to bound log-loss regret from above returns
-a negative number exactly where the regret is unbounded. Consumers must require `0 < q`. -/
-theorem bernoulliKLReal_certain_forecast_is_junk (p : ℝ) :
-    bernoulliKLReal p 0 = (1 - p) * Real.log (1 - p) := by
-  unfold bernoulliKLReal
-  simp
 
 /-- **A forecast that matches the truth has zero divergence.** Both logarithms are of one, so the
 divergence vanishes identically on the diagonal. Nonnegativity is shared by every positive
@@ -748,18 +669,6 @@ theorem klBernReal_eq_zero_iff (p q : Foundations.UnitProb)
   · intro h
     exact hiff.mpr (by rw [h])
 
-/-- Pointwise log-loss regret equals Bernoulli KL. -/
-theorem logLoss_regret_eq_kl_pointwise (p q : ℝ)
-    (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q) (hq1 : q < 1) :
-    bernoulliLogLoss p q - bernoulliLogLoss p p = bernoulliKLReal p q := by
-  have hp_ne : p ≠ 0 := hp0.ne'
-  have hq_ne : q ≠ 0 := hq0.ne'
-  have hp1_ne : 1 - p ≠ 0 := sub_ne_zero.mpr (ne_of_lt hp1).symm
-  have hq1_ne : 1 - q ≠ 0 := sub_ne_zero.mpr (ne_of_lt hq1).symm
-  unfold bernoulliLogLoss bernoulliKLReal
-  rw [Real.log_div hp_ne hq_ne, Real.log_div hp1_ne hq1_ne]
-  ring
-
 /-- Population log-loss regret. -/
 noncomputable def logLossRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
     (p q : Z → ℝ) : ℝ :=
@@ -868,12 +777,6 @@ theorem logRisk_regret_zero_iff_ae_eq {Z : Type u} [MeasurableSpace Z] (μ : Mea
       exact (h_kl_zero_iff z).2 hz
     rw [integral_congr_ae h_ae_zero]
     simp
-
-/-- Pointwise Brier regret identity (L² certificate). -/
-theorem brier_regret_pointwise (p q : ℝ) :
-    expectedBrierScore q p - expectedBrierScore p p = (q - p) ^ 2 := by
-  unfold expectedBrierScore
-  ring
 
 /-- Population Brier regret. -/
 noncomputable def brierRegret {Z : Type u} [MeasurableSpace Z] (μ : Measure Z)
@@ -1130,10 +1033,6 @@ theorem brierRisk_eq_iff_ae_eq_eta {Z : Type u} [MeasurableSpace Z] (μ : Measur
     linarith [hdiff]
 
 /-! ### Pointwise Properness and Population Risk -/
-
-/-- Pointwise Bernoulli Brier risk at true parameter `η` and prediction `q`. -/
-noncomputable def brierBernoulliRisk (η q : ℝ) : ℝ :=
-  expectedBrierScore q η
 
 theorem brierBernoulliRisk_decomp (η q : ℝ) :
     brierBernoulliRisk η q = η * (1 - η) + (q - η) ^ 2 := by

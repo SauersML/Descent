@@ -588,6 +588,27 @@ theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
     Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith
   ring
 
+/-- **Two stages of drift compose without the mechanisms meeting.**
+
+Run the divergence in two stages. The frequency factors compound with each other and the LD
+factors compound with each other; the retention of the whole is the product of the two stage
+retentions, with no cross term between a frequency change in one stage and an LD change in the
+other. That is the independence the block header asserts when it multiplies the two factors,
+stated so it can fail: a retention that added its factors, or that took their minimum, would
+break this at every pair of stages.
+
+What it does not say is that the two mechanisms are independent in a population — that is a
+modelling claim, carried by the argument the body is fed. It says the body has no room to
+express an interaction, which is why an interaction would have to arrive as a different
+definition rather than as a different value here. -/
+theorem covarianceRetention_compose (freq_corr₁ ld_overlap₁ freq_corr₂ ld_overlap₂ : ℝ) :
+    covarianceRetention (Descent.Core.product freq_corr₁ freq_corr₂)
+        (Descent.Core.product ld_overlap₁ ld_overlap₂) =
+      Descent.Core.product (covarianceRetention freq_corr₁ ld_overlap₁)
+        (covarianceRetention freq_corr₂ ld_overlap₂) := by
+  unfold covarianceRetention Descent.Core.product
+  ring
+
 /-- **Covariance divergence derived from retention.**
     Divergence is `1 - retention`, which yields the multiplicative formula
     `1 - (1 - Fst) × shared_LD`. -/

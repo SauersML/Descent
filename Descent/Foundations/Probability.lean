@@ -745,6 +745,21 @@ theorem latentLiability_sub_environment (s e : ℝ) :
   unfold latentLiability Descent.Core.sum
   ring
 
+/-- **The liability cannot say which channel moved.**
+
+A shift added to the environment and the same shift added to the genetic part -- each written
+as the `Descent.Core.sum` of the channel with it -- give the same liability. So the liability
+value alone carries no information about which side of the decomposition changed, and every
+identification in this file has to come from somewhere else: the threshold, the ancestry
+argument of `T`, or an assumption on the noise. This is the exchangeability that the
+declaration's own status note is about, made precise -- an interaction term in the body would
+break it, and so would any body weighting the two channels differently. -/
+theorem latentLiability_channel_exchange (s e shift : ℝ) :
+    latentLiability s (Descent.Core.sum e shift) =
+      latentLiability (Descent.Core.sum s shift) e := by
+  unfold latentLiability Descent.Core.sum
+  ring
+
 /-- Disease event under an ancestry-dependent threshold: `L > T(x)`. -/
 def diseaseEvent {k : ℕ} (T : (Fin k → ℝ) → ℝ) (x : Fin k → ℝ) (s : ℝ) : Set ℝ :=
   {e : ℝ | latentLiability s e > T x}

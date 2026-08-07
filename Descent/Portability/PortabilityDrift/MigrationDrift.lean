@@ -947,6 +947,22 @@ theorem sharedLD_from_equilibrium_at_reference_point :
   norm_num [sharedLD_from_equilibrium,
       Descent.Core.share]
 
+/-- **The two hazards divide one unit between them.**
+
+Migration's share and recombination's share of the same race sum to one: swap the two rates
+and you get exactly what the first fraction leaves behind. This is the competing-risks reading
+carried to its conclusion — there is one lineage pair, it is either brought together or pulled
+apart, and no third outcome is available at equilibrium.
+
+It is also the sharpest of the cheap tests on this body. Every rival the battery above
+rejects fails it: `2m / (2m + c)` sums with its swap to more than one wherever the two rates
+differ, and `1 - F_ST` and `M / (1 + M)` do not depend on `c` at all, so neither can trade
+against recombination's share. -/
+theorem sharedLD_from_equilibrium_add_swap (m c : ℝ) (h : m + c ≠ 0) :
+    Descent.Core.sum (sharedLD_from_equilibrium m c) (sharedLD_from_equilibrium c m) = 1 := by
+  unfold Descent.Core.sum sharedLD_from_equilibrium Descent.Core.share
+  rw [add_comm c m, div_add_div_same, div_self h]
+
 /-- **Complete linkage: the shared fraction is 1.** Two sites that never
 recombine apart carry the same ancestral association in both demes however far
 their frequencies have drifted, and this is the limit the old `1 - F_ST` body
