@@ -723,6 +723,58 @@ def shape_chain(n: int) -> dict:
     return files
 
 
+# `shape-routes` reads the FIELD NAMES off `structure PopGenParameters` in
+# `Descent.Core.Parameters`, so its fixture has to be a corpus with that record in that
+# module. Its docstring says it "was calibrated against a fixture holding exactly the
+# pair above"; this is that fixture, in the harness, where the claim can be checked.
+ROUTES_PARAMETERS = HEADER + """
+namespace Descent.Core
+
+/-- The record every route is supposed to go through. -/
+structure PopGenParameters where
+  /-- Effective population size. -/
+  Ne : ℝ
+  /-- Mutation rate. -/
+  mu : ℝ
+  /-- Migration rate. -/
+  mig : ℝ
+  /-- Additive genetic variance. -/
+  V_A : ℝ
+
+end Descent.Core
+"""
+
+ROUTES_RECORD_ROUTE = """
+/-- The route through the record, which is the one whose constraints reach a caller. -/
+noncomputable def deployedR2 (p : PopGenParameters) (V_E : ℝ) : ℝ := p.V_A + V_E
+"""
+
+ROUTES_RAW_ROUTE = """
+/-- A second route to the same metric, taking the record's fields as loose reals. -/
+noncomputable def deployedR2FromIsland (Ne mu mig V_A : ℝ) : ℝ := Ne + mu + mig + V_A
+"""
+
+
+def routes_corpus(raw: bool) -> dict:
+    """The record-typed route, with or without a raw-real twin beside it."""
+    body = ROUTES_RECORD_ROUTE + (ROUTES_RAW_ROUTE if raw else "")
+    return {
+        "Descent.lean": HEADER + "\nimport Descent.Core\n",
+        "Descent/Core.lean": HEADER + """
+import Descent.Core.Parameters
+import Descent.Core.Metrics
+""",
+        "Descent/Core/Parameters.lean": ROUTES_PARAMETERS,
+        "Descent/Core/Metrics.lean": HEADER + """
+import Descent.Core.Parameters
+
+namespace Descent.Core
+""" + body + """
+end Descent.Core
+""",
+    }
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
     ("heads", "a module on disk that its directory head does not import",
@@ -758,6 +810,9 @@ end Descent.Alpha
     ("shape-depth", "an import chain past the limit",
      shape_chain(SHAPE_DEPTH_LIMIT + 2),
      "exceeds"),
+    ("shape-routes", "a raw-real second route beside the record-typed one",
+     routes_corpus(raw=True),
+     "re-supplies"),
     ("layers", "a qualified name from a layer the file cannot reach",
      layers_corpus(LAYERS_REFERENCE), "names Core.bigM"),
     # The `set_option` screen was one rule reading a timeout and a kernel bypass as
@@ -1080,6 +1135,9 @@ NEGATIVE_CASES = [
     # Demanding a clean exit here would assert something about the fixture.
     ("layers", "a qualified name inside a string literal, which is prose",
      layers_corpus(LAYERS_IN_A_STRING), "names Core.bigM"),
+    # The other half of the pair `shape-routes` is about: the record-typed route on its
+    # own is the shape the guard wants, not a shape it reports.
+    ("shape-routes", "a record-typed route with no raw-real twin", routes_corpus(raw=False)),
     # A heartbeat budget decides whether elaboration FINISHES; it cannot make the
     # kernel accept anything it would otherwise reject. Reporting it under a sentence
     # about `debug.skipKernelTC` is what the split above fixed, so the trap asserts
