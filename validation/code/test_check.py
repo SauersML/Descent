@@ -872,8 +872,45 @@ def core_empirics_corpus(verdict: str) -> dict:
     }
 
 
+LEDGER_LEAN = HEADER + """
+namespace Descent.Core
+
+/-- A quantity whose docstring cites a battery.
+
+Measured by `simcov/battery_ghost.py`.
+
+    Empirical status: MEASURED -- a number was obtained. -/
+noncomputable def citedRate (x : ℝ) : ℝ :=
+  x
+
+end Descent.Core
+"""
+
+
+def ledger_corpus(known_battery: bool) -> dict:
+    """A docstring citing a battery the ledger has, or has never seen."""
+    records = []
+    if known_battery:
+        records.append({
+            "role": "corpus",
+            "declaration": "citedRate",
+            "lean_file": "Descent/Core/Cited.lean",
+            "verdict": "MATCH",
+            "battery": "ghost",
+        })
+    return {
+        "Descent.lean": HEADER + "\nimport Descent.Core\n",
+        "Descent/Core.lean": HEADER + "\nimport Descent.Core.Cited\n",
+        "Descent/Core/Cited.lean": LEDGER_LEAN,
+        "validation/empirical/simcov/ledger.json": json.dumps({"records": records},
+                                                             indent=2),
+    }
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
+    ("ledger", "a docstring citing a battery the ledger has never seen",
+     ledger_corpus(known_battery=False), "never seen"),
     ("core-empirics", "a Core declaration denying measurement the ledger measured",
      core_empirics_corpus("MATCH"), "while the ledger holds"),
     ("core-empirics", "a FALSIFIED row whose declaration never names the battery",
