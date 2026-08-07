@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Layer
 import Descent.Pangenome.GaugeCounterexample
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Tactic
