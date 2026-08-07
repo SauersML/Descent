@@ -6911,9 +6911,19 @@ def _shape_is_toc(mod: str, graph, decls) -> bool:
 
 
 def _shape_graph_without_toc():
-    """The import graph with the tables of contents deleted, not merely skipped."""
+    """The import graph with the tables of contents deleted, not merely skipped.
+
+    `Descent.Layer` goes too, for a different reason than the heads.  It declares the
+    `assert_below` macro and nothing else, every module in the corpus sits above it by
+    construction, and it therefore adds exactly one to every path -- a constant, not a
+    shape.  `SHAPE_DEPTH_LIMIT` was set on 2026-08-05 against a graph that did not
+    contain it; the gate was added the following morning.  Counting it would mean the
+    number and the limit it is compared against were measured on different graphs.
+    The layer rule already drops it, for the same reason, as `LAYER_GATE`.
+    """
     _raw, _code, graph, decls, _arch = _shape_corpus()
-    toc = {m for m in graph if _shape_is_toc(m, graph, decls)}
+    gate = {f"Descent.{LAYER_GATE}"}
+    toc = {m for m in graph if _shape_is_toc(m, graph, decls)} | gate
     return {m: {d for d in graph[m] if d not in toc}
             for m in graph if m not in toc}
 
