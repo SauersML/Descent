@@ -247,7 +247,7 @@ def main():
            "[REFUTATION INSTRUMENT: unit minus a free power law, competing]",
            "PopulationGeneticsFoundations.lean",
            "1 - c * M^(-b), both c and b fitted", c_pow,
-           regime=reg + fitted,
+           regime=reg + fitted, control=control,
            note="two free parameters against eight cells spanning a "
                 "thousandfold in M, asking ONLY whether the deficit family can "
                 "be excluded outright. A failure here says the corpus should "
