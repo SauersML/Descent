@@ -44,6 +44,7 @@ import Descent.Portability.PGSCalibrationTheory.PopulationCalibrationDrift
 import Descent.Portability.PGSCalibrationTheory.RecalibrationMethods
 import Descent.Portability.PhenomeWidePortability
 import Descent.Portability.PolygenicContinuumCalibration
+import Descent.Portability.PopulationAUC
 import Descent.Portability.PortabilityBounds
 import Descent.Portability.PortabilityDrift
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime

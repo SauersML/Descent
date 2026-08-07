@@ -2,16 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
--- Same three names as `CalibrationVsDiscrimination`, and the same vanished fifteen-module
--- path to them.  This file reaches `Program.Conclusions` on its own now rather than
--- through a sibling that happens to be earlier in the chain.
-import Descent.Program.Conclusions
+-- `BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`, which this
+-- file names directly rather than through a sibling that happens to be earlier in a chain.
+import Descent.Portability.PopulationAUC
 
-assert_below Descent.Decision
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Program`:
---   Program: reaches 1 module(s) -- `Descent.Program.Conclusions`
--- The repair is to move what it reaches for DOWN, not to move this file up.
+assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
@@ -141,6 +136,22 @@ theorem recalibratedCalibrationSlope_null_fit_is_junk (slope : ℝ) :
   unfold recalibratedCalibrationSlope Descent.Core.ratio
   norm_num
 
+/-- **Refits compose multiplicatively: two recalibrations are one recalibration.**
+
+A score recalibrated once and then recalibrated again against a second fitted slope carries
+the correction factor of a single refit against the PRODUCT of the two fitted slopes.  So a
+deployment that refits per cohort and again per site is not applying two independent
+corrections that might partly cancel -- it is applying one, and the fitted slopes multiply.
+
+The composition is what identifies the direction as a quotient.  A correction that entered
+as a difference, `slope - fittedSlope`, would compose by addition, and the same two refits
+would then leave a score whose slope depends on the order they were applied in. -/
+theorem recalibratedCalibrationSlope_compose (slope firstFit secondFit : ℝ) :
+    recalibratedCalibrationSlope slope (Descent.Core.product firstFit secondFit)
+      = Descent.Core.ratio (recalibratedCalibrationSlope slope firstFit) secondFit := by
+  unfold recalibratedCalibrationSlope Descent.Core.product Descent.Core.ratio
+  rw [div_div]
+
 /-- Exact affine representation of the target linear predictor in terms of the
     logistic-recalibrated predictor. -/
 theorem target_linear_predictor_eq_affine_in_logistic_recalibrated
@@ -201,13 +212,13 @@ theorem logistic_recalibration_corrects_citl_and_slope
     affine transform when the fitted slope is positive. -/
 theorem logistic_recalibration_preserves_auc
     {Z : Type*} [MeasurableSpace Z]
-    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    Program.populationAUC pop (fun z ↦ logisticRecalibrated (score z) a b) =
-      Program.populationAUC pop score := by
+    populationAUC pop (fun z ↦ logisticRecalibrated (score z) a b) =
+      populationAUC pop score := by
   simpa [logisticRecalibrated, Function.comp] using
-    (Program.populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
+    (populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos]))
 
@@ -437,12 +448,12 @@ theorem rarer_target_prevalence_requires_larger_recalibration_cohort
     orderings, so population AUC is unchanged. -/
 theorem recalibration_preserves_auc
     {Z : Type*} [MeasurableSpace Z]
-    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
     (a b : ℝ)
     (h_b_pos : 0 < b) :
-    Program.populationAUC pop (fun z ↦ a + b * score z) = Program.populationAUC pop score := by
+    populationAUC pop (fun z ↦ a + b * score z) = populationAUC pop score := by
   simpa [Function.comp] using
-    Program.populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
+    populationAUC_strictMono_invariant pop score (fun x ↦ a + b * x) (by
       intro x y hxy
       linarith [mul_lt_mul_of_pos_left hxy h_b_pos])
 

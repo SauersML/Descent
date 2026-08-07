@@ -6,6 +6,10 @@ import Descent.Portability.ClinicalUtilityFairness
 import Descent.Spectral.ProjectionShiftBounds
 import Descent.Blindness.ImitationRigidity
 import Descent.Spectral.FoldedSpectrum
+-- `BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant` are named
+-- below, so the module declaring them is imported directly rather than reached along a
+-- path that runs through some other chapter's head.
+import Descent.Portability.PopulationAUC
 
 assert_below Descent.Decision
 
@@ -201,7 +205,7 @@ theorem R2DecompositionData.cal_loss_reduces_r2 (d : R2DecompositionData)
     population AUC functional, not on a liability-model surrogate. -/
 theorem r2_less_portable_than_auc_from_decomposition
     {Z : Type*} [MeasurableSpace Z]
-    (pop : Program.BinaryPopulation Z)
+    (pop : BinaryPopulation Z)
     (scoreSource scoreTarget : Z → ℝ)
     (source target : R2DecompositionData)
     (g : ℝ → ℝ)
@@ -214,9 +218,9 @@ theorem r2_less_portable_than_auc_from_decomposition
     -- Discrimination transfers perfectly, so the only `R²` loss comes from
     -- calibration.
     (hDiscPreserved : target.discrimination = source.discrimination) :
-    Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource ∧
-    |ENNReal.toReal (Program.populationAUC pop scoreTarget) -
-        ENNReal.toReal (Program.populationAUC pop scoreSource)| = 0 ∧
+    populationAUC pop scoreTarget = populationAUC pop scoreSource ∧
+    |ENNReal.toReal (populationAUC pop scoreTarget) -
+        ENNReal.toReal (populationAUC pop scoreSource)| = 0 ∧
     target.r2 / source.r2 = target.calibration ∧
     0 < 1 - target.r2 / source.r2 := by
   have h_src_r2 : source.r2 = source.discrimination * source.calibration :=
@@ -234,14 +238,14 @@ theorem r2_less_portable_than_auc_from_decomposition
   have h_r2_ratio : target.r2 / source.r2 = target.calibration := by
     rw [h_tgt_r2, h_src_r2_eq, hDiscPreserved]
     field_simp [ne_of_gt source.disc_pos]
-  have h_auc_eq : Program.populationAUC pop scoreTarget = Program.populationAUC pop scoreSource
+  have h_auc_eq : populationAUC pop scoreTarget = populationAUC pop scoreSource
     := by
     rw [hScoreTarget]
     simpa [Function.comp] using
-      (Program.populationAUC_strictMono_invariant pop scoreSource g hg)
+      (populationAUC_strictMono_invariant pop scoreSource g hg)
   have h_auc_gap_zero :
-      |ENNReal.toReal (Program.populationAUC pop scoreTarget) -
-          ENNReal.toReal (Program.populationAUC pop scoreSource)| = 0 := by
+      |ENNReal.toReal (populationAUC pop scoreTarget) -
+          ENNReal.toReal (populationAUC pop scoreSource)| = 0 := by
     rw [h_auc_eq]
     simp
   have h_r2_gap_pos : 0 < 1 - target.r2 / source.r2 := by

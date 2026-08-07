@@ -7841,14 +7841,6 @@ LAYER_PENDING = {
         "beside `hweHeterozygosity` it would be two names for one body in one namespace, "
         "which is what `duplication` reports, and the ledger keys of two VALIDATED "
         "battery records move with the name.",
-    ("Descent.Portability.PGSCalibrationTheory.RecalibrationMethods",
-     "Descent.Program.Conclusions"):
-        "`BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`: "
-        "a measure-theoretic AUC apparatus housed in the narrative module. This entry "
-        "used to read `the same three names and the same repair`, deferring to a "
-        "`CalibrationVsDiscrimination` entry that has since been retired with its "
-        "edge; the names are written out here so the argument does not depend on a "
-        "neighbour that can be deleted.",
     ("Descent.Portability.PortabilityDrift.PresentDayMoments",
      "Descent.Program.Conclusions"):
         "`brierBernoulliRisk`, `bernoulliKLReal` and `exactBrierRiskOfCalibrated`. "
