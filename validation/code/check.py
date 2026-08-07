@@ -668,9 +668,70 @@ def ident_lean_files():
     return [str(p) for p in lean_sources(root / "Descent")] + \
            [os.path.join(IDENT_ROOT, "Descent.lean")]
 
+# ======================================================================================
+# The four screens below are named because the auditor's own modules trip them, and
+# because a rule with a name can be exempted per file and per rule instead of per file.
+#
+# `Descent/Meta/` and `Descent/Layer.lean` are the corpus's machinery about itself:
+# `assert_below`, `informal_lemma`, `semiformal_result`, the `env_linter`s and the
+# status linter.  Installing syntax and elaboration IS what those modules are, and
+# `partial` is how a linter walks an expression.  Screening them for it reported the
+# auditor's existence as eight defects of the corpus.
+#
+# ENUMERATED PER FILE AND PER RULE, for the reason `LAYER_META_VOCABULARY` gives about
+# itself: a path-shaped test ("anything under `Descent/Meta/`") would admit whatever
+# the next auditor does, and the value of the rule is that widening it is an edit
+# somebody argues for.  A file exempt from `partial` is still screened for `sorry`,
+# `native_decide`, `opaque`, notation rebinding and every other escape, in machinery
+# exactly as in a proof.
+IDENT_ELABORATION = (r"(?m)^\s*(?:syntax|macro_rules|elab|elab_rules|initialize"
+                     r"|builtin_initialize|run_cmd|run_tac)\b")
+IDENT_UNSAFE = r"(?m)^\s*(?:(?:private|protected|noncomputable)\s+)*(?:unsafe|partial)\b"
+IDENT_AXIOM = r"(?m)^\s*(?:(?:private|protected)\s+)*axiom\b"
+
+# `set_option`, split by what the option can DO, because the old single rule read a
+# timeout and a kernel bypass as the same finding and described both with the
+# bypass's sentence.
+#
+# ESCAPES first: `debug.skipKernelTC` stops the kernel checking the declaration at
+# all, `debug.byAsSorry` turns every `by` into a sorry, and `autoImplicit true`
+# re-enables inside one file the thing `lakefile.lean` disables for the library.
+# These three change what is ACCEPTED and nothing is exempt from them, machinery
+# included.
+IDENT_SET_OPTION_ESCAPE = r"(?m)^[ \t]*set_option[ \t]+(?:debug\.[\w.]+|autoImplicit)\b"
+# Everything else, with `maxHeartbeats` named as the one option that cannot change
+# what the kernel accepts: it decides whether elaboration FINISHES, and a proof that
+# needs twenty times the default budget is a fact about that proof, not a hole in it.
+# `Coalescent/MohleLemma.lean` carries the corpus's only one.  Any other option still
+# gates, which is what keeps this a ratchet rather than a licence.
+IDENT_SET_OPTION_OTHER = r"(?m)^[ \t]*set_option[ \t]+(?!maxHeartbeats\b)[\w.]+"
+
+IDENT_MACHINERY_EXEMPT = {
+    # The layer gate. `assert_below` is a command, so it is `syntax` and `elab`.
+    "Descent/Layer.lean": {IDENT_ELABORATION},
+    # The gap vocabulary: `TODO`, `informal_definition`, `informal_lemma`.
+    "Descent/Meta/Informal.lean": {IDENT_ELABORATION},
+    # `#informal_report`, which is a command.
+    "Descent/Meta/InformalLint.lean": {IDENT_ELABORATION},
+    # The `env_linter`s. `partial` is how a linter recurses through an expression.
+    "Descent/Meta/Linters.lean": {IDENT_UNSAFE},
+    # The status linter, which is also a command.
+    "Descent/Meta/StatusLinter.lean": {IDENT_ELABORATION},
+    # `semiformal_result` elaborates a QUOTATION containing `axiom helper` and a
+    # `set_option`, under `withoutModifyingEnv`. Neither reaches an environment
+    # anything can cite -- the file says so at its head, and the elaborated axiom
+    # audit in `Check.lean`, which reads the environment rather than the text, is
+    # what actually holds that claim. This screen reads text and cannot see a
+    # quotation boundary, so what it reports here is the shape of the code and not
+    # its effect.
+    "Descent/Meta/Semiformal.lean": {IDENT_AXIOM, IDENT_SET_OPTION_OTHER},
+}
+
+
 def run_identifications() -> int:
     bad = []
     admissions = []
+    exemptions_used = set()
 
     for f in ident_lean_files():
         src = ident_strip_comments(open(f).read())
@@ -685,10 +746,8 @@ def run_identifications() -> int:
 
         forbidden = [
             (r"\badmit\b", "contains `admit`"),
-            (r"(?m)^\s*(?:(?:private|protected)\s+)*axiom\b",
-             "declares a custom axiom"),
-            (r"(?m)^\s*(?:(?:private|protected|noncomputable)\s+)*(?:unsafe|partial)\b",
-             "declares unsafe or partial code"),
+            (IDENT_AXIOM, "declares a custom axiom"),
+            (IDENT_UNSAFE, "declares unsafe or partial code"),
             (r"\bnative_decide\b", "uses `native_decide`"),
             (r"\b(?:sorryAx|Lean\.ofReduceBool|Lean\.trustCompiler)\b",
              "references a forbidden proof/compiler axiom directly"),
@@ -707,7 +766,7 @@ def run_identifications() -> int:
             # The escapes stay closed: `sorry`, `sorryAx` and `native_decide` are
             # screened over the whole file text, so a tactic macro cannot smuggle
             # one in.
-            (r"(?m)^\s*(?:syntax|macro_rules|elab|elab_rules|initialize|builtin_initialize|run_cmd|run_tac)\b",
+            (IDENT_ELABORATION,
              "installs custom syntax, elaboration, or initialization code"),
             (r"(?m)^\s*macro\b(?![^\n]*:\s*tactic\s*=>)",
              "installs a non-tactic macro, which rewrites what a reader reads"),
@@ -715,12 +774,16 @@ def run_identifications() -> int:
             # Each is a ratchet, not a cleanup. They cost nothing to adopt and
             # each closes a way to make the kernel accept something without the
             # mathematics having been done.
-            (r"(?m)^[ \t]*set_option\b",
-             "sets a compiler option in a proof module: `debug.skipKernelTC` "
-             "stops the kernel from checking the declaration at all, "
-             "`debug.byAsSorry` turns every `by` block into a sorry, and "
-             "`autoImplicit true` re-enables inside one file the very thing "
-             "lakefile.lean disables for the library"),
+            (IDENT_SET_OPTION_ESCAPE,
+             "sets a compiler option that changes what is ACCEPTED: "
+             "`debug.skipKernelTC` stops the kernel from checking the "
+             "declaration at all, `debug.byAsSorry` turns every `by` block into "
+             "a sorry, and `autoImplicit true` re-enables inside one file the "
+             "very thing lakefile.lean disables for the library"),
+            (IDENT_SET_OPTION_OTHER,
+             "sets a compiler option other than `maxHeartbeats` in a proof "
+             "module; every option that is not a pure elaboration budget can "
+             "change what the file means, so a new one is a deliberate edit"),
             (r"(?m)^[ \t]*(?:(?:scoped|local)[ \t]+)*(?:notation|infixl|infixr|infix|prefix|postfix|notation3)\b",
              "rebinds notation: `+`, `≤`, `∈` or `‖·‖` bound to a convenient "
              "operation leaves every theorem statement in the file reading as "
@@ -761,9 +824,25 @@ def run_identifications() -> int:
              "leaves an exploratory suggestion tactic in production"),
             (r"(?m)^\s*hint\b", "leaves the exploratory `hint` command in production"),
         ]
+        exempt = IDENT_MACHINERY_EXEMPT.get(rel, frozenset())
         for pattern, reason in forbidden:
-            if re.search(pattern, src):
-                bad.append(f"{rel}: {reason}")
+            if not re.search(pattern, src):
+                continue
+            if pattern in exempt:
+                exemptions_used.add((rel, pattern))
+                continue
+            bad.append(f"{rel}: {reason}")
+
+    # An exemption whose rule no longer fires is the same defect as a `LAYER_PENDING`
+    # entry for an edge that no longer exists: it describes the corpus as it was, it
+    # cannot be told from a live exemption by reading, and it is the shape under which
+    # a real one gets added later without argument.
+    for rel, pattern in sorted(
+            (k for k in ((f, p) for f, ps in IDENT_MACHINERY_EXEMPT.items() for p in ps)
+             if k not in exemptions_used)):
+        bad.append(f"{rel}: is exempted from a screen it no longer trips; delete the "
+                   f"entry in `IDENT_MACHINERY_EXEMPT`, because an exemption nothing "
+                   f"uses is indistinguishable from one that is load-bearing")
 
     # convention drift
     DOMAIN = re.compile(r"fst|drift|selection|herit|linkage|allele|geno|migrat|coalesc|mutation|"

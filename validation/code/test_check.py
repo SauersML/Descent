@@ -645,6 +645,19 @@ CASES = [
     # (guard, label, files, must_appear_in_output)
     ("layers", "a qualified name from a layer the file cannot reach",
      layers_corpus(LAYERS_REFERENCE), "names Core.bigM"),
+    # The `set_option` screen was one rule reading a timeout and a kernel bypass as
+    # the same finding. It is two now, and both directions are asserted: the bypass
+    # here, the budget among the traps below.
+    ("identifications", "a compiler option that disables the kernel check",
+     clean_plus("Descent/Sub.lean",
+                CLEAN_SUB.replace("namespace Descent",
+                                  "set_option debug.skipKernelTC true\n\nnamespace Descent")),
+     "changes what is ACCEPTED"),
+    ("identifications", "a compiler option that is neither a budget nor named",
+     clean_plus("Descent/Sub.lean",
+                CLEAN_SUB.replace("namespace Descent",
+                                  "set_option pp.all true\n\nnamespace Descent")),
+     "other than `maxHeartbeats`"),
     ("style", "line over 100 characters",
      clean_plus("Descent/Sub.lean",
                 CLEAN_SUB + "\n-- " + "x" * 120 + "\n"),
@@ -952,6 +965,15 @@ NEGATIVE_CASES = [
     # Demanding a clean exit here would assert something about the fixture.
     ("layers", "a qualified name inside a string literal, which is prose",
      layers_corpus(LAYERS_IN_A_STRING), "names Core.bigM"),
+    # A heartbeat budget decides whether elaboration FINISHES; it cannot make the
+    # kernel accept anything it would otherwise reject. Reporting it under a sentence
+    # about `debug.skipKernelTC` is what the split above fixed, so the trap asserts
+    # that neither of the two messages now comes back for it.
+    ("identifications", "a raised elaboration budget, which changes nothing accepted",
+     clean_plus("Descent/Sub.lean",
+                CLEAN_SUB.replace("namespace Descent",
+                                  "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
+     "set_option"),
     ("duplication", "two short idiomatic proofs of different statements",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + """
 theorem model_rate_refl (m : CleanModel) : m.rate = m.rate := rfl
