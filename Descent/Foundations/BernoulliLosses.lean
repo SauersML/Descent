@@ -167,4 +167,33 @@ theorem brier_regret_pointwise (p q : ℝ) :
 noncomputable def brierBernoulliRisk (η q : ℝ) : ℝ :=
   expectedBrierScore q η
 
+/-- **The risk and the score are one quantity read with its arguments the other way round.**
+
+`brierBernoulliRisk` puts the truth first because it is read as a risk *of a population*, and
+`expectedBrierScore` puts the prediction first because it is read as a score *of a forecast*.
+Nothing else separates them, and stating that here is what stops the two names from drifting
+into two bodies. -/
+theorem brierBernoulliRisk_eq_expectedBrierScore (η q : ℝ) :
+    brierBernoulliRisk η q = expectedBrierScore q η := rfl
+
+/-- **The kernel's Brier score is this one, attenuated by the variance the predictor explains.**
+
+`Descent.Core.brier` is a shape: prevalence variance times the unexplained fraction. This
+file's `expectedBrierScore` at the truth IS that prevalence variance, so the kernel says
+exactly that a predictor explaining `m.r2` of the outcome pays the calibrated Bernoulli risk
+scaled by `1 - m.r2` — and at `m.r2 = 0` the two coincide, which is `Core.brier_at_zero_r2`
+read from this side.
+
+This is the join that makes the loss functions here and the deployed metrics in `Core`
+statements about one quantity rather than two chapters that both use the word "Brier". Before
+it, this module named nothing any other module in the corpus declares, so no measurement of a
+deployed Brier score could bear on the propriety results proved above, and no reader could
+tell whether `π * (1 - π) * complement m.r2` was the same object at all. -/
+theorem core_brier_eq_expectedBrierScore_mul_complement
+    (π : ℝ) (m : Descent.Core.ScoreMoments) :
+    Descent.Core.brier π m =
+      expectedBrierScore π π * Descent.Core.complement m.r2 := by
+  unfold Descent.Core.brier expectedBrierScore
+  ring
+
 end Descent.Foundations
