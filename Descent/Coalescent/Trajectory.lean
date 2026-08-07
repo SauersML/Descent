@@ -112,6 +112,30 @@ theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
           simp only [List.length_cons] at hlen ⊢
           omega
 
+/-- **The successor step of `chainLaw`, destructured once.**  A trajectory after `m + 1`
+jumps is a trajectory after `m` -- nonempty, by `chainLaw_length` -- carrying one more state
+on the front, drawn from `jumpLaw` of its head.
+
+Both theorems below open the successor case this way, and each wrote the eight lines out:
+the same `bind` and `map` support rewrites, the same `match` on a list whose empty case
+`chainLaw_length` rules out.  Neither step was doing anything specific to what it went on
+to prove, which is what made them one block of text to `duplication` and one argument in
+fact. -/
+theorem mem_support_chainLaw_succ {n m : ℕ} {l : List (ER n)}
+    (hl : l ∈ (chainLaw n (m + 1)).support) :
+    ∃ (x y : ER n) (rest : List (ER n)),
+      l = y :: x :: rest ∧ (x :: rest) ∈ (chainLaw n m).support
+        ∧ y ∈ (jumpLaw x).support := by
+  classical
+  rw [chainLaw, PMF.mem_support_bind_iff] at hl
+  obtain ⟨lPrev, hPrev, hmem⟩ := hl
+  have hlen := chainLaw_length m hPrev
+  match lPrev with
+  | x :: rest =>
+      rw [PMF.mem_support_map_iff] at hmem
+      obtain ⟨y, hy, rfl⟩ := hmem
+      exact ⟨x, y, rest, rfl, hPrev, hy⟩
+
 /-- Every trajectory starts at `Δ`, which is K-C (1.1). -/
 theorem chainLaw_getLast {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chainLaw n k).support) :
     l.getLast? = some (Delta n) := by
@@ -122,16 +146,9 @@ theorem chainLaw_getLast {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chai
       rw [hl]
       rfl
   | succ m ih =>
-      rw [chainLaw, PMF.mem_support_bind_iff] at hl
-      obtain ⟨l', hl', hmem⟩ := hl
-      have hlast := ih hl'
-      have hlen := chainLaw_length m hl'
-      match l' with
-      | x :: rest =>
-          rw [PMF.mem_support_map_iff] at hmem
-          obtain ⟨y, -, rfl⟩ := hmem
-          rw [List.getLast?_cons_cons]
-          exact hlast
+      obtain ⟨x, y, rest, rfl, hPrev, -⟩ := mem_support_chainLaw_succ hl
+      rw [List.getLast?_cons_cons]
+      exact ih hPrev
 
 /-- **K-C (1.13): every trajectory is a descending chain of covers.**
 
@@ -149,18 +166,11 @@ theorem chainLaw_support_chain' {n : ℕ} (k : ℕ) {l : List (ER n)}
       rw [hl]
       exact List.chain'_singleton _
   | succ m ih =>
-      rw [chainLaw, PMF.mem_support_bind_iff] at hl
-      obtain ⟨l', hl', hmem⟩ := hl
-      have hchain := ih hl'
-      have hlen := chainLaw_length m hl'
-      match l' with
-      | x :: rest =>
-          rw [PMF.mem_support_map_iff] at hmem
-          obtain ⟨y, hy, rfl⟩ := hmem
-          refine List.Chain'.cons ?_ hchain
-          rcases lt_or_ge (blocks x) 2 with hb | hb
-          · exact Or.inr ((mem_support_jumpLaw_of_absorbed hb).mp hy)
-          · exact Or.inl ((mem_support_jumpLaw hb).mp hy)
+      obtain ⟨x, y, rest, rfl, hPrev, hy⟩ := mem_support_chainLaw_succ hl
+      refine List.Chain'.cons ?_ (ih hPrev)
+      rcases lt_or_ge (blocks x) 2 with hb | hb
+      · exact Or.inr ((mem_support_jumpLaw_of_absorbed hb).mp hy)
+      · exact Or.inl ((mem_support_jumpLaw hb).mp hy)
 
 /-- The head of a trajectory is the current state; every entry after the first jump is a
 state the chain can be in. -/
