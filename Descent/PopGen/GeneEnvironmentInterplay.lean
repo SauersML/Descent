@@ -331,6 +331,7 @@ theorem linearNormOfReaction_slope_identified (a b E₁ E₂ : ℝ) (h : E₁ �
   unfold linearNormOfReaction Descent.Core.affineStep Descent.Core.ratio
     Descent.Core.difference
   field_simp
+  ring
 
 /-- **Different genotypes have different slopes.**
     If b(G₁) ≠ b(G₂), then the genotype ranking can reverse

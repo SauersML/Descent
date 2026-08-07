@@ -21,6 +21,8 @@ import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
+import Descent.Pangenome.Register
+import Descent.Pangenome.Strand
 
 /-!
 # `Descent.Pangenome` -- the layer head
