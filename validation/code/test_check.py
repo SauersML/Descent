@@ -775,8 +775,69 @@ end Descent.Core
     }
 
 
+# `shape-spine`'s two floors -- 80 spine theorems, 20% cross-module reuse -- cannot be
+# MET by a fixture, so its control is not about the floors. It is about the detection
+# underneath them: which theorems the guard counts as spine. Both halves of that
+# definition are asserted here, because a guard that counted the wrong theorems would
+# report a number that looks exactly as wrong as a corpus with no spine.
+SPINE_MOMENTS = HEADER + """
+namespace Descent.Core
+
+/-- A deployed metric: an `ℝ`-valued definition of `Core/Moments.lean`.  The body is on
+the next line because that is what the kernel scan requires -- it reads a definition
+whose SIGNATURE ends the line, so a one-liner is not seen as a metric at all. -/
+noncomputable def r2 (x : ℝ) : ℝ :=
+  x
+
+end Descent.Core
+"""
+
+SPINE_PARAMETERS = HEADER + """
+namespace Descent.Core
+
+/-- The record a spine theorem has to start from. -/
+structure PopGenParameters where
+  /-- Additive genetic variance. -/
+  V_A : ℝ
+
+end Descent.Core
+"""
+
+SPINE_THEOREMS = HEADER + """
+import Descent.Core.Moments
+import Descent.Core.Parameters
+
+namespace Descent.Core
+
+/-- Binds the record AND names a deployed metric, which is what a spine theorem is. -/
+theorem carries_demography_to_r2 (p : PopGenParameters) : r2 p.V_A = p.V_A := rfl
+
+/-- Names the metric about a free real. The record is what the free real was supposed
+to have come from, and nothing here says it did. -/
+theorem free_real_reaches_r2 (x : ℝ) : r2 x = x := rfl
+
+end Descent.Core
+"""
+
+
+def spine_corpus() -> dict:
+    return {
+        "Descent.lean": HEADER + "\nimport Descent.Core\n",
+        "Descent/Core.lean": HEADER + """
+import Descent.Core.Moments
+import Descent.Core.Parameters
+import Descent.Core.Spine
+""",
+        "Descent/Core/Moments.lean": SPINE_MOMENTS,
+        "Descent/Core/Parameters.lean": SPINE_PARAMETERS,
+        "Descent/Core/Spine.lean": SPINE_THEOREMS,
+    }
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
+    ("shape-spine", "a theorem binding the record and naming a deployed metric",
+     spine_corpus(), "have: carries_demography_to_r2"),
     ("heads", "a module on disk that its directory head does not import",
      shape_corpus(**{"Descent/Alpha.lean": HEADER + "\n"}),
      "does not import"),
@@ -1138,6 +1199,11 @@ NEGATIVE_CASES = [
     # The other half of the pair `shape-routes` is about: the record-typed route on its
     # own is the shape the guard wants, not a shape it reports.
     ("shape-routes", "a record-typed route with no raw-real twin", routes_corpus(raw=False)),
+    # The other half of what a spine theorem IS. Naming the metric is not enough; a
+    # theorem about a free real is the shape the record exists to replace, and counting
+    # it would put this guard and `shape-routes` in opposition.
+    ("shape-spine", "a theorem naming the metric about a free real",
+     spine_corpus(), "have: free_real_reaches_r2"),
     # A heartbeat budget decides whether elaboration FINISHES; it cannot make the
     # kernel accept anything it would otherwise reject. Reporting it under a sentence
     # about `debug.skipKernelTC` is what the split above fixed, so the trap asserts
