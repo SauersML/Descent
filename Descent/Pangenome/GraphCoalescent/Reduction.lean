@@ -119,22 +119,13 @@ A coarsening can only lose blocks, so every graph state has at most as many line
 graph's floor -- and the floor has `Linkage.width s` of them.  That is what makes `w` the
 graph coalescent's sample size rather than an incidental bound. -/
 
-/-- A coarsening cannot gain blocks.  The surjection on classes is
-`Descent.Coalescent.StateSpace.blockMap_surjective`; this is its cardinality. -/
-theorem blocks_antitone {n : ℕ} {ξ η : Coalescent.ER n} (h : ξ ≤ η) :
-    Coalescent.blocks η ≤ Coalescent.blocks ξ := by
-  letI : Fintype (Quotient ξ) := Fintype.ofFinite _
-  letI : Fintype (Quotient η) := Fintype.ofFinite _
-  have hsurj := Fintype.card_le_of_surjective _ (Coalescent.blockMap_surjective h)
-  simpa [Coalescent.blocks, Nat.card_eq_fintype_card] using hsurj
-
 /-- **A graph state has at most `w` lineages.**  The graph coalescent's sample size is the
 interface's occupied width, and the panel's `n` never enters.
 
 Assumes: `GraphState s ξ`. -/
 theorem blocks_le_width_of_graphState {n : ℕ} {s : Fin n → Fin n} {ξ : Coalescent.ER n}
     (h : GraphState s ξ) : Coalescent.blocks ξ ≤ Linkage.width s := by
-  have hb := blocks_antitone h
+  have hb := Coalescent.blocks_antitone h
   rwa [blocks_graphKer] at hb
 
 /-- **The graph coalescent's entrance rate is the pair count of the graph's nodes.**  A

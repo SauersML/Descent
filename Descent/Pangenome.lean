@@ -9,6 +9,7 @@ import Descent.Pangenome.GaugeCounterexample
 import Descent.Pangenome.GaugeInvariance
 import Descent.Pangenome.GraphCoalescent
 import Descent.Pangenome.GraphCoalescent.Deficit
+import Descent.Pangenome.GraphCoalescent.EstimatorSign
 import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned

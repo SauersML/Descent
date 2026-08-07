@@ -23,7 +23,7 @@ a theorem.
 
 ## The chain
 
-`GraphCoalescent.Reduction.blocks_antitone` says coarsening loses blocks, `blocks_graphKer`
+`Coalescent.Interpolation.blocks_antitone` says coarsening loses blocks, `blocks_graphKer`
 says the graph's block count is its width, and the transit deficit `2/w - 2/n` is decreasing
 in `w`.  So:
 
@@ -70,11 +70,11 @@ namespace Descent.Pangenome.GraphCoalescent
 /-- **A coarser construction has a smaller graph.**  If the interface `t` merges everything
 `s` merges and possibly more, then `t`'s graph has no more nodes than `s`'s.
 
-This is `blocks_antitone` read through `blocks_graphKer`, and it is the step that turns a
+This is `Coalescent.blocks_antitone` read through `blocks_graphKer`, and it is the step that turns a
 statement about equivalence relations into a statement about the object a builder emits. -/
 theorem width_antitone {n : ℕ} {s t : Fin n → Fin n} (h : graphKer s ≤ graphKer t) :
     Linkage.width t ≤ Linkage.width s := by
-  have := blocks_antitone h
+  have := Coalescent.blocks_antitone h
   rwa [blocks_graphKer, blocks_graphKer] at this
 
 /-- **Coarsening only inflates the transit deficit.**
@@ -93,9 +93,11 @@ theorem transitDeficit_mono {n : ℕ} {s t : Fin n → Fin n} (h : graphKer s �
   have hws : 1 ≤ Linkage.width s := le_trans hwt hts
   rw [transitDeficit_eq hn hws, transitDeficit_eq hn hwt]
   have h0 : (0 : ℝ) < (Linkage.width t : ℝ) := by exact_mod_cast hwt
+  have h0s : (0 : ℝ) < (Linkage.width s : ℝ) := by exact_mod_cast hws
   have h1 : (Linkage.width t : ℝ) ≤ (Linkage.width s : ℝ) := by exact_mod_cast hts
-  have : (2 : ℝ) / (Linkage.width s : ℝ) ≤ 2 / (Linkage.width t : ℝ) :=
-    div_le_div_of_nonneg_left (by norm_num) h0 h1
+  have hdiv : (2 : ℝ) / (Linkage.width s : ℝ) ≤ 2 / (Linkage.width t : ℝ) := by
+    rw [div_le_div_iff₀ h0s h0]
+    linarith
   linarith
 
 /-- **and only depresses the reported `θ_W`.**
