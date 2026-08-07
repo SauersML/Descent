@@ -359,15 +359,25 @@ theorem sum_classSize {n : ℕ} (ξ : ER n) :
   rw [Finset.card_univ, Fintype.card_fin] at h
   exact h.symm
 
-/-- Seating at `c` leaves every other class untouched. -/
-theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ c) :
-    Nat.card {x : Fin (n + 1) // extendMap ξ (some c) x = some d}
+/-- **Seating anywhere but `d` leaves `d`'s class untouched.**  The new sample point goes to
+whatever `o` says, so the fibre over `some d` in `Fin (n + 1)` is the old fibre over `d`
+exactly when `o` is not `some d` -- and it does not matter whether `o` is another class or
+no class at all.
+
+The two corollaries below are that statement at `o = some c` and at `o = none`, and they
+used to be two proofs of it: twelve identical lines each, differing in the last step, where
+one discharged `some c = some d` against `d ≠ c` and the other discharged `none = some d`
+against nothing.  Carrying `o ≠ some d` as the hypothesis makes that last step the same
+step, which is what says the two theorems are one theorem. -/
+theorem card_fiber_of_seat_ne {n : ℕ} (ξ : ER n) (o : Option (Quotient ξ))
+    (d : Quotient ξ) (hne : o ≠ some d) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ o x = some d}
       = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
   classical
   refine (Nat.card_eq_of_bijective
     (fun p : {x : Fin n // Quotient.mk ξ x = d} ↦
       (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
-        {x : Fin (n + 1) // extendMap ξ (some c) x = some d})) ?_).symm
+        {x : Fin (n + 1) // extendMap ξ o x = some d})) ?_).symm
   constructor
   · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
     have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q ↦ (q.1 : ℕ)) h
@@ -380,7 +390,13 @@ theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ 
       · exact Subtype.ext (Fin.ext rfl)
     · exfalso
       rw [eq_last_of_not_lt (x := y) (by omega), extendMap_last] at hy
-      exact hne (Option.some_injective _ hy).symm
+      exact hne hy
+
+/-- Seating at `c` leaves every other class untouched. -/
+theorem card_fiber_of_ne {n : ℕ} (ξ : ER n) (c d : Quotient ξ) (hne : d ≠ c) :
+    Nat.card {x : Fin (n + 1) // extendMap ξ (some c) x = some d}
+      = Nat.card {x : Fin n // Quotient.mk ξ x = d} :=
+  card_fiber_of_seat_ne ξ (some c) d fun h ↦ hne (Option.some_injective _ h).symm
 
 /-- Seating at `c` raises `λ_c` by exactly one. -/
 theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
@@ -421,25 +437,8 @@ theorem card_fiber_self {n : ℕ} (ξ : ER n) (c : Quotient ξ) :
 /-- Starting a new class leaves every old class untouched. -/
 theorem card_fiber_none_old {n : ℕ} (ξ : ER n) (d : Quotient ξ) :
     Nat.card {x : Fin (n + 1) // extendMap ξ none x = some d}
-      = Nat.card {x : Fin n // Quotient.mk ξ x = d} := by
-  classical
-  refine (Nat.card_eq_of_bijective
-    (fun p : {x : Fin n // Quotient.mk ξ x = d} ↦
-      (⟨Fin.castLE (Nat.le_succ n) p.1, by rw [extendMap_castLE, p.2]⟩ :
-        {x : Fin (n + 1) // extendMap ξ none x = some d})) ?_).symm
-  constructor
-  · rintro ⟨x, hx⟩ ⟨y, hy⟩ h
-    have hval : (x : ℕ) = (y : ℕ) := congrArg (fun q ↦ (q.1 : ℕ)) h
-    exact Subtype.ext (Fin.ext hval)
-  · rintro ⟨y, hy⟩
-    rcases lt_or_ge (y : ℕ) n with hylt | hyge
-    · refine ⟨⟨⟨y, hylt⟩, ?_⟩, ?_⟩
-      · rw [extendMap_of_lt ξ _ y hylt] at hy
-        exact Option.some_injective _ hy
-      · exact Subtype.ext (Fin.ext rfl)
-    · exfalso
-      rw [eq_last_of_not_lt (x := y) (by omega), extendMap_last] at hy
-      exact Option.noConfusion hy
+      = Nat.card {x : Fin n // Quotient.mk ξ x = d} :=
+  card_fiber_of_seat_ne ξ none d (by simp)
 
 /-- And the class it starts is a singleton -- the `(λ - 1)! = 0! = 1` that leaves the
 factorial product unchanged when a new class opens. -/

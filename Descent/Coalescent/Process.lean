@@ -65,16 +65,16 @@ theorem card_covers_fintype {n : ℕ} (ξ : ER n) :
 
 /-- A state with at least two blocks has somewhere to go: pick two distinct blocks and merge
 them.  Without this the jump chain would have no next state, which is exactly the absorbing
-case `k = 1`. -/
+case `k = 1`.
+
+This is `StateSpace.nonempty_covers` under the name the jump-chain construction uses, and
+it is that theorem rather than a second proof of it.  Both statements existed, in two
+files, with two arguments -- a merge of two distinct blocks here, `card_covers_eq_deathRate`
+and `deathRate_pos` there -- and nothing in the corpus said they were the same claim, so
+`duplication` reported them as one proposition under two names.  Deriving one from the
+other is what says it. -/
 theorem covers_nonempty {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) :
-    Nonempty {η : ER n // Covers ξ η} := by
-  classical
-  letI : Fintype (Quotient ξ) := Fintype.ofFinite _
-  have hcard : 2 ≤ Fintype.card (Quotient ξ) := by
-    rw [← Nat.card_eq_fintype_card]
-    exact hk
-  obtain ⟨a, b, hab⟩ := Fintype.exists_pair_of_one_lt_card (α := Quotient ξ) (by omega)
-  exact ⟨⟨merge ξ a b, merge_covers ξ hab⟩⟩
+    Nonempty {η : ER n // Covers ξ η} := nonempty_covers ξ hk
 
 /-- **The partition-valued transition law of the `n`-coalescent's jump chain.**
 
