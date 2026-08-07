@@ -2,6 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.ImitationRigidity
+import Descent.Core.Genome
+import Descent.Foundations.Probability
+import Descent.PopGen.DGP
 
 assert_below Descent.Conditionals Descent.Decision
 

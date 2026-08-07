@@ -2,6 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift
+import Descent.Core.Ratios
+import Descent.Foundations.TransportIdentities
+import Descent.Portability.PortabilityDrift.PresentDayMoments
 
 assert_below Descent.Decision
 

@@ -2,6 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
+import Descent.Core.Ratios
+import Descent.Foundations.TransportIdentities
+import Descent.Portability.PGSCalibrationTheory.RecalibrationMethods
 
 -- There is no `import Descent.Program.OpenQuestions` here, and there is no need for one:
 -- `f1Score` lives DOWN in `Core/Decision.lean`, beside the rest of the clinical family,

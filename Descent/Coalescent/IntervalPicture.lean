@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Paintbox
+import Descent.Coalescent.StateSpace
 import Mathlib.Tactic
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness

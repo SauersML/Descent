@@ -2,6 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.Definitions
+import Descent.Core.Parameters
+import Descent.Core.Scaling
+import Descent.PopGen.DGP
 
 assert_below Descent.Decision Descent.Program
 

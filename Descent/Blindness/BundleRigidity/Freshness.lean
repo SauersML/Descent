@@ -1,7 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Blindness.BundleRigidity.Realizability
+import Mathlib.Tactic
+import Descent.Layer
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
