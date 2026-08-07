@@ -295,15 +295,35 @@ noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
       1000   1000   1000      0.50000       0.33333  0.32924±0.00326   1.3
       1000   1000   2000      0.66667       0.50000  0.49999±0.00302   0.0
        600    600   1200      0.66667       0.50000  0.49410±0.00385   1.5
-       500   2000   1000      0.55556       0.38462  0.36592±0.00330   5.7
 
-    So: validated for equal branch lengths at worst 1.5 sems over four designs
-    spanning 0.19682 to 0.49999, and wrong for unequal ones -- the last row
-    misses by 5.7 sems. That is the boundary the status at the top records.
+    So: validated for equal branch lengths at worst 1.53 sems over four designs
+    spanning 0.19682 to 0.49999, and the superseded sum form is excluded at 44.8
+    to 55.3 sems on every one of them.
+
+    **THE BOUNDARY IS NOW MEASURED, NOT ASSERTED.** The status at the top says
+    this body is valid for equal branch lengths and not otherwise, and until now
+    the second half of that rested on one asymmetric cell run beside four
+    symmetric ones. A conditional status with evidence on only one side of its
+    condition is an assertion. The same battery now runs THREE unequal-branch
+    designs as their own recorded row, and the ledger carries the falsification
+    separately from the validation rather than averaging them into one verdict:
+
+      NeA    NeB    t      this (mean)   simulated          sems
+       500   2000   1000       0.38462  0.36592±0.00330    5.7
+       400   1600   1000       0.43860  0.41836±0.00403    5.0
+       500   2000   2000       0.55556  0.50417±0.00281   18.3
+
+    The error grows with the split depth at fixed asymmetry, which is what
+    distinguishes a real misspecification from a noise excursion: the mean of the
+    branch taus discards the information that the two branches differ, and how
+    much that costs is how far apart they are allowed to drift.
+
+    Both rows are gated against the same control -- a symmetric split at `t` =
+    3000, a depth in neither design, scored against `coalFst` at 0.60000 against
+    a measured 0.60345 ± 0.00258.
 
     Power: the prediction spans 0.20000 to 0.50000 across the symmetric designs,
-    a factor of two and a half, and the superseded sum form is excluded at 40 to
-    59 sems on every one of them. -/
+    a factor of two and a half. -/
 noncomputable def pairwiseFstFromBranchTaus (tauS tauT : ℝ) : ℝ :=
   Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled ((tauS + tauT) / 2))
 
