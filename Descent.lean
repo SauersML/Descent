@@ -689,23 +689,5 @@ theorem intensity_eq_charFnSq {n : ℕ} (P : Spectral.PhasePanel n) (s : ℝ) :
 
 end Condensation
 
-/-! ### The gap ledger, printed where it can see the whole corpus
-
-`#informal_report` reads the objects `Descent.Meta.Informal`'s commands record and reports
-the state worth finding: an `informal_lemma` whose recorded deps have ALL become constants,
-so its prerequisites are complete and nobody noticed.  It also fails on a duplicated tag,
-which is the one thing in the ledger that is a defect rather than a state of the work.
-
-IT IS INVOKED HERE AND NOWHERE ELSE, and that is forced.  A gap is recorded in the module
-that declares it; `Descent.Meta.InformalLint`, where the command is defined, sits at the
-bottom of the layer order and imports no proof module, so run from there it would report
-zero -- truthfully, and answering a different question than the one asked, which is the
-failure shape this corpus catalogues at length above.  This file is the only one that
-imports every head.
-
-If the build fails somewhere unexpected in the metaprogramming, DELETE THIS LINE FIRST: it
-is the one place an unverified command elaborator is invoked, and the corpus is otherwise
-unaffected by whether it works. -/
-#informal_report
 
 end Descent

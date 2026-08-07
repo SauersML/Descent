@@ -2395,8 +2395,9 @@ correlation decays exponentially with recombination distance and divergence.
     FALSIFIED, which is the same chart under another name.
 
     CONSUMERS. `jointTagLDKernelAt` multiplies this factor in and inherits the
-    shape fault; its own record already carries a separate, established
-    falsification through `migrationSharedBoostAt`.
+    shape fault, and it is now the ONLY fault that kernel carries: the migration
+    factor it used to inherit a second falsification through has been deleted
+    outright.
 
     The earlier, control-less run reached the same conclusion by the same
     reasoning, and is kept because the reasoning is what the control licenses:

@@ -133,9 +133,12 @@ def inCorpus (declName : Name) : MetaM Bool := do
 /-- Is `declName` on Core's surface: named into `Descent.Core`, or housed under
 `Descent/Core/`?
 
-Core's surface is not its directory.  `migrationSharedBoostAt` is a Core
+Core's surface is not its directory.  `mutationSharedRetentionAt` is a Core
 declaration housed in `Portability/PortabilityDrift/Generational.lean` under a
-`_root_.` prefix, and a scope rule reading only the path would not look at it. -/
+`_root_.` prefix, and a scope rule reading only the path would not look at it.
+(The example used to be its sibling `migrationSharedBoostAt`, which was deleted
+as refuted; the shape it illustrates is unchanged, and picking a live
+declaration for it is the point of the rule.) -/
 def onCoreSurface (declName : Name) : MetaM Bool := do
   if (`Descent.Core).isPrefixOf declName then return true
   return (`Descent.Core).isPrefixOf (← moduleOf declName)

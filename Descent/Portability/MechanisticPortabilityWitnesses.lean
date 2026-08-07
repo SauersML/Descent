@@ -41,7 +41,6 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       Descent.Core.PopGenParameters.tauAt, Descent.Core.PopGenParameters.hetDecayFactor,
       Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
-      Descent.Core.PopGenParameters.migrationSharedBoostAt,
       ldCorrelationDecay, Matrix.one_mulVec, Matrix.mulVec, dotProduct,
       Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
@@ -654,9 +653,8 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
     nondegenerateGenerationalPopGen.bigM.value = 1 / 2 ∧
     (nondegenerateGenerationalPopGen.tauAt 1).value = 1 / 2 ∧
     nondegenerateGenerationalPopGen.fstTransientAt 1 = 1 / 4 ∧
-    nondegenerateGenerationalPopGen.mutationSharedRetentionAt 1 = Real.exp (-(1 : ℝ)) ∧
-    nondegenerateGenerationalPopGen.migrationSharedBoostAt 1 = 7 / 6 := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+    nondegenerateGenerationalPopGen.mutationSharedRetentionAt 1 = Real.exp (-(1 : ℝ)) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · norm_num [nondegenerateGenerationalPopGen, Descent.Core.PopGenParameters.theta,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
@@ -685,7 +683,6 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio]
   · simp [nondegenerateGenerationalPopGen,
-      Descent.Core.PopGenParameters.migrationSharedBoostAt,
       Descent.Core.PopGenParameters.bigM, Descent.Core.PopGenParameters.tauAt,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
@@ -1140,7 +1137,6 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
       Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
-      Descent.Core.PopGenParameters.migrationSharedBoostAt,
       Descent.Core.PopGenParameters.bigM,
       ldCorrelationDecay,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,

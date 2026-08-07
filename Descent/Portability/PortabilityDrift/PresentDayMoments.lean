@@ -214,56 +214,58 @@ noncomputable def novelVariantInnovationAt (g : Descent.Core.PopGenParameters) (
   simp [novelVariantInnovationAt]
 
 /-- Joint locus-level transport kernel for LD among scored SNPs at generation
-`t`. This is where drift, recombination, mutation history, migration history,
-and tag-SNP allele-frequency drift meet; the mechanistic model does not treat
-them as independent global scalars.
+`t`. This is where drift, recombination, mutation history and tag-SNP
+allele-frequency drift meet; the mechanistic model does not treat them as
+independent global scalars.
 
-    Empirical status: **FALSIFIED**, inherited from `migrationSharedBoostAt`,
-    which overstates the migration-driven restoration of shared LD by roughly a
-    factor of three, worst cell 18.17 sems, with the gap widening in both `τ`
-    and `bigM`. This kernel MULTIPLIES that factor in, so the overstatement
-    passes straight through and grows with `t`.
+    **THE MIGRATION FACTOR IS DELETED, AND ITS ABSENCE IS A GAP RATHER THAN A
+    ZERO.** This kernel used to multiply in `migrationSharedBoostAt`, and that
+    body is refuted -- `simcov/battery_bulk55.py`, eightfold `τ` sweep, worst
+    29.5 sems at 56% -- as a SHAPE and not as a coefficient: its own form given a
+    free amplitude and fitted to the cells still misses by 3.90 sems, so nothing
+    is recoverable by rescaling. A product cannot average a wrong factor away, so
+    it went.
+
+    **What that costs, stated rather than hidden.** The same run rejects a boost
+    of exactly `1` at 13.6 sems: migration DOES restore shared LD. This kernel
+    now omits that restoration entirely, so it is an UNDERSTATEMENT of shared LD
+    wherever migration is ongoing, by a factor the measurement bounds between
+    about 1.02 and 1.25 over `τ ∈ [0.25, 2]` and `bigM ∈ [0.5, 16]`. It is exact
+    only at `bigM = 0`. The corpus prefers a named omission to a refuted formula,
+    and the repair is a DERIVED migration factor, which nothing here supplies:
+    the measured dependence rises with divergence and then flattens, which is
+    neither the deleted proportionality nor the constant that replaced it.
 
     **THE `fstGap` FAULT THIS RECORD USED TO NAME IS FIXED AND THE MARKER WAS
     STALE.** The first factor is `ldCorrelationDecay` at the transient `F_ST`,
     and that body's `fstGap` dependence WAS falsified at 4.73 sems -- the fitted
     decay rate tracks `√fstGap`, not `fstGap`. It now carries
     `Real.sqrt fstGap`, so the "attenuates at twice the supported rate" reading
-    that stood here describes a superseded body. The status did not change
-    because a second, live fault was underneath it; the reason did.
+    that stood here describes a superseded body.
 
-    The composition is where the damage concentrates rather than cancels: a
-    kernel that is a product of factors inherits the worst of them and cannot
-    average them away.
-
-    THE SECOND INHERITED FAULT IS NO LONGER A LEAD. Whether the decay in
-    DISTANCE is exponential at all, or hyperbolic as Sved's relation gives, was
-    settled against the exponential once the control the earlier run lacked was
-    supplied (`validation/empirical/popgensel/ldshapecell.py`, cell `I`;
-    χ²/point 28.49 and 79.66 exponential against 4.16 and 1.95 hyperbolic, on a
-    fitter that prefers the exponential by 168-fold and 197-fold when handed a
-    true exponential). So this kernel carries TWO established faults, not one
-    established and one open: the migration overstatement it inherits from
-    `migrationSharedBoostAt`, and the wrong LD shape it inherits from
-    `ldCorrelationDecay`. Being a product, it inherits the worse of them and
-    cannot average them away. -/
+    Empirical status: **FALSIFIED**, and now for ONE reason rather than two. The
+    surviving fault is the LD shape inherited from `ldCorrelationDecay`: whether
+    the decay in DISTANCE is exponential at all, or hyperbolic as Sved's relation
+    gives, was settled against the exponential once the control the earlier run
+    lacked was supplied (`validation/empirical/popgensel/ldshapecell.py`, cell
+    `I`; χ²/point 28.49 and 79.66 exponential against 4.16 and 1.95 hyperbolic,
+    on a fitter that prefers the exponential by 168-fold and 197-fold when handed
+    a true exponential). -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
   ldCorrelationDecay (m.tagDistance i j)
       (m.popGen.fstTransientAt t) m.popGen.recomb *
     m.popGen.mutationSharedRetentionAt t *
-    m.popGen.migrationSharedBoostAt t *
     tagAlleleFreqRetentionAt m t i *
     tagAlleleFreqRetentionAt m t j
 
-@[simp] theorem jointTagLDKernelAt_uses_ld_af_mutation_migration {p q : ℕ}
+@[simp] theorem jointTagLDKernelAt_uses_ld_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
     jointTagLDKernelAt m t i j =
       ldCorrelationDecay (m.tagDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
+            tagAlleleFreqRetentionAt m t i *
         tagAlleleFreqRetentionAt m t j := by
   simp [jointTagLDKernelAt]
 
@@ -273,16 +275,14 @@ it still carries mutation, migration, and AF-history interactions. -/
 noncomputable def jointDirectCausalKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
   m.popGen.mutationSharedRetentionAt t *
-    m.popGen.migrationSharedBoostAt t *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
 
-@[simp] theorem jointDirectCausalKernelAt_uses_af_mutation_migration {p q : ℕ}
+@[simp] theorem jointDirectCausalKernelAt_uses_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     jointDirectCausalKernelAt m t i j =
       m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
+            tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
   simp [jointDirectCausalKernelAt]
 
@@ -294,18 +294,16 @@ noncomputable def jointProxyTaggingKernelAt {p q : ℕ}
   ldCorrelationDecay (m.tagCausalDistance i j)
       (m.popGen.fstTransientAt t) m.popGen.recomb *
     m.popGen.mutationSharedRetentionAt t *
-    m.popGen.migrationSharedBoostAt t *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
 
-@[simp] theorem jointProxyTaggingKernelAt_uses_ld_tagging_af_mutation_migration {p q : ℕ}
+@[simp] theorem jointProxyTaggingKernelAt_uses_ld_tagging_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     jointProxyTaggingKernelAt m t i j =
       ldCorrelationDecay (m.tagCausalDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         m.popGen.mutationSharedRetentionAt t *
-        m.popGen.migrationSharedBoostAt t *
-        tagAlleleFreqRetentionAt m t i *
+            tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
   simp [jointProxyTaggingKernelAt]
 
@@ -317,16 +315,14 @@ migration, and still depend on target allele-frequency matching.
 noncomputable def jointNovelDirectCausalKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
   novelVariantInnovationAt m.popGen t *
-    (m.popGen.migrationSharedBoostAt t)⁻¹ *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
 
-@[simp] theorem jointNovelDirectCausalKernelAt_uses_af_mutation_migration {p q : ℕ}
+@[simp] theorem jointNovelDirectCausalKernelAt_uses_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     jointNovelDirectCausalKernelAt m t i j =
       novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
+            tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
   simp [jointNovelDirectCausalKernelAt]
 
@@ -338,7 +334,6 @@ noncomputable def jointNovelProxyTaggingKernelAt {p q : ℕ}
   ldCorrelationDecay (m.tagCausalDistance i j)
       (m.popGen.fstTransientAt t) m.popGen.recomb *
     novelVariantInnovationAt m.popGen t *
-    (m.popGen.migrationSharedBoostAt t)⁻¹ *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
 
@@ -348,8 +343,7 @@ noncomputable def jointNovelProxyTaggingKernelAt {p q : ℕ}
       ldCorrelationDecay (m.tagCausalDistance i j)
           (m.popGen.fstTransientAt t) m.popGen.recomb *
         novelVariantInnovationAt m.popGen t *
-        (m.popGen.migrationSharedBoostAt t)⁻¹ *
-        tagAlleleFreqRetentionAt m t i *
+            tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
   simp [jointNovelProxyTaggingKernelAt]
 

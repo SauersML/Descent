@@ -578,8 +578,8 @@ def skip_attribute_block(lines, j):
     """Walk `j` back past blank lines and whole `@[...]` attribute blocks.
 
     AN ATTRIBUTE IS NOT ALWAYS ONE LINE. This used to skip only lines that
-    THEMSELVES begin with `@[`, which is every `@[simp]` and no `@[withdrawn
-    "tag" "a sentence of justification"]` -- that form wraps, so the line
+    THEMSELVES begin with `@[`, which is every `@[simp]` and no attribute
+    carrying a wrapped string argument -- that form wraps, so the line
     directly above the declaration is the tail of the attribute's string
     argument and matches nothing. The docstring above it then failed the
     `endswith("-/")` test and the declaration was read as carrying NO docstring
@@ -673,8 +673,7 @@ def ident_lean_files():
 # because a rule with a name can be exempted per file and per rule instead of per file.
 #
 # `Descent/Meta/` and `Descent/Layer.lean` are the corpus's machinery about itself:
-# `assert_below`, `informal_lemma`, `semiformal_result`, the `env_linter`s and the
-# status linter.  Installing syntax and elaboration IS what those modules are, and
+# `assert_below`, the `env_linter`s and the status linter.  Installing syntax and elaboration IS what those modules are, and
 # `partial` is how a linter walks an expression.  Screening them for it reported the
 # auditor's existence as eight defects of the corpus.
 #
@@ -709,22 +708,10 @@ IDENT_SET_OPTION_OTHER = r"(?m)^[ \t]*set_option[ \t]+(?!maxHeartbeats\b)[\w.]+"
 IDENT_MACHINERY_EXEMPT = {
     # The layer gate. `assert_below` is a command, so it is `syntax` and `elab`.
     "Descent/Layer.lean": {IDENT_ELABORATION},
-    # The gap vocabulary: `TODO`, `informal_definition`, `informal_lemma`.
-    "Descent/Meta/Informal.lean": {IDENT_ELABORATION},
-    # `#informal_report`, which is a command.
-    "Descent/Meta/InformalLint.lean": {IDENT_ELABORATION},
     # The `env_linter`s. `partial` is how a linter recurses through an expression.
     "Descent/Meta/Linters.lean": {IDENT_UNSAFE},
     # The status linter, which is also a command.
     "Descent/Meta/StatusLinter.lean": {IDENT_ELABORATION},
-    # `semiformal_result` elaborates a QUOTATION containing `axiom helper` and a
-    # `set_option`, under `withoutModifyingEnv`. Neither reaches an environment
-    # anything can cite -- the file says so at its head, and the elaborated axiom
-    # audit in `Check.lean`, which reads the environment rather than the text, is
-    # what actually holds that claim. This screen reads text and cannot see a
-    # quotation boundary, so what it reports here is the shape of the code and not
-    # its effect.
-    "Descent/Meta/Semiformal.lean": {IDENT_AXIOM, IDENT_SET_OPTION_OTHER},
 }
 
 
@@ -2582,9 +2569,8 @@ def run_identifications() -> int:
     # is "a false DEFINITION sheltered where nothing can contradict it", and scopes the count
     # to modules that define something. What it must mean by "something" is something a
     # measurement could contradict. `DocConvention.statusMarker : List Char`,
-    # `Linters.moduleOf : MetaM Name`, `StatusLinter.statusLinter : Linter` and
-    # `Semiformal.elabSemiformalResult : CommandElab` are the corpus's own tooling; they
-    # assert nothing about a population, and the link demanded -- a theorem naming one of
+    # `Linters.moduleOf : MetaM Name` and `StatusLinter.statusLinter : Linter` are the
+    # corpus's own tooling; they assert nothing about a population, and the link demanded -- a theorem naming one of
     # them beside another module's quantity -- is not a statement anyone can write. The same
     # reasoning already exempts a module of pure theorems over Mathlib objects, which owns
     # nothing to be wrong about; a module owning only elaboration machinery owns no more.
@@ -3913,10 +3899,9 @@ def check_bridges(c: Corpus) -> list[Finding]:
 # Files whose custom syntax IS the corpus's mechanism for enumerating unproved
 # statements, rather than a way of smuggling one in.
 #
-# `Meta/Informal.lean` declares `informal_lemma`, `informal_definition`, `TODO`
-# and `withdrawn`; `Meta/InformalLint.lean` reports on them. Their design point,
-# stated at length in `Informal.lean`'s own module docstring, is that a gap
-# pushes a record into an environment extension and ADDS NO CONSTANT -- "not a
+# The gap vocabulary that once lived in `Meta/Informal.lean` is deleted. Its
+# design point, worth keeping as a note on what this guard is for, was that a gap
+# pushed a record into an environment extension and ADDED NO CONSTANT -- "not a
 # `sorry`, not an axiom, not an opaque constant" -- precisely so that no proof
 # can rest on one. That is the opposite of a trust bypass, and it is stricter
 # than the PhysLean design it is taken from, which does emit an inert record.
@@ -7607,18 +7592,15 @@ def run_shape_routes() -> int:
 #              written to satisfy it."  That is the whole argument, and it is an
 #              argument about auditors.
 #
-#              THE RULE WAS FIRST WRITTEN AS "no edge in either direction", which is
-#              stronger than its own argument and was true only because
-#              `Descent/Meta/` then held nothing but checks.  It stopped being true the
-#              day the directory acquired VOCABULARY: `Descent.Meta.Informal` supplies
-#              the `informal_lemma`, `TODO` and `@[withdrawn]` commands, which a proof
-#              module must import in order to record a gap, and which cannot be
-#              "written to satisfy" because they have no verdict -- they add data to an
-#              environment extension and no constant to the environment.  A file that
-#              declares a gap has not passed a check; there is no check.
+#              THE RULE IS "no edge in either direction".  It was relaxed once, when
+#              `Descent/Meta/` held VOCABULARY as well as checks -- commands a proof
+#              module imported in order to record a gap, which could not be "written to
+#              satisfy" because they had no verdict.  That vocabulary is deleted, the
+#              directory holds nothing but checks again, and the rule is back to the
+#              form its own argument supports.
 #
-#              So the direction that carries the danger is still absolute, and the
-#              direction that carries none is allowed for the named modules in
+#              So the direction that carries the danger is absolute, and so is the
+#              direction that carries none, there being nothing left to name in
 #              `LAYER_META_VOCABULARY` and no others.  Widening a rule to fit a case is
 #              how allowlists start, which is why the set is enumerated here rather
 #              than derived from a path shape, and why the Meta-imports-proof half
@@ -7859,20 +7841,17 @@ LAYER_PENDING = {
 # The self-auditing directory.  See META in the header.
 LAYER_META = "Meta"
 
-# The modules under `Descent/Meta/` a proof module MAY import: the ones that add
-# SYNTAX and read nothing.  `Informal` supplies `TODO`, `informal_definition`,
-# `informal_lemma` and `@[withdrawn]`; `Semiformal` supplies `semiformal_result`.
-# Both import `Lean.Elab.Command` and nothing else, both record into an environment
-# extension, and neither adds a constant to the environment -- so a proof module that
-# imports one gains a way to WRITE DOWN a gap and no way to cite one.
+# The modules under `Descent/Meta/` a proof module MAY import: none.  This held the
+# gap vocabulary -- syntax that read nothing, recorded into an environment extension,
+# and added no constant, so importing it gave a proof module a way to WRITE DOWN a gap
+# and no way to cite one.  That vocabulary is deleted and the set is empty; every module
+# under `Descent/Meta/` now reads the corpus, so every edge into it is the dangerous
+# direction.
 #
-# Enumerated, not derived.  A path-shaped test ("anything not named `*Lint*`") would
-# admit the next auditor somebody files under a neutral name, and the whole value of
-# this rule is that widening it has to be a deliberate edit somebody argues for.
-LAYER_META_VOCABULARY = {
-    "Descent.Meta.Informal",
-    "Descent.Meta.Semiformal",
-}
+# Kept as an empty set rather than removed, because the guard that reads it states the
+# rule, and a rule with no exceptions still needs somewhere for the next one to be
+# argued for.
+LAYER_META_VOCABULARY: set[str] = set()
 
 LAYER_QUALIFIED = re.compile(r"\b([A-Z][A-Za-z0-9]*)\.([A-Za-z_][A-Za-z0-9_'!?]*)")
 

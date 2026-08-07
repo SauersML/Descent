@@ -3183,7 +3183,7 @@ repoint that stayed well-formed would have compiled and been silent.
 The general rule the two share: a textual repoint sees applications. It does not
 see bare constant names in `unfold`/`simp only`/`rw` argument lists, and it does
 not see docstrings — a third instance left an orphaned doc comment above the
-`Step 2` section header when `migrationLDBoost` moved.
+`Step 2` section header when the migration coordinate was deleted.
 
 (That sentence originally quoted the doc-comment opener literally. Lean nests
 block comments, so the quoted opener opened one, the closer below shut only
@@ -3430,117 +3430,6 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
   apply Real.exp_le_exp.mpr
   nlinarith [p.theta_nonneg, p.tau_nonneg]
 
-/-- **Migration LD boost**: migration increases shared LD by introducing
-    alleles from the other population. Models as a correction factor ≥ 1.
-
-    Empirical status: **FALSIFIED in magnitude; the direction is right**
-    (`simcov/battery_bulk55.py`). Two demes split at the same time, with and
-    WITHOUT ongoing migration, and the observable is the RATIO of their
-    cross-deme LD correlation -- a ratio, so no scale has to be fixed. The
-    control, a split at `t = 1` where the two demes are effectively one
-    population, gives `F_ST = 0.0002`.
-
-      τ     bigM    this body   measured boost
-      0.5    0.5     1.1667      1.0669 ± 0.0162
-      0.5    4.0     1.4000      1.1406 ± 0.0166
-      0.5   16.0     1.4706      1.1788 ± 0.0161
-      1.0    0.5     1.3333      1.1197 ± 0.0454
-      1.0    4.0     1.8000      1.2624 ± 0.0450
-      1.0   16.0     1.9412      1.3189 ± 0.0465
-
-    Worst cell 18.17 sems at 24.8% relative, and the gap WIDENS with both
-    arguments -- at `τ = 1, bigM = 16` the body predicts a 94% boost against a
-    measured 32%.
-
-    The direction survives, which is why this is a magnitude failure and not a
-    shape one. A boost of exactly 1 -- no restoration from migration at all --
-    sits 11.13 sems from the measurements, and the measured boost does rise with both `τ` and
-    `bigM`, saturating in `bigM` as the body says. So migration
-    does restore shared LD; it restores roughly a third of what this factor
-    claims.
-
-    Read together with `PortabilityDrift.sharedLD_from_equilibrium`, which finds
-    LD already largely shared without any migration, the picture is consistent:
-    most of the sharing is inherited from before the split, so there is less
-    left for migration to restore than a model starting from zero would expect.
-
-    `PortabilityDrift.migrationSharedBoostAt` is the same expression at
-    generation `t` and is falsified by the same run.
-
-    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
-    battery this cites had never been committed: the verdict was real when it
-    was produced and no reader could check it, which is the same standing as no
-    verdict. `simcov/battery_bulk55.py` is now in the repository, was run against
-    the design described above, and its results are committed beside it.
-    FALSIFIED at worst 15.6 sems (62% relative); no restoration at all is also rejected,
-    at 8.3 sems, so the direction survives and the magnitude does not. Split-half
-    estimator, panmictic control passing at 1.0044 against 1.
-
-    **"MAGNITUDE" WAS THE WRONG READING, AND A WIDER SWEEP SAYS SO.** The runs
-    above held `τ` to 0.5 and 1.0. A factor of two cannot separate "too large by
-    a constant" from "does not depend on `τ` the way the body says", and those
-    call for different repairs -- one rescales a coefficient, the other deletes
-    an argument. `τ` now sweeps 0.25 to 2.0, EIGHTFOLD, at 16 replicates, with the
-    sequence scaled with divergence so the deepest cells stay measurable:
-
-      τ      bigM    this body   measured boost      sems
-      0.25    0.5      1.0833    1.0173 ± 0.0075      8.8
-      0.25    4.0      1.2000    1.0599 ± 0.0066     21.2
-      0.25   16.0      1.2353    1.0858 ± 0.0063     23.7
-      0.50    0.5      1.1667    1.0319 ± 0.0153      8.8
-      0.50    4.0      1.4000    1.1181 ± 0.0146     19.3
-      0.50   16.0      1.4706    1.1624 ± 0.0150     20.5
-      1.00    0.5      1.3333    1.0560 ± 0.0225     12.3
-      1.00    4.0      1.8000    1.2042 ± 0.0238     25.0
-      1.00   16.0      1.9412    1.2476 ± 0.0235     29.5
-      2.00    0.5      1.6667    1.0818 ± 0.0559     10.5
-      2.00    4.0      2.6000    1.2118 ± 0.0620     22.4
-      2.00   16.0      2.8824    1.2488 ± 0.0638     25.6
-
-    Worst 29.5 sems at 56% relative. `1` -- no restoration at all -- is rejected
-    at 13.6 sems on the same cells, so migration does restore shared LD and the
-    direction is not in question.
-
-    **THE SHAPE FAILS WITH ITS MAGNITUDE ALREADY REPAIRED**, which is the finding
-    the narrow sweep could not reach. Two rivals were run as REFUTATION
-    INSTRUMENTS -- each given ONE free amplitude, fitted by weighted least
-    squares to these very cells, while this body was given nothing:
-
-      `1 + a·bigM·τ/(1+bigM)`, this body's own shape        FALSIFIED, 3.90 sems
-      `1 + a·bigM/(1+bigM)`, no `τ` dependence at all       FALSIFIED, 6.30 sems
-
-    The first is decisive. It is the best any rescaling of this body can do, and
-    it still misses -- so **no choice of coefficient repairs the `τ` factor**, and
-    the defect is the proportionality rather than the size. The second rules out
-    the opposite repair: the boost is not independent of divergence either. What
-    the cells trace is a dependence that rises and then flattens, which is
-    neither.
-
-    Fitting can only HELP a rival, so a fitted rival that fails refutes its whole
-    family; the converse does not hold, and a fitted form that agreed would have
-    demonstrated nothing because it was chosen to agree. **No successor is
-    installed here for exactly that reason.** A simulation validates an analytic
-    formula and does not produce one, so the replacement has to come from a
-    derivation of how migration restores ancestral linkage -- and this battery is
-    then what tests it.
-
-    Consumers should read this coordinate as ORDINAL until then: it is right that
-    the boost exceeds one and rises with both arguments (`migrationLDBoost_ge_one`
-    is the first half), and wrong by up to 56% as a magnitude.
-    -/
-noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
-  1 + p.bigM * p.tau / (1 + p.bigM)
-
-/-- Migration LD boost ≥ 1. -/
-theorem migrationLDBoost_ge_one (p : EvolutionaryParameters) :
-    1 ≤ migrationLDBoost p := by
-  unfold migrationLDBoost
-  have h1 : 0 ≤ p.bigM * p.tau / (1 + p.bigM) := by
-    apply div_nonneg
-    · exact mul_nonneg p.bigM_nonneg p.tau_nonneg
-    · linarith [p.bigM_nonneg]
-  linarith
-
 /-- Primitive coordinate record extracted from the coarse evolutionary block.
 These coordinates are stored side by side, but this file does not assert that
 they act independently, are jointly sufficient for transport, or combine into a
@@ -3549,14 +3438,12 @@ structure EvolutionaryCoordinateSummary where
   alleleFreqCoordinate : ℝ
   sharedLDCoordinate : ℝ
   ancestralVariantCoordinate : ℝ
-  migrationCoordinate : ℝ
 
 @[ext] theorem EvolutionaryCoordinateSummary.ext
     {a b : EvolutionaryCoordinateSummary}
     (h₁ : a.alleleFreqCoordinate = b.alleleFreqCoordinate)
     (h₂ : a.sharedLDCoordinate = b.sharedLDCoordinate)
-    (h₃ : a.ancestralVariantCoordinate = b.ancestralVariantCoordinate)
-    (h₄ : a.migrationCoordinate = b.migrationCoordinate) :
+    (h₃ : a.ancestralVariantCoordinate = b.ancestralVariantCoordinate) :
     a = b := by
   cases a
   cases b
@@ -3568,7 +3455,6 @@ noncomputable def EvolutionaryParameters.coordinateSummary
   alleleFreqCoordinate := 1 - fstEquilibrium p
   sharedLDCoordinate := sharedLDRetention p
   ancestralVariantCoordinate := mutationLDErosion p
-  migrationCoordinate := migrationLDBoost p
 
 @[simp] theorem EvolutionaryParameters.coordinateSummary_alleleFreqCoordinate
     (p : EvolutionaryParameters) :
@@ -3585,10 +3471,6 @@ noncomputable def EvolutionaryParameters.coordinateSummary
     p.coordinateSummary.ancestralVariantCoordinate = mutationLDErosion p := by
   rfl
 
-@[simp] theorem EvolutionaryParameters.coordinateSummary_migrationCoordinate
-    (p : EvolutionaryParameters) :
-    p.coordinateSummary.migrationCoordinate = migrationLDBoost p := by
-  rfl
 
 /-- The allele-frequency coordinate is nonnegative, unconditionally.
 
@@ -3617,12 +3499,6 @@ theorem EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate_pos
   rw [EvolutionaryParameters.coordinateSummary_ancestralVariantCoordinate]
   exact mutationLDErosion_pos p
 
-/-- The migration coordinate is at least one. -/
-theorem EvolutionaryParameters.coordinateSummary_migrationCoordinate_ge_one
-    (p : EvolutionaryParameters) :
-    1 ≤ p.coordinateSummary.migrationCoordinate := by
-  rw [EvolutionaryParameters.coordinateSummary_migrationCoordinate]
-  exact migrationLDBoost_ge_one p
 
 /-- **Raising either rate strictly lowers the equilibrium Fst**, at a fixed population
 size.  `fstEquilibrium` is `1/(1 + θ + 2M)` with `θ = 4Nₑμ` and `M = 4Nₑm`, so both rates
@@ -4430,7 +4306,6 @@ noncomputable def PGSEvolutionaryModel.coordinateSummary
   alleleFreqCoordinate := 1 - m.fstTransient
   sharedLDCoordinate := sharedLDRetention m.toEvo
   ancestralVariantCoordinate := mutationLDErosion m.toEvo
-  migrationCoordinate := migrationLDBoost m.toEvo
 
 @[simp] theorem PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate
     (m : PGSEvolutionaryModel) :
@@ -4447,10 +4322,6 @@ noncomputable def PGSEvolutionaryModel.coordinateSummary
     m.coordinateSummary.ancestralVariantCoordinate = mutationLDErosion m.toEvo := by
   rfl
 
-@[simp] theorem PGSEvolutionaryModel.coordinateSummary_migrationCoordinate
-    (m : PGSEvolutionaryModel) :
-    m.coordinateSummary.migrationCoordinate = migrationLDBoost m.toEvo := by
-  rfl
 
 /-- Fully expanded evolutionary coordinate summary. Each field is a separate
 coarse coordinate, not a joint portability law. -/
@@ -4461,12 +4332,11 @@ theorem PGSEvolutionaryModel.coordinateSummary_explicit
           1 - fstEquilibrium m.toEvo *
             (1 - fstTransientDecayFromScaled m.Ne ⟨m.theta⟩ ⟨m.bigM⟩ ^ (Nat.floor m.t_div))
         sharedLDCoordinate := (1 - m.recomb) ^ (2 * m.t_div)
-        ancestralVariantCoordinate := Real.exp (-m.theta * m.tau)
-        migrationCoordinate := 1 + m.bigM * m.tau / (1 + m.bigM) } := by
+        ancestralVariantCoordinate := Real.exp (-m.theta * m.tau) } := by
   ext <;>
     simp [PGSEvolutionaryModel.coordinateSummary, PGSEvolutionaryModel.fstTransient,
       PGSEvolutionaryModel.toEvo,
-      sharedLDRetention, mutationLDErosion, migrationLDBoost, fstEquilibrium,
+      sharedLDRetention, mutationLDErosion, fstEquilibrium,
         Descent.Core.fstFromFlow]
 
 /-! ### Step 3: Metric evaluation from explicit target signal and additive losses
@@ -4736,10 +4606,6 @@ theorem fstDriftMigrationManyDemes_at_witness :
   norm_num [fstDriftMigrationManyDemes, EvolutionaryParameters.bigM,
     EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
-theorem migrationLDBoost_at_witness :
-    migrationLDBoost EvolutionaryParameters.witness = 7 / 5 := by
-  norm_num [migrationLDBoost, EvolutionaryParameters.bigM, EvolutionaryParameters.tau,
-    EvolutionaryParameters.witness, Descent.Core.scaledMigrationRate, Descent.Core.ploidy]
 
 theorem mutationLDErosion_at_witness :
     mutationLDErosion EvolutionaryParameters.witness = Real.exp (-2) := by

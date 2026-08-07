@@ -196,33 +196,6 @@ noncomputable def _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   Real.exp (-g.theta.value * (g.tauAt t).value)
 
-/-- Migration-driven restoration of shared variation after `t` generations.
-
-    Empirical status: **FALSIFIED in magnitude** (`simcov/battery_bulk55.py`).
-    This is `DGP.migrationLDBoost` evaluated at generation `t`, and the same run
-    falsifies both: the measured boost in cross-deme LD correlation from ongoing
-    migration is roughly a third of what this factor claims, with the gap
-    widening in both `τ` and `bigM`. At `τ = 1, bigM = 16` the body predicts a
-    94% boost against a measured 32%, worst cell 18.17 sems.
-
-    The direction is right -- no boost at all sits 11 sems away, and the
-    measured value does rise with `t` and saturate in `bigM` as written. See
-    `DGP.migrationLDBoost` for the table and for why the overstatement is
-    expected: most LD sharing is inherited from before the split, so there is
-    less for migration to restore than a model starting from zero assumes.
-
-    REBUILT AND RE-RUN, and the numbers above are superseded by these. The
-    battery this cites had never been committed: the verdict was real when it
-    was produced and no reader could check it, which is the same standing as no
-    verdict. `simcov/battery_bulk55.py` is now in the repository, was run against
-    the design described above, and its results are committed beside it.
-    FALSIFIED at worst 15.6 sems (62% relative) on the same run that falsifies
-    `DGP.migrationLDBoost`, of which this is the generation-t reading.
-    -/
-noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
-    (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  1 + g.bigM.value * (g.tauAt t).value / (1 + g.bigM.value)
-
 @[simp] theorem _root_.Descent.Core.PopGenParameters.tauAt_zero (g : Descent.Core.PopGenParameters)
   :
     (g.tauAt 0).value = 0 := by
@@ -239,14 +212,6 @@ noncomputable def _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt
     g.mutationSharedRetentionAt 0 = 1 := by
   simp [Descent.Core.PopGenParameters.mutationSharedRetentionAt,
     Descent.Core.PopGenParameters.tauAt]
-
-@[simp] theorem _root_.Descent.Core.PopGenParameters.migrationSharedBoostAt_zero (g :
-  Descent.Core.PopGenParameters) :
-    g.migrationSharedBoostAt 0 = 1 := by
-  simp [Descent.Core.PopGenParameters.migrationSharedBoostAt, Descent.Core.PopGenParameters.tauAt,
-    Descent.Core.Tau.ofGenerations,
-    Descent.Core.BigM.ofRate, Descent.Core.scalingConstant, Descent.Core.ratio,
-    PopGen.EvolutionaryParameters.bigM]
 
 
 /-- Exact bridge from the coarse DGP evolutionary block to the
@@ -345,22 +310,6 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationShared
     PopGen.EvolutionaryParameters.theta, PopGen.EvolutionaryParameters.tau]
   rw [h_disc, Nat.floor_natCast]
 
-/-- When divergence time is an integer number of generations, the coarse
-migration-history coordinate agrees exactly with the generational popgen bridge
-at that generation. -/
-theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_migrationSharedBoostAt_floor
-    (m : PopGen.PGSEvolutionaryModel)
-    (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
-    (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
-      PopGen.migrationLDBoost m.toEvo := by
-  unfold Descent.Core.PopGenParameters.migrationSharedBoostAt
-    PopGen.PGSEvolutionaryModel.toEvo PopGen.migrationLDBoost
-  rw [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_bigM]
-  simp only [Descent.Core.PopGenParameters.tauAt, Descent.Core.Tau.value_ofGenerations,
-    PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
-    PopGen.EvolutionaryParameters.bigM, PopGen.EvolutionaryParameters.tau]
-  rw [h_disc, Nat.floor_natCast]
-
 /-- Exact bridge from the DGP coordinate summary to the generational popgen
 coordinates for the fields that genuinely match. The LD coordinate is
 deliberately excluded here because the mechanistic model uses a joint
@@ -372,19 +321,14 @@ theorem
     m.coordinateSummary.alleleFreqCoordinate =
       1 - (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) ∧
     m.coordinateSummary.ancestralVariantCoordinate =
-      (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) ∧
-    m.coordinateSummary.migrationCoordinate =
-      (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) := by
-  refine ⟨?_, ?_, ?_⟩
+      (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) := by
+  refine ⟨?_, ?_⟩
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_alleleFreqCoordinate]
     exact congrArg (fun x ↦ 1 - x)
       (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
     exact
       (PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor
-      m h_disc).symm
-  · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
-    exact (PopGen.PGSEvolutionaryModel.toGenerational_migrationSharedBoostAt_floor
       m h_disc).symm
 
 /-- Allele-frequency mismatch penalty. This penalizes transport when target
