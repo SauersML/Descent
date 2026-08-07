@@ -964,7 +964,6 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
               rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
                     = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
-              ring
       _ < Real.exp (-(1 : ℝ)) * 1 := by
               exact mul_lt_mul_of_pos_left h_ld_gap_lt_one (by positivity)
       _ = popgenDrivenTagScale := by simp [popgenDrivenTagScale, Descent.Core.scaledMutationRate,
@@ -996,7 +995,6 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
               rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
                     = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
-              ring
       _ ≤ ((1 / 2 : ℝ)) * 1 := by
               have h_exp_nonneg : 0 ≤ Real.exp (-popgenDrivenLDDecayExponent) := by positivity
               nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one, h_exp_nonneg]
