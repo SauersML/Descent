@@ -9,6 +9,7 @@ assert_below Descent.Decision Descent.Program
 namespace Descent.Portability
 
 open MeasureTheory
+open PopGen (genotypeVarianceHWE)
 
 /-!
 # Statistical Power and PGS Portability
@@ -490,15 +491,6 @@ of two is visible. -/
 theorem hweHeterozygosity_at_half : Descent.Core.hweHeterozygosity (1 / 2) = 1 / 2 := by
   unfold Descent.Core.hweHeterozygosity Descent.Core.ploidy
   norm_num
-
-/-- **The heterozygote frequency and the genotype variance coincide under
-Hardy-Weinberg.** They are different quantities — one is a probability, one is
-a second moment — and this is the only thing that licenses writing either
-formula where the other is meant. -/
-theorem hweHeterozygosity_eq_genotypeVarianceHWE (p : ℝ) :
-    Descent.Core.hweHeterozygosity p = genotypeVarianceHWE p := by
-  unfold Descent.Core.hweHeterozygosity genotypeVarianceHWE Descent.Core.hweHeterozygosity
-    Descent.Core.ploidy; ring
 
 /-- Heterozygosity is strictly increasing on (0, 1/2).
     Proof: het(q) - het(p) = 2(q - p)(1 - p - q). When p < q < 1/2,

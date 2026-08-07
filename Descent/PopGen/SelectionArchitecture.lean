@@ -931,7 +931,7 @@ noncomputable def gwasNCP (n : ℕ) (β p : ℝ) : ℝ :=
 theorem gwasNCP_at_reference_point :
     gwasNCP 1 1 (1 / 2) = 1 / 2 := by
   norm_num [gwasNCP, Portability.ncp, Portability.effectiveFisherInformation,
-    Portability.fisherInformation, Portability.genotypeVarianceHWE,
+    Portability.fisherInformation, genotypeVarianceHWE,
       Descent.Core.product,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
@@ -989,7 +989,7 @@ theorem ncp_ratio_from_maf
     gwasNCP n β p₁ < gwasNCP n β p₂ := by
   unfold gwasNCP
   unfold Portability.ncp Portability.effectiveFisherInformation Portability.fisherInformation
-    Portability.genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity
+    genotypeVarianceHWE Descent.Core.product Descent.Core.hweHeterozygosity
     Descent.Core.ploidy
   simp only [mul_one]
   apply mul_lt_mul_of_pos_right _ (sq_pos_of_pos hβ)
@@ -1219,9 +1219,9 @@ theorem cross_trait_portability_bound
 end Pleiotropy
 
 theorem gwasNCP_uses_hwe (n : ℕ) (β p : ℝ) :
-    PopGen.gwasNCP n β p = n * β ^ 2 * Portability.genotypeVarianceHWE p := by
+    PopGen.gwasNCP n β p = n * β ^ 2 * genotypeVarianceHWE p := by
   unfold PopGen.gwasNCP Portability.ncp Portability.effectiveFisherInformation
-    Portability.fisherInformation Portability.genotypeVarianceHWE
+    Portability.fisherInformation genotypeVarianceHWE
     Descent.Core.product Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring_nf
 

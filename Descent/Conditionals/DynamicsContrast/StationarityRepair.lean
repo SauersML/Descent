@@ -170,10 +170,10 @@ probability-normalized merger law has pair-merger rate one, whereas the three-li
 its first merger-fraction moment.  The displayed point-mass pair is the smallest exact
 witness: identical at two lineages and separated at three. -/
 theorem pairwiseGenealogy_blind_threeLineage_visible :
-    Blindness.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 0) 2 2 =
-        Blindness.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 1) 2 2 ∧
-      Blindness.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 0) 3 3 = 0 ∧
-      Blindness.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 1) 3 3 = 1 :=
+    Coalescent.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 0) 2 2 =
+        Coalescent.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 1) 2 2 ∧
+      Coalescent.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 0) 3 3 = 0 ∧
+      Coalescent.lambdaCoalescentMergerRate (MeasureTheory.Measure.dirac 1) 3 3 = 1 :=
   Blindness.pairwise_blind_three_lineage_separates_dirac
 
 /-- **Speed-conditioned genealogy is identified at three lineages, not two.**  In the

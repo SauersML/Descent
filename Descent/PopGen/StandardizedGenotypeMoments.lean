@@ -6,7 +6,6 @@ import Descent.Spectral.PolygenicSpectroscopy
 -- moment lemmas are named throughout, each through the module that defines it.
 import Descent.Blindness.EpistaticChaos
 import Descent.Conditionals.LatentMechanismCollapse
-import Descent.Portability.AncestrySpecificPower
 
 assert_below Descent.Decision
 
@@ -70,9 +69,9 @@ open scoped BigOperators
 is the corpus-wide `genotypeVarianceHWE`, which is built from the single `ploidy`
 constant. Drift between the two is now a compile error. -/
 theorem mellinDrift_uses_ploidy (h : Foundations.HardyWeinbergModel) :
-    h.genotypeVariance = Portability.genotypeVarianceHWE h.altFreq := by
+    h.genotypeVariance = genotypeVarianceHWE h.altFreq := by
   rw [h.genotypeVariance_eq]
-  unfold Portability.genotypeVarianceHWE Foundations.HardyWeinbergModel.refFreq
+  unfold genotypeVarianceHWE Foundations.HardyWeinbergModel.refFreq
     Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
 
@@ -82,7 +81,7 @@ variance, with no second convention introduced. -/
 theorem standardizedSquare_eq_over_genotypeVarianceHWE
     (h : Foundations.HardyWeinbergModel) (g : Foundations.DiploidGenotype) :
     h.standardizedSquare g =
-      (h.centeredAltAlleleCount g) ^ 2 / Portability.genotypeVarianceHWE h.altFreq := by
+      (h.centeredAltAlleleCount g) ^ 2 / genotypeVarianceHWE h.altFreq := by
   unfold Foundations.HardyWeinbergModel.standardizedSquare
   rw [mellinDrift_uses_ploidy]
 
@@ -312,7 +311,7 @@ compiling. -/
 theorem hweStandardizedFourthMoment_eq_inv_genotypeVarianceHWE (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 4 =
-      1 / Portability.genotypeVarianceHWE h.altFreq := by
+      1 / genotypeVarianceHWE h.altFreq := by
   rw [Blindness.standardizedGenotype_fourth_moment h hq0 hq1, mellinDrift_uses_ploidy]
 
 /-- The squared standardized genotype is the corpus's `standardizedSquare`: the level-two
@@ -478,8 +477,8 @@ theorem gaussianKurtosisMaf_lt_one : gaussianKurtosisMaf < 1 := by
 
 /-- At the blind frequency the genotype variance is exactly `1/3`. -/
 theorem gaussianKurtosisMaf_genotypeVariance :
-    Portability.genotypeVarianceHWE gaussianKurtosisMaf = 1 / 3 := by
-  unfold Portability.genotypeVarianceHWE gaussianKurtosisMaf Descent.Core.hweHeterozygosity
+    genotypeVarianceHWE gaussianKurtosisMaf = 1 / 3 := by
+  unfold genotypeVarianceHWE gaussianKurtosisMaf Descent.Core.hweHeterozygosity
     Descent.Core.ploidy
   nlinarith [sqrt_three_sq]
 

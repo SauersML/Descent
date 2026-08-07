@@ -43,7 +43,7 @@ section LDMatrixProperties
 
 /-! **Diagonal of LD matrix is genotype variance.** `Σ_jj = 2p_j(1-p_j)`.
 
-This is `genotypeVarianceHWE` from `Descent.Portability.AncestrySpecificPower`. Do not define it
+This is `genotypeVarianceHWE` from `Descent.PopGen.DGP`. Do not define it
 here: the ploidy convention lives in a single place, and its empirical status and
 `Denotes` declaration belong with that definition. -/
 

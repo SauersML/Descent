@@ -10,6 +10,8 @@ assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
+open PopGen (genotypeVarianceHWE)
+
 open MeasureTheory
 
 /-!

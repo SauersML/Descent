@@ -2,15 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StateSpace
-import Descent.Blindness.MultipleMergerBlindness
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.Tactic
 
-assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
+assert_below Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
---   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`
--- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent
 
@@ -65,6 +63,43 @@ namespace Coalescent
 
 open MeasureTheory
 
+/-- Rate at which a specified `k`-tuple among `b` active lineages merges in a
+`Λ`-coalescent.  Natural-number subtraction makes the definition total; the biological range
+is `2 ≤ k ≤ b`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM. The integral IS the definition of a
+`Λ`-coalescent (Pitman 1999, Sagitov 1999): a `Λ`-coalescent is by construction the process
+whose `k`-of-`b` merger rate is `∫ x^(k-2) (1-x)^(b-k) dΛ`, so no population can make this
+formula a different one. It is a modelling frame, and the only empirical questions --
+which `Λ` a real population has, and whether one exists at all -- are claims about the
+INPUT `Λ`, and `Descent.Blindness.MultipleMergerBlindness` is where the corpus keeps what a
+pairwise spectrum can answer about them. `lambdaCoalescentMergerRate_two_two` is the
+sharpest form: after normalization the pair rate is `1` for every `Λ`, so it carries no
+information about which one. -/
+noncomputable def lambdaCoalescentMergerRate
+    (Λ : Measure ℝ) (b k : ℕ) : ℝ :=
+  ∫ x, x ^ (k - 2) * (1 - x) ^ (b - k) ∂Λ
+
+/-- **Every normalized merger law has the same pair rate.**  After the conventional
+probability normalization of `Λ`, the two-lineage merger rate is `1`, whatever `Λ` is.
+`Descent.Blindness.MultipleMergerBlindness` draws the blindness consequence; the value
+itself is arithmetic and belongs with the definition. -/
+@[simp] theorem lambdaCoalescentMergerRate_two_two
+    (Λ : Measure ℝ) [IsProbabilityMeasure Λ] :
+    lambdaCoalescentMergerRate Λ 2 2 = 1 := by
+  simp [lambdaCoalescentMergerRate]
+
+/-- Three simultaneous lineages expose the first moment of the merger-fraction law. -/
+theorem lambdaCoalescentMergerRate_three_three (Λ : Measure ℝ) :
+    lambdaCoalescentMergerRate Λ 3 3 = ∫ x, x ∂Λ := by
+  simp [lambdaCoalescentMergerRate]
+
+/-- A point-mass merger law has three-lineage rate equal to its merger fraction. -/
+@[simp] theorem lambdaCoalescentMergerRate_dirac_three_three (fraction : ℝ) :
+    lambdaCoalescentMergerRate (Measure.dirac fraction) 3 3 = fraction := by
+  rw [lambdaCoalescentMergerRate_three_three]
+  simp
+
 /-- **Pitman's consistency condition.**  A `k`-merger among `b` blocks is a `k`-merger among
 `b+1` that misses the extra block, or a `(k+1)`-merger that includes it.  A rate array
 satisfying this, and only such an array, comes from a single process compatible across
@@ -89,14 +124,14 @@ form, by linearity of the integral over the pointwise split.  This is the theore
 
 The integrability hypotheses are the honest cost of stating it for a general finite measure:
 on `[0,1]` the integrands are bounded and the hypotheses are automatic, but `Λ` here is any
-measure on `ℝ`, as `Descent.Blindness.MultipleMergerBlindness` defines it. -/
+measure on `ℝ`, which is the generality the definition above is stated in. -/
 theorem lambdaRate_consistent (Λ : Measure ℝ) {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b)
     (h1 : Integrable (fun x : ℝ ↦ x ^ (k - 2) * (1 - x) ^ (b + 1 - k)) Λ)
     (h2 : Integrable (fun x : ℝ ↦ x ^ (k + 1 - 2) * (1 - x) ^ (b + 1 - (k + 1))) Λ) :
-    Blindness.lambdaCoalescentMergerRate Λ b k
-      = Blindness.lambdaCoalescentMergerRate Λ (b + 1) k + Blindness.lambdaCoalescentMergerRate Λ (b
+    lambdaCoalescentMergerRate Λ b k
+      = lambdaCoalescentMergerRate Λ (b + 1) k + lambdaCoalescentMergerRate Λ (b
         + 1) (k + 1) := by
-  unfold Blindness.lambdaCoalescentMergerRate
+  unfold lambdaCoalescentMergerRate
   rw [← integral_add h1 h2]
   exact integral_congr_ae (Filter.Eventually.of_forall fun x ↦ lambdaIntegrand_split hk hkb x)
 
@@ -118,8 +153,8 @@ possible merger: `x^{k-2}` vanishes at `x = 0` unless `k = 2`, and then the inte
 `1`.  So the whole of `Descent.Coalescent` -- the state space, the rates, the jump chain,
 the Ewens formula -- is the `δ₀` fibre of Pitman's family. -/
 theorem lambdaRate_dirac_zero {b k : ℕ} (hk : 2 ≤ k) (hkb : k ≤ b) :
-    Blindness.lambdaCoalescentMergerRate (Measure.dirac 0) b k = kingmanRate b k := by
-  unfold Blindness.lambdaCoalescentMergerRate kingmanRate
+    lambdaCoalescentMergerRate (Measure.dirac 0) b k = kingmanRate b k := by
+  unfold lambdaCoalescentMergerRate kingmanRate
   rw [integral_dirac]
   by_cases h : k = 2
   · subst h

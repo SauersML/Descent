@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.BayesianPGSTheory
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Descent.Portability.MechanisticPortabilityWitnesses
-import Descent.Portability.AncestrySpecificPower
 import Descent.PopGen.HaplotypeTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
@@ -76,12 +75,12 @@ section GWASDiscovery
     the two frequencies coincide, so a grid at matched frequencies would have
     had no power and this one does. -/
 noncomputable def discoveryNCP (n β maf_causal ld : ℝ) : ℝ :=
-  n * β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf_causal
+  n * β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf_causal
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem discoveryNCP_at_reference_point :
     discoveryNCP 1 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [discoveryNCP, Portability.genotypeVarianceHWE,
+  norm_num [discoveryNCP, genotypeVarianceHWE,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
 /-- A locus is discovered when its test statistic crosses the genome-wide
@@ -134,7 +133,7 @@ the other -- and the noncentrality parameter is even in the first and, through
 of the variant, and which allele the assembly happens to call reference is not. -/
 theorem discoveryNCP_allele_swap (n β maf ld : ℝ) :
     discoveryNCP n (-β) (1 - maf) ld = discoveryNCP n β maf ld := by
-  unfold discoveryNCP Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity
+  unfold discoveryNCP genotypeVarianceHWE Descent.Core.hweHeterozygosity
     Descent.Core.ploidy
   ring
 
@@ -176,7 +175,7 @@ theorem discoveryNCP_increases_with_n
     have h_var : 0 < 2 * p * (1 - p) := by
       nlinarith
     exact mul_pos (mul_pos hβ2 hld2) h_var
-  simpa [Portability.genotypeVarianceHWE, mul_assoc,
+  simpa [genotypeVarianceHWE, mul_assoc,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy] using
     mul_lt_mul_of_pos_right (Nat.cast_lt.mpr h_n) h_factor
 
@@ -186,12 +185,12 @@ theorem genotypeVarianceHWE_strictMono_left_half
     (maf₁ maf₂ : ℝ)
     (h_order : maf₂ < maf₁)
     (h_maf₁_half : maf₁ ≤ 1 / 2) :
-    Portability.genotypeVarianceHWE maf₂ < Portability.genotypeVarianceHWE maf₁ := by
+    genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
   -- The shape fact -- `2 p (1 - p)` rises with `p` below the turning point -- is
   -- `two_mul_one_sub_strictMono_le_half` in `Descent.Foundations.Probability`, where it is about a
   -- real number rather than about a minor allele.  This theorem is that fact read through
   -- the name the genotype variance carries here.
-  unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   exact Foundations.two_mul_one_sub_strictMono_le_half maf₂ maf₁ h_order h_maf₁_half
 
 /-- **Different LD and MAF can produce population-specific GWAS hits.**
@@ -216,24 +215,24 @@ theorem different_populations_different_hits
       gwasDiscovered n β maf₁ ld₁ z ∧ ¬ gwasDiscovered n β maf₂ ld₂ z := by
   rcases h_threshold_between with ⟨h_pop2_below, h_pop1_above⟩
   have h_var :
-      Portability.genotypeVarianceHWE maf₂ < Portability.genotypeVarianceHWE maf₁ := by
+      genotypeVarianceHWE maf₂ < genotypeVarianceHWE maf₁ := by
     exact genotypeVarianceHWE_strictMono_left_half
       maf₁ maf₂ h_maf_order h_maf₁_half
-  have h_var_pos : 0 < Portability.genotypeVarianceHWE maf₂ := by
-    unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+  have h_var_pos : 0 < genotypeVarianceHWE maf₂ := by
+    unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
     have h_maf₂_lt_one : maf₂ < 1 := by
       have h_maf₂_lt_half : maf₂ < 1 / 2 := lt_of_lt_of_le h_maf_order h_maf₁_half
       linarith
     nlinarith [mul_pos h_maf₂_pos (sub_pos.mpr h_maf₂_lt_one)]
   have h_ld_sq_nn : 0 ≤ ld₁ ^ 2 := sq_nonneg ld₁
   have h_prod_lt :
-      ld₂ ^ 2 * Portability.genotypeVarianceHWE maf₂ <
-        ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₁ := by
+      ld₂ ^ 2 * genotypeVarianceHWE maf₂ <
+        ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
     calc
-      ld₂ ^ 2 * Portability.genotypeVarianceHWE maf₂
-        < ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₂ := by
+      ld₂ ^ 2 * genotypeVarianceHWE maf₂
+        < ld₁ ^ 2 * genotypeVarianceHWE maf₂ := by
             exact mul_lt_mul_of_pos_right h_ld_sq h_var_pos
-      _ ≤ ld₁ ^ 2 * Portability.genotypeVarianceHWE maf₁ := by
+      _ ≤ ld₁ ^ 2 * genotypeVarianceHWE maf₁ := by
             exact mul_le_mul_of_nonneg_left (le_of_lt h_var) h_ld_sq_nn
   have h_prefactor_pos : 0 < n * β ^ 2 := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
@@ -782,7 +781,7 @@ noncomputable def multiTraitDiscoveryNCP
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem multiTraitDiscoveryNCP_at_reference_point :
     multiTraitDiscoveryNCP 1 1 0 1 1 (1 / 2) 1 = 1 / 2 := by
-  norm_num [multiTraitDiscoveryNCP, discoveryNCP, Portability.genotypeVarianceHWE,
+  norm_num [multiTraitDiscoveryNCP, discoveryNCP, genotypeVarianceHWE,
     multiTraitEffectiveSampleSize,
       Descent.Core.hweHeterozygosity, Descent.Core.ploidy]
 
@@ -1052,20 +1051,20 @@ theorem multi_trait_increases_effective_n
   have h_n : n₁ < multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance := by
     unfold multiTraitEffectiveSampleSize
     linarith
-  have h_factor : 0 < β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf := by
+  have h_factor : 0 < β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf := by
     have h_beta_sq : 0 < β ^ 2 := sq_pos_of_ne_zero h_beta
     have h_ld_sq : 0 < ld ^ 2 := sq_pos_of_ne_zero h_ld
-    have h_var : 0 < Portability.genotypeVarianceHWE maf := by
-      unfold Portability.genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
+    have h_var : 0 < genotypeVarianceHWE maf := by
+      unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
       nlinarith [mul_pos h_maf (sub_pos.mpr h_maf_lt_one)]
     exact mul_pos (mul_pos h_beta_sq h_ld_sq) h_var
   constructor
   · exact h_n
   · unfold multiTraitDiscoveryNCP discoveryNCP
     have h_ncp :
-        n₁ * (β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf) <
+        n₁ * (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) <
           multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance *
-            (β ^ 2 * ld ^ 2 * Portability.genotypeVarianceHWE maf) :=
+            (β ^ 2 * ld ^ 2 * genotypeVarianceHWE maf) :=
       mul_lt_mul_of_pos_right h_n h_factor
     simpa [mul_assoc, mul_left_comm, mul_comm] using h_ncp
 

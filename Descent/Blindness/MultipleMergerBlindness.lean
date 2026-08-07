@@ -6,6 +6,7 @@ import Mathlib.MeasureTheory.Measure.Dirac
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.PSeries
 import Mathlib.Tactic
+import Descent.Coalescent.Lambda
 import Descent.Core.Ratios
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -52,55 +53,23 @@ the results below say exactly what becomes identifiable once a normalized `Λ` l
 open MeasureTheory
 open Filter
 
-/-- Rate at which a specified `k`-tuple among `b` active lineages merges in a
-`Λ`-coalescent.  Natural-number subtraction makes the definition total; the biological range
-is `2 ≤ k ≤ b`.
-
-Empirical status: NOT AN EMPIRICAL CLAIM. The integral IS the definition of a
-`Λ`-coalescent (Pitman 1999, Sagitov 1999): a `Λ`-coalescent is by construction the process
-whose `k`-of-`b` merger rate is `∫ x^(k-2) (1-x)^(b-k) dΛ`, so no population can make this
-formula a different one. It is a modelling frame, and the only empirical questions --
-which `Λ` a real population has, and whether one exists at all -- are claims about the
-INPUT `Λ`, which is exactly what this file shows the pairwise spectrum cannot answer.
-`lambdaCoalescentMergerRate_two_two` is the sharpest form of that: after normalization the
-pair rate is `1` for every `Λ`, so it carries no information about which one. -/
-noncomputable def lambdaCoalescentMergerRate
-    (Λ : Measure ℝ) (b k : ℕ) : ℝ :=
-  ∫ x, x ^ (k - 2) * (1 - x) ^ (b - k) ∂Λ
-
-/-- **Universal pairwise blindness.**  After the conventional probability normalization of
-`Λ`, every multiple-merger model has the same two-lineage merger rate. -/
-@[simp] theorem lambdaCoalescentMergerRate_two_two
-    (Λ : Measure ℝ) [IsProbabilityMeasure Λ] :
-    lambdaCoalescentMergerRate Λ 2 2 = 1 := by
-  simp [lambdaCoalescentMergerRate]
-
-/-- Therefore no statistic that sees a normalized `Λ` only through its pair-merger rate can
-distinguish two merger laws. -/
+/-- **Universal pairwise blindness.**  `Descent.Coalescent.Lambda` computes the normalized
+pair-merger rate and finds it is `1` for every `Λ`.  The consequence is this file's subject:
+no statistic that sees a normalized `Λ` only through its pair-merger rate can distinguish
+two merger laws, because there is nothing there to see. -/
 theorem lambdaCoalescent_pairwise_rate_blind
     (Λ₁ Λ₂ : Measure ℝ) [IsProbabilityMeasure Λ₁] [IsProbabilityMeasure Λ₂] :
-    lambdaCoalescentMergerRate Λ₁ 2 2 =
-      lambdaCoalescentMergerRate Λ₂ 2 2 := by
-  simp
-
-/-- Three simultaneous lineages expose the first moment of the merger-fraction law. -/
-theorem lambdaCoalescentMergerRate_three_three (Λ : Measure ℝ) :
-    lambdaCoalescentMergerRate Λ 3 3 = ∫ x, x ∂Λ := by
-  simp [lambdaCoalescentMergerRate]
-
-/-- A point-mass merger law has three-lineage rate equal to its merger fraction. -/
-@[simp] theorem lambdaCoalescentMergerRate_dirac_three_three (fraction : ℝ) :
-    lambdaCoalescentMergerRate (Measure.dirac fraction) 3 3 = fraction := by
-  rw [lambdaCoalescentMergerRate_three_three]
+    Coalescent.lambdaCoalescentMergerRate Λ₁ 2 2 =
+      Coalescent.lambdaCoalescentMergerRate Λ₂ 2 2 := by
   simp
 
 /-- **Exact smallest-sample separation.**  Point-mass merger laws at fractions zero and one
 are indistinguishable at two lineages and maximally separated at three lineages. -/
 theorem pairwise_blind_three_lineage_separates_dirac :
-    lambdaCoalescentMergerRate (Measure.dirac 0) 2 2 =
-        lambdaCoalescentMergerRate (Measure.dirac 1) 2 2 ∧
-      lambdaCoalescentMergerRate (Measure.dirac 0) 3 3 = 0 ∧
-      lambdaCoalescentMergerRate (Measure.dirac 1) 3 3 = 1 := by
+    Coalescent.lambdaCoalescentMergerRate (Measure.dirac 0) 2 2 =
+        Coalescent.lambdaCoalescentMergerRate (Measure.dirac 1) 2 2 ∧
+      Coalescent.lambdaCoalescentMergerRate (Measure.dirac 0) 3 3 = 0 ∧
+      Coalescent.lambdaCoalescentMergerRate (Measure.dirac 1) 3 3 = 1 := by
   simp
 
 /-! ## Complete normalized speed-tilt rate chart -/

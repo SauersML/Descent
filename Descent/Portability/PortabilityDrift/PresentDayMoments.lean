@@ -16,6 +16,7 @@ assert_below Descent.Decision Descent.Program
 namespace Descent.Portability
 
 open MeasureTheory
+open PopGen (genotypeVarianceHWE)
 
 open PopGen.TransportedMetrics (r2FromSignalVariance r2FromSignalVariance_eq_rsquared
   equalVarianceGaussianAUCFromSignalVariance
