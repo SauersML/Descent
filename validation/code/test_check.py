@@ -834,8 +834,50 @@ import Descent.Core.Spine
     }
 
 
+# `core-empirics` joins Core's docstrings against `simcov/ledger.json`, and
+# `LEDGER_PATH` is built from `CORPUS`, so a fixture corpus can carry its own ledger --
+# which is the only way to test a rule whose whole content is the join.
+CORE_EMPIRICS_LEAN = HEADER + """
+namespace Descent.Core
+
+/-- A quantity a battery measured.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a definition and the laws
+    computed from it. -/
+noncomputable def measuredRate (x : ℝ) : ℝ :=
+  x
+
+end Descent.Core
+"""
+
+
+def core_empirics_corpus(verdict: str) -> dict:
+    """Core's surface, plus a ledger holding one row against it."""
+    ledger = {
+        "records": [
+            {
+                "role": "corpus",
+                "declaration": "measuredRate",
+                "lean_file": "Descent/Core/Rates.lean",
+                "verdict": verdict,
+                "battery": "fixture1",
+            }
+        ]
+    }
+    return {
+        "Descent.lean": HEADER + "\nimport Descent.Core\n",
+        "Descent/Core.lean": HEADER + "\nimport Descent.Core.Rates\n",
+        "Descent/Core/Rates.lean": CORE_EMPIRICS_LEAN,
+        "validation/empirical/simcov/ledger.json": json.dumps(ledger, indent=2),
+    }
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
+    ("core-empirics", "a Core declaration denying measurement the ledger measured",
+     core_empirics_corpus("MATCH"), "while the ledger holds"),
+    ("core-empirics", "a FALSIFIED row whose declaration never names the battery",
+     core_empirics_corpus("FALSIFIED"), "never names that battery"),
     ("shape-spine", "a theorem binding the record and naming a deployed metric",
      spine_corpus(), "have: carries_demography_to_r2"),
     ("heads", "a module on disk that its directory head does not import",
