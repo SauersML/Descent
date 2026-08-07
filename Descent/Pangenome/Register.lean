@@ -5,6 +5,7 @@ import Mathlib.Algebra.BigOperators.Group.Finset.Defs
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic
+import Descent.Core.Ratios
 import Descent.Layer
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
