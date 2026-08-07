@@ -578,6 +578,21 @@ theorem portabilityGap_at_reference_point :
   norm_num [portabilityGap,
       Descent.Core.difference]
 
+/-- **Comparing two populations' gaps compares the populations, not the discovery cohort.**
+
+The `Descent.Core.difference` between the gaps two target populations face against a common
+source is the gap between those two targets, with the source cancelling out entirely. The
+inequity BETWEEN two under-served populations is therefore a fact about them, and a discovery
+cohort that improves for everyone cannot narrow it: raising the source `R²` raises both gaps
+by the same amount. That is the equity reading this section is for, and it holds only because
+the gap is a difference of two accuracies rather than a ratio of them. -/
+theorem portabilityGap_between_targets (r2_source r2_target₁ r2_target₂ : ℝ) :
+    Descent.Core.difference (portabilityGap r2_source r2_target₂)
+        (portabilityGap r2_source r2_target₁) =
+      portabilityGap r2_target₁ r2_target₂ := by
+  unfold portabilityGap Descent.Core.difference
+  ring
+
 
 /-- **Portability gap is always non-negative under drift.** -/
 theorem portability_gap_nonneg

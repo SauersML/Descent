@@ -773,6 +773,23 @@ theorem informationPerUnitCost_mul_cost (information cost : ℝ) (hc : cost ≠ 
   unfold informationPerUnitCost Descent.Core.ratio
   field_simp
 
+/-- **A `c`-fold dearer assay delivers exactly `1/c` the information per unit cost.**
+
+Scale invariance moves information and cost together and so says nothing about a price
+change at fixed yield; this says what a price change does, and the answer is reciprocal
+rather than merely decreasing.  With `informationAtBudget` below linear in the budget, that
+is what makes an assay `c` times cheaper worth precisely a budget `c` times larger, so the
+two levers of a fixed-budget design trade at a fixed rate and a design can be compared
+against a funding change on one scale.
+
+A body falling off any other way in the cost -- a fixed overhead added to it, a saturating
+denominator -- ranks the same designs in the same order and still fails here. -/
+theorem informationPerUnitCost_cost_scaling (information cost c : ℝ) :
+    informationPerUnitCost information (Descent.Core.product c cost)
+      = Descent.Core.ratio (informationPerUnitCost information cost) c := by
+  unfold informationPerUnitCost Descent.Core.product Descent.Core.ratio
+  rw [div_div, mul_comm c cost]
+
 /-- Total information attainable by spending a fixed budget on exchangeable units of one
 design. Fractional units represent the continuous design relaxation; an implemented study
 rounds sample counts and rechecks the inequality. -/

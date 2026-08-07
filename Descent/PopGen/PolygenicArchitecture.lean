@@ -92,6 +92,19 @@ theorem per_variant_h2_decreases_with_M (h2 M₁ M₂ : ℝ)
   unfold expectedSquaredEffect Descent.Core.ratio
   exact div_lt_div_iff_of_pos_left h_h2 h_M₂ h_M₁ |>.mpr h_M
 
+/-- **The `M` variants carry the whole heritability between them.**
+
+Monotonicity in `M` is satisfied by every body that falls as variants are added -- `h²/M²`
+and `h²/(1 + M)` both do -- so it leaves the scale free, and the scale is what a per-variant
+effect is for.  Multiplying the per-variant share back by the count returns the heritability
+exactly, with no coefficient: that is what makes this an ALLOCATION of `h²` rather than a
+quantity merely decreasing in polygenicity, and it is the statement a stray factor of two
+in the body would break. -/
+theorem expectedSquaredEffect_mul_count (h2 M : ℝ) (hM : M ≠ 0) :
+    Descent.Core.product (expectedSquaredEffect h2 M) M = h2 := by
+  unfold expectedSquaredEffect Descent.Core.product Descent.Core.ratio
+  field_simp
+
 /-- **Spike-and-slab model.**
     π proportion of variants have effect ~ N(0, σ²_large),
     (1-π) proportion have effect = 0 (or ~ N(0, σ²_small)).

@@ -589,6 +589,20 @@ theorem effectiveBlockCount_mul_correlationLength (markers correlationLength : �
   unfold effectiveBlockCount Descent.Core.ratio
   field_simp
 
+/-- **Longer blocks mean proportionally fewer of them.**
+
+Unit invariance moves markers and correlation length together; this moves the correlation
+length alone, which is the comparison a population with stronger LD actually makes against
+one with weaker LD at the same marker density.  Blocks `c` times longer leave exactly `1/c`
+as many independent ones -- not `1/√c`, which is what a body dividing by the square root of
+the correlation length would give, and which would inflate every per-block multiple-testing
+correction built on the count. -/
+theorem effectiveBlockCount_longer_blocks (markers correlationLength c : ℝ) :
+    effectiveBlockCount markers (Descent.Core.product c correlationLength)
+      = Descent.Core.ratio (effectiveBlockCount markers correlationLength) c := by
+  unfold effectiveBlockCount Descent.Core.product Descent.Core.ratio
+  rw [div_div, mul_comm c correlationLength]
+
 /-- **Residual discreteness of the freezing transition.**
 
     The lattice ghost surviving in a block of `n` markers at correlation length `ℓ`.

@@ -790,6 +790,25 @@ theorem larger_lambda_star_worsens_ben_david_bound
   unfold benDavidUpperBound Descent.Core.sum3
   linarith
 
+/-- **The certificate composes along a chain of domains.**
+
+Certifying a transfer through an intermediate population and then on to the target gives
+exactly the bound of the single hop whose divergence and joint-optimal residual are the
+`Descent.Core.sum` of the two legs'. Inserting an intermediate ancestry therefore neither
+buys nor costs anything on this bound: it can be done for other reasons, but not to tighten
+the certificate, and a two-leg budget can be reported as one number without saying where it
+was cut. Only a body additive in all three arguments admits this; a divergence entering with
+any curvature would make the split matter, which is the same reading the `½` convention on
+the divergence argument above exists to protect. -/
+theorem benDavidUpperBound_chain
+    (err_source divergence₁ divergence₂ lambda₁ lambda₂ : ℝ) :
+    benDavidUpperBound err_source
+        (Descent.Core.sum divergence₁ divergence₂) (Descent.Core.sum lambda₁ lambda₂) =
+      benDavidUpperBound (benDavidUpperBound err_source divergence₁ lambda₁)
+        divergence₂ lambda₂ := by
+  unfold benDavidUpperBound Descent.Core.sum3 Descent.Core.sum
+  ring
+
 /-- **A relative tightness certificate gives a two-sided envelope around a bound.**
     This theorem does not derive tightness of the Ben-David bound from a model
     class. It records the exact quantitative consequence of a supplied

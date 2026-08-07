@@ -466,6 +466,25 @@ theorem costEffectiveness_mul_cost (improvement cost : ℝ) (hc : cost ≠ 0) :
   unfold costEffectiveness Descent.Core.ratio
   field_simp
 
+/-- **A bundle bought at one price is worth the sum of its parts' rates.**
+
+An intervention that improves a score through two separable channels -- more discovery
+samples and a better imputation panel, say -- funded by a single outlay, has the
+cost-effectiveness of the two channels added.  So a bundle cannot be made to look better
+than its components by being priced as one line item, and a component whose improvement is
+zero contributes nothing to the bundle's rate.
+
+The additivity is in the IMPROVEMENT only, and deliberately so: nothing here says two costs
+add to a joint rate, because they do not.  A body that saturated in the numerator -- a
+diminishing-returns transform of the improvement -- would break this while still ranking
+single interventions the same way. -/
+theorem costEffectiveness_add_improvement (firstImprovement secondImprovement cost : ℝ) :
+    costEffectiveness (Descent.Core.sum firstImprovement secondImprovement) cost
+      = Descent.Core.sum (costEffectiveness firstImprovement cost)
+          (costEffectiveness secondImprovement cost) := by
+  unfold costEffectiveness Descent.Core.sum Descent.Core.ratio
+  ring
+
 /-- **Cross-multiplication:** with both costs positive, ordering the two
     `costEffectiveness` ratios is ordering the cross products.
 

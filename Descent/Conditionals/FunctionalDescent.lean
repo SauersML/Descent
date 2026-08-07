@@ -449,6 +449,20 @@ theorem localizationResidual_at_reference_point :
   norm_num [localizationResidual,
       Descent.Core.difference]
 
+/-- **Localizing in stages costs the `Descent.Core.sum` of the stages.**
+
+Passing from a mixture to a fiber through an intermediate coarsening charges the two steps'
+residuals and nothing more: the residual is a function of its two endpoints alone. So no
+choice of intermediate can hide localization error inside a stage or manufacture it between
+stages, which is what lets the two-residual decomposition below be stated against ONE
+mixture value without asking how that mixture was reached. -/
+theorem localizationResidual_chain (localValue midValue mixtureValue : ℝ) :
+    Descent.Core.sum (localizationResidual localValue midValue)
+        (localizationResidual midValue mixtureValue) =
+      localizationResidual localValue mixtureValue := by
+  unfold localizationResidual Descent.Core.difference Descent.Core.sum
+  ring
+
 
 /-- Failure of a functional to commute with component mixing. -/
 noncomputable def jensenResidual (mixtureValue : ℝ)

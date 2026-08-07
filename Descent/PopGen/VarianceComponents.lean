@@ -110,6 +110,23 @@ theorem narrow_h2_sub_snp_h2_eq
   unfold snpH2 narrowSenseH2 Descent.Core.ratio
   rw [div_sub_div_same]
 
+/-- **Partitioned SNP heritability adds up.**
+
+Splitting the tagged additive variance into annotation categories -- coding and noncoding,
+or one chromosome and the rest -- and taking each category's SNP heritability against the
+same phenotypic variance recovers the SNP heritability of the whole, with nothing left over.
+Every partitioned-heritability analysis assumes this and none of them state it here.
+
+It is a real constraint on the body, not bookkeeping: it holds because the denominator is
+the phenotypic variance alone.  A body normalising by anything that moves with the numerator
+-- the tagged variance plus a residual, say -- makes the categories sum to less than the
+whole, and the shortfall would be read as untagged variance that does not exist. -/
+theorem snpH2_add_tagged (firstTagged secondTagged V_P : ℝ) :
+    snpH2 (Descent.Core.sum firstTagged secondTagged) V_P
+      = Descent.Core.sum (snpH2 firstTagged V_P) (snpH2 secondTagged V_P) := by
+  unfold snpH2 Descent.Core.sum Descent.Core.ratio
+  ring
+
 /-- **The missing heritability gap.**
     h²_twin - h²_SNP > 0 for most traits. This is the "missing heritability".
     It sets an upper bound on what PGS can achieve with current genotyping.

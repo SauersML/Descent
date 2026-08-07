@@ -86,6 +86,20 @@ theorem equilibriumEffectVariance_mul_selection (v_mutation s : ℝ) (h : s ≠ 
   unfold equilibriumEffectVariance Descent.Core.ratio
   field_simp
 
+/-- **The standing variance falls as the reciprocal of selection, exactly.**
+
+The docstring above states the equilibrium is proportional to `1/s`, and the balance
+identity does not check that: `v/s`, `v/s²` and `v/(s + s²)` all return the mutational input
+when multiplied by their own selection term only if the term matches the body, and only the
+first is reciprocal.  This is the proportionality itself -- strengthening selection `c`-fold
+divides the standing variance by exactly `c`, at every `c`, with no hypothesis needed since
+the junk points agree on both sides. -/
+theorem equilibriumEffectVariance_inverse_in_selection (v_mutation s c : ℝ) :
+    equilibriumEffectVariance v_mutation (Descent.Core.product c s)
+      = Descent.Core.ratio (equilibriumEffectVariance v_mutation s) c := by
+  unfold equilibriumEffectVariance Descent.Core.product Descent.Core.ratio
+  rw [div_div, mul_comm c s]
+
 /-- The algebraic equilibrium vanishes exactly when mutational input or selection strength
 vanishes. The `s = 0` branch is the named junk boundary above, not a biological equilibrium. -/
 theorem equilibriumEffectVariance_eq_zero_iff (v_mutation s : ℝ) :
@@ -250,6 +264,21 @@ theorem polygenicAveragingVariance_lt_of_locusCount_lt
     polygenicAveragingVariance architectureVariance m₂ <
       polygenicAveragingVariance architectureVariance m₁ :=
   div_lt_div_of_pos_left h_var (Nat.cast_pos.mpr h_m₁) (Nat.cast_lt.mpr h_more)
+
+/-- **Equal allocation is additive in what is being allocated.**
+
+Two architecture components spread over the same loci -- a common-variant component and a
+rare-variant one, say -- can be allocated together or separately, and the per-locus
+contribution is the same either way.  This is what lets a per-locus figure be assembled from
+a variance decomposition instead of only from a total, and it fails for any body nonlinear
+in the architecture scale: `V²/M` and `(V + 1)/M` both spread a positive variance over more
+loci and neither survives here. -/
+theorem polygenicAveragingVariance_add (firstVariance secondVariance : ℝ) (locusCount : ℕ) :
+    polygenicAveragingVariance (Descent.Core.sum firstVariance secondVariance) locusCount
+      = Descent.Core.sum (polygenicAveragingVariance firstVariance locusCount)
+          (polygenicAveragingVariance secondVariance locusCount) := by
+  unfold polygenicAveragingVariance Descent.Core.sum Descent.Core.ratio
+  ring
 
 /-- Equal per-locus heritability when total heritability is spread over a specified count.
 

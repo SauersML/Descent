@@ -231,6 +231,24 @@ theorem adaptationDifficultyIndex_mul_info (nParams infoPerSample : ℝ)
   unfold adaptationDifficultyIndex Descent.Core.ratio
   field_simp
 
+/-- **The difficulty index is a sample count, so it does not depend on the information
+scale.**
+
+Fisher information has a unit -- it is per parameter, per sample, in whatever scale the
+parameters are measured -- and rescaling the parameterisation rescales the information with
+it.  The index is unchanged, which is what makes its value comparable between two adaptation
+tasks that were never measured on the same scale, and is why the number can be read as a
+required sample size rather than as a quantity in units of information.
+
+A body that mixed degrees -- `d/I + d`, or `d/I` plus a floor -- moves under this rescaling
+and would rank two identical tasks differently for having been written in different units. -/
+theorem adaptationDifficultyIndex_scale_invariant (nParams infoPerSample t : ℝ) (ht : t ≠ 0) :
+    adaptationDifficultyIndex (Descent.Core.product t nParams)
+        (Descent.Core.product t infoPerSample)
+      = adaptationDifficultyIndex nParams infoPerSample := by
+  unfold adaptationDifficultyIndex Descent.Core.product Descent.Core.ratio
+  exact mul_div_mul_left _ _ ht
+
 /-- **Trace-MSE lower bound under an orthogonal Fisher model.**
     For an unbiased estimator of `d` orthogonal target parameters, the summed
     estimation variance is lower-bounded by `(d / I) / n_eff`, where `I` is the

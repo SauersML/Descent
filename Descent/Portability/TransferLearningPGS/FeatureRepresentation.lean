@@ -70,6 +70,23 @@ theorem pcaBiasReduction_positive_when_correction_helps :
   unfold pcaBiasReduction Descent.Core.difference
   norm_num
 
+/-- **The credit for removing PCs is read off the change, not off the level.**
+
+Measuring both bias readings against a shifted reference -- the `Descent.Core.sum` of each
+with a common offset -- leaves the reduction where it was. A cohort carrying more ancestry
+bias to begin with therefore does not report a larger PCA benefit for that reason alone, and
+the reductions of two cohorts on different bias scales can be compared directly. This is what
+makes the quantity a reduction rather than a residual bias, and it is the property the
+trade-off criterion below needs when it weighs the reduction against a signal-loss penalty
+measured on its own scale. -/
+theorem pcaBiasReduction_reference_invariant
+    (ancestryBiasWith ancestryBiasWithout offset : ℝ) :
+    pcaBiasReduction (Descent.Core.sum ancestryBiasWith offset)
+        (Descent.Core.sum ancestryBiasWithout offset) =
+      pcaBiasReduction ancestryBiasWith ancestryBiasWithout := by
+  unfold pcaBiasReduction Descent.Core.difference Descent.Core.sum
+  ring
+
 /-- Linearized target error after PCA adjustment: ancestry bias plus a
     weighted trait-signal loss penalty. -/
 def pcaNetTargetError

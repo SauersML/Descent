@@ -65,6 +65,23 @@ theorem fineTunedTargetR2_cancels (r2_source d : ℝ) :
 noncomputable def scratchTargetR2 (oracle_target_r2 estimation_penalty : ℝ) : ℝ :=
   Descent.Core.difference oracle_target_r2 estimation_penalty
 
+/-- **Estimation penalties accumulate the same however they are staged.**
+
+Charging the target-trained score one penalty that is the `Descent.Core.sum` of two
+contributions gives the same `R²` as charging the two in succession. A penalty discovered
+after a first accounting can therefore be applied to the already-penalised figure, and no
+order of accounting changes the deployed number. Only an additive penalty model does this;
+a penalty compounding on the remaining accuracy would make the order matter, and the
+comparisons below against `fineTunedTargetR2` would depend on it. -/
+theorem scratchTargetR2_penalty_stages
+    (oracle_target_r2 estimation_penalty₁ estimation_penalty₂ : ℝ) :
+    scratchTargetR2 oracle_target_r2
+        (Descent.Core.sum estimation_penalty₁ estimation_penalty₂) =
+      scratchTargetR2 (scratchTargetR2 oracle_target_r2 estimation_penalty₁)
+        estimation_penalty₂ := by
+  unfold scratchTargetR2 Descent.Core.difference Descent.Core.sum
+  ring
+
 /-- Canonical deployed target `R²` for transfer/adaptation methods: start from
     an explicit transported target baseline, add any target-specific adaptation
     gain, and subtract any finite-sample estimation penalty. This is the shared
@@ -108,6 +125,24 @@ theorem transportPenalty_positive_when_transport_costs :
     transportPenalty 3 1 = 2 := by
   unfold transportPenalty Descent.Core.difference
   norm_num
+
+/-- **The transported baseline cancels between the penalty and the gain.**
+
+What refitting in the target buys, net of what transport costs -- their
+`Descent.Core.difference` -- is the oracle's advantage over the source, and the transported
+`R²` both are measured against has dropped out. So the transported baseline is not
+identifiable from this pair: a baseline chosen too high inflates the adaptation gain and
+deflates the transport penalty by the same amount, leaving every net figure untouched. Any
+claim that separates the two therefore rests on how that baseline was obtained, not on the
+arithmetic here. -/
+theorem transportPenalty_and_adaptation_gain_cancel_the_baseline
+    (source_r2 transported_r2 oracle_target_r2 : ℝ) :
+    Descent.Core.difference
+        (oracleTransportAdaptationGain transported_r2 oracle_target_r2)
+        (transportPenalty source_r2 transported_r2) =
+      Descent.Core.difference oracle_target_r2 source_r2 := by
+  unfold oracleTransportAdaptationGain transportPenalty Descent.Core.difference
+  ring
 
 /-- The additive fine-tuning model is exactly the transported target baseline
     plus any additional target-specific adaptation gain once the portability
