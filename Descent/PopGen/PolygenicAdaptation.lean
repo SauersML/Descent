@@ -1,7 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.Core.Scaling
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
