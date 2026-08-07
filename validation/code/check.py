@@ -578,8 +578,8 @@ def skip_attribute_block(lines, j):
     """Walk `j` back past blank lines and whole `@[...]` attribute blocks.
 
     AN ATTRIBUTE IS NOT ALWAYS ONE LINE. This used to skip only lines that
-    THEMSELVES begin with `@[`, which is every `@[simp]` and no attribute
-    carrying a wrapped string argument -- that form wraps, so the line
+    THEMSELVES begin with `@[`, which is every `@[simp]` and no `@[withdrawn
+    "tag" "a sentence of justification"]` -- that form wraps, so the line
     directly above the declaration is the tail of the attribute's string
     argument and matches nothing. The docstring above it then failed the
     `endswith("-/")` test and the declaration was read as carrying NO docstring
@@ -3913,8 +3913,8 @@ def check_bridges(c: Corpus) -> list[Finding]:
 # Files whose custom syntax IS the corpus's mechanism for enumerating unproved
 # statements, rather than a way of smuggling one in.
 #
-# `Meta/Informal.lean` declares `informal_lemma`, `informal_definition` and
-# `TODO`; `Meta/InformalLint.lean` reports on them. Their design point,
+# `Meta/Informal.lean` declares `informal_lemma`, `informal_definition`, `TODO`
+# and `withdrawn`; `Meta/InformalLint.lean` reports on them. Their design point,
 # stated at length in `Informal.lean`'s own module docstring, is that a gap
 # pushes a record into an environment extension and ADDS NO CONSTANT -- "not a
 # `sorry`, not an axiom, not an opaque constant" -- precisely so that no proof
@@ -7611,7 +7611,7 @@ def run_shape_routes() -> int:
 #              stronger than its own argument and was true only because
 #              `Descent/Meta/` then held nothing but checks.  It stopped being true the
 #              day the directory acquired VOCABULARY: `Descent.Meta.Informal` supplies
-#              the `informal_lemma` and `TODO` commands, which a proof
+#              the `informal_lemma`, `TODO` and `@[withdrawn]` commands, which a proof
 #              module must import in order to record a gap, and which cannot be
 #              "written to satisfy" because they have no verdict -- they add data to an
 #              environment extension and no constant to the environment.  A file that
@@ -7860,8 +7860,8 @@ LAYER_PENDING = {
 LAYER_META = "Meta"
 
 # The modules under `Descent/Meta/` a proof module MAY import: the ones that add
-# SYNTAX and read nothing.  `Informal` supplies `TODO`, `informal_definition`
-# and `informal_lemma`; `Semiformal` supplies `semiformal_result`.
+# SYNTAX and read nothing.  `Informal` supplies `TODO`, `informal_definition`,
+# `informal_lemma` and `@[withdrawn]`; `Semiformal` supplies `semiformal_result`.
 # Both import `Lean.Elab.Command` and nothing else, both record into an environment
 # extension, and neither adds a constant to the environment -- so a proof module that
 # imports one gains a way to WRITE DOWN a gap and no way to cite one.
