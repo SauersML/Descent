@@ -7789,11 +7789,6 @@ LAYER_PENDING = {
         "capacity theorem in terms of them, so the consumer moves UP rather than the "
         "definitions moving down.",
     ("Descent.PopGen.GeneticArchitectureDiscovery",
-     "Descent.Portability.BayesianPGSTheory"):
-        "`jamesSteinMSE` and `optimalShrinkage`: shrinkage-estimator facts about one "
-        "population, in Portability because the Bayesian PGS chapter was written "
-        "there. They belong at or below PopGen.",
-    ("Descent.PopGen.GeneticArchitectureDiscovery",
      "Descent.Portability.MechanisticPortabilityWitnesses"):
         "`mechanisticPortabilityRatio` and `sigmaTagCausalSourceAt` ARE about "
         "transport and are correctly placed. This edge inverts because a PopGen file "

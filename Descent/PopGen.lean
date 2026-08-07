@@ -29,6 +29,7 @@ import Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation
 import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.SerialFounderChain
+import Descent.PopGen.Shrinkage
 import Descent.PopGen.StandardizedGenotypeMoments
 import Descent.PopGen.VarianceComponents
 

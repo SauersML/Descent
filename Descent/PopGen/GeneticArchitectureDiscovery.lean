@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.BayesianPGSTheory
+import Descent.PopGen.Shrinkage
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.PopGen.HaplotypeTheory
@@ -316,24 +316,24 @@ theorem ct_more_variable_than_bayesian
     (h_sigma : ∀ i, 0 < σSq i)
     (h_beta : ∀ i, 0 < βSq i) :
     taggedScoreEstimationRisk targetTagVariance
-        (fun i ↦ Portability.jamesSteinMSE
-          (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
+        (fun i ↦ jamesSteinMSE
+          (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i)) <
       taggedScoreEstimationRisk targetTagVariance
-        (fun i ↦ Portability.jamesSteinMSE 1 (σSq i) (βSq i)) := by
+        (fun i ↦ jamesSteinMSE 1 (σSq i) (βSq i)) := by
   unfold taggedScoreEstimationRisk Descent.Core.innerSum
   refine Finset.sum_lt_sum ?_ ?_
   · intro i _
     have h_mse :
-        Portability.jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
-          Portability.jamesSteinMSE 1 (σSq i) (βSq i) := by
-      exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
+        jamesSteinMSE (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+          jamesSteinMSE 1 (σSq i) (βSq i) := by
+      exact bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact le_of_lt (mul_lt_mul_of_pos_left h_mse (h_tag i))
   · rcases h_nonempty with ⟨i⟩
     refine ⟨i, Finset.mem_univ i, ?_⟩
     have h_mse :
-        Portability.jamesSteinMSE (Portability.optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
-          Portability.jamesSteinMSE 1 (σSq i) (βSq i) := by
-      exact Portability.bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
+        jamesSteinMSE (optimalShrinkage (σSq i) (βSq i)) (σSq i) (βSq i) <
+          jamesSteinMSE 1 (σSq i) (βSq i) := by
+      exact bayesian_shrinkage_reduces_mse (σSq i) (βSq i) (h_sigma i) (h_beta i)
     exact mul_lt_mul_of_pos_left h_mse (h_tag i)
 
 /-- **Both methods converge with infinite sample size.**
@@ -721,8 +721,8 @@ theorem is what catches them drifting apart. -/
 theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
     (n₁ n₂ rg priorVariance : ℝ) :
     multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance =
-      Portability.multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
-  simp only [multiTraitEffectiveSampleSize, Portability.multiAncestryEffectiveN]
+      multiAncestryEffectiveN n₁ rg n₂ priorVariance := by
+  simp only [multiTraitEffectiveSampleSize, multiAncestryEffectiveN]
 
 /-- GWAS noncentrality parameter after cross-trait borrowing.
 
