@@ -776,6 +776,29 @@ theorem target_r2_strictly_decreases_of_covariance_mismatch
   have hneg : -(mseTarget / varY) < -(mseSource / varY) := neg_lt_neg hdiv
   linarith
 
+open Descent.Core (PopGenParameters) in
+/-- **The same drop, for an actual demography.**
+
+The theorem above takes the outcome variance as a free positive real, which a reader has to
+believe came from somewhere.  Here it is the record's: a population's additive variance plus
+an environmental component, which is the phenotypic variance a deployment measures, and
+`V_A_pos` supplies the positivity the free-real form asks the caller for.
+
+Nothing else changes, and nothing is weakened -- the covariance-mismatch hypotheses are the
+same ones, because they are about the two populations' second moments and not about the
+demography that produced them. -/
+theorem target_r2_strictly_decreases_of_covariance_mismatch_of_params
+    {t : ℕ} (p : PopGenParameters) (V_E mseSource mseTarget lam : ℝ)
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (hE : 0 ≤ V_E)
+    (h_gap_lb :
+      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
+    (hlam : 0 < lam)
+    (h_mismatch : 0 < frobeniusNormSq (sigmaSource - sigmaTarget)) :
+    r2FromMSE mseTarget (p.V_A + V_E) < r2FromMSE mseSource (p.V_A + V_E) :=
+  target_r2_strictly_decreases_of_covariance_mismatch mseSource mseTarget (p.V_A + V_E) lam
+    sigmaSource sigmaTarget h_gap_lb hlam h_mismatch (by linarith [p.V_A_pos])
+
 /-! ### Step 4: Demography (`F_ST`) → Covariance Divergence (with tagging density)
 
 This block introduces a demographic lower bound connecting divergence to covariance-matrix
@@ -1087,6 +1110,34 @@ theorem target_r2_drop_of_twoLocusCoalescent
     (twoLocusCoalescentCovarianceMatrix ht ibdWeight recombRate tTarget)
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
 
+open Descent.Core (PopGenParameters) in
+/-- **The two-locus drop, read off one demography's own recombination rate.**
+
+The free-real form takes the recombination rate and the outcome variance from the caller.
+Both are the record's here: the coalescent covariance is built at `p.recomb`, and the
+variance the `R²` is measured against is `p.V_A` plus an environmental component.
+
+The record discharges two of the four side conditions -- positivity of the outcome variance
+from `V_A_pos`, and `recomb < 1` from `recomb_le_half`, since a recombination FRACTION cannot
+reach one.  It does not discharge the third: `0 < p.recomb` is a hypothesis here because the
+record admits `recomb = 0`, and at completely linked loci there is no two-locus decay to
+read.  That is the one thing the demography does not settle, so it is asked for. -/
+theorem target_r2_drop_of_twoLocusCoalescent_of_params
+    {t : ℕ} (ht : 2 ≤ t) (p : PopGenParameters)
+    (V_E mseSource mseTarget lam ibdWeight : ℝ) (tSource tTarget : ℕ)
+    (h_mse_gap_lb :
+      lam *
+          frobeniusNormSq
+            (twoLocusCoalescentCovarianceMatrix ht ibdWeight p.recomb tSource -
+              twoLocusCoalescentCovarianceMatrix ht ibdWeight p.recomb tTarget) ≤
+        mseTarget - mseSource)
+    (h_lam_pos : 0 < lam) (hE : 0 ≤ V_E) (h_ibd_pos : 0 < ibdWeight)
+    (h_recomb_pos : 0 < p.recomb) (h_time : tSource < tTarget) :
+    r2FromMSE mseTarget (p.V_A + V_E) < r2FromMSE mseSource (p.V_A + V_E) :=
+  target_r2_drop_of_twoLocusCoalescent ht mseSource mseTarget (p.V_A + V_E) lam ibdWeight
+    p.recomb tSource tTarget h_mse_gap_lb h_lam_pos (by linarith [p.V_A_pos]) h_ibd_pos
+    h_recomb_pos (by linarith [p.recomb_le_half]) h_time
+
 /-- If the demographic lower bound is available and strictly positive, covariance mismatch is
     strict. -/
 theorem covariance_mismatch_pos_of_fst_and_sparse_array
@@ -1137,6 +1188,42 @@ theorem target_r2_drop_of_fst_and_sparse_array
   exact target_r2_strictly_decreases_of_covariance_mismatch
     mseSource mseTarget varY lam sigmaSource sigmaTarget
     h_mse_gap_lb h_lam_pos h_mismatch h_varY_pos
+
+open Descent.Core (PopGenParameters) in
+/-- **Less migration, lower deployed `R²`** -- the whole chain in one claim.
+
+Two demographies alike in everything but migration: the target exchanges fewer migrants, so
+by `Core.fstEquilibrium_lt_of_mig_lt` it sits at a strictly higher equilibrium
+differentiation, that differentiation feeds `demographicCovarianceGapLowerBound`, the
+covariance gap bounds the excess target risk, and the `R²` a deployment reports in the target
+is strictly below the one it reports in the source.
+
+This is the shape the corpus exists to state.  Every earlier form of it takes `F_ST` as a
+free real and a reader has to supply the population genetics that produced it; here the
+demography is the input and the metric is the output, and the two differentiations are the
+records' own.  The remaining hypotheses are the ones the demography genuinely does not fix:
+the risk-to-covariance constant, the array sparsity, the tagging constant, and a strictly
+positive recombination rate. -/
+theorem target_r2_drop_of_migration_gap_of_params
+    {t : ℕ} (source target : PopGenParameters)
+    (V_E mseSource mseTarget lam arraySparsity kappa : ℝ)
+    (sigmaSource sigmaTarget : Matrix (Fin t) (Fin t) ℝ)
+    (hNe : target.Ne = source.Ne) (hmu : target.mu = source.mu)
+    (hd : target.nDemes = source.nDemes) (hmig : target.mig < source.mig) (hE : 0 ≤ V_E)
+    (h_mse_gap_lb :
+      lam * frobeniusNormSq (sigmaSource - sigmaTarget) ≤ mseTarget - mseSource)
+    (h_cov_lb :
+      demographicCovarianceGapLowerBound source.fstEquilibrium target.fstEquilibrium
+          source.recomb arraySparsity kappa
+        ≤ frobeniusNormSq (sigmaSource - sigmaTarget))
+    (h_lam_pos : 0 < lam) (h_recomb_pos : 0 < source.recomb)
+    (h_sparse_pos : 0 < arraySparsity) (h_kappa_pos : 0 < kappa) :
+    r2FromMSE mseTarget (source.V_A + V_E) < r2FromMSE mseSource (source.V_A + V_E) :=
+  target_r2_drop_of_fst_and_sparse_array mseSource mseTarget (source.V_A + V_E) lam
+    sigmaSource sigmaTarget source.fstEquilibrium target.fstEquilibrium source.recomb
+    arraySparsity kappa h_mse_gap_lb h_cov_lb h_lam_pos (by linarith [source.V_A_pos])
+    (Descent.Core.fstEquilibrium_lt_of_mig_lt target source hNe hmu hd hmig)
+    h_recomb_pos h_sparse_pos h_kappa_pos
 
 /-! ### Step 4b: the same conclusion without an `F_ST` difference
 
@@ -1238,6 +1325,28 @@ theorem target_r2_drop_of_bandwise_readout_mismatch
       mul_lt_mul_of_pos_right hlt h_inv_pos
     simpa [div_eq_mul_inv] using hmul
   linarith
+
+open Descent.Core (PopGenParameters) in
+/-- **The band-mismatch drop, against a population's own phenotypic variance.**
+
+The readout mismatch is spectral and owes the demography nothing; what the demography owns
+is the scale the risks are read against.  Supplying it from the record rather than as a free
+positive real is what makes the conclusion a statement about a population deploying a score,
+and `V_A_pos` is what the free-real form was asking the caller to assert. -/
+theorem target_r2_drop_of_bandwise_readout_mismatch_of_params
+    {Band : Type*} [Fintype Band] (p : PopGenParameters)
+    (source target : Spectral.FiniteSpectralModel Band) (b : Band) (V_E : ℝ)
+    (hb : Spectral.FiniteSpectralModel.optimalReadout source b ≠
+      Spectral.FiniteSpectralModel.optimalReadout target b)
+    (hE : 0 ≤ V_E) :
+    r2FromMSE
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          source)) (p.V_A + V_E) <
+      r2FromMSE
+        (Spectral.FiniteSpectralModel.risk target (Spectral.FiniteSpectralModel.optimalReadout
+          target)) (p.V_A + V_E) :=
+  target_r2_drop_of_bandwise_readout_mismatch source target b (p.V_A + V_E) hb
+    (by linarith [p.V_A_pos])
 
 /-! ### Example Scenario DGPs (Specific Instantiations)
 
@@ -3966,6 +4075,50 @@ theorem calibratedBrierFromVariances_eq_rsquared_form {k : ℕ} [Fintype (Fin k)
   rw [calibratedBrierFromVariances_eq_chart,
     r2FromSignalVariance_eq_rsquared V_signal V_E h_signal h_additive h_split
       h_signal_pos h_outcome_pos]
+
+open Descent.Core (PopGenParameters) in
+/-- **The same identity when the signal variance is a population's, not a caller's.**
+
+Both positivity side conditions come off the record: `V_A_pos` is the signal variance being
+positive, and the outcome variance is positive because an environmental component only adds
+to it.  What remains are the three regime hypotheses -- that the process's signal variance,
+its signal-outcome covariance and its outcome variance split the way the additive-noise
+regime says -- and those are claims about the process, not about the demography, so they
+stay where a caller can see them. -/
+theorem calibratedBrierFromVariances_eq_rsquared_form_of_params {k : ℕ} [Fintype (Fin k)]
+    {dgp : Foundations.DataGeneratingProcess k} {signal : Foundations.Predictor k}
+    (p : PopGenParameters) (π V_E : ℝ)
+    (h_signal : signalVariance dgp signal = p.V_A)
+    (h_additive : signalOutcomeCovariance dgp signal = p.V_A)
+    (h_split : outcomeMeanVariance dgp = p.V_A + V_E)
+    (hE : 0 ≤ V_E) :
+    calibratedBrierFromVariances π p.V_A V_E =
+      calibratedBrier π (rsquared dgp signal dgp.trueExpectation) :=
+  calibratedBrierFromVariances_eq_rsquared_form p.V_A π V_E h_signal h_additive h_split
+    p.V_A_pos (by linarith [p.V_A_pos])
+
+open Descent.Core (PopGenParameters) in
+/-- **Every demography's deployed Brier risk lies between perfect and prevalence-only.**
+
+The calibrated risk is linear in the explained fraction, and the fraction a population
+supplies is a SHARE -- its additive variance against its own phenotypic variance -- so it
+cannot leave the unit interval and the risk cannot leave the interval the two anchors pin.
+The record is what closes it: `V_A_pos` makes the share well defined at a positive total,
+and a nonnegative environmental component is what keeps the share at most one.
+
+The bound is the reason the anchors are anchors rather than two evaluations.  A deployment
+reporting a Brier risk above `π(1-π)` for a population with additive variance is reporting
+something no demography in this record can produce -- it has either mismeasured the
+prevalence or is not in the additive-noise regime this chart assumes. -/
+theorem calibratedBrier_mem_anchors_of_params (p : PopGenParameters) (π V_E : ℝ)
+    (hπ0 : 0 ≤ π) (hπ1 : π ≤ 1) (hE : 0 ≤ V_E) :
+    0 ≤ calibratedBrier π (r2FromSignalVariance p.V_A V_E) ∧
+      calibratedBrier π (r2FromSignalVariance p.V_A V_E) ≤ π * (1 - π) := by
+  have hunit :=
+    Descent.Core.share_mem_unit p.V_A V_E p.V_A_pos.le hE (by linarith [p.V_A_pos])
+  have hprev : 0 ≤ π * (1 - π) := mul_nonneg hπ0 (by linarith)
+  unfold calibratedBrier r2FromSignalVariance
+  exact ⟨by nlinarith [hunit.1, hunit.2], by nlinarith [hunit.1, hunit.2]⟩
 
 /-- Explicit additive irreducible target-side residual-loss budget.
 These penalties are not compressed into a single multiplicative transport
