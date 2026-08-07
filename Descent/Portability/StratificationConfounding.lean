@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PCCorrectability.ImitationCapacity
 import Descent.Portability.AncestrySpecificPower
+import Descent.Core.Moments
 
 assert_below Descent.Decision Descent.Program
 

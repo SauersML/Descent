@@ -6911,21 +6911,31 @@ def _shape_is_toc(mod: str, graph, decls) -> bool:
 
 
 def _shape_graph_without_toc():
-    """The import graph with the tables of contents deleted, not merely skipped.
-
-    `Descent.Layer` goes too, for a different reason than the heads.  It declares the
-    `assert_below` macro and nothing else, every module in the corpus sits above it by
-    construction, and it therefore adds exactly one to every path -- a constant, not a
-    shape.  `SHAPE_DEPTH_LIMIT` was set on 2026-08-05 against a graph that did not
-    contain it; the gate was added the following morning.  Counting it would mean the
-    number and the limit it is compared against were measured on different graphs.
-    The layer rule already drops it, for the same reason, as `LAYER_GATE`.
-    """
+    """The import graph with the tables of contents deleted, not merely skipped."""
     _raw, _code, graph, decls, _arch = _shape_corpus()
-    gate = {f"Descent.{LAYER_GATE}"}
-    toc = {m for m in graph if _shape_is_toc(m, graph, decls)} | gate
+    toc = {m for m in graph if _shape_is_toc(m, graph, decls)}
     return {m: {d for d in graph[m] if d not in toc}
             for m in graph if m not in toc}
+
+
+def _shape_graph_for_depth():
+    """The same graph with the layer gate dropped as well -- depth only.
+
+    `Descent.Layer` declares the `assert_below` macro and nothing else, and every module
+    in the corpus sits above it by construction, so it adds exactly one to every path and
+    changes the shape of none of them.  `SHAPE_DEPTH_LIMIT` was set on 2026-08-05 against
+    a graph that did not contain it; the gate was added the following morning, so counting
+    it compares a depth against a limit measured on a different graph.  The layer rule
+    drops it for the same reason, where it is `LAYER_GATE`.
+
+    Depth only, and the reason is `shape-components`: a handful of modules import the gate
+    and nothing else from the corpus, so deleting it from the shared graph does not shorten
+    them, it disconnects them -- nine islands, which is a fact about this function and not
+    about the corpus.
+    """
+    graph = _shape_graph_without_toc()
+    gate = f"Descent.{LAYER_GATE}"
+    return {m: {d for d in graph[m] if d != gate} for m in graph if m != gate}
 
 
 def _shape_depths(graph):
@@ -6973,7 +6983,7 @@ def run_shape_depth() -> int:
     prints is the actionable object; the count of modules over the limit is not,
     because every one of them is over it on account of some chain.
     """
-    graph = _shape_graph_without_toc()
+    graph = _shape_graph_for_depth()
     depth = _shape_depths(graph)
     if not depth:
         print("shape-depth guard CANNOT RUN: no Lean modules found under "
