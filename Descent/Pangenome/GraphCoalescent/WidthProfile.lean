@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.SiteFrequencySpectrum
 import Descent.Pangenome.GraphCoalescent.MergerDepth
+import Descent.Pangenome.Linkage.Chain
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
