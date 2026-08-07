@@ -56,7 +56,7 @@ def _ld_corr_rep(params):
     between replicates -- so `simlib.replicate_map` returns the same list in the
     same order at any worker count.  See `simlib.replicate_map`.
     """
-    t_div, bigM, seed, n_dip, r = params
+    t_div, bigM, seed, n_dip, r, seq = params
     import msprime
     m = bigM / (4.0 * NE)
     dem = msprime.Demography()
@@ -68,7 +68,7 @@ def _ld_corr_rep(params):
     dem.add_population_split(time=t_div, derived=["A", "B"], ancestral="ANC")
     ts = msprime.sim_ancestry(
         samples={"A": n_dip, "B": n_dip}, demography=dem,
-        sequence_length=SEQ, recombination_rate=RHO, random_seed=seed + r)
+        sequence_length=seq, recombination_rate=RHO, random_seed=seed + r)
     ts = msprime.sim_mutations(ts, rate=MU, random_seed=seed + 5000 + r)
     if ts.num_sites < 20:
         return None
@@ -116,7 +116,7 @@ def _ld_corr_rep(params):
     return None
 
 
-def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30):
+def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30, seq=SEQ):
     """Per-replicate correlation of signed LD `r` across the two demes.
 
     Two demes split `t_div` generations ago, optionally exchanging migrants at
@@ -125,7 +125,7 @@ def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30):
     """
     out = simlib.replicate_map(
         _ld_corr_rep,
-        [(t_div, bigM, seed, n_dip, r) for r in range(reps)])
+        [(t_div, bigM, seed, n_dip, r, seq) for r in range(reps)])
     return simlib.summarize([x for x in out if x is not None])
 
 
@@ -147,15 +147,28 @@ def main():
     #
     # So `tau` runs 0.25 to 2.0 here. If the excess is still flat across an
     # eightfold change in divergence depth, no constant repairs the body.
+    #
+    # THE DEEPEST CELL NEEDS MORE SEQUENCE, and that is a measurement problem
+    # rather than a modelling one. The estimator scores SNP pairs common in
+    # BOTH demes, and by two coalescent units without migration a shrinking
+    # fraction of sites are still common in both -- at a fixed 5 Mb every
+    # replicate at `tau = 2` was dropped, `summarize([])` returned NaN, and the
+    # record came back MATCH on cells nothing had measured. (That is now
+    # impossible: `verdict.classify` voids a record with a non-finite cell.)
+    # The sequence scales with divergence so the number of scorable pairs does
+    # not collapse; nothing about the observable changes, only how many pairs it
+    # is averaged over.
     taus = (0.25, 0.5, 1.0, 2.0)
     bigMs = (0.5, 4.0, 16.0)
     obs = []
     for tau in taus:
         t_div = int(tau * 2 * NE)
-        base = cross_deme_ld_corr(t_div, 0.0, reps, seed=55000 + t_div)
+        seq = SEQ * (1.0 + 2.0 * tau)
+        base = cross_deme_ld_corr(t_div, 0.0, reps, seed=55000 + t_div, seq=seq)
         for bigM in bigMs:
             with_m = cross_deme_ld_corr(t_div, bigM, reps,
-                                        seed=55500 + t_div + int(10 * bigM))
+                                        seed=55500 + t_div + int(10 * bigM),
+                                        seq=seq)
             boost = with_m["mean"] / base["mean"]
             # Ratio of two independent means: relative errors add in quadrature.
             sem = boost * math.sqrt((with_m["sem"] / with_m["mean"]) ** 2
@@ -181,18 +194,29 @@ def main():
 
     tau_basis = lambda t, M: M * t / (1 + M)
     flat_basis = lambda t, M: M / (1 + M)
+    # THE THIRD CANDIDATE IS THE ONE THE MEASUREMENTS POINT AT, and it is not
+    # either of the two hypotheses this design was built to separate. Across
+    # `tau` = 0.25, 0.5, 1.0 at fixed `bigM` the excess rose and then flattened
+    # -- a fourfold change in divergence producing about a twofold change in
+    # excess -- which is neither proportional (the body) nor constant (the
+    # tau-free rival). It is SATURATING, in `tau` exactly as the body already
+    # saturates in `bigM`, so the candidate applies the corpus's own saturation
+    # to both arguments and spends the same single parameter as its rivals.
+    sat_basis = lambda t, M: (M / (1 + M)) * (t / (1 + t))
     a_tau = fit(tau_basis)
     a_flat = fit(flat_basis)
-    print("  fitted amplitudes: tau-bearing a=%.4f, tau-free a=%.4f"
-          % (a_tau, a_flat))
+    a_sat = fit(sat_basis)
+    print("  fitted amplitudes: tau-bearing a=%.4f, tau-free a=%.4f, "
+          "saturating a=%.4f" % (a_tau, a_flat, a_sat))
 
-    cells, c_none, c_fit_tau, c_flat = [], [], [], []
+    cells, c_none, c_fit_tau, c_flat, c_sat = [], [], [], [], []
     for tau, bigM, lab, boost, sem in obs:
         cell = lambda v: dict(design=lab, lean=v, truth=boost, sem=sem)
         cells.append(cell(1 + bigM * tau / (1 + bigM)))
         c_none.append(cell(1.0))
         c_fit_tau.append(cell(1 + a_tau * tau_basis(tau, bigM)))
         c_flat.append(cell(1 + a_flat * flat_basis(tau, bigM)))
+        c_sat.append(cell(1 + a_sat * sat_basis(tau, bigM)))
 
     # POSITIVE CONTROL, through the ESTIMATOR UNDER TEST rather than beside it:
     # a split one generation ago, no migration, is one population labelled two
@@ -239,6 +263,18 @@ def main():
                 "on a tau. If this beats the row above across an eightfold tau "
                 "sweep then the divergence depth does not enter the boost, and "
                 "the repair deletes the argument rather than rescaling it",
+           **MODEL)
+    record("migrationLDBoost "
+           "[CANDIDATE: saturating in tau as well as in bigM, competing]",
+           "DGP.lean",
+           "1 + a * (bigM/(1+bigM)) * (tau/(1+tau)), a fitted", c_sat,
+           regime=reg + fitted,
+           note="the same one free parameter as the two rows above, spent on "
+                "the shape the cells actually trace: the excess rises with "
+                "divergence and then flattens, which is neither proportional "
+                "nor constant. It is the body's own saturation applied to its "
+                "OTHER argument, so if it survives, the repair to the "
+                "declaration is one kernel and not a new function",
            **MODEL)
     record("migrationSharedBoostAt", "PortabilityDrift.lean",
            "1 + bigM * tauAt t / (1 + bigM)", cells,

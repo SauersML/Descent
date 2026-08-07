@@ -149,6 +149,32 @@ def classify(cells, control=None, sem_source="replicates", selected_from=1,
     """
     notes = []
 
+    # --- FN gate: a cell that did not produce a number ----------------------
+    #
+    # A design can fail to MEASURE a cell rather than fail to predict it, and
+    # until this gate existed that read as a pass. `battery_bulk55`'s deepest
+    # divergence cells returned NaN -- after 2 coalescent units without
+    # migration, too few sites are common in BOTH demes to survive the MAF
+    # filter, so every replicate was dropped and `summarize([])` is NaN -- and
+    # every comparison against NaN is False, including `|lean - truth| / sem >
+    # gate`. The record came back MATCH on three cells the battery never
+    # measured, alongside three it did.
+    #
+    # This is the same shape as the empty results file and the raised group:
+    # absence reading as agreement. Any non-finite entry voids the record,
+    # because a verdict over cells that are partly missing is a verdict about
+    # which cells happened to work.
+    bad = [c for c in cells
+           if not all(isinstance(c.get(k), (int, float))
+                      and math.isfinite(c.get(k)) for k in ("lean", "truth", "sem"))]
+    if bad:
+        return "VOID (cells not measured)", (
+            "%d of %d cell(s) carry a non-finite lean, truth or sem -- the "
+            "design did not measure them. First: '%s'. Every numerical gate "
+            "below compares against NaN and every such comparison is False, so "
+            "an unmeasured cell would otherwise pass silently"
+            % (len(bad), len(cells), bad[0].get("design", "?"))), cells[0]
+
     # --- FN gate: is this design's definition its own oracle's estimator? ----
     entry = oracle_identity(name)
     if entry is not None:
