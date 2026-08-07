@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Interpolation
 import Descent.Coalescent.Lumping
 import Descent.Pangenome.Linkage.Interface
 

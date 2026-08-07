@@ -580,6 +580,28 @@ theorem ldOverlapFromSharedLD_at_reference_point :
   unfold ldOverlapFromSharedLD Descent.Core.identifiedWith
   norm_num
 
+/-- **What the identification buys downstream: retention is additive in the shared LD.**
+
+At a fixed `F_ST`, splitting the shared-LD fraction into two parts -- their
+`Descent.Core.sum` -- splits the retention into the retentions of the parts. The fraction
+enters the retention linearly and unscaled, which is the force of the naming claim above:
+"LD overlap" and "shared LD fraction" denote one quantity, so a fraction assembled from
+several regions contributes what those regions contribute separately. A re-encoding of the
+fraction on any other scale -- a squared overlap, an odds -- would leave every statement about
+the identity itself true and break this one, which is why the claim is tested here and not on
+the body. -/
+theorem covarianceRetention_additive_in_ldOverlap (fst shared_ld₁ shared_ld₂ : ℝ) :
+    covarianceRetention (covarianceRetentionFactorFromFst fst)
+        (ldOverlapFromSharedLD (Descent.Core.sum shared_ld₁ shared_ld₂)) =
+      Descent.Core.sum
+        (covarianceRetention (covarianceRetentionFactorFromFst fst)
+          (ldOverlapFromSharedLD shared_ld₁))
+        (covarianceRetention (covarianceRetentionFactorFromFst fst)
+          (ldOverlapFromSharedLD shared_ld₂)) := by
+  unfold covarianceRetention covarianceRetentionFactorFromFst ldOverlapFromSharedLD
+    Descent.Core.product Descent.Core.complement Descent.Core.identifiedWith Descent.Core.sum
+  ring
+
 /-- Covariance retention in terms of Fst and shared_LD. -/
 theorem covarianceRetention_from_fst_ld (fst shared_ld : ℝ) :
     covarianceRetention (covarianceRetentionFactorFromFst fst) (ldOverlapFromSharedLD shared_ld) =

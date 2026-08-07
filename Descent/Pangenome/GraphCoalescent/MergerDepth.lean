@@ -155,17 +155,19 @@ theorem two_le_mergerDepth_of_two_fibers {n : ℕ} {s : Fin n → Fin n} {a b : 
     (ha : a ∈ Finset.univ.image s) (hb : b ∈ Finset.univ.image s) (hab : a ≠ b)
     (hca : 2 ≤ (Linkage.stateFiber s a).card) (hcb : 2 ≤ (Linkage.stateFiber s b).card) :
     2 ≤ mergerDepth s := by
-  rw [mergerDepth_eq_sum_excess]
   have hsub : ({a, b} : Finset (Fin n)) ⊆ Finset.univ.image s := by
     intro c hc
     rcases Finset.mem_insert.mp hc with rfl | hc'
     · exact ha
     · rw [Finset.mem_singleton.mp hc']
       exact hb
-  have hle := Finset.sum_le_sum_of_subset hsub (f := fun a ↦ (Linkage.stateFiber s a).card - 1)
+  have hle : ∑ c ∈ ({a, b} : Finset (Fin n)), ((Linkage.stateFiber s c).card - 1)
+      ≤ ∑ c ∈ Finset.univ.image s, ((Linkage.stateFiber s c).card - 1) :=
+    Finset.sum_le_sum_of_subset hsub
   have hpair : ∑ c ∈ ({a, b} : Finset (Fin n)), ((Linkage.stateFiber s c).card - 1)
       = ((Linkage.stateFiber s a).card - 1) + ((Linkage.stateFiber s b).card - 1) :=
     Finset.sum_pair hab
+  rw [mergerDepth_eq_sum_excess]
   omega
 
 /-! ### The depth and the identity loss vanish together

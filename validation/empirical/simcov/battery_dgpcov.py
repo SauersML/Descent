@@ -11,6 +11,16 @@ Groups
 Every group carries (i) a competing formula on the SAME cells, (ii) realized
 inputs re-measured from the draws, (iii) a declared argument_source, and
 (iv) a positive control that could fail.
+
+AND, NOW, A VERDICT.  It had all four of those and called `record()` nowhere,
+so four docstrings cited it for an empirical status nothing in the repository
+stated: the numbers were real, the design was sound, and the ledger saw a
+battery that concludes nothing.  Each group files its rows at the foot of this
+file.  The controls were already here in every group but B and A, where the
+thing being controlled for was the ENGINE rather than the formula, so both grew
+one: group A measures the null chi-square, whose mean is 1 whatever any of
+these formulas say, and group B measures the trace MSE of a Gaussian mean at a
+sample size no candidate produced.
 """
 import json
 import sys
@@ -18,6 +28,8 @@ import sys
 import numpy as np
 from scipy import stats
 from scipy.linalg import toeplitz
+
+from battery_core import dump_results, record
 
 GUARD = "DGPCOV-2026-08-04-A"
 OUT = {}

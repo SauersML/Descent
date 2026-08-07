@@ -29,6 +29,7 @@ import Descent.Coalescent.Generator
 import Descent.Coalescent.HoldingSecondMoment
 import Descent.Coalescent.HoldingTime
 import Descent.Coalescent.Infinite
+import Descent.Coalescent.Interpolation
 import Descent.Coalescent.IntervalPicture
 import Descent.Coalescent.JumpChain
 import Descent.Coalescent.Kernel

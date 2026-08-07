@@ -323,6 +323,27 @@ theorem requiredEventsForRecalibration_zero_infoperevent_is_junk
   unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct
   simp
 
+/-- **Richer events buy events one for one.**
+
+Scaling the per-event information by a factor -- the `Descent.Core.product` of that factor
+with `infoPerEvent` -- divides the event requirement by the same factor. A cohort whose events
+carry twice the Fisher information needs half as many of them, with no floor and no threshold
+at which the trade stops. The requirement is therefore a statement about total information and
+not about event count as such: the same target precision is reachable from a small deeply
+phenotyped cohort or a large shallow one, interchangeably and at exactly this rate. It is also
+why no count of events separates the per-event information from the trace-MSE target -- the
+two enter only through their product. -/
+theorem requiredEventsForRecalibration_scales_with_information
+    (nParams infoPerEvent targetTraceMSE factor : ℝ) :
+    requiredEventsForRecalibration nParams
+        (Descent.Core.product factor infoPerEvent) targetTraceMSE =
+      Descent.Core.ratio
+        (requiredEventsForRecalibration nParams infoPerEvent targetTraceMSE) factor := by
+  unfold requiredEventsForRecalibration Descent.Core.ratioOfProduct Descent.Core.product
+    Descent.Core.ratio
+  rw [div_div]
+  ring
+
 /-- **Sample size needed for recalibration.**
     Under the orthogonal Fisher trace-MSE model, achieving target calibration
     precision `τ` is equivalent to having at least

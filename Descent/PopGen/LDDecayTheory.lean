@@ -234,6 +234,26 @@ theorem tag_r2_le_one (D_sq var_tag var_causal : ℝ)
   rw [div_le_one (mul_pos h_vt h_vc)]
   exact h_dsq_le
 
+/-- **The scale hazard in the docstring above, as an equation.**
+
+`tagR2` is invariant under a CONSISTENT rescaling of its three arguments: a factor `c` on
+each genotypic variance and `c²` on the squared covariance, which is what changing the
+variance convention actually does to a squared dosage covariance.  Read consistently, the
+allelic and genotypic conventions give the same `r²`.
+
+The factor of four the docstring warns about is this theorem's hypothesis being broken rather
+than a property of `r²`: halving both variances while leaving `D²` alone is the rescaling
+with `c = 1/2` on the denominator and `c² = 1` on the numerator, and no invariance covers
+that.  Stating the invariance is what makes the mismatch a visible failure of its condition
+instead of a number that looks like a definition error. -/
+theorem tagR2_consistent_rescaling (D_sq var_tag var_causal c : ℝ) (hc : c ≠ 0) :
+    tagR2 (Descent.Core.product (c ^ 2) D_sq) (Descent.Core.product c var_tag)
+        (Descent.Core.product c var_causal)
+      = tagR2 D_sq var_tag var_causal := by
+  unfold tagR2 Descent.Core.ratioOfProduct Descent.Core.product
+  rw [show c * var_tag * (c * var_causal) = c ^ 2 * (var_tag * var_causal) by ring]
+  exact mul_div_mul_left _ _ (pow_ne_zero 2 hc)
+
 /-- **Tag r² decreases when LD structure changes.**
     In the target population, D² between tag and causal may be different. -/
 theorem tag_r2_decreases_with_ld_change
@@ -858,6 +878,29 @@ theorem driftLDTrajectory_closedForm (Ne c Q₀ : ℝ)
       rw [driftLDTrajectory_succ, ih, driftLDStep_affine,
         ← driftLDEquilibrium_mul_one_sub_retention Ne c hNe hc hc1]
       ring
+
+/-- **What decays geometrically is the DEVIATION from equilibrium, not the trajectory.**
+
+`ldRecurrence` above decays to zero and this one does not: recombination breaks LD down while
+drift builds it back up, and the rest point is `driftLDEquilibrium` rather than the origin.
+Stated against the same kernel, the difference is visible as one argument -- the deviation
+decays by `Core.geometricDecay` at the loss rate `1 - driftLDRetention`, and the trajectory
+itself is that decay displaced by the equilibrium.
+
+This is why a measurement that anchors on the equilibrium each generation cannot see an error
+in the retention: it is measuring the thing this theorem holds fixed.  Reading the trajectory
+as a bare geometric decay -- the shape the LD literature's `(1-c)^t` suggests -- sends it to
+zero, and at `Nₑ` small enough for drift to matter that is the wrong limit, not a small
+error. -/
+theorem driftLDTrajectory_deviation_eq_geometricDecay (Ne c Q₀ : ℝ)
+    (hNe : 1 ≤ Ne) (hc : 0 ≤ c) (hc1 : c ≤ 1) (t : ℕ) :
+    driftLDTrajectory Ne c Q₀ t - driftLDEquilibrium Ne c
+      = Descent.Core.geometricDecay (1 - driftLDRetention Ne c) t
+          * (Q₀ - driftLDEquilibrium Ne c) := by
+  rw [driftLDTrajectory_closedForm Ne c Q₀ hNe hc hc1 t]
+  unfold Descent.Core.geometricDecay
+  rw [sub_sub_cancel]
+  ring
 
 end BottleneckLD
 
@@ -1569,6 +1612,22 @@ theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
     simp
   | succ n ih =>
     simp [ih, pow_succ, mul_left_comm, mul_comm]
+
+/-- **The LD decay is the corpus's geometric decay, on the nose.**
+
+The closed form above writes the power out, and a power written out is a power that can
+drift: `Core.hetRecurrence` decays by `(1 - 1/(2Nₑ))^t` and this by `(1 - r)^t`, and until
+both are stated against the same kernel a change to one is invisible to the other.  Routing
+this one through `Core.geometricDecay` is what makes the two comparable, and it is the same
+step `Core.hetRecurrence_eq_geometricDecay` takes for heterozygosity.
+
+The recombination reading is unchanged and is the point of the warning at the top of this
+file: `r` here is a recombination fraction, so what decays geometrically is `E[D]` per
+generation of recombination, not a correlation. -/
+theorem ldRecurrence_eq_geometricDecay (r D₀ : ℝ) (t : ℕ) :
+    ldRecurrence r D₀ t = Descent.Core.geometricDecay r t * D₀ := by
+  rw [ld_decay_closed_form]
+  rfl
 
 /-- **LD magnitude decreases each generation** when 0 < r < 1 and D(t) > 0.
 

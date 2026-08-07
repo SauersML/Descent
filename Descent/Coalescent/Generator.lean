@@ -76,6 +76,27 @@ def prodUpTo {M : Type*} [Monoid M] (A : ℕ → M) : ℕ → M
 theorem prodUpTo_succ {M : Type*} [Monoid M] (A : ℕ → M) (r : ℕ) :
     prodUpTo A (r + 1) = prodUpTo A r * A r := rfl
 
+/-- **At a constant factor the ordered product is the corpus's geometric decay.**
+
+The product above is written for factors that do not commute, which is what the K-G estimate
+below needs; the corpus's decaying quantities are the commuting scalar case of it, and
+`Descent.Core.geometricDecay` is where they all route.  The two constructions meet here: `r`
+generations of a constant retention `1 - r` is one kernel evaluation, so a change to either
+the recursion or the kernel stops this compiling.
+
+The scalar case is not a lesser instance.  `Core.hetRecurrence`, the LD decay and the drift
+retention are all this product with the factor held fixed, and reading them as a product is
+what makes the per-generation factor -- not the exponent -- the thing a mechanism has to
+supply. -/
+theorem prodUpTo_const_eq_geometricDecay (r : ℝ) (t : ℕ) :
+    prodUpTo (fun _ ↦ 1 - r) t = Descent.Core.geometricDecay r t := by
+  induction t with
+  | zero => simp [prodUpTo, Descent.Core.geometricDecay]
+  | succ n ih =>
+      simp only [prodUpTo_succ, ih]
+      unfold Descent.Core.geometricDecay
+      ring
+
 /-- A product of contractions is a contraction. -/
 theorem norm_prodUpTo_le_one {M : Type*} [NormedRing M] [NormOneClass M] (A : ℕ → M)
     (hA : ∀ s, ‖A s‖ ≤ 1) (r : ℕ) : ‖prodUpTo A r‖ ≤ 1 := by

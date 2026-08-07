@@ -169,22 +169,31 @@ def correct_freq_corr():
             comp.append(dict(design=design, lean=1 - gst,
                              truth=s["mean"], sem=s["sem"]))
             g = simlib.summarize(gst_reps)
-            gst_cells.append(dict(design=design, lean=f_br,
+            # `f_br` is the WITHIN-deme drift index against the ancestor; the
+            # BETWEEN-deme G_ST of two sisters each drifted by F is F/(2-F),
+            # because Hs = 2p0q0(1-F) while Ht = 2p0q0(1-F/2).  An earlier
+            # version of this control compared G_ST against F itself and missed
+            # by 858 sems -- correctly, since they differ by nearly a factor of
+            # two, and the run it voided was the run whose corpus row is fine.
+            gst_cells.append(dict(design=design, lean=f_br / (2 - f_br),
                                   truth=g["mean"], sem=g["sem"]))
             print("  %-30s %9.4f %9.4f %9.4f %8.1f"
                   % (design, 1 - gst, proposed, s["mean"], z))
     OUT["freq_corr"] = rows
 
-    # CONTROL: the Wright drift index itself.  `F = 1 - (1 - 1/(2Ne))^t` is the
-    # textbook recursion and is what the correlation law is evaluated at, so a
-    # run in which the simulated G_ST does NOT reproduce it has no standing to
-    # report anything about the correlation.  The worst of the eight cells is
-    # taken, because a control that passes only on its easiest cell is not one.
+    # CONTROL: the differentiation the drift index implies.  With
+    # `F = 1 - (1 - 1/(2Ne))^t` the between-deme `G_ST` of two sisters is
+    # `F/(2-F)`, which is the Wright-Fisher variance recursion and Nei's
+    # decomposition and nothing from the law under test, so a run in which the
+    # simulated `G_ST` does not reproduce it has no standing to report anything
+    # about the correlation.  The worst of the eight cells is taken, because a
+    # control that passes only on its easiest cell is not one.
     control = max(gst_cells,
                   key=lambda c: abs(c["lean"] - c["truth"]) / max(c["sem"], 1e-12))
     control = dict(control)
-    control["design"] = ("Wright drift index F = 1-(1-1/(2Ne))^t, worst of the "
-                         "eight cells: " + control["design"])
+    control["design"] = ("between-deme G_ST implied by the drift index, "
+                         "F/(2-F) at F = 1-(1-1/(2Ne))^t, worst of the eight "
+                         "cells: " + control["design"])
     print("  CONTROL %s: predicted %.5f measured %.5f +/- %.5f"
           % (control["design"], control["lean"], control["truth"],
              control["sem"]))

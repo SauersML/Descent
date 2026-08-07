@@ -666,6 +666,21 @@ interest is exactly what the symbol analysis below can be falsified against. -/
 noncomputable def stationaryLDEntry (decay : ℝ) (separation : ℕ) : ℝ :=
   Descent.Core.power decay separation
 
+/-- **LD factors through every intermediate site.**
+
+The correlation across `m + n` sites is the `Descent.Core.product` of the correlations across
+`m` and across `n`. So the whole sequence is fixed by the one-site retention, and there is no
+separation at which LD is lost faster or slower than the per-site coefficient says: reading
+the correlation at a distance never requires knowing where along the interval the sites fall.
+This is the semigroup property that makes the entry the stationary sequence of a *process*
+rather than a table indexed by separation, and it is what the symbol analysis below relies on
+when it reads an entire spectral density off `decay` alone. -/
+theorem stationaryLDEntry_add_separation (decay : ℝ) (m n : ℕ) :
+    stationaryLDEntry decay (m + n) =
+      Descent.Core.product (stationaryLDEntry decay m) (stationaryLDEntry decay n) := by
+  unfold stationaryLDEntry Descent.Core.power Descent.Core.product
+  exact pow_add decay m n
+
 /-- **One site of propagation along the chromosome.**
 
 The first-order Markov model is a *process*, and `stationaryLDEntry` is its

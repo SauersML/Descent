@@ -744,6 +744,25 @@ noncomputable def pooledEnvironmentCorrelation
     (left right leftMass : ℝ) : ℝ :=
   Descent.Core.convexCombination leftMass left right
 
+/-- **Pooling displaces from the right environment in proportion to the left mass.**
+
+The pooled correlation minus the right environment's is the left mass times the gap between
+the two environments. So the mixture moves along the segment joining them at unit rate in the
+mass: no mass leaves the right environment where it is, full mass arrives at the left one, and
+every intermediate value is reached exactly once.
+
+This is what makes the pooling a convex combination rather than merely a two-argument average,
+and it is the law behind the cancellation example below: opposite-sign environments put the
+gap at `2·rho`, so the displacement is `2·rho·mix` and the pooled value crosses zero at half
+mass. A pooling that weighted the two sides by anything other than a mass and its complement
+would satisfy neither this nor `pooledEnvironmentCorrelation_same`. -/
+theorem pooledEnvironmentCorrelation_sub_right (left right leftMass : ℝ) :
+    Descent.Core.difference (pooledEnvironmentCorrelation left right leftMass) right =
+      Descent.Core.product leftMass (Descent.Core.difference left right) := by
+  unfold pooledEnvironmentCorrelation Descent.Core.convexCombination Descent.Core.difference
+    Descent.Core.product
+  ring
+
 /-- Opposite-sign, equal-magnitude environments reduce to the cancellation parameter used
 below. -/
 theorem pooledEnvironmentCorrelation_opposite

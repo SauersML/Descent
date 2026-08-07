@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.Deficit
+import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.Reduction

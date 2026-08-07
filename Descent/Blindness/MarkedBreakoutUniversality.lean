@@ -430,6 +430,22 @@ theorem genealogicalTimescale_add (width : ℝ) (p q : ℕ) :
   simp [genealogicalTimescale, pow_add,
       Descent.Core.power]
 
+/-- **Widths compose too, and that is what makes the exponent an exponent.**
+
+`genealogicalTimescale_add` says the clock is additive in the susceptibility exponent; this
+says it is multiplicative in the front width at fixed exponent. A front twice as wide as
+another runs a clock `2^p` times slower, and the two laws together leave only the power: a
+body linear in the exponent satisfies neither, and `width · p` satisfies the first and fails
+this one.
+
+Both are homomorphism statements about the same kernel, which is why they are stated against
+`Core.product` rather than against a bare multiplication — the composition is the content, and
+the kernel is where a change to it would have to happen. -/
+theorem genealogicalTimescale_mul_width (width₁ width₂ : ℝ) (p : ℕ) :
+    genealogicalTimescale (Descent.Core.product width₁ width₂) p =
+      Descent.Core.product (genealogicalTimescale width₁ p) (genealogicalTimescale width₂ p) := by
+  simp [genealogicalTimescale, Descent.Core.power, Descent.Core.product, mul_pow]
+
 /-- With susceptibility exponent three, the pioneer clock is the front-width cube. -/
 @[simp] theorem genealogicalTimescale_three (width : ℝ) :
     genealogicalTimescale width 3 = width ^ 3 := rfl

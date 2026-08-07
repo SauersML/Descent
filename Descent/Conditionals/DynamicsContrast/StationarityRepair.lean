@@ -1483,6 +1483,32 @@ theorem genomicExponentialProfileDistance_finitePrefixControl
     Blindness.TrafficInvariantSeparation.exponentialProfileDistance_le_geometricTail_of_prefix_eq
       left right prefixLength hprefix⟩
 
+/-- **The approximation modulus is the corpus's geometric decay at rate one half.**
+
+The tail left by agreeing on the first `K` coordinates is `2·2⁻ᴷ`, and `2⁻ᴷ` is
+`Core.geometricDecay` at rate one half: each further coordinate retires half of what remains,
+exactly as a per-step retention of one half does anywhere else in the corpus. So the profile
+metric's modulus is not a constant invented for this construction — it is the same decay
+kernel, read at a rate the enumeration weights fix.
+
+This is also the only statement relating `ExponentialProfileCompactness` to anything outside
+itself. Every other fact about the profile space is proved from Mathlib alone, which makes the
+module self-contained and, until this, unable to disagree with the corpus about anything: a
+wrong weight in the enumeration would have been consistent with everything else. Stating the
+modulus against the shared kernel is what puts it at risk. -/
+theorem genomicExponentialProfileDistance_finitePrefixControl_eq_geometricDecay
+    {bound : ℝ} (left right : Blindness.TrafficInvariantSeparation.BoundedExponentialProfile bound)
+    (prefixLength : ℕ)
+    (hprefix : ∀ coordinate < prefixLength, left coordinate = right coordinate) :
+    exponentialProfileDistance left right ≤
+      2 * Descent.Core.geometricDecay (1 / 2) prefixLength := by
+  have hdecay : Descent.Core.geometricDecay (1 / 2 : ℝ) prefixLength =
+      (1 / 2 : ℝ) ^ prefixLength := by
+    unfold Descent.Core.geometricDecay
+    norm_num
+  rw [hdecay]
+  exact (genomicExponentialProfileDistance_finitePrefixControl left right prefixLength hprefix).2
+
 /-- **Bounded genomic exponential profiles are sequentially compact in the
 explicit weighted distance.**  The same subsequence works simultaneously for
 every enumerated prior/replica/tilt coordinate. -/
