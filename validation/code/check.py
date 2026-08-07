@@ -7769,10 +7769,16 @@ LAYER_PENDING = {
         "states an architecture theorem in terms of them, so here the consumer moves "
         "UP rather than the definition moving down.",
     ("Descent.PopGen.HumanDemography", "Descent.Portability.PortabilityDrift"):
-        "`fstFromGenerations` and `coalescentTau` are demography and coalescent time "
-        "-- single-population quantities with no score being carried anywhere -- "
-        "housed in the drift chapter because that is where the drift chapter was "
-        "written.",
+        "`fstFromGenerations`, eight times: demography, a single-population quantity "
+        "with no score carried anywhere, housed in the drift chapter because that is "
+        "where the drift chapter was written. THIS EDGE DOES NOT COME WITH THE DRIFT "
+        "EXTRACTION, and an earlier version of this entry said it did by naming "
+        "`coalescentTau`, which this file uses ZERO times -- the only matches are its "
+        "own theorem names, like `fstFromGenerations_le_coalescentTau`. What it also "
+        "names is `presentDayR2`, `presentDayR2_eq_core`, `presentDayPGSVariance` and "
+        "`pgsVarianceFromHet` from `PortabilityDrift.PresentDayMetrics`, and those are "
+        "PGS transport, correctly placed. So this edge outlives every extraction the "
+        "other entries name and its repair is the consumer moving UP.",
     ("Descent.PopGen.LDDecayTheory", "Descent.Portability.PortabilityDrift"):
         "Unfolds `Portability.ibdRecurrenceStep` and `islandFstMultiplicativeStep` "
         "against its own `driftLDStep`. The identity-by-descent recurrence and the "
@@ -7825,8 +7831,16 @@ LAYER_PENDING = {
         "`GeneticArchitectureDiscovery`.",
     ("Descent.PopGen.StandardizedGenotypeMoments",
      "Descent.Portability.AncestrySpecificPower"):
-        "`Portability.genotypeVarianceHWE` again, six times. One extraction retires "
-        "this edge, and two more above it.",
+        "`Portability.genotypeVarianceHWE` again. One extraction retires this edge and "
+        "ONE more, not two: `GeneticArchitectureDiscovery` names nothing else from "
+        "`AncestrySpecificPower` and goes with it, but `SelectionArchitecture` "
+        "independently names `fisherInformation`, `ncp`, `effectiveFisherInformation` "
+        "and three of their lemmas, all declared there, so its edge survives and needs "
+        "its own extraction. The declaration's body is `Descent.Core.hweHeterozygosity` "
+        "and nothing else, and its home is `PopGen.DGP` rather than `Core/Fst.lean` -- "
+        "beside `hweHeterozygosity` it would be two names for one body in one namespace, "
+        "which is what `duplication` reports, and the ledger keys of two VALIDATED "
+        "battery records move with the name.",
     ("Descent.Portability.PGSCalibrationTheory.RecalibrationMethods",
      "Descent.Program.Conclusions"):
         "`BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant`: "
