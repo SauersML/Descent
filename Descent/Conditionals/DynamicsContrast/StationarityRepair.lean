@@ -5,6 +5,7 @@ import Descent.Conditionals.DynamicsContrast.CohortLandscapeSuperposition
 import Descent.Blindness.TrafficInvariantSeparation.CurieWeissWindow
 import Descent.Blindness.TrafficInvariantSeparation.MatchedBayesBoundary
 import Descent.Blindness.XiFromMarkedBreakouts
+import Descent.Blindness.TrafficInvariantSeparation.ExponentialProfileCompactness
 
 assert_below Descent.Decision
 
