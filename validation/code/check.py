@@ -7774,14 +7774,6 @@ LAYER_UNRANKED = {
 # repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
 # still counts as a violation; see the section header.
 LAYER_PENDING = {
-    ("Descent.PopGen.DemographicHistory",
-     "Descent.Portability.PortabilityDrift.MigrationDrift"):
-        "`Portability.fstMigrationDriftEquilibrium_decreases_with_m`, the monotonicity of "
-        "the migration-drift equilibrium in the migration rate. The QUANTITY it is about "
-        "moved down to `PopGen.DriftRecurrences` with the rest of the drift block; this "
-        "theorem about it did not, because it is stated in the drift chapter's own terms. "
-        "The repair is to move the theorem down beside the definition it constrains, "
-        "which is a smaller version of the move that retired six edges.",
     ("Descent.PopGen.PolygenicAdaptation",
      "Descent.Portability.PortabilityDrift.PresentDayMetrics"):
         "`Portability.Var_Delta_Mu`, the variance of the mean shift. This is a "
