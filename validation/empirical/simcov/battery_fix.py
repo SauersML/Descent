@@ -39,31 +39,45 @@ import simlib
 from battery_core import RESULTS, record
 
 
-def split_fst_rec(Ne, t, NeA=None, NeB=None, NeANC=None, n_dip=50,
-                  seq_len=2e7, mu=1e-8, rho=1e-8, reps=25, seed=1):
-    """Clean split with RECOMBINATION on, so a replicate holds many genealogies."""
+def _split_fst_rec_rep(params):
+    """One recombining-split replicate.  Top-level so a pool can pickle it.
+
+    The seed is `seed + r` and nothing carries between replicates, so fanning
+    these out across processes returns the same numbers in the same order --
+    see `simlib.replicate_map`.
+    """
+    NeA, NeB, NeANC, t, n_dip, seq_len, mu, rho, seed, r = params
     import msprime
-    NeA = NeA or Ne
-    NeB = NeB or Ne
-    NeANC = NeANC or Ne
     dem = msprime.Demography()
     dem.add_population(name="A", initial_size=NeA)
     dem.add_population(name="B", initial_size=NeB)
     dem.add_population(name="ANC", initial_size=NeANC)
     dem.add_population_split(time=t, derived=["A", "B"], ancestral="ANC")
-    hud = []
-    for r in range(reps):
-        ts = msprime.sim_ancestry(samples={"A": n_dip, "B": n_dip},
-                                  demography=dem, sequence_length=seq_len,
-                                  recombination_rate=rho, random_seed=seed + r)
-        ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 7000 + r)
-        if ts.num_sites == 0:
-            continue
-        gm = ts.genotype_matrix()
-        a, b = ts.samples(population=0), ts.samples(population=1)
-        hud.append(simlib.hudson_fst(gm[:, a].sum(1).astype(float), len(a),
-                                     gm[:, b].sum(1).astype(float), len(b)))
-    return simlib.summarize(hud)
+    ts = msprime.sim_ancestry(samples={"A": n_dip, "B": n_dip},
+                              demography=dem, sequence_length=seq_len,
+                              recombination_rate=rho, random_seed=seed + r)
+    ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 7000 + r)
+    if ts.num_sites == 0:
+        return None
+    gm = ts.genotype_matrix()
+    a, b = ts.samples(population=0), ts.samples(population=1)
+    return simlib.hudson_fst(gm[:, a].sum(1).astype(float), len(a),
+                             gm[:, b].sum(1).astype(float), len(b))
+
+
+def split_fst_rec(Ne, t, NeA=None, NeB=None, NeANC=None, n_dip=50,
+                  seq_len=2e7, mu=1e-8, rho=1e-8, reps=25, seed=1,
+                  workers=None):
+    """Clean split with RECOMBINATION on, so a replicate holds many genealogies."""
+    NeA = NeA or Ne
+    NeB = NeB or Ne
+    NeANC = NeANC or Ne
+    out = simlib.replicate_map(
+        _split_fst_rec_rep,
+        [(NeA, NeB, NeANC, t, n_dip, seq_len, mu, rho, seed, r)
+         for r in range(reps)],
+        workers=workers)
+    return simlib.summarize([x for x in out if x is not None])
 
 
 # ---------------------------------------------------------------------------

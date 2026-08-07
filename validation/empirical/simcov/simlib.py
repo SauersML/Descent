@@ -20,8 +20,47 @@ indistinguishable without the error bar.  This is the same rule
 `validation/empirical/simprov.py` states for the sweeps.
 """
 import math
+import os
 
 import numpy as np
+
+# --------------------------------------------------------------------------
+# replicate scheduling
+# --------------------------------------------------------------------------
+#
+# Every coalescent replicate below is a PURE FUNCTION OF ITS OWN INDEX: the
+# only thing that varies across the loop is `random_seed = seed + r`, nothing
+# is carried from one iteration to the next, and the demography is rebuilt
+# from the same numbers each time.  So running the replicates in a process
+# pool cannot move a single digit -- it is a scheduling choice and not a
+# modelling one, which is the whole safety argument for doing it at all.
+#
+# Two things keep that true and both are load-bearing.  The map is ORDERED, so
+# the replicate list is the same list at any worker count and `summarize`'s sem
+# does not depend on how many cores answered first.  And a replicate that
+# scores nothing (no segregating sites) returns `None` and is dropped AFTER the
+# map rather than skipped inside it, so the survivors are the same survivors.
+#
+# Default is serial.  Set `SIMCOV_WORKERS` to fan out; a battery that wants a
+# fixed width can pass `workers=` instead.
+
+_WORKERS = int(os.environ.get("SIMCOV_WORKERS", "1"))
+
+
+def replicate_map(fn, args, workers=None):
+    """Map a top-level `fn` over `args` in order, serially or in a pool.
+
+    `fn` must be importable by name -- a closure cannot be pickled and will
+    fail here rather than silently falling back to serial.
+    """
+    w = _WORKERS if workers is None else workers
+    args = list(args)
+    if w <= 1 or len(args) <= 1:
+        return [fn(a) for a in args]
+    import concurrent.futures as cf
+    with cf.ProcessPoolExecutor(max_workers=min(w, len(args))) as ex:
+        return list(ex.map(fn, args))
+
 
 # --------------------------------------------------------------------------
 # estimators over allele-frequency tables
@@ -76,42 +115,70 @@ def summarize(vals):
 # --------------------------------------------------------------------------
 
 
-def split_fst(Ne, t_split, n_dip=50, seq_len=5e5, mu=1e-8, rho=0.0,
-              reps=20, seed=1):
-    """F_ST between two demes that split `t_split` generations ago.
+def _fst_pair(ts):
+    """Hudson and Nei between the first two sampled populations of `ts`."""
+    if ts.num_sites == 0:
+        return None
+    gm = ts.genotype_matrix()
+    a = ts.samples(population=0)
+    b = ts.samples(population=1)
+    ac1 = gm[:, a].sum(axis=1).astype(float)
+    ac2 = gm[:, b].sum(axis=1).astype(float)
+    return (hudson_fst(ac1, len(a), ac2, len(b)),
+            nei_gst(ac1, len(a), ac2, len(b)))
 
-    No migration, ancestral size `Ne`, both daughters size `Ne`.  This is the
-    design whose Hudson F_ST theory predicts exactly `t/(t + 2Ne)`, so it is
-    also the engine's own calibration case.
-    """
+
+def _split_fst_rep(params):
+    """One clean-split replicate.  Top-level so a process pool can pickle it."""
+    Ne, t_split, n_dip, seq_len, mu, rho, seed, r = params
     import msprime
     dem = msprime.Demography()
     dem.add_population(name="A", initial_size=Ne)
     dem.add_population(name="B", initial_size=Ne)
     dem.add_population(name="ANC", initial_size=Ne)
     dem.add_population_split(time=t_split, derived=["A", "B"], ancestral="ANC")
-    hud, nei = [], []
-    for r in range(reps):
-        ts = msprime.sim_ancestry(
-            samples={"A": n_dip, "B": n_dip}, demography=dem,
-            sequence_length=seq_len, recombination_rate=rho,
-            random_seed=seed + r)
-        ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 10000 + r)
-        if ts.num_sites == 0:
-            continue
-        gm = ts.genotype_matrix()
-        a = ts.samples(population=0)
-        b = ts.samples(population=1)
-        ac1 = gm[:, a].sum(axis=1).astype(float)
-        ac2 = gm[:, b].sum(axis=1).astype(float)
-        hud.append(hudson_fst(ac1, len(a), ac2, len(b)))
-        nei.append(nei_gst(ac1, len(a), ac2, len(b)))
+    ts = msprime.sim_ancestry(
+        samples={"A": n_dip, "B": n_dip}, demography=dem,
+        sequence_length=seq_len, recombination_rate=rho,
+        random_seed=seed + r)
+    ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 10000 + r)
+    return _fst_pair(ts)
+
+
+def _island_fst_rep(params):
+    """One island-model replicate.  Top-level so a process pool can pickle it."""
+    Ne, m, n_demes, n_dip, seq_len, mu, seed, r = params
+    import msprime
+    dem = msprime.Demography.island_model(
+        [Ne] * n_demes, migration_rate=m / (n_demes - 1))
+    ts = msprime.sim_ancestry(
+        samples={f"pop_{i}": n_dip for i in range(2)}, demography=dem,
+        sequence_length=seq_len, recombination_rate=0.0,
+        random_seed=seed + r)
+    ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 20000 + r)
+    return _fst_pair(ts)
+
+
+def split_fst(Ne, t_split, n_dip=50, seq_len=5e5, mu=1e-8, rho=0.0,
+              reps=20, seed=1, workers=None):
+    """F_ST between two demes that split `t_split` generations ago.
+
+    No migration, ancestral size `Ne`, both daughters size `Ne`.  This is the
+    design whose Hudson F_ST theory predicts exactly `t/(t + 2Ne)`, so it is
+    also the engine's own calibration case.
+    """
+    out = replicate_map(_split_fst_rep,
+                        [(Ne, t_split, n_dip, seq_len, mu, rho, seed, r)
+                         for r in range(reps)],
+                        workers=workers)
+    hud = [x[0] for x in out if x is not None]
+    nei = [x[1] for x in out if x is not None]
     return dict(hudson=summarize(hud), nei=summarize(nei),
                 hudson_reps=hud, nei_reps=nei)
 
 
 def island_fst(Ne, m, n_demes=2, n_dip=50, seq_len=5e5, mu=1e-8,
-               reps=20, seed=1):
+               reps=20, seed=1, workers=None):
     """F_ST at migration-drift-mutation equilibrium in a symmetric island model.
 
     `m` is the per-generation probability that a lineage's parent sat in a
@@ -121,25 +188,12 @@ def island_fst(Ne, m, n_demes=2, n_dip=50, seq_len=5e5, mu=1e-8,
     Getting this wrong rescales the prediction by `n-1` and would manufacture a
     falsification out of a units error.
     """
-    import msprime
-    dem = msprime.Demography.island_model(
-        [Ne] * n_demes, migration_rate=m / (n_demes - 1))
-    hud, nei = [], []
-    for r in range(reps):
-        ts = msprime.sim_ancestry(
-            samples={f"pop_{i}": n_dip for i in range(2)}, demography=dem,
-            sequence_length=seq_len, recombination_rate=0.0,
-            random_seed=seed + r)
-        ts = msprime.sim_mutations(ts, rate=mu, random_seed=seed + 20000 + r)
-        if ts.num_sites == 0:
-            continue
-        gm = ts.genotype_matrix()
-        a = ts.samples(population=0)
-        b = ts.samples(population=1)
-        ac1 = gm[:, a].sum(axis=1).astype(float)
-        ac2 = gm[:, b].sum(axis=1).astype(float)
-        hud.append(hudson_fst(ac1, len(a), ac2, len(b)))
-        nei.append(nei_gst(ac1, len(a), ac2, len(b)))
+    out = replicate_map(_island_fst_rep,
+                        [(Ne, m, n_demes, n_dip, seq_len, mu, seed, r)
+                         for r in range(reps)],
+                        workers=workers)
+    hud = [x[0] for x in out if x is not None]
+    nei = [x[1] for x in out if x is not None]
     return dict(hudson=summarize(hud), nei=summarize(nei))
 
 

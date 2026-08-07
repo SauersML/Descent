@@ -22,13 +22,24 @@ Three questions:
      noisy at large `n` to accept or reject it.  Enough replicates here to
      decide, because installing an unvalidated correction is the same mistake
      as leaving an unvalidated formula.
+
+RECORDING THE VERDICTS.  For three releases this battery printed numbers and
+called `record()` nowhere, so seven docstrings cited it for an empirical status
+that the ledger could not see: the citation was followable and the arithmetic
+was real, but nothing in the repository stated what the run CONCLUDED.  Each
+group below now files the CURRENT corpus body as the corpus row and the form it
+superseded as a competitor -- in that order, because filing the proposal as the
+corpus row is what leaves the ledger asserting a falsification of a formula no
+file contains.
 """
 import json
 import math
 
 import numpy as np
 
+import battery_core
 import simlib
+from battery_core import dump_results, record, run_groups
 
 OUT = {}
 

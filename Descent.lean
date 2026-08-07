@@ -327,7 +327,7 @@ theorem covariance_mismatch_pos_of_twoLocusCoalescent_dim_two
 /-- The true derivative of expected Brier score with respect to `p`,
     proved via the quadratic-form derivative in `Conclusions`. -/
 theorem expectedBrierScore_deriv_proved (p π : ℝ) :
-    deriv (fun x ↦ Program.expectedBrierScore x π) p = 2 * (p - π) :=
+    deriv (fun x ↦ Foundations.expectedBrierScore x π) p = 2 * (p - π) :=
   Program.expectedBrierScore_deriv p π
 
 /-- Concrete 2x2 matrix representing independent LD. -/
