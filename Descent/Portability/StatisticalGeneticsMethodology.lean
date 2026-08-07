@@ -73,6 +73,20 @@ theorem incrementalR2_telescope (a b c : ℝ) :
     incrementalR2 a b + incrementalR2 b c = incrementalR2 a c := by
   unfold incrementalR2 Descent.Core.difference; ring
 
+/-- **The increment reads the gap, not the level.**
+
+Adding the same explained variance to both fits -- a covariate set that helps the full and
+the baseline model equally, taken here as the `Descent.Core.sum` of each `R²` with a common
+term -- leaves the increment where it was. This is what makes an incremental `R²` comparable
+across cohorts whose baseline models explain different amounts, and it is the reason the
+metric is reported without its baseline. A body sensitive to the level would make that
+comparison invalid without saying so. -/
+theorem incrementalR2_baseline_shift_invariant (r2_full r2_covariates common : ℝ) :
+    incrementalR2 (Descent.Core.sum r2_full common)
+        (Descent.Core.sum r2_covariates common) =
+      incrementalR2 r2_full r2_covariates := by
+  unfold incrementalR2 Descent.Core.difference Descent.Core.sum; ring
+
 /-- Incremental R² vanishes exactly when the full and covariate-only fits explain the
 same fraction of variance. -/
 theorem incrementalR2_eq_zero_iff (r2_full r2_covariates : ℝ) :
@@ -197,6 +211,21 @@ theorem sampleOverlapBias_lt_one_iff
     sampleOverlapBias p_snps n_overlap < 1 ↔ p_snps < n_overlap := by
   unfold sampleOverlapBias Descent.Core.ratio
   rw [div_lt_one h_n]
+
+/-- **The bias falls off as one over the overlap.**
+
+Scaling the overlapping sample by a factor -- the `Descent.Core.product` of that factor with
+the overlap count -- divides the bias by the same factor. Doubling the overlapping sample
+halves the inflation, so an evaluation design buys down this bias at a fixed rate rather
+than at a rate that depends on how many predictors the score carries. The statement holds at
+the zero factor as well, where both sides read the junk value that
+`portabilityRatio_zero_dr2source_is_junk` names for the same kernel. -/
+theorem sampleOverlapBias_scales_inversely_with_overlap
+    (p_snps n_overlap factor : ℝ) :
+    sampleOverlapBias p_snps (Descent.Core.product factor n_overlap) =
+      Descent.Core.ratio (sampleOverlapBias p_snps n_overlap) factor := by
+  unfold sampleOverlapBias Descent.Core.ratio Descent.Core.product
+  rw [div_div, mul_comm n_overlap factor]
 
 end CrossValidation
 

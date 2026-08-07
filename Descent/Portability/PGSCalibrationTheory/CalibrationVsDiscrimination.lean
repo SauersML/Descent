@@ -3,14 +3,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 import Descent.Portability.PortabilityDrift
-
--- `Program.BinaryPopulation`, `Program.populationAUC` and
--- `Program.populationAUC_strictMono_invariant` are named below.  They used to arrive
--- through `CalibrationDefinitions -> Program.OpenQuestions -> Portability.PortabilityDrift
--- -> ... -> PortabilityDrift.Definitions -> Program.Conclusions`, a fifteen-module path
--- that no longer exists now that the head of this chain imports what it uses.  The
--- dependency is real, so it is written.  The `layers` guard reports the edge: the repair
--- is to move the AUC apparatus out of the narrative module it is housed in.
+-- `BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant` are named
+-- below, so the module declaring them is imported directly rather than reached along a
+-- path that runs through some other chapter's head.
+import Descent.Portability.PopulationAUC
 
 assert_below Descent.Decision
 
@@ -142,14 +138,14 @@ section CalibrationVsDiscrimination
     numbers, not a computation of the AUC-invariant score's calibration. -/
 theorem auc_invariant_and_citl_shifts_under_score_offset
     {Z : Type*} [MeasurableSpace Z]
-    (pop : Program.BinaryPopulation Z) (score : Z → ℝ)
+    (pop : BinaryPopulation Z) (score : Z → ℝ)
     (mean_obs mean_pred c : ℝ) :
-    Program.populationAUC pop (fun z ↦ score z + c) = Program.populationAUC pop score ∧
+    populationAUC pop (fun z ↦ score z + c) = populationAUC pop score ∧
       calibrationInTheLarge mean_obs (mean_pred + c) =
         calibrationInTheLarge mean_obs mean_pred - c := by
   constructor
   · simpa [Function.comp] using
-      Program.populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
+      populationAUC_strictMono_invariant pop score (fun x ↦ x + c) (by
         intro a b hab
         linarith)
   · unfold calibrationInTheLarge Descent.Core.difference
@@ -217,6 +213,24 @@ a model that carried only the total could not tell them apart. -/
 noncomputable def totalObservedMeanShift
     (prevalence environmental genetic : ℝ) : ℝ :=
   Descent.Core.sum3 prevalence environmental genetic
+
+/-- **Each channel is attributable, and carries no cross term.**
+
+Zeroing one channel moves the budget by the `Descent.Core.difference` of exactly that
+channel, whatever the other two carry. This is the property the three names exist to
+provide: a calibration failure can be charged to prevalence, to environment or to genetics
+by reading one channel, without first knowing the others. A budget that let the channels
+interact would still have three names and no attribution behind them. -/
+theorem totalObservedMeanShift_channel_attribution
+    (prevalence environmental genetic : ℝ) :
+    Descent.Core.difference (totalObservedMeanShift prevalence environmental genetic)
+        (totalObservedMeanShift 0 environmental genetic) = prevalence ∧
+    Descent.Core.difference (totalObservedMeanShift prevalence environmental genetic)
+        (totalObservedMeanShift prevalence 0 genetic) = environmental ∧
+    Descent.Core.difference (totalObservedMeanShift prevalence environmental genetic)
+        (totalObservedMeanShift prevalence environmental 0) = genetic := by
+  unfold totalObservedMeanShift Descent.Core.sum3 Descent.Core.difference
+  refine ⟨by ring, by ring, by ring⟩
 
 /-- **Observed mean in a population**: the base mean, shifted in the target only.
 

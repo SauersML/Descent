@@ -665,6 +665,22 @@ theorem posteriorPredictiveVariance_sub_estimation (residual_var estimation_var 
   unfold posteriorPredictiveVariance Descent.Core.sum
   ring
 
+/-- **Estimation uncertainty accumulates the same way however it is staged.**
+
+Widening the predictive variance once by the `Descent.Core.sum` of two estimation terms and
+widening it twice, one term at a time, give the same interval. A posterior predictive
+interval reported after a second GWAS therefore does not depend on whether the two studies
+were pooled before the interval was formed or after, which is what licenses adding an
+estimation term to an already-published interval. -/
+theorem posteriorPredictiveVariance_estimation_stages
+    (residual_var estimation_var₁ estimation_var₂ : ℝ) :
+    posteriorPredictiveVariance residual_var
+        (Descent.Core.sum estimation_var₁ estimation_var₂) =
+      posteriorPredictiveVariance
+        (posteriorPredictiveVariance residual_var estimation_var₁) estimation_var₂ := by
+  unfold posteriorPredictiveVariance Descent.Core.sum
+  ring
+
 /-- Posterior predictive variance ≥ residual variance. -/
 theorem posterior_predictive_wider_than_residual
     (residual_var estimation_var : ℝ)

@@ -91,6 +91,20 @@ theorem fisherInformation_at_reference_point :
   norm_num [fisherInformation,
       Descent.Core.product]
 
+/-- **Information adds over independent samples.**
+
+Two cohorts genotyped at the same locus carry the `Descent.Core.sum` of the information each
+carries alone, which is the property that lets a meta-analysis pool sample sizes instead of
+pooling estimates. It is exactly the linearity in `n` that the body asserts: a body with any
+curvature in the sample size would make pooled information depend on how the cohorts were
+split. -/
+theorem fisherInformation_add_samples (m n : ℕ) (v : ℝ) :
+    fisherInformation (m + n) v =
+      Descent.Core.sum (fisherInformation m v) (fisherInformation n v) := by
+  unfold fisherInformation Descent.Core.product Descent.Core.sum
+  push_cast
+  ring
+
 
 
 
@@ -582,6 +596,22 @@ theorem portable_fraction_le_one (r2_causal r2_total : ℝ)
   unfold portableFraction Descent.Core.ratio
   rw [div_le_one h_total]
   exact h_le
+
+/-- **The non-portable remainder is exactly what the portable fraction leaves.**
+
+The signal a score carries through tags rather than causal variants is the
+`Descent.Core.difference` between total and causal, and read as a fraction of the same total
+it is the `Descent.Core.complement` of the portable fraction. Portable and non-portable are
+therefore one split of one total, not two independently normalised readings, so a discovery
+bias that inflates one deflates the other by the same amount. The nonzero total is required
+for the same reason it is in `portableFraction_zero_r2total_is_junk`: with no signal there is
+nothing to divide. -/
+theorem portableFraction_residual_eq_complement (r2_causal r2_total : ℝ)
+    (h_total : r2_total ≠ 0) :
+    portableFraction (Descent.Core.difference r2_total r2_causal) r2_total =
+      Descent.Core.complement (portableFraction r2_causal r2_total) := by
+  unfold portableFraction Descent.Core.ratio Descent.Core.difference Descent.Core.complement
+  rw [sub_div, div_self h_total]
 
 end DiscoveryBias
 

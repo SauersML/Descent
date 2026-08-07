@@ -62,6 +62,23 @@ theorem calibrationInTheLarge_negative_when_overpredicting :
   unfold calibrationInTheLarge Descent.Core.difference
   norm_num
 
+/-- **An intercept recalibration moves CITL by exactly its own size.**
+
+Shifting the predicted mean by a recalibration intercept takes the calibration-in-the-large
+to the `Descent.Core.difference` between the old value and that intercept -- one unit of
+intercept for one unit of CITL, with no dependence on the observed mean or on how badly
+calibrated the model already was. This is what makes intercept recalibration exact rather
+than iterative: the intercept that zeroes CITL is the CITL itself. A body that scaled the
+means before subtracting them would move CITL by some other amount and the recalibration
+would have to be solved for. -/
+theorem calibrationInTheLarge_predicted_shift
+    (mean_observed mean_predicted intercept : ℝ) :
+    calibrationInTheLarge mean_observed (Descent.Core.sum mean_predicted intercept) =
+      Descent.Core.difference
+        (calibrationInTheLarge mean_observed mean_predicted) intercept := by
+  unfold calibrationInTheLarge Descent.Core.difference Descent.Core.sum
+  ring
+
 /-- **Calibration slope.**
     Regress observed on predicted: Y = a + b × predicted.
     b = 1 means well-calibrated spread.

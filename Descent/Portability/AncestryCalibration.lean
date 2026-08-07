@@ -194,6 +194,19 @@ theorem ancestryRecalibratedR2_add_effectTurnoverR2Loss
     Descent.Core.retainedFraction
   ring
 
+/-- **Attenuation composes, and the chain forgets where it was cut.**
+
+Recalibrating a source `R²` across two ancestry steps in succession is recalibrating it once
+against the `Descent.Core.product` of the two squared correlations. A two-step portability
+budget can therefore be read off a single retained fraction, and no intermediate population
+can be inserted or removed to change the answer. A body carrying anything but the
+multiplicative attenuation -- an additive offset, a floor -- would fail this. -/
+theorem ancestryRecalibratedR2_compose (r2Source rhoSq₁ rhoSq₂ : ℝ) :
+    ancestryRecalibratedR2 (ancestryRecalibratedR2 r2Source rhoSq₁) rhoSq₂ =
+      ancestryRecalibratedR2 r2Source (Descent.Core.product rhoSq₁ rhoSq₂) := by
+  unfold ancestryRecalibratedR2 Descent.Core.product
+  ring
+
 
 end LinearRecalibration
 
@@ -270,6 +283,22 @@ theorem explainedVarianceFraction_le_one
   unfold explainedVarianceFraction Descent.Core.share
   rw [div_le_one h_total_pos]
   linarith
+
+/-- **The two fractions of a variance split partition unity.**
+
+Reading the noise component as the signal of its own split returns the
+`Descent.Core.complement` of the signal fraction: the two readings account for the whole
+variance between them and for nothing outside it. This is what makes "explained" and
+"unexplained" a partition rather than two separately normalised numbers, and it is the
+property a body dividing by anything other than the total would lose. The nonzero total is
+required because at no variance at all there is no split to partition. -/
+theorem explainedVarianceFraction_noise_eq_complement
+    (var_signal var_noise : ℝ) (h_total : var_signal + var_noise ≠ 0) :
+    explainedVarianceFraction var_noise var_signal =
+      Descent.Core.complement (explainedVarianceFraction var_signal var_noise) := by
+  unfold explainedVarianceFraction Descent.Core.share Descent.Core.complement
+  rw [add_comm var_noise var_signal, eq_sub_iff_add_eq, div_add_div_same,
+    add_comm var_noise var_signal, div_self h_total]
 
 end SplineCalibration
 
