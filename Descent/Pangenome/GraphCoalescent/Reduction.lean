@@ -137,6 +137,21 @@ theorem blocks_le_width_of_graphState {n : ℕ} {s : Fin n → Fin n} {ξ : Coal
   have hb := blocks_antitone h
   rwa [blocks_graphKer] at hb
 
+/-- **The graph coalescent's entrance rate is the pair count of the graph's nodes.**  A
+coalescent leaves its starting state at the total rate `C(k, 2)`, one per pair of lineages
+(`Descent.Coalescent.Rates.deathRate`, which is `Descent.Core.pairCount`).  For a pangenome
+graph the lineages are nodes, so the process starts at `C(w, 2)` and not at `C(n, 2)`.
+
+This is the group's arithmetic stated as a rate rather than as a count, and it is where the
+entrance point stops being an observation about block numbers and becomes a number the
+process runs at.  A study that assumes its data began coalescing at `C(n, 2)` is off by the
+ratio the width law charges, before any time has passed. -/
+theorem deathRate_blocks_graphKer {n : ℕ} (s : Fin n → Fin n) :
+    Coalescent.deathRate (Coalescent.blocks (graphKer s))
+      = Descent.Core.pairCount (Linkage.width s) := by
+  rw [blocks_graphKer]
+  rfl
+
 /-! ### The object
 
 Everything above is the statement that the process observed by a pangenome graph is a

@@ -89,6 +89,14 @@ example {n : ℕ} {s : Fin n → Fin n} {ξ : Coalescent.ER n} (h : GraphState s
     Coalescent.blocks ξ ≤ Linkage.width s :=
   blocks_le_width_of_graphState h
 
+/-- The entrance point as a RATE, through the corpus's own pair count.  Pinned separately
+from the block count because the two say different things: one is how many lineages the
+graph hands the process, the other is how fast the process then runs. -/
+example {n : ℕ} (s : Fin n → Fin n) :
+    Coalescent.deathRate (Coalescent.blocks (graphKer s))
+      = Descent.Core.pairCount (Linkage.width s) :=
+  deathRate_blocks_graphKer s
+
 /-- K-G (5.7) at the graph's own sample size.  An EQUALITY, not the bound it implies. -/
 example {n : ℕ} {s : Fin n → Fin n} (hw : 1 ≤ Linkage.width s) :
     graphMeanTransitTime s = 2 - 2 / (Linkage.width s : ℝ) :=

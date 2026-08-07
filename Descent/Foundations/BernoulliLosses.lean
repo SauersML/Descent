@@ -178,8 +178,9 @@ theorem brierBernoulliRisk_eq_expectedBrierScore (η q : ℝ) :
 
 /-- **The kernel's Brier score is this one, attenuated by the variance the predictor explains.**
 
-`Descent.Core.brier` is a shape: prevalence variance times the unexplained fraction. This
-file's `expectedBrierScore` at the truth IS that prevalence variance, so the kernel says
+`Descent.Core.ScoreMoments.brier` is a shape: prevalence variance times the unexplained
+fraction. This file's `expectedBrierScore` at the truth IS that prevalence variance, so the
+kernel says
 exactly that a predictor explaining `m.r2` of the outcome pays the calibrated Bernoulli risk
 scaled by `1 - m.r2` — and at `m.r2 = 0` the two coincide, which is `Core.brier_at_zero_r2`
 read from this side.
@@ -191,9 +192,9 @@ deployed Brier score could bear on the propriety results proved above, and no re
 tell whether `π * (1 - π) * complement m.r2` was the same object at all. -/
 theorem core_brier_eq_expectedBrierScore_mul_complement
     (π : ℝ) (m : Descent.Core.ScoreMoments) :
-    Descent.Core.brier π m =
+    Descent.Core.ScoreMoments.brier π m =
       expectedBrierScore π π * Descent.Core.complement m.r2 := by
-  unfold Descent.Core.brier expectedBrierScore
+  unfold Descent.Core.ScoreMoments.brier expectedBrierScore
   ring
 
 end Descent.Foundations
