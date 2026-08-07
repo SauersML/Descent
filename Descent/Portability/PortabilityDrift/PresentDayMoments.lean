@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Foundations.BernoulliLosses
 import Descent.Portability.PortabilityDrift.Generational
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
+import Descent.Portability.PortabilityDrift.Definitions
 
 -- The Brier and log-loss risk decompositions this file states its present-day moment
 -- results in terms of: `bernoulliLogLoss`, `bernoulliKLReal`, `brierBernoulliRisk`,
