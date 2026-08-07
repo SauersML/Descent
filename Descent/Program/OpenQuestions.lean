@@ -993,4 +993,6 @@ theorem mulVec_smul_ne_of_not_aligned
   exact h_not_aligned α
 
 
+end RecoverablePortability
+
 end Descent.Program
