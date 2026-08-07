@@ -7,6 +7,8 @@ import Descent.Foundations.TransportIdentities
 -- See the discussion above `excess_target_risk_pos_of_bandwise_readout_mismatch`.
 import Descent.Spectral.SpectralDegradation
 import Descent.Core.Parameters
+import Descent.Foundations.Probability
+import Descent.Core.Population
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision
 assert_below Descent.Program

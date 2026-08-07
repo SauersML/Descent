@@ -5,6 +5,7 @@ import Descent.Foundations.TransportIdentities
 import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.Data.Matrix.Basic
+import Descent.Core.Fst
 
 assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
 assert_below Descent.Decision Descent.Program
