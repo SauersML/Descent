@@ -3475,6 +3475,58 @@ theorem mutationLDErosion_le_one (p : EvolutionaryParameters) :
     FALSIFIED at worst 15.6 sems (62% relative); no restoration at all is also rejected,
     at 8.3 sems, so the direction survives and the magnitude does not. Split-half
     estimator, panmictic control passing at 1.0044 against 1.
+
+    **"MAGNITUDE" WAS THE WRONG READING, AND A WIDER SWEEP SAYS SO.** The runs
+    above held `τ` to 0.5 and 1.0. A factor of two cannot separate "too large by
+    a constant" from "does not depend on `τ` the way the body says", and those
+    call for different repairs -- one rescales a coefficient, the other deletes
+    an argument. `τ` now sweeps 0.25 to 2.0, EIGHTFOLD, at 16 replicates, with the
+    sequence scaled with divergence so the deepest cells stay measurable:
+
+      τ      bigM    this body   measured boost      sems
+      0.25    0.5      1.0833    1.0173 ± 0.0075      8.8
+      0.25    4.0      1.2000    1.0599 ± 0.0066     21.2
+      0.25   16.0      1.2353    1.0858 ± 0.0063     23.7
+      0.50    0.5      1.1667    1.0319 ± 0.0153      8.8
+      0.50    4.0      1.4000    1.1181 ± 0.0146     19.3
+      0.50   16.0      1.4706    1.1624 ± 0.0150     20.5
+      1.00    0.5      1.3333    1.0560 ± 0.0225     12.3
+      1.00    4.0      1.8000    1.2042 ± 0.0238     25.0
+      1.00   16.0      1.9412    1.2476 ± 0.0235     29.5
+      2.00    0.5      1.6667    1.0818 ± 0.0559     10.5
+      2.00    4.0      2.6000    1.2118 ± 0.0620     22.4
+      2.00   16.0      2.8824    1.2488 ± 0.0638     25.6
+
+    Worst 29.5 sems at 56% relative. `1` -- no restoration at all -- is rejected
+    at 13.6 sems on the same cells, so migration does restore shared LD and the
+    direction is not in question.
+
+    **THE SHAPE FAILS WITH ITS MAGNITUDE ALREADY REPAIRED**, which is the finding
+    the narrow sweep could not reach. Two rivals were run as REFUTATION
+    INSTRUMENTS -- each given ONE free amplitude, fitted by weighted least
+    squares to these very cells, while this body was given nothing:
+
+      `1 + a·bigM·τ/(1+bigM)`, this body's own shape        FALSIFIED, 3.90 sems
+      `1 + a·bigM/(1+bigM)`, no `τ` dependence at all       FALSIFIED, 6.30 sems
+
+    The first is decisive. It is the best any rescaling of this body can do, and
+    it still misses -- so **no choice of coefficient repairs the `τ` factor**, and
+    the defect is the proportionality rather than the size. The second rules out
+    the opposite repair: the boost is not independent of divergence either. What
+    the cells trace is a dependence that rises and then flattens, which is
+    neither.
+
+    Fitting can only HELP a rival, so a fitted rival that fails refutes its whole
+    family; the converse does not hold, and a fitted form that agreed would have
+    demonstrated nothing because it was chosen to agree. **No successor is
+    installed here for exactly that reason.** A simulation validates an analytic
+    formula and does not produce one, so the replacement has to come from a
+    derivation of how migration restores ancestral linkage -- and this battery is
+    then what tests it.
+
+    Consumers should read this coordinate as ORDINAL until then: it is right that
+    the boost exceeds one and rises with both arguments (`migrationLDBoost_ge_one`
+    is the first half), and wrong by up to 56% as a magnitude.
     -/
 noncomputable def migrationLDBoost (p : EvolutionaryParameters) : ℝ :=
   1 + p.bigM * p.tau / (1 + p.bigM)

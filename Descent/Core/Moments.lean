@@ -1109,6 +1109,73 @@ theorem aucArgument_mono_in_migration_of_params (p q : PopGenParameters) (V_E : 
   rw [hV]
   exact this
 
+
+/-! ### The AUC argument across the demographic axes
+
+`deployedR2` and `deployedBrier` already have a law for each of the four axes a
+`PopGenParameters` can differ along -- migration, mutation, effective size, deme count.
+The AUC argument had one only for migration, so a deployment reading discrimination
+rather than calibration had no statement to appeal to for the other three. These are
+those statements, each proved through the same `fstEquilibrium_lt_of_*` ordering the
+`deployedBrier` laws use. -/
+
+/-- **More mutation, better discrimination.** -/
+theorem aucArgument_mono_in_mutation_of_params (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    aucArgument (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
+      < aucArgument (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt
+  have := aucArgument_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
+    (hV ▸ p.V_A_pos) hE hfst (p.fstEquilibrium_lt_one hflow) (q.fstEquilibrium_mem_unit).1
+  rw [hV]
+  exact this
+
+/-- **A larger effective size, better discrimination.**  Drift is what differentiates, so
+a population that drifts less carries more of its signal across. -/
+theorem aucArgument_mono_in_Ne_of_params (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
+    aucArgument (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
+      < aucArgument (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt
+  have := aucArgument_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
+    (hV ▸ p.V_A_pos) hE hfst (p.fstEquilibrium_lt_one hflow) (q.fstEquilibrium_mem_unit).1
+  rw [hV]
+  exact this
+
+/-- **More demes, worse discrimination.**  The deme correction runs the other way: a
+metapopulation split more finely differentiates further at the same flow. -/
+theorem aucArgument_anti_in_demes_of_params (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hV : p.V_A = q.V_A) (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes)
+    (hflow : 0 < q.mu + q.mig) :
+    aucArgument (momentsUnderDrift q.V_A V_E q.fstEquilibrium)
+      < aucArgument (momentsUnderDrift p.V_A V_E p.fstEquilibrium) := by
+  have hfst : p.fstEquilibrium < q.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt
+  have := aucArgument_momentsUnderDrift_anti p.V_A V_E p.fstEquilibrium q.fstEquilibrium
+    p.V_A_pos hE hfst (q.fstEquilibrium_lt_one hflow) (p.fstEquilibrium_mem_unit).1
+  rw [← hV]
+  exact this
+
+/-! ### The Brier score along the last axis
+
+`deployedBrier` has migration, mutation and effective size; the deme count was the one
+axis without a law, and it is the axis whose direction is opposite to the other three. -/
+
+/-- **More demes, worse Brier score.** -/
+theorem deployedBrier_anti_in_demes_of_params (π : ℝ) (p q : PopGenParameters) (V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu)
+    (hmig : p.mig = q.mig) (hV : p.V_A = q.V_A) (hmigpos : 0 < p.mig)
+    (hlt : p.nDemes < q.nDemes) (hflow : 0 < q.mu + q.mig) :
+    deployedBrier π p V_E < deployedBrier π q V_E :=
+  deployedBrier_anti_of_fstEquilibrium_lt π q p V_E hπ hπ1 hE hV.symm
+    (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
+    (q.fstEquilibrium_lt_one hflow)
+
 end ScoreMoments
 
 end Descent.Core

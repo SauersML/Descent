@@ -585,45 +585,10 @@ structure CrossPopulationGenerationalModel (p q : ℕ) where
   causalAlleleFreqMutationShiftAt : ℕ → Fin q → ℝ
   contextCrossSource : Fin p → ℝ
   contextCrossTargetAt : ℕ → Fin p → ℝ
-  /-- The outcome scale.  The accessors below expose its fields under their old names, so
-  every reader of the model is unaffected by the nesting. -/
+  /-- The outcome scale: the four quantities that carry the phenotype's units, grouped so
+  that the hypotheses constraining them (`targetPrevalence_pos` and its companions) travel
+  with the fields they constrain.  Read its fields through `outcome`; there is no flattened
+  spelling. -/
   outcome : GenerationalOutcomeScale
-
-namespace CrossPopulationGenerationalModel
-
-variable {p q : ℕ} (m : CrossPopulationGenerationalModel p q)
-
-/-! The outcome scale's fields, under the names they had when they were fields of the model.
-They are `abbrev`s and projections, so nothing that read them before reads differently now. -/
-
-/-- Outcome variance in the source population. -/
-abbrev sourceOutcomeVariance : ℝ := m.outcome.sourceOutcomeVariance
-
-/-- Outcome variance in the target population, per generation. -/
-abbrev targetOutcomeVarianceAt : ℕ → ℝ := m.outcome.targetOutcomeVarianceAt
-
-/-- Variance of the target-only untaggable phenotype, per generation. -/
-abbrev novelUntaggablePhenotypeVarianceAt : ℕ → ℝ :=
-  m.outcome.novelUntaggablePhenotypeVarianceAt
-
-/-- Target prevalence, per generation. -/
-abbrev targetPrevalenceAt : ℕ → ℝ := m.outcome.targetPrevalenceAt
-
-/-! The accessors, as `simp` lemmas: a proof that evaluates a model literal has to get from
-the old field name to the nested one, and `abbrev` alone does not carry `simp` across. -/
-
-@[simp] theorem sourceOutcomeVariance_eq :
-    m.sourceOutcomeVariance = m.outcome.sourceOutcomeVariance := rfl
-
-@[simp] theorem targetOutcomeVarianceAt_eq :
-    m.targetOutcomeVarianceAt = m.outcome.targetOutcomeVarianceAt := rfl
-
-@[simp] theorem novelUntaggablePhenotypeVarianceAt_eq :
-    m.novelUntaggablePhenotypeVarianceAt = m.outcome.novelUntaggablePhenotypeVarianceAt := rfl
-
-@[simp] theorem targetPrevalenceAt_eq :
-    m.targetPrevalenceAt = m.outcome.targetPrevalenceAt := rfl
-
-end CrossPopulationGenerationalModel
 
 end Descent.Portability

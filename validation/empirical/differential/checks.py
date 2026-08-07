@@ -1244,25 +1244,19 @@ check(
 # real test: `hetEquilibrium-vs-exact-iam` now runs it against the exact
 # infinite-alleles recursion, which is a reference the corpus does not contain.
 
-check(
-    id="ldCorrelationMigrationAnsatz-vs-sharedLD-squared",
-    fqn="Descent.PopulationGeneticsFoundations.ldCorrelationMigrationAnsatz",
-    claim="M^2/(1+M)^2 is exactly the square of PortabilityDrift.sharedLDFromMigration",
-    model_lean="proportion of LD that is shared, as a function of M=4Nm",
-    model_ref="sharedLDFromMigration(M)^2 = (1 - islandModelFst)^2",
-    reference="Descent.PortabilityDrift.sharedLDFromMigration ** 2",
-    grid=grid(M=[0.1, 1.0, 4.0, 40.0]),
-    lean=lambda D, M: D["ldCorrelationMigrationAnsatz"](M),
-    ref=lambda D, M: D["sharedLDFromMigration"](M) ** 2,
-    kind="internal",
-    note=(
-        "CONSISTENT: PopulationGeneticsFoundations.ldCorrelationMigrationAnsatz "
-        "is exactly the square of PortabilityDrift.sharedLDFromMigration, i.e. "
-        "(1 - islandModelFst)^2. Both are 'shared LD' but one is a correlation "
-        "and the other its square; the relation is exact and now recorded."
-    ),
-    canfail_clause="M must be away from the fixed points of x->x^2 (0 and 1); M=1 gives 0.25 vs 0.5",
-)
+# RETIRED: `ldCorrelationMigrationAnsatz-vs-sharedLD-squared` compared two
+# bodies for the shared-LD fraction and found them exactly related -- one the
+# square of the other. Both have since been measured against a simulation and
+# both are refuted: `simcov/battery_bulk51.py` sweeps `4*Ne*m` a thousandfold
+# and misses by 144 sems on the squared form and 105 on the unsquared. The
+# squared body has been DELETED from `MigrationDriftFoundations`, so by the
+# general rule above this check is retired rather than repointed.
+#
+# The consistency it recorded was real and is worth keeping in view: the two
+# bodies never disagreed with each other, only with the population. A check
+# that two expressions are one expression cannot detect that neither is the
+# quantity, which is the whole reason the differential layer is not a
+# substitute for a measurement.
 
 check(
     id="targetHetFromFst-tautology",

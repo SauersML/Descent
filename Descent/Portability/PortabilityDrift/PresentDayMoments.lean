@@ -492,12 +492,13 @@ noncomputable def CrossPopulationGenerationalModel.toMetricModelAt {p q : ℕ}
   directCausal := Pop.pair (m.directCausalSource) (directCausalTargetAt m t)
   proxyTagging := Pop.pair (m.proxyTaggingSource) (proxyTaggingTargetAt m t)
   contextCross := Pop.pair (m.contextCrossSource) (m.contextCrossTargetAt t)
-  outcomeVariance := Pop.pair (m.sourceOutcomeVariance) (m.targetOutcomeVarianceAt t)
+  outcomeVariance :=
+    Pop.pair (m.outcome.sourceOutcomeVariance) (m.outcome.targetOutcomeVarianceAt t)
   novelDirectCausal := Pop.pair 0 (novelDirectCausalTargetAt m t)
   novelProxyTagging := Pop.pair 0 (novelProxyTaggingTargetAt m t)
   novelCausalEffect := Pop.pair 0 (m.novelCausalEffectTargetAt t)
-  novelUntaggablePhenotypeVarianceTarget := m.novelUntaggablePhenotypeVarianceAt t
-  targetPrevalence := m.targetPrevalenceAt t
+  novelUntaggablePhenotypeVarianceTarget := m.outcome.novelUntaggablePhenotypeVarianceAt t
+  targetPrevalence := m.outcome.targetPrevalenceAt t
   novelUntaggablePhenotypeVarianceTarget_nonneg :=
     m.outcome.novelUntaggablePhenotypeVariance_nonneg t
   targetPrevalence_pos := m.outcome.targetPrevalence_pos t
@@ -1824,7 +1825,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
       , brier :=
           PopGen.TransportedMetrics.calibratedBrierFromVariances
-            (m.targetPrevalenceAt t)
+            (m.outcome.targetPrevalenceAt t)
             ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
