@@ -6,7 +6,8 @@ import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 -- named below and are declared in the `PortabilityDrift` subsystem.  They used to
 -- arrive through the head of this directory, which no longer carries that subsystem
 -- because it does not use it.  The module that does use it names it.
-import Descent.Portability.PortabilityDrift
+import Descent.Portability.PortabilityDrift.MigrationDrift
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Decision Descent.Program
 
