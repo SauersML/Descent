@@ -54,13 +54,6 @@ present.  Deps are stored as written and never resolved against the ambient name
 because a gap frequently names something that does not exist yet and name resolution
 throws on those -- the case the mechanism exists for.
 
-**A withdrawn instruction stays, with its reason.**  `Descent.lean`: "WITHDRAW IT IN
-PLACE AND QUOTE WHAT IT USED TO SAY: a withdrawn instruction with its reason is more
-useful than a clean paragraph, because the clean paragraph loses the fact that a careful
-reader was misled here once."  `@[withdrawn "tag" "reason"]` attaches that to the
-declaration the instruction was about; the `withdrawn "tag" "reason"` command carries the
-cases -- the majority -- where the retracted instruction had no declaration to attach to.
-
 ## Unverified
 
 **NONE OF THIS HAS BEEN COMPILED.**  It was written while every build partition was in
@@ -77,8 +70,8 @@ namespace Descent.Meta
 
 open Lean Elab Command
 
-/-- Which kind of gap a record came from.  Kept as data rather than as five extensions so
-that one report reads all of them and a reader sees the whole ledger at once. -/
+/-- Which kind of gap a record came from.  Kept as data rather than as four extensions so
+that one report reads all of them and a reader sees them at once. -/
 inductive GapKind where
   /-- An object the corpus refers to and has not defined. -/
   | informalDefinition
@@ -88,8 +81,6 @@ inductive GapKind where
   | semiformal
   /-- Deferred work, with no statement yet. -/
   | todo
-  /-- An instruction that was issued, acted on or nearly acted on, and retracted. -/
-  | withdrawn
 
 /-- The keyword each kind is written with, for the report. -/
 def GapKind.label : GapKind → String
@@ -97,14 +88,10 @@ def GapKind.label : GapKind → String
   | .informalLemma => "informal_lemma"
   | .semiformal => "semiformal_result"
   | .todo => "TODO"
-  | .withdrawn => "withdrawn"
 
 /-- One recorded gap.
 
-`name` is `Name.anonymous` for a `TODO`, which has no name because it has no statement;
-for `withdrawn` used as an attribute it is the declaration the instruction was about.
-`line` is `0` for the attribute form, whose position is the declaration's rather than the
-attribute's. -/
+`name` is `Name.anonymous` for a `TODO`, which has no name because it has no statement. -/
 structure GapInfo where
   /-- Which command recorded it. -/
   kind : GapKind
@@ -208,44 +195,7 @@ def elabInformalLemma : CommandElab := fun stx ↦
       (deps.getElems.toList.map (fun d ↦ d.getId))
   | _ => throwError "invalid `informal_lemma` command"
 
-/-! ### `withdrawn`
-
-Two forms, because retracted instructions come in two shapes.  Most of them named no
-declaration -- the `Conventions.lean` specimen was a paragraph about four names, none of
-which it was attached to -- and those take the command.  One that was about a specific
-declaration takes the attribute, so a reader of that declaration sees the retraction. -/
-
-/-- Syntax for `@[withdrawn "tag" "reason"]`. -/
-syntax (name := withdrawn) "withdrawn " str str : attr
-
-/-- Syntax for the free-standing `withdrawn "tag" "reason"` command. -/
-syntax (name := withdrawnCmd) "withdrawn " str str : command
-
-/-- The `@[withdrawn "tag" "reason"]` attribute: this declaration was the subject of an
-instruction that has been retracted, and the reason is recorded here rather than lost. -/
-initialize withdrawnAttribute : Unit ←
-  registerBuiltinAttribute {
-    name := `withdrawn
-    descr := "records a retracted instruction about this declaration, with its reason"
-    applicationTime := AttributeApplicationTime.afterCompilation
-    add := fun declName stx _ ↦ do
-      match stx with
-      | `(attr| withdrawn $t $r) =>
-        modifyEnv fun env ↦ gapExtension.addEntry env
-          { kind := GapKind.withdrawn, tag := t.getString, name := declName,
-            content := r.getString, deps := [], fileName := env.mainModule, line := 0 }
-      | _ => throwError "invalid `withdrawn` attribute"
-  }
-
-/-- Elaborator for the free-standing `withdrawn "tag" "reason"` command. -/
-@[command_elab withdrawnCmd]
-def elabWithdrawn : CommandElab := fun stx ↦
-  match stx with
-  | `(withdrawn $t $r) =>
-    recordGap stx GapKind.withdrawn t.getString Name.anonymous r.getString []
-  | _ => throwError "invalid `withdrawn` command"
-
-/-! ### Reading the ledger
+/-! ### Reading the records
 
 `depClosed` is the whole definition of progress this file offers, and it is deliberately
 crude: a dep is closed when a constant of that exact name exists.  It does not check that

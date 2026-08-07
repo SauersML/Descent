@@ -258,7 +258,7 @@ def main():
            "[REFUTATION INSTRUMENT: unit minus c/sqrt(M), competing]",
            "PopulationGeneticsFoundations.lean",
            "1 - c / sqrt(M), c fitted and the exponent PINNED at one half",
-           c_sqrt, regime=reg + fitted,
+           c_sqrt, regime=reg + fitted, control=control,
            note="the same family with the exponent HELD FIXED rather than "
                 "fitted, so only the amplitude is free. The pinned exponent is "
                 "the informative part: a half is what a diffusive deficit would "

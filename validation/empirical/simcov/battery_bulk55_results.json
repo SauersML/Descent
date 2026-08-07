@@ -1,70 +1,118 @@
 {
- "_battery_sha": "1e60b1640fe745a1",
+ "_battery_sha": "de9567ded2675169",
  "results": [
   {
    "name": "migrationLDBoost",
    "file": "DGP.lean",
    "source": "1 + bigM * tau / (1 + bigM)",
    "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
-   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
-   "span": 0.39898989898989895,
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "span": 0.6241496598639455,
    "verdict": "FALSIFIED",
    "worst": {
-    "design": "tau=1.0 bigM=16.0",
+    "design": "tau=1.00 bigM=16.0",
     "lean": 1.9411764705882353,
-    "truth": 1.1972292442878267,
-    "sem": 0.04766044834181859,
-    "sems_off": 15.60932077190824,
-    "rel_err": 0.6213907903184794
+    "truth": 1.2475928108629777,
+    "sem": 0.02349073120676456,
+    "sems_off": 29.52584377303369,
+    "rel_err": 0.5559375251974207
    },
    "cells": [
     {
-     "design": "tau=0.5 bigM=0.5",
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.0833333333333333,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 8.78746127272201,
+     "rel_err": 0.06487089057140356
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.2,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 21.276335113302245,
+     "rel_err": 0.13217408351887253
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.2352941176470589,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 23.650903970191802,
+     "rel_err": 0.13772990456075554
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
      "lean": 1.1666666666666667,
-     "truth": 1.0238048340411292,
-     "sem": 0.019894492572888077,
-     "sems_off": 7.180973935481398,
-     "rel_err": 0.1395401036168563
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 8.79667049547576,
+     "rel_err": 0.13061605721776745
     },
     {
-     "design": "tau=0.5 bigM=4.0",
+     "design": "tau=0.50 bigM=4.0",
      "lean": 1.4,
-     "truth": 1.1269174415718926,
-     "sem": 0.020951837778409046,
-     "sems_off": 13.033823634770599,
-     "rel_err": 0.24232703155893595
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 19.361256334730864,
+     "rel_err": 0.252105063831145
     },
     {
-     "design": "tau=0.5 bigM=16.0",
+     "design": "tau=0.50 bigM=16.0",
      "lean": 1.4705882352941178,
-     "truth": 1.1738649999784971,
-     "sem": 0.0210621416938201,
-     "sems_off": 14.087989703472699,
-     "rel_err": 0.2527745825295549
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 20.523342539965995,
+     "rel_err": 0.2650867977706272
     },
     {
-     "design": "tau=1.0 bigM=0.5",
+     "design": "tau=1.00 bigM=0.5",
      "lean": 1.3333333333333333,
-     "truth": 1.0111518215851947,
-     "sem": 0.041721533510838175,
-     "sems_off": 7.722187672330984,
-     "rel_err": 0.31862822661294404
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 12.35052178524367,
+     "rel_err": 0.2626354101333021
     },
     {
-     "design": "tau=1.0 bigM=4.0",
+     "design": "tau=1.00 bigM=4.0",
      "lean": 1.8,
-     "truth": 1.145615145259064,
-     "sem": 0.04579560594968111,
-     "sems_off": 14.289249834579223,
-     "rel_err": 0.5712082783201654
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 25.055980689583002,
+     "rel_err": 0.49474462920006107
     },
     {
-     "design": "tau=1.0 bigM=16.0",
+     "design": "tau=1.00 bigM=16.0",
      "lean": 1.9411764705882353,
-     "truth": 1.1972292442878267,
-     "sem": 0.04766044834181859,
-     "sems_off": 15.60932077190824,
-     "rel_err": 0.6213907903184794
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 29.52584377303369,
+     "rel_err": 0.5559375251974207
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.6666666666666665,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 10.456710254875196,
+     "rel_err": 0.5405716149251909
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 2.6,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 22.388584146332786,
+     "rel_err": 1.1455978176380714
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 2.8823529411764706,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 25.590501185726954,
+     "rel_err": 1.308006630670659
     }
    ]
   },
@@ -73,65 +121,458 @@
    "file": "DGP.lean",
    "source": "1",
    "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
-   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
    "span": 0.0,
    "verdict": "FALSIFIED",
    "worst": {
-    "design": "tau=0.5 bigM=16.0",
+    "design": "tau=0.25 bigM=16.0",
     "lean": 1.0,
-    "truth": 1.1738649999784971,
-    "sem": 0.0210621416938201,
-    "sems_off": 8.254858527967805,
-    "rel_err": 0.14811328387990272
+    "truth": 1.0857534048241178,
+    "sem": 0.006322832861332208,
+    "sems_off": 13.562497491994383,
+    "rel_err": 0.07898055345081698
    },
    "cells": [
     {
-     "design": "tau=0.5 bigM=0.5",
+     "design": "tau=0.25 bigM=0.5",
      "lean": 1.0,
-     "truth": 1.0238048340411292,
-     "sem": 0.019894492572888077,
-     "sems_off": 1.1965539685877733,
-     "rel_err": 0.02325133975698038
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 2.308557092990184,
+     "rel_err": 0.01704225485716588
     },
     {
-     "design": "tau=0.5 bigM=4.0",
+     "design": "tau=0.25 bigM=4.0",
      "lean": 1.0,
-     "truth": 1.1269174415718926,
-     "sem": 0.020951837778409046,
-     "sems_off": 6.057580385749334,
-     "rel_err": 0.11262354888647427
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 9.098398175597874,
+     "rel_err": 0.05652159706760619
     },
     {
-     "design": "tau=0.5 bigM=16.0",
+     "design": "tau=0.25 bigM=16.0",
      "lean": 1.0,
-     "truth": 1.1738649999784971,
-     "sem": 0.0210621416938201,
-     "sems_off": 8.254858527967805,
-     "rel_err": 0.14811328387990272
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 13.562497491994383,
+     "rel_err": 0.07898055345081698
     },
     {
-     "design": "tau=1.0 bigM=0.5",
+     "design": "tau=0.50 bigM=0.5",
      "lean": 1.0,
-     "truth": 1.0111518215851947,
-     "sem": 0.041721533510838175,
-     "sems_off": 0.26729174713335313,
-     "rel_err": 0.011028830040291905
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 2.081074251871739,
+     "rel_err": 0.03090052238477081
     },
     {
-     "design": "tau=1.0 bigM=4.0",
+     "design": "tau=0.50 bigM=4.0",
      "lean": 1.0,
-     "truth": 1.145615145259064,
-     "sem": 0.04579560594968111,
-     "sems_off": 3.179675041729149,
-     "rel_err": 0.12710651204435258
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 8.112920763667145,
+     "rel_err": 0.10563924012061064
     },
     {
-     "design": "tau=1.0 bigM=16.0",
+     "design": "tau=0.50 bigM=16.0",
      "lean": 1.0,
-     "truth": 1.1972292442878267,
-     "sem": 0.04766044834181859,
-     "sems_off": 4.138216301980784,
-     "rel_err": 0.1647380777147227
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 10.818916568268998,
+     "rel_err": 0.13974097751597356
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 2.4934458767677965,
+     "rel_err": 0.05302344240002336
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 8.588575268867467,
+     "rel_err": 0.1695863171110772
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 10.540021452873253,
+     "rel_err": 0.19845642641344993
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 1.4634946240933255,
+     "rel_err": 0.07565703104488539
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 3.415556804777559,
+     "rel_err": 0.1747700701392033
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 3.8984819065149594,
+     "rel_err": 0.1992630056856897
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBoost [tau-bearing shape, free amplitude, competing]",
+   "file": "DGP.lean",
+   "source": "1 + a * bigM * tau / (1 + bigM), a fitted",
+   "note": "the body's own shape with its magnitude repaired: this is the best any rescaling of the constant can do, and it is carried so that a magnitude reading of this design can be excluded rather than assumed away; positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. It is FITTED by weighted least squares on the very cells it is scored against, so it may be read in one direction only: if it FAILS, no choice of constant rescues its shape. If it agrees, that is a property of the fitting and not evidence about a population, and it must not be promoted into the corpus -- a simulation validates a formula and does not produce one",
+   "span": 0.31771693964519965,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=2.00 bigM=16.0",
+    "lean": 1.4979793900321434,
+    "truth": 1.248849506268064,
+    "sem": 0.06383241277898416,
+    "sems_off": 3.9028743066109133,
+    "rel_err": 0.19948751431912243
+   },
+   "cells": [
+    {
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.022045962579548,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 0.6269117750794312,
+     "rel_err": 0.004627994809529862
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.0529103101909152,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 1.0627153741877575,
+     "rel_err": 0.006601862110023966
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.0622474237540178,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 3.7176344188777546,
+     "rel_err": 0.021649465675779016
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
+     "lean": 1.044091925159096,
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 0.79664999192704,
+     "rel_err": 0.011828939253959005
+    },
+    {
+     "design": "tau=0.50 bigM=4.0",
+     "lean": 1.1058206203818304,
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 0.8445846010852591,
+     "rel_err": 0.010997429665008421
+    },
+    {
+     "design": "tau=0.50 bigM=16.0",
+     "lean": 1.1244948475080359,
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 2.52727331076524,
+     "rel_err": 0.0326431616944127
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.088183850318192,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 1.433548790536908,
+     "rel_err": 0.030484596610209688
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.211641240763661,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 0.31214419111863273,
+     "rel_err": 0.006163465082655725
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.2489896950160717,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 0.05946533297744975,
+     "rel_err": 0.001119663515957406
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.1763677006363842,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 1.6900140643341048,
+     "rel_err": 0.08736721298913683
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.423282481527322,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 3.4109687048891764,
+     "rel_err": 0.17453530240289258
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.4979793900321434,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 3.9028743066109133,
+     "rel_err": 0.19948751431912243
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBoost [tau-free, free amplitude, competing]",
+   "file": "DGP.lean",
+   "source": "1 + a * bigM / (1 + bigM), a fitted",
+   "note": "the same one free parameter, spent on an amplitude instead of on a tau. If this beats the row above across an eightfold tau sweep then the divergence depth does not enter the boost, and the repair deletes the argument rather than rescaling it; positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. It is FITTED by weighted least squares on the very cells it is scored against, so it may be read in one direction only: if it FAILS, no choice of constant rescues its shape. If it agrees, that is a property of the fitting and not evidence about a population, and it must not be promoted into the corpus -- a simulation validates a formula and does not produce one",
+   "span": 0.05846068279236128,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=1.00 bigM=16.0",
+    "lean": 1.099529119611747,
+    "truth": 1.2475928108629777,
+    "sem": 0.02349073120676456,
+    "sems_off": 6.30306864217974,
+    "rel_err": 0.1186795002039271
+   },
+   "cells": [
+    {
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 2.385044898334031,
+     "rel_err": 0.01760690395165577
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 3.7500762908169816,
+     "rel_err": 0.02329644152646818
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 2.178725120487633,
+     "rel_err": 0.012687701209521623
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 0.2195620090159599,
+     "rel_err": 0.0032601339276293476
+    },
+    {
+     "design": "tau=0.50 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 2.3021493640130064,
+     "rel_err": 0.029976541931435396
+    },
+    {
+     "design": "tau=0.50 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 4.1900482249364925,
+     "rel_err": 0.0541201543700764
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 0.9237009042634778,
+     "rel_err": 0.019642616729083746
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 5.030673919952696,
+     "rel_err": 0.09933352575531683
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 6.30306864217974,
+     "rel_err": 0.1186795002039271
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 0.8332156412082766,
+     "rel_err": 0.04307403703176074
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 2.0511668569517965,
+     "rel_err": 0.10495582300234092
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 2.3392565023874283,
+     "rel_err": 0.11956635760102999
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBoost [REFUTATION INSTRUMENT: saturating in tau as well as in bigM, competing]",
+   "file": "DGP.lean",
+   "source": "1 + a * (bigM/(1+bigM)) * (tau/(1+tau)), a fitted",
+   "note": "the third thing a bounded increasing dependence can be, carried so that `rejected and rejected` is not the whole report: the excess rises with divergence and then flattens, which is neither proportional nor constant. Its REJECTION would be the finding. Its agreement would not be, and would not license writing it into the declaration",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. It is FITTED by weighted least squares on the very cells it is scored against, so it may be read in one direction only: if it FAILS, no choice of constant rescues its shape. If it agrees, that is a property of the fitting and not evidence about a population, and it must not be promoted into the corpus -- a simulation validates a formula and does not produce one",
+   "span": 0.19627617836257877,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "tau=0.25 bigM=4.0",
+    "lean": 1.07175957567118,
+    "truth": 1.059907674507369,
+    "sem": 0.006584419955156816,
+    "sems_off": 1.799991684085815,
+    "rel_err": 0.011182012781744946
+   },
+   "cells": [
+    {
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.029899823196325,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 1.6726707548254562,
+     "rel_err": 0.012348007932063153
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.07175957567118,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 1.799991684085815,
+     "rel_err": 0.011182012781744946
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.0844230302013882,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 0.2104080009556429,
+     "rel_err": 0.0012253008987294554
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
+     "lean": 1.0498330386605417,
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 1.1713521953326922,
+     "rel_err": 0.017392649349139647
+    },
+    {
+     "design": "tau=0.50 bigM=4.0",
+     "lean": 1.1195992927853,
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 0.10180961339907656,
+     "rel_err": 0.0013256742558878571
+    },
+    {
+     "design": "tau=0.50 bigM=16.0",
+     "lean": 1.1407050503356468,
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 1.4476365091726824,
+     "rel_err": 0.018698188455664268
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.0747495579908124,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 0.8352941879280141,
+     "rel_err": 0.017762636708235992
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.1793989391779498,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 1.0438282087934871,
+     "rel_err": 0.020610983321950046
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.2110575755034705,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 1.5553043044052306,
+     "rel_err": 0.029284583111885087
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.0996660773210833,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 0.31856546763232235,
+     "rel_err": 0.016468606770194807
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.2391985855705998,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 0.4421394560786826,
+     "rel_err": 0.022623761854024562
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.281410100671294,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 0.51009499697229,
+     "rel_err": 0.02607247249552966
     }
    ]
   },
@@ -140,65 +581,113 @@
    "file": "PortabilityDrift.lean",
    "source": "1 + bigM * tauAt t / (1 + bigM)",
    "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
-   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; this is migrationLDBoost at generation t, so the same cells measure both",
-   "span": 0.39898989898989895,
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; this is migrationLDBoost at generation t, so the same cells measure both",
+   "span": 0.6241496598639455,
    "verdict": "FALSIFIED",
    "worst": {
-    "design": "tau=1.0 bigM=16.0",
+    "design": "tau=1.00 bigM=16.0",
     "lean": 1.9411764705882353,
-    "truth": 1.1972292442878267,
-    "sem": 0.04766044834181859,
-    "sems_off": 15.60932077190824,
-    "rel_err": 0.6213907903184794
+    "truth": 1.2475928108629777,
+    "sem": 0.02349073120676456,
+    "sems_off": 29.52584377303369,
+    "rel_err": 0.5559375251974207
    },
    "cells": [
     {
-     "design": "tau=0.5 bigM=0.5",
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.0833333333333333,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 8.78746127272201,
+     "rel_err": 0.06487089057140356
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.2,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 21.276335113302245,
+     "rel_err": 0.13217408351887253
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.2352941176470589,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 23.650903970191802,
+     "rel_err": 0.13772990456075554
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
      "lean": 1.1666666666666667,
-     "truth": 1.0238048340411292,
-     "sem": 0.019894492572888077,
-     "sems_off": 7.180973935481398,
-     "rel_err": 0.1395401036168563
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 8.79667049547576,
+     "rel_err": 0.13061605721776745
     },
     {
-     "design": "tau=0.5 bigM=4.0",
+     "design": "tau=0.50 bigM=4.0",
      "lean": 1.4,
-     "truth": 1.1269174415718926,
-     "sem": 0.020951837778409046,
-     "sems_off": 13.033823634770599,
-     "rel_err": 0.24232703155893595
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 19.361256334730864,
+     "rel_err": 0.252105063831145
     },
     {
-     "design": "tau=0.5 bigM=16.0",
+     "design": "tau=0.50 bigM=16.0",
      "lean": 1.4705882352941178,
-     "truth": 1.1738649999784971,
-     "sem": 0.0210621416938201,
-     "sems_off": 14.087989703472699,
-     "rel_err": 0.2527745825295549
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 20.523342539965995,
+     "rel_err": 0.2650867977706272
     },
     {
-     "design": "tau=1.0 bigM=0.5",
+     "design": "tau=1.00 bigM=0.5",
      "lean": 1.3333333333333333,
-     "truth": 1.0111518215851947,
-     "sem": 0.041721533510838175,
-     "sems_off": 7.722187672330984,
-     "rel_err": 0.31862822661294404
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 12.35052178524367,
+     "rel_err": 0.2626354101333021
     },
     {
-     "design": "tau=1.0 bigM=4.0",
+     "design": "tau=1.00 bigM=4.0",
      "lean": 1.8,
-     "truth": 1.145615145259064,
-     "sem": 0.04579560594968111,
-     "sems_off": 14.289249834579223,
-     "rel_err": 0.5712082783201654
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 25.055980689583002,
+     "rel_err": 0.49474462920006107
     },
     {
-     "design": "tau=1.0 bigM=16.0",
+     "design": "tau=1.00 bigM=16.0",
      "lean": 1.9411764705882353,
-     "truth": 1.1972292442878267,
-     "sem": 0.04766044834181859,
-     "sems_off": 15.60932077190824,
-     "rel_err": 0.6213907903184794
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 29.52584377303369,
+     "rel_err": 0.5559375251974207
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.6666666666666665,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 10.456710254875196,
+     "rel_err": 0.5405716149251909
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 2.6,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 22.388584146332786,
+     "rel_err": 1.1455978176380714
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 2.8823529411764706,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 25.590501185726954,
+     "rel_err": 1.308006630670659
     }
    ]
   },
@@ -207,65 +696,228 @@
    "file": "PortabilityDrift.lean",
    "source": "1",
    "note": "positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
-   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; the observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters",
    "span": 0.0,
    "verdict": "FALSIFIED",
    "worst": {
-    "design": "tau=0.5 bigM=16.0",
+    "design": "tau=0.25 bigM=16.0",
     "lean": 1.0,
-    "truth": 1.1738649999784971,
-    "sem": 0.0210621416938201,
-    "sems_off": 8.254858527967805,
-    "rel_err": 0.14811328387990272
+    "truth": 1.0857534048241178,
+    "sem": 0.006322832861332208,
+    "sems_off": 13.562497491994383,
+    "rel_err": 0.07898055345081698
    },
    "cells": [
     {
-     "design": "tau=0.5 bigM=0.5",
+     "design": "tau=0.25 bigM=0.5",
      "lean": 1.0,
-     "truth": 1.0238048340411292,
-     "sem": 0.019894492572888077,
-     "sems_off": 1.1965539685877733,
-     "rel_err": 0.02325133975698038
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 2.308557092990184,
+     "rel_err": 0.01704225485716588
     },
     {
-     "design": "tau=0.5 bigM=4.0",
+     "design": "tau=0.25 bigM=4.0",
      "lean": 1.0,
-     "truth": 1.1269174415718926,
-     "sem": 0.020951837778409046,
-     "sems_off": 6.057580385749334,
-     "rel_err": 0.11262354888647427
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 9.098398175597874,
+     "rel_err": 0.05652159706760619
     },
     {
-     "design": "tau=0.5 bigM=16.0",
+     "design": "tau=0.25 bigM=16.0",
      "lean": 1.0,
-     "truth": 1.1738649999784971,
-     "sem": 0.0210621416938201,
-     "sems_off": 8.254858527967805,
-     "rel_err": 0.14811328387990272
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 13.562497491994383,
+     "rel_err": 0.07898055345081698
     },
     {
-     "design": "tau=1.0 bigM=0.5",
+     "design": "tau=0.50 bigM=0.5",
      "lean": 1.0,
-     "truth": 1.0111518215851947,
-     "sem": 0.041721533510838175,
-     "sems_off": 0.26729174713335313,
-     "rel_err": 0.011028830040291905
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 2.081074251871739,
+     "rel_err": 0.03090052238477081
     },
     {
-     "design": "tau=1.0 bigM=4.0",
+     "design": "tau=0.50 bigM=4.0",
      "lean": 1.0,
-     "truth": 1.145615145259064,
-     "sem": 0.04579560594968111,
-     "sems_off": 3.179675041729149,
-     "rel_err": 0.12710651204435258
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 8.112920763667145,
+     "rel_err": 0.10563924012061064
     },
     {
-     "design": "tau=1.0 bigM=16.0",
+     "design": "tau=0.50 bigM=16.0",
      "lean": 1.0,
-     "truth": 1.1972292442878267,
-     "sem": 0.04766044834181859,
-     "sems_off": 4.138216301980784,
-     "rel_err": 0.1647380777147227
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 10.818916568268998,
+     "rel_err": 0.13974097751597356
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 2.4934458767677965,
+     "rel_err": 0.05302344240002336
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 8.588575268867467,
+     "rel_err": 0.1695863171110772
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 10.540021452873253,
+     "rel_err": 0.19845642641344993
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.0,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 1.4634946240933255,
+     "rel_err": 0.07565703104488539
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.0,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 3.415556804777559,
+     "rel_err": 0.1747700701392033
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.0,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 3.8984819065149594,
+     "rel_err": 0.1992630056856897
+    }
+   ]
+  },
+  {
+   "name": "migrationSharedBoostAt [tau-free, free amplitude, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 + a * bigM / (1 + bigM), a fitted",
+   "note": "same rival, same cells: whatever the tau sweep says about migrationLDBoost it says about this one, because they are the same expression read at a generation; positive control 'split at t=1 [one population: LD correlation is 1]' passed at 1.60 sems",
+   "regime": "two demes split tau*2*Ne generations ago at Ne = 1000 over 5 Mb with recombination 1e-8 and mu = 1e-8, WITH and WITHOUT ongoing migration at m = bigM/(4 Ne), 16 replicates each; tau sweeps 0.25 to 2.0, EIGHTFOLD, which is what separates an amplitude error from a dependence that is not there. The observable is the RATIO of the cross-deme correlation of signed LD r across SNP pairs common in BOTH demes. A ratio fixes no scale, so no LD normalisation convention enters; THIS ROW IS A REFUTATION INSTRUMENT AND NOT A PROPOSED BODY. It is FITTED by weighted least squares on the very cells it is scored against, so it may be read in one direction only: if it FAILS, no choice of constant rescues its shape. If it agrees, that is a property of the fitting and not evidence about a population, and it must not be promoted into the corpus -- a simulation validates a formula and does not produce one",
+   "span": 0.05846068279236128,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "tau=1.00 bigM=16.0",
+    "lean": 1.099529119611747,
+    "truth": 1.2475928108629777,
+    "sem": 0.02349073120676456,
+    "sems_off": 6.30306864217974,
+    "rel_err": 0.1186795002039271
+   },
+   "cells": [
+    {
+     "design": "tau=0.25 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0173377288508871,
+     "sem": 0.0075102014602680895,
+     "sems_off": 2.385044898334031,
+     "rel_err": 0.01760690395165577
+    },
+    {
+     "design": "tau=0.25 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.059907674507369,
+     "sem": 0.006584419955156816,
+     "sems_off": 3.7500762908169816,
+     "rel_err": 0.02329644152646818
+    },
+    {
+     "design": "tau=0.25 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.0857534048241178,
+     "sem": 0.006322832861332208,
+     "sems_off": 2.178725120487633,
+     "rel_err": 0.012687701209521623
+    },
+    {
+     "design": "tau=0.50 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.031885810588621,
+     "sem": 0.015321803419528466,
+     "sems_off": 0.2195620090159599,
+     "rel_err": 0.0032601339276293476
+    },
+    {
+     "design": "tau=0.50 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.1181170338184971,
+     "sem": 0.014559125777176544,
+     "sems_off": 2.3021493640130064,
+     "rel_err": 0.029976541931435396
+    },
+    {
+     "design": "tau=0.50 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.162440583433193,
+     "sem": 0.015014496359979153,
+     "sems_off": 4.1900482249364925,
+     "rel_err": 0.0541201543700764
+    },
+    {
+     "design": "tau=1.00 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0559923495196188,
+     "sem": 0.02245581106905781,
+     "sems_off": 0.9237009042634778,
+     "rel_err": 0.019642616729083746
+    },
+    {
+     "design": "tau=1.00 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.204219078521327,
+     "sem": 0.023777992522414755,
+     "sems_off": 5.030673919952696,
+     "rel_err": 0.09933352575531683
+    },
+    {
+     "design": "tau=1.00 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.2475928108629777,
+     "sem": 0.02349073120676456,
+     "sems_off": 6.30306864217974,
+     "rel_err": 0.1186795002039271
+    },
+    {
+     "design": "tau=2.00 bigM=0.5",
+     "lean": 1.0352498965291603,
+     "truth": 1.0818495229432088,
+     "sem": 0.05592745036143661,
+     "sems_off": 0.8332156412082766,
+     "rel_err": 0.04307403703176074
+    },
+    {
+     "design": "tau=2.00 bigM=4.0",
+     "lean": 1.0845997516699848,
+     "truth": 1.2117834845964497,
+     "sem": 0.062005551862060825,
+     "sems_off": 2.0511668569517965,
+     "rel_err": 0.10495582300234092
+    },
+    {
+     "design": "tau=2.00 bigM=16.0",
+     "lean": 1.099529119611747,
+     "truth": 1.248849506268064,
+     "sem": 0.06383241277898416,
+     "sems_off": 2.3392565023874283,
+     "rel_err": 0.11956635760102999
     }
    ]
   }

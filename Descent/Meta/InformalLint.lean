@@ -84,7 +84,6 @@ def gapReport (env : Environment) : String := Id.run do
   let mut nLem := 0
   let mut nSemi := 0
   let mut nTodo := 0
-  let mut nWith := 0
   let mut ready : Array String := #[]
   let mut blocked : Array String := #[]
   let mut undeclared : Array String := #[]
@@ -94,7 +93,6 @@ def gapReport (env : Environment) : String := Id.run do
     | .informalLemma => nLem := nLem + 1
     | .semiformal => nSemi := nSemi + 1
     | .todo => nTodo := nTodo + 1
-    | .withdrawn => nWith := nWith + 1
     let open_ := openDeps env g
     if g.deps.isEmpty then
       undeclared := undeclared.push g.locator
@@ -109,7 +107,6 @@ def gapReport (env : Environment) : String := Id.run do
   out := out ++ s!"  informal_lemma: {nLem}\n"
   out := out ++ s!"  semiformal_result: {nSemi}\n"
   out := out ++ s!"  TODO: {nTodo}\n"
-  out := out ++ s!"  withdrawn: {nWith}\n"
   out := out ++ s!"\nREADY TO CLOSE ({ready.size}) -- every recorded dep is now a constant:\n"
   for l in ready do
     out := out ++ l ++ "\n"
