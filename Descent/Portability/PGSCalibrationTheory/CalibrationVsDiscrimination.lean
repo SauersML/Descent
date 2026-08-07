@@ -1210,7 +1210,7 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
                 scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
       , brier :=
           PopGen.TransportedMetrics.calibratedBrierFromVariances
-            (m.metric.targetPrevalenceAt t)
+            (m.metric.outcome.targetPrevalenceAt t)
             ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
               scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
             (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
