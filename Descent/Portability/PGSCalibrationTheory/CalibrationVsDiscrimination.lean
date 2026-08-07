@@ -2,8 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
--- This used to be `import Descent.Portability.PortabilityDrift`, the chapter head, and the
--- head sits above the whole six-module drift recurrence: `Definitions` ->
+-- Importing `Descent.Portability.PortabilityDrift` instead would be importing the chapter
+-- head, and the head sits above the whole six-module drift recurrence: `Definitions` ->
 -- `ClosedPopulationRegime` -> `PresentDayMetrics` -> `MutationDrift` -> `MigrationDrift` ->
 -- `MigrationDriftRecurrence`.  This file names nothing from the last three.  Everything it
 -- does name is declared in `PresentDayMoments` (21 declarations), `PresentDayMetrics` (14)
