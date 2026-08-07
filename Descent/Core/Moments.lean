@@ -1176,6 +1176,67 @@ theorem deployedBrier_anti_in_demes_of_params (π : ℝ) (p q : PopGenParameters
     (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
     (q.fstEquilibrium_lt_one hflow)
 
+
+/-! ### The deployed portability ratio across the remaining axes
+
+`deployedPortabilityRatio` had a law for migration alone.  The ratio is the deployed `R²`
+over the same population's source `R²`, so it moves with differentiation exactly as the
+Brier score and the AUC argument do, and the three axes below complete it. -/
+
+/-- **More mutation, a higher portability ratio.** -/
+theorem deployedPortabilityRatio_mono_in_mutation (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
+  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
+    unfold share
+    have := q.V_A_pos
+    positivity
+  unfold deployedPortabilityRatio portabilityRatio ratio
+  rw [hV]
+  exact div_lt_div_of_pos_right
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
+      (p.fstEquilibrium_lt_one hflow)) hsrc
+
+/-- **A larger effective size, a higher portability ratio.** -/
+theorem deployedPortabilityRatio_mono_in_Ne (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
+  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
+    unfold share
+    have := q.V_A_pos
+    positivity
+  unfold deployedPortabilityRatio portabilityRatio ratio
+  rw [hV]
+  exact div_lt_div_of_pos_right
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
+      (p.fstEquilibrium_lt_one hflow)) hsrc
+
+/-- **More demes, a lower portability ratio.**  The one axis whose direction is opposite:
+a metapopulation split more finely differentiates further at the same flow, so less of the
+source accuracy survives the transport. -/
+theorem deployedPortabilityRatio_anti_in_demes (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hV : p.V_A = q.V_A) (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes)
+    (hflow : 0 < q.mu + q.mig) :
+    deployedPortabilityRatio q V_E < deployedPortabilityRatio p V_E := by
+  have hsrc : 0 < (momentsUnderDrift p.V_A V_E 0).r2 := by
+    rw [r2_momentsUnderDrift_at_source p.V_A V_E p.V_A_pos (le_of_lt hE)]
+    unfold share
+    have := p.V_A_pos
+    positivity
+  unfold deployedPortabilityRatio portabilityRatio ratio
+  rw [← hV]
+  exact div_lt_div_of_pos_right
+    (r2_momentsUnderDrift_anti p.V_A V_E p.fstEquilibrium q.fstEquilibrium p.V_A_pos hE
+      (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
+      (q.fstEquilibrium_lt_one hflow)) hsrc
+
 end ScoreMoments
 
 end Descent.Core
