@@ -135,7 +135,7 @@ def skip_attribute_block(lines, j):
     lines and whole `@[...]` blocks, which are NOT always one line.
 
     Skipping only lines that themselves begin with `@[` catches every `@[simp]`
-    and no `@[withdrawn "tag" "a sentence of justification"]`; that form wraps,
+    and no attribute carrying a wrapped string argument; that form wraps,
     so the line above the declaration is the tail of a string argument, the
     docstring above it fails the `-/` test, and a declaration that documents its
     status in detail is read as declaring none.

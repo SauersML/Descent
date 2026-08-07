@@ -27,12 +27,12 @@ environment.  `Linters` holds environment linters for Batteries' `#lint`, run by
 default, that reports the two textual rules at the line a person typed.
 
 **Vocabulary, which the corpus reads.**  `Informal` supplies `TODO`,
-`informal_definition`, `informal_lemma` and `@[withdrawn]`, the commands that
-turn a deferred-work note into a tagged object that cannot be cited, and proof
+`informal_definition` and `informal_lemma`, the commands that turn a
+deferred-work note into a tagged object that cannot be cited, and proof
 modules import it -- `Descent.Program.OpenQuestions` and
 `Descent.Coalescent.Program` do.  `Semiformal` adds `semiformal_result`, whose
 statement elaborates and whose proof does not exist.  `InformalLint` reads the
-ledger the first two write.
+records the first two write.
 
 Both directions are consistent with the rule above, and the import graph is what
 enforces it: `Informal` imports `Lean.Elab.Command` alone, so it can sit under

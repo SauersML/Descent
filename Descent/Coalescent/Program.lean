@@ -507,11 +507,6 @@ waits on Lévy's DOWNWARD martingale theorem and on nothing else, which is the s
 useful sentence in this section and was, until now, a sentence.  A reader who wants to know
 what to work on next reads the chain, not the paragraphs.
 
-Three retractions in this file also become objects.  Two are the Ionescu-Tulcea entry's own
-corrections of earlier optimistic claims, and one is a mathematical error the enumeration
-caught.  All three are recorded with `withdrawn`, which is the command form for a retracted
-instruction that named no declaration -- which is most of them.
-
 ## Main results
 
 - `sum_choose_interior_add_two`: `Σ_{ν=1}^{λ-1} C(λ,ν) = 2^λ - 2`.
@@ -668,8 +663,7 @@ informal_lemma "coalescent-spatial-difference-walk-recurrence"
 /-- **A measure on the infinite simplex.**
 
 Needed for `Ξ`, and absent: the corpus has no infinite-dimensional measure at all.  This is
-also the obstacle one layer under Ionescu-Tulcea for the paintbox kernel, which is the
-correction the `withdrawn` note below records. -/
+also the obstacle one layer under Ionescu-Tulcea for the paintbox kernel. -/
 informal_definition "coalescent-infinite-simplex-measure"
   Descent.Coalescent.infiniteSimplexMeasure
   []
@@ -699,36 +693,8 @@ informal_lemma "coalescent-asg-forward-resolution"
   Descent.Coalescent.asg_forward_resolution
   []
 
-/-! ### Three retractions
 
-Written with `withdrawn` rather than as prose because a retracted claim that cannot be
-listed is a retracted claim the next reader re-derives.  None of the three named a
-declaration, which is why they are commands and not attributes. -/
 
-withdrawn "coalescent-ionescu-tulcea-most-promising"
-  "an earlier revision of the Mathlib entry called Ionescu-Tulcea 'the most \
-   promising unexplored route' to K-C Theorem 3. Scoping it retracts that: \
-   Ionescu-Tulcea needs the kernels, and the kernel from R_k to R_{k+1} is a \
-   splitting kernel whose probabilities are K-C (3.19)'s Dirichlet structure, \
-   which is the paintbox measure on the simplex. It avoids Kolmogorov's \
-   topological hypotheses and not the missing simplex measure -- the same \
-   obstacle, one layer down. Recorded because an optimistic claim in a ledger \
-   is worse than none."
-
-withdrawn "coalescent-ionescu-tulcea-jump-chain-scope"
-  "the verdict that Ionescu-Tulcea 'avoids Kolmogorov's topological hypotheses \
-   and not the missing simplex measure' was right about the PAINTBOX, whose \
-   kernel needs the simplex measure, and wrong about the JUMP CHAIN at finite \
-   n, whose kernel is Kernel.jumpKernel and needs no simplex at all. The \
-   distinction had not been drawn; drawing it is what unblocked \
-   Coalescent.TrajectoryLaw."
-
-withdrawn "coalescent-disjoint-pairs-never-share-tree"
-  "an earlier pass asserted that DISJOINT pairs never share tree. That is true \
-   of the pairing that respects the cherries and false of the other two, and it \
-   would have made Tajima's theta coefficient vanish like 2/n instead of \
-   tending to 1/3. The enumeration in TajimaVariance found it; re-reading had \
-   not."
 
 /-- The interior binomial coefficients of row `λ` sum to `2^λ - 2`.  Stated additively to
 keep it clear of truncated subtraction. -/

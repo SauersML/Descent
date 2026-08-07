@@ -50,11 +50,6 @@ closes by itself and the gap object is deleted.  A dep that names something abse
 indistinguishable from a typo -- `Descent.lean` says exactly this about failed searches --
 so the names below are the names the corpus WOULD use, written once, in one place.
 
-**Five withdrawn claims below now carry `@[withdrawn]`.**  Each is a docstring that already
-began "Previously `X`, documented as ..." and then explained why the old heading was false.
-That is the discipline `Descent.lean` asks for in capitals -- withdraw in place and quote
-what it used to say -- and it was already being followed here.  What the attribute adds is
-that the retraction can be listed.
 -/
 
 /-!
@@ -92,18 +87,11 @@ originals did not; what they added was a second block of hypotheses to keep in s
     it is assumed is that a nonnegative summand's share of a positive total is at most one,
     which is `div_le_one` plus `linarith`.
 
-    The heading `law_of_total_variance_r2_bound` is withdrawn rather than deleted, and is
-    recorded as such: see `@[withdrawn]` on this declaration.
-
     The real conditional-variance statements in this file are
     `explainable_fraction_bound_of_conditional_noise_floor_exact` and its Gaussian
     companion, which work against `conditionalVariance` and `conditionalMean` on an actual
     measure rather than against three scalars. Those are where the law of total variance
     is genuinely used. -/
-@[withdrawn "OQ-1-law-of-total-variance-r2-bound"
-  "the name said the law of total variance was proved here; the law is the \
-   hypothesis h_decomp, three free reals related by an equation, and what is \
-   proved is div_le_one"]
 theorem between_group_variance_fraction_le_one
     (varZ eVarZgivenD varEZgivenD : ℝ)
     (h_decomp : varZ = eVarZgivenD + varEZgivenD)
@@ -399,10 +387,6 @@ theorem env_variance_lowers_r2
     genetic distance picks up exactly `β_ses · ρ` when SES is omitted is the standard
     omitted-variable formula, asserted in this docstring and derived nowhere in this
     corpus. What is proved is that adding a nonzero product to a number changes it. -/
-@[withdrawn "OQ-4-omitted-variable-bias-name"
-  "the name claims the omitted-variable formula; no regression, estimator or \
-   correlation appears in the statement, and the formula is asserted in the \
-   docstring and derived nowhere"]
 theorem omitted_variable_bias
     (β_true β_ses ρ : ℝ)
     (h_ses : β_ses ≠ 0) (h_corr : ρ ≠ 0) :
@@ -643,10 +627,6 @@ section FourFactorDecomposition
     from the other three being below one. It supports the surrounding argument — an Fst
     proxy that sees only the AF factor overstates portability — without being that
     argument. -/
-@[withdrawn "OQ-four-factor-single-factor-insufficient"
-  "the name claimed no single factor captures the full ratio, which is a claim \
-   about approximation error; what is proved is one strict inequality between a \
-   product and one of its factors"]
 theorem four_factor_product_lt_af_factor
     (af ld eff env : ℝ)
     (h_af : 0 < af)
@@ -676,10 +656,6 @@ theorem four_factor_product_lt_af_factor
     fractions and is `div_lt_one`. The variance-decomposition reading, in which these four
     numbers are the variances of independent contributions to portability, is asserted in
     the section prose and formalised nowhere. -/
-@[withdrawn "OQ-four-factor-genetic-distance-variance-bound"
-  "the name claimed a bound BY the AF variance fraction; what is proved is a \
-   bound ON it, namely that it is under one, which holds of any of the four \
-   fractions and is div_lt_one"]
 theorem af_variance_fraction_lt_one
     (var_af var_ld var_eff var_env : ℝ)
     (h_af : 0 < var_af) (h_ld : 0 < var_ld)
@@ -757,11 +733,6 @@ theorem neutral_beats_immune
     the theorem says is that a drift-only prediction, which omits `ρ²`, is higher than one
     that includes it; that supports the surrounding claim about immune traits without being
     a statement about genetic distance at all. -/
-@[withdrawn "OQ-drift-only-overestimates-immune-portability"
-  "the name claimed a source-to-target portability ratio under pure drift; both \
-   sides are evaluated at fstT, the source Fst enters no term, and the three \
-   hypotheses that made it look like a source-versus-target comparison occurred \
-   in no proof term"]
 theorem effect_retention_lowers_target_r2_at_fixed_fst
     (V_A V_E fstT ρ : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E)
@@ -873,10 +844,6 @@ theorem faster_decay_lower_correlation
     to make it one. It is falsified at 17.6 sems in the same place, and `E[r²]`
     -- the expectation of the ratio, which is what an `r²` curve looks like a
     curve of -- has no mutation-free equilibrium to measure. -/
-@[withdrawn "OQ-2-ld-decay-ohta-kimura-attribution"
-  "this body was attributed to Ohta-Kimura; that result is hyperbolic in the \
-   scaled recombination rate, and no published neutral two-locus theory in the \
-   corpus's reference set predicts an exponential in genetic distance"]
 noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
   Real.exp (-lam_LD * d)
 
@@ -1245,11 +1212,6 @@ theorem mulVec_smul_ne_of_not_aligned
     recalibrations `α` and shows none succeeds, it never quantifies over corrections at
     all. That is the difference between the two, and it is why only one of them keeps a
     non-recoverability name. -/
-@[withdrawn "OQ-effect-turnover-requires-target-data"
-  "the name made an information claim -- that the source GWAS carries no \
-   information about the new effects -- with no information measure and no \
-   statement about what data determines what; the statement is cancellation in \
-   a field"]
 theorem effect_mismatch_gives_prediction_mismatch_at_nonzero_genotype
     (β_source β_target : ℝ)
     (h_different : β_source ≠ β_target) :

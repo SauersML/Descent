@@ -191,10 +191,7 @@ A "TODO" IS THE MOST AUTHORITATIVE-LOOKING SENTENCE IN A CODEBASE, because it
 reads as a decision taken by someone who had looked, and the next sweep
 executes it rather than re-deriving it. So a deferred-work note must carry the
 evidence it rests on and say what would overturn it, exactly as a result must.
-When one turns out wrong, WITHDRAW IT IN PLACE AND QUOTE WHAT IT USED TO SAY:
-a withdrawn instruction with its reason is more useful than a clean paragraph,
-because the clean paragraph loses the fact that a careful reader was misled
-here once. Same discipline as the retracted 14-sigma row in the ledger.
+When one turns out wrong, DELETE IT.
 
 WHY IT KEEPS HAPPENING, which is the part worth internalising: A WELL-FORMED
 ARGUMENT FOR A FALSE PREMISE IS HARDER TO STOP THAN A WEAK ONE. The reasoning
