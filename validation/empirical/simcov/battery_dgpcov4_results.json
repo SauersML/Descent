@@ -1,4 +1,243 @@
 {
+ "_battery_sha": "f8d3ae8470fa8540",
+ "results": [
+  {
+   "name": "multiTraitDiscoveryNCP",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "discoveryNCP (multiTraitEffectiveSampleSize n1 rg n2 priorVariance) beta1 1 maf, priorVariance on the STANDARDIZED effect scale",
+   "note": "the convention this row pins is which scale `priorVariance` is on; the dosage-scale reading of the SAME body is carried beside it and is what the design was built to separate",
+   "regime": "8000 replicate cohort PAIRS per cell, genotypes drawn and OLS run in both, the borrowed estimate formed by inverse-variance combination of beta1_hat with beta2_hat/rg -- a rule fixed before any formula is evaluated; beta1 is HELD FIXED so the statistic is a frequentist noncentrality and prior shrinkage is not credited as information; maf swept 0.5 to 0.1 at FIXED n*2p(1-p), so the realised noncentrality is invariant along the sweep by construction and only a SCALE error can move with maf",
+   "span": 0.5016467359882169,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "p=0.50 n1=4000 n2=8000 rg=0.7 tau2_std=2e-04",
+    "lean": 7.703846690383017,
+    "truth": 7.621259722168642,
+    "sem": 0.06308493857962066,
+    "sems_off": 1.3091392347182973,
+    "rel_err": 0.010836393355569194
+   },
+   "cells": [
+    {
+     "design": "p=0.50 n1=4000 n2=8000 rg=0.7 tau2_std=2e-04",
+     "lean": 7.703846690383017,
+     "truth": 7.621259722168642,
+     "sem": 0.06308493857962066,
+     "sems_off": 1.3091392347182973,
+     "rel_err": 0.010836393355569194
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-04",
+     "lean": 9.91018176499046,
+     "truth": 9.982670956732786,
+     "sem": 0.07305917491259191,
+     "sems_off": 0.9921983355143581,
+     "rel_err": 0.007261502663616885
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-04",
+     "lean": 6.497355402617058,
+     "truth": 6.5632121597126005,
+     "sem": 0.059475644141529095,
+     "sems_off": 1.1072895139870895,
+     "rel_err": 0.010034226456946757
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-05",
+     "lean": 13.037649939949892,
+     "truth": 13.04179539215809,
+     "sem": 0.08131286306852685,
+     "sems_off": 0.05098150589905801,
+     "rel_err": 0.0003178590127774907
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-05",
+     "lean": 8.99665707328474,
+     "truth": 9.031458284706972,
+     "sem": 0.06864553945281536,
+     "sems_off": 0.5069697419473538,
+     "rel_err": 0.0038533324658277853
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [priorVariance on the dosage scale, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "same composition with priorVariance read on the dosage scale of beta",
+   "note": "understates the borrowed term by 2p(1-p), which is why it moves with maf on a design where the truth cannot; positive control 'single-cohort noncentrality n1*beta^2*2p(1-p), worst of the five cells: p=0.50 n1=4000' passed at 2.38 sems",
+   "regime": "8000 replicate cohort PAIRS per cell, genotypes drawn and OLS run in both, the borrowed estimate formed by inverse-variance combination of beta1_hat with beta2_hat/rg -- a rule fixed before any formula is evaluated; beta1 is HELD FIXED so the statistic is a frequentist noncentrality and prior shrinkage is not credited as information; maf swept 0.5 to 0.1 at FIXED n*2p(1-p), so the realised noncentrality is invariant along the sweep by construction and only a SCALE error can move with maf",
+   "span": 0.5601087001907133,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-05",
+    "lean": 7.170525918115523,
+    "truth": 9.031458284706972,
+    "sem": 0.06864553945281536,
+    "sems_off": 27.109297726046588,
+    "rel_err": 0.2060500428532763
+   },
+   "cells": [
+    {
+     "design": "p=0.50 n1=4000 n2=8000 rg=0.7 tau2_std=2e-04",
+     "lean": 6.8667014468841785,
+     "truth": 7.621259722168642,
+     "sem": 0.06308493857962066,
+     "sems_off": 11.960989299087945,
+     "rel_err": 0.09900702807563581
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-04",
+     "lean": 8.621622463646052,
+     "truth": 9.982670956732786,
+     "sem": 0.07305917491259191,
+     "sems_off": 18.629398630837187,
+     "rel_err": 0.13634111541749042
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-04",
+     "lean": 5.358304246266798,
+     "truth": 6.5632121597126005,
+     "sem": 0.059475644141529095,
+     "sems_off": 20.258845966906836,
+     "rel_err": 0.18358509280592344
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-05",
+     "lean": 12.18097345546473,
+     "truth": 13.04179539215809,
+     "sem": 0.08131286306852685,
+     "sems_off": 10.586540729329585,
+     "rel_err": 0.0660048644231118
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-05",
+     "lean": 7.170525918115523,
+     "truth": 9.031458284706972,
+     "sem": 0.06864553945281536,
+     "sems_off": 27.109297726046588,
+     "rel_err": 0.2060500428532763
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [n1 alone, no borrowing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "n1 * beta1^2 * 2p(1-p)",
+   "note": "the second cohort contributes nothing; rejecting it is what makes the borrowing term measured rather than assumed; positive control 'single-cohort noncentrality n1*beta^2*2p(1-p), worst of the five cells: p=0.50 n1=4000' passed at 2.38 sems",
+   "regime": "8000 replicate cohort PAIRS per cell, genotypes drawn and OLS run in both, the borrowed estimate formed by inverse-variance combination of beta1_hat with beta2_hat/rg -- a rule fixed before any formula is evaluated; beta1 is HELD FIXED so the statistic is a frequentist noncentrality and prior shrinkage is not credited as information; maf swept 0.5 to 0.1 at FIXED n*2p(1-p), so the realised noncentrality is invariant along the sweep by construction and only a SCALE error can move with maf",
+   "span": 0.2862571878629938,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-05",
+    "lean": 6.999438275813986,
+    "truth": 13.04179539215809,
+    "sem": 0.08131286306852685,
+    "sems_off": 74.30997862234754,
+    "rel_err": 0.463307154778499
+   },
+   "cells": [
+    {
+     "design": "p=0.50 n1=4000 n2=8000 rg=0.7 tau2_std=2e-04",
+     "lean": 5.00364291478382,
+     "truth": 7.621259722168642,
+     "sem": 0.06308493857962066,
+     "sems_off": 41.493530251774416,
+     "rel_err": 0.34346248557449427
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-04",
+     "lean": 7.002463080912577,
+     "truth": 9.982670956732786,
+     "sem": 0.07305917491259191,
+     "sems_off": 40.79169904923966,
+     "rel_err": 0.2985381255915498
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-04",
+     "lean": 4.997957691256107,
+     "truth": 6.5632121597126005,
+     "sem": 0.059475644141529095,
+     "sems_off": 26.317570680391313,
+     "rel_err": 0.23848908588763876
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-05",
+     "lean": 6.999438275813986,
+     "truth": 13.04179539215809,
+     "sem": 0.08131286306852685,
+     "sems_off": 74.30997862234754,
+     "rel_err": 0.463307154778499
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-05",
+     "lean": 5.0011587402264635,
+     "truth": 9.031458284706972,
+     "sem": 0.06864553945281536,
+     "sems_off": 58.711746991962976,
+     "rel_err": 0.44625124951360745
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [small-prior limit, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "(n1 + rg^2 * n2) * beta1^2 * 2p(1-p)",
+   "note": "the naive borrowing form, which credits the second cohort its full size scaled by rg^2 and ignores the prior's own variance; positive control 'single-cohort noncentrality n1*beta^2*2p(1-p), worst of the five cells: p=0.50 n1=4000' passed at 2.38 sems",
+   "regime": "8000 replicate cohort PAIRS per cell, genotypes drawn and OLS run in both, the borrowed estimate formed by inverse-variance combination of beta1_hat with beta2_hat/rg -- a rule fixed before any formula is evaluated; beta1 is HELD FIXED so the statistic is a frequentist noncentrality and prior shrinkage is not credited as information; maf swept 0.5 to 0.1 at FIXED n*2p(1-p), so the realised noncentrality is invariant along the sweep by construction and only a SCALE error can move with maf",
+   "span": 0.28625718786299376,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-04",
+    "lean": 9.89595622868709,
+    "truth": 6.5632121597126005,
+    "sem": 0.059475644141529095,
+    "sems_off": 56.03544303015608,
+    "rel_err": 0.5077916099424751
+   },
+   "cells": [
+    {
+     "design": "p=0.50 n1=4000 n2=8000 rg=0.7 tau2_std=2e-04",
+     "lean": 9.907212971271964,
+     "truth": 7.621259722168642,
+     "sem": 0.06308493857962066,
+     "sems_off": 36.236117535696394,
+     "rel_err": 0.2999442785625013
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-04",
+     "lean": 13.8648769002069,
+     "truth": 9.982670956732786,
+     "sem": 0.07305917491259191,
+     "sems_off": 53.1378290012006,
+     "rel_err": 0.38889451132873115
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-04",
+     "lean": 9.89595622868709,
+     "truth": 6.5632121597126005,
+     "sem": 0.059475644141529095,
+     "sems_off": 56.03544303015608,
+     "rel_err": 0.5077916099424751
+    },
+    {
+     "design": "p=0.30 n1=6667 n2=13334 rg=0.7 tau2_std=2e-05",
+     "lean": 13.85888778611169,
+     "truth": 13.04179539215809,
+     "sem": 0.08131286306852685,
+     "sems_off": 10.048747063118316,
+     "rel_err": 0.06265183353857177
+    },
+    {
+     "design": "p=0.10 n1=11111 n2=22222 rg=0.7 tau2_std=2e-05",
+     "lean": 9.902294305648397,
+     "truth": 9.031458284706972,
+     "sem": 0.06864553945281536,
+     "sems_off": 12.685981170561107,
+     "rel_err": 0.09642252596305712
+    }
+   ]
+  }
+ ],
  "group_c3_multiTraitDiscoveryNCP_convention": [
   {
    "p": 0.5,
@@ -19,7 +258,11 @@
    "competitor_n1_alone": 5.00364291478382,
    "sems_n1_alone": 41.493530251774416,
    "competitor_small_prior": 9.907212971271964,
-   "sems_small_prior": 36.236117535696394
+   "sems_small_prior": 36.236117535696394,
+   "control_solo_ncp_measured": 4.881731643127733,
+   "control_solo_se": 0.051320527609611824,
+   "control_solo_predicted": 5.00364291478382,
+   "control_solo_sems": 2.3754874966105173
   },
   {
    "p": 0.3,
@@ -40,7 +283,11 @@
    "competitor_n1_alone": 7.002463080912577,
    "sems_n1_alone": 40.79169904923966,
    "competitor_small_prior": 13.8648769002069,
-   "sems_small_prior": 53.1378290012006
+   "sems_small_prior": 53.1378290012006,
+   "control_solo_ncp_measured": 7.035902170942174,
+   "control_solo_se": 0.06186570869994693,
+   "control_solo_predicted": 7.002463080912577,
+   "control_solo_sems": 0.540510902279961
   },
   {
    "p": 0.1,
@@ -61,7 +308,11 @@
    "competitor_n1_alone": 4.997957691256107,
    "sems_n1_alone": 26.317570680391313,
    "competitor_small_prior": 9.89595622868709,
-   "sems_small_prior": 56.03544303015608
+   "sems_small_prior": 56.03544303015608,
+   "control_solo_ncp_measured": 5.047020039083091,
+   "control_solo_se": 0.052314524905873426,
+   "control_solo_predicted": 4.997957691256107,
+   "control_solo_sems": 0.9378341467357179
   },
   {
    "p": 0.3,
@@ -82,7 +333,11 @@
    "competitor_n1_alone": 6.999438275813986,
    "sems_n1_alone": 74.30997862234754,
    "competitor_small_prior": 13.85888778611169,
-   "sems_small_prior": 10.048747063118316
+   "sems_small_prior": 10.048747063118316,
+   "control_solo_ncp_measured": 6.979486764662126,
+   "control_solo_se": 0.0605960171665183,
+   "control_solo_predicted": 6.999438275813986,
+   "control_solo_sems": 0.32925449699166404
   },
   {
    "p": 0.1,
@@ -95,15 +350,19 @@
    "maf_implied": 0.1000271978517186,
    "n1_times_gv": 2000.4634960905848,
    "ncp_measured": 9.031458284706972,
-   "se": 0.06864553945281535,
+   "se": 0.06864553945281536,
    "body_priorVariance_standardized": 8.99665707328474,
-   "sems_standardized": 0.5069697419473539,
+   "sems_standardized": 0.5069697419473538,
    "body_priorVariance_dosage": 7.170525918115523,
-   "sems_dosage": 27.109297726046595,
+   "sems_dosage": 27.109297726046588,
    "competitor_n1_alone": 5.0011587402264635,
-   "sems_n1_alone": 58.71174699196299,
+   "sems_n1_alone": 58.711746991962976,
    "competitor_small_prior": 9.902294305648397,
-   "sems_small_prior": 12.685981170561108
+   "sems_small_prior": 12.685981170561107,
+   "control_solo_ncp_measured": 4.9550818818576206,
+   "control_solo_se": 0.051824965791505,
+   "control_solo_predicted": 5.0011587402264635,
+   "control_solo_sems": 0.8890861318502922
   }
  ],
  "_guard": "DGPCOV4-2026-08-04-D"

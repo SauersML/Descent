@@ -1,166 +1,750 @@
 {
- "pairwise_tau": [
-  [
-   1000,
-   1000,
-   500,
-   0.3333333333333333,
-   0.2,
-   0.19681543981994967,
-   0.0027651832938587113
-  ],
-  [
-   1000,
-   1000,
-   1000,
-   0.5,
-   0.3333333333333333,
-   0.32924289722440997,
-   0.0032631828163026196
-  ],
-  [
-   1000,
-   1000,
-   2000,
-   0.6666666666666666,
-   0.5,
-   0.4999854440405074,
-   0.003015721488142749
-  ],
-  [
-   600,
-   600,
-   1200,
-   0.6666666666666666,
-   0.5,
-   0.49409964066433143,
-   0.003853389619189758
-  ],
-  [
-   500,
-   2000,
-   1000,
-   0.5555555555555556,
-   0.38461538461538464,
-   0.3659220662825821,
-   0.003295872460856876
-  ]
+ "_battery_sha": "e96065a8aa5b2c60",
+ "results": [
+  {
+   "name": "pairwiseFstFromBranchTaus",
+   "file": "Definitions.lean",
+   "source": "fstFromTau (Tau.ofScaled ((tauS + tauT) / 2))",
+   "note": "the superseded SUM form is carried on the same cells",
+   "regime": "clean two-deme split with RECOMBINATION on (rho = 1e-8 over 20 Mb, so a replicate holds many genealogies), no migration, EQUAL daughter sizes -- the equal-branch-length regime the declaration's status restricts itself to; Hudson F_ST, 30 replicates, both branch taus taken from the simulation's own Ne and split time",
+   "span": 0.6,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "NeA=600 NeB=600 t=1200",
+    "lean": 0.5,
+    "truth": 0.49409964066433143,
+    "sem": 0.003853389619189758,
+    "sems_off": 1.53121275520258,
+    "rel_err": 0.011941638588798332
+   },
+   "cells": [
+    {
+     "design": "NeA=1000 NeB=1000 t=500",
+     "lean": 0.2,
+     "truth": 0.19681543981994967,
+     "sem": 0.0027651832938587113,
+     "sems_off": 1.151663322689326,
+     "rel_err": 0.01618043880583572
+    },
+    {
+     "design": "NeA=1000 NeB=1000 t=1000",
+     "lean": 0.3333333333333333,
+     "truth": 0.32924289722440997,
+     "sem": 0.0032631828163026196,
+     "sems_off": 1.2535111696739238,
+     "rel_err": 0.012423764167447867
+    },
+    {
+     "design": "NeA=1000 NeB=1000 t=2000",
+     "lean": 0.5,
+     "truth": 0.4999854440405074,
+     "sem": 0.003015721488142749,
+     "sems_off": 0.004826692235955798,
+     "rel_err": 2.9112766513747526e-05
+    },
+    {
+     "design": "NeA=600 NeB=600 t=1200",
+     "lean": 0.5,
+     "truth": 0.49409964066433143,
+     "sem": 0.003853389619189758,
+     "sems_off": 1.53121275520258,
+     "rel_err": 0.011941638588798332
+    }
+   ]
+  },
+  {
+   "name": "pairwiseFstFromBranchTaus [sum of branch taus, superseded]",
+   "file": "Definitions.lean",
+   "source": "fstFromTau (Tau.ofScaled (tauS + tauT))",
+   "note": "the body this declaration carried before the split time was counted once instead of twice; positive control 'symmetric t=3000 Ne=1000: coalFst = t/(t+2Ne)' passed at 1.34 sems",
+   "regime": "clean two-deme split with RECOMBINATION on (rho = 1e-8 over 20 Mb, so a replicate holds many genealogies), no migration, EQUAL daughter sizes -- the equal-branch-length regime the declaration's status restricts itself to; Hudson F_ST, 30 replicates, both branch taus taken from the simulation's own Ne and split time",
+   "span": 0.5,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "NeA=1000 NeB=1000 t=2000",
+    "lean": 0.6666666666666666,
+    "truth": 0.4999854440405074,
+    "sem": 0.003015721488142749,
+    "sems_off": 55.270761335726306,
+    "rel_err": 0.3333721503553516
+   },
+   "cells": [
+    {
+     "design": "NeA=1000 NeB=1000 t=500",
+     "lean": 0.3333333333333333,
+     "truth": 0.19681543981994967,
+     "sem": 0.0027651832938587113,
+     "sems_off": 49.3702872487986,
+     "rel_err": 0.6936340646763927
+    },
+    {
+     "design": "NeA=1000 NeB=1000 t=1000",
+     "lean": 0.5,
+     "truth": 0.32924289722440997,
+     "sem": 0.0032631828163026196,
+     "sems_off": 52.32838991505477,
+     "rel_err": 0.5186356462511719
+    },
+    {
+     "design": "NeA=1000 NeB=1000 t=2000",
+     "lean": 0.6666666666666666,
+     "truth": 0.4999854440405074,
+     "sem": 0.003015721488142749,
+     "sems_off": 55.270761335726306,
+     "rel_err": 0.3333721503553516
+    },
+    {
+     "design": "NeA=600 NeB=600 t=1200",
+     "lean": 0.6666666666666666,
+     "truth": 0.49409964066433143,
+     "sem": 0.003853389619189758,
+     "sems_off": 44.783176127053665,
+     "rel_err": 0.3492555181183977
+    }
+   ]
+  },
+  {
+   "name": "pairwiseFstFromBranchTaus [unequal branch lengths]",
+   "file": "Definitions.lean",
+   "source": "fstFromTau (Tau.ofScaled ((tauS + tauT) / 2)), unequal Ne",
+   "note": "this is the boundary the declaration's status names, measured rather than asserted: the mean of the branch taus is not the pairwise F_ST when the two branches differ in length; positive control 'symmetric t=3000 Ne=1000: coalFst = t/(t+2Ne)' passed at 1.34 sems",
+   "regime": "clean two-deme split with RECOMBINATION on (rho = 1e-8 over 20 Mb, so a replicate holds many genealogies), no migration, UNEQUAL daughter sizes -- the equal-branch-length regime the declaration's status restricts itself to; Hudson F_ST, 30 replicates, both branch taus taken from the simulation's own Ne and split time",
+   "span": 0.3076923076923077,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "NeA=500 NeB=2000 t=2000",
+    "lean": 0.5555555555555556,
+    "truth": 0.5041706644624055,
+    "sem": 0.002811204282221849,
+    "sems_off": 18.278604446539095,
+    "rel_err": 0.10191963697043235
+   },
+   "cells": [
+    {
+     "design": "NeA=500 NeB=2000 t=1000",
+     "lean": 0.38461538461538464,
+     "truth": 0.3659220662825821,
+     "sem": 0.0032958724608568766,
+     "sems_off": 5.671735953017595,
+     "rel_err": 0.0510855180795975
+    },
+    {
+     "design": "NeA=400 NeB=1600 t=1000",
+     "lean": 0.43859649122807015,
+     "truth": 0.4183569030683033,
+     "sem": 0.004025663710226577,
+     "sems_off": 5.027640065500576,
+     "rel_err": 0.04837875988498369
+    },
+    {
+     "design": "NeA=500 NeB=2000 t=2000",
+     "lean": 0.5555555555555556,
+     "truth": 0.5041706644624055,
+     "sem": 0.002811204282221849,
+     "sems_off": 18.278604446539095,
+     "rel_err": 0.10191963697043235
+    }
+   ]
+  },
+  {
+   "name": "alleleFreqCorrelation",
+   "file": "MutationDrift.lean",
+   "source": "varAncestral / (varAncestral + fst * meanHetAncestral)",
+   "note": "the design holds the drift index nearly fixed at each depth and moves the correlation across the range the quantity admits, which is what separates the two readings",
+   "regime": "Wright-Fisher forward simulation, Ne = 200, 4000 loci, 400 replicate deme pairs, four ancestral frequency distributions crossed with two drift depths; the correlation is taken ACROSS LOCI WITHIN a replicate so its scatter is measured, the two ancestral moments are the realised moments of the drawn p0, and the drift index is the model's 1-(1-1/(2Ne))^t and never one estimated from the replicates the oracle measures",
+   "span": 1.0,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "uniform(0.05,0.95) t=200",
+    "lean": 0.48615241974678947,
+    "truth": 0.4846224883774536,
+    "sem": 0.0005353602348687073,
+    "sems_off": 2.857760568845915,
+    "rel_err": 0.003156954961908981
+   },
+   "cells": [
+    {
+     "design": "uniform(0.05,0.95) t=60",
+     "lean": 0.7236701937183966,
+     "truth": 0.7240362680988255,
+     "sem": 0.00031584165767597886,
+     "sems_off": 1.1590440068056487,
+     "rel_err": 0.0005056022696074919
+    },
+    {
+     "design": "uniform(0.05,0.95) t=200",
+     "lean": 0.48615241974678947,
+     "truth": 0.4846224883774536,
+     "sem": 0.0005353602348687073,
+     "sems_off": 2.857760568845915,
+     "rel_err": 0.003156954961908981
+    },
+    {
+     "design": "beta(0.5,0.5) t=60",
+     "lean": 0.873540386677074,
+     "truth": 0.8735941918650387,
+     "sem": 0.00017372350339114545,
+     "sems_off": 0.30971737798524984,
+     "rel_err": 6.159059717401323e-05
+    },
+    {
+     "design": "beta(0.5,0.5) t=200",
+     "lean": 0.7109332640015323,
+     "truth": 0.7109975336096827,
+     "sem": 0.000406476175913394,
+     "sems_off": 0.1581140838227311,
+     "rel_err": 9.039357397489336e-05
+    },
+    {
+     "design": "beta(2,2) t=60",
+     "lean": 0.6464722680189459,
+     "truth": 0.6460226673612912,
+     "sem": 0.000397157017316406,
+     "sems_off": 1.132047623613964,
+     "rel_err": 0.0006959518301285953
+    },
+    {
+     "design": "beta(2,2) t=200",
+     "lean": 0.38953218839278503,
+     "truth": 0.38962710735899253,
+     "sem": 0.0006576729699465828,
+     "sems_off": 0.1443254786877006,
+     "rel_err": 0.00024361489335506206
+    },
+    {
+     "design": "all p0 = 0.5 t=60",
+     "lean": 0.0,
+     "truth": -0.0004211392900597418,
+     "sem": 0.0007535776368195888,
+     "sems_off": 0.5588532215965496,
+     "rel_err": 1.0
+    },
+    {
+     "design": "all p0 = 0.5 t=200",
+     "lean": 0.0,
+     "truth": -0.0006155397777293764,
+     "sem": 0.000787390896204314,
+     "sems_off": 0.7817461196168753,
+     "rel_err": 1.0
+    }
+   ]
+  },
+  {
+   "name": "alleleFreqCorrelation [1 - Fst, the superseded identification]",
+   "file": "MutationDrift.lean",
+   "source": "1 - fst",
+   "note": "the claim the rename retired: this was `freqCorrFromFst`, and the ledger's three rows under that dead name are this measurement. The body `1 - fst` survives under `covarianceRetentionFactorFromFst`, which is what consumers use it as; what is refuted here is only the identification of it with the correlation; the positive control 'between-deme G_ST implied by the drift index, F/(2-F) at F = 1-(1-1/(2Ne))^t, worst of the eight cells: uniform(0.05,0.95) t=200' missed by 3.1 sems on the same code path, so this design cannot support any verdict",
+   "regime": "Wright-Fisher forward simulation, Ne = 200, 4000 loci, 400 replicate deme pairs, four ancestral frequency distributions crossed with two drift depths; the correlation is taken ACROSS LOCI WITHIN a replicate so its scatter is measured, the two ancestral moments are the realised moments of the drawn p0, and the drift index is the model's 1-(1-1/(2Ne))^t and never one estimated from the replicates the oracle measures",
+   "span": 0.18482457259897037,
+   "verdict": "VOID (control failed)",
+   "worst": {
+    "design": "all p0 = 0.5 t=60",
+    "lean": 0.9249494990987582,
+    "truth": -0.0004211392900597418,
+    "sem": 0.0007535776368195888,
+    "sems_off": 1227.9698775221982,
+    "rel_err": 2197.303030685043
+   },
+   "cells": [
+    {
+     "design": "uniform(0.05,0.95) t=60",
+     "lean": 0.9250606511467093,
+     "truth": 0.7240362680988255,
+     "sem": 0.00031584165767597886,
+     "sems_off": 636.4720364218523,
+     "rel_err": 0.2776440793162664
+    },
+    {
+     "design": "uniform(0.05,0.95) t=200",
+     "lean": 0.7540867116703935,
+     "truth": 0.4846224883774536,
+     "sem": 0.0005353602348687073,
+     "sems_off": 503.3325333903887,
+     "rel_err": 0.5560291355754517
+    },
+    {
+     "design": "beta(0.5,0.5) t=60",
+     "lean": 0.9250263661893969,
+     "truth": 0.8735941918650387,
+     "sem": 0.00017372350339114545,
+     "sems_off": 296.0576624370543,
+     "rel_err": 0.05887421734633504
+    },
+    {
+     "design": "beta(0.5,0.5) t=200",
+     "lean": 0.7546212314118523,
+     "truth": 0.7109975336096827,
+     "sem": 0.000406476175913394,
+     "sems_off": 107.321659637598,
+     "rel_err": 0.06135562465413255
+    },
+    {
+     "design": "beta(2,2) t=60",
+     "lean": 0.9249570309568116,
+     "truth": 0.6460226673612912,
+     "sem": 0.000397157017316406,
+     "sems_off": 702.3276725167358,
+     "rel_err": 0.4317717901986944
+    },
+    {
+     "design": "beta(2,2) t=200",
+     "lean": 0.7548359500200675,
+     "truth": 0.38962710735899253,
+     "sem": 0.0006576729699465828,
+     "sems_off": 555.3046260829875,
+     "rel_err": 0.9373291430787972
+    },
+    {
+     "design": "all p0 = 0.5 t=60",
+     "lean": 0.9249494990987582,
+     "truth": -0.0004211392900597418,
+     "sem": 0.0007535776368195888,
+     "sems_off": 1227.9698775221982,
+     "rel_err": 2197.303030685043
+    },
+    {
+     "design": "all p0 = 0.5 t=200",
+     "lean": 0.7544232277871531,
+     "truth": -0.0006155397777293764,
+     "sem": 0.000787390896204314,
+     "sems_off": 958.912239403087,
+     "rel_err": 1226.6287165877316
+    }
+   ]
+  },
+  {
+   "name": "fstIslandEquilibriumFiniteDemes",
+   "file": "MigrationDriftFoundations.lean",
+   "source": "fstFromFlow (4*Ne*m * islandDemeCorrection nDemes + 4*Ne*mu)",
+   "note": "at fixed 4 Ne m the limit form is one number and this one spans 0.111 to 0.196, so the design separates them by construction rather than by power",
+   "regime": "msprime symmetric island model at migration-drift-mutation equilibrium, Ne = 1000, TOTAL emigration rate m = 1e-3 held FIXED so 4 Ne m = 4.0 is identical in every row and the deme count is the only thing that moves, mu = 1e-8, Hudson F_ST over 40 replicates of 20 Mb; every rate is the simulation's own parameter",
+   "span": 0.43304650839728465,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "n_demes=10, 4Nm=4.0 held fixed",
+    "lean": 0.18367211995993496,
+    "truth": 0.14297421008910227,
+    "sem": 0.01752053177528223,
+    "sems_off": 2.3228695562910278,
+    "rel_err": 0.28465210505775507
+   },
+   "cells": [
+    {
+     "design": "n_demes=2, 4Nm=4.0 held fixed",
+     "lean": 0.1111106172861454,
+     "truth": 0.1169801884147013,
+     "sem": 0.010166594723957654,
+     "sems_off": 0.5773389505459698,
+     "rel_err": 0.05017577085572771
+    },
+    {
+     "design": "n_demes=3, 4Nm=4.0 held fixed",
+     "lean": 0.14285632653527694,
+     "truth": 0.13272876023458174,
+     "sem": 0.016693983147311145,
+     "sems_off": 0.6066596696143434,
+     "rel_err": 0.0763027265740746
+    },
+    {
+     "design": "n_demes=4, 4Nm=4.0 held fixed",
+     "lean": 0.15789373961848663,
+     "truth": 0.12658012403423163,
+     "sem": 0.017639117838430203,
+     "sems_off": 1.7752370538640132,
+     "rel_err": 0.24738177358545416
+    },
+    {
+     "design": "n_demes=6, 4Nm=4.0 held fixed",
+     "lean": 0.17241260405100653,
+     "truth": 0.17579120991984934,
+     "sem": 0.020358733921098812,
+     "sems_off": 0.16595363355780124,
+     "rel_err": 0.019219424397745825
+    },
+    {
+     "design": "n_demes=10, 4Nm=4.0 held fixed",
+     "lean": 0.18367211995993496,
+     "truth": 0.14297421008910227,
+     "sem": 0.01752053177528223,
+     "sems_off": 2.3228695562910278,
+     "rel_err": 0.28465210505775507
+    },
+    {
+     "design": "n_demes=20, 4Nm=4.0 held fixed",
+     "lean": 0.19191771861145307,
+     "truth": 0.18580228683975009,
+     "sem": 0.01879417420949378,
+     "sems_off": 0.3253897566094607,
+     "rel_err": 0.03291365179470258
+    },
+    {
+     "design": "n_demes=40, 4Nm=4.0 held fixed",
+     "lean": 0.1959783631846906,
+     "truth": 0.17113678572543592,
+     "sem": 0.01808631242397101,
+     "sems_off": 1.3735015119129796,
+     "rel_err": 0.14515626990394334
+    }
+   ]
+  },
+  {
+   "name": "fstIslandEquilibriumFiniteDemes [many-deme limit, superseded]",
+   "file": "MigrationDriftFoundations.lean",
+   "source": "fstFromFlow (4*Ne*m)",
+   "note": "constant across the whole design: this is the form that cannot see the deme count at all; positive control 'n_demes=40, m=1e-2: Wright's 1/(1+4Nm) at 4Nm=40' passed at 1.95 sems",
+   "regime": "msprime symmetric island model at migration-drift-mutation equilibrium, Ne = 1000, TOTAL emigration rate m = 1e-3 held FIXED so 4 Ne m = 4.0 is identical in every row and the deme count is the only thing that moves, mu = 1e-8, Hudson F_ST over 40 replicates of 20 Mb; every rate is the simulation's own parameter",
+   "span": 0.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n_demes=2, 4Nm=4.0 held fixed",
+    "lean": 0.2,
+    "truth": 0.1169801884147013,
+    "sem": 0.010166594723957654,
+    "sems_off": 8.165940891659814,
+    "rel_err": 0.7096912110535234
+   },
+   "cells": [
+    {
+     "design": "n_demes=2, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.1169801884147013,
+     "sem": 0.010166594723957654,
+     "sems_off": 8.165940891659814,
+     "rel_err": 0.7096912110535234
+    },
+    {
+     "design": "n_demes=3, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.13272876023458174,
+     "sem": 0.016693983147311145,
+     "sems_off": 4.02966980209594,
+     "rel_err": 0.5068324276255172
+    },
+    {
+     "design": "n_demes=4, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.12658012403423163,
+     "sem": 0.017639117838430203,
+     "sems_off": 4.162332642611474,
+     "rel_err": 0.5800268922624306
+    },
+    {
+     "design": "n_demes=6, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.17579120991984934,
+     "sem": 0.020358733921098812,
+     "sems_off": 1.1891107852763794,
+     "rel_err": 0.13771331394321984
+    },
+    {
+     "design": "n_demes=10, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.14297421008910227,
+     "sem": 0.01752053177528223,
+     "sems_off": 3.254797893255106,
+     "rel_err": 0.39885368050195186
+    },
+    {
+     "design": "n_demes=20, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.18580228683975009,
+     "sem": 0.01879417420949378,
+     "sems_off": 0.7554316035379742,
+     "rel_err": 0.07641301623211508
+    },
+    {
+     "design": "n_demes=40, 4Nm=4.0 held fixed",
+     "lean": 0.2,
+     "truth": 0.17113678572543592,
+     "sem": 0.01808631242397101,
+     "sems_off": 1.5958595427285511,
+     "rel_err": 0.16865581617777325
+    }
+   ]
+  },
+  {
+   "name": "fstIslandEquilibriumFiniteDemes [squared correction, competing]",
+   "file": "MigrationDriftFoundations.lean",
+   "source": "fstFromFlow (4*Ne*m * (nDemes/(nDemes-1))^2)",
+   "note": "the candidate this battery was written to accept or reject; it over-corrects at small deme counts, where the linear form and the data agree; positive control 'n_demes=40, m=1e-2: Wright's 1/(1+4Nm) at 4Nm=40' passed at 1.95 sems",
+   "regime": "msprime symmetric island model at migration-drift-mutation equilibrium, Ne = 1000, TOTAL emigration rate m = 1e-3 held FIXED so 4 Ne m = 4.0 is identical in every row and the deme count is the only thing that moves, mu = 1e-8, Hudson F_ST over 40 replicates of 20 Mb; every rate is the simulation's own parameter",
+   "span": 0.693661290946359,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n_demes=2, 4Nm=4.0 held fixed",
+    "lean": 0.058823529411764705,
+    "truth": 0.1169801884147013,
+    "sem": 0.010166594723957654,
+    "sems_off": 5.720367594263398,
+    "rel_err": 0.49714964380778726
+   },
+   "cells": [
+    {
+     "design": "n_demes=2, 4Nm=4.0 held fixed",
+     "lean": 0.058823529411764705,
+     "truth": 0.1169801884147013,
+     "sem": 0.010166594723957654,
+     "sems_off": 5.720367594263398,
+     "rel_err": 0.49714964380778726
+    },
+    {
+     "design": "n_demes=3, 4Nm=4.0 held fixed",
+     "lean": 0.1,
+     "truth": 0.13272876023458174,
+     "sem": 0.016693983147311145,
+     "sems_off": 1.9605123562050122,
+     "rel_err": 0.24658378618724144
+    },
+    {
+     "design": "n_demes=4, 4Nm=4.0 held fixed",
+     "lean": 0.12328767123287672,
+     "truth": 0.12658012403423163,
+     "sem": 0.017639117838430203,
+     "sems_off": 0.1866563187293683,
+     "rel_err": 0.026010819838227693
+    },
+    {
+     "design": "n_demes=6, 4Nm=4.0 held fixed",
+     "lean": 0.14792899408284024,
+     "truth": 0.17579120991984934,
+     "sem": 0.020358733921098812,
+     "sems_off": 1.3685632881195051,
+     "rel_err": 0.1584960695686244
+    },
+    {
+     "design": "n_demes=10, 4Nm=4.0 held fixed",
+     "lean": 0.16839916839916838,
+     "truth": 0.14297421008910227,
+     "sem": 0.01752053177528223,
+     "sems_off": 1.451152204520148,
+     "rel_err": 0.1778289825432233
+    },
+    {
+     "design": "n_demes=20, 4Nm=4.0 held fixed",
+     "lean": 0.184089750127486,
+     "truth": 0.18580228683975009,
+     "sem": 0.01879417420949378,
+     "sems_off": 0.09112061499350242,
+     "rel_err": 0.009216984039282124
+    },
+    {
+     "design": "n_demes=40, 4Nm=4.0 held fixed",
+     "lean": 0.19202120944325216,
+     "truth": 0.17113678572543592,
+     "sem": 0.01808631242397101,
+     "sems_off": 1.154708778011415,
+     "rel_err": 0.12203351622673489
+    }
+   ]
+  }
  ],
- "freq_corr": [
-  [
-   "uniform(0.05,0.95)",
-   60,
-   0.9250999605251808,
-   0.7236701937183966,
-   0.7240139958217042,
-   0.00032018500462801136
+ "raw": {
+  "pairwise_tau": [
+   [
+    1000,
+    1000,
+    500,
+    0.3333333333333333,
+    0.2,
+    0.19681543981994967,
+    0.0027651832938587113
+   ],
+   [
+    1000,
+    1000,
+    1000,
+    0.5,
+    0.3333333333333333,
+    0.32924289722440997,
+    0.0032631828163026196
+   ],
+   [
+    1000,
+    1000,
+    2000,
+    0.6666666666666666,
+    0.5,
+    0.4999854440405074,
+    0.003015721488142749
+   ],
+   [
+    600,
+    600,
+    1200,
+    0.6666666666666666,
+    0.5,
+    0.49409964066433143,
+    0.003853389619189758
+   ],
+   [
+    500,
+    2000,
+    1000,
+    0.5555555555555556,
+    0.38461538461538464,
+    0.3659220662825821,
+    0.0032958724608568766
+   ],
+   [
+    400,
+    1600,
+    1000,
+    0.6097560975609756,
+    0.43859649122807015,
+    0.4183569030683033,
+    0.004025663710226577
+   ],
+   [
+    500,
+    2000,
+    2000,
+    0.7142857142857143,
+    0.5555555555555556,
+    0.5041706644624055,
+    0.002811204282221849
+   ]
   ],
-  [
-   "uniform(0.05,0.95)",
-   200,
-   0.7545243533011468,
-   0.47858806646123625,
-   0.47802660960495885,
-   0.0005920710793197809
+  "pairwise_tau_control": {
+   "design": "symmetric t=3000 Ne=1000: coalFst = t/(t+2Ne)",
+   "lean": 0.6,
+   "truth": 0.6034488057280676,
+   "sem": 0.002575086002024431
+  },
+  "freq_corr": [
+   [
+    "uniform(0.05,0.95)",
+    60,
+    0.9250606511467093,
+    0.7236701937183966,
+    0.7240362680988255,
+    0.00031584165767597886
+   ],
+   [
+    "uniform(0.05,0.95)",
+    200,
+    0.7540867116703935,
+    0.48615241974678947,
+    0.4846224883774536,
+    0.0005353602348687073
+   ],
+   [
+    "beta(0.5,0.5)",
+    60,
+    0.9250263661893969,
+    0.873540386677074,
+    0.8735941918650387,
+    0.00017372350339114545
+   ],
+   [
+    "beta(0.5,0.5)",
+    200,
+    0.7546212314118523,
+    0.7109332640015323,
+    0.7109975336096827,
+    0.000406476175913394
+   ],
+   [
+    "beta(2,2)",
+    60,
+    0.9249570309568116,
+    0.6464722680189459,
+    0.6460226673612912,
+    0.000397157017316406
+   ],
+   [
+    "beta(2,2)",
+    200,
+    0.7548359500200675,
+    0.38953218839278503,
+    0.38962710735899253,
+    0.0006576729699465828
+   ],
+   [
+    "all p0 = 0.5",
+    60,
+    0.9249494990987582,
+    0.0,
+    -0.0004211392900597418,
+    0.0007535776368195888
+   ],
+   [
+    "all p0 = 0.5",
+    200,
+    0.7544232277871531,
+    0.0,
+    -0.0006155397777293764,
+    0.000787390896204314
+   ]
   ],
-  [
-   "beta(0.5,0.5)",
-   60,
-   0.9248810133174018,
-   0.8720513294858686,
-   0.8718696482596999,
-   0.00017447521638307612
+  "freq_corr_control": {
+   "design": "between-deme G_ST implied by the drift index, F/(2-F) at F = 1-(1-1/(2Ne))^t, worst of the eight cells: uniform(0.05,0.95) t=200",
+   "lean": 0.2452128849886965,
+   "truth": 0.24590908946946344,
+   "sem": 0.00022738975813538435
+  },
+  "island": [
+   [
+    2,
+    0.1169801884147013,
+    0.010166594723957654,
+    0.2,
+    0.1111106172861454,
+    0.058823529411764705
+   ],
+   [
+    3,
+    0.13272876023458174,
+    0.016693983147311145,
+    0.2,
+    0.14285632653527694,
+    0.1
+   ],
+   [
+    4,
+    0.12658012403423163,
+    0.017639117838430203,
+    0.2,
+    0.15789373961848663,
+    0.12328767123287672
+   ],
+   [
+    6,
+    0.17579120991984934,
+    0.020358733921098812,
+    0.2,
+    0.17241260405100653,
+    0.14792899408284024
+   ],
+   [
+    10,
+    0.14297421008910227,
+    0.01752053177528223,
+    0.2,
+    0.18367211995993496,
+    0.16839916839916838
+   ],
+   [
+    20,
+    0.18580228683975009,
+    0.01879417420949378,
+    0.2,
+    0.19191771861145307,
+    0.184089750127486
+   ],
+   [
+    40,
+    0.17113678572543592,
+    0.01808631242397101,
+    0.2,
+    0.1959783631846906,
+    0.19202120944325216
+   ]
   ],
-  [
-   "beta(0.5,0.5)",
-   200,
-   0.7546643721552777,
-   0.7135672989711114,
-   0.7131726158093687,
-   0.0003803645704108899
-  ],
-  [
-   "beta(2,2)",
-   60,
-   0.9250811597378501,
-   0.6437252785839325,
-   0.6440445838141525,
-   0.00040286075023771695
-  ],
-  [
-   "beta(2,2)",
-   200,
-   0.7546918317394502,
-   0.3907633062895342,
-   0.3906022578533493,
-   0.0006362521905389065
-  ],
-  [
-   "all p0 = 0.5",
-   60,
-   0.9251787658846832,
-   0.0,
-   0.0005834243885321273,
-   0.0007599541464548354
-  ],
-  [
-   "all p0 = 0.5",
-   200,
-   0.7546481394081292,
-   0.0,
-   -5.838394922970648e-05,
-   0.0007870550127322438
-  ]
- ],
- "island": [
-  [
-   2,
-   0.1169801884147013,
-   0.010166594723957655,
-   0.2,
-   0.058823529411764705
-  ],
-  [
-   3,
-   0.13272876023458174,
-   0.016693983147311145,
-   0.2,
-   0.1
-  ],
-  [
-   4,
-   0.12658012403423163,
-   0.017639117838430207,
-   0.2,
-   0.12328767123287672
-  ],
-  [
-   6,
-   0.17579120991984934,
-   0.020358733921098816,
-   0.2,
-   0.14792899408284024
-  ],
-  [
-   10,
-   0.1429742100891023,
-   0.017520531775282233,
-   0.2,
-   0.16839916839916838
-  ],
-  [
-   20,
-   0.18580228683975009,
-   0.01879417420949378,
-   0.2,
-   0.184089750127486
-  ],
-  [
-   40,
-   0.17113678572543592,
-   0.01808631242397101,
-   0.2,
-   0.19202120944325216
-  ]
- ]
+  "island_control": {
+   "design": "n_demes=40, m=1e-2: Wright's 1/(1+4Nm) at 4Nm=40",
+   "lean": 0.024390243902439025,
+   "truth": 0.01815417520310506,
+   "sem": 0.0032028825942557212
+  }
+ }
 }
