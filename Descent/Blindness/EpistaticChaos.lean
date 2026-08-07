@@ -776,6 +776,38 @@ variable {ι : Type*} [Fintype ι] {n : ℕ}
 
 /-! ### The coordinate: what a standardized genotype contributes -/
 
+/-- **The centered allele count is the coding minus twice the frequency**:
+`G - E[G] = dosage g - 2q`, because `E[G] = 2q` under Hardy-Weinberg.
+
+This is where the genotype CODING and the Hardy-Weinberg mean meet, and it is the
+only place they need to. Every statement below about one named genotype — the
+heterozygote term that carries the even-moment lower bound, the three signed squares
+of the sign bias — is this identity at that genotype followed by the `dosage`
+equation lemma for its constructor. -/
+theorem hweCenteredDosage_eq (h : Foundations.HardyWeinbergModel)
+    (g : Foundations.DiploidGenotype) :
+    h.centeredAltAlleleCount g = Descent.Core.Genotype.dosage g - 2 * h.altFreq := by
+  unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount Foundations.altAlleleCount
+  rw [h.expectedAltAlleleCount_eq]
+
+/-- **Every centered moment of the dosage is the same three Hardy-Weinberg terms.**
+`E[(G - 2q)^k]` is the three genotype probabilities `p²`, `2pq`, `q²` weighting the
+three centered codings `0 - 2q`, `1 - 2q`, `2 - 2q`, at every order `k`.
+
+The orders this section needs — the first, for centering; the fourth, for `E[x⁴]`;
+the sixth, for `E[x⁶]` — were one expansion of one sum, differing only in the
+exponent, so they are one lemma with the exponent as an argument. The closed forms
+are what `ring` makes of it at each order, and each closed form cites this. -/
+theorem hweCenteredMoment_eq (h : Foundations.HardyWeinbergModel) (k : ℕ) :
+    ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ k =
+      (1 - h.altFreq) ^ 2 * (0 - 2 * h.altFreq) ^ k +
+        2 * (1 - h.altFreq) * h.altFreq * (1 - 2 * h.altFreq) ^ k +
+        h.altFreq ^ 2 * (2 - 2 * h.altFreq) ^ k := by
+  rw [Foundations.sum_over_genotypes]
+  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
+    hweCenteredDosage_eq, Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
+    Descent.Core.Genotype.dosage_homAlt]
+
 /-- **The standardized genotype is centered**, at every allele frequency and with no symmetry
 hypothesis: `E[(g - 2q) / sqrt (2q(1-q))] = 0`.
 
@@ -791,12 +823,9 @@ theorem standardizedGenotype_expectation_zero (h : Foundations.HardyWeinbergMode
     ring
   have hnum : ∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredAltAlleleCount g = 0 := by
-    rw [Foundations.sum_over_genotypes]
-    simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
-      Foundations.HardyWeinbergModel.centeredAltAlleleCount,
-      Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount,
-        Descent.Core.Genotype.dosage, Descent.Core.Genotype.dosage_homRef,
-        Descent.Core.Genotype.dosage_het, Descent.Core.Genotype.dosage_homAlt]
+    have hexp := hweCenteredMoment_eq h 1
+    simp only [pow_one] at hexp
+    rw [hexp]
     ring
   simp_rw [hfactor]
   rw [← Finset.sum_div, hnum, zero_div]
@@ -864,12 +893,8 @@ theorem standardizedGenotype_fourth_moment (h : Foundations.HardyWeinbergModel)
     ring
   have hnum : ∑ g : Foundations.DiploidGenotype,
       h.genotypeProb g * h.centeredAltAlleleCount g ^ 4 = h.genotypeVariance := by
-    rw [h.genotypeVariance_eq, Foundations.sum_over_genotypes]
-    simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
-      Foundations.HardyWeinbergModel.centeredAltAlleleCount,
-      Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount,
-        Descent.Core.Genotype.dosage, Descent.Core.Genotype.dosage_homRef,
-        Descent.Core.Genotype.dosage_het, Descent.Core.Genotype.dosage_homAlt]
+    rw [hweCenteredMoment_eq h 4, h.genotypeVariance_eq]
+    simp only [Foundations.HardyWeinbergModel.refFreq]
     ring
   simp_rw [hfactor]
   rw [← Finset.sum_div, hnum, pow_two, ← div_div, div_self (ne_of_gt hvar)]
@@ -1006,12 +1031,8 @@ moment below. -/
 theorem hweCenteredSixthMoment_eq (h : Foundations.HardyWeinbergModel) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.centeredAltAlleleCount g ^ 6 =
       h.genotypeVariance + 10 * h.genotypeVariance ^ 2 - 20 * h.genotypeVariance ^ 3 := by
-  rw [h.genotypeVariance_eq, Foundations.sum_over_genotypes]
-  simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq,
-    Foundations.HardyWeinbergModel.centeredAltAlleleCount,
-    Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq, Foundations.altAlleleCount,
-      Descent.Core.Genotype.dosage, Descent.Core.Genotype.dosage_homRef,
-      Descent.Core.Genotype.dosage_het, Descent.Core.Genotype.dosage_homAlt]
+  rw [hweCenteredMoment_eq h 6, h.genotypeVariance_eq]
+  simp only [Foundations.HardyWeinbergModel.refFreq]
   ring
 
 /-- **The sixth moment of the standardized genotype is a quadratic in the fourth.**
@@ -1224,11 +1245,7 @@ theorem standardizedGenotype_even_moment_lower_bound (h : Foundations.HardyWeinb
         h.genotypeVariance * (1 - 2 * h.altFreq) ^ (2 * m) := by
     have hcentered : h.centeredAltAlleleCount Descent.Core.Genotype.het =
         1 - 2 * h.altFreq := by
-      unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
-      rw [h.expectedAltAlleleCount_eq]
-      simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
-        Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
-        Descent.Core.Genotype.dosage_homAlt]
+      rw [hweCenteredDosage_eq, Descent.Core.Genotype.dosage_het]
     rw [hcentered, h.genotypeVariance_eq]
     simp only [Foundations.HardyWeinbergModel.genotypeProb, Foundations.HardyWeinbergModel.refFreq]
     ring
@@ -1310,24 +1327,12 @@ theorem hweSignBias_eq (h : Foundations.HardyWeinbergModel) (hq0 : 0 < h.altFreq
     rw [abs_div, abs_of_pos hs, div_mul_div_comm, hss]
     ring
   have hcref : h.centeredAltAlleleCount Descent.Core.Genotype.homRef = -(2 * h.altFreq) := by
-    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
-    rw [h.expectedAltAlleleCount_eq]
-    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
-      Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
-      Descent.Core.Genotype.dosage_homAlt]
+    rw [hweCenteredDosage_eq, Descent.Core.Genotype.dosage_homRef]
     ring
   have hchet : h.centeredAltAlleleCount Descent.Core.Genotype.het = 1 - 2 * h.altFreq := by
-    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
-    rw [h.expectedAltAlleleCount_eq]
-    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
-      Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
-      Descent.Core.Genotype.dosage_homAlt]
+    rw [hweCenteredDosage_eq, Descent.Core.Genotype.dosage_het]
   have hcalt : h.centeredAltAlleleCount Descent.Core.Genotype.homAlt = 2 - 2 * h.altFreq := by
-    unfold Foundations.HardyWeinbergModel.centeredAltAlleleCount
-    rw [h.expectedAltAlleleCount_eq]
-    simp only [Foundations.altAlleleCount, Descent.Core.Genotype.dosage,
-      Descent.Core.Genotype.dosage_homRef, Descent.Core.Genotype.dosage_het,
-      Descent.Core.Genotype.dosage_homAlt]
+    rw [hweCenteredDosage_eq, Descent.Core.Genotype.dosage_homAlt]
   unfold Foundations.HardyWeinbergModel.signBias
   simp_rw [hsigned]
   rw [← Finset.sum_div, Foundations.sum_over_genotypes, hcref, hchet, hcalt,

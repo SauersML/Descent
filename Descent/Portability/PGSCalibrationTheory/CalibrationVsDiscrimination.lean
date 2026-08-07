@@ -618,6 +618,24 @@ noncomputable def CrossPopulationMechanisticCalibrationModel.identityCalibration
     CrossPopulationCalibrationShiftModel.predictedMeanShift]
   ring
 
+/-- **Cross between the mechanistic calibration state and the shift model it induces.**
+
+A mechanistic calibration state and its induced shift model carry the same mean-shift budget in
+differently named fields, so a law proved on one layer is transported to the other by
+normalising both through the same chain: the induced shift model, the observed- and score-mean
+shifts as each layer spells them, and the three-way observed shift underneath both. That chain
+is the crossing, and it is the same one at every law that crosses. What a law needs beyond the
+mean-shift plumbing -- a calibration profile to open, an associativity step -- it passes in,
+and the transported fact is the `using` term. -/
+macro "mechanistic_shift_budget" ms:Lean.Parser.Tactic.simpLemma,* " using " e:term : tactic =>
+  `(tactic| simpa [$ms,*,
+      CrossPopulationMechanisticCalibrationModel.toShiftModel,
+      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
+      CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
+      CrossPopulationCalibrationShiftModel.observedMeanShift,
+      CrossPopulationCalibrationShiftModel.predictedMeanShift,
+      totalObservedMeanShift, shiftedObservedMean, Descent.Core.sum3] using $e)
+
 namespace CrossPopulationMechanisticCalibrationModel
 
 /-- Shared definitional reduction for the three mechanistic calibration-profile projections
@@ -697,14 +715,8 @@ theorem target_profile_citl_eq_source_profile_citl_add_exact_biological_shift_bu
     (m.calibrationProfile Pop.target link).citl =
       (m.calibrationProfile Pop.source link).citl +
         m.observedMeanShift - (m.scoreMeanShift + m.deploymentInterceptShift) := by
-  simpa [CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-    CrossPopulationMechanisticCalibrationModel.toShiftModel,
-    CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-    CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
-    CrossPopulationCalibrationShiftModel.observedMeanShift,
-    CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean,
-      Descent.Core.sum3] using
+  mechanistic_shift_budget
+    CrossPopulationMechanisticCalibrationModel.calibrationProfile using
     CrossPopulationCalibrationShiftModel.target_profile_citl_eq_source_profile_citl_add_shift_budget
       m.toShiftModel link
 
@@ -932,14 +944,7 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationCalibrationShiftModel.identityCalibrationProfile] using h_src_cal
   have h_shift_nonzero_shift :
       cal.toShiftModel.observedMeanShift - cal.toShiftModel.predictedMeanShift ≠ 0 := by
-    simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
-      CrossPopulationCalibrationShiftModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      sub_eq_add_neg, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean,
-      Descent.Core.sum3] using h_shift_nonzero
+    mechanistic_shift_budget sub_eq_add_neg, add_assoc using h_shift_nonzero
   have h_main :=
     source_to_target_exact_metric_profile_from_shift_budget cal.metric cal.toShiftModel
       h_target_mean_eq_prevalence_shift h_source_r2_unit h_target_r2_unit h_r2_drop
@@ -948,24 +953,12 @@ theorem source_to_target_exact_metric_profile
   dsimp at h_main ⊢
   rcases h_main with ⟨⟨h_auc, h_citl, h_abs, h_worse⟩, h_brier⟩
   refine ⟨h_auc, ?_, ?_, ?_, ?_⟩
-  · simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
-      CrossPopulationCalibrationShiftModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean,
-      Descent.Core.sum3] using h_citl
-  · simpa [CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.calibrationProfile,
-      CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationMechanisticCalibrationModel.scoreMeanShift,
-      CrossPopulationCalibrationShiftModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.predictedMeanShift,
-      totalObservedMeanShift, shiftedObservedMean,
-      Descent.Core.sum3] using h_abs
+  · mechanistic_shift_budget
+      CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile using h_citl
+  · mechanistic_shift_budget
+      CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
+      CrossPopulationMechanisticCalibrationModel.calibrationProfile using h_abs
   · exact h_worse
   · simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
       CrossPopulationMechanisticCalibrationModel.observedMean,

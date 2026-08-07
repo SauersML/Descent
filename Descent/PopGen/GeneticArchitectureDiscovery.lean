@@ -1135,24 +1135,14 @@ noncomputable def commonAndRarePortableModel : Portability.CrossPopulationMetric
     beta := Pop.pair (![1, 1]) (![1, 0])
     directCausal := Pop.pair 1 1 }
 
-/-- Evaluate a witness model's SOURCE `R²` by unfolding the source-weight chain.
+/-- Evaluate a witness model's `R²`, at either population, by unfolding the weight chain.
 
-The unfolding list is the same for every witness, and it was written out once per theorem:
-four copies here, differing only in which model name led the list.  A copy that drifts is a
-theorem that evaluates a different chain from its neighbour while reading identically. -/
-local macro "source_r2_of " m:term : tactic =>
-  `(tactic| norm_num [$m:term, Portability.r2FromSourceWeights,
-      commonOnlyPortableModel,
-      Portability.explainedSignalVarianceFromSourceWeights,
-      Portability.predictiveCovarianceFromSourceWeights,
-      Portability.scoreVarianceFromSourceWeights,
-      Portability.sourceWeightsFromExplicitDrivers, Portability.sourceERMWeights,
-        Portability.crossCovariance,
-      sigmaTagCausal, dotProduct, Portability.totalEffect, Matrix.mulVec])
-
-/-- Evaluate a witness model's TARGET `R²`.  The target chain carries the residual burden
-terms the source chain has no need of, and is otherwise the same list. -/
-local macro "target_r2_of " m:term : tactic =>
+One list serves both sides.  `r2FromSourceWeights` divides by `effectiveOutcomeVariance`
+whichever population it is read at, and the residual-burden terms below it are zero at the
+source by `Portability.residualBurden_source` -- so naming them costs a source evaluation
+nothing and is what a target evaluation needs.  The list is otherwise the same for every
+witness, differing only in which model name leads it. -/
+local macro "r2_of " m:term : tactic =>
   `(tactic| norm_num [$m:term, Portability.r2FromSourceWeights,
       commonOnlyPortableModel,
       Portability.explainedSignalVarianceFromSourceWeights,
@@ -1168,19 +1158,19 @@ local macro "target_r2_of " m:term : tactic =>
 
 theorem commonOnlyPortableModel_sourceR2 :
     Portability.r2FromSourceWeights commonOnlyPortableModel Pop.source = 1 / 4 := by
-  source_r2_of commonOnlyPortableModel
+  r2_of commonOnlyPortableModel
 
 theorem commonOnlyPortableModel_targetR2 :
     Portability.r2FromSourceWeights commonOnlyPortableModel Pop.target = 1 / 4 := by
-  target_r2_of commonOnlyPortableModel
+  r2_of commonOnlyPortableModel
 
 theorem commonAndRarePortableModel_sourceR2 :
     Portability.r2FromSourceWeights commonAndRarePortableModel Pop.source = 1 / 2 := by
-  source_r2_of commonAndRarePortableModel
+  r2_of commonAndRarePortableModel
 
 theorem commonAndRarePortableModel_targetR2 :
     Portability.r2FromSourceWeights commonAndRarePortableModel Pop.target = 1 / 8 := by
-  target_r2_of commonAndRarePortableModel
+  r2_of commonAndRarePortableModel
 
 /-- **WGS discovers causal variants directly (no tagging needed).**
     This theorem is now stated on the mechanistic portability model itself.

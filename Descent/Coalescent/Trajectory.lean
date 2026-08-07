@@ -116,11 +116,10 @@ theorem chainLaw_length {n : ℕ} (k : ℕ) {l : List (ER n)} (hl : l ∈ (chain
 jumps is a trajectory after `m` -- nonempty, by `chainLaw_length` -- carrying one more state
 on the front, drawn from `jumpLaw` of its head.
 
-Both theorems below open the successor case this way, and each wrote the eight lines out:
-the same `bind` and `map` support rewrites, the same `match` on a list whose empty case
-`chainLaw_length` rules out.  Neither step was doing anything specific to what it went on
-to prove, which is what made them one block of text to `duplication` and one argument in
-fact. -/
+Every theorem below opens the successor case this way: the same `bind` and `map` support
+rewrites, the same `match` on a list whose empty case `chainLaw_length` rules out.  None of
+that is specific to what any of them goes on to prove, which is what makes it one argument
+and not four copies of one. -/
 theorem mem_support_chainLaw_succ {n m : ℕ} {l : List (ER n)}
     (hl : l ∈ (chainLaw n (m + 1)).support) :
     ∃ (x y : ER n) (rest : List (ER n)),
@@ -204,20 +203,14 @@ theorem chainLaw_head_blocks {n : ℕ} :
       simpa using blocks_bot n
   | succ m ih =>
       intro hmn l hl x hx
-      rw [chainLaw, PMF.mem_support_bind_iff] at hl
-      obtain ⟨l', hl', hmem⟩ := hl
-      have hlen := chainLaw_length m hl'
-      match l' with
-      | y :: rest =>
-          rw [PMF.mem_support_map_iff] at hmem
-          obtain ⟨z, hz, rfl⟩ := hmem
-          rw [List.head?_cons, Option.some_inj] at hx
-          have hy : blocks y + m = n := ih (by omega) hl' List.head?_cons
-          have hy2 : 2 ≤ blocks y := by omega
-          have hcov : Covers y z := (mem_support_jumpLaw hy2).mp hz
-          have hc2 := hcov.2
-          rw [← hx]
-          omega
+      obtain ⟨y, z, rest, rfl, hprev, hz⟩ := mem_support_chainLaw_succ hl
+      rw [List.head?_cons, Option.some_inj] at hx
+      have hy : blocks y + m = n := ih (by omega) hprev List.head?_cons
+      have hy2 : 2 ≤ blocks y := by omega
+      have hcov : Covers y z := (mem_support_jumpLaw hy2).mp hz
+      have hc2 := hcov.2
+      rw [← hx]
+      omega
 
 /-- **The law of `ℛ_k`**, the jump chain's state after `k` jumps: the head of the trajectory.
 
@@ -268,29 +261,20 @@ theorem chainLaw_blocks_at {n : ℕ} :
       simpa using blocks_bot n
   | succ m ih =>
       intro hmn l hl i hi
-      rw [chainLaw, PMF.mem_support_bind_iff] at hl
-      obtain ⟨l', hl', hmem⟩ := hl
-      have hlen := chainLaw_length m hl'
-      match l' with
-      | y :: rest =>
-          rw [PMF.mem_support_map_iff] at hmem
-          obtain ⟨z, hz, rfl⟩ := hmem
-          match i with
-          | 0 =>
-              have hhead : blocks z + (m + 1) = n :=
-                chainLaw_head_blocks (m + 1) hmn
-                  (by rw [chainLaw, PMF.mem_support_bind_iff]
-                      exact ⟨y :: rest, hl', by rw [PMF.mem_support_map_iff]; exact ⟨z, hz, rfl⟩⟩)
-                  List.head?_cons
-              simp only [List.getD_cons_zero, Nat.add_zero]
-              omega
-          | j + 1 =>
-              have hj : j < (y :: rest).length := by
-                simp only [List.length_cons] at hi ⊢
-                omega
-              have hrec := ih (by omega) hl' j hj
-              simp only [List.getD_cons_succ]
-              omega
+      obtain ⟨y, z, rest, rfl, hprev, -⟩ := mem_support_chainLaw_succ hl
+      match i with
+      | 0 =>
+          have hhead : blocks z + (m + 1) = n :=
+            chainLaw_head_blocks (m + 1) hmn hl List.head?_cons
+          simp only [List.getD_cons_zero, Nat.add_zero]
+          omega
+      | j + 1 =>
+          have hj : j < (y :: rest).length := by
+            simp only [List.length_cons] at hi ⊢
+            omega
+          have hrec := ih (by omega) hprev j hj
+          simp only [List.getD_cons_succ]
+          omega
 
 /-- A trajectory read as the chain function `Path` takes: `chainOfList l k` is the state with `k`
 blocks, which on a full trajectory sits at position `k - 1`. -/

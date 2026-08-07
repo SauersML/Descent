@@ -3284,6 +3284,34 @@ theorem EvolutionaryParameters.coordinateSummary_migrationCoordinate_ge_one
   rw [EvolutionaryParameters.coordinateSummary_migrationCoordinate]
   exact migrationLDBoost_ge_one p
 
+/-- **Raising either rate strictly lowers the equilibrium Fst**, at a fixed population
+size.  `fstEquilibrium` is `1/(1 + θ + 2M)` with `θ = 4Nₑμ` and `M = 4Nₑm`, so both rates
+enter the denominator with a positive coefficient and nothing else does: raising one of them
+while not lowering the other strictly increases the flow and strictly decreases the
+reciprocal.
+
+This is the content of both marginal-effect theorems below.  Neither is about mutation or
+migration in particular -- each fixes one rate, moves the other, and reads off this lemma at
+its own disjunct -- so the two differ in exactly which rate they move. -/
+theorem fstEquilibrium_lt_of_rates_le {p q : EvolutionaryParameters} (hNe : p.Ne = q.Ne)
+    (hmu : p.mu ≤ q.mu) (hmig : p.mig ≤ q.mig) (hlt : p.mu < q.mu ∨ p.mig < q.mig) :
+    fstEquilibrium q < fstEquilibrium p := by
+  have hflow : p.theta + 2 * p.bigM < q.theta + 2 * q.bigM := by
+    unfold EvolutionaryParameters.theta EvolutionaryParameters.bigM
+      Descent.Core.scaledMutationRate Descent.Core.scaledMigrationRate Descent.Core.ploidy
+    rw [hNe]
+    rcases hlt with h | h
+    · nlinarith [mul_pos q.Ne_pos (sub_pos.mpr h),
+        mul_nonneg q.Ne_pos.le (sub_nonneg.mpr hmig)]
+    · nlinarith [mul_pos q.Ne_pos (sub_pos.mpr h),
+        mul_nonneg q.Ne_pos.le (sub_nonneg.mpr hmu)]
+  unfold fstEquilibrium Descent.Core.fstFromFlow
+  rw [div_lt_div_iff₀ (by linarith [q.theta_nonneg, q.bigM_nonneg] :
+      (0 : ℝ) < 1 + (q.theta + 2 * q.bigM))
+    (by linarith [p.theta_nonneg, p.bigM_nonneg] :
+      (0 : ℝ) < 1 + (p.theta + 2 * p.bigM))]
+  linarith
+
 /-- **Each force's marginal effect on Fst.**
     Increasing any counterbalancing force (θ or M) strictly decreases Fst. -/
 theorem fstEquilibrium_decreasing_in_theta
@@ -3297,15 +3325,7 @@ theorem fstEquilibrium_decreasing_in_theta
       ⟨Ne, mu₂, mig, t_div, recomb, V_A, hNe, hmu₂, hmig, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
-    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.ploidy
-  simp only
-  rw [← add_assoc, ← add_assoc]
-  rw [div_lt_div_iff₀
-    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu₂ + 2 * (2 * 2 * Ne * mig))
-    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu₁ + 2 * (2 * 2 * Ne * mig))]
-  nlinarith
+  exact fstEquilibrium_lt_of_rates_le rfl h_mu.le le_rfl (Or.inl h_mu)
 
 theorem fstEquilibrium_decreasing_in_migration
     (Ne mu mig₁ mig₂ t_div recomb V_A : ℝ)
@@ -3318,15 +3338,7 @@ theorem fstEquilibrium_decreasing_in_migration
       ⟨Ne, mu, mig₂, t_div, recomb, V_A, hNe, hmu, hmig₂, ht, hr, hr2, hV⟩
     fstEquilibrium p₂ < fstEquilibrium p₁ := by
   simp only
-  unfold fstEquilibrium EvolutionaryParameters.theta EvolutionaryParameters.bigM
-    Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
-    Descent.Core.scaledMigrationRate Descent.Core.ploidy
-  simp only
-  rw [← add_assoc, ← add_assoc]
-  rw [div_lt_div_iff₀
-    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu + 2 * (2 * 2 * Ne * mig₂))
-    (by nlinarith : 0 < 1 + 2 * 2 * Ne * mu + 2 * (2 * 2 * Ne * mig₁))]
-  nlinarith
+  exact fstEquilibrium_lt_of_rates_le rfl le_rfl h_mig.le (Or.inr h_mig)
 
 /-! **Two Fst-to-covariance-gap statements were removed here, and neither mentioned a
 covariance gap.**

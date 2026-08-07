@@ -213,6 +213,23 @@ theorem row_small {N k : ℕ} (hN : 0 < N) (hk : k ≤ 1) : blockTransition N k 
   · simp
   · exact noCoalescenceProb_one hN
 
+/-- **Off the band, all three index tests fail.**  `blockGenerator` decides an entry by
+three comparisons of `j` with `k`: equal, one below, otherwise zero.  For a `j` that is
+neither `k` nor the index `k - 1` below it -- which is what membership in the twice-erased
+universe says -- every one of the three comes out false, so the entry is zero.
+
+Both row-sum estimates below need exactly this triple, and neither needs anything else about
+`j`: the sum over the rest of the row is a sum over the indices this lemma covers. -/
+theorem off_band_index_tests {n : ℕ} {k k' j : Fin (n + 1)}
+    (hj : j ∈ (Finset.univ.erase k).erase k') (hk' : (k' : ℕ) = (k : ℕ) - 1) :
+    ¬((k : ℕ) = (j : ℕ)) ∧ ¬((j : ℕ) = (k : ℕ)) ∧ ¬((j : ℕ) + 1 = (k : ℕ)) := by
+  have hjk' : j ≠ k' := (Finset.mem_erase.mp hj).1
+  have hjk : j ≠ k := (Finset.mem_erase.mp (Finset.mem_erase.mp hj).2).1
+  have h2 : ¬((j : ℕ) = (k : ℕ)) := fun hc ↦ hjk (Fin.ext hc)
+  refine ⟨fun hc ↦ h2 hc.symm, h2, ?_⟩
+  intro hc
+  exact hjk' (Fin.ext (by omega))
+
 /-- **Every row of the difference is `O(N⁻²)`**, with a constant depending only on the state
 count.  For `k ≥ 2` this is `row_diff_bound` with `d_k ≤ n²`; for `k ≤ 1` the row vanishes,
 because a generation with fewer than two lineages cannot lose one. -/
@@ -305,13 +322,7 @@ theorem row_sum_diff_le {n N : ℕ} (hN : 0 < N) (hnN : n ≤ N) (k : Fin (n + 1
         |blockMatrix n N k j - ((1 : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
           + (1 / (N : ℝ)) • blockGenerator n) k j| = blockMatrix n N k j := by
       intro j hj
-      have hjk' : j ≠ k' := (Finset.mem_erase.mp hj).1
-      have hjk : j ≠ k := (Finset.mem_erase.mp (Finset.mem_erase.mp hj).2).1
-      have h2 : ¬((j : ℕ) = (k : ℕ)) := fun hc ↦ hjk (Fin.ext hc)
-      have h1 : ¬((k : ℕ) = (j : ℕ)) := fun hc ↦ h2 hc.symm
-      have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by
-        intro hc
-        exact hjk' (Fin.ext (by simp only [hk']; omega))
+      obtain ⟨h1, h2, h3⟩ := off_band_index_tests hj rfl
       rw [hentry j]
       simp only [h1, h2, h3, if_false, mul_zero, add_zero, sub_zero]
       exact abs_of_nonneg (blockTransition_nonneg hN)
@@ -464,13 +475,7 @@ theorem norm_blockStochastic_le_one {n : ℕ} (hn : 2 ≤ n) : ‖blockStochasti
       omega
     have hrest : ∀ j ∈ (Finset.univ.erase k).erase k', |blockStochastic n k j| = 0 := by
       intro j hj
-      have hjk' : j ≠ k' := (Finset.mem_erase.mp hj).1
-      have hjk : j ≠ k := (Finset.mem_erase.mp (Finset.mem_erase.mp hj).2).1
-      have h2 : ¬((j : ℕ) = (k : ℕ)) := fun hc ↦ hjk (Fin.ext hc)
-      have h1 : ¬((k : ℕ) = (j : ℕ)) := fun hc ↦ h2 hc.symm
-      have h3 : ¬((j : ℕ) + 1 = (k : ℕ)) := by
-        intro hc
-        exact hjk' (Fin.ext (by simp only [hk']; omega))
+      obtain ⟨h1, h2, h3⟩ := off_band_index_tests hj rfl
       rw [blockStochastic_apply]
       simp [h1, h2, h3]
     have hdiag : blockStochastic n k k = 1 - deathRate (k : ℕ) / deathRate n := by

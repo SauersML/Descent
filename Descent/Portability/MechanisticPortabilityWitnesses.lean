@@ -54,6 +54,26 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       Descent.Core.share, Descent.Core.ratio, Descent.Core.product, Descent.Core.difference,
       Descent.Core.sum, Descent.Core.complement])
 
+/-- **Read one entry of a generational witness's covariance or LD matrix.**
+
+An entry of `crossCovariance` or of a witness's `sigmaTag` is read by unfolding the transport
+chain down to the kernel that entry names and then matching it against the scale lemma holding
+that kernel's value at the generation in question. The goal and the scale lemma have to be
+normalised together, which is `simpa` and not the `simp` of `generational_witness_simp`; the
+unfolding reaches only the definitions a matrix entry can mention, so a witness that needs the
+whole metric chain uses the plain form instead. The witness passes its own models and
+hypotheses for the same reason it does there. -/
+macro "generational_witness_entry" ms:Lean.Parser.Tactic.simpLemma,* " using " e:term : tactic =>
+  `(tactic| simpa [$ms,*,
+      CrossPopulationGenerationalModel.toMetricModelAt, crossCovariance, sigmaTagTargetAt,
+      PopGen.sigmaTagCausal, directCausalTargetAt, novelDirectCausalTargetAt,
+      proxyTaggingTargetAt, novelProxyTaggingTargetAt, totalEffect,
+      Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
+      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy, Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate,
+      Descent.Core.Tau.ofGenerations, Descent.Core.scalingConstant,
+      Descent.Core.ratio] using $e)
+
 /-!
 # Mechanistic Witness Models for Portability
 
@@ -893,24 +913,8 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
         crossCovariance m1 Pop.target = ![popgenDrivenProxyScale, popgenDrivenProxyScale] := by
       ext i
       fin_cases i
-      · simpa [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
-          novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-          using h_proxy0
-      · simpa [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          crossCovariance, PopGen.sigmaTagCausal, directCausalTargetAt,
-          novelDirectCausalTargetAt, proxyTaggingTargetAt, novelProxyTaggingTargetAt,
-          totalEffect, Matrix.mulVec, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-          using h_proxy1
+      · generational_witness_entry m1, popgenDrivenProxyGenerationalModel using h_proxy0
+      · generational_witness_entry m1, popgenDrivenProxyGenerationalModel using h_proxy1
     rw [predictiveCovarianceFromSourceWeights]
     rw [h_weights, h_cross]
     simp [dotProduct, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
@@ -925,32 +929,10 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
         (m1.sigmaTag Pop.target) = !![popgenDrivenTagScale, 0; 0, popgenDrivenTagScale] := by
       ext i j
       fin_cases i <;> fin_cases j
-      · simpa [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          sigmaTagTargetAt, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-          using h_ld0
-      · simp [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          sigmaTagTargetAt, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-      · simp [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          sigmaTagTargetAt, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-      · simpa [m1, popgenDrivenProxyGenerationalModel,
-          CrossPopulationGenerationalModel.toMetricModelAt,
-          sigmaTagTargetAt, Matrix.cons_val', Matrix.cons_val_fin_one,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-          using h_ld1
+      · generational_witness_entry m1, popgenDrivenProxyGenerationalModel using h_ld0
+      · generational_witness_simp m1, popgenDrivenProxyGenerationalModel
+      · generational_witness_simp m1, popgenDrivenProxyGenerationalModel
+      · generational_witness_entry m1, popgenDrivenProxyGenerationalModel using h_ld1
     rw [scoreVarianceFromSourceWeights]
     rw [h_weights, h_sigma]
     simp [Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
@@ -1233,6 +1215,17 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
     simpa using hcalc
 
+/-- **Read one coordinate off the time-varying-effect witness.**
+
+Every coordinate of that witness -- its tagging and tag-causal kernels, the source-effect and
+heterogeneity projections, the per-locus target effects and the deployed `R²` -- comes out of
+the same three definitions and then an evaluation of the numerals they leave. The witness
+theorem below states ten of those coordinates and the read is one argument, so it is named
+here once rather than at each conjunct. -/
+macro "time_varying_effect_coordinate" : tactic =>
+  `(tactic| generational_witness_simp singleLocusGenerationalWitness,
+      baselineGenerationalPopGen, timeVaryingEffectGenerationalModel <;> (try norm_num))
+
 /-- With LD, tagging, and allele frequencies held fixed, a locus-resolved
 target-effect heterogeneity path alone changes deployed target `R²`. This is
 the required witness that portability can fail because `β_source ≠ β_target`
@@ -1265,18 +1258,10 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
     generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
       timeVaryingAFGenerationalModel,
       timeVaryingEffectGenerationalModel
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
+  · time_varying_effect_coordinate
+  · time_varying_effect_coordinate
+  · time_varying_effect_coordinate
+  · time_varying_effect_coordinate
   · simp [betaTargetAt, singleLocusGenerationalWitness, baselineGenerationalPopGen,
     timeVaryingAFGenerationalModel,
     timeVaryingEffectGenerationalModel,
@@ -1290,12 +1275,8 @@ theorem target_effect_heterogeneity_changes_generation_path_without_ld_or_af_cha
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio]
     norm_num
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
-  · generational_witness_simp singleLocusGenerationalWitness, baselineGenerationalPopGen,
-      timeVaryingEffectGenerationalModel
-    all_goals try norm_num
+  · time_varying_effect_coordinate
+  · time_varying_effect_coordinate
 
 /-- The generation-indexed deployed profile always reads its `R²` coordinate
 from the same explicit time-sliced source-weights-on-target-state model. This
