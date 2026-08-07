@@ -4,6 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.CoalescentGauge
 import Descent.Pangenome.GaugeCounterexample
 import Descent.Pangenome.GaugeInvariance
+import Descent.Pangenome.GraphCoalescent
+import Descent.Pangenome.GraphCoalescent.Deficit
+import Descent.Pangenome.GraphCoalescent.Observation
+import Descent.Pangenome.GraphCoalescent.Pinned
+import Descent.Pangenome.GraphCoalescent.Reduction
+import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.Linkage
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
@@ -36,8 +42,17 @@ that states a theorem is a module pretending to be a table of contents.
 
 ## What is under it
 
-Two groups, both about what a representation of a haplotype panel loses.  The `Gauge`
+Three groups, all about what a representation of a haplotype panel loses.  The `Gauge`
 modules ask which statistics of a variant catalogue survive a change of reference tree.  The
 `Linkage` modules ask what a graph is forced to admit once it has merged haplotype identity
-at a separator; `Descent/Pangenome/Linkage.lean` is that group's own table of contents.
+at a separator; `Descent/Pangenome/Linkage.lean` is that group's own table of contents.  The
+`GraphCoalescent` modules ask what ancestral process is left once it has, and answer that it
+is Kingman's at the graph's width rather than the panel's size;
+`Descent/Pangenome/GraphCoalescent.lean` is that group's table of contents.
+
+The third group is where the first two meet the coalescent.  `Gauge` and `Linkage` both
+measure a loss in the vocabulary of the representation -- hidden edges, nats of conditional
+entropy.  `GraphCoalescent` measures the same loss in the vocabulary of the process, as a
+lineage count, a transit time and a bias in `θ`, and `transitDeficit_eq_zero_iff` is the
+theorem that says the two vocabularies are describing one thing.
 -/
