@@ -7847,10 +7847,6 @@ LAYER_PENDING = {
         "Same file and same repair: the minimax entropy exponents it names are "
         "Decision's, and the architecture statement consuming them is the thing in "
         "the wrong place.",
-    ("Descent.PopGen.SelectionArchitecture", "Descent.Portability.AncestrySpecificPower"):
-        "`fisherInformation`, `ncp` and `effectiveFisherInformation` are study-design "
-        "quantities for a single cohort. Same extraction as "
-        "`GeneticArchitectureDiscovery`.",
 }
 
 # The self-auditing directory.  See META in the header.

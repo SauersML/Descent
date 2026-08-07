@@ -1246,7 +1246,7 @@ of the threshold model and the cut-off chosen, and they stay as hypotheses here.
 
 section DeployedClinicalUtility
 
-open Descent.Core.ScoreMoments
+open Descent.Core.ScoreMoments (deployedR2 deployedR2_mono_in_migration deployedR2_mem_unit)
 
 /-- **Two histories differing only in migration land in the threshold regime.**
 

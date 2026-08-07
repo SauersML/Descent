@@ -9,7 +9,9 @@ assert_below Descent.Decision Descent.Program
 namespace Descent.Portability
 
 open MeasureTheory
-open PopGen (genotypeVarianceHWE)
+open PopGen (genotypeVarianceHWE fisherInformation effectiveFisherInformation ncp
+  genotypeVariance_eq_zero_iff effectiveFisherInformation_eq_zero_iff
+  fullyTaggedFisherInformation_pos_iff ncp_eq_zero_iff)
 
 /-!
 # Statistical Power and PGS Portability
@@ -75,12 +77,6 @@ the same Fisher information:
 This is the formula implemented below.
 -/
 
-/-- **Fisher information for β in linear regression Y = βG + ε.**
-    At a biallelic locus with sample size n and genotype variance v,
-    the Fisher information is n × v (with σ² = 1). -/
-noncomputable def fisherInformation (n : ℕ) (v : ℝ) : ℝ :=
-  Descent.Core.product n v
-
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem fisherInformation_at_reference_point :
     fisherInformation 1 1 = 1 := by
@@ -127,61 +123,11 @@ theorem genotypeVariance_pos_iff (p : ℝ) :
   · rintro ⟨h_p, h_p_lt⟩
     nlinarith
 
-/-- Genotype variance vanishes exactly for an absent or fixed alternate allele. -/
-theorem genotypeVariance_eq_zero_iff (p : ℝ) :
-    genotypeVarianceHWE p = 0 ↔ p = 0 ∨ p = 1 := by
-  unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
-  constructor
-  · intro h
-    rcases mul_eq_zero.mp h with h | h
-    · left
-      nlinarith
-    · right
-      linarith
-  · rintro (rfl | rfl) <;> norm_num
-
 /-- Genotype variance is maximized at p = 1/2 where it equals 1/2. -/
 theorem genotypeVariance_max (p : ℝ) :
     genotypeVarianceHWE p ≤ genotypeVarianceHWE (1/2 : ℝ) := by
   unfold genotypeVarianceHWE Descent.Core.hweHeterozygosity Descent.Core.ploidy
   nlinarith [sq_nonneg (p - 1/2)]
-
-/-- **Effective Fisher information under imperfect tagging.**
-    When the causal variant is tagged with LD r², the Fisher information
-    for the causal effect is attenuated by r²:
-      I_eff = I(β) × r²_LD = n × 2p(1-p) × r²_LD
-
-    Derivation: Under imperfect tagging, the observed genotype G_tag
-    satisfies Cov(G_tag, G_causal)² / (Var(G_tag) × Var(G_causal)) = r².
-    The regression of Y on G_tag recovers β_tag = β × r, NOT β × r² -- the
-    covariance carries one factor of r and the tag's own variance divides out
-    no second one, which is the correction `AncestrySpecificArchitecture.taggedEffect`
-    records and which battery 22 measured at up to 159 sems. The INFORMATION
-    about β through G_tag is nonetheless I × r², because recovering β from the
-    tag divides by that single r and squares it in the variance.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk40b.py`, `group_e`). Two linked
-    diploid loci from an explicit haplotype-frequency table, so the dosage correlation is
-    constructed and then REMEASURED; 6000 independent studies per cell,
-    `Y = β · causal dosage + N(0,1)`; the observable is the inverse variance across studies
-    of the CAUSAL effect estimated through the tag with realised moments.
-
-      r     n      realised r²   this body   measured 1/Var(β̂)   sems
-      0.6    600     0.3600         98.3           97.0          0.71
-      0.6   2400     0.3602        393.3          385.9          1.05
-      0.6   9600     0.3602       1573.4         1558.7          0.52
-      0.9   2400     0.8099        884.4          854.8          1.90
-
-    The identity gate: an `r¹` attenuation misses by up to 38 sems (70%) and an `r⁴` one by
-    35 sems (64%). The positive control -- observe the causal variant directly, where the
-    information must be the full `n·2p(1-p)` -- passes at 1.67 sems.
-
-    `n` is swept SIXTEENFOLD at fixed `r` on purpose. An earlier run at `n = 600` alone read
-    FALSIFIED at 3.2 sems and 7%, which is the estimator and not the body: the tag-based
-    estimate is a RATIO, biased at order `1/n`, and the residual shrinks as `n` grows. A
-    single sample size could not have told those apart. -/
-noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
-  fisherInformation n (genotypeVarianceHWE p) * r2_ld
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem effectiveFisherInformation_at_reference_point :
@@ -196,30 +142,6 @@ theorem effectiveFisherInfo_eq (n : ℕ) (p r2_ld : ℝ) :
   unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
     Descent.Core.hweHeterozygosity Descent.Core.ploidy
   ring
-
-/-- Effective information vanishes exactly when the study is empty, the locus is
-monomorphic, or the tag carries no squared correlation with the causal variant. -/
-theorem effectiveFisherInformation_eq_zero_iff (n : ℕ) (p r2_ld : ℝ) :
-    effectiveFisherInformation n p r2_ld = 0 ↔
-      n = 0 ∨ p = 0 ∨ p = 1 ∨ r2_ld = 0 := by
-  simp [effectiveFisherInformation, fisherInformation, genotypeVariance_eq_zero_iff,
-    mul_eq_zero, or_assoc,
-      Descent.Core.product]
-
-/-- With perfect tagging, Fisher information is positive exactly for a nonempty study
-at a polymorphic locus. -/
-theorem fullyTaggedFisherInformation_pos_iff (n : ℕ) (p : ℝ) :
-    0 < effectiveFisherInformation n p 1 ↔ 0 < n ∧ 0 < p ∧ p < 1 := by
-  unfold effectiveFisherInformation fisherInformation genotypeVarianceHWE Descent.Core.product
-    Descent.Core.hweHeterozygosity Descent.Core.ploidy
-  simp only [mul_one]
-  constructor
-  · intro h
-    rcases mul_pos_iff.mp h with ⟨h_n, h_frequency⟩ | ⟨h_n, _⟩
-    · exact ⟨Nat.cast_pos.mp h_n, by constructor <;> nlinarith⟩
-    · exact (not_lt_of_ge (Nat.cast_nonneg n) h_n).elim
-  · rintro ⟨h_n, hp0, hp1⟩
-    exact mul_pos (Nat.cast_pos.mpr h_n) (by nlinarith)
 
 /-- **Bridge between conventional LD `r²` and permeability attenuation.**
 If `η` is the correlation-scale response retained by a tag, conventional regression
@@ -406,42 +328,10 @@ theorem source_higher_effective_information
         h_p_target h_p_target_lt (by linarith) h_n
     linarith
 
-/-- **Non-centrality parameter (NCP) for association test.**
-    NCP = n_eff × β² where β is the modelled effect size.
-    Power is Φ(√NCP - z_α) for threshold z_α.
-
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk2.py`, `test_ncp`).
-    Measured as the mean realised Wald statistic minus one, over 3000 replicate
-    GWAS studies per cell, with `n_eff` read as `n · 2p(1-p)` on the residual
-    variance scale:
-
-      n      p     beta      this def   simulated            sems
-      4000   0.3   0.05       4.20000   4.20814±0.07956     0.10
-      8000   0.3   0.05       8.40000   8.48391±0.10873     0.77
-      4000   0.1   0.08       4.60800   4.73164±0.08485     1.46
-
-    The design varies `n`, `p` and `beta` separately, so linearity in each is
-    tested rather than one combination of them.
-
-    Power: the prediction spans 4.20000 to 8.40000. -/
-noncomputable def ncp (n_eff β : ℝ) : ℝ := n_eff * β ^ 2
-
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem ncp_at_reference_point :
     ncp 1 1 = 1 := by
   norm_num [ncp]
-
-/-- A non-centrality parameter vanishes exactly when information or effect size vanishes. -/
-theorem ncp_eq_zero_iff (n_eff β : ℝ) :
-    ncp n_eff β = 0 ↔ n_eff = 0 ∨ β = 0 := by
-  unfold ncp
-  constructor
-  · intro h
-    rcases mul_eq_zero.mp h with h_information | h_effect
-    · exact Or.inl h_information
-    · exact Or.inr (sq_eq_zero_iff.mp h_effect)
-  · rintro (rfl | rfl) <;> norm_num
 
 /-- NCP is monotone in effective sample size. -/
 theorem ncp_mono_neff (n1 n2 β : ℝ) (h_n : n1 < n2) (h_β : β ≠ 0) :

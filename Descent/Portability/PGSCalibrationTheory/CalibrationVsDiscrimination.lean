@@ -2,7 +2,15 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
-import Descent.Portability.PortabilityDrift
+-- This used to be `import Descent.Portability.PortabilityDrift`, the chapter head, and the
+-- head sits above the whole six-module drift recurrence: `Definitions` ->
+-- `ClosedPopulationRegime` -> `PresentDayMetrics` -> `MutationDrift` -> `MigrationDrift` ->
+-- `MigrationDriftRecurrence`.  This file names nothing from the last three.  Everything it
+-- does name is declared in `PresentDayMoments` (21 declarations), `PresentDayMetrics` (14)
+-- and `Generational` (2), and `PresentDayMoments` imports the other two -- so one specific
+-- import reaches every symbol the head was being asked for, and stops charging this file a
+-- rebuild whenever a migration recurrence it never mentions changes.
+import Descent.Portability.PortabilityDrift.PresentDayMoments
 -- `BinaryPopulation`, `populationAUC` and `populationAUC_strictMono_invariant` are named
 -- below, so the module declaring them is imported directly rather than reached along a
 -- path that runs through some other chapter's head.
