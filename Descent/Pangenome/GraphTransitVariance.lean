@@ -77,7 +77,7 @@ theorem varTransitTime_mono_of_le {m n : ℕ} (h : m ≤ n) :
     varTransitTime m ≤ varTransitTime n := by
   unfold varTransitTime
   refine Finset.sum_le_sum_of_subset_of_nonneg
-    (Finset.range_subset.mpr (Nat.sub_le_sub_right h 1)) ?_
+    (Finset.range_mono (Nat.sub_le_sub_right h 1)) ?_
   intro k _ _
   positivity
 
