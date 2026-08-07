@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.CoalescentGauge
 import Descent.Pangenome.Construction
+import Descent.Pangenome.ConstructionCoalescent
 import Descent.Pangenome.GaugeCounterexample
 import Descent.Pangenome.GaugeInvariance
 import Descent.Pangenome.GraphCoalescent
