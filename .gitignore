@@ -73,3 +73,8 @@ validation/empirical/invariants/results_ranges.json
 # `python3 validation/empirical/simcov/inventory.py` -- same reason as the
 # extraction tables above: committed, it drifts and reads as authoritative.
 /inventory.json
+
+# Claude Code session runtime state. The lock is held by the scheduler for a
+# running loop and means nothing outside the session that created it. A shared
+# `.claude/settings.json` is still committable -- only the lock is ignored.
+.claude/scheduled_tasks.lock
