@@ -3899,7 +3899,7 @@ def check_bridges(c: Corpus) -> list[Finding]:
 # Files whose custom syntax IS the corpus's mechanism for enumerating unproved
 # statements, rather than a way of smuggling one in.
 #
-# The gap vocabulary that once lived in `Meta/Informal.lean` is deleted. Its
+# The gap vocabulary that once lived under `Descent/Meta/` is deleted. Its
 # design point, worth keeping as a note on what this guard is for, was that a gap
 # pushed a record into an environment extension and ADDED NO CONSTANT -- "not a
 # `sorry`, not an axiom, not an opaque constant" -- precisely so that no proof
@@ -3960,11 +3960,11 @@ def check_files(c: Corpus) -> list[Finding]:
             # A `syntax` declaration declares GRAMMAR.  It has no elaboration behaviour at
             # all: parsing is not elaboration, and a parse rule on its own cannot put
             # anything into the trusted base.  Flagging it reported six findings in
-            # `Meta/Informal.lean` and `Meta/InformalLint.lean` that were parse rules.
+            # the since-deleted gap-vocabulary modules that were parse rules.
             #
             # What those files actually declare is `@[command_elab todoCmd] def elabTODO`,
             # and the attribute form was INVISIBLE here -- including one in
-            # `Meta/Semiformal.lean` that no exemption ever covered and that this guard
+            # one of those files that no exemption ever covered and that this guard
             # never reported.  A screen that reports the grammar and misses the elaborator
             # is wrong in both directions at once.
             #
@@ -7600,11 +7600,10 @@ def run_shape_routes() -> int:
 #              form its own argument supports.
 #
 #              So the direction that carries the danger is absolute, and so is the
-#              direction that carries none, there being nothing left to name in
-#              `LAYER_META_VOCABULARY` and no others.  Widening a rule to fit a case is
-#              how allowlists start, which is why the set is enumerated here rather
-#              than derived from a path shape, and why the Meta-imports-proof half
-#              admits no exceptions at all.
+#              direction that carries none, `LAYER_META_VOCABULARY` now being empty.
+#              Widening a rule to fit a case is how allowlists start, which is why the
+#              set is enumerated rather than derived from a path shape, and why both
+#              halves admit no exceptions at all.
 #   REACHABLE  a qualified cross-directory name must have its defining module in the
 #              importer's transitive closure.  This is not a layer rule and it is here
 #              because it is the rule that makes the other three SAFE TO ACT ON.  Lean
@@ -7709,9 +7708,9 @@ LAYER_RANK = {name: i for i, name in enumerate(LAYER_ORDER)}
 
 # The gate module's own top-level name.  Two rules below are absolute rather than
 # ranked -- `Core` imports nothing outside itself, and nothing crosses the `Meta`
-# boundary -- and both must admit this one target, for the same reason
-# `LAYER_META_VOCABULARY` exists: it adds SYNTAX and no constant, so a module that
-# imports it gains a way to STATE where it sits and nothing it could cite.  A file that
+# boundary -- and both must admit this one target, for the reason
+# `LAYER_META_VOCABULARY` was written to carry: it adds SYNTAX and no constant, so a
+# module that imports it gains a way to STATE where it sits and nothing it could cite.  A file that
 # may not say which layer it is below is a file exempt from the gate, which is the
 # opposite of what either rule is for.
 LAYER_GATE = "Layer"
@@ -7739,10 +7738,10 @@ LAYER_UNRANKED = {
         "corpus's own language and importing only Lean and Batteries. A rank would "
         "permit it to import the bottom of the order and the point is that it imports "
         "none of it, so its separation is enforced by the META rule below instead. "
-        "That rule is asymmetric on purpose. Nothing here may import a proof module, "
-        "ever; a proof module may import the VOCABULARY modules named in "
-        "`LAYER_META_VOCABULARY`, which add commands for writing a gap down and add no "
-        "constant anything could cite, and may import no auditor.",
+        "That rule is absolute in both directions. Nothing here may import a proof "
+        "module, ever, and no proof module may import anything here: "
+        "`LAYER_META_VOCABULARY`, which once named the gap-recording commands, is "
+        "empty, because every module here is now an auditor.",
     "Spectral":
         "Frequency-band and pencil machinery that both PopGen and Portability consume, "
         "and that consumes Blindness and Conditionals in turn. It is a genuine "
