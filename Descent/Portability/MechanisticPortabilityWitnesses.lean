@@ -957,19 +957,13 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       linarith
     simpa using Real.exp_lt_one_iff.mpr hneg
   have h_proxy_lt_tag : popgenDrivenProxyScale < popgenDrivenTagScale := by
+    -- With the migration factor deleted both scales are bare exponentials, so the
+    -- chain that used to carry a common `7/6` through three steps is one rewrite
+    -- and one inequality.
     unfold popgenDrivenProxyScale popgenDrivenTagScale
-    calc
-      Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
-              rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-                    = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
-                Real.exp_add]
-      _ < Real.exp (-(1 : ℝ)) * 1 := by
-              exact mul_lt_mul_of_pos_left h_ld_gap_lt_one (by positivity)
-      _ = popgenDrivenTagScale := by simp [popgenDrivenTagScale, Descent.Core.scaledMutationRate,
-        Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
+    rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring, Real.exp_add]
+    nlinarith [h_ld_gap_lt_one, Real.exp_pos (-(1 : ℝ))]
   have h_exp_one_ge_two : (2 : ℝ) ≤ Real.exp (1 : ℝ) := by
     have h := Real.add_one_le_exp (1 : ℝ)
     nlinarith
@@ -989,16 +983,10 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     nlinarith
   have h_proxy_lt_one : popgenDrivenProxyScale < 1 := by
     unfold popgenDrivenProxyScale
-    calc
-      Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
-              rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-                    = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
-                Real.exp_add]
-      _ ≤ ((1 / 2 : ℝ)) * 1 := by
-              have h_exp_nonneg : 0 ≤ Real.exp (-popgenDrivenLDDecayExponent) := by positivity
-              nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one, h_exp_nonneg]
-      _ < (1 : ℝ) := by norm_num
+    rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring, Real.exp_add]
+    nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one,
+      Real.exp_pos (-popgenDrivenLDDecayExponent), Real.exp_pos (-(1 : ℝ))]
   have h_proxy_sq_lt_tag : popgenDrivenProxyScale ^ 2 < popgenDrivenTagScale := by
     have h_proxy_sq_lt_proxy : popgenDrivenProxyScale ^ 2 < popgenDrivenProxyScale := by
       have h_proxy_pos : 0 < popgenDrivenProxyScale := by
