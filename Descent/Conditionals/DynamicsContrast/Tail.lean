@@ -11,7 +11,6 @@ import Descent.Portability.ContinuumCalibration
 import Descent.Conditionals.FunctionalDescent
 import Descent.Conditionals.DescentGeometry
 import Descent.Spectral.ErgodicCovariancePencil
-import Descent.PopGen.SelectionArchitecture
 import Descent.Conditionals.DeclaredInteractionClass
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Spectral.PencilEnvironment

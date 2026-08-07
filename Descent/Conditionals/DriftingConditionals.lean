@@ -7,7 +7,7 @@ import Descent.Conditionals.DriftingConditional
 -- `Program.OpenQuestions` and the whole `PortabilityDrift` interior; the module that
 -- defines it is one line.
 import Descent.Spectral.ReversibleMarkovSpectrum
-import Descent.Conditionals.DynamicsContrast
+import Descent.Conditionals.DynamicsContrast.Tail
 
 assert_below Descent.Decision
 

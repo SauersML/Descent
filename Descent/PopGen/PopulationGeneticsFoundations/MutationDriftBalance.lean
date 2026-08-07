@@ -5,6 +5,7 @@ import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
 -- `fstMutationDriftEquilibrium` is declared in `PopGen.DGP` and named throughout the
 -- fixed-point results below.  This is a PopGen-internal edge, not a layer inversion.
 import Descent.PopGen.DGP
+import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision
 assert_below Descent.Program
