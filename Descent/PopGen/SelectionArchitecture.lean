@@ -1088,6 +1088,7 @@ theorem selectionCoefficient_complement_mul_reference
   unfold selectionCoefficient Descent.Core.proportionalReduction Descent.Core.product
     Descent.Core.complement
   field_simp
+  ring
 
 /-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
 
