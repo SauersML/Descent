@@ -996,4 +996,77 @@ theorem deployedReport_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
 
 end ScoreMoments
 
+/-! ## The demography's own metrics
+
+Every result above states a metric law over loose reals -- `V_A`, `V_E`, an `F_ST` -- and
+a reader has to believe those came from a population. The results below say the same
+things about `(p : PopGenParameters)` and the differentiation that record itself
+predicts, so the demography reaches the deployed number inside one claim rather than
+across a gap the reader closes.
+
+That gap is what `shape-spine` counts, and it is not a formality: a theorem taking `F_ST`
+as a free real is a statement about arithmetic, and the corpus's claim is about
+populations. `shape-routes` refuses the same shape from the other side, by forbidding a
+second entry point that re-supplies the record's fields as bare arguments.
+-/
+
+/-- **A demography's deployed portability ratio is a fraction.**  Its own equilibrium
+differentiation, fed to the ratio, lands in the unit interval -- so the number a
+deployment reports is a share of the source accuracy and not something that can exceed
+it. -/
+theorem portabilityRatio_mem_unit_of_params (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 ≤ V_E) (hflow : 0 < p.mu + p.mig) :
+    0 ≤ portabilityRatio p.V_A V_E p.fstEquilibrium ∧
+      portabilityRatio p.V_A V_E p.fstEquilibrium ≤ 1 :=
+  portabilityRatio_mem_unit p.V_A V_E p.fstEquilibrium p.V_A_pos hE
+    (fstEquilibrium_mem_unit p).1 (fstEquilibrium_lt_one p hflow)
+
+/-- **At the source there is nothing to lose.**  Read at zero differentiation, the ratio
+is one for every demography's additive variance. -/
+theorem portabilityRatio_at_source_of_params (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 ≤ V_E) : portabilityRatio p.V_A V_E 0 = 1 :=
+  portabilityRatio_at_source p.V_A V_E p.V_A_pos hE
+
+/-- **A demography with no coalescent separation deploys its full share.**  At `τ = 0`
+the tau-form `R²` is the source share `V_A/(V_A + V_E)` of that population. -/
+theorem deployedR2FromTau_at_zero_of_params (p : PopGenParameters) (V_E : ℝ)
+    (hE : 0 ≤ V_E) : deployedR2FromTau p.V_A V_E ⟨0⟩ = share p.V_A V_E :=
+  deployedR2FromTau_at_zero p.V_A V_E p.V_A_pos hE
+
+/-- **Deeper separation deploys less, for a fixed demography.**  The additive variance is
+the record's; only the coalescent time moves. -/
+theorem deployedR2FromTau_anti_of_params (p : PopGenParameters) (V_E : ℝ) (t₁ t₂ : Tau)
+    (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
+    deployedR2FromTau p.V_A V_E t₂ < deployedR2FromTau p.V_A V_E t₁ :=
+  deployedR2FromTau_anti p.V_A V_E t₁ t₂ p.V_A_pos hE h0 hlt
+
+/-- **And the portability ratio falls with it.** -/
+theorem portabilityRatioFromTau_anti_of_params (p : PopGenParameters) (V_E : ℝ)
+    (t₁ t₂ : Tau) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
+    portabilityRatioFromTau p.V_A V_E t₂ < portabilityRatioFromTau p.V_A V_E t₁ :=
+  portabilityRatioFromTau_anti p.V_A V_E t₁ t₂ p.V_A_pos hE h0 hlt
+
+/-- **A demography with no flow pays its whole share in Brier risk.**  At `F_ST = 0` the
+deployed Brier score is the base rate's variance discounted by exactly the share the
+population's additive variance commands. -/
+theorem deployedBrier_at_no_flow_bound_of_params (p : PopGenParameters) (π V_E : ℝ)
+    (hE : 0 ≤ V_E) :
+    brier π (momentsUnderDrift p.V_A V_E 0) = π * (1 - π) * (1 - share p.V_A V_E) :=
+  deployedBrier_at_no_flow_bound π p.V_A V_E p.V_A_pos hE
+
+/-- **Brier risk rises with separation, for one demography.**  The additive variance is
+the record's and only the differentiation moves, which is the comparison a deployment
+across two populations actually makes. -/
+theorem brier_momentsUnderDrift_mono_of_params (p : PopGenParameters) (π V_E f₁ f₂ : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) :
+    brier π (momentsUnderDrift p.V_A V_E f₁) < brier π (momentsUnderDrift p.V_A V_E f₂) :=
+  brier_momentsUnderDrift_mono π p.V_A V_E f₁ f₂ hπ hπ1 p.V_A_pos hE h1 h2
+
+/-- **The AUC argument falls with separation, for one demography.** -/
+theorem aucArgument_momentsUnderDrift_anti_of_params (p : PopGenParameters)
+    (V_E f₁ f₂ : ℝ) (hE : 0 < V_E) (h1 : f₁ < f₂) (h2 : f₂ < 1) (h0 : 0 ≤ f₁) :
+    aucArgument (momentsUnderDrift p.V_A V_E f₂) <
+      aucArgument (momentsUnderDrift p.V_A V_E f₁) :=
+  aucArgument_momentsUnderDrift_anti p.V_A V_E f₁ f₂ p.V_A_pos hE h1 h2 h0
+
 end Descent.Core
