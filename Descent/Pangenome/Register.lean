@@ -97,7 +97,9 @@ theorem sum_weight_mul_orbitSum (G : Type*) [Group G] [Fintype G] {X : Type*} [M
     [Fintype X] (μ : X → ℝ) (hμ : ∀ (g : G) (x : X), μ (g • x) = μ x) (f : X → ℝ) :
     (∑ x, μ x * orbitSum G f x) = (Fintype.card G : ℝ) * ∑ x, μ x * f x := by
   have key : ∀ g : G, (∑ x, μ x * f (g • x)) = ∑ x, μ x * f x := fun g =>
-    Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun x => by rw [hμ g x])
+    Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun x => by
+      show μ x * f (g • x) = μ (g • x) * f (g • x)
+      rw [hμ g x])
   calc (∑ x, μ x * orbitSum G f x)
       = ∑ x, ∑ g : G, μ x * f (g • x) := by
         simp only [orbitSum, Finset.mul_sum]
@@ -170,8 +172,6 @@ theorem first_copy_not_shiftInvariant :
     ¬ RegisterInvariant (n := 2) (fun a => a 0) := by
   intro h
   have h1 := h 1 (fun i => if i = 0 then (0 : ℝ) else 1)
-  simp only [shift, zero_add] at h1
-  rw [if_neg (by decide : ¬((1 : ZMod 2) = 0)), if_pos (rfl : (0 : ZMod 2) = 0)] at h1
-  exact one_ne_zero h1
+  simp [shift] at h1
 
 end Descent.Pangenome.Register

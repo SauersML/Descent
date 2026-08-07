@@ -12,6 +12,7 @@ import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.Visibility
+import Descent.Pangenome.GraphCoalescent.WidthProfile
 import Descent.Pangenome.Linkage
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
