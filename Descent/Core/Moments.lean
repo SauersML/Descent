@@ -264,7 +264,6 @@ theorem r2_momentsUnderDrift_of_no_environment (V_A fst : ℝ) (hV : 0 < V_A)
   field_simp
   ring
 
-
 /-! ### The chain, link by link
 
 Each theorem below is one claim about how a demographic parameter reaches a deployed
@@ -527,7 +526,6 @@ theorem deployedR2_le_heritability (p : PopGenParameters) (V_E : ℝ) (hE : 0 �
   rw [div_le_div_iff₀ hd1 hd2]
   nlinarith [mul_nonneg (mul_nonneg hge (le_of_lt hV)) hE]
 
-
 /-! ### The rest of the metric family
 
 `R²` is one coordinate of a deployment report. A calibration slope, a mean squared error,
@@ -745,7 +743,6 @@ theorem brier_deployedR2FromTau_anti (π V_A V_E : ℝ) (t₁ t₂ : Tau) (hπ :
   exact brier_momentsUnderDrift_mono π V_A V_E (fstFromTau t₁) (fstFromTau t₂) hπ hπ1 hV hE
     hf1 hlt2
 
-
 /-! ### The deme count reaches the metric
 
 The island lattice is not decoration: the deme correction is a factor of two at the
@@ -911,7 +908,6 @@ theorem portabilityRatioFromTau_anti (V_A V_E : ℝ) (t₁ t₂ : Tau) (hV : 0 <
   exact div_lt_div_of_pos_right
     (deployedR2FromTau_anti V_A V_E t₁ t₂ hV hE h0 hlt) hsrc
 
-
 /-- **The portability ratio a demographic history produces.** What a paper reporting
 "the score transfers at 40% of its source `R²`" is measuring, as a function of
 `(Nₑ, m, μ)` rather than of a differentiation supplied by hand.
@@ -964,7 +960,6 @@ theorem deployedR2_at_no_flow (p : PopGenParameters) (V_E : ℝ) (hmu : p.mu = 0
   rw [hf]
   exact r2_momentsUnderDrift_at_complete p.V_A V_E hE
 
-
 /-- **A history with no flow leaves the Brier score at its uninformative baseline.**
 The binary coordinate's version of the no-flow boundary: with nothing passing between the
 populations, a deployed score does no better than knowing the prevalence. -/
@@ -993,9 +988,6 @@ theorem deployedReport_at_no_flow (π : ℝ) (p : PopGenParameters) (V_E : ℝ)
     deployedBrier_at_no_flow π p V_E hmu hmig hE,
     mse_momentsUnderDrift p.V_A V_E p.fstEquilibrium⟩
 
-
-end ScoreMoments
-
 /-! ## The demography's own metrics
 
 Every result above states a metric law over loose reals -- `V_A`, `V_E`, an `F_ST` -- and
@@ -1019,7 +1011,7 @@ theorem portabilityRatio_mem_unit_of_params (p : PopGenParameters) (V_E : ℝ)
     0 ≤ portabilityRatio p.V_A V_E p.fstEquilibrium ∧
       portabilityRatio p.V_A V_E p.fstEquilibrium ≤ 1 :=
   portabilityRatio_mem_unit p.V_A V_E p.fstEquilibrium p.V_A_pos hE
-    (fstEquilibrium_mem_unit p).1 (fstEquilibrium_lt_one p hflow)
+    p.fstEquilibrium_mem_unit.1 (p.fstEquilibrium_lt_one hflow)
 
 /-- **At the source there is nothing to lose.**  Read at zero differentiation, the ratio
 is one for every demography's additive variance. -/
@@ -1068,5 +1060,7 @@ theorem aucArgument_momentsUnderDrift_anti_of_params (p : PopGenParameters)
     aucArgument (momentsUnderDrift p.V_A V_E f₂) <
       aucArgument (momentsUnderDrift p.V_A V_E f₁) :=
   aucArgument_momentsUnderDrift_anti p.V_A V_E f₁ f₂ p.V_A_pos hE h1 h2 h0
+
+end ScoreMoments
 
 end Descent.Core
