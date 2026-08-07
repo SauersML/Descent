@@ -111,9 +111,9 @@ noncomputable def scaledMigrationRate (Ne m : ℝ) : ℝ := 2 * ploidy * Ne * m
 
 /-- **The scaling constant, stated as a value.** Both scaled rates carry the same four.
 
-This used to be the theorem that caught a divergence between two hand-written products.
-There is nothing left to diverge -- both bodies are projections of constructors that
-multiply by `scalingConstant` -- so it now records the fact rather than guarding it, and
+Nothing here can diverge: both bodies are projections of constructors that multiply by
+`scalingConstant`, so this records the fact rather than guarding it. Against two
+hand-written products it would be a guard, and that is the shape it is written for. And
 `Core.theta_bigM_share_constant` is the same statement one level down, on the types. That
 the two say the same thing is the point: this is why `Theta` and `BigM` had to become
 different types, since nothing about their VALUES ever distinguished them. -/

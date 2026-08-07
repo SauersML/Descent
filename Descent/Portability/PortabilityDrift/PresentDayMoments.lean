@@ -1,6 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Program.Conclusions
+import Descent.Portability.PortabilityDrift.Generational
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
+
 -- The `Program -> Portability` edge, written where the USE is. This file names nine
 -- declarations from `Program.Conclusions` -- the Brier and log-loss risk decompositions --
 -- and used to reach them through `Definitions.lean`, the head of the fan, which imported
@@ -8,9 +12,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -- sibling makes the whole fan look like it depends on the audit layer, and makes the one
 -- file that really does look like it does not. The edge is still a layer violation and is
 -- still owed a repair; it is now a violation of exactly one file.
-import Descent.Program.Conclusions
-import Descent.Portability.PortabilityDrift.Generational
-import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Decision
 

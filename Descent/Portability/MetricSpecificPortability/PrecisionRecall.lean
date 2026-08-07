@@ -2,11 +2,12 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricSpecificPortability.R2Decomposition
--- The `import Descent.Program.OpenQuestions` that used to be here is GONE, and the repair
--- is the one this comment prescribed: `f1Score` moved DOWN, to `Core/Decision.lean`, beside
--- the rest of the clinical family. An F1 formula is a classifier metric and carries no
--- programme content, so this file no longer reaches the audit layer at the top of the graph
--- to obtain a harmonic mean of two arguments. `f1_le_one` went with the definition.
+
+-- There is no `import Descent.Program.OpenQuestions` here, and there is no need for one:
+-- `f1Score` lives DOWN in `Core/Decision.lean`, beside the rest of the clinical family,
+-- and `f1_le_one` sits with it. An F1 formula is a classifier metric carrying no
+-- programme content, so nothing in this file reaches the audit layer at the top of the
+-- graph to obtain a harmonic mean of two arguments.
 
 assert_below Descent.Decision
 

@@ -1081,10 +1081,10 @@ sends the scaled migration number `M` to `M/(1 + M)`. The arguments are differen
 quantities and no value of one may be substituted for the other, but the map is the same
 saturating map, and a change of convention in either spelling has to be made in both.
 
-This used to be stated as `sharedLDFromMigration M = Core.fstFromTau M`, which said the
-right thing in a form that ASSERTED the substitution its own docstring forbade -- the two
-sides took the same real. `Core.fstFromTau` takes a `Tau` now, so that spelling no longer
-elaborates, and the shared content is where it always was: both are `Core.saturation`. -/
+Stating that as `sharedLDFromMigration M = Core.fstFromTau M` would say the right thing
+in a form that ASSERTS the substitution the paragraph above forbids: both sides would
+take the same real. `Core.fstFromTau` takes a `Tau`, so that spelling does not elaborate,
+and the shared content is stated where it actually lives -- both are `Core.saturation`. -/
 theorem sharedLDFromMigration_eq_saturation (M : ℝ) :
     sharedLDFromMigration M = Descent.Core.saturation M := rfl
 

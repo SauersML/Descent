@@ -2175,8 +2175,8 @@ noncomputable def fstAtGeneration (p : PopGenParameters) (t : ℕ) : ℝ :=
 
 Stated on `Tau.ofGenerations`'s own value rather than on `t/(2 Nₑ)` written out, so that
 the `2` in it is `ploidy` and the same `ploidy` every other scaling in the corpus carries.
-It used to be written out here, which is how a corpus ends up with `t/(2 Nₑ)` in one file
-and `t/(4 Nₑ)` in another. -/
+Writing the quotient out instead is how a corpus ends up with `t/(2 Nₑ)` in one file and
+`t/(4 Nₑ)` in another. -/
 theorem scaledTime_nonneg (p : PopGenParameters) (t : ℕ) :
     (0:ℝ) ≤ (Tau.ofGenerations (t : ℝ) p.Ne).value := by
   have hNe := p.Ne_pos
