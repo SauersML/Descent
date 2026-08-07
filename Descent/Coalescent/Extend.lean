@@ -157,6 +157,42 @@ theorem extend_injective {n : ℕ} (ξ : ER n) : Function.Injective (extend ξ) 
       rw [hx] at this
       rw [this]
 
+/-- **On the old sample points the extension agrees with what it restricts, wherever the
+new point is seated.**  Both `u` and `v` are below `n`, so `extendMap` sends each to its own
+old class and the seat never enters; the relation between them is `ξ`'s either way.
+
+`exists_extend` needs this once per branch -- at `some (Quotient.mk ξ x₀)` and at `none` --
+and had it twice, as nineteen identical lines whose only difference was the seat written
+into a `have`.  Taking the seat as an argument it does not use is what says the two copies
+were one argument. -/
+private theorem extend_agrees_on_old {n : ℕ} (ζ : ER (n + 1))
+    (o : Option (Quotient (restrict (Nat.le_succ n) ζ)))
+    {u v : Fin (n + 1)} (hu : (u : ℕ) < n) (hv : (v : ℕ) < n) :
+    ζ.r u v ↔ (extend (restrict (Nat.le_succ n) ζ) o).r u v := by
+  classical
+  constructor
+  · intro huv
+    show extendMap (restrict (Nat.le_succ n) ζ) _ u = extendMap (restrict (Nat.le_succ n) ζ) _ v
+    rw [extendMap_of_lt (restrict (Nat.le_succ n) ζ) _ u hu,
+      extendMap_of_lt (restrict (Nat.le_succ n) ζ) _ v hv]
+    have : (restrict (Nat.le_succ n) ζ).r ⟨u, hu⟩ ⟨v, hv⟩ := huv
+    rw [Quotient.sound this]
+  · intro huv
+    have h' : extendMap (restrict (Nat.le_succ n) ζ) o u
+        = extendMap (restrict (Nat.le_succ n) ζ) o v := huv
+    rw [extendMap_of_lt (restrict (Nat.le_succ n) ζ) _ u hu,
+      extendMap_of_lt (restrict (Nat.le_succ n) ζ) _ v hv] at h'
+    have h2 : Quotient.mk (restrict (Nat.le_succ n) ζ) (⟨(u : ℕ), hu⟩ : Fin n)
+        = Quotient.mk (restrict (Nat.le_succ n) ζ) (⟨(v : ℕ), hv⟩ : Fin n) :=
+      Option.some_injective _ h'
+    have h3ξ : (restrict (Nat.le_succ n) ζ).r (⟨(u : ℕ), hu⟩ : Fin n) (⟨(v : ℕ), hv⟩ : Fin n) :=
+      Quotient.exact h2
+    have h3 : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
+        (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) := h3ξ
+    have hu' : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
+    have hv' : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
+    rwa [hu', hv'] at h3
+
 /-- **Every relation on `n+1` elements is an extension of its own restriction.**  With
 `restrict_extend` and `extend_injective`, this is the fibre decomposition: restriction over
 `ξ` has fibre `Option (Quotient ξ)`, which is the Chinese restaurant's "join a class or start
@@ -173,24 +209,7 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
     rcases lt_or_ge (u : ℕ) n with hu | hu
     · rcases lt_or_ge (v : ℕ) n with hv | hv
       · -- both old: the relation is `ξ`, and both maps agree there
-        constructor
-        · intro huv
-          show extendMap ξ _ u = extendMap ξ _ v
-          rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv]
-          have : ξ.r ⟨u, hu⟩ ⟨v, hv⟩ := huv
-          rw [Quotient.sound this]
-        · intro huv
-          have h' : extendMap ξ (some (Quotient.mk ξ x₀)) u
-              = extendMap ξ (some (Quotient.mk ξ x₀)) v := huv
-          rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv] at h'
-          have h2 : Quotient.mk ξ (⟨(u : ℕ), hu⟩ : Fin n)
-              = Quotient.mk ξ (⟨(v : ℕ), hv⟩ : Fin n) := Option.some_injective _ h'
-          have h3ξ : ξ.r (⟨(u : ℕ), hu⟩ : Fin n) (⟨(v : ℕ), hv⟩ : Fin n) := Quotient.exact h2
-          have h3 : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
-              (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) := h3ξ
-          have hu' : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
-          have hv' : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
-          rwa [hu', hv'] at h3
+        exact extend_agrees_on_old ζ _ hu hv
       · -- `v` is the new element
         have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
@@ -241,24 +260,7 @@ theorem exists_extend {n : ℕ} (ζ : ER (n + 1)) :
     refine Setoid.ext fun u v ↦ ?_
     rcases lt_or_ge (u : ℕ) n with hu | hu
     · rcases lt_or_ge (v : ℕ) n with hv | hv
-      · constructor
-        · intro huv
-          show extendMap ξ _ u = extendMap ξ _ v
-          rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv]
-          have : ξ.r ⟨u, hu⟩ ⟨v, hv⟩ := huv
-          rw [Quotient.sound this]
-        · intro huv
-          have h' : extendMap ξ (none : Option (Quotient ξ)) u
-              = extendMap ξ none v := huv
-          rw [extendMap_of_lt ξ _ u hu, extendMap_of_lt ξ _ v hv] at h'
-          have h2 : Quotient.mk ξ (⟨(u : ℕ), hu⟩ : Fin n)
-              = Quotient.mk ξ (⟨(v : ℕ), hv⟩ : Fin n) := Option.some_injective _ h'
-          have h3ξ : ξ.r (⟨(u : ℕ), hu⟩ : Fin n) (⟨(v : ℕ), hv⟩ : Fin n) := Quotient.exact h2
-          have h3 : ζ.r (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n))
-              (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) := h3ξ
-          have hu' : (Fin.castLE (Nat.le_succ n) (⟨(u : ℕ), hu⟩ : Fin n)) = u := Fin.ext rfl
-          have hv' : (Fin.castLE (Nat.le_succ n) (⟨(v : ℕ), hv⟩ : Fin n)) = v := Fin.ext rfl
-          rwa [hu', hv'] at h3
+      · exact extend_agrees_on_old ζ _ hu hv
       · have hvlast : v = Fin.last n := eq_last_of_not_lt (by omega)
         subst hvlast
         constructor
