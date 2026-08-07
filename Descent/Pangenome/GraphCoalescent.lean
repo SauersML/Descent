@@ -7,6 +7,7 @@ import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.Visibility
+import Descent.Pangenome.GraphCoalescent.WidthProfile
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

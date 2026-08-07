@@ -79,6 +79,20 @@ Empirical status: DERIVED.  It is the function the neutral generator annihilates
 right boundary values, which `neutralFixation_generator_eq_zero` proves. -/
 noncomputable def neutralFixation (x : ℝ) : ℝ := Descent.Core.identifiedWith x
 
+/-- **One of the two alleles fixes.**  An allele at frequency `x` and the allele it is
+segregating against, at `1 - x`, have fixation probabilities summing to one: the two
+outcomes are exhaustive, and drift eventually reaches one of them.
+
+Being killed by the generator does not say this.  The generator kills every affine function,
+so `u(x) = 2x` and `u(x) = x + 1` are harmonic too, and neither sums to one across a
+complementary pair; the boundary values `u(0) = 0` and `u(1) = 1` are what select this
+function, and this identity is those boundary conditions stated as a property of the answer
+rather than as a constraint on the problem. -/
+theorem neutralFixation_add_complement (x : ℝ) :
+    Descent.Core.sum (neutralFixation x) (neutralFixation (Descent.Core.complement x)) = 1 := by
+  unfold neutralFixation Descent.Core.identifiedWith Descent.Core.sum Descent.Core.complement
+  ring
+
 /-- **`u(x) = x` is harmonic for the neutral diffusion.**  The second derivative of the
 identity is zero, so `½x(1-x)u'' = 0` whatever `x` is -- the diffusion coefficient never
 enters.  This is why drift is unbiased: it is the `n = 1` companion of
