@@ -93,8 +93,10 @@ enormous. On a widened grid (`q = p ± δ`, `p ∈ {0.001, 0.01, 0.1, 0.5, 0.9}`
     log1p form, exactly equal          worst 1.1·10⁻²   21/104 cells over 1e-6
 
 Twelve orders of magnitude in the worst case and a third of the failing region.
-`bernoulliKLReal_eq_logOnePlus` below proves the two forms equal, so this is a
-free substitution and not an approximation. Implementations must use it.
+`bernoulliKLReal_eq_logOnePlus`, in `Descent.Program.Conclusions`, proves the two
+forms equal, so this is a free substitution and not an approximation.
+Implementations must use it. That lemma consumes this definition rather than the
+other way round, which is why it is stated there and not here.
 
 What survives is a genuine domain restriction and not a large one: below
 `|p - q| ≈ 10⁻⁶` even the stable form loses relative accuracy, because the
