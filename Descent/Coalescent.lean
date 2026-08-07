@@ -28,6 +28,7 @@ import Descent.Coalescent.GeneTreeDiscordance
 import Descent.Coalescent.Generator
 import Descent.Coalescent.HoldingSecondMoment
 import Descent.Coalescent.HoldingTime
+import Descent.Coalescent.Homoplasy
 import Descent.Coalescent.Infinite
 import Descent.Coalescent.Interpolation
 import Descent.Coalescent.IntervalPicture

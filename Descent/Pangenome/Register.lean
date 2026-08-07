@@ -89,6 +89,34 @@ noncomputable def orbitAverage (G : Type*) [Group G] [Fintype G] {X : Type*} [Mu
     (f : X → ℝ) (x : X) : ℝ :=
   orbitSum G f x / (Fintype.card G : ℝ)
 
+/-- **The divisor is the group's order, not the orbit's size.**  Stated through
+`Descent.Core.ratio` so the denominator is visible rather than buried in the definition.
+
+The two differ, and the difference is not a technicality: by orbit-stabiliser an orbit has
+`|G| / |stabiliser|` points, so whenever a point is fixed by part of the group the orbit sum
+visits each of its images several times and `orbitAverage` is a MULTIPLICITY-weighted mean
+rather than a uniform one over distinct images.  That is the right choice here -- it is what
+makes `sum_weight_mul_orbitAverage` hold with no hypothesis about stabilisers -- but a reader
+who assumed "average over the orbit" would have the wrong denominator, so it is recorded. -/
+theorem orbitAverage_eq_ratio (G : Type*) [Group G] [Fintype G] {X : Type*} [MulAction G X]
+    (f : X → ℝ) (x : X) :
+    orbitAverage G f x = Descent.Core.ratio (orbitSum G f x) (Fintype.card G : ℝ) := rfl
+
+/-- **The weights sum to one.**  Averaging a constant returns it, for every group and every
+point.
+
+This is the law that fails if the normalisation drifts: an `orbitSum` divided by the orbit
+size, or by `|G| - 1`, or left undivided, all break here while leaving every other statement
+in the file looking correct.  It is a partition of unity for the orbit weights and the reason
+`sum_weight_mul_orbitAverage` can be read as "same expectation" rather than "same up to a
+factor". -/
+theorem orbitAverage_const (G : Type*) [Group G] [Fintype G] {X : Type*} [MulAction G X]
+    (c : ℝ) (x : X) : orbitAverage G (fun _ ↦ c) x = c := by
+  have hcard : (Fintype.card G : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+  unfold orbitAverage orbitSum
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+  field_simp
+
 /-- **The weighted orbit sum, resummed.**  If the weight is invariant then every group element
 contributes the same total, so the whole double sum collapses to `|G|` copies of one.
 

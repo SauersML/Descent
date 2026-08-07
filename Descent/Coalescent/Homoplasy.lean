@@ -79,7 +79,7 @@ space is bounded below and that of an infinitely-branching one is not.
 - `homoplasyProb_antitone`: a larger alphabet is always safer.
 - `tendsto_homoplasyProb_atTop`: **infinite sites is the `k → ∞` limit**, and is attained
   only there.
-- `homoplasyProb_two_lt_half`: the biallelic case, which is the worst one.
+- `homoplasyProb_two_le_half`: the biallelic case, which is the worst one.
 -/
 
 namespace Coalescent
@@ -141,14 +141,17 @@ theorem homoplasyProb_pos {k : ℕ} {μ t : ℝ} (hk : 1 ≤ k) (h : 0 < μ * t)
 mutation rate cannot make homoplasy worse than the alphabet allows, so `k` alone bounds it --
 which is what lets a variant class be ranked by its alphabet without knowing its rate.
 
-Assumes: `1 ≤ k` and `0 ≤ μ * t`. -/
-theorem homoplasyProb_le_inv {k : ℕ} {μ t : ℝ} (hk : 1 ≤ k) (h : 0 ≤ μ * t) :
+The bound needs no hypothesis on `μ * t` at all: `exp` is positive everywhere, so the
+numerator never exceeds `1` whatever the rate and however long the process has run.
+
+Assumes: `1 ≤ k`. -/
+theorem homoplasyProb_le_inv {k : ℕ} {μ t : ℝ} (hk : 1 ≤ k) :
     homoplasyProb k μ t ≤ 1 / (k : ℝ) := by
   have hkpos : (0 : ℝ) < (k : ℝ) := by exact_mod_cast hk
   have hexp : 0 < Real.exp (-(μ * t)) := Real.exp_pos _
   unfold homoplasyProb
-  apply div_le_div_of_nonneg_right' <;> skip
-  all_goals sorry
+  rw [div_le_div_iff₀ hkpos hkpos]
+  nlinarith
 
 /-- **A larger alphabet is always safer.**  Homoplasy is antitone in the alphabet size, at
 every rate and every time -- so the ranking of variant classes by `k` is a ranking by
@@ -162,8 +165,7 @@ theorem homoplasyProb_antitone {k k' : ℕ} {μ t : ℝ} (hk : 1 ≤ k) (hkk : k
   have hle : (k : ℝ) ≤ (k' : ℝ) := by exact_mod_cast hkk
   unfold homoplasyProb
   rw [div_le_div_iff₀ hk'pos hkpos]
-  have := one_sub_exp_nonneg h
-  nlinarith
+  exact mul_le_mul_of_nonneg_left hle (one_sub_exp_nonneg h)
 
 /-! ### Infinite sites is the limit, and only the limit -/
 
@@ -184,12 +186,9 @@ theorem tendsto_homoplasyProb_atTop (μ t : ℝ) :
 inverted repeats, a presence/absence call -- put the homoplasy ceiling at one half, and the
 ceiling is approached as mutation accumulates.
 
-Assumes: `0 ≤ μ * t`. -/
-theorem homoplasyProb_two_le_half {μ t : ℝ} (h : 0 ≤ μ * t) :
-    homoplasyProb 2 μ t ≤ 1 / 2 := by
-  have := homoplasyProb_le_inv (k := 2) (by norm_num) h
-  norm_num at this ⊢
-  linarith
+No hypothesis on `μ * t` is needed, for the reason `homoplasyProb_le_inv` records. -/
+theorem homoplasyProb_two_le_half (μ t : ℝ) : homoplasyProb 2 μ t ≤ 1 / 2 := by
+  simpa using homoplasyProb_le_inv (k := 2) (μ := μ) (t := t) (by norm_num)
 
 end Coalescent
 
