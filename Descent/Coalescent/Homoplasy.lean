@@ -84,6 +84,9 @@ space is bounded below and that of an infinitely-branching one is not.
 
 namespace Coalescent
 
+namespace Homoplasy
+
+
 open Filter Topology
 
 /-! ### The family -/
@@ -189,6 +192,9 @@ ceiling is approached as mutation accumulates.
 No hypothesis on `μ * t` is needed, for the reason `homoplasyProb_le_inv` records. -/
 theorem homoplasyProb_two_le_half (μ t : ℝ) : homoplasyProb 2 μ t ≤ 1 / 2 := by
   simpa using homoplasyProb_le_inv (k := 2) (μ := μ) (t := t) (by norm_num)
+
+
+end Homoplasy
 
 end Coalescent
 
