@@ -1237,6 +1237,106 @@ theorem deployedPortabilityRatio_anti_in_demes (p q : PopGenParameters) (V_E : �
       (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
       (q.fstEquilibrium_lt_one hflow)) hsrc
 
+
+/-! ### What two demographies look like to each metric
+
+The laws above say every deployed number moves the same way when a population's
+demography changes.  These say the opposite thing about the other two metrics, and the
+pair is the point: an audit that reads only the calibration slope or only the mean
+squared error sees NOTHING when a score is transported between two genuinely different
+populations, while the deployed `R²` between the same two has strictly fallen.
+
+Stated about records rather than about a free `F_ST` because that is the claim a
+deployment needs: not "the slope is flat in this parameter" but "these two populations,
+which differ in how much migration they exchange, are indistinguishable to this metric". -/
+
+/-- **A demography's deployed calibration slope is one.**  Drift erodes the score's
+variance and its predictive covariance by the same factor, so their ratio does not move --
+whatever population the score is carried to. -/
+theorem calibrationSlope_of_params (p : PopGenParameters) (V_E : ℝ)
+    (hflow : 0 < p.mu + p.mig) :
+    calibrationSlope (momentsUnderDrift p.V_A V_E p.fstEquilibrium) = 1 :=
+  calibrationSlope_momentsUnderDrift p.V_A V_E p.fstEquilibrium p.V_A_pos
+    (p.fstEquilibrium_lt_one hflow)
+
+/-- **Two demographies, one calibration slope.**  However far apart two populations sit,
+a deployment judged on calibration alone reports the same number for both. -/
+theorem calibrationSlope_eq_of_params (p q : PopGenParameters) (V_E : ℝ)
+    (hp : 0 < p.mu + p.mig) (hq : 0 < q.mu + q.mig) :
+    calibrationSlope (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+      calibrationSlope (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  rw [calibrationSlope_of_params p V_E hp, calibrationSlope_of_params q V_E hq]
+
+/-- **A demography's deployed mean squared error is its environmental variance.**  Drift
+removes signal from the score and the same signal from the outcome, so the residual does
+not depend on the population at all. -/
+theorem mse_of_params (p : PopGenParameters) (V_E : ℝ) :
+    mse (momentsUnderDrift p.V_A V_E p.fstEquilibrium) = V_E :=
+  mse_momentsUnderDrift p.V_A V_E p.fstEquilibrium
+
+/-- **Two demographies with the same environmental variance, one mean squared error.**
+The second metric that cannot tell two populations apart. -/
+theorem mse_eq_of_params (p q : PopGenParameters) (V_E : ℝ) :
+    mse (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+      mse (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  rw [mse_of_params p V_E, mse_of_params q V_E]
+
+/-- **The audit gap, stated about two populations.**  Take two demographies alike but for
+migration.  The deployed `R²` is strictly worse for the one exchanging fewer migrants,
+and the calibration slope and the mean squared error are IDENTICAL for both.
+
+That conjunction is what makes a single-metric audit unsafe rather than merely
+incomplete: the two numbers a deployment is most often judged on are exactly the two that
+cannot see the difference, and the one that can is the one being lost. -/
+theorem audit_gap_between_demographies (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    deployedR2 p V_E < deployedR2 q V_E ∧
+      calibrationSlope (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+        calibrationSlope (momentsUnderDrift q.V_A V_E q.fstEquilibrium) ∧
+      mse (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+        mse (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  refine ⟨deployedR2_mono_in_migration p q V_E hE hNe hmu hd hV hlt hflow, ?_, ?_⟩
+  · exact calibrationSlope_eq_of_params p q V_E hflow (by rw [← hmu]; linarith)
+  · exact mse_eq_of_params p q V_E
+
+/-- **The same gap read through the AUC argument.**  Discrimination falls with the
+deployed `R²` while the calibration slope does not move, so a deployment audited on
+calibration alone also misses a loss of ranking accuracy. -/
+theorem audit_gap_discrimination (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    aucArgument (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
+        < aucArgument (momentsUnderDrift q.V_A V_E q.fstEquilibrium) ∧
+      calibrationSlope (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+        calibrationSlope (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  refine ⟨aucArgument_mono_in_migration_of_params p q V_E hE hNe hmu hd hV hlt hflow, ?_⟩
+  exact calibrationSlope_eq_of_params p q V_E hflow (by rw [← hmu]; linarith)
+
+
+/-- **The audit gap along the deme axis.**  The same conjunction as
+`audit_gap_between_demographies`, for two populations that differ in how finely they are
+subdivided rather than in how much they migrate: the deployed `R²` is strictly worse for
+the more finely split one, and the mean squared error is identical.
+
+Stated separately because the deme count is the axis that runs the other way, and a
+reader checking whether the audit gap is an artefact of one parameter's direction should
+be able to see it holding in both. -/
+theorem audit_gap_across_demes (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
+    (hV : p.V_A = q.V_A) (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes)
+    (hflow : 0 < q.mu + q.mig) :
+    deployedR2 q V_E < deployedR2 p V_E ∧
+      mse (momentsUnderDrift p.V_A V_E p.fstEquilibrium) =
+        mse (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  refine ⟨?_, mse_eq_of_params p q V_E⟩
+  have hfst : p.fstEquilibrium < q.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt
+  unfold deployedR2
+  rw [← hV]
+  exact r2_momentsUnderDrift_anti p.V_A V_E p.fstEquilibrium q.fstEquilibrium p.V_A_pos hE
+    hfst (q.fstEquilibrium_lt_one hflow)
+
 end ScoreMoments
 
 end Descent.Core
