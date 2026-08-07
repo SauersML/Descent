@@ -1233,7 +1233,7 @@ end Recommendations
 
 Everything above states a clinical-utility law about a free `R²`, and a reader has to
 believe that number came from a population. The results below say the same things about
-`(p : Descent.Core.PopGenParameters)` and the `R²` that record itself deploys, so a
+`(p : PopGenParameters)` and the `R²` that record itself deploys, so a
 migration rate reaches an operating-point metric inside one claim.
 
 What the record supplies and what it cannot. The three `R²` facts the threshold regime
@@ -1247,6 +1247,7 @@ of the threshold model and the cut-off chosen, and they stay as hypotheses here.
 section DeployedClinicalUtility
 
 open Descent.Core.ScoreMoments (deployedR2 deployedR2_mono_in_migration deployedR2_mem_unit)
+open Descent.Core (PopGenParameters)
 
 /-- **Two histories differing only in migration land in the threshold regime.**
 
@@ -1259,7 +1260,7 @@ This is the bridge every corollary below crosses, and the reason none of them ha
 an `R²` gap: the gap is `deployedR2_mono_in_migration`, which is a statement about
 demography rather than a number a reader supplies. -/
 theorem thresholdRegime_of_deployedR2_of_mig_lt
-    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
     (T' μ_control V_E : ℝ) (hE : 0 < V_E)
     (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
@@ -1279,7 +1280,7 @@ theorem thresholdRegime_of_deployedR2_of_mig_lt
 The end-to-end claim: a demographic rate on the left, a number a clinic reports on the
 right, and no free `R²` in between. -/
 theorem sensFromR2_mono_in_migration_of_params
-    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
     (T' μ_control V_E : ℝ) (hE : 0 < V_E)
     (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
@@ -1293,7 +1294,7 @@ theorem sensFromR2_mono_in_migration_of_params
 
 /-- **And strictly better specificity**, from the same demographic contrast. -/
 theorem specFromR2_mono_in_migration_of_params
-    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
     (T' μ_control V_E : ℝ) (hE : 0 < V_E)
     (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
     (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hμ_control_neg : μ_control < 0)
@@ -1312,7 +1313,7 @@ The reclassification improvement a score buys is strictly smaller under the hist
 deploys the lower `R²`, against a common baseline. The regime is the one
 `thresholdRegime_of_deployedR2_of_mig_lt` builds from a migration contrast. -/
 theorem nri_decreases_with_deployedR2_loss_of_params
-    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
     (T' μ_control r2_base V_E : ℝ)
     (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E)) :
     netReclassificationImprovement
@@ -1329,7 +1330,7 @@ theorem nri_decreases_with_deployedR2_loss_of_params
 Net benefit at every treatment threshold is strictly lower under the history that deploys
 less, which is the decision-curve statement with the demography in place of a free `R²`. -/
 theorem portability_narrows_useful_range_of_params
-    (m : LiabilityThresholdModel) (p q : Descent.Core.PopGenParameters)
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
     (T' μ_control V_E π t : ℝ) (h_π : 0 < π) (h_π1 : π < 1) (ht : 0 < t) (ht1 : t < 1)
     (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E)) :
     decisionCurveNetBenefit (sensFromR2 m (deployedR2 p V_E) T' * π)

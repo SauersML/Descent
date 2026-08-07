@@ -166,6 +166,12 @@ theorem portabilityRatio_eq_zero_iff
   · rintro rfl
     norm_num
 
+section DeployedPortabilityRatio
+
+open Descent.Core (PopGenParameters)
+open Descent.Core.ScoreMoments (deployedR2 deployedPortabilityRatio
+  deployedR2_le_heritability)
+
 /-- **The methodology's ratio, fed a demography's own two `R²`s, is the deployed one.**
 
 `Core.ScoreMoments.deployedPortabilityRatio` is the same quotient computed inside the metric
@@ -178,12 +184,12 @@ This is the statement that makes the three bounds below claims about populations
 what would fail if either spelling drifted: they are separate definitions in separate
 subsystems, and nothing but a theorem naming both keeps them together. -/
 theorem portabilityRatio_eq_deployedPortabilityRatio_of_params
-    (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) :
-    portabilityRatio (Descent.Core.ScoreMoments.deployedR2 p V_E)
+    (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E) :
+    portabilityRatio (deployedR2 p V_E)
         (Descent.Core.share p.V_A V_E) =
-      Descent.Core.ScoreMoments.deployedPortabilityRatio p V_E := by
-  unfold portabilityRatio Descent.Core.ScoreMoments.deployedPortabilityRatio
-    Descent.Core.ScoreMoments.portabilityRatio Descent.Core.ScoreMoments.deployedR2
+      deployedPortabilityRatio p V_E := by
+  unfold portabilityRatio deployedPortabilityRatio
+    Descent.Core.ScoreMoments.portabilityRatio deployedR2
   rw [Descent.Core.ScoreMoments.r2_momentsUnderDrift_at_source p.V_A V_E p.V_A_pos hE]
 
 /-- **A demography cannot deploy more than it starts with.**
@@ -192,21 +198,21 @@ The reported ratio is at most one, with the source increment being the share the
 own additive variance commands and the target increment the one its equilibrium
 differentiation leaves. Both come from the record; the reader supplies neither. -/
 theorem portabilityRatio_le_one_of_params
-    (p : Descent.Core.PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
+    (p : PopGenParameters) (V_E : ℝ) (hE : 0 ≤ V_E)
     (hflow : 0 < p.mu + p.mig) (hsrc : 0 < Descent.Core.share p.V_A V_E) :
-    portabilityRatio (Descent.Core.ScoreMoments.deployedR2 p V_E)
+    portabilityRatio (deployedR2 p V_E)
       (Descent.Core.share p.V_A V_E) ≤ 1 :=
   portabilityRatio_le_one _ _ hsrc
-    (Descent.Core.ScoreMoments.deployedR2_le_heritability p V_E hE hflow)
+    (deployedR2_le_heritability p V_E hE hflow)
 
 /-- **Full transport is exactly no loss.** The reported ratio is one precisely when the
 history deploys the whole source share — not merely bounded by it. -/
 theorem portabilityRatio_eq_one_iff_of_params
-    (p : Descent.Core.PopGenParameters) (V_E : ℝ)
+    (p : PopGenParameters) (V_E : ℝ)
     (hsrc : 0 < Descent.Core.share p.V_A V_E) :
-    portabilityRatio (Descent.Core.ScoreMoments.deployedR2 p V_E)
+    portabilityRatio (deployedR2 p V_E)
         (Descent.Core.share p.V_A V_E) = 1 ↔
-      Descent.Core.ScoreMoments.deployedR2 p V_E = Descent.Core.share p.V_A V_E :=
+      deployedR2 p V_E = Descent.Core.share p.V_A V_E :=
   portabilityRatio_eq_one_iff _ _ hsrc
 
 /-- **And zero transport is exactly a deployed `R²` of zero**, which
@@ -214,12 +220,14 @@ theorem portabilityRatio_eq_one_iff_of_params
 a working source the reported zero is a real transfer failure rather than a division
 artifact. -/
 theorem portabilityRatio_eq_zero_iff_of_params
-    (p : Descent.Core.PopGenParameters) (V_E : ℝ)
+    (p : PopGenParameters) (V_E : ℝ)
     (hsrc : Descent.Core.share p.V_A V_E ≠ 0) :
-    portabilityRatio (Descent.Core.ScoreMoments.deployedR2 p V_E)
+    portabilityRatio (deployedR2 p V_E)
         (Descent.Core.share p.V_A V_E) = 0 ↔
-      Descent.Core.ScoreMoments.deployedR2 p V_E = 0 :=
+      deployedR2 p V_E = 0 :=
   portabilityRatio_eq_zero_iff _ _ hsrc
+
+end DeployedPortabilityRatio
 
 end IncrementalR2
 

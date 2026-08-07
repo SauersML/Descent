@@ -470,6 +470,87 @@ theorem phased_deployment_reduces_risk
     mul_lt_mul_of_pos_right h_spec (by linarith)
   linarith
 
+/-! ## The same equity laws, read at a demography's own deployed `R²`
+
+The disparity results above compare two free `R²`s, and which populations those belong to is
+left to the reader. Below, the two numbers are the `R²`s that two `PopGenParameters` records
+deploy, and the gap between them is `Core.ScoreMoments.deployedR2_mono_in_migration` — a
+demographic theorem — rather than a hypothesis. What a record cannot supply, it does not:
+the benefit slope, the cost, and the operating point stay as hypotheses.
+-/
+
+section DeployedEquity
+
+open Descent.Core (PopGenParameters)
+open Descent.Core.ScoreMoments (deployedR2 deployedR2_mono_in_migration)
+
+/-- **A migration difference is a clinical-benefit difference.**
+
+Two histories alike but for migration, one benefit-per-unit-`R²` constant, and the history
+with less flow returns strictly less benefit. The `R²` ordering is not assumed here; it is
+the deployed-metric monotonicity, so this reads from a rate in a population to a number in a
+clinic. -/
+theorem clinical_benefit_increases_with_migration_of_params
+    (p q : PopGenParameters) (α V_E : ℝ) (h_α : 0 < α) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    α * deployedR2 p V_E < α * deployedR2 q V_E :=
+  clinical_benefit_increases_with_r2 α _ _ h_α
+    (deployedR2_mono_in_migration p q V_E hE hsame.1 hsame.2.1 hsame.2.2.1 hsame.2.2.2 hlt hflow)
+
+/-- **And a QALY gap**, at the same demographic contrast and a positive QALY slope. -/
+theorem qaly_gap_from_migration_of_params
+    (p q : PopGenParameters) (γ V_E : ℝ) (h_γ : 0 < γ) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    0 < γ * deployedR2 q V_E - γ * deployedR2 p V_E :=
+  qaly_gap_proportional_to_r2_gap γ _ _ h_γ
+    (deployedR2_mono_in_migration p q V_E hE hsame.1 hsame.2.1 hsame.2.2.1 hsame.2.2.2 hlt hflow)
+
+/-- **A history below the cost-to-benefit ratio is a history not worth screening.**
+
+The threshold is a statement about costs and the benefit slope, so it stays a hypothesis;
+what changes is that the accuracy compared against it is the one the demography predicts
+rather than a number a study reports. -/
+theorem r2_threshold_for_utility_of_params
+    (p : PopGenParameters) (α cost V_E : ℝ) (h_α : 0 < α)
+    (h_below : deployedR2 p V_E < cost / α) :
+    α * deployedR2 p V_E - cost < 0 :=
+  r2_threshold_for_utility _ α cost h_α h_below
+
+/-- **Do no harm, at two demographies.**
+
+Net clinical value is strictly lower under the history that deploys the lower `R²`, so a
+population can fail the do-no-harm principle on a score that satisfies it elsewhere, for
+demographic reasons alone. The threshold regime is supplied by
+`thresholdRegime_of_deployedR2_of_mig_lt` from a migration contrast. -/
+theorem do_no_harm_principle_of_params
+    (m : LiabilityThresholdModel) (p q : PopGenParameters)
+    (T' μ_control V_E π benefit harm : ℝ)
+    (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E))
+    (h_π : 0 < π) (h_π1 : π < 1) (h_benefit : 0 < benefit) (h_harm : 0 < harm) :
+    sensFromR2 m (deployedR2 p V_E) T' * π * benefit -
+        (1 - specFromR2 m (deployedR2 p V_E) T' μ_control) * (1 - π) * harm <
+      sensFromR2 m (deployedR2 q V_E) T' * π * benefit -
+        (1 - specFromR2 m (deployedR2 q V_E) T' μ_control) * (1 - π) * harm :=
+  do_no_harm_principle m T' μ_control (deployedR2 q V_E) (deployedR2 p V_E) π benefit harm
+    hregime h_π h_π1 h_benefit h_harm
+
+/-- **Phased deployment, at two demographies.** Validating where the history deploys more
+buys strictly better classification than deploying where it deploys less. -/
+theorem phased_deployment_reduces_risk_of_params
+    (m : LiabilityThresholdModel) (p q : PopGenParameters) (T' μ_control V_E π : ℝ)
+    (hregime : ThresholdRegime m T' μ_control (deployedR2 p V_E) (deployedR2 q V_E))
+    (h_π : 0 < π) (h_π1 : π < 1) :
+    sensFromR2 m (deployedR2 p V_E) T' * π +
+        specFromR2 m (deployedR2 p V_E) T' μ_control * (1 - π) <
+      sensFromR2 m (deployedR2 q V_E) T' * π +
+        specFromR2 m (deployedR2 q V_E) T' μ_control * (1 - π) :=
+  phased_deployment_reduces_risk m T' μ_control (deployedR2 q V_E) (deployedR2 p V_E) π
+    hregime h_π h_π1
+
+end DeployedEquity
+
 end ClinicalImplementation
 
 end Descent.Portability

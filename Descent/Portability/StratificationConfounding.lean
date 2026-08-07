@@ -1103,6 +1103,91 @@ theorem momentContinuousFunctional_ne_inverseTraceCertificate
     False :=
   certificate_not_momentContinuous Φ hΦ
 
+/-! ## The same confounding laws, read at a demography's own deployed `R²`
+
+Each law above takes an `R²` as a free real. The results below state them at the `R²` a
+`PopGenParameters` record deploys, so an attenuation figure or a sampling variance is
+reported for a population rather than for a number.
+-/
+
+section DeployedAttenuation
+
+open Descent.Core (PopGenParameters)
+open Descent.Core.ScoreMoments (deployedR2 deployedR2_eq deployedR2_mem_unit
+  deployedR2_mono_in_migration)
+
+/-- **A polymorphic history deploys an `R²` strictly inside the unit interval.**
+
+`Core.ScoreMoments.deployedR2_mem_unit` gives the closed interval, which is the right
+statement there: at zero environmental variance the deployed value is one, and at no flow it
+is zero. Both endpoints are excluded once there is environmental variance and some flow, and
+the strict form is what the reliability and estimator-variance laws below need — a
+reliability ratio at `R² = 0` is junk-zero, and the sampling variance vanishes at both ends.
+
+Stated here rather than in the metric kernel because it is these consumers that need it; the
+proof is the kernel's own evaluation of the deployed metric, read at a positive retained
+fraction. -/
+theorem deployedR2_mem_Ioo_of_params (p : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E)
+    (hflow : 0 < p.mu + p.mig) :
+    0 < deployedR2 p V_E ∧ deployedR2 p V_E < 1 := by
+  have hlt := p.fstEquilibrium_lt_one hflow
+  have hge := p.fstEquilibrium_mem_unit.1
+  have hV := p.V_A_pos
+  have hretained : 0 < Descent.Core.retainedFraction p.fstEquilibrium p.V_A := by
+    unfold Descent.Core.retainedFraction
+    nlinarith
+  rw [deployedR2_eq p V_E hE.le hflow]
+  unfold Descent.Core.share
+  constructor
+  · positivity
+  · rw [div_lt_one (by linarith)]
+    linarith
+
+/-- **The reliability ratio recovers a demography's deployed `R²` from the noisy total.**
+
+`reliabilityRatio_mul_total` over a free `R²` with the demography's own in its place: the
+attenuation a noisy proxy causes is exactly undone by the total it is measured against, and
+the number recovered is the one the history predicts. The guard the loose-real version asks
+the reader to check is discharged from the record — a deployed `R²` is nonnegative and the
+noise variance is positive, so their sum cannot vanish. -/
+theorem reliabilityRatio_mul_total_of_params
+    (p : PopGenParameters) (V_E σ2_noise : ℝ) (hE : 0 ≤ V_E)
+    (hflow : 0 < p.mu + p.mig) (hnoise : 0 < σ2_noise) :
+    reliabilityRatio (deployedR2 p V_E) σ2_noise * (deployedR2 p V_E + σ2_noise) =
+      deployedR2 p V_E :=
+  reliabilityRatio_mul_total _ σ2_noise
+    (by have := (deployedR2_mem_unit p V_E hE hflow).1; linarith)
+
+/-- **More migration, a higher reliability ratio at the same measurement noise.**
+
+The end-to-end statement for attenuation: two histories differing only in migration, one
+noisy instrument, and the history with more flow suffers strictly less attenuation. The
+`R²` ordering is `deployedR2_mono_in_migration` rather than an assumption. -/
+theorem reliabilityRatio_mono_in_migration_of_params
+    (p q : PopGenParameters) (V_E σ2_noise : ℝ) (hE : 0 < V_E)
+    (hsame : p.Ne = q.Ne ∧ p.mu = q.mu ∧ p.nDemes = q.nDemes ∧ p.V_A = q.V_A)
+    (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) (hnoise : 0 < σ2_noise) :
+    reliabilityRatio (deployedR2 p V_E) σ2_noise <
+      reliabilityRatio (deployedR2 q V_E) σ2_noise := by
+  unfold reliabilityRatio Descent.Core.share
+  exact ratio_strict_mono (deployedR2_mem_Ioo_of_params p V_E hE hflow).1 hnoise
+    (deployedR2_mono_in_migration p q V_E hE hsame.1 hsame.2.1 hsame.2.2.1 hsame.2.2.2 hlt hflow)
+
+/-- **A polymorphic history's deployed `R²` has positive estimator variance.**
+
+An `R²` estimate from a finite sample scatters unless the quantity estimated sits at an
+endpoint, and `deployedR2_mem_Ioo_of_params` says a history with environmental variance and
+some flow never does. So the sampling variance a portability study must report is strictly
+positive at every such demography, rather than at `R²` values a reader stipulates. -/
+theorem r2_estimator_variance_pos_of_params
+    (p : PopGenParameters) (V_E : ℝ) (n : ℕ) (hE : 0 < V_E)
+    (hflow : 0 < p.mu + p.mig) (h_n : 0 < n) :
+    0 < r2EstimatorVariance (deployedR2 p V_E) n :=
+  r2_estimator_variance_pos _ n (deployedR2_mem_Ioo_of_params p V_E hE hflow).1
+    (deployedR2_mem_Ioo_of_params p V_E hE hflow).2 h_n
+
+end DeployedAttenuation
+
 end ImitationWall
 
 end Descent.Portability

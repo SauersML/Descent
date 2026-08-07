@@ -49,6 +49,73 @@ def freshness():
           % ("OK" if src.count(FRESH_TOKEN) >= 2 else "STALE", FRESH_TOKEN))
 
 
+def _ld_corr_rep(params):
+    """One replicate of `cross_deme_ld_corr`.  Top-level so a pool can pickle it.
+
+    Pure in its own index -- the seed is `seed + r` and nothing is carried
+    between replicates -- so `simlib.replicate_map` returns the same list in the
+    same order at any worker count.  See `simlib.replicate_map`.
+    """
+    t_div, bigM, seed, n_dip, r = params
+    import msprime
+    m = bigM / (4.0 * NE)
+    dem = msprime.Demography()
+    dem.add_population(name="A", initial_size=NE)
+    dem.add_population(name="B", initial_size=NE)
+    dem.add_population(name="ANC", initial_size=NE)
+    if m > 0:
+        dem.set_symmetric_migration_rate(["A", "B"], m)
+    dem.add_population_split(time=t_div, derived=["A", "B"], ancestral="ANC")
+    ts = msprime.sim_ancestry(
+        samples={"A": n_dip, "B": n_dip}, demography=dem,
+        sequence_length=SEQ, recombination_rate=RHO, random_seed=seed + r)
+    ts = msprime.sim_mutations(ts, rate=MU, random_seed=seed + 5000 + r)
+    if ts.num_sites < 20:
+        return None
+    gm = ts.genotype_matrix()
+    A = ts.samples(population=0)
+    B = ts.samples(population=1)
+    ga, gb = gm[:, A], gm[:, B]
+    fa, fb = ga.mean(axis=1), gb.mean(axis=1)
+    keep = (np.minimum(fa, 1 - fa) > 0.05) & (np.minimum(fb, 1 - fb) > 0.05)
+    idx = np.flatnonzero(keep)
+    if idx.size < 20:
+        return None
+    # A fixed stride over the kept sites gives pairs spanning the whole
+    # sequence at a bounded cost, rather than all O(n^2) of them.
+    idx = idx[:400]
+    # SPLIT-HALF, for the reason battery_bulk51 records at length: the naive
+    # correlation of r between demes is attenuated by the sampling noise in r
+    # itself, and the panmictic control detects it at twelve sems. Every
+    # product below is between DISJOINT halves, so no E[noise^2] term survives.
+    #
+    # This battery reports a RATIO of two such correlations, and an attenuation
+    # common to both would cancel -- but only if it is the same size in both
+    # arms, and it is not: the noise-to-signal ratio in r depends on the LD
+    # level, which is the very thing migration changes.
+    a1, a2 = ga[:, :len(A) // 2], ga[:, len(A) // 2:]
+    b1, b2 = gb[:, :len(B) // 2], gb[:, len(B) // 2:]
+    ra1, ra2, rb1, rb2 = [], [], [], []
+    for k in range(0, len(idx) - 1, 2):
+        i, j = idx[k], idx[k + 1]
+        vals = [np.corrcoef(h[i], h[j])[0, 1] for h in (a1, a2, b1, b2)]
+        if all(np.isfinite(v) for v in vals):
+            ra1.append(vals[0]); ra2.append(vals[1])
+            rb1.append(vals[2]); rb2.append(vals[3])
+    if len(ra1) < 20:
+        return None
+    ra1 = np.asarray(ra1); ra2 = np.asarray(ra2)
+    rb1 = np.asarray(rb1); rb2 = np.asarray(rb2)
+    num = float(np.mean(ra1 * rb1))
+    da = float(np.mean(ra1 * ra2))
+    db = float(np.mean(rb1 * rb2))
+    if da > 0 and db > 0:
+        c = num / math.sqrt(da * db)
+        if np.isfinite(c):
+            return float(c)
+    return None
+
+
 def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30):
     """Per-replicate correlation of signed LD `r` across the two demes.
 
@@ -56,68 +123,10 @@ def cross_deme_ld_corr(t_div, bigM, reps, seed, n_dip=30):
     `m = bigM / (4 Ne)`. SNP pairs are kept only if common in BOTH demes, so the
     estimator is not dominated by sites segregating in one of them.
     """
-    import msprime
-    m = bigM / (4.0 * NE)
-    out = []
-    for r in range(reps):
-        dem = msprime.Demography()
-        dem.add_population(name="A", initial_size=NE)
-        dem.add_population(name="B", initial_size=NE)
-        dem.add_population(name="ANC", initial_size=NE)
-        if m > 0:
-            dem.set_symmetric_migration_rate(["A", "B"], m)
-        dem.add_population_split(time=t_div, derived=["A", "B"],
-                                 ancestral="ANC")
-        ts = msprime.sim_ancestry(
-            samples={"A": n_dip, "B": n_dip}, demography=dem,
-            sequence_length=SEQ, recombination_rate=RHO,
-            random_seed=seed + r)
-        ts = msprime.sim_mutations(ts, rate=MU, random_seed=seed + 5000 + r)
-        if ts.num_sites < 20:
-            continue
-        gm = ts.genotype_matrix()
-        A = ts.samples(population=0)
-        B = ts.samples(population=1)
-        ga, gb = gm[:, A], gm[:, B]
-        fa, fb = ga.mean(axis=1), gb.mean(axis=1)
-        keep = (np.minimum(fa, 1 - fa) > 0.05) & (np.minimum(fb, 1 - fb) > 0.05)
-        idx = np.flatnonzero(keep)
-        if idx.size < 20:
-            continue
-        # A fixed stride over the kept sites gives pairs spanning the whole
-        # sequence at a bounded cost, rather than all O(n^2) of them.
-        idx = idx[:400]
-        # SPLIT-HALF, for the reason battery_bulk51 records at length: the
-        # naive correlation of r between demes is attenuated by the sampling
-        # noise in r itself, and the panmictic control detects it at twelve
-        # sems. Every product below is between DISJOINT halves, so no
-        # E[noise^2] term survives.
-        #
-        # This battery reports a RATIO of two such correlations, and an
-        # attenuation common to both would cancel -- but only if it is the same
-        # size in both arms, and it is not: the noise-to-signal ratio in r
-        # depends on the LD level, which is the very thing migration changes.
-        a1, a2 = ga[:, :len(A) // 2], ga[:, len(A) // 2:]
-        b1, b2 = gb[:, :len(B) // 2], gb[:, len(B) // 2:]
-        ra1, ra2, rb1, rb2 = [], [], [], []
-        for k in range(0, len(idx) - 1, 2):
-            i, j = idx[k], idx[k + 1]
-            vals = [np.corrcoef(h[i], h[j])[0, 1] for h in (a1, a2, b1, b2)]
-            if all(np.isfinite(v) for v in vals):
-                ra1.append(vals[0]); ra2.append(vals[1])
-                rb1.append(vals[2]); rb2.append(vals[3])
-        if len(ra1) < 20:
-            continue
-        ra1 = np.asarray(ra1); ra2 = np.asarray(ra2)
-        rb1 = np.asarray(rb1); rb2 = np.asarray(rb2)
-        num = float(np.mean(ra1 * rb1))
-        da = float(np.mean(ra1 * ra2))
-        db = float(np.mean(rb1 * rb2))
-        if da > 0 and db > 0:
-            c = num / math.sqrt(da * db)
-            if np.isfinite(c):
-                out.append(float(c))
-    return simlib.summarize(out)
+    out = simlib.replicate_map(
+        _ld_corr_rep,
+        [(t_div, bigM, seed, n_dip, r) for r in range(reps)])
+    return simlib.summarize([x for x in out if x is not None])
 
 
 def main():
