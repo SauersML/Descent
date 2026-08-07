@@ -615,46 +615,16 @@ attribute [local simp] Descent.Core.scaledMutationRate Descent.Core.scaledMigrat
 that the mechanistic target state can vary with time. Recombination, mutation,
 and migration are set to zero here so the witness isolates allele-frequency
 drift while still flowing through the same public API. -/
-noncomputable def baselineGenerationalPopGen : Descent.Core.PopGenParameters := {
-  Ne := 1
-  mu := 0
-  mig := 0
-  nDemes := 2
-  t_div := 0
-  recomb := 0
-  V_A := 1
-  Ne_pos := by norm_num
-  mu_nonneg := by norm_num
-  t_div_nonneg := by norm_num
-  mig_nonneg := by norm_num
-  nDemes_ge_two := by norm_num
-  recomb_nonneg := by norm_num
-  recomb_le_half := by norm_num
-  V_A_pos := by norm_num
-}
+noncomputable def baselineGenerationalPopGen : Descent.Core.PopGenParameters :=
+  Descent.Core.PopGenParameters.ofLiterals 1 0 0 2 0 0 1 (by norm_num)
 
 /-- Nondegenerate generation-indexed population-genetic parameters with positive mutation,
 migration, and recombination. This witness is used to show
 that the public generational portability API changes because of explicit
 population-genetic coordinates, not only because of hand-injected AF/effect
 paths. -/
-noncomputable def nondegenerateGenerationalPopGen : Descent.Core.PopGenParameters := {
-  Ne := 1
-  mu := 1 / 2
-  mig := 1 / 8
-  nDemes := 2
-  t_div := 0
-  recomb := 1 / 4
-  V_A := 1
-  Ne_pos := by norm_num
-  mu_nonneg := by norm_num
-  t_div_nonneg := by norm_num
-  mig_nonneg := by norm_num
-  nDemes_ge_two := by norm_num
-  recomb_nonneg := by norm_num
-  recomb_le_half := by norm_num
-  V_A_pos := by norm_num
-}
+noncomputable def nondegenerateGenerationalPopGen : Descent.Core.PopGenParameters :=
+  Descent.Core.PopGenParameters.ofLiterals 1 (1 / 2) (1 / 8) 2 0 (1 / 4) 1 (by norm_num)
 
 /-- The chosen mutation scale makes the differentiation transient's retention
 factor vanish exactly at generation one. -/

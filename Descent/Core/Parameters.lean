@@ -134,6 +134,62 @@ structure PopGenParameters where
 
 namespace PopGenParameters
 
+/-- **A record from literal values, with the eight constraints as one obligation.**
+
+Every witness in this corpus is seven numerals followed by the same eight `by norm_num`
+lines, and `duplication` reads those eight lines as what they are: one block of text
+written out once per witness. Taking the constraints as a single conjunction lets a
+caller discharge them with one `by norm_num`, which is also the more honest shape --
+there is one arithmetic check here, on literals, not eight independent ones.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a parameter record and the
+    laws computed from it. What carries a status is a claim that a population
+    reaches these values, which is asked where the demography is. -/
+noncomputable def ofLiterals (Ne mu mig nDemes t_div recomb V_A : ℝ)
+    (h : 0 < Ne ∧ 0 ≤ mu ∧ 0 ≤ mig ∧ 2 ≤ nDemes ∧ 0 ≤ t_div ∧ 0 ≤ recomb
+      ∧ recomb ≤ 1 / 2 ∧ 0 < V_A) : PopGenParameters where
+  Ne := Ne
+  mu := mu
+  mig := mig
+  nDemes := nDemes
+  t_div := t_div
+  recomb := recomb
+  V_A := V_A
+  Ne_pos := h.1
+  mu_nonneg := h.2.1
+  mig_nonneg := h.2.2.1
+  nDemes_ge_two := h.2.2.2.1
+  t_div_nonneg := h.2.2.2.2.1
+  recomb_nonneg := h.2.2.2.2.2.1
+  recomb_le_half := h.2.2.2.2.2.2.1
+  V_A_pos := h.2.2.2.2.2.2.2
+
+/-- The seven projections of `ofLiterals`, which are the seven arguments.  Needed as
+`simp` lemmas rather than left to definitional unfolding: a witness written as a record
+literal exposes its fields to `simp` and `norm_num` directly, and every downstream proof
+about a witness was relying on exactly that.  A smart constructor that hides them would
+move the repetition out of the witnesses and into the proofs about them. -/
+@[simp] theorem ofLiterals_Ne (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).Ne = Ne := rfl
+
+@[simp] theorem ofLiterals_mu (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).mu = mu := rfl
+
+@[simp] theorem ofLiterals_mig (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).mig = mig := rfl
+
+@[simp] theorem ofLiterals_nDemes (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).nDemes = nDemes := rfl
+
+@[simp] theorem ofLiterals_t_div (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).t_div = t_div := rfl
+
+@[simp] theorem ofLiterals_recomb (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).recomb = recomb := rfl
+
+@[simp] theorem ofLiterals_V_A (Ne mu mig nDemes t_div recomb V_A : ℝ) (h) :
+    (ofLiterals Ne mu mig nDemes t_div recomb V_A h).V_A = V_A := rfl
+
 /-- **The record is inhabited**, at a standard human-scale setting: `Nₑ = 1000`,
 `μ = 10⁻⁵` per generation, `m = 10⁻³`, `d = 2` demes, `t = 2000` generations,
 `r = 10⁻²`, additive variance `1`.
