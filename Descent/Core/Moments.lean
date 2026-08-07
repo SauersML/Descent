@@ -1061,6 +1061,54 @@ theorem aucArgument_momentsUnderDrift_anti_of_params (p : PopGenParameters)
       aucArgument (momentsUnderDrift p.V_A V_E f₁) :=
   aucArgument_momentsUnderDrift_anti p.V_A V_E f₁ f₂ p.V_A_pos hE h1 h2 h0
 
+
+/-- **Deeper coalescent separation costs a demography Brier accuracy.**  The additive
+variance is the record's; only the separation moves. -/
+theorem brier_deployedR2FromTau_anti_of_params (p : PopGenParameters) (π V_E : ℝ)
+    (t₁ t₂ : Tau) (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value)
+    (hlt : t₁.value < t₂.value) :
+    brier π (momentsUnderDrift p.V_A V_E (fstFromTau t₁))
+      < brier π (momentsUnderDrift p.V_A V_E (fstFromTau t₂)) :=
+  brier_deployedR2FromTau_anti π p.V_A V_E t₁ t₂ hπ hπ1 p.V_A_pos hE h0 hlt
+
+/-- **And costs it discrimination.** -/
+theorem aucArgument_deployedR2FromTau_anti_of_params (p : PopGenParameters) (V_E : ℝ)
+    (t₁ t₂ : Tau) (hE : 0 < V_E) (h0 : 0 ≤ t₁.value) (hlt : t₁.value < t₂.value) :
+    aucArgument (momentsUnderDrift p.V_A V_E (fstFromTau t₂))
+      < aucArgument (momentsUnderDrift p.V_A V_E (fstFromTau t₁)) :=
+  aucArgument_deployedR2FromTau_anti p.V_A V_E t₁ t₂ p.V_A_pos hE h0 hlt
+
+/-- **More migration, strictly lower Brier risk.**  Two demographies alike but for
+migration: the one exchanging more migrants sits at strictly lower equilibrium
+differentiation, and a deployment against it reports strictly less Brier risk. The
+demography enters, the deployed number comes out, and no free `F_ST` appears. -/
+theorem brier_anti_in_migration_of_params (p q : PopGenParameters) (π V_E : ℝ)
+    (hπ : 0 < π) (hπ1 : π < 1) (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu)
+    (hd : p.nDemes = q.nDemes) (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig)
+    (hflow : 0 < p.mu + p.mig) :
+    brier π (momentsUnderDrift q.V_A V_E q.fstEquilibrium)
+      < brier π (momentsUnderDrift p.V_A V_E p.fstEquilibrium) := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt
+  have := brier_momentsUnderDrift_mono π q.V_A V_E q.fstEquilibrium p.fstEquilibrium hπ hπ1
+    (hV ▸ p.V_A_pos) hE hfst (p.fstEquilibrium_lt_one hflow)
+  rw [hV]
+  exact this
+
+/-- **And strictly better discrimination.**  Same two demographies, read through the AUC
+argument rather than the Brier score. -/
+theorem aucArgument_mono_in_migration_of_params (p q : PopGenParameters) (V_E : ℝ)
+    (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
+    (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
+    aucArgument (momentsUnderDrift p.V_A V_E p.fstEquilibrium)
+      < aucArgument (momentsUnderDrift q.V_A V_E q.fstEquilibrium) := by
+  have hfst : q.fstEquilibrium < p.fstEquilibrium :=
+    PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt
+  have := aucArgument_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium
+    (hV ▸ p.V_A_pos) hE hfst (p.fstEquilibrium_lt_one hflow) (q.fstEquilibrium_mem_unit).1
+  rw [hV]
+  exact this
+
 end ScoreMoments
 
 end Descent.Core
