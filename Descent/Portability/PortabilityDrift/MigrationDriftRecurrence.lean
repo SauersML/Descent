@@ -8,7 +8,9 @@ assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
-open PopGen (fstMigrationDriftEquilibrium)
+open PopGen (fstMigrationDriftEquilibrium
+  fstMigrationDriftEquilibrium_strictAnti_product
+  fstMigrationDriftEquilibrium_decreases_with_m)
 
 open MeasureTheory
 

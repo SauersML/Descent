@@ -419,4 +419,23 @@ noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
 noncomputable def fstMigrationDriftEquilibrium (Ne m : ℝ) : ℝ :=
   Descent.Core.fstFromFlow (4 * Ne * m)
 
+/-- **The equilibrium decreases when the migration-drift product rises.**
+
+Both monotonicities are this one fact: the equilibrium is `1 / (1 + 4 Ne m)`, so it falls
+whenever `Ne * m` rises, and whether that happened by moving `m` or by moving `Ne` is the
+caller's business.  Stated separately, each carried the same three-line proof. -/
+theorem fstMigrationDriftEquilibrium_strictAnti_product (Ne₁ m₁ Ne₂ m₂ : ℝ)
+    (h_pos : 0 < Ne₁ * m₁) (h_more : Ne₁ * m₁ < Ne₂ * m₂) :
+    fstMigrationDriftEquilibrium Ne₂ m₂ < fstMigrationDriftEquilibrium Ne₁ m₁ := by
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
+
+/-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
+    More migration → more gene flow → less differentiation. -/
+theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
+    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ :=
+  fstMigrationDriftEquilibrium_strictAnti_product Ne m₁ Ne m₂
+    (by positivity) (by nlinarith)
+
 end Descent.PopGen

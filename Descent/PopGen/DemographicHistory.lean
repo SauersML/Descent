@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.DriftRecurrences
-import Descent.Portability.PortabilityDrift.MigrationDrift
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -58,7 +58,7 @@ theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (h_more : m₁ < m₂) :
     fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁
       :=
-  Portability.fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
+  fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
 /-! The island-model `F_ST` has one definition, `fstMigrationDriftEquilibrium`. A second
 spelling in this module would need its own theorem tying it to that one, which is a

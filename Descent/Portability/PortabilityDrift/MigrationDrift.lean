@@ -9,7 +9,9 @@ assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
 
-open PopGen (effectiveSymmetricMigration ibdRecurrenceStep ibdRecurrenceFixedPoint
+open PopGen (effectiveSymmetricMigration
+  fstMigrationDriftEquilibrium_strictAnti_product
+  fstMigrationDriftEquilibrium_decreases_with_m ibdRecurrenceStep ibdRecurrenceFixedPoint
   islandFstMultiplicativeStep fstIslandMultiplicativeEquilibrium fstMigrationDriftEquilibrium)
 
 open MeasureTheory
@@ -288,25 +290,6 @@ theorem fstMigrationDriftEquilibrium_in_unit (Ne m : ℝ) (hNe : 0 < Ne) (hm : 0
     0 < fstMigrationDriftEquilibrium Ne m ∧ fstMigrationDriftEquilibrium Ne m < 1 :=
   ⟨fstMigrationDriftEquilibrium_pos Ne m hNe (le_of_lt hm),
    fstMigrationDriftEquilibrium_lt_one Ne m hNe hm⟩
-
-/-- **The equilibrium decreases when the migration-drift product rises.**
-
-Both monotonicities are this one fact: the equilibrium is `1 / (1 + 4 Ne m)`, so it falls
-whenever `Ne * m` rises, and whether that happened by moving `m` or by moving `Ne` is the
-caller's business.  Stated separately, each carried the same three-line proof. -/
-theorem fstMigrationDriftEquilibrium_strictAnti_product (Ne₁ m₁ Ne₂ m₂ : ℝ)
-    (h_pos : 0 < Ne₁ * m₁) (h_more : Ne₁ * m₁ < Ne₂ * m₂) :
-    fstMigrationDriftEquilibrium Ne₂ m₂ < fstMigrationDriftEquilibrium Ne₁ m₁ := by
-  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
-  apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
-
-/-- **Equilibrium Fst decreases with migration rate** (Ne fixed).
-    More migration → more gene flow → less differentiation. -/
-theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
-    (hNe : 0 < Ne) (hm₁ : 0 < m₁) (h_more : m₁ < m₂) :
-    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁ :=
-  fstMigrationDriftEquilibrium_strictAnti_product Ne m₁ Ne m₂
-    (by positivity) (by nlinarith)
 
 /-- **Equilibrium Fst decreases with effective population size** (m fixed).
     Larger Ne → slower drift relative to migration → less differentiation. -/
