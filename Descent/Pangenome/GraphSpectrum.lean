@@ -102,8 +102,9 @@ graph's own sample size: the spectrum sums to Watterson's `E(S)` evaluated at `w
 `n`. -/
 theorem graphSpectrum_total_eq {n : ℕ} (θ : Descent.Core.Theta) (s : Fin n → Fin n) :
     ∑ j ∈ Finset.range (graphSpectrumClasses s), graphSpectrum θ (j + 1)
-      = expectedSegregatingSites θ (Linkage.width s) :=
-  sum_expectedSpectrum θ (Linkage.width s)
+      = expectedSegregatingSites θ (Linkage.width s) := by
+  unfold graphSpectrumClasses graphSpectrum
+  exact sum_expectedSpectrum θ (Linkage.width s)
 
 /-! ### What is missing, and which end of the spectrum it comes from -/
 
