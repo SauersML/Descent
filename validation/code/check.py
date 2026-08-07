@@ -7841,7 +7841,6 @@ LAYER_PENDING = {
         "beside `hweHeterozygosity` it would be two names for one body in one namespace, "
         "which is what `duplication` reports, and the ledger keys of two VALIDATED "
         "battery records move with the name.",
-        "programme content in them.",
 }
 
 # The self-auditing directory.  See META in the header.
