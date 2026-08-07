@@ -3371,8 +3371,16 @@ INFLATED = re.compile(
 #   names where the statement is evaluated -- `F_ST = 1`, complete differentiation -- and
 #   its sibling is `r2_momentsUnderDrift_at_source`.  `_at_` introduces a location in
 #   parameter space, never a claim about a proof's status.
+#
+#   AN ARGUMENT.  `isCore_mono_in_construction` matched `_construction$`, but `_in_` is
+#   this corpus's convention for naming WHICH ARGUMENT a monotonicity is in --
+#   `deployedR2_mono_in_Ne`, `brier_anti_in_r2`, `core_antitone_in_sample`, twenty more.
+#   The token after it is a variable, not a claim, and reading `mono_in_construction` as
+#   "a construction was completed" is the regex meeting a naming convention rather than a
+#   defect.  The convention is load-bearing elsewhere: `shape-spine` prints these names as
+#   the spine it counts, so it cannot be renamed away to satisfy this rule.
 QUALIFIED_NAME_TOKEN = re.compile(
-    r"(?:^|_)(?:of|assuming|given|under|conditional|when|if|requires|at)_", re.I)
+    r"(?:^|_)(?:of|assuming|given|under|conditional|when|if|requires|at|in)_", re.I)
 STANDARD_PREDICATES = {
     "IsSofic", "IsFinitelyPresented", "HasPropertyT", "IsAmenable", "IsCompact",
     "IsOpen", "IsClosed", "IsIntegral", "Measurable", "Continuous", "Integrable",
