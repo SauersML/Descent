@@ -926,23 +926,41 @@ theorem deployedPortabilityRatio_mem_unit (p : PopGenParameters) (V_E : ℝ)
   portabilityRatio_mem_unit p.V_A V_E p.fstEquilibrium p.V_A_pos hE
     p.fstEquilibrium_mem_unit.1 (p.fstEquilibrium_lt_one hflow)
 
+/-- **A population's source `R2` is positive.**  Read at no differentiation, the deployed
+`R2` is the share its additive variance commands of its own phenotypic variance, and that
+share is positive because `V_A` is.  Every portability ratio divides by this, so it is
+stated once rather than re-derived at each of them. -/
+theorem r2_momentsUnderDrift_at_source_pos (p : PopGenParameters) (V_E : ℝ) (hE : 0 < V_E) :
+    0 < r2 (momentsUnderDrift p.V_A V_E 0) := by
+  rw [r2_momentsUnderDrift_at_source p.V_A V_E p.V_A_pos (le_of_lt hE)]
+  unfold share
+  have := p.V_A_pos
+  positivity
+
+/-- **Less differentiation, a higher portability ratio.**  The engine the four
+demographic laws below share, stated on the `F_ST` ordering itself so that each of them is
+the ordering plus a citation -- the same shape `deployedBrier_anti_of_fstEquilibrium_lt`
+already has for the Brier score. -/
+theorem deployedPortabilityRatio_lt_of_fstEquilibrium_lt (p q : PopGenParameters)
+    (V_E : ℝ) (hE : 0 < V_E) (hV : p.V_A = q.V_A)
+    (hfst : q.fstEquilibrium < p.fstEquilibrium) (hone : p.fstEquilibrium < 1) :
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
+  have hsrc := r2_momentsUnderDrift_at_source_pos q V_E hE
+  unfold deployedPortabilityRatio portabilityRatio ratio
+  rw [hV]
+  exact div_lt_div_of_pos_right
+    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
+      hfst hone) hsrc
+
 /-- **More migration, a higher portability ratio.** The reported quantity, moved by a
 demographic parameter, with every step a named map. -/
 theorem deployedPortabilityRatio_mono_in_migration (p q : PopGenParameters) (V_E : ℝ)
     (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.mig < q.mig) (hflow : 0 < p.mu + p.mig) :
-    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
-  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
-    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
-    unfold share
-    have := q.V_A_pos
-    positivity
-  unfold deployedPortabilityRatio portabilityRatio ratio
-  rw [hV]
-  exact div_lt_div_of_pos_right
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
-      (p.fstEquilibrium_lt_one hflow)) hsrc
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E :=
+  deployedPortabilityRatio_lt_of_fstEquilibrium_lt p q V_E hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_mig_lt p q hNe hmu hd hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **A history with no flow transfers nothing.** At zero migration and zero mutation the
 equilibrium is complete differentiation and the deployed `R²` is zero: two populations
@@ -1187,35 +1205,19 @@ Brier score and the AUC argument do, and the three axes below complete it. -/
 theorem deployedPortabilityRatio_mono_in_mutation (p q : PopGenParameters) (V_E : ℝ)
     (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.mu < q.mu) (hflow : 0 < p.mu + p.mig) :
-    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
-  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
-    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
-    unfold share
-    have := q.V_A_pos
-    positivity
-  unfold deployedPortabilityRatio portabilityRatio ratio
-  rw [hV]
-  exact div_lt_div_of_pos_right
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
-      (p.fstEquilibrium_lt_one hflow)) hsrc
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E :=
+  deployedPortabilityRatio_lt_of_fstEquilibrium_lt p q V_E hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_mu_lt p q hNe hmig hd hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **A larger effective size, a higher portability ratio.** -/
 theorem deployedPortabilityRatio_mono_in_Ne (p q : PopGenParameters) (V_E : ℝ)
     (hE : 0 < V_E) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig) (hd : p.nDemes = q.nDemes)
     (hV : p.V_A = q.V_A) (hlt : p.Ne < q.Ne) (hflow : 0 < p.mu + p.mig) :
-    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E := by
-  have hsrc : 0 < (momentsUnderDrift q.V_A V_E 0).r2 := by
-    rw [r2_momentsUnderDrift_at_source q.V_A V_E q.V_A_pos (le_of_lt hE)]
-    unfold share
-    have := q.V_A_pos
-    positivity
-  unfold deployedPortabilityRatio portabilityRatio ratio
-  rw [hV]
-  exact div_lt_div_of_pos_right
-    (r2_momentsUnderDrift_anti q.V_A V_E q.fstEquilibrium p.fstEquilibrium q.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
-      (p.fstEquilibrium_lt_one hflow)) hsrc
+    deployedPortabilityRatio p V_E < deployedPortabilityRatio q V_E :=
+  deployedPortabilityRatio_lt_of_fstEquilibrium_lt p q V_E hE hV
+    (PopGenParameters.fstEquilibrium_lt_of_Ne_lt p q hmu hmig hd hflow hlt)
+    (p.fstEquilibrium_lt_one hflow)
 
 /-- **More demes, a lower portability ratio.**  The one axis whose direction is opposite:
 a metapopulation split more finely differentiates further at the same flow, so less of the
@@ -1224,18 +1226,10 @@ theorem deployedPortabilityRatio_anti_in_demes (p q : PopGenParameters) (V_E : �
     (hE : 0 < V_E) (hNe : p.Ne = q.Ne) (hmu : p.mu = q.mu) (hmig : p.mig = q.mig)
     (hV : p.V_A = q.V_A) (hmigpos : 0 < p.mig) (hlt : p.nDemes < q.nDemes)
     (hflow : 0 < q.mu + q.mig) :
-    deployedPortabilityRatio q V_E < deployedPortabilityRatio p V_E := by
-  have hsrc : 0 < (momentsUnderDrift p.V_A V_E 0).r2 := by
-    rw [r2_momentsUnderDrift_at_source p.V_A V_E p.V_A_pos (le_of_lt hE)]
-    unfold share
-    have := p.V_A_pos
-    positivity
-  unfold deployedPortabilityRatio portabilityRatio ratio
-  rw [← hV]
-  exact div_lt_div_of_pos_right
-    (r2_momentsUnderDrift_anti p.V_A V_E p.fstEquilibrium q.fstEquilibrium p.V_A_pos hE
-      (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
-      (q.fstEquilibrium_lt_one hflow)) hsrc
+    deployedPortabilityRatio q V_E < deployedPortabilityRatio p V_E :=
+  deployedPortabilityRatio_lt_of_fstEquilibrium_lt q p V_E hE hV.symm
+    (PopGenParameters.fstEquilibrium_lt_of_nDemes_lt p q hNe hmu hmig hmigpos hlt)
+    (q.fstEquilibrium_lt_one hflow)
 
 
 /-! ### What two demographies look like to each metric
