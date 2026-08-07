@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Blindness.BundleRigidity
-import Descent.Blindness.BundleRigidity.CoverageInvariance
 import Descent.Blindness.BundleRigidity.EntropySplit
 import Descent.Blindness.BundleRigidity.Freshness
 import Descent.Core.Ratios

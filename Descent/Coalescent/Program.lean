@@ -2,9 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.CutCount
-import Descent.Coalescent.Encoding
-import Descent.Coalescent.StepLaw
-import Descent.Coalescent.PaintboxFrequency
 import Descent.Coalescent.Mutation
 import Mathlib.Tactic
 
