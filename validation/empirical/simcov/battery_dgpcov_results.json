@@ -1,43 +1,753 @@
 {
+ "_battery_sha": "82b6f92eee016a3d",
+ "results": [
+  {
+   "name": "ldBlockDetectionShare",
+   "file": "GeneticFrontier.lean",
+   "source": "ldBandDetectionShare decay (ldPanelRetentionFraction panel)",
+   "note": "the oracle is the UNIFORMLY THINNED panel, which is the reading `retainedMarkers / totalMarkers` most directly names. The control passing while this row fails is the whole finding: the band formula is right about DIRECTIONS and this definition hands it MARKERS; positive control 'the BAND operation the closed form is for -- normalised mass of the reciprocal symbol on |t| <= pi*kappa, by quadrature, at rho=0.2' passed at 0.33 sems",
+   "regime": "exact linear algebra on the AR(1) kernel Sigma_ij = rho^|i-j|, not a simulation: the surviving whitened detection weight of a retained panel S is tr((Sigma_SS)^-1)/tr(Sigma^-1), at panel sizes 512, 1024 and 2048 with the spread across sizes as the error bar, so a gap smaller than the finite-n variation cannot be reported",
+   "span": 0.49823290061992725,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.2 kappa=0.50",
+    "lean": 0.37757312069854204,
+    "truth": 0.4630549638742299,
+    "sem": 1.4066095382061694e-05,
+    "sems_off": 6077.155092002414,
+    "rel_err": 0.18460409637009212
+   },
+   "cells": [
+    {
+     "design": "rho=0.2 kappa=0.50",
+     "lean": 0.37757312069854204,
+     "truth": 0.4630549638742299,
+     "sem": 1.4066095382061694e-05,
+     "sems_off": 6077.155092002414,
+     "rel_err": 0.18460409637009212
+    },
+    {
+     "design": "rho=0.5 kappa=0.50",
+     "lean": 0.24535209105296746,
+     "truth": 0.3400638394927666,
+     "sem": 2.4139163888780172e-05,
+     "sems_off": 3923.572037381996,
+     "rel_err": 0.27851167175277897
+    },
+    {
+     "design": "rho=0.8 kappa=0.50",
+     "lean": 0.18945376957678955,
+     "truth": 0.2619322736852517,
+     "sem": 4.317131266668593e-05,
+     "sems_off": 1678.8580108288375,
+     "rel_err": 0.2767070399104587
+    }
+   ]
+  },
+  {
+   "name": "ldBlockDetectionShare [random half-panel, a second reading]",
+   "file": "GeneticFrontier.lean",
+   "source": "same body, scored against a randomly chosen half-panel",
+   "note": "carried to show the oracle is not unique: at one (decay, kappa) the thinned, random and contiguous panels disagree with EACH OTHER, so the retained detection weight is not a function of this definition's arguments at all and no repair of the constant can make it one; positive control 'the BAND operation the closed form is for -- normalised mass of the reciprocal symbol on |t| <= pi*kappa, by quadrature, at rho=0.2' passed at 0.33 sems",
+   "regime": "exact linear algebra on the AR(1) kernel Sigma_ij = rho^|i-j|, not a simulation: the surviving whitened detection weight of a retained panel S is tr((Sigma_SS)^-1)/tr(Sigma^-1), at panel sizes 512, 1024 and 2048 with the spread across sizes as the error bar, so a gap smaller than the finite-n variation cannot be reported",
+   "span": 0.49823290061992725,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.2 kappa=0.50",
+    "lean": 0.37757312069854204,
+    "truth": 0.48129777303645976,
+    "sem": 0.0005411383999831213,
+    "sems_off": 191.67860262948074,
+    "rel_err": 0.21551035169668292
+   },
+   "cells": [
+    {
+     "design": "rho=0.2 kappa=0.50",
+     "lean": 0.37757312069854204,
+     "truth": 0.48129777303645976,
+     "sem": 0.0005411383999831213,
+     "sems_off": 191.67860262948074,
+     "rel_err": 0.21551035169668292
+    },
+    {
+     "design": "rho=0.5 kappa=0.50",
+     "lean": 0.24535209105296746,
+     "truth": 0.41088889878349777,
+     "sem": 0.001464081246844817,
+     "sems_off": 113.06531525301077,
+     "rel_err": 0.40287486038349657
+    },
+    {
+     "design": "rho=0.8 kappa=0.50",
+     "lean": 0.18945376957678955,
+     "truth": 0.357287336819158,
+     "sem": 0.002879869218170811,
+     "sems_off": 58.27819061483988,
+     "rel_err": 0.46974395660520674
+    }
+   ]
+  },
+  {
+   "name": "ldBlockDetectionShare [contiguous half-panel, a third reading]",
+   "file": "GeneticFrontier.lean",
+   "source": "same body, scored against a contiguous half-panel",
+   "note": "the extreme of the same point: a contiguous block of an AR(1) chromosome keeps almost all the whitened weight, so the measured share is near kappa and the deficit near zero; the simulated truth moves by only 0.1% across the design",
+   "regime": "exact linear algebra on the AR(1) kernel Sigma_ij = rho^|i-j|, not a simulation: the surviving whitened detection weight of a retained panel S is tr((Sigma_SS)^-1)/tr(Sigma^-1), at panel sizes 512, 1024 and 2048 with the spread across sizes as the error bar, so a gap smaller than the finite-n variation cannot be reported",
+   "span": 0.49823290061992725,
+   "verdict": "DEGENERATE ORACLE",
+   "worst": {
+    "design": "rho=0.2 kappa=0.50",
+    "lean": 0.37757312069854204,
+    "truth": 0.4999561749495128,
+    "sem": 1.6565645432515347e-05,
+    "sems_off": 7387.762508230139,
+    "rel_err": 0.2447875641566571
+   },
+   "cells": [
+    {
+     "design": "rho=0.2 kappa=0.50",
+     "lean": 0.37757312069854204,
+     "truth": 0.4999561749495128,
+     "sem": 1.6565645432515347e-05,
+     "sems_off": 7387.762508230139,
+     "rel_err": 0.2447875641566571
+    },
+    {
+     "design": "rho=0.5 kappa=0.50",
+     "lean": 0.24535209105296746,
+     "truth": 0.4997720018115474,
+     "sem": 8.621129960280682e-05,
+     "sems_off": 2951.1202351750267,
+     "rel_err": 0.509071956484901
+    },
+    {
+     "design": "rho=0.8 kappa=0.50",
+     "lean": 0.18945376957678955,
+     "truth": 0.49955487718076136,
+     "sem": 0.000168378135945881,
+     "sems_off": 1841.694623009976,
+     "rel_err": 0.6207548394963689
+    }
+   ]
+  },
+  {
+   "name": "ldBlockPruningDeficit",
+   "file": "GeneticFrontier.lean",
+   "source": "ldPruningDetectionDeficit decay (ldPanelRetentionFraction panel)",
+   "note": "the complement of the row above and falsified for the same reason; it prices the loss at between 1.6 and 800 times what the kernel exacts, depending on which markers are kept; positive control 'the BAND operation the closed form is for -- normalised mass of the reciprocal symbol on |t| <= pi*kappa, by quadrature, at rho=0.2' passed at 0.33 sems",
+   "regime": "exact linear algebra on the AR(1) kernel Sigma_ij = rho^|i-j|, not a simulation: the surviving whitened detection weight of a retained panel S is tr((Sigma_SS)^-1)/tr(Sigma^-1), at panel sizes 512, 1024 and 2048 with the spread across sizes as the error bar, so a gap smaller than the finite-n variation cannot be reported",
+   "span": 0.6057692307692308,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.2 kappa=0.50",
+    "lean": 0.12242687930145796,
+    "truth": 0.0369450361257701,
+    "sem": 1.4066095382061694e-05,
+    "sems_off": 6077.155092002414,
+    "rel_err": 2.3137571955454685
+   },
+   "cells": [
+    {
+     "design": "rho=0.2 kappa=0.50",
+     "lean": 0.12242687930145796,
+     "truth": 0.0369450361257701,
+     "sem": 1.4066095382061694e-05,
+     "sems_off": 6077.155092002414,
+     "rel_err": 2.3137571955454685
+    },
+    {
+     "design": "rho=0.5 kappa=0.50",
+     "lean": 0.25464790894703254,
+     "truth": 0.15993616050723342,
+     "sem": 2.4139163888780172e-05,
+     "sems_off": 3923.572037381996,
+     "rel_err": 0.5921847075697156
+    },
+    {
+     "design": "rho=0.8 kappa=0.50",
+     "lean": 0.31054623042321045,
+     "truth": 0.23806772631474832,
+     "sem": 4.317131266668593e-05,
+     "sems_off": 1678.8580108288375,
+     "rel_err": 0.3044448957043367
+    }
+   ]
+  },
+  {
+   "name": "requiredEffectiveSampleSizeForTraceMSE",
+   "file": "CalibrationVsDiscrimination.lean",
+   "source": "(d / I) / tau",
+   "note": "the prediction is the TARGET the formula promises and the oracle is the trace MSE actually attained at the size it prescribes, so the row asks the only question the definition makes: does this many samples buy that much accuracy",
+   "regime": "two exponential families with different Fisher information, so `I` is not a relabelled variance; for each candidate formula the sample size it prescribes is computed, `d` coordinates are drawn at that size over 4000 replicates, and the measured trace MSE is compared against the target tau the formula promised",
+   "span": 0.7999999999999999,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "bernoulli d=5 tau=0.10",
+    "lean": 0.1,
+    "truth": 0.10270000000000001,
+    "sem": 0.000968013048628777,
+    "sems_off": 2.7892185997127297,
+    "rel_err": 0.026290165530671934
+   },
+   "cells": [
+    {
+     "design": "gaussian d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.09849548145095327,
+     "sem": 0.0009730946191940874,
+     "sems_off": 1.546117427196104,
+     "rel_err": 0.015275000709508931
+    },
+    {
+     "design": "gaussian d=20 tau=0.02",
+     "lean": 0.02,
+     "truth": 0.019978253474541303,
+     "sem": 0.00010011153870653193,
+     "sems_off": 0.2172229668993997,
+     "rel_err": 0.0010885098382803582
+    },
+    {
+     "design": "bernoulli d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.10270000000000001,
+     "sem": 0.000968013048628777,
+     "sems_off": 2.7892185997127297,
+     "rel_err": 0.026290165530671934
+    },
+    {
+     "design": "bernoulli d=12 tau=0.05",
+     "lean": 0.05,
+     "truth": 0.0504402,
+     "sem": 0.0003207925855763194,
+     "sems_off": 1.3722262290107303,
+     "rel_err": 0.008727166030269403
+    }
+   ]
+  },
+  {
+   "name": "requiredEffectiveSampleSizeForTraceMSE [tau squared, competing]",
+   "file": "CalibrationVsDiscrimination.lean",
+   "source": "(d / I) / tau^2",
+   "note": "the dimensional error that oversamples by 1/tau; positive control 'trace MSE of 5 coordinates at a FIXED n=3777, d/(n*I) -- a size no candidate produced (gaussian)' passed at 1.15 sems",
+   "regime": "two exponential families with different Fisher information, so `I` is not a relabelled variance; for each candidate formula the sample size it prescribes is computed, `d` coordinates are drawn at that size over 4000 replicates, and the measured trace MSE is compared against the target tau the formula promised",
+   "span": 0.7999999999999999,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "gaussian d=20 tau=0.02",
+    "lean": 0.02,
+    "truth": 0.00039997493542449735,
+    "sem": 1.995479345189886e-06,
+    "sems_off": 9822.213951661026,
+    "rel_err": 49.00313326827293
+   },
+   "cells": [
+    {
+     "design": "gaussian d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.009980231878482364,
+     "sem": 0.0001011511081722037,
+     "sems_off": 889.9533554122252,
+     "rel_err": 9.019807276783075
+    },
+    {
+     "design": "gaussian d=20 tau=0.02",
+     "lean": 0.02,
+     "truth": 0.00039997493542449735,
+     "sem": 1.995479345189886e-06,
+     "sems_off": 9822.213951661026,
+     "rel_err": 49.00313326827293
+    },
+    {
+     "design": "bernoulli d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.0099243537414966,
+     "sem": 9.999828165261903e-05,
+     "sems_off": 900.7719409760904,
+     "rel_err": 9.076222855889448
+    },
+    {
+     "design": "bernoulli d=12 tau=0.05",
+     "lean": 0.05,
+     "truth": 0.0024803702325837743,
+     "sem": 1.5816888433190083e-05,
+     "sems_off": 3004.3601791931,
+     "rel_err": 19.158280946597056
+    }
+   ]
+  },
+  {
+   "name": "requiredEffectiveSampleSizeForTraceMSE [info multiplied, competing]",
+   "file": "CalibrationVsDiscrimination.lean",
+   "source": "(d * I) / tau",
+   "note": "information multiplied where it should divide, which inverts the dependence on how sharp each observation is; positive control 'trace MSE of 5 coordinates at a FIXED n=3777, d/(n*I) -- a size no candidate produced (gaussian)' passed at 1.15 sems",
+   "regime": "two exponential families with different Fisher information, so `I` is not a relabelled variance; for each candidate formula the sample size it prescribes is computed, `d` coordinates are drawn at that size over 4000 replicates, and the measured trace MSE is compared against the target tau the formula promised",
+   "span": 0.7999999999999999,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "bernoulli d=12 tau=0.05",
+    "lean": 0.05,
+    "truth": 0.002210146128934233,
+    "sem": 1.4474492975345247e-05,
+    "sems_off": 3301.659958139285,
+    "rel_err": 21.622938522219243
+   },
+   "cells": [
+    {
+     "design": "gaussian d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 1.6662209621406867,
+     "sem": 0.016308495796195505,
+     "sems_off": 96.03711965306202,
+     "rel_err": 0.9399839503450224
+    },
+    {
+     "design": "gaussian d=20 tau=0.02",
+     "lean": 0.02,
+     "truth": 0.31857115660616675,
+     "sem": 0.0015834948632820161,
+     "sems_off": 188.55202093130632,
+     "rel_err": 0.9372196773459783
+    },
+    {
+     "design": "bernoulli d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.004354910493609209,
+     "sem": 4.3504535969232194e-05,
+     "sems_off": 2198.508439994259,
+     "rel_err": 21.962584454203842
+    },
+    {
+     "design": "bernoulli d=12 tau=0.05",
+     "lean": 0.05,
+     "truth": 0.002210146128934233,
+     "sem": 1.4474492975345247e-05,
+     "sems_off": 3301.659958139285,
+     "rel_err": 21.622938522219243
+    }
+   ]
+  },
+  {
+   "name": "requiredEffectiveSampleSizeForTraceMSE [d squared, competing]",
+   "file": "CalibrationVsDiscrimination.lean",
+   "source": "(d^2 / I) / tau",
+   "note": "the coordinate count squared, which is what a per-coordinate budget summed d times would give; positive control 'trace MSE of 5 coordinates at a FIXED n=3777, d/(n*I) -- a size no candidate produced (gaussian)' passed at 1.15 sems",
+   "regime": "two exponential families with different Fisher information, so `I` is not a relabelled variance; for each candidate formula the sample size it prescribes is computed, `d` coordinates are drawn at that size over 4000 replicates, and the measured trace MSE is compared against the target tau the formula promised",
+   "span": 0.7999999999999999,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "gaussian d=20 tau=0.02",
+    "lean": 0.02,
+    "truth": 0.0009968579624737824,
+    "sem": 4.969712745335476e-06,
+    "sems_off": 3823.7908328529415,
+    "rel_err": 19.06303882086512
+   },
+   "cells": [
+    {
+     "design": "gaussian d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.02023709520963306,
+     "sem": 0.00020287720768210127,
+     "sems_off": 393.1585302344635,
+     "rel_err": 3.9414206418517517
+    },
+    {
+     "design": "gaussian d=20 tau=0.02",
+     "lean": 0.02,
+     "truth": 0.0009968579624737824,
+     "sem": 4.969712745335476e-06,
+     "sems_off": 3823.7908328529415,
+     "rel_err": 19.06303882086512
+    },
+    {
+     "design": "bernoulli d=5 tau=0.10",
+     "lean": 0.1,
+     "truth": 0.01998139792899408,
+     "sem": 0.0001961583847841126,
+     "sems_off": 407.9285326450488,
+     "rel_err": 4.004654847241425
+    },
+    {
+     "design": "bernoulli d=12 tau=0.05",
+     "lean": 0.05,
+     "truth": 0.004131613960795028,
+     "sem": 2.6817858225547023e-05,
+     "sems_off": 1710.3672356471102,
+     "rel_err": 11.101808270194423
+    }
+   ]
+  },
+  {
+   "name": "gwasDiscovered",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "z^2 <= discoveryNCP n beta maf ld, i.e. n*beta^2*ld^2*2p(1-p)",
+   "note": "the predicate is a threshold on `discoveryNCP`, so what is measurable about it is whether that threshold is the noncentrality the Wald statistic actually has; the two competitors are the ploidy and LD-power errors that would leave the predicate looking the same",
+   "regime": "3000 replicate two-locus GWASes per cell, haplotypes drawn at D = D' * Dmax and the tag regressed on the phenotype the CAUSAL variant generated; the noncentrality is mean(chi2)-1 over replicates and both `maf` and `ld` are REMEASURED from the realised genotype draws rather than taken from the parameters that generated them",
+   "span": 0.8368453633267923,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "n=2000 beta=0.05 D'=1.0",
+    "lean": 2.100355587604931,
+    "truth": 1.9998111779817371,
+    "sem": 0.0574106294975671,
+    "sems_off": 1.751320452381637,
+    "rel_err": 0.05027695150932494
+   },
+   "cells": [
+    {
+     "design": "n=2000 beta=0.05 D'=1.0",
+     "lean": 2.100355587604931,
+     "truth": 1.9998111779817371,
+     "sem": 0.0574106294975671,
+     "sems_off": 1.751320452381637,
+     "rel_err": 0.05027695150932494
+    },
+    {
+     "design": "n=4000 beta=0.04 D'=0.8",
+     "lean": 0.3426827527802242,
+     "truth": 0.3545236200266799,
+     "sem": 0.033089620748101435,
+     "sems_off": 0.35784233783142133,
+     "rel_err": 0.03339937475975403
+    },
+    {
+     "design": "n=1500 beta=0.07 D'=0.6",
+     "lean": 0.47869418737199987,
+     "truth": 0.5073255273234365,
+     "sem": 0.03739714409603032,
+     "sems_off": 0.7656023111795808,
+     "rel_err": 0.056435835394467
+    }
+   ]
+  },
+  {
+   "name": "gwasDiscovered [ploidy halved, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "n*beta^2*ld^2*p(1-p), the haploid genotype variance",
+   "note": "a factor of two that no cell of a one-ploidy design could see; positive control 'null cell (beta = 0) on the same draws and the same OLS: E[chi2] - 1 = 0, n=4000' passed at 0.65 sems",
+   "regime": "3000 replicate two-locus GWASes per cell, haplotypes drawn at D = D' * Dmax and the tag regressed on the phenotype the CAUSAL variant generated; the noncentrality is mean(chi2)-1 over replicates and both `maf` and `ld` are REMEASURED from the realised genotype draws rather than taken from the parameters that generated them",
+   "span": 0.8368453633267923,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n=2000 beta=0.05 D'=1.0",
+    "lean": 1.0501777938024655,
+    "truth": 1.9998111779817371,
+    "sem": 0.0574106294975671,
+    "sems_off": 16.541072489363916,
+    "rel_err": 0.4748615242453375
+   },
+   "cells": [
+    {
+     "design": "n=2000 beta=0.05 D'=1.0",
+     "lean": 1.0501777938024655,
+     "truth": 1.9998111779817371,
+     "sem": 0.0574106294975671,
+     "sems_off": 16.541072489363916,
+     "rel_err": 0.4748615242453375
+    },
+    {
+     "design": "n=4000 beta=0.04 D'=0.8",
+     "lean": 0.1713413763901121,
+     "truth": 0.3545236200266799,
+     "sem": 0.033089620748101435,
+     "sems_off": 5.535942676135935,
+     "rel_err": 0.516699687379877
+    },
+    {
+     "design": "n=1500 beta=0.07 D'=0.6",
+     "lean": 0.23934709368599993,
+     "truth": 0.5073255273234365,
+     "sem": 0.03739714409603032,
+     "sems_off": 7.165745944377669,
+     "rel_err": 0.5282179176972335
+    }
+   ]
+  },
+  {
+   "name": "gwasDiscovered [LD at first power, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "n*beta^2*ld*2p(1-p), the correlation where r^2 belongs",
+   "note": "the D' sweep is what separates these: at D' = 1 the two agree and the design deliberately does not stay there; positive control 'null cell (beta = 0) on the same draws and the same OLS: E[chi2] - 1 = 0, n=4000' passed at 0.65 sems",
+   "regime": "3000 replicate two-locus GWASes per cell, haplotypes drawn at D = D' * Dmax and the tag regressed on the phenotype the CAUSAL variant generated; the noncentrality is mean(chi2)-1 over replicates and both `maf` and `ld` are REMEASURED from the realised genotype draws rather than taken from the parameters that generated them",
+   "span": 0.6438316517865735,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n=1500 beta=0.07 D'=0.6",
+    "lean": 1.299542688434992,
+    "truth": 0.5073255273234365,
+    "sem": 0.03739714409603032,
+    "sems_off": 21.18389465990396,
+    "rel_err": 1.561555881666667
+   },
+   "cells": [
+    {
+     "design": "n=2000 beta=0.05 D'=1.0",
+     "lean": 2.100355587604931,
+     "truth": 1.9998111779817371,
+     "sem": 0.0574106294975671,
+     "sems_off": 1.751320452381637,
+     "rel_err": 0.05027695150932494
+    },
+    {
+     "design": "n=4000 beta=0.04 D'=0.8",
+     "lean": 0.748080180298089,
+     "truth": 0.3545236200266799,
+     "sem": 0.033089620748101435,
+     "sems_off": 11.89365581634809,
+     "rel_err": 1.1100996888212742
+    },
+    {
+     "design": "n=1500 beta=0.07 D'=0.6",
+     "lean": 1.299542688434992,
+     "truth": 0.5073255273234365,
+     "sem": 0.03739714409603032,
+     "sems_off": 21.18389465990396,
+     "rel_err": 1.561555881666667
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [posterior-mean borrowing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "discoveryNCP (multiTraitEffectiveSampleSize n1 rg n2 tau2) beta maf ld, at the analytic posterior mean",
+   "note": "the same composition `battery_dgpcov4` tests with drawn cohorts and inverse-variance weights; agreement between two borrowing rules is what makes the effective-sample-size reading a property of the composition rather than of one estimator; positive control 'realised genetic correlation reproduces the nominal one it was drawn at (rg=0.6)' passed at 0.77 sems",
+   "regime": "20000 replicate SNPs per cell, effect PAIRS drawn from a bivariate prior and per-SNP GWAS estimates drawn at their sampling variances; the borrowed estimator is the posterior mean under that prior and the statistic is normalised by ITS OWN sampling sd at fixed effects, so the noncentrality is frequentist and prior shrinkage is not credited as information; rg and the effect scale are REMEASURED from the drawn pairs",
+   "span": 0.654453456047313,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n1=4000 n2=8000 rg=0.6",
+    "lean": 0.24331462562056372,
+    "truth": 0.3583281723393572,
+    "sem": 0.013459320108507793,
+    "sems_off": 8.545271662429077,
+    "rel_err": 0.320972660251422
+   },
+   "cells": [
+    {
+     "design": "n1=4000 n2=8000 rg=0.6",
+     "lean": 0.24331462562056372,
+     "truth": 0.3583281723393572,
+     "sem": 0.013459320108507793,
+     "sems_off": 8.545271662429077,
+     "rel_err": 0.320972660251422
+    },
+    {
+     "design": "n1=4000 n2=8000 rg=0.9",
+     "lean": 0.4008807568883209,
+     "truth": 0.47467040997302656,
+     "sem": 0.014833093260660703,
+     "sems_off": 4.974663867340834,
+     "rel_err": 0.15545450387122042
+    },
+    {
+     "design": "n1=6000 n2=3000 rg=0.5",
+     "lean": 0.13852296007989662,
+     "truth": 0.13837980236007774,
+     "sem": 0.011435089734206191,
+     "sems_off": 0.012519160159333359,
+     "rel_err": 0.0010345275638302019
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [n1 alone, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "n1 * tau2 * 2p(1-p)",
+   "note": "no borrowing at all: the floor the composition has to clear; positive control 'realised genetic correlation reproduces the nominal one it was drawn at (rg=0.6)' passed at 0.77 sems",
+   "regime": "20000 replicate SNPs per cell, effect PAIRS drawn from a bivariate prior and per-SNP GWAS estimates drawn at their sampling variances; the borrowed estimator is the posterior mean under that prior and the statistic is normalised by ITS OWN sampling sd at fixed effects, so the noncentrality is frequentist and prior shrinkage is not credited as information; rg and the effect scale are REMEASURED from the drawn pairs",
+   "span": 0.252477699485675,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n1=4000 n2=8000 rg=0.9",
+    "lean": 0.16660731687692681,
+    "truth": 0.47467040997302656,
+    "sem": 0.014833093260660703,
+    "sems_off": 20.76863454456416,
+    "rel_err": 0.6490042071794735
+   },
+   "cells": [
+    {
+     "design": "n1=4000 n2=8000 rg=0.6",
+     "lean": 0.16526566810148943,
+     "truth": 0.3583281723393572,
+     "sem": 0.013459320108507793,
+     "sems_off": 14.344149829368478,
+     "rel_err": 0.5387868416191026
+    },
+    {
+     "design": "n1=4000 n2=8000 rg=0.9",
+     "lean": 0.16660731687692681,
+     "truth": 0.47467040997302656,
+     "sem": 0.014833093260660703,
+     "sems_off": 20.76863454456416,
+     "rel_err": 0.6490042071794735
+    },
+    {
+     "design": "n1=6000 n2=3000 rg=0.5",
+     "lean": 0.12454268479435945,
+     "truth": 0.13837980236007774,
+     "sem": 0.011435089734206191,
+     "sems_off": 1.2100576285227413,
+     "rel_err": 0.09999376592338785
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [small-prior limit, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "(n1 + rg^2*n2) * tau2 * 2p(1-p)",
+   "note": "credits the second cohort its full size scaled by rg^2 and ignores the prior's own variance; positive control 'realised genetic correlation reproduces the nominal one it was drawn at (rg=0.6)' passed at 0.77 sems",
+   "regime": "20000 replicate SNPs per cell, effect PAIRS drawn from a bivariate prior and per-SNP GWAS estimates drawn at their sampling variances; the borrowed estimator is the posterior mean under that prior and the statistic is normalised by ITS OWN sampling sd at fixed effects, so the noncentrality is frequentist and prior shrinkage is not credited as information; rg and the effect scale are REMEASURED from the drawn pairs",
+   "span": 0.678945792097914,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n1=4000 n2=8000 rg=0.6",
+    "lean": 0.28288098983177723,
+    "truth": 0.3583281723393572,
+    "sem": 0.013459320108507793,
+    "sems_off": 5.605571596435167,
+    "rel_err": 0.2105533093170447
+   },
+   "cells": [
+    {
+     "design": "n1=4000 n2=8000 rg=0.6",
+     "lean": 0.28288098983177723,
+     "truth": 0.3583281723393572,
+     "sem": 0.013459320108507793,
+     "sems_off": 5.605571596435167,
+     "rel_err": 0.2105533093170447
+    },
+    {
+     "design": "n1=4000 n2=8000 rg=0.9",
+     "lean": 0.4363082897811068,
+     "truth": 0.47467040997302656,
+     "sem": 0.014833093260660703,
+     "sems_off": 2.5862522076673717,
+     "rel_err": 0.08081843608936927
+    },
+    {
+     "design": "n1=6000 n2=3000 rg=0.5",
+     "lean": 0.1400786123767871,
+     "truth": 0.13837980236007774,
+     "sem": 0.011435089734206191,
+     "sems_off": 0.1485611443544374,
+     "rel_err": 0.012276430430857835
+    }
+   ]
+  },
+  {
+   "name": "multiTraitDiscoveryNCP [pooled, competing]",
+   "file": "GeneticArchitectureDiscovery.lean",
+   "source": "(n1 + n2) * tau2 * 2p(1-p)",
+   "note": "pooling outright, which ignores rg entirely; positive control 'realised genetic correlation reproduces the nominal one it was drawn at (rg=0.6)' passed at 0.77 sems",
+   "regime": "20000 replicate SNPs per cell, effect PAIRS drawn from a bivariate prior and per-SNP GWAS estimates drawn at their sampling variances; the borrowed estimator is the posterior mean under that prior and the statistic is normalised by ITS OWN sampling sd at fixed effects, so the noncentrality is frequentist and prior shrinkage is not credited as information; rg and the effect scale are REMEASURED from the drawn pairs",
+   "span": 0.6262388497428375,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "n1=4000 n2=8000 rg=0.6",
+    "lean": 0.49579700430446827,
+    "truth": 0.3583281723393572,
+    "sem": 0.013459320108507793,
+    "sems_off": 10.21365350232033,
+    "rel_err": 0.3836394751426919
+   },
+   "cells": [
+    {
+     "design": "n1=4000 n2=8000 rg=0.6",
+     "lean": 0.49579700430446827,
+     "truth": 0.3583281723393572,
+     "sem": 0.013459320108507793,
+     "sems_off": 10.21365350232033,
+     "rel_err": 0.3836394751426919
+    },
+    {
+     "design": "n1=4000 n2=8000 rg=0.9",
+     "lean": 0.49982195063078044,
+     "truth": 0.47467040997302656,
+     "sem": 0.014833093260660703,
+     "sems_off": 1.6956369258770214,
+     "rel_err": 0.05298737846157954
+    },
+    {
+     "design": "n1=6000 n2=3000 rg=0.5",
+     "lean": 0.18681402719153917,
+     "truth": 0.13837980236007774,
+     "sem": 0.011435089734206191,
+     "sems_off": 4.23557890294279,
+     "rel_err": 0.3500093511149181
+    }
+   ]
+  }
+ ],
  "group_d_ldBlockDetectionShare": [
   {
    "rho": 0.2,
    "kappa": 0.5,
    "body": 0.37757312069854204,
-   "band_control": 0.3775736206986427,
-   "thin": 0.46304964661962605,
+   "band_control": 0.37757362069864264,
+   "band_se": 1.500001510335025e-06,
+   "thin": 0.4630549638742299,
+   "thin_se": 1.4066095382061694e-05,
    "thin_closed": 0.4630177514792899,
    "submatrix_of_inverse": 0.5,
-   "random_panel": 0.4803994572604332,
-   "contiguous_panel": 0.4999624370821126,
+   "subinv_se": 0.0,
+   "random_panel": 0.48129777303645976,
+   "random_se": 0.0005411383999831213,
+   "contiguous_panel": 0.4999561749495128,
+   "contiguous_se": 1.6565645432515347e-05,
+   "panel_sizes": [
+    512,
+    1024,
+    2048
+   ],
    "deficit_body": 0.12242687930145796,
-   "deficit_thin": 0.036950353380373946
+   "deficit_thin": 0.0369450361257701
   },
   {
    "rho": 0.5,
    "kappa": 0.5,
    "body": 0.24535209105296746,
-   "band_control": 0.24535259105317686,
-   "thin": 0.3400547088706525,
+   "band_control": 0.24535259105317683,
+   "band_se": 1.5000031416689819e-06,
+   "thin": 0.3400638394927666,
+   "thin_se": 2.4139163888780172e-05,
    "thin_closed": 0.34,
    "submatrix_of_inverse": 0.5,
-   "random_panel": 0.41789531758199827,
-   "contiguous_panel": 0.4998046111762407,
+   "subinv_se": 0.0,
+   "random_panel": 0.41088889878349777,
+   "random_se": 0.001464081246844817,
+   "contiguous_panel": 0.4997720018115474,
+   "contiguous_se": 8.621129960280682e-05,
+   "panel_sizes": [
+    512,
+    1024,
+    2048
+   ],
    "deficit_body": 0.25464790894703254,
-   "deficit_thin": 0.15994529112934752
+   "deficit_thin": 0.15993616050723342
   },
   {
    "rho": 0.8,
    "kappa": 0.5,
    "body": 0.18945376957678955,
-   "band_control": 0.189454269577045,
-   "thin": 0.2619486149094901,
+   "band_control": 0.18945426957704495,
+   "band_se": 1.5000038312840136e-06,
+   "thin": 0.2619322736852517,
+   "thin_se": 4.317131266668593e-05,
    "thin_closed": 0.26204640095181436,
    "submatrix_of_inverse": 0.5,
-   "random_panel": 0.3603080097301985,
-   "contiguous_panel": 0.4996186117467582,
+   "subinv_se": 0.0,
+   "random_panel": 0.357287336819158,
+   "random_se": 0.002879869218170811,
+   "contiguous_panel": 0.49955487718076136,
+   "contiguous_se": 0.000168378135945881,
+   "panel_sizes": [
+    512,
+    1024,
+    2048
+   ],
    "deficit_body": 0.31054623042321045,
-   "deficit_thin": 0.23805138509050988
+   "deficit_thin": 0.23806772631474832
   }
  ],
  "group_b_requiredEffectiveSampleSizeForTraceMSE": [
@@ -69,6 +779,13 @@
     "trace_mse": 0.02023709520963306,
     "se": 0.00020287720768210127,
     "sems_from_tau": 393.1585302344635
+   },
+   "control_fixed_n": {
+    "n": 3777,
+    "predicted": 0.0052952078369075985,
+    "trace_mse": 0.005233915467619821,
+    "se": 5.335996268175965e-05,
+    "sems": 1.1486583986823045
    }
   },
   {
@@ -78,27 +795,34 @@
    "info": 0.25,
    "body": {
     "n": 4000,
-    "trace_mse": 0.01994782423680241,
-    "se": 0.00010060498060686864,
-    "sems_from_tau": 0.5186200810621474
+    "trace_mse": 0.019978253474541303,
+    "se": 0.00010011153870653193,
+    "sems_from_tau": 0.2172229668993997
    },
    "tau_squared": {
     "n": 200000,
-    "trace_mse": 0.0003994311244889356,
-    "se": 1.9961090658960342e-06,
-    "sems_from_tau": 9819.387733060847
+    "trace_mse": 0.00039997493542449735,
+    "se": 1.995479345189886e-06,
+    "sems_from_tau": 9822.213951661026
    },
    "info_multiplied": {
     "n": 250,
-    "trace_mse": 0.3184869167012321,
-    "se": 0.001578061406410834,
-    "sems_from_tau": 189.14784652145767
+    "trace_mse": 0.31857115660616675,
+    "se": 0.0015834948632820161,
+    "sems_from_tau": 188.55202093130632
    },
    "d_squared": {
     "n": 80000,
-    "trace_mse": 0.0009970707664083089,
-    "se": 5.047292723324239e-06,
-    "sems_from_tau": 3764.974665680975
+    "trace_mse": 0.0009968579624737824,
+    "se": 4.969712745335476e-06,
+    "sems_from_tau": 3823.7908328529415
+   },
+   "control_fixed_n": {
+    "n": 3777,
+    "predicted": 0.021180831347630394,
+    "trace_mse": 0.021118821015694154,
+    "se": 0.00010665581732376278,
+    "sems": 0.5814059982120106
    }
   },
   {
@@ -108,27 +832,34 @@
    "info": 4.761904761904762,
    "body": {
     "n": 10,
-    "trace_mse": 0.1053075,
-    "se": 0.001047425718653368,
-    "sems_from_tau": 5.067185104852711
+    "trace_mse": 0.10270000000000001,
+    "se": 0.000968013048628777,
+    "sems_from_tau": 2.7892185997127297
    },
    "tau_squared": {
     "n": 105,
-    "trace_mse": 0.010122312925170069,
-    "se": 0.00010233385438669755,
-    "sems_from_tau": 878.2791150932471
+    "trace_mse": 0.0099243537414966,
+    "se": 9.999828165261903e-05,
+    "sems_from_tau": 900.7719409760904
    },
    "info_multiplied": {
     "n": 238,
-    "trace_mse": 0.00440414518748676,
-    "se": 4.324646066943453e-05,
-    "sems_from_tau": 2210.4896755187624
+    "trace_mse": 0.004354910493609209,
+    "se": 4.3504535969232194e-05,
+    "sems_from_tau": 2198.508439994259
    },
    "d_squared": {
     "n": 52,
-    "trace_mse": 0.01993487426035503,
-    "se": 0.0001963006508197807,
-    "sems_from_tau": 407.86989449745124
+    "trace_mse": 0.01998139792899408,
+    "se": 0.0001961583847841126,
+    "sems_from_tau": 407.9285326450488
+   },
+   "control_fixed_n": {
+    "n": 3777,
+    "predicted": 0.00027799841143764893,
+    "trace_mse": 0.00027668277590300503,
+    "se": 2.8088240332409457e-06,
+    "sems": 0.46839371889233594
    }
   },
   {
@@ -138,31 +869,37 @@
    "info": 4.761904761904762,
    "body": {
     "n": 50,
-    "trace_mse": 0.050599899999999996,
-    "se": 0.0003304139121402638,
-    "sems_from_tau": 1.8156015166375026
+    "trace_mse": 0.0504402,
+    "se": 0.0003207925855763194,
+    "sems_from_tau": 1.3722262290107303
    },
    "tau_squared": {
     "n": 1008,
-    "trace_mse": 0.002501111298107206,
-    "se": 1.5961532235912994e-05,
-    "sems_from_tau": 2975.8351516542784
+    "trace_mse": 0.0024803702325837743,
+    "se": 1.5816888433190083e-05,
+    "sems_from_tau": 3004.3601791931
    },
    "info_multiplied": {
     "n": 1143,
-    "trace_mse": 0.0021983085447652376,
-    "se": 1.4399347856577816e-05,
-    "sems_from_tau": 3319.7122488709315
+    "trace_mse": 0.002210146128934233,
+    "se": 1.4474492975345247e-05,
+    "sems_from_tau": 3301.659958139285
    },
    "d_squared": {
     "n": 605,
-    "trace_mse": 0.004124136329485691,
-    "se": 2.5809858222931608e-05,
-    "sems_from_tau": 1777.455082250487
+    "trace_mse": 0.004131613960795028,
+    "se": 2.6817858225547023e-05,
+    "sems_from_tau": 1710.3672356471102
+   },
+   "control_fixed_n": {
+    "n": 3777,
+    "predicted": 0.0006671961874503574,
+    "trace_mse": 0.0006673069283735869,
+    "se": 4.299350441130911e-06,
+    "sems": 0.025757594023975743
    }
   }
  ],
- "_guard": "DGPCOV-2026-08-04-A",
  "group_a_gwasDiscovered": [
   {
    "n": 2000,
@@ -182,7 +919,10 @@
    "sems_ld_first_power": 1.751320452381637,
    "power_at_predicate_boundary": 0.49,
    "power_theory_ncx2": 0.5018746376879684,
-   "power_se": 0.009128709291752768
+   "power_se": 0.009128709291752768,
+   "control_null_ncp": -0.011017250567444514,
+   "control_null_se": 0.03480406382109154,
+   "control_null_sems": 0.3165506943119663
   },
   {
    "n": 4000,
@@ -190,19 +930,22 @@
    "p_causal": 0.15,
    "p_tag": 0.35,
    "dprime": 0.8,
-   "maf_realized": 0.15017733333333336,
-   "ld_realized": 0.45829991291902533,
-   "ncp_measured": 0.3185455462408564,
-   "se": 0.03342969105760373,
-   "body": 0.34311698573664834,
-   "sems_body": 0.7350184437376981,
-   "competitor_ploidy_half": 0.17155849286832417,
-   "sems_ploidy_half": 4.396901338970029,
-   "competitor_ld_first_power": 0.7486734691945532,
-   "sems_ld_first_power": 12.86664367350958,
-   "power_at_predicate_boundary": 0.6126666666666667,
-   "power_theory_ncx2": 0.6206941545873194,
-   "power_se": 0.009128709291752768
+   "maf_realized": 0.150119125,
+   "ld_realized": 0.4580829191914625,
+   "ncp_measured": 0.3545236200266799,
+   "se": 0.033089620748101435,
+   "body": 0.3426827527802242,
+   "sems_body": 0.35784233783142133,
+   "competitor_ploidy_half": 0.1713413763901121,
+   "sems_ploidy_half": 5.535942676135935,
+   "competitor_ld_first_power": 0.748080180298089,
+   "sems_ld_first_power": 11.89365581634809,
+   "power_at_predicate_boundary": 0.624,
+   "power_theory_ncx2": 0.6208431627983609,
+   "power_se": 0.009128709291752768,
+   "control_null_ncp": 0.02426819123408519,
+   "control_null_se": 0.03727390119186615,
+   "control_null_sems": 0.6510773076626858
   },
   {
    "n": 1500,
@@ -210,19 +953,22 @@
    "p_causal": 0.4,
    "p_tag": 0.2,
    "dprime": 0.6,
-   "maf_realized": 0.39994288888888885,
-   "ld_realized": 0.36779017585652096,
-   "ncp_measured": 0.5306065837657667,
-   "se": 0.03649169650351042,
-   "body": 0.47720847711915537,
-   "sems_body": 1.4632947153189932,
-   "competitor_ploidy_half": 0.23860423855957769,
-   "sems_ploidy_half": 8.001884625399619,
-   "competitor_ld_first_power": 1.2975019683650268,
-   "sems_ld_first_power": 21.015613360850093,
-   "power_at_predicate_boundary": 0.5863333333333334,
-   "power_theory_ncx2": 0.5835464237659601,
-   "power_se": 0.009128709291752768
+   "maf_realized": 0.3999844444444445,
+   "ld_realized": 0.36835587751909843,
+   "ncp_measured": 0.5073255273234365,
+   "se": 0.03739714409603032,
+   "body": 0.47869418737199987,
+   "sems_body": 0.7656023111795808,
+   "competitor_ploidy_half": 0.23934709368599993,
+   "sems_ploidy_half": 7.165745944377669,
+   "competitor_ld_first_power": 1.299542688434992,
+   "sems_ld_first_power": 21.18389465990396,
+   "power_at_predicate_boundary": 0.5886666666666667,
+   "power_theory_ncx2": 0.5832168068029401,
+   "power_se": 0.009128709291752768,
+   "control_null_ncp": 0.000831923843575666,
+   "control_null_se": 0.037804363619644545,
+   "control_null_sems": 0.022006026921806657
   }
  ],
  "group_c_multiTraitDiscoveryNCP": [
@@ -251,18 +997,18 @@
    "rg_nominal": 0.9,
    "rg_realized": 0.8996616818988492,
    "tau2_nominal": 0.0001,
-   "tau2_realized": 9.917102195055166e-05,
+   "tau2_realized": 9.917102195055168e-05,
    "neff": 9624.565460938367,
    "ncp_measured": 0.47467040997302656,
    "se": 0.014833093260660703,
-   "body": 0.40088075688832087,
-   "sems_body": 4.974663867340838,
-   "competitor_n1_alone": 0.1666073168769268,
-   "sems_n1_alone": 20.768634544564165,
+   "body": 0.4008807568883209,
+   "sems_body": 4.974663867340834,
+   "competitor_n1_alone": 0.16660731687692681,
+   "sems_n1_alone": 20.76863454456416,
    "competitor_small_prior_limit": 0.4363082897811068,
    "sems_small_prior": 2.5862522076673717,
-   "competitor_n1_plus_n2": 0.4998219506307804,
-   "sems_n1_plus_n2": 1.6956369258770176
+   "competitor_n1_plus_n2": 0.49982195063078044,
+   "sems_n1_plus_n2": 1.6956369258770214
   },
   {
    "n1": 6000,
@@ -270,18 +1016,19 @@
    "rg_nominal": 0.5,
    "rg_realized": 0.49948733426684333,
    "tau2_nominal": 5e-05,
-   "tau2_realized": 4.942170031522201e-05,
+   "tau2_realized": 4.9421700315222005e-05,
    "neff": 6673.51729129435,
-   "ncp_measured": 0.13837980236007796,
+   "ncp_measured": 0.13837980236007774,
    "se": 0.011435089734206191,
    "body": 0.13852296007989662,
-   "sems_body": 0.012519160159313942,
+   "sems_body": 0.012519160159333359,
    "competitor_n1_alone": 0.12454268479435945,
-   "sems_n1_alone": 1.2100576285227607,
-   "competitor_small_prior_limit": 0.14007861237678712,
-   "sems_small_prior": 0.14856114435442042,
-   "competitor_n1_plus_n2": 0.1868140271915392,
-   "sems_n1_plus_n2": 4.235578902942773
+   "sems_n1_alone": 1.2100576285227413,
+   "competitor_small_prior_limit": 0.1400786123767871,
+   "sems_small_prior": 0.1485611443544374,
+   "competitor_n1_plus_n2": 0.18681402719153917,
+   "sems_n1_plus_n2": 4.23557890294279
   }
- ]
+ ],
+ "_guard": "DGPCOV-2026-08-04-A"
 }
