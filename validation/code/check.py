@@ -7800,6 +7800,17 @@ LAYER_PENDING = {
         "`Portability.pairwiseFstFromBranches`: pairwise F_ST off a tree. Same "
         "extraction as the two above; one move of the drift recurrences down into "
         "PopGen retires all three edges and `LDDecayTheory`'s as well.",
+    ("Descent.PopGen.AncestrySpecificArchitecture",
+     "Descent.Portability.PortabilityDrift.MutationDrift"):
+        "`Portability.ibdFlowStep` and `ibdFlowStep_fixedPoint`: the identity-by-descent "
+        "recurrence for ONE population over generations, and its fixed point. Nothing in "
+        "either is about carrying a score anywhere. This edge is the head import "
+        "`Descent.Portability.PortabilityDrift` made specific -- the file named these "
+        "declarations and reached them through the head, and `shape-chains` asks a file "
+        "to import what it names -- so it is the same violation as before, now pointing "
+        "at the module that actually declares them. The repair is the extraction the "
+        "`LDDecayTheory` and `PopulationGeneticsFoundations` entries name: move the drift "
+        "recurrences down into PopGen and this edge goes with theirs.",
     ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.CertificateGrading"):
         "Reads `FinitePrior.mean` and the atom-modulus lemmas. The certificate "
         "machinery is decision-theoretic and correctly placed; the polygenic INSTANCE "
