@@ -6,12 +6,6 @@ import Descent.Portability.PCCorrectability.ImitationCapacity
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
---   Portability: reaches 12 module(s) -- `Descent.Portability.PCCorrectability.ImitationCapacity`,
---   `Descent.Portability.PCCorrectability.Threshold`, `Descent.Portability.PortabilityDrift` and 9
---   more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.Blindness
 
 open Descent.Blindness.CountingInvariantBlindness

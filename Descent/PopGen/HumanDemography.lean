@@ -7,16 +7,6 @@ import Descent.Blindness.LumpedRateBlindness
 
 assert_below Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Portability`,
--- `Descent.Spectral`:
---   Spectral: reaches 2 module(s) -- `Descent.Spectral.CirculationDefect`,
---   `Descent.Spectral.SpectralDegradation`
---   Blindness: reaches 1 module(s) -- `Descent.Blindness.LumpedRateBlindness`
---   Portability: reaches 10 module(s) -- `Descent.Portability.PortabilityDrift`,
---   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime`,
---   `Descent.Portability.PortabilityDrift.Definitions` and 7 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.PopGen
 
 /-!

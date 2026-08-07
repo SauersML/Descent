@@ -682,17 +682,16 @@ theorem nondegenerateGenerationalPopGen_coordinates_at_one :
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio]
-  · simp [nondegenerateGenerationalPopGen,
-      Descent.Core.PopGenParameters.bigM, Descent.Core.PopGenParameters.tauAt,
-      Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio]
-    norm_num
 
 /-- Shared diagonal tag-LD scale at generation `1` in the nondegenerate
-two-tag proxy witness. -/
+two-tag proxy witness.
+
+The factor `7/6` this used to carry was `migrationSharedBoostAt 1` on these
+parameters, and that body is deleted as refuted -- so the scale is now the
+mutation-sharing retention alone, which is what the kernels it witnesses
+compute. -/
 noncomputable def popgenDrivenTagScale : ℝ :=
-  (7 / 6 : ℝ) * Real.exp (-(1 : ℝ))
+  Real.exp (-(1 : ℝ))
 
 /-- The LD decay exponent this witness carries across one tag-causal unit of
 distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with `lambda` and the gap READ
@@ -735,7 +734,7 @@ left a memorised constant behind that was still syntactically well-formed and no
 longer true. -/
 theorem popgenDrivenLDDecayExponent_eq_eighth :
     popgenDrivenLDDecayExponent = 1 / 8 := by
-  obtain ⟨-, -, -, h_fst, -, -⟩ := nondegenerateGenerationalPopGen_coordinates_at_one
+  obtain ⟨-, -, -, h_fst, -⟩ := nondegenerateGenerationalPopGen_coordinates_at_one
   unfold popgenDrivenLDDecayExponent
   rw [h_fst, show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num,
     Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 1 / 2)]
@@ -751,14 +750,18 @@ theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
 /-- Shared proxy-tagging scale at generation `1` in the nondegenerate two-tag
 proxy witness. The additional `exp (-popgenDrivenLDDecayExponent)` factor comes
 from explicit recombination-driven LD decay across one tag-causal unit of
-distance. -/
+distance.
+
+The `7/6` this used to carry was `migrationSharedBoostAt 1` on these parameters,
+and that body is deleted as refuted, so it is gone from here too. -/
 noncomputable def popgenDrivenProxyScale : ℝ :=
-  (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+  Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
 
 /-- Two-tag one-causal-variant generational witness with constant allele
 frequencies and constant effects. Any transport change after generation `0`
 comes from the explicit population-genetic kernels: transient `F_ST`,
-recombination, mutation retention, and migration boost. -/
+recombination and mutation retention. (The migration boost was a fourth until it
+was deleted as refuted; see `jointTagLDKernelAt` for what its absence costs.) -/
 noncomputable def popgenDrivenProxyGenerationalModel :
     CrossPopulationGenerationalModel 2 1 := {
   popGen := nondegenerateGenerationalPopGen
@@ -840,7 +843,7 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
     proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 1 0 =
       popgenDrivenProxyScale := by
   rcases nondegenerateGenerationalPopGen_coordinates_at_one with ⟨h_theta, h_bigM, h_tau, h_fst,
-    h_mut, h_mig⟩
+    h_mut⟩
   -- Both tags carry the same proxy scale at generation one, and the calculation that shows
   -- it does not depend on which: it was written out once per tag, `calc` step for `calc`
   -- step. Proved for an arbitrary tag, the last two goals are two instances of it.
@@ -850,8 +853,7 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
     intro i
     calc
       proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0
-          = (7 / 6 : ℝ) *
-              (Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent)) := by
+          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
               -- The gap is a perfect square again, so the surd reduces; the step is
               -- kept because the exponent is still WRITTEN as a square root and the
               -- two sides have to be put in the same shape before `ring_nf` runs.
@@ -861,23 +863,22 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
               rw [popgenDrivenLDDecayExponent_eq_eighth]
               fin_cases i <;>
                 generational_witness_simp nondegenerateGenerationalPopGen,
-                  popgenDrivenProxyGenerationalModel, h_fst, h_mut, h_mig,
+                  popgenDrivenProxyGenerationalModel, h_fst, h_mut,
                   nondegenerateGenerationalPopGen_fstDecay_eq_zero <;>
                 ring_nf <;>
                 (try rw [hsqrt]) <;>
                 (try ring_nf)
-      _ = (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent)) := by
-            congr 1
+      _ = Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent)) := by
             rw [← Real.exp_add]
             congr 1
             ring
       _ = popgenDrivenProxyScale := by rfl
   refine ⟨?_, ?_, proxy_scale_at 0, proxy_scale_at 1⟩
   · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut
     ring_nf
   · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
-      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut, h_mig
+      nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut
     ring_nf
 
 /-- In the nondegenerate proxy witness, generation-1 transport degrades target
@@ -958,13 +959,13 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_proxy_lt_tag : popgenDrivenProxyScale < popgenDrivenTagScale := by
     unfold popgenDrivenProxyScale popgenDrivenTagScale
     calc
-      (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-popgenDrivenLDDecayExponent) := by
+      Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
               rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
                     = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
               ring
-      _ < ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * 1 := by
+      _ < Real.exp (-(1 : ℝ)) * 1 := by
               exact mul_lt_mul_of_pos_left h_ld_gap_lt_one (by positivity)
       _ = popgenDrivenTagScale := by simp [popgenDrivenTagScale, Descent.Core.scaledMutationRate,
         Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
@@ -990,13 +991,13 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_proxy_lt_one : popgenDrivenProxyScale < 1 := by
     unfold popgenDrivenProxyScale
     calc
-      (7 / 6 : ℝ) * Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = ((7 / 6 : ℝ) * Real.exp (-(1 : ℝ))) * Real.exp (-popgenDrivenLDDecayExponent) := by
+      Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
               rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
                     = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring,
                 Real.exp_add]
               ring
-      _ ≤ ((7 / 6 : ℝ) * (1 / 2 : ℝ)) * 1 := by
+      _ ≤ ((1 / 2 : ℝ)) * 1 := by
               have h_exp_nonneg : 0 ≤ Real.exp (-popgenDrivenLDDecayExponent) := by positivity
               nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one, h_exp_nonneg]
       _ < (1 : ℝ) := by norm_num

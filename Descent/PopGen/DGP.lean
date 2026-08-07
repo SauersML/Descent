@@ -11,10 +11,6 @@ import Descent.Core.Parameters
 assert_below Descent.Blindness Descent.Conditionals Descent.Portability Descent.Decision
 assert_below Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`:
---   Spectral: reaches 1 module(s) -- `Descent.Spectral.SpectralDegradation`
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.PopGen
 
 /-! ### The ploidy-scaled rates, and the identity fraction they feed

@@ -5,11 +5,6 @@ import Descent.Conditionals.DynamicsContrast.Tail
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
---   Portability: reaches 13 module(s) -- `Descent.Portability.ContinuumCalibration`,
---   `Descent.Portability.CorrectionWidths`, `Descent.Portability.HorizonCurve` and 10 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 /-!
 # `DynamicsContrast` -- the head of a split file
 

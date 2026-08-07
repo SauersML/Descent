@@ -18,18 +18,6 @@ import Descent.Spectral.SecondMomentShift
 import Descent.Spectral.SpectralDegradation
 import Descent.Spectral.WhiteningEquivalence
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`,
--- `Descent.Portability`:
---   Blindness: reaches 15 module(s) -- `Descent.Blindness.BundleRigidity`,
---   `Descent.Blindness.BundleRigidity.Coverage`,
---   `Descent.Blindness.BundleRigidity.CoverageInvariance` and 12 more
---   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.ConditionalGain`,
---   `Descent.Conditionals.LocalToGlobalCoherence`
---   Portability: reaches 11 module(s) -- `Descent.Portability.PCCorrectability.Core`,
---   `Descent.Portability.PortabilityDrift`,
---   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 /-!
 # `Descent.Spectral` -- the layer head
 

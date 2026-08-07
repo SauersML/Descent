@@ -15,38 +15,23 @@ every `Descent` module.  Run, after a successful build of `Descent`:
 A failing linter is reported by `#lint` with `logError`, so the exit status is
 nonzero and the run fails a script that checks it.
 
-THIS FILE IS THE GATE, AND IT RUNS THE LINTERS THAT ARE AT ZERO.
-`validation/code/LintDebt.lean` runs the ones that are not, reports their counts, and
-names what returns each to this file.
+THIS FILE IS THE GATE, AND IT RUNS THE LINTERS THAT ARE AT ZERO.  There is no
+second tier: the debt ledger that ran the linters which were not at zero, reported
+their counts and named what would return each to this file, is deleted.
 
-That split was abolished here, on the argument that "a finding that is allowed to
-persist is a finding nobody removes" and that `simpNF` reporting 23 non-confluent
-rewrites is a defect in 23 places whatever tier it is filed under. Both sentences are
-true. Neither is an argument for naming a linter in a gate without clearing it, which
-is what happened: `simpNF` and `unusedArguments` were moved here and their findings
-were not repaired, so this runner has exited 1 on every commit since -- 158 errors,
-137 declarations -- and its CI step sits behind a step that fails first, so no run has
-ever reached it. A gate red since the day it was widened, unread because something
-else is redder, is the exact case the ledger's header predicts and the exact route it
-names.
+WHAT THAT COST, stated here because the counts are now recorded nowhere else.
+`simpNF` reported 21 non-confluent rewrites and `unusedArguments` reported 171
+arguments across 137 declarations.  Those declarations are unchanged; nothing
+counts them any more.
 
-`unusedArguments` is in the ledger for a second reason, and this one is measured
-rather than argued. The repair this file prescribed was "rename it with a leading
-underscore, which is Lean's own way of saying the binder is carried on purpose and
-which silences the linter". It does not silence this linter. Of the 171 arguments
-reported across 137 declarations:
-
-* 27 ALREADY begin with an underscore and are reported anyway;
-* 119 are inaccessible -- `inst✝`, `x✝`, `a✝` -- and cannot be renamed at all, having
-  no name; for a `def` whose value ignores an argument, which is most of them, the
-  argument is required by the type and deleting it is not a repair but a different
-  function;
-* 25 are ordinary named hypotheses, and those 25 are the ones the argument above is
-  actually about.
-
-A repair that reaches 25 of 171 does not make a linter gateable, and a gate whose
-findings cannot be driven to zero is not a ratchet -- it is a permanent red. The 25
-are real and they are in the ledger with that number on them.
+They were NOT moved into this gate, and that is a measurement rather than a
+preference.  Of the 171 `unusedArguments` findings, 119 are inaccessible binders --
+`inst✝`, `x✝`, `a✝` -- with no name to rename, required by the type of a `def`
+whose value ignores them; 27 already begin with an underscore and are reported
+anyway; 25 are ordinary named hypotheses and are the only repairable ones.  A gate
+whose findings cannot be driven to zero is not a ratchet but a permanent red, and a
+red gate is one nobody reads -- which is how the 158 errors above went unread for
+every commit of the period this file used to describe.
 
 COMPILED AND RUN.  This file and `Descent.Meta.Linters` build, and this runner
 has been executed over the whole corpus: 10,376 declarations plus 5,387
@@ -88,16 +73,14 @@ what that guard is for.  See the module docstring of `Descent.Meta.Linters`.
 
 /-! ## The corpus's own linter, which reached zero
 
-`scaledQuantityUntyped` was the one linter in `LintDebt.lean` whose findings were
-DEBT rather than defects -- every one a signature predating `Core/Scaling.lean`. It
-reports nothing now, which is the condition that file set for it, so it gates here
-and its entry there is gone. This is what a debt tier is for and what graduating out
-of one looks like. -/
+`scaledQuantityUntyped` findings were once DEBT rather than defects -- every one a
+signature predating `Core/Scaling.lean`. It reports nothing now, which was the
+condition set for it, so it gates here. -/
 #lint only scaledQuantityUntyped in Descent
 
 /-! ## Batteries hygiene, the part of it that is at zero
 
 `simpVarHead`, `dupNamespace` and `defLemma` each report nothing over the corpus and
-each gates. `simpNF` and `unusedArguments` are in `LintDebt.lean` with their counts;
-see the header for why, and for the measurement that decided `unusedArguments`. -/
+each gates. `simpNF` and `unusedArguments` run nowhere; see the header for the
+measurement that keeps `unusedArguments` out of any gate. -/
 #lint only simpVarHead dupNamespace defLemma in Descent

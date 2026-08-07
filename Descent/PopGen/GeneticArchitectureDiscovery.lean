@@ -8,14 +8,6 @@ import Descent.PopGen.HaplotypeTheory
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`, `Descent.Spectral`:
---   Spectral: reaches 4 module(s) -- `Descent.Spectral.CirculationDefect`,
---   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 1 more
---   Portability: reaches 13 module(s) -- `Descent.Portability.AncestrySpecificPower`,
---   `Descent.Portability.BayesianPGSTheory`, `Descent.Portability.MechanisticPortabilityWitnesses`
---   and 10 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.PopGen
 
 open MeasureTheory

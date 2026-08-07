@@ -9,10 +9,6 @@ import Mathlib.Tactic.Ring
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Portability`:
---   Portability: reaches 1 module(s) -- `Descent.Portability.PCCorrectability.Core`
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.Spectral
 
 /-!

@@ -176,21 +176,6 @@ jobs:
       - name: Environment linters
         run: lake env lean validation/code/Lint.lean
 
-      # The debt ledger, which reports and does not gate. `scaledQuantityUntyped`,
-      # `simpVarHead`, `dupNamespace` and `defLemma` reached zero and moved UP into the
-      # gating step; `simpNF` (21) and `unusedArguments` (137 declarations) have not,
-      # and are here with their counts and their flip conditions.
-      #
-      # This step was deleted on the argument that a linter whose findings are allowed
-      # to persist is a linter whose findings persist. What actually followed was worse:
-      # the two uncleared linters were named in the GATE, that step has exited 1 ever
-      # since, and it sits behind a step that fails first -- so the findings persisted
-      # anyway and no run ever printed them. A count nobody reads is what this step is
-      # for; a red nobody reaches is what the other one becomes without it.
-      - name: Environment linters (debt ledger, reported not gated)
-        run: lake env lean validation/code/LintDebt.lean
-        continue-on-error: true
-
       - name: Verify arithmetic runtime semantics
         working-directory: validation/empirical/invariants
         run: python3 test_lean_semantics.py

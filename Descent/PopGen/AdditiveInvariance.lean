@@ -7,14 +7,6 @@ import Descent.Foundations.TransportIdentities
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Spectral`, `Descent.Blindness`,
--- `Descent.Conditionals`:
---   Spectral: reaches 1 module(s) -- `Descent.Spectral.PolygenicSpectroscopy`
---   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`,
---   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
---   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.LocalToGlobalCoherence`
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.PopGen
 
 /-!

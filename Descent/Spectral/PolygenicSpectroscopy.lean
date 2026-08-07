@@ -8,12 +8,6 @@ import Descent.Blindness.HiddenConeAmbiguity
 
 assert_below Descent.Portability Descent.Decision Descent.Program
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`:
---   Blindness: reaches 6 module(s) -- `Descent.Blindness.Condensation`,
---   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 3 more
---   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.LocalToGlobalCoherence`
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.Spectral
 
 /-!

@@ -673,7 +673,8 @@ def ident_lean_files():
 # because a rule with a name can be exempted per file and per rule instead of per file.
 #
 # `Descent/Meta/` and `Descent/Layer.lean` are the corpus's machinery about itself:
-# `assert_below`, the `env_linter`s and the status linter.  Installing syntax and elaboration IS what those modules are, and
+# `assert_below`, the `env_linter`s and the status linter.  Installing syntax and
+# elaboration IS what those modules are, and
 # `partial` is how a linter walks an expression.  Screening them for it reported the
 # auditor's existence as eight defects of the corpus.
 #

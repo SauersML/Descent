@@ -9,19 +9,6 @@ import Descent.Conditionals.LatentMechanismCollapse
 
 assert_below Descent.Decision
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`, `Descent.Conditionals`,
--- `Descent.Portability`, `Descent.Spectral`:
---   Spectral: reaches 6 module(s) -- `Descent.Spectral.CirculationDefect`,
---   `Descent.Spectral.EnsembleChannel`, `Descent.Spectral.Permeability` and 3 more
---   Blindness: reaches 8 module(s) -- `Descent.Blindness.Condensation`,
---   `Descent.Blindness.CramerStratum`, `Descent.Blindness.CumulantBlindness` and 5 more
---   Conditionals: reaches 2 module(s) -- `Descent.Conditionals.LatentMechanismCollapse`,
---   `Descent.Conditionals.LocalToGlobalCoherence`
---   Portability: reaches 11 module(s) -- `Descent.Portability.AncestrySpecificPower`,
---   `Descent.Portability.PortabilityDrift`,
---   `Descent.Portability.PortabilityDrift.ClosedPopulationRegime` and 8 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 namespace Descent.PopGen
 
 /-!

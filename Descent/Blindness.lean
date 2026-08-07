@@ -45,14 +45,6 @@ import Descent.Blindness.TrafficInvariantSeparation.RankOneInvisibility
 import Descent.Blindness.TrafficInvariantSeparation.SpectralSDPSeparation
 import Descent.Blindness.XiFromMarkedBreakouts
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Conditionals`,
--- `Descent.Portability`:
---   Conditionals: reaches 1 module(s) -- `Descent.Conditionals.ConditionalGain`
---   Portability: reaches 22 module(s) -- `Descent.Portability.ClinicalUtilityFairness`,
---   `Descent.Portability.ContinuumCalibration`,
---   `Descent.Portability.MetricSpecificPortability.PrecisionRecall` and 19 more
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 /-!
 # `Descent.Blindness` -- the layer head
 
