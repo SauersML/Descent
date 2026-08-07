@@ -183,6 +183,24 @@ theorem walk_sub (x₀ y₀ : ℤ) (ξ η : ℕ → ℤ) (t : ℕ) :
       rw [← ih]
       ring
 
+/-- **The separation of two lineages is the corpus's `difference`, at every time.**
+
+`walk_sub` says the separation process is itself a walk; this says what the separation IS
+in the vocabulary the rest of the corpus measures with.  `Descent.Core.difference` is the
+kernel every gap, residual and portability shortfall routes through, and the quantity whose
+hitting time decides spatial coalescence is that same kernel evaluated at the two positions.
+
+The point is not the arithmetic -- it is that the spatial model's central observable is not
+a new kind of quantity.  A separation that never reaches zero and a portability gap that
+never closes are the same shape, so a statement about one transports to the other by
+substitution rather than by analogy, and a body that stopped being a difference would stop
+compiling here. -/
+theorem walk_difference (x₀ y₀ : ℤ) (ξ η : ℕ → ℤ) (t : ℕ) :
+    Descent.Core.difference ((walk x₀ ξ t : ℤ) : ℝ) ((walk y₀ η t : ℤ) : ℝ)
+      = ((walk (x₀ - y₀) (fun s ↦ ξ s - η s) t : ℤ) : ℝ) := by
+  unfold Descent.Core.difference
+  exact_mod_cast congrArg (fun z : ℤ ↦ (z : ℝ)) (walk_sub x₀ y₀ ξ η t)
+
 /-- **Two lineages meet exactly when the difference walk is at zero.**  Pairwise coalescence
 in space is a hitting-time problem, which is why the dimension of the space decides whether
 lineages coalesce: recurrence of the difference walk is the whole question.
