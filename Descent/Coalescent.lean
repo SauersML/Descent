@@ -82,10 +82,6 @@ import Descent.Coalescent.WrightFisher
 import Descent.Coalescent.Xi
 import Descent.Coalescent.XiRates
 
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
---   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`
--- The repair is to move what it reaches for DOWN, not to move this file up.
-
 /-!
 # `Descent.Coalescent` -- the layer head
 

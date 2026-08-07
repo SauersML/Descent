@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.SiteFrequencySpectrum
 import Descent.Pangenome.ConstructionCoalescent
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals

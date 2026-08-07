@@ -23,9 +23,9 @@ a theorem.
 
 ## The chain
 
-Coarsening loses blocks (`blocks_antitone`), the graph's block count is its width
-(`GraphCoalescent.blocks_graphKer`), and the transit deficit `2/w - 2/n` is decreasing in `w`.
-So:
+`GraphCoalescent.Reduction.blocks_antitone` says coarsening loses blocks, `blocks_graphKer`
+says the graph's block count is its width, and the transit deficit `2/w - 2/n` is decreasing
+in `w`.  So:
 
 **A coarser construction yields a smaller entrance point, a shallower reported tree, and a
 strictly larger deficit** -- `width_antitone` and `transitDeficit_mono`.
@@ -58,7 +58,6 @@ None.  Every result is an order-theoretic consequence of definitions already in 
 
 ## Main results
 
-- `blocks_antitone`: a coarser relation has no more blocks.  The missing order fact.
 - `width_antitone`: a coarser construction has a smaller graph width.
 - `transitDeficit_mono`: **the headline.**  Coarsening only inflates the transit deficit.
 - `graphWatterson_antitone`: and only depresses the reported `θ_W`.
@@ -66,32 +65,7 @@ None.  Every result is an order-theoretic consequence of definitions already in 
 
 namespace Descent.Pangenome.GraphCoalescent
 
-/-! ### Coarsening loses blocks -/
-
-/-- **The map a coarsening induces on classes.**  If `ξ ≤ η` then every `ξ`-class lies in a
-single `η`-class, so there is a map of quotients sending a class to the class containing it.
-This is the whole content of "coarser": no new distinctions, only lost ones. -/
-def coarsen {n : ℕ} {ξ η : Coalescent.ER n} (h : ξ ≤ η) : Quotient ξ → Quotient η :=
-  Quotient.lift (fun a => Quotient.mk η a) (fun _ _ hab => Quotient.sound (h hab))
-
-/-- The induced map is onto: every `η`-class contains a point, and that point names a
-`ξ`-class above it.  Coarsening cannot invent a class. -/
-theorem coarsen_surjective {n : ℕ} {ξ η : Coalescent.ER n} (h : ξ ≤ η) :
-    Function.Surjective (coarsen h) := by
-  intro q
-  refine Quotient.inductionOn q ?_
-  intro a
-  exact ⟨Quotient.mk ξ a, rfl⟩
-
-/-- **A coarser relation has no more blocks.**  The order fact the two halves of this file
-needed and neither had: `Coalescent.StateSpace` proves a merge drops the count by exactly
-one, which is the covering case, but nothing there covers an arbitrary coarsening. -/
-theorem blocks_antitone {n : ℕ} {ξ η : Coalescent.ER n} (h : ξ ≤ η) :
-    Coalescent.blocks η ≤ Coalescent.blocks ξ := by
-  unfold Coalescent.blocks
-  exact Nat.card_le_card_of_surjective _ (coarsen_surjective h)
-
-/-! ### and so loses width, and so costs depth -/
+/-! ### Coarsening loses width, and so costs depth -/
 
 /-- **A coarser construction has a smaller graph.**  If the interface `t` merges everything
 `s` merges and possibly more, then `t`'s graph has no more nodes than `s`'s.
@@ -145,8 +119,8 @@ theorem graphWatterson_antitone {n : ℕ} (θ : Descent.Core.Theta) {s t : Fin n
   have hden : (0 : ℝ) ≤ Coalescent.harmonicSum (n - 1) := Coalescent.harmonicSum_nonneg _
   have key : Coalescent.harmonicSum (Linkage.width t - 1) / Coalescent.harmonicSum (n - 1)
       ≤ Coalescent.harmonicSum (Linkage.width s - 1) / Coalescent.harmonicSum (n - 1) := by
-    rw [div_eq_mul_one_div, div_eq_mul_one_div]
-    exact mul_le_mul_of_nonneg_right hmono (div_nonneg zero_le_one hden)
+    rw [div_eq_mul_inv, div_eq_mul_inv]
+    exact mul_le_mul_of_nonneg_right hmono (inv_nonneg.mpr hden)
   exact mul_le_mul_of_nonneg_left key hθ
 
 end Descent.Pangenome.GraphCoalescent

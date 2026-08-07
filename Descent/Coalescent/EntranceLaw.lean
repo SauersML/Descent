@@ -6,12 +6,9 @@ import Descent.Coalescent.HoldingTime
 import Mathlib.Probability.ProductMeasure
 import Mathlib.Tactic
 
-assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Conditionals
+assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
+assert_below Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
-
--- LAYER DEBT. This file cannot yet assert it is below `Descent.Blindness`:
---   Blindness: reaches 1 module(s) -- `Descent.Blindness.MultipleMergerBlindness`
--- The repair is to move what it reaches for DOWN, not to move this file up.
 
 namespace Descent
 
