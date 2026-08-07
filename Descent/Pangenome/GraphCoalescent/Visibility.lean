@@ -111,7 +111,7 @@ theorem observed_merge_le {n : ℕ} {s : Fin n → Fin n} {x y z : Fin n} (hxz :
       ≤ observed s (Coalescent.merge (⊥ : Coalescent.ER n)
         (Quotient.mk ⊥ y) (Quotient.mk ⊥ z)) :=
   observed_le
-    (merge_le_of_rel_trans hxz (graphKer_le_observed s _ (graphKer_rel hxy))
+    (merge_le_of_rel_trans hxz (graphKer_le_observed s _ (graphKer_rel_iff.mpr hxy))
       (le_observed s _ (Coalescent.merge_rel ⊥ (Quotient.mk ⊥ y) (Quotient.mk ⊥ z) rfl rfl)))
     (graphKer_le_observed s _)
 

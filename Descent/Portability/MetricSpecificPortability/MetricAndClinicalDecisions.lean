@@ -2,6 +2,10 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricSpecificPortability.PrecisionRecall
+-- `brierScore`, the pointwise squared-error score this file states its clinical decision
+-- results against. It is a loss of one outcome against one prediction, so the import runs
+-- downward.
+import Descent.Foundations.BernoulliLosses
 
 assert_below Descent.Decision
 
@@ -331,17 +335,17 @@ section ProperScoringRules
 
 /-- **Brier score is a proper scoring rule.**
     Brier(p, y) = (p - y)². The unique minimizer is p = P(Y=1|X). -/
-noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := Program.brierScore p y
+noncomputable abbrev brierScoreMetric (p y : ℝ) : ℝ := Foundations.brierScore p y
 
 /-- The local metric surface is exactly the core Brier score object from
     `Conclusions`. -/
 @[simp] theorem brierScoreMetric_eq_core (p y : ℝ) :
-    brierScoreMetric p y = Program.brierScore p y := by
+    brierScoreMetric p y = Foundations.brierScore p y := by
   rfl
 
 /-- Brier score is nonneg. -/
 theorem brier_nonneg (p y : ℝ) : 0 ≤ brierScoreMetric p y := by
-  simpa [brierScoreMetric, Program.brierScore] using sq_nonneg (y - p)
+  simpa [brierScoreMetric, Foundations.brierScore] using sq_nonneg (y - p)
 
 /-- **Brier score is bounded above by 1 (derived from definition).**
     Since `brierFromR2 π r2 = π(1-π)(1-r2)`, and π(1-π) ≤ 1/4 (AM-GM)

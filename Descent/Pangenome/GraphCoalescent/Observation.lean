@@ -57,11 +57,15 @@ a coalescent state; whether a given graph merges a given pair is the empirical q
 is not settled here. -/
 def graphKer {n : ℕ} (s : Fin n → Fin n) : Coalescent.ER n := Setoid.ker s
 
-theorem graphKer_rel {n : ℕ} {s : Fin n → Fin n} {x y : Fin n} (h : s x = s y) :
-    (graphKer s).r x y := h
+/-- **Graph identity is interface identity, in both directions at once.**
 
-theorem rel_graphKer {n : ℕ} {s : Fin n → Fin n} {x y : Fin n} (h : (graphKer s).r x y) :
-    s x = s y := h
+`graphKer` is `Setoid.ker`, so the coalescent relation it carries and the equation between
+graph states are the same proposition rather than two propositions that happen to agree.
+Stating that as an `Iff` is what makes it usable: the two one-way readings this replaces
+each handed back the premise they were given, so neither could be rewritten with, and a
+consumer had to know which of the two names moved in the direction it needed. -/
+theorem graphKer_rel_iff {n : ℕ} {s : Fin n → Fin n} {x y : Fin n} :
+    (graphKer s).r x y ↔ s x = s y := Iff.rfl
 
 /-- **A faithful interface has destroyed nothing.**  If no two panel haplotypes share a
 graph state then `graphKer s` sits below every coalescent state, so joining with it changes

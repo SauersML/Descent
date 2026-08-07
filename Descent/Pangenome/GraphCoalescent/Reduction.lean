@@ -64,8 +64,15 @@ def GraphState {n : ℕ} (s : Fin n → Fin n) (ξ : Coalescent.ER n) : Prop := 
 point of the process. -/
 theorem graphState_graphKer {n : ℕ} (s : Fin n → Fin n) : GraphState s (graphKer s) := le_rfl
 
-theorem graphState_le {n : ℕ} {s : Fin n → Fin n} {ξ : Coalescent.ER n} (h : GraphState s ξ) :
-    graphKer s ≤ ξ := h
+/-- **Being a graph state is being above the graph's floor, and that is the whole of it.**
+
+`GraphState` names an up-set and adds no condition to the inequality that defines it, so the
+predicate and the order relation are one proposition. The one-way reading this replaces
+returned its own premise, which made the definitional content invisible: a consumer could
+not rewrite with it, and nothing recorded that the predicate is *exactly* `graphKer s ≤ ξ`
+rather than something implying it. -/
+theorem graphState_iff {n : ℕ} {s : Fin n → Fin n} {ξ : Coalescent.ER n} :
+    GraphState s ξ ↔ graphKer s ≤ ξ := Iff.rfl
 
 /-- **The stratum is closed under the coalescent.**  Coalescence only coarsens, so a process
 that has reached a graph state stays in graph states forever.  The graph coalescent is

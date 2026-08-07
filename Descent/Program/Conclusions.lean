@@ -60,32 +60,7 @@ in the MAP estimate" — is therefore conditional on that hypothesis.
 
 section BrierScore
 
-/-! ### Definition of Brier Score -/
-
-/-- The Brier Score measures squared error between predicted probability and outcome.
-    For a binary outcome y ∈ {0, 1} and prediction p ∈ [0, 1]:
-    BS(p, y) = (y - p)²
-
-    This is the standard proper scoring rule for probability forecasts. -/
-noncomputable def brierScore (p : ℝ) (y : ℝ) : ℝ := (y - p) ^ 2
-
-/-- The score is never negative: it is a squared error, so a body that lost the square would
-fail here wherever the prediction overshoots. -/
-theorem brierScore_nonneg (p y : ℝ) : 0 ≤ brierScore p y := by
-  unfold brierScore; positivity
-
-/-- **Anchors of the Brier score.** A confident correct call scores `0`, a confident wrong call
-scores `1`, and the uninformative call scores `1/4`. Three numbers rather than one, because a
-single anchor is met by many wrong bodies. -/
-theorem brierScore_anchors :
-    brierScore 1 1 = 0 ∧ brierScore 0 1 = 1 ∧ brierScore (1 / 2) 1 = 1 / 4 := by
-  refine ⟨?_, ?_, ?_⟩ <;> unfold brierScore <;> norm_num
-
-/-- The score vanishes exactly on a correct point prediction. -/
-theorem brierScore_eq_zero_iff (p y : ℝ) : brierScore p y = 0 ↔ p = y := by
-  unfold brierScore
-  rw [pow_eq_zero_iff two_ne_zero, sub_eq_zero]
-  exact eq_comm
+/-! ### The Expected Brier Score as a Quadratic -/
 
 /-- The expected Brier score can be rewritten as:
     E[(Y - p)²] = π - 2πp + p²
