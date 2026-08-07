@@ -128,7 +128,7 @@ def Honors {Pos : Type*} (A : Pos → Pos → Prop) (r : Setoid Pos) : Prop :=
 /-- The closure believes the aligner.  This is the witness that `Honors` is inhabited, so the
 constraint is not vacuous. -/
 theorem closure_honors {Pos : Type*} (A : Pos → Pos → Prop) : Honors A (closure A) :=
-  fun _ _ h => EqvGen.rel _ _ h
+  fun _ _ h ↦ EqvGen.rel _ _ h
 
 /-- **The Galois connection, and the reason closure is the free construction.**
 
@@ -139,7 +139,7 @@ aligner, so the whole up-set is admissible on the data alone.  The data therefor
 determine the object -- it determines a lower bound. -/
 theorem honors_iff_closure_le {Pos : Type*} (A : Pos → Pos → Prop) (r : Setoid Pos) :
     Honors A r ↔ closure A ≤ r :=
-  ⟨fun h => Setoid.eqvGen_le h, fun h _ _ hxy => h (EqvGen.rel _ _ hxy)⟩
+  ⟨fun h ↦ Setoid.eqvGen_le h, fun h _ _ hxy ↦ h (EqvGen.rel _ _ hxy)⟩
 
 /-- **Pruning only refines.**  A builder that discards alignments -- restricting to what is
 coherent with a chosen reference backbone -- produces a construction at or below the closure
@@ -157,10 +157,10 @@ two were never compared.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is an explicit finite relation exhibited to
 witness that the closure adds pairs; it models no particular alignment. -/
-def forcingRel : Fin 3 → Fin 3 → Prop := fun p q =>
+def forcingRel : Fin 3 → Fin 3 → Prop := fun p q ↦
   p = q ∨ (p = 0 ∧ q = 1) ∨ (p = 1 ∧ q = 0) ∨ (p = 1 ∧ q = 2) ∨ (p = 2 ∧ q = 1)
 
-instance : DecidableRel forcingRel := fun p q => by unfold forcingRel; infer_instance
+instance : DecidableRel forcingRel := fun p q ↦ by unfold forcingRel; infer_instance
 
 /-- The witness relation is reflexive, as a reported alignment is. -/
 theorem forcingRel_refl : ∀ p : Fin 3, forcingRel p p := by decide
@@ -193,11 +193,11 @@ This is the one conserved quantity, and it is why the confound below is a redist
 rather than a gain or a loss. -/
 theorem mass_conserved {Pos : Type*} [Fintype Pos] (r : Setoid Pos) [Fintype (Quotient r)]
     [DecidableEq (Quotient r)] :
-    (∑ c : Quotient r, (Finset.univ.filter fun p : Pos => Quotient.mk r p = c).card)
+    (∑ c : Quotient r, (Finset.univ.filter fun p : Pos ↦ Quotient.mk r p = c).card)
       = Fintype.card Pos := by
   have h := Finset.card_eq_sum_card_fiberwise
     (s := (Finset.univ : Finset Pos)) (t := (Finset.univ : Finset (Quotient r)))
-    (f := fun p : Pos => Quotient.mk r p) (fun x _ => Finset.mem_univ _)
+    (f := fun p : Pos ↦ Quotient.mk r p) (fun x _ ↦ Finset.mem_univ _)
   simpa using h.symm
 
 /-! ### Support, and the direction the spectrum moves -/
@@ -263,7 +263,7 @@ def CollapseFree {Pos Hap : Type*} (hap : Pos → Hap) (r : Setoid Pos) : Prop :
 definition is not vacuous. -/
 theorem collapseFree_bot {Pos Hap : Type*} (hap : Pos → Hap) :
     CollapseFree hap (⊥ : Setoid Pos) :=
-  fun _ _ h _ => h
+  fun _ _ h _ ↦ h
 
 /-- **Collapse-freedom is injectivity of the quotient map within a haplotype.**
 
@@ -275,8 +275,8 @@ recorded with a multiplicity in `Descent.Pangenome.GaugeInvariance` and not with
 theorem collapseFree_iff_quotient_inj {Pos Hap : Type*} (hap : Pos → Hap) (r : Setoid Pos) :
     CollapseFree hap r ↔
       ∀ x y : Pos, hap x = hap y → Quotient.mk r x = Quotient.mk r y → x = y :=
-  ⟨fun hcf x y hh hq => hcf x y (Quotient.exact hq) hh,
-    fun hinj x y hr hh => hinj x y hh (Quotient.sound hr)⟩
+  ⟨fun hcf x y hh hq ↦ hcf x y (Quotient.exact hq) hh,
+    fun hinj x y hr hh ↦ hinj x y hh (Quotient.sound hr)⟩
 
 /-- **Collapse is created by the closure and not reported by the aligner.**  A construction
 below a collapse-free one is collapse-free, so collapse can only appear as the construction
@@ -285,6 +285,6 @@ shows on the side of the builder: the closure both adds pairs and, in adding the
 only thing that can make a haplotype meet itself. -/
 theorem collapseFree_mono {Pos Hap : Type*} (hap : Pos → Hap) {r s : Setoid Pos} (h : r ≤ s)
     (hs : CollapseFree hap s) : CollapseFree hap r :=
-  fun x y hxy hh => hs x y (h hxy) hh
+  fun x y hxy hh ↦ hs x y (h hxy) hh
 
 end Descent.Pangenome.Construction

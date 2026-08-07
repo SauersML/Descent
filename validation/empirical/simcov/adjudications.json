@@ -426,5 +426,35 @@
     "pairing pgsdrift01 records and which matches."
    ]
   }
+ },
+ "pairwiseFstFromBranchTaus": {
+  "authoritative": "correct",
+  "superseded": {
+   "pgs": "The row records `fstFromTau(tauS + tauT)`, the SUM of the branch taus, and no file has carried that body since the split time was corrected to be counted once. It is a true measurement filed under a name whose body moved -- the relabelling pattern, not a live falsification."
+  },
+  "reason": [
+   "The disagreement is between the body this declaration HAS and the body it",
+   "HAD, and the ledger names both rows with the same key.",
+   "",
+   "`battery_pgs` falsified `(tauS + tauT) / (1 + tauS + tauT)` at 8.75 sems.",
+   "That falsification is what MOVED the body: `Definitions.lean` now reads",
+   "`fstFromTau (Tau.ofScaled ((tauS + tauT) / 2))`, the mean, which counts the",
+   "split time once instead of twice and reduces to `coalFst` on a symmetric",
+   "split. Nobody swapped the roles in the ledger, so the old formula still",
+   "reads as a verdict on the current declaration.",
+   "",
+   "`battery_correct`, group `correct_pairwise_tau`, runs BOTH forms on the same",
+   "cells -- a clean two-deme split with recombination over 20 Mb, 30 replicates,",
+   "Hudson F_ST, controlled against `coalFst` at a split depth outside the design",
+   "-- and separates them by fifty sems: the current body matches at worst 1.53",
+   "and the superseded sum misses by 55.27 at 33% relative.",
+   "",
+   "The remaining FALSIFIED row under this key is TAGGED `[unequal branch",
+   "lengths]` and is a competitor, not a corpus row. It is the boundary the",
+   "declaration's own status names -- the mean of the branch taus is not the",
+   "pairwise F_ST when the two branches differ in length -- measured at 18.28",
+   "sems on three asymmetric cells rather than asserted in prose. A conditional",
+   "status with evidence on only one side of its condition is an assertion."
+  ]
  }
 }

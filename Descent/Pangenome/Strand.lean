@@ -101,7 +101,7 @@ Empirical status: NOT AN EMPIRICAL CLAIM.  It transports a reported relation to 
 which alignments a real aligner reports is not settled here. -/
 def doubled {Pos : Type*} (S : Pos → Pos → Bool → Prop) :
     (Pos × Bool) → (Pos × Bool) → Prop :=
-  fun a b => ∃ s, S a.1 b.1 s ∧ b.2 = xor a.2 s
+  fun a b ↦ ∃ s, S a.1 b.1 s ∧ b.2 = xor a.2 s
 
 /-- **A frustrated alignment set** is one whose identifications force some position into a
 class with its own reverse complement.  Equivalently: some closed chain of alignments has an
@@ -172,7 +172,7 @@ only around the cycle.  This is an inversion polymorphism in the smallest form t
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is an explicit finite relation exhibited to
 witness that frustration occurs; it models no particular locus. -/
-def frustratedTriangle : Fin 3 → Fin 3 → Bool → Prop := fun p q s =>
+def frustratedTriangle : Fin 3 → Fin 3 → Bool → Prop := fun p q s ↦
   (p = 0 ∧ q = 1 ∧ s = false) ∨ (p = 1 ∧ q = 0 ∧ s = false) ∨
   (p = 1 ∧ q = 2 ∧ s = false) ∨ (p = 2 ∧ q = 1 ∧ s = false) ∨
   (p = 2 ∧ q = 0 ∧ s = true) ∨ (p = 0 ∧ q = 2 ∧ s = true)
@@ -213,7 +213,7 @@ not "the best one is lossy": there is no assignment of reading directions to thr
 consistent with three alignments.  A builder handed this input must discard one of them. -/
 theorem frustratedTriangle_no_gaugeFixing (g : Fin 3 → Bool) :
     ¬ GaugeFixing frustratedTriangle g :=
-  fun h => not_frustrated_of_gaugeFixing h frustratedTriangle_frustrated
+  fun h ↦ not_frustrated_of_gaugeFixing h frustratedTriangle_frustrated
 
 /-- **Without inversions the reference exists.**  An alignment set reporting no inverted
 alignment is gauge fixed by the constant convention, so it is unfrustrated.
@@ -223,7 +223,7 @@ inverted alignment, so wherever a genome has none, a global strand coordinate ex
 classical coordinate-based picture is not an approximation but exact.  The defect lives at
 the inverted loci and nowhere else. -/
 theorem gaugeFixing_const_of_no_inversion {Pos : Type*} {S : Pos → Pos → Bool → Prop}
-    (h : ∀ p q s, S p q s → s = false) : GaugeFixing S (fun _ => false) := by
+    (h : ∀ p q s, S p q s → s = false) : GaugeFixing S (fun _ ↦ false) := by
   intro p q s hS
   rw [h p q s hS]
   rfl
@@ -235,7 +235,7 @@ theorem exists_inversion_of_frustrated {Pos : Type*} {S : Pos → Pos → Bool �
   by_contra hc
   push_neg at hc
   exact not_frustrated_of_gaugeFixing
-    (gaugeFixing_const_of_no_inversion (fun p q s hS => by
+    (gaugeFixing_const_of_no_inversion (fun p q s hS ↦ by
       cases s with
       | false => rfl
       | true => exact absurd rfl (hc p q true hS))) h

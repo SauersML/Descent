@@ -82,7 +82,7 @@ that is, only on the part of `x` the symmetry does not move.
 This is what makes it the canonical invariant replacement for `f` rather than one of many. -/
 theorem orbitSum_smul (G : Type*) [Group G] [Fintype G] {X : Type*} [MulAction G X]
     (f : X → ℝ) (h : G) (x : X) : orbitSum G f (h • x) = orbitSum G f x :=
-  Fintype.sum_equiv (Equiv.mulRight h) _ _ (fun g => congrArg f (mul_smul g h x).symm)
+  Fintype.sum_equiv (Equiv.mulRight h) _ _ (fun g ↦ congrArg f (mul_smul g h x).symm)
 
 /-- **The orbit average**: the orbit sum divided by the order of the group. -/
 noncomputable def orbitAverage (G : Type*) [Group G] [Fintype G] {X : Type*} [MulAction G X]
@@ -96,15 +96,15 @@ This is the computational core; `sum_weight_mul_orbitAverage` is its useful form
 theorem sum_weight_mul_orbitSum (G : Type*) [Group G] [Fintype G] {X : Type*} [MulAction G X]
     [Fintype X] (μ : X → ℝ) (hμ : ∀ (g : G) (x : X), μ (g • x) = μ x) (f : X → ℝ) :
     (∑ x, μ x * orbitSum G f x) = (Fintype.card G : ℝ) * ∑ x, μ x * f x := by
-  have key : ∀ g : G, (∑ x, μ x * f (g • x)) = ∑ x, μ x * f x := fun g =>
-    Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun x => by
+  have key : ∀ g : G, (∑ x, μ x * f (g • x)) = ∑ x, μ x * f x := fun g ↦
+    Fintype.sum_equiv (MulAction.toPerm g) _ _ (fun x ↦ by
       show μ x * f (g • x) = μ (g • x) * f (g • x)
       rw [hμ g x])
   calc (∑ x, μ x * orbitSum G f x)
       = ∑ x, ∑ g : G, μ x * f (g • x) := by
         simp only [orbitSum, Finset.mul_sum]
     _ = ∑ g : G, ∑ x, μ x * f (g • x) := Finset.sum_comm
-    _ = ∑ _g : G, ∑ x, μ x * f x := Finset.sum_congr rfl (fun g _ => key g)
+    _ = ∑ _g : G, ∑ x, μ x * f x := Finset.sum_congr rfl (fun g _ ↦ key g)
     _ = (Fintype.card G : ℝ) * ∑ x, μ x * f x := by
         rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
 
@@ -127,7 +127,7 @@ theorem sum_weight_mul_orbitAverage (G : Type*) [Group G] [Fintype G] {X : Type*
   calc (∑ x, μ x * orbitAverage G f x)
       = (∑ x, μ x * orbitSum G f x) / (Fintype.card G : ℝ) := by
         rw [Finset.sum_div]
-        exact Finset.sum_congr rfl (fun x _ => by
+        exact Finset.sum_congr rfl (fun x _ ↦ by
           simp only [orbitAverage, mul_div_assoc])
     _ = ((Fintype.card G : ℝ) * ∑ x, μ x * f x) / (Fintype.card G : ℝ) := by rw [h]
     _ = ∑ x, μ x * f x := by field_simp
@@ -139,7 +139,7 @@ theorem sum_weight_mul_orbitAverage (G : Type*) [Group G] [Fintype G] {X : Type*
 a starting point; `shift k` is the relabelling that starts counting `k` copies later.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is a reindexing of a function on `ZMod n`. -/
-def shift {n : ℕ} (k : ZMod n) (a : ZMod n → ℝ) : ZMod n → ℝ := fun i => a (i + k)
+def shift {n : ℕ} (k : ZMod n) (a : ZMod n → ℝ) : ZMod n → ℝ := fun i ↦ a (i + k)
 
 /-- **A summary of a repeat array is register-invariant** when no change of register moves
 it.  Only such summaries are functions of the array; the rest are functions of the labelling.
@@ -153,9 +153,9 @@ def RegisterInvariant {n : ℕ} (F : (ZMod n → ℝ) → ℝ) : Prop :=
 relabelling, because relabelling permutes the terms.  Any function of the multiset of copy
 values is invariant for the same reason; the sum is the instance that carries the witness. -/
 theorem shiftInvariant_sum {n : ℕ} [NeZero n] :
-    RegisterInvariant (n := n) (fun a => ∑ i, a i) := by
+    RegisterInvariant (n := n) (fun a ↦ ∑ i, a i) := by
   intro k a
-  exact Fintype.sum_equiv (Equiv.addRight k) _ _ (fun i => rfl)
+  exact Fintype.sum_equiv (Equiv.addRight k) _ _ (fun i ↦ rfl)
 
 /-- **A per-copy readout does not survive the register.**
 
@@ -169,9 +169,9 @@ average over the register, which is `shiftInvariant_sum` up to a factor.  This i
 construction-difference peaks reported at tandem repeats are not evidence that repeats are
 hard to align -- they are what a frame-dependent readout looks like when the frame moves. -/
 theorem first_copy_not_shiftInvariant :
-    ¬ RegisterInvariant (n := 2) (fun a => a 0) := by
+    ¬ RegisterInvariant (n := 2) (fun a ↦ a 0) := by
   intro h
-  have h1 := h 1 (fun i => if i = 0 then (0 : ℝ) else 1)
+  have h1 := h 1 (fun i ↦ if i = 0 then (0 : ℝ) else 1)
   simp [shift] at h1
 
 end Descent.Pangenome.Register
