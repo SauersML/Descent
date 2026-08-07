@@ -8116,8 +8116,13 @@ def run_heads() -> int:
     import os as _os
     import re as _re
 
-    root = _os.path.dirname(_os.path.dirname(
-        _os.path.dirname(_os.path.abspath(__file__))))
+    # `CORPUS`, not a root computed from `__file__`. The section header above
+    # `_shape_corpus` records the same repair for the same reason: a guard that
+    # locates the corpus by where its own source file sits cannot be pointed at a
+    # fixture, so it can never be shown to fire on a planted defect -- and a
+    # detector that has never been shown to fire is indistinguishable from a clean
+    # corpus, which is the sentence this file's calibration section opens with.
+    root = str(CORPUS)
     lean = _os.path.join(root, "Descent")
     decl = _re.compile(r"(?m)^\s*(?:@\[[^\]]*\]\s*)?(?:private\s+|protected\s+|"
                        r"noncomputable\s+)*(?:def|abbrev|theorem|lemma|structure|"

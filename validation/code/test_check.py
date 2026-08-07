@@ -51,6 +51,14 @@ from pathlib import Path
 # test_check.py sits beside check.py at validation/code/.
 CHECK = Path(__file__).resolve().parent / "check.py"
 
+# Read the depth limit from the guard rather than pinning it here. A fixture that
+# hard-codes 12 stops testing the rule the moment someone changes the limit, and
+# changing it is exactly the edit this harness exists to keep honest.
+sys.path.insert(0, str(CHECK.parent))
+import check as _check  # noqa: E402 -- the path has to be set first
+
+SHAPE_DEPTH_LIMIT = _check.SHAPE_DEPTH_LIMIT
+
 # --------------------------------------------------------------------------------------
 # Planted laundering.  Each block is labelled with the family it MUST be reported as.
 # --------------------------------------------------------------------------------------
@@ -641,8 +649,115 @@ def advice : String := "Core.bigM is the type for this"
 end Descent.PopGen
 """
 
+# A corpus with SHAPE: two directories, each with a head, and a real edge between
+# them. `heads` and the four shape guards read the directory layout and the import
+# graph rather than the text of a declaration, so none of the fixtures above can reach
+# them -- which is why all five had no control of any kind. This is the smallest tree
+# that satisfies all of them at once, and every case below is one planted defect in it.
+SHAPE_ROOT = HEADER + """
+import Descent.Alpha
+import Descent.Beta
+"""
+
+SHAPE_ALPHA_HEAD = HEADER + """
+import Descent.Alpha.One
+"""
+
+SHAPE_ALPHA_ONE = HEADER + """
+namespace Descent.Alpha
+
+/-- A quantity the other directory reads. -/
+noncomputable def alphaOne (x : ℝ) : ℝ := x
+
+end Descent.Alpha
+"""
+
+SHAPE_BETA_HEAD = HEADER + """
+import Descent.Beta.Two
+"""
+
+SHAPE_BETA_TWO = HEADER + """
+import Descent.Alpha.One
+
+namespace Descent.Beta
+
+/-- Reads `Alpha.One`, which is the edge that makes this corpus one component. -/
+noncomputable def betaTwo (x : ℝ) : ℝ := Alpha.alphaOne x
+
+end Descent.Beta
+"""
+
+
+def shape_corpus(**overrides) -> dict:
+    """The clean shape fixture, with named files replaced or added."""
+    files = {
+        "Descent.lean": SHAPE_ROOT,
+        "Descent/Alpha.lean": SHAPE_ALPHA_HEAD,
+        "Descent/Alpha/One.lean": SHAPE_ALPHA_ONE,
+        "Descent/Beta.lean": SHAPE_BETA_HEAD,
+        "Descent/Beta/Two.lean": SHAPE_BETA_TWO,
+    }
+    for rel, text in overrides.items():
+        files[rel.replace("__", "/").replace("_lean", ".lean")] = text
+    return files
+
+
+def shape_chain(n: int) -> dict:
+    """A corpus that is one chain of `n` modules under a single head.
+
+    `shape-depth`'s limit is 12, and nothing shorter than that can exercise it. The
+    chain is generated rather than written out because the number is the point: a
+    fixture pinned at exactly the limit stops testing the rule the moment someone
+    changes the limit.
+    """
+    files = {"Descent.lean": HEADER + "\nimport Descent.Alpha\n"}
+    head = [f"import Descent.Alpha.M{i}" for i in range(n)]
+    files["Descent/Alpha.lean"] = HEADER + "\n" + "\n".join(head) + "\n"
+    for i in range(n):
+        imports = f"import Descent.Alpha.M{i - 1}\n" if i else ""
+        body = (f"noncomputable def m{i} (x : ℝ) : ℝ := "
+                + (f"Alpha.m{i - 1} x" if i else "x"))
+        files[f"Descent/Alpha/M{i}.lean"] = (
+            HEADER + "\n" + imports + "\nnamespace Descent.Alpha\n\n"
+            f"/-- Rung {i} of a chain. -/\n{body}\n\nend Descent.Alpha\n")
+    return files
+
+
 CASES = [
     # (guard, label, files, must_appear_in_output)
+    ("heads", "a module on disk that its directory head does not import",
+     shape_corpus(**{"Descent/Alpha.lean": HEADER + "\n"}),
+     "does not import"),
+    ("heads", "a head that states a theorem instead of listing modules",
+     shape_corpus(**{"Descent/Alpha.lean": SHAPE_ALPHA_HEAD
+                     + "\ntheorem head_states_something : (1:ℕ) = 1 := rfl\n"}),
+     "a head is a table of contents"),
+    ("shape-components", "a subsystem that reaches nothing and nothing reaches",
+     shape_corpus(**{"Descent/Beta/Two.lean": HEADER + """
+namespace Descent.Beta
+
+/-- Names nothing in the corpus, and nothing names it. -/
+noncomputable def betaTwo (x : ℝ) : ℝ := x
+
+end Descent.Beta
+"""}),
+     "component"),
+    ("shape-chains", "a module whose one internal import is a sibling it never names",
+     shape_corpus(**{"Descent/Alpha.lean": SHAPE_ALPHA_HEAD + "import Descent.Alpha.Three\n",
+                     "Descent/Alpha/Three.lean": HEADER + """
+import Descent.Alpha.One
+
+namespace Descent.Alpha
+
+/-- Imports `One` and names nothing it declares. -/
+noncomputable def alphaThree (x : ℝ) : ℝ := x
+
+end Descent.Alpha
+"""}),
+     "unused sibling"),
+    ("shape-depth", "an import chain past the limit",
+     shape_chain(SHAPE_DEPTH_LIMIT + 2),
+     "exceeds"),
     ("layers", "a qualified name from a layer the file cannot reach",
      layers_corpus(LAYERS_REFERENCE), "names Core.bigM"),
     # The `set_option` screen was one rule reading a timeout and a kernel bypass as
