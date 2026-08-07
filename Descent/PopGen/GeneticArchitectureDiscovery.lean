@@ -529,6 +529,21 @@ theorem perCausalLocusSignal_mul_count (h2 k : ℝ) (hk : k ≠ 0) :
   unfold perCausalLocusSignal Descent.Core.ratio
   field_simp
 
+/-- **Polygenicity dilutes the per-locus signal in inverse proportion, exactly.**
+
+Spreading the same heritability over `c` times as many loci divides the per-locus signal by
+`c`, and the statement needs no hypothesis on `c` or `k`: at the junk points both sides
+return the same junk.  The reciprocal dependence on the count is the whole of the
+architecture argument -- how fast per-locus signal falls as a trait gets more polygenic is
+what decides whether individual loci are detectable at a given sample size.  A body
+depending on the count any other way, `h²/√k` or `h² - k`, is still positive, still
+decreasing in `k`, and still vanishes with `h²`; it fails here. -/
+theorem perCausalLocusSignal_dilution (h2 k c : ℝ) :
+    perCausalLocusSignal h2 (Descent.Core.product c k)
+      = Descent.Core.ratio (perCausalLocusSignal h2 k) c := by
+  unfold perCausalLocusSignal Descent.Core.product Descent.Core.ratio
+  rw [div_div, mul_comm c k]
+
 /-- **OLS effect estimates are unbiased but noisy.**
     This theorem now includes the actual unbiasedness statement for the
     one-locus additive model:

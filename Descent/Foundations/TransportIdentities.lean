@@ -969,6 +969,25 @@ theorem explainableFraction_zero_total_is_junk (between : ℝ) :
   unfold explainableFraction Descent.Core.ratio
   simp
 
+/-- **The explainable and residual fractions are complements**, on a total that is the sum
+of the two parts.
+
+Every bound below takes `total = between + within` as a hypothesis and then works with
+`between / total` alone.  This is the identity that makes the discarded half recoverable:
+the fraction the between-group component explains and the fraction the within-group
+component leaves are one another's complements, so a residual fraction reported next to an
+explainable fraction that does not complement it is reporting a decomposition whose parts do
+not sum to the total they are shares of.  A total with anything else in it -- a cross term,
+or a component counted in both parts -- fails this. -/
+theorem explainableFraction_eq_complement_within (between within : ℝ)
+    (h : Descent.Core.sum between within ≠ 0) :
+    explainableFraction between (Descent.Core.sum between within)
+      = Descent.Core.complement
+          (explainableFraction within (Descent.Core.sum between within)) := by
+  have hsum : between + within ≠ 0 := h
+  unfold explainableFraction Descent.Core.sum Descent.Core.complement Descent.Core.ratio
+  rw [eq_sub_iff_add_eq, div_add_div_same, div_self hsum]
+
 section NoiseFloor
 
 theorem explainable_fraction_bound_of_noise_floor

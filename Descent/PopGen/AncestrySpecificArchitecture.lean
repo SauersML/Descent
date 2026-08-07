@@ -576,6 +576,21 @@ theorem gwasHeritability_le_true (h2_true avg_r2_tag : ℝ)
   unfold gwasHeritability Descent.Core.product
   nlinarith
 
+/-- **The two exponents on the LD correlation are one exponent, related here.**
+
+`taggedEffect` is linear in `r` and `gwasHeritability` is quadratic in it, and the two
+docstrings each argue for their own power against the other's.  This is where the argument
+is discharged: a tag carries the apparent effect `β r`, and the variance that apparent
+effect explains is its square, so the quadratic quantity at the squared arguments is the
+square of the linear one.  The two definitions share a body and nothing else forces them to
+keep sharing one; if either grows or loses a factor of `r`, this equation is the step that
+stops compiling. -/
+theorem taggedEffect_sq_eq_gwasHeritability (causalEffect tagR : ℝ) :
+    taggedEffect causalEffect tagR ^ 2
+      = gwasHeritability (causalEffect ^ 2) (tagR ^ 2) := by
+  unfold taggedEffect gwasHeritability Descent.Core.product
+  ring
+
 
 end LDTagging
 
@@ -638,6 +653,23 @@ theorem allelicHeterogeneityRetainedSignal_eq_full_iff
     · exact Or.inr (Or.inr (by linarith))
   · rintro (rfl | rfl | rfl) <;> ring
 
+/-- **Sharing is one more multiplicative channel, and multiplicative channels compose.**
+
+The retained signal is attenuated three times: by how much of the variance is causal, by how
+well the causal variance is tagged, and by how much of it is shared across populations.
+Splitting the shared fraction into two stages -- shared at the gene, then shared at the
+variant within it -- and applying them one after the other retains exactly what applying
+their product at once retains.  An attenuation that entered additively, or a body carrying a
+coefficient on the shared fraction, fails this while still satisfying every bound stated
+above it. -/
+theorem allelicHeterogeneityRetainedSignal_compose_shared
+    (r2_causal r2_tag ρ σ : ℝ) :
+    allelicHeterogeneityRetainedSignal r2_causal r2_tag (Descent.Core.product ρ σ)
+      = Descent.Core.product
+          (allelicHeterogeneityRetainedSignal r2_causal r2_tag ρ) σ := by
+  unfold allelicHeterogeneityRetainedSignal Descent.Core.product3 Descent.Core.product
+  ring
+
 /-- Total gene-level variance is the sum of shared and population-specific components. -/
 noncomputable def populationGeneVariance (shared specific : ℝ) : ℝ :=
   Descent.Core.sum shared specific
@@ -691,6 +723,26 @@ theorem crossPopulationGeneTransferFraction_eq_one_iff
       linarith
   · rintro rfl
     simp [ne_of_gt h_shared]
+
+/-- **The shared and specific shares are complements**, which is what makes
+`populationGeneVariance` a partition of the gene's variance rather than an unstructured
+total.  Whatever fraction of it the shared component carries, the population-specific
+component carries the rest -- so the two shares cannot both be estimated freely, and a
+transfer fraction reported alongside a specific fraction that does not complement it is
+reporting an inconsistent decomposition.
+
+A total carrying anything beyond the two components -- a covariance term between them, or
+either component counted twice -- leaves the two shares summing to something other than
+one, so this equation holds only for the plain sum. -/
+theorem crossPopulationGeneTransferFraction_eq_complement
+    (shared specific : ℝ) (h : populationGeneVariance shared specific ≠ 0) :
+    crossPopulationGeneTransferFraction shared specific
+      = Descent.Core.complement
+          (Descent.Core.ratio specific (populationGeneVariance shared specific)) := by
+  have hsum : shared + specific ≠ 0 := h
+  unfold crossPopulationGeneTransferFraction populationGeneVariance Descent.Core.sum
+    Descent.Core.complement Descent.Core.ratio
+  rw [eq_sub_iff_add_eq, div_add_div_same, div_self hsum]
 
 /-- Number of distinct causal signals across two populations after shared signals are
 counted only once. -/
