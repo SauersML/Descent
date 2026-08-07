@@ -2,8 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.FstDefinitions
--- `Portability.pairwiseFstFromBranches` is the right-hand side of `wrightFIT_eq` below.
-import Descent.Portability.PortabilityDrift.Definitions
+-- `pairwiseFstFromBranches` is the right-hand side of `wrightFIT_eq` below.
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -102,7 +102,7 @@ exists so the arithmetic agreement is on the record and cannot drift, and so tha
 repairing one of the two is forced to look at the other. `pairwiseFstFromBranchTaus` is the
 composition PortabilityDrift offers in place of the branch case. -/
 theorem wrightFIT_eq_pairwiseFstFromBranches (a b : ℝ) :
-    wrightFIT a b = Portability.pairwiseFstFromBranches a b := rfl
+    wrightFIT a b = pairwiseFstFromBranches a b := rfl
 
 /-- **Within-population heterozygosity loss after `t` generations of drift.**
     `1 - (1 - 1/(2 Nₑ))^t`.

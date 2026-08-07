@@ -7754,6 +7754,21 @@ LAYER_UNRANKED = {
 # repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
 # still counts as a violation; see the section header.
 LAYER_PENDING = {
+    ("Descent.PopGen.DemographicHistory",
+     "Descent.Portability.PortabilityDrift.MigrationDrift"):
+        "`Portability.fstMigrationDriftEquilibrium_decreases_with_m`, the monotonicity of "
+        "the migration-drift equilibrium in the migration rate. The QUANTITY it is about "
+        "moved down to `PopGen.DriftRecurrences` with the rest of the drift block; this "
+        "theorem about it did not, because it is stated in the drift chapter's own terms. "
+        "The repair is to move the theorem down beside the definition it constrains, "
+        "which is a smaller version of the move that retired six edges.",
+    ("Descent.PopGen.PolygenicAdaptation",
+     "Descent.Portability.PortabilityDrift.PresentDayMetrics"):
+        "`Portability.Var_Delta_Mu`, the variance of the mean shift. This is a "
+        "present-day transport quantity and is correctly placed: it is about a score "
+        "carried from a source population to a present-day one, which is what "
+        "`PresentDayMetrics` is for. The repair is the consumer moving UP, not the "
+        "definition moving down.",
     ("Descent.PopGen.DemographicCapacity",
      "Descent.Portability.PCCorrectability.ImitationCapacity"):
         "`traceWindowBudgetClass`, `imitable_within_traceWindowBudget`, "
@@ -7773,14 +7788,6 @@ LAYER_PENDING = {
         "states an architecture theorem in terms of them, so here the consumer moves "
         "UP rather than the definition moving down.",
     ("Descent.PopGen.HumanDemography",
-     "Descent.Portability.PortabilityDrift.Definitions"):
-        "`fstFromGenerations` and its two bounds `fst_from_tau_nonneg_of_nonneg` and "
-        "`fst_from_tau_lt_one`: F_ST accumulated over generations, a single-population "
-        "quantity with no score carried anywhere, housed in the drift chapter because that "
-        "is where the drift chapter was written. THIS HALF retires with the drift "
-        "extraction; the same file's edge to `PresentDayMetrics` does not. Until the head "
-        "import was made specific the two were one edge and the difference was invisible.",
-    ("Descent.PopGen.HumanDemography",
      "Descent.Portability.PortabilityDrift.PresentDayMetrics"):
         "`presentDayR2`, `presentDayR2_eq_core`, `presentDayPGSVariance` and "
         "`pgsVarianceFromHet`: a polygenic score's variance and R-squared carried from a "
@@ -7790,33 +7797,6 @@ LAYER_PENDING = {
         "only matches are its own theorem names, like `fstFromGenerations_le_coalescentTau` "
         "-- and concluded the drift extraction would take the whole edge. Splitting the head "
         "import proved the file has two dependencies of different kinds and only one leaves.",
-    ("Descent.PopGen.LDDecayTheory",
-     "Descent.Portability.PortabilityDrift.MigrationDrift"):
-        "`ibdRecurrenceStep`, `ibdRecurrenceFixedPoint`, `islandFstMultiplicativeStep` and "
-        "`fstIslandMultiplicativeEquilibrium`, unfolded against this file's own "
-        "`driftLDStep`. The identity-by-descent recurrence and the island-model F_ST step "
-        "are statements about one population's allele frequencies over generations; nothing "
-        "in them is about transport. Retired by the drift extraction.",
-    ("Descent.PopGen.PopulationGeneticsFoundations.MigrationDriftFoundations",
-     "Descent.Portability.PortabilityDrift"):
-        "`Portability.effectiveSymmetricMigration` and "
-        "`fstMigrationDriftEquilibrium`: island-model migration-drift balance, single "
-        "population set, no score carried anywhere.",
-    ("Descent.PopGen.PopulationGeneticsFoundations.TransientFstDerivation",
-     "Descent.Portability.PortabilityDrift"):
-        "`Portability.hudsonFstFromCoalescenceTimes`: Hudson's F_ST from coalescence "
-        "times, which is the definition this directory exists to derive.",
-    ("Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics",
-     "Descent.Portability.PortabilityDrift.Definitions"):
-        "`pairwiseFstFromBranches`: pairwise F_ST off a tree. One move of the drift "
-        "recurrences down into PopGen retires this edge, `LDDecayTheory`'s, "
-        "`MigrationDriftFoundations`'s, `TransientFstDerivation`'s, "
-        "`FstDerivationFromDrift`'s and the `Definitions` half of `HumanDemography`'s.",
-    ("Descent.PopGen.PopulationGeneticsFoundations.FstDerivationFromDrift",
-     "Descent.Portability.PortabilityDrift.ClosedPopulationRegime"):
-        "`hetMutationFloor`: the heterozygosity a closed population retains under "
-        "mutation-drift balance. One population, one mutation rate, no score carried "
-        "anywhere. Same extraction as the drift recurrences and it goes down with them.",
     ("Descent.PopGen.AncestrySpecificArchitecture",
      "Descent.Portability.PortabilityDrift.MutationDrift"):
         "`Portability.ibdFlowStep` and `ibdFlowStep_fixedPoint`: the identity-by-descent "

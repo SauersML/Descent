@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.PopGen.DriftRecurrences
 import Descent.PopGen.AdditiveInvariance
 import Descent.PopGen.AncestrySpecificArchitecture
 import Descent.PopGen.AssortativeMatingPGS

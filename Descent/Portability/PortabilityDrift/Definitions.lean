@@ -4,10 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.PopGen.DGP
 import Descent.Spectral.CirculationDefect
 import Descent.Core.Moments
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
+
+open PopGen (fstFromGenerations hudsonFstFromCoalescenceTimes pairwiseFstFromBranches)
 
 open MeasureTheory
 
@@ -35,7 +38,6 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
 `variable`s, and this file declares none at that level, so the reopening is exact.
 -/
 
-
 /-! `r2FromSignalVariance` and the Gaussian-AUC declarations live in
 `Descent.TransportedMetrics` (DGP.lean). `Descent.PopGen.DGP` is imported, so
 the module is available, but the namespace was never opened here and this file
@@ -55,7 +57,6 @@ namespace. The remaining `TransportedMetrics.` prefixes in this file are left
 alone; both spellings resolve to the same constant. -/
 
 section PortabilityDrift
-
 
 /-- Empirical status: **VALIDATED** through
     `coalescenceSurvivalFromHazard`, whose measurement
@@ -158,7 +159,6 @@ theorem coalescentTau_zero_population_is_junk (t : ℝ) :
 calls the kernel.  `Core.fstFromTau` is the split law `tau/(1+tau)`; the wrapper added a second
 place for the convention to be got wrong. -/
 
-
 /-- **fstFromTau at `tau = -1`, named.** A coalescent time of minus one is outside the admissible
 range, which is exactly why it must be excluded by hypothesis rather than left to the totality
 convention: the saturation curve's divisor vanishes there and Lean returns `0`, an ordinary `Fst`
@@ -168,27 +168,6 @@ theorem fstFromTau_negative_unit_tau_is_junk :
   unfold Descent.Core.fstFromTau Descent.Core.saturation
   simp only [Descent.Core.Tau.value_ofScaled]
   norm_num
-
-/-- `F_ST` after `t` generations of drift at effective size `Nₑ`, obtained by
-rescaling to coalescent time and applying `fstFromTau`.
-
-    Regime: a clean two-population split with no migration and equal sizes;
-    `F_ST` is the pairwise Hudson estimator as a ratio of averages, which is the
-    convention every `F_ST` in this corpus is written for.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).
-    The composition, not either half alone, is what is measured: `τ` is never
-    read off, only `t` and `Nₑ` go in. Over `τ` = 0.125, 0.25, 1, 2, 4 the body
-    predicts 0.11111, 0.20000, 0.50000, 0.66667 and 0.80000 against measured
-    0.11708 ± 0.00264, 0.19851 ± 0.00511, 0.50095 ± 0.00770, 0.66607 ± 0.00624
-    and 0.80065 ± 0.00317, worst cell 2.26 sems at 5.1% relative. Power: the
-    prediction spans 86% of the unit interval and crosses the whole saturating
-    curve, so a form linear in `τ`, or one saturating at another rate, separates
-    on the grid rather than only at its ends. Simulated with recombination
-    (8 Mb at 1e-8): at zero recombination one genealogy per replicate makes the
-    error bar honest but far too wide to decide anything. -/
-noncomputable def fstFromGenerations (t Ne : ℝ) : ℝ :=
-  Descent.Core.fstFromTau (Descent.Core.Tau.ofGenerations t Ne)
 
 /-- **Circulation inflates transfer time by the same saturation law that drift
 uses for `F_ST`.**
@@ -211,38 +190,6 @@ theorem one_div_transferTimeInflation_eq_one_sub_saturation (s a : ℝ) :
   unfold Spectral.transferTimeInflation Descent.Core.saturation
   field_simp
   ring
-
-/-- **Branchwise-to-pairwise `F_ST` map under independent drift from a common
-ancestor.**
-
-    Regime: small divergence, `F_ST` below about `0.05`. Multiplicative
-    composition is the right shape -- additive composition `fstS + fstT` is 53%
-    high at `T = 4000` -- and this map is within simulation error at the shortest
-    branch tested, but it degrades monotonically as divergence grows, and the
-    degradation is one-sided, always too high:
-
-        T      fstS     fstT   pairwise obs      se      this map    err
-      200    0.0461   0.0500     0.09314      0.00612    0.09366    +0.6%
-     1000    0.1867   0.1895     0.31845      0.00941    0.34075    +7.0%
-     2000    0.3374   0.3234     0.48780      0.01002    0.55098   +13.0%
-     4000    0.5029   0.4987     0.65365      0.00801    0.74948   +14.7%
-
-    Twelve to eighteen standard errors on the last two rows. Not an estimator
-    artifact: under Nei's estimator the same rows give -1.4%, +3.3%, +10.0%,
-    +14.2%.
-
-    The mechanism is derivable rather than empirical, and
-    `pairwiseFstFromBranches_eq_fstFromTau_add_mul` states it: composing
-    multiplicatively in `F_ST` is the same as composing *additively in coalescent
-    time* after inserting a spurious `tauS * tauT` of extra divergence time.
-    Coalescence times add along a path; `F_ST` values do not. At `tau` near `1`,
-    which is where `T = 4000` sits, that spurious term doubles the divergence
-    time, which is the sign and the size of the error above.
-    `pairwiseFstFromBranchTaus` is the same composition without it.
-
-    Empirical status: CONDITIONALLY VALID. -/
-noncomputable def pairwiseFstFromBranches (fstS fstT : ℝ) : ℝ :=
-  Descent.Core.complementaryComposition fstS fstT
 
 /-- **Pairwise `F_ST` composed in coalescent time instead of in `F_ST`.**
 
@@ -408,19 +355,6 @@ theorem pairwiseFst_composition_gap_eq (a : ℝ) (ha : 0 ≤ a) :
 @[simp] theorem fstFromGenerations_eq (t Ne : ℝ) :
     fstFromGenerations t Ne = t / (2 * Ne) / (1 + t / (2 * Ne)) := rfl
 
-theorem fst_from_tau_nonneg_of_nonneg (tau : ℝ) (htau : 0 ≤ tau) :
-    0 ≤ Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled tau) := by
-  unfold Descent.Core.fstFromTau Descent.Core.saturation
-  simp only [Descent.Core.Tau.value_ofScaled]
-  exact div_nonneg htau (by linarith)
-
-theorem fst_from_tau_lt_one (tau : ℝ) (htau : 0 ≤ tau) :
-    Descent.Core.fstFromTau (Descent.Core.Tau.ofScaled tau) < 1 := by
-  unfold Descent.Core.fstFromTau Descent.Core.saturation
-  simp only [Descent.Core.Tau.value_ofScaled]
-  rw [div_lt_one (by linarith)]
-  linarith
-
 /-- **The coalescence CDF is not `F_ST`.**  `1 - exp (-tau)` is the probability
 that a lineage pair has coalesced by `tau`; `F_ST` is the between-population
 share of variance.  Conflating them overstates divergence at every positive
@@ -442,8 +376,6 @@ theorem fstFromTau_lt_coalescenceCdf (tau : ℝ) (htau : 0 < tau) :
     ring
   rw [hrw]
   exact div_pos (by linarith) (by positivity)
-
-
 
 /-- **The `Fst` saturation curve's midpoint, pinned.** `fstFromTau_lt_coalescenceCdf` bounds this
 above by the coalescence CDF and is satisfied by any body below that curve, including
@@ -521,26 +453,6 @@ Wright's diffusion form `1/(1 + 4 Nₑ m)` written through `scaledMigrationRate`
 noncomputable def SplitMigrationModel.fstEqLimitLowMutationManyDemes (m :
     SplitMigrationModel) : ℝ :=
   1 / (1 + Descent.Core.scaledMigrationRate m.Ne m.mig)
-
-/-- Hudson's `F_ST` estimator from mean coalescence times: one minus the ratio
-of the within-population time to the total time.
-
-    Regime: a clean two-population split, no migration, equal sizes.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk20.py`, `group_a`).
-    This body claims that the GENEALOGICAL quantity computes the FREQUENCY one,
-    so the two sides are taken from two engines that share no code: `ETss` and
-    `ETst` come from branch-mode diversity and divergence over the tree
-    sequence, and the value they are compared against is the site-frequency
-    Hudson estimator over mutations dropped on that same tree, as a ratio of
-    averages. Agreement is therefore evidence and not a transcription checked
-    against itself. Over `τ` = 0.125, 0.25, 1, 2, 4 the branch-time reading
-    gives 0.11571, 0.19622, 0.49809, 0.66453 and 0.79992 against the
-    frequency-based 0.11708 ± 0.00372, 0.19851 ± 0.00711, 0.50095 ± 0.01057,
-    0.66607 ± 0.00875 and 0.80065 ± 0.00447, worst cell 0.37 sems over a
-    prediction spanning 86%. -/
-noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
-  Descent.Core.proportionalReduction ETss ETst
 
 structure DemographicCoalescenceScalars where
   ETss : ℝ

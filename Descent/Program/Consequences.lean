@@ -24,6 +24,7 @@ import Descent.Blindness.CountingInvariantInstances
 import Descent.Blindness.BundleRigidity.Cycles
 import Descent.Blindness.BundleRigidity.Dichotomy
 import Descent.Blindness.BundleRigidity.TwoAtom
+import Descent.PopGen.DriftRecurrences
 
 /-!
 # What the separate results say when they are put together
@@ -44,6 +45,8 @@ population.
 -/
 
 namespace Descent.Program
+
+open PopGen (fstFromGenerations hudsonFstFromCoalescenceTimes)
 
 /-! ### A reported improvement has two possible causes, and they are not distinguishable
 from the number alone -/
@@ -210,7 +213,7 @@ theorem gradual_loss_meets_a_noisy_instrument
     (V_A V_E t Ne σ_sq bias_sq : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne)
     (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
-    1 - t / (2 * Ne) ≤ PopGen.neutralDriftR2Ratio V_A V_E (Portability.fstFromGenerations t Ne) ∧
+    1 - t / (2 * Ne) ≤ PopGen.neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) ∧
       4 * bias_sq * σ_sq + 2 * σ_sq ^ 2 ≥ 2 * σ_sq ^ 2 :=
   ⟨PopGen.neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
    Portability.high_cv_inevitable σ_sq bias_sq hσ hb⟩
@@ -626,7 +629,7 @@ this section exists to prevent. -/
 theorem pcTargetAxisEfficacy_eq_proportionalReduction (residual baseline : ℝ) :
     Portability.pcTargetAxisEfficacy baseline residual = PopGen.fstFromHetRatio residual baseline ∧
       Portability.pcTargetAxisEfficacy baseline residual =
-        Portability.hudsonFstFromCoalescenceTimes residual baseline ∧
+        hudsonFstFromCoalescenceTimes residual baseline ∧
       Portability.pcTargetAxisEfficacy baseline residual = PopGen.r2FromMSE residual baseline := by
   refine ⟨rfl, rfl, rfl⟩
 

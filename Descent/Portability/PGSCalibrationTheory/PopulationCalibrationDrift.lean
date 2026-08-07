@@ -36,16 +36,65 @@ calibration drifts systematically.
 
 section PopulationCalibrationDrift
 
-/-- CITL shift is zero when prevalences match.
+/-- Shared logistic-scale calibration profile induced by a prevalence shift.
 
-Proved directly on `prevalenceCITLShift`. It used to route through the deleted
-`prevalenceLogisticCalibrationProfile`, which packaged this difference as a deployment
-calibration profile and was falsified in that reading. The difference of logits is
-unaffected: it is what it always was, and this is its value on the diagonal. -/
+    **This profile's `citl` is a difference of MARGINAL prevalence logits, and
+    that is not the intercept correction a deployment needs.** The two coincide
+    only when the score is constant, because `logit E[p]` is not `E[logit p]`.
+
+    Empirical status: **FALSIFIED** as the deployment
+    calibration-in-the-large, and exact for a constant predictor
+    (`validation/empirical/simcov/battery_pgscal01.py`). Two million
+    individuals per arm, a logistic risk model, and a target differing from the
+    source by a baseline-risk (intercept) shift and nothing else — the one
+    regime the phrase "induced by a prevalence shift" names. The oracle is the
+    intercept correction the target actually needs: the `a` solving
+    `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear predictor held as an
+    offset. Both prevalences are fed at their realised cohort values.
+
+      score sd   true intercept shift   this citl   fitted correction   sems
+      1.2              0.80              0.66237    0.79967±0.00204     67.2
+      1.5              0.60              0.42940    0.60007±0.00181     94.4
+      2.0              1.50              0.94064    1.49676±0.00149    374.0
+      1.0             -0.90             -0.75407   -0.89961±0.00190     76.4
+
+    The failure is one-directional: `|citl|` is 17% to 37% SMALLER than the
+    correction required, so a deployment sized from this number under-corrects.
+    The gap grows with the spread of the score and vanishes with it — the
+    positive control is a zero-variance score, where the fitted correction
+    returns the 0.7 intercept shift it was given at 0.26 sems and this body
+    returns 0.7 as well. The identity-scale reading `π_target - π_source` is
+    rejected on the same cells at up to 878 sems, so the failure is not an
+    artefact of comparing across links.
+
+    Consumers that read this `citl` as the recalibration a target population
+    needs — rather than as the shift in marginal log-odds, which is what it is —
+    are reading an attenuated number. -/
+noncomputable def prevalenceLogisticCalibrationProfile
+    (pi_source pi_target slope : ℝ) : CalibrationProfile :=
+  logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source) slope
+
+@[simp] theorem prevalenceLogisticCalibrationProfile_citl
+    (pi_source pi_target slope : ℝ) :
+    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).citl =
+      prevalenceCITLShift pi_source pi_target := by
+  unfold prevalenceLogisticCalibrationProfile prevalenceCITLShift
+    logisticCalibrationProfile calibrationProfile prevalenceLogit
+    calibrationInTheLarge Descent.Core.difference
+  ring
+
+@[simp] theorem prevalenceLogisticCalibrationProfile_slope
+    (pi_source pi_target slope : ℝ) :
+    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).slope = slope := by
+  rfl
+
+/-- CITL shift is zero when prevalences match. -/
 theorem no_citl_shift_same_prevalence (pi : ℝ) :
     prevalenceCITLShift pi pi = 0 := by
-  unfold prevalenceCITLShift
-  ring
+  rw [← prevalenceLogisticCalibrationProfile_citl pi pi (1 : ℝ)]
+  simp [prevalenceLogisticCalibrationProfile, logisticCalibrationProfile,
+    calibrationProfile, calibrationInTheLarge,
+      Descent.Core.difference]
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence

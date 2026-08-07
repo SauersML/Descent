@@ -1,9 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PortabilityDrift.Definitions
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Blindness.LumpedRateBlindness
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Conditionals Descent.Decision
 
@@ -221,8 +221,8 @@ theorem neutral_drift_ratio_ge_one_sub_fst (V_A V_E fst : ℝ)
 `t / (2 Ne)`, the coalescent time scale. -/
 theorem fstFromGenerations_le_coalescentTau (t Ne : ℝ)
     (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    Portability.fstFromGenerations t Ne ≤ t / (2 * Ne) := by
-  unfold Portability.fstFromGenerations Descent.Core.fstFromTau
+    fstFromGenerations t Ne ≤ t / (2 * Ne) := by
+  unfold fstFromGenerations Descent.Core.fstFromTau
     Descent.Core.Tau.ofGenerations Descent.Core.saturation Descent.Core.ratio Descent.Core.ploidy
   have hfrac : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
   rw [div_le_iff₀ (by linarith)]
@@ -237,16 +237,16 @@ divergence, `t ≈ 2.5 × 10^3` and `Ne ≈ 10^4` give a floor of `0.875`. -/
 theorem neutral_drift_ratio_ge_one_sub_coalescentTau
     (V_A V_E t Ne : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne) :
-    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (Portability.fstFromGenerations t Ne) := by
+    1 - t / (2 * Ne) ≤ neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) := by
   have hτ : 0 ≤ t / (2 * Ne) := div_nonneg ht (by linarith)
-  have hfst0 : 0 ≤ Portability.fstFromGenerations t Ne := by
-    unfold Portability.fstFromGenerations
-    exact Portability.fst_from_tau_nonneg_of_nonneg (t / (2 * Ne)) hτ
-  have hfst1 : Portability.fstFromGenerations t Ne < 1 := by
-    unfold Portability.fstFromGenerations
-    exact Portability.fst_from_tau_lt_one (t / (2 * Ne)) hτ
+  have hfst0 : 0 ≤ fstFromGenerations t Ne := by
+    unfold fstFromGenerations
+    exact fst_from_tau_nonneg_of_nonneg (t / (2 * Ne)) hτ
+  have hfst1 : fstFromGenerations t Ne < 1 := by
+    unfold fstFromGenerations
+    exact fst_from_tau_lt_one (t / (2 * Ne)) hτ
   have hbound := neutral_drift_ratio_ge_one_sub_fst V_A V_E
-    (Portability.fstFromGenerations t Ne) hVA hVE hfst0 hfst1
+    (fstFromGenerations t Ne) hVA hVE hfst0 hfst1
   have hle := fstFromGenerations_le_coalescentTau t Ne ht hNe
   linarith
 

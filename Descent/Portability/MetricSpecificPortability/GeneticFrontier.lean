@@ -148,12 +148,92 @@ theorem ldRetentionPerGen_strictAnti_recomb {r₁ r₂ Ne : ℝ}
   unfold PopGen.ldRetentionPerGen
   nlinarith [hlt, hfac]
 
-/-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries no decay
-parameter because it is the value the frontier saturates to as the band decay approaches one.
+/-- **Detection share of a clumped panel**: the fraction of the whitened detection weight — the
+inverse-LD-kernel trace whose per-variant limit is `ImitationRigidity.ldWhiteningGain` — that
+survives clumping, as a function of the band kernel's decay and the marker counts.
 
-It is stated on `κ` directly.  The composition that read `κ` off a panel's MARKER counts was
-deleted as falsified, so there is no longer a marker-indexed detection share for this to
-bound; what it floors is `ldBandDetectionShare` at a fraction of DIRECTIONS.
+`decay` is the AR(1) decay of the LD band, indexed by MARKER SEPARATION along the chromosome.
+It is deliberately not computed here from a recombination rate and an effective size:
+`ldRetentionPerGen` is a per-GENERATION retention, and feeding it here would make linkage
+disequilibrium decay with physical distance at the rate it decays with time. The stationary law
+relating separation to LD is Sved's, which this corpus carries as
+`LDDecayTheory.ohtaKimuraSigmaDSq`; supplying `decay` from it is a modelling step and belongs at
+the call site, where it can be named.
+
+Empirical status: **FALSIFIED**
+(`validation/empirical/simcov/battery_dgpcov.py`, group D;
+`battery_dgpcov2.py`, group D2). The `kappa` of `ldBandDetectionShare` is a
+fraction of DIRECTIONS -- a contiguous low-frequency band of the AR(1) symbol.
+`ldPanelRetentionFraction` is a fraction of MARKERS. Feeding the second into the
+first is a change of object, not a change of variable, and the two are not
+close.
+
+The instrument is exact linear algebra on the AR(1) kernel `Σᵢⱼ = ρ^|i-j|`, not
+a simulation: the surviving whitened detection weight of a retained panel `S` is
+`tr((Σ_SS)⁻¹) / tr(Σ⁻¹)`, computed at `n` = 512, 1024 and 2048 markers with agreement to five digits
+between panel sizes, so nothing here is a finite-`n`
+artefact.
+
+  ρ    κ      this body   uniform thinning   random panel   contiguous panel
+  0.5  1/2    0.24535     0.34005            0.41790        0.49980
+  0.8  1/2    0.18945     0.26195            0.36031        0.49962
+  0.5  1/3    0.11290     0.20648            0.25299
+  0.8  1/3    0.06448     0.12520            0.19601
+  0.5  1/4    0.06994     0.15120            0.18110
+  0.8  1/4    0.03041     0.07699            0.13229
+
+(the `κ = 1/2` row at `n` = 1024, the others at `n` = 2048; the two panel sizes
+agree to four digits wherever both were run)
+
+Every marker-subset reading exceeds the body, by 38 percent at `κ = 1/2` and by
+a factor of 2.5 at `κ = 1/4`; the shortfall grows as pruning gets more
+aggressive, which is the regime the frontier is about. The thinned column has a
+closed form -- a panel keeping every `s`-th marker of an AR(1) chromosome is
+itself AR(1) at `ρ^s`, so its share is `κ(1+ρ^{2s})(1-ρ²) / ((1-ρ^{2s})(1+ρ²))`
+-- and it reproduces the measured column to four digits, which is the check that
+the numbers are the kernel's and not the inverter's.
+
+POSITIVE CONTROL, and it is what makes this a falsification of the composition
+rather than of `ldBandDetectionShare`: the band operation the closed form is FOR
+-- the normalised mass of the reciprocal symbol on `|t| ≤ πκ`, by quadrature --
+agrees with the body to five decimals in every cell above. The formula is right
+about directions. It is this definition that hands it markers.
+
+There is also no repair by substituting a different `κ`. The three marker
+columns disagree with EACH OTHER at the same `κ` and `ρ` (0.262, 0.356, 0.500 at
+`ρ = 0.8`, `κ = 1/2`), so the retained detection weight of a pruned panel is not
+a function of `(decay, κ)` at all: it depends on WHICH markers are kept. A
+definition of this signature cannot express the quantity its name claims. The
+`retainedMarkers / totalMarkers` reading is charitable at that -- the reading on
+which the retained weight is the retained block of `Σ⁻¹` gives exactly `κ` and a
+deficit of zero. -/
+noncomputable def ldBlockDetectionShare (decay : ℝ)
+    (panel : LDPanelRetention) : ℝ :=
+  ldBandDetectionShare decay (ldPanelRetentionFraction panel)
+
+/-- **Detection weight surrendered to clumping**, over and above the fraction of markers
+discarded, as a function of the band kernel's decay.  This is the price the frontier puts on the
+pruning convention.
+
+Empirical status: **FALSIFIED**, for the reason recorded in full at
+`ldBlockDetectionShare` above and on the same cells
+(`validation/empirical/simcov/battery_dgpcov.py`, group D): the `kappa`
+of `ldPruningDetectionDeficit` counts DIRECTIONS and `ldPanelRetentionFraction`
+counts MARKERS. At `κ = 1/2` this body prices the loss at 0.25465 (`ρ = 0.5`)
+and 0.31055 (`ρ = 0.8`); the measured deficit of a uniformly thinned panel is
+0.15995 and 0.23805, of a random half-panel 0.08210 and 0.13969, and of a
+contiguous half-panel 0.00020 and 0.00038. The frontier is therefore charging
+between 1.6 and 800 times the price the kernel exacts, and the spread across those three panels
+at one `(decay, κ)` is the same evidence that no function of this signature can
+be the quantity. -/
+noncomputable def ldBlockPruningDeficit (decay : ℝ)
+    (panel : LDPanelRetention) : ℝ :=
+  ldPruningDetectionDeficit decay (ldPanelRetentionFraction panel)
+
+/-- **Tight-linkage floor on the detection share**, `κ - sin(πκ)/π`.  It carries no decay
+parameter because it is the value the frontier saturates to as the band decay approaches one,
+and `ldTightLinkage_le_ldBlockDetectionShare` shows it bounds the detection share at every
+decay.
 
 Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_bulk4.py`,
@@ -167,6 +247,26 @@ Empirical status: **VALIDATED**
 noncomputable def ldTightLinkageDetectionShare (panel : LDPanelRetention) : ℝ :=
   ldPanelRetentionFraction panel -
     Real.sin (Real.pi * ldPanelRetentionFraction panel) / Real.pi
+
+/-- Accounting identity: what clumping keeps plus what it surrenders is the
+fraction of markers it retained. -/
+theorem ldBlockDetectionShare_add_deficit (decay : ℝ)
+    (panel : LDPanelRetention) :
+    ldBlockDetectionShare decay panel + ldBlockPruningDeficit decay panel =
+      ldPanelRetentionFraction panel := by
+  unfold ldBlockDetectionShare ldBlockPruningDeficit ldBandDetectionShare
+    ldPruningDetectionDeficit
+  ring
+
+/-- **Clumping loses detection weight faster than it loses markers**, at every band decay. -/
+theorem ldBlockDetectionShare_le_retention {decay : ℝ}
+    {panel : LDPanelRetention}
+    (hd0 : 0 ≤ decay)
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldBlockDetectionShare decay panel ≤ ldPanelRetentionFraction panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
+  unfold ldBlockDetectionShare
+  exact ldBandDetectionShare_le_retention hd0 (le_of_lt hkpos) (le_of_lt hklt)
 
 /-- The whitening gain exceeds its no-linkage value exactly when there is
 linkage to exploit. -/
@@ -209,6 +309,30 @@ theorem ldPruningDetectionDeficit_pos_iff {decay kappa : ℝ}
   · intro h
     exact div_pos (mul_pos (by linarith) hsin) hden
 
+/-- **The corpus's detection quantity is what clumping destroys.**
+
+`ImitationRigidity.ldWhiteningGain` is the per-variant limit of `tr K⁻¹`, the
+quantity every whitened detection threshold in this corpus is stated in.  It
+exceeds its no-linkage value `1` precisely when the LD kernel has spectral
+spread — and that is precisely the condition under which a clumped panel loses
+detection weight strictly faster than it loses markers.
+
+This is the implication the inverse-ordering result explains: the inverse-kernel
+trace is built out of the small-eigenvalue directions, clumping keeps the large
+ones, so the gain being larger than one and the pruning deficit being positive
+are the same fact seen from two sides.  Both sides are functions of the band decay; what that
+decay is in terms of a recombination rate and an effective size is a separate modelling step,
+and it is not the per-generation retention. -/
+theorem pruning_loses_detection_iff_whiteningGain_exceeds_one
+    {decay : ℝ} {panel : LDPanelRetention}
+    (hd0 : 0 ≤ decay) (hd1 : decay < 1)
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    1 < Blindness.ldWhiteningGain decay ↔ 0 < ldBlockPruningDeficit decay panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
+  unfold ldBlockPruningDeficit
+  rw [ldWhiteningGain_one_lt_iff hd0 hd1,
+    ldPruningDetectionDeficit_pos_iff hd0 hkpos hklt]
+
 /-- The deficit is strictly increasing in the AR(1) decay. -/
 theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
     (h₁ : 0 ≤ p₁) (h₂ : p₂ < 1) (hlt : p₁ < p₂)
@@ -227,6 +351,20 @@ theorem ldPruningDetectionDeficit_strictMono {p₁ p₂ kappa : ℝ}
   rw [div_lt_div_iff₀ hd1 hd2]
   nlinarith [mul_pos (mul_pos (mul_pos hsin hpi) (sub_pos.mpr hlt)) hprod]
 
+/-- **Tighter linkage, larger surrendered detection power**, stated on the band decay: a panel
+whose LD band decays more slowly gives up strictly more detection weight to clumping. It runs in
+the same direction as `ImitationRigidity.ldWhiteningGain_of_ldRetention_antitone` — the tighter
+the block, the more there was to lose. What a recombination rate and an effective size imply for
+`decay` is the modelling step named at `ldBlockDetectionShare`, and is not supplied here. -/
+theorem ldBlockPruningDeficit_strictMono_in_decay
+    {d₁ d₂ : ℝ} {panel : LDPanelRetention}
+    (hd₁ : 0 ≤ d₁) (hd₂ : d₂ < 1) (hlt : d₁ < d₂)
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldBlockPruningDeficit d₁ panel < ldBlockPruningDeficit d₂ panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
+  unfold ldBlockPruningDeficit
+  exact ldPruningDetectionDeficit_strictMono hd₁ hd₂ hlt hkpos hklt
+
 /-- The deficit never exceeds `sin(πκ)/π`, at any decay. -/
 theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
     (hk0 : 0 ≤ kappa) (hk1 : kappa ≤ 1) :
@@ -242,6 +380,25 @@ theorem ldPruningDetectionDeficit_le_sin_div_pi {decay kappa : ℝ}
   rw [div_le_div_iff₀ hden hpi]
   nlinarith [mul_nonneg (mul_nonneg hsin (le_of_lt hpi)) (sq_nonneg (1 - decay))]
 
+/-- **The tight-linkage floor.**  At every band decay, a clumped panel retaining
+`retainedMarkers` of `totalMarkers` keeps at least `κ - sin(πκ)/π` of the detection weight, and
+no more than `κ`.  The lower end is approached as linkage tightens, so on a dense panel the
+detection share is pinned near a curve carrying no free parameters at all — which is what makes
+the prediction cheap to test. -/
+theorem ldTightLinkage_le_ldBlockDetectionShare {decay : ℝ}
+    {panel : LDPanelRetention}
+    (h0 : 0 < panel.retainedMarkers) (h1 : panel.retainedMarkers < panel.totalMarkers) :
+    ldTightLinkageDetectionShare panel ≤ ldBlockDetectionShare decay panel := by
+  obtain ⟨hkpos, hklt⟩ := ldPanelRetentionFraction_mem panel h0 h1
+  have hbound := ldPruningDetectionDeficit_le_sin_div_pi
+    (decay := decay)
+    (kappa := ldPanelRetentionFraction panel)
+    (le_of_lt hkpos) (le_of_lt hklt)
+  unfold ldTightLinkageDetectionShare ldBlockDetectionShare
+    ldBandDetectionShare
+  unfold ldPruningDetectionDeficit at hbound
+  linarith
+
 /-- **The pruning prohibition on the LD kernel itself.**
 
 `S` is the set of retained directions of a clumping pass: the low-frequency band
@@ -252,10 +409,8 @@ budget, fractional ones included — the clumped panel has the minimum detection
 efficiency.
 
 The kernel is the AR(1) LD band at decay `decay`, indexed by marker separation. What that decay
-is in terms of a recombination rate and an effective size is a modelling step, and the
-per-generation retention `ldRetentionPerGen` is not it: that is a retention per GENERATION and
-this decay is indexed by SEPARATION.  Supplying it belongs at a call site that can name the
-stationary law it uses.
+is in terms of a recombination rate and an effective size is a modelling step named at
+`ldBlockDetectionShare`; the per-generation retention is not it.
 
 Scope: relaxed projection-type reductions.  This is not a statement about
 arbitrary measurable summaries of the genotypes, and no joint data-processing

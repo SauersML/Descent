@@ -1,10 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
+import Descent.PopGen.DriftRecurrences
 import Descent.PopGen.PopulationGeneticsFoundations.WrightFStatistics
 
--- `Portability.hetMutationFloor` and `fstMutationDriftEquilibrium` are named below.
+-- `hetMutationFloor` and `fstMutationDriftEquilibrium` are named below.
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -201,9 +201,9 @@ noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ �
     This proves H* is indeed a fixed point — the equilibrium heterozygosity. -/
 theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    hetMutationDriftRecurrence Ne mu (Portability.hetMutationFloor Ne mu) 1 =
-      Portability.hetMutationFloor Ne mu := by
-  simp [hetMutationDriftRecurrence, Portability.hetMutationFloor]
+    hetMutationDriftRecurrence Ne mu (hetMutationFloor Ne mu) 1 =
+      hetMutationFloor Ne mu := by
+  simp [hetMutationDriftRecurrence, hetMutationFloor]
   -- We need: (1 - 1/(2Ne)) * (4Neμ/(1+4Neμ)) + 2μ * (1 - 4Neμ/(1+4Neμ))
   --        = 4Neμ/(1+4Neμ)
   have hθ : 0 < 4 * Ne * mu := by positivity
@@ -218,8 +218,8 @@ theorem hetMutationDrift_fixed_point (Ne mu : ℝ)
 theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu)
     (h_fixed : (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H) = H) :
-    H = Portability.hetMutationFloor Ne mu := by
-  unfold Portability.hetMutationFloor
+    H = hetMutationFloor Ne mu := by
+  unfold hetMutationFloor
   -- From the fixed-point equation:
   -- H - (1 - 1/(2Ne))H - 2μ(1-H) = 0
   -- H × [1 - (1 - 1/(2Ne)) + 2μ] = 2μ
@@ -249,8 +249,8 @@ theorem hetMutationDrift_fixed_point_unique (Ne mu H : ℝ)
     This is Wright's classical result, but *derived* from the recurrence
     rather than postulated. -/
 theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - Portability.hetMutationFloor Ne mu = 1 / (1 + 4 * Ne * mu) := by
-  unfold Portability.hetMutationFloor
+    1 - hetMutationFloor Ne mu = 1 / (1 + 4 * Ne * mu) := by
+  unfold hetMutationFloor
   have hθ : 0 < 4 * Ne * mu := by positivity
   have hden : (1 + 4 * Ne * mu) ≠ 0 := by linarith
   field_simp
@@ -259,30 +259,30 @@ theorem fstEquilibrium_derived (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
 /-- **The equilibrium derived from the recurrence agrees with `fstMutationDriftEquilibrium`.** -/
 theorem fstEquilibrium_derived_consistent (Ne mu : ℝ)
     (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - Portability.hetMutationFloor Ne mu = Descent.Core.fstFromFlow (4 * Ne * mu) := by
+    1 - hetMutationFloor Ne mu = Descent.Core.fstFromFlow (4 * Ne * mu) := by
   rw [fstEquilibrium_derived Ne mu hNe hmu]
   unfold Descent.Core.fstFromFlow
   rfl
 
 /-- **Equilibrium heterozygosity is in (0, 1) for positive parameters.** -/
 theorem hetEquilibrium_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < Portability.hetMutationFloor Ne mu := by
-  unfold Portability.hetMutationFloor
+    0 < hetMutationFloor Ne mu := by
+  unfold hetMutationFloor
   positivity
 
 theorem hetEquilibrium_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    Portability.hetMutationFloor Ne mu < 1 := by
-  unfold Portability.hetMutationFloor
+    hetMutationFloor Ne mu < 1 := by
+  unfold hetMutationFloor
   rw [div_lt_one (by positivity)]
   linarith
 
 /-- **Equilibrium Fst is in (0, 1) for positive parameters.** -/
 theorem fstEquilibrium_derived_pos (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    0 < 1 - Portability.hetMutationFloor Ne mu := by
+    0 < 1 - hetMutationFloor Ne mu := by
   linarith [hetEquilibrium_lt_one Ne mu hNe hmu]
 
 theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu) :
-    1 - Portability.hetMutationFloor Ne mu < 1 := by
+    1 - hetMutationFloor Ne mu < 1 := by
   linarith [hetEquilibrium_pos Ne mu hNe hmu]
 
 /-- **Larger θ → lower equilibrium Fst** (derived version).
@@ -290,10 +290,10 @@ theorem fstEquilibrium_derived_lt_one (Ne mu : ℝ) (hNe : 0 < Ne) (hmu : 0 < mu
 theorem fstEquilibrium_derived_decreases (Ne₁ Ne₂ mu : ℝ)
     (hNe₁ : 0 < Ne₁) (hNe₂ : 0 < Ne₂) (hmu : 0 < mu)
     (h_lt : Ne₁ < Ne₂) :
-    1 - Portability.hetMutationFloor Ne₂ mu < 1 - Portability.hetMutationFloor Ne₁ mu := by
+    1 - hetMutationFloor Ne₂ mu < 1 - hetMutationFloor Ne₁ mu := by
   -- Equivalent to hetMutationFloor Ne₁ mu < hetMutationFloor Ne₂ mu
   -- i.e., 4Ne₁μ/(1+4Ne₁μ) < 4Ne₂μ/(1+4Ne₂μ)
-  unfold Portability.hetMutationFloor
+  unfold hetMutationFloor
   have h₁ : 0 < 1 + 4 * Ne₁ * mu := by positivity
   have h₂ : 0 < 1 + 4 * Ne₂ * mu := by positivity
   rw [sub_lt_sub_iff_left]

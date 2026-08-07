@@ -5,6 +5,7 @@ import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.Core.Fst
 import Descent.Core.Ratios
 import Descent.Portability.PortabilityDrift.MutationDrift
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -844,17 +845,17 @@ Migration homogenises at rate `2m` per pair and drift re-creates identity at
 rate `1/(2 Nₑ)`; balancing them forces `F = 1/(1 + 4 Nₑ m)`.  The formula is
 derived here, not stipulated: no other constant satisfies this. -/
 theorem equilibriumFst_isFixedPoint (m Ne : ℝ) (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    geneFlowFstStep m Ne (Portability.fstMigrationDriftEquilibrium Ne m) =
-      Portability.fstMigrationDriftEquilibrium Ne m :=
+    geneFlowFstStep m Ne (fstMigrationDriftEquilibrium Ne m) =
+      fstMigrationDriftEquilibrium Ne m :=
   Portability.ibdFlowStep_fixedPoint Ne m hNe hm
 
 /-- Equilibrium FST strictly decreases as a nonnegative migration rate increases. -/
 theorem fstMigrationDriftEquilibrium_lt_of_migration_lt (m₁ m₂ Ne : ℝ)
     (h_Ne : 0 < Ne) (h_m₁ : 0 ≤ m₁)
     (h_m : m₁ < m₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁
       := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith) (by nlinarith)]
   nlinarith
 

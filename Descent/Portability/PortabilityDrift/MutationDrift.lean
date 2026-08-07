@@ -2,10 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
+
+open PopGen (pairwiseFstFromBranches)
 
 open MeasureTheory
 

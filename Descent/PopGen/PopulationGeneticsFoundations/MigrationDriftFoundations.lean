@@ -2,9 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
--- `Portability.effectiveSymmetricMigration` and `Portability.fstMigrationDriftEquilibrium`
+-- `effectiveSymmetricMigration` and `fstMigrationDriftEquilibrium`
 -- are named below.
-import Descent.Portability.PortabilityDrift
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -198,8 +198,8 @@ correct in its regime and silent about the regime is still a defect, and this
 is what stops the limit from being read as the general answer. -/
 theorem islandFstFiniteDemes_lt_islandLimit (Ne m d : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hd : 1 < d) :
-    islandFstFiniteDemes Ne m d < Portability.fstMigrationDriftEquilibrium Ne m := by
-  unfold islandFstFiniteDemes Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    islandFstFiniteDemes Ne m d < fstMigrationDriftEquilibrium Ne m := by
+  unfold islandFstFiniteDemes fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hc : 1 < Descent.Core.islandDemeCorrection d := one_lt_islandDemeCorrection d hd
   have hNm : 0 < 4 * Ne * m := by positivity
   apply div_lt_div_of_pos_left one_pos (by nlinarith)
@@ -220,17 +220,17 @@ theorem islandDemeCorrection_tendsto_one :
 
 /-- Island model Fst is the reciprocal of (1 + 4Nm). -/
 theorem islandModelFst_eq_inv (Ne m : ℝ) :
-    Portability.fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationDriftEquilibrium Ne m = (1 + 4 * Ne * m)⁻¹ := by
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [one_div]
 
 /-- **Island model Fst is strictly decreasing in migration rate.**
     The function m ↦ 1/(1 + 4Nm) is strictly anti-monotone for positive Ne. -/
 theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     (ha : 0 ≤ a) (hab : a < b) :
-    Portability.fstMigrationDriftEquilibrium Ne b < Portability.fstMigrationDriftEquilibrium Ne a
+    fstMigrationDriftEquilibrium Ne b < fstMigrationDriftEquilibrium Ne a
       := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * Ne * a := by nlinarith
   have hden_lt : 1 + 4 * Ne * a < 1 + 4 * Ne * b := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -239,9 +239,9 @@ theorem islandModelFst_strictAnti_m (Ne a b : ℝ) (hNe : 0 < Ne)
     Larger populations have more effective migrants per generation. -/
 theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (ha : 0 ≤ a) (hab : a < b) :
-    Portability.fstMigrationDriftEquilibrium b m < Portability.fstMigrationDriftEquilibrium a m
+    fstMigrationDriftEquilibrium b m < fstMigrationDriftEquilibrium a m
       := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   have hden_pos : 0 < 1 + 4 * a * m := by nlinarith
   have hden_lt : 1 + 4 * a * m < 1 + 4 * b * m := by nlinarith
   exact div_lt_div_of_pos_left one_pos hden_pos hden_lt
@@ -251,8 +251,8 @@ theorem islandModelFst_strictAnti_Ne (m a b : ℝ) (hm : 0 < m)
     (Nm = 0.25, so 4Nm = 1) is enough to prevent substantial differentiation. -/
 theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
     (h_threshold : 1 < 4 * Ne * m) :
-    Portability.fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationDriftEquilibrium Ne m < 1 / 2 := by
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   rw [div_lt_div_iff₀ (by nlinarith : 0 < 1 + 4 * Ne * m) (by norm_num : (0:ℝ) < 2)]
   linarith
 
@@ -260,8 +260,8 @@ theorem islandModelFst_lt_half_of_one_migrant (Ne m : ℝ)
 theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     (hk : 0 < k)
     (h_large : k < 4 * Ne * m) :
-    Portability.fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+    fstMigrationDriftEquilibrium Ne m < 1 / (1 + k) := by
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by linarith) (by nlinarith)
 
 /-! ### Relationship between Migration and Mutation Effects on Fst -/
@@ -272,9 +272,9 @@ theorem islandModelFst_small_of_large_migration (Ne m k : ℝ)
     Fst_migration = 1/(1+4Nm), Fst_mutation = 1/(1+4Neμ).
     The key parameter is the scaled rate 4N × (rate). -/
 theorem islandModelFst_eq_mutationForm (Ne m : ℝ) :
-    Portability.fstMigrationDriftEquilibrium Ne m
+    fstMigrationDriftEquilibrium Ne m
       = Descent.Core.fstFromFlow (4 * Ne * m) := by
-  unfold Portability.fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
+  unfold fstMigrationDriftEquilibrium Descent.Core.fstFromFlow
   ring
 
 /-- **Combined migration and mutation reduce Fst below either alone.**
@@ -534,9 +534,9 @@ theorem fstMigrationMutationEquilibriumManyDemes_isFixedPoint (Ne m μ : ℝ)
 /-- Combined Fst is below migration-only Fst. -/
 theorem fstMigrationMutation_lt_migrationOnly (Ne m μ : ℝ)
     (hNe : 0 < Ne) (hm : 0 < m) (hμ : 0 < μ) :
-    fstMigrationMutationEquilibriumManyDemes Ne m μ < Portability.fstMigrationDriftEquilibrium Ne m
+    fstMigrationMutationEquilibriumManyDemes Ne m μ < fstMigrationDriftEquilibrium Ne m
       := by
-  unfold fstMigrationMutationEquilibriumManyDemes Portability.fstMigrationDriftEquilibrium
+  unfold fstMigrationMutationEquilibriumManyDemes fstMigrationDriftEquilibrium
     Descent.Core.fstFromFlow
   apply div_lt_div_of_pos_left one_pos (by nlinarith) (by nlinarith)
 
@@ -778,8 +778,8 @@ theorem alleleFreq_deviation_decreases (p₀ p_c m : ℝ) (t₁ t₂ : ℕ)
 
 /-- Effective migration equals both rates when migration is symmetric. -/
 theorem effectiveMigration_symmetric (m : ℝ) :
-    Portability.effectiveSymmetricMigration m m = m := by
-  unfold Portability.effectiveSymmetricMigration Descent.Core.midpoint
+    effectiveSymmetricMigration m m = m := by
+  unfold effectiveSymmetricMigration Descent.Core.midpoint
   ring
 
 /-- **Asymmetric migration yields asymmetric Fst.**
@@ -788,7 +788,7 @@ theorem effectiveMigration_symmetric (m : ℝ) :
 theorem asymmetric_fst_difference_sign (Ne m₁₂ m₂₁ : ℝ)
     (hNe : 0 < Ne) (hm₂₁ : 0 < m₂₁)
     (h_asym : m₂₁ < m₁₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₁₂ < Portability.fstMigrationDriftEquilibrium Ne
+    fstMigrationDriftEquilibrium Ne m₁₂ < fstMigrationDriftEquilibrium Ne
       m₂₁ := by
   exact islandModelFst_strictAnti_m Ne m₂₁ m₁₂ hNe (le_of_lt hm₂₁) h_asym
 

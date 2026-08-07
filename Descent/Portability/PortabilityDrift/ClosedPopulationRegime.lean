@@ -2,10 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.Definitions
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Decision Descent.Program
 
 namespace Descent.Portability
+
+open PopGen (hetMutationFloor)
 
 open MeasureTheory
 
@@ -102,63 +105,6 @@ noncomputable def hetTrajectory (Ne mu H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => hetStepWithMutation Ne mu (hetTrajectory Ne mu H₀ t)
 
-/-- **The heterozygosity floor that mutation holds.**
-
-`theta / (1 + theta)` with `theta = 4 Nₑ mu`: the level at which mutational
-input balances drift loss. Below it the recurrence gains heterozygosity, above
-it the recurrence loses heterozygosity, and it is never crossed from above.
-This is the number the closed-population model sets to zero.
-
-    Regime: none. Its `mu = 0` value is `0`, which is the closed-population
-    assumption itself, and is why that model predicts unbounded loss.
-
-    Empirical status: **VALIDATED** (`simcov/battery_bulk20b.py`). The
-    saturation is an INFINITE-ALLELES statement, and reading it under infinite
-    sites is what an earlier attempt got wrong: per-site heterozygosity there is
-    approximately `θ` and the `1 / (1 + θ)` denominator never shows. Measured on
-    a single locus under `msprime`'s `InfiniteAlleles` model at `Nₑ = 1000` with 100 sampled
-    chromosomes and 40 independent replicates, with heterozygosity
-    taken as the unbiased `1 - ∑ pᵢ²` over the WHOLE sample -- never conditioned
-    on the locus being polymorphic, which inflates it exactly where `θ` is
-    small. Over `θ` = 0.1, 0.5, 1, 3, 10 the body predicts 0.09091, 0.33333,
-    0.50000, 0.75000 and 0.90909 against measured 0.11943 ± 0.02958, 0.37403 ±
-    0.03421, 0.49994 ± 0.03388, 0.76355 ± 0.01782 and 0.91824 ± 0.00421, worst
-    cell 2.17 sems at 1.0% relative, over a prediction spanning 90%.
-
-    Control: Ewens' sampling formula for the expected number of distinct
-    alleles, `∑ᵢ θ/(θ+i-1)`, evaluated on the same samples. It shares no algebra
-    with the body and passed at worst 1.10 sems (1.50/1.53, 3.28/3.45,
-    5.19/5.38, 11.12/11.40, 24.44/25.05). It earned its place: on the first run
-    the control returned exactly 2 alleles in every cell, which the sampling
-    formula cannot produce, and it voided a design whose heterozygosity cells
-    would otherwise have been read as a 21-sem falsification of this body.
-
-    The observation the body explains is measured too: at demographic
-    equilibrium the retention stays at `1.025 ± 0.020` out to `T = 4000` where
-    the floorless model predicts `0.135`.
-
-    INDEPENDENTLY CONFIRMED, and with the competitor gate the run above lacks
-    (`simcov/battery_ia02.py`). 200 replicates rather than 40, same regime, and
-    two competing readings carried on the same cells: `θ/(1+2θ)` misses by up to
-    182 sems and `2θ/(1+2θ)` by 18, while the body sits at worst 0.68 sems. The
-    Ewens control tracks `E[K]` from 1.5 to 24.4 alleles across the hundredfold
-    sweep at 0.09 to 1.45 sems. A validation with no rejected competitor is
-    arithmetic; this one is not.
-
-    THE SAME TRAP HAS NOW BITTEN THIS DEFINITION THREE TIMES, in three
-    directions, and it is worth naming so it stops. `msprime.InfiniteAlleles()`
-    requires a DISCRETE genome. Under `discrete_genome=False` each mutation
-    lands at its own real-valued position, so one locus carrying `k` mutations
-    is reported as `k` biallelic SITES instead of one site with `k+1` allelic
-    states -- and a design reading the FIRST variant then sees two alleles
-    however large `θ` is. That produced a 21-sem falsification once, a VOID in
-    `battery_bulk20.py` `group_b` once, and correct numbers only when
-    `sequence_length = 1` is used with msprime's default discrete genome. The
-    Ewens control is what caught it every time, because `∑ᵢ θ/(θ+i-1)` cannot
-    return 2 for every `θ`. Do not drop that control. -/
-noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
-  4 * Ne * mu / (1 + 4 * Ne * mu)
-
 /-- The trajectory inherits the equilibrium's junk point: where `1 + 4 Nₑ mu` vanishes the
 mutation step divides by zero and Mathlib returns `0`, so the recursion reports a monomorphic
 population rather than an inadmissible parameter. -/
@@ -167,14 +113,12 @@ theorem hetTrajectory_inherits_zero_denominator_junk (Ne mu : ℝ)
     4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
   rw [hzero, div_zero]
 
-
 /-- At the excluded parameter the equilibrium heterozygosity divides by zero and Mathlib
 returns `0`, reporting a monomorphic equilibrium rather than an undefined one. -/
 theorem hetEquilibriumWithMutation_at_zero_denominator_is_junk (Ne mu : ℝ)
     (hzero : 1 + 4 * Ne * mu = 0) :
     4 * Ne * mu / (1 + 4 * Ne * mu) = 0 := by
   rw [hzero, div_zero]
-
 
 /-- **The floor is the rest point of the recurrence.**  Solving
 `(1 - 1/(2 Nₑ)) H + 2 mu (1 - H) = H` gives `H (1/(2 Nₑ) + 2 mu) = 2 mu`, i.e.
@@ -395,14 +339,13 @@ theorem ClosedPopulationNoMutation.targetHet_eq_trajectory_of_no_mutation
 
 end ClosedPopulationRegime
 
-
 /-- Equilibrium heterozygosity under mutation-drift balance, `θ/(1 + θ)`,
 written out with its own four. This is the last inline restatement of the
 ploidy convention in the development. -/
 theorem hetMutationFloor_eq_scaled (Ne mu : ℝ) :
-    Portability.hetMutationFloor Ne mu
+    hetMutationFloor Ne mu
       = Descent.Core.scaledMutationRate Ne mu / (1 + Descent.Core.scaledMutationRate Ne mu) := by
-  unfold Portability.hetMutationFloor
+  unfold hetMutationFloor
   rw [Descent.Core.scaledMutationRate_eq_ploidy_form]; unfold Descent.Core.ploidy; ring_nf
 
 /-- **Both twos in the mutation-drift heterozygosity step are the ploidy.** The drift term

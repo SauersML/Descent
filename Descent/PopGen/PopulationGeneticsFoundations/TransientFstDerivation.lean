@@ -2,9 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations.MutationDriftBalance
--- `Portability.hudsonFstFromCoalescenceTimes`, `hetDecayFromScaled` and `r2FromMSE` are
+-- `hudsonFstFromCoalescenceTimes`, `hetDecayFromScaled` and `r2FromMSE` are
 -- named below; the first is Portability's, the others `PopGen.DGP`'s.
-import Descent.Portability.PortabilityDrift
+import Descent.PopGen.DriftRecurrences
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -197,7 +197,7 @@ statement back as a hit that asserts an equality the named function does not sat
 is the exact convention where `neiFst`'s docstring records paying a factor of two to four,
 so the abbreviation is not available here. -/
 theorem fstFromHetRatio_eq_hudsonFstFromCoalescenceTimes_eq_r2FromMSE (a b : ℝ) :
-    fstFromHetRatio a b = Portability.hudsonFstFromCoalescenceTimes a b ∧
+    fstFromHetRatio a b = hudsonFstFromCoalescenceTimes a b ∧
       fstFromHetRatio a b = r2FromMSE a b := by
   constructor <;> rfl
 

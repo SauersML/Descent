@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.PopGen.LDDecayTheory
+import Descent.PopGen.DriftRecurrences
+import Descent.Portability.PortabilityDrift.MigrationDrift
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -54,7 +56,7 @@ this file names the consequence it uses rather than reproving it. -/
 theorem more_migration_lower_fst (Ne m₁ m₂ : ℝ)
     (hNe : 0 < Ne) (hm₁ : 0 < m₁)
     (h_more : m₁ < m₂) :
-    Portability.fstMigrationDriftEquilibrium Ne m₂ < Portability.fstMigrationDriftEquilibrium Ne m₁
+    fstMigrationDriftEquilibrium Ne m₂ < fstMigrationDriftEquilibrium Ne m₁
       :=
   Portability.fstMigrationDriftEquilibrium_decreases_with_m Ne m₁ m₂ hNe hm₁ h_more
 
@@ -1363,8 +1365,8 @@ theorem driftLDCreationRate_eq_inv_timeScale (Ne : ℝ) :
 written once for the two branches of a split and once for the two levels of
 the `F`-statistic hierarchy. -/
 theorem pairwiseFstFromBranches_eq_wrightFIT (a b : ℝ) :
-    Portability.pairwiseFstFromBranches a b = PopGen.wrightFIT a b := by
-  unfold Portability.pairwiseFstFromBranches PopGen.wrightFIT Descent.Core.complementaryComposition;
+    pairwiseFstFromBranches a b = PopGen.wrightFIT a b := by
+  unfold pairwiseFstFromBranches PopGen.wrightFIT Descent.Core.complementaryComposition;
     ring_nf
 
 theorem cumulativeDrift_uses_timeScale {T : ℕ} (Ne : Fin T → ℝ) :
@@ -1405,8 +1407,8 @@ are Hudson-convention readings, so the edge is inside one convention and needs n
     caller, not established here. -/
 theorem slatkin_hetRatio_eq_coalescenceRatio
     (Hw Hb ETw ETb : ℝ) (h : Hw / Hb = ETw / ETb) :
-    PopGen.fstFromHetRatio Hw Hb = Portability.hudsonFstFromCoalescenceTimes ETw ETb := by
-  unfold PopGen.fstFromHetRatio Portability.hudsonFstFromCoalescenceTimes
+    PopGen.fstFromHetRatio Hw Hb = hudsonFstFromCoalescenceTimes ETw ETb := by
+  unfold PopGen.fstFromHetRatio hudsonFstFromCoalescenceTimes
     Descent.Core.proportionalReduction
   rw [h]
 

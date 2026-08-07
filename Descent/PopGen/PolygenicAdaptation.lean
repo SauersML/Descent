@@ -5,6 +5,7 @@ import Descent.PopGen.PopulationGeneticsFoundations
 import Descent.Core.Scaling
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 

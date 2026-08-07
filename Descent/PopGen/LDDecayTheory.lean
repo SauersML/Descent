@@ -1,10 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.PortabilityDrift.MigrationDrift
+import Descent.PopGen.DriftRecurrences
+import Descent.PopGen.DGP
 
--- `driftLDStep` is proved equal to `Portability.ibdRecurrenceStep` and
--- `Portability.islandFstMultiplicativeStep` by unfolding both, and the Frobenius mismatch
+-- `driftLDStep` is proved equal to `ibdRecurrenceStep` and
+-- `islandFstMultiplicativeStep` by unfolding both, and the Frobenius mismatch
 -- lemmas name `frobeniusNormSq` and `alleleFreqDivergenceRate` from `PopGen.DGP`.  Both
 -- arrive through `PortabilityDrift`, which is the single import
 -- `Descent.Program.OpenQuestions` used to carry here; the programme narrative was never
@@ -450,8 +451,8 @@ applies it with the migration rate in the place of the recombination rate and
 and the same map, so the `1/(2 Nₑ)` inside them has to be the same
 `1/(2 Nₑ)`. -/
 theorem driftLDStep_eq_islandFstMultiplicativeStep (Ne c Q : ℝ) :
-    driftLDStep Ne c Q = Portability.islandFstMultiplicativeStep Ne c Q := by
-  unfold driftLDStep Portability.islandFstMultiplicativeStep Portability.ibdRecurrenceStep
+    driftLDStep Ne c Q = islandFstMultiplicativeStep Ne c Q := by
+  unfold driftLDStep islandFstMultiplicativeStep ibdRecurrenceStep
     Descent.Core.survivalWeightedMix
   ring
 
@@ -468,8 +469,8 @@ composed with `islandFstMultiplicativeStep` being `ibdRecurrenceStep` by definit
 stated here anyway, in the direct form. A two-step route is a route a reader has to
 reconstruct, and the guard that looks for these pairs cannot follow it. -/
 theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
-    driftLDStep Ne c Q = Portability.ibdRecurrenceStep Ne c Q := by
-  unfold driftLDStep Portability.ibdRecurrenceStep Descent.Core.survivalWeightedMix
+    driftLDStep Ne c Q = ibdRecurrenceStep Ne c Q := by
+  unfold driftLDStep ibdRecurrenceStep Descent.Core.survivalWeightedMix
   ring
 
 /-- **Per-generation retention factor of the two-locus identity measure**,
@@ -651,9 +652,9 @@ two equilibria go with it as one quantity rather than being deduplicated by
 inspection. -/
 theorem driftLDEquilibrium_eq_fstIslandMultiplicativeEquilibrium (Ne c : ℝ)
     (hNe : Ne ≠ 0) :
-    driftLDEquilibrium Ne c = Portability.fstIslandMultiplicativeEquilibrium Ne c := by
-  unfold driftLDEquilibrium driftLDRetention Portability.fstIslandMultiplicativeEquilibrium
-    Portability.ibdRecurrenceFixedPoint
+    driftLDEquilibrium Ne c = fstIslandMultiplicativeEquilibrium Ne c := by
+  unfold driftLDEquilibrium driftLDRetention fstIslandMultiplicativeEquilibrium
+    ibdRecurrenceFixedPoint
   field_simp [hNe]
   ring
 

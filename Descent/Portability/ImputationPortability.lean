@@ -184,6 +184,142 @@ theorem attenuatedVariance_panelAdjusted (beta_sq het r2_LD panelMatch : ℝ) :
     Descent.Core.product
   ring
 
+/-- **Imputation quality as a function of LD extent alone.**
+
+    The name carries the restriction because the signature cannot carry the alternative.
+    Realised imputation `r²` is dominated by reference-panel size and by minor-allele
+    frequency, and neither appears here: this is the LD-extent dependence with everything else
+    held fixed, so it cannot be read as a predicted `r²` for a given panel.
+
+    `1 - c / ld_extent` is an `r²` and must lie in `[0, 1]`, but the bare
+    expression goes negative for `ld_extent < c` — which is the short-LD limit
+    the portability claim is about, not a remote corner. The clamp at `0` is
+    what makes this a quality measure at every LD extent; the theorems below
+    that need the unclamped branch say so with a hypothesis `c < ld_extent`.
+
+    Empirical status: **FALSIFIED as a shape in distance**
+    (`simcov/battery_gap01.py`, `group_imputation`).
+
+    THE FIRST DESIGN WAS CIRCULAR AND IS RECORDED SO IT IS NOT REBUILT. It generated a
+    tag whose CORRELATION with the target fell linearly in `c / ld_extent`, then measured
+    imputation `r²` -- that correlation squared -- and reported this body wrong by 400%.
+    The finding was entirely the modelling choice: had the `r²` been made to fall linearly
+    instead, the body would have matched to machine precision and the design would have
+    been a SELF-TEST. A definition of the form `f(c / ld_extent)` cannot be tested against
+    a simulation that stipulates `f`.
+
+    So the decay comes from a coalescent instead: msprime, one panmictic population at
+    `Nₑ = 2000` over 4 Mb at recombination `1e-8`, 12 replicates, with the observable the
+    realised imputation `r²` between common site pairs binned by physical separation and
+    `c` reported in Morgans. `ld_extent` is FITTED by weighted least squares -- it has to
+    be, since nothing in the corpus says what an LD extent is in base pairs and the body
+    carries it as a free argument -- so what is on trial is the SHAPE and not the scale.
+
+    Worst cell 15.3 sems at 100% relative, and the 100% is the whole finding: `max 0`
+    sends this body to EXACTLY zero beyond the fitted extent, while measured `r²` has a
+    long tail there. No choice of `ld_extent` fits both ends, which is the signature of a
+    wrong shape rather than a wrong constant.
+
+    The rival is the shape coalescent theory actually gives, Sved's
+    `r² = 1/(1 + 4·Nₑ·c)`, fitted with its own free rate so neither is handicapped. It is
+    closer -- 10.8 sems at 59% -- and is also refused, so this run names a direction and
+    not a replacement. Control: a pair with an imposed correlation of 0.6 returns 0.36
+    through the same `r²` code path.
+
+    The clamp is still what makes the body a quality measure at every LD extent, and the
+    junk-point theorem below still stands. What is now measured is that the LINEAR
+    approach to zero is not how LD decays. -/
+noncomputable def ldExtentImputationQuality (c ld_extent : ℝ) : ℝ :=
+  max 0 (1 - c / ld_extent)
+
+/-- **ldExtentImputationQuality at its junk point, named.** A panel with no linkage-disequilibrium
+extent imputes nothing. The divisor is zero, the penalty term is junk-zero, and the quality
+clamps to `1`: PERFECT imputation from a panel that carries no information. The `max 0` guard
+protects the lower end and lets the upper end fail unremarked. Consumers must guard the argument
+that makes the divisor vanish. -/
+theorem ldExtentImputationQuality_zero_extent_is_junk (c : ℝ) :
+    ldExtentImputationQuality c 0 = 1 := by
+  unfold ldExtentImputationQuality
+  simp
+
+/-- The clamped quality measure is an `r²`: it lies in `[0, 1]` for every
+positive tagging constant and LD extent, with no side condition. -/
+theorem ldExtentImputationQuality_mem_unit (c ld_extent : ℝ)
+    (h_c : 0 < c) (h_ld : 0 < ld_extent) :
+    0 ≤ ldExtentImputationQuality c ld_extent ∧ ldExtentImputationQuality c ld_extent ≤ 1 := by
+  have h_frac_pos : 0 < c / ld_extent := div_pos h_c h_ld
+  unfold ldExtentImputationQuality
+  refine ⟨le_max_left _ _, ?_⟩
+  apply max_le
+  · norm_num
+  · linarith
+
+/-- **Exact LD cutoff for non-imputability.**  At positive LD extent, the clamped LD-only quality
+is zero exactly when the available LD extent does not exceed the tagging constant. -/
+theorem ldExtentImputationQuality_eq_zero_iff
+    (c ld_extent : ℝ) (h_ld : 0 < ld_extent) :
+    ldExtentImputationQuality c ld_extent = 0 ↔ ld_extent ≤ c := by
+  constructor
+  · intro h_zero
+    have h_penalty : 1 - c / ld_extent ≤ 0 := by
+      calc
+        1 - c / ld_extent ≤ max 0 (1 - c / ld_extent) := le_max_right _ _
+        _ = 0 := h_zero
+    have h_ratio : 1 ≤ c / ld_extent := by linarith
+    have := (le_div_iff₀ h_ld).1 h_ratio
+    simpa using this
+  · intro h_cutoff
+    have h_ratio : 1 ≤ c / ld_extent := by
+      apply (le_div_iff₀ h_ld).2
+      simpa using h_cutoff
+    unfold ldExtentImputationQuality
+    rw [max_eq_left (by linarith)]
+
+/-- At positive LD extent, LD-only imputation quality is strictly positive exactly above the
+tagging cutoff. -/
+theorem ldExtentImputationQuality_pos_iff
+    (c ld_extent : ℝ) (h_ld : 0 < ld_extent) :
+    0 < ldExtentImputationQuality c ld_extent ↔ c < ld_extent := by
+  constructor
+  · intro h_quality
+    by_contra h_not_above
+    have h_zero :=
+      (ldExtentImputationQuality_eq_zero_iff c ld_extent h_ld).2 (le_of_not_gt h_not_above)
+    linarith
+  · intro h_above
+    have h_ratio : c / ld_extent < 1 := (div_lt_one h_ld).2 h_above
+    calc
+      0 < 1 - c / ld_extent := by linarith
+      _ ≤ ldExtentImputationQuality c ld_extent := by
+        exact le_max_right _ _
+
+/-- **LD-dependent imputation creates systematic bias.**
+    In populations with shorter LD (e.g., AFR), tagging is worse,
+    so imputation quality is systematically lower.
+    This creates a baseline portability artifact.
+    Model: mean imputation r² = `ldExtentImputationQuality c ld_extent`, monotone
+    increasing in LD extent. Shorter LD → smaller LD_extent → lower mean
+    imputation r². The hypothesis `c < ld_extent_short` is what puts both
+    populations on the unclamped branch; below it the measure is `0` in both and
+    the comparison is an equality rather than a strict inequality. -/
+theorem shorter_ld_worse_imputation
+    (c ld_extent_long ld_extent_short : ℝ)
+    (h_c : 0 < c) (h_short : c < ld_extent_short)
+    (h_shorter : ld_extent_short < ld_extent_long) :
+    ldExtentImputationQuality c ld_extent_short < ldExtentImputationQuality c ld_extent_long := by
+  have h_short_pos : 0 < ld_extent_short := by linarith
+  have h_long_pos : 0 < ld_extent_long := by linarith
+  have h1 : c / ld_extent_long < c / ld_extent_short :=
+    div_lt_div_of_pos_left h_c h_short_pos h_shorter
+  have h_short_lt_one : c / ld_extent_short < 1 := by
+    rw [div_lt_one h_short_pos]; linarith
+  have h_long_lt_one : c / ld_extent_long < 1 := by
+    rw [div_lt_one h_long_pos]; linarith
+  unfold ldExtentImputationQuality
+  rw [max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_short),
+    max_eq_right (by linarith : (0 : ℝ) ≤ 1 - c / ld_extent_long)]
+  linarith
+
 end ReferencePanel
 
 /-!
