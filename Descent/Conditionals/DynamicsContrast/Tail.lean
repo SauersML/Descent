@@ -1245,7 +1245,7 @@ structure DynamicsObstructions : Prop where
       (∀ population, (certificate population).variance ≤ varianceBound) →
       (∀ population,
         (certificate population).nuclearDistance =
-          Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.normalizedNuclearDistance
+          FiniteLowRankSingularSpectrum.normalizedNuclearDistance
             (Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum population
               spikeStrength hspike)) →
         Filter.Tendsto
@@ -2003,7 +2003,7 @@ theorem dynamicsContrast_obstructions : DynamicsObstructions := by
             K profiles limit hprofiles hlimit parameters hdense hconverges
       genomicDenseTiltConvergenceIsUniformOnCompactDomains :=
         fun _Parameter _ _ K profiles limit hprofiles hlimit parameters hdense hconverges ↦
-          Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
+          lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense
             K profiles limit hprofiles hlimit parameters hdense hconverges
       genomicBoundedLipschitzPressureProfilesAreCompact :=
         fun _Parameter _ _ K bound ↦

@@ -480,7 +480,8 @@ the surrogate fits this grid. The crossing is measured, not assumed: the same fi
 42 simulated cells at 4000 reps against which the drift constant is read. -/
 theorem exists_maf_pairwise_beyond_safe_order {N : ℝ} (hN : 1 ≤ N) :
     ∃ q : ℝ, 0 < q ∧ q ≤ 1 / 8 ∧ Spectral.maxSafeEpistaticOrder N q ≤ 2 := by
-  obtain ⟨q, hq0, hq8, hsuper⟩ := Spectral.exists_maf_supercritical (N := N) (m := 2) (by norm_num) hN
+  obtain ⟨q, hq0, hq8, hsuper⟩ := Spectral.exists_maf_supercritical (N := N) (m := 2) (by norm_num)
+    hN
   refine ⟨q, hq0, hq8, ?_⟩
   by_contra hcon
   push_neg at hcon

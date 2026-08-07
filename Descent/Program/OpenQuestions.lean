@@ -772,10 +772,13 @@ theorem effect_retention_lowers_target_r2_at_fixed_fst
       PopGen.TransportedMetrics.r2FromSignalVariance (Portability.presentDayPGSVariance V_A fstT)
         V_E := by
   apply Portability.expectedR2_strictMono_nonneg V_E _ _ hVE
-  · exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos)
-      (by unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product; exact mul_pos hVA (by linarith)))
+  · have hpdv : 0 < Portability.presentDayPGSVariance V_A fstT := by
+      unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product
+      exact mul_pos hVA (by linarith)
+    exact le_of_lt (mul_pos (sq_pos_of_pos hρ_pos) hpdv)
   · have h_pdv_pos : 0 < Portability.presentDayPGSVariance V_A fstT := by
-      unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product; exact mul_pos hVA (by linarith)
+      unfold Portability.presentDayPGSVariance Portability.pgsVarianceFromHet Descent.Core.product;
+        exact mul_pos hVA (by linarith)
     calc ρ ^ 2 * Portability.presentDayPGSVariance V_A fstT
         < 1 * Portability.presentDayPGSVariance V_A fstT := by
           apply mul_lt_mul_of_pos_right _ h_pdv_pos

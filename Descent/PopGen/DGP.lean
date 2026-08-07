@@ -2235,7 +2235,7 @@ theorem conditionalMeanApproximationRisk_at_conditional_mean {k : ℕ} [Fintype 
   simp
 
 
-theorem _root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_conditionalMeanApproximationRisk
+theorem _root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_approxRisk
     {k : ℕ} [Fintype (Fin k)]
     (cmdgp : Foundations.ConditionalMeanDGP k) (pred : Foundations.Predictor k)
     (hResidualSq_int :

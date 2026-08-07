@@ -504,7 +504,7 @@ theorem genomicRankOneTrafficCorrection_vanishes_of_positiveEvenDegreeData
           vertices edges
           (population + 1))
       Filter.atTop (nhds 0) :=
-  Blindness.TrafficInvariantSeparation.finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
+  finiteRankOneTrafficCorrection_tendsto_zero_of_positiveEvenDegreeData
     coefficient hasOddDegree vertices edges degree hpositive heven hhandshake
 
 /-- **One concrete genomic LD covariance carries the whole counterexample.**
@@ -706,7 +706,7 @@ theorem positiveLDSpike_pressure_convergesUniformlyOnNonnegativeStrength
     (baseline temperature : ℝ) (htemperature : 0 ≤ temperature) :
     Blindness.TrafficInvariantSeparation.FiniteRankOnePressureUniformLimitStatement baseline
       temperature :=
-  Blindness.TrafficInvariantSeparation.finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
+  finiteRankOneRademacherPressure_tendstoUniformlyOn_nonnegativeSpike
     baseline temperature htemperature
 
 /-- **One genomic counterexample to both C2 and C3.**  A single positive LD
@@ -920,7 +920,7 @@ theorem matchedBayes_randomDesignEventuallySeparates_ofAsymmetricWishartRatios
     (hleftRatio : Filter.Tendsto leftRatio regime (nhds 0))
     (hrightRatio : Filter.Tendsto rightRatio regime (nhds 0)) :
     ∀ᶠ index in regime, randomLeft index < randomRight index :=
-  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_of_asymmetricWishartRatios regime
+  randomDesign_eventually_separates_of_scalarGap_of_asymmetricWishartRatios regime
     scalarLeft scalarRight delta leftConstant rightConstant leftRatio rightRatio
     randomLeft randomRight hleft hright hgap hpositive hleftRatio hrightRatio
 
@@ -939,7 +939,7 @@ theorem matchedBayes_randomDesignEventuallySeparates_ofWishartRatio
     (hgap : scalarRight - scalarLeft = delta) (hpositive : 0 < delta)
     (hratio : Filter.Tendsto adjustedRatio regime (nhds 0)) :
     ∀ᶠ index in regime, randomLeft index < randomRight index :=
-  Blindness.TrafficInvariantSeparation.randomDesign_eventually_separates_of_scalarGap_of_wishartRatio regime
+  randomDesign_eventually_separates_of_scalarGap_of_wishartRatio regime
     scalarLeft scalarRight delta constant adjustedRatio randomLeft randomRight
     hleft hright hgap hpositive hratio
 
@@ -1086,7 +1086,7 @@ theorem matchedBayes_certifiedPositiveGap_forcesExtensiveRank
     (hnuclearRank : certificate.nuclearDistance ≤ operatorBound * rankFraction) :
     0 < rankFraction ∧
       delta / (varianceBound * operatorBound / 2) ≤ rankFraction :=
-  Blindness.TrafficInvariantSeparation.matchedInformationPath_positiveGap_forces_rankFraction_of_varianceBound
+  matchedInformationPath_positiveGap_forces_rankFraction_of_varianceBound
     certificate varianceBound operatorBound rankFraction delta hvarianceBound
     hvariancePositive hoperator hdelta hgap hnuclearRank
 
@@ -1266,7 +1266,7 @@ theorem degreeLimitedGenomicPolynomial_factorsThroughCanonicalLDGraphs
       coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
     Blindness.TrafficInvariantSeparation.DegreeAtMostTrafficFactorizationStatement coefficient value
       :=
-  Blindness.TrafficInvariantSeparation.degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
+  degreeAtMostInvariantPolynomial_canonicalTraffic_factorization
     coefficient value hinvariant
 
 /-- The corresponding degree-limited permutation-equivariant genomic vector
@@ -1279,7 +1279,7 @@ theorem degreeLimitedGenomicEquivariantPolynomial_factorsThroughRootedLDGraphs
       coefficient degree (permutation ∘ monomial) = coefficient degree monomial) :
     Blindness.TrafficInvariantSeparation.DegreeAtMostRootedTrafficFactorizationStatement coefficient
       value :=
-  Blindness.TrafficInvariantSeparation.degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
+  degreeAtMostRootedInvariantPolynomial_canonicalTraffic_factorization
     coefficient value hinvariant
 
 /-- Equal canonical LD profiles make every invariant scalar genomic
@@ -1296,7 +1296,7 @@ theorem degreeLimitedGenomicPolynomial_eq_ofCanonicalLDProfileEq
       ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
       ∑ degree : Fin (D + 1),
         ∑ monomial, coefficient degree monomial * rightValue degree monomial :=
-  Blindness.TrafficInvariantSeparation.degreeAtMostInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+  degreeAtMostInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
     coefficient leftValue rightValue hinvariant htraffic
 
 /-- Equal rooted LD profiles likewise make every equivariant genomic
@@ -1314,7 +1314,7 @@ theorem degreeLimitedGenomicEquivariantPolynomial_eq_ofRootedLDProfileEq
       ∑ monomial, coefficient degree monomial * leftValue degree monomial) =
       ∑ degree : Fin (D + 1),
         ∑ monomial, coefficient degree monomial * rightValue degree monomial :=
-  Blindness.TrafficInvariantSeparation.degreeAtMostRootedInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
+  degreeAtMostRootedInvariantPolynomial_eq_of_canonicalTrafficProfile_eq
     coefficient leftValue rightValue hinvariant htraffic
 
 /-- **Direct genomic fixed-degree hardness.**  Equal canonical LD profiles
@@ -1343,7 +1343,7 @@ theorem degreeLimitedGenomicPolynomial_fullGapHardness_fromCanonicalLDProfile
         ∑ monomial,
           coefficient algorithm degree monomial * leftValue degree monomial) -
         bayesLeft :=
-  Blindness.TrafficInvariantSeparation.degreeAtMostInvariantPolynomial_hardness_of_canonicalTrafficProfile_eq
+  degreeAtMostInvariantPolynomial_hardness_of_canonicalTrafficProfile_eq
     coefficient leftValue rightValue hinvariant htraffic bayesLeft bayesRight
     hoptimalRight algorithm
 

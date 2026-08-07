@@ -356,7 +356,8 @@ noncomputable def baselineProxyTagMetricModel : CrossPopulationMetricModel 1 1 :
 /-- Target tagging-shift witness: only the target proxy-tagging alignment
 changes. -/
 noncomputable def targetTaggingShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineProxyTagMetricModel with proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![1 / 2] }
+{ baselineProxyTagMetricModel with
+      proxyTagging := Pop.withTarget baselineProxyTagMetricModel.proxyTagging !![1 / 2] }
 
 /-- Target effect-shift witness: only the target causal effect size changes.
 
@@ -374,7 +375,8 @@ noncomputable def targetEffectShiftMetricModel : CrossPopulationMetricModel 1 1 
 /-- Target context-shift witness: only the target context/environment
 cross-covariance changes. -/
 noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
+{ baselineMetricModel with
+      contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
 
 /-- Irreducible target mismatch witness.
 
@@ -580,11 +582,15 @@ theorem target_ld_shift_changes_liability_auc :
       equalVarianceGaussianAUCFromSourceWeights baselineMetricModel Pop.target := by
   rcases target_ld_shift_changes_portability_without_changing_source_r2 with ⟨_, _, h_target_shift,
     h_target_base, _⟩
-  rw [target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_shift, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+  rw
+    [target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_shift,
+    Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using
       (show (1 / 6 : ℝ) < 1 by norm_num)),
-    target_liability_auc_eq_explainedR2_chart _ (by simpa [h_target_base, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+    target_liability_auc_eq_explainedR2_chart _
+      (by simpa [h_target_base, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+      Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow] using
       (show (1 / 2 : ℝ) < 1 by norm_num)),
@@ -1033,7 +1039,9 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
       have h_cancel : Real.exp (1 : ℝ) * Real.exp (-(1 : ℝ)) = 1 := by
         rw [← Real.exp_add]
         norm_num
-      exact le_trans h_mul' (by simpa [h_cancel, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
+      exact le_trans h_mul'
+        (by simpa [h_cancel, Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate,
+        Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
       Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow])
     nlinarith

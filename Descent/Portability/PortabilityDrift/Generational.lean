@@ -332,7 +332,7 @@ theorem constrained them jointly and could not have caught the decay base. -/
 /-- When divergence time is an integer number of generations, the coarse
 mutation-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
-theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).mutationSharedRetentionAt (Nat.floor m.t_div) =
@@ -348,7 +348,7 @@ theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameter
 /-- When divergence time is an integer number of generations, the coarse
 migration-history coordinate agrees exactly with the generational popgen bridge
 at that generation. -/
-theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+theorem _root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_migrationSharedBoostAt_floor
     (m : PopGen.PGSEvolutionaryModel)
     (h_disc : m.t_div = (Nat.floor m.t_div : ℝ)) :
     (m.toGenerationalPopGenParameters).migrationSharedBoostAt (Nat.floor m.t_div) =
@@ -381,10 +381,10 @@ theorem
       (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor m).symm
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_ancestralVariantCoordinate]
     exact
-      (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_mutationSharedRetentionAt_floor
+      (PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor
       m h_disc).symm
   · rw [PopGen.PGSEvolutionaryModel.coordinateSummary_migrationCoordinate]
-    exact (PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters_migrationSharedBoostAt_floor
+    exact (PopGen.PGSEvolutionaryModel.toGenerational_migrationSharedBoostAt_floor
       m h_disc).symm
 
 /-- Allele-frequency mismatch penalty. This penalizes transport when target

@@ -87,7 +87,8 @@ what the other computes.  No equation between them typechecks: they live at `Fin
 `Fin 3`.  What can be stated is what each one is, together, and that is this. -/
 theorem configurationOverlap_and_transplantSqNorm_are_dotProduct
     (configuration : Blindness.TwoCoordinateConfiguration) (displacement : Fin 3 → ℝ) :
-    Blindness.configurationOverlap configuration configuration = dotProduct configuration configuration ∧
+    Blindness.configurationOverlap configuration configuration = dotProduct configuration
+      configuration ∧
       Portability.transplantSqNorm displacement = dotProduct displacement displacement :=
   ⟨rfl, rfl⟩
 
@@ -123,7 +124,8 @@ theorem contextMatchQuality_eq_oneHotWeight (x y : BinaryState) :
 /-- The stable sieve dimension and the condensation critical degree are the same logarithmic
 law, at different arguments: `log L / κ` and `log N / c`. -/
 theorem stableSieveDimension_eq_criticalDegree (kappa L : ℝ) :
-    Blindness.SpectrumIdentifiability.stableSieveDimension kappa L = Blindness.criticalDegree L kappa := rfl
+    Blindness.SpectrumIdentifiability.stableSieveDimension kappa L = Blindness.criticalDegree L
+      kappa := rfl
 
 /-
 THE WARNING WAS ALREADY WRITTEN DOWN. READ THE PROSE NEXT TO WHAT YOU ARE ABOUT
@@ -341,7 +343,8 @@ def crossS : Fin 2 → ℝ := ![1, 0]
 theorem overlapEnergyTruth_eq_crossS : Blindness.overlapEnergyTruth = crossS := rfl
 
 /-- The positive configuration is the reordering score. -/
-theorem overlapEnergyPositive_eq_reorderScore : Blindness.overlapEnergyPositive = Portability.reorderScore := rfl
+theorem overlapEnergyPositive_eq_reorderScore : Blindness.overlapEnergyPositive =
+  Portability.reorderScore := rfl
 
 /-- And it is the two-ancestry conditional, which is the third name for `![0, 1]`. -/
 theorem overlapEnergyPositive_eq_twoAncestryConditional :
@@ -677,7 +680,8 @@ already imports both — and it gives `ResonanceSpectrum`'s graded spectrum a st
 to the dichotomy `CramerStratum` decides, should a result ever need the finer invariant. -/
 theorem intensity_eq_charFnSq {n : ℕ} (P : Spectral.PhasePanel n) (s : ℝ) :
     P.intensity s = Blindness.charFnSq P.weight P.phase s := by
-  unfold Spectral.PhasePanel.intensity Spectral.PhasePanel.cosPart Spectral.PhasePanel.sinPart Blindness.charFnSq
+  unfold Spectral.PhasePanel.intensity Spectral.PhasePanel.cosPart Spectral.PhasePanel.sinPart
+    Blindness.charFnSq
   rw [pow_two, pow_two, Finset.sum_mul_sum, Finset.sum_mul_sum,
     ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun u _ ↦ ?_

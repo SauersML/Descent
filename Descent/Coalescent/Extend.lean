@@ -366,9 +366,9 @@ whatever `o` says, so the fibre over `some d` in `Fin (n + 1)` is the old fibre 
 exactly when `o` is not `some d` -- and it does not matter whether `o` is another class or
 no class at all.
 
-The two corollaries below are that statement at `o = some c` and at `o = none`, and they
-used to be two proofs of it: twelve identical lines each, differing in the last step, where
-one discharged `some c = some d` against `d ≠ c` and the other discharged `none = some d`
+The two corollaries below are that statement at `o = some c` and at `o = none`.  Proved
+separately they are twelve identical lines each, differing only in the last step, where one
+discharges `some c = some d` against `d ≠ c` and the other discharges `none = some d`
 against nothing.  Carrying `o ≠ some d` as the hypothesis makes that last step the same
 step, which is what says the two theorems are one theorem. -/
 theorem card_fiber_of_seat_ne {n : ℕ} (ξ : ER n) (o : Option (Quotient ξ))
