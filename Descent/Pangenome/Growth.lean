@@ -192,5 +192,6 @@ theorem complement_fstEquilibrium_eq_saturation (Ne μ nDemes : ℝ)
   unfold Descent.Core.complement Descent.Core.saturation
   have h1 : (0 : ℝ) < 1 + Descent.Core.scaledMutationRate Ne μ := by linarith
   field_simp
+  ring
 
 end Descent.Pangenome.Growth
