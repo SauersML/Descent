@@ -112,7 +112,8 @@ theorem expectedPanSize_step (θ : Descent.Core.Theta) (base : ℝ) {mSample : �
     (hm : 0 < mSample) :
     expectedPanSize θ base (mSample + 1) - expectedPanSize θ base mSample
       = Descent.Core.ratio θ.value mSample := by
-  obtain ⟨k, rfl⟩ : ∃ k, mSample = k + 1 := ⟨mSample - 1, (Nat.succ_pred_eq_of_pos hm).symm⟩
+  obtain ⟨k, rfl⟩ : ∃ k, mSample = k + 1 :=
+    ⟨mSample - 1, (Nat.succ_pred_eq_of_pos hm).symm⟩
   rw [expectedPanSize_eq, expectedPanSize_eq, Nat.add_sub_cancel, Nat.add_sub_cancel,
     Coalescent.harmonicSum_succ]
   unfold Descent.Core.ratio
