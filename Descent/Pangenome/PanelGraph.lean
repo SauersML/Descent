@@ -135,7 +135,7 @@ chapter's abstract half takes over. -/
 theorem closure_posAlign {m n : ℕ} (H : Fin m → Core.Haplotype n) :
     Construction.closure (posAlign H) = posSetoid H := by
   refine le_antisymm ((Construction.honors_iff_closure_le _ _).mp fun _ _ h ↦ h) ?_
-  exact Setoid.le_def.mpr fun h ↦ EqvGen.rel _ _ h
+  exact Setoid.le_def.mpr fun h ↦ Relation.EqvGen.rel _ _ h
 
 /-- **A positional build has no repeats.**  The construction never identifies two distinct
 positions of one haplotype, since they sit at distinct loci.  So the traversal
@@ -249,7 +249,8 @@ theorem card_nodesAt_eq_two_iff {m n : ℕ} (H : Fin m → Core.Haplotype n)
     (l : Core.Locus n) : (nodesAt H l).card = 2 ↔ SegregatesAt H l := by
   constructor
   · intro h2
-    obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp (by omega)
+    obtain ⟨a, ha, b, hb, hab⟩ :=
+      Finset.one_lt_card.mp (show 1 < (nodesAt H l).card by omega)
     obtain ⟨i, hi⟩ := (mem_nodesAt H l a).mp ha
     obtain ⟨j, hj⟩ := (mem_nodesAt H l b).mp hb
     exact ⟨i, j, by rw [hi, hj]; exact hab⟩
@@ -338,8 +339,9 @@ theorem segregatesAt_subsample {m m' n : ℕ} (H : Fin m → Core.Haplotype n)
 /-- More genomes, no fewer segregating loci: `S` is monotone in the panel. -/
 theorem segregatingCount_subsample_le {m m' n : ℕ} (H : Fin m → Core.Haplotype n)
     (f : Fin m' → Fin m) : segregatingCount (H ∘ f) ≤ segregatingCount H :=
-  Finset.card_le_card
-    (Finset.filter_subset_filter _ fun l _ ↦ segregatesAt_subsample H f l)
+  Finset.card_le_card fun l hl ↦ by
+    rw [Finset.mem_filter] at hl ⊢
+    exact ⟨hl.1, segregatesAt_subsample H f l hl.2⟩
 
 /-! ### The diploid identification -/
 
@@ -352,7 +354,7 @@ theorem segregatesAt_pair_iff_ne {n : ℕ} (h₁ h₂ : Core.Haplotype n) (l : C
     intro hne
     apply hij
     fin_cases i <;> fin_cases j <;>
-      simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, hne]
+      simp [Matrix.cons_val_zero, Matrix.cons_val_one, hne]
   · intro hne
     refine ⟨0, 1, ?_⟩
     simpa [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons] using hne
