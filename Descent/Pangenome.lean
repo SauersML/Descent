@@ -19,6 +19,7 @@ import Descent.Pangenome.GraphCoalescent.WidthProfile
 import Descent.Pangenome.GraphSpectrum
 import Descent.Pangenome.GraphTransitVariance
 import Descent.Pangenome.GromovWeak
+import Descent.Pangenome.Growth
 import Descent.Pangenome.Linkage
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
@@ -28,6 +29,7 @@ import Descent.Pangenome.Linkage.Metadata
 import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
+import Descent.Pangenome.PanelGraph
 import Descent.Pangenome.Register
 import Descent.Pangenome.Strand
 
@@ -66,4 +68,11 @@ measure a loss in the vocabulary of the representation -- hidden edges, nats of 
 entropy.  `GraphCoalescent` measures the same loss in the vocabulary of the process, as a
 lineage count, a transit time and a bias in `θ`, and `transitDeficit_eq_zero_iff` is the
 theorem that says the two vocabularies are describing one thing.
+
+The fourth pair is where the chapter meets the corpus's data objects and its growth law.
+`PanelGraph` instantiates the abstract construction at `Core.Genome`'s phased haplotypes --
+the bracket collapses, support becomes allele-sharing, and `pan = reference + S` is exact --
+and `Growth` takes that identity in expectation, where the pangenome growth curve becomes
+`θ` times a harmonic sum, its increments become Watterson's estimator, and openness becomes
+the neutral null rather than a finding.
 -/
