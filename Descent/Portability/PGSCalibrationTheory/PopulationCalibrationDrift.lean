@@ -397,6 +397,59 @@ theorem prevalenceCITLShift_undercorrects_downward {ι : Type*} (t : Finset ι)
         simpa [smul_eq_mul] using
           (oddsScale_strictConvexOn _ hc0 hc1).map_sum_lt hw hw1 hp hne
 
+/-- `oddsScale` is monotone in the multiplier on the risk interval: raising the odds ratio
+    never lowers the risk. The difference is `(c' - c)·p·(1-p)` over positive denominators,
+    so it is strict exactly on interior risks (`oddsScale_lt_oddsScale_left`). -/
+theorem oddsScale_le_oddsScale_left (c c' p : ℝ) (hc : 0 < c) (hc' : 0 < c')
+    (hcc : c ≤ c') (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    oddsScale c p ≤ oddsScale c' p := by
+  have hD : 0 < 1 + (c - 1) * p := oddsScale_denom_pos c p hc h0 h1
+  have hD' : 0 < 1 + (c' - 1) * p := oddsScale_denom_pos c' p hc' h0 h1
+  unfold oddsScale
+  rw [div_le_div_iff₀ hD hD']
+  nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.mpr hcc) h0) (sub_nonneg.mpr h1)]
+
+/-- Strict version of `oddsScale_le_oddsScale_left` on interior risks. -/
+theorem oddsScale_lt_oddsScale_left (c c' p : ℝ) (hc : 0 < c) (hc' : 0 < c')
+    (hcc : c < c') (h0 : 0 < p) (h1 : p < 1) :
+    oddsScale c p < oddsScale c' p := by
+  have hD : 0 < 1 + (c - 1) * p := oddsScale_denom_pos c p hc h0.le h1.le
+  have hD' : 0 < 1 + (c' - 1) * p := oddsScale_denom_pos c' p hc' h0.le h1.le
+  unfold oddsScale
+  rw [div_lt_div_iff₀ hD hD']
+  nlinarith [mul_pos (mul_pos (sub_pos.mpr hcc) h0) (sub_pos.mpr h1)]
+
+/-- **The correction a deployment actually needs strictly exceeds the Δ-logit recipe.** If
+    some odds multiplier `cstar` really does move the mixture's marginal prevalence from
+    `ps` to `pt > ps`, then `cstar` is strictly larger than the recipe's
+    `exp (prevalenceCITLShift ps pt)` whenever two subpopulations differ in risk: the recipe
+    lands short (`prevalenceCITLShift_undercorrects_upward`), and `oddsScale` is monotone in
+    the multiplier, so no multiplier at or below the recipe's can reach the target. This is
+    the theorem form of `battery_pgscal01`'s fitted corrections exceeding `citl` on every
+    cell: 0.79967 needed against 0.66237 prescribed, 1.49676 against 0.94064. -/
+theorem required_odds_multiplier_exceeds_deltaLogit {ι : Type*} (t : Finset ι)
+    (w p : ι → ℝ) (ps pt cstar : ℝ)
+    (hw : ∀ i ∈ t, 0 < w i) (hw1 : ∑ i ∈ t, w i = 1)
+    (hp : ∀ i ∈ t, p i ∈ Set.Icc (0 : ℝ) 1)
+    (hmean : ∑ i ∈ t, w i * p i = ps)
+    (hne : ∃ j ∈ t, ∃ k ∈ t, p j ≠ p k)
+    (hs0 : 0 < ps) (hs1 : ps < 1) (ht1 : pt < 1) (hlt : ps < pt)
+    (hcstar : 0 < cstar)
+    (hachieves : ∑ i ∈ t, w i * oddsScale cstar (p i) = pt) :
+    Real.exp (prevalenceCITLShift ps pt) < cstar := by
+  by_contra hle
+  push_neg at hle
+  have hshort := prevalenceCITLShift_undercorrects_upward t w p ps pt
+    hw hw1 hp hmean hne hs0 hs1 ht1 hlt
+  have hmono : ∑ i ∈ t, w i * oddsScale cstar (p i) ≤
+      ∑ i ∈ t, w i * oddsScale (Real.exp (prevalenceCITLShift ps pt)) (p i) := by
+    refine Finset.sum_le_sum fun i hi => ?_
+    have hpi := hp i hi
+    exact mul_le_mul_of_nonneg_left
+      (oddsScale_le_oddsScale_left cstar _ (p i) hcstar (Real.exp_pos _) hle
+        hpi.1 hpi.2) (hw i hi).le
+  linarith [hachieves ▸ hmono]
+
 /-!
 ## The probit marginal-slope parameterisation: exact marginal calibration, identifiability
 
