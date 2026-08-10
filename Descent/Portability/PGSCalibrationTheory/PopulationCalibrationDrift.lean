@@ -306,6 +306,24 @@ theorem oddsScale_citl_exact (ps pt : ℝ)
   rw [div_eq_iff hq.ne']
   field_simp
 
+/-- Shared setup for the two two-point Jensen arguments on `oddsScale`: risks in the unit
+    interval with interior weights give positive denominators at both endpoints and at the
+    mixture, and a strictly positive endpoint spread. Factored out of the strict-concavity
+    and strict-convexity proofs, which differ only in the sign of the multiplier's
+    displacement from one. -/
+theorem oddsScale_two_point_setup (c x y a : ℝ) (hc0 : 0 < c)
+    (hx0 : 0 ≤ x) (hx1 : x ≤ 1) (hy0 : 0 ≤ y) (hy1 : y ≤ 1) (hxy : x ≠ y)
+    (ha : 0 < a) (ha1 : a < 1) :
+    0 < 1 + (c - 1) * x ∧ 0 < 1 + (c - 1) * y ∧
+      0 < 1 + (c - 1) * (a * x + (1 - a) * y) ∧ 0 < (x - y) ^ 2 := by
+  have hDx := oddsScale_denom_pos c x hc0 hx0 hx1
+  have hDy := oddsScale_denom_pos c y hc0 hy0 hy1
+  have hz0 : 0 ≤ a * x + (1 - a) * y := by nlinarith
+  have hz1 : a * x + (1 - a) * y ≤ 1 := by nlinarith
+  refine ⟨hDx, hDy, oddsScale_denom_pos c _ hc0 hz0 hz1, ?_⟩
+  have hne : x - y ≠ 0 := sub_ne_zero.mpr hxy
+  positivity
+
 /-- **Raising odds is strictly concave in the risk.** For an odds multiplier `c > 1` the map
     `p ↦ oddsScale c p` is strictly concave on `[0,1]`: it lifts middling risks
     proportionally more than it lifts a mixture's extremes. This is the entire mechanism of
@@ -316,15 +334,8 @@ theorem oddsScale_strictConcaveOn (c : ℝ) (hc : 1 < c) :
   refine ⟨convex_Icc 0 1, ?_⟩
   rintro x ⟨hx0, hx1⟩ y ⟨hy0, hy1⟩ hxy a b ha hb hab
   obtain rfl : b = 1 - a := by linarith
-  have hDx : 0 < 1 + (c - 1) * x := oddsScale_denom_pos c x hc0 hx0 hx1
-  have hDy : 0 < 1 + (c - 1) * y := oddsScale_denom_pos c y hc0 hy0 hy1
-  have hz0 : 0 ≤ a * x + (1 - a) * y := by nlinarith
-  have hz1 : a * x + (1 - a) * y ≤ 1 := by nlinarith
-  have hDz : 0 < 1 + (c - 1) * (a * x + (1 - a) * y) :=
-    oddsScale_denom_pos c _ hc0 hz0 hz1
-  have hsq : 0 < (x - y) ^ 2 := by
-    have hne : x - y ≠ 0 := sub_ne_zero.mpr hxy
-    positivity
+  obtain ⟨hDx, hDy, hDz, hsq⟩ :=
+    oddsScale_two_point_setup c x y a hc0 hx0 hx1 hy0 hy1 hxy ha (by linarith)
   have hgap : 0 < c * (c - 1) * (a * (1 - a)) * (x - y) ^ 2 := by
     have : 0 < a * (1 - a) := mul_pos ha hb
     have : 0 < c - 1 := by linarith
@@ -343,15 +354,8 @@ theorem oddsScale_strictConvexOn (c : ℝ) (hc0 : 0 < c) (hc : c < 1) :
   refine ⟨convex_Icc 0 1, ?_⟩
   rintro x ⟨hx0, hx1⟩ y ⟨hy0, hy1⟩ hxy a b ha hb hab
   obtain rfl : b = 1 - a := by linarith
-  have hDx : 0 < 1 + (c - 1) * x := oddsScale_denom_pos c x hc0 hx0 hx1
-  have hDy : 0 < 1 + (c - 1) * y := oddsScale_denom_pos c y hc0 hy0 hy1
-  have hz0 : 0 ≤ a * x + (1 - a) * y := by nlinarith
-  have hz1 : a * x + (1 - a) * y ≤ 1 := by nlinarith
-  have hDz : 0 < 1 + (c - 1) * (a * x + (1 - a) * y) :=
-    oddsScale_denom_pos c _ hc0 hz0 hz1
-  have hsq : 0 < (x - y) ^ 2 := by
-    have hne : x - y ≠ 0 := sub_ne_zero.mpr hxy
-    positivity
+  obtain ⟨hDx, hDy, hDz, hsq⟩ :=
+    oddsScale_two_point_setup c x y a hc0 hx0 hx1 hy0 hy1 hxy ha (by linarith)
   have hgap : 0 < c * (1 - c) * (a * (1 - a)) * (x - y) ^ 2 := by
     have : 0 < a * (1 - a) := mul_pos ha hb
     have : 0 < 1 - c := by linarith
