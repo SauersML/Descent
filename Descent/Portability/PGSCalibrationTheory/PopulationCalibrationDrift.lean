@@ -235,6 +235,29 @@ theorem oddsScale_one (c : ℝ) (hc : c ≠ 0) : oddsScale c 1 = 1 := by
   unfold oddsScale
   norm_num
 
+/-- **Successive intercept shifts compose by multiplying their odds multipliers.** Applying
+    `oddsScale c'` and then `oddsScale c` to a risk is applying `oddsScale (c * c')` once. Via
+    `sigmoid_add_eq_oddsScale` this is the statement that a logistic recalibration applied on
+    top of another is a single recalibration by the sum of the two intercept shifts, so the
+    under-correction theorems below cannot be escaped by iterating the Δ-logit recipe: two
+    passes of the recipe are one pass at a different multiplier, and
+    `required_odds_multiplier_exceeds_deltaLogit` bounds every multiplier the recipe can
+    name. -/
+theorem oddsScale_comp (c c' p : ℝ) (hc : 0 < c) (hc' : 0 < c')
+    (h0 : 0 ≤ p) (h1 : p ≤ 1) :
+    oddsScale c (oddsScale c' p) = oddsScale (c * c') p := by
+  have hD' : 0 < 1 + (c' - 1) * p := oddsScale_denom_pos c' p hc' h0 h1
+  have hD : 0 < 1 + (c * c' - 1) * p :=
+    oddsScale_denom_pos (c * c') p (mul_pos hc hc') h0 h1
+  have hD'0 : (1 : ℝ) + (c' - 1) * p ≠ 0 := hD'.ne'
+  have hden : 1 + (c - 1) * (c' * p / (1 + (c' - 1) * p))
+      = (1 + (c * c' - 1) * p) / (1 + (c' - 1) * p) := by
+    rw [eq_div_iff hD'0, add_mul, one_mul, mul_assoc, div_mul_cancel₀ _ hD'0]
+    ring
+  unfold oddsScale
+  rw [hden, div_eq_div_iff (div_pos hD hD').ne' hD.ne']
+  field_simp
+
 /-- **A logistic intercept shift acts on risks by scaling odds.** Shifting the linear
     predictor by `δ` carries the risk `sigmoid x` to `oddsScale (exp δ) (sigmoid x)`: the
     intercept correction of a logistic recalibration IS an odds multiplier, applied to every
@@ -443,7 +466,7 @@ theorem required_odds_multiplier_exceeds_deltaLogit {ι : Type*} (t : Finset ι)
     hw hw1 hp hmean hne hs0 hs1 ht1 hlt
   have hmono : ∑ i ∈ t, w i * oddsScale cstar (p i) ≤
       ∑ i ∈ t, w i * oddsScale (Real.exp (prevalenceCITLShift ps pt)) (p i) := by
-    refine Finset.sum_le_sum fun i hi => ?_
+    refine Finset.sum_le_sum fun i hi ↦ ?_
     have hpi := hp i hi
     exact mul_le_mul_of_nonneg_left
       (oddsScale_le_oddsScale_left cstar _ (p i) hcstar (Real.exp_pos _) hle
