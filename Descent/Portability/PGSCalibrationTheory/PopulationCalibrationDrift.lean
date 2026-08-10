@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Conditionals.DriftingConditional
+import Descent.Foundations.Probability
 import Descent.Portability.PGSCalibrationTheory.CalibrationVsDiscrimination
 import Mathlib.Analysis.Convex.Jensen
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
@@ -394,6 +396,59 @@ theorem prevalenceCITLShift_undercorrects_downward {ι : Type*} (t : Finset ι)
     _ < ∑ i ∈ t, w i * oddsScale (Real.exp (prevalenceCITLShift ps pt)) (p i) := by
         simpa [smul_eq_mul] using
           (oddsScale_strictConvexOn _ hc0 hc1).map_sum_lt hw hw1 hp hne
+
+/-!
+## The probit marginal-slope parameterisation: exact marginal calibration, identifiability
+
+The Δ-logit correction above under-corrects because `logit E[p] ≠ E[logit p]` — the logistic
+baseline parameter does not commute with mixing over the score. The probit marginal-slope
+parameterisation `Pr(Y = 1 | z) = Φ(q·√(1+b²) + b·z)` is built so the corresponding gap is
+zero: marginalising over a standard-normal score returns `Φ(q)` exactly
+(`marginalSlope_marginal_prevalence`), so `q` is the baseline-prevalence parameter with no
+Jensen correction owed at any accuracy `b`. The pair `(q, b)` is also identified by the risk
+curve alone (`marginalSlope_identified`): two parameterisations agreeing at every score agree
+parameter by parameter, so a baseline surface and a score-accuracy surface fitted jointly
+from phenotype data cannot trade off against each other inside one ancestry's risk curve.
+-/
+
+open ProbabilityTheory in
+/-- **Marginalising the probit marginal-slope model returns its baseline exactly.** With a
+    standard-normal score `z`, the parameterisation `Φ(q·√(1+b²) + b·z)` has marginal
+    prevalence `Φ(q)` — for every score accuracy `b`, with no correction term. This is the
+    probit counterpart of the Δ-logit failure derived above: here the baseline parameter
+    commutes with mixing over the score, which is exactly the property
+    `prevalenceLogisticCalibrationProfile` is FALSIFIED for lacking. Instance of
+    `Conditionals.gaussianAverage_probit` at `α = q·√(1+b²)`, `β = b`. -/
+theorem marginalSlope_marginal_prevalence (q b : ℝ) :
+    ∫ z, Foundations.Phi (q * Real.sqrt (1 + b ^ 2) + b * z)
+      ∂(gaussianReal 0 1) = Foundations.Phi q := by
+  rw [Conditionals.gaussianAverage_probit (q * Real.sqrt (1 + b ^ 2)) b]
+  have hs : Real.sqrt (1 + b ^ 2) ≠ 0 := by positivity
+  rw [mul_div_assoc, div_self hs, mul_one]
+
+/-- **The baseline and accuracy parameters are identified by the risk curve.** Two
+    marginal-slope parameterisations that agree at every score value agree parameter by
+    parameter: the probit index is affine in the score, an affine map is determined by two
+    evaluations, and `Φ` is strictly monotone (`Foundations.strictMono_Phi`), so nothing
+    else can produce the same risk curve. Fitting a baseline surface `q(PC)` and an accuracy
+    surface `b(PC)` from outcome data is therefore estimating a well-posed target: within
+    any one ancestry position the two surfaces cannot compensate for each other. -/
+theorem marginalSlope_identified (q b q' b' : ℝ)
+    (h : ∀ z : ℝ, Foundations.Phi (q * Real.sqrt (1 + b ^ 2) + b * z)
+      = Foundations.Phi (q' * Real.sqrt (1 + b' ^ 2) + b' * z)) :
+    q = q' ∧ b = b' := by
+  have hinj := Foundations.strictMono_Phi.injective
+  have h0 : q * Real.sqrt (1 + b ^ 2) = q' * Real.sqrt (1 + b' ^ 2) := by
+    have := hinj (h 0)
+    simpa using this
+  have h1 : q * Real.sqrt (1 + b ^ 2) + b = q' * Real.sqrt (1 + b' ^ 2) + b' := by
+    have := hinj (h 1)
+    simpa using this
+  have hb : b = b' := by linarith
+  subst hb
+  refine ⟨?_, rfl⟩
+  have hs : (0 : ℝ) < Real.sqrt (1 + b ^ 2) := by positivity
+  exact mul_right_cancel₀ hs.ne' h0
 
 end PopulationCalibrationDrift
 
