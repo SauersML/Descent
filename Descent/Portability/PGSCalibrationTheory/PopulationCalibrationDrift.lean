@@ -473,6 +473,54 @@ theorem required_odds_multiplier_exceeds_deltaLogit {ι : Type*} (t : Finset ι)
         hpi.1 hpi.2) (hw i hi).le
   linarith [hachieves ▸ hmono]
 
+/-- **The shortfall grows with the spread of the score.** For a symmetric two-point mixture at
+    risks `m ± s` with equal weights, the Jensen gap between the promised risk `oddsScale c m`
+    and the achieved average is STRICTLY INCREASING in the spread `s`. The
+    under-correction theorems above say the gap has one sign for any mixture that is not
+    degenerate; this says how it moves as the mixture widens, which is the direction
+    `battery_pgscal01` measured across its score-sd column — 17% at the narrow cell rising to
+    37% at the wide one, and vanishing at the zero-variance positive control where `s = 0`
+    makes the gap zero.
+
+    The reading is perverse and is the point: `s` is the spread of predicted risk, so a
+    SHARPER score — better discrimination, the thing a PGS is improved to have — makes the
+    Δ-logit intercept correction worse, not better. Recalibration by this recipe degrades
+    exactly as the model it recalibrates improves.
+
+    The mechanism is visible in one line of algebra. Writing `A = 1 + (c-1)·m` for the
+    denominator at the mixture mean, the symmetric average of the two endpoint risks is
+    `c·(m·A - (c-1)·s²) / (A² - (c-1)²·s²)`, and the difference between two spreads `s < s'`
+    collapses to `c·(c-1)·A·(s'² - s²)` over a product of positive denominators — so the
+    achieved average falls in `s²` and the gap it is subtracted from rises. -/
+theorem oddsScale_jensen_gap_grows_with_spread (c m s s' : ℝ) (hc : 1 < c)
+    (hs0 : 0 ≤ s) (hss : s < s') (h0 : 0 ≤ m - s') (h1 : m + s' ≤ 1) :
+    oddsScale c m - (oddsScale c (m - s) + oddsScale c (m + s)) / 2 <
+      oddsScale c m - (oddsScale c (m - s') + oddsScale c (m + s')) / 2 := by
+  have hc0 : (0 : ℝ) < c := by linarith
+  have hk : (0 : ℝ) < c - 1 := by linarith
+  have hs'0 : (0 : ℝ) < s' := lt_of_le_of_lt hs0 hss
+  have hDm : 0 < 1 + (c - 1) * (m - s) :=
+    oddsScale_denom_pos c _ hc0 (by linarith) (by linarith)
+  have hDp : 0 < 1 + (c - 1) * (m + s) :=
+    oddsScale_denom_pos c _ hc0 (by linarith) (by linarith)
+  have hDm' : 0 < 1 + (c - 1) * (m - s') :=
+    oddsScale_denom_pos c _ hc0 (by linarith) (by linarith)
+  have hDp' : 0 < 1 + (c - 1) * (m + s') :=
+    oddsScale_denom_pos c _ hc0 (by linarith) (by linarith)
+  have hA : 0 < 1 + (c - 1) * m :=
+    oddsScale_denom_pos c m hc0 (by linarith) (by linarith)
+  have hsq : 0 < s' ^ 2 - s ^ 2 := by
+    nlinarith [mul_pos (sub_pos.mpr hss) (show (0 : ℝ) < s' + s by linarith)]
+  have hgap : 0 < 2 * c * (c - 1) * (1 + (c - 1) * m) * (s' ^ 2 - s ^ 2) :=
+    mul_pos (mul_pos (mul_pos (by linarith) hk) hA) hsq
+  have key : oddsScale c (m - s') + oddsScale c (m + s')
+      < oddsScale c (m - s) + oddsScale c (m + s) := by
+    unfold oddsScale
+    rw [div_add_div _ _ hDm'.ne' hDp'.ne', div_add_div _ _ hDm.ne' hDp.ne',
+      div_lt_div_iff₀ (mul_pos hDm' hDp') (mul_pos hDm hDp)]
+    nlinarith [hgap]
+  linarith
+
 /-!
 ## The probit marginal-slope parameterisation: exact marginal calibration, identifiability
 
