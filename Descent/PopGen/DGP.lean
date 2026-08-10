@@ -1953,6 +1953,71 @@ theorem normalization_no_bias_iff_constant_prevalence {k : ℕ} [Fintype (Fin k)
   intro p c
   simp [prevalenceDGP_trueExpectation, h_const c]
 
+/-- **The floor is not specific to a linear predictor.**
+    `normalization_prevalence_bias` computes the residual of the one normalized predictor
+    `π̄ + β·p`; this theorem closes the escape route of picking a cleverer score map. For ANY
+    prediction rule `g` that reads the score alone — however nonlinear, however tuned — the
+    two prediction errors at a fixed score in two ancestries sum to at least the prevalence
+    gap between those ancestries, because the ancestry term enters the truth additively and
+    `g` cannot cancel it in both places at once. Small error in one ancestry is BOUGHT with
+    error in the other; only modeling the ancestry term itself escapes the floor. -/
+theorem scoreOnly_predictor_pair_floor {k : ℕ} [Fintype (Fin k)]
+    (pdgp : PrevalenceDGP k) (g : ℝ → ℝ) (p : ℝ) (c₁ c₂ : Fin k → ℝ) :
+    |pdgp.prevalence c₁ - pdgp.prevalence c₂| ≤
+      |prevalenceDGP_trueExpectation pdgp p c₁ - g p| +
+        |prevalenceDGP_trueExpectation pdgp p c₂ - g p| := by
+  have hkey : pdgp.prevalence c₁ - pdgp.prevalence c₂ =
+      (prevalenceDGP_trueExpectation pdgp p c₁ - g p) -
+        (prevalenceDGP_trueExpectation pdgp p c₂ - g p) := by
+    unfold prevalenceDGP_trueExpectation
+    ring
+  calc |pdgp.prevalence c₁ - pdgp.prevalence c₂|
+      = |(prevalenceDGP_trueExpectation pdgp p c₁ - g p) +
+          -(prevalenceDGP_trueExpectation pdgp p c₂ - g p)| := by
+        rw [hkey, sub_eq_add_neg]
+    _ ≤ |prevalenceDGP_trueExpectation pdgp p c₁ - g p| +
+          |-(prevalenceDGP_trueExpectation pdgp p c₂ - g p)| := abs_add_le _ _
+    _ = |prevalenceDGP_trueExpectation pdgp p c₁ - g p| +
+          |prevalenceDGP_trueExpectation pdgp p c₂ - g p| := by rw [abs_neg]
+
+/-- **The z-normalisation prevalence floor, pairwise.** A phenotype-agnostic normalisation
+    aims to make the score's distribution identical in every ancestry; to the extent it
+    succeeds, any predictor consuming the normalised score has the SAME mean prediction
+    `mu` in every ancestry, because a mean prediction is a functional of the score
+    distribution alone. This theorem prices that success: one number `mu` standing in for
+    every ancestry's prevalence pays, over any two ancestries, total prevalence error at
+    least their prevalence gap. The better the normalisation equalises the score across
+    ancestries, the more exactly its predicted prevalence is FLAT across them — which is
+    the calibration failure, not an approximation to calibration, whenever true prevalence
+    varies. `pdgp.prevalence` is the per-ancestry truth the flat prediction is judged
+    against. -/
+theorem ancestry_invariant_mean_prediction_pair_floor {k : ℕ} [Fintype (Fin k)]
+    (pdgp : PrevalenceDGP k) (mu : ℝ) (c₁ c₂ : Fin k → ℝ) :
+    |pdgp.prevalence c₁ - pdgp.prevalence c₂| ≤
+      |pdgp.prevalence c₁ - mu| + |pdgp.prevalence c₂ - mu| := by
+  have h := abs_sub_le (pdgp.prevalence c₁) mu (pdgp.prevalence c₂)
+  calc |pdgp.prevalence c₁ - pdgp.prevalence c₂|
+      ≤ |pdgp.prevalence c₁ - mu| + |mu - pdgp.prevalence c₂| := h
+    _ = |pdgp.prevalence c₁ - mu| + |pdgp.prevalence c₂ - mu| := by rw [abs_sub_comm mu]
+
+/-- **The z-normalisation prevalence floor, worst case.** However the single predicted
+    prevalence `mu` is chosen, the worse of any two ancestries' prevalence errors is at
+    least HALF their prevalence gap. Choosing `mu` optimally splits the gap; nothing closes
+    it. Together with `ancestry_invariant_mean_prediction_pair_floor` this is the structural
+    reading of a normalised model's cross-ancestry prevalence error: it cannot fall below
+    the dispersion of `pdgp.prevalence`, no matter what is fitted downstream of the
+    normalised score. -/
+theorem ancestry_invariant_mean_prediction_worstcase_floor {k : ℕ} [Fintype (Fin k)]
+    (pdgp : PrevalenceDGP k) (mu : ℝ) (c₁ c₂ : Fin k → ℝ) :
+    |pdgp.prevalence c₁ - pdgp.prevalence c₂| / 2 ≤
+      max |pdgp.prevalence c₁ - mu| |pdgp.prevalence c₂ - mu| := by
+  have hpair := ancestry_invariant_mean_prediction_pair_floor pdgp mu c₁ c₂
+  have h1 : |pdgp.prevalence c₁ - mu| ≤
+      max |pdgp.prevalence c₁ - mu| |pdgp.prevalence c₂ - mu| := le_max_left _ _
+  have h2 : |pdgp.prevalence c₂ - mu| ≤
+      max |pdgp.prevalence c₁ - mu| |pdgp.prevalence c₂ - mu| := le_max_right _ _
+  linarith
+
 /-! ### Biological → Statistical Bridges
 
 These structures connect biological mechanisms to statistical DGPs and to the
