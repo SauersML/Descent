@@ -1186,6 +1186,21 @@
       "constants": [],
       "note": "The SUM of two per-branch Wright F values, one per branch of a clean split. Summing is the composition per-branch indices admit and pairwise ones do not, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu`; a pairwise F_ST here is the substitution that produced a factor-of-four false falsification twice. Being a sum, it is not confined to the unit interval, and `cleanSplitFst_lt_one_iff` states where it stays inside the consuming chart's pole."
     },
+    "Descent/Portability/PhenomeWidePortability.lean::effectiveDriftGenerations": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "constants": ["1", "1", "1", "2"],
+      "note": "Inverts `neutralDriftFactor`, a SINGLE-LINEAGE retention, so its `F` argument is the per-branch Wright F measured against the ancestor and not a pairwise Hudson F_ST. The guard cannot see this from the name or the binder -- the argument is called `F` -- which is the reason for the entry: a caller handing it a pairwise value gets a generation count for a history that was never measured. The pinned `2` is the ploidy in `1/(2*Ne)`; a `4` there is the scaled-rate convention of the identity-probability family and would halve the implied generation count.",
+      "source": "Wright-Fisher per-generation non-coalescence, as carried by `neutralDriftFactor`."
+    },
+    "Descent/Portability/PhenomeWidePortability.lean::steppingStonePortability": {
+      "quantity": "fst",
+      "convention": "inherited",
+      "role": "consumer",
+      "constants": [],
+      "note": "Feeds `steppingStoneFst`'s output straight into `neutralPortability`'s `fst` slot, so it returns a portability in whatever convention `fst_neighbor` was supplied in. That the two stages want the same reading is the untested join, not a settled fact: the stepping-stone body is measured against F_ST read from coalescence times, and the portability chart is measured against transported R-squared."
+    },
     "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::ldCorrelationDecayHyperbolic": {
       "quantity": "fst",
       "convention": "undetermined",

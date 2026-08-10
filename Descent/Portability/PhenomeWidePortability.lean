@@ -6,6 +6,7 @@ import Descent.PopGen.DriftRegime
 import Descent.Portability.PortabilityBounds
 import Descent.Portability.PortabilityDrift.PresentDayMoments
 import Descent.Portability.PortabilityDrift.MutationDrift
+import Descent.Portability.PortabilityDrift.MigrationDrift
 
 assert_below Descent.Decision Descent.Program
 
@@ -1306,5 +1307,244 @@ theorem cleanSplitTargetR2_eq_indexScaleTrueIndexR2 (r2_0 NeS NeT : ℝ) (t : �
   rw [indexScaleTrueIndexR2_of_standardized rho s hs, hretain]
 
 end CleanSplit
+
+/-!
+## The migration-connected chain: a bracket, not a law
+
+The clean split above is the easy demography — two closed branches, nothing crossing between
+them — and the corpus can write a single composed number for it. A MIGRATION-CONNECTED CHAIN
+cannot be written that way, and the reason is a measurement rather than a gap in effort.
+
+Two effects run in opposite directions along such a chain. Drift and limited migration push
+`F_ST` up with distance, which `steppingStoneFst` describes and which costs transported `R²`.
+Ongoing gene flow also RESTORES shared linkage disequilibrium between demes, which recovers
+some of what the LD stage takes away. The first effect has a validated body. The second does
+not: `DGP.migrationLDBoost` is the corpus's only candidate and `simcov/battery_bulk55.py`
+FALSIFIES it in magnitude at worst 15.6 sems and 62% relative, while rejecting no restoration
+at all at 8.3 sems. So restoration is real and no formula for it survives.
+
+That is what forces a bracket. The UPPER end applies the drift-and-migration penalty and no LD
+penalty at all, which is the limit of complete restoration. The LOWER end multiplies the upper
+by the LD retention a model with no restoration would predict. Any multiplicative-LD model
+whose restoration lies between none and full lies between the two, which
+`steppingStonePortability_mem_bracket` states. The bracket's WIDTH is the falsified quantity:
+a surviving migration-LD restoration formula is what would pick the point inside it, and until
+one exists the width is the honest report and a point prediction would not be.
+
+`effectiveDriftGenerations` is the other half of instantiating such a chain. A stepping-stone
+`F_ST` is a differentiation index, and a drift law wants a generation count; this inverts the
+per-branch drift law to supply one.
+-/
+
+section MigrationChainBracket
+
+/-- **The generation count a per-branch drift index implies.** Inverting
+    `neutralDriftFactor`: the retention after `t` generations is `(1 - 1/(2·Ne))^t`, so the
+    `t` at which the accumulated per-branch index reaches `F` is `log(1-F) / log(1-1/(2·Ne))`.
+    Both logarithms are negative on the admissible range and the quotient is positive.
+
+    THE ARGUMENT IS A PER-BRANCH INDEX, not a pairwise `F_ST`, and the two differ by the
+    factor this corpus has paid for twice. `F` is the slot `fstFromDriftFactor` returns into —
+    Wright's `F` for ONE lineage measured against the ancestor — because the law being
+    inverted, `neutralDriftFactor`, is a single-branch retention. Feeding a pairwise Hudson
+    value returns a generation count for a history that is not the one measured.
+
+    JUNK VALUES, both from Lean's total division and total logarithm rather than from any
+    modelling choice. At `F = 1` no finite generation count is implied, and this returns `0`
+    because `log 0` is `0`; `effectiveDriftGenerations_at_full_index_is_junk` names it. At
+    `Ne = 1/2` the per-generation retention is `0`, its logarithm is `0`, and the whole
+    quotient is `0` at every `F`; `effectiveDriftGenerations_at_half_Ne_is_junk` names that.
+    Below `Ne = 1/2` the retention goes negative and the logarithm is junk again. Consumers
+    must require `1/2 < Ne` and `F < 1`.
+
+    Empirical status: UNTESTED. It inherits its regime whole from `neutralDriftFactor` —
+    closed population, no mutation — which is CONDITIONALLY VALID inside that regime and
+    known to fail at demographic equilibrium, so an inverted generation count read off a
+    population at mutation-drift balance is wrong for that reason and not for any reason
+    about the inversion. A battery is owed and none has been run. -/
+noncomputable def effectiveDriftGenerations (Ne F : ℝ) : ℝ :=
+  Real.log (1 - F) / Real.log (1 - 1 / (2 * Ne))
+
+/-- **The two in `2·Ne` is the corpus's ploidy, not a free constant.** A population of `Ne`
+    diploids carries `ploidy · Ne` gene copies and drift acts at rate `1/(ploidy · Ne)`, so a
+    haploid reading of this same inversion would return generation counts off by a factor of
+    two in the drift rate — and off in the same direction at every index, which no range check
+    would catch. Stated beside the definition so the numeral in the body is tied to the
+    convention primitive wherever the definition is in scope. -/
+theorem effectiveDriftGenerations_uses_ploidy (Ne F : ℝ) :
+    effectiveDriftGenerations Ne F
+      = Real.log (1 - F) / Real.log (1 - 1 / (Descent.Core.ploidy * Ne)) := by
+  unfold effectiveDriftGenerations
+  rw [Descent.Core.ploidy_at_reference_point]
+
+/-- **No differentiation, no elapsed time.** The anchor of the inversion: an index of zero is
+    reached at generation zero, for every population size. -/
+theorem effectiveDriftGenerations_at_zero_index (Ne : ℝ) :
+    effectiveDriftGenerations Ne 0 = 0 := by
+  unfold effectiveDriftGenerations
+  norm_num
+
+/-- **effectiveDriftGenerations at complete differentiation, named.** A per-branch index of
+    one is reached only in the limit, so the true value is unbounded. `Real.log 0` is `0` and
+    the quotient is `0` — the value the function also takes at `F = 0`, which is the opposite
+    end of the range. The two are indistinguishable in the output, so a consumer that reads a
+    returned `0` as "no time has passed" is reading complete fixation the same way. -/
+theorem effectiveDriftGenerations_at_full_index_is_junk (Ne : ℝ) :
+    effectiveDriftGenerations Ne 1 = 0 := by
+  unfold effectiveDriftGenerations
+  norm_num
+
+/-- **effectiveDriftGenerations at the smallest diploid population, named.** At `Ne = 1/2`
+    there is one gene copy, the per-generation retention `1 - 1/(2·Ne)` is `0`, and `log 0`
+    is Lean's `0`, so the divisor vanishes and every index returns generation `0`. The true
+    reading is that all differentiation happens in one generation. Consumers must require
+    `1/2 < Ne`. -/
+theorem effectiveDriftGenerations_at_half_Ne_is_junk (F : ℝ) :
+    effectiveDriftGenerations (1 / 2) F = 0 := by
+  unfold effectiveDriftGenerations
+  norm_num
+
+/-- **More differentiation means more elapsed generations.** Strictly monotone in the index
+    across `[0, 1)` whenever the population is large enough for the per-generation retention
+    to be a probability.
+
+    The sign bookkeeping is the whole content and it cancels twice. `log(1-F)` is negative and
+    falls as `F` rises; the divisor `log(1-1/(2·Ne))` is negative and fixed; so the quotient
+    rises. Writing the inversion with either logarithm's sign flipped produces a generation
+    count that DECREASES with differentiation, which is monotone in the wrong direction and
+    would not be caught by any range check. -/
+theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
+    (hNe : 1 / 2 < Ne) (h0 : 0 ≤ F₁) (hlt : F₁ < F₂) (h1 : F₂ < 1) :
+    effectiveDriftGenerations Ne F₁ < effectiveDriftGenerations Ne F₂ := by
+  have hNe0 : 0 < 2 * Ne := by linarith
+  have hfrac : 1 / (2 * Ne) < 1 := (div_lt_one hNe0).mpr (by linarith)
+  have hfracpos : 0 < 1 / (2 * Ne) := div_pos one_pos hNe0
+  have hL : Real.log (1 - 1 / (2 * Ne)) < 0 :=
+    Real.log_neg (by linarith) (by linarith)
+  have hnum : Real.log (1 - F₂) < Real.log (1 - F₁) :=
+    Real.log_lt_log (by linarith) (by linarith)
+  have hkey : 0 < (Real.log (1 - F₂) - Real.log (1 - F₁)) / Real.log (1 - 1 / (2 * Ne)) :=
+    div_pos_of_neg_of_neg (by linarith) hL
+  have hsplit : (Real.log (1 - F₂) - Real.log (1 - F₁)) / Real.log (1 - 1 / (2 * Ne))
+      = effectiveDriftGenerations Ne F₂ - effectiveDriftGenerations Ne F₁ := by
+    unfold effectiveDriftGenerations
+    ring
+  rw [hsplit] at hkey
+  linarith
+
+/-- **The drift-and-migration UPPER bound on transported `R²` along a stepping-stone chain.**
+    The stepping-stone `F_ST` at separation `d` put through the neutral portability chart, and
+    nothing else — no LD penalty at all. That omission is what makes it an upper bound rather
+    than a prediction: it is the transported `R²` a chain would retain if ongoing migration
+    restored every bit of the linkage disequilibrium that divergence costs.
+
+    The LOWER end of the bracket is this quantity times an LD retention, and this file does
+    NOT define the retention. `DGP.migrationLDBoost` is the corpus's only candidate for how
+    much migration restores and `simcov/battery_bulk55.py` falsifies it in magnitude, so
+    there is no body to compose here. Writing one anyway — a placeholder factor with a
+    plausible shape — would be the laundering this corpus guards against: a number a reader
+    could take for a measured restoration when none survives measurement.
+
+    Empirical status: UNTESTED. The stages carry their own verdicts and the join does not.
+    `steppingStoneFst`'s saturating body is VALIDATED head to head at worst 1.87 sems with a
+    free parameter withheld, the linear form FALSIFIED at 10.38 sems; `neutralPortability` is
+    VALIDATED at worst 1.70 sems with the linear `1 - 2·fst` form FALSIFIED at 101 sems on the
+    same cells. What is untested is that a stepping-stone `F_ST` is the argument
+    `neutralPortability`'s `fst` slot wants — the same join gap `cleanSplitTargetR2` records.
+
+    INFORMAL SUPPORT, WHICH IS NOT A VERDICT. An exploratory run at `Ne = 3000`, `m = 1e-3`, a
+    ten-deme chain, 250 kb clumps and recombination `1.1e-8` had all ten deme means of the
+    ancestry-calibration study inside the bracket this body's upper end defines. That run is
+    not committed and no reader can check it, which is the standing the corpus assigns to no
+    verdict at all; it is recorded as the reason a battery is being commissioned and not as
+    evidence. A bracket is also a weak thing to pass: an interval wide enough to hold every
+    plausible model is not confirmed by holding the data, and the battery owed here must
+    measure the WIDTH against the restoration gap, not merely report containment. -/
+noncomputable def steppingStonePortability (r2_0 f1 α : ℝ) (d : ℕ) : ℝ :=
+  neutralPortability r2_0 (steppingStoneFst f1 α d)
+
+/-- **At zero separation the chain transports the source `R²` whole.** The deme compared with
+    itself has no differentiation, and `neutralPortability` at index zero is the identity, so
+    the composed law reduces to its own input with no hypotheses at all. A body that returned
+    anything else here would be charging a transport penalty for not transporting. -/
+theorem steppingStonePortability_at_zero_distance (r2_0 f1 α : ℝ) :
+    steppingStonePortability r2_0 f1 α 0 = r2_0 := by
+  unfold steppingStonePortability neutralPortability
+  rw [steppingStoneFst_at_zero]
+  have hden : (1 - (0 : ℝ)) * r2_0 + (1 - r2_0) = 1 := by ring
+  rw [hden, div_one]
+  ring
+
+/-- **The upper bound is a nonnegative `R²`.** Needed before anything may be multiplied into
+    it: the bracket's lower end is this quantity scaled down, and scaling down is only a lower
+    bound when what is scaled is nonnegative. -/
+theorem steppingStonePortability_nonneg (r2_0 f1 α : ℝ) (d : ℕ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α) :
+    0 ≤ steppingStonePortability r2_0 f1 α d := by
+  unfold steppingStonePortability
+  rcases Nat.eq_zero_or_pos d with rfl | hpos
+  · rw [steppingStoneFst_at_zero]
+    exact neutralPortability_nonneg r2_0 0 hr2 hr2' (by norm_num)
+  · exact neutralPortability_nonneg r2_0 _ hr2 hr2'
+      (steppingStoneFst_le_one f1 α d hf hf'.le hα.le hpos)
+
+/-- **Portability falls off along the chain.** Two monotonicities composed: `steppingStoneFst`
+    rises with separation and `neutralPortability` falls with the index it is given. Stated
+    from separation zero rather than one, so the source deme itself is inside the range and
+    the fall-off is anchored at `steppingStonePortability_at_zero_distance`. -/
+theorem steppingStonePortability_antitone_distance (r2_0 f1 α : ℝ) (d₁ d₂ : ℕ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+    (hd : d₁ ≤ d₂) :
+    steppingStonePortability r2_0 f1 α d₂ ≤ steppingStonePortability r2_0 f1 α d₁ := by
+  unfold steppingStonePortability
+  rcases Nat.eq_zero_or_pos d₂ with rfl | hpos
+  · rw [Nat.le_zero.mp hd]
+  · have hlt1 : steppingStoneFst f1 α d₂ < 1 :=
+      steppingStoneFst_lt_one f1 α d₂ hf hf' hα hpos
+    have hnn : 0 ≤ steppingStoneFst f1 α d₁ := by
+      rcases Nat.eq_zero_or_pos d₁ with rfl | hpos₁
+      · exact (steppingStoneFst_at_zero f1 α).ge
+      · exact steppingStoneFst_nonneg f1 α d₁ hf hf'.le hα.le hpos₁
+    have hmono : steppingStoneFst f1 α d₁ ≤ steppingStoneFst f1 α d₂ := by
+      rcases eq_or_lt_of_le hd with rfl | h
+      · exact le_rfl
+      · exact (steppingStoneFst_increases_with_distance f1 α d₁ d₂ hf hf' hα h).le
+    exact neutralPortability_antitone_fst r2_0 _ _ hr2 hr2' hnn hmono hlt1
+
+/-- **The bracket contains every intermediate restoration.** If the true multiplicative LD
+    retention `ldFactor` lies anywhere between the no-restoration retention `ldLoss` and one —
+    which is what "restoration between none and full" means — then the transported `R²` it
+    predicts lies between the bracket's two ends.
+
+    This is the theorem that makes the bracket a claim rather than two unrelated numbers. It
+    does not say where inside the interval the truth is, and nothing in this corpus does: the
+    only candidate restoration formula is falsified in magnitude by
+    `simcov/battery_bulk55.py`, which is what leaves the width open. Supplying the point is
+    the outstanding empirical derivation, and the hypothesis `ldLoss ≤ ldFactor ≤ 1` is the
+    whole of what may be assumed about it without one. -/
+theorem steppingStonePortability_mem_bracket (r2_0 f1 α : ℝ) (d : ℕ) (ldLoss ldFactor : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+    (hlow : ldLoss ≤ ldFactor) (hhigh : ldFactor ≤ 1) :
+    steppingStonePortability r2_0 f1 α d * ldLoss
+        ≤ steppingStonePortability r2_0 f1 α d * ldFactor ∧
+      steppingStonePortability r2_0 f1 α d * ldFactor
+        ≤ steppingStonePortability r2_0 f1 α d := by
+  have hnn := steppingStonePortability_nonneg r2_0 f1 α d hr2 hr2' hf hf' hα
+  exact ⟨mul_le_mul_of_nonneg_left hlow hnn, mul_le_of_le_one_right hnn hhigh⟩
+
+/-- **The bracket is a nonempty interval of nonnegative `R²`.** The lower end is at or above
+    zero and at or below the upper end, for any LD retention in `[0, 1]`. Stated separately
+    from the membership theorem because a consumer plotting the band needs the endpoints to be
+    ordered and in range before it needs to know what lies between them. -/
+theorem steppingStonePortability_bracket (r2_0 f1 α : ℝ) (d : ℕ) (ldLoss : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+    (hld0 : 0 ≤ ldLoss) (hld1 : ldLoss ≤ 1) :
+    0 ≤ steppingStonePortability r2_0 f1 α d * ldLoss ∧
+      steppingStonePortability r2_0 f1 α d * ldLoss
+        ≤ steppingStonePortability r2_0 f1 α d := by
+  have hnn := steppingStonePortability_nonneg r2_0 f1 α d hr2 hr2' hf hf' hα
+  exact ⟨mul_nonneg hnn hld0, mul_le_of_le_one_right hnn hld1⟩
+
+end MigrationChainBracket
 
 end Descent.Portability
