@@ -1209,6 +1209,72 @@ theorem one_lt_orPerSDFromLiability (r2 K : ℝ) (h0 : 0 < r2) (h1 : r2 < 1) :
   rw [← hp0, ← hp1]
   exact (one_lt_div hodds0).mpr hoddsmono
 
+/-- **Squared correlation between the score-driven probit index and the true-liability index**,
+    from the score's retention `rho` and the scale `s` of the independent noise the score
+    carries.
+
+    THE PROJECTION IDENTITY. Write the true-liability index as `a + b·z` and the score index as
+    `a + b·ẑ` with `ẑ = rho·z + s·ε` and `ε` independent of `z`, both standardised. Then
+    `Cov = b²·rho` and the variances are `b²·(rho² + s²)` and `b²`, so the squared
+    correlation is `rho²/(rho² + s²)`: the intercept `a` cancels from a covariance and `b`
+    cancels between numerator and denominator. Neither appears in this body, which is the
+    content — the index-scale fidelity is a property of the score alone and not of the risk
+    model wrapped around it. `indexScaleTrueIndexR2_slope_invariant` states the cancellation.
+
+    ON THE STANDARDISED SCORE `s² = 1 - rho²` this reduces to `rho²`, the retained fraction —
+    `indexScaleTrueIndexR2_of_standardized` — which is what makes it compose with
+    `cleanSplitTargetR2`.
+
+    **THIS BODY CLAIMS THE INDEX SCALE ONLY, and the simulations do not measure that scale.**
+    The harness's `r2_true` is a squared correlation between RISKS — probabilities, after the
+    `Φ` warp — and `Φ` is not affine, so the two are not the same number and no closed form
+    carries one to the other. The gap is smallest where the risk curve is closest to linear,
+    which is the middle of the index range, and largest in the tails where a rare trait
+    actually lives. So a battery comparing this body to a risk-scale `r2_true` would be
+    measuring the warp, not this identity. Testing THIS declaration means correlating the
+    indices, which a simulation can do because it knows the latent liability it drew.
+
+    Empirical status: UNTESTED on the index scale. NOT TESTED BY THE DESIGN THAT LOOKED LIKE
+    IT WAS would be the wrong head, since no design has been pointed at this body yet; the
+    paragraph above is a warning about the design a battery would reach for first, not a
+    record of one that ran. -/
+noncomputable def indexScaleTrueIndexR2 (rho s : ℝ) : ℝ :=
+  rho ^ 2 / (rho ^ 2 + s ^ 2)
+
+/-- **The affine wrapper cancels.** Building the two indices with any nonzero slope `b`
+    returns the same squared correlation, which is why the body carries neither slope nor
+    intercept. The left-hand side is `Cov²/(Var·Var)` written out in the moments the
+    projection gives. -/
+theorem indexScaleTrueIndexR2_slope_invariant (b rho s : ℝ) (hb : b ≠ 0)
+    (hden : rho ^ 2 + s ^ 2 ≠ 0) :
+    (b ^ 2 * rho) ^ 2 / ((b ^ 2 * (rho ^ 2 + s ^ 2)) * b ^ 2) = indexScaleTrueIndexR2 rho s := by
+  have hb2 : b ^ 2 ≠ 0 := pow_ne_zero 2 hb
+  unfold indexScaleTrueIndexR2
+  rw [div_eq_div_iff (mul_ne_zero (mul_ne_zero hb2 hden) hb2) hden]
+  ring
+
+/-- **On a standardised score the index-scale fidelity IS the retained fraction.** This is the
+    identity that lets the clean-split law's output be read directly as an index-scale `R²`
+    without a further conversion. -/
+theorem indexScaleTrueIndexR2_of_standardized (rho s : ℝ) (hs : s ^ 2 = 1 - rho ^ 2) :
+    indexScaleTrueIndexR2 rho s = rho ^ 2 := by
+  unfold indexScaleTrueIndexR2
+  rw [hs]
+  have : rho ^ 2 + (1 - rho ^ 2) = 1 := by ring
+  rw [this, div_one]
+
+/-- **The composition.** A score whose retained squared correlation is the clean-split law's
+    predicted target `R²` has, on the probit-index scale, exactly that `R²` against the true
+    liability index. The clean-split prediction therefore needs no conversion to be read as
+    index-scale fidelity — and, by the definition's docstring, does need one to be read as the
+    risk-scale number a simulation reports most easily. -/
+theorem cleanSplitTargetR2_eq_indexScaleTrueIndexR2 (r2_0 NeS NeT : ℝ) (t : ℕ)
+    (ldFactor rho s : ℝ)
+    (hretain : rho ^ 2 = cleanSplitTargetR2 r2_0 NeS NeT t ldFactor)
+    (hs : s ^ 2 = 1 - rho ^ 2) :
+    indexScaleTrueIndexR2 rho s = cleanSplitTargetR2 r2_0 NeS NeT t ldFactor := by
+  rw [indexScaleTrueIndexR2_of_standardized rho s hs, hretain]
+
 end CleanSplit
 
 end Descent.Portability
