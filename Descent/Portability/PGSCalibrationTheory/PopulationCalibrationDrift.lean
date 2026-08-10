@@ -502,6 +502,43 @@ theorem marginalSlope_marginal_prevalence (q b : ℝ) :
   have hs : Real.sqrt (1 + b ^ 2) ≠ 0 := by positivity
   rw [mul_div_assoc, div_self hs, mul_one]
 
+open ProbabilityTheory in
+/-- **The probit index is centred at the baseline.** The index `q·√(1+b²) + b·z` driving the
+    marginal-slope model has mean `q·√(1+b²)` under a standard-normal score, for every
+    accuracy `b`: the score contributes spread and nothing else. Together with
+    `marginalSlope_marginal_prevalence` — which says the marginal prevalence is `Φ(q)`, not
+    `Φ` of this mean — it separates the two roles the parameterisation gives `q`. -/
+theorem marginalSlope_index_mean (q b : ℝ) :
+    ∫ z, (q * Real.sqrt (1 + b ^ 2) + b * z) ∂(gaussianReal 0 1)
+      = q * Real.sqrt (1 + b ^ 2) := by
+  have hz : Integrable (fun z : ℝ ↦ z) (gaussianReal 0 1) := by
+    simpa using Foundations.gaussian_moments_integrable 1
+  have hlin : ∫ z, b * z ∂(gaussianReal 0 1) = 0 := by
+    rw [integral_const_mul, Foundations.gaussian_mean_zero, mul_zero]
+  rw [integral_add (integrable_const _) (hz.const_mul b), hlin]
+  simp
+
+open ProbabilityTheory in
+/-- **The accuracy parameter IS the index spread.** The probit index of the marginal-slope
+    model has variance exactly `b²` about its mean under a standard-normal score, so at a
+    fixed baseline `q` the score-accuracy parameter is the whole dispersion of the risk index
+    and nothing in `q` contributes to it. This is the attenuation statement the manuscript's
+    measurement-error discussion needs: a target population whose PGS is noisier is a
+    population with a SMALLER `b`, and by this theorem its risk index is correspondingly less
+    spread, so its predicted risks contract toward the baseline `Φ(q)` — which
+    `marginalSlope_marginal_prevalence` fixes independently of `b`. Attenuated accuracy
+    therefore flattens the risk curve without moving the prevalence it integrates to. -/
+theorem marginalSlope_index_variance (q b : ℝ) :
+    ∫ z, (q * Real.sqrt (1 + b ^ 2) + b * z - q * Real.sqrt (1 + b ^ 2)) ^ 2
+      ∂(gaussianReal 0 1) = b ^ 2 := by
+  have hsq : ∀ z : ℝ,
+      (q * Real.sqrt (1 + b ^ 2) + b * z - q * Real.sqrt (1 + b ^ 2)) ^ 2
+        = b ^ 2 * z ^ 2 := by
+    intro z
+    ring
+  simp_rw [hsq]
+  rw [integral_const_mul, Foundations.gaussian_second_moment, mul_one]
+
 /-- **The baseline and accuracy parameters are identified by the risk curve.** Two
     marginal-slope parameterisations that agree at every score value agree parameter by
     parameter: the probit index is affine in the score, an affine map is determined by two
