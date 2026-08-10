@@ -526,6 +526,35 @@ theorem marginalSlope_identified (q b q' b' : ℝ)
   have hs : (0 : ℝ) < Real.sqrt (1 + b ^ 2) := by positivity
   exact mul_right_cancel₀ hs.ne' h0
 
+/-- **Two score values already pin the pair.** `marginalSlope_identified` assumes agreement
+    of the two risk curves at EVERY score; this strengthening asks only for agreement at two
+    distinct scores `z₁ ≠ z₂`. The probit index is affine in the score and `Φ` is injective
+    (`Foundations.strictMono_Phi`), so the two equalities give two evaluations of an affine
+    map; dividing their difference by `z₁ - z₂` recovers the accuracy `b`, and either
+    evaluation then recovers the baseline `q`. The estimation reading is the sharper one: a
+    baseline surface and an accuracy surface fitted jointly are separated by any two score
+    strata that differ, not by the whole curve — so the identification does not depend on
+    observing the tails, where a PGS cohort has the fewest individuals. -/
+theorem marginalSlope_identified_of_two (q b q' b' z₁ z₂ : ℝ) (hz : z₁ ≠ z₂)
+    (h₁ : Foundations.Phi (q * Real.sqrt (1 + b ^ 2) + b * z₁)
+      = Foundations.Phi (q' * Real.sqrt (1 + b' ^ 2) + b' * z₁))
+    (h₂ : Foundations.Phi (q * Real.sqrt (1 + b ^ 2) + b * z₂)
+      = Foundations.Phi (q' * Real.sqrt (1 + b' ^ 2) + b' * z₂)) :
+    q = q' ∧ b = b' := by
+  have hinj := Foundations.strictMono_Phi.injective
+  have e₁ := hinj h₁
+  have e₂ := hinj h₂
+  have hb : b = b' := by
+    have hprod : (b - b') * (z₁ - z₂) = 0 := by linear_combination e₁ - e₂
+    rcases mul_eq_zero.mp hprod with h | h
+    · linarith
+    · exact absurd (sub_eq_zero.mp h) hz
+  subst hb
+  refine ⟨?_, rfl⟩
+  have h0 : q * Real.sqrt (1 + b ^ 2) = q' * Real.sqrt (1 + b ^ 2) := by linarith
+  have hs : (0 : ℝ) < Real.sqrt (1 + b ^ 2) := by positivity
+  exact mul_right_cancel₀ hs.ne' h0
+
 end PopulationCalibrationDrift
 
 end Descent.Portability
