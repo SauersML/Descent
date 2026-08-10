@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
 import Descent.PopGen.AssortativeMatingPGS
+import Descent.PopGen.LDDecayTheory
 import Descent.Core.Moments
 
 assert_below Descent.Decision Descent.Program
@@ -2541,6 +2542,95 @@ theorem ldCorrelationDecay_strictAnti_fst
       Real.sqrt fstTarget * (lambda * distance) :=
     mul_lt_mul_of_pos_right hsqrt h_pos
   linarith
+
+/-- **The hyperbolic candidate the falsification record names, written down so a battery can
+    race it against the body it would replace.** `ldCorrelationDecay` is FALSIFIED as a shape
+    in distance and its docstring names the successor — `ohtaKimuraSigmaDSq`, the
+    Ohta-Kimura `(10 + ρ)/((2 + ρ)(11 + ρ))` — while stating an obstruction that stops the
+    substitution. This declaration is that successor written at the falsified body's
+    signature, with the `√fstGap` divergence factor carried over unchanged, so the two are
+    functions of the same three arguments and one simulation can fit both.
+
+    THE SHAPE IS NORMALISED TO ONE AT ZERO DISTANCE, by dividing through by
+    `ohtaKimuraSigmaDSq` at `ρ = 0`, which is `10/22`. That keeps the boundary behaviour
+    `ldCorrelationDecay` has — `Real.exp 0 = 1` — so a consumer swapping one for the other
+    does not silently acquire a different value at zero separation.
+
+    **NORMALISING DOES NOT CLEAR THE OBSTRUCTION, and this declaration does not claim it
+    does.** Read the falsified body's docstring closely: the difficulty is not that the
+    hyperbolic fails to reach one at zero distance — the naive
+    `1/(1 + λ·√fstGap·d)` already does. It is that the fits which chose the hyperbolic over
+    the exponential carried a FREE amplitude and measured it at 0.373 and 0.316, so an
+    amplitude-one curve is not the curve that was fitted, and cell `I` bears on the shape
+    only. Normalising to one is therefore how this candidate lands squarely on the object the
+    measurement does not yet cover, rather than a way around it. What would settle it is the
+    re-analysis that docstring already specifies: one cell fitting the amplitude-one
+    hyperbolic against measured `r²` normalised to its own zero-distance limit. That is a
+    re-analysis of a stored curve, not a new simulation.
+
+    NOTHING HERE DISTURBS THE STANDING RECORDS. `ldCorrelationDecay` keeps its body and its
+    FALSIFIED marker, and `jointTagLDKernelAt` keeps the shape fault it inherits through it.
+    A candidate sitting beside a falsified body is not a repair of it; the marker moves when
+    a battery moves it and not before.
+
+    Empirical status: UNTESTED as a decay law in distance. The shape it is built from is
+    VALIDATED in its own variable — `ohtaKimuraSigmaDSq` within 3.5% at `ρ = 0.5` and 1% at
+    `ρ = 2`, and at 1.85 sems worst cell against a forward two-locus Wright-Fisher engine
+    where this body's exponential rival loses at 6.29 sems with a least-squares-fitted
+    amplitude AND rate. What is untested is this composition: that `ρ` may be read as
+    `λ·√fstGap·distance`, and that the normalised shape is the curve a cross-population LD
+    correlation follows. The `√fstGap` factor is the one part carried over already measured,
+    at 2.42 sems against 4.73 for the un-rooted rival. -/
+noncomputable def ldCorrelationDecayHyperbolic (distance fstGap lambda : ℝ) : ℝ :=
+  PopGen.ohtaKimuraSigmaDSq (1 / 4) (lambda * Real.sqrt fstGap * distance) /
+    PopGen.ohtaKimuraSigmaDSq (1 / 4) 0
+
+/-- The candidate agrees with `ldCorrelationDecay` at zero distance, which is the boundary
+    condition the normalisation exists to preserve. Both are `1`. -/
+theorem ldCorrelationDecayHyperbolic_at_reference_point :
+    ldCorrelationDecayHyperbolic 0 0 0 = 1 := by
+  unfold ldCorrelationDecayHyperbolic PopGen.ohtaKimuraSigmaDSq
+  norm_num
+
+/-- **The normalisation is the `10/22` the docstring names.** Stated separately so the
+    amplitude this candidate commits to is a theorem rather than a constant buried in a
+    body — it is the number the outstanding re-analysis has to bear on. -/
+theorem ldCorrelationDecayHyperbolic_normalizer :
+    PopGen.ohtaKimuraSigmaDSq (1 / 4) 0 = 10 / 22 := by
+  unfold PopGen.ohtaKimuraSigmaDSq
+  norm_num
+
+/-- **The candidate in closed form**, with `ρ = λ·√fstGap·distance` cleared of the
+    normalisation. Written so a fitter has the expression without unfolding two definitions,
+    and so a replacement body that is not this curve cannot pass as it. The nonnegativity
+    hypothesis is what keeps the Ohta-Kimura denominator off its pole at `ρ = -2`, which
+    `ohtaKimuraSigmaDSq_cancelling_scaled_recombination_is_junk` names; every use of a decay
+    law in distance supplies it. -/
+theorem ldCorrelationDecayHyperbolic_closed (distance fstGap lambda : ℝ)
+    (hrho : 0 ≤ lambda * Real.sqrt fstGap * distance) :
+    ldCorrelationDecayHyperbolic distance fstGap lambda =
+      22 * (10 + lambda * Real.sqrt fstGap * distance) /
+        (10 * ((2 + lambda * Real.sqrt fstGap * distance) *
+          (11 + lambda * Real.sqrt fstGap * distance))) := by
+  have h2 : (2 : ℝ) + lambda * Real.sqrt fstGap * distance ≠ 0 := by positivity
+  have h11 : (11 : ℝ) + lambda * Real.sqrt fstGap * distance ≠ 0 := by positivity
+  unfold ldCorrelationDecayHyperbolic PopGen.ohtaKimuraSigmaDSq
+  norm_num
+  field_simp
+  ring
+
+/-- **The candidate is a decay: it is strictly below one at any positive scaled distance.**
+    A shape normalised to one at the origin that failed this would be predicting that
+    separation can strengthen an LD correlation. -/
+theorem ldCorrelationDecayHyperbolic_lt_one (distance fstGap lambda : ℝ)
+    (hpos : 0 < lambda * Real.sqrt fstGap * distance) :
+    ldCorrelationDecayHyperbolic distance fstGap lambda < 1 := by
+  rw [ldCorrelationDecayHyperbolic_closed distance fstGap lambda hpos.le]
+  set r := lambda * Real.sqrt fstGap * distance with hr
+  have h2 : 0 < 2 + r := by linarith
+  have h11 : 0 < 11 + r := by linarith
+  rw [div_lt_one (by positivity)]
+  nlinarith [mul_pos h2 h11, sq_nonneg r]
 
 /-! ### Generation-indexed population-genetic parameters
 
