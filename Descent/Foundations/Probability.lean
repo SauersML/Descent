@@ -646,6 +646,26 @@ theorem strictMono_Phi : StrictMono Phi := by
 strict form it follows from, rather than being restated in each file that uses it. -/
 theorem Phi_monotone : Monotone Phi := strictMono_Phi.monotone
 
+/-- **`Φ` is strictly positive everywhere.**
+
+A CDF is only nonneg by `cdf_nonneg`; strictness comes from `strictMono_Phi`, since `Φ x`
+dominates `Φ (x - 1)` and that is already at least zero. Anything dividing by `Φ` or by an
+odds built from it needs this, and the weak bound will not do: `p / (1 - p)` at `p = 0` is a
+junk zero that silently turns an odds ratio into `0 / 0`. -/
+theorem Phi_pos (x : ℝ) : 0 < Phi x := by
+  have hle : 0 ≤ Phi (x - 1) := by
+    unfold Phi
+    exact ProbabilityTheory.cdf_nonneg _ _
+  exact lt_of_le_of_lt hle (strictMono_Phi (by linarith))
+
+/-- **`Φ` is strictly below one everywhere.** The mirror of `Phi_pos`, and what a denominator
+`1 - Φ x` needs to be nonzero. -/
+theorem Phi_lt_one (x : ℝ) : Phi x < 1 := by
+  have hle : Phi (x + 1) ≤ 1 := by
+    unfold Phi
+    exact ProbabilityTheory.cdf_le_one _ _
+  exact lt_of_lt_of_le (strictMono_Phi (by linarith)) hle
+
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/
 structure GaussianNoiseAssumption (k : ℕ) where

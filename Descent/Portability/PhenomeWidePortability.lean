@@ -1088,6 +1088,127 @@ theorem cleanSplitTargetR2_antitone_time (r2_0 NeS NeT : ℝ) (t₁ t₂ : ℕ) 
   unfold cleanSplitTargetR2
   exact mul_le_mul_of_nonneg_right hanti hld
 
+/-!
+### Two metrics the simulations report, given laws
+
+`cleanSplitTargetR2` predicts an `R²`. The simulation harness reports two other numbers
+alongside it — an odds ratio per standard deviation of score, and a squared correlation with
+the truth — and neither had a law here to be compared against. The declarations below supply
+them. Both are UNTESTED and both name honestly what they do NOT cover.
+-/
+
+/-- **Risk at a given score, under the liability-threshold model.** A liability
+    `√r2 · z + √(1-r2) · e` with `e` standard normal crosses the threshold
+    `liabilityThreshold K` with probability `Φ((√r2·z - T)/√(1-r2))`, and no other.
+
+    THE SIGN IS THE CORPUS'S AND IT IS NOT FREE. `liabilityThreshold K` is
+    `Φ⁻¹(1 - K)`, the UPPER-tail quantile — positive for a rare trait — because the model
+    puts cases ABOVE the threshold. So the threshold enters this index with a MINUS, and at
+    `r2 = 0` the risk is `Φ(-T)`, which is the prevalence. Writing `+T` instead inverts the
+    trait: it would report a 95% risk at average score for a 5%-prevalence disease. That is
+    the same sign slip `liabilityThreshold`'s own docstring records as FALSIFIED at 3390 sems
+    and 200% relative, and it is indistinguishable from the correct reading only at
+    `K = 1/2`.
+
+    WHY THE PREVALENCE CHECK IS NOT A THEOREM HERE. `liabilityRiskAtScore 0 K z = K` is the
+    natural sanity statement and it is NOT provable in this corpus, because it needs
+    `Φ (liabilityThreshold K) = 1 - K` — that is, that `Φ` is onto `(0,1)`, so that
+    `Function.invFun` returns a genuine preimage. `PresentDayMoments` records that gap in as
+    many words where it deletes `LiabilityThresholdRegime`: the surjectivity is a real
+    theorem, continuity plus the limits at `±∞` plus the intermediate value theorem, and
+    `Foundations.Probability` does not have it. `liabilityRiskAtScore_at_zero_r2` below
+    therefore states what IS provable, `Φ(-T)`, and the step from there to `K` is the lemma
+    that is missing.
+
+    Empirical status: UNTESTED. A battery is being commissioned against this name and against
+    `orPerSDFromLiability`, which is built from it. -/
+noncomputable def liabilityRiskAtScore (r2 K z : ℝ) : ℝ :=
+  Foundations.Phi ((Real.sqrt r2 * z - liabilityThreshold K) / Real.sqrt (1 - r2))
+
+/-- **Odds ratio per standard deviation of score**, under the liability-threshold model: the
+    odds of disease at a score one SD above the mean, divided by the odds at the mean. This
+    is the law-side counterpart of the simulations' `or_per_sd` metric, which until now had
+    no declaration to be compared against.
+
+    The quantity is a RATIO OF ODDS, not of risks: the risk ratio and the odds ratio agree
+    only in the rare-disease limit, and a battery reading one against the other would be
+    measuring the gap between them rather than this body.
+
+    Empirical status: UNTESTED, and a battery is being commissioned against this name. The
+    components are in different states and the composition is what is untested.
+    `liabilityThreshold` is VALIDATED at worst 0.91 sems with the sign slip `Φ⁻¹(K)`
+    FALSIFIED at 3390 sems, so the threshold convention this body inherits is measured. What
+    is not measured is that the odds ratio a fitted logistic reports on simulated data is
+    this function of the explained-variance fraction — which is the join, and joins are where
+    this corpus has hidden errors before. Note also that the model is probit and the metric
+    is logistic: an odds ratio is constant per SD only under a logistic link, and
+    under this probit model it is not, so `orPerSDFromLiability` is the odds ratio for the
+    FIRST standard deviation specifically and not a slope that may be extrapolated. A battery
+    fitting a logistic regression over a wide score range will recover something between this
+    and the odds ratio at other points. -/
+noncomputable def orPerSDFromLiability (r2 K : ℝ) : ℝ :=
+  (liabilityRiskAtScore r2 K 1 / (1 - liabilityRiskAtScore r2 K 1)) /
+    (liabilityRiskAtScore r2 K 0 / (1 - liabilityRiskAtScore r2 K 0))
+
+/-- **At no explained variance the risk is flat at `Φ(-T)`**, the same at every score. This is
+    as far as the prevalence check can be taken without `Φ`'s surjectivity; see the
+    definition's docstring. -/
+theorem liabilityRiskAtScore_at_zero_r2 (K z : ℝ) :
+    liabilityRiskAtScore 0 K z = Foundations.Phi (-liabilityThreshold K) := by
+  unfold liabilityRiskAtScore
+  norm_num
+
+/-- **The risk is strictly increasing in the score** whenever the score explains anything.
+    A body that failed this would have a higher polygenic score lowering risk. -/
+theorem liabilityRiskAtScore_strictMono_score (r2 K z₁ z₂ : ℝ)
+    (h0 : 0 < r2) (h1 : r2 < 1) (hz : z₁ < z₂) :
+    liabilityRiskAtScore r2 K z₁ < liabilityRiskAtScore r2 K z₂ := by
+  have hs : 0 < Real.sqrt (1 - r2) := Real.sqrt_pos.mpr (by linarith)
+  have hr : 0 < Real.sqrt r2 := Real.sqrt_pos.mpr h0
+  unfold liabilityRiskAtScore
+  refine Foundations.strictMono_Phi ?_
+  rw [div_lt_div_iff_of_pos_right hs]
+  nlinarith [mul_lt_mul_of_pos_left hz hr]
+
+/-- **No explained variance, no odds ratio.** With a flat risk curve the odds at one SD equal
+    the odds at the mean, so the ratio is exactly one. `Foundations.Phi_pos` and
+    `Foundations.Phi_lt_one` are what make this a real `1` rather than Lean's junk `0 / 0`:
+    the odds are a genuine positive number, so they cancel. -/
+theorem orPerSDFromLiability_at_zero_r2 (K : ℝ) : orPerSDFromLiability 0 K = 1 := by
+  have hpos := Foundations.Phi_pos (-liabilityThreshold K)
+  have hlt := Foundations.Phi_lt_one (-liabilityThreshold K)
+  unfold orPerSDFromLiability
+  rw [liabilityRiskAtScore_at_zero_r2, liabilityRiskAtScore_at_zero_r2]
+  exact div_self (div_pos hpos (by linarith)).ne'
+
+/-- **A score that explains anything raises the odds.** For any explained-variance fraction
+    strictly between zero and one, the odds ratio per standard deviation is strictly above
+    one. The mechanism is two strict monotonicities composed: the probit index is increasing
+    in the score, `Φ` is strictly monotone (`Foundations.strictMono_Phi`), and `p ↦ p/(1-p)`
+    is strictly increasing on `(0,1)`, where `Foundations.Phi_pos` and `Phi_lt_one` put both
+    risks.
+
+    THE PREVALENCE IS UNCONSTRAINED, which is worth stating because it looks like an
+    omission. `K` enters only through the threshold `T`, and the argument shifts BOTH indices
+    by the same `T`; the comparison survives any real threshold. So no `0 < K < 1` hypothesis
+    is needed for the direction, and adding one would suggest the bound depends on a
+    prevalence range when it does not. -/
+theorem one_lt_orPerSDFromLiability (r2 K : ℝ) (h0 : 0 < r2) (h1 : r2 < 1) :
+    1 < orPerSDFromLiability r2 K := by
+  have hlt := liabilityRiskAtScore_strictMono_score r2 K 0 1 h0 h1 (by norm_num)
+  set p0 := liabilityRiskAtScore r2 K 0 with hp0
+  set p1 := liabilityRiskAtScore r2 K 1 with hp1
+  have h0pos : 0 < p0 := Foundations.Phi_pos _
+  have h0lt : p0 < 1 := Foundations.Phi_lt_one _
+  have h1lt : p1 < 1 := Foundations.Phi_lt_one _
+  have hodds0 : 0 < p0 / (1 - p0) := div_pos h0pos (by linarith)
+  have hoddsmono : p0 / (1 - p0) < p1 / (1 - p1) := by
+    rw [div_lt_div_iff₀ (by linarith) (by linarith)]
+    nlinarith
+  unfold orPerSDFromLiability
+  rw [← hp0, ← hp1]
+  exact (one_lt_div hodds0).mpr hoddsmono
+
 end CleanSplit
 
 end Descent.Portability
