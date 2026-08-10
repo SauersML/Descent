@@ -1179,6 +1179,12 @@
     "Descent/PopGen/DriftRecurrences.lean::islandFstMultiplicativeStep": {
       "quantity": "fst",
       "convention": "identity-probability"
+    },
+    "Descent/Portability/PhenomeWidePortability.lean::cleanSplitFst": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "constants": [],
+      "note": "The SUM of two per-branch Wright F values, one per branch of a clean split. Summing is the composition per-branch indices admit and pairwise ones do not, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu`; a pairwise F_ST here is the substitution that produced a factor-of-four false falsification twice. Being a sum, it is not confined to the unit interval, and `cleanSplitFst_lt_one_iff` states where it stays inside the consuming chart's pole."
     }
   }
 }

@@ -289,6 +289,32 @@ theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
   ⟨neutralPortability_nonneg r2_0 fst hr2 hr2_le (le_of_lt hfst'),
     le_trans (neutralPortability_le_r2_0 r2_0 fst hr2 hr2_le hfst hfst') hr2_le⟩
 
+/-- **Neutral portability is decreasing in `F_ST`.** More divergence never transports more
+    signal. Written as an antitone step rather than a derivative because the corrected body is
+    a ratio, and the gap between the two evaluations is `r2_0·(1-r2_0)·(fst₂ - fst₁)` over a
+    product of positive denominators — so the monotonicity is exact algebra and holds across
+    the whole admissible range rather than to first order.
+
+    This is the step a composed transport law needs: a consumer that builds `fst` from a drift
+    model and wants to know the direction of the resulting `R²` movement gets it from here,
+    without reasoning about the ratio again. `cleanSplitTargetR2_antitone_time` in
+    `PhenomeWidePortability` is the instance. -/
+theorem neutralPortability_antitone_fst (r2_0 fst1 fst2 : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
+    (h0 : 0 ≤ fst1) (hle : fst1 ≤ fst2) (h2 : fst2 < 1) :
+    neutralPortability r2_0 fst2 ≤ neutralPortability r2_0 fst1 := by
+  unfold neutralPortability
+  have hf1 : (0 : ℝ) < 1 - fst1 := by linarith
+  have hf2 : (0 : ℝ) < 1 - fst2 := by linarith
+  have hd2 : 0 < (1 - fst2) * r2_0 + (1 - r2_0) := by
+    nlinarith [mul_nonneg (show (0 : ℝ) ≤ 1 - r2_0 by linarith)
+      (show (0 : ℝ) ≤ fst2 by linarith)]
+  have hd1 : 0 < (1 - fst1) * r2_0 + (1 - r2_0) := by
+    nlinarith [mul_nonneg (show (0 : ℝ) ≤ 1 - r2_0 by linarith) h0]
+  rw [div_le_div_iff₀ hd2 hd1]
+  nlinarith [mul_nonneg (mul_nonneg hr2 (show (0 : ℝ) ≤ 1 - r2_0 by linarith))
+    (show (0 : ℝ) ≤ fst2 - fst1 by linarith)]
+
 end EvolutionaryModels
 
 /-!

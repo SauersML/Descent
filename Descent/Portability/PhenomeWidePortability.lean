@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.DriftRegime
+import Descent.Portability.PortabilityBounds
 import Descent.Portability.PortabilityDrift.PresentDayMoments
 import Descent.Portability.PortabilityDrift.MutationDrift
 
@@ -885,5 +886,208 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
   unfold PopGen.heterozygosityLossFromDrift Descent.Core.heterozygosityLoss Descent.Core.complement
     Descent.Core.geometricDecay
   rfl
+
+/-!
+## The composed clean-split transport prediction
+
+A CLEAN TWO-BRANCH SPLIT is the simplest demographic history a portability law can be asked
+about: one ancestral population, two closed descendant branches, no migration between them
+and no mutation regime. Everything the corpus needs for an end-to-end prediction under that
+history is already here and separately measured — `neutralDriftFactor` for the retention in
+each branch, `fstFromDriftFactor` for the drift index it implies, `neutralPortability` for
+the `R²` a given index transports, the multiplicative LD penalty of
+`neutralPortabilityRatioLD`, and `liabilityThresholdAUCFromExplainedR2` for the conversion to
+discrimination. The definitions below compose them and nothing else, so that a battery has a
+single name to aim at instead of a chain a reader has to assemble by hand.
+
+THE SUMMATION CONVENTION IS THE LOAD-BEARING CHOICE and it is not free. `fstFromDriftFactor`
+returns the PER-BRANCH drift coefficient — Wright's `F` measured against the ancestor within
+ONE lineage — and its own docstring says so, distinguishing it from the pairwise Hudson
+`F_ST`. Per-branch indices ADD over independent branches, which is the convention
+`expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu` and which that definition's docstring
+records as adjudicated after a two-branch design fed a pairwise value produced a
+factor-of-four false falsification TWICE. `cleanSplitFst` therefore sums, and a battery that
+fed it a pairwise value would be repeating the error the corpus has already paid for twice.
+
+THE SUM IS NOT CONFINED TO THE UNIT INTERVAL, and this is a genuine restriction rather than
+a technicality. Each branch index lies in `[0,1)`, so their sum reaches toward `2`, while
+`neutralPortability` has a pole at `fst = 1`. `cleanSplitFst_lt_one_iff` below says exactly
+when the composition is admissible: the two retentions must sum above one. Deep splits leave
+that range, and there the composed prediction is not defined rather than merely inaccurate.
+-/
+
+section CleanSplit
+
+/-- The drift index a clean two-branch split accumulates, as the SUM of the two per-branch
+    coefficients.
+
+    Empirical status: UNTESTED. A battery is being commissioned against this name and the two
+    that compose it. What the battery must respect is the convention rather than the
+    arithmetic: this is the sum of two PER-BRANCH Wright `F` values, the reading
+    `fstFromDriftFactor` is validated at, and NOT a pairwise Hudson `F_ST`. Feeding a pairwise
+    value here is the error `Var_Delta_Mu`'s docstring records as having produced a
+    factor-of-four false falsification twice. The components carry their own measurements:
+    `neutralDriftFactor` is CONDITIONALLY VALID inside the closed-population, no-mutation
+    regime this definition also assumes, and `fstFromDriftFactor` is VALIDATED at worst 1.42
+    sems on the same Wright-Fisher runs. -/
+noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
+  fstFromDriftFactor (neutralDriftFactor NeS t) +
+    fstFromDriftFactor (neutralDriftFactor NeT t)
+
+/-- **The composed target `R²` for a clean two-branch split.** The drift index of the split
+    transported through the neutral portability chart, then scaled by the LD factor.
+
+    Empirical status: UNTESTED, and a battery is being commissioned against this name.
+    The composition is what is untested; every stage carries a measurement of its own.
+    `neutralPortability` is VALIDATED at worst 1.70 sems with the superseded linear
+    `1 - 2·fst` form FALSIFIED at 101 sems on the same cells. That the drift penalty and the
+    LD penalty MULTIPLY rather than add is the validated content of
+    `neutralPortabilityRatioLD`, where the additive reading is FALSIFIED at 41 sems, and
+    `cleanSplitTargetR2_eq_ratioLD_scaling` below states that this body uses that combination
+    and does not double-count the drift penalty inside it.
+
+    WHAT A BATTERY MUST NOT INHERIT AS SETTLED. The join is the claim: that a summed
+    per-branch drift index is the argument `neutralPortability`'s `fst` slot wants, and that
+    an LD retention measured on tagging may multiply an `R²` measured on transport. Neither
+    battery behind the two stages feeds the other's output, which is the same gap
+    `targetLiabilityAUCFromNeutralAFBenchmark` records for its own composition. The regime is
+    inherited whole from `neutralDriftFactor`: closed populations, no mutation, no migration.
+    At demographic equilibrium the retention is stationary and this prediction is wrong for
+    that reason and not for any reason about transport. -/
+noncomputable def cleanSplitTargetR2 (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) : ℝ :=
+  neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
+
+/-- **The composed target AUC for a clean two-branch split**, at a required prevalence.
+
+    Empirical status: UNTESTED, with the same battery commissioned against it. Prevalence is a
+    required argument for the reason `targetLiabilityAUCFromNeutralAFBenchmark` gives at
+    length: converting a drift-induced `R²` drop to AUC through a prevalence-free chart is the
+    fault that carried a `-0.068` bias, and making `K` mandatory is what prevents it.
+    `liabilityThresholdAUCFromExplainedR2` is VALIDATED against 400 simulated PGS studies at
+    pooled RMSE 0.0121 against a 0.0120 noise floor, with its prevalence axis swept; what is
+    untested here is that the `R²` this file computes is the explained-variance fraction that
+    chart's argument expects. -/
+noncomputable def cleanSplitTargetAUC (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) : ℝ :=
+  liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K
+
+/-- The AUC prediction is the `R²` prediction put through the liability chart, and nothing
+    else. Stated so the two cannot drift apart under later edits. -/
+theorem cleanSplitTargetAUC_eq (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) :
+    cleanSplitTargetAUC r2_0 NeS NeT t ldFactor K =
+      liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K :=
+  rfl
+
+/-- **The LD penalty enters as the validated multiplicative factor.** `neutralPortabilityRatioLD`
+    is the measured combination `(1 - fst_additional)·ld_factor`; read at zero additional `F_ST`
+    it is the bare LD factor, which is what this composition multiplies in. The point of
+    stating it is the zero: the drift penalty is carried ONCE, by `neutralPortability`, and is
+    not applied a second time inside the LD stage. -/
+theorem cleanSplitTargetR2_eq_ratioLD_scaling (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) :
+    cleanSplitTargetR2 r2_0 NeS NeT t ldFactor =
+      neutralPortability r2_0 (cleanSplitFst NeS NeT t) *
+        neutralPortabilityRatioLD 0 ldFactor := by
+  unfold cleanSplitTargetR2 neutralPortabilityRatioLD Descent.Core.retainedFraction
+  ring
+
+/-- **The admissible range, exactly.** The composition is defined where the summed per-branch
+    index stays below `neutralPortability`'s pole, and that is precisely where the two
+    retentions sum above one. Beyond it the split is deep enough that the chart has no value,
+    which a consumer must exclude rather than read. -/
+theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
+    cleanSplitFst NeS NeT t < 1 ↔
+      1 < neutralDriftFactor NeS t + neutralDriftFactor NeT t := by
+  unfold cleanSplitFst fstFromDriftFactor Descent.Core.complement
+  constructor <;> intro h <;> linarith
+
+/-- **No time, no differentiation.** Both branches retain everything at generation zero, so the
+    split has accumulated no drift index. -/
+@[simp] theorem cleanSplitFst_at_zero_time (NeS NeT : ℝ) :
+    cleanSplitFst NeS NeT 0 = 0 := by
+  unfold cleanSplitFst neutralDriftFactor fstFromDriftFactor Descent.Core.complement
+  norm_num
+
+/-- **The composition recovers the ancestral `R²` at the root.** At generation zero with no LD
+    loss the target `R²` IS the source `R²`: the two penalties are the whole content of the
+    prediction, and with neither of them active nothing is lost. A body that failed this would
+    be predicting a drop with no elapsed time and no decayed tagging. -/
+theorem cleanSplitTargetR2_at_zero_time (r2_0 NeS NeT : ℝ) :
+    cleanSplitTargetR2 r2_0 NeS NeT 0 1 = r2_0 := by
+  unfold cleanSplitTargetR2 neutralPortability
+  rw [cleanSplitFst_at_zero_time]
+  norm_num
+
+/-- **The prediction is a genuine `R²`**: nonnegative, and never above the ancestral value.
+    Both bounds need the admissible range, and the upper one needs the LD factor to be a
+    retention rather than an amplification. -/
+theorem cleanSplitTargetR2_mem_Icc (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
+    (hfst0 : 0 ≤ cleanSplitFst NeS NeT t) (hfst1 : cleanSplitFst NeS NeT t < 1)
+    (hld0 : 0 ≤ ldFactor) (hld1 : ldFactor ≤ 1) :
+    0 ≤ cleanSplitTargetR2 r2_0 NeS NeT t ldFactor ∧
+      cleanSplitTargetR2 r2_0 NeS NeT t ldFactor ≤ r2_0 := by
+  have hnn := neutralPortability_nonneg r2_0 (cleanSplitFst NeS NeT t) hr2 hr2' hfst1.le
+  have hle := neutralPortability_le_r2_0 r2_0 (cleanSplitFst NeS NeT t) hr2 hr2' hfst0 hfst1
+  unfold cleanSplitTargetR2
+  refine ⟨mul_nonneg hnn hld0, ?_⟩
+  calc neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
+      ≤ neutralPortability r2_0 (cleanSplitFst NeS NeT t) * 1 :=
+        mul_le_mul_of_nonneg_left hld1 hnn
+    _ = neutralPortability r2_0 (cleanSplitFst NeS NeT t) := mul_one _
+    _ ≤ r2_0 := hle
+
+/-- **The per-generation retention is an admissible base** whenever the effective size is at
+    least one. Both halves are needed downstream: nonnegativity to raise it to a power at all,
+    and the upper bound to make the power antitone in the generation count. -/
+theorem neutralDriftFactor_base_mem_unit (Ne : ℝ) (hNe : 1 ≤ Ne) :
+    0 ≤ 1 - 1 / (2 * Ne) ∧ 1 - 1 / (2 * Ne) ≤ 1 := by
+  have hpos : (0 : ℝ) < 2 * Ne := by linarith
+  have hhalf : 1 / (2 * Ne) ≤ 1 / 2 :=
+    one_div_le_one_div_of_le (by norm_num) (by linarith)
+  have hnn : (0 : ℝ) ≤ 1 / (2 * Ne) := by positivity
+  exact ⟨by linarith, by linarith⟩
+
+/-- **Drift retention falls with the generation count**, for any effective size of at least
+    one. This is the monotone step the composed prediction rests on. -/
+theorem neutralDriftFactor_antitone_time (Ne : ℝ) (t₁ t₂ : ℕ)
+    (hNe : 1 ≤ Ne) (ht : t₁ ≤ t₂) :
+    neutralDriftFactor Ne t₂ ≤ neutralDriftFactor Ne t₁ := by
+  obtain ⟨h0, h1⟩ := neutralDriftFactor_base_mem_unit Ne hNe
+  unfold neutralDriftFactor
+  exact pow_le_pow_of_le_one h0 h1 ht
+
+/-- **The split's drift index grows with time.** Retention falls in each branch, so the
+    per-branch indices rise and so does their sum. -/
+theorem cleanSplitFst_monotone_time (NeS NeT : ℝ) (t₁ t₂ : ℕ)
+    (hS : 1 ≤ NeS) (hT : 1 ≤ NeT) (ht : t₁ ≤ t₂) :
+    cleanSplitFst NeS NeT t₁ ≤ cleanSplitFst NeS NeT t₂ := by
+  have hdS := neutralDriftFactor_antitone_time NeS t₁ t₂ hS ht
+  have hdT := neutralDriftFactor_antitone_time NeT t₁ t₂ hT ht
+  unfold cleanSplitFst fstFromDriftFactor Descent.Core.complement
+  linarith
+
+/-- **The composed prediction decays with the age of the split.** More generations since the
+    split means a larger summed drift index, and `neutralPortability` is decreasing in that
+    index, so the transported `R²` can only fall. The LD factor is held fixed, which is the
+    honest statement: this theorem is about the drift half of the composition, and a target
+    whose tagging has also decayed falls further.
+
+    The admissibility hypothesis is on the LATER time only. That is not a convenience — the
+    index is monotone in time, so keeping the older split inside the pole automatically keeps
+    the younger one there, and requiring it at both times would be redundant. -/
+theorem cleanSplitTargetR2_antitone_time (r2_0 NeS NeT : ℝ) (t₁ t₂ : ℕ) (ldFactor : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
+    (hS : 1 ≤ NeS) (hT : 1 ≤ NeT) (ht : t₁ ≤ t₂)
+    (hfst0 : 0 ≤ cleanSplitFst NeS NeT t₁) (hfst1 : cleanSplitFst NeS NeT t₂ < 1)
+    (hld : 0 ≤ ldFactor) :
+    cleanSplitTargetR2 r2_0 NeS NeT t₂ ldFactor ≤
+      cleanSplitTargetR2 r2_0 NeS NeT t₁ ldFactor := by
+  have hmono := cleanSplitFst_monotone_time NeS NeT t₁ t₂ hS hT ht
+  have hanti :=
+    neutralPortability_antitone_fst r2_0 (cleanSplitFst NeS NeT t₁) (cleanSplitFst NeS NeT t₂)
+      hr2 hr2' hfst0 hmono hfst1
+  unfold cleanSplitTargetR2
+  exact mul_le_mul_of_nonneg_right hanti hld
+
+end CleanSplit
 
 end Descent.Portability
