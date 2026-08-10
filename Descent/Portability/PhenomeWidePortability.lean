@@ -1110,15 +1110,17 @@ them. Both are UNTESTED and both name honestly what they do NOT cover.
     and 200% relative, and it is indistinguishable from the correct reading only at
     `K = 1/2`.
 
-    WHY THE PREVALENCE CHECK IS NOT A THEOREM HERE. `liabilityRiskAtScore 0 K z = K` is the
-    natural sanity statement and it is NOT provable in this corpus, because it needs
-    `Φ (liabilityThreshold K) = 1 - K` — that is, that `Φ` is onto `(0,1)`, so that
-    `Function.invFun` returns a genuine preimage. `PresentDayMoments` records that gap in as
-    many words where it deletes `LiabilityThresholdRegime`: the surjectivity is a real
-    theorem, continuity plus the limits at `±∞` plus the intermediate value theorem, and
-    `Foundations.Probability` does not have it. `liabilityRiskAtScore_at_zero_r2` below
-    therefore states what IS provable, `Φ(-T)`, and the step from there to `K` is the lemma
-    that is missing.
+    THE PREVALENCE CHECK IS NOW A THEOREM, and it is the sign convention's warrant.
+    `liabilityRiskAtScore_at_zero_r2_eq_prevalence` below proves
+    `liabilityRiskAtScore 0 K z = K` for `0 < K < 1`: with no explained variance the model
+    must return the population prevalence at every score, and this body does. That check
+    needs `Φ (liabilityThreshold K) = 1 - K` — that is, that `Φ` is onto `(0,1)`, so that
+    `Function.invFun` returns a genuine preimage — which `PresentDayMoments` recorded as a
+    gap where it deletes `LiabilityThresholdRegime`. `Foundations.Phi_surjOn_Ioo` supplies
+    it (continuity plus the limits at `±∞` plus the intermediate value theorem) and
+    `Foundations.Phi_neg` carries `Φ(-T)` back to `1 - Φ(T)`. Under the `+T` reading the
+    same computation returns `1 - K`, so the check separates the two conventions at every
+    prevalence but `K = 1/2`.
 
     Empirical status: UNTESTED. A battery is being commissioned against this name and against
     `orPerSDFromLiability`, which is built from it. -/
@@ -1150,13 +1152,41 @@ noncomputable def orPerSDFromLiability (r2 K : ℝ) : ℝ :=
   (liabilityRiskAtScore r2 K 1 / (1 - liabilityRiskAtScore r2 K 1)) /
     (liabilityRiskAtScore r2 K 0 / (1 - liabilityRiskAtScore r2 K 0))
 
-/-- **At no explained variance the risk is flat at `Φ(-T)`**, the same at every score. This is
-    as far as the prevalence check can be taken without `Φ`'s surjectivity; see the
-    definition's docstring. -/
+/-- **At no explained variance the risk is flat at `Φ(-T)`**, the same at every score. This
+    form holds for every real `K`, including the degenerate prevalences where
+    `liabilityThreshold` is a junk `Function.invFun` value; the identification of `Φ(-T)`
+    with `K` itself needs `0 < K < 1` and is the theorem below. -/
 theorem liabilityRiskAtScore_at_zero_r2 (K z : ℝ) :
     liabilityRiskAtScore 0 K z = Foundations.Phi (-liabilityThreshold K) := by
   unfold liabilityRiskAtScore
   norm_num
+
+/-- **At no explained variance the risk is the prevalence**: `liabilityRiskAtScore 0 K z = K`
+    for every score `z`, whenever `0 < K < 1`.
+
+    This is the sanity check the definition's docstring long recorded as unprovable here, and
+    what made it provable is `Foundations.Phi_surjOn_Ioo`: `liabilityThreshold K` is
+    `Function.invFun Φ (1 - K)`, an opaque value until `Φ` is known to hit `1 - K`, and
+    surjectivity on `(0,1)` — the interval that `0 < K < 1` places `1 - K` inside —
+    turns it into a genuine preimage. `Foundations.Phi_neg` then carries `Φ(-T)` to
+    `1 - Φ(T) = 1 - (1 - K) = K`.
+
+    It is also the sign test. Under the `+T` reading of `liabilityRiskAtScore` this same
+    computation returns `Φ(T) = 1 - K`: a 95% risk at average score for a 5%-prevalence
+    disease, which is the slip `liabilityThreshold`'s docstring records as FALSIFIED at 3390
+    sems. The two readings agree only at `K = 1/2`.
+
+    Empirical status: UNTESTED as a joint claim, and it needs no battery to be believed —
+    it is a closed derivation from `Phi_surjOn_Ioo` and `Phi_neg`, both of which are proved
+    from Mathlib's Gaussian. What a battery would measure is `liabilityRiskAtScore` at
+    nonzero `r2`, where the body is not pinned by this boundary case. -/
+theorem liabilityRiskAtScore_at_zero_r2_eq_prevalence (K z : ℝ) (hK0 : 0 < K) (hK1 : K < 1) :
+    liabilityRiskAtScore 0 K z = K := by
+  have hthr : Foundations.Phi (liabilityThreshold K) = 1 - K := by
+    unfold liabilityThreshold
+    exact Foundations.Phi_invFun_eq (1 - K) (by linarith) (by linarith)
+  rw [liabilityRiskAtScore_at_zero_r2, Foundations.Phi_neg, hthr]
+  ring
 
 /-- **The risk is strictly increasing in the score** whenever the score explains anything.
     A body that failed this would have a higher polygenic score lowering risk. -/

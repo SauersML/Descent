@@ -1030,8 +1030,10 @@ structure would import them unproved:
   normal CDF is onto `(0, 1)`. That is a theorem — continuity plus the limits at `±∞` plus
   the intermediate value theorem — and it is *derivable* from `prevalence_pos` and
   `prevalence_lt_one`, which is exactly why it should not have been assumed alongside
-  them. `Descent.Foundations.Probability` defines `Phi` and proves nothing about it, so the
-  derivation is not currently available; supplying it is the honest way to reinstate this.
+  them. It has since been proved: `Descent.Foundations.Probability` now carries
+  `Phi_surjOn_Ioo` and its consumer form `Phi_invFun_eq`, so this field would today be a
+  one-line corollary of the two prevalence bounds rather than an assumption. That removes
+  the first of the three reasons this structure could not be reinstated honestly.
 * `caseVariance_pos` and `controlVariance_pos`. These are not conditions a caller can
   choose to meet: `liabilityCaseVariance r2 K` is a closed formula in `r2` and `K`, so its
   positivity is true or false once those are fixed. Both follow from `0 ≤ r2 < 1` together
@@ -1039,9 +1041,10 @@ structure would import them unproved:
   the standard fact that truncation cannot increase variance. That bound is a real result
   and the corpus does not have it.
 
-Reinstating this regime honestly means proving those three, not restating them. Until
-then, the four genuine domain conditions (`0 < K < 1`, `0 ≤ r2 < 1`) are what the
-individual theorems below already take as explicit hypotheses where they need them. -/
+Reinstating this regime honestly means proving those three, not restating them; one is now
+proved and the two variance bounds are not. Until then, the four genuine domain conditions
+(`0 < K < 1`, `0 ≤ r2 < 1`) are what the individual theorems below already take as explicit
+hypotheses where they need them. -/
 
 /-- Source Brier chart as a function of prevalence and source `R²`. -/
 noncomputable def sourceBrierFromR2 (π r2Source : ℝ) : ℝ :=

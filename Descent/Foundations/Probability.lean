@@ -666,6 +666,121 @@ theorem Phi_lt_one (x : ℝ) : Phi x < 1 := by
     exact ProbabilityTheory.cdf_le_one _ _
   exact lt_of_lt_of_le (strictMono_Phi (by linarith)) hle
 
+/-- **`Φ` is continuous.**
+
+A CDF is monotone and right-continuous by construction, so continuity is exactly the absence
+of atoms: a point mass at `a` is the jump `Φ a - leftLim Φ a`, and `gaussianReal 0 1` has no
+atoms because it has a density. Mathlib supplies each link — `StieltjesFunction.measure_singleton`
+writes the singleton mass as that jump, `measure_cdf` identifies the Stieltjes measure of `cdf μ`
+with `μ`, `noAtoms_gaussianReal` kills it, and `Monotone.continuousAt_iff_leftLim_eq_rightLim`
+turns the two one-sided limits agreeing into continuity. -/
+theorem continuous_Phi : Continuous Phi := by
+  haveI : MeasureTheory.NoAtoms (ProbabilityTheory.gaussianReal 0 1) :=
+    ProbabilityTheory.noAtoms_gaussianReal one_ne_zero
+  rw [continuous_iff_continuousAt]
+  intro a
+  set f := ProbabilityTheory.cdf (ProbabilityTheory.gaussianReal 0 1) with hf
+  have hsing : f.measure {a} = 0 := by
+    rw [hf, ProbabilityTheory.measure_cdf]
+    exact MeasureTheory.measure_singleton a
+  have hjump := f.measure_singleton a
+  rw [hsing] at hjump
+  have hle : Function.leftLim f a ≤ f a := f.mono.leftLim_le le_rfl
+  have hleft : Function.leftLim f a = f a := by
+    have h0 : f a - Function.leftLim f a ≤ 0 := by
+      rw [eq_comm, ENNReal.ofReal_eq_zero] at hjump
+      exact hjump
+    linarith
+  show ContinuousAt (⇑f) a
+  rw [f.mono.continuousAt_iff_leftLim_eq_rightLim, f.rightLim_eq, hleft]
+
+/-- **`Φ` is onto `(0, 1)`**: every strictly interior probability is attained.
+
+This is the lemma `PortabilityDrift.PresentDayMoments` records as missing where it deletes
+`LiabilityThresholdRegime` — the reason `Phi (liabilityThreshold K) = 1 - K` could not be
+proved and had to be *assumed* alongside the very hypotheses it follows from. With it,
+`liabilityThreshold` stops being an opaque `Function.invFun` and becomes a genuine preimage,
+which is what any prevalence-recovery statement needs.
+
+The argument is the standard one and every piece of it is Mathlib's: `Φ → 0` at `-∞` and
+`Φ → 1` at `+∞` (`tendsto_cdf_atBot`, `tendsto_cdf_atTop`) put a point strictly below and a
+point strictly above the target, `continuous_Phi` licenses the intermediate value theorem,
+and monotonicity orders the two points so `Icc` is the right interval. -/
+theorem Phi_surjOn_Ioo (y : ℝ) (hy0 : 0 < y) (hy1 : y < 1) : ∃ x : ℝ, Phi x = y := by
+  have hbot : ∀ᶠ x in Filter.atBot, Phi x < y := by
+    unfold Phi
+    exact (ProbabilityTheory.tendsto_cdf_atBot _).eventually (gt_mem_nhds hy0)
+  have htop : ∀ᶠ x in Filter.atTop, y < Phi x := by
+    unfold Phi
+    exact (ProbabilityTheory.tendsto_cdf_atTop _).eventually (lt_mem_nhds hy1)
+  obtain ⟨a, ha⟩ := hbot.exists
+  obtain ⟨b, hb⟩ := htop.exists
+  have hab : a ≤ b := by
+    by_contra hcon
+    push_neg at hcon
+    have := Phi_monotone hcon.le
+    linarith
+  obtain ⟨x, _, hx⟩ :=
+    intermediate_value_Icc hab continuous_Phi.continuousOn ⟨ha.le, hb.le⟩
+  exact ⟨x, hx⟩
+
+/-- **`Φ` composed with its inverse is the identity on `(0, 1)`.** The form consumers actually
+need: `Function.invFun Phi` returns a genuine preimage there, so a threshold read back through
+`Φ` gives the probability it was built from. -/
+theorem Phi_invFun_eq (y : ℝ) (hy0 : 0 < y) (hy1 : y < 1) :
+    Phi (Function.invFun Phi y) = y :=
+  Function.invFun_eq (Phi_surjOn_Ioo y hy0 hy1)
+
+/-- **`Φ` is symmetric about zero**: `Φ(-x) = 1 - Φ(x)`.
+
+`Portability.AncestryCalibration` records this as one of the two facts it lacks — the
+reflection `Φ⁻¹(K) = -Φ⁻¹(1-K)` is taken there as an explicit HYPOTHESIS rather than proved,
+because deriving it needs exactly this identity plus injectivity of `Φ`, and the development
+had neither. `strictMono_Phi` has since supplied the injectivity; this supplies the rest.
+
+The proof is the measure-theoretic one and carries no analysis: negation preserves the
+standard normal (`gaussianReal_map_neg` at mean zero), so the mass below `-x` is the mass
+above `x`; the mass above `x` is one minus the mass strictly below it; and strictly-below
+equals weakly-below because the measure has no atoms. That last step is where a
+discrete distribution would break the identity, which is why the atomlessness is doing work
+and not decoration. -/
+theorem Phi_neg (x : ℝ) : Phi (-x) = 1 - Phi x := by
+  haveI : MeasureTheory.NoAtoms (ProbabilityTheory.gaussianReal 0 1) :=
+    ProbabilityTheory.noAtoms_gaussianReal one_ne_zero
+  have hPhi : ∀ y : ℝ,
+      Phi y = (ProbabilityTheory.gaussianReal 0 1).real (Set.Iic y) := by
+    intro y
+    unfold Phi
+    exact ProbabilityTheory.cdf_eq_real _ y
+  have hmap : (ProbabilityTheory.gaussianReal 0 1).map (fun t : ℝ ↦ -t)
+      = ProbabilityTheory.gaussianReal 0 1 := by
+    rw [ProbabilityTheory.gaussianReal_map_neg]
+    norm_num
+  have hpre : (fun t : ℝ ↦ -t) ⁻¹' (Set.Iic (-x)) = Set.Ici x := by
+    ext t
+    simp
+  have hEq : (ProbabilityTheory.gaussianReal 0 1) (Set.Iic (-x))
+      = (ProbabilityTheory.gaussianReal 0 1) (Set.Ici x) := by
+    conv_lhs => rw [← hmap]
+    rw [MeasureTheory.Measure.map_apply (by fun_prop) measurableSet_Iic, hpre]
+  have hIio : (ProbabilityTheory.gaussianReal 0 1) (Set.Iio x)
+      = (ProbabilityTheory.gaussianReal 0 1) (Set.Iic x) :=
+    MeasureTheory.measure_congr MeasureTheory.Iio_ae_eq_Iic
+  have hsum : (ProbabilityTheory.gaussianReal 0 1).real (Set.Iio x)
+      + (ProbabilityTheory.gaussianReal 0 1).real (Set.Iio x)ᶜ = 1 := by
+    rw [MeasureTheory.measureReal_add_measureReal_compl measurableSet_Iio]
+    exact MeasureTheory.measureReal_univ_eq_one
+  rw [Set.compl_Iio] at hsum
+  have hIioR : (ProbabilityTheory.gaussianReal 0 1).real (Set.Iio x) = Phi x := by
+    rw [hPhi x]
+    simp only [MeasureTheory.measureReal_def, hIio]
+  have hNegR : Phi (-x) = (ProbabilityTheory.gaussianReal 0 1).real (Set.Ici x) := by
+    rw [hPhi (-x)]
+    simp only [MeasureTheory.measureReal_def, hEq]
+  rw [hNegR]
+  rw [hIioR] at hsum
+  linarith
+
 /-- Heteroscedastic Gaussian noise assumption:
 for each ancestry coordinate `x`, the environmental noise follows `N(0, σ²(x))`. -/
 structure GaussianNoiseAssumption (k : ℕ) where
