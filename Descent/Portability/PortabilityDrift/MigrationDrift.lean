@@ -526,6 +526,21 @@ theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
   rw [div_lt_one (by linarith)]
   nlinarith
 
+/-- **Zero separation, zero differentiation.** A deme compared with itself has `F_ST = 0`,
+and the saturating body gives it with no hypotheses at all: the numerator carries the
+factor `d` and vanishes, so even the degenerate parameter settings that make the
+denominator zero return Lean's `0`, which is the right answer here rather than a junk one.
+
+This is the anchor the range lemmas above cannot supply. `steppingStoneFst_le_one`,
+`steppingStoneFst_lt_one` and `steppingStoneFst_nonneg` all require `1 ≤ d`, which is the
+correct hypothesis for them — their proofs need the numerator to be positive — and it
+excludes the source deme itself. A composed law that starts at zero distance and walks
+outward needs the `d = 0` end, and gets it here. -/
+theorem steppingStoneFst_at_zero (fst_neighbor α : ℝ) :
+    steppingStoneFst fst_neighbor α 0 = 0 := by
+  unfold steppingStoneFst
+  norm_num
+
 /-- Stepping-stone Fst at distance 1 equals the neighbor Fst. At `α = 1` the
 characteristic scale is `(1 - fst_neighbor)/fst_neighbor` and the form reproduces its own
 anchor; `α` rescales that length, so it is the unit of distance rather than a per-step
