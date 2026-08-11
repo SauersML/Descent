@@ -1264,7 +1264,9 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     contribution is a functional of the spectrum, so a body taking one number where this takes
     `w` and `p` cannot be repaired by rescaling that number.
 
-    Empirical status: **VALIDATED** (`simcov/battery_clean01.py`). Evaluated at the battery's
+    Empirical status: **MEASURED** — not VALIDATED, because no competing form has ever been
+    run against this body and the ledger gates its MATCH to UNINFORMATIVE for exactly that
+    reason; see the note below. (`simcov/battery_clean01.py`.) Evaluated at the battery's
     own instantiation — 20000 loci from a neutral `1/p` spectrum on `[0.01, 0.99]`,
     `NeS = 2000` closed, no mutation and no migration, 10 independent blocks — against the
     realised fraction of the target's signal carried by variants still polymorphic in the
@@ -1286,11 +1288,22 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     FALSIFIED at 66.51 sems, the target-branch-only reading at 47.30, the superseded linear
     retention at 229.
 
-    A `record()` NOW NAMES THIS BODY and it is a MATCH (`simcov/battery_clean02.py`): 14
-    cells, worst 2.86 sems and 0.69% relative, residuals of mixed sign, zero fitted
-    constants, error bars MEASUREMENT-ONLY rather than paired. Two spectra at five depths
-    each — `1/p` truncated at `[0.01,0.99]` and at `[0.05,0.95]` — plus four target sizes at
-    fixed `(NeS, t)`. The prediction spans 0.775 to 0.9996 across the design.
+    A `record()` NOW NAMES THIS BODY (`simcov/battery_clean02.py`): 14 cells, worst 2.86
+    sems and 0.69% relative, residuals of mixed sign, zero fitted constants, error bars
+    MEASUREMENT-ONLY rather than paired. Two spectra at five depths each — `1/p` truncated
+    at `[0.01,0.99]` and at `[0.05,0.95]` — plus four target sizes at fixed `(NeS, t)`. The
+    prediction spans 0.775 to 0.9996 across the design.
+
+    THE RAW VERDICT IS A MATCH AND THE LEDGER GATES IT TO **UNINFORMATIVE**, which is the
+    honest standing and is quoted here rather than the raw word: `no competing formula was
+    rejected on these cells, so the design never showed it could reject anything`. The group
+    runs NO rival for `Φ` — the rivals in that battery are all in the composed `R²` group —
+    so agreement here is agreement with nothing to lose to. A reader grepping the ledger by
+    declaration name will see UNINFORMATIVE, and a docstring claiming a MATCH would be the
+    relabelling this corpus polices. What is owed is a competing form on these same cells:
+    the UNWEIGHTED still-segregating fraction, which tests whether the `w` weighting earns
+    its place, and `1 - F_S`, the heterozygosity-retention proxy a reader would otherwise
+    assume. Until one of those is run and rejected, this body is measured and not validated.
 
     THE FOUR `NeT` CELLS ARE THE INFORMATIVE ONES, and they are not a restatement of the
     argument list. This body has no `NeT` argument, but its ORACLE — the realised fraction of
