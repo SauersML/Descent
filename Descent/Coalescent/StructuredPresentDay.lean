@@ -482,9 +482,11 @@ theorem PairwiseCoalescenceTimes.slatkin_identity {D : ℕ}
   unfold PairwiseCoalescenceTimes.hudsonFst
   field_simp [hmu, (T.between_pos i j).ne']
 
-/-- Exact train-versus-all representation.  Only the train-to-deme pairwise functionals are
-needed for a weighted train-vs-all report, so its state grows linearly in the number of demes
-rather than as the Cartesian product of all sample configurations. -/
+/-- Exact train-versus-all projection of the many-population JSFS/moment representation.
+Following the marginal-projection principle used by Kamm--Terhorst--Song, only the
+train-to-deme pairwise functionals needed by the requested report are materialized.  Its state
+therefore grows linearly in the number of demes rather than as the Cartesian product of all
+sample configurations. -/
 structure TrainVsAllRepresentation (D : ℕ) where
   train : Fin D
   weight : Fin D → ℝ

@@ -86,6 +86,18 @@ structure PTWinner {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
   index : Fin thresholdCount
   optimal : ∀ q, objective q ≤ objective index
 
+/-- A normalized law over threshold choices.  This is the analytic alternative to selecting
+one winner when threshold uncertainty must be propagated. -/
+structure PTThresholdMixture (thresholdCount : ℕ) where
+  probability : Fin thresholdCount → ℝ
+  probability_nonneg : ∀ q, 0 ≤ probability q
+  probability_sum_one : ∑ q, probability q = 1
+
+/-- Exact marginalization of any threshold-indexed functional. -/
+noncomputable def PTThresholdMixture.expectation {thresholdCount : ℕ}
+    (mixture : PTThresholdMixture thresholdCount) (functional : Fin thresholdCount → ℝ) : ℝ :=
+  ∑ q, mixture.probability q * functional q
+
 /-- Additive effect-variance mass retained after clumping and thresholding. -/
 noncomputable def PTDesign.selectedEffectMass {thresholdCount m : ℕ}
     (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
@@ -100,6 +112,18 @@ noncomputable def PTDesign.selectedEffectMassFraction {thresholdCount m : ℕ}
   d.selectedEffectMass q alleleFrequency effect /
     (∑ i, 2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2)
 
+/-- Effect mass surviving the analytically predicted winner. -/
+noncomputable def PTWinner.selectedEffectMass {thresholdCount m : ℕ}
+    {d : PTDesign thresholdCount m} {objective : Fin thresholdCount → ℝ}
+    (winner : PTWinner d objective) (alleleFrequency effect : Fin m → ℝ) : ℝ :=
+  d.selectedEffectMass winner.index alleleFrequency effect
+
+/-- Effect mass with threshold uncertainty marginalized rather than optimized away. -/
+noncomputable def PTDesign.marginalSelectedEffectMass {thresholdCount m : ℕ}
+    (d : PTDesign thresholdCount m) (mixture : PTThresholdMixture thresholdCount)
+    (alleleFrequency effect : Fin m → ℝ) : ℝ :=
+  mixture.expectation fun q ↦ d.selectedEffectMass q alleleFrequency effect
+
 /-! ## B2. GWAS estimation noise and its composition with selection -/
 
 /-- The one-locus OLS variance at a supplied discovery sample size.  The genotype variance is
@@ -107,6 +131,11 @@ diploid HWE `2p(1-p)`. -/
 noncomputable def gwasEffectNoiseVariance
     (discoverySampleSize : ℕ) (residualVariance p : ℝ) : ℝ :=
   residualVariance / (discoverySampleSize * (2 * p * (1 - p)))
+
+/-- GWAS noise evaluated at the discovery sample size carried by a P+T design. -/
+noncomputable def PTDesign.effectNoiseVariance {thresholdCount m : ℕ}
+    (d : PTDesign thresholdCount m) (residualVariance p : ℝ) : ℝ :=
+  gwasEffectNoiseVariance d.parameters.discoverySampleSize residualVariance p
 
 /-- An exact finite representation of the sampling law of the GWAS output.  Continuous
 Gaussian sampling may be approximated by quadrature, but no independence between linked
