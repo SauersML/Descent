@@ -302,6 +302,6 @@ theorem firstObserved_ext (g₁ g₂ : AdministrativePHGenerator) (s1 s2 : ℝ)
   rw [hhorizon]
   apply intervalIntegral.integral_congr
   intro t _
-  rw [hhazard, hsurv1, hsurv2]
+  simp only [hhazard, hsurv1, hsurv2]
 
 end Descent.Portability
