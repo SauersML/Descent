@@ -382,7 +382,11 @@ theorem AssortativeMatingModel.ratio_denom_pos (m : AssortativeMatingModel) :
     of that battery measure this definition and `pgsR2AM` at once: worst 2.1
     sems over four cells spanning 0.540 to 0.869, against the previous body
     `h2 / (1 - r*h2)` rejected on the same cells at up to 275 sems and 54%.
-    See `pgsR2AM` for the full table and the design. -/
+    See `pgsR2AM` for the full table and the design.
+
+    Power: the prediction spans 0.540 to 0.869 over the four cells, and the
+    previous body `h2 / (1 - r*h2)` is carried on those same cells and rejected
+    at up to 275 sems and 54 percent. -/
 noncomputable def AssortativeMatingModel.observedH2 (m : AssortativeMatingModel) : ℝ :=
   m.h2 / (1 - m.r * m.h2 * (1 - m.h2))
 
@@ -456,7 +460,13 @@ theorem am_inflates_observed_h2
     heritability, which is the reading `amVarianceStep` disowns — the same run
     gives 0.5379 against a measured 0.5456 and 0.8737 against 0.8724, while the
     old body gives 0.5838 and 1.3269. The repair does not depend on which
-    reading is taken; the defect did not either. -/
+    reading is taken; the defect did not either.
+
+    Power: the prediction spans 0.308 to 0.872 across the five cells, and three
+    rivals ride those same cells -- the old body from 13.3 to 277.8 sems, its
+    1.341 being a squared correlation above one that needed no measurement to
+    reject; the inverted `R2_rm * (1 - r*h2)` at 227 sems; and the `r = 0`
+    positive control passing at 0.78. -/
 noncomputable def AssortativeMatingModel.pgsR2AM (m : AssortativeMatingModel)
     (R2_rm : ℝ) : ℝ :=
   R2_rm / (1 - m.r * m.h2 * (1 - m.h2))
@@ -869,7 +879,12 @@ section PopulationStructure
     intercept back to zero, which is what finite-habitat saturation predicts and what a
     genuine failure of the law would not have done: if the shortfall had been the body's, a
     larger habitat would not have repaired it. The higher-`Nσ²` design needs a habitat
-    larger than the neighbourhood size, and at 40 demes it did not have one. -/
+    larger than the neighbourhood size, and at 40 demes it did not have one.
+
+    Power: the predicted slope spans 0.03125 to 0.12500 across the two designs,
+    and the constant `4` is pinned rather than tolerated by carrying its
+    neighbours on both rows -- `1/(2Nσ²)` rejected at 12.1 and 20.1 sems,
+    `1/(8Nσ²)` at 6.0 and 7.2, and the `PLANTED` arm at 4.9 and 9.2. -/
 noncomputable def ibdFst (d N sigma_sq : ℝ) : ℝ :=
   d / (4 * N * sigma_sq + d)
 

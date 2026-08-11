@@ -105,7 +105,14 @@ scales the target's residual with its own genetic variance and finds NO `alpha` 
 this one holds the outcome scale fixed and finds exactly the `1/alpha` the body carries.
 The third convention is not a gap in the simulations but a genuine fork, and the two runs
 bracket it. A consumer that states which side it is on gets a determinate answer; one that
-does not is choosing between 0.90 and 0.56 at `alpha = 1.6`. -/
+does not is choosing between 0.90 and 0.56 at `alpha = 1.6`.
+
+Power: on the outcome-scale design that validates it, `alpha` is swept over 0.7, 1.0 and 1.5
+and the body matches the realised OLS slope to worst 1.52 percent, while the variance-ratio
+reading `rho * bSource / Real.sqrt alpha` is FALSIFIED at 102.75 sems and 23 percent on those
+same cells. The complementary design spans predictions 0.53839 to 1.21862 and rejects this
+body at 119.77 and 212.19 sems away from `alpha = 1` -- which is the third convention forking
+rather than a defect, and the two runs bracket it. -/
 noncomputable def ancestryRecalibratedSlope (bSource rho alpha : ℝ) : ℝ :=
   rho * (bSource * alpha) / alpha ^ 2
 
@@ -148,7 +155,12 @@ Cells in which the two populations have UNEQUAL heritability, run on the same co
 because in general `R²_target = rho² · h²_target` while `r2Source = h²_source`, also match
 (worst 2.51 sems, 1.05%): at `m = 400` the scatter in the two effect vectors' norms is too
 small to separate the readings. That is a limit of this design, not a licence -- at small `m`
-the equal-heritability condition would bind. -/
+the equal-heritability condition would bind.
+
+Power: the prediction spans 0.14510 to 0.40210 across the five cells, and the competing
+reading that evaluates at the NOMINAL `rho` rather than the realised one is carried on those
+same cells and misses by 35 sems -- that being the first of the two design faults behind the
+353-sem falsification this overturns. -/
 noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
   Descent.Core.product r2Source rhoSq
 
@@ -470,7 +482,13 @@ theorem threshold_shift_changes_prevalence
     recovers `K`, passing at 0.93 sems.
 
     The old docstring already carried the correct relation in prose -- "`f(K) =
-    K(1-K)/φ(Φ⁻¹(K))²`" -- and the body simplified it away. -/
+    K(1-K)/φ(Φ⁻¹(K))²`" -- and the body simplified it away.
+
+    Power: the prediction spans 0.03586 to 0.31831 across the design with `K`
+    swept fiftyfold, and the superseded form fails on those same cells in BOTH
+    directions -- by up to 5316 sems read as an explained variance and by 352
+    sems read as an `R²`, in the opposite sense -- which is what shows the error
+    was structural and no constant could have repaired it. -/
 noncomputable def prevalenceScaledR2 (h2 prevalence : ℝ) : ℝ :=
   h2 * standardNormalPdf (liabilityThreshold prevalence) ^ 2 /
     (prevalence * (1 - prevalence))
@@ -534,7 +552,11 @@ section Epistasis
     simulation draws 600000 independent Hardy-Weinberg dosages at the two loci,
     centres both realised dosage vectors, and compares the interaction variance
     against the formula extracted from this definition over `γ ∈ [0.2, 2]` and
-    `p₁, p₂ ∈ [0.1, 0.9]`, with relative tolerance `0.05`. -/
+    `p₁, p₂ ∈ [0.1, 0.9]`, with relative tolerance `0.05`.
+
+    Power: `γ` is swept over [0.2, 2] and both frequencies over [0.1, 0.9], so
+    the prediction moves with `γ²` across that whole range and with each locus's
+    heterozygosity besides, against a relative tolerance of 0.05. -/
 noncomputable def epistaticVariancePairwise (γ p₁ p₂ : ℝ) : ℝ :=
   γ ^ 2 * (2 * p₁ * (1 - p₁)) * (2 * p₂ * (1 - p₂))
 
