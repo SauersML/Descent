@@ -105,6 +105,13 @@ theorem discoveryNCP_at_reference_point :
     than 0.50, because `ncx2.sf(λ, 1, λ)` tends to 0.5 only as λ grows. The
     contour reading is exact from λ ≈ 2 upward and optimistic below it.
 
+    Power: the noncentrality spans 0.336 to 48.379 across the design, a
+    144-fold span, and the halved-ploidy competitor `n β² ld² p(1-p)` is refuted
+    on those same cells at 12 to 244 sems. What the PREDICATE adds is measured
+    separately: discovery probability at the boundary is 0.50 against the exact
+    `ncx2.sf(λ, 1, λ)`, so the certainty reading is refuted at more than a
+    hundred sems.
+
     Convention: `maf_causal` is the causal variant's frequency, matching
     `discoveryNCP`, which this predicate thresholds. -/
 def gwasDiscovered (n β maf_causal ld z : ℝ) : Prop :=
@@ -765,7 +772,16 @@ theorem multiTraitEffectiveSampleSize_eq_multiAncestryEffectiveN
     exactly when the prior is standardized-scale, and the dosage-scale reading
     understates the borrowed term by a factor of `2p(1-p)` -- the column above,
     off by 10 to 27 sems and growing as `maf` falls. Supplying the wrong one is
-    a silent 10 to 30 percent power error, not a type error. -/
+    a silent 10 to 30 percent power error, not a type error.
+
+    Power: `maf` is swept from 0.5 to 0.1 at FIXED `n·2p(1-p)`, so the realised
+    noncentrality is invariant along that sweep BY CONSTRUCTION and only a scale
+    error can move with `maf` -- which is what puts the standardized-against-
+    dosage convention on trial, the dosage-scale reading being off by 10 to 27
+    sems and growing as `maf` falls. Across the `τ²` axis the prediction still
+    spans 6.4974 to 13.0376, and two competitors die on the same cells: `n₁`
+    alone at 26 to 74 sems and the small-prior limit `n₁ + rg²n₂` at 10 to
+    56. -/
 noncomputable def multiTraitDiscoveryNCP
     (n₁ n₂ rg priorVariance β maf ld : ℝ) : ℝ :=
   discoveryNCP (multiTraitEffectiveSampleSize n₁ n₂ rg priorVariance) β maf ld

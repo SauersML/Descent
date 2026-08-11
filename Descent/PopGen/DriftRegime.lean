@@ -379,7 +379,13 @@ these two has no power to check the functional form.
     `symmetric_design_has_no_power` observed, with a `3.1×` dynamic range.
 
     Empirical status: **VALIDATED as a discriminating rival**
-    (`validation/empirical/drift_diff/`). -/
+    (`validation/empirical/drift_diff/`).
+
+    Power: the design's dynamic range is 3.1, and this rival is 214.0 percent off
+    on the asymmetric arm against 0.4 percent -- indistinguishable -- on the
+    symmetric one. That contrast IS `symmetric_design_has_no_power` observed: the
+    symmetric arm cannot separate a function from its square and the asymmetric
+    arm can, which is the whole reason this rival is carried. -/
 noncomputable def benchmarkRatioSquared (fstS fstT : ℝ) : ℝ := ((1 - fstT) / (1 - fstS)) ^ 2
 
 /-- **The rival is exactly the square of the benchmark.** Stating the relation ties the two

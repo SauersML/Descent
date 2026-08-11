@@ -104,7 +104,12 @@ theorem additive_pgs_ceiling
     The design puts `p` on both sides of one half and uses a negative `d` in one
     cell, because the `(1 - 2p)` term vanishes at `p = 1/2` -- a design pinned
     there could not see it at all, which is the blindness
-    `BlindnessRegistry` instance 8 records for this very quantity. -/
+    `BlindnessRegistry` instance 8 records for this very quantity.
+
+    Power: the prediction spans 0.36000 to 1.30000 across the design, with `p`
+    put on both sides of one half and a negative `d` in one cell, so the
+    `(1 - 2p)` term is on trial rather than sitting at the value that annihilates
+    it. -/
 noncomputable def fisherAverageEffect (a d p : ℝ) : ℝ :=
   a + d * (1 - 2 * p)
 
@@ -200,7 +205,9 @@ theorem additive_misses_epistasis
     interaction term AFTER both main effects are removed by least squares, four
     million individuals, worst 2.56 sems over a prediction spanning 0.12250 to
     0.23040. Removing the main effects first is what makes this the epistatic
-    component rather than the total two-locus variance. -/
+    component rather than the total two-locus variance.
+
+    Power: the prediction spans 0.12250 to 0.23040 across the design. -/
 noncomputable def epistaticVariance
     (beta12 p1 p2 : ℝ) : ℝ :=
   beta12 ^ 2 * (2 * p1 * (1 - p1)) * (2 * p2 * (1 - p2))

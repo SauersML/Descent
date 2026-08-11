@@ -444,7 +444,13 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     `-t / log(rho)` inherits that: a 0.006 measurement gives 7.8 where the truth
     is 5. The inverse is usable only while `rho` is separated from zero by more
     than its own error bar, which the first five rows satisfy and the sixth does
-    not. -/
+    not.
+
+    Power: `tau` is swept from 5 to 60 and `t` from 10 to 40, the recovered value
+    spanning 4.94210 to 61.96429, so a wrong inverse would show on any of the
+    first five rows. The sixth is the regime boundary rather than a defect: at
+    `tau = 5`, `t = 40` the true correlation is `exp(-8) = 0.00034` and the
+    measurement returns 0.00607 ± 0.00707, consistent with zero. -/
 noncomputable def tauFromObservedEffectCorrelation (t effectCorr : ℝ) : ℝ :=
   -t / Real.log effectCorr
 
@@ -782,6 +788,8 @@ section GWASPowerMAF
     `test_gwas_ncp_fork`). Chi-square noncentrality measured as the mean
     realised Wald statistic minus one over 3000 replicate studies, worst 1.55
     sems over a prediction spanning 4.20000 to 8.40000.
+
+    Power: the prediction spans 4.20000 to 8.40000 across the design.
 
     This is defined through the canonical `ncp` and `effectiveFisherInformation`
     declarations, so the ancestry-power and selection APIs share one implementation. -/

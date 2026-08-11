@@ -115,7 +115,12 @@ theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ)
     weights under a shared LD kernel.
 
     Empirical status: **VALIDATED** through `pgsR2`, measured on the
-    same runs (`battery_transfer.py`, `test_transfer_chain`) at 0.02 sems. -/
+    same runs (`battery_transfer.py`, `test_transfer_chain`) at 0.02 sems.
+
+    Power: this is the SOURCE end of the span `pgsR2` records for those runs --
+    0.23227 here at 0.02 sems against 0.11581 transported at 1.35 -- so the
+    design moves the prediction by a factor of two between the two ends, and the
+    source end is the one where the weights were fitted. -/
 noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (β_source : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (sharedLDGeneticVariance β_source ld)
@@ -128,7 +133,12 @@ noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (`validation/empirical/simcov/battery_transfer.py`,
     `test_transfer_chain`). The transported case is the one that matters, since
     the source weights were not fitted there: 1.35 sems, predicted 0.11581
-    against a measured 0.12099. -/
+    against a measured 0.12099.
+
+    Power: this is the TRANSPORTED end of the span `pgsR2` records for those runs
+    -- 0.11581 here against 0.23227 in the source -- so the design moves the
+    prediction by a factor of two between the two ends, and this end is the one
+    the source weights were not fitted for. -/
 noncomputable def transportedTargetR2SharedLD {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (pgsPhenoCov β_source β_target ld)
