@@ -54,7 +54,10 @@ the average heterozygosity 2p(1-p) (or its sum, depending on normalisation).
     Regime: linkage equilibrium. The formula sums per-locus contributions and
     drops the LD cross terms, the same qualifier `ScoreDistribution.pgsVariance`
     carries, where the omission was measured at 72 percent on a recombining
-    panel. -/
+    panel.
+
+    Power: the prediction spans 49.77 to 134.19 across the design, a factor of
+    two and a half. -/
 noncomputable def pgsVarianceFromHet (β_sq_sum het : ℝ) : ℝ :=
   Descent.Core.product β_sq_sum het
 
@@ -1127,7 +1130,12 @@ noncomputable def CrossPopulationMetricModel.witness (p q : ℕ) :
     0.00161, a factor of 33, so the transport signal is real. Compared against an
     explicit least-squares regression in the source, worst of 12 coordinates:
     0.70 sems. The error bar carries a `sqrt(2 log p)` factor for the worst-of-`p`
-    selection, so this is not a multiple-comparisons artefact. -/
+    selection, so this is not a multiple-comparisons artefact.
+
+    Power: the design moves all three channels the model separates -- tag-tag LD
+    (Frobenius distance 2.09), tag-causal alignment (1.89) and the effect vector
+    (0.69) -- and the source and target `R²` it produces are 0.05366 and 0.00161,
+    a factor of 33. -/
 noncomputable def sourceERMWeights {p : ℕ}
     (sigmaObsSource : Matrix (Fin p) (Fin p) ℝ)
     (crossSource : Fin p → ℝ) : Fin p → ℝ :=
@@ -1170,7 +1178,12 @@ by variants that arose after divergence.
     (1.89), and the effect vector (0.69) -- because a design that moved only one
     could not say which term a discrepancy belonged to. Measured source and
     target `R²` are 0.05366 and 0.00161, a factor of 33, so the transport signal
-    is real and not a rounding difference. -/
+    is real and not a rounding difference.
+
+    Power: the design moves all three channels the model separates -- tag-tag LD
+    (Frobenius distance 2.09), tag-causal alignment (1.89) and the effect vector
+    (0.69) -- and the source and target `R²` it produces are 0.05366 and 0.00161,
+    a factor of 33. -/
 noncomputable def totalEffect {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : Fin q → ℝ :=
   m.beta P + m.novelCausalEffect P
@@ -1862,6 +1875,11 @@ to be implicit in the fact that only a `target` version existed.
     `ancestrySpecificLDResidual`; and the ADDITIVITY of `m.outcomeVariance` with the burden is what
     the target cell tests, at 2.50 sems, which is a pass and
     not a comfortable one.
+
+    Power: the transport burden is the swept input and it runs from none in the
+    source to the whole irreducible burden in the target, so the source cell at
+    0.06 sems fixes the numerator and the target cell at 2.50 sems can pass only
+    if the burden is added with coefficient one.
 
     argument_source: model. -/
 noncomputable def effectiveOutcomeVariance {p q : ℕ}

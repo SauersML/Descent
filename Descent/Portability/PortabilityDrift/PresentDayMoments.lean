@@ -243,7 +243,14 @@ noncomputable def causalAlleleFreqTargetAt {p q : ℕ}
     that measured 0.842, 0.428 and 1.193 are now given three different values.
     And it is unbounded above, so a variant drifting toward `1/2` -- which raises
     its genotype variance and therefore its contribution -- is reported as
-    retention above one instead of as a loss. -/
+    retention above one instead of as a loss.
+
+    Power: measured retention runs from 0.428 to 1.193 across the design -- one
+    cell above one -- on three pairs that all share `|Δp| = 0.2`, which is
+    exactly the set a gap-based penalty must give a single number to. That is why
+    `alleleFreqMismatchPenalty` is FALSIFIED at 560 sems on these cells where this
+    body sits at 2.12, and the square-root form -- a ratio of standard deviations
+    rather than of variances -- is rejected at 411. -/
 noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) : ℝ :=
   (2 * tagAlleleFreqTargetAt m t i * (1 - tagAlleleFreqTargetAt m t i)) /
@@ -270,7 +277,13 @@ noncomputable def tagAlleleFreqRetentionAt {p q : ℕ}
     square-root form rejected at 411 sems so the exponent is fixed. That the
     corrected body is exactly the quantity this docstring already said the
     contribution scales with is the point -- the diagnosis was written down here
-    before the body was changed to match it. -/
+    before the body was changed to match it.
+
+    Power: the cells are `tagAlleleFreqRetentionAt`'s, where the gap-based penalty
+    this body replaces is FALSIFIED at 560 sems and the square-root form at 411,
+    while this body sits at 2.12. What the design turns on is that a variant
+    drifting toward 0.5 must be reported as retention ABOVE one, which a penalty
+    bounded by one cannot express at any parameter. -/
 noncomputable def causalAlleleFreqRetentionAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (j : Fin q) : ℝ :=
   (2 * causalAlleleFreqTargetAt m t j * (1 - causalAlleleFreqTargetAt m t j)) /
@@ -1035,7 +1048,12 @@ theorem liabilityControlMean_unit_prevalence_is_junk :
 
     So this is the variance of the STANDARDISED SCORE among cases, not of the
     liability. The name alone does not say which, and a consumer that took the
-    other reading would be wrong by a factor of five. -/
+    other reading would be wrong by a factor of five.
+
+    Power: the prediction spans 0.48285 to 0.76559 across the design, and the
+    rival reading -- the variance of the LIABILITY among cases rather than of the
+    standardised score -- is carried on the same cells and rejected at 796 to
+    1583 sems. -/
 noncomputable def liabilityCaseVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityCaseMean K * (liabilityCaseMean K - liabilityThreshold K)
 
@@ -1058,7 +1076,11 @@ theorem liabilityCaseVariance_at_zero_r2 (K : ℝ) : liabilityCaseVariance 0 K =
       0.05    0.6     0.88579   0.88614±0.00064      0.56
 
     The reading is pinned the same way `liabilityCaseVariance`'s was: the
-    variance is of the standardised PGS among controls, not of the liability. -/
+    variance is of the standardised PGS among controls, not of the liability.
+
+    Power: the prediction spans 0.87490 to 0.94289 across the design, which is
+    narrow, and it is narrow because the two inputs are swept against each other:
+    `K` fourfold from 0.05 to 0.20 and `r2` doubling from 0.3 to 0.6. -/
 noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
 
