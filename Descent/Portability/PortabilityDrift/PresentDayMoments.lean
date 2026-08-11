@@ -53,7 +53,14 @@ section PresentDayMetrics
     which the transported score is the source score at every generation. It is
     the null of the theory rather than an interesting member of it, and that is
     the point — it fixes what the generational statements quantify over. The
-    variance and prevalence fields are strictly inside their constraints. -/
+    variance and prevalence fields are strictly inside their constraints.
+
+    PROVENANCE OF THE LD-RETENTION SURFACE, which the field requires of every
+    construction site: STIPULATED, not measured. This is the no-divergence
+    configuration, in which the two populations are the same population, so
+    nothing decorrelates and the surface is `1` everywhere. It is the one place
+    the value `1` is not a claim about a diverged pair — `momentsLDWitness`
+    below is the diverged instance, and its surface is measured. -/
 noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
     CrossPopulationGenerationalModel p q where
   popGen := Descent.Core.PopGenParameters.witness
@@ -67,6 +74,7 @@ noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
   novelProxyTaggingTemplate := 0
   tagDistance := 0
   tagCausalDistance := 0
+  ldRetentionAt := fun _ _ ↦ 1
   tagAlleleFreqSource := fun _ ↦ 1 / 2
   tagAlleleFreqStandingTargetAt := fun _ _ ↦ 1 / 2
   tagAlleleFreqMutationShiftAt := fun _ _ ↦ 0
@@ -76,6 +84,69 @@ noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
   contextCrossSource := fun _ ↦ 0
   contextCrossTargetAt := fun _ _ ↦ 0
   outcome := GenerationalOutcomeScale.balanced 1 (by norm_num)
+
+/-- **The generational model at a MEASURED LD-retention surface.**
+
+    The null above fills its retention slot by stipulation, which is right for a
+    no-divergence configuration and says nothing about a diverged pair. This one
+    fills it from the Ragsdale-Gravel two-locus moment system, which integrates
+    the cross-deme second moments of `D` exactly for a stated demography rather
+    than fitting a rate to a simulation. The run is
+    `validation/empirical/momentsld/ld_surface.py`; its cell is a two-deme split
+    with continuous symmetric migration at equal sizes, and the Hudson `F_ST`
+    measured from that same integration's heterozygosities is 0.0476. In the rate
+    variable `ρ = 4·Nₑ·c` it returns
+
+      ρ        0        1        2        5        10       20
+      Corr(D)  0.91113  0.84009  0.77904  0.63985  0.49350  0.33915
+
+    and this witness reads two of those points: every tag pair sits at `ρ = 5`,
+    and each locus is at separation `0` from itself.
+
+    THE GENERATION INDEX, and why the measured slice is not generation `0`. The
+    run is an EQUILIBRIUM cell -- a pair that has already diverged and is held
+    there by migration -- so it is the surface AFTER divergence, not a trajectory
+    through it. Generation `0` of this structure is the slice at which the target
+    IS the source, where every kernel is `1` by construction, so the measured
+    surface is read at every later generation and the undiverged slice keeps the
+    value the structure's own semantics give it. Nothing here claims the approach
+    to equilibrium takes one generation; the witness exhibits two slices, not a
+    path between them.
+
+    TWO THINGS THE MEASURED SURFACE SAYS THAT NEITHER DELETED BODY COULD.
+    Retention at zero separation is 0.91113 and not `1`: at zero recombination
+    distance the ancestral `D` still drifts apart in the two demes, and how far
+    it drifts is what `F_ST` measures — the same integration gives 0.6926 at
+    `F_ST` 0.1999, so the deficit tracks divergence. And the fall with separation
+    is exhibited as values rather than as a law, because the corpus states no
+    shape here and this witness is not the place to smuggle one back.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM. It is a witness — an instance
+    exhibited so that statements about the structure have something to be about.
+    What was measured is the surface it reads, and that measurement's provenance
+    is the paragraph above. -/
+noncomputable def CrossPopulationGenerationalModel.momentsLDWitness :
+    CrossPopulationGenerationalModel 2 1 :=
+  { CrossPopulationGenerationalModel.witness 2 1 with
+    tagDistance := Matrix.of fun i j ↦ if i = j then 0 else 5
+    tagCausalDistance := Matrix.of fun _ _ ↦ 5
+    ldRetentionAt := fun t d ↦
+      if t = 0 then 1 else if d ≤ 0 then 0.91113 else 0.63985 }
+
+/-- **The measured surface is below one where it is shared, and falls where it
+separates.** Both retired bodies forced the first of these to equality — an
+amplitude of `1` at zero separation — and the measurement refuses it. Stated on
+the witness rather than as a property of the field, because the field asserts
+nothing and this is one instance of it. Read after divergence: at generation `0`
+the two populations are one population and the retention is `1` for a reason that
+has nothing to do with the amplitude question. -/
+theorem momentsLDWitness_retention_below_one_and_falls :
+    CrossPopulationGenerationalModel.momentsLDWitness.ldRetentionAt 1 0 < 1 ∧
+      CrossPopulationGenerationalModel.momentsLDWitness.ldRetentionAt 1 5 <
+        CrossPopulationGenerationalModel.momentsLDWitness.ldRetentionAt 1 0 := by
+  constructor <;>
+    norm_num [CrossPopulationGenerationalModel.momentsLDWitness,
+      CrossPopulationGenerationalModel.witness]
 
 /-- Generation-indexed target effect vector. This is derived from the source
 effect vector plus an explicit locus-resolved heterogeneity path and a
@@ -237,25 +308,25 @@ independent global scalars.
     the measured dependence rises with divergence and then flattens, which is
     neither the deleted proportionality nor the constant that replaced it.
 
-    **THE `fstGap` FAULT THIS RECORD USED TO NAME IS FIXED AND THE MARKER WAS
-    STALE.** The first factor is `ldCorrelationDecay` at the transient `F_ST`,
-    and that body's `fstGap` dependence WAS falsified at 4.73 sems -- the fitted
-    decay rate tracks `√fstGap`, not `fstGap`. It now carries
-    `Real.sqrt fstGap`, so the "attenuates at twice the supported rate" reading
-    that stood here describes a superseded body.
+    **THE LD FACTOR IS NOW A SUPPLIED SURFACE AND THE FALSIFIED BODY IT CALLED
+    IS GONE.** The first factor was `ldCorrelationDecay` read at the
+    transient `F_ST`, and that body's shape, rate and amplitude were each
+    refuted in turn. It is replaced by `m.ldRetentionAt`, a FIELD of the model:
+    the construction site supplies the surface and states where it came from,
+    and the refutation record travels with that field rather than with this
+    kernel. Nothing is claimed here about how retention varies with separation.
 
-    Empirical status: **FALSIFIED**, and now for ONE reason rather than two. The
-    surviving fault is the LD shape inherited from `ldCorrelationDecay`: whether
-    the decay in DISTANCE is exponential at all, or hyperbolic as Sved's relation
-    gives, was settled against the exponential once the control the earlier run
-    lacked was supplied (`validation/empirical/popgensel/ldshapecell.py`, cell
-    `I`; χ²/point 28.49 and 79.66 exponential against 4.16 and 1.95 hyperbolic,
-    on a fitter that prefers the exponential by 168-fold and 197-fold when handed
-    a true exponential). -/
+    Empirical status: **UNTESTED**, which is a narrower gap than the FALSIFIED
+    head this carried and not the same statement. What this kernel claims, once
+    the LD factor is an input, is that the four factors enter as a PRODUCT --
+    LD retention, mutation retention and the two allele-frequency retentions
+    multiplying without interaction. That is contradictable and nothing has
+    measured it. Carrying the old head forward would attribute to a product a
+    verdict that was about one of its factors, and that factor is no longer
+    here. -/
 noncomputable def jointTagLDKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) : ℝ :=
-  ldCorrelationDecay (m.tagDistance i j)
-      (m.popGen.fstTransientAt t) m.popGen.recomb *
+  m.ldRetentionAt t (m.tagDistance i j) *
     m.popGen.mutationSharedRetentionAt t *
     tagAlleleFreqRetentionAt m t i *
     tagAlleleFreqRetentionAt m t j
@@ -263,8 +334,7 @@ noncomputable def jointTagLDKernelAt {p q : ℕ}
 @[simp] theorem jointTagLDKernelAt_uses_ld_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i j : Fin p) :
     jointTagLDKernelAt m t i j =
-      ldCorrelationDecay (m.tagDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
+      m.ldRetentionAt t (m.tagDistance i j) *
         m.popGen.mutationSharedRetentionAt t *
             tagAlleleFreqRetentionAt m t i *
         tagAlleleFreqRetentionAt m t j := by
@@ -288,12 +358,17 @@ noncomputable def jointDirectCausalKernelAt {p q : ℕ}
   simp [jointDirectCausalKernelAt]
 
 /-- Joint locus-level transport kernel for ancestry-specific proxy tagging.
-This carries the full interaction between LD decay, mutation/migration sharing,
-and source/target allele-frequency history. -/
+This carries the full interaction between LD retention, mutation/migration
+sharing, and source/target allele-frequency history.
+
+    The LD factor is the model's supplied `ldRetentionAt`, read at the
+    tag-causal separation; see `jointTagLDKernelAt` for what that slot replaced
+    and what a product of retentions still claims.
+
+    Empirical status: **UNTESTED**. -/
 noncomputable def jointProxyTaggingKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
-  ldCorrelationDecay (m.tagCausalDistance i j)
-      (m.popGen.fstTransientAt t) m.popGen.recomb *
+  m.ldRetentionAt t (m.tagCausalDistance i j) *
     m.popGen.mutationSharedRetentionAt t *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
@@ -301,8 +376,7 @@ noncomputable def jointProxyTaggingKernelAt {p q : ℕ}
 @[simp] theorem jointProxyTaggingKernelAt_uses_ld_tagging_af_mutation {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     jointProxyTaggingKernelAt m t i j =
-      ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
+      m.ldRetentionAt t (m.tagCausalDistance i j) *
         m.popGen.mutationSharedRetentionAt t *
             tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by
@@ -329,11 +403,15 @@ noncomputable def jointNovelDirectCausalKernelAt {p q : ℕ}
 
 /-- Joint locus-level kernel for target-only novel proxy tagging. This carries
 both local LD structure and mutation-generated novelty, rather than just
-attenuating the shared source proxy surface. -/
+attenuating the shared source proxy surface.
+
+    The LD factor is the model's supplied `ldRetentionAt`, read at the
+    tag-causal separation; see `jointTagLDKernelAt` for what that slot replaced.
+
+    Empirical status: **UNTESTED**. -/
 noncomputable def jointNovelProxyTaggingKernelAt {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) : ℝ :=
-  ldCorrelationDecay (m.tagCausalDistance i j)
-      (m.popGen.fstTransientAt t) m.popGen.recomb *
+  m.ldRetentionAt t (m.tagCausalDistance i j) *
     novelVariantInnovationAt m.popGen t *
     tagAlleleFreqRetentionAt m t i *
     causalAlleleFreqRetentionAt m t j
@@ -341,8 +419,7 @@ noncomputable def jointNovelProxyTaggingKernelAt {p q : ℕ}
 @[simp] theorem jointNovelProxyTaggingKernelAt_uses_ld_af_mutation_migration {p q : ℕ}
     (m : CrossPopulationGenerationalModel p q) (t : ℕ) (i : Fin p) (j : Fin q) :
     jointNovelProxyTaggingKernelAt m t i j =
-      ldCorrelationDecay (m.tagCausalDistance i j)
-          (m.popGen.fstTransientAt t) m.popGen.recomb *
+      m.ldRetentionAt t (m.tagCausalDistance i j) *
         novelVariantInnovationAt m.popGen t *
             tagAlleleFreqRetentionAt m t i *
         causalAlleleFreqRetentionAt m t j := by

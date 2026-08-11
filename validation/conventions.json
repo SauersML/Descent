@@ -1024,12 +1024,6 @@
       "constants": [],
       "note": "Hudson. The corpus's standing rule: every F_ST written in tau/(1+tau) coordinates is a Hudson F_ST, because Nei's G_ST is FALSIFIED at up to 18.59 sems against the split law on genotype matrices where Hudson's matches at 0.03, and the ratio between them moves with the data so no correction factor converts one to the other. Same argument, same requirement."
     },
-    "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::ldCorrelationDecay": {
-      "quantity": "fst",
-      "convention": "undetermined",
-      "role": "consumer",
-      "note": "No reading is declared on the definition and none is derivable from its callees. EXCLUDED FROM THE F-CONVENTION MIGRATION, not migrated: this declaration retires with task #32, so typing its fst slot would be work on a body being deleted."
-    },
     "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::presentDayEqualVarianceGaussianAUC": {
       "quantity": "fst",
       "convention": "per-branch-drift",

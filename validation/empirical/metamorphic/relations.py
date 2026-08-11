@@ -586,15 +586,13 @@ RELATIONS = {
         scales("rhoSq", 1),
         jointly_scales(["V_A", "rhoSq"], 2),
     ],
-    "Descent.ldCorrelationDecay": [
-        # The decay reads the product lambda·distance, so those two trade off
-        # exactly. This still holds after the body's correction.
-        invariant_under_reciprocal_scaling(["distance"], ["lambda"]),
-        # And this one is PINNED AS A VIOLATION rather than deleted -- see
-        # EXPECTED_VIOLATIONS. It held for the superseded body and must not hold
-        # for the corrected one.
-        invariant_under_reciprocal_scaling(["fstGap"], ["lambda"]),
-    ],
+    # `Descent.ldCorrelationDecay` stood here with two entries, and the
+    # declaration is DELETED rather than corrected: its shape, its rate and its
+    # amplitude were each refuted, and the corpus now carries the cross-deme LD
+    # retention as a SUPPLIED FIELD of the generational model rather than as a
+    # closed form. A field is not a function of arguments, so no relation in
+    # this table's vocabulary can be stated about it -- there is nothing left to
+    # scale. The pinned violation below went with it for the same reason.
     "Descent.alleleFreqMismatchPenalty": [
         # The body was corrected while this table was live -- from the refuted
         # `exp(-|Δp|)` to the genotype-variance ratio `2p_t(1-p_t)/2p_s(1-p_s)`
@@ -987,7 +985,9 @@ RELATIONS = {
         # powers -- which is what the correction must produce -- will FAIL this
         # relation, and that failure is the confirmation that the body moved.
         # When it is corrected, move this entry to EXPECTED_VIOLATIONS rather
-        # than deleting it, exactly as was done for ldCorrelationDecay.
+        # than deleting it. That is what was done for ldCorrelationDecay, whose
+        # pin outlived one correction and was removed only when the declaration
+        # itself was deleted -- which is the other end of the same rule.
         symmetric_in("m", "σ_sq"),
     ],
     # STILL FALSIFIED. Coalescent time in a serial-founder chain.
@@ -1318,19 +1318,14 @@ RELATIONS = {
 # ---------------------------------------------------------------------------
 
 EXPECTED_VIOLATIONS = {
-    ("Descent.ldCorrelationDecay", "reciprocal_scale/fstGap|lambda"):
-        "The superseded body was `exp(-(lambda · fstGap · distance))`, in which "
-        "fstGap and distance entered identically and each traded off exactly "
-        "against lambda. That linear fstGap dependence was refuted at 4.73 sems "
-        "and the body is now `exp(-(lambda · sqrt(fstGap) · distance))`. So the "
-        "trade against lambda survives for DISTANCE and must NOT survive for "
-        "fstGap: scaling fstGap by c now needs lambda scaled by 1/sqrt(c), not "
-        "1/c. Pinned rather than deleted because that asymmetry IS the "
-        "correction -- a body in which the two arguments traded off the same "
-        "way would be the refuted one, and this entry fires if anyone restores "
-        "it. This table's vocabulary has no reciprocal relation with unequal "
-        "exponents, which is why the fact is recorded as a pinned violation "
-        "rather than as a relation of its own.",
+    # `Descent.ldCorrelationDecay`'s reciprocal_scale/fstGap|lambda violation
+    # was pinned here so that a body restoring the refuted linear fstGap
+    # dependence would fail. It is removed because the DECLARATION is deleted,
+    # not because the pin stopped holding: the sqrt reading it protected was
+    # itself falsified (battery_bulk54, 4.31 sems) along with the rate slot
+    # (battery_rate22, 1099.66 sems) and the amplitude, so there is no body of
+    # this quantity left to protect. Its successor is a supplied field of
+    # `CrossPopulationGenerationalModel`, which takes no arguments to scale.
     ("Descent.multiTraitEffectiveSampleSize", "swap/n₁<->n₂"):
         "The body is deliberately NOT symmetric: n₁ is the target trait's "
         "own sample and enters undiscounted, while the second trait's sample is "
@@ -1584,11 +1579,12 @@ NO_RELATIONS = {
     "Descent.windowVariance":
         "Phi(w/sqrt v) needs w scaled by c and v by c² to hold fixed, which is a "
         "reciprocal trade with UNEQUAL exponents -- the same shape this table "
-        "could not express for ldCorrelationDecay's corrected sqrt(fstGap), and "
-        "recorded there as a pinned violation because a relation already "
-        "existed to pin. Here there is nothing to pin, so it is recorded as an "
-        "absence. Note also that Phi is bounded, so no scaling of the output is "
-        "available even where the argument has one.",
+        "could not express for ldCorrelationDecay's sqrt(fstGap) before that "
+        "declaration was deleted, and recorded there as a pinned violation "
+        "because a relation already existed to pin. Here there is nothing to "
+        "pin, so it is recorded as an absence. Note also that Phi is bounded, "
+        "so no scaling of the output is available even where the argument has "
+        "one.",
     "Descent.localPencilTraceContribution":
         "(1 + source² - 2·source·target)/(1 - source²) carries bare `1`s above "
         "and below. They are ANCHORS -- the unit-variance normalisation of the "

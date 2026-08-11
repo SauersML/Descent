@@ -1,0 +1,47 @@
+{
+ "engine": "moments.LD (Ragsdale & Gravel two-locus moment system)",
+ "version": "1.5.0",
+ "demography": "two-deme split with continuous symmetric migration, equal sizes, T = 10.0 (units of 2N), theta = 0.001",
+ "cells": {
+  "low-divergence": {
+   "m_scaled": 5.0,
+   "fst_hudson": 0.047614616899622764,
+   "rho": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    20.0
+   ],
+   "corr_D": [
+    0.9111299505920575,
+    0.8400898082206056,
+    0.7790436132955654,
+    0.6398499568280799,
+    0.4935017841863256,
+    0.3391542582003808
+   ]
+  },
+  "high-divergence": {
+   "m_scaled": 1.0,
+   "fst_hudson": 0.19986355606129136,
+   "rho": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    20.0
+   ],
+   "corr_D": [
+    0.6926388587211598,
+    0.5500377227964189,
+    0.45711625668054334,
+    0.30624175682508054,
+    0.19974932343412274,
+    0.11889500050494642
+   ]
+  }
+ }
+}

@@ -339,8 +339,10 @@ FAMILIES = [
                     "continuousSteppingStoneFst", "demoSteppingStoneFst",
                     "steppingStoneDiffusionTimescale", "steppingStoneFst",
                     "steppingStoneFstQuadratic",
-                    # newly classified
-                    "ldCorrelationDecay",
+                    # `ldCorrelationDecay` was classified into this family and
+                    # is now DELETED -- shape, rate and amplitude each refuted,
+                    # its slot replaced by a supplied field of the generational
+                    # model. Nothing in this family measures it any more.
                     # d*(D-d)/(2 sigma^2 m) -- fam_stepping_stone.py already
                     # computes exactly this body as
                     # T_textbook_d_Dmd_over_Vrel (control E2) and

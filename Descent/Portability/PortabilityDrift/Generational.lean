@@ -536,6 +536,7 @@ time-varying target LD and tagging state is derived from:
 - target-only novel direct causal links,
 - ancestry-specific proxy tagging that is mediated by LD decay,
 - target-only novel proxy-tagging links,
+- a SUPPLIED LD-retention surface, read at a tag separation and a generation,
 - recombination and transient `F_ST`,
 - mutation- and migration-driven sharing terms, and
 - explicit target allele-frequency trajectories split into standing and
@@ -553,6 +554,57 @@ structure CrossPopulationGenerationalModel (p q : ℕ) where
   novelProxyTaggingTemplate : Matrix (Fin p) (Fin q) ℝ
   tagDistance : Matrix (Fin p) (Fin p) ℝ
   tagCausalDistance : Matrix (Fin p) (Fin q) ℝ
+  /-- **The LD-retention surface**: the fraction of the source population's between-locus
+  LD correlation that survives in the target, read at a tag separation and a generation.
+
+  IT IS AN INPUT AND IT ASSERTS NOTHING.  Any surface whatever satisfies this field, so no
+  measurement can disagree with it, and the field carries no hypothesis -- not monotonicity
+  in separation, not a rate multiplying separation, and in particular not the value `1` at
+  zero separation.  What IS claimed is claimed by the kernels that read it
+  (`jointTagLDKernelAt` and the two proxy kernels): that this factor enters MULTIPLICATIVELY
+  beside mutation retention and the allele-frequency retentions.  A construction site fills
+  this slot with a stipulation or a measurement and says which; a site that filled it
+  silently would be a deleted body with extra steps.
+
+  ONE THING A CONSTRUCTION SITE OWES THE REST OF THE CHAPTER, and it is about the time
+  index rather than about LD: at generation `0` the target IS the source, so retention there
+  is `1` at every separation and every kernel is exactly `1`.  The closed form this slot
+  replaced got that free, through a transient `F_ST` of zero at `t = 0`; a supplied surface
+  has to say it, and a site that did not would be claiming the two populations differ before
+  they have diverged.  It is stated here rather than carried as a hypothesis field for the
+  same reason the allele-frequency paths carry none: the structure lets a construction be
+  wrong and the theorems about each construction are what pin it.
+
+  THE SLOT IS EMPTY BECAUSE THE CLOSED FORM IS OWED, NOT BECAUSE NONE EXISTS.  The exact
+  machinery is published and installed: the Ragsdale-Gravel two-locus moment system computes
+  the cross-deme second moments of `D` directly for a stated demography, so the surface can
+  be evaluated numerically today (`validation/empirical/momentsld/ld_surface.py`) and a
+  derivation has something exact to be checked against.  What the corpus lacks is a closed
+  form for it, which is a derivation owed rather than an open question.  When that lands it
+  becomes a computed instance of this field and no consumer changes.
+
+  WHAT RETIRED INTO THIS SLOT, carried as a rival record rather than as prose about the
+  past.  The field replaces `ldCorrelationDecay`, `exp(-(lambda * √fstGap * distance))`,
+  and every part of that body is refuted:
+
+  * the SHAPE in separation, at `validation/empirical/popgensel/ldshapecell.py` cell `I` --
+    χ²/point 28.49 and 79.66 for the exponential against 4.16 and 1.95 for a hyperbolic, on
+    a fitter that prefers the exponential 168- and 197-fold when handed a true one;
+  * the RATE's divergence dependence, at `simcov/battery_bulk54.py` -- the `√fstGap` reading
+    FALSIFIED at 4.31 sems, the superseded linear `fstGap` at 8.04 and a rate independent of
+    divergence at 25.48, over a 240-fold sweep in `4·Nₑ·m`;
+  * the RATE SLOT itself, at `simcov/battery_rate22.py` -- read as `4·Nₑ·c` under this
+    shape, FALSIFIED at 1099.66 sems over six cells crossing `Nₑ` against realised `F_ST`;
+  * the AMPLITUDE.  Both this body and the hyperbolic successor deleted beside it force the
+    surface to `1` at zero separation.  The measurement puts it at 0.91-0.98 and tracking
+    `F_ST` rather than `Nₑ`, and the moment system agrees from a separate code path
+    (0.9111 at `F_ST` 0.048, 0.6926 at 0.200).  A theorem needing `retention 0 = 1` would
+    inherit that refutation, so nothing in this chapter states one.
+
+  The one reading `battery_rate22` did NOT refute is the rate VARIABLE: in `ρ = 4·Nₑ·c`
+  units the cross-deme curve is free of `Nₑ`, which is the coordinate the owed derivation
+  should be written in. -/
+  ldRetentionAt : ℕ → ℝ → ℝ
   tagAlleleFreqSource : Fin p → ℝ
   tagAlleleFreqStandingTargetAt : ℕ → Fin p → ℝ
   tagAlleleFreqMutationShiftAt : ℕ → Fin p → ℝ

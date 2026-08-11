@@ -42,7 +42,7 @@ macro "generational_witness_simp" ms:Lean.Parser.Tactic.simpLemma,* : tactic =>
       Descent.Core.PopGenParameters.fstTransientAt, PopGen.fstConnectedPairAt,
       PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
-      ldCorrelationDecay, Matrix.one_mulVec, Matrix.mulVec, dotProduct,
+      Matrix.one_mulVec, Matrix.mulVec, dotProduct,
       Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
@@ -666,75 +666,47 @@ compute. -/
 noncomputable def popgenDrivenTagScale : ℝ :=
   Real.exp (-(1 : ℝ))
 
-/-- The LD decay exponent this witness carries across one tag-causal unit of
-distance: `ldCorrelationDecay`'s `lambda * √(F_ST gap) * distance`, with `lambda` and the gap READ
-OFF the witness's own population-genetic parameters
-rather than copied out as numbers, and `distance = 1` from the model's
-`tagCausalDistance` below.
-
-**Why it is written this way, and not as a literal.** This is the one place the
-witness depends on the FORM of `ldCorrelationDecay`, and the number has moved
-three times. While that body read `lambda * F_ST * distance` it was
-`2/7 * 1/4 = 1/14`; the exponent was measured to be a SQUARE ROOT and it became
-`√(2/7) * 1/4`, a surd that did not reduce; then the gap moved from `2/7` to
-`1/4` when `fstTransientAt` picked up the two-deme correction on its migration
-term. Each time, the repair upstream was correct and this constant was left
-behind -- still syntactically well-formed, no longer true, and the build broke
-on a file that had not been touched. A literal cannot fail with the body it
-came from, so the body now supplies it: `popgenDrivenLDDecayExponent_eq_eighth`
-carries the value `1/8` exactly once, as a CONSEQUENCE of the fields, and every
-proof below rewrites with that theorem instead of unfolding a number. Move the
-decay law, the recombination rate or the `F_ST` gap and the theorem fails
-immediately, at the one place that names the value.
-
-Empirical status: NOT AN EMPIRICAL CLAIM. It is a function of a witness's own
-coordinates, and a witness's coordinates are stipulated rather than measured.
-The empirical content -- that the exponent goes as `√fstGap` and not as
-`fstGap` -- belongs to `PortabilityDrift.ldCorrelationDecay`, where it was
-measured across a ninetyfold span of `F_ST`; the `F_ST` gap itself belongs to
-`DGP.fstEquilibrium`, whose two-deme correction last moved it. -/
-noncomputable def popgenDrivenLDDecayExponent : ℝ :=
-  nondegenerateGenerationalPopGen.recomb *
-    Real.sqrt (nondegenerateGenerationalPopGen.fstTransientAt 1)
-
-/-- **The exponent's value, DERIVED rather than restated.** This is the step that
-makes the definition above safe to depend on: the number `1/8` appears once, as a
-consequence of the witness's own fields, and every proof below rewrites with this
-theorem instead of unfolding a literal. Move `fstTransientAt`, the recombination
-rate or the decay law and this theorem fails, which is the whole point -- the
-three times this file broke the build, it was because a corrected body upstream
-left a memorised constant behind that was still syntactically well-formed and no
-longer true. -/
-theorem popgenDrivenLDDecayExponent_eq_eighth :
-    popgenDrivenLDDecayExponent = 1 / 8 := by
-  obtain ⟨-, -, -, h_fst, -⟩ := nondegenerateGenerationalPopGen_coordinates_at_one
-  unfold popgenDrivenLDDecayExponent
-  rw [h_fst, show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num,
-    Real.sqrt_sq (by norm_num : (0 : ℝ) ≤ 1 / 2)]
-  norm_num [nondegenerateGenerationalPopGen, Descent.Core.scaledMutationRate,
-    Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
-      Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
-      Descent.Core.scalingConstant, Descent.Core.ratio, Descent.Core.fstFromFlow]
-
-theorem popgenDrivenLDDecayExponent_pos : 0 < popgenDrivenLDDecayExponent := by
-  rw [popgenDrivenLDDecayExponent_eq_eighth]
-  norm_num
-
 /-- Shared proxy-tagging scale at generation `1` in the nondegenerate two-tag
-proxy witness. The additional `exp (-popgenDrivenLDDecayExponent)` factor comes
-from explicit recombination-driven LD decay across one tag-causal unit of
-distance.
+proxy witness: the mutation-sharing retention, halved by the LD retention the
+witness supplies across one tag-causal unit of separation.
 
-The `7/6` this used to carry was `migrationSharedBoostAt 1` on these parameters,
+**This scale carried `exp (-(1 + popgenDrivenLDDecayExponent))`, and the exponent is
+gone with the body that had one.** `popgenDrivenLDDecayExponent` was
+`recomb * √(fstTransientAt 1)` -- `ldCorrelationDecay`'s rate read off the
+witness's own coordinates rather than copied out as `1/8`, so that a correction
+upstream would break here rather than leave a memorised constant behind. That
+discipline was right and its object is not: an EXPONENT is a coordinate only an
+exponential has, and the exponential is deleted. The LD retention is now a
+supplied field, so the witness states the surviving factor directly and there is
+no derived rate left to memorise.
+
+The `7/6` this once carried was `migrationSharedBoostAt 1` on these parameters,
 and that body is deleted as refuted, so it is gone from here too. -/
 noncomputable def popgenDrivenProxyScale : ℝ :=
-  Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent))
+  Real.exp (-(1 : ℝ)) * (1 / 2)
 
 /-- Two-tag one-causal-variant generational witness with constant allele
 frequencies and constant effects. Any transport change after generation `0`
-comes from the explicit population-genetic kernels: transient `F_ST`,
-recombination and mutation retention. (The migration boost was a fourth until it
-was deleted as refuted; see `jointTagLDKernelAt` for what its absence costs.) -/
+comes from the explicit population-genetic kernels: mutation retention and the
+supplied LD retention. (The migration boost was a third until it was deleted as
+refuted; see `jointTagLDKernelAt` for what its absence costs.)
+
+PROVENANCE OF THE LD-RETENTION SURFACE: STIPULATED, and stipulated in this
+file's own idiom -- a round design value chosen to make a contrast visible, not
+a measurement and not a law. Each locus retains all of its own variance at
+separation `0`, and half of the shared LD is left at the one unit of
+tag-causal separation this witness uses, so the proxy channel is degraded
+relative to the tag channel by a factor a reader can see. The measured surface
+is at `CrossPopulationGenerationalModel.momentsLDWitness`, where it belongs:
+this witness is about which channel loses what, and a measured curve here would
+put two unrelated things in one declaration.
+
+The generation-`0` slice is `1` at every separation, and that is not a stipulation
+of the same kind: at generation `0` the target IS the source, so every kernel is
+exactly `1` and the deployed target metrics equal the source ones. The closed form
+this slot replaced got that for free, through a transient `F_ST` of zero; a
+supplied surface has to say it, and a construction that failed to would be
+claiming the two populations differ before they have diverged. -/
 noncomputable def popgenDrivenProxyGenerationalModel :
     CrossPopulationGenerationalModel 2 1 := {
   popGen := nondegenerateGenerationalPopGen
@@ -748,6 +720,7 @@ noncomputable def popgenDrivenProxyGenerationalModel :
   novelProxyTaggingTemplate := !![0; 0]
   tagDistance := !![0, 1; 1, 0]
   tagCausalDistance := !![1; 1]
+  ldRetentionAt := fun t d ↦ if t = 0 then 1 else if d ≤ 0 then 1 else 1 / 2
   tagAlleleFreqSource := ![1 / 2, 1 / 2]
   tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2, 1 / 2]
   tagAlleleFreqMutationShiftAt := fun _ ↦ ![0, 0]
@@ -818,41 +791,28 @@ theorem popgenDrivenProxyGenerationalModel_generation_one_scales :
   rcases nondegenerateGenerationalPopGen_coordinates_at_one with ⟨h_theta, h_bigM, h_tau, h_fst,
     h_mut⟩
   -- Both tags carry the same proxy scale at generation one, and the calculation that shows
-  -- it does not depend on which: it was written out once per tag, `calc` step for `calc`
-  -- step. Proved for an arbitrary tag, the last two goals are two instances of it.
+  -- it does not depend on which: proved for an arbitrary tag, the last two goals are two
+  -- instances of it. The three-step `calc` this used to need is gone with the exponent --
+  -- it existed to put a surd, `√(fstTransientAt 1)`, into the same shape as the constant
+  -- it reduces to, and the LD factor the witness supplies is already a number.
   have proxy_scale_at :
       ∀ i : Fin 2, proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0 =
         popgenDrivenProxyScale := by
     intro i
-    calc
-      proxyTaggingTargetAt popgenDrivenProxyGenerationalModel 1 i 0
-          = Real.exp (-(1 : ℝ)) * Real.exp (-popgenDrivenLDDecayExponent) := by
-              -- The gap is a perfect square again, so the surd reduces; the step is
-              -- kept because the exponent is still WRITTEN as a square root and the
-              -- two sides have to be put in the same shape before `ring_nf` runs.
-              have hsqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
-                rw [show (1 / 4 : ℝ) = (1 / 2) ^ 2 by norm_num]
-                exact Real.sqrt_sq (by norm_num)
-              rw [popgenDrivenLDDecayExponent_eq_eighth]
-              fin_cases i <;>
-                generational_witness_simp nondegenerateGenerationalPopGen,
-                  popgenDrivenProxyGenerationalModel, h_fst, h_mut,
-                  nondegenerateGenerationalPopGen_fstDecay_eq_zero <;>
-                ring_nf <;>
-                (try rw [hsqrt]) <;>
-                (try ring_nf)
-      _ = Real.exp (-((1 : ℝ) + popgenDrivenLDDecayExponent)) := by
-            rw [← Real.exp_add]
-            congr 1
-            ring
-      _ = popgenDrivenProxyScale := by rfl
+    unfold popgenDrivenProxyScale
+    fin_cases i <;>
+      generational_witness_simp nondegenerateGenerationalPopGen,
+        popgenDrivenProxyGenerationalModel, h_fst, h_mut,
+        nondegenerateGenerationalPopGen_fstDecay_eq_zero <;>
+      (try norm_num) <;>
+      (try ring_nf)
   refine ⟨?_, ?_, proxy_scale_at 0, proxy_scale_at 1⟩
   · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
       nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut
-    ring_nf
+    all_goals (try norm_num)
   · generational_witness_simp popgenDrivenProxyGenerationalModel, popgenDrivenTagScale,
       nondegenerateGenerationalPopGen, h_theta, h_bigM, h_tau, h_fst, h_mut
-    ring_nf
+    all_goals (try norm_num)
 
 /-- In the nondegenerate proxy witness, generation-1 transport degrades target
 `R²` even though target allele frequencies and target effects are held fixed.
@@ -924,19 +884,12 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
   have h_proxy_nonneg : 0 ≤ popgenDrivenProxyScale := by
     unfold popgenDrivenProxyScale
     positivity
-  have h_ld_gap_lt_one : Real.exp (-popgenDrivenLDDecayExponent) < 1 := by
-    have hneg : -popgenDrivenLDDecayExponent < 0 := by
-      have := popgenDrivenLDDecayExponent_pos
-      linarith
-    simpa using Real.exp_lt_one_iff.mpr hneg
   have h_proxy_lt_tag : popgenDrivenProxyScale < popgenDrivenTagScale := by
-    -- With the migration factor deleted both scales are bare exponentials, so the
-    -- chain that used to carry a common `7/6` through three steps is one rewrite
-    -- and one inequality.
+    -- The two scales now share a factor and differ by the supplied LD retention, so
+    -- the chain that once carried a common `7/6` through three steps, and then a
+    -- second exponential through two more, is one inequality.
     unfold popgenDrivenProxyScale popgenDrivenTagScale
-    rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring, Real.exp_add]
-    nlinarith [h_ld_gap_lt_one, Real.exp_pos (-(1 : ℝ))]
+    nlinarith [Real.exp_pos (-(1 : ℝ))]
   have h_exp_one_ge_two : (2 : ℝ) ≤ Real.exp (1 : ℝ) := by
     have h := Real.add_one_le_exp (1 : ℝ)
     nlinarith
@@ -956,10 +909,7 @@ theorem popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one :
     nlinarith
   have h_proxy_lt_one : popgenDrivenProxyScale < 1 := by
     unfold popgenDrivenProxyScale
-    rw [show (-((1 : ℝ) + popgenDrivenLDDecayExponent))
-          = (-(1 : ℝ)) + (-popgenDrivenLDDecayExponent) by ring, Real.exp_add]
-    nlinarith [h_exp_neg_one_le_half, le_of_lt h_ld_gap_lt_one,
-      Real.exp_pos (-popgenDrivenLDDecayExponent), Real.exp_pos (-(1 : ℝ))]
+    nlinarith [h_exp_neg_one_le_half, Real.exp_pos (-(1 : ℝ))]
   have h_proxy_sq_lt_tag : popgenDrivenProxyScale ^ 2 < popgenDrivenTagScale := by
     have h_proxy_sq_lt_proxy : popgenDrivenProxyScale ^ 2 < popgenDrivenProxyScale := by
       have h_proxy_pos : 0 < popgenDrivenProxyScale := by
@@ -1015,7 +965,15 @@ two-tag witness above already says.
 
 Taken as a function of the five, the twenty are stated once and every witness theorem still
 evaluates them: a function application unfolds by `simp`, which a structure update does not
--- that was tried first, and it left six goals open that the literals close. -/
+-- that was tried first, and it left six goals open that the literals close.
+
+PROVENANCE OF THE LD-RETENTION SURFACE: STIPULATED at `1`, and it is the ONE
+configuration in which that value is not a claim contradicted by the measurement.
+`baselineGenerationalPopGen` sets recombination, mutation and migration all to zero, so
+these witnesses hold LD fixed BY CONSTRUCTION -- they exist to isolate allele-frequency
+drift and effect heterogeneity, and a retention that moved would put a second driver into
+a witness built to have one. The diverged case with a measured surface is
+`CrossPopulationGenerationalModel.momentsLDWitness`. -/
 noncomputable def singleLocusGenerationalWitness
     (targetEffectHeterogeneityAt : ℕ → Fin 1 → ℝ)
     (directCausalSource proxyTaggingSource : Matrix (Fin 1) (Fin 1) ℝ)
@@ -1032,6 +990,7 @@ noncomputable def singleLocusGenerationalWitness
   novelProxyTaggingTemplate := !![0]
   tagDistance := !![1]
   tagCausalDistance := !![1]
+  ldRetentionAt := fun _ _ ↦ 1
   tagAlleleFreqSource := ![1 / 2]
   tagAlleleFreqStandingTargetAt := fun _ ↦ ![1 / 2]
   tagAlleleFreqMutationShiftAt := tagAlleleFreqMutationShiftAt
@@ -1099,7 +1058,6 @@ theorem target_r2_changes_along_generation_indexed_af_path :
       PopGen.fstTransientDecayFromScaled,
       Descent.Core.PopGenParameters.mutationSharedRetentionAt,
       Descent.Core.PopGenParameters.bigM,
-      ldCorrelationDecay,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,

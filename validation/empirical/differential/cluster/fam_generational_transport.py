@@ -39,8 +39,11 @@ WHAT EACH MEASUREMENT SETTLES
   M3  diagonal of the tag second-moment matrix, target/source  ->
       jointTagLDKernelAt(i,i), tagAlleleFreqRetentionAt,
       alleleFreqMismatchPenalty, sigmaTagTargetAt.
-  M4  off-diagonal of the same  ->  jointTagLDKernelAt(i,j) and its
-      ldCorrelationDecay factor.
+  M4  off-diagonal of the same  ->  jointTagLDKernelAt(i,j) and its LD-retention
+      factor.  That factor used to be the closed form ldCorrelationDecay, which
+      is deleted as refuted; it is now a SUPPLIED FIELD of the model, so M4
+      measures the surface the field must be filled with rather than checking a
+      body against it.
   M5  tag-causal cross moments  ->  jointDirectCausalKernelAt,
       jointProxyTaggingKernelAt, directCausalTargetAt, proxyTaggingTargetAt,
       sigmaTagCausalTargetAt, causalAlleleFreqRetentionAt.
@@ -61,7 +64,7 @@ SPLIT CONTROLS -- each isolates one factor, because the kernels are PRODUCTS
   C2  mu = 0 and mig = 0. Every kernel must reduce to the pure-drift form:
       mutationSharedRetentionAt = 1, migrationSharedBoostAt = 1,
       novelVariantInnovationAt = 0, and the whole kernel is the AF-retention
-      product times ldCorrelationDecay. Isolates DRIFT.
+      product times the supplied LD retention. Isolates DRIFT.
   C3  Ne enormous. All frequencies freeze, so every retention must be exactly
       1 and novelVariantInnovationAt exactly 0 -- EXCEPT that mutation still
       runs, so C3 separates the INNOVATION term from the RETENTION term.
