@@ -1726,28 +1726,28 @@
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 0,
-   "declaration": "fstDriftMigration",
+   "declaration": "fstDriftMigrationManyDemes",
    "downgraded_because": null,
    "freshness": "UNVERIFIED (no recorded source hash)",
    "lean_file": "DGP.lean",
-   "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+   "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
    "regime": "island model with 4*Ne*m held FIXED at 2.0 while the deme count runs 2, 4, 10, 40; F_ST read as 1 - E[T_within]/E[T_between] from coalescence times, so no estimator convention and no mutation model enters",
    "results_file": "battery_bulk18_results.json",
    "role": "corpus",
    "source": "1 / (1 + bigM)",
    "tag": "",
-   "verdict": "NO POWER",
-   "verdict_raw": "NO POWER",
+   "verdict": "LEAD",
+   "verdict_raw": "LEAD (no control)",
    "worst_sems": 499.1340095433742
   },
   {
-   "against": "fstDriftMigration",
+   "against": "fstDriftMigrationManyDemes",
    "battery": "bulk18",
    "battery_sha": "a568922b6d661ebb",
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 0,
-   "declaration": "fstDriftMigration",
+   "declaration": "fstDriftMigrationManyDemes",
    "downgraded_because": null,
    "freshness": "UNVERIFIED (no recorded source hash)",
    "lean_file": "DGP.lean",
@@ -1822,7 +1822,7 @@
    "tag": "",
    "verdict": "UNINFORMATIVE",
    "verdict_raw": "MATCH",
-   "worst_sems": 3.0178346333475194
+   "worst_sems": 3.0178346333476305
   },
   {
    "against": null,
@@ -1864,7 +1864,7 @@
    "tag": "",
    "verdict": "UNINFORMATIVE",
    "verdict_raw": "MATCH",
-   "worst_sems": 0.829720281917511
+   "worst_sems": 0.8297202819174946
   },
   {
    "against": null,
@@ -1885,7 +1885,7 @@
    "tag": "",
    "verdict": "UNINFORMATIVE",
    "verdict_raw": "MATCH",
-   "worst_sems": 0.8297202819175074
+   "worst_sems": 0.8297202819174911
   },
   {
    "against": null,
@@ -1906,7 +1906,7 @@
    "tag": "",
    "verdict": "UNINFORMATIVE",
    "verdict_raw": "MATCH",
-   "worst_sems": 1.8284996903632023
+   "worst_sems": 1.828499690362381
   },
   {
    "against": "expectedSquaredEffect",
@@ -1927,7 +1927,7 @@
    "tag": "[h2/M^2 variant, competing]",
    "verdict": "LEAD",
    "verdict_raw": "LEAD (no control)",
-   "worst_sems": 2000.89265033304
+   "worst_sems": 2000.8926503330383
   },
   {
    "against": null,
@@ -1969,7 +1969,7 @@
    "tag": "[root-mean-square variant, competing]",
    "verdict": "LEAD",
    "verdict_raw": "LEAD (no control)",
-   "worst_sems": 947.1974200551944
+   "worst_sems": 947.1974200551964
   },
   {
    "against": null,
