@@ -28,7 +28,7 @@ resulting kernel, while symmetry calculations stay on the witness-valued chart g
 namespace Descent.Pangenome
 
 open CategoryTheory
-open PartialSymmetry
+open Descent.Core
 
 universe u v
 
