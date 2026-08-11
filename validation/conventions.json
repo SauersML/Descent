@@ -684,13 +684,13 @@
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PopGen/HumanDemography.lean::neutralDriftR2Ratio": {
+    "Descent/Portability/HumanDemography.lean::neutralDriftR2Ratio": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/PopGen/HumanDemography.lean::taggedDriftR2RatioCorrected": {
+    "Descent/Portability/HumanDemography.lean::taggedDriftR2RatioCorrected": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",

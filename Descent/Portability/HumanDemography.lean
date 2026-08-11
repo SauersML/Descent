@@ -5,9 +5,11 @@ import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Blindness.LumpedRateBlindness
 import Descent.PopGen.DriftRecurrences
 
-assert_below Descent.Conditionals Descent.Decision
+assert_below Descent.Decision Descent.Program
 
-namespace Descent.PopGen
+namespace Descent.Portability
+
+open Descent.PopGen
 
 /-!
 # Human demographic parameters and the size of the portability gap
@@ -495,4 +497,4 @@ theorem hubFlow_carries_no_exchange_information
 
 end UnidentifiableExchange
 
-end Descent.PopGen
+end Descent.Portability

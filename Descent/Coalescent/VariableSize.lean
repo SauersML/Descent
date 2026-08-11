@@ -15,7 +15,7 @@ namespace Descent
 # A population that changes size: the coalescent as a deterministic time change
 
 Everything in `Descent.Coalescent` up to here holds the population size constant.  Real
-histories do not, and the corpus's own `Descent.PopGen.HumanDemography` is a catalogue of
+histories do not, and the corpus's own `Descent.Portability.HumanDemography` is a catalogue of
 bottlenecks and expansions.  The standard device -- Griffiths and Tavaré (1994) -- is that a
 varying size does not need a new coalescent: it is the SAME coalescent run on a different
 clock.
@@ -79,7 +79,7 @@ open Filter Topology
 a population growing forwards at exponential rate `β`.
 
 Empirical status: THIS IS THE MODEL.  Exponential growth is a modelling choice about a
-history, not a derivation; `Descent.PopGen.HumanDemography` is where the corpus records
+history, not a derivation; `Descent.Portability.HumanDemography` is where the corpus records
 which histories have been measured. -/
 noncomputable def relativeSize (β t : ℝ) : ℝ := Real.exp (-(β * t))
 

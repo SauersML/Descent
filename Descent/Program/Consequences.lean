@@ -8,7 +8,7 @@ import Descent.Portability.PortabilityBounds
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.EquityAndImplementation
-import Descent.PopGen.HumanDemography
+import Descent.Portability.HumanDemography
 import Descent.PopGen.DemographicCapacity
 import Descent.PopGen.AdditiveInvariance
 import Descent.Portability.PCCorrectability.Nonidentifiability
@@ -214,9 +214,9 @@ theorem gradual_loss_meets_a_noisy_instrument
     (V_A V_E t Ne σ_sq bias_sq : ℝ)
     (hVA : 0 < V_A) (hVE : 0 < V_E) (ht : 0 ≤ t) (hNe : 0 < Ne)
     (hσ : 0 < σ_sq) (hb : 0 ≤ bias_sq) :
-    1 - t / (2 * Ne) ≤ PopGen.neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) ∧
+    1 - t / (2 * Ne) ≤ Portability.neutralDriftR2Ratio V_A V_E (fstFromGenerations t Ne) ∧
       4 * bias_sq * σ_sq + 2 * σ_sq ^ 2 ≥ 2 * σ_sq ^ 2 :=
-  ⟨PopGen.neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
+  ⟨Portability.neutral_drift_ratio_ge_one_sub_coalescentTau V_A V_E t Ne hVA hVE ht hNe,
    Portability.high_cv_inevitable σ_sq bias_sq hσ hb⟩
 
 /-- **And the floor is the same quantity the Core chain bounds from above.**
@@ -229,11 +229,12 @@ than leaving the two names to agree by inspection. -/
 theorem the_bounded_quantity_is_one_quantity
     (V_A V_E fst : ℝ) (hV : 0 < V_A) (hE : 0 ≤ V_E)
     (hf0 : 0 ≤ fst) (hf : fst < 1) :
-    PopGen.neutralDriftR2Ratio V_A V_E fst
+    Portability.neutralDriftR2Ratio V_A V_E fst
       = Descent.Core.ScoreMoments.portabilityRatio V_A V_E fst ∧
-    0 ≤ PopGen.neutralDriftR2Ratio V_A V_E fst ∧ PopGen.neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
-  ⟨PopGen.neutralDriftR2Ratio_eq_core V_A V_E fst,
-   PopGen.neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
+    0 ≤ Portability.neutralDriftR2Ratio V_A V_E fst ∧
+    Portability.neutralDriftR2Ratio V_A V_E fst ≤ 1 :=
+  ⟨Portability.neutralDriftR2Ratio_eq_core V_A V_E fst,
+   Portability.neutralDriftR2Ratio_mem_unit V_A V_E fst hV hE hf0 hf⟩
 
 /-! ### What correction cannot reach, and what the convention says the number is -/
 

@@ -30,7 +30,7 @@ the covariance be invertible, which is the usual identifiability condition.
 
 So under a strictly additive architecture, allele-frequency divergence is not
 merely a weak explanation of effect-size heterogeneity, as
-`Descent.PopGen.HumanDemography` shows for accuracy; it explains none of it. The
+`Descent.Portability.HumanDemography` shows for accuracy; it explains none of it. The
 optimal weights are a property of the causal map alone.
 
 ## The contrapositive, which is the useful direction

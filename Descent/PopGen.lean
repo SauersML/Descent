@@ -14,7 +14,6 @@ import Descent.PopGen.FrequencySpectrumStability
 import Descent.PopGen.GeneEnvironmentInterplay
 import Descent.PopGen.GeneticArchitectureDiscovery
 import Descent.PopGen.HaplotypeTheory
-import Descent.PopGen.HumanDemography
 import Descent.PopGen.LDDecayTheory
 import Descent.PopGen.PolygenicAdaptation
 import Descent.PopGen.PolygenicArchitecture

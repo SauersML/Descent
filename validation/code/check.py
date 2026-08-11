@@ -7921,16 +7921,6 @@ LAYER_PENDING = {
         "transport and are correctly placed. This edge inverts because a PopGen file "
         "states an architecture theorem in terms of them, so here the consumer moves "
         "UP rather than the definition moving down.",
-    ("Descent.PopGen.HumanDemography",
-     "Descent.Portability.PortabilityDrift.PresentDayMetrics"):
-        "`presentDayR2`, `presentDayR2_eq_core`, `presentDayPGSVariance` and "
-        "`pgsVarianceFromHet`: a polygenic score's variance and R-squared carried from a "
-        "source population to a present-day one. This IS transport and is correctly placed, "
-        "so NO extraction retires this edge and the repair is the consumer moving UP. An "
-        "earlier entry for this file named `coalescentTau`, which it uses ZERO times -- the "
-        "only matches are its own theorem names, like `fstFromGenerations_le_coalescentTau` "
-        "-- and concluded the drift extraction would take the whole edge. Splitting the head "
-        "import proved the file has two dependencies of different kinds and only one leaves.",
     ("Descent.PopGen.AncestrySpecificArchitecture",
      "Descent.Portability.PortabilityDrift.MutationDrift"):
         "`Portability.ibdFlowStep` and `ibdFlowStep_fixedPoint`: the identity-by-descent "

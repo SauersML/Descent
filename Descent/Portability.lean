@@ -12,6 +12,7 @@ import Descent.Portability.CorrectionWidths
 import Descent.Portability.EquityAndImplementation
 import Descent.Portability.GenerativePortabilityLaw
 import Descent.Portability.HorizonCurve
+import Descent.Portability.HumanDemography
 import Descent.Portability.ImputationPortability
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.MechanisticPortabilityWitnesses
