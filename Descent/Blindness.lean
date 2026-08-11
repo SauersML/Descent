@@ -24,6 +24,7 @@ import Descent.Blindness.CumulantBlindness
 import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Blindness.EffectSizeSurgery
 import Descent.Blindness.EpistaticChaos
+import Descent.Blindness.GaugeSymmetry
 import Descent.Blindness.HiddenConeAmbiguity
 import Descent.Blindness.ImitationRigidity
 import Descent.Blindness.JetBarrier

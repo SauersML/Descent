@@ -300,21 +300,21 @@ theorem identifiedBy_of_factors {Parameter Data Target : Type*}
 
 /-- **Identification is exactly the existence of a readout.** Converse to
 `identifiedBy_of_factors`: if the observation pins the target then the target *is* a
-function of the data, and the function is exhibited. The inhabitedness premise supplies a
-value off the range of the observation, where nothing is being claimed. -/
-theorem IdentifiedBy.exists_readout {Parameter Data Target : Type*} [Nonempty Target]
-    {observe : Parameter → Data} {target : Parameter → Target}
+function of the data, and the function is exhibited. The base parameter supplies the value
+the readout returns off the range of the observation, where nothing is being claimed. -/
+theorem IdentifiedBy.exists_readout {Parameter Data Target : Type*}
+    {observe : Parameter → Data} {target : Parameter → Target} (base : Parameter)
     (hidentified : IdentifiedBy observe target) :
     ∃ readout : Data → Target, ∀ parameter : Parameter,
       target parameter = readout (observe parameter) := by
   classical
   refine ⟨fun data ↦ if hdata : ∃ parameter : Parameter, observe parameter = data then
-    target hdata.choose else Classical.arbitrary Target, ?_⟩
+    target hdata.choose else target base, ?_⟩
   intro parameter
   have hdata : ∃ preimage : Parameter, observe preimage = observe parameter := ⟨parameter, rfl⟩
   show target parameter =
     if hexists : ∃ preimage : Parameter, observe preimage = observe parameter then
-      target hexists.choose else Classical.arbitrary Target
+      target hexists.choose else target base
   rw [dif_pos hdata]
   exact hidentified parameter hdata.choose hdata.choose_spec.symm
 
