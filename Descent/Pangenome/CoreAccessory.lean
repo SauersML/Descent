@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.Construction
+import Descent.Pangenome.Presentation
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -61,11 +62,14 @@ explicit two-position witness.
 
 - `core_antitone_in_sample`: **more genomes, no more core.**
 - `isCore_mono_in_construction`: **coarser build, no less core.**  Opposite signs.
+- `isCore_iff_of_iso`: core membership survives categorical presentation equivalence.
 - `core_not_sampling_consistent`: **the razor bites.**  An explicit node that is core to one
   sample and not to a larger one, so the predicate is not a function of the sequence.
 -/
 
 namespace Descent.Pangenome.Construction
+
+open CategoryTheory
 
 /-! ### Core membership -/
 
@@ -85,6 +89,14 @@ theorem isCore_congr {Pos Hap : Type*} (hap : Pos → Hap) (r : Setoid Pos) (S :
     {x y : Pos} (hxy : r x y) : IsCore hap r S x ↔ IsCore hap r S y := by
   unfold IsCore
   rw [support_congr hap r hxy]
+
+/-- **Core membership is representation-invariant.**  Isomorphic presentations have equal
+semantic kernels, so the existing construction-level predicate gives the same answer on
+both. -/
+theorem isCore_iff_of_iso {Pos Hap : Type*} (hap : Pos → Hap)
+    {P Q : Presentation Pos} (i : P ≅ Q) (S : Set Hap) (x : Pos) :
+    IsCore hap P.kernel S x ↔ IsCore hap Q.kernel S x := by
+  rw [Presentation.kernel_eq_of_iso i]
 
 /-- Every node is core to the empty sample, so `IsCore` is inhabited and the definition is
 not vacuous.  It is also the degenerate case that makes the antitonicity below sharp: the

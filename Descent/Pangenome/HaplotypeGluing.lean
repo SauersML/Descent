@@ -174,7 +174,7 @@ theorem gluingDefect_eq_empty_iff (P : TwoChartPanel Global Left Right Overlap) 
     rw [hEmpty] at hzDefect
     exact hzDefect
   · intro hGluing
-    apply Set.eq_empty_iff_forall_not_mem.mpr
+    apply Set.eq_empty_iff_forall_notMem.mpr
     rintro z ⟨hz, hMissing⟩
     exact hMissing (hGluing hz)
 
@@ -226,6 +226,7 @@ theorem pair_mem_mosaics_iff_matchingClosure (s : ι → ι) (h g : ι) :
       (h, g) ∈ (interfacePanel s).matchingClosure := by
   rw [pair_mem_mosaics_singleton_iff, mem_matchingClosure_interfacePanel]
 
+omit [Fintype ι] [DecidableEq ι] in
 @[simp]
 theorem mem_gluingDefect_interfacePanel (s : ι → ι) (h g : ι) :
     (h, g) ∈ (interfacePanel s).gluingDefect ↔ s h = s g ∧ h ≠ g := by
@@ -233,6 +234,7 @@ theorem mem_gluingDefect_interfacePanel (s : ι → ι) (h g : ι) :
     (h, g) ∉ (interfacePanel s).observedSections) ↔ _
   rw [mem_matchingClosure_interfacePanel, mem_observedSections_interfacePanel]
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- **An interface satisfies haplotype gluing exactly when it preserves donor identity.**
 Any noninjective merge creates the crossed pair of the merged donors as a locally compatible
 but globally absent section; an injective interface admits only diagonal matching families.

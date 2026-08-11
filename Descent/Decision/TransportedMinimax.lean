@@ -199,10 +199,16 @@ same `δ` range — flat at `0.500`. Three parameters (`ρ`, innovation variance
 Fisher metric, an efficient estimator has expected transported loss exactly `p/(2n)` for `p`
 parameters, because the metric and the variance are reciprocal *by construction* — `δ` and
 `ε` cancel because the factors of **any** parameterisation cancel. `efficientFloor_eq` below
-is that statement, and it is one line. The original `transportedFloor_eq` is the same algebra
-with two inputs that are **each wrong, reciprocally**, which is exactly why their product
-survived. It is kept because the identity is true and is the shape a reader will look for,
-but it should not be read as evidence for either factor.
+is that statement, and it is one line.
+
+**The two factors are now REPAIRED rather than retained.** `longMemoryMetric` is the measured
+information `1/(δ(2-δ))` and `longMemoryVariance` is its Cramér-Rao reciprocal `δ(2-δ)/n`, so
+`transportedFloor_eq` reads `1/(2n)` — the one-parameter floor measured at `0.500` — and it is
+now an instance of `efficientFloor_eq` rather than a coincidence. The superseded pair produced
+`3/(2n)` by the same algebra for the OPPOSITE reason, its two inputs being **each wrong,
+reciprocally**, which is precisely why a check on their product could not catch either. That
+`3` was a parameter count folded into a one-parameter variance; it now lives in
+`efficientFloor_dim`'s `p`, where the three-parameter measurement reads `1.500`.
 
 The honest residue: long memory has zero marginal sample cost *because loss is measured in
 the information metric*, and that is a statement about the choice of loss, not about memory.
@@ -217,55 +223,62 @@ parameter is not identified at all**, even though its absolute variance is the s
 the table. The prose describes relative precision and is correct; the formula is an absolute
 variance and is correct.
 
-Empirical status: **MIXED** -- the `p/(2n)` floor is VALIDATED and its
-stated mechanism is FALSIFIED**; the metric and the variance are each
-refuted individually. See
-`validation/empirical/longmemory/`.
+Empirical status: **MIXED** -- the `p/(2n)` floor is VALIDATED and the mechanism originally
+stated for it is FALSIFIED. The metric and the variance were each refuted individually and
+have each been REPLACED by the form the same runs measured: the information is `ε`-free and
+scales as `1/δ`, the variance is its reciprocal. See `validation/empirical/longmemory/`.
 The measurement bounds the Whittle estimator's risk, so the floor is an efficiency statement,
 not a minimax lower bound. -/
 
 section LongMemoryGeometry
 
-/-- The conformal metric coefficient as originally posited: `ε²/δ³`.
+/-- **The Fisher information for a memory rate**, `1/(δ·(2-δ))`, which is `≈ 1/(2δ)` at small
+    `δ`.
 
-    **Retained as a named object, not endorsed.** Both of its features are now refuted: the
-    information for a memory rate is `ε`-free for structural reasons and scales as `1/δ`
-    (Whittle, symbolic and Monte-Carlo agreeing), and the width law does **not** supply the
-    exponent `3` — that identification was a category error, withdrawn below. So the exponent
-    here is unsupported as well as contradicted. -/
-noncomputable def longMemoryMetric (ε δ : ℝ) : ℝ := ε ^ 2 / δ ^ 3
+    THE AMPLITUDE IS ABSENT FOR A STRUCTURAL REASON, not because it was measured small. In any
+    family `f = ε²·g(λ; δ)` the amplitude enters `log f` ADDITIVELY, so `∂(log f)/∂δ` is
+    `ε`-free and the information for `δ` cannot depend on `ε` at all. The measurement agrees
+    and could have disagreed: `Var(ε=2.5)/Var(ε=1)` is `0.963`–`1.015` across every cell where
+    the superseded `ε²/δ³` predicted `1/6.25 = 0.16`.
+
+    THE SUPERSEDED FORM WAS WRONG IN BOTH FEATURES and the module docstring above carries the
+    run: it scaled as `δ^{-3}` where the observed exponent converges to `1`, and it carried an
+    `ε` that cannot be there. The `3` came from a width law that was withdrawn as a category
+    error — see the note at the end of this section. -/
+noncomputable def longMemoryMetric (δ : ℝ) : ℝ := 1 / (δ * (2 - δ))
 
 /-- **longMemoryMetric where its denominator vanishes, named.** The guard `δ ^ 3` is zero at `δ =
 0`. Lean returns `0` there rather than the value the modelled quantity takes, and no type error
 marks the point. A zero bandwidth gives an infinite metric, and what is reported instead is `0`,
 the finest possible resolution, for a bandwidth that resolves nothing. Consumers must require
 `δ ≠ 0`. -/
-theorem longMemoryMetric_at_0_is_junk (ε : ℝ) :
-    longMemoryMetric ε 0 = 0 := by
+theorem longMemoryMetric_at_0_is_junk :
+    longMemoryMetric 0 = 0 := by
   unfold longMemoryMetric
   norm_num
 
-/-- The parameter variance as originally posited: `3δ³/(nε²)`.
+/-- **The Cramér-Rao variance of the memory rate at that information**, `δ·(2-δ)/n` — the
+    reciprocal of `n · longMemoryMetric δ`, which is what an efficient estimator attains.
 
-    **Retained as a named object, not endorsed.** The measured scaling is `δ^{+1}` with no
-    `ε` dependence. -/
-noncomputable def longMemoryVariance (ε δ n : ℝ) : ℝ := 3 * δ ^ 3 / (n * ε ^ 2)
+    The measured scaling is `δ^{+1}` with no `ε` dependence, which is this form at small `δ`.
+    The superseded `3δ³/(nε²)` was wrong in the exponent, wrong in carrying `ε`, and wrong in
+    its numerator: that `3` was a PARAMETER COUNT — `ρ`, the innovation variance and the mean —
+    that had been folded into a one-parameter variance, which is why the floor it produced read
+    `3/(2n)` where the one-parameter measurement reads `0.500 = 1/2` for `n·(1/2)·I·V`. The
+    count belongs in `efficientFloor_dim`'s `p` and nowhere else. -/
+noncomputable def longMemoryVariance (δ n : ℝ) : ℝ := δ * (2 - δ) / n
 
-/-- **longMemoryVariance where its denominator vanishes, named.** The guard `n * ε ^ 2` is zero at
-`ε = 0`, `n = 0`. Lean returns `0` there rather than the value the modelled quantity takes, and
-no type error marks the point. Consumers must require `n * ε ^ 2 ≠ 0`. -/
-theorem longMemoryVariance_at_0n0_is_junk (δ : ℝ) :
-    longMemoryVariance 0 δ 0 = 0 := by
+/-- **longMemoryVariance where its denominator vanishes, named.** The guard `n` is zero at no
+sample. Lean returns `0` there rather than the value the modelled quantity takes, and no type
+error marks the point: no data is reported as a perfectly estimated parameter. Consumers must
+require `n ≠ 0`.
+
+The companion junk point at `ε = 0` is gone with the amplitude itself — the information for a
+memory rate does not depend on the signal scale, so there is no zero-amplitude case to guard. -/
+theorem longMemoryVariance_at_n0_is_junk (δ : ℝ) :
+    longMemoryVariance δ 0 = 0 := by
   unfold longMemoryVariance
   norm_num
-
-/-- **longMemoryVariance at zero ε, named.** A zero signal scale makes the variance infinite:
-nothing can be estimated. Lean returns `0`, a perfectly estimated quantity. Consumers must
-require `ε ≠ 0`. -/
-theorem longMemoryVariance_zero_ε_is_junk (δ : ℝ) (n : ℝ) :
-    longMemoryVariance 0 δ n = 0 := by
-  unfold longMemoryVariance
-  simp
 
 /-- **The actual mechanism: an efficient estimator's transported loss is `p/(2n)`.**
 
@@ -287,38 +300,46 @@ theorem efficientFloor_dim (p g n : ℝ) (hg : g ≠ 0) (hn : n ≠ 0) :
   rw [efficientFloor_eq g n hg hn]
   ring
 
-/-- **The originally posited pair reproduces `3/(2n)`** — because its two factors are wrong
-    reciprocally, not because either is right. Kept for continuity with the upstream
-    statement; see `efficientFloor_eq` for the mechanism that actually holds. -/
-theorem transportedFloor_eq (ε δ n : ℝ) (hε : ε ≠ 0) (hδ : δ ≠ 0) (hn : n ≠ 0) :
-    (1 / 2) * longMemoryMetric ε δ * longMemoryVariance ε δ n = 3 / (2 * n) := by
+/-- **The repaired pair gives the ONE-parameter floor `1/(2n)`**, which is the measurement:
+    `n·(1/2)·I·V` is flat at `0.500` across `δ` from `0.5` to `0.005`. The superseded pair
+    reproduced `3/(2n)` instead, and the `3` was not a property of memory but a parameter count
+    folded into the variance — with three parameters the same measurement reads `1.500`, which
+    is `efficientFloor_dim` at `p = 3` and not a different floor.
+
+    This is now an instance of `efficientFloor_eq` rather than a coincidence: the factors
+    cancel because the variance IS the reciprocal of `n` times the information, which is what
+    an efficient estimator attains. Under the superseded pair the same algebra went through for
+    the opposite reason — two factors each wrong, reciprocally — which is exactly why their
+    product survived a check that should have caught them. -/
+theorem transportedFloor_eq (δ n : ℝ) (hδ : δ ≠ 0) (hδ' : δ ≠ 2) (hn : n ≠ 0) :
+    (1 / 2) * longMemoryMetric δ * longMemoryVariance δ n = 1 / (2 * n) := by
   unfold longMemoryMetric longMemoryVariance
+  have h2 : (2 : ℝ) - δ ≠ 0 := by intro h; apply hδ'; linarith
   field_simp
 
 /-- The floor does not depend on the memory parameter. True, and true for every `δ`-dependent
     pair whose product is constant — which is the point of `efficientFloor_eq`. -/
-theorem transportedFloor_indep_of_memory (ε δ₁ δ₂ n : ℝ)
-    (hε : ε ≠ 0) (hδ₁ : δ₁ ≠ 0) (hδ₂ : δ₂ ≠ 0) (hn : n ≠ 0) :
-    (1 / 2) * longMemoryMetric ε δ₁ * longMemoryVariance ε δ₁ n =
-      (1 / 2) * longMemoryMetric ε δ₂ * longMemoryVariance ε δ₂ n := by
-  rw [transportedFloor_eq ε δ₁ n hε hδ₁ hn, transportedFloor_eq ε δ₂ n hε hδ₂ hn]
+theorem transportedFloor_indep_of_memory (δ₁ δ₂ n : ℝ)
+    (hδ₁ : δ₁ ≠ 0) (hδ₁' : δ₁ ≠ 2) (hδ₂ : δ₂ ≠ 0) (hδ₂' : δ₂ ≠ 2) (hn : n ≠ 0) :
+    (1 / 2) * longMemoryMetric δ₁ * longMemoryVariance δ₁ n =
+      (1 / 2) * longMemoryMetric δ₂ * longMemoryVariance δ₂ n := by
+  rw [transportedFloor_eq δ₁ n hδ₁ hδ₁' hn, transportedFloor_eq δ₂ n hδ₂ hδ₂' hn]
 
-/-- **The stated formula is increasing in `δ`**, so the absolute variance shrinks as memory
-    lengthens. Confirmed by measurement (`7.45e-4 → 3.51e-5` as `δ` falls `0.5 → 0.005`);
-    what blows up over the same range is *relative* precision, by a factor of 300. -/
-theorem longMemoryVariance_strictMono (ε n : ℝ) (hε : ε ≠ 0) (hn : 0 < n)
-    (δ₁ δ₂ : ℝ) (h₁ : 0 < δ₁) (h₁₂ : δ₁ < δ₂) :
-    longMemoryVariance ε δ₁ n < longMemoryVariance ε δ₂ n := by
-  have hε2 : 0 < ε ^ 2 := by positivity
-  have hden : 0 < n * ε ^ 2 := mul_pos hn hε2
+/-- **The variance is increasing in `δ` on the admissible range**, so the absolute variance
+    shrinks as memory lengthens. Confirmed by measurement (`7.45e-4 → 3.51e-5` as `δ` falls
+    `0.5 → 0.005`); what blows up over the same range is *relative* precision, by a factor of
+    300.
+
+    THE UPPER BOUND `δ₂ ≤ 1` IS NEW WITH THE REPAIRED BODY and is not a convenience. `δ(2-δ)`
+    turns over at `δ = 1`, so the monotonicity is a statement about memory rates below one,
+    which is where a memory rate lives; the superseded `δ³` was monotone everywhere and that
+    was one of the ways it did not look like an information-metric variance. -/
+theorem longMemoryVariance_strictMono (n : ℝ) (hn : 0 < n)
+    (δ₁ δ₂ : ℝ) (h₁₂ : δ₁ < δ₂) (h₂ : δ₂ ≤ 1) :
+    longMemoryVariance δ₁ n < longMemoryVariance δ₂ n := by
   unfold longMemoryVariance
-  have hδ₂ : 0 < δ₂ := lt_trans h₁ h₁₂
-  have hquad : (0 : ℝ) < δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2 := by
-    nlinarith [mul_pos hδ₂ h₁, sq_nonneg δ₁, sq_nonneg δ₂]
-  have hfac : (0 : ℝ) < (δ₂ - δ₁) * (δ₂ ^ 2 + δ₂ * δ₁ + δ₁ ^ 2) :=
-    mul_pos (by linarith) hquad
-  apply div_lt_div_of_pos_right _ hden
-  nlinarith [hfac]
+  apply div_lt_div_of_pos_right _ hn
+  nlinarith [mul_pos (sub_pos.mpr h₁₂) (show (0 : ℝ) < 2 - (δ₁ + δ₂) by linarith)]
 
 /-! ### The width law, removed
 
@@ -331,9 +352,12 @@ band).
 
 None of that is a reason to carry it as an assumption. The structure and its theorems are
 **deleted**: an exponent verified by simulation elsewhere is not a theorem of this corpus, and
-writing it as a field made it look like one. The `δ^{-3}` in `longMemoryMetric` is therefore
-unsupported here, which is the honest state — and it is independently contradicted by the
-Whittle measurement recorded above. -/
+writing it as a field made it look like one.
+
+This is where the superseded `δ^{-3}` came from: the width law's `w^{-3}` was carried across
+to the memory rate, which was a category error twice over — the identification was never
+proved here, and the Whittle measurement recorded above contradicts the exponent directly.
+`longMemoryMetric` now carries `1/(δ(2-δ))`, which owes nothing to a width law. -/
 
 /-! ### Positivity buys an exponent
 

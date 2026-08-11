@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GaugeCounterexample
+import Descent.Pangenome.Presentation
 import Descent.Layer
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -48,6 +49,10 @@ derived.  What is proved is everything downstream of that.
 * `gaugeInvariant_of_treeFree` and its instances: any functional defined on
   walks alone is gauge-invariant, which is why sequence-level `π` and weighted
   holonomy survive.
+* `gaugeInvariant_iff_factorsThroughWalks`: the exact descent theorem behind that
+  construction; every gauge-invariant statistic factors through the walks.
+* `treePresentationIso`: reference-tree choices are isomorphic presentations of
+  the same edge identities.
 * `witness` section: the concrete triallelic example is an instance of this
   framework, its `S` values are reproduced, and its hidden edge is exhibited —
   showing the polymorphism hypothesis of `segregatingCount_gauge_invariant` is
@@ -70,6 +75,8 @@ namespace Descent.Pangenome
 -- section below refers to both sets of names.
 namespace Gauge
 
+open CategoryTheory
+
 universe u v
 
 /-- A haplotype walk, recorded by how many times it traverses each edge.
@@ -79,6 +86,32 @@ abbrev Walk (E : Type u) := E → Nat
 /-- A reference tree, as the characteristic function of its edge set.  The
 complementary edges are the variant edges. -/
 abbrev Tree (E : Type u) := E → Bool
+
+/-- A reference-tree choice as a presentation of edge identities.  The Boolean decoration
+records whether an edge lies in the tree, while the edge itself remains the first coordinate;
+restricting to the occupied range removes unused decorated coordinates. -/
+def treePresentation {E : Type u} (T : Tree E) : Presentation E :=
+  Presentation.ofMap fun e ↦ (e, T e)
+
+/-- A tree decoration never identifies distinct edges. -/
+@[simp]
+theorem kernel_treePresentation {E : Type u} (T : Tree E) :
+    (treePresentation T).kernel = ⊥ := by
+  apply Setoid.ext
+  intro x y
+  constructor
+  · intro h
+    have h' := (Presentation.kernel_rel_iff (treePresentation T) x y).mp h
+    exact congrArg Prod.fst (congrArg Subtype.val h')
+  · intro h
+    subst h
+    rfl
+
+/-- **Every choice of reference tree presents the same edge identities.**  Its effect on a
+VCF is therefore extra gauge decoration, not a change in the pangenome's semantic kernel. -/
+noncomputable def treePresentationIso {E : Type u} (T₁ T₂ : Tree E) :
+    treePresentation T₁ ≅ treePresentation T₂ :=
+  Presentation.isoOfKernelEq (by rw [kernel_treePresentation, kernel_treePresentation])
 
 /-- Number of list elements satisfying `p`.  Defined here rather than as
 `(l.filter p).length` so that every lemma below is an induction on this
@@ -272,6 +305,22 @@ theorem weighted_geno_sum_split (edges : List E) (T : Tree E) (ℓ : E → Nat)
 the reference tree. -/
 def GaugeInvariant {α : Type v} (F : Tree E → List (Walk E) → α) : Prop :=
   ∀ T₁ T₂ : Tree E, ∀ s : List (Walk E), F T₁ s = F T₂ s
+
+/-- A catalogue statistic factors through the biological walks when the reference-tree
+argument can be removed from its definition. -/
+def FactorsThroughWalks {α : Type v} (F : Tree E → List (Walk E) → α) : Prop :=
+  ∃ f : List (Walk E) → α, ∀ T s, F T s = f s
+
+/-- **Gauge invariance is exactly descent to walks.**  The reverse implication evaluates the
+statistic at the canonical all-variant tree and uses invariance to remove every other tree. -/
+theorem gaugeInvariant_iff_factorsThroughWalks {α : Type v}
+    (F : Tree E → List (Walk E) → α) :
+    GaugeInvariant F ↔ FactorsThroughWalks F := by
+  constructor
+  · intro hF
+    exact ⟨F (fun _ ↦ false), fun T s ↦ hF T (fun _ ↦ false) s⟩
+  · rintro ⟨f, hf⟩ T₁ T₂ s
+    rw [hf T₁ s, hf T₂ s]
 
 /-- **Any functional of the walks alone is gauge-invariant.**  Trivial to prove
 and the whole classification: an estimator survives a change of reference tree

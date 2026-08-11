@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Core.Genome
 import Descent.Pangenome.CoreAccessory
+import Descent.Pangenome.Presentation
 import Mathlib.Data.Fin.VecNotation
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
@@ -73,6 +74,8 @@ settled here.
 
 - `posAlign_equivalence`, `closure_posAlign`: **the bracket collapses.**  Positional
   homology is total, so the closure invents nothing and the construction is forced.
+- `closurePresentationIso`: categorically, the universal alignment presentation and the
+  concrete positional panel graph are the same object.
 - `posSetoid_collapseFree`: a coordinate build has no repeats.
 - `support_posSetoid`, `isCore_univ_iff`: support is allele-sharing; a node is core to the
   panel exactly when its allele is universal.
@@ -86,6 +89,8 @@ settled here.
 -/
 
 namespace Descent.Pangenome.PanelGraph
+
+open CategoryTheory
 
 /-! ### The positional construction -/
 
@@ -118,6 +123,22 @@ proof; nothing about a population is asserted. -/
 def posSetoid {m n : ℕ} (H : Fin m → Core.Haplotype n) : Setoid (Fin m × Core.Locus n) :=
   ⟨posAlign H, posAlign_equivalence H⟩
 
+/-- **The positional graph as an object of the presentation category.**  Its coordinate
+carrier is the quotient by locus-and-allele identity, and the quotient map embeds every
+observed panel position into that carrier.
+
+Empirical status: NOT AN EMPIRICAL CLAIM. -/
+def posPresentation {m n : ℕ} (H : Fin m → Core.Haplotype n) :
+    Presentation (Fin m × Core.Locus n) :=
+  Presentation.ofSetoid (posSetoid H)
+
+/-- The concrete positional presentation carries exactly `posSetoid` as its semantic
+kernel. -/
+@[simp]
+theorem kernel_posPresentation {m n : ℕ} (H : Fin m → Core.Haplotype n) :
+    (posPresentation H).kernel = posSetoid H :=
+  Presentation.kernel_ofSetoid _
+
 /-- The construction relates exactly what positional homology relates.  Definitional, and
 stated as the `Iff` so consumers rewrite rather than re-derive. -/
 theorem posSetoid_rel_iff {m n : ℕ} (H : Fin m → Core.Haplotype n)
@@ -136,6 +157,15 @@ theorem closure_posAlign {m n : ℕ} (H : Fin m → Core.Haplotype n) :
     Construction.closure (posAlign H) = posSetoid H := by
   refine le_antisymm ((Construction.honors_iff_closure_le _ _).mp fun _ _ h ↦ h) ?_
   exact Setoid.le_def.mpr fun h ↦ Relation.EqvGen.rel _ _ h
+
+/-- **The positional graph is the universal presentation of its alignments.**  The earlier
+setoid equality becomes an isomorphism in the presentation category, making precise that a
+different coordinate carrier with the same positional homology is not a different graph
+object. -/
+noncomputable def closurePresentationIso {m n : ℕ} (H : Fin m → Core.Haplotype n) :
+    Presentation.closurePresentation (posAlign H) ≅ posPresentation H := by
+  apply Presentation.isoOfKernelEq
+  simpa [Presentation.closurePresentation, posPresentation] using closure_posAlign H
 
 /-- **A positional build has no repeats.**  The construction never identifies two distinct
 positions of one haplotype, since they sit at distinct loci.  So the traversal

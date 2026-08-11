@@ -8,6 +8,7 @@ import Descent.Coalescent.Lumping
 -- stops this group being a second theory of the same object.
 import Descent.Coalescent.WrightFisher
 import Descent.Pangenome.Linkage.Interface
+import Descent.Pangenome.Presentation
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -35,6 +36,10 @@ downstream and each is one line of lattice algebra:
 
 ## The one identification
 
+`graphPresentation` is the bridge to the categorical pangenome construction: the interface
+map is restricted to its occupied states, making it a surjective presentation, and its
+presentation kernel is definitionally the merge the graph has already made.
+
 `blocks_graphKer` is the bridge between the two developments this group joins:
 `Coalescent.blocks (graphKer s) = Linkage.width s`.  The number of ancestral lineages the
 graph starts with is the number of OCCUPIED graph states at the interface -- the `w` of the
@@ -54,13 +59,27 @@ namespace Descent.Pangenome.GraphCoalescent
 
 /-! ### The merge the graph was built with -/
 
+/-- **The categorical presentation carried by an interface.**  Empty states of `Fin n` are
+removed by restricting to the range, so the result satisfies `Presentation`'s rule that every
+coordinate be supported by the panel.
+
+Empirical status: NOT AN EMPIRICAL CLAIM. -/
+def graphPresentation {n : ℕ} (s : Fin n → Fin n) : Presentation (Fin n) :=
+  Presentation.ofMap s
+
 /-- The identity a pangenome graph has already destroyed at interface `s`: two sampled
 haplotypes are one object to the graph exactly when they occupy the same graph state.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is `Setoid.ker` of the interface map, read as
 a coalescent state; whether a given graph merges a given pair is the empirical question and
 is not settled here. -/
-def graphKer {n : ℕ} (s : Fin n → Fin n) : Coalescent.ER n := Setoid.ker s
+def graphKer {n : ℕ} (s : Fin n → Fin n) : Coalescent.ER n :=
+  (graphPresentation s).kernel
+
+/-- The coalescent's graph relation is exactly the kernel of the categorical presentation,
+so the two developments have one object rather than parallel definitions. -/
+theorem graphKer_eq_presentationKernel {n : ℕ} (s : Fin n → Fin n) :
+    graphKer s = (graphPresentation s).kernel := rfl
 
 /-- **Graph identity is interface identity, in both directions at once.**
 
@@ -70,7 +89,9 @@ Stating that as an `Iff` is what makes it usable: the two one-way readings this 
 each handed back the premise they were given, so neither could be rewritten with, and a
 consumer had to know which of the two names moved in the direction it needed. -/
 theorem graphKer_rel_iff {n : ℕ} {s : Fin n → Fin n} {x y : Fin n} :
-    (graphKer s).r x y ↔ s x = s y := Iff.rfl
+    (graphKer s).r x y ↔ s x = s y := by
+  rw [graphKer_eq_presentationKernel, graphPresentation, Presentation.kernel_ofMap]
+  rfl
 
 /-- **The graph's merge and one generation of reproduction are the same object.**
 
@@ -93,7 +114,9 @@ What it does NOT say is that a graph's interface arises from descent.  It is one
 compared with another, and which merges a real graph performs is the empirical question
 `Descent.Pangenome.Linkage.Interface` states and this file assumes. -/
 theorem graphKer_eq_ancestralPartition {n : ℕ} (s : Fin n → Fin n) :
-    graphKer s = Coalescent.ancestralPartition s := rfl
+    graphKer s = Coalescent.ancestralPartition s := by
+  rw [graphKer_eq_presentationKernel, graphPresentation, Presentation.kernel_ofMap]
+  rfl
 
 /-- **A faithful interface has destroyed nothing.**  If no two panel haplotypes share a
 graph state then `graphKer s` sits below every coalescent state, so joining with it changes
@@ -101,7 +124,7 @@ nothing. -/
 theorem graphKer_le_of_injective {n : ℕ} {s : Fin n → Fin n} (hs : Function.Injective s)
     (ξ : Coalescent.ER n) : graphKer s ≤ ξ := by
   intro x y hxy
-  have hxy' : s x = s y := hxy
+  have hxy' : s x = s y := graphKer_rel_iff.mp hxy
   have hxy'' : x = y := hs hxy'
   subst hxy''
   exact ξ.iseqv.refl x
@@ -190,8 +213,9 @@ that indexes Kingman's rate ladder `d_k = k(k-1)/2`.  A graph that merges its pa
 `w` states hands the coalescent a sample of `w`, whatever `n` the study wrote down. -/
 theorem blocks_graphKer {n : ℕ} (s : Fin n → Fin n) :
     Coalescent.blocks (graphKer s) = Linkage.width s := by
-  have h1 : Coalescent.blocks (graphKer s) = Nat.card (Set.range s) :=
-    Nat.card_congr (Setoid.quotientKerEquivRange s)
+  have h1 : Coalescent.blocks (graphKer s) = Nat.card (Set.range s) := by
+    rw [graphKer_eq_presentationKernel, graphPresentation, Presentation.kernel_ofMap]
+    exact Nat.card_congr (Setoid.quotientKerEquivRange s)
   have h2 : Nat.card (Set.range s) = Fintype.card (Set.range s) := Nat.card_eq_fintype_card
   have h3 : Fintype.card (Set.range s) = (Finset.univ.image s).card := by
     rw [← Set.toFinset_card, Set.toFinset_range]

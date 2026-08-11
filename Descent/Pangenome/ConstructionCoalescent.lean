@@ -125,4 +125,28 @@ theorem graphWatterson_antitone {n : ℕ} (θ : Descent.Core.Theta) {s t : Fin n
     exact mul_le_mul_of_nonneg_right hmono (inv_nonneg.mpr hden)
   exact mul_le_mul_of_nonneg_left key hθ
 
+/-! ### The categorical form
+
+The two sign laws above were stated against a raw inequality of kernels because that is the
+order-theoretic calculation they use.  An analysis, however, changes one graph presentation
+into another.  The following corollaries expose exactly that interface: a morphism in the
+presentation category is the evidence that the target construction is coarser, and no caller
+has to unpack it back into an equivalence-relation inequality.
+-/
+
+/-- **A categorical coarsening can only increase the coalescent transit deficit.** -/
+theorem transitDeficit_mono_of_presentationHom {n : ℕ} {s t : Fin n → Fin n}
+    (h : Presentation.Hom (graphPresentation s) (graphPresentation t))
+    (hn : 1 ≤ n) (hwt : 1 ≤ Linkage.width t) :
+    transitDeficit s ≤ transitDeficit t :=
+  transitDeficit_mono (Presentation.kernel_le_of_hom h) hn hwt
+
+/-- **A categorical coarsening can only decrease graph-based Watterson estimation.** -/
+theorem graphWatterson_antitone_of_presentationHom {n : ℕ} (θ : Descent.Core.Theta)
+    {s t : Fin n → Fin n}
+    (h : Presentation.Hom (graphPresentation s) (graphPresentation t))
+    (hθ : 0 ≤ θ.value) :
+    graphWatterson θ t ≤ graphWatterson θ s :=
+  graphWatterson_antitone θ (Presentation.kernel_le_of_hom h) hθ
+
 end Descent.Pangenome.GraphCoalescent

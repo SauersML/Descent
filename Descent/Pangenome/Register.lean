@@ -7,6 +7,7 @@ import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic
 import Descent.Core.Ratios
 import Descent.Layer
+import Descent.Pangenome.Presentation
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -60,9 +61,13 @@ empirical questions and are not settled here.
   a statistic and its orbit average have the same expectation, so what a symmetry-variant
   statistic estimates is its orbit average.
 - `shiftInvariant_sum`, `first_copy_not_shiftInvariant`: the repeat array, both ways.
+- `registerPresentationIso`: every cyclic choice of first copy is one categorical
+  presentation object up to isomorphism.
 -/
 
 namespace Descent.Pangenome.Register
+
+open CategoryTheory
 
 /-! ### Averaging over a finite orbit -/
 
@@ -169,6 +174,42 @@ a starting point; `shift k` is the relabelling that starts counting `k` copies l
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  It is a reindexing of a function on `ZMod n`. -/
 def shift {n : ℕ} (k : ZMod n) (a : ZMod n → ℝ) : ZMod n → ℝ := fun i ↦ a (i + k)
+
+/-- **A cyclic register as a pangenome presentation.**  Position `i` receives coordinate
+`i + k`, so changing `k` changes only which copy is called first.  Addition by `k` is
+surjective, hence no coordinate is dead.
+
+Empirical status: NOT AN EMPIRICAL CLAIM. -/
+def registerPresentation {n : ℕ} (k : ZMod n) : Presentation (ZMod n) where
+  Coord := ZMod n
+  encode i := i + k
+  onto := (Equiv.addRight k).surjective
+
+/-- A cyclic register identifies no distinct copies, independently of where counting starts. -/
+@[simp]
+theorem kernel_registerPresentation {n : ℕ} (k : ZMod n) :
+    (registerPresentation k).kernel = ⊥ := by
+  apply Setoid.ext
+  intro x y
+  constructor
+  · intro h
+    exact add_right_cancel ((Presentation.kernel_rel_iff (registerPresentation k) x y).mp h)
+  · intro h
+    exact (Presentation.kernel_rel_iff (registerPresentation k) x y).mpr
+      (congrArg (fun z ↦ z + k) h)
+
+/-- **Every choice of first repeat copy is the same presentation.**  The existing group
+action and the categorical notion of presentation equivalence therefore agree on the cyclic
+register example. -/
+noncomputable def registerPresentationIso {n : ℕ} (k l : ZMod n) :
+    registerPresentation k ≅ registerPresentation l :=
+  Presentation.isoOfKernelEq (by rw [kernel_registerPresentation, kernel_registerPresentation])
+
+/-- Every representation-invariant pangenome statistic ignores the choice of first copy. -/
+theorem invariant_registerPresentation {n : ℕ} {Value : Type*}
+    (F : Presentation (ZMod n) → Value) (hF : Presentation.IsInvariant F)
+    (k l : ZMod n) : F (registerPresentation k) = F (registerPresentation l) :=
+  hF _ _ ⟨registerPresentationIso k l⟩
 
 /-- **A summary of a repeat array is register-invariant** when no change of register moves
 it.  Only such summaries are functions of the array; the rest are functions of the labelling.

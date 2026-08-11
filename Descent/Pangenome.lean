@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.CoalescentGauge
+import Descent.Pangenome.Chart
 import Descent.Pangenome.Construction
 import Descent.Pangenome.ConstructionCoalescent
 import Descent.Pangenome.CoreAccessory
@@ -20,6 +21,8 @@ import Descent.Pangenome.GraphSpectrum
 import Descent.Pangenome.GraphTransitVariance
 import Descent.Pangenome.GromovWeak
 import Descent.Pangenome.Growth
+import Descent.Pangenome.HaplotypeGluing
+import Descent.Pangenome.HomologyGroupoid
 import Descent.Pangenome.Linkage
 import Descent.Pangenome.Linkage.Barrier
 import Descent.Pangenome.Linkage.Chain
@@ -30,8 +33,10 @@ import Descent.Pangenome.Linkage.Pinned
 import Descent.Pangenome.Linkage.Splicing
 import Descent.Pangenome.Linkage.Tree
 import Descent.Pangenome.PanelGraph
+import Descent.Pangenome.Presentation
 import Descent.Pangenome.Register
 import Descent.Pangenome.Strand
+import Descent.Pangenome.Symmetry
 
 /-!
 # `Descent.Pangenome` -- the layer head
@@ -55,24 +60,38 @@ that states a theorem is a module pretending to be a table of contents.
 
 ## What is under it
 
-Three groups, all about what a representation of a haplotype panel loses.  The `Gauge`
-modules ask which statistics of a variant catalogue survive a change of reference tree.  The
-`Linkage` modules ask what a graph is forced to admit once it has merged haplotype identity
-at a separator; `Descent/Pangenome/Linkage.lean` is that group's own table of contents.  The
-`GraphCoalescent` modules ask what ancestral process is left once it has, and answer that it
-is Kingman's at the graph's width rather than the panel's size;
-`Descent/Pangenome/GraphCoalescent.lean` is that group's table of contents.
+The organising spine is one pipeline.  `Chart` puts genomic anchors and mass on the canonical
+`PartialSymmetry.FinitePartialBijection` maps, then quotients representatives through the shared
+`PartialSymmetry.GroupoidPresentation` engine to obtain an exact Mathlib groupoid.
+`HomologyGroupoid` propositionally truncates that SAME groupoid to `Presentation`; it defines no
+second groupoid.  For a fixed panel, presentation objects are surjective coordinate maps and
+arrows are commuting coarsenings.  Isomorphism is exactly equality of the induced homology
+relation, while invariant statistics are exactly those factoring through it.  The coarse layer
+is used only for representation-invariant statistics; symmetry stays on the exact
+witness groupoid where its isotropy remains available.
 
-The third group is where the first two meet the coalescent.  `Gauge` and `Linkage` both
-measure a loss in the vocabulary of the representation -- hidden edges, nats of conditional
-entropy.  `GraphCoalescent` measures the same loss in the vocabulary of the process, as a
-lineage count, a transit time and a bias in `θ`, and `transitDeficit_eq_zero_iff` is the
-theorem that says the two vocabularies are describing one thing.
+`Construction` supplies the universal coarse object: equivalence closure is the initial
+presentation coequalising the reported alignments.  A `PangenomeObject` is then the quotient of
+storage graphs by semantic equivalence, so node splitting and merging do not change the object.
+`PanelGraph` instantiates it at `Core.Genome`'s phased haplotypes, where the bracket collapses,
+support becomes allele-sharing, and `pan = reference + S` is exact.
 
-The fourth pair is where the chapter meets the corpus's data objects and its growth law.
-`PanelGraph` instantiates the abstract construction at `Core.Genome`'s phased haplotypes --
-the bracket collapses, support becomes allele-sharing, and `pan = reference + S` is exact --
-and `Growth` takes that identity in expectation, where the pangenome growth curve becomes
-`θ` times a harmonic sum, its increments become Watterson's estimator, and openness becomes
-the neutral null rather than a finding.
+The remaining modules are structures and observables on that spine.  `Register` and `Strand`
+place cyclic copy labels and reverse-complement holonomy inside presentation equivalence.
+`Gauge` asks which catalogue statistics descend after a reference-tree decoration is
+forgotten.  `CoreAccessory` and `Growth` study kernel-defined counts.  `HaplotypeGluing`
+proves that compatible local sections are the least crossover-closed extension of the
+observed panel, identifies its one-interface defect exactly with `Linkage.phantoms`, and
+recovers classical binary `D` as the normalized probabilistic gluing residual.  `Linkage`
+asks what a presentation is forced to admit after merging haplotype identity at a separator,
+and
+`GraphCoalescent` reads the same presentation kernel as a floor on ancestral resolution.
+Its categorical coarsening arrows therefore control linkage loss, transit deficit and bias
+in `θ` through one refinement order rather than through parallel notions of graph change.
+
+`Symmetry` introduces no parallel symmetry structure: global chart symmetries are the shared
+`PartialSymmetry.FiniteGroupoid.Bisection`, and the existing bisection theorem identifies them
+with the existing `PartialSymmetry.Wreath` whenever the chart groupoid is connected.  Thus local
+isotropy, exchange of equivalent charts, and finite partial correspondences all live in the same
+exact groupoid before coarse truncation.
 -/
