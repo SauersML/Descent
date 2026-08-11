@@ -1,0 +1,908 @@
+{
+ "_battery_sha": "ef719fc9fbb86ab4",
+ "results": [
+  {
+   "name": "tagSampleMonomorphicProb",
+   "file": "Coalescent/Duality.lean",
+   "source": "sum_k P(N_tau = k | n) * (p^k + (1-p)^k), swept over n",
+   "note": "twenty-four cells over four sample sizes and two ascertainments; the n-sweep both tests the n-dependence and extends the validated regime to n = 20, 50 and 100, which had no verdict before",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
+   "span": 0.940144571061607,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "asc t=250 n=100",
+    "lean": 0.05661978447645568,
+    "truth": 0.0425,
+    "sem": 0.011555732828589387,
+    "sems_off": 1.221885680977559,
+    "rel_err": 0.33223022297542765
+   },
+   "cells": [
+    {
+     "design": "asc t=250 n=20",
+     "lean": 0.13202588143096194,
+     "truth": 0.1175,
+     "sem": 0.01692594517769536,
+     "sems_off": 0.8582020843423173,
+     "rel_err": 0.12362452281669746
+    },
+    {
+     "design": "asc t=250 n=50",
+     "lean": 0.07545923627164973,
+     "truth": 0.06,
+     "sem": 0.01320654571916414,
+     "sems_off": 1.1705737897243405,
+     "rel_err": 0.25765393786082885
+    },
+    {
+     "design": "asc t=250 n=100",
+     "lean": 0.05661978447645568,
+     "truth": 0.0425,
+     "sem": 0.011555732828589387,
+     "sems_off": 1.221885680977559,
+     "rel_err": 0.33223022297542765
+    },
+    {
+     "design": "asc t=250 n=200",
+     "lean": 0.04739431273272212,
+     "truth": 0.04,
+     "sem": 0.010624040174683434,
+     "sems_off": 0.6959981900616682,
+     "rel_err": 0.18485781831805298
+    },
+    {
+     "design": "asc t=750 n=20",
+     "lean": 0.271792380004666,
+     "truth": 0.265,
+     "sem": 0.02224417239279005,
+     "sems_off": 0.3053554829878757,
+     "rel_err": 0.025631622659116893
+    },
+    {
+     "design": "asc t=750 n=50",
+     "lean": 0.2246376229181603,
+     "truth": 0.2325,
+     "sem": 0.020867172861209465,
+     "sems_off": 0.3767820937763584,
+     "rel_err": 0.03381667562081594
+    },
+    {
+     "design": "asc t=750 n=100",
+     "lean": 0.20815049617553888,
+     "truth": 0.215,
+     "sem": 0.020299252887570507,
+     "sems_off": 0.33742639999598983,
+     "rel_err": 0.03185815732307497
+    },
+    {
+     "design": "asc t=750 n=200",
+     "lean": 0.19975473900655166,
+     "truth": 0.2025,
+     "sem": 0.01999079683573019,
+     "sems_off": 0.13732624147035788,
+     "rel_err": 0.01355684441209062
+    },
+    {
+     "design": "asc t=2000 n=20",
+     "lean": 0.5232748957868176,
+     "truth": 0.5375,
+     "sem": 0.024972899272316818,
+     "sems_off": 0.5696216549814578,
+     "rel_err": 0.026465310164060184
+    },
+    {
+     "design": "asc t=2000 n=50",
+     "lean": 0.49357490059346615,
+     "truth": 0.505,
+     "sem": 0.024997935819664,
+     "sems_off": 0.45704171292201606,
+     "rel_err": 0.02262395922085912
+    },
+    {
+     "design": "asc t=2000 n=100",
+     "lean": 0.48326742388260824,
+     "truth": 0.5,
+     "sem": 0.024985997123212617,
+     "sems_off": 0.6696781415157844,
+     "rel_err": 0.033465152234783524
+    },
+    {
+     "design": "asc t=2000 n=200",
+     "lean": 0.4780333319757808,
+     "truth": 0.495,
+     "sem": 0.024975861621569423,
+     "sems_off": 0.6793226308383533,
+     "rel_err": 0.03427609701862465
+    },
+    {
+     "design": "unasc t=250 n=20",
+     "lean": 0.5564613430028298,
+     "truth": 0.535,
+     "sem": 0.024840094441563463,
+     "sems_off": 0.8639799278266737,
+     "rel_err": 0.04011465981837338
+    },
+    {
+     "design": "unasc t=250 n=50",
+     "lean": 0.49296909105649106,
+     "truth": 0.4825,
+     "sem": 0.024997528193774887,
+     "sems_off": 0.41880505045687616,
+     "rel_err": 0.02169759804454109
+    },
+    {
+     "design": "unasc t=250 n=100",
+     "lean": 0.4652313074617737,
+     "truth": 0.45,
+     "sem": 0.024939483656402264,
+     "sems_off": 0.6107306659439857,
+     "rel_err": 0.03384734991505267
+    },
+    {
+     "design": "unasc t=250 n=200",
+     "lean": 0.44943120776313256,
+     "truth": 0.4375,
+     "sem": 0.02487181121529474,
+     "sems_off": 0.479708038142214,
+     "rel_err": 0.027271332030017272
+    },
+    {
+     "design": "unasc t=750 n=20",
+     "lean": 0.6617973942482455,
+     "truth": 0.655,
+     "sem": 0.02365489395529379,
+     "sems_off": 0.28735678380516394,
+     "rel_err": 0.010377701142359445
+    },
+    {
+     "design": "unasc t=750 n=50",
+     "lean": 0.6307692600332695,
+     "truth": 0.64,
+     "sem": 0.02412982597483616,
+     "sems_off": 0.3825448213491806,
+     "rel_err": 0.014423031198016432
+    },
+    {
+     "design": "unasc t=750 n=100",
+     "lean": 0.6190411932222795,
+     "truth": 0.63,
+     "sem": 0.02428112406357127,
+     "sems_off": 0.4513302905182191,
+     "rel_err": 0.01739493139320721
+    },
+    {
+     "design": "unasc t=750 n=200",
+     "lean": 0.6128599160170018,
+     "truth": 0.6225,
+     "sem": 0.024354806474114886,
+     "sems_off": 0.3958185417422229,
+     "rel_err": 0.015486078687547315
+    },
+    {
+     "design": "unasc t=2000 n=20",
+     "lean": 0.7918130998861159,
+     "truth": 0.7725,
+     "sem": 0.020300561244387783,
+     "sems_off": 0.9513579281683745,
+     "rel_err": 0.02500077655160642
+    },
+    {
+     "design": "unasc t=2000 n=50",
+     "lean": 0.7781482342681479,
+     "truth": 0.7675,
+     "sem": 0.02077459745539679,
+     "sems_off": 0.5125603175228699,
+     "rel_err": 0.013873920870551119
+    },
+    {
+     "design": "unasc t=2000 n=100",
+     "lean": 0.7733467963723032,
+     "truth": 0.76,
+     "sem": 0.020933318472771977,
+     "sems_off": 0.6375862665856536,
+     "rel_err": 0.017561574174083133
+    },
+    {
+     "design": "unasc t=2000 n=200",
+     "lean": 0.7708954806814569,
+     "truth": 0.7575,
+     "sem": 0.0210128317074569,
+     "sems_off": 0.6374905042761658,
+     "rel_err": 0.017683802879811097
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [POPULATION FIXATION used where sample monomorphism belongs, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "the realised fraction of sites FIXED IN THE POPULATION, which a sample-free quantity like stillSegregatingProb reports",
+   "note": "the confusion actually present in the corpus rather than a straw man. Recorded ONLY on the cells whose predicted gap clears 2 sems -- seven of twenty-four -- because the other seventeen cannot speak to the distinction at any site count; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
+   "span": 0.9166666666666667,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "asc t=250 n=20",
+    "lean": 0.035,
+    "truth": 0.1175,
+    "sem": 0.01692594517769536,
+    "sems_off": 4.874173887123106,
+    "rel_err": 0.702127659574468
+   },
+   "cells": [
+    {
+     "design": "asc t=250 n=20",
+     "lean": 0.035,
+     "truth": 0.1175,
+     "sem": 0.01692594517769536,
+     "sems_off": 4.874173887123106,
+     "rel_err": 0.702127659574468
+    },
+    {
+     "design": "asc t=250 n=50",
+     "lean": 0.035,
+     "truth": 0.06,
+     "sem": 0.01320654571916414,
+     "sems_off": 1.8930006779685218,
+     "rel_err": 0.4166666666666666
+    },
+    {
+     "design": "asc t=750 n=20",
+     "lean": 0.19,
+     "truth": 0.265,
+     "sem": 0.02224417239279005,
+     "sems_off": 3.3716696074657997,
+     "rel_err": 0.28301886792452835
+    },
+    {
+     "design": "unasc t=250 n=20",
+     "lean": 0.42,
+     "truth": 0.535,
+     "sem": 0.024840094441563463,
+     "sems_off": 4.629612027866421,
+     "rel_err": 0.21495327102803746
+    },
+    {
+     "design": "unasc t=250 n=50",
+     "lean": 0.42,
+     "truth": 0.4825,
+     "sem": 0.024997528193774887,
+     "sems_off": 2.500247205064232,
+     "rel_err": 0.1295336787564767
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [beta closure matching the first two moments, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "Balding-Nichols E[X^n] + E[(1-X)^n]",
+   "note": "no atoms at 0 and 1, where the monomorphic probability lives. Its separation from the law is n-DEPENDENT: indistinguishable at n = 20 and refuted at n = 200, which is the sweep working rather than an inconsistency; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
+   "span": 0.9745039753544912,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "asc t=2000 n=200",
+    "lean": 0.287050204317904,
+    "truth": 0.495,
+    "sem": 0.024975861621569423,
+    "sems_off": 8.326030902673976,
+    "rel_err": 0.42010059733756766
+   },
+   "cells": [
+    {
+     "design": "asc t=250 n=20",
+     "lean": 0.12262581872271575,
+     "truth": 0.1175,
+     "sem": 0.01692594517769536,
+     "sems_off": 0.3028379608289435,
+     "rel_err": 0.04362398912949577
+    },
+    {
+     "design": "asc t=250 n=50",
+     "lean": 0.0575683202572118,
+     "truth": 0.06,
+     "sem": 0.01320654571916414,
+     "sems_off": 0.1841268560680152,
+     "rel_err": 0.04052799571313664
+    },
+    {
+     "design": "asc t=250 n=100",
+     "lean": 0.033021677838779954,
+     "truth": 0.0425,
+     "sem": 0.011555732828589387,
+     "sems_off": 0.820226834750823,
+     "rel_err": 0.2230193449698835
+    },
+    {
+     "design": "asc t=250 n=200",
+     "lean": 0.01933037560264607,
+     "truth": 0.04,
+     "sem": 0.010624040174683434,
+     "sems_off": 1.9455521682427963,
+     "rel_err": 0.5167406099338483
+    },
+    {
+     "design": "asc t=750 n=20",
+     "lean": 0.23469284290470094,
+     "truth": 0.265,
+     "sem": 0.02224417239279005,
+     "sems_off": 1.3624762728921513,
+     "rel_err": 0.11436663054829839
+    },
+    {
+     "design": "asc t=750 n=50",
+     "lean": 0.15783236529118097,
+     "truth": 0.2325,
+     "sem": 0.020867172861209465,
+     "sems_off": 3.5782343494944957,
+     "rel_err": 0.32115111702717863
+    },
+    {
+     "design": "asc t=750 n=100",
+     "lean": 0.12029623945489014,
+     "truth": 0.215,
+     "sem": 0.020299252887570507,
+     "sems_off": 4.665381581757533,
+     "rel_err": 0.44048260718655746
+    },
+    {
+     "design": "asc t=750 n=200",
+     "lean": 0.09362998742447987,
+     "truth": 0.2025,
+     "sem": 0.01999079683573019,
+     "sems_off": 5.4460066534683245,
+     "rel_err": 0.5376296917309636
+    },
+    {
+     "design": "asc t=2000 n=20",
+     "lean": 0.4559326904514907,
+     "truth": 0.5375,
+     "sem": 0.024972899272316818,
+     "sems_off": 3.266233073663537,
+     "rel_err": 0.1517531340437382
+    },
+    {
+     "design": "asc t=2000 n=50",
+     "lean": 0.37391337708256417,
+     "truth": 0.505,
+     "sem": 0.024997935819664,
+     "sems_off": 5.243897890733836,
+     "rel_err": 0.25957747112363533
+    },
+    {
+     "design": "asc t=2000 n=100",
+     "lean": 0.3260388006268355,
+     "truth": 0.5,
+     "sem": 0.024985997123212617,
+     "sems_off": 6.962347690801189,
+     "rel_err": 0.347922398746329
+    },
+    {
+     "design": "asc t=2000 n=200",
+     "lean": 0.287050204317904,
+     "truth": 0.495,
+     "sem": 0.024975861621569423,
+     "sems_off": 8.326030902673976,
+     "rel_err": 0.42010059733756766
+    },
+    {
+     "design": "unasc t=250 n=20",
+     "lean": 0.5467830641906886,
+     "truth": 0.535,
+     "sem": 0.024840094441563463,
+     "sems_off": 0.47435665828116275,
+     "rel_err": 0.022024419048015942
+    },
+    {
+     "design": "unasc t=250 n=50",
+     "lean": 0.46592013022039497,
+     "truth": 0.4825,
+     "sem": 0.024997528193774887,
+     "sems_off": 0.6632603692285819,
+     "rel_err": 0.034362424413689155
+    },
+    {
+     "design": "unasc t=250 n=100",
+     "lean": 0.41906397511608673,
+     "truth": 0.45,
+     "sem": 0.024939483656402264,
+     "sems_off": 1.240443679994619,
+     "rel_err": 0.06874672196425173
+    },
+    {
+     "design": "unasc t=250 n=200",
+     "lean": 0.38143489379079254,
+     "truth": 0.4375,
+     "sem": 0.02487181121529474,
+     "sems_off": 2.254162582849239,
+     "rel_err": 0.1281488141924742
+    },
+    {
+     "design": "unasc t=750 n=20",
+     "lean": 0.6359732832404017,
+     "truth": 0.655,
+     "sem": 0.02365489395529379,
+     "sems_off": 0.804345891195183,
+     "rel_err": 0.029048422533737905
+    },
+    {
+     "design": "unasc t=750 n=50",
+     "lean": 0.5773871656793798,
+     "truth": 0.64,
+     "sem": 0.02412982597483616,
+     "sems_off": 2.594831574248243,
+     "rel_err": 0.09783255362596915
+    },
+    {
+     "design": "unasc t=750 n=100",
+     "lean": 0.5425086133486533,
+     "truth": 0.63,
+     "sem": 0.02428112406357127,
+     "sems_off": 3.603267559701207,
+     "rel_err": 0.13887521690689952
+    },
+    {
+     "design": "unasc t=750 n=200",
+     "lean": 0.5135167014905042,
+     "truth": 0.6225,
+     "sem": 0.024354806474114886,
+     "sems_off": 4.474816854953333,
+     "rel_err": 0.17507357190280454
+    },
+    {
+     "design": "unasc t=2000 n=20",
+     "lean": 0.7581721413989605,
+     "truth": 0.7725,
+     "sem": 0.020300561244387783,
+     "sems_off": 0.7057863291834108,
+     "rel_err": 0.01854738977480837
+    },
+    {
+     "design": "unasc t=2000 n=50",
+     "lean": 0.7163593951780274,
+     "truth": 0.7675,
+     "sem": 0.02077459745539679,
+     "sems_off": 2.4616893266775364,
+     "rel_err": 0.06663270986576232
+    },
+    {
+     "design": "unasc t=2000 n=100",
+     "lean": 0.6900729709871356,
+     "truth": 0.76,
+     "sem": 0.020933318472771977,
+     "sems_off": 3.3404655407989265,
+     "rel_err": 0.09200924870113737
+    },
+    {
+     "design": "unasc t=2000 n=200",
+     "lean": 0.6672314558734969,
+     "truth": 0.7575,
+     "sem": 0.0210128317074569,
+     "sems_off": 4.295877175586438,
+     "rel_err": 0.11916639488647274
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [tau/2 convention, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "the same law with tau = t/(4 Ne)",
+   "note": "one wrong constant, reading Tavare's N as the diploid size; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
+   "span": 0.9810655403710762,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "asc t=2000 n=200",
+    "lean": 0.2666530900824216,
+    "truth": 0.495,
+    "sem": 0.024975861621569423,
+    "sems_off": 9.142703998663075,
+    "rel_err": 0.46130688872238057
+   },
+   "cells": [
+    {
+     "design": "asc t=250 n=20",
+     "lean": 0.09289580059699577,
+     "truth": 0.1175,
+     "sem": 0.01692594517769536,
+     "sems_off": 1.4536381362871893,
+     "rel_err": 0.2093974417276955
+    },
+    {
+     "design": "asc t=250 n=50",
+     "lean": 0.03692007606805211,
+     "truth": 0.06,
+     "sem": 0.01320654571916414,
+     "sems_off": 1.747612466025571,
+     "rel_err": 0.38466539886579815
+    },
+    {
+     "design": "asc t=250 n=100",
+     "lean": 0.020383116034597828,
+     "truth": 0.0425,
+     "sem": 0.011555732828589387,
+     "sems_off": 1.9139317508868015,
+     "rel_err": 0.5203972697741688
+    },
+    {
+     "design": "asc t=250 n=200",
+     "lean": 0.013197101393595591,
+     "truth": 0.04,
+     "sem": 0.010624040174683434,
+     "sems_off": 2.522853656961351,
+     "rel_err": 0.6700724651601103
+    },
+    {
+     "design": "asc t=750 n=20",
+     "lean": 0.1696367790401333,
+     "truth": 0.265,
+     "sem": 0.02224417239279005,
+     "sems_off": 4.287110317072375,
+     "rel_err": 0.3598612111693083
+    },
+    {
+     "design": "asc t=750 n=50",
+     "lean": 0.11490506476707757,
+     "truth": 0.2325,
+     "sem": 0.020867172861209465,
+     "sems_off": 5.635403320567817,
+     "rel_err": 0.5057846676684836
+    },
+    {
+     "design": "asc t=750 n=100",
+     "lean": 0.09603765484530538,
+     "truth": 0.215,
+     "sem": 0.020299252887570507,
+     "sems_off": 5.860429731753172,
+     "rel_err": 0.5533132332776494
+    },
+    {
+     "design": "asc t=750 n=200",
+     "lean": 0.08654373579911728,
+     "truth": 0.2025,
+     "sem": 0.01999079683573019,
+     "sems_off": 5.8004823496395295,
+     "rel_err": 0.5726235269179394
+    },
+    {
+     "design": "asc t=2000 n=20",
+     "lean": 0.3318032987174754,
+     "truth": 0.5375,
+     "sem": 0.024972899272316818,
+     "sems_off": 8.23679697897734,
+     "rel_err": 0.3826915372698132
+    },
+    {
+     "design": "asc t=2000 n=50",
+     "lean": 0.2891261949574012,
+     "truth": 0.505,
+     "sem": 0.024997935819664,
+     "sems_off": 8.63566522451774,
+     "rel_err": 0.42747288127247285
+    },
+    {
+     "design": "asc t=2000 n=100",
+     "lean": 0.2742331940540443,
+     "truth": 0.5,
+     "sem": 0.024985997123212617,
+     "sems_off": 9.035733288234981,
+     "rel_err": 0.45153361189191143
+    },
+    {
+     "design": "asc t=2000 n=200",
+     "lean": 0.2666530900824216,
+     "truth": 0.495,
+     "sem": 0.024975861621569423,
+     "sems_off": 9.142703998663075,
+     "rel_err": 0.46130688872238057
+    },
+    {
+     "design": "unasc t=250 n=20",
+     "lean": 0.5154543255377679,
+     "truth": 0.535,
+     "sem": 0.024840094441563463,
+     "sems_off": 0.7868599094183586,
+     "rel_err": 0.03653397095744317
+    },
+    {
+     "design": "unasc t=250 n=50",
+     "lean": 0.42897962851906046,
+     "truth": 0.4825,
+     "sem": 0.024997528193774887,
+     "sems_off": 2.1410265473474954,
+     "rel_err": 0.11092304970142906
+    },
+    {
+     "design": "unasc t=250 n=100",
+     "lean": 0.3861740499895201,
+     "truth": 0.45,
+     "sem": 0.024939483656402264,
+     "sems_off": 2.559233017404313,
+     "rel_err": 0.14183544446773313
+    },
+    {
+     "design": "unasc t=250 n=200",
+     "lean": 0.35961346370305103,
+     "truth": 0.4375,
+     "sem": 0.02487181121529474,
+     "sems_off": 3.131518473775372,
+     "rel_err": 0.1780263686787405
+    },
+    {
+     "design": "unasc t=750 n=20",
+     "lean": 0.5895177445943032,
+     "truth": 0.655,
+     "sem": 0.02365489395529379,
+     "sems_off": 2.768232887852047,
+     "rel_err": 0.09997290901633107
+    },
+    {
+     "design": "unasc t=750 n=50",
+     "lean": 0.5391753627816359,
+     "truth": 0.64,
+     "sem": 0.02412982597483616,
+     "sems_off": 4.178423720233593,
+     "rel_err": 0.1575384956536939
+    },
+    {
+     "design": "unasc t=750 n=100",
+     "lean": 0.5185260090307462,
+     "truth": 0.63,
+     "sem": 0.02428112406357127,
+     "sems_off": 4.590973246436195,
+     "rel_err": 0.17694284280833938
+    },
+    {
+     "design": "unasc t=750 n=200",
+     "lean": 0.5071851382676117,
+     "truth": 0.6225,
+     "sem": 0.024354806474114886,
+     "sems_off": 4.734788669125698,
+     "rel_err": 0.1852447578030335
+    },
+    {
+     "design": "unasc t=2000 n=20",
+     "lean": 0.6969885411166454,
+     "truth": 0.7725,
+     "sem": 0.020300561244387783,
+     "sems_off": 3.7196734599754055,
+     "rel_err": 0.09774946133767577
+    },
+    {
+     "design": "unasc t=2000 n=50",
+     "lean": 0.6723276603508365,
+     "truth": 0.7675,
+     "sem": 0.02077459745539679,
+     "sems_off": 4.5811881483383345,
+     "rel_err": 0.1240030484028189
+    },
+    {
+     "design": "unasc t=2000 n=100",
+     "lean": 0.6632482579337841,
+     "truth": 0.76,
+     "sem": 0.020933318472771977,
+     "sems_off": 4.62190178743333,
+     "rel_err": 0.1273049237713368
+    },
+    {
+     "design": "unasc t=2000 n=200",
+     "lean": 0.6585187277880713,
+     "truth": 0.7575,
+     "sem": 0.0210128317074569,
+     "sems_off": 4.710515631113288,
+     "rel_err": 0.13066834615436126
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [no drift, the tau = 0 reading, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "p0^n + (1-p0)^n",
+   "note": "trivially refuted on the ascertained arm, where the MAF floor makes it near zero, and sharply refuted on the unascertained one; carried rather than dropped because hiding the trivial half would flatter the comparison; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
+   "span": 0.999997619434191,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "unasc t=2000 n=200",
+    "lean": 0.13400005924197841,
+    "truth": 0.7575,
+    "sem": 0.0210128317074569,
+    "sems_off": 29.672342568505783,
+    "rel_err": 0.8231022320237908
+   },
+   "cells": [
+    {
+     "design": "asc t=250 n=20",
+     "lean": 0.05337282275036768,
+     "truth": 0.1175,
+     "sem": 0.01692594517769536,
+     "sems_off": 3.7886910643039133,
+     "rel_err": 0.5457632106351687
+    },
+    {
+     "design": "asc t=250 n=50",
+     "lean": 0.006219745539535646,
+     "truth": 0.06,
+     "sem": 0.01320654571916414,
+     "sems_off": 4.072242326199146,
+     "rel_err": 0.8963375743410726
+    },
+    {
+     "design": "asc t=250 n=100",
+     "lean": 0.00030564754850901933,
+     "truth": 0.0425,
+     "sem": 0.011555732828589387,
+     "sems_off": 3.6513783312037393,
+     "rel_err": 0.9928082929762583
+    },
+    {
+     "design": "asc t=250 n=200",
+     "lean": 1.0982845629703021e-06,
+     "truth": 0.04,
+     "sem": 0.010624040174683434,
+     "sems_off": 3.7649426261350603,
+     "rel_err": 0.9999725428859257
+    },
+    {
+     "design": "asc t=750 n=20",
+     "lean": 0.05337282275036768,
+     "truth": 0.265,
+     "sem": 0.02224417239279005,
+     "sems_off": 9.513825621951508,
+     "rel_err": 0.7985931216967258
+    },
+    {
+     "design": "asc t=750 n=50",
+     "lean": 0.006219745539535646,
+     "truth": 0.2325,
+     "sem": 0.020867172861209465,
+     "sems_off": 10.843838595936619,
+     "rel_err": 0.9732484062815672
+    },
+    {
+     "design": "asc t=750 n=100",
+     "lean": 0.00030564754850901933,
+     "truth": 0.215,
+     "sem": 0.020299252887570507,
+     "sems_off": 10.576465727118022,
+     "rel_err": 0.9985783834953069
+    },
+    {
+     "design": "asc t=750 n=200",
+     "lean": 1.0982845629703021e-06,
+     "truth": 0.2025,
+     "sem": 0.01999079683573019,
+     "sems_off": 10.129606307313587,
+     "rel_err": 0.9999945763725285
+    },
+    {
+     "design": "asc t=2000 n=20",
+     "lean": 0.05337282275036768,
+     "truth": 0.5375,
+     "sem": 0.024972899272316818,
+     "sems_off": 19.386102189035828,
+     "rel_err": 0.900701725115595
+    },
+    {
+     "design": "asc t=2000 n=50",
+     "lean": 0.006219745539535646,
+     "truth": 0.505,
+     "sem": 0.024997935819664,
+     "sems_off": 19.95285763027327,
+     "rel_err": 0.9876836721989394
+    },
+    {
+     "design": "asc t=2000 n=100",
+     "lean": 0.00030564754850901933,
+     "truth": 0.5,
+     "sem": 0.024985997123212617,
+     "sems_off": 19.998975825834158,
+     "rel_err": 0.9993887049029819
+    },
+    {
+     "design": "asc t=2000 n=200",
+     "lean": 1.0982845629703021e-06,
+     "truth": 0.495,
+     "sem": 0.024975861621569423,
+     "sems_off": 19.819092098426374,
+     "rel_err": 0.9999977812433072
+    },
+    {
+     "design": "unasc t=250 n=20",
+     "lean": 0.46135442205123406,
+     "truth": 0.535,
+     "sem": 0.024840094441563463,
+     "sems_off": 2.964786551919834,
+     "rel_err": 0.13765528588554388
+    },
+    {
+     "design": "unasc t=250 n=50",
+     "lean": 0.322162040365545,
+     "truth": 0.4825,
+     "sem": 0.024997528193774887,
+     "sems_off": 6.414152567067963,
+     "rel_err": 0.33230665209213467
+    },
+    {
+     "design": "unasc t=250 n=100",
+     "lean": 0.22280696306148498,
+     "truth": 0.45,
+     "sem": 0.024939483656402264,
+     "sems_off": 9.109773083862217,
+     "rel_err": 0.5048734154189223
+    },
+    {
+     "design": "unasc t=250 n=200",
+     "lean": 0.13400005924197841,
+     "truth": 0.4375,
+     "sem": 0.02487181121529474,
+     "sems_off": 12.202566919267483,
+     "rel_err": 0.6937141503040493
+    },
+    {
+     "design": "unasc t=750 n=20",
+     "lean": 0.46135442205123406,
+     "truth": 0.655,
+     "sem": 0.02365489395529379,
+     "sems_off": 8.186279689722706,
+     "rel_err": 0.29564210373857397
+    },
+    {
+     "design": "unasc t=750 n=50",
+     "lean": 0.322162040365545,
+     "truth": 0.64,
+     "sem": 0.02412982597483616,
+     "sems_off": 13.171995519814896,
+     "rel_err": 0.4966218119288359
+    },
+    {
+     "design": "unasc t=750 n=100",
+     "lean": 0.22280696306148498,
+     "truth": 0.63,
+     "sem": 0.02428112406357127,
+     "sems_off": 16.76994178162545,
+     "rel_err": 0.6463381538706588
+    },
+    {
+     "design": "unasc t=750 n=200",
+     "lean": 0.13400005924197841,
+     "truth": 0.6225,
+     "sem": 0.024354806474114886,
+     "sems_off": 20.057640009466546,
+     "rel_err": 0.7847388606554563
+    },
+    {
+     "design": "unasc t=2000 n=20",
+     "lean": 0.46135442205123406,
+     "truth": 0.7725,
+     "sem": 0.020300561244387783,
+     "sems_off": 15.326944620054977,
+     "rel_err": 0.4027774471828685
+    },
+    {
+     "design": "unasc t=2000 n=50",
+     "lean": 0.322162040365545,
+     "truth": 0.7675,
+     "sem": 0.02077459745539679,
+     "sems_off": 21.4366589095456,
+     "rel_err": 0.5802448985465212
+    },
+    {
+     "design": "unasc t=2000 n=100",
+     "lean": 0.22280696306148498,
+     "truth": 0.76,
+     "sem": 0.020933318472771977,
+     "sems_off": 25.662105969354236,
+     "rel_err": 0.7068329433401513
+    },
+    {
+     "design": "unasc t=2000 n=200",
+     "lean": 0.13400005924197841,
+     "truth": 0.7575,
+     "sem": 0.0210128317074569,
+     "sems_off": 29.672342568505783,
+     "rel_err": 0.8231022320237908
+    }
+   ]
+  }
+ ]
+}
