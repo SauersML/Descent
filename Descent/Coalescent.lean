@@ -73,6 +73,7 @@ import Descent.Coalescent.StateSpace
 import Descent.Coalescent.StepLaw
 import Descent.Coalescent.Structured
 import Descent.Coalescent.StructuredPresentDay
+import Descent.Coalescent.TwoDemeLDClosedForm
 import Descent.Coalescent.TajimaVariance
 import Descent.Coalescent.ThreeSeries
 import Descent.Coalescent.Trajectory
