@@ -1,10 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import PartialSymmetry.BisectionGroup
+import PartialSymmetry.BisectionWreath
 import PartialSymmetry.FiniteGroupoidBisection
 import PartialSymmetry.FiniteGroupoidCounting
 import PartialSymmetry.FiniteGroupoidFunctor
 import PartialSymmetry.FiniteGroupoidPresentation
+import PartialSymmetry.Wreath
 
 /-!
 # `PartialSymmetry` -- the partial-symmetry library
