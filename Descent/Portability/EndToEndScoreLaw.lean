@@ -28,6 +28,17 @@ which is exactly what the existing metric and calibration layers consume.
 
 /-! ## B1. The P+T selection law -/
 
+/-- A real quantity known to be strictly positive. -/
+structure PositiveScale where
+  value : ℝ
+  value_pos : 0 < value
+
+/-- A probability strictly inside the unit interval. -/
+structure InteriorProbability where
+  value : ℝ
+  value_pos : 0 < value
+  value_lt_one : value < 1
+
 /-- Parameters of a P+T construction.  They are supplied by a study instance, never selected
 inside the law. -/
 structure PTParameters where
@@ -37,6 +48,19 @@ structure PTParameters where
   clumpR2Cutoff_nonneg : 0 ≤ clumpR2Cutoff
   clumpR2Cutoff_lt_one : clumpR2Cutoff < 1
   discoverySampleSize_pos : 0 < discoverySampleSize
+
+/-- The fixed part of a P+T analysis.  LD geometry and the threshold family do not change
+with a realised GWAS draw. -/
+structure PTProtocol (thresholdCount m : ℕ) where
+  parameters : PTParameters
+  positionBp : Fin m → ℕ
+  sourceR2 : Fin m → Fin m → ℝ
+  sourceR2_nonnegative : ∀ i j, 0 ≤ sourceR2 i j
+  sourceR2_le_one : ∀ i j, sourceR2 i j ≤ 1
+  sourceR2_symmetric : sourceR2.IsSymm
+  pThreshold : Fin thresholdCount → ℝ
+  pThreshold_nonnegative : ∀ q, 0 ≤ pThreshold q
+  pThreshold_le_one : ∀ q, pThreshold q ≤ 1
 
 /-- Two markers conflict when they lie inside the supplied clumping window and their source
 LD reaches the supplied exclusion cutoff.  Equality is excluded, matching retention by a
@@ -62,11 +86,10 @@ def greedyClump {α : Type*} (conflict : α → α → Bool) (ordered : List α)
 /-- A complete P+T design with an arbitrary finite threshold family.  `orderedMarkers` is the
 deterministic order used by the clumper; `coversMarkers` prevents silently dropping a marker. -/
 structure PTDesign (thresholdCount m : ℕ) where
-  parameters : PTParameters
-  positionBp : Fin m → ℕ
-  sourceR2 : Fin m → Fin m → ℝ
+  protocol : PTProtocol thresholdCount m
   pValue : Fin m → ℝ
-  pThreshold : Fin thresholdCount → ℝ
+  pValue_nonnegative : ∀ i, 0 ≤ pValue i
+  pValue_le_one : ∀ i, pValue i ≤ 1
   orderedMarkers : List (Fin m)
   orderedMarkers_nodup : orderedMarkers.Nodup
   orderedMarkers_by_significance :
@@ -76,12 +99,13 @@ structure PTDesign (thresholdCount m : ℕ) where
 /-- Ordered threshold-eligible markers. -/
 def PTDesign.eligible {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
     (q : Fin thresholdCount) : List (Fin m) :=
-  d.orderedMarkers.filter fun i ↦ decide (d.pValue i ≤ d.pThreshold q)
+  d.orderedMarkers.filter fun i ↦ decide (d.pValue i ≤ d.protocol.pThreshold q)
 
 /-- The exact retained marker list at threshold `q`. -/
 def PTDesign.selected {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
     (q : Fin thresholdCount) : List (Fin m) :=
-  greedyClump (ptConflict d.parameters d.positionBp d.sourceR2) (d.eligible q)
+  greedyClump
+    (ptConflict d.protocol.parameters d.protocol.positionBp d.protocol.sourceR2) (d.eligible q)
 
 /-- A threshold winner is the index whose analytically predicted objective dominates all
 other candidates.  Ties are allowed and must be resolved by the caller's declared
@@ -132,16 +156,29 @@ noncomputable def PTDesign.marginalSelectedEffectMass {thresholdCount m : ℕ}
 
 /-! ## B2. GWAS estimation noise and its composition with selection -/
 
-/-- The one-locus OLS variance at a supplied discovery sample size.  The genotype variance is
-diploid HWE `2p(1-p)`. -/
-noncomputable def gwasEffectNoiseVariance
-    (discoverySampleSize : ℕ) (residualVariance p : ℝ) : ℝ :=
-  residualVariance / (discoverySampleSize * (2 * p * (1 - p)))
+/-- Inputs to the one-locus OLS noise law.  Every denominator constraint is carried by the
+type. -/
+structure GWASNoiseMarginal where
+  discoverySampleSize : ℕ
+  discoverySampleSize_pos : 0 < discoverySampleSize
+  residualVariance : PositiveScale
+  alleleFrequency : InteriorProbability
 
-/-- GWAS noise evaluated at the discovery sample size carried by a P+T design. -/
-noncomputable def PTDesign.effectNoiseVariance {thresholdCount m : ℕ}
-    (d : PTDesign thresholdCount m) (residualVariance p : ℝ) : ℝ :=
-  gwasEffectNoiseVariance d.parameters.discoverySampleSize residualVariance p
+/-- The one-locus OLS variance.  The genotype variance is diploid HWE `2p(1-p)`. -/
+noncomputable def GWASNoiseMarginal.variance (noise : GWASNoiseMarginal) : ℝ :=
+  noise.residualVariance.value /
+    (noise.discoverySampleSize *
+      (2 * noise.alleleFrequency.value * (1 - noise.alleleFrequency.value)))
+
+/-- GWAS noise evaluated at the discovery sample size fixed by a P+T protocol. -/
+noncomputable def PTProtocol.effectNoiseVariance {thresholdCount m : ℕ}
+    (protocol : PTProtocol thresholdCount m) (residualVariance : PositiveScale)
+    (alleleFrequency : InteriorProbability) : ℝ :=
+  GWASNoiseMarginal.variance
+    { discoverySampleSize := protocol.parameters.discoverySampleSize
+      discoverySampleSize_pos := protocol.parameters.discoverySampleSize_pos
+      residualVariance := residualVariance
+      alleleFrequency := alleleFrequency }
 
 /-- An exact finite representation of the sampling law of the GWAS output.  Continuous
 Gaussian sampling may be approximated by quadrature, but no independence between linked
@@ -151,6 +188,7 @@ structure PTGWASSamplingLaw (omega m : ℕ) where
   probability : Fin omega → ℝ
   probability_nonneg : ∀ w, 0 ≤ probability w
   probability_sum_one : ∑ w, probability w = 1
+  trueEffect : Fin m → ℝ
   estimatedEffect : Fin omega → Fin m → ℝ
   pValue : Fin omega → Fin m → ℝ
 
@@ -158,6 +196,19 @@ structure PTGWASSamplingLaw (omega m : ℕ) where
 noncomputable def PTGWASSamplingLaw.expectation {omega m : ℕ}
     (law : PTGWASSamplingLaw omega m) (f : Fin omega → ℝ) : ℝ :=
   ∑ w, law.probability w * f w
+
+/-- A joint GWAS sampling law certified to have the declared OLS marginal moments.  Linkage
+and cross-marker estimation dependence remain arbitrary in the joint atoms. -/
+structure PTGWASNoiseModel {omega thresholdCount m : ℕ}
+    (protocol : PTProtocol thresholdCount m) (law : PTGWASSamplingLaw omega m) where
+  residualVariance : PositiveScale
+  alleleFrequency : Fin m → InteriorProbability
+  estimationErrorMeanZero : ∀ marker,
+    law.expectation (fun draw ↦ law.estimatedEffect draw marker - law.trueEffect marker) = 0
+  estimationErrorVariance : ∀ marker,
+    law.expectation (fun draw ↦
+      (law.estimatedEffect draw marker - law.trueEffect marker) ^ 2) =
+      protocol.effectNoiseVariance residualVariance (alleleFrequency marker)
 
 /-- Selection and estimation noise composed in the correct order: select with the realised
 joint GWAS output, construct the selected score, and only then average over GWAS samples. -/
@@ -238,6 +289,12 @@ structure DemeScoreLaw where
   prevalence_pos : 0 < prevalence
   prevalence_lt_one : prevalence < 1
 
+/-- The prevalence carried by a deme score law, with its domain evidence. -/
+def DemeScoreLaw.prevalenceProbability (law : DemeScoreLaw) : InteriorProbability where
+  value := law.prevalence
+  value_pos := law.prevalence_pos
+  value_lt_one := law.prevalence_lt_one
+
 /-- The exact A+B-to-C constructor. -/
 noncomputable def AdmissibleScoreWeights.toDemeScoreLaw {markerCount : ℕ}
     {primitive : DemeGeneticMomentPrimitive markerCount}
@@ -267,8 +324,12 @@ structure DistanceResolvedScoreLaw (D : ℕ) where
 Each realised GWAS atom performs its own clumping and threshold comparison; selection never
 uses mean p-values or a mean retained set. -/
 structure PTGWASDistanceLaw (omega thresholdCount markerCount D : ℕ) where
+  protocol : PTProtocol thresholdCount markerCount
   sampling : PTGWASSamplingLaw omega markerCount
+  noiseModel : PTGWASNoiseModel protocol sampling
   designAt : Fin omega → PTDesign thresholdCount markerCount
+  design_protocol_eq : ∀ draw, (designAt draw).protocol = protocol
+  design_pValue_eq : ∀ draw, (designAt draw).pValue = sampling.pValue draw
   scoreLawAt : Fin omega → Fin thresholdCount → DistanceResolvedScoreLaw D
   validationDeme : Fin D
   winnerAt : ∀ draw,
@@ -301,8 +362,12 @@ noncomputable def PTGWASDistanceLaw.expectedMarginalMetric
 
 /-- Concrete composition of realised GWAS weights with per-deme genetic moment primitives. -/
 structure PTGWASMomentComposition (omega thresholdCount markerCount D : ℕ) where
+  protocol : PTProtocol thresholdCount markerCount
   sampling : PTGWASSamplingLaw omega markerCount
+  noiseModel : PTGWASNoiseModel protocol sampling
   designAt : Fin omega → PTDesign thresholdCount markerCount
+  design_protocol_eq : ∀ draw, (designAt draw).protocol = protocol
+  design_pValue_eq : ∀ draw, (designAt draw).pValue = sampling.pValue draw
   primitiveAt : Fin omega → Fin D → DemeGeneticMomentPrimitive markerCount
   train : Fin D
   validationDeme : Fin D
@@ -329,8 +394,12 @@ noncomputable def PTGWASMomentComposition.toDistanceLaw
     {omega thresholdCount markerCount D : ℕ}
     (composition : PTGWASMomentComposition omega thresholdCount markerCount D) :
     PTGWASDistanceLaw omega thresholdCount markerCount D where
+  protocol := composition.protocol
   sampling := composition.sampling
+  noiseModel := composition.noiseModel
   designAt := composition.designAt
+  design_protocol_eq := composition.design_protocol_eq
+  design_pValue_eq := composition.design_pValue_eq
   scoreLawAt := composition.distanceLawAt
   validationDeme := composition.validationDeme
   winnerAt := composition.winnerAt
@@ -434,18 +503,19 @@ theorem DemeScoreLaw.topDecileRMSE_eq_residualRMSE (law : DemeScoreLaw)
 /-- Mean liability-model risk in the score tail `z >= q`, divided by prevalence.  This is
 the exact Gaussian integral chart for the top-decile risk ratio. -/
 noncomputable def topTailRiskRatio
-    (r2 prevalence : ℝ) (tail : GaussianUpperTail) : ℝ :=
+    (r2 : ℝ) (prevalence : InteriorProbability) (tail : GaussianUpperTail) : ℝ :=
   ((∫ z in Set.Ici tail.boundary,
-      liabilityRiskAtScore r2 prevalence z * standardNormalDensity z) / tail.mass) /
-    prevalence
+      liabilityRiskAtScore r2 prevalence.value z * standardNormalDensity z) / tail.mass) /
+    prevalence.value
 
 /-- C3: top-decile risk ratio at the law's own `R^2` and prevalence. -/
 noncomputable def DemeScoreLaw.topDecileRiskRatio (law : DemeScoreLaw)
-    (tail : GaussianTopDecile) : ℝ :=
-  topTailRiskRatio law.r2True law.prevalence tail.toGaussianUpperTail
+    (_ : law.ResidualVariation) (tail : GaussianTopDecile) : ℝ :=
+  topTailRiskRatio law.r2True law.prevalenceProbability tail.toGaussianUpperTail
 
 /-- C3: OR per SD, using the already validated liability chart. -/
-noncomputable def DemeScoreLaw.orPerSD (law : DemeScoreLaw) : ℝ :=
+noncomputable def DemeScoreLaw.orPerSD
+    (law : DemeScoreLaw) (_ : law.ResidualVariation) : ℝ :=
   orPerSDFromLiability law.r2True law.prevalence
 
 /-- C3: exact liability Brier chart. -/
@@ -464,18 +534,6 @@ noncomputable def DemeScoreLaw.brierSkill
 
 /-! ## D. Calibration and the phenotype ladder -/
 
-/-- A probability strictly inside the unit interval. -/
-structure InteriorProbability where
-  value : ℝ
-  value_pos : 0 < value
-  value_lt_one : value < 1
-
-/-- The prevalence already carried by a deme score law, with its domain evidence. -/
-def DemeScoreLaw.prevalenceProbability (law : DemeScoreLaw) : InteriorProbability where
-  value := law.prevalence
-  value_pos := law.prevalence_pos
-  value_lt_one := law.prevalence_lt_one
-
 /-- D1--D2: identity-scale per-deme calibration from the score mean, observed outcome mean,
 and the same variance/covariance pair used by `r2True`. -/
 noncomputable def DemeScoreLaw.identityCalibration (law : DemeScoreLaw)
@@ -484,29 +542,24 @@ noncomputable def DemeScoreLaw.identityCalibration (law : DemeScoreLaw)
     (predictedReferenceMean + law.scoreMean) law.calibrationSlope
 
 /-- Drifted prevalence generated by a liability mean shift.  The threshold is pinned by the
-source prevalence and the residual scale is explicit. -/
+source prevalence; a zero residual scale cannot be supplied. -/
 noncomputable def emergentPrevalenceFromLiabilityMean
-    (sourcePrevalence liabilityMean residualSD : ℝ) : ℝ :=
-  Foundations.Phi
-    (liabilityMean / residualSD - liabilityThreshold sourcePrevalence)
-
-/-- The emergent prevalence is always an interior probability. -/
-noncomputable def emergentPrevalenceProbability
-    (sourcePrevalence : InteriorProbability) (liabilityMean residualSD : ℝ) :
-    InteriorProbability where
-  value := emergentPrevalenceFromLiabilityMean sourcePrevalence.value liabilityMean residualSD
+    (sourcePrevalence : InteriorProbability) (liabilityMean : ℝ)
+    (residualSD : PositiveScale) : InteriorProbability where
+  value := Foundations.Phi
+    (liabilityMean / residualSD.value - liabilityThreshold sourcePrevalence.value)
   value_pos := Foundations.Phi_pos _
   value_lt_one := Foundations.Phi_lt_one _
 
 /-- With no liability-mean shift, the emergent prevalence is exactly the source prevalence
 at every positive residual scale. -/
 theorem emergentPrevalenceFromLiabilityMean_zero
-    (sourcePrevalence residualSD : ℝ) (hK0 : 0 < sourcePrevalence)
-    (hK1 : sourcePrevalence < 1) (_ : 0 < residualSD) :
-    emergentPrevalenceFromLiabilityMean sourcePrevalence 0 residualSD = sourcePrevalence := by
+    (sourcePrevalence : InteriorProbability) (residualSD : PositiveScale) :
+    (emergentPrevalenceFromLiabilityMean sourcePrevalence 0 residualSD).value =
+      sourcePrevalence.value := by
   unfold emergentPrevalenceFromLiabilityMean
   have h := liabilityRiskAtScore_at_zero_r2_eq_prevalence
-    sourcePrevalence 0 hK0 hK1
+    sourcePrevalence.value 0 sourcePrevalence.value_pos sourcePrevalence.value_lt_one
   unfold liabilityRiskAtScore at h
   norm_num at h ⊢
   exact h
@@ -523,11 +576,8 @@ deriving DecidableEq, Repr
 `affineBaseline` and `randomBaseline` are used only on their named rungs; phenoB uses the
 genetic-liability mean generated upstream. -/
 structure PhenotypeLadderInput where
-  sourcePrevalence : ℝ
-  sourcePrevalence_pos : 0 < sourcePrevalence
-  sourcePrevalence_lt_one : sourcePrevalence < 1
-  residualSD : ℝ
-  residualSD_pos : 0 < residualSD
+  sourcePrevalence : InteriorProbability
+  residualSD : PositiveScale
   affineBaseline : ℝ
   randomBaseline : ℝ
   geneticLiabilityMean : ℝ
@@ -549,14 +599,11 @@ def ScoreLiabilityScale.identity : ScoreLiabilityScale where
 /-- Build the phenotype ladder from the demographic score law.  This is the A1-to-phenoB
 edge: the emergent rung receives the genetic-liability mean and no target prevalence. -/
 noncomputable def PhenotypeLadderInput.ofScoreLaw
-    (sourcePrevalence : InteriorProbability) (residualSD : ℝ) (residualSD_pos : 0 < residualSD)
+    (sourcePrevalence : InteriorProbability) (residualSD : PositiveScale)
     (affineBaseline randomBaseline : ℝ) (scale : ScoreLiabilityScale)
     (law : DemeScoreLaw) : PhenotypeLadderInput where
-  sourcePrevalence := sourcePrevalence.value
-  sourcePrevalence_pos := sourcePrevalence.value_pos
-  sourcePrevalence_lt_one := sourcePrevalence.value_lt_one
+  sourcePrevalence := sourcePrevalence
   residualSD := residualSD
-  residualSD_pos := residualSD_pos
   affineBaseline := affineBaseline
   randomBaseline := randomBaseline
   geneticLiabilityMean := scale.mean law.scoreMean
@@ -567,16 +614,12 @@ told a target prevalence. -/
 noncomputable def phenotypePrevalence (input : PhenotypeLadderInput)
     (rung : PhenotypeRung) : InteriorProbability :=
   match rung with
-  | .phenoC => ⟨input.sourcePrevalence, input.sourcePrevalence_pos,
-      input.sourcePrevalence_lt_one⟩
-  | .phenoA => emergentPrevalenceProbability
-      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
+  | .phenoC => input.sourcePrevalence
+  | .phenoA => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
       input.affineBaseline input.residualSD
-  | .phenoR => emergentPrevalenceProbability
-      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
+  | .phenoR => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
       input.randomBaseline input.residualSD
-  | .phenoB => emergentPrevalenceProbability
-      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
+  | .phenoB => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
       input.geneticLiabilityMean input.residualSD
 
 /-- Replace only the prevalence axis of a score law by a phenotype rung.  Score moments stay
@@ -606,10 +649,8 @@ noncomputable def phenotypeCalibrationProfile (law : DemeScoreLaw)
 
 /-- The clean rung has no intercept shift when predicted at its source prevalence. -/
 theorem phenotypeCITL_phenoC_zero (input : PhenotypeLadderInput) :
-    phenotypeCITL input
-      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
-      PhenotypeRung.phenoC = 0 := by
-  exact no_citl_shift_same_prevalence input.sourcePrevalence
+    phenotypeCITL input input.sourcePrevalence PhenotypeRung.phenoC = 0 := by
+  exact no_citl_shift_same_prevalence input.sourcePrevalence.value
 
 /-- D2 is shared by all rungs: changing a baseline changes the intercept/prevalence but not
 the variance-attenuation slope supplied by the score law. -/

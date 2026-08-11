@@ -233,11 +233,12 @@ noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Add one constant coordinate to turn `x' = A x + b` into a homogeneous system. -/
 abbrev AffineMomentCoordinate (K : ℕ) := Option (MomentCoordinate K)
 
-/-- Augmented affine generator `[A b; 0 0]`.  `none` is the constant coordinate. -/
+/-- Augmented affine generator `[A, -b; 0, 0]`.  The stationary system is `A m = b`,
+whereas forward dynamics is `m' = A m - b`; `none` is the constant coordinate. -/
 noncomputable def augmentedTwoDemeMomentGenerator (r : TwoDemeRates) (K : ℕ) :
     Matrix (AffineMomentCoordinate K) (AffineMomentCoordinate K) ℝ
   | some row, some column => twoDemeMomentDynamicsMatrix r K row column
-  | some row, none => twoDemeMomentForcing r K row
+  | some row, none => -twoDemeMomentForcing r K row
   | none, _ => 0
 
 /-- One piecewise-constant epoch.  Rates may change arbitrarily between epochs. -/
@@ -271,6 +272,11 @@ noncomputable def propagateTwoDemeMomentEpochs {K : ℕ}
 /-- Arbitrary piecewise-constant two-deme history from an ancestral frequency law. -/
 structure PiecewiseTwoDemeMomentDemography (K : ℕ) where
   ancestralMoment : ℕ → ℝ
+  ancestralMeasure : Measure ℝ
+  ancestralProbability : IsProbabilityMeasure ancestralMeasure
+  ancestralSupported : ∀ᵐ frequency ∂ancestralMeasure, frequency ∈ Set.Icc (0 : ℝ) 1
+  ancestralMoment_spec : ∀ degree,
+    ancestralMoment degree = ∫ frequency, frequency ^ degree ∂ancestralMeasure
   ancestralNormalized : ancestralMoment 0 = 1
   epochs : List (TwoDemeMomentEpoch K)
 
@@ -313,19 +319,22 @@ noncomputable def PiecewiseTwoDemeMomentDemography.fixedDifference
 
 /-- Target monomorphism conditional on source polymorphism under the same transient law. -/
 noncomputable def PiecewiseTwoDemeMomentDemography.targetErosionGivenSourcePolymorphic
-    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : ℝ :=
-  (∑ i ∈ Finset.Icc 1 (ns - 1),
-      demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt) /
-    (∑ i ∈ Finset.Icc 1 (ns - 1),
-      ∑ j ∈ Finset.range (nt + 1), demography.jointSampleCount ns nt i j)
+    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : Option ℝ :=
+  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt
+  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    ∑ j ∈ Finset.range (nt + 1), demography.jointSampleCount ns nt i j
+  if 0 < denominator then some (numerator / denominator) else none
 
 /-- Conditional target spectrum under the full transient demography. -/
 noncomputable def PiecewiseTwoDemeMomentDemography.conditionalTargetSpectrum
     (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt))
-    (sourceCount targetCount : ℕ) : ℝ :=
-  demography.jointSampleCount ns nt sourceCount targetCount /
-    (∑ j ∈ Finset.range (nt + 1),
-      demography.jointSampleCount ns nt sourceCount j)
+    (sourceCount targetCount : ℕ) : Option ℝ :=
+  let denominator := ∑ j ∈ Finset.range (nt + 1),
+    demography.jointSampleCount ns nt sourceCount j
+  if 0 < denominator then
+    some (demography.jointSampleCount ns nt sourceCount targetCount / denominator)
+  else none
 
 /-- Zero-duration epochs are identity propagators: an exact analytic limit. -/
 theorem matrixExponential_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -342,34 +351,38 @@ noncomputable def solvedTwoDemeFixedDifference
 /-- Target erosion conditional on source polymorphism, with both masses evaluated from the
 same directly solved joint law. -/
 noncomputable def solvedTwoDemeTargetErosionGivenSourcePolymorphic
-    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : ℝ :=
-  (∑ i ∈ Finset.Icc 1 (ns - 1),
-      solvedTwoDemeJointSampleCount ns nt system i 0 +
-        solvedTwoDemeJointSampleCount ns nt system i nt) /
-    (∑ i ∈ Finset.Icc 1 (ns - 1),
-      ∑ j ∈ Finset.range (nt + 1), solvedTwoDemeJointSampleCount ns nt system i j)
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : Option ℝ :=
+  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    solvedTwoDemeJointSampleCount ns nt system i 0 +
+      solvedTwoDemeJointSampleCount ns nt system i nt
+  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    ∑ j ∈ Finset.range (nt + 1), solvedTwoDemeJointSampleCount ns nt system i j
+  if 0 < denominator then some (numerator / denominator) else none
 
 /-- Conditional target spectrum at a given source count, directly from the symbolic joint
 law. -/
 noncomputable def solvedTwoDemeConditionalTargetSpectrum
     (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt))
-    (sourceCount targetCount : ℕ) : ℝ :=
-  solvedTwoDemeJointSampleCount ns nt system sourceCount targetCount /
-    (∑ j ∈ Finset.range (nt + 1),
-      solvedTwoDemeJointSampleCount ns nt system sourceCount j)
+    (sourceCount targetCount : ℕ) : Option ℝ :=
+  let denominator := ∑ j ∈ Finset.range (nt + 1),
+    solvedTwoDemeJointSampleCount ns nt system sourceCount j
+  if 0 < denominator then
+    some (solvedTwoDemeJointSampleCount ns nt system sourceCount targetCount / denominator)
+  else none
 
-/-- A solved present-day mixed-moment law for a specified two-deme demography.
-
-`stationary` is the Notohara structured moment system.  For a transient epoch the same
-interface is filled by the epoch propagator and the field is the corresponding forward
-equation; downstream sample laws do not change.  The normalization and Hausdorff bounds are
-part of the object, preventing an arbitrary table from masquerading as a population law. -/
+/-- A present-day two-deme frequency law backed by an actual probability measure on the unit
+square.  Stationary Cramer solves and transient epoch propagators are constructors of this
+interface only after their moment tables have been certified against such a measure. -/
 structure TwoDemePresentDayLaw where
-  rates : TwoDemeRates
   mixedMoment : ℕ → ℕ → ℝ
+  representingMeasure : Measure (ℝ × ℝ)
+  probability : IsProbabilityMeasure representingMeasure
+  supported_on_unit_square : ∀ᵐ frequency ∂representingMeasure,
+    frequency.1 ∈ Set.Icc (0 : ℝ) 1 ∧ frequency.2 ∈ Set.Icc (0 : ℝ) 1
+  mixedMoment_spec : ∀ i j,
+    mixedMoment i j =
+      ∫ frequency, frequency.1 ^ i * frequency.2 ^ j ∂representingMeasure
   normalized : mixedMoment 0 0 = 1
-  stationary : ∀ i j, i + j > 0 →
-    twoDemeMomentGenerator rates mixedMoment i j = 0
   moment_nonneg : ∀ i j, 0 ≤ mixedMoment i j
   moment_le_one : ∀ i j, mixedMoment i j ≤ 1
 
@@ -410,7 +423,7 @@ noncomputable def twoDemeFixedDifference (law : TwoDemePresentDayLaw)
 sample.  Conditioning happens once, by division by the source-polymorphic mass; there is no
 sign-changing correction term. -/
 noncomputable def twoDemeTargetErosionGivenSourcePolymorphic
-    (law : TwoDemePresentDayLaw) (ns nt : ℕ) : ℝ :=
+    (law : TwoDemePresentDayLaw) (ns nt : ℕ) : Option ℝ :=
   let sourcePolyTargetMono :=
     ∑ i ∈ Finset.Icc 1 (ns - 1),
       twoDemeJointSampleCount law ns nt i 0 +
@@ -418,16 +431,18 @@ noncomputable def twoDemeTargetErosionGivenSourcePolymorphic
   let sourcePoly :=
     ∑ i ∈ Finset.Icc 1 (ns - 1),
       ∑ j ∈ Finset.range (nt + 1), twoDemeJointSampleCount law ns nt i j
-  sourcePolyTargetMono / sourcePoly
+  if 0 < sourcePoly then some (sourcePolyTargetMono / sourcePoly) else none
 
 /-- Conditional target spectrum given a source count.  This is the object required by
 ascertainment: the numerator and denominator are entries of one joint law, so conditioning
 cannot introduce an independently chosen sign or multiplier. -/
 noncomputable def twoDemeConditionalTargetSpectrum
-    (law : TwoDemePresentDayLaw) (ns nt sourceCount targetCount : ℕ) : ℝ :=
-  twoDemeJointSampleCount law ns nt sourceCount targetCount /
-    (∑ j ∈ Finset.range (nt + 1),
-      twoDemeJointSampleCount law ns nt sourceCount j)
+    (law : TwoDemePresentDayLaw) (ns nt sourceCount targetCount : ℕ) : Option ℝ :=
+  let denominator := ∑ j ∈ Finset.range (nt + 1),
+    twoDemeJointSampleCount law ns nt sourceCount j
+  if 0 < denominator then
+    some (twoDemeJointSampleCount law ns nt sourceCount targetCount / denominator)
+  else none
 
 /-- The joint count law has literal zero outside its sample rectangle. -/
 theorem twoDemeJointSampleCount_outside (law : TwoDemePresentDayLaw)
@@ -488,6 +503,8 @@ exist.  Both counterexample-producing poles are excluded by the value's type. -/
 structure NonsingularAffineLDPoint {n : ℕ} (sys : AffineTwoDemeLDSystem n) where
   rho : ℝ
   migration : ℝ
+  rho_nonnegative : 0 ≤ rho
+  migration_nonnegative : 0 ≤ migration
   operator_nonsingular :
     (sys.drift + rho • sys.recombination + migration • sys.migration).det ≠ 0
   within_numerator_nonzero :
@@ -654,20 +671,23 @@ noncomputable def TrainVsAllMomentProjection.jointSampleCount {D : ℕ}
 /-- Exact target spectrum conditional on a source count, in `O(D)` pairwise projections. -/
 noncomputable def TrainVsAllMomentProjection.conditionalTargetSpectrum {D : ℕ}
     (projection : TrainVsAllMomentProjection D) (target : Fin D)
-    (sourceCount targetCount : ℕ) : ℝ :=
-  projection.jointSampleCount target sourceCount targetCount /
-    (∑ j ∈ Finset.range (projection.targetSampleSize target + 1),
-      projection.jointSampleCount target sourceCount j)
+    (sourceCount targetCount : ℕ) : Option ℝ :=
+  let denominator := ∑ j ∈ Finset.range (projection.targetSampleSize target + 1),
+    projection.jointSampleCount target sourceCount j
+  if 0 < denominator then
+    some (projection.jointSampleCount target sourceCount targetCount / denominator)
+  else none
 
 /-- Exact erosion probability for every train-target pair. -/
 noncomputable def TrainVsAllMomentProjection.targetErosion {D : ℕ}
-    (projection : TrainVsAllMomentProjection D) (target : Fin D) : ℝ :=
+    (projection : TrainVsAllMomentProjection D) (target : Fin D) : Option ℝ :=
   let ns := projection.trainSampleSize
   let nt := projection.targetSampleSize target
-  (∑ i ∈ Finset.Icc 1 (ns - 1),
-      projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt) /
-    (∑ i ∈ Finset.Icc 1 (ns - 1),
-      ∑ j ∈ Finset.range (nt + 1), projection.jointSampleCount target i j)
+  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt
+  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
+    ∑ j ∈ Finset.range (nt + 1), projection.jointSampleCount target i j
+  if 0 < denominator then some (numerator / denominator) else none
 
 /-- Pairwise coalescence times in raw generations. -/
 structure PairwiseCoalescenceTimes (D : ℕ) where

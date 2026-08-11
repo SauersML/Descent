@@ -273,16 +273,22 @@ inductive LedgerStatus where
   | validated (evidence : BlindBatteryEvidence)
   | falsified (cause : MissClass)
 
+/-- The ledger stage is determined by status and cannot contradict it. -/
+def LedgerStatus.lastCompletedStage : LedgerStatus → DoctrineStage
+  | .derived => .analyticSelfCheck
+  | .preregistered => .blindBatteryPreregistered
+  | .validated _ => .ledgered
+  | .falsified _ => .ledgered
+
 /-- One auditable ledger row. -/
 structure LedgerRow where
   gap : BlindGap
   status : LedgerStatus
-  lastCompletedStage : DoctrineStage
 
 /-- Authoring a preregistration enters every gap as preregistered, never validated. -/
 def BlindBatteryPreregistration.initialLedger {Demography : Type}
     (registration : BlindBatteryPreregistration Demography) : List LedgerRow :=
   registration.gaps.map fun gap =>
-    ⟨gap, .preregistered, .blindBatteryPreregistered⟩
+    ⟨gap, .preregistered⟩
 
 end Descent.Program

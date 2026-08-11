@@ -78,9 +78,11 @@ The literature route is frozen before the symbolic objects:
   stationary solution by Cramer's rule rather than treating the numerical solver as a law.
 
 The resulting A1 body is the matrix-exponential propagation of a finite mixed-moment vector
-through an arbitrary list of typed piecewise-constant two-deme epochs. Its Bernstein
-projection is the joint present-day source/target count law, from which fixation, erosion,
-and conditional spectra are projections. A2 is the determinant ratio of the concrete
+through an arbitrary list of typed piecewise-constant two-deme epochs. The affine column uses
+the forward-dynamics sign `G(constant)`, the negative of the stationary Cramer right-hand
+side. Its Bernstein projection is the joint present-day source/target count law, from which
+fixation, erosion, and conditional spectra are projections. Conditional quantities return an
+explicit undefined branch unless their conditioning mass is positive. A2 is the determinant ratio of the concrete
 three-heterozygosity plus fifteen-two-locus stationary system, hence a rational function of
 recombination and migration wherever its typed denominators are nonzero. A4 projects an
 actual many-deme probability law to train-versus-all pairs without enumerating the full joint
@@ -93,7 +95,7 @@ sample configuration.
 | A1 | transient epoch moment propagation → joint source/target JSFS, fixation, and conditional erosion | zero-duration epoch is identity; split initial moment is `E[P^(i+j)]`; probabilities sum to one | scalar retention; independent marginal spectra | zero conditional denominator is reported as undefined branch |
 | A2 | concrete 18-state stationary system → cross-deme `D1D2` family over recombination and migration | zero recombination; zero migration block; panmictic equality; determinant nonzero | fitted exponential retention; one-locus substitution | zero Cramer numerator is retained |
 | A3/A4 | typed demographic primitives → arbitrary serial, grid, and many-deme instances | pair relabelling; train=target; aggregation invariance | one scalar F for all primitives | absent spectrum cell stays zero |
-| B | realised GWAS sampling law, then clump and threshold → winning threshold and retained effect mass | zero estimation noise; no conflicts; one threshold | select using mean p-values; independent-locus clumping | empty retained set is a prediction |
+| B | moment-certified joint GWAS sampling law, then clump and threshold → winning threshold and retained effect mass | zero estimation noise; no conflicts; one threshold; realised design p-values equal the sampling atom's p-values | select using mean p-values; independent-locus clumping | empty retained set is a prediction |
 | C/D | per-deme score moments → R2, slope, risk spread, errors, CITL, phenotype ladder | identical deme; clean rung CITL zero; common rung slope | pooled retention; entered target prevalence for emergent rung | correct R2 with wrong slope rejects the joint law |
 | E1/E2 | deme laws and mixture weights → within and pooled AUC | one deme; identical deme laws; weights sum to one | unweighted mean of within-deme AUCs | zero off-diagonal mean shift remains diagnostic |
 | E3 | administrative PH law → Harrell C | horizon zero has no admissible Harrell domain; common prognostic-index shift with reciprocal baseline change | uncensored AUC; prevalence-threshold AUC | no comparable pairs is undefined and is not imputed as 0.5 |

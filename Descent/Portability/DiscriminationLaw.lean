@@ -170,6 +170,24 @@ theorem DemeMixture.pooledAUC_diagonal_offDiagonal {D : ℕ} (mix : DemeMixture 
 
 /-! ## E3. Harrell C under an administrative horizon -/
 
+/-- Shifting the score origin by `shift` and scaling the baseline hazard by the reciprocal
+hazard multiplier leaves every individual hazard unchanged. -/
+theorem proportionalHazard_score_origin_invariant
+    (baseline logHazardRatio score shift : ℝ) :
+    baseline * Real.exp (-logHazardRatio * shift) *
+        Real.exp (logHazardRatio * (score + shift)) =
+      baseline * Real.exp (logHazardRatio * score) := by
+  rw [mul_assoc, ← Real.exp_add]
+  congr 1
+  ring
+
+/-- The same origin shift preserves every pairwise prognostic-index contrast. -/
+theorem prognosticIndex_difference_shift_invariant
+    (logHazardRatio score1 score2 shift : ℝ) :
+    logHazardRatio * (score1 + shift) - logHazardRatio * (score2 + shift) =
+      logHazardRatio * score1 - logHazardRatio * score2 := by
+  ring
+
 /-- A proportional-hazards generator with an arbitrary baseline hazard and administrative
 horizon.  The cumulative-hazard identity is carried by the type; constant, piecewise,
 spline, and generator-native baselines are instances of this same law. -/
