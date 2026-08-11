@@ -38,7 +38,6 @@ import Descent.Blindness.MultipleMergerBlindness
 import Descent.Blindness.NormVisibility
 import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.PangenomeCovariance
-import Descent.Blindness.PartialSymmetryBlindness
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Blindness.SpectrumIdentifiability
 import Descent.Blindness.TrafficInvariantSeparation
