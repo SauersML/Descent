@@ -1,0 +1,649 @@
+{
+ "_battery_sha": "319fbef699cca6c5",
+ "results": [
+  {
+   "name": "sourcePolymorphicSignalFraction",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(sum_j w_j * stillSegregatingProb NeS (p j) t) / sum_j w_j, w_j = beta_j^2 * h_0,j",
+   "note": "the NeT cells carry a single prediction against four target sizes; the oracle's weighting drifts with NeT even though the prediction has no NeT argument",
+   "regime": "clean two-branch split, forward Wright-Fisher on allele frequencies, 10000 loci, NeS=2000 closed (raised to 200000 in the source-off cells), no mutation and no migration, 10 blocks per cell. Two spectra, both 1/p, truncated at [0.01,0.99] and [0.05,0.95]. The oracle is the realised fraction of the TARGET's signal carried by variants still polymorphic in the source, sum beta^2 h_T 1[poly_S] / sum beta^2 h_T. The prediction is Kimura's diffusion solution at each block's own realised ancestral frequencies. Error bars are measurement-only",
+   "span": 0.22453733824343625,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Phi t=500 1/p on [0.01,0.99]",
+    "lean": 0.9010053572221979,
+    "truth": 0.8948292528540357,
+    "sem": 0.002159361255192886,
+    "sems_off": 2.8601533686453493,
+    "rel_err": 0.006901992026371122
+   },
+   "cells": [
+    {
+     "design": "Phi t=100 1/p on [0.01,0.99]",
+     "lean": 0.9889728438612291,
+     "truth": 0.9877425637757067,
+     "sem": 0.0005262963603611695,
+     "sems_off": 2.337618456411362,
+     "rel_err": 0.0012455473021427503
+    },
+    {
+     "design": "Phi t=250 1/p on [0.01,0.99]",
+     "lean": 0.9557073275183375,
+     "truth": 0.9552170343514653,
+     "sem": 0.0015816249676211401,
+     "sems_off": 0.3099933150458822,
+     "rel_err": 0.0005132793378261859
+    },
+    {
+     "design": "Phi t=500 1/p on [0.01,0.99]",
+     "lean": 0.9010053572221979,
+     "truth": 0.8948292528540357,
+     "sem": 0.002159361255192886,
+     "sems_off": 2.8601533686453493,
+     "rel_err": 0.006901992026371122
+    },
+    {
+     "design": "Phi t=800 1/p on [0.01,0.99]",
+     "lean": 0.8339427780254496,
+     "truth": 0.831163232203733,
+     "sem": 0.004623488020852036,
+     "sems_off": 0.601179414584998,
+     "rel_err": 0.0033441635938910993
+    },
+    {
+     "design": "Phi t=1100 1/p on [0.01,0.99]",
+     "lean": 0.7751217886112273,
+     "truth": 0.7727399238033833,
+     "sem": 0.004564064014179147,
+     "sems_off": 0.5218736635691889,
+     "rel_err": 0.003082362816354256
+    },
+    {
+     "design": "Phi t=100 1/p on [0.05,0.95]",
+     "lean": 0.9995604261015426,
+     "truth": 0.9994069038930279,
+     "sem": 0.0001907248229619618,
+     "sems_off": 0.8049408888183425,
+     "rel_err": 0.00015361331597440604
+    },
+    {
+     "design": "Phi t=250 1/p on [0.05,0.95]",
+     "lean": 0.9873647936570362,
+     "truth": 0.9861551526108757,
+     "sem": 0.0005647521038950984,
+     "sems_off": 2.141897370222443,
+     "rel_err": 0.0012266234607789068
+    },
+    {
+     "design": "Phi t=500 1/p on [0.05,0.95]",
+     "lean": 0.9449987284881731,
+     "truth": 0.9452002119019953,
+     "sem": 0.002358499302731241,
+     "sems_off": 0.08542865100230251,
+     "rel_err": 0.00021316479967430665
+    },
+    {
+     "design": "Phi t=800 1/p on [0.05,0.95]",
+     "lean": 0.885760204148043,
+     "truth": 0.8872825616127088,
+     "sem": 0.002894408639969538,
+     "sems_off": 0.5259649393120254,
+     "rel_err": 0.0017157527156836832
+    },
+    {
+     "design": "Phi t=1100 1/p on [0.05,0.95]",
+     "lean": 0.8258102754635989,
+     "truth": 0.8221979164809371,
+     "sem": 0.004353039601782067,
+     "sems_off": 0.8298474889093412,
+     "rel_err": 0.0043935394510885035
+    },
+    {
+     "design": "Phi NeT=250 (NeS=2000 t=500)",
+     "lean": 0.8993054125791076,
+     "truth": 0.8978121311892302,
+     "sem": 0.0030584974611749046,
+     "sems_off": 0.4882401927199017,
+     "rel_err": 0.0016632448348624835
+    },
+    {
+     "design": "Phi NeT=500 (NeS=2000 t=500)",
+     "lean": 0.8993054125791076,
+     "truth": 0.8963640599382783,
+     "sem": 0.0030146339374141303,
+     "sems_off": 0.9756914776035122,
+     "rel_err": 0.0032814263448177764
+    },
+    {
+     "design": "Phi NeT=1000 (NeS=2000 t=500)",
+     "lean": 0.8993054125791076,
+     "truth": 0.8982532635459906,
+     "sem": 0.0035162178780435115,
+     "sems_off": 0.29922748521557674,
+     "rel_err": 0.0011713278156802837
+    },
+    {
+     "design": "Phi NeT=2000 (NeS=2000 t=500)",
+     "lean": 0.8993054125791076,
+     "truth": 0.8984042306551483,
+     "sem": 0.0018166717203818706,
+     "sems_off": 0.4960620644052518,
+     "rel_err": 0.0010030918079071123
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2'",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * sourcePolymorphicSignalFraction w p NeS t * ldFactor",
+   "note": "per-allele score only; the source-standardised score is a different observable, is measured in battery_clean01, and is deliberately NOT recorded against this body",
+   "regime": "same engine, 40000 target individuals per block, 10 blocks, TRUE causal effects so no GWAS-inefficiency confound is present, r2_0 = 0.50 realised in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the LD slot is exercised rather than measured. PER-ALLELE score only. Cells span two spectra at five depths, four NeT at fixed (NeS,t) sharing their ancestral draw and source branch, and a source-off limit at NeS=200000. Each prediction is re-evaluated in every block at that block's own realised per-branch heterozygosity loss and realised ancestral frequencies. Error bars are MEASUREMENT-ONLY, which is at or above the paired bar the design could claim",
+   "span": 0.5915025925512409,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "t=100 1/p on [0.01,0.99]",
+    "lean": 0.4697986383848248,
+    "truth": 0.468264680581539,
+    "sem": 0.0007790452362602831,
+    "sems_off": 1.9690227625925667,
+    "rel_err": 0.0032758349431368083
+   },
+   "cells": [
+    {
+     "design": "t=100 1/p on [0.01,0.99]",
+     "lean": 0.4697986383848248,
+     "truth": 0.468264680581539,
+     "sem": 0.0007790452362602831,
+     "sems_off": 1.9690227625925667,
+     "rel_err": 0.0032758349431368083
+    },
+    {
+     "design": "t=250 1/p on [0.01,0.99]",
+     "lean": 0.4187120848281566,
+     "truth": 0.41776416246972675,
+     "sem": 0.0011540788305203398,
+     "sems_off": 0.8213670794069079,
+     "rel_err": 0.002269037039524716
+    },
+    {
+     "design": "t=500 1/p on [0.01,0.99]",
+     "lean": 0.34171247825906326,
+     "truth": 0.3395778833999543,
+     "sem": 0.0019491754518818176,
+     "sems_off": 1.0951270995374536,
+     "rel_err": 0.006286024395160086
+    },
+    {
+     "design": "t=800 1/p on [0.01,0.99]",
+     "lean": 0.25886773103369437,
+     "truth": 0.2584235936060817,
+     "sem": 0.0014177362950319023,
+     "sems_off": 0.3132722419317652,
+     "rel_err": 0.0017186411713230906
+    },
+    {
+     "design": "t=1100 1/p on [0.01,0.99]",
+     "lean": 0.193929473664431,
+     "truth": 0.19389618245478474,
+     "sem": 0.0015486209538257618,
+     "sems_off": 0.021497326097790277,
+     "rel_err": 0.00017169605520225598
+    },
+    {
+     "design": "t=100 1/p on [0.05,0.95]",
+     "lean": 0.47473856658137314,
+     "truth": 0.47458967155278964,
+     "sem": 0.0015114833802507724,
+     "sems_off": 0.09850920660391468,
+     "rel_err": 0.00031373423719134765
+    },
+    {
+     "design": "t=250 1/p on [0.05,0.95]",
+     "lean": 0.43189040414774105,
+     "truth": 0.43081135455536373,
+     "sem": 0.00125859312872491,
+     "sems_off": 0.8573458473196224,
+     "rel_err": 0.0025046916265496046
+    },
+    {
+     "design": "t=500 1/p on [0.05,0.95]",
+     "lean": 0.3570657182505817,
+     "truth": 0.35866186407220485,
+     "sem": 0.0013640012281043185,
+     "sems_off": 1.1701938302808323,
+     "rel_err": 0.00445028028210387
+    },
+    {
+     "design": "t=800 1/p on [0.05,0.95]",
+     "lean": 0.2747342732501318,
+     "truth": 0.27734542451070787,
+     "sem": 0.0026353054456370087,
+     "sems_off": 0.9908343888178489,
+     "rel_err": 0.009414798405932534
+    },
+    {
+     "design": "t=1100 1/p on [0.05,0.95]",
+     "lean": 0.20465166671075688,
+     "truth": 0.2049752677765,
+     "sem": 0.0016581904933478898,
+     "sems_off": 0.19515313050056204,
+     "rel_err": 0.0015787322502535221
+    },
+    {
+     "design": "NeT=250 (NeS=2000 t=500)",
+     "lean": 0.24209181015992504,
+     "truth": 0.24087897519506885,
+     "sem": 0.002126620268693829,
+     "sems_off": 0.5703110154221913,
+     "rel_err": 0.005035038711344615
+    },
+    {
+     "design": "NeT=500 (NeS=2000 t=500)",
+     "lean": 0.33938481571824985,
+     "truth": 0.33786460538019825,
+     "sem": 0.0012092862092944923,
+     "sems_off": 1.2571137637784788,
+     "rel_err": 0.004499466099270503
+    },
+    {
+     "design": "NeT=1000 (NeS=2000 t=500)",
+     "lean": 0.39299612972572706,
+     "truth": 0.39486417034856935,
+     "sem": 0.00209147730128924,
+     "sems_off": 0.8931680117641176,
+     "rel_err": 0.0047308435738630476
+    },
+    {
+     "design": "NeT=2000 (NeS=2000 t=500)",
+     "lean": 0.4216732312927154,
+     "truth": 0.42034661181470323,
+     "sem": 0.0013650030803287504,
+     "sems_off": 0.9718802082795687,
+     "rel_err": 0.003156013253645441
+    },
+    {
+     "design": "t=100 NeS=200000 source drift off",
+     "lean": 0.4746400044357575,
+     "truth": 0.47457386174009175,
+     "sem": 0.0011028973587490403,
+     "sems_off": 0.05997175996573312,
+     "rel_err": 0.00013937281632666622
+    },
+    {
+     "design": "t=250 NeS=200000 source drift off",
+     "lean": 0.4385674746807064,
+     "truth": 0.43609153810652845,
+     "sem": 0.0015677179316427711,
+     "sems_off": 1.5793252881808078,
+     "rel_err": 0.005677561607657513
+    },
+    {
+     "design": "t=500 NeS=200000 source drift off",
+     "lean": 0.3777677302318265,
+     "truth": 0.37544052657383253,
+     "sem": 0.002626258488671281,
+     "sems_off": 0.8861289427650394,
+     "rel_err": 0.0061985946994892
+    },
+    {
+     "design": "t=800 NeS=200000 source drift off",
+     "lean": 0.3103443077704221,
+     "truth": 0.31412468461368115,
+     "sem": 0.0026573046203339752,
+     "sems_off": 1.422635859784838,
+     "rel_err": 0.012034637927001043
+    },
+    {
+     "design": "t=1100 NeS=200000 source drift off",
+     "lean": 0.2498455693705593,
+     "truth": 0.24768935760268077,
+     "sem": 0.002053645272770535,
+     "sems_off": 1.049943627786129,
+     "rel_err": 0.008705306472381083
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2' [the SUPERSEDED summed-index body, both branches in the chart's fst slot and no source-branch factor, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor",
+   "note": "it passed battery_clean01's t=100 cell on the [0.01,0.99] spectrum by a cancellation; the [0.05,0.95] cells are where that pass dies, and a battery on one spectrum could not have seen it; positive control 't=0, no drift: measured target R2 is the constructed V_A/(V_A+V_E)' passed at 0.73 sems",
+   "regime": "same engine, 40000 target individuals per block, 10 blocks, TRUE causal effects so no GWAS-inefficiency confound is present, r2_0 = 0.50 realised in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the LD slot is exercised rather than measured. PER-ALLELE score only. Cells span two spectra at five depths, four NeT at fixed (NeS,t) sharing their ancestral draw and source branch, and a source-off limit at NeS=200000. Each prediction is re-evaluated in every block at that block's own realised per-branch heterozygosity loss and realised ancestral frequencies. Error bars are MEASUREMENT-ONLY, which is at or above the paired bar the design could claim",
+   "span": 0.8279466580861832,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "[summed] t=1100 1/p on [0.05,0.95]",
+    "lean": 0.08164581236728,
+    "truth": 0.2049752677765,
+    "sem": 0.0016581904933478898,
+    "sems_off": 74.37592719532337,
+    "rel_err": 0.6016796891988716
+   },
+   "cells": [
+    {
+     "design": "[summed] t=100 1/p on [0.01,0.99]",
+     "lean": 0.4680501642591576,
+     "truth": 0.468264680581539,
+     "sem": 0.0007790452362602831,
+     "sems_off": 0.27535797973832454,
+     "rel_err": 0.00045810912348757325
+    },
+    {
+     "design": "[summed] t=250 1/p on [0.01,0.99]",
+     "lean": 0.41868344879215647,
+     "truth": 0.41776416246972675,
+     "sem": 0.0011540788305203398,
+     "sems_off": 0.7965541851376257,
+     "rel_err": 0.0022004911024322946
+    },
+    {
+     "design": "[summed] t=500 1/p on [0.01,0.99]",
+     "lean": 0.3311755368998669,
+     "truth": 0.3395778833999543,
+     "sem": 0.0019491754518818176,
+     "sems_off": 4.310718407609451,
+     "rel_err": 0.024743503363530744
+    },
+    {
+     "design": "[summed] t=800 1/p on [0.01,0.99]",
+     "lean": 0.21227396223136658,
+     "truth": 0.2584235936060817,
+     "sem": 0.0014177362950319023,
+     "sems_off": 32.551632864612984,
+     "rel_err": 0.1785813389974817
+    },
+    {
+     "design": "[summed] t=1100 1/p on [0.01,0.99]",
+     "lean": 0.08384025366382061,
+     "truth": 0.19389618245478474,
+     "sem": 0.0015486209538257618,
+     "sems_off": 71.06705389661589,
+     "rel_err": 0.5676023498638423
+    },
+    {
+     "design": "[summed] t=100 1/p on [0.05,0.95]",
+     "lean": 0.4680579074342872,
+     "truth": 0.47458967155278964,
+     "sem": 0.0015114833802507724,
+     "sems_off": 4.321426357608201,
+     "rel_err": 0.013762971488889393
+    },
+    {
+     "design": "[summed] t=250 1/p on [0.05,0.95]",
+     "lean": 0.4176047860637121,
+     "truth": 0.43081135455536373,
+     "sem": 0.00125859312872491,
+     "sems_off": 10.493119809919278,
+     "rel_err": 0.030655107744971138
+    },
+    {
+     "design": "[summed] t=500 1/p on [0.05,0.95]",
+     "lean": 0.32916541887394757,
+     "truth": 0.35866186407220485,
+     "sem": 0.0013640012281043185,
+     "sems_off": 21.624940352327453,
+     "rel_err": 0.08224026068274473
+    },
+    {
+     "design": "[summed] t=800 1/p on [0.05,0.95]",
+     "lean": 0.2116387630005952,
+     "truth": 0.27734542451070787,
+     "sem": 0.0026353054456370087,
+     "sems_off": 24.933224199455175,
+     "rel_err": 0.2369127294096602
+    },
+    {
+     "design": "[summed] t=1100 1/p on [0.05,0.95]",
+     "lean": 0.08164581236728,
+     "truth": 0.2049752677765,
+     "sem": 0.0016581904933478898,
+     "sems_off": 74.37592719532337,
+     "rel_err": 0.6016796891988716
+    },
+    {
+     "design": "[summed] NeT=250 (NeS=2000 t=500)",
+     "lean": 0.2003222554445557,
+     "truth": 0.24087897519506885,
+     "sem": 0.002126620268693829,
+     "sems_off": 19.07097395221531,
+     "rel_err": 0.16836969568501967
+    },
+    {
+     "design": "[summed] NeT=500 (NeS=2000 t=500)",
+     "lean": 0.32808612530078707,
+     "truth": 0.33786460538019825,
+     "sem": 0.0012092862092944923,
+     "sems_off": 8.086158598563713,
+     "rel_err": 0.028942007904046288
+    },
+    {
+     "design": "[summed] NeT=1000 (NeS=2000 t=500)",
+     "lean": 0.3969996383446233,
+     "truth": 0.39486417034856935,
+     "sem": 0.00209147730128924,
+     "sems_off": 1.0210333120697062,
+     "rel_err": 0.005408107791012953
+    },
+    {
+     "design": "[summed] NeT=2000 (NeS=2000 t=500)",
+     "lean": 0.4334258925822154,
+     "truth": 0.42034661181470323,
+     "sem": 0.0013650030803287504,
+     "sems_off": 9.581869049234781,
+     "rel_err": 0.031115466141256272
+    },
+    {
+     "design": "[summed] t=100 NeS=200000 source drift off",
+     "lean": 0.4745377884503819,
+     "truth": 0.47457386174009175,
+     "sem": 0.0011028973587490403,
+     "sems_off": 0.03270774875257033,
+     "rel_err": 7.601196066207533e-05
+    },
+    {
+     "design": "[summed] t=250 NeS=200000 source drift off",
+     "lean": 0.4383560598898028,
+     "truth": 0.43609153810652845,
+     "sem": 0.0015677179316427711,
+     "sems_off": 1.4444701674754845,
+     "rel_err": 0.00519276708075261
+    },
+    {
+     "design": "[summed] t=500 NeS=200000 source drift off",
+     "lean": 0.37729330697615404,
+     "truth": 0.37544052657383253,
+     "sem": 0.002626258488671281,
+     "sems_off": 0.7054828800415972,
+     "rel_err": 0.004934950467999484
+    },
+    {
+     "design": "[summed] t=800 NeS=200000 source drift off",
+     "lean": 0.3094480466373094,
+     "truth": 0.31412468461368115,
+     "sem": 0.0026573046203339752,
+     "sems_off": 1.7599179034972572,
+     "rel_err": 0.014887839782865833
+    },
+    {
+     "design": "[summed] t=1100 NeS=200000 source drift off",
+     "lean": 0.2482917788483555,
+     "truth": 0.24768935760268077,
+     "sem": 0.002053645272770535,
+     "sems_off": 0.2933424061410601,
+     "rel_err": 0.002432164431711548
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2' [the chart alone, Phi forced to 1, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor",
+   "note": "the upper bound cleanSplitTargetR2'_le_targetBranchOnly fixes. In the source-off cells it COINCIDES with the corrected body, because Phi is 1 there; those cells therefore test the chart alone and are what separates the two factors instead of fitting them jointly; positive control 't=0, no drift: measured target R2 is the constructed V_A/(V_A+V_E)' passed at 0.73 sems",
+   "regime": "same engine, 40000 target individuals per block, 10 blocks, TRUE causal effects so no GWAS-inefficiency confound is present, r2_0 = 0.50 realised in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the LD slot is exercised rather than measured. PER-ALLELE score only. Cells span two spectra at five depths, four NeT at fixed (NeS,t) sharing their ancestral draw and source branch, and a source-off limit at NeS=200000. Each prediction is re-evaluated in every block at that block's own realised per-branch heterozygosity loss and realised ancestral frequencies. Error bars are MEASUREMENT-ONLY, which is at or above the paired bar the design could claim",
+   "span": 0.4783093823735611,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "[chart only] t=800 1/p on [0.01,0.99]",
+    "lean": 0.31041071361073147,
+    "truth": 0.2584235936060817,
+    "sem": 0.0014177362950319023,
+    "sems_off": 36.66910425219801,
+    "rel_err": 0.2011701767598449
+   },
+   "cells": [
+    {
+     "design": "[chart only] t=100 1/p on [0.01,0.99]",
+     "lean": 0.47503697921230337,
+     "truth": 0.468264680581539,
+     "sem": 0.0007790452362602831,
+     "sems_off": 8.693074953226125,
+     "rel_err": 0.014462544179829796
+    },
+    {
+     "design": "[chart only] t=250 1/p on [0.01,0.99]",
+     "lean": 0.43811852660802125,
+     "truth": 0.41776416246972675,
+     "sem": 0.0011540788305203398,
+     "sems_off": 17.636892385520426,
+     "rel_err": 0.04872214030510451
+    },
+    {
+     "design": "[chart only] t=500 1/p on [0.01,0.99]",
+     "lean": 0.3792574420247904,
+     "truth": 0.3395778833999543,
+     "sem": 0.0019491754518818176,
+     "sems_off": 20.357099504063488,
+     "rel_err": 0.11684965530603049
+    },
+    {
+     "design": "[chart only] t=800 1/p on [0.01,0.99]",
+     "lean": 0.31041071361073147,
+     "truth": 0.2584235936060817,
+     "sem": 0.0014177362950319023,
+     "sems_off": 36.66910425219801,
+     "rel_err": 0.2011701767598449
+    },
+    {
+     "design": "[chart only] t=1100 1/p on [0.01,0.99]",
+     "lean": 0.25019423865998036,
+     "truth": 0.19389618245478474,
+     "sem": 0.0015486209538257618,
+     "sems_off": 36.35367070690548,
+     "rel_err": 0.29035154530865476
+    },
+    {
+     "design": "[chart only] t=100 1/p on [0.05,0.95]",
+     "lean": 0.47494734872650896,
+     "truth": 0.47458967155278964,
+     "sem": 0.0015114833802507724,
+     "sems_off": 0.23663983236122296,
+     "rel_err": 0.0007536556211791309
+    },
+    {
+     "design": "[chart only] t=250 1/p on [0.05,0.95]",
+     "lean": 0.43741737499429867,
+     "truth": 0.43081135455536373,
+     "sem": 0.00125859312872491,
+     "sems_off": 5.248733914213835,
+     "rel_err": 0.015333905128273475
+    },
+    {
+     "design": "[chart only] t=500 1/p on [0.05,0.95]",
+     "lean": 0.377847952273426,
+     "truth": 0.35866186407220485,
+     "sem": 0.0013640012281043185,
+     "sems_off": 14.066034403712276,
+     "rel_err": 0.0534935272554058
+    },
+    {
+     "design": "[chart only] t=800 1/p on [0.05,0.95]",
+     "lean": 0.31016435193532016,
+     "truth": 0.27734542451070787,
+     "sem": 0.0026353054456370087,
+     "sems_off": 12.453557320631296,
+     "rel_err": 0.11833231964259501
+    },
+    {
+     "design": "[chart only] t=1100 1/p on [0.05,0.95]",
+     "lean": 0.24782233508066437,
+     "truth": 0.2049752677765,
+     "sem": 0.0016581904933478898,
+     "sems_off": 25.839653209961458,
+     "rel_err": 0.20903530347321594
+    },
+    {
+     "design": "[chart only] NeT=250 (NeS=2000 t=500)",
+     "lean": 0.26919809563775116,
+     "truth": 0.24087897519506885,
+     "sem": 0.002126620268693829,
+     "sems_off": 13.316491364053407,
+     "rel_err": 0.1175657627227486
+    },
+    {
+     "design": "[chart only] NeT=500 (NeS=2000 t=500)",
+     "lean": 0.37738374150989745,
+     "truth": 0.33786460538019825,
+     "sem": 0.0012092862092944923,
+     "sems_off": 32.67972116605464,
+     "rel_err": 0.11696737539354977
+    },
+    {
+     "design": "[chart only] NeT=1000 (NeS=2000 t=500)",
+     "lean": 0.43700109985951646,
+     "truth": 0.39486417034856935,
+     "sem": 0.00209147730128924,
+     "sems_off": 20.146969553517422,
+     "rel_err": 0.10671246640015582
+    },
+    {
+     "design": "[chart only] NeT=2000 (NeS=2000 t=500)",
+     "lean": 0.46888799868167,
+     "truth": 0.42034661181470323,
+     "sem": 0.0013650030803287504,
+     "sems_off": 35.56137533057873,
+     "rel_err": 0.11547942936284392
+    },
+    {
+     "design": "[chart only] t=100 NeS=200000 source drift off",
+     "lean": 0.47464000443561866,
+     "truth": 0.47457386174009175,
+     "sem": 0.0011028973587490403,
+     "sems_off": 0.05997175983985251,
+     "rel_err": 0.00013937281603412294
+    },
+    {
+     "design": "[chart only] t=250 NeS=200000 source drift off",
+     "lean": 0.43856747468070634,
+     "truth": 0.43609153810652845,
+     "sem": 0.0015677179316427711,
+     "sems_off": 1.5793252881807722,
+     "rel_err": 0.005677561607657386
+    },
+    {
+     "design": "[chart only] t=500 NeS=200000 source drift off",
+     "lean": 0.3777677302815448,
+     "truth": 0.37544052657383253,
+     "sem": 0.002626258488671281,
+     "sems_off": 0.8861289616962623,
+     "rel_err": 0.006198594831915727
+    },
+    {
+     "design": "[chart only] t=800 NeS=200000 source drift off",
+     "lean": 0.31034433426501085,
+     "truth": 0.31412468461368115,
+     "sem": 0.0026573046203339752,
+     "sems_off": 1.4226258893100412,
+     "rel_err": 0.012034553582821668
+    },
+    {
+     "design": "[chart only] t=1100 NeS=200000 source drift off",
+     "lean": 0.24984604139017944,
+     "truth": 0.24768935760268077,
+     "sem": 0.002053645272770535,
+     "sems_off": 1.0501734725535767,
+     "rel_err": 0.008707212164352305
+    }
+   ]
+  }
+ ]
+}
