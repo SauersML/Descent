@@ -87,7 +87,10 @@ def matchingClosure (P : TwoChartPanel Global Left Right Overlap) : Set (Left ×
 def splice (a b : Left × Right) : Left × Right := (a.1, b.2)
 
 /-- A collection is closed under every crossover whose two chosen pieces match on the
-overlap. -/
+overlap.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A closure condition on a set of local sections;
+it names no observable and carries no free parameter. -/
 def RecombinationClosed (P : TwoChartPanel Global Left Right Overlap)
     (T : Set (Left × Right)) : Prop :=
   ∀ a ∈ T, ∀ b ∈ T, P.Compatible (splice a b) → splice a b ∈ T
@@ -280,7 +283,11 @@ noncomputable def probabilisticGluingResidual (joint leftMarginal rightMarginal 
 noncomputable def binaryGluingResidual (_p00 p01 p10 p11 : ℝ) : ℝ :=
   probabilisticGluingResidual p11 (p10 + p11) (p01 + p11)
 
-/-- The classical determinant form of two-locus linkage disequilibrium. -/
+/-- The classical determinant form of two-locus linkage disequilibrium.
+
+Empirical status: DERIVED.  An algebraic combination of the table's own four cells, with no
+free parameter; `binaryGluingResidual_eq_tableDeterminant` derives it from the gluing
+residual under normalization alone. -/
 noncomputable def binaryLinkageDeterminant (p00 p01 p10 p11 : ℝ) : ℝ :=
   p11 * p00 - p10 * p01
 

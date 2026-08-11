@@ -88,6 +88,20 @@ theorem tripleGluingResidual_eq_bennettThreeLocus
   unfold tripleGluingResidual bennettThreeLocus probabilisticGluingResidual
   ring
 
+/-- **The closed form written through the pairwise residual.** Each singleton is charged the
+second-order residual of the other two, and what remains after those three charges and the
+all-singleton product is the third-order term. This is the sense in which the closed form is
+built out of `probabilisticGluingResidual` rather than posed beside it. -/
+theorem tripleGluingResidual_eq_pairwiseResidualForm
+    (triple pairAB pairAC pairBC singleA singleB singleC : ℝ) :
+    tripleGluingResidual triple pairAB pairAC pairBC singleA singleB singleC =
+      triple - singleA * probabilisticGluingResidual pairBC singleB singleC
+        - singleB * probabilisticGluingResidual pairAC singleA singleC
+        - singleC * probabilisticGluingResidual pairAB singleA singleB
+        - singleA * singleB * singleC := by
+  unfold tripleGluingResidual probabilisticGluingResidual
+  ring
+
 /-- **Three independent loci carry no third-order disequilibrium.** -/
 theorem tripleGluingResidual_of_independent (singleA singleB singleC : ℝ) :
     tripleGluingResidual (singleA * singleB * singleC) (singleA * singleB)
