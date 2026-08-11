@@ -971,10 +971,17 @@ section CleanSplit
     WHAT THIS DOES NOT CARRY, AND IT IS WHY THE COMPOSITION BELOW DOES NOT READ IT. This index
     describes the TOTAL differentiation the split has accumulated between the two branches. It
     is NOT the argument a portability chart takes, and the same run that validated it rejected
-    it in that role at 66.51 sems and 56% low at the deepest cell. A consumer wanting a
-    transported `R²` wants `cleanSplitTargetR2'`, which charts the target branch alone; this
-    body answers how far apart the branches have drifted, a different question with its own
-    oracle. -/
+    it in that role at 66.51 sems and 56% low at the deepest cell.
+
+    THE LINE IS CHART ARGUMENT VERSUS DRIFT-VARIANCE ARGUMENT, and NOT transported `R²` versus
+    anything else. A consumer feeding a portability CHART wants `cleanSplitTargetR2'`, which
+    charts the target branch alone. A consumer wanting the DRIFT VARIANCE BETWEEN THE BRANCHES
+    — the moment `Var(p_T | p_S) = F · p_S · (1 - p_S)`, whose `F` accumulates along BOTH
+    branches from their common ancestor — wants this body, summed, for exactly the reason the
+    convention paragraph above gives. A transported `R²` that has been decomposed into factors
+    can carry one factor of each kind, so a reader deriving such a factor should not read the
+    paragraph above as putting this body out of reach: what is rejected is this index in a
+    chart's `fst` slot, not this index. -/
 noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
   fstFromDriftFactor (neutralDriftFactor NeS t) +
     fstFromDriftFactor (neutralDriftFactor NeT t)
