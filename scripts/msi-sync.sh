@@ -22,8 +22,21 @@ export COPYFILE_DISABLE=1
 # `Counterexamples` is a second lean_lib target and ships with the rest: a library that
 # is not synced is not built, and a deliberately-wrong body that nothing type-checks is
 # worse than one inside the corpus, because it rots silently.
-tar czf "$TAR" Descent Descent.lean Counterexamples Counterexamples.lean \
-  lakefile.lean lean-toolchain lake-manifest.json validation
+#
+# TRACKED FILES ONLY (2026-08-11). The tar used to archive whole directories, so one
+# agent's sync shipped every other agent's uncommitted files — including untracked
+# never-compiled WIP, which broke the node for whoever synced next and got them blamed
+# for a red build they did not cause. Shipping `git ls-files` keeps the edit->sync->build
+# loop (working-tree content of TRACKED files still ships, committed or not) while
+# untracked files stay home. A NEW file must be `git add -N`ed (intent-to-add) before it
+# syncs — that is the declaration that it belongs to the build.
+UNTRACKED=$(git ls-files --others --exclude-standard Descent Counterexamples validation | grep '\.lean$' || true)
+if [ -n "$UNTRACKED" ]; then
+  echo "msi-sync: NOT shipping untracked files (git add -N to include):" >&2
+  echo "$UNTRACKED" | sed 's/^/  /' >&2
+fi
+git ls-files -z Descent Descent.lean Counterexamples Counterexamples.lean \
+  lakefile.lean lean-toolchain lake-manifest.json validation | tar czf "$TAR" --null -T -
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"
 # Overlay, never delete: the remote checkout is shared with other sessions, and a
