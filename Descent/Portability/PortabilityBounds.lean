@@ -297,7 +297,7 @@ theorem neutralPortability_mem_unit (r2_0 fst : ℝ)
 
     This is the step a composed transport law needs: a consumer that builds `fst` from a drift
     model and wants to know the direction of the resulting `R²` movement gets it from here,
-    without reasoning about the ratio again. `cleanSplitTargetR2_antitone_time` in
+    without reasoning about the ratio again. `cleanSplitTargetR2'_antitone_time` in
     `PhenomeWidePortability` is the instance. -/
 theorem neutralPortability_antitone_fst (r2_0 fst1 fst2 : ℝ)
     (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)

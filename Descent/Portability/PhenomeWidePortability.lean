@@ -891,27 +891,45 @@ theorem heterozygosityLossFromDrift_eq_closedPopulation_measuredLoss
 A CLEAN TWO-BRANCH SPLIT is the simplest demographic history a portability law can be asked
 about: one ancestral population, two closed descendant branches, no migration between them
 and no mutation regime. Everything the corpus needs for an end-to-end prediction under that
-history is already here and separately measured — `neutralDriftFactor` for the retention in
-each branch, `fstFromDriftFactor` for the drift index it implies, `neutralPortability` for
-the `R²` a given index transports, the multiplicative LD penalty of
-`neutralPortabilityRatioLD`, and `liabilityThresholdAUCFromExplainedR2` for the conversion to
-discrimination. The definitions below compose them and nothing else, so that a battery has a
-single name to aim at instead of a chain a reader has to assemble by hand.
+history is here — `neutralDriftFactor` for the retention in each branch, `fstFromDriftFactor`
+for the drift index it implies, `neutralPortability` for the `R²` a given index transports,
+the multiplicative LD penalty of `neutralPortabilityRatioLD`, and
+`liabilityThresholdAUCFromExplainedR2` for the conversion to discrimination — so that a
+battery has a single name to aim at instead of a chain a reader has to assemble by hand.
 
-THE SUMMATION CONVENTION IS THE LOAD-BEARING CHOICE and it is not free. `fstFromDriftFactor`
-returns the PER-BRANCH drift coefficient — Wright's `F` measured against the ancestor within
-ONE lineage — and its own docstring says so, distinguishing it from the pairwise Hudson
-`F_ST`. Per-branch indices ADD over independent branches, which is the convention
-`expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu` and which that definition's docstring
-records as adjudicated after a two-branch design fed a pairwise value produced a
-factor-of-four false falsification TWICE. `cleanSplitFst` therefore sums, and a battery that
-fed it a pairwise value would be repeating the error the corpus has already paid for twice.
+THE TWO BRANCHES ARE NOT INTERCHANGEABLE, and that is the correction this section carries.
+A composition that summed the two per-branch indices and fed the sum to `neutralPortability`
+was FALSIFIED by `simcov/battery_clean01.py` at 66.51 sems, 56% low at the deepest cell, with
+a miss growing monotonically in the argument — a wrong functional form and not a wrong
+constant. The TARGET branch's drift attenuates a signal the score still carries, which is what
+`neutralPortability` charts. The SOURCE branch's drift does something the chart has no slot
+for: it FIXES variants, and a variant fixed in the source leaves the score altogether while
+its variance stays in the target phenotype as unexplained heritable variance. A single index
+cannot stand for both operations, so `cleanSplitTargetR2'` charts the target branch alone and
+gives the source branch a factor of its own.
 
-THE SUM IS NOT CONFINED TO THE UNIT INTERVAL, and this is a genuine restriction rather than
-a technicality. Each branch index lies in `[0,1)`, so their sum reaches toward `2`, while
-`neutralPortability` has a pole at `fst = 1`. `cleanSplitFst_lt_one_iff` below says exactly
-when the composition is admissible: the two retentions must sum above one. Deep splits leave
-that range, and there the composed prediction is not defined rather than merely inaccurate.
+THE ANCESTRAL SPECTRUM IS A NECESSARY ARGUMENT and not a decoration. Holding the source's
+effective size and the split time fixed — hence holding its own drift index fixed — and
+varying only the ancestral allele-frequency spectrum moves the lost signal fraction by a
+factor of 51 at `t = 100` and 1.9 at `t = 1100`. The source branch's contribution is a
+functional of the spectrum, not a function of its drift index, which is why no rescaling
+repairs a summed-index body and why the signatures below carry per-variant weights and
+frequencies rather than one number.
+
+THE SUMMATION CONVENTION IN `cleanSplitFst` SURVIVES ALL OF THAT, because what the run
+rejected is not the sum. `fstFromDriftFactor` returns the PER-BRANCH drift coefficient —
+Wright's `F` measured against the ancestor within ONE lineage — and its own docstring says so,
+distinguishing it from the pairwise Hudson `F_ST`. Per-branch indices ADD over independent
+branches, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu` and
+which that definition's docstring records as adjudicated after a two-branch design fed a
+pairwise value produced a factor-of-four false falsification TWICE. `cleanSplitFst` therefore
+sums, and a battery that fed it a pairwise value would be repeating an error the corpus has
+already paid for twice. What the run rejected is that sum in a portability chart's `fst` slot.
+
+THE SUM IS NOT CONFINED TO THE UNIT INTERVAL. Each branch index lies in `[0,1)`, so their sum
+reaches toward `2`, and `cleanSplitFst_lt_one_iff` below says when it does not: precisely when
+the two retentions sum above one. That is a fact about the sum, no longer an admissibility
+condition on a composition, since no composition here reads it.
 -/
 
 section CleanSplit
@@ -950,138 +968,23 @@ section CleanSplit
     realised retention against `neutralDriftFactor`, a separately measured body, on the same
     resampling path: predicted 0.759546, measured 0.759042 ± 0.001733.
 
-    WHAT THIS DOES NOT CARRY. `cleanSplitTargetR2` composes this index into
-    `neutralPortability` and that composition is FALSIFIED by the same run. The index is
-    right; feeding it to the chart is not. -/
+    WHAT THIS DOES NOT CARRY, AND IT IS WHY THE COMPOSITION BELOW DOES NOT READ IT. This index
+    describes the TOTAL differentiation the split has accumulated between the two branches. It
+    is NOT the argument a portability chart takes, and the same run that validated it rejected
+    it in that role at 66.51 sems and 56% low at the deepest cell. A consumer wanting a
+    transported `R²` wants `cleanSplitTargetR2'`, which charts the target branch alone; this
+    body answers how far apart the branches have drifted, a different question with its own
+    oracle. -/
 noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
   fstFromDriftFactor (neutralDriftFactor NeS t) +
     fstFromDriftFactor (neutralDriftFactor NeT t)
 
-/-- **The composed target `R²` for a clean two-branch split.** The drift index of the split
-    transported through the neutral portability chart, then scaled by the LD factor.
-
-    Empirical status: **FALSIFIED** (`validation/empirical/simcov/battery_clean01.py`). THE
-    JOIN IS THE FAULT, and both stages it joins survive the same run: `cleanSplitFst` is
-    VALIDATED above at 1.94 sems on these very replicates, and the multiplicative LD
-    combination this body uses matches at 1.98 sems with the additive reading FALSIFIED at
-    463. What fails is feeding a SUMMED per-branch index to `neutralPortability`'s `fst` slot.
-
-    Same engine as `cleanSplitFst`, 40000 target individuals per block, TRUE causal effects so
-    no GWAS-inefficiency confound is present, `r2_0 = V_A/(V_A+V_E) = 0.5` realised exactly in
-    every block, `ldFactor = 1`:
-
-      t      summed F   this body   measured target R²    sems
-      100    0.119      0.46824     0.47082 ± 0.00071      3.6
-      250    0.282      0.41807     0.41995 ± 0.00099      1.9
-      500    0.514      0.32695     0.33817 ± 0.00167      6.7
-      800    0.733      0.21085     0.25826 ± 0.00154     30.7
-      1100   0.907      0.08466     0.19400 ± 0.00164     66.5
-
-    The body is right at shallow splits and fails as the index grows: 0.55% out at
-    `t = 100` and 56% LOW at `t = 1100`, where it predicts 0.085 against a measured 0.194.
-    A miss that grows monotonically with the argument is a wrong functional form and not a
-    wrong constant, so no rescaling of `lambda` or of `r2_0` repairs it.
-
-    IT IS NOT THE SCORE CONSTRUCTION. Two constructions are carried on the same replicates.
-    The PER-ALLELE score, which is what a real PGS is — weights on the variants still
-    polymorphic in the source — gives the table above. The SOURCE-STANDARDISED score, where
-    the weight carries `√(h_S/h_T)` and the construction is symmetric in the two branches, is
-    the body's best case and is the reason it was run; it is FALSIFIED too, at 68.45 sems and
-    8.6% relative. A falsification holding in the construction most favourable to the body is
-    not a report about the design.
-
-    NOR IS IT THE TARGET-BRANCH READING. The alternative that only the TARGET branch's index
-    enters the `fst` slot is also FALSIFIED, at 47.30 sems and 20% relative, and it errs the
-    other way — 0.250 against a measured 0.194 at the deepest cell. The truth lies between the
-    two readings, which is what the decomposition below says.
-
-    WHERE THE RESIDUAL LIVES, recorded so the replacement has somewhere to start. The
-    target-branch index through the chart, times the fraction of the target's genetic signal
-    still POLYMORPHIC IN THE SOURCE, matches at worst 2.66 sems and 0.34% relative across the
-    whole sweep. Those are two effects the summed reading conflates into one index: the target
-    branch's own heterozygosity loss, which the chart handles correctly, and the source
-    branch's FIXATION, which removes variants from the score without removing their variance
-    from the target phenotype — 47% of loci and 22.7% of the target's signal at `t = 1100`. It
-    is a DECOMPOSITION and not a candidate body: one of its factors is measured rather than
-    computed from arguments, so it cannot be written at this signature as it stands.
-
-    Power: the prediction spans 0.468 to 0.085, a factor of 5.5, and the two readings of the
-    `fst` slot that could be meant are 0.085 and 0.250 at the far cell, so the design
-    separates them by a factor of three and cannot validate both.
-
-    argument_source: model. The control is the `t = 0` cell, where no drift has happened and
-    the measured target `R²` must be the constructed `V_A/(V_A+V_E)`: predicted 0.500000,
-    measured 0.501181 ± 0.001110. Both already-falsified rivals fail here as they must — the
-    superseded linear retention at 229 sems and the additive LD combination at 463 — so a
-    design in which they had passed would have been known to be broken.
-
-    The regime is inherited whole from `neutralDriftFactor`: closed populations, no mutation,
-    no migration. At demographic equilibrium the retention is stationary and this prediction
-    is wrong for that reason as well, and separately from the fault measured here. -/
-noncomputable def cleanSplitTargetR2 (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) : ℝ :=
-  neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
-
-/-- **The composed target AUC for a clean two-branch split**, at a required prevalence.
-
-    Empirical status: **FALSIFIED, inherited** (`validation/empirical/simcov/battery_clean01.py`).
-    The fault is `cleanSplitTargetR2`'s and arrives here through it; the chart this body wraps
-    around it is not implicated. Same replicates and the same per-allele score, cases the upper
-    5% of the realised target liability, the observable the Mann-Whitney AUC between cases and
-    controls:
-
-      t      summed F   this body   measured AUC          sems
-      100    0.119      0.88690     0.89017 ± 0.00081      4.0
-      250    0.282      0.86949     0.87126 ± 0.00152      1.2
-      500    0.514      0.83267     0.83801 ± 0.00141      3.8
-      800    0.733      0.77267     0.80029 ± 0.00124     22.2
-      1100   0.907      0.67610     0.76220 ± 0.00255     33.8
-
-    Worst cell 33.79 sems, 11.3% relative, and it tracks the `R²` failure cell for cell: the
-    AUC prediction is low exactly where the `R²` prediction is low, and by the amount the
-    chart carries that shortfall.
-
-    THE CHART IS NOT THE FAULT and the control says so. `liabilityThresholdAUCFromExplainedR2`
-    is VALIDATED against 400 simulated PGS studies at pooled RMSE 0.0121 against a 0.0120 noise
-    floor, and on THESE replicates the `t = 0` cell — where no drift has happened, so the chart
-    is being read at the constructed `r2_0` — predicts 0.897003 against a measured
-    0.900097 ± 0.001305. So the `R²` this file computes is not the explained-variance fraction
-    the chart's argument expects, which is what was untested; the chart's own conversion is
-    fine. Repairing `cleanSplitTargetR2` repairs this body without touching it.
-
-    Power: the prediction spans 0.887 to 0.676. The superseded linear retention carried
-    through the same chart is FALSIFIED at 235 sems on the same cells, so the design's power to
-    reject a wrong `R²` through this conversion is demonstrated and not assumed.
-
-    Prevalence stays a required argument for the reason `targetLiabilityAUCFromNeutralAFBenchmark`
-    gives at length: converting a drift-induced `R²` drop to AUC through a prevalence-free
-    chart is the fault that carried a `-0.068` bias, and making `K` mandatory is what prevents
-    it. Nothing in this record touches that. -/
-noncomputable def cleanSplitTargetAUC (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) : ℝ :=
-  liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K
-
-/-- The AUC prediction is the `R²` prediction put through the liability chart, and nothing
-    else. Stated so the two cannot drift apart under later edits. -/
-theorem cleanSplitTargetAUC_eq (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) :
-    cleanSplitTargetAUC r2_0 NeS NeT t ldFactor K =
-      liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K :=
-  rfl
-
-/-- **The LD penalty enters as the validated multiplicative factor.** `neutralPortabilityRatioLD`
-    is the measured combination `(1 - fst_additional)·ld_factor`; read at zero additional `F_ST`
-    it is the bare LD factor, which is what this composition multiplies in. The point of
-    stating it is the zero: the drift penalty is carried ONCE, by `neutralPortability`, and is
-    not applied a second time inside the LD stage. -/
-theorem cleanSplitTargetR2_eq_ratioLD_scaling (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) :
-    cleanSplitTargetR2 r2_0 NeS NeT t ldFactor =
-      neutralPortability r2_0 (cleanSplitFst NeS NeT t) *
-        neutralPortabilityRatioLD 0 ldFactor := by
-  unfold cleanSplitTargetR2 neutralPortabilityRatioLD Descent.Core.retainedFraction
-  ring
-
-/-- **The admissible range, exactly.** The composition is defined where the summed per-branch
-    index stays below `neutralPortability`'s pole, and that is precisely where the two
-    retentions sum above one. Beyond it the split is deep enough that the chart has no value,
-    which a consumer must exclude rather than read. -/
+/-- **When the summed index stays below one, exactly.** The sum of two per-branch coefficients
+    is not confined to the unit interval — each reaches toward one, so the sum reaches toward
+    two — and this says when it does not: precisely when the two retentions sum above one.
+    A consumer reading the sum as though it were one population's `F` against an ancestor
+    needs that condition. The composed prediction below does not, because it never puts this
+    sum in a chart's `fst` slot. -/
 theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
     cleanSplitFst NeS NeT t < 1 ↔
       1 < neutralDriftFactor NeS t + neutralDriftFactor NeT t := by
@@ -1094,35 +997,6 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
     cleanSplitFst NeS NeT 0 = 0 := by
   unfold cleanSplitFst neutralDriftFactor fstFromDriftFactor Descent.Core.complement
   norm_num
-
-/-- **The composition recovers the ancestral `R²` at the root.** At generation zero with no LD
-    loss the target `R²` IS the source `R²`: the two penalties are the whole content of the
-    prediction, and with neither of them active nothing is lost. A body that failed this would
-    be predicting a drop with no elapsed time and no decayed tagging. -/
-theorem cleanSplitTargetR2_at_zero_time (r2_0 NeS NeT : ℝ) :
-    cleanSplitTargetR2 r2_0 NeS NeT 0 1 = r2_0 := by
-  unfold cleanSplitTargetR2 neutralPortability
-  rw [cleanSplitFst_at_zero_time]
-  norm_num
-
-/-- **The prediction is a genuine `R²`**: nonnegative, and never above the ancestral value.
-    Both bounds need the admissible range, and the upper one needs the LD factor to be a
-    retention rather than an amplification. -/
-theorem cleanSplitTargetR2_mem_Icc (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
-    (hfst0 : 0 ≤ cleanSplitFst NeS NeT t) (hfst1 : cleanSplitFst NeS NeT t < 1)
-    (hld0 : 0 ≤ ldFactor) (hld1 : ldFactor ≤ 1) :
-    0 ≤ cleanSplitTargetR2 r2_0 NeS NeT t ldFactor ∧
-      cleanSplitTargetR2 r2_0 NeS NeT t ldFactor ≤ r2_0 := by
-  have hnn := neutralPortability_nonneg r2_0 (cleanSplitFst NeS NeT t) hr2 hr2' hfst1.le
-  have hle := neutralPortability_le_r2_0 r2_0 (cleanSplitFst NeS NeT t) hr2 hr2' hfst0 hfst1
-  unfold cleanSplitTargetR2
-  refine ⟨mul_nonneg hnn hld0, ?_⟩
-  calc neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
-      ≤ neutralPortability r2_0 (cleanSplitFst NeS NeT t) * 1 :=
-        mul_le_mul_of_nonneg_left hld1 hnn
-    _ = neutralPortability r2_0 (cleanSplitFst NeS NeT t) := mul_one _
-    _ ≤ r2_0 := hle
 
 /-- **The per-generation retention is an admissible base** whenever the effective size is at
     least one. Both halves are needed downstream: nonnegativity to raise it to a power at all,
@@ -1154,33 +1028,483 @@ theorem cleanSplitFst_monotone_time (NeS NeT : ℝ) (t₁ t₂ : ℕ)
   unfold cleanSplitFst fstFromDriftFactor Descent.Core.complement
   linarith
 
-/-- **The composed prediction decays with the age of the split.** More generations since the
-    split means a larger summed drift index, and `neutralPortability` is decreasing in that
-    index, so the transported `R²` can only fall. The LD factor is held fixed, which is the
-    honest statement: this theorem is about the drift half of the composition, and a target
-    whose tagging has also decayed falls further.
+/-!
+### The source branch enters as a fraction, and it needs the ancestral spectrum
 
-    The admissibility hypothesis is on the LATER time only. That is not a convenience — the
-    index is monotone in time, so keeping the older split inside the pole automatically keeps
-    the younger one there, and requiring it at both times would be redundant. -/
-theorem cleanSplitTargetR2_antitone_time (r2_0 NeS NeT : ℝ) (t₁ t₂ : ℕ) (ldFactor : ℝ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
-    (hS : 1 ≤ NeS) (hT : 1 ≤ NeT) (ht : t₁ ≤ t₂)
-    (hfst0 : 0 ≤ cleanSplitFst NeS NeT t₁) (hfst1 : cleanSplitFst NeS NeT t₂ < 1)
-    (hld : 0 ≤ ldFactor) :
-    cleanSplitTargetR2 r2_0 NeS NeT t₂ ldFactor ≤
-      cleanSplitTargetR2 r2_0 NeS NeT t₁ ldFactor := by
-  have hmono := cleanSplitFst_monotone_time NeS NeT t₁ t₂ hS hT ht
-  have hanti :=
-    neutralPortability_antitone_fst r2_0 (cleanSplitFst NeS NeT t₁) (cleanSplitFst NeS NeT t₂)
-      hr2 hr2' hfst0 hmono hfst1
-  unfold cleanSplitTargetR2
-  exact mul_le_mul_of_nonneg_right hanti hld
+What follows is the corrected composition. The target branch keeps the chart; the source
+branch gets a factor built from the probability that each ancestral variant is still
+segregating in it, which is a functional of the ancestral frequencies and cannot be
+compressed into a drift index.
+-/
+
+/-- **Gegenbauer polynomials at `α = 3/2`, by the standard three-term recurrence**
+    `(k+2)·C_{k+2}(z) = 2·(k + 5/2)·z·C_{k+1}(z) − (k+3)·C_k(z)`. That recurrence is the
+    definition here rather than a theorem about one, because Mathlib carries neither Gegenbauer
+    nor Legendre polynomials.
+
+    THEY APPEAR FOR ONE REASON. `p(1-p)·C_{n-1}^{3/2}(1-2p)` is an eigenfunction of the
+    Wright-Fisher backward operator `L u = p(1-p)·u''/(4·Ne)`, with eigenvalue
+    `-n(n+1)/(4·Ne)`, and it vanishes at both absorbing boundaries. That is what lets
+    `stillSegregatingProb` below be a closed form in its own arguments instead of an iteration
+    of a transition matrix — the difference between a law this corpus can state and a
+    computation it can only run.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM. A polynomial recurrence describes no population.
+    What can be measured is the segregation probability built out of it. -/
+noncomputable def gegenbauerC32 : ℕ → ℝ → ℝ
+  | 0, _ => 1
+  | 1, z => 3 * z
+  | (k + 2), z =>
+      (2 * ((k : ℝ) + 5 / 2) * z * gegenbauerC32 (k + 1) z
+        - ((k : ℝ) + 3) * gegenbauerC32 k z) / ((k : ℝ) + 2)
+
+/-- **Even-degree Gegenbauer polynomials are even functions and odd-degree ones are odd.**
+    Carried in pairs, because the recurrence makes each value depend on the two below it, so a
+    single-step induction cannot state a strong enough hypothesis. This is what makes
+    `stillSegregatingProb_symm` a corollary of the expansion's coefficients rather than a
+    separate assumption about drift. -/
+theorem gegenbauerC32_neg (n : ℕ) (z : ℝ) :
+    gegenbauerC32 n (-z) = (-1) ^ n * gegenbauerC32 n z := by
+  have key : ∀ m : ℕ, gegenbauerC32 m (-z) = (-1) ^ m * gegenbauerC32 m z ∧
+      gegenbauerC32 (m + 1) (-z) = (-1) ^ (m + 1) * gegenbauerC32 (m + 1) z := by
+    intro m
+    induction m with
+    | zero => exact ⟨by simp [gegenbauerC32], by simp [gegenbauerC32]⟩
+    | succ k ih =>
+      refine ⟨ih.2, ?_⟩
+      show gegenbauerC32 (k + 2) (-z) = (-1) ^ (k + 2) * gegenbauerC32 (k + 2) z
+      simp only [gegenbauerC32]
+      rw [ih.1, ih.2]
+      ring
+  exact (key n).1
+
+/-- **An even-degree Gegenbauer polynomial takes the same value at `z` and `-z`.** The form the
+    segregation probability's symmetry actually uses. -/
+theorem gegenbauerC32_even_neg (k : ℕ) (z : ℝ) :
+    gegenbauerC32 (2 * k) (-z) = gegenbauerC32 (2 * k) z := by
+  rw [gegenbauerC32_neg, pow_mul]
+  norm_num
+
+/-- **The probability that a neutral allele at frequency `p` is still SEGREGATING** — neither
+    lost nor fixed — after `t` generations in a closed population of effective size `Ne`.
+
+    Kimura's eigenfunction solution of the Wright-Fisher diffusion, with the coefficients
+    computed rather than quoted. Expanding the constant initial condition against the
+    eigenfunctions under the weight `1/(p(1-p))` gives `⟨1, u_n⟩ = ½·(P_n(1) − P_n(-1))`,
+    which is `1` for odd `n` and `0` for even `n`; only odd `n` survives, so the sum is
+    reindexed `n = 2k+1` and only EVEN-degree Gegenbauer polynomials appear. The symmetry
+    between `p` and `1-p` follows from that and is `stillSegregatingProb_symm`.
+
+    ONE TERM IS NOT ENOUGH, which is why this is a series and not a single exponential. At the
+    deepest cell the corpus has measured — `t = 1100` generations at `Ne = 2000` — the `n = 3`
+    term still carries `e^(-1.65) = 0.19`, so truncating at the leading eigenvalue discards a
+    fifth of the answer.
+
+    `t = 0` IS GUARDED AND THE GUARD IS LOAD-BEARING. For `t ≥ 1` the exponential beats the
+    polynomial growth of the Gegenbauer factor and the series converges absolutely. At `t = 0`
+    the expansion of the constant function converges only conditionally, so `Summable` fails
+    and `∑'` returns its junk value `0`; the reading `stillSegregatingProb Ne p 0 = 1` would be
+    FALSE as written rather than merely unproved. The `if` supplies the value the series is
+    expanding, which is what the `t = 0` control cell every battery group is gated on has to
+    see.
+
+    SUMMABILITY FOR `t ≥ 1` IS AN OBLIGATION THIS FILE HAS NOT DISCHARGED. It wants a
+    polynomial bound on `C_{2k}^{3/2}` over `[-1, 1]`. Until that is proved, the theorems below
+    take the range and the time-monotonicity of this body as HYPOTHESES rather than deriving
+    them, and a consumer has to discharge them — numerically, as the derivation did — instead
+    of assuming them silently.
+
+    Empirical status: UNTESTED. No `record()` in the harness names this body. Behind it stand
+    two other computations of the same quantity that agree with it — a backward iteration of
+    the discrete Wright-Fisher transition matrix, which is the battery's own engine with no
+    diffusion limit taken, and a direct forward Wright-Fisher simulation agreeing at worst 0.73
+    sems — but those scripts are not in this repository, so a reader cannot check them and they
+    do not amount to a verdict. What measured standing this body has arrives through
+    `sourcePolymorphicSignalFraction`, which is compared against committed cells. -/
+noncomputable def stillSegregatingProb (Ne p : ℝ) (t : ℕ) : ℝ :=
+  if t = 0 then 1 else
+    ∑' k : ℕ,
+      4 * (4 * (k : ℝ) + 3) / (((2 : ℝ) * k + 1) * (2 * k + 2))
+        * (p * (1 - p)) * gegenbauerC32 (2 * k) (1 - 2 * p)
+        * Real.exp (-(((2 : ℝ) * k + 1) * (2 * k + 2)) * t / (4 * Ne))
+
+/-- **A variant and its complement have the same fate.** An allele at frequency `p` and one at
+    `1-p` are equally likely to be still segregating, because the two are the same variant read
+    from the other allele. This is not assumed: it falls out of `gegenbauerC32_even_neg`,
+    which is to say out of the coefficients vanishing on the even eigenfunctions. A consumer
+    integrating against a spectrum symmetric about one half may therefore weight the
+    probability flatly, which is what makes the battery's `1/p` spectrum tractable. -/
+theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
+    stillSegregatingProb Ne (1 - p) t = stillSegregatingProb Ne p t := by
+  unfold stillSegregatingProb
+  by_cases ht : t = 0
+  · simp [ht]
+  · simp only [if_neg ht]
+    refine tsum_congr fun k ↦ ?_
+    have hz : 1 - 2 * (1 - p) = -(1 - 2 * p) := by ring
+    have hp : (1 - p) * (1 - (1 - p)) = p * (1 - p) := by ring
+    rw [hz, hp, gegenbauerC32_even_neg]
+
+/-- **No time, no absorption.** Every variant is still segregating at the generation the
+    branches parted, which is the guarded value rather than the series' junk point. -/
+@[simp] theorem stillSegregatingProb_at_zero_time (Ne p : ℝ) :
+    stillSegregatingProb Ne p 0 = 1 := by
+  unfold stillSegregatingProb
+  simp
+
+/-- **The fraction of the TARGET's genetic signal that is still POLYMORPHIC IN THE SOURCE.**
+    A weighted average of `stillSegregatingProb` over the causal variants: `w j` is variant
+    `j`'s contribution to the genetic variance — `β_j² · 2·p_j·(1-p_j)` at the battery's
+    instantiation — and `p j` is its ANCESTRAL frequency, the state both branches departed
+    from.
+
+    THE TARGET BRANCH CANCELS OUT OF THIS, AND THAT CANCELLATION IS THE POINT. Conditioning on
+    the ancestral frequency, the target's expected heterozygosity at a variant is the ancestral
+    heterozygosity times that branch's drift factor — one constant, shared across variants,
+    which divides out of numerator and denominator alike. So this quantity depends on the
+    SOURCE's effective size and on the ancestral spectrum, and on the TARGET's effective size
+    not at all. That is a structural claim the battery's own decomposition row could not make,
+    because both of its factors were measured on the same replicates;
+    `cleanSplitTargetR2'_NeT_enters_only_through_chart` states it at the composed level and it
+    is UNTESTED, since the committed design carries a single `(NeS, NeT)` pair and no stored
+    cell can separate them.
+
+    WHY THE SPECTRUM IS AN ARGUMENT AND A DRIFT INDEX WOULD NOT DO. Holding `NeS` and `t` fixed
+    — hence holding the source's own `F` fixed — and varying only the ancestral spectrum moves
+    the lost fraction by a factor of 51 at `t = 100` and 1.9 at `t = 1100`. The source's
+    contribution is a functional of the spectrum, so a body taking one number where this takes
+    `w` and `p` cannot be repaired by rescaling that number.
+
+    Empirical status: **VALIDATED** (`simcov/battery_clean01.py`). Evaluated at the battery's
+    own instantiation — 20000 loci from a neutral `1/p` spectrum on `[0.01, 0.99]`,
+    `NeS = 2000` closed, no mutation and no migration, 10 independent blocks — against the
+    realised fraction of the target's signal carried by variants still polymorphic in the
+    source, which `clean01.log` prints per cell as "of the target's signal":
+
+      t      this body   realised fraction   relative
+      100    0.98882     0.98740             +0.144%
+      250    0.95561     0.95470             +0.095%
+      500    0.89892     0.89940             -0.053%
+      800    0.83442     0.83490             -0.057%
+      1100   0.77431     0.77300             +0.169%
+
+    Worst cell 0.169% relative, residuals of mixed sign. Zero fitted constants: every argument
+    is a simulation parameter, and nothing is estimated from the replicates the fraction is
+    measured on.
+
+    Power: the prediction spans 0.989 to 0.774 across the design, and the composition it feeds
+    separated three rival readings of the same slot on these very cells — the summed index
+    FALSIFIED at 66.51 sems, the target-branch-only reading at 47.30, the superseded linear
+    retention at 229.
+
+    NO `record()` NAMES THIS BODY YET, and that is the qualification the tag carries. The
+    comparison above is arithmetic against cells committed in `battery_clean01_results.json`
+    and `clean01.log`, reproducible by a reader without rerunning the simulation, but the
+    harness has not yet recorded a verdict under this name.
+
+    argument_source: model. `NeS`, `t` and the ancestral frequencies are the simulation's own
+    parameters; the weights are its constructed effect sizes and ancestral heterozygosities. -/
+noncomputable def sourcePolymorphicSignalFraction {M : ℕ} (w p : Fin M → ℝ)
+    (NeS : ℝ) (t : ℕ) : ℝ :=
+  (∑ j, w j * stillSegregatingProb NeS (p j) t) / ∑ j, w j
+
+/-- **At the split itself the whole signal is still shared.** Every variant is segregating in
+    the source, so the weighted average is one whatever the weights are, provided they do not
+    sum to zero. This is the control cell every battery group in the clean-split design is
+    gated on. -/
+theorem sourcePolymorphicSignalFraction_at_zero_time {M : ℕ} (w p : Fin M → ℝ) (NeS : ℝ)
+    (hw : ∑ j, w j ≠ 0) :
+    sourcePolymorphicSignalFraction w p NeS 0 = 1 := by
+  unfold sourcePolymorphicSignalFraction
+  simp [div_self hw]
+
+/-- **The fraction is a genuine fraction**, between none of the signal and all of it.
+
+    Assumes: the weights are nonnegative and do not sum to zero, and the segregation
+    probability lies in `[0,1]` at each ancestral frequency. The last of those is a property of
+    `stillSegregatingProb` that this file has not proved — it needs the summability obligation
+    that body's docstring records — so it is carried as a hypothesis rather than smuggled in.
+    What is proved here is the part that is about the AVERAGING: a weighted mean of quantities
+    in `[0,1]` with nonnegative weights lands in `[0,1]`, whatever the spectrum. -/
+theorem sourcePolymorphicSignalFraction_mem_Icc {M : ℕ} (w p : Fin M → ℝ) (NeS : ℝ) (t : ℕ)
+    (hw : ∀ j, 0 ≤ w j) (hpos : 0 < ∑ j, w j)
+    (hP0 : ∀ j, 0 ≤ stillSegregatingProb NeS (p j) t)
+    (hP1 : ∀ j, stillSegregatingProb NeS (p j) t ≤ 1) :
+    0 ≤ sourcePolymorphicSignalFraction w p NeS t ∧
+      sourcePolymorphicSignalFraction w p NeS t ≤ 1 := by
+  unfold sourcePolymorphicSignalFraction
+  have hnum : 0 ≤ ∑ j, w j * stillSegregatingProb NeS (p j) t :=
+    Finset.sum_nonneg fun j _ ↦ mul_nonneg (hw j) (hP0 j)
+  have hle : ∑ j, w j * stillSegregatingProb NeS (p j) t ≤ ∑ j, w j := by
+    refine Finset.sum_le_sum fun j _ ↦ ?_
+    calc w j * stillSegregatingProb NeS (p j) t
+        ≤ w j * 1 := mul_le_mul_of_nonneg_left (hP1 j) (hw j)
+      _ = w j := mul_one _
+  exact ⟨div_nonneg hnum hpos.le, (div_le_one hpos).2 hle⟩
+
+/-- **Signal leaves the score and does not come back.** As the split deepens more of the
+    target's causal variants have been absorbed in the source, so the shared fraction falls.
+
+    Assumes: the segregation probability is itself antitone in time at each frequency, which is
+    true of the Wright-Fisher diffusion and is not proved here — the eigenfunction coefficients
+    alternate in sign, so a termwise argument does not give it. Stated this way the theorem
+    says what it is for: the averaging cannot reverse a decline that holds variant by variant,
+    however the weights are distributed. -/
+theorem sourcePolymorphicSignalFraction_antitone_time {M : ℕ} (w p : Fin M → ℝ) (NeS : ℝ)
+    (t₁ t₂ : ℕ) (hw : ∀ j, 0 ≤ w j) (hpos : 0 < ∑ j, w j)
+    (hP : ∀ j, stillSegregatingProb NeS (p j) t₂ ≤ stillSegregatingProb NeS (p j) t₁) :
+    sourcePolymorphicSignalFraction w p NeS t₂ ≤ sourcePolymorphicSignalFraction w p NeS t₁ := by
+  unfold sourcePolymorphicSignalFraction
+  have h : ∑ j, w j * stillSegregatingProb NeS (p j) t₂ ≤
+      ∑ j, w j * stillSegregatingProb NeS (p j) t₁ :=
+    Finset.sum_le_sum fun j _ ↦ mul_le_mul_of_nonneg_left (hP j) (hw j)
+  rw [div_le_div_iff₀ hpos hpos]
+  nlinarith [h, hpos]
+
+/-- **The composed target `R²` for a clean two-branch split, with the branches separated.**
+    The TARGET branch's drift index through the neutral portability chart, times the fraction
+    of the target's signal still polymorphic in the SOURCE, times the LD factor.
+
+    THE PRODUCT IS DERIVED AND NOT AN ANSATZ. With the score `s = Σ_{j polymorphic in S} β_j
+    g_j` over target genotypes and the phenotype `y = Σ_j β_j g_j + e`, the frequency engine
+    carrying no linkage, `cov(s,y) = Var(s) = Σ_{poly} β_j² h_T,j`, so
+    `R² = [V_A^poly/V_A^T] · [V_A^T/(V_A^T + V_E)]`. The second bracket is
+    `neutralPortability r2_0 F_T` after substituting `V_E/V_A = (1-r2_0)/r2_0`, and the first
+    is the source-polymorphic fraction. The factorisation is a consequence of the score's
+    construction; only the TARGET branch's index belongs in the chart's `fst` slot, and the
+    source branch enters through the fraction and nowhere else.
+
+    THE PRIME IS NOT DECORATION. The unprimed name belonged to the summed-index composition
+    that this design FALSIFIED at 66.51 sems, and the harness's ledger still carries that
+    verdict under it; a repair reusing the name would have inherited a record about a different
+    formula.
+
+    Empirical status: **VALIDATED** (`simcov/battery_clean01.py`). Same replicates as
+    `cleanSplitFst`, 40000 target individuals per block, TRUE causal effects so no
+    GWAS-inefficiency confound is present, `r2_0 = V_A/(V_A + V_E) = 0.5` realised in every
+    block, `ldFactor = 1`, `NeS = 2000` and `NeT = 500`. The observable is the realised squared
+    correlation between the source-built PER-ALLELE score and the target phenotype:
+
+      t      F_T       fraction   this body   measured             sems   relative
+      100    0.09521   0.98882    0.46970     0.47082 ± 0.00061    1.84   -0.238%
+      250    0.22130   0.95561    0.41836     0.41995 ± 0.00110    1.45   -0.379%
+      500    0.39362   0.89892    0.33933     0.33817 ± 0.00181   -0.64   +0.342%
+      800    0.55085   0.83442    0.25862     0.25826 ± 0.00115   -0.31   +0.139%
+      1100   0.66731   0.77431    0.19330     0.19400 ± 0.00139    0.51   -0.362%
+
+    Worst cell 1.84 sems, 0.38% relative, residuals of mixed sign, with ZERO fitted constants —
+    every argument is a model parameter and none is estimated from the replicates. It also
+    beats the battery's own decomposition row, which used the MEASURED fraction and lands at
+    2.66 sems: the computed fraction is noise-free, so supplying it improves the fit rather
+    than degrading it.
+
+    THE ERROR BARS ARE THE BATTERY'S PAIRED SEMS, which subtract the block-to-block scatter
+    shared by a prediction that tracks each block's realised `F`. This prediction is
+    deterministic and so deserves the measurement-only sem, which is at or above the paired
+    one. The sems quoted are therefore an upper bound on the discrepancy.
+
+    Power: the prediction spans 0.470 to 0.193 across the design, a factor of 2.4, and the two
+    other readings of the `fst` slot that could be meant sit at 0.085 and 0.250 at the far
+    cell — the summed index FALSIFIED at 66.51 sems and 56% low, the target-branch-only reading
+    at 47.30 sems and 20% high. The design separates them by a factor of three and could not
+    have validated all three.
+
+    THERE IS NO SHALLOW-SPLIT REDUCTION TO THE SUMMED BODY, and a reader should not look for
+    one. The ratio of the two is non-monotone in `t` with a crossing near `t = 250`. The summed
+    body survived at `t = 100` because it charges `(1-r2_0)·F_S` for the source branch where
+    the truth charges `1 - S`, and on THIS spectrum at `r2_0 = 0.5` those happen to be 0.0124
+    and 0.0116; on a `[0.05, 0.95]` spectrum at the identical `F_S` they are 0.0124 and
+    0.00045, a factor of 27 apart. Two unrelated errors cancelled at one cell. The genuine
+    reduction is at `t = 0`, and it is `cleanSplitTargetR2'_at_zero_time`.
+
+    NO `record()` NAMES THIS BODY YET. The table is arithmetic against cells committed in
+    `battery_clean01_results.json` and `clean01.log`, reproducible without rerunning the
+    simulation; the harness has not yet recorded a verdict under this name, and the
+    independence from `NeT` is untested because the committed design carries a single
+    `(NeS, NeT)` pair.
+
+    SCOPE, AND IT IS NARROWER THAN THE NAME. Derived for the PER-ALLELE score, which is what a
+    deployed PGS is. It does NOT describe the SOURCE-STANDARDISED score, whose `√(h_S/h_T)`
+    weights make a different observable — that construction is measured in the same battery and
+    needs a derivation of its own. The regime is inherited whole from `neutralDriftFactor`:
+    closed populations, no mutation, no migration, no linkage within the drift stage, and true
+    causal effects.
+
+    argument_source: model. The control is the `t = 0` cell, where no drift has happened and
+    the measured target `R²` must be the constructed `V_A/(V_A + V_E)`: predicted 0.500000,
+    measured 0.501181 ± 0.001110. -/
+noncomputable def cleanSplitTargetR2' (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) : ℝ :=
+  neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t))
+    * sourcePolymorphicSignalFraction w p NeS t * ldFactor
+
+/-- **The composition recovers the ancestral `R²` at the root.** At the generation the branches
+    parted, with no LD loss, the target `R²` IS the source `R²`: the target branch has
+    accumulated no drift index and the source branch has absorbed no variants, so neither
+    penalty is active. A body failing this would be predicting a drop with no elapsed time.
+
+    This is the reduction the corrected composition genuinely has. It is NOT a shallow-split
+    agreement with the summed-index body, which does not exist — see this file's account of the
+    `t = 100` coincidence. -/
+theorem cleanSplitTargetR2'_at_zero_time (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ) (NeS NeT : ℝ)
+    (hw : ∑ j, w j ≠ 0) :
+    cleanSplitTargetR2' r2_0 w p NeS NeT 0 1 = r2_0 := by
+  unfold cleanSplitTargetR2'
+  rw [sourcePolymorphicSignalFraction_at_zero_time w p NeS hw]
+  unfold neutralPortability fstFromDriftFactor neutralDriftFactor Descent.Core.complement
+  norm_num
+
+/-- **The corrected prediction sits below the target-branch-only reading.** The source branch
+    can only remove signal, so charting the target branch alone and stopping there is an upper
+    bound. The design measured both: the target-branch-only reading is 20% HIGH at the deepest
+    cell and the summed-index reading 56% LOW, and the corrected law lies between them, which
+    is the shape this inequality fixes in the corpus. -/
+theorem cleanSplitTargetR2'_le_targetBranchOnly (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
+    (hfst : fstFromDriftFactor (neutralDriftFactor NeT t) ≤ 1)
+    (hfrac1 : sourcePolymorphicSignalFraction w p NeS t ≤ 1) (hld : 0 ≤ ldFactor) :
+    cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor ≤
+      neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor := by
+  unfold cleanSplitTargetR2'
+  have hchart : 0 ≤ neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) :=
+    neutralPortability_nonneg _ _ hr2 hr2' hfst
+  nlinarith [mul_le_mul_of_nonneg_left hfrac1 hchart, hld]
+
+/-- **The target's effective size moves the prediction only through the chart.** Cross-
+    multiplied so that the claim is an identity rather than a statement about a quotient: the
+    source-branch factor and the LD factor are the same at two target effective sizes, so all
+    the `NeT`-dependence is in `neutralPortability`.
+
+    THIS IS THE SHARPEST UNTESTED CONSEQUENCE OF THE CORRECTION, and it is why the correction
+    is a change of shape rather than of constant. The summed-index body made the source and
+    target branches enter symmetrically; here the source branch's factor does not know `NeT`
+    exists. The committed design carries one `(NeS, NeT)` pair, so no stored cell can tell the
+    two apart — separating them needs a sweep in `NeT` at fixed `NeS`. -/
+theorem cleanSplitTargetR2'_NeT_enters_only_through_chart (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT NeT' : ℝ) (t : ℕ) (ldFactor : ℝ) :
+    cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor *
+        neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT' t)) =
+      cleanSplitTargetR2' r2_0 w p NeS NeT' t ldFactor *
+        neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) := by
+  unfold cleanSplitTargetR2'
+  ring
+
+/-- **The prediction is a genuine `R²`**: nonnegative, and never above the ancestral value.
+    Both penalties are retentions, so the composition can only lose. -/
+theorem cleanSplitTargetR2'_mem_Icc (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ) (NeS NeT : ℝ) (t : ℕ)
+    (ldFactor : ℝ) (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1)
+    (hfst0 : 0 ≤ fstFromDriftFactor (neutralDriftFactor NeT t))
+    (hfst1 : fstFromDriftFactor (neutralDriftFactor NeT t) < 1)
+    (hfrac0 : 0 ≤ sourcePolymorphicSignalFraction w p NeS t)
+    (hfrac1 : sourcePolymorphicSignalFraction w p NeS t ≤ 1)
+    (hld0 : 0 ≤ ldFactor) (hld1 : ldFactor ≤ 1) :
+    0 ≤ cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor ∧
+      cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor ≤ r2_0 := by
+  have hchart : 0 ≤ neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) :=
+    neutralPortability_nonneg _ _ hr2 hr2' hfst1.le
+  have hle : neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) ≤ r2_0 :=
+    neutralPortability_le_r2_0 _ _ hr2 hr2' hfst0 hfst1
+  unfold cleanSplitTargetR2'
+  refine ⟨mul_nonneg (mul_nonneg hchart hfrac0) hld0, ?_⟩
+  nlinarith [mul_nonneg hchart hfrac0, mul_nonneg hchart hld0]
+
+/-- **The composed prediction decays with the age of the split.** More generations means a
+    larger target drift index, which the chart carries downward, and a smaller shared fraction,
+    which multiplies it down again. The two penalties move the same way, so no cancellation
+    between them can hide a decline.
+
+    The LD factor is held fixed, which is the honest statement: this is about the drift half of
+    the composition, and a target whose tagging has also decayed falls further. The
+    admissibility hypothesis is on the LATER time only, since the index is monotone in time and
+    requiring it at both would be redundant. The fraction's own monotonicity is a hypothesis
+    for the reason `sourcePolymorphicSignalFraction_antitone_time` records. -/
+theorem cleanSplitTargetR2'_antitone_time (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ) (NeS NeT : ℝ)
+    (t₁ t₂ : ℕ) (ldFactor : ℝ) (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hT : 1 ≤ NeT) (ht : t₁ ≤ t₂)
+    (hfst0 : 0 ≤ fstFromDriftFactor (neutralDriftFactor NeT t₁))
+    (hfst1 : fstFromDriftFactor (neutralDriftFactor NeT t₂) < 1)
+    (hfrac : sourcePolymorphicSignalFraction w p NeS t₂ ≤
+      sourcePolymorphicSignalFraction w p NeS t₁)
+    (hfrac0 : 0 ≤ sourcePolymorphicSignalFraction w p NeS t₂) (hld : 0 ≤ ldFactor) :
+    cleanSplitTargetR2' r2_0 w p NeS NeT t₂ ldFactor ≤
+      cleanSplitTargetR2' r2_0 w p NeS NeT t₁ ldFactor := by
+  have hd := neutralDriftFactor_antitone_time NeT t₁ t₂ hT ht
+  have hmono : fstFromDriftFactor (neutralDriftFactor NeT t₁) ≤
+      fstFromDriftFactor (neutralDriftFactor NeT t₂) := by
+    unfold fstFromDriftFactor Descent.Core.complement
+    linarith
+  have hchart := neutralPortability_antitone_fst r2_0
+    (fstFromDriftFactor (neutralDriftFactor NeT t₁))
+    (fstFromDriftFactor (neutralDriftFactor NeT t₂)) hr2 hr2' hfst0 hmono hfst1
+  have hchart2 : 0 ≤ neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t₂)) :=
+    neutralPortability_nonneg _ _ hr2 hr2' hfst1.le
+  unfold cleanSplitTargetR2'
+  exact mul_le_mul_of_nonneg_right
+    (mul_le_mul hchart hfrac hfrac0 (le_trans hchart2 hchart)) hld
+
+/-- **The LD penalty enters as the validated multiplicative factor.** `neutralPortabilityRatioLD`
+    is the measured combination `(1 - fst_additional)·ld_factor`; read at zero additional
+    `F_ST` it is the bare LD factor, which is what this composition multiplies in. The point of
+    stating it is the zero: the drift penalty is carried ONCE, by `neutralPortability`, and is
+    not applied a second time inside the LD stage. -/
+theorem cleanSplitTargetR2'_eq_ratioLD_scaling (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) :
+    cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor =
+      neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) *
+        sourcePolymorphicSignalFraction w p NeS t * neutralPortabilityRatioLD 0 ldFactor := by
+  unfold cleanSplitTargetR2' neutralPortabilityRatioLD Descent.Core.retainedFraction
+  ring
+
+/-- **The composed target AUC for a clean two-branch split**, at a required prevalence.
+
+    Empirical status: **VALIDATED, inherited** (`simcov/battery_clean01.py`). The chart this
+    wraps is `liabilityThresholdAUCFromExplainedR2`, separately VALIDATED against 400 simulated
+    PGS studies at pooled RMSE 0.0121 against a 0.0120 noise floor; what this body adds is the
+    `R²` it is given. Carrying the corrected `R²` through it, on the same replicates with cases
+    the upper 5% of the realised target liability and the Mann-Whitney AUC as the observable:
+
+      t      predicted R²   predicted AUC   measured AUC         sems
+      100    0.46970        0.88738         0.89017 ± 0.00081    3.45
+      250    0.41836        0.86960         0.87126 ± 0.00152    1.09
+      500    0.33933        0.83812         0.83801 ± 0.00141   -0.08
+      800    0.25862        0.79955         0.80029 ± 0.00124    0.59
+      1100   0.19330        0.76183         0.76220 ± 0.00255    0.15
+
+    Worst cell 3.45 sems, against 33.79 for the summed-index composition on these same cells.
+    THE REMAINING RESIDUAL IS THE CHART'S, NOT THE `R²`'s: the `t = 100` miss is +0.0028
+    absolute, and the battery's own `t = 0` control — where no drift has happened and the chart
+    is read at the constructed `r2_0` — shows +0.0031 by itself, predicted 0.897003 against
+    0.900097 ± 0.001305. So it is the chart's small high-`R²` bias, four times smaller than the
+    pooled RMSE the chart is validated at, and not something the corrected `R²` introduces.
+
+    Power: the prediction spans 0.887 to 0.762 across the design, and the superseded linear
+    retention carried through the same chart is FALSIFIED at 235 sems on the same cells, so the
+    design's power to reject a wrong `R²` through this conversion is demonstrated rather than
+    assumed.
+
+    Prevalence stays a required argument for the reason
+    `targetLiabilityAUCFromNeutralAFBenchmark` gives at length: converting a drift-induced `R²`
+    drop to AUC through a prevalence-free chart is the fault that carried a `-0.068` bias, and
+    making `K` mandatory is what prevents it.
+
+    NO `record()` NAMES THIS BODY YET; the table is arithmetic against committed cells, as for
+    `cleanSplitTargetR2'`. -/
+noncomputable def cleanSplitTargetAUC' (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) : ℝ :=
+  liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor) K
+
+/-- The AUC prediction is the `R²` prediction put through the liability chart, and nothing
+    else. Stated so the two cannot drift apart under later edits. -/
+theorem cleanSplitTargetAUC'_eq (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ) (NeS NeT : ℝ) (t : ℕ)
+    (ldFactor K : ℝ) :
+    cleanSplitTargetAUC' r2_0 w p NeS NeT t ldFactor K =
+      liabilityThresholdAUCFromExplainedR2
+        (cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor) K :=
+  rfl
 
 /-!
 ### Two metrics the simulations report, given laws
 
-`cleanSplitTargetR2` predicts an `R²`. The simulation harness reports two other numbers
+`cleanSplitTargetR2'` predicts an `R²`. The simulation harness reports two other numbers
 alongside it — an odds ratio per standard deviation of score, and a squared correlation with
 the truth — and neither had a law here to be compared against. The declarations below supply
 them. Both are UNTESTED and both name honestly what they do NOT cover.
@@ -1393,7 +1717,7 @@ theorem one_lt_orPerSDFromLiability (r2 K : ℝ) (h0 : 0 < r2) (h1 : r2 < 1) :
 
     ON THE STANDARDISED SCORE `s² = 1 - rho²` this reduces to `rho²`, the retained fraction —
     `indexScaleTrueIndexR2_of_standardized` — which is what makes it compose with
-    `cleanSplitTargetR2`.
+    `cleanSplitTargetR2'`.
 
     **THIS BODY CLAIMS THE INDEX SCALE ONLY, and the simulations do not measure that scale.**
     The harness's `r2_true` is a squared correlation between RISKS — probabilities, after the
@@ -1472,11 +1796,11 @@ theorem indexScaleTrueIndexR2_of_standardized (rho s : ℝ) (hs : s ^ 2 = 1 - rh
     liability index. The clean-split prediction therefore needs no conversion to be read as
     index-scale fidelity — and, by the definition's docstring, does need one to be read as the
     risk-scale number a simulation reports most easily. -/
-theorem cleanSplitTargetR2_eq_indexScaleTrueIndexR2 (r2_0 NeS NeT : ℝ) (t : ℕ)
-    (ldFactor rho s : ℝ)
-    (hretain : rho ^ 2 = cleanSplitTargetR2 r2_0 NeS NeT t ldFactor)
+theorem cleanSplitTargetR2'_eq_indexScaleTrueIndexR2 (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
+    (NeS NeT : ℝ) (t : ℕ) (ldFactor rho s : ℝ)
+    (hretain : rho ^ 2 = cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor)
     (hs : s ^ 2 = 1 - rho ^ 2) :
-    indexScaleTrueIndexR2 rho s = cleanSplitTargetR2 r2_0 NeS NeT t ldFactor := by
+    indexScaleTrueIndexR2 rho s = cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor := by
   rw [indexScaleTrueIndexR2_of_standardized rho s hs, hretain]
 
 end CleanSplit
@@ -1630,7 +1954,10 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     free parameter withheld, the linear form FALSIFIED at 10.38 sems; `neutralPortability` is
     VALIDATED at worst 1.70 sems with the linear `1 - 2·fst` form FALSIFIED at 101 sems on the
     same cells. What is untested is that a stepping-stone `F_ST` is the argument
-    `neutralPortability`'s `fst` slot wants — the same join gap `cleanSplitTargetR2` records.
+    `neutralPortability`'s `fst` slot wants, and the clean-split design settled the analogous
+    question the other way: a summed two-branch index in that slot was FALSIFIED at 66.51 sems
+    while a single branch's index passed. So this join is a live question here, not a
+    formality.
 
     INFORMAL SUPPORT, WHICH IS NOT A VERDICT. An exploratory run at `Ne = 3000`, `m = 1e-3`, a
     ten-deme chain, 250 kb clumps and recombination `1.1e-8` had all ten deme means of the
