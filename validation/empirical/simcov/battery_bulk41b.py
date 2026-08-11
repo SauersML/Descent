@@ -64,6 +64,7 @@ def group_a():
     eq_r2, eq_loss, eq_slope = [], [], []
     un_r2 = []
     c_nom, c_alt = [], []
+    c_unsq, c_rhoonly, c_scale = [], [], []
     control = None
     designs = ((0.9, 1.0, True), (0.7, 1.0, True), (0.5, 1.0, True),
                (0.9, 1.6, True), (0.7, 0.6, True),
@@ -114,6 +115,21 @@ def group_a():
                                  truth=slope, sem=sem_slope))
             c_nom.append(dict(design=lab, lean=r2_source * rho ** 2,
                               truth=r2_target, sem=sem_r2))
+            # THREE RIVALS THAT DIFFER IN FORM RATHER THAN IN PROVENANCE, and
+            # that is why they are here. The `[nominal rho]` row above is a real
+            # competing reading, but its whole defect is that it evaluates at the
+            # nominal input -- so this harness books it as a LEAD however far it
+            # misses, and it can never be a rejected competitor. These three are
+            # evaluated at the SAME realised rho as the corpus row, so what they
+            # can lose on is the algebra.
+            c_unsq.append(dict(design=lab, lean=r2_source * rho_hat,
+                               truth=r2_target, sem=sem_r2))
+            c_rhoonly.append(dict(design=lab, lean=rho_hat ** 2,
+                                  truth=r2_target, sem=sem_r2))
+            c_scale.append(dict(design=lab,
+                                lean=r2_source * rho_hat ** 2
+                                / max(alpha_meas ** 2, 1e-12),
+                                truth=r2_target, sem=sem_r2))
             c_alt.append(dict(design=lab,
                               lean=rho_hat * b_source * alpha_meas,
                               truth=slope, sem=sem_slope))
@@ -138,23 +154,38 @@ def group_a():
                          "by the sampling scatter in the vector norms")
     record("ancestryRecalibratedR2", "AncestryCalibration.lean",
            "r2Source * rhoSq  [equal heritability, realised rhoSq]", eq_r2,
-           regime=reg, control=control)
+           regime=reg, control=control, realised_inputs=True,
+           note="three competing forms are carried on these same cells at the "
+                "same realised rho -- the correlation left unsquared, the "
+                "correlation alone with r2Source dropped, and a reading in "
+                "which the target genotype scale alpha enters R-squared, which "
+                "the threefold alpha sweep is what tests")
     record("ancestryRecalibratedR2 [nominal rho, the battery-22 reading, "
            "competing]", "AncestryCalibration.lean",
            "r2Source * rhoSq  [NOMINAL rhoSq]", c_nom, regime=reg,
-           control=control)
+           control=control, realised_inputs=False)
+    record("ancestryRecalibratedR2 [rho left unsquared, competing]",
+           "AncestryCalibration.lean", "r2Source * rho  [realised rho]",
+           c_unsq, regime=reg, control=control, realised_inputs=True)
+    record("ancestryRecalibratedR2 [the correlation alone, r2Source dropped, "
+           "competing]", "AncestryCalibration.lean", "rhoSq  [realised rhoSq]",
+           c_rhoonly, regime=reg, control=control, realised_inputs=True)
+    record("ancestryRecalibratedR2 [target genotype scale entering R-squared, "
+           "competing]", "AncestryCalibration.lean",
+           "r2Source * rhoSq / alpha^2  [realised]", c_scale, regime=reg,
+           control=control, realised_inputs=True)
     record("ancestryRecalibratedR2 [UNEQUAL heritability, the regime boundary]",
            "AncestryCalibration.lean", "r2Source * rhoSq", un_r2,
-           regime=reg_un, control=control)
+           regime=reg_un, control=control, realised_inputs=True)
     record("effectTurnoverR2Loss", "AncestryCalibration.lean",
            "r2Source * (1 - rhoSq)  [equal heritability, realised rhoSq]",
-           eq_loss, regime=reg, control=control)
+           eq_loss, regime=reg, control=control, realised_inputs=True)
     record("ancestryRecalibratedSlope", "AncestryCalibration.lean",
            "rho * bSource / alpha  [realised rho]", eq_slope, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("ancestryRecalibratedSlope [rho*b*alpha reading, competing]",
            "AncestryCalibration.lean", "rho * bSource * alpha", c_alt,
-           regime=reg, control=control)
+           regime=reg, control=control, realised_inputs=True)
 
 
 def group_g():
@@ -168,12 +199,26 @@ def group_g():
     for sens, spec, benefit, harm in designs:
         grid = np.linspace(0.02, 0.70, 69)
         nb = []
+        # THE REALISED OPERATING POINT, pooled over the whole grid the crossing
+        # is read from. The predictions below are evaluated here rather than at
+        # the nominal (sens, spec) the draws were made at: the two differ by
+        # O(1/sqrt(n * pi)) ~ 4e-4, which is small against these bars, and a
+        # falsification declared at a NOMINAL input is a LEAD in this harness
+        # whatever its size -- which is why the three competing forms below,
+        # missing by 140 to 965 sems, had never counted as rejected.
+        d_tot = p_tot = neg_tot = tn_tot = 0
         for pi in grid:
             disease = rng.random(n) < pi
             pos = np.where(disease, rng.random(n) < sens, rng.random(n) >= spec)
             tp = float(np.mean(pos & disease))
             fp = float(np.mean(pos & ~disease))
+            d_tot += int(disease.sum())
+            p_tot += int((pos & disease).sum())
+            neg_tot += int((~disease).sum())
+            tn_tot += int((~pos & ~disease).sum())
             nb.append(benefit * tp - harm * fp)
+        sens_hat = p_tot / d_tot
+        spec_hat = tn_tot / neg_tot
         nb = np.asarray(nb)
         sgn = np.where(nb >= 0)[0]
         if len(sgn) == 0 or sgn[0] == 0:
@@ -185,25 +230,29 @@ def group_g():
         pi_star = x0 + (x1 - x0) * (-y0) / (y1 - y0)
         slope = (y1 - y0) / (x1 - x0)
         sem = math.sqrt(max(harm, benefit) ** 2 / n) / abs(slope)
-        lean = ((1 - spec) * harm) / (sens * benefit + (1 - spec) * harm)
+        lean = (((1 - spec_hat) * harm)
+                / (sens_hat * benefit + (1 - spec_hat) * harm))
         lab = "sens=%.2f spec=%.2f harm=%.1f" % (sens, spec, harm)
-        print("  %-30s pi* = %.5f ± %.5f | body %.5f  swap %.5f  odds %.5f  "
-              "specraw %.5f"
+        print("  %-30s pi* = %.5f ± %.5f | body %.5f (nominal %.5f)  swap %.5f  "
+              "odds %.5f  specraw %.5f  [realised sens %.5f spec %.5f]"
               % (lab, pi_star, sem, lean,
-                 (sens * benefit) / (sens * benefit + (1 - spec) * harm),
-                 ((1 - spec) * harm) / (sens * benefit),
-                 (spec * harm) / (sens * benefit + spec * harm)))
+                 ((1 - spec) * harm) / (sens * benefit + (1 - spec) * harm),
+                 (sens_hat * benefit)
+                 / (sens_hat * benefit + (1 - spec_hat) * harm),
+                 ((1 - spec_hat) * harm) / (sens_hat * benefit),
+                 (spec_hat * harm) / (sens_hat * benefit + spec_hat * harm),
+                 sens_hat, spec_hat))
         cells.append(dict(design=lab, lean=lean, truth=pi_star, sem=sem))
         c_swap.append(dict(design=lab,
-                           lean=(sens * benefit)
-                           / (sens * benefit + (1 - spec) * harm),
+                           lean=(sens_hat * benefit)
+                           / (sens_hat * benefit + (1 - spec_hat) * harm),
                            truth=pi_star, sem=sem))
         c_odds.append(dict(design=lab,
-                           lean=((1 - spec) * harm) / (sens * benefit),
+                           lean=((1 - spec_hat) * harm) / (sens_hat * benefit),
                            truth=pi_star, sem=sem))
-        c_ratio.append(dict(design=lab, lean=(spec * harm)
-                            / (sens * benefit + spec * harm), truth=pi_star,
-                            sem=sem))
+        c_ratio.append(dict(design=lab, lean=(spec_hat * harm)
+                            / (sens_hat * benefit + spec_hat * harm),
+                            truth=pi_star, sem=sem))
         if abs(spec - 0.90) < 1e-9 and abs(harm - 1.5) < 1e-9:
             pi_c = 0.30
             disease = rng.random(n) < pi_c
@@ -222,20 +271,24 @@ def group_g():
            "prevalence at which the MEASURED net benefit crosses zero, read by "
            "interpolation. The harm-to-benefit ratio is chosen so the crossing "
            "is interior to the grid, which battery 40's design was not")
+    reg = reg + (". Every prediction is evaluated at the REALISED sensitivity "
+                 "and specificity of the drawn tests, pooled over the whole "
+                 "grid the crossing is read from, not at the nominal pair the "
+                 "draws were made at")
     record("screeningBreakEvenPrevalence", "PGSCalibrationTheory.lean",
            "(1-spec)*harm / (sens*benefit + (1-spec)*harm)", cells, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("screeningBreakEvenPrevalence [numerator swapped, competing]",
            "PGSCalibrationTheory.lean",
            "sens*benefit / (sens*benefit + (1-spec)*harm)", c_swap, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("screeningBreakEvenPrevalence [odds form, competing]",
            "PGSCalibrationTheory.lean", "(1-spec)*harm / (sens*benefit)",
-           c_odds, regime=reg, control=control)
+           c_odds, regime=reg, control=control, realised_inputs=True)
     record("screeningBreakEvenPrevalence [spec not complemented, competing]",
            "PGSCalibrationTheory.lean",
            "spec*harm / (sens*benefit + spec*harm)", c_ratio, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
 
 
 GROUPS = (("A recalibration trio, heritability held", group_a),

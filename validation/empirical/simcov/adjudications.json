@@ -527,5 +527,69 @@
    "question."
   ],
   "superseded": {}
+ },
+ "prevalenceLogit": {
+  "authoritative": "rival01",
+  "with": "rival01",
+  "reason": [
+   "NEITHER DESIGN IS WRONG AND THE PAIR IS THE FINDING: the two rows are",
+   "the same expression on DISJOINT cells of one battery, separated by the",
+   "spread of the logistic linear predictor. At spread zero the predictor",
+   "is constant, the claim holds exactly, and the row matches at 1.37 sems with three competing readings rejected on the",
+   "same cells. Above zero spread the marginal logit is attenuated toward",
+   "zero -- 3.2 to 5.3 percent at spread 0.5, 11.6 to 17.3 percent at 1.0 and 34.7 to 39.1 percent",
+   "at 2.0 -- and the row is FALSIFIED at 611.05 sems.",
+   "The direction is not a surprise: PopulationCalibrationDrift.lean",
+   "derives it from Jensen on the odds-multiplier action, and",
+   "battery_pgscal01 measured the same attenuation at 374 sems under the",
+   "declaration name prevalenceLogisticCalibrationProfile, which is this",
+   "arithmetic under another name. What is new is that the measurement now",
+   "sits under the name the body carries, against an oracle the body does",
+   "not appear in, with the regime that separates the two verdicts written",
+   "on both rows. The body's recorded empirical status must keep the word",
+   "'intercept-only', because that word is the whole difference."
+  ],
+  "superseded": {
+   "bulk6": [
+    "Not wrong so much as empty. It predicted log(pi/(1-pi)) at the nominal",
+    "prevalence and measured log(pihat/(1-pihat)) at the realised one, so",
+    "the body stood on BOTH sides of the comparison and what the cells",
+    "tested was whether the Bernoulli sampler draws at its stated rate. Any",
+    "monotone transform would have produced the same verdict against its",
+    "own transform of the same sample mean, which is why no rival could be",
+    "rejected there and why its MATCH was downgraded to UNINFORMATIVE."
+   ]
+  }
+ },
+ "prevalenceCITLShift": {
+  "authoritative": "rival01",
+  "with": "rival01",
+  "reason": [
+   "NEITHER DESIGN IS WRONG AND THE PAIR IS THE FINDING: the two rows are",
+   "the same expression on DISJOINT cells of one battery, separated by the",
+   "spread of the logistic linear predictor. At spread zero the predictor",
+   "is constant, the claim holds exactly, and the row matches at 1.16 sems with three competing readings rejected on the",
+   "same cells. Above zero spread the marginal logit is attenuated toward",
+   "zero -- 1.6 to 5.4 percent at spread 0.5, 5.6 to 17.3 percent at 1.0 and 21.6 to 39.4 percent",
+   "at 2.0 -- and the row is FALSIFIED at 616.96 sems.",
+   "The direction is not a surprise: PopulationCalibrationDrift.lean",
+   "derives it from Jensen on the odds-multiplier action, and",
+   "battery_pgscal01 measured the same attenuation at 374 sems under the",
+   "declaration name prevalenceLogisticCalibrationProfile, which is this",
+   "arithmetic under another name. What is new is that the measurement now",
+   "sits under the name the body carries, against an oracle the body does",
+   "not appear in, with the regime that separates the two verdicts written",
+   "on both rows. The body's recorded empirical status must keep the word",
+   "'intercept-only', because that word is the whole difference."
+  ],
+  "superseded": {
+   "bulk6": [
+    "Same defect as its summand: a difference of nominal-prevalence logits",
+    "measured against a difference of realised-prevalence logits is the",
+    "body compared with itself. The oracle in rival01 is the intercept",
+    "shift delta actually applied between the two populations, a",
+    "construction constant that never enters the prediction."
+   ]
+  }
  }
 }
