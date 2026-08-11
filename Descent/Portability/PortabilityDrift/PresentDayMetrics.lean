@@ -2575,14 +2575,62 @@ theorem ldCorrelationDecay_strictAnti_fst
     A candidate sitting beside a falsified body is not a repair of it; the marker moves when
     a battery moves it and not before.
 
-    Empirical status: UNTESTED as a decay law in distance. The shape it is built from is
-    VALIDATED in its own variable — `ohtaKimuraSigmaDSq` within 3.5% at `ρ = 0.5` and 1% at
-    `ρ = 2`, and at 1.85 sems worst cell against a forward two-locus Wright-Fisher engine
-    where this body's exponential rival loses at 6.29 sems with a least-squares-fitted
-    amplitude AND rate. What is untested is this composition: that `ρ` may be read as
-    `λ·√fstGap·distance`, and that the normalised shape is the curve a cross-population LD
-    correlation follows. The `√fstGap` factor is the one part carried over already measured,
-    at 2.42 sems against 4.73 for the un-rooted rival. -/
+    Empirical status: **MEASURED** (`validation/empirical/simcov/battery_ldshape01.py`). THE
+    AMPLITUDE OBSTRUCTION IS CLEARED; THE SHAPE IS NOT SEPARATED FROM THE NAIVE HYPERBOLA. The
+    re-analysis `ldCorrelationDecay`'s falsification record specifies has now been run, on the
+    terms that record sets: one cell fitting the amplitude-1 hyperbolic against measured `r²`
+    normalised to its own zero-distance limit, a re-analysis of cell `I`'s two stored curves
+    and no new simulation.
+
+    WHAT THE OBSTRUCTION WAS. That record refuses to install an amplitude-1 body because
+    cell `I`'s fits "carry a free amplitude, measured at 0.373 and 0.316", so an amplitude-1
+    curve "is NOT the curve that was fitted". The re-analysis measures each curve's OWN
+    zero-distance limit from its three shortest bins alone — with the candidate's droop across
+    them divided out — and finds 0.3798 ± 0.0244 and 0.3803 ± 0.0243. The free amplitudes the
+    record objects to ARE those limits, to within one and two sems respectively:
+
+      curve             A from the whole curve   A from the shortest bins   ratio
+      Ne=2000, 4 Mb            0.3202                0.3798 ± 0.0244        0.843
+      Ne=5000, 2 Mb            0.3826                0.3803 ± 0.0243        1.006
+
+    So the free 0.32 was never a constant pulling away from the data; it was the data's own
+    plateau. That the two curves agree on that plateau to 0.1% across a 2.5-fold change in
+    `Nₑ` is the check that it is a real quantity: under the theory it is set by the shared
+    sample size and MAF filter and not by `Nₑ`, and it behaves that way.
+
+    WITH THE AMPLITUDE PINNED AT 1 AND ONLY THE RATE FREE — one parameter where cell `I`
+    allowed two — this body matches the normalised curves at worst 2.57 sems, and the
+    exponential shape `ldCorrelationDecay` carries is FALSIFIED at 12.05 sems and 78%
+    relative on the same 26 cells. Power: the prediction spans 0.998 down to 0.020, a factor
+    of 51.
+
+    WHY THIS IS `MEASURED` AND NOT `VALIDATED`, and why `ldCorrelationDecay`'s marker has NOT
+    moved. Three things the run does not deliver:
+
+    * The naive amplitude-1 hyperbola `1/(1 + ρ)` matches at 2.58 sems — indistinguishable
+      from this body's 2.57. The data decide hyperbolic against exponential and do not decide
+      WHICH hyperbolic, so nothing here says this normalisation rather than that one.
+    * The residuals are large in absolute terms, 27% relative at the worst cell, because the
+      anchor's own 6% uncertainty is carried into every bar. A match at that width is a weak
+      constraint even where it holds.
+    * The scale mismatch is untouched. These curves are binned `E[r²]`, the expectation of the
+      ratio, while `ohtaKimuraSigmaDSq` is a closed form for `σ_d²`, the ratio of
+      expectations, and `battery_sved01` established those are different numbers. Normalising
+      each curve to its own zero limit is what makes this a comparison of SHAPES; the mismatch
+      is not known to cancel exactly, so this record licenses the shape and the amplitude-1
+      normalisation and does NOT license reading this body as a `σ_d²`.
+
+    The control is what makes the amplitude number usable, and it failed first: fed synthetic
+    curves of known amplitude 1, an earlier anchor that did not divide out the droop returned
+    1.0400 ± 0.0031, a 4% bias at 12.8 sems — larger than the effect being reported. Corrected,
+    it returns 0.998814 ± 0.002886. The bias was found by the control and not by a reading of
+    the verdict.
+
+    The `√fstGap` factor is the one part carried over already measured, at 2.42 sems against
+    4.73 for the un-rooted rival, and nothing in this run bears on it: these curves are
+    within-population `r²` against genetic distance, so `fstGap` is not exercised and `ρ` is
+    read as a bare rate times distance. That `ρ` may be read as `λ·√fstGap·distance` remains
+    untested. -/
 noncomputable def ldCorrelationDecayHyperbolic (distance fstGap lambda : ℝ) : ℝ :=
   PopGen.ohtaKimuraSigmaDSq (1 / 4) (lambda * Real.sqrt fstGap * distance) /
     PopGen.ohtaKimuraSigmaDSq (1 / 4) 0

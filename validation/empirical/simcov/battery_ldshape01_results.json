@@ -1,0 +1,686 @@
+{
+ "_battery_sha": "25c1d1b21a63f579",
+ "results": [
+  {
+   "name": "ldCorrelationDecayHyperbolic",
+   "file": "PresentDayMetrics.lean",
+   "source": "22*(10 + rho)/(10*(2 + rho)*(11 + rho)), rho = lambda*sqrt(fstGap)*d",
+   "note": "",
+   "regime": "a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared",
+   "span": 0.912981166545984,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=2000 over 4 Mb d=2.26e-05 (rate 7615)",
+    "lean": 0.9220942474153163,
+    "truth": 0.7244861486367439,
+    "sem": 0.07678649441112465,
+    "sems_off": 2.5734746753843663,
+    "rel_err": 0.2727562136976794
+   },
+   "cells": [
+    {
+     "design": "Ne=2000 over 4 Mb d=4.6e-06 (rate 7615)",
+     "lean": 0.9831141254281845,
+     "truth": 1.039216321601265,
+     "sem": 0.15181174441685313,
+     "sems_off": 0.36955109361652555,
+     "rel_err": 0.05398509916264218
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=7.82e-06 (rate 7615)",
+     "lean": 0.9716139884382933,
+     "truth": 0.8917036171699251,
+     "sem": 0.13672201575095683,
+     "sems_off": 0.5844733258901572,
+     "rel_err": 0.08961539431900756
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=1.33e-05 (rate 7615)",
+     "lean": 0.9526644376261809,
+     "truth": 0.9859633965572787,
+     "sem": 0.10614877665039822,
+     "sems_off": 0.31370082615994876,
+     "rel_err": 0.033773017383169485
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=2.26e-05 (rate 7615)",
+     "lean": 0.9220942474153163,
+     "truth": 0.7244861486367439,
+     "sem": 0.07678649441112465,
+     "sems_off": 2.5734746753843663,
+     "rel_err": 0.2727562136976794
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=3.85e-05 (rate 7615)",
+     "lean": 0.8744222380592951,
+     "truth": 0.8254352537104744,
+     "sem": 0.06967867849876513,
+     "sems_off": 0.7030412373519513,
+     "rel_err": 0.059346852619409786
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=6.55e-05 (rate 7615)",
+     "lean": 0.8038740490083015,
+     "truth": 0.727108706206649,
+     "sem": 0.05675058472501481,
+     "sems_off": 1.3526793278627747,
+     "rel_err": 0.1055761568337421
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000111 (rate 7615)",
+     "lean": 0.7071547122137857,
+     "truth": 0.702279711466792,
+     "sem": 0.05167365255135718,
+     "sems_off": 0.09434209710932487,
+     "rel_err": 0.006941679600584861
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00019 (rate 7615)",
+     "lean": 0.5875427818330337,
+     "truth": 0.5572866635603513,
+     "sem": 0.03944497899123928,
+     "sems_off": 0.7670461246639846,
+     "rel_err": 0.05429183982151009
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000322 (rate 7615)",
+     "lean": 0.4570498782898477,
+     "truth": 0.42490278832655803,
+     "sem": 0.02920570051832253,
+     "sems_off": 1.1007128537499673,
+     "rel_err": 0.07565751707560722
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000549 (rate 7615)",
+     "lean": 0.33264790503840996,
+     "truth": 0.3289719641157555,
+     "sem": 0.022083082048757027,
+     "sems_off": 0.1664595962890672,
+     "rel_err": 0.011174024912837211
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000933 (rate 7615)",
+     "lean": 0.22821640695342024,
+     "truth": 0.23097912405993626,
+     "sem": 0.015325709869284486,
+     "sems_off": 0.18026682809995015,
+     "rel_err": 0.011960895244364701
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00159 (rate 7615)",
+     "lean": 0.14935797222562958,
+     "truth": 0.17067093054168717,
+     "sem": 0.011199237510647653,
+     "sems_off": 1.903072266821231,
+     "rel_err": 0.12487749523842785
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1e-06 (rate 1.43e+04)",
+     "lean": 0.9930301608700797,
+     "truth": 0.8744347030004871,
+     "sem": 0.11632885227899806,
+     "sems_off": 1.0194844662024034,
+     "rel_err": 0.13562528735724996
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.7e-06 (rate 1.43e+04)",
+     "lean": 0.9813965937873642,
+     "truth": 1.1052541690090336,
+     "sem": 0.15938109347713428,
+     "sems_off": 0.777115858095419,
+     "rel_err": 0.11206252705901992
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=4.6e-06 (rate 1.43e+04)",
+     "lean": 0.9687644553953307,
+     "truth": 1.0185257740872604,
+     "sem": 0.11530460310317223,
+     "sems_off": 0.4315640256564975,
+     "rel_err": 0.04885621940841181
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=7.82e-06 (rate 1.43e+04)",
+     "lean": 0.9480159601346745,
+     "truth": 1.0048446874714705,
+     "sem": 0.10069209408209251,
+     "sems_off": 0.5643812243140413,
+     "rel_err": 0.056554737309500364
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1.33e-05 (rate 1.43e+04)",
+     "lean": 0.9147164845929928,
+     "truth": 0.9624552159645385,
+     "sem": 0.08379613566391056,
+     "sems_off": 0.5697008697753816,
+     "rel_err": 0.04960098982237179
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.26e-05 (rate 1.43e+04)",
+     "lean": 0.8632096377801226,
+     "truth": 0.8381183031641559,
+     "sem": 0.0668999472267699,
+     "sems_off": 0.3750576144838338,
+     "rel_err": 0.029937700347599062
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=3.85e-05 (rate 1.43e+04)",
+     "lean": 0.7879128325571946,
+     "truth": 0.8271303777654061,
+     "sem": 0.06123590576459463,
+     "sems_off": 0.6404338225839769,
+     "rel_err": 0.04741398244151366
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=6.55e-05 (rate 1.43e+04)",
+     "lean": 0.6864372006676668,
+     "truth": 0.6789270253648159,
+     "sem": 0.048196113346572055,
+     "sems_off": 0.15582533074495475,
+     "rel_err": 0.011061829949714238
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000111 (rate 1.43e+04)",
+     "lean": 0.5636571503106453,
+     "truth": 0.5638234819376499,
+     "sem": 0.03857045361144427,
+     "sems_off": 0.004312410444537034,
+     "rel_err": 0.0002950065620411977
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00019 (rate 1.43e+04)",
+     "lean": 0.43299109689025617,
+     "truth": 0.41813256767958845,
+     "sem": 0.02811115464997698,
+     "sems_off": 0.5285634615752036,
+     "rel_err": 0.03553545061826823
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000322 (rate 1.43e+04)",
+     "lean": 0.3114624454690889,
+     "truth": 0.3086435160368565,
+     "sem": 0.020425959384145743,
+     "sems_off": 0.13800719854659008,
+     "rel_err": 0.009133285767441055
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000549 (rate 1.43e+04)",
+     "lean": 0.21161700951743165,
+     "truth": 0.2139273390431951,
+     "sem": 0.013966654748893942,
+     "sems_off": 0.16541752963045225,
+     "rel_err": 0.010799599228862332
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000933 (rate 1.43e+04)",
+     "lean": 0.1374764708781895,
+     "truth": 0.14312883799486179,
+     "sem": 0.009279887579384801,
+     "sems_off": 0.6090986629222712,
+     "rel_err": 0.039491462348595255
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00159 (rate 1.43e+04)",
+     "lean": 0.0864123261835681,
+     "truth": 0.08456831427214367,
+     "sem": 0.00545224269992611,
+     "sems_off": 0.3382116338015215,
+     "rel_err": 0.02180499785641152
+    }
+   ]
+  },
+  {
+   "name": "ldCorrelationDecayHyperbolic [the NAIVE amplitude-1 hyperbola 1/(1+rho) in its place, the shape cell I actually fitted, competing]",
+   "file": "PresentDayMetrics.lean",
+   "source": "1 / (1 + rho)",
+   "note": "cell I's free-amplitude verdict was about THIS curve and not about the body; carried so the two are not conflated",
+   "regime": "a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared",
+   "span": 0.9142245771466488,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "Ne=2000 over 4 Mb d=2.26e-05 (rate 3631)",
+    "lean": 0.9240668982421041,
+    "truth": 0.7253701699493968,
+    "sem": 0.0768801066220723,
+    "sems_off": 2.5845012061372628,
+    "rel_err": 0.27392459260706664
+   },
+   "cells": [
+    {
+     "design": "Ne=2000 over 4 Mb d=4.6e-06 (rate 3631)",
+     "lean": 0.9835853329178459,
+     "truth": 1.0404843781106696,
+     "sem": 0.15199689940100303,
+     "sems_off": 0.3743434597485497,
+     "rel_err": 0.054685150868042876
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=7.82e-06 (rate 3631)",
+     "lean": 0.9723922660119557,
+     "truth": 0.8927916780026011,
+     "sem": 0.1368887739459672,
+     "sems_off": 0.5814982902891265,
+     "rel_err": 0.08915919577951392
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=1.33e-05 (rate 3631)",
+     "lean": 0.9539242527794918,
+     "truth": 0.9871664736039446,
+     "sem": 0.10627818864422016,
+     "sems_off": 0.31278497731773935,
+     "rel_err": 0.033674381893352014
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=2.26e-05 (rate 3631)",
+     "lean": 0.9240668982421041,
+     "truth": 0.7253701699493968,
+     "sem": 0.0768801066220723,
+     "sems_off": 2.5845012061372628,
+     "rel_err": 0.27392459260706664
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=3.85e-05 (rate 3631)",
+     "lean": 0.877349433615179,
+     "truth": 0.8264424535829196,
+     "sem": 0.06976358197893749,
+     "sems_off": 0.7297070848172464,
+     "rel_err": 0.06159773110826985
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=6.55e-05 (rate 3631)",
+     "lean": 0.8078655371059863,
+     "truth": 0.7279959275760454,
+     "sem": 0.05681971890187633,
+     "sems_off": 1.405667100674506,
+     "rel_err": 0.1097116158271337
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000111 (rate 3631)",
+     "lean": 0.7119419561849807,
+     "truth": 0.7031366363832292,
+     "sem": 0.05173658905738458,
+     "sems_off": 0.1701952131398708,
+     "rel_err": 0.012522914247569274
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00019 (rate 3631)",
+     "lean": 0.5922968464692902,
+     "truth": 0.5579666672964774,
+     "sem": 0.03949301430873888,
+     "sems_off": 0.8692721934171612,
+     "rel_err": 0.061527293985415316
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000322 (rate 3631)",
+     "lean": 0.46060750982588833,
+     "truth": 0.4254212566525476,
+     "sem": 0.02924126236784992,
+     "sems_off": 1.2033082816570597,
+     "rel_err": 0.08270920322648156
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000549 (rate 3631)",
+     "lean": 0.33419704549835294,
+     "truth": 0.3293733772112175,
+     "sem": 0.022109968405527838,
+     "sems_off": 0.2181671270922955,
+     "rel_err": 0.01464498535970669
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000933 (rate 3631)",
+     "lean": 0.22782581629993898,
+     "truth": 0.23126096584370412,
+     "sem": 0.015344368090402807,
+     "sems_off": 0.22387038185780161,
+     "rel_err": 0.014853996355298287
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00159 (rate 3631)",
+     "lean": 0.14779580122321648,
+     "truth": 0.1708791839918505,
+     "sem": 0.0112128712820036,
+     "sems_off": 2.0586504730222246,
+     "rel_err": 0.13508598431588317
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1e-06 (rate 6762)",
+     "lean": 0.99328312304111,
+     "truth": 0.8755983838014757,
+     "sem": 0.11648211865987201,
+     "sems_off": 1.010324508118486,
+     "rel_err": 0.1344049297221144
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.7e-06 (rate 6762)",
+     "lean": 0.9820609984137492,
+     "truth": 1.1067250198939254,
+     "sem": 0.15959139692061694,
+     "sems_off": 0.7811449983246018,
+     "rel_err": 0.11264227268678238
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=4.6e-06 (rate 6762)",
+     "lean": 0.9698603476234628,
+     "truth": 1.0198812085005453,
+     "sem": 0.11545593785741967,
+     "sems_off": 0.43324632587416045,
+     "rel_err": 0.04904577166454942
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=7.82e-06 (rate 6762)",
+     "lean": 0.9497860865919804,
+     "truth": 1.0061819153591258,
+     "sem": 0.1008237410114167,
+     "sems_off": 0.5593506866677314,
+     "rel_err": 0.056049336512887606
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1.33e-05 (rate 6762)",
+     "lean": 0.9174791486773364,
+     "truth": 0.9637360327628497,
+     "sem": 0.08390505693474025,
+     "sems_off": 0.5513003122266044,
+     "rel_err": 0.04799746249281926
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.26e-05 (rate 6762)",
+     "lean": 0.8672906844741936,
+     "truth": 0.8392336548021944,
+     "sem": 0.06698651344963902,
+     "sems_off": 0.4188459471486403,
+     "rel_err": 0.03343172608897837
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=3.85e-05 (rate 6762)",
+     "lean": 0.7934498779325793,
+     "truth": 0.8282311068847071,
+     "sem": 0.061314776662689814,
+     "sems_off": 0.5672568807266378,
+     "rel_err": 0.04199459385551616
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=6.55e-05 (rate 6762)",
+     "lean": 0.6930636567511451,
+     "truth": 0.6798305283273337,
+     "sem": 0.04825800841588702,
+     "sems_off": 0.2742162152604486,
+     "rel_err": 0.019465334186110208
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000111 (rate 6762)",
+     "lean": 0.5703099097648742,
+     "truth": 0.564573807329387,
+     "sem": 0.03861984911191407,
+     "sems_off": 0.1485273134771933,
+     "rel_err": 0.010160057659459529
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00019 (rate 6762)",
+     "lean": 0.438254254737977,
+     "truth": 0.41868901041865997,
+     "sem": 0.028147105548303606,
+     "sems_off": 0.6951067947551797,
+     "rel_err": 0.04672977754957831
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000322 (rate 6762)",
+     "lean": 0.31440267529566146,
+     "truth": 0.30905425286229277,
+     "sem": 0.02045204789128757,
+     "sems_off": 0.2615103612996664,
+     "rel_err": 0.01730577199256929
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000549 (rate 6762)",
+     "lean": 0.21232261887842088,
+     "truth": 0.21421202941103723,
+     "sem": 0.01398447268251724,
+     "sems_off": 0.1351077423876271,
+     "rel_err": 0.00882028211866143
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000933 (rate 6762)",
+     "lean": 0.13677389710723944,
+     "truth": 0.14331931108595813,
+     "sem": 0.0092917192487577,
+     "sems_off": 0.704435186157159,
+     "rel_err": 0.04567014681498831
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00159 (rate 6762)",
+     "lean": 0.08519927989194839,
+     "truth": 0.08468085615017389,
+     "sem": 0.005459190749901489,
+     "sems_off": 0.0949634782012081,
+     "rel_err": 0.006122089045192564
+    }
+   ]
+  },
+  {
+   "name": "ldCorrelationDecayHyperbolic [the FALSIFIED exponential shape exp(-rho) in its place, competing]",
+   "file": "PresentDayMetrics.lean",
+   "source": "exp(-rho)",
+   "note": "the shape ldCorrelationDecay carries, FALSIFIED at 6.29 sems by battery_sved01 with a least-squares-fitted amplitude AND rate; carried so that a design in which it passed would be known to be broken; positive control 'synthetic amplitude-1 candidate at the stored x and sems: the amplitude the WHOLE curve wants, divided by the one the three shortest bins want, must be 1' passed at 0.41 sems",
+   "regime": "a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared",
+   "span": 0.9807462448292337,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "Ne=5000 over 2 Mb d=0.00159 (rate 2489)",
+    "lean": 0.01920588611305304,
+    "truth": 0.08594205289271577,
+    "sem": 0.005537266407384158,
+    "sems_off": 12.052186380389333,
+    "rel_err": 0.7765251647289788
+   },
+   "cells": [
+    {
+     "design": "Ne=2000 over 4 Mb d=4.6e-06 (rate 1584)",
+     "lean": 0.9927451593742521,
+     "truth": 1.058955957745019,
+     "sem": 0.15469458317540216,
+     "sems_off": 0.4280098049438032,
+     "rel_err": 0.06252460065644147
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=7.82e-06 (rate 1584)",
+     "lean": 0.9876890897959965,
+     "truth": 0.9086412889377066,
+     "sem": 0.13931837235002847,
+     "sems_off": 0.5673896380276922,
+     "rel_err": 0.08699560742028875
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=1.33e-05 (rate 1584)",
+     "lean": 0.9791465281530717,
+     "truth": 1.0046915076295833,
+     "sem": 0.10816403404350868,
+     "sems_off": 0.2361688864732632,
+     "rel_err": 0.02542569463613868
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=2.26e-05 (rate 1584)",
+     "lean": 0.9647828850454446,
+     "truth": 0.7382475693034662,
+     "sem": 0.0782442793051178,
+     "sems_off": 2.8952316738530066,
+     "rel_err": 0.3068554847470932
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=3.85e-05 (rate 1584)",
+     "lean": 0.9408291707319651,
+     "truth": 0.8411141756344159,
+     "sem": 0.07100112770790319,
+     "sems_off": 1.4044142440634766,
+     "rel_err": 0.11855108139431668
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=6.55e-05 (rate 1584)",
+     "lean": 0.901436401375412,
+     "truth": 0.7409199416531433,
+     "sem": 0.05782751925467933,
+     "sems_off": 2.775779798115409,
+     "rel_err": 0.21664480964586236
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000111 (rate 1584)",
+     "lean": 0.8381719671202471,
+     "truth": 0.715619326797443,
+     "sem": 0.05265412690718587,
+     "sems_off": 2.3275030376788752,
+     "rel_err": 0.1712539554671541
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00019 (rate 1584)",
+     "lean": 0.7405769010902984,
+     "truth": 0.5678721747169675,
+     "sem": 0.040193357290904536,
+     "sems_off": 4.29684748958288,
+     "rel_err": 0.3041260587550507
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000322 (rate 1584)",
+     "lean": 0.5999370455501374,
+     "truth": 0.4329737031723805,
+     "sem": 0.02975977307479407,
+     "sems_off": 5.610370144897761,
+     "rel_err": 0.3856200530296029
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000549 (rate 1584)",
+     "lean": 0.4192772888970166,
+     "truth": 0.3352206986074686,
+     "sem": 0.022502003685799042,
+     "sems_off": 3.7355157995372603,
+     "rel_err": 0.25075000033925476
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.000933 (rate 1584)",
+     "lean": 0.22791808459963545,
+     "truth": 0.23536651075794418,
+     "sem": 0.0156164336187659,
+     "sems_off": 0.47696076710870383,
+     "rel_err": 0.03164607460221413
+    },
+    {
+     "design": "Ne=2000 over 4 Mb d=0.00159 (rate 1584)",
+     "lean": 0.08080131186223563,
+     "truth": 0.17391277923014667,
+     "sem": 0.011411677119619799,
+     "sems_off": 8.159314918560648,
+     "rel_err": 0.5353917508539865
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1e-06 (rate 2489)",
+     "lean": 0.9975137806994703,
+     "truth": 0.8886391332651676,
+     "sem": 0.11820076230152848,
+     "sems_off": 0.9210993678413422,
+     "rel_err": 0.12251840298126362
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.7e-06 (rate 2489)",
+     "lean": 0.9932982843319276,
+     "truth": 1.1232080604940877,
+     "sem": 0.1619494022204905,
+     "sems_off": 0.802162739602403,
+     "rel_err": 0.11565958323430671
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=4.6e-06 (rate 2489)",
+     "lean": 0.9886254863220285,
+     "truth": 1.0350708383226561,
+     "sem": 0.11715332842534171,
+     "sems_off": 0.3964492739975871,
+     "rel_err": 0.044871665089022135
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=7.82e-06 (rate 2489)",
+     "lean": 0.9807263233398329,
+     "truth": 1.0211675143687182,
+     "sem": 0.10230066751441233,
+     "sems_off": 0.39531698092964923,
+     "rel_err": 0.03960289615547153
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=1.33e-05 (rate 2489)",
+     "lean": 0.9674325898784248,
+     "truth": 0.9780894628112567,
+     "sem": 0.08512747480968126,
+     "sems_off": 0.12518723193255035,
+     "rel_err": 0.010895601412780355
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=2.26e-05 (rate 2489)",
+     "lean": 0.9452293037969312,
+     "truth": 0.8517328051389718,
+     "sem": 0.0679583193168476,
+     "sems_off": 1.3757918029438463,
+     "rel_err": 0.10977209999878328
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=3.85e-05 (rate 2489)",
+     "lean": 0.9086204723824308,
+     "truth": 0.8405663904607542,
+     "sem": 0.062200453353204746,
+     "sems_off": 1.0941090981320036,
+     "rel_err": 0.08096217347492676
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=6.55e-05 (rate 2489)",
+     "lean": 0.8495678718060823,
+     "truth": 0.6899556036606114,
+     "sem": 0.048953184604321194,
+     "sems_off": 3.2605083701006374,
+     "rel_err": 0.2313370125536136
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000111 (rate 2489)",
+     "lean": 0.7577883618436451,
+     "truth": 0.5729823034062991,
+     "sem": 0.03917473449372164,
+     "sems_off": 4.717480815778446,
+     "rel_err": 0.32253362335747543
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00019 (rate 2489)",
+     "lean": 0.623850320040701,
+     "truth": 0.42492476711839916,
+     "sem": 0.02855099635333286,
+     "sems_off": 6.967376916045191,
+     "rel_err": 0.46814299451477737
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000322 (rate 2489)",
+     "lean": 0.44810486318955073,
+     "truth": 0.31365716117828096,
+     "sem": 0.020745163828837152,
+     "sems_off": 6.480917823573828,
+     "rel_err": 0.42864540859263356
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000549 (rate 2489)",
+     "lean": 0.255216148182309,
+     "truth": 0.21740240237121816,
+     "sem": 0.014184679826936029,
+     "sems_off": 2.66581595583739,
+     "rel_err": 0.1739343512245243
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.000933 (rate 2489)",
+     "lean": 0.09794898762103477,
+     "truth": 0.14545384132694208,
+     "sem": 0.009424668216362732,
+     "sems_off": 5.040480218012481,
+     "rel_err": 0.32659745024628717
+    },
+    {
+     "design": "Ne=5000 over 2 Mb d=0.00159 (rate 2489)",
+     "lean": 0.01920588611305304,
+     "truth": 0.08594205289271577,
+     "sem": 0.005537266407384158,
+     "sems_off": 12.052186380389333,
+     "rel_err": 0.7765251647289788
+    }
+   ]
+  }
+ ]
+}

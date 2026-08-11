@@ -1,0 +1,113 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-LDSHAPE01-SHRIKE-20260810)
+FRESHNESS token literal: SIMCOV-BATTERY-LDSHAPE01-SHRIKE-20260810
+
+zero-distance anchors, from the 3 shortest bins with the candidate's own droop across them divided out:
+  Ne=2000 over 4 Mb      A0 = 0.3798 +/- 0.0244 (6.4%)   cell I's free-amplitude naive-hyperbolic fit wanted A = 0.3159
+  Ne=5000 over 2 Mb      A0 = 0.3803 +/- 0.0243 (6.4%)   cell I's free-amplitude naive-hyperbolic fit wanted A = 0.3732
+  DIAGNOSTIC: under the theory the plateau is set by the shared sample size and MAF filter, not by Ne, and the two agree to 0.1% across a 2.5-fold change in Ne
+
+  CONTROL synthetic amplitude-1 candidate at the stored x and sems: the amplitude the WHOLE curve wants, divided by the one the three shortest bins want, must be 1: predicted 1.000000 measured 0.998814 +/- 0.002886
+
+amplitude the WHOLE curve wants, against the one the shortest bins want (the body commits to their ratio being 1):
+  Ne=2000 over 4 Mb      A_full = 0.3202   A_short = 0.3798 +/- 0.0244   ratio 0.8430 (rate 5581)
+  Ne=5000 over 2 Mb      A_full = 0.3826   A_short = 0.3803 +/- 0.0243   ratio 1.0061 (rate 1.442e+04)
+
+ldCorrelationDecayHyperbolic             MATCH   (pred span 91%)
+  lean: 22*(10 + rho)/(10*(2 + rho)*(11 + rho)), rho = lambda*sqrt(fstGap)*d
+  regime: a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared
+  design                                   lean        sim      sem     sems
+  Ne=2000 over 4 Mb d=4.6e-06 (rate 7615)    0.98311    1.03922  0.15181     0.37
+  Ne=2000 over 4 Mb d=7.82e-06 (rate 7615)    0.97161    0.89170  0.13672     0.58
+  Ne=2000 over 4 Mb d=1.33e-05 (rate 7615)    0.95266    0.98596  0.10615     0.31
+  Ne=2000 over 4 Mb d=2.26e-05 (rate 7615)    0.92209    0.72449  0.07679     2.57
+  Ne=2000 over 4 Mb d=3.85e-05 (rate 7615)    0.87442    0.82544  0.06968     0.70
+  Ne=2000 over 4 Mb d=6.55e-05 (rate 7615)    0.80387    0.72711  0.05675     1.35
+  Ne=2000 over 4 Mb d=0.000111 (rate 7615)    0.70715    0.70228  0.05167     0.09
+  Ne=2000 over 4 Mb d=0.00019 (rate 7615)    0.58754    0.55729  0.03944     0.77
+  Ne=2000 over 4 Mb d=0.000322 (rate 7615)    0.45705    0.42490  0.02921     1.10
+  Ne=2000 over 4 Mb d=0.000549 (rate 7615)    0.33265    0.32897  0.02208     0.17
+  Ne=2000 over 4 Mb d=0.000933 (rate 7615)    0.22822    0.23098  0.01533     0.18
+  Ne=2000 over 4 Mb d=0.00159 (rate 7615)    0.14936    0.17067  0.01120     1.90
+  Ne=5000 over 2 Mb d=1e-06 (rate 1.43e+04)    0.99303    0.87443  0.11633     1.02
+  Ne=5000 over 2 Mb d=2.7e-06 (rate 1.43e+04)    0.98140    1.10525  0.15938     0.78
+  Ne=5000 over 2 Mb d=4.6e-06 (rate 1.43e+04)    0.96876    1.01853  0.11530     0.43
+  Ne=5000 over 2 Mb d=7.82e-06 (rate 1.43e+04)    0.94802    1.00484  0.10069     0.56
+  Ne=5000 over 2 Mb d=1.33e-05 (rate 1.43e+04)    0.91472    0.96246  0.08380     0.57
+  Ne=5000 over 2 Mb d=2.26e-05 (rate 1.43e+04)    0.86321    0.83812  0.06690     0.38
+  Ne=5000 over 2 Mb d=3.85e-05 (rate 1.43e+04)    0.78791    0.82713  0.06124     0.64
+  Ne=5000 over 2 Mb d=6.55e-05 (rate 1.43e+04)    0.68644    0.67893  0.04820     0.16
+  Ne=5000 over 2 Mb d=0.000111 (rate 1.43e+04)    0.56366    0.56382  0.03857     0.00
+  Ne=5000 over 2 Mb d=0.00019 (rate 1.43e+04)    0.43299    0.41813  0.02811     0.53
+  Ne=5000 over 2 Mb d=0.000322 (rate 1.43e+04)    0.31146    0.30864  0.02043     0.14
+  Ne=5000 over 2 Mb d=0.000549 (rate 1.43e+04)    0.21162    0.21393  0.01397     0.17
+  Ne=5000 over 2 Mb d=0.000933 (rate 1.43e+04)    0.13748    0.14313  0.00928     0.61
+  Ne=5000 over 2 Mb d=0.00159 (rate 1.43e+04)    0.08641    0.08457  0.00545     0.34
+
+ldCorrelationDecayHyperbolic [the NAIVE amplitude-1 hyperbola 1/(1+rho) in its place, the shape cell I actually fitted, competing] MATCH   (pred span 91%)
+  lean: 1 / (1 + rho)
+  regime: a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared
+  NOTE: cell I's free-amplitude verdict was about THIS curve and not about the body; carried so the two are not conflated
+  design                                   lean        sim      sem     sems
+  Ne=2000 over 4 Mb d=4.6e-06 (rate 3631)    0.98359    1.04048  0.15200     0.37
+  Ne=2000 over 4 Mb d=7.82e-06 (rate 3631)    0.97239    0.89279  0.13689     0.58
+  Ne=2000 over 4 Mb d=1.33e-05 (rate 3631)    0.95392    0.98717  0.10628     0.31
+  Ne=2000 over 4 Mb d=2.26e-05 (rate 3631)    0.92407    0.72537  0.07688     2.58
+  Ne=2000 over 4 Mb d=3.85e-05 (rate 3631)    0.87735    0.82644  0.06976     0.73
+  Ne=2000 over 4 Mb d=6.55e-05 (rate 3631)    0.80787    0.72800  0.05682     1.41
+  Ne=2000 over 4 Mb d=0.000111 (rate 3631)    0.71194    0.70314  0.05174     0.17
+  Ne=2000 over 4 Mb d=0.00019 (rate 3631)    0.59230    0.55797  0.03949     0.87
+  Ne=2000 over 4 Mb d=0.000322 (rate 3631)    0.46061    0.42542  0.02924     1.20
+  Ne=2000 over 4 Mb d=0.000549 (rate 3631)    0.33420    0.32937  0.02211     0.22
+  Ne=2000 over 4 Mb d=0.000933 (rate 3631)    0.22783    0.23126  0.01534     0.22
+  Ne=2000 over 4 Mb d=0.00159 (rate 3631)    0.14780    0.17088  0.01121     2.06
+  Ne=5000 over 2 Mb d=1e-06 (rate 6762)    0.99328    0.87560  0.11648     1.01
+  Ne=5000 over 2 Mb d=2.7e-06 (rate 6762)    0.98206    1.10673  0.15959     0.78
+  Ne=5000 over 2 Mb d=4.6e-06 (rate 6762)    0.96986    1.01988  0.11546     0.43
+  Ne=5000 over 2 Mb d=7.82e-06 (rate 6762)    0.94979    1.00618  0.10082     0.56
+  Ne=5000 over 2 Mb d=1.33e-05 (rate 6762)    0.91748    0.96374  0.08391     0.55
+  Ne=5000 over 2 Mb d=2.26e-05 (rate 6762)    0.86729    0.83923  0.06699     0.42
+  Ne=5000 over 2 Mb d=3.85e-05 (rate 6762)    0.79345    0.82823  0.06131     0.57
+  Ne=5000 over 2 Mb d=6.55e-05 (rate 6762)    0.69306    0.67983  0.04826     0.27
+  Ne=5000 over 2 Mb d=0.000111 (rate 6762)    0.57031    0.56457  0.03862     0.15
+  Ne=5000 over 2 Mb d=0.00019 (rate 6762)    0.43825    0.41869  0.02815     0.70
+  Ne=5000 over 2 Mb d=0.000322 (rate 6762)    0.31440    0.30905  0.02045     0.26
+  Ne=5000 over 2 Mb d=0.000549 (rate 6762)    0.21232    0.21421  0.01398     0.14
+  Ne=5000 over 2 Mb d=0.000933 (rate 6762)    0.13677    0.14332  0.00929     0.70
+  Ne=5000 over 2 Mb d=0.00159 (rate 6762)    0.08520    0.08468  0.00546     0.09
+
+ldCorrelationDecayHyperbolic [the FALSIFIED exponential shape exp(-rho) in its place, competing] FALSIFIED   (pred span 98%)
+  lean: exp(-rho)
+  regime: a RE-ANALYSIS of the two stored msprime r-squared curves in popgensel/results.json cell I -- Ne=2000 over 4 Mb and Ne=5000 over 2 Mb, 300 haplotypes, MAF 0.05, 12 and 14 distance bins with their own sems -- and no new simulation. Each curve is divided by its own zero-distance limit, built from its 3 SHORTEST bins alone with the candidate's own droop across them divided out, while the RATE is fitted to the WHOLE curve: a wrong shape makes the two disagree, and each candidate is anchored with itself so none is handicapped. Each candidate is then fitted with ONE free parameter, the rate, its amplitude PINNED at 1, which is the commitment ldCorrelationDecay's falsification record says nothing in cell I covers; cell I's own fits carried TWO free parameters, so this is the harder test. Every cell's error bar carries the anchor's own (roughly 6%) relative uncertainty in quadrature with the bin's; that term is COMMON to a curve's cells rather than independent, so it slides the curve rather than scattering it and the bars are conservative. The measured curves are binned E[r-squared] while Ohta-Kimura is a closed form for sigma_d-squared, the ratio of expectations; normalising each curve to its own zero-distance limit is what makes this a comparison of SHAPES, and that mismatch is not known to cancel exactly, so a match here licenses the shape and the amplitude-1 normalisation and does not license reading this body as a sigma_d-squared
+  NOTE: the shape ldCorrelationDecay carries, FALSIFIED at 6.29 sems by battery_sved01 with a least-squares-fitted amplitude AND rate; carried so that a design in which it passed would be known to be broken; positive control 'synthetic amplitude-1 candidate at the stored x and sems: the amplitude the WHOLE curve wants, divided by the one the three shortest bins want, must be 1' passed at 0.41 sems
+  design                                   lean        sim      sem     sems
+  Ne=2000 over 4 Mb d=4.6e-06 (rate 1584)    0.99275    1.05896  0.15469     0.43
+  Ne=2000 over 4 Mb d=7.82e-06 (rate 1584)    0.98769    0.90864  0.13932     0.57
+  Ne=2000 over 4 Mb d=1.33e-05 (rate 1584)    0.97915    1.00469  0.10816     0.24
+  Ne=2000 over 4 Mb d=2.26e-05 (rate 1584)    0.96478    0.73825  0.07824     2.90
+  Ne=2000 over 4 Mb d=3.85e-05 (rate 1584)    0.94083    0.84111  0.07100     1.40
+  Ne=2000 over 4 Mb d=6.55e-05 (rate 1584)    0.90144    0.74092  0.05783     2.78
+  Ne=2000 over 4 Mb d=0.000111 (rate 1584)    0.83817    0.71562  0.05265     2.33
+  Ne=2000 over 4 Mb d=0.00019 (rate 1584)    0.74058    0.56787  0.04019     4.30
+  Ne=2000 over 4 Mb d=0.000322 (rate 1584)    0.59994    0.43297  0.02976     5.61
+  Ne=2000 over 4 Mb d=0.000549 (rate 1584)    0.41928    0.33522  0.02250     3.74
+  Ne=2000 over 4 Mb d=0.000933 (rate 1584)    0.22792    0.23537  0.01562     0.48
+  Ne=2000 over 4 Mb d=0.00159 (rate 1584)    0.08080    0.17391  0.01141     8.16
+  Ne=5000 over 2 Mb d=1e-06 (rate 2489)    0.99751    0.88864  0.11820     0.92
+  Ne=5000 over 2 Mb d=2.7e-06 (rate 2489)    0.99330    1.12321  0.16195     0.80
+  Ne=5000 over 2 Mb d=4.6e-06 (rate 2489)    0.98863    1.03507  0.11715     0.40
+  Ne=5000 over 2 Mb d=7.82e-06 (rate 2489)    0.98073    1.02117  0.10230     0.40
+  Ne=5000 over 2 Mb d=1.33e-05 (rate 2489)    0.96743    0.97809  0.08513     0.13
+  Ne=5000 over 2 Mb d=2.26e-05 (rate 2489)    0.94523    0.85173  0.06796     1.38
+  Ne=5000 over 2 Mb d=3.85e-05 (rate 2489)    0.90862    0.84057  0.06220     1.09
+  Ne=5000 over 2 Mb d=6.55e-05 (rate 2489)    0.84957    0.68996  0.04895     3.26
+  Ne=5000 over 2 Mb d=0.000111 (rate 2489)    0.75779    0.57298  0.03917     4.72
+  Ne=5000 over 2 Mb d=0.00019 (rate 2489)    0.62385    0.42492  0.02855     6.97
+  Ne=5000 over 2 Mb d=0.000322 (rate 2489)    0.44810    0.31366  0.02075     6.48
+  Ne=5000 over 2 Mb d=0.000549 (rate 2489)    0.25522    0.21740  0.01418     2.67
+  Ne=5000 over 2 Mb d=0.000933 (rate 2489)    0.09795    0.14545  0.00942     5.04
+  Ne=5000 over 2 Mb d=0.00159 (rate 2489)    0.01921    0.08594  0.00554    12.05
+
+================ SUMMARY ================
+MATCH                              ldCorrelationDecayHyperbolic                                     worst      2.57 sems,    27.28% rel
+MATCH                              ldCorrelationDecayHyperbolic [the NAIVE amplitude-1 hyperbola 1/ worst      2.58 sems,    27.39% rel
+FALSIFIED                          ldCorrelationDecayHyperbolic [the FALSIFIED exponential shape ex worst     12.05 sems,    77.65% rel
