@@ -209,8 +209,6 @@ FAMILIES = [
                     "fstMigDriftEq", "fstMigrationMutationEquilibrium",
                     "fstEqLimitLowMutationManyDemes",
                     "ldCorrelationMigrationAnsatz", "sharedLDFromMigration",
-                    "signalRetentionMigrationDrift",
-                    "retainedSignalVarianceMigrationDrift",
                     "migrationSharedBoostAt", "migBoost", "migrationLDBoost",
                     # finite-deme corrections -- the members that DO take the
                     # deme count the simulator varies

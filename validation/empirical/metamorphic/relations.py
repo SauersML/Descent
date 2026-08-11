@@ -669,13 +669,6 @@ RELATIONS = {
     "Descent.sharedLD_from_equilibrium": [
         invariant_under_reciprocal_scaling(["Ne"], ["m"]),
     ],
-    "Descent.signalRetentionMigrationDrift": [
-        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
-    ],
-    "Descent.retainedSignalVarianceMigrationDrift": [
-        scales("V_A", 1),
-        invariant_under_reciprocal_scaling(["Ne"], ["m"]),
-    ],
     "Descent.neutralAFBenchmarkFromRecurrence": [
         invariant_under_reciprocal_scaling(["Ne"], ["m"]),
     ],

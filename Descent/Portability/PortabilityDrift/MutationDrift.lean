@@ -660,10 +660,12 @@ theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :
     model, `Nₑ = 1000`, 5 Mb with recombination. `F_ST`, cross-deme LD
     correlation and score-covariance retention are three SEPARATE measurements
     on the same replicates, and the body is fed the measured `shared_ld` rather
-    than its migration formula, which is what distinguishes it from
-    `signalRetentionMigrationDrift`: this body takes the LD term as an ARGUMENT
+    than a migration closed form: this body takes the LD term as an ARGUMENT
     and so is not committed to the `M/(1+M)` reading that `battery_bulk34`
-    refuted. Stated as retention, `1 - covDiv = (1 - fst) * shared_ld`:
+    refuted. The product body that hard-wired that reading was falsified
+    two-sidedly by `battery_pd2.py` -- 110% low at `4Nₑm = 0.4`, 51% high at
+    `8` -- and is deleted; taking the term as an argument is what this body
+    keeps instead. Stated as retention, `1 - covDiv = (1 - fst) * shared_ld`:
 
       4Nₑm   measured retention   this body   1-F     shared_ld
       0.4    0.392 ± 0.074        0.429       0.472   0.909
@@ -675,9 +677,10 @@ theorem covarianceDivergenceFromRetention_eq (fst shared_ld : ℝ) :
     sems and 50% relative. The retention column is divided by the estimator's
     panmictic ceiling, and THAT run's ceiling came out 1.0430 -- above one, which
     attenuation cannot produce, so the calibration is noise-dominated on six
-    replicates. `signalRetentionMigrationDrift` records the same retraction for
-    the same numbers, and a rejection quoted here from a calibration retracted
-    there would be the corpus disagreeing with itself in two docstrings. What
+    replicates. That calibration was retracted on replication -- the ceiling
+    came out `0.8905` in one run and `1.0430` in the other, a swing attenuation
+    cannot produce -- so a rejection resting on it would quote a retracted
+    number. What
     the run does establish is the DIRECTION, and it is the same direction in both
     replications: measured retention runs well below every candidate at weak
     migration, so if any of the three is right it is not by a wide margin.
