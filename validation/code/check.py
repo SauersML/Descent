@@ -7915,12 +7915,6 @@ LAYER_UNRANKED = {
 # repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
 # still counts as a violation; see the section header.
 LAYER_PENDING = {
-    ("Descent.PopGen.GeneticArchitectureDiscovery",
-     "Descent.Portability.MechanisticPortabilityWitnesses"):
-        "`mechanisticPortabilityRatio` and `sigmaTagCausalSourceAt` ARE about "
-        "transport and are correctly placed. This edge inverts because a PopGen file "
-        "states an architecture theorem in terms of them, so here the consumer moves "
-        "UP rather than the definition moving down.",
     ("Descent.PopGen.AncestrySpecificArchitecture",
      "Descent.Portability.PortabilityDrift.MutationDrift"):
         "`Portability.ibdFlowStep` and `ibdFlowStep_fixedPoint`: the identity-by-descent "
