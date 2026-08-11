@@ -31,10 +31,12 @@ Independently of any simulation, the form is not dimensionally homogeneous: repl
 by `σ²²·m²` multiplies the denominator's second term by one extra factor of `m`, leaving a
 per-generation rate added to a distance, and no choice of units rescues it.
 
-These declarations are built and type-checked like the rest of the corpus. They are outside
-the reach of `validation/code/check.py`, which scans `Descent/` only, and that is intended:
-the guards enforce properties of production laws, and none of them should be asked to hold
-of a body kept precisely because it is false.
+These declarations are built and type-checked like the rest of the corpus, and the guards
+DO see them: `validation/code/check.py` takes the repository root as its corpus, not
+`Descent/`, so a foil here answers to `style`, `laundering` and `duplication` like any
+production body. What separates this file from `Descent/` is the library boundary and
+nothing else — a reader who meets a deliberately-wrong body inside the corpus proper has to
+be warned off it every time, and one who meets it here has been warned by the header.
 -/
 
 namespace Descent.Counterexamples
