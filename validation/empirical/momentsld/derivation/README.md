@@ -15,18 +15,27 @@ matters.** Files are one of three kinds and the kind is stated per file below:
   follow the citation: `../ldchain_reduction.py` (in the parent directory, with
   its `../ldchain_reduction.json`). Pure standard library, exact rational
   arithmetic, vendors the state space it needs.
-* **SOURCE, as run** — the exact file that produced the log beside it, kept so
-  the log has a provenance. These import `argcore` (the two-locus
-  ancestral-configuration machinery, which lives in the MSI working directory
-  `$HOME/theory-out/` and is **not** in this repository) and variously require
-  `sympy`, `numpy`, `scipy`, `msprime` or `moments`. A reader cannot run them
-  here without `argcore`. They are committed as the record of what was executed,
-  not as a reproduction path.
+* **SOURCE, as run** — the exact file that produced the log beside it, kept
+  unedited so the log has a provenance. These import `argcore` and variously
+  require `sympy`, `numpy`, `scipy`, `msprime` or `moments`. `argcore.py` is now
+  committed one directory up (`../argcore.py`, byte-identical to the MSI original
+  at md5 `d2861c207fe7ff9779c01cc8a47f5f14`), so the import is satisfiable — but
+  these files still carry the absolute `sys.path.insert` of the cluster working
+  directory they were run from, and that line is deliberately **not** edited,
+  because a file kept as the provenance of a log must stay the file that produced
+  it. To run one, point that path at `..` yourself. They are committed as the
+  record of what was executed, not as a turnkey reproduction path.
 * **RECORD** — output. A log or a set of forms. Nothing to run.
 
 If you need a followable citation for the falsified two-deme reduction, cite
-`../ldchain_reduction.py` and `../ldchain_reduction.json`, which reimplement the
-same system with no dependencies and reproduce these numbers.
+`../ldchain_reduction.py` and `../ldchain_reduction.json`, which recompute the
+same system with no dependencies beyond the standard library.
+
+The shared machinery both live above this directory: `../lumping.py` (the
+enumeration, the symmetry lumping, and the verification that makes lumping a
+proof — standard library only, with a self test) and `../argcore.py` (the
+original numpy/scipy implementation, kept as authored). `../lumping.py`'s self
+test checks the two enumerations agree, so the duplication cannot drift.
 
 ## The files
 

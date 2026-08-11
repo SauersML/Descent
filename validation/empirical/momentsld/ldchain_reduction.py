@@ -29,11 +29,13 @@ and its "competitor" is refuted against an exact reference rather than against
 data.  Nothing here reaches `simcov/ledger.json` and nothing should cite it as
 a battery.
 
-ARITHMETIC.  Everything is exact rational arithmetic in `fractions.Fraction`
-with a stdlib Gaussian elimination; floats appear only when printing.  The
-symmetry reduction is not assumed -- lumpability is CHECKED on every state, and
-the lumped solution is substituted back into the full system and required to
-have exactly zero residual.
+ARITHMETIC.  Everything is exact rational arithmetic in `fractions.Fraction`;
+floats appear only when printing.  The symmetry reduction is not assumed --
+lumpability is CHECKED on every state, and the lumped solution is substituted
+back into the full system and required to have exactly zero residual.  Both
+checks, the state-space enumeration and the exact solver come from `lumping.py`
+beside this file, which is also standard library only; this file adds the chain
+geometry and the comparison, and holds no second copy of the shared machinery.
 
 CONVENTIONS.  Deme diploid size `N`; time in units of `2N` generations; a block
 carrying units of both loci splits at `rho/2` with `rho = 4*N*c`; a block hops
@@ -46,9 +48,9 @@ serial1d's.
 
 from __future__ import annotations
 
-import itertools
 import json
 import pathlib
+import sys
 from fractions import Fraction as F
 
 RHOS = [F(1, 2), F(1), F(2), F(5), F(10), F(20)]
@@ -56,116 +58,53 @@ CELLS = [("grid2d-per-edge", F(18, 5)), ("serial1d-per-edge", F(12))]
 SIZES = [2, 3, 4]
 
 
-# ---------------------------------------------------------------- state space
-def _canon(part):
-    m, out = {}, []
-    for x in part:
-        if x not in m:
-            m[x] = len(m)
-        out.append(m[x])
-    return tuple(out)
-
-
-SHAPES = [p for p in itertools.product(range(4), repeat=4)
-          if _canon(p) == p and p[0] != p[1] and p[2] != p[3]]
-assert len(SHAPES) == 7, SHAPES
-SHAPE_IX = {s: i for i, s in enumerate(SHAPES)}
-NBLK = [max(s) + 1 for s in SHAPES]
-AU, BU = (0, 1), (2, 3)
-
-
-class TwoLocus:
-    """Phase-1 two-locus ancestral configurations over `n` demes."""
-
-    def __init__(self, n):
-        self.n = n
-        self.keys = [(si, dm) for si in range(len(SHAPES))
-                     for dm in itertools.product(range(n), repeat=NBLK[si])]
-        self.ix = {k: i for i, k in enumerate(self.keys)}
-        self.ns = len(self.keys)
-        self.udeme = [[dm[SHAPES[si][u]] for u in range(4)] for si, dm in self.keys]
-
-    def mk(self, part_raw, dmu):
-        cp = _canon(part_raw)
-        if cp[0] == cp[1] or cp[2] == cp[3]:
-            return None
-        dm = [0] * NBLK[SHAPE_IX[cp]]
-        for u in range(4):
-            dm[cp[u]] = dmu[u]
-        return self.ix[(SHAPE_IX[cp], tuple(dm))]
-
-    def state(self, blocks):
-        pr, dmu = [-1] * 4, [-1] * 4
-        for bi, (units, d) in enumerate(blocks):
-            for u in units:
-                pr[u], dmu[u] = bi, d
-        return self.mk(pr, dmu)
+# The shared machinery lives beside this file. Import it by path so the script
+# runs from any working directory.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from lumping import (  # noqa: E402
+    AU, BU, NBLK, SHAPES, TwoLocusSpace, lump, orbits, pair_rows, solve_exact,
+    verify_residual,
+)
 
 
 def neighbours(n):
     return [[w for w in (i - 1, i + 1) if 0 <= w < n] for i in range(n)]
 
 
-# ---------------------------------------------------------------- exact solver
-def solve_exact(A, b):
-    """Gaussian elimination with partial pivoting over the rationals."""
-    n = len(b)
-    M = [row[:] + [b[i]] for i, row in enumerate(A)]
-    for c in range(n):
-        p = next(r for r in range(c, n) if M[r][c] != 0)
-        M[c], M[p] = M[p], M[c]
-        inv = F(1) / M[c][c]
-        M[c] = [v * inv for v in M[c]]
-        for r in range(n):
-            if r != c and M[r][c] != 0:
-                f = M[r][c]
-                M[r] = [a - f * bb for a, bb in zip(M[r], M[c])]
-    return [M[i][n] for i in range(n)]
-
-
 def pair_t2(n, Mv):
     """Exact mean pairwise coalescence times on the n-deme chain, units of 2N."""
-    nbr, mu = neighbours(n), Mv / 2
-    idx = {}
-    for i in range(n):
-        for j in range(i, n):
-            idx[(i, j)] = len(idx)
-    k = lambda a, b: idx[(min(a, b), max(a, b))]
-    A = [[F(0)] * len(idx) for _ in idx]
-    b = [F(-1)] * len(idx)
-    for (i, j), r in idx.items():
-        for (a, o) in ((i, j), (j, i)):
-            for w in nbr[a]:
-                A[r][k(w, o)] += mu
-                A[r][r] -= mu
-        if i == j:
-            A[r][r] -= F(1)
-    return {p: v for p, v in zip(idx, solve_exact(A, b))}, k
+    Q, idx, key = pair_rows(n, neighbours(n), Mv / 2, coal=F(1))
+    A = [[Q[i].get(j, F(0)) for j in range(len(idx))] for i in range(len(idx))]
+    return dict(zip(idx, solve_exact(A, [F(-1)] * len(idx)))), key
 
 
 def rD_chain(n, Mv, rv):
     """Exact rD(i,j) and Hudson F_ST(i,j) on the n-deme chain at rational (M, rho)."""
     t2, kk = pair_t2(n, Mv)
     T2 = lambda a, b: t2[(min(a, b), max(a, b))]
-    ts, nbr, mu = TwoLocus(n), neighbours(n), Mv / 2
+    ts, nbr, mu = TwoLocusSpace(n), neighbours(n), Mv / 2
     NS = ts.ns
-    Q = [[F(0)] * NS for _ in range(NS)]
+    Q = [dict() for _ in range(NS)]
+
+    def add(i, j, v):
+        Q[i][j] = Q[i].get(j, F(0)) + v
+
     for i, (si, dm) in enumerate(ts.keys):
         sh, nb = SHAPES[si], NBLK[si]
         dmu = ts.udeme[i]
         for blk in range(nb):
             for w in nbr[dm[blk]]:
                 nd = [w if sh[u] == blk else dmu[u] for u in range(4)]
-                Q[i][ts.mk(list(sh), nd)] += mu
-                Q[i][i] -= mu
+                add(i, ts.mk(list(sh), nd), mu)
+                add(i, i, -mu)
         for b1 in range(nb):
             for b2 in range(b1 + 1, nb):
                 if dm[b1] != dm[b2]:
                     continue
                 j = ts.mk([b1 if sh[u] == b2 else sh[u] for u in range(4)], dmu)
                 if j is not None:
-                    Q[i][j] += F(1)
-                Q[i][i] -= F(1)
+                    add(i, j, F(1))
+                add(i, i, -F(1))
         for blk in range(nb):
             units = [u for u in range(4) if sh[u] == blk]
             if not (any(u in AU for u in units) and any(u in BU for u in units)):
@@ -174,50 +113,25 @@ def rD_chain(n, Mv, rv):
             for u in units:
                 if u in BU:
                     pr[u] = new
-            Q[i][ts.mk(pr, dmu)] += rv / 2
-            Q[i][i] -= rv / 2
+            add(i, ts.mk(pr, dmu), rv / 2)
+            add(i, i, -rv / 2)
+    Q = [{c: v for c, v in row.items() if v != 0} for row in Q]
     src = [T2(ts.udeme[i][0], ts.udeme[i][1]) + T2(ts.udeme[i][2], ts.udeme[i][3])
            for i in range(NS)]
 
-    # symmetry orbits: a1<->a2, b1<->b2, locus A<->B, chain reflection
-    def perm(i, up, refl):
-        si, dm = ts.keys[i]
-        sh, dmu = SHAPES[si], ts.udeme[i]
-        inv = [0] * 4
-        for u in range(4):
-            inv[up[u]] = u
-        return ts.mk([sh[inv[u]] for u in range(4)],
-                     [(n - 1 - dmu[inv[u]]) if refl else dmu[inv[u]] for u in range(4)])
-
-    GENS = [((1, 0, 2, 3), False), ((0, 1, 3, 2), False),
-            ((2, 3, 0, 1), False), ((0, 1, 2, 3), True)]
-    orb_of, orbits = [-1] * NS, []
-    for i in range(NS):
-        if orb_of[i] >= 0:
-            continue
-        o, stack, mem = len(orbits), [i], set()
-        while stack:
-            x = stack.pop()
-            if x in mem:
-                continue
-            mem.add(x)
-            orb_of[x] = o
-            for g in GENS:
-                stack.append(perm(x, *g))
-        orbits.append(sorted(mem))
-    NO = len(orbits)
-    for mem in orbits:
-        assert len({src[j] for j in mem}) == 1, "source not orbit-constant"
-    reps = [m[0] for m in orbits]
-    Qr = [[sum(Q[ia][j] for j in orbits[b]) for b in range(NO)] for ia in reps]
-    for a, mem in enumerate(orbits):          # lumpability, checked not assumed
-        for ia in mem:
-            for b in range(NO):
-                assert sum(Q[ia][j] for j in orbits[b]) == Qr[a][b], "not lumpable"
-    Pr = solve_exact(Qr, [-src[ia] for ia in reps])
+    # symmetry orbits: a1<->a2, b1<->b2, locus A<->B, chain reflection.
+    # lump() verifies the source is orbit-constant AND that every orbit member
+    # gives the identical lumped row before it reduces anything.
+    refl = lambda d: n - 1 - d
+    maps = [lambda i: ts.permute(i, (1, 0, 2, 3)),
+            lambda i: ts.permute(i, (0, 1, 3, 2)),
+            lambda i: ts.permute(i, (2, 3, 0, 1)),
+            lambda i: ts.permute(i, (0, 1, 2, 3), relabel=refl)]
+    orb_of, mem = orbits(NS, maps)
+    Qr, srcr, _ = lump(Q, src, mem)
+    Pr = solve_exact(Qr, [-v for v in srcr])
     P = [Pr[orb_of[i]] for i in range(NS)]
-    for i in range(NS):                        # exact residual on the FULL system
-        assert sum(Q[i][j] * P[j] for j in range(NS) if Q[i][j]) + src[i] == 0, "residual"
+    verify_residual(Q, src, P, zero=F(0))
 
     def Nab(a, b):
         return (P[ts.state([((0, 2), a), ((1, 3), b)])]
