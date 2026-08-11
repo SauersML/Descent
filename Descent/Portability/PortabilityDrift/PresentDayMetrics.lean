@@ -1999,8 +1999,8 @@ back to a benchmark `R²` surrogate.
     **THE SCALE OF THE EXPLAINED FRACTION IS THE WHOLE OF WHAT THIS BODY HAS TO GET RIGHT.**
     `r2FromSourceWeights` is a LIABILITY-scale fraction and a prevalence argument announces a
     dichotomised outcome, so the Brier body it is fed to must be the liability-threshold one.
-    `calibratedBrierFromVariances` is not: it is exact on the OBSERVED scale and measured
-    wrong by 9% to 47%, at up to 299 sems, on a truncated liability tail.
+    `calibratedBrierFromVariances` is not: it is the OBSERVED-scale body, right on that scale
+    and measured wrong by 9% to 47%, at up to 299 sems, on a truncated liability tail.
 
     Empirical status: UNTESTED, inherited. `liabilityBrierExact` carries the head and the
     queued battery; this body adds no arithmetic, it only chooses which prevalence and which

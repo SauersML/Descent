@@ -1286,10 +1286,24 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     FALSIFIED at 66.51 sems, the target-branch-only reading at 47.30, the superseded linear
     retention at 229.
 
-    NO `record()` NAMES THIS BODY YET, and that is the qualification the tag carries. The
-    comparison above is arithmetic against cells committed in `battery_clean01_results.json`
-    and `clean01.log`, reproducible by a reader without rerunning the simulation, but the
-    harness has not yet recorded a verdict under this name.
+    A `record()` NOW NAMES THIS BODY and it is a MATCH (`simcov/battery_clean02.py`): 14
+    cells, worst 2.86 sems and 0.69% relative, residuals of mixed sign, zero fitted
+    constants, error bars MEASUREMENT-ONLY rather than paired. Two spectra at five depths
+    each — `1/p` truncated at `[0.01,0.99]` and at `[0.05,0.95]` — plus four target sizes at
+    fixed `(NeS, t)`. The prediction spans 0.775 to 0.9996 across the design.
+
+    THE FOUR `NeT` CELLS ARE THE INFORMATIVE ONES, and they are not a restatement of the
+    argument list. This body has no `NeT` argument, but its ORACLE — the realised fraction of
+    the target's signal carried by variants still polymorphic in the source — weights by the
+    TARGET's realised heterozygosity, which does drift with `NeT`. One prediction, 0.899305,
+    against measurements 0.897812, 0.896364, 0.898253, 0.898404 at `NeT` = 250, 500, 1000,
+    2000: a 0.2% spread with every cell inside one sem.
+
+    The source-off cells (`NeS = 200000`) are deliberately NOT among the 14. No locus fixes
+    there, so the prediction and every replicate of the measurement are 1 alike: the cell
+    cannot fail, and its replicates being identical drive the sem to zero. Including them
+    reported a MATCH whose worst cell read "1888130 sems off". A cell that can only agree
+    buys no evidence and destroys the error bar it is scored against.
 
     argument_source: model. `NeS`, `t` and the ancestral frequencies are the simulation's own
     parameters; the weights are its constructed effect sizes and ancestral heterozygosities. -/
@@ -1406,11 +1420,26 @@ theorem sourcePolymorphicSignalFraction_antitone_time {M : ℕ} (w p : Fin M →
     0.00045, a factor of 27 apart. Two unrelated errors cancelled at one cell. The genuine
     reduction is at `t = 0`, and it is `cleanSplitTargetR2'_at_zero_time`.
 
-    NO `record()` NAMES THIS BODY YET. The table is arithmetic against cells committed in
-    `battery_clean01_results.json` and `clean01.log`, reproducible without rerunning the
-    simulation; the harness has not yet recorded a verdict under this name, and the
-    independence from `NeT` is untested because the committed design carries a single
-    `(NeS, NeT)` pair.
+    A `record()` NOW NAMES THIS BODY and it is a MATCH (`simcov/battery_clean02.py`), which
+    also closes the `NeT` question. 19 cells, worst 1.97 sems and 0.33% relative, residuals
+    of mixed sign, ZERO fitted constants, and MEASUREMENT-ONLY error bars rather than the
+    paired ones the table above carries. The design spans two spectra at five depths each,
+    four target sizes at fixed `(NeS, t)`, and a source-off limit at `NeS = 200000` where
+    `Φ = 1` and the composition reduces to its chart — which is what separates the two
+    factors instead of fitting them jointly, and is the thing a single `(NeS, NeT)` pair
+    could never do.
+
+    BOTH RIVALS FAIL ON THE SAME CELLS. The superseded summed-index body is FALSIFIED at
+    74.38 sems and 60% relative, the chart alone with `Φ` forced to 1 at 36.67 sems and 20%
+    relative. The positive control — `t = 0`, where the measured target `R²` must be the
+    constructed `V_A/(V_A + V_E)` and no formula under test is involved — passes at 0.73
+    sems.
+
+    THE `t = 100` COINCIDENCE IS NOW MEASURED RATHER THAN ARGUED. On `[0.01,0.99]` the two
+    source-branch charges are `1 - Φ = 0.01103` against `(1-r2_0)·F_S = 0.01251`, a ratio of
+    1.1, which is why the summed body survived that cell. On `[0.05,0.95]` at the same `F_S`
+    they are 0.00044 and 0.01233, a ratio of 28.1 — the paragraph above predicted 27 from
+    the derivation alone, before the second spectrum was run.
 
     SCOPE, AND IT IS NARROWER THAN THE NAME. Derived for the PER-ALLELE score, which is what a
     deployed PGS is. It does NOT describe the SOURCE-STANDARDISED score, whose `√(h_S/h_T)`
@@ -1464,11 +1493,16 @@ theorem cleanSplitTargetR2'_le_targetBranchOnly (r2_0 : ℝ) {M : ℕ} (w p : Fi
     source-branch factor and the LD factor are the same at two target effective sizes, so all
     the `NeT`-dependence is in `neutralPortability`.
 
-    THIS IS THE SHARPEST UNTESTED CONSEQUENCE OF THE CORRECTION, and it is why the correction
-    is a change of shape rather than of constant. The summed-index body made the source and
-    target branches enter symmetrically; here the source branch's factor does not know `NeT`
-    exists. The committed design carries one `(NeS, NeT)` pair, so no stored cell can tell the
-    two apart — separating them needs a sweep in `NeT` at fixed `NeS`. -/
+    THIS WAS THE SHARPEST UNTESTED CONSEQUENCE OF THE CORRECTION, and it is why the
+    correction is a change of shape rather than of constant: the summed-index body made the
+    source and target branches enter symmetrically, and here the source branch's factor does
+    not know `NeT` exists. It is now TESTED AND MATCHED (`simcov/battery_clean02.py`), by the
+    sweep in `NeT` at fixed `NeS` the claim needed and no stored cell could supply:
+    `NeT` = 250, 500, 1000, 2000 at `NeS = 2000`, `t = 500`.
+    `sourcePolymorphicSignalFraction` returns ONE prediction, 0.899305, against measurements
+    spanning 0.2%, while the composed prediction moves 0.242 to 0.422 across the same four
+    cells — a factor of 1.74, carried entirely by `neutralPortability` — and matches at 0.57,
+    1.26, 0.89 and 0.97 sems. -/
 theorem cleanSplitTargetR2'_NeT_enters_only_through_chart (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
     (NeS NeT NeT' : ℝ) (t : ℕ) (ldFactor : ℝ) :
     cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor *
@@ -1575,8 +1609,11 @@ theorem cleanSplitTargetR2'_eq_ratioLD_scaling (r2_0 : ℝ) {M : ℕ} (w p : Fin
     drop to AUC through a prevalence-free chart is the fault that carried a `-0.068` bias, and
     making `K` mandatory is what prevents it.
 
-    NO `record()` NAMES THIS BODY YET; the table is arithmetic against committed cells, as for
-    `cleanSplitTargetR2'`. -/
+    NO `record()` NAMES THIS BODY YET; the table is arithmetic against committed cells. This
+    is no longer the standing of `cleanSplitTargetR2'`, which `simcov/battery_clean02.py`
+    now records as a MATCH — that battery scopes itself to the per-allele `R²` and does not
+    measure the AUC, so the `R²` it feeds is validated while this composition with
+    `liabilityThresholdAUCFromExplainedR2` is not. -/
 noncomputable def cleanSplitTargetAUC' (r2_0 : ℝ) {M : ℕ} (w p : Fin M → ℝ)
     (NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) : ℝ :=
   liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2' r2_0 w p NeS NeT t ldFactor) K
@@ -2098,7 +2135,7 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     recent ancestry. At small `c` the surviving ancestral term dominates and the floor is
     nearly right; as `c` grows the ancestral term dies exponentially while the regenerated
     one does not, so the floor underpredicts by more and more. This is the same functional
-    error, seen from the opposite side, that sank the exact-coalescent PGF derivation of the
+    error, seen from the opposite side, that sank the full-coalescent PGF derivation of the
     restoration law: `E[(1-c)^{2T}]` is the right functional for a GIVEN ancestral `D` and
     the wrong one for an LD CORRELATION. On that reading these three numbers are a direct
     measurement of the regeneration term, and a `D`-based rerun on the same replicates is
@@ -2113,7 +2150,7 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
 
     What the isolation arm settles without any caveat is the drift term: the superseded floor
     `(1-c)^(2t)`, carried as a competitor, is a uniform 1.28x above the corrected one —
-    exactly `exp(t/Nₑ) = exp(0.25) = 1.2840`, recovered to three digits and uniform in
+    which is `exp(t/Nₑ) = exp(0.25) = 1.2840`, recovered to three digits and uniform in
     separation as a constant factor must be — and is FALSIFIED at 13.63 sems. Omitting drift
     from the lower end was a real error of a size now measured rather than asserted.
 
