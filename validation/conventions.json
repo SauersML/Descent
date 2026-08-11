@@ -1234,12 +1234,6 @@
       "role": "consumer",
       "constants": [],
       "note": "Feeds `steppingStoneFst`'s output straight into `neutralPortability`'s `fst` slot, so it returns a portability in whatever convention `fst_neighbor` was supplied in. That the two stages want the same reading is the untested join, not a settled fact: the stepping-stone body is measured against F_ST read from coalescence times, and the portability chart is measured against transported R-squared."
-    },
-    "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::ldCorrelationDecayHyperbolic": {
-      "quantity": "fst",
-      "convention": "undetermined",
-      "role": "consumer",
-      "note": "Carries the `fstGap` slot of `ldCorrelationDecay` over unchanged, and inherits its undetermined reading with it: no reading is declared on that definition and none is derivable from its callees, so a candidate written at its signature cannot declare one either. The divergence factor is measured as a SHAPE -- the decay rate tracks the square root of the gap at 2.42 sems against 4.73 for the un-rooted rival -- and a shape measurement does not pin which F_ST estimator the gap is. Naming the reading is work the battery racing this candidate against the falsified body should settle, not work this entry can do. EXCLUDED FROM THE F-CONVENTION MIGRATION, not migrated: this declaration retires with task #32, so typing its fst slot would be work on a body being deleted."
     }
   }
 }
