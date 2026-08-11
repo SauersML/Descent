@@ -61,6 +61,7 @@ import Descent.Coalescent.RenewalCriterion
 import Descent.Coalescent.Restriction
 import Descent.Coalescent.SchweinsbergBound
 import Descent.Coalescent.SeedBank
+import Descent.Coalescent.SampleMonomorphism
 import Descent.Coalescent.SegregatingSites
 import Descent.Coalescent.Selection
 import Descent.Coalescent.SemigroupLimit
