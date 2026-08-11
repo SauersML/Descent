@@ -4248,6 +4248,53 @@ theorem calibratedBrierFromVariances_no_residual (π vSignal : ℝ) (hv : vSigna
       calibratedBrier π (r2FromSignalVariance vSignal vResidual) := by
   rfl
 
+/-- **The standard bivariate normal lower-orthant probability at correlation `ρ`.**
+
+`P(X ≤ a, Y ≤ b)` for a centred unit-variance Gaussian pair of correlation `ρ`, built as the
+pushforward of an INDEPENDENT pair under `(x, y) ↦ (x, ρ·x + √(1-ρ²)·y)`. That map sends a
+standard pair to a correlated one -- the second coordinate has variance `ρ² + (1-ρ²) = 1` and
+covariance `ρ` with the first -- so the image measure is the bivariate normal and this is its
+distribution function.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a distribution function, constructed rather
+    than charted. Nothing here is fitted and no population appears.
+
+Outside `|ρ| ≤ 1` the radicand is negative, `Real.sqrt` returns Mathlib's junk `0`, and the
+"correlated" pair degenerates to `(x, ρ·x)`; consumers must supply `|ρ| ≤ 1`. -/
+noncomputable def bivariateNormalOrthant (a b ρ : ℝ) : ℝ :=
+  ((((ProbabilityTheory.gaussianReal 0 1).prod
+        (ProbabilityTheory.gaussianReal 0 1)).map
+      (fun z : ℝ × ℝ ↦ (z.1, ρ * z.1 + Real.sqrt (1 - ρ ^ 2) * z.2)))
+    (Set.Iic a ×ˢ Set.Iic b)).toReal
+
+/-- **The exact calibrated Brier risk of a liability-threshold trait.**
+
+`π - Φ₂(z, z; r²)` at the trait's own liability threshold `z = Φ⁻¹(π)`, with `r²` the
+LIABILITY-scale explained fraction. This is the body `calibratedBrierFromVariances` is not:
+that one is exact when `r²` is the observed-scale explained fraction and wrong by 9% to 47%
+when the outcome is a truncated liability tail, and the difference is the scale rather than
+the simulation.
+
+Why this shape. For a calibrated predictor `Brier = E[p(1-p)] = π - E[p²]`, and under the
+liability-threshold model `E[p²]` is the probability that two conditionally independent
+replicate draws sharing the score component both fall on the same side of the threshold --
+a bivariate normal orthant at correlation `r²`. So the nonlinearity in `r²` that the linear
+chart misses is `Φ₂`'s, and the two agree exactly at `r² = 0` and `r² = 1`, which is why the
+chart's two anchor theorems could not tell a line from a curve through the same two points.
+
+    Empirical status: UNTESTED. The FORM is known to reproduce the four cells tabulated at
+    `calibratedBrierFromVariances` to between 5e-05 and 2.5e-03 relative, and at `π = 1/2` it
+    closes in elementary terms -- `Φ₂(0,0;ρ) = 1/4 + arcsin ρ / (2π)` gives `0.1666667`
+    against a realised `0.166658` -- but no battery has yet put THIS DECLARATION on trial, and
+    a form checked by hand is not a measured body. Queued for the simcov harness.
+
+Junk branches, both inherited and both real: `Function.invFun Foundations.Phi` is junk outside
+`(0,1)`, where no threshold exists, and `bivariateNormalOrthant` is junk outside `|r²| ≤ 1`.
+Consumers must supply `0 < π < 1` and `0 ≤ r² ≤ 1`. -/
+noncomputable def liabilityBrierExact (π r2 : ℝ) : ℝ :=
+  π - bivariateNormalOrthant (Function.invFun Foundations.Phi π)
+        (Function.invFun Foundations.Phi π) r2
+
 /-- **The calibrated Brier closed form is the Brier risk at the process's own `R²`.**
 
 Nothing new is assumed here beyond `r2FromSignalVariance_eq_rsquared`: the same
