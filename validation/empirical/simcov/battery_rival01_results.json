@@ -1,0 +1,1575 @@
+{
+ "_battery_sha": "646cc0b5de2ee6ea",
+ "results": [
+  {
+   "name": "reliabilityRatio",
+   "file": "StratificationConfounding.lean",
+   "source": "r2 / (r2 + sigma2_noise)",
+   "note": "the competing form that could have disagreed is the SQUARE ROOT of the same expression -- the factor by which reliability attenuates a CORRELATION rather than a slope. The oracle here is a slope ratio, so rejecting the square root is what establishes which of the two this body is; the corpus swept for correlation-where-slope-belongs and this body had never been asked",
+   "regime": "a signal of realised variance v_sig plus independent noise of realised variance v_noi, outcome y = signal + N(0,1); the observable is the ratio of the least-squares slope of y on the NOISY predictor to the slope of y on the CLEAN one. The prediction is evaluated at each block's REALISED variances, never at the nominal pair. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.8891330278505609,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r2=0.9 s2=0.1",
+    "lean": 0.9000187525030079,
+    "truth": 0.900200737281172,
+    "sem": 0.00011083705113600725,
+    "sems_off": 1.6419128468223192,
+    "rel_err": 0.00020216021896821756
+   },
+   "cells": [
+    {
+     "design": "r2=0.5 s2=0.5",
+     "lean": 0.49988370595187664,
+     "truth": 0.49969382697029247,
+     "sem": 0.0004081051365771783,
+     "sems_off": 0.46526976645458307,
+     "rel_err": 0.0003799906489448549
+    },
+    {
+     "design": "r2=0.2 s2=0.8",
+     "lean": 0.19993987319109247,
+     "truth": 0.20045803837322912,
+     "sem": 0.0004027817909724775,
+     "sems_off": 1.2864662548065902,
+     "rel_err": 0.002584905980033047
+    },
+    {
+     "design": "r2=0.8 s2=0.2",
+     "lean": 0.8000140290895197,
+     "truth": 0.8004878733138974,
+     "sem": 0.00037823542841188196,
+     "sems_off": 1.252775887143201,
+     "rel_err": 0.0005919442881951996
+    },
+    {
+     "design": "r2=0.9 s2=0.1",
+     "lean": 0.9000187525030079,
+     "truth": 0.900200737281172,
+     "sem": 0.00011083705113600725,
+     "sems_off": 1.6419128468223192,
+     "rel_err": 0.00020216021896821756
+    },
+    {
+     "design": "r2=0.1 s2=0.9",
+     "lean": 0.0997823539677238,
+     "truth": 0.09964451545310365,
+     "sem": 0.0005946487540699895,
+     "sems_off": 0.2317982063810327,
+     "rel_err": 0.0013833025730855327
+    }
+   ]
+  },
+  {
+   "name": "reliabilityRatio [sqrt, the correlation-attenuation reading, competing]",
+   "file": "StratificationConfounding.lean",
+   "source": "sqrt(r2 / (r2 + sigma2_noise))",
+   "note": "positive control 'slope on the CLEAN predictor, which the construction fixes at 1' passed at 1.55 sems",
+   "regime": "a signal of realised variance v_sig plus independent noise of realised variance v_noi, outcome y = signal + N(0,1); the observable is the ratio of the least-squares slope of y on the NOISY predictor to the slope of y on the CLEAN one. The prediction is evaluated at each block's REALISED variances, never at the nominal pair. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.6670331827199949,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.2 s2=0.8 [sqrt]",
+    "lean": 0.44714615467949625,
+    "truth": 0.20045803837322912,
+    "sem": 0.0004027817909724775,
+    "sems_off": 612.4609449465495,
+    "rel_err": 1.2306222205315762
+   },
+   "cells": [
+    {
+     "design": "r2=0.5 s2=0.5 [sqrt]",
+     "lean": 0.7070244529959215,
+     "truth": 0.49969382697029247,
+     "sem": 0.0004081051365771783,
+     "sems_off": 508.03238539101307,
+     "rel_err": 0.4149153238147871
+    },
+    {
+     "design": "r2=0.2 s2=0.8 [sqrt]",
+     "lean": 0.44714615467949625,
+     "truth": 0.20045803837322912,
+     "sem": 0.0004027817909724775,
+     "sems_off": 612.4609449465495,
+     "rel_err": 1.2306222205315762
+    },
+    {
+     "design": "r2=0.8 s2=0.2 [sqrt]",
+     "lean": 0.8944350177595641,
+     "truth": 0.8004878733138974,
+     "sem": 0.00037823542841188196,
+     "sems_off": 248.38271983174036,
+     "rel_err": 0.11736235810386478
+    },
+    {
+     "design": "r2=0.9 s2=0.1 [sqrt]",
+     "lean": 0.948693176440647,
+     "truth": 0.900200737281172,
+     "sem": 0.00011083705113600725,
+     "sems_off": 437.51109094349965,
+     "rel_err": 0.05386847305405914
+    },
+    {
+     "design": "r2=0.1 s2=0.9 [sqrt]",
+     "lean": 0.3158833475347006,
+     "truth": 0.09964451545310365,
+     "sem": 0.0005946487540699895,
+     "sems_off": 363.6412766386556,
+     "rel_err": 2.17010270056827
+    }
+   ]
+  },
+  {
+   "name": "reliabilityRatio [noise share, numerator swapped, competing]",
+   "file": "StratificationConfounding.lean",
+   "source": "sigma2_noise / (r2 + sigma2_noise)",
+   "note": "positive control 'slope on the CLEAN predictor, which the construction fixes at 1' passed at 1.55 sems",
+   "regime": "a signal of realised variance v_sig plus independent noise of realised variance v_noi, outcome y = signal + N(0,1); the observable is the ratio of the least-squares slope of y on the NOISY predictor to the slope of y on the CLEAN one. The prediction is evaluated at each block's REALISED variances, never at the nominal pair. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.8889365833499698,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.9 s2=0.1 [swap]",
+    "lean": 0.09998124749699214,
+    "truth": 0.900200737281172,
+    "sem": 0.00011083705113600725,
+    "sems_off": 7219.7832907178035,
+    "rel_err": 0.8889344972111886
+   },
+   "cells": [
+    {
+     "design": "r2=0.5 s2=0.5 [swap]",
+     "lean": 0.5001162940481232,
+     "truth": 0.49969382697029247,
+     "sem": 0.0004081051365771783,
+     "sems_off": 1.035191767920396,
+     "rel_err": 0.0008454518647792703
+    },
+    {
+     "design": "r2=0.2 s2=0.8 [swap]",
+     "lean": 0.8000601268089076,
+     "truth": 0.20045803837322912,
+     "sem": 0.0004027817909724775,
+     "sems_off": 1488.6524214215283,
+     "rel_err": 2.9911601116204203
+    },
+    {
+     "design": "r2=0.8 s2=0.2 [swap]",
+     "lean": 0.1999859709104804,
+     "truth": 0.8004878733138974,
+     "sem": 0.00037823542841188196,
+     "sems_off": 1587.640546854052,
+     "rel_err": 0.7501698931645658
+    },
+    {
+     "design": "r2=0.9 s2=0.1 [swap]",
+     "lean": 0.09998124749699214,
+     "truth": 0.900200737281172,
+     "sem": 0.00011083705113600725,
+     "sems_off": 7219.7832907178035,
+     "rel_err": 0.8889344972111886
+    },
+    {
+     "design": "r2=0.1 s2=0.9 [swap]",
+     "lean": 0.9002176460322762,
+     "truth": 0.09964451545310365,
+     "sem": 0.0005946487540699895,
+     "sems_off": 1346.295817656663,
+     "rel_err": 8.03429197220545
+    }
+   ]
+  },
+  {
+   "name": "reliabilityRatio [total variance forced to one, competing]",
+   "file": "StratificationConfounding.lean",
+   "source": "r2 / (1 + sigma2_noise)",
+   "note": "positive control 'slope on the CLEAN predictor, which the construction fixes at 1' passed at 1.55 sems",
+   "regime": "a signal of realised variance v_sig plus independent noise of realised variance v_noi, outcome y = signal + N(0,1); the observable is the ratio of the least-squares slope of y on the NOISY predictor to the slope of y on the CLEAN one. The prediction is evaluated at each block's REALISED variances, never at the nominal pair. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9357843096868669,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.9 s2=0.1 [unit]",
+    "lean": 0.8185475242763993,
+    "truth": 0.900200737281172,
+    "sem": 0.00011083705113600725,
+    "sems_off": 736.6960070471082,
+    "rel_err": 0.09070556113004917
+   },
+   "cells": [
+    {
+     "design": "r2=0.5 s2=0.5 [unit]",
+     "lean": 0.33336351489691096,
+     "truth": 0.49969382697029247,
+     "sem": 0.0004081051365771783,
+     "sems_off": 407.5673084353011,
+     "rel_err": 0.3328644523824988
+    },
+    {
+     "design": "r2=0.2 s2=0.8 [unit]",
+     "lean": 0.11110765658677815,
+     "truth": 0.20045803837322912,
+     "sem": 0.0004027817909724775,
+     "sems_off": 221.83322034177152,
+     "rel_err": 0.4457310991943917
+    },
+    {
+     "design": "r2=0.8 s2=0.2 [unit]",
+     "lean": 0.666728797328684,
+     "truth": 0.8004878733138974,
+     "sem": 0.00037823542841188196,
+     "sems_off": 353.6397331863783,
+     "rel_err": 0.1670969423077845
+    },
+    {
+     "design": "r2=0.9 s2=0.1 [unit]",
+     "lean": 0.8185475242763993,
+     "truth": 0.900200737281172,
+     "sem": 0.00011083705113600725,
+     "sems_off": 736.6960070471082,
+     "rel_err": 0.09070556113004917
+    },
+    {
+     "design": "r2=0.1 s2=0.9 [unit]",
+     "lean": 0.05256359432551501,
+     "truth": 0.09964451545310365,
+     "sem": 0.0005946487540699895,
+     "sems_off": 79.17433746451148,
+     "rel_err": 0.4724888360739397
+    }
+   ]
+  },
+  {
+   "name": "liabilityScaleH2",
+   "file": "VarianceComponents.lean",
+   "source": "h2_observed * K * (1 - K) / z^2",
+   "note": "the competing form that could have disagreed is the transform with the (1-K) factor dropped: a 2% error at K=0.02 and a 67% error at K=0.40, so it is the twentyfold prevalence sweep and not the sample size that rejects it. On a grid that stayed rare it would have matched, which is why the earlier three-cell design could not have carried it",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and the transform is applied to it. The TRUTH of each cell is the h2 the simulation was built with, a construction constant that never touches the prediction side. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.6645102698338378,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "h2=0.2 K=0.02",
+    "lean": 0.20118006260493546,
+    "truth": 0.2,
+    "sem": 0.0008,
+    "sems_off": 1.4750782561693057,
+    "rel_err": 0.005900313024677223
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05",
+     "lean": 0.49919172138350393,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 0.404139308248036,
+     "rel_err": 0.001616557232992144
+    },
+    {
+     "design": "h2=0.5 K=0.20",
+     "lean": 0.49944409425843683,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 0.2779528707815837,
+     "rel_err": 0.0011118114831263348
+    },
+    {
+     "design": "h2=0.3 K=0.10",
+     "lean": 0.3006772960597444,
+     "truth": 0.3,
+     "sem": 0.0012,
+     "sems_off": 0.5644133831203546,
+     "rel_err": 0.0022576535324814184
+    },
+    {
+     "design": "h2=0.2 K=0.02",
+     "lean": 0.20118006260493546,
+     "truth": 0.2,
+     "sem": 0.0008,
+     "sems_off": 1.4750782561693057,
+     "rel_err": 0.005900313024677223
+    },
+    {
+     "design": "h2=0.6 K=0.40",
+     "lean": 0.599660867428921,
+     "truth": 0.6,
+     "sem": 0.0024,
+     "sems_off": 0.1413052379495757,
+     "rel_err": 0.0005652209517983028
+    }
+   ]
+  },
+  {
+   "name": "liabilityScaleH2 [the (1-K) factor dropped, competing]",
+   "file": "VarianceComponents.lean",
+   "source": "h2_observed * K / z^2",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and the transform is applied to it. The TRUTH of each cell is the h2 the simulation was built with, a construction constant that never touches the prediction side. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.794357236798129,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.6 K=0.40 [no (1-K)]",
+    "lean": 0.9982965011076869,
+    "truth": 0.6,
+    "sem": 0.0024,
+    "sems_off": 165.9568754615362,
+    "rel_err": 0.6638275018461448
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [no (1-K)]",
+     "lean": 0.5254715584053645,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 12.735779202682263,
+     "rel_err": 0.05094311681072905
+    },
+    {
+     "design": "h2=0.5 K=0.20 [no (1-K)]",
+     "lean": 0.6242336465308669,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 62.11682326543344,
+     "rel_err": 0.24846729306173376
+    },
+    {
+     "design": "h2=0.3 K=0.10 [no (1-K)]",
+     "lean": 0.3340412249129364,
+     "truth": 0.3,
+     "sem": 0.0012,
+     "sems_off": 28.367687427447027,
+     "rel_err": 0.1134707497097881
+    },
+    {
+     "design": "h2=0.2 K=0.02 [no (1-K)]",
+     "lean": 0.20529245098254445,
+     "truth": 0.2,
+     "sem": 0.0008,
+     "sems_off": 6.615563728180549,
+     "rel_err": 0.026462254912722194
+    },
+    {
+     "design": "h2=0.6 K=0.40 [no (1-K)]",
+     "lean": 0.9982965011076869,
+     "truth": 0.6,
+     "sem": 0.0024,
+     "sems_off": 165.9568754615362,
+     "rel_err": 0.6638275018461448
+    }
+   ]
+  },
+  {
+   "name": "liabilityScaleH2 [z not squared, competing]",
+   "file": "VarianceComponents.lean",
+   "source": "h2_observed * K * (1 - K) / z",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and the transform is applied to it. The TRUTH of each cell is the h2 the simulation was built with, a construction constant that never touches the prediction side. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9578797289540985,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.2 K=0.02 [z linear]",
+    "lean": 0.00975377292663769,
+    "truth": 0.2,
+    "sem": 0.0008,
+    "sems_off": 237.8077838417029,
+    "rel_err": 0.9512311353668116
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [z linear]",
+     "lean": 0.05149386972848944,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 224.25306513575526,
+     "rel_err": 0.8970122605430211
+    },
+    {
+     "design": "h2=0.5 K=0.20 [z linear]",
+     "lean": 0.1397864656509453,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 180.10676717452733,
+     "rel_err": 0.7204270686981094
+    },
+    {
+     "design": "h2=0.3 K=0.10 [z linear]",
+     "lean": 0.05272190467411379,
+     "truth": 0.3,
+     "sem": 0.0012,
+     "sems_off": 206.0650794382385,
+     "rel_err": 0.8242603177529539
+    },
+    {
+     "design": "h2=0.2 K=0.02 [z linear]",
+     "lean": 0.00975377292663769,
+     "truth": 0.2,
+     "sem": 0.0008,
+     "sems_off": 237.8077838417029,
+     "rel_err": 0.9512311353668116
+    },
+    {
+     "design": "h2=0.6 K=0.40 [z linear]",
+     "lean": 0.2315695669671327,
+     "truth": 0.6,
+     "sem": 0.0024,
+     "sems_off": 153.51268043036137,
+     "rel_err": 0.6140507217214455
+    }
+   ]
+  },
+  {
+   "name": "liabilityScaleH2 [no transform at all, competing]",
+   "file": "VarianceComponents.lean",
+   "source": "h2_observed",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and the transform is applied to it. The TRUTH of each cell is the h2 the simulation was built with, a construction constant that never touches the prediction side. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9353847610799396,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.2 K=0.02 [no transform]",
+    "lean": 0.024089677105100876,
+    "truth": 0.2,
+    "sem": 0.0008,
+    "sems_off": 219.8879036186239,
+    "rel_err": 0.8795516144744956
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [no transform]",
+     "lean": 0.1118032700335301,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 194.09836498323494,
+     "rel_err": 0.7763934599329398
+    },
+    {
+     "design": "h2=0.5 K=0.20 [no transform]",
+     "lean": 0.24460979796235283,
+     "truth": 0.5,
+     "sem": 0.002,
+     "sems_off": 127.69510101882358,
+     "rel_err": 0.5107804040752943
+    },
+    {
+     "design": "h2=0.3 K=0.10 [no transform]",
+     "lean": 0.10282637054405282,
+     "truth": 0.3,
+     "sem": 0.0012,
+     "sems_off": 164.311357879956,
+     "rel_err": 0.657245431519824
+    },
+    {
+     "design": "h2=0.2 K=0.02 [no transform]",
+     "lean": 0.024089677105100876,
+     "truth": 0.2,
+     "sem": 0.0008,
+     "sems_off": 219.8879036186239,
+     "rel_err": 0.8795516144744956
+    },
+    {
+     "design": "h2=0.6 K=0.40 [no transform]",
+     "lean": 0.37281727202005377,
+     "truth": 0.6,
+     "sem": 0.0024,
+     "sems_off": 94.65946999164426,
+     "rel_err": 0.37863787996657705
+    }
+   ]
+  },
+  {
+   "name": "liabilityControlVariance",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - r2 * controlMean * (controlMean - T)",
+   "note": "this body's docstring says its reading 'is pinned the same way liabilityCaseVariance's was' -- but that body was pinned by CARRYING the rival, and this one inherited the sentence without the measurement. The rival is carried here: the variance of the LIABILITY among controls rather than of the standardised score, which is the same expression with r2 set to one and is what a reader who took the other reading of the name would compute",
+   "regime": "explicit normal liabilities g + e with realised r2 = Var(g)/Var(l), dichotomised at the threshold for prevalence K; the observable is the variance of the STANDARDISED score among controls, Var(g | l <= T)/Var(g). The control mean is evaluated at the block's realised case fraction. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.2734866856357626,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "K=0.20 r2=0.3",
+    "lean": 0.8748956019743511,
+    "truth": 0.8744862756180294,
+    "sem": 0.00031072747525491345,
+    "sems_off": 1.3173162623805181,
+    "rel_err": 0.00046807636407152596
+   },
+   "cells": [
+    {
+     "design": "K=0.05 r2=0.3",
+     "lean": 0.942928207873633,
+     "truth": 0.9429302347155477,
+     "sem": 0.0002110145341411334,
+     "sems_off": 0.009605224223051987,
+     "rel_err": 2.149514184747591e-06
+    },
+    {
+     "design": "K=0.20 r2=0.3",
+     "lean": 0.8748956019743511,
+     "truth": 0.8744862756180294,
+     "sem": 0.00031072747525491345,
+     "sems_off": 1.3173162623805181,
+     "rel_err": 0.00046807636407152596
+    },
+    {
+     "design": "K=0.05 r2=0.6",
+     "lean": 0.8858595487209422,
+     "truth": 0.8858757274174957,
+     "sem": 0.00016367707768030363,
+     "sems_off": 0.09884521878536859,
+     "rel_err": 1.8262941463159292e-05
+    },
+    {
+     "design": "K=0.40 r2=0.5",
+     "lean": 0.7114459804311477,
+     "truth": 0.710984330336781,
+     "sem": 0.0006019239431224395,
+     "sems_off": 0.766957519536336,
+     "rel_err": 0.000649311207953122
+    },
+    {
+     "design": "K=0.02 r2=0.2",
+     "lean": 0.9792607600780519,
+     "truth": 0.9791649229065393,
+     "sem": 0.00020441271624175743,
+     "sems_off": 0.468841534296565,
+     "rel_err": 9.787643457246427e-05
+    }
+   ]
+  },
+  {
+   "name": "liabilityControlVariance [the LIABILITY variance among controls, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - controlMean * (controlMean - T)",
+   "note": "positive control 'realised total liability variance, which the construction fixes at 1' passed at 0.92 sems",
+   "regime": "explicit normal liabilities g + e with realised r2 = Var(g)/Var(l), dichotomised at the threshold for prevalence K; the observable is the variance of the STANDARDISED score among controls, Var(g | l <= T)/Var(g). The control mean is evaluated at the block's realised case fraction. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.5281680057209077,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "K=0.20 r2=0.3 [liability]",
+    "lean": 0.5827551915132514,
+    "truth": 0.8744862756180294,
+    "sem": 0.00031072747525491345,
+    "sems_off": 938.8647845365098,
+    "rel_err": 0.33360281600600494
+   },
+   "cells": [
+    {
+     "design": "K=0.05 r2=0.3 [liability]",
+     "lean": 0.8095934764013106,
+     "truth": 0.9429302347155477,
+     "sem": 0.0002110145341411334,
+     "sems_off": 631.8842389551096,
+     "rel_err": 0.14140681187772133
+    },
+    {
+     "design": "K=0.20 r2=0.3 [liability]",
+     "lean": 0.5827551915132514,
+     "truth": 0.8744862756180294,
+     "sem": 0.00031072747525491345,
+     "sems_off": 938.8647845365098,
+     "rel_err": 0.33360281600600494
+    },
+    {
+     "design": "K=0.05 r2=0.6 [liability]",
+     "lean": 0.8096455135941403,
+     "truth": 0.8858757274174957,
+     "sem": 0.00016367707768030363,
+     "sems_off": 465.73542797635537,
+     "rel_err": 0.08605068573848575
+    },
+    {
+     "design": "K=0.40 r2=0.5 [liability]",
+     "lean": 0.4228038853983278,
+     "truth": 0.710984330336781,
+     "sem": 0.0006019239431224395,
+     "sems_off": 478.7655454334259,
+     "rel_err": 0.4053260144312141
+    },
+    {
+     "design": "K=0.02 r2=0.2 [liability]",
+     "lean": 0.8960899017548098,
+     "truth": 0.9791649229065393,
+     "sem": 0.00020441271624175743,
+     "sems_off": 406.4082835897414,
+     "rel_err": 0.08484272588639181
+    }
+   ]
+  },
+  {
+   "name": "liabilityControlVariance [the CASE formula applied to controls, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - r2 * caseMean * (caseMean - T)",
+   "note": "positive control 'realised total liability variance, which the construction fixes at 1' passed at 0.92 sems",
+   "regime": "explicit normal liabilities g + e with realised r2 = Var(g)/Var(l), dichotomised at the threshold for prevalence K; the observable is the variance of the STANDARDISED score among controls, Var(g | l <= T)/Var(g). The control mean is evaluated at the block's realised case fraction. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.41412062448055703,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "K=0.05 r2=0.6 [case form]",
+    "lean": 0.4821026610872,
+    "truth": 0.8858757274174957,
+    "sem": 0.00016367707768030363,
+    "sems_off": 2466.888290362508,
+    "rel_err": 0.4557897387112915
+   },
+   "cells": [
+    {
+     "design": "K=0.05 r2=0.3 [case form]",
+     "lean": 0.7485642095350586,
+     "truth": 0.9429302347155477,
+     "sem": 0.0002110145341411334,
+     "sems_off": 921.1025485594785,
+     "rel_err": 0.20612980475604661
+    },
+    {
+     "design": "K=0.20 r2=0.3 [case form]",
+     "lean": 0.7672333067496694,
+     "truth": 0.8744862756180294,
+     "sem": 0.00031072747525491345,
+     "sems_off": 345.16731673107506,
+     "rel_err": 0.12264682918272292
+    },
+    {
+     "design": "K=0.05 r2=0.6 [case form]",
+     "lean": 0.4821026610872,
+     "truth": 0.8858757274174957,
+     "sem": 0.00016367707768030363,
+     "sems_off": 2466.888290362508,
+     "rel_err": 0.4557897387112915
+    },
+    {
+     "design": "K=0.40 r2=0.5 [case form]",
+     "lean": 0.6552823708843887,
+     "truth": 0.710984330336781,
+     "sem": 0.0006019239431224395,
+     "sems_off": 92.53986336453438,
+     "rel_err": 0.07834484822753725
+    },
+    {
+     "design": "K=0.02 r2=0.2 [case form]",
+     "lean": 0.8228701695801561,
+     "truth": 0.9791649229065393,
+     "sem": 0.00020441271624175743,
+     "sems_off": 764.6038671172225,
+     "rel_err": 0.1596204578718364
+    }
+   ]
+  },
+  {
+   "name": "liabilityControlVariance [the -T term dropped, competing]",
+   "file": "PortabilityDrift.lean",
+   "source": "1 - r2 * controlMean^2",
+   "note": "positive control 'realised total liability variance, which the construction fixes at 1' passed at 0.92 sems",
+   "regime": "explicit normal liabilities g + e with realised r2 = Var(g)/Var(l), dichotomised at the threshold for prevalence K; the observable is the variance of the STANDARDISED score among controls, Var(g | l <= T)/Var(g). The control mean is evaluated at the block's realised case fraction. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.20665939632676072,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "K=0.05 r2=0.6 [no -T]",
+    "lean": 0.992933036538725,
+    "truth": 0.8858757274174957,
+    "sem": 0.00016367707768030363,
+    "sems_off": 654.076371832195,
+    "rel_err": 0.12084912793956185
+   },
+   "cells": [
+    {
+     "design": "K=0.05 r2=0.3 [no -T]",
+     "lean": 0.9964655675234935,
+     "truth": 0.9429302347155477,
+     "sem": 0.0002110145341411334,
+     "sems_off": 253.70448071666752,
+     "rel_err": 0.05677549710143262
+    },
+    {
+     "design": "K=0.20 r2=0.3 [no -T]",
+     "lean": 0.9632461139308325,
+     "truth": 0.8744862756180294,
+     "sem": 0.00031072747525491345,
+     "sems_off": 285.65172178606554,
+     "rel_err": 0.10149940689472053
+    },
+    {
+     "design": "K=0.05 r2=0.6 [no -T]",
+     "lean": 0.992933036538725,
+     "truth": 0.8858757274174957,
+     "sem": 0.00016367707768030363,
+     "sems_off": 654.076371832195,
+     "rel_err": 0.12084912793956185
+    },
+    {
+     "design": "K=0.40 r2=0.5 [no -T]",
+     "lean": 0.792954087767753,
+     "truth": 0.710984330336781,
+     "sem": 0.0006019239431224395,
+     "sems_off": 136.17959273352622,
+     "rel_err": 0.11529052601221795
+    },
+    {
+     "design": "K=0.02 r2=0.2 [no -T]",
+     "lean": 0.9995127995419664,
+     "truth": 0.9791649229065393,
+     "sem": 0.00020441271624175743,
+     "sems_off": 99.54310577900519,
+     "rel_err": 0.020780847188670404
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogit",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "log(pi / (1 - pi))",
+   "note": "the oracle is the generating intercept, NOT the fitted intercept-only logistic intercept -- the latter is log of the sample mean, so a design using it puts this body on both sides and can reject nothing. Three competing LINKS are carried on these cells: probit, log-risk and complementary log-log. Rejecting them is what says this transform of prevalence is the log-odds and not another increasing reparameterisation, which is the claim prevalenceLogit_reflect's docstring makes for it",
+   "regime": "binary outcomes drawn from expit(b0 + s x) with x standard normal; the TRUTH of each cell is the linear-predictor intercept b0 that generated the data, a construction constant that never enters the prediction. The corpus row is the s=0 cells, where the predictor is constant and the claim holds exactly. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 5.267435953728882,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "b0=-3.8918 s=0.0",
+    "lean": -3.8868261510470536,
+    "truth": -3.8918202981106265,
+    "sem": 0.0036487902136098874,
+    "sems_off": 1.3687131271468518,
+    "rel_err": 0.0012832419487604147
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 s=0.0",
+     "lean": -3.8868261510470536,
+     "truth": -3.8918202981106265,
+     "sem": 0.0036487902136098874,
+     "sems_off": 1.3687131271468518,
+     "rel_err": 0.0012832419487604147
+    },
+    {
+     "design": "b0=-2.1972 s=0.0",
+     "lean": -2.196159558395212,
+     "truth": -2.1972245773362196,
+     "sem": 0.0011904170446471172,
+     "sems_off": 0.8946603594064239,
+     "rel_err": 0.00048471100860281044
+    },
+    {
+     "design": "b0=-0.6190 s=0.0",
+     "lean": -0.6201620853795151,
+     "truth": -0.6190392084062235,
+     "sem": 0.001312371614442696,
+     "sems_off": 0.8556090065758113,
+     "rel_err": 0.0018139028320719207
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogit [probit link, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "Phi^{-1}(pi)",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "binary outcomes drawn from expit(b0 + s x) with x standard normal; the TRUTH of each cell is the linear-predictor intercept b0 that generated the data, a construction constant that never enters the prediction. The corpus row is the s=0 cells, where the predictor is constant and the claim holds exactly. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 4.315211518114212,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-2.1972 s=0.0 [probit]",
+    "lean": -1.2810049920397235,
+    "truth": -2.1972245773362196,
+    "sem": 0.00061065011453658,
+    "sems_off": 1500.400251282703,
+    "rel_err": 0.4169895033703221
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 s=0.0 [probit]",
+     "lean": -2.0517241666771957,
+     "truth": -3.8918202981106265,
+     "sem": 0.0014776117928782275,
+     "sems_off": 1245.3177081438441,
+     "rel_err": 0.4728111758723155
+    },
+    {
+     "design": "b0=-2.1972 s=0.0 [probit]",
+     "lean": -1.2810049920397235,
+     "truth": -2.1972245773362196,
+     "sem": 0.00061065011453658,
+     "sems_off": 1500.400251282703,
+     "rel_err": 0.4169895033703221
+    },
+    {
+     "design": "b0=-0.6190 s=0.0 [probit]",
+     "lean": -0.38600988120320917,
+     "truth": -0.6190392084062235,
+     "sem": 0.000806083108500374,
+     "sems_off": 289.0884633924893,
+     "rel_err": 0.3764371045300522
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogit [log-risk link, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "log(pi)",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "binary outcomes drawn from expit(b0 + s x) with x standard normal; the TRUTH of each cell is the linear-predictor intercept b0 that generated the data, a construction constant that never enters the prediction. The corpus row is the s=0 cells, where the predictor is constant and the claim holds exactly. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 2.7191155596151186,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-0.6190 s=0.0 [log risk]",
+    "lean": -1.0505535092940428,
+    "truth": -0.6190392084062235,
+    "sem": 0.0008529161467351797,
+    "sems_off": 505.92816484901107,
+    "rel_err": 0.6970710336729635
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 s=0.0 [log risk]",
+     "lean": -3.9071299026237405,
+     "truth": -3.8918202981106265,
+     "sem": 0.0035756033565080164,
+     "sems_off": 4.281684232466321,
+     "rel_err": 0.003933790190812876
+    },
+    {
+     "design": "b0=-2.1972 s=0.0 [log risk]",
+     "lean": -2.3016270739903746,
+     "truth": -2.1972245773362196,
+     "sem": 0.001071161068725227,
+     "sems_off": 97.46666463373514,
+     "rel_err": 0.047515623906194515
+    },
+    {
+     "design": "b0=-0.6190 s=0.0 [log risk]",
+     "lean": -1.0505535092940428,
+     "truth": -0.6190392084062235,
+     "sem": 0.0008529161467351797,
+     "sems_off": 505.92816484901107,
+     "rel_err": 0.6970710336729635
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogit [complementary log-log link, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "log(-log(1 - pi))",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "binary outcomes drawn from expit(b0 + s x) with x standard normal; the TRUTH of each cell is the linear-predictor intercept b0 that generated the data, a construction constant that never enters the prediction. The corpus row is the s=0 cells, where the predictor is constant and the claim holds exactly. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 3.622418204745938,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-0.6190 s=0.0 [cloglog]",
+    "lean": -0.8430641782046455,
+    "truth": -0.6190392084062235,
+    "sem": 0.0010661952019646104,
+    "sems_off": 210.11628019486992,
+    "rel_err": 0.36189140648327595
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 s=0.0 [cloglog]",
+     "lean": -3.8969952051023276,
+     "truth": -3.8918202981106265,
+     "sem": 0.0036120731984322914,
+     "sems_off": 1.4326694691422914,
+     "rel_err": 0.0013296880624764115
+    },
+    {
+     "design": "b0=-2.1972 s=0.0 [cloglog]",
+     "lean": -2.2493567522529396,
+     "truth": -2.1972245773362196,
+     "sem": 0.0011297401828099332,
+     "sems_off": 46.145278100186644,
+     "rel_err": 0.02372637528928514
+    },
+    {
+     "design": "b0=-0.6190 s=0.0 [cloglog]",
+     "lean": -0.8430641782046455,
+     "truth": -0.6190392084062235,
+     "sem": 0.0010661952019646104,
+     "sems_off": 210.11628019486992,
+     "rel_err": 0.36189140648327595
+    }
+   ]
+  },
+  {
+   "name": "prevalenceLogit [score spread above zero, the regime boundary]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "log(pi / (1 - pi))",
+   "note": "the marginal prevalence logit is the linear-predictor intercept only for a CONSTANT predictor; with a score of nonzero spread the marginal logit is attenuated toward zero. This row measures the size of that gap and is where the qualifier in the body's recorded empirical status -- 'intercept-only' -- is doing the work; positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "binary outcomes drawn from expit(b0 + s x) with x standard normal; the TRUTH of each cell is the linear-predictor intercept b0 that generated the data, a construction constant that never enters the prediction. The corpus row is the s=0 cells, where the predictor is constant and the claim holds exactly. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 8.989225124293394,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-3.8918 s=2.0",
+    "lean": -2.5429355836289886,
+    "truth": -3.8918202981106265,
+    "sem": 0.002207474150726769,
+    "sems_off": 611.0534585592059,
+    "rel_err": 0.3465948094100041
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 s=0.5",
+     "lean": -3.768417889545895,
+     "truth": -3.8918202981106265,
+     "sem": 0.002573253188889531,
+     "sems_off": 47.955797392010545,
+     "rel_err": 0.0317081466029251
+    },
+    {
+     "design": "b0=-3.8918 s=1.0",
+     "lean": -3.438801081413706,
+     "truth": -3.8918202981106265,
+     "sem": 0.00202143107633196,
+     "sems_off": 224.10816871330482,
+     "rel_err": 0.1164029122610951
+    },
+    {
+     "design": "b0=-3.8918 s=2.0",
+     "lean": -2.5429355836289886,
+     "truth": -3.8918202981106265,
+     "sem": 0.002207474150726769,
+     "sems_off": 611.0534585592059,
+     "rel_err": 0.3465948094100041
+    },
+    {
+     "design": "b0=-2.1972 s=0.5",
+     "lean": -2.102466533870727,
+     "truth": -2.1972245773362196,
+     "sem": 0.0016021361728817362,
+     "sems_off": 59.14481245065013,
+     "rel_err": 0.04312624410035114
+    },
+    {
+     "design": "b0=-2.1972 s=1.0",
+     "lean": -1.866992415482076,
+     "truth": -2.1972245773362196,
+     "sem": 0.0021638702880368193,
+     "sems_off": 152.61181027340973,
+     "rel_err": 0.15029513380671208
+    },
+    {
+     "design": "b0=-2.1972 s=2.0",
+     "lean": -1.3667632552588755,
+     "truth": -2.1972245773362196,
+     "sem": 0.001448107509359953,
+     "sems_off": 573.4804333998644,
+     "rel_err": 0.37795923577559126
+    },
+    {
+     "design": "b0=-0.6190 s=0.5",
+     "lean": -0.5864744165779261,
+     "truth": -0.6190392084062235,
+     "sem": 0.001153306034056156,
+     "sems_off": 28.236036981240478,
+     "rel_err": 0.05260537844143771
+    },
+    {
+     "design": "b0=-0.6190 s=1.0",
+     "lean": -0.5118649220504672,
+     "truth": -0.6190392084062235,
+     "sem": 0.001215369589636572,
+     "sems_off": 88.18246504571856,
+     "rel_err": 0.17313004556155162
+    },
+    {
+     "design": "b0=-0.6190 s=2.0",
+     "lean": -0.3772482692757874,
+     "truth": -0.6190392084062235,
+     "sem": 0.001255586551512086,
+     "sems_off": 192.57210013857707,
+     "rel_err": 0.39059066993987396
+    }
+   ]
+  },
+  {
+   "name": "prevalenceCITLShift",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "prevalenceLogit pi_target - prevalenceLogit pi_source",
+   "note": "the competing forms that could have disagreed are the identity-scale difference, the probit-scale difference and the log risk ratio, all three carried on these same cells against the same known delta. The earlier design measured this body against the logit of a sample mean -- itself -- so no rival could be rejected there",
+   "regime": "two populations differing ONLY by a known intercept shift delta on the logistic linear predictor, outcomes drawn from expit(b0 + s x) and expit(b0 + delta + s x); the TRUTH of each cell is delta itself. The corpus row is the s=0 cells. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 1.7520324782588628,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "b0=-3.8918 delta=+1.0 s=0.0",
+    "lean": 0.9954534276420364,
+    "truth": 1.0,
+    "sem": 0.003924827649428859,
+    "sems_off": 1.1584132512481782,
+    "rel_err": 0.00454657235796363
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=0.0",
+     "lean": 0.9954534276420364,
+     "truth": 1.0,
+     "sem": 0.003924827649428859,
+     "sems_off": 1.1584132512481782,
+     "rel_err": 0.00454657235796363
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=0.0",
+     "lean": 1.9957950716328248,
+     "truth": 2.0,
+     "sem": 0.004165209013551346,
+     "sems_off": 1.0095359809062785,
+     "rel_err": 0.0021024641835876157
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=0.0",
+     "lean": -1.4997304636751427,
+     "truth": -1.5,
+     "sem": 0.011576581932458016,
+     "sems_off": 0.023282893554404892,
+     "rel_err": 0.00017969088323817792
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=0.0",
+     "lean": 0.9980633629896631,
+     "truth": 1.0,
+     "sem": 0.001957631081989163,
+     "sems_off": 0.989275777318079,
+     "rel_err": 0.0019366370103368613
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=0.0",
+     "lean": 1.9991259569106672,
+     "truth": 2.0,
+     "sem": 0.0016828272786470662,
+     "sems_off": 0.5193896607354201,
+     "rel_err": 0.00043702154466640497
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=0.0",
+     "lean": -1.5036204512592475,
+     "truth": -1.5,
+     "sem": 0.004966703344304299,
+     "sems_off": 0.7289445348893913,
+     "rel_err": 0.0024136341728316544
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=0.0",
+     "lean": 1.0006315472858842,
+     "truth": 1.0,
+     "sem": 0.0012275657597515485,
+     "sems_off": 0.5144712459331192,
+     "rel_err": 0.0006315472858842153
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=0.0",
+     "lean": 1.9994089281097178,
+     "truth": 2.0,
+     "sem": 0.0027804701887675616,
+     "sems_off": 0.21257983368063782,
+     "rel_err": 0.00029553594514108994
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=0.0",
+     "lean": -1.5000174992199728,
+     "truth": -1.5,
+     "sem": 0.0024084600750750892,
+     "sems_off": 0.00726572973077167,
+     "rel_err": 1.166614664856643e-05
+    }
+   ]
+  },
+  {
+   "name": "prevalenceCITLShift [identity-scale reading, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "pi_target - pi_source",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "two populations differing ONLY by a known intercept shift delta on the logistic linear predictor, outcomes drawn from expit(b0 + s x) and expit(b0 + delta + s x); the TRUTH of each cell is delta itself. The corpus row is the s=0 cells. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 1.540148155075213,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-3.8918 delta=-1.5 s=0.0 [identity]",
+    "lean": -0.01554,
+    "truth": -1.5,
+    "sem": 7.926087126877742e-05,
+    "sems_off": 18728.787310022428,
+    "rel_err": 0.98964
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=0.0 [identity]",
+     "lean": 0.032482750000000005,
+     "truth": 1.0,
+     "sem": 8.801618154797238e-05,
+     "sems_off": 10992.492891465236,
+     "rel_err": 0.96751725
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=0.0 [identity]",
+     "lean": 0.11102825,
+     "truth": 2.0,
+     "sem": 0.0001584840855011732,
+     "sems_off": 11918.999589305873,
+     "rel_err": 0.944485875
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=0.0 [identity]",
+     "lean": -0.01554,
+     "truth": -1.5,
+     "sem": 7.926087126877742e-05,
+     "sems_off": 18728.787310022428,
+     "rel_err": 0.98964
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=0.0 [identity]",
+     "lean": 0.13171825,
+     "truth": 1.0,
+     "sem": 0.0002657895078817065,
+     "sems_off": 3266.8022034430396,
+     "rel_err": 0.86828175
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=0.0 [identity]",
+     "lean": 0.35080425,
+     "truth": 2.0,
+     "sem": 0.0003385820089516182,
+     "sems_off": 4870.890083931372,
+     "rel_err": 0.824597875
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=0.0 [identity]",
+     "lean": -0.07596249999999999,
+     "truth": -1.5,
+     "sem": 0.00017285491438941231,
+     "sems_off": 8238.33967943711,
+     "rel_err": 0.9493583333333334
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=0.0 [identity]",
+     "lean": 0.244241,
+     "truth": 1.0,
+     "sem": 0.00029010958520629714,
+     "sems_off": 2605.0811091352916,
+     "rel_err": 0.755759
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=0.0 [identity]",
+     "lean": 0.4491240000000001,
+     "truth": 2.0,
+     "sem": 0.0005258588892740785,
+     "sems_off": 2949.2246525316054,
+     "rel_err": 0.775438
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=0.0 [identity]",
+     "lean": -0.2425935,
+     "truth": -1.5,
+     "sem": 0.0003856561662561946,
+     "sems_off": 3260.4340602315033,
+     "rel_err": 0.8382710000000001
+    }
+   ]
+  },
+  {
+   "name": "prevalenceCITLShift [probit-scale reading, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "Phi^{-1}(pi_target) - Phi^{-1}(pi_source)",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "two populations differing ONLY by a known intercept shift delta on the logistic linear predictor, outcomes drawn from expit(b0 + s x) and expit(b0 + delta + s x); the TRUTH of each cell is delta itself. The corpus row is the s=0 cells. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 1.6994214441125417,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-2.1972 delta=+2.0 s=0.0 [probit]",
+    "lean": 1.1576181223071431,
+    "truth": 2.0,
+    "sem": 0.0009776315738578528,
+    "sems_off": 861.6557609414309,
+    "rel_err": 0.42119093884642844
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=0.0 [probit]",
+     "lean": 0.43140345460084345,
+     "truth": 1.0,
+     "sem": 0.0016082093143458096,
+     "sems_off": 353.5587938255733,
+     "rel_err": 0.5685965453991566
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=0.0 [probit]",
+     "lean": 0.930644642813059,
+     "truth": 2.0,
+     "sem": 0.0017690259149767582,
+     "sems_off": 604.4882373591403,
+     "rel_err": 0.5346776785934705
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=0.0 [probit]",
+     "lean": -0.5560183860093922,
+     "truth": -1.5,
+     "sem": 0.003965553539057274,
+     "sems_off": 238.0453585339865,
+     "rel_err": 0.6293210759937385
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=0.0 [probit]",
+     "lean": 0.5481195571438902,
+     "truth": 1.0,
+     "sem": 0.0010724394518969226,
+     "sems_off": 421.35753403777454,
+     "rel_err": 0.45188044285610984
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=0.0 [probit]",
+     "lean": 1.1576181223071431,
+     "truth": 2.0,
+     "sem": 0.0009776315738578528,
+     "sems_off": 861.6557609414309,
+     "rel_err": 0.42119093884642844
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=0.0 [probit]",
+     "lean": -0.6940242219443838,
+     "truth": -1.5,
+     "sem": 0.002126015935685949,
+     "sems_off": 379.10147545322695,
+     "rel_err": 0.5373171853704107
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=0.0 [probit]",
+     "lean": 0.6238211394273825,
+     "truth": 1.0,
+     "sem": 0.0007598292937122759,
+     "sems_off": 495.0833873944651,
+     "rel_err": 0.3761788605726175
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=0.0 [probit]",
+     "lean": 1.2236010103510404,
+     "truth": 2.0,
+     "sem": 0.0016395499387419237,
+     "sems_off": 473.5439716125475,
+     "rel_err": 0.3881994948244798
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=0.0 [probit]",
+     "lean": -0.8558127856772895,
+     "truth": -1.5,
+     "sem": 0.0013541117268901577,
+     "sems_off": 475.7267820153554,
+     "rel_err": 0.429458142881807
+    }
+   ]
+  },
+  {
+   "name": "prevalenceCITLShift [log risk ratio, competing]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "log(pi_target / pi_source)",
+   "note": "positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "two populations differing ONLY by a known intercept shift delta on the logistic linear predictor, outcomes drawn from expit(b0 + s x) and expit(b0 + delta + s x); the TRUTH of each cell is delta itself. The corpus row is the s=0 cells. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 1.7912366652318035,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-0.6190 delta=+2.0 s=0.0 [log RR]",
+    "lean": 0.8259947808645495,
+    "truth": 2.0,
+    "sem": 0.001114127100515447,
+    "sems_off": 1053.7444234076174,
+    "rel_err": 0.5870026095677252
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=0.0 [log RR]",
+     "lean": 0.9617425501745862,
+     "truth": 1.0,
+     "sem": 0.0038359495797888605,
+     "sems_off": 9.973397467731985,
+     "rel_err": 0.03825744982541379
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=0.0 [log RR]",
+     "lean": 1.875540164988093,
+     "truth": 2.0,
+     "sem": 0.004015382769752465,
+     "sems_off": 30.99575859852075,
+     "rel_err": 0.062229917505953525
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=0.0 [log RR]",
+     "lean": -1.4839961456534851,
+     "truth": -1.5,
+     "sem": 0.011519704287039889,
+     "sems_off": 1.3892591292052356,
+     "rel_err": 0.010669236231009904
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=0.0 [log RR]",
+     "lean": 0.8398065956830609,
+     "truth": 1.0,
+     "sem": 0.001638785309469949,
+     "sems_off": 97.75130603822184,
+     "rel_err": 0.16019340431693907
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=0.0 [log RR]",
+     "lean": 1.5051165518330816,
+     "truth": 2.0,
+     "sem": 0.001221635676020851,
+     "sems_off": 405.09904702428787,
+     "rel_err": 0.2474417240834592
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=0.0 [log RR]",
+     "lean": -1.4225827167350311,
+     "truth": -1.5,
+     "sem": 0.00479896963967827,
+     "sems_off": 16.132063563160834,
+     "rel_err": 0.05161152217664592
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=0.0 [log RR]",
+     "lean": 0.5296527911071118,
+     "truth": 1.0,
+     "sem": 0.0006838267206360517,
+     "sems_off": 687.8163644371799,
+     "rel_err": 0.47034720889288817
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=0.0 [log RR]",
+     "lean": 0.8259947808645495,
+     "truth": 2.0,
+     "sem": 0.001114127100515447,
+     "sems_off": 1053.7444234076174,
+     "rel_err": 0.5870026095677252
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=0.0 [log RR]",
+     "lean": -1.1829645342355586,
+     "truth": -1.5,
+     "sem": 0.0018967262943310075,
+     "sems_off": 167.14876928316252,
+     "rel_err": 0.2113569771762943
+    }
+   ]
+  },
+  {
+   "name": "prevalenceCITLShift [score spread above zero, the regime boundary]",
+   "file": "PGSCalibrationTheory.lean",
+   "source": "prevalenceLogit pi_target - prevalenceLogit pi_source",
+   "note": "the difference of MARGINAL prevalence logits undercorrects the intercept shift a deployment needs whenever the linear predictor has spread -- the direction PopulationCalibrationDrift.lean derives from Jensen on the odds-multiplier action, here measured in magnitude. battery_pgscal01 recorded the same arithmetic under the declaration name prevalenceLogisticCalibrationProfile at 374 sems, and nothing in the ledger connects that row to this body; positive control 'realised prevalence at b0=-1.1972 s=2.0 against a 64-node Gauss-Hermite quadrature of E expit(b0 + s x)' passed at 1.28 sems",
+   "regime": "two populations differing ONLY by a known intercept shift delta on the logistic linear predictor, outcomes drawn from expit(b0 + s x) and expit(b0 + delta + s x); the TRUTH of each cell is delta itself. The corpus row is the s=0 cells. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 1.7613319665265186,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "b0=-2.1972 delta=+2.0 s=2.0",
+    "lean": 1.2472700938182082,
+    "truth": 2.0,
+    "sem": 0.0012200620523099281,
+    "sems_off": 616.9603462026032,
+    "rel_err": 0.3763649530908959
+   },
+   "cells": [
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=0.5",
+     "lean": 0.9838467223324674,
+     "truth": 1.0,
+     "sem": 0.0033024116123838176,
+     "sems_off": 4.891358062986128,
+     "rel_err": 0.016153277667532606
+    },
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=1.0",
+     "lean": 0.9444903142809074,
+     "truth": 1.0,
+     "sem": 0.0022635666085924953,
+     "sems_off": 24.523106812221904,
+     "rel_err": 0.05550968571909265
+    },
+    {
+     "design": "b0=-3.8918 delta=+1.0 s=2.0",
+     "lean": 0.7121555867157261,
+     "truth": 1.0,
+     "sem": 0.0026477399036155033,
+     "sems_off": 108.71325121142783,
+     "rel_err": 0.2878444132842739
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=0.5",
+     "lean": 1.9637353583293777,
+     "truth": 2.0,
+     "sem": 0.0027229364944414175,
+     "sems_off": 13.318210595308646,
+     "rel_err": 0.018132320835311133
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=1.0",
+     "lean": 1.8413837373492954,
+     "truth": 2.0,
+     "sem": 0.0023697315217374587,
+     "sems_off": 66.93427554797815,
+     "rel_err": 0.0793081313253523
+    },
+    {
+     "design": "b0=-3.8918 delta=+2.0 s=2.0",
+     "lean": 1.376800826717613,
+     "truth": 2.0,
+     "sem": 0.0018460492801808405,
+     "sems_off": 337.5853396618631,
+     "rel_err": 0.31159958664119347
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=0.5",
+     "lean": -1.495054502094563,
+     "truth": -1.5,
+     "sem": 0.0065597484210065775,
+     "sems_off": 0.7539157888433479,
+     "rel_err": 0.00329699860362472
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=1.0",
+     "lean": -1.472419019787475,
+     "truth": -1.5,
+     "sem": 0.0060076084378990115,
+     "sems_off": 4.591008301827797,
+     "rel_err": 0.01838732014168339
+    },
+    {
+     "design": "b0=-3.8918 delta=-1.5 s=2.0",
+     "lean": -1.17569261097744,
+     "truth": -1.5,
+     "sem": 0.005413649688507397,
+     "sems_off": 59.905499558094824,
+     "rel_err": 0.21620492601504004
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=0.5",
+     "lean": 0.9656355192076317,
+     "truth": 1.0,
+     "sem": 0.002396099961292037,
+     "sems_off": 14.34183938379521,
+     "rel_err": 0.03436448079236831
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=1.0",
+     "lean": 0.8694259302464873,
+     "truth": 1.0,
+     "sem": 0.002383274986250336,
+     "sems_off": 54.78766424639401,
+     "rel_err": 0.1305740697535127
+    },
+    {
+     "design": "b0=-2.1972 delta=+1.0 s=2.0",
+     "lean": 0.6371994383543813,
+     "truth": 1.0,
+     "sem": 0.001864997455666044,
+     "sems_off": 194.5313976399245,
+     "rel_err": 0.3628005616456187
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=0.5",
+     "lean": 1.915822217555602,
+     "truth": 2.0,
+     "sem": 0.0016404341420865748,
+     "sems_off": 51.31433215436916,
+     "rel_err": 0.042088891222199054
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=1.0",
+     "lean": 1.7040733216631094,
+     "truth": 2.0,
+     "sem": 0.002298994660724183,
+     "sems_off": 128.72003723735213,
+     "rel_err": 0.14796333916844528
+    },
+    {
+     "design": "b0=-2.1972 delta=+2.0 s=2.0",
+     "lean": 1.2472700938182082,
+     "truth": 2.0,
+     "sem": 0.0012200620523099281,
+     "sems_off": 616.9603462026032,
+     "rel_err": 0.3763649530908959
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=0.5",
+     "lean": -1.478584684298248,
+     "truth": -1.5,
+     "sem": 0.0033063096700333416,
+     "sems_off": 6.4771052439065935,
+     "rel_err": 0.014276877134501357
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=1.0",
+     "lean": -1.3890484084395167,
+     "truth": -1.5,
+     "sem": 0.002729755925308005,
+     "sems_off": 40.645242503856586,
+     "rel_err": 0.07396772770698885
+    },
+    {
+     "design": "b0=-2.1972 delta=-1.5 s=2.0",
+     "lean": -1.0326828622466024,
+     "truth": -1.5,
+     "sem": 0.0017430813197271387,
+     "sems_off": 268.0982995254353,
+     "rel_err": 0.31154475850226504
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=0.5",
+     "lean": 0.9457832241884678,
+     "truth": 1.0,
+     "sem": 0.0016532559127780029,
+     "sems_off": 32.79394036488308,
+     "rel_err": 0.05421677581153217
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=1.0",
+     "lean": 0.8271270557628092,
+     "truth": 1.0,
+     "sem": 0.0022198903777616483,
+     "sems_off": 77.874540999408,
+     "rel_err": 0.1728729442371908
+    },
+    {
+     "design": "b0=-0.6190 delta=+1.0 s=2.0",
+     "lean": 0.6063081916646975,
+     "truth": 1.0,
+     "sem": 0.0017333848698884648,
+     "sems_off": 227.1231364564955,
+     "rel_err": 0.3936918083353025
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=0.5",
+     "lean": 1.8984224474184948,
+     "truth": 2.0,
+     "sem": 0.0016226833053513152,
+     "sems_off": 62.59850720502325,
+     "rel_err": 0.050788776290752624
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=1.0",
+     "lean": 1.6655570138015345,
+     "truth": 2.0,
+     "sem": 0.002106462267849787,
+     "sems_off": 158.769986675268,
+     "rel_err": 0.16722149309923273
+    },
+    {
+     "design": "b0=-0.6190 delta=+2.0 s=2.0",
+     "lean": 1.2236244242187317,
+     "truth": 2.0,
+     "sem": 0.0019224496873496187,
+     "sems_off": 403.8470191912366,
+     "rel_err": 0.38818778789063413
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=0.5",
+     "lean": -1.4379502544384533,
+     "truth": -1.5,
+     "sem": 0.001969565145724444,
+     "sems_off": 31.504286972302022,
+     "rel_err": 0.04136649704103116
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=1.0",
+     "lean": -1.2846573654557365,
+     "truth": -1.5,
+     "sem": 0.001899056072631425,
+     "sems_off": 113.39456356645341,
+     "rel_err": 0.14356175636284232
+    },
+    {
+     "design": "b0=-0.6190 delta=-1.5 s=2.0",
+     "lean": -0.9384611504570165,
+     "truth": -1.5,
+     "sem": 0.0017839712693665131,
+     "sems_off": 314.76899834961216,
+     "rel_err": 0.37435923302865565
+    }
+   ]
+  }
+ ]
+}
