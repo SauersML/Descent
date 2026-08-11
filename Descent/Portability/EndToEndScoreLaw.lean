@@ -658,4 +658,107 @@ theorem phenotype_ladder_slope_is_score_slope (law : DemeScoreLaw)
     (input : PhenotypeLadderInput) (rung : PhenotypeRung) :
     law.calibrationSlope = law.moments.calibrationSlope := rfl
 
+/-! ## Inhabitation
+
+A theorem quantified over an uninhabited structure is true and empty -- kernel-checked, clean
+axiom report, no content -- so each hypothesis-carrying class above needs one exhibited
+inhabitant before anything stated over it is a statement about something.
+
+THE VALUES ARE CHOSEN OFF THE BOUNDARIES THEIR OWN HYPOTHESES EXCLUDE, which is the whole
+difference between a witness that discharges a screen and a witness that tests a construction.
+`PTProtocol.witness` carries TWO markers a megabase apart against a 250 kb clumping window, so
+the conflict predicate is exercised and returns false for a reason rather than vacuously; a
+one-marker protocol would inhabit the class while making the clumping recursion unreachable. -/
+
+/-- Inhabitation for the positive scale. -/
+noncomputable def PositiveScale.witness : PositiveScale where
+  value := 1
+  value_pos := by norm_num
+
+/-- Inhabitation for the interior probability, away from both endpoints. -/
+noncomputable def InteriorProbability.witness : InteriorProbability where
+  value := 1 / 4
+  value_pos := by norm_num
+  value_lt_one := by norm_num
+
+/-- Inhabitation for the P+T parameters, at a cutoff strictly inside its admitted range. -/
+noncomputable def PTParameters.witness : PTParameters where
+  clumpR2Cutoff := 1 / 10
+  clumpWindowBp := 250000
+  discoverySampleSize := 100000
+  clumpR2Cutoff_nonneg := by norm_num
+  clumpR2Cutoff_lt_one := by norm_num
+  discoverySampleSize_pos := by norm_num
+
+/-- Inhabitation for the protocol: two markers a megabase apart, so the clumping window is a
+real constraint rather than an unreached branch, and a two-threshold family. -/
+noncomputable def PTProtocol.witness : PTProtocol 2 2 where
+  parameters := PTParameters.witness
+  positionBp := fun i ↦ if i = 0 then 0 else 1000000
+  sourceR2 := fun i j ↦ if i = j then 1 else 1 / 2
+  sourceR2_nonnegative := by intro i j; split <;> norm_num
+  sourceR2_le_one := by intro i j; split <;> norm_num
+  sourceR2_symmetric := by
+    intro i j
+    by_cases h : i = j
+    · subst h; rfl
+    · simp [h, Ne.symm h]
+  pThreshold := fun q ↦ if q = 0 then 1 / 20 else 1 / 2
+  pThreshold_nonnegative := by intro q; split <;> norm_num
+  pThreshold_le_one := by intro q; split <;> norm_num
+
+/-- Inhabitation for the design.  Both markers pass both thresholds and neither clumps the
+other out, so `selected` returns both and the greedy recursion is genuinely run. -/
+noncomputable def PTDesign.witness : PTDesign 2 2 where
+  protocol := PTProtocol.witness
+  pValue := fun _ ↦ 1 / 100
+  pValue_nonnegative := by intro i; norm_num
+  pValue_le_one := by intro i; norm_num
+  orderedMarkers := [0, 1]
+  orderedMarkers_nodup := by decide
+  orderedMarkers_by_significance := by simp
+  coversMarkers := by decide
+
+/-- Inhabitation for the threshold winner, against a constant objective where every index is
+optimal and the tie is the caller's to resolve, which is what the class says. -/
+noncomputable def PTWinner.witness : PTWinner PTDesign.witness (fun _ ↦ (0 : ℝ)) where
+  index := 0
+  optimal := by intro q; norm_num
+
+/-- Inhabitation for the threshold mixture, at the uniform law over two thresholds. -/
+noncomputable def PTThresholdMixture.witness : PTThresholdMixture 2 where
+  probability := fun _ ↦ 1 / 2
+  probability_nonneg := by intro q; norm_num
+  probability_sum_one := by simp
+
+/-- Inhabitation for the one-locus OLS noise inputs. -/
+noncomputable def GWASNoiseMarginal.witness : GWASNoiseMarginal where
+  discoverySampleSize := 100000
+  discoverySampleSize_pos := by norm_num
+  residualVariance := PositiveScale.witness
+  alleleFrequency := InteriorProbability.witness
+
+/-- Inhabitation for the joint GWAS sampling law, at two atoms. -/
+noncomputable def PTGWASSamplingLaw.witness : PTGWASSamplingLaw 2 2 where
+  probability := fun _ ↦ 1 / 2
+  probability_nonneg := by intro w; norm_num
+  probability_sum_one := by simp
+  trueEffect := fun _ ↦ 0
+  estimatedEffect := fun _ _ ↦ 0
+  pValue := fun _ _ ↦ 1 / 100
+
+/-- Inhabitation for the Gaussian upper tail.  The mass is positive at EVERY boundary because
+`Foundations.Phi_lt_one` is strict, so this exhibits the class without choosing a special
+point. -/
+noncomputable def GaussianUpperTail.witness : GaussianUpperTail where
+  boundary := 0
+  mass := 1 - Foundations.Phi 0
+  mass_pos := by have := Foundations.Phi_lt_one 0; linarith
+  mass_eq := rfl
+
+/-- Inhabitation for the reference Brier score. -/
+noncomputable def ReferenceBrier.witness : ReferenceBrier where
+  value := 1 / 4
+  value_pos := by norm_num
+
 end Descent.Portability
