@@ -31,16 +31,20 @@ which is the case `r = 1`, and it is proved by the same mechanism made inductive
 injective interface has singleton fibers, so a derivation reaching a donor has nowhere to
 switch to, and the only derivations are the constant ones.
 
-## What is proved here and what is not
+## Both directions, and a correction
 
-The direction proved is the one a study design needs: it certifies a whole chain from a
-per-interface check, and the check is on the interface maps alone. The converse — every
-non-injective interface anywhere along a chain manufactures a phantom — is true and is NOT
-proved here. It needs a decomposition lemma for `mosaicsFrom` along a list append
-(`mosaicsFrom (pre ++ s :: post)` in terms of `mosaicsFrom pre` and `mosaicsFrom post`),
-which the corpus does not currently have; `HaplotypeGluing` supplies the `r = 1` instance of
-it and nothing longer. Stating the missing lemma is the whole of the remaining work, and it
-is stated here rather than left for a reader to rediscover.
+`phantoms_eq_empty_iff_forall_injective` is the biconditional: a chain admits no phantom
+exactly when every one of its interfaces preserves donor identity. So the per-interface
+check is not merely sufficient, it is the whole criterion, and `HaplotypeGluing`'s
+`interfacePanel_hasGluing_iff_injective` is its `r = 1` case.
+
+An earlier draft of this file claimed the converse required a decomposition lemma for
+`mosaicsFrom` along a list append, and said so in this docstring. That was wrong, and the
+error is worth recording because it is the kind that quietly parks work: `mosaicsFrom` is
+defined by recursion on the chain, so the induction follows its own recursion and never
+needs to split a chain in the middle. The witness is built directly — switch donors at the
+offending interface and travel diagonally thereafter — and an injective head interface has
+a singleton fiber, which lifts a phantom of the tail to a phantom of the whole chain.
 -/
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -106,5 +110,74 @@ theorem phantoms_singleton_eq_empty_of_injective (s : ι → ι) (hs : Function.
   intro interface hinterface
   rw [List.mem_singleton.mp hinterface]
   exact hs
+
+/-- Membership in the diagonals, unfolded: a derivation is diagonal exactly when it is one
+donor repeated. -/
+theorem mem_diagonals_iff {c : Chain ι} {derivation : List ι} :
+    derivation ∈ diagonals c ↔ ∃ donor : ι, derivation = List.replicate (c.length + 1) donor := by
+  simp only [diagonals, Finset.mem_image, Finset.mem_univ, true_and]
+  exact ⟨fun ⟨donor, hdonor⟩ ↦ ⟨donor, hdonor.symm⟩, fun ⟨donor, hdonor⟩ ↦ ⟨donor, hdonor.symm⟩⟩
+
+/-- **A merging interface anywhere along the chain manufactures a phantom.** The witness is
+explicit: travel diagonally to the offending interface, switch to the donor it cannot
+distinguish, and travel diagonally thereafter. -/
+theorem phantoms_nonempty_of_exists_not_injective :
+    ∀ (c : Chain ι), (∃ s ∈ c, ¬ Function.Injective s) → (phantoms c).Nonempty
+  | [], hbad => by simp at hbad
+  | s :: rest, hbad => by
+    by_cases hs : Function.Injective s
+    · obtain ⟨t, ht, hnot⟩ := hbad
+      have htail : t ∈ rest := by
+        rcases List.mem_cons.mp ht with rfl | hrest
+        · exact absurd hs hnot
+        · exact hrest
+      obtain ⟨tailPhantom, htail'⟩ :=
+        phantoms_nonempty_of_exists_not_injective rest ⟨t, htail, hnot⟩
+      rw [phantoms, Finset.mem_sdiff, mosaics, Finset.mem_biUnion] at htail'
+      obtain ⟨⟨donor, -, hderivation⟩, hnotdiagonal⟩ := htail'
+      refine ⟨donor :: tailPhantom, ?_⟩
+      rw [phantoms, Finset.mem_sdiff]
+      refine ⟨?_, ?_⟩
+      · rw [mosaics, Finset.mem_biUnion]
+        refine ⟨donor, Finset.mem_univ _, ?_⟩
+        rw [mosaicsFrom, Finset.mem_biUnion]
+        exact ⟨donor, by simp, Finset.mem_image_of_mem _ hderivation⟩
+      · intro hdiagonal
+        apply hnotdiagonal
+        obtain ⟨witness, hwitness⟩ := mem_diagonals_iff.mp hdiagonal
+        rw [List.length_cons, List.replicate_succ] at hwitness
+        obtain ⟨-, htailEq⟩ := List.cons.injEq .. ▸ hwitness
+        exact mem_diagonals_iff.mpr ⟨witness, htailEq⟩
+    · obtain ⟨left, right, hstate, hne⟩ : ∃ left right, s left = s right ∧ left ≠ right := by
+        rw [Function.Injective] at hs
+        push_neg at hs
+        obtain ⟨left, right, hstate, hne⟩ := hs
+        exact ⟨left, right, hstate, hne⟩
+      refine ⟨left :: List.replicate (rest.length + 1) right, ?_⟩
+      rw [phantoms, Finset.mem_sdiff]
+      refine ⟨?_, ?_⟩
+      · rw [mosaics, Finset.mem_biUnion]
+        refine ⟨left, Finset.mem_univ _, ?_⟩
+        rw [mosaicsFrom, Finset.mem_biUnion]
+        exact ⟨right, by simp [hstate], Finset.mem_image_of_mem _ (replicate_mem_mosaicsFrom rest right)⟩
+      · intro hdiagonal
+        obtain ⟨witness, hwitness⟩ := mem_diagonals_iff.mp hdiagonal
+        rw [List.length_cons, List.replicate_succ] at hwitness
+        obtain ⟨hhead, htailEq⟩ := List.cons.injEq .. ▸ hwitness
+        have hright : right = witness := by
+          have := congrArg (fun l ↦ l.head?) htailEq
+          simpa [List.replicate_succ] using this
+        exact hne (hhead.trans hright.symm)
+
+/-- **The criterion, both ways.** A chain admits no phantom recombinant exactly when every
+interface along it preserves donor identity. -/
+theorem phantoms_eq_empty_iff_forall_injective (c : Chain ι) :
+    phantoms c = ∅ ↔ ∀ s ∈ c, Function.Injective s := by
+  refine ⟨fun hempty ↦ ?_, phantoms_eq_empty_of_forall_injective c⟩
+  by_contra hbad
+  push_neg at hbad
+  obtain ⟨phantom, hphantom⟩ := phantoms_nonempty_of_exists_not_injective c hbad
+  rw [hempty] at hphantom
+  exact absurd hphantom (by simp)
 
 end Descent.Pangenome.Linkage
