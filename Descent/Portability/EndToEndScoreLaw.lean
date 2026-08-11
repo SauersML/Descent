@@ -1,9 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Coalescent.StructuredPresentDay
+import Descent.Coalescent.TwoDemeLDClosedForm
+import Descent.Coalescent.TwoLocusHistory
+import Descent.Core.Identifiability
 import Descent.PopGen.GeneticArchitectureDiscovery
 import Descent.PopGen.Shrinkage
+import Descent.Portability.AncestryCalibration
 import Descent.Portability.PGSCalibrationTheory.CalibrationDefinitions
 import Descent.Portability.PGSCalibrationTheory.PopulationCalibrationDrift
 import Descent.Portability.PhenomeWidePortability
@@ -19,12 +22,1005 @@ open MeasureTheory
 /-!
 # End-to-end selected-score and calibration law
 
-This file is the score-construction layer between a demographic moment law and the metric
-charts.  Clumping cutoff, physical window, threshold family, discovery sample size, marker
-count and GWAS sampling law are all inputs.  No study layout and no global retention scalar
-appears in the law.  The output is a score mean and a `Core.ScoreMoments` tuple in each deme,
-which is exactly what the existing metric and calibration layers consume.
+The concrete declarations in this file form the score-construction layer between a demographic
+moment law and the metric charts.  Clumping cutoff, physical window, threshold family, and
+discovery sample size come from the visible study design.  Marker count, marker positions,
+joint GWAS output, and the selected panel instead live inside `RealizedPTGWASDraw`, so mutation
+may change them between realizations.  `VariableMarkerPTGWASKernel` is the exact interface an
+upstream demographic/ARG construction must inhabit.  Its selected output is a score mean and a
+`Core.ScoreMoments` tuple in each deme.  Those moments feed population Gaussian charts; exact
+finite-cohort AUC, Brier, observed-risk `R²`, logistic calibration slope, and CITL are evaluated
+separately in `DiscriminationLaw` from realized outcomes and predicted risks.
+
+The requested endpoint contract recorded next is broader: it also names cohort layout and the
+intermediate coordinates the current concrete construction does not yet reach.  Keeping the
+contract and the attained construction in one file makes that gap visible; it does not erase
+it with a global retention scalar.
+
+The metric codomain is real only on its named domain.  Finite simulations can produce
+undefined metrics (for example, a singleton cohort can contain neither a case-control pair nor
+nonzero outcome variance; `BinaryRiskCohort.noAUCDomain_singleton` and
+`noR2Domain_singleton` prove the corresponding facts in `DiscriminationLaw`).  Consequently
+an unrestricted all-positive-cohort endpoint must ultimately return a partial value or a
+definedness probability in addition to a conditional expectation.  The real-valued vocabulary
+below records the requested coordinate names; it is not a convention that fills an undefined
+metric with zero.
 -/
+
+/-! ## The requested endpoint contract
+
+This vocabulary states the proposed endpoint without claiming that the corpus already
+constructs it.  The distinction between `VisiblePipelineInput` and a completion must be made
+*after* simulator randomness determined by the visible input has been integrated out.  In
+particular, if gnomon draws causal positions, effects, and haplotypes from conditional laws
+fixed by the visible input, those draws belong inside the expectation; they are not residual
+fiber coordinates and cannot be used to manufacture a non-identifiability witness.
+
+No `Core.SharpFiberEnvelope` for the real pipeline is declared here.  Such a declaration must
+supply derived, attained endpoints for the actual expected semantics.  Five links
+currently prevent that construction:
+
+* `PipelineDemographicHistory.twoLocusMoments` now maps an arbitrary finite event history to
+  the complete transient many-deme `H/DD/Dz/pi2` operator product.  This supplies a concrete
+  candidate for the linkage factor that was previously bracketed.  The tracked exact-rational
+  ancestral-configuration reference in `validation/empirical/momentsld/ldchain_reduction.py`
+  solves 2-, 3-, and 4-deme chains with verified lumpability and zero full-system residual.  It
+  shows that an `F_ST`-matched two-deme surrogate is biased high and that a geometric scalar
+  composition is only approximate.  This supports the full-state operator form, but no Lean
+  specialization theorem yet identifies its generator/readout with that reference.  The
+  preregistered 2-D comparison has now completed 4x4, 5x5, and an additional 6x6 check with
+  relative linear-solve residuals below `1e-12`.  Its mechanical verdict rejects the proposed
+  Bessel law with the one-dimensional decay length at `rho = 1` and fails it on both shape and
+  length at `rho = 5, 20` (the 4x4/5x5 length differences stay below the filed inconclusive
+  threshold).  Thus another scalar composition has been ruled out, not fitted into this file.
+  The complete ordered operator product remains the derived candidate law, but still lacks the
+  specialization proof and independent simulator gate needed for a discharged endpoint;
+* the concrete one-locus propagator below is a symmetric-biallelic diffusion component.
+  Gnomon's real-P+T study generates an ancestral recombination graph with `msprime`, lays its
+  mutation model on that graph, reservoir-selects multi-marker genotype columns, computes
+  PCs, and then runs logistic/Firth GWAS plus PLINK clumping and held-out threshold selection.
+  Identifying that full joint kernel is strictly stronger than identifying `F_ST` and the
+  low-order `DD` coordinate.  The latter collapses the linkage bracket but does not by itself
+  construct the deployed score law.  The low-order operator now includes the exact recurrent
+  symmetric-biallelic damping and its recurrent one-deme stationary boundary, so it uses the
+  same mutation mechanism as the marginal ascertainment propagator.  A projection theorem
+  from one common two-locus diffusion to both coordinate systems is still owed before their
+  product is promoted to an exact joint endpoint.  The exact remaining proposition is named
+  `PipelineDemographicHistory.CommonDiffusionProjection`: the joint operator's exposed `H`
+  coordinate must equal the marginal divergence moment after every compiled history.  Rate
+  coherence, equality of the recurrent ancestral `H` boundary, the exact `H`-row reduction to
+  the shared divergence derivative, and passage of a generator intertwining through the
+  matrix exponential are now proved.  What remains formal is the one-locus projection-matrix
+  identity and its lift through paired split/event lists, not another fitted biological
+  factor.  A
+  realizability corollary must also show that the propagated `DD` kernel stays positive
+  semidefinite, thereby constructing `LDPairDomain` (and its Cauchy--Schwarz field) whenever
+  within-deme `DD` is nonzero.  The input-only linkage function returns `none` rather than
+  accepting that proof from its caller, so this formal obligation cannot be hidden;
+  moreover, the executable currently calls `msprime.sim_mutations` without a mutation model.
+  Current msprime therefore supplies its default discrete-genome recurrent four-state JC69
+  process, while `stream_geno.py` immediately adds pairs of genotype-state integers and treats
+  their mean divided by two as a biallelic allele frequency.  No msprime version is pinned in
+  the executable environment.  An exact shared kernel must first make that protocol explicit
+  (or the executable must explicitly choose a binary/infinite-sites model); silently replacing
+  the default by this file's biallelic law would predict a different program;
+* the cohort-evaluation time-shift candidate is contradicted by its pre-filed check: at the
+  `30 ↔ 50` comparison it predicts a gap of `0.0016` against a measured `0.0148`.  The exact
+  replacement is now the sample-size-specific Bernstein conditional event
+  `Coalescent.targetErosionEvent`, composed directly from a visible history by
+  `PipelineDemographicHistory.targetErosion`.  It includes the missing mechanism—
+  the sampled polymorphic/monomorphic events themselves change with `n`—but its connection to
+  the end-to-end cohort evaluation still awaits the filed validation verdict;
+* `DiscriminationLaw` now derives the finite liability prevalence root, the bounded CITL root,
+  and the complete finite Bernoulli outcome sum.  Its ridge-logistic calibration slope is
+  exactly characterized by the sklearn objective, but existence and uniqueness of that
+  two-parameter minimizer are still carried as a proof obligation rather than derived from the
+  executable guards.  That convex-analysis theorem remains part of the exact metric segment;
+* the executable protocol is not yet a function of exactly this visible input type.
+  `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
+  `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
+  individuals and 5000 individuals in the chosen training deme, and randomly chooses that
+  training deme even though `PipelineStudyDesign.gwasDeme` is a visible constant.  It also
+  exposes genome chunk count and chunk length as run-time arguments, varies the resulting
+  sequence length and marker reservoir, fixes unit genetic variance and `SIGMA_E = 1` (hence
+  liability heritability one half) rather than consuming the advertised arbitrary
+  heritability, and emits several phenotype rungs.  `fit_binary.py` then evaluates five
+  distinct recalibration methods
+  (`linpc`, `znorm`, `calpred`, `rawpgs`, and `gamfit`) while the visible input and
+  `PipelineQuantity` index none of them; it also declares discrimination global-only rather
+  than reporting the requested within-deme AUCs.  Thus the requested report is not literally
+  the executable's current output schema even before its values are derived.
+  Either one canonical executable protocol must be fixed and proved to match this contract, or
+  those genuine degrees of freedom must become visible coordinates.  Leaving them implicit
+  would create a real pipeline fiber, unlike the removed Boolean toy.  The finite composition
+  now makes the phenotype rule explicit through `PhenotypeBaseline`; the downstream kernel
+  selects one `PhenotypeRung`, and `phenotypeBaselineForRung` implements the executable's four
+  individual-level rules rather than accepting an arbitrary baseline.  Moreover,
+  `FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift` proves its exact quotient:
+  only one common baseline offset is absorbed by the prevalence intercept; every nonconstant
+  per-deme baseline change alters at least one true risk.  Selecting among the executable
+  phenotype rungs is therefore semantically material, while the selection itself remains a
+  missing protocol coordinate.  Finally, the executable sets its realized causal count to
+  `min(requested, eligible_pool_size)`, whereas `VariableMarkerPTGWASKernel` now preserves the
+  advertised count and returns `none` when a draw cannot realize it.  One of those failure
+  semantics must be chosen explicitly before the two programs denote the same experiment.
+
+The definitions below therefore specify the target and route it to the generic core
+identification theory.  They do not instantiate the real semantic map, assert a positive
+fiber width, or claim an exact endpoint law.
+
+## Where the pieces live
+
+* `Descent/Core/Identifiability.lean` contains only the generic exact-readout and sharp-fiber
+  theorems.  It contains no biological counterexample or pipeline verdict.
+* `Descent/Coalescent/StructuredPresentDay.lean` contains the finite one-locus moment and
+  Bernstein sample-count machinery, including the cohort-size-specific ascertainment event,
+  the shared pair-divergence derivative, and the exact matrix-exponential intertwining law.
+* `Descent/Coalescent/TwoLocusHistory.lean` contains the arbitrary-deme recurrent
+  `H/DD/Dz/pi2` generator, split transforms, epoch semigroups, and ordered composition that
+  evaluates the proposed migration-restored linkage factor.
+* This file defines the visible history/study contract, compiles both demographic operators,
+  specifies the exact P+T selection objective on a realized variable-marker draw, and builds
+  the total-liability/phenotype layer.  `CommonDiffusionProjection` is the precise missing
+  mathematical join between its marginal and linkage compilers.
+* `Descent/Portability/DiscriminationLaw.lean` evaluates realized and expected finite-cohort
+  `R²`, AUC, calibration, Brier, and score variance, preserving undefined coordinates as
+  `Option` values.
+* `Descent/Portability/PhenomeWidePortability.lean` retains the historical migration-chain
+  bracket and now inserts the operator point into it, with exact identities showing that its
+  two gaps differ only by the linkage factor.
+* `validation/empirical/momentsld/ldchain_reduction.py` and
+  `validation/empirical/momentsld/derivation/ld2d_iter.log` are the independent exact-chain
+  and preregistered 2-D evidence.  They refute scalar reductions; they are not a simulator
+  validation of the Lean operator.
+-/
+
+/-- One elapsed epoch followed by a change in an arbitrary finite-deme demographic history. -/
+inductive DemographicEvent (demeCount : ℕ) where
+  | split (elapsed : ℝ) (elapsed_nonneg : 0 ≤ elapsed)
+      (parent child : Fin demeCount) (parent_ne_child : parent ≠ child)
+  | sizeChange (elapsed : ℝ) (elapsed_nonneg : 0 ≤ elapsed)
+      (effectiveSize : Fin demeCount → ℝ)
+      (effectiveSize_pos : ∀ deme, 0 < effectiveSize deme)
+  /-- Backward-lineage convention: `migration source parent` is the raw per-generation
+  probability/rate that a lineage currently in `source` chooses its parent in `parent`. -/
+  | migrationChange (elapsed : ℝ) (elapsed_nonneg : 0 ≤ elapsed)
+      (migration : Fin demeCount → Fin demeCount → ℝ)
+      (migration_nonneg : ∀ source target, 0 ≤ migration source target)
+      (migration_self : ∀ deme, migration deme deme = 0)
+  | mutationRateChange (elapsed : ℝ) (elapsed_nonneg : 0 ≤ elapsed) (mutationRate : ℝ)
+      (mutationRate_nonneg : 0 ≤ mutationRate)
+  | recombinationRateChange (elapsed : ℝ) (elapsed_nonneg : 0 ≤ elapsed)
+      (recombinationRate : ℝ)
+      (recombinationRate_nonneg : 0 ≤ recombinationRate)
+
+/-- Real time evolved under the preceding rates before one event is applied. -/
+def DemographicEvent.elapsed {demeCount : ℕ} : DemographicEvent demeCount → ℝ
+  | .split elapsed _ _ _ _ => elapsed
+  | .sizeChange elapsed _ _ _ => elapsed
+  | .migrationChange elapsed _ _ _ _ => elapsed
+  | .mutationRateChange elapsed _ _ _ => elapsed
+  | .recombinationRateChange elapsed _ _ _ => elapsed
+
+/-- Every declared event interval lies in the forward-time domain. -/
+theorem DemographicEvent.elapsed_nonneg {demeCount : ℕ}
+    (event : DemographicEvent demeCount) : 0 ≤ event.elapsed := by
+  cases event <;> assumption
+
+/-- A deme label is initially inactive exactly when it occurs as a split child later in the
+history. -/
+def initialDemeActive {demeCount : ℕ} (events : List (DemographicEvent demeCount))
+    (deme : Fin demeCount) : Bool :=
+  !(events.any fun event ↦ match event with
+    | .split _ _ _ child _ => decide (child = deme)
+    | _ => false)
+
+/-- A split activates its child; all other events leave the active set unchanged. -/
+def DemographicEvent.updateActive {demeCount : ℕ} (event : DemographicEvent demeCount)
+    (active : Fin demeCount → Bool) : Fin demeCount → Bool :=
+  match event with
+  | .split _ _ _ child _ => fun deme ↦ if deme = child then true else active deme
+  | _ => active
+
+/-- Split chronology is valid when every parent is already active and every child is activated
+exactly once.  This rules out ghost migration through future deme labels. -/
+def demographicEventsWellFormed {demeCount : ℕ} :
+    List (DemographicEvent demeCount) → (Fin demeCount → Bool) → Prop
+  | [], _ => True
+  | event :: remaining, active =>
+      match event with
+      | .split _ _ parent child _ =>
+          active parent = true ∧ active child = false ∧
+            demographicEventsWellFormed remaining (event.updateActive active)
+      | _ => demographicEventsWellFormed remaining active
+
+/-- The visible demographic argument.  Time runs forward from a common ancestral state.
+Each event carries the nonnegative real epoch elapsed under the preceding rates; `finalElapsed`
+is the terminal epoch after the last event.  Domain facts live in the type so an exact
+propagator never assigns a meaning to negative times, sizes, or rates. -/
+structure PipelineDemographicHistory (demeCount : ℕ) where
+  ancestralDeme : Fin demeCount
+  initialEffectiveSize : Fin demeCount → ℝ
+  initialEffectiveSize_pos : ∀ deme, 0 < initialEffectiveSize deme
+  /-- Backward-lineage migration matrix in raw generations. -/
+  initialMigration : Fin demeCount → Fin demeCount → ℝ
+  initialMigration_nonneg : ∀ source target, 0 ≤ initialMigration source target
+  initialMigration_self : ∀ deme, initialMigration deme deme = 0
+  initialMutationRate : ℝ
+  initialMutationRate_nonneg : 0 ≤ initialMutationRate
+  initialRecombinationRate : ℝ
+  initialRecombinationRate_nonneg : 0 ≤ initialRecombinationRate
+  events : List (DemographicEvent demeCount)
+  ancestralDeme_active : initialDemeActive events ancestralDeme = true
+  events_wellFormed : demographicEventsWellFormed events (initialDemeActive events)
+  finalElapsed : ℝ
+  finalElapsed_nonneg : 0 ≤ finalElapsed
+
+/-- Raw moments of the symmetric-beta stationary frequency law.  For positive shape this is
+`Beta(shape, shape)`; at zero mutation the recursion selects the ancestral-allele boundary
+mass at frequency zero. -/
+noncomputable def symmetricBetaMoment (shape : ℝ) : ℕ → ℝ
+  | 0 => 1
+  | degree + 1 =>
+      symmetricBetaMoment shape degree *
+        (shape + degree) / (2 * shape + degree)
+
+/-- The heterozygosity of the symmetric-beta boundary is exactly the recurrent-biallelic
+one-deme `H` boundary used by the two-locus operator.  This is a first-principles bridge
+between the marginal ascertainment and linkage systems, including the zero-mutation edge. -/
+theorem symmetricBetaHeterozygosity_eq_recurrentLowOrderH
+    (effectiveSize mutationRate : ℝ) (effectiveSize_pos : 0 < effectiveSize)
+    (mutationRate_nonneg : 0 ≤ mutationRate) :
+    2 * (symmetricBetaMoment (4 * effectiveSize * mutationRate) 1 -
+      symmetricBetaMoment (4 * effectiveSize * mutationRate) 2) =
+      (2 * mutationRate) /
+        (1 / (2 * effectiveSize) + 2 * (2 * mutationRate)) := by
+  rcases eq_or_lt_of_le mutationRate_nonneg with hzero | hpos
+  · subst mutationRate
+    norm_num [symmetricBetaMoment]
+  · have hshape : 0 < 4 * effectiveSize * mutationRate := by positivity
+    have hsize : effectiveSize ≠ 0 := ne_of_gt effectiveSize_pos
+    have hshape_ne : 4 * effectiveSize * mutationRate ≠ 0 := ne_of_gt hshape
+    have htwoshape : 2 * (4 * effectiveSize * mutationRate) ≠ 0 := by positivity
+    have hnext : 2 * (4 * effectiveSize * mutationRate) + 1 ≠ 0 := by positivity
+    have hscale : 1 / (2 * effectiveSize) + 2 * (2 * mutationRate) ≠ 0 := by
+      positivity
+    norm_num [symmetricBetaMoment]
+    field_simp [hsize, hshape_ne, htwoshape, hnext, hscale]
+    ring
+
+/-- The stationary symmetric-beta shape derived from raw diploid population size and the
+per-generation bidirectional mutation rate: `2 u / (1 / (2 Nₑ)) = 4 Nₑ u`.
+
+Empirical status: DERIVED -- the standard scaled mutation parameter read off the history's
+own root size and rate; nothing is fitted.  Whether the ancestral population sat at the
+symmetric-beta stationary law is the boundary assumption named at `ancestralLDRates`. -/
+noncomputable def PipelineDemographicHistory.ancestralMutationShape
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) : ℝ :=
+  4 * history.initialEffectiveSize history.ancestralDeme * history.initialMutationRate
+
+/-- The ancestral one-locus moments are derived from the history's own root size and mutation
+rate; they are not an additional caller-supplied completion.
+
+Empirical status: DERIVED -- symmetric-beta moments by the exact recurrence, with
+`ancestralMoment_zero` and `ancestralMoment_succ` proved beside the definition; no moment
+table is supplied from outside and no measurement bears on the recurrence itself. -/
+noncomputable def PipelineDemographicHistory.ancestralMoment
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (degree : ℕ) : ℝ :=
+  symmetricBetaMoment history.ancestralMutationShape degree
+
+/-- The derived ancestral law is normalized. -/
+theorem PipelineDemographicHistory.ancestralMoment_zero
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) :
+    history.ancestralMoment 0 = 1 := rfl
+
+/-- Successive ancestral moments obey the exact beta recurrence. -/
+theorem PipelineDemographicHistory.ancestralMoment_succ
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (degree : ℕ) :
+    history.ancestralMoment (degree + 1) =
+      history.ancestralMoment degree *
+        (history.ancestralMutationShape + degree) /
+          (2 * history.ancestralMutationShape + degree) := rfl
+
+/-- The rate state carried between consecutive forward-time events. -/
+structure PipelineRateState (demeCount : ℕ) where
+  effectiveSize : Fin demeCount → ℝ
+  effectiveSize_pos : ∀ deme, 0 < effectiveSize deme
+  migration : Fin demeCount → Fin demeCount → ℝ
+  migration_nonneg : ∀ source target, 0 ≤ migration source target
+  migration_self : ∀ deme, migration deme deme = 0
+  mutationRate : ℝ
+  mutationRate_nonneg : 0 ≤ mutationRate
+  recombinationRate : ℝ
+  recombinationRate_nonneg : 0 ≤ recombinationRate
+
+/-- Initial certified rate state of a visible history. -/
+def PipelineDemographicHistory.initialRateState {demeCount : ℕ}
+    (history : PipelineDemographicHistory demeCount) : PipelineRateState demeCount where
+  effectiveSize := history.initialEffectiveSize
+  effectiveSize_pos := history.initialEffectiveSize_pos
+  migration := history.initialMigration
+  migration_nonneg := history.initialMigration_nonneg
+  migration_self := history.initialMigration_self
+  mutationRate := history.initialMutationRate
+  mutationRate_nonneg := history.initialMutationRate_nonneg
+  recombinationRate := history.initialRecombinationRate
+  recombinationRate_nonneg := history.initialRecombinationRate_nonneg
+
+/-- Raw-generation symmetric biallelic diffusion rates.  The coalescence coefficient is
+`1/(2Nₑ)`; forward and backward mutation both use the history's declared mutation rate. -/
+noncomputable def PipelineRateState.toManyDemeRates {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (active : Fin demeCount → Bool) :
+    Coalescent.ManyDemeRates demeCount where
+  coalescence := fun deme ↦ 1 / (2 * state.effectiveSize deme)
+  migration := fun source target ↦
+    if active source && active target then state.migration source target else 0
+  forwardMutation := fun _ ↦ state.mutationRate
+  backwardMutation := fun _ ↦ state.mutationRate
+  coalescence_pos := fun deme ↦
+    one_div_pos.mpr (mul_pos (by norm_num) (state.effectiveSize_pos deme))
+  migration_nonneg := by
+    intro source target
+    split <;> simp_all [state.migration_nonneg]
+  migration_self := by
+    intro deme
+    simp [state.migration_self]
+  forwardMutation_nonneg := fun _ ↦ state.mutationRate_nonneg
+  backwardMutation_nonneg := fun _ ↦ state.mutationRate_nonneg
+
+/-- Raw-generation rates for the closed `H/DD/Dz/pi2` operator at a physical separation.
+The scaled recombination coordinate is `2 r distance`, because a within-deme `DD = E[D²]`
+contains two `D` factors; mutation similarly enters the heterozygosity equation as `2 mu`.
+
+Empirical status: DERIVED -- a unit conversion from raw per-generation parameters into the
+generator's rate carrier, with the two factors of two argued above from the shape of the
+moment equations rather than fitted; the generator the rates feed carries its own status in
+`Coalescent.TwoLocusHistory`. -/
+noncomputable def PipelineRateState.toManyDemeLDRates {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (separationBp : ℝ)
+    (separationBp_nonneg : 0 ≤ separationBp) (active : Fin demeCount → Bool) :
+    Coalescent.ManyDemeLDRates demeCount where
+  coalescence := fun deme ↦ 1 / (2 * state.effectiveSize deme)
+  migration := fun source target ↦
+    if active source && active target then state.migration source target else 0
+  mutation := fun _ ↦ 2 * state.mutationRate
+  recombination := fun _ ↦ 2 * state.recombinationRate * separationBp
+  coalescence_pos := fun deme ↦
+    one_div_pos.mpr (mul_pos two_pos (state.effectiveSize_pos deme))
+  migration_nonneg := by
+    intro source target
+    split <;> simp_all [state.migration_nonneg]
+  migration_self := fun deme ↦ by simp [state.migration_self]
+  mutation_nonneg := fun _ ↦ mul_nonneg (by norm_num) state.mutationRate_nonneg
+  recombination_nonneg := fun _ ↦
+    mul_nonneg (mul_nonneg (by norm_num) state.recombinationRate_nonneg) separationBp_nonneg
+
+/-- The one- and two-locus compilers use the same coalescence and migration rates, while the
+two-locus recurrent-mutation coordinate is exactly the sum of the forward and backward
+biallelic rates.  This is the rate-level part of the common-diffusion projection theorem. -/
+theorem PipelineRateState.oneLocus_twoLocus_rate_coherence {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (active : Fin demeCount → Bool)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) (deme : Fin demeCount) :
+    (state.toManyDemeLDRates separationBp separationBp_nonneg active).coalescence deme =
+        (state.toManyDemeRates active).coalescence deme ∧
+      (∀ target,
+        (state.toManyDemeLDRates separationBp separationBp_nonneg active).migration deme target =
+          (state.toManyDemeRates active).migration deme target) ∧
+      (state.toManyDemeLDRates separationBp separationBp_nonneg active).mutation deme =
+        (state.toManyDemeRates active).forwardMutation deme +
+          (state.toManyDemeRates active).backwardMutation deme := by
+  refine ⟨rfl, fun _ ↦ rfl, ?_⟩
+  simp [PipelineRateState.toManyDemeLDRates, PipelineRateState.toManyDemeRates] <;> ring
+
+/-- Apply the parameter update carried by an event.  A split changes the moment state, not
+the rate state; its instantaneous transform is emitted separately by the compiler below. -/
+def DemographicEvent.updateRateState {demeCount : ℕ}
+    (event : DemographicEvent demeCount) (state : PipelineRateState demeCount) :
+    PipelineRateState demeCount :=
+  match event with
+  | .split _ _ _ _ _ => state
+  | .sizeChange _ _ effectiveSize effectiveSize_pos =>
+      { state with effectiveSize := effectiveSize, effectiveSize_pos := effectiveSize_pos }
+  | .migrationChange _ _ migration migration_nonneg migration_self =>
+      { effectiveSize := state.effectiveSize
+        effectiveSize_pos := state.effectiveSize_pos
+        migration := migration
+        migration_nonneg := migration_nonneg
+        migration_self := migration_self
+        mutationRate := state.mutationRate
+        mutationRate_nonneg := state.mutationRate_nonneg
+        recombinationRate := state.recombinationRate
+        recombinationRate_nonneg := state.recombinationRate_nonneg }
+  | .mutationRateChange _ _ mutationRate mutationRate_nonneg =>
+      { state with
+        mutationRate := mutationRate
+        mutationRate_nonneg := mutationRate_nonneg }
+  | .recombinationRateChange _ _ recombinationRate recombinationRate_nonneg =>
+      { state with
+        recombinationRate := recombinationRate
+        recombinationRate_nonneg := recombinationRate_nonneg }
+
+/-- Result of compiling a prefix of demographic events. -/
+structure CompiledMomentEvents (demeCount K : ℕ) where
+  instructions : List (Coalescent.ManyDemeMomentInstruction demeCount K)
+  finalRateState : PipelineRateState demeCount
+  finalActive : Fin demeCount → Bool
+
+/-- Result of compiling a prefix into the concrete low-order two-locus operator. -/
+structure CompiledLowOrderLDEvents (demeCount : ℕ) where
+  instructions : List (Coalescent.LowOrderLDInstruction demeCount)
+  finalRateState : PipelineRateState demeCount
+  finalActive : Fin demeCount → Bool
+
+/-- Compile the ordered event sequence into exact moment propagation.  Each event first evolves
+under the preceding rates for its elapsed interval, then applies its instantaneous split (if
+any), and finally updates the rates used by the next interval. -/
+noncomputable def compileMomentEvents {demeCount : ℕ} (K : ℕ) :
+    List (DemographicEvent demeCount) → PipelineRateState demeCount →
+      (Fin demeCount → Bool) → CompiledMomentEvents demeCount K
+  | [], state, active =>
+      { instructions := [], finalRateState := state, finalActive := active }
+  | event :: remaining, state, active =>
+      let epoch : Coalescent.ManyDemeMomentEpoch demeCount K :=
+        { rates := state.toManyDemeRates active
+          duration := event.elapsed
+          duration_nonneg := event.elapsed_nonneg }
+      let front : List (Coalescent.ManyDemeMomentInstruction demeCount K) :=
+        match event with
+        | .split _ _ parent child _ => [.evolve epoch, .split parent child]
+        | _ => [.evolve epoch]
+      let tail := compileMomentEvents K remaining (event.updateRateState state)
+        (event.updateActive active)
+      { instructions := front ++ tail.instructions
+        finalRateState := tail.finalRateState
+        finalActive := tail.finalActive }
+
+/-- Compile the same ordered history into the derived arbitrary-deme two-locus
+generator.  Unlike a scalar distance recurrence, every epoch propagates the complete closed
+moment state and every split applies the exact label pullback.
+
+Empirical status: DERIVED -- a structural recursion turning the visible event list into
+epoch and split instructions; it invents no rates and drops no event, and the composed
+prediction it feeds is the untested composite named in `Coalescent.TwoLocusHistory`'s
+module status. -/
+noncomputable def compileLowOrderLDEvents {demeCount : ℕ}
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    List (DemographicEvent demeCount) → PipelineRateState demeCount →
+      (Fin demeCount → Bool) → CompiledLowOrderLDEvents demeCount
+  | [], state, active =>
+      { instructions := [], finalRateState := state, finalActive := active }
+  | event :: remaining, state, active =>
+      let epoch := (state.toManyDemeLDRates separationBp separationBp_nonneg active).epoch
+        event.elapsed event.elapsed_nonneg
+      let front : List (Coalescent.LowOrderLDInstruction demeCount) :=
+        match event with
+        | .split _ _ parent child _ =>
+            [.evolve epoch, Coalescent.LowOrderLDInstruction.split parent child]
+        | _ => [.evolve epoch]
+      let tail := compileLowOrderLDEvents separationBp separationBp_nonneg remaining
+        (event.updateRateState state) (event.updateActive active)
+      { instructions := front ++ tail.instructions
+        finalRateState := tail.finalRateState
+        finalActive := tail.finalActive }
+
+/-- Exact one-locus moment instructions for the whole visible event history.  Recombination
+updates are retained in the rate state for the two-locus compiler; they correctly have no
+effect on this one-locus generator. -/
+noncomputable def PipelineDemographicHistory.oneLocusMomentInstructions
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    List (Coalescent.ManyDemeMomentInstruction demeCount K) :=
+  let compiled := compileMomentEvents K history.events history.initialRateState
+    (initialDemeActive history.events)
+  let finalEpoch : Coalescent.ManyDemeMomentEpoch demeCount K :=
+    { rates := compiled.finalRateState.toManyDemeRates compiled.finalActive
+      duration := history.finalElapsed
+      duration_nonneg := history.finalElapsed_nonneg }
+  compiled.instructions ++ [.evolve finalEpoch]
+
+/-- Constant ancestral one-deme rates implied by the visible history.  The ancestral
+population is assumed to have occupied its initial epoch long enough to reach the stationary
+low-order law; this is the same equilibrium boundary condition used by coalescent genome
+simulation rather than an extra fitted moment table.
+
+Empirical status: DERIVED, with one named assumption -- the rates are the root epoch's own
+parameters in generator units, and the stationarity of the ancestral boundary is an
+assumption this docstring states rather than hides; it is the boundary condition coalescent
+simulators impose, so a battery comparing the composed pipeline against `msprime` shares it
+rather than testing it. -/
+noncomputable def PipelineDemographicHistory.ancestralLDRates
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    Coalescent.ManyDemeLDRates 1 where
+  coalescence := fun _ ↦ 1 / (2 * history.initialEffectiveSize history.ancestralDeme)
+  migration := fun _ _ ↦ 0
+  mutation := fun _ ↦ 2 * history.initialMutationRate
+  recombination := fun _ ↦ 2 * history.initialRecombinationRate * separationBp
+  coalescence_pos := fun _ ↦ one_div_pos.mpr
+    (mul_pos (by norm_num) (history.initialEffectiveSize_pos history.ancestralDeme))
+  migration_nonneg := fun _ _ ↦ le_rfl
+  migration_self := fun _ ↦ rfl
+  mutation_nonneg := fun _ ↦ mul_nonneg (by norm_num) history.initialMutationRate_nonneg
+  recombination_nonneg := fun _ ↦
+    mul_nonneg (mul_nonneg (by norm_num) history.initialRecombinationRate_nonneg)
+      separationBp_nonneg
+
+/-- The ancestral marginal and linkage compilers start from the same heterozygosity.
+The left side is the one-locus symmetric-beta boundary used by finite-cohort ascertainment;
+the right side is the `H` coordinate of the recurrent two-locus stationary boundary.  The
+identity holds at every marker separation (including zero mutation), so neither side carries
+an independent boundary constant that could leave a hidden gap between the two factors. -/
+theorem PipelineDemographicHistory.ancestralHeterozygosity_eq_lowOrderH
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    2 * (history.ancestralMoment 1 - history.ancestralMoment 2) =
+      Coalescent.oneDemeStationaryLowOrderLDState
+        (history.ancestralLDRates separationBp separationBp_nonneg)
+          (some (.H 0 0)) := by
+  simpa [PipelineDemographicHistory.ancestralMoment,
+    PipelineDemographicHistory.ancestralMutationShape,
+    PipelineDemographicHistory.ancestralLDRates,
+    Coalescent.oneDemeStationaryLowOrderLDState] using
+    symmetricBetaHeterozygosity_eq_recurrentLowOrderH
+      (history.initialEffectiveSize history.ancestralDeme)
+      history.initialMutationRate
+      (history.initialEffectiveSize_pos history.ancestralDeme)
+      history.initialMutationRate_nonneg
+
+/-- Complete concrete two-locus history at one physical marker separation.
+
+Empirical status: DERIVED -- the ancestral boundary, the compiled instruction list, and the
+final epoch assembled into one `Coalescent.LowOrderLDHistory`; each part carries its own
+status and this composition adds no new quantity.  The composed present-day prediction is
+the untested composite named in `Coalescent.TwoLocusHistory`'s module status. -/
+noncomputable def PipelineDemographicHistory.lowOrderLDHistory
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    Coalescent.LowOrderLDHistory demeCount :=
+  let compiled := compileLowOrderLDEvents separationBp separationBp_nonneg history.events
+    history.initialRateState (initialDemeActive history.events)
+  let finalEpoch := (compiled.finalRateState.toManyDemeLDRates
+    separationBp separationBp_nonneg compiled.finalActive).epoch
+      history.finalElapsed history.finalElapsed_nonneg
+  { initial := Coalescent.commonAncestralLowOrderLDState
+      (history.ancestralLDRates separationBp separationBp_nonneg)
+    initial_constant := rfl
+    instructions := compiled.instructions ++ [.evolve finalEpoch] }
+
+/-- The arbitrary-deme, arbitrary-event two-locus moment family constructed from the visible
+demographic history.  This is the concrete missing bridge from history to `DD/Dz/pi2`; marker
+separation is typed nonnegative and all rate changes are compiled into the epoch product. -/
+noncomputable def PipelineDemographicHistory.twoLocusMoments
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) :
+    Coalescent.DemographicTwoLocusMoments demeCount :=
+  Coalescent.LowOrderLDHistory.toDemographicTwoLocusMoments fun separation ↦
+    history.lowOrderLDHistory separation.value separation.value_nonneg
+
+/-- Exact present-day mixed one-locus moment produced by the visible event history.  The
+matrix dimension is finite for every requested degree, and every epoch is a matrix
+exponential; no closure or fitted attenuation enters. -/
+noncomputable def PipelineDemographicHistory.oneLocusMoment
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (exponent : Fin demeCount → ℕ) : ℝ :=
+  if hzero : ∀ deme, exponent deme = 0 then 1
+  else
+    let presentState := Coalescent.propagateManyDemeMomentInstructions
+      (history.oneLocusMomentInstructions K)
+      (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment)
+    Coalescent.manyDemeMomentVectorTable K
+      (fun coordinate ↦ presentState (some coordinate)) exponent
+
+/-- Exact train-target mixed frequency moment from the arbitrary-deme history. -/
+noncomputable def PipelineDemographicHistory.pairMoment
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (train target : Fin demeCount) (sourceDegree targetDegree : ℕ) : ℝ :=
+  history.oneLocusMoment K
+    (Coalescent.pairExponent train target sourceDegree targetDegree)
+
+/-- Exact joint allele-count law for any train-target pair and cohort sizes.  Sample size
+enters both the propagated moment degree `ns + nt` and this Bernstein event polynomial. -/
+noncomputable def PipelineDemographicHistory.jointSampleCount
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (train target : Fin demeCount) (ns nt sourceCount targetCount : ℕ) : ℝ :=
+  if sourceCount ≤ ns ∧ targetCount ≤ nt then
+    (Nat.choose ns sourceCount : ℝ) * (Nat.choose nt targetCount : ℝ) *
+      (∑ a ∈ Finset.range (ns - sourceCount + 1),
+        ∑ b ∈ Finset.range (nt - targetCount + 1),
+          (Nat.choose (ns - sourceCount) a : ℝ) *
+          (Nat.choose (nt - targetCount) b : ℝ) * (-1 : ℝ) ^ (a + b) *
+          history.pairMoment (ns + nt) train target
+            (sourceCount + a) (targetCount + b))
+  else 0
+
+/-- Exact cohort-size-aware target erosion derived directly from the visible demographic
+history, rather than from a time-shift surrogate. -/
+noncomputable def PipelineDemographicHistory.targetErosion
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (train target : Fin demeCount) (ns nt : ℕ) : Option ℝ :=
+  Coalescent.targetErosionEvent (history.jointSampleCount train target ns nt) ns nt
+
+/-- Study-design constants named by the requested endpoint. -/
+structure PipelineStudyDesign (demeCount : ℕ) where
+  gwasDeme : Fin demeCount
+  gwasSampleSize : ℕ
+  gwasSampleSize_pos : 0 < gwasSampleSize
+  selectionThresholds : List ℝ
+  selectionThresholds_nonempty : selectionThresholds ≠ []
+  selectionThresholds_nonneg : ∀ threshold ∈ selectionThresholds, 0 ≤ threshold
+  selectionThresholds_le_one : ∀ threshold ∈ selectionThresholds, threshold ≤ 1
+  clumpR2Threshold : ℝ
+  clumpR2Threshold_nonneg : 0 ≤ clumpR2Threshold
+  clumpR2Threshold_lt_one : clumpR2Threshold < 1
+  clumpWindowBp : ℕ
+  causalLocusCount : ℕ
+  causalLocusCount_pos : 0 < causalLocusCount
+  heritability : ℝ
+  heritability_pos : 0 < heritability
+  heritability_lt_one : heritability < 1
+  prevalence : ℝ
+  prevalence_pos : 0 < prevalence
+  prevalence_lt_one : prevalence < 1
+  cohortSize : Fin demeCount → ℕ
+  cohortSize_pos : ∀ deme, 0 < cohortSize deme
+
+/-- Exactly the arguments the proposed endpoint law is allowed to inspect. -/
+structure VisiblePipelineInput (demeCount : ℕ) where
+  demography : PipelineDemographicHistory demeCount
+  studyDesign : PipelineStudyDesign demeCount
+
+/-- Haploid count corresponding to the diploid GWAS cohort.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- the diploid-to-haploid factor of two, a ploidy
+convention and not a population assertion. -/
+def PipelineStudyDesign.gwasHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : ℕ :=
+  2 * design.gwasSampleSize
+
+/-- Haploid count corresponding to one diploid evaluation cohort.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- the same ploidy convention as
+`gwasHaplotypeCount`. -/
+def PipelineStudyDesign.evaluationHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) (deme : Fin demeCount) : ℕ :=
+  2 * design.cohortSize deme
+
+/-- The pooled evaluation cohort is concatenation of the deme cohorts.  Its size is derived,
+not an independently supplied constant that could disagree with the evaluator. -/
+def PipelineStudyDesign.pooledCohortSize {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : ℕ :=
+  ∑ deme, design.cohortSize deme
+
+/-- Concatenating positive deme cohorts produces a nonempty pooled cohort. -/
+theorem PipelineStudyDesign.pooledCohortSize_pos {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : 0 < design.pooledCohortSize := by
+  have hle : design.cohortSize design.gwasDeme ≤ design.pooledCohortSize := by
+    unfold PipelineStudyDesign.pooledCohortSize
+    exact Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) (Finset.mem_univ design.gwasDeme)
+  exact lt_of_lt_of_le (design.cohortSize_pos design.gwasDeme) hle
+
+/-- Exact ascertained-tag erosion at the study's actual source and target cohort sizes.  The
+result is `none` exactly when the source-polymorphic conditioning event has zero mass. -/
+noncomputable def VisiblePipelineInput.ascertainedTagErosion
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (target : Fin demeCount) : Option ℝ :=
+  input.demography.targetErosion input.studyDesign.gwasDeme target
+    input.studyDesign.gwasHaplotypeCount
+    (input.studyDesign.evaluationHaplotypeCount target)
+
+/-- Conditional probability that a source-ascertained tag remains segregating in the target
+cohort.  Both the Bernstein law and its event boundary use the actual two cohort sizes. -/
+noncomputable def VisiblePipelineInput.ascertainedTagSegregationRetention
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (target : Fin demeCount) : Option ℝ :=
+  (input.ascertainedTagErosion target).map fun erosion ↦ 1 - erosion
+
+/-- Migration-restored linkage factor on its mathematical correlation domain.  It is the
+squared normalized cross-deme `DD` read after the complete demographic operator product.
+
+Empirical status: DERIVED -- `accuracyLinkageFactor_eq` proves this quotient is the squared
+normalized correlation, so this inherits the status of `StructuredPresentDay`'s
+`accuracyLinkageFactor` applied to the composed history; no battery has compared the composed
+factor against simulation yet. -/
+noncomputable def VisiblePipelineInput.accuracyLinkageFactorOn
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
+    (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
+      input.studyDesign.gwasDeme target) : ℝ :=
+  input.demography.twoLocusMoments.accuracyLinkageFactor separation
+    input.studyDesign.gwasDeme target domain
+
+/-- The visible linkage factor is literally the squared `DD` correlation; migration
+restoration is already inside the history generator and is not an added fitted term. -/
+theorem VisiblePipelineInput.accuracyLinkageFactor_eq
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
+    (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
+      input.studyDesign.gwasDeme target) :
+    input.accuracyLinkageFactorOn separation target domain =
+      (input.demography.twoLocusMoments.crossDemeLDCorrelation separation
+        input.studyDesign.gwasDeme target domain) ^ 2 :=
+  input.demography.twoLocusMoments.accuracyLinkageFactor_eq_correlation_sq
+    separation input.studyDesign.gwasDeme target domain
+
+/-- Exact input-only linkage readout.  The normalization domain is decided from the composed
+moments rather than supplied as an extra argument.  `none` covers a zero within-deme `DD`
+denominator; failure of a separate Cauchy--Schwarz certificate no longer suppresses an
+otherwise exactly evaluable operator quotient. -/
+noncomputable def VisiblePipelineInput.accuracyLinkageFactor
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount) : Option ℝ := by
+  classical
+  exact if domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
+        input.studyDesign.gwasDeme target then
+      some (input.accuracyLinkageFactorOn separation target domain)
+    else none
+
+/-- On a certified nondegenerate moment pair, the input-only readout returns exactly the
+squared normalized `DD` correlation. -/
+theorem VisiblePipelineInput.accuracyLinkageFactor_eq_some
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
+    (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
+      input.studyDesign.gwasDeme target) :
+    input.accuracyLinkageFactor separation target =
+      some ((input.demography.twoLocusMoments.crossDemeLDCorrelation separation
+        input.studyDesign.gwasDeme target domain) ^ 2) := by
+  classical
+  simp [VisiblePipelineInput.accuracyLinkageFactor, domain,
+    VisiblePipelineInput.accuracyLinkageFactorOn,
+    Coalescent.DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq]
+
+/-- A defined input-only linkage factor with a realizable covariance certificate lies in
+`[0,1]`.  Evaluation itself requires only positive normalization denominators. -/
+theorem VisiblePipelineInput.accuracyLinkageFactor_mem_unitInterval
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
+    (domain : input.demography.twoLocusMoments.LDPairDomain separation
+      input.studyDesign.gwasDeme target)
+    {value : ℝ} (hvalue : input.accuracyLinkageFactor separation target = some value) :
+    value ∈ Set.Icc (0 : ℝ) 1 := by
+  rw [input.accuracyLinkageFactor_eq_some separation target
+    domain.toLDNormalizationDomain] at hvalue
+  have heq := Option.some.inj hvalue
+  subst value
+  rw [← input.accuracyLinkageFactor_eq separation target
+    domain.toLDNormalizationDomain]
+  exact ⟨input.demography.twoLocusMoments.accuracyLinkageFactor_nonneg
+      separation input.studyDesign.gwasDeme target domain.toLDNormalizationDomain,
+    input.demography.twoLocusMoments.accuracyLinkageFactor_le_one
+      separation input.studyDesign.gwasDeme target domain⟩
+
+/-- Expected within-deme heterozygosity from the exact propagated first two moments. -/
+noncomputable def PipelineDemographicHistory.withinHeterozygosity
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (deme : Fin demeCount) : ℝ :=
+  2 * (history.oneLocusMoment 2 (Coalescent.oneDemeExponent deme 1) -
+    history.oneLocusMoment 2 (Coalescent.oneDemeExponent deme 2))
+
+/-- Expected pairwise allelic divergence between two demes. -/
+noncomputable def PipelineDemographicHistory.betweenDivergence
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (first second : Fin demeCount) : ℝ :=
+  history.oneLocusMoment 2 (Coalescent.oneDemeExponent first 1) +
+  history.oneLocusMoment 2 (Coalescent.oneDemeExponent second 1) -
+    2 * history.pairMoment 2 first second 1 1
+
+/-- The exact remaining common-diffusion obligation.  The right side is the marginal
+frequency-divergence coordinate used by finite ascertainment; the left side is the `H`
+coordinate propagated inside the joint linkage operator.  Rates, the ancestral boundary,
+the joint generator's `H` row, and passage from generators to epoch exponentials are already
+proved coherent above and in `Coalescent`.  Proving this statement now amounts to the
+one-locus projection-matrix calculation followed by induction over the paired split/event
+lists; it introduces no new empirical constant. -/
+def PipelineDemographicHistory.CommonDiffusionProjection
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) : Prop :=
+  ∀ separation first second,
+    history.twoLocusMoments.H separation first second =
+      history.betweenDivergence first second
+
+/-- Candidate one-tag/one-causal portability channel after cohort ascertainment.  The
+marginal factor and low-order LD factor share recurrent symmetric-biallelic mutation rates
+and boundary law.  Requiring `CommonDiffusionProjection` in the type prevents their product
+from being used as a shared-kernel curve until the epoch/split intertwining proof is supplied.
+`none` records a zero-mass ascertainment event. -/
+noncomputable def VisiblePipelineInput.singlePairAccuracyRetentionCandidate
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (_projection : input.demography.CommonDiffusionProjection)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount) : Option ℝ :=
+  (input.ascertainedTagSegregationRetention target).bind fun marginal ↦
+    (input.accuracyLinkageFactor separation target).map fun linkage ↦
+      marginal * linkage
+
+/-- Once the common projection is proved, the curve has exactly the advertised marginal and
+joint factors and no fitted restoration coordinate. -/
+theorem VisiblePipelineInput.singlePairAccuracyRetentionCandidate_eq
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (projection : input.demography.CommonDiffusionProjection)
+    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
+    (domain : input.demography.twoLocusMoments.LDPairDomain separation
+      input.studyDesign.gwasDeme target) :
+    input.singlePairAccuracyRetentionCandidate projection separation target =
+      (input.ascertainedTagErosion target).map fun erosion ↦
+        (1 - erosion) *
+          (input.demography.twoLocusMoments.crossDemeLDCorrelation separation
+            input.studyDesign.gwasDeme target domain.toLDNormalizationDomain) ^ 2 := by
+  classical
+  cases hErosion : input.ascertainedTagErosion target with
+  | none =>
+      simp [VisiblePipelineInput.singlePairAccuracyRetentionCandidate,
+        VisiblePipelineInput.ascertainedTagSegregationRetention,
+        VisiblePipelineInput.accuracyLinkageFactor,
+        domain.toLDNormalizationDomain, hErosion]
+  | some erosion =>
+      simp [VisiblePipelineInput.singlePairAccuracyRetentionCandidate,
+        VisiblePipelineInput.ascertainedTagSegregationRetention,
+        VisiblePipelineInput.accuracyLinkageFactor,
+        VisiblePipelineInput.accuracyLinkageFactorOn,
+        Coalescent.DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq,
+        domain.toLDNormalizationDomain, hErosion]
+
+/-- Domain on which Hudson differentiation is defined. -/
+structure PipelineDemographicHistory.HudsonFstDomain
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (first second : Fin demeCount) : Prop where
+  betweenDivergence_pos : 0 < history.betweenDivergence first second
+
+/-- Exact Hudson differentiation coordinate from the propagated demographic moments.
+
+Empirical status: DERIVED -- Hudson's ratio-of-averages built from the pipeline's exact
+propagated moments, with the between-pair divergence in the denominator; the convention
+ledger entry for this declaration records why it is Hudson and not Nei, and the typed
+`HudsonFstDomain` hypothesis excludes the zero-divergence pole instead of clamping it. -/
+noncomputable def PipelineDemographicHistory.hudsonFst
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (first second : Fin demeCount) (_ : history.HudsonFstDomain first second) : ℝ :=
+  1 - ((history.withinHeterozygosity first + history.withinHeterozygosity second) / 2) /
+    history.betweenDivergence first second
+
+/-- A population coordinate is either one deme or the pooled population. -/
+abbrev EvaluatedPopulation (demeCount : ℕ) := Option (Fin demeCount)
+
+/-- Every requested metric and intermediate quantity.  Natural-number coordinates index
+ascertained tags; the real coordinate of `liabilityToRisk` is the liability at which risk is
+evaluated. -/
+inductive PipelineQuantity (demeCount : ℕ) where
+  | observedRiskR2 (population : EvaluatedPopulation demeCount)
+  | withinDemeAUC (deme : Fin demeCount)
+  | pooledAUC
+  | calibrationSlope (population : EvaluatedPopulation demeCount)
+  | calibrationInTheLarge (population : EvaluatedPopulation demeCount)
+  | brierScore (population : EvaluatedPopulation demeCount)
+  | ascertainedTagFixation (deme : Fin demeCount) (tag : ℕ)
+  | differentiation (first second : Fin demeCount) (tag : ℕ)
+  | linkageRetention (deme : Fin demeCount) (firstTag secondTag : ℕ)
+  | linkageRestoredByMigration (deme : Fin demeCount) (firstTag secondTag : ℕ)
+  | scoreVariance (population : EvaluatedPopulation demeCount)
+  | liabilityToRisk (population : EvaluatedPopulation demeCount) (liability : ℝ)
+
+/-- The endpoint report on the unrestricted finite-cohort domain.  `none` is an actual
+undefined metric, not a numeric default; `some value` carries every defined biological
+intermediate and evaluation coordinate. -/
+abbrev PipelineOutput (demeCount : ℕ) := PipelineQuantity demeCount → Option ℝ
+
+/-- The type of a candidate exact expected semantic map.  `Completion` means only residual
+state not probabilistically determined by the visible input; simulator draws already integrated
+into the expectation do not belong there. -/
+abbrev PipelineCompletionLaw (demeCount : ℕ) (Completion : Type*) :=
+  Core.CompletionLaw (VisiblePipelineInput demeCount) Completion (PipelineQuantity demeCount)
+    (Option ℝ)
+
+/-- The proposition that the actual completed semantic map factors exactly through the visible
+endpoint input. -/
+abbrev HasExactPipelineReadout {demeCount : ℕ} {Completion : Type*}
+    (law : PipelineCompletionLaw demeCount Completion) : Prop :=
+  Core.HasExactReadout law
+
+/-- Real-valued completion laws remain available for coordinates restricted to a domain where
+they are defined; only these ordered scalar fibers admit the core sharp-envelope theory. -/
+abbrev NumericPipelineCompletionLaw (demeCount : ℕ) (Completion : Type*) :=
+  Core.CompletionLaw (VisiblePipelineInput demeCount) Completion (PipelineQuantity demeCount) ℝ
+
+/-- Sharp numeric fibers are deliberately separate from the unrestricted partial endpoint. -/
+abbrev PipelineSharpEnvelope {demeCount : ℕ} {Completion : Type*}
+    (law : NumericPipelineCompletionLaw demeCount Completion) :=
+  Core.SharpFiberEnvelope law
+
+/-! ## Marginalizing simulator-generated state
+
+The following is the positive identification result relevant to gnomon-style semantics.
+Random causal positions, effects, haplotypes, GWAS noise, and cohort draws do not create a
+completion fiber when their joint distribution is fixed by the visible input.  They form one
+sample space and are integrated once.  What remains open is constructing this kernel and
+proving that its realized coordinates agree with the actual pipeline—not the marginalization
+step itself.
+-/
+
+/-- A probabilistic pipeline whose entire draw law is determined by the visible endpoint
+input.  `realizedValue` may include every layer of simulator randomness simultaneously. -/
+structure PipelineRandomSemantics (demeCount : ℕ) (Sample : Type*)
+    [MeasurableSpace Sample] where
+  drawLaw : VisiblePipelineInput demeCount → Measure Sample
+  drawLaw_probability : ∀ input, IsProbabilityMeasure (drawLaw input)
+  realizedValue : VisiblePipelineInput demeCount → Sample → PipelineQuantity demeCount → ℝ
+  integrable : ∀ input coordinate,
+    Integrable (fun sample ↦ realizedValue input sample coordinate) (drawLaw input)
+
+/-- The exact expected report after all input-determined simulator draws are marginalized. -/
+noncomputable def PipelineRandomSemantics.expectedOutput
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PipelineRandomSemantics demeCount Sample) :
+    VisiblePipelineInput demeCount → PipelineOutput demeCount :=
+  fun input coordinate ↦
+    some (∫ sample, semantics.realizedValue input sample coordinate ∂semantics.drawLaw input)
+
+/-- View the marginalized semantics as a completion law with no residual hidden state. -/
+noncomputable def PipelineRandomSemantics.expectedCompletionLaw
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PipelineRandomSemantics demeCount Sample) :
+    PipelineCompletionLaw demeCount PUnit where
+  value := fun input _completion coordinate ↦ semantics.expectedOutput input coordinate
+
+/-- Input-determined random draws integrate out exactly: the expected endpoint has an exact
+visible-input readout.  This theorem does not supply the simulator kernel or any biological
+coordinate formula; those are the remaining model-specific construction obligations. -/
+theorem PipelineRandomSemantics.hasExactExpectedReadout
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PipelineRandomSemantics demeCount Sample) :
+    HasExactPipelineReadout semantics.expectedCompletionLaw := by
+  exact ⟨semantics.expectedOutput, fun _input _completion _coordinate ↦ rfl⟩
+
+/-! ### Undefined finite-sample branches -/
+
+/-- A pipeline semantics whose realized metric may be undefined.  The value outside the
+defined event is deliberately ignored; carrying the event separately avoids smuggling a
+numeric sentinel into an expectation. -/
+structure PartialPipelineRandomSemantics (demeCount : ℕ) (Sample : Type*)
+    [MeasurableSpace Sample] where
+  drawLaw : VisiblePipelineInput demeCount → Measure Sample
+  drawLaw_probability : ∀ input, IsProbabilityMeasure (drawLaw input)
+  defined : VisiblePipelineInput demeCount → Sample → PipelineQuantity demeCount → Bool
+  defined_measurable : ∀ input coordinate,
+    MeasurableSet {sample | defined input sample coordinate = true}
+  realizedValue : VisiblePipelineInput demeCount → Sample → PipelineQuantity demeCount → ℝ
+  definedValue_integrable : ∀ input coordinate,
+    Integrable (fun sample ↦ if defined input sample coordinate then
+      realizedValue input sample coordinate else 0) (drawLaw input)
+
+/-- Probability that one finite pipeline realization defines a requested metric. -/
+noncomputable def PartialPipelineRandomSemantics.definedProbability
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PartialPipelineRandomSemantics demeCount Sample)
+    (input : VisiblePipelineInput demeCount) (coordinate : PipelineQuantity demeCount) : ℝ :=
+  (semantics.drawLaw input
+    {sample | semantics.defined input sample coordinate = true}).toReal
+
+/-- Exact conditional mean over the realizations on which the pipeline reports the metric.
+This is the population target of a skip-undefined Monte Carlo average.  If the metric is never
+defined, the result remains `none`. -/
+noncomputable def PartialPipelineRandomSemantics.expectedOutput
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PartialPipelineRandomSemantics demeCount Sample) :
+    VisiblePipelineInput demeCount → PipelineOutput demeCount :=
+  fun input coordinate ↦
+    let mass := semantics.definedProbability input coordinate
+    if mass = 0 then none else
+      some ((∫ sample, (if semantics.defined input sample coordinate then
+        semantics.realizedValue input sample coordinate else 0) ∂semantics.drawLaw input) / mass)
+
+/-- The partial conditional expectation has no residual completion coordinate once the entire
+input-determined draw law is integrated. -/
+noncomputable def PartialPipelineRandomSemantics.expectedCompletionLaw
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PartialPipelineRandomSemantics demeCount Sample) :
+    PipelineCompletionLaw demeCount PUnit where
+  value := fun input _completion coordinate ↦ semantics.expectedOutput input coordinate
+
+/-- Exact identification still holds for partial values: simulator randomness determines the
+definedness probability and conditional mean, rather than becoming a completion fiber. -/
+theorem PartialPipelineRandomSemantics.hasExactExpectedReadout
+    {demeCount : ℕ} {Sample : Type*} [MeasurableSpace Sample]
+    (semantics : PartialPipelineRandomSemantics demeCount Sample) :
+    HasExactPipelineReadout semantics.expectedCompletionLaw := by
+  exact ⟨semantics.expectedOutput, fun _input _completion _coordinate ↦ rfl⟩
 
 /-! ## B1. The P+T selection law -/
 
@@ -32,6 +1028,338 @@ which is exactly what the existing metric and calibration layers consume.
 structure PositiveScale where
   value : ℝ
   value_pos : 0 < value
+
+/-- Environmental variance implied by a unit-variance genetic liability and the visible
+narrow-sense heritability: `h² = 1 / (1 + Vₑ)`. -/
+noncomputable def PipelineStudyDesign.residualVariance {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : ℝ :=
+  (1 - design.heritability) / design.heritability
+
+/-- The visible heritability keeps its derived residual variance strictly positive. -/
+theorem PipelineStudyDesign.residualVariance_pos {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : 0 < design.residualVariance :=
+  div_pos (sub_pos.mpr design.heritability_lt_one) design.heritability_pos
+
+/-- Environmental standard deviation derived from the visible heritability, not supplied as
+a second phenotype parameter. -/
+noncomputable def PipelineStudyDesign.residualSD {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : PositiveScale where
+  value := Real.sqrt design.residualVariance
+  value_pos := Real.sqrt_pos.2 design.residualVariance_pos
+
+/-- A realized total-liability panel with exactly the visible per-deme cohort layout.
+
+The entries include every phenotype component that shifts liability before the common
+environmental residual is added: genetic score, ancestry baseline, and any other rung chosen
+by the executable phenotype protocol.  Keeping this type total-liability-valued prevents the
+downstream risk law from silently assuming the genetic-only phenotype rung. -/
+structure FiniteLiabilityPanel {demeCount : ℕ} (design : PipelineStudyDesign demeCount) where
+  liability : ∀ deme, Fin (design.cohortSize deme) → ℝ
+
+/-- Arithmetic mean total liability in one visible deme. -/
+noncomputable def FiniteLiabilityPanel.demeMean
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (deme : Fin demeCount) : ℝ :=
+  (∑ individual, panel.liability deme individual) / design.cohortSize deme
+
+/-- Conditional event risk under a normal environmental residual and a proposed global
+liability intercept. -/
+noncomputable def FiniteLiabilityPanel.riskAtIntercept
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (intercept : ℝ)
+    (deme : Fin demeCount) (individual : Fin (design.cohortSize deme)) : ℝ :=
+  Foundations.Phi
+    ((intercept + panel.liability deme individual) / design.residualSD.value)
+
+/-- Cohort-size-weighted mean risk across the concatenated population. -/
+noncomputable def FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (intercept : ℝ) : ℝ :=
+  (∑ deme, ∑ individual, panel.riskAtIntercept intercept deme individual) /
+    design.pooledCohortSize
+
+/-- Exact domain of the global prevalence intercept.  The proof field contains no fitted
+constant; it certifies the unique root of the displayed, exactly evaluable finite sum. -/
+structure FiniteLiabilityPanel.PrevalenceInterceptDomain
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) : Prop where
+  existsUniqueRoot : ∃! intercept : ℝ,
+    panel.pooledMeanRiskAtIntercept intercept = design.prevalence
+
+/-- A finite, exactly evaluable common bound on every absolute total liability in the
+visible evaluation panel. -/
+noncomputable def FiniteLiabilityPanel.liabilityAbsSum
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) : ℝ :=
+  ∑ deme, ∑ individual, |panel.liability deme individual|
+
+/-- Every individual liability is bounded in absolute value by the finite panel sum. -/
+theorem FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (deme : Fin demeCount)
+    (individual : Fin (design.cohortSize deme)) :
+    |panel.liability deme individual| ≤ panel.liabilityAbsSum := by
+  unfold FiniteLiabilityPanel.liabilityAbsSum
+  have hinner :
+      |panel.liability deme individual| ≤
+        ∑ other, |panel.liability deme other| :=
+    Finset.single_le_sum (fun other _ ↦ abs_nonneg (panel.liability deme other))
+      (Finset.mem_univ individual)
+  have houter :
+      (∑ other, |panel.liability deme other|) ≤
+        ∑ otherDeme, ∑ otherIndividual,
+          |panel.liability otherDeme otherIndividual| := by
+    apply Finset.single_le_sum
+      (s := (Finset.univ : Finset (Fin demeCount)))
+      (f := fun otherDeme ↦ ∑ otherIndividual,
+        |panel.liability otherDeme otherIndividual|)
+    · intro otherDeme _
+      exact Finset.sum_nonneg fun otherIndividual _ ↦
+        abs_nonneg (panel.liability otherDeme otherIndividual)
+    · exact Finset.mem_univ deme
+  exact hinner.trans houter
+
+/-- The global prevalence intercept exists uniquely for every finite visible panel.  The
+proof uses explicit brackets
+
+`sigma_e * Phi⁻¹(K) ± sum |L_i|`.
+
+At the lower bracket every individual probit risk is at most `K`; at the upper bracket every
+risk is at least `K`.  A finite sum of continuous strictly increasing Gaussian CDFs is itself
+continuous and strictly increasing, so the intermediate value is the unique root.  Thus the
+domain is derived from the visible prevalence and panel rather than supplied by a caller. -/
+theorem FiniteLiabilityPanel.hasPrevalenceInterceptDomain
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) : panel.PrevalenceInterceptDomain := by
+  classical
+  let z := Function.invFun Foundations.Phi design.prevalence
+  let lower := design.residualSD.value * z - panel.liabilityAbsSum
+  let upper := design.residualSD.value * z + panel.liabilityAbsSum
+  have hPhiZ : Foundations.Phi z = design.prevalence := by
+    exact Foundations.Phi_invFun_eq design.prevalence design.prevalence_pos
+      design.prevalence_lt_one
+  have hab : lower ≤ upper := by
+    dsimp [lower, upper]
+    have hsum : 0 ≤ panel.liabilityAbsSum := by
+      unfold FiniteLiabilityPanel.liabilityAbsSum
+      positivity
+    linarith
+  have hriskContinuous : ∀ deme individual,
+      Continuous (fun intercept ↦ panel.riskAtIntercept intercept deme individual) := by
+    intro deme individual
+    unfold FiniteLiabilityPanel.riskAtIntercept
+    exact Foundations.continuous_Phi.comp
+      ((continuous_id.add continuous_const).div_const design.residualSD.value)
+  have hcontinuous : Continuous panel.pooledMeanRiskAtIntercept := by
+    unfold FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+    exact (continuous_finset_sum _ fun deme _ ↦
+      continuous_finset_sum _ fun individual _ ↦
+        hriskContinuous deme individual).div_const design.pooledCohortSize
+  have hriskStrict : ∀ deme individual,
+      StrictMono (fun intercept ↦ panel.riskAtIntercept intercept deme individual) := by
+    intro deme individual first second hlt
+    apply Foundations.strictMono_Phi
+    exact div_lt_div_of_pos_right (add_lt_add_right hlt _)
+      design.residualSD.value_pos
+  have hstrict : StrictMono panel.pooledMeanRiskAtIntercept := by
+    intro first second hlt
+    unfold FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+    have hsums :
+        (∑ deme, ∑ individual, panel.riskAtIntercept first deme individual) <
+          ∑ deme, ∑ individual, panel.riskAtIntercept second deme individual := by
+      apply Finset.sum_lt_sum
+      · intro deme _
+        exact Finset.sum_le_sum fun individual _ ↦
+          (hriskStrict deme individual hlt).le
+      · refine ⟨design.gwasDeme, Finset.mem_univ _, ?_⟩
+        apply Finset.sum_lt_sum
+        · intro individual _
+          exact (hriskStrict design.gwasDeme individual hlt).le
+        · let witness : Fin (design.cohortSize design.gwasDeme) :=
+            ⟨0, design.cohortSize_pos design.gwasDeme⟩
+          exact ⟨witness, Finset.mem_univ _, hriskStrict design.gwasDeme witness hlt⟩
+    exact div_lt_div_of_pos_right hsums
+      (Nat.cast_pos.mpr design.pooledCohortSize_pos)
+  have hconstantSum :
+      (∑ deme, ∑ _individual : Fin (design.cohortSize deme), design.prevalence) =
+        (design.pooledCohortSize : ℝ) * design.prevalence := by
+    simp [PipelineStudyDesign.pooledCohortSize, Finset.sum_mul]
+  have hlower : panel.pooledMeanRiskAtIntercept lower ≤ design.prevalence := by
+    have hterm : ∀ deme individual,
+        panel.riskAtIntercept lower deme individual ≤ design.prevalence := by
+      intro deme individual
+      rw [← hPhiZ]
+      apply Foundations.Phi_monotone
+      apply (div_le_iff₀ design.residualSD.value_pos).2
+      have habsolute := panel.abs_liability_le_liabilityAbsSum deme individual
+      dsimp [lower]
+      linarith [le_abs_self (panel.liability deme individual)]
+    unfold FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+    rw [div_le_iff₀ (Nat.cast_pos.mpr design.pooledCohortSize_pos)]
+    calc
+      (∑ deme, ∑ individual, panel.riskAtIntercept lower deme individual) ≤
+          ∑ deme, ∑ _individual : Fin (design.cohortSize deme), design.prevalence :=
+        Finset.sum_le_sum fun deme _ ↦ Finset.sum_le_sum fun individual _ ↦
+          hterm deme individual
+      _ = (design.pooledCohortSize : ℝ) * design.prevalence := hconstantSum
+      _ = design.prevalence * design.pooledCohortSize := by ring
+  have hupper : design.prevalence ≤ panel.pooledMeanRiskAtIntercept upper := by
+    have hterm : ∀ deme individual,
+        design.prevalence ≤ panel.riskAtIntercept upper deme individual := by
+      intro deme individual
+      rw [← hPhiZ]
+      apply Foundations.Phi_monotone
+      apply (le_div_iff₀ design.residualSD.value_pos).2
+      have habsolute := panel.abs_liability_le_liabilityAbsSum deme individual
+      dsimp [upper]
+      linarith [neg_le_of_abs_le habsolute]
+    unfold FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+    rw [le_div_iff₀ (Nat.cast_pos.mpr design.pooledCohortSize_pos)]
+    calc
+      design.prevalence * design.pooledCohortSize =
+          (design.pooledCohortSize : ℝ) * design.prevalence := by ring
+      _ = ∑ deme, ∑ _individual : Fin (design.cohortSize deme), design.prevalence :=
+        hconstantSum.symm
+      _ ≤ ∑ deme, ∑ individual, panel.riskAtIntercept upper deme individual :=
+        Finset.sum_le_sum fun deme _ ↦ Finset.sum_le_sum fun individual _ ↦
+          hterm deme individual
+  obtain ⟨root, _, hroot⟩ :=
+    intermediate_value_Icc hab hcontinuous.continuousOn ⟨hlower, hupper⟩
+  refine ⟨⟨root, hroot, ?_⟩⟩
+  intro other hother
+  exact hstrict.injective (hother.trans hroot.symm)
+
+/-- The exact global intercept selected by the visible prevalence equation.
+
+Empirical status: DERIVED -- `hasPrevalenceInterceptDomain` proves the unique root exists for
+every finite visible panel, and `prevalenceIntercept_spec` proves it attains the requested
+pooled prevalence; no caller supplies domain evidence or a fitted constant. -/
+noncomputable def FiniteLiabilityPanel.prevalenceIntercept
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) : ℝ :=
+  panel.hasPrevalenceInterceptDomain.existsUniqueRoot.exists.choose
+
+/-- The selected intercept attains the requested pooled prevalence exactly. -/
+theorem FiniteLiabilityPanel.prevalenceIntercept_spec
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) :
+    panel.pooledMeanRiskAtIntercept panel.prevalenceIntercept = design.prevalence :=
+  panel.hasPrevalenceInterceptDomain.existsUniqueRoot.exists.choose_spec
+
+/-- Exact individual liability-to-risk transformation after solving the global intercept. -/
+noncomputable def FiniteLiabilityPanel.risk
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (deme : Fin demeCount)
+    (individual : Fin (design.cohortSize deme)) : ℝ :=
+  panel.riskAtIntercept panel.prevalenceIntercept deme individual
+
+/-- The same globally calibrated liability-to-risk curve evaluated at an arbitrary liability,
+which is the requested `liabilityToRisk` intermediate rather than an individual lookup. -/
+noncomputable def FiniteLiabilityPanel.riskForLiability
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (liability : ℝ) : ℝ :=
+  Foundations.Phi
+    ((panel.prevalenceIntercept + liability) / design.residualSD.value)
+
+/-- Individual risk is the common liability-to-risk curve evaluated at that individual's
+derived genetic liability. -/
+theorem FiniteLiabilityPanel.risk_eq_riskForLiability
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (deme : Fin demeCount)
+    (individual : Fin (design.cohortSize deme)) :
+    panel.risk deme individual =
+      panel.riskForLiability (panel.liability deme individual) := rfl
+
+/-- Every transformed risk is strictly inside the Bernoulli probability interval. -/
+theorem FiniteLiabilityPanel.risk_mem_unitInterval
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (deme : Fin demeCount)
+    (individual : Fin (design.cohortSize deme)) :
+    0 < panel.risk deme individual ∧ panel.risk deme individual < 1 := by
+  exact ⟨Foundations.Phi_pos _, Foundations.Phi_lt_one _⟩
+
+/-- Add one common liability offset to every individual.  This changes the arbitrary origin
+of the liability scale but no relative liability. -/
+noncomputable def FiniteLiabilityPanel.shift
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (offset : ℝ) : FiniteLiabilityPanel design where
+  liability := fun deme individual ↦ panel.liability deme individual + offset
+
+/-- A common liability offset is absorbed exactly by the derived global intercept. -/
+theorem FiniteLiabilityPanel.prevalenceIntercept_shift
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (offset : ℝ) :
+    (panel.shift offset).prevalenceIntercept = panel.prevalenceIntercept - offset := by
+  apply (panel.shift offset).hasPrevalenceInterceptDomain.existsUniqueRoot.unique
+  · exact (panel.shift offset).prevalenceIntercept_spec
+  · rw [← panel.prevalenceIntercept_spec]
+    unfold FiniteLiabilityPanel.pooledMeanRiskAtIntercept
+      FiniteLiabilityPanel.riskAtIntercept FiniteLiabilityPanel.shift
+    apply congrArg (fun total : ℝ ↦ total / design.pooledCohortSize)
+    apply Finset.sum_congr rfl
+    intro deme _
+    apply Finset.sum_congr rfl
+    intro individual _
+    apply congrArg Foundations.Phi
+    apply congrArg (fun numerator : ℝ ↦ numerator / design.residualSD.value)
+    ring
+
+/-- Consequently every individual true risk is invariant to a common liability offset. -/
+theorem FiniteLiabilityPanel.risk_shift
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (panel : FiniteLiabilityPanel design) (offset : ℝ) (deme : Fin demeCount)
+    (individual : Fin (design.cohortSize deme)) :
+    (panel.shift offset).risk deme individual = panel.risk deme individual := by
+  unfold FiniteLiabilityPanel.risk
+  rw [panel.prevalenceIntercept_shift]
+  unfold FiniteLiabilityPanel.riskAtIntercept FiniteLiabilityPanel.shift
+  apply congrArg Foundations.Phi
+  apply congrArg (fun numerator : ℝ ↦ numerator / design.residualSD.value)
+  ring
+
+/-- Exact identifiability quotient for the finite liability-to-risk transformation: two
+panels have the same individual risk vector if and only if their liabilities differ by one
+common additive constant.  Thus a global intercept convention is harmless, whereas the
+nonconstant per-deme shifts distinguishing gnomon's phenotype rungs are not integrated-away
+simulator noise. -/
+theorem FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (first second : FiniteLiabilityPanel design) :
+    (∀ deme individual, first.risk deme individual = second.risk deme individual) ↔
+      ∃ offset : ℝ, ∀ deme individual,
+        second.liability deme individual = first.liability deme individual + offset := by
+  constructor
+  · intro hrisk
+    refine ⟨first.prevalenceIntercept - second.prevalenceIntercept, ?_⟩
+    intro deme individual
+    have harguments := Foundations.strictMono_Phi.injective (hrisk deme individual)
+    unfold FiniteLiabilityPanel.risk at harguments
+    field_simp [ne_of_gt design.residualSD.value_pos] at harguments
+    linarith
+  · rintro ⟨offset, hliability⟩
+    have hpanel : second = first.shift offset := by
+      cases first with
+      | mk firstLiability =>
+        cases second with
+        | mk secondLiability =>
+          congr
+          funext deme individual
+          exact hliability deme individual
+    subst second
+    exact fun deme individual ↦ (first.risk_shift offset deme individual).symm
+
+/-- Any liability difference outside the common-shift quotient changes at least one exact
+individual risk after global prevalence calibration. -/
+theorem FiniteLiabilityPanel.exists_risk_ne_of_not_common_shift
+    {demeCount : ℕ} {design : PipelineStudyDesign demeCount}
+    (first second : FiniteLiabilityPanel design)
+    (hshift : ¬ ∃ offset : ℝ, ∀ deme individual,
+      second.liability deme individual = first.liability deme individual + offset) :
+    ∃ deme, ∃ individual,
+      first.risk deme individual ≠ second.risk deme individual := by
+  by_contra hsame
+  push_neg at hsame
+  exact hshift ((first.risk_eq_iff_liability_eq_up_to_common_shift second).mp hsame)
 
 /-- A probability strictly inside the unit interval. -/
 structure InteriorProbability where
@@ -49,8 +1377,18 @@ structure PTParameters where
   clumpR2Cutoff_lt_one : clumpR2Cutoff < 1
   discoverySampleSize_pos : 0 < discoverySampleSize
 
-/-- The fixed part of a P+T analysis.  LD geometry and the threshold family do not change
-with a realised GWAS draw. -/
+/-- P+T parameters projected from the visible study design with no duplicated constants. -/
+def PipelineStudyDesign.ptParameters {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : PTParameters where
+  clumpR2Cutoff := design.clumpR2Threshold
+  clumpWindowBp := design.clumpWindowBp
+  discoverySampleSize := design.gwasSampleSize
+  clumpR2Cutoff_nonneg := design.clumpR2Threshold_nonneg
+  clumpR2Cutoff_lt_one := design.clumpR2Threshold_lt_one
+  discoverySampleSize_pos := design.gwasSampleSize_pos
+
+/-- The fixed part of P+T conditional on one realized marker panel.  LD geometry is fixed
+during the GWAS/clump operation on that panel; the full upstream genome draw may change it. -/
 structure PTProtocol (thresholdCount m : ℕ) where
   parameters : PTParameters
   positionBp : Fin m → ℕ
@@ -61,6 +1399,37 @@ structure PTProtocol (thresholdCount m : ℕ) where
   pThreshold : Fin thresholdCount → ℝ
   pThreshold_nonnegative : ∀ q, 0 ≤ pThreshold q
   pThreshold_le_one : ∀ q, pThreshold q ≤ 1
+
+/-- Build the fixed P+T protocol from the visible study constants and one realized marker
+panel.  Positions and source LD belong to the genome draw; clump constants, discovery size,
+and every threshold are definitionally the visible design rather than a second supplied copy. -/
+noncomputable def PipelineStudyDesign.ptProtocol {demeCount m : ℕ}
+    (design : PipelineStudyDesign demeCount)
+    (positionBp : Fin m → ℕ) (sourceR2 : Fin m → Fin m → ℝ)
+    (sourceR2_nonnegative : ∀ i j, 0 ≤ sourceR2 i j)
+    (sourceR2_le_one : ∀ i j, sourceR2 i j ≤ 1)
+    (sourceR2_symmetric : ∀ i j, sourceR2 i j = sourceR2 j i) :
+    PTProtocol design.selectionThresholds.length m where
+  parameters := design.ptParameters
+  positionBp := positionBp
+  sourceR2 := sourceR2
+  sourceR2_nonnegative := sourceR2_nonnegative
+  sourceR2_le_one := sourceR2_le_one
+  sourceR2_symmetric := sourceR2_symmetric
+  pThreshold := fun threshold ↦ design.selectionThresholds.get threshold
+  pThreshold_nonnegative := fun threshold ↦
+    design.selectionThresholds_nonneg _ (List.get_mem design.selectionThresholds threshold)
+  pThreshold_le_one := fun threshold ↦
+    design.selectionThresholds_le_one _ (List.get_mem design.selectionThresholds threshold)
+
+/-- A realized marker-panel protocol uses exactly the visible non-genomic study constants.
+Only positions and source LD may vary with the genome draw. -/
+structure PTProtocol.MatchesStudyDesign {demeCount m : ℕ}
+    (design : PipelineStudyDesign demeCount)
+    (protocol : PTProtocol design.selectionThresholds.length m) : Prop where
+  parameters_eq : protocol.parameters = design.ptParameters
+  thresholds_eq : ∀ threshold,
+    protocol.pThreshold threshold = design.selectionThresholds.get threshold
 
 /-- Two markers conflict when they lie inside the supplied clumping window and their source
 LD reaches the supplied exclusion cutoff.  Equality is excluded, matching retention by a
@@ -127,14 +1496,21 @@ noncomputable def PTThresholdMixture.expectation {thresholdCount : ℕ}
     (mixture : PTThresholdMixture thresholdCount) (functional : Fin thresholdCount → ℝ) : ℝ :=
   ∑ q, mixture.probability q * functional q
 
-/-- Additive effect-variance mass retained after clumping and thresholding. -/
+/-- Additive effect-variance mass retained after clumping and thresholding.
+
+Empirical status: DERIVED -- the standard additive-variance summand `2 p (1-p) beta²`
+summed over exactly the markers the design keeps; which markers are kept is the design's
+combinatorics, proved above, and no retention coefficient is fitted. -/
 noncomputable def PTDesign.selectedEffectMass {thresholdCount m : ℕ}
     (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
     (alleleFrequency effect : Fin m → ℝ) : ℝ :=
   (d.selected q).map (fun i ↦
     2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2) |>.sum
 
-/-- Fraction of total additive effect mass retained by P+T. -/
+/-- Fraction of total additive effect mass retained by P+T.
+
+Empirical status: DERIVED -- the ratio of `selectedEffectMass` to the same sum over all
+markers, defined only where the hypothesis supplies a nonzero total. -/
 noncomputable def PTDesign.selectedEffectMassFraction {thresholdCount m : ℕ}
     (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
     (alleleFrequency effect : Fin m → ℝ)
@@ -142,90 +1518,26 @@ noncomputable def PTDesign.selectedEffectMassFraction {thresholdCount m : ℕ}
   d.selectedEffectMass q alleleFrequency effect /
     (∑ i, 2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2)
 
-/-- Effect mass surviving the analytically predicted winner. -/
+/-- Effect mass surviving the analytically predicted winner.
+
+Empirical status: DERIVED -- `PTDesign.selectedEffectMass` evaluated at the winner index
+the design proves optimal; it adds no quantity of its own. -/
 noncomputable def PTWinner.selectedEffectMass {thresholdCount m : ℕ}
     {d : PTDesign thresholdCount m} {objective : Fin thresholdCount → ℝ}
     (winner : PTWinner d objective) (alleleFrequency effect : Fin m → ℝ) : ℝ :=
   d.selectedEffectMass winner.index alleleFrequency effect
 
-/-- Effect mass with threshold uncertainty marginalized rather than optimized away. -/
+/-- Effect mass with threshold uncertainty marginalized rather than optimized away.
+
+Empirical status: DERIVED -- the mixture expectation of `selectedEffectMass` under the
+supplied threshold law; the marginalization is exact and the mixture is an argument, not a
+fit. -/
 noncomputable def PTDesign.marginalSelectedEffectMass {thresholdCount m : ℕ}
     (d : PTDesign thresholdCount m) (mixture : PTThresholdMixture thresholdCount)
     (alleleFrequency effect : Fin m → ℝ) : ℝ :=
   mixture.expectation fun q ↦ d.selectedEffectMass q alleleFrequency effect
 
-/-! ## B2. GWAS estimation noise and its composition with selection -/
-
-/-- Inputs to the one-locus OLS noise law.  Every denominator constraint is carried by the
-type. -/
-structure GWASNoiseMarginal where
-  discoverySampleSize : ℕ
-  discoverySampleSize_pos : 0 < discoverySampleSize
-  residualVariance : PositiveScale
-  alleleFrequency : InteriorProbability
-
-/-- The one-locus OLS variance.  The genotype variance is diploid HWE `2p(1-p)`. -/
-noncomputable def GWASNoiseMarginal.variance (noise : GWASNoiseMarginal) : ℝ :=
-  noise.residualVariance.value /
-    (noise.discoverySampleSize *
-      (2 * noise.alleleFrequency.value * (1 - noise.alleleFrequency.value)))
-
-/-- GWAS noise evaluated at the discovery sample size fixed by a P+T protocol. -/
-noncomputable def PTProtocol.effectNoiseVariance {thresholdCount m : ℕ}
-    (protocol : PTProtocol thresholdCount m) (residualVariance : PositiveScale)
-    (alleleFrequency : InteriorProbability) : ℝ :=
-  GWASNoiseMarginal.variance
-    { discoverySampleSize := protocol.parameters.discoverySampleSize
-      discoverySampleSize_pos := protocol.parameters.discoverySampleSize_pos
-      residualVariance := residualVariance
-      alleleFrequency := alleleFrequency }
-
-/-- An exact finite representation of the sampling law of the GWAS output.  Continuous
-Gaussian sampling may be approximated by quadrature, but no independence between linked
-markers is assumed: each atom carries the whole estimated-effect and p-value vector, so
-clumping is performed jointly inside the atom before averaging. -/
-structure PTGWASSamplingLaw (omega m : ℕ) where
-  probability : Fin omega → ℝ
-  probability_nonneg : ∀ w, 0 ≤ probability w
-  probability_sum_one : ∑ w, probability w = 1
-  trueEffect : Fin m → ℝ
-  estimatedEffect : Fin omega → Fin m → ℝ
-  pValue : Fin omega → Fin m → ℝ
-
-/-- Expected value under the exact joint GWAS sampling law. -/
-noncomputable def PTGWASSamplingLaw.expectation {omega m : ℕ}
-    (law : PTGWASSamplingLaw omega m) (f : Fin omega → ℝ) : ℝ :=
-  ∑ w, law.probability w * f w
-
-/-- A joint GWAS sampling law certified to have the declared OLS marginal moments.  Linkage
-and cross-marker estimation dependence remain arbitrary in the joint atoms. -/
-structure PTGWASNoiseModel {omega thresholdCount m : ℕ}
-    (protocol : PTProtocol thresholdCount m) (law : PTGWASSamplingLaw omega m) where
-  residualVariance : PositiveScale
-  alleleFrequency : Fin m → InteriorProbability
-  estimationErrorMeanZero : ∀ marker,
-    law.expectation (fun draw ↦ law.estimatedEffect draw marker - law.trueEffect marker) = 0
-  estimationErrorVariance : ∀ marker,
-    law.expectation (fun draw ↦
-      (law.estimatedEffect draw marker - law.trueEffect marker) ^ 2) =
-      protocol.effectNoiseVariance residualVariance (alleleFrequency marker)
-
-/-- Selection and estimation noise composed in the correct order: select with the realised
-joint GWAS output, construct the selected score, and only then average over GWAS samples. -/
-noncomputable def expectedSelectedFunctional {omega thresholdCount m : ℕ}
-    (law : PTGWASSamplingLaw omega m)
-    (designAt : Fin omega → PTDesign thresholdCount m) (q : Fin thresholdCount)
-    (functional : Fin omega → List (Fin m) → ℝ) : ℝ :=
-  law.expectation fun w ↦ functional w ((designAt w).selected q)
-
-/-- The composition really is selection inside expectation, a useful guard against replacing
-the random retained set by a list selected from mean p-values. -/
-theorem expectedSelectedFunctional_eq {omega thresholdCount m : ℕ}
-    (law : PTGWASSamplingLaw omega m)
-    (designAt : Fin omega → PTDesign thresholdCount m) (q : Fin thresholdCount)
-    (functional : Fin omega → List (Fin m) → ℝ) :
-    expectedSelectedFunctional law designAt q functional =
-      ∑ w, law.probability w * functional w ((designAt w).selected q) := rfl
+/-! ## B2. Joint GWAS estimation and selection, conditional on one realized genome -/
 
 /-! ## C. Within-deme accuracy from the selected score moments -/
 
@@ -270,7 +1582,6 @@ structure AdmissibleScoreWeights {markerCount : ℕ}
     (primitive : DemeGeneticMomentPrimitive markerCount) where
   weight : Fin markerCount → ℝ
   scoreVariance_pos : 0 < primitive.scoreVariance weight
-  predictiveCovariance_nonneg : 0 ≤ primitive.predictiveCovariance weight
 
 /-- Zero unselected weights and retain the realised GWAS effect at selected markers. -/
 noncomputable def PTDesign.selectedWeight {thresholdCount markerCount : ℕ}
@@ -284,12 +1595,14 @@ structure DemeScoreLaw where
   scoreMean : ℝ
   moments : Descent.Core.ScoreMoments
   moments_admissible : Descent.Core.ScoreMoments.Admissible moments
-  predictiveCovariance_nonneg : 0 ≤ moments.predictiveCovariance
   prevalence : ℝ
   prevalence_pos : 0 < prevalence
   prevalence_lt_one : prevalence < 1
 
-/-- The prevalence carried by a deme score law, with its domain evidence. -/
+/-- The prevalence carried by a deme score law, with its domain evidence.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- repackaging the law's own prevalence field with
+its interiority evidence; the field's value is whatever the constructor supplied. -/
 def DemeScoreLaw.prevalenceProbability (law : DemeScoreLaw) : InteriorProbability where
   value := law.prevalence
   value_pos := law.prevalence_pos
@@ -308,7 +1621,6 @@ noncomputable def AdmissibleScoreWeights.toDemeScoreLaw {markerCount : ℕ}
     { scoreVariance_pos := score.scoreVariance_pos
       outcomeVariance_pos := primitive.outcomeVariance_pos
       cauchy_schwarz := primitive.cauchy_schwarz score.weight }
-  predictiveCovariance_nonneg := score.predictiveCovariance_nonneg
   prevalence := primitive.prevalence
   prevalence_pos := primitive.prevalence_pos
   prevalence_lt_one := primitive.prevalence_lt_one
@@ -318,94 +1630,186 @@ structure DistanceResolvedScoreLaw (D : ℕ) where
   train : Fin D
   atDeme : Fin D → DemeScoreLaw
 
-/-! ### B1+B2 composed into the distance-resolved moment law -/
+/-- Additive genetic-liability variance induced by a realized distinct causal-marker map and
+effect vector in one deme. -/
+noncomputable def DemeGeneticMomentPrimitive.causalGeneticVariance
+    {markerCount causalCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount)
+    (causalMarker : Fin causalCount → Fin markerCount)
+    (causalEffect : Fin causalCount → ℝ) : ℝ :=
+  ∑ first, ∑ second,
+    causalEffect first * primitive.genotypeCovariance (causalMarker first) (causalMarker second) *
+      causalEffect second
 
-/-- A complete family of candidate score laws under the joint GWAS sampling distribution.
-Each realised GWAS atom performs its own clumping and threshold comparison; selection never
-uses mean p-values or a mean retained set. -/
-structure PTGWASDistanceLaw (omega thresholdCount markerCount D : ℕ) where
-  protocol : PTProtocol thresholdCount markerCount
-  sampling : PTGWASSamplingLaw omega markerCount
-  noiseModel : PTGWASNoiseModel protocol sampling
-  designAt : Fin omega → PTDesign thresholdCount markerCount
-  design_protocol_eq : ∀ draw, (designAt draw).protocol = protocol
-  design_pValue_eq : ∀ draw, (designAt draw).pValue = sampling.pValue draw
-  scoreLawAt : Fin omega → Fin thresholdCount → DistanceResolvedScoreLaw D
-  validationDeme : Fin D
-  winnerAt : ∀ draw,
-    PTWinner (designAt draw)
-      (fun threshold ↦ ((scoreLawAt draw threshold).atDeme validationDeme).moments.r2)
+/-- Covariance of one marker with the additive genetic liability from the same architecture.
 
-/-- Candidate selected in one realised GWAS draw. -/
-noncomputable def PTGWASDistanceLaw.winningScoreLaw
-    {omega thresholdCount markerCount D : ℕ}
-    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
-    (draw : Fin omega) : DistanceResolvedScoreLaw D :=
-  law.scoreLawAt draw (law.winnerAt draw).index
+Empirical status: DERIVED -- bilinear expansion of the supplied genotype covariance against
+the realized effect vector; it asserts nothing beyond the moment primitive it reads. -/
+noncomputable def DemeGeneticMomentPrimitive.markerLiabilityCovariance
+    {markerCount causalCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount)
+    (causalMarker : Fin causalCount → Fin markerCount)
+    (causalEffect : Fin causalCount → ℝ) (marker : Fin markerCount) : ℝ :=
+  ∑ causal,
+    primitive.genotypeCovariance marker (causalMarker causal) * causalEffect causal
 
-/-- Exact expected downstream metric after GWAS noise, clumping, and threshold choice. -/
-noncomputable def PTGWASDistanceLaw.expectedWinningMetric
-    {omega thresholdCount markerCount D : ℕ}
-    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
-    (target : Fin D) (metric : DemeScoreLaw → ℝ) : ℝ :=
-  law.sampling.expectation fun draw ↦ metric ((law.winningScoreLaw draw).atDeme target)
+/-! ### B1+B2 composed into a variable-marker realized draw -/
 
-/-- Threshold uncertainty marginalized inside each GWAS draw. -/
-noncomputable def PTGWASDistanceLaw.expectedMarginalMetric
-    {omega thresholdCount markerCount D : ℕ}
-    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
-    (thresholdLaw : Fin omega → PTThresholdMixture thresholdCount)
-    (target : Fin D) (metric : DemeScoreLaw → ℝ) : ℝ :=
-  law.sampling.expectation fun draw ↦
-    (thresholdLaw draw).expectation fun threshold ↦
-      metric ((law.scoreLawAt draw threshold).atDeme target)
+/-- Everything needed to construct the selected score after one realized genome, architecture,
+phenotype, and GWAS draw.  The marker count is a field, not a type parameter of the stochastic
+law: mutation can therefore change it from one realization to the next.  The fields are
+construction obligations for the upstream ARG/mutation/GWAS kernel, not independently fitted
+inputs.
 
-/-- Concrete composition of realised GWAS weights with per-deme genetic moment primitives. -/
-structure PTGWASMomentComposition (omega thresholdCount markerCount D : ℕ) where
-  protocol : PTProtocol thresholdCount markerCount
-  sampling : PTGWASSamplingLaw omega markerCount
-  noiseModel : PTGWASNoiseModel protocol sampling
-  designAt : Fin omega → PTDesign thresholdCount markerCount
-  design_protocol_eq : ∀ draw, (designAt draw).protocol = protocol
-  design_pValue_eq : ∀ draw, (designAt draw).pValue = sampling.pValue draw
-  primitiveAt : Fin omega → Fin D → DemeGeneticMomentPrimitive markerCount
-  train : Fin D
-  validationDeme : Fin D
-  selectedScoreAt : ∀ draw threshold deme,
-    AdmissibleScoreWeights (primitiveAt draw deme)
-  selectedWeight_eq : ∀ draw threshold deme,
-    (selectedScoreAt draw threshold deme).weight =
-      (designAt draw).selectedWeight threshold (sampling.estimatedEffect draw)
-  winnerAt : ∀ draw,
-    PTWinner (designAt draw) (fun threshold ↦
-      ((selectedScoreAt draw threshold validationDeme).toDemeScoreLaw).moments.r2)
+Selection remains inside the draw.  In particular, `design.pValue`, `estimatedEffect`, the
+greedy retained sets, held-out objective, orientation, and winning threshold are jointly
+realized before any downstream expectation is taken. -/
+structure RealizedPTGWASDraw {D : ℕ} (input : VisiblePipelineInput D) where
+  markerCount : ℕ
+  design : PTDesign input.studyDesign.selectionThresholds.length markerCount
+  design_matches_study : PTProtocol.MatchesStudyDesign input.studyDesign design.protocol
+  estimatedEffect : Fin markerCount → ℝ
+  genotypeAt : ∀ deme, Fin (input.studyDesign.cohortSize deme) → Fin markerCount → ℝ
+  primitiveAt : Fin D → DemeGeneticMomentPrimitive markerCount
+  causalMarker : Fin input.studyDesign.causalLocusCount → Fin markerCount
+  causalMarker_injective : Function.Injective causalMarker
+  causalEffect : Fin input.studyDesign.causalLocusCount → ℝ
+  sourceGeneticVariance_eq_one :
+    (primitiveAt input.studyDesign.gwasDeme).causalGeneticVariance
+      causalMarker causalEffect = 1
+  outcomeCrossCovariance_eq : ∀ deme marker,
+    (primitiveAt deme).outcomeCrossCovariance marker =
+      (primitiveAt deme).markerLiabilityCovariance causalMarker causalEffect marker
+  outcomeVariance_eq : ∀ deme,
+    (primitiveAt deme).outcomeVariance =
+      (primitiveAt deme).causalGeneticVariance causalMarker causalEffect +
+        input.studyDesign.residualVariance
+  selectionObjective : Fin input.studyDesign.selectionThresholds.length → ℝ
+  deploymentSign : ℝ
+  deploymentSign_is_orientation : deploymentSign = 1 ∨ deploymentSign = -1
+  selectedScoreAt : ∀ threshold deme, AdmissibleScoreWeights (primitiveAt deme)
+  selectedWeight_eq : ∀ threshold deme,
+    (selectedScoreAt threshold deme).weight =
+      fun marker ↦ deploymentSign *
+        design.selectedWeight threshold estimatedEffect marker
+  winner : PTWinner design selectionObjective
+
+/-- The architecture normalization and derived residual scale recover exactly the visible
+source heritability on every draw.  No fitted variance constant remains in this identity. -/
+theorem RealizedPTGWASDraw.sourceHeritability_eq
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input) :
+    (draw.primitiveAt input.studyDesign.gwasDeme).causalGeneticVariance
+        draw.causalMarker draw.causalEffect /
+      (draw.primitiveAt input.studyDesign.gwasDeme).outcomeVariance =
+        input.studyDesign.heritability := by
+  rw [draw.outcomeVariance_eq input.studyDesign.gwasDeme,
+    draw.sourceGeneticVariance_eq_one]
+  unfold PipelineStudyDesign.residualVariance
+  have hne : input.studyDesign.heritability ≠ 0 :=
+    ne_of_gt input.studyDesign.heritability_pos
+  field_simp [hne]
+  ring
 
 /-- Distance-resolved score law generated by one GWAS draw and threshold. -/
-noncomputable def PTGWASMomentComposition.distanceLawAt
-    {omega thresholdCount markerCount D : ℕ}
-    (composition : PTGWASMomentComposition omega thresholdCount markerCount D)
-    (draw : Fin omega) (threshold : Fin thresholdCount) : DistanceResolvedScoreLaw D where
-  train := composition.train
-  atDeme := fun deme ↦ (composition.selectedScoreAt draw threshold deme).toDemeScoreLaw
+noncomputable def RealizedPTGWASDraw.distanceLawAt
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (threshold : Fin input.studyDesign.selectionThresholds.length) :
+    DistanceResolvedScoreLaw D where
+  train := input.studyDesign.gwasDeme
+  atDeme := fun deme ↦ (draw.selectedScoreAt threshold deme).toDemeScoreLaw
 
-/-- Forget the construction details only after the exact quadratic moment law has built every
-candidate score. -/
-noncomputable def PTGWASMomentComposition.toDistanceLaw
-    {omega thresholdCount markerCount D : ℕ}
-    (composition : PTGWASMomentComposition omega thresholdCount markerCount D) :
-    PTGWASDistanceLaw omega thresholdCount markerCount D where
-  protocol := composition.protocol
-  sampling := composition.sampling
-  noiseModel := composition.noiseModel
-  designAt := composition.designAt
-  design_protocol_eq := composition.design_protocol_eq
-  design_pValue_eq := composition.design_pValue_eq
-  scoreLawAt := composition.distanceLawAt
-  validationDeme := composition.validationDeme
-  winnerAt := composition.winnerAt
+/-- Candidate selected by held-out threshold comparison in this realized draw. -/
+noncomputable def RealizedPTGWASDraw.winningScoreLaw
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input) :
+    DistanceResolvedScoreLaw D :=
+  draw.distanceLawAt draw.winner.index
+
+/-- Deployed score of one visible evaluation individual at a specified P+T threshold.  This
+is the same selected-weight dot product whose population moments form `distanceLawAt`; it is
+kept at individual resolution for the exact finite-cohort evaluator. -/
+noncomputable def RealizedPTGWASDraw.scoreValueAt
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (threshold : Fin input.studyDesign.selectionThresholds.length) (deme : Fin D)
+    (individual : Fin (input.studyDesign.cohortSize deme)) : ℝ :=
+  ∑ marker, (draw.selectedScoreAt threshold deme).weight marker *
+    draw.genotypeAt deme individual marker
+
+/-- Individual deployed score after the held-out winning threshold has been chosen. -/
+noncomputable def RealizedPTGWASDraw.winningScoreValue
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (deme : Fin D) (individual : Fin (input.studyDesign.cohortSize deme)) : ℝ :=
+  draw.scoreValueAt draw.winner.index deme individual
+
+/-- Additive genetic liability of one realized individual from the same causal-marker map,
+effect vector, and genotype panel that generated the GWAS score. -/
+noncomputable def RealizedPTGWASDraw.geneticLiabilityValue
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (deme : Fin D) (individual : Fin (input.studyDesign.cohortSize deme)) : ℝ :=
+  ∑ causal, draw.causalEffect causal *
+    draw.genotypeAt deme individual (draw.causalMarker causal)
+
+/-- The executable phenotype protocol's non-genetic liability contribution on the visible
+evaluation cohort.  In gnomon this is the quantity that distinguishes the `C`, `A`, `R`, and
+`B` phenotype rungs.  It is deliberately not inferred from demography: choosing the rung is
+a protocol decision and is not among `VisiblePipelineInput`'s arguments. -/
+abbrev PhenotypeBaseline {D : ℕ} (input : VisiblePipelineInput D) :=
+  ∀ deme, Fin (input.studyDesign.cohortSize deme) → ℝ
+
+/-- Total liability obtained by composing the realized causal architecture with an explicit
+phenotype-baseline rule.  This is the unique input to the derived global prevalence root and
+therefore to the true Bernoulli risks used by every finite-cohort metric. -/
+noncomputable def RealizedPTGWASDraw.phenotypeLiabilityPanel
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (phenotypeBaseline : PhenotypeBaseline input) :
+    FiniteLiabilityPanel input.studyDesign where
+  liability := fun deme individual ↦
+    phenotypeBaseline deme individual + draw.geneticLiabilityValue deme individual
+
+/-- Two executable phenotype rules on the same genome draw induce identical exact risks only
+when their baseline vectors differ by one global constant.  In particular, per-deme centering
+(`phenoC`) and nonconstant affine/random deme effects (`phenoA`/`phenoR`) are real semantic
+coordinates, not simulator draws that can be marginalized without first choosing a rung. -/
+theorem RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (first second : PhenotypeBaseline input)
+    (hshift : ¬ ∃ offset : ℝ, ∀ deme individual,
+      second deme individual = first deme individual + offset) :
+    ∃ deme, ∃ individual,
+      (draw.phenotypeLiabilityPanel first).risk deme individual ≠
+        (draw.phenotypeLiabilityPanel second).risk deme individual := by
+  apply (draw.phenotypeLiabilityPanel first).exists_risk_ne_of_not_common_shift
+    (draw.phenotypeLiabilityPanel second)
+  intro panelShift
+  apply hshift
+  obtain ⟨offset, hliability⟩ := panelShift
+  refine ⟨offset, ?_⟩
+  intro deme individual
+  have := hliability deme individual
+  simp only [RealizedPTGWASDraw.phenotypeLiabilityPanel] at this
+  linarith
+
+/-- A single stochastic kernel for every visible input.  Its sample space may be continuous,
+and a successful `realizedAt input sample` may have a different marker count for every input
+and sample.  Failure is explicit: zero mutation or a finite genome with fewer eligible markers
+than the advertised causal-locus count cannot construct `RealizedPTGWASDraw`'s injective causal
+map.  Returning `none` preserves the study design instead of silently reducing its causal
+count, as the current executable's `min` does.
+
+Constructing this kernel from the demographic history is the remaining upstream theorem; this
+type states its exact partial target without freezing the number of segregating sites. -/
+structure VariableMarkerPTGWASKernel (Sample : Type*) [MeasurableSpace Sample] (D : ℕ) where
+  drawLaw : VisiblePipelineInput D → Measure Sample
+  drawLaw_probability : ∀ input, IsProbabilityMeasure (drawLaw input)
+  realizedAt : (input : VisiblePipelineInput D) → Sample → Option (RealizedPTGWASDraw input)
 
 /-- C1: true within-deme squared accuracy. -/
 noncomputable def DemeScoreLaw.r2True (law : DemeScoreLaw) : ℝ := law.moments.r2
+
+/-- C1 on the observed binary-risk scale.  The score moments first determine explained
+liability variance; thresholding at prevalence `K` contributes the exact density/Jacobian
+factor `phi(Phi⁻¹(1-K))² / (K(1-K))`. -/
+noncomputable def DemeScoreLaw.observedRiskR2 (law : DemeScoreLaw) : ℝ :=
+  prevalenceScaledR2 law.r2True law.prevalence
 
 /-- Certificate that an A+B moment construction composes with the validated clean-split
 portability law.  The score moments remain the primary object; this equality is the independent
@@ -422,8 +1826,9 @@ structure CleanSplitMomentCertificate (law : DemeScoreLaw) (markerCount : ℕ) w
     cleanSplitTargetR2' ancestralR2 effectMass sourceFrequency
       sourceEffectiveSize targetEffectiveSize generations ldFactor
 
-/-- C2: calibration slope from the same two score moments. -/
-noncomputable def DemeScoreLaw.calibrationSlope (law : DemeScoreLaw) : ℝ :=
+/-- Linear least-squares calibration slope from the same two score moments.  This is not the
+logistic recalibration coefficient evaluated by the binary-risk pipeline. -/
+noncomputable def DemeScoreLaw.linearCalibrationSlope (law : DemeScoreLaw) : ℝ :=
   law.moments.calibrationSlope
 
 /-- Domain for charts that divide by unexplained variance. -/
@@ -539,10 +1944,16 @@ and the same variance/covariance pair used by `r2True`. -/
 noncomputable def DemeScoreLaw.identityCalibration (law : DemeScoreLaw)
     (observedMean predictedReferenceMean : ℝ) : CalibrationProfile :=
   identityCalibrationProfile observedMean
-    (predictedReferenceMean + law.scoreMean) law.calibrationSlope
+    (predictedReferenceMean + law.scoreMean) law.linearCalibrationSlope
 
 /-- Drifted prevalence generated by a liability mean shift.  The threshold is pinned by the
-source prevalence; a zero residual scale cannot be supplied. -/
+source prevalence; a zero residual scale cannot be supplied.
+
+Empirical status: DERIVED -- the liability-threshold model's prevalence under a mean shift,
+with the threshold a genuine `Phi` preimage by `Phi_surjOn_Ioo` rather than an assumed
+inverse; `emergentPrevalenceFromLiabilityMean_zero` proves the no-shift anchor.  Whether a
+real cohort's prevalence drifts this way is the liability-model question, tested wherever
+the calibration ladder is compared against simulation. -/
 noncomputable def emergentPrevalenceFromLiabilityMean
     (sourcePrevalence : InteriorProbability) (liabilityMean : ℝ)
     (residualSD : PositiveScale) : InteriorProbability where
@@ -571,6 +1982,62 @@ inductive PhenotypeRung where
   | phenoR
   | phenoB
 deriving DecidableEq, Repr
+
+/-- Mean realized genetic liability in one visible deme. -/
+noncomputable def RealizedPTGWASDraw.demeMeanGeneticLiability
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (deme : Fin D) : ℝ :=
+  (∑ individual, draw.geneticLiabilityValue deme individual) /
+    input.studyDesign.cohortSize deme
+
+/-- The four individual-level phenotype rules in `gen_real_pt.py`.
+
+`phenoA` and `phenoR` consume their supplied per-deme baseline realization.  `phenoB` adds
+nothing.  `phenoC` subtracts the realized within-deme genetic-liability mean, exactly matching
+the executable's drift-proof centering operation. -/
+noncomputable def RealizedPTGWASDraw.phenotypeBaselineForRung
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (rung : PhenotypeRung) (affineBaseline randomBaseline : Fin D → ℝ) :
+    PhenotypeBaseline input :=
+  match rung with
+  | .phenoA => fun deme _individual ↦ affineBaseline deme
+  | .phenoR => fun deme _individual ↦ randomBaseline deme
+  | .phenoB => fun _deme _individual ↦ 0
+  | .phenoC => fun deme _individual ↦ -draw.demeMeanGeneticLiability deme
+
+/-- The constant-baseline rung is definitionally genetic liability alone. -/
+theorem RealizedPTGWASDraw.phenotypeBaselineForRung_phenoB
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (affineBaseline randomBaseline : Fin D → ℝ) (deme : Fin D)
+    (individual : Fin (input.studyDesign.cohortSize deme)) :
+    draw.phenotypeBaselineForRung .phenoB affineBaseline randomBaseline deme individual = 0 :=
+  rfl
+
+/-- The drift-proof rung's baseline is exactly the negative realized deme mean. -/
+theorem RealizedPTGWASDraw.phenotypeBaselineForRung_phenoC
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (affineBaseline randomBaseline : Fin D → ℝ) (deme : Fin D)
+    (individual : Fin (input.studyDesign.cohortSize deme)) :
+    draw.phenotypeBaselineForRung .phenoC affineBaseline randomBaseline deme individual =
+      -draw.demeMeanGeneticLiability deme := rfl
+
+/-- The executable phenoC construction has exactly zero realized mean total liability in
+every deme; this is the algebraic property its "drift-proof" label promises. -/
+theorem RealizedPTGWASDraw.phenotypeLiabilityPanel_phenoC_demeMean
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (affineBaseline randomBaseline : Fin D → ℝ) (deme : Fin D) :
+    (draw.phenotypeLiabilityPanel
+      (draw.phenotypeBaselineForRung .phenoC affineBaseline randomBaseline)).demeMean deme =
+        0 := by
+  unfold FiniteLiabilityPanel.demeMean RealizedPTGWASDraw.phenotypeLiabilityPanel
+    RealizedPTGWASDraw.phenotypeBaselineForRung
+  rw [Finset.sum_add_distrib]
+  simp only [Finset.sum_const, Finset.card_fin, nsmul_eq_mul]
+  unfold RealizedPTGWASDraw.demeMeanGeneticLiability
+  have hsize : (input.studyDesign.cohortSize deme : ℝ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (Nat.ne_of_gt (input.studyDesign.cohortSize_pos deme))
+  field_simp [hsize]
+  ring
 
 /-- Inputs whose provenance distinguishes imposed baselines from the emergent genetic mean.
 `affineBaseline` and `randomBaseline` are used only on their named rungs; phenoB uses the
@@ -610,7 +2077,12 @@ noncomputable def PhenotypeLadderInput.ofScoreLaw
 
 /-- D3: per-rung prevalence.  phenoC is the clean floor; phenoA/R apply their imposed
 baselines; phenoB obtains its prevalence from the upstream genetic-liability mean and is not
-told a target prevalence. -/
+told a target prevalence.
+
+Empirical status: DERIVED -- rung dispatch over `emergentPrevalenceFromLiabilityMean`,
+whose status it inherits; the ladder's point is that phenoB's prevalence is computed from
+the upstream mean rather than imposed, and that structural claim is what a battery on the
+ladder would test. -/
 noncomputable def phenotypePrevalence (input : PhenotypeLadderInput)
     (rung : PhenotypeRung) : InteriorProbability :=
   match rung with
@@ -633,30 +2105,32 @@ noncomputable def DemeScoreLaw.atPhenotypeRung (law : DemeScoreLaw)
     prevalence_pos := rungPrevalence.value_pos
     prevalence_lt_one := rungPrevalence.value_lt_one }
 
-/-- D1--D3: logistic CITL at every rung, using the validated prevalence-shift algebra. -/
-noncomputable def phenotypeCITL (input : PhenotypeLadderInput)
+/-- Difference of marginal prevalence logits at one phenotype rung.  This equals logistic
+CITL only in the constant-predictor regime; the exact nonconstant-score pipeline CITL is the
+offset likelihood fit in `BinaryRiskCohort.calibrationInTheLarge`. -/
+noncomputable def phenotypeMarginalLogitShift (input : PhenotypeLadderInput)
     (predictedPrevalence : InteriorProbability) (rung : PhenotypeRung) : ℝ :=
   prevalenceCITLShift predictedPrevalence.value (phenotypePrevalence input rung).value
 
-/-- The complete per-rung calibration profile: rung-specific CITL and the single slope fixed
-by the selected score moments. -/
-noncomputable def phenotypeCalibrationProfile (law : DemeScoreLaw)
+/-- Linear-moment calibration profile paired with a marginal-logit prevalence shift.  It is a
+population approximation and is deliberately not named as the pipeline's logistic fit. -/
+noncomputable def phenotypeLinearCalibrationProfile (law : DemeScoreLaw)
     (input : PhenotypeLadderInput) (predictedPrevalence : InteriorProbability)
     (rung : PhenotypeRung) : CalibrationProfile where
-  citl := phenotypeCITL input predictedPrevalence rung
-  slope := law.calibrationSlope
+  citl := phenotypeMarginalLogitShift input predictedPrevalence rung
+  slope := law.linearCalibrationSlope
   link := CalibrationLink.logistic
 
 /-- The clean rung has no intercept shift when predicted at its source prevalence. -/
-theorem phenotypeCITL_phenoC_zero (input : PhenotypeLadderInput) :
-    phenotypeCITL input input.sourcePrevalence PhenotypeRung.phenoC = 0 := by
+theorem phenotypeMarginalLogitShift_phenoC_zero (input : PhenotypeLadderInput) :
+    phenotypeMarginalLogitShift input input.sourcePrevalence PhenotypeRung.phenoC = 0 := by
   exact no_citl_shift_same_prevalence input.sourcePrevalence.value
 
 /-- D2 is shared by all rungs: changing a baseline changes the intercept/prevalence but not
 the variance-attenuation slope supplied by the score law. -/
 theorem phenotype_ladder_slope_is_score_slope (law : DemeScoreLaw)
     (input : PhenotypeLadderInput) (rung : PhenotypeRung) :
-    law.calibrationSlope = law.moments.calibrationSlope := rfl
+    law.linearCalibrationSlope = law.moments.calibrationSlope := rfl
 
 /-! ## Inhabitation
 
@@ -730,22 +2204,6 @@ noncomputable def PTThresholdMixture.witness : PTThresholdMixture 2 where
   probability := fun _ ↦ 1 / 2
   probability_nonneg := by intro q; norm_num
   probability_sum_one := by simp
-
-/-- Inhabitation for the one-locus OLS noise inputs. -/
-noncomputable def GWASNoiseMarginal.witness : GWASNoiseMarginal where
-  discoverySampleSize := 100000
-  discoverySampleSize_pos := by norm_num
-  residualVariance := PositiveScale.witness
-  alleleFrequency := InteriorProbability.witness
-
-/-- Inhabitation for the joint GWAS sampling law, at two atoms. -/
-noncomputable def PTGWASSamplingLaw.witness : PTGWASSamplingLaw 2 2 where
-  probability := fun _ ↦ 1 / 2
-  probability_nonneg := by intro w; norm_num
-  probability_sum_one := by simp
-  trueEffect := fun _ ↦ 0
-  estimatedEffect := fun _ _ ↦ 0
-  pValue := fun _ _ ↦ 1 / 100
 
 /-- Inhabitation for the Gaussian upper tail.  The mass is positive at EVERY boundary because
 `Foundations.Phi_lt_one` is strict, so this exhibits the class without choosing a special

@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Structured
 import Descent.Core.Moments
+import Mathlib.Analysis.Matrix
+import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Tactic
@@ -267,7 +269,73 @@ noncomputable def twoDemeMomentDynamicsMatrix (r : TwoDemeRates) (K : ℕ) :
 /-- The exact matrix exponential, defined by its absolutely convergent power series. -/
 noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
     (A : Matrix ι ι ℝ) (time : ℝ) : Matrix ι ι ℝ :=
-  ∑' power : ℕ, (time ^ power / power.factorial) • (A ^ power)
+  ∑' power : ℕ, ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)
+
+/-- The series used by `matrixExponential` is summable for every finite real matrix and
+every real time.  The operator norm is introduced only inside the proof; the exponential's
+definition and all downstream demographic objects remain independent of a chosen matrix
+norm. -/
+private theorem matrixExponentialSeries_summable
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) :
+    Summable (fun power : ℕ ↦
+      ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) := by
+  open scoped Matrix.Norms.Operator in
+    exact NormedSpace.expSeries_summable' (𝕂 := ℝ) (time • A)
+
+/-- Generator intertwining propagates through every finite power.  The following theorem
+passes this identity through the absolutely convergent exponential series. -/
+theorem matrix_pow_intertwines
+    {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq ι] [DecidableEq κ]
+    (projection : Matrix κ ι ℝ) (source : Matrix ι ι ℝ) (target : Matrix κ κ ℝ)
+    (hgenerator : projection * source = target * projection) (power : ℕ) :
+    projection * source ^ power = target ^ power * projection := by
+  induction power with
+  | zero => simp
+  | succ power ih =>
+      rw [pow_succ, ← Matrix.mul_assoc, ih, Matrix.mul_assoc, hgenerator,
+        ← Matrix.mul_assoc, ← pow_succ]
+
+/-- A generator projection intertwines the exact epoch semigroups.  This is the analytic
+completion of `matrix_pow_intertwines`: absolute convergence permits left and right matrix
+multiplication to pass through the power series, and every corresponding power agrees. -/
+theorem matrixExponential_intertwines
+    {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq ι] [DecidableEq κ]
+    (projection : Matrix κ ι ℝ) (source : Matrix ι ι ℝ) (target : Matrix κ κ ℝ)
+    (hgenerator : projection * source = target * projection) (time : ℝ) :
+    projection * matrixExponential source time =
+      matrixExponential target time * projection := by
+  let left : Matrix ι ι ℝ →+ Matrix κ ι ℝ :=
+    { toFun := fun matrix ↦ projection * matrix
+      map_zero' := by simp
+      map_add' := by intro first second; rw [Matrix.mul_add] }
+  let right : Matrix κ κ ℝ →+ Matrix κ ι ℝ :=
+    { toFun := fun matrix ↦ matrix * projection
+      map_zero' := by simp
+      map_add' := by intro first second; rw [Matrix.add_mul] }
+  have hleftContinuous : Continuous left := by
+    exact continuous_const.matrix_mul continuous_id
+  have hrightContinuous : Continuous right := by
+    exact continuous_id.matrix_mul continuous_const
+  have hleft :=
+    (matrixExponentialSeries_summable source time).hasSum.map left hleftContinuous
+  have hright :=
+    (matrixExponentialSeries_summable target time).hasSum.map right hrightContinuous
+  have hscaled : projection * (time • source) = (time • target) * projection := by
+    rw [Matrix.mul_smul, Matrix.smul_mul, hgenerator]
+  unfold matrixExponential
+  change left (∑' power : ℕ,
+      ((power.factorial : ℝ)⁻¹) • ((time • source) ^ power)) =
+    right (∑' power : ℕ,
+      ((power.factorial : ℝ)⁻¹) • ((time • target) ^ power))
+  rw [← hleft.tsum_eq, ← hright.tsum_eq]
+  apply tsum_congr
+  intro power
+  change projection *
+      (((power.factorial : ℝ)⁻¹) • ((time • source) ^ power)) =
+    (((power.factorial : ℝ)⁻¹) • ((time • target) ^ power)) * projection
+  rw [Matrix.mul_smul, Matrix.smul_mul,
+    matrix_pow_intertwines projection (time • source) (time • target) hscaled power]
 
 /-- Add one constant coordinate to turn `x' = A x + b` into a homogeneous system. -/
 abbrev AffineMomentCoordinate (K : ℕ) := Option (MomentCoordinate K)
@@ -618,6 +686,26 @@ structure ManyDemeRates (D : ℕ) where
   forwardMutation_nonneg : ∀ d, 0 ≤ forwardMutation d
   backwardMutation_nonneg : ∀ d, 0 ≤ backwardMutation d
 
+/-- The closed affine evolution law for expected allelic divergence
+`H(i,j) = E[X_i] + E[X_j] - 2 E[X_i X_j]` under symmetric recurrent mutation.
+
+`mutation` is the total forward-plus-backward rate (`2u` when both directions have rate
+`u`).  This operator is deliberately shared by the marginal and joint systems: a projection
+proof has one target law rather than two algebraically similar formulas. -/
+noncomputable def symmetricPairDivergenceDerivative {D : ℕ}
+    (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
+    (mutation : Fin D → ℝ) (divergence : Fin D → Fin D → ℝ)
+    (first second : Fin D) : ℝ :=
+  (if first = second then
+      -coalescence first * divergence first second
+    else 0) +
+    (∑ target, migration first target *
+      (divergence target second - divergence first second)) +
+    (∑ target, migration second target *
+      (divergence first target - divergence first second)) -
+    (mutation first + mutation second) * divergence first second +
+    (mutation first + mutation second) / 2
+
 /-- Lower one exponent, using truncated subtraction only at the coordinate whose coefficient
 already guarantees a positive exponent. -/
 def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
@@ -764,6 +852,11 @@ def pairExponent {D : ℕ} (train target : Fin D) (i j : ℕ) : Fin D → ℕ :=
   if train = target then fun d ↦ if d = train then i + j else 0
   else fun d ↦ if d = train then i else if d = target then j else 0
 
+/-- Exponent selecting one marginal moment in one deme.  It lives beside `pairExponent` so
+all consumers use the same coordinate embedding. -/
+def oneDemeExponent {D : ℕ} (deme : Fin D) (degree : ℕ) : Fin D → ℕ :=
+  fun other ↦ if other = deme then degree else 0
+
 /-- A many-deme mixed-moment oracle.  Implementations may be a sparse moment solver, the
 published JSFS dynamic program, or an exact external demography constructor; consumers see
 one typed mathematical object. -/
@@ -850,16 +943,26 @@ structure MarkerSeparationBp where
 
 /-- The two-locus moments a demographic history supplies at a recombination coordinate. -/
 structure DemographicTwoLocusMoments (D : ℕ) where
+  H : MarkerSeparationBp → Fin D → Fin D → ℝ
   DD : MarkerSeparationBp → Fin D → Fin D → ℝ
   Dz : MarkerSeparationBp → Fin D → Fin D → Fin D → ℝ
   pi2 : MarkerSeparationBp → Fin D → Fin D → Fin D → Fin D → ℝ
 
-/-- Domain on which the cross-deme `DD` correlation is defined. -/
-structure DemographicTwoLocusMoments.LDPairDomain {D : ℕ}
+/-- Minimal domain on which the normalized cross-deme `DD` quotient is evaluable. -/
+structure DemographicTwoLocusMoments.LDNormalizationDomain {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D) : Prop where
   firstWithin_pos : 0 < moments.DD rho first first
   secondWithin_pos : 0 < moments.DD rho second second
+
+/-- Certificate that an evaluable `DD` pair is also a realizable covariance pair.  This
+extra field is needed to prove `lambda ≤ 1`; it is not needed to evaluate `lambda`. -/
+structure DemographicTwoLocusMoments.LDPairDomain {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D) : Prop extends
+      moments.LDNormalizationDomain rho first second where
+  cross_sq_le : (moments.DD rho first second) ^ 2 ≤
+    moments.DD rho first first * moments.DD rho second second
 
 /-- Exact normalized cross-deme linkage correlation
 `E[D_i D_j] / sqrt(E[D_i²] E[D_j²])` for an arbitrary demographic two-locus law.
@@ -872,15 +975,16 @@ on any composed cross-deme correlation yet. -/
 noncomputable def DemographicTwoLocusMoments.crossDemeLDCorrelation {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
-    (_ : moments.LDPairDomain rho first second) : ℝ :=
+    (_ : moments.LDNormalizationDomain rho first second) : ℝ :=
   moments.DD rho first second /
     Real.sqrt (moments.DD rho first first * moments.DD rho second second)
 
 /-- The joint-channel factor on the `R²` scale.  Score accuracy is quadratic in the
-tag--causal correlation, so this is the square of the exact `DD` correlation, not an
-independently fitted retention coefficient.
+tag--causal correlation, so this is the exact quotient `DD(i,j)²/(DD(i,i)DD(j,j))`, not an
+independently fitted retention coefficient.  The next theorem identifies the quotient with
+the squared normalized correlation.
 
-Empirical status: DERIVED -- the square of `crossDemeLDCorrelation`, whose status it
+Empirical status: DERIVED -- the quotient of the composed `DD` coordinates, whose status it
 inherits; `accuracyLinkageFactor_nonneg` is its arithmetic consequence.  That score accuracy
 is quadratic in the tag--causal correlation is the standard result assumed by the consumer
 in `PhenomeWidePortability`; whether a composed history's factor matches simulation is the
@@ -888,16 +992,43 @@ untested composite claim named in `TwoLocusHistory`'s module status. -/
 noncomputable def DemographicTwoLocusMoments.accuracyLinkageFactor {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
-    (domain : moments.LDPairDomain rho first second) : ℝ :=
-  (moments.crossDemeLDCorrelation rho first second domain) ^ 2
+    (_ : moments.LDNormalizationDomain rho first second) : ℝ :=
+  (moments.DD rho first second) ^ 2 /
+    (moments.DD rho first first * moments.DD rho second second)
+
+/-- On the nondegenerate normalization domain, the determinant quotient is exactly the
+square of the normalized `DD` correlation.  The quotient form evaluates without first
+assuming Cauchy--Schwarz; the correlation form explains its statistical meaning. -/
+theorem DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D)
+    (domain : moments.LDNormalizationDomain rho first second) :
+    moments.accuracyLinkageFactor rho first second domain =
+      (moments.crossDemeLDCorrelation rho first second domain) ^ 2 := by
+  unfold DemographicTwoLocusMoments.accuracyLinkageFactor
+    DemographicTwoLocusMoments.crossDemeLDCorrelation
+  rw [div_pow, Real.sq_sqrt
+    (mul_nonneg domain.firstWithin_pos.le domain.secondWithin_pos.le)]
 
 /-- The exact joint-channel factor is nonnegative on its typed domain. -/
 theorem DemographicTwoLocusMoments.accuracyLinkageFactor_nonneg {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
-    (domain : moments.LDPairDomain rho first second) :
+    (domain : moments.LDNormalizationDomain rho first second) :
     0 ≤ moments.accuracyLinkageFactor rho first second domain :=
-  sq_nonneg _
+  div_nonneg (sq_nonneg _) (mul_nonneg domain.firstWithin_pos.le domain.secondWithin_pos.le)
+
+/-- A genuine normalized `DD` correlation cannot contribute more than one unit of
+accuracy.  The Cauchy--Schwarz fact is part of `LDPairDomain`, rather than silently assumed
+from arbitrary real-valued moment fields. -/
+theorem DemographicTwoLocusMoments.accuracyLinkageFactor_le_one {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D)
+    (domain : moments.LDPairDomain rho first second) :
+    moments.accuracyLinkageFactor rho first second domain.toLDNormalizationDomain ≤ 1 := by
+  unfold DemographicTwoLocusMoments.accuracyLinkageFactor
+  exact (div_le_one (mul_pos domain.firstWithin_pos domain.secondWithin_pos)).2
+    domain.cross_sq_le
 
 /-- The complete typed output of a demography.  Serial-founder, grid and `stdpopsim` histories
 are constructors of this interface, not new metric derivations. -/
@@ -1017,6 +1148,7 @@ recombination coordinate here, which is all the class asks: its two hypotheses a
 symmetries, and a constant family satisfies them without pretending to a decay law the
 interface deliberately does not fix. -/
 noncomputable def DemographicTwoLocusMoments.witness : DemographicTwoLocusMoments 2 where
+  H := fun _ _ _ ↦ 1
   DD := fun _ _ _ ↦ 1
   Dz := fun _ _ _ _ ↦ 0
   pi2 := fun _ _ _ _ _ ↦ 1

@@ -88,6 +88,15 @@ test checks the two enumerations agree, so the duplication cannot drift.
   estimated"). The geometric column over the same points *is* informative,
   because it fits one parameter to `d=1` and then predicts `d=2` with no freedom
   left; it fails by 26-57%, which is the result.
+* `ld2d_iter.py` (SOURCE) / `ld2d_iter.log` (RECORD) — the completed
+  preregistered comparison, using BiCGSTAB with Jacobi preconditioning after the
+  direct sparse solve became fill-in limited.  It first reproduces every 3x3
+  logged value, then solves 4x4, 5x5, and an additional 6x6 lattice with relative
+  residual below `1e-12`, and scores the frozen criteria mechanically.  The
+  branches are `RULED OUT` at `rho=1` (Bessel shape fits but its decay length is
+  unrelated to the 1-D value) and `FAIL` at `rho=5,20` (the Bessel shape itself
+  fails).  The filed inconclusive branch does not trigger: the 4x4 and 5x5 fitted
+  lengths differ by less than 15% at every rho.
 
 ### The exact pairwise tables for the gnomon demographies
 * `pairF.py` (SOURCE) — integrates the structured pair coalescent through each
@@ -109,5 +118,9 @@ rate 1.
 
 ## What this directory does not contain
 
-A law for the 2-D lattice. The 1-D geometric law is falsified there and the
-Bessel replacement is untested; `ld2d_prereg.md` states what would settle it.
+A scalar law for the 2-D lattice.  The 1-D geometric law is falsified there and
+the preregistered shared-length Bessel replacement has now been ruled out or
+failed.  The exact finite ancestral-configuration operator remains the law that
+evaluates the lattice; this directory does not reduce that operator to a scalar
+distance curve or prove a coordinatewise equivalence with the Lean low-order
+moment generator.
