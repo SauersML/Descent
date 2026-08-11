@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Coalescent.Structured
 import Descent.Core.Moments
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Tactic
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
@@ -208,6 +209,127 @@ theorem solvedTwoDemeJointSampleCount_outside
     (i j : ℕ) (h : ¬ (i ≤ ns ∧ j ≤ nt)) :
     solvedTwoDemeJointSampleCount ns nt system i j = 0 := by
   simp [solvedTwoDemeJointSampleCount, h]
+
+/-! ### Transient piecewise demographies -/
+
+/-- Homogeneous generator for the nonconstant moment coordinates.  Unlike the stationary
+square solve, unused padding coordinates have zero rows: they do not evolve. -/
+noncomputable def twoDemeMomentDynamicsMatrix (r : TwoDemeRates) (K : ℕ) :
+    Matrix (MomentCoordinate K) (MomentCoordinate K) ℝ :=
+  fun row column ↦
+    let i := row.1.val
+    let j := row.2.val
+    if 0 < i + j ∧ i + j ≤ K then
+      twoDemeMomentGenerator r (momentBasisTable K column) i j
+    else 0
+
+/-- The exact matrix exponential, defined by its absolutely convergent power series. -/
+noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) : Matrix ι ι ℝ :=
+  ∑' power : ℕ, (time ^ power / power.factorial) • (A ^ power)
+
+/-- Add one constant coordinate to turn `x' = A x + b` into a homogeneous system. -/
+abbrev AffineMomentCoordinate (K : ℕ) := Option (MomentCoordinate K)
+
+/-- Augmented affine generator `[A b; 0 0]`.  `none` is the constant coordinate. -/
+noncomputable def augmentedTwoDemeMomentGenerator (r : TwoDemeRates) (K : ℕ) :
+    Matrix (AffineMomentCoordinate K) (AffineMomentCoordinate K) ℝ
+  | some row, some column => twoDemeMomentDynamicsMatrix r K row column
+  | some row, none => twoDemeMomentForcing r K row
+  | none, _ => 0
+
+/-- One piecewise-constant epoch.  Rates may change arbitrarily between epochs. -/
+structure TwoDemeMomentEpoch (K : ℕ) where
+  rates : TwoDemeRates
+  duration : ℝ
+  duration_nonneg : 0 ≤ duration
+
+/-- Exact propagator of one epoch. -/
+noncomputable def TwoDemeMomentEpoch.propagator {K : ℕ}
+    (epoch : TwoDemeMomentEpoch K) :
+    Matrix (AffineMomentCoordinate K) (AffineMomentCoordinate K) ℝ :=
+  matrixExponential (augmentedTwoDemeMomentGenerator epoch.rates K) epoch.duration
+
+/-- At an instantaneous split the two daughter frequencies equal the ancestral frequency,
+so the mixed moment `(i,j)` is the ancestral moment of total degree `i+j`. -/
+noncomputable def splitMomentState (K : ℕ) (ancestralMoment : ℕ → ℝ) :
+    AffineMomentCoordinate K → ℝ
+  | none => 1
+  | some coordinate =>
+      let i := coordinate.1.val
+      let j := coordinate.2.val
+      if 0 < i + j ∧ i + j ≤ K then ancestralMoment (i + j) else 0
+
+/-- Apply a list of epochs in forward-time order. -/
+noncomputable def propagateTwoDemeMomentEpochs {K : ℕ}
+    (epochs : List (TwoDemeMomentEpoch K))
+    (initial : AffineMomentCoordinate K → ℝ) : AffineMomentCoordinate K → ℝ :=
+  epochs.foldl (fun state epoch ↦ epoch.propagator.mulVec state) initial
+
+/-- Arbitrary piecewise-constant two-deme history from an ancestral frequency law. -/
+structure PiecewiseTwoDemeMomentDemography (K : ℕ) where
+  ancestralMoment : ℕ → ℝ
+  ancestralNormalized : ancestralMoment 0 = 1
+  epochs : List (TwoDemeMomentEpoch K)
+
+/-- Present-day mixed moment under the full epoch cascade. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.presentMoment {K : ℕ}
+    (demography : PiecewiseTwoDemeMomentDemography K) (i j : ℕ) : ℝ :=
+  if hzero : i = 0 ∧ j = 0 then 1
+  else if hi : i < K + 1 then
+    if hj : j < K + 1 then
+      if hdegree : i + j ≤ K then
+        propagateTwoDemeMomentEpochs demography.epochs
+          (splitMomentState K demography.ancestralMoment) (some (⟨i, hi⟩, ⟨j, hj⟩))
+      else 0
+    else 0
+  else 0
+
+/-- Present-day Bernstein core after an arbitrary epoch cascade. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.jointBernsteinCore {K : ℕ}
+    (demography : PiecewiseTwoDemeMomentDemography K)
+    (i j remainingSource remainingTarget : ℕ) : ℝ :=
+  ∑ a ∈ Finset.range (remainingSource + 1),
+    ∑ b ∈ Finset.range (remainingTarget + 1),
+      (Nat.choose remainingSource a : ℝ) * (Nat.choose remainingTarget b : ℝ) *
+        (-1 : ℝ) ^ (a + b) * demography.presentMoment (i + a) (j + b)
+
+/-- A1 for an arbitrary finite epoch cascade.  The type index pins the moment degree to the
+two requested sample sizes. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.jointSampleCount
+    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt))
+    (i j : ℕ) : ℝ :=
+  if i ≤ ns ∧ j ≤ nt then
+    (Nat.choose ns i : ℝ) * (Nat.choose nt j : ℝ) *
+      demography.jointBernsteinCore i j (ns - i) (nt - j)
+  else 0
+
+/-- Fixed differences are events of the transient joint law. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.fixedDifference
+    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : ℝ :=
+  demography.jointSampleCount ns nt ns 0 + demography.jointSampleCount ns nt 0 nt
+
+/-- Target monomorphism conditional on source polymorphism under the same transient law. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.targetErosionGivenSourcePolymorphic
+    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : ℝ :=
+  (∑ i ∈ Finset.Icc 1 (ns - 1),
+      demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt) /
+    (∑ i ∈ Finset.Icc 1 (ns - 1),
+      ∑ j ∈ Finset.range (nt + 1), demography.jointSampleCount ns nt i j)
+
+/-- Conditional target spectrum under the full transient demography. -/
+noncomputable def PiecewiseTwoDemeMomentDemography.conditionalTargetSpectrum
+    (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt))
+    (sourceCount targetCount : ℕ) : ℝ :=
+  demography.jointSampleCount ns nt sourceCount targetCount /
+    (∑ j ∈ Finset.range (nt + 1),
+      demography.jointSampleCount ns nt sourceCount j)
+
+/-- Zero-duration epochs are identity propagators: an exact analytic limit. -/
+theorem matrixExponential_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) : matrixExponential A 0 = 1 := by
+  unfold matrixExponential
+  simp
 
 /-- Fixed difference under the directly solved joint law. -/
 noncomputable def solvedTwoDemeFixedDifference
