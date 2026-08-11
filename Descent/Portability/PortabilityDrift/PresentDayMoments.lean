@@ -121,6 +121,20 @@ noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
     is exhibited as values rather than as a law, because the corpus states no
     shape here and this witness is not the place to smuggle one back.
 
+    THE TABLE DOES NOT TRANSFER TO A MULTI-DEME PAIR AT SEPARATION `≥ 2`, and the reason is
+    in the run's own scope rather than in any later measurement. The cell integrated is a
+    TWO-DEME split with continuous symmetric migration
+    (`moments.LD.Demographics2D.split_mig`), so what the table holds is that demography's
+    surface. It is NOT a function of `F_ST` that a stepping-stone pair may be looked up in.
+    Matching a distant pair's `F_ST` to this cell's and reading `Corr(D)` off the row is a
+    substitution nothing here licenses: two demes exchanging migrants directly and two demes
+    separated by intervening ones can arrive at the same one-locus `F_ST` along different
+    histories, and the two-locus moments are not determined by the one-locus moment. A pair
+    at separation `0` or `1` is inside this demography; anything beyond it needs its own
+    integration, not this row rescaled. How far wrong the `F_ST`-matched reduction goes has
+    been measured outside the corpus and the numbers are owed here — until they are cited
+    from a committed run, the prohibition rests on the scope argument above and not on them.
+
     Empirical status: NOT AN EMPIRICAL CLAIM. It is a witness — an instance
     exhibited so that statements about the structure have something to be about.
     What was measured is the surface it reads, and that measurement's provenance
