@@ -520,7 +520,13 @@ varies is a free parameter in the signature and a constant in fact.
     together. `α = 1` is the right coefficient AND the body is approximate at depth: at
     `d = 9` the chart returns 0.255 against an exact 0.193. So the shape coefficient is
     settled and the `d`-dependence at large separation is not, which is the same residual
-    drift in `K = d(1-F)/F` that `battery_bulk11` reports. -/
+    drift in `K = d(1-F)/F` that `battery_bulk11` reports.
+
+    Power: the prediction spans 0.13357 to 0.29132 over `d` = 3, 5, 8, and the
+    comparison was stacked AGAINST this body -- the rival linear form was given a
+    free `α` fitted at `d = 2` and this one was given nothing but `F(1)`. The
+    linear form is FALSIFIED at 10.38 sems and 31.8 percent with that fitted
+    parameter in hand where this one matches at 1.87 with none. -/
 noncomputable def steppingStoneFst (fst_neighbor : ℝ) (d : ℕ) : ℝ :=
   steppingStoneFstGeneral fst_neighbor 1 d
 

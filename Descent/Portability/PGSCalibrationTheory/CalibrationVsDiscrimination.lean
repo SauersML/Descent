@@ -48,7 +48,9 @@ scopes `variable`s and this file declares none at that level, so the reopening i
     `test_prevalence_logit`). The oracle is the fitted intercept of an
     intercept-only logistic model on four million simulated binary outcomes,
     which is what a calibration-in-the-large is read off in practice; worst 2.66
-    sems over a prediction spanning -3.89182 to -0.61904. -/
+    sems over a prediction spanning -3.89182 to -0.61904.
+
+    Power: the prediction spans -3.89182 to -0.61904 across the design. -/
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 

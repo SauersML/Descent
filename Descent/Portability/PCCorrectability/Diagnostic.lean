@@ -35,7 +35,8 @@ axis.  `scale` collects the positive locus- and panel-count factors.
     1.31% relative, over designs where the offset runs 0 to 1 and the axis
     spread 0.5 to 2.
 
-    Power, and the practical warning: the same inner product with the axis left
+    Power: the offset runs 0 to 1 and the axis spread 0.5 to 2, and the practical
+    warning is what that sweep buys. The same inner product with the axis left
     UNCENTRED misses by up to 894 sems (1333% relative). The two agree exactly
     when the offset is zero and diverge without bound as it grows -- at
     `shift = 1.0` the uncentred form reads 1.075 where the truth is 0.075, a

@@ -280,7 +280,13 @@ theorem fisherTraceMSELowerBound_zero_neff_is_junk (nParams infoPerSample : ℝ)
     `τ` by 878 to 9819 sems, `(d·I)/τ` by 96 to 3320, and `(d²/I)/τ` by 393 to
     1777. So the design fixes both exponents and the direction of `I`, which a
     single family could not: inverting `I` is invisible when `I` is 1/4 unless a
-    second family puts it above one. -/
+    second family puts it above one.
+
+    Power: the required `n` spans 10 to 4000 across the design, and the design
+    runs TWO exponential families so that `I` is not a relabelled variance --
+    Gaussian location at `I = 1/4` against Bernoulli at `I = 4.76`. Three
+    competitors, each run at its own `n`, all miss `τ`: `(d/I)/τ²` by 878 to 9819
+    sems, `(d·I)/τ` by 96 to 3320, and `(d²/I)/τ` by 393 to 1777. -/
 noncomputable def requiredEffectiveSampleSizeForTraceMSE
     (nParams infoPerSample targetTraceMSE : ℝ) : ℝ :=
   adaptationDifficultyIndex nParams infoPerSample / targetTraceMSE

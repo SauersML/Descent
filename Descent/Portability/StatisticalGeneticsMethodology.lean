@@ -326,7 +326,13 @@ correct inverse-variance meta-analysis **weight**, and where a weight is wanted
     `0.9965, 1.0065, 1.0966, 1.0283`.
 
     Empirical status: **VALIDATED at small effect**, biased upward at large effect
-    (`validation/empirical/ldsc_diff/`). -/
+    (`validation/empirical/ldsc_diff/`).
+
+    Power: allele frequency is swept from 0.5 down to 0.01, a fiftyfold range
+    over which the `2p(1-p)` factor is the whole difference between this body and
+    `1/SE²` alone -- and the design is what shows that, since the bare form
+    understates by 50 percent at `p = 0.5` and by 98 percent at `p = 0.01` while
+    this one holds to about 1 percent throughout. -/
 noncomputable def effectiveSampleSizeFromSE (se p : ℝ) : ℝ :=
   1 / (se ^ 2 * (2 * p * (1 - p)))
 

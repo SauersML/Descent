@@ -157,7 +157,12 @@ it. -/
 
     The identity gate: the exponential reading `exp(-rt)` misses by up to 27 sems, `(1-r)^2t`
     by 68, and the linear `1 - rt` by 98. The positive control -- NO recombination, where the
-    disequilibrium must persist unchanged -- passes on the identical `evolve` path. -/
+    disequilibrium must persist unchanged -- passes on the identical `evolve` path.
+
+    Power: the prediction spans 0.01680 to 0.90250 across the design, with `r`
+    swept eightfold so that `(1-r)^t` and `exp(-rt)` separate at all, and three
+    readings die on the same cells -- the exponential by up to 27 sems,
+    `(1-r)^2t` by 68 and the linear `1 - rt` by 98. -/
 noncomputable def ldDecayPerGeneration (r : ℝ) (t : ℕ) : ℝ :=
   Descent.Core.geometricDecay r t
 

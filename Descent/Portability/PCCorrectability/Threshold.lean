@@ -281,7 +281,13 @@ silently reinterpreted as the different Nei functional.
 
     The competitor on the same cells is `neiContrastSpike`: supplying Nei's `G_ST` to the
     same body moves the answer by a factor approaching two at weak differentiation, so the
-    measurement identifies the ESTIMATOR as well as the constant. -/
+    measurement identifies the ESTIMATOR as well as the constant.
+
+    Power: the recovered constant is 3.9920 ± 0.0045, which sits 1.8 sems from
+    the derived 4 and 442 sems from the 2 the constant might otherwise have been,
+    so the run discriminates it rather than tolerating it. The estimator is on
+    trial too: supplying Nei's `G_ST` to the same body moves the answer by a
+    factor approaching two at weak differentiation. -/
 noncomputable def hudsonBbpSpike (n m p₁ p₂ : ℝ) : ℝ :=
   demographicSpike n (Descent.Core.hudsonFst p₁ p₂) m
 

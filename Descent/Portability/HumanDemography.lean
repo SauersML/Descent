@@ -332,7 +332,12 @@ Measured in `validation/empirical/drift_diff/`. Use `taggedDriftR2RatioCorrected
     rationals, 12 of 12 replicates across two independent designs — where a form that also
     shrinks the denominator runs `+15%` to `+112%` high.
 
-    Empirical status: **VALIDATED** (`validation/empirical/drift_diff/`). -/
+    Empirical status: **VALIDATED** (`validation/empirical/drift_diff/`).
+
+    Power: the rival that ALSO shrinks the denominator is carried on the same
+    cells and runs 15 to 112 percent high, over 12 of 12 replicates across 2
+    independent designs where this body reproduces the simulation at 0.00000 in
+    exact rationals. -/
 noncomputable def taggedDriftR2RatioCorrected (V_A V_E fst shared_ld : ℝ) : ℝ :=
   (1 - fst) * shared_ld * (V_A + V_E) / ((1 - fst) * V_A + V_E)
 
