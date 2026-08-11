@@ -78,8 +78,11 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
     value is `0.105`, three orders of magnitude too small. The mixture law
     matches simulation to three decimals at every overlap fraction tested.
 
-    `n_gwas` is retained in the signature and unused, so that existing call
-    sites keep their arity; nothing depends on it.
+    THE DISCOVERY SAMPLE SIZE IS GONE FROM THE SIGNATURE, and that is the
+    measurement's verdict rather than a tidy-up. A body that still took `n_gwas`
+    would advertise a dependence this design refuted by three orders of
+    magnitude, and an argument a caller must supply and the body must ignore is
+    the shape a spurious divisor leaves behind when only its value is removed.
 
     Convention: `r2_true` is out-of-sample, `h2` is the in-sample value.
 
@@ -93,25 +96,25 @@ theorem overlap_inflation_positive (r2_true r2_observed : ℝ)
     The superseded `f (h2 - r2_true) / n_gwas` form predicts `0.000045` at the
     same last cell, so the design separates them by three orders of magnitude
     rather than by a margin. -/
-noncomputable def partialOverlapR2 (r2_true h2 : ℝ) (f : ℝ) (_n_gwas : ℕ) : ℝ :=
+noncomputable def partialOverlapR2 (r2_true h2 f : ℝ) : ℝ :=
   (1 - f) * r2_true + f * h2
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem partialOverlapR2_at_reference_point :
-    partialOverlapR2 1 1 1 1 = 1 := by
+    partialOverlapR2 1 1 1 = 1 := by
   norm_num [partialOverlapR2]
 
 /-- Zero overlap gives unbiased estimate. -/
-theorem no_overlap_unbiased (r2_true h2 : ℝ) (n_gwas : ℕ) :
-    partialOverlapR2 r2_true h2 0 n_gwas = r2_true := by
+theorem no_overlap_unbiased (r2_true h2 : ℝ) :
+    partialOverlapR2 r2_true h2 0 = r2_true := by
   unfold partialOverlapR2; ring
 
 /-- More overlap → more inflation (when h² > R²_true). -/
-theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ) (n_gwas : ℕ)
+theorem more_overlap_more_inflation (r2_true h2 f₁ f₂ : ℝ)
     (h_h2 : r2_true < h2)
     (h_f : f₁ < f₂) :
-    partialOverlapR2 r2_true h2 f₁ n_gwas <
-      partialOverlapR2 r2_true h2 f₂ n_gwas := by
+    partialOverlapR2 r2_true h2 f₁ <
+      partialOverlapR2 r2_true h2 f₂ := by
   unfold partialOverlapR2
   have h_diff : 0 < h2 - r2_true := by linarith
   nlinarith [mul_lt_mul_of_pos_right h_f h_diff]
@@ -134,16 +137,16 @@ section CrossAncestryNoOverlap
     The apparent portability gap therefore includes a spurious
     overlap-driven component. -/
 theorem apparent_portability_loss_includes_overlap
-    (r2_same_true h2 r2_cross : ℝ) (f : ℝ) (n_gwas : ℕ)
+    (r2_same_true h2 r2_cross : ℝ) (f : ℝ)
     (h_h2 : r2_same_true < h2)
     (h_f_pos : 0 < f)
     (h_real_gap : r2_cross < r2_same_true) :
-    r2_cross < partialOverlapR2 r2_same_true h2 f n_gwas ∧
-    partialOverlapR2 r2_same_true h2 f n_gwas - r2_cross >
+    r2_cross < partialOverlapR2 r2_same_true h2 f ∧
+    partialOverlapR2 r2_same_true h2 f - r2_cross >
       r2_same_true - r2_cross := by
-  have h_inflation : r2_same_true < partialOverlapR2 r2_same_true h2 f n_gwas := by
-    have h0 := no_overlap_unbiased r2_same_true h2 n_gwas
-    have hlt := more_overlap_more_inflation r2_same_true h2 0 f n_gwas h_h2 h_f_pos
+  have h_inflation : r2_same_true < partialOverlapR2 r2_same_true h2 f := by
+    have h0 := no_overlap_unbiased r2_same_true h2
+    have hlt := more_overlap_more_inflation r2_same_true h2 0 f h_h2 h_f_pos
     rw [h0] at hlt
     exact hlt
   constructor
@@ -230,9 +233,8 @@ theorem loo_reduces_overfitting
     (overlap fraction f) and then on the excluded sample (overlap fraction 0)
     yields a difference that exactly equals the bias term.
     Derived from the structural definition of `partialOverlapR2`. -/
-theorem gwas_subtraction_estimates_bias
-    (r2_true h2 f : ℝ) (n_gwas : ℕ) :
-    partialOverlapR2 r2_true h2 f n_gwas - partialOverlapR2 r2_true h2 0 n_gwas =
+theorem gwas_subtraction_estimates_bias (r2_true h2 f : ℝ) :
+    partialOverlapR2 r2_true h2 f - partialOverlapR2 r2_true h2 0 =
       f * (h2 - r2_true) := by
   unfold partialOverlapR2
   ring
