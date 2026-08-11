@@ -1,0 +1,69 @@
+{
+  "checks": {
+    "all_semantic_invariants_equal": true,
+    "some_node_statistics_differ": true
+  },
+  "claim": "kernel statistics survive lossless presentation rewrites; node statistics need not",
+  "presentations": {
+    "atomic": {
+      "invariant": {
+        "atom_support_histogram": {"1": 1, "2": 1, "3": 6},
+        "pairwise_hamming_sum": 2,
+        "semantic_coordinate_count": 8,
+        "semantic_kernel_sha256": "4d5c4273cb130a6948fc0f553943f1cba83a17c1938f5d4af9fbc4b74c5cdf24",
+        "spelled_haplotypes": {"h1": "ACGTGGA", "h2": "ACGCGGA", "h3": "ACGCGGA"},
+        "weighted_support_mass": 21
+      },
+      "presentation_dependent": {
+        "edge_count": 8,
+        "node_count": 8,
+        "node_support_histogram": {"1": 1, "2": 1, "3": 6}
+      }
+    },
+    "coarse": {
+      "invariant": {
+        "atom_support_histogram": {"1": 1, "2": 1, "3": 6},
+        "pairwise_hamming_sum": 2,
+        "semantic_coordinate_count": 8,
+        "semantic_kernel_sha256": "4d5c4273cb130a6948fc0f553943f1cba83a17c1938f5d4af9fbc4b74c5cdf24",
+        "spelled_haplotypes": {"h1": "ACGTGGA", "h2": "ACGCGGA", "h3": "ACGCGGA"},
+        "weighted_support_mass": 21
+      },
+      "presentation_dependent": {
+        "edge_count": 4,
+        "node_count": 4,
+        "node_support_histogram": {"1": 1, "2": 1, "3": 2}
+      }
+    },
+    "mixed": {
+      "invariant": {
+        "atom_support_histogram": {"1": 1, "2": 1, "3": 6},
+        "pairwise_hamming_sum": 2,
+        "semantic_coordinate_count": 8,
+        "semantic_kernel_sha256": "4d5c4273cb130a6948fc0f553943f1cba83a17c1938f5d4af9fbc4b74c5cdf24",
+        "spelled_haplotypes": {"h1": "ACGTGGA", "h2": "ACGCGGA", "h3": "ACGCGGA"},
+        "weighted_support_mass": 21
+      },
+      "presentation_dependent": {
+        "edge_count": 6,
+        "node_count": 6,
+        "node_support_histogram": {"1": 1, "2": 1, "3": 4}
+      }
+    },
+    "relabelled": {
+      "invariant": {
+        "atom_support_histogram": {"1": 1, "2": 1, "3": 6},
+        "pairwise_hamming_sum": 2,
+        "semantic_coordinate_count": 8,
+        "semantic_kernel_sha256": "4d5c4273cb130a6948fc0f553943f1cba83a17c1938f5d4af9fbc4b74c5cdf24",
+        "spelled_haplotypes": {"h1": "ACGTGGA", "h2": "ACGCGGA", "h3": "ACGCGGA"},
+        "weighted_support_mass": 21
+      },
+      "presentation_dependent": {
+        "edge_count": 4,
+        "node_count": 4,
+        "node_support_histogram": {"1": 1, "2": 1, "3": 2}
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.DriftRecurrences
 import Descent.PopGen.DGP
+import Descent.Pangenome.HaplotypeGluing
 
 -- `driftLDStep` is proved equal to `ibdRecurrenceStep` and
 -- `islandFstMultiplicativeStep` by unfolding both, and the Frobenius mismatch
@@ -1607,6 +1608,30 @@ theorem ld_decay_closed_form (r D₀ : ℝ) (t : ℕ) :
     simp
   | succ n ih =>
     simp [ih, pow_succ, mul_left_comm, mul_comm]
+
+/-- **Recombination acts directly on the gluing obstruction.**  For a normalized binary
+haplotype table, the initial probabilistic gluing residual is classical `D`; the existing
+recombination recurrence therefore multiplies that local-to-global obstruction by
+`(1-r)^t`.  This is the exact two-locus instance of obstruction-mode decay, with no second
+LD definition introduced. -/
+theorem binaryGluingResidual_decay_eq
+    (r p00 p01 p10 p11 : ℝ) (t : ℕ) (hTotal : p00 + p01 + p10 + p11 = 1) :
+    ldRecurrence r
+        (Descent.Pangenome.HaplotypeGluing.binaryGluingResidual p00 p01 p10 p11) t =
+      (1 - r) ^ t *
+        Descent.Pangenome.HaplotypeGluing.binaryLinkageDeterminant p00 p01 p10 p11 := by
+  rw [ld_decay_closed_form,
+    Descent.Pangenome.HaplotypeGluing.binaryGluingResidual_eq_tableDeterminant
+      p00 p01 p10 p11 hTotal]
+
+/-- The direct admixture-LD trajectory in `Foundations` and the population-genetic
+recombination recurrence are the same construction. -/
+theorem admixtureLDAtGen_eq_ldRecurrence
+    (alpha pA qA pB qB r : ℝ) (t : ℕ) :
+    Descent.Foundations.admixtureLDAtGen alpha pA qA pB qB r t =
+      ldRecurrence r (Descent.Foundations.admixtureLDTwoLocus alpha pA qA pB qB) t := by
+  rw [ld_decay_closed_form]
+  rfl
 
 /-- **The LD decay is the corpus's geometric decay, on the nose.**
 
