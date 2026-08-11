@@ -1237,6 +1237,15 @@
       "role": "consumer",
       "constants": [],
       "note": "Feeds `steppingStoneFst`'s output straight into `neutralPortability`'s `fst` slot, so it returns a portability in whatever convention `fst_neighbor` was supplied in. That the two stages want the same reading is the untested join, not a settled fact: the stepping-stone body is measured against F_ST read from coalescence times, and the portability chart is measured against transported R-squared."
+    },
+    "Descent/Portability/EndToEndScoreLaw.lean::PipelineDemographicHistory.hudsonFst": {
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1",
+        "2"
+      ],
+      "note": "Hudson, and by construction rather than by assertion: the body is 1 - ((withinHeterozygosity first + withinHeterozygosity second)/2) / betweenDivergence, where withinHeterozygosity is E[2x(1-x)] and betweenDivergence is E[x_i(1-x_j)] + E[x_j(1-x_i)], all read from the pipeline's exact propagated moments -- the ratio-of-averages with the BETWEEN-pair heterozygosity in the denominator, which is Hudson's definition in the Bhatia-Patterson reading and the same denominator the corpus already ledgers at Core/Fst.lean::hudsonFst.  It is NOT Nei's G_ST: no total-pool heterozygosity enters, and the bridge theorems hudsonFst_eq_of_neiGst and no_constant_scales_neiGst_to_hudsonFst carry the exact non-relation.  The zero-divergence pole is excluded by the typed HudsonFstDomain hypothesis rather than by a clamp, so a singular pair is unrepresentable instead of silently zero.  Constants: the 1 is the complement and the 2 is the two-deme average in the numerator (with the matching 2 inside withinHeterozygosity and betweenDivergence's cross term), none a fitted parameter."
     }
   }
 }
