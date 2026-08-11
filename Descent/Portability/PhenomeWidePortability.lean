@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.StructuredPresentDay
+import Descent.Coalescent.TwoDemeLDClosedForm
 import Descent.PopGen.SelectionArchitecture
 import Descent.PopGen.DriftRegime
 import Descent.Portability.PortabilityBounds
@@ -2060,10 +2062,13 @@ cannot be written that way, and the reason is a measurement rather than a gap in
 Two effects run in opposite directions along such a chain. Drift and limited migration push
 `F_ST` up with distance, which `steppingStoneFstGeneral` describes and which costs transported `R²`.
 Ongoing gene flow also RESTORES shared linkage disequilibrium between demes, which recovers
-some of what the LD stage takes away. The first effect has a validated body. The second does
-not: `DGP.migrationLDBoost` is the corpus's only candidate and `simcov/battery_bulk55.py`
-FALSIFIES it in magnitude at worst 15.6 sems and 62% relative, while rejecting no restoration
-at all at 8.3 sems. So restoration is real and no formula for it survives.
+some of what the LD stage takes away. The first effect has a validated body. The second has no
+law in this scalar chain model: `DGP.migrationLDBoost` is its only candidate and
+`simcov/battery_bulk55.py` FALSIFIES it in magnitude at worst 15.6 sems and 62% relative,
+while rejecting no restoration at all at 8.3 sems.  The exact stationary two-deme determinant
+law now lives at `Coalescent.publishedTwoDemeDCorrelation`, but applying it here would be the
+already-refuted reduction of a many-deme transient history to a two-deme scalar surface.  So
+restoration is real and no point formula with this construction's inputs survives.
 
 That is what forces a bracket. The UPPER end applies the drift-and-migration penalty and no LD
 penalty at all, which is the limit of complete restoration. The LOWER end multiplies the upper
@@ -2360,6 +2365,28 @@ theorem steppingStonePortability_mem_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss l
         ≤ steppingStonePortability r2_0 f1 d := by
   have hnn := steppingStonePortability_nonneg r2_0 f1 d hr2 hr2' hf hf'
   exact ⟨mul_le_mul_of_nonneg_left hlow hnn, mul_le_of_le_one_right hnn hhigh⟩
+
+/-- Candidate point inside the former shaded band after replacing the free restoration scalar
+by the derived squared `DD` correlation.  Exact endpoint status additionally requires a
+coherence theorem showing that the separately supplied stepping-stone marginal factor and
+two-locus moment family arise from the same demographic/mutation/ascertainment model. -/
+noncomputable def steppingStonePortabilityFromTwoLocusMomentsCandidate {D : ℕ}
+    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
+    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
+    (domain : moments.LDPairDomain rho source target) : ℝ :=
+  steppingStonePortability r2_0 f1 d *
+    moments.accuracyLinkageFactor rho source target domain
+
+/-- The candidate is definitionally the marginal factor times derived `lambda`; this removes
+the fitted linkage coordinate but does not supply the missing cross-model coherence proof. -/
+theorem steppingStonePortabilityFromTwoLocusMomentsCandidate_eq {D : ℕ}
+    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
+    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
+    (domain : moments.LDPairDomain rho source target) :
+    steppingStonePortabilityFromTwoLocusMomentsCandidate
+      r2_0 f1 d moments rho source target domain =
+      steppingStonePortability r2_0 f1 d *
+        (moments.crossDemeLDCorrelation rho source target domain) ^ 2 := rfl
 
 /-- **The bracket is a nonempty interval of nonnegative `R²`.** The lower end is at or above
     zero and at or below the upper end, for any LD retention in `[0, 1]`. Stated separately

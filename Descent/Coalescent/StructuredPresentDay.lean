@@ -68,6 +68,17 @@ theorem cramerCoordinate_eq_det_ratio (A : Matrix ι ι ℝ)
     (b : ι → ℝ) (k : ι) :
     cramerCoordinate A b k = (replaceColumn A b k).det / A.det := rfl
 
+/-- A ratio of two coordinates from the same nonsingular Cramer system cancels the common
+operator determinant.  Keeping this proof abstract avoids expanding a concrete large matrix. -/
+theorem cramerCoordinate_ratio_eq_replaceColumn_ratio
+    (A : Matrix ι ι ℝ) (b : ι → ℝ) (numerator denominator : ι)
+    (hoperator : A.det ≠ 0)
+    (hdenominator : (replaceColumn A b denominator).det ≠ 0) :
+    cramerCoordinate A b numerator / cramerCoordinate A b denominator =
+      (replaceColumn A b numerator).det / (replaceColumn A b denominator).det := by
+  unfold cramerCoordinate
+  field_simp [hoperator, hdenominator]
+
 /-- A singular symbolic system is named rather than silently interpreted as a zero law. -/
 theorem cramerCoordinate_at_singular_is_junk (A : Matrix ι ι ℝ)
     (b : ι → ℝ) (k : ι) (h : A.det = 0) :
@@ -212,6 +223,34 @@ theorem solvedTwoDemeJointSampleCount_outside
     solvedTwoDemeJointSampleCount ns nt system i j = 0 := by
   simp [solvedTwoDemeJointSampleCount, h]
 
+/-! ### Sample-size-specific ascertainment events -/
+
+/-- Mass of the event that the source sample is polymorphic.  The cohort sizes occur in the
+event itself: source counts range from `1` through `ns - 1`, and every target count through
+`nt` is marginalized.  This is not a time parameter. -/
+noncomputable def sourcePolymorphicEventMass
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) : ℝ :=
+  ∑ i ∈ Finset.Icc 1 (ns - 1),
+    ∑ j ∈ Finset.range (nt + 1), jointCount i j
+
+/-- Mass of source polymorphism together with target monomorphism.  Increasing `nt` moves
+the upper monomorphic boundary from the count `nt` to the new cohort size, so a cohort-size
+change alters the conditioning event even if the underlying frequency law is held fixed. -/
+noncomputable def sourcePolymorphicTargetMonomorphicEventMass
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) : ℝ :=
+  ∑ i ∈ Finset.Icc 1 (ns - 1), (jointCount i 0 + jointCount i nt)
+
+/-- Exact cohort-evaluation functional: target monomorphism conditional on observed source
+polymorphism, evaluated from one joint count law.  A time-shift approximation is not an
+argument of this definition; sample-size dependence enters both the supplied Bernstein law
+and the event boundaries above. -/
+noncomputable def targetErosionEvent
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) : Option ℝ :=
+  let denominator := sourcePolymorphicEventMass jointCount ns nt
+  if 0 < denominator then
+    some (sourcePolymorphicTargetMonomorphicEventMass jointCount ns nt / denominator)
+  else none
+
 /-! ### Transient piecewise demographies -/
 
 /-- Homogeneous generator for the nonconstant moment coordinates.  Unlike the stationary
@@ -320,11 +359,7 @@ noncomputable def PiecewiseTwoDemeMomentDemography.fixedDifference
 /-- Target monomorphism conditional on source polymorphism under the same transient law. -/
 noncomputable def PiecewiseTwoDemeMomentDemography.targetErosionGivenSourcePolymorphic
     (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : Option ℝ :=
-  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    (demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt)
-  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    ∑ j ∈ Finset.range (nt + 1), demography.jointSampleCount ns nt i j
-  if 0 < denominator then some (numerator / denominator) else none
+  targetErosionEvent (demography.jointSampleCount ns nt) ns nt
 
 /-- Conditional target spectrum under the full transient demography. -/
 noncomputable def PiecewiseTwoDemeMomentDemography.conditionalTargetSpectrum
@@ -353,12 +388,7 @@ noncomputable def solvedTwoDemeFixedDifference
 same directly solved joint law. -/
 noncomputable def solvedTwoDemeTargetErosionGivenSourcePolymorphic
     (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : Option ℝ :=
-  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    (solvedTwoDemeJointSampleCount ns nt system i 0 +
-      solvedTwoDemeJointSampleCount ns nt system i nt)
-  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    ∑ j ∈ Finset.range (nt + 1), solvedTwoDemeJointSampleCount ns nt system i j
-  if 0 < denominator then some (numerator / denominator) else none
+  targetErosionEvent (solvedTwoDemeJointSampleCount ns nt system) ns nt
 
 /-- Conditional target spectrum at a given source count, directly from the symbolic joint
 law. -/
@@ -425,14 +455,7 @@ sample.  Conditioning happens once, by division by the source-polymorphic mass; 
 sign-changing correction term. -/
 noncomputable def twoDemeTargetErosionGivenSourcePolymorphic
     (law : TwoDemePresentDayLaw) (ns nt : ℕ) : Option ℝ :=
-  let sourcePolyTargetMono :=
-    ∑ i ∈ Finset.Icc 1 (ns - 1),
-      (twoDemeJointSampleCount law ns nt i 0 +
-        twoDemeJointSampleCount law ns nt i nt)
-  let sourcePoly :=
-    ∑ i ∈ Finset.Icc 1 (ns - 1),
-      ∑ j ∈ Finset.range (nt + 1), twoDemeJointSampleCount law ns nt i j
-  if 0 < sourcePoly then some (sourcePolyTargetMono / sourcePoly) else none
+  targetErosionEvent (twoDemeJointSampleCount law ns nt) ns nt
 
 /-- Conditional target spectrum given a source count.  This is the object required by
 ascertainment: the numerator and denominator are entries of one joint law, so conditioning
@@ -600,7 +623,12 @@ already guarantees a positive exponent. -/
 def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = deme then exponent d - 1 else exponent d
 
-/-- Move one ancestral lineage from one deme label to another. -/
+/-- Move one ancestral lineage from one deme label to another.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- index bookkeeping for the moment generator.
+Relabelling a lineage asserts nothing about a population; the generator assembled from it is
+where a migration mechanism is chosen, and the composed output is where a measurement could
+bear. -/
 def migrateExponent {D : ℕ} (exponent : Fin D → ℕ)
     (src dst : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = src then exponent d - 1 else if d = dst then exponent d + 1 else exponent d
@@ -617,6 +645,118 @@ noncomputable def manyDemeMomentGenerator {D : ℕ} (rates : ManyDemeRates D)
   (∑ d, (rates.forwardMutation d * exponent d *
       (moment (decrementExponent exponent d) - moment exponent) -
     rates.backwardMutation d * exponent d * moment exponent))
+
+/-! ### Exact finite propagation for arbitrary deme count -/
+
+/-- Finite rectangular carrier for every exponent through coordinatewise degree `K`.
+Rows whose total degree exceeds `K` are padding and never enter a valid generator row. -/
+abbrev ManyDemeMomentCoordinate (D K : ℕ) := Fin D → Fin (K + 1)
+
+/-- Total degree of a finite many-deme moment coordinate. -/
+def ManyDemeMomentCoordinate.degree {D K : ℕ}
+    (coordinate : ManyDemeMomentCoordinate D K) : ℕ :=
+  ∑ d, (coordinate d).val
+
+/-- Read a finite vector as a moment table, returning zero outside its rectangle. -/
+noncomputable def manyDemeMomentVectorTable {D : ℕ} (K : ℕ)
+    (vector : ManyDemeMomentCoordinate D K → ℝ)
+    (exponent : Fin D → ℕ) : ℝ :=
+  if h : ∀ d, exponent d < K + 1 then
+    vector (fun d ↦ ⟨exponent d, h d⟩)
+  else 0
+
+/-- Basis table for one many-deme moment coordinate. -/
+noncomputable def manyDemeMomentBasisTable {D : ℕ} (K : ℕ)
+    (column : ManyDemeMomentCoordinate D K) : (Fin D → ℕ) → ℝ :=
+  manyDemeMomentVectorTable K (fun coordinate ↦ if coordinate = column then 1 else 0)
+
+/-- Normalized constant moment table. -/
+noncomputable def manyDemeMomentConstantTable {D : ℕ} : (Fin D → ℕ) → ℝ :=
+  fun exponent ↦ if ∀ d, exponent d = 0 then 1 else 0
+
+/-- Homogeneous generator matrix for all nonconstant moments of total degree at most `K`. -/
+noncomputable def manyDemeMomentDynamicsMatrix {D : ℕ}
+    (rates : ManyDemeRates D) (K : ℕ) :
+    Matrix (ManyDemeMomentCoordinate D K) (ManyDemeMomentCoordinate D K) ℝ :=
+  fun row column ↦
+    if 0 < row.degree ∧ row.degree ≤ K then
+      manyDemeMomentGenerator rates (manyDemeMomentBasisTable K column)
+        (fun d ↦ (row d).val)
+    else 0
+
+/-- Affine forcing contributed by the normalized constant moment. -/
+noncomputable def manyDemeMomentForcing {D : ℕ}
+    (rates : ManyDemeRates D) (K : ℕ) : ManyDemeMomentCoordinate D K → ℝ :=
+  fun row ↦
+    if 0 < row.degree ∧ row.degree ≤ K then
+      -manyDemeMomentGenerator rates manyDemeMomentConstantTable
+        (fun d ↦ (row d).val)
+    else 0
+
+/-- Constant-augmented coordinate for affine many-deme moment propagation. -/
+abbrev AffineManyDemeMomentCoordinate (D K : ℕ) :=
+  Option (ManyDemeMomentCoordinate D K)
+
+/-- Exact affine generator `[A,-b;0,0]` for arbitrary finite deme count. -/
+noncomputable def augmentedManyDemeMomentGenerator {D : ℕ}
+    (rates : ManyDemeRates D) (K : ℕ) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ
+  | some row, some column => manyDemeMomentDynamicsMatrix rates K row column
+  | some row, none => -manyDemeMomentForcing rates K row
+  | none, _ => 0
+
+/-- One arbitrary-deme piecewise-constant diffusion epoch in raw time units. -/
+structure ManyDemeMomentEpoch (D K : ℕ) where
+  rates : ManyDemeRates D
+  duration : ℝ
+  duration_nonneg : 0 ≤ duration
+
+/-- Exact matrix-exponential propagator for an arbitrary-deme epoch. -/
+noncomputable def ManyDemeMomentEpoch.propagator {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  matrixExponential (augmentedManyDemeMomentGenerator epoch.rates K) epoch.duration
+
+/-- Merge a newly split child's exponent back into its parent.  This is the pullback of the
+instantaneous constraint `X_child = X_parent`. -/
+def mergeSplitExponent {D : ℕ} (parent child : Fin D)
+    (exponent : Fin D → ℕ) : Fin D → ℕ :=
+  fun d ↦ if d = parent then exponent parent + exponent child
+    else if d = child then 0 else exponent d
+
+/-- Exact instantaneous split transform on a finite moment state. -/
+noncomputable def splitManyDemeMomentState {D K : ℕ}
+    (parent child : Fin D)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    AffineManyDemeMomentCoordinate D K → ℝ
+  | none => 1
+  | some coordinate =>
+      manyDemeMomentVectorTable K (fun oldCoordinate ↦ state (some oldCoordinate))
+        (mergeSplitExponent parent child (fun d ↦ (coordinate d).val))
+
+/-- An exact instruction is either continuous propagation or an instantaneous split. -/
+inductive ManyDemeMomentInstruction (D K : ℕ) where
+  | evolve (epoch : ManyDemeMomentEpoch D K)
+  | split (parent child : Fin D)
+
+/-- Execute an arbitrary finite sequence of exact demographic moment instructions. -/
+noncomputable def propagateManyDemeMomentInstructions {D K : ℕ}
+    (instructions : List (ManyDemeMomentInstruction D K))
+    (initial : AffineManyDemeMomentCoordinate D K → ℝ) :
+    AffineManyDemeMomentCoordinate D K → ℝ :=
+  instructions.foldl (fun state instruction ↦ match instruction with
+    | .evolve epoch => epoch.propagator.mulVec state
+    | .split parent child => splitManyDemeMomentState parent child state) initial
+
+/-- At a common ancestor all deme frequencies coincide, so a mixed moment depends only on
+the total exponent. -/
+noncomputable def commonAncestorManyDemeMomentState {D K : ℕ}
+    (ancestralMoment : ℕ → ℝ) : AffineManyDemeMomentCoordinate D K → ℝ
+  | none => 1
+  | some coordinate =>
+      if 0 < coordinate.degree ∧ coordinate.degree ≤ K then
+        ancestralMoment coordinate.degree
+      else 0
 
 /-- Embed a bivariate train-target exponent into the full deme index without enumerating a
 full sample-count cell. -/
@@ -685,11 +825,7 @@ noncomputable def TrainVsAllMomentProjection.targetErosion {D : ℕ}
     (projection : TrainVsAllMomentProjection D) (target : Fin D) : Option ℝ :=
   let ns := projection.trainSampleSize
   let nt := projection.targetSampleSize target
-  let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    (projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt)
-  let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    ∑ j ∈ Finset.range (nt + 1), projection.jointSampleCount target i j
-  if 0 < denominator then some (numerator / denominator) else none
+  targetErosionEvent (projection.jointSampleCount target) ns nt
 
 /-- Pairwise coalescence times in raw generations. -/
 structure PairwiseCoalescenceTimes (D : ℕ) where
@@ -707,13 +843,61 @@ structure JointSampleSpectrum (D : ℕ) where
   mass_nonneg : ∀ cell, 0 ≤ mass cell
   mass_sum_one : ∑ cell, mass cell = 1
 
+/-- A nonnegative physical separation between two marker positions, in base pairs. -/
+structure MarkerSeparationBp where
+  value : ℝ
+  value_nonneg : 0 ≤ value
+
 /-- The two-locus moments a demographic history supplies at a recombination coordinate. -/
 structure DemographicTwoLocusMoments (D : ℕ) where
-  DD : ℝ → Fin D → Fin D → ℝ
-  Dz : ℝ → Fin D → Fin D → Fin D → ℝ
-  pi2 : ℝ → Fin D → Fin D → Fin D → Fin D → ℝ
-  DD_symmetric : ∀ rho i j, DD rho i j = DD rho j i
-  pi2_pair_swap : ∀ rho i j k l, pi2 rho i j k l = pi2 rho k l i j
+  DD : MarkerSeparationBp → Fin D → Fin D → ℝ
+  Dz : MarkerSeparationBp → Fin D → Fin D → Fin D → ℝ
+  pi2 : MarkerSeparationBp → Fin D → Fin D → Fin D → Fin D → ℝ
+
+/-- Domain on which the cross-deme `DD` correlation is defined. -/
+structure DemographicTwoLocusMoments.LDPairDomain {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D) : Prop where
+  firstWithin_pos : 0 < moments.DD rho first first
+  secondWithin_pos : 0 < moments.DD rho second second
+
+/-- Exact normalized cross-deme linkage correlation
+`E[D_i D_j] / sqrt(E[D_i²] E[D_j²])` for an arbitrary demographic two-locus law.
+
+Empirical status: DERIVED from whatever `DemographicTwoLocusMoments` a history supplies --
+this is the normalized ratio of the supplied joint moments and asserts nothing beyond them.
+The empirical claim lives in the history that fills the interface (the composed generator of
+`TwoLocusHistory`, or the two-deme stationary solve), and no battery has recorded a verdict
+on any composed cross-deme correlation yet. -/
+noncomputable def DemographicTwoLocusMoments.crossDemeLDCorrelation {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D)
+    (_ : moments.LDPairDomain rho first second) : ℝ :=
+  moments.DD rho first second /
+    Real.sqrt (moments.DD rho first first * moments.DD rho second second)
+
+/-- The joint-channel factor on the `R²` scale.  Score accuracy is quadratic in the
+tag--causal correlation, so this is the square of the exact `DD` correlation, not an
+independently fitted retention coefficient.
+
+Empirical status: DERIVED -- the square of `crossDemeLDCorrelation`, whose status it
+inherits; `accuracyLinkageFactor_nonneg` is its arithmetic consequence.  That score accuracy
+is quadratic in the tag--causal correlation is the standard result assumed by the consumer
+in `PhenomeWidePortability`; whether a composed history's factor matches simulation is the
+untested composite claim named in `TwoLocusHistory`'s module status. -/
+noncomputable def DemographicTwoLocusMoments.accuracyLinkageFactor {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D)
+    (domain : moments.LDPairDomain rho first second) : ℝ :=
+  (moments.crossDemeLDCorrelation rho first second domain) ^ 2
+
+/-- The exact joint-channel factor is nonnegative on its typed domain. -/
+theorem DemographicTwoLocusMoments.accuracyLinkageFactor_nonneg {D : ℕ}
+    (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
+    (first second : Fin D)
+    (domain : moments.LDPairDomain rho first second) :
+    0 ≤ moments.accuracyLinkageFactor rho first second domain :=
+  sq_nonneg _
 
 /-- The complete typed output of a demography.  Serial-founder, grid and `stdpopsim` histories
 are constructors of this interface, not new metric derivations. -/
@@ -722,7 +906,15 @@ structure DemographyFunctionals (D : ℕ) where
   spectrum : JointSampleSpectrum D
   twoLocus : DemographicTwoLocusMoments D
 
-/-- Slatkin--Hudson `F_ST` on the typed coalescence constructor. -/
+/-- Slatkin--Hudson `F_ST` on the typed coalescence constructor.
+
+Empirical status: DERIVED -- the ratio-of-times reading of Hudson's `F_ST`,
+`1 - t̄_within / t_between`, applied to the typed coalescence functionals; Slatkin's identity
+(`slatkin_identity`, proved beside it) is what licenses reading it as a heterozygosity ratio
+with the mutation rate cancelled.  It is Hudson's convention and not Nei's `G_ST`; the
+conversion and their inequality live in `Core.Fst`.  Which population supplies the times is
+the empirical question, asked wherever a demography constructor fills
+`PairwiseCoalescenceTimes`. -/
 noncomputable def PairwiseCoalescenceTimes.hudsonFst {D : ℕ}
     (T : PairwiseCoalescenceTimes D) (i j : Fin D) : ℝ :=
   1 - ((T.within i + T.within j) / 2) / T.between i j
@@ -828,8 +1020,6 @@ noncomputable def DemographicTwoLocusMoments.witness : DemographicTwoLocusMoment
   DD := fun _ _ _ ↦ 1
   Dz := fun _ _ _ _ ↦ 0
   pi2 := fun _ _ _ _ _ ↦ 1
-  DD_symmetric := by intro rho i j; rfl
-  pi2_pair_swap := by intro rho i j k l; rfl
 
 end Coalescent
 
