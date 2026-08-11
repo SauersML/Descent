@@ -1,0 +1,7 @@
+cell                measured        body      design   sem(reps) sem(asserted)
+h2=0.5 rho=0.9      0.409845    0.424971    0.410498    0.006317    0.003346
+                   sems off:        2.39        0.10  (on the block sem)
+h2=0.5 rho=0.6      0.178813    0.188876    0.178880    0.003069    0.001460
+                   sems off:        3.28        0.02  (on the block sem)
+h2=0.8 rho=0.8      0.513268    0.537248    0.514378    0.003225    0.004191
+                   sems off:        7.44        0.34  (on the block sem)
