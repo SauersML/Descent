@@ -1,0 +1,299 @@
+{
+ "_battery_sha": "96c929d80be184fb",
+ "results": [
+  {
+   "name": "liabilityBrierExact",
+   "file": "PopGen/DGP.lean",
+   "source": "pi - bivariateNormalOrthant (Phi_inv pi) (Phi_inv pi) r2",
+   "note": "the measured side draws the outcome and averages (p-y)^2, so it is a different computation from the orthant rather than the same one twice",
+   "regime": "liability-threshold DGP: standard normal liability split into a score component of variance r2 and an independent residual, disease when the liability clears the prevalence threshold; 2000000 individuals per block, 6 blocks. The predictor is the calibrated risk implied by the SCORE component alone. THE MEASURED SIDE DRAWS THE ACTUAL OUTCOME and averages (p_calib - y_event)^2; it never forms E[p^2] analytically. The estimand is that unweighted per-individual mean, in squared-probability units. The predicted side evaluates the orthant by direct grid quadrature over the shared score on +/-9 sd, checked against the declaration's own closed form at pi=1/2 before any cell is scored and refusing to run if it disagrees or returns non-finite. Cells are admitted only where the two competing bodies differ by more than three Monte-Carlo floors, because they agree exactly at r2=0 and r2=1 and a cell between them discriminates nothing",
+   "span": 0.9742560762856611,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prev=0.05 r2=0.80",
+    "lean": 0.02524302426564118,
+    "truth": 0.025302970549019758,
+    "sem": 2.0440307181741487e-05,
+    "sems_off": 2.932748654194731,
+    "rel_err": 0.002369140147495511
+   },
+   "cells": [
+    {
+     "design": "prev=0.01 r2=0.05",
+     "lean": 0.009859383946194242,
+     "truth": 0.009841897125933202,
+     "sem": 9.133111502785765e-06,
+     "sems_off": 1.914661860386401,
+     "rel_err": 0.0017767733229971292
+    },
+    {
+     "design": "prev=0.01 r2=0.20",
+     "lean": 0.00966108282092655,
+     "truth": 0.009651838164704407,
+     "sem": 3.131531153306427e-05,
+     "sems_off": 0.29521201513138046,
+     "rel_err": 0.0009578130159651289
+    },
+    {
+     "design": "prev=0.01 r2=0.50",
+     "lean": 0.008706075581735343,
+     "truth": 0.008678358972422666,
+     "sem": 2.0649402679091797e-05,
+     "sems_off": 1.3422475092096118,
+     "rel_err": 0.0031937615626125493
+    },
+    {
+     "design": "prev=0.01 r2=0.80",
+     "lean": 0.006231031836877643,
+     "truth": 0.006243805748453744,
+     "sem": 1.8755438196894083e-05,
+     "sems_off": 0.6810777461982312,
+     "rel_err": 0.0020458534571265695
+    },
+    {
+     "design": "prev=0.05 r2=0.05",
+     "lean": 0.04693153228615868,
+     "truth": 0.046896850695615305,
+     "sem": 6.63887019674152e-05,
+     "sems_off": 0.5224019978639618,
+     "rel_err": 0.0007395292014057448
+    },
+    {
+     "design": "prev=0.05 r2=0.20",
+     "lean": 0.04475455028417369,
+     "truth": 0.04475047201585375,
+     "sem": 5.140864758998478e-05,
+     "sems_off": 0.0793303950041044,
+     "rel_err": 9.113352633454871e-05
+    },
+    {
+     "design": "prev=0.05 r2=0.50",
+     "lean": 0.037810571232825066,
+     "truth": 0.03779123903472096,
+     "sem": 3.8700669195829676e-05,
+     "sems_off": 0.49953136485271993,
+     "rel_err": 0.0005115523755742653
+    },
+    {
+     "design": "prev=0.05 r2=0.80",
+     "lean": 0.02524302426564118,
+     "truth": 0.025302970549019758,
+     "sem": 2.0440307181741487e-05,
+     "sems_off": 2.932748654194731,
+     "rel_err": 0.002369140147495511
+    },
+    {
+     "design": "prev=0.20 r2=0.05",
+     "lean": 0.1560114540130555,
+     "truth": 0.15599661446313412,
+     "sem": 6.504421147481976e-05,
+     "sems_off": 0.22814558874496754,
+     "rel_err": 9.512738447847458e-05
+    },
+    {
+     "design": "prev=0.20 r2=0.20",
+     "lean": 0.14318509019065212,
+     "truth": 0.1431183541306947,
+     "sem": 4.680880852519236e-05,
+     "sems_off": 1.4257158440914959,
+     "rel_err": 0.00046629980034894
+    },
+    {
+     "design": "prev=0.20 r2=0.50",
+     "lean": 0.11284943333542996,
+     "truth": 0.1128515834764227,
+     "sem": 7.12864001027672e-05,
+     "sems_off": 0.030162008316285117,
+     "rel_err": 1.905282076247434e-05
+    },
+    {
+     "design": "prev=0.20 r2=0.80",
+     "lean": 0.07096602023688398,
+     "truth": 0.070951778765361,
+     "sem": 2.68689044713263e-05,
+     "sems_off": 0.5300354369925909,
+     "rel_err": 0.00020072042971704002
+    },
+    {
+     "design": "prev=0.50 r2=0.05",
+     "lean": 0.24203893338166976,
+     "truth": 0.24202396554348063,
+     "sem": 2.8881630735294814e-05,
+     "sems_off": 0.5182476822834791,
+     "rel_err": 6.184444650149654e-05
+    },
+    {
+     "design": "prev=0.50 r2=0.20",
+     "lean": 0.2179528915755125,
+     "truth": 0.21787637966962659,
+     "sem": 4.769439382418278e-05,
+     "sems_off": 1.6042117270212346,
+     "rel_err": 0.00035117118249321374
+    },
+    {
+     "design": "prev=0.50 r2=0.50",
+     "lean": 0.16666666666666663,
+     "truth": 0.16672156674951857,
+     "sem": 6.596351864356553e-05,
+     "sems_off": 0.832279477821631,
+     "rel_err": 0.0003292920281538961
+    },
+    {
+     "design": "prev=0.50 r2=0.80",
+     "lean": 0.10241638234956663,
+     "truth": 0.10242490667329807,
+     "sem": 2.6738876319324543e-05,
+     "sems_off": 0.31879887657357,
+     "rel_err": 8.322510616123967e-05
+    }
+   ]
+  },
+  {
+   "name": "liabilityBrierExact [calibratedBrier's LINEAR chart, correct on the OBSERVED scale and used here on the liability scale, competing]",
+   "file": "PopGen/DGP.lean",
+   "source": "pi * (1 - pi) * (1 - r2)",
+   "note": "this is the body #41 repairs: it is the linear chart through the same two anchor points, and the cells where it is separable from the curve are exactly the ones the anchor theorems could not see; positive control 'realised prevalence at prev=0.20 r2=0.05' passed at 0.32 sems",
+   "regime": "liability-threshold DGP: standard normal liability split into a score component of variance r2 and an independent residual, disease when the liability clears the prevalence threshold; 2000000 individuals per block, 6 blocks. The predictor is the calibrated risk implied by the SCORE component alone. THE MEASURED SIDE DRAWS THE ACTUAL OUTCOME and averages (p_calib - y_event)^2; it never forms E[p^2] analytically. The estimand is that unweighted per-individual mean, in squared-probability units. The predicted side evaluates the orthant by direct grid quadrature over the shared score on +/-9 sd, checked against the declaration's own closed form at pi=1/2 before any cell is scored and refusing to run if it disagrees or returns non-finite. Cells are admitted only where the two competing bodies differ by more than three Monte-Carlo floors, because they agree exactly at r2=0 and r2=1 and a cell between them discriminates nothing",
+   "span": 0.9916631578947368,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prev=0.50 r2=0.80",
+    "lean": 0.04999999999999999,
+    "truth": 0.10242490667329807,
+    "sem": 2.6738876319324543e-05,
+    "sems_off": 1960.6248986390613,
+    "rel_err": 0.5118374853932391
+   },
+   "cells": [
+    {
+     "design": "prev=0.01 r2=0.05",
+     "lean": 0.009405,
+     "truth": 0.009841897125933202,
+     "sem": 9.133111502785765e-06,
+     "sems_off": 47.836613600955175,
+     "rel_err": 0.04439155584973414
+    },
+    {
+     "design": "prev=0.01 r2=0.20",
+     "lean": 0.007920000000000002,
+     "truth": 0.009651838164704407,
+     "sem": 3.131531153306427e-05,
+     "sems_off": 55.303239211778056,
+     "rel_err": 0.1794309161790058
+    },
+    {
+     "design": "prev=0.01 r2=0.50",
+     "lean": 0.00495,
+     "truth": 0.008678358972422666,
+     "sem": 2.0649402679091797e-05,
+     "sems_off": 180.55529403752448,
+     "rel_err": 0.4296156663109143
+    },
+    {
+     "design": "prev=0.01 r2=0.80",
+     "lean": 0.0019799999999999996,
+     "truth": 0.006243805748453744,
+     "sem": 1.8755438196894083e-05,
+     "sems_off": 227.33703706052754,
+     "rel_err": 0.6828857142952693
+    },
+    {
+     "design": "prev=0.05 r2=0.05",
+     "lean": 0.045125,
+     "truth": 0.046896850695615305,
+     "sem": 6.63887019674152e-05,
+     "sems_off": 26.68903959720381,
+     "rel_err": 0.03778186955698858
+    },
+    {
+     "design": "prev=0.05 r2=0.20",
+     "lean": 0.038000000000000006,
+     "truth": 0.04475047201585375,
+     "sem": 5.140864758998478e-05,
+     "sems_off": 131.3100486457621,
+     "rel_err": 0.15084694555763015
+    },
+    {
+     "design": "prev=0.05 r2=0.50",
+     "lean": 0.02375,
+     "truth": 0.03779123903472096,
+     "sem": 3.8700669195829676e-05,
+     "sems_off": 362.81644029643866,
+     "rel_err": 0.3715474642633568
+    },
+    {
+     "design": "prev=0.05 r2=0.80",
+     "lean": 0.009499999999999998,
+     "truth": 0.025302970549019758,
+     "sem": 2.0440307181741487e-05,
+     "sems_off": 773.1278404238428,
+     "rel_err": 0.6245500115650243
+    },
+    {
+     "design": "prev=0.20 r2=0.05",
+     "lean": 0.15200000000000002,
+     "truth": 0.15599661446313412,
+     "sem": 6.504421147481976e-05,
+     "sems_off": 61.44458319217669,
+     "rel_err": 0.0256198794883372
+    },
+    {
+     "design": "prev=0.20 r2=0.20",
+     "lean": 0.12800000000000003,
+     "truth": 0.1431183541306947,
+     "sem": 4.680880852519236e-05,
+     "sems_off": 322.98096463100586,
+     "rel_err": 0.10563532694687573
+    },
+    {
+     "design": "prev=0.20 r2=0.50",
+     "lean": 0.08000000000000002,
+     "truth": 0.1128515834764227,
+     "sem": 7.12864001027672e-05,
+     "sems_off": 460.83942279401833,
+     "rel_err": 0.29110432006730447
+    },
+    {
+     "design": "prev=0.20 r2=0.80",
+     "lean": 0.032,
+     "truth": 0.070951778765361,
+     "sem": 2.68689044713263e-05,
+     "sems_off": 1449.6973185836137,
+     "rel_err": 0.5489894607741314
+    },
+    {
+     "design": "prev=0.50 r2=0.05",
+     "lean": 0.2375,
+     "truth": 0.24202396554348063,
+     "sem": 2.8881630735294814e-05,
+     "sems_off": 156.6381616378789,
+     "rel_err": 0.01869222138114207
+    },
+    {
+     "design": "prev=0.50 r2=0.20",
+     "lean": 0.2,
+     "truth": 0.21787637966962659,
+     "sem": 4.769439382418278e-05,
+     "sems_off": 374.8109208710103,
+     "rel_err": 0.08204826836545173
+    },
+    {
+     "design": "prev=0.50 r2=0.50",
+     "lean": 0.125,
+     "truth": 0.16672156674951857,
+     "sem": 6.596351864356553e-05,
+     "sems_off": 632.4945607429075,
+     "rel_err": 0.25024696902111526
+    },
+    {
+     "design": "prev=0.50 r2=0.80",
+     "lean": 0.04999999999999999,
+     "truth": 0.10242490667329807,
+     "sem": 2.6738876319324543e-05,
+     "sems_off": 1960.6248986390613,
+     "rel_err": 0.5118374853932391
+    }
+   ]
+  }
+ ]
+}
