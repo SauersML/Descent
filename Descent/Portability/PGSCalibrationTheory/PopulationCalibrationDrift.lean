@@ -40,65 +40,11 @@ calibration drifts systematically.
 
 section PopulationCalibrationDrift
 
-/-- Shared logistic-scale calibration profile induced by a prevalence shift.
-
-    **This profile's `citl` is a difference of MARGINAL prevalence logits, and
-    that is not the intercept correction a deployment needs.** The two coincide
-    only when the score is constant, because `logit E[p]` is not `E[logit p]`.
-
-    Empirical status: **FALSIFIED** as the deployment
-    calibration-in-the-large, and exact for a constant predictor
-    (`validation/empirical/simcov/battery_pgscal01.py`). Two million
-    individuals per arm, a logistic risk model, and a target differing from the
-    source by a baseline-risk (intercept) shift and nothing else — the one
-    regime the phrase "induced by a prevalence shift" names. The oracle is the
-    intercept correction the target actually needs: the `a` solving
-    `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear predictor held as an
-    offset. Both prevalences are fed at their realised cohort values.
-
-      score sd   true intercept shift   this citl   fitted correction   sems
-      1.2              0.80              0.66237    0.79967±0.00204     67.2
-      1.5              0.60              0.42940    0.60007±0.00181     94.4
-      2.0              1.50              0.94064    1.49676±0.00149    374.0
-      1.0             -0.90             -0.75407   -0.89961±0.00190     76.4
-
-    The failure is one-directional: `|citl|` is 17% to 37% SMALLER than the
-    correction required, so a deployment sized from this number under-corrects.
-    The gap grows with the spread of the score and vanishes with it — the
-    positive control is a zero-variance score, where the fitted correction
-    returns the 0.7 intercept shift it was given at 0.26 sems and this body
-    returns 0.7 as well. The identity-scale reading `π_target - π_source` is
-    rejected on the same cells at up to 878 sems, so the failure is not an
-    artefact of comparing across links.
-
-    Consumers that read this `citl` as the recalibration a target population
-    needs — rather than as the shift in marginal log-odds, which is what it is —
-    are reading an attenuated number. -/
-noncomputable def prevalenceLogisticCalibrationProfile
-    (pi_source pi_target slope : ℝ) : CalibrationProfile :=
-  logisticCalibrationProfile (prevalenceLogit pi_target) (prevalenceLogit pi_source) slope
-
-@[simp] theorem prevalenceLogisticCalibrationProfile_citl
-    (pi_source pi_target slope : ℝ) :
-    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).citl =
-      prevalenceCITLShift pi_source pi_target := by
-  unfold prevalenceLogisticCalibrationProfile prevalenceCITLShift
-    logisticCalibrationProfile calibrationProfile prevalenceLogit
-    calibrationInTheLarge Descent.Core.difference
-  ring
-
-@[simp] theorem prevalenceLogisticCalibrationProfile_slope
-    (pi_source pi_target slope : ℝ) :
-    (prevalenceLogisticCalibrationProfile pi_source pi_target slope).slope = slope := by
-  rfl
-
 /-- CITL shift is zero when prevalences match. -/
 theorem no_citl_shift_same_prevalence (pi : ℝ) :
     prevalenceCITLShift pi pi = 0 := by
-  rw [← prevalenceLogisticCalibrationProfile_citl pi pi (1 : ℝ)]
-  simp [prevalenceLogisticCalibrationProfile, logisticCalibrationProfile,
-    calibrationProfile, calibrationInTheLarge,
-      Descent.Core.difference]
+  unfold prevalenceCITLShift
+  ring
 
 /-- CITL shift is positive when target has higher prevalence. -/
 theorem citl_shift_positive_higher_prevalence
@@ -180,11 +126,19 @@ theorem genetic_distribution_shift_nonzero_of_calibrated_source
 /-!
 ## Why the Δ-logit intercept shift under-corrects
 
-`prevalenceLogisticCalibrationProfile` above is FALSIFIED as the deployment intercept
-correction, and the recorded failure is one-directional: the shift it prescribes moves the
-marginal prevalence by LESS than it promises, by 17% to 37% on the measured cells, with the
-gap growing in the spread of the score. This section derives that direction instead of citing
-it. The mechanism is three short facts. A logistic intercept shift `δ` acts on every
+`prevalenceCITLShift` is a difference of MARGINAL prevalence logits, and read as the intercept
+correction a deployment needs it is measured wrong in a fixed direction
+(`validation/empirical/simcov/battery_pgscal01.py`): two million individuals per arm, a
+logistic risk model, a target differing from the source by a baseline-risk shift and nothing
+else, and the oracle the `a` solving `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear
+predictor held as an offset. Over score spreads 1.0 to 2.0 the Δ-logit shift is 17% to 37%
+SMALLER than the correction required, at 67 to 374 sems, with the gap growing in the spread of
+the score and vanishing with it — a zero-variance score recovers the intercept shift it was
+given at 0.26 sems. The identity-scale reading `π_target - π_source` is rejected on the same
+cells at up to 878 sems, so the failure is not an artefact of comparing across links.
+
+This section derives that direction instead of citing it. The mechanism is three short facts.
+A logistic intercept shift `δ` acts on every
 subpopulation's risk by multiplying its odds by `exp δ` (`sigmoid_add_eq_oddsScale`). The
 odds-multiplier action is strictly concave in the risk when the odds go up
 (`oddsScale_strictConcaveOn`) and strictly convex when they go down
@@ -199,13 +153,13 @@ noisy one.
 /-- The action of an odds multiplier on a risk: `oddsScale c p` is the probability whose odds
     are `c` times the odds of `p`, i.e. `c·p/(1-p) / (1 + c·p/(1-p))` cleared of the inner
     division. A logistic intercept shift `δ` acts on risks as `oddsScale (exp δ)`
-    (`sigmoid_add_eq_oddsScale`), so this is the map through which
-    `prevalenceLogisticCalibrationProfile`'s `citl` reaches a deployment's predictions.
+    (`sigmoid_add_eq_oddsScale`), so this is the map through which a Δ-logit `citl` reaches a
+    deployment's predictions.
 
     Empirical status: NOT AN EMPIRICAL CLAIM — a reparameterisation map, not a quantity; it
-    asserts nothing about any population. The empirical content of what this map does to a
-    deployed correction is recorded on `prevalenceLogisticCalibrationProfile`, whose FALSIFIED
-    verdict the theorems below derive. -/
+    asserts nothing about any population. What this map does to a deployed correction is
+    measured in `battery_pgscal01`, recorded in the section header above, and derived by the
+    theorems below. -/
 noncomputable def oddsScale (c p : ℝ) : ℝ :=
   c * p / (1 + (c - 1) * p)
 
@@ -373,9 +327,8 @@ theorem oddsScale_strictConvexOn (c : ℝ) (hc0 : 0 < c) (hc : c < 1) :
     achieves a marginal prevalence STRICTLY BELOW `pt` whenever any two subpopulations differ
     in risk. The promise `oddsScale_citl_exact` is met only by a constant predictor; a score
     with any spread converts the strict concavity of `oddsScale` into a one-directional
-    shortfall. This derives the direction of `battery_pgscal01`'s falsification of
-    `prevalenceLogisticCalibrationProfile` for every mixture at once: the fitted correction
-    can only exceed the Δ-logit `citl`. -/
+    shortfall. This derives the direction of what `battery_pgscal01` measured, for every
+    mixture at once: the fitted correction can only exceed the Δ-logit `citl`. -/
 theorem prevalenceCITLShift_undercorrects_upward {ι : Type*} (t : Finset ι)
     (w p : ι → ℝ) (ps pt : ℝ)
     (hw : ∀ i ∈ t, 0 < w i) (hw1 : ∑ i ∈ t, w i = 1)
@@ -544,8 +497,8 @@ open ProbabilityTheory in
     standard-normal score `z`, the parameterisation `Φ(q·√(1+b²) + b·z)` has marginal
     prevalence `Φ(q)` — for every score accuracy `b`, with no correction term. This is the
     probit counterpart of the Δ-logit failure derived above: here the baseline parameter
-    commutes with mixing over the score, which is exactly the property
-    `prevalenceLogisticCalibrationProfile` is FALSIFIED for lacking. Instance of
+    commutes with mixing over the score, which is exactly the property the Δ-logit shift is
+    measured to lack. Instance of
     `Conditionals.gaussianAverage_probit` at `α = q·√(1+b²)`, `β = b`. -/
 theorem marginalSlope_marginal_prevalence (q b : ℝ) :
     ∫ z, Foundations.Phi (q * Real.sqrt (1 + b ^ 2) + b * z)
