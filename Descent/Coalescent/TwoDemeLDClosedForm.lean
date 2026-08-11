@@ -23,6 +23,37 @@ same diffusion time unit.  The operator is exactly
 
 Consequently every stationary coordinate, and every ratio of `DD` coordinates, is a literal
 rational function of `(rho,M)` by Cramer's rule.
+
+## Empirical status
+
+Stated once here for the component matrices and the solve built from them, because they share
+one verdict and twelve copies of it would be twelve places for it to drift.
+
+THE COMPONENT MATRICES ARE THE MODEL. `twoDemeHDrift`, `twoDemeHMigration`, `twoDemeYDrift`,
+`twoDemeYRecombination`, `twoDemeMutationCoupling` and `twoDemeYMigration` are the entries of
+the Ragsdale--Gravel two-locus generator specialized to two demes, and `publishedTwoDemeLDBase`,
+`...Recombination`, `...Migration`, `...Forcing` and `...Operator` assemble them. Writing them
+down is choosing a reproduction and migration mechanism, not asserting anything about a
+population, so no measurement can bear on an entry of the generator: what could be wrong is
+whether a population is described by this generator at all, and that question is asked where
+its output is compared against something -- `validation/empirical/momentsld/ld_surface.py`
+integrates this system and `Descent.Portability.PortabilityDrift.PresentDayMoments`'s
+`momentsLDWitness` reads the surface it returns.
+
+`publishedTwoDemeLDCoordinateValue` is DERIVED and not measured: it is Cramer's rule applied to
+the operator above, and `publishedTwoDemeCrossD_eq_rational` and
+`publishedTwoDemeDCorrelation_eq_rational` are the proofs. An arithmetic consequence of a model
+is true of the model whatever a population does.
+
+WHAT THIS SECTION DOES NOT COVER, named rather than left silent. The quantity this file exists
+to supply downstream is `publishedTwoDemeDCorrelation`, and it carries no status of its own.
+Unlike the entries above it IS an empirical claim -- it predicts a cross-deme LD correlation at
+a recombination rate and a migration rate, which a simulation can contradict -- and the screen
+that asks for a marker never asks it, because that screen keys on the NAME and this name
+carries no domain word it recognizes while `publishedTwoDemeLDBase` does. So the file's
+internal bookkeeping is the part being policed and the prediction is the part that is not.
+Supplying it means comparing this rational function against the same system integrated
+numerically, which is a measurement nobody has recorded here yet.
 -/
 
 /-- Canonical two-deme heterozygosity moments. -/
