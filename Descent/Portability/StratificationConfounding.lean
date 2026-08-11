@@ -565,7 +565,9 @@ section CausalInference
     (`validation/empirical/simcov/battery_bulk5.py`,
     `test_attenuation`). Against the realised correlation between score and
     outcome at a given r-squared, two million individuals, worst 0.74 sems over
-    a prediction spanning 0.31623 to 0.94868. -/
+    a prediction spanning 0.31623 to 0.94868.
+
+    Power: the prediction spans 0.31623 to 0.94868 across the design. -/
 noncomputable def pgsAttenuationFactor (r2_gwas : ℝ) : ℝ :=
   Real.sqrt r2_gwas
 
@@ -815,7 +817,12 @@ noncomputable def MRInstrumentModel.witness : MRInstrumentModel where
     `simcov/battery_bulk40.py`, `group_d`, whose measured noncentralities are tabulated
     above and whose identity gate rejects two competing genotype-variance conventions
     against this exact body. A definition a battery validates against is not dead code, and
-    deleting it would silently retire a passing measurement. -/
+    deleting it would silently retire a passing measurement.
+
+    Power: the prediction spans 0.4864 to 2.5600 across the four frequencies, and
+    the two neighbouring genotype-variance conventions ride the same cells and
+    die there -- `p(1-p)` at 24 sems and 51 percent low, `4p(1-p)` at 46 sems and
+    97 percent high -- so the ploidy factor is carried by the data. -/
 noncomputable def MRInstrumentModel.fStat (m : MRInstrumentModel) (p : ℝ) : ℝ :=
   m.n * m.β_inst ^ 2 * Descent.Core.hweHeterozygosity p / m.σ2_X_resid
 

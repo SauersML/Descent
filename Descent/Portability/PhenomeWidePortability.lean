@@ -78,6 +78,12 @@ section TraitClassification
     the design described above, and its results are committed beside it (group_ratio).
     MATCH at worst 1.41 sems; the ADDITIVE reading is FALSIFIED at 41 sems, so the
     product is what the design establishes.
+
+    Power: the prediction spans 0.35000 to 1.00000 across the five cells, with
+    `fst_additional` and `ld_factor` swept INDEPENDENTLY rather than one at a
+    time -- which is the point, since the product and the sum separate only where
+    both penalties bite. The additive reading `(1 - fst_additional) + ld_factor
+    - 1` is FALSIFIED at 41 sems on the committed re-run.
     -/
 noncomputable def neutralPortabilityRatioLD (fst_additional ld_factor : ℝ) : ℝ :=
   Descent.Core.retainedFraction fst_additional ld_factor
@@ -347,6 +353,11 @@ theorem selectedDriftFactor_empty_population_is_junk (t : ℕ) (s_correction : �
     the design described above, and its results are committed beside it (group_a).
     MATCH at worst 1.42 sems (0.29% relative) read as the LOSS on the same runs; the
     haploid drift factor is FALSIFIED at 532 sems.
+
+    Power: the design is the one measuring `selectedDriftFactor`, where the
+    realised fraction of ancestral heterozygosity lost moves with `t`, and this
+    body tracks it at worst 1.42 sems and 0.29 percent while the HAPLOID drift
+    factor carried on the same runs is FALSIFIED at 532 sems.
     -/
 noncomputable def fstFromDriftFactor (driftFactor : ℝ) : ℝ :=
   Descent.Core.complement driftFactor

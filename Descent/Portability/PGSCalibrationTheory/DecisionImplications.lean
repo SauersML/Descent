@@ -224,7 +224,12 @@ theorem positive_nri_means_improvement
     prevalence dropped, which is the ordinary base-rate mistake — is
     rejected at up to 1486 sems and a factor of thirteen. The positive control,
     the simulated cohort reproducing its own nominal event rate, passes at 0.26
-    sems. -/
+    sems.
+
+    Power: the prediction spans 0.02279 to 0.49220 across the four designs, and
+    the ordinary base-rate mistake -- the prior-free `f_e / (f_e + f_n)` -- rides
+    the same cells and is rejected at up to 1486 sems and a factor of
+    thirteen. -/
 noncomputable def reclassifiedBandEventPrevalence
     (π : ℝ)
     (μevent μnonevent : Measure ℝ)
@@ -1149,6 +1154,13 @@ An earlier design (`battery_bulk40.py`, `group_g`) chose harm-to-benefit ratios 
 crossing near π = 0.005 on a grid of spacing 0.0068, so the error bar was 35% of the quantity
 and the odds form matched too. The harm-to-benefit ratios here put the crossing between 0.14
 and 0.24, where the grid resolves it and the odds form separates.
+
+Power: the prediction spans 0.14286 to 0.24000 across the four cells, and that placement is
+the design rather than an accident: an earlier run put every crossing near 0.005 on a grid of
+spacing 0.0068, where the error bar was 35 percent of the quantity and the odds form matched
+too. Here the grid resolves the crossing and three competing forms are refuted on the same
+cells -- the swapped numerator by 965 sems, the odds form by 140, and leaving `spec`
+uncomplemented by 459.
 
 What is validated is the ARITHMETIC of the declared linear QALY model. Its clinical adequacy
 -- whether benefit and harm are commensurable on one scale at all -- is not established by
