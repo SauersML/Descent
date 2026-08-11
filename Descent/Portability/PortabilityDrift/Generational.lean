@@ -161,6 +161,17 @@ noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g :
   Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   PopGen.fstConnectedPairAt g.Ne g.theta (g.bigM.value / (2 * g.Ne)) t
 
+/-- **The divisor turning a scaled rate back into a per-generation one is the coalescent time
+scale**, not a loose two: `bigM` is `2 · ploidy · Nₑ · m` and dividing by `2 Nₑ` returns `2m`,
+the total emigration of a deme with two neighbours. -/
+theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_uses_coalescentTimeScale
+    (g : Descent.Core.PopGenParameters) (t : ℕ) :
+    g.fstTransientAt t =
+      PopGen.fstConnectedPairAt g.Ne g.theta
+        (g.bigM.value / Descent.Core.coalescentTimeScale g.Ne) t := by
+  unfold Descent.Core.PopGenParameters.fstTransientAt
+  rw [Descent.Core.coalescentTimeScale_eq]
+
 /-- **The record's own spelling of the coordinate**, recovered from the general law at the
 two-neighbour total emigration rate. `4 · Nₑ · (bigM / (2 Nₑ))` is `2 · bigM` whenever the
 effective size is nonzero, which is where the superseded hardcoded level came from; at

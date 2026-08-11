@@ -607,8 +607,8 @@ theorem faster_decay_lower_correlation
     in genetic distance was measured against the same binned `r²` values with a
     free amplitude and a free rate and missed at both ends, so an exponential is
     not available here even as a convenience. The effect-turnover factor is a
-    fitted exponential and is still exactly that: `lam_eff` has no derivation,
-    and nothing below identifies it with a selection coefficient.
+    fitted exponential and remains no more than that: `lam_eff` has no
+    derivation, and nothing below identifies it with a selection coefficient.
 
     Empirical status: UNTESTED as a product. The LD factor is validated
     separately at `ohtaKimuraSigmaDSq` and the turnover factor is a chart; that
