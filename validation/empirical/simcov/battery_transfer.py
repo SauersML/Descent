@@ -180,7 +180,7 @@ def test_fst_equilibrium_dgp():
     record("fstEquilibrium", "DGP.lean", "1 / (1 + theta + bigM)", cells,
            regime="20-deme island model, exact coalescence times; mutation "
                   "does not alter a coalescence-time F_ST")
-    record("fstDriftMigration", "DGP.lean", "1 / (1 + bigM)", cells_nomut,
+    record("fstDriftMigrationManyDemes", "DGP.lean", "1 / (1 + bigM)", cells_nomut,
            regime="same runs, the mutation-free sibling")
 
 

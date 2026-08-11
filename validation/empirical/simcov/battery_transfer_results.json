@@ -3,10 +3,10 @@
   "name": "pgsPhenoCov / sharedLDGeneticVariance",
   "file": "TransferLearningPGS.lean",
   "source": "sum_ij bw_i * ld_ij * bc_j",
-  "note": "",
+  "note": "the simulated truth moves by only 2.3% across the design",
   "regime": "standardised dosages, LD as the correlation matrix, coalescent LD from msprime",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "DEGENERATE ORACLE",
   "worst": {
    "design": "Cov(PGS, y)",
    "lean": 0.8690399985252654,
@@ -38,26 +38,22 @@
   "name": "sharedLDHeritability",
   "file": "TransferLearningPGS.lean",
   "source": "sharedLDGeneticVariance beta ld / var_y",
-  "note": "",
+  "note": "prediction equals truth to machine precision in every cell: the oracle is the formula, not a measurement",
   "regime": "fraction of phenotypic variance from the additive score",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "SELF-TEST",
   "worst": {
    "design": "sharedLDHeritability",
    "lean": 0.22176142558922918,
    "truth": 0.2217614255892292,
-   "sem": 0.004958736224047779,
-   "sems_off": 5.597308338569429e-15,
-   "rel_err": 1.251596193606765e-16
+   "sem": 0.004958736224047779
   },
   "cells": [
    {
     "design": "sharedLDHeritability",
     "lean": 0.22176142558922918,
     "truth": 0.2217614255892292,
-    "sem": 0.004958736224047779,
-    "sems_off": 5.597308338569429e-15,
-    "rel_err": 1.251596193606765e-16
+    "sem": 0.004958736224047779
    }
   ]
  },
@@ -100,10 +96,10 @@
   "name": "ldEffectGeneticCorrelation vs effectGeneticCorrelation",
   "file": "TransferLearningPGS.lean",
   "source": "LD-weighted vs plain cosine between effect vectors",
-  "note": "",
+  "note": "the simulated truth moves by only 0.0% across the design",
   "regime": "truth is the correlation of the two genetic values in the same individuals; only one of the two can be it",
   "span": 0.03851595737969871,
-  "verdict": "NO POWER",
+  "verdict": "DEGENERATE ORACLE",
   "worst": {
    "design": "effectGeneticCorrelation (LD-free)",
    "lean": 0.6979178023210815,
@@ -183,7 +179,7 @@
   ]
  },
  {
-  "name": "fstDriftMigration",
+  "name": "fstDriftMigrationManyDemes",
   "file": "DGP.lean",
   "source": "1 / (1 + bigM)",
   "note": "",
@@ -280,10 +276,10 @@
   "name": "sharedLDRetention",
   "file": "DGP.lean",
   "source": "exp(-2 * recomb * t_div)",
-  "note": "",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
   "regime": "two lineages each surviving t_div meioses intact; the continuous approximation to the exact (1-r)^(2t)",
   "span": 0.9726762775527074,
-  "verdict": "FALSIFIED",
+  "verdict": "LEAD (no control)",
   "worst": {
    "design": "r=0.05 t=40",
    "lean": 0.01831563888873418,
