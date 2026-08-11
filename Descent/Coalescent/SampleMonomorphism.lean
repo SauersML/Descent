@@ -116,7 +116,7 @@ and it is what an analysis pricing tag loss off a population-level quantity is a
     existed and reproduced by it.
 
     `battery_fix36b`, a sample-size sweep at `n` = 20, 50, 100 and 200: MATCH at worst 1.22
-    sems, `competitors_rejected: 4`. It falsifies the population-fixation reading at 4.87
+    sems, `competitors_rejected: 4`. It falsifies the population-fixation reading at 7.21
     sems, the beta closure at 8.33, the halved clock at 9.14, and the no-drift `τ = 0`
     reading at 29.67.
 
@@ -129,15 +129,18 @@ and it is what an analysis pricing tag loss off a population-level quantity is a
     WHAT THE MATCH COVERS. It validates this law AGAINST SIMULATED DRIFT. The two statements
     below are separate and both are true.
 
-    The sample-versus-population distinction is MEASURED, not asserted. On seven cells
-    declared readable in advance, the population-level reading is rejected in five, at up to
-    8.76 sems; the two that do not reject are cells whose predicted separation sat near the
-    threshold. The honest standing is FIVE OF SEVEN, not seven of seven. The rejection occurs
-    at SMALL sample sizes, `n` = 20 and `n` = 50. At `n` = 200 the population quantity
-    remains within 0.25 sems of the measurement and is not rejected. So the substantive claim
-    is unchanged: the sample quantity is the correct object, the population quantity is its
-    `n → ∞` limit, and it remains an adequate approximation at the large samples this law is
-    meant to serve -- 20% apart at `t = 250` and 0.8% apart by `t = 2000`, at `n` = 200.
+    The sample-versus-population distinction is MEASURED, not asserted -- and what is
+    measured is a MAGNITUDE rather than a direction. The sign was never available as a
+    finding: a fixed population makes every sample drawn from it monomorphic, so the
+    sample-monomorphic event CONTAINS the population-fixed one site by site and the
+    difference is non-negative in every realisation. What is under test is ADEQUACY AS AN
+    APPROXIMATION, and that is `n`-dependent. Every cell where the two are separable at all
+    sits at `n` = 20 or `n` = 50 -- 7.21 and 5.16 sems unascertained at `t` = 250, 6.00 and
+    3.20 ascertained, 5.69 at `t` = 750 -- and the sweep places none at `n` = 100 or 200,
+    because by there the gap has shrunk below what these site counts can read. So the
+    substantive claim is unchanged and is now measured rather than argued: the sample
+    quantity is the correct object, the population quantity is its `n → ∞` limit, and it
+    remains an adequate approximation at the large samples this law is meant to serve.
 
     The validated REGIME is extended by that sweep: `n` = 20, 50 and 100 had no verdict
     before it and all pass. Only `n` = 200 had one previously.
