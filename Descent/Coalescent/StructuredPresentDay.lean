@@ -14,6 +14,8 @@ namespace Descent
 
 namespace Coalescent
 
+open MeasureTheory
+
 /-!
 # The structured present-day law
 
@@ -562,24 +564,134 @@ theorem TwoDemeLDSystem.crossDCorrelation_panmixia {n : ℕ}
 
 /-! ## A3--A4. Typed demographic functionals and the many-deme representation -/
 
+/-- Typed rates for an arbitrary finite structured diffusion. -/
+structure ManyDemeRates (D : ℕ) where
+  coalescence : Fin D → ℝ
+  migration : Fin D → Fin D → ℝ
+  forwardMutation : Fin D → ℝ
+  backwardMutation : Fin D → ℝ
+  coalescence_pos : ∀ d, 0 < coalescence d
+  migration_nonneg : ∀ i j, 0 ≤ migration i j
+  migration_self : ∀ i, migration i i = 0
+  forwardMutation_nonneg : ∀ d, 0 ≤ forwardMutation d
+  backwardMutation_nonneg : ∀ d, 0 ≤ backwardMutation d
+
+/-- Lower one exponent, using truncated subtraction only at the coordinate whose coefficient
+already guarantees a positive exponent. -/
+def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
+  fun d ↦ if d = deme then exponent d - 1 else exponent d
+
+/-- Move one ancestral lineage from one deme label to another. -/
+def migrateExponent {D : ℕ} (exponent : Fin D → ℕ)
+    (from to : Fin D) : Fin D → ℕ :=
+  fun d ↦ if d = from then exponent d - 1 else if d = to then exponent d + 1 else exponent d
+
+/-- The arbitrary-deme structured moment generator.  This is the direct many-deme extension
+of `twoDemeMomentGenerator`; a serial chain, grid, island model, or typed external demography
+differs only in the supplied rate matrix and epoch schedule. -/
+noncomputable def manyDemeMomentGenerator {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ) (exponent : Fin D → ℕ) : ℝ :=
+  (∑ d, rates.coalescence d * ((exponent d * (exponent d - 1) : ℕ) : ℝ) / 2 *
+      (moment (decrementExponent exponent d) - moment exponent)) +
+  (∑ from, ∑ to, rates.migration from to * exponent from *
+      (moment (migrateExponent exponent from to) - moment exponent)) +
+  (∑ d, rates.forwardMutation d * exponent d *
+      (moment (decrementExponent exponent d) - moment exponent) -
+    rates.backwardMutation d * exponent d * moment exponent)
+
+/-- Embed a bivariate train-target exponent into the full deme index without enumerating a
+full sample-count cell. -/
+def pairExponent {D : ℕ} (train target : Fin D) (i j : ℕ) : Fin D → ℕ :=
+  if train = target then fun d ↦ if d = train then i + j else 0
+  else fun d ↦ if d = train then i else if d = target then j else 0
+
+/-- A many-deme mixed-moment oracle.  Implementations may be a sparse moment solver, the
+published JSFS dynamic program, or an exact external demography constructor; consumers see
+one typed mathematical object. -/
+structure ManyDemeMomentLaw (D : ℕ) where
+  mixedMoment : (Fin D → ℕ) → ℝ
+  representingMeasure : Measure (Fin D → ℝ)
+  probability : IsProbabilityMeasure representingMeasure
+  supported_on_unit_cube : ∀ᵐ frequency ∂representingMeasure,
+    ∀ d, frequency d ∈ Set.Icc (0 : ℝ) 1
+  mixedMoment_spec : ∀ exponent,
+    mixedMoment exponent =
+      ∫ frequency, (∏ d, frequency d ^ exponent d) ∂representingMeasure
+  normalized : mixedMoment (fun _ ↦ 0) = 1
+  moment_nonneg : ∀ exponent, 0 ≤ mixedMoment exponent
+  moment_le_one : ∀ exponent, mixedMoment exponent ≤ 1
+
+/-- Exact pairwise projection of a full many-deme moment law. -/
+noncomputable def ManyDemeMomentLaw.pairMoment {D : ℕ} (law : ManyDemeMomentLaw D)
+    (train target : Fin D) (i j : ℕ) : ℝ :=
+  law.mixedMoment (pairExponent train target i j)
+
+/-- A linear-size train-versus-all representation: only bivariate projections needed by the
+report are materialized.  Exactness is certified against a full moment oracle, but downstream
+state is `O(D K²)` rather than the Cartesian product of all deme sample configurations. -/
+structure TrainVsAllMomentProjection (D : ℕ) where
+  fullLaw : ManyDemeMomentLaw D
+  train : Fin D
+  trainSampleSize : ℕ
+  targetSampleSize : Fin D → ℕ
+
+/-- Exact joint train-target sample-count law for one target projection. -/
+noncomputable def TrainVsAllMomentProjection.jointSampleCount {D : ℕ}
+    (projection : TrainVsAllMomentProjection D) (target : Fin D)
+    (sourceCount targetCount : ℕ) : ℝ :=
+  let ns := projection.trainSampleSize
+  let nt := projection.targetSampleSize target
+  if sourceCount ≤ ns ∧ targetCount ≤ nt then
+    (Nat.choose ns sourceCount : ℝ) * (Nat.choose nt targetCount : ℝ) *
+      (∑ a ∈ Finset.range (ns - sourceCount + 1),
+        ∑ b ∈ Finset.range (nt - targetCount + 1),
+          (Nat.choose (ns - sourceCount) a : ℝ) *
+          (Nat.choose (nt - targetCount) b : ℝ) * (-1 : ℝ) ^ (a + b) *
+          projection.fullLaw.pairMoment projection.train target
+            (sourceCount + a) (targetCount + b))
+  else 0
+
+/-- Exact target spectrum conditional on a source count, in `O(D)` pairwise projections. -/
+noncomputable def TrainVsAllMomentProjection.conditionalTargetSpectrum {D : ℕ}
+    (projection : TrainVsAllMomentProjection D) (target : Fin D)
+    (sourceCount targetCount : ℕ) : ℝ :=
+  projection.jointSampleCount target sourceCount targetCount /
+    (∑ j ∈ Finset.range (projection.targetSampleSize target + 1),
+      projection.jointSampleCount target sourceCount j)
+
+/-- Exact erosion probability for every train-target pair. -/
+noncomputable def TrainVsAllMomentProjection.targetErosion {D : ℕ}
+    (projection : TrainVsAllMomentProjection D) (target : Fin D) : ℝ :=
+  let ns := projection.trainSampleSize
+  let nt := projection.targetSampleSize target
+  (∑ i ∈ Finset.Icc 1 (ns - 1),
+      projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt) /
+    (∑ i ∈ Finset.Icc 1 (ns - 1),
+      ∑ j ∈ Finset.range (nt + 1), projection.jointSampleCount target i j)
+
 /-- Pairwise coalescence times in raw generations. -/
 structure PairwiseCoalescenceTimes (D : ℕ) where
   within : Fin D → ℝ
   between : Fin D → Fin D → ℝ
   within_pos : ∀ d, 0 < within d
   between_pos : ∀ i j, 0 < between i j
+  between_symmetric : ∀ i j, between i j = between j i
+  between_self : ∀ i, between i i = within i
 
 /-- A typed joint spectrum rather than an unlabelled array of reals. -/
 structure JointSampleSpectrum (D : ℕ) where
   sampleSize : Fin D → ℕ
   mass : (∀ d, Fin (sampleSize d + 1)) → ℝ
   mass_nonneg : ∀ cell, 0 ≤ mass cell
+  mass_sum_one : ∑ cell, mass cell = 1
 
 /-- The two-locus moments a demographic history supplies at a recombination coordinate. -/
 structure DemographicTwoLocusMoments (D : ℕ) where
   DD : ℝ → Fin D → Fin D → ℝ
   Dz : ℝ → Fin D → Fin D → Fin D → ℝ
   pi2 : ℝ → Fin D → Fin D → Fin D → Fin D → ℝ
+  DD_symmetric : ∀ rho i j, DD rho i j = DD rho j i
+  pi2_pair_swap : ∀ rho i j k l, pi2 rho i j k l = pi2 rho k l i j
 
 /-- The complete typed output of a demography.  Serial-founder, grid and `stdpopsim` histories
 are constructors of this interface, not new metric derivations. -/
