@@ -30,6 +30,28 @@ structure FiniteDemeCount where
   value : ℕ
   value_gt_one : 1 < value
 
+/-- **The three scalar classes are inhabited.**  Each carries exactly one hypothesis, and a
+theorem quantified over an uninhabited structure is true and empty -- kernel-checked, clean
+axiom report, no content -- so each needs an exhibited inhabitant before anything stated over
+it is a statement about something.  The values are not `0` and not `1`: a witness sitting on
+the boundary its own hypothesis excludes, or on a value at which the arithmetic below
+degenerates, demonstrates inhabitation while hiding whether the general construction works. -/
+noncomputable def DirectionalMigrationRate.witness : DirectionalMigrationRate where
+  value := 1 / 100
+  nonneg := by norm_num
+
+/-- Inhabitation for the size scale; see `DirectionalMigrationRate.witness`. -/
+noncomputable def PositivePopulationSize.witness : PositivePopulationSize where
+  value := 1000
+  value_pos := by norm_num
+
+/-- Inhabitation for the deme count; see `DirectionalMigrationRate.witness`.  Three rather than
+the smallest admissible two, because a two-deme island is the case in which the finite-deme
+correction `D / (D - 1)` and several stepping-stone distinctions collapse. -/
+def FiniteDemeCount.witness : FiniteDemeCount where
+  value := 3
+  value_gt_one := by norm_num
+
 /-- Complete two-deme migration decomposition. -/
 structure TwoDemeMigrationComponents where
   sourceToTarget : DirectionalMigrationRate
