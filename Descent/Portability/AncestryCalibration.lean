@@ -157,10 +157,18 @@ because in general `R²_target = rho² · h²_target` while `r2Source = h²_sour
 small to separate the readings. That is a limit of this design, not a licence -- at small `m`
 the equal-heritability condition would bind.
 
-Power: the prediction spans 0.14510 to 0.40210 across the five cells, and the competing
-reading that evaluates at the NOMINAL `rho` rather than the realised one is carried on those
-same cells and misses by 35 sems -- that being the first of the two design faults behind the
-353-sem falsification this overturns. -/
+Power: the prediction spans 0.14510 to 0.40210 across the five cells, and three competing
+forms are REJECTED on those same cells at the same realised `rho`: the correlation left
+unsquared at 204.50 sems, the correlation alone with `r2Source` dropped at 290.74, and a
+reading in which the target genotype scale enters the `R²` as `r2Source·rhoSq/alpha^2` at
+467.25. The third of those is earned by the ALPHA SWEEP and by nothing else. It is
+arithmetically identical to this body wherever `alpha = 1`, and duly agrees there at 1.06,
+1.70 and 1.48 sems in the three such cells; what rejects it is `alpha` moved off one --
+177.81 sems at `alpha = 1.6`, 467.25 at `alpha = 0.6`, where this body sits at 2.34 and 1.65.
+A design that had held the score scale fixed would have carried that rival and rejected
+nothing by it. The NOMINAL-`rho` reading is not counted among the three: it declares
+`realised_inputs=False`, so its 35-sem miss is booked a LEAD rather than a rejection, the
+disagreement being possibly the nominal/realised gap rather than the form. -/
 noncomputable def ancestryRecalibratedR2 (r2Source rhoSq : ℝ) : ℝ :=
   Descent.Core.product r2Source rhoSq
 

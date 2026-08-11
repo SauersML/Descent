@@ -1139,10 +1139,17 @@ positive minus harm per false positive; the observable is the prevalence at whic
 net benefit crosses zero, read by interpolation.
 
   sens   spec   harm    this body   measured crossing   sems
-  0.90   0.90    1.5     0.14286        0.14281         0.05
-  0.80   0.95    3.0     0.15789        0.15798         0.04
-  0.95   0.70    1.0     0.24000        0.24034         0.64
-  0.70   0.99   20.0     0.22222        0.22303         0.07
+  0.90   0.90    1.5     0.14285        0.14281         0.04
+  0.80   0.95    3.0     0.15787        0.15798         0.05
+  0.95   0.70    1.0     0.24004        0.24034         0.56
+  0.70   0.99   20.0     0.22239        0.22303         0.05
+
+THE PREDICTION COLUMN IS EVALUATED AT EACH CELL'S REALISED SENSITIVITY AND SPECIFICITY, not
+at the nominal pair the draws were made from -- which is why it is 0.24004 and not the
+0.24000 the nominal arithmetic gives. That is not a detail: a run whose provenance is
+undeclared has every falsification on it booked as a LEAD rather than a rejection, so until
+the battery declared where its inputs came from, the three rivals below died and the ledger
+still gated this body as though nothing had been raced against it.
 
 Three competing forms are carried on the same cells and all three are refuted: swapping the
 numerator misses by 965 sems, the odds form `(1-spec)·harm/(sens·benefit)` by 140, and
@@ -1155,7 +1162,7 @@ crossing near π = 0.005 on a grid of spacing 0.0068, so the error bar was 35% o
 and the odds form matched too. The harm-to-benefit ratios here put the crossing between 0.14
 and 0.24, where the grid resolves it and the odds form separates.
 
-Power: the prediction spans 0.14286 to 0.24000 across the four cells, and that placement is
+Power: the prediction spans 0.14285 to 0.24004 across the four cells, and that placement is
 the design rather than an accident: an earlier run put every crossing near 0.005 on a grid of
 spacing 0.0068, where the error bar was 35 percent of the quantity and the odds form matched
 too. Here the grid resolves the crossing and three competing forms are refuted on the same
