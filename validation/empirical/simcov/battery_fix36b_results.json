@@ -1,5 +1,5 @@
 {
- "_battery_sha": "ef719fc9fbb86ab4",
+ "_battery_sha": "a345f380b3030447",
  "results": [
   {
    "name": "tagSampleMonomorphicProb",
@@ -216,57 +216,57 @@
    "name": "tagSampleMonomorphicProb [POPULATION FIXATION used where sample monomorphism belongs, competing]",
    "file": "Coalescent/Duality.lean",
    "source": "the realised fraction of sites FIXED IN THE POPULATION, which a sample-free quantity like stillSegregatingProb reports",
-   "note": "the confusion actually present in the corpus rather than a straw man. Recorded ONLY on the cells whose predicted gap clears 2 sems -- seven of twenty-four -- because the other seventeen cannot speak to the distinction at any site count; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
+   "note": "THE SIGN OF THIS ROW IS FORCED AND IS NOT A FINDING: a fixed population makes every sample drawn from it monomorphic, so the sample-monomorphic event CONTAINS the population-fixed one site by site and the difference is non-negative in every realisation. What the row measures is the MAGNITUDE of a gap already known to be positive, and the substantive claim under test is therefore ADEQUACY AS AN APPROXIMATION -- whether the population quantity can stand in for the sample one -- which is the confusion the corpus committed and is n-DEPENDENT: negligible at n = 200, not negligible at n = 20. The error bar is the PAIRED one, since the nesting makes the difference a single count. Recorded only on cells whose predicted gap clears 2 sems, the rest printed; positive control 'mean frequency is a martingale, unasc t=250' passed at 0.01 sems",
    "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from an ASCERTAINED panel of 400 sites per arm, drawn once by msprime at seed 360137: the ascertained arm is MAF >= 0.05 then top-ranked by |b|*sd, the unascertained arm is random segregating sites with no floor and no ranking. Samples of n = (20, 50, 100, 200) haplotypes drawn binomially (WITH replacement) from the same trajectories at t = (250, 750, 2000). The estimand is the unweighted fraction of PANEL SITES whose sample of n is monomorphic -- a proportion over sites, not a per-site probability averaged and not a population fixation probability. Error bars are prediction-side, sqrt(sum P(1-P))/N_sites. The law and its pmf are imported from battery_fix36 rather than retyped",
    "span": 0.9166666666666667,
    "verdict": "FALSIFIED",
    "worst": {
-    "design": "asc t=250 n=20",
-    "lean": 0.035,
-    "truth": 0.1175,
-    "sem": 0.01692594517769536,
-    "sems_off": 4.874173887123106,
-    "rel_err": 0.702127659574468
+    "design": "unasc t=250 n=20",
+    "lean": 0.42,
+    "truth": 0.535,
+    "sem": 0.015951097140949274,
+    "sems_off": 7.209535430937525,
+    "rel_err": 0.21495327102803746
    },
    "cells": [
     {
      "design": "asc t=250 n=20",
      "lean": 0.035,
      "truth": 0.1175,
-     "sem": 0.01692594517769536,
-     "sems_off": 4.874173887123106,
+     "sem": 0.013756248580190748,
+     "sems_off": 5.997274585369263,
      "rel_err": 0.702127659574468
     },
     {
      "design": "asc t=250 n=50",
      "lean": 0.035,
      "truth": 0.06,
-     "sem": 0.01320654571916414,
-     "sems_off": 1.8930006779685218,
+     "sem": 0.007806247497997997,
+     "sems_off": 3.2025630761017423,
      "rel_err": 0.4166666666666666
     },
     {
      "design": "asc t=750 n=20",
      "lean": 0.19,
      "truth": 0.265,
-     "sem": 0.02224417239279005,
-     "sems_off": 3.3716696074657997,
+     "sem": 0.013169567191065925,
+     "sems_off": 5.694947974514994,
      "rel_err": 0.28301886792452835
     },
     {
      "design": "unasc t=250 n=20",
      "lean": 0.42,
      "truth": 0.535,
-     "sem": 0.024840094441563463,
-     "sems_off": 4.629612027866421,
+     "sem": 0.015951097140949274,
+     "sems_off": 7.209535430937525,
      "rel_err": 0.21495327102803746
     },
     {
      "design": "unasc t=250 n=50",
      "lean": 0.42,
      "truth": 0.4825,
-     "sem": 0.024997528193774887,
-     "sems_off": 2.500247205064232,
+     "sem": 0.012103072956898178,
+     "sems_off": 5.163977794943222,
      "rel_err": 0.1295336787564767
     }
    ]

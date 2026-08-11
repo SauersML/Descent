@@ -168,7 +168,16 @@ def group_sweep():
                 c_nodrift.append(cell(lab, float(np.mean(
                     p0 ** n + (1.0 - p0) ** n)), meas, sem))
                 if readable:
-                    c_pop.append(cell(lab, pop_fixed, meas, sem))
+                    # THE PAIRED SEM, because the two events are NESTED: a fixed
+                    # population makes every sample from it monomorphic, so the
+                    # difference is a single count -- the sites monomorphic in
+                    # the sample while the population still segregates -- and its
+                    # variance is that of one proportion, not of a difference of
+                    # two loose ones. The marginal sem used in the first version
+                    # overstated the bar and understated the separation.
+                    dd = meas - pop_fixed
+                    sem_d = math.sqrt(max(dd * (1.0 - dd), 1e-12) / p0.size)
+                    c_pop.append(cell(lab, pop_fixed, meas, sem_d))
                 else:
                     skipped.append((lab, gap))
             # CONTROL, per arm and time: the mean frequency is a martingale under
@@ -211,10 +220,18 @@ def group_sweep():
            "sample-free quantity like stillSegregatingProb reports",
            c_pop, regime=reg, control=control,
            realised_inputs=True, argument_source="model",
-           note="the confusion actually present in the corpus rather than a straw "
-                "man. Recorded ONLY on the cells whose predicted gap clears 2 sems "
-                "-- seven of twenty-four -- because the other seventeen cannot "
-                "speak to the distinction at any site count")
+           note="THE SIGN OF THIS ROW IS FORCED AND IS NOT A FINDING: a fixed "
+                "population makes every sample drawn from it monomorphic, so the "
+                "sample-monomorphic event CONTAINS the population-fixed one site "
+                "by site and the difference is non-negative in every realisation. "
+                "What the row measures is the MAGNITUDE of a gap already known to "
+                "be positive, and the substantive claim under test is therefore "
+                "ADEQUACY AS AN APPROXIMATION -- whether the population quantity "
+                "can stand in for the sample one -- which is the confusion the "
+                "corpus committed and is n-DEPENDENT: negligible at n = 200, not "
+                "negligible at n = 20. The error bar is the PAIRED one, since the "
+                "nesting makes the difference a single count. Recorded only on "
+                "cells whose predicted gap clears 2 sems, the rest printed")
     record("tagSampleMonomorphicProb [beta closure matching the first two moments, "
            "competing]", LEAN_FILE, "Balding-Nichols E[X^n] + E[(1-X)^n]",
            c_beta, regime=reg, control=control,
