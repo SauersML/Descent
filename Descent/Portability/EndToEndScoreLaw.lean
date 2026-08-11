@@ -464,6 +464,18 @@ noncomputable def DemeScoreLaw.brierSkill
 
 /-! ## D. Calibration and the phenotype ladder -/
 
+/-- A probability strictly inside the unit interval. -/
+structure InteriorProbability where
+  value : ℝ
+  value_pos : 0 < value
+  value_lt_one : value < 1
+
+/-- The prevalence already carried by a deme score law, with its domain evidence. -/
+def DemeScoreLaw.prevalenceProbability (law : DemeScoreLaw) : InteriorProbability where
+  value := law.prevalence
+  value_pos := law.prevalence_pos
+  value_lt_one := law.prevalence_lt_one
+
 /-- D1--D2: identity-scale per-deme calibration from the score mean, observed outcome mean,
 and the same variance/covariance pair used by `r2True`. -/
 noncomputable def DemeScoreLaw.identityCalibration (law : DemeScoreLaw)
@@ -476,7 +488,28 @@ source prevalence and the residual scale is explicit. -/
 noncomputable def emergentPrevalenceFromLiabilityMean
     (sourcePrevalence liabilityMean residualSD : ℝ) : ℝ :=
   Foundations.Phi
-    ((liabilityMean - liabilityThreshold sourcePrevalence) / residualSD)
+    (liabilityMean / residualSD - liabilityThreshold sourcePrevalence)
+
+/-- The emergent prevalence is always an interior probability. -/
+noncomputable def emergentPrevalenceProbability
+    (sourcePrevalence : InteriorProbability) (liabilityMean residualSD : ℝ) :
+    InteriorProbability where
+  value := emergentPrevalenceFromLiabilityMean sourcePrevalence.value liabilityMean residualSD
+  value_pos := Foundations.Phi_pos _
+  value_lt_one := Foundations.Phi_lt_one _
+
+/-- With no liability-mean shift, the emergent prevalence is exactly the source prevalence
+at every positive residual scale. -/
+theorem emergentPrevalenceFromLiabilityMean_zero
+    (sourcePrevalence residualSD : ℝ) (hK0 : 0 < sourcePrevalence)
+    (hK1 : sourcePrevalence < 1) (_ : 0 < residualSD) :
+    emergentPrevalenceFromLiabilityMean sourcePrevalence 0 residualSD = sourcePrevalence := by
+  unfold emergentPrevalenceFromLiabilityMean
+  have h := liabilityRiskAtScore_at_zero_r2_eq_prevalence
+    sourcePrevalence 0 hK0 hK1
+  unfold liabilityRiskAtScore at h
+  norm_num at h ⊢
+  exact h
 
 /-- The four phenotype rungs. -/
 inductive PhenotypeRung where
@@ -491,45 +524,81 @@ deriving DecidableEq, Repr
 genetic-liability mean generated upstream. -/
 structure PhenotypeLadderInput where
   sourcePrevalence : ℝ
+  sourcePrevalence_pos : 0 < sourcePrevalence
+  sourcePrevalence_lt_one : sourcePrevalence < 1
   residualSD : ℝ
+  residualSD_pos : 0 < residualSD
   affineBaseline : ℝ
   randomBaseline : ℝ
   geneticLiabilityMean : ℝ
 
+/-- Explicit affine coordinate map from deployed score mean to genetic-liability mean. -/
+structure ScoreLiabilityScale where
+  intercept : ℝ
+  loading : ℝ
+
+noncomputable def ScoreLiabilityScale.mean
+    (scale : ScoreLiabilityScale) (scoreMean : ℝ) : ℝ :=
+  scale.intercept + scale.loading * scoreMean
+
+/-- Identity scale for a score already measured as genetic liability. -/
+def ScoreLiabilityScale.identity : ScoreLiabilityScale where
+  intercept := 0
+  loading := 1
+
 /-- Build the phenotype ladder from the demographic score law.  This is the A1-to-phenoB
 edge: the emergent rung receives the genetic-liability mean and no target prevalence. -/
-noncomputable def PhenotypeLadderInput.ofScoreLaw (sourcePrevalence residualSD
-    affineBaseline randomBaseline : ℝ) (scoreMeanToLiabilityMean : ℝ → ℝ)
+noncomputable def PhenotypeLadderInput.ofScoreLaw
+    (sourcePrevalence : InteriorProbability) (residualSD : ℝ) (residualSD_pos : 0 < residualSD)
+    (affineBaseline randomBaseline : ℝ) (scale : ScoreLiabilityScale)
     (law : DemeScoreLaw) : PhenotypeLadderInput where
-  sourcePrevalence := sourcePrevalence
+  sourcePrevalence := sourcePrevalence.value
+  sourcePrevalence_pos := sourcePrevalence.value_pos
+  sourcePrevalence_lt_one := sourcePrevalence.value_lt_one
   residualSD := residualSD
+  residualSD_pos := residualSD_pos
   affineBaseline := affineBaseline
   randomBaseline := randomBaseline
-  geneticLiabilityMean := scoreMeanToLiabilityMean law.scoreMean
+  geneticLiabilityMean := scale.mean law.scoreMean
 
 /-- D3: per-rung prevalence.  phenoC is the clean floor; phenoA/R apply their imposed
 baselines; phenoB obtains its prevalence from the upstream genetic-liability mean and is not
 told a target prevalence. -/
 noncomputable def phenotypePrevalence (input : PhenotypeLadderInput)
-    (rung : PhenotypeRung) : ℝ :=
+    (rung : PhenotypeRung) : InteriorProbability :=
   match rung with
-  | .phenoC => input.sourcePrevalence
-  | .phenoA => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
+  | .phenoC => ⟨input.sourcePrevalence, input.sourcePrevalence_pos,
+      input.sourcePrevalence_lt_one⟩
+  | .phenoA => emergentPrevalenceProbability
+      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
       input.affineBaseline input.residualSD
-  | .phenoR => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
+  | .phenoR => emergentPrevalenceProbability
+      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
       input.randomBaseline input.residualSD
-  | .phenoB => emergentPrevalenceFromLiabilityMean input.sourcePrevalence
+  | .phenoB => emergentPrevalenceProbability
+      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
       input.geneticLiabilityMean input.residualSD
+
+/-- Replace only the prevalence axis of a score law by a phenotype rung.  Score moments stay
+fixed, so discrimination and calibration consume phenoB's emergent prevalence without being
+told it independently. -/
+noncomputable def DemeScoreLaw.atPhenotypeRung (law : DemeScoreLaw)
+    (input : PhenotypeLadderInput) (rung : PhenotypeRung) : DemeScoreLaw :=
+  let rungPrevalence := phenotypePrevalence input rung
+  { law with
+    prevalence := rungPrevalence.value
+    prevalence_pos := rungPrevalence.value_pos
+    prevalence_lt_one := rungPrevalence.value_lt_one }
 
 /-- D1--D3: logistic CITL at every rung, using the validated prevalence-shift algebra. -/
 noncomputable def phenotypeCITL (input : PhenotypeLadderInput)
-    (predictedPrevalence : ℝ) (rung : PhenotypeRung) : ℝ :=
-  prevalenceCITLShift predictedPrevalence (phenotypePrevalence input rung)
+    (predictedPrevalence : InteriorProbability) (rung : PhenotypeRung) : ℝ :=
+  prevalenceCITLShift predictedPrevalence.value (phenotypePrevalence input rung).value
 
 /-- The complete per-rung calibration profile: rung-specific CITL and the single slope fixed
 by the selected score moments. -/
 noncomputable def phenotypeCalibrationProfile (law : DemeScoreLaw)
-    (input : PhenotypeLadderInput) (predictedPrevalence : ℝ)
+    (input : PhenotypeLadderInput) (predictedPrevalence : InteriorProbability)
     (rung : PhenotypeRung) : CalibrationProfile where
   citl := phenotypeCITL input predictedPrevalence rung
   slope := law.calibrationSlope
@@ -537,7 +606,9 @@ noncomputable def phenotypeCalibrationProfile (law : DemeScoreLaw)
 
 /-- The clean rung has no intercept shift when predicted at its source prevalence. -/
 theorem phenotypeCITL_phenoC_zero (input : PhenotypeLadderInput) :
-    phenotypeCITL input input.sourcePrevalence PhenotypeRung.phenoC = 0 := by
+    phenotypeCITL input
+      ⟨input.sourcePrevalence, input.sourcePrevalence_pos, input.sourcePrevalence_lt_one⟩
+      PhenotypeRung.phenoC = 0 := by
   exact no_citl_shift_same_prevalence input.sourcePrevalence
 
 /-- D2 is shared by all rungs: changing a baseline changes the intercept/prevalence but not
