@@ -17,15 +17,25 @@
       the three cells all had the SAME sum, so the design could not have
       rejected it. Six designs spanning a factor of four in the sum.
 
+      SINCE 2026-08-11 the sum reading is recorded BARE rather than as a
+      candidate, because it stopped being one: `MigrationDrift.lean` now
+      declares `asymmetricFst = 1 / (1 + 4 * Ne * (m₁₂ + m₂₁))` and proves it is
+      the island law at the total exchange rate. While every row for this
+      declaration stayed tagged, `ledger.py` had nothing to make canonical, so
+      nine rows across four batteries measured a live body and credited nothing
+      to it -- and the two rate readings refuted here were rejections of
+      nothing. No cell changes; the row's name does.
+
   sourceBestLinearWeightsFromLD   never reported: `verdict.report` raises
       KeyError on any verdict `classify` returns before it computes `sems_off`,
       so SELF-TEST and GENERATIVE SELF-TEST crash the reporter. Guarded here.
 """
 import math
+import os
 
 import numpy as np
 
-from battery_core import RESULTS, record
+from battery_core import dump_results, record, run_groups
 
 
 def island_transient_nomut(Ne, d, bigM, gens, n_loci=240, reps=10, seed=1):
@@ -155,13 +165,33 @@ def test_asymmetric_fst_spanning():
            "share a sum while differing in asymmetry, so a law depending on "
            "more than the sum would separate")
     record("asymmetricFst [m_into = the larger rate]", "PortabilityDrift.lean",
-           "1 / (1 + 4*Ne*m_into)", cells_big, control=control, regime=reg)
+           "1 / (1 + 4*Ne*m_into)", cells_big, control=control, regime=reg,
+           realised_inputs=True)
     record("asymmetricFst [m_into = the smaller rate]", "PortabilityDrift.lean",
            "1 / (1 + 4*Ne*m_into)", cells_small, control=control,
-           regime="same runs, the other reading of the single rate argument")
-    record("asymmetricFst [CANDIDATE: 1/(1 + 4Ne(m12 + m21))]",
-           "PortabilityDrift.lean", "1 / (1 + 4*Ne*(m12 + m21))", cells_sum,
-           control=control, regime="same runs, the total-exchange reading")
+           regime="same runs, the other reading of the single rate argument",
+           realised_inputs=True)
+    # THE CANDIDATE WAS ADOPTED, SO THIS ROW IS NO LONGER A CANDIDATE.
+    # `asymmetricFst` now reads `1 / (1 + 4 * Ne * (m₁₂ + m₂₁))` in
+    # `MigrationDrift.lean`, with `asymmetricFst_eq_fstFromFlow_total` proving it
+    # is the island law at the TOTAL exchange rate, which is the reading this row
+    # transcribes verbatim. While it stayed tagged, `ledger.py` had no bare row
+    # to make canonical -- a row is corpus only if it is bare or shares a source
+    # string with a bare row of the same name -- so nine rows across four
+    # batteries measured a live body and credited nothing to it, and the two
+    # readings refuted beside it here counted as rejections of nothing.
+    # Untagging it is the bookkeeping catching up with a decision the corpus
+    # already made, not a new claim: the cells, the oracle and the control are
+    # the ones this battery already ran.
+    record("asymmetricFst", "PortabilityDrift.lean",
+           "1 / (1 + 4*Ne*(m12 + m21))", cells_sum,
+           control=control, realised_inputs=True, regime=reg + ". This row is the TOTAL-EXCHANGE "
+           "reading, which is the body the corpus now declares",
+           note="the two competing readings of the single rate argument -- the "
+                "larger of the two rates and the smaller -- are carried on "
+                "these same runs and refuted, which is what makes the "
+                "agreement here evidence that asymmetry enters only through "
+                "the sum rather than an agreement with nothing to lose to")
 
 
 def test_source_weights():
@@ -197,16 +227,21 @@ def test_source_weights():
 
 
 def main():
-    for fn in (test_transient_rate_nomut, test_asymmetric_fst_spanning,
-               test_source_weights):
-        try:
-            fn()
-        except Exception:
-            import traceback
-            traceback.print_exc()
-    import json
-    with open("battery_dis2_results.json", "w") as f:
-        json.dump(RESULTS, f, indent=1, default=float)
+    # `run_groups` rather than a local try/except, and `dump_results` rather than
+    # a bare `json.dump`. The bare dump wrote a list with no `_battery_sha`, so
+    # the ledger could only mark this battery UNVERIFIED and no one could tell
+    # whether the numbers on disk came from the source beside them. They could
+    # not: re-running on 2026-08-11 moved the transient group's measurements by
+    # 4.8 percent against the committed file, on a seeded design, with no way to
+    # attribute the difference. That is the exact failure the hash exists to
+    # make visible, and it stayed invisible here for as long as this battery
+    # wrote its results the old way.
+    failed = run_groups(test_transient_rate_nomut, test_asymmetric_fst_spanning,
+                        test_source_weights)
+    here = os.path.dirname(os.path.abspath(__file__))
+    sha = dump_results(os.path.join(here, "battery_dis2_results.json"),
+                       failed_groups=failed)
+    print("\nbattery sha %s" % sha)
 
 
 if __name__ == "__main__":
