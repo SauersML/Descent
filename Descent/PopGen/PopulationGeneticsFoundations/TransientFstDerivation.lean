@@ -105,7 +105,12 @@ noncomputable def hetDecayFactor (Ne : ℝ) (θ : Descent.Core.Theta) : ℝ :=
     The engine runs about 1% hot against the known plateau (`H = 0.4489` and
     `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
     the same systematic `ia_engine.selftest` reports, so it is disclosed rather
-    than absorbed: it is a tenth of the gap being resolved here. -/
+    than absorbed: it is a tenth of the gap being resolved here.
+
+    Power: `theta` is swept over 0.80 and 1.00 and `Ne` over 50, 100 and 200, so
+    the plateau the trajectory approaches moves from 0.4444 to 0.5000 while the
+    rate it approaches at moves with `Ne` independently, over fifteen iterated
+    generations from a measured start. Worst cell 1.01 sems at 6.5 percent. -/
 noncomputable def hetMutationRecurrence (lam Hstar H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => lam * hetMutationRecurrence lam Hstar H₀ t + (1 - lam) * Hstar
@@ -156,7 +161,11 @@ theorem hetMutationRecurrence_closed_form (lam Hstar H₀ : ℝ) (t : ℕ) :
     property `E[p_t] = p₀`, `p₀(1-p₀)(1 - H_t/H₀)` reduces identically to
     `Var(p_t)`, so those comparisons return the drift model's own algebra and
     scored MATCH at 0.00 sems in three cells. The heterozygosity decay above is
-    the only one of the four that a simulation can refute. -/
+    the only one of the four that a simulation can refute.
+
+    Power: the prediction spans 0.18168 to 0.63304 across the design, a span of
+    71 percent, with `Nₑ` and `t` moved separately so that the two cells reaching
+    `F ≈ 0.18` by different routes both have to hold. -/
 noncomputable def fstFromHetRatio (H H₀ : ℝ) : ℝ :=
   Descent.Core.proportionalReduction H H₀
 
@@ -249,7 +258,14 @@ theorem het_ratio_prefactor_unit_H₀ (θ : Descent.Core.Theta) (hθ : 0 ≤ θ.
 
     Separating them needs about a hundredfold increase in replicates at small
     `Ne`, which is worth doing only if something downstream depends on the
-    difference; nothing currently does. -/
+    difference; nothing currently does.
+
+    Power: `t/Ne` is swept from 0.25 to 4 at `Ne` of 50, 100 and 200, over which
+    the prediction rises from a quarter of the plateau toward it. NOT separated
+    from `fstMutationDriftTransient`: the two differ by about a percent at
+    `Ne = 50` while the measurement's own noise is six percent, so what this
+    design establishes is the common content and neither form beats the
+    other. -/
 noncomputable def fstMutationDriftTransientDiscrete (θ : Descent.Core.Theta) (Ne : ℝ) (t : ℕ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - hetDecayFactor Ne θ ^ t)
 

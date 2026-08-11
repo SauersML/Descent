@@ -246,7 +246,12 @@ the factor -- as it stood -- asserted that the units agree.
 
     Empirical status: **VALIDATED as half the one-branch drift variance** (worst
     0.5 sems), and the reading its own summary line invited -- that the sum is
-    that variance -- **FALSIFIED at 17.9 sems**. -/
+    that variance -- **FALSIFIED at 17.9 sems**.
+
+    Power: the prediction spans 51.97 to 421.76 across the three cells, `F`
+    running from 0.072 to 0.465, and the reading this docstring's own summary
+    line invited -- the sum without its factor of two -- rides those same cells
+    and is 50 percent low at up to 17.9 sems. -/
 noncomputable def pgsDriftVarianceFromLoci {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) : ℝ :=
   ∑ i : Fin n, fst * β i ^ 2
 
@@ -278,7 +283,11 @@ theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n
     two independently drifted populations, 4000 replicates. Before the
     correction to `pgsDriftVariance_one_pop` this definition inherited that
     body's missing ploidy factor and read 50.5 percent low at 22.6 sems; it is
-    `2 * pgsDriftVariance_one_pop` and so was corrected with it. -/
+    `2 * pgsDriftVariance_one_pop` and so was corrected with it.
+
+    Power: the pre-correction body is carried on the same 4000-replicate design
+    and reads 50.5 percent low at 22.6 sems, so the ploidy factor is chosen by
+    the measurement rather than by the algebra above it. -/
 noncomputable def pgsDiffVariance_two_pop (V_A fst : ℝ) : ℝ :=
   2 * pgsDriftVariance_one_pop V_A fst
 
@@ -300,7 +309,11 @@ theorem pgsDiffVariance_two_pop_eq_sum (V_A fst : ℝ) :
     sems in every cell.
 
     Empirical status: **VALIDATED** after correction; the superseded body
-    **FALSIFIED** at 22.6 sems. -/
+    **FALSIFIED** at 22.6 sems.
+
+    Power: the superseded `V_A × 2FST` is carried on the two-branch design of
+    `battery_bulk3.py` and is 50.5 percent low at 22.6 sems in every cell, so
+    the factor of 4 is chosen by the measurement. -/
 noncomputable def expectedPGSDiffVariance (V_A fst : ℝ) : ℝ :=
   V_A * 4 * fst
 
