@@ -189,9 +189,46 @@ def group_e():
         tag = ((idx == 0) | (idx == 2)).sum(axis=1).astype(float)
         return causal, tag
 
+    # WHICH AVERAGE OVER STUDIES THE BODY IS PREDICTING, derived before the run
+    # rather than chosen after it.
+    #
+    # Write the estimator out. `b_tag = Cov(tag,y)/Var(tag)` and `y = beta*causal
+    # + eps`, so `est = Cov(tag,y)/Cov(tag,causal) = beta + Cov(tag,eps) /
+    # Cov(tag,causal)`. Conditional on one study's drawn dosages,
+    # `Var(Cov(tag,eps)) = sigma^2 Var(tag)/n` and `Cov(tag,causal)^2 = r2 *
+    # Var(tag) * Var(causal)`, so
+    #
+    #     Var(est | that study's design) = sigma^2 / (n * Var(causal) * r2)
+    #
+    # and with `sigma = 1` that is `1/(n * H * r2)` for THAT study. The oracle is
+    # one over the variance of `est` ACROSS studies, and the across-study
+    # variance is the MEAN of the per-study variances (the estimator is
+    # conditionally unbiased, so the between-study term vanishes). So
+    #
+    #     info = 1 / E_j[1/(n H_j r2_j)] = n / E_j[1/(H_j r2_j)]
+    #
+    # -- a HARMONIC mean of `H_j r2_j`, not the product of two arithmetic means.
+    #
+    # THE PREDICTION I WROTE HERE BEFORE RUNNING IT WAS WRONG AND THE ROW IS
+    # KEPT SO THAT IT STAYS WRONG IN PUBLIC. I expected the Jensen gap between
+    # the two averages to be roughly constant in n, on the reasoning that it is
+    # a property of the spread of `H_j r2_j` across studies, and therefore to
+    # be separable from the order-1/n estimator bias this group was built to
+    # isolate. It is not. That spread is itself sampling scatter WITHIN each
+    # study -- `r2_j` and `H_j` are estimated from n individuals apiece -- so it
+    # falls like 1/n and the gap falls with it: measured at 1.39, 0.34 and 0.09
+    # percent across n = 600, 2400, 9600 at fixed r. The harmonic correction is
+    # a COMPONENT of the order-1/n family, not an alternative to it, and this
+    # design cannot separate the two because they have the same n-dependence.
+    #
+    # Both readings are computed and printed in every cell. The HARMONIC one is
+    # scored, because it is the one the functional above predicts, and the
+    # product-of-means figure is carried beside it so the size of the choice is
+    # never something a reader has to take on trust.
+    gaps = []
     for r, n, reps in ((0.6, 600, 6000), (0.6, 2400, 6000),
                        (0.6, 9600, 6000), (0.9, 2400, 6000)):
-        ests, r2_real = [], []
+        ests, r2_real, h_real = [], [], []
         for _ in range(reps):
             causal, tag = draw(r, n)
             if tag.std() == 0 or causal.std() == 0:
@@ -203,33 +240,52 @@ def group_e():
                 continue
             ests.append(b_tag * float(tag.var(ddof=1)) / cov)
             r2_real.append(float(np.corrcoef(tag, causal)[0, 1]) ** 2)
+            # the causal variant's REALISED heterozygosity in this study: for a
+            # diploid dosage that is exactly the dosage variance, and it is the
+            # quantity `2p(1-p)` names. The nominal table frequency was what
+            # this group used, and it is the one argument that kept the whole
+            # prediction from being declarable as realised.
+            h_real.append(float(causal.var(ddof=1)))
         ests = np.asarray(ests)
-        r2_hat = float(np.mean(r2_real))
+        r2j = np.asarray(r2_real)
+        hj = np.asarray(h_real)
+        r2_hat = float(np.mean(r2j))
+        h_hat = float(np.mean(hj))
         info = 1.0 / float(ests.var(ddof=1))
         sem = info * math.sqrt(2.0 / (len(ests) - 1))
-        H = 2 * p * (1 - p)
-        lean = n * H * r2_hat
+
+        def harmonic(w):
+            """n / E_j[1/(H_j w_j)], the average the functional predicts."""
+            return n / float(np.mean(1.0 / (hj * w)))
+
+        lean = harmonic(r2j)
+        prod_of_means = n * h_hat * r2_hat
+        gaps.append(100.0 * (prod_of_means / lean - 1.0))
         lab = "r=%.1f n=%d (realised r2=%.4f)" % (r, n, r2_hat)
-        print("  %-34s I = %.2f ± %.2f | body %.2f (%.2f%% off)  r^1 %.2f  "
-              "r^4 %.2f" % (lab, info, sem, lean, 100 * (lean / info - 1),
-                            n * H * math.sqrt(r2_hat), n * H * r2_hat ** 2))
+        print("  %-34s I = %.2f ± %.2f | body %.2f (%.2f%% off)  "
+              "[product-of-means %.2f, %.2f%% above the harmonic]  r^1 %.2f  "
+              "r^4 %.2f"
+              % (lab, info, sem, lean, 100 * (lean / info - 1), prod_of_means,
+                 gaps[-1], harmonic(np.sqrt(r2j)), harmonic(r2j ** 2)))
         cells.append(dict(design=lab, lean=lean, truth=info, sem=sem))
-        c_r1.append(dict(design=lab, lean=n * H * math.sqrt(r2_hat),
-                         truth=info, sem=sem))
-        c_r4.append(dict(design=lab, lean=n * H * r2_hat ** 2, truth=info,
+        c_r1.append(dict(design=lab, lean=harmonic(np.sqrt(r2j)), truth=info,
+                         sem=sem))
+        c_r4.append(dict(design=lab, lean=harmonic(r2j ** 2), truth=info,
                          sem=sem))
         if r == 0.9 and n == 2400:
             # Control: with the CAUSAL variant observed directly the estimator
             # is ordinary least squares and the information must be n*2p(1-p).
-            ests0 = []
+            ests0, h0 = [], []
             for _ in range(2000):
                 causal, _tag = draw(r, n)
                 y = beta * causal + rng.normal(0, 1.0, n)
                 b0, _ = ols(causal, y)
                 ests0.append(b0)
+                h0.append(float(causal.var(ddof=1)))
             i0 = 1.0 / float(np.var(ests0, ddof=1))
             control = dict(design="causal variant observed [I = n 2p(1-p)]",
-                           lean=n * H, truth=i0,
+                           lean=n / float(np.mean(1.0 / np.asarray(h0))),
+                           truth=i0,
                            sem=i0 * math.sqrt(2.0 / (len(ests0) - 1)))
     reg = ("two linked diploid loci from an explicit haplotype-frequency table "
            "so the dosage correlation is constructed and then REMEASURED, 6000 "
@@ -237,28 +293,36 @@ def group_e():
            "unit-variance Gaussian noise; the observable is the inverse "
            "variance across studies of the causal effect estimated through the "
            "tag with realised moments. n is swept SIXTEENFOLD at fixed r so an "
-           "order-1/n estimator bias is separated from a defect in the body")
-    # NO `realised_inputs` DECLARATION HERE, DELIBERATELY, and the reason is a
-    # real one rather than an oversight. Groups A and B evaluate every argument
-    # at the value their sample realised and now say so, which is what lets
-    # their competitors count as rejected rather than as LEADs. This group is
-    # MIXED: `r2_hat` is remeasured from the drawn dosages, but the
-    # heterozygosity `H = 2p(1-p)` is the nominal table frequency, not the
-    # realised one. Declaring True would assert something about the whole
-    # prediction that is true of one factor of it. The repair is to remeasure
-    # `H` from the drawn causal dosages -- a change to the prediction, not to a
-    # keyword -- and it belongs with whoever owns this body, because the two
-    # competitors it would unlock miss by only 38 and 35 sems and the group's
-    # own docstring warns that the estimator carries an order-1/n bias at the
-    # small-n end.
+           "order-1/n estimator bias is separated from a defect in the body. "
+           "BOTH arguments are realised: the LD r-squared and the causal "
+           "variant's heterozygosity are each remeasured from the drawn "
+           "dosages of the same studies the oracle is taken over, the "
+           "heterozygosity as the realised dosage variance. The estimand form "
+           "is n over the MEAN OF THE RECIPROCALS of H*r2 across studies, "
+           "which is what an inverse across-study variance predicts; the "
+           "product of the two arithmetic means is a different average and is "
+           "printed beside it")
+    note = ("both averages over studies are computed in every cell and the "
+            "HARMONIC one is scored, because that is what the conditional "
+            "variance of the ratio estimator predicts: the across-study "
+            "variance is the MEAN of the per-study variances, and each of those "
+            "is one over n*H_j*r2_j. The product of arithmetic means sits %s "
+            "percent above it across the four cells. That gap SHRINKS with n "
+            "(1.39 to 0.09 percent from n=600 to n=9600 at fixed r), because "
+            "the spread it comes from is sampling scatter within each study "
+            "rather than a property of the design -- so it is a component of "
+            "the order-1/n family this group was built to isolate and not an "
+            "alternative to it, and this design cannot tell the two apart"
+            % "/".join("%.2f" % g for g in gaps))
     record("effectiveFisherInformation", "AncestrySpecificPower.lean",
-           "n * (2*p*(1-p)) * r2_ld", cells, regime=reg, control=control)
+           "n * (2*p*(1-p)) * r2_ld", cells, regime=reg, control=control,
+           realised_inputs=True, note=note)
     record("effectiveFisherInformation [r^1 attenuation, competing]",
            "AncestrySpecificPower.lean", "n * (2*p*(1-p)) * r", c_r1,
-           regime=reg, control=control)
+           regime=reg, control=control, realised_inputs=True)
     record("effectiveFisherInformation [r^4 attenuation, competing]",
            "AncestrySpecificPower.lean", "n * (2*p*(1-p)) * r2^2", c_r4,
-           regime=reg, control=control)
+           regime=reg, control=control, realised_inputs=True)
 
 
 def group_f():

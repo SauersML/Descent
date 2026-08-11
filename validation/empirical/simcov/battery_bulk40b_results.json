@@ -1,5 +1,5 @@
 {
- "_battery_sha": "6e0d0d3070e134a5",
+ "_battery_sha": "e34dc195db973e86",
  "results": [
   {
    "name": "averageEffect",
@@ -418,50 +418,50 @@
    "name": "effectiveFisherInformation",
    "file": "AncestrySpecificPower.lean",
    "source": "n * (2*p*(1-p)) * r2_ld",
-   "note": "",
-   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
-   "span": 0.9375371833427809,
+   "note": "both averages over studies are computed in every cell and the HARMONIC one is scored, because that is what the conditional variance of the ratio estimator predicts: the across-study variance is the MEAN of the per-study variances, and each of those is one over n*H_j*r2_j. The product of arithmetic means sits 1.39/0.34/0.09/0.08 percent above it across the four cells. That gap SHRINKS with n (1.39 to 0.09 percent from n=600 to n=9600 at fixed r), because the spread it comes from is sampling scatter within each study rather than a property of the design -- so it is a component of the order-1/n family this group was built to isolate and not an alternative to it, and this design cannot tell the two apart",
+   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body. BOTH arguments are realised: the LD r-squared and the causal variant's heterozygosity are each remeasured from the drawn dosages of the same studies the oracle is taken over, the heterozygosity as the realised dosage variance. The estimand form is n over the MEAN OF THE RECIPROCALS of H*r2 across studies, which is what an inverse across-study variance predicts; the product of the two arithmetic means is a different average and is printed beside it",
+   "span": 0.938330691306269,
    "verdict": "MATCH",
    "worst": {
     "design": "r=0.9 n=2400 (realised r2=0.8099)",
-    "lean": 884.3865439034389,
+    "lean": 883.9736408327282,
     "truth": 854.7708119950457,
     "sem": 15.607209162516225,
-    "sems_off": 1.8975674382272754,
-    "rel_err": 0.03464757042799541
+    "sems_off": 1.8711115186319636,
+    "rel_err": 0.03416451337350028
    },
    "cells": [
     {
      "design": "r=0.6 n=600 (realised r2=0.3600)",
-     "lean": 98.27841476189283,
+     "lean": 96.95110766561946,
      "truth": 97.0208040174285,
      "sem": 1.7714970611610887,
-     "sems_off": 0.7099141014888597,
-     "rel_err": 0.012962279144155688
+     "sems_off": 0.03934319358303752,
+     "rel_err": 0.0007183650199035945
     },
     {
      "design": "r=0.6 n=2400 (realised r2=0.3602)",
-     "lean": 393.28693467041916,
+     "lean": 392.09065464419984,
      "truth": 385.8667635989652,
      "sem": 7.045518171468818,
-     "sems_off": 1.053176060421267,
-     "rel_err": 0.019229878733908863
+     "sems_off": 0.8833830094198929,
+     "rel_err": 0.016129637565009906
     },
     {
      "design": "r=0.6 n=9600 (realised r2=0.3602)",
-     "lean": 1573.3906990013152,
+     "lean": 1572.1127692075956,
      "truth": 1558.7031279261348,
      "sem": 28.460267241732243,
-     "sems_off": 0.5160728446584465,
-     "rel_err": 0.00942294322249951
+     "sems_off": 0.47117060312764136,
+     "rel_err": 0.008603075878408261
     },
     {
      "design": "r=0.9 n=2400 (realised r2=0.8099)",
-     "lean": 884.3865439034389,
+     "lean": 883.9736408327282,
      "truth": 854.7708119950457,
      "sem": 15.607209162516225,
-     "sems_off": 1.8975674382272754,
-     "rel_err": 0.03464757042799541
+     "sems_off": 1.8711115186319636,
+     "rel_err": 0.03416451337350028
     }
    ]
   },
@@ -469,50 +469,50 @@
    "name": "effectiveFisherInformation [r^1 attenuation, competing]",
    "file": "AncestrySpecificPower.lean",
    "source": "n * (2*p*(1-p)) * r",
-   "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.67 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
-   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
-   "span": 0.9375185944374153,
-   "verdict": "LEAD (undeclared input provenance)",
+   "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.64 sems",
+   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body. BOTH arguments are realised: the LD r-squared and the causal variant's heterozygosity are each remeasured from the drawn dosages of the same studies the oracle is taken over, the heterozygosity as the realised dosage variance. The estimand form is n over the MEAN OF THE RECIPROCALS of H*r2 across studies, which is what an inverse across-study variance predicts; the product of the two arithmetic means is a different average and is printed beside it",
+   "span": 0.9378935487901989,
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "r=0.6 n=2400 (realised r2=0.3602)",
-    "lean": 655.339097460313,
+    "lean": 654.4989688423084,
     "truth": 385.8667635989652,
     "sem": 7.045518171468818,
-    "sems_off": 38.24734069278108,
-    "rel_err": 0.6983559074847215
+    "sems_off": 38.12809770772899,
+    "rel_err": 0.6961786569483738
    },
    "cells": [
     {
      "design": "r=0.6 n=600 (realised r2=0.3600)",
-     "lean": 163.798678962917,
+     "lean": 162.7559583973314,
      "truth": 97.0208040174285,
      "sem": 1.7714970611610887,
-     "sems_off": 37.69573001815787,
-     "rel_err": 0.6882840811491598
+     "sems_off": 37.107120198561454,
+     "rel_err": 0.6775366896371467
     },
     {
      "design": "r=0.6 n=2400 (realised r2=0.3602)",
-     "lean": 655.339097460313,
+     "lean": 654.4989688423084,
      "truth": 385.8667635989652,
      "sem": 7.045518171468818,
-     "sems_off": 38.24734069278108,
-     "rel_err": 0.6983559074847215
+     "sems_off": 38.12809770772899,
+     "rel_err": 0.6961786569483738
     },
     {
      "design": "r=0.6 n=9600 (realised r2=0.3602)",
-     "lean": 2621.5588059850465,
+     "lean": 2620.596656658545,
      "truth": 1558.7031279261348,
      "sem": 28.460267241732243,
-     "sems_off": 37.34524588372139,
-     "rel_err": 0.6818846122885815
+     "sems_off": 37.31143912715338,
+     "rel_err": 0.6812673367411962
     },
     {
      "design": "r=0.9 n=2400 (realised r2=0.8099)",
-     "lean": 982.7258549272809,
+     "lean": 982.4601491181077,
      "truth": 854.7708119950457,
      "sem": 15.607209162516225,
-     "sems_off": 8.198457623003113,
-     "rel_err": 0.14969514767775766
+     "sems_off": 8.181433066824845,
+     "rel_err": 0.14938429732413702
     }
    ]
   },
@@ -520,50 +520,50 @@
    "name": "effectiveFisherInformation [r^4 attenuation, competing]",
    "file": "AncestrySpecificPower.lean",
    "source": "n * (2*p*(1-p)) * r2^2",
-   "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.67 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
-   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body",
-   "span": 0.9506039724163963,
-   "verdict": "LEAD (undeclared input provenance)",
+   "note": "positive control 'causal variant observed [I = n 2p(1-p)]' passed at 1.64 sems",
+   "regime": "two linked diploid loci from an explicit haplotype-frequency table so the dosage correlation is constructed and then REMEASURED, 6000 independent studies per cell, Y = beta * causal dosage + unit-variance Gaussian noise; the observable is the inverse variance across studies of the causal effect estimated through the tag with realised moments. n is swept SIXTEENFOLD at fixed r so an order-1/n estimator bias is separated from a defect in the body. BOTH arguments are realised: the LD r-squared and the causal variant's heterozygosity are each remeasured from the drawn dosages of the same studies the oracle is taken over, the heterozygosity as the realised dosage variance. The estimand form is n over the MEAN OF THE RECIPROCALS of H*r2 across studies, which is what an inverse across-study variance predicts; the product of the two arithmetic means is a different average and is printed beside it",
+   "span": 0.9523112721712511,
+   "verdict": "FALSIFIED",
    "worst": {
-    "design": "r=0.6 n=9600 (realised r2=0.3602)",
-    "lean": 566.7486931556426,
-    "truth": 1558.7031279261348,
-    "sem": 28.460267241732243,
-    "sems_off": 34.85400984977247,
-    "rel_err": 0.6363972824576892
+    "design": "r=0.6 n=600 (realised r2=0.3600)",
+    "lean": 34.12109007391848,
+    "truth": 97.0208040174285,
+    "sem": 1.7714970611610887,
+    "sems_off": 35.50653022381182,
+    "rel_err": 0.6483116129630395
    },
    "cells": [
     {
      "design": "r=0.6 n=600 (realised r2=0.3600)",
-     "lean": 35.37965863776789,
+     "lean": 34.12109007391848,
      "truth": 97.0208040174285,
      "sem": 1.7714970611610887,
-     "sems_off": 34.79607543873614,
-     "rel_err": 0.6353394615095913
+     "sems_off": 35.50653022381182,
+     "rel_err": 0.6483116129630395
     },
     {
      "design": "r=0.6 n=2400 (realised r2=0.3602)",
-     "lean": 141.64341848210125,
+     "lean": 140.43947085891176,
      "truth": 385.8667635989652,
      "sem": 7.045518171468818,
-     "sems_off": 34.6636456216746,
-     "rel_err": 0.6329214333958222
+     "sems_off": 34.83452696693391,
+     "rel_err": 0.6360415456645243
     },
     {
      "design": "r=0.6 n=9600 (realised r2=0.3602)",
-     "lean": 566.7486931556426,
+     "lean": 565.5061823256384,
      "truth": 1558.7031279261348,
      "sem": 28.460267241732243,
-     "sems_off": 34.85400984977247,
-     "rel_err": 0.6363972824576892
+     "sems_off": 34.897667585641585,
+     "rel_err": 0.6371944264472938
     },
     {
      "design": "r=0.9 n=2400 (realised r2=0.8099)",
-     "lean": 716.2450174335798,
+     "lean": 715.4959175352284,
      "truth": 854.7708119950457,
      "sem": 15.607209162516225,
-     "sems_off": 8.875756909451995,
-     "rel_err": 0.1620619148636404
+     "sems_off": 8.923753953033021,
+     "rel_err": 0.16293829001337565
     }
    ]
   },
