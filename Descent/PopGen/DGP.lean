@@ -521,24 +521,42 @@ theorem genotypeVariance_eq_zero_iff (p : ℝ) :
     of the CAUSAL effect estimated through the tag with realised moments.
 
       r     n      realised r²   this body   measured 1/Var(β̂)   sems
-      0.6    600     0.3600         98.3           97.0          0.71
-      0.6   2400     0.3602        393.3          385.9          1.05
-      0.6   9600     0.3602       1573.4         1558.7          0.52
-      0.9   2400     0.8099        884.4          854.8          1.90
+      0.6    600     0.3600         96.95          97.02         0.04
+      0.6   2400     0.3602        392.09         385.87         0.88
+      0.6   9600     0.3602       1572.11        1558.70         0.47
+      0.9   2400     0.8099        883.97         854.77         1.87
 
-    The identity gate: an `r¹` attenuation misses by up to 38 sems (70%) and an `r⁴` one by
-    35 sems (64%). The positive control -- observe the causal variant directly, where the
-    information must be the full `n·2p(1-p)` -- passes at 1.67 sems.
+    WHICH AVERAGE OVER STUDIES THIS BODY IS PREDICTING, because the two candidates differ and
+    only one of them is what the oracle measures. The oracle is a single variance taken ACROSS
+    studies, and the across-study variance of a conditionally unbiased ratio estimator is the
+    MEAN of the per-study variances, each of which is `1/(n·H_j·r²_j)`. So the matched
+    prediction is `n` over the mean of those reciprocals -- a HARMONIC mean of `H_j·r²_j` --
+    and NOT the product of the two arithmetic means, which is a different average of the same
+    draws. The battery computes both and scores the harmonic one. An earlier version of this
+    head quoted the product-of-means column (98.3, 393.3, 1573.4, 884.4); those numbers are
+    still printed in the run's log beside the scored ones, so a reader who finds them there
+    should know they are the unmatched average and not this body.
 
-    `n` is swept SIXTEENFOLD at fixed `r` on purpose. An earlier run at `n = 600` alone read
-    FALSIFIED at 3.2 sems and 7%, which is the estimator and not the body: the tag-based
-    estimate is a RATIO, biased at order `1/n`, and the residual shrinks as `n` grows. A
-    single sample size could not have told those apart.
+    The identity gate: an `r¹` attenuation misses by up to 38.13 sems and 69.6 percent, and an
+    `r⁴` one by 35.51 sems and 64.8 percent, both carried on these cells at the same realised
+    moments. The positive control -- observe the causal variant directly, where the
+    information must be the full `n·2p(1-p)` -- passes at 1.64 sems.
 
-    Power: the prediction spans 98.3 to 1573.4 across the design, `n` sweeping
-    sixteenfold at fixed `r`, and the two neighbouring attenuations are carried on
-    the same cells and rejected -- `r¹` at up to 38 sems and 70 percent, `r⁴` at 35
-    sems and 64 percent. -/
+    `n` IS SWEPT SIXTEENFOLD AT FIXED `r`, AND THIS DESIGN NO LONGER SETTLES WHAT THAT SWEEP
+    WAS FOR. An earlier run at `n = 600` alone read FALSIFIED at 3.2 sems and 7 percent, which
+    was attributed to the estimator rather than the body: the tag-based estimate is a RATIO,
+    biased at order `1/n`, so the residual should shrink as `n` grows. Under the matched
+    prediction the residuals are 0.04, 0.88, 0.47 and 1.87 sems and do NOT shrink with `n` --
+    the worst cell is the high-`r` one, not the small-`n` one. Part of what was read as ratio
+    bias was the averaging mismatch instead, and the two cannot be told apart here, because
+    the Jensen gap between the two averages is ITSELF an order-`1/n` effect: the battery
+    measures it at 1.39, 0.34 and 0.09 percent across `n` = 600, 2400 and 9600 at fixed `r`.
+    No account of which one it was should be read off these cells.
+
+    Power: the prediction spans 96.95 to 1572.11 across the design, `n` sweeping sixteenfold
+    at fixed `r`, and the two neighbouring attenuations are carried on the same cells and
+    rejected -- `r¹` at up to 38.13 sems and 69.6 percent, `r⁴` at 35.51 sems and 64.8
+    percent. -/
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
 
