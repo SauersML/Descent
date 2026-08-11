@@ -791,5 +791,64 @@ noncomputable def equivarianceDefect {L : Type*} [Fintype L]
     ∀ hx : p.2 ∈ b.source, ∀ hsx : actY p.1 p.2 ∈ b.source,
       b.apply (actY p.1 p.2) hsx ≠ actZ p.1 (b.apply p.2 hx)
 
+/-! ## Preserving an observation on the domain
+
+`ObservationalSymmetry` in `Descent/Blindness/` asks for an EQUALITY -- a transformation
+under which an observation is literally unchanged -- because the impossibility results it
+feeds turn on functions respecting equality, and a bound will not do. The bounds above are
+the approximate story; this is the exact one, and the bridge between them is
+`apply_eq_self_of_notMem_disagreement`.
+-/
+
+/-- **A partial transformation preserves an observation on its domain.** Nothing is
+asked of the observation off the source, which is what makes this the PARTIAL form:
+a transformation defined on part of a structure can only be asked to preserve what it
+is defined on.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    Whether a named observation is preserved by a named transformation is a claim
+    someone can measure; that this is the right form for such a claim is not. -/
+def PreservesOnSource {Omega : Type*} (observe : Y → Omega)
+    (u : FinitePartialBijection Y Y) : Prop :=
+  ∀ y (hy : y ∈ u.source), observe (u.apply y hy) = observe y
+
+/-- **The identity preserves every observation**, so the class is inhabited and the
+theorems quantified over it are not vacuous. -/
+theorem preservesOnSource_refl {Omega : Type*} (observe : Y → Omega) :
+    PreservesOnSource observe (refl Y) :=
+  fun _ _ ↦ rfl
+
+/-- The identity restricted to any finite set preserves every observation. -/
+theorem preservesOnSource_reflOn {Omega : Type*} (observe : Y → Omega) (s : Finset Y) :
+    PreservesOnSource observe (reflOn s) :=
+  fun _ hy ↦ by rw [reflOn_apply s _ hy]
+
+/-- **The bridge from the quantitative side.** A point of the source that the
+disagreement set against the identity-on-the-source does not contain is a point the
+transformation fixes.
+
+The restriction to points OF the source is not a weakening: `disagreement` counts a
+point where either map is undefined as a disagreement, so `u.disagreement (reflOn
+u.source)` is nonempty whenever `u` is partial, however faithfully `u` acts where it is
+defined. Zero total disagreement therefore says `u` is the identity everywhere, which is
+far more than a caller wanting invariance on a domain has to prove. -/
+theorem apply_eq_self_of_notMem_disagreement (u : FinitePartialBijection Y Y)
+    (y : Y) (hy : y ∈ u.source)
+    (h : y ∉ u.disagreement (reflOn u.source)) :
+    u.apply y hy = y := by
+  by_contra hne
+  exact h ((mem_disagreement _ _ _).2 fun hb hc ↦ by
+    rw [reflOn_apply]
+    exact hne)
+
+/-- A transformation that fixes every point of its source preserves every observation
+on it -- the route a caller arriving from the disagreement bounds takes to the equality
+`ObservationalSymmetry` wants. -/
+theorem preservesOnSource_of_fixesOnSource {Omega : Type*} (observe : Y → Omega)
+    (u : FinitePartialBijection Y Y)
+    (hfix : ∀ y (hy : y ∈ u.source), u.apply y hy = y) :
+    PreservesOnSource observe u :=
+  fun y hy ↦ by rw [hfix y hy]
+
 end FinitePartialBijection
 end Descent.Core
