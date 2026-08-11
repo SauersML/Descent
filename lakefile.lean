@@ -40,10 +40,14 @@ lean_lib Descent where
 -- asserts nothing about the world is not a law, and a reader who meets one inside
 -- `Descent/` has to be warned off it every time; Mathlib keeps `Counterexamples`
 -- separate for the same reason.  These modules `import Descent`, so they are built
--- and type-checked with everything else, and they sit outside the reach of
--- `validation/code/check.py`, which scans `Descent/` only -- which is the point:
--- the guards enforce properties of production laws, and none of them should be
--- asked to hold of a body kept precisely because it is false.
+-- and type-checked with everything else.  They are NOT outside the reach of
+-- `validation/code/check.py`: that script takes the REPOSITORY ROOT as its corpus, so
+-- `style`, `laundering` and `duplication` read these modules like any production body,
+-- and only the `Descent/`-scoped guards -- `identifications`, `conventions`, `layers`,
+-- the `shape-*` family and the rest -- pass them by.  This comment used to claim the
+-- opposite, and the claim was load-bearing: a second library was built on it and sat
+-- red for a day.  What separates a foil from the corpus is the library boundary and the
+-- warning a reader gets from it, not an exemption from the guards.
 -- A build that names its targets must name this one too:
 --   lake build Descent Counterexamples ValidationShared
 @[default_target]

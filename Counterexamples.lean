@@ -21,7 +21,9 @@ A body that merely failed its measurement does not belong here; it belongs nowhe
 purge deletes it.
 
 These modules `import Descent`, so they are built and type-checked with the rest of the
-corpus. They are outside the reach of `validation/code/check.py`, which scans `Descent/`.
+corpus. They are NOT outside the reach of `validation/code/check.py`: it takes the repository
+root as its corpus, so `style`, `laundering` and `duplication` read them like any
+production body, and only the `Descent/`-scoped guards pass them by.
 
     lake build Descent Counterexamples ValidationShared
 
