@@ -42,8 +42,10 @@ which is the elementary two-locus recursion, not Ohta and Kimura's result. Ohta
 and Kimura (1971) give the equilibrium `σ_d²` truncation, and exactly one
 definition in this file is theirs: `ohtaKimuraSigmaDSq`, whose own docstring
 says so and insists on the name being read literally. Do not cite this file's
-`E[D]` decay to them, and see `Descent.OpenQuestions.ldTaggingDecay` for the
-third thing the name has been attached to and should not be.
+`E[D]` decay to them, and do not cite an exponential chart in genetic distance
+to them either: no neutral two-locus theory in this corpus's reference set gives
+an exponential, and one measured against binned `r²` with a free amplitude and a
+free rate missed at both ends.
 
 Key results:
 1. LD decay with recombination distance follows the classical two-locus

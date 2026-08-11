@@ -2393,8 +2393,9 @@ correlation decays exponentially with recombination distance and divergence.
     substitution. What would land the repair is one cell fitting the
     amplitude-1 hyperbolic against measured `r²` normalised to its own
     zero-distance limit -- a re-analysis of cell `I`'s stored curve, not a new
-    simulation. The same evidence carried `OpenQuestions.ldTaggingDecay` to
-    FALSIFIED, which is the same chart under another name.
+    simulation. The same evidence condemned the identical chart carried under
+    another name in `Program/OpenQuestions.lean`, which is why the combined
+    portability there now multiplies in `ohtaKimuraSigmaDSq` instead.
 
     CONSUMERS. `jointTagLDKernelAt` multiplies this factor in and inherits the
     shape fault, and it is now the ONLY fault that kernel carries: the migration

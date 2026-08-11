@@ -598,108 +598,57 @@ theorem faster_decay_lower_correlation
   apply Real.exp_lt_exp.mpr
   nlinarith
 
-/-- **LD tagging efficiency decays exponentially with genetic distance.**
-    ρ²_LD(d) = exp(-λ_LD · d).
-
-    **Attribution, corrected: this is NOT the Ohta-Kimura result**, which the
-    docstring previously claimed. Ohta and Kimura (1971) give
-    `σ_d² ≈ (10 + ρ)/((2 + ρ)(11 + ρ))` with `ρ = 4·Nₑ·c`, formalized at
-    `LDDecayTheory.ohtaKimuraSigmaDSq`; that is HYPERBOLIC in the scaled
-    recombination rate, not exponential in it, and so is Sved's
-    `r² ≈ 1/(1 + 4·Nₑ·c)`. No published neutral two-locus theory in this
-    corpus's reference set predicts an exponential in genetic distance. The
-    exponential here is a phenomenological one-parameter chart, and it is only
-    that.
-
-    Regime: `d` is genetic distance, `λ_LD` a fitted rate with no derivation.
-    Nothing identifies `λ_LD` with `Nₑ` or with a recombination rate, so this
-    body cannot be inverted for a demographic parameter.
-
-    Empirical status: **FALSIFIED as a shape**
-    (`validation/empirical/popgensel/ldshapecell.py`, cell I). This
-    supersedes the LEAD the sibling body `PortabilityDrift.ldCorrelationDecay`
-    carried -- the same exponential chart, fitted against the same kind of
-    simulated `r²` curve, missing at BOTH ends at 21.7 and 14.2 sems. That run
-    was recorded as a lead rather than a verdict for one reason: it carried no
-    valid positive control. Cell I supplies exactly that control and changes
-    nothing else.
-
-    Both shapes are fitted to the SAME binned msprime `r²` values with a free
-    amplitude AND a free rate each, so neither is handicapped and any upward
-    bias in the `r²` estimator is common to both. The discrimination is the
-    shape, which no estimator convention moves.
-
-    | design | exponential χ²/point | hyperbolic χ²/point | worst exp. residual | worst hyp. |
-    |---|---|---|---|---|
-    | `Nₑ = 2000`, 4 Mb | 28.49 | 4.16 | 8.87 sems | 3.91 sems |
-    | `Nₑ = 5000`, 2 Mb | 79.66 | 1.95 | 12.56 sems | 3.46 sems |
-
-    **The positive control, which is the whole point of this cell.** A fitter
-    that prefers the hyperbolic on real data proves nothing unless it prefers the
-    EXPONENTIAL on data that is genuinely exponential. Run on a true exponential
-    with the same `x` grid and matched per-point noise, the same fitter prefers
-    the exponential by a sum-of-squares ratio of 168 and 197. So the preference
-    reported above is the data's and not the fitter's, and the lead becomes a
-    verdict.
-
-    This does not identify the hyperbolic's fitted rate with `4·Nₑ`: at
-    `Nₑ = 5000` the fit returns `b = 6572` against Sved's `20000`. What is
-    established is that the decay is hyperbolic in genetic distance and not
-    exponential in it, which is what this body gets wrong -- and, as the
-    paragraph above already says, no choice of `λ_LD` repairs a two-sided
-    failure.
-
-    **The successor is `PopGen.LDDecayTheory.ohtaKimuraSigmaDSq`**, and the
-    withdrawal above named none, which leaves a consumer holding a falsified
-    shape with nowhere to go. `simcov/battery_sved01.py` puts the same question
-    to a forward two-locus Wright-Fisher engine rather than to msprime -- a
-    different model class, a different estimator, no binning -- and over
-    `ρ = 4·Nₑ·c` from 0.5 to 20 the Ohta-Kimura form MATCHES at worst 1.85 sems
-    while this body's exponential shape is FALSIFIED at 6.29 sems and 36%
-    relative. The exponential there is fitted to the very curve it is tested
-    against, with a free amplitude AND a free rate, and the hyperbola is given
-    no fitted constant at all; so the failure cannot be a badly chosen `λ_LD`,
-    because it was chosen optimally.
-
-    Sved's `1/(1 + 4·Nₑ·c)` is NOT the successor, and that battery was written
-    to make it one. It is falsified at 17.6 sems in the same place, and `E[r²]`
-    -- the expectation of the ratio, which is what an `r²` curve looks like a
-    curve of -- has no mutation-free equilibrium to measure. -/
-noncomputable def ldTaggingDecay (lam_LD d : ℝ) : ℝ :=
-  Real.exp (-lam_LD * d)
-
-/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
-theorem ldTaggingDecay_at_reference_point :
-    ldTaggingDecay 0 0 = 1 := by
-  norm_num [ldTaggingDecay]
-
-
 /-- **Combined LD + effect turnover portability.**
-    Total portability = R²_source · ρ²_LD(d) · ρ²_effect(d). -/
+    Total portability = `R²_source · σ_d²(Nₑ, c) · ρ²_effect(d)`, at genetic
+    distance `d` read as the recombination fraction `c`.
+
+    The LD factor is `LDDecayTheory.ohtaKimuraSigmaDSq`, the corpus's validated
+    neutral two-locus decay. It is hyperbolic in `4·Nₑ·c`; an exponential chart
+    in genetic distance was measured against the same binned `r²` values with a
+    free amplitude and a free rate and missed at both ends, so an exponential is
+    not available here even as a convenience. The effect-turnover factor is a
+    fitted exponential and is still exactly that: `lam_eff` has no derivation,
+    and nothing below identifies it with a selection coefficient.
+
+    Empirical status: UNTESTED as a product. The LD factor is validated
+    separately at `ohtaKimuraSigmaDSq` and the turnover factor is a chart; that
+    the two multiply is the modelling assumption this section is about, and no
+    battery has put the product itself on trial. -/
 noncomputable def combinedPortability
-    (r2_src lam_LD lam_eff d : ℝ) : ℝ :=
-  r2_src * ldTaggingDecay lam_LD d * (Real.exp (-lam_eff * d)) ^ 2
+    (r2_src Ne lam_eff d : ℝ) : ℝ :=
+  r2_src * PopGen.ohtaKimuraSigmaDSq Ne d * (Real.exp (-lam_eff * d)) ^ 2
 
-/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why.
+The LD factor at zero scaled recombination is `5/11`, not `1`: complete linkage
+in a finite population does not make the squared correlation one. -/
 theorem combinedPortability_at_reference_point :
-    combinedPortability 1 0 0 1 = 1 := by
-  norm_num [combinedPortability, ldTaggingDecay]
+    combinedPortability 1 0 0 1 = 5 / 11 := by
+  norm_num [combinedPortability, PopGen.ohtaKimuraSigmaDSq]
 
+/-- **The LD factor is positive at every nonnegative distance**, which is what
+lets the turnover comparisons below be strict. -/
+theorem ohtaKimuraSigmaDSq_pos_of_nonneg {Ne d : ℝ} (hNe : 0 ≤ Ne) (hd : 0 ≤ d) :
+    0 < PopGen.ohtaKimuraSigmaDSq Ne d := by
+  have hrho : 0 ≤ 4 * Ne * d := by positivity
+  unfold PopGen.ohtaKimuraSigmaDSq
+  apply div_pos <;> nlinarith
 
-/-- **At distance 0, combined portability equals source R².** -/
-theorem combined_portability_at_zero (r2_src lam_LD lam_eff : ℝ) :
-    combinedPortability r2_src lam_LD lam_eff 0 = r2_src := by
-  unfold combinedPortability ldTaggingDecay
-  simp [mul_zero, Real.exp_zero]
+/-- **At zero distance, combined portability is the source `R²` times the
+complete-linkage value of `σ_d²`.** The `5/11` is the LD factor's own value at
+`ρ = 0` and is not a portability loss to genetic distance. -/
+theorem combined_portability_at_zero (r2_src Ne lam_eff : ℝ) :
+    combinedPortability r2_src Ne lam_eff 0 = r2_src * (5 / 11) := by
+  unfold combinedPortability PopGen.ohtaKimuraSigmaDSq
+  norm_num
 
 /-- **LD-only portability strictly exceeds combined portability at positive distance.**
     Adding effect turnover always makes portability worse. -/
 theorem turnover_worsens_ld_only_portability
-    (r2_src lam_LD lam_eff d : ℝ)
-    (hr2 : 0 < r2_src)
+    (r2_src Ne lam_eff d : ℝ)
+    (hr2 : 0 < r2_src) (hNe : 0 ≤ Ne)
     (hlam_eff : 0 < lam_eff) (hd : 0 < d) :
-    combinedPortability r2_src lam_LD lam_eff d <
-      r2_src * ldTaggingDecay lam_LD d := by
+    combinedPortability r2_src Ne lam_eff d <
+      r2_src * PopGen.ohtaKimuraSigmaDSq Ne d := by
   unfold combinedPortability
   have h_exp_lt : (Real.exp (-lam_eff * d)) ^ 2 < 1 := by
     have h1 : Real.exp (-lam_eff * d) < 1 := by
@@ -707,32 +656,30 @@ theorem turnover_worsens_ld_only_portability
       linarith [mul_pos hlam_eff hd]
     have h2 : 0 ≤ Real.exp (-lam_eff * d) := Real.exp_nonneg _
     nlinarith [sq_abs (Real.exp (-lam_eff * d))]
-  have h_base_pos : 0 < r2_src * ldTaggingDecay lam_LD d := by
-    unfold ldTaggingDecay
-    exact mul_pos hr2 (Real.exp_pos _)
-  calc r2_src * ldTaggingDecay lam_LD d * (Real.exp (-lam_eff * d)) ^ 2
-      < r2_src * ldTaggingDecay lam_LD d * 1 :=
+  have h_base_pos : 0 < r2_src * PopGen.ohtaKimuraSigmaDSq Ne d :=
+    mul_pos hr2 (ohtaKimuraSigmaDSq_pos_of_nonneg hNe (le_of_lt hd))
+  calc r2_src * PopGen.ohtaKimuraSigmaDSq Ne d * (Real.exp (-lam_eff * d)) ^ 2
+      < r2_src * PopGen.ohtaKimuraSigmaDSq Ne d * 1 :=
         mul_lt_mul_of_pos_left h_exp_lt h_base_pos
-    _ = r2_src * ldTaggingDecay lam_LD d := mul_one _
+    _ = r2_src * PopGen.ohtaKimuraSigmaDSq Ne d := mul_one _
 
 /-- **Immune portability drops multiplicatively faster.**
     For immune traits (large λ_eff), the combined decay is much faster
     than for neutral traits (small λ_eff). -/
 theorem immune_combined_decay_faster
-    (r2_src lam_LD lam_eff_neutral lam_eff_immune d : ℝ)
-    (hr2 : 0 < r2_src)
+    (r2_src Ne lam_eff_neutral lam_eff_immune d : ℝ)
+    (hr2 : 0 < r2_src) (hNe : 0 ≤ Ne)
     (hlami : lam_eff_neutral < lam_eff_immune)
     (hd : 0 < d) :
-    combinedPortability r2_src lam_LD lam_eff_immune d <
-      combinedPortability r2_src lam_LD lam_eff_neutral d := by
+    combinedPortability r2_src Ne lam_eff_immune d <
+      combinedPortability r2_src Ne lam_eff_neutral d := by
   unfold combinedPortability
-  have h_ld_pos : 0 < r2_src * ldTaggingDecay lam_LD d := by
-    unfold ldTaggingDecay; exact mul_pos hr2 (Real.exp_pos _)
+  have h_ld_pos : 0 < r2_src * PopGen.ohtaKimuraSigmaDSq Ne d :=
+    mul_pos hr2 (ohtaKimuraSigmaDSq_pos_of_nonneg hNe (le_of_lt hd))
   apply mul_lt_mul_of_pos_left _ h_ld_pos
   apply sq_lt_sq'
   · linarith [Real.exp_pos (-lam_eff_immune * d), Real.exp_pos (-lam_eff_neutral * d)]
   · exact faster_decay_lower_correlation lam_eff_neutral lam_eff_immune d hlami hd
-
 
 end LDTurnoverInteraction
 
