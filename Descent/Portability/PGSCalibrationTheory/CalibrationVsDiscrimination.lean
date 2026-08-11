@@ -43,14 +43,32 @@ scopes `variable`s and this file declares none at that level, so the reopening i
 
 /-- Logistic-scale prevalence log-odds.
 
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk6.py`,
-    `test_prevalence_logit`). The oracle is the fitted intercept of an
-    intercept-only logistic model on four million simulated binary outcomes,
-    which is what a calibration-in-the-large is read off in practice; worst 2.66
-    sems over a prediction spanning -3.89182 to -0.61904.
+    Empirical status: **VALIDATED IN THE CONSTANT-PREDICTOR REGIME, AND
+    FALSIFIED OUTSIDE IT** (`validation/empirical/simcov/battery_rival01.py`).
+    The qualifier is the content of this head, not a hedge on it: the same
+    battery measures both sides of the boundary, and the body is right on one
+    side of it.
 
-    Power: the prediction spans -3.89182 to -0.61904 across the design. -/
+    WHERE IT HOLDS. Binary outcomes drawn from `expit(b₀ + s·x)` with `x`
+    standard normal and the truth of each cell the generating intercept `b₀` --
+    a construction constant that never enters the prediction. On the `s = 0`
+    cells the predictor is constant, this body is the marginal logit exactly,
+    and it matches at 1.37 sems with THREE competing link readings rejected on
+    the same cells: probit `Φ⁻¹(π)` at 1500.40 sems, log-risk `log π` at 505.93,
+    complementary log-log `log(-log(1-π))` at 210.12. That competition is what
+    the earlier record lacked -- `simcov/battery_bulk6.py` agreed at 2.66 sems
+    with nothing run against it, which the ledger gates UNINFORMATIVE rather
+    than MATCH, and an uncompeted agreement is arithmetic.
+
+    WHERE IT FAILS, measured rather than conceded. Above zero score spread the
+    marginal logit is attenuated toward zero relative to the linear-predictor
+    intercept, and the same expression on those cells is FALSIFIED at 611.05
+    sems. A deployment reading this as the intercept of a model with a
+    non-degenerate score is outside what the body was measured to do.
+
+    Power: the prediction spans -3.89182 to -0.61904 across the design, and the
+    regime boundary itself is swept -- score spread from 0, where the claim is
+    exact, upward to where it fails at 611.05 sems. -/
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
@@ -91,21 +109,47 @@ theorem prevalenceLogit_reflect (pi : ℝ) :
     in the target, the intercept shift on the logistic linear-predictor
     scale is `logit(π_target) - logit(π_source)`.
 
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk6.py`,
-    `test_prevalence_logit`). Difference of fitted intercepts between two
-    simulated populations:
+    Empirical status: **VALIDATED IN THE CONSTANT-PREDICTOR REGIME, AND
+    FALSIFIED OUTSIDE IT** (`validation/empirical/simcov/battery_rival01.py`).
+    This head carried no regime qualifier while the corpus already held the
+    failure elsewhere, which is the defect the qualifier repairs: a reader took
+    an unscoped VALIDATED and got a body that is wrong wherever the score has
+    spread.
 
-      shift            this def   fitted               sems
-      0.02 -> 0.10      1.69460   1.69828±0.00394      0.93
-      0.10 -> 0.35      1.57819   1.57618±0.00197      1.02
-      0.35 -> 0.02     -3.27278  -3.27761±0.00373      1.29
+    WHERE IT HOLDS. Two populations differing ONLY by a known intercept shift
+    `δ` on the logistic linear predictor, outcomes drawn from `expit(b₀ + s·x)`
+    and `expit(b₀ + δ + s·x)`, with the truth of each cell `δ` itself. On the
+    `s = 0` cells this body recovers `δ` at 1.16 sems with THREE competing
+    readings rejected on the same cells: the identity-scale
+    `π_target - π_source` at 18728.79 sems, the probit-scale difference at
+    861.66, and the log risk ratio at 1053.74. The older record
+    (`simcov/battery_bulk6.py`, three cells including a sign reversal, worst
+    1.29 sems) agreed with nothing run against it and the ledger gates it
+    UNINFORMATIVE; this head no longer rests on it.
 
-    The design includes a SIGN REVERSAL, so a formula that had the two
-    prevalences the wrong way round would show rather than cancel.
+    WHERE IT FAILS. Above zero score spread the same expression is FALSIFIED at
+    616.96 sems, and the direction is not accidental -- this chapter DERIVES it
+    (`prevalenceCITLShift_undercorrects_upward`, `_downward`): a logistic
+    intercept shift multiplies every subpopulation's odds by `exp δ`, that
+    action is strictly concave in the risk upward and strictly convex downward,
+    and Jensen then puts the achieved marginal prevalence strictly on the near
+    side of the promised one for ANY mixture. The magnitude is measured, the
+    direction is proved, and together they say this is an UNDER-correction
+    rather than a noisy one.
 
-    Power: the prediction spans -3.27278 to 1.69460. Definitional within the logistic model declared
-    above: it fixes the shift rather than predicting an observable. -/
+    A SECOND DESIGN MEASURES THIS BODY AND AGREES THAT IT UNDER-CORRECTS.
+    `simcov/battery_pgscal01.py` transcribes this expression verbatim and
+    rejects it at 374.03 sems against the intercept a deployment actually needs,
+    with the identity-link reading rejected at 877.65 on the same cells -- two
+    million individuals per arm, the oracle the `a` solving
+    `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear predictor held as an
+    offset. That run and `battery_rival01.py` reach the same verdict from
+    different oracles, which is what makes the regime boundary a property of the
+    body rather than of one design.
+
+    Power: the prediction spans -3.27278 to 1.69460 across the design, and the
+    regime boundary is swept in its own right -- score spread from 0, where the
+    claim is exact at 1.16 sems, upward to where it fails at 616.96. -/
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
