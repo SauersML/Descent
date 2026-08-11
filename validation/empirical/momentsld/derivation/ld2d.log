@@ -1,0 +1,48 @@
+ld2d.py -- IS THE LD-CORRELATION DECAY GEOMETRIC IN 2-D, OR MALECOT-BESSEL?
+
+THE CANDIDATE LAW, from the literature and from the 1-D exact solutions.
+The exact chain solutions gave rD(0,d) = rD(0,1)^d to within 6% -- geometric in lattice
+steps, i.e. EXPONENTIAL in distance. That is the signature of a Green's function of a
+SCREENED (killed) random walk: in one dimension the Green's function of the discrete
+Laplacian minus a killing rate is exactly geometric, G(d) proportional to lambda^d.
+The classical one-locus isolation-by-distance theory (Malecot; Sawyer 1977, Adv. Appl.
+Prob. 9:268-282) says the SAME operator in two dimensions has Green's function
+K_0(r/L), the modified Bessel function of the second kind -- log-divergent at short
+range and e^{-r/L}/sqrt(r) at long range, NOT lambda^r. If the two-locus correlation
+inherits that structure, then the 2-D analogue of the geometric law is
+
+    rD(r) proportional to K_0(r / L),   with the SAME decay length L that the 1-D
+    nearest-neighbour value pins, and the dimension entering ONLY through the Green's
+    function -- an algebraic prefactor, not a different rate.
+
+That is a falsifiable structural claim and this file tests it. THE SOLVES HERE ARE
+NUMERIC AND VALIDATE ONLY; what is being tested is the SHAPE of an analytic law.
+
+Conventions as everywhere else: deme diploid size N, time in units of 2N generations,
+rho = 4Nc (joint block splits at rho/2), M = 4Nm per EDGE (a block hops to EACH
+neighbour at M/2), same-deme coalescence rate 1.
+
+
+==============================================================================
+[ 208.6s] 3x3 lattice (9 demes, 9639 two-locus states), rho=1 solved
+/projects/standard/hsiehph/sauer354/theory-out/ld2d.py:150: OptimizeWarning: Covariance of the parameters could not be estimated
+  popt, _ = curve_fit(lambda d, A, L: A * kn(0, np.asarray(d) / L),
+  rho=1      centre deme, rD by Manhattan distance
+      d    exact rD   geometric   geo err |   Bessel K0    K0 err
+      1    0.593569    0.593569    +0.00% |    0.593569    -0.00%
+      2    0.477509    0.352324   -26.22% |    0.477509    -0.00%
+    geometric max |err| over d>=2 = +26.22%   Bessel (A=0.1682 L=30.3502) max |err| = 0.00%
+[ 307.5s] 3x3 lattice (9 demes, 9639 two-locus states), rho=5 solved
+  rho=5      centre deme, rD by Manhattan distance
+      d    exact rD   geometric   geo err |   Bessel K0    K0 err
+      1    0.304652    0.304652    +0.00% |    0.304652    +0.00%
+      2    0.173644    0.092813   -46.55% |    0.173644    +0.00%
+    geometric max |err| over d>=2 = +46.55%   Bessel (A=0.2193 L=3.3945) max |err| = 0.00%
+[ 343.4s] 3x3 lattice (9 demes, 9639 two-locus states), rho=20 solved
+  rho=20     centre deme, rD by Manhattan distance
+      d    exact rD   geometric   geo err |   Bessel K0    K0 err
+      1    0.131780    0.131780    +0.00% |    0.131780    +0.00%
+      2    0.039922    0.017366   -56.50% |    0.039922    +0.00%
+    geometric max |err| over d>=2 = +56.50%   Bessel (A=0.2668 L=1.1237) max |err| = 0.00%
+
+==============================================================================

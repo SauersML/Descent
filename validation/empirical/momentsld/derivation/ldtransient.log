@@ -1,0 +1,74 @@
+ldtransient.py -- THE NON-EQUILIBRIUM (post-split) two-deme LD law.
+
+The equilibrium form in ld2evidence.py does not describe either gnomon demography,
+because both are SPLITS OF FINITE AGE: grid2d's demes all split 12000 generations ago,
+and serial1d's adjacent pairs split at 201 + (8 - min(i,j))*400 generations and have
+exchanged migrants ever since.  This file closes that gap for the two-deme case, and
+it closes it in CLOSED FORM rather than by integration, because a split supplies an
+exact initial condition.
+
+THE ARGUMENT.  On the post-split interval the generator Q(rho, M) is constant, so the
+moment vector obeys the linear inhomogeneous system  dP/ds = -(src + Q P)  (present-ward
+s).  Its exact solution with the terminal condition supplied at the split is
+
+    P(present) = P_eq + exp(Q * T) * (P_anc - P_eq),      P_eq = -Q^{-1} src
+
+where T is the split age in units of 2N and P_anc is the ANCESTRAL panmictic solution
+mapped through the shape map -- at the split the two demes are one population, so P
+depends only on the partition shape and not on the deme labels.  Everything on the right
+is exact: P_eq is the rational function already derived, exp(Q T) is the matrix
+exponential of the 9x9 LUMPED generator (an eigen-expansion, i.e. a finite sum of
+exponentials with algebraic coefficients), and P_anc is the 3-state panmictic solve at
+the ancestral size.  No integration and no closure.
+
+THE ANCESTRAL PHASE, and why its size does not complicate the rates: time is in units of
+2N with N the DEME size, so the recombination rate per joint block is rho/2 whatever the
+population size, while the pairwise coalescence rate in the ancestor is 2N/(2*Nanc) =
+N/Nanc, and the ancestral t2 is Nanc/N.  Both are exact rationals for the gnomon values.
+
+RIGOROUS CONSEQUENCE EVEN BEFORE THE NUMBERS: at T = 0 the demes are identical so
+rD = 1, and as T -> oo rD -> the equilibrium value.  The transient therefore brackets the
+LD slot from BOTH ends, and the width of that bracket is set by the slowest relaxation
+mode of Q -- which this file reports as the spectral gap.
+
+==============================================================================
+SANITY GATES ON THE TRANSIENT
+  T -> 0   rD = 0.99999998   (must be 1: the demes ARE the same population)
+  T -> oo  rD = 0.67862306   equilibrium closed form = 0.67862306   diff 0.00e+00
+  slowest relaxation eigenvalue of the lumped generator = -0.95614 per 2N units (=> 6275 generations)
+  BOTH GATES PASS: the transient interpolates rD = 1 at the split to the
+  equilibrium rational function at infinite age, so it brackets the LD slot.
+
+==============================================================================
+grid2d: ALL demes split at 4N = 12000 generations = 2.0000 units of 2N; 4Nm = 3.6
+     rho |  rD(T=2.0)  rD(equilib)      ratio | how far from equilibrium
+    0.50 |    0.75730      0.72935      1.038 | transient is 3.8% ABOVE equilibrium
+    1.00 |    0.69714      0.67192      1.038 | transient is 3.8% ABOVE equilibrium
+    2.00 |    0.60083      0.58110      1.034 | transient is 3.4% ABOVE equilibrium
+    5.00 |    0.42499      0.41518      1.024 | transient is 2.4% ABOVE equilibrium
+   10.00 |    0.28759      0.28293      1.016 | transient is 1.6% ABOVE equilibrium
+   20.00 |    0.17591      0.17387      1.012 | transient is 1.2% ABOVE equilibrium
+
+==============================================================================
+serial1d: adjacent pair (k-1,k) split at 201 + (8-(k-1))*400 generations; 4Nm = 12.
+Split ages run 201 (the d8-d9 edge) to 3401 (the d0-d1 edge) -- a factor of 17,
+which is why the standing Jensen warning bites hardest here.
+   edge   T(gen)    T(2N) | rD@rho=0.5   rD@rho=1     rD@rho=2     rD@rho=5     rD@rho=10    rD@rho=20   
+  0-1     3401   0.5668 |    0.90141    0.87085    0.81805    0.69302    0.54785    0.38421
+  1-2     3001   0.5002 |    0.89960    0.86841    0.81516    0.69134    0.54777    0.38440
+  2-3     2601   0.4335 |    0.89744    0.86541    0.81139    0.68861    0.54725    0.38455
+  3-4     2201   0.3668 |    0.89487    0.86171    0.80646    0.68429    0.54586    0.38460
+  4-5     1801   0.3002 |    0.89181    0.85717    0.80000    0.67751    0.54269    0.38429
+  5-6     1401   0.2335 |    0.88828    0.85168    0.79163    0.66695    0.53592    0.38276
+  6-7     1001   0.1668 |    0.88491    0.84587    0.78161    0.65113    0.52218    0.37727
+  7-8      601   0.1002 |    0.88633    0.84548    0.77672    0.63495    0.50017    0.36141
+  8-9      201   0.0335 |    0.92298    0.89189    0.83550    0.70166    0.55251    0.38560
+  equilibrium (T=oo) for comparison:
+                      |    0.89286    0.86252    0.80771    0.67862    0.53626    0.37821
+
+==============================================================================
+THE JENSEN EXPOSURE, MADE QUANTITATIVE.  Averaging rD over the split ages in a
+distance bin is NOT the same as rD at the mean split age.  serial1d d=1 bin:
+  rho=    1 : mean of rD over the 9 edges = 0.86205   rD at the mean age = 0.85717   Jensen error -0.57%
+  rho=    5 : mean of rD over the 9 edges = 0.67661   rD at the mean age = 0.67751   Jensen error +0.13%
+  rho=   20 : mean of rD over the 9 edges = 0.38101   rD at the mean age = 0.38429   Jensen error +0.86%

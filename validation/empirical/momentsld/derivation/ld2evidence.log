@@ -1,0 +1,153 @@
+ld2evidence.py -- THE SINGLE TRACEABLE EVIDENCE FILE for the two-deme two-locus
+equilibrium closed form.  Everything claimed about this derivation is produced here,
+in one run, into one log: the derivation, every gated limit, and both checks with
+their figures.  Supersedes the split ld2deme2.py / ld2val.py evidence.
+
+WHY THE SYSTEM IS EXACT AND NOT A MOMENT CLOSURE.  This matters more than the word
+"exact" usually carries, because "finite linear system" describes both exact systems
+and closed ones.  The state space here is the ANCESTRAL-CONFIGURATION ENUMERATION of
+the two-locus coalescent: a state is a partition of the four ancestral units
+{a1,a2,b1,b2} into lineages, each carrying a deme label, and the transitions are the
+actual events (a lineage migrates, two lineages in one deme coalesce, a lineage
+carrying units of both loci recombines).  The set of reachable configurations is
+FINITE AND CLOSED UNDER THOSE EVENTS -- four units can only be partitioned so many
+ways -- so the generator maps the span of these states into itself with nothing
+truncated and nothing approximated by a lower moment.  That is a different situation
+from the SFS moment systems (Jouganous et al.), where continuous migration couples
+sample sizes -- the evolution of Phi_n depends on Phi_n' for n' != n -- and the
+published remedy is a third-order jackknife MOMENT CLOSURE, an approximation that is
+active precisely in the n*m << 1 regime.  No closure is used, needed, or available
+here: there is no larger system this one is a truncation of.
+
+CONVENTIONS: deme diploid size N, two demes, time in units of 2N generations,
+rho := 4Nc (a block carrying units of both loci splits at rho/2), M := 4Nm with m the
+per-generation backward migration probability (a block migrates at M/2), two blocks in
+one deme coalesce at rate 1.
+
+==============================================================================
+1. THE STRUCTURED PAIR COALESCENT (the source term, derived not assumed)
+   t2(same deme) = 2      t2(different demes) = (2*M + 1)/M
+  GATE STROBECK/NAGYLAKI  t2(same) = 2, free of M     PASS   within-deme mean coalescence time = 2 x TOTAL size, independent of migration
+  GATE t2(diff) - t2(same) = 1/M                      PASS   exact
+  GATE Hudson F_ST of this pair = 1/(2M+1)            PASS   the one-locus relation used later to pin conventions
+
+==============================================================================
+2. THE EXACT STATE SPACE AND GENERATOR
+   56 ancestral configurations = 7 shapes x deme labels (16 + 4*8 + 2*4)
+  GATE state space closed and complete                PASS   56 states, nothing truncated
+  GATE generator rows sum to zero on the non-leaking part PASS   leaks are the A/B coalescences that send tau_A tau_B to 0, by construction
+
+   symmetry group <a1<->a2, b1<->b2, A<->B, deme0<->deme1> gives 9 orbits [4, 4, 8, 16, 8, 2, 8, 2, 4]
+  GATE source is orbit-constant                       PASS   prerequisite for lumping
+  GATE exact lumpability on ALL 56 states             PASS   every orbit member gives the identical lumped row
+[    1.5s] reduced 9x9 system solved over QQ(rho,M)
+  GATE FULL 56-equation residual exactly zero         PASS   the lumping is proved, not assumed; 0 nonzero residuals
+
+==============================================================================
+3. THE CLOSED FORMS
+
+   sigma_d^2 WITHIN = E[D_0^2]/E[p0(1-p0)q0(1-q0)]
+     num = 128*M**6*rho + 640*M**6 + 192*M**5*rho**2 + 1728*M**5*rho + 3840*M**5 + 72*M**4*rho**3 + 1208*M**4*rho**2 + 6016*M**4*rho + 8560*M**4 + 8*M**3*rho**4 + 252*M**3*rho**3 + 2448*M**3*rho**2 + 8704*M**3*rho + 9272*M**3 + 12*M**2*rho**4 + 272*M**2*rho**3 + 2039*M**2*rho**2 + 5858*M**2*rho + 5184*M**2 + 4*M*rho**4 + 95*M*rho**3 + 676*M*rho**2 + 1736*M*rho + 1416*M + 6*rho**3 + 60*rho**2 + 168*rho + 144
+     den = 256*M**6*rho**2 + 1664*M**6*rho + 1408*M**6 + 256*M**5*rho**3 + 3072*M**5*rho**2 + 10560*M**5*rho + 7872*M**5 + 80*M**4*rho**4 + 1592*M**4*rho**3 + 10280*M**4*rho**2 + 24368*M**4*rho + 16144*M**4 + 8*M**3*rho**5 + 280*M**3*rho**4 + 3124*M**3*rho**3 + 14232*M**3*rho**2 + 26512*M**3*rho + 15896*M**3 + 12*M**2*rho**5 + 292*M**2*rho**4 + 2442*M**2*rho**3 + 8879*M**2*rho**2 + 14146*M**2*rho + 7920*M**2 + 4*M*rho**5 + 91*M*rho**4 + 687*M*rho**3 + 2232*M*rho**2 + 3312*M*rho + 1848*M + 2*rho**4 + 26*rho**3 + 116*rho**2 + 216*rho + 144
+
+   sigma_d^2 CROSS  = E[D_0 D_1]/E[p0(1-p0)q1(1-q1)]
+     num = M**2*(128*M**5*rho + 640*M**5 + 64*M**4*rho**2 + 960*M**4*rho + 3200*M**4 + 8*M**3*rho**3 + 280*M**3*rho**2 + 2368*M**3*rho + 5648*M**3 + 20*M**2*rho**3 + 440*M**2*rho**2 + 2664*M**2*rho + 4584*M**2 + 16*M*rho**3 + 291*M*rho**2 + 1394*M*rho + 1776*M + 4*rho**3 + 66*rho**2 + 268*rho + 288)
+     den = 256*M**7*rho**2 + 1664*M**7*rho + 1408*M**7 + 256*M**6*rho**3 + 3328*M**6*rho**2 + 12224*M**6*rho + 9152*M**6 + 80*M**5*rho**4 + 1848*M**5*rho**3 + 13416*M**5*rho**2 + 35184*M**5*rho + 23792*M**5 + 8*M**4*rho**5 + 360*M**4*rho**4 + 4780*M**4*rho**3 + 25104*M**4*rho**2 + 52344*M**4*rho + 32808*M**4 + 20*M**3*rho**5 + 592*M**3*rho**4 + 5920*M**3*rho**3 + 25043*M**3*rho**2 + 44410*M**3*rho + 26400*M**3 + 18*M**2*rho**5 + 451*M**2*rho**4 + 3832*M**2*rho**3 + 13974*M**2*rho**2 + 22220*M**2*rho + 12672*M**2 + 7*M*rho**5 + 163*M*rho**4 + 1273*M*rho**3 + 4264*M*rho**2 + 6340*M*rho + 3456*M + rho**5 + 23*rho**4 + 176*rho**3 + 568*rho**2 + 816*rho + 432
+
+   rD = E[D_0 D_1]/E[D_0^2]  (the LD restoration object)
+     num = M*(128*M**5*rho + 640*M**5 + 64*M**4*rho**2 + 960*M**4*rho + 3200*M**4 + 8*M**3*rho**3 + 280*M**3*rho**2 + 2368*M**3*rho + 5648*M**3 + 20*M**2*rho**3 + 440*M**2*rho**2 + 2664*M**2*rho + 4584*M**2 + 16*M*rho**3 + 291*M*rho**2 + 1394*M*rho + 1776*M + 4*rho**3 + 66*rho**2 + 268*rho + 288)
+     den = 128*M**6*rho + 640*M**6 + 192*M**5*rho**2 + 1728*M**5*rho + 3840*M**5 + 72*M**4*rho**3 + 1208*M**4*rho**2 + 6016*M**4*rho + 8560*M**4 + 8*M**3*rho**4 + 252*M**3*rho**3 + 2448*M**3*rho**2 + 8704*M**3*rho + 9272*M**3 + 12*M**2*rho**4 + 272*M**2*rho**3 + 2039*M**2*rho**2 + 5858*M**2*rho + 5184*M**2 + 4*M*rho**4 + 95*M*rho**3 + 676*M*rho**2 + 1736*M*rho + 1416*M + 6*rho**3 + 60*rho**2 + 168*rho + 144
+
+==============================================================================
+4. GATED LIMITS  (every limit with independent content is an assert; the rest
+   are labelled PRINTED OBSERVATION and gate nothing)
+  GATE M->oo  sigma_d^2 within = Ohta-Kimura(rho_T=2rho) PASS   = (rho + 5)/((rho + 1)*(2*rho + 11))
+  GATE M->oo  sigma_d^2 cross  = Ohta-Kimura(rho_T=2rho) PASS   = (rho + 5)/((rho + 1)*(2*rho + 11))
+  GATE M->oo  rD = 1                                  PASS   demes merge
+  GATE M->oo, rho->0  sigma_d^2 within = 5/11         PASS   Ohta-Kimura at complete linkage
+  GATE M->0   rD = 0                                  PASS   no migration, no shared LD -- content, not restatement
+  GATE rho->oo  rho*rD -> M+1 (finite, nonzero)       PASS   rD ~ (M+1)/rho at free recombination
+  GATE rD < 1 for finite M at rho=1 (drift alone bounds it away from 1) PASS   checked at M = 0.1, 1, 10, 100, 1000
+
+   PRINTED OBSERVATIONS (not gates -- these restate the derived form):
+     lim_{M->0} sigma_d^2 within = 3/(rho + 3)
+     lim_{rho->0} rD            = M*(80*M**5 + 400*M**4 + 706*M**3 + 573*M**2 + 222*M + 36)/((M + 1)*(80*M**5 + 400*M**4 + 670*M**3 + 489*M**2 + 159*M + 18))
+
+==============================================================================
+5. CHECK ONE -- argcore's own numeric generator.  THIS IS A SOLVE CHECK, NOT AN
+   INDEPENDENT INSTRUMENT: it builds the very generator I solved symbolically, so
+   it can catch a transcription or linear-algebra error and CANNOT catch a wrong
+   model.  Instrument count from this check: zero.
+      rho      M |      sd2w symb     sd2w numer |        rD symb       rD numer |   max rel
+     0.50   0.25 |    0.545339757    0.545339757 |    0.235140637    0.235140637 |  2.22e-14
+     1.00   1.00 |    0.337483956    0.337483956 |    0.413365603    0.413365603 |  4.00e-15
+     2.00   0.50 |    0.281094678    0.281094678 |    0.237628032    0.237628032 |  1.64e-14
+     5.00   2.00 |    0.125580850    0.125580850 |    0.306631706    0.306631706 |  1.34e-14
+    10.00   1.00 |    0.082300475    0.082300475 |    0.136801344    0.136801344 |  1.44e-14
+    20.00   5.00 |    0.038830134    0.038830134 |    0.216629103    0.216629103 |  4.25e-14
+     1.00  10.00 |    0.250260058    0.250260058 |    0.840538518    0.840538518 |  2.89e-15
+     0.10   0.10 |    0.777180474    0.777180474 |    0.144090050    0.144090050 |  9.98e-14
+    50.00   0.20 |    0.020717136    0.020717136 |    0.020128893    0.020128893 |  5.69e-12
+  GATE SOLVE CHECK worst relative deviation < 1e-9    PASS   worst = 5.686e-12 over 9 cells at N=2000 (finite-N residual expected)
+
+==============================================================================
+6. CHECK TWO -- moments.LD (Ragsdale & Gravel 2019), a separate implementation in
+   a different basis.  Whether it counts as a fully INDEPENDENT instrument depends
+   on whether the order-2 two-locus multi-population system closes exactly under
+   migration or carries a closure the way the SFS system does; that read is with
+   the custodian and is NOT assumed here.  Reported as: agreement with moments.LD.
+   moments version 1.5.0
+   2-pop order-2 basis: 15 LD moments + 3 H moments
+
+   CONVENTION PIN, ONE-LOCUS ONLY: H_0_1/H_0_0 must equal t2d/t2s = (2M+1)/(2M).
+   No two-locus quantity is used to calibrate anything.
+     M=0.25  M   =0.25    H01/H00=2.0000000  target=3.0000000  
+     M=0.25  M/2 =0.125   H01/H00=3.0000000  target=3.0000000  MATCH
+     M=0.25  2M  =0.5     H01/H00=1.5000000  target=3.0000000  
+     M=1.00  M   =1       H01/H00=1.2500000  target=1.5000000  
+     M=1.00  M/2 =0.5     H01/H00=1.5000000  target=1.5000000  MATCH
+     M=1.00  2M  =2       H01/H00=1.1250000  target=1.5000000  
+     M=4.00  M   =4       H01/H00=1.0625000  target=1.1250000  
+     M=4.00  M/2 =2       H01/H00=1.1250000  target=1.1250000  MATCH
+     M=4.00  2M  =8       H01/H00=1.0312500  target=1.1250000  
+  GATE moments.LD migration argument identified as M/2 (their Mbar = 2Nm) PASS   identified from a one-locus quantity alone
+
+   TWO-LOCUS COMPARISON (nothing calibrated here)
+      rho      M |     sd2w symb  sd2w moments       rel |       rD symb    rD moments       rel
+     0.50   0.25 |   0.545339757   0.545339757  2.22e-16 |   0.235140637   0.235140637  4.44e-16
+     1.00   1.00 |   0.337483956   0.337483956  4.44e-16 |   0.413365603   0.413365603  2.22e-16
+     2.00   0.50 |   0.281094678   0.281094678  0.00e+00 |   0.237628032   0.237628032  8.88e-16
+     5.00   2.00 |   0.125580850   0.125580850  3.64e-13 |   0.306631706   0.306631706  3.73e-13
+    10.00   1.00 |   0.082300475   0.082300475  0.00e+00 |   0.136801344   0.136801344  7.77e-16
+    20.00   5.00 |   0.038830134   0.038830134  5.04e-11 |   0.216629103   0.216629103  5.75e-11
+     1.00  10.00 |   0.250260058   0.250260056  1.00e-08 |   0.840538518   0.840538517  1.68e-09
+     0.10   0.10 |   0.777180474   0.777180474  2.22e-16 |   0.144090050   0.144090050  7.11e-15
+    50.00   0.20 |   0.020717136   0.020717136  2.22e-16 |   0.020128893   0.020128893  2.22e-16
+  GATE moments.LD agreement worst relative deviation < 1e-6 PASS   worst = 1.001e-08 over 9 cells (their Crank-Nicolson tolerance)
+
+==============================================================================
+GATE SUMMARY: 18/18 PASS
+  PASS STROBECK/NAGYLAKI  t2(same) = 2, free of M
+  PASS t2(diff) - t2(same) = 1/M
+  PASS Hudson F_ST of this pair = 1/(2M+1)
+  PASS state space closed and complete
+  PASS generator rows sum to zero on the non-leaking part
+  PASS source is orbit-constant
+  PASS exact lumpability on ALL 56 states
+  PASS FULL 56-equation residual exactly zero
+  PASS M->oo  sigma_d^2 within = Ohta-Kimura(rho_T=2rho)
+  PASS M->oo  sigma_d^2 cross  = Ohta-Kimura(rho_T=2rho)
+  PASS M->oo  rD = 1
+  PASS M->oo, rho->0  sigma_d^2 within = 5/11
+  PASS M->0   rD = 0
+  PASS rho->oo  rho*rD -> M+1 (finite, nonzero)
+  PASS rD < 1 for finite M at rho=1 (drift alone bounds it away from 1)
+  PASS SOLVE CHECK worst relative deviation < 1e-9
+  PASS moments.LD migration argument identified as M/2 (their Mbar = 2Nm)
+  PASS moments.LD agreement worst relative deviation < 1e-6
+
+HEADLINE FIGURES, all produced above in this run:
+  solve check (argcore, NOT an independent instrument) : 5.686e-12
+  moments.LD agreement                                 : 1.001e-08
+  Strobeck t2(same)                                    : 2
+[   15.2s] evidence complete
