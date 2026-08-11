@@ -228,8 +228,14 @@ theorem multiAncestryEffectiveN_at_perfect_correlation
     factor with predictive `R²` is a modelling step taken nowhere in this file, so the
     theorem does not say a PGS is more accurate — it says a shrinkage factor is larger.
 
-    `_h_rg` is deliberately unused: because the formula uses `rg ^ 2`, the sign of the
-    genetic correlation is irrelevant, so the monotonicity holds for negative `rg` too.
+    **THE HYPOTHESIS IS `|rg| ≤ 1`, AND IT WAS PREVIOUSLY WRITTEN AS A PAIR ONE HALF OF
+    WHICH THE DOCSTRING CALLED UNUSED.** The signature carried `0 ≤ rg` and `rg ≤ 1`, with
+    prose saying the first was deliberately unused because the formula squares `rg`, so the
+    result held for negative `rg` too. The statement did not say that, and the proof did not
+    have it either: what the denominator needs is `0 ≤ 1 - rg²`, `nlinarith` was reading
+    BOTH bounds out of the context to get it, and `rg ≤ 1` alone is satisfied by `rg = -5`.
+    So the claim lived only in the prose. It is now in the signature, where a reader and a
+    tactic see the same thing.
 
     The bound on `rg` and the nonnegative `priorVariance` are what the corrected
     effective-sample-size body needs: its denominator `(1-rg²)·priorVariance + 1/n_other` is
@@ -238,14 +244,16 @@ theorem multiAncestryEffectiveN_at_perfect_correlation
     the same reason it was wrong. -/
 theorem gaussianPosteriorShrinkage_mono_in_multiAncestryEffectiveN
     (n_target rg n_other priorVariance h_sq : ℝ)
-    (h_nt : 0 < n_target) (_h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) (h_no : 0 < n_other)
+    (h_nt : 0 < n_target) (h_rg : |rg| ≤ 1) (h_no : 0 < n_other)
     (h_pv : 0 ≤ priorVariance) (h_hsq : 0 < h_sq) :
     gaussianPosteriorShrinkage n_target h_sq ≤
       gaussianPosteriorShrinkage
         (multiAncestryEffectiveN n_target rg n_other priorVariance) h_sq := by
+  have h_bounds := abs_le.mp h_rg
+  have h_sq_le : rg ^ 2 ≤ 1 := by nlinarith [h_bounds.1, h_bounds.2]
   have h_den : 0 < (1 - rg ^ 2) * priorVariance + 1 / n_other := by
     have : 0 ≤ (1 - rg ^ 2) * priorVariance :=
-      mul_nonneg (by nlinarith) h_pv
+      mul_nonneg (by linarith) h_pv
     have : 0 < 1 / n_other := by positivity
     linarith
   have h_gain : 0 ≤ rg ^ 2 / ((1 - rg ^ 2) * priorVariance + 1 / n_other) :=
@@ -256,16 +264,18 @@ theorem gaussianPosteriorShrinkage_mono_in_multiAncestryEffectiveN
 
 /-- Multi-ancestry effective N ≥ single-ancestry N.
 
-    `_h_rg` is deliberately unused, for the same reason as above: the contribution enters
-    squared. -/
+    `|rg| ≤ 1` for the same reason as above, and it replaces the same pair: the contribution
+    enters squared, so the sign of `rg` is irrelevant and its MAGNITUDE is not. -/
 theorem multi_ancestry_effective_n_ge
     (n_target rg n_other priorVariance : ℝ)
-    (_h_rg : 0 ≤ rg) (h_rg_le : rg ≤ 1) (h_n : 0 < n_other)
+    (h_rg : |rg| ≤ 1) (h_n : 0 < n_other)
     (h_pv : 0 ≤ priorVariance) :
     n_target ≤ multiAncestryEffectiveN n_target rg n_other priorVariance := by
+  have h_bounds := abs_le.mp h_rg
+  have h_sq_le : rg ^ 2 ≤ 1 := by nlinarith [h_bounds.1, h_bounds.2]
   have h_den : 0 < (1 - rg ^ 2) * priorVariance + 1 / n_other := by
     have h1 : 0 ≤ (1 - rg ^ 2) * priorVariance :=
-      mul_nonneg (by nlinarith) h_pv
+      mul_nonneg (by linarith) h_pv
     have h2 : 0 < 1 / n_other := by positivity
     linarith
   unfold multiAncestryEffectiveN
