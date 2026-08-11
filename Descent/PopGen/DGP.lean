@@ -238,6 +238,16 @@ a two-neighbour deme and for no other.
     This is the same kind of hypothesis the stepping-stone range lemmas carry when they require
     a separation of at least one.
 
+    Assumes: an UNBOUNDED habitat. This body's level is the many-deme limit, and a habitat of
+    `D` demes sits strictly below it. On a vertex-transitive habitat -- ring, torus, any
+    symmetric migration graph whose automorphisms act transitively -- the exact equilibrium
+    neighbour level carries a factor `D/(D-1)` on the total flow, `1/(1 + 4·Nₑ·mTot·D/(D-1))`,
+    and that factor is universal: it does not depend on dimension, neighbour count or
+    migration rate. This body is its `D → ∞` limit, approached from below and monotonically
+    in `D`, which is the direction every habitat-size cell in the table below shows. A body
+    for the finite case is derived and owed; until it exists, a caller who knows `D` is
+    outside this law rather than approximately inside it.
+
     Empirical status: **FALSIFIED** (`validation/empirical/simcov/battery_transient01.py`),
     AND THE REPAIR THIS BODY CARRIES IS NONETHELESS VINDICATED. Those are two findings and the
     order matters: the `mTot` accounting is right and is a fourteenfold improvement on the
@@ -289,7 +299,21 @@ a two-neighbour deme and for no other.
 
     So the 1.0% lattice agreement the motivating table reports is a property of a SMALL
     lattice, and at 9x9 the same body is 5.0% low. A replacement that is right in a habitat of
-    any size will need a coordinate for the habitat, or an explicit restriction to one.
+    any size needs a coordinate for the habitat, or an explicit restriction to one; the
+    restriction is the second `Assumes` above, and the coordinate is `D` entering as
+    `D/(D-1)`.
+
+    THE COMPOSITION WITH THE TRANSIENT FACTOR CLAIMS THE UNBOUNDED CASE ONLY, and that is a
+    second restriction rather than a restatement of the first. The clock here is per-deme
+    drift and emigration. For a finite habitat the pairwise clock is instead the spectral gap
+    of the pair generator between its two slowest modes -- `F_ST` is invariant under
+    truncating the slowest mode alone, numerator and denominator scaling together, so the
+    habitat-wide coalescent scale is not it either, too small by 5.3x for a 25-deme chain at
+    `u = 1` and too large by 7x for a 9x9 lattice at `u = 3`. No function of `Nₑ`, `mTot` and
+    `D` alone can be that clock: at one `D` and one `mTot` the required split depth moves by a
+    factor of twelve across the migration sweep. So a finite-habitat transient law is a
+    separate derivation, owed rather than approximated, and composing this level with this
+    factor at a known `D` is outside both.
 
     THE CONVENTION IS PINNED, and not by assumption. Read against Nei's `G_ST` on the same
     replicates the body is off by 97.5% at 58.89 sems, so this level is the
