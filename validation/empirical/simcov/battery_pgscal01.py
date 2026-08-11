@@ -262,15 +262,52 @@ def test_prevalence_citl():
            "prevalences fed at their REALISED cohort values; the oracle is the "
            "intercept correction the target needs with the source linear "
            "predictor held as an offset")
+    # THIS ROW NAMES A DECLARATION THE CORPUS NO LONGER HAS, AND THAT IS THE
+    # CORRECT STATE RATHER THAN A DEFECT. `prevalenceLogisticCalibrationProfile`
+    # was a real `noncomputable def` in `PopulationCalibrationDrift.lean` and it
+    # was DELETED, at 09b6562b, BECAUSE OF THE ROW BELOW: "the calibration
+    # profile that packaged a difference of marginal prevalence logits as a
+    # deployment intercept correction is deleted, since the correction a target
+    # needs was measured 17 to 37 percent larger at up to 374 sems". The
+    # measurement was deliberately kept, and moved to the section that derives
+    # its direction from Jensen, so that it stands as evidence for the
+    # under-correction theorems rather than as an epitaph.
+    #
+    # SO DO NOT RE-KEY IT ONTO `prevalenceCITLShift`, which is the natural-looking
+    # repair and was proposed once. The two share an expression -- the deleted
+    # profile's `citl` field IS a difference of prevalence logits -- but they are
+    # not the same declaration, and moving this row onto the live one would
+    # reattach a deleted body's cause of death to a body that is still standing,
+    # reopening a deletion the corpus has already made on this exact evidence.
+    # `prevalenceCITLShift` has its own rows in `battery_rival01`, which measure
+    # the same boundary directly: MATCH at 1.16 sems where the linear predictor
+    # is constant, FALSIFIED at 616.96 where it has spread.
+    #
+    # What a reader is owed is that this row's orphan status is legible from the
+    # row itself, which is what the note below is for. An extracted copy survives
+    # in `validation/empirical/extract/lean_defs.py` because that extract was
+    # ninety-one declarations behind the corpus (aee7192f); it is not evidence
+    # that the declaration exists.
+    orphan = ("the declaration this row names was DELETED from the corpus at "
+              "09b6562b, and this measurement is why -- the profile packaged a "
+              "difference of marginal prevalence logits as the intercept "
+              "correction a deployment needs, and the correction it needs was "
+              "measured 17 to 37 percent larger. The row is kept as the "
+              "evidence behind that deletion and behind the under-correction "
+              "theorems in PopulationCalibrationDrift.lean, so it is expected "
+              "to key to no live declaration. It must NOT be re-keyed onto "
+              "prevalenceCITLShift, which is a different declaration that is "
+              "still standing and is measured on its own cells in "
+              "battery_rival01")
     MODEL = dict(regime=reg, control=control, realised_inputs=True,
                  argument_source="model")
     record("prevalenceLogisticCalibrationProfile",
            "PGSCalibrationTheory.lean",
            "prevalenceLogit pi_target - prevalenceLogit pi_source", cells,
-           **MODEL)
+           note=orphan, **MODEL)
     record("prevalenceLogisticCalibrationProfile [identity-link reading, "
            "competing]", "PGSCalibrationTheory.lean",
-           "pi_target - pi_source", comp, **MODEL)
+           "pi_target - pi_source", comp, note=orphan, **MODEL)
 
 
 def main():

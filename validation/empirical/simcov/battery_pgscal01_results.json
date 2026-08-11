@@ -1,5 +1,5 @@
 {
- "_battery_sha": "f7b5da68201d02c8",
+ "_battery_sha": "4e3239a949f8d34d",
  "results": [
   {
    "name": "effectGeneticCorrelation",
@@ -22,16 +22,16 @@
      "design": "rho=0.9 mu=0",
      "lean": 0.9077830980877775,
      "truth": 0.9078273543371511,
-     "sem": 0.0006756643768780816,
-     "sems_off": 0.06550034438420428,
+     "sem": 0.0006756643768780738,
+     "sems_off": 0.06550034438420503,
      "rel_err": 4.874963192309486e-05
     },
     {
      "design": "rho=0.5 mu=0",
      "lean": 0.4814003605660389,
      "truth": 0.4806562653024996,
-     "sem": 0.001776935004807283,
-     "sems_off": 0.4187520992755739,
+     "sem": 0.0017769350048072827,
+     "sems_off": 0.41875209927557394,
      "rel_err": 0.0015480818981336018
     },
     {
@@ -46,8 +46,8 @@
      "design": "rho=0.7 mu=0.6",
      "lean": 0.7574068385377751,
      "truth": 0.757787505668722,
-     "sem": 0.0009138889940890757,
-     "sems_off": 0.4165354144857581,
+     "sem": 0.0009138889940890734,
+     "sems_off": 0.41653541448575915,
      "rel_err": 0.0005023402050036965
     },
     {
@@ -81,15 +81,15 @@
      "design": "rho=0.9 mu=0",
      "lean": 0.9079475856104593,
      "truth": 0.9078273543371511,
-     "sem": 0.0006756643768780816,
-     "sems_off": 0.17794526013597262,
+     "sem": 0.0006756643768780738,
+     "sems_off": 0.17794526013597467,
      "rel_err": 0.0001324384782346273
     },
     {
      "design": "rho=0.5 mu=0",
      "lean": 0.48170931859078814,
      "truth": 0.4806562653024996,
-     "sem": 0.001776935004807283,
+     "sem": 0.0017769350048072827,
      "sems_off": 0.5926234135967955,
      "rel_err": 0.0021908656233281267
     },
@@ -105,8 +105,8 @@
      "design": "rho=0.7 mu=0.6",
      "lean": 0.6912852076506708,
      "truth": 0.757787505668722,
-     "sem": 0.0009138889940890757,
-     "sems_off": 72.76846361886408,
+     "sem": 0.0009138889940890734,
+     "sems_off": 72.76846361886426,
      "rel_err": 0.08775850422522491
     },
     {
@@ -225,7 +225,7 @@
    "name": "prevalenceLogisticCalibrationProfile",
    "file": "PGSCalibrationTheory.lean",
    "source": "prevalenceLogit pi_target - prevalenceLogit pi_source",
-   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "note": "the declaration this row names was DELETED from the corpus at 09b6562b, and this measurement is why -- the profile packaged a difference of marginal prevalence logits as the intercept correction a deployment needs, and the correction it needs was measured 17 to 37 percent larger. The row is kept as the evidence behind that deletion and behind the under-correction theorems in PopulationCalibrationDrift.lean, so it is expected to key to no live declaration. It must NOT be re-keyed onto prevalenceCITLShift, which is a different declaration that is still standing and is measured on its own cells in battery_rival01; positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
    "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
    "span": 1.801655936802828,
    "verdict": "FALSIFIED",
@@ -276,7 +276,7 @@
    "name": "prevalenceLogisticCalibrationProfile [identity-link reading, competing]",
    "file": "PGSCalibrationTheory.lean",
    "source": "pi_target - pi_source",
-   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "note": "the declaration this row names was DELETED from the corpus at 09b6562b, and this measurement is why -- the profile packaged a difference of marginal prevalence logits as the intercept correction a deployment needs, and the correction it needs was measured 17 to 37 percent larger. The row is kept as the evidence behind that deletion and behind the under-correction theorems in PopulationCalibrationDrift.lean, so it is expected to key to no live declaration. It must NOT be re-keyed onto prevalenceCITLShift, which is a different declaration that is still standing and is measured on its own cells in battery_rival01; positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
    "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
    "span": 1.8620894588676886,
    "verdict": "FALSIFIED",

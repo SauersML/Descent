@@ -12766,7 +12766,7 @@
   {
    "against": null,
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 5,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12787,7 +12787,7 @@
   {
    "against": "effectGeneticCorrelation",
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 5,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12808,7 +12808,7 @@
   {
    "against": null,
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12829,7 +12829,7 @@
   {
    "against": "reclassifiedBandEventPrevalence",
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12850,7 +12850,7 @@
   {
    "against": null,
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12858,7 +12858,7 @@
    "downgraded_because": null,
    "freshness": "OK (recorded source hash matches)",
    "lean_file": "PGSCalibrationTheory.lean",
-   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "note": "the declaration this row names was DELETED from the corpus at 09b6562b, and this measurement is why -- the profile packaged a difference of marginal prevalence logits as the intercept correction a deployment needs, and the correction it needs was measured 17 to 37 percent larger. The row is kept as the evidence behind that deletion and behind the under-correction theorems in PopulationCalibrationD",
    "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
    "results_file": "battery_pgscal01_results.json",
    "role": "corpus",
@@ -12871,7 +12871,7 @@
   {
    "against": "prevalenceLogisticCalibrationProfile",
    "battery": "pgscal01",
-   "battery_sha": "f7b5da68201d02c8",
+   "battery_sha": "4e3239a949f8d34d",
    "cells": 4,
    "competitors_carried": 1,
    "competitors_rejected": 1,
@@ -12879,7 +12879,7 @@
    "downgraded_because": null,
    "freshness": "OK (recorded source hash matches)",
    "lean_file": "PGSCalibrationTheory.lean",
-   "note": "positive control 'zero-variance score: the offset fit returns the intercept shift it was given (0.7)' passed at 0.26 sems",
+   "note": "the declaration this row names was DELETED from the corpus at 09b6562b, and this measurement is why -- the profile packaged a difference of marginal prevalence logits as the intercept correction a deployment needs, and the correction it needs was measured 17 to 37 percent larger. The row is kept as the evidence behind that deletion and behind the under-correction theorems in PopulationCalibrationD",
    "regime": "logistic risk model, target differing from source by a baseline (intercept) shift only; two million individuals per arm; both prevalences fed at their REALISED cohort values; the oracle is the intercept correction the target needs with the source linear predictor held as an offset",
    "results_file": "battery_pgscal01_results.json",
    "role": "competitor",
