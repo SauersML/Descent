@@ -978,7 +978,8 @@ section CleanSplit
     charts the target branch alone. A consumer wanting the DRIFT VARIANCE BETWEEN THE BRANCHES
     — the moment `Var(p_T | p_S) = F · p_S · (1 - p_S)`, whose `F` accumulates along BOTH
     branches from their common ancestor — wants this body, summed, for exactly the reason the
-    convention paragraph above gives. A transported `R²` that has been decomposed into factors
+    convention paragraph above gives, and `causalVarianceRatio` below is that consumer.
+    A transported `R²` that has been decomposed into factors
     can carry one factor of each kind, so a reader deriving such a factor should not read the
     paragraph above as putting this body out of reach: what is rejected is this index in a
     chart's `fst` slot, not this index. -/
@@ -1003,6 +1004,87 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
 @[simp] theorem cleanSplitFst_at_zero_time (NeS NeT : ℝ) :
     cleanSplitFst NeS NeT 0 = 0 := by
   unfold cleanSplitFst neutralDriftFactor fstFromDriftFactor Descent.Core.complement
+  norm_num
+
+/-- **The causal variance ratio across a split**, `1/(1 - F)`, taking the SUMMED per-branch
+    drift index — which is what `cleanSplitFst` computes and is the reason that body survives.
+
+    WHERE IT COMES FROM. Conditioning on the source frequency, the target's expected
+    heterozygosity is `E[h_T | p_S] = h_S · (1 - F)`, the same cancellation family that makes
+    `sourcePolymorphicSignalFraction` independent of the target's effective size. The causal
+    genetic variance therefore rises across the split by the reciprocal of the retained
+    fraction, and `F` here accumulates along BOTH branches from their common ancestor, which is
+    why the index is summed rather than pairwise.
+
+    **A HUDSON-DERIVED STAND-IN IS NOT ADMISSIBLE AS THE INPUT, and that refusal is measured.**
+    Reading the argument as `2 · F_hudson` fits at 1.6%, 3.1% and 1.7% where `F_hudson` alone
+    runs 5.6% to 35%, so the convention is decided rather than conventional. But the factor
+    relating the two is specific to a symmetric split and is not a law: it was MEASURED at
+    2.23 to 2.40, not the folkloric 2. Substituting a doubled Hudson value flatters the fit at
+    depth in one direction, so a caller must supply a genuine summed per-branch index.
+
+    Empirical status: **CONDITIONALLY VALID**, and the regime has two independent edges.
+
+    INSIDE THE REGIME the relation is a clean-split identity and was confirmed against
+    ancient-sample per-branch `F` at `t = 200` to 0.0004 relative, with zero fitted parameters.
+
+    THE FIRST EDGE IS DEPTH. Beyond `F ≈ 0.2` the agreement degrades one-signed, reaching a
+    ratio of 0.665 by `F = 0.79`. So this is a first-order law in the drift index and the
+    correction at depth is OWED, not merely unmeasured.
+
+    THE SECOND EDGE IS CAUSAL ASCERTAINMENT, and it is a fired pre-registration rather than a
+    caveat added afterwards. Drawing causal variants from all segregating sites rather than
+    common ones returned a measured ratio of 0.943 at the nearest separation — BELOW ONE. This
+    body is `≥ 1` by construction on `F ∈ [0,1)`, as `causalVarianceRatio_one_le` states, so
+    that regime lies outside its scope entirely and no choice of argument reaches it. The
+    reading is not yet settled: 0.943 carries no error bar, and a jackknife sem is owed before
+    it can be called below one. The candidate mechanism — ascertaining causals on being
+    polymorphic in the SOURCE enriches for source-rare variants and depresses the source
+    variance, while the target carries no matching condition — is flagged and NOT adopted.
+
+    ON A STEPPING-STONE CHAIN the relation is approximate with a known sign: the target
+    regresses toward the ancestral mean, so the truth sits BELOW this body. The sign is
+    reported rather than predicted, because the chain approximation has no derivation here and
+    retrofitting a sign argument to a one-signed residual is how a finding becomes an excuse.
+
+    NO `record()` NAMES THIS BODY. The numbers above come from the derivation's own runs, which
+    are not in this repository, so a reader cannot check them; a battery under this name is
+    owed and is what would move the head.
+
+    argument_source: model. -/
+noncomputable def causalVarianceRatio (fstSummed : ℝ) : ℝ := 1 / (1 - fstSummed)
+
+/-- **No differentiation, no inflation.** At the split itself the causal variance is the
+    ancestral one, which is the control cell any battery for this body is gated on. -/
+@[simp] theorem causalVarianceRatio_at_zero : causalVarianceRatio 0 = 1 := by
+  unfold causalVarianceRatio
+  norm_num
+
+/-- **The ratio is at least one on the admissible range**, and this is the statement that puts
+    the observed sub-one regime outside the body rather than merely far from it: no argument in
+    `[0,1)` produces a value below one, so a measurement below one refutes the SCOPE and not
+    the constant. -/
+theorem causalVarianceRatio_one_le (fstSummed : ℝ)
+    (h0 : 0 ≤ fstSummed) (h1 : fstSummed < 1) :
+    1 ≤ causalVarianceRatio fstSummed := by
+  unfold causalVarianceRatio
+  rw [le_div_iff₀ (by linarith)]
+  linarith
+
+/-- **Deeper splits inflate the causal variance further.** Monotone in the summed index across
+    the admissible range. -/
+theorem causalVarianceRatio_monotone (f₁ f₂ : ℝ)
+    (h₁₂ : f₁ ≤ f₂) (h1 : f₂ < 1) :
+    causalVarianceRatio f₁ ≤ causalVarianceRatio f₂ := by
+  unfold causalVarianceRatio
+  exact one_div_le_one_div_of_le (by linarith) (by linarith)
+
+/-- **causalVarianceRatio at complete differentiation, named.** The denominator vanishes at
+    `F = 1`, where no ancestral variation is retained and the ratio is unbounded. Lean returns
+    `0` there — the smallest possible inflation for a split that has retained nothing — and no
+    type error marks the point. Consumers must exclude it. -/
+theorem causalVarianceRatio_at_one_is_junk : causalVarianceRatio 1 = 0 := by
+  unfold causalVarianceRatio
   norm_num
 
 /-- **The per-generation retention is an admissible base** whenever the effective size is at

@@ -1195,6 +1195,13 @@
       "constants": [],
       "note": "The SUM of two per-branch Wright F values, one per branch of a clean split. Summing is the composition per-branch indices admit and pairwise ones do not, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu`; a pairwise F_ST here is the substitution that produced a factor-of-four false falsification twice. Being a sum, it is not confined to the unit interval, and `cleanSplitFst_lt_one_iff` states where it stays inside the consuming chart's pole."
     },
+    "Descent/Portability/PhenomeWidePortability.lean::causalVarianceRatio": {
+      "quantity": "fst",
+      "convention": "per-branch-drift",
+      "role": "consumer",
+      "constants": ["1", "1"],
+      "note": "Consumes the SUMMED per-branch F, which is what `cleanSplitFst` returns, because the drift variance separating two contemporary branches accumulates along BOTH of them from their common ancestor. The reading is decided by measurement and not by taste: `1/(1 - 2*F_hudson)` fits at 1.6, 3.1 and 1.7 percent where `1/(1 - F_hudson)` runs 5.6 to 35. A DOUBLED HUDSON VALUE IS STILL NOT ADMISSIBLE as the argument -- the factor relating summed to Hudson is specific to a symmetric split and was measured at 2.23 to 2.40, not the folkloric 2, and the stand-in flatters the fit at depth in one direction. Supply a genuine summed per-branch index."
+    },
     "Descent/Portability/PhenomeWidePortability.lean::effectiveDriftGenerations": {
       "quantity": "fst",
       "convention": "per-branch-drift",
