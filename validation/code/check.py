@@ -7774,13 +7774,6 @@ LAYER_UNRANKED = {
 # repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
 # still counts as a violation; see the section header.
 LAYER_PENDING = {
-    ("Descent.PopGen.PolygenicAdaptation",
-     "Descent.Portability.PortabilityDrift.PresentDayMetrics"):
-        "`Portability.Var_Delta_Mu`, the variance of the mean shift. This is a "
-        "present-day transport quantity and is correctly placed: it is about a score "
-        "carried from a source population to a present-day one, which is what "
-        "`PresentDayMetrics` is for. The repair is the consumer moving UP, not the "
-        "definition moving down.",
     ("Descent.PopGen.DemographicCapacity",
      "Descent.Portability.PCCorrectability.ImitationCapacity"):
         "`traceWindowBudgetClass`, `imitable_within_traceWindowBudget`, "

@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Core.Scaling
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.PopulationGeneticsFoundations.CoalescentTheory
-import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Blindness Descent.Conditionals Descent.Decision
 
@@ -171,9 +170,12 @@ section PGSOverdispersion
        250          0.465       186.38          372.76        366.22±8.19
 
     The superseded body is 50.7 percent low at 22.7 sems in every cell. The
-    corrected value is what `PortabilityDrift.Var_Delta_Mu` already states for
-    this same quantity, and that definition was validated on the same engine at
-    0.29 to 1.19 sems -- so the two agreed only after this correction.
+    corrected value is what `PortabilityDrift.Var_Delta_Mu` states for this same
+    quantity, and that definition was validated on the same engine at 0.29 to
+    1.19 sems -- so the two agreed only after this correction. `Var_Delta_Mu` is
+    now DEFINED as this body rather than the other way round: the drift variance
+    of a mean is population genetics, so the canonical body is the PopGen one and
+    the transport file aliases it downward.
 
     The docstring below on `expectedPGSDiffVariance` predicted precisely this
     failure: a common wrong factor built into both sides of a cross-identity
@@ -184,19 +186,19 @@ section PGSOverdispersion
 
     Power: the prediction spans 60.79 to 372.76 across the design. -/
 noncomputable def pgsDriftVariance_one_pop (V_A fst : ℝ) : ℝ :=
-  Portability.Var_Delta_Mu V_A fst
+  Descent.Core.ploidy * fst * V_A
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem pgsDriftVariance_one_pop_at_reference_point :
     pgsDriftVariance_one_pop (1 / 2) (1 / 2) = 1 / 2 := by
-  unfold pgsDriftVariance_one_pop Portability.Var_Delta_Mu
+  unfold pgsDriftVariance_one_pop Descent.Core.ploidy
   norm_num
 
 /-- Single-population PGS drift variance is nonneg. -/
 theorem pgsDriftVariance_one_pop_nonneg (V_A fst : ℝ)
     (h_VA : 0 ≤ V_A) (h_fst : 0 ≤ fst) :
     0 ≤ pgsDriftVariance_one_pop V_A fst := by
-  unfold pgsDriftVariance_one_pop Portability.Var_Delta_Mu
+  unfold pgsDriftVariance_one_pop Descent.Core.ploidy
   positivity
 
 /-- **The same drift variance, as a sum over loci.**
@@ -253,7 +255,7 @@ in prose. -/
 theorem pgsDriftVarianceFromLoci_eq_closedForm {n : ℕ} (fst : ℝ) (β : Fin n → ℝ) :
     2 * pgsDriftVarianceFromLoci fst β =
       pgsDriftVariance_one_pop (∑ i : Fin n, β i ^ 2) fst := by
-  unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop Portability.Var_Delta_Mu
+  unfold pgsDriftVarianceFromLoci pgsDriftVariance_one_pop Descent.Core.ploidy
   rw [Finset.mul_sum, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun i _ ↦ by ring)
 
@@ -323,7 +325,7 @@ theorem expectedPGSDiffVariance_complete_differentiation (V_A : ℝ) :
       = expectedPGSDiffVariance V_A fst -/
 theorem pgsDiffVariance_eq_expected (V_A fst : ℝ) :
     pgsDiffVariance_two_pop V_A fst = expectedPGSDiffVariance V_A fst := by
-  unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop Portability.Var_Delta_Mu
+  unfold pgsDiffVariance_two_pop pgsDriftVariance_one_pop Descent.Core.ploidy
     expectedPGSDiffVariance
   ring
 
@@ -336,7 +338,7 @@ theorem pgsDiffVariance_two_pop_eq_lociSum {n : ℕ} (fst : ℝ) (β : Fin n →
     pgsDiffVariance_two_pop (∑ i : Fin n, β i ^ 2) fst =
       2 * (pgsDriftVarianceFromLoci fst β + pgsDriftVarianceFromLoci fst β) := by
   unfold pgsDiffVariance_two_pop pgsDriftVarianceFromLoci pgsDriftVariance_one_pop
-    Portability.Var_Delta_Mu
+    Descent.Core.ploidy
   rw [Finset.mul_sum, Finset.mul_sum]
   rw [← Finset.sum_add_distrib, Finset.mul_sum]
   exact Finset.sum_congr rfl (fun i _ ↦ by ring)
@@ -454,14 +456,14 @@ theorem stratification_reduces_adaptation_signal
 
 end DetectingAdaptation
 
-/-- **The one-population PGS drift variance carries the same ploidy factor.**
+/-- **The one-population PGS drift variance carries the ploidy factor explicitly.**
 
-`pgsDriftVariance_one_pop` is the single-population form of `Var_Delta_Mu`, and its `2` is
-the same convention: `ploidy · F_ST · V_A`.  The two definitions are alpha-equivalent, and
-this pair of theorems is what says so rather than leaving it to the reader. -/
+Its `2` is the `ploidy` convention: `ploidy · F_ST · V_A`.  `Portability.Var_Delta_Mu` is
+this body under its transport name, and this pair of theorems is what says so rather than
+leaving it to the reader. -/
 theorem pgsDriftVariance_one_pop_eq_ploidy_form (V_A fst : ℝ) :
     PopGen.pgsDriftVariance_one_pop V_A fst = Descent.Core.ploidy * fst * V_A := by
-  unfold PopGen.pgsDriftVariance_one_pop Portability.Var_Delta_Mu Descent.Core.ploidy
+  unfold PopGen.pgsDriftVariance_one_pop Descent.Core.ploidy
   ring
 
 /-- The between-population drift variance of the score, carrying the same

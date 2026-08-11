@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.PortabilityDrift.ClosedPopulationRegime
 import Descent.PopGen.AssortativeMatingPGS
 import Descent.PopGen.LDDecayTheory
+import Descent.PopGen.PolygenicAdaptation
 import Descent.Core.Moments
 
 assert_below Descent.Decision Descent.Program
@@ -2658,6 +2659,17 @@ the same convention as everywhere else and is now tied to it. -/
 theorem Var_Delta_Mu_eq_ploidy_form (V_A fst : ℝ) :
     Portability.Var_Delta_Mu V_A fst = Descent.Core.ploidy * fst * V_A := by
   unfold Portability.Var_Delta_Mu Descent.Core.ploidy; ring
+
+/-- **The transport name and the population-genetics name are one quantity.**
+
+`PopGen.pgsDriftVariance_one_pop` is the drift variance of one population's mean breeding
+value and `Var_Delta_Mu` is the same number under the name transport theory calls it by.
+The two were previously joined by an alias that ran from PopGen UP into this file, which
+made a population-genetics body unreadable without the transport layer; they are now
+declared where each belongs and tied here, where both are in scope. -/
+theorem Var_Delta_Mu_eq_pgsDriftVariance_one_pop (V_A fst : ℝ) :
+    Portability.Var_Delta_Mu V_A fst = PopGen.pgsDriftVariance_one_pop V_A fst := by
+  unfold Portability.Var_Delta_Mu PopGen.pgsDriftVariance_one_pop Descent.Core.ploidy; ring
 
 /-- **Present-day PGS variance is a retained fraction of the ancestral variance.**
 `presentDayPGSVariance` is not a wrapper over the kernel -- it routes through

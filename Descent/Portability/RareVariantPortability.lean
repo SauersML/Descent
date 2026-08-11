@@ -2,6 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.PopGen.PolygenicAdaptation
+-- `ncp`, `Var_Delta_Mu` and `two_mul_one_sub_strictMono_le_half` are named below and
+-- were reached through `PolygenicAdaptation`'s import of `PresentDayMetrics`, which is
+-- gone now that the drift variance of a mean is declared in PopGen. Imported here,
+-- where the use is.
+import Descent.PopGen.DGP
+import Descent.Foundations.Probability
+import Descent.Portability.PortabilityDrift.PresentDayMetrics
 
 assert_below Descent.Decision Descent.Program
 
@@ -54,7 +61,7 @@ if allele frequency is below `1 / (2 Ne)`. -/
 theorem rareVariantSharingApproximation_lt_one_iff
     (Ne p : ℝ) (h_Ne : 0 < Ne) :
     rareVariantSharingApproximation Ne p < 1 ↔ p < 1 / (2 * Ne) := by
-  unfold rareVariantSharingApproximation PopGen.pgsDriftVariance_one_pop Var_Delta_Mu
+  unfold rareVariantSharingApproximation PopGen.pgsDriftVariance_one_pop Descent.Core.ploidy
   have h2Ne_pos : (0 : ℝ) < 2 * Ne := by positivity
   rw [lt_div_iff₀ h2Ne_pos]
   constructor <;> intro h <;> nlinarith [mul_comm p (2 * Ne)]
