@@ -767,6 +767,70 @@ theorem TrainVsAllRepresentation.aggregate_const {D : ℕ}
   unfold TrainVsAllRepresentation.aggregate
   rw [← Finset.sum_mul, r.weight_sum_one, one_mul]
 
+/-! ## Inhabitation
+
+A theorem quantified over an uninhabited structure is true and empty -- kernel-checked, clean
+axiom report, no content -- so the rate and moment classes carry exhibited inhabitants.
+
+THE VALUES ARE OFF THE BOUNDARIES THEIR OWN HYPOTHESES ADMIT.  Migration and mutation are
+allowed to be zero by the type, and are nonzero here: zero migration disconnects the two demes
+and collapses every structured statement to a pair of independent panmictic ones, and zero
+mutation removes the only forcing term, so a witness at either would inhabit the class while
+making the structure it exists to describe unreachable.  The between-deme coalescence time
+likewise exceeds the within-deme one, which is what "structured" means. -/
+
+/-- Inhabitation for the two-deme rate set, at nonzero migration and nonzero mutation. -/
+noncomputable def TwoDemeRates.witness : TwoDemeRates where
+  sourceCoal := 1
+  targetCoal := 1
+  sourceToTarget := 1 / 10
+  targetToSource := 1 / 10
+  sourceForwardMutation := 1 / 1000
+  sourceBackwardMutation := 1 / 1000
+  targetForwardMutation := 1 / 1000
+  targetBackwardMutation := 1 / 1000
+  sourceCoal_pos := by norm_num
+  targetCoal_pos := by norm_num
+  sourceToTarget_nonneg := by norm_num
+  targetToSource_nonneg := by norm_num
+  sourceForwardMutation_nonneg := by norm_num
+  sourceBackwardMutation_nonneg := by norm_num
+  targetForwardMutation_nonneg := by norm_num
+  targetBackwardMutation_nonneg := by norm_num
+
+/-- Inhabitation for one epoch, at a positive duration.  A zero-duration epoch has the
+identity propagator, so it would satisfy the class without propagating anything. -/
+noncomputable def TwoDemeMomentEpoch.witness (K : ℕ) : TwoDemeMomentEpoch K where
+  rates := TwoDemeRates.witness
+  duration := 1
+  duration_nonneg := by norm_num
+
+/-- Inhabitation for the pairwise coalescence times, on two demes and with the between-deme
+time strictly exceeding the within-deme one -- the ordering that makes `hudsonFst` positive
+rather than zero. -/
+noncomputable def PairwiseCoalescenceTimes.witness : PairwiseCoalescenceTimes 2 where
+  within := fun _ ↦ 1
+  between := fun i j ↦ if i = j then 1 else 2
+  within_pos := by intro d; norm_num
+  between_pos := by intro i j; split <;> norm_num
+  between_symmetric := by
+    intro i j
+    by_cases h : i = j
+    · subst h; rfl
+    · simp [h, Ne.symm h]
+  between_self := by intro i; simp
+
+/-- Inhabitation for the two-locus moment interface.  The moments are constant in the
+recombination coordinate here, which is all the class asks: its two hypotheses are the index
+symmetries, and a constant family satisfies them without pretending to a decay law the
+interface deliberately does not fix. -/
+noncomputable def DemographicTwoLocusMoments.witness : DemographicTwoLocusMoments 2 where
+  DD := fun _ _ _ ↦ 1
+  Dz := fun _ _ _ _ ↦ 0
+  pi2 := fun _ _ _ _ _ ↦ 1
+  DD_symmetric := by intro rho i j; rfl
+  pi2_pair_swap := by intro rho i j k l; rfl
+
 end Coalescent
 
 end Descent
