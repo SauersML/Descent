@@ -2225,7 +2225,28 @@ def run_identifications() -> int:
             if len(nums) < 2:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause names fewer than "
                                  f"two predicted values, so no span is declared")
-            elif max(nums) - min(nums) <= 0.05 * max(abs(max(nums)), 1.0):
+            # THE SPAN IS RELATIVE TO THE PREDICTION'S OWN SCALE, and the `1.0` floor that
+            # used to sit here was an assumption that predictions are O(1). They are not:
+            # `expectedThresholdQalyLoss` predicts between 0.000144 and 0.001191 QALYs --
+            # a span that is 88% OF ITS LARGEST PREDICTION, a factor of 8.3 across the
+            # design, with two rival accountings failing on those cells at 255 and 1005
+            # sems -- and the floor made the threshold 0.05, so an honest Power clause was
+            # reported as "a near-constant prediction". A body cannot answer that finding
+            # except by writing a larger number into the clause, which is the corpus
+            # contorting around a guard rather than the guard being right.
+            #
+            # THE INVARIANT, verified before the change: nothing currently passing can start
+            # failing. The floor only BINDS below 1, since `0.05 * max(abs(m), 1.0)` equals
+            # `0.05 * abs(m)` whenever `abs(m) >= 1`. So this is strictly more permissive,
+            # and only for sub-unit predictions.
+            #
+            # WHAT IT COSTS, accepted deliberately: a probability spanning 0.90 to 0.95 was
+            # reported and now is not. That trade is bounded by where power is actually
+            # certified -- this clause DOCUMENTS discrimination, while the ledger's
+            # `competitors_rejected` gate and the uncompeted-agreement rule ADJUDICATE it.
+            # A 0.90-0.95 span that cannot reject a rival will not bank a VALIDATED verdict
+            # through those, whatever this screen says about it.
+            elif max(nums) - min(nums) <= 0.05 * abs(max(nums)):
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause declares a span of "
                                  f"only {max(nums) - min(nums):.4f}; a near-constant prediction "
                                  f"cannot reject a wrong functional form")

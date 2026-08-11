@@ -1026,6 +1026,20 @@ noncomputable def gwasDetectionPower (beta sampleSize : ℝ) : ℝ :=
 macro "myRate" x:term : term => `(cleanRate $x)
 """),
      "non-tactic macro"),
+    # The Power screen, which had no calibration at all until the scale rule changed.
+    # A VALIDATED note whose prediction barely moves cannot have rejected a wrong
+    # functional form, whatever its sems say.
+    ("identifications", "a VALIDATED note whose prediction is near-constant",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A chart that predicts almost the same number everywhere.
+
+    Empirical status: VALIDATED (`simcov/battery_flat.py`).
+
+    Power: the prediction spans 0.998 to 1.000 across the design. -/
+noncomputable def nearConstantChart (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares a span of only"),
     # The overclaim screen, planted where the claim actually has to be: an untested
     # body calling ITSELF exact, in the headline. The two traps below are the same
     # words about somebody else's body, which is what this screen used to report.
@@ -1315,6 +1329,36 @@ NEGATIVE_CASES = [
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
      "set_option"),
+    # The Power screen's two boundaries after the scale rule changed. The first is the
+    # case that forced the change: a quantity whose natural scale is 1e-3 whose
+    # prediction nonetheless moves by 88% of its own magnitude. The second is the
+    # cost of that change, planted deliberately so nobody has to rediscover it -- a
+    # sub-unit probability spanning 0.90 to 0.95 WAS reported and now is not. The
+    # trade is accepted because this clause documents discrimination while the
+    # ledger's competitors_rejected gate adjudicates it, and a span that rejects no
+    # rival will not bank a verdict through that gate whatever this screen says.
+    ("identifications", "a Power clause on a quantity whose scale is far below one",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A per-individual loss measured in QALYs.
+
+    Empirical status: VALIDATED (`simcov/battery_tiny.py`).
+
+    Power: the prediction spans 0.000144 to 0.001191 across the nine admitted cells. -/
+noncomputable def tinyScaleLoss (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares a span of only"),
+    ("identifications", "a sub-unit probability span of five points, the accepted trade",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A probability chart over a narrow design.
+
+    Empirical status: VALIDATED (`simcov/battery_narrow.py`).
+
+    Power: the prediction spans 0.90 to 0.95 across the design. -/
+noncomputable def narrowProbabilityChart (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares a span of only"),
     # THE TWO SHAPES THAT MADE THE CORPUS REWORD TRUE PROSE. On 2026-08-11 the
     # overclaim screen read whole docstrings and produced two findings, neither of
     # which said the body was exact: one described a REJECTED rival that is right on

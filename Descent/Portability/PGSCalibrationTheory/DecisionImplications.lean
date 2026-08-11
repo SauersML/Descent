@@ -1567,7 +1567,42 @@ theorem miscalibration_induced_false_positive_qaly_loss
 
 /-- **Expected threshold-specialized QALY loss from miscalibration.**
 
-    Empirical status: UNTESTED. -/
+    Empirical status: VALIDATED (`simcov/battery_qaly01.py`), and read the scope clause
+    below for what that covers. MATCH at worst 1.73 sems over nine admitted cells,
+    `competitors_rejected: 2`.
+
+    WHAT MAKES IT A MEASUREMENT RATHER THAN A RESTATEMENT, which is the question this
+    declaration invites: the predicted side integrates the analytic per-individual loss, and
+    the measured side never evaluates that loss at all. It draws a Bernoulli disease event
+    per individual, applies the ORACLE rule and the DEPLOYED rule, books realised QALYs under
+    each, and differences them. Two different computations. Credit the benefit to
+    non-events, or charge the harm only to treated cases rather than to everyone treated, and
+    the measured side moves while the predicted side does not.
+
+    Power: the prediction spans 0.000144 to 0.001191 QALYs of loss across the nine cells --
+    small in absolute terms and a factor of eight across the design, which is the range that
+    separates the rivals below.
+
+    Both rivals are real confusions rather than straw men, and both are FALSIFIED on the same
+    cells: pricing the benefit at the PREDICTED risk -- the quantity a deployer actually
+    holds -- at 1005 sems, and booking benefit and harm together only on events at 255 sems.
+    The positive control, the data-generating process's own prevalence with no QALY
+    accounting in it, passes at 0.60 sems.
+
+    THREE CELLS ARE EXCLUDED BY A RULE FIXED BEFORE THE RUN, and the reason is the
+    interesting one: at zero miscalibration the deployed model is calibrated, so the two
+    decision rules coincide individual by individual and the loss is identically zero. That
+    cell cannot fail. It would report the harness rather than the law -- the identity-control
+    pattern -- so it is excluded and printed with its prediction rather than counted as three
+    free passes.
+
+    SCOPE, and it is not a formality. What is validated is that the integral of THIS
+    accounting equals the realised loss UNDER THIS DECISION MODEL. Whether real clinical
+    decisions follow a threshold rule, and whether benefit and harm are constants rather than
+    functions of the patient, is the modelling assumption carried by
+    `ThresholdTreatmentModel`, and this run leaves it exactly where it was. The estimand is
+    the unweighted MEAN OVER INDIVIDUALS of the realised QALY difference -- not a
+    per-decision or a per-event mean, which are different numbers. -/
 noncomputable def expectedThresholdQalyLoss {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) (model : ThresholdTreatmentModel)
     (trueRisk predictedRisk : Z → ℝ) : ℝ :=
