@@ -1,0 +1,120 @@
+{
+ "_battery_sha": "306c04957abbe599",
+ "results": [
+  {
+   "name": "fstFromCoalescenceTimes [Slatkin identity against the allele-frequency estimator on random demographies]",
+   "file": "PopGen/Structure.lean",
+   "source": "(T_between - T_within) / T_between, exact realised times",
+   "note": "TWO ROUTES TO ONE QUANTITY, one with no sampling theory in it. This is the harness control for #39: if it fails, no law row measured on these demographies would be readable. The law rows themselves are NOT recorded, because the demography-general predictor does not exist yet and a placeholder prediction would be worse than none",
+   "regime": "random demographies from a STATED distribution: D ~ U{3..8}, log10 Ne ~ U[2.7,4.0] per deme, 0-2 piecewise size changes per deme at U[0.1,2.0]xNe_ref multiplying by exp(U[-0.7,0.7]), migration graph uniform over Erdos-Renyi(p=0.45) / geometric(r=0.55) / Barabasi-Albert(m=1) rejection-sampled until CONNECTED, symmetric edge rates 10^U[-5,-3], all demes coalescing at U[4,20]xNe_ref; 5 Mb, rec=mu=1e-8, 30 diploids per deme, 12 specs, seed 390039. The control compares Slatkin F_ST from EXACT realised coalescence times (branch-mode, no estimator) against Hudson's ratio-of-averages on ALL SEGREGATING SITES with NO MAF filter -- like with like, because the branch statistic integrates the whole tree. A MAF-filtered arm is reported alongside and is never the comparison",
+   "span": 0.8283037322143842,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "spec 6 (geometric, D=5)",
+    "lean": 0.311882337363197,
+    "truth": 0.3166075082887124,
+    "sem": 0.01,
+    "sems_off": 0.4725170925515443,
+    "rel_err": 0.014924380508394603
+   },
+   "cells": [
+    {
+     "design": "spec 0 (geometric, D=6)",
+     "lean": 0.29193485569293653,
+     "truth": 0.29168059391060897,
+     "sem": 0.01,
+     "sems_off": 0.025426178232756946,
+     "rel_err": 0.0008717130574874405
+    },
+    {
+     "design": "spec 1 (scale_free, D=8)",
+     "lean": 0.6276161780787595,
+     "truth": 0.6300810810439237,
+     "sem": 0.01,
+     "sems_off": 0.24649029651642174,
+     "rel_err": 0.003912040909211788
+    },
+    {
+     "design": "spec 2 (erdos_renyi, D=7)",
+     "lean": 0.44000775382553386,
+     "truth": 0.4423191593417071,
+     "sem": 0.01,
+     "sems_off": 0.23114055161732594,
+     "rel_err": 0.0052256509069452655
+    },
+    {
+     "design": "spec 3 (scale_free, D=5)",
+     "lean": 0.3293448897487078,
+     "truth": 0.3259860710152766,
+     "sem": 0.01,
+     "sems_off": 0.33588187334311903,
+     "rel_err": 0.010303565189059219
+    },
+    {
+     "design": "spec 4 (geometric, D=5)",
+     "lean": 0.11125041912988125,
+     "truth": 0.11277848007043813,
+     "sem": 0.01,
+     "sems_off": 0.152806094055688,
+     "rel_err": 0.013549224458447197
+    },
+    {
+     "design": "spec 5 (geometric, D=7)",
+     "lean": 0.35006654637633183,
+     "truth": 0.35075098427159174,
+     "sem": 0.01,
+     "sems_off": 0.0684437895259904,
+     "rel_err": 0.0019513498919505054
+    },
+    {
+     "design": "spec 6 (geometric, D=5)",
+     "lean": 0.311882337363197,
+     "truth": 0.3166075082887124,
+     "sem": 0.01,
+     "sems_off": 0.4725170925515443,
+     "rel_err": 0.014924380508394603
+    },
+    {
+     "design": "spec 7 (geometric, D=6)",
+     "lean": 0.27140112061669786,
+     "truth": 0.2724630326456389,
+     "sem": 0.01,
+     "sems_off": 0.106191202894107,
+     "rel_err": 0.003897453605466455
+    },
+    {
+     "design": "spec 8 (geometric, D=6)",
+     "lean": 0.19479261746088822,
+     "truth": 0.19554782243722058,
+     "sem": 0.01,
+     "sems_off": 0.07552049763323576,
+     "rel_err": 0.003861996349127393
+    },
+    {
+     "design": "spec 9 (erdos_renyi, D=8)",
+     "lean": 0.36933991080584067,
+     "truth": 0.3691727748608052,
+     "sem": 0.01,
+     "sems_off": 0.016713594503547924,
+     "rel_err": 0.0004527309607229218
+    },
+    {
+     "design": "spec 10 (geometric, D=3)",
+     "lean": 0.6479489657212076,
+     "truth": 0.6458618147853723,
+     "sem": 0.01,
+     "sems_off": 0.20871509358353357,
+     "rel_err": 0.0032315750645963196
+    },
+    {
+     "design": "spec 11 (geometric, D=6)",
+     "lean": 0.4545385482095344,
+     "truth": 0.45053902057590356,
+     "sem": 0.01,
+     "sems_off": 0.3999527633630817,
+     "rel_err": 0.008877205860034949
+    }
+   ]
+  }
+ ]
+}
