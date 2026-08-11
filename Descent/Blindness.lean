@@ -23,6 +23,7 @@ import Descent.Blindness.CramerStratum
 import Descent.Blindness.CumulantBlindness
 import Descent.Blindness.DecoratedGeometryBlindness
 import Descent.Blindness.EffectSizeSurgery
+import Descent.Blindness.EffectSizeSymmetry
 import Descent.Blindness.EpistaticChaos
 import Descent.Blindness.GaugeSymmetry
 import Descent.Blindness.HiddenConeAmbiguity
