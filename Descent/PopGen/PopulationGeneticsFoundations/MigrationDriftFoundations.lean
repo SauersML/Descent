@@ -741,7 +741,12 @@ should use `demoSteppingStoneFst`. -/
     furthest. The trajectory reading, which involves no logarithm, agrees at
     0.03% across all twelve cells, and it is the one that carries the status.
     Both are reported because a 10-sem disagreement that is understood is worth
-    more on the record than one that is dropped. -/
+    more on the record than one that is dropped.
+
+    Power: `m` is swept from 0.002 to 0.050, a factor of twenty-five, and `t`
+    over 5, 15, 30 and 60, with the sign of `p0 - p_c` REVERSED in the third
+    parameter set so the approach is tested from both directions. Twelve cells
+    at 0.03 percent relative. -/
 noncomputable def alleleFreqAfterMigration (p₀ p_c m : ℝ) (t : ℕ) : ℝ :=
   p_c + (p₀ - p_c) * (1 - m) ^ t
 

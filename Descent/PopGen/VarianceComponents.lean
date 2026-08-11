@@ -189,7 +189,14 @@ section PopulationSpecificH2
     `D = 0` control at `0.9974` against `1.0`.
 
     Empirical status: **VALIDATED at linkage equilibrium**; the unconditional reading is
-    **FALSIFIED** (`validation/empirical/ldsc_diff/`). -/
+    **FALSIFIED** (`validation/empirical/ldsc_diff/`).
+
+    Power: the design moves the SIGN of the error, not just its size, which is
+    what shows no constant repairs it: at `p = 1/2`, `D = 1/8` in exact rationals
+    this body returns 1 against a true 3/2 with `α = (1,1)` and 1 against a true
+    1/2 with `α = (1,-1)` -- ratios of 2/3 and 2 on either side. The simulation at
+    `n = 400k` reproduces both, 1.4975 against the LD-inclusive 1.5, with a
+    `D = 0` control at 0.9974 against 1.0. -/
 noncomputable def additiveVariance
     {m : ℕ} (p : Fin m → ℝ) (α : Fin m → ℝ) : ℝ :=
   ∑ i, 2 * p i * (1 - p i) * (α i) ^ 2

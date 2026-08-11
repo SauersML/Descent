@@ -190,7 +190,16 @@ theorem heterozygosityLossFromDrift_faster_small_Ne (Ne₁ Ne₂ : ℝ) (t : ℕ
     The engine runs about 1% hot against the known plateau (`H = 0.4489` and
     `0.5044` measured against `theta/(1+theta) = 0.4444` and `0.5000`), which is
     the same systematic `ia_engine.selftest` reports, so it is disclosed rather
-    than absorbed: it is a tenth of the gap being resolved here. -/
+    than absorbed: it is a tenth of the gap being resolved here.
+
+    Power: the prediction spans 0.12168 to 0.36406 over seven cells started
+    MONOMORPHIC, so the whole trajectory sits far from the plateau where a
+    recurrence's slope is what is actually on trial, and the map is iterated
+    FIFTEEN generations because a map can be right for one step and wrong
+    compounded. Both mutation-model candidates were carried through: the
+    biallelic input term reaches 2.84 sems and 11.2 percent on the same
+    trajectories where this body reaches 1.01 sems and 6.5. That is a preference
+    rather than an exclusion, and it is stated as one. -/
 noncomputable def hetMutationDriftRecurrence (Ne mu : ℝ) (H₀ : ℝ) : ℕ → ℝ
   | 0 => H₀
   | t + 1 => (1 - 1 / (2 * Ne)) * hetMutationDriftRecurrence Ne mu H₀ t +

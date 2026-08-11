@@ -59,7 +59,13 @@ and `-rho`.  This is the biological name for the landscape parameter itself.
     opposite sign is a modelling step no simulation can settle, and no dataset here bears on
     it. The pooling formula is arithmetic on the two environment correlations; what was
     untested until now was that arithmetic, and what remains untested is the model it is
-    arithmetic about. -/
+    arithmetic about.
+
+    Power: `(rho, mix)` is swept over (0.8, 0.5), (0.8, 0.75), (0.4, 0.25) and
+    (0.6, 0.9), the balanced cell included because exact cancellation is the one
+    prediction a reader will check by hand, and the two one-sided readings die on
+    those same cells -- the positive environment's mass alone FALSIFIED at 473
+    sems and the negative environment's at 730. -/
 noncomputable def ancestryMixtureCorrelation (rho positiveEnvironmentMass : ℝ) : ℝ :=
   Blindness.mixedEnvironmentCorrelation rho positiveEnvironmentMass
 

@@ -509,7 +509,13 @@ theorem driftLDStep_eq_ibdRecurrenceStep (Ne c Q : ℝ) :
     FALSIFIED at 25.8 sems by measuring the raw ratio `E[D²_{t+1}]/E[D²_t]`,
     which came out at `1.044` at `Ne = 100, c = 0` -- above one, which no
     retention factor can be. That number was correct and was evidence about the
-    creation term, not about this slope. -/
+    creation term, not about this slope.
+
+    Power: the prediction spans 0.89799 to 0.99500 across the design, `c` swept
+    from 0.00 to 0.05 and `Ne` from 100 to 500, and the slope is obtained by
+    DIFFERENCING two arms that share `p` and `q` and differ only in `D₀`, so the
+    creation term -- identical in both arms, and the thing that put 1.044 on the
+    record when the raw ratio was read instead -- cancels exactly. -/
 noncomputable def driftLDRetention (Ne c : ℝ) : ℝ :=
   (1 - c) ^ 2 * (1 - 1 / (2 * Ne))
 
