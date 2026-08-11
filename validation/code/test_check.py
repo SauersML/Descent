@@ -1026,6 +1026,18 @@ noncomputable def gwasDetectionPower (beta sampleSize : ℝ) : ℝ :=
 macro "myRate" x:term : term => `(cleanRate $x)
 """),
      "non-tactic macro"),
+    # The overclaim screen, planted where the claim actually has to be: an untested
+    # body calling ITSELF exact, in the headline. The two traps below are the same
+    # words about somebody else's body, which is what this screen used to report.
+    ("identifications", "an untested definition whose headline calls itself exact",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- **The exact target risk, in closed form.**
+
+    Empirical status: UNTESTED. -/
+noncomputable def headlineClaimsExact (x : ℝ) : ℝ :=
+  x * x
+"""),
+     "is UNTESTED but its docstring claims"),
     # The three duplication shapes, one case each.  They are planted separately
     # because they have three different fixes, and a screen that reports the
     # wrong one of the three sends the reader to the wrong repair.
@@ -1292,6 +1304,38 @@ NEGATIVE_CASES = [
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
      "set_option"),
+    # THE TWO SHAPES THAT MADE THE CORPUS REWORD TRUE PROSE. On 2026-08-11 the
+    # overclaim screen read whole docstrings and produced two findings, neither of
+    # which said the body was exact: one described a REJECTED rival that is right on
+    # another scale, the other a SUPERSEDED derivation, deep in an evidence
+    # paragraph. Both were reworded around the guard. These traps are what stops
+    # that from being the repair a third time.
+    ("identifications", "an untested body naming a rival that is exact elsewhere",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- The liability-scale risk. `observedScaleRisk` is exact on the observed scale and
+is the wrong body here.
+
+    Empirical status: UNTESTED. -/
+noncomputable def liabilityScaleRisk (x : ℝ) : ℝ :=
+  x * x
+
+/-- The observed-scale risk, named so the sentence above has a subject. -/
+noncomputable def observedScaleRisk (x : ℝ) : ℝ :=
+  x + x
+"""),
+     "is UNTESTED but its docstring claims"),
+    ("identifications", "an untested body calling a superseded derivation exact, in evidence",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- The regenerated-term floor.
+
+This is the same functional error, seen from the opposite side, that sank the
+exact-coalescent derivation of the restoration law.
+
+    Empirical status: UNTESTED. -/
+noncomputable def regeneratedFloor (x : ℝ) : ℝ :=
+  x * x
+"""),
+     "is UNTESTED but its docstring claims"),
     ("duplication", "two short idiomatic proofs of different statements",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + """
 theorem model_rate_refl (m : CleanModel) : m.rate = m.rate := rfl

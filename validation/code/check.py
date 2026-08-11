@@ -1378,18 +1378,59 @@ def run_identifications() -> int:
     #     "exact" in a docstring while being 26 percent wrong. A definition may
     #     claim exactness or derivation, or it may be untested, but not both:
     #     an untested definition has no standing to call itself exact.
+    #
+    #     WHERE THE CLAIM HAS TO BE, AND WHY THE WHOLE DOCSTRING WAS THE WRONG
+    #     PLACE TO LOOK. Reading every paragraph, this fired three times on
+    #     2026-08-11 and not one of the three said the body was exact: a
+    #     SUPERSEDED derivation called "exact-coalescent", a COMPETITOR's ratio
+    #     recovered "exactly" to three digits, and a REJECTED rival that is right
+    #     on the observed scale while being measured wrong on this one. All three
+    #     were reworded around the guard, which is the wrong repair -- a corpus
+    #     that must avoid true words to keep a check quiet has been made less
+    #     accurate by its own instrument.
+    #
+    #     The repair shape is already in this file, twice: `convention_status_head`
+    #     and the `Empirical status:` scan both began by reading paragraphs, both
+    #     produced findings that were not defects, and both were fixed by reading
+    #     the HEAD. Same discriminator here. A body says what it IS in its opening
+    #     paragraph and on its status line; everything after those is evidence,
+    #     discussion and rivals, and all three misfires lived there.
+    #
+    #     SECOND FILTER, for the headline that legitimately names a rival. A
+    #     sentence naming ANOTHER corpus declaration in backticks is a sentence
+    #     about that declaration, not this body claiming anything. The price is
+    #     that a body burying its own exactness claim in a sentence that also
+    #     names a neighbour escapes. That price is lower than the one paid above.
     overclaim = []
+    corpus_names = set()
+    for f in ident_lean_files():
+        for dm in re.finditer(r"^(?:noncomputable\s+|private\s+|protected\s+)*"
+                              r"(?:def|abbrev|theorem|structure|inductive)\s+"
+                              r"([A-Za-z_][A-Za-z_0-9'.]*)", open(f).read(), re.M):
+            corpus_names.add(dm.group(1).split(".")[-1])
+    OVERCLAIM_WORD = re.compile(r"\b(exact|exactly|derived from first principles|"
+                                r"the true |precisely)\b", re.I)
+    BACKTICKED_NAME = re.compile(r"`([A-Za-z_][A-Za-z_0-9'.]*)`")
     for f in ident_lean_files():
         raw = open(f).read()
         for m in re.finditer(r"/--((?:(?!-/).)*)-/\s*\n(?:noncomputable )?def ([A-Za-z_0-9'.]+)", raw, re.S):
             doc, name = m.group(1), m.group(2).split(".")[-1]
             if "Empirical status: UNTESTED" not in doc:
                 continue
-            claim = re.search(r"\b(exact|exactly|derived from first principles|"
-                              r"the true |precisely)\b", doc, re.I)
-            if claim:
+            # The opening paragraph plus every status line: the two places a body
+            # speaks about itself rather than about its neighbours.
+            region = doc.split("\n\n", 1)[0] + "\n" + "\n".join(
+                line for line in doc.split("\n") if "Empirical status:" in line)
+            for sentence in re.split(r"(?<=[.!?])\s+", region):
+                claim = OVERCLAIM_WORD.search(sentence)
+                if not claim:
+                    continue
+                named = {n.split(".")[-1] for n in BACKTICKED_NAME.findall(sentence)}
+                if any(other in corpus_names and other != name for other in named):
+                    continue
                 overclaim.append(f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` is UNTESTED but its "
                                  f"docstring claims \"{claim.group(1)}\"")
+                break
     if overclaim:
         bad.append(f"untested definitions whose docstring claims exactness: "
                    f"{len(overclaim)}")
