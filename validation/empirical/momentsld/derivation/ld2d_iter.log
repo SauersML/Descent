@@ -1,0 +1,77 @@
+ld2d_iter.py -- the 2-D lattice test, scored MECHANICALLY against ld2d_prereg.md.
+
+WHY THIS FILE EXISTS RATHER THAN ld2d.py FINISHING.  ld2d.py used a sparse DIRECT
+solve (scipy spsolve / SuperLU).  It completed 3x3 (9639 states) in minutes and then
+spent 58 minutes on 4x4 (82432 states) at 5.2 GB of resident memory and still
+climbing, which is fill-in: the two-locus state space is a four-fold product of the
+lattice, so its graph has large separators and a direct factorisation densifies.
+5x5 (454375 states) is out of reach that way, and 5x5 is required -- the
+pre-registration's inconclusive branch is decided by comparing L fitted on 4x4
+against L fitted on 5x5.  So the direct solve cannot deliver the test at all, and the
+solver is replaced by an iterative one (BiCGSTAB, Jacobi-preconditioned), which needs
+no factorisation and therefore no fill-in.
+
+THIS IS NOT A CHANGE TO THE PRE-REGISTRATION, and the distinction matters.  Solver
+choice is not one of the pre-registered degrees of freedom: the criteria fix a SHAPE
+tolerance and an L-match tolerance, both stated in the file at md5
+ae7c6da9739b718ba348a5a60c7dc5e2, and neither mentions how the linear system is
+solved.  The prereg does say spsolve is accurate to ~1e-10 so that residuals above
+1e-8 are model error; the iterative solve is held to a TIGHTER standard than that --
+every solve below asserts a relative residual under 1e-12 -- and, as the equivalence
+proof, reproduces the already-published 3x3 numbers that are in ld2d.log.  Those 3x3
+numbers were read and declared uninformative long ago, so checking against them
+breaks no blind.
+
+SCORING IS PERFORMED BY THIS SCRIPT, not by me reading numbers and deciding.  The two
+criteria and the inconclusive branch are coded below exactly as filed, and the script
+prints the branch it lands in.
+
+ONE READING OF THE FILED TEXT I HAD TO FIX, and I fix it in the least discretionary
+direction.  The prereg lists the 1-D target L at each rho as TWO numbers, the n=3 and
+n=4 chain values, without selecting between them -- and it justifies the 15% tolerance
+by the spread between them.  The least discretionary reading is therefore that the
+target is the INTERVAL they span, and the fitted L passes if it lies within 15% of
+that interval (i.e. within 15% of the nearer endpoint, or inside it).  Both endpoints
+are printed so anyone can re-score under a stricter reading.
+
+==============================================================================
+SOLVER EQUIVALENCE CHECK against the 3x3 numbers already in ld2d.log
+  rho=1     logged [0.593569, 0.477509]  iterative ['0.593569', '0.477509']  max rel dev 3.83e-07  (residual 1.3e-13)
+  rho=5     logged [0.304652, 0.173644]  iterative ['0.304652', '0.173644']  max rel dev 1.57e-06  (residual 1.1e-13)
+  rho=20    logged [0.13178, 0.039922]  iterative ['0.131780', '0.039922']  max rel dev 3.68e-06  (residual 1.6e-13)
+[    1.3s] solver equivalence established
+[    5.7s] 4x4 (82432 states) rho=1: d=[1, 2, 3, 4] rD=['0.53259', '0.38622', '0.29337', '0.23159'] | K0 fit A=0.2311 L=8.9303 maxerr 1.54%
+[    9.4s] 4x4 (82432 states) rho=5: d=[1, 2, 3, 4] rD=['0.27843', '0.12765', '0.06316', '0.03398'] | K0 fit A=0.3027 L=1.9907 maxerr 1.54%
+[   15.6s] 4x4 (82432 states) rho=20: d=[1, 2, 3, 4] rD=['0.12637', '0.02946', '0.00765', '0.00234'] | K0 fit A=0.3682 L=0.8729 maxerr 8.24%
+[   36.4s] 5x5 (454375 states) rho=1: d=[1, 2, 3, 4] rD=['0.47343', '0.31949', '0.25122', '0.19792'] | K0 fit A=0.2145 L=7.8789 maxerr 2.52%
+[   55.9s] 5x5 (454375 states) rho=5: d=[1, 2, 3, 4] rD=['0.25404', '0.10185', '0.05461', '0.03110'] | K0 fit A=0.3022 L=1.7931 maxerr 16.41%
+[   76.5s] 5x5 (454375 states) rho=20: d=[1, 2, 3, 4] rD=['0.12100', '0.02406', '0.00694', '0.00222'] | K0 fit A=0.4190 L=0.7857 maxerr 37.01%
+[  166.9s] 6x6 (1868832 states) rho=1: d=[1, 2, 3, 4, 5, 6] rD=['0.44929', '0.28832', '0.20703', '0.15776', '0.12161', '0.09305'] | K0 fit A=0.2388 L=5.6613 maxerr 2.03%
+[  268.4s] 6x6 (1868832 states) rho=5: d=[1, 2, 3, 4, 5, 6] rD=['0.25073', '0.09657', '0.04419', '0.02271', '0.01215', '0.00646'] | K0 fit A=0.3379 L=1.5873 maxerr 25.26%
+[  363.0s] 6x6 (1868832 states) rho=20: d=[1, 2, 3, 4, 5, 6] rD=['0.12062', '0.02348', '0.00566', '0.00165', '0.00054', '0.00019'] | K0 fit A=0.4403 L=0.7623 maxerr 61.48%
+
+==============================================================================
+MECHANICAL SCORING against ld2d_prereg.md (md5 ae7c6da9739b718ba348a5a60c7dc5e2)
+  criterion (a) SHAPE : max |K0 fit residual| <= 6%
+  criterion (b) L     : fitted L within 15% of the 1-D target interval
+  inconclusive branch : |L(4x4)/L(5x5) - 1| > 15%
+
+  rho=1     4x4 : shape err   1.54% PASS | L= 8.9303 vs target [2.2779,2.3292] gap 283.41% FAIL
+  rho=1     5x5 : shape err   2.52% PASS | L= 7.8789 vs target [2.2779,2.3292] gap 238.27% FAIL
+  rho=1     6x6 : shape err   2.03% PASS | L= 5.6613 vs target [2.2779,2.3292] gap 143.06% FAIL
+      L(4x4)=8.9303  L(5x5)=7.8789  differ by 13.34%  -> internally consistent
+      BRANCH at rho=1 : RULED OUT
+
+  rho=5     4x4 : shape err   1.54% PASS | L= 1.9907 vs target [1.0528,1.0592] gap  87.94% FAIL
+  rho=5     5x5 : shape err  16.41% FAIL | L= 1.7931 vs target [1.0528,1.0592] gap  69.29% FAIL
+  rho=5     6x6 : shape err  25.26% FAIL | L= 1.5873 vs target [1.0528,1.0592] gap  49.86% FAIL
+      L(4x4)=1.9907  L(5x5)=1.7931  differ by 11.02%  -> internally consistent
+      BRANCH at rho=5 : FAIL
+
+  rho=20    4x4 : shape err   8.24% FAIL | L= 0.8729 vs target [0.5571,0.5574] gap  56.60% FAIL
+  rho=20    5x5 : shape err  37.01% FAIL | L= 0.7857 vs target [0.5571,0.5574] gap  40.95% FAIL
+  rho=20    6x6 : shape err  61.48% FAIL | L= 0.7623 vs target [0.5571,0.5574] gap  36.76% FAIL
+      L(4x4)=0.8729  L(5x5)=0.7857  differ by 11.10%  -> internally consistent
+      BRANCH at rho=20 : FAIL
+
+BRANCHES BY RHO: {1.0: 'RULED OUT', 5.0: 'FAIL', 20.0: 'FAIL'}
