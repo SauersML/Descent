@@ -1378,6 +1378,37 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     chain meets a finite cohort — not inside this one, which would then condition on an `n`
     its oracle does not have.
 
+    THAT SAMPLE-SCALE RIVAL WAS SIZED AND DECLINED, and declined is the word rather than
+    rejected. `validation/empirical/simcov/probe_phisample01.py` runs the sample-level object
+    against this body on these same fourteen cells at four cohort sizes. At the 80000
+    chromosomes this design actually draws the gap is below printing precision in every cell;
+    it is 0.03 to 0.42 sems at `n = 4000`, which is the entire source population, and reaches
+    one sem only near `n = 1000`. So the distinction sits four orders of magnitude below this
+    design's resolution, for a structural reason and not by luck: a frequency still segregating
+    in a `2Ne = 4000` population is at least `1/4000`, so the sample-monomorphic probability is
+    at most `(1 - 1/4000)^n`, which is `2e-9` at `n = 80000`. THE RIVAL IS THEREFORE NOT AMONG
+    THE THREE ABOVE and must never be reported as one that agreed: a cell that cannot fail
+    agrees with everything, and banking that as agreement is the identity control this corpus
+    refuses.
+
+    None of which says the two objects are interchangeable at an `n` where the gap HAS power —
+    that `n` is no longer this design's cohort, and the question becomes a GWAS-ascertainment
+    one against a different oracle. `validation/empirical/simcov/probe_bridge01.py` sizes that
+    regime on a spectrum with NO MAF floor, reaching population singletons: at a 4000-haplotype
+    discovery cohort the signal-weighted gap is 4.566e-04, 3.895e-04 and 2.571e-04 against
+    factors of 0.921087, 0.780144 and 0.514373, falling as a clean `1/n` across a fortyfold
+    sweep. Its readable finding is that the gap is NOT concentrated on the rarest variants —
+    the lowest frequency bin carries the smallest gap at every depth — while WHERE it
+    concentrates moves with depth, peaking in an interior bin at `t = 250` and rising
+    monotonically with frequency by `t = 2000`.
+
+    BOTH PROBES BOUND A MEAN AND NOT A SPREAD, which is the limit to carry forward. Each forms
+    its sample-level column as the EXPECTATION given the drifted frequency, `1 - p^n -
+    (1-p)^n`, rather than by drawing a cohort. That is the right object for comparing two laws
+    and it carries no cohort-sampling variance, so neither file supports any claim about the
+    VARIANCE of a cohort-level factor. Neither emits a verdict or records a cell, by design:
+    an oracle that is one of the two laws under comparison cannot score either of them.
+
     THE FOUR `NeT` CELLS ARE THE INFORMATIVE ONES, and they are not a restatement of the
     argument list. This body has no `NeT` argument, but its ORACLE — the realised fraction of
     the target's signal carried by variants still polymorphic in the source — weights by the
