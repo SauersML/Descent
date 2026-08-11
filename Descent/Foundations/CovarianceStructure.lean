@@ -349,7 +349,9 @@ from first principles, starting with haplotype frequency dynamics.
     (`validation/empirical/simcov/battery_bulk2.py`,
     `test_admixture_ld`). Two million individuals of a one-pulse admixed
     population, joint haplotype frequency counted directly: worst 0.76 sems over
-    a prediction spanning 0.18200 to 0.30000. -/
+    a prediction spanning 0.18200 to 0.30000.
+
+    Power: the prediction spans 0.18200 to 0.30000 across the design. -/
 noncomputable def haplotypeFreqAdmixed (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   alpha * p_A * q_A + (1 - alpha) * p_B * q_B
 
@@ -381,7 +383,9 @@ per-locus copy; two copies differing only in bound-variable names is what that i
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_bulk2.py`,
     `test_admixture_ld`). Gametic `D` measured directly from haplotype counts in
-    the admixed generation: worst 0.19 sems over 0.06000 to 0.07560. -/
+    the admixed generation: worst 0.19 sems over 0.06000 to 0.07560.
+
+    Power: the prediction spans 0.06000 to 0.07560 across the design. -/
 noncomputable def admixtureLDTwoLocus (alpha p_A q_A p_B q_B : ℝ) : ℝ :=
   haplotypeFreqAdmixed alpha p_A q_A p_B q_B
     - Descent.Core.convexCombination alpha p_A p_B * Descent.Core.convexCombination alpha q_A q_B
@@ -418,7 +422,11 @@ theorem admixture_ld_two_locus_eq (alpha p_A q_A p_B q_B : ℝ) :
     `test_admixture_ld`). Decay across generations of random mating at
     recombination `r`: worst 0.19 sems over four cells spanning 0.01966 to
     0.04526, with `r` and `g` both varied so the exponent is tested and not only
-    the coefficient. -/
+    the coefficient.
+
+    Power: the prediction spans 0.01966 to 0.04526 over the four cells, with `r`
+    and `g` both varied so the exponent is on trial and not only the
+    coefficient. -/
 noncomputable def admixtureLDAtGen (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) : ℝ :=
   (1 - r) ^ g * admixtureLDTwoLocus alpha p_A q_A p_B q_B
 
@@ -464,7 +472,12 @@ theorem admixture_ld_at_gen_eq (alpha p_A q_A p_B q_B r : ℝ) (g : ℕ) :
     approximation `exp(-r·g)` in place of `(1-r)^g`, at 9.3 sems in the `r = 0.10` row,
     which is the row with the recombination rate large enough to separate the discrete and
     continuous forms; the two low-`r` rows cannot, and read 0.3 to 0.7 sems there. The
-    `PLANTED` control at `1.4x` this body is rejected at 21.8 to 195 sems. -/
+    `PLANTED` control at `1.4x` this body is rejected at 21.8 to 195 sems.
+
+    Power: the prediction spans 0.02178 to 0.11664 across the three cells, and
+    three competitors are rejected on those same cells -- `α²` in place of
+    `α(1-α)` at 120 sems, no decay factor at up to 181 sems, and `exp(-r·g)` in
+    place of `(1-r)^g` at 9.3 sems in the `r = 0.10` row. -/
 noncomputable def admixtureLDMagnitude (alpha p_A p_B r : ℝ) (g : ℕ) : ℝ :=
   alpha * (1 - alpha) * (p_A - p_B)^2 * (1 - r)^g
 

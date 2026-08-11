@@ -298,7 +298,9 @@ theorem HardyWeinbergModel.genotypeProb_sum (h : HardyWeinbergModel) :
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_linalg.py`,
     `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
-    1.1 sems over a prediction spanning 0.20000 to 1.00000. -/
+    1.1 sems over a prediction spanning 0.20000 to 1.00000.
+
+    Power: the prediction spans 0.20000 to 1.00000 across the design. -/
 noncomputable def HardyWeinbergModel.expectedAltAlleleCount (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype, altAlleleCount g * h.genotypeProb g
 
@@ -347,7 +349,9 @@ noncomputable def HardyWeinbergModel.centeredAltAlleleCount
     Empirical status: **VALIDATED**
     (`validation/empirical/simcov/battery_linalg.py`,
     `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
-    1.0 sems over a prediction spanning 0.18000 to 0.50000. -/
+    1.0 sems over a prediction spanning 0.18000 to 0.50000.
+
+    Power: the prediction spans 0.18000 to 0.50000 across the design. -/
 noncomputable def HardyWeinbergModel.genotypeVariance (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
     h.genotypeProb g * (h.centeredAltAlleleCount g) ^ 2
@@ -393,7 +397,9 @@ enters the Berry-Esseen numerator for weighted sums of bounded genotype variable
     `test_hwe_moments`). Two million Hardy-Weinberg genotypes per cell, worst
     1.0 sems over a prediction spanning 0.15696 to 0.50000. The third ABSOLUTE
     moment is not the third central moment: the latter vanishes at `p = 1/2`
-    and this does not, which is what the design at `p = 0.5` checks. -/
+    and this does not, which is what the design at `p = 0.5` checks.
+
+    Power: the prediction spans 0.15696 to 0.50000 across the design. -/
 noncomputable def HardyWeinbergModel.genotypeThirdAbsMoment
     (h : HardyWeinbergModel) : ℝ :=
   ∑ g : DiploidGenotype,
