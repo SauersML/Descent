@@ -103,7 +103,16 @@ section SteppingStone
 
     Empirical status: **VALIDATED in its stated regime**
     (`validation/empirical/coalescent_diff/`),
-    with the untruncated `d(D-d)/D` form recorded as the available improvement. -/
+    with the untruncated `d(D-d)/D` form recorded as the available improvement.
+
+    Power: `d` is swept from 1 to 32 around the circle and the design separates
+    shapes on it. In the stated `d ≪ D` regime this form carries RMS relative
+    error 0.058 against 0.103 for an exponential whose length scale is fitted
+    FREELY to the same measurement, 1.8 times worse. Across the whole range
+    `d ≤ D/2` this form's error rises to 0.172, its per-`d` relative error
+    running from -0.10 at `d = 1` to +0.36 at `d = 32`, where the untruncated
+    form stays flat at 0.061 -- which is how the truncation is located rather
+    than assumed. -/
 noncomputable def demoSteppingStoneFst (d Ne m σ_sq : ℝ) : ℝ :=
   d / (d + 4 * Ne * m * σ_sq)
 
@@ -559,7 +568,12 @@ This is `admixedFst α fst_AB`.
     is where the power lives: three competing forms of the mixing weight are
     falsified there at up to 1627 sems. That matters here because both bodies
     read `α` as the same mixing proportion, so a design that fixed the weight
-    for one fixes the reading for the other. -/
+    for one fixes the reading for the other.
+
+    Power: `α` is swept from 0.2 to 0.8 with the ancestral frequencies differing
+    by up to 0.8, and the discrimination lives on the companion measured on the
+    SAME draws -- three competing forms of the mixing weight are falsified at
+    `LDDecayTheory.admixtureLD` at up to 1627 sems. -/
 noncomputable def admixedAlleleFreq (α p_A p_B : ℝ) : ℝ :=
   Descent.Core.convexCombination α p_A p_B
 
@@ -1011,6 +1025,11 @@ trajectory of that process and its closed form is proved, not asserted.
     tolerating any `1/(kNₑ)`. The `PLANTED` control `1.4/(2Nₑ)` is rejected at 79 to 82
     sems. Ne was scaled down so the whole cell runs in seconds.
 
+    Power: the prediction spans 0.008333 to 0.05000 across the three cells, and
+    the competitors carried on those same cells fix the factor of two rather than
+    tolerating any `1/(kNₑ)` -- `1/(4Nₑ)` rejected at 102 sems and `1/Nₑ` at 199
+    to 206, with the `PLANTED` control at 79 to 82.
+
     Denotes: a per-generation rate. Other definitions share this formula under names from a
     different concept family; the formula does not fix which is meant. -/
 noncomputable def driftLDCreationRate (Ne : ℝ) : ℝ :=
@@ -1100,7 +1119,13 @@ section DemographicPortability
     discrimination that carries information is the rejection of the predecessor
     and of the no-recombination variant, which are different functions of it. It
     is not independent evidence that a real bottlenecked population has this much
-    excess. -/
+    excess.
+
+    Power: the prediction spans 0.13297 to 0.25598 across the three cells, and
+    two different functions of the same model ride those rows and die on them --
+    the deleted predecessor at 10.3, 19.6 and 10.3 sems, and the variant keeping
+    the trajectory but dropping the `(1-c)²` recombination factor at 12.2, 21.9
+    and 13.8, with the `PLANTED` control at 9.7 to 19.2. -/
 noncomputable def bottleneckExcessLD (Ne_b Ne_stable c : ℝ) (t_b : ℕ) : ℝ :=
   driftLDTrajectory Ne_b c (driftLDEquilibrium Ne_stable c) t_b -
     driftLDEquilibrium Ne_stable c

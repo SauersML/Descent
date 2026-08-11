@@ -152,7 +152,12 @@ theorem uniformOccupancyDistinctHaplotypes_strictMono
     a measurement rather than the same expression twice. The identity gate: the uniform
     reading `1/k` misses by up to 1383 sems, the complement `1 - ∑f²` by 3718, and `(∑f²)/k`
     by 2098. The positive control -- a UNIFORM frequency vector, where the match rate must
-    be `1/k` -- passes at 1.19 sems. -/
+    be `1/k` -- passes at 1.19 sems.
+
+    Power: the prediction spans 0.22531 to 0.49446 across the four cells, and
+    three readings of the same symbols ride those cells and die there -- the
+    uniform `1/k` at up to 1383 sems, the complement `1 - ∑f²` at 3718, and
+    `(∑f²)/k` at 2098. -/
 noncomputable def haplotypeHomozygosity {α : Type*} [Fintype α] (freq : α → ℝ) : ℝ :=
   ∑ i, freq i ^ 2
 
@@ -359,7 +364,7 @@ error. Worst cell 1.51 sems at 0.14% relative, with `switch_err` swept 0 to 0.25
 and one design giving the two interactions opposite signs, where misreading
 phase costs most.
 
-Power, and the two confusions this shape invites, both rejected on the same
+The two confusions this shape invites, both rejected on the same
 cells: dropping the switch channel entirely -- computing the error as if phase
 were always read correctly -- misses by 1152 sems (83% relative); applying the
 switch rate to the phase FREQUENCY rather than to the READ misses by 1174 sems
@@ -380,6 +385,11 @@ verdict. `simcov/battery_bulk50.py` is now in the repository, was run against
 the design described above, and its results are committed beside it (group_a).
 MATCH at worst 1.49 sems (0.18% relative); dropping the switch channel and applying the
 switch rate to the phase FREQUENCY are both FALSIFIED at 912 sems.
+
+Power: `switch_err` is swept from 0 to 0.25 and one design gives the two
+interactions opposite signs, which is where misreading phase costs most. On the
+committed re-run this body MATCHES at worst 1.49 sems (0.18% relative) while both
+confusions above are FALSIFIED at 912 sems on those same cells.
 -/
 noncomputable def haplotypePhasePredictionError
     (freq_cis switch_err pred_cis pred_trans interaction_cis interaction_trans : ℝ) : ℝ :=
@@ -731,7 +741,12 @@ Measured in `validation/empirical/popgen_diff2/`. -/
     Note the shape is **U-shaped in `f`**, not monotone: the variance is largest at the two
     extremes and smallest at `f = 1/2`. The rarity intuition holds only below `f = 1/2`.
 
-    Empirical status: **VALIDATED** (`validation/empirical/popgen_diff2/`). -/
+    Empirical status: **VALIDATED** (`validation/empirical/popgen_diff2/`).
+
+    Power: `f` is swept over 0.02, 0.1, 0.3 and 0.5 -- across the U-shape's
+    minimum rather than up one side of it -- and this body stays within 0.8 to
+    3.5 percent of the measured variance while the rarity-only `σ²/(n·f)` runs
+    from -5 to -50 percent over the same set. -/
 noncomputable def haplotypeEffectVarianceOLS
     (σ2 n freq : ℝ) : ℝ :=
   σ2 / (n * freq * (1 - freq))
@@ -1036,7 +1051,14 @@ theorem la_deconvolution_improves_pgs
     argument is spurious and another is missing.
 
     Empirical status: **VALIDATED**; the form below is FALSIFIED
-    (`validation/empirical/popgen_diff2/`). -/
+    (`validation/empirical/popgen_diff2/`).
+
+    Power: the map length is the swept input and it runs from 1 to 16 Morgans
+    while this body does not contain it at all. The simulated tract length stays
+    between 0.1462 and 0.1913, rising toward `1/(g(1-α)) = 0.20` as edge
+    censoring vanishes, while the map-length form falls from 0.1000 to 0.00625 --
+    a factor of sixteen. Across `α ∈ {0.2,0.5,0.8} × g ∈ {5,10,20}` that form
+    runs -78 to -95 percent where this body matches to 0.1-7 percent. -/
 noncomputable def expectedTractLength (g admixtureFraction : ℝ) : ℝ :=
   1 / (g * (1 - admixtureFraction))
 
