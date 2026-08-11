@@ -245,4 +245,30 @@ noncomputable def faithful (bridgeData : BridgeFunctorData P Q)
 
 end BridgeFunctorData
 
+/-- The identity bridge on the one-chart system, witnessing that `BridgeFunctorData`'s
+obligations are jointly satisfiable so the functors above are not implications from an
+unrealized certificate.  The bridge is the FULL partial identity rather than the empty
+correspondence, which is the degenerate boundary a bridge witness must avoid: through an
+empty bridge every sandwich collapses to the empty arrow and the transport laws hold
+without transporting anything, while here `sandwich_refl` makes the transported identity
+the genuine partial identity on the bridge's range.  What this witness does NOT exercise
+is a discriminating target relation: `unitChartGroupoidRelation.rel` is indiscrete, so the
+three coherence fields hold for the relation's reason rather than the transport's, and a
+witness whose relation can refuse an arrow is the bridge machinery still owed to the
+chart-to-chart correspondence programme. -/
+noncomputable def unitBridgeFunctorData :
+    BridgeFunctorData unitChartGroupoidRelation unitChartGroupoidRelation where
+  obj := id
+  bridge _ := FinitePartialBijection.refl unitFiniteModel
+  map_respects := by intros; trivial
+  map_one := by intros; trivial
+  map_comp := by intros; trivial
+
+/-- The induced endofunctor of the unit pangenome groupoid: the bridge witness feeds the
+whole descent pipeline, so the composite construction is exercised rather than merely
+inhabited. -/
+noncomputable def unitBridgeFunctor :
+    unitChartGroupoidRelation.Obj ⥤ unitChartGroupoidRelation.Obj :=
+  unitBridgeFunctorData.toFunctor
+
 end Descent.Pangenome
