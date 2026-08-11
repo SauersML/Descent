@@ -134,7 +134,13 @@ Two accessors on two structures used to write this product out separately.
     (1 - theta/(2Ne))` drops the input term that `hetStepWithMutation` carries,
     so it is a pure-decay reading and understates the retained heterozygosity
     wherever mutation replenishes it. One and a half percent per generation at
-    `theta = 2` compounds over a run. -/
+    `theta = 2` compounds over a run.
+
+    Power: the prediction spans 0.36263 to 0.39294 across the three cells, which
+    is narrow, and what the design actually separates is the `theta` dependence
+    of the shortfall -- 0.35 percent at `theta = 0.4` against 1.52 percent at
+    `theta = 2.0` on the same `Ne = 100` -- so the dropped input term is
+    identified as a growing gap rather than as a constant bias. -/
 noncomputable def hetDecayFromScaled (Ne : ℝ) (θ : Descent.Core.Theta) : ℝ :=
   (1 - 1 / (2 * Ne)) * (1 - θ.value / (2 * Ne))
 
@@ -199,7 +205,13 @@ than to the instrument is what an earlier run of this design did.
 Denotes: a per-generation retention factor for a BETWEEN-population quantity.
 Other definitions share the shape of this formula under names from the
 heterozygosity family; the formula does not fix which is meant, and the whole
-content of this one is that the two families take different forces. -/
+content of this one is that the two families take different forces.
+
+Power: the predicted half-life spans 32.6 to 69.3 generations across the design,
+and the superseded heterozygosity base carried on the same cells runs to 554.5 at
+`M = 16.0` -- a factor of seventeen, FALSIFIED at 2222 sems. `Ne` is swept
+alongside `M` so that both candidates predict a MOVING half-life rather than one
+of them predicting a constant. -/
 noncomputable def fstTransientDecayFromScaled (Ne : ℝ) (θ : Descent.Core.Theta)
     (bigM : Descent.Core.BigM) : ℝ :=
   hetDecayFromScaled Ne θ * (1 - bigM.value / (2 * Ne))
@@ -452,7 +464,10 @@ theorem hetDecayFromScaled_zero_population_is_junk (θ : Descent.Core.Theta) :
     *not* the allelic variance `p(1-p)`, and it is numerically but not
     conceptually the heterozygote frequency `hweHeterozygosity`; the formula
     alone does not fix which is meant, so the identity is stated as
-    `hweHeterozygosity_eq_genotypeVarianceHWE` below. -/
+    `hweHeterozygosity_eq_genotypeVarianceHWE` below.
+
+    Power: the prediction spans 0.09500 to 0.50000 across the design, on both
+    batteries. -/
 noncomputable def genotypeVarianceHWE (p : ℝ) : ℝ := Descent.Core.hweHeterozygosity p
 
 /-- **The heterozygote frequency and the genotype variance coincide under
@@ -518,7 +533,12 @@ theorem genotypeVariance_eq_zero_iff (p : ℝ) :
     `n` is swept SIXTEENFOLD at fixed `r` on purpose. An earlier run at `n = 600` alone read
     FALSIFIED at 3.2 sems and 7%, which is the estimator and not the body: the tag-based
     estimate is a RATIO, biased at order `1/n`, and the residual shrinks as `n` grows. A
-    single sample size could not have told those apart. -/
+    single sample size could not have told those apart.
+
+    Power: the prediction spans 98.3 to 1573.4 across the design, `n` sweeping
+    sixteenfold at fixed `r`, and the two neighbouring attenuations are carried on
+    the same cells and rejected -- `r¹` at up to 38 sems and 70 percent, `r⁴` at 35
+    sems and 64 percent. -/
 noncomputable def effectiveFisherInformation (n : ℕ) (p r2_ld : ℝ) : ℝ :=
   fisherInformation n (genotypeVarianceHWE p) * r2_ld
 
@@ -3185,6 +3205,14 @@ theorem EvolutionaryParameters.tau_nonneg (p : EvolutionaryParameters) :
     first two were repaired by naming the limit; `asymmetricFst` could not be,
     because its name commits it to exactly two demes, so it was repaired by
     carrying both migration rates and returning the two-deme value at their sum.
+
+    Power: the deme count is the swept input and it runs from 2 to 25 with the
+    total emigration rate `4 Ne m` held at 2.0, while this body predicts 0.33333
+    at every cell by the claim itself. The measurement climbs from 0.18634 to
+    0.32598 over that sweep, which is what shows this body to be the limit and
+    wrong by 79 percent at two demes; the deme-carrying
+    `fstIslandEquilibriumFiniteDemes` is validated on the same five counts at
+    worst 2.74 sems, its squared variant excluded at 9.04.
 -/
 noncomputable def fstDriftMigrationManyDemes (p : EvolutionaryParameters) : ℝ :=
   1 / (1 + p.bigM)
@@ -3223,7 +3251,9 @@ within-generation ordering does not matter.  This is the first-order
     source pool, 4000 loci, 300 replicate populations, worst 0.24 sems over a
     prediction spanning 0.02698 to 0.07078. Mutation and migration enter only
     through their sum, and the design includes a cell where each supplies half
-    of it. -/
+    of it.
+
+    Power: the prediction spans 0.02698 to 0.07078 across the design. -/
 noncomputable def fstDriftFlowStep (p : EvolutionaryParameters) (F : ℝ) : ℝ :=
   F + (1 - F) / (2 * p.Ne) - 2 * (p.mig + p.mu) * F
 
@@ -3763,7 +3793,13 @@ theorem ldRetentionWithDrift_at_zero_time (p : EvolutionaryParameters) (branches
 
     This is the same arithmetic as `PortabilityDrift.mutationSharedRetentionAt`
     stated on the DGP parameter record, so it SHARES that measurement rather
-    than having an independent one, and the status is recorded as shared. -/
+    than having an independent one, and the status is recorded as shared.
+
+    Power: the prediction spans 0.13534 to 0.77880 across the design, with
+    `theta*tau` running over a factor of eight and `Ne` independently over a
+    factor of eight, so the form and the `Ne` cancellation are on trial at once.
+    The competing one-lineage reading `exp(-mu t)` is carried through the same
+    measurement and misses by up to 433 sems and 174 percent. -/
 noncomputable def mutationLDErosion (p : EvolutionaryParameters) : ℝ :=
   Real.exp (-p.theta * p.tau)
 
@@ -4095,7 +4131,12 @@ noncomputable def PGSEvolutionaryModel.hetDecayFactor (m : PGSEvolutionaryModel)
 
     Empirical status: **VALIDATED after correction; the superseded base
     FALSIFIED at up to 2222 sems**, on the runs recorded in
-    `fstTransientDecayFromScaled`. -/
+    `fstTransientDecayFromScaled`.
+
+    Power: the design is the one recorded at `fstTransientDecayFromScaled`, where
+    `Nₑ` is swept alongside `M` so that the half-life moves. The superseded
+    heterozygosity base overstates that half-life by a factor of seventeen at
+    `4 Nₑ m = 16` and is FALSIFIED at up to 2222 sems on those cells. -/
 noncomputable def PGSEvolutionaryModel.fstTransient (m : PGSEvolutionaryModel) : ℝ :=
   fstEquilibrium m.toEvo *
     (1 - fstTransientDecayFromScaled m.Ne ⟨m.theta⟩ ⟨m.bigM⟩ ^ (Nat.floor m.t_div))

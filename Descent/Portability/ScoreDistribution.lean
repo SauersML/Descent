@@ -101,7 +101,11 @@ theorem pgs_variance_nonneg {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ)
 
     On the same runs `SelectionArchitecture.polygenicAdaptationShift` was 50
     percent low at 15.2 sems, because it lacked the ploidy factor this
-    definition carries; that body has since been corrected. -/
+    definition carries; that body has since been corrected.
+
+    Power: the predicted shift spans 1.78945 to -3.66260 across the design and
+    changes sign, and on the same runs the rival lacking the ploidy factor was 50
+    percent low at 15.2 sems. -/
 noncomputable def pgsMeanShift
     {m : ℕ} (β : Fin m → ℝ) (p_source p_target : Fin m → ℝ) : ℝ :=
   ∑ i, β i * (2 * (p_target i - p_source i))
@@ -551,7 +555,9 @@ section BlockCount
     (`validation/empirical/simcov/battery_bulk6.py`,
     `test_effective_block_count`). Measured by recovering the independent-block
     count from the variance of a block sum against fully independent markers,
-    400000 draws: worst 1.69 sems over a prediction spanning 10.0 to 50.0. -/
+    400000 draws: worst 1.69 sems over a prediction spanning 10.0 to 50.0.
+
+    Power: the prediction spans 10.0 to 50.0 across the design. -/
 noncomputable def effectiveBlockCount (markers correlationLength : ℝ) : ℝ :=
   Descent.Core.ratio markers correlationLength
 
