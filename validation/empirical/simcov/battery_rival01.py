@@ -285,9 +285,11 @@ L_DESIGNS = ((0.5, 0.05), (0.5, 0.20), (0.3, 0.10), (0.2, 0.02), (0.6, 0.40))
 def group_l():
     rng = np.random.default_rng(770202)
     cells, c_no1mk, c_zlin, c_none = [], [], [], []
+    fwd, f_old, f_noden, f_no1mk = [], [], [], []
     ctrl = None
     for h2, K in L_DESIGNS:
         body, no1mk, zlin, none, ctrl_v = [], [], [], [], []
+        f_body, f_a, f_b, f_c, obs = [], [], [], [], []
         T = Phinv(1.0 - K)
         for _ in range(BLOCKS):
             g = rng.normal(0.0, math.sqrt(h2), N_BLOCK)
@@ -305,6 +307,15 @@ def group_l():
             no1mk.append(h2_obs * k_hat / z_hat ** 2)
             zlin.append(h2_obs * k_hat * (1.0 - k_hat) / z_hat)
             none.append(h2_obs)
+            # THE SAME TRANSFORM RUN FORWARDS -- `prevalenceScaledR2`. It takes
+            # the liability-scale heritability and the prevalence and returns the
+            # OBSERVED-scale heritability, which is the direction the body is
+            # used in and the direction nothing has ever measured it in.
+            f_body.append(h2 * z_hat ** 2 / (k_hat * (1.0 - k_hat)))
+            f_a.append(h2 * k_hat * (1.0 - k_hat))
+            f_b.append(h2 * z_hat ** 2)
+            f_c.append(h2 * z_hat ** 2 / k_hat)
+            obs.append(h2_obs)
             bb = float(gc @ (liab - liab.mean()) / (gc @ gc))
             ctrl_v.append(float(bb ** 2 * gc.var() / liab.var()))
         lab = "h2=%.1f K=%.2f" % (h2, K)
@@ -318,6 +329,10 @@ def group_l():
                                  h2 * math.sqrt(8.0 / N_BLOCK)))
         c_none.append(const_cell(lab + " [no transform]", none, h2,
                                  h2 * math.sqrt(8.0 / N_BLOCK)))
+        fwd.append(cell(lab + " [forward]", f_body, obs))
+        f_old.append(cell(lab + " [fwd: h2*K(1-K)]", f_a, obs))
+        f_noden.append(cell(lab + " [fwd: h2*z^2]", f_b, obs))
+        f_no1mk.append(cell(lab + " [fwd: no (1-K)]", f_c, obs))
         if ctrl is None:
             m, s = blocked(ctrl_v)
             ctrl = dict(design="the same regression recovers h2 when the "
@@ -349,6 +364,45 @@ def group_l():
     record("liabilityScaleH2 [no transform at all, competing]", LEAN_VAR,
            "h2_observed", c_none, regime=reg, control=ctrl,
            realised_inputs=True, argument_source="model")
+
+    # -- the same transform, forwards -------------------------------------
+    reg_f = (reg.replace("the transform is applied to it. The TRUTH of each "
+                         "cell is the h2 the simulation was built with, a "
+                         "construction constant that never touches the "
+                         "prediction side.",
+                         "and that fitted value is the TRUTH of each cell. The "
+                         "prediction runs the other way: it is built from the "
+                         "liability-scale h2 the simulation was given and the "
+                         "block's realised prevalence, and no measured quantity "
+                         "enters it."))
+    note_f = (
+        "READ THE AGREEMENT NARROWLY: this row is the liabilityScaleH2 row "
+        "above rearranged, so its MATCH is not independent evidence that the "
+        "transform is right -- given one the other follows by algebra, and a "
+        "cell that cannot fail independently buys nothing. What it does buy is "
+        "the rejection of competing forms IN THE DIRECTION THE BODY IS USED, "
+        "which nothing had done: this declaration had exactly two rows in the "
+        "ledger before today, both in battery_bulk22, and both are readings of "
+        "the SUPERSEDED form h2*K(1-K) rather than of the body, so the body "
+        "itself had never been scored against anything. That superseded form is "
+        "carried here as the first rival. The informative one is the third -- "
+        "the denominator with (1-K) dropped -- which misses by 2 percent at "
+        "K=0.02 and by 67 at K=0.40, so it is the twentyfold prevalence sweep "
+        "and not the sample size that rejects it, exactly as in the inverse "
+        "direction")
+    record("prevalenceScaledR2", "AncestryCalibration.lean",
+           "h2 * phi(T)^2 / (K * (1 - K))", fwd, regime=reg_f, control=ctrl,
+           realised_inputs=True, argument_source="model", note=note_f)
+    record("prevalenceScaledR2 [the SUPERSEDED h2*K(1-K), competing]",
+           "AncestryCalibration.lean", "h2 * K * (1 - K)", f_old, regime=reg_f,
+           control=ctrl, realised_inputs=True, argument_source="model")
+    record("prevalenceScaledR2 [the K(1-K) denominator dropped, competing]",
+           "AncestryCalibration.lean", "h2 * phi(T)^2", f_noden, regime=reg_f,
+           control=ctrl, realised_inputs=True, argument_source="model")
+    record("prevalenceScaledR2 [the (1-K) factor dropped, competing]",
+           "AncestryCalibration.lean", "h2 * phi(T)^2 / K", f_no1mk,
+           regime=reg_f, control=ctrl, realised_inputs=True,
+           argument_source="model")
 
 
 # ---------------------------------------------------------------------------

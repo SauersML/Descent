@@ -1,5 +1,5 @@
 {
- "_battery_sha": "646cc0b5de2ee6ea",
+ "_battery_sha": "00d2f6695e9729e0",
  "results": [
   {
    "name": "reliabilityRatio",
@@ -470,6 +470,242 @@
      "sem": 0.0024,
      "sems_off": 94.65946999164426,
      "rel_err": 0.37863787996657705
+    }
+   ]
+  },
+  {
+   "name": "prevalenceScaledR2",
+   "file": "AncestryCalibration.lean",
+   "source": "h2 * phi(T)^2 / (K * (1 - K))",
+   "note": "READ THE AGREEMENT NARROWLY: this row is the liabilityScaleH2 row above rearranged, so its MATCH is not independent evidence that the transform is right -- given one the other follows by algebra, and a cell that cannot fail independently buys nothing. What it does buy is the rejection of competing forms IN THE DIRECTION THE BODY IS USED, which nothing had done: this declaration had exactly two rows in the ledger before today, both in battery_bulk22, and both are readings of the SUPERSEDED form h2*K(1-K) rather than of the body, so the body itself had never been scored against anything. That superseded form is carried here as the first rival. The informative one is the third -- the denominator with (1-K) dropped -- which misses by 2 percent at K=0.02 and by 67 at K=0.40, so it is the twentyfold prevalence sweep and not the sample size that rejects it, exactly as in the inverse direction",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and and that fitted value is the TRUTH of each cell. The prediction runs the other way: it is built from the liability-scale h2 the simulation was given and the block's realised prevalence, and no measured quantity enters it. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9357995760258716,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "h2=0.2 K=0.02 [forward]",
+    "lean": 0.023948553447898542,
+    "truth": 0.024089677105100876,
+    "sem": 9.494686759778995e-05,
+    "sems_off": 1.4863434758075058,
+    "rel_err": 0.005858262715047014
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [forward]",
+     "lean": 0.11198387524938264,
+     "truth": 0.1118032700335301,
+     "sem": 0.00030010170777438364,
+     "sems_off": 0.6018133558517087,
+     "rel_err": 0.0016153840205064365
+    },
+    {
+     "design": "h2=0.5 K=0.20 [forward]",
+     "lean": 0.24488159296160955,
+     "truth": 0.24460979796235283,
+     "sem": 0.0004664903426865399,
+     "sems_off": 0.582637997801722,
+     "rel_err": 0.001111137008904917
+    },
+    {
+     "design": "h2=0.3 K=0.10 [forward]",
+     "lean": 0.10259527288798778,
+     "truth": 0.10282637054405282,
+     "sem": 0.00030723969198087533,
+     "sems_off": 0.7521738307152719,
+     "rel_err": 0.002247455150291709
+    },
+    {
+     "design": "h2=0.2 K=0.02 [forward]",
+     "lean": 0.023948553447898542,
+     "truth": 0.024089677105100876,
+     "sem": 9.494686759778995e-05,
+     "sems_off": 1.4863434758075058,
+     "rel_err": 0.005858262715047014
+    },
+    {
+     "design": "h2=0.6 K=0.40 [forward]",
+     "lean": 0.373027964076209,
+     "truth": 0.37281727202005377,
+     "sem": 0.0003683194778896536,
+     "sems_off": 0.5720361501444299,
+     "rel_err": 0.0005651349118392531
+    }
+   ]
+  },
+  {
+   "name": "prevalenceScaledR2 [the SUPERSEDED h2*K(1-K), competing]",
+   "file": "AncestryCalibration.lean",
+   "source": "h2 * K * (1 - K)",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and and that fitted value is the TRUTH of each cell. The prediction runs the other way: it is built from the liability-scale h2 the simulation was given and the block's realised prevalence, and no measured quantity enters it. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9727194767908027,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.6 K=0.40 [fwd: h2*K(1-K)]",
+    "lean": 0.14391702940199996,
+    "truth": 0.37281727202005377,
+    "sem": 0.0003683194778896536,
+    "sems_off": 621.4720001493675,
+    "rel_err": 0.6139743509676808
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [fwd: h2*K(1-K)]",
+     "lean": 0.023755118982000004,
+     "truth": 0.1118032700335301,
+     "sem": 0.00030010170777438364,
+     "sems_off": 293.3943685442959,
+     "rel_err": 0.7875275117187917
+    },
+    {
+     "design": "h2=0.5 K=0.20 [fwd: h2*K(1-K)]",
+     "lean": 0.07997204605675,
+     "truth": 0.24460979796235283,
+     "sem": 0.0004664903426865399,
+     "sems_off": 352.92853214805314,
+     "rel_err": 0.6730627852075726
+    },
+    {
+     "design": "h2=0.3 K=0.10 [fwd: h2*K(1-K)]",
+     "lean": 0.0269712966744,
+     "truth": 0.10282637054405282,
+     "sem": 0.00030723969198087533,
+     "sems_off": 246.8921687187948,
+     "rel_err": 0.7377005866131882
+    },
+    {
+     "design": "h2=0.2 K=0.02 [fwd: h2*K(1-K)]",
+     "lean": 0.0039261318608,
+     "truth": 0.024089677105100876,
+     "sem": 9.494686759778995e-05,
+     "sems_off": 212.36661887274536,
+     "rel_err": 0.8370201541651773
+    },
+    {
+     "design": "h2=0.6 K=0.40 [fwd: h2*K(1-K)]",
+     "lean": 0.14391702940199996,
+     "truth": 0.37281727202005377,
+     "sem": 0.0003683194778896536,
+     "sems_off": 621.4720001493675,
+     "rel_err": 0.6139743509676808
+    }
+   ]
+  },
+  {
+   "name": "prevalenceScaledR2 [the K(1-K) denominator dropped, competing]",
+   "file": "AncestryCalibration.lean",
+   "source": "h2 * phi(T)^2",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and and that fitted value is the TRUTH of each cell. The prediction runs the other way: it is built from the liability-scale h2 the simulation was given and the block's realised prevalence, and no measured quantity enters it. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.9947451881622784,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.6 K=0.40 [fwd: h2*z^2]",
+    "lean": 0.08947514976534164,
+    "truth": 0.37281727202005377,
+    "sem": 0.0003683194778896536,
+    "sems_off": 769.2835683797308,
+    "rel_err": 0.7600026702611332
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [fwd: h2*z^2]",
+     "lean": 0.00532052658264918,
+     "truth": 0.1118032700335301,
+     "sem": 0.00030010170777438364,
+     "sems_off": 354.82218425406165,
+     "rel_err": 0.9524117086999911
+    },
+    {
+     "design": "h2=0.5 K=0.20 [fwd: h2*z^2]",
+     "lean": 0.039167446873526815,
+     "truth": 0.24460979796235283,
+     "sem": 0.0004664903426865399,
+     "sems_off": 440.40000893839266,
+     "rel_err": 0.8398778495391467
+    },
+    {
+     "design": "h2=0.3 K=0.10 [fwd: h2*z^2]",
+     "lean": 0.009223788335581278,
+     "truth": 0.10282637054405282,
+     "sem": 0.00030723969198087533,
+     "sems_off": 304.6565422748113,
+     "rel_err": 0.9102974432844575
+    },
+    {
+     "design": "h2=0.2 K=0.02 [fwd: h2*z^2]",
+     "lean": 0.0004701750761688302,
+     "truth": 0.024089677105100876,
+     "sem": 9.494686759778995e-05,
+     "sems_off": 248.76546879869713,
+     "rel_err": 0.9804823006087834
+    },
+    {
+     "design": "h2=0.6 K=0.40 [fwd: h2*z^2]",
+     "lean": 0.08947514976534164,
+     "truth": 0.37281727202005377,
+     "sem": 0.0003683194778896536,
+     "sems_off": 769.2835683797308,
+     "rel_err": 0.7600026702611332
+    }
+   ]
+  },
+  {
+   "name": "prevalenceScaledR2 [the (1-K) factor dropped, competing]",
+   "file": "AncestryCalibration.lean",
+   "source": "h2 * phi(T)^2 / K",
+   "note": "positive control 'the same regression recovers h2 when the outcome is the LIABILITY, not its dichotomy' passed at 0.13 sems",
+   "regime": "a normal liability of declared heritability h2 dichotomised at the threshold for prevalence K; the observed-scale heritability is fitted by least squares of the 0/1 outcome on the genetic value and and that fitted value is the TRUTH of each cell. The prediction runs the other way: it is built from the liability-scale h2 the simulation was given and the block's realised prevalence, and no measured quantity enters it. Prevalence and threshold height are taken at the block's REALISED case fraction. K spans 0.02 to 0.40. 8 blocks of 500000 individuals; error bars are the block sem",
+   "span": 0.8952626583725232,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "h2=0.6 K=0.40 [fwd: no (1-K)]",
+    "lean": 0.22407256508339962,
+    "truth": 0.37281727202005377,
+    "sem": 0.0003683194778896536,
+    "sems_off": 403.84697488417163,
+    "rel_err": 0.3989748278847263
+   },
+   "cells": [
+    {
+     "design": "h2=0.5 K=0.05 [fwd: no (1-K)]",
+     "lean": 0.1063832314248988,
+     "truth": 0.1118032700335301,
+     "sem": 0.00030010170777438364,
+     "sems_off": 18.060672326150453,
+     "rel_err": 0.04847835494441098
+    },
+    {
+     "design": "h2=0.5 K=0.20 [fwd: no (1-K)]",
+     "lean": 0.19592784907150654,
+     "truth": 0.24460979796235283,
+     "sem": 0.0004664903426865399,
+     "sems_off": 104.35789219233274,
+     "rel_err": 0.19901880176663564
+    },
+    {
+     "design": "h2=0.3 K=0.10 [fwd: no (1-K)]",
+     "lean": 0.09234796843023482,
+     "truth": 0.10282637054405282,
+     "sem": 0.00030723969198087533,
+     "sems_off": 34.10497532483609,
+     "rel_err": 0.10190384099309276
+    },
+    {
+     "design": "h2=0.2 K=0.02 [fwd: no (1-K)]",
+     "lean": 0.023468764798485052,
+     "truth": 0.024089677105100876,
+     "sem": 9.494686759778995e-05,
+     "sems_off": 6.539576526590721,
+     "rel_err": 0.025775036498282868
+    },
+    {
+     "design": "h2=0.6 K=0.40 [fwd: no (1-K)]",
+     "lean": 0.22407256508339962,
+     "truth": 0.37281727202005377,
+     "sem": 0.0003683194778896536,
+     "sems_off": 403.84697488417163,
+     "rel_err": 0.3989748278847263
     }
    ]
   },
