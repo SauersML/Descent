@@ -206,6 +206,130 @@ def ofWitnessFamily {Data ι : Type*} (p : ι → Object → Data) (P : Object �
 end ProbeBlindness
 
 /-!
+### 1½. Where witness pairs come from: observational symmetry
+
+`ProbeBlindness` asks for two objects and says nothing about how to find them. In
+practice they are almost never found by search: they are found by exhibiting a
+**transformation** of the parameter that every experiment in the class reports
+identically and that moves the quantity of interest. A change of reference tree, a
+rescaling of two parameters along a constant product, a relabelling of a fiber, a
+nuisance shift that leaves every summary statistic fixed — each is a map `T` with
+`observe ∘ T = observe` and `target ∘ T ≠ target`, and each yields a witness pair
+`(T θ, θ)` for free.
+
+That is the whole content of `ObservationalSymmetry` and of
+`ObservationalSymmetry.toProbeBlindness`: the symmetry is the reusable object, the pair
+is a consequence of it, and the impossibility is `no_criterion_of_factors` as before. The
+invariance is demanded at *every* parameter rather than only at the witness, because that
+is what makes the object a symmetry rather than a coincidence, and because it is what a
+gauge argument or a reparameterization argument actually establishes.
+
+The positive counterpart is `IdentifiedBy`: the observation pins the target. It is exactly
+the negation of the existence of a symmetry with a moved target
+(`not_identifiedBy_of_observationalSymmetry`), and it is exactly the existence of a readout
+from data to target (`IdentifiedBy.exists_readout` and `identifiedBy_of_factors`, which are
+converse to each other). So a per-law identification claim has a definite shape to be
+stated in, and a definite shape to be refuted in.
+-/
+
+/-- An **observational symmetry**: a transformation of the parameter that every experiment
+in the class reports identically, together with one parameter whose target it moves.
+
+`observe` is what the experiments see; `target` is the quantity being asked for. The
+invariance is universal and the movement is witnessed, which is the asymmetry that makes
+the structure useful: a symmetry is established once and refutes identification of any
+target it moves anywhere. -/
+structure ObservationalSymmetry {Parameter Data Target : Type*}
+    (observe : Parameter → Data) (target : Parameter → Target) where
+  /-- The transformation the observation cannot see. -/
+  transform : Parameter → Parameter
+  /-- Every parameter is reported identically to its image. -/
+  observation_invariant : ∀ parameter, observe (transform parameter) = observe parameter
+  /-- A parameter at which the transformation changes the answer. -/
+  moved : Parameter
+  /-- It does change the answer there. -/
+  target_moved : target (transform moved) ≠ target moved
+
+namespace ObservationalSymmetry
+
+variable {Parameter Data Target : Type*} {observe : Parameter → Data}
+  {target : Parameter → Target}
+
+/-- **A symmetry is a blindness witness.** Any property the transformation flips at the
+moved parameter is undecidable from the observation, by `no_criterion_of_factors`. -/
+def toProbeBlindness (S : ObservationalSymmetry observe target) (P : Parameter → Prop)
+    (hpositive : P (S.transform S.moved)) (hnegative : ¬ P S.moved) :
+    ProbeBlindness observe P where
+  positive := S.transform S.moved
+  negative := S.moved
+  same_data := S.observation_invariant S.moved
+  holds := hpositive
+  fails := hnegative
+
+/-- The canonical instance: the property *"the target takes the value it takes after the
+transformation"* is flipped by construction, so no hypothesis is needed. -/
+def targetBlindness (S : ObservationalSymmetry observe target) :
+    ProbeBlindness observe (fun parameter ↦ target parameter = target (S.transform S.moved)) :=
+  S.toProbeBlindness _ rfl (fun hmoved ↦ S.target_moved hmoved.symm)
+
+/-- **No criterion built from the observation reads the target.** The law applied to
+`targetBlindness`: no statistic, no fitting procedure, no hierarchy of tests folded into a
+verdict decides which value the target takes, because each of them is a function of the
+observation and functions respect equality. -/
+theorem no_target_criterion (S : ObservationalSymmetry observe target) :
+    ¬ ∃ decide : Data → Prop, ∀ parameter : Parameter,
+      target parameter = target (S.transform S.moved) ↔ decide (observe parameter) :=
+  S.targetBlindness.no_criterion
+
+end ObservationalSymmetry
+
+/-- The **identified** relation, the positive counterpart: parameters agreeing on the
+observation agree on the target. This is what a per-law identification claim asserts, and
+what a symmetry refutes. -/
+def IdentifiedBy {Parameter Data Target : Type*}
+    (observe : Parameter → Data) (target : Parameter → Target) : Prop :=
+  ∀ first second : Parameter, observe first = observe second → target first = target second
+
+/-- **The class is inhabited, and the witness is the general reason anything is
+identified.** A target computed from the observation is identified by it; the converse
+`IdentifiedBy.exists_readout` says there is nothing else. -/
+theorem identifiedBy_of_factors {Parameter Data Target : Type*}
+    (observe : Parameter → Data) (readout : Data → Target) :
+    IdentifiedBy observe (fun parameter ↦ readout (observe parameter)) :=
+  fun _first _second hobserve ↦ congrArg readout hobserve
+
+/-- **Identification is exactly the existence of a readout.** Converse to
+`identifiedBy_of_factors`: if the observation pins the target then the target *is* a
+function of the data, and the function is exhibited. The inhabitedness premise supplies a
+value off the range of the observation, where nothing is being claimed. -/
+theorem IdentifiedBy.exists_readout {Parameter Data Target : Type*} [Nonempty Target]
+    {observe : Parameter → Data} {target : Parameter → Target}
+    (hidentified : IdentifiedBy observe target) :
+    ∃ readout : Data → Target, ∀ parameter : Parameter,
+      target parameter = readout (observe parameter) := by
+  classical
+  refine ⟨fun data ↦ if hdata : ∃ parameter : Parameter, observe parameter = data then
+    target hdata.choose else Classical.arbitrary Target, ?_⟩
+  intro parameter
+  have hdata : ∃ preimage : Parameter, observe preimage = observe parameter := ⟨parameter, rfl⟩
+  show target parameter =
+    if hexists : ∃ preimage : Parameter, observe preimage = observe parameter then
+      target hexists.choose else Classical.arbitrary Target
+  rw [dif_pos hdata]
+  exact hidentified parameter hdata.choose hdata.choose_spec.symm
+
+/-- **A symmetry refutes identification.** The two are exact opposites: an observational
+symmetry with a moved target is precisely a failure of `IdentifiedBy`, so a proposed
+identification result is refuted by exhibiting one transformation, not by a search over
+pairs. -/
+theorem not_identifiedBy_of_observationalSymmetry {Parameter Data Target : Type*}
+    {observe : Parameter → Data} {target : Parameter → Target}
+    (S : ObservationalSymmetry observe target) : ¬ IdentifiedBy observe target := by
+  intro hidentified
+  exact S.target_moved
+    (hidentified (S.transform S.moved) S.moved (S.observation_invariant S.moved))
+
+/-!
 ### 1a. Approximate blindness, and criteria with a margin
 
 `ProbeBlindness.same_data` is exact equality, so `no_criterion_of_factors` says nothing

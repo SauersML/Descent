@@ -623,6 +623,30 @@ theorem balancedRankOneSign_rootMeanSquare (population : ℕ) (hpopulation : 0 <
     exact_mod_cast hpositive.ne'
   rw [NormVisibility.rootMeanSquare, hsum, hcard, div_self hne, Real.sqrt_one]
 
+/-- The all-one spin is the norm layer's dense family under another name: at `Fin`-indexed
+coordinates `constantOneVector` IS `NormVisibility.denseFamily`, so everything the norm
+layer proves of the dense family holds of it. -/
+theorem constantOneVector_eq_denseFamily (dimension : ℕ) :
+    (constantOneVector : Fin dimension → ℝ) = NormVisibility.denseFamily dimension := rfl
+
+/-- **The orthogonal spin is exactly as large as the direction it cannot see.**  Its
+mean-square size is one, the same as the hidden direction's: a spin's failure to align with
+the spike says nothing about its magnitude, which is what makes the ground-state certificate
+above a statement about geometry rather than about size. -/
+theorem balancedRankOneOrthogonalSpin_rootMeanSquare (population : ℕ)
+    (hpopulation : 0 < population) :
+    NormVisibility.rootMeanSquare (balancedRankOneOrthogonalSpin population) = 1 := by
+  have hcard : Fintype.card (BalancedRankOneCoordinate population) = 2 * population := by
+    simp [BalancedRankOneCoordinate, two_mul]
+  have hne : ((2 * population : ℕ) : ℝ) ≠ 0 := by
+    have hpositive : 0 < 2 * population := by omega
+    exact_mod_cast hpositive.ne'
+  have hsum : ∑ coordinate, balancedRankOneOrthogonalSpin population coordinate ^ 2
+      = ((2 * population : ℕ) : ℝ) := by
+    simp only [balancedRankOneOrthogonalSpin, constantOneVector_apply, one_pow,
+      Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_one, hcard]
+  rw [NormVisibility.rootMeanSquare, hsum, hcard, div_self hne, Real.sqrt_one]
+
 /-- **The spike saturates the norm inequality.**  Equality in
 `NormVisibility.rootMeanSquare_le_supremumNorm` is the signature of a dense perturbation,
 and it is what rules out reading the rank-one result as a support-counting effect. -/
