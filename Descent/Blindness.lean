@@ -27,6 +27,7 @@ import Descent.Blindness.EffectSizeSymmetry
 import Descent.Blindness.EpistaticChaos
 import Descent.Blindness.FactorIdentifiability
 import Descent.Blindness.GaugeSymmetry
+import Descent.Blindness.GluingBlindness
 import Descent.Blindness.HiddenConeAmbiguity
 import Descent.Blindness.ImitationRigidity
 import Descent.Blindness.JetBarrier
