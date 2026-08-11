@@ -699,8 +699,8 @@ NOT help, and `recurrence_matching_leaves_fourth_cycle_density_free_of_palindrom
 shows that matching recurrence preserves nothing.  Lean already has a
 convention for "unused on purpose": the leading underscore, which is what its
 own `unusedVariables` linter respects.  So a dead binder is FATAL when its name
-does not begin with `_`, and reported without failing when it does.  That keeps
-the gate at budget zero without an allow-list, and it makes the underscore an
+does not begin with `_`, and reported without failing when it does. This permits
+no unmarked dead binder and makes the underscore an
 admission a reader can grep for rather than a way around the check.
 
 **The known blind spot, stated because a gate that hides one is worse than no

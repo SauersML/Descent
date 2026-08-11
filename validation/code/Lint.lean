@@ -28,9 +28,9 @@ They were NOT moved into this gate, and that is a measurement rather than a
 preference.  Of the 171 `unusedArguments` findings, 119 are inaccessible binders --
 `inst✝`, `x✝`, `a✝` -- with no name to rename, required by the type of a `def`
 whose value ignores them; 27 already begin with an underscore and are reported
-anyway; 25 are ordinary named hypotheses and are the only repairable ones.  A gate
-whose findings cannot be driven to zero is not a ratchet but a permanent red, and a
-red gate is one nobody reads -- which is how the 158 errors above went unread for
+anyway; 25 are ordinary named hypotheses and are the only repairable ones. A gate
+whose findings cannot be driven to zero is permanently red, and a red gate is one
+nobody reads -- which is how the 158 errors above went unread for
 every commit of the period this file used to describe.
 
 COMPILED AND RUN.  This file and `Descent.Meta.Linters` build, and this runner

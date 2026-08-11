@@ -1014,9 +1014,9 @@ things about `(p : PopGenParameters)` and the differentiation that record itself
 predicts, so the demography reaches the deployed number inside one claim rather than
 across a gap the reader closes.
 
-That gap is what `shape-spine` counts, and it is not a formality: a theorem taking `F_ST`
-as a free real is a statement about arithmetic, and the corpus's claim is about
-populations. `shape-routes` refuses the same shape from the other side, by forbidding a
+That gap is not a formality: a theorem taking `F_ST` as a free real is a statement about
+arithmetic, and the corpus's claim is about populations. `shape-routes` refuses the same
+shape from the other side, by forbidding a
 second entry point that re-supplies the record's fields as bare arguments.
 -/
 

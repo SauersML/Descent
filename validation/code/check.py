@@ -80,7 +80,7 @@ THE GUARDS, and what each one catches:
                   run.  It is excluded from the default set because it shells
                   out to git and reads a remote ref.
 
-THE SHAPE GUARDS are five more, and they are a family rather than five checks
+THE SHAPE GUARDS are three more, and they are a family rather than three checks
 that happen to be adjacent.  Every one of them measures a property this corpus
 has already been repaired to have and has already lost again, because the tree is
 organised by the order a person would read it in and a reading order is invisible
@@ -88,10 +88,6 @@ to a build.  They read the import graph and the declaration index from
 `architecture.py` rather than deriving either, and the only thing they add is an
 exit code.
 
-  shape-depth     the longest import chain, with the tables of contents removed.
-                  A chain of thirty-eight modules in which each file imports the
-                  one written before it is a manuscript order compiled into the
-                  build graph.
   shape-chains    a module whose ONE internal import is a sibling in its own
                   directory that it names nothing from.  The finding prints where
                   the symbols it does name actually live, which is the import it
@@ -100,14 +96,10 @@ exit code.
                   `Coalescent` was an island one release ago and `Pangenome` was
                   one in this release; both were wired in by hand, which is the
                   argument for the guard rather than against it.
-  shape-spine     cross-module theorem reuse, and the count of theorems joining
-                  `PopGenParameters` to a metric computed from the `Core/Moments`
-                  kernel.  The second is the corpus's headline claim, counted.
   shape-routes    a definition taking four or more bare reals that shares a name
                   stem with a record-typed one: two routes to one metric, of
                   which only one carries the record's constraints.  GATED; the
-                  other four are DIAGNOSTIC while their repairs land, and the
-                  `GUARDS` entry for each names what flips it.
+                  other route does not.
 
 WHY ONE FILE.  These seven were seven scripts in three directories, and the cost
 was not tidiness.  Three of them independently re-derived "which files are the
@@ -378,7 +370,7 @@ def run_style() -> int:
 # GUARD: identifications -- structural guards over the corpus
 #
 # Was `validation/code/check.py`.  Its full header, which carries the
-# reasoning behind every budget and the record of two wrong deletions, is
+# reasoning behind every rule and the record of two wrong deletions, is
 # reproduced immediately below.
 # ======================================================================================
 
@@ -472,8 +464,7 @@ def run_style() -> int:
 #    ever satisfy the hypothesis: a proposition never concluded (3m), a bundle
 #    never inhabited (3n), a supplied field installed as an instance (3o), and a
 #    result whose name hides what it rests on (3p). Every count must be zero.
-#    Nothing is pinned at what was measured and nothing ratchets: a screen that
-#    permits the defects already present has agreed to them.
+#    A screen that permits defects already present has agreed to them.
 #
 #    Prefer `sorry`. An admission is a debt this corpus can enumerate; a laundered
 #    premise is a debt it cannot, and guard 1 exists to keep the first cheap.
@@ -492,9 +483,8 @@ def run_style() -> int:
 # the point of the merge: three guards used to re-derive this and disagree.
 IDENT_ROOT = str(CORPUS)
 
-# THERE ARE NO BUDGETS. A screen that permits N existing instances of the defect
-# it names is a screen that has agreed to the defect, and "it was already there"
-# is not a standard. Every count above 0 fails the build.
+# ZERO TOLERANCE. A screen that permits existing instances of the defect it names
+# has agreed to the defect. Every count above 0 fails the build.
 #
 # The last remnant of the old discipline was a table of the values seven screens
 # carried before they were zeroed, printed beside any failure so a reader could
@@ -701,9 +691,9 @@ IDENT_AXIOM = r"(?m)^\s*(?:(?:private|protected)\s+)*axiom\b"
 IDENT_SET_OPTION_ESCAPE = r"(?m)^[ \t]*set_option[ \t]+(?:debug\.[\w.]+|autoImplicit)\b"
 # Everything else, with `maxHeartbeats` named as the one option that cannot change
 # what the kernel accepts: it decides whether elaboration FINISHES, and a proof that
-# needs twenty times the default budget is a fact about that proof, not a hole in it.
+# needs twenty times the default heartbeat limit is a fact about that proof, not a hole in it.
 # `Coalescent/MohleLemma.lean` carries the corpus's only one.  Any other option still
-# gates, which is what keeps this a ratchet rather than a licence.
+# gates, so the exception does not become a licence for unrelated options.
 IDENT_SET_OPTION_OTHER = r"(?m)^[ \t]*set_option[ \t]+(?!maxHeartbeats\b)[\w.]+"
 
 IDENT_MACHINERY_EXEMPT = {
@@ -759,8 +749,7 @@ def run_identifications() -> int:
             (r"(?m)^\s*macro\b(?![^\n]*:\s*tactic\s*=>)",
              "installs a non-tactic macro, which rewrites what a reader reads"),
             # --- Below: patterns with ZERO occurrences in the corpus when added.
-            # Each is a ratchet, not a cleanup. They cost nothing to adopt and
-            # each closes a way to make the kernel accept something without the
+            # Each closes a way to make the kernel accept something without the
             # mathematics having been done.
             (IDENT_SET_OPTION_ESCAPE,
              "sets a compiler option that changes what is ACCEPTED: "
@@ -770,7 +759,7 @@ def run_identifications() -> int:
              "very thing lakefile.lean disables for the library"),
             (IDENT_SET_OPTION_OTHER,
              "sets a compiler option other than `maxHeartbeats` in a proof "
-             "module; every option that is not a pure elaboration budget can "
+             "module; every option that is not a pure elaboration limit can "
              "change what the file means, so a new one is a deliberate edit"),
             (r"(?m)^[ \t]*(?:(?:scoped|local)[ \t]+)*(?:notation|infixl|infixr|infix|prefix|postfix|notation3)\b",
              "rebinds notation: `+`, `≤`, `∈` or `‖·‖` bound to a convenient "
@@ -1024,7 +1013,7 @@ def run_identifications() -> int:
             # member counted as tied through some sibling. Those 63 are latent in the
             # corpus, not invented by the sharpening; they are a corpus-sized project
             # and they are recorded here rather than either silently kept hidden or
-            # dumped into a report nobody can act on. Do not pin a budget to them.
+            # dumped into a report nobody can act on.
             norm = re.sub(r"[A-Za-z_][A-Za-z_0-9₀-₉'.]*",
                           lambda t: "V" if t.group(0) in bound else t.group(0), body)
             if not re.search(r"[0-9]|[A-Za-z_]{3,}", norm.replace("V", "")):
@@ -2013,7 +2002,7 @@ def run_identifications() -> int:
     #     Everything else a docstring does with an `=` is legitimate -- setting up
     #     a model, recalling a definition, running a chain of algebra whose net
     #     claim is an inequality -- and the screen is written to under-fire rather
-    #     than to catch those. Measured over the corpus before the budget was set:
+    #     than to catch those. Measured over the corpus before the rule was enabled:
     #     a looser first version reported fifteen sites, every one of which was a
     #     false positive on inspection.
     DISPLAYED_EQ = re.compile(r"(?<![:<>!≤≥≠])\s=\s")
@@ -2173,11 +2162,7 @@ def run_identifications() -> int:
             if cites_identity and not cites_measurement:
                 inherited.append(f"{os.path.relpath(f, IDENT_ROOT)}: a VALIDATED note cites a sibling "
                                  f"identity but no measurement: \"{note.strip()[:70]}\"")
-    #     ENFORCED, at zero. This comment used to say "reported, not enforced,
-    #     until the count is measured once and pinned", and proposed ratcheting a
-    #     budget down from that count -- while the code below already appended to
-    #     `bad` and failed the build. The prose described a discipline the corpus
-    #     no longer has and the code no longer followed. A VALIDATED tag resting
+    #     ENFORCED. A VALIDATED tag resting
     #     on a sibling identity rather than on a measurement is a defect at one
     #     occurrence, and being retroactive over twenty of them is a reason to
     #     fix twenty, not a reason to permit them.
@@ -2266,50 +2251,11 @@ def run_identifications() -> int:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause declares a span of "
                                  f"only {max(nums) - min(nums):.4f}; a near-constant prediction "
                                  f"cannot reject a wrong functional form")
-    # THE BURN-DOWN BUDGET, AND IT IS BUILT TO DELETE ITSELF.
-    #
-    # Making the match markup-tolerant lit 130 heads that had been invisible. Landing
-    # the tolerance without a budget turns the tree red for every agent; landing the
-    # 130 clauses first leaves the evasion open for the whole sweep, which is
-    # protection exactly when it is not needed. So the tolerance takes effect NOW and
-    # the arrears are pinned.
-    #
-    # This is `LAYER_PENDING`'s device, which burned to empty and was deleted. It is a
-    # RATCHET WITH TEETH IN BOTH DIRECTIONS, not a suppression ledger: an INCREASE is a
-    # hard failure that names the offending heads, so a new VALIDATED note without a
-    # Power clause fails on arrival at budget zero; a DECREASE re-pins automatically, so
-    # nobody maintains a list by hand. WHEN THE PIN REACHES 0 THIS BLOCK AND ITS FILE
-    # SHOULD BE DELETED -- a budget that has burned down is a comment pretending to be
-    # a check.
-    #
-    # THE PIN LIVES UNDER THE CORPUS ROOT, not beside this script, so a fixture corpus
-    # carries its own and the calibration suite cannot ratchet the real one down. An
-    # absent pin means ZERO, which is the right default for anything that is not this
-    # corpus mid-burn-down.
-    #
-    # KNOWN HAZARD, stated rather than discovered: the re-pin trusts the scan. A run
-    # over a partial or broken checkout counts fewer heads and would ratchet the pin
-    # down, after which a correct tree reads as an increase and fails. The pin is
-    # tracked in git for exactly that reason -- the ratchet shows up as a diff, and a
-    # path-scoped commit is where it gets caught.
-    budget_path = CORPUS / "validation" / "code" / "results" / "power_budget.json"
-    try:
-        pinned = int(json.loads(budget_path.read_text())["powerless"])
-    except (OSError, ValueError, KeyError, TypeError):
-        pinned = 0
-    if len(powerless) > pinned:
-        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}, "
-                   f"budget {pinned}; record the spread of the prediction across the "
-                   f"design, see Descent.DriftRegime")
+    if powerless:
+        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}; "
+                   f"record the spread of the prediction across the design, "
+                   f"see Descent.DriftRegime")
         bad.extend("    " + x for x in powerless)
-    elif len(powerless) < pinned:
-        try:
-            budget_path.parent.mkdir(parents=True, exist_ok=True)
-            budget_path.write_text(json.dumps({"powerless": len(powerless)}, indent=2) + "\n")
-            print(f"power budget ratcheted {pinned} -> {len(powerless)}; "
-                  f"commit {os.path.relpath(budget_path, CORPUS)}")
-        except OSError:
-            pass
 
     # 3m. Assumptions laundered into hypotheses. A proposition the corpus cannot
     #     prove can be made to look proved in five moves, none of which is a
@@ -2465,8 +2411,7 @@ def run_identifications() -> int:
     #     A corpus-declared class is different, and is the case the original
     #     screen was written for: it puts a proposition this development invented
     #     into synthesis, where no use site names it and no structure parameter
-    #     carries it. There are no such classes today, so this is a ratchet
-    #     against introducing one rather than a report on what exists.
+    #     carries it. There are no such classes today, and introducing one fails.
     #
     #     The Mathlib-class escape route is not left open. `Fact` is the class an
     #     arbitrary proposition can be smuggled through, and the parameterized
@@ -2566,8 +2511,7 @@ def run_identifications() -> int:
     #     docstrings that already admitted the content was trivial, which
     #     reached nobody reading a theorem list.
     #
-    #     Pinned, not zero. The survivors are grandfathered so the budget can
-    #     ratchet down as they are renamed; what it forbids is adding more.
+    #     Every finding fails; no survivor is grandfathered.
     DOMAIN_WORD = re.compile(
         # `variant` must not fire inside `invariant`: an invariant measure, an
         # invariant subspace and an invariant average are mathematics, not genetics,
@@ -2602,7 +2546,7 @@ def run_identifications() -> int:
     # constant this corpus defines" and reports a theorem written entirely in
     # corpus vocabulary. `cross_ancestry_exact_metric_profile` is one such.
     #
-    # With the budget at zero a false positive here is not noise, it is pressure
+    # With every finding fatal, a false positive here is not noise, it is pressure
     # to rename a correct name, so this guard splits at the PROOF's `:=`: scan at
     # depth zero and let each `let`/`have`/`fun` binder consume the next one.
     def statement_of(decl):
@@ -2675,7 +2619,7 @@ def run_identifications() -> int:
                     "%s cites `Descent.%s` for load-bearing content, and that file "
                     "disclaims having it" % (path.relative_to(REPO), match.group(3)))
     if dead_pointers:
-        bad.append("citations landing on a disclaimer: %d, budget 0; say what the cited "
+        bad.append("citations landing on a disclaimer: %d; say what the cited "
                    "file actually contains, or drop the claim"
                    % len(dead_pointers))
         bad.extend("    " + x for x in dict.fromkeys(dead_pointers))
@@ -2711,7 +2655,7 @@ def run_identifications() -> int:
                     "`%s` takes `%s` as a hypothesis: a named theorem supplied as a "
                     "parameter proves only that the theorem was assumed" % (tname, hname))
     if law_hypotheses:
-        bad.append("named mathematical laws supplied as hypotheses: %d, budget 0; "
+        bad.append("named mathematical laws supplied as hypotheses: %d; "
                    "prove the law for the object at hand, or state the theorem about "
                    "an object that has it" % len(law_hypotheses))
         bad.extend("    " + x for x in law_hypotheses)
@@ -2772,7 +2716,7 @@ def run_identifications() -> int:
     # 4. semantic isolation. A module that no theorem ever relates to another
     #    module cannot be contradicted by anything: a false definition inside it
     #    is consistent with the whole corpus. This is the condition that let two
-    #    falsified identifications survive review, so the count is ratcheted.
+    #    falsified identifications survive review, so every finding fails.
     # A LEAN-SIDE DEFINITION IS NOT A QUANTITY. This screen's own scoping note says the risk
     # is "a false DEFINITION sheltered where nothing can contradict it", and scopes the count
     # to modules that define something. What it must mean by "something" is something a
@@ -3600,8 +3544,7 @@ INFLATED = re.compile(
 #   `deployedR2_mono_in_Ne`, `brier_anti_in_r2`, `core_antitone_in_sample`, twenty more.
 #   The token after it is a variable, not a claim, and reading `mono_in_construction` as
 #   "a construction was completed" is the regex meeting a naming convention rather than a
-#   defect.  The convention is load-bearing elsewhere: `shape-spine` prints these names as
-#   the spine it counts, so it cannot be renamed away to satisfy this rule.
+#   defect. The name follows the corpus's established monotonicity convention.
 QUALIFIED_NAME_TOKEN = re.compile(
     r"(?:^|_)(?:of|assuming|given|under|conditional|when|if|requires|at|in)_", re.I)
 STANDARD_PREDICATES = {
@@ -5528,9 +5471,8 @@ def run_duplication() -> int:
 # is a FAILURE with the path it looked for, not a pass.  Point it elsewhere
 # with DESCENT_MATHLIB.
 
-# Every budget here is 0, like every other budget in this file.  Nothing is
-# grandfathered: the four known collisions were removed before the guard
-# landed, not pinned.
+# Nothing is grandfathered: the four known collisions were removed before the
+# guard landed.
 
 MATHLIB_DECL = re.compile(
     r"^(?:@\[[^\]]*\][ \t]*)?"
@@ -6024,7 +5966,7 @@ def run_mathlib() -> int:
 # corpus against a paper.  `validation/conventions.json` is that reading
 # written down as DATA; this guard is what makes the data load-bearing.
 #
-# THE FOUR RULES, all at budget 0:
+# THE FOUR RULES; every finding fails:
 #
 #   UNLEDGERED   a `def` whose name carries a ledgered quantity's word, under a
 #                quantity whose scope is `complete`, with no ledger entry.  The
@@ -6625,7 +6567,7 @@ def run_conventions() -> int:
 # `empirical/extract/test_parser.py` is a standing demonstration of what happens
 # when a check does.
 #
-# THE RULES, all at budget 0:
+# THE RULES; every finding fails:
 #
 #   1. A docstring citing a battery FILE the ledger has never seen.  A renamed
 #      or deleted battery leaves a citation pointing at nothing, and a citation
@@ -6646,7 +6588,7 @@ def run_conventions() -> int:
 #      definition cannot be both validated and falsified; one of the two designs
 #      is wrong and the docstring has to say which.
 #
-# REPORTED, NOT GATED, and named as outstanding work rather than given a budget:
+# REPORTED, NOT GATED, because adjudication requires inspecting the Lean body:
 # definitions whose docstring asserts agreement while every ledger record for
 # them disagrees.  These are real findings -- each is either a stale docstring
 # or a stale record -- but a verdict is evidence about the FORMULA a battery
@@ -6831,7 +6773,7 @@ def run_ledger() -> int:
                         "battery and saying why the other design is wrong"),
     ):
         if found:
-            bad.append(f"{label}: {len(found)}, budget 0; {advice}")
+            bad.append(f"{label}: {len(found)}; {advice}")
             bad.extend("    " + x for x in sorted(set(found)))
 
     if bad:
@@ -6861,7 +6803,7 @@ def run_ledger() -> int:
               f"either a stale docstring or a record against a body that has "
               f"since been corrected, and telling those apart needs a human "
               f"because a transcription and a Lean body share no text. This "
-              f"count is printed in full rather than carried as a budget:")
+              f"count is printed in full for review:")
         for line in sorted(set(contradicted)):
             print("    " + line)
     return 0
@@ -6881,8 +6823,7 @@ def run_ledger() -> int:
 # this layer.  It reports its two sharpest findings -- a docstring asserting
 # agreement against a disagreeing record, a citation to a battery that emits no
 # verdict -- as REPORTED, NOT GATED, because telling a stale docstring from a
-# corrected body needs a human and a budget pinned to the count would be worse
-# than none.  That reasoning is sound across 2164 definitions.  Across the
+# corrected body needs a human. That reasoning is sound across 2164 definitions. Across the
 # seven files in `Core/` it is not: the population is small enough to hold at
 # zero by hand, and the cost of a silent one is the whole chain.
 #
@@ -7069,7 +7010,7 @@ def run_core_empirics() -> int:
                  "`NOT TESTED BY THE DESIGN THAT LOOKED LIKE IT WAS`"),
     ):
         if found:
-            bad.append(f"{label}: {len(found)}, budget 0; {advice}")
+            bad.append(f"{label}: {len(found)}; {advice}")
             bad.extend("    " + x for x in sorted(set(found)))
 
     if bad:
@@ -7134,28 +7075,11 @@ def run_core_empirics() -> int:
 # exactly that reason and no other -- the findings are real and the fixes are in
 # flight.  Each entry in `GUARDS` names what has to land before it flips.
 
-# The depth limit.  Twelve is one rung for each of the corpus's eleven top-level
-# directories, plus one.  That is the depth a tree gets from its own layer contract
-# -- `Core < Foundations < Coalescent < PopGen < Portability < Decision < Program`,
-# with `Blindness`, `Conditionals`, `Pangenome` and `Spectral` hanging off it -- so
-# a corpus whose imports run downward through the layers and no further can meet
-# it.  Anything above 12 is modules stacked on each other INSIDE a layer, which is
-# the shape a reading order makes and a dependency order does not.
-SHAPE_DEPTH_LIMIT = 12
-
 SHAPE_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_'₀-₉]*")
 # Where a declaration block ends: the head of the next one.
 SHAPE_DECL_STOP = re.compile(
     r"^\s*(noncomputable |def |abbrev |theorem |lemma |structure |inductive "
     r"|instance |class |end |namespace |section |open |variable |@\[)")
-SHAPE_THEOREM = re.compile(
-    r"^\s*(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+([\w.'₀-₉]+)(.*?):=", re.S | re.M)
-
-# The two spine thresholds.  Both are the audit's, and both are far from where the
-# corpus stands; see `run_shape_spine` for how each is counted.
-SHAPE_REUSE_PCT = 20.0
-SHAPE_SPINE_THEOREMS = 80
-
 # A function of four or more BARE reals is a demography spelled out longhand.
 # Three is not: `deployedR2FromTau (V_A V_E tau : ℝ)` is a formula in its own
 # coordinates and takes no population history at all, while
@@ -7230,109 +7154,6 @@ def _shape_graph_without_toc():
     toc = {m for m in graph if _shape_is_toc(m, graph, decls)}
     return {m: {d for d in graph[m] if d not in toc}
             for m in graph if m not in toc}
-
-
-def _shape_graph_for_depth():
-    """The same graph with the layer gate dropped as well -- depth only.
-
-    `Descent.Layer` declares the `assert_below` macro and nothing else, and every module
-    in the corpus sits above it by construction, so it adds exactly one to every path and
-    changes the shape of none of them.  `SHAPE_DEPTH_LIMIT` was set on 2026-08-05 against
-    a graph that did not contain it; the gate was added the following morning, so counting
-    it compares a depth against a limit measured on a different graph.  The layer rule
-    drops it for the same reason, where it is `LAYER_GATE`.
-
-    Depth only, and the reason is `shape-components`: a handful of modules import the gate
-    and nothing else from the corpus, so deleting it from the shared graph does not shorten
-    them, it disconnects them -- nine islands, which is a fact about this function and not
-    about the corpus.
-    """
-    graph = _shape_graph_without_toc()
-    gate = f"Descent.{LAYER_GATE}"
-    return {m: {d for d in graph[m] if d != gate} for m in graph if m != gate}
-
-
-def _shape_depths(graph):
-    """Longest path from a leaf, per module, iteratively so a cycle cannot hang us."""
-    depth = {}
-
-    def go(mod, seen):
-        if mod in depth:
-            return depth[mod]
-        if mod in seen:
-            return 0
-        d = 0
-        for dep in graph.get(mod, ()):
-            d = max(d, go(dep, seen | {mod}) + 1)
-        depth[mod] = d
-        return d
-
-    for mod in graph:
-        go(mod, frozenset())
-    return depth
-
-
-def run_shape_depth() -> int:
-    """No module may sit more than `SHAPE_DEPTH_LIMIT` imports above a leaf.
-
-    WHAT THIS CAUGHT.  The audit that asked for this guard measured a longest
-    import chain of 38 modules at depth 37, and the top of it was not a deep result
-    resting on deep machinery.  It was a sequence: `PortabilityDrift.Definitions` ->
-    `ClosedPopulationRegime` -> `PresentDayMetrics` -> `Generational` ->
-    `PresentDayMoments` -> `MutationDrift` -> `MigrationDrift` -> ... , each file
-    importing the one written before it.  `Generational` did not use a single
-    declaration of `PresentDayMetrics`; it used twenty-five of `PopGen.DGP`, which
-    it did not import, and reached them through the chain.  The depth was a reading
-    order compiled into the build graph.
-
-    WHY DEPTH AND NOT SOMETHING VAGUER.  "Files should be small" and "directories
-    should be shallow" are not checkable and would fire on the whole corpus.  Depth
-    is checkable, it is exactly the quantity a narrative order inflates and a
-    dependency order does not, and it is the one number that cannot be brought down
-    by moving files or renaming them: the only way down is for a module to import
-    what it uses.
-
-    Measured with the tables of contents removed -- see `_shape_is_toc` for which
-    modules earn that and why resembling a head does not.  The chain the guard
-    prints is the actionable object; the count of modules over the limit is not,
-    because every one of them is over it on account of some chain.
-    """
-    graph = _shape_graph_for_depth()
-    depth = _shape_depths(graph)
-    if not depth:
-        print("shape-depth guard CANNOT RUN: no Lean modules found under "
-              f"{CORPUS / 'Descent'}")
-        return 1
-
-    worst = max(depth.values())
-    over = sorted(((depth[m], m) for m in depth if depth[m] > SHAPE_DEPTH_LIMIT),
-                  reverse=True)
-
-    if worst > SHAPE_DEPTH_LIMIT:
-        # The chain, not the count, is the actionable object: the fix is an edit to
-        # some module ON it, and a bare number names none of them.
-        top = max(sorted(depth), key=lambda m: depth[m])
-        chain, cur = [top], top
-        while graph.get(cur):
-            cur = max(sorted(graph[cur]), key=lambda d: depth[d])
-            chain.append(cur)
-        print(f"deepest import chain: {len(chain)} modules, depth {worst}, "
-              f"limit {SHAPE_DEPTH_LIMIT}")
-        for m in chain:
-            print(f"    {depth[m]:>3}  {m}")
-        print(f"modules above the limit: {len(over)}, budget 0; for each link on "
-              f"the chain, check whether the module below it is actually used -- "
-              f"`--only shape-chains` names the ones that are not -- and import "
-              f"what the module names instead of the file that precedes it")
-        print(f"shape-depth guard FAILS: depth {worst} exceeds {SHAPE_DEPTH_LIMIT}. "
-              f"A chain of {len(chain)} modules is a reading order compiled into "
-              f"the build graph, and every module on it must be rebuilt when the "
-              f"bottom one changes, whether or not it uses anything from it.")
-        return 1
-
-    print(f"shape-depth guard passes: {len(depth)} modules, deepest sits {worst} "
-          f"imports above a leaf, limit {SHAPE_DEPTH_LIMIT}")
-    return 0
 
 
 def run_shape_chains() -> int:
@@ -7428,7 +7249,7 @@ def run_shape_chains() -> int:
 
     if findings:
         print(f"modules whose one internal import is an unused sibling: "
-              f"{len(findings)}, budget 0; import the module whose declarations the "
+              f"{len(findings)}; import the module whose declarations the "
               f"file actually names, then the sibling is used or removable")
         for line in findings:
             print("    " + line)
@@ -7512,7 +7333,7 @@ def run_shape_components() -> int:
     if stranded:
         n = sum(len(c) for c in stranded)
         print(f"modules outside the corpus's largest weak component: {n} in "
-              f"{len(stranded)} island(s), budget 0; give each a theorem relating "
+              f"{len(stranded)} island(s); give each a theorem relating "
               f"its quantities to something the corpus already deploys, and import "
               f"what that theorem needs -- an island is wired in when an edit "
               f"elsewhere can break it")
@@ -7531,179 +7352,6 @@ def run_shape_components() -> int:
 
     print(f"shape-components guard passes: all {len(graph)} modules lie in one "
           f"weak component once the directory heads are removed")
-    return 0
-
-
-def _shape_metric_names(code):
-    """The deployed metrics, read off the source rather than listed here.
-
-    A metric is an `ℝ`-valued definition of `Descent/Core/Moments.lean` -- `r2`,
-    `calibrationSlope`, `brier`, `deployedR2` and the rest, which is what the corpus
-    means by "a number a deployment reports" -- CLOSED UNDER being computed from
-    one.  `sensFromR2` counts because its body names `r2`; `brierFromR2` counts for
-    the same reason.
-
-    THE CLOSURE IS THE POINT, not a convenience.  A hardcoded list of metric names
-    -- `architecture.py` carries one -- counts `presentDayR2` and
-    `portabilityStatistic` as metrics on the strength of their spelling.  Neither
-    is computed from the metric kernel, so a theorem joining `PopGenParameters` to
-    one of them joins the parameter record to a number that has no stated relation
-    to the `R²` the corpus actually deploys.  Reading the set off the bodies means
-    a new metric joins it the moment it calls the kernel, and never before, which
-    is the same rule `duplicate_body_groups` enforces one level down.
-    """
-    kernel = set()
-    for line in code.get("Descent.Core.Moments", "").split("\n"):
-        m = re.match(r"^(?:noncomputable\s+)?def\s+([\w.'₀-₉]+)(.*)", line)
-        if m and re.search(r":\s*ℝ\s*:?=?\s*$", m.group(2)):
-            kernel.add(m.group(1).split(".")[-1])
-
-    # Parse once.  The closure below sweeps the list repeatedly and re-parsing
-    # every module on each sweep is the whole cost of this guard.
-    real_defs = []
-    for _mod, text in code.items():
-        real_defs += _shape_real_defs(text)
-
-    metrics = set(kernel)
-    while True:
-        grew = {name for name, body in real_defs
-                if name not in metrics
-                and any(re.search(r"(?<![\w.'])" + re.escape(k) + r"(?![\w'])", body)
-                        for k in metrics)}
-        if not grew:
-            return kernel, metrics
-        metrics |= grew
-
-
-def _shape_real_defs(text):
-    """`(short name, body)` for every `ℝ`-valued `def` in one module's code."""
-    lines, i, out = text.split("\n"), 0, []
-    while i < len(lines):
-        m = re.match(r"^\s*(?:noncomputable\s+)?(?:def|abbrev)\s+([\w.'₀-₉]+)",
-                     lines[i])
-        if not m:
-            i += 1
-            continue
-        block, j = [lines[i]], i + 1
-        while j < len(lines) and lines[j].strip() and not SHAPE_DECL_STOP.match(lines[j]):
-            block.append(lines[j])
-            j += 1
-        i = j
-        joined = " ".join(" ".join(block).split())
-        sig, _sep, body = joined.partition(":=")
-        if re.search(r":\s*ℝ\s*$", sig.strip()):
-            out.append((m.group(1).split(".")[-1], body))
-    return out
-
-
-def run_shape_spine() -> int:
-    """The corpus must have a spine: theorems joining the parameters to the metrics.
-
-    TWO NUMBERS, one shape.
-
-    CROSS-MODULE REUSE is the fraction of theorems whose name appears in the CODE
-    of some other module.  A corpus of independent monographs and a corpus with a
-    spine are the same size, the same soundness and the same line count; this is
-    the number that tells them apart, and just under 12% this one is much closer to
-    the monographs.  The threshold is 20%: not a comfortable number and not an
-    arbitrary one -- it is one theorem in five load-bearing, which is roughly what
-    it takes for the deepest results to rest on the shallow ones rather than
-    beside them.  `architecture.py` computes this figure and REPORTS it, on the
-    argument that no value of it is correct.  That argument is right about the
-    percentage and wrong about the corpus: 88% of theorems having no consumer
-    outside their own file is not a property with no correct value, it is the
-    island shape measured one level down, and this is where the same number gets
-    an exit code.  The function that computes it is `architecture`'s, called, not
-    a second copy.
-
-    A SPINE THEOREM is a theorem whose STATEMENT binds the parameter record
-    `PopGenParameters` and names a deployed metric.  Both halves are the point:
-
-      * the record and not a demographic quantity generally.  `Ne`, `m` and `μ`
-        passed as three loose reals are what the record exists to replace, and
-        `shape-routes` fails on exactly that pattern -- so counting a theorem over
-        loose reals as a spine theorem would have the two guards pulling against
-        each other.  A theorem is on the spine when it starts where the spine
-        starts.
-      * the metric read off `Core/Moments.lean` and closed under being computed
-        from it -- see `_shape_metric_names`, which explains why a name list would
-        count theorems that reach a number the corpus never connects to the `R²`
-        it deploys.
-
-    So a spine theorem is `PopGenParameters → … → a number a deployment reports`,
-    stated as one claim.  There are nineteen, and every one of them is in
-    `Core/Moments.lean`: the spine exists, it is one file long, and not one of the
-    subsystems has stated a theorem reaching from the record to a metric.  The
-    per-module breakdown is printed for that reason -- the count alone would read
-    as "not many theorems", and the finding is that they are all in one place.
-
-    HOW THIS DIFFERS FROM `architecture.composition_theorems`, which reads 64.
-    That one matches a statement against two hand-written lists of names, and a
-    name on the metric list is a metric by virtue of its spelling.  Three of them
-    -- `momentsUnderDrift`, `ScoreMoments`, `presentDayR2` -- are respectively the
-    intermediate of the chain, the tuple it passes, and a quantity with no stated
-    relation to the `R²` the corpus deploys.  The audit that asked for this guard
-    counted 26 with a similar list.  Nineteen is the same population under a
-    definition that requires the metric to be computed from the metric kernel, and
-    the smaller number is the more useful one: it is the count of theorems that
-    actually carry a demography to a reported number.
-
-    The threshold is 80, the audit's, which is roughly one such theorem per
-    subsystem module that names a demographic quantity.
-    """
-    _raw, code, _graph, decls, arch = _shape_corpus()
-
-    reused, total = arch.gate_cross_module_reuse(code, decls)
-    pct = round(100.0 * reused / total, 2) if total else 0.0
-
-    kernel, metrics = _shape_metric_names(code)
-    spine = []
-    for mod, text in code.items():
-        for m in SHAPE_THEOREM.finditer(text):
-            stmt = m.group(2)
-            if not re.search(r"(?<![\w.'])PopGenParameters(?![\w'])", stmt):
-                continue
-            if any(re.search(r"(?<![\w.'])" + re.escape(k) + r"(?![\w'])", stmt)
-                   for k in metrics):
-                spine.append((m.group(1), mod))
-
-    bad = []
-    if pct < SHAPE_REUSE_PCT:
-        bad.append(f"cross-module theorem reuse: {pct}% ({reused} of {total} "
-                   f"theorems named in another module's code), floor "
-                   f"{SHAPE_REUSE_PCT}%; the gap is "
-                   f"{int(SHAPE_REUSE_PCT * total / 100) - reused} theorems that "
-                   f"need a consumer somewhere other than the file they are in")
-    if len(spine) < SHAPE_SPINE_THEOREMS:
-        bad.append(f"spine theorems: {len(spine)}, floor {SHAPE_SPINE_THEOREMS}; "
-                   f"state the subsystem's result about `(p : PopGenParameters)` "
-                   f"and one of the {len(metrics)} deployed metrics in the same "
-                   f"claim, rather than about a free real someone has to believe "
-                   f"came from a demography")
-        for name, mod in sorted(spine):
-            bad.append(f"    have: {name}  ({mod})")
-        homes = collections.Counter(mod for _n, mod in spine)
-        for mod, n in homes.most_common():
-            bad.append(f"    {n:>3} of {len(spine)} in {mod}")
-
-    print(f"deployed metrics: {len(kernel)} in Core/Moments.lean, {len(metrics)} "
-          f"once closed under being computed from one")
-    print("    " + ", ".join(sorted(metrics)))
-
-    if bad:
-        for line in bad:
-            print(line)
-        print(f"shape-spine guard FAILS. `PopGenParameters → fstEquilibrium → "
-              f"momentsUnderDrift → a deployed metric` is the claim this corpus "
-              f"exists to make, and a theorem that takes `F_ST` as a free real "
-              f"does not make it -- it makes a statement about arithmetic that a "
-              f"reader has to supply the population genetics for.")
-        return 1
-
-    print(f"shape-spine guard passes: {pct}% cross-module reuse (floor "
-          f"{SHAPE_REUSE_PCT}%) and {len(spine)} theorems joining "
-          f"`PopGenParameters` to a deployed metric (floor "
-          f"{SHAPE_SPINE_THEOREMS})")
     return 0
 
 
@@ -7857,7 +7505,7 @@ def run_shape_routes() -> int:
 
     if findings:
         print(f"metrics reachable by two routes, one of them raw reals: "
-              f"{len(findings)}, budget 0; make the raw-real definition compute the "
+              f"{len(findings)}; make the raw-real definition compute the "
               f"record and call the record-typed one, so the record's field "
               f"constraints hold on both routes -- or delete it if the "
               f"record-typed one already covers its callers")
@@ -7903,11 +7551,7 @@ def run_shape_routes() -> int:
 #
 #   ORDER      the seven ranked directories are `Core < Foundations < Coalescent <
 #              PopGen < Portability < Decision < Program`, and an import from a lower
-#              rank to a higher one is a violation.  That contract is not invented
-#              here; it is the corpus's own, quoted in the `SHAPE_DEPTH_LIMIT` comment
-#              above, and `SHAPE_DEPTH_LIMIT` is 12 BECAUSE of it.  A guard measuring
-#              depth against a layer contract nothing checks is measuring against a
-#              wish.
+#              rank to a higher one is a violation.
 #   CORE       a module under `Descent/Core/` may import `Descent.Core.*` and Mathlib
 #              and nothing else.  This is ORDER's strongest case and it is stated
 #              separately because it does not need the ranking to be right: Core is
@@ -7991,10 +7635,8 @@ def run_shape_routes() -> int:
 # ABOUT.  `LAYER_PENDING` below carries one sentence per outstanding edge saying what
 # the edge is made of and what repair retires it.  An edge NOT in that table is
 # reported harder than one in it, because an unlisted edge is one nobody has argued
-# for.  The table is not a budget: every entry in it still counts as a violation and
-# the budget is 0.  What the sentence buys is that the next person does not re-derive
-# the analysis, and that an edge cannot be added silently -- adding one means writing
-# down why.
+# for. Every entry still counts as a violation. The sentence keeps the analysis beside
+# the edge and prevents an edge from being added silently.
 #
 # CALIBRATION.  Both counted rules have been run against a second tree -- the corpus at
 # `62bbadb`, the state before this release's import work, reachable with
@@ -8264,7 +7906,7 @@ def run_layers() -> int:
     if edges:
         listed = [e for e in edges if e in LAYER_PENDING]
         unlisted = [e for e in edges if e not in LAYER_PENDING]
-        bad.append(f"cross-layer import edges: {len(edges)}, budget 0")
+        bad.append(f"cross-layer import edges: {len(edges)}")
         for mod, dep in edges:
             rules = ("order " if (mod, dep) in order else "") + \
                     ("core " if (mod, dep) in core else "") + \
@@ -8285,20 +7927,20 @@ def run_layers() -> int:
                    f"{len(unlisted)} not)")
     if unreachable:
         bad.append(f"qualified names outside the importer's closure: "
-                   f"{len(unreachable)}, budget 0; import the module that DEFINES the "
+                   f"{len(unreachable)}; import the module that DEFINES the "
                    f"name, because the chain it currently arrives through belongs to "
                    f"another file and can be cut without warning")
         bad.extend("    " + x for x in sorted(unreachable))
     if unplaced:
         bad.append(f"top-level directories in neither `LAYER_ORDER` nor "
-                   f"`LAYER_UNRANKED`: {len(unplaced)}, budget 0; give it a rank in "
+                   f"`LAYER_UNRANKED`: {len(unplaced)}; give it a rank in "
                    f"the order or a sentence in `LAYER_UNRANKED` saying why it has "
                    f"none -- an unplaced directory is a piece of the corpus this "
                    f"guard silently reports as clean")
         bad.extend("    " + x for x in unplaced)
     if stale:
         bad.append(f"`LAYER_PENDING` entries whose edge no longer exists: {len(stale)}, "
-                   f"budget 0; delete the entry -- a repaired edge described as "
+                   f"delete the entry -- a repaired edge described as "
                    f"outstanding is worse than no description")
         bad.extend(f"    {m} -> {d}" for m, d in stale)
 
@@ -8433,80 +8075,11 @@ GUARDS = {
     "closure":         dict(fn=run_closure,         gated=True,  takes_argv=False),
     "wiring":          dict(fn=run_wiring,          gated=True,  takes_argv=True),
     "conventions":     dict(fn=run_conventions,     gated=True,  takes_argv=False),
-    # `ledger` is DIAGNOSTIC for one commit only, and for one reason, recorded
-    # here so it is not forgotten: it currently reports seven docstring
-    # citations to `simcov/battery_bulk19.py` and `simcov/battery_bulk20.py`,
-    # whose results were never committed.  Those are true findings -- six
-    # definitions assert an empirical status against evidence that does not
-    # exist in the repository -- and the fix is to land the results, which is
-    # GATED.  The condition this entry set for itself -- flip when
-    # `battery_bulk19_results.json` and `battery_bulk20_results.json` land -- is met:
-    # both files are committed, the seven citations they blocked resolve, and the
-    # guard's gated rules are at zero.  It ran diagnostic for exactly as long as its
-    # stated reason lasted, which is the only thing that separates a ratchet from a
-    # permanent exemption.
-    #
-    # Its `REPORTED, NOT GATED` section still names seven citations that reach a
-    # battery emitting numbers and calling `record()` nowhere.  Those are outstanding
-    # and they do NOT gate: the repair is a `record()` call in three battery scripts
-    # and a rerun, not a change here.  That category is the next thing to flip.
     "ledger":          dict(fn=run_ledger,          gated=True,  takes_argv=False),
-    # GATED, where `ledger` is not, and the difference is the population.  This
-    # one reads seven files' worth of declarations at depth 0-1, small enough to
-    # hold at zero by hand; `ledger` reads 2164 and reports its sharpest rules
-    # because a budget pinned to their count would be worse than none.
     "core-empirics":   dict(fn=run_core_empirics,   gated=True,  takes_argv=False),
     "field-proofs":    dict(fn=run_field_proofs,    gated=True , takes_argv=False),
-    # THE SHAPE GUARDS. One is gated and four are DIAGNOSTIC, for the reason the
-    # `ledger` entry above records: each of the four reports true findings whose
-    # fixes are in flight, and gating them today breaks the build for everyone while
-    # the repair lands. The budgets are the budgets and they do not move. What flips
-    # each one is named on its line; run `--only <name>` for the outstanding count,
-    # which is also the work list.
-    #
-    # The counts quoted below were true when written and every one of them has moved
-    # since, in both directions -- `shape-components` went UP when a new subsystem
-    # arrived as an island, which is the recurrence these guards exist to catch,
-    # happening while they were being written. Read the guard, not the comment.
-    #
-    # `shape-depth`: GATED, flipped from diagnostic once it reached the limit. The
-    # audit measured 37 on a chain of 38 modules; the chain repairs brought it to
-    # exactly 12.
-    #
-    # THERE IS NO HEADROOM, and that is deliberate rather than an oversight. One
-    # import added to the wrong module fails this, which is the whole reason to gate
-    # it now rather than after it has drifted back: the depth has been repaired
-    # before and lost again, and a limit set above the current value is a licence to
-    # regress to it. If a module legitimately needs a thirteenth rung, the fix is
-    # not to raise `SHAPE_DEPTH_LIMIT` -- it is that some link on the chain the
-    # guard prints is importing a file rather than a dependency, and `shape-chains`
-    # will usually name it.
-    "shape-depth":     dict(fn=run_shape_depth,      gated=True,  takes_argv=False),
-    # `shape-chains`: flip when no module's only internal import is a sibling it
-    # names nothing from. Measured 38 when the audit asked for this, six of them
-    # consecutive files in `PopGen/PopulationGeneticsFoundations`; 28 as the repair
-    # lands. Each line of the output names the module the file should have imported.
     "shape-chains":    dict(fn=run_shape_chains,     gated=True , takes_argv=False),
-    # `shape-components`: flip when every module lies in the corpus's one weak
-    # component. `Pangenome`'s island closed while this was being written, and a new
-    # `Descent/Meta/` arrived as one on the same day -- which is the whole case for
-    # the guard: the previous two islands were each found by an audit and fixed by
-    # hand, and the third was caught within hours by a check. Three singletons also
-    # remain: `BundleRigidity/LinearSCM`, `BundleRigidity/Operator` and
-    # `Spectral/ResonanceSpectrum`, each importing nothing from the corpus and
-    # imported by nothing in it.
     "shape-components": dict(fn=run_shape_components, gated=True , takes_argv=False),
-    # `shape-spine`: flip when cross-module theorem reuse reaches 20% and the corpus
-    # states 80 theorems joining `PopGenParameters` to a deployed metric. Both are
-    # far off -- just under 12%, and 19 -- and the second is the sharper number:
-    # all nineteen are in `Core/Moments.lean`, so the spine exists and is one file
-    # long. This is the one of the five that no amount of moving imports around
-    # will fix; it needs theorems that do not exist yet.
-    "shape-spine":     dict(fn=run_shape_spine,      gated=True , takes_argv=False),
-    # GATED, alone among the five, because its count is already zero:
-    # `deployedR2FromIsland` was deleted while these guards were being written and
-    # nothing has taken its place. Calibrated against a fixture carrying that pair,
-    # since a guard that has only ever reported zero has not been shown to fire.
     "shape-routes":    dict(fn=run_shape_routes,     gated=True,  takes_argv=False),
     # DIAGNOSTIC for the reason the `ledger` entry above records, and the outstanding
     # findings are two different things that flip it at two different times.

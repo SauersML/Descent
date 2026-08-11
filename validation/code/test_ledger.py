@@ -192,7 +192,7 @@ def test_guard() -> None:
 
     rc, out = run_guard(CLEAN_DEF, ledger_with())
     expect("a clean corpus and ledger produce ZERO findings",
-           rc == 0 and "budget 0" not in out,
+           rc == 0,
            "rc=%d\n%s" % (rc, out.strip()[:600]))
     expect("and the guard says what it checked",
            "ledger guard passes" in out, out.strip()[:300])

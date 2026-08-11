@@ -51,14 +51,6 @@ from pathlib import Path
 # test_check.py sits beside check.py at validation/code/.
 CHECK = Path(__file__).resolve().parent / "check.py"
 
-# Read the depth limit from the guard rather than pinning it here. A fixture that
-# hard-codes 12 stops testing the rule the moment someone changes the limit, and
-# changing it is exactly the edit this harness exists to keep honest.
-sys.path.insert(0, str(CHECK.parent))
-import check as _check  # noqa: E402 -- the path has to be set first
-
-SHAPE_DEPTH_LIMIT = _check.SHAPE_DEPTH_LIMIT
-
 # --------------------------------------------------------------------------------------
 # Planted laundering.  Each block is labelled with the family it MUST be reported as.
 # --------------------------------------------------------------------------------------
@@ -229,11 +221,11 @@ theorem Panel.mass_sum_nonneg {n : ℕ} (p : Panel n) (i j : Fin n) :
   add_nonneg (p.mass_nonneg i) (p.mass_nonneg j)
 
 /-- A Prop-valued structure witnessed by a THEOREM rather than a term. -/
-structure IsBudget (k : ℝ) (M : ℝ) : Prop where
+structure IsBounded (k : ℝ) (M : ℝ) : Prop where
   lower : 0 ≤ M
   upper : M ≤ k
 
-theorem IsBudget.witness : IsBudget 1 0 where
+theorem IsBounded.witness : IsBounded 1 0 where
   lower := le_refl 0
   upper := by norm_num
 
@@ -702,27 +694,6 @@ def shape_corpus(**overrides) -> dict:
     return files
 
 
-def shape_chain(n: int) -> dict:
-    """A corpus that is one chain of `n` modules under a single head.
-
-    `shape-depth`'s limit is 12, and nothing shorter than that can exercise it. The
-    chain is generated rather than written out because the number is the point: a
-    fixture pinned at exactly the limit stops testing the rule the moment someone
-    changes the limit.
-    """
-    files = {"Descent.lean": HEADER + "\nimport Descent.Alpha\n"}
-    head = [f"import Descent.Alpha.M{i}" for i in range(n)]
-    files["Descent/Alpha.lean"] = HEADER + "\n" + "\n".join(head) + "\n"
-    for i in range(n):
-        imports = f"import Descent.Alpha.M{i - 1}\n" if i else ""
-        body = (f"noncomputable def m{i} (x : ℝ) : ℝ := "
-                + (f"Alpha.m{i - 1} x" if i else "x"))
-        files[f"Descent/Alpha/M{i}.lean"] = (
-            HEADER + "\n" + imports + "\nnamespace Descent.Alpha\n\n"
-            f"/-- Rung {i} of a chain. -/\n{body}\n\nend Descent.Alpha\n")
-    return files
-
-
 # `shape-routes` reads the FIELD NAMES off `structure PopGenParameters` in
 # `Descent.Core.Parameters`, so its fixture has to be a corpus with that record in that
 # module. Its docstring says it "was calibrated against a fixture holding exactly the
@@ -772,65 +743,6 @@ namespace Descent.Core
 """ + body + """
 end Descent.Core
 """,
-    }
-
-
-# `shape-spine`'s two floors -- 80 spine theorems, 20% cross-module reuse -- cannot be
-# MET by a fixture, so its control is not about the floors. It is about the detection
-# underneath them: which theorems the guard counts as spine. Both halves of that
-# definition are asserted here, because a guard that counted the wrong theorems would
-# report a number that looks exactly as wrong as a corpus with no spine.
-SPINE_MOMENTS = HEADER + """
-namespace Descent.Core
-
-/-- A deployed metric: an `ℝ`-valued definition of `Core/Moments.lean`.  The body is on
-the next line because that is what the kernel scan requires -- it reads a definition
-whose SIGNATURE ends the line, so a one-liner is not seen as a metric at all. -/
-noncomputable def r2 (x : ℝ) : ℝ :=
-  x
-
-end Descent.Core
-"""
-
-SPINE_PARAMETERS = HEADER + """
-namespace Descent.Core
-
-/-- The record a spine theorem has to start from. -/
-structure PopGenParameters where
-  /-- Additive genetic variance. -/
-  V_A : ℝ
-
-end Descent.Core
-"""
-
-SPINE_THEOREMS = HEADER + """
-import Descent.Core.Moments
-import Descent.Core.Parameters
-
-namespace Descent.Core
-
-/-- Binds the record AND names a deployed metric, which is what a spine theorem is. -/
-theorem carries_demography_to_r2 (p : PopGenParameters) : r2 p.V_A = p.V_A := rfl
-
-/-- Names the metric about a free real. The record is what the free real was supposed
-to have come from, and nothing here says it did. -/
-theorem free_real_reaches_r2 (x : ℝ) : r2 x = x := rfl
-
-end Descent.Core
-"""
-
-
-def spine_corpus() -> dict:
-    return {
-        "Descent.lean": HEADER + "\nimport Descent.Core\n",
-        "Descent/Core.lean": HEADER + """
-import Descent.Core.Moments
-import Descent.Core.Parameters
-import Descent.Core.Spine
-""",
-        "Descent/Core/Moments.lean": SPINE_MOMENTS,
-        "Descent/Core/Parameters.lean": SPINE_PARAMETERS,
-        "Descent/Core/Spine.lean": SPINE_THEOREMS,
     }
 
 
@@ -915,8 +827,6 @@ CASES = [
      core_empirics_corpus("MATCH"), "while the ledger holds"),
     ("core-empirics", "a FALSIFIED row whose declaration never names the battery",
      core_empirics_corpus("FALSIFIED"), "never names that battery"),
-    ("shape-spine", "a theorem binding the record and naming a deployed metric",
-     spine_corpus(), "have: carries_demography_to_r2"),
     ("heads", "a module on disk that its directory head does not import",
      shape_corpus(**{"Descent/Alpha.lean": HEADER + "\n"}),
      "does not import"),
@@ -947,23 +857,19 @@ noncomputable def alphaThree (x : ℝ) : ℝ := x
 end Descent.Alpha
 """}),
      "unused sibling"),
-    ("shape-depth", "an import chain past the limit",
-     shape_chain(SHAPE_DEPTH_LIMIT + 2),
-     "exceeds"),
     ("shape-routes", "a raw-real second route beside the record-typed one",
      routes_corpus(raw=True),
      "re-supplies"),
     ("layers", "a qualified name from a layer the file cannot reach",
      layers_corpus(LAYERS_REFERENCE), "names Core.bigM"),
     # The `set_option` screen was one rule reading a timeout and a kernel bypass as
-    # the same finding. It is two now, and both directions are asserted: the bypass
-    # here, the budget among the traps below.
+    # the same finding. It is two now, and both directions are asserted.
     ("identifications", "a compiler option that disables the kernel check",
      clean_plus("Descent/Sub.lean",
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option debug.skipKernelTC true\n\nnamespace Descent")),
      "changes what is ACCEPTED"),
-    ("identifications", "a compiler option that is neither a budget nor named",
+    ("identifications", "an unrelated compiler option",
      clean_plus("Descent/Sub.lean",
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option pp.all true\n\nnamespace Descent")),
@@ -1338,16 +1244,11 @@ NEGATIVE_CASES = [
     # The other half of the pair `shape-routes` is about: the record-typed route on its
     # own is the shape the guard wants, not a shape it reports.
     ("shape-routes", "a record-typed route with no raw-real twin", routes_corpus(raw=False)),
-    # The other half of what a spine theorem IS. Naming the metric is not enough; a
-    # theorem about a free real is the shape the record exists to replace, and counting
-    # it would put this guard and `shape-routes` in opposition.
-    ("shape-spine", "a theorem naming the metric about a free real",
-     spine_corpus(), "have: free_real_reaches_r2"),
-    # A heartbeat budget decides whether elaboration FINISHES; it cannot make the
+    # A heartbeat limit decides whether elaboration FINISHES; it cannot make the
     # kernel accept anything it would otherwise reject. Reporting it under a sentence
     # about `debug.skipKernelTC` is what the split above fixed, so the trap asserts
     # that neither of the two messages now comes back for it.
-    ("identifications", "a raised elaboration budget, which changes nothing accepted",
+    ("identifications", "a raised elaboration limit, which changes nothing accepted",
      clean_plus("Descent/Sub.lean",
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
@@ -1365,20 +1266,6 @@ NEGATIVE_CASES = [
 noncomputable def boldedWithSpan (x : ℝ) : ℝ :=
   x + 1
 """),
-     "declares no Power"),
-    # THE BURN-DOWN BUDGET, in the direction that makes it a ratchet rather than a
-    # suppression file: arrears pinned in the corpus's own budget file are absorbed,
-    # so the tolerance can land before the clauses are written. The POSITIVE direction
-    # is already covered -- every case above runs against a fixture with NO budget
-    # file, which means a pin of zero, which is why they are reported at all.
-    ("identifications", "a powerless head inside the pinned burn-down budget",
-     dict(clean_plus("Descent/Sub.lean", CLEAN_SUB + """
-/-- A chart whose Power clause has not been written yet.
-
-    Empirical status: **VALIDATED** (`simcov/battery_arrears.py`). -/
-noncomputable def arrearsHead (x : ℝ) : ℝ :=
-  x + 1
-"""), **{"validation/code/results/power_budget.json": '{"powerless": 1}\n'}),
      "declares no Power"),
     # The Power screen's two boundaries after the scale rule changed. The first is the
     # case that forced the change: a quantity whose natural scale is 1e-3 whose

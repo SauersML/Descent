@@ -12,7 +12,7 @@ to no line number.
 
 Two kinds of finding:
 
-GATING (budget 0) -- a claim that cross-engine measurement showed to be
+GATING -- a claim that cross-engine measurement showed to be
     RESTRICTED has silently dropped its restriction.  `results.json` records
     which claims were rejected on which cells; if such a definition's docstring
     goes back to reading as an unrestricted validation, the corpus has lost a
@@ -141,8 +141,8 @@ def check(results_path: pathlib.Path, show_all: bool) -> int:
     if show_all or not gating:
         for f in diagnostic:
             print("DIAGNOSTIC: " + f)
-    print(f"\ncrossengine provenance: {len(gating)} gating "
-          f"(budget 0), {len(diagnostic)} diagnostic")
+    print(f"\ncrossengine provenance: {len(gating)} gating, "
+          f"{len(diagnostic)} diagnostic")
     return 1 if gating else 0
 
 

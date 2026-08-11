@@ -139,8 +139,7 @@ def main():
     stray = {cid: c["n_grid_errors"] for cid, c in out["checks"].items()
              if c["n_grid_errors"]}
     expect(not stray,
-           f"no check in the real battery has an errored grid point, so the "
-           f"budget below is 0 and not a ratchet (got {stray})")
+           f"no check in the real battery has an errored grid point (got {stray})")
 
     print()
     print("CALIBRATION: a check that loses part of its grid must fail")

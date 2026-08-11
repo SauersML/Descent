@@ -275,7 +275,7 @@ def _evaluate_conjunct(api, conjunct):
     return result, head
 
 
-# Budget 0, and it must stay 0.  Pinning it to the current count would record
+# Every occurrence fails. Pinning the current count would record
 # how many the corpus was carrying on the day somebody was in a hurry, which is
 # the opposite of what this guard is for.
 

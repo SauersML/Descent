@@ -20,11 +20,7 @@ no allowance for the state the corpus happens to be in: a duplicate body, an
 orphan definition, an uninhabited structure, a foundation that depends on what it
 reconciles, or a falsification no docstring mentions fails the build.
 
-This replaces an earlier ratchet that compared against a recorded baseline and
-failed only on regression.  A ratchet makes the current state the standard, and
-the current state is the thing being repaired -- so it licenses every defect that
-already exists and asks only that no new ones appear.  The counts below are what
-is left to fix, and the gate says so by failing.
+The counts below are what is left to fix, and the gate says so by failing.
 
 WHAT IS REPORTED AND WHAT IS GATED.  Six defect counts must be zero.  Everything
 else is a measurement, and several of them are deliberately ungated because their
@@ -45,10 +41,9 @@ the rest: `externally_silent_modules`, `foundation_not_yet_load_bearing`,
 `theorems_no_cross_module_consumer` and `subsystems_not_reaching_a_metric`.
 They were reported on the argument that their honest target is not zero -- a
 conclusion needs no consumer, a new foundation starts with no callers.  That
-argument is how the disease got measured, printed, and shipped green, and it is
-the same argument a baseline makes.  There is no budget and no ratchet here: a
-theorem nothing depends on is a theorem nothing can notice going wrong, and the
-count of them is what is left to fix.
+argument is how the disease got measured, printed, and shipped green. A theorem
+nothing depends on is a theorem nothing can notice going wrong, and the count of
+them is what is left to fix.
 
     python3 validation/code/architecture.py            # report
     python3 validation/code/architecture.py --gate     # exit nonzero unless every count is zero
@@ -258,8 +253,8 @@ def gate_duplicate_bodies(code):
 
     The wrappers are returned rather than discarded, keyed by the kernel they
     delegate to. They are the other half of the same measurement and they read in
-    the opposite direction: an unwrapped duplicate is a defect and its budget is
-    zero, while a wrapper over a kernel is the repaired state and its count going
+    the opposite direction: an unwrapped duplicate is a defect, while a wrapper
+    over a kernel is the repaired state and its count going
     UP is the repair working. Reporting only the defect count made the healthy
     structure invisible, so a corpus that had fixed a duplicate by introducing a
     kernel and a corpus that had simply deleted the second name were
@@ -844,11 +839,6 @@ def measure():
 # diagnosis that motivated the repair should be checkable against the corpus it
 # diagnosed rather than remembered.
 #
-# It is deliberately NOT a baseline file.  An earlier version of this script
-# ratcheted against `architecture_baseline.json`, failing only on regression --
-# which makes the current state the standard and licenses every defect already
-# present.  That file is deleted and the gate is zero tolerance.  The difference
-# between the two is that a ratchet is consulted and this is not.
 CORPUS_AT_DIAGNOSIS = {
     "cross_module_reuse_pct": 8.0,      # theorems cited from another module
     "terminal_theorem_pct": 61.8,       # theorems no other theorem uses

@@ -122,7 +122,7 @@ jobs:
         run: lake exe cache get
 
       # Compile first so syntax/elaboration/axiom failures are never hidden by
-      # an independent provenance or validation-ratchet failure below.  Every
+      # an independent provenance or source-validation failure below. Every
       # gate remains mandatory; this ordering maximizes diagnostic signal from
       # a single remote run.
       # `ValidationShared` carries the generated-declaration filter and the
@@ -340,10 +340,8 @@ jobs:
       # a portability layer that share a namespace and almost nothing else.
       # None of that breaks a build, so none of it was ever caught by one.
       #
-      # ZERO TOLERANCE. Every defect count must be zero. This replaced a
-      # ratchet against a recorded baseline, which failed only on regression --
-      # and a ratchet makes the current state the standard, so it licensed every
-      # defect already present. This step FAILS until the counts reach zero;
+      # ZERO TOLERANCE. Every defect count must be zero. This step FAILS until
+      # the counts reach zero;
       # that is the intended state of a repair in progress, not a broken gate.
       - name: Architecture gates (import depth, duplication, spine)
         run: python3 validation/code/architecture.py --gate --verbose
@@ -422,7 +420,7 @@ jobs:
       # measure, regret, energy and empty sum acquired one. 17 of 17 audited in
       # one pass were identities rather than mislocated reference points.
       #
-      # Budget 0, so the corpus cannot re-acquire one. The failure message names
+      # Any occurrence fails, so the corpus cannot re-acquire one. The failure message names
       # BOTH repairs, because the wrong one is destructive: moving a metric off
       # its own diagonal does not fix `d P P = 0`, it deletes it.
       - name: Vacuous reference evaluations
