@@ -20,40 +20,28 @@ open MeasureTheory
 # End-to-end selected-score and calibration law
 
 This file is the score-construction layer between a demographic moment law and the metric
-charts.  It models the pipeline that was actually run: greedy clumping at `r^2 < 0.1` inside
-250 kb, nine p-value thresholds, a winner selected by an explicit objective, and GWAS weights
-estimated in 2,500 individuals.  No global retention scalar appears.  The output is a score
-mean and a `Core.ScoreMoments` tuple in each deme, which is exactly what the existing metric
-and calibration layers consume.
+charts.  Clumping cutoff, physical window, threshold family, discovery sample size, marker
+count and GWAS sampling law are all inputs.  No study layout and no global retention scalar
+appears in the law.  The output is a score mean and a `Core.ScoreMoments` tuple in each deme,
+which is exactly what the existing metric and calibration layers consume.
 -/
 
 /-! ## B1. The P+T selection law -/
 
-/-- The fixed pipeline constants.  They are data, not optional defaults. -/
-structure PTConstants where
+/-- Parameters of a P+T construction.  They are supplied by a study instance, never selected
+inside the law. -/
+structure PTParameters where
   clumpR2Cutoff : ℝ
   clumpWindowBp : ℕ
   discoverySampleSize : ℕ
-  thresholdCount : ℕ
-
-/-- The study's P+T constants: `r^2 < 0.1`, 250 kb, 2,500 discovery individuals and nine
-p-value thresholds. -/
-def gnomonPTConstants : PTConstants where
-  clumpR2Cutoff := 1 / 10
-  clumpWindowBp := 250000
-  discoverySampleSize := 2500
-  thresholdCount := 9
-
-/-- The named constants really carry the nine-threshold design. -/
-theorem gnomonPTConstants_thresholdCount : gnomonPTConstants.thresholdCount = 9 := rfl
 
 /-- Two markers conflict when they lie inside the clumping window and their source LD reaches
 the exclusion cutoff.  Equality is excluded, matching the pipeline's retained condition
 `r^2 < 0.1`. -/
-def ptConflict {m : ℕ} (positionBp : Fin m → ℕ)
+def ptConflict {m : ℕ} (parameters : PTParameters) (positionBp : Fin m → ℕ)
     (sourceR2 : Fin m → Fin m → ℝ) (i j : Fin m) : Bool :=
-  decide (Nat.dist (positionBp i) (positionBp j) ≤ gnomonPTConstants.clumpWindowBp ∧
-    gnomonPTConstants.clumpR2Cutoff ≤ sourceR2 i j)
+  decide (Nat.dist (positionBp i) (positionBp j) ≤ parameters.clumpWindowBp ∧
+    parameters.clumpR2Cutoff ≤ sourceR2 i j)
 
 /-- Greedy clumping in the supplied significance order.  A marker is kept exactly when no
 already-kept marker conflicts with it.  This recursion, rather than an independence
@@ -68,51 +56,57 @@ def greedyClumpAux {α : Type*} (conflict : α → α → Bool) : List α → Li
 def greedyClump {α : Type*} (conflict : α → α → Bool) (ordered : List α) : List α :=
   greedyClumpAux conflict ordered []
 
-/-- A complete nine-threshold P+T design.  `orderedMarkers` is the deterministic order used
-by the clumper; `coversMarkers` prevents silently dropping a marker outside that order. -/
-structure PTDesign (m : ℕ) where
+/-- A complete P+T design with an arbitrary finite threshold family.  `orderedMarkers` is the
+deterministic order used by the clumper; `coversMarkers` prevents silently dropping a marker. -/
+structure PTDesign (thresholdCount m : ℕ) where
+  parameters : PTParameters
   positionBp : Fin m → ℕ
   sourceR2 : Fin m → Fin m → ℝ
   pValue : Fin m → ℝ
-  pThreshold : Fin 9 → ℝ
+  pThreshold : Fin thresholdCount → ℝ
   orderedMarkers : List (Fin m)
   orderedMarkers_nodup : orderedMarkers.Nodup
   coversMarkers : ∀ i, i ∈ orderedMarkers
 
 /-- Ordered threshold-eligible markers. -/
-def PTDesign.eligible {m : ℕ} (d : PTDesign m) (q : Fin 9) : List (Fin m) :=
+def PTDesign.eligible {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
+    (q : Fin thresholdCount) : List (Fin m) :=
   d.orderedMarkers.filter fun i ↦ decide (d.pValue i ≤ d.pThreshold q)
 
 /-- The exact retained marker list at threshold `q`. -/
-def PTDesign.selected {m : ℕ} (d : PTDesign m) (q : Fin 9) : List (Fin m) :=
-  greedyClump (ptConflict d.positionBp d.sourceR2) (d.eligible q)
+def PTDesign.selected {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
+    (q : Fin thresholdCount) : List (Fin m) :=
+  greedyClump (ptConflict d.parameters d.positionBp d.sourceR2) (d.eligible q)
 
 /-- A threshold winner is the index whose analytically predicted objective dominates all
-other eight candidates.  Ties are allowed and must be resolved by the caller's declared
+other candidates.  Ties are allowed and must be resolved by the caller's declared
 ordering, not by an unrecorded search. -/
-structure PTWinner {m : ℕ} (d : PTDesign m) (objective : Fin 9 → ℝ) where
-  index : Fin 9
+structure PTWinner {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
+    (objective : Fin thresholdCount → ℝ) where
+  index : Fin thresholdCount
   optimal : ∀ q, objective q ≤ objective index
 
 /-- Additive effect-variance mass retained after clumping and thresholding. -/
-noncomputable def PTDesign.selectedEffectMass {m : ℕ} (d : PTDesign m)
-    (q : Fin 9) (alleleFrequency effect : Fin m → ℝ) : ℝ :=
+noncomputable def PTDesign.selectedEffectMass {thresholdCount m : ℕ}
+    (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
+    (alleleFrequency effect : Fin m → ℝ) : ℝ :=
   (d.selected q).map (fun i ↦
     2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2) |>.sum
 
 /-- Fraction of total additive effect mass retained by P+T. -/
-noncomputable def PTDesign.selectedEffectMassFraction {m : ℕ} (d : PTDesign m)
-    (q : Fin 9) (alleleFrequency effect : Fin m → ℝ) : ℝ :=
+noncomputable def PTDesign.selectedEffectMassFraction {thresholdCount m : ℕ}
+    (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
+    (alleleFrequency effect : Fin m → ℝ) : ℝ :=
   d.selectedEffectMass q alleleFrequency effect /
     (∑ i, 2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2)
 
 /-! ## B2. GWAS estimation noise and its composition with selection -/
 
-/-- The one-locus OLS variance at the discovery sample size actually used by the pipeline.
-The genotype variance is diploid HWE `2p(1-p)`. -/
-noncomputable def gnomonGWASEffectNoiseVariance (residualVariance p : ℝ) : ℝ :=
-  residualVariance /
-    (gnomonPTConstants.discoverySampleSize * (2 * p * (1 - p)))
+/-- The one-locus OLS variance at a supplied discovery sample size.  The genotype variance is
+diploid HWE `2p(1-p)`. -/
+noncomputable def gwasEffectNoiseVariance
+    (discoverySampleSize : ℕ) (residualVariance p : ℝ) : ℝ :=
+  residualVariance / (discoverySampleSize * (2 * p * (1 - p)))
 
 /-- An exact finite representation of the sampling law of the GWAS output.  Continuous
 Gaussian sampling may be approximated by quadrature, but no independence between linked
@@ -132,17 +126,17 @@ noncomputable def PTGWASSamplingLaw.expectation {omega m : ℕ}
 
 /-- Selection and estimation noise composed in the correct order: select with the realised
 joint GWAS output, construct the selected score, and only then average over GWAS samples. -/
-noncomputable def expectedSelectedFunctional {omega m : ℕ}
+noncomputable def expectedSelectedFunctional {omega thresholdCount m : ℕ}
     (law : PTGWASSamplingLaw omega m)
-    (designAt : Fin omega → PTDesign m) (q : Fin 9)
+    (designAt : Fin omega → PTDesign thresholdCount m) (q : Fin thresholdCount)
     (functional : Fin omega → List (Fin m) → ℝ) : ℝ :=
   law.expectation fun w ↦ functional w ((designAt w).selected q)
 
 /-- The composition really is selection inside expectation, a useful guard against replacing
 the random retained set by a list selected from mean p-values. -/
-theorem expectedSelectedFunctional_eq {omega m : ℕ}
+theorem expectedSelectedFunctional_eq {omega thresholdCount m : ℕ}
     (law : PTGWASSamplingLaw omega m)
-    (designAt : Fin omega → PTDesign m) (q : Fin 9)
+    (designAt : Fin omega → PTDesign thresholdCount m) (q : Fin thresholdCount)
     (functional : Fin omega → List (Fin m) → ℝ) :
     expectedSelectedFunctional law designAt q functional =
       ∑ w, law.probability w * functional w ((designAt w).selected q) := rfl
