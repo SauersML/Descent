@@ -31,7 +31,7 @@ even class — heritability, LD-score regression, stratified heritability, momen
 polygenicity — is blind to the imbalance as a matter of arithmetic, while a single odd
 summary at a magnitude where it does not vanish pins the imbalance exactly, by division.
 So this is not an experimental limit dressed up as a theorem: the information is in the
-data, and the summaries in use discard it. `IdentifiedBy` is what makes that contrast
+data, and the summaries in use discard it. `Core.IdentifiedBy` is what makes that contrast
 statable in one vocabulary rather than as two unrelated observations.
 
 The observation here is the whole even class at once, not one summary at a time: the
@@ -63,7 +63,7 @@ def fiberTransferSymmetry (shift : ℝ) (hshift : shift ≠ 0) (baseFiber : Fibe
 /-- **The imbalance is not identified by the even class.** Not poorly estimated by it: not
 a function of it. One transfer of unit mass at one fiber is the whole refutation. -/
 theorem imbalance_not_identifiedBy_evenSummaryReport :
-    ¬ IdentifiedBy evenSummaryReport Fiber.imbalance :=
+    ¬ Core.IdentifiedBy evenSummaryReport Fiber.imbalance :=
   not_identifiedBy_of_observationalSymmetry
     (fiberTransferSymmetry 1 one_ne_zero ⟨1, 0, 0⟩)
 
@@ -84,7 +84,7 @@ magnitude is not a technicality — fibers at different levels are compared by a
 weights them differently, and nothing pins them together. -/
 theorem imbalance_identifiedBy_oddSummary {summary : ℝ → ℝ} (hsummary : IsOddSummary summary)
     (level : ℝ) (hlevel : summary level ≠ 0) :
-    IdentifiedBy (fun fiber : {fiber : Fiber // fiber.level = level} ↦
+    Core.IdentifiedBy (fun fiber : {fiber : Fiber // fiber.level = level} ↦
         fiber.val.contribution summary)
       (fun fiber ↦ fiber.val.imbalance) := by
   intro first second hobserve
@@ -102,8 +102,8 @@ together, and the second is why that is a choice rather than a limit. -/
 theorem imbalance_blind_to_evenClass_identified_by_oddSummary
     {summary : ℝ → ℝ} (hsummary : IsOddSummary summary) (level : ℝ)
     (hlevel : summary level ≠ 0) :
-    ¬ IdentifiedBy evenSummaryReport Fiber.imbalance ∧
-      IdentifiedBy (fun fiber : {fiber : Fiber // fiber.level = level} ↦
+    ¬ Core.IdentifiedBy evenSummaryReport Fiber.imbalance ∧
+      Core.IdentifiedBy (fun fiber : {fiber : Fiber // fiber.level = level} ↦
           fiber.val.contribution summary)
         (fun fiber ↦ fiber.val.imbalance) :=
   ⟨imbalance_not_identifiedBy_evenSummaryReport,

@@ -593,13 +593,12 @@ structure CrossPopulationGenerationalModel (p q : ℕ) where
   same reason the allele-frequency paths carry none: the structure lets a construction be
   wrong and the theorems about each construction are what pin it.
 
-  THE SLOT IS EMPTY BECAUSE THE CLOSED FORM IS OWED, NOT BECAUSE NONE EXISTS.  The exact
-  machinery is published and installed: the Ragsdale-Gravel two-locus moment system computes
-  the cross-deme second moments of `D` directly for a stated demography, so the surface can
-  be evaluated numerically today (`validation/empirical/momentsld/ld_surface.py`) and a
-  derivation has something exact to be checked against.  What the corpus lacks is a closed
-  form for it, which is a derivation owed rather than an open question.  When that lands it
-  becomes a computed instance of this field and no consumer changes.
+  THE SLOT REMAINS BECAUSE THE GENERAL CONSTRUCTOR IS OWED, NOT BECAUSE NO EXACT CASE EXISTS.
+  `Coalescent.publishedTwoDemeDCorrelation` is the live determinant-ratio law for a stationary
+  symmetric two-deme model.  The exact ancestral-configuration machinery also computes linear
+  chains for fixed histories.  What the corpus still lacks is a constructor from an arbitrary
+  event history to the transient many-deme two-locus system required here.  Until that lands,
+  filling this field from the two-deme surface would silently make an invalid reduction.
 
   WHAT RETIRED INTO THIS SLOT, carried as a rival record rather than as prose about the
   past.  The field replaces `ldCorrelationDecay`, `exp(-(lambda * √fstGap * distance))`,

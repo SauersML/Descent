@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.Identifiability
 import Descent.Foundations.Probability
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -224,12 +225,12 @@ invariance is demanded at *every* parameter rather than only at the witness, bec
 is what makes the object a symmetry rather than a coincidence, and because it is what a
 gauge argument or a reparameterization argument actually establishes.
 
-The positive counterpart is `IdentifiedBy`: the observation pins the target. It is exactly
-the negation of the existence of a symmetry with a moved target
+The positive counterpart is `Core.IdentifiedBy`: the observation pins the target. It is
+exactly the negation of the existence of a symmetry with a moved target
 (`not_identifiedBy_of_observationalSymmetry`), and it is exactly the existence of a readout
-from data to target (`IdentifiedBy.exists_readout` and `identifiedBy_of_factors`, which are
-converse to each other). So a per-law identification claim has a definite shape to be
-stated in, and a definite shape to be refuted in.
+from data to target (`Core.IdentifiedBy.exists_readout` and `Core.identifiedBy_of_factors`,
+which are converse to each other). So a per-law identification claim has a definite shape to
+be stated in, and a definite shape to be refuted in.
 -/
 
 /-- An **observational symmetry**: a transformation of the parameter that every experiment
@@ -283,48 +284,13 @@ theorem no_target_criterion (S : ObservationalSymmetry observe target) :
 
 end ObservationalSymmetry
 
-/-- The **identified** relation, the positive counterpart: parameters agreeing on the
-observation agree on the target. This is what a per-law identification claim asserts, and
-what a symmetry refutes. -/
-def IdentifiedBy {Parameter Data Target : Type*}
-    (observe : Parameter → Data) (target : Parameter → Target) : Prop :=
-  ∀ first second : Parameter, observe first = observe second → target first = target second
-
-/-- **The class is inhabited, and the witness is the general reason anything is
-identified.** A target computed from the observation is identified by it; the converse
-`IdentifiedBy.exists_readout` says there is nothing else. -/
-theorem identifiedBy_of_factors {Parameter Data Target : Type*}
-    (observe : Parameter → Data) (readout : Data → Target) :
-    IdentifiedBy observe (fun parameter ↦ readout (observe parameter)) :=
-  fun _first _second hobserve ↦ congrArg readout hobserve
-
-/-- **Identification is exactly the existence of a readout.** Converse to
-`identifiedBy_of_factors`: if the observation pins the target then the target *is* a
-function of the data, and the function is exhibited. The base parameter supplies the value
-the readout returns off the range of the observation, where nothing is being claimed. -/
-theorem IdentifiedBy.exists_readout {Parameter Data Target : Type*}
-    {observe : Parameter → Data} {target : Parameter → Target} (base : Parameter)
-    (hidentified : IdentifiedBy observe target) :
-    ∃ readout : Data → Target, ∀ parameter : Parameter,
-      target parameter = readout (observe parameter) := by
-  classical
-  refine ⟨fun data ↦ if hdata : ∃ parameter : Parameter, observe parameter = data then
-    target hdata.choose else target base, ?_⟩
-  intro parameter
-  have hdata : ∃ preimage : Parameter, observe preimage = observe parameter := ⟨parameter, rfl⟩
-  show target parameter =
-    if hexists : ∃ preimage : Parameter, observe preimage = observe parameter then
-      target hexists.choose else target base
-  rw [dif_pos hdata]
-  exact hidentified parameter hdata.choose hdata.choose_spec.symm
-
 /-- **A symmetry refutes identification.** The two are exact opposites: an observational
-symmetry with a moved target is precisely a failure of `IdentifiedBy`, so a proposed
+symmetry with a moved target is precisely a failure of `Core.IdentifiedBy`, so a proposed
 identification result is refuted by exhibiting one transformation, not by a search over
 pairs. -/
 theorem not_identifiedBy_of_observationalSymmetry {Parameter Data Target : Type*}
     {observe : Parameter → Data} {target : Parameter → Target}
-    (S : ObservationalSymmetry observe target) : ¬ IdentifiedBy observe target := by
+    (S : ObservationalSymmetry observe target) : ¬ Core.IdentifiedBy observe target := by
   intro hidentified
   exact S.target_moved
     (hidentified (S.transform S.moved) S.moved (S.observation_invariant S.moved))

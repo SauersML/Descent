@@ -26,7 +26,7 @@ This file says what that costs an observer, in the corpus's identifiability voca
 ## The two halves
 
 `identifiedBy_classOf_iff_isGraphInvariant` is the positive half, and it is a translation
-rather than a new theorem: `IdentifiedBy classOf F` and `IsGraphInvariant F` are the same
+rather than a new theorem: `Core.IdentifiedBy classOf F` and `IsGraphInvariant F` are the same
 predicate written twice. Composing it with the descent theorem gives
 `identifiedBy_classOf_iff_factorsThroughSemantic` — **a storage-graph statistic is pinned by
 the pangenome object exactly when it factors through semantic homology.** That is the
@@ -66,7 +66,7 @@ identifiability vocabulary and the storage layer's invariance vocabulary are one
 neither development needs its own. -/
 theorem identifiedBy_classOf_iff_isGraphInvariant {Pos : Type*} {Value : Type*}
     (statistic : GraphPresentation Pos → Value) :
-    IdentifiedBy (fun graph : GraphPresentation Pos ↦ classOf graph) statistic ↔
+    Core.IdentifiedBy (fun graph : GraphPresentation Pos ↦ classOf graph) statistic ↔
       IsGraphInvariant statistic := by
   constructor
   · intro hidentified first second hequivalent
@@ -80,7 +80,7 @@ statistic that reads only homology is independent of how the graph was chopped, 
 does not is not merely hard to compare across builds but unpinned by the pangenome at all. -/
 theorem identifiedBy_classOf_iff_factorsThroughSemantic {Pos : Type*} {Value : Type*}
     (statistic : GraphPresentation Pos → Value) :
-    IdentifiedBy (fun graph : GraphPresentation Pos ↦ classOf graph) statistic ↔
+    Core.IdentifiedBy (fun graph : GraphPresentation Pos ↦ classOf graph) statistic ↔
       FactorsThroughSemantic statistic :=
   (identifiedBy_classOf_iff_isGraphInvariant statistic).trans
     (graphInvariant_iff_factorsThroughSemantic statistic)
@@ -100,7 +100,7 @@ noncomputable def rechoppingSymmetry :
 
 /-- **The storage node count is not identified by the pangenome.** -/
 theorem graphNodeCount_not_identifiedBy_classOf :
-    ¬ IdentifiedBy (fun graph : GraphPresentation (Fin 2) ↦ classOf graph)
+    ¬ Core.IdentifiedBy (fun graph : GraphPresentation (Fin 2) ↦ classOf graph)
       (fun graph : GraphPresentation (Fin 2) ↦ graphNodeCount graph) :=
   not_identifiedBy_of_observationalSymmetry rechoppingSymmetry
 

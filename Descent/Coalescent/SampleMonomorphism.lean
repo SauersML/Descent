@@ -52,10 +52,10 @@ vector at every partial sum. The two agree to 1e-12 at the relevant times. Nobod
 ## What this law is licensed for
 
 ONE population, and an initial condition carried FORWARD. It does NOT cover the structured or
-migration case, whose block counting runs over deme configurations and is underived here. It
-does NOT cover the downstream-observation object -- conditioning on the present, which is what
-real data and a coalescent simulator both hand you. Those are separate derivations and
-neither is started.
+migration case, whose block counting runs over deme configurations.  The separate exact
+present-day construction is in `Coalescent.StructuredPresentDay`: there the cohort sizes enter
+both the moment degree and the Bernstein ascertainment event.  This one-population law must not
+be used as a time-shift substitute for that conditional structured law.
 
 ## The sibling it is not, and where the comparison has to live
 
@@ -95,6 +95,46 @@ noncomputable def blockCountLaw (n k : ℕ) (tau : ℝ) : ℝ :=
     Real.exp (-(deathRate j * tau)) * (2 * (j : ℝ) - 1) * (-1 : ℝ) ^ (j - k) *
         ((k.ascFactorial (j - 1) : ℝ) * (n.descFactorial j : ℝ)) /
       ((k.factorial : ℝ) * ((j - k).factorial : ℝ) * (n.ascFactorial j : ℝ))
+
+/-- The monomorphism event evaluated on `k` exchangeable ancestral lineages.  This is a
+separate part of the law from the block-count transition.  Changing a cohort size therefore
+cannot in general be represented by changing only the coalescent time: it changes the block
+count law, while each possible resulting block count is evaluated by this event polynomial. -/
+noncomputable def sampleMonomorphismEvent (p : ℝ) (k : ℕ) : ℝ :=
+  p ^ k + (1 - p) ^ k
+
+/-- Increasing the number of lineages changes the event polynomial by an exact, non-clock
+term.  The right side is the mass lost when the two allelic unanimity events are each required
+to survive one additional draw. -/
+theorem sampleMonomorphismEvent_step (p : ℝ) (k : ℕ) :
+    sampleMonomorphismEvent p k - sampleMonomorphismEvent p (k + 1) =
+      p ^ k * (1 - p) + (1 - p) ^ k * p := by
+  simp only [sampleMonomorphismEvent, pow_succ]
+  ring
+
+/-- Away from fixation, the monomorphism event strictly strengthens with sample size.  This
+is the mechanism a time-shift-only cohort correction omits. -/
+theorem sampleMonomorphismEvent_strictAnti (p : ℝ) (k : ℕ)
+    (hp : 0 < p) (hp_one : p < 1) :
+    sampleMonomorphismEvent p (k + 1) < sampleMonomorphismEvent p k := by
+  have hleft : 0 < p ^ k * (1 - p) :=
+    mul_pos (pow_pos hp k) (sub_pos.mpr hp_one)
+  have hright : 0 < (1 - p) ^ k * p :=
+    mul_pos (pow_pos (sub_pos.mpr hp_one) k) hp
+  linarith [sampleMonomorphismEvent_step p k]
+
+/-- The complementary event that both alleles occur in the sample. -/
+noncomputable def samplePolymorphismEvent (p : ℝ) (k : ℕ) : ℝ :=
+  1 - sampleMonomorphismEvent p k
+
+/-- Away from fixation, observed polymorphism becomes strictly more likely when the sample
+gains one draw.  Together with `sampleMonomorphismEvent_strictAnti`, this gives both sides of
+the cohort-conditioning change missed by a clock-only correction. -/
+theorem samplePolymorphismEvent_strictMono (p : ℝ) (k : ℕ)
+    (hp : 0 < p) (hp_one : p < 1) :
+    samplePolymorphismEvent p k < samplePolymorphismEvent p (k + 1) := by
+  unfold samplePolymorphismEvent
+  linarith [sampleMonomorphismEvent_strictAnti p k hp hp_one]
 
 /-- **The probability that a sample of `n` haplotypes is monomorphic**, `τ` in units of
 `2 Nₑ` generations after the branches parted at ancestral frequency `p`.
@@ -157,7 +197,7 @@ and it is what an analysis pricing tag loss off a population-level quantity is a
 
     argument_source: derived. -/
 noncomputable def tagSampleMonomorphicProb (p : ℝ) (n : ℕ) (tau : ℝ) : ℝ :=
-  ∑ k ∈ Finset.Icc 1 n, blockCountLaw n k tau * (p ^ k + (1 - p) ^ k)
+  ∑ k ∈ Finset.Icc 1 n, blockCountLaw n k tau * sampleMonomorphismEvent p k
 
 /-- **A variant and its complement are the same variant.** Reading the sample from the other
 allele exchanges `p` and `1 - p` and cannot change whether it is monomorphic. This mirrors
@@ -168,6 +208,7 @@ theorem tagSampleMonomorphicProb_symm (p : ℝ) (n : ℕ) (tau : ℝ) :
     tagSampleMonomorphicProb (1 - p) n tau = tagSampleMonomorphicProb p n tau := by
   unfold tagSampleMonomorphicProb
   refine Finset.sum_congr rfl fun k _ ↦ ?_
+  unfold sampleMonomorphismEvent
   rw [show (1 : ℝ) - (1 - p) = p by ring]
   ring
 
@@ -184,6 +225,7 @@ sum's index set, and this is the statement that would catch it. -/
 theorem tagSampleMonomorphicProb_sample_one (p tau : ℝ) :
     tagSampleMonomorphicProb p 1 tau = 1 := by
   rw [tagSampleMonomorphicProb, Finset.Icc_self, Finset.sum_singleton, blockCountLaw_one_one]
+  unfold sampleMonomorphismEvent
   ring
 
 /-- **Two lineages survive with probability `exp (-τ)`.** The pair coalesces at rate one --
@@ -224,6 +266,7 @@ theorem tagSampleMonomorphicProb_pair (p tau : ℝ) :
   have hIcc : Finset.Icc 1 2 = ({1, 2} : Finset ℕ) := by decide
   rw [tagSampleMonomorphicProb, hIcc, Finset.sum_pair (by norm_num : (1 : ℕ) ≠ 2),
     blockCountLaw_two_one, blockCountLaw_two_two]
+  unfold sampleMonomorphismEvent
   ring
 
 /-- **At the instant of the split there is no coalescent content left**, only sampling: the

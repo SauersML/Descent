@@ -152,7 +152,7 @@ noncomputable def dispersalSymmetry (d Ne scale migration variance : ℝ) (hscal
 estimated by it: not a function of it, at any migration rate and any nonzero variance. -/
 theorem dispersalVariance_not_identifiedBy_fst (d Ne migration variance : ℝ)
     (hvariance : variance ≠ 0) :
-    ¬ Descent.Blindness.IdentifiedBy
+    ¬ Descent.Core.IdentifiedBy
       (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
       (fun parameter : ℝ × ℝ ↦ parameter.2) :=
   Descent.Blindness.not_identifiedBy_of_observationalSymmetry
@@ -179,13 +179,13 @@ gathered with `m` free is evidence about `m · σ²`, whatever the fit quality. 
 theorem steppingStoneFst_pins_product_only (d Ne migration variance : ℝ)
     (hinjective : Function.Injective (dispersalProductReport d Ne))
     (hmigration : migration ≠ 0) (hvariance : variance ≠ 0) :
-    Descent.Blindness.IdentifiedBy
+    Descent.Core.IdentifiedBy
         (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
         (fun parameter ↦ parameter.1 * parameter.2)
-      ∧ ¬ Descent.Blindness.IdentifiedBy
+      ∧ ¬ Descent.Core.IdentifiedBy
         (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
         (fun parameter ↦ parameter.1)
-      ∧ ¬ Descent.Blindness.IdentifiedBy
+      ∧ ¬ Descent.Core.IdentifiedBy
         (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
         (fun parameter ↦ parameter.2)
       ∧ ∀ scale : ℝ, scale ≠ 0 → ∀ parameter : ℝ × ℝ,

@@ -13,6 +13,7 @@ import Descent.Core.GroupoidFunctor
 import Descent.Core.GroupoidPartialBisection
 import Descent.Core.GroupoidPresentation
 import Descent.Core.Heterozygosity
+import Descent.Core.Identifiability
 import Descent.Core.Moments
 import Descent.Core.Parameters
 import Descent.Core.PartialBijection

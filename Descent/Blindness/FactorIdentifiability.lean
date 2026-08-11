@@ -131,7 +131,7 @@ theorem not_identifiedBy_secondFactor_of_product {Data : Type*} (observe : ℝ �
     (report : ℝ → Data)
     (hfactors : ∀ parameter : ℝ × ℝ, observe parameter = report (parameter.1 * parameter.2))
     (base : ℝ × ℝ) (hbase : base.2 ≠ 0) :
-    ¬ IdentifiedBy observe (fun parameter ↦ parameter.2) :=
+    ¬ Core.IdentifiedBy observe (fun parameter ↦ parameter.2) :=
   not_identifiedBy_of_observationalSymmetry
     (productSymmetrySecondFactor observe report hfactors 2 two_ne_zero (by norm_num) base hbase)
 
@@ -140,7 +140,7 @@ theorem not_identifiedBy_firstFactor_of_product {Data : Type*} (observe : ℝ ×
     (report : ℝ → Data)
     (hfactors : ∀ parameter : ℝ × ℝ, observe parameter = report (parameter.1 * parameter.2))
     (base : ℝ × ℝ) (hbase : base.1 ≠ 0) :
-    ¬ IdentifiedBy observe (fun parameter ↦ parameter.1) :=
+    ¬ Core.IdentifiedBy observe (fun parameter ↦ parameter.1) :=
   not_identifiedBy_of_observationalSymmetry
     (productSymmetryFirstFactor observe report hfactors 2 two_ne_zero (by norm_num) base hbase)
 
@@ -151,7 +151,7 @@ theorem product_identifiedBy_of_injective {Data : Type*} (observe : ℝ × ℝ �
     (report : ℝ → Data)
     (hfactors : ∀ parameter : ℝ × ℝ, observe parameter = report (parameter.1 * parameter.2))
     (hinjective : Function.Injective report) :
-    IdentifiedBy observe (fun parameter ↦ parameter.1 * parameter.2) := by
+    Core.IdentifiedBy observe (fun parameter ↦ parameter.1 * parameter.2) := by
   intro first second hobserve
   rw [hfactors, hfactors] at hobserve
   exact hinjective hobserve
@@ -166,9 +166,9 @@ theorem factorizedLaw_pins_product_only {Data : Type*} (observe : ℝ × ℝ →
     (hfactors : ∀ parameter : ℝ × ℝ, observe parameter = report (parameter.1 * parameter.2))
     (hinjective : Function.Injective report)
     (base : ℝ × ℝ) (hfirst : base.1 ≠ 0) (hsecond : base.2 ≠ 0) :
-    IdentifiedBy observe (fun parameter ↦ parameter.1 * parameter.2)
-      ∧ ¬ IdentifiedBy observe (fun parameter ↦ parameter.1)
-      ∧ ¬ IdentifiedBy observe (fun parameter ↦ parameter.2)
+    Core.IdentifiedBy observe (fun parameter ↦ parameter.1 * parameter.2)
+      ∧ ¬ Core.IdentifiedBy observe (fun parameter ↦ parameter.1)
+      ∧ ¬ Core.IdentifiedBy observe (fun parameter ↦ parameter.2)
       ∧ ∀ scale : ℝ, scale ≠ 0 → ∀ parameter : ℝ × ℝ,
           observe (productRescaling scale parameter) = observe parameter := by
   refine ⟨product_identifiedBy_of_injective observe report hfactors hinjective,

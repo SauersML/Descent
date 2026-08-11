@@ -60,7 +60,7 @@ theorem not_identifiedBy_of_gaugeDependent {Edge : Type*} {Observable Quantity :
     (hinvariant : Gauge.GaugeInvariant observation)
     (sample : List (Gauge.Walk Edge)) (baseTree otherTree : Gauge.Tree Edge)
     (hmoved : quantity otherTree sample ≠ quantity baseTree sample) :
-    ¬ IdentifiedBy (fun tree ↦ observation tree sample) (fun tree ↦ quantity tree sample) :=
+    ¬ Core.IdentifiedBy (fun tree ↦ observation tree sample) (fun tree ↦ quantity tree sample) :=
   not_identifiedBy_of_observationalSymmetry
     (observationalSymmetry_of_gaugeInvariant observation quantity hinvariant sample
       baseTree otherTree hmoved)
@@ -95,7 +95,7 @@ theorem segregatingCountGaugeSymmetry_moves_segregatingCount :
 by it: not a function of it. The subsample of the triallelic site carries one value of the
 walk-level statistic and two values of `S`. -/
 theorem segregatingCount_not_identifiedBy_totalWalkDist :
-    ¬ IdentifiedBy
+    ¬ Core.IdentifiedBy
       (fun _tree : Gauge.Tree Allele ↦ Gauge.totalWalkDist allEdges Gauge.sampleSub)
       (fun tree : Gauge.Tree Allele ↦
         Gauge.segregatingCount allEdges tree Gauge.sampleSub) :=
