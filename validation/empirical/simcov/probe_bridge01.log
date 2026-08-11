@@ -1,0 +1,47 @@
+spectrum: 1/p on [0.000333333, 0.999667], 40000 loci, NO MAF floor; Ne=1500
+lowest bin holds 5469 loci below 3/(2Ne)=0.001, carrying 0.1335% of the signal weight
+
+=== t=250 generations, tau=0.0833, 2/tau=24.0 expected blocks ===
+  n=  100  E[N_tau]=  19.69 | signal-weighted: pop 0.921087  sample 0.902982  gap 1.810e-02
+  n=  500  E[N_tau]=  23.24 | signal-weighted: pop 0.921087  sample 0.917440  gap 3.647e-03
+  n= 1000  E[N_tau]=  23.77 | signal-weighted: pop 0.921087  sample 0.919262  gap 1.825e-03
+  n= 2000  E[N_tau]=  24.05 | signal-weighted: pop 0.921087  sample 0.920174  gap 9.130e-04
+  n= 4000  E[N_tau]=  24.19 | signal-weighted: pop 0.921087  sample 0.920630  gap 4.566e-04
+  --- binned by ancestral frequency, at the cohort n=4000, UNWEIGHTED means ---
+  bin                       loci        pop     sample        gap
+  [0.000333,0.001000)    5469   0.014685   0.014600  8.567e-05
+  [0.001000,0.003333)    6152   0.046071   0.045807  2.639e-04
+  [0.003333,0.010000)    5574   0.137399   0.136654  7.446e-04
+  [0.010000,0.050000)    7867   0.435990   0.434201  1.789e-03
+  [0.050000,0.200000)    6886   0.896358   0.895185  1.174e-03
+  [0.200000,0.500000)    4607   0.999116   0.999084  3.212e-05
+
+=== t=750 generations, tau=0.2500, 2/tau=8.0 expected blocks ===
+  n=  100  E[N_tau]=   7.75 | signal-weighted: pop 0.780144  sample 0.764711  gap 1.543e-02
+  n=  500  E[N_tau]=   8.22 | signal-weighted: pop 0.780144  sample 0.777033  gap 3.111e-03
+  n= 1000  E[N_tau]=   8.28 | signal-weighted: pop 0.780144  sample 0.778587  gap 1.557e-03
+  n= 2000  E[N_tau]=   8.31 | signal-weighted: pop 0.780144  sample 0.779365  gap 7.789e-04
+  n= 4000  E[N_tau]=   8.33 | signal-weighted: pop 0.780144  sample 0.779754  gap 3.895e-04
+  --- binned by ancestral frequency, at the cohort n=4000, UNWEIGHTED means ---
+  bin                       loci        pop     sample        gap
+  [0.000333,0.001000)    5469   0.005061   0.005051  9.650e-06
+  [0.001000,0.003333)    6152   0.016066   0.016036  3.044e-05
+  [0.003333,0.010000)    5574   0.049637   0.049545  9.228e-05
+  [0.010000,0.050000)    7867   0.184896   0.184584  3.118e-04
+  [0.050000,0.200000)    6886   0.584145   0.583498  6.470e-04
+  [0.200000,0.500000)    4607   0.936202   0.935894  3.089e-04
+
+=== t=2000 generations, tau=0.6667, 2/tau=3.0 expected blocks ===
+  n=  100  E[N_tau]=   3.27 | signal-weighted: pop 0.514373  sample 0.504188  gap 1.018e-02
+  n=  500  E[N_tau]=   3.34 | signal-weighted: pop 0.514373  sample 0.512319  gap 2.053e-03
+  n= 1000  E[N_tau]=   3.35 | signal-weighted: pop 0.514373  sample 0.513345  gap 1.028e-03
+  n= 2000  E[N_tau]=   3.35 | signal-weighted: pop 0.514373  sample 0.513859  gap 5.141e-04
+  n= 4000  E[N_tau]=   3.35 | signal-weighted: pop 0.514373  sample 0.514116  gap 2.571e-04
+  --- binned by ancestral frequency, at the cohort n=4000, UNWEIGHTED means ---
+  bin                       loci        pop     sample        gap
+  [0.000333,0.001000)    5469   0.002028   0.002027  1.406e-06
+  [0.001000,0.003333)    6152   0.006463   0.006458  4.470e-06
+  [0.003333,0.010000)    5574   0.020188   0.020174  1.388e-05
+  [0.010000,0.050000)    7867   0.079380   0.079327  5.296e-05
+  [0.050000,0.200000)    6886   0.303941   0.303760  1.804e-04
+  [0.200000,0.500000)    4607   0.651170   0.650856  3.141e-04
