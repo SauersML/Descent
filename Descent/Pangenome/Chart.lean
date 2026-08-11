@@ -220,28 +220,28 @@ namespace BridgeFunctorData
 variable {I J : Type u} {P : ChartGroupoidRelation I} {Q : ChartGroupoidRelation J}
 
 /-- A bridge supplies the generic representative-level functor data. -/
-noncomputable def toFunctorData (D : BridgeFunctorData P Q) :
+noncomputable def toFunctorData (bridgeData : BridgeFunctorData P Q) :
     GroupoidPresentation.FunctorData P.toPresentation Q.toPresentation where
-  obj := D.obj
-  map f := FinitePartialBijection.sandwich (D.bridge _) (D.bridge _) f
-  map_respects := D.map_respects
-  map_one := D.map_one
-  map_comp := D.map_comp
+  obj := bridgeData.obj
+  map f := FinitePartialBijection.sandwich (bridgeData.bridge _) (bridgeData.bridge _) f
+  map_respects := bridgeData.map_respects
+  map_one := bridgeData.map_one
+  map_comp := bridgeData.map_comp
 
 /-- **Representation bridge theorem.**  Compatible partial chart bridges induce an honest
 functor between the quotient pangenome groupoids. -/
-noncomputable def toFunctor (D : BridgeFunctorData P Q) : P.Obj ⥤ Q.Obj :=
-  D.toFunctorData.toFunctor
+noncomputable def toFunctor (bridgeData : BridgeFunctorData P Q) : P.Obj ⥤ Q.Obj :=
+  bridgeData.toFunctorData.toFunctor
 
 /-- If sandwich transport also reflects biological equivalence, the induced pangenome
 functor is faithful. -/
-noncomputable def faithful (D : BridgeFunctorData P Q)
+noncomputable def faithful (bridgeData : BridgeFunctorData P Q)
     (hreflects : ∀ {X Y} {f g : ChartMap (P.chart X) (P.chart Y)},
-      Q.rel (D.obj X) (D.obj Y)
-        (FinitePartialBijection.sandwich (D.bridge X) (D.bridge Y) f)
-        (FinitePartialBijection.sandwich (D.bridge X) (D.bridge Y) g) →
-      P.rel X Y f g) : D.toFunctor.Faithful :=
-  D.toFunctorData.faithful hreflects
+      Q.rel (bridgeData.obj X) (bridgeData.obj Y)
+        (FinitePartialBijection.sandwich (bridgeData.bridge X) (bridgeData.bridge Y) f)
+        (FinitePartialBijection.sandwich (bridgeData.bridge X) (bridgeData.bridge Y) g) →
+      P.rel X Y f g) : bridgeData.toFunctor.Faithful :=
+  bridgeData.toFunctorData.faithful hreflects
 
 end BridgeFunctorData
 
