@@ -51,6 +51,20 @@ lean_lib Counterexamples where
   srcDir := "."
   leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
 
+-- General mathematics about partial bijections, finite groupoids, and wreath products,
+-- extracted from `nonsofic_existence` (github.com/SauersML/nonsofic_existence, Apache 2.0).
+-- A separate library for the same reason `Counterexamples` is one: what belongs in
+-- `Descent/` is a law that answers to a measurement, and none of this does -- a groupoid
+-- either has the claimed decomposition or it does not, and no simulation is entitled to a
+-- view. These modules do NOT `import Descent`; they depend on Mathlib alone, so they build
+-- whether or not the corpus does.
+-- A build that names its targets must name this one too:
+--   lake build Descent Counterexamples PartialSymmetry
+@[default_target]
+lean_lib PartialSymmetry where
+  srcDir := "."
+  leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
+
 -- The generated-declaration filter and the results writer that the detectors
 -- under `validation/` share.  A separate library, and deliberately not
 -- part of `Descent`:
