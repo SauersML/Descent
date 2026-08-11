@@ -39,8 +39,12 @@
       "compatible_with_hudson": "Deliberately NOT declared incompatible with `hudson`.  In the island model at low mutation the equilibrium identity probability IS the Hudson F_ST; that identification is what `ibdFlowStep_fixedPoint` and `fstMigrationDriftEquilibrium_isFixedPoint` state.  See `open_questions` below for what is nevertheless missing."
     },
     "per-branch-drift": {
-      "means": "The single-lineage Wright F measured against the ANCESTOR: the fraction of ancestral heterozygosity one lineage has lost, 1 - H_t/H_0, approaching 1 - exp(-tau).  NOT a between-population quantity.",
+      "means": "The single-lineage Wright F measured against the ANCESTOR: the fraction of ancestral heterozygosity one lineage has lost, 1 - H_t/H_0, approaching 1 - exp(-tau).  NOT a between-population quantity.  A SUM over branches is `per-branch-summed`, not this: three entries were filed here while composing sums, which this gloss had already excluded by saying single-lineage.",
       "source": "Wright (1931); the corpus's own `heterozygosityLossFromDrift`."
+    },
+    "per-branch-summed": {
+      "means": "The SUM of the per-branch Wright F values over the branches of a split -- two of them for a clean two-branch split. Per-branch indices add over independent branches; the sum is what a quantity about the pair of contemporary populations reads, and it is NOT confined to the unit interval. Distinct from `per-branch-drift`, which is one lineage, and NOT interconvertible with `hudson`: the factor relating them was MEASURED at 2.23 to 2.40 on a symmetric split, not the folkloric 2, so any conversion is design-specific and must be stated at the call site rather than applied as a cast.",
+      "source": "The corpus's own `cleanSplitFst`, VALIDATED at 1.94 sems against realised summed per-branch heterozygosity loss, with the pairwise Hudson reading of the same two branches FALSIFIED at 459 sems on the same replicates (simcov/battery_clean01.py)."
     },
     "inherited": {
       "means": "The body transforms an F supplied by the caller and asserts no estimator of its own.  Whatever convention the caller used, this body returns.  Never incompatible with anything, because it commits to nothing.",
@@ -1004,9 +1008,9 @@
     },
     "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::Expected_Abs_Shift": {
       "quantity": "fst",
-      "convention": "per-branch-drift",
+      "convention": "per-branch-summed",
       "role": "consumer",
-      "note": "Composes Var_Delta_Mu on the SUM of two branch values."
+      "note": "Composes Var_Delta_Mu on the SUM of two branch values. Re-filed from `per-branch-drift` to `per-branch-summed`: its own note says it composes Var_Delta_Mu on the SUM of two branch values, and `per-branch-drift` is defined as the SINGLE-lineage value."
     },
     "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::Var_Delta_Mu": {
       "quantity": "fst",
@@ -1024,7 +1028,7 @@
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
-      "note": "No reading is declared on the definition and none is derivable from its callees."
+      "note": "No reading is declared on the definition and none is derivable from its callees. EXCLUDED FROM THE F-CONVENTION MIGRATION, not migrated: this declaration retires with task #32, so typing its fst slot would be work on a body being deleted."
     },
     "Descent/Portability/PortabilityDrift/PresentDayMetrics.lean::presentDayEqualVarianceGaussianAUC": {
       "quantity": "fst",
@@ -1191,22 +1195,30 @@
     },
     "Descent/Portability/PhenomeWidePortability.lean::cleanSplitFst": {
       "quantity": "fst",
-      "convention": "per-branch-drift",
+      "convention": "per-branch-summed",
       "constants": [],
-      "note": "The SUM of two per-branch Wright F values, one per branch of a clean split. Summing is the composition per-branch indices admit and pairwise ones do not, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu`; a pairwise F_ST here is the substitution that produced a factor-of-four false falsification twice. Being a sum, it is not confined to the unit interval, and `cleanSplitFst_lt_one_iff` states where it stays inside the consuming chart's pole."
+      "note": "The SUM of two per-branch Wright F values, one per branch of a clean split. Summing is the composition per-branch indices admit and pairwise ones do not, which is the convention `expectedSqMeanPGSDiff_pureSplit` feeds `Var_Delta_Mu`; a pairwise F_ST here is the substitution that produced a factor-of-four false falsification twice. Being a sum, it is not confined to the unit interval, and `cleanSplitFst_lt_one_iff` states where it stays inside the consuming chart's pole. Re-filed from `per-branch-drift` to `per-branch-summed`: the SUM of two per-branch values, as its own note and its VALIDATED oracle both state, and `per-branch-drift` is defined as the SINGLE-lineage value."
     },
     "Descent/Portability/PhenomeWidePortability.lean::causalVarianceRatio": {
       "quantity": "fst",
-      "convention": "per-branch-drift",
+      "convention": "per-branch-summed",
       "role": "consumer",
-      "constants": ["1", "1"],
-      "note": "Consumes the SUMMED per-branch F, which is what `cleanSplitFst` returns, because the drift variance separating two contemporary branches accumulates along BOTH of them from their common ancestor. The reading is decided by measurement and not by taste: `1/(1 - 2*F_hudson)` fits at 1.6, 3.1 and 1.7 percent where `1/(1 - F_hudson)` runs 5.6 to 35. A DOUBLED HUDSON VALUE IS STILL NOT ADMISSIBLE as the argument -- the factor relating summed to Hudson is specific to a symmetric split and was measured at 2.23 to 2.40, not the folkloric 2, and the stand-in flatters the fit at depth in one direction. Supply a genuine summed per-branch index."
+      "constants": [
+        "1",
+        "1"
+      ],
+      "note": "Consumes the SUMMED per-branch F, which is what `cleanSplitFst` returns, because the drift variance separating two contemporary branches accumulates along BOTH of them from their common ancestor. The reading is decided by measurement and not by taste: `1/(1 - 2*F_hudson)` fits at 1.6, 3.1 and 1.7 percent where `1/(1 - F_hudson)` runs 5.6 to 35. A DOUBLED HUDSON VALUE IS STILL NOT ADMISSIBLE as the argument -- the factor relating summed to Hudson is specific to a symmetric split and was measured at 2.23 to 2.40, not the folkloric 2, and the stand-in flatters the fit at depth in one direction. Supply a genuine summed per-branch index. Re-filed from `per-branch-drift` to `per-branch-summed`: consumes the summed index; the drift variance accumulates along both branches, and `per-branch-drift` is defined as the SINGLE-lineage value."
     },
     "Descent/Portability/PhenomeWidePortability.lean::effectiveDriftGenerations": {
       "quantity": "fst",
       "convention": "per-branch-drift",
       "role": "consumer",
-      "constants": ["1", "1", "1", "2"],
+      "constants": [
+        "1",
+        "1",
+        "1",
+        "2"
+      ],
       "note": "Inverts `neutralDriftFactor`, a SINGLE-LINEAGE retention, so its `F` argument is the per-branch Wright F measured against the ancestor and not a pairwise Hudson F_ST. The guard cannot see this from the name or the binder -- the argument is called `F` -- which is the reason for the entry: a caller handing it a pairwise value gets a generation count for a history that was never measured. The pinned `2` is the ploidy in `1/(2*Ne)`; a `4` there is the scaled-rate convention of the identity-probability family and would halve the implied generation count.",
       "source": "Wright-Fisher per-generation non-coalescence, as carried by `neutralDriftFactor`."
     },
@@ -1221,7 +1233,7 @@
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",
-      "note": "Carries the `fstGap` slot of `ldCorrelationDecay` over unchanged, and inherits its undetermined reading with it: no reading is declared on that definition and none is derivable from its callees, so a candidate written at its signature cannot declare one either. The divergence factor is measured as a SHAPE -- the decay rate tracks the square root of the gap at 2.42 sems against 4.73 for the un-rooted rival -- and a shape measurement does not pin which F_ST estimator the gap is. Naming the reading is work the battery racing this candidate against the falsified body should settle, not work this entry can do."
+      "note": "Carries the `fstGap` slot of `ldCorrelationDecay` over unchanged, and inherits its undetermined reading with it: no reading is declared on that definition and none is derivable from its callees, so a candidate written at its signature cannot declare one either. The divergence factor is measured as a SHAPE -- the decay rate tracks the square root of the gap at 2.42 sems against 4.73 for the un-rooted rival -- and a shape measurement does not pin which F_ST estimator the gap is. Naming the reading is work the battery racing this candidate against the falsified body should settle, not work this entry can do. EXCLUDED FROM THE F-CONVENTION MIGRATION, not migrated: this declaration retires with task #32, so typing its fst slot would be work on a body being deleted."
     }
   }
 }
