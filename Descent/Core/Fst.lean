@@ -813,6 +813,39 @@ estimator returns 0 and the comparison goes degenerate. -/
 noncomputable def hudsonFst (p₁ p₂ : ℝ) : ℝ :=
   (p₁ - p₂) ^ 2 / (p₁ * (1 - p₂) + p₂ * (1 - p₁))
 
+/-! ### Bhatia's finite-sample ratio-of-sums constructor -/
+
+/-- One biallelic locus for the finite-sample Hudson estimator.  The haploid sample sizes
+carry `1 < n` in their type because the unbiased corrections divide by `n - 1`. -/
+structure BhatiaHudsonLocus where
+  pSource : ℝ
+  pTarget : ℝ
+  sourceHaplotypes : ℕ
+  targetHaplotypes : ℕ
+  sourceHaplotypes_gt_one : 1 < sourceHaplotypes
+  targetHaplotypes_gt_one : 1 < targetHaplotypes
+
+/-- The sample-corrected Hudson numerator at one locus (Bhatia et al. 2013, eqs. 6--10). -/
+noncomputable def BhatiaHudsonLocus.numerator (locus : BhatiaHudsonLocus) : ℝ :=
+  (locus.pSource - locus.pTarget) ^ 2 -
+    locus.pSource * (1 - locus.pSource) / (locus.sourceHaplotypes - 1) -
+    locus.pTarget * (1 - locus.pTarget) / (locus.targetHaplotypes - 1)
+
+/-- The between-population heterozygosity denominator at one locus. -/
+noncomputable def BhatiaHudsonLocus.denominator (locus : BhatiaHudsonLocus) : ℝ :=
+  locus.pSource * (1 - locus.pTarget) + locus.pTarget * (1 - locus.pSource)
+
+/-- The Bhatia/Hudson multilocus estimator is a ratio of sums, never a mean of per-locus
+ratios.  It is a distinct typed estimator, not another spelling of parametric Hudson `F_ST`. -/
+noncomputable def bhatiaHudsonRatioOfSums {L : ℕ}
+    (locus : Fin L → BhatiaHudsonLocus) : ℝ :=
+  (∑ ell, (locus ell).numerator) / (∑ ell, (locus ell).denominator)
+
+/-- At a single locus the aggregate constructor is exactly numerator over denominator. -/
+theorem bhatiaHudsonRatioOfSums_one (locus : Fin 1 → BhatiaHudsonLocus) :
+    bhatiaHudsonRatioOfSums locus = (locus 0).numerator / (locus 0).denominator := by
+  simp [bhatiaHudsonRatioOfSums]
+
 /-- **hudsonFst where its denominator vanishes, named.** The guard `p₁ * (1 - p₂) + p₂ * (1 - p₁)`
 is zero at `p₁ = 0`, `p₂ = 0`. Two populations both fixed for the reference allele have no
 polymorphism to partition. Lean returns `0` there rather than the value the modelled quantity

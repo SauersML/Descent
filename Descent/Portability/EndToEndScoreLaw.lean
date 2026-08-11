@@ -223,6 +223,12 @@ noncomputable def DemeScoreLaw.orPerSD (law : DemeScoreLaw) : ℝ :=
 noncomputable def DemeScoreLaw.brier (law : DemeScoreLaw) : ℝ :=
   PopGen.liabilityBrierExact law.prevalence law.r2True
 
+/-- C3: Brier skill against an explicitly supplied reference risk.  The reference is an
+argument because its definition belongs to the comparison instance, not to the metric law. -/
+noncomputable def DemeScoreLaw.brierSkill
+    (law : DemeScoreLaw) (referenceBrier : ℝ) : ℝ :=
+  1 - law.brier / referenceBrier
+
 /-! ## D. Calibration and the phenotype ladder -/
 
 /-- D1--D2: identity-scale per-deme calibration from the score mean, observed outcome mean,

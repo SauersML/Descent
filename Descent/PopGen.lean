@@ -15,6 +15,7 @@ import Descent.PopGen.GeneEnvironmentInterplay
 import Descent.PopGen.GeneticArchitectureDiscovery
 import Descent.PopGen.HaplotypeTheory
 import Descent.PopGen.LDDecayTheory
+import Descent.PopGen.MigrationCorrespondence
 import Descent.PopGen.PolygenicAdaptation
 import Descent.PopGen.PolygenicArchitecture
 import Descent.PopGen.PopulationGeneticsFoundations
