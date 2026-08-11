@@ -1489,7 +1489,7 @@ them — and the corpus can write a single composed number for it. A MIGRATION-C
 cannot be written that way, and the reason is a measurement rather than a gap in effort.
 
 Two effects run in opposite directions along such a chain. Drift and limited migration push
-`F_ST` up with distance, which `steppingStoneFst` describes and which costs transported `R²`.
+`F_ST` up with distance, which `steppingStoneFstGeneral` describes and which costs transported `R²`.
 Ongoing gene flow also RESTORES shared linkage disequilibrium between demes, which recovers
 some of what the LD stage takes away. The first effect has a validated body. The second does
 not: `DGP.migrationLDBoost` is the corpus's only candidate and `simcov/battery_bulk55.py`
@@ -1619,7 +1619,7 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     could take for a measured restoration when none survives measurement.
 
     Empirical status: UNTESTED. The stages carry their own verdicts and the join does not.
-    `steppingStoneFst`'s saturating body is VALIDATED head to head at worst 1.87 sems with a
+    `steppingStoneFstGeneral`'s saturating body is VALIDATED head to head at worst 1.87 sems with a
     free parameter withheld, the linear form FALSIFIED at 10.38 sems; `neutralPortability` is
     VALIDATED at worst 1.70 sems with the linear `1 - 2·fst` form FALSIFIED at 101 sems on the
     same cells. What is untested is that a stepping-stone `F_ST` is the argument
@@ -1696,17 +1696,17 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
 
     The control is a split at `t = 1`, one population, where the cross-deme LD correlation
     must be 1: measured 0.995290 ± 0.002158. -/
-noncomputable def steppingStonePortability (r2_0 f1 α : ℝ) (d : ℕ) : ℝ :=
-  neutralPortability r2_0 (steppingStoneFst f1 α d)
+noncomputable def steppingStonePortability (r2_0 f1 : ℝ) (d : ℕ) : ℝ :=
+  neutralPortability r2_0 (steppingStoneFst f1 d)
 
 /-- **At zero separation the chain transports the source `R²` whole.** The deme compared with
     itself has no differentiation, and `neutralPortability` at index zero is the identity, so
     the composed law reduces to its own input with no hypotheses at all. A body that returned
     anything else here would be charging a transport penalty for not transporting. -/
-theorem steppingStonePortability_at_zero_distance (r2_0 f1 α : ℝ) :
-    steppingStonePortability r2_0 f1 α 0 = r2_0 := by
-  unfold steppingStonePortability neutralPortability
-  rw [steppingStoneFst_at_zero]
+theorem steppingStonePortability_at_zero_distance (r2_0 f1 : ℝ) :
+    steppingStonePortability r2_0 f1 0 = r2_0 := by
+  unfold steppingStonePortability neutralPortability steppingStoneFst
+  rw [steppingStoneFstGeneral_at_zero]
   have hden : (1 - (0 : ℝ)) * r2_0 + (1 - r2_0) = 1 := by ring
   rw [hden, div_one]
   ring
@@ -1714,37 +1714,38 @@ theorem steppingStonePortability_at_zero_distance (r2_0 f1 α : ℝ) :
 /-- **The upper bound is a nonnegative `R²`.** Needed before anything may be multiplied into
     it: the bracket's lower end is this quantity scaled down, and scaling down is only a lower
     bound when what is scaled is nonnegative. -/
-theorem steppingStonePortability_nonneg (r2_0 f1 α : ℝ) (d : ℕ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α) :
-    0 ≤ steppingStonePortability r2_0 f1 α d := by
-  unfold steppingStonePortability
+theorem steppingStonePortability_nonneg (r2_0 f1 : ℝ) (d : ℕ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) :
+    0 ≤ steppingStonePortability r2_0 f1 d := by
+  unfold steppingStonePortability steppingStoneFst
   rcases Nat.eq_zero_or_pos d with rfl | hpos
-  · rw [steppingStoneFst_at_zero]
+  · rw [steppingStoneFstGeneral_at_zero]
     exact neutralPortability_nonneg r2_0 0 hr2 hr2' (by norm_num)
   · exact neutralPortability_nonneg r2_0 _ hr2 hr2'
-      (steppingStoneFst_le_one f1 α d hf hf'.le hα.le hpos)
+      (steppingStoneFstGeneral_le_one f1 1 d hf hf'.le zero_le_one hpos)
 
-/-- **Portability falls off along the chain.** Two monotonicities composed: `steppingStoneFst`
-    rises with separation and `neutralPortability` falls with the index it is given. Stated
+/-- **Portability falls off along the chain.** Two monotonicities composed:
+    `steppingStoneFst` rises with separation and `neutralPortability` falls with the index it
+    is given. Stated
     from separation zero rather than one, so the source deme itself is inside the range and
     the fall-off is anchored at `steppingStonePortability_at_zero_distance`. -/
-theorem steppingStonePortability_antitone_distance (r2_0 f1 α : ℝ) (d₁ d₂ : ℕ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+theorem steppingStonePortability_antitone_distance (r2_0 f1 : ℝ) (d₁ d₂ : ℕ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1)
     (hd : d₁ ≤ d₂) :
-    steppingStonePortability r2_0 f1 α d₂ ≤ steppingStonePortability r2_0 f1 α d₁ := by
-  unfold steppingStonePortability
+    steppingStonePortability r2_0 f1 d₂ ≤ steppingStonePortability r2_0 f1 d₁ := by
+  unfold steppingStonePortability steppingStoneFst
   rcases Nat.eq_zero_or_pos d₂ with rfl | hpos
   · rw [Nat.le_zero.mp hd]
-  · have hlt1 : steppingStoneFst f1 α d₂ < 1 :=
-      steppingStoneFst_lt_one f1 α d₂ hf hf' hα hpos
-    have hnn : 0 ≤ steppingStoneFst f1 α d₁ := by
+  · have hlt1 : steppingStoneFstGeneral f1 1 d₂ < 1 :=
+      steppingStoneFstGeneral_lt_one f1 1 d₂ hf hf' one_pos hpos
+    have hnn : 0 ≤ steppingStoneFstGeneral f1 1 d₁ := by
       rcases Nat.eq_zero_or_pos d₁ with rfl | hpos₁
-      · exact (steppingStoneFst_at_zero f1 α).ge
-      · exact steppingStoneFst_nonneg f1 α d₁ hf hf'.le hα.le hpos₁
-    have hmono : steppingStoneFst f1 α d₁ ≤ steppingStoneFst f1 α d₂ := by
+      · exact (steppingStoneFstGeneral_at_zero f1 1).ge
+      · exact steppingStoneFstGeneral_nonneg f1 1 d₁ hf hf'.le zero_le_one hpos₁
+    have hmono : steppingStoneFstGeneral f1 1 d₁ ≤ steppingStoneFstGeneral f1 1 d₂ := by
       rcases eq_or_lt_of_le hd with rfl | h
       · exact le_rfl
-      · exact (steppingStoneFst_increases_with_distance f1 α d₁ d₂ hf hf' hα h).le
+      · exact (steppingStoneFstGeneral_increases_with_distance f1 1 d₁ d₂ hf hf' one_pos h).le
     exact neutralPortability_antitone_fst r2_0 _ _ hr2 hr2' hnn hmono hlt1
 
 /-- **The bracket contains every intermediate restoration.** If the true multiplicative LD
@@ -1758,27 +1759,27 @@ theorem steppingStonePortability_antitone_distance (r2_0 f1 α : ℝ) (d₁ d₂
     `simcov/battery_bulk55.py`, which is what leaves the width open. Supplying the point is
     the outstanding empirical derivation, and the hypothesis `ldLoss ≤ ldFactor ≤ 1` is the
     whole of what may be assumed about it without one. -/
-theorem steppingStonePortability_mem_bracket (r2_0 f1 α : ℝ) (d : ℕ) (ldLoss ldFactor : ℝ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+theorem steppingStonePortability_mem_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss ldFactor : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1)
     (hlow : ldLoss ≤ ldFactor) (hhigh : ldFactor ≤ 1) :
-    steppingStonePortability r2_0 f1 α d * ldLoss
-        ≤ steppingStonePortability r2_0 f1 α d * ldFactor ∧
-      steppingStonePortability r2_0 f1 α d * ldFactor
-        ≤ steppingStonePortability r2_0 f1 α d := by
-  have hnn := steppingStonePortability_nonneg r2_0 f1 α d hr2 hr2' hf hf' hα
+    steppingStonePortability r2_0 f1 d * ldLoss
+        ≤ steppingStonePortability r2_0 f1 d * ldFactor ∧
+      steppingStonePortability r2_0 f1 d * ldFactor
+        ≤ steppingStonePortability r2_0 f1 d := by
+  have hnn := steppingStonePortability_nonneg r2_0 f1 d hr2 hr2' hf hf'
   exact ⟨mul_le_mul_of_nonneg_left hlow hnn, mul_le_of_le_one_right hnn hhigh⟩
 
 /-- **The bracket is a nonempty interval of nonnegative `R²`.** The lower end is at or above
     zero and at or below the upper end, for any LD retention in `[0, 1]`. Stated separately
     from the membership theorem because a consumer plotting the band needs the endpoints to be
     ordered and in range before it needs to know what lies between them. -/
-theorem steppingStonePortability_bracket (r2_0 f1 α : ℝ) (d : ℕ) (ldLoss : ℝ)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1) (hα : 0 < α)
+theorem steppingStonePortability_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss : ℝ)
+    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1)
     (hld0 : 0 ≤ ldLoss) (hld1 : ldLoss ≤ 1) :
-    0 ≤ steppingStonePortability r2_0 f1 α d * ldLoss ∧
-      steppingStonePortability r2_0 f1 α d * ldLoss
-        ≤ steppingStonePortability r2_0 f1 α d := by
-  have hnn := steppingStonePortability_nonneg r2_0 f1 α d hr2 hr2' hf hf' hα
+    0 ≤ steppingStonePortability r2_0 f1 d * ldLoss ∧
+      steppingStonePortability r2_0 f1 d * ldLoss
+        ≤ steppingStonePortability r2_0 f1 d := by
+  have hnn := steppingStonePortability_nonneg r2_0 f1 d hr2 hr2' hf hf'
   exact ⟨mul_nonneg hnn hld0, mul_le_of_le_one_right hnn hld1⟩
 
 end MigrationChainBracket

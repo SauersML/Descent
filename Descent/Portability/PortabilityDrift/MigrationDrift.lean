@@ -396,10 +396,11 @@ theorem splitMigration_more_migration_less_fst
     `min 1 (Fst_neighbor × (1 + α × (d - 1)))`, linear in the separation and held inside
     `[0,1]` by an outer clamp. That form is FALSIFIED and the saturating one is measured;
     the evidence is below. Two theorems changed with it:
-    `steppingStoneFst_eq_one_of_saturated` is gone, replaced by `steppingStoneFst_lt_one`
+    `steppingStoneFstGeneral_eq_one_of_saturated` is gone, replaced by
+    `steppingStoneFstGeneral_lt_one`
     which says the opposite, because a saturating form approaches complete
     differentiation without ever attaining it at finite separation; and
-    `steppingStoneFst_increases_with_distance` no longer needs a below-saturation
+    `steppingStoneFstGeneral_increases_with_distance` no longer needs a below-saturation
     hypothesis, since `d/(d+K)` rises at every separation while the clamped linear form
     stopped rising once it hit the clamp.
 
@@ -407,7 +408,7 @@ theorem splitMigration_more_migration_less_fst
     `[0, 1]`; the bare linear form returns `10000` at
     `fst_neighbor = 1, α = 1, d = 10000`, which is not a value the quantity can
     take. Clamping also makes the fixation boundary attainable rather than
-    merely approached: `steppingStoneFst_eq_one_of_saturated` exhibits the
+    merely approached: `steppingStoneFstGeneral_eq_one_of_saturated` exhibits the
     regime where distant demes are completely differentiated, which is the
     physically correct behaviour of isolation by distance at long range.
 
@@ -490,18 +491,53 @@ theorem splitMigration_more_migration_less_fst
     lattice realisation with different seeds and 26 replicates of 6 Mb, so the finding
     does not rest on one run.
 -/
-noncomputable def steppingStoneFst (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
+noncomputable def steppingStoneFstGeneral (fst_neighbor α : ℝ) (d : ℕ) : ℝ :=
   (d : ℝ) * fst_neighbor / (fst_neighbor * (d : ℝ) + α * (1 - fst_neighbor))
+
+/-- **Stepping-stone `F_ST` at the measured shape coefficient**, `α = 1`.
+
+`steppingStoneFstGeneral` carries `α` because the saturating form admits one; this is the
+value the measurement picks, and it is picked with NO free parameter to spend. Every current
+caller uses this body: nothing in the corpus supplies an `α ≠ 1`, and a coefficient no caller
+varies is a free parameter in the signature and a constant in fact.
+
+    Empirical status: **VALIDATED at `α = 1`, and approximate at depth**
+    (`validation/empirical/simcov/battery_bulk17.py`, reproduced on separate seeds and a
+    separate lattice realisation by `battery_bulk11.py`). A 20-deme 1D stepping stone,
+    `Nₑ = 500`, `m = 0.01`, interior demes only, `F_ST` from coalescence times, 22 replicates
+    of 4 Mb. The comparison was stacked AGAINST this body: the rival linear form was given a
+    free `α` fitted at `d = 2`, this one was given nothing but `F(1)`.
+
+      d    measured F_ST        linear (free α)        this body (no free parameter)
+      3    0.12319 ± 0.00570    0.13869  (2.72 sems)   0.13357  (1.82 sems)
+      5    0.20518 ± 0.00574    0.22850  (4.06 sems)   0.20441  (0.13 sems)
+      8    0.27555 ± 0.00845    0.36322 (10.38 sems)   0.29132  (1.87 sems)
+
+    The linear form is FALSIFIED at 10.38 sems and 31.8% relative with a fitted parameter in
+    hand; this one matches at 1.87 sems with none.
+
+    PINNING `α` IS NOT AN ALL-DISTANCE VALIDATION, and the two claims must not be run
+    together. `α = 1` is the right coefficient AND the body is approximate at depth: at
+    `d = 9` the chart returns 0.255 against an exact 0.193. So the shape coefficient is
+    settled and the `d`-dependence at large separation is not, which is the same residual
+    drift in `K = d(1-F)/F` that `battery_bulk11` reports. -/
+noncomputable def steppingStoneFst (fst_neighbor : ℝ) (d : ℕ) : ℝ :=
+  steppingStoneFstGeneral fst_neighbor 1 d
+
+/-- **The pinned body is the general one at the measured coefficient**, stated so that the
+general lemmas apply to it by rewriting rather than by unfolding a definition. -/
+theorem steppingStoneFst_eq_general (fst_neighbor : ℝ) (d : ℕ) :
+    steppingStoneFst fst_neighbor d = steppingStoneFstGeneral fst_neighbor 1 d := rfl
 
 /-- **Stepping-stone Fst never leaves the unit interval.** The saturating body needs no
 clamp to achieve this: the denominator exceeds the numerator by `α (1 - fst_neighbor)`,
 which is nonnegative exactly when the neighbour value is itself a valid `F_ST`. The
 previous linear body returned `10000` at `fst_neighbor = 1, α = 1, d = 10000` and was
 held in range by an outer `min`; the range is now a consequence of the form. -/
-theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ)
+theorem steppingStoneFstGeneral_le_one (fst_neighbor α : ℝ) (d : ℕ)
     (hfst : 0 < fst_neighbor) (hle : fst_neighbor ≤ 1) (hα : 0 ≤ α) (hd : 1 ≤ d) :
-    steppingStoneFst fst_neighbor α d ≤ 1 := by
-  unfold steppingStoneFst
+    steppingStoneFstGeneral fst_neighbor α d ≤ 1 := by
+  unfold steppingStoneFstGeneral
   have hd1 : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
   have hnum : 0 < fst_neighbor * (d : ℝ) := by nlinarith
   have hextra : 0 ≤ α * (1 - fst_neighbor) := mul_nonneg hα (by linarith)
@@ -509,17 +545,17 @@ theorem steppingStoneFst_le_one (fst_neighbor α : ℝ) (d : ℕ)
   nlinarith
 
 /-- **The fixation boundary is approached and never attained.** This REPLACES
-`steppingStoneFst_eq_one_of_saturated`, which said the opposite, and the replacement is
+`steppingStoneFstGeneral_eq_one_of_saturated`, which said the opposite, and the replacement is
 forced by the measurement rather than chosen for elegance. The linear body reached `1` at
 finite separation and the clamp then held it there, so complete differentiation was
 attainable at a finite number of steps. A saturating form cannot do that: with `α (1 - fst_neighbor)
 > 0` the value is strictly below one at every finite `d` and tends to
 one only as `d → ∞`, which is the correct behaviour of isolation by distance -- demes an
 arbitrary but finite distance apart still share ancestry. -/
-theorem steppingStoneFst_lt_one (fst_neighbor α : ℝ) (d : ℕ)
+theorem steppingStoneFstGeneral_lt_one (fst_neighbor α : ℝ) (d : ℕ)
     (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : 1 ≤ d) :
-    steppingStoneFst fst_neighbor α d < 1 := by
-  unfold steppingStoneFst
+    steppingStoneFstGeneral fst_neighbor α d < 1 := by
+  unfold steppingStoneFstGeneral
   have hd1 : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
   have hnum : 0 < fst_neighbor * (d : ℝ) := by nlinarith
   have hextra : 0 < α * (1 - fst_neighbor) := mul_pos hα (by linarith)
@@ -531,23 +567,24 @@ and the saturating body gives it with no hypotheses at all: the numerator carrie
 factor `d` and vanishes, so even the degenerate parameter settings that make the
 denominator zero return Lean's `0`, which is the right answer here rather than a junk one.
 
-This is the anchor the range lemmas above cannot supply. `steppingStoneFst_le_one`,
-`steppingStoneFst_lt_one` and `steppingStoneFst_nonneg` all require `1 ≤ d`, which is the
+This is the anchor the range lemmas above cannot supply. `steppingStoneFstGeneral_le_one`,
+`steppingStoneFstGeneral_lt_one` and `steppingStoneFstGeneral_nonneg` all require `1 ≤ d`,
+which is the
 correct hypothesis for them — their proofs need the numerator to be positive — and it
 excludes the source deme itself. A composed law that starts at zero distance and walks
 outward needs the `d = 0` end, and gets it here. -/
-theorem steppingStoneFst_at_zero (fst_neighbor α : ℝ) :
-    steppingStoneFst fst_neighbor α 0 = 0 := by
-  unfold steppingStoneFst
+theorem steppingStoneFstGeneral_at_zero (fst_neighbor α : ℝ) :
+    steppingStoneFstGeneral fst_neighbor α 0 = 0 := by
+  unfold steppingStoneFstGeneral
   norm_num
 
 /-- Stepping-stone Fst at distance 1 equals the neighbor Fst. At `α = 1` the
 characteristic scale is `(1 - fst_neighbor)/fst_neighbor` and the form reproduces its own
 anchor; `α` rescales that length, so it is the unit of distance rather than a per-step
 increment as it was under the linear body. -/
-theorem steppingStoneFst_at_one (fst_neighbor : ℝ) :
-    steppingStoneFst fst_neighbor 1 1 = fst_neighbor := by
-  unfold steppingStoneFst
+theorem steppingStoneFstGeneral_at_one (fst_neighbor : ℝ) :
+    steppingStoneFstGeneral fst_neighbor 1 1 = fst_neighbor := by
+  unfold steppingStoneFstGeneral
   have hden : fst_neighbor * ((1 : ℕ) : ℝ) + 1 * (1 - fst_neighbor) = 1 := by
     push_cast; ring
   rw [hden, div_one]
@@ -558,11 +595,11 @@ theorem steppingStoneFst_at_one (fst_neighbor : ℝ) :
     strictly increasing in `d` for every positive `K`, at every separation. The linear
     body required the caller to certify it had not yet hit the clamp, and above the clamp
     the increase stopped altogether. -/
-theorem steppingStoneFst_increases_with_distance
+theorem steppingStoneFstGeneral_increases_with_distance
     (fst_neighbor α : ℝ) (d₁ d₂ : ℕ)
     (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : d₁ < d₂) :
-    steppingStoneFst fst_neighbor α d₁ < steppingStoneFst fst_neighbor α d₂ := by
-  unfold steppingStoneFst
+    steppingStoneFstGeneral fst_neighbor α d₁ < steppingStoneFstGeneral fst_neighbor α d₂ := by
+  unfold steppingStoneFstGeneral
   have hd_real : (d₁ : ℝ) < (d₂ : ℝ) := Nat.cast_lt.mpr hd
   have hd₁ : (0 : ℝ) ≤ (d₁ : ℝ) := Nat.cast_nonneg _
   have hK : 0 < α * (1 - fst_neighbor) := mul_pos hα (by linarith)
@@ -576,17 +613,17 @@ theorem steppingStoneFst_increases_with_distance
 
 /-- **Nearby demes have lower Fst than distant demes.**
     Fst(1) < Fst(d) for d > 1 under the stepping-stone model, at every separation. -/
-theorem steppingStoneFst_neighbor_lt_distant
+theorem steppingStoneFstGeneral_neighbor_lt_distant
     (fst_neighbor α : ℝ) (d : ℕ)
     (hfst : 0 < fst_neighbor) (hlt : fst_neighbor < 1) (hα : 0 < α) (hd : 1 < d) :
-    steppingStoneFst fst_neighbor α 1 < steppingStoneFst fst_neighbor α d :=
-  steppingStoneFst_increases_with_distance fst_neighbor α 1 d hfst hlt hα hd
+    steppingStoneFstGeneral fst_neighbor α 1 < steppingStoneFstGeneral fst_neighbor α d :=
+  steppingStoneFstGeneral_increases_with_distance fst_neighbor α 1 d hfst hlt hα hd
 
 /-- **Stepping-stone Fst is nonneg for valid parameters.** -/
-theorem steppingStoneFst_nonneg (fst_neighbor α : ℝ) (d : ℕ)
+theorem steppingStoneFstGeneral_nonneg (fst_neighbor α : ℝ) (d : ℕ)
     (hfst : 0 < fst_neighbor) (hle : fst_neighbor ≤ 1) (hα : 0 ≤ α) (hd : 1 ≤ d) :
-    0 ≤ steppingStoneFst fst_neighbor α d := by
-  unfold steppingStoneFst
+    0 ≤ steppingStoneFstGeneral fst_neighbor α d := by
+  unfold steppingStoneFstGeneral
   have hd1 : (1 : ℝ) ≤ (d : ℝ) := Nat.one_le_cast.mpr hd
   have hextra : 0 ≤ α * (1 - fst_neighbor) := mul_nonneg hα (by linarith)
   apply div_nonneg (by nlinarith) (by nlinarith)

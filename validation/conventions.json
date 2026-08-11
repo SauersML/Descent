@@ -918,10 +918,19 @@
         "4"
       ]
     },
+    "Descent/Portability/PortabilityDrift/MigrationDrift.lean::steppingStoneFstGeneral": {
+      "quantity": "fst",
+      "convention": "inherited",
+      "note": "Takes `fst_neighbor` and returns a distance-`d` value in whatever convention that was. The shape coefficient `alpha` is a free argument here; no caller varies it, and the value measurement picks is pinned at the sibling `steppingStoneFst`."
+    },
     "Descent/Portability/PortabilityDrift/MigrationDrift.lean::steppingStoneFst": {
       "quantity": "fst",
       "convention": "inherited",
-      "note": "Takes `fst_neighbor` and returns a distance-`d` value in whatever convention that was."
+      "constants": [
+        "1"
+      ],
+      "role": "consumer",
+      "note": "The 1 is the shape coefficient of `steppingStoneFstGeneral`, pinned by measurement rather than fitted: on battery_bulk17 this form matches at worst 1.87 sems with no free parameter while the linear rival is falsified at 10.38 with one, reproduced on separate seeds by battery_bulk11. The convention is still whatever `fst_neighbor` arrives in."
     },
     "Descent/Portability/PortabilityDrift/MigrationDriftRecurrence.lean::fstMigDriftNext": {
       "quantity": "fst",
