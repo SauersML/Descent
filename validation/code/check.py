@@ -7774,13 +7774,6 @@ LAYER_UNRANKED = {
 # repair that retires it.  Keys are `(importer, imported)` module names.  Every entry
 # still counts as a violation; see the section header.
 LAYER_PENDING = {
-    ("Descent.PopGen.DemographicCapacity",
-     "Descent.Portability.PCCorrectability.ImitationCapacity"):
-        "`traceWindowBudgetClass`, `imitable_within_traceWindowBudget`, "
-        "`pcCorrectabilityMargin` and `demographicSpike`. These ARE about correcting a "
-        "score across populations and are correctly placed; the file states a PopGen "
-        "capacity theorem in terms of them, so the consumer moves UP rather than the "
-        "definitions moving down.",
     ("Descent.PopGen.GeneticArchitectureDiscovery",
      "Descent.Portability.MechanisticPortabilityWitnesses"):
         "`mechanisticPortabilityRatio` and `sigmaTagCausalSourceAt` ARE about "

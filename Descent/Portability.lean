@@ -26,6 +26,7 @@ import Descent.Portability.MetricSpecificPortability.SharedCorrectionFamily
 import Descent.Portability.MultiAncestryTheory
 import Descent.Portability.PCCorrectability
 import Descent.Portability.PCCorrectability.Core
+import Descent.Portability.PCCorrectability.DemographicCapacity
 import Descent.Portability.PCCorrectability.Design
 import Descent.Portability.PCCorrectability.Diagnostic
 import Descent.Portability.PCCorrectability.EndToEnd
