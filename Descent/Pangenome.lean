@@ -37,6 +37,7 @@ import Descent.Pangenome.PanelGraph
 import Descent.Pangenome.Presentation
 import Descent.Pangenome.Register
 import Descent.Pangenome.Strand
+import Descent.Pangenome.TripleGluing
 import Descent.Pangenome.Symmetry
 
 /-!
@@ -62,8 +63,8 @@ that states a theorem is a module pretending to be a table of contents.
 ## What is under it
 
 The organising spine is one pipeline.  `Chart` puts genomic anchors and mass on the canonical
-`PartialSymmetry.FinitePartialBijection` maps, then quotients representatives through the shared
-`PartialSymmetry.GroupoidPresentation` engine to obtain an exact Mathlib groupoid.
+`Descent.Core.FinitePartialBijection` maps, then quotients representatives through the shared
+`Descent.Core.GroupoidPresentation` engine to obtain an exact Mathlib groupoid.
 `HomologyGroupoid` propositionally truncates that SAME groupoid to `Presentation`; it defines no
 second groupoid.  For a fixed panel, presentation objects are surjective coordinate maps and
 arrows are commuting coarsenings.  Isomorphism is exactly equality of the induced homology
@@ -91,8 +92,8 @@ Its categorical coarsening arrows therefore control linkage loss, transit defici
 in `θ` through one refinement order rather than through parallel notions of graph change.
 
 `Symmetry` introduces no parallel symmetry structure: global chart symmetries are the shared
-`PartialSymmetry.FiniteGroupoid.Bisection`, and the existing bisection theorem identifies them
-with the existing `PartialSymmetry.Wreath` whenever the chart groupoid is connected.  Thus local
+`Descent.Core.FiniteGroupoid.Bisection`, and the existing bisection theorem identifies them
+with the existing `Descent.Core.Wreath` whenever the chart groupoid is connected.  Thus local
 isotropy, exchange of equivalent charts, and finite partial correspondences all live in the same
 exact groupoid before coarse truncation.
 -/
