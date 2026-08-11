@@ -844,6 +844,37 @@ structure BhatiaHudsonPanel (L : ℕ) where
   locus : Fin L → BhatiaHudsonLocus
   denominator_sum_pos : 0 < ∑ ell, (locus ell).denominator
 
+/-- **The locus class is inhabited.**  A theorem quantified over an uninhabited structure is
+true and empty: kernel-checked, clean axiom report, no content.  The two frequency bounds and
+the two `1 < n` conditions are jointly satisfiable, and this exhibits a locus satisfying all
+four so that everything stated about `BhatiaHudsonLocus` is a statement about something.  The
+sample sizes are 100 rather than 2 because `n - 1` is the unbiased correction's divisor and a
+witness sitting at the smallest admissible `n` would make that correction the whole numerator,
+which is a degenerate example of a general construction. -/
+noncomputable def BhatiaHudsonLocus.witness : BhatiaHudsonLocus where
+  pSource := 1 / 2
+  pTarget := 1 / 4
+  pSource_nonnegative := by norm_num
+  pSource_le_one := by norm_num
+  pTarget_nonnegative := by norm_num
+  pTarget_le_one := by norm_num
+  sourceHaplotypes := 100
+  targetHaplotypes := 100
+  sourceHaplotypes_gt_one := by norm_num
+  targetHaplotypes_gt_one := by norm_num
+
+/-- **The panel class is inhabited, and at a genuinely positive denominator.**  The panel's one
+hypothesis is the one that cannot be discharged locus by locus -- a sum of per-locus
+denominators is positive only if the panel is not everywhere fixed -- so a witness has to
+exhibit the sum, not just the loci.  At `BhatiaHudsonLocus.witness` the denominator is
+`(1/2)(3/4) + (1/4)(1/2) = 1/2`, and a one-locus panel of it therefore satisfies the
+condition. -/
+noncomputable def BhatiaHudsonPanel.witness : BhatiaHudsonPanel 1 where
+  locus := fun _ ↦ BhatiaHudsonLocus.witness
+  denominator_sum_pos := by
+    simp [BhatiaHudsonLocus.denominator, BhatiaHudsonLocus.witness]
+    norm_num
+
 /-- The Bhatia/Hudson multilocus estimator is a ratio of sums, never a mean of per-locus
 ratios.  It is a distinct typed estimator, not another spelling of parametric Hudson `F_ST`. -/
 noncomputable def bhatiaHudsonRatioOfSums {L : ℕ}
