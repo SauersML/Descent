@@ -233,12 +233,12 @@ whole of the generalisation, and it is what the superseded spelling got wrong --
 `1/(1 + θ + 2 · bigM)` is this body at `mTot = bigM/(2 Nₑ)`, which is `2m`, which is right for
 a two-neighbour deme and for no other.
 
-    Assumes: `mTot` is the row sum for an INTERIOR deme. A boundary deme has fewer neighbours
+    Regime: `mTot` is the row sum for an INTERIOR deme. A boundary deme has fewer neighbours
     and a reflecting edge, and is outside this law's reach -- measured up to 16% high there.
     This is the same kind of hypothesis the stepping-stone range lemmas carry when they require
     a separation of at least one.
 
-    Assumes: an UNBOUNDED habitat. This body's level is the many-deme limit, and a habitat of
+    Regime: an UNBOUNDED habitat. This body's level is the many-deme limit, and a habitat of
     `D` demes sits strictly below it. On a vertex-transitive habitat -- ring, torus, any
     symmetric migration graph whose automorphisms act transitively -- the exact equilibrium
     neighbour level carries a factor `D/(D-1)` on the total flow, `1/(1 + 4·Nₑ·mTot·D/(D-1))`,

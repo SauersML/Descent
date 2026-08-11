@@ -137,7 +137,7 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     with its own row sum; reading this coordinate there is a scope error, not a
     numerical approximation.
 
-    Assumes: an interior deme with two neighbours. Boundary demes are outside
+    Regime: an interior deme with two neighbours. Boundary demes are outside
     the general law's reach as well, measured up to 16% high.
 
     The half-life design that validated the decay base does NOT bear on the
